@@ -50,10 +50,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadPaletteReaction : public pqReaction
 
 public:
   pqLoadPaletteReaction(QAction* parent = 0);
-  virtual ~pqLoadPaletteReaction();
+  ~pqLoadPaletteReaction() override;
 
 protected:
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
 private slots:
   void populateMenu();

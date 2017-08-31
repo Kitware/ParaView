@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStatusBar : public QStatusBar
 
 public:
   pqStatusBar(QWidget* parent = 0);
-  virtual ~pqStatusBar();
+  ~pqStatusBar() override;
 
 private:
   Q_DISABLE_COPY(pqStatusBar)

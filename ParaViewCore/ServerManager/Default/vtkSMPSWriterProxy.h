@@ -36,7 +36,7 @@ public:
 
 protected:
   vtkSMPSWriterProxy();
-  ~vtkSMPSWriterProxy();
+  ~vtkSMPSWriterProxy() override;
 
 private:
   vtkSMPSWriterProxy(const vtkSMPSWriterProxy&) VTK_DELETE_FUNCTION;

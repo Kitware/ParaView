@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqTriggerOnIdleHelper : public QObject
 
 public:
   pqTriggerOnIdleHelper(QObject* parent = 0);
-  virtual ~pqTriggerOnIdleHelper();
+  ~pqTriggerOnIdleHelper() override;
 
   /**
   * get the server

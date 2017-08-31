@@ -94,7 +94,7 @@ public:
 
 protected:
   vtkSMSelectionHelper(){};
-  ~vtkSMSelectionHelper(){};
+  ~vtkSMSelectionHelper() override{};
 
   static void ConvertSurfaceSelectionToVolumeSelectionInternal(
     vtkIdType connectionID, vtkSelection* input, vtkSelection* output, int global_ids);

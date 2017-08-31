@@ -76,19 +76,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject* obj) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* obj) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream* css) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream* css) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream* css) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream* css) VTK_OVERRIDE;
   //@}
 
   /**
@@ -115,7 +115,7 @@ public:
 
 protected:
   vtkPVSystemConfigInformation();
-  ~vtkPVSystemConfigInformation();
+  ~vtkPVSystemConfigInformation() override;
 
 private:
   vector<ConfigInfo> Configs;

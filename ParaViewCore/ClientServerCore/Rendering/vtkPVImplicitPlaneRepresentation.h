@@ -36,7 +36,7 @@ public:
 
 protected:
   vtkPVImplicitPlaneRepresentation();
-  ~vtkPVImplicitPlaneRepresentation();
+  ~vtkPVImplicitPlaneRepresentation() override;
 
 private:
   vtkPVImplicitPlaneRepresentation(const vtkPVImplicitPlaneRepresentation&) VTK_DELETE_FUNCTION;

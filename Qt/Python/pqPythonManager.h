@@ -58,7 +58,7 @@ class PQPYTHON_EXPORT pqPythonManager : public QObject
 
 public:
   pqPythonManager(QObject* parent = NULL);
-  virtual ~pqPythonManager();
+  ~pqPythonManager() override;
 
   /**
    * Returns true if the interpreter has been initialized.

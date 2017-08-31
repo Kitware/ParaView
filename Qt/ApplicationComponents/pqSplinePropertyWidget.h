@@ -67,7 +67,7 @@ public:
 
   pqSplinePropertyWidget(
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, ModeTypes mode = SPLINE, QWidget* parent = 0);
-  virtual ~pqSplinePropertyWidget();
+  ~pqSplinePropertyWidget() override;
 
 public slots:
   /**
@@ -76,7 +76,7 @@ public slots:
   void setLineColor(const QColor&);
 
 protected slots:
-  virtual void placeWidget();
+  void placeWidget() override;
 
 private slots:
   void addPoint();

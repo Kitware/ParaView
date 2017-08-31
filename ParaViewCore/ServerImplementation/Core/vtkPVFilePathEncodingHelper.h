@@ -86,7 +86,7 @@ public:
 
 protected:
   vtkPVFilePathEncodingHelper();
-  ~vtkPVFilePathEncodingHelper();
+  ~vtkPVFilePathEncodingHelper() override;
 
   bool CallObjectMethod(const char* method, bool ignoreError = false);
 

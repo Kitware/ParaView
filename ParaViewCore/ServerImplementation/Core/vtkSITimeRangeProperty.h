@@ -33,14 +33,14 @@ public:
 
 protected:
   vtkSITimeRangeProperty();
-  ~vtkSITimeRangeProperty();
+  ~vtkSITimeRangeProperty() override;
 
   friend class vtkSIProxy;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSITimeRangeProperty(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;

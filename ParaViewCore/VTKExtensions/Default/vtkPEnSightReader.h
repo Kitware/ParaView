@@ -587,12 +587,11 @@ public:
 
 protected:
   vtkPEnSightReader();
-  ~vtkPEnSightReader();
+  ~vtkPEnSightReader() override;
 
-  virtual int RequestInformation(
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /*int RequestUpdateExtent(
     vtkInformation *vtkNotUsed(request),

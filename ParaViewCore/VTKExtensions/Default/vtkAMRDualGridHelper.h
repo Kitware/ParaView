@@ -144,7 +144,7 @@ public:
 
 private:
   vtkAMRDualGridHelper();
-  ~vtkAMRDualGridHelper();
+  ~vtkAMRDualGridHelper() override;
 
   char* ArrayName;
   int DataTypeSize;

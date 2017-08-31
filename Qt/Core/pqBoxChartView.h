@@ -51,7 +51,7 @@ public:
   pqBoxChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
     pqServer* server, QObject* parent = NULL);
 
-  virtual ~pqBoxChartView();
+  ~pqBoxChartView() override;
 
 signals:
   /**

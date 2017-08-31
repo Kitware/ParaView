@@ -62,7 +62,7 @@ public:
   * @param[in] parent The parent object
   */
   pqCheckableHeaderView(Qt::Orientation orientation, QWidget* parent = 0);
-  virtual ~pqCheckableHeaderView();
+  ~pqCheckableHeaderView() override;
 
   /**
   * \brief
@@ -93,7 +93,7 @@ protected:
   *   Reimplemented form QHeaderView::paintSection()
   * \sa QHeaderView::paintSection
   */
-  virtual void paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const;
+  void paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const override;
 
   /**
   * \brief
@@ -103,7 +103,7 @@ protected:
   *   Reimplemented from QWidget::mousePressEvent()
   * \sa QHeaderView::mousePressEvent
   */
-  void mousePressEvent(QMouseEvent* event);
+  void mousePressEvent(QMouseEvent* event) override;
 
   /**
   * \brief

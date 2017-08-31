@@ -46,7 +46,7 @@ class Segment : public vtkObject
 {
   vtkTypeMacro(Segment, vtkObject);
   static Segment* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkSetObjectMacro(PolyData, vtkPolyData);
   vtkGetObjectMacro(PolyData, vtkPolyData);
@@ -73,7 +73,7 @@ class Segment : public vtkObject
 
 protected:
   Segment();
-  virtual ~Segment();
+  ~Segment() override;
 
   void ComputeDirection(vtkIdType pointIndex, bool increment, double* direction) const;
 
@@ -111,7 +111,7 @@ class Node : public vtkObject
 
 protected:
   Node();
-  virtual ~Node();
+  ~Node() override;
 
   vtkPolyData* PolyData;
   vtkIdType PointId;

@@ -75,7 +75,7 @@ public:
    * (same name and number of components)to be in final.
    */
   void AddInformation(vtkPVDataSetAttributesInformation* info);
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
   //@}
 
   /**
@@ -109,13 +109,13 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
 protected:
   vtkPVDataSetAttributesInformation();
-  ~vtkPVDataSetAttributesInformation();
+  ~vtkPVDataSetAttributesInformation() override;
 
   // Standard cell attributes.
   int FieldAssociation;

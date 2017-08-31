@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqImportCinemaReaction : public pqReaction
 
 public:
   pqImportCinemaReaction(QAction* parent);
-  virtual ~pqImportCinemaReaction();
+  ~pqImportCinemaReaction() override;
 
   static bool loadCinemaDatabase();
   static bool loadCinemaDatabase(const QString& dbase, pqServer* server = NULL);
@@ -59,11 +59,11 @@ public:
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
   /// this.
-  void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /// Called when the action is triggered.
-  virtual void onTriggered() { this->loadCinemaDatabase(); }
+  void onTriggered() override { this->loadCinemaDatabase(); }
 
 private:
   Q_DISABLE_COPY(pqImportCinemaReaction)

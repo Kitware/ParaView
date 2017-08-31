@@ -67,7 +67,7 @@ public:
 
 protected:
   vtkVRMLSource();
-  ~vtkVRMLSource();
+  ~vtkVRMLSource() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 

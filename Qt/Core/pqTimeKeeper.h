@@ -49,7 +49,7 @@ class PQCORE_EXPORT pqTimeKeeper : public pqProxy
 public:
   pqTimeKeeper(const QString& group, const QString& name, vtkSMProxy* timekeeper, pqServer* server,
     QObject* parent = 0);
-  virtual ~pqTimeKeeper();
+  ~pqTimeKeeper() override;
 
   /**
   * Returns the number of timestep values

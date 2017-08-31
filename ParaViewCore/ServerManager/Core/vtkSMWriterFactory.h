@@ -124,7 +124,7 @@ public:
 
 protected:
   vtkSMWriterFactory();
-  ~vtkSMWriterFactory();
+  ~vtkSMWriterFactory() override;
 
 private:
   vtkSMWriterFactory(const vtkSMWriterFactory&) VTK_DELETE_FUNCTION;

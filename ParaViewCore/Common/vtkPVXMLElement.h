@@ -259,7 +259,7 @@ public:
 
 protected:
   vtkPVXMLElement();
-  ~vtkPVXMLElement();
+  ~vtkPVXMLElement() override;
 
   vtkPVXMLElementInternals* Internal;
 

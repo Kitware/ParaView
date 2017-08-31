@@ -44,7 +44,7 @@ class PQCOMPONENTS_EXPORT pqViewManager : public pqTabbedMultiViewWidget
 
 public:
   pqViewManager(QWidget* parentW = 0);
-  virtual ~pqViewManager();
+  ~pqViewManager() override;
 
 private:
   Q_DISABLE_COPY(pqViewManager)

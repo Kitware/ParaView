@@ -70,10 +70,10 @@ public:
 
 protected:
   vtkPVPLYWriter();
-  ~vtkPVPLYWriter();
+  ~vtkPVPLYWriter() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual void WriteData() VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  void WriteData() VTK_OVERRIDE;
 
   bool EnableColoring;
   vtkNew<vtkPLYWriter> Writer;

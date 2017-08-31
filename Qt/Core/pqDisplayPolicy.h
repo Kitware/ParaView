@@ -59,7 +59,7 @@ class PQCORE_EXPORT pqDisplayPolicy : public QObject
 
 public:
   pqDisplayPolicy(QObject* p);
-  virtual ~pqDisplayPolicy();
+  ~pqDisplayPolicy() override;
 
   /**
   * Set the visibility of the source in the given view.

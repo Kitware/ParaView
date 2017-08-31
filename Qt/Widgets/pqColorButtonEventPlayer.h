@@ -45,10 +45,11 @@ class PQWIDGETS_EXPORT pqColorButtonEventPlayer : public pqWidgetEventPlayer
 
 public:
   pqColorButtonEventPlayer(QObject* parent = 0);
-  ~pqColorButtonEventPlayer();
+  ~pqColorButtonEventPlayer() override;
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
+  bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error) override;
 
   static const QString& EVENT_NAME();
 

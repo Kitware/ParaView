@@ -40,7 +40,7 @@ public:
 
 protected:
   vtkSIIntVectorProperty();
-  ~vtkSIIntVectorProperty();
+  ~vtkSIIntVectorProperty() override;
 
 private:
   vtkSIIntVectorProperty(const vtkSIIntVectorProperty&) VTK_DELETE_FUNCTION;

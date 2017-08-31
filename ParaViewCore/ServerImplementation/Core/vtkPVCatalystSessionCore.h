@@ -42,7 +42,7 @@ public:
    * Gather information about an object referred by the \c globalid.
    * \c location identifies the processes to gather the information from.
    */
-  virtual bool GatherInformation(
+  bool GatherInformation(
     vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid) VTK_OVERRIDE;
 
   /**
@@ -58,7 +58,7 @@ public:
 
 protected:
   vtkPVCatalystSessionCore();
-  ~vtkPVCatalystSessionCore();
+  ~vtkPVCatalystSessionCore() override;
 
 private:
   vtkPVCatalystSessionCore(const vtkPVCatalystSessionCore&) VTK_DELETE_FUNCTION;

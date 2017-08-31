@@ -59,7 +59,7 @@ public:
   /**
   * destroy this dialog
   */
-  ~pqLinksManager();
+  ~pqLinksManager() override;
 
 public slots:
   /**

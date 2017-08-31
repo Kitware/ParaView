@@ -265,7 +265,7 @@ public:
 
 protected:
   vtkProcessModule();
-  ~vtkProcessModule();
+  ~vtkProcessModule() override;
 
   vtkSetMacro(SymmetricMPIMode, bool);
 

@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqKeyFrameTypeWidget : public QWidget
 
 public:
   pqKeyFrameTypeWidget(QWidget* parent = NULL);
-  virtual ~pqKeyFrameTypeWidget();
+  ~pqKeyFrameTypeWidget() override;
 
 public slots:
   void setType(const QString& text);

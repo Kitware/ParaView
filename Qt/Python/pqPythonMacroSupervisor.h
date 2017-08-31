@@ -46,7 +46,7 @@ class PQPYTHON_EXPORT pqPythonMacroSupervisor : public QObject
   Q_OBJECT
 public:
   pqPythonMacroSupervisor(QObject* p = 0);
-  ~pqPythonMacroSupervisor();
+  ~pqPythonMacroSupervisor() override;
 
   // Description:
   // Add a widget to be given macro actions.  QActions representing script macros

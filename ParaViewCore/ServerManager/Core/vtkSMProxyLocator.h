@@ -92,7 +92,7 @@ public:
 
 protected:
   vtkSMProxyLocator();
-  ~vtkSMProxyLocator();
+  ~vtkSMProxyLocator() override;
 
   /**
    * Create new proxy with the given id. Default implementation asks the

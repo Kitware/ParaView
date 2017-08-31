@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkPVCenterAxesActor();
-  ~vtkPVCenterAxesActor();
+  ~vtkPVCenterAxesActor() override;
 
   vtkAxes* Axes;
   vtkPolyDataMapper* Mapper;

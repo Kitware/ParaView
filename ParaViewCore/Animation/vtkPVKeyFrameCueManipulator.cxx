@@ -33,7 +33,7 @@ public:
     this->KeyFrameAnimationCueManipulatorProxy = proxy;
   }
 
-  virtual void Execute(vtkObject* obj, unsigned long event, void* calldata)
+  void Execute(vtkObject* obj, unsigned long event, void* calldata) override
   {
     if (this->KeyFrameAnimationCueManipulatorProxy)
     {

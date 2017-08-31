@@ -75,7 +75,7 @@ class PQWIDGETS_EXPORT pqTreeViewExpandState : public QObject
 
 public:
   pqTreeViewExpandState(QObject* parent = nullptr);
-  virtual ~pqTreeViewExpandState();
+  ~pqTreeViewExpandState() override;
 
   void save(QTreeView* treeView);
   void restore(QTreeView* treeView);

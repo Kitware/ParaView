@@ -59,23 +59,23 @@ public:
    * to the enumeration. This uses the Input property with a
    * vtkSMInputArrayDomain.
    */
-  virtual void Update(vtkSMProperty* prop) VTK_OVERRIDE;
+  void Update(vtkSMProperty* prop) VTK_OVERRIDE;
 
   /**
    * Overridden to ensure that the property's default value is valid for the
    * enumeration, if not it will be set to the first enumeration value.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMFieldDataDomain();
-  ~vtkSMFieldDataDomain();
+  ~vtkSMFieldDataDomain() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
 
   // When true, "Field Data" option is added to the domain.
   bool EnableFieldDataSelection;

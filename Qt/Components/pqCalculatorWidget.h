@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqCalculatorWidget : public pqPropertyWidget
 
 public:
   pqCalculatorWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  virtual ~pqCalculatorWidget();
+  ~pqCalculatorWidget() override;
 
 protected slots:
   /**

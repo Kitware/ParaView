@@ -62,7 +62,7 @@ public:
 
 protected:
   vtkPVRepresentedArrayListSettings();
-  ~vtkPVRepresentedArrayListSettings();
+  ~vtkPVRepresentedArrayListSettings() override;
 
 private:
   vtkPVRepresentedArrayListSettings(const vtkPVRepresentedArrayListSettings&) VTK_DELETE_FUNCTION;

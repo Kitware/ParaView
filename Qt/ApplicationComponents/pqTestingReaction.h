@@ -77,7 +77,7 @@ public:
   static void lockViewSizeCustom();
 
 protected:
-  virtual void onTriggered()
+  void onTriggered() override
   {
     switch (this->ReactionMode)
     {

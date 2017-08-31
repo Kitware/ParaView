@@ -35,8 +35,7 @@ public:
 
   static vtkPVClipDataSet* New();
 
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -50,15 +49,14 @@ public:
 
 protected:
   vtkPVClipDataSet(vtkImplicitFunction* cf = NULL);
-  ~vtkPVClipDataSet();
+  ~vtkPVClipDataSet() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
 
   //@{
   /**

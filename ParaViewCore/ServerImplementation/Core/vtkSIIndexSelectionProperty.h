@@ -39,14 +39,14 @@ public:
 
 protected:
   vtkSIIndexSelectionProperty();
-  ~vtkSIIndexSelectionProperty();
+  ~vtkSIIndexSelectionProperty() override;
 
   friend class vtkSIProxy;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;

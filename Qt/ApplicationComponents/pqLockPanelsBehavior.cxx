@@ -53,7 +53,7 @@ class vtkLockDockWidgetsCallback : public vtkCommand
 public:
   static vtkLockDockWidgetsCallback* New() { return new vtkLockDockWidgetsCallback(); }
 
-  virtual void Execute(vtkObject*, unsigned long, void*)
+  void Execute(vtkObject*, unsigned long, void*) override
   {
     this->Behavior->generalSettingsChanged();
   }
@@ -62,7 +62,7 @@ public:
 
 protected:
   vtkLockDockWidgetsCallback() {}
-  virtual ~vtkLockDockWidgetsCallback() {}
+  ~vtkLockDockWidgetsCallback() override {}
 };
 
 } // anonymous namespace

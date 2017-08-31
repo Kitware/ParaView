@@ -53,7 +53,7 @@ public:
   {
   }
 
-  virtual ~pqSettingsCleaner() { QFile::remove(this->Filename); }
+  ~pqSettingsCleaner() override { QFile::remove(this->Filename); }
 };
 }
 

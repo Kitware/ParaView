@@ -59,9 +59,9 @@ public:
 
 protected:
   vtkCleanArrays();
-  ~vtkCleanArrays();
+  ~vtkCleanArrays() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;

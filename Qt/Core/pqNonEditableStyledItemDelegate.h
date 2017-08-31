@@ -52,8 +52,8 @@ class PQCORE_EXPORT pqNonEditableStyledItemDelegate : public QStyledItemDelegate
 
 public:
   pqNonEditableStyledItemDelegate(QObject* parent = 0);
-  virtual QWidget* createEditor(
-    QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  QWidget* createEditor(
+    QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
 private:
   Q_DISABLE_COPY(pqNonEditableStyledItemDelegate)

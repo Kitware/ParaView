@@ -52,7 +52,7 @@ public:
   static vtkGlyphRepresentationMultiBlockMaker* New();
   vtkTypeMacro(vtkGlyphRepresentationMultiBlockMaker, vtkMultiBlockDataSetAlgorithm)
 
-    protected : virtual int RequestData(vtkInformation*, vtkInformationVector** inVec,
+    protected : int RequestData(vtkInformation*, vtkInformationVector** inVec,
                   vtkInformationVector* outVec) VTK_OVERRIDE
   {
     vtkDataObject* inputDO = vtkDataObject::GetData(inVec[0], 0);
@@ -65,7 +65,7 @@ public:
     return 1;
   }
 
-  virtual int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE
+  int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");

@@ -304,7 +304,7 @@ public:
     return obs;
   }
 
-  virtual void Execute(vtkObject* ocaller, unsigned long eventId, void*)
+  void Execute(vtkObject* ocaller, unsigned long eventId, void*) override
   {
     vtkRenderWindow* renWin = vtkRenderWindow::SafeDownCast(ocaller);
     if (this->Target && this->Target->GetEnabled())

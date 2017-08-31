@@ -59,7 +59,7 @@ public:
   * default values shown by this dialog.
   */
   pqChangeInputDialog(vtkSMProxy* filterProxy, QWidget* parent = 0);
-  virtual ~pqChangeInputDialog();
+  ~pqChangeInputDialog() override;
 
   /**
   * Returns the map of selected inputs. The key in this map is the name of the

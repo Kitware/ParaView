@@ -43,26 +43,26 @@ class @name@Implementation : public QObject, public pqPropertyWidgetInterface
   Q_INTERFACES(pqPropertyWidgetInterface)
 public:
   @name@Implementation(QObject* parent);
-  virtual ~@name@Implementation();
+  ~@name@Implementation() override;
 
   /// Given a proxy and its property, create a widget for the same, of possible.
   /// For unsupported/unknown proxies/properties, implementations should simply
   /// return NULL without raising any errors (or messages).
-  virtual pqPropertyWidget* createWidgetForProperty(vtkSMProxy *proxy,
-                                                    vtkSMProperty *property);
+  pqPropertyWidget* createWidgetForProperty(vtkSMProxy *proxy,
+                                            vtkSMProperty *property) override;
 
   /// Given a proxy and its property group, create a widget for the same, of possible.
   /// For unsupported/unknown proxies/property-groups, implementations should simply
   /// return NULL without raising any errors (or messages).
-  virtual pqPropertyWidget* createWidgetForPropertyGroup(vtkSMProxy *proxy,
-                                                         vtkSMPropertyGroup *group);
+  pqPropertyWidget* createWidgetForPropertyGroup(vtkSMProxy *proxy,
+                                                 vtkSMPropertyGroup *group) override;
 
   /// Given the type of the decorator and the pqPropertyWidget that needs to be
   /// decorated, create the pqPropertyWidgetDecorator instance, if possible.
   /// For unsupported/unknown, implementations should simply return NULL without
   /// raising any errors (or messages).
-  virtual pqPropertyWidgetDecorator* createWidgetDecorator(
-    const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
+  pqPropertyWidgetDecorator* createWidgetDecorator(
+    const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget) override;
 
 private:
   Q_DISABLE_COPY(@name@Implementation)

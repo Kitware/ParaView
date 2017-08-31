@@ -92,7 +92,7 @@ public:
 
 protected:
   vtkAMRStreamingPriorityQueue();
-  ~vtkAMRStreamingPriorityQueue();
+  ~vtkAMRStreamingPriorityQueue() override;
 
   vtkMultiProcessController* Controller;
 

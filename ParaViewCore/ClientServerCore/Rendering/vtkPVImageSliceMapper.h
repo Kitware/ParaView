@@ -51,9 +51,9 @@ public:
   /**
    * This calls RenderPiece (in a for loop is streaming is necessary).
    */
-  virtual void Render(vtkRenderer* ren, vtkActor* act) VTK_OVERRIDE;
+  void Render(vtkRenderer* ren, vtkActor* act) VTK_OVERRIDE;
 
-  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -105,16 +105,13 @@ public:
   /**
    * Update that sets the update piece first.
    */
-  virtual void Update(int port) VTK_OVERRIDE;
-  virtual void Update() VTK_OVERRIDE { this->Superclass::Update(); }
-  virtual int Update(int port, vtkInformationVector* requests) VTK_OVERRIDE
+  void Update(int port) VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE { this->Superclass::Update(); }
+  int Update(int port, vtkInformationVector* requests) VTK_OVERRIDE
   {
     return this->Superclass::Update(port, requests);
   }
-  virtual int Update(vtkInformation* requests) VTK_OVERRIDE
-  {
-    return this->Superclass::Update(requests);
-  }
+  int Update(vtkInformation* requests) VTK_OVERRIDE { return this->Superclass::Update(requests); }
 
   //@{
   /**
@@ -141,8 +138,8 @@ public:
    * Return bounding box (array of six doubles) of data expressed as
    * (xmin,xmax, ymin,ymax, zmin,zmax).
    */
-  virtual double* GetBounds() VTK_OVERRIDE;
-  virtual void GetBounds(double bounds[6]) VTK_OVERRIDE { this->Superclass::GetBounds(bounds); };
+  double* GetBounds() VTK_OVERRIDE;
+  void GetBounds(double bounds[6]) VTK_OVERRIDE { this->Superclass::GetBounds(bounds); };
   //@}
 
   /**
@@ -152,10 +149,10 @@ public:
 
 protected:
   vtkPVImageSliceMapper();
-  ~vtkPVImageSliceMapper();
+  ~vtkPVImageSliceMapper() override;
 
   // Tell the executive that we accept vtkImageData.
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   /**
    * Perform the actual rendering.

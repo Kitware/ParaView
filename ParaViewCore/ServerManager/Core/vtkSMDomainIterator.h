@@ -76,7 +76,7 @@ public:
 
 protected:
   vtkSMDomainIterator();
-  ~vtkSMDomainIterator();
+  ~vtkSMDomainIterator() override;
 
   vtkSMProperty* Property;
 

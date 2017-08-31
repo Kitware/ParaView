@@ -48,7 +48,7 @@ class PQWIDGETS_EXPORT pqDoubleRangeDialog : public QDialog
 
 public:
   pqDoubleRangeDialog(const QString& label, double minimum, double maximum, QWidget* parent = 0);
-  ~pqDoubleRangeDialog();
+  ~pqDoubleRangeDialog() override;
 
   void setValue(double value);
   double value() const;

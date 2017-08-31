@@ -72,24 +72,23 @@ public:
    * is visible as long as the dataset being process if a
    * vtkUniformGrid.
    */
-  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId) VTK_OVERRIDE;
+  int IsPointVisible(vtkDataSet* ds, vtkIdType ptId) VTK_OVERRIDE;
 
   void SetKeepRandomPoints(int keepRandomPoints);
   vtkGetMacro(KeepRandomPoints, int);
 
 protected:
   vtkPVLegacyGlyphFilter();
-  ~vtkPVLegacyGlyphFilter();
+  ~vtkPVLegacyGlyphFilter() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
 
@@ -117,7 +116,7 @@ protected:
 
   int RandomMode;
 
-  virtual void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
 
   int KeepRandomPoints;
   vtkIdType MaximumNumberOfPointsOld;

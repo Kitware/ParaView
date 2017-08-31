@@ -54,21 +54,21 @@ public:
    * Transfer information about a single object into
    * this object.
    */
-  virtual void CopyFromObject(vtkObject* data) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* data) VTK_OVERRIDE;
   virtual void CopyFromMessage(unsigned char* msg);
   //@}
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   //@{
   /**
    * Serialize objects to/from a stream object.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream* css) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream* css) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -77,12 +77,12 @@ public:
    * gathered. This are different from the ivars that constitute the gathered
    * information itself.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
 
 protected:
   vtkPVTimerInformation();
-  ~vtkPVTimerInformation();
+  ~vtkPVTimerInformation() override;
   //@}
 
   void Reallocate(int num);

@@ -21,7 +21,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqWelcomeDialog : public QDialog
 
 public:
   explicit pqWelcomeDialog(QWidget* parent = 0);
-  virtual ~pqWelcomeDialog();
+  ~pqWelcomeDialog() override;
 
 public slots:
   virtual void onGettingStartedGuideClicked();

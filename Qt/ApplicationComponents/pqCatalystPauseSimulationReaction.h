@@ -53,7 +53,7 @@ public:
   pqCatalystPauseSimulationReaction(QAction* parent = 0);
 
 public slots:
-  virtual void updateEnableState() { updateEnableState(PAUSE); }
+  void updateEnableState() override { updateEnableState(PAUSE); }
 
 protected:
   enum Type
@@ -65,7 +65,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { this->setPauseSimulation(true); }
+  void onTriggered() override { this->setPauseSimulation(true); }
 
   void setPauseSimulation(bool pause);
   void updateEnableState(Type type);

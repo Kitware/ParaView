@@ -36,14 +36,14 @@ public:
   vtkTypeMacro(vtkSMComparativeAnimationCueUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual int Undo() VTK_OVERRIDE;
-  virtual int Redo() VTK_OVERRIDE;
+  int Undo() VTK_OVERRIDE;
+  int Redo() VTK_OVERRIDE;
 
   void SetXMLStates(vtkTypeUInt32 id, vtkPVXMLElement* before, vtkPVXMLElement* after);
 
 protected:
   vtkSMComparativeAnimationCueUndoElement();
-  ~vtkSMComparativeAnimationCueUndoElement();
+  ~vtkSMComparativeAnimationCueUndoElement() override;
 
   vtkSmartPointer<vtkPVXMLElement> BeforeState;
   vtkSmartPointer<vtkPVXMLElement> AfterState;

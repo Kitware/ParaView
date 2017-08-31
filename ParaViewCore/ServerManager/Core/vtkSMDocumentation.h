@@ -61,7 +61,7 @@ public:
 
 protected:
   vtkSMDocumentation();
-  ~vtkSMDocumentation();
+  ~vtkSMDocumentation() override;
   //@}
 
   vtkPVXMLElement* DocumentationElement;

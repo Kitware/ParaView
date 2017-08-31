@@ -232,7 +232,7 @@ public:
 
 protected:
   vtkCGNSReader();
-  ~vtkCGNSReader();
+  ~vtkCGNSReader() override;
 
   int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;

@@ -49,7 +49,7 @@ public:
   pqHighlightablePushButton(QWidget* parent = 0);
   pqHighlightablePushButton(const QString& text, QWidget* parent = 0);
   pqHighlightablePushButton(const QIcon& icon, const QString& text, QWidget* parent = 0);
-  virtual ~pqHighlightablePushButton();
+  ~pqHighlightablePushButton() override;
 
 public slots:
   /**

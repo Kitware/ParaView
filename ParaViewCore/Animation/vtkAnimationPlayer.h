@@ -88,7 +88,7 @@ public:
 
 protected:
   vtkAnimationPlayer();
-  ~vtkAnimationPlayer();
+  ~vtkAnimationPlayer() override;
 
   friend class vtkCompositeAnimationPlayer;
 

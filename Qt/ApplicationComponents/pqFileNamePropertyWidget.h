@@ -47,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFileNamePropertyWidget : public pqPropert
 
 public:
   pqFileNamePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  virtual ~pqFileNamePropertyWidget();
+  ~pqFileNamePropertyWidget() override;
 
 signals:
   /**

@@ -59,7 +59,7 @@ public:
 
 protected:
   vtkSelectionConverter();
-  ~vtkSelectionConverter();
+  ~vtkSelectionConverter() override;
 
   void Convert(vtkSelectionNode* input, vtkSelection* output, int global_ids);
 

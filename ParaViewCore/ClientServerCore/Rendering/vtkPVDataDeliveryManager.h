@@ -216,7 +216,7 @@ public:
 
 protected:
   vtkPVDataDeliveryManager();
-  ~vtkPVDataDeliveryManager();
+  ~vtkPVDataDeliveryManager() override;
 
   vtkWeakPointer<vtkPVRenderView> RenderView;
   vtkSmartPointer<vtkPKdTree> KdTree;

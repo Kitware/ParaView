@@ -56,7 +56,7 @@ public:
   * configuration files which contains lists the items shown by this menu.
   */
   pqProxyGroupMenuManager(QMenu* menu, const QString& resourceTagName);
-  ~pqProxyGroupMenuManager();
+  ~pqProxyGroupMenuManager() override;
 
   /**
   * Access the menu.

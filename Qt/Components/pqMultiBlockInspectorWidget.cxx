@@ -170,9 +170,9 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~CConnectionType() {}
+  ~CConnectionType() override {}
 protected:
-  virtual void setServerManagerValue(bool vtkNotUsed(use_unchecked), const QVariant& value)
+  void setServerManagerValue(bool vtkNotUsed(use_unchecked), const QVariant& value) override
   {
     if (vtkSMDoubleMapProperty* dmp = vtkSMDoubleMapProperty::SafeDownCast(this->propertySM()))
     {
@@ -192,7 +192,7 @@ protected:
       }
     }
   }
-  virtual QVariant currentServerManagerValue(bool vtkNotUsed(use_unchecked)) const
+  QVariant currentServerManagerValue(bool vtkNotUsed(use_unchecked)) const override
   {
     QList<QVariant> curValue;
     if (vtkSMDoubleMapProperty* dmp = vtkSMDoubleMapProperty::SafeDownCast(this->propertySM()))
@@ -242,7 +242,7 @@ public:
   {
     this->IconSize = std::max(p->style()->pixelMetric(QStyle::PM_SmallIconSize), 16);
   }
-  virtual ~MultiBlockInspectorModel() {}
+  ~MultiBlockInspectorModel() override {}
 
   void setRootLabel(const QString& str)
   {
@@ -458,7 +458,7 @@ public:
   {
   }
 
-  virtual ~MultiBlockInspectorSelectionModel() {}
+  ~MultiBlockInspectorSelectionModel() override {}
 
   using Superclass::select;
 

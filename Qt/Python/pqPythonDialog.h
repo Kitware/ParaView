@@ -56,7 +56,7 @@ class PQPYTHON_EXPORT pqPythonDialog : public QDialog
 public:
   typedef QDialog Superclass;
   VTK_LEGACY(pqPythonDialog(QWidget* Parent = 0));
-  VTK_LEGACY(~pqPythonDialog());
+  VTK_LEGACY(~pqPythonDialog() override);
 
 public slots:
   /**
@@ -85,7 +85,7 @@ protected:
   /**
   * Overloaded to save window geometry on close events.
   */
-  void closeEvent(QCloseEvent* event);
+  void closeEvent(QCloseEvent* event) override;
 
 private slots:
   void runScript();

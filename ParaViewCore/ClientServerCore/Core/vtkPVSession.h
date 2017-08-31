@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkPVSession();
-  ~vtkPVSession();
+  ~vtkPVSession() override;
 
   enum
   {

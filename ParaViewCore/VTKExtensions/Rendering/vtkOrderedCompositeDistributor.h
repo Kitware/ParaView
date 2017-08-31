@@ -57,7 +57,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkOrderedCompositeDistributor
 public:
   vtkTypeMacro(vtkOrderedCompositeDistributor, vtkPointSetAlgorithm);
   static vtkOrderedCompositeDistributor* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -94,7 +94,7 @@ public:
 
 protected:
   vtkOrderedCompositeDistributor();
-  ~vtkOrderedCompositeDistributor();
+  ~vtkOrderedCompositeDistributor() override;
 
   char* OutputType;
   bool PassThrough;

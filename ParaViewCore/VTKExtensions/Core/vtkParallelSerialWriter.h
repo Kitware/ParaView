@@ -50,7 +50,7 @@ public:
   /**
    * Return the MTime also considering the internal writer.
    */
-  virtual vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   //@{
   /**
@@ -136,7 +136,7 @@ public:
 
 protected:
   vtkParallelSerialWriter();
-  ~vtkParallelSerialWriter();
+  ~vtkParallelSerialWriter() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;

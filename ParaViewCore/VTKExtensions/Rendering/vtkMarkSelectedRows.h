@@ -60,17 +60,16 @@ public:
 
 protected:
   vtkMarkSelectedRows();
-  ~vtkMarkSelectedRows();
+  ~vtkMarkSelectedRows() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Overridden to create a vtkTable or vtkMultiBlockDataSet as the output based
    * on  the input type.
    */
-  virtual int RequestDataObject(
+  int RequestDataObject(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**

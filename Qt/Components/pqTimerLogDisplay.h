@@ -47,7 +47,7 @@ class PQCOMPONENTS_EXPORT pqTimerLogDisplay : public QDialog
 
 public:
   pqTimerLogDisplay(QWidget* p = NULL);
-  ~pqTimerLogDisplay();
+  ~pqTimerLogDisplay() override;
   typedef QDialog Superclass;
 
   float timeThreshold() const;
@@ -70,8 +70,8 @@ public slots:
 protected:
   virtual void addToLog(const QString& source, vtkPVTimerInformation* timerInfo);
 
-  virtual void showEvent(QShowEvent*);
-  virtual void hideEvent(QHideEvent*);
+  void showEvent(QShowEvent*) override;
+  void hideEvent(QHideEvent*) override;
 
 protected slots:
   void setTimeThresholdById(int id);

@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqShowWidgetDecorator : public pqBoolProper
 public:
   pqShowWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
 
-  virtual bool canShowWidget(bool show_advanced) const
+  bool canShowWidget(bool show_advanced) const override
   {
     (void)show_advanced;
     return this->isBoolProperty();

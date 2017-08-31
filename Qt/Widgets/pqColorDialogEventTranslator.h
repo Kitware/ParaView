@@ -48,13 +48,13 @@ class PQWIDGETS_EXPORT pqColorDialogEventTranslator : public pqWidgetEventTransl
 
 public:
   pqColorDialogEventTranslator(QObject* parent = 0);
-  ~pqColorDialogEventTranslator();
+  ~pqColorDialogEventTranslator() override;
 
   /**
   * Overridden to handle events on QColorDialog.
   */
   using Superclass::translateEvent;
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+  bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
 
 private slots:
   void onColorChosen(const QColor&);

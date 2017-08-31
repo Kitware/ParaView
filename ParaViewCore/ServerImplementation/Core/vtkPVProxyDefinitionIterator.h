@@ -90,7 +90,7 @@ public:
 
 protected:
   vtkPVProxyDefinitionIterator();
-  virtual ~vtkPVProxyDefinitionIterator();
+  ~vtkPVProxyDefinitionIterator() override;
 
 private:
   vtkPVProxyDefinitionIterator(const vtkPVProxyDefinitionIterator&) VTK_DELETE_FUNCTION;

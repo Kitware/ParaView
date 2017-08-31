@@ -106,7 +106,7 @@ public:
 
 protected:
   vtkSMPropertyGroup();
-  ~vtkSMPropertyGroup();
+  ~vtkSMPropertyGroup() override;
 
   friend class vtkSMProxy;
   virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);

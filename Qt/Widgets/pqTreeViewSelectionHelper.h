@@ -47,7 +47,7 @@ class PQWIDGETS_EXPORT pqTreeViewSelectionHelper : public QObject
 
 public:
   pqTreeViewSelectionHelper(QTreeView* view);
-  virtual ~pqTreeViewSelectionHelper();
+  ~pqTreeViewSelectionHelper() override;
 
 protected slots:
   void onClicked(QModelIndex idx);

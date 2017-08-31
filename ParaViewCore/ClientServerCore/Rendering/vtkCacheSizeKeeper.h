@@ -91,7 +91,7 @@ public:
 protected:
   static vtkCacheSizeKeeper* New();
   vtkCacheSizeKeeper();
-  ~vtkCacheSizeKeeper();
+  ~vtkCacheSizeKeeper() override;
 
   unsigned long CacheSize;
   unsigned long CacheLimit;

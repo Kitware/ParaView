@@ -75,7 +75,7 @@ public:
 
 protected:
   vtkSMProxyClipboard();
-  ~vtkSMProxyClipboard();
+  ~vtkSMProxyClipboard() override;
 
   vtkSmartPointer<vtkPVXMLElement> CopiedState;
 

@@ -120,7 +120,7 @@ public:
 
 protected:
   vtkSMProxyConfigurationReader();
-  virtual ~vtkSMProxyConfigurationReader();
+  ~vtkSMProxyConfigurationReader() override;
 
 private:
   char* FileName;

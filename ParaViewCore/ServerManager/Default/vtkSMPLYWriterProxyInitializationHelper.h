@@ -36,11 +36,11 @@ public:
   vtkTypeMacro(vtkSMPLYWriterProxyInitializationHelper, vtkSMProxyInitializationHelper);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) VTK_OVERRIDE;
+  void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) VTK_OVERRIDE;
 
 protected:
   vtkSMPLYWriterProxyInitializationHelper();
-  ~vtkSMPLYWriterProxyInitializationHelper();
+  ~vtkSMPLYWriterProxyInitializationHelper() override;
 
 private:
   vtkSMPLYWriterProxyInitializationHelper(

@@ -70,7 +70,7 @@ class PQCORE_EXPORT pqPropertyLinks : public QObject
 
 public:
   pqPropertyLinks(QObject* parent = 0);
-  virtual ~pqPropertyLinks();
+  ~pqPropertyLinks() override;
 
   /**
   * Setup a link between a Qt property and vtkSMProperty on a vtkSMProxy

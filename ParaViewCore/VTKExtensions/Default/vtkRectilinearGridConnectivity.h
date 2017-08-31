@@ -148,7 +148,7 @@ public:
 
 protected:
   vtkRectilinearGridConnectivity();
-  ~vtkRectilinearGridConnectivity();
+  ~vtkRectilinearGridConnectivity() override;
 
   int DualGridsReady;
   int NumberOfBlocks;
@@ -162,9 +162,9 @@ protected:
   vtkRectilinearGridConnectivityFaceHash* FaceHash;
   vtkRectilinearGridConnectivityInternal* Internal;
 
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // ---------------------------------------------------------------------- //

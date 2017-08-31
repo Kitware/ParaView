@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget : public pqPropertyGro
 
 public:
   pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqFontPropertyWidget();
+  ~pqFontPropertyWidget() override;
 
   QString justification() const;
 signals:

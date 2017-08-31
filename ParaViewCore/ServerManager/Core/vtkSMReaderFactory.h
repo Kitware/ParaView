@@ -176,7 +176,7 @@ public:
 
 protected:
   vtkSMReaderFactory();
-  ~vtkSMReaderFactory();
+  ~vtkSMReaderFactory() override;
 
   // To support legacy configuration files.
   void RegisterPrototype(

@@ -48,14 +48,14 @@ public:
    * Triggers a high-resolution render.
    * \note CallOnAllProcesses
    */
-  virtual void StillRender() VTK_OVERRIDE;
+  void StillRender() VTK_OVERRIDE;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
    * \note CallOnAllProcesses
    */
-  virtual void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() VTK_OVERRIDE;
 
   //@{
   /**
@@ -88,13 +88,13 @@ public:
    * must be called before calling any other methods on this class.
    * \note CallOnAllProcesses
    */
-  virtual void Initialize(unsigned int id) VTK_OVERRIDE;
+  void Initialize(unsigned int id) VTK_OVERRIDE;
 
   /**
    * Overridden to ensure that in multi-client configurations, same set of
    * representations are "dirty" on all processes to avoid race conditions.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * Representations can use this method to set the selection for a particular
@@ -123,7 +123,7 @@ public:
 
 protected:
   vtkPVContextView();
-  ~vtkPVContextView();
+  ~vtkPVContextView() override;
 
   /**
    * Actual rendering implementation.

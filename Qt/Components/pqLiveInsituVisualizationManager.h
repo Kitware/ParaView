@@ -58,7 +58,7 @@ class PQCOMPONENTS_EXPORT pqLiveInsituVisualizationManager : public QObject
 
 public:
   pqLiveInsituVisualizationManager(int connection_port, pqServer* server);
-  virtual ~pqLiveInsituVisualizationManager();
+  ~pqLiveInsituVisualizationManager() override;
 
   /**
   * returns true of the port is extracted over to the visualization server.

@@ -64,7 +64,7 @@ public:
   /**
    * Sets the visibility for the plot matrix representation.
    */
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -168,23 +168,23 @@ public:
 
 protected:
   vtkPVPlotMatrixRepresentation();
-  ~vtkPVPlotMatrixRepresentation();
+  ~vtkPVPlotMatrixRepresentation() override;
 
   /**
    * Overridden to pass information about changes to series visibility etc. to
    * the plot-matrix.
    */
-  virtual void PrepareForRendering() VTK_OVERRIDE;
+  void PrepareForRendering() VTK_OVERRIDE;
 
   /**
    * Add the plot matrix representation to the view.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Remove the plot matrix representation from the view.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
 private:
   vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&) VTK_DELETE_FUNCTION;

@@ -66,7 +66,7 @@ class PQCOMPONENTS_EXPORT pqCompositeTreePropertyWidget : public pqPropertyWidge
 public:
   pqCompositeTreePropertyWidget(
     vtkSMIntVectorProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent = nullptr);
-  virtual ~pqCompositeTreePropertyWidget();
+  ~pqCompositeTreePropertyWidget() override;
 
   /**
    * API to get/set the selected values. What there values represents depends on

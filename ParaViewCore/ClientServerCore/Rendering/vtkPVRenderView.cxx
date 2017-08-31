@@ -189,7 +189,7 @@ public:
   static vtkPVRendererCuller* New();
   vtkTypeMacro(vtkPVRendererCuller, vtkCuller);
 
-  virtual double Cull(vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength,
+  double Cull(vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength,
     int& initialized) VTK_OVERRIDE
   {
     double total_time = 0;
@@ -263,7 +263,7 @@ private:
     : RenderOnLocalProcess(false)
   {
   }
-  ~vtkPVRendererCuller() {}
+  ~vtkPVRendererCuller() override {}
   bool RenderOnLocalProcess;
 };
 vtkStandardNewMacro(vtkPVRendererCuller);

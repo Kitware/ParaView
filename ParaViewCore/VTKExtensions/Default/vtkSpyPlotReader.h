@@ -230,7 +230,7 @@ public:
 
 protected:
   vtkSpyPlotReader();
-  ~vtkSpyPlotReader();
+  ~vtkSpyPlotReader() override;
 
   // Determine the bounds of just this reader
   void GetLocalBounds(vtkSpyPlotBlockIterator* biter, int nBlocks, int progressInterval);
@@ -284,21 +284,21 @@ protected:
   // The array selections.
   vtkDataArraySelection* CellDataArraySelection;
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // Create either vtkNonOverlappingAMR or vtkMultiBlockDataSet based on
   // whether the dataset is AMR.
-  virtual int RequestDataObject(
+  int RequestDataObject(
     vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) VTK_OVERRIDE;
 
   // Read the case file and the first binary file do get meta
   // informations (number of files, number of fields, number of timestep).
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Read the data: get the number of pieces (=processors) and get
   // my piece id (=my processor id).
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
@@ -343,7 +343,7 @@ protected:
   /**
    * Overwritten to avoid hiding.
    */
-  virtual int UpdateTimeStep(double time, int piece = -1, int numPieces = 1, int ghostLevels = 0,
+  int UpdateTimeStep(double time, int piece = -1, int numPieces = 1, int ghostLevels = 0,
     const int extents[6] = 0) VTK_OVERRIDE
   {
     return this->Superclass::UpdateTimeStep(time, piece, numPieces, ghostLevels, extents);

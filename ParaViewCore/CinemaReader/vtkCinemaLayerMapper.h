@@ -131,7 +131,7 @@ public:
 
 protected:
   vtkCinemaLayerMapper();
-  ~vtkCinemaLayerMapper();
+  ~vtkCinemaLayerMapper() override;
 
   bool ScalarVisibility;
   vtkScalarsToColors* LookupTable;

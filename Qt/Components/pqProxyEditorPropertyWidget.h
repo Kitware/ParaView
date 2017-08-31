@@ -73,7 +73,7 @@ class PQCOMPONENTS_EXPORT pqProxyEditorPropertyWidget : public pqPropertyWidget
 
 public:
   pqProxyEditorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  virtual ~pqProxyEditorPropertyWidget();
+  ~pqProxyEditorPropertyWidget() override;
 
   pqSMProxy proxyToEdit() const;
 

@@ -56,13 +56,13 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqChangePipelineInputReaction::changeInput(); }
+  void onTriggered() override { pqChangePipelineInputReaction::changeInput(); }
 
 private:
   Q_DISABLE_COPY(pqChangePipelineInputReaction)

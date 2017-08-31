@@ -90,7 +90,7 @@ public:
   /**
   * overload setData() to call callbacks if set.
   */
-  virtual void setData(int column, int role, const QVariant& v);
+  void setData(int column, int role, const QVariant& v) override;
 
 public:
   class pqCallbackHandler

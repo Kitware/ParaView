@@ -37,7 +37,7 @@ public:
 
 protected:
   vtkSIUnstructuredGridVolumeRepresentationProxy();
-  ~vtkSIUnstructuredGridVolumeRepresentationProxy();
+  ~vtkSIUnstructuredGridVolumeRepresentationProxy() override;
 
   /**
    * Register the mappers

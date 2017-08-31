@@ -59,7 +59,7 @@ class PQCORE_EXPORT pqQVTKWidget : public pqQVTKWidgetBase
 
 public:
   pqQVTKWidget(QWidget* parent = NULL, Qt::WindowFlags f = 0);
-  virtual ~pqQVTKWidget();
+  ~pqQVTKWidget() override;
 
   /**
   * Set the view proxy.
@@ -88,7 +88,7 @@ public slots:
   void paintMousePointer(int x, int y);
 
 protected:
-  virtual bool renderVTK();
+  bool renderVTK() override;
   bool canRender();
 
 private slots:

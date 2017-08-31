@@ -45,7 +45,7 @@ public:
 
 protected:
   vtkPVKeyFrameAnimationCue();
-  ~vtkPVKeyFrameAnimationCue();
+  ~vtkPVKeyFrameAnimationCue() override;
 
   vtkPVKeyFrameCueManipulator* GetKeyFrameManipulator();
 

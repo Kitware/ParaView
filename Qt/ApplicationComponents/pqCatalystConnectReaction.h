@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystConnectReaction : public pqReacti
 
 public:
   pqCatalystConnectReaction(QAction* parent = 0);
-  virtual ~pqCatalystConnectReaction();
+  ~pqCatalystConnectReaction() override;
 
   /**
   * Connect to Catalyst
@@ -61,13 +61,13 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { this->connect(); }
+  void onTriggered() override { this->connect(); }
 
   /**
   * reaction disabled when already connected to a catalyst server or in
   * collaboration mode.
   */
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
 private:
   Q_DISABLE_COPY(pqCatalystConnectReaction)

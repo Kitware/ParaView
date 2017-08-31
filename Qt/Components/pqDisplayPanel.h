@@ -52,7 +52,7 @@ public:
   /**
   * destructor
   */
-  ~pqDisplayPanel();
+  ~pqDisplayPanel() override;
 
   /**
   * get the proxy for which properties are displayed

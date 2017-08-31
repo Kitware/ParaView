@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLockPanelsReaction : public pqReaction
 
 public:
   pqLockPanelsReaction(QAction* action);
-  ~pqLockPanelsReaction();
+  ~pqLockPanelsReaction() override;
 
 public slots:
   void actionTriggered();

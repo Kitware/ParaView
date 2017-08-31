@@ -73,7 +73,7 @@ public:
   * the property.
   */
   pqSILWidget(const QString& activeCategory, QWidget* parent = 0);
-  virtual ~pqSILWidget();
+  ~pqSILWidget() override;
 
   /**
   * Get/Set the SIL model. This is typically a pqSILModel instance.

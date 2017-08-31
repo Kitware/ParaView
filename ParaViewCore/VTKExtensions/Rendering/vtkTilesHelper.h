@@ -91,7 +91,7 @@ public:
 
 protected:
   vtkTilesHelper();
-  ~vtkTilesHelper();
+  ~vtkTilesHelper() override;
 
   int TileDimensions[2];
   int TileMullions[2];

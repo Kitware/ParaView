@@ -85,7 +85,7 @@ public:
 
 protected:
   vtkPVKeyFrame();
-  ~vtkPVKeyFrame();
+  ~vtkPVKeyFrame() override;
 
   double KeyTime;
   vtkPVKeyFrameInternals* Internals;

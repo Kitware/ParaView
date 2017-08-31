@@ -66,7 +66,7 @@ public:
     PV_SELECTION_TOGGLE
   };
 
-  virtual ~pqView();
+  ~pqView() override;
 
   /**
   * Returns the internal render Module proxy associated with this object.

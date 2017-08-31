@@ -45,7 +45,7 @@ class PQCORE_EXPORT pqAnimationCue : public pqProxy
 public:
   pqAnimationCue(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
     QObject* parent = NULL);
-  virtual ~pqAnimationCue();
+  ~pqAnimationCue() override;
 
   // Returns the number of keyframes in this cue.
   int getNumberOfKeyFrames() const;

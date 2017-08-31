@@ -116,7 +116,7 @@ public:
   */
   pqFileDialog(pqServer*, QWidget* Parent, const QString& Title = QString(),
     const QString& Directory = QString(), const QString& Filter = QString());
-  ~pqFileDialog();
+  ~pqFileDialog() override;
 
   /**
   * set the file mode
@@ -141,7 +141,7 @@ public:
   /**
   * accept this dialog
   */
-  void accept();
+  void accept() override;
 
   /**
   * set a file current to support test playback
@@ -193,7 +193,7 @@ protected:
 
   QStringList buildFileGroup(const QString& filename);
 
-  virtual void showEvent(QShowEvent* showEvent);
+  void showEvent(QShowEvent* showEvent) override;
 
 private slots:
   void onModelReset();

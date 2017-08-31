@@ -44,7 +44,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBackgroundEditorWidget : public pqPropert
 public:
   pqBackgroundEditorWidget(
     vtkSMProxy* smproxy, vtkSMPropertyGroup* smgroup, QWidget* parentObject = 0);
-  ~pqBackgroundEditorWidget();
+  ~pqBackgroundEditorWidget() override;
 
   bool gradientBackground() const;
   void setGradientBackground(bool gradientBackground);
@@ -56,7 +56,7 @@ signals:
   void imageBackgroundChanged();
 
 public slots:
-  void setView(pqView* newView);
+  void setView(pqView* newView) override;
 
 protected slots:
   void currentIndexChangedBackgroundType(int type);

@@ -55,7 +55,7 @@ public:
    * Push an undo set on the Undo stack. This will clear
    * any sets in the Redo stack.
    */
-  virtual void Push(const char* label, vtkUndoSet* changeSet) VTK_OVERRIDE;
+  void Push(const char* label, vtkUndoSet* changeSet) VTK_OVERRIDE;
 
   /**
    * Performs an Undo using the set on the top of the undo stack. The set is poped from
@@ -64,7 +64,7 @@ public:
    * it fires vtkCommand::EndEvent.
    * \returns the status of the operation.
    */
-  virtual int Undo() VTK_OVERRIDE;
+  int Undo() VTK_OVERRIDE;
 
   /**
    * Performs a Redo using the set on the top of the redo stack. The set is poped from
@@ -73,7 +73,7 @@ public:
    * it fires vtkCommand::EndEvent.
    * \returns the status of the operation.
    */
-  virtual int Redo() VTK_OVERRIDE;
+  int Redo() VTK_OVERRIDE;
 
   enum EventIds
   {
@@ -84,7 +84,7 @@ public:
 
 protected:
   vtkSMUndoStack();
-  ~vtkSMUndoStack();
+  ~vtkSMUndoStack() override;
 
   // Helper method used to push all vtkSMRemoteObject to the collection of
   // all the sessions that have been used across that undoset.

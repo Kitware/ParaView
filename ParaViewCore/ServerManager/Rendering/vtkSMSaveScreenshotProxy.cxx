@@ -261,7 +261,7 @@ public:
   {
   }
 
-  ~vtkStateView()
+  ~vtkStateView() override
   {
     if (this->OriginalSize[0] > 0 && this->OriginalSize[1] > 0)
     {
@@ -319,7 +319,7 @@ public:
     layout->GetSeparatorColor(this->OriginalSeparatorColor);
   }
 
-  ~vtkStateLayout()
+  ~vtkStateLayout() override
   {
     vtkSMPropertyHelper(this->Layout, "ShowWindowDecorations").Set(this->ShowWindowDecorations);
     if (this->OriginalSize[0] > 0 && this->OriginalSize[1] > 0)

@@ -57,15 +57,15 @@ class PQWIDGETS_EXPORT pqTreeView : public QTreeView
 
 public:
   pqTreeView(QWidget* parent = 0);
-  virtual ~pqTreeView() {}
+  ~pqTreeView() override {}
 
-  virtual bool eventFilter(QObject* object, QEvent* e);
+  bool eventFilter(QObject* object, QEvent* e) override;
 
-  virtual void setModel(QAbstractItemModel* model);
-  virtual void setRootIndex(const QModelIndex& index);
+  void setModel(QAbstractItemModel* model) override;
+  void setRootIndex(const QModelIndex& index) override;
 
-  virtual QSize sizeHint() const;
-  virtual QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
   void setMaximumRowCountBeforeScrolling(int val) { this->MaximumRowCountBeforeScrolling = val; }
   int maximumRowCountBeforeScrolling() const { return this->MaximumRowCountBeforeScrolling; }

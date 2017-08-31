@@ -187,7 +187,7 @@ public:
    * Overridden to not call Update() directly on the input representations,
    * instead use ProcessViewRequest() for all vtkPVDataRepresentations.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * Returns true if the application is currently in tile display mode.
@@ -231,7 +231,7 @@ public:
 
 protected:
   vtkPVView();
-  ~vtkPVView();
+  ~vtkPVView() override;
 
   /**
    * Overridden to check that the representation has View setup properly. Older
@@ -239,7 +239,7 @@ protected:
    * call the superclass implementations. We check that that's not the case and
    * warn.
    */
-  virtual void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
 
   // vtkPVSynchronizedRenderWindows is used to ensure that this view participates
   // in tile-display configurations. Even if your view subclass a simple

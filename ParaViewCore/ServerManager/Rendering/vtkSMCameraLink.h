@@ -58,7 +58,7 @@ public:
   /**
    * Remove a linked proxy.
    */
-  virtual void RemoveLinkedProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
+  void RemoveLinkedProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
 
   /**
    * Update all the views linked with an OUTPUT direction.
@@ -73,36 +73,36 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMCameraLink();
-  ~vtkSMCameraLink();
+  ~vtkSMCameraLink() override;
 
   /**
    * Called when an input proxy is updated (UpdateVTKObjects).
    * Argument is the input proxy.
    */
-  virtual void UpdateVTKObjects(vtkSMProxy* proxy) VTK_OVERRIDE;
+  void UpdateVTKObjects(vtkSMProxy* proxy) VTK_OVERRIDE;
 
   /**
    * Called when a property of an input proxy is modified.
    * caller:- the input proxy.
    * pname:- name of the property being modified.
    */
-  virtual void PropertyModified(vtkSMProxy* proxy, const char* pname) VTK_OVERRIDE;
+  void PropertyModified(vtkSMProxy* proxy, const char* pname) VTK_OVERRIDE;
 
   /**
    * Called when a property is pushed.
    * caller :- the input proxy.
    * pname :- name of property that was pushed.
    */
-  virtual void UpdateProperty(vtkSMProxy*, const char*) VTK_OVERRIDE {}
+  void UpdateProperty(vtkSMProxy*, const char*) VTK_OVERRIDE {}
 
   /**
    * Save the state of the link.
    */
-  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
+  void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
 
   /**
    * Internal method to copy vtkSMproperty values from caller to all linked
@@ -117,7 +117,7 @@ protected:
   /**
    * Update the internal protobuf state
    */
-  virtual void UpdateState() VTK_OVERRIDE;
+  void UpdateState() VTK_OVERRIDE;
 
 private:
   class vtkInternals;

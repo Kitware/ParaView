@@ -44,10 +44,9 @@ public:
 
 protected:
   vtkPConvertSelection();
-  ~vtkPConvertSelection();
+  ~vtkPConvertSelection() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;
 

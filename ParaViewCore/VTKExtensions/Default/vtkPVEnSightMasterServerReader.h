@@ -64,12 +64,11 @@ public:
 
 protected:
   vtkPVEnSightMasterServerReader();
-  ~vtkPVEnSightMasterServerReader();
+  ~vtkPVEnSightMasterServerReader() override;
 
-  virtual int RequestInformation(
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   int ParseMasterServerFile();
 
   void SuperclassExecuteInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);

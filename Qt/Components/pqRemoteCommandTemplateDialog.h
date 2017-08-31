@@ -16,7 +16,7 @@ class pqRemoteCommandTemplateDialog : public QDialog
 
 public:
   pqRemoteCommandTemplateDialog(QWidget* parent, Qt::WindowFlags f);
-  ~pqRemoteCommandTemplateDialog();
+  ~pqRemoteCommandTemplateDialog() override;
 
   // Description:
   // Access to UI state

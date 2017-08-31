@@ -69,7 +69,7 @@ public:
   * \param parent The parent widget for the dialog.
   */
   pqCustomFilterManager(pqCustomFilterManagerModel* model, QWidget* parent = 0);
-  virtual ~pqCustomFilterManager();
+  ~pqCustomFilterManager() override;
 
 public slots:
   /**

@@ -55,7 +55,7 @@ public:
   // \c parent:- QObject parent.
   pqComparativeRenderView(const QString& group, const QString& name, vtkSMViewProxy* renModule,
     pqServer* server, QObject* parent = NULL);
-  virtual ~pqComparativeRenderView();
+  ~pqComparativeRenderView() override;
 
   /**
   * Returns the comparative view proxy.
@@ -65,7 +65,7 @@ public:
   /**
   * Returns the root render view in the comparative view.
   */
-  virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
+  vtkSMRenderViewProxy* getRenderViewProxy() const override;
 
 protected slots:
   /**
@@ -78,7 +78,7 @@ protected:
   * Creates a new instance of the QWidget subclass to be used to show this
   * view. Default implementation creates a pqQVTKWidgetBase.
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
 private:
   Q_DISABLE_COPY(pqComparativeRenderView)

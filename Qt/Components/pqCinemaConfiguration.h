@@ -58,9 +58,9 @@ class PQCOMPONENTS_EXPORT pqCinemaConfiguration : public pqPropertyWidget
 
 public:
   pqCinemaConfiguration(vtkSMProxy* proxy_, vtkSMPropertyGroup* smpgroup, QWidget* parent_ = NULL);
-  virtual ~pqCinemaConfiguration();
+  ~pqCinemaConfiguration() override;
 
-  virtual void updateWidget(bool showing_advanced_properties);
+  void updateWidget(bool showing_advanced_properties) override;
 
   /**
   * Get method for the viewSelection Q_PROPERTY. Defines a python script extract describing
@@ -84,7 +84,7 @@ protected:
   /**
   * Updates the vtkCinemaExporter proxy by emitting pqPropertyWidget's changeFinished() signal.
   */
-  void hideEvent(QHideEvent* event_);
+  void hideEvent(QHideEvent* event_) override;
 
 signals:
 

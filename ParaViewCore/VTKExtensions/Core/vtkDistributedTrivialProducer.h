@@ -54,7 +54,7 @@ public:
 
 protected:
   vtkDistributedTrivialProducer();
-  ~vtkDistributedTrivialProducer();
+  ~vtkDistributedTrivialProducer() override;
 
 private:
   vtkDistributedTrivialProducer(const vtkDistributedTrivialProducer&) VTK_DELETE_FUNCTION;

@@ -33,14 +33,14 @@ public:
 
 protected:
   vtkSITimeStepsProperty();
-  ~vtkSITimeStepsProperty();
+  ~vtkSITimeStepsProperty() override;
 
   friend class vtkSIProxy;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSITimeStepsProperty(const vtkSITimeStepsProperty&) VTK_DELETE_FUNCTION;

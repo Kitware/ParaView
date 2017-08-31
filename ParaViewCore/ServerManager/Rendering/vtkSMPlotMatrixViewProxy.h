@@ -36,10 +36,10 @@ public:
   /**
    * Provides access to the vtk plot matrix.
    */
-  virtual vtkAbstractContextItem* GetContextItem() VTK_OVERRIDE;
+  vtkAbstractContextItem* GetContextItem() VTK_OVERRIDE;
 
 protected:
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
   void ActivePlotChanged();
 
   void PostRender(bool) VTK_OVERRIDE;
@@ -47,7 +47,7 @@ protected:
   bool ActiveChanged;
 
   vtkSMPlotMatrixViewProxy();
-  ~vtkSMPlotMatrixViewProxy();
+  ~vtkSMPlotMatrixViewProxy() override;
   void SendAnimationPath();
   void AnimationTickEvent();
 

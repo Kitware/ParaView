@@ -67,7 +67,7 @@ class PQCOMPONENTS_EXPORT pqColorChooserButtonWithPalettes : public pqColorChoos
 
 public:
   pqColorChooserButtonWithPalettes(QWidget* parent = 0);
-  virtual ~pqColorChooserButtonWithPalettes();
+  ~pqColorChooserButtonWithPalettes() override;
 
 private slots:
   /**
@@ -106,7 +106,7 @@ class PQCOMPONENTS_EXPORT pqColorPaletteLinkHelper : public QObject
 public:
   pqColorPaletteLinkHelper(
     pqColorChooserButtonWithPalettes* button, vtkSMProxy* smproxy, const char* smproperty);
-  virtual ~pqColorPaletteLinkHelper();
+  ~pqColorPaletteLinkHelper() override;
 
 private:
   /**

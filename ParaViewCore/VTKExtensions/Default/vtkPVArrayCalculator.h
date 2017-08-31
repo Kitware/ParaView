@@ -47,10 +47,9 @@ public:
 
 protected:
   vtkPVArrayCalculator();
-  ~vtkPVArrayCalculator();
+  ~vtkPVArrayCalculator() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   //@{
   /**

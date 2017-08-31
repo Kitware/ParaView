@@ -47,14 +47,14 @@ class PQCORE_EXPORT pqStandardServerManagerModelInterface : public QObject,
   Q_INTERFACES(pqServerManagerModelInterface)
 public:
   pqStandardServerManagerModelInterface(QObject* parent);
-  virtual ~pqStandardServerManagerModelInterface();
+  ~pqStandardServerManagerModelInterface() override;
 
   /**
   * Creates a pqProxy subclass for the vtkSMProxy given the details for its
   * registration with the proxy manager.
   */
-  virtual pqProxy* createPQProxy(
-    const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server) const;
+  pqProxy* createPQProxy(
+    const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server) const override;
 };
 
 #endif

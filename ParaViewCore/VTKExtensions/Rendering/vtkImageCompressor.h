@@ -114,7 +114,7 @@ protected:
    * Construct with NULL input array and empty but allocated output array.
    */
   vtkImageCompressor();
-  virtual ~vtkImageCompressor();
+  ~vtkImageCompressor() override;
   //@}
 
   // This is the array which contains the compressed data.

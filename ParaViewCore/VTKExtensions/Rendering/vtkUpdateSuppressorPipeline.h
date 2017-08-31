@@ -38,7 +38,7 @@ public:
    * Generalized interface for asking the executive to fullfill update
    * requests.
    */
-  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
+  int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
     vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   //@{
@@ -51,7 +51,7 @@ public:
 
 protected:
   vtkUpdateSuppressorPipeline();
-  ~vtkUpdateSuppressorPipeline();
+  ~vtkUpdateSuppressorPipeline() override;
   //@}
 
   bool Enabled;

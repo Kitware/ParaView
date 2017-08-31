@@ -96,7 +96,7 @@ public:
   // a placeholder for whatever operation is actually performed) and store the
   // result in B.  The operation is assumed to be associative.  Commutativity
   // is specified by the Commutative method.
-  virtual void Function(const void* A, void* B, vtkIdType length, int datatype)
+  void Function(const void* A, void* B, vtkIdType length, int datatype) override
   {
     assert((datatype == VTK_DOUBLE) && (length == 6));
     (void)datatype;
@@ -132,7 +132,7 @@ public:
   // Description:
   // Subclasses override this method to specify whether their operation
   // is commutative.  It should return 1 if commutative or 0 if not.
-  virtual int Commutative() { return 1; }
+  int Commutative() override { return 1; }
 };
 
 //----------------------------------------------------------------------------

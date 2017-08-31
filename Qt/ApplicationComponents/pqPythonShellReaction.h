@@ -66,7 +66,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqPythonShellReaction::showPythonShell(); }
+  void onTriggered() override { pqPythonShellReaction::showPythonShell(); }
 
 private:
   Q_DISABLE_COPY(pqPythonShellReaction)

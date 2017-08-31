@@ -46,14 +46,14 @@ public:
 
 protected:
   vtkSMChartRepresentationProxy();
-  ~vtkSMChartRepresentationProxy();
+  ~vtkSMChartRepresentationProxy() override;
 
   /**
    * Overridden to ensure that whenever "Input" property changes, we update the
    * "Input" properties for all internal representations (including setting up
    * of the link to the extract-selection representation).
    */
-  virtual void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
+  void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
 private:
   vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&) VTK_DELETE_FUNCTION;

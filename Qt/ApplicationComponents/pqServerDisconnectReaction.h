@@ -70,7 +70,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override;
 
   pqTimer UpdateTimer;
 

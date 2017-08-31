@@ -207,25 +207,25 @@ public:
 
 protected:
   vtkPVGeometryFilter();
-  ~vtkPVGeometryFilter();
+  ~vtkPVGeometryFilter() override;
 
   //@{
   /**
    * Overridden to create vtkMultiBlockDataSet when input is a
    * composite-dataset and vtkPolyData when input is a vtkDataSet.
    */
-  virtual int RequestDataObject(
+  int RequestDataObject(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   virtual int RequestAMRData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
   virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
   //@}
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * Produce geometry for a block in the dataset.
@@ -298,15 +298,15 @@ protected:
   // Callback for recording progress of internal filters.
   void HandleGeometryFilterProgress(vtkObject* caller, unsigned long, void*);
 
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
-  virtual void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
 
   /**
    * Overridden to request ghost-cells for vtkUnstructuredGrid inputs so that we
    * don't generate internal surfaces.
    */
-  virtual int RequestUpdateExtent(
+  int RequestUpdateExtent(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Convenience method to purge ghost cells.

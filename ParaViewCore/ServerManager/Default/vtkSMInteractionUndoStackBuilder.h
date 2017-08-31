@@ -83,7 +83,7 @@ public:
 
 protected:
   vtkSMInteractionUndoStackBuilder();
-  ~vtkSMInteractionUndoStackBuilder();
+  ~vtkSMInteractionUndoStackBuilder() override;
 
   vtkSMRenderViewProxy* RenderView;
   vtkSMUndoStack* UndoStack;

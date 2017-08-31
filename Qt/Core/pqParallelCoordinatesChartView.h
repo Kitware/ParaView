@@ -52,7 +52,7 @@ public:
 
   pqParallelCoordinatesChartView(const QString& group, const QString& name,
     vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
-  virtual ~pqParallelCoordinatesChartView();
+  ~pqParallelCoordinatesChartView() override;
 
 private:
   Q_DISABLE_COPY(pqParallelCoordinatesChartView)

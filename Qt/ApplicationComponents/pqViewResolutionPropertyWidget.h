@@ -59,7 +59,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewResolutionPropertyWidget : public pqP
 
 public:
   pqViewResolutionPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  virtual ~pqViewResolutionPropertyWidget();
+  ~pqViewResolutionPropertyWidget() override;
 
   //@{
   /**

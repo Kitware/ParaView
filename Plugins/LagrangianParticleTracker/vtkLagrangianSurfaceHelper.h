@@ -53,18 +53,18 @@ public:
 
 protected:
   vtkLagrangianSurfaceHelper();
-  ~vtkLagrangianSurfaceHelper();
+  ~vtkLagrangianSurfaceHelper() override;
 
   /**
    * Fill the model with inputs if any.
    */
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
    * Creates the same output type as the input type.
    */
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;

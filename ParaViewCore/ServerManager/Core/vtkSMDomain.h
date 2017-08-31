@@ -110,7 +110,7 @@ public:
 
 protected:
   vtkSMDomain();
-  ~vtkSMDomain();
+  ~vtkSMDomain() override;
 
   //@{
   /**

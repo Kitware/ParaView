@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqAboutDialog : public QDialog
 
 public:
   pqAboutDialog(QWidget* Parent);
-  ~pqAboutDialog();
+  ~pqAboutDialog() override;
 
 protected:
   void AddClientInformation();

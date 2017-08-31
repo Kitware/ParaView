@@ -83,19 +83,19 @@ public:
   void SetReductionTypeToMin() { this->SetReductionType(vtkAttributeDataReductionFilter::MIN); }
 protected:
   vtkAttributeDataReductionFilter();
-  ~vtkAttributeDataReductionFilter();
+  ~vtkAttributeDataReductionFilter() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestDataObject(
+  int RequestDataObject(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int ReductionType;
   int AttributeType;
 

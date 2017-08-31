@@ -41,14 +41,14 @@ public:
    * Must call UpdateVTKObjects() before calling UpdatePipeline()
    * to ensure that the filename etc. are set correctly.
    */
-  virtual void UpdatePipeline() VTK_OVERRIDE;
+  void UpdatePipeline() VTK_OVERRIDE;
 
   /**
    * Updates the pipeline and writes the file(s).
    * Must call UpdateVTKObjects() before calling UpdatePipeline()
    * to ensure that the filename etc. are set correctly.
    */
-  virtual void UpdatePipeline(double time) VTK_OVERRIDE;
+  void UpdatePipeline(double time) VTK_OVERRIDE;
 
   //@{
   /**
@@ -70,13 +70,12 @@ public:
 
 protected:
   vtkSMWriterProxy();
-  ~vtkSMWriterProxy();
+  ~vtkSMWriterProxy() override;
 
   /**
    * Read attributes from an XML element.
    */
-  virtual int ReadXMLAttributes(
-    vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   int SupportsParallel;
   int ParallelOnly;

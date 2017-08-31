@@ -40,9 +40,9 @@ public:
 
 protected:
   vtkPGenericEnSightReader();
-  ~vtkPGenericEnSightReader();
+  ~vtkPGenericEnSightReader() override;
 
-  virtual int RequestInformation(
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**

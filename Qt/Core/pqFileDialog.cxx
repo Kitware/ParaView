@@ -65,7 +65,7 @@ public:
     : QComboBox(p)
   {
   }
-  void showPopup()
+  void showPopup() override
   {
     QWidget* container = this->view()->parentWidget();
     container->setMaximumWidth(this->width());
@@ -168,7 +168,7 @@ public:
       SLOT(setChosenFiles(const QList<QStringList>&)));
   }
 
-  ~pqImplementation()
+  ~pqImplementation() override
   {
     delete this->RecentModel;
     delete this->FavoriteModel;
@@ -176,7 +176,7 @@ public:
     delete this->Completer;
   }
 
-  bool eventFilter(QObject* obj, QEvent* anEvent)
+  bool eventFilter(QObject* obj, QEvent* anEvent) override
   {
     if (obj == this->Ui.Files)
     {

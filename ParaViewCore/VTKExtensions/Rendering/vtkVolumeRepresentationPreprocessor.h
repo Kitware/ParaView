@@ -67,14 +67,13 @@ public:
 
 protected:
   vtkVolumeRepresentationPreprocessor();
-  ~vtkVolumeRepresentationPreprocessor();
+  ~vtkVolumeRepresentationPreprocessor() override;
 
   vtkUnstructuredGrid* TriangulateDataSet(vtkDataSet*);
   vtkDataSet* MultiBlockToDataSet(vtkMultiBlockDataSet*);
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   int TetrahedraOnly;
   int ExtractedBlockIndex;

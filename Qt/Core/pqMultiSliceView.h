@@ -40,7 +40,7 @@ public:
   */
   pqMultiSliceView(const QString& viewtype, const QString& group, const QString& name,
     vtkSMViewProxy* viewmodule, pqServer* server, QObject* p);
-  virtual ~pqMultiSliceView();
+  ~pqMultiSliceView() override;
 
   /**
   * Provide access to visible slices positions for any axis.
@@ -78,7 +78,7 @@ public:
   /**
   * Override for custom management
   */
-  virtual void setCursor(const QCursor&);
+  void setCursor(const QCursor&) override;
 
   /**
   * Update Outline visibility
@@ -114,7 +114,7 @@ protected:
   /**
   * Override to decorate the pqQVTKWidgetBase
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
   /**
   * Helper method to get the concreate 3D widget

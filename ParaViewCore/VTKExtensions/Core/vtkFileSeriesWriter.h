@@ -46,7 +46,7 @@ public:
   /**
    * Return the MTime also considering the internal writer.
    */
-  virtual vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   //@{
   /**
@@ -122,8 +122,7 @@ public:
   /**
    * see vtkAlgorithm for details
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Get/Set the interpreter to use to call methods on the writer.
@@ -132,7 +131,7 @@ public:
 
 protected:
   vtkFileSeriesWriter();
-  ~vtkFileSeriesWriter();
+  ~vtkFileSeriesWriter() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;

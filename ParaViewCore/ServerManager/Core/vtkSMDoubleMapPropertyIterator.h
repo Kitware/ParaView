@@ -56,7 +56,7 @@ public:
 
 protected:
   vtkSMDoubleMapPropertyIterator();
-  ~vtkSMDoubleMapPropertyIterator();
+  ~vtkSMDoubleMapPropertyIterator() override;
 
 private:
   vtkSMDoubleMapPropertyIterator(const vtkSMDoubleMapPropertyIterator&) VTK_DELETE_FUNCTION;

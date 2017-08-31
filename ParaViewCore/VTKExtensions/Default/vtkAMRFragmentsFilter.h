@@ -113,7 +113,7 @@ public:
 
 protected:
   vtkAMRFragmentsFilter();
-  virtual ~vtkAMRFragmentsFilter();
+  ~vtkAMRFragmentsFilter() override;
 
   bool ExtractSurface;
   bool UseWatertightSurface;
@@ -126,10 +126,9 @@ protected:
   vtkAMRConnectivity* Connectivity;
   vtkPVAMRFragmentIntegration* Integration;
 
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
   vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;

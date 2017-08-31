@@ -132,7 +132,7 @@ public:
 
 protected:
   vtkSMUndoStackBuilder();
-  ~vtkSMUndoStackBuilder();
+  ~vtkSMUndoStackBuilder() override;
 
   vtkSMUndoStack* UndoStack;
   vtkUndoSet* UndoSet;

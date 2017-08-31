@@ -65,7 +65,7 @@ public:
 
 protected:
   vtkPolyDataGeodesicDistance();
-  ~vtkPolyDataGeodesicDistance();
+  ~vtkPolyDataGeodesicDistance() override;
 
   // Get the distance field array on the polydata
   vtkFloatArray* GetGeodesicDistanceField(vtkPolyData* pd);

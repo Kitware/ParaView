@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqPipelineFilter : public pqPipelineSource
 
 public:
   pqPipelineFilter(QString name, vtkSMProxy* proxy, pqServer* server, QObject* parent = NULL);
-  virtual ~pqPipelineFilter();
+  ~pqPipelineFilter() override;
 
   /**
   * Returns the inputs ports on any proxy.
@@ -151,7 +151,7 @@ protected:
   * underlying vtkSMProxy. This needs to be done only once,
   * after the object has been created.
   */
-  virtual void initialize();
+  void initialize() override;
 
   /**
   * Called when a input property changes. \c portname is the name of the input

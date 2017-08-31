@@ -43,12 +43,12 @@ public:
 
 protected:
   vtkSMCompoundProxyDefinitionLoader();
-  ~vtkSMCompoundProxyDefinitionLoader();
+  ~vtkSMCompoundProxyDefinitionLoader() override;
 
   /**
    * Locate the XML for the proxy with the given id.
    */
-  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
+  vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
 
   vtkPVXMLElement* RootElement;
 

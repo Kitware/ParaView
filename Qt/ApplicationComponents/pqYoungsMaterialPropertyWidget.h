@@ -56,7 +56,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqYoungsMaterialPropertyWidget
 
 public:
   pqYoungsMaterialPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
-  virtual ~pqYoungsMaterialPropertyWidget();
+  ~pqYoungsMaterialPropertyWidget() override;
 
   void setOrderingArrays(const QList<QVariant>&);
   QList<QVariant> orderingArrays() const;

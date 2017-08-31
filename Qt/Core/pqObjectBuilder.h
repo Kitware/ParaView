@@ -72,7 +72,7 @@ class PQCORE_EXPORT pqObjectBuilder : public QObject
 
 public:
   pqObjectBuilder(QObject* parent = 0);
-  virtual ~pqObjectBuilder();
+  ~pqObjectBuilder() override;
 
   /**
   * Create a server connection give a server resource.

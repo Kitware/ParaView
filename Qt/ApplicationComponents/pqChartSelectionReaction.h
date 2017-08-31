@@ -83,10 +83,10 @@ protected slots:
   /**
   * called when modifier group is changed.
   */
-  virtual void modifiersChanged();
+  void modifiersChanged() override;
 
   // Get the current state of selection modifier, converting it to vtkScene enum
-  int getSelectionModifier();
+  int getSelectionModifier() override;
 
 private:
   Q_DISABLE_COPY(pqChartSelectionReaction)

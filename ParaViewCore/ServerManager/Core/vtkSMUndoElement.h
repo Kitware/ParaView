@@ -49,7 +49,7 @@ public:
 
 protected:
   vtkSMUndoElement();
-  ~vtkSMUndoElement();
+  ~vtkSMUndoElement() override;
 
   // Identifies the session to which this object is related.
   vtkWeakPointer<vtkSMSession> Session;

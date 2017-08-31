@@ -48,7 +48,7 @@ class PQCOMPONENTS_EXPORT pqPipelineTimeKeyFrameEditor : public QDialog
   Q_OBJECT
 public:
   pqPipelineTimeKeyFrameEditor(pqAnimationScene* scene, pqAnimationCue* cue, QWidget* p);
-  ~pqPipelineTimeKeyFrameEditor();
+  ~pqPipelineTimeKeyFrameEditor() override;
 
 public slots:
   /**

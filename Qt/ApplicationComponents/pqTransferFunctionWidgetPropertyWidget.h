@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget
 public:
   explicit pqTransferFunctionWidgetPropertyWidget(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  ~pqTransferFunctionWidgetPropertyWidget();
+  ~pqTransferFunctionWidgetPropertyWidget() override;
 
   const double* getRange() { return this->Range; };
   void setRange(const double& min, const double& max);

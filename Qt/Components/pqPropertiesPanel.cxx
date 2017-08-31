@@ -90,7 +90,7 @@ public:
     QObject::connect(panel, SIGNAL(viewChanged(pqView*)), this->Panel, SLOT(setView(pqView*)));
   }
 
-  ~pqProxyWidgets() { delete this->Panel; }
+  ~pqProxyWidgets() override { delete this->Panel; }
 
   void hide()
   {

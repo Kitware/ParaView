@@ -57,7 +57,7 @@ public:
 
 protected:
   vtkSMViewExportHelper();
-  ~vtkSMViewExportHelper();
+  ~vtkSMViewExportHelper() override;
 
 private:
   vtkSMViewExportHelper(const vtkSMViewExportHelper&) VTK_DELETE_FUNCTION;

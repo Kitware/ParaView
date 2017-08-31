@@ -53,7 +53,7 @@ public:
 
 protected:
   vtkNetworkImageSource();
-  ~vtkNetworkImageSource();
+  ~vtkNetworkImageSource() override;
 
   vtkTimeStamp UpdateImageTime;
 

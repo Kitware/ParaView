@@ -47,9 +47,9 @@ public:
 
 protected:
   vtkCompleteArrays();
-  ~vtkCompleteArrays();
+  ~vtkCompleteArrays() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
   vtkMultiProcessController* Controller;
 

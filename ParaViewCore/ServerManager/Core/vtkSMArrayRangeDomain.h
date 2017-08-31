@@ -45,11 +45,11 @@ public:
    * (vtkSMStringVectorProperty) properties. Currently, this uses
    * only the first component of the array.
    */
-  virtual void Update(vtkSMProperty* prop) VTK_OVERRIDE;
+  void Update(vtkSMProperty* prop) VTK_OVERRIDE;
 
 protected:
   vtkSMArrayRangeDomain();
-  ~vtkSMArrayRangeDomain();
+  ~vtkSMArrayRangeDomain() override;
 
   void Update(const char* arrayName, int fieldAssociation, vtkSMSourceProxy* producer,
     int producerPort, int component = -1);

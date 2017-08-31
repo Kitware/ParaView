@@ -63,7 +63,7 @@ public:
   pqCustomViewButtonDialog(QWidget* parent, Qt::WindowFlags f, QStringList& toolTips,
     QStringList& configurations, QString& currentConfig);
 
-  ~pqCustomViewButtonDialog();
+  ~pqCustomViewButtonDialog() override;
 
   // Description:
   // Constant variable that contains the default name for the tool tips.

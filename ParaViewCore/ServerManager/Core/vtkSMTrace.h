@@ -200,7 +200,7 @@ public:
 
 protected:
   vtkSMTrace();
-  virtual ~vtkSMTrace();
+  ~vtkSMTrace() override;
 
   /**
    * Returns true of there's an error. Otherwise, returns false.

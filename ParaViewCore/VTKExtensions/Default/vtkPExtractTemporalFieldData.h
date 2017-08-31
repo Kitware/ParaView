@@ -52,7 +52,7 @@ public:
 
 protected:
   vtkPExtractTemporalFieldData();
-  ~vtkPExtractTemporalFieldData();
+  ~vtkPExtractTemporalFieldData() override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;

@@ -63,7 +63,7 @@ public:
   /**
   * destructor
   */
-  ~pqFileChooserWidget();
+  ~pqFileChooserWidget() override;
 
   /**
   * get the filename

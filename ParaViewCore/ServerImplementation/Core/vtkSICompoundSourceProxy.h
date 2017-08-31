@@ -39,21 +39,21 @@ public:
   /**
    * Returns the vtkAlgorithmOutput for an output port, if valid.
    */
-  virtual vtkAlgorithmOutput* GetOutputPort(int port) VTK_OVERRIDE;
+  vtkAlgorithmOutput* GetOutputPort(int port) VTK_OVERRIDE;
 
 protected:
   vtkSICompoundSourceProxy();
-  ~vtkSICompoundSourceProxy();
+  ~vtkSICompoundSourceProxy() override;
 
   /**
    * Read xml-attributes.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Create the output ports and add post filters for each output port.
    */
-  virtual bool CreateOutputPorts() VTK_OVERRIDE;
+  bool CreateOutputPorts() VTK_OVERRIDE;
 
 private:
   vtkSICompoundSourceProxy(const vtkSICompoundSourceProxy&) VTK_DELETE_FUNCTION;

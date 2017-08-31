@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
 
 public:
   pqAnimationViewWidget(QWidget* parent = 0);
-  virtual ~pqAnimationViewWidget();
+  ~pqAnimationViewWidget() override;
 
 public slots:
 

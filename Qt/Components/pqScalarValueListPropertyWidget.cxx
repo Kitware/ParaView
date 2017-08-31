@@ -78,28 +78,28 @@ public:
     Q_ASSERT(num_columns > 0);
   }
 
-  virtual ~pqTableModel() {}
+  ~pqTableModel() override {}
 
   void setAllowIntegerValuesOnly(bool allow) { this->AllowIntegralValuesOnly = allow; }
 
   // QAbstractTableModel API -------------------------------------------------
-  virtual Qt::ItemFlags flags(const QModelIndex& idx) const
+  Qt::ItemFlags flags(const QModelIndex& idx) const override
   {
     return this->Superclass::flags(idx) | Qt::ItemIsEditable;
   }
 
-  virtual int rowCount(const QModelIndex& prnt = QModelIndex()) const
+  int rowCount(const QModelIndex& prnt = QModelIndex()) const override
   {
     Q_UNUSED(prnt);
     return this->Values.size() / this->NumberOfColumns;
   }
-  virtual int columnCount(const QModelIndex& prnt = QModelIndex()) const
+  int columnCount(const QModelIndex& prnt = QModelIndex()) const override
   {
     Q_UNUSED(prnt);
     return this->NumberOfColumns;
   }
 
-  virtual QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const
+  QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override
   {
     if (role == Qt::DisplayRole || role == Qt::ToolTipRole || role == Qt::EditRole)
     {
@@ -112,7 +112,7 @@ public:
     return QVariant();
   }
 
-  virtual bool setData(const QModelIndex& idx, const QVariant& aValue, int role = Qt::EditRole)
+  bool setData(const QModelIndex& idx, const QVariant& aValue, int role = Qt::EditRole) override
   {
     Q_UNUSED(role);
     if (!aValue.toString().isEmpty())

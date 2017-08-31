@@ -42,7 +42,7 @@ public:
 
 protected:
   vtkSMViewResolutionDomain();
-  ~vtkSMViewResolutionDomain();
+  ~vtkSMViewResolutionDomain() override;
 
   void GetLayoutResolution(vtkSMViewLayoutProxy* layout, int resolution[2]);
   void GetViewResolution(vtkSMViewProxy* view, int resolution[2]);

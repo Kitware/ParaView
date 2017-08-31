@@ -38,21 +38,20 @@ public:
    * Similar to IsSelectionAvailable(), however, on failure returns the
    * error message otherwise 0.
    */
-  virtual const char* IsSelectVisiblePointsAvailable() VTK_OVERRIDE;
+  const char* IsSelectVisiblePointsAvailable() VTK_OVERRIDE;
 
   /**
    * Overridden to set initial default slices when a representation is created.
    * Not sure that's the best way to do this, but leaving the logic unchanged in
    * this pass.
    */
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+  vtkSMRepresentationProxy* CreateDefaultRepresentation(
     vtkSMProxy* proxy, int outputPort) VTK_OVERRIDE;
 
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  virtual const char* GetRepresentationType(
-    vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Fetchs data bounds from the client-side object. We simply fetch the
@@ -74,7 +73,7 @@ public:
 
 protected:
   vtkSMMultiSliceViewProxy();
-  ~vtkSMMultiSliceViewProxy();
+  ~vtkSMMultiSliceViewProxy() override;
 
   /**
    * Use the center of the source to initialize the view with three orthogonal

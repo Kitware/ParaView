@@ -105,7 +105,7 @@ public:
 
 protected:
   vtkSMSaveScreenshotProxy();
-  ~vtkSMSaveScreenshotProxy();
+  ~vtkSMSaveScreenshotProxy() override;
 
   /**
    * Captures rendered image, but assumes that the `Prepare` has already been

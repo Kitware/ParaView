@@ -176,7 +176,7 @@ public:
 
 protected:
   vtkPVSynchronizedRenderer();
-  ~vtkPVSynchronizedRenderer();
+  ~vtkPVSynchronizedRenderer() override;
 
   /**
    * Sets up the render passes on the renderer. This won't get called on

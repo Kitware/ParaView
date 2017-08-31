@@ -99,7 +99,7 @@ public:
 
 protected:
   vtkInitializationHelper(){};
-  virtual ~vtkInitializationHelper(){};
+  ~vtkInitializationHelper() override{};
 
   /**
    * Load user and site settings

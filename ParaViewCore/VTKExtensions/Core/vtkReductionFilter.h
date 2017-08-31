@@ -131,15 +131,15 @@ public:
 
 protected:
   vtkReductionFilter();
-  ~vtkReductionFilter();
+  ~vtkReductionFilter() override;
 
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   void Reduce(vtkDataObject* input, vtkDataObject* output);

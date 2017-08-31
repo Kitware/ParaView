@@ -64,7 +64,7 @@ class PQCOMPONENTS_EXPORT pqProxiesWidget : public QWidget
 
 public:
   pqProxiesWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  virtual ~pqProxiesWidget();
+  ~pqProxiesWidget() override;
 
 public slots:
   /**

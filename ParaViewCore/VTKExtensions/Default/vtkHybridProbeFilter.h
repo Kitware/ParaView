@@ -64,12 +64,11 @@ public:
 
 protected:
   vtkHybridProbeFilter();
-  ~vtkHybridProbeFilter();
+  ~vtkHybridProbeFilter() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   bool InterpolateAtLocation(vtkDataObject* input, vtkUnstructuredGrid* output);
   bool ExtractCellContainingLocation(vtkDataObject* input, vtkUnstructuredGrid* output);

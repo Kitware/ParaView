@@ -111,12 +111,11 @@ public:
 
 protected:
   vtkPVEnSightMasterServerReader2();
-  ~vtkPVEnSightMasterServerReader2();
+  ~vtkPVEnSightMasterServerReader2() override;
 
-  virtual int RequestInformation(
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   int ParseMasterServerFile();
 
   // The MPI controller used to communicate with the instances in

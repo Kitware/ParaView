@@ -79,7 +79,7 @@ public:
 
 protected:
   vtkPVRayCastPickingHelper();
-  ~vtkPVRayCastPickingHelper();
+  ~vtkPVRayCastPickingHelper() override;
 
   /**
    * Compute the intersection using provided dataset

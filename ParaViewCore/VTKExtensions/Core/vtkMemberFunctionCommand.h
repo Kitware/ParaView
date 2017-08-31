@@ -78,13 +78,13 @@ class vtkMemberFunctionCommand : public vtkCommand
 public:
   typedef vtkCommand Superclass;
 
-  virtual const char* GetClassNameInternal() const { return "vtkMemberFunctionCommand"; }
+  const char* GetClassNameInternal() const override { return "vtkMemberFunctionCommand"; }
 
   static ThisT* SafeDownCast(vtkObjectBase* o) { return dynamic_cast<ThisT*>(o); }
 
   static ThisT* New() { return new ThisT(); }
 
-  void PrintSelf(ostream& os, vtkIndent indent) { vtkCommand::PrintSelf(os, indent); }
+  void PrintSelf(ostream& os, vtkIndent indent) override { vtkCommand::PrintSelf(os, indent); }
 
   //@{
   /**
@@ -104,7 +104,7 @@ public:
     this->Method2 = method2;
   }
 
-  virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
+  void Execute(vtkObject* caller, unsigned long event, void* calldata) override
   {
     if (this->Object && this->Method)
     {
@@ -130,7 +130,7 @@ private:
     this->Method2 = 0;
   }
 
-  ~vtkMemberFunctionCommand() {}
+  ~vtkMemberFunctionCommand() override {}
 
   ClassT* Object;
   void (ClassT::*Method)();

@@ -59,7 +59,7 @@ public:
   * Constructor. Parent cannot be NULL.
   */
   pqReaction(QAction* parent, Qt::ConnectionType type = Qt::AutoConnection);
-  virtual ~pqReaction();
+  ~pqReaction() override;
 
   /**
   * Provides access to the parent action.

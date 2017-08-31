@@ -38,9 +38,8 @@ public:
    * insert VTK-algorithms in the input pipeline.
    * Overridden to insert "CompleteArrays" filter in the pipeline.
    */
-  virtual void AddInput(
-    int input_port, vtkAlgorithmOutput* connection, const char* method) VTK_OVERRIDE;
-  virtual void CleanInputs(const char* method) VTK_OVERRIDE;
+  void AddInput(int input_port, vtkAlgorithmOutput* connection, const char* method) VTK_OVERRIDE;
+  void CleanInputs(const char* method) VTK_OVERRIDE;
   //@}
 
   /**
@@ -52,7 +51,7 @@ public:
 
 protected:
   vtkSIWriterProxy();
-  ~vtkSIWriterProxy();
+  ~vtkSIWriterProxy() override;
 
   /**
    * Overridden to setup stuff on the writer e.g piece request, gather helpers
@@ -63,7 +62,7 @@ protected:
   /**
    * Read xml-attributes.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   char* FileNameMethod;
   vtkSetStringMacro(FileNameMethod);

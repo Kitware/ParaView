@@ -61,7 +61,7 @@ public:
   // If preserve_order == true, then the widget will preserve value orders
   // and allow for duplicates, otherwise the values are unique and sorted.
   pqSampleScalarWidget(bool preserve_order, QWidget* Parent = 0);
-  ~pqSampleScalarWidget();
+  ~pqSampleScalarWidget() override;
 
   /**
   * Sets the server manager objects that will be controlled by the widget
@@ -113,7 +113,7 @@ private:
   class pqImplementation;
   pqImplementation* const Implementation;
 
-  bool eventFilter(QObject* object, QEvent* e);
+  bool eventFilter(QObject* object, QEvent* e) override;
 };
 
 #endif // !_pqSampleScalarWidget_h

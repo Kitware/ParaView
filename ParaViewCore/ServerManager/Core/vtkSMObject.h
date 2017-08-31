@@ -37,7 +37,7 @@ public:
 
 protected:
   vtkSMObject();
-  ~vtkSMObject();
+  ~vtkSMObject() override;
 
 private:
   vtkSMObject(const vtkSMObject&) VTK_DELETE_FUNCTION;

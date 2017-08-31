@@ -110,7 +110,7 @@ public:
 
 protected:
   vtkCameraInterpolator2();
-  ~vtkCameraInterpolator2();
+  ~vtkCameraInterpolator2() override;
 
   void Evaluate(double u, vtkParametricSpline* spline, double tuple[3]);
 

@@ -258,7 +258,7 @@ public:
   //@}
 protected:
   vtkPVSynchronizedRenderWindows(vtkPVSession*);
-  ~vtkPVSynchronizedRenderWindows();
+  ~vtkPVSynchronizedRenderWindows() override;
 
   /**
    * Set/Get the controller used for communication among parallel processes.

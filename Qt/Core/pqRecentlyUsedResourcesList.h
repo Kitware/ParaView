@@ -80,7 +80,7 @@ class PQCORE_EXPORT pqRecentlyUsedResourcesList : public QObject
 
 public:
   pqRecentlyUsedResourcesList(QObject* parent = 0);
-  virtual ~pqRecentlyUsedResourcesList();
+  ~pqRecentlyUsedResourcesList() override;
 
   /**
   * convenience typedef.

@@ -74,22 +74,22 @@ public:
 
 protected:
   vtkSMAnimationSceneImageWriter();
-  ~vtkSMAnimationSceneImageWriter();
+  ~vtkSMAnimationSceneImageWriter() override;
 
   /**
    * Called to initialize saving.
    */
-  virtual bool SaveInitialize(int startCount) VTK_OVERRIDE;
+  bool SaveInitialize(int startCount) VTK_OVERRIDE;
 
   /**
    * Called to save a particular frame.
    */
-  virtual bool SaveFrame(double time) VTK_OVERRIDE;
+  bool SaveFrame(double time) VTK_OVERRIDE;
 
   /**
    * Called to finalize saving.
    */
-  virtual bool SaveFinalize() VTK_OVERRIDE;
+  bool SaveFinalize() VTK_OVERRIDE;
 
   /**
    * Capture and return an image for the current frame.

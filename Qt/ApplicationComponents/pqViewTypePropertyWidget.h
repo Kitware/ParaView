@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewTypePropertyWidget : public pqPropert
 
 public:
   pqViewTypePropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  virtual ~pqViewTypePropertyWidget();
+  ~pqViewTypePropertyWidget() override;
 
   /**
   * get the current value in the widget

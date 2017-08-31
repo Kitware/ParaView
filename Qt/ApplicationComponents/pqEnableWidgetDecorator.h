@@ -51,7 +51,7 @@ public:
   /**
   * overridden from pqPropertyWidget.
   */
-  virtual bool enableWidget() const { return this->isBoolProperty(); }
+  bool enableWidget() const override { return this->isBoolProperty(); }
 
 private:
   Q_DISABLE_COPY(pqEnableWidgetDecorator)

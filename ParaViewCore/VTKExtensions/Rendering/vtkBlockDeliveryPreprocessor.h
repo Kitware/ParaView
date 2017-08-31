@@ -90,19 +90,18 @@ public:
 
 protected:
   vtkBlockDeliveryPreprocessor();
-  ~vtkBlockDeliveryPreprocessor();
+  ~vtkBlockDeliveryPreprocessor() override;
 
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestDataObject(
+  int RequestDataObject(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int FieldAssociation;
   int FlattenTable;

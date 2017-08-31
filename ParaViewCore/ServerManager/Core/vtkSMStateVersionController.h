@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkSMStateVersionController();
-  ~vtkSMStateVersionController();
+  ~vtkSMStateVersionController() override;
 
 private:
   vtkSMStateVersionController(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;

@@ -40,7 +40,7 @@ public:
 
 protected:
   vtkSpyPlotFileSeriesReader();
-  ~vtkSpyPlotFileSeriesReader();
+  ~vtkSpyPlotFileSeriesReader() override;
 
 private:
   vtkSpyPlotFileSeriesReader(const vtkSpyPlotFileSeriesReader&) VTK_DELETE_FUNCTION;

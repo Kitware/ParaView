@@ -592,7 +592,7 @@ public:
     this->GlobalHistogram = new Histogram(HISTOGRAM_SIZE);
   }
 
-  virtual ~Internals()
+  ~Internals() override
   {
     if (this->LocalSorter)
       delete this->LocalSorter;
@@ -601,7 +601,7 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  bool IsSortable()
+  bool IsSortable() override
   {
     // See if one process is able to sort the table,
     // if not then just say NOT sortable
@@ -723,8 +723,8 @@ public:
 
   // --------------------------------------------------------------------------
   // The sorting is based on processId and the current order
-  int Extract(
-    vtkTable* input, vtkTable* output, vtkIdType block, vtkIdType blockSize, bool revertOrder)
+  int Extract(vtkTable* input, vtkTable* output, vtkIdType block, vtkIdType blockSize,
+    bool revertOrder) override
   {
     // ------------------------------------------------------------------------
     // Make sure that the Cache is builded
@@ -856,8 +856,8 @@ public:
     return 1;
   }
   // --------------------------------------------------------------------------
-  int Compute(
-    vtkTable* input, vtkTable* output, vtkIdType block, vtkIdType blockSize, bool revertOrder)
+  int Compute(vtkTable* input, vtkTable* output, vtkIdType block, vtkIdType blockSize,
+    bool revertOrder) override
   {
     // ------------------------------------------------------------------------
     // Make sure that the Cache is builded
@@ -1099,7 +1099,7 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  void SetSelectedComponent(int newValue)
+  void SetSelectedComponent(int newValue) override
   {
     if (this->SelectedComponent != newValue)
     {
@@ -1109,10 +1109,10 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  void InvalidateCache() { this->NeedToBuildCache = true; }
+  void InvalidateCache() override { this->NeedToBuildCache = true; }
 
   // --------------------------------------------------------------------------
-  bool IsInvalid(vtkTable* input, vtkDataArray* dataToProcess)
+  bool IsInvalid(vtkTable* input, vtkDataArray* dataToProcess) override
   {
     return !dataToProcess || input->GetMTime() != this->InputMTime ||
       dataToProcess->GetMTime() != this->DataMTime;
@@ -1166,7 +1166,7 @@ public:
     }
   }
   // --------------------------------------------------------------------------
-  bool TestInternalClasses()
+  bool TestInternalClasses() override
   {
     cout << "vtkSortedTableStreamer::TestInternalClasses()" << endl;
 

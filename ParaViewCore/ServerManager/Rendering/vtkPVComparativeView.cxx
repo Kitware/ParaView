@@ -283,7 +283,7 @@ public:
 
 protected:
   vtkCloningVector() {}
-  virtual ~vtkCloningVector() {}
+  ~vtkCloningVector() override {}
 
   /**
    * This must be called to initialize the vector with the "root".
@@ -427,7 +427,7 @@ public:
 
 protected:
   vtkCloningVectorOfRepresentations() {}
-  ~vtkCloningVectorOfRepresentations() {}
+  ~vtkCloningVectorOfRepresentations() override {}
 
 private:
   vtkCloningVectorOfRepresentations(const vtkCloningVectorOfRepresentations&) VTK_DELETE_FUNCTION;
@@ -583,7 +583,7 @@ protected:
     this->CameraLink->SynchronizeInteractiveRendersOff();
   }
 
-  ~vtkCloningVectorOfViews() {}
+  ~vtkCloningVectorOfViews() override {}
 
   /**
    * A new view is being created, we need to create clones of representations too

@@ -39,16 +39,15 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMergeCompositeDataSet : public vtkVert
 {
 public:
   vtkTypeMacro(vtkMergeCompositeDataSet, vtkVertexGlyphFilter);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkMergeCompositeDataSet* New();
 
 protected:
   vtkMergeCompositeDataSet();
-  virtual ~vtkMergeCompositeDataSet();
+  ~vtkMergeCompositeDataSet() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
 private:
   vtkMergeCompositeDataSet(const vtkMergeCompositeDataSet&) VTK_DELETE_FUNCTION;

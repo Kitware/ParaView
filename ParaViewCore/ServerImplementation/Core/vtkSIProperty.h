@@ -85,7 +85,7 @@ public:
 
 protected:
   vtkSIProperty();
-  ~vtkSIProperty();
+  ~vtkSIProperty() override;
 
   friend class vtkSIProxy;
 

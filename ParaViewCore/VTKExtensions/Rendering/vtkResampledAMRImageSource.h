@@ -90,7 +90,7 @@ public:
 
 protected:
   vtkResampledAMRImageSource();
-  ~vtkResampledAMRImageSource();
+  ~vtkResampledAMRImageSource() override;
 
   bool Initialize(vtkOverlappingAMR* amr);
   bool UpdateResampledVolume(

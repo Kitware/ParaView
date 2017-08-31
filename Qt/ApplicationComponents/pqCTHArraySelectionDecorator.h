@@ -48,7 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCTHArraySelectionDecorator : public pqPro
 
 public:
   pqCTHArraySelectionDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  virtual ~pqCTHArraySelectionDecorator();
+  ~pqCTHArraySelectionDecorator() override;
 
 private slots:
   void updateSelection();

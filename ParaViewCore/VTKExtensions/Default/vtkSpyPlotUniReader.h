@@ -233,7 +233,7 @@ public:
 
 protected:
   vtkSpyPlotUniReader();
-  ~vtkSpyPlotUniReader();
+  ~vtkSpyPlotUniReader() override;
   vtkSpyPlotBlock* Blocks;
 
 private:

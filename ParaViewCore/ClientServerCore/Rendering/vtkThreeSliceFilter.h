@@ -109,11 +109,10 @@ public:
 
 protected:
   vtkThreeSliceFilter();
-  ~vtkThreeSliceFilter();
+  ~vtkThreeSliceFilter() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkCutter* Slices[3];
   vtkPlane* Planes[3];

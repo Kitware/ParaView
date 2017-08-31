@@ -50,7 +50,7 @@ public:
 
 protected:
   vtkPVEnSightMasterServerTranslator();
-  ~vtkPVEnSightMasterServerTranslator();
+  ~vtkPVEnSightMasterServerTranslator() override;
   //@}
 
   // The process id on which this translator is running.

@@ -65,7 +65,7 @@ public:
 
 protected:
   vtkSMProxyInitializationHelper();
-  ~vtkSMProxyInitializationHelper();
+  ~vtkSMProxyInitializationHelper() override;
 
 private:
   vtkSMProxyInitializationHelper(const vtkSMProxyInitializationHelper&) VTK_DELETE_FUNCTION;

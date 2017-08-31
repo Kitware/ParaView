@@ -57,7 +57,7 @@ public:
    * Override the SetSession so if the object already have an ID
    * we automatically register it to the associated session
    */
-  virtual void SetSession(vtkSMSession*) VTK_OVERRIDE;
+  void SetSession(vtkSMSession*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -137,7 +137,7 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkSMRemoteObject();
+  ~vtkSMRemoteObject() override;
 
   /**
    * Subclasses can call this method to send a message to its state

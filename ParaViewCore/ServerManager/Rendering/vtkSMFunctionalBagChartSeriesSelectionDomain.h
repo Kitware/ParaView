@@ -38,17 +38,17 @@ public:
   /**
    * Returns the default visibility for a series given its name.
    */
-  virtual bool GetDefaultSeriesVisibility(const char*) VTK_OVERRIDE;
+  bool GetDefaultSeriesVisibility(const char*) VTK_OVERRIDE;
 
 protected:
   vtkSMFunctionalBagChartSeriesSelectionDomain();
-  ~vtkSMFunctionalBagChartSeriesSelectionDomain();
+  ~vtkSMFunctionalBagChartSeriesSelectionDomain() override;
 
   /**
    * Get the default value that will be used for the series with the given name
    * by this domain.
    */
-  virtual std::vector<vtkStdString> GetDefaultValue(const char* series) VTK_OVERRIDE;
+  std::vector<vtkStdString> GetDefaultValue(const char* series) VTK_OVERRIDE;
 
 private:
   vtkSMFunctionalBagChartSeriesSelectionDomain(

@@ -141,7 +141,7 @@ public:
 
 protected:
   vtkPVFileInformationHelper();
-  ~vtkPVFileInformationHelper();
+  ~vtkPVFileInformationHelper() override;
 
   char* Path;
   char* WorkingDirectory;

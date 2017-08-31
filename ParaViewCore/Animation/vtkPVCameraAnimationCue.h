@@ -63,15 +63,15 @@ public:
   void SetTimeKeeper(vtkSMProxy*);
   //@}
 
-  virtual void BeginUpdateAnimationValues() VTK_OVERRIDE {}
-  virtual void SetAnimationValue(int, double) VTK_OVERRIDE {}
-  virtual void EndUpdateAnimationValues() VTK_OVERRIDE;
+  void BeginUpdateAnimationValues() VTK_OVERRIDE {}
+  void SetAnimationValue(int, double) VTK_OVERRIDE {}
+  void EndUpdateAnimationValues() VTK_OVERRIDE;
 
   void SetDataSourceProxy(vtkSMProxy* dataSourceProxy);
 
 protected:
   vtkPVCameraAnimationCue();
-  ~vtkPVCameraAnimationCue();
+  ~vtkPVCameraAnimationCue() override;
 
   vtkPVRenderView* View;
   vtkSMProxy* DataSourceProxy;

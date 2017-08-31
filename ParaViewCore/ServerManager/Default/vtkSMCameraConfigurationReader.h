@@ -55,15 +55,15 @@ public:
    * managed render view proxy. This will make sure the renderview is
    * updated after the read.
    */
-  virtual int ReadConfiguration(const char* filename) VTK_OVERRIDE;
-  virtual int ReadConfiguration(vtkPVXMLElement* x) VTK_OVERRIDE;
+  int ReadConfiguration(const char* filename) VTK_OVERRIDE;
+  int ReadConfiguration(vtkPVXMLElement* x) VTK_OVERRIDE;
   // unhide
-  virtual int ReadConfiguration() VTK_OVERRIDE { return this->Superclass::ReadConfiguration(); }
+  int ReadConfiguration() VTK_OVERRIDE { return this->Superclass::ReadConfiguration(); }
   //@}
 
 protected:
   vtkSMCameraConfigurationReader();
-  virtual ~vtkSMCameraConfigurationReader();
+  ~vtkSMCameraConfigurationReader() override;
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy

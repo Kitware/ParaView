@@ -46,14 +46,14 @@ public:
   bool collapsed() const;
   void setCollapsed(bool);
 
-  QSize minimumSizeHint() const;
+  QSize minimumSizeHint() const override;
 
 protected:
-  virtual void paintEvent(QPaintEvent*);
-  virtual void mousePressEvent(QMouseEvent*);
-  virtual void mouseMoveEvent(QMouseEvent*);
-  virtual void mouseReleaseEvent(QMouseEvent*);
-  virtual void childEvent(QChildEvent* c);
+  void paintEvent(QPaintEvent*) override;
+  void mousePressEvent(QMouseEvent*) override;
+  void mouseMoveEvent(QMouseEvent*) override;
+  void mouseReleaseEvent(QMouseEvent*) override;
+  void childEvent(QChildEvent* c) override;
 
   virtual void setChildrenEnabled(bool);
 

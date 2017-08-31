@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
   Q_PROPERTY(bool allowChangeOfSource READ allowChangeOfSource WRITE setAllowChangeOfSource)
 public:
   pqSpreadSheetViewDecorator(pqSpreadSheetView* view);
-  ~pqSpreadSheetViewDecorator();
+  ~pqSpreadSheetViewDecorator() override;
   void setPrecision(int);
   void setFixedRepresentation(bool);
 

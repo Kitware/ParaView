@@ -62,7 +62,7 @@ public:
 
 private:
   vtkGetFreePort() {}
-  ~vtkGetFreePort() {}
+  ~vtkGetFreePort() override {}
 };
 vtkStandardNewMacro(vtkGetFreePort);
 

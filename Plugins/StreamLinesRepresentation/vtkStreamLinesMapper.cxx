@@ -111,7 +111,7 @@ public:
 
 protected:
   Private();
-  ~Private();
+  ~Private() override;
 
   void InitParticle(int);
   bool PrepareGLBuffers(vtkRenderer*, vtkActor*);

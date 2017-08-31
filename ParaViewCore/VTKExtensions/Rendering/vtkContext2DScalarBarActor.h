@@ -52,7 +52,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkContext2DScalarBarActor : public vtk
 {
 public:
   vtkTypeMacro(vtkContext2DScalarBarActor, vtkScalarBarActor);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkContext2DScalarBarActor* New();
 
   //@{
@@ -184,7 +184,7 @@ public:
   /**
    * We only render in the overlay for the context scene.
    */
-  virtual int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
 
   /**
    * Draw the scalar bar and annotation text to the screen.
@@ -196,7 +196,7 @@ public:
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  virtual void ReleaseGraphicsResources(vtkWindow* window) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow* window) VTK_OVERRIDE;
 
   /**
    * Responsible for actually drawing the scalar bar.
@@ -211,7 +211,7 @@ public:
 
 protected:
   vtkContext2DScalarBarActor();
-  virtual ~vtkContext2DScalarBarActor();
+  ~vtkContext2DScalarBarActor() override;
 
 private:
   vtkContext2DScalarBarActor(const vtkContext2DScalarBarActor&) VTK_DELETE_FUNCTION;

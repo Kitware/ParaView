@@ -341,7 +341,7 @@ public:
 
 protected:
   vtkSMTransferFunctionProxy();
-  ~vtkSMTransferFunctionProxy();
+  ~vtkSMTransferFunctionProxy() override;
 
 private:
   vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) VTK_DELETE_FUNCTION;

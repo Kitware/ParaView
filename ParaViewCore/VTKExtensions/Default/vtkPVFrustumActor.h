@@ -50,7 +50,7 @@ public:
 
 protected:
   vtkPVFrustumActor();
-  ~vtkPVFrustumActor();
+  ~vtkPVFrustumActor() override;
 
   vtkOutlineSource* Outline;
   vtkPolyDataMapper* Mapper;

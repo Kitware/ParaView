@@ -48,13 +48,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLoadRestoreWindowLayoutReaction : public 
 
 public:
   pqLoadRestoreWindowLayoutReaction(bool load, QAction* parent = 0);
-  virtual ~pqLoadRestoreWindowLayoutReaction();
+  ~pqLoadRestoreWindowLayoutReaction() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqLoadRestoreWindowLayoutReaction)

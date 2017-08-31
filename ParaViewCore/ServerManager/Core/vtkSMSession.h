@@ -128,7 +128,7 @@ public:
   /**
    * Builtin session is always alive.
    */
-  virtual bool GetIsAlive() VTK_OVERRIDE { return true; }
+  bool GetIsAlive() VTK_OVERRIDE { return true; }
 
   /**
    * Returns a ServerFlags indicate the nature of the current processes. e.g. if
@@ -137,26 +137,23 @@ public:
    * The implementation provided by this class returns
    * vtkPVSession::CLIENT_AND_SERVERS suitable for builtin-mode.
    */
-  virtual ServerFlags GetProcessRoles() VTK_OVERRIDE;
+  ServerFlags GetProcessRoles() VTK_OVERRIDE;
 
   /**
    * Push the state message. Overridden to ensure that the information in the
    * undo-redo state manager is updated.
    */
-  virtual void PushState(vtkSMMessage* msg) VTK_OVERRIDE;
+  void PushState(vtkSMMessage* msg) VTK_OVERRIDE;
 
   /**
    * Sends the message to all clients.
    */
-  virtual void NotifyAllClients(const vtkSMMessage* msg) VTK_OVERRIDE
-  {
-    this->ProcessNotification(msg);
-  }
+  void NotifyAllClients(const vtkSMMessage* msg) VTK_OVERRIDE { this->ProcessNotification(msg); }
 
   /**
    * Sends the message to all but the active client-session.
    */
-  virtual void NotifyOtherClients(const vtkSMMessage*) VTK_OVERRIDE { /* nothing to do. */}
+  void NotifyOtherClients(const vtkSMMessage*) VTK_OVERRIDE { /* nothing to do. */}
 
   //---------------------------------------------------------------------------
   // API for Collaboration management
@@ -254,7 +251,7 @@ protected:
   // has been created/setup correctly.
   vtkSMSession(
     bool initialize_during_constructor = true, vtkPVSessionCore* preExistingSessionCore = NULL);
-  ~vtkSMSession();
+  ~vtkSMSession() override;
 
   /**
    * Internal method used by ConnectToRemote().

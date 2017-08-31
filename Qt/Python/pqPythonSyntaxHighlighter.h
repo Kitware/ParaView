@@ -61,7 +61,7 @@ public:
   * NOTE: the optional tab key capture is enabled by the constructor
   */
   explicit pqPythonSyntaxHighlighter(QTextEdit* textEdit, QObject* p = 0);
-  virtual ~pqPythonSyntaxHighlighter();
+  ~pqPythonSyntaxHighlighter() override;
 
   /**
   * Returns true if the tab key is being intercepted to insert spaces in
@@ -79,7 +79,7 @@ protected:
   * This event filter is applied to the TextEdit to translate presses of the
   * Tab key into 4 spaces being inserted
   */
-  bool eventFilter(QObject*, QEvent*);
+  bool eventFilter(QObject*, QEvent*) override;
 private slots:
   void rehighlightSyntax();
 

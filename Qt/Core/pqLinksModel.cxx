@@ -82,7 +82,7 @@ public:
   static pqInternal* New() { return new pqInternal; }
   static const char* columnHeaders[];
 
-  void Execute(vtkObject*, unsigned long eid, void* callData)
+  void Execute(vtkObject*, unsigned long eid, void* callData) override
   {
     vtkSMProxyManager::RegisteredProxyInformation* info =
       reinterpret_cast<vtkSMProxyManager::RegisteredProxyInformation*>(callData);
@@ -121,7 +121,7 @@ public:
 
 protected:
   pqInternal() {}
-  ~pqInternal()
+  ~pqInternal() override
   {
     // clean up interactiveViewLinks
     foreach (pqInteractiveViewLink* interLink, this->InteractiveViewLinks)

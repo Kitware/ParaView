@@ -55,8 +55,8 @@ public:
   }
 
   // create a line-edit with validator.
-  virtual QWidget* createEditor(
-    QWidget* parentObject, const QStyleOptionViewItem& option, const QModelIndex& index) const
+  QWidget* createEditor(QWidget* parentObject, const QStyleOptionViewItem& option,
+    const QModelIndex& index) const override
   {
     (void)option;
     (void)index;

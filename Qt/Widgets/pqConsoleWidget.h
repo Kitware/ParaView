@@ -54,7 +54,7 @@ class PQWIDGETS_EXPORT pqConsoleWidget : public QWidget
 
 public:
   pqConsoleWidget(QWidget* parent = nullptr);
-  virtual ~pqConsoleWidget();
+  ~pqConsoleWidget() override;
 
   /**
   * Returns the current formatting that will be used by printString

@@ -36,7 +36,7 @@ public:
 
 protected:
   vtkPVNullSource();
-  ~vtkPVNullSource();
+  ~vtkPVNullSource() override;
 
 private:
   vtkPVNullSource(const vtkPVNullSource&) VTK_DELETE_FUNCTION;

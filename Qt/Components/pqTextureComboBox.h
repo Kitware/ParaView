@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqTextureComboBox : public QComboBox
 
 public:
   pqTextureComboBox(QWidget* parent = 0);
-  virtual ~pqTextureComboBox();
+  ~pqTextureComboBox() override;
 
 public slots:
   /**

@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqComparativeCueWidget : public QTableWidget
 
 public:
   pqComparativeCueWidget(QWidget* parent = 0);
-  virtual ~pqComparativeCueWidget();
+  ~pqComparativeCueWidget() override;
 
   /**
   * Get/Set the cue that is currently being shown/edited by this widget.
@@ -97,7 +97,7 @@ protected:
   * called when mouse is released. We use this to popup the range editing
   * dialog if the selection changed.
   */
-  virtual void mouseReleaseEvent(QMouseEvent* evt);
+  void mouseReleaseEvent(QMouseEvent* evt) override;
 
   void editRange();
 

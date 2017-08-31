@@ -37,7 +37,7 @@ public:
 
 protected:
   vtkSIImageTextureProxy();
-  ~vtkSIImageTextureProxy();
+  ~vtkSIImageTextureProxy() override;
 
   /**
    * Overridden to hookup the image source with the Texture, if available.

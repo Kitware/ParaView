@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqOutputPortComboBox : public QComboBox
 
 public:
   pqOutputPortComboBox(QWidget* parent = 0);
-  ~pqOutputPortComboBox();
+  ~pqOutputPortComboBox() override;
 
   /**
   * Enable/Disable changing of the combo-box selected index based on the

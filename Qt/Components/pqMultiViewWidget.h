@@ -59,7 +59,7 @@ class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
       decorationsVisibilityChanged)
 public:
   pqMultiViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqMultiViewWidget();
+  ~pqMultiViewWidget() override;
 
   /**
   * Get/Set the vtkSMViewLayoutProxy instance this widget is using as the layout
@@ -225,7 +225,7 @@ protected:
   * Event filter callback to detect when a sub-frame becomes active, so that
   * we can mark it as such.
   */
-  virtual bool eventFilter(QObject* caller, QEvent* evt);
+  bool eventFilter(QObject* caller, QEvent* evt) override;
 
 private:
   QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg, int& maxIndex);

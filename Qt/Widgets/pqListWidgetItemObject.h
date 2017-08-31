@@ -52,7 +52,7 @@ public:
   /**
   * overload setData() to emit changed signal
   */
-  void setData(int role, const QVariant& v);
+  void setData(int role, const QVariant& v) override;
 
 public slots:
   /**

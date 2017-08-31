@@ -46,7 +46,7 @@ public:
   /**
    * Triggers UpdateInformation() on vtkObject if possible.
    */
-  virtual void UpdatePipelineInformation() VTK_OVERRIDE;
+  void UpdatePipelineInformation() VTK_OVERRIDE;
 
   /**
    * Triggers UpdatePipeline().
@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkSISourceProxy();
-  ~vtkSISourceProxy();
+  ~vtkSISourceProxy() override;
 
   /**
    * Overridden to setup the output ports and pipelines for the output ports.
@@ -82,7 +82,7 @@ protected:
   /**
    * Read xml-attributes.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Create the output ports and add post filters for each output port.

@@ -38,7 +38,7 @@ public:
    * Overridden to format the series name to remove the operation applied e.g.
    * a columnName of "min(EQPS)" and "max(EQPS)" both will return "EQPS".
    */
-  virtual vtkStdString GetDefaultSeriesLabel(
+  vtkStdString GetDefaultSeriesLabel(
     const vtkStdString& tableName, const vtkStdString& columnName) VTK_OVERRIDE;
 
   //@{
@@ -75,7 +75,7 @@ public:
 
 protected:
   vtkQuartileChartRepresentation();
-  ~vtkQuartileChartRepresentation();
+  ~vtkQuartileChartRepresentation() override;
 
   bool QuartileVisibility;
   bool RangeVisibility;

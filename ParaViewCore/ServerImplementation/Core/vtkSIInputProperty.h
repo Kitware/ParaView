@@ -43,17 +43,17 @@ public:
 
 protected:
   vtkSIInputProperty();
-  ~vtkSIInputProperty();
+  ~vtkSIInputProperty() override;
 
   /**
    * Push a new state to the underneath implementation
    */
-  virtual bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
 
   /**
    * Parse the xml for the property.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   vtkSetMacro(PortIndex, int);
   int PortIndex;

@@ -263,7 +263,7 @@ public:
 
 protected:
   vtkSMParaViewPipelineController();
-  ~vtkSMParaViewPipelineController();
+  ~vtkSMParaViewPipelineController() override;
 
   /**
    * Find proxy of the group type (xmlgroup, xmltype) registered under a

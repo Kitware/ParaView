@@ -57,7 +57,7 @@ class PQCOMPONENTS_EXPORT pqArrayListDomain : public QObject
 public:
   pqArrayListDomain(QWidget* selectorWidget, const QString& qproperty, vtkSMProxy* proxy,
     vtkSMProperty* smproperty, vtkSMDomain* domain);
-  virtual ~pqArrayListDomain();
+  ~pqArrayListDomain() override;
 
 private slots:
   void domainChanged();

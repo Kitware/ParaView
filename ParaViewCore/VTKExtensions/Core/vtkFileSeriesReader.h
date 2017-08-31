@@ -70,8 +70,7 @@ public:
    * updated the file name of the internal in RequestUpdateExtent based
    * on the time step request.
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * CanReadFile is forwarded to the internal reader if it supports it.
@@ -122,11 +121,11 @@ public:
 
 protected:
   vtkFileSeriesReader();
-  ~vtkFileSeriesReader();
+  ~vtkFileSeriesReader() override;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestUpdateExtent(
+  int RequestUpdateExtent(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
@@ -138,10 +137,10 @@ protected:
   {
     return 1;
   };
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Make sure the reader's output is set to the given index and, if it changed,

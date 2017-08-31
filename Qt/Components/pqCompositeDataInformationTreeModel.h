@@ -159,7 +159,7 @@ class PQCOMPONENTS_EXPORT pqCompositeDataInformationTreeModel : public QAbstract
 
 public:
   pqCompositeDataInformationTreeModel(QObject* parent = 0);
-  virtual ~pqCompositeDataInformationTreeModel();
+  ~pqCompositeDataInformationTreeModel() override;
 
   //@{
   /**

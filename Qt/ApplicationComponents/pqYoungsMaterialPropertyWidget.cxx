@@ -56,15 +56,15 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~pqYoungsMaterialPropertyLinksConnection() {}
+  ~pqYoungsMaterialPropertyLinksConnection() override {}
 
 protected:
-  virtual QVariant currentServerManagerValue(bool use_unchecked) const
+  QVariant currentServerManagerValue(bool use_unchecked) const override
   {
     return pqSMAdaptor::getMultipleElementProperty(
       this->propertySM(), (use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));
   }
-  virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
+  void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
     pqSMAdaptor::setMultipleElementProperty(this->propertySM(), value.value<QList<QVariant> >(),
       (use_unchecked ? pqSMAdaptor::UNCHECKED : pqSMAdaptor::CHECKED));

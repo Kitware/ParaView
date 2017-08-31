@@ -54,17 +54,17 @@ public:
   /**
   * destructor
   */
-  virtual ~pqLinkViewWidget();
+  ~pqLinkViewWidget() override;
 
 protected:
   /**
   * event filter to monitor user's selection
   */
-  bool eventFilter(QObject* watched, QEvent* e);
+  bool eventFilter(QObject* watched, QEvent* e) override;
   /**
   * watch internal events
   */
-  bool event(QEvent* e);
+  bool event(QEvent* e) override;
 
 private:
   pqRenderView* RenderView;

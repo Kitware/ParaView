@@ -47,7 +47,7 @@ public:
   /**
    * Shallow copy from another vtkGridAxes3DActor.
    */
-  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   //@{
   /**
@@ -267,7 +267,7 @@ public:
 
 protected:
   vtkGridAxes3DActor();
-  ~vtkGridAxes3DActor();
+  ~vtkGridAxes3DActor() override;
 
   virtual void Update(vtkViewport* viewport);
 

@@ -56,7 +56,7 @@ class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
 
 public:
   pqCoreTestUtility(QObject* parent = 0);
-  ~pqCoreTestUtility();
+  ~pqCoreTestUtility() override;
 
 public:
   /**

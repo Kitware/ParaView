@@ -97,12 +97,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotBlockDistributionBlockIterator
 {
 public:
   vtkSpyPlotBlockDistributionBlockIterator() {}
-  virtual ~vtkSpyPlotBlockDistributionBlockIterator() {}
-  virtual void Start();
-  virtual int GetNumberOfBlocksToProcess();
+  ~vtkSpyPlotBlockDistributionBlockIterator() override {}
+  void Start() override;
+  int GetNumberOfBlocksToProcess() override;
 
 protected:
-  virtual void FindFirstBlockOfCurrentOrNextFile();
+  void FindFirstBlockOfCurrentOrNextFile() override;
 };
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotFileDistributionBlockIterator
@@ -110,14 +110,14 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotFileDistributionBlockIterator
 {
 public:
   vtkSpyPlotFileDistributionBlockIterator();
-  virtual ~vtkSpyPlotFileDistributionBlockIterator() {}
-  virtual void Init(int numberOfProcessors, int processorId, vtkSpyPlotReader* parent,
-    vtkSpyPlotReaderMap* fileMap, int currentTimeStep);
-  virtual void Start();
-  virtual int GetNumberOfBlocksToProcess();
+  ~vtkSpyPlotFileDistributionBlockIterator() override {}
+  void Init(int numberOfProcessors, int processorId, vtkSpyPlotReader* parent,
+    vtkSpyPlotReaderMap* fileMap, int currentTimeStep) override;
+  void Start() override;
+  int GetNumberOfBlocksToProcess() override;
 
 protected:
-  virtual void FindFirstBlockOfCurrentOrNextFile();
+  void FindFirstBlockOfCurrentOrNextFile() override;
   int FileStart;
   int FileEnd;
 };

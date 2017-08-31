@@ -64,7 +64,7 @@ public:
 
 protected:
   vtkSMDataDeliveryManager();
-  ~vtkSMDataDeliveryManager();
+  ~vtkSMDataDeliveryManager() override;
 
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
 

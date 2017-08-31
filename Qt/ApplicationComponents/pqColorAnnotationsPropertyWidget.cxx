@@ -89,7 +89,7 @@ public:
     , IsAdvanced(false)
   {
   }
-  virtual ~pqColorAnnotationsPropertyWidgetDecorator() {}
+  ~pqColorAnnotationsPropertyWidgetDecorator() override {}
 
   void setIsAdvanced(bool val)
   {
@@ -99,7 +99,7 @@ public:
       emit this->visibilityChanged();
     }
   }
-  virtual bool canShowWidget(bool show_advanced) const
+  bool canShowWidget(bool show_advanced) const override
   {
     return this->IsAdvanced ? show_advanced : true;
   }
@@ -187,25 +187,25 @@ public:
     , MissingColorIcon(":/pqWidgets/Icons/pqUnknownData16.png")
   {
   }
-  virtual ~pqAnnotationsModel() {}
+  ~pqAnnotationsModel() override {}
 
   /// Columns 1,2 are editable. 0 is not (since we show color swatch in 0). We
   /// hookup double-click event on the view to allow the user to edit the color.
-  virtual Qt::ItemFlags flags(const QModelIndex& idx) const
+  Qt::ItemFlags flags(const QModelIndex& idx) const override
   {
     return idx.column() > 0 ? this->Superclass::flags(idx) | Qt::ItemIsEditable
                             : this->Superclass::flags(idx);
   }
 
-  virtual int rowCount(const QModelIndex& prnt = QModelIndex()) const
+  int rowCount(const QModelIndex& prnt = QModelIndex()) const override
   {
     Q_UNUSED(prnt);
     return this->Items.size();
   }
 
-  virtual int columnCount(const QModelIndex& /*parent*/) const { return 3; }
+  int columnCount(const QModelIndex& /*parent*/) const override { return 3; }
 
-  virtual bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole)
+  bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole) override
   {
     Q_UNUSED(role);
     Q_ASSERT(idx.row() < this->rowCount());
@@ -218,7 +218,7 @@ public:
     return false;
   }
 
-  virtual QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const
+  QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override
   {
     if (role == Qt::DecorationRole || role == Qt::DisplayRole)
     {
@@ -244,7 +244,7 @@ public:
     return QVariant();
   }
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override
   {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
     {

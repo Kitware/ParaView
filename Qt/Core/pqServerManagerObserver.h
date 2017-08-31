@@ -57,7 +57,7 @@ class PQCORE_EXPORT pqServerManagerObserver : public QObject
 
 public:
   pqServerManagerObserver(QObject* parent = 0);
-  virtual ~pqServerManagerObserver();
+  ~pqServerManagerObserver() override;
 
 signals:
   /**

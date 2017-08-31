@@ -40,7 +40,7 @@ public:
   /**
    * Calls MarkDirty() and invokes ModifiedEvent.
    */
-  virtual void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
+  void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
 
   /**
    * Returns information about the data that is finally rendered by this
@@ -70,18 +70,18 @@ public:
    * Calls Update() on all sources. It also creates output ports if
    * they are not already created.
    */
-  virtual void UpdatePipeline() VTK_OVERRIDE;
+  void UpdatePipeline() VTK_OVERRIDE;
 
   /**
    * Calls Update() on all sources with the given time request.
    * It also creates output ports if they are not already created.
    */
-  virtual void UpdatePipeline(double time) VTK_OVERRIDE;
+  void UpdatePipeline(double time) VTK_OVERRIDE;
 
   /**
    * Overridden to reset this->MarkedModified flag.
    */
-  virtual void PostUpdateData() VTK_OVERRIDE;
+  void PostUpdateData() VTK_OVERRIDE;
 
   /**
    * Called after the view updates.
@@ -91,7 +91,7 @@ public:
   /**
    * Overridden to reserve additional IDs for use by internal composite representation
    */
-  virtual vtkTypeUInt32 GetGlobalID() VTK_OVERRIDE;
+  vtkTypeUInt32 GetGlobalID() VTK_OVERRIDE;
 
   //@{
   /**
@@ -112,18 +112,18 @@ public:
 
 protected:
   vtkSMRepresentationProxy();
-  ~vtkSMRepresentationProxy();
+  ~vtkSMRepresentationProxy() override;
 
   // Unlike subproxies in regular proxies, subproxies in representations
   // typically represent internal representations e.g. label representation,
   // representation for selection etc. In that case, if the internal
   // representation is modified, we need to ensure that any of our consumers is
   // a consumer of all our subproxies as well.
-  virtual void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy) VTK_OVERRIDE;
-  virtual void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy) VTK_OVERRIDE;
-  virtual void RemoveAllConsumers() VTK_OVERRIDE;
+  void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy) VTK_OVERRIDE;
+  void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy) VTK_OVERRIDE;
+  void RemoveAllConsumers() VTK_OVERRIDE;
 
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
   void OnVTKRepresentationUpdated();
 
   virtual void UpdatePipelineInternal(double time, bool doTime);
@@ -131,12 +131,12 @@ protected:
   /**
    * Mark the data information as invalid.
    */
-  virtual void InvalidateDataInformation() VTK_OVERRIDE;
+  void InvalidateDataInformation() VTK_OVERRIDE;
 
   /**
    * Overridden to restore this->Servers flag state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 private:
   vtkSMRepresentationProxy(const vtkSMRepresentationProxy&) VTK_DELETE_FUNCTION;

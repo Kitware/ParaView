@@ -55,10 +55,10 @@ public:
   pqCatalystRemoveBreakpointReaction(QAction* parent = 0);
 
 public slots:
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
 protected:
-  virtual void onTriggered();
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqCatalystRemoveBreakpointReaction)

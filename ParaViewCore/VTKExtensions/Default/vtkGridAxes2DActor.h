@@ -205,7 +205,7 @@ public:
   /**
    * Returns the prop bounds.
    */
-  virtual double* GetBounds() VTK_OVERRIDE
+  double* GetBounds() VTK_OVERRIDE
   {
     this->GetGridBounds(this->Bounds);
     return this->Bounds;
@@ -234,7 +234,7 @@ public:
 
 protected:
   vtkGridAxes2DActor();
-  ~vtkGridAxes2DActor();
+  ~vtkGridAxes2DActor() override;
 
   bool Update(vtkViewport* viewport);
   void UpdateTextProperties(vtkViewport* viewport);

@@ -56,7 +56,7 @@ public:
   * needs to be watched
   */
   pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, const QString& domainName = QString());
-  virtual ~pqComboBoxDomain();
+  ~pqComboBoxDomain() override;
 
   // explicitly trigger a domain change.
   // simply calls internalDomainChanged();

@@ -60,7 +60,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPipelineContextMenuBehavior : public QObj
 
 public:
   pqPipelineContextMenuBehavior(QObject* parent = 0);
-  virtual ~pqPipelineContextMenuBehavior();
+  ~pqPipelineContextMenuBehavior() override;
 
 protected slots:
   /**
@@ -151,7 +151,7 @@ protected:
   * to eat away the right button release, leaving the render window in a
   * dragging state.
   */
-  virtual bool eventFilter(QObject* caller, QEvent* e);
+  bool eventFilter(QObject* caller, QEvent* e) override;
 
   /**
   * return the name of the block from its flat index

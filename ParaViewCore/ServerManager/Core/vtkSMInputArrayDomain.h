@@ -84,7 +84,7 @@ public:
    * to a vtkSMSourceProxy. The input has to have one or more
    * arrays that match the requirements.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if input has one or more arrays that match the
@@ -151,7 +151,7 @@ public:
 
 protected:
   vtkSMInputArrayDomain();
-  ~vtkSMInputArrayDomain();
+  ~vtkSMInputArrayDomain() override;
 
   vtkSetMacro(AttributeType, int);
   void SetAttributeType(const char* type);
@@ -160,7 +160,7 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Returns true if based on this->AttributeType, the specified \c

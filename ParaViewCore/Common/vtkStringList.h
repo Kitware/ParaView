@@ -75,7 +75,7 @@ public:
 
 protected:
   vtkStringList();
-  ~vtkStringList();
+  ~vtkStringList() override;
 
   int NumberOfStrings;
   int StringArrayLength;

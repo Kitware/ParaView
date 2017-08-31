@@ -43,7 +43,7 @@ public:
   /**
    * Override it so we can change the output type of the filter
    */
-  virtual vtkAlgorithm* SetActiveFilter(int index) VTK_OVERRIDE;
+  vtkAlgorithm* SetActiveFilter(int index) VTK_OVERRIDE;
 
   void SetImplicitFunction(vtkImplicitFunction* func);
 
@@ -71,7 +71,7 @@ public:
 
 protected:
   vtkPVMetaSliceDataSet();
-  ~vtkPVMetaSliceDataSet();
+  ~vtkPVMetaSliceDataSet() override;
 
 private:
   vtkPVMetaSliceDataSet(const vtkPVMetaSliceDataSet&) VTK_DELETE_FUNCTION;

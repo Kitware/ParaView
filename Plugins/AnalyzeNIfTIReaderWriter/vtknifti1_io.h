@@ -320,7 +320,7 @@ class vtknifti1_io : public vtkObject
 public:
   static vtknifti1_io *New();
   vtkTypeMacro(vtknifti1_io,vtkObject);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 /*****************************************************************************/
 /*--------------- Prototypes of functions defined in this file --------------*/
@@ -558,7 +558,7 @@ static int    valid_nifti_extensions(const nifti_image *nim);
 /*------------------------------------------------------------------------*/
 protected:
   vtknifti1_io();
-  ~vtknifti1_io();
+  ~vtknifti1_io() override;
 
 
 /*---------------------------------------------------------------------------*/

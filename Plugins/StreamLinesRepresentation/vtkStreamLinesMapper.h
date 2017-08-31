@@ -121,7 +121,7 @@ public:
 
 protected:
   vtkStreamLinesMapper();
-  ~vtkStreamLinesMapper();
+  ~vtkStreamLinesMapper() override;
 
   double Alpha;
   double StepLength;

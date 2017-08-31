@@ -43,7 +43,7 @@ class PQCOMPONENTS_EXPORT pqIntVectorPropertyWidget : public pqPropertyWidget
 
 public:
   pqIntVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
-  virtual ~pqIntVectorPropertyWidget();
+  ~pqIntVectorPropertyWidget() override;
 
   /**
    * Creates known pqPropertyWidget subclasses for vtkSMIntVectorProperty property.

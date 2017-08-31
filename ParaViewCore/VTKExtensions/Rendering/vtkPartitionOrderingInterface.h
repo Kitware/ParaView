@@ -74,11 +74,11 @@ public:
   vtkObject* GetImplementation() { return this->Implementation; }
   //@}
 
-  virtual vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
 protected:
   vtkPartitionOrderingInterface();
-  ~vtkPartitionOrderingInterface();
+  ~vtkPartitionOrderingInterface() override;
 
 private:
   // Implementation must be either a vtkPKdTree object or a vtkPartitionOrdering object.

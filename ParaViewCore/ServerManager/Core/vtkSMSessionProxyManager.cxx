@@ -88,7 +88,7 @@ public:
 
   void SetTarget(vtkSMSessionProxyManager* t) { this->Target = t; }
 
-  virtual void Execute(vtkObject* obj, unsigned long event, void* data)
+  void Execute(vtkObject* obj, unsigned long event, void* data) override
   {
     if (this->Target)
     {
@@ -106,7 +106,7 @@ class vtkSMProxyManagerForwarder : public vtkCommand
 public:
   static vtkSMProxyManagerForwarder* New() { return new vtkSMProxyManagerForwarder(); }
 
-  virtual void Execute(vtkObject*, unsigned long event, void* data)
+  void Execute(vtkObject*, unsigned long event, void* data) override
   {
     if (vtkSMProxyManager::IsInitialized())
     {

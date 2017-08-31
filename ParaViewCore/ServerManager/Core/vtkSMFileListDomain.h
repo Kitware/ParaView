@@ -34,7 +34,7 @@ public:
 
 protected:
   vtkSMFileListDomain();
-  ~vtkSMFileListDomain();
+  ~vtkSMFileListDomain() override;
 
 private:
   vtkSMFileListDomain(const vtkSMFileListDomain&) VTK_DELETE_FUNCTION;

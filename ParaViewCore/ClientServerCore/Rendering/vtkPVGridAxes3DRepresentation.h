@@ -53,7 +53,7 @@ public:
 
 protected:
   vtkPVGridAxes3DRepresentation();
-  ~vtkPVGridAxes3DRepresentation();
+  ~vtkPVGridAxes3DRepresentation() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int RequestData(vtkInformation* req, vtkInformationVector** inInfoVec,

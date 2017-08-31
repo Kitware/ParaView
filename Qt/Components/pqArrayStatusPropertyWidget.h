@@ -44,7 +44,7 @@ class PQCOMPONENTS_EXPORT pqArrayStatusPropertyWidget : public pqPropertyWidget
 public:
   pqArrayStatusPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parent = 0);
   pqArrayStatusPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  virtual ~pqArrayStatusPropertyWidget();
+  ~pqArrayStatusPropertyWidget() override;
 
   virtual bool showLabel() const { return false; }
 

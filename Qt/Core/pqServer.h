@@ -66,7 +66,7 @@ class PQCORE_EXPORT pqServer : public pqServerManagerModelItem
   Q_OBJECT
 public:
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
-  virtual ~pqServer();
+  ~pqServer() override;
 
   const pqServerResource& getResource();
   void setResource(const pqServerResource& server_resource);

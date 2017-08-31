@@ -93,7 +93,7 @@ public:
   }
 
 protected:
-  void highlightBlock(const QString& text)
+  void highlightBlock(const QString& text) override
   {
     // is comment.
     static QRegExp comment("#[^\n]*");

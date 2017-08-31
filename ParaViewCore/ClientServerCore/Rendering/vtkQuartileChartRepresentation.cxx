@@ -41,8 +41,8 @@ public:
   // Subclasses can override this method to assign a role for a specific data
   // array in the input dataset. This is useful when multiple plots are to be
   // created for a single series.
-  virtual std::string GetSeriesRole(
-    const std::string& vtkNotUsed(tableName), const std::string& columnName)
+  std::string GetSeriesRole(
+    const std::string& vtkNotUsed(tableName), const std::string& columnName) override
   {
     if (StatsArrayRe.find(columnName))
     {
@@ -60,8 +60,8 @@ public:
     return std::string();
   }
 
-  virtual vtkPlot* NewPlot(vtkXYChartRepresentation* self, const std::string& tableName,
-    const std::string& columnName, const std::string& role)
+  vtkPlot* NewPlot(vtkXYChartRepresentation* self, const std::string& tableName,
+    const std::string& columnName, const std::string& role) override
   {
     if (role == "minmax" || role == "q1q3")
     {
@@ -84,8 +84,8 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  virtual int GetInputArrayIndex(
-    const std::string& tableName, const std::string& columnName, const std::string& role)
+  int GetInputArrayIndex(
+    const std::string& tableName, const std::string& columnName, const std::string& role) override
   {
     if (role == "minmax")
     {
@@ -108,7 +108,7 @@ public:
 
   //---------------------------------------------------------------------------
   // Export visible plots to a CSV file.
-  virtual bool Export(vtkXYChartRepresentation* self, vtkCSVExporter* exporter)
+  bool Export(vtkXYChartRepresentation* self, vtkCSVExporter* exporter) override
   {
     for (PlotsMap::iterator iter1 = this->SeriesPlots.begin(); iter1 != this->SeriesPlots.end();
          ++iter1)
@@ -172,9 +172,8 @@ public:
   }
 
 protected:
-  virtual bool UpdateSinglePlotProperties(vtkXYChartRepresentation* self,
-    const std::string& tableName, const std::string& columnName, const std::string& role,
-    vtkPlot* plot)
+  bool UpdateSinglePlotProperties(vtkXYChartRepresentation* self, const std::string& tableName,
+    const std::string& columnName, const std::string& role, vtkPlot* plot) override
   {
     vtkQuartileChartRepresentation* qcr = vtkQuartileChartRepresentation::SafeDownCast(self);
     if ((role == "minmax" && (qcr->GetRangeVisibility() == false || qcr->HasOnlyOnePoint)) ||

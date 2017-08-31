@@ -45,7 +45,7 @@ public:
 
 protected:
   vtkPVInstantiator();
-  ~vtkPVInstantiator();
+  ~vtkPVInstantiator() override;
 
 private:
   vtkPVInstantiator(const vtkPVInstantiator&) VTK_DELETE_FUNCTION;

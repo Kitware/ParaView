@@ -47,8 +47,8 @@ public:
 
 protected:
   vtkPExtentTranslator();
-  ~vtkPExtentTranslator();
-  virtual int PieceToExtentThreadSafe(int vtkNotUsed(piece), int vtkNotUsed(numPieces),
+  ~vtkPExtentTranslator() override;
+  int PieceToExtentThreadSafe(int vtkNotUsed(piece), int vtkNotUsed(numPieces),
     int vtkNotUsed(ghostLevel), int* wholeExtent, int* resultExtent, int vtkNotUsed(splitMode),
     int vtkNotUsed(byPoints)) VTK_OVERRIDE;
 

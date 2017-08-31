@@ -92,7 +92,7 @@ public:
 
 protected:
   vtkSMOutputPort();
-  ~vtkSMOutputPort();
+  ~vtkSMOutputPort() override;
 
   /**
    * Get the classname of the dataset from server.

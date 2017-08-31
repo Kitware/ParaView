@@ -44,7 +44,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNamedPropertyIterator : public vtkSMPro
 public:
   static vtkSMNamedPropertyIterator* New();
   vtkTypeMacro(vtkSMNamedPropertyIterator, vtkSMPropertyIterator);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Set the names of properties to iterate over.
@@ -54,37 +54,37 @@ public:
   /**
    * Go to the first property.
    */
-  virtual void Begin() VTK_OVERRIDE;
+  void Begin() VTK_OVERRIDE;
 
   /**
    * Returns true if iterator points past the end of the collection.
    */
-  virtual int IsAtEnd() VTK_OVERRIDE;
+  int IsAtEnd() VTK_OVERRIDE;
 
   /**
    * Move to the next property.
    */
-  virtual void Next() VTK_OVERRIDE;
+  void Next() VTK_OVERRIDE;
 
   /**
    * Returns the key (name) at the current iterator position.
    */
-  virtual const char* GetKey() VTK_OVERRIDE;
+  const char* GetKey() VTK_OVERRIDE;
 
   /**
    * Returns the XMLLabel for self properties and the exposed name for
    * sub-proxy properties.
    */
-  virtual const char* GetPropertyLabel() VTK_OVERRIDE;
+  const char* GetPropertyLabel() VTK_OVERRIDE;
 
   /**
    * Returns the property at the current iterator position.
    */
-  virtual vtkSMProperty* GetProperty() VTK_OVERRIDE;
+  vtkSMProperty* GetProperty() VTK_OVERRIDE;
 
 protected:
   vtkSMNamedPropertyIterator();
-  ~vtkSMNamedPropertyIterator();
+  ~vtkSMNamedPropertyIterator() override;
 
   vtkStringList* PropertyNames;
   int PropertyNameIndex;

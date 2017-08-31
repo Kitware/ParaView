@@ -179,7 +179,7 @@ public:
 
 protected:
   vtkFileSeriesHelper();
-  ~vtkFileSeriesHelper();
+  ~vtkFileSeriesHelper() override;
 
   class vtkTimeInformation
   {

@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqPresetToPixmap : public QObject
 
 public:
   pqPresetToPixmap(QObject* parent = 0);
-  virtual ~pqPresetToPixmap();
+  ~pqPresetToPixmap() override;
 
   /**
   * Render a preset to a pixmap for the given resolution.

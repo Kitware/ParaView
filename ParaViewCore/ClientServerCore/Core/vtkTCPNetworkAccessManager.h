@@ -71,34 +71,34 @@ public:
    * connect to the host/port. If absent, default is 60s. 0 or
    * negative implies no retry attempts.
    */
-  virtual vtkMultiProcessController* NewConnection(const char* url) VTK_OVERRIDE;
+  vtkMultiProcessController* NewConnection(const char* url) VTK_OVERRIDE;
 
   /**
    * Used to abort pending connection creation, if any. Refer to
    * NewConnection() for details.
    */
-  virtual void AbortPendingConnection() VTK_OVERRIDE;
+  void AbortPendingConnection() VTK_OVERRIDE;
 
   /**
    * Process any network activity.
    */
-  virtual int ProcessEvents(unsigned long timeout_msecs) VTK_OVERRIDE;
+  int ProcessEvents(unsigned long timeout_msecs) VTK_OVERRIDE;
 
   /**
    * Peeks to check if any activity is available. When this call returns true,
    * ProcessEvents() will always result in some activity processing if called
    * afterword.
    */
-  virtual bool GetNetworkEventsAvailable() VTK_OVERRIDE;
+  bool GetNetworkEventsAvailable() VTK_OVERRIDE;
 
   /**
    * Returns true is the manager is currently waiting for any connections.
    */
-  virtual bool GetPendingConnectionsPresent() VTK_OVERRIDE;
+  bool GetPendingConnectionsPresent() VTK_OVERRIDE;
 
 protected:
   vtkTCPNetworkAccessManager();
-  ~vtkTCPNetworkAccessManager();
+  ~vtkTCPNetworkAccessManager() override;
 
   // used by GetPendingConnectionsPresent and ProcessEvents
   int ProcessEventsInternal(unsigned long timeout_msecs, bool do_processing);

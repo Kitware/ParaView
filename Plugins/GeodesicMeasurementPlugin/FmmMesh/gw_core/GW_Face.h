@@ -51,7 +51,7 @@ public:
     /*------------------------------------------------------------------------------*/
     //@{
     GW_Face();
-    virtual ~GW_Face();
+    ~GW_Face() override;
     virtual GW_Face& operator=(const GW_Face& Face);
     //@}
 

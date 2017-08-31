@@ -107,7 +107,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(PythonShellResetBehavior);
 
   pqParaViewBehaviors(QMainWindow* window, QObject* parent = NULL);
-  virtual ~pqParaViewBehaviors();
+  ~pqParaViewBehaviors() override;
 
 private:
   Q_DISABLE_COPY(pqParaViewBehaviors)

@@ -95,7 +95,7 @@ public:
    * vtkSMSourceProxy and contains a vtkSMInputArrayDomain. Only
    * the first proxy and domain are used.
    */
-  virtual void Update(vtkSMProperty* prop) VTK_OVERRIDE;
+  void Update(vtkSMProperty* prop) VTK_OVERRIDE;
 
   /**
    * Returns true if the array with the given idx is partial
@@ -156,7 +156,7 @@ public:
    * property.
    * Returns 1 if the domain updated the property.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
   // This enum represents the possible strategies associated
   // with a given InformationKey :
@@ -225,13 +225,13 @@ public:
 
 protected:
   vtkSMArrayListDomain();
-  ~vtkSMArrayListDomain();
+  ~vtkSMArrayListDomain() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * HACK: Provides a temporary mechanism for subclasses to provide an

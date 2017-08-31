@@ -208,7 +208,7 @@ public:
 
 protected:
   vtkSMProxyManager();
-  ~vtkSMProxyManager();
+  ~vtkSMProxyManager() override;
 #ifndef __WRAP__
   static vtkSMProxyManager* New();
 #endif

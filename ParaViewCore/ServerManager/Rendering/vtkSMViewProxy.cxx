@@ -103,7 +103,7 @@ public:
 
 protected:
   WindowToImageFilter() {}
-  ~WindowToImageFilter() {}
+  ~WindowToImageFilter() override {}
 
   void Render() VTK_OVERRIDE
   {

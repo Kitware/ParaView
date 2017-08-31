@@ -86,7 +86,7 @@ public:
 
 protected:
   vtkSMOrderedPropertyIterator();
-  ~vtkSMOrderedPropertyIterator();
+  ~vtkSMOrderedPropertyIterator() override;
 
   vtkSMProxy* Proxy;
   unsigned int Index;

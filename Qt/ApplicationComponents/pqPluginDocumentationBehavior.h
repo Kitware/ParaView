@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginDocumentationBehavior : public QObj
 
 public:
   pqPluginDocumentationBehavior(QHelpEngine* engine);
-  virtual ~pqPluginDocumentationBehavior();
+  ~pqPluginDocumentationBehavior() override;
 
 protected slots:
   void updatePlugin(vtkPVPlugin*);

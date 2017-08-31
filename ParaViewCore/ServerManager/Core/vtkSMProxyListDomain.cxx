@@ -43,9 +43,9 @@ class vtkSMLinkObserver : public vtkCommand
 public:
   vtkWeakPointer<vtkSMProperty> Output;
   typedef vtkCommand Superclass;
-  virtual const char* GetClassNameInternal() const { return "vtkSMLinkObserver"; }
+  const char* GetClassNameInternal() const override { return "vtkSMLinkObserver"; }
   static vtkSMLinkObserver* New() { return new vtkSMLinkObserver(); }
-  virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
+  void Execute(vtkObject* caller, unsigned long event, void* calldata) override
   {
     (void)event;
     (void)calldata;

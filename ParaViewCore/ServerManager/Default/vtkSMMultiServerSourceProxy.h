@@ -49,7 +49,7 @@ public:
   /**
    * Marks the selection proxies dirty as well as chain to superclass.
    */
-  virtual void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
+  void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
 
   /**
    * This method is used to initialise the object to the given state
@@ -58,11 +58,11 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMMultiServerSourceProxy();
-  ~vtkSMMultiServerSourceProxy();
+  ~vtkSMMultiServerSourceProxy() override;
 
   virtual void UpdateState();
 

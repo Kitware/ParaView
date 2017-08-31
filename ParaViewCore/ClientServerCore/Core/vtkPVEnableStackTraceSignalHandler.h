@@ -36,22 +36,22 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE {}
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE {}
 
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE {}
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE {}
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE {}
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE {}
 
 protected:
   vtkPVEnableStackTraceSignalHandler() {}
-  ~vtkPVEnableStackTraceSignalHandler() {}
+  ~vtkPVEnableStackTraceSignalHandler() override {}
 
 private:
   vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&) VTK_DELETE_FUNCTION;

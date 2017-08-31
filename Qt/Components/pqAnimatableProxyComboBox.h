@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqAnimatableProxyComboBox : public QComboBox
 
 public:
   pqAnimatableProxyComboBox(QWidget* parent = 0);
-  ~pqAnimatableProxyComboBox();
+  ~pqAnimatableProxyComboBox() override;
 
   /**
   * Returns the current source

@@ -62,7 +62,7 @@ public:
   * constructor requires a QComboBox,
   */
   pqFieldSelectionAdaptor(QComboBox* p, vtkSMProperty* prop);
-  ~pqFieldSelectionAdaptor();
+  ~pqFieldSelectionAdaptor() override;
 
   /**
   * get the attribute mode

@@ -50,7 +50,7 @@ class pqIntegrationModelSurfaceHelperWidget : public pqIntegrationModelHelperWid
 public:
   pqIntegrationModelSurfaceHelperWidget(
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
-  virtual ~pqIntegrationModelSurfaceHelperWidget();
+  ~pqIntegrationModelSurfaceHelperWidget() override;
 
   QList<QVariant> arrayToGenerate() const;
 
@@ -62,7 +62,7 @@ signals:
 
 protected slots:
   /// Create/Reset the widget
-  virtual void resetWidget();
+  void resetWidget() override;
 
 protected:
   /// Recursive method to fill leaf names from a potentially composite data information

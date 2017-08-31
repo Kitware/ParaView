@@ -61,7 +61,7 @@ public:
   /**
   * destructor
   */
-  ~pqPropertyManager();
+  ~pqPropertyManager() override;
 
   /**
   * register a QObject property to link with the server manager

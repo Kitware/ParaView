@@ -51,7 +51,7 @@ public:
 
 protected:
   vtkCinemaExporter();
-  ~vtkCinemaExporter();
+  ~vtkCinemaExporter() override;
 
   void WriteData() VTK_OVERRIDE;
 

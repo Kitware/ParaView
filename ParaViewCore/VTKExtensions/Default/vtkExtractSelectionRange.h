@@ -67,10 +67,10 @@ public:
 
 protected:
   vtkExtractSelectionRange();
-  ~vtkExtractSelectionRange();
+  ~vtkExtractSelectionRange() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int FieldType;

@@ -82,10 +82,9 @@ public:
 
 protected:
   vtkEnsembleDataReader();
-  ~vtkEnsembleDataReader();
+  ~vtkEnsembleDataReader() override;
 
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   vtkAlgorithm* GetCurrentReader();
 
 private:

@@ -33,12 +33,12 @@ public:
 
 protected:
   vtkSMInsituStateLoader();
-  ~vtkSMInsituStateLoader();
+  ~vtkSMInsituStateLoader() override;
 
   /**
    * Overridden to try to reuse existing proxies as much as possible.
    */
-  virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 private:
   vtkSMInsituStateLoader(const vtkSMInsituStateLoader&) VTK_DELETE_FUNCTION;

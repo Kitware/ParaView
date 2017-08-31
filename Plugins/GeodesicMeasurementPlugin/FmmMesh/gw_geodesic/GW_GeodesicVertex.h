@@ -24,7 +24,7 @@ public:
     };
 
     GW_GeodesicVertex();
-    virtual ~GW_GeodesicVertex();
+    ~GW_GeodesicVertex() override;
     using GW_Vertex::operator=;
     GW_Float GetDistance();
     void SetDistance( GW_Float rDistance );

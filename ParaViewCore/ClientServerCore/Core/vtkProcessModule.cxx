@@ -86,7 +86,7 @@ public:
 
 private:
   vtkPVGenericOutputWindow() {}
-  ~vtkPVGenericOutputWindow() {}
+  ~vtkPVGenericOutputWindow() override {}
 };
 vtkStandardNewMacro(vtkPVGenericOutputWindow);
 }

@@ -76,7 +76,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
 
 public:
   pqColorOpacityEditorWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqColorOpacityEditorWidget();
+  ~pqColorOpacityEditorWidget() override;
 
   /**
   * Returns the current list of control points for the color transfer

@@ -122,7 +122,7 @@ public:
 
 protected:
   vtkUnstructuredPOPReader();
-  ~vtkUnstructuredPOPReader();
+  ~vtkUnstructuredPOPReader() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 

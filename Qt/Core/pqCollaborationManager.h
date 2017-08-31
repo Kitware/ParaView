@@ -63,7 +63,7 @@ class PQCORE_EXPORT pqCollaborationManager : public QObject
 
 public:
   pqCollaborationManager(QObject* parent);
-  virtual ~pqCollaborationManager();
+  ~pqCollaborationManager() override;
 
   /**
   * Return the vtkSMCollaborationManager

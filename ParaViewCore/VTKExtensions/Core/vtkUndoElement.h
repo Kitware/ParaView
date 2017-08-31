@@ -86,7 +86,7 @@ public:
 
 protected:
   vtkUndoElement();
-  ~vtkUndoElement();
+  ~vtkUndoElement() override;
 
   //@{
   /**

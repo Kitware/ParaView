@@ -48,7 +48,7 @@ public:
 
 protected:
   vtkPVRepresentationAnimationHelper();
-  ~vtkPVRepresentationAnimationHelper();
+  ~vtkPVRepresentationAnimationHelper() override;
 
   vtkWeakPointer<vtkSMProxy> SourceProxy;
 

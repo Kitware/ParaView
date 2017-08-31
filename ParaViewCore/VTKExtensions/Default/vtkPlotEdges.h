@@ -39,9 +39,9 @@ public:
 
 protected:
   vtkPlotEdges();
-  virtual ~vtkPlotEdges();
+  ~vtkPlotEdges() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   // Usual data generation method
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 

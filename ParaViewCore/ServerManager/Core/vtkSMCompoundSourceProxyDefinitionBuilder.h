@@ -111,7 +111,7 @@ public:
 
 protected:
   vtkSMCompoundSourceProxyDefinitionBuilder();
-  ~vtkSMCompoundSourceProxyDefinitionBuilder();
+  ~vtkSMCompoundSourceProxyDefinitionBuilder() override;
 
 private:
   vtkSMCompoundSourceProxyDefinitionBuilder(

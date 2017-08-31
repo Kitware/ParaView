@@ -49,7 +49,7 @@ class PQWIDGETS_EXPORT pqExpanderButton : public QFrame
   Q_PROPERTY(bool checked READ checked WRITE setChecked)
 public:
   pqExpanderButton(QWidget* parent = 0);
-  virtual ~pqExpanderButton();
+  ~pqExpanderButton() override;
 
 public slots:
   /**
@@ -79,8 +79,8 @@ signals:
   void toggled(bool checked);
 
 protected:
-  void mousePressEvent(QMouseEvent* evt);
-  void mouseReleaseEvent(QMouseEvent* evt);
+  void mousePressEvent(QMouseEvent* evt) override;
+  void mouseReleaseEvent(QMouseEvent* evt) override;
 
 private:
   Q_DISABLE_COPY(pqExpanderButton)

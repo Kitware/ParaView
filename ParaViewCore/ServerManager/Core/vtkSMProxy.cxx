@@ -54,7 +54,7 @@ class vtkSMProxyObserver : public vtkCommand
 public:
   static vtkSMProxyObserver* New() { return new vtkSMProxyObserver; }
 
-  virtual void Execute(vtkObject* obj, unsigned long event, void* data)
+  void Execute(vtkObject* obj, unsigned long event, void* data) override
   {
     if (this->Proxy)
     {
@@ -1387,9 +1387,9 @@ class vtkSMProxyPropertyLinkObserver : public vtkCommand
 public:
   vtkWeakPointer<vtkSMProperty> Output;
   typedef vtkCommand Superclass;
-  virtual const char* GetClassNameInternal() const { return "vtkSMProxyPropertyLinkObserver"; }
+  const char* GetClassNameInternal() const override { return "vtkSMProxyPropertyLinkObserver"; }
   static vtkSMProxyPropertyLinkObserver* New() { return new vtkSMProxyPropertyLinkObserver(); }
-  virtual void Execute(vtkObject* caller, unsigned long event, void* calldata)
+  void Execute(vtkObject* caller, unsigned long event, void* calldata) override
   {
     (void)event;
     (void)calldata;

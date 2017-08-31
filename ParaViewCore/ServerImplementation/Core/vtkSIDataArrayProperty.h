@@ -34,14 +34,14 @@ public:
 
 protected:
   vtkSIDataArrayProperty();
-  ~vtkSIDataArrayProperty();
+  ~vtkSIDataArrayProperty() override;
 
   friend class vtkSIProxy;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
   vtkSIDataArrayProperty(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;

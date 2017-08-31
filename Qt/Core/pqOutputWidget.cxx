@@ -135,7 +135,7 @@ protected:
   {
     this->PromptUserOff();
   }
-  ~OutputWindow() {}
+  ~OutputWindow() override {}
 
   pqOutputWidget::MessageTypes CurrentMessageType;
   QPointer<pqOutputWidget> Widget;

@@ -55,14 +55,14 @@ public:
 
 private:
   pqImageTip(const QPixmap& image, QWidget* parent);
-  ~pqImageTip();
+  ~pqImageTip() override;
 
   QBasicTimer* const hideTimer;
 
-  bool eventFilter(QObject*, QEvent*);
-  void enterEvent(QEvent*);
-  void timerEvent(QTimerEvent* e);
-  void paintEvent(QPaintEvent* e);
+  bool eventFilter(QObject*, QEvent*) override;
+  void enterEvent(QEvent*) override;
+  void timerEvent(QTimerEvent* e) override;
+  void paintEvent(QPaintEvent* e) override;
 };
 
 #endif

@@ -75,11 +75,11 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~PropertyLinksConnection() {}
+  ~PropertyLinksConnection() override {}
 protected:
   /// These are the methods that subclasses can override to customize how
   /// values are updated in either directions.
-  virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
+  void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
     Q_ASSERT(use_unchecked == false);
     (void)use_unchecked;
@@ -96,7 +96,7 @@ protected:
       .Set(&proxies[0], static_cast<unsigned int>(proxies.size() - 1));
   }
 
-  virtual QVariant currentServerManagerValue(bool use_unchecked) const
+  QVariant currentServerManagerValue(bool use_unchecked) const override
   {
     Q_ASSERT(use_unchecked == false);
     (void)use_unchecked;
@@ -134,7 +134,7 @@ public:
       sourceProxy->AddObserver(vtkCommand::UpdateDataEvent, this, &TimeTrack::updateTime);
     this->updateTimeSteps();
   }
-  ~TimeTrack()
+  ~TimeTrack() override
   {
     this->Source->RemoveObserver(this->ObserverId1);
     this->Source->RemoveObserver(this->ObserverId2);
@@ -150,7 +150,7 @@ public:
   }
 
 protected:
-  virtual void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget)
+  void paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* widget) override
   {
     Q_UNUSED(option);
     Q_UNUSED(widget);

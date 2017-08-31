@@ -74,7 +74,7 @@ protected:
     : TargetSessionID(-1)
   {
   }
-  ~vtkPVServerSideAnimationPlayerObserver() {}
+  ~vtkPVServerSideAnimationPlayerObserver() override {}
 
   void SaveAnimation()
   {

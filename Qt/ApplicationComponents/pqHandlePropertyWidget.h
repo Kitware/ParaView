@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqHandlePropertyWidget : public pqInteracti
 
 public:
   pqHandlePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqHandlePropertyWidget();
+  ~pqHandlePropertyWidget() override;
 
 public slots:
   /**
@@ -65,7 +65,7 @@ protected slots:
   /**
   * Places the interactive widget using current data source information.
   */
-  virtual void placeWidget();
+  void placeWidget() override;
 
 private slots:
   void setWorldPosition(double x, double y, double z);

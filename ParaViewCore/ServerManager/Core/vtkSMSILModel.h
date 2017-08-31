@@ -179,7 +179,7 @@ public:
 
 protected:
   vtkSMSILModel();
-  virtual ~vtkSMSILModel();
+  ~vtkSMSILModel() override;
 
   void UpdateProperty();
   void OnPropertyModified();

@@ -95,7 +95,7 @@ protected:
     : Actor(NULL)
   {
   }
-  virtual ~vtkScalarBarItem() {}
+  ~vtkScalarBarItem() override {}
 };
 
 //----------------------------------------------------------------------------

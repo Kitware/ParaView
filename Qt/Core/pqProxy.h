@@ -69,7 +69,7 @@ public:
 
   pqProxy(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
     QObject* parent = NULL);
-  virtual ~pqProxy();
+  ~pqProxy() override;
 
   /**
   * Get the server on which this proxy exists.

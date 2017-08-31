@@ -46,10 +46,11 @@ class PQWIDGETS_EXPORT pqColorDialogEventPlayer : public pqWidgetEventPlayer
 
 public:
   pqColorDialogEventPlayer(QObject* parent = 0);
-  ~pqColorDialogEventPlayer();
+  ~pqColorDialogEventPlayer() override;
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
+  bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error) override;
 
   static const QString& EVENT_NAME();
 

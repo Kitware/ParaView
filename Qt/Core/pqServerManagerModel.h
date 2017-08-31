@@ -88,7 +88,7 @@ public:
   *                 manager.
   */
   pqServerManagerModel(pqServerManagerObserver* observer, QObject* parent = 0);
-  ~pqServerManagerModel();
+  ~pqServerManagerModel() override;
 
   /**
   * Given a session Id, returns the pqServer instance for that session,

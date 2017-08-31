@@ -48,11 +48,11 @@ class PQCORE_EXPORT pqCollaborationEventPlayer : public pqWidgetEventPlayer
 
 public:
   pqCollaborationEventPlayer(QObject* parent = NULL);
-  virtual ~pqCollaborationEventPlayer();
+  ~pqCollaborationEventPlayer() override;
 
   using Superclass::playEvent;
-  virtual bool playEvent(
-    QObject* object, const QString& command, const QString& arguments, bool& error);
+  bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error) override;
 
   /**
   * used to wait till the process becomes a master.

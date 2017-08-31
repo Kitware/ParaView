@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkSMWidgetRepresentationProxy();
-  ~vtkSMWidgetRepresentationProxy();
+  ~vtkSMWidgetRepresentationProxy() override;
 
   virtual void SendRepresentation();
 

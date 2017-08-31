@@ -112,7 +112,7 @@ public:
 
 protected:
   vtkCameraManipulator();
-  ~vtkCameraManipulator();
+  ~vtkCameraManipulator() override;
   //@}
 
   char* ManipulatorName;

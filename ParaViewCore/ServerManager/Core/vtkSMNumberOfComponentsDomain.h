@@ -47,11 +47,11 @@ public:
    * (vtkSMStringVectorProperty) properties. Currently, this uses
    * only the first component of the array.
    */
-  virtual void Update(vtkSMProperty* prop) VTK_OVERRIDE;
+  void Update(vtkSMProperty* prop) VTK_OVERRIDE;
 
 protected:
   vtkSMNumberOfComponentsDomain();
-  ~vtkSMNumberOfComponentsDomain();
+  ~vtkSMNumberOfComponentsDomain() override;
 
   /**
    * Set the appropriate ivars from the xml element.

@@ -46,13 +46,14 @@ class PQWIDGETS_EXPORT pqConsoleWidgetEventPlayer : public pqWidgetEventPlayer
 
 public:
   pqConsoleWidgetEventPlayer(QObject* parent = 0);
-  virtual ~pqConsoleWidgetEventPlayer();
+  ~pqConsoleWidgetEventPlayer() override;
 
   /**
   * Callback to play a command.
   */
   using Superclass::playEvent;
-  virtual bool playEvent(QObject* target, const QString& cmd, const QString& args, bool& errorFlag);
+  bool playEvent(
+    QObject* target, const QString& cmd, const QString& args, bool& errorFlag) override;
 
 private:
   Q_DISABLE_COPY(pqConsoleWidgetEventPlayer)

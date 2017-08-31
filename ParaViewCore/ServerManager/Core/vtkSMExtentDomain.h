@@ -43,12 +43,12 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value) VTK_OVERRIDE;
+  void SetAnimationValue(vtkSMProperty* property, int idx, double value) VTK_OVERRIDE;
 
   //@{
   /**
@@ -60,11 +60,11 @@ public:
    * application must explicitly call this method to initialize the
    * property.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMExtentDomain();
-  ~vtkSMExtentDomain();
+  ~vtkSMExtentDomain() override;
   //@}
 
   void Update(vtkSMProxyProperty* pp);
