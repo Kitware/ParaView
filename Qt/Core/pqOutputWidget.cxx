@@ -470,7 +470,9 @@ QString pqOutputWidget::extractSummary(const QString& message, MessageTypes)
     summary.replace('\n', ' ');
     return summary;
   }
-  return message;
+
+  // if couldn't extract summary in a known form, just return the first line.
+  return message.left(message.indexOf('\n'));
 }
 
 //-----------------------------------------------------------------------------
