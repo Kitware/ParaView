@@ -3,6 +3,8 @@ project( FmmMesh )
 set( vtkFmmMesh_THIRD_PARTY 1)
 set(vtkFmmMesh_LIBRARIES FmmMesh)
 
+set(CMAKE_CXX_STANDARD 11)
+
 set( VTKFMMMESH_BUILD_SHARED_LIBS OFF )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkFmmMeshConfig.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/vtkFmmMeshConfig.h)
