@@ -308,7 +308,8 @@ void vtkTexturePainter::RenderInternal(
     clone = 0;
 
     this->Texture->SetLookupTable(this->LookupTable);
-    this->Texture->SetMapColorScalarsThroughLookupTable(this->MapScalars);
+    this->Texture->SetColorMode(
+      this->MapScalars ? VTK_COLOR_MODE_MAP_SCALARS : VTK_COLOR_MODE_DEFAULT);
 
     if (cellFlag)
     {
