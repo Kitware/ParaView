@@ -2638,11 +2638,17 @@
         <DoubleRangeDomain
             min="0.0"
             name="range"/>
-        <Documentation>Dimish or Amplify all lights in the scene.</Documentation>
+        <Documentation>Diminish or Amplify all lights in the scene.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </DoubleVectorProperty>
+      <ProxyProperty
+        name="ExtraLight"
+        command="AddLight"
+        remove_command="RemoveLight"
+        repeatable="1">
+      </ProxyProperty>
 
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>

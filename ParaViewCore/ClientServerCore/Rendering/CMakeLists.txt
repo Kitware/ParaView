@@ -73,6 +73,7 @@ set (Module_SRCS
   vtkPVImplicitCylinderRepresentation.cxx
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
+  vtkPVLight.cxx
   vtkPVMultiSliceView.cxx
   vtkPVOpenGLInformation.cxx
   vtkPVOrthographicSliceView.cxx

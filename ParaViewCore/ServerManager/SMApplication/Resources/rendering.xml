@@ -440,4 +440,146 @@
     </Proxy>
     <!-- End of PropPickers -->
   </ProxyGroup>
+
+  <ProxyGroup name="extra_lights" label="Lights">
+    <Proxy name="Light"
+           class="vtkPVLight"
+           processes="client|dataserver|renderserver">
+      <IntVectorProperty name="LightType"
+        command="SetLightType"
+        number_of_elements="1"
+        panel_visibility="default"
+        default_values="3">
+        <EnumerationDomain name="enum">
+          <Entry text="HEADLIGHT"
+                 value="1" />
+          <Entry text="CAMERA"
+                 value="2" />
+          <Entry text="SCENE"
+                 value="3" />
+          <Entry text="AMBIENT"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>
+        Whether this light is attached the the eye, relative to the
+        eye or fixed in world space, or position-less.
+        </Documentation>
+      </IntVectorProperty>
+      <Property name="SetLightTypeToHeadlight"
+        command="SetLightTypeToHeadlight" />
+      <Property name="SetLightTypeToCameraLight"
+        command="SetLightTypeToCameraLight" />
+      <Property name="SetLightTypeToSceneLight"
+        command="SetLightTypeToSceneLight" />
+
+      <IntVectorProperty command="SetSwitch"
+                         default_values="1"
+                         name="LightSwitch"
+                         number_of_elements="1"
+                         >
+        <Documentation>Turn on/off the default light in the 3D
+        renderer.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetIntensity"
+                            default_values="1.0"
+                            name="LightIntensity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>
+        Light intensity.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetPositional"
+                         default_values="1"
+                         name="Positional"
+                         number_of_elements="1"
+                         >
+        <Documentation>Set whether light is positional or directional</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="GetPosition"
+                            default_values="0 0 1"
+                            information_only="1"
+                            name="PositionInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 1"
+                            name="LightPosition"
+                            information_property="PositionInfo"
+                            number_of_elements="3">
+        <Documentation>
+        Relative position of light for CAMERA type, Absolute for SCENE type light.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetFocalPoint"
+                            default_values="0 0 0"
+                            information_only="1"
+                            name="FocalPointInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalPoint"
+                            default_values="0 0 0"
+                            name="FocalPoint"
+                            information_property="FocalPointInfo"
+                            number_of_elements="3">
+        <Documentation>
+        Used with position to compute light direction
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetColor"
+                            default_values="1 1 1"
+                            name="DiffuseColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain
+            max="1 1 1"
+            min="0 0 0"
+            name="range" />
+        <Documentation>
+        RGB diffuse color of light.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetConeAngle"
+                            default_values="30.0"
+                            name="ConeAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="180.0"
+                           min="0.0"
+                           name="range" />
+        <Documentation>
+        Light Cone Angle for positional light, in degrees.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>
+        Light radius for OSPRay renderer lights, in degrees for directional, world space units for positional. Increasing produces soft shadows.
+        </Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty command="SetName"
+                            name="LightName"
+                            number_of_elements="1">
+      </StringVectorProperty>
+
+    </Proxy>
+    <!-- End of ExtraLights -->
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

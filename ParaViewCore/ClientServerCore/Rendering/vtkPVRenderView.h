@@ -634,6 +634,11 @@ public:
   void SetLightType(int val);
 
   //*****************************************************************
+  // Entry point for dynamic lights
+  void AddLight(vtkLight*);
+  void RemoveLight(vtkLight*);
+
+  //*****************************************************************
   // Forward to vtkRenderWindow.
   void SetStereoCapableWindow(int val);
   void SetStereoRender(int val);

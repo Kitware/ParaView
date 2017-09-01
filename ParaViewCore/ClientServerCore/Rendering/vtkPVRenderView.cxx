@@ -2436,6 +2436,18 @@ void vtkPVRenderView::SetLightType(int val)
 }
 
 //*****************************************************************
+// Entry point for dynamic lights
+//----------------------------------------------------------------------------
+void vtkPVRenderView::AddLight(vtkLight* newLight)
+{
+  this->GetRenderer()->AddLight(newLight);
+}
+void vtkPVRenderView::RemoveLight(vtkLight* oldLight)
+{
+  this->GetRenderer()->RemoveLight(oldLight);
+}
+
+//*****************************************************************
 // Forward to vtkRenderWindow.
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetStereoCapableWindow(int val)
