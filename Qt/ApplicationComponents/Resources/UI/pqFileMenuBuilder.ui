@@ -7,7 +7,7 @@
   </property>
   <widget class="QMenu" name="menuRecentFiles">
    <property name="title">
-    <string>Recent Files</string>
+    <string>&amp;Recent Files</string>
    </property>
   </widget>
   <action name="actionServerConnect">
