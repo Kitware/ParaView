@@ -272,8 +272,7 @@ void vtkPVImageSliceMapper::RenderInternal(vtkRenderer* renderer, vtkActor* acto
     clone->GetBounds(outputbounds);
 
     this->Texture->SetLookupTable(this->LookupTable);
-    this->Texture->SetMapColorScalarsThroughLookupTable(
-      this->ColorMode == VTK_COLOR_MODE_MAP_SCALARS ? 1 : 0);
+    this->Texture->SetColorMode(this->ColorMode);
 
     if (cellFlag)
     {
