@@ -2438,12 +2438,15 @@ void vtkPVRenderView::SetLightType(int val)
 //*****************************************************************
 // Entry point for dynamic lights
 //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkPVRenderView::AddLight(vtkLight* newLight)
 {
+  cerr << "ADDING LIGHT " << newLight << endl;
   this->GetRenderer()->AddLight(newLight);
 }
 void vtkPVRenderView::RemoveLight(vtkLight* oldLight)
 {
+  cerr << "REMOVING LIGHT " << oldLight << endl;
   this->GetRenderer()->RemoveLight(oldLight);
 }
 

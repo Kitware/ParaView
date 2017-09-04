@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqProxyWidget.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 
@@ -48,12 +49,14 @@ class pqLightsInspector::pqInternals
 {
 public:
   Ui::LightsInspector Ui;
+  pqLightsInspector* self;
 
   pqInternals(pqLightsInspector* self)
+    : self(self)
   {
     this->Ui.setupUi(self);
 
-    // this might not be necessary
+    // update the panel when user picks a different view
     QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), self,
       SLOT(setActiveView(pqView*)));
 
@@ -62,8 +65,63 @@ public:
 
     // and, temporily the remove light button for testing
     connect(this->Ui.removeLight, SIGNAL(pressed()), self, SLOT(removeLight()));
+
+    // populate the area with controls for each light
+    this->updateLightWidgets();
   }
+
   ~pqInternals() {}
+
+  vtkSMRenderViewProxy* getActiveView()
+  {
+    // returns nullptr if the active view is incompatible,
+    // otherwise returns the correspongine SMViewProxy
+    pqView* pv = pqActiveObjects::instance().activeView();
+    if (pv == nullptr)
+    {
+      return nullptr;
+    }
+    vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(pv->getViewProxy());
+    return view;
+  }
+
+  void updateLightWidgets()
+  {
+    // we populate the qt panel with child widgets for each light here
+
+    // clear current contents
+    QLayoutItem* child;
+    while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
+    {
+      child->widget()->setParent(0);
+      delete child;
+    }
+    vtkSMRenderViewProxy* view = this->getActiveView();
+    if (!view)
+    {
+      return;
+    }
+
+    // add new contents
+    unsigned int nlights = vtkSMPropertyHelper(view, "ExtraLight").GetNumberOfElements();
+    for (unsigned int i = 0; i < nlights; ++i)
+    {
+      vtkSMProxy* light = vtkSMPropertyHelper(view, "ExtraLight").GetAsProxy(i);
+
+      // make new qproxyproperty
+      // QPushButton *lightWidget = new QPushButton(self);
+      // button->setText(QString("0x%1").arg((qintptr)light));
+
+      // todo: this leaks the vtkSMProxy, but the above does not
+      // todo: we want to customize this to make sure controls are
+      // consistent with the light type
+      pqProxyWidget* lightWidget = new pqProxyWidget(light, self);
+      lightWidget->setApplyChangesImmediately(true);
+
+      // add it to this->Ui.scrollArea
+      this->Ui.verticalLayout_2->addWidget(lightWidget);
+    }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -81,21 +139,19 @@ pqLightsInspector::~pqLightsInspector()
 }
 
 //-----------------------------------------------------------------------------
-void pqLightsInspector::setActiveView(pqView* newview)
+void pqLightsInspector::setActiveView(pqView*)
 {
-  // we may need to populate the qt panel here
+  this->Internals->updateLightWidgets();
 }
 
 //-----------------------------------------------------------------------------
 void pqLightsInspector::addLight()
 {
-  pqView* pv = pqActiveObjects::instance().activeView();
-  if (pv == nullptr)
-  {
-    return;
-  }
-  vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(pv->getViewProxy());
-  if (view == nullptr)
+  // todo: this should take effect immediately, but you have to change something
+  // on the view to make it take effect
+
+  vtkSMRenderViewProxy* view = this->Internals->getActiveView();
+  if (!view)
   {
     return;
   }
@@ -123,18 +179,18 @@ void pqLightsInspector::addLight()
   vtkSMPropertyHelper(view, "ExtraLight").Add(light);
   // todo: call update to make the change take effect now
   END_UNDO_SET();
+
+  this->Internals->updateLightWidgets();
 }
 
 //-----------------------------------------------------------------------------
 void pqLightsInspector::removeLight()
 {
-  pqView* pv = pqActiveObjects::instance().activeView();
-  if (pv == nullptr)
-  {
-    return;
-  }
-  vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(pv->getViewProxy());
-  if (view == nullptr)
+  // todo: this should take effect immediately, but you have to change something
+  // on the view to make it take effect
+
+  vtkSMRenderViewProxy* view = this->Internals->getActiveView();
+  if (!view)
   {
     return;
   }
@@ -159,4 +215,6 @@ void pqLightsInspector::removeLight()
   vtkSMPropertyHelper(view, "ExtraLight").Remove(light);
 
   END_UNDO_SET();
+
+  this->Internals->updateLightWidgets();
 }
