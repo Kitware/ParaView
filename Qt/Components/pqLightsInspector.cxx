@@ -32,8 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLightsInspector.h"
 #include "ui_pqLightsInspector.h"
 
+#include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionProxyManager.h"
+
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqUndoStack.h"
+#include "pqView.h"
 
 //=============================================================================
 class pqLightsInspector::pqInternals
@@ -41,7 +48,17 @@ class pqLightsInspector::pqInternals
 public:
   Ui::LightsInspector Ui;
 
-  pqInternals(pqLightsInspector* self) { this->Ui.setupUi(self); }
+  pqInternals(pqLightsInspector* self)
+  {
+    this->Ui.setupUi(self);
+
+    // this might not be necessary
+    QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), self,
+      SLOT(setActiveView(pqView*)));
+
+    // hook up the add light button
+    connect(this->Ui.addLight, SIGNAL(pressed()), self, SLOT(addLight()));
+  }
   ~pqInternals() {}
 };
 
@@ -57,4 +74,49 @@ pqLightsInspector::pqLightsInspector(
 //-----------------------------------------------------------------------------
 pqLightsInspector::~pqLightsInspector()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqLightsInspector::setActiveView(pqView* newview)
+{
+  // we may need to populate the qt panel here
+}
+
+//-----------------------------------------------------------------------------
+void pqLightsInspector::addLight()
+{
+  pqView* pv = pqActiveObjects::instance().activeView();
+  if (pv == nullptr)
+  {
+    return;
+  }
+  vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(pv->getViewProxy());
+  if (view == nullptr)
+  {
+    return;
+  }
+
+  // tell python trace to add the light
+  // todo: when we implement the python analog for addLight, fill this in
+  // SM_SCOPED_TRACE(CallFunction AddLight)
+  //   .arg("view", view)
+  //   .comment("add a light to the view");
+
+  // tell undo/redo and state about the new light
+  BEGIN_UNDO_SET("Add Light");
+  vtkSMSessionProxyManager* pxm = view->GetSessionProxyManager();
+  vtkSMProxy* light = pxm->NewProxy("extra_lights", "Light");
+
+  // standard application level logic
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  controller->InitializeProxy(light);
+
+  // makes sure the light is a child of the view, so it will be deleted by it
+  pxm->RegisterProxy(controller->GetHelperProxyGroupName(view), "Lights", light);
+  light->Delete();
+
+  // call vtkPVRenderView::AddLight
+  vtkSMPropertyHelper(view, "ExtraLight").Add(light);
+  // todo: call update to make the change take effect now
+  END_UNDO_SET();
 }

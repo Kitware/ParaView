@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
 
+class pqView;
+
 class PQCOMPONENTS_EXPORT pqLightsInspector : public QWidget
 {
   Q_OBJECT
@@ -55,10 +57,10 @@ public:
   ~pqLightsInspector() override;
 
 public slots:
+  void addLight();
+  void setActiveView(pqView*);
 
 private slots:
-
-signals:
 
 private:
   Q_DISABLE_COPY(pqLightsInspector);
