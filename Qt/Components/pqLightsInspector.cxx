@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -97,10 +98,10 @@ void pqLightsInspector::addLight()
   }
 
   // tell python trace to add the light
-  // todo: when we implement the python analog for addLight, fill this in
-  // SM_SCOPED_TRACE(CallFunction AddLight)
-  //   .arg("view", view)
-  //   .comment("add a light to the view");
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("AddLight")
+    .arg("view", view)
+    .arg("comment", "add a light to the view");
 
   // tell undo/redo and state about the new light
   BEGIN_UNDO_SET("Add Light");

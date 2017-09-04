@@ -1807,6 +1807,29 @@ def ExportView(filename, view=None, **params):
     del proxy
     del helper
 
+def AddLight(view=None):
+    """Makes a new vtkLight and adds it to the designated or active view."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if view.IsA("vtkSMRenderViewProxy") is False:
+        return
+    pxm = servermanager.ProxyManager()
+    lightproxy = pxm.NewProxy("extra_lights", "Light")
+
+    #is this necessary?
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.InitializeProxy(lightproxy)
+
+    #todo: is this necessary?
+    grpname = controller.SMController.GetHelperProxyGroupName(view.SMProxy)
+    pxm.RegisterProxy(grpname, "Lights", lightproxy)
+
+    nowlights = [l for l in view.ExtraLight]
+    nowlights.append(lightproxy)
+    view.ExtraLight = nowlights
+
+
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
     if proxy == None:
         proxy = GetActiveSource()
