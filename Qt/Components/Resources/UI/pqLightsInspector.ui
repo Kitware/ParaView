@@ -24,6 +24,13 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="removeLight">
+     <property name="text">
+      <string>Remove Light</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources>

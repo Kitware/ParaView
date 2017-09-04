@@ -59,6 +59,9 @@ public:
 
     // hook up the add light button
     connect(this->Ui.addLight, SIGNAL(pressed()), self, SLOT(addLight()));
+
+    // and, temporily the remove light button for testing
+    connect(this->Ui.removeLight, SIGNAL(pressed()), self, SLOT(removeLight()));
   }
   ~pqInternals() {}
 };
@@ -119,5 +122,41 @@ void pqLightsInspector::addLight()
   // call vtkPVRenderView::AddLight
   vtkSMPropertyHelper(view, "ExtraLight").Add(light);
   // todo: call update to make the change take effect now
+  END_UNDO_SET();
+}
+
+//-----------------------------------------------------------------------------
+void pqLightsInspector::removeLight()
+{
+  pqView* pv = pqActiveObjects::instance().activeView();
+  if (pv == nullptr)
+  {
+    return;
+  }
+  vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(pv->getViewProxy());
+  if (view == nullptr)
+  {
+    return;
+  }
+
+  unsigned int nlights = vtkSMPropertyHelper(view, "ExtraLight").GetNumberOfElements();
+  if (nlights < 1)
+  {
+    return;
+  }
+
+  // tell python trace to add the light
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("RemoveLight")
+    .arg("view", view)
+    .arg("comment", "remove last light added to the view");
+
+  // tell undo/redo and state about the new light
+  BEGIN_UNDO_SET("Remove Light");
+
+  // todo: this works but do I need to do something more?
+  vtkSMProxy* light = vtkSMPropertyHelper(view, "ExtraLight").GetAsProxy(nlights - 1);
+  vtkSMPropertyHelper(view, "ExtraLight").Remove(light);
+
   END_UNDO_SET();
 }

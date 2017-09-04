@@ -1829,6 +1829,22 @@ def AddLight(view=None):
     nowlights.append(lightproxy)
     view.ExtraLight = nowlights
 
+def RemoveLight(view=None):
+    """Makes a new vtkLight and adds it to the designated or active view."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if view.IsA("vtkSMRenderViewProxy") is False:
+        return
+
+    numlights = len(view.ExtraLight)
+    if numlights < 1:
+        return
+
+    #todo: this seems to work but do I need to do something more?
+    nowlights = [l for l in view.ExtraLight][:numlights-1]
+    view.ExtraLight = nowlights
+
 
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
     if proxy == None:

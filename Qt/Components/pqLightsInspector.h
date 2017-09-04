@@ -58,6 +58,7 @@ public:
 
 public slots:
   void addLight();
+  void removeLight();
   void setActiveView(pqView*);
 
 private slots:
