@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqProxyWidget.h"
+#include "pqRenderView.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 
@@ -181,6 +182,14 @@ void pqLightsInspector::addLight()
   END_UNDO_SET();
 
   this->Internals->updateLightWidgets();
+
+  view->UpdateVTKObjects();
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (!renderView)
+  {
+    return;
+  }
+  renderView->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -201,7 +210,7 @@ void pqLightsInspector::removeLight()
     return;
   }
 
-  // tell python trace to add the light
+  // tell python trace to remove the light
   SM_SCOPED_TRACE(CallFunction)
     .arg("RemoveLight")
     .arg("view", view)
@@ -217,4 +226,12 @@ void pqLightsInspector::removeLight()
   END_UNDO_SET();
 
   this->Internals->updateLightWidgets();
+
+  view->UpdateVTKObjects();
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+  if (!renderView)
+  {
+    return;
+  }
+  renderView->render();
 }
