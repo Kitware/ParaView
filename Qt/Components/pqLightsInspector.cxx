@@ -76,8 +76,11 @@ public:
     QLayoutItem* child;
     while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
     {
-      child->widget()->setParent(0);
-      delete child->widget();
+      if (child->widget())
+      {
+        child->widget()->setParent(0);
+        delete child->widget();
+      }
       delete child;
     }
   }
@@ -103,9 +106,11 @@ public:
     QLayoutItem* child;
     while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
     {
-      child->widget()->setParent(0);
-      delete child->widget();
-      delete child;
+      if (child->widget())
+      {
+        child->widget()->setParent(0);
+        delete child->widget();
+      }
     }
     vtkSMRenderViewProxy* view = this->getActiveView();
     if (!view)
@@ -127,16 +132,17 @@ public:
       // add it to this->Ui.scrollArea
       this->Ui.verticalLayout_2->addWidget(lightWidget);
     }
+    this->Ui.verticalLayout_2->addStretch(1);
   }
 };
 
 //-----------------------------------------------------------------------------
 pqLightsInspector::pqLightsInspector(
-  QWidget* parentObject, Qt::WindowFlags f, bool arg_autotracking)
+  QWidget* parentObject, Qt::WindowFlags f, bool /* arg_autotracking */)
   : Superclass(parentObject, f)
   , Internals(new pqLightsInspector::pqInternals(this))
 {
-  pqInternals& internals = (*this->Internals);
+  // pqInternals& internals = (*this->Internals);
 }
 
 //-----------------------------------------------------------------------------

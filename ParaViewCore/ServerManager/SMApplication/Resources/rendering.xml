@@ -445,33 +445,6 @@
     <Proxy name="Light"
            class="vtkPVLight"
            processes="client|dataserver|renderserver">
-      <IntVectorProperty name="LightType"
-        command="SetLightType"
-        number_of_elements="1"
-        panel_visibility="default"
-        default_values="3">
-        <EnumerationDomain name="enum">
-          <Entry text="HEADLIGHT"
-                 value="1" />
-          <Entry text="CAMERA"
-                 value="2" />
-          <Entry text="SCENE"
-                 value="3" />
-          <Entry text="AMBIENT"
-                 value="4" />
-        </EnumerationDomain>
-        <Documentation>
-        Whether this light is attached the the eye, relative to the
-        eye or fixed in world space, or position-less.
-        </Documentation>
-      </IntVectorProperty>
-      <Property name="SetLightTypeToHeadlight"
-        command="SetLightTypeToHeadlight" />
-      <Property name="SetLightTypeToCameraLight"
-        command="SetLightTypeToCameraLight" />
-      <Property name="SetLightTypeToSceneLight"
-        command="SetLightTypeToSceneLight" />
-
       <IntVectorProperty command="SetSwitch"
                          default_values="1"
                          name="LightSwitch"
@@ -480,6 +453,32 @@
         <Documentation>Turn on/off the default light in the 3D
         renderer.</Documentation>
         <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetName"
+                            name="LightName"
+                            number_of_elements="1">
+      </StringVectorProperty>
+
+      <IntVectorProperty name="LightType"
+        command="SetLightType"
+        number_of_elements="1"
+        panel_visibility="default"
+        default_values="3">
+        <EnumerationDomain name="enum">
+          <Entry text="headlight"
+                 value="1" />
+          <Entry text="camera"
+                 value="2" />
+          <Entry text="scene"
+                 value="3" />
+          <Entry text="ambient"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>
+        Whether this light is attached the the eye, relative to the
+        eye or fixed in world space, or position-less.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty command="SetIntensity"
@@ -496,7 +495,7 @@
       </DoubleVectorProperty>
 
       <IntVectorProperty command="SetPositional"
-                         default_values="1"
+                         default_values="0"
                          name="Positional"
                          number_of_elements="1"
                          >
@@ -519,6 +518,19 @@
         <Documentation>
         Relative position of light for CAMERA type, Absolute for SCENE type light.
         </Documentation>
+        <Hints>
+          <!-- don't display when light type is Head(1) or Ambient(4) -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="GetFocalPoint"
@@ -541,6 +553,7 @@
       <DoubleVectorProperty command="SetColor"
                             default_values="1 1 1"
                             name="DiffuseColor"
+                            panel_widget="color_selector"
                             number_of_elements="3">
         <DoubleRangeDomain
             max="1 1 1"
@@ -573,11 +586,6 @@
         Light radius for OSPRay renderer lights, in degrees for directional, world space units for positional. Increasing produces soft shadows.
         </Documentation>
       </DoubleVectorProperty>
-      <StringVectorProperty command="SetName"
-                            name="LightName"
-                            number_of_elements="1">
-      </StringVectorProperty>
-
     </Proxy>
     <!-- End of ExtraLights -->
   </ProxyGroup>
