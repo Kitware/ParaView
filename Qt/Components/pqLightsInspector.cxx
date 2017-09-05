@@ -71,7 +71,16 @@ public:
     this->updateLightWidgets();
   }
 
-  ~pqInternals() {}
+  ~pqInternals()
+  {
+    QLayoutItem* child;
+    while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
+    {
+      child->widget()->setParent(0);
+      delete child->widget();
+      delete child;
+    }
+  }
 
   vtkSMRenderViewProxy* getActiveView()
   {
@@ -95,6 +104,7 @@ public:
     while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
     {
       child->widget()->setParent(0);
+      delete child->widget();
       delete child;
     }
     vtkSMRenderViewProxy* view = this->getActiveView();
@@ -109,11 +119,6 @@ public:
     {
       vtkSMProxy* light = vtkSMPropertyHelper(view, "ExtraLight").GetAsProxy(i);
 
-      // make new qproxyproperty
-      // QPushButton *lightWidget = new QPushButton(self);
-      // button->setText(QString("0x%1").arg((qintptr)light));
-
-      // todo: this leaks the vtkSMProxy, but the above does not
       // todo: we want to customize this to make sure controls are
       // consistent with the light type
       pqProxyWidget* lightWidget = new pqProxyWidget(light, self);
@@ -148,9 +153,6 @@ void pqLightsInspector::setActiveView(pqView*)
 //-----------------------------------------------------------------------------
 void pqLightsInspector::addLight()
 {
-  // todo: this should take effect immediately, but you have to change something
-  // on the view to make it take effect
-
   vtkSMRenderViewProxy* view = this->Internals->getActiveView();
   if (!view)
   {
@@ -178,11 +180,11 @@ void pqLightsInspector::addLight()
 
   // call vtkPVRenderView::AddLight
   vtkSMPropertyHelper(view, "ExtraLight").Add(light);
-  // todo: call update to make the change take effect now
   END_UNDO_SET();
 
   this->Internals->updateLightWidgets();
 
+  // make it so...
   view->UpdateVTKObjects();
   pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   if (!renderView)
@@ -195,9 +197,6 @@ void pqLightsInspector::addLight()
 //-----------------------------------------------------------------------------
 void pqLightsInspector::removeLight()
 {
-  // todo: this should take effect immediately, but you have to change something
-  // on the view to make it take effect
-
   vtkSMRenderViewProxy* view = this->Internals->getActiveView();
   if (!view)
   {
@@ -227,6 +226,7 @@ void pqLightsInspector::removeLight()
 
   this->Internals->updateLightWidgets();
 
+  // make it so...
   view->UpdateVTKObjects();
   pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   if (!renderView)
