@@ -1845,6 +1845,15 @@ def RemoveLight(view=None):
     nowlights = [l for l in view.ExtraLight][:numlights-1]
     view.ExtraLight = nowlights
 
+def GetLight(number, view=None):
+    """Get a handle on a previously added light"""
+    if not view:
+        view = active_objects.view
+    numlights = len(view.ExtraLight)
+    if numlights < 1 or number < 0 or number >= numlights:
+        return
+    return view.ExtraLight[number][0]
+
 
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
     if proxy == None:

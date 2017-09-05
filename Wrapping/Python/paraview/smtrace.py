@@ -280,6 +280,15 @@ class Trace(object):
                     "# get the time-keeper",
                     "%s = GetTimeKeeper()" % tkAccessor])
             return True
+        if obj.GetVTKClassName() == "vtkPVLight":
+            view = simple.GetActiveView()
+            index = view.ExtraLight.index(obj)
+            accessor = ProxyAccessor("alight", obj)
+            cls.Output.append_separated([\
+               "# get light properties",
+               "%s = GetLight(%s)" % (accessor, index)])
+            return True
+
         return False
 
     @classmethod
