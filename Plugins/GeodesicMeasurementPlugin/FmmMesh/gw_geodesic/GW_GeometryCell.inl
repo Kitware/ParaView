@@ -2,7 +2,7 @@
 /**
  *  \file   GW_GeometryCell.inl
  *  \brief  Inlined methods for \c GW_GeometryCell
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  */
 /*------------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ namespace GW {
 *  \param  v [GW_Vector3D&] Parameter position.
 *  \param  seed [GW_Face*] A seed for the search. Will be modified !
 *  \return [GW_Vector3D] The position in 3D space.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   2-4-2004
 *
 *  Interpolate a position on the surface.
@@ -137,7 +137,7 @@ GW_Vector3D GW_GeometryCell::GetInterpolatedPosition( GW_Mesh& ParamMesh, GW_Mes
 /**
  *  \param  ParamMesh [GW_Mesh&] Parameter space.
  *  \param  RealMesh [GW_Mesh&] Real position of 3D meshes.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  Interpolate the position of each point.
@@ -163,7 +163,7 @@ void GW_GeometryCell::InterpolateAllPositions( GW_Mesh& ParamMesh, GW_Mesh& Real
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

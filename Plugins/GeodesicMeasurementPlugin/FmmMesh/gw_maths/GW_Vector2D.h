@@ -3,7 +3,7 @@
 /**
  *  \file  GW_Vector2D.h
  *  \brief Definition of class \c GW_Vector2D
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  */
 /*------------------------------------------------------------------------------*/
 
@@ -19,7 +19,7 @@ GW_BEGIN_NAMESPACE
 /**
  *  \class  GW_Vector2D
  *  e\brief  A 3D vector, with usefull operators and methods.
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  *
  *    Just a planar vector.
  */
@@ -49,7 +49,7 @@ public:
     /**
     *  \param  a [GW_Float] Angle
     *  \return [GW_Vector2D] Rotated vector.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-26-2003
     *
     *  Return a rotated vector.
@@ -85,7 +85,7 @@ GW_END_NAMESPACE
 #endif // GW_Vector2D_h
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

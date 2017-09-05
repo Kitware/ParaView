@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Parameterization.inl
  *  \brief  Inlined methods for \c GW_Parameterization
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-1-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -147,7 +147,7 @@ GW_GeodesicFace* CreateNewFace( GW_GeodesicMesh& Mesh, GW_GeodesicVertex* pV1, G
 /**
  *  \param  Face [GW_Face&] The face to cut.
  *  \param  BaseVert [GW_GeodesicVertex&] The origin of the voronoi region we are segmenting.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-1-2003
  *
  *  Cut a face according to voronoi diagrams.
@@ -316,7 +316,7 @@ void GW_Parameterization::CutFace( GW_Face& Face, GW_GeodesicVertex& BaseVert, G
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

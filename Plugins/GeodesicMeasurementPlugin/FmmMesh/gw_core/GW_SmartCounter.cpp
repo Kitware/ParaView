@@ -2,11 +2,11 @@
 /**
  *  \file  GW_SmartCounter.cpp
  *  \brief Definition of class \c GW_SmartCounter
- *  \author Gabriel Peyré 2001-09-12
+ *  \author Gabriel PeyrÃ© 2001-09-12
  */
 /*------------------------------------------------------------------------------*/
 #ifdef GW_SCCSID
-static const char* sccsid = "@(#) GW_SmartCounter.cpp (c) Gabriel Peyré & Antoine Bouthors 2001";
+static const char* sccsid = "@(#) GW_SmartCounter.cpp (c) Gabriel PeyrÃ© & Antoine Bouthors 2001";
 #endif // GW_SCCSID
 
 
@@ -26,7 +26,7 @@ using namespace GW;
  *
  *  \param  pCounter the counter that we don't use anymore (can be NULL).
  *  \return Do we have delete the pointer ?
- *  \author Gabriel Peyré 2001-10-29
+ *  \author Gabriel PeyrÃ© 2001-10-29
  *
  *    First release the pointer. If it is no longer use, delete it.
  *    Else print a warning message, since only manager should destroy datas.

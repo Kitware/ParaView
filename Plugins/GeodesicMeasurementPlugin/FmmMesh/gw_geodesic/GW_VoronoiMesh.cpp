@@ -2,14 +2,14 @@
 /**
  *  \file   GW_VoronoiMesh.cpp
  *  \brief  Definition of class \c GW_VoronoiMesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_VoronoiMesh.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_VoronoiMesh.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -33,7 +33,7 @@ T_FloatMap* GW_VoronoiMesh::pCurWeights_    = NULL;
 // Name : GW_VoronoiMesh::PerformFastMarching
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-13-2003
  *
  *  Just an helper method that launch a fire from each base point.
@@ -59,7 +59,7 @@ void GW_VoronoiMesh::PerformFastMarching( GW_GeodesicMesh& Mesh, T_GeodesicVerte
  *  \param  CurVert [GW_GeodesicVertex&] The current vertex.
  *  \param  rNewDist [GW_Float] The new distance.
  *  \return [GW_Bool] Insert this vertex to active list ?
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-13-2003
  *
  *  Add the vertex only if the distance decreases.
@@ -74,7 +74,7 @@ GW_Bool GW_VoronoiMesh::FastMarchingCallbackFunction_VertexInsersion( GW_Geodesi
 // Name : GW_VoronoiMesh::AddFurthestPoint
 /**
 *  \param  Mesh [GW_GeodesicMesh&] Fine mesh.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-14-2003
 *
 *  Add to the list of point the furthest from all nodes.
@@ -141,7 +141,7 @@ GW_U32 GW_VoronoiMesh::AddFurthestPoint( T_GeodesicVertexList& VertList,GW_Geode
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
  *  \return [GW_GeodesicVertex*] The max distance vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-14-2003
  *
  *  Find the vertex with maximum distance.
@@ -170,7 +170,7 @@ GW_GeodesicVertex* GW_VoronoiMesh::FindMaxVertex( GW_GeodesicMesh& Mesh )
 /**
  *  \param  Vert [GW_GeodesicVertex&] The current vertex.
  *  \return [GW_Face*] The face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-15-2003
  *
  *  Find the face of maximum distance.
@@ -215,7 +215,7 @@ GW_Face* GW_VoronoiMesh::FindMaxFace( GW_GeodesicVertex& Vert )
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
  *  \param  nNbrIterations [GW_U32] Number of points.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-14-2003
  *
  *  Add a given number of furthest points.
@@ -249,7 +249,7 @@ GW_U32 GW_VoronoiMesh::AddFurthestPointsIterate( T_GeodesicVertexList& VertList,
 /**
 *  \param  CurVert [GW_GeodesicVertex&] The current vertex.
 *  \return [GW_Bool] The new dead vertex.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-13-2003
 *
 *  Test if the vertex is a saddle point.
@@ -328,7 +328,7 @@ void GW_VoronoiMesh::FastMarchingCallbackFunction_MeshBuilding( GW_GeodesicVerte
  *  \param  Vert0 [GW_VoronoiVertex&] 1st vertex.
  *  \param  Vert1 [GW_VoronoiVertex&] 2nd vertex.
  *  \return [GW_Bool] Answer.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-15-2003
  *
  *  Test if the edge has only 2 neighbors.
@@ -350,7 +350,7 @@ GW_Bool GW_VoronoiMesh::TestManifoldStructure( GW_VoronoiVertex& Vert0, GW_Voron
 /*------------------------------------------------------------------------------*/
 // Name : GW_VoronoiMesh::CreateVoronoiVertex
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-1-2003
  *
  *  Just create the voronoi vertex.
@@ -381,7 +381,7 @@ void GW_VoronoiMesh::CreateVoronoiVertex()
 // Name : GW_VoronoiMesh::BuildMesh
 /**
  *  \param  Mesh [GW_Mesh&] The mesh that will be build.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-13-2003
  *
  *  Build a mesh from scratch.
@@ -505,7 +505,7 @@ void GW_VoronoiMesh::BuildMesh( GW_GeodesicMesh& Mesh, GW_Bool bFixHole )
 /*------------------------------------------------------------------------------*/
 // Name : GW_VoronoiMesh::FixHole
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-16-2003
  *
  *  Try to fix the hole in the boundary.
@@ -613,7 +613,7 @@ void GW_VoronoiMesh::FixHole()
 // Name : GW_VoronoiMesh::CreateNewVertex
 /**
 *  \return [GW_Vertex&] The newly created vertex.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-9-2003
 *
 *  Allocate memory for a new vertex.
@@ -628,7 +628,7 @@ GW_Vertex& GW_VoronoiMesh::CreateNewVertex()
 // Name : GW_VoronoiMesh::CreateNewFace
 /**
 *  \return [GW_Face&] The newly created face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-9-2003
 *
 *  Allocate memory for a new face.
@@ -642,7 +642,7 @@ GW_Face& GW_VoronoiMesh::CreateNewFace()
 /*------------------------------------------------------------------------------*/
 // Name : FastMarchingCallbackFunction_Boundaries
 /**
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-12-2003
 *
 *  A callback function for geodesic computations.
@@ -669,7 +669,7 @@ GW_Bool GW_VoronoiMesh::FastMarchingCallbackFunction_Boundaries( GW_GeodesicVert
 /*------------------------------------------------------------------------------*/
 // Name : GW_VoronoiMesh::BuildGeodesicBoundaries
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-21-2003
  *
  *  Compute the geodesic path corresponding to each base mesh vertex.
@@ -762,7 +762,7 @@ void GW_VoronoiMesh::BuildGeodesicBoundaries( GW_GeodesicMesh& Mesh )
 // Name : GW_VoronoiMesh::AddPathToMeshVertex
 /**
  *  \param  CurPath [T_GeodesicVertexList&] The path to test.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-14-2003
  *
  *  Test for path intersection and fix cracks.
@@ -889,7 +889,7 @@ void GW_VoronoiMesh::AddPathToMeshVertex( GW_GeodesicMesh& Mesh, GW_GeodesicPath
 /*------------------------------------------------------------------------------*/
 // Name : FastMarchingCallbackFunction_Parametrization
 /**
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-12-2003
 *
 *  A callback function for geodesic computations.
@@ -916,7 +916,7 @@ GW_Bool GW_VoronoiMesh::FastMarchingCallbackFunction_Parametrization( GW_Geodesi
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The vertex around which we perform fast marching.
  *  \param  Vert [GW_VoronoiVertex&] The base mesh.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-28-2003
  *
  *  Perform a fast marching on the voronoi faces around a given
@@ -956,7 +956,7 @@ void GW_VoronoiMesh::PerformLocalFastMarching( GW_GeodesicMesh& Mesh, GW_Voronoi
 /*------------------------------------------------------------------------------*/
 // Name : GW_VoronoiMesh::BuildGeodesicParametrization
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-26-2003
  *
  *  Compute the parameter of each vertex of the base mesh.
@@ -1019,7 +1019,7 @@ void GW_VoronoiMesh::BuildGeodesicParametrization( GW_GeodesicMesh& Mesh )
 // Name : GW_VoronoiMesh::ComputeVertexParameters
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-27-2003
  *
  *  Using geodesic distance from 3 base vertex, compute the
@@ -1139,7 +1139,7 @@ void GW_VoronoiMesh::ComputeVertexParameters( GW_GeodesicMesh& Mesh )
 // Name : GW_VoronoiMesh::ResetOnlyVertexState
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The mesh.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-13-2003
  *
  *  Resst only the state of each vertex of the mesh.
@@ -1175,7 +1175,7 @@ void GW_VoronoiMesh::PrepareInterpolation( GW_GeodesicMesh& Mesh )
 *  \param  CurVert [GW_GeodesicVertex&] The current vertex.
 *  \param  rNewDist [GW_Float] The new distance.
 *  \return [GW_Bool] Insert this vertex to active list ?
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-13-2003
 *
 *  Add the vertex only if the distance decreases.
@@ -1194,7 +1194,7 @@ GW_Bool GW_VoronoiMesh::FastMarchingCallbackFunction_VertexInsersionNN( GW_Geode
 /**
  *  \param  Mesh [GW_GeodesicMesh&] The original mesh.
  *  \param  FlatteningMap [T_Vector2DMap&] A link between the basis geodesic vertex and their 2D positions.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-1-2003
  *
  *  Compute a 2D position for each base point, using multidimensional scaling.
@@ -1302,7 +1302,7 @@ void GW_VoronoiMesh::FlattenBasePoints( GW_GeodesicMesh& Mesh, T_Vector2DMap& Fl
 *  \param  CurVert [GW_GeodesicVertex&] The current vertex.
 *  \param  rNewDist [GW_Float] The new distance.
 *  \return [GW_Bool] Insert this vertex to active list ?
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-13-2003
 *
 *  Here we only record the natural neighbors in the weights map.
@@ -1325,7 +1325,7 @@ GW_Bool GW_VoronoiMesh::FastMarchingCallbackFunction_VertexInsersionRD1( GW_Geod
 *  \param  CurVert [GW_GeodesicVertex&] The current vertex.
 *  \param  rNewDist [GW_Float] The new distance.
 *  \return [GW_Bool] Insert this vertex to active list ?
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-13-2003
 *
 *  Here we record the reciprocical of the distance.
@@ -1363,7 +1363,7 @@ GW_Bool GW_VoronoiMesh::FastMarchingCallbackFunction_ForceStopRD( GW_GeodesicVer
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

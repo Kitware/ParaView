@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Mesh.inl
  *  \brief  Inlined methods for \c GW_Mesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -14,7 +14,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 // Name : GW_Mesh constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Constructor.
@@ -33,7 +33,7 @@ GW_Mesh::GW_Mesh()
 /*------------------------------------------------------------------------------*/
 // Name : GW_Mesh destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  destructor.
@@ -55,7 +55,7 @@ GW_Mesh::~GW_Mesh()
 // Name : GW_Mesh::GetNbrVertex
 /**
  *  \return [GW_U32] The number
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Get the number of vertex *allocated* in the mesh.
@@ -71,7 +71,7 @@ GW_U32 GW_Mesh::GetNbrVertex() const
 // Name : GW_Mesh::GetNbrFace
 /**
  *  \return [GW_U32] the number.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Get the number of vertex *allocated* in the mesh.
@@ -89,7 +89,7 @@ GW_U32 GW_Mesh::GetNbrFace() const
 /**
  *  \param  nNum [GW_U32] The number of the new face.
  *  \param  pFace [GW_Face*] The new face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Set one of the face.
@@ -114,7 +114,7 @@ void GW_Mesh::SetFace( GW_U32 nNum, GW_Face* pFace )
 // Name : GW_Mesh::AddFace
 /**
  *  \param  Face [GW_Face&] The new face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-16-2003
  *
  *  Add a new face at the end of the list.
@@ -133,7 +133,7 @@ void GW_Mesh::AddFace( GW_Face& Face )
 /**
  *  \param  nNum [GW_U32] The number of the vertex.
  *  \param  pVert [GW_Vertex*] The vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Set one of the vertex.
@@ -159,7 +159,7 @@ void GW_Mesh::SetVertex( GW_U32 nNum, GW_Vertex* pVert )
 /**
  *  \param  nNum [GW_U32] The number
  *  \return [GW_Face*] The face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Get one of the faces.
@@ -179,7 +179,7 @@ GW_Face* GW_Mesh::GetFace( GW_U32 nNum )
  *  \param  Vert2 [GW_Vertex&] 2nd vert
  *  \param  Vert3 [GW_Vertex&] 3rd vert
  *  \return [GW_Face*] The face
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   1-19-2004
  *
  *  Get a face from it's 3 vertices.
@@ -203,7 +203,7 @@ GW_Face* GW_Mesh::GetFace( GW_Vertex& Vert1, GW_Vertex& Vert2, GW_Vertex& Vert3 
 /**
  *  \param  nNum [GW_U32] The number.
  *  \return [GW_Vertex*] The vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Get one of the vertex.
@@ -221,7 +221,7 @@ GW_Vertex* GW_Mesh::GetVertex( GW_U32 nNum )
 /**
 *  \param  nNum [GW_U32] The number
 *  \return [GW_Face*] The face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   2-15-2003
 *
 *  Get one of the faces.
@@ -239,7 +239,7 @@ const GW_Face* GW_Mesh::GetFace( GW_U32 nNum )const
 /**
 *  \param  nNum [GW_U32] The number.
 *  \return [GW_Vertex*] The vertex.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   2-15-2003
 *
 *  Get one of the vertex.
@@ -257,7 +257,7 @@ const GW_Vertex* GW_Mesh::GetVertex( GW_U32 nNum ) const
 /*------------------------------------------------------------------------------*/
 // Name : GW_Mesh::SetStaticThis
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  *
  *  Set the global pointer.
@@ -272,7 +272,7 @@ void GW_Mesh::SetStaticThis()
 /*------------------------------------------------------------------------------*/
 // Name : GW_Mesh::UnSetStaticThis
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  *
  *  Set to NULL the global pointer.
@@ -289,7 +289,7 @@ void GW_Mesh::UnSetStaticThis()
 // Name : GW_Mesh::StaticThis
 /**
  *  \return [GW_Mesh&] Current mesh.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  *
  *  For global access during serialization.
@@ -305,7 +305,7 @@ GW_Mesh& GW_Mesh::StaticThis()
 /*------------------------------------------------------------------------------*/
 // Name : GW_Mesh::Reset
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-6-2003
  *
  *  Clear everything.
@@ -322,7 +322,7 @@ void GW_Mesh::Reset()
 // Name : GW_Mesh::CreateNewVertex
 /**
  *  \return [GW_Vertex&] The newly created vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Allocate memory for a new vertex. You should overload this
@@ -339,7 +339,7 @@ GW_Vertex& GW_Mesh::CreateNewVertex()
 // Name : GW_Mesh::CreateNewFace
 /**
  *  \return [GW_Face&] The newly created face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Allocate memory for a new face.
@@ -356,7 +356,7 @@ GW_Face& GW_Mesh::CreateNewFace()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

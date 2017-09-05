@@ -3,7 +3,7 @@
 /**
  *  \file   GW_GeometryCell.h
  *  \brief  Definition of class \c GW_GeometryCell
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  */
 /*------------------------------------------------------------------------------*/
@@ -21,7 +21,7 @@ namespace GW {
 /**
  *  \class  GW_GeometryCell_Template
  *  \brief  In fact this is just a 2D array.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  A 2D array, a patch of a 3D mesh.
@@ -152,7 +152,7 @@ typedef T_GeometryCellVector::const_reverse_iterator CRIT_GeometryCellVector;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

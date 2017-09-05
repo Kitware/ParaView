@@ -3,7 +3,7 @@
 /**
  *  \file   GW_PolygonIntersector.h
  *  \brief  Definition of class \c GW_PolygonIntersector
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-11-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -19,7 +19,7 @@ namespace GW {
 /**
  *  \class  GW_PolygonIntersector
  *  \brief  Compute the intersection of 2 CONVEX polygon.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-11-2003
  *
  *  This is based on the source code from the book <i>Computational Geometry in C</i>
@@ -463,7 +463,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

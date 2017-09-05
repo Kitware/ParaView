@@ -2,7 +2,7 @@
 /**
  *  \file  GW_Matrix4x4.h
  *  \brief Definition of class \c GW_Matrix4x4
- *  \author Gabriel Peyré 2001-08-04
+ *  \author Gabriel PeyrÃ© 2001-08-04
  */
 /*------------------------------------------------------------------------------*/
 
@@ -19,7 +19,7 @@ namespace GW {
 /**
  *  \class  GW_Matrix4x4
  *  \brief  a 4x4 matrix
- *  \author Gabriel Peyré 2001-08-04
+ *  \author Gabriel PeyrÃ© 2001-08-04
  *
  *    A 4x4 transformation matrix. Warning : NOT THE SAME PACKING THAN OPENGL
  *    (here we use *row* major convention)
@@ -75,7 +75,7 @@ public:
     * Name : OrthoInvert
     *
     *  \return The inverse of an orthogonal matrix.
-    *  \author Gabriel Peyré 2001-08-04
+    *  \author Gabriel PeyrÃ© 2001-08-04
     *
     *    Compute the inverse the matrix, assuming that it's an orthogonal matrix.
     */
@@ -109,7 +109,7 @@ public:
     *  \param  y Y component of the orginal vector.
     *  \param  z Z component of the orginal vector.
     *  \return The X coordinate of the oringal vector tranformed by the matrix.
-    *  \author Gabriel Peyré 2001-10-30
+    *  \author Gabriel PeyrÃ© 2001-10-30
     *
     *    This speed up computation when you only needs depth information (used by
     *    the alpha pipeline).
@@ -125,7 +125,7 @@ public:
     *
     *  \param  v the orginal vector.
     *  \return The X coordinate of the oringal vector tranformed by the matrix.
-    *  \author Gabriel Peyré 2001-10-30
+    *  \author Gabriel PeyrÃ© 2001-10-30
     *
     *    This speed up computation when you only needs depth information (used by
     *    the alpha pipeline).
@@ -243,7 +243,7 @@ public:
     * Name : GW_Matrix4x4::GetRotation
     *
     *  \return The rotation part of the matrix.
-    *  \author Gabriel Peyré 2001-08-04
+    *  \author Gabriel PeyrÃ© 2001-08-04
     *
     *    Compute a matrix without the translation (last column).
     */
@@ -261,7 +261,7 @@ public:
     /**
     *   @return a pointer on the datas of the matrix
     */
-    ///    \author Gabriel Peyré 2001-08-30
+    ///    \author Gabriel PeyrÃ© 2001-08-30
     //-----------------------------------------------------------------------------
     GW_Float* GetCoords() const
     {
@@ -274,7 +274,7 @@ public:
     /**
     *    Set the different elements of the matrix.
     */
-    /// \author Gabriel Peyré 2001-08-31
+    /// \author Gabriel PeyrÃ© 2001-08-31
     //-----------------------------------------------------------------------------
     void SetCoords(
                 GW_Float m00, GW_Float m10, GW_Float m20, GW_Float m30,
@@ -358,7 +358,7 @@ public:
     * Name : GW_Matrix4x4::SetScale
     *
     *  \param  rScale the new scale value.
-    *  \author Gabriel Peyré 2001-10-23
+    *  \author Gabriel PeyrÃ© 2001-10-23
     */
     /*------------------------------------------------------------------------------*/
     void SetScale(GW_Float rScale)
@@ -543,7 +543,7 @@ public:
     * Name : GW_Matrix4x4::Invert
     *
     *  \return The inverse of the matrix.
-    *  \author Gabriel Peyré 2001-08-04
+    *  \author Gabriel PeyrÃ© 2001-08-04
     *
     *    Compute the inverse the matrix, not assuming that it's
     *    an orthogonal matrix.
@@ -706,7 +706,7 @@ public:
     *
     *  \return The product of the matrix by a vectGW.
     *    \param  v The result of the product.
-    *  \author Gabriel Peyré 2001-08-04
+    *  \author Gabriel PeyrÃ© 2001-08-04
     */
     /*------------------------------------------------------------------------------*/
     GW_Vector3D operator*( const GW_Vector3D& v)

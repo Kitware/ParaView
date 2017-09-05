@@ -3,7 +3,7 @@
 /**
  *  \file   GW_TriangularInterpolation_Linear.h
  *  \brief  Definition of class \c GW_TriangularInterpolation_Linear
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-5-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ namespace GW {
 /**
  *  \class  GW_TriangularInterpolation_Linear
  *  \brief  Perform linear interpolation
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-5-2003
  *
  *  No data is stored in this class.
@@ -57,7 +57,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

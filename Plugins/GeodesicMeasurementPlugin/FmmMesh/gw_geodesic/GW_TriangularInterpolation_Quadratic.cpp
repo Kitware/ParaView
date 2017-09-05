@@ -2,14 +2,14 @@
 /**
  *  \file   GW_TriangularInterpolation_Quadratic.cpp
  *  \brief  Definition of class \c GW_TriangularInterpolation_Quadratic
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_TriangularInterpolation_Quadratic.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_TriangularInterpolation_Quadratic.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -26,7 +26,7 @@ using namespace GW;
 /*------------------------------------------------------------------------------*/
 // Name : GW_TriangularInterpolation_Quadratic constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Constructor.
@@ -41,7 +41,7 @@ GW_TriangularInterpolation_Quadratic::GW_TriangularInterpolation_Quadratic()
 /*------------------------------------------------------------------------------*/
 // Name : GW_TriangularInterpolation_Quadratic destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Destructor.
@@ -58,7 +58,7 @@ GW_TriangularInterpolation_Quadratic::~GW_TriangularInterpolation_Quadratic()
 // Name : GW_TriangularInterpolation_Quadratic::SetUpTriangularInterpolation
 /**
  *  \param  Face [GW_GeodesicFace&] The face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Compute the coefficients of the interpolation.
@@ -191,7 +191,7 @@ void GW_TriangularInterpolation_Quadratic::SetUpTriangularInterpolation( GW_Geod
  *  \param  y [GW_Float] y local coord.
  *  \param  dx [GW_Float&] x coord of the gradient in local coord.
  *  \param  dy [GW_Float&] y coord of the gradient in local coord.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Compute the gradient at given point in local frame.
@@ -252,7 +252,7 @@ void GW_TriangularInterpolation_Quadratic::ComputeGradient( GW_GeodesicVertex& v
  *  \param  x [GW_Float] x local coord.
  *  \param  y [GW_Float] y local coord.
  *  \return  value of the distance function.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Compute the value at a given location in the triangle.
@@ -291,7 +291,7 @@ GW_Float GW_TriangularInterpolation_Quadratic::ComputeValue( GW_GeodesicVertex& 
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

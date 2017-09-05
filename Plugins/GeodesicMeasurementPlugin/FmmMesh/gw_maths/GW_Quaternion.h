@@ -75,7 +75,7 @@ public:
     * Name : GW_Quaternion constructor
     *
     *  \param  axe the axe of the quaternion
-    *  \author Gabriel Peyré 2001-09-10
+    *  \author Gabriel PeyrÃ© 2001-09-10
     */
     /*------------------------------------------------------------------------------*/
     GW_Quaternion::GW_Quaternion(GW_Vector3D& axe)
@@ -106,7 +106,7 @@ public:
     * Name : GW_Quaternion::GetX
     *
     *  \return the X coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_Quaternion::GetX() const
@@ -118,7 +118,7 @@ public:
     * Name : GW_Quaternion::GetY
     *
     *  \return the Y coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_Quaternion::GetY() const
@@ -130,7 +130,7 @@ public:
     * Name : GW_Quaternion::GetZ
     *
     *  \return the Z coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_Quaternion::GetZ() const
@@ -142,7 +142,7 @@ public:
     * Name : GW_Quaternion::GetW
     *
     *  \return the W coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_Quaternion::GetW() const
@@ -154,7 +154,7 @@ public:
     * Name : GW_Quaternion::SetW
     *
     *  \return the W coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     void GW_Quaternion::SetW(GW_Float rVal)
@@ -166,7 +166,7 @@ public:
     * Name : GW_Quaternion::SetX
     *
     *  \return the X coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     void GW_Quaternion::SetX(GW_Float rVal)
@@ -178,7 +178,7 @@ public:
     * Name : GW_Quaternion::SetY
     *
     *  \return the Y coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     void GW_Quaternion::SetY(GW_Float rVal)
@@ -190,7 +190,7 @@ public:
     * Name : GW_Quaternion::SetZ
     *
     *  \return the Z coord.
-    *  \author Gabriel Peyré 2001-11-28
+    *  \author Gabriel PeyrÃ© 2001-11-28
     */
     /*------------------------------------------------------------------------------*/
     void GW_Quaternion::SetZ(GW_Float rVal)
@@ -427,7 +427,7 @@ public:
     *
     *  \param  axis output the axis of the rotation.
     *  \param  angle output the angle of the rotation (\b IN \b RADIAN).
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    A quaternion can be converted back to a rotation axis and angle
     *    using the following algorithm :
@@ -463,7 +463,7 @@ public:
     /**
     * Name : GW_Quaternion constructor
     *
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Create a matrix representing the same rotation.
     *
@@ -494,7 +494,7 @@ public:
     * Name : GW_Quaternion::BuildFromMatrix
     *
     *  \param  m rotation matrix.
-    *  \author Gabriel Peyré 2001-11-06
+    *  \author Gabriel PeyrÃ© 2001-11-06
     *
     *    Build the quaternion to reflect the rotation matrix.
     */

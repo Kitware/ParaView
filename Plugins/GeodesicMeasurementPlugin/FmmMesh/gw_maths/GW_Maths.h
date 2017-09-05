@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Maths.h
  *  \brief  Definition of class \c GW_Maths
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   10-28-2002
  */
 /*------------------------------------------------------------------------------*/
@@ -35,7 +35,7 @@ void lubksb(GW_Float **a, GW_I32 n, GW_I32 *indx, GW_Float b[]);
 /**
  *  \class  GW_Maths
  *  \brief  Basic Maths functions.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   10-28-2002
  *
  *  A bunch of useful functions to work on a sphere. Warning : All
@@ -55,7 +55,7 @@ public:
     *  \param  v2 [GW_Vector3D&] Point of the triangle.
     *  \param  v3 [GW_Vector3D&] Point of the triangle.
     *  \return [GW_Float] The area.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   10-28-2002
     *
     *  Compute the area of a spherical triangle.
@@ -89,7 +89,7 @@ public:
     *  \param  v2 [GW_Vector2D&] a point of the triangle.
     *  \param  v3 [GW_Vector2D&] a point of the triangle.
     *  \return [GW_Float] The area
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   10-28-2002
     *
     *  Compute the area of a plane triangle.
@@ -108,7 +108,7 @@ public:
     *  \param  v2 [GW_Vector3D&] a point of the triangle.
     *  \param  v3 [GW_Vector3D&] a point of the triangle.
     *  \return [GW_Float] The area
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   10-28-2002
     *
     *  Compute the area of a plane triangle.
@@ -127,7 +127,7 @@ public:
     *  \param  v3 [GW_Vector3D&] 3rd point.
     *  \param  v4 [GW_Vector3D&] 4th point.
     *  \return [GW_Float] Area.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-30-2003
     *
     *  Compute the area of a CONVEX quadrilater.
@@ -148,7 +148,7 @@ public:
     *  \param  v1 [GW_Vector3D&] A point in the triangle.
     *  \param  v2 [GW_Vector3D&] A point in the triangle.
     *  \param  v3 [GW_Vector3D&] A point in the triangle.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   10-28-2002
     *
     *  Comute the normal of a triangle, assuming CW orientation.
@@ -166,7 +166,7 @@ public:
     *  \param  b [GW_Float] Length of a side.
     *  \param  c [GW_Float] Length of a side.
     *    \return Area of the triangle.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   4-27-2003
     *
     *  Compute the area of a triangle using Heron rule.
@@ -187,7 +187,7 @@ public:
     *  \param  Pos [GW_Vector3D] Absolute position of the point.
     *  \param  rLong [GW_Float&] Return value : longitude.
     *  \param  rLat [GW_Float&] Return value : latitude.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   10-27-2002
     *
     *  Convert from absolute cartesian coords to polar coords
@@ -235,7 +235,7 @@ public:
     *  \param  Points[2][6] [GW_Float] Coordinates of the points.
     *  \param  Values[6] [GW_Float] Value of the function.
     *  \param  Coeffs[6] [GW_Float] Coefficients.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   4-12-2003
     *
     *  Find the coefficients of a 2nd order 2D polynomial that pass
@@ -285,7 +285,7 @@ public:
     *  \param  b2 [GW_Float] 3rd geodesic coord GLOBAL COORDS
     *  \param  c2 [GW_Float] 3rd geodesic coord GLOBAL COORDS
     *  \return >=0 if the conversion was successful, <0 otherwise.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   4-30-2003
     *
     *  Convert from global parametric coords to local ones.
@@ -333,7 +333,7 @@ public:
     /*------------------------------------------------------------------------------*/
     // Name : GW_Maths::TestClass
     /**
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   4-12-2003
     *
     *  Test the class.
@@ -466,7 +466,7 @@ void free_vector(GW_Float *v, long nl, long /*nh*/)
     Given a matrix a[1..n][1..n], this routine replaces it by the LU decomposition of a rowwise
     permutation of itself. a and n are input. a is output, arranged as in equation (2.3.14) above;
     indx[1..n] is an output vector that records the row permutation elected by the partial
-    pivoting; d is output as ±1 depending on whether the number of row interchanges was even
+    pivoting; d is output as Â±1 depending on whether the number of row interchanges was even
     or odd, respectively. This routine is used in combination with lubksb to solve linear equations
     or invert a matrix.
 */
@@ -534,7 +534,7 @@ void ludcmp(GW_Float **a, GW_I32 n, GW_I32 *indx, GW_Float *d)
 
 /************************************************************************/
 /*
-    Solves the set of n linear equations A·X = B. Here a[1..n][1..n] is input, not as the matrix
+    Solves the set of n linear equations AÂ·X = B. Here a[1..n][1..n] is input, not as the matrix
     A but rather as its LU decomposition, determined by the routine ludcmp. indx[1..n] is input
     as the permutation vector returned by ludcmp. b[1..n] is input as the right-hand side vector
     B, and returns with the solution vector X. a, n, and indx are not modi?ed by this routine
@@ -582,7 +582,7 @@ GW_END_NAMESPACE
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

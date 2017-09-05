@@ -2,7 +2,7 @@
 /**
  *  \file   GW_GeodesicVertex.inl
  *  \brief  Inlined methods for \c GW_GeodesicVertex
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -14,7 +14,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicVertex constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Constructor.
@@ -36,7 +36,7 @@ GW_GeodesicVertex::GW_GeodesicVertex()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicVertex destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Destructor.
@@ -52,7 +52,7 @@ GW_GeodesicVertex::~GW_GeodesicVertex()
 // Name : GW_GeodesicVertex::GetDistance
 /**
  *  \return [GW_Float] Current distance. If the vertex is not "Dead", then it is not reliable.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Get the current distance.
@@ -68,7 +68,7 @@ GW_Float GW_GeodesicVertex::GetDistance()
 // Name : GW_GeodesicVertex::SetDistance
 /**
  *  \param  rDistance [GW_Float] Current distance.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Set the current distance.
@@ -84,7 +84,7 @@ void GW_GeodesicVertex::SetDistance( GW_Float rDistance )
 // Name : GW_GeodesicVertex::SetState
 /**
  *  \param  nState [T_GeodesicVertexState] The new state.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Set the state of the vertex.
@@ -100,7 +100,7 @@ void GW_GeodesicVertex::SetState( T_GeodesicVertexState nState )
 // Name : GW_GeodesicVertex::GetState
 /**
  *  \return [T_GeodesicVertexState] The current state.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Return the current state of the vertex.
@@ -116,7 +116,7 @@ GW_GeodesicVertex::T_GeodesicVertexState GW_GeodesicVertex::GetState()
 // Name : GW_GeodesicVertex::GetFront
 /**
  *  \return [GW_GeodesicVertex*] \c NULL if the vertex hasn't already been reached by a front.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Get the vertex from which the front was started.
@@ -132,7 +132,7 @@ GW_GeodesicVertex* GW_GeodesicVertex::GetFront()
 // Name : GW_GeodesicVertex::SetFront
 /**
  *  \param  pFront [GW_GeodesicVertex*] The vertex from which the front started.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  *
  *  Set the front to which this vertex belongs.
@@ -151,7 +151,7 @@ void GW_GeodesicVertex::SetFront( GW_GeodesicVertex* pFront )
  *  \param  pVert1 [GW_GeodesicVertex*] 1st vertex.
  *  \param  pVert2 [GW_GeodesicVertex*] 2nd vertex.
  *  \return [GW_Bool] True if distance of the 1st mesh is < to the one of the 2nd.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Compare the distance of the 2 vertex. Used by the heap sorter.
@@ -166,7 +166,7 @@ GW_Bool GW_GeodesicVertex::CompareVertex(GW_GeodesicVertex* pVert1, GW_GeodesicV
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicVertex::ResetGeodesicVertex
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-26-2003
  *
  *  Reset the datas for geodesic computations.
@@ -185,7 +185,7 @@ void GW_GeodesicVertex::ResetGeodesicVertex()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicVertex::ResetParametrizationData
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-27-2003
  *
  *  Reset only the data relative to parametrization.
@@ -203,7 +203,7 @@ void GW_GeodesicVertex::ResetParametrizationData()
 // Name : GW_GeodesicVertex::SetBoundaryReached
 /**
  *  \param  bBoundaryReached [GW_Bool] Was it reached ?
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-30-2003
  *
  *  Is the vertex a boundary one reached by a parametrizing front ?
@@ -219,7 +219,7 @@ void GW_GeodesicVertex::SetBoundaryReached( GW_Bool bBoundaryReached )
 // Name : GW_GeodesicVertex::GetBoundaryReached
 /**
  *  \return [GW_Bool] Answer.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-30-2003
  *
  *  Reached on a boundary ?
@@ -238,7 +238,7 @@ GW_Bool GW_GeodesicVertex::GetBoundaryReached()
  *  \param  v2 [GW_GeodesicVertex&] 2nd vertex.
  *  \param  pInter [GW_Vector3D*] Location of intersection.
  *  \param  pLambda [GW_Float*] Location in barycentric coord.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-30-2003
  *
  *  Compute the location of intersection of two front on a edge.
@@ -297,7 +297,7 @@ void GW_GeodesicVertex::ComputeFrontIntersection( GW_GeodesicVertex& v1, GW_Geod
 *  \param  v2 [GW_GeodesicVertex&] 2nd vertex.
 *  \param  pInter [GW_Vector3D*] Location of intersection.
 *  \param  pLambda [GW_Float*] Location in barycentric coord.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-30-2003
 *
 *  Compute the location of intersection of two front on a edge.
@@ -322,7 +322,7 @@ void GW_GeodesicVertex::ComputeFrontIntersection( GW_GeodesicVertex& v1, GW_Floa
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
 /**
  *  \file   GW_Mesh.h
  *  \brief  Definition of class \c GW_Mesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ namespace GW {
 /**
  *  \class  GW_Mesh
  *  \brief  A basic mesh, composed of vertex and faces.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  This class does not provide any advanded feature. You must build
@@ -170,7 +170,7 @@ typedef T_MeshVector::const_reverse_iterator CRIT_MeshVector;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

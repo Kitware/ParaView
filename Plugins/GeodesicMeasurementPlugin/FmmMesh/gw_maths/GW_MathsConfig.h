@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Config.h
  *  \brief  Main configuration file.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   10-26-2002
  */
 /*------------------------------------------------------------------------------*/

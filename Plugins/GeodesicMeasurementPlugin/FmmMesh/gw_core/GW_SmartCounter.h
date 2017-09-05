@@ -3,7 +3,7 @@
 /**
  *  \file  GW_SmartCounter.h
  *  \brief Definition of class \c GW_SmartCounter
- *  \author Gabriel Peyré 2001-09-12
+ *  \author Gabriel PeyrÃ© 2001-09-12
  */
 /*------------------------------------------------------------------------------*/
 
@@ -19,7 +19,7 @@ namespace GW {
 /**
  *  \class  GW_SmartCounter
  *  \brief  A smart reference counter.
- *  \author Gabriel Peyré 2001-09-12
+ *  \author Gabriel PeyrÃ© 2001-09-12
  *
  *    Each object that want to use reference management must inherit from this class.
  *

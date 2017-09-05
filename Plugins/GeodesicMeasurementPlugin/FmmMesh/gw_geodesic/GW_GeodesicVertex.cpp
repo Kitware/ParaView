@@ -2,14 +2,14 @@
 /**
  *  \file   GW_GeodesicVertex.cpp
  *  \brief  Definition of class \c GW_GeodesicVertex
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_GeodesicVertex.cpp (c) Gabriel Peyré 2003";
+    static const char* sccsid = "@(#) GW_GeodesicVertex.cpp (c) Gabriel PeyrÃ© 2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -28,7 +28,7 @@ using namespace GW;
 // Name : GW_GeodesicVertex::SetStoppingVertex
 /**
  *  \param  bIsStoppingVertex [GW_Bool] Yes/No
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-26-2003
  *
  *  Set on/off stopping criterion.
@@ -44,7 +44,7 @@ void GW_GeodesicVertex::SetStoppingVertex( GW_Bool bIsStoppingVertex )
 // Name : GW_GeodesicVertex::GetIsStoppingVertex
 /**
  *  \return [GW_Bool] Stopping state.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-26-2003
  *
  *  Get the stopping vertex state.
@@ -61,7 +61,7 @@ GW_Bool GW_GeodesicVertex::GetIsStoppingVertex()
 /**
  *  \param  VornoiVert [GW_VoronoiVertex&] The corresponding voronoi vertex.
  *  \param  rParam [GW_Float] The parameter.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-26-2003
  *
  *  Add a parameter value.
@@ -96,7 +96,7 @@ void GW_GeodesicVertex::AddParameterVertex( GW_VoronoiVertex& VornoiVert, GW_Flo
  *  \param  nNum [GW_U32] The number of the parameter.
  *  \param  rParam [GW_Float&] Retrun value : the parameter.
  *  \return [GW_VoronoiVertex*] The corresponding vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-26-2003
  *
  *  Return the value of a given parameter.
@@ -115,7 +115,7 @@ GW_VoronoiVertex* GW_GeodesicVertex::GetParameterVertex( GW_U32 nNum, GW_Float& 
 /**
  *  \param  nNum [GW_U32] The number of the parameter.
  *  \param  rParam [GW_Float] The value.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-27-2003
  *
  *  Set the value of a given parameter. You should first add the
@@ -136,7 +136,7 @@ void GW_GeodesicVertex::SetParameterVertex( GW_U32 nNum, GW_Float rParam )
  *  \param  a [GW_Float] 1st param
  *  \param  b [GW_Float] 2nd param
  *  \param  c [GW_Float] 3rd param
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-28-2003
  *
  *  Set the three parameters in one time.
@@ -151,7 +151,7 @@ void GW_GeodesicVertex::SetParameterVertex( GW_Float a, GW_Float b, GW_Float c  
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

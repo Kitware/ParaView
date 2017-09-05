@@ -3,7 +3,7 @@
 /**
  *  \file   GW_FaceIterator.h
  *  \brief  Definition of class \c GW_FaceIterator
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-1-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -23,7 +23,7 @@ class GW_Vertex;
 /**
  *  \class  GW_FaceIterator
  *  \brief  Iterator on a group of face surounding a vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-1-2003
  *
  *  Usefull iterator.
@@ -104,7 +104,7 @@ inline GW_Face* GW_FaceIterator::operator*(  )
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

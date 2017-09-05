@@ -2,14 +2,14 @@
 /**
  *  \file   GW_GeometryAtlas.cpp
  *  \brief  Definition of class \c GW_GeometryAtlas
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_GeometryAtlas.cpp(c) Gabriel Peyré2004";
+    static const char* sccsid = "@(#) GW_GeometryAtlas.cpp(c) Gabriel PeyrÃ©2004";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -24,7 +24,7 @@ using namespace GW;
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeometryAtlas constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  Constructor.
@@ -40,7 +40,7 @@ GW_GeometryAtlas::GW_GeometryAtlas()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeometryAtlas destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  Destructor.
@@ -57,7 +57,7 @@ GW_GeometryAtlas::~GW_GeometryAtlas()
 // Name : GW_GeometryAtlas::InitSampling
 /**
  *  \param  CyclicPositionCollection [std::vector<T_TrissectorInfoVector>] The position of each base point on each polygon.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  Initialize the sampling position of each point.
@@ -114,7 +114,7 @@ void GW_GeometryAtlas::InitSampling( std::vector<T_TrissectorInfoVector>& Cyclic
 /**
  *  \param  ParamMeshVector [T_MeshVector&] Parameter spaces
  *  \param  RealMeshVector [T_MeshVector&] Real 3D position
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  Positionate each point on the grid
@@ -152,7 +152,7 @@ void GW_GeometryAtlas::PositionateVertex( T_MeshVector& ParamMeshVector, T_MeshV
 // Name : GW_GeometryAtlas::SmoothSampling
 /**
 *  \param  CyclicPositionCollection [std::vector<T_GeometryCellVector>] collection of cells.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   2-4-2004
 *
 *  Smooth the sampling into a conformal mapping.
@@ -172,7 +172,7 @@ void GW_GeometryAtlas::SmoothSampling( GW_U32 nNbrIter )
 // Name : GW_GeometryAtlas::SmoothSampling
 /**
  *  \param  CurCellGroup [T_GeometryCellVector&] The region.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-4-2004
  *
  *  Smooth just one region.
@@ -267,7 +267,7 @@ void GW_GeometryAtlas::SmoothSampling( T_GeometryCellVector& CurCellGroup )
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

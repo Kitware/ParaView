@@ -2,7 +2,7 @@
 /**
  *  \file   GW_GeodesicPoint.inl
  *  \brief  Inlined methods for \c GW_GeodesicPoint
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -14,7 +14,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicPoint constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Constructor.
@@ -33,7 +33,7 @@ GW_GeodesicPoint::GW_GeodesicPoint()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicPoint destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Destructor.
@@ -51,7 +51,7 @@ GW_GeodesicPoint::~GW_GeodesicPoint()
 // Name : GW_GeodesicPoint::SetVertex1
 /**
  *  \param  Vert1 [GW_GeodesicVertex&] The first vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Set the 1st vertex.
@@ -69,7 +69,7 @@ void GW_GeodesicPoint::SetVertex1( GW_GeodesicVertex& Vert1 )
 // Name : GW_GeodesicPoint::SetVertex2
 /**
 *  \param  Vert1 [GW_GeodesicVertex&] The 2nd vertex.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-10-2003
 *
 *  Set the 2nd vertex.
@@ -87,7 +87,7 @@ void GW_GeodesicPoint::SetVertex2( GW_GeodesicVertex& Vert2 )
 // Name : GW_GeodesicPoint::SetCoord
 /**
  *  \param  rCoord [GW_Float] The coordinate.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  The the barycentric coordinate of the point.
@@ -105,7 +105,7 @@ void GW_GeodesicPoint::SetCoord( GW_Float rCoord )
 // Name : GW_GeodesicPoint::GetVertex1
 /**
  *  \return [GW_GeodesicVertex*] The 1st vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Get the 1st vertex.
@@ -121,7 +121,7 @@ GW_GeodesicVertex* GW_GeodesicPoint::GetVertex1()
 // Name : GW_GeodesicPoint::GetVertex2
 /**
 *  \return [GW_GeodesicVertex*] The 2nd vertex.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-10-2003
 *
 *  Get the 2nd vertex.
@@ -137,7 +137,7 @@ GW_GeodesicVertex* GW_GeodesicPoint::GetVertex2()
 // Name : GW_GeodesicPoint::GetCoord
 /**
  *  \return [GW_Float] The coordinate.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Get the barycentric coordinate.
@@ -153,7 +153,7 @@ GW_Float GW_GeodesicPoint::GetCoord()
 // Name : GW_GeodesicPoint::GetSubPointVector
 /**
  *  \return [T_SubPointVector&] The vector.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Get the vector of sub-points
@@ -169,7 +169,7 @@ T_SubPointVector& GW_GeodesicPoint::GetSubPointVector()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

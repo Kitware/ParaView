@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Serializable.h
  *  \brief  Definition of class \c GW_Serializable
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -124,7 +124,7 @@ typedef class GW_Serializable& (*T_CreateInstance_Function)(void);
 /**
  *  \class  GW_Serializable
  *  \brief  Base class for all class that want to be serialized into a file.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  *
  *  You must overload \c BuildFromFile and \c BuildToFile.
@@ -228,7 +228,7 @@ GW_Ifstream& operator >> (GW_Ifstream& file, GW_Serializable& v)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 /**
  *  \file   GW_GeodesicMesh.inl
  *  \brief  Inlined methods for \c GW_GeodesicMesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -14,7 +14,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicMesh constructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Constructor.
@@ -38,7 +38,7 @@ GW_GeodesicMesh::GW_GeodesicMesh()
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicMesh destructor
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Destructor.
@@ -55,7 +55,7 @@ GW_GeodesicMesh::~GW_GeodesicMesh()
 // Name : GW_GeodesicMesh::CreateNewVertex
 /**
 *  \return [GW_Vertex&] The newly created vertex.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-9-2003
 *
 *  Allocate memory for a new vertex. You should overload this
@@ -72,7 +72,7 @@ GW_Vertex& GW_GeodesicMesh::CreateNewVertex()
 // Name : GW_GeodesicMesh::CreateNewFace
 /**
 *  \return [GW_Face&] The newly created face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-9-2003
 *
 *  Allocate memory for a new face.
@@ -88,7 +88,7 @@ GW_Face& GW_GeodesicMesh::CreateNewFace()
 // Name : GW_GeodesicMesh::AddStartVertex
 /**
  *  \param  StartVert [GW_GeodesicVertex&] The new starting point.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Add a new vertex as a starting point for the next fire.
@@ -110,7 +110,7 @@ void GW_GeodesicMesh::AddStartVertex( GW_GeodesicVertex& StartVert )
 /**
  *  \param  Vert [GW_GeodesicVertex&] Current vertex.
  *  \return [GW_Float] 1
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Just the constant function = 1.
@@ -126,7 +126,7 @@ GW_Float GW_GeodesicMesh::BasicWeightCallback(GW_GeodesicVertex& /*Vert*/, void 
 // Name : GW_GeodesicMesh::RegisterForceStopCallbackFunction
 /**
  *  \param  pFunc [T_FastMarchingCallbackFunction] The function.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Set the function used to test if we should end the fast marching or not.
@@ -144,7 +144,7 @@ void GW_GeodesicMesh::RegisterForceStopCallbackFunction( T_FastMarchingCallbackF
 // Name : GW_GeodesicMesh::RegisterWeightCallbackFunction
 /**
 *  \param  pFunc [T_WeightCallbackFunction] The function.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-10-2003
 *
 *  Set the function used to define the metric on the mesh.
@@ -162,7 +162,7 @@ void GW_GeodesicMesh::RegisterWeightCallbackFunction( T_WeightCallbackFunction p
 // Name : GW_GeodesicMesh::RegisterHeuristicToGoalCallbackFunction
 /**
  *  \param  pFunc [T_HeuristicToGoalCallbackFunction] Callback function.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   3-14-2004
  *
  *  Turn the propagation into an A* like.
@@ -179,7 +179,7 @@ void GW_GeodesicMesh::RegisterHeuristicToGoalCallbackFunction( T_HeuristicToGoal
 // Name : GW_GeodesicMesh::PerformFastMarchingOneStep
 /**
  *  \return [GW_Bool] Is the marching process finished ?
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-13-2003
  *
  *  Just one update step of the marching algorithm.
@@ -295,7 +295,7 @@ GW_Bool GW_GeodesicMesh::PerformFastMarchingOneStep()
 *  \param  Vert1 [GW_GeodesicVertex&] It's 1st neighbor.
 *  \param  Vert2 [GW_GeodesicVertex&] 2nd vertex.
 *  \return The value of the distance according to this triangle contribution.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-12-2003
 *
 *  Compute the update of a vertex from inside of a triangle.
@@ -406,7 +406,7 @@ GW_Float GW_GeodesicMesh::ComputeVertexDistance( GW_GeodesicFace& CurrentFace, G
  *  \param  b [GW_Float] Length of the 2nd edge.
  *  \param  dot [GW_Float] Value of the dot product between the 2 edges.
  *  \return [GW_Float] The update value.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-26-2003
  *
  *  Compute the update value using Sethian's method.
@@ -481,7 +481,7 @@ GW_Float GW_GeodesicMesh::ComputeUpdate_SethianMethod( GW_Float d1, GW_Float d2,
 *  \param  b [GW_Float] Length of the 2nd edge.
 *  \param  dot [GW_Float] Value of the dot product between the 2 edges.
 *  \return [GW_Float] The update value.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-26-2003
 *
 *  Compute the update value using a change of basis method.
@@ -506,10 +506,10 @@ GW_Float GW_GeodesicMesh::ComputeUpdate_MatrixMethod( GW_Float d1, GW_Float d2, 
     QL[0] = 1/det * (      L[0] - dot*L[1] );
     QL[1] = 1/det * (- dot*L[0] +     L[1] );
 
-    /* compute the equation 'e2*t² + 2*e1*t + e0 = 0' */
+    /* compute the equation 'e2*tÂ² + 2*e1*t + e0 = 0' */
     GW_Float e2 = QL[0]*L[0] + QL[1]*L[1];            // <L,Q*L>
     GW_Float e1 = -( QD[0]*L[0] + QD[1]*L[1] );        // -<L,Q*D>
-    GW_Float e0 = QD[0]*D[0] + QD[1]*D[1] - F*F;    // <D,Q*D> - F²
+    GW_Float e0 = QD[0]*D[0] + QD[1]*D[1] - F*F;    // <D,Q*D> - FÂ²
 
     GW_Float delta = e1*e1 - e0*e2;
 
@@ -548,7 +548,7 @@ GW_Float GW_GeodesicMesh::ComputeUpdate_MatrixMethod( GW_Float d1, GW_Float d2, 
  *  \param  vert1 [GW_GeodesicVertex&] 1st neighbor.
  *  \param  vert2 [GW_GeodesicVertex&] 2nd neighbor.
  *  \return [GW_GeodesicVertex*] The vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-26-2003
  *
  *  Find a correct vertex to update \c v.
@@ -658,7 +658,7 @@ GW_GeodesicVertex* GW_GeodesicMesh::UnfoldTriangle( GW_GeodesicFace& CurFace, GW
 // Name : GW_GeodesicMesh::RegisterVertexInsersionCallbackFunction
 /**
  *  \param  pFunc [T_VertexInsersionCallbackFunction] New function.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-13-2003
  *
  *  Set the function we use when trying to insert a new vertex.
@@ -674,7 +674,7 @@ void GW_GeodesicMesh::RegisterVertexInsersionCallbackFunction( T_VertexInsersion
 // Name : GW_GeodesicMesh::RegisterNewDeadVertexCallbackFunction
 /**
 *  \param  pFunc [T_NewDeadVertexCallbackFunction] New function.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-13-2003
 *
 *  Set the function we use when a new dead vertex is set.
@@ -690,7 +690,7 @@ void GW_GeodesicMesh::RegisterNewDeadVertexCallbackFunction( T_NewDeadVertexCall
 // Name : GW_GeodesicMesh::SetUseUnfolding
 /**
  *  \param  bUseUnfolding [GW_Bool] Use it or not ?
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-26-2003
  *
  *  Set wether to use or not the special handling of obtuse angles
@@ -708,7 +708,7 @@ void GW_GeodesicMesh::SetUseUnfolding( GW_Bool bUseUnfolding )
 // Name : GW_GeodesicMesh::GetUseUnfolding
 /**
  *  \return [GW_Bool] Answer.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-27-2003
  *
  *  Does the fast marching computations use unfolding of the obtuse angles ?
@@ -726,7 +726,7 @@ GW_Bool GW_GeodesicMesh::GetUseUnfolding()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////
