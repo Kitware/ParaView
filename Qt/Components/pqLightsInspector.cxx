@@ -88,7 +88,7 @@ public:
   vtkSMRenderViewProxy* getActiveView()
   {
     // returns nullptr if the active view is incompatible,
-    // otherwise returns the correspongine SMViewProxy
+    // otherwise returns the corresponding SMViewProxy
     pqView* pv = pqActiveObjects::instance().activeView();
     if (pv == nullptr)
     {
@@ -111,6 +111,7 @@ public:
         child->widget()->setParent(0);
         delete child->widget();
       }
+      delete child;
     }
     vtkSMRenderViewProxy* view = this->getActiveView();
     if (!view)
@@ -131,6 +132,7 @@ public:
 
       // add it to this->Ui.scrollArea
       this->Ui.verticalLayout_2->addWidget(lightWidget);
+      this->Ui.verticalLayout_2->addSpacing(20);
     }
     this->Ui.verticalLayout_2->addStretch(1);
   }

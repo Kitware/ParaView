@@ -450,7 +450,7 @@
                          name="LightSwitch"
                          number_of_elements="1"
                          >
-        <Documentation>Turn on/off the default light in the 3D
+        <Documentation>Turn on/off this light in the 3D
         renderer.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -477,7 +477,7 @@
         </EnumerationDomain>
         <Documentation>
         Whether this light is attached the the eye, relative to the
-        eye or fixed in world space, or position-less.
+        eye, fixed in world space, or position-less.
         </Documentation>
       </IntVectorProperty>
 
@@ -501,6 +501,14 @@
                          >
         <Documentation>Set whether light is positional or directional</Documentation>
         <BooleanDomain name="bool" />
+        <Hints>
+          <!-- display when light type is not Ambient -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+        </Hints>
       </IntVectorProperty>
 
       <DoubleVectorProperty command="GetPosition"
@@ -519,17 +527,11 @@
         Relative position of light for CAMERA type, Absolute for SCENE type light.
         </Documentation>
         <Hints>
-          <!-- don't display when light type is Head(1) or Ambient(4) -->
+          <!-- display when light type is Scene or Camera -->
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="LightType"
-                                   inverse="1"
-                                   value="1" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="LightType"
-                                   inverse="1"
-                                   value="4" />
+                                   values="2 3" />
         </Hints>
       </DoubleVectorProperty>
 
@@ -548,6 +550,13 @@
         <Documentation>
         Used with position to compute light direction
         </Documentation>
+        <Hints>
+          <!-- display when light type is Scene or Camera -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   values="2 3" />
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetColor"
@@ -574,6 +583,14 @@
         <Documentation>
         Light Cone Angle for positional light, in degrees.
         </Documentation>
+        <Hints>
+          <!-- display when light type is not Ambient -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetRadius"
@@ -585,6 +602,15 @@
         <Documentation>
         Light radius for OSPRay renderer lights, in degrees for directional, world space units for positional. Increasing produces soft shadows.
         </Documentation>
+        <Hints>
+          <!-- display when light type is not Ambient -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
       </DoubleVectorProperty>
     </Proxy>
     <!-- End of ExtraLights -->
