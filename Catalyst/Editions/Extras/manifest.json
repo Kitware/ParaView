@@ -210,6 +210,7 @@
         { "class": "vtkXMLRectilinearGridWriter" },
         { "class": "vtkXMLStructuredDataWriter" },
         { "class": "vtkXMLStructuredGridWriter" },
+        { "class": "vtkXMLTableWriter" },
         { "class": "vtkXMLUnstructuredDataWriter" },
         { "class": "vtkXMLUnstructuredGridWriter" },
         { "class": "vtkXMLWriter" }
@@ -226,6 +227,7 @@
       "include": [
         { "path": "module.cmake" },
         { "class": "vtkXMLPDataWriter" },
+        { "class": "vtkXMLPDataObjectWriter" },
         { "class": "vtkXMLPImageDataWriter" },
         { "class": "vtkXMLPMultiBlockDataWriter" },
         { "class": "vtkXMLPPolyDataWriter" },
