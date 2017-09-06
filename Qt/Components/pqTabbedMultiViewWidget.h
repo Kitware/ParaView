@@ -84,7 +84,7 @@ public:
   /**
   * Return the layout proxy.
   */
-  vtkSMViewLayoutProxy* getLayoutProxy() const;
+  vtkSMViewLayoutProxy* layoutProxy() const;
 
 signals:
   /**

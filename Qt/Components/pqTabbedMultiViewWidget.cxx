@@ -821,7 +821,7 @@ void pqTabbedMultiViewWidget::onLayoutNameChanged(pqServerManagerModelItem* item
 }
 
 //-----------------------------------------------------------------------------
-vtkSMViewLayoutProxy* pqTabbedMultiViewWidget::getLayoutProxy() const
+vtkSMViewLayoutProxy* pqTabbedMultiViewWidget::layoutProxy() const
 {
   if (auto widget = qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget()))
   {

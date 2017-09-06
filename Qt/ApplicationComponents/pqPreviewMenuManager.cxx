@@ -337,7 +337,7 @@ void pqPreviewMenuManager::onPreviewModeChanged()
 {
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
-  auto layout = viewManager->getLayoutProxy();
+  auto layout = viewManager->layoutProxy();
   if (layout)
   {
     int resolution[2];
