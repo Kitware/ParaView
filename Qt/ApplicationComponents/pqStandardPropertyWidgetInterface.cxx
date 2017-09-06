@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOpenVRHidingDecorator.h"
 #include "pqPropertyGroupButton.h"
 #include "pqProxyEditorPropertyWidget.h"
+#include "pqRemoveLightWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
 #include "pqShowWidgetDecorator.h"
 #include "pqSpherePropertyWidget.h"
@@ -193,6 +194,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "view_resolution")
   {
     return new pqViewResolutionPropertyWidget(smProxy, smProperty);
+  }
+  else if (name == "remove_light_button")
+  {
+    return new pqRemoveLightWidget(smProxy, smProperty);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

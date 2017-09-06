@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqPropertyWidget.h"
 #include "pqProxyWidget.h"
 #include "pqRenderView.h"
 #include "pqUndoStack.h"
@@ -129,10 +130,17 @@ public:
       // consistent with the light type
       pqProxyWidget* lightWidget = new pqProxyWidget(light, self);
       lightWidget->setApplyChangesImmediately(true);
+      lightWidget->updatePanel();
 
       // add it to this->Ui.scrollArea
       this->Ui.verticalLayout_2->addWidget(lightWidget);
       this->Ui.verticalLayout_2->addSpacing(20);
+      // listen to the 'remove me' signal that this widget emits.
+      pqPropertyWidget* button = lightWidget->findChild<pqPropertyWidget*>("RemoveLight");
+      if (button)
+      {
+        self->connect(button, SIGNAL(removeLight(vtkSMProxy*)), SLOT(removeLight(vtkSMProxy*)));
+      }
     }
     this->Ui.verticalLayout_2->addStretch(1);
   }
@@ -203,7 +211,7 @@ void pqLightsInspector::addLight()
 }
 
 //-----------------------------------------------------------------------------
-void pqLightsInspector::removeLight()
+void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
 {
   vtkSMRenderViewProxy* view = this->Internals->getActiveView();
   if (!view)
@@ -227,8 +235,11 @@ void pqLightsInspector::removeLight()
   BEGIN_UNDO_SET("Remove Light");
 
   // todo: this works but do I need to do something more?
-  vtkSMProxy* light = vtkSMPropertyHelper(view, "ExtraLight").GetAsProxy(nlights - 1);
-  vtkSMPropertyHelper(view, "ExtraLight").Remove(light);
+  if (!lightProxy)
+  {
+    lightProxy = vtkSMPropertyHelper(view, "ExtraLight").GetAsProxy(nlights - 1);
+  }
+  vtkSMPropertyHelper(view, "ExtraLight").Remove(lightProxy);
 
   END_UNDO_SET();
 

@@ -242,6 +242,8 @@ set (Module_SRCS
   pqReaction.h
   pqReloadFilesReaction.cxx
   pqReloadFilesReaction.h
+  pqRemoveLightWidget.cxx
+  pqRemoveLightWidget.h
   pqRenameProxyReaction.cxx
   pqRenameProxyReaction.h
   pqRenderViewSelectionReaction.cxx
@@ -436,6 +438,7 @@ set (Module_MOC_HDRS
   pqProxyGroupMenuManager.h
   pqReaction.h
   pqReloadFilesReaction.h
+  pqRemoveLightWidget.h
   pqRenameProxyReaction.h
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.h

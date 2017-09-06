@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqLightsInspector.h
+   Module:  pqRemoveLightWidget.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2017 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -29,46 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqLightsInspector_h
-#define pqLightsInspector_h
+#ifndef pqRemoveLightWidget_h
+#define pqRemoveLightWidget_h
 
-#include "pqComponentsModule.h" // for exports
-#include <QWidget>
+#include "pqApplicationComponentsModule.h"
+#include "pqPropertyWidget.h"
+#include <QPointer>
+
+class QPushButton;
 
 /**
- * @class pqLightsInspector
- * @brief widget to that lets user edit ParaView's lights
+ * @class pqRemoveLightWidget
+ * @brief Remove a light from the scene.
  *
- * pqLightsInspector is a QWidget that is used to allow user to view
- * and edit the lights in the active render view
- *
+ * pqRemoveLightWidget is a pqPropertyWidget that sends a signal to remove
+ * this
  */
-
-class pqView;
-class vtkSMProxy;
-
-class PQCOMPONENTS_EXPORT pqLightsInspector : public QWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqRemoveLightWidget : public pqPropertyWidget
 {
   Q_OBJECT
-  typedef QWidget Superclass;
+  typedef pqPropertyWidget Superclass;
 
 public:
-  pqLightsInspector(
-    QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags(), bool autotracking = true);
-  ~pqLightsInspector() override;
+  pqRemoveLightWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  ~pqRemoveLightWidget() override;
 
-public slots:
-  void addLight();
-  void removeLight(vtkSMProxy* = nullptr);
-  void setActiveView(pqView*);
+signals:
+  void removeLight(vtkSMProxy* smproxy);
 
 private slots:
+  void buttonPressed();
 
 private:
-  Q_DISABLE_COPY(pqLightsInspector);
-
-  class pqInternals;
-  QScopedPointer<pqInternals> Internals;
+  Q_DISABLE_COPY(pqRemoveLightWidget)
+  QPointer<QPushButton> PushButton;
 };
 
 #endif

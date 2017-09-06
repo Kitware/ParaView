@@ -2511,14 +2511,14 @@
           number_of_elements="2"
           >
         <DoubleRangeDomain name="range" />
-        <Documentation>Min and max values to map linearly between to
+        <Documentation>Map linearly between the min and max values to
         produce RGB colors.</Documentation>
       </DoubleVectorProperty>
       <Property
           name="EndValueCapture"
           command="EndValueCapture"
           >
-        <Documentation>Terminantes the render state where RGB colors
+        <Documentation>Terminates the render state where RGB colors
         encode values from a particular array and returns to normal
         behavior.</Documentation>
       </Property>
@@ -2533,7 +2533,7 @@
           name="StopCaptureLuminance"
           command="StopCaptureLuminance"
         >
-        <Documentation>Terminantes the render state where lighting contributions
+        <Documentation>Terminates the render state where lighting contributions
         are encoded into RGB.</Documentation>
       </Property>
       <IntVectorProperty name="EnableOSPRay"

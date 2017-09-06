@@ -63,17 +63,18 @@ public:
   * \li \c command_button : pqCommandButtonPropertyWidget
   * \li \c display_representation_selector : pqDisplayRepresentationPropertyWidget
   * \li \c double_range : pqDoubleRangeSliderPropertyWidget
+  * \li \c filename_widget: pqFileNamePropertyWidget
+  * \li \c glyph_scale_factor: pqGlyphScaleFactorPropertyWidget
   * \li \c image_compressor_config : pqImageCompressorWidget
   * \li \c index_selection : pqIndexSelectionWidget
   * \li \c input_selector : pqInputSelectorWidget
+  * \li \c int_mask: pqIntMaskPropertyWidget
   * \li \c list : pqListPropertyWidget
+  * \li \c proxy_editor: pqProxyEditorPropertyWidget
+  * \li \c remove_light_button: pqRemoveLightWidget
   * \li \c texture_selector : pqTextureSelectorPropertyWidget
   * \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
   * \li \c viewtype_selector: pqViewTypePropertyWidget
-  * \li \c glyph_scale_factor: pqGlyphScaleFactorPropertyWidget
-  * \li \c proxy_editor: pqProxyEditorPropertyWidget
-  * \li \c int_mask: pqIntMaskPropertyWidget
-  * \li \c filename_widget: pqFileNamePropertyWidget
   * \li \c view_resolution: pqViewResolutionPropertyWidget
   */
   pqPropertyWidget* createWidgetForProperty(vtkSMProxy* proxy, vtkSMProperty* property) override;
