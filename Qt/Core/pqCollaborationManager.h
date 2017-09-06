@@ -156,6 +156,16 @@ public slots:
   */
   void enableMousePointerSharing(bool);
 
+  /**
+   * Enable/disable further connections to the server.
+   */
+  void disableFurtherConnections(bool disable);
+
+  /**
+   * Set the connect-id.
+   */
+  void setConnectID(int connectID);
+
 private slots:
   /**
   * Called when a message has been sent by another client

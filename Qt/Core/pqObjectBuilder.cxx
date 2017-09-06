@@ -135,6 +135,7 @@ pqPipelineSource* postCreatePipelineProxy(
 //-----------------------------------------------------------------------------
 pqObjectBuilder::pqObjectBuilder(QObject* _parent /*=0*/)
   : QObject(_parent)
+  , ForceWaitingForConnection(false)
   , WaitingForConnection(false)
 {
 }
@@ -602,6 +603,13 @@ QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy)
 {
   const char* fname = vtkSMCoreUtilities::GetFileNameProperty(proxy);
   return fname ? QString(fname) : QString::Null();
+}
+
+//-----------------------------------------------------------------------------
+bool pqObjectBuilder::forceWaitingForConnection(bool force)
+{
+  std::swap(force, this->ForceWaitingForConnection);
+  return force;
 }
 
 //-----------------------------------------------------------------------------

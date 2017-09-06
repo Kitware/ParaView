@@ -56,6 +56,7 @@ vtkTCPNetworkAccessManager::vtkTCPNetworkAccessManager()
 {
   this->Internals = new vtkInternals();
   this->AbortPendingConnectionFlag = false;
+  this->WrongConnectID = false;
 
   // It's essential to initialize the socket controller to initialize sockets on
   // Windows.
@@ -111,6 +112,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
       }
     }
 
+    this->WrongConnectID = false;
+
     if (parameters["listen"] == "true" && parameters["multiple"] == "true")
     {
       return this->WaitForConnection(port, false, handshake, parameters["nonblocking"] == "true");
@@ -144,6 +147,37 @@ bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
   // FIXME_COLLABORATION
   cout << "Need to fix this to report real pending connections" << endl;
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkTCPNetworkAccessManager::DisableFurtherConnections(int port, bool disable)
+{
+  if (disable)
+  {
+    if (this->Internals->ServerSockets.find(port) != this->Internals->ServerSockets.end())
+    {
+      this->Internals->ServerSockets.at(port)->CloseSocket();
+      this->Internals->ServerSockets.erase(port);
+    }
+  }
+  else
+  {
+    vtkServerSocket* server_socket = vtkServerSocket::New();
+    if (server_socket->CreateServer(port) != 0)
+    {
+      vtkErrorMacro("Failed to set up server socket.");
+      server_socket->Delete();
+      return;
+    }
+    this->Internals->ServerSockets[port] = server_socket;
+    server_socket->FastDelete();
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkTCPNetworkAccessManager::GetWrongConnectID()
+{
+  return this->WrongConnectID;
 }
 
 //----------------------------------------------------------------------------
@@ -216,6 +250,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
 
   if (size == 0 || this->AbortPendingConnectionFlag)
   {
+    // Connection failed / aborted.
     return -1;
   }
 
@@ -261,6 +296,11 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
       return 1;
     }
 
+    if (can_quit_if_error)
+    {
+      vtkErrorMacro("Some error in socket processing.");
+    }
+
     // Close cleanly the socket in error
     vtkSocketCommunicator* comm =
       vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
@@ -274,7 +314,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode)
+void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode, bool server_side)
 {
   switch (errorcode)
   {
@@ -304,11 +344,14 @@ void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode)
                     "**********************************************************************\n");
       break;
     case HANDSHAKE_DIFFERENT_CONNECTION_IDS:
-      vtkErrorMacro("\n"
-                    "**********************************************************************\n"
-                    " Connection failed during handshake.  The server has a different connection id"
-                    " than the client.\n"
-                    "**********************************************************************\n");
+      if (server_side)
+      {
+        vtkWarningMacro("\n"
+                        " Connection failed during handshake. The server has a different \n"
+                        " connection id than the client.\n"
+                        "\n");
+      }
+      this->WrongConnectID = true;
       break;
     case HANDSHAKE_DIFFERENT_RENDERING_BACKENDS:
       vtkErrorMacro("\n"
@@ -370,7 +413,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
     controller->Delete();
     // handshake failed, must be bogus client, continue waiting (unless
     // this->AbortPendingConnectionFlag == true).
-    this->PrintHandshakeError(errorcode);
+    this->PrintHandshakeError(errorcode, false);
     return NULL;
   }
   this->Internals->Controllers.push_back(controller);
@@ -442,9 +485,11 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     {
       controller->Delete();
       controller = NULL;
-      // handshake failed, must be bogus client, continue waiting (unless
-      // this->AbortPendingConnectionFlag == true).
-      this->PrintHandshakeError(errorcode);
+      this->PrintHandshakeError(errorcode, true);
+      if (!once)
+      {
+        break;
+      }
     }
   }
 

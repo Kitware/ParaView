@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkPVServerInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
@@ -95,6 +95,9 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p)
 #endif
   this->Internal->CameraToFollowOfUserId = -1;
   this->Internal->NeedToConnectToCollaborationManager = true;
+  this->Internal->connectId->setMaximum(VTK_INT_MAX);
+  this->Internal->disableFurtherConnections->setChecked(false);
+  this->Internal->masterControl->setVisible(false);
 
   QObject::connect(this->Internal->message, SIGNAL(returnPressed()), this, SLOT(onUserMessage()));
 
@@ -106,6 +109,12 @@ pqCollaborationPanel::pqCollaborationPanel(QWidget* p)
 
   QObject::connect(this->Internal->shareMousePointer, SIGNAL(clicked(bool)), this,
     SIGNAL(shareLocalMousePointer(bool)));
+
+  QObject::connect(this->Internal->disableFurtherConnections, SIGNAL(clicked(bool)), this,
+    SIGNAL(disableFurtherConnections(bool)));
+
+  QObject::connect(
+    this->Internal->connectId, SIGNAL(editingFinished()), this, SLOT(onConnectIDChanged()));
 
   QObject::connect(this, SIGNAL(triggerChatMessage(pqServer*, int, QString&)), this,
     SLOT(writeChatMessage(pqServer*, int, QString&)));
@@ -134,6 +143,12 @@ pqCollaborationPanel::~pqCollaborationPanel()
   QObject::disconnect(this->Internal->shareMousePointer, SIGNAL(clicked(bool)), this,
     SIGNAL(shareLocalMousePointer(bool)));
 
+  QObject::disconnect(this->Internal->disableFurtherConnections, SIGNAL(clicked(bool)), this,
+    SIGNAL(disableFurtherConnections(bool)));
+
+  QObject::disconnect(
+    this->Internal->connectId, SIGNAL(editingFinished()), this, SLOT(onConnectIDChanged()));
+
   QObject::disconnect(this, SIGNAL(triggerChatMessage(pqServer*, int, QString&)), this,
     SLOT(writeChatMessage(pqServer*, int, QString&)));
 
@@ -154,6 +169,11 @@ pqCollaborationPanel::~pqCollaborationPanel()
 
     QObject::disconnect(
       this, SIGNAL(shareLocalMousePointer(bool)), collab, SLOT(enableMousePointerSharing(bool)));
+
+    QObject::disconnect(
+      this, SIGNAL(disableFurtherConnections(bool)), collab, SLOT(disableFurtherConnections(bool)));
+
+    QObject::disconnect(this, SIGNAL(connectIDChanged(int)), collab, SLOT(setConnectID(int)));
 
     QObject::disconnect(collab, SIGNAL(triggeredMasterUser(int)), this, SLOT(onNewMaster(int)));
 
@@ -303,7 +323,14 @@ void pqCollaborationPanel::onNewMaster(int masterId)
       this->Internal->members->item(i, 0)->setIcon(QIcon());
     }
   }
+
+  vtkSMCollaborationManager* collabManager = this->getSMCollaborationManager();
+  if (collabManager != NULL)
+  {
+    this->Internal->masterControl->setVisible(collabManager->IsMaster());
+  }
 }
+
 //-----------------------------------------------------------------------------
 void pqCollaborationPanel::promoteToMaster(int masterId)
 {
@@ -347,9 +374,14 @@ void pqCollaborationPanel::onUserUpdate()
   if (!collab)
   {
     this->Internal->members->setRowCount(0);
+    this->Internal->masterControl->setVisible(false);
     return;
   }
   int nbUsers = collab->GetNumberOfConnectedClients();
+  this->Internal->masterControl->setVisible(collab->IsMaster());
+  this->Internal->disableFurtherConnections->setChecked(collab->GetDisableFurtherConnections());
+  this->Internal->connectId->setValue(collab->GetServerConnectID());
+
   int userId;
   QString userName;
   this->Internal->members->setRowCount(nbUsers);
@@ -451,6 +483,11 @@ void pqCollaborationPanel::onServerChanged()
       QObject::connect(
         this, SIGNAL(shareLocalMousePointer(bool)), collab, SLOT(enableMousePointerSharing(bool)));
 
+      QObject::connect(this, SIGNAL(disableFurtherConnections(bool)), collab,
+        SLOT(disableFurtherConnections(bool)));
+
+      QObject::connect(this, SIGNAL(connectIDChanged(int)), collab, SLOT(setConnectID(int)));
+
       QObject::connect(collab, SIGNAL(triggeredMasterUser(int)), this, SLOT(onNewMaster(int)));
 
       QObject::connect(collab, SIGNAL(triggerFollowCamera(int)), this, SLOT(followUserCamera(int)));
@@ -462,4 +499,10 @@ void pqCollaborationPanel::onServerChanged()
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationPanel::onConnectIDChanged()
+{
+  emit connectIDChanged(this->Internal->connectId->value());
 }

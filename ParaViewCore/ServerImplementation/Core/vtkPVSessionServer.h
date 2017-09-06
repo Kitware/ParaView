@@ -97,11 +97,30 @@ public:
    * Enable or Disable multi-connection support.
    * The MultipleConnection is only used inside the DATA_SERVER to support
    * several clients to connect to it.
-   * By default we allow collaboration (this->MultipleConnection = true)
+   * By default, collaboration is not allowed (this->MultipleConnection = false)
    */
   vtkBooleanMacro(MultipleConnection, bool);
   vtkSetMacro(MultipleConnection, bool);
   vtkGetMacro(MultipleConnection, bool);
+  //@}
+
+  //@{
+  /**
+   * Enable or Disable further connections in muliple connection mode.
+   * By default, further connections are enabled. (this->DisableFurtherConnections = false)
+   */
+  vtkBooleanMacro(DisableFurtherConnections, bool);
+  vtkGetMacro(DisableFurtherConnections, bool);
+  void SetDisableFurtherConnections(bool disable);
+  //@}
+
+  //@{
+  /**
+   * Set/Get the server connect-id.
+   * Default is 0.
+   */
+  void SetConnectID(int newConnectID);
+  int GetConnectID();
   //@}
 
   void OnClientServerMessageRMI(void* message, int message_length);
@@ -135,6 +154,7 @@ protected:
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
   bool MultipleConnection;
+  bool DisableFurtherConnections;
 
   class vtkInternals;
   vtkInternals* Internal;

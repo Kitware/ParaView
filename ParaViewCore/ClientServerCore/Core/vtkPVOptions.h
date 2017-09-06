@@ -137,6 +137,13 @@ public:
 
   //@{
   /**
+   * Returns if this server does not allow connection after the first client.
+   */
+  vtkGetMacro(DisableFurtherConnections, int);
+  //@}
+
+  //@{
+  /**
    * Is this client allow multiple server connection in parallel
    */
   vtkGetMacro(MultiServerMode, int);
@@ -295,6 +302,7 @@ protected:
   int ClientMode;
   int RenderServerMode;
   int MultiClientMode;
+  int DisableFurtherConnections;
   int MultiClientModeWithErrorMacro;
   int MultiServerMode;
   int SymmetricMPIMode;
