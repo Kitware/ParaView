@@ -1460,3 +1460,9 @@ bool vtkSMPropertyHelper::Copy(vtkSMPropertyHelper& source)
       return false;
   }
 }
+
+vtkSMPropertyHelper& vtkSMPropertyHelper::Modified()
+{
+  this->Property->Modified();
+  return *this;
+}

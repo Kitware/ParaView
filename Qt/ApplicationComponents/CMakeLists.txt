@@ -294,6 +294,8 @@ set (Module_SRCS
   pqStatusBar.h
   pqStreamingTestingEventPlayer.cxx
   pqStreamingTestingEventPlayer.h
+  pqSyncLightToCameraWidget.cxx
+  pqSyncLightToCameraWidget.h
   pqTestingReaction.cxx
   pqTestingReaction.h
   pqTextLocationWidget.cxx
@@ -464,6 +466,7 @@ set (Module_MOC_HDRS
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h
   pqStreamingTestingEventPlayer.h
+  pqSyncLightToCameraWidget.h
   pqTestingReaction.h
   pqTextLocationWidget.h
   pqTimeInspectorWidget.h

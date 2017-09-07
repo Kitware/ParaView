@@ -119,7 +119,7 @@ public:
     {
       return;
     }
-
+    pqView* pv = pqActiveObjects::instance().activeView();
     // add new contents
     unsigned int nlights = vtkSMPropertyHelper(view, "ExtraLight").GetNumberOfElements();
     for (unsigned int i = 0; i < nlights; ++i)
@@ -130,6 +130,7 @@ public:
       // consistent with the light type
       pqProxyWidget* lightWidget = new pqProxyWidget(light, self);
       lightWidget->setApplyChangesImmediately(true);
+      lightWidget->setView(pv);
       lightWidget->updatePanel();
 
       // add it to this->Ui.scrollArea

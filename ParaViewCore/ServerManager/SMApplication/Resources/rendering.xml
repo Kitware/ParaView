@@ -487,7 +487,8 @@
           Remove this light.
         </Documentation>
       </Property>
-      <Property name="SyncToCamera">
+      <Property name="SyncToCamera"
+                panel_widget="sync_light_to_camera_button">
         <Documentation>
           Match this light's position and focal point to the camera.
         </Documentation>

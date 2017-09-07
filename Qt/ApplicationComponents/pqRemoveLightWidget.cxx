@@ -31,40 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqRemoveLightWidget.h"
 
-#include "vtkPVProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMSessionProxyManager.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSmartPointer.h"
-
-#include <QPushButton>
-#include <QVBoxLayout>
 
 //-----------------------------------------------------------------------------
 pqRemoveLightWidget::pqRemoveLightWidget(
   vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
-  : Superclass(smproxy, parentObject)
+  : Superclass(smproxy, smproperty, parentObject)
 {
   PV_DEBUG_PANELS() << "pqRemoveLightWidget for a property with "
                        "the panel_widget=\"remove_light_button\" attribute.";
-  // vtkSMSessionProxyManager* pxm = smproxy->GetSessionProxyManager();
-
-  QPushButton* button = new QPushButton(smproperty->GetXMLLabel(), this);
-  button->setObjectName("PushButton");
-  // this is over-written by pqProxyWidget to this value:
-  // this->setObjectName("RemoveLight");
-
-  this->PushButton = button;
-
-  this->connect(button, SIGNAL(pressed()), SLOT(buttonPressed()));
-
-  QHBoxLayout* layoutLocal = new QHBoxLayout(this);
-  layoutLocal->setMargin(0);
-  layoutLocal->addWidget(button);
-  layoutLocal->addStretch();
-
-  this->setShowLabel(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -72,7 +47,7 @@ pqRemoveLightWidget::~pqRemoveLightWidget()
 {
 }
 
-void pqRemoveLightWidget::buttonPressed()
+void pqRemoveLightWidget::buttonClicked()
 {
   // pass the signal along to the listening pqLightInspector,
   // with our proxy so we can be identified.

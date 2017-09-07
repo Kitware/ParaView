@@ -72,6 +72,7 @@ public:
   * \li \c list : pqListPropertyWidget
   * \li \c proxy_editor: pqProxyEditorPropertyWidget
   * \li \c remove_light_button: pqRemoveLightWidget
+  * \li \c sync_light_to_camera_button: pqSyncLightToCameraWidget
   * \li \c texture_selector : pqTextureSelectorPropertyWidget
   * \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
   * \li \c viewtype_selector: pqViewTypePropertyWidget

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqRemoveLightWidget.h
+   Module:  pqSyncLightToCameraWidget.h
 
    Copyright (c) 2017 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqRemoveLightWidget_h
-#define pqRemoveLightWidget_h
+#ifndef pqSyncLightToCameraWidget_h
+#define pqSyncLightToCameraWidget_h
 
 #include "pqApplicationComponentsModule.h"
 #include "pqCommandButtonPropertyWidget.h"
 
 /**
- * @class pqRemoveLightWidget
- * @brief Remove a light from the scene.
+ * @class pqSyncLightToCameraWidget
+ * @brief Sync a light with the current camera.
  *
- * pqRemoveLightWidget is a pqCommandButtonPropertyWidget that sends a signal to remove
- * this light
+ * pqSyncLightToCameraWidget is a pqPropertyWidget that sets a light's
+ * position and focal point to match the camera
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqRemoveLightWidget : public pqCommandButtonPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqSyncLightToCameraWidget
+  : public pqCommandButtonPropertyWidget
 {
   Q_OBJECT
   typedef pqCommandButtonPropertyWidget Superclass;
 
 public:
-  pqRemoveLightWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  ~pqRemoveLightWidget() override;
-
-signals:
-  void removeLight(vtkSMProxy* smproxy);
+  pqSyncLightToCameraWidget(vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  ~pqSyncLightToCameraWidget() override;
 
 protected slots:
   void buttonClicked() override;
 
 private:
-  Q_DISABLE_COPY(pqRemoveLightWidget)
+  Q_DISABLE_COPY(pqSyncLightToCameraWidget)
 };
 
 #endif

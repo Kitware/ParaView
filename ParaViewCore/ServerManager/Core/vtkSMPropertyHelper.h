@@ -285,6 +285,12 @@ public:
    */
   bool Copy(vtkSMPropertyHelper& source);
 
+  /**
+   * Set the proxy to modified if necessary before calling Set()
+   * Return reference so method chaining can be used.
+   */
+  vtkSMPropertyHelper& Modified();
+
 protected:
   void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
 

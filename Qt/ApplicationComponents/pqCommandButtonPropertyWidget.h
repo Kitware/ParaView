@@ -52,8 +52,8 @@ public:
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
   ~pqCommandButtonPropertyWidget() override;
 
-private slots:
-  void buttonClicked();
+protected slots:
+  virtual void buttonClicked();
 
 private:
   vtkSMProperty* Property;
