@@ -74,6 +74,7 @@ public:
    */
   void SetChartType(const char* type);
   void SetChartTypeToLine() { this->SetChartType("Line"); }
+  void SetChartTypeToPoint() { this->SetChartType("Point"); }
   void SetChartTypeToBar() { this->SetChartType("Bar"); }
   void SetChartTypeToBag() { this->SetChartType("Bag"); }
   void SetChartTypeToBox() { this->SetChartType("Box"); }

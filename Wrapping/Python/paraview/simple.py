@@ -169,9 +169,17 @@ def CreateRenderView(detachedFromLayout=False, **params):
 def CreateXYPlotView(detachedFromLayout=False, **params):
     """Create XY plot Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("XYChartView", detachedFromLayout=False, **params)
+    return CreateView("XYChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
+
+def CreateXYPointPlotView(detachedFromLayout=False, **params):
+    """Create XY plot point Chart view.
+    See CreateView for arguments documentation"""
+    return CreateView("XYPointChartView", detachedFromLayout, **params)
+
+# -----------------------------------------------------------------------------
+
 
 def CreateBarChartView(detachedFromLayout=False, **params):
     """"Create Bar Chart view.
@@ -204,14 +212,14 @@ def CreateComparativeBarChartView(detachedFromLayout=False, **params):
 def CreateParallelCoordinatesChartView(detachedFromLayout=False, **params):
     """"Create Parallele coordinate Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("ParallelCoordinatesChartView", **params)
+    return CreateView("ParallelCoordinatesChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def Create2DRenderView(detachedFromLayout=False, **params):
     """"Create the standard 3D render view with the 2D interaction mode turned ON.
     See CreateView for arguments documentation"""
-    return CreateView("2DRenderView", **params)
+    return CreateView("2DRenderView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
