@@ -39,29 +39,24 @@
 #include "vtkStructuredData.h"
 #include "vtkWeakPointer.h"
 
-//****************************************************************************
-
-namespace
-{
-const char XY_CHART_VIEW[] = "XYChartView";
-}
-
 vtkStandardNewMacro(vtkSMContextViewProxy);
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
   : InteractorHelper()
 {
-  this->ChartView = NULL;
+  this->ChartView = nullptr;
   this->SkipPlotableCheck = false;
   this->InteractorHelper->SetViewProxy(this);
   this->EventForwarder->SetTarget(this);
+
+  this->XYChartViewBase4Axes = false;
 }
 
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::~vtkSMContextViewProxy()
 {
-  this->EventForwarder->SetTarget(NULL);
-  this->InteractorHelper->SetViewProxy(NULL);
+  this->EventForwarder->SetTarget(nullptr);
+  this->InteractorHelper->SetViewProxy(nullptr);
   this->InteractorHelper->CleanupInteractor();
 }
 
@@ -97,7 +92,7 @@ vtkRenderWindowInteractor* vtkSMContextViewProxy::GetInteractor()
 {
   this->CreateVTKObjects();
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(this->GetClientSideObject());
-  return pvview ? pvview->GetInteractor() : NULL;
+  return pvview ? pvview->GetInteractor() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -149,7 +144,7 @@ vtkContextView* vtkSMContextViewProxy::GetContextView()
 vtkAbstractContextItem* vtkSMContextViewProxy::GetContextItem()
 {
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(this->GetClientSideObject());
-  return pvview ? pvview->GetContextItem() : NULL;
+  return pvview ? pvview->GetContextItem() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -174,13 +169,14 @@ void vtkSMContextViewProxy::CopyAxisRangesFromChart()
       this->GetProperty("LeftAxisRangeMaximum"));
     update_property(chartXY->GetAxis(vtkAxis::BOTTOM), this->GetProperty("BottomAxisRangeMinimum"),
       this->GetProperty("BottomAxisRangeMaximum"));
-    if (this->GetXMLName() && !strncmp(this->GetXMLName(), XY_CHART_VIEW, sizeof(XY_CHART_VIEW)))
+    if (this->XYChartViewBase4Axes)
     {
       update_property(chartXY->GetAxis(vtkAxis::RIGHT), this->GetProperty("RightAxisRangeMinimum"),
         this->GetProperty("RightAxisRangeMaximum"));
       update_property(chartXY->GetAxis(vtkAxis::TOP), this->GetProperty("TopAxisRangeMinimum"),
         this->GetProperty("TopAxisRangeMaximum"));
     }
+
     // HACK: This overcomes a issue where we mark the chart modified, in Render.
     // We seems to be lacking a mechanism in vtkSMProxy to say "here's the
     // new property value, however it's already set on the server side too,
@@ -203,7 +199,7 @@ void vtkSMContextViewProxy::OnInteractionEvent()
     this->CopyAxisRangesFromChart();
     vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(1);
     vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(1);
-    if (this->GetXMLName() && !strncmp(this->GetXMLName(), XY_CHART_VIEW, sizeof(XY_CHART_VIEW)))
+    if (this->XYChartViewBase4Axes)
     {
       vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(1);
       vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(1);
@@ -250,7 +246,7 @@ void vtkSMContextViewProxy::ResetDisplay()
     // new ranges to use in the Update call.
     vtkSMPropertyHelper(this, "LeftAxisUseCustomRange").Set(0);
     vtkSMPropertyHelper(this, "BottomAxisUseCustomRange").Set(0);
-    if (this->GetXMLName() && !strncmp(this->GetXMLName(), XY_CHART_VIEW, sizeof(XY_CHART_VIEW)))
+    if (this->XYChartViewBase4Axes)
     {
       vtkSMPropertyHelper(this, "RightAxisUseCustomRange").Set(0);
       vtkSMPropertyHelper(this, "TopAxisUseCustomRange").Set(0);
@@ -305,7 +301,7 @@ bool vtkSMContextViewProxy::CanDisplayData(vtkSMSourceProxy* producer, int outpu
 vtkSelection* vtkSMContextViewProxy::GetCurrentSelection()
 {
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(this->GetClientSideObject());
-  return pvview ? pvview->GetSelection() : NULL;
+  return pvview ? pvview->GetSelection() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -317,7 +313,16 @@ int vtkSMContextViewProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPV
     this->SkipPlotableCheck = (tmp == 1);
   }
 
-  return this->Superclass::ReadXMLAttributes(pm, element);
+  int ret = this->Superclass::ReadXMLAttributes(pm, element);
+
+  this->XYChartViewBase4Axes = this->GetProperty("RightAxisRangeMinimum") != nullptr &&
+    this->GetProperty("RightAxisRangeMaximum") != nullptr &&
+    this->GetProperty("RightAxisUseCustomRange") != nullptr &&
+    this->GetProperty("TopAxisRangeMinimum") != nullptr &&
+    this->GetProperty("TopAxisRangeMaximum") != nullptr &&
+    this->GetProperty("TopAxisUseCustomRange") != nullptr;
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------
