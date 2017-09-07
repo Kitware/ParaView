@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSession.h"
+#include "vtkSMViewLayoutProxy.h"
 
 #include <QDebug>
 
@@ -525,4 +526,14 @@ void pqActiveObjects::updateRepresentation()
 vtkSMSessionProxyManager* pqActiveObjects::proxyManager() const
 {
   return this->activeServer() ? this->activeServer()->proxyManager() : NULL;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMViewLayoutProxy* pqActiveObjects::activeLayout() const
+{
+  if (pqView* view = this->activeView())
+  {
+    return vtkSMViewLayoutProxy::FindLayout(view->getViewProxy());
+  }
+  return nullptr;
 }

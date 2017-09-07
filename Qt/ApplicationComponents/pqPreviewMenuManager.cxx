@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPreviewMenuManager.h"
 #include "ui_pqCustomResolutionDialog.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqEventDispatcher.h"
@@ -95,7 +96,7 @@ pqPreviewMenuManager::pqPreviewMenuManager(QMenu* menu)
                << "1920 x 1080 (FHD)"
                << "3840 x 2160 (4K UHD)";
   this->init(defaultItems, menu);
-  this->connect(menu, SIGNAL(aboutToShow()), SLOT(onPreviewModeChanged()));
+  this->connect(menu, SIGNAL(aboutToShow()), SLOT(aboutToShow()));
 }
 
 //-----------------------------------------------------------------------------
@@ -109,30 +110,31 @@ pqPreviewMenuManager::pqPreviewMenuManager(const QStringList& defaultItems, QMen
 //-----------------------------------------------------------------------------
 void pqPreviewMenuManager::init(const QStringList& defaultItems, QMenu* menu)
 {
-  if (qobject_cast<pqTabbedMultiViewWidget*>(
-        pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET")))
+  foreach (const QString& txt, defaultItems)
   {
-    menu->setEnabled(true);
-    foreach (const QString& txt, defaultItems)
-    {
-      SETUP_ACTION(menu->addAction(txt));
-    }
-    if (defaultItems.size() > 0)
-    {
-      menu->addSeparator();
-    }
-    menu->addAction("Custom ...", this, SLOT(addCustom()));
-    this->updateCustomActions();
+    SETUP_ACTION(menu->addAction(txt));
   }
-  else
+  if (defaultItems.size() > 0)
   {
-    menu->setEnabled(false);
+    menu->addSeparator();
   }
+  menu->addAction("Custom ...", this, SLOT(addCustom()));
+  this->updateCustomActions();
+  this->connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), SLOT(updateEnabledState()));
+  this->updateEnabledState();
 }
 
 //-----------------------------------------------------------------------------
 pqPreviewMenuManager::~pqPreviewMenuManager()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqPreviewMenuManager::updateEnabledState()
+{
+  QMenu* menu = this->parentMenu();
+  menu->setEnabled(pqActiveObjects::instance().activeLayout() != nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -333,34 +335,30 @@ void pqPreviewMenuManager::unlock()
 }
 
 //-----------------------------------------------------------------------------
-void pqPreviewMenuManager::onPreviewModeChanged()
+void pqPreviewMenuManager::aboutToShow()
 {
-  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
-  auto layout = viewManager->layoutProxy();
-  if (layout)
+  auto layout = pqActiveObjects::instance().activeLayout();
+  Q_ASSERT(layout != NULL);
+  int resolution[2];
+  vtkSMPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
+  if (resolution[0] == 0 && resolution[1] == 0)
   {
-    int resolution[2];
-    vtkSMPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
-    if (resolution[0] == 0 && resolution[1] == 0)
+    // make sure every item in the menu is unlocked
+    this->unlock();
+  }
+  else
+  {
+    // find the corresponding item and lock it, otherwise create one
+    if (QAction* act = this->findAction(resolution[0], resolution[1]))
     {
-      // make sure every item in the menu is unlocked
-      this->unlock();
+      this->lockResolution(resolution[0], resolution[1]);
     }
     else
     {
-      // find the corresponding item and lock it, otherwise create one
-      if (QAction* act = this->findAction(resolution[0], resolution[1]))
+      if (this->prependCustomResolution(resolution[0], resolution[0], QString()))
       {
+        this->updateCustomActions();
         this->lockResolution(resolution[0], resolution[1]);
-      }
-      else
-      {
-        if (this->prependCustomResolution(resolution[0], resolution[0], QString()))
-        {
-          this->updateCustomActions();
-          this->lockResolution(resolution[0], resolution[1]);
-        }
       }
     }
   }

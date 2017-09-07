@@ -95,6 +95,7 @@ public:
   void unlock();
 
 private slots:
+  void updateEnabledState();
   void addCustom();
   void lockResolution(bool lock);
   void lockResolution(int dx, int dy, QAction* target);
@@ -102,7 +103,7 @@ private slots:
    * If the resolution is changed through the python shell using the vtkSMViewLayoutProxy
    * the menu needs to respond to it.
    */
-  void onPreviewModeChanged();
+  void aboutToShow();
 
 private:
   void updateCustomActions();
