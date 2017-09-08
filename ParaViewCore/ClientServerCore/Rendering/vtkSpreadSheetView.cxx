@@ -587,6 +587,7 @@ bool vtkSpreadSheetView::Export(vtkCSVExporter* exporter)
   {
     return false;
   }
+  this->ClearCache();
 
   vtkIdType blockSize = this->TableStreamer->GetBlockSize();
   vtkIdType numBlocks = (this->GetNumberOfRows() / blockSize) + 1;

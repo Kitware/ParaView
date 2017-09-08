@@ -303,6 +303,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSightTensorInversionBin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusXML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportLinePlotToCSV.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ExportSceneSpreadSheetView2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportX3dPOVVRML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
@@ -734,6 +735,11 @@ set (QuartilePlot_THRESHOLD 20)
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
 set (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
 set (DisconnectAndSaveAnimation_BREAK TRUE)
+
+# ExportSceneSpreadSheetView2 won't work in parallel CS because of ghost cells
+# than cannot be processed by TableToStructuredGrid.
+set(ExportSceneSpreadSheetView2_DISABLE_CS TRUE)
+set(ExportSceneSpreadSheetView2_DISABLE_CRS TRUE)
 
 # Cannot support CRS since we do volume rendering of image data
 # in this test.
