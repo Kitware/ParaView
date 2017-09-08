@@ -179,7 +179,7 @@ read_all_submodules () {
     local git_index="$GIT_INDEX_FILE"
     export git_index
 
-    git submodule foreach --quiet '
+    git submodule foreach --recursive --quiet '
         gitdir="$( git rev-parse --git-dir )"
         cd "$toplevel"
         GIT_INDEX_FILE="$git_index"
@@ -344,8 +344,8 @@ info "Loading source tree from $commit..."
 rm -f "$GIT_INDEX_FILE"
 git read-tree -m -i "$commit"
 git rm -rf -q --cached ".ExternalData"
-git submodule sync
-git submodule update --init
+git submodule sync --recursive
+git submodule update --init --recursive
 read_submodules_into_index
 tree="$( git write-tree )"
 
