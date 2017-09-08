@@ -129,7 +129,7 @@ void pqTraceReaction::start()
   {
     mainWindow->statusBar()->showMessage("Recording python trace...");
   }
-  if (proxy)
+  if (proxy && trace)
   {
     trace->SetPropertiesToTraceOnCreate(
       vtkSMPropertyHelper(proxy, "PropertiesToTraceOnCreate").GetAsInt());
