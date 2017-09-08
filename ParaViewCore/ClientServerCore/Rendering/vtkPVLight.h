@@ -23,11 +23,12 @@
 #ifndef vtkPVLight_h
 #define vtkPVLight_h
 
-class vtkInformationStringKey;
-
 #include "vtkLight.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include <string>
+
+#include <string> //needed for std::string
+
+class vtkInformationStringKey;
 
 #define VTK_LIGHT_TYPE_AMBIENT_LIGHT 4
 

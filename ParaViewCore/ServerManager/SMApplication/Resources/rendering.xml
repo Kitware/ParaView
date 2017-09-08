@@ -446,9 +446,10 @@
            class="vtkPVLight"
            processes="client|dataserver|renderserver">
       <IntVectorProperty command="SetSwitch"
-                         default_values="1"
+                         label="Switch"
                          name="LightSwitch"
                          number_of_elements="1"
+                         default_values="1"
                          >
         <Documentation>Turn on/off this light in the 3D
         renderer.</Documentation>
@@ -456,16 +457,17 @@
       </IntVectorProperty>
 
       <StringVectorProperty command="SetName"
+                            label="Name"
                             name="LightName"
                             panel_visibility="never"
                             number_of_elements="1">
       </StringVectorProperty>
 
-      <IntVectorProperty name="LightType"
-        command="SetLightType"
-        number_of_elements="1"
-        panel_visibility="default"
-        default_values="3">
+      <IntVectorProperty command="SetLightType"
+                         label="Light Coords"
+                         name="LightType"
+                         number_of_elements="1"
+                         default_values="3">
         <EnumerationDomain name="enum">
           <Entry text="headlight"
                  value="1" />
@@ -489,6 +491,7 @@
         </Documentation>
       </Property>
       <Property name="SyncToCamera"
+                label="Move to Camera"
                 panel_widget="sync_light_to_camera_button">
         <Documentation>
           Match this light's position and focal point to the camera.
@@ -503,8 +506,9 @@
       </Property>
 
       <DoubleVectorProperty command="SetIntensity"
-                            default_values="1.0"
+                            label="Intensity"
                             name="LightIntensity"
+                            default_values="1.0"
                             number_of_elements="1">
         <DoubleRangeDomain max="1"
                            min="0"
@@ -516,12 +520,18 @@
       </DoubleVectorProperty>
 
       <IntVectorProperty command="SetPositional"
-                         default_values="0"
+                         label="Light Type"
                          name="Positional"
+                         default_values="0"
                          number_of_elements="1"
                          >
         <Documentation>Set whether light is positional or directional</Documentation>
-        <BooleanDomain name="bool" />
+        <EnumerationDomain name="enum">
+          <Entry text="directional"
+                 value="0" />
+          <Entry text="positional"
+                 value="1" />
+        </EnumerationDomain>
         <Hints>
           <!-- display when light type is not Ambient -->
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -533,16 +543,17 @@
       </IntVectorProperty>
 
       <DoubleVectorProperty command="GetPosition"
+                            name="PositionInfo"
                             default_values="0 0 1"
                             information_only="1"
-                            name="PositionInfo"
                             number_of_elements="3">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetPosition"
-                            default_values="0 0 1"
+                            label="Position"
                             name="LightPosition"
                             information_property="PositionInfo"
+                            default_values="0 0 1"
                             number_of_elements="3">
         <Documentation>
         Relative position of light for CAMERA type, Absolute for SCENE type light.
@@ -557,16 +568,16 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="GetFocalPoint"
+                            name="FocalPointInfo"
                             default_values="0 0 0"
                             information_only="1"
-                            name="FocalPointInfo"
                             number_of_elements="3">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetFocalPoint"
-                            default_values="0 0 0"
                             name="FocalPoint"
                             information_property="FocalPointInfo"
+                            default_values="0 0 0"
                             number_of_elements="3">
         <Documentation>
         Used with position to compute light direction
@@ -605,12 +616,16 @@
         Light Cone Angle for positional light, in degrees.
         </Documentation>
         <Hints>
-          <!-- display when light type is not Ambient -->
+          <!-- display when light type is not Ambient, and when Positional -->
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="LightType"
                                    inverse="1"
                                    value="4" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Positional"
+                                   value="1" />
         </Hints>
       </DoubleVectorProperty>
 
