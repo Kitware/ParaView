@@ -202,7 +202,7 @@
         { "path": "vtkXMLOffsetsManager.h" },
         { "path": "vtkXMLReaderVersion.h" },
         { "class": "vtkXMLCompositeDataWriter" },
-        { "class": "vtkXMLDataSetWriter" },
+        { "class": "vtkXMLDataObjectWriter" },
         { "class": "vtkXMLHyperOctreeWriter" },
         { "class": "vtkXMLImageDataWriter" },
         { "class": "vtkXMLMultiBlockDataWriter" },
@@ -281,7 +281,7 @@
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/writers.xml",
       "proxies":[
-        "XMLDataSetWriter",
+        "XMLDataObjectWriter",
         "XMLMultiBlockDataWriter",
         "XMLPImageDataWriter",
         "XMLPPolyDataWriter",
@@ -294,7 +294,7 @@
       "proxies":[
         "FileSeriesWriter",
         "ParallelFileSeriesWriter",
-        "XMLDataSetWriterCore",
+        "XMLDataObjectWriterCore",
         "XMLPDataSetWriterCore",
         "XMLPImageDataWriterCore",
         "XMLPMultiBlockDataWriterCore",

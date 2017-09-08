@@ -87,13 +87,13 @@
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="FileSeriesWriter"
-                 name="XMLDataSetWriterBase">
+                 name="XMLDataObjectWriterBase">
       <Documentation>Base for all XML-based file-series
       writers.</Documentation>
       <SubProxy>
         <Proxy name="Writer"
                proxygroup="internal_writers"
-               proxyname="XMLDataSetWriterCore"></Proxy>
+               proxyname="XMLDataObjectWriterCore"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
@@ -102,11 +102,11 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLDataSetWriterBase -->
+      <!-- End of XMLDataObjectWriterBase -->
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLPolyDataWriter">
@@ -136,7 +136,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLHyperOctreeWriter">
@@ -166,7 +166,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLUnstructuredGridWriter">
@@ -196,7 +196,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLStructuredGridWriter">
@@ -226,7 +226,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLRectilinearGridWriter">
@@ -256,7 +256,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLImageDataWriter">
@@ -286,7 +286,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLTableWriter">
