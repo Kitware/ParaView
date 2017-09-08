@@ -9932,6 +9932,12 @@
         <DoubleRangeDomain max="100.0"
                            min="0"
                            name="range" />
+        <Documentation>Makes the object emit light.
+        Only takes effect with OSPRay's path traced renderer.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEdgeColor"
                             default_values="0 0 0.5"
