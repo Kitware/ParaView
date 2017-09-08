@@ -1829,7 +1829,7 @@ def AddLight(view=None):
     nowlights.append(lightproxy)
     view.ExtraLight = nowlights
 
-def RemoveLight(view=None):
+def RemoveLight(view=None, light=None):
     """Makes a new vtkLight and adds it to the designated or active view."""
     view = view if view else GetActiveView()
     if not view:
@@ -1842,7 +1842,10 @@ def RemoveLight(view=None):
         return
 
     #todo: this seems to work but do I need to do something more?
-    nowlights = [l for l in view.ExtraLight][:numlights-1]
+    if light:
+        nowlights = [l for l in view.ExtraLight if l != light]
+    else:
+        nowlights = [l for l in view.ExtraLight][:numlights-1]
     view.ExtraLight = nowlights
 
 def GetLight(number, view=None):

@@ -65,9 +65,6 @@ public:
     // hook up the add light button
     connect(this->Ui.addLight, SIGNAL(pressed()), self, SLOT(addLight()));
 
-    // and, temporily the remove light button for testing
-    connect(this->Ui.removeLight, SIGNAL(pressed()), self, SLOT(removeLight()));
-
     // populate the area with controls for each light
     this->updateLightWidgets();
   }
@@ -132,6 +129,8 @@ public:
       lightWidget->setApplyChangesImmediately(true);
       lightWidget->setView(pv);
       lightWidget->updatePanel();
+      // whenever a property changes, do a render.
+      self->connect(lightWidget, SIGNAL(changeFinished()), SLOT(render()));
 
       // add it to this->Ui.scrollArea
       this->Ui.verticalLayout_2->addWidget(lightWidget);
@@ -203,6 +202,12 @@ void pqLightsInspector::addLight()
 
   // make it so...
   view->UpdateVTKObjects();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqLightsInspector::render()
+{
   pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
   if (!renderView)
   {
@@ -230,7 +235,8 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   SM_SCOPED_TRACE(CallFunction)
     .arg("RemoveLight")
     .arg("view", view)
-    .arg("comment", "remove last light added to the view");
+    .arg("light", lightProxy)
+    .arg("comment", "remove light added to the view");
 
   // tell undo/redo and state about the new light
   BEGIN_UNDO_SET("Remove Light");

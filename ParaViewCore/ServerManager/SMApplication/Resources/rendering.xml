@@ -457,6 +457,7 @@
 
       <StringVectorProperty command="SetName"
                             name="LightName"
+                            panel_visibility="never"
                             number_of_elements="1">
       </StringVectorProperty>
 

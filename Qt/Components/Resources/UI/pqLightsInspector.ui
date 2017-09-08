@@ -48,16 +48,8 @@
      </widget>
     </widget>
    </item>
-   <item>
-    <widget class="QPushButton" name="removeLight">
-     <property name="text">
-      <string>Remove Light</string>
-     </property>
-    </widget>
-   </item>
   </layout>
   <zorder>addLight</zorder>
-  <zorder>removeLight</zorder>
   <zorder>scrollArea</zorder>
  </widget>
  <resources>
