@@ -13,6 +13,7 @@ paraview_test_load_data_dirs(""
   FieldDataBlocks
   FieldDataBlocks/FieldDataBlocks
   FileSeries
+  GenericIOReader
   GMV
   GMV/invalid
   GMV/partial-pyramid

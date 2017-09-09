@@ -40,3 +40,7 @@ add_paraview_plugin(GenericIOReader "1.0"
 )
 
 target_link_libraries(GenericIOReader LINK_PUBLIC GenericIO)
+
+if (BUILD_TESTING AND PARAVIEW_BUILD_QT_GUI)
+  add_subdirectory(Testing)
+endif()
