@@ -231,6 +231,10 @@ public:
   /**
    * Returns the prototype proxy for the given type. This method may create
    * a new prototype proxy, if one does not already exist.
+   *
+   * @note After loading a plugin, all existing prototypes are discarded. This
+   * is done because plugins can potentially alter definitions for existing
+   * proxies.
    */
   vtkSMProxy* GetPrototypeProxy(const char* groupname, const char* name);
 
@@ -447,6 +451,11 @@ public:
    * Creates protytpes for all known proxy types.
    */
   void InstantiatePrototypes();
+
+  /**
+   * Converse on `InstantiatePrototypes`, clear all prototypes.
+   */
+  void ClearPrototypes();
 
   /**
    * Return true if the XML Definition was found by vtkSMProxyDefinitionManager
