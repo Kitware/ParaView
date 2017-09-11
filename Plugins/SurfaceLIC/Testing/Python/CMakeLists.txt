@@ -62,3 +62,6 @@ ELSE()
     SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
 ENDIF()
+
+# add test that tests loading of SurfaceLIC plugin in Python and then using it.
+paraview_add_test_python(TestSuraceLICPlugin.py,NO_VALID)
