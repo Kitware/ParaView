@@ -121,8 +121,7 @@ cases, being your topic name with the issue number.
         $ git commit
 
     Caveats:
-    * To add data follow [these instructions](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/data.md),
-      from VTK.
+    * To add data follow these [vtk instructions][].
 
     Commit messages must contain a brief description as the first line
     and a more detailed description of what the commit contains. If
@@ -132,6 +131,22 @@ cases, being your topic name with the issue number.
     behavior, its underlying cause, and the approach to fix it. If the
     bug is described in the bug tracker, the commit message must
     contain a reference to the bug number.
+
+4. Add some tests
+
+    * Start `paraview.exe -dr` to ignore prefs (disable registry)
+    * Choose `Tools .. Record Test` to start.
+    * Choose `Tools .. Lock View Size Custom...` - a 400x400 window works well.
+    * Perform actions in the GUI that exercise your feature. Stop recording.
+    * Put the resulting XML file into `Applications/ParaView/Testing/XML`
+    * Add it to CMakeLists.txt, probably in a TESTS_WITH_BASELINES section
+        * you can manually add `<pqcompareview>` for multiple image comparisons, then add to the TESTS_WITH_INLINE_COMPARES section
+    * Follow the [vtk instructions][] to add the baseline images, which live in `Testing/Data/Baseline/`.
+    * Add all testing files to your topic.
+
+    Some background is in the [testing design wiki](https://www.paraview.org/Wiki/Testing_design).
+
+[vtk instructions]: https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/data.md
 
 Share a Topic
 -------------
