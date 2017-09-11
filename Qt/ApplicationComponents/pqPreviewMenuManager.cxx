@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
+#include "pqUndoStack.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMViewLayoutProxy.h"
@@ -57,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-QString generateText(int dx, int dy, const QString& label)
+QString generateText(int dx, int dy, const QString& label = QString())
 {
   return label.isEmpty() ? QString("%1 x %2").arg(dx).arg(dy)
                          : QString("%1 x %2 (%3)").arg(dx).arg(dy).arg(label);
@@ -119,7 +120,6 @@ void pqPreviewMenuManager::init(const QStringList& defaultItems, QMenu* menu)
     menu->addSeparator();
   }
   menu->addAction("Custom ...", this, SLOT(addCustom()));
-  this->updateCustomActions();
   this->connect(
     &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), SLOT(updateEnabledState()));
   this->updateEnabledState();
@@ -152,7 +152,7 @@ void pqPreviewMenuManager::updateCustomActions()
   QList<QAction*> actions = menu->actions();
   for (int index = 0; index < actions.size(); ++index)
   {
-    if (actions[index]->data().toBool() == true)
+    if (actions[index]->data().toBool())
     {
       menu->removeAction(actions[index]);
     }
@@ -216,9 +216,11 @@ void pqPreviewMenuManager::addCustom()
     const QString label = ui.resolutionLabel->text();
     if (this->prependCustomResolution(dx, dy, label))
     {
-      this->updateCustomActions();
       this->lockResolution(dx, dy);
     }
+    // this is not needed, but just ensures that our current test playback
+    // infrastructure doesn't croak.
+    this->updateCustomActions();
   }
 }
 
@@ -245,9 +247,16 @@ void pqPreviewMenuManager::lockResolution(bool lock)
     if (lock)
     {
       QSize size = extractSize(actn->text());
-      if (size.isEmpty() == false)
+      if (!size.isEmpty())
       {
         this->lockResolution(size.width(), size.height(), actn);
+        // if `actn` is a custom action, let's sort the custom resolutions list to
+        // have the most recently used item at the top of the list.
+        if (actn->data().toBool())
+        {
+          this->prependCustomResolution(size.width(), size.height(), extractLabel(actn->text()));
+          // no need to update menu. It will get updated before showing.
+        }
       }
     }
     else
@@ -274,40 +283,17 @@ void pqPreviewMenuManager::lockResolution(int dx, int dy)
 //-----------------------------------------------------------------------------
 void pqPreviewMenuManager::lockResolution(int dx, int dy, QAction* target)
 {
+  Q_UNUSED(target);
+
+  SCOPED_UNDO_SET("Enter Preview mode");
   Q_ASSERT(dx >= 1 && dy >= 1);
-
-  if (QAction* actn = (target ? target : this->findAction(dx, dy)))
-  {
-    actn->setChecked(true);
-
-    foreach (QAction* other, this->parentMenu()->actions())
-    {
-      if (other != actn && other->isChecked())
-      {
-        other->setChecked(false);
-      }
-    }
-
-    // if `actn` is a custom action, let's sort the custom resolutions list to
-    // have the most recently used item at the top of the list.
-    if (actn->data().toBool() == true)
-    {
-      this->prependCustomResolution(dx, dy, extractLabel(actn->text()));
-
-      // move actn to the top of the list in the menu as well.
-      if (this->FirstCustomAction != nullptr && this->FirstCustomAction != actn)
-      {
-        this->parentMenu()->removeAction(actn);
-        this->parentMenu()->insertAction(this->FirstCustomAction, actn);
-        this->FirstCustomAction = actn;
-      }
-    }
-  }
-
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   Q_ASSERT(viewManager);
-  if (viewManager->preview(QSize(dx, dy)) == false)
+
+  const QSize requestedSize(dx, dy);
+  const QSize previewSize = viewManager->preview(requestedSize);
+  if (requestedSize != previewSize)
   {
     pqCoreUtilities::promptUser("pqPreviewMenuManager/LockResolutionPrompt",
       QMessageBox::Information, "Requested resolution too big for window",
@@ -320,14 +306,7 @@ void pqPreviewMenuManager::lockResolution(int dx, int dy, QAction* target)
 //-----------------------------------------------------------------------------
 void pqPreviewMenuManager::unlock()
 {
-  foreach (QAction* other, this->parentMenu()->actions())
-  {
-    if (other->isChecked())
-    {
-      other->setChecked(false);
-    }
-  }
-
+  SCOPED_UNDO_SET("Exit Preview mode");
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   Q_ASSERT(viewManager);
@@ -337,29 +316,38 @@ void pqPreviewMenuManager::unlock()
 //-----------------------------------------------------------------------------
 void pqPreviewMenuManager::aboutToShow()
 {
+  this->updateCustomActions();
+
   auto layout = pqActiveObjects::instance().activeLayout();
-  Q_ASSERT(layout != NULL);
+  Q_ASSERT(layout != nullptr);
   int resolution[2];
   vtkSMPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
-  if (resolution[0] == 0 && resolution[1] == 0)
+
+  foreach (QAction* other, this->parentMenu()->actions())
   {
-    // make sure every item in the menu is unlocked
-    this->unlock();
-  }
-  else
-  {
-    // find the corresponding item and lock it, otherwise create one
-    if (QAction* act = this->findAction(resolution[0], resolution[1]))
+    if (other->isChecked())
     {
-      this->lockResolution(resolution[0], resolution[1]);
+      other->setChecked(false);
+    }
+  }
+
+  if (resolution[0] > 0 && resolution[1] > 0)
+  {
+
+    // find the corresponding item and lock it, otherwise create one
+    if (QAction* actn = this->findAction(resolution[0], resolution[1]))
+    {
+      actn->setChecked(true);
     }
     else
     {
-      if (this->prependCustomResolution(resolution[0], resolution[0], QString()))
-      {
-        this->updateCustomActions();
-        this->lockResolution(resolution[0], resolution[1]);
-      }
+      // this can happen if the preview mode state is directly coming from
+      // Python. In that case we add the option to the menu, but not to the
+      // settings.
+      actn = this->parentMenu()->addAction(generateText(resolution[0], resolution[1]));
+      SETUP_ACTION(actn);
+      actn->setData(true); // custom action.
+      actn->setChecked(true);
     }
   }
 }

@@ -41,6 +41,7 @@ class pqProxy;
 class pqView;
 class pqViewFrame;
 class vtkImageData;
+class vtkObject;
 class vtkSMProxy;
 class vtkSMViewLayoutProxy;
 class vtkSMViewProxy;
@@ -90,6 +91,26 @@ public:
   * the view is popped out at the end of this call, false otherwise.
   */
   bool togglePopout();
+
+  /**
+   * Enter (or exit) preview mode.
+   *
+   * Preview mode is a mode were various widget's decorations
+   * are hidden and the widget is locked to the specified size. If the widget's
+   * current size is less than the size specified, then the widget is locked to
+   * a size with similar aspect ratio as requested. Pass in invalid (or empty)
+   * size to exit preview mode.
+   *
+   * Preview mode is preferred over `toggleWidgetDecoration` and `lockViewSize`
+   * and is mutually exclusive with either. Mixing them can have unintended
+   * consequences.
+   *
+   * @returns the size to which the widget was locked. When unlocked, this will
+   * be QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX). When entering preview mode this
+   * will same as requested `previewSize` or a smaller size preserving aspect
+   * ratio as much as possible.
+   */
+  QSize preview(const QSize& previewSize = QSize());
 
 signals:
   /**
@@ -190,12 +211,6 @@ protected slots:
   */
   void viewAdded(pqView*);
 
-  /**
-  * called when the vtkSMViewLayoutProxy is changed in order to synchronize
-  * the separator width and color with the user inputs.
-  */
-  void updateSplitter();
-
 protected:
   /**
   * Called whenever a new frame needs to be created for a view. Note that view
@@ -213,6 +228,18 @@ protected:
 
 private:
   QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg, int& maxIndex);
+  void layoutPropertyModified(vtkObject*, unsigned long, void*);
+
+  /**
+  * called when the vtkSMViewLayoutProxy is changed in order to synchronize
+  * the separator width and color with the user inputs.
+  */
+  void updateSplitter();
+
+  /**
+   * called when the vtkSMViewLayoutProxy's "PreviewMode" property is changed.
+   */
+  void updatePreviewMode();
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget)

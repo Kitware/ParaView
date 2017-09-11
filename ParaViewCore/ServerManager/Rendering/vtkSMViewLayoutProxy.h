@@ -42,8 +42,8 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
-#include "vtkVector.h"
-#include <vector> // needed for std::vector.
+#include "vtkVector.h" // needed for vtkVector2i
+#include <vector>      // needed for std::vector.
 
 class vtkSMViewProxy;
 class vtkImageData;

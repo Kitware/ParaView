@@ -73,9 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject)
   : Superclass(parentObject)
   , ReadOnly(false)
-  , InPreviewMode(false)
   , TabBarVisibility(true)
-  , magnified(false)
 {
 }
 
@@ -177,74 +175,19 @@ void pqTabbedMultiViewWidget::pqTabWidget::setReadOnly(bool val)
 void pqTabbedMultiViewWidget::pqTabWidget::setTabBarVisibility(bool val)
 {
   this->TabBarVisibility = val;
-  if (!this->InPreviewMode)
-  {
-    this->tabBar()->setVisible(val);
-  }
+  this->tabBar()->setVisible(val);
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::pqTabWidget::togglePreview()
+QSize pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
 {
+  // NOTE: do for all widgets? Currently, we'll only do this for the current
+  // widget.
   if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
   {
-    vtkSMViewLayoutProxy* vlayout = widget->layoutManager();
-    if (vlayout)
-    {
-      int resolution[2] = { 0, 0 };
-      vtkSMPropertyHelper(vlayout, "PreviewMode").Get(resolution, 2);
-      if (resolution[0] == 0 || resolution[1] == 0)
-      {
-        // exit preview mode
-        this->InPreviewMode = false;
-        this->tabBar()->setVisible(this->TabBarVisibility);
-        this->setDocumentMode(false);
-        this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-        this->magnified = false;
-        widget->setDecorationsVisible(true);
-      }
-      else
-      {
-        // enter preview mode
-        this->InPreviewMode = true;
-        this->tabBar()->setVisible(false);
-        this->setDocumentMode(true);
-        widget->setDecorationsVisible(false);
-
-        vtkVector2i tsize(resolution[0], resolution[1]);
-        const QRect crect = this->parentWidget()->contentsRect();
-        vtkVector2i csize(crect.width(), crect.height());
-        this->magnified = (vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize) > 1);
-        this->setMaximumSize(QSize(csize[0], csize[1]));
-      }
-    }
+    return widget->preview(nsize);
   }
-}
-
-//-----------------------------------------------------------------------------
-bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
-{
-  int resolution[2];
-  if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
-  {
-    vtkSMViewLayoutProxy* vlayout = widget->layoutManager();
-    if (vlayout)
-    {
-      if (nsize.isEmpty())
-      {
-        resolution[0] = 0;
-        resolution[1] = 0;
-      }
-      else
-      {
-        resolution[0] = nsize.width();
-        resolution[1] = nsize.height();
-      }
-      vtkSMPropertyHelper(vlayout, "PreviewMode").Set(resolution, 2);
-      return nsize.isEmpty() || !this->magnified;
-    }
-  }
-  return false;
+  return QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }
 
 //-----------------------------------------------------------------------------
@@ -411,9 +354,6 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
   {
     auto vlayout = vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy());
     this->createTab(vlayout);
-    vlayout->GetProperty("PreviewMode")
-      ->AddObserver(vtkCommand::ModifiedEvent, this->Internals->TabWidget,
-        &pqTabbedMultiViewWidget::pqTabWidget::togglePreview);
   }
   else if (qobject_cast<pqView*>(proxy))
   {
@@ -703,7 +643,7 @@ void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
 }
 
 //-----------------------------------------------------------------------------
-bool pqTabbedMultiViewWidget::preview(const QSize& nsize)
+QSize pqTabbedMultiViewWidget::preview(const QSize& nsize)
 {
   return this->Internals->TabWidget->preview(nsize);
 }

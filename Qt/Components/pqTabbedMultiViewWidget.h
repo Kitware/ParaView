@@ -132,12 +132,12 @@ public slots:
    * and is mutually exclusive with either. Mixing them can have unintended
    * consequences.
    *
-   * @returns `true` if preview mode was exited, or if preview mode was entered
-   *          at exactly the requested size. `false` is preview mode was
-   *          entered, but only respecting the aspect ratio for the size
-   *          specified.
+   * @returns the size to which the widget was locked. When unlocked, this will
+   * be QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX). When entering preview mode this
+   * will same as requested `previewSize` or a smaller size preserving aspect
+   * ratio as much as possible.
    */
-  virtual bool preview(const QSize& previewSize = QSize());
+  QSize preview(const QSize& previewSize = QSize());
 
 protected slots:
   /**
@@ -239,8 +239,7 @@ protected:
     /**
      * Enter/exit preview mode
      */
-    bool preview(const QSize&);
-    void togglePreview();
+    QSize preview(const QSize&);
 
     //@{
     /**
@@ -253,10 +252,8 @@ protected:
     //@}
   private:
     Q_DISABLE_COPY(pqTabWidget)
-    bool InPreviewMode;
     bool ReadOnly;
     bool TabBarVisibility;
-    bool magnified;
     friend class pqTabbedMultiViewWidget;
   };
 
