@@ -2641,19 +2641,14 @@
         remove_command="RemoveLight"
         repeatable="1">
       </ProxyProperty>
-      <StringVectorProperty command="SetMaterialLibrary"
-                            name="OSPRayLibrary"
-                            label="OSPRay Material Library"
-                            number_of_elements="1"
-                            panel_visibility="advanced"
-                            default_values="None">
-        <Documentation>Load a set of Materials that can be colored with.</Documentation>
-        <FileListDomain name="files" />
-        <Hints>
-          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
-          <FileChooser extensions="json" file_description="material library files" />
-        </Hints>
-      </StringVectorProperty>
+      <ProxyProperty command="SetMaterialLibrary"
+                     name="OSPRayMaterialLibrary"
+                     label="OSPRay Material Library"
+                     number_of_elements="1"
+                     panel_visibility="never"
+                     default_values="None">
+        <Documentation>Container for a set of material specifications.</Documentation>
+      </ProxyProperty>
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>
         <Property name="OrientationAxesInteractivity"/>
@@ -2732,7 +2727,6 @@
         <Property name="SamplesPerPixel"/>
         <Property name="MaxFrames"/>
         <Property name="LightScale"/>
-        <Property name="OSPRayLibrary" />
       </PropertyGroup>
     </RenderViewProxy>
 

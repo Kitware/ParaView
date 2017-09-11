@@ -65,6 +65,11 @@ public:
    */
   virtual vtkSMProxy* FindTimeKeeper(vtkSMSession* session);
 
+  /**
+   * Returns the MaterialLibrary proxy associated with the session.
+   */
+  virtual vtkSMProxy* FindMaterialLibrary(vtkSMSession* session);
+
   //---------------------------------------------------------------------------
   /**
    * Pre-initializes a proxy i.e. prepares the proxy for initialization.
@@ -322,6 +327,8 @@ protected:
    * calls those initialization helpers, if any.
    */
   void ProcessInitializationHelper(vtkSMProxy*, vtkMTimeType initializationTimeStamp);
+
+  virtual void DoMaterialStuff(vtkSMProxy* proxy);
 
 private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;

@@ -170,11 +170,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
 
-#ifdef PARAVIEW_USE_OSPRAY
-  vtkSmartPointer<vtkOSPRayMaterialLibrary> ml = vtkOSPRayMaterialLibrary::GetInstance();
-  ml->LoadMaterials(this->Property);
-#endif
-
   // setup composite display attributes
   vtkCompositeDataDisplayAttributes* compositeAttributes = vtkCompositeDataDisplayAttributes::New();
   vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)
@@ -1063,6 +1058,16 @@ void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
   (void)pwf;
 #endif
 }
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetMaterialLibrary(vtkOSPRayMaterialLibrary* ml)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+// todo this should probably be on the proxy, we only have the ML we
+// can its MLP in a proxy property to use in the domain
+#else
+  (void)ml;
+#endif
+}
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetMaterial(const char* val)
@@ -1076,7 +1081,6 @@ void vtkGeometryRepresentation::SetMaterial(const char* val)
   {
     this->Property->SetMaterialName(val);
   }
-
 #else
   (void)val;
 #endif

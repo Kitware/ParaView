@@ -49,6 +49,7 @@ class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
+class vtkOSPRayMaterialLibrary;
 class vtkPartitionOrderingInterface;
 class vtkProp;
 class vtkPVAxesWidget;
@@ -898,9 +899,9 @@ public:
   void SetOSPRayRendererType(std::string);
 
   /**
-   * For OSPRay, loads a set of materials.
+   * For OSPRay, set the library of materials.
    */
-  virtual void SetMaterialLibrary(const char*);
+  virtual void SetMaterialLibrary(vtkOSPRayMaterialLibrary*);
 
   //@{
   /**

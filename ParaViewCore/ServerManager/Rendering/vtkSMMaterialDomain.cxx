@@ -16,15 +16,26 @@
 #include "vtkSMMaterialDomain.h"
 #include "vtkCommand.h"
 #include "vtkNew.h"
-#include "vtkOSPRayMaterialLibrary.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMMaterialLibraryProxy.h"
+#include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkStdString.h"
+
+#include "vtkPVConfig.h"
+
+#ifdef PARAVIEW_USE_OSPRAY
+#include "vtkOSPRayMaterialLibrary.h"
+#endif
 
 class vtkSMMaterialObserver : public vtkCommand
 {
 public:
-  static vtkSMMaterialObserver* New() { return new vtkSMMaterialObserver; }
+  static vtkSMMaterialObserver* New()
+  {
+    vtkSMMaterialObserver* ret = new vtkSMMaterialObserver;
+    return ret;
+  }
   vtkTypeMacro(vtkSMMaterialObserver, vtkCommand);
 
   void Execute(vtkObject* caller, unsigned long eventid, void* calldata) VTK_OVERRIDE
@@ -40,14 +51,14 @@ vtkStandardNewMacro(vtkSMMaterialDomain);
 //---------------------------------------------------------------------------
 vtkSMMaterialDomain::vtkSMMaterialDomain()
 {
-  vtkNew<vtkSMMaterialObserver> observer;
-  observer->Owner = this;
-  vtkOSPRayMaterialLibrary::GetInstance()->AddObserver(vtkCommand::UpdateDataEvent, observer.Get());
+  this->Observer = vtkSMMaterialObserver::New();
+  this->Observer->Owner = this;
 }
 
 //---------------------------------------------------------------------------
 vtkSMMaterialDomain::~vtkSMMaterialDomain()
 {
+  this->Observer->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -59,6 +70,7 @@ void vtkSMMaterialDomain::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 int vtkSMMaterialDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
+#ifdef PARAVIEW_USE_OSPRAY
   int retVal = this->Superclass::ReadXMLAttributes(prop, element);
   if (!retVal)
   {
@@ -66,12 +78,34 @@ int vtkSMMaterialDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
   }
   // throw away whatever XML said our strings are and call update instead
   this->Update(nullptr);
+
+  // register updates whenever the materials change
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  vtkSMMaterialLibraryProxy* mlp =
+    vtkSMMaterialLibraryProxy::SafeDownCast(controller->FindMaterialLibrary(this->GetSession()));
+  if (!mlp)
+  {
+    return 1;
+  }
+  // todo: is GetClientSideObject guaranteed to succeed?
+  vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(mlp->GetClientSideObject());
+  if (!ml)
+  {
+    return 1;
+  }
+  ml->AddObserver(vtkCommand::UpdateDataEvent, this->Observer);
+
   return 1;
+#else
+  (void)prop;
+  (void)element;
+#endif
 }
 
 //---------------------------------------------------------------------------
 void vtkSMMaterialDomain::CallMeSometime()
 {
+  // materials changed, update self with new contents
   this->Update(nullptr);
   this->DomainModified();
 }
@@ -79,19 +113,38 @@ void vtkSMMaterialDomain::CallMeSometime()
 //---------------------------------------------------------------------------
 void vtkSMMaterialDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 {
-  std::vector<vtkStdString> sa;
-  sa.push_back(vtkStdString("None"));
+#ifdef PARAVIEW_USE_OSPRAY
+  // find the material library we reflect contents of
+  vtkNew<vtkSMParaViewPipelineController> controller;
+  vtkSMMaterialLibraryProxy* mlp =
+    vtkSMMaterialLibraryProxy::SafeDownCast(controller->FindMaterialLibrary(this->GetSession()));
+  if (!mlp)
+  {
+    return;
+  }
+  vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(mlp->GetClientSideObject());
+  if (!ml)
+  {
+    return;
+  }
 
-  std::set<std::string> materialNames = vtkOSPRayMaterialLibrary::GetInstance()->GetMaterialNames();
+  // populate my list
+  std::vector<vtkStdString> sa;
+  sa.push_back(vtkStdString("None")); // 1: standard vtk coloration
+  // 2: whole actor material choices
+  std::set<std::string> materialNames = ml->GetMaterialNames();
   std::set<std::string>::iterator it = materialNames.begin();
   while (it != materialNames.end())
   {
     sa.push_back(*it);
     it++;
   }
+  // 3: cells/blocks can choose for themselves from the above
   if (materialNames.size() > 1)
   {
     sa.push_back(vtkStdString("MasterMaterial"));
   }
+
   this->SetStrings(sa);
+#endif
 }

@@ -36,6 +36,7 @@ class vtkCallbackCommand;
 class vtkCompositeDataDisplayAttributes;
 class vtkCompositePolyDataMapper2;
 class vtkMapper;
+class vtkOSPRayMaterialLibrary;
 class vtkPiecewiseFunction;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
@@ -258,6 +259,10 @@ public:
   virtual void SetScalingFunction(vtkPiecewiseFunction* pwf);
   //@}
 
+  /**
+   * For OSPRay, set the library of materials.
+   */
+  virtual void SetMaterialLibrary(vtkOSPRayMaterialLibrary*);
   /**
    * For OSPRay, choose from among the materials.
    */

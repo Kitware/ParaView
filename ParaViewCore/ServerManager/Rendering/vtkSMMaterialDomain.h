@@ -25,6 +25,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"
 
+class vtkSMMaterialObserver;
+
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMaterialDomain : public vtkSMStringListDomain
 {
 public:
@@ -45,6 +47,7 @@ protected:
 
   void CallMeSometime();
   friend class vtkSMMaterialObserver;
+  vtkSMMaterialObserver* Observer;
 
 private:
   vtkSMMaterialDomain(const vtkSMMaterialDomain&) VTK_DELETE_FUNCTION;

@@ -17,6 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h"
 #include "vtkPVInstantiator.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
@@ -341,6 +342,12 @@ bool vtkSMParaViewPipelineController::CreateAnimationHelpers(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMParaViewPipelineController::DoMaterialStuff(vtkSMProxy* proxy)
+{
+  // typically overridedn by rendering capable subclass
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
 {
   assert(session != NULL);
@@ -390,6 +397,26 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
   }
 
   //---------------------------------------------------------------------------
+  // Create the materiallibrary
+  vtkSmartPointer<vtkSMProxy> materialLib = this->FindMaterialLibrary(session);
+  if (!materialLib)
+  {
+#ifdef PARAVIEW_USE_OSPRAY
+
+    materialLib.TakeReference(vtkSafeNewProxy(pxm, "materials", "MaterialLibrary"));
+    if (!materialLib)
+    {
+      vtkErrorMacro("Failed to create 'MaterialLibrary' proxy. ");
+      return false;
+    }
+    this->InitializeProxy(materialLib);
+    materialLib->UpdateVTKObjects();
+    this->DoMaterialStuff(materialLib.Get());
+    pxm->RegisterProxy("materiallibrary", materialLib);
+#endif
+  }
+
+  //---------------------------------------------------------------------------
   // Create the animation-scene (optional)
   vtkSMProxy* animationScene = this->GetAnimationScene(session);
   if (animationScene)
@@ -428,6 +455,17 @@ vtkSMProxy* vtkSMParaViewPipelineController::FindTimeKeeper(vtkSMSession* sessio
   assert(pxm);
 
   return this->FindProxy(pxm, "timekeeper", "misc", "TimeKeeper");
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMParaViewPipelineController::FindMaterialLibrary(vtkSMSession* session)
+{
+  assert(session != NULL);
+
+  vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
+  assert(pxm);
+
+  return this->FindProxy(pxm, "materiallibrary", "materials", "MaterialLibrary");
 }
 
 //----------------------------------------------------------------------------
@@ -639,6 +677,12 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy, const
     scene->UpdateVTKObjects();
   }
 
+  vtkSmartPointer<vtkSMProxy> materialLib = this->FindMaterialLibrary(proxy->GetSession());
+  if (materialLib)
+  {
+    vtkSMPropertyHelper(proxy, "OSPRayMaterialLibrary").Add(materialLib);
+  }
+
   // Make the proxy active.
   vtkSMProxySelectionModel* selmodel =
     proxy->GetSessionProxyManager()->GetSelectionModel("ActiveView");
@@ -734,6 +778,7 @@ bool vtkSMParaViewPipelineController::RegisterRepresentationProxy(vtkSMProxy* pr
 
   // Register the proxy itself.
   proxy->GetSessionProxyManager()->RegisterProxy("representations", proxy);
+
   return true;
 }
 

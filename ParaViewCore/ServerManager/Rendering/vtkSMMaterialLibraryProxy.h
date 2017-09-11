@@ -1,0 +1,61 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkSMMaterialLibraryProxy.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+/**
+ * @class   vtkSMMaterialLibraryProxy
+ * @brief   proxy for a camera.
+ *
+ * This a proxy for controlling vtkOSPRayMaterialLibraries on various nodes.
+ * In particular we use it to ensure that all rendering processes have
+ * a consistent set of materials.
+*/
+
+#ifndef vtkSMMaterialLibraryProxy_h
+#define vtkSMMaterialLibraryProxy_h
+
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
+#include "vtkSMProxy.h"
+
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMaterialLibraryProxy : public vtkSMProxy
+{
+public:
+  static vtkSMMaterialLibraryProxy* New();
+  vtkTypeMacro(vtkSMMaterialLibraryProxy, vtkSMProxy);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+
+  /**
+   * Copies the Material library on the root node of server to the client.
+   */
+  void Synchronize();
+
+  /**
+   * Reads default materials on the process.
+   */
+  void LoadDefaultMaterials();
+
+  /**
+   * Reads and specifed materials.
+   */
+  void LoadMaterials(const char*);
+
+protected:
+  vtkSMMaterialLibraryProxy();
+  ~vtkSMMaterialLibraryProxy() override;
+
+private:
+  vtkSMMaterialLibraryProxy(const vtkSMMaterialLibraryProxy&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkSMMaterialLibraryProxy&) VTK_DELETE_FUNCTION;
+};
+
+#endif

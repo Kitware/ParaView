@@ -37,6 +37,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 
+#include "vtkSMMaterialLibraryProxy.h"
+
 #include <cassert>
 #include <string>
 
@@ -703,4 +705,12 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterLayoutProxy(
 void vtkSMParaViewPipelineControllerWithRendering::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::DoMaterialStuff(vtkSMProxy* prox)
+{
+  vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(prox);
+  mlp->LoadDefaultMaterials();
+  mlp->Synchronize();
 }

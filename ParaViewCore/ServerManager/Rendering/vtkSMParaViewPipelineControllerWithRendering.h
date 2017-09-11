@@ -193,6 +193,8 @@ protected:
   virtual bool AlsoShowInCurrentView(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* currentView);
 
+  virtual void DoMaterialStuff(vtkSMProxy* proxy) override;
+
 private:
   vtkSMParaViewPipelineControllerWithRendering(
     const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;

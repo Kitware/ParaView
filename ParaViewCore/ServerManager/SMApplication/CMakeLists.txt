@@ -140,6 +140,12 @@ if (PARAVIEW_USE_OPENTURNS)
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_openturns.xml)
 endif()
 
+if (PARAVIEW_USE_OSPRAY)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_ospray.xml)
+endif()
+
+
 #------------------------------------------------------------------------------
 
 if (PARAVIEW_ENABLE_PYTHON)

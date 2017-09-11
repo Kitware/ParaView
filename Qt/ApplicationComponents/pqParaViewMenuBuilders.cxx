@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImportCinemaReaction.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
+#include "pqLoadMaterialsReaction.h"
 #include "pqLoadRestoreWindowLayoutReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainControlsToolbar.h"
@@ -123,6 +124,11 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);
   new pqImportCinemaReaction(ui.actionFileImportCinemaDatabase);
+#ifdef PARAVIEW_USE_OSPRAY
+  new pqLoadMaterialsReaction(ui.actionFileLoadMaterials);
+#else
+  delete ui.actionFileLoadMaterials;
+#endif
   new pqRecentFilesMenu(*ui.menuRecentFiles, ui.menuRecentFiles);
   new pqReloadFilesReaction(ui.actionReloadFiles);
 

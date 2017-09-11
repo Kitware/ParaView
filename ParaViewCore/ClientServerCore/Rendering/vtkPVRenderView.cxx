@@ -3032,22 +3032,13 @@ bool vtkPVRenderView::GetEnableOSPRay()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetMaterialLibrary(const char* val)
+void vtkPVRenderView::SetMaterialLibrary(vtkOSPRayMaterialLibrary* ml)
 {
 #ifdef PARAVIEW_USE_OSPRAY
-  if (!strcmp(val, "None"))
-  {
-    ;
-  }
-  else
-  {
-    // TODO: should only do this when val is changed
-    vtkSmartPointer<vtkOSPRayMaterialLibrary> ml = vtkOSPRayMaterialLibrary::GetInstance();
-    ml->ReadFile(val, this->GetRenderer());
-    vtkOSPRayMaterialLibrary::GetInstance()->Fire();
-  }
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetMaterialLibrary(ml, ren);
 #else
-  (void)val;
+  (void)ml;
 #endif
 }
 
