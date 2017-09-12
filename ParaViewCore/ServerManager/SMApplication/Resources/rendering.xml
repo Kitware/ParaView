@@ -484,27 +484,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <Property name="RemoveLight"
-                panel_widget="remove_light_button">
-        <Documentation>
-          Remove this light.
-        </Documentation>
-      </Property>
-      <Property name="SyncToCamera"
-                label="Move to Camera"
-                panel_widget="sync_light_to_camera_button">
-        <Documentation>
-          Match this light's position and focal point to the camera.
-        </Documentation>
-        <Hints>
-          <!-- display when light type is Scene or Camera -->
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="LightType"
-                                   values="2 3" />
-        </Hints>
-      </Property>
-
       <DoubleVectorProperty command="SetIntensity"
                             label="Intensity"
                             name="LightIntensity"

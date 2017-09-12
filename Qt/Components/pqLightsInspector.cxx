@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLightsInspector.h"
 #include "ui_pqLightsInspector.h"
 
+#include "vtkCamera.h"
+#include "vtkPVLight.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
@@ -40,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqPropertiesPanel.h"
 #include "pqPropertyWidget.h"
 #include "pqProxyWidget.h"
 #include "pqRenderView.h"
@@ -136,24 +139,52 @@ public:
     {
       vtkSMProxy* light = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(i);
 
+      // add a container widget - title, two buttons, proxy widget
+      QWidget* widget = new QWidget(self);
+      widget->setObjectName(QString("LightContainer%1").arg(i));
+      QVBoxLayout* vbox = new QVBoxLayout(widget);
+      vbox->setContentsMargins(0, pqPropertiesPanel::suggestedVerticalSpacing(), 0, 0);
+      vbox->setSpacing(0);
+      vbox->addWidget(pqProxyWidget::newGroupLabelWidget(QString("Light %1").arg(i), widget));
+
+      // some buttons.
+      QWidget* buttonWidget = new QWidget(widget);
+      buttonWidget->setObjectName("ButtonContainer");
+      QHBoxLayout* hbox = new QHBoxLayout(buttonWidget);
+      hbox->setContentsMargins(0, 0, 0, 0);
+      hbox->setSpacing(0);
+      vbox->addWidget(buttonWidget);
+
+      // Add a button to sync this light with the camera.
+      QPushButton* syncButton = new QPushButton("Move to Camera");
+      syncButton->setObjectName("MoveToCamera");
+      // which light does this button affect?
+      syncButton->setProperty("LightIndex", i);
+      syncButton->setToolTip("Match this light's position and focal point to the camera.");
+      connect(syncButton, SIGNAL(clicked()), self, SLOT(syncLightToCamera()));
+      hbox->addWidget(syncButton);
+
+      // Add a button to remove this light.
+      QPushButton* removeButton = new QPushButton("Remove Light");
+      removeButton->setObjectName("RemoveLight");
+      // which light does this button affect?
+      removeButton->setProperty("LightIndex", i);
+      connect(removeButton, SIGNAL(clicked()), self, SLOT(removeLight()));
+      hbox->addWidget(removeButton);
+
       // todo: we want to customize this to make sure controls are
       // consistent with the light type
-      pqProxyWidget* lightWidget = new pqProxyWidget(light, self);
+      pqProxyWidget* lightWidget = new pqProxyWidget(light, widget);
       lightWidget->setApplyChangesImmediately(true);
       lightWidget->setView(pv);
       lightWidget->updatePanel();
+      vbox->addWidget(lightWidget);
       // whenever a property changes, do a render.
       self->connect(lightWidget, SIGNAL(changeFinished()), SLOT(render()));
 
       // add it to this->Ui.scrollArea
-      this->Ui.verticalLayout_2->addWidget(lightWidget);
+      this->Ui.verticalLayout_2->addWidget(widget);
       this->Ui.verticalLayout_2->addSpacing(20);
-      // listen to the 'remove me' signal that this widget emits.
-      pqPropertyWidget* button = lightWidget->findChild<pqPropertyWidget*>("RemoveLight");
-      if (button)
-      {
-        self->connect(button, SIGNAL(removeLight(vtkSMProxy*)), SLOT(removeLight(vtkSMProxy*)));
-      }
     }
     this->Ui.verticalLayout_2->addStretch(1);
     // add observer to track when it changes.
@@ -262,7 +293,10 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   // todo: this works but do I need to do something more?
   if (!lightProxy)
   {
-    lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(nlights - 1);
+    auto removeButton = sender();
+    int index = removeButton->property("LightIndex").toInt();
+
+    lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(index);
   }
   vtkSMPropertyHelper(view, "AdditionalLights").Remove(lightProxy);
 
@@ -272,10 +306,50 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
 
   // make it so...
   view->UpdateVTKObjects();
-  pqRenderView* renderView = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
-  if (!renderView)
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqLightsInspector::syncLightToCamera(vtkSMProxy* lightProxy)
+{
+  vtkSMRenderViewProxy* view = this->Internals->getActiveView();
+  if (!view)
   {
     return;
   }
-  renderView->render();
+  // todo: this works but do I need to do something more?
+  if (!lightProxy)
+  {
+    auto syncButton = sender();
+    int index = syncButton->property("LightIndex").toInt();
+
+    lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(index);
+  }
+
+  SM_SCOPED_TRACE(PropertiesModified).arg("proxy", lightProxy).arg("comment", "update a light");
+
+  int type = 0;
+  vtkSMPropertyHelper(lightProxy, "LightType").Get(&type);
+
+  // default camera light params.
+  double position[3] = { 0, 0, 1 };
+  double focal[3] = { 0, 0, 0 };
+  // nothing to do for headlight or ambient light
+  if (type == VTK_LIGHT_TYPE_CAMERA_LIGHT)
+  {
+    // camera light is relative the camera already, this button is just a 'reset' to defaults.
+    vtkSMPropertyHelper(lightProxy, "LightPosition").Modified().Set(position, 3);
+    vtkSMPropertyHelper(lightProxy, "FocalPoint").Modified().Set(focal, 3);
+  }
+  else if (type == VTK_LIGHT_TYPE_SCENE_LIGHT)
+  {
+    vtkCamera* camera = view->GetActiveCamera();
+    camera->GetPosition(position);
+    camera->GetFocalPoint(focal);
+
+    vtkSMPropertyHelper(lightProxy, "LightPosition").Modified().Set(position, 3);
+    vtkSMPropertyHelper(lightProxy, "FocalPoint").Modified().Set(focal, 3);
+  }
+  lightProxy->UpdateVTKObjects();
+  this->render();
 }

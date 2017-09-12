@@ -242,8 +242,6 @@ set (Module_SRCS
   pqReaction.h
   pqReloadFilesReaction.cxx
   pqReloadFilesReaction.h
-  pqRemoveLightWidget.cxx
-  pqRemoveLightWidget.h
   pqRenameProxyReaction.cxx
   pqRenameProxyReaction.h
   pqRenderViewSelectionReaction.cxx
@@ -294,8 +292,6 @@ set (Module_SRCS
   pqStatusBar.h
   pqStreamingTestingEventPlayer.cxx
   pqStreamingTestingEventPlayer.h
-  pqSyncLightToCameraWidget.cxx
-  pqSyncLightToCameraWidget.h
   pqTestingReaction.cxx
   pqTestingReaction.h
   pqTextLocationWidget.cxx
@@ -440,7 +436,6 @@ set (Module_MOC_HDRS
   pqProxyGroupMenuManager.h
   pqReaction.h
   pqReloadFilesReaction.h
-  pqRemoveLightWidget.h
   pqRenameProxyReaction.h
   pqRenderViewSelectionReaction.h
   pqRepresentationToolbar.h
@@ -466,7 +461,6 @@ set (Module_MOC_HDRS
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h
   pqStreamingTestingEventPlayer.h
-  pqSyncLightToCameraWidget.h
   pqTestingReaction.h
   pqTextLocationWidget.h
   pqTimeInspectorWidget.h
