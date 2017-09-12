@@ -52,9 +52,12 @@ class pqLightsInspector::pqInternals
 public:
   Ui::LightsInspector Ui;
   pqLightsInspector* self;
+  int observerTag;
+  vtkSMRenderViewProxy* rview;
 
   pqInternals(pqLightsInspector* inSelf)
     : self(inSelf)
+    , observerTag(0)
   {
     this->Ui.setupUi(inSelf);
 
@@ -71,6 +74,10 @@ public:
 
   ~pqInternals()
   {
+    if (this->rview && this->observerTag != 0 && this->rview->GetProperty("AdditionalLights"))
+    {
+      this->rview->GetProperty("AdditionalLights")->RemoveObserver(this->observerTag);
+    }
     QLayoutItem* child;
     while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
     {
@@ -111,9 +118,15 @@ public:
       }
       delete child;
     }
+    if (this->rview && this->observerTag != 0)
+    {
+      this->rview->GetProperty("AdditionalLights")->RemoveObserver(this->observerTag);
+      this->observerTag = 0;
+    }
     vtkSMRenderViewProxy* view = this->getActiveView();
     if (!view)
     {
+      this->rview = nullptr;
       return;
     }
     pqView* pv = pqActiveObjects::instance().activeView();
@@ -143,6 +156,11 @@ public:
       }
     }
     this->Ui.verticalLayout_2->addStretch(1);
+    // add observer to track when it changes.
+    vtkSMProperty* property = view->GetProperty("AdditionalLights");
+    this->observerTag = property->AddObserver(
+      vtkCommand::ModifiedEvent, this, &pqLightsInspector::pqInternals::updateLightWidgets);
+    this->rview = view;
   }
 };
 
