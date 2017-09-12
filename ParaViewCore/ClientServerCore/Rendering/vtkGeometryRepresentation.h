@@ -27,8 +27,10 @@
 
 #ifndef vtkGeometryRepresentation_h
 #define vtkGeometryRepresentation_h
+#include <array>         // needed for array
+#include <unordered_map> // needed for unordered_map
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkPVClientServerCoreRenderingModule.h" // needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkProperty.h" // needed for VTK_POINTS etc.
 
@@ -341,6 +343,15 @@ protected:
   // Progress Callback
   void HandleGeometryRepresentationProgress(vtkObject* caller, unsigned long, void*);
 
+  /**
+   * Block attributes in a mapper are referenced to each block through DataObject
+   * pointers. Since DataObjects may change after updating the pipeline, this class
+   * maintains an additional map using the flat-index as a key.  This method updates
+   * the mapper's attributes with those cached in this representation; This is done
+   * after the data has updated (multi-block nodes change after an update).
+   */
+  void UpdateBlockAttributes(vtkMapper* mapper);
+
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;
@@ -363,6 +374,13 @@ protected:
   vtkPiecewiseFunction* PWF;
 
   bool UseDataPartitions;
+
+  bool BlockAttrChanged = false;
+  vtkTimeStamp BlockAttributeTime;
+  bool UpdateBlockAttrLOD = false;
+  std::unordered_map<unsigned int, bool> BlockVisibilities;
+  std::unordered_map<unsigned int, double> BlockOpacities;
+  std::unordered_map<unsigned int, std::array<double, 3> > BlockColors;
 
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&) VTK_DELETE_FUNCTION;
