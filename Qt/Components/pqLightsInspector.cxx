@@ -53,17 +53,17 @@ public:
   Ui::LightsInspector Ui;
   pqLightsInspector* self;
 
-  pqInternals(pqLightsInspector* self)
-    : self(self)
+  pqInternals(pqLightsInspector* inSelf)
+    : self(inSelf)
   {
-    this->Ui.setupUi(self);
+    this->Ui.setupUi(inSelf);
 
     // update the panel when user picks a different view
-    QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), self,
+    QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)), inSelf,
       SLOT(setActiveView(pqView*)));
 
     // hook up the add light button
-    connect(this->Ui.addLight, SIGNAL(pressed()), self, SLOT(addLight()));
+    connect(this->Ui.addLight, SIGNAL(pressed()), inSelf, SLOT(addLight()));
 
     // populate the area with controls for each light
     this->updateLightWidgets();
@@ -118,10 +118,10 @@ public:
     }
     pqView* pv = pqActiveObjects::instance().activeView();
     // add new contents
-    unsigned int nlights = vtkSMPropertyHelper(view, "ExtraLight").GetNumberOfElements();
+    unsigned int nlights = vtkSMPropertyHelper(view, "AdditionalLights").GetNumberOfElements();
     for (unsigned int i = 0; i < nlights; ++i)
     {
-      vtkSMProxy* light = vtkSMPropertyHelper(view, "ExtraLight").GetAsProxy(i);
+      vtkSMProxy* light = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(i);
 
       // todo: we want to customize this to make sure controls are
       // consistent with the light type
@@ -184,7 +184,7 @@ void pqLightsInspector::addLight()
   // tell undo/redo and state about the new light
   BEGIN_UNDO_SET("Add Light");
   vtkSMSessionProxyManager* pxm = view->GetSessionProxyManager();
-  vtkSMProxy* light = pxm->NewProxy("extra_lights", "Light");
+  vtkSMProxy* light = pxm->NewProxy("additional_lights", "Light");
 
   // standard application level logic
   vtkNew<vtkSMParaViewPipelineController> controller;
@@ -195,7 +195,7 @@ void pqLightsInspector::addLight()
   light->Delete();
 
   // call vtkPVRenderView::AddLight
-  vtkSMPropertyHelper(view, "ExtraLight").Add(light);
+  vtkSMPropertyHelper(view, "AdditionalLights").Add(light);
   END_UNDO_SET();
 
   this->Internals->updateLightWidgets();
@@ -225,7 +225,7 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
     return;
   }
 
-  unsigned int nlights = vtkSMPropertyHelper(view, "ExtraLight").GetNumberOfElements();
+  unsigned int nlights = vtkSMPropertyHelper(view, "AdditionalLights").GetNumberOfElements();
   if (nlights < 1)
   {
     return;
@@ -244,9 +244,9 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   // todo: this works but do I need to do something more?
   if (!lightProxy)
   {
-    lightProxy = vtkSMPropertyHelper(view, "ExtraLight").GetAsProxy(nlights - 1);
+    lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(nlights - 1);
   }
-  vtkSMPropertyHelper(view, "ExtraLight").Remove(lightProxy);
+  vtkSMPropertyHelper(view, "AdditionalLights").Remove(lightProxy);
 
   END_UNDO_SET();
 

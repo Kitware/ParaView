@@ -282,10 +282,10 @@ class Trace(object):
             return True
         if obj.GetVTKClassName() == "vtkPVLight":
             view = simple.GetActiveView()
-            index = view.ExtraLight.index(obj)
-            accessor = ProxyAccessor("alight", obj)
+            index = view.AdditionalLights.index(obj)
+            accessor = ProxyAccessor(cls.get_varname("alight"), obj)
             cls.Output.append_separated([\
-               "# get light properties",
+               "# get light",
                "%s = GetLight(%s)" % (accessor, index)])
             return True
 

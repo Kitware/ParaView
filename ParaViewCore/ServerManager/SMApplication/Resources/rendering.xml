@@ -441,7 +441,7 @@
     <!-- End of PropPickers -->
   </ProxyGroup>
 
-  <ProxyGroup name="extra_lights" label="Lights">
+  <ProxyGroup name="additional_lights" label="Lights">
     <Proxy name="Light"
            class="vtkPVLight"
            processes="client|dataserver|renderserver">
@@ -464,7 +464,7 @@
       </StringVectorProperty>
 
       <IntVectorProperty command="SetLightType"
-                         label="Light Coords"
+                         label="Coords"
                          name="LightType"
                          number_of_elements="1"
                          default_values="3">
@@ -520,7 +520,7 @@
       </DoubleVectorProperty>
 
       <IntVectorProperty command="SetPositional"
-                         label="Light Type"
+                         label="Type"
                          name="Positional"
                          default_values="0"
                          number_of_elements="1"
@@ -649,7 +649,7 @@
         </Hints>
       </DoubleVectorProperty>
     </Proxy>
-    <!-- End of ExtraLights -->
+    <!-- End of additional_lights -->
   </ProxyGroup>
 
 </ServerManagerConfiguration>

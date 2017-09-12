@@ -13,8 +13,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,11,386" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/LightsEditor/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="LightsEditor/LightKit" command="mousePress" arguments="1,1,0,71,12" />
-  <pqevent object="LightsEditor/LightKit" command="mouseRelease" arguments="1,0,0,71,12" />
+  <pqevent object="LightsEditor/LightKit" command="set_boolean" arguments="false" />
   <pqevent object="LightsEditor/Close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/addLight" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/0pqProxyWidget0/DiffuseColor/ColorButton" command="setChosenColor" arguments="10,10,255" />

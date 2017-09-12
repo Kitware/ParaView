@@ -2644,7 +2644,7 @@
         </Hints>
       </DoubleVectorProperty>
       <ProxyProperty
-        name="ExtraLight"
+        name="AdditionalLights"
         command="AddLight"
         remove_command="RemoveLight"
         repeatable="1">

@@ -1815,7 +1815,7 @@ def AddLight(view=None):
     if view.IsA("vtkSMRenderViewProxy") is False:
         return
     pxm = servermanager.ProxyManager()
-    lightproxy = pxm.NewProxy("extra_lights", "Light")
+    lightproxy = pxm.NewProxy("additional_lights", "Light")
 
     #is this necessary?
     controller = servermanager.ParaViewPipelineController()
@@ -1825,9 +1825,10 @@ def AddLight(view=None):
     grpname = controller.SMController.GetHelperProxyGroupName(view.SMProxy)
     pxm.RegisterProxy(grpname, "Lights", lightproxy)
 
-    nowlights = [l for l in view.ExtraLight]
+    nowlights = [l for l in view.AdditionalLights]
     nowlights.append(lightproxy)
-    view.ExtraLight = nowlights
+    view.AdditionalLights = nowlights
+    return GetLight(len(view.AdditionalLights) - 1, view)
 
 def RemoveLight(view=None, light=None):
     """Makes a new vtkLight and adds it to the designated or active view."""
@@ -1837,25 +1838,25 @@ def RemoveLight(view=None, light=None):
     if view.IsA("vtkSMRenderViewProxy") is False:
         return
 
-    numlights = len(view.ExtraLight)
+    numlights = len(view.AdditionalLights)
     if numlights < 1:
         return
 
     #todo: this seems to work but do I need to do something more?
     if light:
-        nowlights = [l for l in view.ExtraLight if l != light]
+        nowlights = [l for l in view.AdditionalLights if l != light]
     else:
-        nowlights = [l for l in view.ExtraLight][:numlights-1]
-    view.ExtraLight = nowlights
+        nowlights = [l for l in view.AdditionalLights][:numlights-1]
+    view.AdditionalLights = nowlights
 
 def GetLight(number, view=None):
     """Get a handle on a previously added light"""
     if not view:
         view = active_objects.view
-    numlights = len(view.ExtraLight)
+    numlights = len(view.AdditionalLights)
     if numlights < 1 or number < 0 or number >= numlights:
         return
-    return view.ExtraLight[number][0]
+    return view.AdditionalLights[number]
 
 
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):

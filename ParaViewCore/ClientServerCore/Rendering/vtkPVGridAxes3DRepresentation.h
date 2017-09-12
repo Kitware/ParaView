@@ -34,8 +34,8 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVGridAxes3DRepresentation
 {
 public:
   static vtkPVGridAxes3DRepresentation* New();
-  vtkTypeMacro(vtkPVGridAxes3DRepresentation, vtkPVDataRepresentation) void PrintSelf(
-    ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  vtkTypeMacro(vtkPVGridAxes3DRepresentation, vtkPVDataRepresentation);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   void SetGridAxes(vtkPVGridAxes3DActor* gridAxes);
   vtkGetObjectMacro(GridAxes, vtkPVGridAxes3DActor)
