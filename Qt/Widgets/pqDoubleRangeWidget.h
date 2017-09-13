@@ -32,34 +32,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqDoubleRangeWidget_h
 #define pqDoubleRangeWidget_h
 
+#include "pqDoubleSliderWidget.h"
 #include "pqWidgetsModule.h"
 #include <QWidget>
 
-class QSlider;
-class pqLineEdit;
+#include "vtkConfigure.h"
 
 /**
-* a widget with a tied slider and line edit for editing a double property
-*/
-class PQWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
+ * Extends pqDoubleSliderWidget to use it with a range of doubles : provides
+ * control on min/max, resolution and on line edit validator.
+ */
+class PQWIDGETS_EXPORT pqDoubleRangeWidget : public pqDoubleSliderWidget
 {
   Q_OBJECT
-  Q_PROPERTY(double value READ value WRITE setValue USER true)
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
   Q_PROPERTY(bool strictRange READ strictRange WRITE setStrictRange)
   Q_PROPERTY(int resolution READ resolution WRITE setResolution)
+
+  typedef pqDoubleSliderWidget Superclass;
+
 public:
   /**
   * constructor requires the proxy, property
   */
   pqDoubleRangeWidget(QWidget* parent = NULL);
   ~pqDoubleRangeWidget() override;
-
-  /**
-  * get the value
-  */
-  double value() const;
 
   // get the min range value
   double minimum() const;
@@ -72,26 +70,7 @@ public:
   // returns the resolution.
   int resolution() const;
 
-signals:
-  /**
-  * signal the value changed
-  */
-  void valueChanged(double);
-
-  /**
-  * signal the value was edited
-  * this means the user is done changing text
-  * or the user is done moving the slider. It implies
-  * value was changed and editing has finished.
-  */
-  void valueEdited(double);
-
 public slots:
-  /**
-  * set the value
-  */
-  void setValue(double);
-
   // set the min range value
   void setMinimum(double);
   // set the max range value
@@ -104,28 +83,18 @@ public slots:
   // set the resolution.
   void setResolution(int);
 
+protected:
+  int valueToSliderPos(double val) VTK_OVERRIDE;
+  double sliderPosToValue(int pos) VTK_OVERRIDE;
+
 private slots:
-  void sliderChanged(int);
-  void textChanged(const QString&);
-  void editingFinished();
   void updateValidator();
-  void updateSlider();
-  void sliderPressed();
-  void sliderReleased();
-  void emitValueEdited();
-  void emitIfDeferredValueEdited();
 
 private:
   int Resolution;
-  double Value;
   double Minimum;
   double Maximum;
-  QSlider* Slider;
-  pqLineEdit* LineEdit;
-  bool BlockUpdate;
   bool StrictRange;
-  bool InteractingWithSlider;
-  bool DeferredValueEdited;
 };
 
 #endif

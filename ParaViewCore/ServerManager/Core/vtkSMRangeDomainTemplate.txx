@@ -29,6 +29,7 @@ template <class T>
 vtkSMRangeDomainTemplate<T>::vtkSMRangeDomainTemplate()
 {
   this->DefaultDefaultMode = MID;
+  this->Resolution = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -109,6 +110,13 @@ T vtkSMRangeDomainTemplate<T>::GetMaximum(unsigned int idx, int& exists)
 
 //-----------------------------------------------------------------------------
 template <class T>
+int vtkSMRangeDomainTemplate<T>::GetResolution()
+{
+  return this->Resolution;
+}
+
+//-----------------------------------------------------------------------------
+template <class T>
 bool vtkSMRangeDomainTemplate<T>::GetMinimumExists(unsigned int idx)
 {
   return (
@@ -121,6 +129,13 @@ bool vtkSMRangeDomainTemplate<T>::GetMaximumExists(unsigned int idx)
 {
   return (
     idx < static_cast<unsigned int>(this->Entries.size()) ? this->Entries[idx].Valid[1] : false);
+}
+
+//-----------------------------------------------------------------------------
+template <class T>
+bool vtkSMRangeDomainTemplate<T>::GetResolutionExists()
+{
+  return this->Resolution != -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -239,6 +254,14 @@ int vtkSMRangeDomainTemplate<T>::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXML
       }
     }
   }
+
+  double resolution;
+  numRead = element->GetScalarAttribute("resolution", &resolution);
+  if (numRead > 0)
+  {
+    this->Resolution = resolution;
+  }
+
   this->SetEntries(new_entries);
   return 1;
 }
@@ -380,5 +403,6 @@ void vtkSMRangeDomainTemplate<T>::PrintSelf(ostream& os, vtkIndent indent)
     }
   }
   os << endl;
+  os << indent << "Resolution: " << this->Resolution << std::endl;
 }
 #endif

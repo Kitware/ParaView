@@ -64,10 +64,14 @@ set(Module_SRCS
   pqConsoleWidget.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
+  pqDiscreteDoubleWidget.cxx
+  pqDiscreteDoubleWidget.h
   pqDoubleRangeDialog.cxx
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.cxx
   pqDoubleRangeWidget.h
+  pqDoubleSliderWidget.h
+  pqDoubleSliderWidget.cxx
   pqDoubleSpinBox.cxx
   pqDoubleSpinBox.h
   pqExpandableTableView.cxx
@@ -151,8 +155,10 @@ set (QtWidgets_SRCS
   pqConsoleWidgetEventTranslator.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
+  pqDiscreteDoubleWidget.h
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.h
+  pqDoubleSliderWidget.h
   pqDoubleSpinBox.h
   pqExpandableTableView.h
   pqExpanderButton.h

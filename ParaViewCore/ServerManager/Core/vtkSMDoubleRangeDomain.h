@@ -87,6 +87,11 @@ public:
   double GetMinimum(unsigned int idx) { return this->RealSuperclass::GetMinimum(idx); }
   double GetMaximum(unsigned int idx) { return this->RealSuperclass::GetMaximum(idx); }
 
+  /**
+   * Returns the resolution.
+   */
+  int GetResolution() { return this->RealSuperclass::GetResolution(); }
+
 protected:
   vtkSMDoubleRangeDomain();
   ~vtkSMDoubleRangeDomain() override;

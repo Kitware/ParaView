@@ -23,9 +23,11 @@
  * @verbatim
  * * min
  * * max
+ * * resolution
  * @endverbatim
  * Both min and max attributes can have one or more space space
  * separated value arguments.
+ * Resolution expects only one value.
  * Optionally, a Required Property may be specified (which typically is a
  * information property) which can be used to obtain the range for the values as
  * follows:
@@ -93,6 +95,12 @@ public:
    */
   T GetMaximum(unsigned int idx, int& exists);
 
+  /**
+   * Returns a resolution.
+   * Default is -1.
+   */
+  int GetResolution();
+
   //@{
   /**
    * Returns if minimum/maximum bound is set for the domain.
@@ -100,6 +108,11 @@ public:
   bool GetMinimumExists(unsigned int idx);
   bool GetMaximumExists(unsigned int idx);
   //@}
+
+  /**
+   * Returns if a resolution is set for the domain.
+   */
+  bool GetResolutionExists();
 
   /**
    * Returns the minimum/maximum value, is exists, otherwise
@@ -209,6 +222,11 @@ protected:
   }
   std::vector<DefaultModes> DefaultModeVector;
   DefaultModes DefaultDefaultMode;
+
+  /**
+   * Resolution is the number of steps in the values list.
+   */
+  int Resolution;
 
 private:
   vtkSMRangeDomainTemplate(const vtkSMRangeDomainTemplate&) VTK_DELETE_FUNCTION;

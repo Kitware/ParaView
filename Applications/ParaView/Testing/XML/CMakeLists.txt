@@ -572,12 +572,20 @@ if(PARAVIEW_ENABLE_PYTHON)
         paraview_test_load_data_dirs("" "cinema-composite.cdb/image/pose=${poseidx}/vis=${visidx}")
       endforeach()
     endforeach()
+    paraview_test_load_data("" "cinema-non-composite.cdb/image/info.json")
+    foreach(phi 0 90 180)
+        paraview_test_load_data_dirs("" "cinema-non-composite.cdb/image/${phi}/0")
+    endforeach()
+
     list(APPEND TESTS_WITH_BASELINES
-      ${CMAKE_CURRENT_SOURCE_DIR}/ImportCinema.xml)
+      ${CMAKE_CURRENT_SOURCE_DIR}/ImportCinema.xml
+      ${CMAKE_CURRENT_SOURCE_DIR}/ImportCinemaSpecA.xml)
 
     # presently, we don't support client-server configurations.
     set(ImportCinema_DISABLE_CS TRUE)
     set(ImportCinema_DISABLE_CRS TRUE)
+    set(ImportCinemaSpecA_DISABLE_CS TRUE)
+    set(ImportCinemaSpecA_DISABLE_CRS TRUE)
   endif()
 endif()
 

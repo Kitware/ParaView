@@ -66,7 +66,7 @@ public:
    */
   void ClearControlParameter(const char* pname);
   void EnableControlParameterValue(const char* pname, const char* value);
-  void EnableControlParameterValue(const char* pname, int value_index);
+  void EnableControlParameterValue(const char* pname, double value);
   //@}
 
 protected:
