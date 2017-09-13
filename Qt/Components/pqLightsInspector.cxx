@@ -127,11 +127,15 @@ public:
       this->observerTag = 0;
     }
     vtkSMRenderViewProxy* view = this->getActiveView();
-    if (!view)
+    if (!view || !view->GetProperty("AdditionalLights"))
     {
+      // disable the 'add light' button
+      this->Ui.addLight->setEnabled(false);
       this->rview = nullptr;
       return;
     }
+    this->Ui.addLight->setEnabled(true);
+
     pqView* pv = pqActiveObjects::instance().activeView();
     // add new contents
     unsigned int nlights = vtkSMPropertyHelper(view, "AdditionalLights").GetNumberOfElements();
@@ -245,12 +249,13 @@ void pqLightsInspector::addLight()
 
   // call vtkPVRenderView::AddLight
   vtkSMPropertyHelper(view, "AdditionalLights").Add(light);
-  END_UNDO_SET();
 
   this->Internals->updateLightWidgets();
 
   // make it so...
   view->UpdateVTKObjects();
+  END_UNDO_SET();
+
   this->render();
 }
 
@@ -300,12 +305,12 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   }
   vtkSMPropertyHelper(view, "AdditionalLights").Remove(lightProxy);
 
-  END_UNDO_SET();
-
   this->Internals->updateLightWidgets();
 
   // make it so...
   view->UpdateVTKObjects();
+  END_UNDO_SET();
+
   this->render();
 }
 
