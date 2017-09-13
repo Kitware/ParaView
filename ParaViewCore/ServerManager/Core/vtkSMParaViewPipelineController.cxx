@@ -901,6 +901,26 @@ bool vtkSMParaViewPipelineController::UnRegisterAnimationProxy(vtkSMProxy* proxy
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMParaViewPipelineController::RegisterLightProxy(
+  vtkSMProxy* proxy, vtkSMProxy* view, const char* proxyname)
+{
+  if (!proxy)
+  {
+    return false;
+  }
+
+  SM_SCOPED_TRACE(RegisterLightProxy).arg("proxy", proxy).arg("view", view);
+
+  // we would like the light to be a child of the view, but lights need to be created
+  // and registered independently, before the view is created in python state files.
+  // pxm->RegisterProxy(controller->GetHelperProxyGroupName(view), "lights", proxy);
+
+  // Register the proxy itself.
+  proxy->GetSessionProxyManager()->RegisterProxy("additional_lights", proxyname, proxy);
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMParaViewPipelineController::UpdateSettingsProxies(vtkSMSession* session)
 {
   // Set up the settings proxies
@@ -1192,7 +1212,8 @@ bool vtkSMParaViewPipelineController::UnRegisterProxy(vtkSMProxy* proxy)
   {
     PREPARE_FOR_UNREGISTERING(proxy);
 
-    const char* known_groups[] = { "lookup_tables", "piecewise_functions", "layouts", NULL };
+    const char* known_groups[] = { "lookup_tables", "piecewise_functions", "layouts",
+      "additional_lights", NULL };
     for (int cc = 0; known_groups[cc] != NULL; ++cc)
     {
       if (const char* pname = pxm->GetProxyName(known_groups[cc], proxy))

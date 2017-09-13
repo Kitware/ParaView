@@ -62,6 +62,7 @@ This is required. If we don't, then the Python object for vtkSMProxy also gets
 garbage collected since there's no reference to it.
 
 """
+from __future__ import absolute_import, division, print_function
 
 import weakref
 import paraview.servermanager as sm
@@ -281,12 +282,20 @@ class Trace(object):
                     "%s = GetTimeKeeper()" % tkAccessor])
             return True
         if obj.GetVTKClassName() == "vtkPVLight":
-            view = simple.GetActiveView()
-            index = view.AdditionalLights.index(obj)
-            accessor = ProxyAccessor(cls.get_varname("alight"), obj)
-            cls.Output.append_separated([\
-               "# get light",
-               "%s = GetLight(%s)" % (accessor, index)])
+            view = simple.GetViewForLight(obj)
+            if view:
+                index = view.AdditionalLights.index(obj)
+                viewAccessor = cls.get_accessor(view)
+                accessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "additional_lights")), obj)
+                cls.Output.append_separated([\
+                   "# get light",
+                   "%s = GetLight(%s, %s)" % (accessor, index, viewAccessor)])
+            else:
+                # create a new light, should be handled by RegisterLightProxy
+                accessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "additional_lights")), obj)
+                cls.Output.append_separated([\
+                    "# create a new light",
+                    "%s = CreateLight()" % (accessor)])
             return True
 
         return False
@@ -1055,13 +1064,29 @@ class RegisterViewProxy(TraceItem):
         varname = Trace.get_varname(pname)
         accessor = ProxyAccessor(varname, self.Proxy)
 
+        trace = TraceOutput()
+        # create dynamic lights as needed.
+        if hasattr(self.Proxy, "AdditionalLights"):
+            for light in self.Proxy.AdditionalLights:
+                trace.append('# create light')
+                lightTrace = RegisterLightProxy(light)
+                lightTrace.finalize()
+
         # unlike for filters/sources, for views the CreateView function still takes the
         # xml name for the view, not its label.
         ctor_args = "'%s'" % self.Proxy.GetXMLName()
-        trace = TraceOutput()
         trace.append("# Create a new '%s'" % self.Proxy.GetXMLLabel())
         filter = ViewProxyFilter()
         trace.append(accessor.trace_ctor("CreateView", filter, ctor_args))
+
+        # append dynamic lights as needed.
+        # if hasattr(self.Proxy, "AdditionalLights"):
+        #     lightsList = []
+        #     for light in self.Proxy.AdditionalLights:
+        #         lightAccessor = Trace.get_accessor(light)
+        #         lightsList.append(lightAccessor)
+        #     trace.append("%s.AdditionalLights = [%s]" % (Trace.get_accessor(self.Proxy), ", ".join(lightsList)))
+
         Trace.Output.append_separated(trace.raw_data())
 
         viewSizeAccessor = accessor.get_property("ViewSize")
@@ -1072,6 +1097,30 @@ class RegisterViewProxy(TraceItem):
                 "# uncomment following to set a specific view size",
                 "# %s" % viewSizeAccessor.get_property_trace(in_ctor=False)])
         # we assume views don't have proxy list domains for now, and ignore tracing them.
+        TraceItem.finalize(self)
+
+class RegisterLightProxy(TraceItem):
+    """Traces creation of a new light (vtkSMParaViewPipelineController::RegisterLightProxy)."""
+    def __init__(self, proxy, view=None):
+        TraceItem.__init__(self)
+        self.Proxy = sm._getPyProxy(proxy)
+        self.View = sm._getPyProxy(view)
+        assert not self.Proxy is None
+
+    def finalize(self):
+        pname = Trace.get_registered_name(self.Proxy, "additional_lights")
+        varname = Trace.get_varname(pname)
+        accessor = ProxyAccessor(varname, self.Proxy)
+
+        trace = TraceOutput()
+        trace.append("# Create a new '%s'" % self.Proxy.GetXMLLabel())
+        filter = ProxyFilter()
+        if self.View:
+            viewAccessor = Trace.get_accessor(self.View)
+            trace.append(accessor.trace_ctor("AddLight", filter, ctor_args="view=%s" % viewAccessor))
+        else:
+            trace.append(accessor.trace_ctor("CreateLight", filter))
+        Trace.Output.append_separated(trace.raw_data())
         TraceItem.finalize(self)
 
 class ExportView(TraceItem):

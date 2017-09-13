@@ -35,9 +35,7 @@ A simple example::
 #
 #==============================================================================
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import paraview
 from paraview import servermanager
@@ -169,7 +167,7 @@ def CreateRenderView(detachedFromLayout=False, **params):
 def CreateXYPlotView(detachedFromLayout=False, **params):
     """Create XY plot Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("XYChartView", detachedFromLayout=False, **params)
+    return CreateView("XYChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
@@ -204,14 +202,14 @@ def CreateComparativeBarChartView(detachedFromLayout=False, **params):
 def CreateParallelCoordinatesChartView(detachedFromLayout=False, **params):
     """"Create Parallele coordinate Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("ParallelCoordinatesChartView", **params)
+    return CreateView("ParallelCoordinatesChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def Create2DRenderView(detachedFromLayout=False, **params):
     """"Create the standard 3D render view with the 2D interaction mode turned ON.
     See CreateView for arguments documentation"""
-    return CreateView("2DRenderView", **params)
+    return CreateView("2DRenderView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
@@ -1754,6 +1752,79 @@ def ClearSelection(proxy=None):
         raise RuntimeError ("No active source was found.")
     proxy.SMProxy.SetSelectionInput(proxy.Port, None, 0)
 
+
+#==============================================================================
+# Dynamic lights.
+#==============================================================================
+
+def CreateLight():
+    """Makes a new vtkLight, unattached to a view."""
+    pxm = servermanager.ProxyManager()
+    lightproxy = pxm.NewProxy("additional_lights", "Light")
+
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.RegisterLightProxy(lightproxy, None)
+
+    return lightproxy
+
+
+def AddLight(view=None):
+    """Makes a new vtkLight and adds it to the designated or active view."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if view.IsA("vtkSMRenderViewProxy") is False:
+        return
+
+    lightproxy = CreateLight()
+
+    nowlights = [l for l in view.AdditionalLights]
+    nowlights.append(lightproxy)
+    view.AdditionalLights = nowlights
+    # This is not the same as returning lightProxy
+    return GetLight(len(view.AdditionalLights) - 1, view)
+
+def RemoveLight(view=None, light=None):
+    """Removes an existing vtkLight from the designated or active view."""
+    view = view if view else GetActiveView()
+    # TODO handle no view.
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if view.IsA("vtkSMRenderViewProxy") is False:
+        return
+
+    numlights = len(view.AdditionalLights)
+    if numlights < 1:
+        return
+
+    if light:
+        nowlights = [l for l in view.AdditionalLights if l != light]
+    else:
+        nowlights = [l for l in view.AdditionalLights][:numlights-1]
+    view.AdditionalLights = nowlights
+
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.UnRegisterProxy(light)
+
+def GetLight(number, view=None):
+    """Get a handle on a previously added light"""
+    if not view:
+        view = active_objects.view
+    numlights = len(view.AdditionalLights)
+    if numlights < 1 or number < 0 or number >= numlights:
+        return
+    return view.AdditionalLights[number]
+
+def GetViewForLight(proxy):
+    """Given a light proxy, find which view it belongs to"""
+    # search current views for this light.
+    for cc in range(proxy.GetNumberOfConsumers()):
+        consumer = proxy.GetConsumerProxy(cc)
+        consumer = consumer.GetTrueParentProxy()
+        if consumer.IsA("vtkSMRenderViewProxy") and proxy in consumer.AdditionalLights:
+            return consumer
+    return None
+
 #==============================================================================
 # Miscellaneous functions.
 #==============================================================================
@@ -1806,58 +1877,6 @@ def ExportView(filename, view=None, **params):
     proxy.Write()
     del proxy
     del helper
-
-def AddLight(view=None):
-    """Makes a new vtkLight and adds it to the designated or active view."""
-    view = view if view else GetActiveView()
-    if not view:
-        raise ValueError ("No 'view' was provided and no active view was found.")
-    if view.IsA("vtkSMRenderViewProxy") is False:
-        return
-    pxm = servermanager.ProxyManager()
-    lightproxy = pxm.NewProxy("additional_lights", "Light")
-
-    #is this necessary?
-    controller = servermanager.ParaViewPipelineController()
-    controller.SMController.InitializeProxy(lightproxy)
-
-    #todo: is this necessary?
-    grpname = controller.SMController.GetHelperProxyGroupName(view.SMProxy)
-    pxm.RegisterProxy(grpname, "Lights", lightproxy)
-
-    nowlights = [l for l in view.AdditionalLights]
-    nowlights.append(lightproxy)
-    view.AdditionalLights = nowlights
-    return GetLight(len(view.AdditionalLights) - 1, view)
-
-def RemoveLight(view=None, light=None):
-    """Makes a new vtkLight and adds it to the designated or active view."""
-    view = view if view else GetActiveView()
-    if not view:
-        raise ValueError ("No 'view' was provided and no active view was found.")
-    if view.IsA("vtkSMRenderViewProxy") is False:
-        return
-
-    numlights = len(view.AdditionalLights)
-    if numlights < 1:
-        return
-
-    #todo: this seems to work but do I need to do something more?
-    if light:
-        nowlights = [l for l in view.AdditionalLights if l != light]
-    else:
-        nowlights = [l for l in view.AdditionalLights][:numlights-1]
-    view.AdditionalLights = nowlights
-
-def GetLight(number, view=None):
-    """Get a handle on a previously added light"""
-    if not view:
-        view = active_objects.view
-    numlights = len(view.AdditionalLights)
-    if numlights < 1 or number < 0 or number >= numlights:
-        return
-    return view.AdditionalLights[number]
-
 
 def ResetProperty(propertyName, proxy=None, restoreFromSettings=True):
     if proxy == None:

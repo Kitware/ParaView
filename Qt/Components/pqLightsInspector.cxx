@@ -228,12 +228,6 @@ void pqLightsInspector::addLight()
     return;
   }
 
-  // tell python trace to add the light
-  SM_SCOPED_TRACE(CallFunction)
-    .arg("AddLight")
-    .arg("view", view)
-    .arg("comment", "add a light to the view");
-
   // tell undo/redo and state about the new light
   BEGIN_UNDO_SET("Add Light");
   vtkSMSessionProxyManager* pxm = view->GetSessionProxyManager();
@@ -242,12 +236,12 @@ void pqLightsInspector::addLight()
   // standard application level logic
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->InitializeProxy(light);
+  // registration, python tracing handled here:
+  controller->RegisterLightProxy(light, view);
 
-  // makes sure the light is a child of the view, so it will be deleted by it
-  pxm->RegisterProxy(controller->GetHelperProxyGroupName(view), "Lights", light);
   light->Delete();
 
-  // call vtkPVRenderView::AddLight
+  // call vtkPVRenderView::AddLight - light saved in "AdditionalLights" list
   vtkSMPropertyHelper(view, "AdditionalLights").Add(light);
 
   this->Internals->updateLightWidgets();
@@ -285,6 +279,13 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
     return;
   }
 
+  if (!lightProxy)
+  {
+    auto removeButton = sender();
+    int index = removeButton->property("LightIndex").toInt();
+
+    lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(index);
+  }
   // tell python trace to remove the light
   SM_SCOPED_TRACE(CallFunction)
     .arg("RemoveLight")
@@ -295,14 +296,6 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   // tell undo/redo and state about the new light
   BEGIN_UNDO_SET("Remove Light");
 
-  // todo: this works but do I need to do something more?
-  if (!lightProxy)
-  {
-    auto removeButton = sender();
-    int index = removeButton->property("LightIndex").toInt();
-
-    lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(index);
-  }
   vtkSMPropertyHelper(view, "AdditionalLights").Remove(lightProxy);
 
   this->Internals->updateLightWidgets();
