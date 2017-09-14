@@ -241,6 +241,42 @@ void vtkSMSessionProxyManager::InstantiatePrototypes()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSessionProxyManager::ClearPrototypes()
+{
+  vtksys::RegularExpression prototypesRe("_prototypes$");
+
+  // clear items from RegisteredProxyMap.
+  for (auto group_iter = this->Internals->RegisteredProxyMap.begin();
+       group_iter != this->Internals->RegisteredProxyMap.end();)
+  {
+    const bool isPrototypeGroup = prototypesRe.find(group_iter->first);
+    if (isPrototypeGroup)
+    {
+      group_iter = this->Internals->RegisteredProxyMap.erase(group_iter);
+    }
+    else
+    {
+      ++group_iter;
+    }
+  }
+
+  // now, also clear item from RegisteredProxyTuple.
+  for (auto tuple_iter = this->Internals->RegisteredProxyTuple.begin();
+       tuple_iter != this->Internals->RegisteredProxyTuple.end();)
+  {
+    const bool isPrototypeGroup = prototypesRe.find(tuple_iter->Group);
+    if (isPrototypeGroup)
+    {
+      tuple_iter = this->Internals->RegisteredProxyTuple.erase(tuple_iter);
+    }
+    else
+    {
+      ++tuple_iter;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSessionProxyManager::NewProxy(
   const char* groupName, const char* proxyName, const char* subProxyName)
 {
@@ -1073,6 +1109,12 @@ void vtkSMSessionProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
         // for this proxy type are removed, otherwise we may end up using
         // obsolete prototypes.
         this->RemovePrototype(defInfo->GroupName, defInfo->ProxyName);
+        break;
+
+      case vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated:
+        // if any definitions updated, we clear all prototypes.
+        this->ClearPrototypes();
+        this->InvokeEvent(event, data);
         break;
 
       default:
