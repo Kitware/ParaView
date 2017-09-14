@@ -128,7 +128,6 @@ protected:
    */
   vtkContextView* ChartView;
 
-  //@{
   /**
    * To avoid showing large datasets in context views, that typically rely on
    * delivering all data to the client side (or cloning it), by default make
@@ -139,10 +138,16 @@ protected:
    */
   bool SkipPlotableCheck;
 
+  /**
+   * Flag automatically set when Bottom and Right custom
+   * axes related property are present in this proxy.
+   * Used to know if these must be set or not
+   */
+  bool XYChartViewBase4Axes;
+
 private:
   vtkSMContextViewProxy(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
   void operator=(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
-  //@}
 
   /**
    * Copies axis ranges from each of the vtkAxis on the vtkChartXY to the
