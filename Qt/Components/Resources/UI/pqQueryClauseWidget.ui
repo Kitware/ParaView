@@ -211,6 +211,23 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>criteria</tabstop>
+  <tabstop>condition</tabstop>
+  <tabstop>location_x</tabstop>
+  <tabstop>location_y</tabstop>
+  <tabstop>location_z</tabstop>
+  <tabstop>location_tolerance</tabstop>
+  <tabstop>value_x</tabstop>
+  <tabstop>value_y</tabstop>
+  <tabstop>value_z</tabstop>
+  <tabstop>value_min</tabstop>
+  <tabstop>value_max</tabstop>
+  <tabstop>value</tabstop>
+  <tabstop>value_block</tabstop>
+  <tabstop>showCompositeTree</tabstop>
+  <tabstop>helpButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
