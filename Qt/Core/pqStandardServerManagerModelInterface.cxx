@@ -110,44 +110,50 @@ inline pqProxy* CreatePQView(
     // Handle the other comparative render views.
     return new pqComparativeRenderView(group, name, proxy, server, parent);
   }
-  if (xmlname == "XYChartView" || xmlname == "QuartileChartView")
+  if (vtkSMContextViewProxy::SafeDownCast(proxy))
   {
+    if (xmlname == "XYChartView" || xmlname == "XYPointChartView" || xmlname == "QuartileChartView")
+    {
+      return new pqXYChartView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    if (xmlname == "XYBagChartView")
+    {
+      return new pqXYBagChartView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    if (xmlname == "XYBarChartView")
+    {
+      return new pqXYBarChartView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    if (xmlname == "XYHistogramChartView")
+    {
+      return new pqXYHistogramChartView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    if (xmlname == "BoxChartView")
+    {
+      return new pqBoxChartView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    if (xmlname == "XYFunctionalBagChartView")
+    {
+      return new pqXYFunctionalBagChartView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    if (xmlname == "ParallelCoordinatesChartView")
+    {
+      return new pqParallelCoordinatesChartView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    if (xmlname == "PlotMatrixView")
+    {
+      return new pqPlotMatrixView(
+        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
+    }
+    // View XML name have not been recognized, default to a pqXYChartView
     return new pqXYChartView(
-      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-  }
-  if (xmlname == "XYBagChartView")
-  {
-    return new pqXYBagChartView(
-      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-  }
-  if (xmlname == "XYBarChartView")
-  {
-    return new pqXYBarChartView(
-      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-  }
-  if (xmlname == "XYHistogramChartView")
-  {
-    return new pqXYHistogramChartView(
-      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-  }
-  if (xmlname == "BoxChartView")
-  {
-    return new pqBoxChartView(
-      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-  }
-  if (xmlname == "XYFunctionalBagChartView")
-  {
-    return new pqXYFunctionalBagChartView(
-      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-  }
-  if (xmlname == "ParallelCoordinatesChartView")
-  {
-    return new pqParallelCoordinatesChartView(
-      group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-  }
-  if (xmlname == "PlotMatrixView")
-  {
-    return new pqPlotMatrixView(
       group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
   }
   return NULL;

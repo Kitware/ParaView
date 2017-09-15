@@ -2763,6 +2763,18 @@
     <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewBase4Axes"
                       class="vtkPVXYChartView"
+                      name="XYPointChartView"
+                      label="Point Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="XYPointChartRepresentation"
+                      post_creation="SetChartTypeToPoint" >
+      <Documentation>This is the proxy for the XY point chart
+      view.</Documentation>
+    </ContextViewProxy>
+    <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase4Axes"
+                      class="vtkPVXYChartView"
                       name="QuartileChartView"
                       label="Quartile Chart View"
                       processes="client|renderserver|dataserver"
@@ -6748,6 +6760,89 @@
                   function="SeriesPlotCorner"/>
       </PropertyGroup>
 
+      <Hints>
+        <InitializationHelper class="vtkSMXYChartRepresentationInitializationHelper" />
+      </Hints>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy base_proxygroup="representations"
+                              base_proxyname="XYChartRepresentationBase"
+                              class="vtkXYChartRepresentation"
+                              name="XYPointChartRepresentation"
+                              processes="client|dataserver|renderserver"
+                              post_creation="SetChartTypeToPoints">
+      <Documentation>Representation used by XYChartView.</Documentation>
+      <StringVectorProperty command="SetLineStyle"
+                            clean_command="ClearLineStyles"
+                            element_types="2 0"
+                            name="SeriesLineStyle"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series line style.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="0">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetLineThickness"
+                            clean_command="ClearLineThicknesses"
+                            element_types="2 0"
+                            name="SeriesLineThickness"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series line thickness.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetMarkerStyle"
+                            clean_command="ClearMarkerStyles"
+                            element_types="2 0"
+                            name="SeriesMarkerStyle"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series marker style.</Documentation>
+        <ChartSeriesSelectionDomain name="array_list"
+                                    default_mode="value"
+                                    default_value="2">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </ChartSeriesSelectionDomain>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Series Parameters"
+                     panel_widget="SeriesEditor"
+                     panel_visibility="default" >
+        <Property name="SeriesVisibility"
+                  function="SeriesVisibility" />
+        <Property name="SeriesColor"
+                  function="SeriesColor" />
+        <Property name="SeriesLineThickness"
+                  function="SeriesLineThickness" />
+        <Property name="SeriesLineStyle"
+                  function="SeriesLineStyle" />
+        <Property name="SeriesLabel"
+                  function="SeriesLabel" />
+        <Property name="SeriesMarkerStyle"
+                  function="SeriesMarkerStyle" />
+        <Property name="SeriesPlotCorner"
+                  function="SeriesPlotCorner"/>
+      </PropertyGroup>
       <Hints>
         <InitializationHelper class="vtkSMXYChartRepresentationInitializationHelper" />
       </Hints>
