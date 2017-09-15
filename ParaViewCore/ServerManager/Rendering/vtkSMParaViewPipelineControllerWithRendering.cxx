@@ -149,12 +149,26 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     }
   }
 
+  // copy over ospray material name by always
+  vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  {
+    const char* pname = iter->GetKey();
+    vtkSMProperty* dest = repr->GetProperty(pname);
+    vtkSMProperty* source = iter->GetProperty();
+    if (dest && source && strcmp("OSPRayMaterial", pname) == 0)
+    {
+      dest->Copy(source);
+    }
+  }
+  iter->Delete();
+
   if (!vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
   {
     return;
   }
   // copy properties from inputRepr to repr is they weren't modified.
-  vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
+  iter = inputRepr->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
     const char* pname = iter->GetKey();
