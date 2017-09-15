@@ -684,10 +684,11 @@ bool vtkSMParaViewPipelineController::UnRegisterViewProxy(
   vtkSMPropertyHelper(timeKeeper, "Views").Remove(proxy);
   timeKeeper->UpdateVTKObjects();
 
-  // remove all representation proxies.
-  const char* pnames[] = { "Representations", "HiddenRepresentations", "Props", "HiddenProps",
-    NULL };
-  for (int index = 0; unregister_representations && (pnames[index] != NULL); ++index)
+  // remove all representation proxies. Always unregister lights.
+  const char* pnames[] = { "AdditionalLights", "Representations", "HiddenRepresentations", "Props",
+    "HiddenProps", NULL };
+  for (int index = 0; index == 0 || (unregister_representations && (pnames[index] != NULL));
+       ++index)
   {
     vtkSMProperty* prop = proxy->GetProperty(pnames[index]);
     if (prop == NULL)
