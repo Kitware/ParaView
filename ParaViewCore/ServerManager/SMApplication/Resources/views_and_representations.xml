@@ -9732,7 +9732,7 @@
     </RepresentationProxy>
 
     <!-- ================================================================== -->
-    <RepresentationProxy class="vtkGeometrypresentation"
+    <RepresentationProxy class="vtkGeometryRepresentation"
                          name="SurfaceRepresentationBase"
                          processes="client|renderserver|dataserver">
       <Documentation>Representation to show any dataset in a 3D render

@@ -173,6 +173,7 @@ public:
       removeButton->setObjectName("RemoveLight");
       // which light does this button affect?
       removeButton->setProperty("LightIndex", i);
+      removeButton->setToolTip("Remove this light.");
       connect(removeButton, SIGNAL(clicked()), self, SLOT(removeLight()));
       hbox->addWidget(removeButton);
 

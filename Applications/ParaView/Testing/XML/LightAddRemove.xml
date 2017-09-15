@@ -26,7 +26,7 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.378125,0.449219,2,0,33554432)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="keyEvent" arguments="7:16777248:0::0:1" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/addLight" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/Positional/ComboBox" command="activated" arguments="positional" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/Positional/ComboBox" command="activated" arguments="Positional" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/DiffuseColor/ColorButton" command="setChosenColor" arguments="7,255,3" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/ButtonContainer/MoveToCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer1/1pqProxyWidget0/ConeAngle/DoubleRangeWidget/LineEdit" command="set_string" arguments="25" />
@@ -41,8 +41,8 @@
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/LightAddRemove1.png" width="400" height="400" />
   <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/ButtonContainer/RemoveLight" command="activate" arguments="" />
   <pqevent object="" command="comment" arguments="Remove blue, green remains" />
-  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/LightType/ComboBox" command="activated" arguments="headlight" />
-  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/Positional/ComboBox" command="activated" arguments="directional" />
-  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/Positional/ComboBox" command="activated" arguments="positional" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/LightType/ComboBox" command="activated" arguments="Headlight" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/Positional/ComboBox" command="activated" arguments="Directional" />
+  <pqevent object="pqClientMainWindow/lightInspectorDock/lightInspectorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/LightContainer0/1pqProxyWidget0/Positional/ComboBox" command="activated" arguments="Positional" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/LightAddRemove2.png" width="400" height="400" />
 </pqevents>
