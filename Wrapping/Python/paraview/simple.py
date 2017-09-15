@@ -1765,7 +1765,7 @@ def CreateLight():
     controller = servermanager.ParaViewPipelineController()
     controller.SMController.RegisterLightProxy(lightproxy, None)
 
-    return lightproxy
+    return servermanager._getPyProxy(lightproxy)
 
 
 def AddLight(view=None):
