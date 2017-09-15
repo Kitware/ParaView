@@ -369,7 +369,7 @@ void vtkImageSliceRepresentation::SetLookupTable(vtkScalarsToColors* val)
 //----------------------------------------------------------------------------
 void vtkImageSliceRepresentation::SetMapScalars(int val)
 {
-  this->SliceMapper->SetColorMode(val);
+  this->SliceMapper->SetColorMode(val ? VTK_COLOR_MODE_MAP_SCALARS : VTK_COLOR_MODE_DIRECT_SCALARS);
 }
 
 //----------------------------------------------------------------------------
