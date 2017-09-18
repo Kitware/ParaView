@@ -3962,6 +3962,9 @@
             <Property name="SelectMapper"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume" />
+            <Property name="SamplingDimensions"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume"/>
             <Property name="UseDataPartitions"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume"
