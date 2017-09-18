@@ -755,6 +755,16 @@ void vtkGeometryRepresentation::SetOpacity(double val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetLuminosity(double val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkOSPRayActorNode::SetLuminosity(val, this->Property);
+#else
+  (void)val;
+#endif
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetPointSize(double val)
 {
   this->Property->SetPointSize(val);

@@ -440,4 +440,199 @@
     </Proxy>
     <!-- End of PropPickers -->
   </ProxyGroup>
+
+  <ProxyGroup name="additional_lights" label="Lights">
+    <Proxy name="Light"
+           class="vtkPVLight"
+           processes="client|dataserver|renderserver">
+      <IntVectorProperty command="SetSwitch"
+                         label="Switch"
+                         name="LightSwitch"
+                         number_of_elements="1"
+                         default_values="1"
+                         >
+        <Documentation>Turn on/off this light in the active view.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetName"
+                            label="Name"
+                            name="LightName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+      </StringVectorProperty>
+
+      <IntVectorProperty command="SetLightType"
+                         label="Coords"
+                         name="LightType"
+                         number_of_elements="1"
+                         default_values="3">
+        <EnumerationDomain name="enum">
+          <Entry text="Headlight"
+                 value="1" />
+          <Entry text="Camera"
+                 value="2" />
+          <Entry text="Scene"
+                 value="3" />
+          <Entry text="Ambient"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>
+        Specify how the light is positioned. It can be attached to the eye (**Headlight**), relative to the
+        eye (**Camera**), fixed in world space (**Scene**), or position-less (**Ambient**).
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="SetIntensity"
+                            label="Intensity"
+                            name="LightIntensity"
+                            default_values="1.0"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range"
+                           resolution="0.01" />
+        <Documentation>
+        Set the light's brightness. Can be greater than 1.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty command="SetPositional"
+                         label="Type"
+                         name="Positional"
+                         default_values="0"
+                         number_of_elements="1"
+                         >
+        <Documentation>
+          Set the light's type.
+          A **Positional** light's rays diverge from its position. Use **Cone Angle** to limit them.
+          A **Directional** light's rays come from far away, and are parallel.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Directional"
+                 value="0" />
+          <Entry text="Positional"
+                 value="1" />
+        </EnumerationDomain>
+        <Hints>
+          <!-- display when light type is not Ambient -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty command="GetPosition"
+                            name="PositionInfo"
+                            default_values="0 0 1"
+                            information_only="1"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            label="Position"
+                            name="LightPosition"
+                            information_property="PositionInfo"
+                            default_values="0 0 1"
+                            number_of_elements="3">
+        <Documentation>
+        Relative position of the light for **Camera Coords** light, world-space position for **Scene Coords** light.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is Scene or Camera -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   values="2 3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetFocalPoint"
+                            name="FocalPointInfo"
+                            default_values="0 0 0"
+                            information_only="1"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetFocalPoint"
+                            name="FocalPoint"
+                            information_property="FocalPointInfo"
+                            default_values="0 0 0"
+                            number_of_elements="3">
+        <Documentation>
+        Used with position to compute the light direction, this is a "look-at" point.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is Scene or Camera -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   values="2 3" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetColor"
+                            default_values="1 1 1"
+                            name="DiffuseColor"
+                            panel_widget="color_selector"
+                            number_of_elements="3">
+        <DoubleRangeDomain
+            max="1 1 1"
+            min="0 0 0"
+            name="range" />
+        <Documentation>
+        Color of the light.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetConeAngle"
+                            default_values="30.0"
+                            name="ConeAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="180.0"
+                           min="0.0"
+                           name="range" />
+        <Documentation>
+        For a **Positional** light, limit the light to a cone around its direction, creating a "spot-light" effect.
+        Set to 180 to light all directions. In degrees.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is not Ambient, and when Positional -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Positional"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
+        <Documentation>
+        For OSPRay renderer lights, sets the apparent size of the light.
+        In degrees for **Directional**, world space units for **Positional**. Increasing above 0 produces soft shadows.
+        </Documentation>
+        <Hints>
+          <!-- display when light type is not Ambient -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="LightType"
+                                   inverse="1"
+                                   value="4" />
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- End of additional_lights -->
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:  pqLightsInspector.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqCommandPropertyWidget_h
-#define pqCommandPropertyWidget_h
+#ifndef pqLightsInspector_h
+#define pqLightsInspector_h
 
-#include "pqPropertyWidget.h"
+#include "pqComponentsModule.h" // for exports
+#include <QWidget>
 
 /**
-* pqCommandPropertyWidget is used for vtkSMProperty instances (not one of its
-* subclasses). It simply creates a button that the users can press. Unlike
-* other pqPropertyWidget subclasses, the result of clicking this button does
-* not affect the state of the Apply/Reset buttons. It triggers the action
-* prompted by the property immediately.
-*/
-class PQCOMPONENTS_EXPORT pqCommandPropertyWidget : public pqPropertyWidget
+ * @class pqLightsInspector
+ * @brief widget to that lets user edit ParaView's lights
+ *
+ * pqLightsInspector is a QWidget that is used to allow user to view
+ * and edit the lights in the active render view
+ *
+ */
+
+class pqView;
+class vtkSMProxy;
+
+class PQCOMPONENTS_EXPORT pqLightsInspector : public QWidget
 {
   Q_OBJECT
-  typedef pqPropertyWidget Superclass;
+  typedef QWidget Superclass;
 
 public:
-  pqCommandPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
-  ~pqCommandPropertyWidget() override;
+  pqLightsInspector(
+    QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags(), bool autotracking = true);
+  ~pqLightsInspector() override;
 
-protected slots:
-  /**
-  * called when the button is clicked by the user.
-  */
-  virtual void buttonClicked();
+public slots:
+  void addLight();
+  void removeLight(vtkSMProxy* = nullptr);
+  void syncLightToCamera(vtkSMProxy* = nullptr);
+  void setActiveView(pqView*);
+  void render();
+
+private slots:
 
 private:
-  Q_DISABLE_COPY(pqCommandPropertyWidget)
+  Q_DISABLE_COPY(pqLightsInspector);
+
+  class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif

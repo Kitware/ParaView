@@ -634,6 +634,11 @@ public:
   void SetLightType(int val);
 
   //*****************************************************************
+  // Entry point for dynamic lights
+  void AddLight(vtkLight*);
+  void RemoveLight(vtkLight*);
+
+  //*****************************************************************
   // Forward to vtkRenderWindow.
   void SetStereoCapableWindow(int val);
   void SetStereoRender(int val);
@@ -893,6 +898,11 @@ public:
   void SetLightScale(double);
   double GetLightScale();
   //@}
+  /**
+   * Set the OSPRay renderer to use.
+   * May be either scivis (default) or pathtracer.
+   */
+  void SetOSPRayRendererType(std::string);
 
   //@{
   /**

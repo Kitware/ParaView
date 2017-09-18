@@ -193,6 +193,17 @@ public:
     return this->RegisterOpacityTransferFunction(proxy, NULL);
   }
 
+  /**
+   * Use this method after PreInitializeProxy() and PostInitializeProxy() to
+   * register a light proxy with the proxy manager. This will also perform
+   * needed python tracing.
+   */
+  virtual bool RegisterLightProxy(vtkSMProxy* proxy, vtkSMProxy* view, const char* proxyname);
+  virtual bool RegisterLightProxy(vtkSMProxy* proxy, vtkSMProxy* view)
+  {
+    return this->RegisterLightProxy(proxy, view, NULL);
+  }
+
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
 

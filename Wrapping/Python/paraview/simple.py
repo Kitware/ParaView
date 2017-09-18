@@ -35,9 +35,7 @@ A simple example::
 #
 #==============================================================================
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import paraview
 from paraview import servermanager
@@ -1761,6 +1759,72 @@ def ClearSelection(proxy=None):
     if not proxy:
         raise RuntimeError ("No active source was found.")
     proxy.SMProxy.SetSelectionInput(proxy.Port, None, 0)
+
+
+#==============================================================================
+# Dynamic lights.
+#==============================================================================
+
+def CreateLight():
+    """Makes a new vtkLight, unattached to a view."""
+    pxm = servermanager.ProxyManager()
+    lightproxy = pxm.NewProxy("additional_lights", "Light")
+
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.RegisterLightProxy(lightproxy, None)
+
+    return servermanager._getPyProxy(lightproxy)
+
+
+def AddLight(view=None):
+    """Makes a new vtkLight and adds it to the designated or active view."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if view.IsA("vtkSMRenderViewProxy") is False:
+        return
+
+    lightproxy = CreateLight()
+
+    nowlights = [l for l in view.AdditionalLights]
+    nowlights.append(lightproxy)
+    view.AdditionalLights = nowlights
+    # This is not the same as returning lightProxy
+    return GetLight(len(view.AdditionalLights) - 1, view)
+
+def RemoveLight(light):
+    """Removes an existing vtkLight from its view."""
+    if not light:
+        raise ValueError ("No 'light' was provided.")
+    view = GetViewForLight(light)
+    if view:
+        if (not view.IsA("vtkSMRenderViewProxy")) or (len(view.AdditionalLights) < 1):
+            raise RuntimeError ("View retrieved inconsistent with owning a 'light'.")
+
+        nowlights = [l for l in view.AdditionalLights if l != light]
+        view.AdditionalLights = nowlights
+
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.UnRegisterProxy(light.SMProxy)
+
+def GetLight(number, view=None):
+    """Get a handle on a previously added light"""
+    if not view:
+        view = active_objects.view
+    numlights = len(view.AdditionalLights)
+    if numlights < 1 or number < 0 or number >= numlights:
+        return
+    return view.AdditionalLights[number]
+
+def GetViewForLight(proxy):
+    """Given a light proxy, find which view it belongs to"""
+    # search current views for this light.
+    for cc in range(proxy.GetNumberOfConsumers()):
+        consumer = proxy.GetConsumerProxy(cc)
+        consumer = consumer.GetTrueParentProxy()
+        if consumer.IsA("vtkSMRenderViewProxy") and proxy in consumer.AdditionalLights:
+            return consumer
+    return None
 
 #==============================================================================
 # Miscellaneous functions.

@@ -2511,14 +2511,14 @@
           number_of_elements="2"
           >
         <DoubleRangeDomain name="range" />
-        <Documentation>Min and max values to map linearly between to
+        <Documentation>Map linearly between the min and max values to
         produce RGB colors.</Documentation>
       </DoubleVectorProperty>
       <Property
           name="EndValueCapture"
           command="EndValueCapture"
           >
-        <Documentation>Terminantes the render state where RGB colors
+        <Documentation>Terminates the render state where RGB colors
         encode values from a particular array and returns to normal
         behavior.</Documentation>
       </Property>
@@ -2533,7 +2533,7 @@
           name="StopCaptureLuminance"
           command="StopCaptureLuminance"
         >
-        <Documentation>Terminantes the render state where lighting contributions
+        <Documentation>Terminates the render state where lighting contributions
         are encoded into RGB.</Documentation>
       </Property>
       <IntVectorProperty name="EnableOSPRay"
@@ -2568,6 +2568,20 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </IntVectorProperty>
+      <StringVectorProperty name="OSPRayRendererType"
+          command="SetOSPRayRendererType"
+          label="OSPRay Renderer"
+          default_values="scivis"
+          number_of_elements="1">
+        <StringListDomain name="list">
+          <String value="scivis" />
+          <String value="pathtracer" />
+        </StringListDomain>
+        <Documentation>Set the OSPRay renderer to use.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty
           name="AmbientSamples"
           command="SetAmbientOcclusionSamples"
@@ -2624,11 +2638,17 @@
         <DoubleRangeDomain
             min="0.0"
             name="range"/>
-        <Documentation>Dimish or Amplify all lights in the scene.</Documentation>
+        <Documentation>Diminish or Amplify all lights in the scene.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </DoubleVectorProperty>
+      <ProxyProperty
+        name="AdditionalLights"
+        command="AddLight"
+        remove_command="RemoveLight"
+        repeatable="1">
+      </ProxyProperty>
 
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>
@@ -2703,6 +2723,7 @@
                      panel_visibility="advanced">
         <Property name="EnableOSPRay"/>
         <Property name="Shadows"/>
+        <Property name="OSPRayRendererType"/>
         <Property name="AmbientSamples"/>
         <Property name="SamplesPerPixel"/>
         <Property name="MaxFrames"/>
@@ -3597,6 +3618,8 @@
                       panel_widget="color_selector"
                       panel_visibility="advanced" />
             <Property name="SpecularPower"
+                      panel_visibility="advanced" />
+            <Property name="Luminosity"
                       panel_visibility="advanced" />
             <Property name="Ambient" panel_visibility="advanced"/>
             <Property name="Diffuse" panel_visibility="advanced"/>
@@ -9999,6 +10022,20 @@
         <DoubleRangeDomain max="100"
                            min="0"
                            name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLuminosity"
+                            default_values="0.0"
+                            name="Luminosity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="100.0"
+                           min="0"
+                           name="range" />
+        <Documentation>Makes the object emit light.
+        Only takes effect with OSPRay's path traced renderer.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEdgeColor"
                             default_values="0 0 0.5"

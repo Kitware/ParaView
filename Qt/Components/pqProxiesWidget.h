@@ -41,7 +41,7 @@ class pqView;
 
 /**
 * pqProxiesWidget similar to pqProxyWidget with the difference being that
-* unlink pqProxyWidget, pqProxiesWidget supports showing of multiple proxies in
+* unlike pqProxyWidget, pqProxiesWidget supports showing of multiple proxies in
 * the same widget. Internally, it indeed creates a pqProxyWidget for each of
 * the added proxies.
 *

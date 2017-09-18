@@ -116,6 +116,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Ensemble.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LightAddRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMap.xml

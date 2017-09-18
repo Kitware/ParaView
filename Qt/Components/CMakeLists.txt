@@ -145,6 +145,8 @@ set (Module_SRCS
   pqKeyFrameTypeWidget.h
   pqLabel.cxx
   pqLabel.h
+  pqLightsInspector.cxx
+  pqLightsInspector.h
   pqLinksEditor.cxx
   pqLinksEditor.h
   pqLinksManager.cxx
@@ -364,6 +366,7 @@ set (Module_MOC_HDRS
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
   pqLabel.h
+  pqLightsInspector.h
   pqLinksEditor.h
   pqLinksManager.h
   pqLiveInsituManager.h
@@ -469,6 +472,7 @@ set (Module_UI_FILES
   Resources/UI/pqItemViewSearchWidget.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
+  Resources/UI/pqLightsInspector.ui
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
