@@ -290,7 +290,6 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   // tell python trace to remove the light
   SM_SCOPED_TRACE(CallFunction)
     .arg("RemoveLight")
-    .arg("view", view)
     .arg("light", lightProxy)
     .arg("comment", "remove light added to the view");
 
@@ -298,6 +297,10 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   BEGIN_UNDO_SET("Remove Light");
 
   vtkSMPropertyHelper(view, "AdditionalLights").Remove(lightProxy);
+
+  // this prevents undo of the remove
+  // vtkNew<vtkSMParaViewPipelineController> controller;
+  // controller->UnRegisterProxy(lightProxy);
 
   this->Internals->updateLightWidgets();
 

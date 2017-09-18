@@ -1784,27 +1784,20 @@ def AddLight(view=None):
     # This is not the same as returning lightProxy
     return GetLight(len(view.AdditionalLights) - 1, view)
 
-def RemoveLight(view=None, light=None):
-    """Removes an existing vtkLight from the designated or active view."""
-    view = view if view else GetActiveView()
-    # TODO handle no view.
-    if not view:
-        raise ValueError ("No 'view' was provided and no active view was found.")
-    if view.IsA("vtkSMRenderViewProxy") is False:
-        return
+def RemoveLight(light):
+    """Removes an existing vtkLight from its view."""
+    if not light:
+        raise ValueError ("No 'light' was provided.")
+    view = GetViewForLight(light)
+    if view:
+        if (not view.IsA("vtkSMRenderViewProxy")) or (len(view.AdditionalLights) < 1):
+            raise RuntimeError ("View retrieved inconsistent with owning a 'light'.")
 
-    numlights = len(view.AdditionalLights)
-    if numlights < 1:
-        return
-
-    if light:
         nowlights = [l for l in view.AdditionalLights if l != light]
-    else:
-        nowlights = [l for l in view.AdditionalLights][:numlights-1]
-    view.AdditionalLights = nowlights
+        view.AdditionalLights = nowlights
 
     controller = servermanager.ParaViewPipelineController()
-    controller.SMController.UnRegisterProxy(light)
+    controller.SMController.UnRegisterProxy(light.SMProxy)
 
 def GetLight(number, view=None):
     """Get a handle on a previously added light"""
