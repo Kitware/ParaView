@@ -7,6 +7,10 @@ include("@VTK_BINARY_DIR@/CTestCustom.cmake")
 set (CTEST_CUSTOM_WARNING_EXCEPTION
   ${CTEST_CUSTOM_WARNING_EXCEPTION}
 
+  # FIXME ignore VTK-m related warnings: remove when these are fixed in VTK-m or VTK
+  "ThirdParty/vtkm"
+  "Accelerators/Vtkm"
+
   #ignore protobuf related warnings.
   "ThirdParty.protobuf/"
   "protobuf"
