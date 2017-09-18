@@ -9,4 +9,5 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="Gradients" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 </pqevents>

@@ -23,4 +23,5 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.387059,0.278276,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.501176,0.40754,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.501176,0.40754,1,0,0)" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 </pqevents>
