@@ -22,6 +22,7 @@
  * supports it.
  *
  * Example usage :
+ * @code{xml}
  *       <RangedTransferFunctionDomain name="proxy_list">
  *         <RequiredProperties>
  *           <Property function="Input" name="Input" />
@@ -29,6 +30,7 @@
  *           <Property function="ComponentSelection" name="OpacityArrayComponent" />
  *         </RequiredProperties>
  *       </RangedTransferFunctionDomain>
+ * @endcode
  */
 
 #ifndef vtkSMRangedTransferFunctionDomain_h
