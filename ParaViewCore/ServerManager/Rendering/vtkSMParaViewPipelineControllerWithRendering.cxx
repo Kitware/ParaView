@@ -149,7 +149,7 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     }
   }
 
-  // copy over ospray material name by always
+  // always copy over ospray material name
   vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
@@ -722,7 +722,7 @@ void vtkSMParaViewPipelineControllerWithRendering::PrintSelf(ostream& os, vtkInd
 }
 
 //----------------------------------------------------------------------------
-void vtkSMParaViewPipelineControllerWithRendering::DoMaterialStuff(vtkSMProxy* prox)
+void vtkSMParaViewPipelineControllerWithRendering::DoMaterialSetup(vtkSMProxy* prox)
 {
   vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(prox);
   mlp->LoadDefaultMaterials();

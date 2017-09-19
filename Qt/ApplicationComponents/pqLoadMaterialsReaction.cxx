@@ -82,7 +82,6 @@ bool pqLoadMaterialsReaction::loadMaterials(const QString& dbase, pqServer* serv
   vtkSMSession* session = server->session();
   if (session)
   {
-    cerr << "TRYING" << endl;
     vtkNew<vtkSMParaViewPipelineController> controller;
     vtkSMMaterialLibraryProxy* mlp =
       vtkSMMaterialLibraryProxy::SafeDownCast(controller->FindMaterialLibrary(session));

@@ -50,7 +50,6 @@
 
 #ifdef PARAVIEW_USE_OSPRAY
 #include "vtkOSPRayActorNode.h"
-#include "vtkOSPRayMaterialLibrary.h"
 #endif
 
 #include <vtksys/SystemTools.hxx>
@@ -1056,16 +1055,6 @@ void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
   this->Actor->SetScalingFunction(pwf);
 #else
   (void)pwf;
-#endif
-}
-//----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetMaterialLibrary(vtkOSPRayMaterialLibrary* ml)
-{
-#ifdef PARAVIEW_USE_OSPRAY
-// todo this should probably be on the proxy, we only have the ML we
-// can its MLP in a proxy property to use in the domain
-#else
-  (void)ml;
 #endif
 }
 

@@ -342,9 +342,9 @@ bool vtkSMParaViewPipelineController::CreateAnimationHelpers(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMParaViewPipelineController::DoMaterialStuff(vtkSMProxy* vtkNotUsed(proxy))
+void vtkSMParaViewPipelineController::DoMaterialSetup(vtkSMProxy* vtkNotUsed(proxy))
 {
-  // typically overridedn by rendering capable subclass
+  // expected to be overridden by rendering capable subclass
 }
 
 //----------------------------------------------------------------------------
@@ -411,7 +411,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
     }
     this->InitializeProxy(materialLib);
     materialLib->UpdateVTKObjects();
-    this->DoMaterialStuff(materialLib.Get());
+    this->DoMaterialSetup(materialLib.Get());
     pxm->RegisterProxy("materiallibrary", materialLib);
 #endif
   }

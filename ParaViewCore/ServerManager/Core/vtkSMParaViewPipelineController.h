@@ -328,7 +328,10 @@ protected:
    */
   void ProcessInitializationHelper(vtkSMProxy*, vtkMTimeType initializationTimeStamp);
 
-  virtual void DoMaterialStuff(vtkSMProxy* proxy);
+  /**
+   * An entry point to load a catalog of OSPRay rendering materials.
+   */
+  virtual void DoMaterialSetup(vtkSMProxy* proxy);
 
 private:
   vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
