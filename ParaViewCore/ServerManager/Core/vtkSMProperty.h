@@ -23,7 +23,7 @@
  * methods with no arguments. Sub-classes support methods with different
  * arguments types and numbers.
  *
- * Property is typically meant for pushing its values to athe VTK object.
+ * vtkSMProperty is typically meant for pushing its values to a VTK object.
  * However, a property may be marked as an InformationOnly property
  * in which case its values are obtained from the server with the
  * UpdateInformation() call.

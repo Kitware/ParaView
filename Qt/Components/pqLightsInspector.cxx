@@ -167,6 +167,7 @@ public:
       syncButton->setToolTip("Match this light's position and focal point to the camera.");
       connect(syncButton, SIGNAL(clicked()), self, SLOT(syncLightToCamera()));
       hbox->addWidget(syncButton);
+      this->updateMoveToCamera(i, light);
 
       // Add a button to remove this light.
       QPushButton* removeButton = new QPushButton("Remove Light");
@@ -182,10 +183,12 @@ public:
       pqProxyWidget* lightWidget = new pqProxyWidget(light, widget);
       lightWidget->setApplyChangesImmediately(true);
       lightWidget->setView(pv);
+      // which light does this widget affect?
+      lightWidget->setProperty("LightIndex", i);
       lightWidget->updatePanel();
       vbox->addWidget(lightWidget);
       // whenever a property changes, do a render.
-      self->connect(lightWidget, SIGNAL(changeFinished()), SLOT(render()));
+      self->connect(lightWidget, SIGNAL(changeFinished()), SLOT(updateAndRender()));
 
       // add it to this->Ui.scrollArea
       this->Ui.verticalLayout_2->addWidget(widget);
@@ -197,6 +200,17 @@ public:
     this->observerTag = property->AddObserver(
       vtkCommand::ModifiedEvent, this, &pqLightsInspector::pqInternals::updateLightWidgets);
     this->rview = view;
+  }
+
+  void updateMoveToCamera(int lightIndex, vtkSMProxy* lightProxy)
+  {
+    int type = 0;
+    vtkSMPropertyHelper(lightProxy, "LightType").Get(&type);
+    bool visible = (type == VTK_LIGHT_TYPE_CAMERA_LIGHT || type == VTK_LIGHT_TYPE_SCENE_LIGHT);
+
+    QWidget* container = self->findChild<QWidget*>(QString("LightContainer%1").arg(lightIndex));
+    QPushButton* button = container->findChild<QPushButton*>(QString("MoveToCamera"));
+    button->setVisible(visible);
   }
 };
 
@@ -266,6 +280,24 @@ void pqLightsInspector::render()
 }
 
 //-----------------------------------------------------------------------------
+void pqLightsInspector::updateAndRender()
+{
+  vtkSMRenderViewProxy* view = this->Internals->getActiveView();
+  if (!view)
+  {
+    return;
+  }
+
+  auto proxyWidget = sender();
+  int index = proxyWidget->property("LightIndex").toInt();
+
+  vtkSMProxy* lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(index);
+  this->Internals->updateMoveToCamera(index, lightProxy);
+
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
 void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
 {
   vtkSMRenderViewProxy* view = this->Internals->getActiveView();
@@ -319,7 +351,6 @@ void pqLightsInspector::syncLightToCamera(vtkSMProxy* lightProxy)
   {
     return;
   }
-  // todo: this works but do I need to do something more?
   if (!lightProxy)
   {
     auto syncButton = sender();
