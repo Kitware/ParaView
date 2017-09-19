@@ -38,7 +38,8 @@ public:
   }
   vtkTypeMacro(vtkSMMaterialObserver, vtkCommand);
 
-  void Execute(vtkObject* caller, unsigned long eventid, void* calldata) VTK_OVERRIDE
+  void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventid),
+    void* vtkNotUsed(calldata)) VTK_OVERRIDE
   {
     this->Owner->CallMeSometime();
   }
@@ -94,12 +95,11 @@ int vtkSMMaterialDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
     return 1;
   }
   ml->AddObserver(vtkCommand::UpdateDataEvent, this->Observer);
-
-  return 1;
 #else
   (void)prop;
   (void)element;
 #endif
+  return 1;
 }
 
 //---------------------------------------------------------------------------

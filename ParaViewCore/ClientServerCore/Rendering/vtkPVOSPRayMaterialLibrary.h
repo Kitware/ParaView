@@ -24,9 +24,10 @@
 #define vtkPVOSPRayMaterialLibrary_h
 
 #include "vtkOSPRayMaterialLibrary.h"
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOSPRayMaterialLibrary : public vtkOSPRayMaterialLibrary
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOSPRayMaterialLibrary
+  : public vtkOSPRayMaterialLibrary
 {
 public:
   static vtkPVOSPRayMaterialLibrary* New();

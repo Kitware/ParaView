@@ -342,7 +342,7 @@ bool vtkSMParaViewPipelineController::CreateAnimationHelpers(vtkSMProxy* proxy)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMParaViewPipelineController::DoMaterialStuff(vtkSMProxy* proxy)
+void vtkSMParaViewPipelineController::DoMaterialStuff(vtkSMProxy* vtkNotUsed(proxy))
 {
   // typically overridedn by rendering capable subclass
 }
