@@ -67,6 +67,13 @@ set (ParaView_CMAKE_BINARY_DIR "${ParaView_BINARY_DIR}/CMake")
 set (ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
 
 #-------------------------------------------------------------------------------
+if (APPLE AND (PARAVIEW_USE_VTKM OR Module_vtkAcceleratorsVTKm))
+  message(WARNING "The vtkAcceleratorsVTKm module's wrapping is broken on macOS. Disabling VTKm")
+  set (PARAVIEW_USE_VTKM OFF CACHE INTERNAL "")
+  set (Module_vtkAcceleratorsVTKm OFF CACHE INTERNAL "")
+endif()
+
+#-------------------------------------------------------------------------------
 # Set up CMAKE_MODULE_PATH
 set (CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
