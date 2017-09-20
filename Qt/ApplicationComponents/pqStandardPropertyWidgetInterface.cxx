@@ -65,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
 #include "pqOSPRayHidingDecorator.h"
-#include "pqOpenVRHidingDecorator.h"
 #include "pqPropertyGroupButton.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
@@ -325,10 +324,6 @@ pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecora
   if (type == "OSPRayHidingDecorator")
   {
     return new pqOSPRayHidingDecorator(config, widget);
-  }
-  if (type == "OpenVRHidingDecorator")
-  {
-    return new pqOpenVRHidingDecorator(config, widget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

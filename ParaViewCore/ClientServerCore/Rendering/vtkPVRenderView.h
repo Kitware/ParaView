@@ -845,13 +845,6 @@ public:
   vtkFloatArray* GetCapturedZBuffer();
   //@}
 
-  /**
-   * Sends the current renderer to OpenVR Virtual Reality.
-   * Control will return to paraview once the user is done
-   * in VR.
-   */
-  void SendToOpenVR();
-
   //@{
   /**
    * Switches between rasterization and ray tracing.
@@ -934,6 +927,10 @@ public:
   static void SetDiscreteCameras(
     vtkInformation* info, vtkPVDataRepresentation* repr, vtkPVCameraCollection* style);
   //@}
+
+  // Get the RenderViewBase used by this
+  vtkGetObjectMacro(RenderView, vtkRenderViewBase);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;
