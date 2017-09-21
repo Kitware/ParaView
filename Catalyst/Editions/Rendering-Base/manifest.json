@@ -691,6 +691,7 @@
         { "class": "vtkSMDataDeliveryManager" },
         { "class": "vtkSMFunctionalBagChartSeriesSelectionDomain" },
         { "class": "vtkSMImplicitPlaneRepresentationProxy" },
+        { "class": "vtkSMMaterialLibraryProxy" },
         { "class": "vtkSMNewWidgetRepresentationProxy" },
         { "class": "vtkSMParaViewPipelineControllerWithRendering" },
         { "class": "vtkSMPlotMatrixViewProxy" },

@@ -37,6 +37,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 
+#include "vtkSMMaterialLibraryProxy.h"
+
 #include <cassert>
 #include <string>
 
@@ -147,12 +149,26 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     }
   }
 
+  // always copy over ospray material name
+  vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  {
+    const char* pname = iter->GetKey();
+    vtkSMProperty* dest = repr->GetProperty(pname);
+    vtkSMProperty* source = iter->GetProperty();
+    if (dest && source && strcmp("OSPRayMaterial", pname) == 0)
+    {
+      dest->Copy(source);
+    }
+  }
+  iter->Delete();
+
   if (!vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
   {
     return;
   }
   // copy properties from inputRepr to repr is they weren't modified.
-  vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
+  iter = inputRepr->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
     const char* pname = iter->GetKey();
@@ -703,4 +719,12 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterLayoutProxy(
 void vtkSMParaViewPipelineControllerWithRendering::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::DoMaterialSetup(vtkSMProxy* prox)
+{
+  vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(prox);
+  mlp->LoadDefaultMaterials();
+  mlp->Synchronize();
 }

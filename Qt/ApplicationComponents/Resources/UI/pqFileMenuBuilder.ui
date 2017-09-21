@@ -176,6 +176,17 @@
     <string>Import a Cinema Database file</string>
    </property>
   </action>
+  <action name="actionFileLoadMaterials">
+   <property name="text">
+    <string>Load OSPRay Materials...</string>
+   </property>
+   <property name="toolTip">
+    <string>Load an OSPRay Materials file</string>
+   </property>
+   <property name="statusTip">
+    <string>Load an OSPRay Materials file</string>
+   </property>
+  </action>
   <addaction name="actionFileOpen"/>
   <addaction name="menuRecentFiles"/>
   <addaction name="actionReloadFiles"/>
@@ -191,6 +202,8 @@
   <addaction name="actionFileSaveGeometry"/>
   <addaction name="separator"/>
   <addaction name="actionFileImportCinemaDatabase"/>
+  <addaction name="separator"/>
+  <addaction name="actionFileLoadMaterials"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadWindowLayout"/>
   <addaction name="actionFileSaveWindowLayout"/>

@@ -2641,7 +2641,14 @@
         remove_command="RemoveLight"
         repeatable="1">
       </ProxyProperty>
-
+      <ProxyProperty command="SetMaterialLibrary"
+                     name="OSPRayMaterialLibrary"
+                     label="OSPRay Material Library"
+                     number_of_elements="1"
+                     panel_visibility="never"
+                     default_values="None">
+        <Documentation>Container for a set of material specifications.</Documentation>
+      </ProxyProperty>
       <PropertyGroup label="Orientation Axes">
         <Property name="OrientationAxesVisibility"/>
         <Property name="OrientationAxesInteractivity"/>
@@ -3681,12 +3688,7 @@
             <Property name="OSPRayUseScaleArray" />
             <Property name="OSPRayScaleArray" />
             <Property name="OSPRayScaleFunction" />
-            <Hints>
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="Representation"
-                                       value="Surface" />
-            </Hints>
+            <Property name="OSPRayMaterial" />
           </PropertyGroup>
 
         </ExposedProperties>
@@ -10250,6 +10252,20 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </ProxyProperty>
+      <StringVectorProperty command="SetMaterial"
+                            name="OSPRayMaterial"
+                            label="OSPRay Material"
+                            number_of_elements="1"
+                            panel_visibility="advanced"
+                            default_values="None">
+        <Documentation>Set the material to paint this object with.</Documentation>
+        <MaterialDomain name="string_list">
+        </MaterialDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+        </Hints>
+      </StringVectorProperty>
+
       <!-- End of SurfaceRepresentationBase -->
     </RepresentationProxy>
 

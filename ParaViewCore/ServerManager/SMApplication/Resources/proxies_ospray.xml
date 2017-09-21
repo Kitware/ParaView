@@ -1,0 +1,8 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="materials">
+    <MaterialLibraryProxy class="vtkPVOSPRayMaterialLibrary"
+                 name="MaterialLibrary"
+                 processes="client|renderserver">
+    </MaterialLibraryProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

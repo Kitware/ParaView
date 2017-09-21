@@ -1057,3 +1057,20 @@ void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
   (void)pwf;
 #endif
 }
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetMaterial(const char* val)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  if (!strcmp(val, "None"))
+  {
+    this->Property->SetMaterialName(nullptr);
+  }
+  else
+  {
+    this->Property->SetMaterialName(val);
+  }
+#else
+  (void)val;
+#endif
+}

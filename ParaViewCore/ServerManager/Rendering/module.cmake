@@ -1,3 +1,8 @@
+set (__dependencies)
+if (PARAVIEW_USE_OSPRAY)
+  list (APPEND __dependencies vtkRenderingOSPRay)
+endif ()
+
 vtk_module(vtkPVServerManagerRendering
   GROUPS
     ParaViewRendering
@@ -7,6 +12,7 @@ vtk_module(vtkPVServerManagerRendering
     vtkPVServerImplementationRendering
     vtkPVServerManagerCore
     vtkjsoncpp
+    ${__dependencies}
   PRIVATE_DEPENDS
     vtkCommonColor
     vtksys

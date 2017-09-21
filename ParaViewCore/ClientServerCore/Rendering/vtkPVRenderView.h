@@ -49,6 +49,7 @@ class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
+class vtkOSPRayMaterialLibrary;
 class vtkPartitionOrderingInterface;
 class vtkProp;
 class vtkPVAxesWidget;
@@ -896,6 +897,11 @@ public:
    * May be either scivis (default) or pathtracer.
    */
   void SetOSPRayRendererType(std::string);
+
+  /**
+   * For OSPRay, set the library of materials.
+   */
+  virtual void SetMaterialLibrary(vtkOSPRayMaterialLibrary*);
 
   //@{
   /**

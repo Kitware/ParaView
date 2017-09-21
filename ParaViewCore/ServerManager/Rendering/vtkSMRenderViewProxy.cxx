@@ -47,6 +47,7 @@
 #include "vtkSMDataDeliveryManager.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
