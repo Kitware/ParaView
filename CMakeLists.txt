@@ -67,13 +67,6 @@ set (ParaView_CMAKE_BINARY_DIR "${ParaView_BINARY_DIR}/CMake")
 set (ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
 
 #-------------------------------------------------------------------------------
-if (APPLE AND (PARAVIEW_USE_VTKM OR Module_vtkAcceleratorsVTKm))
-  message(WARNING "The vtkAcceleratorsVTKm module's wrapping is broken on macOS. Disabling VTKm")
-  set (PARAVIEW_USE_VTKM OFF CACHE INTERNAL "")
-  set (Module_vtkAcceleratorsVTKm OFF CACHE INTERNAL "")
-endif()
-
-#-------------------------------------------------------------------------------
 # Set up CMAKE_MODULE_PATH
 set (CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
@@ -205,7 +198,7 @@ option(BUILD_TESTING "Build ParaView Testing" OFF)
 option(BUILD_EXAMPLES "Build ParaView examples" OFF)
 option(BUILD_SHARED_LIBS "Build ParaView using shared libraries" ON)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
-option(PARAVIEW_USE_VTKM "Build ParaView with VTKm many-core filters" OFF)
+cmake_dependent_option(PARAVIEW_USE_VTKM "Build ParaView with VTKm many-core filters" OFF "NOT APPLE" OFF)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_OSPRAY "Build ParaView with OSPRay Ray Traced rendering" OFF)
 set(VTK_OPENVR_OBJECT_FACTORY OFF

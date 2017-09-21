@@ -411,6 +411,10 @@ if (PARAVIEW_BUILD_PLUGIN_OpenVR)
   list (APPEND _vtk_modules vtkRenderingOpenVR)
 endif()
 
+if (PARAVIEW_USE_VTKM)
+  list (APPEND _vtk_modules vtkAcceleratorsVTKm)
+endif()
+
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
 # list of modules to ensure that these are enabled when the corresponding module
 # is enabled.
