@@ -32,7 +32,7 @@
  * client is connected to 1 and only 1 server. This ID is
  * insignificant. However, it provides the ground work to enable a client
  * to connect with multiple servers.  ConnectionID must be set immediately
- * after instantiating the proxy (if at all).  Chanding the ConnectionID
+ * after instantiating the proxy (if at all).  Changing the ConnectionID
  * after that can be dangerous.
  *
  * Once a proxy has been defined, it can be listed in another secondary group
@@ -43,7 +43,7 @@
  * \endcode
  *
  * When defining a proxy in the XML configuration file,
- * to derrive the property interface from another proxy definition,
+ * to derive the property interface from another proxy definition,
  * we can use attributes "base_proxygroup" and "base_proxyname" which
  * identify the proxy group and proxy name of another proxy. Base interfaces
  * can be defined recursively, however care must be taken to avoid cycles.

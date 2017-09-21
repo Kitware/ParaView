@@ -442,7 +442,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="additional_lights" label="Lights">
-    <Proxy name="Light"
+    <LightProxy name="Light"
            class="vtkPVLight"
            processes="client|dataserver|renderserver">
       <IntVectorProperty command="SetSwitch"
@@ -631,7 +631,7 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </DoubleVectorProperty>
-    </Proxy>
+    </LightProxy>
     <!-- End of additional_lights -->
   </ProxyGroup>
 
