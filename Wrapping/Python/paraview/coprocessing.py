@@ -581,10 +581,10 @@ class CoProcessor(object):
             import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
             import paraview.simple as simple
         except ImportError as e:
+            import paraview
             paraview.print_error("Cannot import cinema")
             paraview.print_error(e)
             return
-
 
         #figure out where to put this store
         import os.path
