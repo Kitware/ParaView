@@ -330,7 +330,8 @@
       "include": [
         { "class": "vtkEllipseArcSource" },
         { "class": "vtkFrustumSource" },
-        { "class": "vtkOutlineSource" }
+        { "class": "vtkOutlineSource" },
+        { "class": "vtkPlaneSource" }
       ],
       "cswrap": true,
       "pythonwrap": true
