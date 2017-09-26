@@ -733,33 +733,45 @@ void vtkPVRenderView::SetInteractionMode(int mode)
     this->InteractionMode = mode;
     this->Modified();
 
-    if (this->Interactor == NULL)
-    {
-      return;
-    }
-
+    // If we're in a situation where we don't have an interactor (e.g. pvbatch or Catalyst)
+    // we still want to set the other properties on the camera.
     switch (this->InteractionMode)
     {
       case INTERACTION_MODE_3D:
-        this->Interactor->SetInteractorStyle(this->InteractorStyle = this->ThreeDInteractorStyle);
+        if (this->Interactor)
+        {
+          this->Interactor->SetInteractorStyle(this->InteractorStyle = this->ThreeDInteractorStyle);
+        }
         // Get back to the previous state
         this->GetActiveCamera()->SetParallelProjection(this->ParallelProjection);
         break;
       case INTERACTION_MODE_2D:
-        this->Interactor->SetInteractorStyle(this->InteractorStyle = this->TwoDInteractorStyle);
+        if (this->Interactor)
+        {
+          this->Interactor->SetInteractorStyle(this->InteractorStyle = this->TwoDInteractorStyle);
+        }
         this->GetActiveCamera()->SetParallelProjection(1);
         break;
 
       case INTERACTION_MODE_SELECTION:
-        this->Interactor->SetInteractorStyle(this->RubberBandStyle);
+        if (this->Interactor)
+        {
+          this->Interactor->SetInteractorStyle(this->RubberBandStyle);
+        }
         break;
 
       case INTERACTION_MODE_POLYGON:
-        this->Interactor->SetInteractorStyle(this->PolygonStyle);
+        if (this->Interactor)
+        {
+          this->Interactor->SetInteractorStyle(this->PolygonStyle);
+        }
         break;
 
       case INTERACTION_MODE_ZOOM:
-        this->Interactor->SetInteractorStyle(this->RubberBandZoom);
+        if (this->Interactor)
+        {
+          this->Interactor->SetInteractorStyle(this->RubberBandZoom);
+        }
         break;
     }
   }
