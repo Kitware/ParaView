@@ -960,10 +960,20 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
   this->ZTexture->CreateDepth(dims[0], dims[1], vtkTextureObject::Native, this->PBO);
 
   // TO to FB: apply TO on quad with special zcomposite fragment shader.
-  glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+  GLboolean prevColorMask[4];
+  glGetBooleanv(GL_COLOR_WRITEMASK, prevColorMask);
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+  GLboolean prevDepthTest;
+  glGetBooleanv(GL_DEPTH_TEST, &prevDepthTest);
   glEnable(GL_DEPTH_TEST);
+
+  GLboolean prevDepthMask;
+  glGetBooleanv(GL_DEPTH_WRITEMASK, &prevDepthMask);
   glDepthMask(GL_TRUE);
+
+  GLint prevDepthFunc;
+  glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
   glDepthFunc(GL_ALWAYS);
 
   if (this->Program == 0)
@@ -978,7 +988,18 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
     0, 0, w - 1, h - 1, 0, 0, w, h, this->Program->Program, this->Program->VAO);
   this->ZTexture->Deactivate();
 
-  glPopAttrib();
+  if (prevDepthTest)
+  {
+    glEnable(GL_DEPTH_TEST);
+  }
+  else
+  {
+    glDisable(GL_DEPTH_TEST);
+  }
+
+  glDepthMask(prevDepthMask);
+  glDepthFunc(prevDepthFunc);
+  glColorMask(prevColorMask[0], prevColorMask[1], prevColorMask[2], prevColorMask[3]);
 
   vtkOpenGLCheckErrorMacro("failed after PushIceTDepthBufferToScreen");
 }
