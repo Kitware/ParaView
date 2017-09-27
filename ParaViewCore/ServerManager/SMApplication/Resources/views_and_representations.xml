@@ -1781,7 +1781,7 @@
                          panel_visibility="never"
                          number_of_elements="1">
         <Documentation>Set the delay (in seconds) after an interactive render
-          before switching to a full-rese render.</Documentation>
+          before switching to a full-res render.</Documentation>
         <Hints>
           <PropertyLink group="settings"
                         proxy="RenderViewSettings"
@@ -2558,6 +2558,10 @@
         or not.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <StringVectorProperty name="OSPRayRendererType"
@@ -2572,6 +2576,10 @@
         <Documentation>Set the OSPRay renderer to use.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </StringVectorProperty>
       <IntVectorProperty
@@ -2587,6 +2595,10 @@
         OSPRay sends at each intersection.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -2602,6 +2614,10 @@
         shoots per pixel.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -2619,6 +2635,10 @@
         is started with the --enable-streaming option.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty
@@ -2633,6 +2653,10 @@
         <Documentation>Diminish or Amplify all lights in the scene.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty
@@ -2686,8 +2710,9 @@
         <Property name="OrientationAxesLabelColor"/>
         <Property name="OrientationAxesOutlineColor"/>
       </PropertyGroup>
-      <PropertyGroup label="Lights" panel_widget="LightsEditor"
-                     panel_visibility="advanced">
+      <PropertyGroup name="Lights"
+                     label="Lights"
+                     panel_visibility="never">
         <!-- Light Kit -->
         <Property name="UseLight"/>
         <!-- Key Light -->
@@ -10087,6 +10112,10 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEdgeColor"

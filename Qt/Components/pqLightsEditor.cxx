@@ -83,14 +83,12 @@ const int PROPERTY_COUNT = sizeof(PROPERTY_NAME) / sizeof(PROPERTY_NAME[0]);
 }
 
 //-----------------------------------------------------------------------------
-pqLightsEditor::pqLightsEditor(
-  pqPropertyGroupWidget* propertyWidget, QWidget* _parent, Qt::WindowFlags flags)
-  : Superclass(_parent, flags)
+pqLightsEditor::pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* _parent)
+  : Superclass(proxy, smGroup, _parent)
   , Internal(new pqInternal(this))
-  , PropertyWidget(propertyWidget)
 {
   Ui::LightsEditor& ui = *this->Internal;
-  pqPropertyGroupWidget& pg = *PropertyWidget;
+  pqPropertyGroupWidget& pg = *this;
 
   pg.addPropertyLink(ui.LightKit, LIGHT_KIT);
   pg.addPropertyLink(ui.KeyLightWarmth, KEY_LIGHT_WARMTH);
@@ -113,7 +111,12 @@ pqLightsEditor::pqLightsEditor(
   pg.addPropertyLink(ui.LightIntensity, LIGHT_INTENSITY);
   pg.addPropertyLink(ui.LightColor, LIGHT_COLOR);
 
-  connect(ui.Close, SIGNAL(pressed()), this, SLOT(close()));
+  // set pqPropertyWidget links to update VTK immediately on UI change - lights are a display
+  // property
+  links().setUseUncheckedProperties(false);
+  links().setAutoUpdateVTKObjects(true);
+
+  // connect(ui.Close, SIGNAL(pressed()), this, SLOT(close()));
   connect(ui.Reset, SIGNAL(pressed()), this, SLOT(reset()));
 }
 
@@ -130,9 +133,10 @@ void pqLightsEditor::reset()
   BEGIN_UNDO_SET("Restore Default Lights");
   for (int i = 0; i < PROPERTY_COUNT; ++i)
   {
-    vtkSMProperty* _property = this->PropertyWidget->propertyGroup()->GetProperty(PROPERTY_NAME[i]);
+    vtkSMProperty* _property = this->propertyGroup()->GetProperty(PROPERTY_NAME[i]);
     _property->ResetToDefault();
   }
-  emit this->PropertyWidget->changeFinished();
+  proxy()->UpdateVTKObjects();
+  emit this->changeFinished();
   END_UNDO_SET();
 }

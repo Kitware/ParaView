@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkPVLight.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -42,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqLightsEditor.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidget.h"
 #include "pqProxyWidget.h"
@@ -121,6 +123,7 @@ public:
       }
       delete child;
     }
+
     if (this->rview && this->observerTag != 0)
     {
       this->rview->GetProperty("AdditionalLights")->RemoveObserver(this->observerTag);
@@ -137,6 +140,25 @@ public:
     this->Ui.addLight->setEnabled(true);
 
     pqView* pv = pqActiveObjects::instance().activeView();
+    // add new light kit for this view.
+    vtkSMPropertyGroup* lightkitGroup = nullptr;
+    size_t ngroups = view->GetNumberOfPropertyGroups();
+    for (size_t j = 0; j < ngroups; ++j)
+    {
+      vtkSMPropertyGroup* smGroup = view->GetPropertyGroup(j);
+      if (smGroup->GetXMLLabel() == vtkStdString("Lights"))
+      {
+        lightkitGroup = smGroup;
+        break;
+      }
+    }
+    if (lightkitGroup)
+    {
+      pqLightsEditor* lightsEditor = new pqLightsEditor(view, lightkitGroup, self);
+      this->Ui.verticalLayout_2->addWidget(lightsEditor);
+      // whenever a property changes, do a render.
+      self->connect(lightsEditor, SIGNAL(changeFinished()), SLOT(render()));
+    }
     // add new contents
     unsigned int nlights = vtkSMPropertyHelper(view, "AdditionalLights").GetNumberOfElements();
     for (unsigned int i = 0; i < nlights; ++i)
@@ -259,7 +281,8 @@ void pqLightsInspector::addLight()
   // call vtkPVRenderView::AddLight - light saved in "AdditionalLights" list
   vtkSMPropertyHelper(view, "AdditionalLights").Add(light);
 
-  this->Internals->updateLightWidgets();
+  // modification of AdditionalLights already calls this:
+  // this->Internals->updateLightWidgets();
 
   // make it so...
   view->UpdateVTKObjects();
@@ -334,7 +357,8 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   // vtkNew<vtkSMParaViewPipelineController> controller;
   // controller->UnRegisterProxy(lightProxy);
 
-  this->Internals->updateLightWidgets();
+  // modification of AdditionalLights already calls this:
+  // this->Internals->updateLightWidgets();
 
   // make it so...
   view->UpdateVTKObjects();

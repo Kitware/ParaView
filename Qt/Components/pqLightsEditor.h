@@ -32,20 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqLightsEditor_h
 #define pqLightsEditor_h
 
-#include "pqApplicationComponentsModule.h"
-#include <QDialog>
+#include "pqComponentsModule.h" // for exports
+#include "pqPropertyGroupWidget.h"
 
 class vtkSMProxy;
 class vtkSMPropertyGroup;
-class pqPropertyGroupWidget;
 
-class PQAPPLICATIONCOMPONENTS_EXPORT pqLightsEditor : public QDialog
+class PQCOMPONENTS_EXPORT pqLightsEditor : public pqPropertyGroupWidget
 {
   Q_OBJECT
-  typedef QDialog Superclass;
+  typedef pqPropertyGroupWidget Superclass;
 
 public:
-  pqLightsEditor(pqPropertyGroupWidget* propertyWidget, QWidget* parent = 0, Qt::WindowFlags f = 0);
+  pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* parent = 0);
   ~pqLightsEditor() override;
 
 protected slots:
@@ -54,7 +53,6 @@ protected slots:
 private:
   class pqInternal;
   pqInternal* Internal;
-  pqPropertyGroupWidget* PropertyWidget;
 };
 
 #endif

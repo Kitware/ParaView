@@ -61,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInputDataTypeDecorator.h"
 #include "pqInputSelectorWidget.h"
 #include "pqIntMaskPropertyWidget.h"
-#include "pqLightsEditor.h"
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
 #include "pqOSPRayHidingDecorator.h"
@@ -216,12 +215,6 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "BackgroundEditor")
   {
     return new pqBackgroundEditorWidget(proxy, group);
-  }
-  else if (panelWidget == "LightsEditor")
-  {
-    pqPropertyGroupButton* pgb = new pqPropertyGroupButton(proxy, group);
-    pgb->SetEditor(new pqLightsEditor(pgb));
-    return pgb;
   }
   else if (panelWidget == "ArrayStatus")
   {
