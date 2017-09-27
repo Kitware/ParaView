@@ -61,6 +61,7 @@ protected:
   vtksys::RegularExpression* reg_ex3;
   vtksys::RegularExpression* reg_ex4;
   vtksys::RegularExpression* reg_ex5;
+  vtksys::RegularExpression* reg_ex_last;
 
   // Used internall so char * allocations are done automatically.
   vtkSetStringMacro(SequenceName);
