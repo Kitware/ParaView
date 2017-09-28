@@ -21,7 +21,6 @@
 
 vtkSmartPointer<vtkPVRenderViewSettings> vtkPVRenderViewSettings::Instance;
 
-vtkInstantiatorNewMacro(vtkPVRenderViewSettings);
 //----------------------------------------------------------------------------
 vtkPVRenderViewSettings* vtkPVRenderViewSettings::New()
 {
