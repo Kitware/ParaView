@@ -5822,6 +5822,7 @@
                             clean_command="ClearSeriesVisibilities">
         <Documentation>Set the series visibility.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -5829,6 +5830,11 @@
             <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
         </ChartSeriesSelectionDomain>
+        <Hints>
+          <!-- when present, the SeriesEditor widget will allow user to
+          re-order the series which will affect the rendered plot -->
+          <SeriesEditor supports_reordering="1" />
+        </Hints>
       </StringVectorProperty>
       <StringVectorProperty command="SetLabel"
                             clean_command="ClearLabels"
@@ -5837,7 +5843,9 @@
                             number_of_elements_per_command="2"
                             repeat_command="1">
         <Documentation>Set the series labels.</Documentation>
-        <ChartSeriesSelectionDomain name="array_list" default_mode="label">
+        <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
+                                    default_mode="label">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
@@ -5852,7 +5860,9 @@
                             number_of_elements_per_command="4"
                             repeat_command="1">
         <Documentation>Set the series line/bar color.</Documentation>
-        <ChartSeriesSelectionDomain name="array_list" default_mode="color">
+        <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
+                                    default_mode="color">
           <RequiredProperties>
             <Property function="Input" name="Input" />
             <Property function="FieldDataSelection" name="AttributeType" />
@@ -5868,6 +5878,7 @@
                             repeat_command="1">
         <Documentation>Set the series axis corner.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="value"
                                     default_value="0">
           <RequiredProperties>
@@ -6220,6 +6231,7 @@
                             clean_command="ClearSeriesVisibilities">
         <Documentation>Set the series visibility.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -6388,6 +6400,7 @@
                             clean_command="ClearSeriesVisibilities">
         <Documentation>Set the series visibility.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -6409,6 +6422,7 @@
                             clean_command="ClearSeriesColors">
         <Documentation>Set the series box plot color.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="color">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -6576,6 +6590,7 @@
                             clean_command="ClearSeriesVisibilities">
         <Documentation>Set the series visibility.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="visibility">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -6717,6 +6732,7 @@
                             repeat_command="1">
         <Documentation>Set the series line style.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="value"
                                     default_value="1">
           <RequiredProperties>
@@ -6734,6 +6750,7 @@
                             repeat_command="1">
         <Documentation>Set the series line thickness.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="value"
                                     default_value="2">
           <RequiredProperties>
@@ -6751,6 +6768,7 @@
                             repeat_command="1">
         <Documentation>Set the series marker style.</Documentation>
         <ChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="value"
                                     default_value="0">
           <RequiredProperties>
@@ -7362,6 +7380,7 @@
                             repeat_command="1">
         <Documentation>Set the series labels.</Documentation>
         <FunctionalBagChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="label"
                                     flatten_table="false">
           <RequiredProperties>
@@ -7379,6 +7398,7 @@
                             repeat_command="1">
         <Documentation>Set the series line/bar color.</Documentation>
         <FunctionalBagChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="color"
                                     flatten_table="false">
           <RequiredProperties>
@@ -7418,6 +7438,7 @@
                             repeat_command="1">
         <Documentation>Set the series visibility.</Documentation>
         <FunctionalBagChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
                                     default_mode="visibility"
                                     flatten_table="false">
           <RequiredProperties>
@@ -7426,6 +7447,12 @@
             <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
           </RequiredProperties>
         </FunctionalBagChartSeriesSelectionDomain>
+        <Hints>
+          <!-- when present, the SeriesEditor widget will allow user to
+          re-order the series which will affect the rendered plot -->
+          <SeriesEditor supports_reordering="1" />
+        </Hints>
+
       </StringVectorProperty>
 
       <PropertyGroup label="Series Parameters"

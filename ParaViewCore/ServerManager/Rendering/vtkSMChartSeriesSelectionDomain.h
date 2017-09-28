@@ -31,6 +31,11 @@
  * the domain changes preserving status for existing series i.e. it won't affect
  * the state for any series that already set on the property. Thus, it's not a
  * true "reset", but more like "update".
+ *
+ * Supported XML attributes
+ * \li hide_partial_arrays : when set to 1, partial arrays will not be shown in
+ * the domain (default).
+ *
 */
 
 #ifndef vtkSMChartSeriesSelectionDomain_h
@@ -161,6 +166,11 @@ protected:
    * Specify if table components should be split.
    */
   bool FlattenTable;
+
+  /**
+   * Specify if Partial Arrays should be hidden
+   */
+  bool HidePartialArrays;
 
   static bool LoadNoVariables;
 

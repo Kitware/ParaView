@@ -32,10 +32,10 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,8,93" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Source/ProxySelectionWidget/frame/ChosenProxyWidget/Resolution/LineEdit0" command="set_string" arguments="13" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable" command="setCurrent" arguments="2.2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable" command="edit" arguments="2.2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable" command="setCurrent" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable" command="edit" arguments="1.2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="RTData2" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable" command="editAccepted" arguments="2.2,RTData2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/SeriesEditor/SeriesTable" command="editAccepted" arguments="1.2,RTData2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/UseIndexForXAxis/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
