@@ -360,6 +360,7 @@
         { "class": "vtkBillboardTextActor3D" },
         { "class": "vtkCamera" },
         { "class": "vtkCellPicker" },
+        { "class": "vtkCIEDE2000" },
         { "class": "vtkColorTransferFunction" },
         { "class": "vtkCompositeDataDisplayAttributes" },
         { "class": "vtkCoordinate" },
