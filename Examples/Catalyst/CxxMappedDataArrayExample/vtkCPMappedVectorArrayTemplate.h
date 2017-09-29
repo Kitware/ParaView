@@ -26,7 +26,6 @@
 #include "vtkMappedDataArray.h"
 
 #include "vtkObjectFactory.h" // for vtkStandardNewMacro
-#include "vtkTypeTemplate.h"  // For templated vtkObject API
 
 template <class Scalar>
 class vtkCPMappedVectorArrayTemplate : public vtkMappedDataArray<Scalar>
