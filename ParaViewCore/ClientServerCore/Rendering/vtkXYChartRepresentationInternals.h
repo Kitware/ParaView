@@ -32,6 +32,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 
+#include <array>
 #include <map>
 #include <string>
 
@@ -194,6 +195,7 @@ public:
   // we have to keep these separate since they are set by different properties
   // and hence may not always match up.
   std::map<std::string, bool> SeriesVisibilities;
+  std::map<std::string, int> SeriesOrder;
   std::map<std::string, int> LineThicknesses;
   std::map<std::string, int> LineStyles;
   std::map<std::string, vtkColor3d> Colors;
@@ -264,6 +266,8 @@ public:
     PlotsMap newPlots;
     assert(self != NULL);
     vtkChartXY* chartXY = self->GetChart();
+    this->RemoveAllPlots(chartXY);
+    std::multimap<int, std::pair<vtkTable*, std::array<std::string, 3> > > orderMap;
     for (MapOfTables::const_iterator tablesIter = tables.begin(); tablesIter != tables.end();
          ++tablesIter)
     {
@@ -274,23 +278,44 @@ public:
       {
         std::string columnName = table->GetColumnName(cc);
         std::string role = this->GetSeriesRole(tableName, columnName);
-        vtkSmartPointer<vtkPlot> plot =
-          this->SeriesPlots.GetPlot(self, tableName, columnName, role);
+
+        // recover the order of the current table column
+        const int order =
+          this->GetSeriesParameter(self, tableName, columnName, role, this->SeriesOrder, -1);
+
+        // store all info in a (sorted) map
+        std::array<std::string, 3> mapValue;
+        mapValue[0] = tableName;
+        mapValue[1] = columnName;
+        mapValue[2] = role;
+        orderMap.insert(std::make_pair(order, std::make_pair(table, mapValue)));
+      }
+    }
+
+    // for each ordered column
+    for (auto it = orderMap.begin(); it != orderMap.end(); ++it)
+    {
+      vtkTable* table = it->second.first;
+      const std::string& tableName = it->second.second[0];
+      const std::string& columnName = it->second.second[1];
+      const std::string& role = it->second.second[2];
+
+      vtkSmartPointer<vtkPlot> plot = this->SeriesPlots.GetPlot(self, tableName, columnName, role);
+      if (!plot)
+      {
+        // Create the plot in the right order
+        plot = this->NewPlot(self, tableName, columnName, role);
         if (!plot)
         {
-          plot = this->NewPlot(self, tableName, columnName, role);
-          if (!plot)
-          {
-            continue;
-          }
+          continue;
         }
-        plot->SetInputData(table);
-        plot->SetUseIndexForXSeries(self->GetUseIndexForXAxis());
-        plot->SetInputArray(0, self->GetXAxisSeriesName());
-        plot->SetInputArray(this->GetInputArrayIndex(tableName, columnName, role), columnName);
-        this->SeriesPlots.AddPlot(self, tableName, columnName, role, plot);
-        newPlots.AddPlot(self, tableName, columnName, role, plot);
       }
+      plot->SetInputData(table);
+      plot->SetUseIndexForXSeries(self->GetUseIndexForXAxis());
+      plot->SetInputArray(0, self->GetXAxisSeriesName());
+      plot->SetInputArray(this->GetInputArrayIndex(tableName, columnName, role), columnName);
+      this->SeriesPlots.AddPlot(self, tableName, columnName, role, plot);
+      newPlots.AddPlot(self, tableName, columnName, role, plot);
     }
 
     // Remove any plots in this->SeriesPlots that are not in newPlots.

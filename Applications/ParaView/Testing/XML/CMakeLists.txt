@@ -90,9 +90,11 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportFilteredColumnsSpreadsheet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FindWidget.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PartialArrayInLineChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Preview.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SearchBox.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/StringInLineChartView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TableHistogram.xml
 )
 
