@@ -117,6 +117,7 @@
           <Entry text="HSV" value="1" />
           <Entry text="Lab" value="2" />
           <Entry text="Diverging" value="3" />
+          <Entry text="Lab/CIEDE2000" value="4" />
         </EnumerationDomain>
         <Documentation>
           The color space used for interpolation: RGB, HSV, Lab (CIELAB), or
@@ -126,6 +127,8 @@
           (in order the match the current functionality of vtkLookupTable).
           Diverging is a special mode where colors will pass through white when
           interpolating between two saturated colors.
+          In Lab/CIEDE2000 mode, it will take the shortest path in the Lab color
+          space with respect to the CIE Delta E 2000 color distance measure.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseBelowRangeColor"
@@ -930,6 +933,8 @@
                  value="2" />
           <Entry text="Diverging"
                  value="3" />
+          <Entry text="Lab/CIEDE2000"
+                 value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
