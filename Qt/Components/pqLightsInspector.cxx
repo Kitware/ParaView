@@ -114,6 +114,15 @@ public:
 
     // clear current contents
     QLayoutItem* child;
+    child = this->Ui.verticalLayout->itemAt(0);
+    // is this a lightkit widget?
+    if (child->widget() && child->widget()->objectName() == "LightsEditor")
+    {
+      child = this->Ui.verticalLayout->takeAt(0);
+      child->widget()->setParent(0);
+      delete child->widget();
+      delete child;
+    }
     while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
     {
       if (child->widget())
@@ -155,7 +164,7 @@ public:
     if (lightkitGroup)
     {
       pqLightsEditor* lightsEditor = new pqLightsEditor(view, lightkitGroup, self);
-      this->Ui.verticalLayout_2->addWidget(lightsEditor);
+      this->Ui.verticalLayout->insertWidget(0, lightsEditor);
       // whenever a property changes, do a render.
       self->connect(lightsEditor, SIGNAL(changeFinished()), SLOT(render()));
     }
