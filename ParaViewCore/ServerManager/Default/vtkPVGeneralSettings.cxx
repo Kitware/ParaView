@@ -31,7 +31,6 @@
 
 vtkSmartPointer<vtkPVGeneralSettings> vtkPVGeneralSettings::Instance;
 
-vtkInstantiatorNewMacro(vtkPVGeneralSettings);
 //----------------------------------------------------------------------------
 vtkPVGeneralSettings* vtkPVGeneralSettings::New()
 {
