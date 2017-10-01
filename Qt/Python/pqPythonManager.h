@@ -46,7 +46,7 @@ class pqPythonDialog;
 * pqPythonManager is a class to facilitate the use of a python interpreter
 * by various paraview GUI components.
 *
-* @section Roadmap
+* @section Roadmap Roadmap
 *
 * pqPythonManager is slated for deprecation. It's unclear there's a need for
 * such a manager anymore since Python interpreter is globally accessible via

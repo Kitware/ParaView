@@ -26,7 +26,7 @@
  * vtkSubsetInclusionLattice and instead simply generate a vtkGraph for
  * representing the SIL.
  *
- * @section Example Server-Manager configuration XML
+ * @section ExampleServerManagerXML Example Server-Manager configuration XML
  *
  * @code{xml}
  *  <StringVectorProperty ...>
@@ -44,7 +44,7 @@
  * vtkSMSubsetInclusionLatticeDomain supports that following attributes that can
  * be specified in the XML configuration for the domain.
  *
- * @subsection Class class
+ * @subsection ClassAttribute class attribute
  *
  * vtkSubsetInclusionLattice is the default, if not specified. However readers
  * often create subclasses for vtkSubsetInclusionLattice that make it easier to
@@ -52,7 +52,7 @@
  * `vtkCGNSSubsetInclusionLattice`. To indicate to the domain to create a
  * specific subclass, one can use the `class` attribute.
  *
- * @subsection DefaultPath default_path
+ * @subsection DefaultPathAttribute default_path attribute
  *
  * `default_path` attribute can be set to a string that defines a path to use to
  * select nodes by default. If not empty, same as calling

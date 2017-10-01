@@ -100,7 +100,7 @@ public:
 /**
  * A walker to build a selection-path map comprising of status for all leaf nodes.
  *
- * @section How to define selection
+ * @section DefineSelection How to define selection
  *
  * I have not been able to decide which is the best way to define the selection.
  * Is the user interested in preserving the state for a non-leaf node he toggled

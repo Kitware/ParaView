@@ -27,7 +27,7 @@
  * information property typically uses the vtkSMSILInformationHelper which is
  * used to access the SIL if requested by using GetSIL().
  *
- * @section Legacy Warning
+ * @section vtkSMSILDomainLegacyWarning Legacy Warning
  *
  * While not deprecated, this class exists to support readers that use legacy
  * representation for SIL which used a `vtkGraph` to represent the SIL. It is
