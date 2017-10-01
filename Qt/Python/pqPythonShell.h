@@ -49,7 +49,7 @@ class pqConsoleWidget;
 * application wide global Python interpreter, it just keeps the context separate
 * using an instance of `core.InteractiveConsole` internally.
 *
-* @section Python initialization
+* @section PythonInit Python initialization
 *
 * pqPythonShell does not initialize Python on creation. By default, it waits
 * till the pqConsoleWidget gets focus or `pqPythonShell::executeScript` is

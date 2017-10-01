@@ -31,7 +31,7 @@
  * \li vtkCommand::UpdateDataEvent -- fired when the check state of any element
  * changes. calldata = vertexid for the element whose check state changed.
  *
- * @section Legacy Warning
+ * @section vtkSMSILModelLegacyWarning Legacy Warning
  *
  * While not deprecated, this class exists to support readers that use legacy
  * representation for SIL which used a `vtkGraph` to represent the SIL. It is
