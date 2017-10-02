@@ -564,6 +564,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     list(APPEND TESTS_WITH_BASELINES
       ${CMAKE_CURRENT_SOURCE_DIR}/ExodusModeShapes.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataSelectLocation.xml # find data needs python/numpy
+      ${CMAKE_CURRENT_SOURCE_DIR}/FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       ${CMAKE_CURRENT_SOURCE_DIR}/ForceTimeDiamond.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridCellBlanking.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml)
