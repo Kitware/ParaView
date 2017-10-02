@@ -18,7 +18,6 @@ if(NOT Module_vtkAcceleratorsVTKm)
 endif()
 
 add_paraview_plugin(VTKmFilters "0.1"
-  REQUIRED_ON_CLIENT
   REQUIRED_ON_SERVER
   SERVER_MANAGER_XML VTKmSM.xml
   )
