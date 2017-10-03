@@ -107,7 +107,7 @@ pqLightsEditor::pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, Q
   links().setAutoUpdateVTKObjects(true);
 
   // connect(ui.Close, SIGNAL(pressed()), this, SLOT(close()));
-  connect(ui.Reset, SIGNAL(pressed()), this, SLOT(reset()));
+  connect(ui.Reset, SIGNAL(pressed()), this, SLOT(resetLights()));
 }
 
 //-----------------------------------------------------------------------------
@@ -118,7 +118,7 @@ pqLightsEditor::~pqLightsEditor()
 }
 
 //-----------------------------------------------------------------------------
-void pqLightsEditor::reset()
+void pqLightsEditor::resetLights()
 {
   BEGIN_UNDO_SET("Restore Default Lights");
   for (int i = 0; i < PROPERTY_COUNT; ++i)

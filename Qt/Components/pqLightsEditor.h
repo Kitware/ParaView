@@ -48,7 +48,7 @@ public:
   ~pqLightsEditor() override;
 
 protected slots:
-  void reset();
+  void resetLights();
 
 private:
   class pqInternal;

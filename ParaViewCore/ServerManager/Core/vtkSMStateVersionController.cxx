@@ -612,7 +612,7 @@ struct Process_5_4_to_5_5
   bool operator()(xml_document& document)
   {
     return LockScalarRange(document) && CalculatorAttributeMode(document) &&
-      CGNSReaderUpdates(document);
+      CGNSReaderUpdates(document) && HeadlightToAdditionalLight(document);
   }
 
   bool LockScalarRange(xml_document& document)
@@ -759,6 +759,146 @@ struct Process_5_4_to_5_5
         eNode.append_attribute("index").set_value(index++);
         eNode.append_attribute("value").set_value(1);
       }
+    }
+    return true;
+  }
+
+  /** Translate the fixed single headlight into a configurable light with the same properties
+  */
+  bool HeadlightToAdditionalLight(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes =
+      document.select_nodes("//ServerManagerState/Proxy[@group='views' and @type='RenderView']");
+
+    pugi::xml_node smstate = document.root().child("ServerManagerState");
+    pugi::xml_node links = smstate.child("Links");
+
+    if (!links)
+    {
+      links = smstate.append_child("Links");
+    }
+
+    for (auto xnode : proxy_nodes)
+    {
+      auto proxyNode = xnode.node();
+      std::string id_string(proxyNode.attribute("id").value());
+      auto switchNode = proxyNode.select_single_node("//Property[@name='LightSwitch']");
+      if (!switchNode)
+      {
+        // state is already newer.
+        continue;
+      }
+      // If the property LightSwitch is on, we add a light
+      if (switchNode.node().child("Element").attribute("value").as_int() == 1)
+      {
+        // add a proxy group to the SM, with one headlight, with intensity and color set
+        // get the old color and intensity. Diffuse color was set by the UI.
+        double diffuseR = 1, diffuseG = 1, diffuseB = 1;
+        double intensity = 1;
+        auto colorNode =
+          proxyNode.select_single_node("//Property[@name='LightDiffuseColor']").node();
+        if (colorNode)
+        {
+          auto colorElt = colorNode.child("Element");
+          diffuseR = colorElt.attribute("value").as_double();
+          colorElt = colorElt.next_sibling("Element");
+          diffuseG = colorElt.attribute("value").as_double();
+          colorElt = colorElt.next_sibling("Element");
+          diffuseB = colorElt.attribute("value").as_double();
+        }
+        auto intensityNode =
+          proxyNode.select_single_node("//Property[@name='LightIntensity']").node();
+        if (intensityNode)
+        {
+          auto intensityElt = intensityNode.child("Element");
+          intensity = intensityElt.attribute("value").as_double();
+        }
+        // Here's the full structure, we will ignore the default values and domains.
+        // <Proxy group="additional_lights" type="Light" id="8232" servers="21">
+        //   <Property name="DiffuseColor" id="8232.DiffuseColor" number_of_elements="3">
+        //     <Element index="0" value="1"/>
+        //     <Element index="1" value="1"/>
+        //     <Element index="2" value="1"/>
+        //     <Domain name="range" id="8232.DiffuseColor.range"/>
+        //   </Property>
+        //   <Property name="LightIntensity" id="8232.LightIntensity" number_of_elements="1">
+        //     <Element index="0" value="1"/>
+        //     <Domain name="range" id="8232.LightIntensity.range"/>
+        //   </Property>
+        //   <Property name="LightSwitch" id="8232.LightSwitch" number_of_elements="1">
+        //     <Element index="0" value="1"/>
+        //     <Domain name="bool" id="8232.LightSwitch.bool"/>
+        //   </Property>
+        //   <Property name="LightType" id="8232.LightType" number_of_elements="1">
+        //     <Element index="0" value="1"/>
+        //     <Domain name="enum" id="8232.LightType.enum">
+        //       <Entry value="1" text="Headlight"/>
+        //       <Entry value="2" text="Camera"/>
+        //       <Entry value="3" text="Scene"/>
+        //       <Entry value="4" text="Ambient"/>
+        //     </Domain>
+        //   </Property>
+        // </Proxy>
+        vtkTypeUInt32 proxyId = this->Session->GetNextGlobalUniqueIdentifier();
+        std::ostringstream stream;
+        stream << "<Proxy group=\"additional_lights\" type=\"Light\" id=\"" << proxyId
+               << "\" servers=\"21\" >\n";
+        stream << "  <Property name=\"DiffuseColor\" id=\"" << proxyId
+               << ".DiffuseColor\" number_of_elements=\"3\" >\n";
+        stream << "    <Element index=\"" << 0 << "\" value=\"" << diffuseR << "\"/>\n";
+        stream << "    <Element index=\"" << 1 << "\" value=\"" << diffuseG << "\"/>\n";
+        stream << "    <Element index=\"" << 2 << "\" value=\"" << diffuseB << "\"/>\n";
+        stream << "  </Property>\n";
+        stream << "  <Property name=\"LightIntensity\" id=\"" << proxyId
+               << ".LightIntensity\" number_of_elements=\"1\" >\n";
+        stream << "    <Element index=\"" << 0 << "\" value=\"" << intensity << "\"/>\n";
+        stream << "  </Property>\n";
+        stream << "  <Property name=\"LightType\" id=\"" << proxyId
+               << ".LightType\" number_of_elements=\"1\" >\n";
+        stream << "    <Element index=\"" << 0 << "\" value=\"1\"/>\n";
+        stream << "  </Property>\n";
+        stream << "</Proxy>\n";
+        // and a proxy collection to the SMS
+        // <ProxyCollection name="additional_lights">
+        //   <Item id="8232" name="Light1"/>
+        // </ProxyCollection>
+        stream << "<ProxyCollection name=\"additional_lights\" >\n";
+        stream << "  <Item id=\"" << proxyId << "\" name=\"Light1\"/>\n";
+        stream << "</ProxyCollection>\n";
+
+        std::string buffer = stream.str();
+        if (!smstate.append_buffer(buffer.c_str(), buffer.size()))
+        {
+          // vtkWarningMacro("Unable to add new light to match deprecated headlight. "
+          //   "Add a light manually in the Lights Inspector.");
+        }
+
+        // add a proxy property to this view for the light
+        // <Property name="AdditionalLights" id="8135.AdditionalLights" number_of_elements="1">
+        //   <Proxy value="8232"/>
+        // </Property>
+        auto additionalLightsNode =
+          proxyNode.select_single_node("//Property[@name='AdditionalLights']").node();
+        if (!additionalLightsNode)
+        {
+          additionalLightsNode = proxyNode.append_child("Property");
+          additionalLightsNode.append_attribute("name").set_value("AdditionalLights");
+          std::ostringstream stream2;
+          stream2 << id_string << ".AdditionalLights";
+          additionalLightsNode.append_attribute("id").set_value(stream2.str().c_str());
+        }
+        additionalLightsNode.append_attribute("number_of_elements").set_value(1);
+        additionalLightsNode.append_child("Proxy").append_attribute("value").set_value(proxyId);
+      }
+      // Remove the old fixed-light properties:
+      // LightDiffuseColor, LightAmbientColor, LightSpecularColor,
+      // LightIntensity, LightSwitch, LightType
+      PurgeElements(proxyNode.select_nodes("//Property[@name='LightDiffuseColor' "
+                                           "or @name='LightAmbientColor' "
+                                           "or @name='LightSpecularColor' "
+                                           "or @name='LightIntensity' "
+                                           "or @name='LightSwitch' "
+                                           "or @name='LightType']"));
     }
     return true;
   }
