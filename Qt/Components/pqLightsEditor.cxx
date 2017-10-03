@@ -68,17 +68,11 @@ const char* HEAD_LIGHT_WARMTH = "HeadLightWarmth";
 const char* HEAD_LIGHT_K_H_RATIO = "HeadLightK:H Ratio";
 const char* MAINTAIN_LUMINANCE = "MaintainLuminance";
 
-const char* LIGHT = "LightSwitch";
-const char* LIGHT_INTENSITY = "LightIntensity";
-const char* LIGHT_COLOR = "LightDiffuseColor";
-
 const char* PROPERTY_NAME[] = { LIGHT_KIT, KEY_LIGHT_WARMTH, KEY_LIGHT_INTENSITY,
   KEY_LIGHT_ELEVATION, KEY_LIGHT_AZIMUTH, FILL_LIGHT_WARMTH, FILL_LIGHT_K_F_RATIO,
   FILL_LIGHT_ELEVATION, FILL_LIGHT_AZIMUTH, BACK_LIGHT_WARMTH, BACK_LIGHT_K_B_RATIO,
   BACK_LIGHT_ELEVATION, BACK_LIGHT_AZIMUTH, HEAD_LIGHT_WARMTH, HEAD_LIGHT_K_H_RATIO,
-  MAINTAIN_LUMINANCE,
-
-  LIGHT, LIGHT_INTENSITY, LIGHT_COLOR };
+  MAINTAIN_LUMINANCE };
 const int PROPERTY_COUNT = sizeof(PROPERTY_NAME) / sizeof(PROPERTY_NAME[0]);
 }
 
@@ -106,10 +100,6 @@ pqLightsEditor::pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, Q
   pg.addPropertyLink(ui.HeadLightWarmth, HEAD_LIGHT_WARMTH);
   pg.addPropertyLink(ui.HeadLightK_H_Ratio, HEAD_LIGHT_K_H_RATIO);
   pg.addPropertyLink(ui.MaintainLuminance, MAINTAIN_LUMINANCE);
-
-  pg.addPropertyLink(ui.Light, LIGHT);
-  pg.addPropertyLink(ui.LightIntensity, LIGHT_INTENSITY);
-  pg.addPropertyLink(ui.LightColor, LIGHT_COLOR);
 
   // set pqPropertyWidget links to update VTK immediately on UI change - lights are a display
   // property
