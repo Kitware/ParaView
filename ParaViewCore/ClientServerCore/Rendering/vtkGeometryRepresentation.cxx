@@ -382,6 +382,25 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     bool lod = this->SuppressLOD ? false : (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
     this->Actor->SetEnableLOD(lod ? 1 : 0);
     this->UpdateColoringParameters();
+
+    auto data = producerPort->GetProducer()->GetOutputDataObject(0);
+    if (this->BlockAttributeTime < data->GetMTime() || this->BlockAttrChanged)
+    {
+      this->UpdateBlockAttributes(this->Mapper);
+      this->BlockAttributeTime.Modified();
+      this->BlockAttrChanged = false;
+
+      // This flag makes the following LOD render requests to also update the block
+      // attribute state, if there were any changes.
+      this->UpdateBlockAttrLOD = true;
+    }
+
+    // Make following (LOD) render request to update.
+    if (lod && this->UpdateBlockAttrLOD)
+    {
+      this->UpdateBlockAttributes(this->LODMapper);
+      this->UpdateBlockAttrLOD = false;
+    }
   }
 
   return 1;
@@ -443,8 +462,6 @@ int vtkGeometryRepresentation::RequestUpdateExtent(
 int vtkGeometryRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // cout << this << ":" << this->DebugString << ":RequestData" << endl;
-
   vtkMath::UninitializeBounds(this->DataBounds);
 
   // Pass caching information to the cache keeper.
@@ -892,100 +909,92 @@ void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockVisibility(unsigned int index, bool visible)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
-  {
-    cpm->SetBlockVisibility(index, visible);
-  }
+  this->BlockVisibilities[index] = visible;
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
 bool vtkGeometryRepresentation::GetBlockVisibility(unsigned int index) const
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  auto it = this->BlockVisibilities.find(index);
+  if (it == this->BlockVisibilities.cend())
   {
-    return cpm->GetBlockVisibility(index);
+    return true;
   }
-  return true;
+  return it->second;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockVisibility(unsigned int index, bool)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  auto it = this->BlockVisibilities.find(index);
+  if (it == this->BlockVisibilities.cend())
   {
-    cpm->RemoveBlockVisibility(index);
+    return;
   }
+  this->BlockVisibilities.erase(it);
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockVisibilities()
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
-  {
-    cpm->RemoveBlockVisibilites();
-  }
+  this->BlockVisibilities.clear();
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockColor(unsigned int index, double r, double g, double b)
 {
-  double color[3] = { r, g, b };
-  this->SetBlockColor(index, color);
+  std::array<double, 3> color = { { r, g, b } };
+  this->BlockColors[index] = color;
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockColor(unsigned int index, double* color)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  if (color)
   {
-    cpm->SetBlockColor(index, color);
+    this->SetBlockColor(index, color[0], color[1], color[2]);
   }
 }
 
 //----------------------------------------------------------------------------
 double* vtkGeometryRepresentation::GetBlockColor(unsigned int index)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  auto it = this->BlockColors.find(index);
+  if (it == this->BlockColors.cend())
   {
-    cpm->GetBlockColor(index);
+    return nullptr;
   }
-  return NULL;
+  return it->second.data();
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockColor(unsigned int index)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  auto it = this->BlockColors.find(index);
+  if (it == this->BlockColors.cend())
   {
-    cpm->RemoveBlockColor(index);
+    return;
   }
+  this->BlockColors.erase(it);
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockColors()
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
-  {
-    cpm->RemoveBlockColors();
-  }
+  this->BlockColors.clear();
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockOpacity(unsigned int index, double opacity)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
-  {
-    cpm->SetBlockOpacity(index, opacity);
-  }
+  this->BlockOpacities[index] = opacity;
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1000,31 +1009,61 @@ void vtkGeometryRepresentation::SetBlockOpacity(unsigned int index, double* opac
 //----------------------------------------------------------------------------
 double vtkGeometryRepresentation::GetBlockOpacity(unsigned int index)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  auto it = this->BlockOpacities.find(index);
+  if (it == this->BlockOpacities.cend())
   {
-    return cpm->GetBlockOpacity(index);
+    return 0.0;
   }
-  return 0.0;
+  return it->second;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockOpacity(unsigned int index)
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  auto it = this->BlockOpacities.find(index);
+  if (it == this->BlockOpacities.cend())
   {
-    cpm->RemoveBlockOpacity(index);
+    return;
   }
+  this->BlockOpacities.erase(it);
+  this->BlockAttrChanged = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::RemoveBlockOpacities()
 {
-  vtkCompositePolyDataMapper2* cpm = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  if (cpm)
+  this->BlockOpacities.clear();
+  this->BlockAttrChanged = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::UpdateBlockAttributes(vtkMapper* mapper)
+{
+  auto cpm = vtkCompositePolyDataMapper2::SafeDownCast(mapper);
+  if (!cpm)
   {
-    cpm->RemoveBlockOpacities();
+    vtkErrorMacro(<< "Invalid mapper!");
+    return;
+  }
+
+  cpm->RemoveBlockVisibilities();
+  for (auto const& item : this->BlockVisibilities)
+  {
+    cpm->SetBlockVisibility(item.first, item.second);
+  }
+
+  cpm->RemoveBlockColors();
+  for (auto const& item : this->BlockColors)
+  {
+    auto& arr = item.second;
+    double color[3] = { arr[0], arr[1], arr[2] };
+    cpm->SetBlockColor(item.first, color);
+  }
+
+  cpm->RemoveBlockOpacities();
+  for (auto const& item : this->BlockOpacities)
+  {
+    cpm->SetBlockOpacity(item.first, item.second);
   }
 }
 
