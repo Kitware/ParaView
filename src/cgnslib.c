@@ -343,8 +343,8 @@ int cg_open(const char *filename, int mode, int *file_number)
     float FileVersion;
 
 #ifdef __CG_MALLOC_H__
-    fprintf(stderr, "before open:files %d/%d: memory %d/%d\n", n_open,
-        cgns_file_size, cgmemnow(), cgmemmax());
+    fprintf(stderr, "CGNS MEM_DEBUG: before open:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
+	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
     /* check file mode */
@@ -504,8 +504,8 @@ int cg_open(const char *filename, int mode, int *file_number)
     }
 
 #ifdef __CG_MALLOC_H__
-    fprintf(stderr, "after  open:files %d/%d: memory %d/%d\n", n_open,
-        cgns_file_size, cgmemnow(), cgmemmax());
+    fprintf(stderr, "CGNS MEM_DEBUG: after  open:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
+	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
     return CG_OK;
@@ -622,8 +622,8 @@ int cg_close(int file_number)
     if (cg == 0) return CG_ERROR;
 
 #ifdef __CG_MALLOC_H__
-    fprintf(stderr, "before close:files %d/%d: memory %d/%d\n", n_open,
-        cgns_file_size, cgmemnow(), cgmemmax());
+    fprintf(stderr, "CGNS MEM_DEBUG: before close:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
+	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
     if (cgns_compress && cg->mode == CG_MODE_MODIFY &&
@@ -657,8 +657,8 @@ int cg_close(int file_number)
     }
 
 #ifdef __CG_MALLOC_H__
-    fprintf(stderr, "after  close:files %d/%d: memory %d/%d\n",
-        n_open, cgns_file_size, cgmemnow(), cgmemmax());
+    fprintf(stderr, "CGNS MEM_DEBUG: after  close:files %d/%d: memory %d/%d: calls %d/%d\n", n_open,
+	    cgns_file_size, cgmemnow(), cgmemmax(), cgalloccalls(), cgfreecalls());
 #endif
 
 #ifdef DEBUG_HDF5_OBJECTS_CLOSE
@@ -708,11 +708,6 @@ int cg_set_file_type(int file_type)
 #endif
         }
 #ifdef BUILD_HDF5
-#ifdef BUILD_PARALLEL
-	else if (*type == '4' || *type == 'p' || *type == 'P') {
-            cgns_filetype = CG_FILE_PHDF5;
-        }
-#endif
 	else if (*type == '2' || *type == 'h' || *type == 'H') {
             cgns_filetype = CG_FILE_HDF5;
         }
@@ -2381,7 +2376,7 @@ int cg_coord_write(int file_number, int B, int Z, CGNS_ENUMT(DataType_t) type,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zcoor->id, hid);
       if (hid == 0) {
@@ -2511,7 +2506,7 @@ int cg_coord_partial_write(int file_number, int B, int Z,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zcoor->id, hid);
       if (hid == 0) {
@@ -2543,7 +2538,7 @@ static int adf2_check_elems(CGNS_ENUMT(ElementType_t) type,
     if (type < CGNS_ENUMV(NODE) || type > CGNS_ENUMV(MIXED)) {
         cgi_error("Element type %s not supported in ADF2.",
             cg_ElementTypeName(type));
-        return 1;
+        return CG_ERROR;
     }
     if (type == CGNS_ENUMV(MIXED)) {
         int npe;
@@ -2553,13 +2548,13 @@ static int adf2_check_elems(CGNS_ENUMT(ElementType_t) type,
             if (type < CGNS_ENUMV(NODE) || type >= CGNS_ENUMV(MIXED)) {
                 cgi_error("Element type %s not supported in ADF2.",
                     cg_ElementTypeName(type));
-                return 1;
+                return CG_ERROR;
             }
-            if (cg_npe(type, &npe) || npe <= 0) return 1;
+            if (cg_npe(type, &npe) || npe <= 0) return CG_ERROR;
             elems += npe;
         }
     }
-    return 0;
+    return CG_OK;
 }
 
 static void free_element_data(cgns_section *section)
@@ -2578,15 +2573,15 @@ static int read_element_data(cgns_section *section)
         section->connect->data = malloc(cnt * sizeof(cgsize_t));
         if (section->connect->data == NULL) {
             cgi_error("malloc failed for element data");
-            return 1;
+            return CG_ERROR;
         }
         if (cgi_read_int_data(section->connect->id,
                 section->connect->data_type, cnt, section->connect->data)) {
             free_element_data(section);
-            return 1;
+            return CG_ERROR;
         }
     }
-    return 0;
+    return CG_OK;
 }
 
 static void free_parent_data(cgns_section *section)
@@ -2611,48 +2606,48 @@ static int read_parent_data(cgns_section *section)
             section->parelem->data = malloc(cnt * sizeof(cgsize_t));
             if (section->parelem->data == NULL) {
                 cgi_error("malloc failed for ParentData data");
-                return 1;
+                return CG_ERROR;
             }
             if (cgi_read_int_data(section->parelem->id,
                 section->parelem->data_type, cnt, section->parelem->data)) {
                 free_parent_data(section);
-                return 1;
+                return CG_ERROR;
             }
         }
-        return 0;
+        return CG_OK;
     }
     if (section->parelem->dim_vals[0] != section->parface->dim_vals[0] ||
         section->parelem->dim_vals[1] != 2 ||
         section->parface->dim_vals[1] != 2) {
         cgi_error("mismatch in ParentElements and ParentElementsPosition data sizes");
-        return 1;
+        return CG_ERROR;
     }
     cnt = section->parelem->dim_vals[0] * 2;
     if (section->parelem->data == NULL) {
         section->parelem->data = malloc(cnt * sizeof(cgsize_t));
         if (section->parelem->data == NULL) {
             cgi_error("malloc failed for ParentElements data");
-            return 1;
+            return CG_ERROR;
         }
         if (cgi_read_int_data(section->parelem->id,
                 section->parelem->data_type, cnt, section->parelem->data)) {
             free_parent_data(section);
-            return 1;
+            return CG_ERROR;
         }
     }
     if (section->parface->data == NULL) {
         section->parface->data = malloc(cnt * sizeof(cgsize_t));
         if (section->parface->data == NULL) {
             cgi_error("malloc failed for ParentElementsPosition data");
-            return 1;
+            return CG_ERROR;
         }
         if (cgi_read_int_data(section->parface->id,
                 section->parface->data_type, cnt, section->parface->data)) {
             free_parent_data(section);
-            return 1;
+            return CG_ERROR;
         }
     }
-    return 0;
+    return CG_OK;
 }
 
 /*----------------------------------------------------------------------*/
@@ -5104,7 +5099,7 @@ int cg_hole_write(int file_number, int B, int Z, const char * holename,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zconn->id, hid);
       if (hid==0) {
@@ -5528,7 +5523,7 @@ int cg_conn_write(int file_number, int B, int Z,  const char * connectname,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zconn->id, hid);
       if (hid==0) {
@@ -5917,7 +5912,7 @@ int cg_1to1_write(int file_number, int B, int Z, const char * connectname,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zconn->id, hid);
       if (hid==0) {
@@ -6224,7 +6219,7 @@ int cg_boco_write(int file_number, int B, int Z, const char * boconame,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(zboco->id, hid);
       if (hid==0) {
@@ -7227,7 +7222,7 @@ int cg_bc_wallfunction_write(int file_number, int B, int Z, int BC,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(bprop->id, hid);
       if (hid==0) {
@@ -7386,7 +7381,7 @@ int cg_bc_area_write(int file_number, int B, int Z, int BC,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(bprop->id, hid);
       if (hid==0) {
@@ -7542,7 +7537,7 @@ int cg_conn_periodic_write(int file_number, int B, int Z, int I,
      }
    }
 #ifdef BUILD_HDF5
-   else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+   else if (cg->filetype == CGIO_FILE_HDF5) {
      hid_t hid;
      to_HDF_ID(cprop->id, hid);
      if (hid==0) {
@@ -7653,7 +7648,7 @@ int cg_conn_average_write(int file_number, int B, int Z, int I,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(cprop->id, hid);
       if (hid==0) {
@@ -7807,7 +7802,7 @@ int cg_1to1_periodic_write(int file_number, int B, int Z, int I,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(cprop->id, hid);
       if (hid==0) {
@@ -7925,7 +7920,7 @@ int cg_1to1_average_write(int file_number, int B, int Z, int I,
       }
     }
 #ifdef BUILD_HDF5
-    else if (cg->filetype == CGIO_FILE_HDF5 || cg->filetype == CGIO_FILE_PHDF5) {
+    else if (cg->filetype == CGIO_FILE_HDF5) {
       hid_t hid;
       to_HDF_ID(cprop->id, hid);
       if (hid==0) {
@@ -8916,7 +8911,7 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
 	  ModelType!=CGNS_ENUMV( Interpolated ) && ModelType!=CGNS_ENUMV( Constant )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
-            return 1;
+            return CG_ERROR;
         }
     }
     else if (strcmp(ModelLabel, "EMMagneticFieldModel_t")==0) {
@@ -8925,7 +8920,7 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
 	  ModelType!=CGNS_ENUMV( Constant )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
-            return 1;
+            return CG_ERROR;
         }
     }
     else if (strcmp(ModelLabel, "EMConductivityModel_t")==0) {
@@ -8935,7 +8930,7 @@ int cg_model_write(const char * ModelLabel, CGNS_ENUMT(ModelType_t) ModelType)
 	  ModelType!=CGNS_ENUMV( Chemistry_LinRessler )) {
             cgi_error("Model Type '%s' is not supported for %s",
                 ModelTypeName[ModelType],ModelLabel);
-            return 1;
+            return CG_ERROR;
         }
     }
 
@@ -9958,7 +9953,7 @@ int cg_expfull_read(void *exponents)
     if(exponent->nexps != 8)
     {
 	cgi_error("Full set of exponents not written, use cg_exponents_read.");
-        return 1;
+        return CG_ERROR;
     }*/
 
     if (cgi_datatype(exponent->data_type)==CGNS_ENUMV( RealSingle )) {
@@ -11563,7 +11558,7 @@ int cg_delete_node(const char *node_name)
                 strcmp(parent->dataset[n].name, node_name); n++);
             if (n == parent->ndataset) {
                 cgi_error("Error in cg_delete: Can't find node '%s'",node_name);
-                return 1;
+                return CG_ERROR;
             }
             if (parent->dataset[n].ptset == parent->ptset)
                 parent->dataset[n].ptset = 0;

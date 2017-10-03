@@ -39,6 +39,9 @@
 #define CG_MAX_INT32 0x7FFFFFFF
 #ifdef _WIN32
 # define CG_LONG_T __int64
+#ifdef CG_BUILD_64BIT
+#define stat _stat32i64
+#endif
 #else
 # define CG_LONG_T @CGLONGT@
 #endif
@@ -55,6 +58,10 @@
 /* Determine if hdf5 has multi-dataset read/write capabilities */
 
 #define HDF5_HAVE_MULTI_DATASETS @HDF5_HAVE_MULTI_DATASETS@
+
+/* Determine if hdf5 has collective metadata APIs  */
+
+#define HDF5_HAVE_COLL_METADATA @HDF5_HAVE_COLL_METADATA@
 
 #endif
 

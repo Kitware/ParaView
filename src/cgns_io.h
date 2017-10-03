@@ -33,7 +33,7 @@
 #include "cgnstypes.h"
 
 #if defined(_WIN32) && defined(BUILD_DLL)
-# define CGEXTERN extern _declspec(dllexport)
+# define CGEXTERN extern __declspec(dllexport)
 #else
 # define CGEXTERN extern
 #endif
@@ -49,7 +49,6 @@
 #define CGIO_FILE_ADF    1
 #define CGIO_FILE_HDF5   2
 #define CGIO_FILE_ADF2   3
-#define CGIO_FILE_PHDF5  4
 
 /* currently these are the same as for ADF */
 
