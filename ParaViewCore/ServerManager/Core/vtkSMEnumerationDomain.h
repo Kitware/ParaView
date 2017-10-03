@@ -31,6 +31,9 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
+#include <utility> // for std::pair
+#include <vector>  //  for std::vector
+
 struct vtkSMEnumerationDomainInternals;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
@@ -114,6 +117,12 @@ public:
    * enumeration, if not it will be set to the first enumeration value.
    */
   int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+
+  /**
+   * Returns a vector of pairs for entries in the enumeration domain.
+   * This makes it easier to iterate over entries.
+   */
+  const std::vector<std::pair<std::string, int> >& GetEntries() const;
 
 protected:
   vtkSMEnumerationDomain();
