@@ -20,6 +20,8 @@
  * has no cells or points, it does not have arrays either.  The writers
  * get confused.  This filter creates empty arrays on node zero if there
  * are no cells or points in that partition.
+ * This filter can also handle vtkTable by letting them pass through it
+ * without modification.
 */
 
 #ifndef vtkCompleteArrays_h
@@ -34,7 +36,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkCompleteArrays : public vtkDataSetAlgo
 {
 public:
   vtkTypeMacro(vtkCompleteArrays, vtkDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkCompleteArrays* New();
 
   //@{
@@ -49,8 +51,24 @@ protected:
   vtkCompleteArrays();
   ~vtkCompleteArrays() override;
 
+  /**
+   * Set the input type of the algorithm to vtkDataSet and vtkTable.
+   */
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+
+  /**
+   * Set the output type of the algorithm to vtkDataObject.
+   */
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
+
+  /**
+   * Generate an output of the same type as the input.
+   */
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   vtkMultiProcessController* Controller;
 
 private:
