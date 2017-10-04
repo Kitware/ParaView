@@ -159,14 +159,15 @@ vtkSmartPointer<vtkRenderWindow> vtkPVRenderingCapabilitiesInformation::NewOffsc
 #elif defined(VTK_OPENGL_HAS_OSMESA)
   window.TakeReference(vtkOSOpenGLRenderWindow::New());
 #endif
-  assert(window == nullptr || window->GetOffScreenRendering() == 1);
-
   if (!window)
   {
     // if not, let VTK create a default based on CMake flags specified.
     window = vtkSmartPointer<vtkRenderWindow>::New();
-    window->SetOffScreenRendering(1); // we want to keep the window unmapped.
   }
+
+  window->SetOffScreenRendering(1); // we want to keep the window unmapped.
+  // this should be largely unnecessary, but vtkRenderWindow subclasses
+  // are fairly inconsistent about this so let's just set it always.
 
   return window;
 }
