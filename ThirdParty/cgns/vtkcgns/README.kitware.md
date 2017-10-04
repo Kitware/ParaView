@@ -16,3 +16,4 @@ process.
       users; and
     - building and installing via ParaView's mechanisms.
   * Mangle all exported symbols to have a `vtkcgns_` prefix.
+  * Remove build status badges from the readme.

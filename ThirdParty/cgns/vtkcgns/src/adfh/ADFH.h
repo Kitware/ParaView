@@ -176,7 +176,7 @@
 ***********************************************************************/
 
 #if defined(_WIN32) && defined(BUILD_DLL)
-# define EXTERN extern _declspec(dllexport)
+# define EXTERN extern __declspec(dllexport)
 #else
 # define EXTERN extern
 #endif

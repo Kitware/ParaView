@@ -15,11 +15,11 @@ if (CGNS_ENABLE_HDF5)
   if (FALSE)
   if (WIN32)
     if (HDF5_LIBRARY)
-      file(STRINGS ${HDF5_LIBRARY} HDF5isDLL REGEX "__imp__H5close")
-      if (HDF5isDLL)
+     # file(STRINGS ${HDF5_LIBRARY} HDF5isDLL REGEX "__imp__H5close")
+     # if (HDF5isDLL)
         # this is only needed when using hdf5 dll libs
         add_definitions(-DWIN32 -D_HDF5USEDLL_)
-      endif (HDF5isDLL)
+     # endif (HDF5isDLL)
     endif (HDF5_LIBRARY)
   endif (WIN32)
   if(HDF5_NEED_MPI AND MPI_INC)
@@ -51,13 +51,10 @@ set(BUILDBASESCOPE 0)
 
 if (CGNS_ENABLE_LEGACY)
   set(BUILDLEGACY 1)
-  set(CGFSIZET "")
 else (CGNS_ENABLE_LEGACY)
   if (CGNS_ENABLE_64BIT)
     set(BUILD64BIT 1)
-    set(CGFSIZET *8)
   else (CGNS_ENABLE_64BIT)
-    set(CGFSIZET *4)
   endif (CGNS_ENABLE_64BIT)
 endif (CGNS_ENABLE_LEGACY)
 if (CGNS_ENABLE_SCOPING)
@@ -114,6 +111,7 @@ set(HAVE_FORTRAN_2003 0)
 set(HAVE_FORTRAN_2008 0)
 set(HAVE_FORTRAN_2008TS 0)
 set(HDF5_HAVE_MULTI_DATASETS 0)
+set(HDF5_HAVE_COLL_METADATA 0)
 set(FORTRAN_DEFAULT_INTEGER_C_INT64_T 0)
 
 if (BUILDFORTRAN)
@@ -141,12 +139,12 @@ MACRO (CHECK_FORTRAN_FEATURE FUNCTION CODE VARIABLE)
       SET (CHECK_FUNCTION_EXISTS_ADD_LIBRARIES)
     ENDIF (CMAKE_REQUIRED_LIBRARIES)
     FILE (WRITE
-        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/testFortranCompiler.f90
+        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/testFortranCompiler.F90
         "${CODE}"
     )
     TRY_COMPILE (${VARIABLE}
         ${CMAKE_BINARY_DIR}
-        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/testFortranCompiler.f90
+        ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/testFortranCompiler.F90
         CMAKE_FLAGS "${CHECK_FUNCTION_EXISTS_ADD_LIBRARIES}"
         OUTPUT_VARIABLE OUTPUT
     )
@@ -305,6 +303,21 @@ if (CHECK_FORTRAN_95)
 endif (CHECK_FORTRAN_95)
 endif (HAVE_FORTRAN_2003)
 
+CHECK_FORTRAN_FEATURE(FortranConcat
+  "
+# define CONCATENATE(a,b) a##b
+      CONCATENATE(PRO,GRAM) testconcat
+         IMPLICIT NONE
+          integer a
+          a = 10
+      END PROGRAM testconcat
+  "
+  CHECK_FORTRAN_CONCAT
+)
+if (NOT CHECK_FORTRAN_CONCAT)
+ SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DNO_CONCATENATION")
+endif (NOT CHECK_FORTRAN_CONCAT)
+
 endif (BUILDFORTRAN)
 
 macro(native_paths INPUT_PATH_VARIABLE RESULT_VARIABLE)
@@ -361,12 +374,13 @@ ENDMACRO (CHECK_HDF5_FEATURE)
 
 if (CGNS_ENABLE_HDF5)
   set(BUILDHDF5 1)
-#  if (HDF5_INCLUDE_PATH)
-#    native_paths(HDF5_INCLUDE_PATH HDF5INC)
-#  endif (HDF5_INCLUDE_PATH)
-#  if (HDF5_LIBRARY)
-#    native_paths(HDF5_LIBRARY HDF5LIB)
-#  endif (HDF5_LIBRARY)
+  if (HDF5_INCLUDE_PATH)
+    native_paths(HDF5_INCLUDE_PATH HDF5INC)
+	include_directories(${HDF5INC})
+  endif (HDF5_INCLUDE_PATH)
+  if (HDF5_LIBRARY)
+    native_paths(HDF5_LIBRARY HDF5LIB)
+  endif (HDF5_LIBRARY)
   if (HDF5_NEED_SZIP)
     set(H5NEEDSZIP 1)
     if (SZIP_LIBRARY)
@@ -415,6 +429,27 @@ CHECK_HDF5_FEATURE(Multi_Dataset
    set(HDF5_HAVE_MULTI_DATASETS 1)
  endif (CHECK_HDF5_HAVE_MULTI_DATASETS)
 
+  # Check if HDF5 library has collective metadata APIs, HDF5 >= 1.10.0
+  # --------------------------------------------------------------------
+
+CHECK_HDF5_FEATURE(Collective_metadata
+  " 
+ #include \"hdf5.h\"
+ void main(void)
+ {
+   hid_t foo;
+   H5Pset_coll_metadata_write(foo, 1);
+   H5Pset_all_coll_metadata_ops(foo, 1);
+   return;
+ }
+  "
+   CHECK_HDF5_HAVE_COLL_METADATA
+ )
+ if (CHECK_HDF5_HAVE_COLL_METADATA)
+   set(HDF5_HAVE_COLL_METADATA 1)
+ endif (CHECK_HDF5_HAVE_COLL_METADATA)
+
+
 endif (CGNS_ENABLE_HDF5)
 
 #create these in build directory so it doesn't mess up the
@@ -449,6 +484,11 @@ set(cgns_C_FILES
 	adf/ADF_interface.c
 	adf/ADF_internals.c)
 
+if (CGNS_ENABLE_MEM_DEBUG)
+  set(cgns_C_FILES ${cgns_C_FILES} cg_malloc.c)
+  add_definitions("-DMEM_DEBUG")
+endif(CGNS_ENABLE_MEM_DEBUG)
+
 if (CGNS_ENABLE_HDF5)
   set(cgns_C_FILES ${cgns_C_FILES} adfh/ADFH.c)
   if (CGNS_ENABLE_PARALLEL)
@@ -459,8 +499,7 @@ endif (CGNS_ENABLE_HDF5)
 # All the Fortran files need by the cgns library (if enabled)
 set(cgns_F_FILES
 	cg_ftoc.c
-	cgio_ftoc.c
-	cgns_f.F90)
+	cgio_ftoc.c)
 
 # Only build those files that are needed
 if (CGNS_ENABLE_FORTRAN)
@@ -469,6 +508,7 @@ if (CGNS_ENABLE_FORTRAN)
       PROPERTY COMPILE_DEFINITIONS ${FORTRAN_NAMING})
   endif (FORTRAN_NAMING)
   set(cgns_FILES ${cgns_C_FILES} ${cgns_F_FILES})
+  add_library(cgns_f2c OBJECT cgns_f.F90)
 else (CGNS_ENABLE_FORTRAN)
   set(cgns_FILES ${cgns_C_FILES})
 endif (CGNS_ENABLE_FORTRAN)
@@ -479,7 +519,12 @@ set(CGNS_BUILD_SHARED "ON" CACHE BOOL "Build a shared version of the library")
 option(CGNS_USE_SHARED "Link programs to the CGNS shared library" "ON")
 
 # Build a static version of the library
-add_library(cgns_static STATIC ${cgns_FILES})
+if (CGNS_ENABLE_FORTRAN)
+    add_library(cgns_static ${cgns_FILES} $<TARGET_OBJECTS:cgns_f2c>)
+else (CGNS_ENABLE_FORTRAN)
+  add_library(cgns_static ${cgns_FILES})
+endif (CGNS_ENABLE_FORTRAN)
+
 
 # Build a shared version of the library
 if(CGNS_BUILD_SHARED)
@@ -489,19 +534,19 @@ if(CGNS_BUILD_SHARED)
   # and link with the HDF5 libraries to build a dll
   if (WIN32 OR CYGWIN)
     add_definitions(-DBUILD_DLL)
-    if (CGNS_ENABLE_HDF5 AND HDF5_LIBRARY)
-      target_link_libraries(cgns_shared ${HDF5_LIBRARY})
-      if(HDF5_NEED_ZLIB AND ZLIB_LIBRARY)
-        target_link_libraries(cgns_shared ${ZLIB_LIBRARY})
-      endif(HDF5_NEED_ZLIB AND ZLIB_LIBRARY)
-      if(HDF5_NEED_SZIP AND SZIP_LIBRARY)
-        target_link_libraries(cgns_shared ${SZIP_LIBRARY})
-      endif(HDF5_NEED_SZIP AND SZIP_LIBRARY)
-      if(HDF5_NEED_MPI AND MPI_LIBS)
-        target_link_libraries(cgns_shared ${MPI_LIBS})
-      endif(HDF5_NEED_MPI AND MPI_LIBS)
-    endif (CGNS_ENABLE_HDF5 AND HDF5_LIBRARY)
   endif (WIN32 OR CYGWIN)
+  if (CGNS_ENABLE_HDF5 AND HDF5_LIBRARY)
+    target_link_libraries(cgns_shared ${HDF5_LIBRARY})
+    if(HDF5_NEED_ZLIB AND ZLIB_LIBRARY)
+      target_link_libraries(cgns_shared ${ZLIB_LIBRARY})
+    endif(HDF5_NEED_ZLIB AND ZLIB_LIBRARY)
+    if(HDF5_NEED_SZIP AND SZIP_LIBRARY)
+      target_link_libraries(cgns_shared ${SZIP_LIBRARY})
+    endif(HDF5_NEED_SZIP AND SZIP_LIBRARY)
+    if(HDF5_NEED_MPI AND MPI_LIBS)
+      target_link_libraries(cgns_shared ${MPI_LIBS})
+    endif(HDF5_NEED_MPI AND MPI_LIBS)
+  endif (CGNS_ENABLE_HDF5 AND HDF5_LIBRARY)
 else(CGNS_BUILD_SHARED)
   set(CGNS_USE_SHARED "OFF")
   mark_as_advanced(FORCE CGNS_USE_SHARED)
@@ -535,12 +580,9 @@ install(TARGETS cgns_static ARCHIVE DESTINATION lib)
 # Set the install path of the shared library
 if(CGNS_BUILD_SHARED)
   # for windows, need to install both cgnsdll.dll and cgnsdll.lib
-  if (WIN32 OR CYGWIN)
-    install(TARGETS cgns_shared ARCHIVE DESTINATION lib)
-    install(TARGETS cgns_shared RUNTIME DESTINATION lib)
-  else (WIN32 OR CYGWIN)
-    install(TARGETS cgns_shared LIBRARY DESTINATION lib)
-  endif (WIN32 OR CYGWIN)
+  install (TARGETS cgns_shared LIBRARY DESTINATION lib
+                               ARCHIVE DESTINATION lib
+                               RUNTIME DESTINATION bin)
 endif(CGNS_BUILD_SHARED)
 else ()
   vtk_add_library(vtkcgns ${cgns_FILES})
@@ -563,7 +605,7 @@ install(FILES
 	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f.h
 	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f03.h
 	#${CMAKE_CURRENT_BINARY_DIR}/cgnsBuild.defs
-        DESTINATION ${cgns_include_directory})
+	DESTINATION ${cgns_include_directory})
 
 if (CGNS_ENABLE_FORTRAN)
   install(FILES
