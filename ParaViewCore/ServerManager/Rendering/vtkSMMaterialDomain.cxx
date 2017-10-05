@@ -37,13 +37,51 @@ public:
     return ret;
   }
   vtkTypeMacro(vtkSMMaterialObserver, vtkCommand);
+  vtkSMMaterialObserver()
+  {
+    this->Owner = nullptr;
+#ifdef PARAVIEW_USE_OSPRAY
+    this->Watchee = nullptr;
+#endif
+  }
+  ~vtkSMMaterialObserver() {}
 
   void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventid),
     void* vtkNotUsed(calldata)) VTK_OVERRIDE
   {
     this->Owner->CallMeSometime();
   }
+
+  void StartWatching()
+  {
+#ifdef PARAVIEW_USE_OSPRAY
+    vtkNew<vtkSMParaViewPipelineController> controller;
+    vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(
+      controller->FindMaterialLibrary(this->Owner->GetSession()));
+    if (mlp)
+    {
+      // todo: is GetClientSideObject guaranteed to succeed?
+      this->Watchee = vtkOSPRayMaterialLibrary::SafeDownCast(mlp->GetClientSideObject());
+      if (this->Watchee)
+      {
+        this->Watchee->AddObserver(vtkCommand::UpdateDataEvent, this);
+      }
+    }
+#endif
+  }
+  void StopWatching()
+  {
+#ifdef PARAVIEW_USE_OSPRAY
+    if (this->Watchee)
+    {
+      this->Watchee->RemoveObserver(this);
+    }
+#endif
+  }
   vtkSMMaterialDomain* Owner;
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkOSPRayMaterialLibrary* Watchee;
+#endif
 };
 
 //---------------------------------------------------------------------------
@@ -59,6 +97,7 @@ vtkSMMaterialDomain::vtkSMMaterialDomain()
 //---------------------------------------------------------------------------
 vtkSMMaterialDomain::~vtkSMMaterialDomain()
 {
+  this->Observer->StopWatching();
   this->Observer->Delete();
 }
 
@@ -80,21 +119,8 @@ int vtkSMMaterialDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
   // throw away whatever XML said our strings are and call update instead
   this->Update(nullptr);
 
-  // register updates whenever the materials change
-  vtkNew<vtkSMParaViewPipelineController> controller;
-  vtkSMMaterialLibraryProxy* mlp =
-    vtkSMMaterialLibraryProxy::SafeDownCast(controller->FindMaterialLibrary(this->GetSession()));
-  if (!mlp)
-  {
-    return 1;
-  }
-  // todo: is GetClientSideObject guaranteed to succeed?
-  vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(mlp->GetClientSideObject());
-  if (!ml)
-  {
-    return 1;
-  }
-  ml->AddObserver(vtkCommand::UpdateDataEvent, this->Observer);
+  // register to  update self whenever available materials change
+  this->Observer->StartWatching();
 #else
   (void)prop;
   (void)element;
