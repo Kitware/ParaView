@@ -3205,6 +3205,34 @@ bool vtkPVRenderView::GetOSPRayContinueStreaming()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetBackgroundNorth(double x, double y, double z)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer* ren = this->GetRenderer();
+  double dir[3] = { x, y, z };
+  vtkOSPRayRendererNode::SetNorthPole(dir, ren);
+#else
+  (void)x;
+  (void)y;
+  (void)z;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetBackgroundEast(double x, double y, double z)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer* ren = this->GetRenderer();
+  double dir[3] = { x, y, z };
+  vtkOSPRayRendererNode::SetEastPole(dir, ren);
+#else
+  (void)x;
+  (void)y;
+  (void)z;
+#endif
+}
+
+//----------------------------------------------------------------------------
 vtkPVCameraCollection* vtkPVRenderView::GetDiscreteCameras(
   vtkInformation* info, vtkPVDataRepresentation* vtkNotUsed(repr))
 {

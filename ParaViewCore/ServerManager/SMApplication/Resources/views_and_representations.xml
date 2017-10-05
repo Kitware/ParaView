@@ -2635,6 +2635,37 @@
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
         </Hints>
       </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="BackgroundNorth"
+          command="SetBackgroundNorth"
+          default_values="1.0 0.0 0.0"
+          animateable="0"
+          number_of_elements="3">
+        <Documentation>Sets north pole for gradient and image background in OSPRay path tracer.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+          name="BackgroundEast"
+          command="SetBackgroundEast"
+          default_values="0.0 1.0 0.0"
+          animateable="0"
+          number_of_elements="3">
+        <Documentation>Sets east direction for image background in OSPRay path tracer.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
       <ProxyProperty
         name="AdditionalLights"
         command="AddLight"
