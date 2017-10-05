@@ -134,9 +134,11 @@
 #define vtkSMProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMDomainIterator.h"          // needed for vtkSMDomainIterator
 #include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h" // needed for vtkweakPointer
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer
 
 class vtkClientServerStream;
 class vtkPVXMLElement;
@@ -211,6 +213,24 @@ public:
    * Returns the first domain which is of the specified type.
    */
   vtkSMDomain* FindDomain(const char* classname);
+
+  /**
+   * Same as FindDomain(classname), except the classname is deduced from the
+   * type.
+   *
+   * @code{cpp}
+   *
+   * #include <vtkSMEnumerationDomain.h>
+   *
+   * ...
+   * vtkSMProperty* prop = ...
+   * auto enumDomain = prop->FindDomain<vtkSMEnumerationDomain>();
+   * ...
+   *
+   * @endcode
+   */
+  template <class DomainType>
+  inline DomainType* FindDomain();
 
   /**
    * Returns the number of domains this property has. This can be
@@ -702,4 +722,17 @@ private:
   vtkSMPropertyTemplateMacroCase(vtkSMStringVectorProperty, vtkStdString, prop, call)
 /* clang-format on */
 
+template <class DomainType>
+DomainType* vtkSMProperty::FindDomain()
+{
+  auto iter = vtkSmartPointer<vtkSMDomainIterator>::Take(this->NewDomainIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  {
+    if (DomainType* domain = DomainType::SafeDownCast(iter->GetDomain()))
+    {
+      return domain;
+    }
+  }
+  return nullptr;
+}
 #endif

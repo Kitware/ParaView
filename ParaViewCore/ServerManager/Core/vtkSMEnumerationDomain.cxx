@@ -18,30 +18,17 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
 
+#include <algorithm>
 #include <sstream>
-#include <vector>
-
-#include "vtkStdString.h"
-
-vtkStandardNewMacro(vtkSMEnumerationDomain);
 
 struct vtkSMEnumerationDomainInternals
 {
-  struct EntryType
-  {
-    EntryType(vtkStdString text, int value)
-      : Text(text)
-      , Value(value)
-    {
-    }
-    vtkStdString Text;
-    int Value;
-  };
-
-  typedef std::vector<EntryType> EntriesType;
+  using EntryType = std::pair<std::string, int>;
+  using EntriesType = std::vector<EntryType>;
   EntriesType Entries;
 };
 
+vtkStandardNewMacro(vtkSMEnumerationDomain);
 //---------------------------------------------------------------------------
 vtkSMEnumerationDomain::vtkSMEnumerationDomain()
 {
@@ -68,7 +55,7 @@ int vtkSMEnumerationDomain::GetEntryValue(unsigned int idx)
     vtkErrorMacro("Invalid idx: " << idx);
     return 0;
   }
-  return this->EInternals->Entries[idx].Value;
+  return this->EInternals->Entries[idx].second;
 }
 
 //---------------------------------------------------------------------------
@@ -79,7 +66,7 @@ const char* vtkSMEnumerationDomain::GetEntryText(unsigned int idx)
     vtkErrorMacro("Invalid idx: " << idx);
     return NULL;
   }
-  return this->EInternals->Entries[idx].Text.c_str();
+  return this->EInternals->Entries[idx].first.c_str();
 }
 
 //---------------------------------------------------------------------------
@@ -112,20 +99,21 @@ int vtkSMEnumerationDomain::GetEntryValueForText(const char* text)
 int vtkSMEnumerationDomain::GetEntryValue(const char* text, int& valid)
 {
   valid = 0;
-
   if (!text)
   {
     return -1;
   }
 
-  vtkSMEnumerationDomainInternals::EntriesType::iterator iter = this->EInternals->Entries.begin();
-  for (; iter != this->EInternals->Entries.end(); ++iter)
+  const std::string str_text(text);
+  const auto& entries = this->EInternals->Entries;
+  auto iter = std::find_if(
+    entries.begin(), entries.end(), [&](const vtkSMEnumerationDomainInternals::EntryType& apair) {
+      return apair.first == str_text;
+    });
+  if (iter != entries.end())
   {
-    if (iter->Text == text)
-    {
-      valid = 1;
-      return iter->Value;
-    }
+    valid = 1;
+    return iter->second;
   }
 
   return -1;
@@ -170,14 +158,15 @@ int vtkSMEnumerationDomain::IsInDomain(int val, unsigned int& idx)
     return 0;
   }
 
-  for (unsigned int i = 0; i < numEntries; i++)
+  const auto& entries = this->EInternals->Entries;
+  auto iter = std::find_if(entries.begin(), entries.end(),
+    [&](const vtkSMEnumerationDomainInternals::EntryType& apair) { return apair.second == val; });
+  if (iter != entries.end())
   {
-    if (val == this->GetEntryValue(i))
-    {
-      idx = i;
-      return 1;
-    }
+    idx = static_cast<int>(iter - entries.begin());
+    return 1;
   }
+
   return 0;
 }
 
@@ -286,6 +275,12 @@ int vtkSMEnumerationDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unche
     }
   }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
+}
+
+//---------------------------------------------------------------------------
+const std::vector<std::pair<std::string, int> >& vtkSMEnumerationDomain::GetEntries() const
+{
+  return this->EInternals->Entries;
 }
 
 //---------------------------------------------------------------------------
