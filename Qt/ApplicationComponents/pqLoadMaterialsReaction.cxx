@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyHelper.h"
 
 #include <sstream>
 
@@ -85,7 +86,8 @@ bool pqLoadMaterialsReaction::loadMaterials(const QString& dbase, pqServer* serv
     vtkNew<vtkSMParaViewPipelineController> controller;
     vtkSMMaterialLibraryProxy* mlp =
       vtkSMMaterialLibraryProxy::SafeDownCast(controller->FindMaterialLibrary(session));
-    mlp->LoadMaterials(dbase.toLatin1().data());
+    vtkSMPropertyHelper(mlp, "LoadMaterials").Set(dbase.toLatin1().data());
+    mlp->UpdateVTKObjects();
   }
 
   CLEAR_UNDO_STACK();

@@ -19,6 +19,8 @@
 #include "vtkPVConfig.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyInternals.h"
 #include "vtkSmartPointer.h"
 
 #ifdef PARAVIEW_USE_OSPRAY
@@ -95,4 +97,17 @@ void vtkSMMaterialLibraryProxy::Synchronize()
 void vtkSMMaterialLibraryProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMaterialLibraryProxy::UpdateVTKObjects()
+{
+  vtkSMProxyInternals::PropertyInfoMap::iterator it =
+    this->Internals->Properties.find("LoadMaterials");
+  if (it->second.ModifiedFlag)
+  {
+    const char* filename = vtkSMPropertyHelper(this, "LoadMaterials").GetAsString();
+    this->LoadMaterials(filename);
+  }
+  this->Superclass::UpdateVTKObjects();
 }
