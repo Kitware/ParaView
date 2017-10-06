@@ -378,7 +378,7 @@ public:
     this->Index = index++;
     if (info == nullptr || info->GetCompositeDataClassName() == 0)
     {
-      this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "";
+      this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "(empty)";
       this->DataType = info != nullptr ? info->GetDataSetType() : -1;
       this->CustomColumnState.resize(custom_column_count);
       this->LeafIndex = leaf_index++;
