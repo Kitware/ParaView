@@ -49,6 +49,11 @@ public:
    */
   void LoadMaterials(const char*);
 
+  /**
+   * Overridden to control load from server file system.
+   */
+  void UpdateVTKObjects() VTK_OVERRIDE;
+
 protected:
   vtkSMMaterialLibraryProxy();
   ~vtkSMMaterialLibraryProxy() override;

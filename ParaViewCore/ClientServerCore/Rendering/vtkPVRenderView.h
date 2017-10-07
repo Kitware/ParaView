@@ -897,7 +897,13 @@ public:
    * May be either scivis (default) or pathtracer.
    */
   void SetOSPRayRendererType(std::string);
-
+  //@{
+  /**
+   * Control of background orientation for OSPRay.
+   */
+  void SetBackgroundNorth(double x, double y, double z);
+  void SetBackgroundEast(double x, double y, double z);
+  //@}
   /**
    * For OSPRay, set the library of materials.
    */
