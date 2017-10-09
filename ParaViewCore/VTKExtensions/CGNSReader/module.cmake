@@ -6,6 +6,7 @@ vtk_module(vtkPVVTKExtensionsCGNSReader
       vtkParallelCore
       vtkPVVTKExtensionsCore
     PRIVATE_DEPENDS
+      vtkhdf5
       vtkcgns
       vtksys
       vtkParallelCore
