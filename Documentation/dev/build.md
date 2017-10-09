@@ -42,6 +42,14 @@ Linux Ubuntu/Debian (16.04):
 * sudo apt-get install ninja-build
     - ninja is a speedy replacement for make, highly recommended.
 
+**Note for Ubuntu 16.04**. The official Qt 5.9.1 binaries downloaded from `qt.io`
+are linked against a different version of `libprotobuf` than what ParaView uses,
+which causes runtime errors in ParaView. To avoid this, you can move the file
+`libqgtk3.so` out from `Qt5.9.1/plugins/platformthemes`. This platform theme is
+linked against a different `libprotobuf` than ParaView. Moving it causes it not
+to be loaded, thereby avoiding the runtime errors with no negative effects on
+running ParaView.
+
 Windows:
 
 * Visual Studio 2015 Community Edition
