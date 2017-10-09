@@ -1399,6 +1399,15 @@
         <Documentation>This property indicates whether to use the string
         delimiter.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetAddTabFieldDelimiter"
+                         default_values="0"
+                         name="AddTabFieldDelimiter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to add the tab character as a
+        field delimiter to the list of other delimiter characters. This is needed
+        since in the GUI the user can't enter a tab character.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetHaveHeaders"
                          default_values="1"
                          name="HaveHeaders"
@@ -6911,14 +6920,16 @@
           <Property name="UseStringDelimiter" />
           <Property name="HaveHeaders" />
           <Property name="FieldDelimiterCharacters" />
+          <Property name="AddTabFieldDelimiter" />
           <Property name="MergeConsecutiveDelimiters" />
         </ExposedProperties>
       </SubProxy>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="SpreadSheetView" />
-        <ReaderFactory extensions="csv txt CSV TXT"
+        <ReaderFactory extensions="csv tsv txt CSV TSV TXT"
                        file_description="Delimited Text" />
+        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
       </Hints>
       <!-- End of CSVReader -->
     </SourceProxy>

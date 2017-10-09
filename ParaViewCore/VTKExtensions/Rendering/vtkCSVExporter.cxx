@@ -57,10 +57,10 @@ public:
     for (std::map<double, std::pair<std::string, int> >::iterator iter = this->Lines.begin();
          iter != this->Lines.end(); ++iter)
     {
-      ofs << iter->first << "," << iter->second.first.c_str();
+      ofs << iter->first << delim << iter->second.first.c_str();
       for (int cc = iter->second.second; cc < (this->ColumnCount - 1); cc++)
       {
-        ofs << ",";
+        ofs << delim;
       }
       ofs << endl;
     }

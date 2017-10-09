@@ -1300,10 +1300,11 @@
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
                    name="CSVWriter">
-      <Documentation short_help="Writer to write CSV files">Writer to write CSV
-      files from table. In parallel, it delivers the table to the root node and
-      then saves the CSV. For composite datasets, it saves multiple csv
-      files.</Documentation>
+      <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
+      delimited files from a table. In parallel, it delivers the table to the root node and
+      then saves the delimited file. For composite datasets, it saves multiple delimited
+      files. If the file extension is tsv it uses the tab character
+      for the delimiter. Otherwise it uses a comma.</Documentation>
       <SubProxy>
         <Proxy class="vtkCSVWriter"
                name="Writer">
@@ -1320,10 +1321,19 @@
                              number_of_elements="1">
             <BooleanDomain name="bool" />
           </IntVectorProperty>
+          <StringVectorProperty command="SetFieldDelimiter"
+                                name="FieldDelimiter"
+                                default_values=","
+                                number_of_elements="1">
+            <Documentation>Used to set the delimiter character. This is hidden from the user
+            and set automatically based on the file extension. An extension of .tsv will set
+            the delimiter character to a tab. Otherwise a comma will be used as the delimiter.</Documentation>
+          </StringVectorProperty>
         </Proxy>
         <ExposedProperties>
           <Property name="Precision" />
           <Property name="UseScientificNotation" />
+          <Property name="FieldDelimiter" />
         </ExposedProperties>
       </SubProxy>
       <InputProperty command="SetInputConnection"
@@ -1354,10 +1364,13 @@
       <Hints>
         <Property name="Input"
                   show="0" />
+        <Property name="FieldDelimiter"
+                  show="0" />
         <Property name="FileName"
                   show="0" />
-        <WriterFactory extensions="csv"
-                       file_description="CSV File" />
+        <WriterFactory extensions="csv txt tsv"
+                       file_description="Comma or Tab Delimited Files" />
+        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
       </Hints>
       <!-- End of CSVWriter -->
     </PSWriterProxy>
@@ -1365,11 +1378,12 @@
     <PSWriterProxy class="vtkParallelSerialWriter"
                    file_name_method="SetFileName"
                    name="DataSetCSVWriter">
-      <Documentation short_help="Writer to write CSV files">Writer to write CSV
-      files from any dataset. Set FieldAssociation to choose whether cell
+      <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
+      delimited files from any dataset. Set FieldAssociation to choose whether cell
       data/point data needs to be saved. In parallel, it delivers the table to
-      the root node and then saves the CSV. For composite datasets, it saves
-      multiple csv files.</Documentation>
+      the root node and then saves the delimited file. For composite datasets, it saves
+      multiple delimited files. If the file extension is tsv it uses the tab character
+      for the delimiter. Otherwise it uses a comma.</Documentation>
       <SubProxy>
         <Proxy class="vtkCSVWriter"
                name="Writer">
@@ -1386,10 +1400,19 @@
                              number_of_elements="1">
             <BooleanDomain name="bool" />
           </IntVectorProperty>
+          <StringVectorProperty command="SetFieldDelimiter"
+                                name="FieldDelimiter"
+                                default_values=","
+                                number_of_elements="1">
+            <Documentation>Used to set the delimiter character. This is hidden from the user
+            and set automatically based on the file extension. An extension of .tsv will set
+            the delimiter character to a tab. Otherwise a comma will be used as the delimiter.</Documentation>
+          </StringVectorProperty>
         </Proxy>
         <ExposedProperties>
           <Property name="Precision" />
           <Property name="UseScientificNotation" />
+          <Property name="FieldDelimiter" />
         </ExposedProperties>
       </SubProxy>
       <InputProperty command="SetInputConnection"
@@ -1458,10 +1481,13 @@
       <Hints>
         <Property name="Input"
                   show="0" />
+        <Property name="FieldDelimiter"
+                  show="0" />
         <Property name="FileName"
                   show="0" />
-        <WriterFactory extensions="csv"
-                       file_description="CSV File" />
+        <WriterFactory extensions="csv txt tsv"
+                       file_description="Comma or Tab Delimited Files" />
+        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
       </Hints>
       <!-- End of CSVWriter -->
     </PSWriterProxy>

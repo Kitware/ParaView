@@ -308,6 +308,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSightTensorInversionBin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusXML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportLinePlotToCSV.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ExportLinePlotToTSV.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportSceneSpreadSheetView2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportX3dPOVVRML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries.xml
@@ -378,6 +379,8 @@ list(APPEND TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveCSV.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SaveTSV.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SaveTXT.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectedProxyPanelVisibility.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionModifiersCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionModifiersPoints.xml
@@ -742,9 +745,11 @@ SET (ColorEditorVolumeControls_THRESHOLD 300)
 set (SpreadSheet2_THRESHOLD 50)
 set (PlotOverTimeAutoApply_THRESHOLD 50)
 set (ExportLinePlotToCSV_THRESHOLD 30)
+set (ExportLinePlotToTSV_THRESHOLD 30)
 set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection.
 set (QuartilePlot_THRESHOLD 20)
-
+# The ExportLinePlotToTSV test uses the same image baseline as the ExportLinePlotToCSV test
+set (ExportLinePlotToTSV_BASELINE ExportLinePlotToCSV.png)
 
 # DisconnectAndSaveAnimation is only support in Client-Server mode.
 set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
@@ -830,6 +835,11 @@ SET (XdmfReadImageDataCollection_THRESHOLD 20)
 # This test renders points and they are offsetted a bit differently on
 # different platforms so just increase the threshold
 SET (SaveCSV_THRESHOLD 40)
+SET (SaveTSV_THRESHOLD 40)
+SET (SaveTXT_THRESHOLD 40)
+# The SaveTXT and SaveTSV tests use the same image baseline as the SaveCSV test
+SET (SaveTSV_BASELINE SaveCSV.png)
+SET (SaveTXT_BASELINE SaveCSV.png)
 
 # Disable some testing configurations for these tests.
 
