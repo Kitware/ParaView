@@ -834,6 +834,7 @@
       <PropertyGroup label="Miscellaneous">
         <Property name="OutlineThreshold" />
         <Property name="ShowAnnotation" />
+        <Property name="PointPickingRadius" />
         <Property name="DisableIceT" />
       </PropertyGroup>
       <Hints>
