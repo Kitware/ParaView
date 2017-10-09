@@ -83,8 +83,8 @@ protected:
   void Reallocate(int num);
   void DeleteStrings();
 
-  vtkStringList(const vtkStringList&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkStringList&) VTK_DELETE_FUNCTION;
+  vtkStringList(const vtkStringList&) = delete;
+  void operator=(const vtkStringList&) = delete;
 };
 
 #endif

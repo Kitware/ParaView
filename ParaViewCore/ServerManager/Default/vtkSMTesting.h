@@ -66,7 +66,7 @@ protected:
   vtkTesting* Testing;
 
 private:
-  vtkSMTesting(const vtkSMTesting&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTesting&) VTK_DELETE_FUNCTION;
+  vtkSMTesting(const vtkSMTesting&) = delete;
+  void operator=(const vtkSMTesting&) = delete;
 };
 #endif

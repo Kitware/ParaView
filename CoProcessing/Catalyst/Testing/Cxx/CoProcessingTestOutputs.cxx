@@ -96,8 +96,8 @@ protected:
   }
 
 private:
-  vtkCPTestPipeline(const vtkCPTestPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPTestPipeline&) VTK_DELETE_FUNCTION;
+  vtkCPTestPipeline(const vtkCPTestPipeline&) = delete;
+  void operator=(const vtkCPTestPipeline&) = delete;
 };
 
 vtkStandardNewMacro(vtkCPTestPipeline);

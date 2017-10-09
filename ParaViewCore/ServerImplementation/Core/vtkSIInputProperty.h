@@ -59,8 +59,8 @@ protected:
   int PortIndex;
 
 private:
-  vtkSIInputProperty(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
+  vtkSIInputProperty(const vtkSIInputProperty&) = delete;
+  void operator=(const vtkSIInputProperty&) = delete;
 };
 
 #endif

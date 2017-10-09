@@ -44,8 +44,8 @@ protected:
   ~vtkSIDoubleVectorProperty() override;
 
 private:
-  vtkSIDoubleVectorProperty(const vtkSIDoubleVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIDoubleVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSIDoubleVectorProperty(const vtkSIDoubleVectorProperty&) = delete;
+  void operator=(const vtkSIDoubleVectorProperty&) = delete;
 };
 
 #endif

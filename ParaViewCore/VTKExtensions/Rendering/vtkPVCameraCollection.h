@@ -90,8 +90,8 @@ protected:
   int LastCameraIndex;
 
 private:
-  vtkPVCameraCollection(const vtkPVCameraCollection&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCameraCollection&) VTK_DELETE_FUNCTION;
+  vtkPVCameraCollection(const vtkPVCameraCollection&) = delete;
+  void operator=(const vtkPVCameraCollection&) = delete;
   class vtkInternals;
   vtkInternals* Internals;
 };

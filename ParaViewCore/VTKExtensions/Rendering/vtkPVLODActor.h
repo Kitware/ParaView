@@ -119,8 +119,8 @@ protected:
   int EnableLOD;
 
 private:
-  vtkPVLODActor(const vtkPVLODActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLODActor&) VTK_DELETE_FUNCTION;
+  vtkPVLODActor(const vtkPVLODActor&) = delete;
+  void operator=(const vtkPVLODActor&) = delete;
 };
 
 #endif

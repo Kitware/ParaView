@@ -164,8 +164,8 @@ protected:
   int ReductionProcessId;
 
 private:
-  vtkReductionFilter(const vtkReductionFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkReductionFilter&) VTK_DELETE_FUNCTION;
+  vtkReductionFilter(const vtkReductionFilter&) = delete;
+  void operator=(const vtkReductionFilter&) = delete;
 };
 
 #endif

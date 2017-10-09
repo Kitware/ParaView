@@ -53,8 +53,8 @@ protected:
   ~vtkSMPluginLoaderProxy() override;
 
 private:
-  vtkSMPluginLoaderProxy(const vtkSMPluginLoaderProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPluginLoaderProxy&) VTK_DELETE_FUNCTION;
+  vtkSMPluginLoaderProxy(const vtkSMPluginLoaderProxy&) = delete;
+  void operator=(const vtkSMPluginLoaderProxy&) = delete;
 };
 
 #endif

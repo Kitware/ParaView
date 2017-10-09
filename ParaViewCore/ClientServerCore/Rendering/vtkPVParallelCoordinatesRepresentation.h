@@ -116,9 +116,8 @@ protected:
   double Opacity;
 
 private:
-  vtkPVParallelCoordinatesRepresentation(
-    const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVParallelCoordinatesRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVParallelCoordinatesRepresentation(const vtkPVParallelCoordinatesRepresentation&) = delete;
+  void operator=(const vtkPVParallelCoordinatesRepresentation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

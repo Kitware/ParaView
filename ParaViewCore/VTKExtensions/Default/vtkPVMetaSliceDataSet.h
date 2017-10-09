@@ -74,8 +74,8 @@ protected:
   ~vtkPVMetaSliceDataSet() override;
 
 private:
-  vtkPVMetaSliceDataSet(const vtkPVMetaSliceDataSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVMetaSliceDataSet&) VTK_DELETE_FUNCTION;
+  vtkPVMetaSliceDataSet(const vtkPVMetaSliceDataSet&) = delete;
+  void operator=(const vtkPVMetaSliceDataSet&) = delete;
 
   class vtkInternals;
   vtkInternals* Internal;

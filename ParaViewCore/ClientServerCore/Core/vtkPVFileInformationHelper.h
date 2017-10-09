@@ -154,8 +154,8 @@ protected:
   vtkSetStringMacro(PathSeparator);
 
 private:
-  vtkPVFileInformationHelper(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
+  vtkPVFileInformationHelper(const vtkPVFileInformationHelper&) = delete;
+  void operator=(const vtkPVFileInformationHelper&) = delete;
 };
 
 #endif

@@ -144,8 +144,8 @@ protected:
   bool IgnoreReaderTime;
 
 private:
-  vtkCGNSFileSeriesReader(const vtkCGNSFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCGNSFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkCGNSFileSeriesReader(const vtkCGNSFileSeriesReader&) = delete;
+  void operator=(const vtkCGNSFileSeriesReader&) = delete;
   void OnReaderModifiedEvent();
 
   vtkMultiProcessController* Controller;

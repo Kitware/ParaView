@@ -110,8 +110,8 @@ protected:
   vtkPVSinusoidKeyFrame* SinusoidKeyFrame;
 
 private:
-  vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&) = delete;
+  void operator=(const vtkPVCompositeKeyFrame&) = delete;
 };
 
 #endif

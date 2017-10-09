@@ -51,8 +51,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkPConvertSelection(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
+  vtkPConvertSelection(const vtkPConvertSelection&) = delete;
+  void operator=(const vtkPConvertSelection&) = delete;
 };
 
 #endif // vtkPConvertSelection_h

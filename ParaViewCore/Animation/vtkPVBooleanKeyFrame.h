@@ -43,7 +43,7 @@ protected:
   ~vtkPVBooleanKeyFrame() override;
 
 private:
-  vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVBooleanKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&) = delete;
+  void operator=(const vtkPVBooleanKeyFrame&) = delete;
 };
 #endif

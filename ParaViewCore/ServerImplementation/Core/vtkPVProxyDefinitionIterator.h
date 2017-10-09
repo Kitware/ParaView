@@ -93,8 +93,8 @@ protected:
   ~vtkPVProxyDefinitionIterator() override;
 
 private:
-  vtkPVProxyDefinitionIterator(const vtkPVProxyDefinitionIterator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVProxyDefinitionIterator&) VTK_DELETE_FUNCTION;
+  vtkPVProxyDefinitionIterator(const vtkPVProxyDefinitionIterator&) = delete;
+  void operator=(const vtkPVProxyDefinitionIterator&) = delete;
 };
 
 #endif

@@ -97,8 +97,8 @@ protected:
   void ReportXmlParseError() VTK_OVERRIDE;
 
 private:
-  vtkPVXMLParser(const vtkPVXMLParser&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVXMLParser&) VTK_DELETE_FUNCTION;
+  vtkPVXMLParser(const vtkPVXMLParser&) = delete;
+  void operator=(const vtkPVXMLParser&) = delete;
 };
 
 #endif

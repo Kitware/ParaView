@@ -87,8 +87,8 @@ protected:
   void PrepareForRendering() VTK_OVERRIDE;
 
 private:
-  vtkQuartileChartRepresentation(const vtkQuartileChartRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkQuartileChartRepresentation&) VTK_DELETE_FUNCTION;
+  vtkQuartileChartRepresentation(const vtkQuartileChartRepresentation&) = delete;
+  void operator=(const vtkQuartileChartRepresentation&) = delete;
 
   class vtkQCRInternals;
   friend class vtkQCRInternals;

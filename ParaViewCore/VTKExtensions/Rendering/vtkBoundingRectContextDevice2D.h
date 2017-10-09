@@ -321,8 +321,8 @@ protected:
   void AddRect(const vtkRectf& rect);
 
 private:
-  vtkBoundingRectContextDevice2D(const vtkBoundingRectContextDevice2D&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkBoundingRectContextDevice2D&) VTK_DELETE_FUNCTION;
+  vtkBoundingRectContextDevice2D(const vtkBoundingRectContextDevice2D&) = delete;
+  void operator=(const vtkBoundingRectContextDevice2D&) = delete;
 };
 
 #endif // vtkBoundingRectContextDevice2D

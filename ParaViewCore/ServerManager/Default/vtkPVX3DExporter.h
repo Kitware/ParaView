@@ -67,8 +67,8 @@ protected:
     vtkContext2DScalarBarActor* actor, vtkX3DExporterWriter* writer);
 
 private:
-  vtkPVX3DExporter(const vtkPVX3DExporter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVX3DExporter&) VTK_DELETE_FUNCTION;
+  vtkPVX3DExporter(const vtkPVX3DExporter&) = delete;
+  void operator=(const vtkPVX3DExporter&) = delete;
 };
 
 #endif

@@ -85,8 +85,8 @@ protected:
   int WindowLocation;
 
 private:
-  vtkPVScalarBarRepresentation(const vtkPVScalarBarRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVScalarBarRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVScalarBarRepresentation(const vtkPVScalarBarRepresentation&) = delete;
+  void operator=(const vtkPVScalarBarRepresentation&) = delete;
 };
 
 #endif // vtkPVScalarBarRepresentation

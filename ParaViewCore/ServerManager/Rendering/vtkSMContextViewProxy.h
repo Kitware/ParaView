@@ -146,8 +146,8 @@ protected:
   bool XYChartViewBase4Axes;
 
 private:
-  vtkSMContextViewProxy(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMContextViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMContextViewProxy(const vtkSMContextViewProxy&) = delete;
+  void operator=(const vtkSMContextViewProxy&) = delete;
 
   /**
    * Copies axis ranges from each of the vtkAxis on the vtkChartXY to the

@@ -229,8 +229,8 @@ protected:
   int Resolution;
 
 private:
-  vtkSMRangeDomainTemplate(const vtkSMRangeDomainTemplate&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRangeDomainTemplate&) VTK_DELETE_FUNCTION;
+  vtkSMRangeDomainTemplate(const vtkSMRangeDomainTemplate&) = delete;
+  void operator=(const vtkSMRangeDomainTemplate&) = delete;
 
   bool GetComputedDefaultValue(unsigned int index, T& value);
 

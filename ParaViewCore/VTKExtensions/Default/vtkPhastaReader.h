@@ -107,8 +107,8 @@ private:
 private:
   vtkPhastaReaderInternal* Internal;
 
-  vtkPhastaReader(const vtkPhastaReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPhastaReader&) VTK_DELETE_FUNCTION;
+  vtkPhastaReader(const vtkPhastaReader&) = delete;
+  void operator=(const vtkPhastaReader&) = delete;
 };
 
 #endif

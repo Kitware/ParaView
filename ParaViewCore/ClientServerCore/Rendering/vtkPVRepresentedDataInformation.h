@@ -43,8 +43,8 @@ protected:
   ~vtkPVRepresentedDataInformation() override;
 
 private:
-  vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
+  vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) = delete;
+  void operator=(const vtkPVRepresentedDataInformation&) = delete;
 };
 
 #endif

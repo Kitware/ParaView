@@ -607,8 +607,8 @@ static int nifti_write_extensions(znzFile fp, nifti_image *nim);
 static int nifti_extension_size(nifti_image *nim);
 
   private:
-  vtknifti1_io(const vtknifti1_io&) VTK_DELETE_FUNCTION;
-  void operator=(const vtknifti1_io&) VTK_DELETE_FUNCTION;
+  vtknifti1_io(const vtknifti1_io&) = delete;
+  void operator=(const vtknifti1_io&) = delete;
 
 };
 

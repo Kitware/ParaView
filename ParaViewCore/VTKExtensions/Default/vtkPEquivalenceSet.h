@@ -41,8 +41,8 @@ protected:
   ~vtkPEquivalenceSet() override;
 
 private:
-  vtkPEquivalenceSet(const vtkPEquivalenceSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPEquivalenceSet&) VTK_DELETE_FUNCTION;
+  vtkPEquivalenceSet(const vtkPEquivalenceSet&) = delete;
+  void operator=(const vtkPEquivalenceSet&) = delete;
 };
 
 #endif /* vtkPEquivalenceSet_h */

@@ -88,8 +88,8 @@ protected:
   char* FileNameMethod;
 
 private:
-  vtkSMWriterProxy(const vtkSMWriterProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMWriterProxy&) VTK_DELETE_FUNCTION;
+  vtkSMWriterProxy(const vtkSMWriterProxy&) = delete;
+  void operator=(const vtkSMWriterProxy&) = delete;
 };
 
 #endif

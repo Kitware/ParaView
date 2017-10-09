@@ -103,8 +103,8 @@ protected:
   void InvokeDomainModifiedEvent();
 
 private:
-  vtkSMRangedTransferFunctionDomain(const vtkSMRangedTransferFunctionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRangedTransferFunctionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMRangedTransferFunctionDomain(const vtkSMRangedTransferFunctionDomain&) = delete;
+  void operator=(const vtkSMRangedTransferFunctionDomain&) = delete;
 
   vtkSMRangedTransferFunctionDomainInternals* Internals;
 };

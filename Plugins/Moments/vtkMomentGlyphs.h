@@ -85,8 +85,8 @@ protected:
   virtual vtkSmartPointer<vtkPolyData> MakeGlyphs(vtkDataSet* input, vtkDataArray* inputArray);
 
 private:
-  vtkMomentGlyphs(const vtkMomentGlyphs&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMomentGlyphs&) VTK_DELETE_FUNCTION;
+  vtkMomentGlyphs(const vtkMomentGlyphs&) = delete;
+  void operator=(const vtkMomentGlyphs&) = delete;
 };
 
 #endif // vtkMomentGlyphs_h

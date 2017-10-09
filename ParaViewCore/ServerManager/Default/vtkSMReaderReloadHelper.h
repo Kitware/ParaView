@@ -72,8 +72,8 @@ protected:
   ~vtkSMReaderReloadHelper() override;
 
 private:
-  vtkSMReaderReloadHelper(const vtkSMReaderReloadHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMReaderReloadHelper&) VTK_DELETE_FUNCTION;
+  vtkSMReaderReloadHelper(const vtkSMReaderReloadHelper&) = delete;
+  void operator=(const vtkSMReaderReloadHelper&) = delete;
 };
 
 #endif

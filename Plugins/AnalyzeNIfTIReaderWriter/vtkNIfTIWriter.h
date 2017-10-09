@@ -63,8 +63,8 @@ private:
   int sform_code;
   int qform_code;
 
-  vtkNIfTIWriter(const vtkNIfTIWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkNIfTIWriter&) VTK_DELETE_FUNCTION;
+  vtkNIfTIWriter(const vtkNIfTIWriter&) = delete;
+  void operator=(const vtkNIfTIWriter&) = delete;
 };
 
 #endif

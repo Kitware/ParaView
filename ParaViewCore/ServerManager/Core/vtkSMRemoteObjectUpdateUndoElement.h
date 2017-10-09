@@ -76,8 +76,8 @@ protected:
   vtkSMProxyLocator* ProxyLocator;
 
 private:
-  vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&) = delete;
+  void operator=(const vtkSMRemoteObjectUpdateUndoElement&) = delete;
 };
 
 #endif

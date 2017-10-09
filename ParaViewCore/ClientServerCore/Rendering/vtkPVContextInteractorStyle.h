@@ -49,8 +49,8 @@ protected:
   ~vtkPVContextInteractorStyle() override;
 
 private:
-  vtkPVContextInteractorStyle(const vtkPVContextInteractorStyle&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVContextInteractorStyle&) VTK_DELETE_FUNCTION;
+  vtkPVContextInteractorStyle(const vtkPVContextInteractorStyle&) = delete;
+  void operator=(const vtkPVContextInteractorStyle&) = delete;
 };
 
 #endif

@@ -56,8 +56,8 @@ protected:
   char* FileNameMethod;
 
 private:
-  vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
+  vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&) = delete;
+  void operator=(const vtkSIMetaReaderProxy&) = delete;
 };
 
 #endif

@@ -65,8 +65,8 @@ protected:
   ~vtkPVRepresentedArrayListSettings() override;
 
 private:
-  vtkPVRepresentedArrayListSettings(const vtkPVRepresentedArrayListSettings&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRepresentedArrayListSettings&) VTK_DELETE_FUNCTION;
+  vtkPVRepresentedArrayListSettings(const vtkPVRepresentedArrayListSettings&) = delete;
+  void operator=(const vtkPVRepresentedArrayListSettings&) = delete;
 
   static vtkSmartPointer<vtkPVRepresentedArrayListSettings> Instance;
 

@@ -96,8 +96,8 @@ protected:
   bool UseTrueParentForRepresentatedDataInformation;
 
 private:
-  vtkSMRepresentedArrayListDomain(const vtkSMRepresentedArrayListDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRepresentedArrayListDomain&) VTK_DELETE_FUNCTION;
+  vtkSMRepresentedArrayListDomain(const vtkSMRepresentedArrayListDomain&) = delete;
+  void operator=(const vtkSMRepresentedArrayListDomain&) = delete;
 };
 
 #endif

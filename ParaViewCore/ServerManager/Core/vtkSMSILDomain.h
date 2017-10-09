@@ -91,8 +91,8 @@ protected:
   vtkIdType SILTimeStamp;
 
 private:
-  vtkSMSILDomain(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
+  vtkSMSILDomain(const vtkSMSILDomain&) = delete;
+  void operator=(const vtkSMSILDomain&) = delete;
 };
 
 #endif

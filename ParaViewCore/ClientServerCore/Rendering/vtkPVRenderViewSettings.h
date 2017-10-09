@@ -95,8 +95,8 @@ protected:
   bool DisableIceT;
 
 private:
-  vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
+  vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) = delete;
+  void operator=(const vtkPVRenderViewSettings&) = delete;
 
   static vtkSmartPointer<vtkPVRenderViewSettings> Instance;
 };

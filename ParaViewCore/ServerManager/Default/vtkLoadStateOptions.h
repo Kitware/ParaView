@@ -45,8 +45,8 @@ protected:
   std::string DataDirectory;
 
 private:
-  vtkLoadStateOptions(const vtkLoadStateOptions&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkLoadStateOptions&) VTK_DELETE_FUNCTION;
+  vtkLoadStateOptions(const vtkLoadStateOptions&) = delete;
+  void operator=(const vtkLoadStateOptions&) = delete;
 };
 
 #endif

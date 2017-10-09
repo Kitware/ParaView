@@ -66,8 +66,8 @@ protected:
   void ExecuteDataWithInformation(vtkDataObject* out, vtkInformation* outInfo) VTK_OVERRIDE;
 
 private:
-  vtkAnalyzeReader(const vtkAnalyzeReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAnalyzeReader&) VTK_DELETE_FUNCTION;
+  vtkAnalyzeReader(const vtkAnalyzeReader&) = delete;
+  void operator=(const vtkAnalyzeReader&) = delete;
 
   void vtkAnalyzeReaderUpdateVTKBit(vtkImageData* data, void* outPtr);
 

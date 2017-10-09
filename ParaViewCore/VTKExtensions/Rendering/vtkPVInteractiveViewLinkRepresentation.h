@@ -54,9 +54,8 @@ protected:
   void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]) VTK_OVERRIDE;
 
 private:
-  vtkPVInteractiveViewLinkRepresentation(
-    const vtkPVInteractiveViewLinkRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVInteractiveViewLinkRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVInteractiveViewLinkRepresentation(const vtkPVInteractiveViewLinkRepresentation&) = delete;
+  void operator=(const vtkPVInteractiveViewLinkRepresentation&) = delete;
 };
 
 #endif

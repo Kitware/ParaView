@@ -103,8 +103,8 @@ protected:
   Scalar* Array;
 
 private:
-  vtkCPMappedVectorArrayTemplate(const vtkCPMappedVectorArrayTemplate&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPMappedVectorArrayTemplate&) VTK_DELETE_FUNCTION;
+  vtkCPMappedVectorArrayTemplate(const vtkCPMappedVectorArrayTemplate&) = delete;
+  void operator=(const vtkCPMappedVectorArrayTemplate&) = delete;
 
   vtkIdType Lookup(const Scalar& val, vtkIdType startIndex);
   double TempDoubleArray[3];

@@ -82,8 +82,8 @@ protected:
 
 private:
   vtkMPIMToNSocketConnectionPortInformation(
-    const vtkMPIMToNSocketConnectionPortInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMPIMToNSocketConnectionPortInformation&) VTK_DELETE_FUNCTION;
+    const vtkMPIMToNSocketConnectionPortInformation&) = delete;
+  void operator=(const vtkMPIMToNSocketConnectionPortInformation&) = delete;
 };
 
 #endif

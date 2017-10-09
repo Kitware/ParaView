@@ -55,8 +55,8 @@ protected:
   int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
-  vtkSMMapProperty(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMMapProperty&) VTK_DELETE_FUNCTION;
+  vtkSMMapProperty(const vtkSMMapProperty&) = delete;
+  void operator=(const vtkSMMapProperty&) = delete;
 };
 
 #endif // vtkSMMapProperty_h

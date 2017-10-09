@@ -100,8 +100,8 @@ protected:
   int AttributeType;
 
 private:
-  vtkAttributeDataReductionFilter(const vtkAttributeDataReductionFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAttributeDataReductionFilter&) VTK_DELETE_FUNCTION;
+  vtkAttributeDataReductionFilter(const vtkAttributeDataReductionFilter&) = delete;
+  void operator=(const vtkAttributeDataReductionFilter&) = delete;
 };
 
 #endif

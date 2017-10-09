@@ -191,8 +191,8 @@ protected:
   bool IsLocalDataAvailable();
 
 private:
-  vtkPythonView(const vtkPythonView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPythonView&) VTK_DELETE_FUNCTION;
+  vtkPythonView(const vtkPythonView&) = delete;
+  void operator=(const vtkPythonView&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

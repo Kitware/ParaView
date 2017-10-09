@@ -200,8 +200,8 @@ protected:
 
 private:
   vtkSMParaViewPipelineControllerWithRendering(
-    const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
+    const vtkSMParaViewPipelineControllerWithRendering&) = delete;
+  void operator=(const vtkSMParaViewPipelineControllerWithRendering&) = delete;
   static bool HideScalarBarOnHide;
   static bool InheritRepresentationProperties;
 };

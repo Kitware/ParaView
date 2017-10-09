@@ -138,8 +138,8 @@ protected:
   vtkEHInternals* Internal;
 
 private:
-  void operator=(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
-  vtkExtractHistogram(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkExtractHistogram&) = delete;
+  vtkExtractHistogram(const vtkExtractHistogram&) = delete;
 
   int GetInputFieldAssociation();
   vtkFieldData* GetInputFieldData(vtkDataObject* input);

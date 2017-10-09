@@ -62,8 +62,8 @@ public:
   }
   ~ScopedSetter() { this->Ref = this->OldValue; }
 private:
-  ScopedSetter(const ScopedSetter&) VTK_DELETE_FUNCTION;
-  void operator=(const ScopedSetter&) VTK_DELETE_FUNCTION;
+  ScopedSetter(const ScopedSetter&) = delete;
+  void operator=(const ScopedSetter&) = delete;
 };
 
 /// Used when pqOutputWidget is registered with vtkOutputWindow as the default
@@ -141,8 +141,8 @@ protected:
   QPointer<pqOutputWidget> Widget;
 
 private:
-  OutputWindow(const OutputWindow&) VTK_DELETE_FUNCTION;
-  void operator=(const OutputWindow&) VTK_DELETE_FUNCTION;
+  OutputWindow(const OutputWindow&) = delete;
+  void operator=(const OutputWindow&) = delete;
 };
 vtkStandardNewMacro(OutputWindow);
 }

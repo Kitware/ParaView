@@ -45,8 +45,8 @@ protected:
   ~vtkSMAnimationFrameWindowDomain() override;
 
 private:
-  vtkSMAnimationFrameWindowDomain(const vtkSMAnimationFrameWindowDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMAnimationFrameWindowDomain&) VTK_DELETE_FUNCTION;
+  vtkSMAnimationFrameWindowDomain(const vtkSMAnimationFrameWindowDomain&) = delete;
+  void operator=(const vtkSMAnimationFrameWindowDomain&) = delete;
 };
 
 #endif

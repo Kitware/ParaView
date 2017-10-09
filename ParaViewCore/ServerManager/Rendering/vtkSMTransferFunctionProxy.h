@@ -344,8 +344,8 @@ protected:
   ~vtkSMTransferFunctionProxy() override;
 
 private:
-  vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTransferFunctionProxy&) VTK_DELETE_FUNCTION;
+  vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) = delete;
+  void operator=(const vtkSMTransferFunctionProxy&) = delete;
 };
 
 #endif

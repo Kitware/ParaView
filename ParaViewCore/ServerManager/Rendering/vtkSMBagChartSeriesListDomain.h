@@ -51,8 +51,8 @@ protected:
   int ArrayType;
 
 private:
-  vtkSMBagChartSeriesListDomain(const vtkSMBagChartSeriesListDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMBagChartSeriesListDomain&) VTK_DELETE_FUNCTION;
+  vtkSMBagChartSeriesListDomain(const vtkSMBagChartSeriesListDomain&) = delete;
+  void operator=(const vtkSMBagChartSeriesListDomain&) = delete;
 };
 
 #endif

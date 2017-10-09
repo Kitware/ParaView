@@ -124,8 +124,8 @@ protected:
   double ProgressInterval;
 
 private:
-  vtkPVProgressHandler(const vtkPVProgressHandler&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVProgressHandler&) VTK_DELETE_FUNCTION;
+  vtkPVProgressHandler(const vtkPVProgressHandler&) = delete;
+  void operator=(const vtkPVProgressHandler&) = delete;
 
   /**
    * Callback called when vtkCommand::ProgressEvent is received.

@@ -247,8 +247,8 @@ protected:
   vtkPPInternals* PPInternals;
 
 private:
-  vtkSMProxyProperty(const vtkSMProxyProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyProperty&) VTK_DELETE_FUNCTION;
+  vtkSMProxyProperty(const vtkSMProxyProperty&) = delete;
+  void operator=(const vtkSMProxyProperty&) = delete;
 };
 
 #endif

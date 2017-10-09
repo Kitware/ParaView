@@ -67,9 +67,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkAllToNRedistributeCompositePolyData(
-    const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAllToNRedistributeCompositePolyData&) VTK_DELETE_FUNCTION;
+  vtkAllToNRedistributeCompositePolyData(const vtkAllToNRedistributeCompositePolyData&) = delete;
+  void operator=(const vtkAllToNRedistributeCompositePolyData&) = delete;
 };
 
 #endif

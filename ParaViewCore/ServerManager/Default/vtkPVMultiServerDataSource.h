@@ -66,8 +66,8 @@ protected:
     vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkPVMultiServerDataSource(const vtkPVMultiServerDataSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVMultiServerDataSource&) VTK_DELETE_FUNCTION;
+  vtkPVMultiServerDataSource(const vtkPVMultiServerDataSource&) = delete;
+  void operator=(const vtkPVMultiServerDataSource&) = delete;
 
   struct vtkInternal;
   vtkInternal* Internal;

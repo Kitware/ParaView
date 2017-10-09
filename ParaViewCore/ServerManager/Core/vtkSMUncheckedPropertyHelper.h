@@ -26,8 +26,8 @@ public:
   vtkSMUncheckedPropertyHelper(vtkSMProperty* property, bool quiet = false);
 
 private:
-  vtkSMUncheckedPropertyHelper(const vtkSMUncheckedPropertyHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMUncheckedPropertyHelper&) VTK_DELETE_FUNCTION;
+  vtkSMUncheckedPropertyHelper(const vtkSMUncheckedPropertyHelper&) = delete;
+  void operator=(const vtkSMUncheckedPropertyHelper&) = delete;
 };
 
 #endif

@@ -295,8 +295,8 @@ protected:
   void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
 
 private:
-  vtkSMPropertyHelper(const vtkSMPropertyHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPropertyHelper&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyHelper(const vtkSMPropertyHelper&) = delete;
+  void operator=(const vtkSMPropertyHelper&) = delete;
   void Initialize(vtkSMProperty* property);
 
   template <typename T>

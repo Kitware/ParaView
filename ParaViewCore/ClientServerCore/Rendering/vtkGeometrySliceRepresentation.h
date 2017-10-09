@@ -68,8 +68,8 @@ protected:
   bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
 private:
-  vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&) = delete;
+  void operator=(const vtkGeometrySliceRepresentation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

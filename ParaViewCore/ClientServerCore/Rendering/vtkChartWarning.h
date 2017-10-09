@@ -59,8 +59,8 @@ protected:
   double TextPad;
 
 private:
-  vtkChartWarning(const vtkChartWarning&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkChartWarning&) VTK_DELETE_FUNCTION;
+  vtkChartWarning(const vtkChartWarning&) = delete;
+  void operator=(const vtkChartWarning&) = delete;
 };
 
 #endif // vtkChartWarning_h

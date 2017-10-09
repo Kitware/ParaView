@@ -76,8 +76,8 @@ protected:
   double Offset;
 
 private:
-  vtkPVSinusoidKeyFrame(const vtkPVSinusoidKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSinusoidKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVSinusoidKeyFrame(const vtkPVSinusoidKeyFrame&) = delete;
+  void operator=(const vtkPVSinusoidKeyFrame&) = delete;
 };
 
 #endif

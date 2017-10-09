@@ -263,8 +263,8 @@ protected:
   virtual void OnConnectionLost(vtkObject* caller, unsigned long eventid, void* calldata);
 
 private:
-  vtkSMSessionClient(const vtkSMSessionClient&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSessionClient&) VTK_DELETE_FUNCTION;
+  vtkSMSessionClient(const vtkSMSessionClient&) = delete;
+  void operator=(const vtkSMSessionClient&) = delete;
 
   int NotBusy;
   vtkTypeUInt32 LastGlobalID;

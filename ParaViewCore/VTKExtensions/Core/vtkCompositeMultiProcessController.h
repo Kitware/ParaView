@@ -148,8 +148,8 @@ protected:
   ~vtkCompositeMultiProcessController() override;
 
 private:
-  vtkCompositeMultiProcessController(const vtkCompositeMultiProcessController&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCompositeMultiProcessController&) VTK_DELETE_FUNCTION;
+  vtkCompositeMultiProcessController(const vtkCompositeMultiProcessController&) = delete;
+  void operator=(const vtkCompositeMultiProcessController&) = delete;
 
   class vtkCompositeInternals;
   vtkCompositeInternals* Internal;

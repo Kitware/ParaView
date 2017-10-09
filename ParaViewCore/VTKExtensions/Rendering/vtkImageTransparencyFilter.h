@@ -53,8 +53,8 @@ protected:
   ~vtkImageTransparencyFilter();
 
 private:
-  vtkImageTransparencyFilter(const vtkImageTransparencyFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkImageTransparencyFilter&) VTK_DELETE_FUNCTION;
+  vtkImageTransparencyFilter(const vtkImageTransparencyFilter&) = delete;
+  void operator=(const vtkImageTransparencyFilter&) = delete;
 };
 
 #endif

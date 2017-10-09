@@ -84,8 +84,8 @@ protected:
   };
 
 private:
-  vtkSMSessionObject(const vtkSMSessionObject&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSessionObject&) VTK_DELETE_FUNCTION;
+  vtkSMSessionObject(const vtkSMSessionObject&) = delete;
+  void operator=(const vtkSMSessionObject&) = delete;
 };
 
 #endif

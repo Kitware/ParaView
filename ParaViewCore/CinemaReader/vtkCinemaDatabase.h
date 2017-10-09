@@ -138,8 +138,8 @@ protected:
   ~vtkCinemaDatabase() override;
 
 private:
-  vtkCinemaDatabase(const vtkCinemaDatabase&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCinemaDatabase&) VTK_DELETE_FUNCTION;
+  vtkCinemaDatabase(const vtkCinemaDatabase&) = delete;
+  void operator=(const vtkCinemaDatabase&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

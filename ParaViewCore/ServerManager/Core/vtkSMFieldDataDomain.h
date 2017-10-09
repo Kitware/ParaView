@@ -98,8 +98,8 @@ private:
    */
   void UpdateDomainEntries(int acceptable_association, vtkPVDataInformation* dataInfo);
 
-  vtkSMFieldDataDomain(const vtkSMFieldDataDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMFieldDataDomain&) VTK_DELETE_FUNCTION;
+  vtkSMFieldDataDomain(const vtkSMFieldDataDomain&) = delete;
+  void operator=(const vtkSMFieldDataDomain&) = delete;
 };
 
 #endif

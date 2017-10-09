@@ -80,8 +80,8 @@ protected:
   std::vector<double> Values;
 
 private:
-  vtkSMDiscreteDoubleDomain(const vtkSMDiscreteDoubleDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDiscreteDoubleDomain&) VTK_DELETE_FUNCTION;
+  vtkSMDiscreteDoubleDomain(const vtkSMDiscreteDoubleDomain&) = delete;
+  void operator=(const vtkSMDiscreteDoubleDomain&) = delete;
 };
 
 #endif

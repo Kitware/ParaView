@@ -122,8 +122,8 @@ protected:
   vtkPVCueManipulator* Manipulator;
 
 private:
-  vtkPVAnimationCue(const vtkPVAnimationCue&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAnimationCue&) VTK_DELETE_FUNCTION;
+  vtkPVAnimationCue(const vtkPVAnimationCue&) = delete;
+  void operator=(const vtkPVAnimationCue&) = delete;
 };
 
 #endif

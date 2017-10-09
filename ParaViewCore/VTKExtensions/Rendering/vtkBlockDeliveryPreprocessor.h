@@ -109,8 +109,8 @@ protected:
   bool GenerateCellConnectivity;
 
 private:
-  vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkBlockDeliveryPreprocessor&) VTK_DELETE_FUNCTION;
+  vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&) = delete;
+  void operator=(const vtkBlockDeliveryPreprocessor&) = delete;
 
   class CompositeDataSetIndicesType;
   CompositeDataSetIndicesType* CompositeDataSetIndices;

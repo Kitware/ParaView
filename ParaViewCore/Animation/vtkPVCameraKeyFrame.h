@@ -90,8 +90,8 @@ protected:
   vtkCameraInterpolator2* Interpolator;
 
 private:
-  vtkPVCameraKeyFrame(const vtkPVCameraKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCameraKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVCameraKeyFrame(const vtkPVCameraKeyFrame&) = delete;
+  void operator=(const vtkPVCameraKeyFrame&) = delete;
 };
 
 #endif

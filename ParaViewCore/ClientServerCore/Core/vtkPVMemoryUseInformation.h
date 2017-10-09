@@ -89,8 +89,8 @@ private:
   vector<MemInfo> MemInfos;
 
 private:
-  vtkPVMemoryUseInformation(const vtkPVMemoryUseInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVMemoryUseInformation&) VTK_DELETE_FUNCTION;
+  vtkPVMemoryUseInformation(const vtkPVMemoryUseInformation&) = delete;
+  void operator=(const vtkPVMemoryUseInformation&) = delete;
 };
 
 #endif

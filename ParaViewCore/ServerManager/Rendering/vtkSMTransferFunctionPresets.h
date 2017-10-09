@@ -150,8 +150,8 @@ protected:
   ~vtkSMTransferFunctionPresets() override;
 
 private:
-  vtkSMTransferFunctionPresets(const vtkSMTransferFunctionPresets&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTransferFunctionPresets&) VTK_DELETE_FUNCTION;
+  vtkSMTransferFunctionPresets(const vtkSMTransferFunctionPresets&) = delete;
+  void operator=(const vtkSMTransferFunctionPresets&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

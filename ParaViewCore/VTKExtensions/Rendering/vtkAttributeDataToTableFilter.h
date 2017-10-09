@@ -124,8 +124,8 @@ protected:
   bool GenerateCellConnectivity;
 
 private:
-  vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
+  vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&) = delete;
+  void operator=(const vtkAttributeDataToTableFilter&) = delete;
 };
 
 #endif

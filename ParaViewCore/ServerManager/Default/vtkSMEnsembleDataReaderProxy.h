@@ -46,8 +46,8 @@ protected:
 private:
   bool FetchFileNames();
 
-  vtkSMEnsembleDataReaderProxy(const vtkSMEnsembleDataReaderProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMEnsembleDataReaderProxy&) VTK_DELETE_FUNCTION;
+  vtkSMEnsembleDataReaderProxy(const vtkSMEnsembleDataReaderProxy&) = delete;
+  void operator=(const vtkSMEnsembleDataReaderProxy&) = delete;
 };
 
 #endif

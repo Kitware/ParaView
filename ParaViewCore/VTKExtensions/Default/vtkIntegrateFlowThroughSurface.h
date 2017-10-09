@@ -57,8 +57,8 @@ protected:
   vtkDataSet* GenerateSurfaceVectors(vtkDataSet* input);
 
 private:
-  vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIntegrateFlowThroughSurface&) VTK_DELETE_FUNCTION;
+  vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&) = delete;
+  void operator=(const vtkIntegrateFlowThroughSurface&) = delete;
 };
 
 #endif

@@ -56,8 +56,8 @@ protected:
   virtual void HandleAnalog(const vtkVREventData& data);
 
 private:
-  vtkVRSpaceNavigatorGrabWorldStyle(const vtkVRSpaceNavigatorGrabWorldStyle&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&) VTK_DELETE_FUNCTION;
+  vtkVRSpaceNavigatorGrabWorldStyle(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;
+  void operator=(const vtkVRSpaceNavigatorGrabWorldStyle&) = delete;
 };
 
 #endif // vtkVRSpaceNavigatorGrabWorldStyle.h_

@@ -103,8 +103,8 @@ protected:
   unsigned long Count;
 
 private:
-  vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;
+  vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) = delete;
+  void operator=(const vtkTimestepsAnimationPlayer&) = delete;
 
   vtkTimestepsAnimationPlayerSetOfDouble* TimeSteps;
 };

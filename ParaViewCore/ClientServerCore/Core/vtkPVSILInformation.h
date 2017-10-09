@@ -79,8 +79,8 @@ protected:
   vtkSmartPointer<vtkSubsetInclusionLattice> SubsetInclusionLattice;
 
 private:
-  vtkPVSILInformation(const vtkPVSILInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSILInformation&) VTK_DELETE_FUNCTION;
+  vtkPVSILInformation(const vtkPVSILInformation&) = delete;
+  void operator=(const vtkPVSILInformation&) = delete;
 };
 
 #endif

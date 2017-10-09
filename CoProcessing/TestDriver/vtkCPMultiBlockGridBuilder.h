@@ -84,8 +84,8 @@ protected:
   void SetGrid(vtkMultiBlockDataSet* multiBlock);
 
 private:
-  vtkCPMultiBlockGridBuilder(const vtkCPMultiBlockGridBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPMultiBlockGridBuilder&) VTK_DELETE_FUNCTION;
+  vtkCPMultiBlockGridBuilder(const vtkCPMultiBlockGridBuilder&) = delete;
+  void operator=(const vtkCPMultiBlockGridBuilder&) = delete;
 
   /**
    * The grid that is returned.

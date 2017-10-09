@@ -210,8 +210,8 @@ protected:
   bool DataReplicatedOnAllProcesses;
 
 private:
-  vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSynchronizedRenderer&) VTK_DELETE_FUNCTION;
+  vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&) = delete;
+  void operator=(const vtkPVSynchronizedRenderer&) = delete;
 };
 
 #endif

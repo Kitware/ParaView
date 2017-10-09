@@ -61,8 +61,8 @@ protected:
   unsigned long CacheSize;
 
 private:
-  vtkPVCacheSizeInformation(const vtkPVCacheSizeInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCacheSizeInformation&) VTK_DELETE_FUNCTION;
+  vtkPVCacheSizeInformation(const vtkPVCacheSizeInformation&) = delete;
+  void operator=(const vtkPVCacheSizeInformation&) = delete;
 };
 
 #endif

@@ -133,8 +133,8 @@ protected:
   void SaveValueToCache(vtkSMMessage* proxyStateUpdate, int offset);
 
 private:
-  vtkSIProperty(const vtkSIProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIProperty&) VTK_DELETE_FUNCTION;
+  vtkSIProperty(const vtkSIProperty&) = delete;
+  void operator=(const vtkSIProperty&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

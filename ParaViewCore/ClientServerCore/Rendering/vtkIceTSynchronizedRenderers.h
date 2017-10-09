@@ -190,8 +190,8 @@ protected:
   virtual void SlaveStartRender() VTK_OVERRIDE;
 
 private:
-  vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) = delete;
+  void operator=(const vtkIceTSynchronizedRenderers&) = delete;
 };
 
 #endif

@@ -37,8 +37,8 @@ protected:
   ~vtkMyElevationFilter();
 
 private:
-  vtkMyElevationFilter(const vtkMyElevationFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMyElevationFilter&) VTK_DELETE_FUNCTION;
+  vtkMyElevationFilter(const vtkMyElevationFilter&) = delete;
+  void operator=(const vtkMyElevationFilter&) = delete;
 };
 
 #endif

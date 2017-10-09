@@ -101,8 +101,8 @@ protected:
   int UseOpenGL;
 
 private:
-  vtkIceTContext(const vtkIceTContext&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIceTContext&) VTK_DELETE_FUNCTION;
+  vtkIceTContext(const vtkIceTContext&) = delete;
+  void operator=(const vtkIceTContext&) = delete;
 
   vtkIceTContextOpaqueHandle* Context;
 };

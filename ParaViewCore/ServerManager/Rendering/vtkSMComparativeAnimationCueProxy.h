@@ -101,8 +101,8 @@ protected:
   vtkPVComparativeAnimationCue* GetComparativeAnimationCue();
 
 private:
-  vtkSMComparativeAnimationCueProxy(const vtkSMComparativeAnimationCueProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMComparativeAnimationCueProxy&) VTK_DELETE_FUNCTION;
+  vtkSMComparativeAnimationCueProxy(const vtkSMComparativeAnimationCueProxy&) = delete;
+  void operator=(const vtkSMComparativeAnimationCueProxy&) = delete;
 
   class vtkInternal;
   vtkInternal* Internals;

@@ -71,8 +71,8 @@ protected:
   ~vtkPVOpenGLInformation() override;
 
 private:
-  vtkPVOpenGLInformation(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
+  vtkPVOpenGLInformation(const vtkPVOpenGLInformation&) = delete;
+  void operator=(const vtkPVOpenGLInformation&) = delete;
 
   std::string Vendor;
   std::string Version;

@@ -89,8 +89,8 @@ protected:
   char* Parameters;
 
 private:
-  vtkAdiosPixieReader(const vtkAdiosPixieReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAdiosPixieReader&) VTK_DELETE_FUNCTION;
+  vtkAdiosPixieReader(const vtkAdiosPixieReader&) = delete;
+  void operator=(const vtkAdiosPixieReader&) = delete;
 
   class Internals;
   Internals* Internal;

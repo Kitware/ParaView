@@ -212,8 +212,8 @@ protected:
   vtkSciVizStatisticsP* P;
 
 private:
-  vtkSciVizStatistics(const vtkSciVizStatistics&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSciVizStatistics&) VTK_DELETE_FUNCTION;
+  vtkSciVizStatistics(const vtkSciVizStatistics&) = delete;
+  void operator=(const vtkSciVizStatistics&) = delete;
 };
 
 #endif // vtkSciVizStatistics_h

@@ -327,8 +327,8 @@ protected:
   int SeparatorWidth;
 
 private:
-  vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
+  vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) = delete;
+  void operator=(const vtkSMViewLayoutProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

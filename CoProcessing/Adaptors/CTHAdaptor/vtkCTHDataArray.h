@@ -271,8 +271,8 @@ protected:
   vtkDoubleArray* Fallback;
 
 private:
-  vtkCTHDataArray(const vtkCTHDataArray&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCTHDataArray&) VTK_DELETE_FUNCTION;
+  vtkCTHDataArray(const vtkCTHDataArray&) = delete;
+  void operator=(const vtkCTHDataArray&) = delete;
 };
 
 #endif /* vtkCTHDataArray_h */

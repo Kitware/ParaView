@@ -151,8 +151,8 @@ protected:
   vtkAMRDualClipLocator* BlockLocator;
 
 private:
-  vtkAMRDualClip(const vtkAMRDualClip&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRDualClip&) VTK_DELETE_FUNCTION;
+  vtkAMRDualClip(const vtkAMRDualClip&) = delete;
+  void operator=(const vtkAMRDualClip&) = delete;
 };
 
 #endif

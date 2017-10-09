@@ -102,8 +102,8 @@ protected:
   vtkTypeUInt32 GlobalID;
 
 private:
-  vtkSIObject(const vtkSIObject&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIObject&) VTK_DELETE_FUNCTION;
+  vtkSIObject(const vtkSIObject&) = delete;
+  void operator=(const vtkSIObject&) = delete;
 };
 
 #endif // #ifndef vtkSIObject_h

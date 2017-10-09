@@ -36,8 +36,8 @@ protected:
   ~vtkCPPythonAdaptorAPI();
 
 private:
-  vtkCPPythonAdaptorAPI(const vtkCPPythonAdaptorAPI&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPPythonAdaptorAPI&) VTK_DELETE_FUNCTION;
+  vtkCPPythonAdaptorAPI(const vtkCPPythonAdaptorAPI&) = delete;
+  void operator=(const vtkCPPythonAdaptorAPI&) = delete;
 };
 
 #endif

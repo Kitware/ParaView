@@ -66,8 +66,8 @@ protected:
   vtkPVTrivialProducerInternal* Internals;
 
 private:
-  vtkPVTrivialProducer(const vtkPVTrivialProducer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrivialProducer&) VTK_DELETE_FUNCTION;
+  vtkPVTrivialProducer(const vtkPVTrivialProducer&) = delete;
+  void operator=(const vtkPVTrivialProducer&) = delete;
 };
 
 #endif

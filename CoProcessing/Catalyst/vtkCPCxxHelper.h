@@ -41,8 +41,8 @@ protected:
   virtual ~vtkCPCxxHelper();
 
 private:
-  vtkCPCxxHelper(const vtkCPCxxHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPCxxHelper&) VTK_DELETE_FUNCTION;
+  vtkCPCxxHelper(const vtkCPCxxHelper&) = delete;
+  void operator=(const vtkCPCxxHelper&) = delete;
 
   vtkPVOptions* Options;
 

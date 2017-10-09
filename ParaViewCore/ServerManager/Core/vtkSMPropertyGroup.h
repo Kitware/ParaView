@@ -117,8 +117,8 @@ protected:
   vtkSMDocumentation* Documentation;
 
 private:
-  vtkSMPropertyGroup(const vtkSMPropertyGroup&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPropertyGroup&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyGroup(const vtkSMPropertyGroup&) = delete;
+  void operator=(const vtkSMPropertyGroup&) = delete;
 
   char* Name;
   char* XMLLabel;

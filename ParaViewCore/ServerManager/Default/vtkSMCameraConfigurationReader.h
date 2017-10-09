@@ -70,8 +70,8 @@ protected:
   void SetProxy(vtkSMProxy*) VTK_OVERRIDE { vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
-  vtkSMCameraConfigurationReader(const vtkSMCameraConfigurationReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCameraConfigurationReader&) VTK_DELETE_FUNCTION;
+  vtkSMCameraConfigurationReader(const vtkSMCameraConfigurationReader&) = delete;
+  void operator=(const vtkSMCameraConfigurationReader&) = delete;
 };
 
 #endif

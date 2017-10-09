@@ -109,8 +109,8 @@ protected:
   int ServerPort;
 
 private:
-  vtkPVServerOptions(const vtkPVServerOptions&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVServerOptions&) VTK_DELETE_FUNCTION;
+  vtkPVServerOptions(const vtkPVServerOptions&) = delete;
+  void operator=(const vtkPVServerOptions&) = delete;
 
   vtkPVServerOptionsInternals* Internals;
 };

@@ -67,8 +67,8 @@ protected:
   static bool LoadAllVariables;
 
 private:
-  vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMArraySelectionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) = delete;
+  void operator=(const vtkSMArraySelectionDomain&) = delete;
 };
 
 #endif

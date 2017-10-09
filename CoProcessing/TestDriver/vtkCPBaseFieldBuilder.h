@@ -52,8 +52,8 @@ protected:
   ~vtkCPBaseFieldBuilder();
 
 private:
-  vtkCPBaseFieldBuilder(const vtkCPBaseFieldBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPBaseFieldBuilder&) VTK_DELETE_FUNCTION;
+  vtkCPBaseFieldBuilder(const vtkCPBaseFieldBuilder&) = delete;
+  void operator=(const vtkCPBaseFieldBuilder&) = delete;
 };
 
 #endif

@@ -261,8 +261,8 @@ public:
   }
 
 private:
-  BCInformation(const BCInformation&) VTK_DELETE_FUNCTION;
-  BCInformation& operator=(const BCInformation&) VTK_DELETE_FUNCTION;
+  BCInformation(const BCInformation&) = delete;
+  BCInformation& operator=(const BCInformation&) = delete;
 };
 }
 

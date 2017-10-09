@@ -99,8 +99,8 @@ protected:
   friend class vtkSMInteractionUndoStackBuilderObserver;
 
 private:
-  vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
+  vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&) = delete;
+  void operator=(const vtkSMInteractionUndoStackBuilder&) = delete;
 
   vtkSMInteractionUndoStackBuilderObserver* Observer;
 };

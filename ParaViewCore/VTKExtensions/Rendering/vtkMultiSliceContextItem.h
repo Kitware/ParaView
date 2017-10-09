@@ -140,8 +140,8 @@ protected:
   ~vtkMultiSliceContextItem() override;
 
 private:
-  vtkMultiSliceContextItem(const vtkMultiSliceContextItem&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMultiSliceContextItem&) VTK_DELETE_FUNCTION;
+  vtkMultiSliceContextItem(const vtkMultiSliceContextItem&) = delete;
+  void operator=(const vtkMultiSliceContextItem&) = delete;
 
   struct vtkInternal;
   vtkInternal* Internal;

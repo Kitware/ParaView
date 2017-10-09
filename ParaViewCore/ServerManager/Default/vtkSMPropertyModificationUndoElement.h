@@ -76,9 +76,8 @@ protected:
   vtkSMMessage* PropertyState;
 
 private:
-  vtkSMPropertyModificationUndoElement(
-    const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyModificationUndoElement(const vtkSMPropertyModificationUndoElement&) = delete;
+  void operator=(const vtkSMPropertyModificationUndoElement&) = delete;
 };
 
 #endif

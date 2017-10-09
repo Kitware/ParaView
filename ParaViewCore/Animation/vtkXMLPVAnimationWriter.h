@@ -81,8 +81,8 @@ protected:
   void AddInputInternal(const char* group);
 
 private:
-  vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;
+  vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&) = delete;
+  void operator=(const vtkXMLPVAnimationWriter&) = delete;
 };
 
 #endif

@@ -90,9 +90,8 @@ protected:
   bool NVPipeSupport;
 
 private:
-  vtkPVClientServerSynchronizedRenderers(
-    const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  vtkPVClientServerSynchronizedRenderers(const vtkPVClientServerSynchronizedRenderers&) = delete;
+  void operator=(const vtkPVClientServerSynchronizedRenderers&) = delete;
 };
 
 #endif

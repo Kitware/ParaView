@@ -160,8 +160,8 @@ protected:
   vtkNew<vtkPolyData> Clone;
 
 private:
-  vtkRulerSourceRepresentation(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkRulerSourceRepresentation(const vtkRulerSourceRepresentation&) = delete;
+  void operator=(const vtkRulerSourceRepresentation&) = delete;
 };
 
 #endif

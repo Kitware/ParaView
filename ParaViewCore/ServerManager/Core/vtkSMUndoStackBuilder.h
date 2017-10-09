@@ -153,8 +153,8 @@ protected:
   bool IgnoreAllChanges;
 
 private:
-  vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMUndoStackBuilder&) VTK_DELETE_FUNCTION;
+  vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&) = delete;
+  void operator=(const vtkSMUndoStackBuilder&) = delete;
 };
 
 #endif

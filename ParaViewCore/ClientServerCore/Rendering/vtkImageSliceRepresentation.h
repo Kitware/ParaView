@@ -210,8 +210,8 @@ protected:
   int WholeExtent[6];
 
 private:
-  vtkImageSliceRepresentation(const vtkImageSliceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkImageSliceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkImageSliceRepresentation(const vtkImageSliceRepresentation&) = delete;
+  void operator=(const vtkImageSliceRepresentation&) = delete;
 };
 
 #endif

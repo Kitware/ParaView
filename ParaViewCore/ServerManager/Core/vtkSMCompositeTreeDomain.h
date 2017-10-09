@@ -198,8 +198,8 @@ protected:
   int SourcePort;
 
 private:
-  vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&) = delete;
+  void operator=(const vtkSMCompositeTreeDomain&) = delete;
 };
 
 #endif

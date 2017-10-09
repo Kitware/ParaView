@@ -82,8 +82,8 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkMergeArrays(const vtkMergeArrays&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMergeArrays&) VTK_DELETE_FUNCTION;
+  vtkMergeArrays(const vtkMergeArrays&) = delete;
+  void operator=(const vtkMergeArrays&) = delete;
 };
 
 #endif

@@ -118,8 +118,8 @@ protected:
   void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTimeKeeperProxy&) VTK_DELETE_FUNCTION;
+  vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&) = delete;
+  void operator=(const vtkSMTimeKeeperProxy&) = delete;
 };
 
 #endif

@@ -202,8 +202,8 @@ protected:
   };
 
 private:
-  vtkSpreadSheetView(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
+  vtkSpreadSheetView(const vtkSpreadSheetView&) = delete;
+  void operator=(const vtkSpreadSheetView&) = delete;
 
   class vtkInternals;
   friend class vtkInternals;

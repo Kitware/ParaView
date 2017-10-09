@@ -41,9 +41,8 @@ protected:
   void SendRepresentation() VTK_OVERRIDE;
 
 private:
-  vtkSMImplicitPlaneRepresentationProxy(
-    const vtkSMImplicitPlaneRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMImplicitPlaneRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMImplicitPlaneRepresentationProxy(const vtkSMImplicitPlaneRepresentationProxy&) = delete;
+  void operator=(const vtkSMImplicitPlaneRepresentationProxy&) = delete;
 };
 
 #endif

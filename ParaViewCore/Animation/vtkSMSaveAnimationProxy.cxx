@@ -72,8 +72,8 @@ protected:
   }
 
 private:
-  SceneImageWriter(const SceneImageWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const SceneImageWriter&) VTK_DELETE_FUNCTION;
+  SceneImageWriter(const SceneImageWriter&) = delete;
+  void operator=(const SceneImageWriter&) = delete;
 };
 
 vtkStandardNewMacro(SceneImageWriter);

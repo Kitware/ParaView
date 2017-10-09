@@ -169,8 +169,8 @@ protected:
   vtkSMMessage* State;
 
 private:
-  vtkSMLink(const vtkSMLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMLink&) VTK_DELETE_FUNCTION;
+  vtkSMLink(const vtkSMLink&) = delete;
+  void operator=(const vtkSMLink&) = delete;
 };
 
 #endif

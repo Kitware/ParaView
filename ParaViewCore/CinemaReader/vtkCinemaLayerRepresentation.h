@@ -97,8 +97,8 @@ protected:
   std::string GetSpecCQuery(int cameraIndex);
 
 private:
-  vtkCinemaLayerRepresentation(const vtkCinemaLayerRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCinemaLayerRepresentation&) VTK_DELETE_FUNCTION;
+  vtkCinemaLayerRepresentation(const vtkCinemaLayerRepresentation&) = delete;
+  void operator=(const vtkCinemaLayerRepresentation&) = delete;
 
   vtkNew<vtkCinemaDatabase> CinemaDatabase;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;

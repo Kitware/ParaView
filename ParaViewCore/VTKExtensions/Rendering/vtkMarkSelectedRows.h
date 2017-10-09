@@ -81,8 +81,8 @@ protected:
   int FieldAssociation;
 
 private:
-  vtkMarkSelectedRows(const vtkMarkSelectedRows&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMarkSelectedRows&) VTK_DELETE_FUNCTION;
+  vtkMarkSelectedRows(const vtkMarkSelectedRows&) = delete;
+  void operator=(const vtkMarkSelectedRows&) = delete;
 };
 
 #endif

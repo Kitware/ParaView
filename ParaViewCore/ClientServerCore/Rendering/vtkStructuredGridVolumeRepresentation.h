@@ -66,9 +66,8 @@ protected:
   vtkTableExtentTranslator* TableExtentTranslator;
 
 private:
-  vtkStructuredGridVolumeRepresentation(
-    const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkStructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkStructuredGridVolumeRepresentation(const vtkStructuredGridVolumeRepresentation&) = delete;
+  void operator=(const vtkStructuredGridVolumeRepresentation&) = delete;
 };
 
 #endif

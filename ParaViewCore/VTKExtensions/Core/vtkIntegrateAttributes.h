@@ -112,8 +112,8 @@ protected:
     vtkDataSetAttributes* data, bool skipLastArray, double sum);
 
 private:
-  vtkIntegrateAttributes(const vtkIntegrateAttributes&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIntegrateAttributes&) VTK_DELETE_FUNCTION;
+  vtkIntegrateAttributes(const vtkIntegrateAttributes&) = delete;
+  void operator=(const vtkIntegrateAttributes&) = delete;
 
   class vtkFieldList;
   vtkFieldList* CellFieldList;

@@ -217,9 +217,8 @@ protected:
   bool UseOutline;
 
 private:
-  vtkStreamingParticlesRepresentation(
-    const vtkStreamingParticlesRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkStreamingParticlesRepresentation&) VTK_DELETE_FUNCTION;
+  vtkStreamingParticlesRepresentation(const vtkStreamingParticlesRepresentation&) = delete;
+  void operator=(const vtkStreamingParticlesRepresentation&) = delete;
 
   // Description:
   // This flag is set to true if the input pipeline is streaming capable in

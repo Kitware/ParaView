@@ -60,8 +60,8 @@ public:
   int ExcludeCubeAxesActorsFromRasterization;
 
 private:
-  vtkPVGL2PSExporter(const vtkPVGL2PSExporter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVGL2PSExporter&) VTK_DELETE_FUNCTION;
+  vtkPVGL2PSExporter(const vtkPVGL2PSExporter&) = delete;
+  void operator=(const vtkPVGL2PSExporter&) = delete;
 };
 
 #endif

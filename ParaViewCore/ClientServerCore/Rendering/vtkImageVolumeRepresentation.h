@@ -166,8 +166,8 @@ protected:
   int WholeExtent[6];
 
 private:
-  vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkImageVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) = delete;
+  void operator=(const vtkImageVolumeRepresentation&) = delete;
 };
 
 #endif

@@ -141,8 +141,8 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkFileSeriesWriter(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
+  vtkFileSeriesWriter(const vtkFileSeriesWriter&) = delete;
+  void operator=(const vtkFileSeriesWriter&) = delete;
 
   void SetWriterFileName(const char* fname);
   bool WriteATimestep(vtkDataObject*, vtkInformation* inInfo);

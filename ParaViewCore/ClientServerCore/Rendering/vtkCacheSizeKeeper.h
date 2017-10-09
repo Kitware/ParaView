@@ -98,8 +98,8 @@ protected:
   int CacheFull;
 
 private:
-  vtkCacheSizeKeeper(const vtkCacheSizeKeeper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCacheSizeKeeper&) VTK_DELETE_FUNCTION;
+  vtkCacheSizeKeeper(const vtkCacheSizeKeeper&) = delete;
+  void operator=(const vtkCacheSizeKeeper&) = delete;
 };
 
 #endif

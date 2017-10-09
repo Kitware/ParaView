@@ -50,8 +50,8 @@ protected:
   vtkSMMaterialObserver* Observer;
 
 private:
-  vtkSMMaterialDomain(const vtkSMMaterialDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMMaterialDomain&) VTK_DELETE_FUNCTION;
+  vtkSMMaterialDomain(const vtkSMMaterialDomain&) = delete;
+  void operator=(const vtkSMMaterialDomain&) = delete;
 };
 
 #endif

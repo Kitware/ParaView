@@ -49,8 +49,8 @@ protected:
   void SetRepresentation(int) VTK_OVERRIDE { this->Superclass::SetRepresentation(WIREFRAME); }
 
 private:
-  vtkOutlineRepresentation(const vtkOutlineRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkOutlineRepresentation&) VTK_DELETE_FUNCTION;
+  vtkOutlineRepresentation(const vtkOutlineRepresentation&) = delete;
+  void operator=(const vtkOutlineRepresentation&) = delete;
 };
 
 #endif

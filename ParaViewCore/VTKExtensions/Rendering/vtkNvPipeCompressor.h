@@ -78,7 +78,7 @@ private:
   uint64_t Bitrate;
 
 private:
-  vtkNvPipeCompressor(const vtkNvPipeCompressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkNvPipeCompressor&) VTK_DELETE_FUNCTION;
+  vtkNvPipeCompressor(const vtkNvPipeCompressor&) = delete;
+  void operator=(const vtkNvPipeCompressor&) = delete;
 };
 #endif

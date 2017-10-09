@@ -98,8 +98,8 @@ protected:
   int ArrayAssociation;
 
 private:
-  vtkPythonCalculator(const vtkPythonCalculator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPythonCalculator&) VTK_DELETE_FUNCTION;
+  vtkPythonCalculator(const vtkPythonCalculator&) = delete;
+  void operator=(const vtkPythonCalculator&) = delete;
 };
 
 #endif

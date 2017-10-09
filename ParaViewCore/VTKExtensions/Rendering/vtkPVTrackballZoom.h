@@ -65,8 +65,8 @@ protected:
   bool UseDollyForPerspectiveProjection;
   double ZoomScale;
 
-  vtkPVTrackballZoom(const vtkPVTrackballZoom&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballZoom&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballZoom(const vtkPVTrackballZoom&) = delete;
+  void operator=(const vtkPVTrackballZoom&) = delete;
 };
 
 #endif

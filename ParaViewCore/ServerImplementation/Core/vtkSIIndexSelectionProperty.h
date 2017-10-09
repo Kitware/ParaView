@@ -49,8 +49,8 @@ protected:
   bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
-  vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIIndexSelectionProperty&) VTK_DELETE_FUNCTION;
+  vtkSIIndexSelectionProperty(const vtkSIIndexSelectionProperty&) = delete;
+  void operator=(const vtkSIIndexSelectionProperty&) = delete;
 };
 
 #endif

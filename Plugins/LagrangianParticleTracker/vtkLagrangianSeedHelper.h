@@ -84,8 +84,8 @@ protected:
   vtkInternals* Internals;
 
 private:
-  vtkLagrangianSeedHelper(const vtkLagrangianSeedHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkLagrangianSeedHelper&) VTK_DELETE_FUNCTION;
+  vtkLagrangianSeedHelper(const vtkLagrangianSeedHelper&) = delete;
+  void operator=(const vtkLagrangianSeedHelper&) = delete;
 };
 
 #endif

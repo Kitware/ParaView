@@ -72,8 +72,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkCompleteArrays(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCompleteArrays&) VTK_DELETE_FUNCTION;
+  vtkCompleteArrays(const vtkCompleteArrays&) = delete;
+  void operator=(const vtkCompleteArrays&) = delete;
 };
 
 #endif

@@ -65,8 +65,8 @@ protected:
     const char* arrayname, vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
 
 private:
-  vtkSMNumberOfComponentsDomain(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMNumberOfComponentsDomain&) VTK_DELETE_FUNCTION;
+  vtkSMNumberOfComponentsDomain(const vtkSMNumberOfComponentsDomain&) = delete;
+  void operator=(const vtkSMNumberOfComponentsDomain&) = delete;
 
   bool EnableMagnitude;
 };

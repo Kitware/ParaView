@@ -334,8 +334,8 @@ protected:
   virtual void DoMaterialSetup(vtkSMProxy* proxy);
 
 private:
-  vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
+  vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) = delete;
+  void operator=(const vtkSMParaViewPipelineController&) = delete;
   //@}
 
   class vtkInternals;

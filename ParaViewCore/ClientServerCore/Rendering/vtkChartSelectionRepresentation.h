@@ -92,8 +92,8 @@ protected:
   bool EnableServerSideRendering;
 
 private:
-  vtkChartSelectionRepresentation(const vtkChartSelectionRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkChartSelectionRepresentation&) VTK_DELETE_FUNCTION;
+  vtkChartSelectionRepresentation(const vtkChartSelectionRepresentation&) = delete;
+  void operator=(const vtkChartSelectionRepresentation&) = delete;
 };
 
 #endif

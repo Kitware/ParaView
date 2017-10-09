@@ -108,8 +108,8 @@ protected:
   int BackfaceRepresentation;
 
 private:
-  vtkGeometryRepresentationWithFaces(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
+  vtkGeometryRepresentationWithFaces(const vtkGeometryRepresentationWithFaces&) = delete;
+  void operator=(const vtkGeometryRepresentationWithFaces&) = delete;
 };
 
 #endif

@@ -213,8 +213,8 @@ protected:
   bool ObjectsCreated;
 
 private:
-  vtkSIProxy(const vtkSIProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIProxy&) VTK_DELETE_FUNCTION;
+  vtkSIProxy(const vtkSIProxy&) = delete;
+  void operator=(const vtkSIProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -300,8 +300,8 @@ protected:
   ~vtkSubsetInclusionLattice();
 
 private:
-  vtkSubsetInclusionLattice(const vtkSubsetInclusionLattice&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSubsetInclusionLattice&) VTK_DELETE_FUNCTION;
+  vtkSubsetInclusionLattice(const vtkSubsetInclusionLattice&) = delete;
+  void operator=(const vtkSubsetInclusionLattice&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

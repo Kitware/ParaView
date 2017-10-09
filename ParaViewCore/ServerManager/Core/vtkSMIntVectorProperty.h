@@ -205,8 +205,8 @@ protected:
   void SaveStateValues(vtkPVXMLElement* propElement) VTK_OVERRIDE;
 
 private:
-  vtkSMIntVectorProperty(const vtkSMIntVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMIntVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSMIntVectorProperty(const vtkSMIntVectorProperty&) = delete;
+  void operator=(const vtkSMIntVectorProperty&) = delete;
 };
 
 #endif

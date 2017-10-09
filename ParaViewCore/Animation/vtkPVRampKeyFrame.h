@@ -42,8 +42,8 @@ protected:
   ~vtkPVRampKeyFrame() override;
 
 private:
-  vtkPVRampKeyFrame(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRampKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVRampKeyFrame(const vtkPVRampKeyFrame&) = delete;
+  void operator=(const vtkPVRampKeyFrame&) = delete;
 };
 
 #endif

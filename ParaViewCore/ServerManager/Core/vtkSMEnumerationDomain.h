@@ -140,8 +140,8 @@ protected:
   vtkSMEnumerationDomainInternals* EInternals;
 
 private:
-  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMEnumerationDomain&) VTK_DELETE_FUNCTION;
+  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&) = delete;
+  void operator=(const vtkSMEnumerationDomain&) = delete;
 };
 
 #endif

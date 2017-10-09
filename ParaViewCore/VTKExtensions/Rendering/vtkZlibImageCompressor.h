@@ -111,8 +111,8 @@ private:
   int CompressionLevel;                           // zlib compression level
 
 private:
-  vtkZlibImageCompressor(const vtkZlibImageCompressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkZlibImageCompressor&) VTK_DELETE_FUNCTION;
+  vtkZlibImageCompressor(const vtkZlibImageCompressor&) = delete;
+  void operator=(const vtkZlibImageCompressor&) = delete;
 };
 
 #endif

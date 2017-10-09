@@ -150,8 +150,8 @@ protected:
   vtkDataLabelRepresentation* LabelRepresentation;
 
 private:
-  vtkSelectionRepresentation(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
+  vtkSelectionRepresentation(const vtkSelectionRepresentation&) = delete;
+  void operator=(const vtkSelectionRepresentation&) = delete;
 };
 
 #endif

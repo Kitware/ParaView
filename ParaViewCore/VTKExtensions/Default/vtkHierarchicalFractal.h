@@ -215,8 +215,8 @@ protected:
     OutputUtil; // convenient class to create composite output
 
 private:
-  vtkHierarchicalFractal(const vtkHierarchicalFractal&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkHierarchicalFractal&) VTK_DELETE_FUNCTION;
+  vtkHierarchicalFractal(const vtkHierarchicalFractal&) = delete;
+  void operator=(const vtkHierarchicalFractal&) = delete;
 };
 
 #endif

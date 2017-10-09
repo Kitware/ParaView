@@ -79,8 +79,8 @@ protected:
   vtkInternals* Internals;
 
 private:
-  vtkLagrangianSurfaceHelper(const vtkLagrangianSurfaceHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkLagrangianSurfaceHelper&) VTK_DELETE_FUNCTION;
+  vtkLagrangianSurfaceHelper(const vtkLagrangianSurfaceHelper&) = delete;
+  void operator=(const vtkLagrangianSurfaceHelper&) = delete;
 };
 
 #endif

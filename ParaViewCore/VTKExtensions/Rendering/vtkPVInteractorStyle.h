@@ -150,8 +150,8 @@ protected:
   void OnButtonUp(int button);
   void ResetLights();
 
-  vtkPVInteractorStyle(const vtkPVInteractorStyle&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVInteractorStyle&) VTK_DELETE_FUNCTION;
+  vtkPVInteractorStyle(const vtkPVInteractorStyle&) = delete;
+  void operator=(const vtkPVInteractorStyle&) = delete;
 };
 
 #endif

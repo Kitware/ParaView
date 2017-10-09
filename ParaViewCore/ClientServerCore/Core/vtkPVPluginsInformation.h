@@ -118,8 +118,8 @@ protected:
   vtkSetStringMacro(SearchPaths);
 
 private:
-  vtkPVPluginsInformation(const vtkPVPluginsInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPluginsInformation&) VTK_DELETE_FUNCTION;
+  vtkPVPluginsInformation(const vtkPVPluginsInformation&) = delete;
+  void operator=(const vtkPVPluginsInformation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

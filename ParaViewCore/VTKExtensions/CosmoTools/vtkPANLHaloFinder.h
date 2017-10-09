@@ -295,8 +295,8 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLHaloFinder : public vtkUnstruct
   vtkInternals* Internal;
 
 private:
-  vtkPANLHaloFinder(const vtkPANLHaloFinder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPANLHaloFinder&) VTK_DELETE_FUNCTION;
+  vtkPANLHaloFinder(const vtkPANLHaloFinder&) = delete;
+  void operator=(const vtkPANLHaloFinder&) = delete;
 
   void ExtractDataArrays(vtkUnstructuredGrid* input, vtkIdType offset);
   void DistributeInput();

@@ -129,8 +129,8 @@ private:
   class vtkInternal;
   vtkInternal* Internal;
 
-  vtkPMultiResolutionGenericIOReader(const vtkPMultiResolutionGenericIOReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPMultiResolutionGenericIOReader&) VTK_DELETE_FUNCTION;
+  vtkPMultiResolutionGenericIOReader(const vtkPMultiResolutionGenericIOReader&) = delete;
+  void operator=(const vtkPMultiResolutionGenericIOReader&) = delete;
 };
 
 #endif

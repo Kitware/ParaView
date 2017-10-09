@@ -113,8 +113,8 @@ protected:
   vtkCacheSizeKeeper* CacheSizeKeeper;
 
 private:
-  vtkPVCacheKeeper(const vtkPVCacheKeeper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCacheKeeper&) VTK_DELETE_FUNCTION;
+  vtkPVCacheKeeper(const vtkPVCacheKeeper&) = delete;
+  void operator=(const vtkPVCacheKeeper&) = delete;
 
   class vtkCacheMap;
   vtkCacheMap* Cache;

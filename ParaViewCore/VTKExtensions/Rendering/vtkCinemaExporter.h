@@ -73,8 +73,8 @@ private:
   /// initializes it if required.
   bool checkInterpreterInitialization();
 
-  vtkCinemaExporter(const vtkCinemaExporter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCinemaExporter&) VTK_DELETE_FUNCTION;
+  vtkCinemaExporter(const vtkCinemaExporter&) = delete;
+  void operator=(const vtkCinemaExporter&) = delete;
 };
 
 #endif

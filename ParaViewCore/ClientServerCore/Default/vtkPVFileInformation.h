@@ -160,8 +160,8 @@ protected:
   bool ReadDetailedFileInformation;
 
 private:
-  vtkPVFileInformation(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
+  vtkPVFileInformation(const vtkPVFileInformation&) = delete;
+  void operator=(const vtkPVFileInformation&) = delete;
 
   struct vtkInfo;
 };

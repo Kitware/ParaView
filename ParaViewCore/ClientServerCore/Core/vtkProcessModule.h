@@ -308,8 +308,8 @@ protected:
   bool ReportInterpreterErrors;
 
 private:
-  vtkProcessModule(const vtkProcessModule&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkProcessModule&) VTK_DELETE_FUNCTION;
+  vtkProcessModule(const vtkProcessModule&) = delete;
+  void operator=(const vtkProcessModule&) = delete;
 
   void DetermineExecutablePath(int argc, char** argv);
 

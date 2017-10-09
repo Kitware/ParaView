@@ -146,8 +146,8 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkParallelSerialWriter(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
+  vtkParallelSerialWriter(const vtkParallelSerialWriter&) = delete;
+  void operator=(const vtkParallelSerialWriter&) = delete;
 
   void WriteATimestep(vtkDataObject* input);
   void WriteAFile(const char* fname, vtkDataObject* input);

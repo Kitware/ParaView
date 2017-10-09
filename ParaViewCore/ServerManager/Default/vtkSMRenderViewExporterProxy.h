@@ -50,8 +50,8 @@ protected:
   ~vtkSMRenderViewExporterProxy() override;
 
 private:
-  vtkSMRenderViewExporterProxy(const vtkSMRenderViewExporterProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRenderViewExporterProxy&) VTK_DELETE_FUNCTION;
+  vtkSMRenderViewExporterProxy(const vtkSMRenderViewExporterProxy&) = delete;
+  void operator=(const vtkSMRenderViewExporterProxy&) = delete;
 };
 
 #endif

@@ -60,8 +60,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkPExtractTemporalFieldData(const vtkPExtractTemporalFieldData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPExtractTemporalFieldData&) VTK_DELETE_FUNCTION;
+  vtkPExtractTemporalFieldData(const vtkPExtractTemporalFieldData&) = delete;
+  void operator=(const vtkPExtractTemporalFieldData&) = delete;
 };
 
 #endif

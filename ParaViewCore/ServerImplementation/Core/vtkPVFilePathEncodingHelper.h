@@ -95,8 +95,8 @@ protected:
   int ActiveGlobalId;
 
 private:
-  vtkPVFilePathEncodingHelper(const vtkPVFilePathEncodingHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVFilePathEncodingHelper&) VTK_DELETE_FUNCTION;
+  vtkPVFilePathEncodingHelper(const vtkPVFilePathEncodingHelper&) = delete;
+  void operator=(const vtkPVFilePathEncodingHelper&) = delete;
 };
 
 #endif

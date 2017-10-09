@@ -62,8 +62,8 @@ protected:
   bool Reverse;
 
 private:
-  pqProxyModifiedStateUndoElement(const pqProxyModifiedStateUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const pqProxyModifiedStateUndoElement&) VTK_DELETE_FUNCTION;
+  pqProxyModifiedStateUndoElement(const pqProxyModifiedStateUndoElement&) = delete;
+  void operator=(const pqProxyModifiedStateUndoElement&) = delete;
 };
 
 #endif

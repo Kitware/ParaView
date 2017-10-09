@@ -224,8 +224,8 @@ protected:
   vtkTimeStamp RedistributionTimeStamp;
 
 private:
-  vtkPVDataDeliveryManager(const vtkPVDataDeliveryManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataDeliveryManager&) VTK_DELETE_FUNCTION;
+  vtkPVDataDeliveryManager(const vtkPVDataDeliveryManager&) = delete;
+  void operator=(const vtkPVDataDeliveryManager&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

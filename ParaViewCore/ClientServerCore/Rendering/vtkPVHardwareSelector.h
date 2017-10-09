@@ -107,8 +107,8 @@ protected:
   vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
 
 private:
-  vtkPVHardwareSelector(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
+  vtkPVHardwareSelector(const vtkPVHardwareSelector&) = delete;
+  void operator=(const vtkPVHardwareSelector&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

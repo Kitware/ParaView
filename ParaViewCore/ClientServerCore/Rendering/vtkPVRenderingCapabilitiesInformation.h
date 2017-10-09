@@ -124,9 +124,8 @@ protected:
   vtkTypeUInt32 Capabilities;
 
 private:
-  vtkPVRenderingCapabilitiesInformation(
-    const vtkPVRenderingCapabilitiesInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRenderingCapabilitiesInformation&) VTK_DELETE_FUNCTION;
+  vtkPVRenderingCapabilitiesInformation(const vtkPVRenderingCapabilitiesInformation&) = delete;
+  void operator=(const vtkPVRenderingCapabilitiesInformation&) = delete;
 };
 
 #endif

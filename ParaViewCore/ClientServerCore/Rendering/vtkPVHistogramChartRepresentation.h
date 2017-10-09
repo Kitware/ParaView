@@ -140,8 +140,8 @@ protected:
   vtkPExtractHistogram* ExtractHistogram;
 
 private:
-  vtkPVHistogramChartRepresentation(const vtkPVHistogramChartRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVHistogramChartRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVHistogramChartRepresentation(const vtkPVHistogramChartRepresentation&) = delete;
+  void operator=(const vtkPVHistogramChartRepresentation&) = delete;
 
   std::string ArrayName;
   int AttributeType;

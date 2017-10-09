@@ -80,8 +80,8 @@ protected:
   vtkSmartPointer<vtkPVXMLElement> CopiedState;
 
 private:
-  vtkSMProxyClipboard(const vtkSMProxyClipboard&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyClipboard&) VTK_DELETE_FUNCTION;
+  vtkSMProxyClipboard(const vtkSMProxyClipboard&) = delete;
+  void operator=(const vtkSMProxyClipboard&) = delete;
 
   vtkSMProxyClipboardInternals* Internals;
 };

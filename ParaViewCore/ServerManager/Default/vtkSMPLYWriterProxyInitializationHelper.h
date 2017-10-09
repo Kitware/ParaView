@@ -43,9 +43,8 @@ protected:
   ~vtkSMPLYWriterProxyInitializationHelper() override;
 
 private:
-  vtkSMPLYWriterProxyInitializationHelper(
-    const vtkSMPLYWriterProxyInitializationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPLYWriterProxyInitializationHelper&) VTK_DELETE_FUNCTION;
+  vtkSMPLYWriterProxyInitializationHelper(const vtkSMPLYWriterProxyInitializationHelper&) = delete;
+  void operator=(const vtkSMPLYWriterProxyInitializationHelper&) = delete;
 };
 
 #endif

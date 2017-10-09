@@ -395,8 +395,8 @@ protected:
   bool FileNameChanged;
 
 private:
-  vtkSpyPlotReader(const vtkSpyPlotReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpyPlotReader&) VTK_DELETE_FUNCTION;
+  vtkSpyPlotReader(const vtkSpyPlotReader&) = delete;
+  void operator=(const vtkSpyPlotReader&) = delete;
 
   class VectorOfDoubles;
 

@@ -291,8 +291,8 @@ private:
   unsigned int NumberOfAlgorithmOutputPorts;
   unsigned int NumberOfAlgorithmRequiredInputPorts;
 
-  vtkSMSourceProxy(const vtkSMSourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSourceProxy(const vtkSMSourceProxy&) = delete;
+  void operator=(const vtkSMSourceProxy&) = delete;
 };
 
 #endif

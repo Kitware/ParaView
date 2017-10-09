@@ -217,8 +217,8 @@ protected:
   vtkWeakPointer<vtkSIProxyDefinitionManager> ProxyDefinitionManager;
 
 private:
-  vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyDefinitionManager&) VTK_DELETE_FUNCTION;
+  vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&) = delete;
+  void operator=(const vtkSMProxyDefinitionManager&) = delete;
 };
 
 #endif

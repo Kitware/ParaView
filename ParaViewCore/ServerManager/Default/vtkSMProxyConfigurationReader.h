@@ -133,8 +133,8 @@ private:
   char* FileExtension;
 
 private:
-  vtkSMProxyConfigurationReader(const vtkSMProxyConfigurationReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyConfigurationReader&) VTK_DELETE_FUNCTION;
+  vtkSMProxyConfigurationReader(const vtkSMProxyConfigurationReader&) = delete;
+  void operator=(const vtkSMProxyConfigurationReader&) = delete;
 };
 
 #endif

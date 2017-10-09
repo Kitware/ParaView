@@ -79,8 +79,8 @@ protected:
   ~vtkSMSelfGeneratingSourceProxy() override;
 
 private:
-  vtkSMSelfGeneratingSourceProxy(const vtkSMSelfGeneratingSourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSelfGeneratingSourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSelfGeneratingSourceProxy(const vtkSMSelfGeneratingSourceProxy&) = delete;
+  void operator=(const vtkSMSelfGeneratingSourceProxy&) = delete;
 
   bool ExtendDefinitionOnSIProxy(vtkPVXMLElement* xml);
 

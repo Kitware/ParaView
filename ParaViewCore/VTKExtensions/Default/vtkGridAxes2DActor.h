@@ -259,8 +259,8 @@ protected:
   bool ForceOpaque;
 
 private:
-  vtkGridAxes2DActor(const vtkGridAxes2DActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGridAxes2DActor&) VTK_DELETE_FUNCTION;
+  vtkGridAxes2DActor(const vtkGridAxes2DActor&) = delete;
+  void operator=(const vtkGridAxes2DActor&) = delete;
 
   class vtkLabels;
   vtkLabels* Labels;

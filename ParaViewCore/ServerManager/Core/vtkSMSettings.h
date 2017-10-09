@@ -280,8 +280,8 @@ protected:
   ~vtkSMSettings() override;
 
 private:
-  vtkSMSettings(const vtkSMSettings&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSettings&) VTK_DELETE_FUNCTION;
+  vtkSMSettings(const vtkSMSettings&) = delete;
+  void operator=(const vtkSMSettings&) = delete;
 
   class vtkSMSettingsInternal;
   vtkSMSettingsInternal* Internal;

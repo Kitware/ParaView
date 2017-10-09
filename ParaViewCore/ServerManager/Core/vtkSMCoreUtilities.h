@@ -122,8 +122,8 @@ protected:
   ~vtkSMCoreUtilities() override;
 
 private:
-  vtkSMCoreUtilities(const vtkSMCoreUtilities&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCoreUtilities&) VTK_DELETE_FUNCTION;
+  vtkSMCoreUtilities(const vtkSMCoreUtilities&) = delete;
+  void operator=(const vtkSMCoreUtilities&) = delete;
 };
 
 #endif

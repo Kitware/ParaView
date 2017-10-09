@@ -106,8 +106,8 @@ protected:
   friend class vtkSICompoundSourceProxy;
 
 private:
-  vtkSISourceProxy(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSISourceProxy(const vtkSISourceProxy&) = delete;
+  void operator=(const vtkSISourceProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

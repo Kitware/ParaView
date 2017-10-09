@@ -80,8 +80,8 @@ protected:
   vtkSmartPointer<vtkScalarsToColors> LookupTable;
 
 private:
-  vtkPVPLYWriter(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
+  vtkPVPLYWriter(const vtkPVPLYWriter&) = delete;
+  void operator=(const vtkPVPLYWriter&) = delete;
 };
 
 #endif

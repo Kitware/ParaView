@@ -70,8 +70,8 @@ protected:
   void Update(vtkSMProxyProperty* pp);
 
 private:
-  vtkSMExtentDomain(const vtkSMExtentDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMExtentDomain&) VTK_DELETE_FUNCTION;
+  vtkSMExtentDomain(const vtkSMExtentDomain&) = delete;
+  void operator=(const vtkSMExtentDomain&) = delete;
 };
 
 #endif

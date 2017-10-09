@@ -46,8 +46,8 @@ protected:
   int FillOutputPortInformation(int, vtkInformation*);
 
 private:
-  vtkMinkowskiFilter(const vtkMinkowskiFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMinkowskiFilter&) VTK_DELETE_FUNCTION;
+  vtkMinkowskiFilter(const vtkMinkowskiFilter&) = delete;
+  void operator=(const vtkMinkowskiFilter&) = delete;
 
   void compute_mf(vtkUnstructuredGrid* ugrid, vtkDoubleArray* S, vtkDoubleArray* V,
     vtkDoubleArray* C, vtkDoubleArray* X, vtkDoubleArray* G, vtkDoubleArray* T, vtkDoubleArray* B,

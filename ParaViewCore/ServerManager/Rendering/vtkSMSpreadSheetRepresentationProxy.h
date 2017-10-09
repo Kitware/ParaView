@@ -46,9 +46,8 @@ protected:
   void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
 private:
-  vtkSMSpreadSheetRepresentationProxy(
-    const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSpreadSheetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSpreadSheetRepresentationProxy(const vtkSMSpreadSheetRepresentationProxy&) = delete;
+  void operator=(const vtkSMSpreadSheetRepresentationProxy&) = delete;
 };
 
 #endif

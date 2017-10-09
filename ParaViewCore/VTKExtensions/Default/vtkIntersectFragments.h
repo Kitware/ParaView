@@ -139,8 +139,8 @@ protected:
   double ProgressIncrement;
 
 private:
-  vtkIntersectFragments(const vtkIntersectFragments&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIntersectFragments&) VTK_DELETE_FUNCTION;
+  vtkIntersectFragments(const vtkIntersectFragments&) = delete;
+  void operator=(const vtkIntersectFragments&) = delete;
 };
 
 #endif

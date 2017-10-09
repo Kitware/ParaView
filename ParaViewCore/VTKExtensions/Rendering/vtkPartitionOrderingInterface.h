@@ -84,8 +84,8 @@ private:
   // Implementation must be either a vtkPKdTree object or a vtkPartitionOrdering object.
   vtkSmartPointer<vtkObject> Implementation;
 
-  vtkPartitionOrderingInterface(const vtkPartitionOrderingInterface&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPartitionOrderingInterface&) VTK_DELETE_FUNCTION;
+  vtkPartitionOrderingInterface(const vtkPartitionOrderingInterface&) = delete;
+  void operator=(const vtkPartitionOrderingInterface&) = delete;
 };
 
 #endif

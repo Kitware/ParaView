@@ -58,8 +58,8 @@ protected:
   friend class vtkSMRangedTransferFunctionDomain;
 
 private:
-  vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMArrayRangeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&) = delete;
+  void operator=(const vtkSMArrayRangeDomain&) = delete;
 };
 
 #endif

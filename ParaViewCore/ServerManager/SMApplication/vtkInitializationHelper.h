@@ -118,8 +118,8 @@ protected:
   static std::string GetUserSettingsFilePath();
 
 private:
-  vtkInitializationHelper(const vtkInitializationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkInitializationHelper&) VTK_DELETE_FUNCTION;
+  vtkInitializationHelper(const vtkInitializationHelper&) = delete;
+  void operator=(const vtkInitializationHelper&) = delete;
 
   static bool LoadSettingsFilesDuringInitialization;
 

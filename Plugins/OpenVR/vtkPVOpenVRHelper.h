@@ -111,8 +111,8 @@ protected:
   vtkTimeStamp PropUpdateTime;
 
 private:
-  vtkPVOpenVRHelper(const vtkPVOpenVRHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOpenVRHelper&) VTK_DELETE_FUNCTION;
+  vtkPVOpenVRHelper(const vtkPVOpenVRHelper&) = delete;
+  void operator=(const vtkPVOpenVRHelper&) = delete;
 };
 
 #endif

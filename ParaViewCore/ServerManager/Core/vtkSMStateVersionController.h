@@ -50,8 +50,8 @@ protected:
   ~vtkSMStateVersionController() override;
 
 private:
-  vtkSMStateVersionController(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
+  vtkSMStateVersionController(const vtkSMStateVersionController&) = delete;
+  void operator=(const vtkSMStateVersionController&) = delete;
 };
 
 #endif

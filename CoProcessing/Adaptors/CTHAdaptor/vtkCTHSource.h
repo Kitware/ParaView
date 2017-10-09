@@ -92,8 +92,8 @@ protected:
   void AddAttributesToAMR(vtkNonOverlappingAMR* amr);
 
 private:
-  vtkCTHSource(const vtkCTHSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCTHSource&) VTK_DELETE_FUNCTION;
+  vtkCTHSource(const vtkCTHSource&) = delete;
+  void operator=(const vtkCTHSource&) = delete;
 };
 
 #endif /* vtkCTHSource_h */

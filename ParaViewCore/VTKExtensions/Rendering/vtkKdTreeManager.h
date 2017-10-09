@@ -104,8 +104,8 @@ protected:
   vtkSetVector6Macro(WholeExtent, int);
 
 private:
-  vtkKdTreeManager(const vtkKdTreeManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkKdTreeManager&) VTK_DELETE_FUNCTION;
+  vtkKdTreeManager(const vtkKdTreeManager&) = delete;
+  void operator=(const vtkKdTreeManager&) = delete;
 
   class vtkDataObjectSet;
   vtkDataObjectSet* DataObjects;

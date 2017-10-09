@@ -59,8 +59,8 @@ protected:
   static void PrintSegments(vtkCollection* segments);
 
 private:
-  vtkPlotEdges(const vtkPlotEdges&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPlotEdges&) VTK_DELETE_FUNCTION;
+  vtkPlotEdges(const vtkPlotEdges&) = delete;
+  void operator=(const vtkPlotEdges&) = delete;
 };
 
 #endif

@@ -59,8 +59,8 @@ protected:
   bool CallDirectoryMethod(const char* method, const char* path, const char* secondaryPath = NULL);
 
 private:
-  vtkSMDirectoryProxy(const vtkSMDirectoryProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDirectoryProxy&) VTK_DELETE_FUNCTION;
+  vtkSMDirectoryProxy(const vtkSMDirectoryProxy&) = delete;
+  void operator=(const vtkSMDirectoryProxy&) = delete;
 };
 
 #endif

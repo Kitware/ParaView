@@ -47,8 +47,8 @@ protected:
   ~vtkCPVector3FieldFunction();
 
 private:
-  vtkCPVector3FieldFunction(const vtkCPVector3FieldFunction&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPVector3FieldFunction&) VTK_DELETE_FUNCTION;
+  vtkCPVector3FieldFunction(const vtkCPVector3FieldFunction&) = delete;
+  void operator=(const vtkCPVector3FieldFunction&) = delete;
 };
 
 #endif

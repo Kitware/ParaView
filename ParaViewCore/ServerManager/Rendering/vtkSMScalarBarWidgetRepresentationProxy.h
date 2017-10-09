@@ -104,9 +104,8 @@ private:
   vtkSMTrace::TraceItem* TraceItem;
 
 private:
-  vtkSMScalarBarWidgetRepresentationProxy(
-    const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
+  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
 };
 
 #endif

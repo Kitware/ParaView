@@ -45,8 +45,8 @@ protected:
   bool CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSIImageTextureProxy(const vtkSIImageTextureProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIImageTextureProxy&) VTK_DELETE_FUNCTION;
+  vtkSIImageTextureProxy(const vtkSIImageTextureProxy&) = delete;
+  void operator=(const vtkSIImageTextureProxy&) = delete;
 };
 
 #endif

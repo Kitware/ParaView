@@ -47,8 +47,8 @@ protected:
   vtkPVGenericAttributeInformation();
   ~vtkPVGenericAttributeInformation() override;
 
-  vtkPVGenericAttributeInformation(const vtkPVGenericAttributeInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVGenericAttributeInformation&) VTK_DELETE_FUNCTION;
+  vtkPVGenericAttributeInformation(const vtkPVGenericAttributeInformation&) = delete;
+  void operator=(const vtkPVGenericAttributeInformation&) = delete;
 };
 
 #endif

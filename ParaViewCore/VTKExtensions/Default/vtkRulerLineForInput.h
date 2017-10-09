@@ -59,8 +59,8 @@ private:
   vtkMultiProcessController* Controller;
   int Axis;
 
-  vtkRulerLineForInput(const vtkRulerLineForInput&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRulerLineForInput&) VTK_DELETE_FUNCTION;
+  vtkRulerLineForInput(const vtkRulerLineForInput&) = delete;
+  void operator=(const vtkRulerLineForInput&) = delete;
 };
 
 #endif

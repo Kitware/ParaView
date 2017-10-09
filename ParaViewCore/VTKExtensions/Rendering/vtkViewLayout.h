@@ -47,8 +47,8 @@ protected:
   ~vtkViewLayout() override;
 
 private:
-  vtkViewLayout(const vtkViewLayout&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkViewLayout&) VTK_DELETE_FUNCTION;
+  vtkViewLayout(const vtkViewLayout&) = delete;
+  void operator=(const vtkViewLayout&) = delete;
 };
 
 #endif

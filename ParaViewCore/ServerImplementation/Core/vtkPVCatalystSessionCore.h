@@ -61,8 +61,8 @@ protected:
   ~vtkPVCatalystSessionCore() override;
 
 private:
-  vtkPVCatalystSessionCore(const vtkPVCatalystSessionCore&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCatalystSessionCore&) VTK_DELETE_FUNCTION;
+  vtkPVCatalystSessionCore(const vtkPVCatalystSessionCore&) = delete;
+  void operator=(const vtkPVCatalystSessionCore&) = delete;
 
   class vtkInternal;
   vtkInternal* CatalystInternal;

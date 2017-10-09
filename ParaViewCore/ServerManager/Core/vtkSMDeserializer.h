@@ -84,8 +84,8 @@ protected:
   vtkWeakPointer<vtkSMSessionProxyManager> SessionProxyManager;
 
 private:
-  vtkSMDeserializer(const vtkSMDeserializer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDeserializer&) VTK_DELETE_FUNCTION;
+  vtkSMDeserializer(const vtkSMDeserializer&) = delete;
+  void operator=(const vtkSMDeserializer&) = delete;
 };
 
 #endif

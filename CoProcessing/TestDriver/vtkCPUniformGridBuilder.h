@@ -83,8 +83,8 @@ protected:
   ~vtkCPUniformGridBuilder();
 
 private:
-  vtkCPUniformGridBuilder(const vtkCPUniformGridBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPUniformGridBuilder&) VTK_DELETE_FUNCTION;
+  vtkCPUniformGridBuilder(const vtkCPUniformGridBuilder&) = delete;
+  void operator=(const vtkCPUniformGridBuilder&) = delete;
 
   /**
    * The dimensions of the vtkUniformGrid.

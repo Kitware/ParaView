@@ -85,8 +85,8 @@ protected:
   vtkSelectionNode* LocateSelection(unsigned int composite_index, vtkSelection* sel);
 
 private:
-  vtkPVExtractSelection(const vtkPVExtractSelection&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExtractSelection&) VTK_DELETE_FUNCTION;
+  vtkPVExtractSelection(const vtkPVExtractSelection&) = delete;
+  void operator=(const vtkPVExtractSelection&) = delete;
 
   class vtkSelectionNodeVector;
   void RequestDataInternal(

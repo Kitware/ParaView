@@ -46,8 +46,8 @@ protected:
   ~vtkSMInteractiveSelectionPipeline() override;
 
 private:
-  vtkSMInteractiveSelectionPipeline(const vtkSMInteractiveSelectionPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMInteractiveSelectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMInteractiveSelectionPipeline(const vtkSMInteractiveSelectionPipeline&) = delete;
+  void operator=(const vtkSMInteractiveSelectionPipeline&) = delete;
 };
 
 #endif

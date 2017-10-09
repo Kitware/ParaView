@@ -84,8 +84,8 @@ protected:
   vtkTimeStamp ModelTransformationMatrixUpdateTime;
 
 private:
-  vtkPVMultiSliceView(const vtkPVMultiSliceView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVMultiSliceView&) VTK_DELETE_FUNCTION;
+  vtkPVMultiSliceView(const vtkPVMultiSliceView&) = delete;
+  void operator=(const vtkPVMultiSliceView&) = delete;
 
   class vtkSliceInternal;
   vtkSliceInternal* Internal;

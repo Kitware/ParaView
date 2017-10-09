@@ -101,8 +101,8 @@ protected:
   bool TooltipEnabled;
 
 private:
-  vtkSMTooltipSelectionPipeline(const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMTooltipSelectionPipeline(const vtkSMTooltipSelectionPipeline&) = delete;
+  void operator=(const vtkSMTooltipSelectionPipeline&) = delete;
 };
 
 #endif

@@ -44,8 +44,8 @@ protected:
   bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
-  vtkSIDataArrayProperty(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIDataArrayProperty&) VTK_DELETE_FUNCTION;
+  vtkSIDataArrayProperty(const vtkSIDataArrayProperty&) = delete;
+  void operator=(const vtkSIDataArrayProperty&) = delete;
 };
 
 #endif

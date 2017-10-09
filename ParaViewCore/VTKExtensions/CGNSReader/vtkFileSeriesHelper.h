@@ -211,8 +211,8 @@ protected:
   std::vector<vtkTimeInformation> Information;
 
 private:
-  vtkFileSeriesHelper(const vtkFileSeriesHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFileSeriesHelper&) VTK_DELETE_FUNCTION;
+  vtkFileSeriesHelper(const vtkFileSeriesHelper&) = delete;
+  void operator=(const vtkFileSeriesHelper&) = delete;
 
   std::vector<std::string> SplitFiles(
     const std::vector<std::string>& files, int piece, int numPieces) const;

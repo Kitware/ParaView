@@ -55,8 +55,8 @@ protected:
   vtkWeakPointer<vtkSMSession> Session;
 
 private:
-  vtkSMUndoElement(const vtkSMUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMUndoElement(const vtkSMUndoElement&) = delete;
+  void operator=(const vtkSMUndoElement&) = delete;
 };
 
 #endif

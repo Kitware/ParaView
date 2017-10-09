@@ -210,8 +210,8 @@ protected:
   vtkDataArraySelection* PointDataArraySelection;
 
 private:
-  vtkH5PartReader(const vtkH5PartReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkH5PartReader&) VTK_DELETE_FUNCTION;
+  vtkH5PartReader(const vtkH5PartReader&) = delete;
+  void operator=(const vtkH5PartReader&) = delete;
 };
 
 #endif

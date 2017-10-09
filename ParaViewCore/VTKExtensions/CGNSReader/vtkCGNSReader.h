@@ -260,8 +260,8 @@ protected:
   vtkIdType ProcSize;
 
 private:
-  vtkCGNSReader(const vtkCGNSReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCGNSReader&) VTK_DELETE_FUNCTION;
+  vtkCGNSReader(const vtkCGNSReader&) = delete;
+  void operator=(const vtkCGNSReader&) = delete;
 
   /**
    * callback called when SIL selection is modified.

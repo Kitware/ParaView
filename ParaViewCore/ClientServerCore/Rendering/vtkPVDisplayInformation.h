@@ -88,8 +88,8 @@ protected:
   int SupportsOpenGL;
 
 private:
-  vtkPVDisplayInformation(const vtkPVDisplayInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDisplayInformation&) VTK_DELETE_FUNCTION;
+  vtkPVDisplayInformation(const vtkPVDisplayInformation&) = delete;
+  void operator=(const vtkPVDisplayInformation&) = delete;
 
   static int GlobalCanOpenDisplayLocally;
   static int GlobalSupportsOpenGL;

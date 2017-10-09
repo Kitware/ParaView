@@ -180,8 +180,8 @@ protected:
   int StackDepth;
 
 private:
-  vtkUndoStack(const vtkUndoStack&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkUndoStack&) VTK_DELETE_FUNCTION;
+  vtkUndoStack(const vtkUndoStack&) = delete;
+  void operator=(const vtkUndoStack&) = delete;
 
   bool InUndo;
   bool InRedo;

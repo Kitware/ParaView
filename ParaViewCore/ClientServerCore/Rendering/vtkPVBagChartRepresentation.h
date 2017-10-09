@@ -208,8 +208,8 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) = delete;
+  void operator=(const vtkPVBagChartRepresentation&) = delete;
 
   int LineThickness;
   int LineStyle;

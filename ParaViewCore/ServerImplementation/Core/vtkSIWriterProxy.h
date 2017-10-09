@@ -68,8 +68,8 @@ protected:
   vtkSetStringMacro(FileNameMethod);
 
 private:
-  vtkSIWriterProxy(const vtkSIWriterProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIWriterProxy&) VTK_DELETE_FUNCTION;
+  vtkSIWriterProxy(const vtkSIWriterProxy&) = delete;
+  void operator=(const vtkSIWriterProxy&) = delete;
 };
 
 #endif

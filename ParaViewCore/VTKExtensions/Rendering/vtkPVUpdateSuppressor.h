@@ -79,8 +79,8 @@ protected:
   vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
 private:
-  vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
+  vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&) = delete;
+  void operator=(const vtkPVUpdateSuppressor&) = delete;
 };
 
 #endif

@@ -78,8 +78,8 @@ protected:
   vtkPlane* Plane;
 
 private:
-  vtkPVPlane(const vtkPVPlane&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPlane&) VTK_DELETE_FUNCTION;
+  vtkPVPlane(const vtkPVPlane&) = delete;
+  void operator=(const vtkPVPlane&) = delete;
 };
 
 #endif

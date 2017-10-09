@@ -39,8 +39,8 @@ protected:
   void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSMNullProxy(const vtkSMNullProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMNullProxy&) VTK_DELETE_FUNCTION;
+  vtkSMNullProxy(const vtkSMNullProxy&) = delete;
+  void operator=(const vtkSMNullProxy&) = delete;
 };
 
 #endif

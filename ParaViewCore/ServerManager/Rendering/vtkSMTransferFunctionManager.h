@@ -122,8 +122,8 @@ protected:
   ~vtkSMTransferFunctionManager() override;
 
 private:
-  vtkSMTransferFunctionManager(const vtkSMTransferFunctionManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTransferFunctionManager&) VTK_DELETE_FUNCTION;
+  vtkSMTransferFunctionManager(const vtkSMTransferFunctionManager&) = delete;
+  void operator=(const vtkSMTransferFunctionManager&) = delete;
 };
 
 #endif

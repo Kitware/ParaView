@@ -66,8 +66,8 @@ protected:
     const char* demangled_name, const char* demagled_component_name);
 
 private:
-  vtkPVPostFilter(const vtkPVPostFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPostFilter&) VTK_DELETE_FUNCTION;
+  vtkPVPostFilter(const vtkPVPostFilter&) = delete;
+  void operator=(const vtkPVPostFilter&) = delete;
 };
 
 #endif

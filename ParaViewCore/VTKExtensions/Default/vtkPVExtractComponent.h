@@ -52,8 +52,8 @@ protected:
   char* OutputArrayName;
 
 private:
-  vtkPVExtractComponent(const vtkPVExtractComponent&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExtractComponent&) VTK_DELETE_FUNCTION;
+  vtkPVExtractComponent(const vtkPVExtractComponent&) = delete;
+  void operator=(const vtkPVExtractComponent&) = delete;
 };
 
 #endif

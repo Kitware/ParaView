@@ -48,8 +48,8 @@ protected:
   ~vtkCPScalarFieldFunction();
 
 private:
-  vtkCPScalarFieldFunction(const vtkCPScalarFieldFunction&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPScalarFieldFunction&) VTK_DELETE_FUNCTION;
+  vtkCPScalarFieldFunction(const vtkCPScalarFieldFunction&) = delete;
+  void operator=(const vtkCPScalarFieldFunction&) = delete;
 };
 
 #endif

@@ -52,8 +52,8 @@ protected:
   vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
 private:
-  vtkPVMergeTables(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
+  vtkPVMergeTables(const vtkPVMergeTables&) = delete;
+  void operator=(const vtkPVMergeTables&) = delete;
 };
 
 #endif

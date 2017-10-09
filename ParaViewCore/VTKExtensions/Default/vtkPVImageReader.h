@@ -55,8 +55,8 @@ protected:
   ~vtkPVImageReader() override;
 
 private:
-  vtkPVImageReader(const vtkPVImageReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVImageReader&) VTK_DELETE_FUNCTION;
+  vtkPVImageReader(const vtkPVImageReader&) = delete;
+  void operator=(const vtkPVImageReader&) = delete;
 };
 
 #endif

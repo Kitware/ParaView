@@ -50,8 +50,8 @@ protected:
   bool ReadXMLProperty(vtkPVXMLElement* property_element) VTK_OVERRIDE;
 
 private:
-  vtkSIDirectoryProxy(const vtkSIDirectoryProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIDirectoryProxy&) VTK_DELETE_FUNCTION;
+  vtkSIDirectoryProxy(const vtkSIDirectoryProxy&) = delete;
+  void operator=(const vtkSIDirectoryProxy&) = delete;
 };
 
 #endif

@@ -43,8 +43,8 @@ protected:
 
 private:
   vtkSMXYChartRepresentationInitializationHelper(
-    const vtkSMXYChartRepresentationInitializationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMXYChartRepresentationInitializationHelper&) VTK_DELETE_FUNCTION;
+    const vtkSMXYChartRepresentationInitializationHelper&) = delete;
+  void operator=(const vtkSMXYChartRepresentationInitializationHelper&) = delete;
 };
 
 #endif

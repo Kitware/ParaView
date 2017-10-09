@@ -117,8 +117,8 @@ protected:
   vtkWeakPointer<vtkPVRenderView> View;
 
 private:
-  vtk3DWidgetRepresentation(const vtk3DWidgetRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtk3DWidgetRepresentation&) VTK_DELETE_FUNCTION;
+  vtk3DWidgetRepresentation(const vtk3DWidgetRepresentation&) = delete;
+  void operator=(const vtk3DWidgetRepresentation&) = delete;
   unsigned long RepresentationObserverTag;
   unsigned long ViewObserverTag;
 };

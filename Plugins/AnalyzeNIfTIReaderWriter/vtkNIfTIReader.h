@@ -65,8 +65,8 @@ protected:
   void ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo) VTK_OVERRIDE;
 
 private:
-  vtkNIfTIReader(const vtkNIfTIReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkNIfTIReader&) VTK_DELETE_FUNCTION;
+  vtkNIfTIReader(const vtkNIfTIReader&) = delete;
+  void operator=(const vtkNIfTIReader&) = delete;
 
   unsigned int numberOfDimensions;
   unsigned int imageSizeInBytes;

@@ -90,8 +90,8 @@ protected:
   friend class vtkPVAnimationCue;
 
 private:
-  vtkPVCueManipulator(const vtkPVCueManipulator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCueManipulator&) VTK_DELETE_FUNCTION;
+  vtkPVCueManipulator(const vtkPVCueManipulator&) = delete;
+  void operator=(const vtkPVCueManipulator&) = delete;
 };
 
 #endif

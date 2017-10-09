@@ -64,8 +64,8 @@ public:
   void CleanPolyLine(vtkPolyData* input, vtkPolyData* output);
 
 private:
-  vtkSliceAlongPolyPlane(const vtkSliceAlongPolyPlane&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSliceAlongPolyPlane&) VTK_DELETE_FUNCTION;
+  vtkSliceAlongPolyPlane(const vtkSliceAlongPolyPlane&) = delete;
+  void operator=(const vtkSliceAlongPolyPlane&) = delete;
 
   double Tolerance;
 };

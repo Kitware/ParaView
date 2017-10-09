@@ -128,8 +128,8 @@ protected:
   virtual void UpdateLODProperty();
 
 private:
-  vtkPVLODVolume(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;
+  vtkPVLODVolume(const vtkPVLODVolume&) = delete;
+  void operator=(const vtkPVLODVolume&) = delete;
 };
 
 #endif

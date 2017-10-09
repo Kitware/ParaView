@@ -125,8 +125,8 @@ protected:
   int Mode;
   double ScaleFactor; // Used only in SCALED_EXTENT and APPROXIMATE_CELL_LENGTH mode.
 private:
-  vtkSMBoundsDomain(const vtkSMBoundsDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMBoundsDomain&) VTK_DELETE_FUNCTION;
+  vtkSMBoundsDomain(const vtkSMBoundsDomain&) = delete;
+  void operator=(const vtkSMBoundsDomain&) = delete;
 
   vtkSMArrayRangeDomain* ArrayRangeDomain;
 };

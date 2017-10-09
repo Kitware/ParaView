@@ -60,8 +60,8 @@ protected:
   vtkPlane* ClippingPlane;
 
 private:
-  vtkPVClipClosedSurface(const vtkPVClipClosedSurface&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClipClosedSurface&) VTK_DELETE_FUNCTION;
+  vtkPVClipClosedSurface(const vtkPVClipClosedSurface&) = delete;
+  void operator=(const vtkPVClipClosedSurface&) = delete;
 };
 
 #endif

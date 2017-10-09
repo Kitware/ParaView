@@ -129,8 +129,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkClientServerMoveData(const vtkClientServerMoveData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkClientServerMoveData&) VTK_DELETE_FUNCTION;
+  vtkClientServerMoveData(const vtkClientServerMoveData&) = delete;
+  void operator=(const vtkClientServerMoveData&) = delete;
 };
 
 #endif

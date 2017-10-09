@@ -67,8 +67,8 @@ protected:
   //@}
 
 private:
-  vtkSMGL2PSExporterProxy(const vtkSMGL2PSExporterProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMGL2PSExporterProxy&) VTK_DELETE_FUNCTION;
+  vtkSMGL2PSExporterProxy(const vtkSMGL2PSExporterProxy&) = delete;
+  void operator=(const vtkSMGL2PSExporterProxy&) = delete;
 };
 
 #endif

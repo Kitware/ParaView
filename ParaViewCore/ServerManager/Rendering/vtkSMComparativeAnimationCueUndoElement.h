@@ -50,9 +50,8 @@ protected:
   vtkTypeUInt32 ComparativeAnimationCueID;
 
 private:
-  vtkSMComparativeAnimationCueUndoElement(
-    const vtkSMComparativeAnimationCueUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMComparativeAnimationCueUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMComparativeAnimationCueUndoElement(const vtkSMComparativeAnimationCueUndoElement&) = delete;
+  void operator=(const vtkSMComparativeAnimationCueUndoElement&) = delete;
 };
 
 #endif

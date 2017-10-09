@@ -75,8 +75,8 @@ protected:
   char* Script;
 
 private:
-  vtkPythonAnimationCue(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPythonAnimationCue&) VTK_DELETE_FUNCTION;
+  vtkPythonAnimationCue(const vtkPythonAnimationCue&) = delete;
+  void operator=(const vtkPythonAnimationCue&) = delete;
 };
 
 #endif

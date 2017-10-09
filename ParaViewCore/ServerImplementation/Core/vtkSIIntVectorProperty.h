@@ -43,8 +43,8 @@ protected:
   ~vtkSIIntVectorProperty() override;
 
 private:
-  vtkSIIntVectorProperty(const vtkSIIntVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIIntVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSIIntVectorProperty(const vtkSIIntVectorProperty&) = delete;
+  void operator=(const vtkSIIntVectorProperty&) = delete;
 };
 
 #endif

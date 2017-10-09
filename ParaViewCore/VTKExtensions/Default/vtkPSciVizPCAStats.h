@@ -87,8 +87,8 @@ protected:
   bool RobustPCA;
 
 private:
-  vtkPSciVizPCAStats(const vtkPSciVizPCAStats&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPSciVizPCAStats&) VTK_DELETE_FUNCTION;
+  vtkPSciVizPCAStats(const vtkPSciVizPCAStats&) = delete;
+  void operator=(const vtkPSciVizPCAStats&) = delete;
 };
 
 #endif // vtkPSciVizPCAStats_h

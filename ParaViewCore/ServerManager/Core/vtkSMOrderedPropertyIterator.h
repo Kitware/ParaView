@@ -92,8 +92,8 @@ protected:
   unsigned int Index;
 
 private:
-  vtkSMOrderedPropertyIterator(const vtkSMOrderedPropertyIterator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMOrderedPropertyIterator&) VTK_DELETE_FUNCTION;
+  vtkSMOrderedPropertyIterator(const vtkSMOrderedPropertyIterator&) = delete;
+  void operator=(const vtkSMOrderedPropertyIterator&) = delete;
 };
 
 #endif

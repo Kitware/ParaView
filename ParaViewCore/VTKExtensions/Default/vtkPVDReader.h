@@ -57,8 +57,8 @@ protected:
   void SetupOutputInformation(vtkInformation* outInfo) VTK_OVERRIDE;
 
 private:
-  vtkPVDReader(const vtkPVDReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDReader&) VTK_DELETE_FUNCTION;
+  vtkPVDReader(const vtkPVDReader&) = delete;
+  void operator=(const vtkPVDReader&) = delete;
 };
 
 #endif

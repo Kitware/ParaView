@@ -82,8 +82,8 @@ protected:
   //@}
 
 private:
-  vtkRawImageFileSeriesReader(const vtkRawImageFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRawImageFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkRawImageFileSeriesReader(const vtkRawImageFileSeriesReader&) = delete;
+  void operator=(const vtkRawImageFileSeriesReader&) = delete;
 };
 
 #endif

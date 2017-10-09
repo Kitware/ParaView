@@ -70,8 +70,8 @@ protected:
   char* SequenceName;
 
 private:
-  vtkFileSequenceParser(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;
+  vtkFileSequenceParser(const vtkFileSequenceParser&) = delete;
+  void operator=(const vtkFileSequenceParser&) = delete;
 };
 
 #endif

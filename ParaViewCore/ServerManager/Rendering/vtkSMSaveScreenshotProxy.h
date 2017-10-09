@@ -128,8 +128,8 @@ protected:
   vtkSMViewProxy* GetView();
 
 private:
-  vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSaveScreenshotProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) = delete;
+  void operator=(const vtkSMSaveScreenshotProxy&) = delete;
 
   /**
    * used to save/restore state for the view(s).

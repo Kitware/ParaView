@@ -60,8 +60,8 @@ protected:
   double EndPower;
 
 private:
-  vtkPVExponentialKeyFrame(const vtkPVExponentialKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExponentialKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVExponentialKeyFrame(const vtkPVExponentialKeyFrame&) = delete;
+  void operator=(const vtkPVExponentialKeyFrame&) = delete;
 };
 
 #endif

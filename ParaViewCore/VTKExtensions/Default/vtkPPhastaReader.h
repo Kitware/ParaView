@@ -185,8 +185,8 @@ protected:
 private:
   vtkPPhastaReaderInternal* Internal;
 
-  vtkPPhastaReader(const vtkPPhastaReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPPhastaReader&) VTK_DELETE_FUNCTION;
+  vtkPPhastaReader(const vtkPPhastaReader&) = delete;
+  void operator=(const vtkPPhastaReader&) = delete;
 };
 
 #endif

@@ -104,8 +104,8 @@ protected:
 
 private:
   vtkPVCompositeOrthographicSliceRepresentation(
-    const vtkPVCompositeOrthographicSliceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCompositeOrthographicSliceRepresentation&) VTK_DELETE_FUNCTION;
+    const vtkPVCompositeOrthographicSliceRepresentation&) = delete;
+  void operator=(const vtkPVCompositeOrthographicSliceRepresentation&) = delete;
 };
 
 #endif

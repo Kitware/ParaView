@@ -137,8 +137,8 @@ protected:
   ~vtkCGNSSubsetInclusionLattice();
 
 private:
-  vtkCGNSSubsetInclusionLattice(const vtkCGNSSubsetInclusionLattice&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCGNSSubsetInclusionLattice&) VTK_DELETE_FUNCTION;
+  vtkCGNSSubsetInclusionLattice(const vtkCGNSSubsetInclusionLattice&) = delete;
+  void operator=(const vtkCGNSSubsetInclusionLattice&) = delete;
 };
 
 #endif

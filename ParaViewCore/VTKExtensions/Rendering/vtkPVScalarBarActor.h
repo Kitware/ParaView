@@ -246,8 +246,8 @@ protected:
   int AddRangeAnnotations;
 
 private:
-  vtkPVScalarBarActor(const vtkPVScalarBarActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVScalarBarActor&) VTK_DELETE_FUNCTION;
+  vtkPVScalarBarActor(const vtkPVScalarBarActor&) = delete;
+  void operator=(const vtkPVScalarBarActor&) = delete;
 };
 
 #endif // vtkPVScalarBarActor_h

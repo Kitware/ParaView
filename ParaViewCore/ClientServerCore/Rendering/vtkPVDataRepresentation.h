@@ -213,8 +213,8 @@ protected:
   unsigned int UniqueIdentifier;
 
 private:
-  vtkPVDataRepresentation(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVDataRepresentation(const vtkPVDataRepresentation&) = delete;
+  void operator=(const vtkPVDataRepresentation&) = delete;
 
   bool Visibility;
   bool ForceUseCache;

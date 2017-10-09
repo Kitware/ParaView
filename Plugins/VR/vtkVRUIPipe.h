@@ -133,9 +133,9 @@ protected:
 #endif
 
 private:
-  vtkVRUIPipe() VTK_DELETE_FUNCTION;
-  vtkVRUIPipe(const vtkVRUIPipe&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVRUIPipe&) VTK_DELETE_FUNCTION;
+  vtkVRUIPipe() = delete;
+  vtkVRUIPipe(const vtkVRUIPipe&) = delete;
+  void operator=(const vtkVRUIPipe&) = delete;
 };
 
 #endif // #ifndef vtkVRUIPipe_h

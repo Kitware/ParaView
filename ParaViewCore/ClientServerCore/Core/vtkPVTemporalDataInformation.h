@@ -151,8 +151,8 @@ protected:
   int PortNumber;
 
 private:
-  vtkPVTemporalDataInformation(const vtkPVTemporalDataInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTemporalDataInformation&) VTK_DELETE_FUNCTION;
+  vtkPVTemporalDataInformation(const vtkPVTemporalDataInformation&) = delete;
+  void operator=(const vtkPVTemporalDataInformation&) = delete;
 };
 
 #endif

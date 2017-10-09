@@ -53,8 +53,8 @@ protected:
     int vtkNotUsed(byPoints)) VTK_OVERRIDE;
 
 private:
-  vtkPExtentTranslator(const vtkPExtentTranslator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPExtentTranslator&) VTK_DELETE_FUNCTION;
+  vtkPExtentTranslator(const vtkPExtentTranslator&) = delete;
+  void operator=(const vtkPExtentTranslator&) = delete;
 
   vtkPExtentTranslatorInternals* Internals;
 };

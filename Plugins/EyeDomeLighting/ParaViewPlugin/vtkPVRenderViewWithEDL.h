@@ -64,8 +64,8 @@ protected:
   ~vtkPVRenderViewWithEDL();
 
 private:
-  vtkPVRenderViewWithEDL(const vtkPVRenderViewWithEDL&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRenderViewWithEDL&) VTK_DELETE_FUNCTION;
+  vtkPVRenderViewWithEDL(const vtkPVRenderViewWithEDL&) = delete;
+  void operator=(const vtkPVRenderViewWithEDL&) = delete;
 };
 
 #endif

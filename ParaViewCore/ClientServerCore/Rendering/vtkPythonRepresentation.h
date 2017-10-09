@@ -114,8 +114,8 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkPythonRepresentation(const vtkPythonRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPythonRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPythonRepresentation(const vtkPythonRepresentation&) = delete;
+  void operator=(const vtkPythonRepresentation&) = delete;
 
   /**
    * Local input for each processor.

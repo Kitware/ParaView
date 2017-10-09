@@ -83,9 +83,8 @@ protected:
   ~vtkPVDiscretizableColorTransferFunction() override;
 
 private:
-  vtkPVDiscretizableColorTransferFunction(
-    const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDiscretizableColorTransferFunction&) VTK_DELETE_FUNCTION;
+  vtkPVDiscretizableColorTransferFunction(const vtkPVDiscretizableColorTransferFunction&) = delete;
+  void operator=(const vtkPVDiscretizableColorTransferFunction&) = delete;
 
   //@{
   /**

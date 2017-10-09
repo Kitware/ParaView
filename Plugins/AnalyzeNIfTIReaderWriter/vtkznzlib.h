@@ -131,8 +131,8 @@ static int znzeof(znzFile file);
 
 
 private:
-  vtkznzlib(const vtkznzlib&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkznzlib&) VTK_DELETE_FUNCTION;
+  vtkznzlib(const vtkznzlib&) = delete;
+  void operator=(const vtkznzlib&) = delete;
 
 };
 

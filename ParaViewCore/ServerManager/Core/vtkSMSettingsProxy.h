@@ -62,8 +62,8 @@ protected:
   vtkSMSettingsObserver* Observer;
 
 private:
-  vtkSMSettingsProxy(const vtkSMSettingsProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSettingsProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSettingsProxy(const vtkSMSettingsProxy&) = delete;
+  void operator=(const vtkSMSettingsProxy&) = delete;
 };
 
 #endif

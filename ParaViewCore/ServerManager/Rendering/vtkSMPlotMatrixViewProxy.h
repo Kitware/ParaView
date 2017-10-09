@@ -52,8 +52,8 @@ protected:
   void AnimationTickEvent();
 
 private:
-  vtkSMPlotMatrixViewProxy(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPlotMatrixViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMPlotMatrixViewProxy(const vtkSMPlotMatrixViewProxy&) = delete;
+  void operator=(const vtkSMPlotMatrixViewProxy&) = delete;
 };
 
 #endif

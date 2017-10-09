@@ -244,8 +244,8 @@ protected:
   }
 
 private:
-  vtkState(const vtkState&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkState&) VTK_DELETE_FUNCTION;
+  vtkState(const vtkState&) = delete;
+  void operator=(const vtkState&) = delete;
 };
 
 //============================================================================

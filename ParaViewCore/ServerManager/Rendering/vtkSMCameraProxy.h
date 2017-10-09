@@ -50,8 +50,8 @@ protected:
   //@}
 
 private:
-  vtkSMCameraProxy(const vtkSMCameraProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCameraProxy&) VTK_DELETE_FUNCTION;
+  vtkSMCameraProxy(const vtkSMCameraProxy&) = delete;
+  void operator=(const vtkSMCameraProxy&) = delete;
 };
 
 #endif

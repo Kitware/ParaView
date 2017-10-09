@@ -73,9 +73,8 @@ protected:
   int UndoRedoInternal(bool undo);
 
 private:
-  vtkSMGlobalPropertiesLinkUndoElement(
-    const vtkSMGlobalPropertiesLinkUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMGlobalPropertiesLinkUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMGlobalPropertiesLinkUndoElement(const vtkSMGlobalPropertiesLinkUndoElement&) = delete;
+  void operator=(const vtkSMGlobalPropertiesLinkUndoElement&) = delete;
 };
 
 #endif

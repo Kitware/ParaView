@@ -111,8 +111,8 @@ protected:
   int ArrayAssociation;
 
 private:
-  vtkPythonAnnotationFilter(const vtkPythonAnnotationFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPythonAnnotationFilter&) VTK_DELETE_FUNCTION;
+  vtkPythonAnnotationFilter(const vtkPythonAnnotationFilter&) = delete;
+  void operator=(const vtkPythonAnnotationFilter&) = delete;
 
   bool DataTimeValid;
   double DataTime;

@@ -117,8 +117,8 @@ protected:
   ofstream* Stream;
 
 private:
-  vtkCSVWriter(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
+  vtkCSVWriter(const vtkCSVWriter&) = delete;
+  void operator=(const vtkCSVWriter&) = delete;
 };
 
 #endif

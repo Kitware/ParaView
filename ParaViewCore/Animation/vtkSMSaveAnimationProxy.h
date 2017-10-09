@@ -104,8 +104,8 @@ protected:
   vtkSMProxy* GetAnimationScene();
 
 private:
-  vtkSMSaveAnimationProxy(const vtkSMSaveAnimationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSaveAnimationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSaveAnimationProxy(const vtkSMSaveAnimationProxy&) = delete;
+  void operator=(const vtkSMSaveAnimationProxy&) = delete;
 
   friend class vtkSMSaveAnimationProxyNS::SceneImageWriter;
 

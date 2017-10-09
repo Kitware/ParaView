@@ -355,8 +355,8 @@ protected:
     const char* arrayname, int attribute_type, bool useComponent, int component);
 
 private:
-  vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPVRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) = delete;
+  void operator=(const vtkSMPVRepresentationProxy&) = delete;
 
   bool InReadXMLAttributes;
   class vtkStringSet;

@@ -143,8 +143,8 @@ protected:
   vtkPVProgressHandler* ProgressHandler;
 
 private:
-  vtkPVSession(const vtkPVSession&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSession&) VTK_DELETE_FUNCTION;
+  vtkPVSession(const vtkPVSession&) = delete;
+  void operator=(const vtkPVSession&) = delete;
 
   int ProgressCount;
   // This flags ensures that while we are waiting for an previous progress-pair

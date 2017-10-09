@@ -60,8 +60,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkPExtractHistogram(const vtkPExtractHistogram&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPExtractHistogram&) VTK_DELETE_FUNCTION;
+  vtkPExtractHistogram(const vtkPExtractHistogram&) = delete;
+  void operator=(const vtkPExtractHistogram&) = delete;
 };
 
 #endif

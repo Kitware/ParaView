@@ -50,8 +50,8 @@ protected:
   vtkTrackballPan();
   ~vtkTrackballPan() override;
 
-  vtkTrackballPan(const vtkTrackballPan&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTrackballPan&) VTK_DELETE_FUNCTION;
+  vtkTrackballPan(const vtkTrackballPan&) = delete;
+  void operator=(const vtkTrackballPan&) = delete;
 };
 
 #endif

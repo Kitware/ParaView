@@ -175,8 +175,8 @@ protected:
   int CosmoFormat; // Enable cosmo format or gadget format
 
 private:
-  vtkPCosmoReader(const vtkPCosmoReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPCosmoReader&) VTK_DELETE_FUNCTION;
+  vtkPCosmoReader(const vtkPCosmoReader&) = delete;
+  void operator=(const vtkPCosmoReader&) = delete;
 };
 
 #endif

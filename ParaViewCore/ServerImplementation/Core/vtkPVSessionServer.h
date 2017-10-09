@@ -161,8 +161,8 @@ protected:
   friend class vtkInternals;
 
 private:
-  vtkPVSessionServer(const vtkPVSessionServer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSessionServer&) VTK_DELETE_FUNCTION;
+  vtkPVSessionServer(const vtkPVSessionServer&) = delete;
+  void operator=(const vtkPVSessionServer&) = delete;
 };
 
 #endif

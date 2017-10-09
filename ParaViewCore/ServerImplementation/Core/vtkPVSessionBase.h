@@ -262,8 +262,8 @@ protected:
   vtkPVSessionCore* SessionCore;
 
 private:
-  vtkPVSessionBase(const vtkPVSessionBase&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSessionBase&) VTK_DELETE_FUNCTION;
+  vtkPVSessionBase(const vtkPVSessionBase&) = delete;
+  void operator=(const vtkPVSessionBase&) = delete;
 
   // Shared constructor method
   void InitSessionBase(vtkPVSessionCore* coreToUse);

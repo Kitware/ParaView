@@ -57,8 +57,8 @@ protected:
     vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
 
 private:
-  vtkPSciVizContingencyStats(const vtkPSciVizContingencyStats&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPSciVizContingencyStats&) VTK_DELETE_FUNCTION;
+  vtkPSciVizContingencyStats(const vtkPSciVizContingencyStats&) = delete;
+  void operator=(const vtkPSciVizContingencyStats&) = delete;
 };
 
 #endif // vtkPSciVizContingencyStats_h

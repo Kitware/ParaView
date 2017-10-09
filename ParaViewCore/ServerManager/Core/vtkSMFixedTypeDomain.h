@@ -60,8 +60,8 @@ protected:
   ~vtkSMFixedTypeDomain() override;
 
 private:
-  vtkSMFixedTypeDomain(const vtkSMFixedTypeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMFixedTypeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMFixedTypeDomain(const vtkSMFixedTypeDomain&) = delete;
+  void operator=(const vtkSMFixedTypeDomain&) = delete;
 };
 
 #endif

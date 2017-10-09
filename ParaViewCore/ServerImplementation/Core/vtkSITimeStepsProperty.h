@@ -43,8 +43,8 @@ protected:
   bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
-  vtkSITimeStepsProperty(const vtkSITimeStepsProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSITimeStepsProperty&) VTK_DELETE_FUNCTION;
+  vtkSITimeStepsProperty(const vtkSITimeStepsProperty&) = delete;
+  void operator=(const vtkSITimeStepsProperty&) = delete;
 };
 
 #endif
