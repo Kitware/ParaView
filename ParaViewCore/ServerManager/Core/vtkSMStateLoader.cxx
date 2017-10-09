@@ -155,8 +155,8 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
       return timekeeper;
     }
   }
-  else if (xml_group && xml_name &&
-    strcmp(xml_group, "materials") == 0 & strcmp(xml_name, "MaterialLibrary") == 0)
+  else if (xml_group && xml_name && strcmp(xml_group, "materials") == 0 &&
+    strcmp(xml_name, "MaterialLibrary") == 0)
   {
     // There is only one material library proxy as well.
     vtkSMProxy* materiallibrary = pxm->FindProxy("materiallibrary", "materials", "MaterialLibrary");
