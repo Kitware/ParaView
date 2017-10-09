@@ -48,16 +48,9 @@ def run(filename=None, nframes=60):
 
     # Start with these defaults
     # v.RemoteRenderThreshold = 0
-    obj = servermanager.misc.GlobalMapperProperties()
-    obj.GlobalImmediateModeRendering = 0
 
     # Test different configurations
-    title = 'display lists, no triangle strips, solid color'
-    obj.GlobalImmediateModeRendering = 0
-    results.append(__render(ss, v, title, nframes))
-
-    title = 'no display lists, no triangle strips, solid color'
-    obj.GlobalImmediateModeRendering = 1
+    title = 'no triangle strips, solid color'
     results.append(__render(ss, v, title, nframes))
 
     # Color by normals
@@ -68,12 +61,7 @@ def run(filename=None, nframes=60):
     lt.ColorSpace = 'HSV'
     lt.VectorComponent = 0
 
-    title = 'display lists, no triangle strips, color by array'
-    obj.GlobalImmediateModeRendering = 0
-    results.append(__render(ss, v, title, nframes))
-
-    title = 'no display lists, no triangle strips, color by array'
-    obj.GlobalImmediateModeRendering = 1
+    title = 'no triangle strips, color by array'
     results.append(__render(ss, v, title, nframes))
 
     if filename:

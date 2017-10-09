@@ -131,23 +131,6 @@ int vtkCPProcessor::Initialize()
   if (this->InitializationHelper == NULL)
   {
     this->InitializationHelper = this->NewInitializationHelper();
-
-    // turn on immediate mode rendering. this helps avoid memory
-    // fragmentation which can kill a run on memory constrained machines.
-    vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
-    vtkSMSessionProxyManager* sessionProxyManager = proxyManager->GetActiveSessionProxyManager();
-    // Catalyst configurations may not have rendering enable and thus
-    // won't have GlobalMapperProperties.
-    if (sessionProxyManager->HasDefinition("misc", "GlobalMapperProperties"))
-    {
-      vtkSmartPointer<vtkSMProxy> globalMapperProperties;
-      globalMapperProperties.TakeReference(
-        sessionProxyManager->NewProxy("misc", "GlobalMapperProperties"));
-      vtkSMIntVectorProperty* immediateModeRendering = vtkSMIntVectorProperty::SafeDownCast(
-        globalMapperProperties->GetProperty("GlobalImmediateModeRendering"));
-      immediateModeRendering->SetElements1(1);
-      globalMapperProperties->UpdateVTKObjects();
-    }
   }
   return 1;
 }
