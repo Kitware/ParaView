@@ -771,24 +771,20 @@ struct Process_5_4_to_5_5
       document.select_nodes("//ServerManagerState/Proxy[@group='views' and @type='RenderView']");
 
     pugi::xml_node smstate = document.root().child("ServerManagerState");
-    pugi::xml_node links = smstate.child("Links");
-
-    if (!links)
-    {
-      links = smstate.append_child("Links");
-    }
 
     for (auto xnode : proxy_nodes)
     {
       auto proxyNode = xnode.node();
       std::string id_string(proxyNode.attribute("id").value());
-      auto switchNode = proxyNode.select_single_node("//Property[@name='LightSwitch']");
-      if (!switchNode)
+      // Don't check for LightSwitch - it seems to find the new light's LightSwitch
+      // as well as the old one in RenderView.
+      if (proxyNode.select_nodes("//Property[@name='LightDiffuseColor']").empty())
       {
         // state is already newer.
         continue;
       }
       // If the property LightSwitch is on, we add a light
+      auto switchNode = proxyNode.select_single_node("//Property[@name='LightSwitch']");
       if (switchNode.node().child("Element").attribute("value").as_int() == 1)
       {
         // add a proxy group to the SM, with one headlight, with intensity and color set
@@ -813,7 +809,7 @@ struct Process_5_4_to_5_5
           auto intensityElt = intensityNode.child("Element");
           intensity = intensityElt.attribute("value").as_double();
         }
-        // Here's the full structure, we will ignore the default values and domains.
+        // Here's the full structure, we will ignore properties with default values, and domains.
         // <Proxy group="additional_lights" type="Light" id="8232" servers="21">
         //   <Property name="DiffuseColor" id="8232.DiffuseColor" number_of_elements="3">
         //     <Element index="0" value="1"/>

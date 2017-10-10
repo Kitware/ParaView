@@ -39,7 +39,7 @@ public:
   void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventid),
     void* vtkNotUsed(calldata)) VTK_OVERRIDE
   {
-    this->Owner->PropChanged();
+    this->Owner->PropertyChanged();
   }
   vtkSMLightProxy* Owner;
 };
@@ -81,7 +81,7 @@ void vtkSMLightProxy::CreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLightProxy::PropChanged()
+void vtkSMLightProxy::PropertyChanged()
 {
   // if the light type changes, update the position/focal to correspond.
   int type = 0;

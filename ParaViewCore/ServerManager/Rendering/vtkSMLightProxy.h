@@ -40,13 +40,13 @@ protected:
 
   void CreateVTKObjects() VTK_OVERRIDE;
 
-  void PropChanged();
+  void PropertyChanged();
   friend class vtkSMLightObserver;
   vtkSMLightObserver* Observer;
 
 private:
-  vtkSMLightProxy(const vtkSMLightProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMLightProxy&) VTK_DELETE_FUNCTION;
+  vtkSMLightProxy(const vtkSMLightProxy&) = delete;
+  void operator=(const vtkSMLightProxy&) = delete;
 };
 
 #endif
