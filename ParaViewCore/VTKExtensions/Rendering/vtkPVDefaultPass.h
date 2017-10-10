@@ -44,8 +44,8 @@ protected:
   ~vtkPVDefaultPass() override;
 
 private:
-  vtkPVDefaultPass(const vtkPVDefaultPass&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDefaultPass&) VTK_DELETE_FUNCTION;
+  vtkPVDefaultPass(const vtkPVDefaultPass&) = delete;
+  void operator=(const vtkPVDefaultPass&) = delete;
 };
 
 #endif

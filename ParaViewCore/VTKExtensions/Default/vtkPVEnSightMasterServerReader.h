@@ -92,8 +92,8 @@ protected:
   int InformationError;
 
 private:
-  vtkPVEnSightMasterServerReader(const vtkPVEnSightMasterServerReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVEnSightMasterServerReader&) VTK_DELETE_FUNCTION;
+  vtkPVEnSightMasterServerReader(const vtkPVEnSightMasterServerReader&) = delete;
+  void operator=(const vtkPVEnSightMasterServerReader&) = delete;
 };
 
 #endif

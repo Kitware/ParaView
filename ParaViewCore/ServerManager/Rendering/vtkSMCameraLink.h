@@ -124,8 +124,8 @@ private:
   vtkInternals* Internals;
   friend class vtkInternals;
 
-  vtkSMCameraLink(const vtkSMCameraLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCameraLink&) VTK_DELETE_FUNCTION;
+  vtkSMCameraLink(const vtkSMCameraLink&) = delete;
+  void operator=(const vtkSMCameraLink&) = delete;
 };
 
 #endif

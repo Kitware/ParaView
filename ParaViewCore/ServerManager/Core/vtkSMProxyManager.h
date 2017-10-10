@@ -231,8 +231,8 @@ private:
 
   static vtkSmartPointer<vtkSMProxyManager> Singleton;
 
-  vtkSMProxyManager(const vtkSMProxyManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyManager&) VTK_DELETE_FUNCTION;
+  vtkSMProxyManager(const vtkSMProxyManager&) = delete;
+  void operator=(const vtkSMProxyManager&) = delete;
 };
 
 #endif

@@ -72,8 +72,8 @@ protected:
   //@}
 
 private:
-  vtkPVOpenGLExtensionsInformation(const vtkPVOpenGLExtensionsInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOpenGLExtensionsInformation&) VTK_DELETE_FUNCTION;
+  vtkPVOpenGLExtensionsInformation(const vtkPVOpenGLExtensionsInformation&) = delete;
+  void operator=(const vtkPVOpenGLExtensionsInformation&) = delete;
 
   vtkPVOpenGLExtensionsInformationInternal* Internal;
 };

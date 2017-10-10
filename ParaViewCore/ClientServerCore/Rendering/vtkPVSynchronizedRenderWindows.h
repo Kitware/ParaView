@@ -331,8 +331,8 @@ protected:
   vtkWeakPointer<vtkPVSession> Session;
 
 private:
-  vtkPVSynchronizedRenderWindows(const vtkPVSynchronizedRenderWindows&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSynchronizedRenderWindows&) VTK_DELETE_FUNCTION;
+  vtkPVSynchronizedRenderWindows(const vtkPVSynchronizedRenderWindows&) = delete;
+  void operator=(const vtkPVSynchronizedRenderWindows&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

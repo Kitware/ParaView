@@ -57,8 +57,8 @@ protected:
   ~vtkSMInputFileNameDomain() override;
 
 private:
-  vtkSMInputFileNameDomain(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
+  vtkSMInputFileNameDomain(const vtkSMInputFileNameDomain&) = delete;
+  void operator=(const vtkSMInputFileNameDomain&) = delete;
 
   std::string FileName;
 };

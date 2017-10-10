@@ -73,8 +73,8 @@ protected:
   vtkInternals* Internals;
 
 private:
-  vtkLagrangianHelperBase(const vtkLagrangianHelperBase&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkLagrangianHelperBase&) VTK_DELETE_FUNCTION;
+  vtkLagrangianHelperBase(const vtkLagrangianHelperBase&) = delete;
+  void operator=(const vtkLagrangianHelperBase&) = delete;
 };
 
 #endif

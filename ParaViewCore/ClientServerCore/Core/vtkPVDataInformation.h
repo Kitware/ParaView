@@ -340,8 +340,8 @@ protected:
   friend class vtkPVCompositeDataInformation;
 
 private:
-  vtkPVDataInformation(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;
+  vtkPVDataInformation(const vtkPVDataInformation&) = delete;
+  void operator=(const vtkPVDataInformation&) = delete;
 
   int PortNumber;
 };

@@ -71,8 +71,8 @@ protected:
   ~vtkSMPipelineState() override;
 
 private:
-  vtkSMPipelineState(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
+  vtkSMPipelineState(const vtkSMPipelineState&) = delete;
+  void operator=(const vtkSMPipelineState&) = delete;
 };
 
 #endif // #ifndef vtkSMPipelineState_h

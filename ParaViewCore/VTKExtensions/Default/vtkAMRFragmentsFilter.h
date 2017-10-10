@@ -131,8 +131,8 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRFragmentsFilter&) VTK_DELETE_FUNCTION;
+  vtkAMRFragmentsFilter(const vtkAMRFragmentsFilter&) = delete;
+  void operator=(const vtkAMRFragmentsFilter&) = delete;
 };
 
 #endif /* vtkAMRFragmentsFilter_h */

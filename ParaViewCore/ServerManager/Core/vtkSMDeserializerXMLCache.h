@@ -56,8 +56,8 @@ protected:
   vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
 
 private:
-  vtkSMDeserializerXMLCache(const vtkSMDeserializerXMLCache&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDeserializerXMLCache&) VTK_DELETE_FUNCTION;
+  vtkSMDeserializerXMLCache(const vtkSMDeserializerXMLCache&) = delete;
+  void operator=(const vtkSMDeserializerXMLCache&) = delete;
 
   class vtkInternal;
   vtkInternal* Internals;

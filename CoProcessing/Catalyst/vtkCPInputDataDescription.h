@@ -122,8 +122,8 @@ protected:
   vtkDataObject* Grid;
 
 private:
-  vtkCPInputDataDescription(const vtkCPInputDataDescription&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPInputDataDescription&) VTK_DELETE_FUNCTION;
+  vtkCPInputDataDescription(const vtkCPInputDataDescription&) = delete;
+  void operator=(const vtkCPInputDataDescription&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -68,8 +68,8 @@ protected:
   vtkNew<vtkMatrix4x4> NewModelMatrix;
 
 private:
-  vtkVRVirtualHandStyle(const vtkVRVirtualHandStyle&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVRVirtualHandStyle&) VTK_DELETE_FUNCTION;
+  vtkVRVirtualHandStyle(const vtkVRVirtualHandStyle&) = delete;
+  void operator=(const vtkVRVirtualHandStyle&) = delete;
 };
 
 #endif // vtkVRVirtualHandStyle.h

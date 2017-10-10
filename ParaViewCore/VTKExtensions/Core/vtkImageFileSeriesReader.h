@@ -67,8 +67,8 @@ protected:
   bool ReadAsImageStack;
 
 private:
-  vtkImageFileSeriesReader(const vtkImageFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkImageFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkImageFileSeriesReader(const vtkImageFileSeriesReader&) = delete;
+  void operator=(const vtkImageFileSeriesReader&) = delete;
 };
 
 #endif

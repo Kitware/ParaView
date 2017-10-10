@@ -122,8 +122,8 @@ protected:
   vtkIdType MaximumNumberOfPointsOld;
 
 private:
-  vtkPVLegacyGlyphFilter(const vtkPVLegacyGlyphFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLegacyGlyphFilter&) VTK_DELETE_FUNCTION;
+  vtkPVLegacyGlyphFilter(const vtkPVLegacyGlyphFilter&) = delete;
+  void operator=(const vtkPVLegacyGlyphFilter&) = delete;
 
 public:
   enum CommunicationIds

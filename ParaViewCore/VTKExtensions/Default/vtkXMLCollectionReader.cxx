@@ -734,7 +734,8 @@ const vtkXMLCollectionReaderEntry vtkXMLCollectionReaderInternals::ReaderList[] 
   { "vtmg", "vtkXMLMultiGroupDataReader" },   // legacy reader - produces vtkMultiBlockDataSet.
   { "vthd", "vtkXMLHierarchicalDataReader" }, // legacy reader - produces vtkMultiBlockDataSet.
   { "vthb", "vtkXMLHierarchicalBoxDataReader" }, { "vts", "vtkXMLStructuredGridReader" },
-  { "pvtp", "vtkXMLPPolyDataReader" }, { "pvtu", "vtkXMLPUnstructuredGridReader" },
-  { "pvti", "vtkXMLPImageDataReader" }, { "pvtr", "vtkXMLPRectilinearGridReader" },
-  { "pvts", "vtkXMLPStructuredGridReader" }, { 0, 0 }
+  { "vtt", "vtkXMLTableReader" }, { "pvtp", "vtkXMLPPolyDataReader" },
+  { "pvtu", "vtkXMLPUnstructuredGridReader" }, { "pvti", "vtkXMLPImageDataReader" },
+  { "pvtr", "vtkXMLPRectilinearGridReader" }, { "pvts", "vtkXMLPStructuredGridReader" },
+  { "pvtt", "vtkXMLPTableReader" }, { 0, 0 }
 };

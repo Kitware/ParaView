@@ -100,8 +100,8 @@ protected:
     const double passValues[8]);
 
 private:
-  vtkFlashContour(const vtkFlashContour&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFlashContour&) VTK_DELETE_FUNCTION;
+  vtkFlashContour(const vtkFlashContour&) = delete;
+  void operator=(const vtkFlashContour&) = delete;
 };
 
 #endif

@@ -48,8 +48,8 @@ protected:
 
   int ZoomPosition[2];
 
-  vtkPVTrackballZoomToMouse(const vtkPVTrackballZoomToMouse&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballZoomToMouse&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballZoomToMouse(const vtkPVTrackballZoomToMouse&) = delete;
+  void operator=(const vtkPVTrackballZoomToMouse&) = delete;
 };
 
 #endif

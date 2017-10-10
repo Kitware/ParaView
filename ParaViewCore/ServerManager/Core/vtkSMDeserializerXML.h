@@ -77,8 +77,8 @@ protected:
   virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
 
 private:
-  vtkSMDeserializerXML(const vtkSMDeserializerXML&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDeserializerXML&) VTK_DELETE_FUNCTION;
+  vtkSMDeserializerXML(const vtkSMDeserializerXML&) = delete;
+  void operator=(const vtkSMDeserializerXML&) = delete;
 };
 
 #endif

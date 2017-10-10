@@ -191,9 +191,8 @@ protected:
   bool UseDataPartitions;
 
 private:
-  vtkUnstructuredGridVolumeRepresentation(
-    const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkUnstructuredGridVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkUnstructuredGridVolumeRepresentation(const vtkUnstructuredGridVolumeRepresentation&) = delete;
+  void operator=(const vtkUnstructuredGridVolumeRepresentation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

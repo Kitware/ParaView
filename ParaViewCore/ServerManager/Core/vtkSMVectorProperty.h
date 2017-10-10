@@ -161,8 +161,8 @@ protected:
   int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
-  vtkSMVectorProperty(const vtkSMVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSMVectorProperty(const vtkSMVectorProperty&) = delete;
+  void operator=(const vtkSMVectorProperty&) = delete;
 };
 
 #endif

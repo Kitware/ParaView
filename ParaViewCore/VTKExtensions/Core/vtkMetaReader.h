@@ -145,8 +145,8 @@ protected:
   vtkTimeStamp MetaFileReadTime;
 
 private:
-  vtkMetaReader(const vtkMetaReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMetaReader&) VTK_DELETE_FUNCTION;
+  vtkMetaReader(const vtkMetaReader&) = delete;
+  void operator=(const vtkMetaReader&) = delete;
 };
 //@}
 

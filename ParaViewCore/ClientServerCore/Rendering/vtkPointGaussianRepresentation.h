@@ -216,8 +216,8 @@ protected:
   std::vector<float> PresetShaderScales;
 
 private:
-  vtkPointGaussianRepresentation(const vtkPointGaussianRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPointGaussianRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPointGaussianRepresentation(const vtkPointGaussianRepresentation&) = delete;
+  void operator=(const vtkPointGaussianRepresentation&) = delete;
 };
 
 #endif // vtkPointGaussianRepresentation_h

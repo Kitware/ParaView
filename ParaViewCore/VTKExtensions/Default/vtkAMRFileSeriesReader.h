@@ -38,8 +38,8 @@ protected:
 
 private:
   vtkAMRFileSeriesReader();
-  vtkAMRFileSeriesReader(const vtkAMRFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkAMRFileSeriesReader(const vtkAMRFileSeriesReader&) = delete;
+  void operator=(const vtkAMRFileSeriesReader&) = delete;
 };
 
 #endif

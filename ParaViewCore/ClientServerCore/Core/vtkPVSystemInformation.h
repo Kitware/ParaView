@@ -88,8 +88,8 @@ protected:
   std::vector<SystemInformationType> SystemInformations;
 
 private:
-  vtkPVSystemInformation(const vtkPVSystemInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSystemInformation&) VTK_DELETE_FUNCTION;
+  vtkPVSystemInformation(const vtkPVSystemInformation&) = delete;
+  void operator=(const vtkPVSystemInformation&) = delete;
 };
 
 #endif

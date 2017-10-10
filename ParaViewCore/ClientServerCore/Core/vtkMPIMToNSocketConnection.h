@@ -120,8 +120,8 @@ private:
   vtkMPIMToNSocketConnectionInternals* Internals;
   vtkMultiProcessController* Controller;
   vtkSocketCommunicator* SocketCommunicator;
-  vtkMPIMToNSocketConnection(const vtkMPIMToNSocketConnection&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMPIMToNSocketConnection&) VTK_DELETE_FUNCTION;
+  vtkMPIMToNSocketConnection(const vtkMPIMToNSocketConnection&) = delete;
+  void operator=(const vtkMPIMToNSocketConnection&) = delete;
   bool IsWaiting;
 };
 

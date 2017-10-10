@@ -138,8 +138,8 @@ protected:
   void TriggerUpdateDataEvent();
 
 private:
-  vtkCompositeRepresentation(const vtkCompositeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCompositeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkCompositeRepresentation(const vtkCompositeRepresentation&) = delete;
+  void operator=(const vtkCompositeRepresentation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

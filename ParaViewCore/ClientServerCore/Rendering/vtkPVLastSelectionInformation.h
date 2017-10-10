@@ -40,8 +40,8 @@ protected:
   ~vtkPVLastSelectionInformation() override;
 
 private:
-  vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
+  vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&) = delete;
+  void operator=(const vtkPVLastSelectionInformation&) = delete;
 };
 
 #endif

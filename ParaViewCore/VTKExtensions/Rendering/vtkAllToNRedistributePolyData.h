@@ -53,8 +53,8 @@ protected:
   int NumberOfProcesses;
 
 private:
-  vtkAllToNRedistributePolyData(const vtkAllToNRedistributePolyData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAllToNRedistributePolyData&) VTK_DELETE_FUNCTION;
+  vtkAllToNRedistributePolyData(const vtkAllToNRedistributePolyData&) = delete;
+  void operator=(const vtkAllToNRedistributePolyData&) = delete;
 };
 
 //****************************************************************

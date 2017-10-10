@@ -48,8 +48,8 @@ protected:
   vtkPVTrackballRoll();
   ~vtkPVTrackballRoll() override;
 
-  vtkPVTrackballRoll(const vtkPVTrackballRoll&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballRoll&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballRoll(const vtkPVTrackballRoll&) = delete;
+  void operator=(const vtkPVTrackballRoll&) = delete;
 };
 
 #endif

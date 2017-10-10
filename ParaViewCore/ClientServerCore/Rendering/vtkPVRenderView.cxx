@@ -1502,25 +1502,16 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   // Configure FXAA. Disable for picking, as it mucks up the selection buffers.
   bool use_fxaa = this->UseFXAA && !this->MakingSelection;
+  this->RenderView->GetRenderer()->SetUseFXAA(use_fxaa);
+  this->RenderView->GetRenderer()->SetFXAAOptions(this->FXAAOptions);
   if (this->SynchronizedRenderers->GetEnabled())
   {
-    this->SynchronizedRenderers->SetUseFXAA(use_fxaa);
-    this->SynchronizedRenderers->SetFXAAOptions(this->FXAAOptions.Get());
-    // Disable the renderer's FXAA implementation when rendering remotely. We
-    // need to run it on the composed image to avoid seam artifacts.
-    this->RenderView->GetRenderer()->SetUseFXAA(false);
-
     // Force opaque rendering for the GridAxes. Needed so that the grid axes
     // labels are visible when not using ordered compositing (see bug #17472)
     if (this->GridAxes3DActor)
     {
       this->GridAxes3DActor->SetForceOpaque(true);
     }
-  }
-  else
-  {
-    this->RenderView->GetRenderer()->SetUseFXAA(use_fxaa);
-    this->RenderView->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());
   }
   this->OrientationWidget->GetRenderer()->SetUseFXAA(use_fxaa);
   this->OrientationWidget->GetRenderer()->SetFXAAOptions(this->FXAAOptions.Get());

@@ -86,8 +86,8 @@ protected:
   double Tolerance;
 
 private:
-  vtkPSciVizKMeans(const vtkPSciVizKMeans&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPSciVizKMeans&) VTK_DELETE_FUNCTION;
+  vtkPSciVizKMeans(const vtkPSciVizKMeans&) = delete;
+  void operator=(const vtkPSciVizKMeans&) = delete;
 };
 
 #endif // vtkPSciVizKMeans_h

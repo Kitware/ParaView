@@ -90,8 +90,8 @@ protected:
   int PropertyNameIndex;
 
 private:
-  vtkSMNamedPropertyIterator(const vtkSMNamedPropertyIterator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMNamedPropertyIterator&) VTK_DELETE_FUNCTION;
+  vtkSMNamedPropertyIterator(const vtkSMNamedPropertyIterator&) = delete;
+  void operator=(const vtkSMNamedPropertyIterator&) = delete;
 };
 
 #endif

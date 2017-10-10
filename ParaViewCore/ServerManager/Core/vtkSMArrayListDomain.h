@@ -275,8 +275,8 @@ protected:
   bool PickFirstAvailableArrayByDefault;
 
 private:
-  vtkSMArrayListDomain(const vtkSMArrayListDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMArrayListDomain&) VTK_DELETE_FUNCTION;
+  vtkSMArrayListDomain(const vtkSMArrayListDomain&) = delete;
+  void operator=(const vtkSMArrayListDomain&) = delete;
 
   friend class vtkSMArrayListDomainInternals;
   vtkSMArrayListDomainInternals* ALDInternals;

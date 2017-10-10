@@ -108,8 +108,8 @@ protected:
   void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMComparativeViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&) = delete;
+  void operator=(const vtkSMComparativeViewProxy&) = delete;
 };
 
 #endif

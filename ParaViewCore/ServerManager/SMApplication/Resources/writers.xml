@@ -14,6 +14,7 @@
         <DataTypeDomain composite_data_supported="0"
                         name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the files.</Documentation>
@@ -86,13 +87,13 @@
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="FileSeriesWriter"
-                 name="XMLDataSetWriterBase">
+                 name="XMLDataObjectWriterBase">
       <Documentation>Base for all XML-based file-series
       writers.</Documentation>
       <SubProxy>
         <Proxy name="Writer"
                proxygroup="internal_writers"
-               proxyname="XMLDataSetWriterCore"></Proxy>
+               proxyname="XMLDataObjectWriterCore"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="XML Writer Parameters">
             <Property name="DataMode" />
@@ -101,11 +102,11 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
-      <!-- End of XMLDataSetWriterBase -->
+      <!-- End of XMLDataObjectWriterBase -->
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLPolyDataWriter">
@@ -135,7 +136,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLHyperOctreeWriter">
@@ -165,7 +166,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLUnstructuredGridWriter">
@@ -195,7 +196,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLStructuredGridWriter">
@@ -225,7 +226,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLRectilinearGridWriter">
@@ -255,7 +256,7 @@
     </WriterProxy>
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="writers"
-                 base_proxyname="XMLDataSetWriterBase"
+                 base_proxyname="XMLDataObjectWriterBase"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="XMLImageDataWriter">
@@ -280,6 +281,36 @@
                   show="0" />
         <WriterFactory extensions="vti"
                        file_description="VTK ImageData Files" />
+      </Hints>
+      <!-- End of XMLImageDataWriter -->
+    </WriterProxy>
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLDataObjectWriterBase"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLTableWriter">
+      <Documentation short_help="Write a table in a xml-based vtk data file.">
+      Writer to write a table in a xml-based vtk data file. Cannot be used
+      for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
+                  show="0" />
+        <WriterFactory extensions="vtt"
+                       file_description="VTK Table Files" />
       </Hints>
       <!-- End of XMLImageDataWriter -->
     </WriterProxy>
@@ -372,6 +403,52 @@
                   show="0" />
         <WriterFactory extensions="pvtu"
                        file_description="PVTK UnstructuredGrid Files" />
+      </Hints>
+      <!-- End of XMLPUnstructuredGridWriter -->
+    </WriterProxy>
+ <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="ParallelFileSeriesWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLPTableWriter"
+                 parallel_only="1">
+      <Documentation short_help="Write table in a xml-based vtk data file.">
+      Writer to write table in a xml-based vtk data file. Can be
+      used for parallel writing.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="XMLPTableCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="XML Writer Parameters">
+            <!-- <Property name="GhostLevel" /> -->
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+            <Property name="UseSubdirectory" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <Property name="HeaderType"
+                  show="0" />
+        <WriterFactory extensions="pvtt"
+                       file_description="PVTK Table Files" />
       </Hints>
       <!-- End of XMLPUnstructuredGridWriter -->
     </WriterProxy>

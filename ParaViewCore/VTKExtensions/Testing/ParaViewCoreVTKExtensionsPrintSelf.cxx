@@ -136,8 +136,6 @@
 #include "vtkQuerySelectionSource.h"
 #include "vtkRectilinearGridConnectivity.h"
 #include "vtkReductionFilter.h"
-#include "vtkScatterPlotMapper.h"
-#include "vtkScatterPlotPainter.h"
 #include "vtkSciVizStatistics.h"
 #include "vtkSelectionConverter.h"
 #include "vtkSelectionSerializer.h"
@@ -320,8 +318,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkQuerySelectionSource);
   PRINT_SELF(vtkRectilinearGridConnectivity);
   PRINT_SELF(vtkReductionFilter);
-  PRINT_SELF(vtkScatterPlotMapper);
-  PRINT_SELF(vtkScatterPlotPainter);
   PRINT_SELF(vtkSciVizStatistics);
   PRINT_SELF(vtkSelectionConverter);
   PRINT_SELF(vtkSelectionSerializer);

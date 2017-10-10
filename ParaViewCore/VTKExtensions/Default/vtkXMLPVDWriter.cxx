@@ -35,10 +35,12 @@
 #include "vtkXMLPPolyDataWriter.h"
 #include "vtkXMLPRectilinearGridWriter.h"
 #include "vtkXMLPStructuredGridWriter.h"
+#include "vtkXMLPTableWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLRectilinearGridWriter.h"
 #include "vtkXMLStructuredGridWriter.h"
+#include "vtkXMLTableWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
 
@@ -105,7 +107,10 @@ int vtkXMLPVDWriter::ProcessRequest(
 
     for (int i = 0; i < GetNumberOfInputConnections(0); ++i)
     {
-      this->GetWriter(i)->ProcessRequest(request, inputVector, outputVector);
+      if (this->GetWriter(i))
+      {
+        this->GetWriter(i)->ProcessRequest(request, inputVector, outputVector);
+      }
     }
     return 1;
   }
@@ -336,7 +341,7 @@ void vtkXMLPVDWriter::CreateWriters()
         if (this->NumberOfPieces > 1)
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLPPolyDataWriter") != 0))
+            (this->Internal->Writers[i]->IsA("vtkXMLPPolyDataWriter")))
           {
             vtkXMLPPolyDataWriter* w = vtkXMLPPolyDataWriter::New();
             this->Internal->Writers[i] = w;
@@ -346,7 +351,7 @@ void vtkXMLPVDWriter::CreateWriters()
         else
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLPolyDataWriter") != 0))
+            (this->Internal->Writers[i]->IsA("vtkXMLPolyDataWriter")))
           {
             vtkXMLPolyDataWriter* w = vtkXMLPolyDataWriter::New();
             this->Internal->Writers[i] = w;
@@ -359,7 +364,7 @@ void vtkXMLPVDWriter::CreateWriters()
         if (this->NumberOfPieces > 1)
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLPImageDataWriter") != 0))
+            (this->Internal->Writers[i]->IsA("vtkXMLPImageDataWriter")))
           {
             vtkXMLPImageDataWriter* w = vtkXMLPImageDataWriter::New();
             this->Internal->Writers[i] = w;
@@ -369,7 +374,7 @@ void vtkXMLPVDWriter::CreateWriters()
         else
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLImageDataWriter") != 0))
+            (this->Internal->Writers[i]->IsA("vtkXMLImageDataWriter")))
           {
             vtkXMLImageDataWriter* w = vtkXMLImageDataWriter::New();
             this->Internal->Writers[i] = w;
@@ -381,8 +386,7 @@ void vtkXMLPVDWriter::CreateWriters()
         if (this->NumberOfPieces > 1)
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLPUnstructuredGridWriter") !=
-              0))
+            (this->Internal->Writers[i]->IsA("vtkXMLPUnstructuredGridWriter")))
           {
             vtkXMLPUnstructuredGridWriter* w = vtkXMLPUnstructuredGridWriter::New();
             this->Internal->Writers[i] = w;
@@ -392,8 +396,7 @@ void vtkXMLPVDWriter::CreateWriters()
         else
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLUnstructuredGridWriter") !=
-              0))
+            (this->Internal->Writers[i]->IsA("vtkXMLUnstructuredGridWriter")))
           {
             vtkXMLUnstructuredGridWriter* w = vtkXMLUnstructuredGridWriter::New();
             this->Internal->Writers[i] = w;
@@ -405,8 +408,7 @@ void vtkXMLPVDWriter::CreateWriters()
         if (this->NumberOfPieces > 1)
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLPStructuredGridWriter") !=
-              0))
+            (this->Internal->Writers[i]->IsA("vtkXMLPStructuredGridWriter")))
           {
             vtkXMLPStructuredGridWriter* w = vtkXMLPStructuredGridWriter::New();
             this->Internal->Writers[i] = w;
@@ -416,7 +418,7 @@ void vtkXMLPVDWriter::CreateWriters()
         else
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLStructuredGridWriter") != 0))
+            (this->Internal->Writers[i]->IsA("vtkXMLStructuredGridWriter")))
           {
             vtkXMLStructuredGridWriter* w = vtkXMLStructuredGridWriter::New();
             this->Internal->Writers[i] = w;
@@ -428,8 +430,7 @@ void vtkXMLPVDWriter::CreateWriters()
         if (this->NumberOfPieces > 1)
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLPRectilinearGridWriter") !=
-              0))
+            (this->Internal->Writers[i]->IsA("vtkXMLPRectilinearGridWriter")))
           {
             vtkXMLPRectilinearGridWriter* w = vtkXMLPRectilinearGridWriter::New();
             this->Internal->Writers[i] = w;
@@ -439,8 +440,7 @@ void vtkXMLPVDWriter::CreateWriters()
         else
         {
           if (!this->Internal->Writers[i].GetPointer() ||
-            (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLRectilinearGridWriter") !=
-              0))
+            (this->Internal->Writers[i]->IsA("vtkXMLRectilinearGridWriter")))
           {
             vtkXMLRectilinearGridWriter* w = vtkXMLRectilinearGridWriter::New();
             this->Internal->Writers[i] = w;
@@ -451,13 +451,40 @@ void vtkXMLPVDWriter::CreateWriters()
 
       case VTK_MULTIBLOCK_DATA_SET:
         if (!this->Internal->Writers[i].GetPointer() ||
-          (strcmp(this->Internal->Writers[i]->GetClassName(), "vtkXMLPMultiBlockDataWriter") != 0))
+          (this->Internal->Writers[i]->IsA("vtkXMLPMultiBlockDataWriter")))
         {
           vtkXMLPMultiBlockDataWriter* w = vtkXMLPMultiBlockDataWriter::New();
           this->Internal->Writers[i] = w;
           w->Delete();
         }
         break;
+
+      case VTK_TABLE:
+        if (this->NumberOfPieces > 1)
+        {
+          if (!this->Internal->Writers[i].GetPointer() ||
+            (this->Internal->Writers[i]->IsA("vtkXMLPTableWriter")))
+          {
+            vtkXMLPTableWriter* w = vtkXMLPTableWriter::New();
+            this->Internal->Writers[i] = w;
+            w->Delete();
+          }
+        }
+        else
+        {
+          if (!this->Internal->Writers[i].GetPointer() ||
+            (this->Internal->Writers[i]->IsA("vtkXMLTableWriter")))
+          {
+            vtkXMLTableWriter* w = vtkXMLTableWriter::New();
+            this->Internal->Writers[i] = w;
+            w->Delete();
+          }
+        }
+        break;
+
+      default:
+        vtkErrorMacro("Unsupported data type: " << exec->GetInputData(0, i)->GetClassName());
+        return;
     }
 
     this->Internal->Writers[i]->SetInputConnection(this->GetInputConnection(0, i));
@@ -475,22 +502,40 @@ void vtkXMLPVDWriter::CreateWriters()
     }
 
     // If this is a parallel writer, set the piece information.
-    if (vtkXMLPDataWriter* w =
+    if (vtkXMLPDataWriter* pDataWriter =
           vtkXMLPDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer()))
     {
-      w->SetStartPiece(this->Piece);
-      w->SetEndPiece(this->Piece);
-      w->SetNumberOfPieces(this->NumberOfPieces);
-      w->SetGhostLevel(this->GhostLevel);
+      pDataWriter->SetStartPiece(this->Piece);
+      pDataWriter->SetEndPiece(this->Piece);
+      pDataWriter->SetNumberOfPieces(this->NumberOfPieces);
+      pDataWriter->SetGhostLevel(this->GhostLevel);
       if (this->WriteCollectionFileInitialized)
       {
-        w->SetWriteSummaryFile(this->WriteCollectionFile);
+        pDataWriter->SetWriteSummaryFile(this->WriteCollectionFile);
       }
       else
       {
         // We tell all piece writers to write summary file. The vtkXMLPDataWriter correctly
         // decides to write out the file only on rank 0.
-        w->SetWriteSummaryFile(1);
+        pDataWriter->SetWriteSummaryFile(1);
+      }
+    }
+    else if (vtkXMLPTableWriter* pTableWriter =
+               vtkXMLPTableWriter::SafeDownCast(this->Internal->Writers[i].GetPointer()))
+    {
+      pTableWriter->SetStartPiece(this->Piece);
+      pTableWriter->SetEndPiece(this->Piece);
+      pTableWriter->SetNumberOfPieces(this->NumberOfPieces);
+      pTableWriter->SetGhostLevel(this->GhostLevel);
+      if (this->WriteCollectionFileInitialized)
+      {
+        pTableWriter->SetWriteSummaryFile(this->WriteCollectionFile);
+      }
+      else
+      {
+        // We tell all piece writers to write summary file. The vtkXMLPDataWriter correctly
+        // decides to write out the file only on rank 0.
+        pTableWriter->SetWriteSummaryFile(1);
       }
     }
   }
@@ -617,5 +662,6 @@ int vtkXMLPVDWriter::FillInputPortInformation(int vtkNotUsed(port), vtkInformati
 {
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
   return 1;
 }

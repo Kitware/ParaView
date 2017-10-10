@@ -180,8 +180,8 @@ protected:
   int ChooseInput(vtkInformation*);
 
 private:
-  vtkFileSeriesReader(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkFileSeriesReader(const vtkFileSeriesReader&) = delete;
+  void operator=(const vtkFileSeriesReader&) = delete;
 
   vtkFileSeriesReaderInternals* Internal;
 };

@@ -171,8 +171,8 @@ protected:
   bool Loaded;
 
 private:
-  vtkPVPluginLoader(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPluginLoader&) VTK_DELETE_FUNCTION;
+  vtkPVPluginLoader(const vtkPVPluginLoader&) = delete;
+  void operator=(const vtkPVPluginLoader&) = delete;
 
   static vtkPluginLoadFunction StaticPluginLoadFunction;
 };

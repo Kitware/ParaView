@@ -106,8 +106,8 @@ protected:
   vtk3DWidgetRepresentation* TextWidgetRepresentation;
 
 private:
-  vtkTextSourceRepresentation(const vtkTextSourceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTextSourceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkTextSourceRepresentation(const vtkTextSourceRepresentation&) = delete;
+  void operator=(const vtkTextSourceRepresentation&) = delete;
 };
 
 #endif

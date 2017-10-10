@@ -62,8 +62,8 @@ protected:
   ~vtkPVEnsembleDataReaderInformation() override;
 
 private:
-  vtkPVEnsembleDataReaderInformation(const vtkPVEnsembleDataReaderInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVEnsembleDataReaderInformation&) VTK_DELETE_FUNCTION;
+  vtkPVEnsembleDataReaderInformation(const vtkPVEnsembleDataReaderInformation&) = delete;
+  void operator=(const vtkPVEnsembleDataReaderInformation&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

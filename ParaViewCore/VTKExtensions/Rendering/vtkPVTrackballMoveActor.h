@@ -50,8 +50,8 @@ protected:
   vtkPVTrackballMoveActor();
   ~vtkPVTrackballMoveActor() override;
 
-  vtkPVTrackballMoveActor(const vtkPVTrackballMoveActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballMoveActor&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballMoveActor(const vtkPVTrackballMoveActor&) = delete;
+  void operator=(const vtkPVTrackballMoveActor&) = delete;
 };
 
 #endif

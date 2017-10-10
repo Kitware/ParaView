@@ -80,8 +80,8 @@ public:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
+  vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) = delete;
+  void operator=(const vtkPVAMRFragmentIntegration&) = delete;
 
 protected:
   double VolumeFractionSurfaceValue;

@@ -70,8 +70,8 @@ protected:
   vtkCameraManipulator* CurrentManipulator;
 
 private:
-  vtkPVTrackballMultiRotate(const vtkPVTrackballMultiRotate&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballMultiRotate&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballMultiRotate(const vtkPVTrackballMultiRotate&) = delete;
+  void operator=(const vtkPVTrackballMultiRotate&) = delete;
 };
 
 #endif // vtkPVTrackballMultiRotate_h

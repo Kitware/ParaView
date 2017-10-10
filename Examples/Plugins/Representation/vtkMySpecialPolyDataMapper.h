@@ -37,8 +37,8 @@ protected:
   ~vtkMySpecialPolyDataMapper();
 
 private:
-  vtkMySpecialPolyDataMapper(const vtkMySpecialPolyDataMapper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMySpecialPolyDataMapper&) VTK_DELETE_FUNCTION;
+  vtkMySpecialPolyDataMapper(const vtkMySpecialPolyDataMapper&) = delete;
+  void operator=(const vtkMySpecialPolyDataMapper&) = delete;
 };
 
 #endif

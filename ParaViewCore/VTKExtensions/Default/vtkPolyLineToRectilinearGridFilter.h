@@ -51,8 +51,8 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkPolyLineToRectilinearGridFilter(const vtkPolyLineToRectilinearGridFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPolyLineToRectilinearGridFilter&) VTK_DELETE_FUNCTION;
+  vtkPolyLineToRectilinearGridFilter(const vtkPolyLineToRectilinearGridFilter&) = delete;
+  void operator=(const vtkPolyLineToRectilinearGridFilter&) = delete;
 };
 
 #endif

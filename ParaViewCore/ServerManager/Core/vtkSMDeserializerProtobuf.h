@@ -63,8 +63,8 @@ protected:
   vtkSMStateLocator* StateLocator;
 
 private:
-  vtkSMDeserializerProtobuf(const vtkSMDeserializerProtobuf&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDeserializerProtobuf&) VTK_DELETE_FUNCTION;
+  vtkSMDeserializerProtobuf(const vtkSMDeserializerProtobuf&) = delete;
+  void operator=(const vtkSMDeserializerProtobuf&) = delete;
 };
 
 #endif

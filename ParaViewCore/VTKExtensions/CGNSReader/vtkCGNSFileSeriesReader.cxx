@@ -56,8 +56,8 @@ public:
   }
   ~SCOPED_SET() { this->Var = this->Prev; }
 private:
-  SCOPED_SET(const SCOPED_SET&) VTK_DELETE_FUNCTION;
-  void operator=(const SCOPED_SET&) VTK_DELETE_FUNCTION;
+  SCOPED_SET(const SCOPED_SET&) = delete;
+  void operator=(const SCOPED_SET&) = delete;
 };
 }
 

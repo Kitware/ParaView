@@ -123,8 +123,8 @@ protected:
   ~vtkPVPluginTracker() override;
 
 private:
-  vtkPVPluginTracker(const vtkPVPluginTracker&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPluginTracker&) VTK_DELETE_FUNCTION;
+  vtkPVPluginTracker(const vtkPVPluginTracker&) = delete;
+  void operator=(const vtkPVPluginTracker&) = delete;
 
   class vtkPluginsList;
   vtkPluginsList* PluginsList;

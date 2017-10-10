@@ -59,8 +59,8 @@ protected:
   bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
-  vtkSIStringVectorProperty(const vtkSIStringVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIStringVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSIStringVectorProperty(const vtkSIStringVectorProperty&) = delete;
+  void operator=(const vtkSIStringVectorProperty&) = delete;
 
   class vtkVectorOfStrings;
   class vtkVectorOfInts;

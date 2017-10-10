@@ -220,8 +220,8 @@ protected:
   vtkSetMacro(OverrideStillRender, bool);
 
 private:
-  vtkSMAnimationScene(const vtkSMAnimationScene&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMAnimationScene&) VTK_DELETE_FUNCTION;
+  vtkSMAnimationScene(const vtkSMAnimationScene&) = delete;
+  void operator=(const vtkSMAnimationScene&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -51,8 +51,8 @@ protected:
   void Update(vtkSMProxyProperty* pp);
 
 private:
-  vtkSMTimeStepIndexDomain(const vtkSMTimeStepIndexDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTimeStepIndexDomain&) VTK_DELETE_FUNCTION;
+  vtkSMTimeStepIndexDomain(const vtkSMTimeStepIndexDomain&) = delete;
+  void operator=(const vtkSMTimeStepIndexDomain&) = delete;
 };
 
 #endif // vtkSMTimeStepIndexDomain_h

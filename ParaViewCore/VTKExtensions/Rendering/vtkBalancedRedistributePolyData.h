@@ -46,8 +46,8 @@ protected:
   void MakeSchedule(vtkPolyData*, vtkCommSched*) VTK_OVERRIDE;
 
 private:
-  vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkBalancedRedistributePolyData&) VTK_DELETE_FUNCTION;
+  vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&) = delete;
+  void operator=(const vtkBalancedRedistributePolyData&) = delete;
 };
 
 //****************************************************************

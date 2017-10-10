@@ -74,8 +74,8 @@ protected:
   //@}
 
 private:
-  vtkMPICompositeManager(const vtkMPICompositeManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMPICompositeManager&) VTK_DELETE_FUNCTION;
+  vtkMPICompositeManager(const vtkMPICompositeManager&) = delete;
+  void operator=(const vtkMPICompositeManager&) = delete;
 };
 
 #endif

@@ -65,8 +65,8 @@ protected:
   vtkGetStringMacro(PythonScriptName);
 
 private:
-  vtkCPPythonScriptPipeline(const vtkCPPythonScriptPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPPythonScriptPipeline&) VTK_DELETE_FUNCTION;
+  vtkCPPythonScriptPipeline(const vtkCPPythonScriptPipeline&) = delete;
+  void operator=(const vtkCPPythonScriptPipeline&) = delete;
 
   /// The name of the python script (without the path or extension)
   /// that is used as the namespace of the functions of the script.

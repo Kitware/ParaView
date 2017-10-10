@@ -2611,18 +2611,6 @@
         <Documentation>Used to set the z-shift if ResolveCoincidentTopology is
         set to ShiftZBuffer. This is a global variable.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetGlobalImmediateModeRendering"
-                         default_values="none"
-                         name="GlobalImmediateModeRendering"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Turn on/off flag to control whether data is rendered
-        using immediate mode or note. Immediate mode rendering tends to be
-        slower but it can handle larger datasets. The default value is
-        immediate mode off. If you are having problems rendering a large
-        dataset you might want to consider using immediate more
-        rendering.</Documentation>
-      </IntVectorProperty>
       <!-- End of GlobalMapperProperties -->
     </Proxy>
     <Proxy class="vtkTimerLog"

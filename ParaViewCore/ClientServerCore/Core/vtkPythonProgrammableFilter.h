@@ -173,8 +173,8 @@ protected:
   int OutputDataSetType;
 
 private:
-  vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPythonProgrammableFilter&) VTK_DELETE_FUNCTION;
+  vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&) = delete;
+  void operator=(const vtkPythonProgrammableFilter&) = delete;
 
   /**
    * When there is a request, cache it so that we can use it inside the Python

@@ -38,8 +38,8 @@ protected:
   ~vtkPVSingleOutputExtractSelection() override;
 
 private:
-  vtkPVSingleOutputExtractSelection(const vtkPVSingleOutputExtractSelection&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSingleOutputExtractSelection&) VTK_DELETE_FUNCTION;
+  vtkPVSingleOutputExtractSelection(const vtkPVSingleOutputExtractSelection&) = delete;
+  void operator=(const vtkPVSingleOutputExtractSelection&) = delete;
 };
 
 #endif

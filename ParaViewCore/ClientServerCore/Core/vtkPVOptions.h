@@ -348,8 +348,8 @@ private:
   vtkSetStringMacro(StereoType);
 
 private:
-  vtkPVOptions(const vtkPVOptions&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOptions&) VTK_DELETE_FUNCTION;
+  vtkPVOptions(const vtkPVOptions&) = delete;
+  void operator=(const vtkPVOptions&) = delete;
 
   vtkSetStringMacro(HostName);
   char* HostName;

@@ -61,8 +61,8 @@ protected:
   vtkWeakPointer<vtkSMSession> Session;
 
 private:
-  vtkSMServerStateLocator(const vtkSMServerStateLocator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMServerStateLocator&) VTK_DELETE_FUNCTION;
+  vtkSMServerStateLocator(const vtkSMServerStateLocator&) = delete;
+  void operator=(const vtkSMServerStateLocator&) = delete;
 };
 
 #endif

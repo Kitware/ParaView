@@ -108,8 +108,8 @@ protected:
   bool UseLICForLOD;
 
 private:
-  vtkSurfaceLICRepresentation(const vtkSurfaceLICRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSurfaceLICRepresentation&) VTK_DELETE_FUNCTION;
+  vtkSurfaceLICRepresentation(const vtkSurfaceLICRepresentation&) = delete;
+  void operator=(const vtkSurfaceLICRepresentation&) = delete;
 };
 
 #endif

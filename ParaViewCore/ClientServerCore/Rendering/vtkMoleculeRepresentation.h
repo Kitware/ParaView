@@ -83,8 +83,8 @@ protected:
   double DataBounds[6];
 
 private:
-  vtkMoleculeRepresentation(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkMoleculeRepresentation(const vtkMoleculeRepresentation&) = delete;
+  void operator=(const vtkMoleculeRepresentation&) = delete;
 };
 
 #endif // vtkMoleculeRepresentation_h

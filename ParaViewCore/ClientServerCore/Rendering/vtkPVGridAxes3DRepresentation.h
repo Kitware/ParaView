@@ -74,8 +74,8 @@ protected:
   vtkPVGridAxes3DActor* GridAxes;
 
 private:
-  vtkPVGridAxes3DRepresentation(const vtkPVGridAxes3DRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVGridAxes3DRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVGridAxes3DRepresentation(const vtkPVGridAxes3DRepresentation&) = delete;
+  void operator=(const vtkPVGridAxes3DRepresentation&) = delete;
 };
 
 #endif // vtkPVGridAxes3DRepresentation_h

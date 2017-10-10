@@ -71,8 +71,8 @@ protected:
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
 private:
-  vtkGeodesicsBetweenPoints(const vtkGeodesicsBetweenPoints&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGeodesicsBetweenPoints&) VTK_DELETE_FUNCTION;
+  vtkGeodesicsBetweenPoints(const vtkGeodesicsBetweenPoints&) = delete;
+  void operator=(const vtkGeodesicsBetweenPoints&) = delete;
 };
 
 #endif

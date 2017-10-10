@@ -55,9 +55,9 @@ protected:
   ~vtkCPGridBuilder();
 
 private:
-  vtkCPGridBuilder(const vtkCPGridBuilder&) VTK_DELETE_FUNCTION;
+  vtkCPGridBuilder(const vtkCPGridBuilder&) = delete;
 
-  void operator=(const vtkCPGridBuilder&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkCPGridBuilder&) = delete;
   //@{
   /**
    * The field builder for creating the input fields to the coprocessing

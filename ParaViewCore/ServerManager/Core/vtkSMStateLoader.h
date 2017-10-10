@@ -167,8 +167,8 @@ protected:
   int KeepIdMapping;
 
 private:
-  vtkSMStateLoader(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;
+  vtkSMStateLoader(const vtkSMStateLoader&) = delete;
+  void operator=(const vtkSMStateLoader&) = delete;
 
   vtkSMStateLoaderInternals* Internal;
 };

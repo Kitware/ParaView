@@ -115,9 +115,8 @@ protected:
   vtkCallbackCommand* InternalProgressObserver;
 
 private:
-  vtkPVDataSetAlgorithmSelectorFilter(
-    const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
+  vtkPVDataSetAlgorithmSelectorFilter(const vtkPVDataSetAlgorithmSelectorFilter&) = delete;
+  void operator=(const vtkPVDataSetAlgorithmSelectorFilter&) = delete;
 
   class vtkInternals;
   vtkInternals* Internal;

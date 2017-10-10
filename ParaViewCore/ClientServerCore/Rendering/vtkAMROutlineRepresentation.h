@@ -168,8 +168,8 @@ protected:
   vtkBoundingBox DataBounds;
 
 private:
-  vtkAMROutlineRepresentation(const vtkAMROutlineRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMROutlineRepresentation&) VTK_DELETE_FUNCTION;
+  vtkAMROutlineRepresentation(const vtkAMROutlineRepresentation&) = delete;
+  void operator=(const vtkAMROutlineRepresentation&) = delete;
 
   /**
    * This flag is set to true if the input pipeline is streaming capable in

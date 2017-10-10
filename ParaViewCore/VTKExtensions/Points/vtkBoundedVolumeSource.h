@@ -71,8 +71,8 @@ protected:
   int Resolution[3];
 
 private:
-  vtkBoundedVolumeSource(const vtkBoundedVolumeSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkBoundedVolumeSource&) VTK_DELETE_FUNCTION;
+  vtkBoundedVolumeSource(const vtkBoundedVolumeSource&) = delete;
+  void operator=(const vtkBoundedVolumeSource&) = delete;
 };
 
 #endif

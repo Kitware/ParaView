@@ -170,8 +170,8 @@ protected:
   bool Enabled;
 
 private:
-  vtkPVComparativeAnimationCue(const vtkPVComparativeAnimationCue&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVComparativeAnimationCue&) VTK_DELETE_FUNCTION;
+  vtkPVComparativeAnimationCue(const vtkPVComparativeAnimationCue&) = delete;
+  void operator=(const vtkPVComparativeAnimationCue&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

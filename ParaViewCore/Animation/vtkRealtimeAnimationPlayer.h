@@ -63,8 +63,8 @@ protected:
   vtkTimerLog* Timer;
 
 private:
-  vtkRealtimeAnimationPlayer(const vtkRealtimeAnimationPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRealtimeAnimationPlayer&) VTK_DELETE_FUNCTION;
+  vtkRealtimeAnimationPlayer(const vtkRealtimeAnimationPlayer&) = delete;
+  void operator=(const vtkRealtimeAnimationPlayer&) = delete;
 };
 
 #endif

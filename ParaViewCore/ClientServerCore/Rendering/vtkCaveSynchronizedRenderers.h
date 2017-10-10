@@ -84,8 +84,8 @@ protected:
   int once;
 
 private:
-  vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&) = delete;
+  void operator=(const vtkCaveSynchronizedRenderers&) = delete;
 };
 
 #endif

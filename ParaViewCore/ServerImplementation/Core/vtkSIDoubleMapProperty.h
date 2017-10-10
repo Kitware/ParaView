@@ -44,8 +44,8 @@ public:
   char* CleanCommand;
 
 private:
-  vtkSIDoubleMapProperty(const vtkSIDoubleMapProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIDoubleMapProperty&) VTK_DELETE_FUNCTION;
+  vtkSIDoubleMapProperty(const vtkSIDoubleMapProperty&) = delete;
+  void operator=(const vtkSIDoubleMapProperty&) = delete;
 };
 
 #endif

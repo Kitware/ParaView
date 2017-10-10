@@ -168,8 +168,8 @@ protected:
   int LastAddedKeyFrameIndex;
 
 private:
-  vtkPVKeyFrameCueManipulator(const vtkPVKeyFrameCueManipulator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVKeyFrameCueManipulator&) VTK_DELETE_FUNCTION;
+  vtkPVKeyFrameCueManipulator(const vtkPVKeyFrameCueManipulator&) = delete;
+  void operator=(const vtkPVKeyFrameCueManipulator&) = delete;
 };
 
 #endif

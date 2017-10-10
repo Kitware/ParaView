@@ -125,8 +125,8 @@ protected:
 private:
   vtkPVCompositeDataInformationInternals* Internal;
 
-  vtkPVCompositeDataInformation(const vtkPVCompositeDataInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCompositeDataInformation&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeDataInformation(const vtkPVCompositeDataInformation&) = delete;
+  void operator=(const vtkPVCompositeDataInformation&) = delete;
 };
 
 #endif

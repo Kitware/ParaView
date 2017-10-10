@@ -69,8 +69,8 @@ protected:
   void Fly(vtkRenderer* ren, vtkRenderWindowInteractor* rwi, double scale, double speed);
   void ComputeCameraAxes(vtkRenderer*);
 
-  vtkPVJoystickFly(const vtkPVJoystickFly&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVJoystickFly&) VTK_DELETE_FUNCTION;
+  vtkPVJoystickFly(const vtkPVJoystickFly&) = delete;
+  void operator=(const vtkPVJoystickFly&) = delete;
 };
 
 #endif

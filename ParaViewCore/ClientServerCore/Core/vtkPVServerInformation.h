@@ -255,8 +255,8 @@ protected:
 
   vtkPVServerOptionsInternals* MachinesInternals;
 
-  vtkPVServerInformation(const vtkPVServerInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVServerInformation&) VTK_DELETE_FUNCTION;
+  vtkPVServerInformation(const vtkPVServerInformation&) = delete;
+  void operator=(const vtkPVServerInformation&) = delete;
 };
 
 #endif

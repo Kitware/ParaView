@@ -56,8 +56,8 @@ protected:
   int FrameNo;
 
 private:
-  vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
+  vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&) = delete;
+  void operator=(const vtkSequenceAnimationPlayer&) = delete;
 };
 
 #endif

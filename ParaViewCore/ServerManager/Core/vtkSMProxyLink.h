@@ -140,8 +140,8 @@ protected:
 private:
   vtkSMProxyLinkInternals* Internals;
 
-  vtkSMProxyLink(const vtkSMProxyLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyLink&) VTK_DELETE_FUNCTION;
+  vtkSMProxyLink(const vtkSMProxyLink&) = delete;
+  void operator=(const vtkSMProxyLink&) = delete;
 };
 
 #endif

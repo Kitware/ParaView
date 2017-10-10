@@ -91,8 +91,8 @@ protected:
   ~vtkSMIntRangeDomain() override;
 
 private:
-  vtkSMIntRangeDomain(const vtkSMIntRangeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMIntRangeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMIntRangeDomain(const vtkSMIntRangeDomain&) = delete;
+  void operator=(const vtkSMIntRangeDomain&) = delete;
 
   typedef vtkSMRangeDomainTemplate<int> RealSuperclass;
 };

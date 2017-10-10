@@ -61,8 +61,8 @@ protected:
     std::vector<std::string> massWeightedNames);
 
 private:
-  vtkAMRFragmentIntegration(const vtkAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
+  vtkAMRFragmentIntegration(const vtkAMRFragmentIntegration&) = delete;
+  void operator=(const vtkAMRFragmentIntegration&) = delete;
 };
 
 #endif /* vtkAMRFragmentIntegration_h */

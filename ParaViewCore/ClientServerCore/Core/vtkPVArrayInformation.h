@@ -217,8 +217,8 @@ protected:
   class vtkInternalComponentNames;
   vtkInternalComponentNames* ComponentNames;
 
-  vtkPVArrayInformation(const vtkPVArrayInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVArrayInformation&) VTK_DELETE_FUNCTION;
+  vtkPVArrayInformation(const vtkPVArrayInformation&) = delete;
+  void operator=(const vtkPVArrayInformation&) = delete;
 };
 
 #endif

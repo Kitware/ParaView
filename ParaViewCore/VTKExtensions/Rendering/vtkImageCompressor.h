@@ -127,8 +127,8 @@ protected:
   char* Configuration;
 
 private:
-  vtkImageCompressor(const vtkImageCompressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkImageCompressor&) VTK_DELETE_FUNCTION;
+  vtkImageCompressor(const vtkImageCompressor&) = delete;
+  void operator=(const vtkImageCompressor&) = delete;
 };
 
 #endif

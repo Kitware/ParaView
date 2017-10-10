@@ -50,8 +50,8 @@ protected:
   int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
 private:
-  vtkMergeCompositeDataSet(const vtkMergeCompositeDataSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMergeCompositeDataSet&) VTK_DELETE_FUNCTION;
+  vtkMergeCompositeDataSet(const vtkMergeCompositeDataSet&) = delete;
+  void operator=(const vtkMergeCompositeDataSet&) = delete;
 };
 
 #endif // vtkMergeCompositeDataSet_h

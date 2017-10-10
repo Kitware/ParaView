@@ -141,8 +141,8 @@ protected:
   vtkArrowSource* ArrowSourceObject;
 
 private:
-  vtkArrowGlyphFilter(const vtkArrowGlyphFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkArrowGlyphFilter&) VTK_DELETE_FUNCTION;
+  vtkArrowGlyphFilter(const vtkArrowGlyphFilter&) = delete;
+  void operator=(const vtkArrowGlyphFilter&) = delete;
 };
 
 #endif

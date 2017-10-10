@@ -167,8 +167,8 @@ protected:
   void SetProxies(vtkSMProxy** proxies, unsigned int count);
 
 private:
-  vtkSMProxyListDomain(const vtkSMProxyListDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyListDomain&) VTK_DELETE_FUNCTION;
+  vtkSMProxyListDomain(const vtkSMProxyListDomain&) = delete;
+  void operator=(const vtkSMProxyListDomain&) = delete;
 
   vtkSMProxyListDomainInternals* Internals;
 };

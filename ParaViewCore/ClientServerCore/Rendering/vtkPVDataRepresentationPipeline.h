@@ -55,8 +55,8 @@ protected:
     vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
 private:
-  vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataRepresentationPipeline&) VTK_DELETE_FUNCTION;
+  vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) = delete;
+  void operator=(const vtkPVDataRepresentationPipeline&) = delete;
 };
 
 #endif

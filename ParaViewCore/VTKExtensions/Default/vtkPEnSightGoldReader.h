@@ -168,8 +168,8 @@ protected:
   int ElementIdsListed;
 
 private:
-  vtkPEnSightGoldReader(const vtkPEnSightGoldReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPEnSightGoldReader&) VTK_DELETE_FUNCTION;
+  vtkPEnSightGoldReader(const vtkPEnSightGoldReader&) = delete;
+  void operator=(const vtkPEnSightGoldReader&) = delete;
 };
 
 #endif

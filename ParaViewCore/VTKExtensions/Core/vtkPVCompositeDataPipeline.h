@@ -50,8 +50,8 @@ protected:
   void ResetPipelineInformation(int port, vtkInformation*) VTK_OVERRIDE;
 
 private:
-  vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCompositeDataPipeline&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&) = delete;
+  void operator=(const vtkPVCompositeDataPipeline&) = delete;
 };
 
 #endif

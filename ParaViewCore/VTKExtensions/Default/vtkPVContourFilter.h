@@ -64,8 +64,8 @@ protected:
     vtkInformationVector* outputVector);
 
 private:
-  vtkPVContourFilter(const vtkPVContourFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVContourFilter&) VTK_DELETE_FUNCTION;
+  vtkPVContourFilter(const vtkPVContourFilter&) = delete;
+  void operator=(const vtkPVContourFilter&) = delete;
 };
 
 #endif // vtkPVContourFilter_h

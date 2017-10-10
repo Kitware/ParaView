@@ -288,8 +288,8 @@ protected:
   bool NeedsUpdateLOD;
 
 private:
-  vtkSMRenderViewProxy(const vtkSMRenderViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRenderViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMRenderViewProxy(const vtkSMRenderViewProxy&) = delete;
+  void operator=(const vtkSMRenderViewProxy&) = delete;
 
   /**
    * Internal method to execute `cmd` on the rendering processes to do rendering

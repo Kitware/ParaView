@@ -116,8 +116,8 @@ protected:
   vtkWeakPointer<vtkSMViewProxy> Parent;
 
 private:
-  WindowToImageFilter(const WindowToImageFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const WindowToImageFilter&) VTK_DELETE_FUNCTION;
+  WindowToImageFilter(const WindowToImageFilter&) = delete;
+  void operator=(const WindowToImageFilter&) = delete;
 };
 vtkStandardNewMacro(WindowToImageFilter);
 };
@@ -462,8 +462,8 @@ public:
   const double Blue;
 
 private:
-  vtkRendererSaveInfo(const vtkRendererSaveInfo&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRendererSaveInfo&) VTK_DELETE_FUNCTION;
+  vtkRendererSaveInfo(const vtkRendererSaveInfo&) = delete;
+  void operator=(const vtkRendererSaveInfo&) = delete;
 };
 
 //----------------------------------------------------------------------------

@@ -53,8 +53,8 @@ protected:
   virtual ~vtkCPPipeline();
 
 private:
-  vtkCPPipeline(const vtkCPPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPPipeline&) VTK_DELETE_FUNCTION;
+  vtkCPPipeline(const vtkCPPipeline&) = delete;
+  void operator=(const vtkCPPipeline&) = delete;
 };
 
 #endif

@@ -81,8 +81,8 @@ protected:
     vtkSMSourceProxy* source, unsigned int sourceOutputPort, vtkSMSourceProxy* selection);
 
 private:
-  vtkSMPreselectionPipeline(const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMPreselectionPipeline(const vtkSMPreselectionPipeline&) = delete;
+  void operator=(const vtkSMPreselectionPipeline&) = delete;
 
 protected:
   vtkSMSourceProxy* ExtractInteractiveSelection;

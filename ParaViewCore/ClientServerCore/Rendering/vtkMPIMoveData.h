@@ -192,8 +192,8 @@ private:
   int UpdateNumberOfPieces;
   int UpdatePiece;
 
-  vtkMPIMoveData(const vtkMPIMoveData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMPIMoveData&) VTK_DELETE_FUNCTION;
+  vtkMPIMoveData(const vtkMPIMoveData&) = delete;
+  void operator=(const vtkMPIMoveData&) = delete;
 
   static bool UseZLibCompression;
 };

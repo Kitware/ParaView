@@ -48,8 +48,8 @@ protected:
   ~vtkSMDataSourceProxy() override;
 
 private:
-  vtkSMDataSourceProxy(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDataSourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSMDataSourceProxy(const vtkSMDataSourceProxy&) = delete;
+  void operator=(const vtkSMDataSourceProxy&) = delete;
 };
 
 #endif

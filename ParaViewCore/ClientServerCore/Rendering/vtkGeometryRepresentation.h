@@ -383,8 +383,8 @@ protected:
   std::unordered_map<unsigned int, std::array<double, 3> > BlockColors;
 
 private:
-  vtkGeometryRepresentation(const vtkGeometryRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGeometryRepresentation&) VTK_DELETE_FUNCTION;
+  vtkGeometryRepresentation(const vtkGeometryRepresentation&) = delete;
+  void operator=(const vtkGeometryRepresentation&) = delete;
 
   friend class vtkSelectionRepresentation;
   char* DebugString;

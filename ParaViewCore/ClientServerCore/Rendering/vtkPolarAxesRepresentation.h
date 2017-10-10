@@ -217,8 +217,8 @@ protected:
   bool ParentVisibility;
 
 private:
-  vtkPolarAxesRepresentation(const vtkPolarAxesRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPolarAxesRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPolarAxesRepresentation(const vtkPolarAxesRepresentation&) = delete;
+  void operator=(const vtkPolarAxesRepresentation&) = delete;
 };
 
 #endif

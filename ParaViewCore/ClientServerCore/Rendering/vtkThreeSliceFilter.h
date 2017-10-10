@@ -123,8 +123,8 @@ protected:
   void Process(vtkDataSet* input, vtkPolyData* outputs[4], unsigned int compositeIndex);
 
 private:
-  vtkThreeSliceFilter(const vtkThreeSliceFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkThreeSliceFilter&) VTK_DELETE_FUNCTION;
+  vtkThreeSliceFilter(const vtkThreeSliceFilter&) = delete;
+  void operator=(const vtkThreeSliceFilter&) = delete;
 };
 
 #endif

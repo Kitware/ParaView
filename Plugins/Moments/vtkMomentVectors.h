@@ -93,8 +93,8 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkMomentVectors(const vtkMomentVectors&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMomentVectors&) VTK_DELETE_FUNCTION;
+  vtkMomentVectors(const vtkMomentVectors&) = delete;
+  void operator=(const vtkMomentVectors&) = delete;
 };
 
 #endif // vtkMomentVectors_h

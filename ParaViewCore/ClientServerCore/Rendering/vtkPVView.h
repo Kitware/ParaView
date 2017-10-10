@@ -286,8 +286,8 @@ protected:
   int PPI;
 
 private:
-  vtkPVView(const vtkPVView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVView&) VTK_DELETE_FUNCTION;
+  vtkPVView(const vtkPVView&) = delete;
+  void operator=(const vtkPVView&) = delete;
 
   class vtkInternals;
 

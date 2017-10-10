@@ -89,8 +89,8 @@ protected:
   mutable double EndDirection[3];
 
 private:
-  Segment(const vtkObject&) VTK_DELETE_FUNCTION;
-  void operator=(const Segment&) VTK_DELETE_FUNCTION;
+  Segment(const vtkObject&) = delete;
+  void operator=(const Segment&) = delete;
 };
 
 class Node : public vtkObject
@@ -118,8 +118,8 @@ protected:
   vtkCollection* Segments;
 
 private:
-  Node(const vtkObject&) VTK_DELETE_FUNCTION;
-  void operator=(const Node&) VTK_DELETE_FUNCTION;
+  Node(const vtkObject&) = delete;
+  void operator=(const Node&) = delete;
 };
 
 vtkStandardNewMacro(Segment);

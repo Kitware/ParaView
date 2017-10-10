@@ -643,8 +643,8 @@ private:
 #endif
 
 private:
-  vtkSMSessionProxyManager(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
+  vtkSMSessionProxyManager(const vtkSMSessionProxyManager&) = delete;
+  void operator=(const vtkSMSessionProxyManager&) = delete;
 };
 
 #endif

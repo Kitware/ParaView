@@ -249,8 +249,8 @@ protected:
   bool GUIOverrideFont;
 
 private:
-  vtkPVGeneralSettings(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
+  vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
+  void operator=(const vtkPVGeneralSettings&) = delete;
 
   static vtkSmartPointer<vtkPVGeneralSettings> Instance;
 };

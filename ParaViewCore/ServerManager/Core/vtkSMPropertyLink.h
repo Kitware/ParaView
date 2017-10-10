@@ -133,8 +133,8 @@ private:
   vtkSMPropertyLinkInternals* Internals;
   bool ModifyingProperty;
 
-  vtkSMPropertyLink(const vtkSMPropertyLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPropertyLink&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyLink(const vtkSMPropertyLink&) = delete;
+  void operator=(const vtkSMPropertyLink&) = delete;
 };
 
 #endif

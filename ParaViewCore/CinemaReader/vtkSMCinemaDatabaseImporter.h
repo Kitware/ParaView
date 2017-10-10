@@ -68,8 +68,8 @@ protected:
     const std::string& parametername, const vtkPVCinemaDatabaseInformation* cinfo);
 
 private:
-  vtkSMCinemaDatabaseImporter(const vtkSMCinemaDatabaseImporter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCinemaDatabaseImporter&) VTK_DELETE_FUNCTION;
+  vtkSMCinemaDatabaseImporter(const vtkSMCinemaDatabaseImporter&) = delete;
+  void operator=(const vtkSMCinemaDatabaseImporter&) = delete;
 };
 
 #endif

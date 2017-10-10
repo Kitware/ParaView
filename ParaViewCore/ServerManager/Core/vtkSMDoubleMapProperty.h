@@ -135,8 +135,8 @@ protected:
   int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
 
 private:
-  vtkSMDoubleMapProperty(const vtkSMDoubleMapProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDoubleMapProperty&) VTK_DELETE_FUNCTION;
+  vtkSMDoubleMapProperty(const vtkSMDoubleMapProperty&) = delete;
+  void operator=(const vtkSMDoubleMapProperty&) = delete;
 
   vtkSMDoubleMapPropertyPrivate* Private;
 };

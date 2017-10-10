@@ -943,8 +943,8 @@ protected:
 protected:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
-  vtkSMProxy(const vtkSMProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxy&) VTK_DELETE_FUNCTION;
+  vtkSMProxy(const vtkSMProxy&) = delete;
+  void operator=(const vtkSMProxy&) = delete;
 
 private:
   vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement, const char* subproxy_name);

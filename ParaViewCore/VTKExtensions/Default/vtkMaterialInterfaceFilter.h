@@ -724,8 +724,8 @@ protected:
 #endif
 
 private:
-  vtkMaterialInterfaceFilter(const vtkMaterialInterfaceFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMaterialInterfaceFilter&) VTK_DELETE_FUNCTION;
+  vtkMaterialInterfaceFilter(const vtkMaterialInterfaceFilter&) = delete;
+  void operator=(const vtkMaterialInterfaceFilter&) = delete;
 };
 
 #endif

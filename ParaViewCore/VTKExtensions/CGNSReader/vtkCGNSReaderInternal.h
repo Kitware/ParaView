@@ -304,8 +304,8 @@ public:
   }
 
 private:
-  vtkCGNSMetaData(const vtkCGNSMetaData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCGNSMetaData&) VTK_DELETE_FUNCTION;
+  vtkCGNSMetaData(const vtkCGNSMetaData&) = delete;
+  void operator=(const vtkCGNSMetaData&) = delete;
 
   void UpdateSIL();
 

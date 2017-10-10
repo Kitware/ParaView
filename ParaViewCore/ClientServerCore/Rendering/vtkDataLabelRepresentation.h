@@ -198,8 +198,8 @@ protected:
   int MaximumNumberOfLabels;
 
 private:
-  vtkDataLabelRepresentation(const vtkDataLabelRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkDataLabelRepresentation&) VTK_DELETE_FUNCTION;
+  vtkDataLabelRepresentation(const vtkDataLabelRepresentation&) = delete;
+  void operator=(const vtkDataLabelRepresentation&) = delete;
 };
 
 #endif

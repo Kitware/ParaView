@@ -93,8 +93,8 @@ protected:
   Internals* Internal;
 
 private:
-  vtkCartisoReader(const vtkCartisoReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCartisoReader&) VTK_DELETE_FUNCTION;
+  vtkCartisoReader(const vtkCartisoReader&) = delete;
+  void operator=(const vtkCartisoReader&) = delete;
 };
 
 #endif // vtkCartisoReader_h

@@ -73,8 +73,8 @@ protected:
   char* FileExtension;
 
 private:
-  vtkSMExporterProxy(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
+  vtkSMExporterProxy(const vtkSMExporterProxy&) = delete;
+  void operator=(const vtkSMExporterProxy&) = delete;
 };
 
 #endif

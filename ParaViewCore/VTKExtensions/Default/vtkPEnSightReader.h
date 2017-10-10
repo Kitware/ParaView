@@ -880,8 +880,8 @@ protected:
   std::map<std::string, std::map<int, long> > FileOffsets;
 
 private:
-  vtkPEnSightReader(const vtkPEnSightReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPEnSightReader&) VTK_DELETE_FUNCTION;
+  vtkPEnSightReader(const vtkPEnSightReader&) = delete;
+  void operator=(const vtkPEnSightReader&) = delete;
 };
 
 #endif

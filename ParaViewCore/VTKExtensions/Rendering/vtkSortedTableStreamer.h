@@ -127,8 +127,8 @@ protected:
   int InvertOrder;
 
 private:
-  vtkSortedTableStreamer(const vtkSortedTableStreamer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSortedTableStreamer&) VTK_DELETE_FUNCTION;
+  vtkSortedTableStreamer(const vtkSortedTableStreamer&) = delete;
+  void operator=(const vtkSortedTableStreamer&) = delete;
 };
 
 #endif

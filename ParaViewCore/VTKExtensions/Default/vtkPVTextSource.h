@@ -53,8 +53,8 @@ protected:
   char* Text;
 
 private:
-  vtkPVTextSource(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
+  vtkPVTextSource(const vtkPVTextSource&) = delete;
+  void operator=(const vtkPVTextSource&) = delete;
 };
 
 #endif

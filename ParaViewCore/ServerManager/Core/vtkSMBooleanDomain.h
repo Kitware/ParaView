@@ -53,8 +53,8 @@ protected:
   ~vtkSMBooleanDomain() override;
 
 private:
-  vtkSMBooleanDomain(const vtkSMBooleanDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMBooleanDomain&) VTK_DELETE_FUNCTION;
+  vtkSMBooleanDomain(const vtkSMBooleanDomain&) = delete;
+  void operator=(const vtkSMBooleanDomain&) = delete;
 };
 
 #endif

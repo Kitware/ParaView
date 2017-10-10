@@ -59,8 +59,8 @@ protected:
   ~vtkSMMaterialLibraryProxy() override;
 
 private:
-  vtkSMMaterialLibraryProxy(const vtkSMMaterialLibraryProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMMaterialLibraryProxy&) VTK_DELETE_FUNCTION;
+  vtkSMMaterialLibraryProxy(const vtkSMMaterialLibraryProxy&) = delete;
+  void operator=(const vtkSMMaterialLibraryProxy&) = delete;
 };
 
 #endif

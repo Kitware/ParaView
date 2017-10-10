@@ -128,8 +128,8 @@ public:
   double DetailLevelToLoad;
 
 private:
-  vtkStreamingParticlesPriorityQueue(const vtkStreamingParticlesPriorityQueue&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkStreamingParticlesPriorityQueue&) VTK_DELETE_FUNCTION;
+  vtkStreamingParticlesPriorityQueue(const vtkStreamingParticlesPriorityQueue&) = delete;
+  void operator=(const vtkStreamingParticlesPriorityQueue&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

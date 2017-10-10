@@ -49,8 +49,8 @@ protected:
 
 private:
   vtkSMSpreadSheetRepresentationInitializationHelper(
-    const vtkSMSpreadSheetRepresentationInitializationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSpreadSheetRepresentationInitializationHelper&) VTK_DELETE_FUNCTION;
+    const vtkSMSpreadSheetRepresentationInitializationHelper&) = delete;
+  void operator=(const vtkSMSpreadSheetRepresentationInitializationHelper&) = delete;
 };
 
 #endif

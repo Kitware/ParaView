@@ -266,9 +266,8 @@ protected:
   int StreamingRequestSize;
 
 private:
-  vtkAMRStreamingVolumeRepresentation(
-    const vtkAMRStreamingVolumeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRStreamingVolumeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkAMRStreamingVolumeRepresentation(const vtkAMRStreamingVolumeRepresentation&) = delete;
+  void operator=(const vtkAMRStreamingVolumeRepresentation&) = delete;
 
   /**
    * This flag is set to true if the input pipeline is streaming capable in

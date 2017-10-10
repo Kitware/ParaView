@@ -139,8 +139,8 @@ protected:
   int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 private:
-  vtkSMRepresentationProxy(const vtkSMRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMRepresentationProxy(const vtkSMRepresentationProxy&) = delete;
+  void operator=(const vtkSMRepresentationProxy&) = delete;
 
   /**
    * HACK: Returns true for lookuptable, piecewise function proxies which are

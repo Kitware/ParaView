@@ -101,8 +101,8 @@ protected:
   ~vtkNetworkAccessManager() override;
 
 private:
-  vtkNetworkAccessManager(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
+  vtkNetworkAccessManager(const vtkNetworkAccessManager&) = delete;
+  void operator=(const vtkNetworkAccessManager&) = delete;
 };
 
 #endif

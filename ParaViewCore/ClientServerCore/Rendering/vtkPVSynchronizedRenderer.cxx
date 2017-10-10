@@ -338,32 +338,6 @@ void vtkPVSynchronizedRenderer::SetRenderEmptyImages(bool useREI)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::SetUseFXAA(bool enable)
-{
-  if (this->ParallelSynchronizer)
-  {
-    this->ParallelSynchronizer->SetUseFXAA(enable);
-  }
-  if (this->CSSynchronizer)
-  {
-    this->CSSynchronizer->SetUseFXAA(enable);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::SetFXAAOptions(vtkFXAAOptions* opts)
-{
-  if (this->ParallelSynchronizer)
-  {
-    this->ParallelSynchronizer->SetFXAAOptions(opts);
-  }
-  if (this->CSSynchronizer)
-  {
-    this->CSSynchronizer->SetFXAAOptions(opts);
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetNVPipeSupport(bool enable)
 {
   vtkPVClientServerSynchronizedRenderers* cssync =

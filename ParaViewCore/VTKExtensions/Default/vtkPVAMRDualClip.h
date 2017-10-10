@@ -61,8 +61,8 @@ public:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkPVAMRDualClip(const vtkPVAMRDualClip&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAMRDualClip&) VTK_DELETE_FUNCTION;
+  vtkPVAMRDualClip(const vtkPVAMRDualClip&) = delete;
+  void operator=(const vtkPVAMRDualClip&) = delete;
 
 protected:
   double VolumeFractionSurfaceValue;

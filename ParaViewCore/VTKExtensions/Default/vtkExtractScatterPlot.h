@@ -75,8 +75,8 @@ public:
 
 private:
   vtkExtractScatterPlot();
-  vtkExtractScatterPlot(const vtkExtractScatterPlot&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkExtractScatterPlot&) VTK_DELETE_FUNCTION;
+  vtkExtractScatterPlot(const vtkExtractScatterPlot&) = delete;
+  void operator=(const vtkExtractScatterPlot&) = delete;
   ~vtkExtractScatterPlot() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;

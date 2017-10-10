@@ -64,8 +64,8 @@ protected:
   ~vtkPVTestUtilities() override { this->Initialize(0, 0); }
 
 private:
-  vtkPVTestUtilities(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
+  vtkPVTestUtilities(const vtkPVTestUtilities&) = delete;
+  void operator=(const vtkPVTestUtilities&) = delete;
   ///
   char GetPathSep();
   char* GetDataRoot();

@@ -157,8 +157,8 @@ protected:
   vtkRenderWindow* RenderWindow;
 
 private:
-  vtkPVContextView(const vtkPVContextView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVContextView&) VTK_DELETE_FUNCTION;
+  vtkPVContextView(const vtkPVContextView&) = delete;
+  void operator=(const vtkPVContextView&) = delete;
 
   // Used in GetSelection to avoid modifying the selection obtained from the
   // annotation link.

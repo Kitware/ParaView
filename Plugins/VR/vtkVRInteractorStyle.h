@@ -133,8 +133,8 @@ protected:
   vtkStdString GetKeyInMap(const StringMap& map_, const vtkStdString& value);
 
 private:
-  vtkVRInteractorStyle(const vtkVRInteractorStyle&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVRInteractorStyle&) VTK_DELETE_FUNCTION;
+  vtkVRInteractorStyle(const vtkVRInteractorStyle&) = delete;
+  void operator=(const vtkVRInteractorStyle&) = delete;
 };
 
 #endif

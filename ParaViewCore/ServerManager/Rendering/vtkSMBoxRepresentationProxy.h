@@ -49,8 +49,8 @@ protected:
   void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&) = delete;
+  void operator=(const vtkSMBoxRepresentationProxy&) = delete;
 };
 
 #endif

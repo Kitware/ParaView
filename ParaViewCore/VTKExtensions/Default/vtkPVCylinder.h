@@ -55,8 +55,8 @@ protected:
   double OrientedAxis[3];
 
 private:
-  vtkPVCylinder(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
+  vtkPVCylinder(const vtkPVCylinder&) = delete;
+  void operator=(const vtkPVCylinder&) = delete;
 };
 
 inline void vtkPVCylinder::SetOrientedAxis(double x, double y, double z)

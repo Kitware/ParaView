@@ -92,8 +92,8 @@ public:
 private:
   vtkStdString EventString;
   vtkSmartPointer<vtkMultiProcessController> Controller;
-  vtkTimerLogSmartMarkEvent(const vtkTimerLogSmartMarkEvent&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTimerLogSmartMarkEvent&) VTK_DELETE_FUNCTION;
+  vtkTimerLogSmartMarkEvent(const vtkTimerLogSmartMarkEvent&) = delete;
+  void operator=(const vtkTimerLogSmartMarkEvent&) = delete;
 };
 };
 #endif

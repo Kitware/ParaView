@@ -46,8 +46,8 @@ protected:
   ~vtkCPBaseGridBuilder();
 
 private:
-  vtkCPBaseGridBuilder(const vtkCPBaseGridBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPBaseGridBuilder&) VTK_DELETE_FUNCTION;
+  vtkCPBaseGridBuilder(const vtkCPBaseGridBuilder&) = delete;
+  void operator=(const vtkCPBaseGridBuilder&) = delete;
 };
 
 #endif

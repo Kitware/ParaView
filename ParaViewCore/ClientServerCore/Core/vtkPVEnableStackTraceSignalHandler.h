@@ -54,8 +54,8 @@ protected:
   ~vtkPVEnableStackTraceSignalHandler() override {}
 
 private:
-  vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVEnableStackTraceSignalHandler&) VTK_DELETE_FUNCTION;
+  vtkPVEnableStackTraceSignalHandler(const vtkPVEnableStackTraceSignalHandler&) = delete;
+  void operator=(const vtkPVEnableStackTraceSignalHandler&) = delete;
 };
 
 #endif

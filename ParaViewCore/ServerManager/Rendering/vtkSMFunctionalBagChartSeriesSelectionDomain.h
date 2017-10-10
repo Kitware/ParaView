@@ -52,8 +52,8 @@ protected:
 
 private:
   vtkSMFunctionalBagChartSeriesSelectionDomain(
-    const vtkSMFunctionalBagChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMFunctionalBagChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
+    const vtkSMFunctionalBagChartSeriesSelectionDomain&) = delete;
+  void operator=(const vtkSMFunctionalBagChartSeriesSelectionDomain&) = delete;
 };
 
 #endif

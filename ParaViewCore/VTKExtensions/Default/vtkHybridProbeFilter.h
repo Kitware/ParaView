@@ -77,8 +77,8 @@ protected:
   int Mode;
 
 private:
-  vtkHybridProbeFilter(const vtkHybridProbeFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkHybridProbeFilter&) VTK_DELETE_FUNCTION;
+  vtkHybridProbeFilter(const vtkHybridProbeFilter&) = delete;
+  void operator=(const vtkHybridProbeFilter&) = delete;
 };
 
 #endif

@@ -82,8 +82,8 @@ protected:
   void InitDefaultSlices(vtkSMSourceProxy* source, int opport, vtkSMRepresentationProxy* repr);
 
 private:
-  vtkSMMultiSliceViewProxy(const vtkSMMultiSliceViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMMultiSliceViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMMultiSliceViewProxy(const vtkSMMultiSliceViewProxy&) = delete;
+  void operator=(const vtkSMMultiSliceViewProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

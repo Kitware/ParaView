@@ -287,8 +287,8 @@ protected:
   void PlotMatrixSelectionCallback(vtkObject*, unsigned long, void*);
 
 private:
-  vtkPVPlotMatrixView(const vtkPVPlotMatrixView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPlotMatrixView&) VTK_DELETE_FUNCTION;
+  vtkPVPlotMatrixView(const vtkPVPlotMatrixView&) = delete;
+  void operator=(const vtkPVPlotMatrixView&) = delete;
 
   vtkScatterPlotMatrix* PlotMatrix;
 };

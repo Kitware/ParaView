@@ -76,8 +76,8 @@ protected:
   float AngularVelocity[3];
 
 private:
-  vtkVRUITrackerState(const vtkVRUITrackerState&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVRUITrackerState&) VTK_DELETE_FUNCTION;
+  vtkVRUITrackerState(const vtkVRUITrackerState&) = delete;
+  void operator=(const vtkVRUITrackerState&) = delete;
 };
 
 #endif // #ifndef vtkVRUITrackerState_h

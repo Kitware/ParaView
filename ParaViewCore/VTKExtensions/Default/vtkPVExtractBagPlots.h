@@ -125,8 +125,8 @@ protected:
   bool UseSilvermanRule;
 
 private:
-  vtkPVExtractBagPlots(const vtkPVExtractBagPlots&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExtractBagPlots&) VTK_DELETE_FUNCTION;
+  vtkPVExtractBagPlots(const vtkPVExtractBagPlots&) = delete;
+  void operator=(const vtkPVExtractBagPlots&) = delete;
 };
 
 #endif // vtkPVExtractBagPlots_h

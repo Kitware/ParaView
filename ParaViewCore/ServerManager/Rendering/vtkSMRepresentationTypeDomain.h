@@ -61,8 +61,8 @@ protected:
   vtkPVDataInformation* GetInputInformation();
 
 private:
-  vtkSMRepresentationTypeDomain(const vtkSMRepresentationTypeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRepresentationTypeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMRepresentationTypeDomain(const vtkSMRepresentationTypeDomain&) = delete;
+  void operator=(const vtkSMRepresentationTypeDomain&) = delete;
 };
 
 #endif

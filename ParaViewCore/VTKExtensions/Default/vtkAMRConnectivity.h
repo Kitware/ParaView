@@ -119,8 +119,8 @@ protected:
   void ProcessBoundaryAtNeighbor(vtkNonOverlappingAMR* volume, vtkIdTypeArray* array);
 
 private:
-  vtkAMRConnectivity(const vtkAMRConnectivity&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRConnectivity&) VTK_DELETE_FUNCTION;
+  vtkAMRConnectivity(const vtkAMRConnectivity&) = delete;
+  void operator=(const vtkAMRConnectivity&) = delete;
 };
 
 #endif /* vtkAMRConnectivity_h */

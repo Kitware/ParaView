@@ -102,8 +102,8 @@ protected:
   int ProcessID;
 
 private:
-  vtkQuerySelectionSource(const vtkQuerySelectionSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkQuerySelectionSource&) VTK_DELETE_FUNCTION;
+  vtkQuerySelectionSource(const vtkQuerySelectionSource&) = delete;
+  void operator=(const vtkQuerySelectionSource&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

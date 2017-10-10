@@ -111,8 +111,8 @@ protected:
   vtkSmartPointer<vtkGenericMovieWriter> MovieWriter;
 
 private:
-  vtkSMAnimationSceneImageWriter(const vtkSMAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMAnimationSceneImageWriter&) VTK_DELETE_FUNCTION;
+  vtkSMAnimationSceneImageWriter(const vtkSMAnimationSceneImageWriter&) = delete;
+  void operator=(const vtkSMAnimationSceneImageWriter&) = delete;
 
   bool MovieWriterStarted;
 };

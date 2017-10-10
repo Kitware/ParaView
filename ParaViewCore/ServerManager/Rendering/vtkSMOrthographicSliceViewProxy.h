@@ -57,8 +57,8 @@ protected:
   void OnPlacePointEvent(vtkObject*, unsigned long, void* calldata);
 
 private:
-  vtkSMOrthographicSliceViewProxy(const vtkSMOrthographicSliceViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMOrthographicSliceViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMOrthographicSliceViewProxy(const vtkSMOrthographicSliceViewProxy&) = delete;
+  void operator=(const vtkSMOrthographicSliceViewProxy&) = delete;
 };
 
 #endif

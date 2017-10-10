@@ -179,8 +179,8 @@ protected:
 
 private:
   static bool AutomaticPropertyConversion;
-  vtkSMInputArrayDomain(const vtkSMInputArrayDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMInputArrayDomain&) VTK_DELETE_FUNCTION;
+  vtkSMInputArrayDomain(const vtkSMInputArrayDomain&) = delete;
+  void operator=(const vtkSMInputArrayDomain&) = delete;
 };
 
 #endif

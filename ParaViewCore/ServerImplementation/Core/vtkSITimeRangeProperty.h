@@ -43,8 +43,8 @@ protected:
   bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
-  vtkSITimeRangeProperty(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSITimeRangeProperty&) VTK_DELETE_FUNCTION;
+  vtkSITimeRangeProperty(const vtkSITimeRangeProperty&) = delete;
+  void operator=(const vtkSITimeRangeProperty&) = delete;
 };
 
 #endif

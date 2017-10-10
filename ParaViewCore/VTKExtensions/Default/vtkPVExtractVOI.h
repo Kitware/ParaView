@@ -112,8 +112,8 @@ protected:
   void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
 
 private:
-  vtkPVExtractVOI(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
+  vtkPVExtractVOI(const vtkPVExtractVOI&) = delete;
+  void operator=(const vtkPVExtractVOI&) = delete;
 };
 
 #endif

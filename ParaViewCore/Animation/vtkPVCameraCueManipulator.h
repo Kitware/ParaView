@@ -89,8 +89,8 @@ protected:
   vtkSMProxy* DataSourceProxy;
 
 private:
-  vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
+  vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&) = delete;
+  void operator=(const vtkPVCameraCueManipulator&) = delete;
 };
 
 #endif

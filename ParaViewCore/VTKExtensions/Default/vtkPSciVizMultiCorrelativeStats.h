@@ -88,8 +88,8 @@ protected:
     vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
 
 private:
-  vtkPSciVizMultiCorrelativeStats(const vtkPSciVizMultiCorrelativeStats&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPSciVizMultiCorrelativeStats&) VTK_DELETE_FUNCTION;
+  vtkPSciVizMultiCorrelativeStats(const vtkPSciVizMultiCorrelativeStats&) = delete;
+  void operator=(const vtkPSciVizMultiCorrelativeStats&) = delete;
 };
 
 #endif // vtkPSciVizMultiCorrelativeStats_h

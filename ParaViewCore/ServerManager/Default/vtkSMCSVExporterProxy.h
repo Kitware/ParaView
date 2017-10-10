@@ -51,8 +51,8 @@ protected:
   ~vtkSMCSVExporterProxy() override;
 
 private:
-  vtkSMCSVExporterProxy(const vtkSMCSVExporterProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCSVExporterProxy&) VTK_DELETE_FUNCTION;
+  vtkSMCSVExporterProxy(const vtkSMCSVExporterProxy&) = delete;
+  void operator=(const vtkSMCSVExporterProxy&) = delete;
 };
 
 #endif

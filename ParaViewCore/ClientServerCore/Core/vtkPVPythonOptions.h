@@ -73,8 +73,8 @@ protected:
   char* PythonScriptName;
 
 private:
-  vtkPVPythonOptions(const vtkPVPythonOptions&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPythonOptions&) VTK_DELETE_FUNCTION;
+  vtkPVPythonOptions(const vtkPVPythonOptions&) = delete;
+  void operator=(const vtkPVPythonOptions&) = delete;
 };
 
 #endif // #ifndef vtkPVPythonOptions_h

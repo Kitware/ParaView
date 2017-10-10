@@ -95,8 +95,8 @@ protected:
   vtkSmartPointer<vtkMultiProcessController> ParallelController;
 
 private:
-  vtkExtractsDeliveryHelper(const vtkExtractsDeliveryHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkExtractsDeliveryHelper&) VTK_DELETE_FUNCTION;
+  vtkExtractsDeliveryHelper(const vtkExtractsDeliveryHelper&) = delete;
+  void operator=(const vtkExtractsDeliveryHelper&) = delete;
 };
 
 #endif

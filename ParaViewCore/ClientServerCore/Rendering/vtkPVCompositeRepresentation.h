@@ -132,8 +132,8 @@ protected:
   bool SelectionVisibility;
 
 private:
-  vtkPVCompositeRepresentation(const vtkPVCompositeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCompositeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeRepresentation(const vtkPVCompositeRepresentation&) = delete;
+  void operator=(const vtkPVCompositeRepresentation&) = delete;
 };
 
 #endif

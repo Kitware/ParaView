@@ -153,8 +153,8 @@ protected:
   void StripValues(vtkPVXMLElement* propertyElem);
 
 private:
-  vtkSMCompoundSourceProxy(const vtkSMCompoundSourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCompoundSourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSMCompoundSourceProxy(const vtkSMCompoundSourceProxy&) = delete;
+  void operator=(const vtkSMCompoundSourceProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* CSInternals;

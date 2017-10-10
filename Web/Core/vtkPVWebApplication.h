@@ -131,8 +131,8 @@ protected:
   int LastStillRenderImageSize[3];
 
 private:
-  vtkPVWebApplication(const vtkPVWebApplication&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVWebApplication&) VTK_DELETE_FUNCTION;
+  vtkPVWebApplication(const vtkPVWebApplication&) = delete;
+  void operator=(const vtkPVWebApplication&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

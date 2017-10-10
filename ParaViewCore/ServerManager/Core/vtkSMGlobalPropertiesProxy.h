@@ -111,8 +111,8 @@ protected:
   void TargetPropertyModified(vtkObject*, unsigned long, void*);
 
 private:
-  vtkSMGlobalPropertiesProxy(const vtkSMGlobalPropertiesProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMGlobalPropertiesProxy&) VTK_DELETE_FUNCTION;
+  vtkSMGlobalPropertiesProxy(const vtkSMGlobalPropertiesProxy&) = delete;
+  void operator=(const vtkSMGlobalPropertiesProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

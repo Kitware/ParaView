@@ -44,8 +44,8 @@ protected:
   bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
-  vtkSIPVRepresentationProxy(const vtkSIPVRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIPVRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSIPVRepresentationProxy(const vtkSIPVRepresentationProxy&) = delete;
+  void operator=(const vtkSIPVRepresentationProxy&) = delete;
 
   void OnVTKObjectModified();
 

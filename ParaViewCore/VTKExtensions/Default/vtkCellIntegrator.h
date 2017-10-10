@@ -63,8 +63,8 @@ private:
   static double IntegrateGeneral2DCell(vtkDataSet* input, vtkIdType cellId, vtkIdList* ptIds);
   static double IntegrateGeneral3DCell(vtkDataSet* input, vtkIdType cellId, vtkIdList* ptIds);
 
-  vtkCellIntegrator(const vtkCellIntegrator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCellIntegrator&) VTK_DELETE_FUNCTION;
+  vtkCellIntegrator(const vtkCellIntegrator&) = delete;
+  void operator=(const vtkCellIntegrator&) = delete;
 };
 
 #endif

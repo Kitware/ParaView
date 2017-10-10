@@ -92,8 +92,8 @@ protected:
   int NumberOfLogs;
   char** Logs;
 
-  vtkPVTimerInformation(const vtkPVTimerInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTimerInformation&) VTK_DELETE_FUNCTION;
+  vtkPVTimerInformation(const vtkPVTimerInformation&) = delete;
+  void operator=(const vtkPVTimerInformation&) = delete;
 };
 
 #endif

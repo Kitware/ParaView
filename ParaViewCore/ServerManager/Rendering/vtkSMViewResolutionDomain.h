@@ -48,8 +48,8 @@ protected:
   void GetViewResolution(vtkSMViewProxy* view, int resolution[2]);
 
 private:
-  vtkSMViewResolutionDomain(const vtkSMViewResolutionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMViewResolutionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMViewResolutionDomain(const vtkSMViewResolutionDomain&) = delete;
+  void operator=(const vtkSMViewResolutionDomain&) = delete;
 };
 
 #endif

@@ -105,8 +105,8 @@ protected:
   bool LocateProxyWithSessionToo;
 
 private:
-  vtkSMProxyLocator(const vtkSMProxyLocator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyLocator&) VTK_DELETE_FUNCTION;
+  vtkSMProxyLocator(const vtkSMProxyLocator&) = delete;
+  void operator=(const vtkSMProxyLocator&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

@@ -56,8 +56,8 @@ protected:
   bool CreateOutputPorts() VTK_OVERRIDE;
 
 private:
-  vtkSICompoundSourceProxy(const vtkSICompoundSourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSICompoundSourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSICompoundSourceProxy(const vtkSICompoundSourceProxy&) = delete;
+  void operator=(const vtkSICompoundSourceProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

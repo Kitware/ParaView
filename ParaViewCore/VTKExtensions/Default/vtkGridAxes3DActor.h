@@ -284,8 +284,8 @@ protected:
   bool ForceOpaque;
 
 private:
-  vtkGridAxes3DActor(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
+  vtkGridAxes3DActor(const vtkGridAxes3DActor&) = delete;
+  void operator=(const vtkGridAxes3DActor&) = delete;
 
   vtkMTimeType GetBoundsMTime;
 };

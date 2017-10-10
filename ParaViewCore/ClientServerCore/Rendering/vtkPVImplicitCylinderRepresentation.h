@@ -39,9 +39,8 @@ protected:
   ~vtkPVImplicitCylinderRepresentation() override;
 
 private:
-  vtkPVImplicitCylinderRepresentation(
-    const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVImplicitCylinderRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVImplicitCylinderRepresentation(const vtkPVImplicitCylinderRepresentation&) = delete;
+  void operator=(const vtkPVImplicitCylinderRepresentation&) = delete;
 };
 
 #endif

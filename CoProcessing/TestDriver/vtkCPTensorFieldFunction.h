@@ -48,8 +48,8 @@ protected:
   ~vtkCPTensorFieldFunction();
 
 private:
-  vtkCPTensorFieldFunction(const vtkCPTensorFieldFunction&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPTensorFieldFunction&) VTK_DELETE_FUNCTION;
+  vtkCPTensorFieldFunction(const vtkCPTensorFieldFunction&) = delete;
+  void operator=(const vtkCPTensorFieldFunction&) = delete;
 };
 
 #endif

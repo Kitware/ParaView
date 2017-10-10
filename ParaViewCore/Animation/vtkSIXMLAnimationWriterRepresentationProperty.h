@@ -46,8 +46,8 @@ protected:
 
 private:
   vtkSIXMLAnimationWriterRepresentationProperty(
-    const vtkSIXMLAnimationWriterRepresentationProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIXMLAnimationWriterRepresentationProperty&) VTK_DELETE_FUNCTION;
+    const vtkSIXMLAnimationWriterRepresentationProperty&) = delete;
+  void operator=(const vtkSIXMLAnimationWriterRepresentationProperty&) = delete;
 };
 
 #endif

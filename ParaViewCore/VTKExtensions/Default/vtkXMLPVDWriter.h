@@ -146,8 +146,8 @@ protected:
   void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
 
 private:
-  vtkXMLPVDWriter(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;
+  vtkXMLPVDWriter(const vtkXMLPVDWriter&) = delete;
+  void operator=(const vtkXMLPVDWriter&) = delete;
 };
 
 #endif

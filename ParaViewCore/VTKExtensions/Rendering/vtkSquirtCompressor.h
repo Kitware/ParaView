@@ -102,8 +102,8 @@ protected:
   int SquirtLevel;
 
 private:
-  vtkSquirtCompressor(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
+  vtkSquirtCompressor(const vtkSquirtCompressor&) = delete;
+  void operator=(const vtkSquirtCompressor&) = delete;
 };
 
 #endif

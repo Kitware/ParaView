@@ -107,8 +107,8 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkOrderedCompositeDistributor&) VTK_DELETE_FUNCTION;
+  vtkOrderedCompositeDistributor(const vtkOrderedCompositeDistributor&) = delete;
+  void operator=(const vtkOrderedCompositeDistributor&) = delete;
 };
 
 #endif // vtkOrderedCompositeDistributor_h

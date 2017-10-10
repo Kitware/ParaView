@@ -91,8 +91,8 @@ protected:
   vtkSetStringMacro(VTKClassName);
 
 private:
-  vtkPVClassNameInformation(const vtkPVClassNameInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClassNameInformation&) VTK_DELETE_FUNCTION;
+  vtkPVClassNameInformation(const vtkPVClassNameInformation&) = delete;
+  void operator=(const vtkPVClassNameInformation&) = delete;
 };
 
 #endif

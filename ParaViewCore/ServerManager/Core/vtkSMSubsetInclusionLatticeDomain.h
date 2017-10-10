@@ -115,8 +115,8 @@ protected:
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
 
 private:
-  vtkSMSubsetInclusionLatticeDomain(const vtkSMSubsetInclusionLatticeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSubsetInclusionLatticeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMSubsetInclusionLatticeDomain(const vtkSMSubsetInclusionLatticeDomain&) = delete;
+  void operator=(const vtkSMSubsetInclusionLatticeDomain&) = delete;
 
   std::string DefaultPath;
   vtkSmartPointer<vtkSubsetInclusionLattice> SIL;

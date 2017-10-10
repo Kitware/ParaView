@@ -315,8 +315,8 @@ private:
   int IsVolumeFraction(Variable* var);
 
 private:
-  vtkSpyPlotUniReader(const vtkSpyPlotUniReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpyPlotUniReader&) VTK_DELETE_FUNCTION;
+  vtkSpyPlotUniReader(const vtkSpyPlotUniReader&) = delete;
+  void operator=(const vtkSpyPlotUniReader&) = delete;
 };
 
 inline double* vtkSpyPlotUniReader::GetTimeArray()

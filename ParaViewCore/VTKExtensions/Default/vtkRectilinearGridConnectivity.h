@@ -443,8 +443,8 @@ protected:
     vtkPolyData** procPlys, int numProcs, unsigned char partIndx, vtkPolyData* polyData);
 
 private:
-  vtkRectilinearGridConnectivity(const vtkRectilinearGridConnectivity&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRectilinearGridConnectivity&) VTK_DELETE_FUNCTION;
+  vtkRectilinearGridConnectivity(const vtkRectilinearGridConnectivity&) = delete;
+  void operator=(const vtkRectilinearGridConnectivity&) = delete;
 };
 
 #endif

@@ -213,8 +213,8 @@ protected:
   bool FullyTraceSupplementalProxies;
 
 private:
-  vtkSMTrace(const vtkSMTrace&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTrace&) VTK_DELETE_FUNCTION;
+  vtkSMTrace(const vtkSMTrace&) = delete;
+  void operator=(const vtkSMTrace&) = delete;
 
   static vtkSmartPointer<vtkSMTrace> ActiveTracer;
   class vtkInternals;

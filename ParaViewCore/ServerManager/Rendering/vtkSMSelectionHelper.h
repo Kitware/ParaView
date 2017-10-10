@@ -100,8 +100,8 @@ protected:
     vtkIdType connectionID, vtkSelection* input, vtkSelection* output, int global_ids);
 
 private:
-  vtkSMSelectionHelper(const vtkSMSelectionHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSelectionHelper&) VTK_DELETE_FUNCTION;
+  vtkSMSelectionHelper(const vtkSMSelectionHelper&) = delete;
+  void operator=(const vtkSMSelectionHelper&) = delete;
 
   static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
     vtkSMSession*, vtkSelectionNode* selection, vtkSMProxy* selSource, bool ignore_composite_keys);

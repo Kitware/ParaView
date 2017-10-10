@@ -75,8 +75,8 @@ protected:
   int ConstraintMode;
 
 private:
-  vtkSurfaceVectors(const vtkSurfaceVectors&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSurfaceVectors&) VTK_DELETE_FUNCTION;
+  vtkSurfaceVectors(const vtkSurfaceVectors&) = delete;
+  void operator=(const vtkSurfaceVectors&) = delete;
 };
 
 #endif

@@ -52,7 +52,7 @@ protected:
   char* FileName;
 
 private:
-  vtkAdditionalFieldReader(const vtkAdditionalFieldReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAdditionalFieldReader&) VTK_DELETE_FUNCTION;
+  vtkAdditionalFieldReader(const vtkAdditionalFieldReader&) = delete;
+  void operator=(const vtkAdditionalFieldReader&) = delete;
 };
 #endif

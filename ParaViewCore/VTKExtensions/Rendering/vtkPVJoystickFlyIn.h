@@ -38,8 +38,8 @@ protected:
   ~vtkPVJoystickFlyIn() override;
 
 private:
-  vtkPVJoystickFlyIn(const vtkPVJoystickFlyIn&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVJoystickFlyIn&) VTK_DELETE_FUNCTION;
+  vtkPVJoystickFlyIn(const vtkPVJoystickFlyIn&) = delete;
+  void operator=(const vtkPVJoystickFlyIn&) = delete;
 };
 
 #endif

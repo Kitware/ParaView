@@ -65,8 +65,8 @@ protected:
   virtual void FindRestartedResults();
 
 private:
-  vtkExodusFileSeriesReader(const vtkExodusFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkExodusFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkExodusFileSeriesReader(const vtkExodusFileSeriesReader&) = delete;
+  void operator=(const vtkExodusFileSeriesReader&) = delete;
 };
 
 #endif // vtkExodusFileSeriesReader_h

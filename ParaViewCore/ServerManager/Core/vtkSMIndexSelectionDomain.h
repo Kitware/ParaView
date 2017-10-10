@@ -46,8 +46,8 @@ protected:
   ~vtkSMIndexSelectionDomain() override;
 
 private:
-  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMIndexSelectionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain&) = delete;
+  void operator=(const vtkSMIndexSelectionDomain&) = delete;
 };
 
 #endif // vtkSMIndexSelectionDomain_h

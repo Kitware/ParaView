@@ -100,8 +100,8 @@ protected:
   int IsPackage;
 
 private:
-  vtkPVPythonModule(const vtkPVPythonModule&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPythonModule&) VTK_DELETE_FUNCTION;
+  vtkPVPythonModule(const vtkPVPythonModule&) = delete;
+  void operator=(const vtkPVPythonModule&) = delete;
 };
 
 #endif // vtkPVPythonModule_h

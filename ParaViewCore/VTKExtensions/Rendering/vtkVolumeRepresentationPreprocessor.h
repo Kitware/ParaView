@@ -82,9 +82,8 @@ protected:
   vtkExtractBlock* ExtractBlockFilter;
 
 private:
-  vtkVolumeRepresentationPreprocessor(
-    const vtkVolumeRepresentationPreprocessor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVolumeRepresentationPreprocessor&) VTK_DELETE_FUNCTION;
+  vtkVolumeRepresentationPreprocessor(const vtkVolumeRepresentationPreprocessor&) = delete;
+  void operator=(const vtkVolumeRepresentationPreprocessor&) = delete;
 };
 
 #endif

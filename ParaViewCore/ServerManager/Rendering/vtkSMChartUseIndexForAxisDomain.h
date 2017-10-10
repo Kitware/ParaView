@@ -63,8 +63,8 @@ protected:
   ~vtkSMChartUseIndexForAxisDomain() override;
 
 private:
-  vtkSMChartUseIndexForAxisDomain(const vtkSMChartUseIndexForAxisDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMChartUseIndexForAxisDomain&) VTK_DELETE_FUNCTION;
+  vtkSMChartUseIndexForAxisDomain(const vtkSMChartUseIndexForAxisDomain&) = delete;
+  void operator=(const vtkSMChartUseIndexForAxisDomain&) = delete;
 };
 
 #endif

@@ -50,8 +50,8 @@ public:
   int ConnectToRemoteBuiltInSelf();
 
 private:
-  vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
+  vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&) = delete;
+  void operator=(const vtkProcessModuleAutoMPI&) = delete;
   vtkProcessModuleAutoMPIInternals* Internals;
 };
 

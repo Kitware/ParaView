@@ -202,7 +202,7 @@
         { "path": "vtkXMLOffsetsManager.h" },
         { "path": "vtkXMLReaderVersion.h" },
         { "class": "vtkXMLCompositeDataWriter" },
-        { "class": "vtkXMLDataSetWriter" },
+        { "class": "vtkXMLDataObjectWriter" },
         { "class": "vtkXMLHyperOctreeWriter" },
         { "class": "vtkXMLImageDataWriter" },
         { "class": "vtkXMLMultiBlockDataWriter" },
@@ -210,6 +210,7 @@
         { "class": "vtkXMLRectilinearGridWriter" },
         { "class": "vtkXMLStructuredDataWriter" },
         { "class": "vtkXMLStructuredGridWriter" },
+        { "class": "vtkXMLTableWriter" },
         { "class": "vtkXMLUnstructuredDataWriter" },
         { "class": "vtkXMLUnstructuredGridWriter" },
         { "class": "vtkXMLWriter" }
@@ -226,6 +227,7 @@
       "include": [
         { "path": "module.cmake" },
         { "class": "vtkXMLPDataWriter" },
+        { "class": "vtkXMLPDataObjectWriter" },
         { "class": "vtkXMLPImageDataWriter" },
         { "class": "vtkXMLPMultiBlockDataWriter" },
         { "class": "vtkXMLPPolyDataWriter" },
@@ -279,7 +281,7 @@
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/writers.xml",
       "proxies":[
-        "XMLDataSetWriter",
+        "XMLDataObjectWriter",
         "XMLMultiBlockDataWriter",
         "XMLPImageDataWriter",
         "XMLPPolyDataWriter",
@@ -292,7 +294,7 @@
       "proxies":[
         "FileSeriesWriter",
         "ParallelFileSeriesWriter",
-        "XMLDataSetWriterCore",
+        "XMLDataObjectWriterCore",
         "XMLPDataSetWriterCore",
         "XMLPImageDataWriterCore",
         "XMLPMultiBlockDataWriterCore",

@@ -108,8 +108,8 @@ protected:
   PipelineObjectVisibilitiesType PipelineObjectVisibilities;
 
 private:
-  vtkPVCinemaDatabaseInformation(const vtkPVCinemaDatabaseInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCinemaDatabaseInformation&) VTK_DELETE_FUNCTION;
+  vtkPVCinemaDatabaseInformation(const vtkPVCinemaDatabaseInformation&) = delete;
+  void operator=(const vtkPVCinemaDatabaseInformation&) = delete;
 };
 
 #endif

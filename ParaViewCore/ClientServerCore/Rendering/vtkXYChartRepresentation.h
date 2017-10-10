@@ -169,8 +169,8 @@ protected:
   class SortTableFilter;
 
 private:
-  vtkXYChartRepresentation(const vtkXYChartRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkXYChartRepresentation&) VTK_DELETE_FUNCTION;
+  vtkXYChartRepresentation(const vtkXYChartRepresentation&) = delete;
+  void operator=(const vtkXYChartRepresentation&) = delete;
 
   int ChartType;
   char* XAxisSeriesName;

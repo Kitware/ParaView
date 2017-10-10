@@ -175,8 +175,8 @@ protected:
   static bool LoadNoVariables;
 
 private:
-  vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMChartSeriesSelectionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMChartSeriesSelectionDomain(const vtkSMChartSeriesSelectionDomain&) = delete;
+  void operator=(const vtkSMChartSeriesSelectionDomain&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

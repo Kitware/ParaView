@@ -250,8 +250,8 @@
       files.</Documentation>
     </Proxy>
     <!-- ================================================================= -->
-    <Proxy class="vtkXMLDataSetWriter"
-           name="XMLDataSetWriterCore">
+    <Proxy class="vtkXMLDataObjectWriter"
+           name="XMLDataObjectWriterCore">
       <Documentation>Internal writer for writing xml-based vtk
       files.</Documentation>
       <IntVectorProperty command="SetDataMode"
@@ -305,11 +305,11 @@
         <Documentation>The compression algorithm used to compress binary data
         (appended mode only).</Documentation>
       </IntVectorProperty>
-      <!-- End of XMLDataSetWriterCore -->
+      <!-- End of XMLDataObjectWriterCore -->
     </Proxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
-                  base_proxyname="XMLDataSetWriterCore"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPMultiBlockDataWriter"
                   name="XMLPMultiBlockDataWriterCore">
       <Documentation>Internal proxy used by
@@ -318,7 +318,7 @@
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
-                  base_proxyname="XMLDataSetWriterCore"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPUniformGridAMRWriter"
                   name="XMLPUniformGridAMRWriter">
       <Documentation>
@@ -328,7 +328,7 @@
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
-                  base_proxyname="XMLDataSetWriterCore"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPPolyDataWriter"
                   name="XMLPPolyDataWriterCore">
       <Documentation>Internal writer used to write XML poly data in
@@ -355,7 +355,7 @@
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
-                  base_proxyname="XMLDataSetWriterCore"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPUnstructuredGridWriter"
                   name="XMLPUnstructuredGridWriterCore">
       <Documentation>Internal writer used to write XML poly data in
@@ -382,7 +382,25 @@
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
-                  base_proxyname="XMLDataSetWriterCore"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPTableWriter"
+                  name="XMLPTableCore">
+      <Documentation>Internal writer used to write XML poly data in
+      parallel.</Documentation>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the pvt* file or in a subdirectory named the same as the
+          pvt* file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPStructuredGridWriter"
                   name="XMLPStructuredGridWriterCore">
       <Documentation>Internal writer used to write XML poly data in
@@ -400,7 +418,7 @@
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
-                  base_proxyname="XMLDataSetWriterCore"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPRectilinearGridWriter"
                   name="XMLPRectilinearGridWriterCore">
       <Documentation>Writer to write rectilinear grid in a xml-based vtk data
@@ -418,7 +436,7 @@
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
-                  base_proxyname="XMLDataSetWriterCore"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPImageDataWriter"
                   name="XMLPImageDataWriterCore"
                   parallel_only="1">

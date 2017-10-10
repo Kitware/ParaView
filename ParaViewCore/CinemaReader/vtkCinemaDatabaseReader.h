@@ -93,8 +93,8 @@ protected:
   MapOfVectorOfString EnabledControlParameterValues;
 
 private:
-  vtkCinemaDatabaseReader(const vtkCinemaDatabaseReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCinemaDatabaseReader&) VTK_DELETE_FUNCTION;
+  vtkCinemaDatabaseReader(const vtkCinemaDatabaseReader&) = delete;
+  void operator=(const vtkCinemaDatabaseReader&) = delete;
 
   vtkNew<vtkCinemaDatabase> Helper;
 

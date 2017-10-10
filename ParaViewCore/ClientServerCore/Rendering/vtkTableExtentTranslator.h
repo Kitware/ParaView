@@ -118,8 +118,8 @@ protected:
   int* PieceAvailable;
 
 private:
-  vtkTableExtentTranslator(const vtkTableExtentTranslator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTableExtentTranslator&) VTK_DELETE_FUNCTION;
+  vtkTableExtentTranslator(const vtkTableExtentTranslator&) = delete;
+  void operator=(const vtkTableExtentTranslator&) = delete;
 };
 
 #endif

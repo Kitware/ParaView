@@ -115,8 +115,8 @@ protected:
   int MismatchOccurred;
 
 private:
-  vtkMinMax(const vtkMinMax&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMinMax&) VTK_DELETE_FUNCTION;
+  vtkMinMax(const vtkMinMax&) = delete;
+  void operator=(const vtkMinMax&) = delete;
 };
 
 #endif

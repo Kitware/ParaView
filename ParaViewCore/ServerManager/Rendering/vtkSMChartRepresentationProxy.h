@@ -56,8 +56,8 @@ protected:
   void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
 private:
-  vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMChartRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&) = delete;
+  void operator=(const vtkSMChartRepresentationProxy&) = delete;
 };
 
 #endif

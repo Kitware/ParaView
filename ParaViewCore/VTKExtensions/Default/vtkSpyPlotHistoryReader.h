@@ -98,8 +98,8 @@ private:
   CachedTables* CachedOutput;
   //@}
 
-  vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpyPlotHistoryReader&) VTK_DELETE_FUNCTION;
+  vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&) = delete;
+  void operator=(const vtkSpyPlotHistoryReader&) = delete;
 };
 
 #endif

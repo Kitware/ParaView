@@ -225,8 +225,8 @@ private:
   int EnableAsynchronousCommunication;
 
 private:
-  vtkAMRDualGridHelper(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
+  vtkAMRDualGridHelper(const vtkAMRDualGridHelper&) = delete;
+  void operator=(const vtkAMRDualGridHelper&) = delete;
 };
 
 // I need to define this small object in the namespace of this class.

@@ -203,8 +203,8 @@ protected:
 
   //@}
 
-  vtkPVProminentValuesInformation(const vtkPVProminentValuesInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVProminentValuesInformation&) VTK_DELETE_FUNCTION;
+  vtkPVProminentValuesInformation(const vtkPVProminentValuesInformation&) = delete;
+  void operator=(const vtkPVProminentValuesInformation&) = delete;
 };
 
 #endif

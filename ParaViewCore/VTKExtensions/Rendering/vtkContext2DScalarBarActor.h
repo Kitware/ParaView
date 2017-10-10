@@ -214,8 +214,8 @@ protected:
   ~vtkContext2DScalarBarActor() override;
 
 private:
-  vtkContext2DScalarBarActor(const vtkContext2DScalarBarActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkContext2DScalarBarActor&) VTK_DELETE_FUNCTION;
+  vtkContext2DScalarBarActor(const vtkContext2DScalarBarActor&) = delete;
+  void operator=(const vtkContext2DScalarBarActor&) = delete;
 
   vtkContextActor* ActorDelegate;
 

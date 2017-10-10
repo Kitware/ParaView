@@ -65,8 +65,8 @@ protected:
   bool MatchingPropertyInformation(vtkInformation* inputArrayInfo, vtkInformation* postArrayInfo);
 
 private:
-  vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPostFilterExecutive&) VTK_DELETE_FUNCTION;
+  vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&) = delete;
+  void operator=(const vtkPVPostFilterExecutive&) = delete;
 };
 
 #endif

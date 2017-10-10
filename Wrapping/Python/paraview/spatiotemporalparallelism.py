@@ -3,8 +3,6 @@ import os
 import paraview
 import paraview.simple as pvsimple
 
-paraview.servermanager.misc.GlobalMapperProperties.GlobalImmediateModeRendering = 1
-
 # trying to import the library where I can specify the global and subcontrollers
 import vtkParallelCorePython
 

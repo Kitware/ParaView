@@ -177,8 +177,8 @@ protected:
   int UseXYPlane;
 
 private:
-  vtkPVImageSliceMapper(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
+  vtkPVImageSliceMapper(const vtkPVImageSliceMapper&) = delete;
+  void operator=(const vtkPVImageSliceMapper&) = delete;
 };
 
 #endif

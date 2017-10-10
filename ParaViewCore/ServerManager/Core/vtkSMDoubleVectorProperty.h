@@ -216,8 +216,8 @@ protected:
   void SaveStateValues(vtkPVXMLElement* propElement) VTK_OVERRIDE;
 
 private:
-  vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDoubleVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&) = delete;
+  void operator=(const vtkSMDoubleVectorProperty&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

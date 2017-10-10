@@ -135,7 +135,7 @@ private:
   bool ModifyingSelection;
   bool ConvertToIndices;
 
-  vtkSMSelectionLink(const vtkSMSelectionLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSelectionLink&) VTK_DELETE_FUNCTION;
+  vtkSMSelectionLink(const vtkSMSelectionLink&) = delete;
+  void operator=(const vtkSMSelectionLink&) = delete;
 };
 #endif

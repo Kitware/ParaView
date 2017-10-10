@@ -214,8 +214,8 @@ protected:
   bool HelperManagedExternally;
 
 private:
-  vtkGridAxesPlane2DActor(const vtkGridAxesPlane2DActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGridAxesPlane2DActor&) VTK_DELETE_FUNCTION;
+  vtkGridAxesPlane2DActor(const vtkGridAxesPlane2DActor&) = delete;
+  void operator=(const vtkGridAxesPlane2DActor&) = delete;
   std::deque<double> EmptyVector;
 
   typedef std::pair<vtkVector3d, vtkVector3d> LineSegmentType;

@@ -54,8 +54,8 @@ protected:
   void BroadcastToClients(vtkSMMessage* msg);
 
 private:
-  vtkSICollaborationManager(const vtkSICollaborationManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSICollaborationManager&) VTK_DELETE_FUNCTION;
+  vtkSICollaborationManager(const vtkSICollaborationManager&) = delete;
+  void operator=(const vtkSICollaborationManager&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

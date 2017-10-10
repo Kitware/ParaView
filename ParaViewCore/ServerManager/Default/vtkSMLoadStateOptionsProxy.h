@@ -103,8 +103,8 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
 
-  vtkSMLoadStateOptionsProxy(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMLoadStateOptionsProxy&) VTK_DELETE_FUNCTION;
+  vtkSMLoadStateOptionsProxy(const vtkSMLoadStateOptionsProxy&) = delete;
+  void operator=(const vtkSMLoadStateOptionsProxy&) = delete;
 };
 
 #endif

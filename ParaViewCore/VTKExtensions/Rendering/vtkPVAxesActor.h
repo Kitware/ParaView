@@ -298,8 +298,8 @@ protected:
   float ZAxisLabelPosition;
 
 private:
-  vtkPVAxesActor(const vtkPVAxesActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAxesActor&) VTK_DELETE_FUNCTION;
+  vtkPVAxesActor(const vtkPVAxesActor&) = delete;
+  void operator=(const vtkPVAxesActor&) = delete;
 };
 
 #endif

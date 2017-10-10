@@ -99,8 +99,8 @@ protected:
   vtkNew<vtkBlockDeliveryPreprocessor> ExtractedDataConditioner;
 
 private:
-  vtkSpreadSheetRepresentation(const vtkSpreadSheetRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpreadSheetRepresentation&) VTK_DELETE_FUNCTION;
+  vtkSpreadSheetRepresentation(const vtkSpreadSheetRepresentation&) = delete;
+  void operator=(const vtkSpreadSheetRepresentation&) = delete;
 };
 
 #endif

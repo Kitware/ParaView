@@ -73,8 +73,8 @@ protected:
   bool UseAMRDualClipForAMR;
 
 private:
-  vtkPVClipDataSet(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
+  vtkPVClipDataSet(const vtkPVClipDataSet&) = delete;
+  void operator=(const vtkPVClipDataSet&) = delete;
 };
 
 #endif

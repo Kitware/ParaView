@@ -203,8 +203,8 @@ protected:
   std::set<std::string> FileNames;
 
 private:
-  vtkACosmoReader(const vtkACosmoReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkACosmoReader&) VTK_DELETE_FUNCTION;
+  vtkACosmoReader(const vtkACosmoReader&) = delete;
+  void operator=(const vtkACosmoReader&) = delete;
 };
 
 #endif

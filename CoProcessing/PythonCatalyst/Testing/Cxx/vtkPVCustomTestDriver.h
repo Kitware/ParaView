@@ -57,8 +57,8 @@ protected:
   ~vtkPVCustomTestDriver();
 
 private:
-  vtkPVCustomTestDriver(const vtkPVCustomTestDriver&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCustomTestDriver&) VTK_DELETE_FUNCTION;
+  vtkPVCustomTestDriver(const vtkPVCustomTestDriver&) = delete;
+  void operator=(const vtkPVCustomTestDriver&) = delete;
 
   //@{
   /**

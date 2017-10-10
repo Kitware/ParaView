@@ -54,8 +54,8 @@ protected:
   int RepresentationState;
 
 private:
-  vtkSMWidgetRepresentationProxy(const vtkSMWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMWidgetRepresentationProxy(const vtkSMWidgetRepresentationProxy&) = delete;
+  void operator=(const vtkSMWidgetRepresentationProxy&) = delete;
 };
 
 #endif

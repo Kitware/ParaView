@@ -64,8 +64,8 @@ protected:
   ~vtkPVTrackballRotate() override;
 
   char KeyCode;
-  vtkPVTrackballRotate(const vtkPVTrackballRotate&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballRotate&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballRotate(const vtkPVTrackballRotate&) = delete;
+  void operator=(const vtkPVTrackballRotate&) = delete;
 };
 
 #endif

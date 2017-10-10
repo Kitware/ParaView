@@ -144,8 +144,8 @@ protected:
   bool WrongConnectID;
 
 private:
-  vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
+  vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) = delete;
+  void operator=(const vtkTCPNetworkAccessManager&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

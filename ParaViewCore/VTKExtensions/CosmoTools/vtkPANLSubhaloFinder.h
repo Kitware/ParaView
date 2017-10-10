@@ -213,8 +213,8 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLSubhaloFinder : public vtkPassI
   vtkInternals* Internal;
 
 private:
-  vtkPANLSubhaloFinder(const vtkPANLSubhaloFinder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPANLSubhaloFinder&) VTK_DELETE_FUNCTION;
+  vtkPANLSubhaloFinder(const vtkPANLSubhaloFinder&) = delete;
+  void operator=(const vtkPANLSubhaloFinder&) = delete;
 
   void ExecuteSubHaloFinder(vtkUnstructuredGrid* input, vtkUnstructuredGrid* allParticles,
     vtkUnstructuredGrid* subFofProperties);

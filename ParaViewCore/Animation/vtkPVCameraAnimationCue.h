@@ -78,8 +78,8 @@ protected:
   vtkSMProxy* TimeKeeper;
 
 private:
-  vtkPVCameraAnimationCue(const vtkPVCameraAnimationCue&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCameraAnimationCue&) VTK_DELETE_FUNCTION;
+  vtkPVCameraAnimationCue(const vtkPVCameraAnimationCue&) = delete;
+  void operator=(const vtkPVCameraAnimationCue&) = delete;
 };
 
 #endif

@@ -204,8 +204,8 @@ protected:
   vtkCommand* DomainObserver;
 
 private:
-  vtkSMSILModel(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
+  vtkSMSILModel(const vtkSMSILModel&) = delete;
+  void operator=(const vtkSMSILModel&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

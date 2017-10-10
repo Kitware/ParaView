@@ -189,8 +189,8 @@ protected:
   char* QueryString;
 
 private:
-  vtkPVSelectionSource(const vtkPVSelectionSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSelectionSource&) VTK_DELETE_FUNCTION;
+  vtkPVSelectionSource(const vtkPVSelectionSource&) = delete;
+  void operator=(const vtkPVSelectionSource&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

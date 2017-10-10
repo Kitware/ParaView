@@ -71,8 +71,8 @@ protected:
   int PortToExport;
 
 private:
-  vtkSMMultiServerSourceProxy(const vtkSMMultiServerSourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMMultiServerSourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSMMultiServerSourceProxy(const vtkSMMultiServerSourceProxy&) = delete;
+  void operator=(const vtkSMMultiServerSourceProxy&) = delete;
 };
 
 #endif

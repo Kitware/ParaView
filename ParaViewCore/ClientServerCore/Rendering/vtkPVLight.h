@@ -62,8 +62,8 @@ protected:
   ~vtkPVLight();
 
 private:
-  vtkPVLight(const vtkPVLight&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLight&) VTK_DELETE_FUNCTION;
+  vtkPVLight(const vtkPVLight&) = delete;
+  void operator=(const vtkPVLight&) = delete;
 };
 
 #endif

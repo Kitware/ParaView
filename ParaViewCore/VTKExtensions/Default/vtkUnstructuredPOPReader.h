@@ -275,8 +275,8 @@ protected:
     int* subExtent, int wrapped, int piece, int numberOfPieces);
 
 private:
-  vtkUnstructuredPOPReader(const vtkUnstructuredPOPReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkUnstructuredPOPReader&) VTK_DELETE_FUNCTION;
+  vtkUnstructuredPOPReader(const vtkUnstructuredPOPReader&) = delete;
+  void operator=(const vtkUnstructuredPOPReader&) = delete;
 
   vtkUnstructuredPOPReaderInternal* Internals;
 };

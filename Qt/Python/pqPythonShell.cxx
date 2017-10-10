@@ -244,8 +244,8 @@ protected:
   pqPythonShellOutputWindow() {}
   ~pqPythonShellOutputWindow() override {}
 private:
-  pqPythonShellOutputWindow(const pqPythonShellOutputWindow&) VTK_DELETE_FUNCTION;
-  void operator=(const pqPythonShellOutputWindow&) VTK_DELETE_FUNCTION;
+  pqPythonShellOutputWindow(const pqPythonShellOutputWindow&) = delete;
+  void operator=(const pqPythonShellOutputWindow&) = delete;
 };
 
 vtkStandardNewMacro(pqPythonShellOutputWindow);

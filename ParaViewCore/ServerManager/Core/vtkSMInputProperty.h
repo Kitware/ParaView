@@ -114,8 +114,8 @@ protected:
   int PortIndex;
 
 private:
-  vtkSMInputProperty(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMInputProperty&) VTK_DELETE_FUNCTION;
+  vtkSMInputProperty(const vtkSMInputProperty&) = delete;
+  void operator=(const vtkSMInputProperty&) = delete;
 };
 
 #endif

@@ -496,8 +496,8 @@ protected:
   bool SortByXAxis;
 
 private:
-  vtkPVXYChartView(const vtkPVXYChartView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVXYChartView&) VTK_DELETE_FUNCTION;
+  vtkPVXYChartView(const vtkPVXYChartView&) = delete;
+  void operator=(const vtkPVXYChartView&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -327,8 +327,8 @@ protected:
   cosmotk::CosmoHaloFinderP* HaloFinder;
 
 private:
-  vtkPLANLHaloFinder(const vtkPLANLHaloFinder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPLANLHaloFinder&) VTK_DELETE_FUNCTION;
+  vtkPLANLHaloFinder(const vtkPLANLHaloFinder&) = delete;
+  void operator=(const vtkPLANLHaloFinder&) = delete;
 };
 
 #endif //  vtkPLANLHaloFinder_h

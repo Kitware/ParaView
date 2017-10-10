@@ -57,8 +57,8 @@ protected:
   char* SearchPaths;
 
 private:
-  vtkPVOSPRayMaterialLibrary(const vtkPVOSPRayMaterialLibrary&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOSPRayMaterialLibrary&) VTK_DELETE_FUNCTION;
+  vtkPVOSPRayMaterialLibrary(const vtkPVOSPRayMaterialLibrary&) = delete;
+  void operator=(const vtkPVOSPRayMaterialLibrary&) = delete;
 };
 
 #endif

@@ -225,8 +225,8 @@ protected:
   int FloatBufferNumberOfVectors;
 
 private:
-  vtkPEnSightGoldBinaryReader(const vtkPEnSightGoldBinaryReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPEnSightGoldBinaryReader&) VTK_DELETE_FUNCTION;
+  vtkPEnSightGoldBinaryReader(const vtkPEnSightGoldBinaryReader&) = delete;
+  void operator=(const vtkPEnSightGoldBinaryReader&) = delete;
 };
 
 #endif

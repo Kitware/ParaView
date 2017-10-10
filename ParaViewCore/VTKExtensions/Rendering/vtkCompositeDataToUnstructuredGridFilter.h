@@ -86,8 +86,8 @@ protected:
 
 private:
   vtkCompositeDataToUnstructuredGridFilter(
-    const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCompositeDataToUnstructuredGridFilter&) VTK_DELETE_FUNCTION;
+    const vtkCompositeDataToUnstructuredGridFilter&) = delete;
+  void operator=(const vtkCompositeDataToUnstructuredGridFilter&) = delete;
 };
 
 #endif

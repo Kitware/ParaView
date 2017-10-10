@@ -114,8 +114,8 @@ protected:
   //@}
 
 private:
-  vtkSMStringListDomain(const vtkSMStringListDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMStringListDomain&) VTK_DELETE_FUNCTION;
+  vtkSMStringListDomain(const vtkSMStringListDomain&) = delete;
+  void operator=(const vtkSMStringListDomain&) = delete;
 
   vtkSMStringListDomainInternals* SLInternals;
 };

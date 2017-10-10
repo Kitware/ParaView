@@ -94,8 +94,8 @@ protected:
   vtkAlgorithm* Selection;
 
 private:
-  vtkPVRayCastPickingHelper(const vtkPVRayCastPickingHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRayCastPickingHelper&) VTK_DELETE_FUNCTION;
+  vtkPVRayCastPickingHelper(const vtkPVRayCastPickingHelper&) = delete;
+  void operator=(const vtkPVRayCastPickingHelper&) = delete;
 };
 
 #endif

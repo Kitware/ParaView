@@ -98,8 +98,8 @@ protected:
   int TileWindowSize[2];
 
 private:
-  vtkTilesHelper(const vtkTilesHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTilesHelper&) VTK_DELETE_FUNCTION;
+  vtkTilesHelper(const vtkTilesHelper&) = delete;
+  void operator=(const vtkTilesHelper&) = delete;
 };
 
 #endif
