@@ -5035,6 +5035,17 @@ array.
         the union of the input dataset and its reflection. Otherwise the output
         will contain only the reflection of the input data.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetFlipAllInputArrays"
+                         default_values="1"
+                         name="FlipAllInputArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> If off, only Vectors, Normals and Tensors will be flipped.
+        If on, all 3-component data arrays ( considered as 3D vectors),
+        6-component data arrays (considered as symmetric tensors),
+        9-component data arrays (considered as tensors ) of signed type will be flipped.
+        All other arrays won't be flipped and will only be copied.</Documentation>
+      </IntVectorProperty>
       <!-- End ReflectionFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
