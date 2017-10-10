@@ -124,11 +124,11 @@ PyObject* PythonConvert(bool const& value)
 {
   if (value)
   {
-    Py_RETURN_TRUE;
+    return PyBool_FromLong(1);
   }
   else
   {
-    Py_RETURN_FALSE;
+    return PyBool_FromLong(0);
   }
 }
 
