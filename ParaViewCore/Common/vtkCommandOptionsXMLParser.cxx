@@ -208,13 +208,13 @@ void vtkCommandOptionsXMLParser::StartElement(const char* name, const char** att
 //----------------------------------------------------------------------------
 void vtkCommandOptionsXMLParser::HandleProcessType(const char** atts)
 {
-  if (!atts[0] && strcmp(atts[0], "Type"))
+  if (atts == nullptr || atts[0] == nullptr || strcmp(atts[0], "Type") != 0)
   {
     vtkErrorMacro(
       "Bad XML Format 0 attributes found in Process Type, expected  Process Type=\"..\" ");
     return;
   }
-  if (!atts[1])
+  if (atts[1] == nullptr)
   {
     vtkErrorMacro("Bad XML Format 1 attributes found in Process Process Type=\"..\" ");
     return;
