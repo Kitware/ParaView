@@ -85,13 +85,6 @@ PyObject* PythonConvert(unsigned int const& value)
 
 //----------------------------------------------------------------------------
 template <>
-PyObject* PythonConvert(unsigned long const& value)
-{
-  Py_RETURN_CHECKED(PyLong_FromUnsignedLong(value));
-}
-
-//----------------------------------------------------------------------------
-template <>
 PyObject* PythonConvert(long long const& value)
 {
   Py_RETURN_CHECKED(PyLong_FromLongLong(value));
