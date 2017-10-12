@@ -760,6 +760,9 @@
         only the first value of BlocksDimension is used. If a 2D cell type is chosen
         then only the first and second value of BlocksDimension is used. A cell block
         may be divided into multiple cells (e.g. 6 pyramids will be in a cell block).
+
+        Note that not all meshes generated for Lagrange cells (particularly tetrahedra)
+        will be conformal; their boundaries will not meet exactly at block boundaries.
       </Documentation>
       <IntVectorProperty command="SetCellType"
                          default_values="12"
@@ -798,6 +801,18 @@
                  value="26" />
           <Entry text="Quadratic Pyramid"
                  value="27" />
+          <Entry text="Lagrange Curve"
+                 value="68" />
+          <Entry text="Lagrange Triangle"
+                 value="69" />
+          <Entry text="Lagrange Quadrilateral"
+                 value="70" />
+          <Entry text="Lagrange Tetrahedron"
+                 value="71" />
+          <Entry text="Lagrange Hexahedron"
+                 value="72" />
+          <Entry text="Lagrange Wedge"
+                 value="73" />
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetOutputPrecision"
@@ -835,6 +850,31 @@
         the first blocks dimension will be used. If a 2D cell type is chosen the
         first and second blocks dimensinos will be used.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCellOrder"
+                         default_values="3"
+                         name="CellOrder"
+                         number_of_elements="1">
+        <Documentation>This property specifies the interpolation order for Lagrange cell types.
+        </Documentation>
+        <IntRangeDomain min="1" max="10" name="range" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompleteQuadraticSimplicialElements"
+                         default_values="0"
+                         name="CompleteQuadraticSimplicialElements"
+                         label="Add nodes to complete polynomial basis"
+                         number_of_elements="1">
+        <Documentation>When true, some quadratic Lagrange cell types will have additional nodes.
+
+        Specifically,
+        triangles will have 7 points instead of 6;
+        tetrahedra will have 15 points instead of 10; and
+        wedges will have 21 points instead of 18.
+        These additional points increase the number of polynomial terms
+        in each element so that the shape functions can span a larger
+        space of polynomial functions.
+        </Documentation>
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End of CellTypeSource -->
     </SourceProxy>
