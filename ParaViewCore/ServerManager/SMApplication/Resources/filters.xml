@@ -7305,7 +7305,7 @@ points in the input. Defaults to ***Single***.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to produce triangles in the output.
-        Warning: Many filters do not properly handle non-trianglular polygons.
+        Warning: Many filters do not properly handle non-triangular polygons.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
