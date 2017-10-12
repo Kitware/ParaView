@@ -68,29 +68,21 @@ const char* HEAD_LIGHT_WARMTH = "HeadLightWarmth";
 const char* HEAD_LIGHT_K_H_RATIO = "HeadLightK:H Ratio";
 const char* MAINTAIN_LUMINANCE = "MaintainLuminance";
 
-const char* LIGHT = "LightSwitch";
-const char* LIGHT_INTENSITY = "LightIntensity";
-const char* LIGHT_COLOR = "LightDiffuseColor";
-
 const char* PROPERTY_NAME[] = { LIGHT_KIT, KEY_LIGHT_WARMTH, KEY_LIGHT_INTENSITY,
   KEY_LIGHT_ELEVATION, KEY_LIGHT_AZIMUTH, FILL_LIGHT_WARMTH, FILL_LIGHT_K_F_RATIO,
   FILL_LIGHT_ELEVATION, FILL_LIGHT_AZIMUTH, BACK_LIGHT_WARMTH, BACK_LIGHT_K_B_RATIO,
   BACK_LIGHT_ELEVATION, BACK_LIGHT_AZIMUTH, HEAD_LIGHT_WARMTH, HEAD_LIGHT_K_H_RATIO,
-  MAINTAIN_LUMINANCE,
-
-  LIGHT, LIGHT_INTENSITY, LIGHT_COLOR };
+  MAINTAIN_LUMINANCE };
 const int PROPERTY_COUNT = sizeof(PROPERTY_NAME) / sizeof(PROPERTY_NAME[0]);
 }
 
 //-----------------------------------------------------------------------------
-pqLightsEditor::pqLightsEditor(
-  pqPropertyGroupWidget* propertyWidget, QWidget* _parent, Qt::WindowFlags flags)
-  : Superclass(_parent, flags)
+pqLightsEditor::pqLightsEditor(vtkSMProxy* proxy, vtkSMPropertyGroup* smGroup, QWidget* _parent)
+  : Superclass(proxy, smGroup, _parent)
   , Internal(new pqInternal(this))
-  , PropertyWidget(propertyWidget)
 {
   Ui::LightsEditor& ui = *this->Internal;
-  pqPropertyGroupWidget& pg = *PropertyWidget;
+  pqPropertyGroupWidget& pg = *this;
 
   pg.addPropertyLink(ui.LightKit, LIGHT_KIT);
   pg.addPropertyLink(ui.KeyLightWarmth, KEY_LIGHT_WARMTH);
@@ -109,12 +101,13 @@ pqLightsEditor::pqLightsEditor(
   pg.addPropertyLink(ui.HeadLightK_H_Ratio, HEAD_LIGHT_K_H_RATIO);
   pg.addPropertyLink(ui.MaintainLuminance, MAINTAIN_LUMINANCE);
 
-  pg.addPropertyLink(ui.Light, LIGHT);
-  pg.addPropertyLink(ui.LightIntensity, LIGHT_INTENSITY);
-  pg.addPropertyLink(ui.LightColor, LIGHT_COLOR);
+  // set pqPropertyWidget links to update VTK immediately on UI change - lights are a display
+  // property
+  links().setUseUncheckedProperties(false);
+  links().setAutoUpdateVTKObjects(true);
 
-  connect(ui.Close, SIGNAL(pressed()), this, SLOT(close()));
-  connect(ui.Reset, SIGNAL(pressed()), this, SLOT(reset()));
+  // connect(ui.Close, SIGNAL(pressed()), this, SLOT(close()));
+  connect(ui.Reset, SIGNAL(pressed()), this, SLOT(resetLights()));
 }
 
 //-----------------------------------------------------------------------------
@@ -125,14 +118,15 @@ pqLightsEditor::~pqLightsEditor()
 }
 
 //-----------------------------------------------------------------------------
-void pqLightsEditor::reset()
+void pqLightsEditor::resetLights()
 {
   BEGIN_UNDO_SET("Restore Default Lights");
   for (int i = 0; i < PROPERTY_COUNT; ++i)
   {
-    vtkSMProperty* _property = this->PropertyWidget->propertyGroup()->GetProperty(PROPERTY_NAME[i]);
+    vtkSMProperty* _property = this->propertyGroup()->GetProperty(PROPERTY_NAME[i]);
     _property->ResetToDefault();
   }
-  emit this->PropertyWidget->changeFinished();
+  proxy()->UpdateVTKObjects();
+  emit this->changeFinished();
   END_UNDO_SET();
 }

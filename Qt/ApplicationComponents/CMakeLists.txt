@@ -172,8 +172,6 @@ set (Module_SRCS
   pqInputDataTypeDecorator.h
   pqInteractivePropertyWidget.cxx
   pqInteractivePropertyWidget.h
-  pqLightsEditor.cxx
-  pqLightsEditor.h
   pqLinePropertyWidget.cxx
   pqLinePropertyWidget.h
   pqLinkSelectionReaction.cxx
@@ -402,7 +400,6 @@ set (Module_MOC_HDRS
   pqImportCinemaReaction.h
   pqInputDataTypeDecorator.h
   pqInteractivePropertyWidget.h
-  pqLightsEditor.h
   pqLinePropertyWidget.h
   pqLinkSelectionReaction.h
   pqListPropertyWidget.h
@@ -526,7 +523,6 @@ set (Module_UI_FILES
   Resources/UI/pqHandlePropertyWidget.ui
   Resources/UI/pqImageCompressorWidget.ui
   Resources/UI/pqImplicitPlanePropertyWidget.ui
-  Resources/UI/pqLightsEditor.ui
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui

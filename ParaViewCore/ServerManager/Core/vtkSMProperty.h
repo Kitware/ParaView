@@ -23,7 +23,7 @@
  * methods with no arguments. Sub-classes support methods with different
  * arguments types and numbers.
  *
- * Property is typically meant for pushing its values to athe VTK object.
+ * vtkSMProperty is typically meant for pushing its values to a VTK object.
  * However, a property may be marked as an InformationOnly property
  * in which case its values are obtained from the server with the
  * UpdateInformation() call.
@@ -106,7 +106,7 @@
  *        are not synchronized among client-processes in collaborative mode.
  *
  * \li \b is_internal: \c {0,1}: When set, the property is treated as internal
- *        which implies that it will not be shown in the UI; it value will not
+ *        which implies that it will not be shown in the UI; its value will not
  *        be pushed when the proxy is created, nor saved in state files or
  *        undo-redo stacks.
  *
@@ -118,7 +118,7 @@
  *        default or advanced mode, or never at all.
  *
  * \li \b panel_widget: \c string: provides a hint to the UI to determine which
- *        what widget to create to edit this property.
+ *        widget to create to edit this property.
  *
  * \li \b no_custom_default: \c {0,1}: When set, vtkSMSettings will neither
  *        change the value of a property upon creation nor save the property

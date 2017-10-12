@@ -555,15 +555,6 @@ public:
 
   //@{
   /**
-   * Turn on/off the default light in the 3D renderer.
-   */
-  void SetLightSwitch(bool enable);
-  bool GetLightSwitch();
-  vtkBooleanMacro(LightSwitch, bool);
-  //@}
-
-  //@{
-  /**
    * Enable/disable showing of annotation for developers.
    */
   void SetShowAnnotation(bool val);
@@ -625,14 +616,6 @@ public:
   virtual void SetBackgroundTexture(vtkTexture* val);
   virtual void SetGradientBackground(int val);
   virtual void SetTexturedBackground(int val);
-
-  //*****************************************************************
-  // Forward to vtkLight.
-  void SetAmbientColor(double r, double g, double b);
-  void SetSpecularColor(double r, double g, double b);
-  void SetDiffuseColor(double r, double g, double b);
-  void SetIntensity(double val);
-  void SetLightType(int val);
 
   //*****************************************************************
   // Entry point for dynamic lights
@@ -1057,7 +1040,6 @@ protected:
    */
   void PostSelect(vtkSelection* sel);
 
-  vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
   vtkRenderer* NonCompositedRenderer;

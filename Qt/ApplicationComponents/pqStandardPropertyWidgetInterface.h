@@ -89,7 +89,6 @@ public:
    * \li \c ColorEditor : pqColorEditorPropertyWidget
    * \li \c ColorOpacityEditor : pqColorOpacityEditorWidget
    * \li \c FontEditor : pqFontPropertyWidget
-   * \li \c LightsEditor : pqLightsPropertyGroup
    * \li \c SeriesEditor : pqSeriesEditorPropertyWidget
    * \li \c InteractivePlane : pqImplicitPlanePropertyWidget
    * \li \c InteractiveBox: pqBoxPropertyWidget

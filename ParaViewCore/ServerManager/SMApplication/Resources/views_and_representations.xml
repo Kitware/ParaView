@@ -1781,7 +1781,7 @@
                          panel_visibility="never"
                          number_of_elements="1">
         <Documentation>Set the delay (in seconds) after an interactive render
-          before switching to a full-rese render.</Documentation>
+          before switching to a full-res render.</Documentation>
         <Hints>
           <PropertyLink group="settings"
                         proxy="RenderViewSettings"
@@ -2025,63 +2025,6 @@
                          name="MaintainLuminance"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty command="SetLightSwitch"
-                         default_values="0"
-                         name="LightSwitch"
-                         number_of_elements="1">
-        <Documentation>Turn on/off the default light in the 3D
-        renderer.</Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetAmbientColor"
-                            default_values="1.0 1.0 1.0"
-                            name="LightAmbientColor"
-                            panel_widget="color_selector"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSpecularColor"
-                            default_values="1.0 1.0 1.0"
-                            name="LightSpecularColor"
-                            panel_widget="color_selector"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetDiffuseColor"
-                            default_values="1.0 1.0 1.0"
-                            name="LightDiffuseColor"
-                            panel_widget="color_selector"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetIntensity"
-                            default_values="1.0"
-                            name="LightIntensity"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetLightType"
-                         default_values="1"
-                         name="LightType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="HeadLight"
-                 value="1" />
-          <Entry text="CameraLight"
-                 value="2" />
-          <Entry text="SceneLight"
-                 value="3" />
-        </EnumerationDomain>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetUseHiddenLineRemoval"
@@ -2558,6 +2501,10 @@
         or not.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <StringVectorProperty name="OSPRayRendererType"
@@ -2572,6 +2519,10 @@
         <Documentation>Set the OSPRay renderer to use.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </StringVectorProperty>
       <IntVectorProperty
@@ -2587,6 +2538,10 @@
         OSPRay sends at each intersection.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -2602,6 +2557,10 @@
         shoots per pixel.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty
@@ -2619,6 +2578,10 @@
         is started with the --enable-streaming option.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty
@@ -2633,6 +2596,10 @@
         <Documentation>Diminish or Amplify all lights in the scene.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty
@@ -2686,8 +2653,9 @@
         <Property name="OrientationAxesLabelColor"/>
         <Property name="OrientationAxesOutlineColor"/>
       </PropertyGroup>
-      <PropertyGroup label="Lights" panel_widget="LightsEditor"
-                     panel_visibility="advanced">
+      <PropertyGroup name="Lights"
+                     label="Lights"
+                     panel_visibility="never">
         <!-- Light Kit -->
         <Property name="UseLight"/>
         <!-- Key Light -->
@@ -2709,14 +2677,6 @@
         <Property name="HeadLightWarmth"/>
         <Property name="HeadLightK:H Ratio"/>
         <Property name="MaintainLuminance"/>
-
-        <!-- Light -->
-        <Property name="LightSwitch"/>
-        <Property name="LightAmbientColor"/>
-        <Property name="LightSpecularColor"/>
-        <Property name="LightDiffuseColor"/>
-        <Property name="LightIntensity"/>
-        <Property name="LightType"/>
       </PropertyGroup>
       <PropertyGroup label="Background" panel_widget="BackgroundEditor">
         <Property name="Background"/>
@@ -9169,14 +9129,6 @@
             <Property name="HeadLightWarmth"/>
             <Property name="HeadLightK:H Ratio"/>
             <Property name="MaintainLuminance"/>
-
-            <!-- Light -->
-            <Property name="LightSwitch"/>
-            <Property name="LightAmbientColor"/>
-            <Property name="LightSpecularColor"/>
-            <Property name="LightDiffuseColor"/>
-            <Property name="LightIntensity"/>
-            <Property name="LightType"/>
           </PropertyGroup>
 
           <!-- ActiveCamera -->
@@ -10087,6 +10039,10 @@
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
         </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetEdgeColor"

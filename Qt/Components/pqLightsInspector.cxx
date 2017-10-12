@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkPVLight.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -42,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqLightsEditor.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidget.h"
 #include "pqProxyWidget.h"
@@ -112,6 +114,15 @@ public:
 
     // clear current contents
     QLayoutItem* child;
+    child = this->Ui.verticalLayout->itemAt(0);
+    // is this a lightkit widget?
+    if (child->widget() && child->widget()->objectName() == "LightsEditor")
+    {
+      child = this->Ui.verticalLayout->takeAt(0);
+      child->widget()->setParent(0);
+      delete child->widget();
+      delete child;
+    }
     while ((child = this->Ui.verticalLayout_2->takeAt(0)) != 0)
     {
       if (child->widget())
@@ -121,6 +132,7 @@ public:
       }
       delete child;
     }
+
     if (this->rview && this->observerTag != 0)
     {
       this->rview->GetProperty("AdditionalLights")->RemoveObserver(this->observerTag);
@@ -137,6 +149,25 @@ public:
     this->Ui.addLight->setEnabled(true);
 
     pqView* pv = pqActiveObjects::instance().activeView();
+    // add new light kit for this view.
+    vtkSMPropertyGroup* lightkitGroup = nullptr;
+    size_t ngroups = view->GetNumberOfPropertyGroups();
+    for (size_t j = 0; j < ngroups; ++j)
+    {
+      vtkSMPropertyGroup* smGroup = view->GetPropertyGroup(j);
+      if (smGroup->GetXMLLabel() == vtkStdString("Lights"))
+      {
+        lightkitGroup = smGroup;
+        break;
+      }
+    }
+    if (lightkitGroup)
+    {
+      pqLightsEditor* lightsEditor = new pqLightsEditor(view, lightkitGroup, self);
+      this->Ui.verticalLayout->insertWidget(0, lightsEditor);
+      // whenever a property changes, do a render.
+      self->connect(lightsEditor, SIGNAL(changeFinished()), SLOT(render()));
+    }
     // add new contents
     unsigned int nlights = vtkSMPropertyHelper(view, "AdditionalLights").GetNumberOfElements();
     for (unsigned int i = 0; i < nlights; ++i)
@@ -167,6 +198,7 @@ public:
       syncButton->setToolTip("Match this light's position and focal point to the camera.");
       connect(syncButton, SIGNAL(clicked()), self, SLOT(syncLightToCamera()));
       hbox->addWidget(syncButton);
+      this->updateMoveToCamera(i, light);
 
       // Add a button to remove this light.
       QPushButton* removeButton = new QPushButton("Remove Light");
@@ -182,10 +214,12 @@ public:
       pqProxyWidget* lightWidget = new pqProxyWidget(light, widget);
       lightWidget->setApplyChangesImmediately(true);
       lightWidget->setView(pv);
+      // which light does this widget affect?
+      lightWidget->setProperty("LightIndex", i);
       lightWidget->updatePanel();
       vbox->addWidget(lightWidget);
       // whenever a property changes, do a render.
-      self->connect(lightWidget, SIGNAL(changeFinished()), SLOT(render()));
+      self->connect(lightWidget, SIGNAL(changeFinished()), SLOT(updateAndRender()));
 
       // add it to this->Ui.scrollArea
       this->Ui.verticalLayout_2->addWidget(widget);
@@ -197,6 +231,17 @@ public:
     this->observerTag = property->AddObserver(
       vtkCommand::ModifiedEvent, this, &pqLightsInspector::pqInternals::updateLightWidgets);
     this->rview = view;
+  }
+
+  void updateMoveToCamera(int lightIndex, vtkSMProxy* lightProxy)
+  {
+    int type = 0;
+    vtkSMPropertyHelper(lightProxy, "LightType").Get(&type);
+    bool visible = (type == VTK_LIGHT_TYPE_CAMERA_LIGHT || type == VTK_LIGHT_TYPE_SCENE_LIGHT);
+
+    QWidget* container = self->findChild<QWidget*>(QString("LightContainer%1").arg(lightIndex));
+    QPushButton* button = container->findChild<QPushButton*>(QString("MoveToCamera"));
+    button->setVisible(visible);
   }
 };
 
@@ -245,7 +290,8 @@ void pqLightsInspector::addLight()
   // call vtkPVRenderView::AddLight - light saved in "AdditionalLights" list
   vtkSMPropertyHelper(view, "AdditionalLights").Add(light);
 
-  this->Internals->updateLightWidgets();
+  // modification of AdditionalLights already calls this:
+  // this->Internals->updateLightWidgets();
 
   // make it so...
   view->UpdateVTKObjects();
@@ -263,6 +309,24 @@ void pqLightsInspector::render()
     return;
   }
   renderView->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqLightsInspector::updateAndRender()
+{
+  vtkSMRenderViewProxy* view = this->Internals->getActiveView();
+  if (!view)
+  {
+    return;
+  }
+
+  auto proxyWidget = sender();
+  int index = proxyWidget->property("LightIndex").toInt();
+
+  vtkSMProxy* lightProxy = vtkSMPropertyHelper(view, "AdditionalLights").GetAsProxy(index);
+  this->Internals->updateMoveToCamera(index, lightProxy);
+
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -302,7 +366,8 @@ void pqLightsInspector::removeLight(vtkSMProxy* lightProxy)
   // vtkNew<vtkSMParaViewPipelineController> controller;
   // controller->UnRegisterProxy(lightProxy);
 
-  this->Internals->updateLightWidgets();
+  // modification of AdditionalLights already calls this:
+  // this->Internals->updateLightWidgets();
 
   // make it so...
   view->UpdateVTKObjects();
@@ -319,7 +384,6 @@ void pqLightsInspector::syncLightToCamera(vtkSMProxy* lightProxy)
   {
     return;
   }
-  // todo: this works but do I need to do something more?
   if (!lightProxy)
   {
     auto syncButton = sender();

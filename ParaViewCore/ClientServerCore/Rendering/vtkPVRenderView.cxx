@@ -417,14 +417,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->GetRenderer()->SetUseDepthPeeling(1);
   this->GetRenderer()->AddCuller(this->Culler);
 
-  this->Light = vtkLight::New();
-  this->Light->SetAmbientColor(1, 1, 1);
-  this->Light->SetSpecularColor(1, 1, 1);
-  this->Light->SetDiffuseColor(1, 1, 1);
-  this->Light->SetIntensity(1.0);
-  this->Light->SetLightType(2); // CameraLight
   this->LightKit = vtkLightKit::New();
-  this->GetRenderer()->AddLight(this->Light);
   this->GetRenderer()->SetAutomaticLightCreation(0);
 
   // Setup interactor styles. Since these are only needed on the process that
@@ -525,7 +518,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->NonCompositedRenderer->Delete();
   this->RenderView->Delete();
   this->LightKit->Delete();
-  this->Light->Delete();
   this->CenterAxes->Delete();
   this->OrientationWidget->Delete();
   this->Interactor = 0;
@@ -2080,18 +2072,6 @@ void vtkPVRenderView::SetUseLightKit(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetLightSwitch(bool enable)
-{
-  this->Light->SetSwitch(enable ? 1 : 0);
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVRenderView::GetLightSwitch()
-{
-  return this->Light->GetSwitch() != 0;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateCenterAxes()
 {
   vtkBoundingBox bbox(this->GeometryBounds);
@@ -2395,38 +2375,6 @@ void vtkPVRenderView::SetGradientBackground(int val)
 void vtkPVRenderView::SetTexturedBackground(int val)
 {
   this->GetRenderer()->SetTexturedBackground(val ? true : false);
-}
-
-//*****************************************************************
-// Forward to vtkLight.
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetAmbientColor(double r, double g, double b)
-{
-  this->Light->SetAmbientColor(r, g, b);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetSpecularColor(double r, double g, double b)
-{
-  this->Light->SetSpecularColor(r, g, b);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetDiffuseColor(double r, double g, double b)
-{
-  this->Light->SetDiffuseColor(r, g, b);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetIntensity(double val)
-{
-  this->Light->SetIntensity(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetLightType(int val)
-{
-  this->Light->SetLightType(val);
 }
 
 //*****************************************************************
