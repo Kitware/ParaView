@@ -82,17 +82,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  void onTriggered() override
-  {
-    if (this->DeleteAll)
-    {
-      pqDeleteReaction::deleteAll();
-    }
-    else
-    {
-      pqDeleteReaction::deleteSelected();
-    }
-  }
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqDeleteReaction)
