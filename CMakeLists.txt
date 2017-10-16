@@ -153,13 +153,6 @@ if (NOT DEFINED VTK_CUSTOM_LIBRARY_SUFFIX)
   set (VTK_CUSTOM_LIBRARY_SUFFIX "-pv${PARAVIEW_VERSION}")
 endif()
 
-# Handle the target export file, this is used if building against a build tree.
-if(NOT VTK_EXPORTS_FILE)
-  set(VTK_EXPORTS_FILE "${ParaView_BINARY_DIR}/VTK/${VTK_INSTALL_EXPORT_NAME}.cmake")
-endif()
-file(REMOVE "${VTK_EXPORTS_FILE}")
-
-
 if(NOT PV_INSTALL_PLUGIN_DIR)
   if (WIN32)
     set (PV_INSTALL_PLUGIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
