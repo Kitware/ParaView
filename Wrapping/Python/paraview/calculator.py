@@ -91,7 +91,12 @@ def pointIsNear(locations, distance, inputs):
 
     extracted = dsa.WrapDataObject(extractedPoints)
     pointIds = extracted.PointData.GetArray('vtkOriginalPointIds')
-    result[pointIds] = 1
+
+    if isinstance(pointIds, dsa.VTKCompositeDataArray):
+        for a in pointIds.GetArrays():
+            result[a] = 1
+    else:
+         result[pointIds] = 1
 
     import vtk.util.numpy_support as np_s
     vtkarray = np_s.numpy_to_vtk(result, deep=True)
@@ -122,7 +127,12 @@ def cellContainsPoint(inputs, locations):
 
     extracted = dsa.WrapDataObject(extractedCells)
     cellIds = extracted.CellData.GetArray('vtkOriginalCellIds')
-    result[cellIds] = 1
+
+    if isinstance(cellIds, dsa.VTKCompositeDataArray):
+        for a in cellIds.GetArrays():
+            result[a] = 1
+    else:
+         result[cellIds] = 1
 
     import vtk.util.numpy_support as np_s
     vtkarray = np_s.numpy_to_vtk(result, deep=True)
