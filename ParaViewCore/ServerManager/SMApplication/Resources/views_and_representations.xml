@@ -3670,8 +3670,7 @@
             <Property name="BlockColorsDistinctValues"
                       panel_visibility="advanced" />
             <Property name="UseDataPartitions"
-                      panel_visibility="advanced"
-                      panel_visibility_default_for_representation="surface" />
+                      panel_visibility="advanced" />
           </PropertyGroup>
 
           <PropertyGroup panel_visibility="advanced"
@@ -3958,7 +3957,6 @@
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
           <Exception name="Visibility" />
-          <Exception name="UseDataPartitions" />
         </ShareProperties>
         <ExposedProperties>
           <PropertyGroup label="Volume Rendering">
@@ -3973,10 +3971,6 @@
             <Property name="SamplingDimensions"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="volume"/>
-            <Property name="UseDataPartitions"
-                      panel_visibility="advanced"
-                      panel_visibility_default_for_representation="volume"
-                      override="1"/>
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
