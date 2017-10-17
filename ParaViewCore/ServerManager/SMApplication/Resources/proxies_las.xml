@@ -1,0 +1,29 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkLASReader"
+                 label="LAS Reader"
+                 name="LASReader">
+      <Documentation short_help="Reads a LAS file."  long_help="Read
+      LIDAR data in LAS format">The LAS reader reads LIDAR data saved
+      using the LAS file format. This reader uses the libLAS library.
+      It produces a vtkPolyData with point data arrays: "intensity":
+      vtkUnsignedShortArray, "classification": vtkUnsignedCharArray
+      (optional) and, "color": vtkUnsignedShortArray
+      (optional)</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        LAS reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="las"
+                       file_description="LAS Files" />
+      </Hints>
+    </SourceProxy>
+      <!-- End LASReader -->
+  </ProxyGroup>
+
+</ServerManagerConfiguration>
