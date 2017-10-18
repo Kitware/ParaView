@@ -769,7 +769,7 @@ vtkPVArrayInformation* vtkSMPVRepresentationProxy::GetArrayInformationForColorAr
 //----------------------------------------------------------------------------
 vtkPVProminentValuesInformation*
 vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
-  double uncertaintyAllowed, double fraction)
+  double uncertaintyAllowed, double fraction, bool force)
 {
   if (!this->GetUsingScalarColoring())
   {
@@ -785,7 +785,7 @@ vtkSMPVRepresentationProxy::GetProminentValuesInformationForColorArray(
   vtkSMPropertyHelper colorArrayHelper(this, "ColorArrayName");
   return this->GetProminentValuesInformation(arrayInfo->GetName(),
     colorArrayHelper.GetInputArrayAssociation(), arrayInfo->GetNumberOfComponents(),
-    uncertaintyAllowed, fraction);
+    uncertaintyAllowed, fraction, force);
 }
 
 //----------------------------------------------------------------------------

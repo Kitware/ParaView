@@ -82,6 +82,10 @@ signals:
   */
   void indexedColorsChanged();
 
+protected:
+  bool addActiveAnnotations(bool force);
+  bool addActiveAnnotationsFromVisibleSources(bool force);
+
 private slots:
   /**
   * slots called when user presses corresponding buttons to add/remove

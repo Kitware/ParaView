@@ -64,7 +64,8 @@ public:
    * about the \a uncertaintyAllowed and \a fraction arguments.
    */
   virtual vtkPVProminentValuesInformation* GetProminentValuesInformation(vtkStdString name,
-    int fieldAssoc, int numComponents, double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
+    int fieldAssoc, int numComponents, double uncertaintyAllowed = 1e-6, double fraction = 1e-3,
+    bool force = false);
 
   /**
    * Calls Update() on all sources. It also creates output ports if
