@@ -32,6 +32,18 @@ set (ParaView_USE_FILE "${ParaView_CMAKE_DIR}/UseParaView.cmake")
 set (PARAVIEW_USE_FILE ${ParaView_USE_FILE})
 set (PARAVIEW_CMAKE_DIR ${ParaView_CMAKE_DIR})
 
+# Setup VTK-m if it was enabled
+set(VTK_HAS_VTKM @VTK_HAS_VTKM@)
+if(VTK_HAS_VTKM AND __pv_install_tree)
+  set(VTKM_CMAKE_DIR "${ParaView_CMAKE_DIR}")
+  get_filename_component(VTKM_CMAKE_DIR "${VTKM_CMAKE_DIR}" PATH)
+  find_package(VTKm
+               PATHS "${CMAKE_CURRENT_LIST_DIR}"
+                     "${VTKM_CMAKE_DIR}"
+               NO_DEFAULT_PATH
+               )
+endif()
+
 # Import ParaView targets.
 if(NOT TARGET vtkPVCommon)
   include("${PARAVIEW_CONFIG_TARGETS_FILE}")
