@@ -84,6 +84,12 @@ public:
   void resetCenterOfRotation();
 
   /**
+  * Resets the parallel scale which is used for a parallel
+  * projection
+  */
+  void resetParallelScale();
+
+  /**
   * Get if the orientation axes is visible.
   */
   bool getOrientationAxesVisibility() const;
@@ -242,6 +248,9 @@ public slots:
   // They are setup correctly by default.
   void setCenterOfRotation(double x, double y, double z);
   void setCenterOfRotation(double xyz[3]) { this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]); }
+
+  // Set the parallel scale
+  void setParallelScale(double scale);
 
   // Toggle center axes visibility.
   void setCenterAxesVisibility(bool visible);
