@@ -386,6 +386,11 @@ if (PARAVIEW_ENABLE_XDMF3)
   endif()
 endif ()
 
+if (PARAVIEW_ENABLE_LAS)
+  list (APPEND _vtk_modules vtkIOLAS)
+endif()
+
+
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
 endif()
