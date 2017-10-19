@@ -932,6 +932,12 @@
       "cswrap": true,
       "pythonwrap": true
     },
+    { "name": "vtkAcceleratorsVTKm",
+      "path": "VTK/Accelerators/Vtkm",
+      "exclude": [
+        { "path": "Testing" }
+      ],
+    },
     { "name": "vtkMetaIO",
       "path": "VTK/Utilities/MetaIO"
     },
@@ -964,6 +970,9 @@
     },
     { "name": "vtklibharu",
       "path": "VTK/ThirdParty/libharu"
+    },
+    { "name": "vtkm",
+      "path": "VTK/ThirdParty/vtkm"
     }
   ],
   "proxies":[
