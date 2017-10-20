@@ -78,6 +78,11 @@ public:
   QList<QVariant> indexedOpacities() const;
   void setIndexedOpacities(const QList<QVariant>&);
 
+  /**
+  * Apply a color preset using its name
+  */
+  void applyPreset(const char* presetName);
+
 signals:
   /**
   * Fired when the annotations are changed.
@@ -129,6 +134,16 @@ private slots:
   * color.
   */
   void onHeaderDoubleClicked(int section);
+
+  /**
+  * Called when user right click on table
+  */
+  void customMenuRequested(QPoint pos);
+
+  /**
+  * Called when global and selected opacity should be set
+  */
+  void execGlobalOpacityDialog();
 
   /**
   * pick a preset.

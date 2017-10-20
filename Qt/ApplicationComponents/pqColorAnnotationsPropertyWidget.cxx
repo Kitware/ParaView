@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChooseColorPresetReaction.h"
 #include "pqDataRepresentation.h"
 #include "pqDoubleRangeDialog.h"
+#include "pqDoubleRangeWidget.h"
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
+#include "pqScalarBarVisibilityReaction.h"
 #include "pqUndoStack.h"
 #include "vtkAbstractArray.h"
 #include "vtkCollection.h"
@@ -68,6 +70,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractTableModel>
 #include <QColorDialog>
 #include <QHeaderView>
+#include <QLabel>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
@@ -109,6 +113,52 @@ QPixmap createOpacitySwatch(double opacity)
 }
 
 //-----------------------------------------------------------------------------
+// Dialog to set global and selected lines opacity
+class pqGlobalOpacityRangeDialog : public QDialog
+{
+public:
+  pqGlobalOpacityRangeDialog(
+    double globalOpacity = 1.0, double selectedOpacity = 1.0, QWidget* parent = 0)
+    : QDialog(parent)
+  {
+    this->GlobalOpacityWidget = new pqDoubleRangeWidget(this);
+    this->GlobalOpacityWidget->setMinimum(0.0);
+    this->GlobalOpacityWidget->setMaximum(1.0);
+    this->GlobalOpacityWidget->setValue(globalOpacity);
+    this->SelectedOpacityWidget = new pqDoubleRangeWidget(this);
+    this->SelectedOpacityWidget->setMinimum(0.0);
+    this->SelectedOpacityWidget->setMaximum(1.0);
+    this->SelectedOpacityWidget->setValue(selectedOpacity);
+
+    QDialogButtonBox* buttonBox =
+      new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+    QHBoxLayout* widgetLayout = new QHBoxLayout;
+    widgetLayout->addWidget(new QLabel(tr("Global Opacity :"), this));
+    widgetLayout->addWidget(this->GlobalOpacityWidget);
+    QHBoxLayout* widgetLayout2 = new QHBoxLayout;
+    widgetLayout2->addWidget(new QLabel(tr("Selected Categories Opacity :"), this));
+    widgetLayout2->addWidget(this->SelectedOpacityWidget);
+
+    QVBoxLayout* layout_ = new QVBoxLayout;
+    layout_->addLayout(widgetLayout);
+    layout_->addLayout(widgetLayout2);
+    layout_->addWidget(buttonBox);
+    this->setLayout(layout_);
+  }
+
+  ~pqGlobalOpacityRangeDialog() override{};
+
+  double globalOpacity() const { return this->GlobalOpacityWidget->value(); }
+  double selectedOpacity() const { return this->SelectedOpacityWidget->value(); }
+
+private:
+  pqDoubleRangeWidget* GlobalOpacityWidget;
+  pqDoubleRangeWidget* SelectedOpacityWidget;
+};
+
 //-----------------------------------------------------------------------------
 // Decorator used to hide the widget when using IndexedLookup.
 class pqColorAnnotationsPropertyWidgetDecorator : public pqPropertyWidgetDecorator
@@ -165,25 +215,37 @@ class pqAnnotationsModel : public QAbstractTableModel
     {
       if (index == 0 && value.canConvert(QVariant::Color))
       {
-        this->Color = value.value<QColor>();
-        this->Swatch = createSwatch(this->Color);
-        return true;
+        if (this->Color != value.value<QColor>())
+        {
+          this->Color = value.value<QColor>();
+          this->Swatch = createSwatch(this->Color);
+          return true;
+        }
       }
       else if (index == 1)
       {
-        this->Opacity = value.toDouble();
-        this->OpacitySwatch = createOpacitySwatch(this->Opacity);
-        return true;
+        if (this->Opacity != value.toDouble())
+        {
+          this->Opacity = value.toDouble();
+          this->OpacitySwatch = createOpacitySwatch(this->Opacity);
+          return true;
+        }
       }
       else if (index == 2)
       {
-        this->Value = value.toString();
-        return true;
+        if (this->Value != value.toString())
+        {
+          this->Value = value.toString();
+          return true;
+        }
       }
       else if (index == 3)
       {
-        this->Annotation = value.toString();
-        return true;
+        if (this->Annotation != value.toString())
+        {
+          this->Annotation = value.toString();
+          return true;
+        }
       }
       return false;
     }
@@ -331,7 +393,7 @@ public:
     {
       this->Items[row].setData(0, this->Colors[row % this->Colors.size()]);
     }
-    this->Items[row].setData(1, 1.0);
+    this->Items[row].setData(1, this->globalOpacity());
     return this->index(row, 0);
   }
 
@@ -371,45 +433,72 @@ public:
 
   void setAnnotations(const QVector<vtkTuple<QString, 2> >& newAnnotations)
   {
-    int size = this->Items.size();
-    int annotationSize = newAnnotations.size();
-    if (annotationSize > size)
+    if (newAnnotations.size() == 0)
     {
-      // rows are added.
-      emit this->beginInsertRows(QModelIndex(), size, annotationSize - 1);
-      this->Items.resize(annotationSize);
-      emit this->endInsertRows();
+      this->removeAllAnnotations();
     }
-
-    // now check for data changes.
-    for (int cc = 0; cc < annotationSize; cc++)
+    else
     {
-      if (this->Items[cc].Value != newAnnotations[cc][0])
+      int size = this->Items.size();
+      int annotationSize = newAnnotations.size();
+      if (annotationSize > size)
       {
-        this->Items[cc].Value = newAnnotations[cc][0];
-        emit this->dataChanged(this->index(cc, 2), this->index(cc, 2));
-      }
-      if (this->Items[cc].Annotation != newAnnotations[cc][1])
-      {
-        this->Items[cc].Annotation = newAnnotations[cc][1];
-        emit this->dataChanged(this->index(cc, 3), this->index(cc, 3));
+        // rows are added.
+        emit this->beginInsertRows(QModelIndex(), size, annotationSize - 1);
+        this->Items.resize(annotationSize);
+        emit this->endInsertRows();
       }
 
-      if (this->Colors.size() > 0)
+      // now check for data changes.
+      bool valueFlag = false;
+      bool annotationFlag = false;
+      bool colorFlag = false;
+      bool opacityFlag = false;
+      for (int cc = 0; cc < annotationSize; cc++)
       {
-        if (this->Items[cc].data(4).isNull())
+        if (this->Items[cc].Value != newAnnotations[cc][0])
         {
-          // Copy color, using modulo if annotation are bigger than current number of colors
-          // and color is not yet defined for this item
-          this->Items[cc].setData(0, this->Colors[cc % this->Colors.size()]);
-          emit this->dataChanged(this->index(cc, 0), this->index(cc, 0));
+          this->Items[cc].Value = newAnnotations[cc][0];
+          valueFlag = true;
         }
-        // Initialize Opacities if not defined
-        if (this->Items[cc].data(5).toDouble() == -1)
+        if (this->Items[cc].Annotation != newAnnotations[cc][1])
         {
-          this->Items[cc].setData(1, 1.0);
-          emit this->dataChanged(this->index(cc, 1), this->index(cc, 1));
+          this->Items[cc].Annotation = newAnnotations[cc][1];
+          annotationFlag = true;
         }
+
+        if (this->Colors.size() > 0)
+        {
+          if (!this->Items[cc].Color.isValid())
+          {
+            // Copy color, using modulo if annotation are bigger than current number of colors
+            // and color is not yet defined for this item
+            this->Items[cc].setData(0, this->Colors[cc % this->Colors.size()]);
+            colorFlag = true;
+          }
+          // Initialize Opacities if not defined
+          if (this->Items[cc].Opacity == -1)
+          {
+            this->Items[cc].setData(1, 1.0);
+            opacityFlag = true;
+          }
+        }
+      }
+      if (colorFlag)
+      {
+        emit this->dataChanged(this->index(0, 0), this->index(this->Items.size() - 1, 0));
+      }
+      if (opacityFlag)
+      {
+        emit this->dataChanged(this->index(0, 1), this->index(this->Items.size() - 1, 1));
+      }
+      if (valueFlag)
+      {
+        emit this->dataChanged(this->index(0, 2), this->index(this->Items.size() - 1, 2));
+      }
+      if (annotationFlag)
+      {
+        emit this->dataChanged(this->index(0, 3), this->index(this->Items.size() - 1, 3));
       }
     }
   }
@@ -432,11 +521,22 @@ public:
     int colorSize = newColors.size();
 
     // now check for data changes.
-    for (int cc = 0; cc < this->Items.size(); cc++)
+    if (colorSize > 0)
     {
-      // Add color with a modulo so all values have colors
-      this->Items[cc].setData(0, newColors[cc % colorSize]);
-      emit this->dataChanged(this->index(cc, 0), this->index(cc, 0));
+      bool colorFlag = false;
+      for (int cc = 0; cc < this->Items.size(); cc++)
+      {
+        if (!this->Items[cc].Color.isValid() || this->Items[cc].Color != newColors[cc % colorSize])
+        {
+          // Add color with a modulo so all values have colors
+          this->Items[cc].setData(0, newColors[cc % colorSize]);
+          colorFlag = true;
+        }
+      }
+      if (colorFlag)
+      {
+        emit this->dataChanged(this->index(0, 0), this->index(this->Items.size() - 1, 0));
+      }
     }
   }
 
@@ -452,12 +552,22 @@ public:
     return icolors;
   }
 
+  bool hasColors() const { return this->Colors.size() != 0; }
+
   void setIndexedOpacities(const QVector<double>& newOpacities)
   {
+    bool opacityFlag = false;
     for (int cc = 0; cc < this->Items.size() && cc < newOpacities.size(); cc++)
     {
-      this->Items[cc].setData(1, newOpacities[cc]);
-      emit this->dataChanged(this->index(cc, 1), this->index(cc, 1));
+      if (this->Items[cc].Opacity == -1 || this->Items[cc].Opacity != newOpacities[cc])
+      {
+        this->Items[cc].setData(1, newOpacities[cc]);
+        opacityFlag = true;
+      }
+    }
+    if (opacityFlag)
+    {
+      emit this->dataChanged(this->index(0, 1), this->index(this->Items.size() - 1, 1));
     }
   }
 
@@ -476,14 +586,39 @@ public:
   void setGlobalOpacity(double opacity)
   {
     this->GlobalOpacity = opacity;
+    bool opacityFlag = false;
     for (int cc = 0; cc < this->Items.size(); cc++)
     {
-      this->Items[cc].setData(1, opacity);
-      emit this->dataChanged(this->index(cc, 1), this->index(cc, 1));
+      if (this->Items[cc].Opacity == -1 || this->Items[cc].Opacity != opacity)
+      {
+        this->Items[cc].setData(1, opacity);
+        opacityFlag = true;
+      }
+    }
+    if (opacityFlag)
+    {
+      emit this->dataChanged(this->index(0, 1), this->index(this->Items.size() - 1, 1));
     }
   }
 
   double globalOpacity() { return this->GlobalOpacity; }
+
+  void setSelectedOpacity(QList<int> rows, double opacity)
+  {
+    bool opacityFlag = false;
+    foreach (int cc, rows)
+    {
+      if (this->Items[cc].Opacity == -1 || this->Items[cc].Opacity != opacity)
+      {
+        this->Items[cc].setData(1, opacity);
+        opacityFlag = true;
+      }
+    }
+    if (opacityFlag)
+    {
+      emit this->dataChanged(this->index(0, 1), this->index(this->Items.size() - 1, 1));
+    }
+  }
 
 private:
   Q_DISABLE_COPY(pqAnnotationsModel)
@@ -572,7 +707,13 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
   QObject::connect(ui.AnnotationsTable->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this,
     SLOT(onHeaderDoubleClicked(int)));
   QObject::connect(ui.AnnotationsTable, SIGNAL(editPastLastRow()), this, SLOT(editPastLastRow()));
+  ui.AnnotationsTable->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(ui.AnnotationsTable, SIGNAL(customContextMenuRequested(QPoint)), this,
+    SLOT(customMenuRequested(QPoint)));
 
+  // Opacity mapping enable/disable mechanism
+  this->connect(
+    ui.EnableOpacityMapping, SIGNAL(stateChanged(int)), SLOT(updateOpacityColumnState()));
   vtkSMProperty* smproperty = smgroup->GetProperty("EnableOpacityMapping");
   if (smproperty)
   {
@@ -582,18 +723,35 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
   {
     ui.EnableOpacityMapping->hide();
   }
-  this->connect(
-    ui.EnableOpacityMapping, SIGNAL(stateChanged(int)), SLOT(updateOpacityColumnState()));
   this->updateOpacityColumnState();
 
+  // Default colors
+  if (!this->Internals->Model.hasColors())
+  {
+    this->applyPreset("KAAMS");
+  }
+}
+
+//-----------------------------------------------------------------------------
+pqColorAnnotationsPropertyWidget::~pqColorAnnotationsPropertyWidget()
+{
+  delete this->Internals;
+  this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsPropertyWidget::applyPreset(const char* presetName)
+{
   vtkNew<vtkSMTransferFunctionPresets> presets;
-  const Json::Value& preset = presets->GetFirstPresetWithName("KAAMS");
+  const Json::Value& preset = presets->GetFirstPresetWithName(presetName);
   const Json::Value& indexedColors = preset["IndexedColors"];
   if (indexedColors.isNull() || !indexedColors.isArray() || (indexedColors.size() % 4) != 0 ||
     indexedColors.size() == 0)
   {
-    qWarning("Could not use KAAMS preset as default preset. Preset may not be valid. Please "
-             "validate the KAAMS preset");
+    QString warningMessage = "Could not use " + QString(presetName) +
+      " preset as default preset. Preset may not be valid. Please "
+      "validate this preset";
+    qWarning("%s", warningMessage.toUtf8().data());
   }
   else
   {
@@ -604,13 +762,6 @@ pqColorAnnotationsPropertyWidget::pqColorAnnotationsPropertyWidget(
     }
     this->setIndexedColors(defaultPresetVariant);
   }
-}
-
-//-----------------------------------------------------------------------------
-pqColorAnnotationsPropertyWidget::~pqColorAnnotationsPropertyWidget()
-{
-  delete this->Internals;
-  this->Internals = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -656,13 +807,27 @@ void pqColorAnnotationsPropertyWidget::onHeaderDoubleClicked(int index)
 {
   if (index == 1)
   {
-    pqDoubleRangeDialog dialog("Global Opacity:", 0.0, 1.0, this);
-    dialog.setWindowTitle("Select Global Opacity");
-    dialog.setValue(this->Internals->Model.globalOpacity());
-    if (dialog.exec() == QDialog::Accepted)
+    this->execGlobalOpacityDialog();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorAnnotationsPropertyWidget::execGlobalOpacityDialog()
+{
+  pqGlobalOpacityRangeDialog dialog(this->Internals->Model.globalOpacity(), 1.0, this);
+  dialog.setWindowTitle(tr("Set Global Opacity"));
+  dialog.move(QCursor::pos());
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    this->Internals->Model.setGlobalOpacity(dialog.globalOpacity());
+
+    QList<int> selectedRows;
+    QItemSelectionModel* select = this->Internals->Ui.AnnotationsTable->selectionModel();
+    foreach (QModelIndex idx, select->selectedRows(1))
     {
-      this->Internals->Model.setGlobalOpacity(dialog.value());
+      selectedRows.append(idx.row());
     }
+    this->Internals->Model.setSelectedOpacity(selectedRows, dialog.selectedOpacity());
   }
 }
 
@@ -673,7 +838,7 @@ void pqColorAnnotationsPropertyWidget::onDoubleClicked(const QModelIndex& idx)
   {
     QColor color = this->Internals->Model.data(idx, Qt::EditRole).value<QColor>();
     color = QColorDialog::getColor(
-      color, this, "Choose Annotation Color", QColorDialog::DontUseNativeDialog);
+      color, this, tr("Choose Annotation Color"), QColorDialog::DontUseNativeDialog);
     if (color.isValid())
     {
       this->Internals->Model.setData(idx, color);
@@ -682,8 +847,9 @@ void pqColorAnnotationsPropertyWidget::onDoubleClicked(const QModelIndex& idx)
   if (idx.column() == 1)
   {
     double opacity = this->Internals->Model.data(idx, Qt::EditRole).toDouble();
-    pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, this);
-    dialog.setWindowTitle("Select Opacity");
+    pqDoubleRangeDialog dialog(tr("Opacity:"), 0.0, 1.0, this);
+    dialog.setWindowTitle(tr("Select Opacity"));
+    dialog.move(QCursor::pos());
     dialog.setValue(opacity);
     if (dialog.exec() == QDialog::Accepted)
     {
@@ -728,9 +894,8 @@ QList<QVariant> pqColorAnnotationsPropertyWidget::indexedColors() const
 {
   QList<QVariant> reply;
   QVector<QColor> colors = this->Internals->Model.indexedColors();
-  for (int i = 0; i < colors.count(); i++)
+  foreach (const QColor& color, colors)
   {
-    QColor color = colors[i];
     reply.push_back(color.redF());
     reply.push_back(color.greenF());
     reply.push_back(color.blueF());
@@ -756,6 +921,7 @@ void pqColorAnnotationsPropertyWidget::setIndexedColors(const QList<QVariant>& v
   }
 
   this->Internals->Model.setIndexedColors(colors);
+  emit this->indexedColorsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -780,6 +946,7 @@ void pqColorAnnotationsPropertyWidget::setIndexedOpacities(const QList<QVariant>
     opacities[cc] = value[cc].toDouble();
   }
   this->Internals->Model.setIndexedOpacities(opacities);
+  emit this->indexedOpacitiesChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -880,19 +1047,25 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
   if (!this->addActiveAnnotations(false))
   {
     QMessageBox* box = new QMessageBox(this);
-    box->setWindowTitle("Couldn't determine discrete values");
-    box->setText("Could not determine discrete values or too many discrete value,"
-                 " using the data produced by the current source/filter. "
-                 "Please add annotations manually or force generation.");
-    box->addButton(QMessageBox::Ok);
-    box->addButton("Force", QMessageBox::ActionRole);
-    if (!box->exec())
+    box->setWindowTitle(tr("Couldn't determine discrete values"));
+    box->setText(
+      tr("Problems generating values or too many discrete value,"
+         " using the data produced by the current source/filter. "
+         "Please add annotations manually or force generation. Forcing the generation will"
+         " automatically hide the Scalar Bar."));
+    box->addButton(tr("Force"), QMessageBox::AcceptRole);
+    box->addButton(QMessageBox::Cancel);
+    if (box->exec() != QMessageBox::Cancel)
     {
+      QAction action;
+      pqScalarBarVisibilityReaction reaction(&action);
+      reaction.setScalarBarVisibility(false);
+
       if (!this->addActiveAnnotations(true))
       {
-        QMessageBox::warning(this, "Couldn't determine discrete values",
-          "Could not determine discrete values using the data produced by the "
-          "current source/filter. Please add annotations manually.",
+        QMessageBox::warning(this, tr("Couldn't determine discrete values"),
+          tr("Could not determine discrete values using the data produced by the "
+             "current source/filter. Please add annotations manually."),
           QMessageBox::Ok);
       }
     }
@@ -956,21 +1129,29 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
 {
   if (!this->addActiveAnnotationsFromVisibleSources(false))
   {
+
     QMessageBox* box = new QMessageBox(this);
-    box->setWindowTitle("Missing or unavailable discrete values");
-    box->setText("Some discrete values are missing or are unavailable because these is too many "
-                 "discrete value,"
-                 "Please add annotations manually or try to force generation.");
-    box->addButton(QMessageBox::Ok);
-    box->addButton("Force", QMessageBox::ActionRole);
-    if (!box->exec())
+    box->setWindowTitle(tr("Couldn't determine discrete values"));
+    box->setText(
+      tr("Some discrete values are missing or are unavailable because these is too many "
+         "discrete value,"
+         "Please add annotations manually or force generation. Forcing the generation will"
+         " automatically hide the Scalar Bar."));
+    box->addButton(tr("Force"), QMessageBox::AcceptRole);
+    box->addButton(QMessageBox::Cancel);
+    if (box->exec() != QMessageBox::Cancel)
     {
+      QAction action;
+      pqScalarBarVisibilityReaction reaction(&action);
+      reaction.setScalarBarVisibility(false);
+
       if (!this->addActiveAnnotationsFromVisibleSources(true))
       {
-        QMessageBox::warning(this, "Missing or unavailable discrete values",
-          "Some discrete values are missing or are unavailable because these is too many discrete "
-          "value,"
-          "Please add annotations manually or try to force generation.",
+        QMessageBox::warning(this, tr("Missing or unavailable discrete values"),
+          tr("Some discrete values are missing or are unavailable because these is too many "
+             "discrete "
+             "value,"
+             "Please add annotations manually or try to force generation."),
           QMessageBox::Ok);
       }
     }
@@ -1084,6 +1265,7 @@ bool pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources(bo
 void pqColorAnnotationsPropertyWidget::removeAllAnnotations()
 {
   this->Internals->Model.removeAllAnnotations();
+  this->Internals->Model.setGlobalOpacity(1.0);
   emit this->annotationsChanged();
 }
 
@@ -1095,6 +1277,7 @@ void pqColorAnnotationsPropertyWidget::choosePreset(const char* presetName)
   ccpr->setTransferFunction(this->proxy());
   this->connect(ccpr, SIGNAL(presetApplied()), SIGNAL(changeFinished()));
   ccpr->choosePreset(presetName);
+  emit this->indexedColorsChanged();
   delete ccpr;
   delete tmp;
 }
@@ -1135,4 +1318,16 @@ void pqColorAnnotationsPropertyWidget::saveAsPreset()
     presetName = presets->AddUniquePreset(cpreset);
   }
   this->choosePreset(presetName);
+}
+
+void pqColorAnnotationsPropertyWidget::customMenuRequested(QPoint pos)
+{
+  // Show a contextual menu to set global opacity and selected rows opacities
+  QMenu* menu = new QMenu(this);
+  Ui::ColorAnnotationsPropertyWidget& ui = this->Internals->Ui;
+  QAction* opacityAction = new QAction(tr("Set global and selected opacity"), this);
+  opacityAction->setEnabled(ui.EnableOpacityMapping->isChecked());
+  QObject::connect(opacityAction, SIGNAL(triggered(bool)), this, SLOT(execGlobalOpacityDialog()));
+  menu->addAction(opacityAction);
+  menu->popup(ui.AnnotationsTable->viewport()->mapToGlobal(pos));
 }
