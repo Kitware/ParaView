@@ -343,6 +343,12 @@ protected:
   vtkSMTransferFunctionProxy();
   ~vtkSMTransferFunctionProxy() override;
 
+  /**
+   * Attempt to reset transfer function to site settings. If site settings are not
+   * available, then the application XML defaults are used.
+   */
+  void RestoreFromSiteSettingsOrXML(const char* arrayName);
+
 private:
   vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) = delete;
   void operator=(const vtkSMTransferFunctionProxy&) = delete;

@@ -373,6 +373,12 @@ bool vtkSMTransferFunctionProxy::ComputeDataRange(double range[2])
 //----------------------------------------------------------------------------
 bool vtkSMTransferFunctionProxy::ComputeAvailableAnnotations(bool extend)
 {
+  if (strcmp(this->GetXMLName(), "PiecewiseFunction") == 0)
+  {
+    // This is a scalar opacity function. Do not compute available annotations.
+    return false;
+  }
+
   int component = -1;
   if (vtkSMPropertyHelper(this, "VectorMode").GetAsInt() == vtkScalarsToColors::COMPONENT)
   {
@@ -861,6 +867,38 @@ bool vtkSMTransferFunctionProxy::UpdateScalarBarsComponentTitle(vtkPVArrayInform
 }
 
 //----------------------------------------------------------------------------
+void vtkSMTransferFunctionProxy::RestoreFromSiteSettingsOrXML(const char* arrayName)
+{
+  // First reset to XML defaults
+  this->ResetPropertiesToXMLDefaults();
+
+  // Restore to site setting if there is one. If there isn't, this does not
+  // change the property setting. NOTE: user settings have priority
+  // of VTK_DOUBLE_MAX, so we set the site settings priority to a
+  // number just below VTK_DOUBLE_MAX.
+  vtkSMSettings* settings = vtkSMSettings::GetInstance();
+
+  // First, check to see if there is an array-specific transfer function in
+  // the settings.
+  double sitePriority = nextafter(VTK_DOUBLE_MAX, 0);
+  std::ostringstream prefix;
+  prefix << ".array_" << this->GetXMLGroup() << "." << arrayName;
+  if (settings->HasSetting(prefix.str().c_str(), sitePriority))
+  {
+    // Attempt to use array-specific site setting
+    settings->GetProxySettings(prefix.str().c_str(), this, sitePriority);
+  }
+  else
+  {
+    // Attempt to use general site setting
+    settings->GetProxySettings(this, sitePriority);
+  }
+
+  // Need to identify the active annotations in the dataset.
+  this->ComputeAvailableAnnotations(this, false);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
   const char* arrayName, bool preserve_range)
 {
@@ -881,7 +919,7 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
     unsigned int num_elements = cntrlPoints.GetNumberOfElements();
     if (num_elements == 0 || num_elements == 4)
     {
-      // nothing to do, but not an error, so return true.
+      // nothing to do, so restore without rescaling the range
       throw true;
     }
 
@@ -893,27 +931,8 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
     std::sort(points.begin(), points.end(), StrictWeakOrdering());
 
     double range[2] = { points.front().GetData()[0], points.back().GetData()[0] };
-    this->ResetPropertiesToXMLDefaults();
 
-    // Restore to site setting if there is one. If there isn't, this does not
-    // change the property setting. NOTE: user settings have priority
-    // of VTK_DOUBLE_MAX, so we set the site settings priority to a
-    // number just below VTK_DOUBLE_MAX.
-    vtkSMSettings* settings = vtkSMSettings::GetInstance();
-
-    // First, check to see if there is an array-specific transfer function in
-    // the settings.
-    double sitePriority = nextafter(VTK_DOUBLE_MAX, 0);
-    std::ostringstream prefix;
-    prefix << ".array_" << this->GetXMLGroup() << "." << arrayName;
-    if (settings->HasSetting(prefix.str().c_str(), sitePriority))
-    {
-      settings->GetProxySettings(prefix.str().c_str(), this, sitePriority);
-    }
-    else
-    {
-      settings->GetProxySettings(this, sitePriority);
-    }
+    this->RestoreFromSiteSettingsOrXML(arrayName);
 
     this->RescaleTransferFunction(range[0], range[1], false);
   }
@@ -921,9 +940,12 @@ void vtkSMTransferFunctionProxy::ResetPropertiesToDefaults(
   {
     if (val)
     {
-      this->ResetPropertiesToXMLDefaults();
+      this->RestoreFromSiteSettingsOrXML(arrayName);
     }
   }
+
+  // Ensure the lookup table is rebuilt.
+  this->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
