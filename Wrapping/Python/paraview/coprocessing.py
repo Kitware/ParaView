@@ -526,7 +526,7 @@ class CoProcessor(object):
             colorArrayInfo = rep.GetArrayInformationForColorArray()
             if not colorArrayInfo:
                 import sys
-                datarange = [sys.float_info.max, sys.float_info.min]
+                datarange = [sys.float_info.max, -sys.float_info.max]
             else:
                 if lut.VectorMode != 'Magnitude' or \
                    colorArrayInfo.GetNumberOfComponents() == 1:
