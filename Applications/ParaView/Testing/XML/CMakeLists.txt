@@ -363,6 +363,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PointGaussianScaleOpacityArray.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolarAxes.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PolyLineSource.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion2.xml
