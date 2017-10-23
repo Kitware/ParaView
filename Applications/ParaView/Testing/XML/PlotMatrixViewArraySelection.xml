@@ -28,5 +28,5 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.506667,0.663333,1,0,0)" />
 
   <!-- give application time to go through the "animation" as a consequence of the above click -->
-  <pqevent object="pqClientMainWindow" command="process_events" arguments="10000"/>
+  <pqevent object="pqClientMainWindow" command="process_events" arguments="30000"/>
 </pqevents>
