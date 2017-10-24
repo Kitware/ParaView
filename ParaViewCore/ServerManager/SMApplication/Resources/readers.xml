@@ -1451,6 +1451,18 @@
         <Documentation>This property specifies the file name for the VTK
         multi-block reader.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetPieceDistribution"
+                         default_values="0"
+                         name="PieceDistribution"
+                         number_of_elements="1">
+        <Documentation>Control how datasets are loaded in parallel.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Block"
+                 value="0" />
+          <Entry text="Interleave"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <!-- End MultiBlockDataReader -->
     </SourceProxy>
     <SourceProxy class="vtkXMLHierarchicalBoxDataReader"
@@ -3604,6 +3616,9 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="XMLMultiBlockDataReaderCore"></Proxy>
+          <ExposedProperties>
+            <Property name="PieceDistribution" />
+          </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
