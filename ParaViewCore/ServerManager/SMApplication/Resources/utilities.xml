@@ -980,6 +980,11 @@
           <Group name="lookup_tables" />
         </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty command="GetEstimatedNumberOfAnnotations"
+                         information_only="1"
+                         name="EstimatedNumberOfAnnotations">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetVisibility"
                          default_values="1"
@@ -1020,6 +1025,18 @@
                          command="SetForceHorizontalTitle"
                          default_values="0"
                          name="HorizontalTitle"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When on, orients the title horizontally. When off (default), the title
+          will be rotated counter-clockwise 90 degrees and lie parallel to the
+          color bar.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetForceHorizontalTitle"
+                         default_values="0"
+                         name="HorizontalTitle2"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>

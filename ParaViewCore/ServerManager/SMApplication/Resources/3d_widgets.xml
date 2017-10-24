@@ -462,6 +462,7 @@
                proxyname="ScalarBarActor"></Proxy>
 
         <ExposedProperties>
+          <Property name="EstimatedNumberOfAnnotations" panel_visibility="never"/>
           <Property name="LookupTable" panel_visibility="never"/>
           <PropertyGroup label="Title Texts">
             <Property name="Title" />

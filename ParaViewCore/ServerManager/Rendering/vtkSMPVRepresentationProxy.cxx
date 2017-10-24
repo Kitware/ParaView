@@ -858,3 +858,43 @@ void vtkSMPVRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+int vtkSMPVRepresentationProxy::GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* view)
+{
+  if (!view)
+  {
+    return -1;
+  }
+
+  if (!this->GetUsingScalarColoring())
+  {
+    return 0;
+  }
+
+  vtkSMProperty* lutProperty = this->GetProperty("LookupTable");
+  if (!lutProperty)
+  {
+    vtkWarningMacro("Missing 'LookupTable' property.");
+    return -1;
+  }
+
+  vtkSMPropertyHelper lutPropertyHelper(lutProperty);
+  if (lutPropertyHelper.GetNumberOfElements() == 0 || lutPropertyHelper.GetAsProxy(0) == NULL)
+  {
+    vtkWarningMacro("Failed to determine the LookupTable being used.");
+    return -1;
+  }
+
+  vtkSMProxy* lutProxy = lutPropertyHelper.GetAsProxy(0);
+  vtkNew<vtkSMTransferFunctionManager> mgr;
+  vtkSMProxy* sbProxy = mgr->GetScalarBarRepresentation(lutProxy, view);
+  if (!sbProxy)
+  {
+    vtkWarningMacro("Failed to locate/create ScalarBar representation.");
+    return -1;
+  }
+
+  sbProxy->UpdatePropertyInformation();
+  return vtkSMPropertyHelper(sbProxy, "EstimatedNumberOfAnnotations").GetAsInt();
+}

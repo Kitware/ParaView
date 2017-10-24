@@ -311,6 +311,16 @@ public:
   //@}
 
   /**
+   * Get an estimated number of annotation shown on this representation scalar bar
+   */
+  int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* view);
+  static int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* proxy, vtkSMProxy* view)
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->GetEstimatedNumberOfAnnotationsOnScalarBar(view) : -1;
+  }
+
+  /**
    * Overridden to ensure when picking representation types that require scalar
    * colors, scalar coloring it setup properly. Currently this is hard-coded for
    * Volume and Slice representation types.
