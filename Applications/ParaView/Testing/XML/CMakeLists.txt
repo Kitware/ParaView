@@ -293,7 +293,9 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditorVolumeControls.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorLegendMinMaxLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorOpacityTableEditing.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalAutomaticAnnotations.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColors.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalOpacities.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorByCellDataStringArray.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeViewOverlay.xml
