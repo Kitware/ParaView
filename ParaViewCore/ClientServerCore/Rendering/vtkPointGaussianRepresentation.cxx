@@ -33,6 +33,7 @@ vtkStandardNewMacro(vtkPointGaussianRepresentation)
   this->LastScaleArrayComponent = 0;
   this->OpacityByArray = false;
   this->LastOpacityArray = NULL;
+  this->SelectedPreset = vtkPointGaussianRepresentation::GAUSSIAN_BLUR;
   InitializeShaderPresets();
 }
 
