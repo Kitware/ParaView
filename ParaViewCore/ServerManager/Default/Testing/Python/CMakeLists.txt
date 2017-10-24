@@ -33,6 +33,7 @@ set(PY_TESTS
   IntegrateAttributes.py,NO_VALID
   MultiServer.py,NO_VALID
   PointGaussianProperties.py
+  CompositeDataFieldArraysInformation.py,NO_VALID
   ProgrammableFilterProperties.py,NO_VALID
   ProgrammableFilter.py,NO_VALID
   ProxyBackwardsCompatibilityTest.py,NO_VALID
