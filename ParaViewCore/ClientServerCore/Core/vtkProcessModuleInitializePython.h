@@ -34,6 +34,11 @@ namespace
 // ParaView should setup Python Path to find the modules in the following
 // locations for various platforms. There are always two cases to handle: when
 // running from build-location and when running from installed-location.
+// In the case of Frozen Python being used though we don't initialize Python
+// paths in order to avoid unnecessary file-system accesses. Note that this
+// use case is for HPC use where we potentially have thousands or more
+// processes trying to access the same files. This option is not available
+// on Windows or Mac OSs.
 
 //----------------------------------------------------------------------------
 void vtkPythonAppInitPrependPythonPath(const std::string& dir)
@@ -48,7 +53,6 @@ void vtkPythonAppInitPrependPythonPath(const std::string& dir)
   }
 }
 
-#ifndef PARAVIEW_FREEZE_PYTHON
 #if defined(_WIN32)
 void vtkPythonAppInitPrependPathWindows(const std::string& SELF_DIR);
 #elif defined(__APPLE__)
@@ -56,14 +60,10 @@ void vtkPythonAppInitPrependPathOsX(const std::string& SELF_DIR);
 #else
 void vtkPythonAppInitPrependPathLinux(const std::string& SELF_DIR);
 #endif
-#endif // ifndef PARAVIEW_FREEZE_PYTHON
 
 //----------------------------------------------------------------------------
 void vtkPythonAppInitPrependPath(const std::string& SELF_DIR)
 {
-// We don't initialize Python paths when Frozen Python is being used. This
-// avoid unnecessary file-system accesses..
-#ifndef PARAVIEW_FREEZE_PYTHON
 #if defined(_WIN32)
   vtkPythonAppInitPrependPathWindows(SELF_DIR);
 #elif defined(__APPLE__)
@@ -71,7 +71,6 @@ void vtkPythonAppInitPrependPath(const std::string& SELF_DIR)
 #else
   vtkPythonAppInitPrependPathLinux(SELF_DIR);
 #endif
-#endif // ifndef PARAVIEW_FREEZE_PYTHON
 
 // *** The following maybe obsolete. Need to verify and remove. ***
 
@@ -102,7 +101,6 @@ void vtkPythonAppInitPrependPath(const std::string& SELF_DIR)
 #endif // if defined(_WIN32)
 }
 
-#ifndef PARAVIEW_FREEZE_PYTHON
 #if defined(_WIN32)
 //===========================================================================
 // Windows
@@ -282,35 +280,53 @@ void vtkPythonAppInitPrependPathLinux(const std::string& SELF_DIR);
 //      - SELF_DIR/../lib/paraview-<version>/site-packages
 //    + VTK Python Module libraries
 //      - SELF_DIR/../lib/paraview-<version>/site-packages/vtk
+//
+// If we're using Frozen Python we only need to add location
+// where VTK Python libs are (e.g. vtkCommonCorePython.so)
+// for shared builds.
 void vtkPythonAppInitPrependPathLinux(const std::string& SELF_DIR)
 {
+  bool using_shared_libs = false;
+#ifdef BUILD_SHARED_LIBS
+  using_shared_libs = true;
+#endif
+  bool freeze_python = false;
+#ifdef PARAVIEW_FREEZE_PYTHON
+  freeze_python = true;
+#endif
   // Determine if running from build or install dir.
   //    If SELF_DIR/../ParaViewConfig.cmake, it must be running from the build
   //    directory.
   bool is_build_dir = vtkPSystemTools::FileExists((SELF_DIR + "/../ParaViewConfig.cmake").c_str());
   if (is_build_dir)
   {
-    vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib");
-    vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib/site-packages");
+    if (freeze_python == false)
+    {
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib/site-packages");
+    }
+    if (using_shared_libs == true)
+    {
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/../lib");
+    }
+
     return;
   }
 
   // We're running from installed directory. We could be either a shared build
   // or a static build.
-  bool using_shared_libs = false;
-#ifdef BUILD_SHARED_LIBS
-  using_shared_libs = true;
-#endif
   if (using_shared_libs)
   {
-    vtkPythonAppInitPrependPythonPath(SELF_DIR);
-    vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages");
+    if (freeze_python == false)
+    {
+      vtkPythonAppInitPrependPythonPath(SELF_DIR);
+      vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages");
+    }
     // site-packages/vtk needs to be added so the Python wrapped VTK modules
     // can be loaded from paraview e.g. import vtkCommonCorePython can work
     // (BUG #14263).
     vtkPythonAppInitPrependPythonPath(SELF_DIR + "/site-packages/vtk");
   }
-  else
+  else if (freeze_python == false) // also a static build
   {
     vtkPythonAppInitPrependPythonPath(
       SELF_DIR + "/../lib/paraview-" PARAVIEW_VERSION "/site-packages");
@@ -320,7 +336,6 @@ void vtkPythonAppInitPrependPathLinux(const std::string& SELF_DIR)
 }
 //===========================================================================
 #endif
-#endif // ifndef PARAVIEW_FREEZE_PYTHON
 }
 
 #endif

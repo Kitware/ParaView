@@ -443,7 +443,7 @@ endif()
 # Add ability to freeze Python modules.
 cmake_dependent_option(PARAVIEW_FREEZE_PYTHON
   "Freeze Python packages/modules into the application." OFF
-  "PARAVIEW_ENABLE_PYTHON;NOT WIN32" OFF)
+  "PARAVIEW_ENABLE_PYTHON;NOT WIN32;NOT APPLE" OFF)
 mark_as_advanced(PARAVIEW_FREEZE_PYTHON)
 
 #------------------------------------------------------------------------------
