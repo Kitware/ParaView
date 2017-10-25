@@ -702,6 +702,7 @@
         { "class": "vtkSMRepresentationProxy" },
         { "class": "vtkSMRepresentationTypeDomain" },
         { "class": "vtkSMRepresentedArrayListDomain" },
+        { "class": "vtkSMSaveScreenshotProxy" },
         { "class": "vtkSMScalarBarWidgetRepresentationProxy" },
         { "class": "vtkSMSelectionHelper" },
         { "class": "vtkSMSpreadSheetRepresentationProxy" },
@@ -713,6 +714,7 @@
         { "class": "vtkSMViewLayoutProxy" },
         { "class": "vtkSMViewProxy" },
         { "class": "vtkSMViewProxyInteractorHelper" },
+        { "class": "vtkSMViewResolutionDomain" },
         { "class": "vtkSMWidgetRepresentationProxy" }
       ],
       "replace": [
@@ -1013,10 +1015,11 @@
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
       "proxies":[
+        "GridAxes3DActor",
         "PiecewiseFunction",
         "PVLookupTable",
-        "ViewLayout",
-        "GridAxes3DActor"
+        "SaveScreenshot",
+        "ViewLayout"
       ]
     }
   ]
