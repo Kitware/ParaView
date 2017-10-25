@@ -228,8 +228,7 @@ cmake_dependent_option(PARAVIEW_USE_ICE_T
   "Enable IceT (needed for parallel rendering)" ON
   "PARAVIEW_USE_MPI" OFF)
 cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
-  "Initialize MPI on client-processes by default. Can be overridden using command line arguments"
-  OFF
+  "Initialize MPI on client-processes by default. Can be overridden using command line arguments" ON
   "PARAVIEW_USE_MPI" OFF)
 
 mark_as_advanced(PARAVIEW_USE_ICE_T
