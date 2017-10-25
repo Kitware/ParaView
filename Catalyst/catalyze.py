@@ -54,30 +54,8 @@ def filter_proxies(fin, fout, proxies, all_proxies):
   if not root.tag == 'ServerManagerConfiguration':
     raise RuntimeError('Invalid ParaView XML file input')
   new_tree = ET.Element('ServerManagerConfiguration')
-  proxy_tags = (
-    'CameraProxy',
-    'ChartRepresentationProxy',
-    'ComparativeViewProxy',
-    'ContextViewProxy',
-    'MultiSliceViewProxy',
-    'NullProxy',
-    'ParallelCoordinatesRepresentationProxy',
-    'PlotMatrixViewProxy',
-    'Proxy',
-    'PVRepresentationProxy',
-    'PSWriterProxy',
-    'PWriterProxy',
-    'PythonViewProxy',
-    'RenderViewProxy',
-    'RepresentationProxy',
-    'SourceProxy',
-    'SpreadSheetRepresentationProxy',
-    'TimeKeeperProxy',
-    'TransferFunctionProxy',
-    'ViewLayoutProxy',
-    'WriterProxy')
   def is_wanted(proxy):
-    return proxy.tag in proxy_tags and \
+    return proxy.tag.endswith("Proxy") and \
            'name' in proxy.attrib and \
            proxy.attrib['name'] in proxies
   for group in root.iter('ProxyGroup'):
