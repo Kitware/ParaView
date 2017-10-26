@@ -141,6 +141,13 @@ if (vtkiolas_index GREATER 0)
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_las.xml)
 endif()
 
+list(FIND VTK_MODULES_ENABLED "vtkIOPDAL" vtkiopdal_index)
+if (vtkiopdal_index GREATER 0)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_pdal.xml)
+endif()
+
+
 list(FIND VTK_MODULES_ENABLED "vtkIOADIOS" vtkioadios_index)
 if (vtkioadios_index GREATER 0)
   list(APPEND requestedResourceFiles

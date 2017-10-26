@@ -210,6 +210,8 @@ option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_GDAL)
 option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_LAS)
+option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
+mark_as_advanced(PARAVIEW_ENABLE_PDAL)
 
 
 if (UNIX)
