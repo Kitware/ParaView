@@ -29,6 +29,7 @@ if (PARAVIEW_FREEZE_PYTHON)
   set (FreezePython_SRC_DIR "${ParaView_SOURCE_DIR}/ThirdParty/FreezePython")
   set (output_dir "${CMAKE_CURRENT_BINARY_DIR}/FrozenPython")
 
+  get_filename_component(PYTHON_LIBRARY_PATH ${PYTHON_LIBRARY} DIRECTORY)
   add_custom_command(
     OUTPUT "${output_dir}/vtkFrozenParaViewPython.h"
     COMMAND ${CMAKE_COMMAND}
@@ -36,6 +37,7 @@ if (PARAVIEW_FREEZE_PYTHON)
             -DPACKAGE_ROOT:PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages"
             -DPYTHON_EXECUTABLE:FILEPATH="${PYTHON_EXECUTABLE}"
             -DOUTPUT_HEADER_PREFIX:STRING="vtkFrozenParaViewPython"
+            -DPYTHON_LIBRARY_PATH:PATH="${PYTHON_LIBRARY_PATH}"
             -P "${FreezePython_SRC_DIR}/vtkFreezePython.cmake"
     DEPENDS "${FreezePython_SRC_DIR}/vtkFreezePython.cmake"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"

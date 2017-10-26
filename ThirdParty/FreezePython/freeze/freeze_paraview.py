@@ -74,6 +74,8 @@ Options:
               Replace prefix with f in the source path references
               contained in the resulting binary.
 
+-D path       Path to the python and util lib.
+
 Arguments:
 
 script:       The Python script to be executed by the resulting binary.
@@ -129,6 +131,7 @@ def main():
     win = sys.platform[:3] == 'win'
     replace_paths = []                  # settable with -r option
     error_if_any_missing = 0
+    python_library_path = None          # settable with -D option
 
     # default the exclude list for each platform
     if win: exclude = exclude + [
@@ -163,7 +166,7 @@ def main():
 
     # Now parse the command line with the extras inserted.
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'r:a:dEe:hmo:p:P:qs:wX:x:l:')
+        opts, args = getopt.getopt(sys.argv[1:], 'r:a:dEe:hmo:p:P:qs:wX:x:l:D:')
     except getopt.error, msg:
         usage('getopt error: ' + str(msg))
 
@@ -206,6 +209,8 @@ def main():
         if o == '-r':
             f,r = a.split("=", 2)
             replace_paths.append( (f,r) )
+        if o == '-D':
+            python_library_path = a
 
     # modules that are imported by the Python runtime
     implicits = []
@@ -243,11 +248,13 @@ def main():
         # the directory we're looking for is different for different systems
         # so we look for a file that exists in that directory
         import fnmatch
-        match = None
-        searchlib = os.path.join(exec_prefix, 'lib', 'python%s' % version)
-        for root, dirnames, filenames in os.walk(searchlib):
-            for filename in fnmatch.filter(filenames, 'config.c.in'):
-                match = root
+        # see if we've set the path to look at with the -D argument
+        match = python_library_path
+        if not match:
+            searchlib = os.path.join(exec_prefix, 'lib', 'python%s' % version)
+            for root, dirnames, filenames in os.walk(searchlib):
+                for filename in fnmatch.filter(filenames, 'config.c.in'):
+                    match = root
 
         if not match:
             usage('could not find python lib directory')
