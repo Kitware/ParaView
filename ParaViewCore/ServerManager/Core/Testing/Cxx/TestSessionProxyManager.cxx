@@ -42,8 +42,10 @@ int TestSessionProxyManager(int argc, char* argv[])
   if (sourceProxies->GetNumberOfItems() != 1)
   {
     cerr << "Expected to get 1 source object, got " << sourceProxies->GetNumberOfItems() << "\n";
+    vtkInitializationHelper::Finalize();
     return EXIT_FAILURE;
   }
 
+  vtkInitializationHelper::Finalize();
   return EXIT_SUCCESS;
 }

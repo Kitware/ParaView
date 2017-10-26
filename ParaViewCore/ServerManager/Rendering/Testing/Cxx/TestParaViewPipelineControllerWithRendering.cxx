@@ -146,5 +146,6 @@ int TestParaViewPipelineControllerWithRendering(int argc, char* argv[])
   controller->UnRegisterProxy(view);
 
   vtkProcessModule::GetProcessModule()->UnRegisterSession(session.Get());
+  vtkInitializationHelper::Finalize();
   return 0;
 }

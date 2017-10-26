@@ -44,22 +44,29 @@ int TestRecreateVTKObjects(int argc, char* argv[])
   vtkWeakPointer<vtkObject> oldObject =
     vtkObject::SafeDownCast(sphereSource->GetClientSideObject());
   sphereSource->RecreateVTKObjects();
-  if (oldObject != NULL)
-  {
-    cerr << "ERROR: Old VTKObject not deleted!!!" << endl;
-    return EXIT_FAILURE;
-  }
-  if (sphereSource->GetClientSideObject() == NULL)
-  {
-    cerr << "ERROR: New VTKObject not created!!!" << endl;
-    return EXIT_FAILURE;
-  }
 
-  // Ensure that the new VTK object indeed has the same radius as before.
-  if (vtkSphereSource::SafeDownCast(sphereSource->GetClientSideObject())->GetRadius() != 10)
+  int exitCode = EXIT_SUCCESS;
+  try
   {
-    cerr << "ERROR: Recreated VTK object doesn't have same state as original!!!" << endl;
-    return EXIT_FAILURE;
+    if (oldObject != NULL)
+    {
+      throw "ERROR: Old VTKObject not deleted!!!";
+    }
+    if (sphereSource->GetClientSideObject() == NULL)
+    {
+      throw "ERROR: New VTKObject not created!!!";
+    }
+
+    // Ensure that the new VTK object indeed has the same radius as before.
+    if (vtkSphereSource::SafeDownCast(sphereSource->GetClientSideObject())->GetRadius() != 10)
+    {
+      throw "ERROR: Recreated VTK object doesn't have same state as original!!!";
+    }
   }
-  return EXIT_SUCCESS;
+  catch (const char* msg)
+  {
+    cerr << msg << endl;
+  }
+  vtkInitializationHelper::Finalize();
+  return exitCode;
 }
