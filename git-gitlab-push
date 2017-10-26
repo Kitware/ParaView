@@ -23,13 +23,17 @@ OPTIONS
     Show what would be pushed without actually updating the destination
 
 -f,--force
-    Force-push the topic HEAD to rewrite the destination branch
+    Force-push the topic HEAD to rewrite the destination branch (use twice
+    to ignore stale remote tracking branches)
 
 --no-default
     Do not push the default branch (e.g. master)
 
 --no-topic
     Do not push the topic HEAD.
+
+--no-upstream
+    Do not set an upstream branch (i.e. tracking) for the topic
 '
 OPTIONS_SPEC=
 SUBDIRECTORY_OK=Yes
@@ -65,14 +69,23 @@ lease_flag=''
 no_topic=''
 no_default=''
 dry_run=''
+set_upstream=true
 
 # Parse the command line options.
 while test $# != 0; do
 	case "$1" in
-		-f|--force)   force='+'; lease=true ;;
-		--no-topic)   no_topic=1 ;;
-		--dry-run)    dry_run=--dry-run ;;
-		--no-default) no_default=1 ;;
+		-f|--force)
+			if test -n "$force"; then
+				lease=false
+			else
+				lease=true
+			fi
+			force='+'
+			;;
+		--no-topic)    no_topic=1; set_upstream=false ;;
+		--dry-run)     dry_run=--dry-run ;;
+		--no-default)  no_default=1 ;;
+		--no-upstream) set_upstream=false ;;
 		--) shift; break ;;
 		-*) usage ;;
 		*) test -z "$remote" || usage ; remote="$1" ;;
@@ -175,6 +188,8 @@ not pushing an outdated branch."
 		echo '
 Add "-f" or "--force" to push a rewritten topic.'
 	fi
+elif $set_upstream && test -n "$topic"; then
+	git branch -u "$remote/$topic"
 fi
 
 # Reproduce the push exit code.
