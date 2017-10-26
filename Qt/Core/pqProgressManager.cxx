@@ -81,7 +81,7 @@ bool pqProgressManager::eventFilter(QObject* obj, QEvent* evt)
 {
   bool skipEvent = false;
   bool skippableEvent = evt->type() == QEvent::KeyPress || evt->type() == QEvent::MouseButtonPress;
-  if (this->ProgressCount > 0 && skippableEvent)
+  if (this->ProgressCount > 0 && skippableEvent && !this->UnblockEvents)
   {
     skipEvent = (this->NonBlockableObjects.contains(obj) == false);
   }
