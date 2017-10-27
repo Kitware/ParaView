@@ -54,7 +54,4 @@ calculator1.Function = 'VEL_X+100'
 
 appendAttributes2 = AppendAttributes(Input=[canex2, calculator1])
 appendAttributes2.UpdatePipeline()
-
-
 print("success")
-sys.exit(0)
