@@ -68,8 +68,6 @@ set(PV_PYTHON_SOURCE_FILES
   paraview/__init__.py
   paraview/lookuptable.py
   paraview/numeric.py
-  paraview/pvfilters.py
-  paraview/pvvtkextensions.py
   paraview/python_view.py
   paraview/servermanager.py
   paraview/simple.py

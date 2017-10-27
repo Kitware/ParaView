@@ -2,10 +2,8 @@
 Utility functions to mimic the template support functions for vtkVariant
 """
 
-import vtk
-import vtkConstants
-
-from vtk import vtkVariant
+from paraview.vtk import vtkVariant, VTK_OBJECT
+from paraview.vtk.util import vtkConstants
 
 _variant_type_map = {
     'void' : vtkConstants.VTK_VOID,
@@ -152,7 +150,7 @@ def vtkVariantStrictWeakOrder(s1, s2):
     r2 = getattr(s2, _variant_method_map[t2])()
 
     # compare vtk objects by classname
-    if t1 == vtk.VTK_OBJECT:
+    if t1 == VTK_OBJECT:
         return cmp(r1.GetClassName(), r2.GetClassName())
 
     return cmp(r1, r2)
