@@ -101,4 +101,3 @@ for f in otherFileNames:
         sys.exit(1)
 
 print("success")
-sys.exit(0)

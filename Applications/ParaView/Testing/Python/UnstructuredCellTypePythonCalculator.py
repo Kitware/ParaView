@@ -50,6 +50,4 @@ if arrayRange[0] < .0098 or arrayRange[0] > .0099 or \
    arrayRange[1] < .13 or arrayRange[1] > .14:
     print("ERROR: incorrect volume computed for can.ex2")
     sys.exit(1)
-
 print("success")
-sys.exit(0)
