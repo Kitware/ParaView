@@ -89,8 +89,13 @@ set(Module_SRCS
   vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkZlibImageCompressor.cxx
-  vtkCinemaExporter.cxx
 )
+
+if (PARAVIEW_ENABLE_PYTHON)
+  list(APPEND Module_SRCS
+    vtkCinemaExporter.cxx
+    )
+endif()
 
 if (PARAVIEW_USE_MPI)
   list(APPEND Module_SRCS

@@ -36,6 +36,7 @@ set (Module_SRCS
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCSVExporterProxy.cxx
+  vtkSMCSVProxiesInitializationHelper.cxx
   vtkSMDirectoryProxy.cxx
   vtkSMEnsembleDataReaderProxy.cxx
   vtkSMExporterProxy.cxx

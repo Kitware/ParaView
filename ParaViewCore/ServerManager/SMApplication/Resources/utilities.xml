@@ -2826,9 +2826,9 @@
     <!-- End of group "palettes" -->
   </ProxyGroup>
   <ProxyGroup name="exporters">
-    <!-- Proxy group for exporters used to export views.  -->
+    <!-- Proxy group for exporters used to export views. the Cinema DB exporter
+         is in pythonfilter.xml since it requires Python -->
     <RenderViewExporterProxy class="vtkPVX3DExporter"
-                             file_extension="x3d"
                              name="X3DExporter">
       <Documentation long_help="Export X3D Files"
                      short_help="X3D Files">vtkX3DExporter is a render window
@@ -2853,13 +2853,14 @@
           under the Scene node in the exported X3D file.
         </Documentation>
       </IntVectorProperty>
-
+      <Hints>
+        <ExporterFactory extensions="x3d" />
+      </Hints>
       <!-- End of X3DExporter -->
     </RenderViewExporterProxy>
     <RenderViewExporterProxy base_proxygroup="exporters"
                              base_proxyname="X3DExporter"
                              class="vtkPVX3DExporter"
-                             file_extension="x3db"
                              name="X3DExporterBinary">
       <Documentation>Binary x3d exporter</Documentation>
       <IntVectorProperty command="SetBinary"
@@ -2879,9 +2880,11 @@
         <Documentation>In binary mode use fastest instead of best
         compression.</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="x3db" />
+      </Hints>
     </RenderViewExporterProxy>
     <RenderViewExporterProxy class="vtkVRMLExporter"
-                             file_extension="vrml"
                              name="VRMLExporter">
       <Documentation>Exporter to export a single render view to an VRML
       file.</Documentation>
@@ -2891,13 +2894,16 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="vrml" />
+      </Hints>
       <!-- End of VRMLExporter -->
     </RenderViewExporterProxy>
     <CSVExporterProxy class="vtkCSVExporter"
-                      file_extension="csv"
                       name="CSVExporter">
-      <Documentation>Exporter to export a single render view to an CSV
-      file.</Documentation>
+      <Documentation long_help="Export Comma or Tab Delimited ASCII Files"
+                     short_help="Comma or Tab Delimited Files">
+        Exporter to export a single render view to an CSV file.</Documentation>
       <StringVectorProperty command="SetFileName"
                             name="FileName"
                             panel_visibility="never"
@@ -2910,10 +2916,12 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <!-- End of VRMLExporter -->
+      <Hints>
+        <ExporterFactory extensions="csv tsv txt" />
+      </Hints>
+      <!-- End of CSVExporter -->
     </CSVExporterProxy>
     <RenderViewExporterProxy class="vtkPOVExporter"
-                             file_extension="pov"
                              name="POVExporter">
       <Documentation long_help="Export POV Ray Files"
                      short_help="POV Files">vtkPOVExporter is a render window
@@ -2925,46 +2933,10 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="pov" />
+      </Hints>
       <!-- End of POVExporter -->
-    </RenderViewExporterProxy>
-    <RenderViewExporterProxy class="vtkCinemaExporter"
-                             file_extension="cdb"
-                             name="CinemaExporter">
-      <Documentation long_help="Export view to a Cinema Database"
-                     short_help="Cinema Database">CinemaExporter is a render window
-                     exporter which writes out the renderered scene as a
-                     Cinema database.</Documentation>
-      <StringVectorProperty name="FileName"
-                            command="SetFileName"
-                            number_of_elements="1">
-        <Documentation>Name of the file to be written.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ViewSelection"
-                            command="SetViewSelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the view selection.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="TrackSelection"
-                            command="SetTrackSelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the track selection.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ArraySelection"
-                            command="SetArraySelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the arrays selected in an item.</Documentation>
-      </StringVectorProperty>
-
-      <PropertyGroup label="Cinema Configuration"
-                     panel_widget="cinema_export_selector">
-        <Property name="ViewSelection"/>
-        <Property name="TrackSelection"/>
-        <Property name="ArraySelection"/>
-      </PropertyGroup>
-      <!-- End of Cinema Exporter -->
     </RenderViewExporterProxy>
     <!-- GL2PS exporter, shared options between render and context views: -->
     <GL2PSExporterProxy class="not-used"
@@ -3120,7 +3092,6 @@
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="ps"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterPS">
       <Documentation long_help="Export PostScript (PS) Files"
@@ -3150,12 +3121,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="ps" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="eps"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterEPS">
       <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
@@ -3177,12 +3150,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="eps" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterEPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="pdf"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterPDF">
       <Documentation long_help="Export Portable Document Format (PDF) Files"
@@ -3205,12 +3180,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="pdf" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterPDF -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="svg"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterSVG">
       <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
@@ -3232,6 +3209,9 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="svg" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterSVG -->
     </GL2PSExporterProxy>
 
@@ -3239,7 +3219,6 @@
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="ps"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterPS">
       <Documentation long_help="Export PostScript (PS) Files"
@@ -3269,12 +3248,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="ps" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="eps"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterEPS">
       <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
@@ -3296,12 +3277,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="eps" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterEPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="pdf"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterPDF">
       <Documentation long_help="Export Portable Document Format (PDF) Files"
@@ -3324,12 +3307,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="pdf" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterPDF -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="svg"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterSVG">
       <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
@@ -3351,15 +3336,20 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="svg" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterSVG -->
     </GL2PSExporterProxy>
 
-    <RenderViewExporterProxy name="WebGLExporter" class="vtkPVWebGLExporter"
-                             file_extension="webgl">
+    <RenderViewExporterProxy name="WebGLExporter" class="vtkPVWebGLExporter">
        <StringVectorProperty name="FileName" command="SetFileName"
                              number_of_elements="1">
           <Documentation>Name of the file to write into</Documentation>
        </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="webgl" />
+      </Hints>
       <!-- End of WebGLExporter -->
     </RenderViewExporterProxy>
 
