@@ -184,7 +184,7 @@ static std::string GetImageFileName(const std::string& filename)
 }
 
 void vtkAnalyzeWriter::WriteFileHeader(
-  ofstream* vtkNotUsed(file), vtkImageData* cache, int wholeExtent[6])
+  ostream* vtkNotUsed(file), vtkImageData* cache, int wholeExtent[6])
 {
 
   struct nifti_1_header nhdr;
@@ -940,7 +940,7 @@ void vtkAnalyzeWriter::WriteFileHeader(
 }
 
 void vtkAnalyzeWriter::WriteFile(
-  ofstream* vtkNotUsed(file), vtkImageData* data, int extent[6], int wholeExtent[6])
+  ostream* vtkNotUsed(file), vtkImageData* data, int extent[6], int wholeExtent[6])
 {
   (void)wholeExtent; // Not used
   // struct nifti_1_header nhdr ;

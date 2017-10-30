@@ -48,8 +48,8 @@ protected:
   vtkNIfTIWriter();
   ~vtkNIfTIWriter() override;
 
-  void WriteFile(ofstream* file, vtkImageData* data, int ext[6], int wholeExtent[6]) VTK_OVERRIDE;
-  void WriteFileHeader(ofstream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
+  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wholeExtent[6]) VTK_OVERRIDE;
+  void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
 
 private:
   int FileType;
