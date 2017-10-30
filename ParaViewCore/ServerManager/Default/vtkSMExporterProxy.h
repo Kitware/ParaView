@@ -66,8 +66,9 @@ public:
   //@{
   /**
    * Returns the suggested file extension for this exporter.
-   * @deprecated ParaView 5.5. `UseGetNumberOfFileExtensions` instead.
+   * @deprecated in ParaView 5.5. Use `GetFileExtensions` instead.
    */
+  VTK_LEGACY(const char* GetFileExtension());
   //@}
 
 protected:
