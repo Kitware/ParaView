@@ -1,0 +1,50 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkGDALVectorReader"
+                 label="GDAL Vector Reader"
+                 name="GDALVectorReader">
+      <Documentation short_help="Reads a vector file using the GDAL
+      library.">vtkGDALVectorReader is a source object that reads
+      vector files and uses GDAL as the underlying library for the
+      task. GDAL is required for this reader. The output of the reader
+      is a vtkMultiBlockDataSet</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        GDAL Vector reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="shp"
+                       file_description="GDAL Vector Files"/>
+      </Hints>
+    </SourceProxy>
+    <!-- End GDALVectorReader -->
+    <SourceProxy class="vtkGDALRasterReader"
+                 label="GDAL Raster Reader"
+                 name="GDALRasterReader">
+      <Documentation short_help="Reads a raster file using the GDAL
+      library.">vtkGDALRasterReader is a source object that reads
+      raster files and uses GDAL as the underlying library for the
+      task. GDAL is required for this reader. The output of the reader
+      is a vtkUniformGrid instead of vtkImageData to support
+      blanking.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        GDAL Raster reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="tif"
+                       file_description="GDAL Raster Files" />
+      </Hints>
+    </SourceProxy>
+    <!-- End GDALRasterReader -->
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

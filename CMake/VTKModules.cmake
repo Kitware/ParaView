@@ -386,6 +386,10 @@ if (PARAVIEW_ENABLE_XDMF3)
   endif()
 endif ()
 
+if (PARAVIEW_ENABLE_GDAL)
+  list (APPEND _vtk_modules vtkIOGDAL)
+endif()
+
 if (PARAVIEW_ENABLE_LAS)
   list (APPEND _vtk_modules vtkIOLAS)
 endif()
