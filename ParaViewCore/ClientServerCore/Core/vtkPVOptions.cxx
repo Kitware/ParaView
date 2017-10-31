@@ -530,4 +530,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SatelliteMessageIds " << this->SatelliteMessageIds << std::endl;
   os << indent << "PrintMonitors: " << this->PrintMonitors << std::endl;
   os << indent << "DisableXDisplayTests: " << this->DisableXDisplayTests << endl;
+  os << indent << "ForceNoMPIInitOnClient: " << this->ForceNoMPIInitOnClient << endl;
+  os << indent << "ForceMPIInitOnClient: " << this->ForceMPIInitOnClient << endl;
 }

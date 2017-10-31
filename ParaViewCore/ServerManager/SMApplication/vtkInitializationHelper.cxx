@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <sstream>
 #include <string>
+#include <vector>
 #include <vtksys/SystemTools.hxx>
 
 // Windows-only helper functionality:
@@ -144,16 +145,29 @@ void vtkInitializationHelper::Initialize(const char* executable, int type, vtkPV
   }
 
   // Pass the program name to make option parser happier
-  char* argv = new char[strlen(executable) + 1];
-  strcpy(argv, executable);
-
   vtkSmartPointer<vtkPVOptions> newoptions = options;
   if (!options)
   {
     newoptions = vtkSmartPointer<vtkPVOptions>::New();
   }
-  vtkInitializationHelper::Initialize(1, &argv, type, newoptions);
-  delete[] argv;
+
+  std::vector<char*> argv;
+  argv.push_back(vtksys::SystemTools::DuplicateString(executable));
+  if (newoptions->GetForceNoMPIInitOnClient())
+  {
+    argv.push_back(vtksys::SystemTools::DuplicateString("--no-mpi"));
+  }
+  if (newoptions->GetForceMPIInitOnClient())
+  {
+    argv.push_back(vtksys::SystemTools::DuplicateString("--mpi"));
+  }
+
+  vtkInitializationHelper::Initialize(static_cast<int>(argv.size()), &argv[0], type, newoptions);
+
+  for (auto tofree : argv)
+  {
+    delete[] tofree;
+  }
 }
 
 //----------------------------------------------------------------------------

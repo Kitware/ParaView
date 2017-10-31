@@ -3145,9 +3145,8 @@ def SetActiveConnection(connection=None):
 # servermanager.Finalize() may also be needed to exit properly without
 # VTK_DEBUG_LEAKS reporting memory leaks.
 if not vtkProcessModule.GetProcessModule():
-    pvoptions = None
+    pvoptions = vtkPVOptions();
     if paraview.options.batch:
-      pvoptions = vtkPVOptions();
       pvoptions.SetProcessType(vtkPVOptions.PVBATCH)
       if paraview.options.symmetric:
         pvoptions.SetSymmetricMPIMode(True)
@@ -3165,6 +3164,8 @@ if not vtkProcessModule.GetProcessModule():
         pm.UnRegisterSession(sid)
 
     else:
+      pvoptions.SetProcessType(vtkPVOptions.PVCLIENT)
+      pvoptions.SetForceNoMPIInitOnClient(1)
       vtkInitializationHelper.Initialize(sys.executable,
           vtkProcessModule.PROCESS_CLIENT, pvoptions)
 
