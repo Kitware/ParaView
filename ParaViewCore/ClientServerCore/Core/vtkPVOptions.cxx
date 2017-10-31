@@ -329,6 +329,7 @@ int vtkPVOptions::PostProcess(int, const char* const*)
       break;
     case vtkPVOptions::PVRENDER_SERVER:
       this->RenderServerMode = 1;
+      VTK_FALLTHROUGH;
     case vtkPVOptions::PVDATA_SERVER:
     case vtkPVOptions::PVSERVER:
       this->ServerMode = 1;

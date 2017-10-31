@@ -3062,6 +3062,7 @@ int vtkClientServerStream::AddArgumentFromString(
             {
               *out++ = *c;
             }
+            VTK_FALLTHROUGH;
           default:
             *out++ = *c;
             break;
