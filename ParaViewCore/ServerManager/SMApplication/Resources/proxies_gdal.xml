@@ -4,7 +4,7 @@
                  label="GDAL Vector Reader"
                  name="GDALVectorReader">
       <Documentation short_help="Reads a vector file using the GDAL
-      library.">vtkGDALVectorReader is a source object that reads
+      library.">GDAL Vector Reader is a source object that reads
       vector files and uses GDAL as the underlying library for the
       task. GDAL is required for this reader. The output of the reader
       is a vtkMultiBlockDataSet</Documentation>
@@ -26,7 +26,7 @@
                  label="GDAL Raster Reader"
                  name="GDALRasterReader">
       <Documentation short_help="Reads a raster file using the GDAL
-      library.">vtkGDALRasterReader is a source object that reads
+      library.">GDAL Raster Reader is a source object that reads
       raster files and uses GDAL as the underlying library for the
       task. GDAL is required for this reader. The output of the reader
       is a vtkUniformGrid instead of vtkImageData to support
