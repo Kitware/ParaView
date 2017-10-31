@@ -281,7 +281,7 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
   for (size_t cc = 0; cc < paths.size(); cc++)
   {
     std::vector<std::string> subpaths;
-    vtksys::SystemTools::Split(paths[cc].c_str(), subpaths, ';');
+    vtksys::SystemTools::Split(paths[cc], subpaths, ';');
     for (size_t scc = 0; scc < subpaths.size(); scc++)
     {
       this->LoadPluginsFromPath(subpaths[scc].c_str());
@@ -307,7 +307,7 @@ void vtkPVPluginLoader::LoadPluginsFromPluginConfigFile()
     for (size_t cc = 0; cc < paths.size(); cc++)
     {
       std::vector<std::string> subpaths;
-      vtksys::SystemTools::Split(paths[cc].c_str(), subpaths, ';');
+      vtksys::SystemTools::Split(paths[cc], subpaths, ';');
       for (size_t scc = 0; scc < subpaths.size(); scc++)
       {
         vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXML(subpaths[scc].c_str(), true);
@@ -416,7 +416,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
 
   std::string pv_verfication_data = pv_plugin_query_verification_data();
 
-  vtkPVPluginLoaderDebugMacro("Plugin's signature: " << pv_verfication_data.c_str());
+  vtkPVPluginLoaderDebugMacro("Plugin's signature: " << pv_verfication_data);
 
   // Validate the signature. If the signature is invalid, then this plugin is
   // totally bogus (even for the GUI layer).
@@ -426,7 +426,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     error << "Mismatch in versions: \n"
           << "ParaView Signature: " << _PV_PLUGIN_VERIFICATION_STRING << "\n"
                                                                          "Plugin Signature: "
-          << pv_verfication_data.c_str();
+          << pv_verfication_data;
     vtkPVPluginLoaderErrorMacro(error.str().c_str());
     vtkDynamicLoader::CloseLibrary(lib);
     vtkPVPluginLoaderDebugMacro("Mismatch in versions signifies that the plugin was built for "
@@ -499,8 +499,8 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     }
     ldLibPath += thisPluginsPath;
 
-    vtksys::SystemTools::PutEnv(ldLibPath.c_str());
-    vtkPVPluginLoaderDebugMacro("Updating Shared Library Paths: " << ldLibPath.c_str());
+    vtksys::SystemTools::PutEnv(ldLibPath);
+    vtkPVPluginLoaderDebugMacro("Updating Shared Library Paths: " << ldLibPath);
   }
 
   vtkPVPlugin* plugin = pv_plugin_query_instance();
