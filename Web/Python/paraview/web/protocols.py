@@ -897,7 +897,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
     # RpcName: setOpacityFunctionPoints => pv.color.manager.opacity.points.set
     @exportRpc("pv.color.manager.opacity.points.set")
-    def setOpacityFunctionPoints(self, arrayName, pointArray):
+    def setOpacityFunctionPoints(self, arrayName, pointArray, enableOpacityMapping=False):
         lutProxy = simple.GetColorTransferFunction(arrayName)
         pwfProxy = simple.GetOpacityTransferFunction(arrayName)
 
@@ -914,6 +914,8 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Set the Points property to scaled and biased points array
         pwfProxy.Points = pointArray
+
+        lutProxy.EnableOpacityMapping = enableOpacityMapping
 
         simple.Render()
         self.getApplication().InvokeEvent('PushRender')
@@ -1183,6 +1185,22 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         repProxy = self.mapIdToProxy(representation)
         lutProxy = repProxy.LookupTable
 
+        return lutProxy.EnableOpacityMapping
+
+    # RpcName: setSurfaceOpacityByArray => pv.color.manager.surface.opacity.by.array.set
+    @exportRpc("pv.color.manager.surface.opacity.by.array.set")
+    def setSurfaceOpacityByArray(self, arrayName, enabled):
+        lutProxy = simple.GetColorTransferFunction(arrayName)
+
+        lutProxy.EnableOpacityMapping = enabled
+
+        simple.Render()
+        self.getApplication().InvokeEvent('PushRender')
+
+    # RpcName: getSurfaceOpacityByArray => pv.color.manager.surface.opacity.by.array.get
+    @exportRpc("pv.color.manager.surface.opacity.by.array.get")
+    def getSurfaceOpacityByArray(self, arrayName):
+        lutProxy = simple.GetColorTransferFunction(arrayName)
         return lutProxy.EnableOpacityMapping
 
     # RpcName: selectColorMap => pv.color.manager.select.preset
