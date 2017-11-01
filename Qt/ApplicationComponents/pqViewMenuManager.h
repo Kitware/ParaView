@@ -58,7 +58,7 @@ protected slots:
    * build the menu from scratch. Clears all existing items in the menu before
    * building it.
    */
-  virtual void buildMenu();
+  void buildMenu();
 
   /**
    * This is called to update items in the menu that are not static and may
