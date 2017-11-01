@@ -168,7 +168,7 @@ void vtkSMMaterialDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   // 3: cells/blocks can choose for themselves from the above
   if (materialNames.size() > 1)
   {
-    sa.push_back(vtkStdString("MasterMaterial"));
+    sa.push_back(vtkStdString("Value Indexed"));
   }
 
   this->SetStrings(sa);
