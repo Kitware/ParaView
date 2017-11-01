@@ -248,6 +248,24 @@ public:
    */
   vtkGetMacro(ForceOnscreenRendering, int);
 
+  //@{
+  /**
+   * Get/Set the ForceNoMPIInitOnClient flag.
+   */
+  vtkGetMacro(ForceNoMPIInitOnClient, int);
+  vtkSetMacro(ForceNoMPIInitOnClient, int);
+  vtkBooleanMacro(ForceNoMPIInitOnClient, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the ForceMPIInitOnClient flag.
+   */
+  vtkGetMacro(ForceMPIInitOnClient, int);
+  vtkSetMacro(ForceMPIInitOnClient, int);
+  vtkBooleanMacro(ForceMPIInitOnClient, int);
+  //@}
+
   enum ProcessTypeEnum
   {
     PARAVIEW = 0x2,
