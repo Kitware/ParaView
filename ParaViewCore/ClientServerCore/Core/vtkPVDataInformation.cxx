@@ -501,10 +501,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   }
 
   this->NumberOfPoints = data->GetNumberOfPoints();
-  if (!this->NumberOfPoints)
-  {
-    return;
-  }
 
   // We do not want to get the number of dual cells from an octree
   // because this triggers generation of connectivity arrays.
@@ -533,10 +529,13 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     }
 #endif
 
-  bds = data->GetBounds();
-  for (idx = 0; idx < 6; ++idx)
+  if (this->NumberOfPoints > 0)
   {
-    this->Bounds[idx] = bds[idx];
+    bds = data->GetBounds();
+    for (idx = 0; idx < 6; ++idx)
+    {
+      this->Bounds[idx] = bds[idx];
+    }
   }
   this->MemorySize = data->GetActualMemorySize();
 
