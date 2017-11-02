@@ -62,6 +62,7 @@ vtkAMRStreamingVolumeRepresentation::vtkAMRStreamingVolumeRepresentation()
 //----------------------------------------------------------------------------
 vtkAMRStreamingVolumeRepresentation::~vtkAMRStreamingVolumeRepresentation()
 {
+  this->AMRVolumeMapper->SetInputConnection(nullptr);
 }
 
 //----------------------------------------------------------------------------
