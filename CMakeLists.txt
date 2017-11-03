@@ -206,6 +206,8 @@ option(PARAVIEW_ENABLE_NVPIPE
 option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_XDMF2)
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
+option(PARAVIEW_ENABLE_GDAL "Enable GDAL support." OFF)
+mark_as_advanced(PARAVIEW_ENABLE_GDAL)
 option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_LAS)
 
