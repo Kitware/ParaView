@@ -38,6 +38,7 @@ class vtkPVRenderView;
 class vtkResampledAMRImageSource;
 class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
+class vtkAMRVolumeMapper;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMRStreamingVolumeRepresentation
   : public vtkPVDataRepresentation
@@ -253,6 +254,7 @@ protected:
    * Rendering components.
    */
   vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
+  vtkSmartPointer<vtkAMRVolumeMapper> AMRVolumeMapper;
   vtkSmartPointer<vtkVolumeProperty> Property;
   vtkSmartPointer<vtkPVLODVolume> Actor;
   //@}
