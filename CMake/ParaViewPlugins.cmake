@@ -1097,7 +1097,7 @@ macro(pv_process_modules)
   endforeach()
 
   set (current_module_set ${VTK_MODULES_ALL})
-  list(APPEND VTK_MODULES_ENABLED ${VTK_MODULES_ALL})
+  list(APPEND VTK_MODULES_AVAILABLE ${VTK_MODULES_ALL})
 
   # sort the modules based on depedencies. This will endup bringing in
   # VTK-modules too. We raise errors if required VTK modules are not already
@@ -1111,7 +1111,7 @@ macro(pv_process_modules)
     if (_found EQUAL -1)
       # this is a VTK module and must have already been enabled. Otherwise raise
       # error.
-      list(FIND VTK_MODULES_ENABLED ${module} _found)
+      list(FIND VTK_MODULES_AVAILABLE ${module} _found)
       if (_found EQUAL -1)
         message(FATAL_ERROR
           "Requested modules not available: ${module}")
@@ -1197,7 +1197,7 @@ macro(pv_setup_module_environment _name)
   endif()
 
   # load information about existing modules.
-  foreach (mod IN LISTS VTK_MODULES_ENABLED)
+  foreach (mod IN LISTS VTK_MODULES_AVAILABLE)
     vtk_module_load("${mod}")
   endforeach()
 
