@@ -56,7 +56,12 @@ endif()
 # ParaView itself needs vtkPVStaticPluginsInit as well.
 set(SUPPORT_STATIC_PLUGINS TRUE)
 
-set(title "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
+if (PARAVIEW_VERSION_NICKNAME)
+  set(title "ParaView ${PARAVIEW_VERSION_NICKNAME} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
+else()
+  set(title "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
+endif()
+
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
