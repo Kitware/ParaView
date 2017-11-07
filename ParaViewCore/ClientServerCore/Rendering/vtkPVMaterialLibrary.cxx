@@ -14,16 +14,18 @@
 =========================================================================*/
 #include "vtkPVMaterialLibrary.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
-#include "vtkPVOptions.h"
+
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #ifdef PARAVIEW_USE_OSPRAY
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
-#include "vtkProcessModule.h"
-
-#include <string>
+#include "vtkResourceFileLocator.h"
 #include <vtksys/SystemTools.hxx>
+
+#include <cassert>
+#include <string>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 const char ENV_PATH_SEP = ';';
@@ -31,52 +33,57 @@ const char ENV_PATH_SEP = ';';
 const char ENV_PATH_SEP = ':';
 #endif
 
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMaterialLibrary);
+
 //-----------------------------------------------------------------------------
 vtkPVMaterialLibrary::vtkPVMaterialLibrary()
 {
+// initialize the class that will act as library of materials
+#ifdef PARAVIEW_USE_OSPRAY
+  this->MaterialLibrary = vtkOSPRayMaterialLibrary::New();
+#else
+  this->MaterialLibrary = nullptr;
+#endif
+
+  // now look for any materials that we want preloaded into the application
   this->SearchPaths = nullptr;
   vtksys::String paths;
 
+  // user can define a path via environment variables
   const char* env = vtksys::SystemTools::GetEnv("PV_MATERIALS_PATH");
   if (env)
   {
     paths += env;
   }
 
-  /*
-  //todo: compile time defined paths like so, see vtkPVPluginLoader
-  #ifdef PARAVIEW_PLUGIN_LOADER_PATHS
-    if (!paths.empty())
+  // and we look in some default locations relative to the exe
+  auto vtklibs = vtkGetLibraryPathForSymbol(GetVTKVersion);
+  assert(!vtklibs.empty);
+
+  // where materials might be in relation to that
+  std::vector<std::string> prefixes = {
+#if defined(_WIN32) || defined(__APPLE__)
+    "materials"
+#else
+    "share/paraview-" PARAVIEW_VERSION "/materials"
+#endif
+  };
+  // search
+  vtkNew<vtkResourceFileLocator> locator;
+  auto resource_dir = locator->Locate(vtklibs, prefixes, "ospray_mats.json");
+  if (!resource_dir.empty())
+  {
+    // append results to search path
+    if (paths.size())
     {
       paths += ENV_PATH_SEP;
     }
-    paths += PARAVIEW_PLUGIN_LOADER_PATHS;
-  #endif
-  */
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVOptions* opt = pm ? pm->GetOptions() : NULL;
-  if (opt)
-  {
-    std::string appDir = vtkProcessModule::GetProcessModule()->GetSelfDir();
-    if (appDir.size())
-    {
-      appDir += "/materials";
-      if (paths.size())
-      {
-        paths += ENV_PATH_SEP;
-      }
-      paths += appDir;
-    }
+    paths += resource_dir.c_str();
   }
 
+  // now we are ready
   this->SetSearchPaths(paths.c_str());
-#ifdef PARAVIEW_USE_OSPRAY
-  this->MaterialLibrary = vtkOSPRayMaterialLibrary::New();
-#else
-  this->MaterialLibrary = nullptr;
-#endif
 }
 
 //-----------------------------------------------------------------------------
