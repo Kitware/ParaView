@@ -233,13 +233,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="EnableOpacityMapping">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the opacity function is used to render translucent surfaces.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
+    <widget class="QGroupBox" name="EnableOpacityMapping">
+     <property name="title">
       <string>Enable opacity mapping for surfaces</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QCheckBox" name="UseLogScaleOpacity">
+        <property name="text">
+         <string>Use log scale when mapping data to opacity</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>

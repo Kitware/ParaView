@@ -446,6 +446,18 @@ vtkIdType pqTransferFunctionWidget::numberOfControlPoints() const
 }
 
 //-----------------------------------------------------------------------------
+void pqTransferFunctionWidget::SetLogScaleXAxis(bool logScale)
+{
+  this->Internals->ChartXY->GetAxis(vtkAxis::BOTTOM)->SetLogScale(logScale);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTransferFunctionWidget::GetLogScaleXAxis() const
+{
+  return this->Internals->ChartXY->GetAxis(vtkAxis::BOTTOM)->GetLogScale();
+}
+
+//-----------------------------------------------------------------------------
 void pqTransferFunctionWidget::render()
 {
   this->Internals->Timer.start();
