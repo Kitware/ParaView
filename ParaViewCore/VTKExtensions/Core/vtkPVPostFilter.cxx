@@ -314,6 +314,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataSet* output, const char* requ
 
     case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
       vtkWarningMacro("Case not handled");
+      VTK_FALLTHROUGH;
 
     default:
       return 0;
