@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -69,6 +70,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtDebug>
+
+#include <cmath>
 
 namespace
 {
@@ -520,6 +523,8 @@ void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
 {
   if (log_space)
   {
+    // Make sure both color and opacity are remapped if needed:
+    this->prepareRangeForLogScaling();
     vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(this->proxy());
   }
   else
@@ -528,8 +533,6 @@ void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
   }
 
   this->Internals->Ui.ColorEditor->SetLogScaleXAxis(log_space);
-
-  // FIXME: ensure scalar range is valid.
 
   emit this->useLogScaleChanged();
 }
@@ -540,6 +543,8 @@ void pqColorOpacityEditorWidget::useLogScaleOpacityClicked(bool log_space)
   vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
   if (log_space)
   {
+    // Make sure both color and opacity are remapped if needed:
+    this->prepareRangeForLogScaling();
     vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(opacityProxy);
   }
   else
@@ -604,6 +609,26 @@ void pqColorOpacityEditorWidget::updateButtonEnableState()
   ui.ResetRangeToData->setEnabled(hasRepresentation);
   ui.ResetRangeToDataOverTime->setEnabled(hasRepresentation);
   ui.ResetRangeToVisibleData->setEnabled(hasRepresentation && hasView);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::prepareRangeForLogScaling()
+{
+  vtkSMProxy* colorProxy = this->proxy();
+  double range[2];
+
+  vtkSMTransferFunctionProxy::GetRange(colorProxy, range);
+
+  if (vtkSMCoreUtilities::AdjustRangeForLog(range))
+  {
+    vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
+
+    vtkGenericWarningMacro("Ranges not valid for log-space. Changed the range to ("
+      << range[0] << ", " << range[1] << ").");
+
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(colorProxy, range);
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, range);
+  }
 }
 
 //-----------------------------------------------------------------------------

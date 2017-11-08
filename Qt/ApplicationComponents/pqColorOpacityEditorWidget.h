@@ -253,6 +253,12 @@ protected slots:
   */
   void updateButtonEnableState();
 
+protected:
+  /**
+   * Validate and adjust the current range before converting to a log range.
+   */
+  void prepareRangeForLogScaling();
+
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget)
 
