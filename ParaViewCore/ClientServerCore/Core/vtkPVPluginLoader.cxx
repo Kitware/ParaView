@@ -274,7 +274,8 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
 void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
 {
 #ifdef BUILD_SHARED_LIBS
-  vtkPVPluginLoaderDebugMacro("Loading Plugins from standard PLUGIN_PATHS \n" << this->SearchPaths);
+  vtkPVPluginLoaderDebugMacro("Loading Plugins from standard PLUGIN_PATHS \n"
+    << this->SearchPaths << endl);
 
   std::vector<std::string> paths;
   vtksys::SystemTools::Split(this->SearchPaths, paths, ENV_PATH_SEP);
@@ -288,7 +289,7 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
     }
   }
 #else
-  vtkPVPluginLoaderDebugMacro("Static build. Skipping PLUGIN_PATHS.");
+  vtkPVPluginLoaderDebugMacro("Static build. Skipping PLUGIN_PATHS.\n");
 #endif
 }
 
@@ -315,17 +316,17 @@ void vtkPVPluginLoader::LoadPluginsFromPluginConfigFile()
     }
   }
 #else
-  vtkPVPluginLoaderDebugMacro("Static build. Skipping PV_PLUGIN_CONFIG_FILE.");
+  vtkPVPluginLoaderDebugMacro("Static build. Skipping PV_PLUGIN_CONFIG_FILE.\n");
 #endif
 }
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::LoadPluginsFromPath(const char* path)
 {
-  vtkPVPluginLoaderDebugMacro("Loading plugins in Path: " << path);
+  vtkPVPluginLoaderDebugMacro("Loading plugins in Path: " << path << endl);
   vtkNew<vtkPDirectory> dir;
   if (dir->Load(path) == false)
   {
-    vtkPVPluginLoaderDebugMacro("Invalid directory: " << path);
+    vtkPVPluginLoaderDebugMacro("Invalid directory: " << path << endl);
     return;
   }
 
