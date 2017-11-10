@@ -20,7 +20,7 @@ from paraview import coprocessing
 
 #--------------------------------------------------------------
 # Code generated from cpstate.py to create the CoProcessor.
-# ParaView @PARAVIEW_VERSION_FULL@ @PARAVIEW_BUILD_ARCHITECTURE@ bits
+# %s
 
 #--------------------------------------------------------------
 # Global screenshot output options
@@ -103,9 +103,12 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
 
     :param filename: if specified, the script is written to the file.
     """
+    from paraview.servermanager import vtkSMProxyManager
+    version_str = vtkSMProxyManager.GetParaViewSourceVersion()
+
     pipeline_script = cpstate.DumpPipeline(\
         export_rendering, simulation_input_map, screenshot_info, cinema_tracks, array_selection)
-    script = __output_contents % (padding_amount, rescale_data_range,
+    script = __output_contents % (version_str, padding_amount, rescale_data_range,
                                   pipeline_script,
                                   enable_live_viz, live_viz_frequency)
     if filename:

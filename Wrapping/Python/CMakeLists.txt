@@ -62,6 +62,7 @@ set(PV_PYTHON_SOURCE_FILES
   paraview/collaboration.py
   paraview/coprocessing.py
   paraview/cpstate.py
+  paraview/cpexport.py
   paraview/demos/demo1.py
   paraview/demos/show_grid_as_background.py
   paraview/extract_selection.py
@@ -79,12 +80,6 @@ set(PV_PYTHON_SOURCE_FILES
   paraview/variant.py
   paraview/vtk/__init__.py
   )
-
-# This is odd; we shouldnt' need to configure cpexport.py, we can simply fill in
-# the version number when cpexport.py is used by the ParaView client.
-# Leaving this unchanged for now since don't want to make too many unrelated changes
-# here.
-configure_file(cpexport.py.in cpexport.py @ONLY)
 
 #------------------------------------------------------------------------------
 add_custom_command(
@@ -105,10 +100,6 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
           "${CMAKE_CURRENT_SOURCE_DIR}/paraview"
           "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview"
-
-  COMMAND ${CMAKE_COMMAND} ARGS -E copy
-          "${CMAKE_CURRENT_BINARY_DIR}/cpexport.py"
-          "${VTK_BUILD_PYTHON_MODULE_DIR}/paraview/cpexport.py"
 
   # Copy into $pydir/paraview/vtk.
   # This is what scripts get when they do "import paraview.vtk".
@@ -154,7 +145,6 @@ add_custom_command(
 
   DEPENDS
     ${_vtkpy_modules}
-    "${CMAKE_CURRENT_BINARY_DIR}/cpexport.py"
     "${VTK_BINARY_DIR}/Wrapping/Python/vtk/__init__.py"
     "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/numpy_support.py"
     "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/vtkConstants.py"
