@@ -41,7 +41,7 @@
 #endif
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "vtkProcessModuleInitializePython.h"
+#include "vtkPythonInterpreter.h"
 #endif
 
 #ifdef _WIN32
@@ -574,9 +574,7 @@ bool vtkProcessModule::InitializePythonEnvironment()
     // where ParaView modules are directly imported in python (not pvpython).
     vtkProcessModule::FinalizePython = true;
   }
-
   vtkPythonInterpreter::SetProgramName(this->ProgramPath.c_str());
-  vtkPythonAppInitPrependPath(this->SelfDir);
 #endif
   return true;
 }
