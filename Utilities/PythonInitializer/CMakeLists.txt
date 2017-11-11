@@ -40,7 +40,7 @@ if (PARAVIEW_FREEZE_PYTHON)
             -DPYTHON_LIBRARY_PATH:PATH="${PYTHON_LIBRARY_PATH}"
             -P "${FreezePython_SRC_DIR}/vtkFreezePython.cmake"
     DEPENDS "${FreezePython_SRC_DIR}/vtkFreezePython.cmake"
-            paraview_pyc # depends on paraview-py files.
+            paraview_python_package # depends on paraview-py files.
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMENT "Freezing Python and ParaView Python packages and modules")
 

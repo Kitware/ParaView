@@ -37,7 +37,7 @@ def initialize():
     import vtkPVPythonCatalystPython as pythoncatalyst
     import paraview.simple
     import paraview.vtk as vtk
-    from paraview import numpy_support
+    from paraview.vtk.util import numpy_support
     paraview.options.batch = True
     paraview.options.symmetric = True
 
@@ -67,7 +67,7 @@ def coprocess(time, timeStep, grid, attributes):
     import vtk
     import vtkPVCatalystPython as catalyst
     import paraview
-    from paraview import numpy_support
+    from paraview.vtk.util import numpy_support
     dataDescription = catalyst.vtkCPDataDescription()
     dataDescription.SetTimeData(time, timeStep)
     dataDescription.AddInput("input")
@@ -78,7 +78,7 @@ def coprocess(time, timeStep, grid, attributes):
         imageData.SetExtent(grid.XStartPoint, grid.XEndPoint, 0, grid.NumberOfYPoints-1, 0, grid.NumberOfZPoints-1)
         imageData.SetSpacing(grid.Spacing)
 
-        velocity = paraview.numpy_support.numpy_to_vtk(attributes.Velocity)
+        velocity = numpy_support.numpy_to_vtk(attributes.Velocity)
         velocity.SetName("velocity")
         imageData.GetPointData().AddArray(velocity)
 

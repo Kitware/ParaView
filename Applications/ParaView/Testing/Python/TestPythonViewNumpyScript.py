@@ -4,7 +4,6 @@ import sys
 
 script = """
 import numpy
-import paraview.numpy_support
 
 def setup_data(view):
   # Don't actually need any data

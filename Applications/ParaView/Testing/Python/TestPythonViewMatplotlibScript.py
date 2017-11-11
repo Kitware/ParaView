@@ -4,7 +4,7 @@ import os
 import sys
 
 script = """
-import paraview.numpy_support
+from paraview.vtk.util import numpy_support
 
 # Utility to get next color
 def getNextColor():
@@ -31,7 +31,7 @@ def render(view,width,height):
       vtk_points = dataObject.GetPoints()
       if vtk_points:
         vtk_points_data = vtk_points.GetData()
-        pts = paraview.numpy_support.vtk_to_numpy(vtk_points_data)
+        pts = numpy_support.vtk_to_numpy(vtk_points_data)
         x, y = pts[:,0], pts[:,1]
         ax.scatter(x, y, color=color)
 
