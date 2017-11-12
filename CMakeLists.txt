@@ -723,19 +723,6 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
     ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS}
     ${vtkPVPythonCatalyst_INCLUDE_DIRS}
     ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
-
-  # All the ${vtk-module}Python files are installed by VTK/Wrapping/Python/CMakeLists.txt
-  # outside the module subsystem. Hence, we need to install the vtkPVPythonCatalystPython
-  # library explicitly here (BUG #15085).
-  # This code mirrors the code in VTK/Wrapping/Python/CMakeLists.txt
-  if (NOT VTK_INSTALL_NO_RUNTIME AND BUILD_SHARED_LIBS AND NOT VTK_INSTALL_NO_LIBRARIES)
-    install(TARGETS ${vtk-module}Python
-      EXPORT ${VTK_INSTALL_EXPORT_NAME}
-      RUNTIME DESTINATION ${VTK_INSTALL_RUNTIME_DIR} COMPONENT RuntimeLibraries
-      LIBRARY DESTINATION ${VTK_INSTALL_PYTHON_MODULE_DIR}/vtk COMPONENT RuntimeLibraries
-      ARCHIVE DESTINATION ${VTK_INSTALL_ARCHIVE_DIR} COMPONENT Development
-      )
-  endif()
   unset(vtk-module)
 endif()
 
