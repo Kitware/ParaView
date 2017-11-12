@@ -111,15 +111,6 @@ endif()
 if(NOT VTK_INSTALL_LIBRARY_DIR)
   set(VTK_INSTALL_LIBRARY_DIR lib/paraview-${PARAVIEW_VERSION})
 endif()
-# ParaView installs the vtk python modules specifically to appropriate locations.
-if(NOT VTK_INSTALL_PYTHON_MODULE_DIR)
-  set (VTK_INSTALL_PYTHON_MODULE_DIR "${VTK_INSTALL_LIBRARY_DIR}/site-packages" CACHE
-    INTERNAL "Directory where python modules will be installed")
-endif()
-if(NOT VTK_BUILD_PYTHON_MODULE_DIR)
-  set (VTK_BUILD_PYTHON_MODULE_DIR "${CMAKE_BINARY_DIR}/lib/site-packages" CACHE
-    INTERNAL "Directory where python modules will be built")
-endif()
 if(NOT VTK_INSTALL_ARCHIVE_DIR)
   set(VTK_INSTALL_ARCHIVE_DIR lib/paraview-${PARAVIEW_VERSION})
 endif()
@@ -144,6 +135,7 @@ endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
+# Leaving  VTK_PYTHON_SITE_PACKAGES_SUFFIX unchanged. VTK picks a good one.
 if(NOT PARAVIEW_WWW_DIR)
   set(PARAVIEW_WWW_DIR "${ParaView_BINARY_DIR}/www")
 endif()
