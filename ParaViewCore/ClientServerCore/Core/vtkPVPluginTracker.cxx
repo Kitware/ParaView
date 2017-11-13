@@ -29,6 +29,8 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
+#include "vtkResourceFileLocator.h"
+#include "vtkVersion.h"
 
 #include <assert.h>
 #include <sstream>
@@ -71,12 +73,24 @@ public:
   }
 };
 
+std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
+{
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  return pluginname + ".dll";
+#elif defined(__APPLE__)
+  return "lib" + pluginname + ".dylib";
+#else
+  return "lib" + pluginname + ".so";
+#endif
+}
+
 std::string vtkLocatePluginSerial(
   const char* plugin, bool add_extensions, vtkPluginSearchFunction searchFunction)
 {
   (void)searchFunction;
+  auto pm = vtkProcessModule::GetProcessModule();
   // Make sure we can get the options before going further
-  if (vtkProcessModule::GetProcessModule() == NULL)
+  if (pm == NULL)
   {
     return std::string();
   }
@@ -90,54 +104,66 @@ std::string vtkLocatePluginSerial(
     return plugin;
   }
 #endif
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  std::string app_dir = options->GetApplicationPath();
-  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
 
-  std::vector<std::string> paths_to_search;
-  paths_to_search.push_back(app_dir);
-  paths_to_search.push_back(app_dir + "/../lib/");
-  paths_to_search.push_back(app_dir + "/plugins/" + plugin);
-#if defined(__APPLE__)
-  // paths for app
-  paths_to_search.push_back(app_dir + "/../Plugins");
-  paths_to_search.push_back(app_dir + "/../../..");
-  paths_to_search.push_back(app_dir + "/../../../../lib");
-#endif
-  // paths when doing an unix style install on OsX and static builds on Linux.
-  paths_to_search.push_back(app_dir + "/../lib/paraview-" PARAVIEW_VERSION);
+  const std::string exe_dir = pm->GetSelfDir();
+  const std::string vtklib = vtkGetLibraryPathForSymbol(GetVTKVersion);
 
-  // On windows configuration files are in the parent directory
-  paths_to_search.push_back(app_dir + "/../");
-
-  // Add test plugin path into the search path.
-  std::string test_plugin_dir(options->GetTestPluginPath());
-  if (!test_plugin_dir.empty())
-  {
-    paths_to_search.push_back(test_plugin_dir);
-  }
-
-  std::string name = plugin;
-  std::string filename = name;
-  if (add_extensions)
-  {
-#if defined(_WIN32) && !defined(__CYGWIN__)
-    filename = name + ".dll";
-#elif defined(__APPLE__)
-    filename = "lib" + name + ".dylib";
+  std::vector<std::string> prefixes = {
+#if defined(BUILD_SHARED_LIBS)
+    std::string("paraview-" PARAVIEW_VERSION "/plugins/") + plugin,
+    std::string("paraview-" PARAVIEW_VERSION "/plugins/"),
 #else
-    filename = "lib" + name + ".so";
+    // for static builds, we need to add "lib"
+    std::string("lib/paraview-" PARAVIEW_VERSION "/plugins/") + plugin,
+    std::string("lib/paraview-" PARAVIEW_VERSION "/plugins/"),
 #endif
-  }
-  for (size_t cc = 0; cc < paths_to_search.size(); cc++)
+
+#if defined(__APPLE__)
+    // needed for Apps
+    std::string("Plugins/") + plugin,
+    std::string("Plugins/"),
+#elif defined(_WIN32)
+    std::string("plugins/") + plugin,
+    std::string("plugins/"),
+#endif
+    std::string()
+  };
+
+  const std::string filename = add_extensions ? vtkGetPluginFileNameFromName(plugin) : plugin;
+
+  vtkNew<vtkResourceFileLocator> locator;
+  locator->SetPrintDebugInformation(debug_plugin);
+
+  // First try the test plugin path, if it exists.
+  vtkPVOptions* options = pm->GetOptions();
+  if (options->GetTestPluginPath() && strlen(options->GetTestPluginPath()) > 0)
   {
-    std::string path = paths_to_search[cc];
-    if (vtksys::SystemTools::FileExists((path + "/" + filename).c_str(), true))
+    auto path = locator->Locate(options->GetTestPluginPath(), filename);
+    if (!path.empty())
     {
-      return (path + "/" + filename);
+      return path + "/" + filename;
     }
-    vtkPVPluginTrackerDebugMacro((path + "/" + filename).c_str() << "-- not found");
   }
+
+  // Now, try the prefixes we so careful put together.
+  if (!vtklib.empty())
+  {
+    auto pluginpath =
+      locator->Locate(vtksys::SystemTools::GetFilenamePath(vtklib), prefixes, filename);
+    if (!pluginpath.empty())
+    {
+      return pluginpath + "/" + filename;
+    }
+  }
+  if (!exe_dir.empty())
+  {
+    auto pluginpath = locator->Locate(exe_dir, prefixes, filename);
+    if (!pluginpath.empty())
+    {
+      return pluginpath + "/" + filename;
+    }
+  }
+
   return std::string();
 }
 

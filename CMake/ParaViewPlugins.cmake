@@ -1,15 +1,18 @@
 include(ParaViewMacros)
 
+if(DEFINED PV_INSTALL_PLUGIN_DIR)
+  message(WARNING "`PV_INSTALL_PLUGIN_DIR` is no longer supported as of ParaView 5.5. "
+    "Please set `PARAVIEW_INSTALL_PLUGINS_DIR` instead.")
+endif()
+
 # Macro to install a plugin that's included in the ParaView source directory.
 # This is a macro internal to ParaView and should not be directly used by
 # external applications. This may change in future without notice.
-MACRO(internal_paraview_install_plugin name)
-  IF (PV_INSTALL_PLUGIN_DIR)
-    INSTALL(TARGETS ${name}
-            DESTINATION ${PV_INSTALL_PLUGIN_DIR}
-            COMPONENT Runtime)
-  ENDIF ()
-ENDMACRO()
+function(internal_paraview_install_plugin name)
+  if(PARAVIEW_INSTALL_PLUGINS_DIR)
+    install(TARGETS ${name} DESTINATION ${PARAVIEW_INSTALL_PLUGINS_DIR}/${name} COMPONENT Runtime)
+  endif()
+endfunction()
 
 # helper PV_PLUGIN_LIST_CONTAINS macro
 MACRO(PV_PLUGIN_LIST_CONTAINS var value)
@@ -921,18 +924,21 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
       set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
     endif()
 
+    set(_extra_add_library_flags)
+    if(PLUGIN_EXCLUDE_FROM_DEFAULT_TARGET)
+      list(APPEND _extra_add_library_flags EXCLUDE_FROM_ALL)
+    endif()
     IF (PARAVIEW_BUILD_SHARED_LIBS)
-      IF (PLUGIN_EXCLUDE_FROM_DEFAULT_TARGET)
-        ADD_LIBRARY(${NAME} SHARED EXCLUDE_FROM_ALL ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
-      ELSE ()
-        ADD_LIBRARY(${NAME} SHARED ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
-      ENDIF()
+      add_library(${NAME} SHARED ${_extra_add_library_flags} ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
+      if(PARAVIEW_BUILD_PLUGINS_DIR)
+        # build plugins under a directory with the same name as the plugin.
+        # This is only done for plugins are built in ParaView build tree itself.
+        set_target_properties(${NAME} PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY ${PARAVIEW_BUILD_PLUGINS_DIR}/${NAME}
+          LIBRARY_OUTPUT_DIRECTORY ${PARAVIEW_BUILD_PLUGINS_DIR}/${NAME})
+      endif()
     ELSE ()
-      IF (PLUGIN_EXCLUDE_FROM_DEFAULT_TARGET)
-        ADD_LIBRARY(${NAME} EXCLUDE_FROM_ALL ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
-      ELSE()
-        ADD_LIBRARY(${NAME} ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
-      ENDIF()
+      add_library(${NAME} ${_extra_add_library_flags} ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
       # When building plugins for static builds, Qt requires this flag to be
       # defined. If not defined, when we link the executable against all the
       # plugins, we get redefinied symbols from the plugins.
