@@ -63,7 +63,7 @@ void InitializePython()
                     << "paraview.print_debug_info = print_dummy\n"
                     << "paraview.print_error = f1\n"
                     << "paraview.print_debug_info = f2\n"
-                    << "import vtkPVCatalystPython\n";
+                    << "from paraview.vtk import vtkPVCatalyst\n";
   vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
 }
 
@@ -231,8 +231,8 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(vtkCPDataDescription* data
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   std::ostringstream pythonInput;
-  pythonInput << "dataDescription = vtkPVCatalystPython.vtkCPDataDescription('"
-              << dataDescriptionString << "')\n"
+  pythonInput << "dataDescription = vtkPVCatalyst.vtkCPDataDescription('" << dataDescriptionString
+              << "')\n"
               << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
 
   vtkPythonInterpreter::RunSimpleString(pythonInput.str().c_str());
@@ -254,8 +254,8 @@ int vtkCPPythonScriptPipeline::CoProcess(vtkCPDataDescription* dataDescription)
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   std::ostringstream pythonInput;
-  pythonInput << "dataDescription = vtkPVCatalystPython.vtkCPDataDescription('"
-              << dataDescriptionString << "')\n"
+  pythonInput << "dataDescription = vtkPVCatalyst.vtkCPDataDescription('" << dataDescriptionString
+              << "')\n"
               << this->PythonScriptName << ".DoCoProcessing(dataDescription)\n";
 
   vtkPythonInterpreter::RunSimpleString(pythonInput.str().c_str());
