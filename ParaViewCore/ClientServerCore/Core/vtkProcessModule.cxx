@@ -574,7 +574,6 @@ bool vtkProcessModule::InitializePythonEnvironment()
     // where ParaView modules are directly imported in python (not pvpython).
     vtkProcessModule::FinalizePython = true;
   }
-  vtkPythonInterpreter::SetProgramName(this->ProgramPath.c_str());
 #endif
   return true;
 }
