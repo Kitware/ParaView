@@ -84,8 +84,8 @@ add_custom_target(paraview_python_package
 # Install the paraview module files.
 # XXX(uda): why are we installing all packages in site-packages? We should only install
 # ones we created here i.e. paraview and vtk.
-install(DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages
-    DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
+install(DIRECTORY ${VTK_BUILD_PYTHON_MODULES_DIR}
+    DESTINATION ${VTK_INSTALL_PYTHON_MODULES_DIR}
     COMPONENT Runtime
     PATTERN *-complete EXCLUDE
     PATTERN *_complete EXCLUDE)

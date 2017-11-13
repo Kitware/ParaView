@@ -74,11 +74,24 @@ set (CMAKE_MODULE_PATH
   ${ParaView_CMAKE_DIR}
 )
 
-# Use the new version of the variable names for output of build process.
-# Make sure these are consistent with what VTK sets.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+# Set up our directory structure for output libraries and binaries
+if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/bin")
+endif()
+if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  if(UNIX)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/lib")
+  else()
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/bin")
+  endif()
+endif()
+if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/lib")
+endif()
+mark_as_advanced(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+  CMAKE_LIBRARY_OUTPUT_DIRECTORY
+  CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+  )
 
 include(Utilities/Git/Git.cmake)
 include(ParaViewDetermineVersion)
@@ -109,10 +122,10 @@ if(NOT VTK_INSTALL_RUNTIME_DIR)
   set(VTK_INSTALL_RUNTIME_DIR bin)
 endif()
 if(NOT VTK_INSTALL_LIBRARY_DIR)
-  set(VTK_INSTALL_LIBRARY_DIR lib/paraview-${PARAVIEW_VERSION})
+  set(VTK_INSTALL_LIBRARY_DIR lib)
 endif()
 if(NOT VTK_INSTALL_ARCHIVE_DIR)
-  set(VTK_INSTALL_ARCHIVE_DIR lib/paraview-${PARAVIEW_VERSION})
+  set(VTK_INSTALL_ARCHIVE_DIR lib)
 endif()
 if(NOT VTK_INSTALL_INCLUDE_DIR)
   set(VTK_INSTALL_INCLUDE_DIR include/paraview-${PARAVIEW_VERSION})
