@@ -68,13 +68,6 @@ set_source_files_properties(
   vtkSMMessage
   WRAP_EXCLUDE)
 
-set_source_files_properties(
-  vtkPVProxyDefinitionIterator.cxx
-  vtkPVSessionBase.cxx
-  vtkSIVectorProperty.cxx
-  vtkSMMessage.cxx
-  ABSTRACT)
-
 # Add header-only files so they get installed correctly.
 set (${vtk-module}_HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkSMMessageMinimal.h

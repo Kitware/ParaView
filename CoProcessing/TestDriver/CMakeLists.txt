@@ -17,17 +17,4 @@ SET(TestDriver_SRCS
   vtkCPVector3FieldFunction.cxx
 )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkCPBaseFieldBuilder
-  vtkCPBaseGridBuilder
-  vtkCPFieldBuilder
-  vtkCPFileGridBuilder
-  vtkCPGridBuilder
-  vtkCPScalarFieldFunction
-  vtkCPTensorFieldFunction
-  vtkCPUnstructuredGridBuilder
-  vtkCPVector3FieldFunction
-  ABSTRACT
-)
-
 vtk_module_library(${vtk-module} ${TestDriver_SRCS})

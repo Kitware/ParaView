@@ -124,18 +124,6 @@ set_source_files_properties(
   WRAP_EXCLUDE
   )
 
-set_source_files_properties(
-  vtkNetworkAccessManager
-  vtkPVDataInformationHelper
-  vtkPVInformation
-  vtkPVPlugin
-  vtkPVPluginTracker
-  vtkPVPythonPluginInterface
-  vtkPVServerManagerPluginInterface
-  vtkPVSession
-  vtkSession
-  ABSTRACT)
-
 if(VTK_OPENGL_HAS_EGL)
   set_source_files_properties(
     vtkPVOptions.cxx

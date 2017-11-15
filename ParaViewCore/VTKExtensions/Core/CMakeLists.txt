@@ -68,9 +68,4 @@ set_source_files_properties(
   WRAP_EXCLUDE
   )
 
-set_source_files_properties(
-  vtkCommunicationErrorCatcher
-  vtkUndoElement
-  ABSTRACT)
-
 vtk_module_library(vtkPVVTKExtensionsCore ${Module_SRCS})
