@@ -807,8 +807,6 @@ if (NOT VTK_INSTALL_NO_DEVELOPMENT)
   #installed
   install(
     FILES ${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/TopologicalSort.cmake
-          ${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.h.in
-          ${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cxx.in
     DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
     COMPONENT Development
   )
