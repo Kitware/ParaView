@@ -1,0 +1,28 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkPDALReader"
+                 label="PDAL Reader"
+                 name="PDALReader">
+      <Documentation short_help="Reads data using PDAL."
+      long_help="Reads LIDAR data using the PDAL library">The PDAL
+      Reader reads LIDAR data using the PDAL library.  See the readers
+      section on www.pdal.io for the supported formats. It produces a
+      vtkPolyData with point data arrays for attributes such as
+      Intensity, Classification, Color, etc.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        PDAL reader.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="bin bpf csd csv greyhound gpkg icebride las laz mat nitf nsf ntf pcd ply pts qi rxp sbet sqlite sid tindex txt h5"
+                       file_description="PDAL Files" />
+      </Hints>
+    </SourceProxy>
+      <!-- End PDALReader -->
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

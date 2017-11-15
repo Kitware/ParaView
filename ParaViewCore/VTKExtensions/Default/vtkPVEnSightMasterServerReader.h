@@ -52,7 +52,7 @@ public:
   /**
    * Return whether we can read the file given.
    */
-  virtual int CanReadFile(const char*);
+  int CanReadFile(const char*) override;
 
   //@{
   /**
