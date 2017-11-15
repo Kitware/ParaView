@@ -146,6 +146,13 @@ cases, being your topic name with the issue number.
 
     Some background is in the [testing design wiki](https://www.paraview.org/Wiki/Testing_design).
 
+5. Add release notes
+
+    Noteable changes should create a new file in `Documentation/release/dev/`
+    named `my-topic.md` (replace `my-topic` with the name of your topic).
+    This is not necessary for branches which are "trivial" such as fixing
+    typos, updating test baselines, or are developer-oriented.
+
 [vtk instructions]: https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/data.md
 
 Share a Topic
