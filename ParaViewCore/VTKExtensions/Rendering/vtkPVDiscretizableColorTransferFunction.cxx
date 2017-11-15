@@ -311,7 +311,7 @@ void vtkPVDiscretizableColorTransferFunction::Build()
         {
           double color[3];
           this->GetIndexedColorInFullSet(i, color);
-          this->SetIndexedColor(annotationCount, color);
+          this->SetIndexedColorRGB(annotationCount, color);
           annotationCount++;
         }
       }

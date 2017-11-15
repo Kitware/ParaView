@@ -17,7 +17,7 @@ def _refHolderMaker(obj):
     return _refHolder
 
 def coProcess(grid, time, step, scriptname, wholeExtent):
-    import vtkPVCatalystPython
+    from paraview.vtk import vtkPVCatalyst
     import os
     scriptpath, scriptname = os.path.split(scriptname)
     sys.path.append(scriptpath)
@@ -32,7 +32,7 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
         sys.exit(1)
         return
 
-    datadescription = vtkPVCatalystPython.vtkCPDataDescription()
+    datadescription = vtkPVCatalyst.vtkCPDataDescription()
     datadescription.SetTimeData(time, step)
     datadescription.AddInput("input")
     cpscript.RequestDataDescription(datadescription)

@@ -74,11 +74,24 @@ set (CMAKE_MODULE_PATH
   ${ParaView_CMAKE_DIR}
 )
 
-# Use the new version of the variable names for output of build process.
-# Make sure these are consistent with what VTK sets.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+# Set up our directory structure for output libraries and binaries
+if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/bin")
+endif()
+if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  if(UNIX)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/lib")
+  else()
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/bin")
+  endif()
+endif()
+if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/lib")
+endif()
+mark_as_advanced(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+  CMAKE_LIBRARY_OUTPUT_DIRECTORY
+  CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+  )
 
 include(Utilities/Git/Git.cmake)
 include(ParaViewDetermineVersion)
@@ -109,19 +122,10 @@ if(NOT VTK_INSTALL_RUNTIME_DIR)
   set(VTK_INSTALL_RUNTIME_DIR bin)
 endif()
 if(NOT VTK_INSTALL_LIBRARY_DIR)
-  set(VTK_INSTALL_LIBRARY_DIR lib/paraview-${PARAVIEW_VERSION})
-endif()
-# ParaView installs the vtk python modules specifically to appropriate locations.
-if(NOT VTK_INSTALL_PYTHON_MODULE_DIR)
-  set (VTK_INSTALL_PYTHON_MODULE_DIR "${VTK_INSTALL_LIBRARY_DIR}/site-packages" CACHE
-    INTERNAL "Directory where python modules will be installed")
-endif()
-if(NOT VTK_BUILD_PYTHON_MODULE_DIR)
-  set (VTK_BUILD_PYTHON_MODULE_DIR "${CMAKE_BINARY_DIR}/lib/site-packages" CACHE
-    INTERNAL "Directory where python modules will be built")
+  set(VTK_INSTALL_LIBRARY_DIR lib)
 endif()
 if(NOT VTK_INSTALL_ARCHIVE_DIR)
-  set(VTK_INSTALL_ARCHIVE_DIR lib/paraview-${PARAVIEW_VERSION})
+  set(VTK_INSTALL_ARCHIVE_DIR lib)
 endif()
 if(NOT VTK_INSTALL_INCLUDE_DIR)
   set(VTK_INSTALL_INCLUDE_DIR include/paraview-${PARAVIEW_VERSION})
@@ -144,6 +148,7 @@ endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
+# Leaving  VTK_PYTHON_SITE_PACKAGES_SUFFIX unchanged. VTK picks a good one.
 if(NOT PARAVIEW_WWW_DIR)
   set(PARAVIEW_WWW_DIR "${ParaView_BINARY_DIR}/www")
 endif()
@@ -731,19 +736,6 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
     ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS}
     ${vtkPVPythonCatalyst_INCLUDE_DIRS}
     ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
-
-  # All the ${vtk-module}Python files are installed by VTK/Wrapping/Python/CMakeLists.txt
-  # outside the module subsystem. Hence, we need to install the vtkPVPythonCatalystPython
-  # library explicitly here (BUG #15085).
-  # This code mirrors the code in VTK/Wrapping/Python/CMakeLists.txt
-  if (NOT VTK_INSTALL_NO_RUNTIME AND BUILD_SHARED_LIBS AND NOT VTK_INSTALL_NO_LIBRARIES)
-    install(TARGETS ${vtk-module}Python
-      EXPORT ${VTK_INSTALL_EXPORT_NAME}
-      RUNTIME DESTINATION ${VTK_INSTALL_RUNTIME_DIR} COMPONENT RuntimeLibraries
-      LIBRARY DESTINATION ${VTK_INSTALL_PYTHON_MODULE_DIR}/vtk COMPONENT RuntimeLibraries
-      ARCHIVE DESTINATION ${VTK_INSTALL_ARCHIVE_DIR} COMPONENT Development
-      )
-  endif()
   unset(vtk-module)
 endif()
 

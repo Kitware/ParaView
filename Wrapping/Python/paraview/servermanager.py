@@ -2943,7 +2943,7 @@ def demo3():
     probes it with a line, delivers the result to the client using Fetch
     and plots it using pylab. This demo requires numpy and pylab installed.
     It returns a tuple of (data, render view)."""
-    import paraview.numpy_support
+    from paraview.vtk.util import numpy_support
     import pylab
 
     if not ActiveConnection:
@@ -3006,7 +3006,7 @@ def demo3():
     # Now deliver it to the client. Remember, this is for small data.
     data = Fetch(probe)
     # Convert it to a numpy array
-    data = paraview.numpy_support.vtk_to_numpy(
+    data = numpy_support.vtk_to_numpy(
       data.GetPointData().GetArray("RTData"))
     # Plot it using matplotlib
     pylab.plot(data)
