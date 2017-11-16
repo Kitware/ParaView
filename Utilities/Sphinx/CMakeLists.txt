@@ -22,7 +22,7 @@ file(COPY config
      PATTERN "*.in" EXCLUDE)
 
 set (paraview_paths
-  "['${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages',
+  "['${VTK_BUILD_PYTHON_MODULES_DIR}',
     '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}',
     '${CMAKE_LIBRARY_OUTPUT_DIRECTORY}']")
 configure_file(config/conf.py.in config/conf.py @ONLY)
@@ -35,7 +35,7 @@ add_custom_target(ParaViewPythonDoc
   COMMAND $<TARGET_FILE:pvpython>
           "${CMAKE_CURRENT_SOURCE_DIR}/sphinx_apidoc.py"
           -o "${CMAKE_CURRENT_BINARY_DIR}/config"
-          "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview"
+          "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview"
   COMMAND ${sphinx-build}
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${PARAVIEW_WWW_DIR}/py-doc"
