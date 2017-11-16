@@ -1305,10 +1305,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         if allowedProxiesFile:
             self.readAllowedProxies(allowedProxiesFile)
         else:
-            module_path = os.path.abspath(__file__)
-            path = os.path.dirname(module_path)
-            proxyFile = os.path.join(path, 'defaultProxies.json')
-            self.readAllowedProxies(proxyFile)
+            from ._default_proxies import getDefaultProxies
+            self.readAllowedProxies(getDefaultProxies())
 
         if fileToLoad:
             if '*' in fileToLoad:
@@ -1333,14 +1331,18 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
     #--------------------------------------------------------------------------
     # Read the configured proxies json file into a dictionary and process.
     #--------------------------------------------------------------------------
-    def readAllowedProxies(self, filepath):
+    def readAllowedProxies(self, filepathOrConfig):
         self.availableList = {}
         self.allowedProxies = {}
-        with open(filepath, 'r') as fd:
-            configurationData = json.load(fd)
-            self.configureFiltersOrSources('sources', configurationData['sources'])
-            self.configureFiltersOrSources('filters', configurationData['filters'])
-            self.configureReaders(configurationData['readers'])
+        configurationData = {}
+        if type(filepathOrConfig) == dict:
+            configurationData = filepathOrConfig
+        else:
+            with open(filepath, 'r') as fd:
+                configurationData = json.load(fd)
+        self.configureFiltersOrSources('sources', configurationData['sources'])
+        self.configureFiltersOrSources('filters', configurationData['filters'])
+        self.configureReaders(configurationData['readers'])
 
     #--------------------------------------------------------------------------
     # Handle filters and sources sections of the proxies config file.

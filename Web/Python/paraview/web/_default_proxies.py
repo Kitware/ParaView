@@ -1,3 +1,11 @@
+r"""internal module used to get the list of default proxies.
+
+This is an internal module and not intended to be used by Python code outside of
+this package.
+
+"""
+
+__defaultProxiesJSON = """
 {
     "sources": [
         { "name": "AnnotateTime", "label": "Annotate Time" },
@@ -32,3 +40,9 @@
         { "name": "Xdmf3ReaderS", "extensions": [ "xmf", "xdmf" ] }
     ]
 }
+"""
+
+def getDefaultProxies():
+    """Returns the JSON object for the default proxies configuration"""
+    import json
+    return json.loads(__defaultProxiesJSON)
