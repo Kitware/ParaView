@@ -61,9 +61,4 @@ set (Module_SRCS
   vtkSMXYChartRepresentationInitializationHelper.cxx
 )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkSMExporterProxy.cxx
-  ABSTRACT
-  )
-
 vtk_module_library(vtkPVServerManagerDefault ${Module_SRCS})

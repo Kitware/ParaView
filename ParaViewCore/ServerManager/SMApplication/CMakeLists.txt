@@ -32,11 +32,6 @@ set (Module_SRCS
   vtkInitializationHelper.cxx
 )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkInitializationHelper
-  ABSTRACT
-  )
-
 vtk_module_library(vtkPVServerManagerApplication ${Module_SRCS})
 
 #------------------------------------------------------------------------------

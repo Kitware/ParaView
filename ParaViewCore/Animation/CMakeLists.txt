@@ -71,12 +71,4 @@ endif()
 #  WRAP_EXCLUDE
 #)
 
-set_source_files_properties(
-  vtkAnimationPlayer
-  vtkPVAnimationCue
-  vtkPVCueManipulator
-  vtkPVKeyFrameAnimationCue
-  vtkSMAnimationSceneWriter.cxx
-  ABSTRACT
-)
 vtk_module_library(${vtk-module} ${Module_SRCS})

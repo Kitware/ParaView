@@ -21,10 +21,6 @@
 // Defines standard new macro
 vtkStandardNewMacro(vtkPVRenderLoopEvent);
 
-// -----------------------------------------------------------------------macro
-// Needed when we don't use vtkStandardNewMacro
-// vtkInstantiatorNewMacro(vtkPVRenderLoopEvent);
-
 // --------------------------------------------------------------------internal
 // IMPORTANT: Make sure that this struct has no pointers.  All pointers should
 // be put in the class declaration. For all newly defined pointers make sure to

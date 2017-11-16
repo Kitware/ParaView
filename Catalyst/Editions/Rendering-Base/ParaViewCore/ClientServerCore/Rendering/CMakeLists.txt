@@ -6,13 +6,6 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
-set_source_files_properties(
-#  vtkPVContextView
-#  vtkPVDataRepresentation
-#  vtkPVSynchronizedRenderWindows
-  vtkPVView
-  ABSTRACT)
-
 #set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
 
 # Use a custom hints file for this module.

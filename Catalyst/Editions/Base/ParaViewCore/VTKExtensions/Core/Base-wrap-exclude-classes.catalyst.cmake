@@ -5,8 +5,3 @@ set_source_files_properties(
   vtkMemberFunctionCommand
   WRAP_EXCLUDE
   )
-
-set_source_files_properties(
-  vtkCommunicationErrorCatcher
-  vtkUndoElement
-  ABSTRACT)

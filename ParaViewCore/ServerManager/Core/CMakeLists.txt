@@ -137,23 +137,6 @@ set (Module_SRCS
 )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMDeserializer
-  vtkSMDomain
-  vtkSMLink
-  vtkSMPropertyHelper
-  vtkSMProxyInitializationHelper
-  vtkSMProxyManager  # since New() is protected.
-  vtkSMRangeDomainTemplate
-  vtkSMRemoteObject
-  vtkSMSession
-  vtkSMSessionProxyManager # since New() is non-standard.
-  vtkSMUncheckedPropertyHelper
-  vtkSMUndoElement
-  vtkSMVectorProperty
-  ABSTRACT
-  )
-
-SET_SOURCE_FILES_PROPERTIES(
   vtkSMPropertyHelper
   vtkSMRangeDomainTemplate
   vtkSMUncheckedPropertyHelper

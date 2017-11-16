@@ -64,10 +64,6 @@ if (PARAVIEW_ENABLE_PYTHON)
     )
 endif()
 
-set_source_files_properties(
-  vtkNetworkAccessManager
-  ABSTRACT)
-
 vtk_module_library(vtkPVClientServerCoreDefault ${Module_SRCS})
 
 # for vtkPVFileInformation

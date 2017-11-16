@@ -39,11 +39,6 @@ set (Module_SRCS
 )
 
 set_source_files_properties(
-  vtkCPAdaptorAPI
-  vtkCPPipeline
-  ABSTRACT)
-
-set_source_files_properties(
   CAdaptorAPI
   vtkCPCxxHelper
   WRAP_EXCLUDE)

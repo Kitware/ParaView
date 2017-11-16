@@ -139,14 +139,6 @@ set_source_files_properties(
   WRAP_EXCLUDE
 )
 
-set_source_files_properties(
-  vtkCacheSizeKeeper
-  vtkPVContextView
-  vtkPVDataRepresentation
-  vtkPVSynchronizedRenderWindows
-  vtkPVView
-  ABSTRACT)
-
 set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
 
 # Use a custom hints file for this module.

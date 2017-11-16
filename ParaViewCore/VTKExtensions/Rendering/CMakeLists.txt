@@ -125,11 +125,6 @@ endif()
 #set_source_files_properties(
 #  WRAP_EXCLUDE
 #  )
-set_source_files_properties(
-  vtkCameraManipulatorGUIHelper
-  vtkImageCompressor
-  vtkPVJoystickFly
-  ABSTRACT)
 
 #---------------------------------------------------------
 # Encode glsl files.
