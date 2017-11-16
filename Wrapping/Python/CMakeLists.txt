@@ -43,6 +43,7 @@ endif()
 
 #------------------------------------------------------------------------------
 # Build paraview package.
+# This will also all install rules to install the `paraview` package.
 vtk_python_package(pvpython_pyc paraview DEPENDS ${_vtkpy_modules})
 
 #------------------------------------------------------------------------------
@@ -81,11 +82,24 @@ add_custom_command(
 add_custom_target(paraview_python_package
   DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pv_copy_and_compile_py_files_complete")
 
-# Install the paraview module files.
-# XXX(uda): why are we installing all packages in site-packages? We should only install
-# ones we created here i.e. paraview and vtk.
-install(DIRECTORY ${VTK_BUILD_PYTHON_MODULES_DIR}
-    DESTINATION ${VTK_INSTALL_PYTHON_MODULES_DIR}
-    COMPONENT Runtime
-    PATTERN *-complete EXCLUDE
-    PATTERN *_complete EXCLUDE)
+if(WIN32)
+  set(_module_extension "pyd")
+else()
+  set(_module_extension "so")
+endif()
+
+# The install rules added by `vtk_python_package` skip vtk.*Python.[so|pyd]
+# files. VTK has install rules to put those under the `vtk` package, but it
+# doesn't do that for the duplicate `paraview/vtk` package which we need to
+# handle explicitly here.
+install(CODE "
+  file(INSTALL DESTINATION
+      \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_PYTHON_MODULES_DIR}/paraview/vtk\"
+    TYPE DIRECTORY FILES
+      \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_PYTHON_MODULES_DIR}/vtk/\"
+    USE_SOURCE_PERMISSIONS
+    FILES_MATCHING
+    REGEX \"/vtk[^/]*Python\\\\.${_module_extension}$\"
+    )
+  "
+  COMPONENT Runtime)
