@@ -262,34 +262,32 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
     this->GlyphMapper->SetInputConnection(0, producerPort);
     this->LODGlyphMapper->SetInputConnection(0, producerPortLOD);
 
-    // Clear these out in case glyph source extraction fails (See below).
-    this->GlyphMapper->SetInputDataObject(1, NULL);
-    this->LODGlyphMapper->SetInputDataObject(1, NULL);
-
     // Extract the real glyph source from the MBDS wrapper (see note above
     // vtkGlyphRepresentationMultiBlockMaker)
     producerGlyphPort->GetProducer()->Update();
     vtkMultiBlockDataSet* glyphMBDS = vtkMultiBlockDataSet::SafeDownCast(
       producerGlyphPort->GetProducer()->GetOutputDataObject(producerGlyphPort->GetIndex()));
-    if (glyphMBDS)
+    if (glyphMBDS && glyphMBDS->GetNumberOfBlocks() == 1)
     {
-      if (glyphMBDS->GetNumberOfBlocks() == 1)
-      {
-        vtkDataObject* realGlyph = glyphMBDS->GetBlock(0);
-        this->GlyphMapper->SetInputDataObject(1, realGlyph);
-      }
+      vtkDataObject* realGlyph = glyphMBDS->GetBlock(0);
+      this->GlyphMapper->SetInputDataObject(1, realGlyph);
+    }
+    else
+    {
+      this->GlyphMapper->SetInputDataObject(1, NULL);
     }
 
     producerGlyphPortLOD->GetProducer()->Update();
     vtkMultiBlockDataSet* glyphMBDSLOD = vtkMultiBlockDataSet::SafeDownCast(
       producerGlyphPortLOD->GetProducer()->GetOutputDataObject(producerGlyphPortLOD->GetIndex()));
-    if (glyphMBDSLOD)
+    if (glyphMBDSLOD && glyphMBDSLOD->GetNumberOfBlocks() == 1)
     {
-      if (glyphMBDSLOD->GetNumberOfBlocks() == 1)
-      {
-        vtkDataObject* realGlyphLOD = glyphMBDSLOD->GetBlock(0);
-        this->LODGlyphMapper->SetInputDataObject(1, realGlyphLOD);
-      }
+      vtkDataObject* realGlyphLOD = glyphMBDSLOD->GetBlock(0);
+      this->LODGlyphMapper->SetInputDataObject(1, realGlyphLOD);
+    }
+    else
+    {
+      this->LODGlyphMapper->SetInputDataObject(1, NULL);
     }
 
     bool lod = this->SuppressLOD ? false : (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
