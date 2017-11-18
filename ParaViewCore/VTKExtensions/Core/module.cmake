@@ -7,6 +7,7 @@ vtk_module(vtkPVVTKExtensionsCore
     vtkIOImage
     vtkParallelCore
     vtkPVCommon
+    vtkCommonMisc
   PRIVATE_DEPENDS
     vtksys
   TEST_LABELS
