@@ -167,6 +167,11 @@ void pqSaveScreenshotReaction::saveScreenshot()
       previewHelper.Set(layoutSize.GetData(), 2);
       restorePreviewMode = true;
     }
+    else
+    {
+      // if in preview mode, check "save all views".
+      vtkSMPropertyHelper(shProxy, "SaveAllViews").Set(1);
+    }
   }
 
   pqProxyWidgetDialog dialog(shProxy, pqCoreUtilities::mainWidget());

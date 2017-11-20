@@ -182,6 +182,11 @@ void pqSaveAnimationReaction::saveAnimation()
       previewHelper.Set(layoutSize.GetData(), 2);
       restorePreviewMode = true;
     }
+    else
+    {
+      // if in preview mode, check "save all views".
+      vtkSMPropertyHelper(ahProxy, "SaveAllViews").Set(1);
+    }
   }
 
   if (!vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(session))
