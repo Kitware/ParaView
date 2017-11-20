@@ -4619,8 +4619,6 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <InputArrayDomain name="input_array"
-                          optional="1" />
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell"
                           optional="1" />
