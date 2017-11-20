@@ -4619,6 +4619,30 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          optional="1" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell_1"
+                          number_of_components="1"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_1"
+                          number_of_components="1"
+                          optional="1" />
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array_cell_3"
+                          number_of_components="3"
+                          optional="1" />
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point_3"
+                          number_of_components="3"
+                          optional="1" />
         <Documentation>Set the input to the representation.</Documentation>
       </InputProperty>
       <IntVectorProperty command="SetBackfaceRepresentation"
