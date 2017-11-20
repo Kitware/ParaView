@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
@@ -929,6 +930,10 @@ QSize pqMultiViewWidget::preview(const QSize& nsize)
       resolution[0] = nsize.width();
       resolution[1] = nsize.height();
     }
+    SM_SCOPED_TRACE(PropertiesModified)
+      .arg("proxy", vlayout)
+      .arg("comment", nsize.isEmpty() ? "Exit preview mode" : "Enter preview mode");
+
     vtkSMPropertyHelper(vlayout, "PreviewMode").Set(resolution, 2);
     //< results in a call to "updatePreviewMode" if changed.
     vlayout->UpdateVTKObjects();
