@@ -20,6 +20,7 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/SplitVertical" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/TitleBar" command="mousePress" arguments="1,1,0,148,7" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/TitleBar" command="mouseRelease" arguments="1,0,0,148,7" />
+  <!-- save large screenshot views -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
 
@@ -35,4 +36,25 @@
   <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" />
   <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" />
   <pqcompareimage image="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/SaveLargeScreenshot.png" />
+
+
+  <!-- save small screenshot views -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+
+  <!-- save all views -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="400" />
+
+  <!-- add a 1 pixel multi-view border in black -->
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorWidth/IntRangeWidget/LineEdit" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorColor/ColorButton" command="setChosenColor" arguments="0,0,0" />
+
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/savesmallscreenshot.test.png" />
+  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/savesmallscreenshot.test.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/savesmallscreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/SaveSmallScreenshot.png" />
 </pqevents>

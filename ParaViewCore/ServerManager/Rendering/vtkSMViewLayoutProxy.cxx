@@ -1048,8 +1048,6 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magX, int magY)
     return NULL;
   }
 
-  this->UpdateState();
-
   std::vector<vtkSmartPointer<vtkImageData> > images;
   for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
        iter != this->Internals->KDTree.end(); ++iter)
