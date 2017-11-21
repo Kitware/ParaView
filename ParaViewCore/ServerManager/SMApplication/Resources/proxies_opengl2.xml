@@ -554,7 +554,7 @@
                          name="ShaderPreset"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry text="Gaussian Blur (Default)"
+          <Entry text="Gaussian Blur"
                  value="0" />
           <Entry text="Sphere"
                  value="1" />
