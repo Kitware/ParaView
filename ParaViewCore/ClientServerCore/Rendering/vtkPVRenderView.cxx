@@ -2971,7 +2971,7 @@ void vtkPVRenderView::SetEnableOSPRay(bool v)
   if (v)
   {
     vtkWarningMacro(
-      "Refusing to switch to OSPRay since it is not built into this copy of ParaView");
+      "Refusing to enable OSPRay since either the client or server does not have it.");
   }
 #endif
 }
