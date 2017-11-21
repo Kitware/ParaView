@@ -1827,6 +1827,18 @@ def GetViewForLight(proxy):
     return None
 
 #==============================================================================
+# Materials.
+#==============================================================================
+
+def GetMaterialLibrary():
+    """Returns the material library for the active session. """
+    if not servermanager.ActiveConnection:
+        raise RuntimeError ("Missing active session")
+    session = servermanager.ActiveConnection.Session
+    controller = servermanager.ParaViewPipelineController()
+    return controller.FindMaterialLibrary(session)
+
+#==============================================================================
 # Miscellaneous functions.
 #==============================================================================
 def Show3DWidgets(proxy=None):

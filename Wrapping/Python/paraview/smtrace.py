@@ -297,6 +297,13 @@ class Trace(object):
                     "# create a new light",
                     "%s = CreateLight()" % (accessor)])
             return True
+        if obj.SMProxy.IsA("vtkSMMaterialLibraryProxy"):
+            tkAccessor = ProxyAccessor(cls.get_varname(cls.get_registered_name(obj, "materiallibrary")), obj)
+            cls.Output.append_separated([\
+                    "# get the material library",
+                    "%s = GetMaterialLibrary()" % tkAccessor])
+            return True
+
 
         return False
 
