@@ -30,6 +30,8 @@ vtkPVDiscretizableColorTransferFunction::vtkPVDiscretizableColorTransferFunction
   this->AnnotationsInFullSet = NULL;
   this->IndexedColorsInFullSet = vtkDoubleArray::New();
   this->IndexedColorsInFullSet->SetNumberOfComponents(3);
+  this->IndexedOpacitiesInFullSet = vtkDoubleArray::New();
+  this->IndexedOpacitiesInFullSet->SetNumberOfComponents(1);
 
   this->ActiveAnnotatedValues = vtkVariantArray::New();
 
@@ -47,6 +49,11 @@ vtkPVDiscretizableColorTransferFunction::~vtkPVDiscretizableColorTransferFunctio
   if (this->AnnotationsInFullSet)
   {
     this->AnnotationsInFullSet->Delete();
+  }
+
+  if (this->IndexedOpacitiesInFullSet)
+  {
+    this->IndexedOpacitiesInFullSet->Delete();
   }
 
   if (this->IndexedColorsInFullSet)
@@ -213,16 +220,15 @@ void vtkPVDiscretizableColorTransferFunction::SetActiveAnnotatedValue(vtkStdStri
 //-----------------------------------------------------------------------------
 void vtkPVDiscretizableColorTransferFunction::SetNumberOfIndexedColorsInFullSet(int n)
 {
-  if (n != this->IndexedColorsInFullSet->GetNumberOfTuples())
+  if (n != static_cast<int>(this->IndexedColorsInFullSet->GetNumberOfTuples()))
   {
     vtkIdType old = this->IndexedColorsInFullSet->GetNumberOfTuples();
     this->IndexedColorsInFullSet->SetNumberOfTuples(n);
     if (old < n)
     {
-      double rgb[3] = { 0, 0, 0 };
-      for (int i = old; i < n; ++i)
+      for (int i = 0; i < 3; i++)
       {
-        this->IndexedColorsInFullSet->SetTypedTuple(i, rgb);
+        this->IndexedColorsInFullSet->FillComponent(i, 0.0);
       }
     }
     this->Modified();
@@ -235,7 +241,7 @@ void vtkPVDiscretizableColorTransferFunction::SetIndexedColorInFullSet(
 {
   if (index >= static_cast<unsigned int>(this->IndexedColorsInFullSet->GetNumberOfTuples()))
   {
-    this->SetNumberOfIndexedColorsInFullSet(index + 1);
+    this->SetNumberOfIndexedColorsInFullSet(static_cast<int>(index + 1));
     this->Modified();
   }
 
@@ -258,7 +264,7 @@ int vtkPVDiscretizableColorTransferFunction::GetNumberOfIndexedColorsInFullSet()
 
 //-----------------------------------------------------------------------------
 void vtkPVDiscretizableColorTransferFunction::GetIndexedColorInFullSet(
-  unsigned int index, double rgb[3])
+  unsigned int index, double* rgb)
 {
   if (index >= static_cast<unsigned int>(this->IndexedColorsInFullSet->GetNumberOfTuples()))
   {
@@ -267,6 +273,59 @@ void vtkPVDiscretizableColorTransferFunction::GetIndexedColorInFullSet(
   }
 
   this->IndexedColorsInFullSet->GetTypedTuple(index, rgb);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDiscretizableColorTransferFunction::SetNumberOfIndexedOpacitiesInFullSet(int n)
+{
+  if (n != static_cast<int>(this->IndexedOpacitiesInFullSet->GetNumberOfTuples()))
+  {
+    vtkIdType old = this->IndexedOpacitiesInFullSet->GetNumberOfTuples();
+    this->IndexedOpacitiesInFullSet->SetNumberOfTuples(n);
+    if (old < n)
+    {
+      this->IndexedOpacitiesInFullSet->FillComponent(0, 1.0);
+    }
+    this->Modified();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDiscretizableColorTransferFunction::SetIndexedOpacityInFullSet(
+  unsigned int index, double alpha)
+{
+  if (index >= static_cast<unsigned int>(this->IndexedOpacitiesInFullSet->GetNumberOfTuples()))
+  {
+    this->SetNumberOfIndexedOpacitiesInFullSet(static_cast<int>(index + 1));
+    this->Modified();
+  }
+
+  double currentAlpha;
+  this->IndexedOpacitiesInFullSet->GetTypedTuple(index, &currentAlpha);
+  if (currentAlpha != alpha)
+  {
+    this->IndexedOpacitiesInFullSet->SetTypedTuple(index, &alpha);
+    this->Modified();
+  }
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVDiscretizableColorTransferFunction::GetNumberOfIndexedOpacitiesInFullSet()
+{
+  return static_cast<int>(this->IndexedOpacitiesInFullSet->GetNumberOfTuples());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDiscretizableColorTransferFunction::GetIndexedOpacityInFullSet(
+  unsigned int index, double* alpha)
+{
+  if (index >= static_cast<unsigned int>(this->IndexedOpacitiesInFullSet->GetNumberOfTuples()))
+  {
+    vtkErrorMacro(<< "Index out of range. Opacity not set.");
+    return;
+  }
+
+  this->IndexedOpacitiesInFullSet->GetTypedTuple(index, alpha);
 }
 
 //-----------------------------------------------------------------------------
@@ -309,9 +368,18 @@ void vtkPVDiscretizableColorTransferFunction::Build()
 
         if (i < this->IndexedColorsInFullSet->GetNumberOfTuples())
         {
-          double color[3];
+          double color[4];
           this->GetIndexedColorInFullSet(i, color);
-          this->SetIndexedColorRGB(annotationCount, color);
+          if (this->EnableOpacityMapping &&
+            i < this->IndexedOpacitiesInFullSet->GetNumberOfTuples())
+          {
+            this->GetIndexedOpacityInFullSet(i, &color[3]);
+          }
+          else
+          {
+            color[3] = 1.0;
+          }
+          this->SetIndexedColorRGBA(annotationCount, color);
           annotationCount++;
         }
       }

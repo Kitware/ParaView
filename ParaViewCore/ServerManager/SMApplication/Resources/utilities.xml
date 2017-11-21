@@ -68,6 +68,7 @@
         </Documentation>
       </IntVectorProperty>
 
+
       <IntVectorProperty name="EnableOpacityMapping"
                          command="SetEnableOpacityMapping"
                          number_of_elements="1"
@@ -295,6 +296,18 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="IndexedOpacities"
+                            command="SetIndexedOpacityInFullSet"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfIndexedOpacitiesInFullSet"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Opacities used when using IndexedLookup is true.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <PropertyGroup label="Mapping Data" panel_widget="ColorOpacityEditor">
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="RGBPoints" function="XRGBPoints" />
@@ -314,6 +327,7 @@
 
       <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
         <Property name="Annotations" />
+        <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="IndexedColors" />
       </PropertyGroup>
 
