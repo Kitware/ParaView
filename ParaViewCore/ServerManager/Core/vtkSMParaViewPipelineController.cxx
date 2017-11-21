@@ -404,15 +404,13 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
 #ifdef PARAVIEW_USE_OSPRAY
 
     materialLib.TakeReference(vtkSafeNewProxy(pxm, "materials", "MaterialLibrary"));
-    if (!materialLib)
+    if (materialLib)
     {
-      vtkErrorMacro("Failed to create 'MaterialLibrary' proxy. ");
-      return false;
+      this->InitializeProxy(materialLib);
+      materialLib->UpdateVTKObjects();
+      this->DoMaterialSetup(materialLib.Get());
+      pxm->RegisterProxy("materiallibrary", materialLib);
     }
-    this->InitializeProxy(materialLib);
-    materialLib->UpdateVTKObjects();
-    this->DoMaterialSetup(materialLib.Get());
-    pxm->RegisterProxy("materiallibrary", materialLib);
 #endif
   }
 
@@ -680,7 +678,9 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy, const
   vtkSmartPointer<vtkSMProxy> materialLib = this->FindMaterialLibrary(proxy->GetSession());
   if (materialLib)
   {
-    vtkSMPropertyHelper(proxy, "OSPRayMaterialLibrary").Add(materialLib);
+    // session has one, try and add it to the view
+    // third argument 'true' stops complaints on incompatible view types
+    vtkSMPropertyHelper(proxy, "OSPRayMaterialLibrary", true).Add(materialLib);
   }
 
   // Make the proxy active.
