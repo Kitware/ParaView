@@ -38,6 +38,7 @@ vtk_module(vtkPVClientServerCoreCore
     vtkPVVTKExtensionsSIL
   PRIVATE_DEPENDS
     vtksys
+    vtkCommonMisc
   COMPILE_DEPENDS
   # This ensures that CS wrappings will be generated 
     vtkUtilitiesWrapClientServer

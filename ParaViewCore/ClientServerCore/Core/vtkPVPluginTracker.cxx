@@ -16,8 +16,8 @@
 
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkCommand.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPResourceFileLocator.h"
 #include "vtkPSystemTools.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
@@ -29,6 +29,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
+#include "vtkVersion.h"
 
 #include <assert.h>
 #include <sstream>
@@ -71,92 +72,115 @@ public:
   }
 };
 
-std::string vtkLocatePluginSerial(
-  const char* plugin, bool add_extensions, vtkPluginSearchFunction searchFunction)
+/**
+ * Convert a plugin name to its library name i.e. add platform specific
+ * library prefix and suffix.
+ */
+std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
+{
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  return pluginname + ".dll";
+#elif defined(__APPLE__)
+  return "lib" + pluginname + ".dylib";
+#else
+  return "lib" + pluginname + ".so";
+#endif
+}
+
+/**
+ * Locate a plugin library or a config file anchored at standard locations
+ * for locating plugins.
+ */
+std::string vtkLocatePluginOrConfigFile(
+  const char* plugin, bool isPlugin, vtkPluginSearchFunction searchFunction)
 {
   (void)searchFunction;
+  auto pm = vtkProcessModule::GetProcessModule();
   // Make sure we can get the options before going further
-  if (vtkProcessModule::GetProcessModule() == NULL)
+  if (pm == NULL)
   {
     return std::string();
   }
 
   bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
 #ifndef BUILD_SHARED_LIBS
-  vtkPVPluginTrackerDebugMacro("Looking for static plugin \'" << plugin << "\'");
-  if (searchFunction && searchFunction(plugin))
+  if (isPlugin)
   {
-    vtkPVPluginTrackerDebugMacro("Found static plugin \'" << plugin << "\'");
-    return plugin;
-  }
-#endif
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  std::string app_dir = options->GetApplicationPath();
-  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
-
-  std::vector<std::string> paths_to_search;
-  paths_to_search.push_back(app_dir);
-  paths_to_search.push_back(app_dir + "/../lib/");
-  paths_to_search.push_back(app_dir + "/plugins/" + plugin);
-#if defined(__APPLE__)
-  // paths for app
-  paths_to_search.push_back(app_dir + "/../Plugins");
-  paths_to_search.push_back(app_dir + "/../../..");
-  paths_to_search.push_back(app_dir + "/../../../../lib");
-#endif
-  // paths when doing an unix style install on OsX and static builds on Linux.
-  paths_to_search.push_back(app_dir + "/../lib/paraview-" PARAVIEW_VERSION);
-
-  // On windows configuration files are in the parent directory
-  paths_to_search.push_back(app_dir + "/../");
-
-  // Add test plugin path into the search path.
-  std::string test_plugin_dir(options->GetTestPluginPath());
-  if (!test_plugin_dir.empty())
-  {
-    paths_to_search.push_back(test_plugin_dir);
-  }
-
-  std::string name = plugin;
-  std::string filename = name;
-  if (add_extensions)
-  {
-#if defined(_WIN32) && !defined(__CYGWIN__)
-    filename = name + ".dll";
-#elif defined(__APPLE__)
-    filename = "lib" + name + ".dylib";
-#else
-    filename = "lib" + name + ".so";
-#endif
-  }
-  for (size_t cc = 0; cc < paths_to_search.size(); cc++)
-  {
-    std::string path = paths_to_search[cc];
-    if (vtksys::SystemTools::FileExists((path + "/" + filename).c_str(), true))
+    vtkPVPluginTrackerDebugMacro("Looking for static plugin \'" << plugin << "\'");
+    if (searchFunction && searchFunction(plugin))
     {
-      return (path + "/" + filename);
+      vtkPVPluginTrackerDebugMacro("Found static plugin \'" << plugin << "\'");
+      return plugin;
     }
-    vtkPVPluginTrackerDebugMacro((path + "/" + filename).c_str() << "-- not found");
   }
+#endif
+
+  const std::string exe_dir = pm->GetSelfDir();
+  const std::string vtklib = vtkGetLibraryPathForSymbol(GetVTKVersion);
+
+  std::vector<std::string> prefixes = {
+#if defined(BUILD_SHARED_LIBS)
+    std::string("paraview-" PARAVIEW_VERSION "/plugins/") + plugin,
+    std::string("paraview-" PARAVIEW_VERSION "/plugins/"),
+#else
+    // for static builds, we need to add "lib"
+    std::string("lib/paraview-" PARAVIEW_VERSION "/plugins/") + plugin,
+    std::string("lib/paraview-" PARAVIEW_VERSION "/plugins/"),
+#endif
+
+#if defined(__APPLE__)
+    // needed for Apps
+    std::string("Plugins/") + plugin,
+    std::string("Plugins/"),
+#elif defined(_WIN32)
+    std::string("plugins/") + plugin,
+    std::string("plugins/"),
+#endif
+    std::string()
+  };
+
+  const std::string landmark = isPlugin ? vtkGetPluginFileNameFromName(plugin) : plugin;
+
+  vtkNew<vtkPResourceFileLocator> locator;
+  locator->SetPrintDebugInformation(debug_plugin);
+
+  // First try the test plugin path, if it exists.
+  vtkPVOptions* options = pm->GetOptions();
+  if (options->GetTestPluginPath() && strlen(options->GetTestPluginPath()) > 0)
+  {
+    auto path = locator->Locate(options->GetTestPluginPath(), landmark);
+    if (!path.empty())
+    {
+      return path + "/" + landmark;
+    }
+  }
+
+  // Now, try the prefixes we so careful put together.
+  if (!vtklib.empty())
+  {
+    auto pluginpath =
+      locator->Locate(vtksys::SystemTools::GetFilenamePath(vtklib), prefixes, landmark);
+    if (!pluginpath.empty())
+    {
+      return pluginpath + "/" + landmark;
+    }
+  }
+  if (!exe_dir.empty())
+  {
+    auto pluginpath = locator->Locate(exe_dir, prefixes, landmark);
+    if (!pluginpath.empty())
+    {
+      return pluginpath + "/" + landmark;
+    }
+  }
+
   return std::string();
 }
 
-std::string vtkLocatePlugin(
-  const char* plugin, bool add_extensions, vtkPluginSearchFunction searchFunction)
-{
-  if (vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController())
-  {
-    std::string pluginLocation;
-    if (controller->GetLocalProcessId() == 0)
-    {
-      pluginLocation = vtkLocatePluginSerial(plugin, add_extensions, searchFunction);
-    }
-    vtkPSystemTools::BroadcastString(pluginLocation, 0);
-    return pluginLocation;
-  }
-  return vtkLocatePluginSerial(plugin, add_extensions, searchFunction);
-}
-
+/**
+ * Converts a filename for a plugin to it's name i.e. removes the library
+ * prefix and suffix, if any.
+ */
 std::string vtkGetPluginNameFromFileName(const std::string& filename)
 {
   std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(filename);
@@ -228,7 +252,8 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
     // Locate ".plugins" file and process it.
     // This will setup the distributed-list of plugins. Also it will load any
     // auto-load plugins.
-    std::string _plugins = vtkLocatePlugin(".plugins", false, StaticPluginSearchFunction);
+    std::string _plugins =
+      vtkLocatePluginOrConfigFile(".plugins", false, StaticPluginSearchFunction);
     if (!_plugins.empty())
     {
       mgr->LoadPluginConfigurationXML(_plugins.c_str());
@@ -328,7 +353,8 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root, bool 
       }
       else
       {
-        plugin_filename = vtkLocatePlugin(name.c_str(), true, StaticPluginSearchFunction);
+        plugin_filename =
+          vtkLocatePluginOrConfigFile(name.c_str(), true, StaticPluginSearchFunction);
       }
       if (plugin_filename.empty())
       {

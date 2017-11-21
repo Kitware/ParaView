@@ -242,12 +242,12 @@ macro(pv_process_plugins root_src root_build)
     endif()
   endforeach()
   set (plugin_ini "${plugin_ini}</Plugins>\n")
-  file(WRITE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/.plugins" "${plugin_ini}")
+  file(WRITE "${PARAVIEW_BUILD_PLUGINS_DIR}/.plugins" "${plugin_ini}")
 
   # Install the .plugins configuration file.
-  install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/.plugins"
-          DESTINATION "${PV_INSTALL_PLUGIN_DIR}"
-          COMPONENT Runtime)
+  install(FILES "${PARAVIEW_BUILD_PLUGINS_DIR}/.plugins"
+    DESTINATION "${PARAVIEW_INSTALL_PLUGINS_DIR}"
+    COMPONENT Runtime)
 
   if (NOT BUILD_SHARED_LIBS)
     # write the static plugins init file.
