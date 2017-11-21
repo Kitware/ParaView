@@ -297,7 +297,7 @@ protected:
 //============================================================================
 class vtkSMSaveScreenshotProxy::vtkStateLayout : public vtkSMSaveScreenshotProxy::vtkState
 {
-  int ShowWindowDecorations;
+  int PreviewMode[2];
   vtkWeakPointer<vtkSMViewLayoutProxy> Layout;
   int OriginalSeparatorWidth;
   double OriginalSeparatorColor[3];
@@ -311,9 +311,8 @@ public:
     // we're doing this here just for completeness, but in reality this should
     // happen on the UI side since the UI may need to refresh after decorations
     // are hidden.
-    vtkSMPropertyHelper swdHelper(layout, "ShowWindowDecorations");
-    this->ShowWindowDecorations = swdHelper.GetAsInt();
-    swdHelper.Set(0);
+    vtkSMPropertyHelper swdHelper(layout, "PreviewMode");
+    swdHelper.Get(this->PreviewMode, 2);
 
     this->OriginalSeparatorWidth = layout->GetSeparatorWidth();
     layout->GetSeparatorColor(this->OriginalSeparatorColor);
@@ -321,7 +320,7 @@ public:
 
   ~vtkStateLayout() override
   {
-    vtkSMPropertyHelper(this->Layout, "ShowWindowDecorations").Set(this->ShowWindowDecorations);
+    vtkSMPropertyHelper(this->Layout, "PreviewMode").Set(this->PreviewMode, 2);
     if (this->OriginalSize[0] > 0 && this->OriginalSize[1] > 0)
     {
       this->Resize(this->OriginalSize);
@@ -332,15 +331,7 @@ public:
     this->Layout->UpdateVTKObjects();
   }
 
-  vtkVector2i GetSize() const VTK_OVERRIDE
-  {
-    vtkVector2i size;
-    int ext[4];
-    this->Layout->GetLayoutExtent(ext);
-    size[0] = ext[1] - ext[0] + 1;
-    size[1] = ext[3] - ext[2] + 1;
-    return size;
-  }
+  vtkVector2i GetSize() const VTK_OVERRIDE { return this->Layout->GetSize(); }
 
   vtkSmartPointer<vtkImageData> CaptureImage() VTK_OVERRIDE
   {

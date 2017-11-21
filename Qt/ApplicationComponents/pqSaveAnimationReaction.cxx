@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
@@ -135,7 +136,6 @@ void pqSaveAnimationReaction::saveAnimation()
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkWeakPointer<vtkSMViewProxy> viewProxy = view->getViewProxy();
   vtkWeakPointer<vtkSMViewLayoutProxy> layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
-  int showWindowDecorations = -1;
 
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("misc", "SaveAnimation"));
@@ -145,6 +145,8 @@ void pqSaveAnimationReaction::saveAnimation()
     qCritical() << "Incorrect type for `SaveAnimation` proxy.";
     return;
   }
+
+  bool restorePreviewMode = false;
 
   // Cache the separator width and color
   int width = vtkSMPropertyHelper(ahProxy, "SeparatorWidth").GetAsInt();
@@ -167,13 +169,24 @@ void pqSaveAnimationReaction::saveAnimation()
   vtkSMPropertyHelper(ahProxy, "AnimationScene").Set(scene);
   controller->PostInitializeProxy(ahProxy);
 
-  if (ahProxy->UpdateSaveAllViewsPanelVisibility())
+  ahProxy->UpdateSaveAllViewsPanelVisibility();
+  if (layout)
   {
-    Q_ASSERT(layout != NULL);
-    // let's hide window decorations.
-    vtkSMPropertyHelper helper(layout, "ShowWindowDecorations");
-    showWindowDecorations = helper.GetAsInt();
-    helper.Set(0);
+    int previewMode[2] = { -1, -1 };
+    vtkSMPropertyHelper previewHelper(layout, "PreviewMode");
+    previewHelper.Get(previewMode, 2);
+    if (previewMode[0] == 0 && previewMode[1] == 0)
+    {
+      // If we are not in the preview mode, enter it with maximum size possible
+      vtkVector2i layoutSize = layout->GetSize();
+      previewHelper.Set(layoutSize.GetData(), 2);
+      restorePreviewMode = true;
+    }
+    else
+    {
+      // if in preview mode, check "save all views".
+      vtkSMPropertyHelper(ahProxy, "SaveAllViews").Set(1);
+    }
   }
 
   if (!vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(session))
@@ -199,7 +212,12 @@ void pqSaveAnimationReaction::saveAnimation()
         // Reset the separator width and color
         vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
         vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
-        vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+        // Reset to the previous preview resolution or exit preview mode
+        if (restorePreviewMode)
+        {
+          int psize[2] = { 0, 0 };
+          vtkSMPropertyHelper(layout, "PreviewMode").Set(psize, 2);
+        }
         layout->UpdateVTKObjects();
         widthLink->RemoveAllLinks();
         colorLink->RemoveAllLinks();
@@ -228,9 +246,11 @@ void pqSaveAnimationReaction::saveAnimation()
     // Reset the separator width and color
     vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
     vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
-    if (showWindowDecorations != -1)
+    // Reset to the previous preview resolution or exit preview mode
+    if (restorePreviewMode)
     {
-      vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+      int psize[2] = { 0, 0 };
+      vtkSMPropertyHelper(layout, "PreviewMode").Set(psize, 2);
     }
     layout->UpdateVTKObjects();
     widthLink->RemoveAllLinks();

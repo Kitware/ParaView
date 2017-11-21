@@ -40,8 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSaveScreenshotProxy.h"
@@ -70,7 +73,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqTabbedMultiViewWidget::pqTabWidget::pqTabWidget(QWidget* parentObject)
   : Superclass(parentObject)
   , ReadOnly(false)
-  , InPreviewMode(false)
   , TabBarVisibility(true)
 {
 }
@@ -173,58 +175,19 @@ void pqTabbedMultiViewWidget::pqTabWidget::setReadOnly(bool val)
 void pqTabbedMultiViewWidget::pqTabWidget::setTabBarVisibility(bool val)
 {
   this->TabBarVisibility = val;
-  if (!this->InPreviewMode)
-  {
-    this->tabBar()->setVisible(val);
-  }
+  this->tabBar()->setVisible(val);
 }
 
 //-----------------------------------------------------------------------------
-bool pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
+QSize pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
 {
-  if (nsize.isEmpty())
+  // NOTE: do for all widgets? Currently, we'll only do this for the current
+  // widget.
+  if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
   {
-    // exit preview mode.
-    if (this->InPreviewMode)
-    {
-      this->InPreviewMode = false;
-      this->tabBar()->setVisible(this->TabBarVisibility);
-      this->setDocumentMode(false);
-      this->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-      if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
-      {
-        widget->setForceSplitter(false);
-        widget->setDecorationsVisible(true);
-      }
-    }
-    return true;
+    return widget->preview(nsize);
   }
-  else
-  {
-    // enter preview mode.
-    this->InPreviewMode = true;
-    this->tabBar()->setVisible(false);
-    this->setDocumentMode(true);
-    bool retval = true;
-
-    const vtkVector2i tsize(nsize.width(), nsize.height());
-    // max available size is clamped by parent widget's contentsRect.
-    const QRect crect = this->parentWidget()->contentsRect();
-    vtkVector2i csize(crect.width(), crect.height());
-    const int magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
-    if (magnification > 1)
-    {
-      retval = false; // cannot respect size. using aspect ratio only.
-    }
-    this->setMaximumSize(QSize(csize[0], csize[1]));
-
-    if (pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->currentWidget()))
-    {
-      widget->setForceSplitter(true);
-      widget->setDecorationsVisible(false);
-    }
-    return retval;
-  }
+  return QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 }
 
 //-----------------------------------------------------------------------------
@@ -389,7 +352,8 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
 {
   if (proxy->getSMGroup() == "layouts" && proxy->getProxy()->IsA("vtkSMViewLayoutProxy"))
   {
-    this->createTab(vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy()));
+    auto vlayout = vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy());
+    this->createTab(vlayout);
   }
   else if (qobject_cast<pqView*>(proxy))
   {
@@ -679,7 +643,7 @@ void pqTabbedMultiViewWidget::lockViewSize(const QSize& viewSize)
 }
 
 //-----------------------------------------------------------------------------
-bool pqTabbedMultiViewWidget::preview(const QSize& nsize)
+QSize pqTabbedMultiViewWidget::preview(const QSize& nsize)
 {
   return this->Internals->TabWidget->preview(nsize);
 }
@@ -794,4 +758,14 @@ void pqTabbedMultiViewWidget::onLayoutNameChanged(pqServerManagerModelItem* item
       return;
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+vtkSMViewLayoutProxy* pqTabbedMultiViewWidget::layoutProxy() const
+{
+  if (auto widget = qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget()))
+  {
+    return widget->layoutManager();
+  }
+  return nullptr;
 }

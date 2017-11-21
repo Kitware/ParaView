@@ -39,19 +39,32 @@ void vtkSMViewResolutionDomain::Update(vtkSMProperty*)
 
   int resolution[2] = { 0, 0 };
 
-  if (useLayoutProperty != NULL && vtkSMUncheckedPropertyHelper(useLayoutProperty).GetAsInt() != 0)
+  // First try to use the PreviewMode property in the vtkSMViewLayoutProxy
+  if (layoutProperty)
   {
-    this->GetLayoutResolution(vtkSMViewLayoutProxy::SafeDownCast(
-                                vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0)),
-      resolution);
+    if (auto layout = vtkSMViewLayoutProxy::SafeDownCast(
+          vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0)))
+    {
+      vtkSMUncheckedPropertyHelper(layout, "PreviewMode").Get(resolution, 2);
+    }
   }
-  else if (viewProperty)
+  // If the PreviewMode property is not set because we were not in preview mode,
+  // then use the extent or view size
+  if (resolution[0] == 0 && resolution[1] == 0)
   {
-    this->GetViewResolution(
-      vtkSMViewProxy::SafeDownCast(vtkSMUncheckedPropertyHelper(viewProperty).GetAsProxy(0)),
-      resolution);
+    if (useLayoutProperty && vtkSMUncheckedPropertyHelper(useLayoutProperty).GetAsInt() != 0)
+    {
+      this->GetLayoutResolution(vtkSMViewLayoutProxy::SafeDownCast(
+                                  vtkSMUncheckedPropertyHelper(layoutProperty).GetAsProxy(0)),
+        resolution);
+    }
+    else if (viewProperty)
+    {
+      this->GetViewResolution(
+        vtkSMViewProxy::SafeDownCast(vtkSMUncheckedPropertyHelper(viewProperty).GetAsProxy(0)),
+        resolution);
+    }
   }
-
   if (resolution[0] != 0 && resolution[1] != 0)
   {
     std::vector<vtkEntry> values;

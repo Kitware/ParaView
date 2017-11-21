@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
@@ -80,17 +81,24 @@ public:
 
   // Set to true to place views in a separate popout widget.
   bool Popout;
-  QWidget PopoutFrame;
+  QPointer<QWidget> PopoutWindow;
+  QPointer<QWidget> PopoutFrame;
 
   pqPropertyLinks Links;
 
   pqInternals(QWidget* self)
     : Popout(false)
-    , PopoutFrame(self)
     , SavedButtons(pqViewFrame::NoButton)
   {
-    this->PopoutFrame.setWindowFlags(Qt::Window | Qt::CustomizeWindowHint | Qt::WindowTitleHint |
-      Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    this->PopoutWindow = new QWidget(self, Qt::Window | Qt::CustomizeWindowHint |
+        Qt::WindowTitleHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    this->PopoutWindow->setObjectName("PopoutWindow");
+    this->PopoutFrame = new QWidget(this->PopoutWindow);
+    this->PopoutFrame->setObjectName("PopoutFrame");
+
+    QVBoxLayout* vbox = new QVBoxLayout(this->PopoutWindow);
+    vbox->setMargin(0);
+    vbox->addWidget(this->PopoutFrame);
   }
 
   ~pqInternals()
@@ -102,6 +110,8 @@ public:
         this->LayoutManager->RemoveObserver(id);
       }
     }
+    delete this->PopoutFrame;
+    delete this->PopoutWindow;
   }
 
   void setMaximizedWidget(QWidget* wdg)
@@ -205,7 +215,6 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , Internals(new pqInternals(this))
   , DecorationsVisible(true)
-  , ForceSplitter(false)
 {
   qApp->installEventFilter(this);
 
@@ -271,15 +280,8 @@ void pqMultiViewWidget::setLayoutManager(vtkSMViewLayoutProxy* vlayout)
     {
       internals.ObserverIds.push_back(
         vlayout->AddObserver(vtkCommand::ConfigureEvent, this, &pqMultiViewWidget::reload));
-      internals.ObserverIds.push_back(
-        vlayout->GetProperty("SeparatorWidth")
-          ->AddObserver(vtkCommand::ModifiedEvent, this, &pqMultiViewWidget::updateSplitter));
-      internals.ObserverIds.push_back(
-        vlayout->GetProperty("SeparatorColor")
-          ->AddObserver(vtkCommand::ModifiedEvent, this, &pqMultiViewWidget::updateSplitter));
-      internals.Links.addPropertyLink(this, "decorationsVisibility",
-        SIGNAL(decorationsVisibilityChanged(bool)), vlayout,
-        vlayout->GetProperty("ShowWindowDecorations"));
+      internals.ObserverIds.push_back(vlayout->AddObserver(
+        vtkCommand::PropertyModifiedEvent, this, &pqMultiViewWidget::layoutPropertyModified));
     }
   }
   // we delay the setting of the LayoutManager to avoid the duplicate `reload`
@@ -296,13 +298,31 @@ vtkSMViewLayoutProxy* pqMultiViewWidget::layoutManager() const
 }
 
 //-----------------------------------------------------------------------------
+void pqMultiViewWidget::layoutPropertyModified(vtkObject*, unsigned long eventid, void* vdata)
+{
+  Q_ASSERT(eventid == vtkCommand::PropertyModifiedEvent);
+  Q_UNUSED(eventid);
+  if (const char* pname = reinterpret_cast<const char*>(vdata))
+  {
+    if (strcmp(pname, "SeparatorWidth") == 0 || strcmp(pname, "SeparatorColor") == 0)
+    {
+      this->updateSplitter();
+    }
+    else if (strcmp(pname, "PreviewMode") == 0)
+    {
+      this->updatePreviewMode();
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
 {
   if (evt->type() == QEvent::MouseButtonPress)
   {
     QWidget* wdg = qobject_cast<QWidget*>(caller);
     if (wdg && ((!this->Internals->Popout && this->isAncestorOf(wdg)) ||
-                 (this->Internals->Popout && this->Internals->PopoutFrame.isAncestorOf(wdg))))
+                 (this->Internals->Popout && this->Internals->PopoutWindow->isAncestorOf(wdg))))
     {
       // If the new widget that is getting the focus is a child widget of any of the
       // frames, then the frame should be made active.
@@ -316,7 +336,7 @@ bool pqMultiViewWidget::eventFilter(QObject* caller, QEvent* evt)
       }
     }
   }
-  else if (evt->type() == QEvent::Close && caller == &this->Internals->PopoutFrame)
+  else if (evt->type() == QEvent::Close && caller == this->Internals->PopoutWindow)
   {
     // the popout-frame is being closed. We interpret that as "un-popping" the
     // frame.
@@ -513,89 +533,52 @@ QWidget* pqMultiViewWidget::createWidget(
 
     case vtkSMViewLayoutProxy::VERTICAL:
     case vtkSMViewLayoutProxy::HORIZONTAL:
-      if (this->DecorationsVisible || this->ForceSplitter)
+      pqSplitter* splitter = qobject_cast<pqSplitter*>(this->Internals->Widgets[index]);
+      if (!splitter)
       {
-        pqSplitter* splitter = qobject_cast<pqSplitter*>(this->Internals->Widgets[index]);
-        if (!splitter)
-        {
-          splitter = new pqSplitter(parentWdg);
-        }
-        Q_ASSERT(splitter);
+        splitter = new pqSplitter(parentWdg);
+      }
+      Q_ASSERT(splitter);
 
-        this->Internals->Widgets[index] = splitter;
-        splitter->setParent(parentWdg);
-        if (this->DecorationsVisible)
-        {
-          splitter->setHandleWidth(3);
-          splitter->setSplitterHandlePaint(false);
-        }
-        else
-        {
-          splitter->setHandleWidth(0);
-          splitter->setSplitterHandlePaint(true);
-        }
-        splitter->setObjectName(QString("Splitter.%1").arg(index));
-        splitter->setProperty("FRAME_INDEX", QVariant(index));
-        splitter->setOpaqueResize(false);
-        splitter->setOrientation(
-          direction == vtkSMViewLayoutProxy::VERTICAL ? Qt::Vertical : Qt::Horizontal);
-        splitter->insertWidget(
-          0, this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
-        splitter->insertWidget(
-          1, this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
-
-        // set the sizes are percentage. QSplitter uses the initially specified
-        // sizes as reference.
-        QList<int> sizes;
-        sizes << static_cast<int>(vlayout->GetSplitFraction(index) * 10000);
-        sizes << static_cast<int>((1.0 - vlayout->GetSplitFraction(index)) * 10000);
-        splitter->setSizes(sizes);
-
-        // FIXME: Don't like this as this QueuedConnection may cause multiple
-        // renders.
-        QObject::disconnect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()));
-        QObject::connect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()),
-          Qt::QueuedConnection);
-        if (max_index < index)
-        {
-          max_index = index;
-        }
-        return splitter;
+      this->Internals->Widgets[index] = splitter;
+      splitter->setParent(parentWdg);
+      if (this->DecorationsVisible)
+      {
+        splitter->setHandleWidth(3);
+        splitter->setSplitterHandlePaint(false);
       }
       else
       {
-        QWidget* container = this->Internals->Widgets[index];
-        // since old widget may be a splitter, which is a QWidget too, we
-        // compare with className rather than using a `qobject_cast`.
-        if (strcmp(container->metaObject()->className(), "QWidget") != 0)
-        {
-          container = new QWidget(parentWdg);
-          new pqSplitterLayout(direction == vtkSMViewLayoutProxy::VERTICAL
-              ? pqSplitterLayout::TopToBottom
-              : pqSplitterLayout::LeftToRight,
-            container);
-        }
-        Q_ASSERT(container);
-        container->setObjectName(QString("Container.%1").arg(index));
-        this->Internals->Widgets[index] = container;
-
-        pqSplitterLayout* slayout = dynamic_cast<pqSplitterLayout*>(container->layout());
-        Q_ASSERT(slayout);
-        slayout->setDirection(direction == vtkSMViewLayoutProxy::VERTICAL
-            ? pqSplitterLayout::TopToBottom
-            : pqSplitterLayout::LeftToRight);
-        slayout->setSplitFraction(vlayout->GetSplitFraction(index));
-        slayout->addWidget(
-          this->createWidget(vlayout->GetFirstChild(index), vlayout, container, max_index));
-        slayout->addWidget(
-          this->createWidget(vlayout->GetSecondChild(index), vlayout, container, max_index));
-        if (max_index < index)
-        {
-          max_index = index;
-        }
-        return container;
+        splitter->setHandleWidth(0);
+        splitter->setSplitterHandlePaint(true);
       }
-      break;
+      splitter->setObjectName(QString("Splitter.%1").arg(index));
+      splitter->setProperty("FRAME_INDEX", QVariant(index));
+      splitter->setOpaqueResize(false);
+      splitter->setOrientation(
+        direction == vtkSMViewLayoutProxy::VERTICAL ? Qt::Vertical : Qt::Horizontal);
+      splitter->insertWidget(
+        0, this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter, max_index));
+      splitter->insertWidget(
+        1, this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter, max_index));
+
+      // set the sizes are percentage. QSplitter uses the initially specified
+      // sizes as reference.
+      QList<int> sizes;
+      sizes << static_cast<int>(vlayout->GetSplitFraction(index) * 10000);
+      sizes << static_cast<int>((1.0 - vlayout->GetSplitFraction(index)) * 10000);
+      splitter->setSizes(sizes);
+
+      // FIXME: Don't like this as this QueuedConnection may cause multiple
+      // renders.
+      QObject::disconnect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()));
+      QObject::connect(splitter, SIGNAL(splitterMoved(int, int)), this, SLOT(splitterMoved()),
+        Qt::QueuedConnection);
+      if (max_index < index)
+      {
+        max_index = index;
+      }
+      return splitter;
   }
   return NULL;
 }
@@ -643,7 +626,7 @@ void pqMultiViewWidget::reload()
 
   // if popout is true, we add the widgets to the PopoutFrame, rather that
   // ourselves.
-  QWidget* parentWdg = this->Internals->Popout ? &this->Internals->PopoutFrame : this;
+  QWidget* parentWdg = this->Internals->Popout ? this->Internals->PopoutFrame.data() : this;
 
   int max_index = 0;
   QWidget* child = this->createWidget(0, vlayout, parentWdg, max_index);
@@ -681,19 +664,19 @@ void pqMultiViewWidget::reload()
   {
     // if the PopoutFrame is being shown for the first time, we resize it to
     // match this widgets size so that it doesn't end up too small.
-    if (!this->Internals->PopoutFrame.property("pqMultiViewWidget::SizeInitialized").isValid())
+    if (!this->Internals->PopoutWindow->property("pqMultiViewWidget::SizeInitialized").isValid())
     {
-      this->Internals->PopoutFrame.setProperty("pqMultiViewWidget::SizeInitialized", true);
-      this->Internals->PopoutFrame.resize(this->size());
+      this->Internals->PopoutWindow->setProperty("pqMultiViewWidget::SizeInitialized", true);
+      this->Internals->PopoutWindow->resize(this->size());
     }
-    this->Internals->PopoutFrame.show();
+    this->Internals->PopoutWindow->show();
 
     QString layoutName = vlayout->GetSessionProxyManager()->GetProxyName("layouts", vlayout);
-    this->Internals->PopoutFrame.setWindowTitle(layoutName);
+    this->Internals->PopoutWindow->setWindowTitle(layoutName);
   }
   else
   {
-    this->Internals->PopoutFrame.hide();
+    this->Internals->PopoutWindow->hide();
   }
 
   int maximized_cell = vlayout->GetMaximizedCell();
@@ -929,4 +912,60 @@ bool pqMultiViewWidget::togglePopout()
   this->Internals->Popout = this->Internals->Popout ? false : true;
   this->reload();
   return this->Internals->Popout;
+}
+
+//-----------------------------------------------------------------------------
+QSize pqMultiViewWidget::preview(const QSize& nsize)
+{
+  if (vtkSMViewLayoutProxy* vlayout = this->layoutManager())
+  {
+    int resolution[2];
+    if (nsize.isEmpty())
+    {
+      resolution[0] = 0;
+      resolution[1] = 0;
+    }
+    else
+    {
+      resolution[0] = nsize.width();
+      resolution[1] = nsize.height();
+    }
+    SM_SCOPED_TRACE(PropertiesModified)
+      .arg("proxy", vlayout)
+      .arg("comment", nsize.isEmpty() ? "Exit preview mode" : "Enter preview mode");
+
+    vtkSMPropertyHelper(vlayout, "PreviewMode").Set(resolution, 2);
+    //< results in a call to "updatePreviewMode" if changed.
+    vlayout->UpdateVTKObjects();
+  }
+  return this->maximumSize();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::updatePreviewMode()
+{
+  vtkSMViewLayoutProxy* vlayout = this->layoutManager();
+  Q_ASSERT(vlayout);
+
+  int size[2];
+  vtkSMPropertyHelper(vlayout, "PreviewMode").Get(size, 2);
+  if (size[0] <= 0 || size[1] <= 0)
+  {
+    this->setDecorationsVisible(true);
+    this->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    this->Internals->PopoutFrame->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+  }
+  else
+  {
+    this->setDecorationsVisible(false);
+
+    // ensure that the max size we set on the dialog is less that what we have
+    // available.
+    vtkVector2i tsize(size[0], size[1]);
+    const QRect crect = this->parentWidget()->contentsRect();
+    vtkVector2i csize(crect.width(), crect.height());
+    vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
+    this->setMaximumSize(csize[0], csize[1]);
+    this->Internals->PopoutFrame->setMaximumSize(csize[0], csize[1]);
+  }
 }
