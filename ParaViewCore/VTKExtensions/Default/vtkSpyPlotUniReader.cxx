@@ -1548,7 +1548,7 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream* spis)
       variable->Index = -1;
       variable->DataBlocks = 0;
       int var = dh->SavedVariables[fieldCnt];
-      if (var >= 100)
+      if (var >= this->NumberOfPossibleCellFields)
       {
         variable->Index = var % 100 - 1;
         var /= 100;
