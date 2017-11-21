@@ -71,12 +71,6 @@ public slots:
   */
   void setPort(pqOutputPort*);
 
-signals:
-  /**
-  * Fired when the user clicks on the help button for the query clause widget.
-  */
-  void helpRequested();
-
 private slots:
   /**
   * marks if the underlying data has changed

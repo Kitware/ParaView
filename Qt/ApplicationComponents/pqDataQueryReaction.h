@@ -56,9 +56,6 @@ public:
   */
   void showQueryDialog();
 
-public slots:
-  void showHelp();
-
 protected:
   /**
   * Called when the action is triggered.
