@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 class pqPipelineSource;
+class vtkPVDataInformation;
 
 /**
 * @ingroup Reactions
@@ -80,6 +81,9 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqSaveDataReaction)
+
+  static QString defaultExtension(vtkPVDataInformation* info);
+  static void setDefaultExtension(vtkPVDataInformation* info, const QString& ext);
 };
 
 #endif

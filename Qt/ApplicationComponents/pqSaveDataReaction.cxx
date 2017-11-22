@@ -40,7 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
+#include "pqSettings.h"
 #include "pqTestUtility.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
@@ -113,12 +115,15 @@ bool pqSaveDataReaction::saveActiveData()
 
   pqFileDialog fileDialog(
     server, pqCoreUtilities::mainWidget(), tr("Save File:"), QString(), filters);
-  // FIXME: fileDialog.setRecentlyUsedExtension(this->DataExtension);
+  fileDialog.setRecentlyUsedExtension(
+    pqSaveDataReaction::defaultExtension(port->getDataInformation()));
   fileDialog.setObjectName("FileSaveDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
   if (fileDialog.exec() == QDialog::Accepted)
   {
-    return pqSaveDataReaction::saveActiveData(fileDialog.getSelectedFiles()[0]);
+    QString fname = fileDialog.getSelectedFiles()[0];
+    pqSaveDataReaction::setDefaultExtension(port->getDataInformation(), QFileInfo(fname).suffix());
+    return pqSaveDataReaction::saveActiveData(fname);
   }
   return false;
 }
@@ -190,4 +195,33 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
     .arg("source", port->getSource()->getProxy())
     .arg("port", port->getPortNumber());
   return true;
+}
+
+//-----------------------------------------------------------------------------
+QString pqSaveDataReaction::defaultExtension(vtkPVDataInformation* dataInfo)
+{
+  if (dataInfo)
+  {
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    const int dataType = dataInfo->GetCompositeDataSetType() == -1
+      ? dataInfo->GetDataSetType()
+      : dataInfo->GetCompositeDataSetType();
+    const char* defaultExt = dataType == VTK_TABLE ? "csv" : "pvd";
+    return settings->value(QString("extensions/SaveDataExtension/%1").arg(dataType), defaultExt)
+      .toString();
+  }
+  return QString("pvd");
+}
+
+//-----------------------------------------------------------------------------
+void pqSaveDataReaction::setDefaultExtension(vtkPVDataInformation* dataInfo, const QString& ext)
+{
+  if (dataInfo)
+  {
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    const int dataType = dataInfo->GetCompositeDataSetType() == -1
+      ? dataInfo->GetDataSetType()
+      : dataInfo->GetCompositeDataSetType();
+    settings->setValue(QString("extensions/SaveDataExtension/%1").arg(dataType), ext);
+  }
 }
