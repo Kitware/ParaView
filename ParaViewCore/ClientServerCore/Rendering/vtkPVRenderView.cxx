@@ -1998,6 +1998,7 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
       {
         return true;
       }
+      VTK_FALLTHROUGH;
     default:
       return false;
   }

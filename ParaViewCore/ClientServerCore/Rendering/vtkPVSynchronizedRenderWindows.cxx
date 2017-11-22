@@ -564,6 +564,7 @@ bool vtkPVSynchronizedRenderWindows::GetLocalProcessIsDriver()
       {
         return true;
       }
+      VTK_FALLTHROUGH;
 
     case DATA_SERVER:
     default:

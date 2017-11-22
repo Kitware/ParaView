@@ -999,6 +999,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files, const bool&
           this->onNavigate(file);
           return true;
         }
+        VTK_FALLTHROUGH;
       case ExistingFile:
       case ExistingFiles:
       case AnyFile:

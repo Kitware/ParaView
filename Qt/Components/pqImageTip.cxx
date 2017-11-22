@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqImageTip.h"
 
+#include "vtkSetGet.h"
+
 #include <QBasicTimer>
 #include <QToolTip>
 #include <qapplication.h>
@@ -107,7 +109,10 @@ bool pqImageTip::eventFilter(QObject*, QEvent* e)
 
       if ((mody & Qt::KeyboardModifierMask) || (key == Qt::Key_Shift || key == Qt::Key_Control ||
                                                  key == Qt::Key_Alt || key == Qt::Key_Meta))
+      {
         break;
+      }
+      VTK_FALLTHROUGH;
     }
     case QEvent::Leave:
     case QEvent::WindowActivate:

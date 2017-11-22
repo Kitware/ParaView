@@ -168,6 +168,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session, unsigned int i
       this->CSSynchronizer->SetRootProcessId(1);
       this->CSSynchronizer->SetParallelController(session->GetController(vtkPVSession::CLIENT));
     }
+      VTK_FALLTHROUGH;
 
     // DONT BREAK, server needs to setup everything in the BATCH case
 

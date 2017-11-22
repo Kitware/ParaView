@@ -455,6 +455,7 @@ void pqRenderViewSelectionReaction::onMouseMove()
     case SELECT_SURFACE_CELLS_TOOLTIP:
       this->MouseMovingTimer.start(TOOLTIP_WAITING_TIME);
       this->MouseMoving = true;
+      VTK_FALLTHROUGH;
 
     case SELECT_SURFACE_CELLS_INTERACTIVELY:
     case SELECT_SURFACE_POINTS_INTERACTIVELY:
