@@ -50,13 +50,10 @@ ADD_PARAVIEW_AUTO_START(
   PARAVIEW_PLUGIN_SRCS2
   CLASS_NAME pqTPPluginManager)
 
-ADD_CUSTOM_COMMAND(
-  OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/tp_export_py.cxx"
-  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tp_export.py"
-  COMMAND vtkEncodeString
-  ARGS "${CMAKE_CURRENT_BINARY_DIR}/tp_export_py.cxx"
-       "${CMAKE_CURRENT_SOURCE_DIR}/tp_export.py"
-       tp_export_py)
+vtk_encode_string(
+  INPUT         "tp_export.py"
+  NAME          "tp_export_py"
+  SOURCE_OUTPUT tp_export_py_source)
 
 ADD_PARAVIEW_PLUGIN(
   TemporalParallelismScriptGenerator
@@ -71,7 +68,7 @@ ADD_PARAVIEW_PLUGIN(
     ${UI_RESOURCES}
     ${PARAVIEW_PLUGIN_SRCS}
     ${PARAVIEW_PLUGIN_SRCS2}
-    tp_export_py.cxx
+    ${tp_export_py_source}
 )
 TARGET_LINK_LIBRARIES(TemporalParallelismScriptGenerator LINK_PRIVATE ${qt_targets})
 
