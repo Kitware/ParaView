@@ -67,8 +67,4 @@ if (PARAVIEW_ENABLE_PYTHON)
     )
 endif()
 
-#set_source_files_properties(
-#  WRAP_EXCLUDE
-#)
-
 vtk_module_library(${vtk-module} ${Module_SRCS})

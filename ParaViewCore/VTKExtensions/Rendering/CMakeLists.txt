@@ -122,10 +122,6 @@ if (PARAVIEW_ENABLE_NVPIPE)
   include_directories(${NVPIPE_INCLUDE_DIRS})
 endif()
 
-#set_source_files_properties(
-#  WRAP_EXCLUDE
-#  )
-
 #---------------------------------------------------------
 # Encode glsl files.
 foreach (file vtkIceTCompositeZPassShader_fs.glsl)
