@@ -102,7 +102,7 @@
     "path": "VTK/Utilities/EncodeString"
     },
     { "name": "vtkParseOGLExt",
-    "path": "VTK/Utilities/ParseOGLExt"
+      "path": "VTK/Utilities/ParseOGLExt"
     }
   ]
 }
