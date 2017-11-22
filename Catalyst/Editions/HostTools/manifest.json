@@ -98,9 +98,6 @@
     { "path":"VTK/vtkLogo.ico" },
     { "path":"VTK/README.md" },
     { "path":"VTK/ThirdParty/utf8" },
-    { "name": "vtkEncodeString",
-    "path": "VTK/Utilities/EncodeString"
-    },
     { "name": "vtkParseOGLExt",
       "path": "VTK/Utilities/ParseOGLExt"
     }
