@@ -275,12 +275,12 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox& globalBounds, int exte
   int i, j, hasBadGhostCells = 0;
   int vectorsWereFixed = 0;
 
-  vtkDebugWithObjectMacro(NULL, "Vectors for block: ");
-  vtkDebugWithObjectMacro(NULL, "  X: " << this->XYZArrays[0]->GetNumberOfTuples());
-  vtkDebugWithObjectMacro(NULL, "  Y: " << this->XYZArrays[1]->GetNumberOfTuples());
-  vtkDebugWithObjectMacro(NULL, "  Z: " << this->XYZArrays[2]->GetNumberOfTuples());
-  vtkDebugWithObjectMacro(NULL, " Dims: " << coutVector3(this->Dimensions));
-  vtkDebugWithObjectMacro(NULL, " Bool: " << this->IsFixed());
+  // vtkDebugWithObjectMacro(NULL, "Vectors for block: ");
+  // vtkDebugWithObjectMacro(NULL, "  X: " << this->XYZArrays[0]->GetNumberOfTuples());
+  // vtkDebugWithObjectMacro(NULL, "  Y: " << this->XYZArrays[1]->GetNumberOfTuples());
+  // vtkDebugWithObjectMacro(NULL, "  Z: " << this->XYZArrays[2]->GetNumberOfTuples());
+  // vtkDebugWithObjectMacro(NULL, " Dims: " << coutVector3(this->Dimensions));
+  // vtkDebugWithObjectMacro(NULL, " Bool: " << this->IsFixed());
 
   double minV, maxV;
   for (i = 0, j = 0; i < 3; i++, j++)
@@ -296,8 +296,8 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox& globalBounds, int exte
 
     minV = MinBlockBound(i);
     maxV = MaxBlockBound(i);
-    vtkDebugWithObjectMacro(
-      NULL, "Bounds[" << (j) << "] = " << minV << " Bounds[" << (j + 1) << "] = " << maxV);
+    // vtkDebugWithObjectMacro(
+    //  NULL, "Bounds[" << (j) << "] = " << minV << " Bounds[" << (j + 1) << "] = " << maxV);
     ca[i] = this->XYZArrays[i];
     if (minV < minP[i])
     {
