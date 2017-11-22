@@ -37,7 +37,7 @@ static int class_is_wrapped(const char* classname)
     if (entry)
     {
       /* only allow non-excluded vtkObjects as args */
-      if (vtkParseHierarchy_GetProperty(entry, "WRAP_EXCLUDE") ||
+      if (vtkParseHierarchy_GetProperty(entry, "WRAP_EXCLUDE_PYTHON") ||
         !vtkParseHierarchy_IsTypeOf(hierarchyInfo, entry, "vtkObjectBase"))
       {
         return 0;
@@ -1107,6 +1107,26 @@ int extractOtherClassesUsed(NewClassInfo* data, const char* classes[])
  * @param fp file to write into
  * @param data data which will be used to write into file
  */
+void output_DummyInitFunction(FILE* fp, ClassInfo* data)
+{
+  fprintf(fp, "#include \"vtkSystemIncludes.h\"\n"
+              "#include \"vtkClientServerInterpreter.h\"\n"
+              "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* /*csi*/)\n"
+              "{\n"
+              "}\n",
+    data->Name);
+}
+
+//--------------------------------------------------------------------------nix
+/*
+ * outputs the "Object"_Init(vtkClientServerInterpreter*csi) file. This is
+ * used to register and initialize the classes and their dependent objects
+ * to the ClientServerInterpreter. Dependent objects include superclasses
+ * Objects passed as parameters and object types returned.
+ *
+ * @param fp file to write into
+ * @param data data which will be used to write into file
+ */
 void output_InitFunction(FILE* fp, NewClassInfo* data)
 {
   fprintf(fp, "\n");
@@ -1249,6 +1269,23 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
+  if (data->Template)
+  {
+    output_DummyInitFunction(fp, data);
+    fclose(fp);
+    exit(0);
+  }
+
+  for (i = 0; i < data->NumberOfSuperClasses; ++i)
+  {
+    if (strchr(data->SuperClasses[i], '<'))
+    {
+      output_DummyInitFunction(fp, data);
+      fclose(fp);
+      exit(0);
+    }
+  }
+
   /* get the hierarchy info for accurate typing */
   if (options->HierarchyFileName)
   {
@@ -1260,6 +1297,16 @@ int main(int argc, char* argv[])
 
       /* expand typedefs */
       vtkWrap_ExpandTypedefs(data, fileInfo, hierarchyInfo);
+    }
+  }
+
+  if (hierarchyInfo)
+  {
+    if (!vtkWrap_IsTypeOf(hierarchyInfo, data->Name, "vtkObjectBase"))
+    {
+      output_DummyInitFunction(fp, data);
+      fclose(fp);
+      exit(0);
     }
   }
 
