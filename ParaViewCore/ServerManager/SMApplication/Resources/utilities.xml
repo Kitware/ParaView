@@ -2005,6 +2005,46 @@
       </Hints>
       <!-- End HighResLineSource -->
     </SourceProxy>
+    <SourceProxy class="vtkPolyLineSource"
+                 label="Poly Line Source"
+                 name="PolyLineSource">
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="Points"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+        <BoundsDomain default_mode="min,min,min,max,max,max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <InputProperty is_internal="1" name="DummyInput">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+      <PropertyGroup label="Poly-line Parameters" panel_widget="InteractivePolyLine">
+        <Property function="HandlePositions" name="Points" />
+        <Property function="Closed" name="Closed" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </SourceProxy>
+    <!-- End PolyLineSource -->
     <SourceProxy class="vtkPointSource"
                  label="Point Source"
                  name="PointSource">
