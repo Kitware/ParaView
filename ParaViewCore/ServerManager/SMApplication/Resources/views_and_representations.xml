@@ -4850,10 +4850,12 @@
                  value="0" />
           <Entry text="Rotation"
                  value="1" />
+          <Entry text="Quaternion"
+                 value="2" />
         </EnumerationDomain>
         <Documentation>Orientation mode indicates if the OrientationArray
-        provides the direction vector for the orientation or the rotations
-        around each axes. Default is DIRECTION.</Documentation>
+        provides the direction vector for the orientation, the rotations
+        around each axes or the quaternion in WXYZ format. Default is DIRECTION.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetMasking"
                          default_values="0"
