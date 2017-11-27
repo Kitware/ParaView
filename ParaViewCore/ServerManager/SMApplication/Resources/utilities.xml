@@ -898,6 +898,12 @@
                          panel_visibility="never" >
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseLogScale"
+                         default_values="0"
+                         name="UseLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty default_values="0"
                          name="ScalarRangeInitialized"
                          number_of_elements="1"

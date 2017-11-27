@@ -73,6 +73,12 @@ public:
   */
   vtkIdType numberOfControlPoints() const;
 
+  /**
+   * Switches the chart to use a log scaled X axis.
+   */
+  void SetLogScaleXAxis(bool logScale);
+  bool GetLogScaleXAxis() const;
+
 public slots:
   /**
   * Set the current point. Set to -1 clear the current point.

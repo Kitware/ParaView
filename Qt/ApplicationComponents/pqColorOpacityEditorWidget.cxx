@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -69,6 +70,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QtDebug>
+
+#include <cmath>
 
 namespace
 {
@@ -225,6 +228,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   QObject::connect(ui.SaveAsPreset, SIGNAL(clicked()), this, SLOT(saveAsPreset()));
   QObject::connect(ui.AdvancedButton, SIGNAL(clicked()), this, SLOT(updatePanel()));
 
+  this->connect(
+    ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
   // if the user edits the "DataValue", we need to update the transfer function.
   QObject::connect(
     ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
@@ -334,6 +339,9 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
     this->links().removePropertyLink(this, "xvmsPoints", SIGNAL(xvmsPointsChanged()),
       internals.ScalarOpacityFunctionProxy,
       internals.ScalarOpacityFunctionProxy->GetProperty("Points"));
+    this->links().removePropertyLink(this, "useLogScaleOpacity",
+      SIGNAL(useLogScaleOpacityChanged()), internals.ScalarOpacityFunctionProxy,
+      internals.ScalarOpacityFunctionProxy->GetProperty("UseLogScale"));
   }
   internals.ScalarOpacityFunctionProxy = newSofProxy;
   if (internals.ScalarOpacityFunctionProxy)
@@ -345,6 +353,9 @@ void pqColorOpacityEditorWidget::setScalarOpacityFunctionProxy(pqSMProxy sofProx
     this->links().addPropertyLink(this, "xvmsPoints", SIGNAL(xvmsPointsChanged()),
       internals.ScalarOpacityFunctionProxy,
       internals.ScalarOpacityFunctionProxy->GetProperty("Points"));
+    this->links().addPropertyLink(this, "useLogScaleOpacity", SIGNAL(useLogScaleOpacityChanged()),
+      internals.ScalarOpacityFunctionProxy,
+      internals.ScalarOpacityFunctionProxy->GetProperty("UseLogScale"));
   }
   ui.OpacityEditor->setVisible(newSofProxy != NULL);
 }
@@ -488,6 +499,12 @@ bool pqColorOpacityEditorWidget::useLogScale() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqColorOpacityEditorWidget::useLogScaleOpacity() const
+{
+  return this->Internals->Ui.UseLogScaleOpacity->isChecked();
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::setUseLogScale(bool val)
 {
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
@@ -495,10 +512,19 @@ void pqColorOpacityEditorWidget::setUseLogScale(bool val)
 }
 
 //-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::setUseLogScaleOpacity(bool val)
+{
+  Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
+  ui.UseLogScaleOpacity->setChecked(val);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
 {
   if (log_space)
   {
+    // Make sure both color and opacity are remapped if needed:
+    this->prepareRangeForLogScaling();
     vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(this->proxy());
   }
   else
@@ -506,9 +532,29 @@ void pqColorOpacityEditorWidget::useLogScaleClicked(bool log_space)
     vtkSMTransferFunctionProxy::MapControlPointsToLinearSpace(this->proxy());
   }
 
-  // FIXME: ensure scalar range is valid.
+  this->Internals->Ui.ColorEditor->SetLogScaleXAxis(log_space);
 
   emit this->useLogScaleChanged();
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::useLogScaleOpacityClicked(bool log_space)
+{
+  vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
+  if (log_space)
+  {
+    // Make sure both color and opacity are remapped if needed:
+    this->prepareRangeForLogScaling();
+    vtkSMTransferFunctionProxy::MapControlPointsToLogSpace(opacityProxy);
+  }
+  else
+  {
+    vtkSMTransferFunctionProxy::MapControlPointsToLinearSpace(opacityProxy);
+  }
+
+  this->Internals->Ui.OpacityEditor->SetLogScaleXAxis(log_space);
+
+  emit this->useLogScaleOpacityChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -563,6 +609,26 @@ void pqColorOpacityEditorWidget::updateButtonEnableState()
   ui.ResetRangeToData->setEnabled(hasRepresentation);
   ui.ResetRangeToDataOverTime->setEnabled(hasRepresentation);
   ui.ResetRangeToVisibleData->setEnabled(hasRepresentation && hasView);
+}
+
+//-----------------------------------------------------------------------------
+void pqColorOpacityEditorWidget::prepareRangeForLogScaling()
+{
+  vtkSMProxy* colorProxy = this->proxy();
+  double range[2];
+
+  vtkSMTransferFunctionProxy::GetRange(colorProxy, range);
+
+  if (vtkSMCoreUtilities::AdjustRangeForLog(range))
+  {
+    vtkSMProxy* opacityProxy = this->Internals->ScalarOpacityFunctionProxy;
+
+    vtkGenericWarningMacro("Ranges not valid for log-space. Changed the range to ("
+      << range[0] << ", " << range[1] << ").");
+
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(colorProxy, range);
+    vtkSMTransferFunctionProxy::RescaleTransferFunction(opacityProxy, range);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -58,6 +58,8 @@ class pqColorMapModel;
 *                                checkbox in the Widget.
 * \li "UseLogScale"           :- (optional) property used to enable/disable log mapping
 *                                for colors.
+* \li "UseLogScaleOpacity"    :- (optional) property used to enable/disable log mapping
+*                                for opacity.
 * Caveats:
 * \li Opacity editor:- pqColorOpacityEditorWidget shows an opacity editor widget.
 * Typically, opacity function is optional and used only when
@@ -70,6 +72,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorOpacityEditorWidget : public pqPrope
   Q_PROPERTY(QList<QVariant> xrgbPoints READ xrgbPoints WRITE setXrgbPoints)
   Q_PROPERTY(QList<QVariant> xvmsPoints READ xvmsPoints WRITE setXvmsPoints)
   Q_PROPERTY(bool useLogScale READ useLogScale WRITE setUseLogScale)
+  Q_PROPERTY(bool useLogScaleOpacity READ useLogScaleOpacity WRITE setUseLogScaleOpacity)
   Q_PROPERTY(pqSMProxy scalarOpacityFunctionProxy READ scalarOpacityFunctionProxy WRITE
       setScalarOpacityFunctionProxy)
   typedef pqPropertyWidget Superclass;
@@ -96,6 +99,11 @@ public:
   bool useLogScale() const;
 
   /**
+  * Returns the value for use-log-scale.
+  */
+  bool useLogScaleOpacity() const;
+
+  /**
   * Returns the scalar opacity function (i.e. PiecewiseFunction) proxy
   * used, if any.
   */
@@ -116,6 +124,11 @@ public slots:
   * Set whether to use-log scale.
   */
   void setUseLogScale(bool value);
+
+  /**
+  * Set whether to use-log scale.
+  */
+  void setUseLogScaleOpacity(bool value);
 
   /**
   * Set the scalar opacity function (or PiecewiseFunction) proxy to use.
@@ -176,6 +189,11 @@ signals:
   void useLogScaleChanged();
 
   /**
+  * Signal fired when useLogScaleOpacity changes.
+  */
+  void useLogScaleOpacityChanged();
+
+  /**
   * This signal is never really fired since this
   * widget doesn't have any UI to allow users to changes the
   * ScalarOpacityFunction proxy used.
@@ -223,11 +241,23 @@ protected slots:
   void useLogScaleClicked(bool);
 
   /**
+  * called when the use-log-scale checkbox is clicked by the user. We then add
+  * extra logic to valid ranges convert the color map to log/linear space.
+  */
+  void useLogScaleOpacityClicked(bool);
+
+  /**
   * called when the active representation or view changes.  We then change the
   * enabled/disabled state of the buttons.  Some actions require a valid
   * representation or view, so disable them if there isn't one.
   */
   void updateButtonEnableState();
+
+protected:
+  /**
+   * Validate and adjust the current range before converting to a log range.
+   */
+  void prepareRangeForLogScaling();
 
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget)
