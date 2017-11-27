@@ -637,6 +637,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       source->UpdatePiece(piece, npieces, 0);
       output->ShallowCopy(source->GetOutput());
     }
+    break;
 
     case ID:
     default:

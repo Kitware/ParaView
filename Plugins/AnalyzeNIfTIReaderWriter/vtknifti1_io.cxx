@@ -6108,14 +6108,14 @@ char *vtknifti1_io::nifti_image_to_ascii( const nifti_image *nim )
    sprintf( buf+strlen(buf) , "  image_offset = '%d'\n" , nim->iname_offset );
 
                        sprintf( buf+strlen(buf), "  ndim = '%d'\n", nim->ndim);
-                       sprintf( buf+strlen(buf), "  nx = '%d'\n",   nim->nx  );
+   if( true )          sprintf( buf+strlen(buf), "  nx = '%d'\n",   nim->nx  );
    if( nim->ndim > 1 ) sprintf( buf+strlen(buf), "  ny = '%d'\n",   nim->ny  );
    if( nim->ndim > 2 ) sprintf( buf+strlen(buf), "  nz = '%d'\n",   nim->nz  );
    if( nim->ndim > 3 ) sprintf( buf+strlen(buf), "  nt = '%d'\n",   nim->nt  );
    if( nim->ndim > 4 ) sprintf( buf+strlen(buf), "  nu = '%d'\n",   nim->nu  );
    if( nim->ndim > 5 ) sprintf( buf+strlen(buf), "  nv = '%d'\n",   nim->nv  );
    if( nim->ndim > 6 ) sprintf( buf+strlen(buf), "  nw = '%d'\n",   nim->nw  );
-                       sprintf( buf+strlen(buf), "  dx = '%g'\n",   nim->dx  );
+   if( true )          sprintf( buf+strlen(buf), "  dx = '%g'\n",   nim->dx  );
    if( nim->ndim > 1 ) sprintf( buf+strlen(buf), "  dy = '%g'\n",   nim->dy  );
    if( nim->ndim > 2 ) sprintf( buf+strlen(buf), "  dz = '%g'\n",   nim->dz  );
    if( nim->ndim > 3 ) sprintf( buf+strlen(buf), "  dt = '%g'\n",   nim->dt  );

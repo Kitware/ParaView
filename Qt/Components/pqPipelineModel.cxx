@@ -779,11 +779,13 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
       {
         return QVariant(source->getProxy()->GetAnnotation("tooltip"));
       }
+      VTK_FALLTHROUGH;
     case Qt::DisplayRole:
       if (idx.column() == 1)
       {
         return QIcon(this->PixmapList[item->VisibilityIcon]);
       }
+      VTK_FALLTHROUGH;
     // *** don't break.
     case Qt::EditRole:
       if (idx.column() == 0)
