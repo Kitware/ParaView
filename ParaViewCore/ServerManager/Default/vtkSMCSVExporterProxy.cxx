@@ -66,7 +66,7 @@ void vtkSMCSVExporterProxy::Write()
   {
     return;
   }
-  if (vtksys::SystemTools::GetFilenameLastExtension(fileName) != ".tsv")
+  if (vtksys::SystemTools::GetFilenameLastExtension(fileName) == ".tsv")
   {
     exporter->SetFieldDelimiter("\t");
   }
