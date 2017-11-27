@@ -101,7 +101,7 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
     writer->Write();
 
     *css << vtkClientServerStream::InsertArray(
-      writer->GetBinaryOutputString(), writer->GetOutputStringLength());
+      writer->GetBinaryOutputString(), static_cast<int>(writer->GetOutputStringLength()));
 
     writer->RemoveAllInputs();
     writer->Delete();
