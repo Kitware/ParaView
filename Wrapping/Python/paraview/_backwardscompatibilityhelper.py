@@ -192,6 +192,19 @@ def setattr(proxy, pname, value):
 
     raise Continue()
 
+def setattr_fix_value(proxy, pname, value, setter_func):
+    if pname == "ShaderPreset" and proxy.SMProxy.GetXMLName().endswith("Representation"):
+        if value == "Gaussian Blur (Default)":
+            if paraview.compatibility.GetVersion() <= 5.5:
+                paraview.print_warning(\
+                    "The 'Gaussian Blur (Default)' option has been renamed to 'Gaussian Blur'.  Please use that instead.")
+                setter_func(proxy, "Gaussian Blur")
+                raise Continue()
+            else:
+                raise NotSupportedException("'Gaussian Blur (Default)' is an obsolete value for ShaderPreset. "\
+                    " Use 'Gaussian Blur' instead.")
+    raise ValueError("'%s' is not a valid value for %s!" % (value, pname))
+
 _fgetattr = getattr
 
 def getattr(proxy, pname):
