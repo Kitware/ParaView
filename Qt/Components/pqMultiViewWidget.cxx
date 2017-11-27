@@ -962,7 +962,8 @@ void pqMultiViewWidget::updatePreviewMode()
     // ensure that the max size we set on the dialog is less that what we have
     // available.
     vtkVector2i tsize(size[0], size[1]);
-    const QRect crect = this->parentWidget()->contentsRect();
+    const QRect crect = this->Internals->Popout ? this->Internals->PopoutWindow->contentsRect()
+                                                : this->parentWidget()->contentsRect();
     vtkVector2i csize(crect.width(), crect.height());
     vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
     this->setMaximumSize(csize[0], csize[1]);
