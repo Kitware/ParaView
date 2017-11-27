@@ -53,8 +53,6 @@ vtk_module(vtkPVVTKExtensionsRendering
   PRIVATE_DEPENDS
     vtkzlib
     vtklz4
-  COMPILE_DEPENDS
-    vtkUtilitiesEncodeString
 
   TEST_DEPENDS
     vtkInteractionStyle

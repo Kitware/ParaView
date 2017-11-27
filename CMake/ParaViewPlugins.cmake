@@ -54,6 +54,8 @@ MACRO(PV_PLUGIN_PARSE_ARGUMENTS prefix arg_names option_names)
   SET(${prefix}_${current_arg_name} ${current_arg_list})
 ENDMACRO()
 
+include(vtkEncodeString)
+
 # Macro to encode any file(s) as a string. This creates a new cxx file with a
 # declaration of a "const char*" string with the same name as the file.
 # Example:
@@ -65,17 +67,10 @@ ENDMACRO()
 # const char* vtkColorMaterialHelper_vs.
 MACRO(ENCODE_FILES_AS_STRINGS OUT_SRCS)
   foreach(file ${ARGN})
-    GET_FILENAME_COMPONENT(file "${file}" ABSOLUTE)
-    GET_FILENAME_COMPONENT(file_name "${file}" NAME_WE)
-    set(src ${file})
-    set(res ${CMAKE_CURRENT_BINARY_DIR}/${file_name}.cxx)
-    add_custom_command(
-      OUTPUT ${res}
-      DEPENDS ${src} vtkEncodeString
-      COMMAND vtkEncodeString
-      ARGS ${res} ${src} ${file_name}
-      )
-    set(${OUT_SRCS} ${${OUT_SRCS}} ${res})
+    vtk_encode_string(
+      INPUT         "${file}"
+      SOURCE_OUTPUT _source)
+    list(APPEND ${OUT_SRCS} ${_source})
   endforeach()
 ENDMACRO()
 

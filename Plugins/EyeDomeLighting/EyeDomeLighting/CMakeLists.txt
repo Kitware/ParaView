@@ -20,17 +20,12 @@ set(GLSL_SRCS
 # in a header file
 # -----------------------------------------------------------------------------
 
-set (${vtk-module}_HDRS)
 foreach(file ${GLSL_SRCS})
-  set(src ${CMAKE_CURRENT_SOURCE_DIR}/${GLSL_RESOURCES_DIR}/${file}.glsl)
-  set(res ${CMAKE_CURRENT_BINARY_DIR}/${file}.cxx)
-  add_custom_command(
-    OUTPUT ${res}
-    DEPENDS ${src} vtkEncodeString
-    COMMAND vtkEncodeString
-    ARGS ${res} ${src} ${file}
-    )
-  list(APPEND ${vtk-module}_HDRS ${res})
+  vtk_encode_string(
+    INPUT         "${GLSL_RESOURCES_DIR}/${file}.glsl"
+    NAME          "${file}"
+    SOURCE_OUTPUT source)
+  list(APPEND SRC_FILES ${source})
 endforeach()
 
 vtk_module_library(vtkEyeDomeLighting ${SRC_FILES})

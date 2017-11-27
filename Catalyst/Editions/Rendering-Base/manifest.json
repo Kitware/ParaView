@@ -935,9 +935,6 @@
     { "name": "vtkMetaIO",
       "path": "VTK/Utilities/MetaIO"
     },
-    { "name": "vtkEncodeString",
-      "path": "VTK/Utilities/EncodeString"
-    },
     { "name": "vtkParseOGLExt",
       "path": "VTK/Utilities/ParseOGLExt"
     },
