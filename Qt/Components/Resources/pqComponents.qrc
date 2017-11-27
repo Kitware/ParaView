@@ -155,6 +155,7 @@
         <file>Icons/pqRedo24.png</file>
         <file>Icons/pqRedo32.png</file>
         <file>Icons/pqRedoCamera24.png</file>
+        <file>Icons/pqReset24.png</file>
         <file>Icons/pqResetCamera16.png</file>
         <file>Icons/pqResetCamera24.png</file>
         <file>Icons/pqResetCamera32.png</file>
@@ -353,6 +354,5 @@
         <file>Icons/inherited_opacity.png</file>
         <file>Icons/no_color.png</file>
         <file>Icons/no_opacity.png</file>
-        <file>Icons/pqDelete.png</file>
     </qresource>
 </RCC>

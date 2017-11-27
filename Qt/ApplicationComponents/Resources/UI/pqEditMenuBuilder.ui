@@ -115,7 +115,7 @@
   <action name="actionDelete_All">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqDelete.png</normaloff>:/pqWidgets/Icons/pqDelete.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqReset24.png</normaloff>:/pqWidgets/Icons/pqReset24.png</iconset>
    </property>
    <property name="text">
     <string>Reset Session</string>
