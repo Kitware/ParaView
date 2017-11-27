@@ -24,6 +24,8 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkViewsCore
     ${__dependencies}
   PRIVATE_DEPENDS
+    vtkAcceleratorsVTKm
+    vtkm
     vtksys
     vtkzlib
   TEST_LABELS
