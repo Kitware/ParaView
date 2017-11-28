@@ -112,18 +112,6 @@ if (PARAVIEW_ENABLE_PYTHON)
     )
 endif()
 
-set_source_files_properties(
-  vtkExtractsDeliveryHelper
-  vtkProcessModuleAutoMPI
-  vtkPVOptionsXMLParser
-  vtkPVPlugin
-  vtkPVPythonPluginInterface
-  vtkPVServerManagerPluginInterface
-  vtkPVServerOptions
-
-  WRAP_EXCLUDE
-  )
-
 if(VTK_OPENGL_HAS_EGL)
   set_source_files_properties(
     vtkPVOptions.cxx

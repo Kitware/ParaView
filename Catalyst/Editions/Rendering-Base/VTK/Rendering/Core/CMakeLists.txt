@@ -6,9 +6,4 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
-set_source_files_properties(
-  vtkCIEDE2000
-  vtkRenderState
-  WRAP_EXCLUDE)
-
 vtk_module_library(vtkRenderingCore ${Module_SRCS})

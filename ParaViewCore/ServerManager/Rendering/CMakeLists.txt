@@ -87,8 +87,6 @@ list(APPEND Module_SRCS
   vtkSMParaViewPipelineControllerWithRendering.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
 
-set_source_files_properties(${vtk-module}ObjectFactory WRAP_EXCLUDE)
-
 # Override some rendering classes. Create object factory:
 set(vtk_module_overrides "vtkSMParaViewPipelineController")
 set(vtk_module_vtkSMParaViewPipelineController_override
@@ -131,7 +129,6 @@ set(${vtk-module}_HDRS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h)
 set_source_files_properties(
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
-  HEADER_FILE_ONLY
-  WRAP_EXCLUDE)
+  HEADER_FILE_ONLY)
 #-----------------------------------------------------------------------------
 vtk_module_library(vtkPVServerManagerRendering ${Module_SRCS})

@@ -987,9 +987,10 @@ MACRO(WRAP_PLUGIN_FOR_PYTHON NAME WRAP_LIST WRAP_EXCLUDE_LIST)
   #VTK/Common/KitCommonPythonWrapBlock so that plugin's name
   #does not to start with "vtk".
 
-  SET_SOURCE_FILES_PROPERTIES(
-    ${WRAP_EXCLUDE_LIST}
-    WRAP_EXCLUDE)
+  if ("${WRAP_EXCLUDE_LIST}")
+    message(WARNING
+      "The WRAP_EXCLUDE property is not used anymore.")
+  endif ()
 
   SET(Kit_PYTHON_EXTRA_SRCS)
 

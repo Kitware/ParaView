@@ -50,7 +50,6 @@ if (APPLE)
   set_source_files_properties(
     vtkPVMacFileInformationHelper
     PROPERTIES
-      WRAP_EXCLUDE 1
       WRAP_EXCLUDE_PYTHON 1
       SKIP_HEADER_INSTALL 1
   )

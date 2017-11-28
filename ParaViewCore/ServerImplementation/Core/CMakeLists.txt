@@ -67,7 +67,6 @@ set (Module_SRCS
 set_source_files_properties(
   vtkSMMessage
   PROPERTIES
-  WRAP_EXCLUDE 1
   WRAP_EXCLUDE_PYTHON 1)
 
 # Add header-only files so they get installed correctly.

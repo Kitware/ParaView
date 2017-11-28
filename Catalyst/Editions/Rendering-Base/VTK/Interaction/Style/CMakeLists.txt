@@ -31,10 +31,6 @@ configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.h.in
 configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.cxx.in
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
 
-set_source_files_properties(
-  ${vtk-module}ObjectFactory.cxx
-  WRAP_EXCLUDE
-  )
 list(APPEND Module_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx
   )

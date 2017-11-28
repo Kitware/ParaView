@@ -59,12 +59,4 @@ set(Module_SRCS
   vtkUndoStack.cxx
 )
 
-set_source_files_properties(
-  vtkCommunicationErrorCatcher
-  vtkMultiProcessControllerHelper
-  vtkPVInformationKeys
-  vtkMemberFunctionCommand
-  WRAP_EXCLUDE
-  )
-
 vtk_module_library(vtkPVVTKExtensionsCore ${Module_SRCS})
