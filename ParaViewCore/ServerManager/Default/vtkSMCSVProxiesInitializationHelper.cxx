@@ -39,7 +39,7 @@ void vtkSMCSVProxiesInitializationHelper::PostInitializeProxy(
   vtkSMProxy* proxy, vtkPVXMLElement*, vtkMTimeType)
 {
   std::string fileName = vtkSMPropertyHelper(proxy, "FileName").GetAsString();
-  if (vtksys::SystemTools::GetFilenameLastExtension(fileName) != ".tsv")
+  if (vtksys::SystemTools::GetFilenameLastExtension(fileName) == ".tsv")
   {
     if (proxy->IsA("vtkSMWriterProxy"))
     { // exporter
