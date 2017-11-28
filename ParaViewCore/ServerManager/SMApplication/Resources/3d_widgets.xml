@@ -476,6 +476,7 @@
             <Property name="TitleColor" function="Color"/>
             <Property name="TitleOpacity" function="Opacity"/>
             <Property name="TitleFontFamily" function="Family"/>
+            <Property name="TitleFontFile" function="File"/>
             <Property name="TitleBold" function="Bold" />
             <Property name="TitleItalic" function="Italics"/>
             <Property name="TitleShadow" function="Shadow" />
@@ -490,6 +491,7 @@
             <Property name="LabelColor" function="Color"/>
             <Property name="LabelOpacity" function="Opacity" />
             <Property name="LabelFontFamily" function="Family"/>
+            <Property name="LabelFontFile" function="File"/>
             <Property name="LabelBold" function="Bold" />
             <Property name="LabelItalic" function="Italics" />
             <Property name="LabelShadow" function="Shadow" />
@@ -583,6 +585,7 @@
           <Property name="Color" />
           <Property name="Opacity" />
           <Property name="FontFamily" />
+          <Property name="FontFile" />
           <Property name="Bold" />
           <Property name="Italic" />
           <Property name="Shadow" />

@@ -76,6 +76,23 @@ pqFontPropertyWidget::pqFontPropertyWidget(
   {
     ui.FontFamily->hide();
   }
+  QObject::connect(
+    ui.FontFamily, SIGNAL(currentIndexChanged(int)), this, SLOT(onFontFamilyChanged()));
+
+  ui.FontFile->setServer(nullptr);
+  ui.FontFile->setForceSingleFile(true);
+  ui.FontFile->setExtension("TrueType Font Files (*.ttf *.TTF)");
+
+  smproperty = smgroup->GetProperty("File");
+  if (smproperty)
+  {
+    this->addPropertyLink(
+      ui.FontFile, "filenames", SIGNAL(filenameChanged(const QString&)), smproperty);
+  }
+  else
+  {
+    ui.FontFile->hide();
+  }
 
   smproperty = smgroup->GetProperty("Size");
   if (smproperty)
@@ -153,6 +170,8 @@ pqFontPropertyWidget::pqFontPropertyWidget(
   {
     ui.Justification->hide();
   }
+
+  onFontFamilyChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -219,4 +238,11 @@ void pqFontPropertyWidget::changeJustificationIcon(QAction* action)
 {
   QString str = action->text();
   this->setJustification(str);
+}
+
+//-----------------------------------------------------------------------------
+void pqFontPropertyWidget::onFontFamilyChanged()
+{
+  Ui::FontPropertyWidget& ui = this->Internals->Ui;
+  ui.FontFile->setVisible(ui.FontFamily->currentIndex() == 3);
 }

@@ -65,6 +65,7 @@ protected:
 
 protected slots:
   void changeJustificationIcon(QAction*);
+  void onFontFamilyChanged();
 
 private:
   Q_DISABLE_COPY(pqFontPropertyWidget)

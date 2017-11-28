@@ -179,6 +179,12 @@ void vtkDataLabelRepresentation::SetPointLabelFontFamily(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkDataLabelRepresentation::SetPointLabelFontFile(char* val)
+{
+  this->PointLabelProperty->SetFontFile(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkDataLabelRepresentation::SetPointLabelBold(int val)
 {
   this->PointLabelProperty->SetBold(val);
@@ -255,6 +261,12 @@ void vtkDataLabelRepresentation::SetCellLabelOpacity(double val)
 void vtkDataLabelRepresentation::SetCellLabelFontFamily(int val)
 {
   this->CellLabelProperty->SetFontFamily(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkDataLabelRepresentation::SetCellLabelFontFile(char* val)
+{
+  this->CellLabelProperty->SetFontFile(val);
 }
 
 //----------------------------------------------------------------------------
