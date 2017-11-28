@@ -21,6 +21,7 @@
 #include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyInternals.h"
+#include "vtkSMSession.h"
 #include "vtkSmartPointer.h"
 
 #ifdef PARAVIEW_USE_OSPRAY
@@ -72,18 +73,28 @@ void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
 void vtkSMMaterialLibraryProxy::Synchronize()
 {
 #ifdef PARAVIEW_USE_OSPRAY
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "WriteBuffer"
-         << vtkClientServerStream::End;
-  this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER_ROOT);
+  bool builtinMode = false;
+  if (!this->GetSession() || (this->GetSession()->GetProcessRoles() & vtkPVSession::SERVERS) != 0)
+  {
+    // avoid serialization in serial since uneccessary and can be slow
+    builtinMode = true;
+  }
 
-  vtkClientServerStream res = this->GetLastResult(vtkPVSession::RENDER_SERVER_ROOT);
-  std::string resbuf = "";
-  res.GetArgument(0, 0, &resbuf);
-  vtkClientServerStream stream2;
-  stream2 << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadBuffer" << resbuf
-          << vtkClientServerStream::End;
-  this->ExecuteStream(stream2, false, vtkProcessModule::CLIENT);
+  if (!builtinMode)
+  {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "WriteBuffer"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER_ROOT);
+
+    vtkClientServerStream res = this->GetLastResult(vtkPVSession::RENDER_SERVER_ROOT);
+    std::string resbuf = "";
+    res.GetArgument(0, 0, &resbuf);
+    vtkClientServerStream stream2;
+    stream2 << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadBuffer" << resbuf
+            << vtkClientServerStream::End;
+    this->ExecuteStream(stream2, false, vtkProcessModule::CLIENT);
+  }
 
   vtkOSPRayMaterialLibrary* ml =
     vtkOSPRayMaterialLibrary::SafeDownCast(this->GetClientSideObject());
