@@ -6036,6 +6036,15 @@ array.
         transform (translation, rotation, and scaling) to apply to the input
         dataset.</Documentation>
       </ProxyProperty>
+      <IntVectorProperty command="SetTransformAllInputVectors"
+                         default_values="1"
+                         name="TransformAllInputVectors"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> If off, only Vectors and Normals will be transformed.
+        If on, all 3-component data arrays (considered as 3D vectors) will be transformed.
+        All other arrays won't be flipped and will only be copied.</Documentation>
+      </IntVectorProperty>
       <!-- End TransformFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
