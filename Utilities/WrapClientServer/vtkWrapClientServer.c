@@ -1107,14 +1107,14 @@ int extractOtherClassesUsed(NewClassInfo* data, const char* classes[])
  * @param fp file to write into
  * @param data data which will be used to write into file
  */
-void output_DummyInitFunction(FILE* fp, ClassInfo* data)
+void output_DummyInitFunction(FILE* fp, const char* name)
 {
   fprintf(fp, "#include \"vtkSystemIncludes.h\"\n"
               "#include \"vtkClientServerInterpreter.h\"\n"
               "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* /*csi*/)\n"
               "{\n"
               "}\n",
-    data->Name);
+    name);
 }
 
 //--------------------------------------------------------------------------nix
@@ -1265,13 +1265,18 @@ int main(int argc, char* argv[])
 
   if (!data)
   {
+    char* basename = strrchr(fileInfo->FileName, '/');
+    char* basename_dup = strdup(basename);
+    *strchr(basename_dup, '.') = '\0';
+    output_DummyInitFunction(fp, basename_dup + 1);
+    free(basename_dup);
     fclose(fp);
-    exit(1);
+    exit(0);
   }
 
   if (data->Template)
   {
-    output_DummyInitFunction(fp, data);
+    output_DummyInitFunction(fp, data->Name);
     fclose(fp);
     exit(0);
   }
@@ -1280,7 +1285,7 @@ int main(int argc, char* argv[])
   {
     if (strchr(data->SuperClasses[i], '<'))
     {
-      output_DummyInitFunction(fp, data);
+      output_DummyInitFunction(fp, data->Name);
       fclose(fp);
       exit(0);
     }
@@ -1304,7 +1309,7 @@ int main(int argc, char* argv[])
   {
     if (!vtkWrap_IsTypeOf(hierarchyInfo, data->Name, "vtkObjectBase"))
     {
-      output_DummyInitFunction(fp, data);
+      output_DummyInitFunction(fp, data->Name);
       fclose(fp);
       exit(0);
     }
