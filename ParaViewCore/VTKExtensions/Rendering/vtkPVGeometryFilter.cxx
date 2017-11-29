@@ -34,8 +34,6 @@
 #include "vtkGeometryFilter.h"
 #include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkHierarchicalBoxDataSet.h"
-#include "vtkHyperOctree.h"
-#include "vtkHyperOctreeSurfaceFilter.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridGeometry.h"
 #include "vtkImageData.h"
@@ -497,11 +495,6 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
   if (input->IsA("vtkPolyData"))
   {
     this->PolyDataExecute(static_cast<vtkPolyData*>(input), output, doCommunicate);
-    return;
-  }
-  if (input->IsA("vtkHyperOctree"))
-  {
-    this->OctreeExecute(static_cast<vtkHyperOctree*>(input), output, doCommunicate);
     return;
   }
   if (input->IsA("vtkHyperTreeGrid"))
@@ -1617,30 +1610,6 @@ void vtkPVGeometryFilter::PolyDataExecute(
 
   this->OutlineFlag = 1;
   this->DataSetExecute(input, output, doCommunicate);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::OctreeExecute(vtkHyperOctree* input, vtkPolyData* out, int doCommunicate)
-{
-  if (!this->UseOutline)
-  {
-    this->OutlineFlag = 0;
-
-    vtkHyperOctreeSurfaceFilter* internalFilter = vtkHyperOctreeSurfaceFilter::New();
-    internalFilter->SetPassThroughCellIds(this->PassThroughCellIds);
-    // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-    vtkHyperOctree* octreeCopy = vtkHyperOctree::New();
-    octreeCopy->ShallowCopy(input);
-    internalFilter->SetInputData(octreeCopy);
-    internalFilter->Update();
-    out->ShallowCopy(internalFilter->GetOutput());
-    octreeCopy->Delete();
-    internalFilter->Delete();
-    return;
-  }
-
-  this->OutlineFlag = 1;
-  this->DataSetExecute(input, out, doCommunicate);
 }
 
 //----------------------------------------------------------------------------

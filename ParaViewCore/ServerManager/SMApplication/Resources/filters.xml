@@ -4451,66 +4451,6 @@ array.
       <!-- End  OutlineCornerFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperOctreeDepth"
-                 label="Octree Depth Scalars"
-                 name="OctreeDepthScalars">
-      <Documentation long_help="This filter adds a scalar to each leaf of the octree that represents the leaf's depth within the tree."
-                     short_help="Computes cell depths within the octree.">The
-                     vtkHyperOctreeDepth filter adds a scalar to each leaf of
-                     the octree that represents the leaf's depth within the
-                     tree.</Documentation>
-      <InputProperty clean_command="RemoveAllInputs"
-                     command="AddInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperOctree" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input to the Octree Depth
-        Scalars filter.</Documentation>
-      </InputProperty>
-      <!-- End  OctreeDepthScalars-->
-    </SourceProxy>
-    <!-- ==================================================================== -->
-    <SourceProxy class="vtkHyperOctreeLimiter"
-                 label="Octree Depth Limit"
-                 name="OctreeDepthLimit">
-      <Documentation long_help="This filter takes in a octree and produces a new octree which is no deeper than the maximum specified depth level."
-                     short_help="Reduce an octree's resolution.">The Octree
-                     Depth Limit filter takes in an octree and produces a new
-                     octree that is nowhere deeper than the maximum specified
-                     depth level. The attribute data of pruned leaf cells are
-                     integrated in to their ancestors at the cut
-                     level.</Documentation>
-      <InputProperty clean_command="RemoveAllInputs"
-                     command="AddInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkHyperOctree" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input to the Octree Depth
-        Limit filter.</Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetMaximumLevel"
-                         default_values="4"
-                         name="MaximumLevel"
-                         number_of_elements="1">
-        <IntRangeDomain max="255"
-                        min="3"
-                        name="range" />
-        <Documentation>The value of this property specifies the maximum depth
-        of the output octree.</Documentation>
-      </IntVectorProperty>
-      <!-- End  OctreeDepthLimit-->
-    </SourceProxy>
-    <!-- ==================================================================== -->
     <SourceProxy class="vtkProcessIdScalars"
                  label="Process Id Scalars"
                  multiprocess_support="multiple_processes"

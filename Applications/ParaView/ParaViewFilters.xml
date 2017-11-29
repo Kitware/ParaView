@@ -202,8 +202,6 @@
   <Proxy group="filters" name="Median" />
   <Proxy group="filters" name="MergeBlocks" />
   <Proxy group="filters" name="MeshQuality" />
-  <Proxy group="filters" name="OctreeDepthLimit" />
-  <Proxy group="filters" name="OctreeDepthScalars" />
   <Proxy group="filters" name="OTKernelSmoothing" />
   <Proxy group="filters" name="OTDensityMap" />
   <Proxy group="filters" name="OutlineCornerFilter" />

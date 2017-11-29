@@ -317,7 +317,6 @@ set(_vtk_modules
   #  vtkXMLPRectilinearGridReader
   #  vtkXMLMultiBlockDataReader
   #  vtkXMLHierarchicalBoxDataReader
-  #  vtkXMLHyperOctreeWriter
   #  vtkXMLPolyDataWriter
   #  vtkXMLUnstructuredGridWriter
   #  vtkXMLStructuredGridWriter
