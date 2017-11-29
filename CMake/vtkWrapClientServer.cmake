@@ -94,6 +94,7 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
         MAIN_DEPENDENCY ${TMP_INPUT}
         DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS} ${_target_includes_file} ${_args_file}
+                ${BARE_TARGET}Hierarchy
         COMMAND ${VTK_WRAP_ClientServer_EXE}
         ARGS
         ${TMP_HINTS}
