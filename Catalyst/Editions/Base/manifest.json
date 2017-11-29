@@ -38,6 +38,10 @@
         "type":"BOOL",
         "value":"ON"
       },
+      { "name":"PARAVIEW_INSTALL_DEVELOPMENT_FILES",
+        "type":"BOOL",
+        "value":"ON"
+      },
       { "name":"VTK_RENDERING_BACKEND",
         "type":"STRING",
         "value":"OpenGL2"
