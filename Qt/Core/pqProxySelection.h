@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqProxySelection_h
 
 #include "pqCoreModule.h"
-#include <QSet>
+#include <QList>
 
 class pqServerManagerModelItem;
 class vtkSMProxySelectionModel;
@@ -43,7 +43,7 @@ class vtkSMProxySelectionModel;
 * pqProxySelection provides methods to convert to and from
 * vtkSMProxySelectionModel.
 */
-class PQCORE_EXPORT pqProxySelection : public QSet<pqServerManagerModelItem*>
+class PQCORE_EXPORT pqProxySelection : public QList<pqServerManagerModelItem*>
 {
   typedef QList<pqServerManagerModelItem> Superclass;
 
