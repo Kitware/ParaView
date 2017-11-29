@@ -45,7 +45,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyDialog : pu
 
 public:
   pqTransferFunctionWidgetPropertyDialog(const QString& label, double* xrange,
-    vtkPiecewiseFunction* transferFunction, QWidget* parentWdg = NULL);
+    vtkPiecewiseFunction* transferFunction, QWidget* propertyWdg, QWidget* parentWdg = NULL);
   ~pqTransferFunctionWidgetPropertyDialog();
 
 protected slots:
@@ -54,6 +54,7 @@ protected slots:
 
 private:
   vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;
+  QWidget* PropertyWidget;
 
   class pqInternals;
   const QScopedPointer<pqInternals> Internals;

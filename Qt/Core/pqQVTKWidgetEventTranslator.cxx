@@ -43,7 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QMouseEvent>
 
+#include "QVTKOpenGLSimpleWidget.h"
 #include "pqQVTKWidgetBase.h"
+
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
 {
@@ -56,8 +58,31 @@ pqQVTKWidgetEventTranslator::~pqQVTKWidgetEventTranslator()
 bool pqQVTKWidgetEventTranslator::translateEvent(
   QObject* Object, QEvent* Event, int eventType, bool& error)
 {
-  pqQVTKWidgetBase* const widget = qobject_cast<pqQVTKWidgetBase*>(Object);
+  // Only translate events for QWidget subclasses that internally use a render
+  // window
+  QWidget* const widget = qobject_cast<QWidget*>(Object);
   if (!widget)
+  {
+    return false;
+  }
+
+  // Look for a render window in the possible widget types.
+  vtkRenderWindow* rw = nullptr;
+
+  pqQVTKWidgetBase* const baseWidget = qobject_cast<pqQVTKWidgetBase*>(Object);
+  if (baseWidget != nullptr)
+  {
+    rw = baseWidget->GetRenderWindow();
+  }
+
+  QVTKOpenGLSimpleWidget* const qvtkWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
+  if (qvtkWidget != nullptr)
+  {
+    rw = qvtkWidget->GetRenderWindow();
+  }
+
+  // Could not find a render window, don't translate the event
+  if (rw == nullptr)
   {
     return false;
   }
@@ -181,10 +206,10 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
       QString file = file_dialog.getSelectedFiles()[0];
 
       // Save screenshot
-      int offRen = widget->GetRenderWindow()->GetOffScreenRendering();
-      widget->GetRenderWindow()->SetOffScreenRendering(1);
-      pqCoreTestUtility::SaveScreenshot(widget->GetRenderWindow(), file);
-      widget->GetRenderWindow()->SetOffScreenRendering(offRen);
+      int offRen = rw->GetOffScreenRendering();
+      rw->SetOffScreenRendering(1);
+      pqCoreTestUtility::SaveScreenshot(rw, file);
+      rw->SetOffScreenRendering(offRen);
 
       // Get a relative to saved file
       QString relPathFile = baselineDir.relativeFilePath(file);
