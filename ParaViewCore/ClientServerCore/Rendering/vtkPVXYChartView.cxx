@@ -225,6 +225,15 @@ void vtkPVXYChartView::SetTitleFontFamily(const char* family)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTitleFontFile(const char* file)
+{
+  if (this->Chart)
+  {
+    this->Chart->GetTitleProperties()->SetFontFile(file);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetTitleFontSize(int pointSize)
 {
   if (this->Chart)
@@ -276,6 +285,16 @@ void vtkPVXYChartView::SetLegendFontFamily(const char* family)
   {
     vtkTextProperty* prop = this->Chart->GetLegend()->GetLabelProperties();
     prop->SetFontFamilyAsString(family);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendFontFile(const char* file)
+{
+  if (this->Chart)
+  {
+    vtkTextProperty* prop = this->Chart->GetLegend()->GetLabelProperties();
+    prop->SetFontFile(file);
   }
 }
 
@@ -435,6 +454,16 @@ void vtkPVXYChartView::SetAxisLabelFontFamily(int index, const char* family)
   {
     vtkTextProperty* prop = this->Chart->GetAxis(index)->GetLabelProperties();
     prop->SetFontFamilyAsString(family);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelFontFile(int index, const char* file)
+{
+  if (this->Chart)
+  {
+    vtkTextProperty* prop = this->Chart->GetAxis(index)->GetLabelProperties();
+    prop->SetFontFile(file);
   }
 }
 
@@ -599,6 +628,16 @@ void vtkPVXYChartView::SetAxisTitleFontFamily(int index, const char* family)
   {
     vtkTextProperty* prop = this->Chart->GetAxis(index)->GetTitleProperties();
     prop->SetFontFamilyAsString(family);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisTitleFontFile(int index, const char* file)
+{
+  if (this->Chart)
+  {
+    vtkTextProperty* prop = this->Chart->GetAxis(index)->GetTitleProperties();
+    prop->SetFontFile(file);
   }
 }
 

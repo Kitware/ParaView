@@ -88,6 +88,7 @@ public:
   void SetPointLabelColor(double r, double g, double b);
   void SetPointLabelOpacity(double);
   void SetPointLabelFontFamily(int);
+  void SetPointLabelFontFile(char*);
   void SetPointLabelBold(int);
   void SetPointLabelItalic(int);
   void SetPointLabelShadow(int);
@@ -101,6 +102,7 @@ public:
   void SetCellLabelColor(double r, double g, double b);
   void SetCellLabelOpacity(double);
   void SetCellLabelFontFamily(int);
+  void SetCellLabelFontFile(char*);
   void SetCellLabelBold(int);
   void SetCellLabelItalic(int);
   void SetCellLabelShadow(int);

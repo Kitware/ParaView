@@ -99,6 +99,7 @@ public:
    */
   void SetTitleFont(const char* family, int pointSize, bool bold, bool italic);
   void SetTitleFontFamily(const char* family);
+  void SetTitleFontFile(const char* file);
   void SetTitleFontSize(int pointSize);
   void SetTitleBold(bool bold);
   void SetTitleItalic(bool bold);
@@ -145,6 +146,11 @@ public:
    * Set the legend font family.
    */
   void SetLegendFontFamily(const char* family);
+
+  /**
+   * Set the legend font file.
+   */
+  void SetLegendFontFile(const char* file);
 
   /**
    * Set the legend font size.
@@ -219,6 +225,14 @@ public:
    */
   void SetAxisLabelFontFamily(int index, const char* family);
   GENERATE_AXIS_FUNCTIONS(AxisLabelFontFamily, const char*);
+  //@}
+
+  //@{
+  /**
+   * Set the axis label font file for the given axis.
+   */
+  void SetAxisLabelFontFile(int index, const char* file);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelFontFile, const char*);
   //@}
 
   //@{
@@ -340,6 +354,17 @@ public:
    */
   void SetAxisTitleFontFamily(int index, const char* family);
   GENERATE_AXIS_FUNCTIONS(AxisTitleFontFamily, const char*);
+  //@}
+
+  //@{
+  /**
+   * Set the chart axis title's font file for the given index.
+   * These methods should not be called directly. They are made public only so
+   * that the client-server-stream-interpreter can invoke them. Use the
+   * corresponding properties to change these values.
+   */
+  void SetAxisTitleFontFile(int index, const char* file);
+  GENERATE_AXIS_FUNCTIONS(AxisTitleFontFile, const char*);
   //@}
 
   //@{

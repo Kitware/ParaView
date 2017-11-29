@@ -1174,6 +1174,8 @@
                     name="Opacity" />
           <Property exposed_name="LabelFontFamily"
                     name="FontFamily" />
+          <Property exposed_name="LabelFontFile"
+                    name="FontFile" />
           <Property exposed_name="LabelBold"
                     name="Bold" />
           <Property exposed_name="LabelItalic"
@@ -1196,6 +1198,8 @@
                     name="Opacity" />
           <Property exposed_name="TitleFontFamily"
                     name="FontFamily" />
+          <Property exposed_name="TitleFontFile"
+                    name="FontFile" />
           <Property exposed_name="TitleBold"
                     name="Bold" />
           <Property exposed_name="TitleItalic"
@@ -1265,6 +1269,7 @@
           <Property exposed_name="XTitleColor" name="Color" />
           <Property exposed_name="XTitleOpacity" name="Opacity" />
           <Property exposed_name="XTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="XTitleFontFile" name="FontFile" />
           <Property exposed_name="XTitleBold" name="Bold" />
           <Property exposed_name="XTitleItalic" name="Italic" />
           <Property exposed_name="XTitleShadow" name="Shadow" />
@@ -1275,6 +1280,7 @@
       <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor">
         <Property name="XTitleColor" function="Color"/>
         <Property name="XTitleFontFamily" function="Family"/>
+        <Property name="XTitleFontFile" function="File"/>
         <Property name="XTitleBold" function="Bold" />
         <Property name="XTitleItalic" function="Italics"/>
         <Property name="XTitleFontSize" function="Size" />
@@ -1288,6 +1294,7 @@
           <Property exposed_name="YTitleColor" name="Color" />
           <Property exposed_name="YTitleOpacity" name="Opacity" />
           <Property exposed_name="YTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="YTitleFontFile" name="FontFile" />
           <Property exposed_name="YTitleBold" name="Bold" />
           <Property exposed_name="YTitleItalic" name="Italic" />
           <Property exposed_name="YTitleShadow" name="Shadow" />
@@ -1298,6 +1305,7 @@
       <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor">
         <Property name="YTitleColor" function="Color"/>
         <Property name="YTitleFontFamily" function="Family"/>
+        <Property name="YTitleFontFile" function="File"/>
         <Property name="YTitleBold" function="Bold" />
         <Property name="YTitleItalic" function="Italics"/>
         <Property name="YTitleFontSize" function="Size" />
@@ -1311,6 +1319,7 @@
           <Property exposed_name="ZTitleColor" name="Color" />
           <Property exposed_name="ZTitleOpacity" name="Opacity" />
           <Property exposed_name="ZTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="ZTitleFontFile" name="FontFile" />
           <Property exposed_name="ZTitleBold" name="Bold" />
           <Property exposed_name="ZTitleItalic" name="Italic" />
           <Property exposed_name="ZTitleShadow" name="Shadow" />
@@ -1321,6 +1330,7 @@
       <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor">
         <Property name="ZTitleColor" function="Color"/>
         <Property name="ZTitleFontFamily" function="Family"/>
+        <Property name="ZTitleFontFile" function="File"/>
         <Property name="ZTitleBold" function="Bold" />
         <Property name="ZTitleItalic" function="Italics"/>
         <Property name="ZTitleFontSize" function="Size" />
@@ -1488,6 +1498,7 @@
           <Property exposed_name="XLabelColor" name="Color" />
           <Property exposed_name="XLabelOpacity" name="Opacity" />
           <Property exposed_name="XLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="XLabelFontFile" name="FontFile" />
           <Property exposed_name="XLabelBold" name="Bold" />
           <Property exposed_name="XLabelItalic" name="Italic" />
           <Property exposed_name="XLabelShadow" name="Shadow" />
@@ -1498,6 +1509,7 @@
       <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor">
         <Property name="XLabelColor" function="Color"/>
         <Property name="XLabelFontFamily" function="Family"/>
+        <Property name="XLabelFontFile" function="File"/>
         <Property name="XLabelBold" function="Bold" />
         <Property name="XLabelItalic" function="Italics"/>
         <Property name="XLabelFontSize" function="Size" />
@@ -1511,6 +1523,7 @@
           <Property exposed_name="YLabelColor" name="Color" />
           <Property exposed_name="YLabelOpacity" name="Opacity" />
           <Property exposed_name="YLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="YLabelFontFile" name="FontFile" />
           <Property exposed_name="YLabelBold" name="Bold" />
           <Property exposed_name="YLabelItalic" name="Italic" />
           <Property exposed_name="YLabelShadow" name="Shadow" />
@@ -1521,6 +1534,7 @@
       <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor">
         <Property name="YLabelColor" function="Color"/>
         <Property name="YLabelFontFamily" function="Family"/>
+        <Property name="YLabelFontFile" function="File"/>
         <Property name="YLabelBold" function="Bold" />
         <Property name="YLabelItalic" function="Italics"/>
         <Property name="YLabelFontSize" function="Size" />
@@ -1534,6 +1548,7 @@
           <Property exposed_name="ZLabelColor" name="Color" />
           <Property exposed_name="ZLabelOpacity" name="Opacity" />
           <Property exposed_name="ZLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="ZLabelFontFile" name="FontFile" />
           <Property exposed_name="ZLabelBold" name="Bold" />
           <Property exposed_name="ZLabelItalic" name="Italic" />
           <Property exposed_name="ZLabelShadow" name="Shadow" />
@@ -1544,6 +1559,7 @@
       <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor">
         <Property name="ZLabelColor" function="Color"/>
         <Property name="ZLabelFontFamily" function="Family"/>
+        <Property name="ZLabelFontFile" function="File"/>
         <Property name="ZLabelBold" function="Bold" />
         <Property name="ZLabelItalic" function="Italics"/>
         <Property name="ZLabelFontSize" function="Size" />

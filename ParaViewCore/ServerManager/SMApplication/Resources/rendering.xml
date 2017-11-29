@@ -346,8 +346,22 @@
                  value="1" />
           <Entry text="Times"
                  value="2" />
+          <Entry text="File"
+                 value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty command="SetFontFile"
+                            label="Name"
+                            name="FontFile"
+                            number_of_elements="1">
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="FontFamily"
+                                   value="4" />
+          <!-- enable this widget when FontFamily==4 -->
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetBold"
                          default_values="0"

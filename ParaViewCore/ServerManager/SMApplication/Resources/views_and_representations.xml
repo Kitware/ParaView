@@ -125,7 +125,13 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetTitleFontFile"
+                            name="ChartTitleFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the chart title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTitleFontSize"
                             default_values="14"
@@ -163,6 +169,7 @@
                      panel_visibility="advanced">
         <Property name="ChartTitleColor" function="Color"/>
         <Property name="ChartTitleFontFamily" function="Family"/>
+        <Property name="ChartTitleFontFile" function="File"/>
         <Property name="ChartTitleBold" function="Bold" />
         <Property name="ChartTitleItalic" function="Italics"/>
         <Property name="ChartTitleFontSize" function="Size" />
@@ -239,8 +246,15 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the legend font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetLegendFontFile"
+                            default_values=""
+                            name="LegendFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the legend font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetLegendFontSize"
                             default_values="12"
@@ -299,6 +313,7 @@
                      panel_widget="FontEditor"
                      panel_visibility="advanced">
         <Property name="LegendFontFamily" function="Family"/>
+        <Property name="LegendFontFile" function="File"/>
         <Property name="LegendBold" function="Bold" />
         <Property name="LegendItalic" function="Italics"/>
         <Property name="LegendFontSize" function="Size" />
@@ -361,8 +376,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetLeftAxisTitleFontFile"
+                            name="LeftAxisTitleFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetLeftAxisTitleFontSize"
                             default_values="12"
@@ -506,8 +527,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetLeftAxisLabelFontFile"
+                            name="LeftAxisLabelFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetLeftAxisLabelFontSize"
                             default_values="12"
@@ -550,6 +577,7 @@
                      panel_visibility="advanced">
         <Property name="LeftAxisTitleColor" function="Color"/>
         <Property name="LeftAxisTitleFontFamily" function="Family"/>
+        <Property name="LeftAxisTitleFontFile" function="File"/>
         <Property name="LeftAxisTitleBold" function="Bold" />
         <Property name="LeftAxisTitleItalic" function="Italics"/>
         <Property name="LeftAxisTitleFontSize" function="Size" />
@@ -578,6 +606,7 @@
                      panel_visibility="advanced">
         <Property name="LeftAxisLabelColor" function="Color"/>
         <Property name="LeftAxisLabelFontFamily" function="Family"/>
+        <Property name="LeftAxisLabelFontFile" function="File"/>
         <Property name="LeftAxisLabelBold" function="Bold" />
         <Property name="LeftAxisLabelItalic" function="Italics"/>
         <Property name="LeftAxisLabelFontSize" function="Size" />
@@ -628,8 +657,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetBottomAxisTitleFontFile"
+                            name="BottomAxisTitleFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetBottomAxisTitleFontSize"
                             default_values="12"
@@ -773,8 +808,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetBottomAxisLabelFontFile"
+                            name="BottomAxisLabelFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetBottomAxisLabelFontSize"
                             default_values="12"
@@ -817,6 +858,7 @@
                      panel_visibility="advanced">
         <Property name="BottomAxisTitleColor" function="Color"/>
         <Property name="BottomAxisTitleFontFamily" function="Family"/>
+        <Property name="BottomAxisTitleFontFile" function="File"/>
         <Property name="BottomAxisTitleBold" function="Bold" />
         <Property name="BottomAxisTitleItalic" function="Italics"/>
         <Property name="BottomAxisTitleFontSize" function="Size" />
@@ -845,6 +887,7 @@
                      panel_visibility="advanced">
         <Property name="BottomAxisLabelColor" function="Color"/>
         <Property name="BottomAxisLabelFontFamily" function="Family"/>
+        <Property name="BottomAxisLabelFontFile" function="File"/>
         <Property name="BottomAxisLabelBold" function="Bold" />
         <Property name="BottomAxisLabelItalic" function="Italics"/>
         <Property name="BottomAxisLabelFontSize" function="Size" />
@@ -907,8 +950,15 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetRightAxisTitleFontFile"
+                            default_values="Arial"
+                            name="RightAxisTitleFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetRightAxisTitleFontSize"
                             default_values="12"
@@ -1056,8 +1106,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetRightAxisLabelFontFile"
+                            name="RightAxisLabelFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetRightAxisLabelFontSize"
                             default_values="12"
@@ -1100,6 +1156,7 @@
                      panel_visibility="advanced">
         <Property name="RightAxisTitleColor" function="Color"/>
         <Property name="RightAxisTitleFontFamily" function="Family"/>
+        <Property name="RightAxisTitleFontFile" function="File"/>
         <Property name="RightAxisTitleBold" function="Bold" />
         <Property name="RightAxisTitleItalic" function="Italics"/>
         <Property name="RightAxisTitleFontSize" function="Size" />
@@ -1128,6 +1185,7 @@
                      panel_visibility="advanced">
         <Property name="RightAxisLabelColor" function="Color"/>
         <Property name="RightAxisLabelFontFamily" function="Family"/>
+        <Property name="RightAxisLabelFontFile" function="File"/>
         <Property name="RightAxisLabelBold" function="Bold" />
         <Property name="RightAxisLabelItalic" function="Italics"/>
         <Property name="RightAxisLabelFontSize" function="Size" />
@@ -1179,8 +1237,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetTopAxisTitleFontFile"
+                            name="TopAxisTitleFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTopAxisTitleFontSize"
                             default_values="12"
@@ -1328,8 +1392,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the axis title font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetTopAxisLabelFontFile"
+                            name="TopAxisLabelFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTopAxisLabelFontSize"
                             default_values="12"
@@ -1372,6 +1442,7 @@
                      panel_visibility="advanced">
         <Property name="TopAxisTitleColor" function="Color"/>
         <Property name="TopAxisTitleFontFamily" function="Family"/>
+        <Property name="TopAxisTitleFontFile" function="File"/>
         <Property name="TopAxisTitleBold" function="Bold" />
         <Property name="TopAxisTitleItalic" function="Italics"/>
         <Property name="TopAxisTitleFontSize" function="Size" />
@@ -1400,6 +1471,7 @@
                      panel_visibility="advanced">
         <Property name="TopAxisLabelColor" function="Color"/>
         <Property name="TopAxisLabelFontFamily" function="Family"/>
+        <Property name="TopAxisLabelFontFile" function="File"/>
         <Property name="TopAxisLabelBold" function="Bold" />
         <Property name="TopAxisLabelItalic" function="Italics"/>
         <Property name="TopAxisLabelFontSize" function="Size" />
@@ -3050,8 +3122,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetActivePlotAxisLabelFontFile"
+                            name="ActivePlotAxisLabelFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetActivePlotAxisLabelFontSize"
                             default_values="12"
@@ -3097,6 +3175,7 @@
                      panel_visibility="advanced">
         <Property name="ActivePlotAxisLabelColor" function="Color"/>
         <Property name="ActivePlotAxisLabelFontFamily" function="Family"/>
+        <Property name="ActivePlotAxisLabelFontFile" function="File"/>
         <Property name="ActivePlotAxisLabelBold" function="Bold" />
         <Property name="ActivePlotAxisLabelItalic" function="Italics"/>
         <Property name="ActivePlotAxisLabelFontSize" function="Size" />
@@ -3176,8 +3255,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetScatterPlotAxisLabelFontFile"
+                            name="ScatterPlotAxisLabelFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetScatterPlotAxisLabelFontSize"
                             default_values="12"
@@ -3223,6 +3308,7 @@
                      panel_visibility="advanced">
         <Property name="ScatterPlotAxisLabelColor" function="Color"/>
         <Property name="ScatterPlotAxisLabelFontFamily" function="Family"/>
+        <Property name="ScatterPlotAxisLabelFontFile" function="File"/>
         <Property name="ScatterPlotAxisLabelBold" function="Bold" />
         <Property name="ScatterPlotAxisLabelItalic" function="Italics"/>
         <Property name="ScatterPlotAxisLabelFontSize" function="Size" />
@@ -3302,8 +3388,14 @@
           <String value="Arial" />
           <String value="Courier" />
           <String value="Times" />
+          <String value="File" />
         </StringListDomain>
         <Documentation>Set the font familyname.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetHistogramAxisLabelFontFile"
+                            name="HistogramAxisLabelFontFile"
+                            number_of_elements="1">
+        <Documentation>Set the font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetHistogramAxisLabelFontSize"
                             default_values="12"
@@ -3349,6 +3441,7 @@
                      panel_visibility="advanced">
         <Property name="HistogramAxisLabelColor" function="Color"/>
         <Property name="HistogramAxisLabelFontFamily" function="Family"/>
+        <Property name="HistogramAxisLabelFontFile" function="File"/>
         <Property name="HistogramAxisLabelBold" function="Bold" />
         <Property name="HistogramAxisLabelItalic" function="Italics"/>
         <Property name="HistogramAxisLabelFontSize" function="Size" />
@@ -3778,6 +3871,7 @@
             <Property exposed_name="SelectionCellLabelBold" name="CellLabelBold" function="Bold"/>
             <Property exposed_name="SelectionCellLabelColor" name="CellLabelColor" function="Color"/>
             <Property exposed_name="SelectionCellLabelFontFamily" name="CellLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionCellLabelFontFile" name="CellLabelFontFile" function="File"/>
             <Property exposed_name="SelectionCellLabelFontSize" name="CellLabelFontSize" function="Size"/>
             <Property exposed_name="SelectionCellLabelItalic" name="CellLabelItalic" function="Italics"/>
             <Property exposed_name="SelectionCellLabelJustification" name="CellLabelJustification" function="Justification"/>
@@ -3791,6 +3885,7 @@
             <Property exposed_name="SelectionPointLabelBold" name="PointLabelBold" function="Bold"/>
             <Property exposed_name="SelectionPointLabelColor" name="PointLabelColor" function="Color"/>
             <Property exposed_name="SelectionPointLabelFontFamily" name="PointLabelFontFamily" function="Family"/>
+            <Property exposed_name="SelectionPointLabelFontFile" name="PointLabelFontFile" function="File"/>
             <Property exposed_name="SelectionPointLabelFontSize" name="PointLabelFontSize" function="Size"/>
             <Property exposed_name="SelectionPointLabelItalic" name="PointLabelItalic" function="Italics"/>
             <Property exposed_name="SelectionPointLabelJustification" name="PointLabelJustification" function="Justification"/>
@@ -4948,8 +5043,14 @@
                  value="1" />
           <Entry text="Times"
                  value="2" />
+          <Entry text="File"
+                 value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty command="SetPointLabelFontFile"
+                            name="PointLabelFontFile"
+                            number_of_elements="1">
+      </StringVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfLabels"
                          default_values="100"
                          name="MaximumNumberOfLabels"
@@ -5080,8 +5181,14 @@
                  value="1" />
           <Entry text="Times"
                  value="2" />
+          <Entry text="File"
+                 value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
+      <StringVectorProperty command="SetCellLabelFontFile"
+                            name="CellLabelFontFile"
+                            number_of_elements="1">
+      </StringVectorProperty>
       <IntVectorProperty command="SetCellLabelBold"
                          default_values="0"
                          name="CellLabelBold"
@@ -5321,6 +5428,7 @@
           <Property name="CellLabelBold" />
           <Property name="CellLabelColor" />
           <Property name="CellLabelFontFamily" />
+          <Property name="CellLabelFontFile" />
           <Property name="CellLabelFontSize" />
           <Property name="CellLabelFormat" />
           <Property name="CellLabelItalic" />
@@ -5332,6 +5440,7 @@
           <Property name="PointLabelBold" />
           <Property name="PointLabelColor" />
           <Property name="PointLabelFontFamily" />
+          <Property name="PointLabelFontFile" />
           <Property name="PointLabelFontSize" />
           <Property name="PointLabelFormat" />
           <Property name="PointLabelItalic" />
@@ -5347,6 +5456,7 @@
         <Property name="CellLabelBold" function="Bold"/>
         <Property name="CellLabelColor" function="Color"/>
         <Property name="CellLabelFontFamily" function="Family"/>
+        <Property name="CellLabelFontFile" function="File"/>
         <Property name="CellLabelFontSize" function="Size"/>
         <Property name="CellLabelItalic" function="Italics"/>
         <Property name="CellLabelJustification" function="Justification"/>
@@ -5358,6 +5468,7 @@
         <Property name="PointLabelBold" function="Bold"/>
         <Property name="PointLabelColor" function="Color"/>
         <Property name="PointLabelFontFamily" function="Family"/>
+        <Property name="PointLabelFontFile" function="File"/>
         <Property name="PointLabelFontSize" function="Size"/>
         <Property name="PointLabelItalic" function="Italics"/>
         <Property name="PointLabelJustification" function="Justification"/>
@@ -5446,6 +5557,7 @@
           <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor">
             <Property name="XTitleColor" function="Color"/>
             <Property name="XTitleFontFamily" function="Family"/>
+            <Property name="XTitleFontFile" function="File"/>
             <Property name="XTitleBold" function="Bold" />
             <Property name="XTitleItalic" function="Italics"/>
             <Property name="XTitleFontSize" function="Size" />
@@ -5455,6 +5567,7 @@
           <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor">
             <Property name="YTitleColor" function="Color"/>
             <Property name="YTitleFontFamily" function="Family"/>
+            <Property name="YTitleFontFile" function="File"/>
             <Property name="YTitleBold" function="Bold" />
             <Property name="YTitleItalic" function="Italics"/>
             <Property name="YTitleFontSize" function="Size" />
@@ -5464,6 +5577,7 @@
           <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor">
             <Property name="ZTitleColor" function="Color"/>
             <Property name="ZTitleFontFamily" function="Family"/>
+            <Property name="ZTitleFontFile" function="File"/>
             <Property name="ZTitleBold" function="Bold" />
             <Property name="ZTitleItalic" function="Italics"/>
             <Property name="ZTitleFontSize" function="Size" />
@@ -5486,6 +5600,7 @@
           <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor">
             <Property name="XLabelColor" function="Color"/>
             <Property name="XLabelFontFamily" function="Family"/>
+            <Property name="XLabelFontFile" function="File"/>
             <Property name="XLabelBold" function="Bold" />
             <Property name="XLabelItalic" function="Italics"/>
             <Property name="XLabelFontSize" function="Size" />
@@ -5495,6 +5610,7 @@
           <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor">
             <Property name="YLabelColor" function="Color"/>
             <Property name="YLabelFontFamily" function="Family"/>
+            <Property name="YLabelFontFile" function="File"/>
             <Property name="YLabelBold" function="Bold" />
             <Property name="YLabelItalic" function="Italics"/>
             <Property name="YLabelFontSize" function="Size" />
@@ -5504,6 +5620,7 @@
           <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor">
             <Property name="ZLabelColor" function="Color"/>
             <Property name="ZLabelFontFamily" function="Family"/>
+            <Property name="ZLabelFontFile" function="File"/>
             <Property name="ZLabelBold" function="Bold" />
             <Property name="ZLabelItalic" function="Italics"/>
             <Property name="ZLabelFontSize" function="Size" />
@@ -7679,6 +7796,7 @@
             <Property name="Color" function="Color"/>
             <Property name="Opacity" function="Opacity"/>
             <Property name="FontFamily" function="Family"/>
+            <Property name="FontFile" function="File"/>
             <Property name="Bold" function="Bold"/>
             <Property name="Italic" function="Italics" />
             <Property name="Shadow" function="Shadow"/>
@@ -7827,6 +7945,7 @@
             <Property name="Color" function="Color"/>
             <Property name="Opacity" function="Opacity"/>
             <Property name="FontFamily" function="Family"/>
+            <Property name="FontFile" function="File"/>
             <Property name="Bold" function="Bold"/>
             <Property name="Italic" function="Italics" />
             <Property name="Shadow" function="Shadow"/>
@@ -8573,6 +8692,7 @@
           <Property exposed_name="PolarAxisTitleColor" name="Color" />
           <Property exposed_name="PolarAxisTitleOpacity" name="Opacity" />
           <Property exposed_name="PolarAxisTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="PolarAxisTitleFontFile" name="FontFile" />
           <Property exposed_name="PolarAxisTitleBold" name="Bold" />
           <Property exposed_name="PolarAxisTitleItalic" name="Italic" />
           <Property exposed_name="PolarAxisTitleShadow" name="Shadow" />
@@ -8582,6 +8702,7 @@
       <PropertyGroup label="Polar Axis Title Font Properties" panel_widget="FontEditor">
         <Property name="PolarAxisTitleColor" function="Color"/>
         <Property name="PolarAxisTitleFontFamily" function="Family"/>
+        <Property name="PolarAxisTitleFontFile" function="File"/>
         <Property name="PolarAxisTitleBold" function="Bold" />
         <Property name="PolarAxisTitleItalic" function="Italics"/>
         <Property name="PolarAxisTitleFontSize" function="Size" />
@@ -8595,6 +8716,7 @@
           <Property exposed_name="PolarAxisLabelColor" name="Color" />
           <Property exposed_name="PolarAxisLabelOpacity" name="Opacity" />
           <Property exposed_name="PolarAxisLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="PolarAxisLabelFontFile" name="FontFile" />
           <Property exposed_name="PolarAxisLabelBold" name="Bold" />
           <Property exposed_name="PolarAxisLabelItalic" name="Italic" />
           <Property exposed_name="PolarAxisLabelShadow" name="Shadow" />
@@ -8604,6 +8726,7 @@
       <PropertyGroup label="Polar Axis Label Font Properties" panel_widget="FontEditor">
         <Property name="PolarAxisLabelColor" function="Color"/>
         <Property name="PolarAxisLabelFontFamily" function="Family"/>
+        <Property name="PolarAxisLabelFontFile" function="File"/>
         <Property name="PolarAxisLabelBold" function="Bold" />
         <Property name="PolarAxisLabelItalic" function="Italics"/>
         <Property name="PolarAxisLabelFontSize" function="Size" />
@@ -8617,6 +8740,7 @@
           <Property exposed_name="LastRadialAxisTextColor" name="Color" />
           <Property exposed_name="LastRadialAxisTextOpacity" name="Opacity" />
           <Property exposed_name="LastRadialAxisTextFontFamily" name="FontFamily" />
+          <Property exposed_name="LastRadialAxisTextFontFile" name="FontFile" />
           <Property exposed_name="LastRadialAxisTextBold" name="Bold" />
           <Property exposed_name="LastRadialAxisTextItalic" name="Italic" />
           <Property exposed_name="LastRadialAxisTextShadow" name="Shadow" />
@@ -8626,6 +8750,7 @@
       <PropertyGroup label="Last Radial Axis Text Font Properties" panel_widget="FontEditor">
         <Property name="LastRadialAxisTextColor" function="Color"/>
         <Property name="LastRadialAxisTextFontFamily" function="Family"/>
+        <Property name="LastRadialAxisTextFontFile" function="File"/>
         <Property name="LastRadialAxisTextBold" function="Bold" />
         <Property name="LastRadialAxisTextItalic" function="Italics"/>
         <Property name="LastRadialAxisTextFontSize" function="Size" />
@@ -8639,6 +8764,7 @@
           <Property exposed_name="SecondaryRadialAxesTextColor" name="Color" />
           <Property exposed_name="SecondaryRadialAxesTextOpacity" name="Opacity" />
           <Property exposed_name="SecondaryRadialAxesTextFontFamily" name="FontFamily" />
+          <Property exposed_name="SecondaryRadialAxesTextFontFile" name="FontFile" />
           <Property exposed_name="SecondaryRadialAxesTextBold" name="Bold" />
           <Property exposed_name="SecondaryRadialAxesTextItalic" name="Italic" />
           <Property exposed_name="SecondaryRadialAxesTextShadow" name="Shadow" />
@@ -8648,6 +8774,7 @@
       <PropertyGroup label="Secondary Radial Axes Text Font Properties" panel_widget="FontEditor">
         <Property name="SecondaryRadialAxesTextColor" function="Color"/>
         <Property name="SecondaryRadialAxesTextFontFamily" function="Family"/>
+        <Property name="SecondaryRadialAxesTextFontFile" function="File"/>
         <Property name="SecondaryRadialAxesTextBold" function="Bold" />
         <Property name="SecondaryRadialAxesTextItalic" function="Italics"/>
         <Property name="SecondaryRadialAxesTextFontSize" function="Size" />
@@ -9215,6 +9342,7 @@
                          panel_visibility="advanced">
             <Property name="ChartTitleColor" function="Color"/>
             <Property name="ChartTitleFontFamily" function="Family"/>
+            <Property name="ChartTitleFontFile" function="File"/>
             <Property name="ChartTitleBold" function="Bold" />
             <Property name="ChartTitleItalic" function="Italics"/>
             <Property name="ChartTitleFontSize" function="Size" />
@@ -9228,6 +9356,7 @@
                          panel_widget="FontEditor"
                          panel_visibility="advanced">
             <Property name="LegendFontFamily" function="Family"/>
+            <Property name="LegendFontFile" function="File"/>
             <Property name="LegendBold" function="Bold"/>
             <Property name="LegendItalic" function="Italics"/>
             <Property name="LegendFontSize" function="Size"/>
@@ -9251,6 +9380,7 @@
                          panel_visibility="advanced">
             <Property name="LeftAxisTitleColor" function="Color"/>
             <Property name="LeftAxisTitleFontFamily" function="Family"/>
+            <Property name="LeftAxisTitleFontFile" function="File"/>
             <Property name="LeftAxisTitleBold" function="Bold" />
             <Property name="LeftAxisTitleItalic" function="Italics"/>
             <Property name="LeftAxisTitleFontSize" function="Size" />
@@ -9276,6 +9406,7 @@
                          panel_visibility="advanced">
             <Property name="LeftAxisLabelColor" function="Color"/>
             <Property name="LeftAxisLabelFontFamily" function="Family"/>
+            <Property name="LeftAxisLabelFontFile" function="File"/>
             <Property name="LeftAxisLabelBold" function="Bold" />
             <Property name="LeftAxisLabelItalic" function="Italics"/>
             <Property name="LeftAxisLabelFontSize" function="Size" />
@@ -9292,6 +9423,7 @@
                          panel_visibility="advanced">
             <Property name="BottomAxisTitleColor" function="Color"/>
             <Property name="BottomAxisTitleFontFamily" function="Family"/>
+            <Property name="BottomAxisTitleFontFile" function="File"/>
             <Property name="BottomAxisTitleBold" function="Bold" />
             <Property name="BottomAxisTitleItalic" function="Italics"/>
             <Property name="BottomAxisTitleFontSize" function="Size" />
@@ -9314,6 +9446,7 @@
                          panel_visibility="advanced">
             <Property name="BottomAxisLabelColor" function="Color"/>
             <Property name="BottomAxisLabelFontFamily" function="Family"/>
+            <Property name="BottomAxisLabelFontFile" function="File"/>
             <Property name="BottomAxisLabelBold" function="Bold" />
             <Property name="BottomAxisLabelItalic" function="Italics"/>
             <Property name="BottomAxisLabelFontSize" function="Size" />
@@ -9330,6 +9463,7 @@
                          panel_visibility="advanced">
             <Property name="RightAxisTitleColor" function="Color"/>
             <Property name="RightAxisTitleFontFamily" function="Family"/>
+            <Property name="RightAxisTitleFontFile" function="File"/>
             <Property name="RightAxisTitleBold" function="Bold" />
             <Property name="RightAxisTitleItalic" function="Italics"/>
             <Property name="RightAxisTitleFontSize" function="Size" />
@@ -9352,6 +9486,7 @@
                          panel_visibility="advanced">
             <Property name="RightAxisLabelColor" function="Color"/>
             <Property name="RightAxisLabelFontFamily" function="Family"/>
+            <Property name="RightAxisLabelFontFile" function="File"/>
             <Property name="RightAxisLabelBold" function="Bold" />
             <Property name="RightAxisLabelItalic" function="Italics"/>
             <Property name="RightAxisLabelFontSize" function="Size" />
@@ -9368,6 +9503,7 @@
                          panel_visibility="advanced">
             <Property name="TopAxisTitleColor" function="Color"/>
             <Property name="TopAxisTitleFontFamily" function="Family"/>
+            <Property name="TopAxisTitleFontFile" function="File"/>
             <Property name="TopAxisTitleBold" function="Bold" />
             <Property name="TopAxisTitleItalic" function="Italics"/>
             <Property name="TopAxisTitleFontSize" function="Size" />
@@ -9390,6 +9526,7 @@
                          panel_visibility="advanced">
             <Property name="TopAxisLabelColor" function="Color"/>
             <Property name="TopAxisLabelFontFamily" function="Family"/>
+            <Property name="TopAxisLabelFontFile" function="File"/>
             <Property name="TopAxisLabelBold" function="Bold" />
             <Property name="TopAxisLabelItalic" function="Italics"/>
             <Property name="TopAxisLabelFontSize" function="Size" />
@@ -9423,6 +9560,7 @@
                          panel_visibility="advanced">
             <Property name="ChartTitleColor" function="Color"/>
             <Property name="ChartTitleFontFamily" function="Family"/>
+            <Property name="ChartTitleFontFile" function="File"/>
             <Property name="ChartTitleBold" function="Bold" />
             <Property name="ChartTitleItalic" function="Italics"/>
             <Property name="ChartTitleFontSize" function="Size" />
@@ -9435,7 +9573,8 @@
           <PropertyGroup label="Legend Properties"
                          panel_widget="FontEditor"
                          panel_visibility="advanced">
-            <Property name="LegendFontFamily" function="Family"/>
+              <Property name="LegendFontFamily" function="Family"/>
+              <Property name="LegendFontFile" function="File"/>
               <Property name="LegendBold" function="Bold"/>
               <Property name="LegendItalic" function="Italics"/>
               <Property name="LegendFontSize" function="Size"/>
@@ -9459,6 +9598,7 @@
                          panel_visibility="advanced">
             <Property name="LeftAxisTitleColor" function="Color"/>
             <Property name="LeftAxisTitleFontFamily" function="Family"/>
+            <Property name="LeftAxisTitleFontFile" function="File"/>
             <Property name="LeftAxisTitleBold" function="Bold" />
             <Property name="LeftAxisTitleItalic" function="Italics"/>
             <Property name="LeftAxisTitleFontSize" function="Size" />
@@ -9484,6 +9624,7 @@
                          panel_visibility="advanced">
             <Property name="LeftAxisLabelColor" function="Color"/>
             <Property name="LeftAxisLabelFontFamily" function="Family"/>
+            <Property name="LeftAxisLabelFontFile" function="File"/>
             <Property name="LeftAxisLabelBold" function="Bold" />
             <Property name="LeftAxisLabelItalic" function="Italics"/>
             <Property name="LeftAxisLabelFontSize" function="Size" />
@@ -9501,6 +9642,7 @@
                          panel_visibility="advanced">
             <Property name="BottomAxisTitleColor" function="Color"/>
             <Property name="BottomAxisTitleFontFamily" function="Family"/>
+            <Property name="BottomAxisTitleFontFile" function="File"/>
             <Property name="BottomAxisTitleBold" function="Bold" />
             <Property name="BottomAxisTitleItalic" function="Italics"/>
             <Property name="BottomAxisTitleFontSize" function="Size" />
@@ -9526,6 +9668,7 @@
                          panel_visibility="advanced">
             <Property name="BottomAxisLabelColor" function="Color"/>
             <Property name="BottomAxisLabelFontFamily" function="Family"/>
+            <Property name="BottomAxisLabelFontFile" function="File"/>
             <Property name="BottomAxisLabelBold" function="Bold" />
             <Property name="BottomAxisLabelItalic" function="Italics"/>
             <Property name="BottomAxisLabelFontSize" function="Size" />
