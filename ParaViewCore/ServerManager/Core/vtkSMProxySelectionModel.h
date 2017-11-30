@@ -35,7 +35,7 @@ class vtkSMProxySelectionModelInternal;
 class vtkCollection;
 class vtkSMProxy;
 
-#include <set> // needed for vtkset::set.
+#include <list> // needed for vtkset::list.
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
 {
@@ -62,7 +62,7 @@ public:
   /**
    * Type for selection.
    */
-  typedef std::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
+  typedef std::list<vtkSmartPointer<vtkSMProxy> > SelectionType;
 
   // vtkSMProxy selection flags
   enum ProxySelectionFlag

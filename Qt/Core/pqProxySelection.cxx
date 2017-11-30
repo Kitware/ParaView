@@ -54,7 +54,7 @@ bool pqProxySelection::copyFrom(vtkSMProxySelectionModel* other)
     pqServerManagerModelItem* item = smmodel->findItem<pqServerManagerModelItem*>(proxy);
     if (item)
     {
-      new_selection.insert(item);
+      new_selection.push_back(item);
     }
   }
 
@@ -79,11 +79,11 @@ bool pqProxySelection::copyTo(vtkSMProxySelectionModel* other) const
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
     if (port)
     {
-      selection.insert(port->getOutputPortProxy());
+      selection.push_back(port->getOutputPortProxy());
     }
     else if (proxy)
     {
-      selection.insert(proxy->getProxy());
+      selection.push_back(proxy->getProxy());
     }
   }
   if (other->GetSelection() != selection)

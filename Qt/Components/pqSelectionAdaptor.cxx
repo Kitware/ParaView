@@ -137,7 +137,7 @@ void pqSelectionAdaptor::selectionChanged()
     pqServerManagerModelItem* item = this->mapToItem(this->mapToSource(index));
     if (item)
     {
-      selection.insert(item);
+      selection.push_back(item);
     }
   }
   pqActiveObjects::instance().setSelection(
