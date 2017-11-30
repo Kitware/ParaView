@@ -936,7 +936,7 @@
       "path": "VTK/Accelerators/Vtkm",
       "exclude": [
         { "path": "Testing" }
-      ],
+      ]
     },
     { "name": "vtkMetaIO",
       "path": "VTK/Utilities/MetaIO"
