@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QSet>
+
 //-----------------------------------------------------------------------------
 pqLinkSelectionReaction::pqLinkSelectionReaction(QAction* parentObject)
   : Superclass(parentObject)
