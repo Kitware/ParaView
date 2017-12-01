@@ -33,16 +33,17 @@ if (PARAVIEW_FREEZE_PYTHON)
   add_custom_command(
     OUTPUT "${output_dir}/vtkFrozenParaViewPython.h"
     COMMAND ${CMAKE_COMMAND}
-            -DOUTPUT_DIRECTORY:PATH="${output_dir}"
-            -DPACKAGE_ROOT:PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages"
-            -DPYTHON_EXECUTABLE:FILEPATH="${PYTHON_EXECUTABLE}"
-            -DOUTPUT_HEADER_PREFIX:STRING="vtkFrozenParaViewPython"
-            -DPYTHON_LIBRARY_PATH:PATH="${PYTHON_LIBRARY_PATH}"
-            -P "${FreezePython_SRC_DIR}/vtkFreezePython.cmake"
+            -DOUTPUT_DIRECTORY:PATH=${output_dir}
+            -DPACKAGE_ROOT:PATH=${VTK_BUILD_PYTHON_MODULES_DIR}
+            -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
+            -DOUTPUT_HEADER_PREFIX:STRING=vtkFrozenParaViewPython
+            -DPYTHON_LIBRARY_PATH:PATH=${PYTHON_LIBRARY_PATH}
+            -P ${FreezePython_SRC_DIR}/vtkFreezePython.cmake
     DEPENDS "${FreezePython_SRC_DIR}/vtkFreezePython.cmake"
             paraview_python_package # depends on paraview-py files.
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMENT "Freezing Python and ParaView Python packages and modules")
+    COMMENT "Freezing Python and ParaView Python packages and modules"
+    VERBATIM)
 
     include_directories("${output_dir}")
     list(APPEND Module_SRCS "${output_dir}/vtkFrozenParaViewPython.h")
