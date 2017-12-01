@@ -1099,6 +1099,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Multi-piece Dataset";
     case VTK_DIRECTED_ACYCLIC_GRAPH:
       return "Directed Acyclic Graph";
+    case VTK_MOLECULE:
+      return "Molecule";
     default:
       vtkPVDataInformationHelper* dhelper = vtkPVDataInformation::FindHelper(this->DataClassName);
       if (dhelper)
