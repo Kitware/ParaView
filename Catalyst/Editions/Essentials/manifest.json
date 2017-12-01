@@ -33,7 +33,6 @@
       "replace":[
         { "path":"ParaViewCore/VTKExtensions/Default/CMakeLists.txt" },
         { "path":"ParaViewCore/VTKExtensions/Default/Essentials.props.catalyst.cmake" },
-        { "path":"ParaViewCore/VTKExtensions/Default/hints" },
         { "path":"ParaViewCore/VTKExtensions/Default/module.cmake" }
       ],
       "cswrap":true,

@@ -322,7 +322,7 @@ double* vtkPVArrayInformation::GetComponentRange(int comp)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::GetComponentRange(int comp, double* range)
+void vtkPVArrayInformation::GetComponentRange(int comp, double range[2])
 {
   double* ptr;
 
@@ -378,7 +378,7 @@ double* vtkPVArrayInformation::GetComponentFiniteRange(int comp)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::GetComponentFiniteRange(int comp, double* range)
+void vtkPVArrayInformation::GetComponentFiniteRange(int comp, double range[2])
 {
   double* ptr = this->GetComponentFiniteRange(comp);
 

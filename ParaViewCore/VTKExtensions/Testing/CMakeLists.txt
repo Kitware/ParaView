@@ -113,9 +113,6 @@ ENDIF()
 
 if(Module_vtkRenderingOpenGL2)
   paraview_add_test_cxx(${vtk-module}CxxTests-Rendering tests
-    # Enable these after the transfer function can take the vtkTable histograms.
-    #TestTransferFunctionEditor
-    #TestTransferFunctionEditor2
     TestPVAMRDualClip.cxx
     )
   paraview_test_cxx_executable(${vtk-module}CxxTest-Renderings tests)

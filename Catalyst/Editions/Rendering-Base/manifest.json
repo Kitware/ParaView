@@ -539,7 +539,6 @@
     { "name": "vtkPVClientServerCoreRendering",
       "path": "ParaViewCore/ClientServerCore/Rendering",
       "include": [
-        { "path": "hints" },
         { "class": "vtk3DWidgetRepresentation" },
         { "class": "vtkCacheSizeKeeper" },
         { "class": "vtkCaveSynchronizedRenderers" },
