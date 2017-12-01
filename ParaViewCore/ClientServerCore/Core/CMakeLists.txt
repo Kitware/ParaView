@@ -135,8 +135,6 @@ if(PARAVIEW_USE_MPI)
   include(vtkMPI)
 endif()
 
-# Use a custom hints file for this module.
-set(${vtk-module}_WRAP_HINTS "${CMAKE_CURRENT_SOURCE_DIR}/hints")
 vtk_module_library(vtkPVClientServerCoreCore ${Module_SRCS})
 if(PARAVIEW_USE_MPI)
   vtk_mpi_link(${vtk-module})
