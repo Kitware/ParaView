@@ -56,6 +56,15 @@
         communication routines to use minimal memory than without this
         restriction.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetMinimumGhostLevel"
+                         default_values="0"
+                         label="Minimum Number Of Ghost Levels"
+                         name="MinimumGhostLevel"
+                         number_of_elements="1">
+        <Documentation>The minimum number of ghost levels to add to each
+        processor's output. If the pipeline also requests ghost levels, the
+        larger value will be used.</Documentation>
+      </IntVectorProperty>
       <!-- End D3 -->
     </SourceProxy>
     <!-- ==================================================================== -->

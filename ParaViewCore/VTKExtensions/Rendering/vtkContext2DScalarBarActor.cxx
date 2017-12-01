@@ -263,6 +263,7 @@ void vtkContext2DScalarBarActor::UpdateScalarBarTexture(vtkImageData* image)
 
   double* lutRange = ctf->GetRange();
   const int numColors = 256;
+  unsigned char color[4];
   for (int i = 0; i < numColors; ++i)
   {
 
@@ -276,10 +277,13 @@ void vtkContext2DScalarBarActor::UpdateScalarBarTexture(vtkImageData* image)
       value = pow(10.0, value);
     }
 
-    unsigned char* color = ctf->MapValue(value);
+    const unsigned char* colorTmp = ctf->MapValue(value);
 
     // The opacity function does not take into account the logarithmic
     // mapping, so we use the original value here.
+    color[0] = colorTmp[0];
+    color[1] = colorTmp[1];
+    color[2] = colorTmp[2];
     color[3] = static_cast<unsigned char>(255.0 * ctf->GetOpacity(originalValue) + 0.5);
     colors->SetTypedTuple(i, color);
   }
