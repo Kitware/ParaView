@@ -98,7 +98,7 @@ public:
     this->SetComponentRange(comp, range[0], range[1]);
   }
   double* GetComponentRange(int component) VTK_SIZEHINT(2);
-  void GetComponentRange(int comp, double* range);
+  void GetComponentRange(int comp, double range[2]);
   //@}
 
   //@{
@@ -113,7 +113,7 @@ public:
     this->SetComponentFiniteRange(comp, range[0], range[1]);
   }
   double* GetComponentFiniteRange(int component);
-  void GetComponentFiniteRange(int comp, double* range);
+  void GetComponentFiniteRange(int comp, double range[2]);
   //@}
 
   /**
