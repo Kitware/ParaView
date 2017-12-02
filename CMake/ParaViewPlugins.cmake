@@ -1199,6 +1199,31 @@ macro(pv_setup_module_environment _name)
   include(vtkClientServerWrapping)
   if (PARAVIEW_ENABLE_PYTHON)
     include(vtkPythonWrapping)
+
+    if(NOT VTK_PYTHON_SITE_PACKAGES_SUFFIX)
+      if(WIN32 AND NOT CYGWIN)
+        set(VTK_PYTHON_SITE_PACKAGES_SUFFIX "Lib/site-packages")
+      else()
+        set(VTK_PYTHON_SITE_PACKAGES_SUFFIX
+          "python${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}/site-packages")
+      endif()
+    endif()
+
+    if(CMAKE_CONFIGURATION_TYPES)
+      # For build systems with configuration types e.g. Xcode/Visual Studio,
+      # we rely on generator expressions.
+      if(CMAKE_VERSION VERSION_LESS 3.4)
+        message(FATAL_ERROR "CMake 3.4 or newer is needed for your generator.")
+      endif()
+      set(VTK_BUILD_PYTHON_MODULES_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/$<CONFIG>/${VTK_PYTHON_SITE_PACKAGES_SUFFIX}")
+    else()
+      set(VTK_BUILD_PYTHON_MODULES_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${VTK_PYTHON_SITE_PACKAGES_SUFFIX}")
+    endif()
+    if(WIN32 AND NOT CYGWIN)
+      set(VTK_INSTALL_PYTHON_MODULES_DIR "${VTK_INSTALL_RUNTIME_DIR}/${VTK_PYTHON_SITE_PACKAGES_SUFFIX}")
+    else()
+      set(VTK_INSTALL_PYTHON_MODULES_DIR "${VTK_INSTALL_LIBRARY_DIR}/${VTK_PYTHON_SITE_PACKAGES_SUFFIX}")
+    endif()
   endif()
 
   # load information about existing modules.
