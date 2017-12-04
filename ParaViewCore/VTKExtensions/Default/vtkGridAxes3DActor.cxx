@@ -20,6 +20,7 @@
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkVectorOperators.h"
 
@@ -379,7 +380,11 @@ void vtkGridAxes3DActor::GetRenderedBounds(double bounds[6])
 //----------------------------------------------------------------------------
 int vtkGridAxes3DActor::RenderOpaqueGeometry(vtkViewport* viewport)
 {
-  this->Update(viewport);
+  vtkRenderWindow* rWin = vtkRenderWindow::SafeDownCast(viewport->GetVTKWindow());
+  if (rWin == nullptr || rWin->GetDesiredUpdateRate() < 1.0)
+  {
+    this->Update(viewport);
+  }
 
   int counter = 0;
   for (int cc = 0; cc < 6; cc++)
