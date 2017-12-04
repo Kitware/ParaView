@@ -1,4 +1,5 @@
 include(ParaViewMacros)
+include(vtkWrapHierarchy)
 
 if(DEFINED PV_INSTALL_PLUGIN_DIR)
   message(WARNING "`PV_INSTALL_PLUGIN_DIR` is no longer supported as of ParaView 5.5. "
@@ -121,6 +122,9 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
   SET(CS_SRCS)
   IF(HDRS)
     include(vtkWrapClientServer)
+
+    vtk_wrap_hierarchy(${Name} ${VTK_MODULES_DIR}
+      "${ARGN}")
 
     # Plugins should not use unified bindings. The problem arises because the
     # PythonD library links to the plugin itself, but the CS wrapping code
@@ -1133,6 +1137,8 @@ macro(pv_process_modules)
     if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
         NOT ${_module}_IS_TEST AND
         NOT ${_module}_THIRD_PARTY)
+        vtk_wrap_hierarchy(${module_name} ${VTK_MODULES_DIR}
+          "${ARG_SOURCES}")
         set(NO_PYTHON_BINDINGS_AVAILABLE TRUE)
         vtk_add_cs_wrapping(${_module})
         list(APPEND plugin_cs_modules ${_module})
