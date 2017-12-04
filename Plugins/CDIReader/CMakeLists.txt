@@ -13,6 +13,7 @@ add_paraview_plugin(CDIReader "1.0"
   SERVER_MANAGER_XML CDIReader.xml
   SERVER_MANAGER_SOURCES
     vtkCDIReader.cxx
+  SERVER_SOURCES
     cdilib.c
   REQUIRED_ON_SERVER
 )
