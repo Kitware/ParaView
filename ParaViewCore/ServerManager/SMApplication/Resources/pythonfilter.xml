@@ -355,6 +355,8 @@ annotation text.
                  value="19" />
           <!-- <Entry value="20" text="vtkGraph"/> -->
           <!-- <Entry value="21" text="vtkTree"/> -->
+          <Entry text="vtkMolecule"
+                 value="33" />
         </EnumerationDomain>
         <Documentation>The value of this property determines the dataset type
         for the output of the programmable filter.</Documentation>
@@ -480,6 +482,8 @@ annotation text.
                  value="19" />
           <!-- <Entry value="20" text="vtkGraph"/> -->
           <!-- <Entry value="21" text="vtkTree"/> -->
+          <Entry text="vtkMolecule"
+                 value="33" />
         </EnumerationDomain>
         <Documentation>The value of this property determines the dataset type
         for the output of the programmable source.</Documentation>
