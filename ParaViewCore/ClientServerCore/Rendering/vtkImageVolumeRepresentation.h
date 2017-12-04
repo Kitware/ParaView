@@ -94,7 +94,7 @@ public:
   void SetSpecular(double);
   void SetSpecularPower(double);
   void SetShade(bool);
-  void SetIndependantComponents(bool);
+  void SetIndependentComponents(bool);
 
   //***************************************************************************
   // Forwarded to vtkSmartVolumeMapper.
