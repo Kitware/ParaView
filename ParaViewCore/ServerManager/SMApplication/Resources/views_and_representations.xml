@@ -4427,7 +4427,7 @@
         <BooleanDomain name="bool" />
         <Documentation>Enable/Disable shading.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetIndependantComponents"
+      <IntVectorProperty command="SetIndependentComponents"
                          default_values="1"
                          name="MapScalars"
                          number_of_elements="1">
