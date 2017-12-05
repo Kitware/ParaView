@@ -275,6 +275,7 @@
         { "class": "vtkStripper" },
         { "class": "vtkStructuredGridOutlineFilter" },
         { "class": "vtkTriangleFilter" },
+        { "class": "vtkTriangleMeshPointNormals"},
         { "class": "vtkTubeFilter" }
       ],
       "cswrap": true,

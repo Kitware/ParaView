@@ -123,6 +123,7 @@
       "include":[
         { "class":"vtkExtractSelectedFrustum" },
         { "class":"vtkExtractSelectionBase" },
+        { "class":"vtkGradientFilter" },
         { "class":"vtkImageDataToPointSet" },
         { "class":"vtkRectilinearGridToPointSet" },
         { "class":"vtkTransformFilter" },
