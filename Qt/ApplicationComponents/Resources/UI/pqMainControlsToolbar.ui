@@ -130,11 +130,30 @@
     <string>Load a color palette</string>
    </property>
   </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqReset24.png</normaloff>:/pqWidgets/Icons/pqReset24.png</iconset>
+   </property>
+   <property name="text">
+    <string>ResetSession</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="toolTip">
+    <string>Reset Session</string>
+   </property>
+   <property name="statusTip">
+    <string>Reset Session</string>
+   </property>
+  </action>
   <addaction name="actionOpenData"/>
   <addaction name="actionSaveData"/>
   <addaction name="separator"/>
   <addaction name="actionServerConnect"/>
   <addaction name="actionServerDisconnect"/>
+  <addaction name="actionDelete"/>
   <addaction name="separator"/>
   <addaction name="actionUndo"/>
   <addaction name="actionRedo"/>
