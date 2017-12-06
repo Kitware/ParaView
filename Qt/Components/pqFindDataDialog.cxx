@@ -56,7 +56,6 @@ public:
     this->Ui.setupUi(self);
     self->connect(
       this->Ui.currentSelectionFrame, SIGNAL(showing(pqOutputPort*)), SLOT(showing(pqOutputPort*)));
-    self->connect(this->Ui.createSelectionFrame, SIGNAL(helpRequested()), SIGNAL(helpRequested()));
 
     self->connect(this->Ui.freezeSelection, SIGNAL(clicked()), SLOT(freezeSelection()));
     self->connect(this->Ui.extractSelection, SIGNAL(clicked()), SLOT(extractSelection()));

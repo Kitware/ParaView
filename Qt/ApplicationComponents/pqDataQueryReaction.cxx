@@ -54,21 +54,12 @@ pqDataQueryReaction::~pqDataQueryReaction()
 }
 
 //-----------------------------------------------------------------------------
-void pqDataQueryReaction::showHelp()
-{
-#ifdef PARAVIEW_USE_QTHELP
-  pqHelpReaction::showHelp("qthelp://paraview.org/paraview/Book/Book_Chapter6.html");
-#endif
-}
-
-//-----------------------------------------------------------------------------
 void pqDataQueryReaction::showQueryDialog()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
   if (pqFindDataSingleton.isNull())
   {
     pqFindDataDialog* dialog = new pqFindDataDialog(pqCoreUtilities::mainWidget());
-    this->connect(dialog, SIGNAL(helpRequested()), SLOT(showHelp()));
     pqFindDataSingleton = dialog;
   }
 

@@ -95,7 +95,6 @@ public:
     self->connect(
       this->Ui.source, SIGNAL(currentIndexChanged(pqOutputPort*)), SLOT(setPort(pqOutputPort*)));
     self->connect(this->Ui.selectionType, SIGNAL(currentIndexChanged(int)), SLOT(refreshQuery()));
-    self->connect(this->Ui.queryClauseWidget, SIGNAL(helpRequested()), SIGNAL(helpRequested()));
     self->connect(this->Ui.runQuery, SIGNAL(clicked()), SLOT(runQuery()));
 
     // when the selection manager reports a new selection, we reset the query

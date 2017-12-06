@@ -52,12 +52,6 @@ public:
   pqFindDataDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
   ~pqFindDataDialog() override;
 
-signals:
-  /**
-  * triggered to request help about the pqFindDataDialog.
-  */
-  void helpRequested();
-
 private slots:
   /**
   * called when pqFindDataCurrentSelectionFrame notifies the dialog that it's

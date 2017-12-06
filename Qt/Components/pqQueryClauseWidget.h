@@ -137,12 +137,6 @@ public slots:
   */
   void initialize(CriteriaTypes type_flags, bool qualifier_mode = false);
 
-signals:
-  /**
-  * Fired when the user clicks on the help button.
-  */
-  void helpRequested();
-
 protected slots:
   /**
   * Based on the selection criteria, populate the options in the selection

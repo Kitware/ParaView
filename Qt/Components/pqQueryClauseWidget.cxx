@@ -143,7 +143,6 @@ pqQueryClauseWidget::pqQueryClauseWidget(QWidget* parentObject, Qt::WindowFlags 
   this->Internals->setupUi(this);
 
   this->connect(this->Internals->showCompositeTree, SIGNAL(clicked()), SLOT(showCompositeTree()));
-  this->connect(this->Internals->helpButton, SIGNAL(clicked()), SIGNAL(helpRequested()));
 
   this->connect(this->Internals->criteria, SIGNAL(currentIndexChanged(int)),
     SLOT(populateSelectionCondition()));
@@ -515,7 +514,6 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
   foreach (CriteriaTypes t_flag, sub_widgets)
   {
     pqQueryClauseWidget* sub_widget = new pqQueryClauseWidget(this);
-    sub_widget->Internals->helpButton->hide();
     sub_widget->setProducer(this->producer());
     sub_widget->setAttributeType(this->attributeType());
     sub_widget->initialize(t_flag, true);
