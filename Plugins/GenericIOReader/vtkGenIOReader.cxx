@@ -43,8 +43,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkGenIOReader.h"
+#include "vtkObjectFactory.h"
 
-vtkGenIOReader::vtkGenIOReader()
+vtkStandardNewMacro(vtkGenIOReader)
+
+  vtkGenIOReader::vtkGenIOReader()
 {
   this->Controller = NULL;
   this->Controller = vtkMultiProcessController::GetGlobalController();

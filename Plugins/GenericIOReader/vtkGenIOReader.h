@@ -156,7 +156,7 @@ struct ParaviewField
 class vtkGenIOReader : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkGenIOReader* New() { return new vtkGenIOReader(); }
+  static vtkGenIOReader* New();
   vtkTypeMacro(vtkGenIOReader, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
