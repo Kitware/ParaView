@@ -905,12 +905,6 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
 
   this->Axis->Update();
   this->Axis->Paint(painter);
-
-  //-----------------------------
-  // Set up title
-  // IMPORTANT: this needs to be done *after* this->Axis->Update() is called
-  // so that we get an accurate axis bounding rectangle.
-  this->PaintTitle(painter, size);
 }
 
 //----------------------------------------------------------------------------
@@ -940,21 +934,35 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
   float titleHeight = titleBounds[3];
 
   // vtkAxis::GetBoundingRect() is not accurate.  Compute it ourselves.
-  vtkRectf axisRect =
-    vtkBoundingRectContextDevice2D::GetBoundingRect(this->Axis, this->CurrentViewport);
+  // All the code in this section is needed to get the actual bounds of
+  // the axis including any offsets applied in PaintAxis().
+  vtkNew<vtkBoundingRectContextDevice2D> boundingDevice;
+  vtkNew<vtkContextDevice2D> contextDevice;
+  boundingDevice->SetDelegateDevice(contextDevice.Get());
+  boundingDevice->Begin(this->CurrentViewport);
+  vtkNew<vtkContext2D> context;
+  context->Begin(boundingDevice);
+  this->PaintAxis(context, size);
+  context->End();
+  boundingDevice->End();
 
-  vtkRectf rect = this->GetColorBarRect(size);
-  float titleX = rect.GetX() + 0.5 * rect.GetWidth();
-  float titleY = rect.GetY() + 0.5 * rect.GetHeight();
+  vtkRectf axisRect = boundingDevice->GetBoundingRect();
+
+  vtkRectf barAndAxisRect = axisRect;
+  vtkRectf colorBarRect = this->GetColorBarRect(size);
+  barAndAxisRect.AddRect(colorBarRect);
+
+  float titleX = barAndAxisRect.GetX() + 0.5 * barAndAxisRect.GetWidth();
+  float titleY = colorBarRect.GetY() + 0.5 * colorBarRect.GetHeight();
   if (this->GetOrientation() == VTK_ORIENT_HORIZONTAL || this->ForceHorizontalTitle)
   {
     if (this->GetTitleJustification() == VTK_TEXT_LEFT)
     {
-      titleX = 0.0;
+      titleX = barAndAxisRect.GetX();
     }
     else if (this->GetTitleJustification() == VTK_TEXT_RIGHT)
     {
-      titleX = rect.GetX() + rect.GetWidth();
+      titleX = barAndAxisRect.GetX() + barAndAxisRect.GetWidth();
     }
     if (this->GetTextPosition() == vtkContext2DScalarBarActor::PrecedeScalarBar)
     {
@@ -965,13 +973,13 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
       // Handle zero-height axis.
       if (axisRect.GetHeight() < 1.0)
       {
-        axisRect.SetHeight(rect.GetHeight());
+        axisRect.SetHeight(colorBarRect.GetHeight());
       }
       titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
     }
 
     // Move title to the top if the title is forced horizontal
-    if (this->ForceHorizontalTitle)
+    if (this->ForceHorizontalTitle && this->GetOrientation() != VTK_ORIENT_HORIZONTAL)
     {
       titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
     }
@@ -981,23 +989,23 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
     // Handle zero-width axis.
     if (axisRect.GetWidth() < 1.0)
     {
-      axisRect.SetWidth(0.25 * rect.GetWidth());
+      axisRect.SetWidth(0.25 * colorBarRect.GetWidth());
     }
     if (this->GetTitleJustification() == VTK_TEXT_LEFT)
     {
-      titleY = 0.0;
+      titleY = barAndAxisRect.GetY();
     }
     else if (this->GetTitleJustification() == VTK_TEXT_RIGHT)
     {
-      titleY = rect.GetY() + rect.GetHeight();
+      titleY = barAndAxisRect.GetY() + barAndAxisRect.GetHeight();
     }
     if (this->GetTextPosition() == vtkContext2DScalarBarActor::PrecedeScalarBar)
     {
-      titleX = rect.GetX() - axisRect.GetWidth();
+      titleX = colorBarRect.GetX() - axisRect.GetWidth();
     }
     else
     {
-      titleX = rect.GetX() + rect.GetWidth() + axisRect.GetWidth() + titleWidth;
+      titleX = colorBarRect.GetX() + colorBarRect.GetWidth() + axisRect.GetWidth() + titleWidth;
     }
   }
 
@@ -1048,6 +1056,9 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 
   this->PaintColorBar(painter, size);
   this->PaintAxis(painter, size);
+  // IMPORTANT: this needs to be done *after* this->Axis->Update() is called
+  // in PaintAxis() so that we get an accurate axis bounding rectangle.
+  this->PaintTitle(painter, size);
 
   // Restore settings
   pen->DeepCopy(savePen.GetPointer());
