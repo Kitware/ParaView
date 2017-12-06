@@ -15,7 +15,7 @@ set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 
 # Sources
-set(SRC_LIST vtkGenIOReader.h vtkGenIOReader.cpp)
+set(SRC_LIST vtkGenIOReader.h vtkGenIOReader.cxx)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -34,7 +34,7 @@ endif()
 # Create the plugin
 add_paraview_plugin(GenericIOReader "1.0"
   SERVER_MANAGER_XML vtkGenIOReader.xml
-  SERVER_MANAGER_SOURCES vtkGenIOReader.cpp
+  SERVER_MANAGER_SOURCES vtkGenIOReader.cxx
   SOURCES ${SRC_LIST}
   REQUIRED_ON_SERVER
 )
