@@ -1,7 +1,7 @@
 # Linking to Paraview: needed to build a paraview plugin
-if (NOT ParaView_BINARY_DIR)
+if(NOT ParaView_BINARY_DIR)
   find_package(ParaView REQUIRED)
-    include(${PARAVIEW_USE_FILE})
+  include(${PARAVIEW_USE_FILE})
 else()
   include_directories(${VTK_INCLUDE_DIRS})
 endif(NOT ParaView_BINARY_DIR)
@@ -26,9 +26,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tools)
 
 # Enable or disable log output
 option(GIO_DEBUG_LOG "Enable GenericIO ParaView Plugin Logging" OFF)
-if (GIO_DEBUG_LOG)
+if(GIO_DEBUG_LOG)
   add_definitions(-DOUTPUT_GIO_LOGS)
 endif()
+mark_as_advanced(GIO_DEBUG_LOG)
 
 
 # Create the plugin
@@ -41,6 +42,6 @@ add_paraview_plugin(GenericIOReader "1.0"
 
 target_link_libraries(GenericIOReader LINK_PUBLIC GenericIO)
 
-if (BUILD_TESTING AND PARAVIEW_BUILD_QT_GUI)
+if(BUILD_TESTING AND PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(Testing)
 endif()
