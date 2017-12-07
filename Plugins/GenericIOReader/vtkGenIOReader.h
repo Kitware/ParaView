@@ -47,7 +47,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define OCTREE_ENABLED 0 // Disabled right now until octree is integrated in HACC output
 
+#ifndef GENERICIO_NO_MPI
 #include <mpi.h>
+#endif
+
 #include <stdlib.h>
 #include <time.h>
 
@@ -180,7 +183,7 @@ public:
   //
   // Cell array selection
   int GetNumberOfCellArrays() { return CellDataArraySelection->GetNumberOfArrays(); }
-  const char* GetCellArrayName(int idx) { return CellDataArraySelection->GetArrayName(idx); }
+  const char* GetCellArrayName(int i) { return CellDataArraySelection->GetArrayName(i); }
   int GetCellArrayStatus(const char* name) { return CellDataArraySelection->ArrayIsEnabled(name); }
   void SetCellArrayStatus(const char* name, int status);
 

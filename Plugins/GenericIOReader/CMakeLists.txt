@@ -7,12 +7,13 @@ else()
 endif(NOT ParaView_BINARY_DIR)
 
 
-# Building GIO
+# Building GIO if not already available
 add_definitions(-DGENERICIO_NO_MPI)
 add_definitions(-DGENERICIO_NO_COMPRESSION)   # Compression not supported yet
-add_library(GenericIO STATIC "${CMAKE_CURRENT_SOURCE_DIR}/GIO/GenericIO.cxx")
-set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
-
+if(NOT TARGET GenericIO)
+  add_library(GenericIO STATIC "${CMAKE_CURRENT_SOURCE_DIR}/GIO/GenericIO.cxx")
+  set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # Sources
 set(SRC_LIST vtkGenIOReader.h vtkGenIOReader.cxx)
@@ -36,7 +37,7 @@ mark_as_advanced(GIO_DEBUG_LOG)
 add_paraview_plugin(GenericIOReader "1.0"
   SERVER_MANAGER_XML vtkGenIOReader.xml
   SERVER_MANAGER_SOURCES vtkGenIOReader.cxx
-  SOURCES ${SRC_LIST}
+  SERVER_SOURCES ${SRC_LIST}
   REQUIRED_ON_SERVER
 )
 

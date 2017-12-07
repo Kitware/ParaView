@@ -143,7 +143,7 @@ void vtkGenIOReader::SetPercentageType(int _type)
   }
 }
 
-void vtkGenIOReader::SetResetSelection(int _x)
+void vtkGenIOReader::SetResetSelection(int /* _x */)
 {
   selections.clear();
   selectionChanged = true;
@@ -232,44 +232,44 @@ void vtkGenIOReader::displayMsg(std::string msg)
   vtkOutputWindowDisplayText(cstr);
 }
 
-bool vtkGenIOReader::doMPIDataSplitting(int numDataRanks, int numMPIranks, int myRank,
+bool vtkGenIOReader::doMPIDataSplitting(int numDataRanksTmp, int numMPIranks, int myRankTmp,
   int ranksRangeToLoad[2], std::vector<size_t>& readRowsInfo)
 {
   bool splitReading = false;
-  if (numDataRanks >= numMPIranks)
+  if (numDataRanksTmp >= numMPIranks)
   {
-    int eachMPIRanksLoads = floor(numDataRanks / (float)numMPIranks);        // 256/10 = 25.6 = 25
-    int sumFloorAllocation = numDataRanks - eachMPIRanksLoads * numMPIranks; // 256 - 10*25 = 16
+    int eachMPIRanksLoads = floor(numDataRanksTmp / (float)numMPIranks); // 256/10 = 25.6 = 25
+    int sumFloorAllocation = numDataRanksTmp - eachMPIRanksLoads * numMPIranks; // 256 - 10*25 = 16
 
     int countAllocation = 0;
     for (int i = 0; i < numMPIranks; i++)
     {
-      if (myRank == i)
+      if (myRankTmp == i)
         ranksRangeToLoad[0] = countAllocation;
 
       countAllocation += eachMPIRanksLoads;
       if (i < sumFloorAllocation)
         countAllocation++;
 
-      if (myRank == i)
+      if (myRankTmp == i)
         ranksRangeToLoad[1] = countAllocation - 1;
     }
-    msgLog << "More data ranks than MPI ranks | My rank: " << myRank
-           << ", num data ranks: " << numDataRanks << ", read extents: " << ranksRangeToLoad[0]
+    msgLog << "More data ranks than MPI ranks | My rank: " << myRankTmp
+           << ", num data ranks: " << numDataRanksTmp << ", read extents: " << ranksRangeToLoad[0]
            << " - " << ranksRangeToLoad[1] << "\n";
   }
   else
   {
     splitReading = true;
-    double eachMPIRanksLoads = numDataRanks / (double)numMPIranks;
+    double eachMPIRanksLoads = numDataRanksTmp / (double)numMPIranks;
 
-    double startFraction = eachMPIRanksLoads * myRank;
+    double startFraction = eachMPIRanksLoads * myRankTmp;
     double endFraction = startFraction + eachMPIRanksLoads;
 
-    ranksRangeToLoad[0] = std::max(std::min((int)startFraction, numDataRanks - 1), 0);
-    ranksRangeToLoad[1] = std::max(std::min((int)endFraction, numDataRanks - 1), 0);
+    ranksRangeToLoad[0] = std::max(std::min((int)startFraction, numDataRanksTmp - 1), 0);
+    ranksRangeToLoad[1] = std::max(std::min((int)endFraction, numDataRanksTmp - 1), 0);
 
-    msgLog << "numDataRanks: " << numDataRanks << "   numRanks: " << numMPIranks
+    msgLog << "numDataRanks: " << numDataRanksTmp << "   numRanks: " << numMPIranks
            << "   eachMPIRanksLoads: " << eachMPIRanksLoads << "\n";
     msgLog << "ranksRangeToLoad[0]: " << ranksRangeToLoad[0]
            << "   ranksRangeToLoad[1]: " << ranksRangeToLoad[1] << "\n";
@@ -313,8 +313,8 @@ bool vtkGenIOReader::doMPIDataSplitting(int numDataRanks, int numMPIranks, int m
       msgLog << "endRow: " << readRowsInfo[3 + 2] << "\n";
     }
 
-    for (int i = 0; i < readRowsInfo.size(); i += 3)
-      msgLog << "Split done! | My rank: " << myRank << " : " << readRowsInfo[i + 0] << ", "
+    for (size_t i = 0; i < readRowsInfo.size(); i += 3)
+      msgLog << "Split done! | My rank: " << myRankTmp << " : " << readRowsInfo[i + 0] << ", "
              << readRowsInfo[i + 1] << ", " << readRowsInfo[i + 2] << "\n";
   }
 
@@ -364,7 +364,7 @@ void vtkGenIOReader::theadedParsing(int threadId, int numThreads, size_t numRows
       bool matchedCriteria = true;
       for (int i = 0; i < numSelections; i++)
       {
-        for (int k = 0; k < paraviewData.size(); k++)
+        for (size_t k = 0; k < paraviewData.size(); k++)
         {
           ParaviewSelection __sel = selections[i];
 
@@ -404,7 +404,7 @@ void vtkGenIOReader::theadedParsing(int threadId, int numThreads, size_t numRows
     mtx.unlock();
 
     int tupleCount = 0;
-    for (int k = 0; k < paraviewData.size(); k++)
+    for (size_t k = 0; k < paraviewData.size(); k++)
     {
       // Load the x,y,z variables
       if (paraviewData[k].xVar)
@@ -464,8 +464,8 @@ void vtkGenIOReader::theadedParsing(int threadId, int numThreads, size_t numRows
 
 //
 // Core components
-int vtkGenIOReader::RequestInformation(
-  vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
+  vtkInformationVector** /*inputVector*/, vtkInformationVector* outputVector)
 {
   GIOPvPlugin::Timer fullClock, resampledClock, haloClock;
   msgLog << "\nRequestInformation for: " << dataFilename << "\n";
@@ -474,7 +474,6 @@ int vtkGenIOReader::RequestInformation(
   outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
   fullClock.start();
-  bool ShowMap = false;
   if (gioReader != NULL)
   {
     if (currentFilename != dataFilename)
@@ -703,9 +702,11 @@ int vtkGenIOReader::RequestData(
   vtkUnstructuredGrid* output =
     vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
+#if 0 // Not used.
   int piece, numPieces;
   piece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   numPieces = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+#endif
 
   //
   // Selection
@@ -776,13 +777,14 @@ int vtkGenIOReader::RequestData(
     }
     maxRowsInRank = std::max(maxRowsInRank, numLoadingRows);
 
-    // Find the number of rows after sampling
-    double pnt[3];
+// Find the number of rows after sampling
+#if 0 // numRowsToSample is unused before scope ends.
     size_t numRowsToSample = numLoadingRows;
     if (percentageType == 0) // normal
       numRowsToSample = numLoadingRows * dataPercentage;
     else
       numRowsToSample = numLoadingRows * (dataPercentage * dataPercentage * dataPercentage);
+#endif
   }
 
   //
@@ -814,7 +816,7 @@ int vtkGenIOReader::RequestData(
   //
   // Create the vtk structures to show the data
   int tupleCount = 0;
-  for (int i = 0; i < paraviewData.size(); i++)
+  for (size_t i = 0; i < paraviewData.size(); i++)
   {
     if (paraviewData[i].show)
     {
@@ -866,7 +868,6 @@ int vtkGenIOReader::RequestData(
     {
       msgLog << "\nShow all sampled; sample type = " << std::to_string(this->sampleType) << "\n";
 
-      int splitReadingCount = 0;
       for (int i = ranksRangeToLoad[0]; i <= ranksRangeToLoad[1]; ++i)
       {
         size_t Np = gioReader->readNumElems(i);
@@ -878,7 +879,7 @@ int vtkGenIOReader::RequestData(
         _clock.start();
 
         // Specify location where to store each var read in
-        for (int j = 0; j < readInData.size(); j++)
+        for (size_t j = 0; j < readInData.size(); j++)
         {
           if (paraviewData[j].load)
           {
@@ -975,7 +976,7 @@ int vtkGenIOReader::RequestData(
         parseClock.stop();
         msgLog << " time taken ~ parsing: " << parseClock.getDuration() << " s.\n";
 
-        for (int j = 0; j < readInData.size(); j++)
+        for (size_t j = 0; j < readInData.size(); j++)
           readInData[j].deAllocateMem();
 
         gioReader->clearVariables();
@@ -995,7 +996,7 @@ int vtkGenIOReader::RequestData(
       for (int i = 0; i < numSelections; i++)
       {
         ParaviewSelection __sel = selections[i];
-        for (int j = 0; j < readInData.size(); j++)
+        for (size_t j = 0; j < readInData.size(); j++)
           if (__sel.selectedScalar == paraviewData[j].name)
           {
             msgLog << "Selected: " << paraviewData[j].name << "\n";
@@ -1015,7 +1016,6 @@ int vtkGenIOReader::RequestData(
         break;
       }
 
-      int splitReadingCount = 0;
       for (int i = ranksRangeToLoad[0]; i <= ranksRangeToLoad[1]; ++i)
       {
         size_t Np = gioReader->readNumElems(i);
@@ -1025,7 +1025,7 @@ int vtkGenIOReader::RequestData(
         gioReader->readCoords(Coords, i);
 
         _clock.start();
-        for (int j = 0; j < readInData.size(); j++)
+        for (size_t j = 0; j < readInData.size(); j++)
         {
           if (paraviewData[j].load)
           {
@@ -1089,7 +1089,6 @@ int vtkGenIOReader::RequestData(
         msgLog << "numLoadingRows: " << numLoadingRows << "\n";
 
         // Find the number of rows after sampling
-        double pnt[3];
         size_t numRowsToSample = numLoadingRows;
         if (percentageType == 0) // normal
           numRowsToSample = round(numLoadingRows * dataPercentage);
@@ -1126,7 +1125,7 @@ int vtkGenIOReader::RequestData(
 
         //
         // Cleanup
-        for (int j = 0; j < readInData.size(); j++)
+        for (size_t j = 0; j < readInData.size(); j++)
           readInData[j].deAllocateMem();
 
         gioReader->clearVariables();
@@ -1136,7 +1135,7 @@ int vtkGenIOReader::RequestData(
       debugLog.writeLogToDisk(msgLog);
       break;
 
-    deafult:
+    default:
       break;
   };
   populatingClock.stop();

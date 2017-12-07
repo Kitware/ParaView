@@ -876,6 +876,11 @@ template <bool IsBigEndian>
 void GenericIO::readHeaderLeader(void* GHPtr, MismatchBehavior MB, int NRanks, int Rank,
   int SplitNRanks, string& LocalFileName, uint64_t& HeaderSize, vector<char>& Header)
 {
+  // May be unused depending on preprocessor. Since it's a static var, it's
+  // initialized here to make sure it's in an executable block so the compiler
+  // will accept it.
+  (void)blosc_initialized;
+
   GlobalHeader<IsBigEndian>& GH = *(GlobalHeader<IsBigEndian>*)GHPtr;
 
   if (MB == MismatchDisallowed)
@@ -1066,7 +1071,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
   SplitNRanks = 1;
 #endif
 
-  uint64_t HeaderSize;
+  uint64_t HeaderSize = 0;
   vector<char> Header;
 
   if (SplitRank == 0)
@@ -1419,6 +1424,7 @@ void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRa
 void GenericIO::readDataSection(
   size_t readOffset, size_t readNumRows, int EffRank, bool PrintStats, bool CollStats)
 {
+  (void)CollStats; // may be unused depending on preprocessor config.
   int Rank;
 #ifndef GENERICIO_NO_MPI
   MPI_Comm_rank(Comm, &Rank);
@@ -1583,6 +1589,7 @@ void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRa
       vector<unsigned char> LData;
       void* Data = VarData;
       bool HasExtraSpace = Vars[i].HasExtraSpace;
+      (void)HasExtraSpace; // Only used in assert, unused in release builds.
       if (offsetof_safe(GH, BlocksStart) < GH->GlobalHeaderSize && GH->BlocksSize > 0)
       {
         BlockHeader<IsBigEndian>* BH =
@@ -1652,14 +1659,14 @@ void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRa
             int Mod = atoi(EnvStr);
             if (Mod > 0)
             {
-              int Rank;
+              int RankTmp;
 #ifndef GENERICIO_NO_MPI
-              MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
+              MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
-              Rank = 0;
+              RankTmp = 0;
 #endif
 
-              std::cerr << "Rank " << Rank << ": " << Retry
+              std::cerr << "Rank " << RankTmp << ": " << Retry
                         << " I/O retries were necessary for reading " << Vars[i].Name
                         << " from: " << OpenFileName << "\n";
 
@@ -1673,10 +1680,10 @@ void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRa
 
       // Byte swap the data if necessary.
       if (IsBigEndian != isBigEndian())
-        for (size_t j = 0; j < RH->NElems; ++j)
+        for (size_t k = 0; k < RH->NElems; ++k)
         {
-          char* Offset = ((char*)VarData) + j * Vars[i].Size;
-          bswap(Offset, Vars[i].Size);
+          char* OffsetTmp = ((char*)VarData) + k * Vars[i].Size;
+          bswap(OffsetTmp, Vars[i].Size);
         }
 
       break;
@@ -1730,6 +1737,7 @@ void GenericIO::readCoords(int Coords[3], int EffRank)
 
 void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
 {
+  (void)CollStats; // may be unused depending on preprocessor config.
   int Rank;
 #ifndef GENERICIO_NO_MPI
   MPI_Comm_rank(Comm, &Rank);
@@ -1970,14 +1978,14 @@ void GenericIO::readData(
             int Mod = atoi(EnvStr);
             if (Mod > 0)
             {
-              int Rank;
+              int RankTmp;
 #ifndef GENERICIO_NO_MPI
-              MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
+              MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
-              Rank = 0;
+              RankTmp = 0;
 #endif
 
-              std::cerr << "Rank " << Rank << ": " << Retry
+              std::cerr << "Rank " << RankTmp << ": " << Retry
                         << " I/O retries were necessary for reading " << Vars[i].Name
                         << " from: " << OpenFileName << "\n";
 
@@ -1994,11 +2002,11 @@ void GenericIO::readData(
       {
         ++NErrs[1];
 
-        int Rank;
+        int RankTmp;
 #ifndef GENERICIO_NO_MPI
-        MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
+        MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
-        Rank = 0;
+        RankTmp = 0;
 #endif
 
         // All ranks will do this and have a good time!
@@ -2008,10 +2016,10 @@ void GenericIO::readData(
         srand(time(0));
         int DumpNum = rand();
         stringstream ssd;
-        ssd << dn << "/gio_crc_error_dump." << Rank << "." << DumpNum << ".bin";
+        ssd << dn << "/gio_crc_error_dump." << RankTmp << "." << DumpNum << ".bin";
 
         stringstream ss;
-        ss << dn << "/gio_crc_error_log." << Rank << ".txt";
+        ss << dn << "/gio_crc_error_log." << RankTmp << ".txt";
 
         ofstream ofs(ss.str().c_str(), ofstream::out | ofstream::app);
         ofs << "On-Disk CRC Error Report:\n";
@@ -2032,8 +2040,12 @@ void GenericIO::readData(
         uint64_t RawCRC = crc64_omp(Data, ReadSize - CRCSize);
         unsigned char* UData = (unsigned char*)Data;
         crc64_invert(RawCRC, &UData[ReadSize - CRCSize]);
-        uint64_t NewCRC = crc64_omp(Data, ReadSize);
-        std::cerr << "Recalulated CRC: " << NewCRC << ((NewCRC == -1) ? "ok" : "bad") << "\n";
+#if 1
+        crc64_omp(Data, ReadSize);
+#else // Commenting because NewCRC cannot == -1 (uint64) and this is debugging code.
+//        uint64_t NewCRC = crc64_omp(Data, ReadSize);
+//        std::cerr << "Recalulated CRC: " << NewCRC << ((NewCRC == -1) ? "ok" : "bad") << "\n";
+#endif
         break;
       }
 
@@ -2074,10 +2086,10 @@ void GenericIO::readData(
 
       // Byte swap the data if necessary.
       if (IsBigEndian != isBigEndian())
-        for (size_t j = 0; j < RH->NElems; ++j)
+        for (size_t k = 0; k < RH->NElems; ++k)
         {
-          char* Offset = ((char*)VarData) + j * Vars[i].Size;
-          bswap(Offset, Vars[i].Size);
+          char* OffsetTmp = ((char*)VarData) + k * Vars[i].Size;
+          bswap(OffsetTmp, Vars[i].Size);
         }
 
       break;
@@ -2095,14 +2107,14 @@ void GenericIO::readData(
         int Mod = atoi(EnvStr);
         if (Mod > 0)
         {
-          int Rank;
+          int RankTmp;
 #ifndef GENERICIO_NO_MPI
-          MPI_Comm_rank(MPI_COMM_WORLD, &Rank);
+          MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
-          Rank = 0;
+          RankTmp = 0;
 #endif
 
-          std::cerr << "Rank " << Rank << ": " << NErrs[0] << " I/O error(s), " << NErrs[1]
+          std::cerr << "Rank " << RankTmp << ": " << NErrs[0] << " I/O error(s), " << NErrs[1]
                     << " CRC error(s) and " << NErrs[2]
                     << " decompression CRC error(s) reading: " << Vars[i].Name
                     << " from: " << OpenFileName << "\n";
