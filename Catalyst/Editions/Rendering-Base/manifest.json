@@ -569,6 +569,7 @@
         { "class": "vtkPVImplicitPlaneRepresentation" },
         { "class": "vtkPVLastSelectionInformation" },
         { "class": "vtkPVOpenGLInformation" },
+        { "class": "vtkPVOSPRayMaterialLibrary" },
         { "class": "vtkPVPlotMatrixView" },
         { "class": "vtkPVProminentValuesInformation" },
         { "class": "vtkPVRenderingCapabilitiesInformation" },

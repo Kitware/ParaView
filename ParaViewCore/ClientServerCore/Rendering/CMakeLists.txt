@@ -77,6 +77,7 @@ set (Module_SRCS
   vtkPVMultiSliceView.cxx
   vtkPVOpenGLInformation.cxx
   vtkPVOrthographicSliceView.cxx
+  vtkPVOSPRayMaterialLibrary.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlotMatrixView.cxx
@@ -118,11 +119,6 @@ endif()
 if (PARAVIEW_USE_ICE_T)
   list(APPEND Module_SRCS
     vtkIceTSynchronizedRenderers.cxx)
-endif()
-
-if (PARAVIEW_USE_OSPRAY)
-  list(APPEND Module_SRCS
-    vtkPVOSPRayMaterialLibrary.cxx)
 endif()
 
 if(NOT VTK_LEGACY_REMOVE)

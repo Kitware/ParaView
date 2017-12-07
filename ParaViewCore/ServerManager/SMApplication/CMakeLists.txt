@@ -104,6 +104,7 @@ SET(requestedResourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_opengl2.xml # has to be after views_and_representations
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_ospray.xml
   ${module_sm_xmls}
   )
 if (PARAVIEW_USE_MPI)
@@ -153,12 +154,6 @@ if (PARAVIEW_USE_OPENTURNS)
   list(APPEND requestedResourceFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_openturns.xml)
 endif()
-
-if (PARAVIEW_USE_OSPRAY)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_ospray.xml)
-endif()
-
 
 #------------------------------------------------------------------------------
 
