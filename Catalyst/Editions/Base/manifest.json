@@ -329,6 +329,16 @@
     { "path":"VTK/ThirdParty/utf8" }
   ],
   "proxies":[
+    { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
+      "proxies":[
+        "Append",
+        "AppendPolyData",
+        "FeatureEdges",
+        "PointDataToCellData",
+        "QuadricClustering",
+        "Threshold"
+      ]
+    },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
       "proxies":[ "TimeKeeper" ]
     }

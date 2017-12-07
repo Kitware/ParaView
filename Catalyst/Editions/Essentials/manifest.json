@@ -98,9 +98,13 @@
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
       "proxies":[
         "Calculator",
+        "CellCenters",
         "Contour",
         "Clip",
         "Cut",
+        "ExtractGeometry",
+        "Glyph",
+        "LegacyGlyph",
         "PassArrays"
       ]
     },
