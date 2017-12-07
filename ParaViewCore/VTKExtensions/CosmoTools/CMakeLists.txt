@@ -41,9 +41,6 @@ set(Module_SRCS
 
 vtk_module_export_code_find_package(GenericIO)
 
-set_source_files_properties(
-  vtkGenericIOUtilities
-  PROPERTIES WRAP_EXCLUDE_PYTHON 1)
 vtk_module_library(vtkPVVTKExtensionsCosmoTools ${Module_SRCS})
 vtk_module_link_libraries(vtkPVVTKExtensionsCosmoTools
                       LINK_PRIVATE

@@ -147,11 +147,6 @@ set (${vtk-module}_HDRS
   vtkMaterialInterfaceIdListItem.h
 )
 
-set_source_files_properties(
-  vtkSpyPlotBlockIterator
-  PROPERTIES WRAP_EXCLUDE_PYTHON 1
-  )
-
 vtk_module_library(vtkPVVTKExtensionsDefault ${Module_SRCS})
 target_link_libraries(vtkPVVTKExtensionsDefault LINK_PRIVATE
   ${vtkIOInfovis_LIBRARIES})

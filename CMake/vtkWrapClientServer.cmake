@@ -57,13 +57,9 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   # For each class
   foreach(FILE ${SOURCES})
 
-    # should we wrap the file?
-    get_source_file_property(TMP_WRAP_EXCLUDE_PYTHON ${FILE} WRAP_EXCLUDE_PYTHON)
-
     # if we should wrap it
-    if (NOT TMP_WRAP_EXCLUDE_PYTHON AND
-        (NOT PARAVIEW_USE_UNIFIED_BINDINGS OR
-         NO_PYTHON_BINDINGS_AVAILABLE))
+    if (NOT PARAVIEW_USE_UNIFIED_BINDINGS OR
+        NO_PYTHON_BINDINGS_AVAILABLE)
 
       # what is the filename without the extension
       get_filename_component(TMP_FILENAME ${FILE} NAME_WE)
@@ -119,7 +115,7 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx)
   set_source_files_properties(
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
-    PROPERTIES GENERATED 1 WRAP_EXCLUDE_PYTHON 1
+    PROPERTIES GENERATED 1
     )
 
   unset(NO_PYTHON_BINDINGS_AVAILABLE)

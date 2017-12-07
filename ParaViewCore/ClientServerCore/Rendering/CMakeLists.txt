@@ -131,15 +131,6 @@ if(NOT VTK_LEGACY_REMOVE)
     vtkPVOpenGLExtensionsInformation.cxx)
 endif()
 
-set_source_files_properties(
-  vtkCacheSizeKeeper
-
-  # No need to wrap vtkPExtentTranslator, its an internal class.
-  vtkPExtentTranslator
-  PROPERTIES
-  WRAP_EXCLUDE_PYTHON 1
-)
-
 set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
 
 vtk_module_library(vtkPVClientServerCoreRendering ${Module_SRCS})
