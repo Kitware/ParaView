@@ -535,7 +535,6 @@ class CoProcessor(object):
                     # -1 corresponds to the magnitude.
                     datarange = colorArrayInfo.GetComponentRange(-1)
 
-            import vtkParallelCorePython
             import paraview.vtk as vtk
             import paraview.servermanager
             pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
