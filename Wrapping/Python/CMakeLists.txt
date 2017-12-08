@@ -99,7 +99,7 @@ install(CODE "
       \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_PYTHON_MODULES_DIR}/vtk/\"
     USE_SOURCE_PERMISSIONS
     FILES_MATCHING
-    REGEX \"/vtk[^/]*Python\\\\.${_module_extension}$\"
+    REGEX \"/vtk[^/]*[Pp]ython\\\\.${_module_extension}$\"
     )
   "
   COMPONENT Runtime)
