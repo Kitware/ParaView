@@ -5,6 +5,10 @@ import sys
 
 script = """
 from paraview.vtk.util import numpy_support
+import matplotlib.style
+import matplotlib as mpl
+
+mpl.style.use('classic')
 
 # Utility to get next color
 def getNextColor():
@@ -22,7 +26,6 @@ def render(view,width,height):
   figure = python_view.matplotlib_figure(width,height)
 
   ax = figure.add_subplot(111)
-  ax.hold = True
   numObjects = view.GetNumberOfVisibleDataObjects()
   print ("num visible objects: ", numObjects)
   for i, color in zip(range(0,numObjects), getNextColor()):
@@ -34,8 +37,6 @@ def render(view,width,height):
         pts = numpy_support.vtk_to_numpy(vtk_points_data)
         x, y = pts[:,0], pts[:,1]
         ax.scatter(x, y, color=color)
-
-  ax.hold = False
 
   return python_view.figure_to_image(figure)
 """
