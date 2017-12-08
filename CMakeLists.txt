@@ -606,6 +606,11 @@ else()
 
 endif()
 
+# ClientServer bindings require the hierarchy to be generated regardless of
+# the enable language support.
+set(VTK_WRAP_HIERARCHY ON
+  CACHE INTERNAL "Forcing the wrap hierarchy to be on.")
+
 #----------------------------------------------------------------------------------
 # Import all essential CMake files. Based on whether we are using internal or
 # external VTK, these modules will be imported for the appropropriate locations.

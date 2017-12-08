@@ -136,10 +136,4 @@ set (Module_SRCS
   vtkSMWriterProxy.cxx
 )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkSMPropertyHelper
-  vtkSMRangeDomainTemplate
-  vtkSMUncheckedPropertyHelper
-  WRAP_EXCLUDE)
-
 vtk_module_library(vtkPVServerManagerCore ${Module_SRCS})

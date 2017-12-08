@@ -148,26 +148,6 @@ set (${vtk-module}_HDRS
 )
 
 set_source_files_properties(
-  vtkAMRDualGridHelper
-  vtkGridAxesHelper
-  vtkMaterialInterfaceCommBuffer
-  vtkMaterialInterfaceIdList
-  vtkMaterialInterfacePieceLoading
-  vtkMaterialInterfacePieceTransaction
-  vtkMaterialInterfacePieceTransactionMatrix
-  vtkMaterialInterfaceProcessLoading
-  vtkMaterialInterfaceProcessRing
-  vtkMaterialInterfaceToProcMap
-  vtkPVPlotTime
-  vtkSpyPlotBlock
-  vtkSpyPlotBlockIterator
-  vtkSpyPlotIStream
-  vtkSpyPlotReaderMap
-  vtkSpyPlotUniReader
-  WRAP_EXCLUDE
-  )
-
-set_source_files_properties(
   vtkSpyPlotBlockIterator
   PROPERTIES WRAP_EXCLUDE_PYTHON 1
   )

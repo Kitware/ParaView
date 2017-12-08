@@ -240,8 +240,7 @@
       ],
       "replace": [
         { "path":"ParaViewCore/VTKExtensions/Core/module.cmake" },
-        { "path":"ParaViewCore/VTKExtensions/Core/CMakeLists.txt" },
-        { "path":"ParaViewCore/VTKExtensions/Core/Base-wrap-exclude-classes.catalyst.cmake" }
+        { "path":"ParaViewCore/VTKExtensions/Core/CMakeLists.txt" }
       ],
       "exclude": [
         { "path": "Testing" }

@@ -137,7 +137,6 @@ set_source_files_properties(
   # No need to wrap vtkPExtentTranslator, its an internal class.
   vtkPExtentTranslator
   PROPERTIES
-  WRAP_EXCLUDE 1
   WRAP_EXCLUDE_PYTHON 1
 )
 

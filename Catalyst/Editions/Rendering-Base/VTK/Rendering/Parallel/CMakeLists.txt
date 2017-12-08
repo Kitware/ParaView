@@ -22,7 +22,6 @@ foreach(file ${shader_files})
     ${source}
     ${header}
     PROPERTIES
-      WRAP_EXCLUDE 1
       WRAP_EXCLUDE_PYTHON 1
     )
 endforeach()
