@@ -33,8 +33,8 @@
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <algorithm>
+#include <unordered_map>
 #include <vector>
-#include <vtksys/hash_map.hxx>
 
 static const unsigned char NO_EDGE_FLAG = static_cast<unsigned char>(-1);
 
@@ -93,7 +93,7 @@ public:
 
 // Description:
 // A map from edge endpoints to the information about that edge.
-typedef vtksys::hash_map<EdgeEndpoints, EdgeInformation, EdgeEndpointsHash> EdgeMapType;
+typedef std::unordered_map<EdgeEndpoints, EdgeInformation, EdgeEndpointsHash> EdgeMapType;
 
 void RecordEdgeFlag(vtkPolyData* output, const EdgeInformation& edgeInfo,
   vtkUnsignedCharArray* edgeFlagArray, unsigned char flag, vtkIdType* duplicatePointMap)
