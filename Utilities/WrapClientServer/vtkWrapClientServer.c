@@ -572,7 +572,7 @@ typedef struct _NewClassInfo
 int notWrappable(FunctionInfo* curFunction)
 {
   return (curFunction->IsOperator || curFunction->ArrayFailure || !curFunction->IsPublic ||
-    !curFunction->Name);
+    !curFunction->Name || curFunction->Template);
 }
 
 //--------------------------------------------------------------------------nix
