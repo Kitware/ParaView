@@ -30,7 +30,6 @@ class vtkDataSet;
 class vtkDataSetSurfaceFilter;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
-class vtkHyperOctree;
 class vtkHyperTreeGrid;
 class vtkImageData;
 class vtkUniformGrid;
@@ -259,8 +258,6 @@ protected:
     vtkUnstructuredGridBase* input, vtkPolyData* output, int doCommunicate);
 
   void PolyDataExecute(vtkPolyData* input, vtkPolyData* output, int doCommunicate);
-
-  void OctreeExecute(vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
 
   void HyperTreeGridExecute(vtkHyperTreeGrid* input, vtkPolyData* output, int doCommunicate);
 
