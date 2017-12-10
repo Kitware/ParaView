@@ -1138,8 +1138,6 @@ macro(pv_process_modules)
     if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
         NOT ${_module}_IS_TEST AND
         NOT ${_module}_THIRD_PARTY)
-        vtk_wrap_hierarchy(${module_name} ${VTK_MODULES_DIR}
-          "${ARG_SOURCES}")
         set(NO_PYTHON_BINDINGS_AVAILABLE TRUE)
         vtk_add_cs_wrapping(${_module})
         list(APPEND plugin_cs_modules ${_module})
