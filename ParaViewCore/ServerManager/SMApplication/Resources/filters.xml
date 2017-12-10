@@ -1673,7 +1673,7 @@ found and the point will be rejected.</Documentation>
       <!-- End Delaunay3d -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkConnectivityFilter"
+    <SourceProxy class="vtkPConnectivityFilter"
                  label="Connectivity"
                  name="PVConnectivityFilter">
       <Documentation long_help="Mark connected components with integer point attribute array."
