@@ -1056,6 +1056,9 @@ MACRO(WRAP_PLUGIN_FOR_PYTHON NAME WRAP_LIST WRAP_EXCLUDE_LIST)
     # this suffix.
     IF(WIN32 AND NOT CYGWIN)
       SET_TARGET_PROPERTIES(${NAME}Python PROPERTIES SUFFIX ".pyd")
+      IF(PYTHON_DEBUG_LIBRARY)
+        SET_TARGET_PROPERTIES(${NAME}Python PROPERTIES OUTPUT_NAME_DEBUG "${NAME}Python_d")
+      ENDIF()
     ENDIF()
 
     # The python modules are installed by a setup.py script which does
