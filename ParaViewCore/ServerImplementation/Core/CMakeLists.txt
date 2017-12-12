@@ -64,11 +64,6 @@ set (Module_SRCS
   vtkSMMessage.cxx
 )
 
-set_source_files_properties(
-  vtkSMMessage
-  PROPERTIES
-  WRAP_EXCLUDE_PYTHON 1)
-
 # Add header-only files so they get installed correctly.
 set (${vtk-module}_HDRS
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkSMMessageMinimal.h

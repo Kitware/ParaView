@@ -1,5 +1,6 @@
 #ifndef vtkSpyPlotBlockIterator_h
 #define vtkSpyPlotBlockIterator_h
+#ifndef __VTK_WRAP__
 
 #include "assert.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
@@ -174,6 +175,7 @@ inline int vtkSpyPlotBlockIterator::GetNumberOfFields() const
   return this->NumberOfFields;
 }
 
+#endif
 #endif
 
 // VTK-HeaderTest-Exclude: vtkSpyPlotBlockIterator.h

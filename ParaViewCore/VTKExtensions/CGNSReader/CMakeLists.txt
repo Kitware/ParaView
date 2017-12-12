@@ -25,7 +25,6 @@ set_source_files_properties(
   vtkCGNSReaderInternal
   vtkFileSeriesHelper
   PROPERTIES
-    WRAP_EXCLUDE_PYTHON 1
     SKIP_HEADER_INSTALL 1
 )
 

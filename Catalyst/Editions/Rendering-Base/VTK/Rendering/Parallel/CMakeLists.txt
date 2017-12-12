@@ -18,12 +18,6 @@ foreach(file ${shader_files})
     HEADER_OUTPUT header
     SOURCE_OUTPUT source)
   list(APPEND Module_SRCS ${source})
-  set_source_files_properties(
-    ${source}
-    ${header}
-    PROPERTIES
-      WRAP_EXCLUDE_PYTHON 1
-    )
 endforeach()
 
 add_definitions(-DVTK_OPENGL2)
