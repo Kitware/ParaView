@@ -396,7 +396,6 @@
         { "class": "vtkMapper" },
         { "class": "vtkMapper2D" },
         { "class": "vtkObserverMediator" },
-        { "class": "vtkPainterDeviceAdapter" },
         { "class": "vtkPicker" },
         { "class": "vtkPickingManager" },
         { "class": "vtkPointGaussianMapper" },

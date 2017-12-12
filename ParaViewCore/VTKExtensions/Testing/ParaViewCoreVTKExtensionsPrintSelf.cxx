@@ -149,7 +149,6 @@
 #include "vtkSpyPlotUniReader.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkSurfaceVectors.h"
-#include "vtkTexturePainter.h"
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
 #include "vtkTimeToTextConvertor.h"
@@ -331,7 +330,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkSpyPlotUniReader);
   PRINT_SELF(vtkSquirtCompressor);
   PRINT_SELF(vtkSurfaceVectors);
-  PRINT_SELF(vtkTexturePainter);
   // PRINT_SELF(vtkTilesHelper);
   // PRINT_SELF(vtkTileDisplayHelper);
   PRINT_SELF(vtkTimeToTextConvertor);
