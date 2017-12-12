@@ -257,7 +257,12 @@ $cmake \\
   try:
     version = subprocess.check_output(['git', 'describe'], cwd=config.repo)
   except subprocess.CalledProcessError as err:
-    error(err)
+    try:
+      version_txt = open(config.repo+'/version.txt', 'r')
+      version = 'v'+version_txt.read()
+    except IOError:
+      err = config.repo+' is not a git repo and does not contain a versions.txt file'
+      error(err)
 
   cmake_script+='  -DPARAVIEW_GIT_DESCRIBE="%s" \\\n' % version.strip()
 
