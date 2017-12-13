@@ -7,13 +7,11 @@ else()
 endif(NOT ParaView_BINARY_DIR)
 
 
-# Building GIO if not already available
-add_definitions(-DGENERICIO_NO_MPI)
-add_definitions(-DGENERICIO_NO_COMPRESSION)   # Compression not supported yet
-if(NOT TARGET GenericIO)
-  add_library(GenericIO STATIC "${CMAKE_CURRENT_SOURCE_DIR}/GIO/GenericIO.cxx")
-  set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif()
+# This plugin depends on a customized snapshot of GenericIO:
+add_definitions(-DLANL_GENERICIO_NO_MPI)
+add_definitions(-DLANL_GENERICIO_NO_COMPRESSION)   # Compression not supported yet
+add_library(LANL_GenericIO STATIC "${CMAKE_CURRENT_SOURCE_DIR}/GIO/GenericIO.cxx")
+set_property(TARGET LANL_GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # Sources
 set(SRC_LIST vtkGenIOReader.h vtkGenIOReader.cxx)
@@ -41,7 +39,7 @@ add_paraview_plugin(GenericIOReader "1.0"
   REQUIRED_ON_SERVER
 )
 
-target_link_libraries(GenericIOReader LINK_PUBLIC GenericIO)
+target_link_libraries(GenericIOReader LINK_PUBLIC LANL_GenericIO)
 
 if(BUILD_TESTING AND PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(Testing)

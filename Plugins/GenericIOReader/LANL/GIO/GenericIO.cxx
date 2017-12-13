@@ -43,7 +43,7 @@
 #include "GenericIO.h"
 #include "CRC64.h"
 
-#ifndef GENERICIO_NO_COMPRESSION
+#ifndef LANL_GENERICIO_NO_COMPRESSION
 extern "C" {
 #include "blosc.h"
 }
@@ -58,7 +58,7 @@ extern "C" {
 #include <sstream>
 #include <stdexcept>
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
 #include <ctime>
 #else
 #include <time.h>
@@ -72,6 +72,9 @@ extern "C" {
 #ifdef __bgq__
 #include <mpix.h>
 #endif
+
+namespace lanl
+{
 
 #ifndef MPI_UINT64_T
 #define MPI_UINT64_T (sizeof(long) == 8 ? MPI_LONG : MPI_LONG_LONG)
@@ -136,7 +139,7 @@ using namespace std;
 namespace gio
 {
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
 GenericFileIO_MPI::~GenericFileIO_MPI()
 {
   (void)MPI_File_close(&FH);
@@ -445,13 +448,13 @@ unsigned GenericIO::DefaultFileIOType = FileIOPOSIX;
 int GenericIO::DefaultPartition = 0;
 bool GenericIO::DefaultShouldCompress = false;
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
 std::size_t GenericIO::CollectiveMPIIOThreshold = 0;
 #endif
 
 static bool blosc_initialized = false;
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
 void GenericIO::write()
 {
   if (isBigEndian())
@@ -608,7 +611,7 @@ void GenericIO::write()
         CompressHeader<IsBigEndian>* CH = (CompressHeader<IsBigEndian>*)&LocalCData[i][0];
         CH->OrigCRC = crc64_omp(Vars[i].Data, Vars[i].Size * NElems);
 
-#ifndef GENERICIO_NO_COMPRESSION
+#ifndef LANL_GENERICIO_NO_COMPRESSION
 #ifdef _OPENMP
 #pragma omp master
         {
@@ -640,7 +643,7 @@ void GenericIO::write()
         LocalCData[i].resize(LocalCData[i].size() + CRCSize);
         LocalData[i] = &LocalCData[i][0];
         LocalHasExtraSpace[i] = true;
-#endif // GENERICIO_NO_COMPRESSION
+#endif // LANL_GENERICIO_NO_COMPRESSION
       }
       else
       {
@@ -870,7 +873,7 @@ void GenericIO::write()
   MPI_Comm_free(&SplitComm);
   SplitComm = MPI_COMM_NULL;
 }
-#endif // GENERICIO_NO_MPI
+#endif // LANL_GENERICIO_NO_MPI
 
 template <bool IsBigEndian>
 void GenericIO::readHeaderLeader(void* GHPtr, MismatchBehavior MB, int NRanks, int Rank,
@@ -893,7 +896,7 @@ void GenericIO::readHeaderLeader(void* GHPtr, MismatchBehavior MB, int NRanks, i
       throw runtime_error(ss.str());
     }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     int TopoStatus;
     MPI_Topo_test(Comm, &TopoStatus);
     if (TopoStatus == MPI_CART)
@@ -975,7 +978,7 @@ void GenericIO::readHeaderLeader(void* GHPtr, MismatchBehavior MB, int NRanks, i
 void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPartMap)
 {
   int NRanks, Rank;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Comm_rank(Comm, &Rank);
   MPI_Comm_size(Comm, &NRanks);
 #else
@@ -994,7 +997,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
     {
       try
       {
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
         GenericIO GIO(MPI_COMM_SELF, FileName, FileIOType);
 #else
         GenericIO GIO(FileName, FileIOType);
@@ -1015,7 +1018,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
       }
     }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     MPI_Bcast(&RanksInMap, 1, MPI_UNSIGNED_LONG, 0, Comm);
     if (RanksInMap > 0)
     {
@@ -1025,7 +1028,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
 #endif
   }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   if (SplitComm != MPI_COMM_NULL)
     MPI_Comm_free(&SplitComm);
 #endif
@@ -1034,7 +1037,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
   if (RankMap.empty())
   {
     LocalFileName = FileName;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     MPI_Comm_dup(MB == MismatchRedistribute ? MPI_COMM_SELF : Comm, &SplitComm);
 #endif
   }
@@ -1043,7 +1046,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
     stringstream ss;
     ss << FileName << "#" << RankMap[EffRank];
     LocalFileName = ss.str();
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     if (MB == MismatchRedistribute)
     {
       MPI_Comm_dup(MPI_COMM_SELF, &SplitComm);
@@ -1063,7 +1066,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
   FH.close();
 
   int SplitNRanks, SplitRank;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Comm_rank(SplitComm, &SplitRank);
   MPI_Comm_size(SplitComm, &SplitNRanks);
 #else
@@ -1076,7 +1079,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
 
   if (SplitRank == 0)
   {
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     if (FileIOType == FileIOMPI)
       FH.get() = new GenericFileIO_MPI(MPI_COMM_SELF);
     else if (FileIOType == FileIOMPICollective)
@@ -1085,7 +1088,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
 #endif
       FH.get() = new GenericFileIO_POSIX();
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     char True = 1, False = 0;
 #endif
 
@@ -1112,14 +1115,14 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
         throw runtime_error("Won't read " + LocalFileName + ": " + Error);
       }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
       close();
       MPI_Bcast(&True, 1, MPI_BYTE, 0, SplitComm);
 #endif
     }
     catch (...)
     {
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
       MPI_Bcast(&False, 1, MPI_BYTE, 0, SplitComm);
 #endif
       close();
@@ -1128,7 +1131,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
   }
   else
   {
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     char Okay;
     MPI_Bcast(&Okay, 1, MPI_BYTE, 0, SplitComm);
     if (!Okay)
@@ -1136,12 +1139,12 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
 #endif
   }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Bcast(&HeaderSize, 1, MPI_UINT64_T, 0, SplitComm);
 #endif
 
   Header.resize(HeaderSize, 0xFD /* poison */);
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Bcast(&Header[0], HeaderSize, MPI_BYTE, 0, SplitComm);
 #endif
 
@@ -1153,7 +1156,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
   FH.getHeaderCache().swap(Header);
   OpenFileName = LocalFileName;
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   if (!DisableCollErrChecking)
     MPI_Barrier(Comm);
 
@@ -1322,7 +1325,7 @@ int GenericIO::readGlobalRankNumber(int EffRank)
 {
   if (EffRank == -1)
   {
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     MPI_Comm_rank(Comm, &EffRank);
 #else
     EffRank = 0;
@@ -1358,7 +1361,7 @@ void GenericIO::getSourceRanks(vector<int>& SR)
   }
 
   int Rank;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Comm_rank(Comm, &Rank);
 #else
   Rank = 0;
@@ -1391,7 +1394,7 @@ size_t GenericIO::readNumElems(int EffRank)
 {
   if (EffRank == -1)
   {
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     MPI_Comm_rank(Comm, &EffRank);
 #else
     EffRank = 0;
@@ -1426,14 +1429,14 @@ void GenericIO::readDataSection(
 {
   (void)CollStats; // may be unused depending on preprocessor config.
   int Rank;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Comm_rank(Comm, &Rank);
 #else
   Rank = 0;
 #endif
 
   uint64_t TotalReadSize = 0;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   double StartTime = MPI_Wtime();
 #else
   double StartTime = double(clock()) / CLOCKS_PER_SEC;
@@ -1461,7 +1464,7 @@ void GenericIO::readDataSection(
   }
 
   int AllNErrs[3];
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Allreduce(NErrs, AllNErrs, 3, MPI_INT, MPI_SUM, Comm);
 #else
   AllNErrs[0] = NErrs[0];
@@ -1477,11 +1480,11 @@ void GenericIO::readDataSection(
     throw runtime_error(ss.str());
   }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Barrier(Comm);
 #endif
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   double EndTime = MPI_Wtime();
 #else
   double EndTime = double(clock()) / CLOCKS_PER_SEC;
@@ -1489,7 +1492,7 @@ void GenericIO::readDataSection(
 
   double TotalTime = EndTime - StartTime;
   double MaxTotalTime;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   if (CollStats)
     MPI_Reduce(&TotalTime, &MaxTotalTime, 1, MPI_DOUBLE, MPI_MAX, 0, Comm);
   else
@@ -1497,7 +1500,7 @@ void GenericIO::readDataSection(
     MaxTotalTime = TotalTime;
 
   uint64_t AllTotalReadSize;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   if (CollStats)
     MPI_Reduce(&TotalReadSize, &AllTotalReadSize, 1, MPI_UINT64_T, MPI_SUM, 0, Comm);
   else
@@ -1660,7 +1663,7 @@ void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRa
             if (Mod > 0)
             {
               int RankTmp;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
               MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
               RankTmp = 0;
@@ -1713,7 +1716,7 @@ void GenericIO::readCoords(int Coords[3], int EffRank)
 {
   if (EffRank == -1)
   {
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     MPI_Comm_rank(Comm, &EffRank);
 #else
     EffRank = 0;
@@ -1739,14 +1742,14 @@ void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
 {
   (void)CollStats; // may be unused depending on preprocessor config.
   int Rank;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Comm_rank(Comm, &Rank);
 #else
   Rank = 0;
 #endif
 
   uint64_t TotalReadSize = 0;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   double StartTime = MPI_Wtime();
 #else
   double StartTime = double(clock()) / CLOCKS_PER_SEC;
@@ -1773,7 +1776,7 @@ void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
   }
 
   int AllNErrs[3];
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Allreduce(NErrs, AllNErrs, 3, MPI_INT, MPI_SUM, Comm);
 #else
   AllNErrs[0] = NErrs[0];
@@ -1789,11 +1792,11 @@ void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
     throw runtime_error(ss.str());
   }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Barrier(Comm);
 #endif
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   double EndTime = MPI_Wtime();
 #else
   double EndTime = double(clock()) / CLOCKS_PER_SEC;
@@ -1801,7 +1804,7 @@ void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
 
   double TotalTime = EndTime - StartTime;
   double MaxTotalTime;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   if (CollStats)
     MPI_Reduce(&TotalTime, &MaxTotalTime, 1, MPI_DOUBLE, MPI_MAX, 0, Comm);
   else
@@ -1809,7 +1812,7 @@ void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
     MaxTotalTime = TotalTime;
 
   uint64_t AllTotalReadSize;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   if (CollStats)
     MPI_Reduce(&TotalReadSize, &AllTotalReadSize, 1, MPI_UINT64_T, MPI_SUM, 0, Comm);
   else
@@ -1979,7 +1982,7 @@ void GenericIO::readData(
             if (Mod > 0)
             {
               int RankTmp;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
               MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
               RankTmp = 0;
@@ -2003,7 +2006,7 @@ void GenericIO::readData(
         ++NErrs[1];
 
         int RankTmp;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
         MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
         RankTmp = 0;
@@ -2056,7 +2059,7 @@ void GenericIO::readData(
       {
         CompressHeader<IsBigEndian>* CH = (CompressHeader<IsBigEndian>*)&LData[0];
 
-#ifndef GENERICIO_NO_COMPRESSION
+#ifndef LANL_GENERICIO_NO_COMPRESSION
 #ifdef _OPENMP
 #pragma omp master
         {
@@ -2075,7 +2078,7 @@ void GenericIO::readData(
 
         blosc_decompress(
           &LData[0] + sizeof(CompressHeader<IsBigEndian>), VarData, Vars[i].Size * RH->NElems);
-#endif // GENERICIO_NO_COMPRESSION
+#endif // LANL_GENERICIO_NO_COMPRESSION
 
         if (CH->OrigCRC != crc64_omp(VarData, Vars[i].Size * RH->NElems))
         {
@@ -2108,7 +2111,7 @@ void GenericIO::readData(
         if (Mod > 0)
         {
           int RankTmp;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
           MPI_Comm_rank(MPI_COMM_WORLD, &RankTmp);
 #else
           RankTmp = 0;
@@ -2168,7 +2171,7 @@ void GenericIO::setNaturalDefaultPartition()
 #ifdef __bgq__
   DefaultPartition = MPIX_IO_link_id();
 #else
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   bool UseName = true;
   const char* EnvStr = getenv("GENERICIO_PARTITIONS_USE_NAME");
   if (EnvStr)
@@ -2209,3 +2212,4 @@ void GenericIO::setNaturalDefaultPartition()
 }
 
 } /* END namespace cosmotk */
+} /* END namespace lanl */

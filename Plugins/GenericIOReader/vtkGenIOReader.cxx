@@ -485,10 +485,10 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
       gioReader = NULL;
 
       metaDataBuilt = false; // signal to re-build metadata
-      unsigned Method = gio::GenericIO::FileIOPOSIX;
+      unsigned Method = lanl::gio::GenericIO::FileIOPOSIX;
 
       randomNumGenerated = false;
-      gioReader = new gio::GenericIO(dataFilename.c_str(), Method);
+      gioReader = new lanl::gio::GenericIO(dataFilename.c_str(), Method);
       msgLog << "Opening ... \n";
 
       currentFilename = dataFilename;
@@ -498,10 +498,10 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
   else
   {
     metaDataBuilt = false; // signal to re-build metadata
-    unsigned Method = gio::GenericIO::FileIOPOSIX;
+    unsigned Method = lanl::gio::GenericIO::FileIOPOSIX;
 
     randomNumGenerated = false;
-    gioReader = new gio::GenericIO(dataFilename.c_str(), Method);
+    gioReader = new lanl::gio::GenericIO(dataFilename.c_str(), Method);
     msgLog << "Opening . .. .\n";
 
     currentFilename = dataFilename;
@@ -512,7 +512,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
 
   if (!metaDataBuilt)
   {
-    gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+    gioReader->openAndReadHeader(lanl::gio::GenericIO::MismatchRedistribute);
     msgLog << "header opened ... reading vars ... \n";
 
     totalNumberOfElements = 0;
@@ -521,7 +521,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
     for (int i = 0; i < numDataRanks; ++i)
       totalNumberOfElements += this->gioReader->readNumElems(i);
 
-    std::vector<gio::GenericIO::VariableInfo> VI;
+    std::vector<lanl::gio::GenericIO::VariableInfo> VI;
     gioReader->getVariableInfo(VI);
 
     numVars = VI.size();

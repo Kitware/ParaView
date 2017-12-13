@@ -53,6 +53,9 @@
 #include <omp.h>
 #endif
 
+namespace lanl
+{
+
 // These functions compute the CRC-64 checksum on a block of data
 // and provide a way to combine the checksums on two blocks of data.
 // For more information, see:
@@ -1118,5 +1121,5 @@ static inline uint64_t crc64_omp(const void* input, size_t nbytes)
 
   return crc64(input, nbytes);
 }
-
+} /* END namespace lanl */
 #endif // CRC64_H

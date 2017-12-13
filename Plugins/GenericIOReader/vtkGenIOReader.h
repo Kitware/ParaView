@@ -47,7 +47,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define OCTREE_ENABLED 0 // Disabled right now until octree is integrated in HACC output
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
 #include <mpi.h>
 #endif
 
@@ -229,7 +229,7 @@ private:
   vtkDataArraySelection* CellDataArraySelection;
 
   // GenericIO Data
-  gio::GenericIO* gioReader;
+  lanl::gio::GenericIO* gioReader;
   size_t totalNumberOfElements;
   bool metaDataBuilt;
   int numDataRanks;

@@ -49,7 +49,7 @@
 #include <string>
 #include <vector>
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
 #include <mpi.h>
 #else
 #include <fstream>
@@ -58,6 +58,9 @@
 #ifndef _WIN32
 #include <unistd.h>
 #endif
+
+namespace lanl
+{
 
 namespace gio
 {
@@ -77,7 +80,7 @@ protected:
   std::string FileName;
 };
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
 class GenericFileIO_MPI : public GenericFileIO
 {
 public:
@@ -220,7 +223,7 @@ public:
     FileIOMPICollective
   };
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   GenericIO(const MPI_Comm& C, const std::string& FN, unsigned FIOT = -1)
     : NElems(0)
     , FileIOType(FIOT == (unsigned)-1 ? DefaultFileIOType : FIOT)
@@ -252,7 +255,7 @@ public:
   {
     close();
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     if (SplitComm != MPI_COMM_NULL)
       MPI_Comm_free(&SplitComm);
 #endif
@@ -265,7 +268,7 @@ public:
   {
     NElems = E;
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
     int IsLarge = E >= CollectiveMPIIOThreshold;
     int AllIsLarge;
     MPI_Allreduce(&IsLarge, &AllIsLarge, 1, MPI_INT, MPI_SUM, Comm);
@@ -308,7 +311,7 @@ public:
     Vars.push_back(Variable(VI, Data, Flags));
   }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   // Writing
   void write();
 #endif
@@ -368,7 +371,7 @@ public:
 
   static void setDefaultShouldCompress(bool C) { DefaultShouldCompress = C; }
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   static void setCollectiveMPIIOThreshold(std::size_t T)
   {
 #ifndef GENERICIO_NO_NEVER_USE_COLLECTIVE_IO
@@ -381,7 +384,7 @@ private:
 // Implementation functions templated on the Endianness of the underlying
 // data.
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   template <bool IsBigEndian>
   void write();
 #endif
@@ -437,7 +440,7 @@ protected:
 
   unsigned FileIOType;
   int Partition;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Comm Comm;
 #endif
   std::string FileName;
@@ -446,7 +449,7 @@ protected:
   static int DefaultPartition;
   static bool DefaultShouldCompress;
 
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   static std::size_t CollectiveMPIIOThreshold;
 #endif
 
@@ -455,7 +458,7 @@ protected:
   std::vector<int> SourceRanks;
 
   std::vector<int> RankMap;
-#ifndef GENERICIO_NO_MPI
+#ifndef LANL_GENERICIO_NO_MPI
   MPI_Comm SplitComm;
 #endif
   std::string OpenFileName;
@@ -546,5 +549,6 @@ protected:
   } FH;
 };
 
+} /* END namespace lanl */
 } /* END namespace cosmotk */
 #endif // GENERICIO_H
