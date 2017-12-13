@@ -91,6 +91,11 @@ set(PVBATCH_TESTS
   UserTransformOnRepresentation.py
   )
 
+if (numpy_found AND PARAVIEW_USE_MPI)
+  list(APPEND PVBATCH_TESTS
+    D3CellsWithNegativeVolumes.py,NO_VALID)
+endif()
+
 # Saving animation currently doesn't work in symmetric mode.
 # paraview/paraview#17329
 set(PVBATCH_NO_SYMMETRIC_TESTS
