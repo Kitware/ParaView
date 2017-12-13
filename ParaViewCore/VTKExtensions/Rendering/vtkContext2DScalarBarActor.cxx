@@ -160,6 +160,7 @@ vtkContext2DScalarBarActor::~vtkContext2DScalarBarActor()
   this->SetTitleTextProperty(NULL);
   this->SetLabelTextProperty(NULL);
   this->Axis->Delete();
+  this->SetRangeLabelFormat(nullptr);
 }
 
 //----------------------------------------------------------------------------

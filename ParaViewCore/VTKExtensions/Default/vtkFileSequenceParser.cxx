@@ -59,6 +59,7 @@ vtkFileSequenceParser::~vtkFileSequenceParser()
   delete this->reg_ex3;
   delete this->reg_ex4;
   delete this->reg_ex5;
+  delete this->reg_ex_last;
 
   this->SetSequenceName(NULL);
 }
