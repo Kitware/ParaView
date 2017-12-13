@@ -103,12 +103,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringArray.h"
 #include "vtkUnstructuredGridAlgorithm.h"
 
-#include "GenericIO.h"
+#include "LANL/GIO/GenericIO.h"
 
-#include "log.h"
-#include "timer.h"
+#include "LANL/utils/log.h"
+#include "LANL/utils/timer.h"
 
-#include "gioData.h"
+#include "LANL/utils/gioData.h"
 
 class vtkDataArraySelection;
 class vtkStringArray;

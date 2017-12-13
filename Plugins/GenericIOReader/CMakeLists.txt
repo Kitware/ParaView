@@ -6,22 +6,17 @@ else()
   include_directories(${VTK_INCLUDE_DIRS})
 endif(NOT ParaView_BINARY_DIR)
 
+# Include directories
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # This plugin depends on a customized snapshot of GenericIO:
 add_definitions(-DLANL_GENERICIO_NO_MPI)
 add_definitions(-DLANL_GENERICIO_NO_COMPRESSION)   # Compression not supported yet
-add_library(LANL_GenericIO STATIC "${CMAKE_CURRENT_SOURCE_DIR}/GIO/GenericIO.cxx")
+add_library(LANL_GenericIO STATIC "LANL/GIO/GenericIO.cxx")
 set_property(TARGET LANL_GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # Sources
 set(SRC_LIST vtkGenIOReader.h vtkGenIOReader.cxx)
-
-# Include directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/GIO)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tools)
-
 
 # Enable or disable log output
 option(GIO_DEBUG_LOG "Enable GenericIO ParaView Plugin Logging" OFF)

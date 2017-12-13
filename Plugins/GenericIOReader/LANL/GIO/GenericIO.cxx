@@ -40,8 +40,8 @@
  */
 
 #define _XOPEN_SOURCE 600
-#include "GenericIO.h"
-#include "CRC64.h"
+#include "LANL/GIO/GenericIO.h"
+#include "LANL/GIO/CRC64.h"
 
 #ifndef LANL_GENERICIO_NO_COMPRESSION
 extern "C" {
