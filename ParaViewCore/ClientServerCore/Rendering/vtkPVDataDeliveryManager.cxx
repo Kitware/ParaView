@@ -379,6 +379,10 @@ void vtkPVDataDeliveryManager::SetPiece(vtkPVDataRepresentation* repr, vtkDataOb
     {
       data_time = data->GetMTime();
     }
+    if (repr && repr->GetPipelineDataTime() > data_time)
+    {
+      data_time = repr->GetPipelineDataTime();
+    }
     if (data_time > item->GetTimeStamp() || item->GetDataObject() != data)
     {
       item->SetDataObject(data);
@@ -597,7 +601,6 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
     }
     cutsGenerator->GenerateKdTree();
     this->KdTree = cutsGenerator->GetKdTree();
-
     vtkTimerLog::MarkEndEvent("Regenerate Kd-Tree");
   }
 

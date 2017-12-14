@@ -178,6 +178,12 @@ public:
    */
   vtkView* GetView() const;
 
+  /**
+   * Returns the timestamp when `RequestData` was executed on the
+   * representation.
+   */
+  vtkMTimeType GetPipelineDataTime();
+
 protected:
   vtkPVDataRepresentation();
   ~vtkPVDataRepresentation() override;

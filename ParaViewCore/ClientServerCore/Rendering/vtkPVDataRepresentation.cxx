@@ -130,6 +130,7 @@ int vtkPVDataRepresentation::RequestData(
   return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVDataRepresentation::RequestUpdateTime(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
@@ -274,6 +275,18 @@ bool vtkPVDataRepresentation::GetUseCache()
     return pvview->GetUseCache();
   }
   return false;
+}
+
+//----------------------------------------------------------------------------
+vtkMTimeType vtkPVDataRepresentation::GetPipelineDataTime()
+{
+  if (auto executive = vtkPVDataRepresentationPipeline::SafeDownCast(this->GetExecutive()))
+  {
+    return executive->GetDataTime();
+  }
+
+  vtkErrorMacro("vtkPVDataRepresentationPipeline is expected!!!");
+  return vtkMTimeType();
 }
 
 //----------------------------------------------------------------------------
