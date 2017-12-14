@@ -460,7 +460,16 @@ class Proxy(object):
                     "to add this attribute.")
         else:
             paraview.print_debug_info(name)
-            setter(self, value)
+            try:
+                setter(self, value)
+            except ValueError:
+                # Let the backwards compatibility helper try to handle this
+                try:
+                    _bc.setattr_fix_value(self, name, value, setter)
+                except _bc.Continue:
+                    pass
+                except ValueError:
+                    raise ValueError("%s is not a valid value for attribute %s." % (value, name))
 
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
