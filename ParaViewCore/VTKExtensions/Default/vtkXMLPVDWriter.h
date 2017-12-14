@@ -67,10 +67,22 @@ public:
   vtkSetMacro(GhostLevel, int);
   //@}
 
+  //@{
+  /**
+   * When WriteAllTimeSteps is turned ON, the writer is executed once for
+   * each timestep available from its input. The default is OFF.
+   */
+  vtkSetMacro(WriteAllTimeSteps, int);
+  vtkGetMacro(WriteAllTimeSteps, int);
+  vtkBooleanMacro(WriteAllTimeSteps, int);
+  //@}
+
+  //@{
   /**
    * Add an input of this algorithm.
    */
   void AddInputData(vtkDataObject*);
+  //@}
 
   //@{
   /**
@@ -90,6 +102,9 @@ protected:
 
   // see algorithm for more info
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+
+  // add in request update extent to set time step information
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Replace vtkXMLWriter's writing driver method.
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
@@ -144,6 +159,12 @@ protected:
 
   // Garbage collection support.
   void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+
+  // The current time step for time series inputs.
+  int CurrentTimeIndex;
+
+  // Option to write all time steps (ON) or just the current one (OFF)
+  int WriteAllTimeSteps;
 
 private:
   vtkXMLPVDWriter(const vtkXMLPVDWriter&) = delete;
