@@ -207,6 +207,7 @@ option(BUILD_EXAMPLES "Build ParaView examples" OFF)
 option(BUILD_SHARED_LIBS "Build ParaView using shared libraries" ON)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
+option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
 option(PARAVIEW_USE_OSPRAY "Build ParaView with OSPRay Ray Traced rendering" OFF)
 set(VTK_OPENVR_OBJECT_FACTORY OFF
     CACHE INTERNAL "ParaView requires the OpenVR factory be disabled" FORCE)

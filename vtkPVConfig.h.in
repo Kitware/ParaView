@@ -79,6 +79,9 @@
 # define PARAVIEW_QT_VERSION @PARAVIEW_QT_VERSION@
 #endif
 
+// defined when vtk-m support is enabled
+#cmakedefine PARAVIEW_USE_VTKM
+
 // ParaView data root (useful for testing).
 #define PARAVIEW_DATA_ROOT "@PARAVIEW_DATA_ROOT@"
 

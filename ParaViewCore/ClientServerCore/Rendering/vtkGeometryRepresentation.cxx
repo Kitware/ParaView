@@ -47,8 +47,6 @@
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
 
-#include "vtkmConfig.h"
-
 #ifdef PARAVIEW_USE_OSPRAY
 #include "vtkOSPRayActorNode.h"
 #endif
@@ -58,6 +56,9 @@
 // We'll use the VTKm decimation filter if TBB is enabled, otherwise we'll
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
 // serial backend.
+#ifdef PARAVIEW_USE_VTKM
+#include "vtkmConfig.h" // for VTKM_ENABLE_TBB
+#endif                  // PARAVIEW_USE_VTKM
 
 #ifdef VTKM_ENABLE_TBB
 #include "vtkmLevelOfDetail.h"
@@ -84,7 +85,7 @@ public:
 };
 vtkStandardNewMacro(DecimationFilterType)
 }
-#else
+#else // VTKM_ENABLE_TBB
 #include "vtkQuadricClustering.h"
 namespace vtkGeometryRepresentation_detail
 {
@@ -119,7 +120,7 @@ public:
 };
 vtkStandardNewMacro(DecimationFilterType)
 }
-#endif
+#endif // VTKM_ENABLE_TBB
 
 //*****************************************************************************
 // This is used to convert a vtkPolyData to a vtkMultiBlockDataSet. If input is

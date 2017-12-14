@@ -5,6 +5,10 @@
   ],
   "cmake": {
     "cache": [
+      { "name": "PARAVIEW_USE_VTKM",
+        "type": "BOOL",
+        "value": "OFF"
+      },
       { "name": "Module_vtkPVVTKExtensionsRendering",
         "type": "BOOL",
         "value": "ON"
@@ -932,12 +936,6 @@
       "cswrap": true,
       "pythonwrap": true
     },
-    { "name": "vtkAcceleratorsVTKm",
-      "path": "VTK/Accelerators/Vtkm",
-      "exclude": [
-        { "path": "Testing" }
-      ]
-    },
     { "name": "vtkMetaIO",
       "path": "VTK/Utilities/MetaIO"
     },
@@ -967,9 +965,6 @@
     },
     { "name": "vtklibharu",
       "path": "VTK/ThirdParty/libharu"
-    },
-    { "name": "vtkm",
-      "path": "VTK/ThirdParty/vtkm"
     }
   ],
   "proxies":[
