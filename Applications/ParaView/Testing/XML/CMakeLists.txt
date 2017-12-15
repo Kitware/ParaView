@@ -295,6 +295,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorByCellDataStringArray.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeViewOverlay.xml
   # disabling overlay test for now. It has issues with Time 0.
   #  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeOverlay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml

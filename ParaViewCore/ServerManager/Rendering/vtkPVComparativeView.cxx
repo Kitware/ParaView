@@ -495,7 +495,7 @@ public:
     {
       // We'll create 1 view, but multiple sets of representations for each comparison.
       vtkSMProxy* rootView = this->GetRoot();
-      bool changed = this->Resize(1);
+      bool changed = this->Superclass::Resize(1);
       for (auto iter = this->Representations.begin(); iter != this->Representations.end(); ++iter)
       {
         size_t old_size = (*iter)->GetNumberOfItems();

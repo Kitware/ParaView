@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Contour" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ComputeScalars/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,56,13,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,56,13,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="RTData" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionResetRange" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/ComparativeRenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,14,8,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,14,8,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Comparative View Inspector" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/layoutY" command="set_int" arguments="1" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/layoutY" command="set_int" arguments="1" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/layoutY" command="set_int" arguments="1" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/layoutY" command="key" arguments="16777221" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel" command="mousePress" arguments="1,1,0,69,318" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel" command="mouseMove" arguments="1,0,0,69,317" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel" command="mouseRelease" arguments="1,0,0,69,317" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/proxyCombo" command="activated" arguments="Contour1" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/addParameter" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/cueGroup/cueWidget" command="edit" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/cueGroup/cueWidget/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="100" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/cueGroup/cueWidget" command="setCurrent" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/cueGroup/cueWidget" command="edit" arguments="0.1" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/cueGroup/cueWidget/qt_scrollarea_viewport/1QExpandingLineEdit0" command="set_string" arguments="200" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/cueGroup/cueWidget" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/overlay" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/qt_dockwidget_closebutton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+</pqevents>
