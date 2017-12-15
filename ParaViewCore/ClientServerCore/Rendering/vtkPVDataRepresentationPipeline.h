@@ -37,6 +37,13 @@ public:
   vtkTypeMacro(vtkPVDataRepresentationPipeline, vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
+  /**
+   * Expose `DataTime` timestamp. This gets changed anytime the `RequestData` is
+   * called on the algorithm. This is more robust mechanism to determine if the
+   * algorithm reexecuted.
+   */
+  vtkGetMacro(DataTime, vtkMTimeType);
+
 protected:
   vtkPVDataRepresentationPipeline();
   ~vtkPVDataRepresentationPipeline() override;
