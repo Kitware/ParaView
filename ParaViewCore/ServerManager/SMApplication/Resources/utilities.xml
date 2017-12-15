@@ -614,6 +614,10 @@
                             default_values="0.0"
                             name="Offset"
                             number_of_elements="1">
+        <Documentation>
+          Set the value to offset the origin by. The origin is translated along the normal
+          direction by the number specified.
+        </Documentation>
       </DoubleVectorProperty>
 
       <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
