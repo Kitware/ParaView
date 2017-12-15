@@ -1,3 +1,5 @@
+import paraview
+
 try:
     from vtkmodules.vtkCommonComputationalGeometry import *
 except ImportError:
@@ -31,5 +33,3 @@ try:
     from vtkmodules.vtkFiltersCore import *
 except ImportError:
     paraview.print_error("Error: Could not import vtkFiltersCore")
-
-# --------------------------------------
