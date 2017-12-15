@@ -4,5 +4,4 @@ use `vtkConstants` from `vtk` package directly as follows:
     from paraview.vtk.util import vtkConstants
 
 """
-from __future__ import absolute_import
-from .vtk.util.vtkConstants import *
+from vtkmodules.util.vtkConstants import *
