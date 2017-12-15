@@ -85,12 +85,6 @@ void vtkPVOSPRayMaterialLibrary::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVOSPRayMaterialLibrary::DummyReadFile(const char* vtkNotUsed(FileName))
-{
-  // intentionally empty
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVOSPRayMaterialLibrary::ReadRelativeFile(const char* FileName)
 {
 #ifdef PARAVIEW_USE_OSPRAY

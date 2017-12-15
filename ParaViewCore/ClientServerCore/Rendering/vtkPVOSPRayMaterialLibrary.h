@@ -39,7 +39,6 @@ public:
    * member variable.
    */
   void ReadRelativeFile(const char* FileName);
-  void DummyReadFile(const char* FileName);
 
   /**
    * Get a string of standard search paths (path1;path2;path3)

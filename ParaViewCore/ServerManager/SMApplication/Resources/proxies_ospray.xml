@@ -3,7 +3,7 @@
     <MaterialLibraryProxy class="vtkPVOSPRayMaterialLibrary"
                  name="MaterialLibrary"
                  processes="client|renderserver">
-      <StringVectorProperty command="DummyReadFile"
+      <StringVectorProperty
                  default_values=""
                  label="Load Materials"
                  name="LoadMaterials"
