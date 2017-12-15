@@ -44,7 +44,6 @@ endif()
 set(_vtk_modules
   # VTK modules which ParaView has a explicity compile
   # time dependency on
-  vtkAcceleratorsVTKm
   vtkRenderingVolume
   vtkRenderingLabel
   vtkRenderingFreeType
@@ -421,6 +420,10 @@ endif()
 
 if (PARAVIEW_BUILD_PLUGIN_OpenVR)
   list (APPEND _vtk_modules vtkRenderingOpenVR)
+endif()
+
+if(PARAVIEW_USE_VTKM)
+  list(APPEND _vtk_modules vtkAcceleratorsVTKm)
 endif()
 
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
