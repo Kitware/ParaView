@@ -15,10 +15,11 @@ This module is intended for use with by simple.py."""
 #
 #==============================================================================
 
-import paraview.simple
-from paraview import servermanager
 import os
 from math import sqrt
+
+from paraview import servermanager
+from _colorMaps import getColorMaps
 
 # -----------------------------------------------------------------------------
 
@@ -144,12 +145,12 @@ class vtkPVLUTReader:
     self.LUTS={}
     self.DefaultLUT=None
     self.Globals=ns
-    baseDir=os.path.dirname(paraview.simple.__file__)
-    defaultLUTFile=os.path.join(baseDir,'ColorMaps.xml')
-    if (os.path.exists(defaultLUTFile)):
-      self.Read(defaultLUTFile)
+
+    defaultColorMaps = getColorMaps()
+    if defaultColorMaps:
+      self._Read(defaultColorMaps)
     else:
-      print ('WARNING: default LUTs not found at %s'%(defaultLUTFile))
+      print('WARNING: default LUTs not found.')
     return
 
   def Clear(self):
@@ -175,6 +176,9 @@ class vtkPVLUTReader:
       print ('ERROR: parsing LUT file %s'%(aFileName))
       print ('ERROR: root element must be <ColorMaps>')
       return
+    return self._Read(root)
+
+  def _Read(self, root):
     nElems=root.GetNumberOfNestedElements()
     i=0
     nFound=0

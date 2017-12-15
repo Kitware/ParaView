@@ -1,3 +1,9 @@
+r"""
+This is a deprecated module and should not be used anymore.
+These are legacy colormap XMLs kept around till `paraview.lookuptable` module is deprecated
+and removed."""
+
+__colorMapsXML = """
 <ColorMaps>
   <!-- ParaView Default Color Maps -->
   <ColorMap name="Cool to Warm" space="Diverging">
@@ -2937,3 +2943,12 @@
     <NaN r="0.25" g="0" b="0"/>
   </ColorMap>
 </ColorMaps>
+"""
+def getColorMaps():
+    """Returns the vtkPVXMLElement instance for the default (legacy) color maps"""
+    global __colorMapsXML
+    from vtkmodules.vtkPVCommon import vtkPVXMLParser
+    parser = vtkPVXMLParser()
+    if parser.Parse(__colorMapsXML):
+        return parser.GetRootElement()
+    return None

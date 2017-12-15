@@ -68,11 +68,6 @@ add_custom_command(
           "${CMAKE_CURRENT_SOURCE_DIR}/paraview/vtk/__init__.py"
           "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview/vtk/__init__.py"
 
-  # Copy ColorMaps.xml (obsolete: we should remove this soonish)
-  COMMAND ${CMAKE_COMMAND} ARGS -E copy
-          "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.xml"
-          "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview/ColorMaps.xml"
-
   # Touch the OUTPUT file, otherwise this command will always be dirty.
   COMMAND ${CMAKE_COMMAND} ARGS -E touch "${CMAKE_CURRENT_BINARY_DIR}/pv_copy_and_compile_py_files_complete"
 
