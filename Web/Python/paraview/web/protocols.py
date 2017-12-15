@@ -19,17 +19,17 @@ import paraview
 from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 from paraview.web import helper
-from vtk.web import protocols as vtk_protocols
-from vtk.web import iteritems
-from vtk.web.render_window_serializer import SynchronizationContext, initializeSerializers, serializeInstance, getReferenceId
+from vtkmodules.web import protocols as vtk_protocols
+from vtkmodules.web import iteritems
+from vtkmodules.web.render_window_serializer import SynchronizationContext, initializeSerializers, serializeInstance, getReferenceId
 from paraview.web.decorators import *
 
-from paraview.vtk.vtkCommonDataModel          import vtkImageData
-from paraview.vtk.vtkCommonCore               import vtkUnsignedCharArray, vtkCollection
-from paraview.vtk.vtkWebCore                  import vtkDataEncoder, vtkWebInteractionEvent
-from paraview.vtk.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
-from paraview.vtk.vtkPVServerManagerCore      import vtkSMProxyManager
-from paraview.vtk.vtkCommonDataModel          import vtkDataObject
+from vtkmodules.vtkCommonDataModel          import vtkImageData
+from vtkmodules.vtkCommonCore               import vtkUnsignedCharArray, vtkCollection
+from vtkmodules.vtkWebCore                  import vtkDataEncoder, vtkWebInteractionEvent
+from vtkmodules.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
+from vtkmodules.vtkPVServerManagerCore      import vtkSMProxyManager
+from vtkmodules.vtkCommonDataModel          import vtkDataObject
 
 if sys.version_info >= (3,):
     xrange = range
@@ -2788,8 +2788,8 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
 # Handle Data Selection
 #
 # =============================================================================
-from vtk.vtkPVClientServerCoreRendering import *
-from vtk.vtkCommonCore import *
+from vtkmodules.vtkPVClientServerCoreRendering import *
+from vtkmodules.vtkCommonCore import *
 
 class ParaViewWebSelectionHandler(ParaViewWebProtocol):
 

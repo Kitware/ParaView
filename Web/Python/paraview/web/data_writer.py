@@ -2,10 +2,10 @@ import os, math
 
 from paraview import simple
 
-from paraview.vtk.vtkIOImage import vtkPNGReader
-from paraview.vtk.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
+from vtkmodules.vtkIOImage import vtkPNGReader
+from vtkmodules.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
 
-from vtk.web import buffer
+from vtkmodules.web import buffer
 
 VTK_DATA_TYPES = [ 'void',            # 0
                    'bit',             # 1
