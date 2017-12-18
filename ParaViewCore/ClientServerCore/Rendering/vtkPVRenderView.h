@@ -59,7 +59,7 @@ class vtkPVDataRepresentation;
 class vtkPVGridAxes3DActor;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
-class vtkPVOSPRayMaterialLibrary;
+class vtkPVMaterialLibrary;
 class vtkPVSynchronizedRenderer;
 class vtkRenderer;
 class vtkRenderViewBase;
@@ -890,7 +890,7 @@ public:
   /**
    * For OSPRay, set the library of materials.
    */
-  virtual void SetMaterialLibrary(vtkPVOSPRayMaterialLibrary*);
+  virtual void SetMaterialLibrary(vtkPVMaterialLibrary*);
 
   //@{
   /**

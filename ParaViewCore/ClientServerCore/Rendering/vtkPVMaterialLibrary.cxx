@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVOSPRayMaterialLibrary.cxx
+  Module:    vtkPVMaterialLibrary.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,11 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVOSPRayMaterialLibrary.h"
+#include "vtkPVMaterialLibrary.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
+#ifdef PARAVIEW_USE_OSPRAY
+#include "vtkOSPRayMaterialLibrary.h"
+#endif
 #include "vtkProcessModule.h"
 
 #include <string>
@@ -28,9 +31,9 @@ const char ENV_PATH_SEP = ';';
 const char ENV_PATH_SEP = ':';
 #endif
 
-vtkStandardNewMacro(vtkPVOSPRayMaterialLibrary);
+vtkStandardNewMacro(vtkPVMaterialLibrary);
 //-----------------------------------------------------------------------------
-vtkPVOSPRayMaterialLibrary::vtkPVOSPRayMaterialLibrary()
+vtkPVMaterialLibrary::vtkPVMaterialLibrary()
 {
   this->SearchPaths = nullptr;
   vtksys::String paths;
@@ -69,23 +72,32 @@ vtkPVOSPRayMaterialLibrary::vtkPVOSPRayMaterialLibrary()
   }
 
   this->SetSearchPaths(paths.c_str());
+#ifdef PARAVIEW_USE_OSPRAY
+  this->MaterialLibrary = vtkOSPRayMaterialLibrary::New();
+#else
+  this->MaterialLibrary = nullptr;
+#endif
 }
 
 //-----------------------------------------------------------------------------
-vtkPVOSPRayMaterialLibrary::~vtkPVOSPRayMaterialLibrary()
+vtkPVMaterialLibrary::~vtkPVMaterialLibrary()
 {
   this->SetSearchPaths(nullptr);
+  if (this->MaterialLibrary)
+  {
+    this->MaterialLibrary->Delete();
+  }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVOSPRayMaterialLibrary::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVMaterialLibrary::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "SearchPaths: " << (this->SearchPaths ? this->SearchPaths : "(none)") << endl;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVOSPRayMaterialLibrary::ReadRelativeFile(const char* FileName)
+void vtkPVMaterialLibrary::ReadRelativeFile(const char* FileName)
 {
 #ifdef PARAVIEW_USE_OSPRAY
   std::vector<std::string> paths;
@@ -105,5 +117,43 @@ void vtkPVOSPRayMaterialLibrary::ReadRelativeFile(const char* FileName)
   }
 #else
   (void)FileName;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+vtkObject* vtkPVMaterialLibrary::GetMaterialLibrary()
+{
+  return this->MaterialLibrary;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVMaterialLibrary::ReadFile(const char* FileName)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->ReadFile(FileName);
+#else
+  (void)FileName;
+  return false;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVMaterialLibrary::ReadBuffer(const char* FileName)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->ReadBuffer(FileName);
+#else
+  (void)FileName;
+  return false;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVMaterialLibrary::WriteBuffer()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->WriteBuffer();
+#else
+  return nullptr;
 #endif
 }

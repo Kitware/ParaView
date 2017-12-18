@@ -17,6 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
+#include "vtkPVMaterialLibrary.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
@@ -96,8 +97,8 @@ void vtkSMMaterialLibraryProxy::Synchronize()
     this->ExecuteStream(stream2, false, vtkProcessModule::CLIENT);
   }
 
-  vtkOSPRayMaterialLibrary* ml =
-    vtkOSPRayMaterialLibrary::SafeDownCast(this->GetClientSideObject());
+  vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(
+    vtkPVMaterialLibrary::SafeDownCast(this->GetClientSideObject())->GetMaterialLibrary());
   ml->Fire();
 #else
   return;

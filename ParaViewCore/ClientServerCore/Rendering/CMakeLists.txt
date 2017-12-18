@@ -77,7 +77,7 @@ set (Module_SRCS
   vtkPVMultiSliceView.cxx
   vtkPVOpenGLInformation.cxx
   vtkPVOrthographicSliceView.cxx
-  vtkPVOSPRayMaterialLibrary.cxx
+  vtkPVMaterialLibrary.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlotMatrixView.cxx
