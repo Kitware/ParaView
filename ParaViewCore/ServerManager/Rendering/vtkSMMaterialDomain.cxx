@@ -17,6 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVMaterialLibrary.h"
 #include "vtkSMMaterialLibraryProxy.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
@@ -61,7 +62,8 @@ public:
     if (mlp)
     {
       // todo: is GetClientSideObject guaranteed to succeed?
-      this->Watchee = vtkOSPRayMaterialLibrary::SafeDownCast(mlp->GetClientSideObject());
+      this->Watchee = vtkOSPRayMaterialLibrary::SafeDownCast(
+        vtkPVMaterialLibrary::SafeDownCast(mlp->GetClientSideObject())->GetMaterialLibrary());
       if (this->Watchee)
       {
         this->Watchee->AddObserver(vtkCommand::UpdateDataEvent, this);
@@ -148,7 +150,8 @@ void vtkSMMaterialDomain::Update(vtkSMProperty* vtkNotUsed(prop))
   {
     return;
   }
-  vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(mlp->GetClientSideObject());
+  vtkOSPRayMaterialLibrary* ml = vtkOSPRayMaterialLibrary::SafeDownCast(
+    vtkPVMaterialLibrary::SafeDownCast(mlp->GetClientSideObject())->GetMaterialLibrary());
   if (!ml)
   {
     return;

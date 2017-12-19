@@ -49,7 +49,6 @@ class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
-class vtkOSPRayMaterialLibrary;
 class vtkPartitionOrderingInterface;
 class vtkProp;
 class vtkPVAxesWidget;
@@ -60,6 +59,7 @@ class vtkPVDataRepresentation;
 class vtkPVGridAxes3DActor;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
+class vtkPVMaterialLibrary;
 class vtkPVSynchronizedRenderer;
 class vtkRenderer;
 class vtkRenderViewBase;
@@ -890,7 +890,7 @@ public:
   /**
    * For OSPRay, set the library of materials.
    */
-  virtual void SetMaterialLibrary(vtkOSPRayMaterialLibrary*);
+  virtual void SetMaterialLibrary(vtkPVMaterialLibrary*);
 
   //@{
   /**

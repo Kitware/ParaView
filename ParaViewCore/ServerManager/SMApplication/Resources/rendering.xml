@@ -648,5 +648,18 @@
     </LightProxy>
     <!-- End of additional_lights -->
   </ProxyGroup>
+  <ProxyGroup name="materials">
+    <MaterialLibraryProxy class="vtkPVMaterialLibrary"
+                 name="MaterialLibrary"
+                 processes="client|renderserver">
+      <StringVectorProperty
+                 default_values=""
+                 label="Load Materials"
+                 name="LoadMaterials"
+                 number_of_elements="1"
+                 panel_visibility="never">
+      </StringVectorProperty>
+    </MaterialLibraryProxy>
+  </ProxyGroup>
 
 </ServerManagerConfiguration>

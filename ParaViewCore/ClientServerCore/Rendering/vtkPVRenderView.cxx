@@ -60,6 +60,7 @@
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVHardwareSelector.h"
 #include "vtkPVInteractorStyle.h"
+#include "vtkPVMaterialLibrary.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
@@ -2984,11 +2985,12 @@ bool vtkPVRenderView::GetEnableOSPRay()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetMaterialLibrary(vtkOSPRayMaterialLibrary* ml)
+void vtkPVRenderView::SetMaterialLibrary(vtkPVMaterialLibrary* ml)
 {
 #ifdef PARAVIEW_USE_OSPRAY
   vtkRenderer* ren = this->GetRenderer();
-  vtkOSPRayRendererNode::SetMaterialLibrary(ml, ren);
+  vtkOSPRayRendererNode::SetMaterialLibrary(
+    vtkOSPRayMaterialLibrary::SafeDownCast(ml->GetMaterialLibrary()), ren);
 #else
   (void)ml;
 #endif
