@@ -384,6 +384,11 @@ public:
   int GetNumberOfControllers() { return static_cast<int>(this->Controllers.size()); }
   //-----------------------------------------------------------------
   int GetControllerId(int idx) { return this->Controllers.at(idx).Id; }
+  //-----------------------------------------------------------------
+  vtkMultiProcessController* GetController(int idx)
+  {
+    return this->Controllers.at(idx).MultiProcessController;
+  }
 
   //-----------------------------------------------------------------
   void SetMasterController(int controllerId)
@@ -563,6 +568,11 @@ int vtkCompositeMultiProcessController::GetNumberOfControllers()
 int vtkCompositeMultiProcessController::GetControllerId(int idx)
 {
   return this->Internal->GetControllerId(idx);
+}
+//----------------------------------------------------------------------------
+vtkMultiProcessController* vtkCompositeMultiProcessController::GetController(int idx)
+{
+  return this->Internal->GetController(idx);
 }
 //----------------------------------------------------------------------------
 void vtkCompositeMultiProcessController::SetMasterController(int id)

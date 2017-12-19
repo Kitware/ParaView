@@ -72,12 +72,19 @@ public:
    * reporting. All progress events before this call are ignored.
    */
   void PrepareProgress();
+  void AddHandlers();
+  bool GetEnableProgress();
 
   /**
    * This method collects all outstanding progress messages. All progress
    * events after this call are ignored.
    */
   void CleanupPendingProgress();
+
+  /**
+   * Local cleanup of progress flags
+   */
+  void LocalCleanupPendingProgress();
 
   //@{
   /**
@@ -104,21 +111,32 @@ public:
   vtkGetStringMacro(LastMessage);
   //@}
 
+  /**
+   * Update the last message and invokes a message event
+   */
+  void RefreshMessage(const char* message_text);
+
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler() override;
 
-  enum eTAGS
+  enum TAGS
   {
     CLEANUP_TAG = 188969,
     PROGRESS_EVENT_TAG = 188970,
     MESSAGE_EVENT_TAG = 188971
   };
 
-  //@{
+  enum RMI_TAGS
+  {
+    CLEANUP_TAG_RMI = 188972,
+    MESSAGE_EVENT_TAG_RMI = 188973
+  };
+
+  /**
+   * Update the last progress and progress text and invokes a progress event
+   */
   void RefreshProgress(const char* progress_text, double progress);
-  void RefreshMessage(const char* message_text);
-  //@}
 
   vtkPVSession* Session;
   double ProgressInterval;

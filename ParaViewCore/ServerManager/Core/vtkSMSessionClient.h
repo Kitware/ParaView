@@ -176,6 +176,15 @@ public:
    */
   vtkSMCollaborationManager* GetCollaborationManager() VTK_OVERRIDE;
 
+  //@{
+  /**
+   * Should be called to begin/end receiving progresses on this session.
+   * Overridden to relay to the server(s).
+   */
+  void PrepareProgressInternal() VTK_OVERRIDE;
+  void CleanupPendingProgressInternal() VTK_OVERRIDE;
+
+  //@}
   /**
    * Return the connect id of this client.
    */

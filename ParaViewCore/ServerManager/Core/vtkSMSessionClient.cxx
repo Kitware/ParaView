@@ -25,6 +25,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkPVProgressHandler.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionServer.h"
 #include "vtkProcessModule.h"
@@ -320,6 +321,7 @@ void vtkSMSessionClient::Initialize()
   {
     this->SetupDataServerRenderServerConnection();
   }
+  this->ProgressHandler->AddHandlers();
 }
 
 //----------------------------------------------------------------------------
@@ -1015,4 +1017,26 @@ int vtkSMSessionClient::GetConnectID()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions* options = pm->GetOptions();
   return options->GetConnectID();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::PrepareProgressInternal()
+{
+  // Only for master client
+  if (!this->IsMultiClients() ||
+    (this->IsMultiClients() && this->GetCollaborationManager()->IsMaster()))
+  {
+    this->Superclass::PrepareProgressInternal();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::CleanupPendingProgressInternal()
+{
+  // Only for master client
+  if (!this->IsMultiClients() ||
+    (this->IsMultiClients() && this->GetCollaborationManager()->IsMaster()))
+  {
+    this->Superclass::CleanupPendingProgressInternal();
+  }
 }
