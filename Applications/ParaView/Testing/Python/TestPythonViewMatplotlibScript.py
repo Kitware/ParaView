@@ -59,10 +59,12 @@ except:
   print ("Could not get baseline directory. Test failed.")
 
 baseline_file = os.path.join(baselinePath, "TestPythonViewMatplotlibScript.png")
-import vtk.test.Testing
-vtk.test.Testing.VTK_TEMP_DIR = vtk.util.misc.vtkGetTempDir()
-vtk.test.Testing.compareImage(view.GetRenderWindow(), baseline_file, threshold=25)
-vtk.test.Testing.interact()
+
+from paraview.vtk.test import Testing
+from paraview.vtk.util.misc import vtkGetTempDir
+Testing.VTK_TEMP_DIR = vtkGetTempDir()
+Testing.compareImage(view.GetRenderWindow(), baseline_file, threshold=25)
+Testing.interact()
 
 Delete(cone)
 del cone

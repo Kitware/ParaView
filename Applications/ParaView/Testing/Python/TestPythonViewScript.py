@@ -47,7 +47,9 @@ except:
 
 import os
 baseline_file = os.path.join(baselinePath, "TestPythonViewScript.png")
-import vtk.test.Testing
-vtk.test.Testing.VTK_TEMP_DIR = vtk.util.misc.vtkGetTempDir()
-vtk.test.Testing.compareImage(view.GetRenderWindow(), baseline_file, threshold=25)
-vtk.test.Testing.interact()
+
+from paraview.vtk.test import Testing
+from paraview.vtk.util.misc import vtkGetTempDir
+Testing.VTK_TEMP_DIR = vtkGetTempDir()
+Testing.compareImage(view.GetRenderWindow(), baseline_file, threshold=25)
+Testing.interact()
