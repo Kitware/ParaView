@@ -15513,7 +15513,7 @@ source.</Documentation>
                  value="1" />
         </EnumerationDomain>
         <Documentation>This property specifies the mode of iteration, either a user-provided number
-        of periods, or the maximum number of periods to rotate to 360°. </Documentation>
+        of periods, or the maximum number of periods to rotate to 360 degrees.</Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty command="SetNumberOfPeriods"

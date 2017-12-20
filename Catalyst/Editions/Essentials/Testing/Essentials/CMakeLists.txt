@@ -13,5 +13,5 @@ if (EXISTS ${PVPYTHON_EXE})
     COMMAND ${PVPYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/use-essentials.py)
   set_tests_properties(import-essentials
     PROPERTIES
-      FAIL_REGULAR_EXPRESSION "No proxy that matches:")
+      FAIL_REGULAR_EXPRESSION "No proxy that matches:;Could not create object of type:")
 endif ()
