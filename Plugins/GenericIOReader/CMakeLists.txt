@@ -12,6 +12,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # This plugin depends on a customized snapshot of GenericIO:
 add_definitions(-DLANL_GENERICIO_NO_MPI)
 add_definitions(-DLANL_GENERICIO_NO_COMPRESSION)   # Compression not supported yet
+add_definitions(-D__STDC_CONSTANT_MACROS) # Required by GenericIO target
 add_library(LANL_GenericIO STATIC "LANL/GIO/GenericIO.cxx")
 set_property(TARGET LANL_GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
