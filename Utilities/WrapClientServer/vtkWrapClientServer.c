@@ -1198,6 +1198,9 @@ int main(int argc, char* argv[])
   NewClassInfo* classData;
   int i;
 
+  /* pre-define a macro to identify the language */
+  vtkParse_DefineMacro("__VTK_WRAP_CLIENTSERVER__", 0);
+
   /* get command-line args and parse the header file */
   fileInfo = vtkParse_Main(argc, argv);
 
