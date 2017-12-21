@@ -402,6 +402,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   menu.addAction(actionPBCopy);
   menu.addAction(actionPBPaste);
   menu.addAction(actionPBChangeInput);
+  QMenu* addFilterMenu = menu.addMenu("Add Filter");
+  pqParaViewMenuBuilders::buildFiltersMenu(*addFilterMenu);
   menu.addAction(actionPBReloadFiles);
   menu.addAction(actionPBIgnoreTime);
   menu.addAction(actionPBDelete);
