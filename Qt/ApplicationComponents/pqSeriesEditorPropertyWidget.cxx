@@ -1002,4 +1002,7 @@ void pqSeriesEditorPropertyWidget::domainModified(vtkObject*)
   // Trigger dataChanged() signals on the model so that the list refreshes to
   // hide series that are no longer in domain.
   this->Internals->Model.domainChanged();
+
+  // Sort the table
+  this->Internals->Ui.SeriesTable->sortByColumn(0, Qt::AscendingOrder);
 }
