@@ -1198,11 +1198,20 @@ int main(int argc, char* argv[])
   NewClassInfo* classData;
   int i;
 
+  /* pre-define a macro to identify the language */
+  vtkParse_DefineMacro("__VTK_WRAP_CLIENTSERVER__", 0);
+
   /* get command-line args and parse the header file */
   fileInfo = vtkParse_Main(argc, argv);
 
   /* get the command-line options */
   options = vtkParse_GetCommandLineOptions();
+
+  /* get the hierarchy info for accurate typing */
+  if (options->HierarchyFileName)
+  {
+    hierarchyInfo = vtkParseHierarchy_ReadFile(options->HierarchyFileName);
+  }
 
   /* get the output file */
   fp = fopen(options->OutputFileName, "w");
@@ -1291,22 +1300,14 @@ int main(int argc, char* argv[])
     }
   }
 
-  /* get the hierarchy info for accurate typing */
-  if (options->HierarchyFileName)
-  {
-    hierarchyInfo = vtkParseHierarchy_ReadFile(options->HierarchyFileName);
-    if (hierarchyInfo)
-    {
-      /* resolve using declarations within the header files */
-      vtkWrap_ApplyUsingDeclarations(data, fileInfo, hierarchyInfo);
-
-      /* expand typedefs */
-      vtkWrap_ExpandTypedefs(data, fileInfo, hierarchyInfo);
-    }
-  }
-
   if (hierarchyInfo)
   {
+    /* resolve using declarations within the header files */
+    vtkWrap_ApplyUsingDeclarations(data, fileInfo, hierarchyInfo);
+
+    /* expand typedefs */
+    vtkWrap_ExpandTypedefs(data, fileInfo, hierarchyInfo);
+
     if (!vtkWrap_IsTypeOf(hierarchyInfo, data->Name, "vtkObjectBase"))
     {
       output_DummyInitFunction(fp, fileInfo->FileName);
