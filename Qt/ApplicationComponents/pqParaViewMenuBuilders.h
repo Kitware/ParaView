@@ -101,7 +101,7 @@ public:
   * Builds the context menu shown over the pipeline browser for some common
   * pipeline operations.
   */
-  static void buildPipelineBrowserContextMenu(QWidget&);
+  static void buildPipelineBrowserContextMenu(QMenu& menu);
 
   /**
   * Builds and adds all standard ParaView toolbars.

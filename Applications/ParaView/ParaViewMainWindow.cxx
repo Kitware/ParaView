@@ -263,7 +263,8 @@ ParaViewMainWindow::ParaViewMainWindow()
   pqParaViewMenuBuilders::buildCatalystMenu(*this->Internals->menu_Catalyst);
 
   // setup the context menu for the pipeline browser.
-  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(*this->Internals->pipelineBrowser);
+  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(
+    *this->Internals->pipelineBrowser->contextMenu());
 
   pqParaViewMenuBuilders::buildToolbars(*this);
 

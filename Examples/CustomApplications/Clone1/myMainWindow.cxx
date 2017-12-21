@@ -78,7 +78,8 @@ myMainWindow::myMainWindow()
   pqParaViewMenuBuilders::buildToolsMenu(*this->Internals->menuTools);
 
   // setup the context menu for the pipeline browser.
-  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(*this->Internals->pipelineBrowser);
+  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(
+    *this->Internals->pipelineBrowser->contextMenu());
 
   pqParaViewMenuBuilders::buildToolbars(*this);
 

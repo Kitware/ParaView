@@ -15,7 +15,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item row="0" column="0">
@@ -29,7 +38,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -94,7 +103,7 @@
    </attribute>
    <widget class="pqPipelineBrowserWidget" name="pipelineBrowser">
     <property name="contextMenuPolicy">
-     <enum>Qt::ActionsContextMenu</enum>
+     <enum>Qt::DefaultContextMenu</enum>
     </property>
    </widget>
   </widget>
@@ -149,12 +158,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqViewManager</class>
-   <extends>QWidget</extends>
-   <header>pqViewManager.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>pqPVAnimationWidget</class>
    <extends>QWidget</extends>
    <header>pqPVAnimationWidget.h</header>
@@ -181,6 +184,12 @@
    <class>pqPropertiesPanel</class>
    <extends>QWidget</extends>
    <header>pqPropertiesPanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqViewManager</class>
+   <extends>QWidget</extends>
+   <header>pqViewManager.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

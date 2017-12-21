@@ -525,7 +525,6 @@ set (Module_UI_FILES
   Resources/UI/pqImplicitPlanePropertyWidget.ui
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
-  Resources/UI/pqPipelineBrowserContextMenu.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui

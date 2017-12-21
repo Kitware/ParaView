@@ -116,7 +116,7 @@
    </attribute>
    <widget class="pqPipelineBrowserWidget" name="pipelineBrowser">
     <property name="contextMenuPolicy">
-     <enum>Qt::ActionsContextMenu</enum>
+     <enum>Qt::DefaultContextMenu</enum>
     </property>
    </widget>
   </widget>
