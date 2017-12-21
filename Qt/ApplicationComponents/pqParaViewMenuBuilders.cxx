@@ -188,12 +188,13 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWind
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow)
+void pqParaViewMenuBuilders::buildFiltersMenu(
+  QMenu& menu, QMainWindow* mainWindow, bool hideDisabled)
 {
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewFilters");
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
-  pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr);
+  pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
   pqPVApplicationCore* appCore = pqPVApplicationCore::instance();
   appCore->registerForQuicklaunch(mgr->widgetActionsHolder());
 
@@ -403,7 +404,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   menu.addAction(actionPBPaste);
   menu.addAction(actionPBChangeInput);
   QMenu* addFilterMenu = menu.addMenu("Add Filter");
-  pqParaViewMenuBuilders::buildFiltersMenu(*addFilterMenu);
+  pqParaViewMenuBuilders::buildFiltersMenu(*addFilterMenu, nullptr, true /*hide disabled*/);
   menu.addAction(actionPBReloadFiles);
   menu.addAction(actionPBIgnoreTime);
   menu.addAction(actionPBDelete);

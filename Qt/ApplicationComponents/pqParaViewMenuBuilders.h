@@ -69,7 +69,7 @@ public:
   * If you want to automatically add toolbars for filters as requested in the
   * configuration pass in a non-null main window.
   */
-  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0);
+  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0, bool hideDisabled = false);
 
   /**
   * Builds the "Tools" menu.
