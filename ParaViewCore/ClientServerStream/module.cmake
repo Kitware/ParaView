@@ -15,7 +15,6 @@ vtk_module(vtkClientServer
   TEST_DEPENDS
     vtkCommonCore
     vtkTestingCore
-  EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW
   KIT
