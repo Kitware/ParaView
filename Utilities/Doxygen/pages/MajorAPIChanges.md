@@ -78,6 +78,17 @@ deprecated and will be removed in future. Use
 `vtkSMParaViewPipelineControllerWithRendering` to show/hide data in views
 instead of `pqDisplayPolicy`.
 
+###Changes to pqParaViewMenuBuilders###
+
+The signature of `pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget&)`
+has changed to `pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu&)` and
+now requires a `QMenu` to populate rather than populating the implicitly created context
+menu in a widget.
+
+Note that the `contextMenuPolicy` set in the widget providing the context menu must be
+set to `Qt::DefaultContextMenu` for the context menu to appear. in `pqPipelineBrowserWidget`,
+this used to be set to `Qt::ActionsContextMenu`.
+
 Changes in 5.4
 --------------
 

@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFiltersMenuReaction : public QObject
   typedef QObject Superclass;
 
 public:
-  pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager);
+  pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager, bool hideDisabledActions = false);
 
 public slots:
   /**
@@ -82,6 +82,7 @@ private:
 
   pqTimer Timer;
   bool IsDirty;
+  bool HideDisabledActions;
 };
 
 #endif

@@ -121,8 +121,10 @@ QString getDomainDisplayText(vtkSMDomain* domain, vtkSMInputProperty*)
 }
 
 //-----------------------------------------------------------------------------
-pqFiltersMenuReaction::pqFiltersMenuReaction(pqProxyGroupMenuManager* menuManager)
+pqFiltersMenuReaction::pqFiltersMenuReaction(
+  pqProxyGroupMenuManager* menuManager, bool hideDisabledActions)
   : Superclass(menuManager)
+  , HideDisabledActions(hideDisabledActions)
 {
   QObject::connect(&this->Timer, SIGNAL(timeout()), this, SLOT(setEnableStateDirty()));
   this->Timer.setInterval(10);
@@ -233,6 +235,10 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
     if (!prototype || !enabled)
     {
       action->setEnabled(false);
+      if (this->HideDisabledActions)
+      {
+        action->setVisible(false);
+      }
       action->setStatusTip("Requires an input");
       continue;
     }
@@ -245,6 +251,10 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       // Skip single process filters when running in multiprocesses and vice
       // versa.
       action->setEnabled(false);
+      if (this->HideDisabledActions)
+      {
+        action->setVisible(false);
+      }
       if (numProcs > 1)
       {
         action->setStatusTip("Not supported in parallel");
@@ -263,6 +273,10 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       if (!input->GetMultipleInput() && outputPorts.size() > 1)
       {
         action->setEnabled(false);
+        if (this->HideDisabledActions)
+        {
+          action->setVisible(false);
+        }
         action->setStatusTip("Multiple inputs not support");
         continue;
       }
@@ -278,6 +292,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       if (input->IsInDomains(&domain))
       {
         action->setEnabled(true);
+        action->setVisible(true);
         some_enabled = true;
         const char* help = prototype->GetDocumentation()->GetShortHelp();
         action->setStatusTip(help ? help : "");
@@ -285,6 +300,10 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       else
       {
         action->setEnabled(false);
+        if (this->HideDisabledActions)
+        {
+          action->setVisible(false);
+        }
         // Here we need to go to the domain that returned false and find out why
         // it said the domain criteria wasn't met.
         action->setStatusTip(::getDomainDisplayText(domain, input));
