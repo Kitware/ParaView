@@ -1,9 +1,5 @@
+from paraview import coprocessing, servermanager
 
-try: paraview.simple
-except: from paraview.simple import *
-
-from paraview import coprocessing
-import sys
 
 # ----------------------- CoProcessor definition -----------------------
 def CreateCoProcessor():
