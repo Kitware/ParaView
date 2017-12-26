@@ -8,7 +8,7 @@ approriate for co-processing.
 # for Python2 print statmements to output like Python3 print statements
 from __future__ import print_function
 from paraview import simple, servermanager
-from vtk.vtkPVVTKExtensionsCore import *
+from paraview.vtk.vtkPVVTKExtensionsCore import *
 import math
 
 # -----------------------------------------------------------------------------
@@ -322,7 +322,6 @@ class CoProcessor(object):
             # code. vtkLiveInsituLink never updates the pipeline, it
             # simply uses the data available at the end of the
             # pipeline, if any.
-            from paraview import simple
             for source in simple.GetSources().values():
                 source.UpdatePipeline(time)
 
@@ -378,8 +377,7 @@ class CoProcessor(object):
 
         # optionally print message so that people know what file string to use to open in Ensight
         if self.__PrintEnsightFormatString:
-            import paraview.servermanager as pvsm
-            pm = pvsm.vtkProcessModule.GetProcessModule()
+            pm = servermanager.vtkProcessModule.GetProcessModule()
             pid = pm.GetGlobalController().GetLocalProcessId()
             if pid == 0:
                 nump = pm.GetGlobalController().GetNumberOfProcesses()
@@ -535,15 +533,15 @@ class CoProcessor(object):
                     # -1 corresponds to the magnitude.
                     datarange = colorArrayInfo.GetComponentRange(-1)
 
-            import paraview.vtk as vtk
+            from paraview.vtk import vtkDoubleArray
             import paraview.servermanager
             pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
             globalController = pm.GetGlobalController()
-            localarray = vtk.vtkDoubleArray()
+            localarray = vtkDoubleArray()
             localarray.SetNumberOfTuples(2)
             localarray.SetValue(0, -datarange[0]) # negate so that MPI_MAX gets min instead of doing a MPI_MIN and MPI_MAX
             localarray.SetValue(1, datarange[1])
-            globalarray = vtk.vtkDoubleArray()
+            globalarray = vtkDoubleArray()
             globalarray.SetNumberOfTuples(2)
             globalController.AllReduce(localarray, globalarray, 0)
             globaldatarange = [-globalarray.GetValue(0), globalarray.GetValue(1)]
@@ -578,7 +576,6 @@ class CoProcessor(object):
             import cinema_python.adaptors.explorers as explorers
             import cinema_python.adaptors.paraview.pv_explorers as pv_explorers
             import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
-            import paraview.simple as simple
         except ImportError as e:
             import paraview
             paraview.print_error("Cannot import cinema")
