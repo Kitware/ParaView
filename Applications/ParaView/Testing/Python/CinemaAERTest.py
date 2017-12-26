@@ -8,8 +8,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
-from vtk import *
-testDir = vtk.util.misc.vtkGetTempDir()
+from paraview.vtk.util.misc import vtkGetTempDir
+testDir = vtkGetTempDir()
 import os
 
 cinemaDBFileName = os.path.join(testDir, "cinema_aer.cdb")
