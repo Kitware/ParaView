@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqEditMenuBuilder.h"
 #include "ui_pqFileMenuBuilder.h"
-#include "ui_pqPipelineBrowserContextMenu.h"
 
 #include "pqAboutDialogReaction.h"
 #include "pqAnimationTimeToolbar.h"
