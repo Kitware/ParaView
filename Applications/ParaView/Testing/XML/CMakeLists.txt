@@ -700,6 +700,7 @@ set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (UseDataPartitions_FORCE_SERIAL TRUE) # Volume rendering seems to work better in serial
 set (SaveTSV_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (DisconnectAndSaveAnimation_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 
 set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 # We don't support volume rendering of image data in data server & render server mode
