@@ -1,14 +1,14 @@
 #### import the simple module from the paraview
 from paraview.simple import *
 from paraview import smtesting
-from vtk import *
-import os
+from paraview.vtk.util.misc import vtkGetTempDir
+import os, os.path
 
 # Create a sphere and save it as a Houdini file.
 sphere = Sphere()
 Show()
 
-testDir = vtk.util.misc.vtkGetTempDir()
+testDir = vtkGetTempDir()
 
 geoFileName = os.path.join(testDir, "HoudiniWriterData.geo")
 writer = CreateWriter(geoFileName, sphere)
