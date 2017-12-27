@@ -2,9 +2,8 @@ r"""paraviewweb_wslink is the paraview-specific subclass
     of vtkweb_wslink that provides the PVWeb Application
 """
 
-from vtk.web import wslink as vtk_wslink
-from vtk.vtkParaViewWebCore import vtkPVWebApplication
-
+from vtkmodules.web import wslink as vtk_wslink
+from vtkmodules.vtkParaViewWebCore import vtkPVWebApplication
 from paraview.web import protocols as pv_protocols
 
 class PVServerProtocol(vtk_wslink.ServerProtocol):

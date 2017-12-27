@@ -901,7 +901,7 @@ def ImportCinema(filename, view=None):
     are shown in that view as indicated in the database.
     """
     try:
-        from paraview.vtk.vtkPVCinemaReader import vtkSMCinemaDatabaseImporter
+        from vtkmodules.vtkPVCinemaReader import vtkSMCinemaDatabaseImporter
     except ImportError:
         # cinema not supported in current configuration
         return False

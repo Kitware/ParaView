@@ -17,8 +17,7 @@ convenience classes in Python.
 #
 #==============================================================================
 import paraview
-from paraview import vtk
-
+from vtkmodules.vtkCommonDataModel import vtkImageData
 
 def numpy_to_image(numpy_array):
   """Convert a numpy 2D or 3D array to a vtkImageData object.
@@ -48,13 +47,13 @@ def numpy_to_image(numpy_array):
   linear_array = numpy.reshape(numpy_array, (w*h, c))
 
   try:
-    from paraview.vtk.util import numpy_support
+    from vtkmodules.util import numpy_support
   except:
-    paraview.print_error("Error: Cannot import vtk.util.numpy_support")
+    paraview.print_error("Error: Cannot import vtkmodules.util.numpy_support")
 
   vtk_array = numpy_support.numpy_to_vtk(linear_array)
 
-  image = vtk.vtkImageData()
+  image = vtkImageData()
   image.SetDimensions(w, h, 1)
   image.AllocateScalars(vtk_array.GetDataType(), 4)
   image.GetPointData().GetScalars().DeepCopy(vtk_array)

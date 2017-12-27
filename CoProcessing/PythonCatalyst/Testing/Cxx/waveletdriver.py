@@ -1,15 +1,15 @@
-import sys
+import sys, math, os.path
 if len(sys.argv) != 3:
     print("command is 'python <python driver code> <script name> <number of time steps>'")
     sys.exit(1)
-import paraview
-import paraview.vtk as vtk
-import paraview.simple as pvsimple
-import math
 
 # initialize and read input parameters
+import paraview
 paraview.options.batch = True
 paraview.options.symmetric = True
+
+from paraview.vtk import vtkPVCatalyst
+import paraview.simple as pvsimple
 
 def _refHolderMaker(obj):
     def _refHolder(obj2, string):
@@ -17,8 +17,6 @@ def _refHolderMaker(obj):
     return _refHolder
 
 def coProcess(grid, time, step, scriptname, wholeExtent):
-    from paraview.vtk import vtkPVCatalyst
-    import os
     scriptpath, scriptname = os.path.split(scriptname)
     sys.path.append(scriptpath)
     if scriptname.endswith(".py"):

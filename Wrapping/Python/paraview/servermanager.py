@@ -53,27 +53,27 @@ import paraview, re, os, os.path, types, sys, atexit
 from paraview import vtk
 from paraview import _backwardscompatibilityhelper as _bc
 
-from vtk.vtkPVServerImplementationCore import *
-from vtk.vtkPVClientServerCoreCore import *
-from vtk.vtkPVServerManagerCore import *
+from vtkmodules.vtkPVServerImplementationCore import *
+from vtkmodules.vtkPVClientServerCoreCore import *
+from vtkmodules.vtkPVServerManagerCore import *
 
 try:
-  from vtk.vtkPVServerManagerDefault import *
+  from vtkmodules.vtkPVServerManagerDefault import *
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerDefault")
 try:
-  from vtk.vtkPVServerManagerRendering import *
+  from vtkmodules.vtkPVServerManagerRendering import *
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerRendering")
 try:
-  from vtk.vtkPVServerManagerApplication import *
+  from vtkmodules.vtkPVServerManagerApplication import *
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerApplication")
 try:
-  from vtk.vtkPVAnimation import *
+  from vtkmodules.vtkPVAnimation import *
 except:
   paraview.print_error("Error: Cannot import vtkPVAnimation")
-from vtk.vtkPVCommon import *
+from vtkmodules.vtkPVCommon import *
 
 def _wrap_property(proxy, smproperty):
     """ Internal function.
@@ -2952,7 +2952,7 @@ def demo3():
     probes it with a line, delivers the result to the client using Fetch
     and plots it using pylab. This demo requires numpy and pylab installed.
     It returns a tuple of (data, render view)."""
-    from paraview.vtk.util import numpy_support
+    from vtkmodules.util import numpy_support
     import pylab
 
     if not ActiveConnection:

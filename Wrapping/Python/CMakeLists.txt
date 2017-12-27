@@ -35,71 +35,15 @@ if (NOT PARAVIEW_ENABLE_PYTHON)
   return()
 endif()
 
-# Copy generated module files from VTK into place in the build tree
-set(_vtkpy_modules vtk_python_package)
-if (TARGET vtkWebPythonCommon)
-  list(APPEND _vtkpy_modules vtkWebPythonCommon)
-endif()
-
 #------------------------------------------------------------------------------
 # Build paraview package.
 # This will also all install rules to install the `paraview` package.
 vtk_python_package(pvpython_pyc paraview DEPENDS ${_vtkpy_modules})
 
-#------------------------------------------------------------------------------
-# This crazy hack is needed to copy `vtk` package under `paraview` package while replacing the
-# `paraview/vtk/__init__.py` to avoid importing all vtk modules.
-add_custom_command(
-  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pv_copy_and_compile_py_files_complete"
-
-  COMMAND ${CMAKE_COMMAND} ARGS -E echo "emptying '.../site-packages/paraview/vtk'"
-  COMMAND ${CMAKE_COMMAND} ARGS -E remove_directory "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview/vtk"
-
-  # Copy into .../paraview/vtk.
-  # This is what scripts get when they do "import paraview.vtk".
-  COMMAND ${CMAKE_COMMAND} ARGS -E echo "copying VTKs py files to '.../site-packages/paraview/vtk'"
-  COMMAND ${CMAKE_COMMAND} ARGS -E copy_directory
-          "${VTK_BUILD_PYTHON_MODULES_DIR}/vtk"
-          "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview/vtk"
-
-  # Overlay that with paraview's customizations.
-  COMMAND ${CMAKE_COMMAND} ARGS -E echo "copy minimized __init__.py to '.../site-packages/paraview/vtk'"
-  COMMAND ${CMAKE_COMMAND} ARGS -E copy
-          "${CMAKE_CURRENT_SOURCE_DIR}/paraview/vtk/__init__.py"
-          "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview/vtk/__init__.py"
-
-  # Copy ColorMaps.xml (obsolete: we should remove this soonish)
-  COMMAND ${CMAKE_COMMAND} ARGS -E copy
-          "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.xml"
-          "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview/ColorMaps.xml"
-
-  # Touch the OUTPUT file, otherwise this command will always be dirty.
-  COMMAND ${CMAKE_COMMAND} ARGS -E touch "${CMAKE_CURRENT_BINARY_DIR}/pv_copy_and_compile_py_files_complete"
-
-  DEPENDS pvpython_pyc
-)
-
-add_custom_target(paraview_python_package
-  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pv_copy_and_compile_py_files_complete")
+add_custom_target(paraview_python_package DEPENDS pvpython_pyc)
 
 if(WIN32)
   set(_module_extension "pyd")
 else()
   set(_module_extension "so")
 endif()
-
-# The install rules added by `vtk_python_package` skip vtk.*Python.[so|pyd]
-# files. VTK has install rules to put those under the `vtk` package, but it
-# doesn't do that for the duplicate `paraview/vtk` package which we need to
-# handle explicitly here.
-install(CODE "
-  file(INSTALL DESTINATION
-      \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_PYTHON_MODULES_DIR}/paraview/vtk\"
-    TYPE DIRECTORY FILES
-      \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_PYTHON_MODULES_DIR}/vtk/\"
-    USE_SOURCE_PERMISSIONS
-    FILES_MATCHING
-    REGEX \"/vtk[^/]*[Pp]ython\\\\.${_module_extension}$\"
-    )
-  "
-  COMPONENT Runtime)

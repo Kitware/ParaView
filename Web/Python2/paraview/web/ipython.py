@@ -76,20 +76,19 @@ def ComputeNextTimeStep():
 import exceptions, traceback, logging, random, sys, threading, time, os, paraview
 
 from mpi4py import MPI
-from vtk.web import server
+from vtkmodules.web import server
 from paraview.vtk import *
-from vtk.vtkCommonCore import *
-from vtk.vtkCommonDataModel import *
-from vtk.vtkCommonExecutionModel import *
-from vtk.vtkFiltersSources import *
-from vtk.vtkParallelCore import *
-from vtk.vtkParaViewWebCore import *
-from vtk.vtkPVClientServerCoreCore import *
-from vtk.vtkPVServerManagerApplication import *
-from vtk.vtkPVServerManagerCore import *
-from vtk.vtkPVVTKExtensionsCore import *
-from vtk.vtkWebCore import *
-
+from vtkmodules.vtkCommonCore import *
+from vtkmodules.vtkCommonDataModel import *
+from vtkmodules.vtkCommonExecutionModel import *
+from vtkmodules.vtkFiltersSources import *
+from vtkmodules.vtkParallelCore import *
+from vtkmodules.vtkParaViewWebCore import *
+from vtkmodules.vtkPVClientServerCoreCore import *
+from vtkmodules.vtkPVServerManagerApplication import *
+from vtkmodules.vtkPVServerManagerCore import *
+from vtkmodules.vtkPVVTKExtensionsCore import *
+from vtkmodules.vtkWebCore import *
 from paraview.web import wamp as pv_wamp
 
 #------------------------------------------------------------------------------

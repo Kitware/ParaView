@@ -12,9 +12,10 @@ except ImportError:
     "this functionality to work. Please install numpy and try again.")
 
 import re
-import vtk
-import vtk.numpy_interface.dataset_adapter as dsa
-import vtk.numpy_interface.algorithms as algos
+import vtkmodules.numpy_interface.dataset_adapter as dsa
+import vtkmodules.numpy_interface.algorithms as algos
+from vtkmodules.vtkCommonDataModel import vtkDataObject
+from vtkmodules.util import vtkConstants
 from paraview import calculator
 
 def _create_id_array(dataobject, attributeType):
@@ -47,11 +48,11 @@ def execute(self):
     selectionNode = inputSEL.GetNode(0)
     field_type = selectionNode.GetFieldType()
     if field_type == selectionNode.CELL:
-        attributeType = vtk.vtkDataObject.CELL
+        attributeType = vtkDataObject.CELL
     elif field_type == selectionNode.POINT:
-        attributeType = vtk.vtkDataObject.POINT
+        attributeType = vtkDataObject.POINT
     elif field_type == selectionNode.ROW:
-        attributeType = vtk.vtkDataObject.ROW
+        attributeType = vtkDataObject.ROW
     else:
         raise RuntimeError ("Unsupported field attributeType %r" % field_type)
 
@@ -102,9 +103,9 @@ def execute(self):
 
         # Note: we must force the data type to VTK_SIGNED_CHAR or the array will
         # be ignored by the freeze selection operation
-        from vtk.util.numpy_support import numpy_to_vtk
-        if type(maskArray) is not vtk.numpy_interface.dataset_adapter.VTKNoneArray:
-            insidedness = numpy_to_vtk(maskArray, deep=1, array_type=vtk.VTK_SIGNED_CHAR)
+        from vtkmodules.util.numpy_support import numpy_to_vtk
+        if type(maskArray) is not dsa.VTKNoneArray:
+            insidedness = numpy_to_vtk(maskArray, deep=1, array_type=vtkConstants.VTK_SIGNED_CHAR)
             insidedness.SetName("vtkInsidedness")
             output.GetAttributes(attributeType).VTKObject.AddArray(insidedness)
     else:

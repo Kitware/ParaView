@@ -23,8 +23,8 @@ except ImportError:
             "this functionality to work. Please install numpy and try again.")
 
 from paraview import calculator
-from vtk import vtkDataObject
-from vtk.numpy_interface import dataset_adapter as dsa
+from vtkmodules.vtkCommonDataModel import vtkDataObject
+from vtkmodules.numpy_interface import dataset_adapter as dsa
 import sys # also for sys.stderr
 if sys.version_info >= (3,):
     xrange = range
@@ -140,8 +140,7 @@ def execute_on_global_data(self):
     except: pass
     expression = self.GetPrefix() if self.GetPrefix() else ""
     try:
-        import vtk
-        if type(chosen_element) is not vtk.numpy_interface.dataset_adapter.VTKNoneArray:
+        if type(chosen_element) is not dsa.VTKNoneArray:
             expression += self.GetFormat() % (chosen_element,)
     except TypeError:
         expression += chosen_element
