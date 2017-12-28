@@ -50,14 +50,14 @@ pqCollaborationEventPlayer::~pqCollaborationEventPlayer()
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationEventPlayer::waitForMaster()
+void pqCollaborationEventPlayer::waitForMaster(int ms)
 {
   pqCollaborationManager* mgr = qobject_cast<pqCollaborationManager*>(
     pqApplicationCore::instance()->manager("COLLABORATION_MANAGER"));
   // this process should just wait patiently until it becomes the master.
   while (mgr && mgr->activeCollaborationManager() && !mgr->activeCollaborationManager()->IsMaster())
   {
-    pqEventDispatcher::processEventsAndWait(500);
+    pqEventDispatcher::processEventsAndWait(ms);
   }
 }
 

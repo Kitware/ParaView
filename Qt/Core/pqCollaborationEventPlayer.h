@@ -57,7 +57,7 @@ public:
   /**
   * used to wait till the process becomes a master.
   */
-  static void waitForMaster();
+  static void waitForMaster(int ms = 500);
 
   /**
   * used to wait until there are num_connection connections.

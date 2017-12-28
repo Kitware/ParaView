@@ -234,7 +234,7 @@ void pqCommandLineOptionsBehavior::playTests()
       }
       else if (options->GetTestSlave())
       {
-        pqCollaborationEventPlayer::waitForMaster();
+        pqCollaborationEventPlayer::waitForMaster(5000);
       }
     }
 
