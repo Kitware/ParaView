@@ -2123,6 +2123,20 @@
                         property="DepthPeeling"/>
         </Hints>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetUseDepthPeelingForVolumes"
+                         default_values="1"
+                         name="DepthPeelingForVolumes"
+                         panel_visibility="never"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyLink group="settings"
+                        proxy="RenderViewSettings"
+                        property="DepthPeelingForVolumes"/>
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetMaximumNumberOfPeels"
                          default_values="4"
                          name="MaximumNumberOfPeels"

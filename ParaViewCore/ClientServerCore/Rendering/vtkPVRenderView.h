@@ -610,6 +610,7 @@ public:
   //*****************************************************************
   // Forward to 3D renderer.
   vtkSetMacro(UseHiddenLineRemoval, bool) virtual void SetUseDepthPeeling(int val);
+  virtual void SetUseDepthPeelingForVolumes(bool val);
   virtual void SetMaximumNumberOfPeels(int val);
   virtual void SetBackground(double r, double g, double b);
   virtual void SetBackground2(double r, double g, double b);

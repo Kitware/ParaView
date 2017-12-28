@@ -416,6 +416,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->UseHiddenLineRemoval = false;
   this->GetRenderer()->SetUseDepthPeeling(1);
+  this->GetRenderer()->SetUseDepthPeelingForVolumes(1);
   this->GetRenderer()->AddCuller(this->Culler);
 
   this->LightKit = vtkLightKit::New();
@@ -2342,6 +2343,11 @@ void vtkPVRenderView::SetMaintainLuminance(int val)
 void vtkPVRenderView::SetUseDepthPeeling(int val)
 {
   this->GetRenderer()->SetUseDepthPeeling(val);
+}
+
+void vtkPVRenderView::SetUseDepthPeelingForVolumes(bool val)
+{
+  this->GetRenderer()->SetUseDepthPeelingForVolumes(val);
 }
 
 //----------------------------------------------------------------------------
