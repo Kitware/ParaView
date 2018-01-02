@@ -175,7 +175,7 @@ std::vector<std::string> createTableLayoutFromHeader(std::string& header, const 
   std::map<int, int>& columnIndexToRowId, std::map<int, std::string>& fieldCols)
 {
   // the single presumption we have is that all the properties points
-  // are continous in the header
+  // are continuous in the header
   std::vector<std::string> cols;
   cols.reserve(header.size());
   split(header, delim, cols);

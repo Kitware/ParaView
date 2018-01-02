@@ -814,7 +814,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
   info = vtkPVDataInformation::SafeDownCast(pvi);
   if (info == NULL)
   {
-    vtkErrorMacro("Cound not cast object to data information.");
+    vtkErrorMacro("Could not cast object to data information.");
     return;
   }
 

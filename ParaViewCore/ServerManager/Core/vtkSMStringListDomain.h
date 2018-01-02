@@ -45,7 +45,7 @@ public:
 
   /**
    * Returns true if the value of the property is in the domain.
-   * The propery has to be a vtkSMStringVectorProperty. If all
+   * The property has to be a vtkSMStringVectorProperty. If all
    * vector values are in the domain, it returns 1. It returns
    * 0 otherwise.
    */

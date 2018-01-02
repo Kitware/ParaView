@@ -11,7 +11,7 @@ vtk_module(vtkPVServerManagerApplication
     vtksys
   COMPILE_DEPENDS
     vtkUtilitiesProcessXML
-    # this enables the necesary modules.
+    # this enables the necessary modules.
     ${PARAVIEW_DEFAULT_VTK_MODULES}
   TEST_LABELS
     PARAVIEW

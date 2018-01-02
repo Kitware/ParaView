@@ -115,7 +115,7 @@ public:
 
   /**
    * Update the VTK object on the server by pushing the values of
-   * all modifed properties (un-modified properties are ignored).
+   * all modified properties (un-modified properties are ignored).
    * If the object has not been created, it will be created first.
    */
   void UpdateVTKObjects() VTK_OVERRIDE;

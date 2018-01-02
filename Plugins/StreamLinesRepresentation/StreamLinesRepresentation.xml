@@ -168,7 +168,7 @@
           use. This transformation is concatenated with the actor's internal
           transformation, which you implicitly create through the use of
           Position, Origin, Orientation. The value is 4x4 matrix for the linear
-          tranform to use.
+          transform to use.
         </Documentation>
       </DoubleVectorProperty>
 

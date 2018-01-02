@@ -526,7 +526,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
             # Update destination directory
             dest_path = os.path.dirname(self.dataHandler.getDataAbsoluteFilePath('directory'))
 
-            # Write camera informations
+            # Write camera information
             if self.dataHandler.can_write:
                 with open(os.path.join(dest_path, "camera.json"), 'w') as f:
                     f.write(json.dumps(camPos))

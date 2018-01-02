@@ -579,7 +579,7 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>This property specifies whether the solution will be
-        transfered to the nodes of the extracted region or the
+        transferred to the nodes of the extracted region or the
         cells.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetNumberOfPartitions"
@@ -650,11 +650,11 @@
         <Documentation>This property specifies the input for this
         filter.</Documentation>
       </InputProperty>
-      <IntVectorPropery command="GetLevelRange"
+      <IntVectorProperty command="GetLevelRange"
                         default_values="0 0"
                         information_only="1"
                         name="LevelRange"
-                        number_of_elements="2"></IntVectorPropery>
+                        number_of_elements="2"></IntVectorProperty>
       <IntVectorProperty command="SetForwardUpstream"
                          default_values="0"
                          name="ForwardUpstream"
@@ -976,7 +976,7 @@
                  name="IntegrateFlowThroughSurface">
       <Documentation long_help="This filter integrates flow through a surface."
                      short_help="This filter integrates flow through a surface.">
-                     The flow integration fitler integrates the dot product of
+                     The flow integration filter integrates the dot product of
                      a point flow vector field and surface normal. It computes
                      the net flow across the 2D surface. It operates on any
                      type of dataset and produces an unstructured grid
@@ -1326,7 +1326,7 @@
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, then points will be merged
         if they are within the specified Tolerance or AbsoluteTolerance (see
-        the Tolerance and AbsoluteTolerance propertys), depending on the value
+        the Tolerance and AbsoluteTolerance properties), depending on the value
         of the ToleranceIsAbsolute property. (See the ToleranceIsAbsolute
         property.) If this property is set to 0, points will not be
         merged.</Documentation>
@@ -1818,7 +1818,7 @@ found and the point will be rejected.</Documentation>
           <Entry text="Mean"
                  value="1" />
         </EnumerationDomain>
-        <Documentation>This propery specifies which type of curvature to
+        <Documentation>This property specifies which type of curvature to
         compute.</Documentation>
       </IntVectorProperty>
       <!-- End Curvatures -->
@@ -2378,7 +2378,7 @@ type as the input.</Documentation>
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>Set whether to output results as point/cell
-        normals. Outputing as normals is only valid with vector
+        normals. Outputting as normals is only valid with vector
         results. Point or cell normals are selected using
         AttributeMode.</Documentation>
       </IntVectorProperty>
@@ -2507,7 +2507,7 @@ array.
         <DoubleRangeDomain max="180"
                            min="0"
                            name="range" />
-        <Documentation>Ths value of this property is used to define a feature
+        <Documentation>The value of this property is used to define a feature
         edge. If the surface normal between two adjacent triangles is at least
         as large as this Feature Angle, a feature edge exists. (See the
         FeatureEdges property.)</Documentation>
@@ -3152,7 +3152,7 @@ array.
         default_values="1" >
         <BooleanDomain name="bool"/>
         <Documentation>
-          If this property is off, each process executes independantly.
+          If this property is off, each process executes independently.
         </Documentation>
       </IntVectorProperty>
 
@@ -3240,7 +3240,7 @@ array.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If this property is off, each process executes
-        independantly.</Documentation>
+        independently.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetEnableMergePoints"
@@ -3333,7 +3333,7 @@ array.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If this property is off, each process executes
-        independantly.</Documentation>
+        independently.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetSkipGhostCopy"
@@ -5696,7 +5696,7 @@ array.
         >
       <BooleanDomain name="bool" />
       <Documentation>
-        This property determines whether or not to color the glyphes.
+        This property determines whether or not to color the glyphs.
       </Documentation>
     </IntVectorProperty>
 
@@ -5880,7 +5880,7 @@ array.
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             use_index="1">
-        <Documentation>This proeprty controls the maximum field error allowed
+        <Documentation>This property controls the maximum field error allowed
         at any edge midpoint in the output tessellation. The field error is
         measured as the difference between a field value at the midpoint of an
         output edge and the value of the corresponding field in the original
@@ -6953,7 +6953,7 @@ array.
         <DoubleRangeDomain max="1 1 1"
                            min="0 0 0"
                            name="range" />
-        <Documentation>Specifiy the color for the capping faces (generated on
+        <Documentation>Specify the color for the capping faces (generated on
         the clipping interface).</Documentation>
       </DoubleVectorProperty>
       <!-- End Clip -->
@@ -8459,7 +8459,7 @@ source.</Documentation>
           </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
-      <PropertyGroup label="Location Paramaters" panel_widget="InteractiveHandle">
+      <PropertyGroup label="Location Parameters" panel_widget="InteractiveHandle">
         <Property function="WorldPosition" name="Location" />
         <Property function="Input" name="Input" />
       </PropertyGroup>
@@ -9045,7 +9045,7 @@ source.</Documentation>
       <Documentation long_help="Produce evenly spaced streamlines in a 2D vector field."
                      short_help="Produce evenly spaced streamlines in a 2D vector field.">
                      This filter generates evenly spaced streamlines in a 2D
-                     vector field from a start postion. Production of
+                     vector field from a start position. Production of
                      streamlines terminates if a streamline crosses the
                      exterior boundary of the input dataset
                      (ReasonForTermination=1), an initialization issue (ReasonForTermination=2),
@@ -9057,7 +9057,7 @@ source.</Documentation>
                      (ReasonForTermination=6), a streamline formed a loop
                      (ReasonForTermination=7), and the streamline was too close to
                      other streamlines (ReasonForTermination=8). This filter
-                     operates on a 2D dataset alligned with plane XY with
+                     operates on a 2D dataset aligned with plane XY with
                      point-centered vectors aligned with plane XY.
                      The output is polygonal data containing polylines.
       </Documentation>
@@ -11164,7 +11164,7 @@ source.</Documentation>
           <Group name="filters" />
         </ProxyGroupDomain>
         <!-- Does this have any data type domain? -->
-        <Documentation>Set the input to the Geoemtry Filter.</Documentation>
+        <Documentation>Set the input to the Geometry Filter.</Documentation>
       </InputProperty>
       <IntVectorProperty animateable="0"
                          command="SetUseStrips"
@@ -11185,7 +11185,7 @@ source.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>This makes UseStrips call Modified() after changing its
-        setting to ensure that the filter's output is immediatley
+        setting to ensure that the filter's output is immediately
         changed.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
@@ -12821,7 +12821,7 @@ source.</Documentation>
       <Documentation short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid">
       vtkCompositeDataToUnstructuredGridFilter appends all vtkDataSet leaves of
       the input composite dataset to a single unstructure grid. The subtree to
-      be combined can be choosen using the SubTreeCompositeIndex. If the
+      be combined can be chosen using the SubTreeCompositeIndex. If the
       SubTreeCompositeIndex is a leaf node, then no appending is
       required.</Documentation>
       <InputProperty command="SetInputConnection"
@@ -14519,8 +14519,8 @@ source.</Documentation>
     <SourceProxy class="vtkMaterialInterfaceFilter"
                  label="Material Interface Filter"
                  name="MaterialInterfaceFilter">
-      <Documentation long_help="The Material Interface filter finds volumes in the input data containg material above a certain material fraction."
-                     short_help="The Material Interface filter finds volumes in the input data containg material above a certain material fraction.">
+      <Documentation long_help="The Material Interface filter finds volumes in the input data containing material above a certain material fraction."
+                     short_help="The Material Interface filter finds volumes in the input data containing material above a certain material fraction.">
       The Material Interface filter finds voxels inside of which a material
       fraction (or normalized amount of material) is higher than a given
       threshold. As these voxels are identified surfaces enclosing adjacent
@@ -14529,13 +14529,13 @@ source.</Documentation>
       compute various volumetric attributes such as fragment volume, mass,
       center of mass as well as volume and mass weighted averages for any of
       the fields present. Any field selected for such computation will be also
-      be coppied into the fragment surface's point data for visualization. The
+      be copied into the fragment surface's point data for visualization. The
       filter also has the ability to generate Oriented Bounding Boxes (OBB) for
       each fragment. The data generated by the filter is organized in three
       outputs. The "geometry" output, containing the fragment surfaces. The
       "statistics" output, containing a point set of the centers of mass. The
-      "obb representaion" output, containing OBB representations (poly data).
-      All computed attributes are coppied into the statistics and geometry
+      "obb representation" output, containing OBB representations (poly data).
+      All computed attributes are copied into the statistics and geometry
       output. The obb representation output is used for validation and
       debugging puproses and is turned off by default. To measure the size of
       craters, the filter can invert a volume fraction and clip the volume
@@ -14674,7 +14674,7 @@ source.</Documentation>
           <NoDefault />
         </Hints>
         <Documentation>For arrays selected a volume weighted average is
-        computed. The values of these arrays are also coppied into fragment
+        computed. The values of these arrays are also copied into fragment
         geometry cell data as the fragment surfaces are
         generated.</Documentation>
       </StringVectorProperty>
@@ -14697,7 +14697,7 @@ source.</Documentation>
           <NoDefault />
         </Hints>
         <Documentation>For arrays selected a mass weighted average is computed.
-        These arrays are also coppied into fragment geometry cell data as the
+        These arrays are also copied into fragment geometry cell data as the
         fragment surfaces are generated.</Documentation>
       </StringVectorProperty>
       <!-- do not remove -->
@@ -14731,7 +14731,7 @@ source.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Compute Object Oriented Bounding boxes (OBB). When
-        active the result of this computation is coppied into the statistics
+        active the result of this computation is copied into the statistics
         output. In the case that the filter is built in its validation mode,
         the OBB's are rendered.</Documentation>
       </IntVectorProperty>
@@ -14764,8 +14764,8 @@ source.</Documentation>
                             number_of_elements="1">
         <Documentation>This property specifies the base including path of where
         to write the statistics and gemoetry output text files. It follows the
-        pattern "/path/to/folder/and/file" here file has no extention, as the
-        filter will generate a unique extention.</Documentation>
+        pattern "/path/to/folder/and/file" here file has no extension, as the
+        filter will generate a unique extension.</Documentation>
       </StringVectorProperty>
       <!-- do not remove
       this is a feature that most users should not
@@ -14869,7 +14869,7 @@ source.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet" />
         </DataTypeDomain>
-        <Documentation>This input must contian fragment
+        <Documentation>This input must contain fragment
         geometry.</Documentation>
       </InputProperty>
       <InputProperty command="SetStatisticsInputConnection"
@@ -14881,7 +14881,7 @@ source.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet" />
         </DataTypeDomain>
-        <Documentation>This input must contian fragment
+        <Documentation>This input must contain fragment
         centers.</Documentation>
       </InputProperty>
       <!-- Cut functuion -->

@@ -19,7 +19,7 @@ GW_BEGIN_NAMESPACE
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_VectorStatic
- *  \brief  A vector of fixed size, with usefull operators and methods.
+ *  \brief  A vector of fixed size, with useful operators and methods.
  *  \author Gabriel Peyré 2001-09-10
  *
  *    This class is used every where ...
@@ -115,7 +115,7 @@ public:
         return (GW_Float) ::sqrt(this->SquareNorm());
     }
     /** Multiplication
-        \return The vector this multplied by \a f
+        \return The vector this multiplied by \a f
         \param f The 'v_type' to multiply the vector by.
     **/
     GW_VectorStatic operator*( v_type f ) const
@@ -237,7 +237,7 @@ public:
         return aCoords_[i];
     }
 
-    /** Normalizes the vector (lentgh = 1) */
+    /** Normalizes the vector (length = 1) */
     void Normalize()
     {
         GW_Float n = this->Norm();
@@ -340,7 +340,7 @@ public:
     /**
     * Name : GW_Vector::SetCoord
     *
-    *  \param  xy value of the 2 coordonates.
+    *  \param  xy value of the 2 coordinates.
     *  \author Gabriel Peyré 2001-09-10
     *
     *    Assign the same value to each coordonate.

@@ -116,7 +116,7 @@ public:
   //@{
   /**
    * It is possible to provide some documentation for each output port in the
-   * configuraton xml. These methods provide access to the port specific
+   * configuration xml. These methods provide access to the port specific
    * documentation, if any. If no documentation is present, these methods will
    * return 0.
    */

@@ -109,7 +109,7 @@ public:
   vtkSMProxy* FindProxy(const char* xmlgroup, const char* xmlname);
 
   /**
-   * Removes the first occurence of the \c proxy in the domain.
+   * Removes the first occurrence of the \c proxy in the domain.
    * Returns if the proxy was removed.
    */
   int RemoveProxy(vtkSMProxy* proxy);

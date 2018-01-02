@@ -464,7 +464,7 @@ int vtkMaterialInterfaceEquivalenceSet::ResolveEquivalences()
 }
 
 //============================================================================
-// Helper object to clip hexahedra wih implicit half sphere.
+// Helper object to clip hexahedra with implicit half sphere.
 class vtkMaterialInterfaceFilterHalfSphere
 {
 public:
@@ -1195,7 +1195,7 @@ public:
   // Get the block at this grid index.
   vtkMaterialInterfaceFilterBlock* GetBlock(int xIdx, int yIdx, int zIdx);
 
-  // Decription:
+  // Description:
   // Get the cell dimensions of the blocks (base extent) stored in this level.
   // We assume that all blocks are the same size.
   void GetBlockDimensions(int dims[3]);
@@ -1375,7 +1375,7 @@ vtkMaterialInterfaceFilterBlock* vtkMaterialInterfaceLevel::GetBlock(int xIdx, i
 //----------------------------------------------------------------------------
 // A class to help traverse pointers acrosss block boundaries.
 // I am keeping this class to a minimum because many are kept on the stack
-// durring recursive connect algorithm.
+// during recursive connect algorithm.
 class vtkMaterialInterfaceFilterIterator
 {
 public:
@@ -1505,7 +1505,7 @@ void vtkMaterialInterfaceFilterRingBuffer::Push(vtkMaterialInterfaceFilterIterat
 
   // Move the the next-available-slot pointer to the next space.
   ++this->Next;
-  // End of the linear buffer moves back to the begining.
+  // End of the linear buffer moves back to the beginning.
   // This makes it a ring.
   if (this->Next == this->End)
   {
@@ -1528,7 +1528,7 @@ int vtkMaterialInterfaceFilterRingBuffer::Pop(vtkMaterialInterfaceFilterIterator
   ++this->First;
   --this->Size;
 
-  // End of the linear buffer moves back to the begining.
+  // End of the linear buffer moves back to the beginning.
   // This makes it a ring.
   if (this->First == this->End)
   {
@@ -1857,7 +1857,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
 #endif
 
   // leaving this logic alone rather than moving it into the
-  // this->ClipFunction conditional because I don't know enought of the class to
+  // this->ClipFunction conditional because I don't know enough of the class to
   // know how important the Clip* ivars are ( Robert Maynard, dec 1 2010).
   if (this->ClipWithPlane || this->ClipWithSphere)
   {
@@ -1889,7 +1889,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
   this->NumberOfInputBlocks = this->GetNumberOfLocalBlocks(input);
 
   this->InputBlocks = new vtkMaterialInterfaceFilterBlock*[this->NumberOfInputBlocks];
-  // Initilize to NULL.
+  // Initialize to NULL.
   for (int blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
   {
     this->InputBlocks[blockId] = 0;
@@ -1958,7 +1958,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
       }
     }
 
-    // Expand the grid extent by 1 in all directions to accomadate ghost blocks.
+    // Expand the grid extent by 1 in all directions to accommodate ghost blocks.
     // We might have a problem with level 0 here since blockDims is not global yet.
     cumulativeExt[0] = cumulativeExt[0] / this->StandardBlockDimensions[0];
     cumulativeExt[1] = cumulativeExt[1] / this->StandardBlockDimensions[0];
@@ -2292,10 +2292,10 @@ int vtkMaterialInterfaceFilter::HasNeighbor(
         }
       }
       if (bdFlag)
-      { // Neighbor primative direction is on grid boundary.
+      { // Neighbor primitive direction is on grid boundary.
         neighbor = this->Levels[level]->GetBlock(idx[0], idx[1], idx[2]);
         if (neighbor && !neighbor->GetGhostFlag())
-        { // We found one.  Thats all we need.
+        { // We found one.  That's all we need.
           return 1;
         }
       }
@@ -2335,7 +2335,7 @@ int vtkMaterialInterfaceFilter::HasNeighbor(
           {
             neighbor = this->Levels[level]->GetBlock(ix, iy, iz);
             if (neighbor && !neighbor->GetGhostFlag())
-            { // We found one.  Thats all we need.
+            { // We found one.  That's all we need.
               return 1;
             }
           }
@@ -2370,7 +2370,7 @@ int vtkMaterialInterfaceFilter::GetNumberOfLocalBlocks(vtkNonOverlappingAMR* hbd
 // StandardBlockDimensions are the size of blocks without the extra
 // overlap layer put on by spyplot format.
 // RootSpacing is the spacing that blocks in level 0 would have.
-// GlobalOrigin is choosen so that there are no negative extents and
+// GlobalOrigin is chosen so that there are no negative extents and
 // base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAMR* input)
@@ -2404,7 +2404,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
   if (globalBoundsDa == NULL || standardBoxSizeIa == NULL || minLevelIa == NULL ||
     minLevelSpacingDa == NULL)
   {
-    // Need to figure out those informations
+    // Need to figure out this information
     int nbProcs = this->Controller->GetNumberOfProcesses();
 
     // - GlobalOrigin
@@ -2469,7 +2469,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
         // Block size
         localValue = receivedBlockSize[3 * j + i];
         globalValue = (globalValue == -1 || globalValue == localValue) ? localValue : globalValue;
-        assert("Block size must be the same accross all processes" && globalValue == localValue);
+        assert("Block size must be the same across all processes" && globalValue == localValue);
       }
 
       // Update block dimension
@@ -2514,7 +2514,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
   // TODO why is globalBounds insufficient for the globalOrigin??
   // in the examples I have looked at they come out to be the same.
   // TODO do we have a case specific where they differ??
-  // TODO why lowestOrigin is necessarilly from the block closest to
+  // TODO why lowestOrigin is necessarily from the block closest to
   // the data set origin?? We just grab the first non empty block but does that
   // guarantee closest to ds origin?? I don't think so.
 }
@@ -2525,7 +2525,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
 // StandardBlockDimensions are the size of blocks without the extra
 // overlap layer put on by spyplot format.
 // RootSpacing is the spacing that blocks in level 0 would have.
-// GlobalOrigin is choosen so that there are no negative extents and
+// GlobalOrigin is chosen so that there are no negative extents and
 // base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlappingAMR* input)
@@ -2537,7 +2537,7 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlapping
 
   // This is a big pain.
   // We have to look through all blocks to get a minimum root origin.
-  // The origin must be choosen so there are no negative indexes.
+  // The origin must be chosen so there are no negative indexes.
   // Negative indexes would require the use floor or ceiling function instead
   // of simple truncation.
   //  The origin must also lie on the root grid.
@@ -4143,7 +4143,7 @@ int vtkMaterialInterfaceFilter::ComputeDisplacementFactors(
   g[1] = -t000 - t001 + t010 + t011 - t100 - t101 + t110 + t111;
   g[0] = -t000 + t001 - t010 + t011 - t100 + t101 - t110 + t111;
   // This is unusual but it can happen with a checkerboard pattern.
-  // We should break the symetry and choose a direction ...
+  // We should break the symmetry and choose a direction ...
   // The masking should take care of this, so this case should never occur.
   // It does occur at boundaries when all voxels (even padded ones)
   // are high.
@@ -5046,7 +5046,7 @@ void vtkMaterialInterfaceFilter::FindNeighbor(int faceIdx[3], int faceLevel,
 
   // I had trouble traversing into ghost blocks that were
   // not connected to the block I wanted.
-  // I am going to define a proximity measure that is independant of
+  // I am going to define a proximity measure that is independent of
   // level.
   refDist = this->ComputeProximity(faceIdx, faceLevel, refExt, refLevel);
 
@@ -5179,9 +5179,9 @@ void vtkMaterialInterfaceFilter::FindNeighbor(int faceIdx[3], int faceLevel,
 long vtkMaterialInterfaceFilter::ComputeProximity(
   const int faceIdx[3], int faceLevel, const int ext[6], int refLevel)
 {
-  // We need a distance that is independant of level.
+  // We need a distance that is independent of level.
   // All neighbors should be no more than one level away from the faces level.
-  // Lets use 2 above for a saftey margin.
+  // Lets use 2 above for a safety margin.
   long distance = 0;
   long min;
   long max;
@@ -5490,7 +5490,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
     // the adds occur in so many places.
     if (iterator.Block->GetGhostFlag() == 0)
     {
-      // accumlate fragment volume
+      // accumulate fragment volume
       const double* dX = iterator.Block->GetSpacing();
 #ifdef USE_VOXEL_VOLUME
       double voxelVolumeFrac = dX[0] * dX[1] * dX[2];
@@ -6523,7 +6523,7 @@ void vtkMaterialInterfaceFilter::CleanLocalFragmentGeometry()
 
 //----------------------------------------------------------------------------
 // Identify fragments who are split across processes. These are always
-// generated and coppied to the output. We also may compute various
+// generated and copied to the output. We also may compute various
 // other geometric attributes here. For fragments whose geometry is
 // split across processes, localize points and compute geometric
 // attributes. eg OBB, AABB center.
@@ -6559,14 +6559,14 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
   int nLocal = static_cast<int>(resolvedFragmentIds.size());
 
   // Start by assuming that all fragment pieces
-  // are local(these are not peices but entire fragments).
+  // are local(these are not pieces but entire fragments).
   // If we are are running client-server later we search
   // for split fragments and mark them.For any remaining
   // un-marked fragments we can compute geometric attributes
   // directly.
   vector<int>& fragmentSplitMarker = this->FragmentSplitMarker[this->MaterialId];
   // intilize to (bool)0 not split. All local ops
-  // on fragments check here. It's coppied to geometry.
+  // on fragments check here. It's copied to geometry.
   fragmentSplitMarker.resize(nLocal, 0);
   //
   if (myProcId == controllingProcId)
@@ -6575,7 +6575,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       this->FragmentSplitGeometry, 1, this->NumberOfResolvedFragments, "SplitGeometry");
     // initialize to 1 (i.e. not split). This holds n-way
     // splitting data, only available on controller. It's
-    // coppied tothe stats output.
+    // copied to the stats output.
     this->FragmentSplitGeometry->FillComponent(0, 1);
   }
 
@@ -6607,7 +6607,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
     vtkMaterialInterfacePieceTransactionMatrix TM;
     TM.Initialize(this->NumberOfResolvedFragments, nProcs);
 
-    // controler receives loading information and
+    // controller receives loading information and
     // builds the transaction matrix.
     if (myProcId == controllingProcId)
     {
@@ -6689,7 +6689,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       cerr << endl;
 #endif
 
-      // Decide who needs to move and build coresponding
+      // Decide who needs to move and build corresponding
       // transaction matrix. Along the way store the geometry
       // split info (this eliminates some communication later).
       int* fragmentSplitGeometry = this->FragmentSplitGeometry->GetPointer(0);
@@ -6838,7 +6838,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
             this->Controller->Send(
               buffer.GetBuffer(), buffer.GetBufferSize(), ta.GetRemoteProc(), 2 * fragmentId);
 
-            // Recieve the remotely computed attributes
+            // Receive the remotely computed attributes
             this->Controller->Receive(
               attributeCommBuffer, nAttributeComps, ta.GetRemoteProc(), 3 * fragmentId);
             // save results
@@ -6881,7 +6881,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
               // pertaining to a single block(material)
               vtkMaterialInterfaceCommBuffer buffer;
               buffer.SizeHeader(1);
-              // recieve buffer's header
+              // receive buffer's header
               this->Controller->Receive(
                 buffer.GetHeader(), buffer.GetHeaderSize(), ta.GetRemoteProc(), fragmentId);
               // size buffer via incoming header
@@ -7098,10 +7098,10 @@ void vtkMaterialInterfaceFilter::BuildLoadingArray(vector<vtkIdType>& loadingArr
 }
 
 //----------------------------------------------------------------------------
-// Load a buffer containg the number of polys for each fragment
+// Load a buffer containing the number of polys for each fragment
 // or fragment piece that we own. Return the size in vtkIdType's
 // of the packed buffer and the buffer itself. Pass in a
-// pointer intialized to null, allocation is internal.
+// pointer initialized to null, allocation is internal.
 int vtkMaterialInterfaceFilter::PackLoadingArray(vtkIdType*& buffer)
 {
   assert("Buffer appears to have been pre-allocated." && buffer == 0);
@@ -7131,7 +7131,7 @@ int vtkMaterialInterfaceFilter::PackLoadingArray(vtkIdType*& buffer)
 
 //----------------------------------------------------------------------------
 // Given a fragment loading array that has been packed into an int array
-// unpack. The packed loading arrays are orderd locally while the unpacked
+// unpack. The packed loading arrays are ordered locally while the unpacked
 // are ordered gloabbly by fragment id. NOTE if memory is an issue you
 // could leave these locally indexed and search, rather than look up.
 //
@@ -7180,7 +7180,7 @@ int vtkMaterialInterfaceFilter::CollectGeometricAttributes(
   }
 
   // size buffer's header's in preparation for
-  // recieve. There's a buffer for each proc and
+  // receive. There's a buffer for each proc and
   // we're working with a single block(material) at a time.
   vtkMaterialInterfaceCommBuffer::SizeHeader(buffers, 1);
 
@@ -7197,7 +7197,7 @@ int vtkMaterialInterfaceFilter::CollectGeometricAttributes(
     this->Controller->Receive(
       buffers[procId].GetHeader(), buffers[procId].GetHeaderSize(), procId, thisMsgId);
     ++thisMsgId;
-    // size buffer to hold incomming attributes
+    // size buffer to hold incoming attributes
     buffers[procId].SizeBuffer();
     // receive attribute's data
     this->Controller->Receive(
@@ -7459,7 +7459,7 @@ int vtkMaterialInterfaceFilter::GatherGeometricAttributes(const int recipientPro
 // initialized with empty arrays.
 //
 // Buffers are allocated. when unpacked the attribute arrays
-// are not coppied from the buffer rather they point to
+// are not copied from the buffer rather they point to
 // the appropriate location in the buffer. The buffers should
 // be deleted by caller after arrays are not needed.
 //
@@ -7487,7 +7487,7 @@ int vtkMaterialInterfaceFilter::CollectIntegratedAttributes(
       continue;
     }
     int thisMsgId = msgBase;
-    // recieve buffer's header
+    // receive buffer's header
     this->Controller->Receive(
       buffers[procId].GetHeader(), buffers[procId].GetHeaderSize(), procId, thisMsgId);
     ++thisMsgId;
@@ -7549,7 +7549,7 @@ int vtkMaterialInterfaceFilter::ReceiveIntegratedAttributes(const int sourceProc
   buffer.SizeHeader(1);
 
   int thisMsgId = msgBase;
-  // recieve buffer's header
+  // receive buffer's header
   this->Controller->Receive(buffer.GetHeader(), buffer.GetHeaderSize(), sourceProcId, thisMsgId);
   ++thisMsgId;
   // size buffer via on incoming header
@@ -7720,7 +7720,7 @@ int vtkMaterialInterfaceFilter::BroadcastIntegratedAttributes(const int sourcePr
       this->SendIntegratedAttributes(procId);
     }
   }
-  // recieve from source
+  // receive from source
   else
   {
     this->ReceiveIntegratedAttributes(sourceProcId);
@@ -8460,7 +8460,7 @@ void vtkMaterialInterfaceFilter::ShareGhostEquivalences(
       sendMsg[0] = myProcId;
       sendMsg[1] = -1;
       this->Controller->Send(sendMsg, 8, otherProc, 722265);
-    } // End if we shoud send or receive.
+    } // End if we should send or receive.
   }   // End loop over all processes.
 }
 
@@ -9566,7 +9566,7 @@ int vtkMaterialInterfaceFilter::WriteGeometryOutputToTextFile()
 
 //----------------------------------------------------------------------------
 // Write the fragment attribute attached ot the statistics output
-// to a text file. This is roughly a csv format except that collumn headers
+// to a text file. This is roughly a csv format except that column headers
 // are written one per line follwed by the number of components per tuple.
 int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
 {
@@ -9671,7 +9671,7 @@ int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
 //============================================================================
 // Implementation of the object that computes the fraction of a box clipped
 // by a half sphere implicit funtcion.
-// The algorithm is to use a case table to contruct the clipped polyhedra.
+// The algorithm is to use a case table to construct the clipped polyhedra.
 // The case table is similar to marching cubes, but the result is a list
 // of triangles for the closed polyhedra.  We then use the projected areas
 // to compute the volume of the polyhedra (similar to mass properties filter).
@@ -9733,7 +9733,7 @@ double vtkMaterialInterfaceFilterHalfSphere::ComputeTriangleProjectionArea(
 
 //----------------------------------------------------------------------------
 // Evaluate the half sphere over a hex cell.
-// Pass in the bounds of the axis alligned hex cell, and the method returns
+// Pass in the bounds of the axis aligned hex cell, and the method returns
 // the fraction of the cell inside the half sphere.
 double vtkMaterialInterfaceFilterHalfSphere::EvaluateHalfSphereBox(double bounds[6])
 {

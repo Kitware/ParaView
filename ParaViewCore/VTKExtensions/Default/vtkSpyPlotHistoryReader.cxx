@@ -56,7 +56,7 @@ public:
   std::map<int, int> ColumnIndexToTracerId;
 
   // maps the names for each col in the header
-  // presumption is that all points are continous
+  // presumption is that all points are continuous
   // and the properties are in the same order for each point
   std::vector<std::string> Header;
 
@@ -315,7 +315,7 @@ void vtkSpyPlotHistoryReader::ConstructTableColumns(vtkTable* table)
 {
   std::vector<std::string>::const_iterator hIt;
 
-  // add in the tracer_id coloumn
+  // add in the tracer_id column
   vtkIdTypeArray* tracerIdCol = vtkIdTypeArray::New();
   tracerIdCol->SetName("TracerID");
   table->AddColumn(tracerIdCol);

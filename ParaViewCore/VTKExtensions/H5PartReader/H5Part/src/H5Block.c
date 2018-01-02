@@ -24,7 +24,7 @@
   size of the field, an error will be indicated. 
  
   \note
-  In write mode partitions are shrinked to make them non-overlaping. This 
+  In write mode partitions are shrunk to make them non-overlaping. This 
   process may shrink the partitions more than required.
 
   \note
@@ -283,7 +283,7 @@ _allgather (
 
   \internal
 
-  Get dimension sizes of block.  These informations are stored inside the
+  Get dimension sizes of block.  These information are stored inside the
   block structure.
 */
 static void
@@ -539,7 +539,7 @@ _dissolve_ghostzone (
   Ghost-zone are dissolved in the order of their magnitude, largest first.
 
   \note
-  Dissolving ghost-zones automaticaly is not trivial!  The implemented 
+  Dissolving ghost-zones automatically is not trivial!  The implemented 
   algorithmn garanties, that there are no ghost-zones left and that we
   have the same result on all processors.
   But there may be zones which are not assigned to a partition any more.

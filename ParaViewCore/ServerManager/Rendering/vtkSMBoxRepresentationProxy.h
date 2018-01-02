@@ -17,7 +17,7 @@
  * @brief   proxy for vtkBoxRepresentation
  *
  * vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
- * specialization is needed to set the tranform on the vtkBoxRepresentation.
+ * specialization is needed to set the transform on the vtkBoxRepresentation.
 */
 
 #ifndef vtkSMBoxRepresentationProxy_h

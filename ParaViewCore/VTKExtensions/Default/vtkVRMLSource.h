@@ -46,7 +46,7 @@ public:
 
   //@{
   /**
-   * Descided whether to generate color arrays or not.
+   * Decided whether to generate color arrays or not.
    */
   vtkSetMacro(Color, int);
   vtkGetMacro(Color, int);

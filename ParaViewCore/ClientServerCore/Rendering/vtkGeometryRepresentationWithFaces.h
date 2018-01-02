@@ -65,7 +65,7 @@ public:
   //@}
 
   //***************************************************************************
-  // Forwaded to vtkProperty(BackfaceProperty)
+  // Forwarded to vtkProperty(BackfaceProperty)
   void SetBackfaceAmbientColor(double r, double g, double b);
   void SetBackfaceDiffuseColor(double r, double g, double b);
   void SetBackfaceOpacity(double val);

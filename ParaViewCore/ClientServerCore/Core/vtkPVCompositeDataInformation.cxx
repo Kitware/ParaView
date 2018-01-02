@@ -268,7 +268,7 @@ void vtkPVCompositeDataInformation::CopyFromAMR(vtkUniformGridAMR* amr)
 }
 
 //----------------------------------------------------------------------------
-// Called to merge informations from two processess.
+// Called to merge information from two processes.
 void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
 {
   vtkPVCompositeDataInformation* info;
@@ -276,7 +276,7 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
   info = vtkPVCompositeDataInformation::SafeDownCast(pvi);
   if (info == NULL)
   {
-    vtkErrorMacro("Cound not cast object to data information.");
+    vtkErrorMacro("Could not cast object to data information.");
     return;
   }
 

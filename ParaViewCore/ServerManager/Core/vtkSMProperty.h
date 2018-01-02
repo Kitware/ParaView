@@ -249,7 +249,7 @@ public:
   //@{
   /**
    * If IgnoreSynchronization is set to true, this property is used to
-   * prevent that property from beeing updated when changed remotely by another
+   * prevent that property from being updated when changed remotely by another
    * collaborative client.
    */
   vtkGetMacro(IgnoreSynchronization, int);
@@ -267,7 +267,7 @@ public:
   /**
    * Properties can have one or more domains. These are assigned by
    * the proxy manager and can be used to obtain information other
-   * than given by the type of the propery and its values.
+   * than given by the type of the property and its values.
    */
   void AddDomain(const char* name, vtkSMDomain* dom);
 
@@ -422,7 +422,7 @@ public:
    * the first one returns true i.e. indicate that it can set a default value
    * and did so. Returns true if any domain can setup a default value for this
    * property. Otherwise false.
-   * vtkSMVectorProperty overrides this method to add support for settting
+   * vtkSMVectorProperty overrides this method to add support for setting
    * default values using information_property.
    */
   virtual bool ResetToDomainDefaults(bool use_unchecked_values = false);
@@ -583,8 +583,8 @@ protected:
 
   /**
    * Calls Update() on all domains contained by the property
-   * as well as all dependant domains. This is autimatically called
-   * after SetUncheckedXXX() to tell all dependant domains to
+   * as well as all dependent domains. This is automatically called
+   * after SetUncheckedXXX() to tell all dependent domains to
    * update themselves according to the new value.
    * Note that when calling Update() on domains contained by
    * this property, a NULL is passed as the argument. This is
@@ -602,7 +602,7 @@ protected:
   virtual void SaveState(
     vtkPVXMLElement* parent, const char* property_name, const char* uid, int saveDomains = 1);
   /**
-   * This method must be overiden by concrete class in order to save the real
+   * This method must be overridden by concrete class in order to save the real
    * property data
    */
   virtual void SaveStateValues(vtkPVXMLElement* propertyElement);

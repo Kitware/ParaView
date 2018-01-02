@@ -319,7 +319,7 @@ ENDMACRO()
 #   add_pqproxy(OUTIFACES OUTSRCS
 #     TYPE <pqProxy subclass name>
 #     XML_GROUP <xml group used to identify the vtkSMProxy>
-#     XML_NAME <xml name used to indentify the vtkSMProxy>
+#     XML_NAME <xml name used to identify the vtkSMProxy>
 #     ...)
 # The TYPE, XML_GROUP, and XML_NAME can be repeated to register multiple types
 # of pqProxy subclasses or reuse the same pqProxy for multiple proxy types.
@@ -682,7 +682,7 @@ ENDMACRO()
 #  PYTHON_MODULES allows you to embed python sources as modules
 #  GUI_INTERFACES is to specify which GUI plugin interfaces were implemented
 #  GUI_RESOURCES is to specify qrc files
-#  GUI_RESOURCE_FILES warns about removed behavoir
+#  GUI_RESOURCE_FILES warns about removed behavior
 #  GUI_SOURCES is to other GUI sources
 #  SOURCES is deprecated, please use SERVER_SOURCES or GUI_SOURCES
 #  REQUIRED_ON_SERVER is to specify whether this plugin should be loaded on server
@@ -1108,7 +1108,7 @@ macro(pv_process_modules)
   set (current_module_set ${VTK_MODULES_ALL})
   list(APPEND VTK_MODULES_AVAILABLE ${VTK_MODULES_ALL})
 
-  # sort the modules based on depedencies. This will endup bringing in
+  # sort the modules based on dependencies. This will endup bringing in
   # VTK-modules too. We raise errors if required VTK modules are not already
   # enabled.
   include(TopologicalSort)
@@ -1162,7 +1162,7 @@ endmacro()
 # within ParaView plugins. This is only needed when building plugins outside of
 # ParaVIew's source tree.
 macro(pv_setup_module_environment _name)
-  # Setup enviroment to build VTK modules outside of VTK source tree.
+  # Setup environment to build VTK modules outside of VTK source tree.
   set (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 
   if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)

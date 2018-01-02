@@ -2718,7 +2718,7 @@ void vtkPVRenderView::SetArrayNumberToDraw(int fieldAttributeType)
 // ----------------------------------------------------------------------------
 void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
 {
-  // Fixes issue with the background (black) when comming back from FLOATING_POINT
+  // Fixes issue with the background (black) when coming back from FLOATING_POINT
   // mode. FLOATING_POINT mode is only supported in BATCH mode and single process
   // CLIENT.
   if (this->GetUseDistributedRenderingForStillRender() &&

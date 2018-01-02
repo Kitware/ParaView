@@ -57,7 +57,7 @@ public:
 
   /**
    * Calls SaveImage(image, filename, writerName) only on process 0.
-   * Other processes will recieve the return code through a broadcast.
+   * Other processes will receive the return code through a broadcast.
    */
   static int SaveImageOnProcessZero(
     vtkImageData* image, const char* filename, const char* writerName);

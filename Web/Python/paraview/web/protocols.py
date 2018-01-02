@@ -1055,7 +1055,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         continuousInfo = rgbInfo['continuous']
         categoricalInfo = rgbInfo['categorical']
 
-        # First make sure the continous mode properties are set
+        # First make sure the continuous mode properties are set
         continuousScalars = continuousInfo['scalars']
         continuousColors = continuousInfo['colors']
 
@@ -1389,7 +1389,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         return xmlElement
 
     #--------------------------------------------------------------------------
-    # Look higher up in XML heirarchy for attributes on a property (useful if
+    # Look higher up in XML hierarchy for attributes on a property (useful if
     # a property is an exposed property).  From the documentation of vtkSMProperty,
     # the GetParent method will access the sub-proxy to which the property
     # actually belongs, if that is the case.

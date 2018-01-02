@@ -100,7 +100,7 @@ public:
   vtkPVArrayInformation* GetAttributeInformation(int attributeType);
 
   /**
-   * Mimicks data set attribute call.  Returns -1 if array (of index) is
+   * Mimics data set attribute call.  Returns -1 if array (of index) is
    * not a standard attribute.  Returns attribute type otherwise.
    */
   int IsArrayAnAttribute(int arrayIndex);

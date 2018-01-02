@@ -38,7 +38,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Returns true if the propery is a vtkSMIntVectorProperty.
+   * Returns true if the property is a vtkSMIntVectorProperty.
    * Return 0 otherwise.
    */
   int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;

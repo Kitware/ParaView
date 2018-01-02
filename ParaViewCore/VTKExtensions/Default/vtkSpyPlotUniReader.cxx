@@ -554,7 +554,7 @@ void vtkSpyPlotUniReader::PrintInformation()
     vtkDebugMacro("  Index:     " << this->MaterialFields[fieldCnt].Index);
   }
 
-  vtkDebugMacro("Cummulative number of dumps: " << this->NumberOfDataDumps);
+  vtkDebugMacro("Cumulative number of dumps: " << this->NumberOfDataDumps);
   int dump;
   for (dump = 0; dump < this->NumberOfDataDumps; ++dump)
   {
@@ -689,7 +689,7 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(
         if (outIndex >= outSize)
         {
           vtkErrorWithObjectMacro(self, "Problem doing RLD decode. "
-              << "Too much data generated. Excpected: " << outSize);
+              << "Too much data generated. Expected: " << outSize);
           return 0;
         }
         out[outIndex] = static_cast<t>(val * scale);
@@ -705,7 +705,7 @@ int vtkSpyPlotUniReaderRunLengthDataDecode(
         if (outIndex >= outSize)
         {
           vtkErrorWithObjectMacro(self, "Problem doing RLD decode. "
-              << "Too much data generated. Excpected: " << outSize);
+              << "Too much data generated. Expected: " << outSize);
           return 0;
         }
         float val;
@@ -1355,7 +1355,7 @@ int vtkSpyPlotUniReader::ReadInformation()
   }
   if (!this->FileName)
   {
-    vtkErrorMacro("FileName not specifed");
+    vtkErrorMacro("FileName not specified");
     return 0;
   }
   ifstream ifs(this->FileName, ios::binary | ios::in);

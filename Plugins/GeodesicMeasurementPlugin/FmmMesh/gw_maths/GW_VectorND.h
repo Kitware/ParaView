@@ -69,7 +69,7 @@ public:
     /**
     * Name : GW_VectorND::operator
     *
-    *  \param  f Rigth hand statement
+    *  \param  f Right hand statement
     *  \return the vector scaled.
     *  \author Gabriel Peyré 2001-09-29
     */
@@ -213,7 +213,7 @@ public:
     /**
     * Name : GW_VectorND::+=
     *
-    *  \param  v rigth hand statement.
+    *  \param  v right hand statement.
     *  \author Gabriel Peyré 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
@@ -225,7 +225,7 @@ public:
     /**
     * Name : GW_VectorND::-=
     *
-    *  \param  v rigth hand statement.
+    *  \param  v right hand statement.
     *  \author Gabriel Peyré 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
@@ -237,7 +237,7 @@ public:
     /**
     * Name : GW_VectorND::*
     *
-    *  \param  v rigth hand statement.
+    *  \param  v right hand statement.
     *    \return Dot product of the two vectOMLs.
     *  \author Gabriel Peyré 2001-09-29
     */
@@ -261,7 +261,7 @@ public:
     *  \return Infinite norm of the vector.
     *  \author Gabriel Peyré 2001-09-30
     *
-    *    The infinte norm is the maximum of the absolute value of the coordonates.
+    *    The infinite norm is the maximum of the absolute value of the coordinates.
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_VectorND::NormInf()
@@ -417,7 +417,7 @@ private:
 /**
 * Name : GW_VectorND::operator
 *
-*  \param  f Rigth hand statement
+*  \param  f Right hand statement
 *  \return the vector scaled.
 *  \author Gabriel Peyré 2001-09-29
 */

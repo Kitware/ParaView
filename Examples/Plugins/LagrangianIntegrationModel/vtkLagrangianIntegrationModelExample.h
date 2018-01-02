@@ -87,9 +87,9 @@ public:
   /**
    * Methods used by ParaView surface helper to get default
    * values for each leaf of each dataset of surface
-   * nComponents could be retrived with arrayName but is
+   * nComponents could be retrieved with arrayName but is
    * given for simplication purposes.
-   * it is your responsability to initialize all components of
+   * it is your responsibility to initialize all components of
    * defaultValues[nComponent]
    */
   virtual void ComputeSurfaceDefaultValues(const char* arrayName, vtkDataSet* dataset,
@@ -103,7 +103,7 @@ protected:
    * This method is called each time a particle interact with a surface
    * With an unrecodgnized surfaceType or SURFACE_TYPE_MODEL
    * The particle next position is already positioned exactly on the surface and
-   * position of the particle is not suposed to be changed
+   * position of the particle is not supposed to be changed
    * It is possible in this method to choose to terminate particle, alter it's variables including
    * velocity,
    * create new particle...

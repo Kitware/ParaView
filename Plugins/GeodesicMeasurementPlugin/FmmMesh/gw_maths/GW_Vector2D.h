@@ -18,7 +18,7 @@ GW_BEGIN_NAMESPACE
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_Vector2D
- *  e\brief  A 3D vector, with usefull operators and methods.
+ *  e\brief  A 3D vector, with useful operators and methods.
  *  \author Gabriel Peyré 2001-09-10
  *
  *    Just a planar vector.

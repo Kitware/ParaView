@@ -22,11 +22,11 @@ class GW_Vertex;
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_FaceIterator
- *  \brief  Iterator on a group of face surounding a vertex.
+ *  \brief  Iterator on a group of face surrounding a vertex.
  *  \author Gabriel Peyré
  *  \date   4-1-2003
  *
- *  Usefull iterator.
+ *  Useful iterator.
  */
 /*------------------------------------------------------------------------------*/
 
@@ -36,7 +36,7 @@ public:
 
     GW_FaceIterator(  GW_Face* pFace, GW_Vertex* pOrigin, GW_Vertex* pDirection, GW_U32 nNbrIncrement = 0 );
 
-    /* assignement */
+    /* assignment */
     //GW_FaceIterator& operator=( const GW_FaceIterator& it);
 
     /* evaluation */

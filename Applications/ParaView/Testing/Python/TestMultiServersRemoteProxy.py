@@ -147,4 +147,4 @@ Disconnect()
 print ("Available connections after disconnect: ", servermanager.Connections)
 
 if errors > 0:
-  raise RuntimeError ("An error occured during the execution")
+  raise RuntimeError ("An error occurred during the execution")

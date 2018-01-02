@@ -116,7 +116,7 @@ void vtkSelectionConverter::Convert(
 {
   if (global_ids)
   {
-    // At somepoint in future for effeciency reasons, we may want to bring back
+    // At somepoint in future for efficiency reasons, we may want to bring back
     // the support for converting to global ids
     vtkErrorMacro("Global id selection no longer supported.");
     return;

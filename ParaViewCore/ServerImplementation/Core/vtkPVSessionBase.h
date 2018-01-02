@@ -173,7 +173,7 @@ public:
 
   /**
    * Allow the user to fill its vtkCollection with all RemoteObject
-   * This could be usefull when you want to hold a reference to them to
+   * This could be useful when you want to hold a reference to them to
    * prevent any deletion across several method call.
    */
   virtual void GetAllRemoteObjects(vtkCollection* collection);
@@ -185,7 +185,7 @@ public:
   /**
    * Provides the next available identifier. This implementation works locally.
    * without any code distribution. To support the distributed architecture
-   * the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+   * the vtkSMSessionClient override those method to call them on the DATA_SERVER
    * vtkPVSessionBase instance.
    */
   virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
@@ -199,7 +199,7 @@ public:
   virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
 
   /**
-   * This propertie is used to discard ignore_synchronization proxy property
+   * This property is used to discard ignore_synchronization proxy property
    * when we load protobuf states.
    * Therefore, if we load any camera state while that property is true, this
    * won't affect the proxy/property state at all. It will simply remain the same.
@@ -242,7 +242,7 @@ protected:
   /**
    * Methods used to monitor if we are currently processing a server notification
    * Only vtkSMSessionClient use the flag to disable ignore_synchronization
-   * properties from beeing updated.
+   * properties from being updated.
    */
   virtual bool StartProcessingRemoteNotification();
   virtual void StopProcessingRemoteNotification(bool previousValue);

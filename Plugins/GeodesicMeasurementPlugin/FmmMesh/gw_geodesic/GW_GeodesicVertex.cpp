@@ -94,7 +94,7 @@ void GW_GeodesicVertex::AddParameterVertex( GW_VoronoiVertex& VornoiVert, GW_Flo
 // Name : GW_GeodesicVertex::GetParameterVertex
 /**
  *  \param  nNum [GW_U32] The number of the parameter.
- *  \param  rParam [GW_Float&] Retrun value : the parameter.
+ *  \param  rParam [GW_Float&] Return value : the parameter.
  *  \return [GW_VoronoiVertex*] The corresponding vertex.
  *  \author Gabriel Peyré
  *  \date   4-26-2003

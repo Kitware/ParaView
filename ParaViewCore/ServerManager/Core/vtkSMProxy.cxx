@@ -1228,7 +1228,7 @@ void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)
    * UpdatePipelineInformation(). The calling on UpdatePropertyInformation()
    * was not really buying us much as far as keeping dependent domains updated
    * was concerned, for unless UpdatePipelineInformation was called on the
-   * reader/filter, updating infor properties was not going to yeild any
+   * reader/filter, updating infor properties was not going to yield any
    * changed values. Removing this also allows for linking for info properties
    * and properties using property links.
    * A side effect of this may be that the 3DWidgets information properties wont get
@@ -1626,7 +1626,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(
     }
     else if (END_WITH_PROPERTY.find(propElement->GetName()) && propElement->GetAttribute("name"))
     {
-      // Make sure that attribute value won't get corrupted inside the comming call
+      // Make sure that attribute value won't get corrupted inside the coming call
       std::string propName = propElement->GetAttribute("name");
       this->NewProperty(propName.c_str(), propElement);
     }
@@ -2097,7 +2097,7 @@ void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locat
     this->SetGlobalID(message->global_id());
   }
 
-  // We try to extract some message informations that we might not get from
+  // We try to extract some message information that we might not get from
   // proxy definition in the XML. This is specially true in collaboration.
   if (message->HasExtension(DefinitionHeader::server_class))
   {

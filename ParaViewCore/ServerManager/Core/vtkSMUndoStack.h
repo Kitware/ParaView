@@ -90,7 +90,7 @@ protected:
   // all the sessions that have been used across that undoset.
   // (It is more than likely that only one session will be find but in case of
   // collaboration, we might want to support a set of sessions.)
-  // This is usefull when we execute the undoset to prevent automatic
+  // This is useful when we execute the undoset to prevent automatic
   // object deletion between 2 undo element calls when a proxy registration
   // is supposed to happen.
   void FillWithRemoteObjects(vtkUndoSet* undoSet, vtkCollection* collection);

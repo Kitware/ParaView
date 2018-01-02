@@ -16,7 +16,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotBlockIterator
 {
 public:
   // Description:
-  // Initialize the iterator with informations about processors,
+  // Initialize the iterator with information about processors,
   // files and timestep.
   virtual void Init(int numberOfProcessors, int processorId, vtkSpyPlotReader* parent,
     vtkSpyPlotReaderMap* fileMap, int currentTimeStep);

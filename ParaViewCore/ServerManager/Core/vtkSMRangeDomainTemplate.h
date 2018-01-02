@@ -68,7 +68,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Returns true if the value of the properyy is in the domain.
+   * Returns true if the value of the propertyy is in the domain.
    * If all vector values are in the domain, it returns 1. It returns
    * 0 otherwise. A value is in the domain if it is between (min, max).
    */

@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVTrackballRoll
- * @brief   Rolls camera arround a point.
+ * @brief   Rolls camera around a point.
  *
  * vtkPVTrackballRoll allows the user to interactively
  * manipulate the camera, the viewpoint of the scene.

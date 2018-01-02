@@ -302,7 +302,7 @@ public:
   /**
    * Calls UpdateVTKObjects() on all managed proxies.
    * If modified_only flag is set, then UpdateVTKObjects will be called
-   * only those proxies that have any properties that were modifed i.e.
+   * only those proxies that have any properties that were modified i.e.
    * not pushed to the VTK objects.
    */
   void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
@@ -558,7 +558,7 @@ public:
    * This method returns the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
   virtual const vtkSMMessage* GetFullState();
 

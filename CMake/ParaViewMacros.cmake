@@ -369,7 +369,7 @@ function(build_help_project name)
   pv_set_if_not_set(arg_FOLDER "${name}")
   pv_set_if_not_set(arg_DEPENDS "")
 
-  # if filename is specified, it takes precendence.
+  # if filename is specified, it takes precedence.
   # setup toc variable to refer to the TOC xml dom.
   if (DEFINED arg_TABLE_OF_CONTENTS_FILE)
     file(READ ${arg_TABLE_OF_CONTENTS_FILE} arg_TABLE_OF_CONTENTS)

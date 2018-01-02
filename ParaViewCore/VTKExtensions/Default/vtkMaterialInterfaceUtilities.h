@@ -84,7 +84,7 @@ void ClearVectorOfArrayPointers(vector<T*>& V)
   }
   V.clear();
 }
-// vector memory managment helper
+// vector memory management helper
 template <class T>
 void ResizeVectorOfVtkPointers(vector<T*>& V, int n)
 {
@@ -96,7 +96,7 @@ void ResizeVectorOfVtkPointers(vector<T*>& V, int n)
     V[i] = T::New();
   }
 }
-// vector memory managment helper
+// vector memory management helper
 template <class T>
 void ResizeVectorOfArrayPointers(vector<T*>& V, int nV, int nA)
 {
@@ -108,7 +108,7 @@ void ResizeVectorOfArrayPointers(vector<T*>& V, int nV, int nA)
     V[i] = new T[nA];
   }
 }
-// vector memory managment helper
+// vector memory management helper
 template <class T>
 void ResizeVectorOfVtkArrayPointers(vector<T*>& V, int nComps, vtkIdType nTups, string name, int nv)
 {
@@ -123,20 +123,20 @@ void ResizeVectorOfVtkArrayPointers(vector<T*>& V, int nComps, vtkIdType nTups, 
     V[i]->SetName(name.c_str());
   }
 }
-// vector memory managment helper
+// vector memory management helper
 template <class T>
 void ResizeVectorOfVtkArrayPointers(vector<T*>& V, int nComps, int nv)
 {
   ResizeVectorOfVtkArrayPointers(V, nComps, 0, "", nv);
 }
-// vector memory managment helper
+// vector memory management helper
 template <class T>
 void ResizeVectorOfVtkArrayPointers(vector<T*>& V, int nComps, int nTups, int nv)
 {
   ResizeVectorOfVtkArrayPointers(V, nComps, nTups, "", nv);
 }
 
-// vtk object memory managment helper
+// vtk object memory management helper
 template <class T>
 inline void ReNewVtkPointer(T*& pv)
 {
@@ -146,7 +146,7 @@ inline void ReNewVtkPointer(T*& pv)
   }
   pv = T::New();
 }
-// vtk object memory managment helper
+// vtk object memory management helper
 template <class T>
 inline void NewVtkArrayPointer(T*& pv, int nComps, vtkIdType nTups, std::string name)
 {
@@ -155,7 +155,7 @@ inline void NewVtkArrayPointer(T*& pv, int nComps, vtkIdType nTups, std::string 
   pv->SetNumberOfTuples(nTups);
   pv->SetName(name.c_str());
 }
-// vtk object memory managment helper
+// vtk object memory management helper
 template <class T>
 inline void ReNewVtkArrayPointer(T*& pv, int nComps, vtkIdType nTups, std::string name)
 {
@@ -165,13 +165,13 @@ inline void ReNewVtkArrayPointer(T*& pv, int nComps, vtkIdType nTups, std::strin
   }
   NewVtkArrayPointer(pv, nComps, nTups, name);
 }
-// vtk object memory managment helper
+// vtk object memory management helper
 template <class T>
 inline void ReNewVtkArrayPointer(T*& pv, std::string name)
 {
   ReNewVtkArrayPointer(pv, 1, 0, name);
 }
-// vtk object memory managment helper
+// vtk object memory management helper
 template <class T>
 inline void ReleaseVtkPointer(T*& pv)
 {
@@ -179,7 +179,7 @@ inline void ReleaseVtkPointer(T*& pv)
   pv->Delete();
   pv = 0;
 }
-// vtk object memory managment helper
+// vtk object memory management helper
 template <class T>
 inline void CheckAndReleaseVtkPointer(T*& pv)
 {
@@ -190,7 +190,7 @@ inline void CheckAndReleaseVtkPointer(T*& pv)
   pv->Delete();
   pv = 0;
 }
-// memory managment helper
+// memory management helper
 template <class T>
 inline void CheckAndReleaseArrayPointer(T*& pv)
 {
@@ -201,7 +201,7 @@ inline void CheckAndReleaseArrayPointer(T*& pv)
   delete[] pv;
   pv = 0;
 }
-// memory managment helper
+// memory management helper
 template <class T>
 inline void CheckAndReleaseCArrayPointer(T*& pv)
 {

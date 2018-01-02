@@ -45,7 +45,7 @@ public:
   void LoadDefaultMaterials();
 
   /**
-   * Reads and specifed materials.
+   * Reads and specified materials.
    */
   void LoadMaterials(const char*);
 

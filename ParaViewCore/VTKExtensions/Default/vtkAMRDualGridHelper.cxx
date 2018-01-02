@@ -66,7 +66,7 @@ static const int DEGENERATE_REGION_TAG = 879015;
 #if 1
 namespace
 {
-// A convienience class for marking the start and end of a function (or any
+// A convenience class for marking the start and end of a function (or any
 // scope).  Simply declare the class at the start of the function and it will
 // automatically call vtkTimerLog::MarkStartEvent() at the beginning and
 // vtkTimerLog::MarkEndEvent() whenever it leaves regardless of where that
@@ -119,7 +119,7 @@ public:
   vtkAMRDualGridHelperLevel();
   ~vtkAMRDualGridHelperLevel();
 
-  // Level is stored implicitely in the Helper,
+  // Level is stored implicitly in the Helper,
   // but it can't hurn to have it here too.
   int Level;
 
@@ -278,7 +278,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::GetGridBlock(int x, int y,
 
 //----------------------------------------------------------------------------
 // This method is meant to be called after all the blocks are created and
-// in their level grids.  It shoud also be called after FindExistingFaces
+// in their level grids.  It should also be called after FindExistingFaces
 // is called for this level, but before FindExisitngFaces is called for
 // higher levels.
 void vtkAMRDualGridHelperLevel::CreateBlockFaces(
@@ -953,7 +953,7 @@ void vtkAMRDualGridHelper::CreateFaces()
   int* ext;
   int level, x, y, z;
   vtkAMRDualGridHelperBlock** blockPtr;
-  // Start witht the low levels.
+  // Start with the low levels.
   for (level = 0; level < this->GetNumberOfLevels(); ++level)
   {
     blockPtr = this->Levels[level]->Grid;
@@ -991,7 +991,7 @@ void vtkAMRDualGridHelper::FindExistingFaces(
   int levelDifference;
   int ext[6];
   int ext2[6]; // Extent of grid in lower level.
-  int ext3[6]; // Convert ext back to orginal level
+  int ext3[6]; // Convert ext back to orignal level
   ext[0] = x;
   ext[1] = x + 1;
   ext[2] = y;
@@ -1084,7 +1084,7 @@ void vtkAMRDualGridHelper::AssignSharedRegions()
     ext = this->Levels[level]->GridExtent;
     // Loop through all blocks in the grid.
     // If blocks remembered their grid location, this would be easier.
-    // Blocks now remeber there grid xyz locations but it is good that we
+    // Blocks now remember there grid xyz locations but it is good that we
     // loop over the grid.  I assume that every process visits
     // to blocks in the same order.  The 1-d block array may
     // not have the same order on all processes, but this
@@ -1156,7 +1156,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(vtkAMRDualGridHelperBlock* bloc
   int ii;
   int ext1[6]; // Point extent of the single block
   int ext2[6]; // Point extent of block in lower level.
-  int ext3[6]; // Extent2 converted back to orginal level.
+  int ext3[6]; // Extent2 converted back to orignal level.
 
   ext1[0] = blockX;
   ext1[1] = blockX + 1;
@@ -1230,7 +1230,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(vtkAMRDualGridHelperBlock* bloc
               // So computation of distance is not correct.
               if (neighborBlock)
               {
-                // Mark this face of the block as non boudary.
+                // Mark this face of the block as non boundary.
                 if (ix == -1 && iy == 0 && iz == 0)
                 { // Turn off the -x boundary bit.
                   block->BoundaryBits = block->BoundaryBits & 62;
@@ -1390,7 +1390,7 @@ void vtkAMRDualGridHelper::DegenerateRegionMessageSize(
 
   // Note: In order to minimize communication, I am rellying heavily on the fact
   // that the queue will be the same on all processes.  Message/region lengths
-  // are computed implicitely.
+  // are computed implicitly.
 
   std::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
   for (region = this->DegenerateRegionQueue.begin(); region != this->DegenerateRegionQueue.end();
@@ -1744,7 +1744,8 @@ const void* vtkDualGridHelperCopyMessageToBlock(vtkDataArray* ptr, const T* mess
           messageExt[0];
         if (hackLevelFlag)
         { // When generalizing I forgot that levels get an extra increment here.
-          // Mybe it woudl be better if the level diff was relative to the block level!!!!  Oh well.
+          // Maybe it would be better if the level diff was relative to the block level!!!!  Oh
+          // well.
           // It is too late to make that change. Just pass in a special case.
           ptr->SetTuple1(xIndex, messagePtr[lx + ly * messageIncY + lz * messageIncZ] + levelDiff);
         }
@@ -2240,7 +2241,7 @@ void vtkAMRDualGridHelper::FinishDegenerateRegionsCommMPIAsynchronous(bool hackL
 // StandardBlockDimensions are the size of blocks without the extra
 // overlap layer put on by spyplot format.
 // RootSpacing is the spacing that blocks in level 0 would have.
-// GlobalOrigin is choosen so that there are no negative extents and
+// GlobalOrigin is chosen so that there are no negative extents and
 // base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 // The array name is the cell array that is being processed by the filter.
@@ -2695,7 +2696,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
 {
   // This is a big pain.
   // We have to look through all blocks to get a minimum root origin.
-  // The origin must be choosen so there are no negative indexes.
+  // The origin must be chosen so there are no negative indexes.
   // Negative indexes would require the use floor or ceiling function instead
   // of simple truncation.
   //  The origin must also lie on the root grid.

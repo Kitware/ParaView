@@ -713,7 +713,7 @@ void vtkPVXMLElement::CopyTo(vtkPVXMLElement* other)
   other->AddCharacterData(
     this->Internal->CharacterData.c_str(), static_cast<int>(this->Internal->CharacterData.size()));
 
-  // Copy recursivly
+  // Copy recursively
   vtkPVXMLElementInternals::VectorOfElements::iterator iter;
   for (iter = this->Internal->NestedElements.begin(); iter != this->Internal->NestedElements.end();
        ++iter)

@@ -44,8 +44,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Returns true if the value of the propery is in the domain.
-   * The propery has to be a vtkSMIntVectorProperty. If all
+   * Returns true if the value of the property is in the domain.
+   * The property has to be a vtkSMIntVectorProperty. If all
    * vector values are in the domain, it returns 1. It returns
    * 0 otherwise.
    */

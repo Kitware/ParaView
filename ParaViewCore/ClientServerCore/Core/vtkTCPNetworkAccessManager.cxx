@@ -514,7 +514,7 @@ int vtkTCPNetworkAccessManager::AnalyzeHandshakeAndGetErrorCode(
     "^paraview-([0-9]+\\.[0-9]+)\\.(connect_id\\.([0-9]+)\\.)?renderingbackend\\.([^\\.]+)$");
   bool success = re.find(serverHS);
   // Since this regex and the server handshake are from the same version
-  // of ParaView, if it doens't match then something is very wrong.
+  // of ParaView, if it doesn't match then something is very wrong.
   if (!success)
   {
     vtkErrorMacro(

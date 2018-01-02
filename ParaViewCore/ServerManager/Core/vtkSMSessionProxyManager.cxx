@@ -790,7 +790,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(const char* name)
     iter++;
   }
 
-  // Push new state only if changed occured
+  // Push new state only if changed occurred
   if (entriesToRemove.size() > 0)
   {
     this->TriggerStateUpdate();
@@ -812,7 +812,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
     iter++;
   }
 
-  // Push new state only if changed occured
+  // Push new state only if changed occurred
   if (tuplesToRemove.size() > 0)
   {
     this->TriggerStateUpdate();
@@ -1681,7 +1681,7 @@ void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
       object->Delete();
     }
   }
-  // Remove Link that have disapeared...
+  // Remove Link that have disappeared...
   for (int i = 0; i < this->GetNumberOfLinks(); i++)
   {
     const char* currentLinkName = this->GetLinkName(i);

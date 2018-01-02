@@ -92,7 +92,7 @@ struct gw_basic_type_traits< GW_Complex<GW_Float> >
     { return (double) val.SquareModulus(); }
     static double Modulus(const GW_Complex<GW_Float>& val)
     { return (double) val.Modulus(); }
-    /** must retrun a number at random between say [0,1] */
+    /** must return a number at random between say [0,1] */
     static GW_Complex<GW_Float> Random(const GW_Complex<GW_Float>& min, const GW_Complex<GW_Float>& max)
     {
         GW_Float r = GW_RAND_RANGE(min.real(),max.real());

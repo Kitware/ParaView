@@ -152,7 +152,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
     // created before MPI_Init().
     MPI_Init(&argc, &argv);
 
-    // restore CWD to what it was before the MPI intialization.
+    // restore CWD to what it was before the MPI initialization.
     vtksys::SystemTools::ChangeDirectory(cwd.c_str());
 
     vtkProcessModule::FinalizeMPI = true;

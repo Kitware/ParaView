@@ -359,8 +359,8 @@ GW_Float GW_GeodesicMesh::ComputeVertexDistance( GW_GeodesicFace& CurrentFace, G
 #endif    // USING_ONLY_DEAD
             GW_Float dot = Edge1*Edge2;
 
-            /*    you can choose wether to use Sethian or my own derivation of the equation.
-                Basicaly, it gives the same answer up to normalization constants */
+            /*    you can choose whether to use Sethian or my own derivation of the equation.
+                Basically, it gives the same answer up to normalization constants */
             #define USE_SETHIAN
 
             /* first special case for obtuse angles */
@@ -693,7 +693,7 @@ void GW_GeodesicMesh::RegisterNewDeadVertexCallbackFunction( T_NewDeadVertexCall
  *  \author Gabriel Peyré
  *  \date   5-26-2003
  *
- *  Set wether to use or not the special handling of obtuse angles
+ *  Set whether to use or not the special handling of obtuse angles
  *  via unfolding.
  */
 /*------------------------------------------------------------------------------*/

@@ -59,7 +59,7 @@ void vtkSIDirectoryProxy::Pull(vtkSMMessage* message)
     }
   }
 
-  // Extract file informations
+  // Extract file information
   // for idx in GetNumberOfFiles
   //    name = GetFile(idx)
   //    isDir = FileIsDirectory(name)

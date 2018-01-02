@@ -98,7 +98,7 @@ GW_U32 GW_VoronoiMesh::AddFurthestPoint( T_GeodesicVertexList& VertList,GW_Geode
             GW_GeodesicVertex* pSelectedVert = GW_VoronoiMesh::FindMaxVertex( Mesh );
             GW_ASSERT( pSelectedVert!=NULL );
             VertList.push_back( pSelectedVert );
-            VertList.pop_front();    // remove random choosen vertex
+            VertList.pop_front();    // remove random chosen vertex
             Mesh.ResetGeodesicMesh();
         }
     }
@@ -446,7 +446,7 @@ void GW_VoronoiMesh::BuildMesh( GW_GeodesicMesh& Mesh, GW_Bool bFixHole )
     {
         GW_GeodesicVertex* pVert0 = *it;
         GW_ASSERT( pVert0!=NULL );
-        /* retrive the corresponding voronoi vertex */
+        /* retrieve the corresponding voronoi vertex */
         GW_VoronoiVertex* pVoronoiVert0 = GW_VoronoiMesh::GetVoronoiFromGeodesic( *pVert0 );
         GW_ASSERT( pVoronoiVert0!=NULL );
         for( IT_VoronoiVertexList itVoronoi1=pVoronoiVert0->BeginNeighborIterator(); itVoronoi1!=pVoronoiVert0->EndNeighborIterator(); ++itVoronoi1 )
@@ -996,7 +996,7 @@ void GW_VoronoiMesh::BuildGeodesicParametrization( GW_GeodesicMesh& Mesh )
                 GW_ASSERT( pGeodesicVert->GetState()==GW_GeodesicVertex::kDead );
                 if( pGeodesicVert->GetState()==GW_GeodesicVertex::kDead )
                 {
-                    /* distance alreay computed in the reverse direction : take the average */
+                    /* distance already computed in the reverse direction : take the average */
                     GW_Float rPrevDist = GeodesicDistanceMap_[nID];
                     GW_Float rNewDist = pGeodesicVert->GetDistance();
                     GeodesicDistanceMap_[nID] = GW_MIN(rPrevDist, rNewDist); //(rPrevDist+rNewDist)*0.5;

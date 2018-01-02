@@ -304,7 +304,7 @@ class vtkPVLUTReader:
   def __GetRange(self,aArray,aRangeOveride):
     """
     Get the range from an array proxy object or if
-    an overide is provided use that.
+    an override is provided use that.
     """
     nComps = aArray.GetNumberOfComponents()
     range = [0.0, 1.0]

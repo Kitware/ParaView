@@ -58,7 +58,7 @@ typedef T_VertexPathMultiMap::const_reverse_iterator CRIT_VertexPathMultiMap;
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_VoronoiMesh
- *  \brief  Iterate an algorithm wich find base vertex at Voronoy crossing points.
+ *  \brief  Iterate an algorithm which find base vertex at Voronoy crossing points.
  *  \author Gabriel Peyré
  *  \date   4-12-2003
  *
@@ -154,7 +154,7 @@ public:
         GW_GeodesicVertex* pFront_;
     };
 
-    /** intermediate variable for boundaries bulding */
+    /** intermediate variable for boundaries building */
     static T_VertexPathMultiMap BoundaryEdgeMap_;
     static void AddPathToMeshVertex( GW_GeodesicMesh& Mesh, GW_GeodesicPath& GeodesicPath, T_GeodesicVertexList& VertexPath );
 

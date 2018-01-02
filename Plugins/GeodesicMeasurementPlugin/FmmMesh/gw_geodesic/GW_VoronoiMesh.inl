@@ -773,7 +773,7 @@ GW_Float GW_VoronoiMesh::DistributeContribution( GW_Face& Face, T_FloatMap& Weig
         }
     }
 
-    /* the 3 fronts are differents *************************************************************************/
+    /* the 3 fronts are different *************************************************************************/
     GW_ASSERT( pFront[0]!=pFront[1] && pFront[1]!=pFront[2] && pFront[2]!=pFront[0] );
     GW_Vector2D inter[3];
     /* compute intersection */

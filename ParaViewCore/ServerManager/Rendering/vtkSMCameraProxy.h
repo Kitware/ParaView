@@ -35,7 +35,7 @@ public:
 
   //@{
   /**
-   * Updates all property informations by calling UpdateInformation()
+   * Updates all property information by calling UpdateInformation()
    * and populating the values.
    */
   void UpdatePropertyInformation() VTK_OVERRIDE;

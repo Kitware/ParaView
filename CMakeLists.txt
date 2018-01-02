@@ -490,7 +490,7 @@ if (NOT PARAVIEW_INSTALL_DEVELOPMENT_FILES)
   set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
 endif()
 
-# Setup Qt state. We just do a quick top level check for Qt's exisiting here.
+# Setup Qt state. We just do a quick top level check for Qt's existing here.
 # We let individual modules find_package(Qt..) as needed.
 if(PARAVIEW_ENABLE_QT_SUPPORT)
   set(PARAVIEW_QT_VERSION "5" CACHE INTERNAL "Select Qt version to 5")
@@ -645,7 +645,7 @@ set(VTK_WRAP_HIERARCHY ON
 
 #----------------------------------------------------------------------------------
 # Import all essential CMake files. Based on whether we are using internal or
-# external VTK, these modules will be imported for the appropropriate locations.
+# external VTK, these modules will be imported for the appropriate locations.
 include(vtkModuleAPI)
 include(vtkModuleMacros)
 include(ParaViewMacros)

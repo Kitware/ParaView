@@ -214,7 +214,7 @@ protected:
   vtkTable* GetLocalOutput();
 
   /**
-   * Method to be overrided to transform input data to a vtkTable.
+   * Method to be overridden to transform input data to a vtkTable.
    * The default implementation just returns the data object provided in parameter.
    */
   virtual vtkDataObject* TransformInputData(

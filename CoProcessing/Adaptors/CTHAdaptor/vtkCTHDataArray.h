@@ -267,7 +267,7 @@ protected:
   int TupleSize;
 
   void BuildFallback();
-  // A writeable version of this array, delegated.
+  // A writable version of this array, delegated.
   vtkDoubleArray* Fallback;
 
 private:

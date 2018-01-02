@@ -41,7 +41,7 @@ namespace vtkSMDataTypeDomainCache
 {
 static std::map<std::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
 
-// Only instanciate classes once and use cache after...
+// Only instantiate classes once and use cache after...
 static vtkDataObject* GetDataObjectOfType(const char* classname)
 {
   if (classname == NULL)

@@ -238,7 +238,7 @@ void vtkCommandOptionsXMLParser::HandleOption(const char** atts)
   }
   // Set name to be the next attribute
   name = atts[1];
-  // make sure Name=somthing
+  // make sure Name=something
   if (!name)
   {
     vtkErrorMacro("Bad XML Format, Name has no name.");
@@ -248,7 +248,7 @@ void vtkCommandOptionsXMLParser::HandleOption(const char** atts)
   // Now look for Value tag
   const char* valueTag = atts[2];
   const char* value = 0;
-  // if there is a value tag and it is "Vaule"
+  // if there is a value tag and it is "Value"
   if (valueTag && (strcmp(valueTag, "Value") != 0))
   {
     vtkErrorMacro("Bad XML Format missing value tag");

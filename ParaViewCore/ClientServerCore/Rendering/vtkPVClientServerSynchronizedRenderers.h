@@ -38,7 +38,7 @@ public:
   vtkTypeMacro(vtkPVClientServerSynchronizedRenderers, vtkSynchronizedRenderers);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  // Descritpion:
+  // Description:
   // This flag is set by the renderer during still renderers. When set
   // compressor must use loss-less compression. When unset compressor
   // can (if it's enabled) use lossy compression.

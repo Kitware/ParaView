@@ -93,7 +93,7 @@ if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 endif()
 
 # link enabled plugins if not building in shared library mode and
-# add dependecies to linked python modules These are non-empty only when
+# add dependencies to linked python modules These are non-empty only when
 # building statically.
 if (PARAVIEW_ENABLE_PYTHON)
   target_link_libraries(paraview 

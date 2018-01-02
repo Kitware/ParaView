@@ -47,7 +47,7 @@ public:
   //@{
   /**
    * Get/Set the location where the underlying VTK-objects are created. The
-   * value can be contructed by or-ing vtkSMSession::ServerFlags
+   * value can be constructed by or-ing vtkSMSession::ServerFlags
    */
   vtkSetMacro(Location, vtkTypeUInt32);
   vtkGetMacro(Location, vtkTypeUInt32);
@@ -88,7 +88,7 @@ public:
    * This method return the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
   virtual const vtkSMMessage* GetFullState() { return NULL; }
 
@@ -117,7 +117,7 @@ public:
   virtual void EnableLocalPushOnly();
 
   /**
-   * Enable the given remote object to communicate its state normaly to the
+   * Enable the given remote object to communicate its state normally to the
    * server location.
    */
   virtual void DisableLocalPushOnly();

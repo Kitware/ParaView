@@ -16,7 +16,7 @@
  * @class   vtkPVPythonInformation
  * @brief   Gets python features.
  *
- * Get details of python availabilty on the root server.
+ * Get details of python availability on the root server.
 */
 
 #ifndef vtkPVPythonInformation_h

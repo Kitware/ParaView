@@ -42,7 +42,7 @@ public:
   SourceToolbarActions(QObject* p);
 
 public slots:
-  /// Callback for each action triggerred.
+  /// Callback for each action triggered.
   void onAction(QAction* a);
 };
 

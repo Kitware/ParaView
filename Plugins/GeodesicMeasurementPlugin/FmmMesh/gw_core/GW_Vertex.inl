@@ -124,7 +124,7 @@ GW_Vector3D& GW_Vertex::GetNormal()
  *  \author Gabriel Peyré
  *  \date   2-15-2003
  *
- *  Texture coordonates. Should be in [O,1]
+ *  Texture coordinates. Should be in [O,1]
  */
 /*------------------------------------------------------------------------------*/
 GW_INLINE

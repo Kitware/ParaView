@@ -19,7 +19,7 @@ namespace GW {
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_Vector4D
- *  \brief  A 4D vector, with usefull operators and methods.
+ *  \brief  A 4D vector, with useful operators and methods.
  *  \author Gabriel Peyré 2001-09-10
  *
  *    This class is used every where ...

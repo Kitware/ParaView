@@ -81,7 +81,7 @@ public:
   // Description:
   // Interpolation order of the path traced through the surface mesh. A zeroth
   // order path passes through vertices of the mesh. A first order path passes
-  // in between vertices. Each point in the first order path is guarenteed to
+  // in between vertices. Each point in the first order path is guaranteed to
   // lie on an edge. Default is first order.
   vtkSetClampMacro(InterpolationOrder, int, 0, 1);
   vtkGetMacro(InterpolationOrder, int);

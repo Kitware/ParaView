@@ -2559,7 +2559,7 @@
                          name="CellLayerRight"
                          number_of_elements="1"
                          panel_visibility="never">
-        <Documentation>**DEPRECATED in ParaView 4.4.** No longer needed/suported.</Documentation>
+        <Documentation>**DEPRECATED in ParaView 4.4.** No longer needed/supported.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
@@ -3530,7 +3530,7 @@
                                    property="LimitPointCloudToBounds"
                                    value="1" />
         </Hints>
-        <Documentation>Define the spatial volume that wil restrict the
+        <Documentation>Define the spatial volume that will restrict the
         extent of the point cloud [xmin, xmax, ymin, ymax, zmin, zmax]</Documentation>
 
       </DoubleVectorProperty>
@@ -4963,7 +4963,7 @@
                      developed at Stanford University. The PLY files that
                      ParaView can read must have the elements "vertex" and
                      "face" defined. The "vertex" elements must have the
-                     propertys "x", "y", and "z". The "face" elements must have
+                     properties "x", "y", and "z". The "face" elements must have
                      the property "vertex_indices" defined. The default file
                      extension for this reader is .ply.</Documentation>
       <SubProxy>
@@ -5207,7 +5207,7 @@
       <Documentation long_help="Reads files in EnSight's Master Server format."
                      short_help="Read parallel EnSight files.">The EnSight
                      Master Server reader reads EnSight's parallel files. The
-                     master file ususally has a .sos extension and may point to
+                     master file usually has a .sos extension and may point to
                      multiple .case files. The output is a multi-block
                      dataset.</Documentation>
       <StringVectorProperty animateable="0"
@@ -7010,7 +7010,7 @@
                          name="Skip #column name fields"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <Documentation>Number of fiels to skip while reading column names.</Documentation>
+        <Documentation>Number of fields to skip while reading column names.</Documentation>
       </IntVectorProperty>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->

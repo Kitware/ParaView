@@ -205,7 +205,7 @@ protected:
   vtkIntArray* Levels;
   int TwoDimensional;
 
-  // New method of specifing blocks.
+  // New method of specifying blocks.
   double TopLevelSpacing[3];
   double TopLevelOrigin[3];
 

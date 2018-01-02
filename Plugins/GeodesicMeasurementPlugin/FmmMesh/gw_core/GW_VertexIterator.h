@@ -36,7 +36,7 @@ public:
 
     GW_VertexIterator(  GW_Face* pFace, GW_Vertex* pOrigin, GW_Vertex* pDirection, GW_Face* pPrevFace, GW_U32 nNbrIncrement = 0 );
 
-    /* assignement */
+    /* assignment */
     //GW_VertexIterator& operator=( const GW_VertexIterator& it);
 
     /* evaluation */
@@ -70,7 +70,7 @@ private:
 
 
 
-/* assignement */
+/* assignment */
 /*
 inline GW_VertexIterator& GW_VertexIterator::operator=( const GW_VertexIterator& it)
 {

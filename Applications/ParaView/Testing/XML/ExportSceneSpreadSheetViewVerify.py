@@ -36,7 +36,7 @@ with open(csv_file_name, 'r') as f:
     header_columns = header.split(',')
 
     if len(expected_columns) != len(header_columns):
-        print("Number of columns in '%s' does not match expected number of colums"
+        print("Number of columns in '%s' does not match expected number of columns"
               % csv_file_name)
         sys.exit(1)
 

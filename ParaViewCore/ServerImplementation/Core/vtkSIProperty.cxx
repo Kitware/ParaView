@@ -182,7 +182,7 @@ bool vtkSIProperty::Push(vtkSMMessage*, int)
   return this->ProcessMessage(stream);
 }
 //----------------------------------------------------------------------------
-// CAUTION: This method should only be called to retreive the cache value of the
+// CAUTION: This method should only be called to retrieve the cache value of the
 //          property.
 bool vtkSIProperty::Pull(vtkSMMessage* msg)
 {

@@ -33,7 +33,7 @@
 // Internal data structure for storing object IDs, server IDs and
 // properties. Each property has associated attributes:
 // * ModifiedFlag : has the property been modified since last update (push)
-// * DoUpdate : should the propery be updated (pushed) during UpdateVTKObjects
+// * DoUpdate : should the property be updated (pushed) during UpdateVTKObjects
 // * ObserverTag : the tag returned by AddObserver(). Used to remove the
 // observer.
 struct vtkSMProxyInternals

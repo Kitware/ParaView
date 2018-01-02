@@ -59,7 +59,7 @@ STANDARD_COLORS = blot_common.STANDARD_COLORS
 
 def _subprogram(names=[]):
     """A decorator factor that can be applied to methods to signal that the
-    method requires a specifc subprogram or subprograms.  The argument to this
+    method requires a specific subprogram or subprograms.  The argument to this
     factor method can be a single string to require a specific subpgram,
     a list of strings to require one of a set of subprograms, or if no argument
     is provided than the method is valid if any subprogram is active."""

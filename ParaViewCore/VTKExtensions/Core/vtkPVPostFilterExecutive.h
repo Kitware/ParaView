@@ -58,7 +58,7 @@ protected:
   vtkPVPostFilterExecutive();
   ~vtkPVPostFilterExecutive() override;
 
-  // Overriden to always return true
+  // Overridden to always return true
   int NeedToExecuteData(int outputPort, vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 

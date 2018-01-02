@@ -31,7 +31,7 @@ const double PI = atan(1) * 4;
 // Returns true if a < b. First it does a relative comparison between a and b
 // and returns false if they are almost equal. This does not work around 0.
 // maxDiff is DBL_EPSILON or small multiples of it.
-// For more information about floating point comparision see
+// For more information about floating point comparison see
 // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
 class FuzzyEQ
 {
@@ -121,7 +121,7 @@ void rotateAroundZDeg(double degQ, const double value[3], double r[3])
 // This function maps (lonDeg, latDeg, r) to (x,y,z) on
 // the sphere of radius r.
 // The sequence or rotations and sign were done to match the history file.
-// They use rigth coordinate system, with Z up, Y toward the screen, X to the right
+// They use right coordinate system, with Z up, Y toward the screen, X to the right
 void sphericalDegToCartesian(double v[3])
 {
   double lonDeg = v[0];

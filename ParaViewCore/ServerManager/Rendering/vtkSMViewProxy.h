@@ -139,7 +139,7 @@ public:
     const char* filename, const char* writerName, int magnificationX, int magnificationY);
 
   /**
-   * Return true any internal representation is dirty. This can be usefull to
+   * Return true any internal representation is dirty. This can be useful to
    * know if the internal geometry has changed.
    * DEPRECATED: Use GetNeedsUpdate() instead.
    */

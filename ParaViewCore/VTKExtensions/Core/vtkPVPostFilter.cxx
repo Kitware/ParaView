@@ -475,7 +475,7 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa, const char* req
   // if we still haven't found a match we will check the component against the
   // the default names.
   int numComps = array->GetNumberOfComponents();
-  // compare agianst cIndex to only run this if component names didn't match
+  // compare against cIndex to only run this if component names didn't match
   for (int i = -1; i < numComps && cIndex == -1; i++)
   {
     vtkStdString defaultName = vtkPVPostFilter::DefaultComponentName(i, numComps);

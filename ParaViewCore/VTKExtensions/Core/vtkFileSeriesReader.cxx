@@ -133,7 +133,7 @@ int vtkFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation* outInfo)
   timeRange[1] =
     (--this->RangeMap.end())->second->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[1];
 
-  // Special case: if the time range is a single value, supress it.  This is
+  // Special case: if the time range is a single value, suppress it.  This is
   // most likely from a data set that is a single file with no time anyway.
   // Even if it is not, how much value added is there for a single time value?
   if (timeRange[0] >= timeRange[1])
@@ -274,7 +274,7 @@ std::vector<double> vtkFileSeriesReaderTimeRanges::GetTimesForInput(
     allowedTimeRange[1] = vtkTypeTraits<double>::Max();
   }
 
-  // Adjust the begining time if we are the first time.
+  // Adjust the beginning time if we are the first time.
   if (this->RangeMap.find(allowedTimeRange[0]) == this->RangeMap.begin())
   {
     allowedTimeRange[0] = -vtkTypeTraits<double>::Max();
@@ -489,7 +489,7 @@ int vtkFileSeriesReader::ProcessRequest(
       return this->RequestData(request, inputVector, outputVector);
     }
 
-    // Additional processing requried by us.
+    // Additional processing required by us.
     if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()))
     {
       this->RequestUpdateExtent(request, inputVector, outputVector);

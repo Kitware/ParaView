@@ -88,7 +88,7 @@ public:
   vtkBooleanMacro(UseStrips, int);
   //@}
 
-  // Desctiption:
+  // Description:
   // Makes set use strips call modified after it changes the setting.
   void SetForceUseStrips(int);
   vtkGetMacro(ForceUseStrips, int);

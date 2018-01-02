@@ -372,7 +372,7 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
       {
         commandLine.push_back(this->PVSSHFlags[i].c_str());
       }
-      // then the paraview intialization:
+      // then the paraview initialization:
       if (this->PVSetupScript.size())
       {
         commandLine.push_back(this->PVSetupScript.c_str());
@@ -505,7 +505,7 @@ int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name
   }
   if (foundWaiting)
   {
-    cerr << "vtkSMTestDriver: " << name << " sucessfully started.\n";
+    cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
     return 1;
   }
   else
@@ -527,7 +527,7 @@ int vtkSMTestDriver::StartProcess(vtksysProcess* client, const char* name)
   vtksysProcess_Execute(client);
   if (vtksysProcess_GetState(client) == vtksysProcess_State_Executing)
   {
-    cerr << "vtkSMTestDriver: " << name << " sucessfully started.\n";
+    cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
     return 1;
   }
   else
@@ -927,7 +927,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
       mpiError = 1;
     }
-    // If client has died, we wait for output from the server processess
+    // If client has died, we wait for output from the server processes
     // for this->ServerExitTimeOut, then we'll kill the servers, if needed.
     double timeout = (clientPipe) ? 0.1 : this->ServerExitTimeOut;
 
@@ -1058,7 +1058,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   }
   if (mpiError)
   {
-    cerr << "vtkSMTestDriver: Error string found in ouput, vtkSMTestDriver returning " << mpiError
+    cerr << "vtkSMTestDriver: Error string found in output, vtkSMTestDriver returning " << mpiError
          << "\n";
     return mpiError;
   }

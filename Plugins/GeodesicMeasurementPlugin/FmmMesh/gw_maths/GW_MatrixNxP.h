@@ -628,7 +628,7 @@ public:
     /**
     *  \param  x [GW_VectorND&] solution.
     *  \param  b [GW_VectorND&] RHS.
-    *  \return [GW_Bool] Was the process sucessful ?
+    *  \return [GW_Bool] Was the process successful ?
     *  \author Gabriel Peyré
     *  \date   5-31-2003
     *

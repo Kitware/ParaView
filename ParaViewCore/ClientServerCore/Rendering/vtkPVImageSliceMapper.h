@@ -19,7 +19,7 @@
  *
  * vtkPVImageSliceMapper is a mapper for vtkImageData that renders the image by
  * loading the image as a texture and then applying it to a quad. For 3D images,
- * this mapper only shows a single Z slice which can be choosen using SetZSlice.
+ * this mapper only shows a single Z slice which can be chosen using SetZSlice.
  * By default, the image data scalars are rendering, however, this mapper
  * provides API to select another point or cell data array. Internally, this
  * mapper uses painters similar to those employed by vtkPainterPolyDataMapper.

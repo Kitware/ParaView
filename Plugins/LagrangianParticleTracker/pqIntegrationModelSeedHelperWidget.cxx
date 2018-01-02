@@ -55,7 +55,7 @@ pqIntegrationModelSeedHelperWidget::pqIntegrationModelSeedHelperWidget(
   vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
   : Superclass(smproxy, smproperty, parentObject)
 {
-  // Connect to input property, so the widget is reseted is the input is changed
+  // Connect to input property, so the widget is reset is the input is changed
   this->FlowInputProperty = vtkSMInputProperty::SafeDownCast(this->proxy()->GetProperty("Input"));
   this->VTKConnector->Connect(this->FlowInputProperty, vtkCommand::UncheckedPropertyModifiedEvent,
     this, SLOT(forceResetSeedWidget()));
@@ -87,7 +87,7 @@ void pqIntegrationModelSeedHelperWidget::forceResetSeedWidget()
 //-----------------------------------------------------------------------------
 void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
 {
-  // Avoid reseting when it is not necessary
+  // Avoid resetting when it is not necessary
   if (force || this->ModelProperty->GetUncheckedProxy(0) != this->ModelPropertyValue)
   {
     // Recover the current unchecked value, ie the value selected by the user but not yet applied

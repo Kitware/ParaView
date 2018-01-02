@@ -50,7 +50,7 @@ void pvspy_fil(char* filename, int len, char* /*runid*/, int* /*error*/)
   coProcessorData = vtkCPDataDescription::New();
   coProcessorData->AddInput("input");
 
-  // this must be initialized here because it initalizes global controller
+  // this must be initialized here because it initializes global controller
   vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
 
   vtkMultiProcessController* ctrl;

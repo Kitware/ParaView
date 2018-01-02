@@ -17,7 +17,7 @@
  * @brief   Data writer for ParaView
  *
  * vtkXMLPVDWriter is used to save all parts of a current
- * source to a file with pieces spread across ther server processes.
+ * source to a file with pieces spread across other server processes.
 */
 
 #ifndef vtkXMLPVDWriter_h

@@ -25,7 +25,7 @@ macro(cleanup_bundle app app_root libdir pluginsdir datadir)
        USE_SOURCE_PERMISSIONS)
 
   # Handle Python packages and modules.
-  # since we dont know which Python version we used to build,
+  # since we don't know which Python version we used to build,
   # let's locate the Python modules dir.
   file(GLOB python_dir "${libdir}/python*")
   if(python_dir AND IS_DIRECTORY "${python_dir}/site-packages")

@@ -43,7 +43,7 @@ pqIntegrationModelHelperWidget::pqIntegrationModelHelperWidget(
   this->setChangeAvailableAsChangeFinished(true);
 
   // Connect the IntegrationModel property to the reset slot
-  // so the widget is reseted when the model is changed.
+  // so the widget is reset when the model is changed.
   this->ModelProperty =
     vtkSMProxyProperty::SafeDownCast(this->proxy()->GetProperty("IntegrationModel"));
   this->ModelPropertyValue = this->ModelProperty->GetProxy(0);

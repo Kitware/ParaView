@@ -69,7 +69,7 @@ public:
   int Read(int isAMR, int fileVersion, vtkSpyPlotIStream* stream);
   // Advances the stream to be after the block, information w/r
   // whether the block is allocated in the time step is returned
-  // as an arguement
+  // as an argument
   static int Scan(vtkSpyPlotIStream* stream, unsigned char* isAllocated, int fileVersion);
   //@}
 
@@ -88,8 +88,8 @@ public:
     const int& downConvertVolumeFraction) const;
 
 protected:
-  // will return a negative volume if you requst a the volume of a cell
-  // that is outside the demensions of the block
+  // will return a negative volume if you request the volume of a cell
+  // that is outside the dimensions of the block
   double GetCellVolume(int i, int j, int k) const;
   void ComputeMaterialDensity(vtkIdType position, vtkDataArray* materialMasses,
     vtkUnsignedCharArray* materialFraction, vtkDoubleArray* volumes,

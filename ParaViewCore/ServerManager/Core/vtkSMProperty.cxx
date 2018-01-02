@@ -321,7 +321,7 @@ void vtkSMProperty::CreateAndSetPrettyLabel(const char* xmlname)
 const char* vtkSMProperty::CreateNewPrettyLabel(const char* xmlname)
 {
 
-  // Add space before every capital letter not preceeded by a capital letter
+  // Add space before every capital letter not preceded by a capital letter
   // or space hence:
   // "MySpace" ==> "My Space"
   // "MySPACE" ==> "My SPACE"
@@ -657,7 +657,7 @@ void vtkSMProperty::SaveState(
 //---------------------------------------------------------------------------
 void vtkSMProperty::SaveStateValues(vtkPVXMLElement* /*propertyElement*/)
 {
-  // Concreate class should overide it !!!
+  // Concreate class should override it !!!
 }
 //---------------------------------------------------------------------------
 void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement, const char* uid)

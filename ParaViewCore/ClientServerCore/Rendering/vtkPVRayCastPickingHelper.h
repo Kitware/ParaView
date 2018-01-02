@@ -73,7 +73,7 @@ public:
    */
   void ComputeIntersection();
 
-  // Descritpion:
+  // Description:
   // Provide access to the resulting intersection
   vtkGetVector3Macro(Intersection, double);
 

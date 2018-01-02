@@ -603,7 +603,7 @@ class ViewLayoutProxy(Proxy):
     def SplitViewHorizontal(self, view, fraction=0.5):
         """Split the cell containing the specified view horizontally.
         If no fraction is specified, the frame is split into equal parts.
-        On success returns a positve number that identifying the new cell
+        On success returns a positive number that identifying the new cell
         location that can be used to assign view to, or split further.
         Return -1 on failure."""
         location = self.GetViewLocation(view)
@@ -617,7 +617,7 @@ class ViewLayoutProxy(Proxy):
         """Split the cell containing the specified view horizontally.
         If no view is specified, active view is used.
         If no fraction is specified, the frame is split into equal parts.
-        On success returns a positve number that identifying the new cell
+        On success returns a positive number that identifying the new cell
         location that can be used to assign view to, or split further.
         Return -1 on failure."""
         location = self.GetViewLocation(view)
@@ -1108,7 +1108,7 @@ class ArrayListProperty(VectorProperty):
         # so that values passed in will take precedence.
         # This is needed for backward compatibility of the
         # property ElementBlocks for vtkExodusIIReader.
-        # If you attemp to change this, please verify that
+        # If you attempt to change this, please verify that
         # python state files for opening old .ex2 file (<=3.14) still works.
         for array in self.Available:
             if not values.__contains__(array):
@@ -1217,7 +1217,7 @@ class ProxyProperty(Property):
         return self.SMProperty.GetNumberOfProxies()
 
     def remove(self, proxy):
-        """Removes the first occurence of the proxy from the property."""
+        """Removes the first occurrence of the proxy from the property."""
         self.SMProperty.RemoveProxy(proxy.SMProxy)
         self._UpdateProperty()
 
@@ -2279,7 +2279,7 @@ def LoadPlugin(filename,  remote=True, connection=None):
     else:
         status = plm.LoadLocalPlugin(filename)
 
-    # shouldn't the extension check happend before attempting to load the plugin?
+    # shouldn't the extension check happen before attempting to load the plugin?
     if not status:
         raise RuntimeError ("Problem loading plugin %s" % (filename))
     else:
@@ -3098,7 +3098,7 @@ def GetAssociationAsString(val):
     raise RuntimeError ("invalid association type '%d'" % val)
 
 def GetAssociationFromString(val):
-    """Returns array association interger value from its string representation"""
+    """Returns array association integer value from its string representation"""
     global ASSOCIATIONS, _LEGACY_ASSOCIATIONS
     val = str(val).upper()
     try:
@@ -3217,7 +3217,7 @@ def GetConnectionFromId(id):
     return None
 
 def GetConnectionFromSession(session):
-    """Retuns the Connection object corresponding to a vtkSMSession instance."""
+    """Returns the Connection object corresponding to a vtkSMSession instance."""
     global Connections
     for connection in Connections:
         if connection.Session == session:

@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notice for more information.
  *
  * @par Implementation Details:
  * - All processors read the first binary file listed in the case file to get
- * informations about the fields.
+ * information about the fields.
  * - Each block of data is already surrounded by ghost cells in the file,
  * even on part of the block that don't have actual neighbor cells. The
  * reader removes those wrong ghost cells.
@@ -292,7 +292,7 @@ protected:
     vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) VTK_OVERRIDE;
 
   // Read the case file and the first binary file do get meta
-  // informations (number of files, number of fields, number of timestep).
+  // information (number of files, number of fields, number of timestep).
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 

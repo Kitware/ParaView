@@ -93,7 +93,7 @@ LoadDistributedPlugin("PacMan", True, globals())
 # Create PacMan on server2
 pacMan_s2 = PacMan()
 
-# Swtich to server1 and Create PacMan ==> This should fail
+# Switch to server1 and Create PacMan ==> This should fail
 SetActiveConnection(server1_connection, globals())
 try:
   pacMan_s1 = PacMan()
@@ -102,7 +102,7 @@ try:
 except NameError:
   print ("OK: PacMan is not available on server1")
 
-# Swtich to server2 with globals and switch back to server1 with not updating the globals
+# Switch to server2 with globals and switch back to server1 with not updating the globals
 SetActiveConnection(server2_connection, globals())
 SetActiveConnection(server1_connection)
 
@@ -131,7 +131,7 @@ LoadDistributedPlugin("PacMan", False, globals())
 pacMan_builtin = PacMan()
 print ("After loading the plugin locally in built-in, the PacMan definition is available")
 
-# Swtich to server1 and Create PacMan ==> This should fail
+# Switch to server1 and Create PacMan ==> This should fail
 SetActiveConnection(server1_connection, globals())
 try:
   pacMan_s1 = PacMan()
@@ -149,4 +149,4 @@ Disconnect()
 print ("Available connections after disconnect: ", servermanager.Connections)
 
 if errors > 0:
-  raise RuntimeError ("An error occured during the execution")
+  raise RuntimeError ("An error occurred during the execution")

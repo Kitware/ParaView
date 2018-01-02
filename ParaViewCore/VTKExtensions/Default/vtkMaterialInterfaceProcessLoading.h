@@ -53,35 +53,35 @@ public:
   }
   //@}
   /**
-   * Comparision of two objects loading.
+   * Comparison of two objects loading.
    */
   bool operator<(const vtkMaterialInterfaceProcessLoading& rhs) const
   {
     return this->Data[LOADING] < rhs.Data[LOADING];
   }
   /**
-   * Comparision of two objects loading.
+   * Comparison of two objects loading.
    */
   bool operator<=(const vtkMaterialInterfaceProcessLoading& rhs) const
   {
     return this->Data[LOADING] <= rhs.Data[LOADING];
   }
   /**
-   * Comparision of two objects loading.
+   * Comparison of two objects loading.
    */
   bool operator>(const vtkMaterialInterfaceProcessLoading& rhs) const
   {
     return this->Data[LOADING] > rhs.Data[LOADING];
   }
   /**
-   * Comparision of two objects loading.
+   * Comparison of two objects loading.
    */
   bool operator>=(const vtkMaterialInterfaceProcessLoading& rhs) const
   {
     return this->Data[LOADING] >= rhs.Data[LOADING];
   }
   /**
-   * Comparision of two objects loading.
+   * Comparison of two objects loading.
    */
   bool operator==(const vtkMaterialInterfaceProcessLoading& rhs) const
   {

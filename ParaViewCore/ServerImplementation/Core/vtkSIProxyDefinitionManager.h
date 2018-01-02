@@ -200,7 +200,7 @@ public:
     const char* groupName, int scope = ALL_DEFINITIONS);
 
   /**
-   * Desactivate the modification of the ProxyDefinitions for that given
+   * Deactivate the modification of the ProxyDefinitions for that given
    * vtkSIProxyDefinitionManager to make sure update only come from the
    * remote server and not plugin loaded on the client.
    */
@@ -263,7 +263,7 @@ protected:
    * as they allow to automatically add some extra hints for those loaded
    * definition set. This is essentially used when proxy get loaded as
    * legacy proxy don't have those expected Hints.
-   * FIXME: Once those pluging get updated, this extra hint attachement
+   * FIXME: Once those pluging get updated, this extra hint attachment
    * might be removed.
    */
   bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints);
@@ -291,7 +291,7 @@ protected:
 
   /**
    * Integrate a ProxyDefinition into another ProxyDefinition by merging them.
-   * If properties are overriden is the last property that will last. So when we build
+   * If properties are overridden is the last property that will last. So when we build
    * a merged definition hierarchy, we should start from the root and go down.
    */
   void MergeProxyDefinition(vtkPVXMLElement* element, vtkPVXMLElement* elementToFill);

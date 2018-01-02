@@ -74,14 +74,14 @@ public:
    * form:
    * @code
    * <Plugins>
-   * <Plugin name="[plugin name]" filename="[optionnal file name] auto_load="[bool]" />
+   * <Plugin name="[plugin name]" filename="[optional file name] auto_load="[bool]" />
    * ...
    * </Plugins>
    * @endcode
    * This method will process the XML, locate the plugin shared library and
    * either load the plugin or call RegisterAvailablePlugin based on the status
-   * of the auto_load flag. auto_load flag is optionnal and is 0 by default.
-   * filaname is also optionnal, if not provided this method will look in
+   * of the auto_load flag. auto_load flag is optional and is 0 by default.
+   * filaname is also optional, if not provided this method will look in
    * different place to find the plugin, eg. paraview lib dir. It will NOT look
    * in PV_PLUGIN_PATH.
    */

@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVMultiClientsInformation
- * @brief   Gets Multi-clients informations from the server.
+ * @brief   Gets Multi-clients information from the server.
  *
  * This objects is used by the client to get the number of multi-clients server
  * as well as their ids.

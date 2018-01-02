@@ -156,13 +156,13 @@ public:
   vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  // Descritpion:
+  // Description:
   // Set or override a key/value pair as annotation to that proxy.
   // If the value is NULL, this method is equivalent to RemoveAnnotation(key)
   void SetAnnotation(const char* key, const char* value);
 
   /**
-   * Retreive an annotation with a given key.
+   * Retrieve an annotation with a given key.
    * If not found, this will return NULL.
    */
   const char* GetAnnotation(const char* key);
@@ -194,7 +194,7 @@ public:
 
   /**
    * Get/Set the location where the underlying VTK-objects are created. The
-   * value can be contructed by or-ing vtkSMSession::ServerFlags
+   * value can be constructed by or-ing vtkSMSession::ServerFlags
    */
   void SetLocation(vtkTypeUInt32) VTK_OVERRIDE;
 
@@ -225,7 +225,7 @@ public:
 
   /**
    * Update the VTK object on the server by pushing the values of
-   * all modifed properties (un-modified properties are ignored).
+   * all modified properties (un-modified properties are ignored).
    * If the object has not been created, it will be created first.
    */
   virtual void UpdateVTKObjects();
@@ -342,7 +342,7 @@ public:
   //@}
 
   /**
-   * Updates all property informations by calling UpdateInformation()
+   * Updates all property information by calling UpdateInformation()
    * and populating the values.
    */
   virtual void UpdatePropertyInformation();
@@ -451,7 +451,7 @@ public:
 
   //@{
   /**
-   * Retuns if the VTK objects for this proxy have been created.
+   * Returns if the VTK objects for this proxy have been created.
    */
   vtkGetMacro(ObjectsCreated, int);
   //@}
@@ -558,7 +558,7 @@ public:
   void EnableLocalPushOnly() VTK_OVERRIDE;
 
   /**
-   * Enable the given remote object to communicate its state normaly to the
+   * Enable the given remote object to communicate its state normally to the
    * server location.
    */
   void DisableLocalPushOnly() VTK_OVERRIDE;
@@ -567,7 +567,7 @@ public:
    * This method return the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
   const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 
@@ -688,7 +688,7 @@ protected:
    * of the definition of that proxy.
    * By default, it stay NULL, only in-line subProxy do specify
    * this field so when the definition is sent to the server, it can
-   * retreive the in-line definition of that proxy.
+   * retrieve the in-line definition of that proxy.
    */
   vtkSetStringMacro(XMLSubProxyName);
   //@}

@@ -96,7 +96,7 @@ void vtkSMChartRepresentationProxy::SetPropertyModifiedFlag(const char* name, in
           vtkSMProxy* selectionReprProxy = this->GetSubProxy("SelectionRepresentation");
           if (selectionReprProxy)
           {
-            // We use these internal properties since we need to add consumer dependecy
+            // We use these internal properties since we need to add consumer dependency
             // on this proxy so that MarkModified() is called correctly.
 
             // Based on the name of the Property, we either pass the id-based

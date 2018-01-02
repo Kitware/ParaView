@@ -325,7 +325,7 @@
         default_values="0.0001">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Specify the intial particle spatial step.
+          Specify the initial particle spatial step.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -778,7 +778,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -922,7 +922,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -956,7 +956,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -987,7 +987,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -1017,7 +1017,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>

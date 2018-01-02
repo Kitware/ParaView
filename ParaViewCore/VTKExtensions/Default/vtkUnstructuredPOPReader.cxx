@@ -429,7 +429,7 @@ int vtkUnstructuredPOPReader::RequestData(vtkInformation* request,
   vtkNew<vtkCleanUnstructuredGrid> cleanToGrid;
   cleanToGrid->SetInputData(tempGrid.GetPointer());
   cleanToGrid->Update();
-  // we use the follwing to get the output grid instead of this->GetOutput() since the
+  // we use the following to get the output grid instead of this->GetOutput() since the
   // vtkInformation object passed in here may be different than the vtkInformation
   // object used in GetOutput() to get the grid pointer.
   vtkUnstructuredGrid* outputGrid =
@@ -645,7 +645,7 @@ int vtkUnstructuredPOPReader::ProcessGrid(
     nc_close(netCDFFD);
   }
 
-  // transfrom from logical tripolar coordinates to a sphere.  also transforms
+  // transform from logical tripolar coordinates to a sphere.  also transforms
   // any vector quantities
   this->Transform(grid, start, count, wholeExtent, subExtent, numberOfGhostLevels, wrapped, piece,
     numberOfPieces);
@@ -972,7 +972,7 @@ public:
     return true;
   }
   // Given a pair of horizontal indices, set the current column
-  // iterator location. Returns true if successfull.
+  // iterator location. Returns true if successful.
   bool SetColumn(int iIndex, int jIndex)
   {
     if (iIndex < this->SubExtent[0] || iIndex > this->SubExtent[1] || jIndex < this->SubExtent[2] ||

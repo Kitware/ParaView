@@ -68,7 +68,7 @@ public:
   //@{
   /**
    * These are to evaluate performances. You can turn off capping, degenerate cells
-   * and multiprocess comunication to see how they affect speed of execution.
+   * and multiprocess communication to see how they affect speed of execution.
    * Degenerate cells is the meshing between levels in the grid.
    */
   vtkSetMacro(EnableCapping, int);
@@ -161,7 +161,7 @@ protected:
 
   void AddCapPolygon(int ptCount, vtkIdType* pointIds, int blockId);
 
-  // This method is getting too many arguements!
+  // This method is getting too many arguments!
   // Capping was an after thought...
   void CapCell(int cellX, int cellY, int cellZ, // block coordinates
     // Which cell faces need to be capped.
@@ -172,11 +172,11 @@ protected:
     vtkIdType edgePtIds[12],
     // Locations of 8 corners. (xyz4xyz4...) 4th value is not used.
     double cornerPoints[32],
-    // The id order is VTK from marching cube cases.  Different than axis orded "cornerPoints".
+    // The id order is VTK from marching cube cases.  Different than axis ordered "cornerPoints".
     vtkIdType cornerOffsets[8],
     // For block id array (for debugging).  I should just make this an ivar.
     int blockId,
-    // For passing attirbutes to output mesh
+    // For passing attributes to output mesh
     vtkDataSet* inData);
 
   // Stuff exclusively for debugging.

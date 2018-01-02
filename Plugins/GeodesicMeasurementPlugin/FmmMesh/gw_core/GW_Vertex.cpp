@@ -428,7 +428,7 @@ void GW_Vertex::ComputeCurvatureDirections( GW_Float rArea )
     GW_Vector3D v2 = Normal_ ^ v1;
 
     /* now we must find the curvature matrix entry by minimising a mean square problem
-    the 3 entry of the symetric curvature matrix in (v1,v2) basis are (a,b,c), stored in vector x.
+    the 3 entry of the symmetric curvature matrix in (v1,v2) basis are (a,b,c), stored in vector x.
     IMPORTANT : we must ensure a<c, so that eigenvalues are in correct order. */
     GW_Float a = 0, b = 0, c = 0;            // the vector (a,b,c) we are searching. We use a+c=2*MeanCurv so we don't take care of c.
     GW_Float D[2] = {0,0};                    // the right side of the equation.

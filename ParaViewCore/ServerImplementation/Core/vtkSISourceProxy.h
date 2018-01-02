@@ -60,7 +60,7 @@ public:
   virtual void SetupSelectionProxy(int port, vtkSIProxy* extractSelection);
 
   /**
-   * Allow to shut down pipeline execution. This is particulary useful for
+   * Allow to shut down pipeline execution. This is particularly useful for
    * a Catalyst session that does not contains any real data.
    */
   virtual void SetDisablePipelineExecution(bool value) { this->DisablePipelineExecution = value; }

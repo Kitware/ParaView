@@ -1,10 +1,10 @@
 Error Handling
 --------------
- Now all functions, in which an error could occure, are returning a
+ Now all functions, in which an error could occur, are returning a
 value. This value is either a 64bit integer or a pointer.
 
  A negative 64bit integer as result indicates an error. Values >= 0
-indicates successfull execution.   This is similiar to the convention
+indicates successful execution.   This is similar to the convention
 used in UNIX system calls, but we do not return -1 but the error
 number (which is always negative).
 
@@ -21,7 +21,7 @@ a side-effect of the implementation of strict error handling.  The
 impact to the existing C/C++ code is very small.  But now you *can*
 and *should* implement some kind of error handling.  The simplest
 error handling is to set an error handler which aborts the program as
-soon as an error occured.
+soon as an error occurred.
 
  The next "biggest" change is the use of H5Part types instead of "long
 long" and "double". The replacement of "long long" is "h5part_int64_t"

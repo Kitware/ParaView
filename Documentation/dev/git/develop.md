@@ -148,7 +148,7 @@ cases, being your topic name with the issue number.
 
 5. Add release notes
 
-    Noteable changes should create a new file in `Documentation/release/dev/`
+    Notable changes should create a new file in `Documentation/release/dev/`
     named `my-topic.md` (replace `my-topic` with the name of your topic).
     This is not necessary for branches which are "trivial" such as fixing
     typos, updating test baselines, or are developer-oriented.

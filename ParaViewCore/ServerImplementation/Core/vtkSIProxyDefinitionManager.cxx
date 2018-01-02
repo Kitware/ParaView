@@ -1036,7 +1036,7 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
     mapIter++;
   }
 
-  // By default alway overide the documentation
+  // By default alway override the documentation
   if (element->FindNestedElementByName("Documentation") &&
     elementToFill->FindNestedElementByName("Documentation"))
   {
@@ -1088,7 +1088,7 @@ void vtkSIProxyDefinitionManager::Pull(vtkSMMessage* msg)
   }
   iter->Delete();
 
-  // Custome Definition
+  // Custom Definition
   iter = this->NewIterator(vtkSIProxyDefinitionManager::CUSTOM_DEFINITIONS);
   iter->GoToFirstItem();
   while (!iter->IsDoneWithTraversal())

@@ -103,7 +103,7 @@ public:
   void Update();
 
   /**
-   * Get all the internal views. The views should only be used to be layed out
+   * Get all the internal views. The views should only be used to be laid out
    * by the GUI. It's not recommended to directly change the properties of the
    * views.
    */
