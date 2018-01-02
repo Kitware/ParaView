@@ -514,6 +514,22 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="DepthPeelingForVolumes"
+        default_values="1"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Include volumes in the depth-peeling pass to correctly render intermixed
+          volumes with translucent polygons. May slow down rendering performance.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DepthPeeling" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="MaximumNumberOfPeels"
         default_values="4"
         number_of_elements="1"

@@ -429,3 +429,9 @@ vtkAbstractVolumeMapper* vtkPVLODVolume::GetMapper()
 {
   return vtkAbstractVolumeMapper::SafeDownCast(this->LODProp->GetLODMapper(this->HighLODId));
 }
+
+void vtkPVLODVolume::SetPropertyKeys(vtkInformation* keys)
+{
+  this->LODProp->SetPropertyKeys(keys);
+  this->Superclass::SetPropertyKeys(keys);
+}

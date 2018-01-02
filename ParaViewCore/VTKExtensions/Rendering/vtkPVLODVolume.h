@@ -106,6 +106,8 @@ public:
   vtkSetMacro(EnableLOD, int);
   vtkGetMacro(EnableLOD, int);
 
+  void SetPropertyKeys(vtkInformation* keys) override;
+
 protected:
   vtkPVLODVolume();
   ~vtkPVLODVolume() override;
