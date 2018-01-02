@@ -34,12 +34,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLPVDWriter : public vtkXMLWriter
 public:
   static vtkXMLPVDWriter* New();
   vtkTypeMacro(vtkXMLPVDWriter, vtkXMLWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Get the default file extension for files written by this writer.
    */
-  const char* GetDefaultFileExtension() VTK_OVERRIDE;
+  const char* GetDefaultFileExtension() override;
 
   //@{
   /**
@@ -77,12 +77,10 @@ public:
   vtkBooleanMacro(WriteAllTimeSteps, int);
   //@}
 
-  //@{
   /**
    * Add an input of this algorithm.
    */
   void AddInputData(vtkDataObject*);
-  //@}
 
   //@{
   /**
@@ -94,22 +92,22 @@ public:
   //@}
 
   // See the vtkAlgorithm for a desciption of what these do
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
   vtkXMLPVDWriter();
   ~vtkXMLPVDWriter() override;
 
   // see algorithm for more info
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   // add in request update extent to set time step information
   virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Replace vtkXMLWriter's writing driver method.
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int WriteData() VTK_OVERRIDE;
-  const char* GetDataSetName() VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int WriteData() override;
+  const char* GetDataSetName() override;
 
   // Methods to create the set of writers matching the set of inputs.
   void CreateWriters();
@@ -158,7 +156,7 @@ protected:
   vtkCallbackCommand* ProgressObserver;
 
   // Garbage collection support.
-  void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) override;
 
   // The current time step for time series inputs.
   int CurrentTimeIndex;
