@@ -18,7 +18,7 @@
  *
  * This filter clips an AMR volume but does not copy attributes yet.
  * This filter has two important features.  First is that the level
- * transitions are handled correctly, and second is that interal
+ * transitions are handled correctly, and second is that internal
  * cells are decimated.  I use a variation of degenerate points/cells
  * used for level transitions.
 */
@@ -61,7 +61,7 @@ public:
   //@{
   /**
    * These are to evaluate performances. You can turn off degenerate cells
-   * and multiprocess comunication to see how they affect speed of execution.
+   * and multiprocess communication to see how they affect speed of execution.
    * Degenerate cells is the meshing between levels in the grid.
    */
   vtkSetMacro(EnableInternalDecimation, int);

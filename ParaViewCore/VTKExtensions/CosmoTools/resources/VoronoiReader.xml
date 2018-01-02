@@ -38,7 +38,7 @@
 
       <Hints>
         <ReaderFactory extensions="out tess"
-                       file_description="Voronoi Tesselation" />
+                       file_description="Voronoi Tessellation" />
      </Hints>
     </SourceProxy>
     <!-- End Reader -->

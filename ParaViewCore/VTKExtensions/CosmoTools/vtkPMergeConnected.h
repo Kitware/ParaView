@@ -16,7 +16,7 @@
  * @class   vtkPMergeConnected
  *
  *
- *  This filter merges connected voroni tesselation regions based on the
+ *  This filter merges connected voroni tessellation regions based on the
  *  global region ID.
 */
 

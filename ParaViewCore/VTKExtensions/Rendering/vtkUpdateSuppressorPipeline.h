@@ -35,7 +35,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Generalized interface for asking the executive to fullfill update
+   * Generalized interface for asking the executive to fulfill update
    * requests.
    */
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,

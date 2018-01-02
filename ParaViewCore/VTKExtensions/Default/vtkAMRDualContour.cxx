@@ -78,7 +78,7 @@ public:
   void Initialize(int xDualCellDim, int yDualCellDim, int zDualCellDim);
 
   // Description:
-  // Lookup and seting uses this pointer. Using a pointer keeps
+  // Lookup and setting uses this pointer. Using a pointer keeps
   // the contour filter from having to lookup a point and second
   // adding a point (both are very similar).
   // The edge index uses VTK voxel edge indexing scheme.
@@ -1028,7 +1028,7 @@ void vtkAMRDualContour::ProcessBlock(
     // that the block is already processes.
     // This will keep neighbors from recreating the locator.
     // Another option would be to create the locator object for
-    // all blocks but do not allocate until needed.  Then the existance of the locator
+    // all blocks but do not allocate until needed.  Then the existence of the locator
     // would tell whether the block was processed.
     block->RegionBits[1][1][1] = 0;
   }
@@ -1435,9 +1435,9 @@ void vtkAMRDualContour::AddCapPolygon(int ptCount, vtkIdType* pointIds, int bloc
 //----------------------------------------------------------------------------
 // Now generate the capping surface.
 // I chose to make a generic face case table. We decided to cap
-// each face independantly.  I permute the hex index into a face case
+// each face independently.  I permute the hex index into a face case
 // and I permute the face corners and edges into hex corners and endges.
-// It endsup being a little long to duplicate the code 6 times,
+// It ends up being a little long to duplicate the code 6 times,
 // but it is still fast.
 void vtkAMRDualContour::CapCell(int cellX, int cellY, int cellZ, // cell index in block coordinates.
   // Which cell faces need to be capped.
@@ -1448,11 +1448,11 @@ void vtkAMRDualContour::CapCell(int cellX, int cellY, int cellZ, // cell index i
   vtkIdType edgePointIds[12],
   // Locations of 8 corners (xyz4xyz4...); 4th value is not used.
   double cornerPoints[32],
-  // The id order is VTK from marching cube cases.  Different than axis orded "cornerPoints".
+  // The id order is VTK from marching cube cases.  Different than axis ordered "cornerPoints".
   vtkIdType cornerOffsets[8],
   // For block id array (for debugging).  I should just make this an ivar.
   int blockId,
-  // For passing attirbutes to output mesh
+  // For passing attributes to output mesh
   vtkDataSet* inData)
 {
   int cornerIdx;

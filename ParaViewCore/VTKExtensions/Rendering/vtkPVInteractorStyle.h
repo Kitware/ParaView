@@ -91,7 +91,7 @@ public:
   //@{
   /**
    * Propagates the center to the manipulators.
-   * This simply sets an interal ivar.
+   * This simply sets an internal ivar.
    * It is propagated to a manipulator before the event
    * is sent to it.
    * Also changing the CenterOfRotation during interaction
@@ -105,7 +105,7 @@ public:
   //@{
   /**
    * Propagates the rotation factor to the manipulators.
-   * This simply sets an interal ivar.
+   * This simply sets an internal ivar.
    * It is propagated to a manipulator before the event
    * is sent to it.
    * Also changing the RotationFactor during interaction

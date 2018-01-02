@@ -541,7 +541,7 @@ int binSearch(int* vec, int size, int value)
   }
   // loop invariants:
   // vec[min] is always <= value
-  // vec[max] is alwasy > value
+  // vec[max] is always > value
   int min = 0, max = size;
   while (min < max - 1)
   {

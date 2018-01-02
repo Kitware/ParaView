@@ -75,7 +75,7 @@ public:
 
   //@{
   /**
-   * Choose on which colum the sort operation should occurs
+   * Choose on which column the sort operation should occur
    */
   vtkGetMacro(SelectedComponent, int);
   vtkSetMacro(SelectedComponent, int);
@@ -90,7 +90,7 @@ public:
   //@}
 
   /**
-   * Choose on which colum the sort operation should occurs
+   * Choose on which column the sort operation should occur
    */
   const char* GetColumnNameToSort();
 
@@ -112,7 +112,7 @@ protected:
 
   //@{
   /**
-   * Choose on which colum the sort operation should occurs
+   * Choose on which column the sort operation should occur
    */
   vtkGetStringMacro(ColumnToSort);
   vtkSetStringMacro(ColumnToSort);

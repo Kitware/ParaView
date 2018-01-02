@@ -16,7 +16,7 @@
  * @class   vtkMaterialInterfaceProcessRing
  *
  * Data structure used to distribute work amongst available
- * processes. The buffer can be intialized from a process
+ * processes. The buffer can be initialized from a process
  * priority queue such that only those processes with loading
  * less than a specified tolerance are included.
 */
