@@ -60,7 +60,8 @@ public:
   std::string FilePath;
   std::string FilePrefix;
   std::vector<std::string> Entries;
-  std::string CreatePieceFileName(int index);
+  std::string CreatePieceFileName(
+    const int index, const bool addTimeIndex, const int currentTimeIndex);
 };
 
 //----------------------------------------------------------------------------
@@ -77,6 +78,8 @@ vtkXMLPVDWriter::vtkXMLPVDWriter()
   this->ProgressObserver = vtkCallbackCommand::New();
   this->ProgressObserver->SetCallback(&vtkXMLPVDWriter::ProgressCallbackFunction);
   this->ProgressObserver->SetClientData(this);
+  this->CurrentTimeIndex = 0;
+  this->WriteAllTimeSteps = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -93,6 +96,7 @@ void vtkXMLPVDWriter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "GhostLevel: " << this->GhostLevel << endl;
   os << indent << "NumberOfPieces: " << this->NumberOfPieces << endl;
   os << indent << "Piece: " << this->Piece << endl;
+  os << indent << "WriteAllTimeSteps: " << this->WriteAllTimeSteps << endl;
   os << indent << "WriteCollectionFile: " << this->WriteCollectionFile << endl;
 }
 
@@ -102,7 +106,7 @@ int vtkXMLPVDWriter::ProcessRequest(
 {
   if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()))
   {
-    // Create writers for each input.
+    // Create writers for each input first
     this->CreateWriters();
 
     for (int i = 0; i < GetNumberOfInputConnections(0); ++i)
@@ -112,14 +116,35 @@ int vtkXMLPVDWriter::ProcessRequest(
         this->GetWriter(i)->ProcessRequest(request, inputVector, outputVector);
       }
     }
-    return 1;
+    // call the typical RequestUpdateExtent method
+    return this->RequestUpdateExtent(request, inputVector, outputVector);
   }
   if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
   {
     return this->RequestData(request, inputVector, outputVector);
   }
+  else if (request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
+  {
+    this->DeleteAllEntries();
+    this->RequestInformation(request, inputVector, outputVector);
+  }
 
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLPVDWriter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (this->WriteAllTimeSteps && inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
+    double* timeSteps = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    double timeReq = timeSteps[this->CurrentTimeIndex];
+    inputVector[0]->GetInformationObject(0)->Set(
+      vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeReq);
+  }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -186,16 +211,25 @@ int vtkXMLPVDWriter::RequestData(
   subdir += this->Internal->FilePrefix;
   this->MakeDirectory(subdir.c_str());
 
+  double timeIndexValue = 0;
+  bool includeTimeIndexValue = false;
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (this->WriteAllTimeSteps && inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+  {
+    double* timeSteps = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    timeIndexValue = timeSteps[this->CurrentTimeIndex];
+    includeTimeIndexValue = true;
+  }
+
   // Write each input.
-  int i, j;
-  this->DeleteAllEntries();
-  for (i = 0; i < this->GetNumberOfInputConnections(0); ++i)
+  for (int i = 0; i < this->GetNumberOfInputConnections(0); ++i)
   {
     this->SetProgressRange(progressRange, i, GetNumberOfInputConnections(0) + writeCollection);
     if (vtkXMLWriter* w = this->GetWriter(i))
     {
       // Set the file name.
-      std::string fname = this->Internal->CreatePieceFileName(i);
+      std::string fname = this->Internal->CreatePieceFileName(
+        i, (this->WriteAllTimeSteps != 0 && this->NumberOfTimeSteps > 1), this->CurrentTimeIndex);
       std::string full = this->Internal->FilePath;
       full += fname;
       w->SetFileName(full.c_str());
@@ -207,15 +241,21 @@ int vtkXMLPVDWriter::RequestData(
 
       // Create the entry for the collection file.
       std::ostringstream entry_with_warning_C4701;
-      entry_with_warning_C4701 << "<DataSet part=\"" << i << "\" file=\"" << fname.c_str() << "\"/>"
+      entry_with_warning_C4701 << "<DataSet";
+      if (includeTimeIndexValue)
+      {
+        entry_with_warning_C4701 << " timestep=\"" << timeIndexValue << "\"";
+      }
+      entry_with_warning_C4701 << " part=\"" << i << "\" file=\"" << fname.c_str() << "\"/>"
                                << ends;
       this->AppendEntry(entry_with_warning_C4701.str().c_str());
 
       if (w->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
       {
-        for (j = 0; j < i; j++)
+        for (int j = 0; j < i; j++)
         {
-          fname = this->Internal->CreatePieceFileName(i);
+          fname = this->Internal->CreatePieceFileName(j,
+            (this->WriteAllTimeSteps != 0 && this->NumberOfTimeSteps > 1), this->CurrentTimeIndex);
           full = this->Internal->FilePath;
           full += fname;
           vtksys::SystemTools::RemoveFile(full.c_str());
@@ -229,18 +269,38 @@ int vtkXMLPVDWriter::RequestData(
     }
   }
 
-  // Write the collection file if requested.
-  if (writeCollection)
-  {
-    this->SetProgressRange(progressRange, this->GetNumberOfInputConnections(0),
-      this->GetNumberOfInputConnections(0) + writeCollection);
-    return this->WriteCollectionFileIfRequested();
-  }
-
   // We have finished writing.
   this->UpdateProgressDiscrete(1);
+  int retVal = 1;
 
-  return 1;
+  // we need to set the CONTINUE_EXECUTING request here since the
+  // piece writer ProcessRequest() removes the CONTINUE_EXECUTING flag
+  if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
+  {
+    // Tell the pipeline to start looping.
+    request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
+  }
+
+  this->CurrentTimeIndex++;
+  if (this->CurrentTimeIndex >= this->NumberOfTimeSteps || this->WriteAllTimeSteps == 0)
+  {
+    // Write the collection file if requested.
+    if (writeCollection)
+    {
+      this->SetProgressRange(progressRange, this->GetNumberOfInputConnections(0),
+        this->GetNumberOfInputConnections(0) + writeCollection);
+      retVal = this->WriteCollectionFileIfRequested();
+    }
+
+    this->CurrentTimeIndex = 0;
+    if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
+    {
+      // Tell the pipeline to stop looping.
+      request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 0);
+    }
+  }
+
+  return retVal;
 }
 
 //----------------------------------------------------------------------------
@@ -637,12 +697,18 @@ void vtkXMLPVDWriter::DeleteAllEntries()
 }
 
 //----------------------------------------------------------------------------
-std::string vtkXMLPVDWriterInternals::CreatePieceFileName(int index)
+std::string vtkXMLPVDWriterInternals::CreatePieceFileName(
+  const int index, const bool addTimeIndex, const int currentTimeIndex)
 {
   std::string fname;
   std::ostringstream fn_with_warning_C4701;
   fn_with_warning_C4701 << this->FilePrefix.c_str() << "/" << this->FilePrefix.c_str() << "_"
-                        << index << "." << this->Writers[index]->GetDefaultFileExtension() << ends;
+                        << index;
+  if (addTimeIndex)
+  {
+    fn_with_warning_C4701 << "_" << currentTimeIndex;
+  }
+  fn_with_warning_C4701 << "." << this->Writers[index]->GetDefaultFileExtension() << ends;
   fname = fn_with_warning_C4701.str();
   return fname;
 }

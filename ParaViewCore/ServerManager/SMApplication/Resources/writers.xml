@@ -70,6 +70,14 @@
         <Documentation>The compression algorithm used to compress binary data
         (appended mode only).</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
+      </IntVectorProperty>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -78,6 +86,8 @@
         <Property name="HeaderType"
                   show="0" />
         <Property name="UseSubdirectory"
+                  show="1" />
+        <Property name="WriteAllTimeSteps"
                   show="1" />
         <WriterFactory extensions="pvd"
                        file_description="ParaView Data Files" />
