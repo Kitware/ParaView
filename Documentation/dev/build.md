@@ -64,7 +64,7 @@ Optional Additions
 When the ability to write .avi files is desired, and writing these files is not supported by the OS, ParaView can attach to an ffmpeg library. This is generally true for Linux. Ffmpeg library source code is found here: [6](http://www.ffmpeg.org/)
 
 ### MPI
-In order to run ParaView in parallel, MPI [1](http://www-unix.mcs.anl.gov/mpi/), [2](http://www.lam-mpi.org/) is also required.
+To run ParaView in parallel, an [MPI](http://www-unix.mcs.anl.gov/mpi/) implementation is required. If an MPI implementation that exploits special interconnect hardware is provided on your system, we suggest using it for optimal performance. Otherwise, on Linux/Mac, we suggest either [OpenMPI](http://www.open-mpi.org/) or [MPICH](http://www.mpich.org/). On Windows, we suggest [Microsoft MPI](https://msdn.microsoft.com/en-us/library/bb524831.aspx).
 
 ### Python
 In order to use scripting, [Python](http://www.python.org/) is required (version 2.7 is supported, whereas version 3.5 support is under development).
