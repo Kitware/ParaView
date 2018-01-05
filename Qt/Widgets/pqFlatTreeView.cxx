@@ -2376,7 +2376,7 @@ void pqFlatTreeView::wheelEvent(QWheelEvent* e)
 {
   if (this->verticalScrollBar()->isVisible())
   {
-    qApp->notify(this->verticalScrollBar(), e);
+    QApplication::sendEvent(this->verticalScrollBar(), e);
   }
   else
   {
