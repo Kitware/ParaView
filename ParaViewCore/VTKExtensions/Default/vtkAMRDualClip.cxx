@@ -250,26 +250,6 @@ void vtkDualGridClipInitializeLevelMask(
     levelMask += 2 * dims[0];
     scalarPtr += 2 * dims[0];
   }
-
-  // simplify for debugging.
-  // Only allow one (the one completely inside) to be decimated.
-  // unsigned char *tmp = levelMask;
-  // if (flag)
-  //  {
-  //  levelMask = tmp + 1+ dims[0] + dims[0]*dims[1];
-  //  for (int zz = 2; zz < dims[2]; ++zz)
-  //    {
-  //    for (int yy = 2; yy < dims[1]; ++yy)
-  //      {
-  //      for (int xx = 2; xx < dims[0]; ++xx)
-  //        {
-  //        *levelMask++ = 4;
-  //        }
-  //      levelMask += 2;
-  //      }
-  //    levelMask += 2*dims[0];
-  //    }
-  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -669,18 +649,6 @@ void vtkAMRDualClipLocator::Initialize(int xDualCellDim, int yDualCellDim, int z
     this->XEdges[idx] = this->YEdges[idx] = this->ZEdges[idx] = -1;
     this->Corners[idx] = -1;
   }
-
-  // int x,y,z;
-  // for (z = 0; z < 3; ++z)
-  //  {
-  //  for (y = 0; y < 3; ++y)
-  //    {
-  //    for (x = 0; x < 3; ++x)
-  //      {
-  //      this->RegionLevelDifference[x][y][z] = 0;
-  //      }
-  //    }
-  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -717,83 +685,6 @@ vtkIdType* vtkAMRDualClipLocator::GetEdgePointer(int xCell, int yCell, int zCell
   {
     ++zp0;
   }
-
-  /*
-  // template index is also the first point index.
-  // Find the second point index.
-  int xp1 = xp0;
-  int yp1 = yp0;
-  int zp1 = zp0;
-  if (axis==1)
-    {
-    ++xp1;
-    }
-  else if (axis==2)
-    {
-    ++yp1;
-    }
-  else if (axis==4)
-    {
-    ++zp1;
-    }
-
-  // Now we can adjust the cell index based on degeneracy.
-  // This is tricky with edges.  Two points in two regions.
-  // We can ignore any edge that collapses to a point.
-  // We only have to consider to edges becoming one.
-  int diff0, diff1;
-  int rx0, ry0, rz0;
-  rx0 = ry0 = rz0 = 1;
-  if (xp0 == 0) {rx0=0;}
-  if (xp0 == this->DualCellDimensions[0]) {rx0=2;}
-  if (yp0 == 0) {ry0=0;}
-  if (yp0 == this->DualCellDimensions[1]) {ry0=2;}
-  if (zp0 == 0) {rz0=0;}
-  if (zp0 == this->DualCellDimensions[2]) {rz0=2;}
-  //diff0 = this->RegionLevelDifference[rx0][ry0][rz0];
-  diff0 = diff1 = 1;
-  int rx1, ry1, rz1;
-  rx1 = ry1 = rz1 = 1;
-  if (xp1 == 0) {rx1=0;}
-  if (xp1 == this->DualCellDimensions[0]) {rx1=2;}
-  if (yp1 == 0) {ry1=0;}
-  if (yp1 == this->DualCellDimensions[1]) {ry1=2;}
-  if (zp1 == 0) {rz1=0;}
-  if (zp1 == this->DualCellDimensions[2]) {rz1=2;}
-  //diff1 = this->RegionLevelDifference[rx1][ry1][rz1];
-  // Take the minimum diff because one unique point makes a unique edge.
-  if (diff1 < diff0) {diff0 = diff1;}
-  // Is does not matter what we do with edges that collase to a point
-  // because the isosurface will never split the two.
-  if (diff0)
-    {
-    if (rx0 == 1 && xp0 > 0)
-      {
-      xp0 = (((xp0 - 1) >> diff0) << diff0) + 1;
-      }
-    if (ry0 == 1 && yp0 > 0)
-      {
-      yp0 = (((yp0 - 1) >> diff0) << diff0) + 1;
-      }
-    if (rz0 == 1 && zp0 > 0)
-      {
-      zp0 = (((zp0 - 1) >> diff0) << diff0) + 1;
-      }
-    // I do not see how these are needed but ...
-    if (rx1 == 1 && xp1 > 0)
-      {
-      xp1 = (((xp1 - 1) >> diff0) << diff0) + 1;
-      }
-    if (ry1 == 1 && yp1 > 0)
-      {
-      yp1 = (((yp1 - 1) >> diff0) << diff0) + 1;
-      }
-    if (rz1 == 1 && zp1 > 0)
-      {
-      zp1 = (((zp1 - 1) >> diff0) << diff0) + 1;
-      }
-    }
-  */
 
   switch (axis)
   {
@@ -1216,12 +1107,6 @@ int vtkAMRDualClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkMultiBlockDataSet* mbdsOutput0 =
     vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  //  mbdsOutput0->SetNumberOfBlocks(1);
-  //  vtkMultiPieceDataSet *mpds=vtkMultiPieceDataSet::New();
-  //  mbdsOutput0->SetBlock(0,mpds);
-  //
-  //  mpds->SetNumberOfPieces(0);
-
   if (hbdsInput == 0)
   {
     // Do not deal with rectilinear grid
@@ -1631,11 +1516,6 @@ void vtkAMRDualClip::ProcessBlock(
   // cast to the correct datatype.
   int yInc = (extent[1] - extent[0] + 1);
   int zInc = yInc * (extent[3] - extent[2] + 1);
-  // Use void pointers to march through the volume before we cast.
-  // int dataType = volumeFractionArray->GetDataType();
-  // int xVoidInc = volumeFractionArray->GetDataTypeSize();
-  // int yVoidInc = xVoidInc * yInc;
-  // int zVoidInc = xVoidInc * zInc;
 
   // Loop over all the cells in the dual grid.
   int x, y, z;
@@ -1905,24 +1785,6 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
       nz = 1;
     }
 
-    /* Internal points based on locator.
-    unsigned char levelMaskValue;
-    levelMaskValue = this->BlockLocator->GetLevelMaskValue(x+(c&1?0:1),
-                                                           y+(c&2?0:1),
-                                                           z+(c&4?0:1));
-    int levelDiff = (int)(levelMaskValue) - 1;
-    if (levelDiff < 0)
-      {
-      levelDiff = 0;
-      }
-    px = px >> levelDiff;
-    py = py >> levelDiff;
-    pz = pz >> levelDiff;
-    cornerPoints[c<<2]     = origin[0] + spacing[0] * (double)(1 << levelDiff) * ((double)(px)+dx);
-    cornerPoints[(c<<2)|1] = origin[1] + spacing[1] * (double)(1 << levelDiff) * ((double)(py)+dy);
-    cornerPoints[(c<<2)|2] = origin[2] + spacing[2] * (double)(1 << levelDiff) * ((double)(pz)+dz);
-    */
-    // /*
     if (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitsDegenerateMask)
     { // point lies in lower level neighbor.
       int levelDiff = block->RegionBits[nx][ny][nz] & vtkAMRRegionBitsDegenerateMask;
@@ -1954,7 +1816,6 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
       cornerPoints[(c << 2) | 1] = origin[1] + spacing[1] * ((double)(py) + dy);
       cornerPoints[(c << 2) | 2] = origin[2] + spacing[2] * ((double)(pz) + dz);
     }
-    // */
   }
   // We have the points, now contour the cell.
   // Get edges.
@@ -2206,235 +2067,3 @@ void vtkAMRDualClip::InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, v
   mesh->GetPointData()->CopyAllocate(uGrid->GetCellData());
   iter->Delete();
 }
-
-// All this was for helping to generate and debug the case table.
-/*
-// Permutations for duplicating case.
-// These permutations do not change face triangulations.
-static int permutations[5][20] = {
-{0,2,4,6,1,3,5,7,12,14,13,15,16,18,17,19,8,9,10,11},
-{0,4,1,5,2,6,3,7,16,17,18,19,8,10,9,11,12,14,13,15},
-{7,5,6,4,3,1,2,0,15,14,13,12,11,10,9,8,19,17,18,16},
-{7,6,3,2,5,4,1,0,11,9,10,8,19,18,17,16,15,14,13,12},
-{7,3,5,1,6,2,4,0,19,17,18,16,15,13,14,12,11,9,10,8}};
-
-
-static int mirror[2][20] = {
-{7,5,3,1,6,4,2,0,15,13,14,12,19,17,18,16,11,10,9,8},
-{0,2,1,3,4,6,5,7,12,13,14,15,8,9,10,11,16,18,17,19}};
-
-static int edgeTable[12][3] = {
-{1,0,0},
-{1,2,0},
-{1,0,2},
-{1,2,2},
-{0,1,0},
-{2,1,0},
-{0,1,2},
-{2,1,2},
-{0,0,1},
-{2,0,1},
-{0,2,1},
-{2,2,1}  };
-
-// This permutation changes from right handed to left handed,
-// so we need to flip the order of the tetras.
-void vtkAMRDualClip::MirrorCases()
-{
-  FILE* fp = fopen("C:/Law/tmp/mirror.txt", "w");
-  for (int ii = 0; ii < 2; ++ii)
-    {
-    for (int cubeCase = 1; cubeCase < 256; ++cubeCase)
-      {
-      int* casePtr = vtkAMRDualClipTetraTable[cubeCase];
-      if (casePtr[0] != -1)
-        {
-        // compute the new case.
-        int newCase = 0;
-        if (cubeCase&1) { newCase += (1 << mirror[ii][0]); }
-        if (cubeCase&2) { newCase += (1 << mirror[ii][1]); }
-        if (cubeCase&4) { newCase += (1 << mirror[ii][2]); }
-        if (cubeCase&8) { newCase += (1 << mirror[ii][3]); }
-        if (cubeCase&16) { newCase += (1 << mirror[ii][4]); }
-        if (cubeCase&32) { newCase += (1 << mirror[ii][5]); }
-        if (cubeCase&64) { newCase += (1 << mirror[ii][6]); }
-        if (cubeCase&128) { newCase += (1 << mirror[ii][7]); }
-        if (newCase != 0 && vtkAMRDualClipTetraTable[newCase][0] == -1)
-          { // new case.
-          int jj = 0;
-          fprintf(fp, "{");
-          // This is where we flip coordinate systems.
-          while (casePtr[jj] != -1)
-            {
-            fprintf(fp,"%d,",mirror[ii][casePtr[jj]]);
-            fprintf(fp,"%d,",mirror[ii][casePtr[jj+2]]);
-            fprintf(fp,"%d,",mirror[ii][casePtr[jj+1]]);
-            fprintf(fp,"%d,",mirror[ii][casePtr[jj+3]]);
-            jj += 4;
-            }
-          fprintf(fp,"-1,");
-          while (jj < 16*4)
-            {
-            fprintf(fp,"0,");
-            ++jj;
-            }
-          fprintf(fp,"}, // %d\n", newCase);
-          vtkWarningMacro("origin case: " << cubeCase << ", mirror New case " << newCase);
-          }
-        }
-      }
-    }
-  fclose(fp);
-}
-
-
-void vtkAMRDualClip::PermuteCases()
-{
-  FILE* fp = fopen("C:/Law/tmp/case.txt", "w");
-  for (int cubeCase = 1; cubeCase < 256; ++cubeCase)
-    {
-    int* casePtr = vtkAMRDualClipTetraTable[cubeCase];
-    if (casePtr[0] != -1)
-      {
-      for (int ii = 0; ii < 5; ++ii)
-        {
-        // compute the new case.
-        int newCase = 0;
-        if (cubeCase&1) { newCase += (1 << permutations[ii][0]); }
-        if (cubeCase&2) { newCase += (1 << permutations[ii][1]); }
-        if (cubeCase&4) { newCase += (1 << permutations[ii][2]); }
-        if (cubeCase&8) { newCase += (1 << permutations[ii][3]); }
-        if (cubeCase&16) { newCase += (1 << permutations[ii][4]); }
-        if (cubeCase&32) { newCase += (1 << permutations[ii][5]); }
-        if (cubeCase&64) { newCase += (1 << permutations[ii][6]); }
-        if (cubeCase&128) { newCase += (1 << permutations[ii][7]); }
-        if (newCase != 0 && vtkAMRDualClipTetraTable[newCase][0] == -1)
-          { // new case.
-          int jj = 0;
-          fprintf(fp, "{");
-          while (casePtr[jj] != -1)
-            {
-            fprintf(fp,"%d,",permutations[ii][casePtr[jj]]);
-            ++jj;
-            }
-          fprintf(fp,"-1,");
-          while (jj < 16*4)
-            {
-            fprintf(fp,"0,");
-            ++jj;
-            }
-          fprintf(fp,"}, // %d\n", newCase);
-          vtkWarningMacro("origin case: " << cubeCase << ", perm: " << ii << ", New case " <<
-newCase);
-          }
-        }
-      }
-    }
-  fclose(fp);
-}
-
-
-void vtkAMRDualClip::DebugCases()
-{
-  // First lets try all permutations to see if we can fill in more cases.
-  this->MirrorCases();
-  this->PermuteCases();
-
-  // Loop through the clip cases for debugging.
-  static int cubeCase = 0;
-  if (this->IsoValue > 1)
-    {
-    cubeCase = (int)(this->IsoValue);
-    }
-  vtkWarningMacro("Case: " << cubeCase);
-  int* casePtr = vtkAMRDualClipTetraTable[cubeCase];
-
-  while (*casePtr != -1)
-    {
-    vtkIdType ptIds[4];
-    double pt[3];
-    for (int ii = 0; ii < 4; ++ii)
-      {
-      if (*casePtr < 8)
-        {
-        pt[0] = *casePtr & 1 ? 2.0 : 0.0;
-        pt[1] = *casePtr & 2 ? 2.0 : 0.0;
-        pt[2] = *casePtr & 4 ? 2.0 : 0.0;
-        }
-      else
-        {
-        pt[0] = (double)(edgeTable[*casePtr-8][0]);
-        pt[1] = (double)(edgeTable[*casePtr-8][1]);
-        pt[2] = (double)(edgeTable[*casePtr-8][2]);
-        }
-      ptIds[ii] = this->Points->InsertNextPoint(pt);
-      ++casePtr;
-      }
-    this->Cells->InsertNextCell(4, ptIds);
-    }
-
-  // Lets put glyphs at corners of case.
-  if (cubeCase&1)
-    {
-    this->AddGlyph(0.0, 0.0, 0.0);
-    }
-  if (cubeCase&2)
-    {
-    this->AddGlyph(2.0, 0.0, 0.0);
-    }
-  if (cubeCase&4)
-    {
-    this->AddGlyph(0.0, 2.0, 0.0);
-    }
-  if (cubeCase&8)
-    {
-    this->AddGlyph(2.0, 2.0, 0.0);
-    }
-  if (cubeCase&16)
-    {
-    this->AddGlyph(0.0, 0.0, 2.0);
-    }
-  if (cubeCase&32)
-    {
-    this->AddGlyph(2.0, 0.0, 2.0);
-    }
-  if (cubeCase&64)
-    {
-    this->AddGlyph(0.0, 2.0, 2.0);
-    }
-  if (cubeCase&128)
-    {
-    this->AddGlyph(2.0, 2.0, 2.0);
-    }
-
-  ++cubeCase;
-}
-
-
-void vtkAMRDualClip::AddGlyph(double x, double y, double z)
-{
-  int* casePtr = vtkAMRDualClipTetraTable[255];
-
-  vtkIdType ptIds[4];
-  double pt[3];
-  while (*casePtr != -1)
-    {
-    for (int ii = 0; ii < 4; ++ii)
-      {
-      if (*casePtr < 8)
-        {
-        pt[0] = x + (*casePtr & 1 ? 0.2 : -0.2);
-        pt[1] = y + (*casePtr & 2 ? 0.2 : -0.2);
-        pt[2] = z + (*casePtr & 4 ? 0.2 : -0.2);
-        }
-      else
-        {
-        vtkWarningMacro("Sanity failed");
-        }
-      ptIds[ii] = this->Points->InsertNextPoint(pt);
-      ++casePtr;
-      }
-    this->Cells->InsertNextCell(4, ptIds);
-    }
-}
-*/
