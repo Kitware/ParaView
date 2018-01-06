@@ -300,6 +300,18 @@ def cmake_cache(config, manifest_list):
       pass
   return cache_entries
 
+def cleanupGeneratedSourceTree(path):
+  # remove all .git* files and directories
+  for dirpath, dirnames, filenames in os.walk(path):
+    for filename in [f for f in filenames if f.startswith(".git")]:
+      shutil.rmtree(os.path.join(dirpath, filename), ignore_errors=True)
+
+  # remove other files and directories that aren't needed
+  notneeded = ['Utilities/Doxygen/', 'Utilities/GitSetup/', 'Utilities/Maintenance/', 'Utilities/MinimalBuildTools',
+               'Utilities/Scripts/', 'Utilities/SetupForDevelopment.sh', 'Utilities/Sphinx/', 'Utilities/TestDriver/']
+  for filename in notneeded:
+    shutil.rmtree(os.path.join(path, filename), ignore_errors=True)
+
 def process(config):
 
   editions = set()
@@ -360,6 +372,8 @@ def process(config):
         filter_proxies(fin, fout, set(proxies), all_proxies)
 
   create_cmake_script(config, all_manifests)
+
+  cleanupGeneratedSourceTree(config.output_dir)
 
 def copyTestTrees(config):
   all_dirs = config.input_dirs
