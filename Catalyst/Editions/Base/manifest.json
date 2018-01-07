@@ -262,9 +262,6 @@
         { "path":"Testing" }
       ]
     },
-    { "name":"vtkUtilitiesHashSource",
-      "path":"VTK/Utilities/HashSource"
-    },
     { "name":"vtkParallelMPI",
       "path":"VTK/Parallel/MPI",
       "exclude":[
