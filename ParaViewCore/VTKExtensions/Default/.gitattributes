@@ -1,0 +1,3 @@
+# The data tables here cause clang-format to take 10+ minutes.
+vtkAMRDualClipTables.cxx                -format.clang-format
+vtkRectilinearGridConnectivityCases.cxx -format.clang-format
