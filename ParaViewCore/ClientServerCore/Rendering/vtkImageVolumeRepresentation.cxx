@@ -18,6 +18,7 @@
 #include "vtkCellData.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
+#include "vtkContourValues.h"
 #include "vtkExtentTranslator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -468,4 +469,23 @@ void vtkImageVolumeRepresentation::SetIndependentComponents(bool val)
 void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
   this->VolumeMapper->SetRequestedRenderMode(mode);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetShowIsosurfaces(int show)
+{
+  this->VolumeMapper->SetBlendMode(
+    show ? vtkVolumeMapper::ISOSURFACE_BLEND : vtkVolumeMapper::COMPOSITE_BLEND);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetIsosurfaceValue(int i, double value)
+{
+  this->Property->GetIsoSurfaceValues()->SetValue(i, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetNumberOfIsosurfaces(int number)
+{
+  this->Property->GetIsoSurfaceValues()->SetNumberOfContours(number);
 }

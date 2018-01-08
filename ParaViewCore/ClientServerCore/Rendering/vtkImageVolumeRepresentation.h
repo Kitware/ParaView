@@ -96,9 +96,18 @@ public:
   void SetShade(bool);
   void SetIndependentComponents(bool);
 
+  //@{
+  /**
+   * Methods to set isosurface values.
+   */
+  void SetIsosurfaceValue(int i, double value);
+  void SetNumberOfIsosurfaces(int number);
+  //@}
+
   //***************************************************************************
   // Forwarded to vtkSmartVolumeMapper.
   void SetRequestedRenderMode(int);
+  void SetShowIsosurfaces(int);
 
   /**
    * Provides access to the actor used by this representation.
