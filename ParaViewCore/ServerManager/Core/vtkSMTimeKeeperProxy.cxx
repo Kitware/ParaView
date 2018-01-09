@@ -179,6 +179,15 @@ int vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(double value)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMTimeKeeperProxy::UpdateTimeInformation()
+{
+  if (vtkSMTimeKeeper* tk = vtkSMTimeKeeper::SafeDownCast(this->GetClientSideObject()))
+  {
+    tk->UpdateTimeInformation();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTimeKeeperProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
