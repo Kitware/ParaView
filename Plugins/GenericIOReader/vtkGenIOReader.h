@@ -161,7 +161,7 @@ class vtkGenIOReader : public vtkUnstructuredGridAlgorithm
 public:
   static vtkGenIOReader* New();
   vtkTypeMacro(vtkGenIOReader, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //
   // UI methods
@@ -193,9 +193,9 @@ protected:
 
   bool doMPIDataSplitting(int numDataRanks, int numMPIranks, int myRank, int ranksRangeToLoad[2],
     std::vector<size_t>& readRowsInfo);
-  int RequestInformation(
-    vtkInformation* rqst, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestInformation(vtkInformation* rqst, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   void theadedParsing(int threadId, int numThreads, size_t numRowsToSample, size_t Np,
     vtkSmartPointer<vtkCellArray> cells, vtkSmartPointer<vtkPoints> pnts, int numSelections = -1);

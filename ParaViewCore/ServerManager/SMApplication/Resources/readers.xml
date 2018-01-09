@@ -1650,6 +1650,20 @@
         <Documentation>Specify which mode shape to animate when HasModeShapes
         is on.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetIgnoreFileTime"
+                         animateable="0"
+                         default_values="0"
+                         name="IgnoreFileTime"
+                         label="Ignore File Time"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, the reader will ignore the time value reported at
+        each time step, using the index of the time step as the time value. This
+        is useful for Exodus files where different time steps are overloaded to
+        represent different aspects of a data set rather than the data set at
+        different time values.
+        </Documentation>
+      </IntVectorProperty>
       <StringVectorProperty information_only="1"
                             name="EdgeBlocksInfo">
         <ArraySelectionInformationHelper attribute_name="EdgeBlock" />
@@ -5781,6 +5795,9 @@
             <Property name="ModeShape" panel_visibility="advanced" />
             <Property name="AnimateVibrations" panel_visibility="advanced" />
             <Property name="ModeShapesRangeInfo" />
+          </PropertyGroup>
+          <PropertyGroup label="Time">
+            <Property name="IgnoreFileTime" panel_visibility="advanced" />
           </PropertyGroup>
           <PropertyGroup label="File Pattern">
             <Property name="FilePrefix" panel_visibility="advanced" />
