@@ -4146,6 +4146,8 @@
                       panel_visibility_default_for_representation="volume" />
             <Property name="InterpolationType"
                       panel_visibility="never" />
+            <Property name="ShowIsosurfaces" />
+            <Property name="IsosurfaceValues" />
             <Hints>
               <PropertyWidgetDecorator type="GenericDecorator"
                                        mode="visibility"
@@ -4478,6 +4480,42 @@
           </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetShowIsosurfaces"
+                         default_values="0"
+                         name="ShowIsosurfaces"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property specifies if the rendering of isosurfaces
+          is enabled.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetIsosurfaceValue"
+                            label="Isosurfaces"
+                            name="IsosurfaceValues"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfIsosurfaces"
+                            use_index="1">
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="ColorArrayName" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>This property specifies the values at which to display
+        isosurfaces and also the number of such values.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ShowIsosurfaces"
+                                   value="1" />
+          <!-- enable this widget when ShowIsosurfaces==1 -->
+        </Hints>
+      </DoubleVectorProperty>
+
       <!-- end of UniformGridVolumeRepresentation -->
     </RepresentationProxy>
 
