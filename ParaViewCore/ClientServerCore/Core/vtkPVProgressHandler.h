@@ -72,7 +72,17 @@ public:
    * reporting. All progress events before this call are ignored.
    */
   void PrepareProgress();
+
+  /**
+   * This method add wrong tag event handlers and rmi call back
+   * for progress related mathods
+   */
   void AddHandlers();
+
+  /**
+   * Get whether or not progress is currently enable and if
+   * this progress handler is ready to receive progress events
+   */
   bool GetEnableProgress();
 
   /**

@@ -54,29 +54,29 @@ inline const char* vtkGetProgressText(vtkObjectBase* o)
 
 namespace
 {
+//----------------------------------------------------------------------------
 // Collaboration needs rmi callback to cleanup the progress on secondary clients
 void LocalCleanupPendingProgressRMICallback(void* localArg, void* vtkNotUsed(remoteArg),
   int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
 {
   vtkPVProgressHandler* self = reinterpret_cast<vtkPVProgressHandler*>(localArg);
-  if (!self->GetEnableProgress())
+  if (self->GetEnableProgress())
   {
-    return;
+    self->LocalCleanupPendingProgress();
   }
-  self->LocalCleanupPendingProgress();
 }
 
+//----------------------------------------------------------------------------
 // Collaboration needs rmi callback to refresh error and warning messages on secondary clients
 void RefreshMessageRMICallback(
   void* localArg, void* remoteArg, int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
 {
   vtkPVProgressHandler* self = reinterpret_cast<vtkPVProgressHandler*>(localArg);
-  if (!self->GetEnableProgress())
+  if (self->GetEnableProgress())
   {
-    return;
+    const char* message = reinterpret_cast<const char*>(remoteArg);
+    self->RefreshMessage(message);
   }
-  const char* message = reinterpret_cast<const char*>(remoteArg);
-  self->RefreshMessage(message);
 }
 }
 
@@ -351,13 +351,13 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
     // only true of server-nodes.
     int progress_text_len = static_cast<int>(strlen(progress_text));
     int message_size = progress_text_len + sizeof(double) + sizeof(char);
-    unsigned char* buffer = new unsigned char[message_size];
+    std::vector<unsigned char> buffer(message_size);
 
     double le_progress = progress;
     vtkByteSwap::SwapLE(&progress);
-    memcpy(buffer, &le_progress, sizeof(double));
+    memcpy(buffer.data(), &le_progress, sizeof(double));
 
-    memcpy(buffer + sizeof(double), progress_text, progress_text_len);
+    memcpy(buffer.data() + sizeof(double), progress_text, progress_text_len);
     buffer[progress_text_len + sizeof(double)] = 0;
 
     vtkCompositeMultiProcessController* collabController =
@@ -368,14 +368,15 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
       for (int i = 0; i < collabController->GetNumberOfControllers(); i++)
       {
         client_controller = collabController->GetController(i);
-        client_controller->Send(buffer, message_size, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
+        client_controller->Send(
+          buffer.data(), message_size, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
       }
     }
     else
     {
-      client_controller->Send(buffer, message_size, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
+      client_controller->Send(
+        buffer.data(), message_size, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
     }
-    delete[] buffer;
   }
 
   this->SetLastProgressText(progress_text);
@@ -420,7 +421,7 @@ bool vtkPVProgressHandler::OnWrongTagEvent(vtkObject*, unsigned long eventid, vo
   {
     // Secondary client PrepareProgress is never called by
     // vtkSMSessionClient::PrepareProgressInternal
-    // so we call it when it receive an progress event from the server
+    // so we call it when it receives a progress event from the server
     if (!this->GetEnableProgress())
     {
       this->PrepareProgress();
@@ -476,19 +477,19 @@ void vtkPVProgressHandler::RefreshMessage(const char* message)
       vtkCompositeMultiProcessController::SafeDownCast(client_controller);
     if (collabController)
     {
-      // In collaboration, the secondary clients message are updated with a with RMI call
+      // In collaboration, the messages of the secondary clients are updated with a RMI call
       vtkMultiProcessController* secondaryClientController;
       vtkMultiProcessController* activeClientController = collabController->GetActiveController();
       int length = static_cast<int>(strlen(message));
-      char* buffer = new char[length];
-      memcpy(buffer, message, length * sizeof(char));
+      std::vector<char> buffer(length);
+      memcpy(buffer.data(), message, length * sizeof(char));
       for (int i = 0; i < collabController->GetNumberOfControllers(); i++)
       {
         secondaryClientController = collabController->GetController(i);
         if (secondaryClientController != activeClientController)
         {
           secondaryClientController->TriggerRMI(
-            1, buffer, length, vtkPVProgressHandler::MESSAGE_EVENT_TAG_RMI);
+            1, buffer.data(), length, vtkPVProgressHandler::MESSAGE_EVENT_TAG_RMI);
         }
       }
     }
