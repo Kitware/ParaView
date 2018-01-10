@@ -205,13 +205,16 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
       QList<QString> files;
       files.append(fileEvent->file());
 
-      // By default we always update the options
-      this->Options->SetParaViewDataName(files[0].toLocal8Bit().data());
-
       // If the application is already started just load the data
       if (vtkProcessModule::GetProcessModule()->GetSession())
       {
         pqLoadDataReaction::loadData(files);
+      }
+      else
+      {
+        // If the application has not yet started, treat it as a --data argument
+        // to be processed after the application starts.
+        this->Options->SetParaViewDataName(files[0].toLocal8Bit().data());
       }
     }
     return false;
