@@ -485,6 +485,8 @@ if (PARAVIEW_USE_MPI)
     #${CMAKE_CURRENT_SOURCE_DIR}/UseDataPartitions.xml
   )
 
+  # Volume rendering seems to work better in serial
+  set (UseDataPartitions_FORCE_SERIAL TRUE)
   # This test requires a parallel partition to make sense so we
   # skip running it with the built-in server.
   add_client_server_tests("pvcs"
@@ -693,11 +695,9 @@ set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (FindWidget_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (PropertyLink_FORCE_SERIAL TRUE)
 set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
-set (Contour_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
-set (UseDataPartitions_FORCE_SERIAL TRUE) # Volume rendering seems to work better in serial
 set (SaveTSV_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (DisconnectAndSaveAnimation_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
