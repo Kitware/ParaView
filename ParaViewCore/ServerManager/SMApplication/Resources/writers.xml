@@ -333,6 +333,8 @@
                   show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="GhostLevel"
+                  show="0" />
         <Property name="HeaderType"
                   show="0" />
         <WriterFactory extensions="pvtp"
@@ -378,6 +380,8 @@
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
+                  show="0" />
+        <Property name="GhostLevel"
                   show="0" />
         <Property name="HeaderType"
                   show="0" />
