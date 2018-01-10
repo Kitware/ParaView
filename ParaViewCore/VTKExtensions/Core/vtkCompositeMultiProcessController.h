@@ -58,6 +58,11 @@ public:
   int GetControllerId(int idx);
 
   /**
+   * Return the nth controller.
+   */
+  vtkMultiProcessController* GetController(int idx);
+
+  /**
    * Promote the given controller (ID) to be the next master controller.
    * Making a controller to be the master one, doesn't change anything on the
    * controller itself. It is just a meta-data information that helps client
