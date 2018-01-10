@@ -16,6 +16,7 @@
       "path":"ParaViewCore/VTKExtensions/Default",
       "include":[
         { "class":"vtkAMRDualClip" },
+        { "path":"vtkAMRDualClipTables.cxx" },
         { "class":"vtkAMRDualContour" },
         { "class":"vtkAMRDualGridHelper" },
         { "class":"vtkPVArrayCalculator" },
