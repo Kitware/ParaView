@@ -111,6 +111,22 @@ public:
   }
   //@}
 
+  //@{
+  /**
+   * Iterates over all sources providing time and calls
+   * `vtkSMSourceProxy::UpdatePipelineInformation` on them. That ensures that
+   * timekeeper is using the latest time information available to it.
+   */
+  virtual void UpdateTimeInformation();
+  static void UpdateTimeInformation(vtkSMProxy* timeKeeper)
+  {
+    if (vtkSMTimeKeeperProxy* self = vtkSMTimeKeeperProxy::SafeDownCast(timeKeeper))
+    {
+      self->UpdateTimeInformation();
+    }
+  }
+  //@}
+
 protected:
   vtkSMTimeKeeperProxy();
   ~vtkSMTimeKeeperProxy() override;

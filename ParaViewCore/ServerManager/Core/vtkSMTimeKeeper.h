@@ -91,6 +91,15 @@ public:
   void RemoveSuppressedTimeSource(vtkSMSourceProxy*);
   //@}
 
+  //@{
+  /**
+   * Iterates over all sources providing time and calls
+   * `vtkSMSourceProxy::UpdatePipelineInformation` on them. That ensures that
+   * timekeeper is using the latest time information available to it.
+   */
+  void UpdateTimeInformation();
+  //@}
+
 protected:
   vtkSMTimeKeeper();
   ~vtkSMTimeKeeper() override;
@@ -113,6 +122,8 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
+
+  bool DeferUpdateTimeSteps;
 };
 
 #endif

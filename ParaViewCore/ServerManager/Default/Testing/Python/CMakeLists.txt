@@ -27,6 +27,7 @@ set(PY_TESTS
   Animation.py
   AxesGridTestGridLines.py
   CellIntegrator.py,NO_VALID
+  ChangeTimeSteps.py
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   CSVWriterReader.py,NO_VALID
   GhostCellsInMergeBlocks.py

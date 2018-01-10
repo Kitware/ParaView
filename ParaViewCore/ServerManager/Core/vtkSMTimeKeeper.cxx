@@ -81,6 +81,7 @@ vtkSMTimeKeeper::vtkSMTimeKeeper()
   this->TimestepValuesProperty = 0;
   this->TimeRangeProperty = 0;
   this->TimeLabelProperty = 0;
+  this->DeferUpdateTimeSteps = false;
 }
 
 //----------------------------------------------------------------------------
@@ -205,8 +206,27 @@ void vtkSMTimeKeeper::SetTime(double time)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMTimeKeeper::UpdateTimeInformation()
+{
+  const bool prev = this->DeferUpdateTimeSteps;
+  this->DeferUpdateTimeSteps = true;
+  for (vtkSMSourceProxy* source : this->Internal->Sources)
+  {
+    source->UpdatePipelineInformation();
+  }
+  this->DeferUpdateTimeSteps = prev;
+
+  this->UpdateTimeSteps();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMTimeKeeper::UpdateTimeSteps()
 {
+  if (this->DeferUpdateTimeSteps)
+  {
+    return;
+  }
+
   std::set<double> timesteps;
   double timerange[2] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
   const char* label = NULL;
