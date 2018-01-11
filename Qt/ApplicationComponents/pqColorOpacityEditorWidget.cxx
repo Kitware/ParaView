@@ -140,20 +140,12 @@ public:
 
     this->Ui.ColorTable->setModel(&this->ColorTableModel);
     this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
-#if QT_VERSION >= 0x050000
     this->Ui.ColorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    this->Ui.ColorTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
     this->Ui.ColorTable->horizontalHeader()->setStretchLastSection(true);
 
     this->Ui.OpacityTable->setModel(&this->OpacityTableModel);
     this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
-#if QT_VERSION >= 0x050000
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    this->Ui.OpacityTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
   }
 
@@ -190,6 +182,9 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
     QObject::connect(&this->Internals->ColorTableModel,
       SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
       SIGNAL(xrgbPointsChanged()));
+    QObject::connect(&this->Internals->OpacityTableModel,
+      SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this,
+      SIGNAL(xvmsPointsChanged()));
   }
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(representationChanged(pqRepresentation*)),
     this, SLOT(updateButtonEnableState()));
