@@ -68,6 +68,7 @@
         </Documentation>
       </IntVectorProperty>
 
+
       <IntVectorProperty name="EnableOpacityMapping"
                          command="SetEnableOpacityMapping"
                          number_of_elements="1"
@@ -295,6 +296,18 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="IndexedOpacities"
+                            command="SetIndexedOpacityInFullSet"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfIndexedOpacitiesInFullSet"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Opacities used when using IndexedLookup is true.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <PropertyGroup label="Mapping Data" panel_widget="ColorOpacityEditor">
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="RGBPoints" function="XRGBPoints" />
@@ -314,6 +327,7 @@
 
       <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
         <Property name="Annotations" />
+        <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="IndexedColors" />
       </PropertyGroup>
 
@@ -966,6 +980,11 @@
           <Group name="lookup_tables" />
         </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty command="GetEstimatedNumberOfAnnotations"
+                         information_only="1"
+                         name="EstimatedNumberOfAnnotations">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetVisibility"
                          default_values="1"
@@ -1006,6 +1025,18 @@
                          command="SetForceHorizontalTitle"
                          default_values="0"
                          name="HorizontalTitle"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When on, orients the title horizontally. When off (default), the title
+          will be rotated counter-clockwise 90 degrees and lie parallel to the
+          color bar.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetForceHorizontalTitle"
+                         default_values="0"
+                         name="HorizontalTitle2"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>

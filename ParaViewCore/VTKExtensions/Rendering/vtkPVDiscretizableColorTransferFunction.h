@@ -63,6 +63,11 @@ public:
   void SetIndexedColorInFullSet(unsigned int index, double r, double g, double b);
   void GetIndexedColorInFullSet(unsigned int index, double rgb[3]);
 
+  void SetNumberOfIndexedOpacitiesInFullSet(int n);
+  int GetNumberOfIndexedOpacitiesInFullSet();
+  void SetIndexedOpacityInFullSet(unsigned int index, double alpha);
+  void GetIndexedOpacityInFullSet(unsigned int index, double* alpha);
+
   //@{
   /**
    * Set whether to use restrict annotations to only the values
@@ -95,6 +100,7 @@ private:
   //@}
 
   vtkDoubleArray* IndexedColorsInFullSet;
+  vtkDoubleArray* IndexedOpacitiesInFullSet;
 
   /**
    * Set of active annotations.

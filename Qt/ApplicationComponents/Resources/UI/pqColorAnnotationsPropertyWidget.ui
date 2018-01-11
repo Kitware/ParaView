@@ -151,6 +151,16 @@
      </attribute>
     </widget>
    </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QCheckBox" name="EnableOpacityMapping">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked, the opacity function is used to render translucent surfaces.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Enable opacity mapping for surfaces</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

@@ -1330,3 +1330,23 @@ void vtkContext2DScalarBarActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+int vtkContext2DScalarBarActor::GetEstimatedNumberOfAnnotations()
+{
+  vtkDiscretizableColorTransferFunction* ctf =
+    vtkDiscretizableColorTransferFunction::SafeDownCast(this->LookupTable);
+  if (!ctf)
+  {
+    return 0;
+  }
+  if (this->GetAutomaticAnnotations() && !ctf->GetIndexedLookup())
+  {
+    // How many annotations should there be?
+    return ctf->GetNumberOfAvailableColors();
+  }
+  else // Manual annotations
+  {
+    return ctf->GetNumberOfAnnotatedValues();
+  }
+}

@@ -209,6 +209,14 @@ public:
    */
   vtkRectf GetBoundingRect();
 
+  /**
+   * Get an estimated number of annotations emulating loosely the
+   * algorithm generating the annotations. The actual number of annotations
+   * can be slightly lower than the return of this method when using
+   * automatic annotations.
+   */
+  int GetEstimatedNumberOfAnnotations();
+
 protected:
   vtkContext2DScalarBarActor();
   ~vtkContext2DScalarBarActor() override;

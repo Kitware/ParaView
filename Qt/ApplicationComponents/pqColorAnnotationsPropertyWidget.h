@@ -48,6 +48,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqColorAnnotationsPropertyWidget : public p
   Q_OBJECT;
   Q_PROPERTY(QList<QVariant> annotations READ annotations WRITE setAnnotations);
   Q_PROPERTY(QList<QVariant> indexedColors READ indexedColors WRITE setIndexedColors);
+  Q_PROPERTY(QList<QVariant> indexedOpacities READ indexedOpacities WRITE setIndexedOpacities);
 
   typedef pqPropertyWidget Superclass;
 
@@ -71,6 +72,17 @@ public:
   QList<QVariant> indexedColors() const;
   void setIndexedColors(const QList<QVariant>&);
 
+  /**
+  * Get/Set the indexed opacities.
+  */
+  QList<QVariant> indexedOpacities() const;
+  void setIndexedOpacities(const QList<QVariant>&);
+
+  /**
+  * Apply a color preset using its name
+  */
+  void applyPreset(const char* presetName);
+
 signals:
   /**
   * Fired when the annotations are changed.
@@ -81,6 +93,15 @@ signals:
   * Fired when the indexed colors are changed.
   */
   void indexedColorsChanged();
+
+  /**
+  * Fired when the indexed opacities are changed.
+  */
+  void indexedOpacitiesChanged();
+
+protected:
+  bool addActiveAnnotations(bool force);
+  bool addActiveAnnotationsFromVisibleSources(bool force);
 
 private slots:
   /**
@@ -95,7 +116,8 @@ private slots:
 
   /**
   * called whenever the internal model's data changes. We fire
-  * annotationsChanged() or indexedColorsChanged() signals appropriately.
+  * annotationsChanged(), indexedColorsChanged()
+  * or indexedOpacitiesChanged signals appropriately.
   */
   void onDataChanged(const QModelIndex& topleft, const QModelIndex& btmright);
 
@@ -105,6 +127,23 @@ private slots:
   * color.
   */
   void onDoubleClicked(const QModelIndex& idx);
+
+  /**
+  * called when user double-clicks on an item. If the double click is on the
+  * 0-th column, we show the color editor to allow editing of the indexed
+  * color.
+  */
+  void onHeaderDoubleClicked(int section);
+
+  /**
+  * Called when user right click on table
+  */
+  void customMenuRequested(QPoint pos);
+
+  /**
+  * Called when global and selected opacity should be set
+  */
+  void execGlobalOpacityDialog();
 
   /**
   * pick a preset.
@@ -117,10 +156,16 @@ private slots:
   void saveAsPreset();
 
   /**
-  * Ensures that the color-swatches for indexedColors are shown only when this
+  * Ensures that the table for indexedColors are shown only when this
   * is set to true.
   */
   void updateIndexedLookupState();
+
+  /**
+  * Ensures that the table for indexedColors are shown only when this
+  * is set to true.
+  */
+  void updateOpacityColumnState();
 
   /**
   * called when the user edits past the last row.

@@ -104,6 +104,26 @@ public:
   vtkGetMacro(Uncertainty, double);
   //@}
 
+  //@{
+  /**
+   * Set/get the force flag that will be used when recovering the prominents values.
+   * If not set, a maximum of vtkAbstractArray::MAX_DISCRETE_VALUES (32) values
+   * will be recovered, if there is more, none will be recovered and the information
+   * will be considered invalid. If the force flag is set, there is no maximum number
+   * of prominent values recovered and the information should be valid even with a high
+   * number of prominent values.
+   */
+  vtkSetMacro(Force, bool);
+  vtkGetMacro(Force, bool);
+
+  //@{
+  /**
+   * Get the validity of the information. The flag has a meaning after trying to recover
+   * prominent values, if true, the data can be used, if false, this information should
+   * be considered invalid.
+   */
+  vtkGetMacro(Valid, bool);
+
   /**
    * Returns 1 if the array can be combined.
    * It must have the same name and number of components.
@@ -193,6 +213,8 @@ protected:
   char* FieldAssociation;
   double Fraction;
   double Uncertainty;
+  bool Force;
+  bool Valid;
   //@}
 
   /// Information results

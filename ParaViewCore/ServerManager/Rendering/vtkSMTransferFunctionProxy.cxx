@@ -765,7 +765,7 @@ bool vtkSMTransferFunctionProxy::SaveColorMap(vtkPVXMLElement* xml)
         child->AddAttribute("r", points[cc].GetData()[1]);
         child->AddAttribute("g", points[cc].GetData()[2]);
         child->AddAttribute("b", points[cc].GetData()[3]);
-        child->AddAttribute("o", "1");
+        child->AddAttribute("o", 1.0);
         xml->AddNestedElement(child.GetPointer());
       }
     }

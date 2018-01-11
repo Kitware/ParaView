@@ -68,6 +68,8 @@ vtkPVProminentValuesInformation::vtkPVProminentValuesInformation()
   this->DistinctValues = 0;
   this->InitializeParameters();
   this->Initialize();
+  this->Force = false;
+  this->Valid = true;
 }
 
 //----------------------------------------------------------------------------
@@ -271,6 +273,8 @@ void vtkPVProminentValuesInformation::DeepCopyParameters(vtkPVProminentValuesInf
   this->SetNumberOfComponents(other->GetNumberOfComponents());
   this->Fraction = other->Fraction;
   this->Uncertainty = other->Uncertainty;
+  this->Force = other->Force;
+  this->Valid = other->Valid;
 }
 
 //----------------------------------------------------------------------------
@@ -382,7 +386,13 @@ void vtkPVProminentValuesInformation::CopyDistinctValuesFromObject(vtkAbstractAr
     tuple.resize(tupleSize);
     std::set<std::vector<vtkVariant> >& compDistincts((*this->DistinctValues)[c]);
     cvalues->Initialize();
+    unsigned int maxDiscreteValues = array->GetMaxDiscreteValues();
+    if (this->Force)
+    {
+      array->SetMaxDiscreteValues(VTK_UNSIGNED_INT_MAX);
+    }
     array->GetProminentComponentValues(c, cvalues.GetPointer(), 0., 0.);
+    array->SetMaxDiscreteValues(maxDiscreteValues);
     vtkIdType nt = cvalues->GetNumberOfTuples();
     if (nt > 0)
     {
@@ -402,6 +412,14 @@ void vtkPVProminentValuesInformation::CopyDistinctValuesFromObject(vtkAbstractAr
           }
           */
       }
+      this->Valid = true;
+    }
+    else
+    {
+      // if there is no tuples provided, it means we were unable
+      // to determine the prominent values and this information
+      // is invalid
+      this->Valid = false;
     }
   }
 }
@@ -430,6 +448,7 @@ void vtkPVProminentValuesInformation::AddInformation(vtkPVInformation* info)
     // Add unique values to our own.
     this->AddDistinctValues(aInfo);
   }
+  this->Valid = this->Valid && aInfo->GetValid();
 }
 
 //----------------------------------------------------------------------------
@@ -440,7 +459,8 @@ void vtkPVProminentValuesInformation::CopyToStream(vtkClientServerStream* css)
 
   // Copy parameter values to stream.
   *css << this->PortNumber << std::string(this->FieldAssociation) << std::string(this->FieldName)
-       << this->NumberOfComponents << this->Fraction << this->Uncertainty;
+       << this->NumberOfComponents << this->Fraction << this->Uncertainty << this->Force
+       << this->Valid;
 
   // Now copy results to stream.
   int numberOfDistinctValueComponents =
@@ -513,6 +533,18 @@ void vtkPVProminentValuesInformation::CopyFromStream(const vtkClientServerStream
     return;
   }
 
+  if (!css->GetArgument(0, pos++, &this->Force))
+  {
+    vtkErrorMacro("Error parsing force flag from message.");
+    return;
+  }
+
+  if (!css->GetArgument(0, pos++, &this->Valid))
+  {
+    vtkErrorMacro("Error parsing valid flag from message.");
+    return;
+  }
+
   int numberOfDistinctValueComponents;
   if (!css->GetArgument(0, pos++, &numberOfDistinctValueComponents))
   {
@@ -575,7 +607,7 @@ void vtkPVProminentValuesInformation::CopyParametersToStream(vtkMultiProcessStre
   vtkTypeUInt32 magic_number = VTK_PROMINENT_MAGIC_NUMBER;
   mps << magic_number << this->PortNumber << std::string(this->FieldAssociation)
       << std::string(this->FieldName) << this->NumberOfComponents << this->Fraction
-      << this->Uncertainty;
+      << this->Uncertainty << this->Force << this->Valid;
 }
 
 //-----------------------------------------------------------------------------
@@ -586,7 +618,7 @@ void vtkPVProminentValuesInformation::CopyParametersFromStream(vtkMultiProcessSt
   std::string fieldAssoc;
   std::string fieldName;
   mps >> magic_number >> this->PortNumber >> fieldAssoc >> fieldName >> this->NumberOfComponents >>
-    this->Fraction >> this->Uncertainty;
+    this->Fraction >> this->Uncertainty >> this->Force >> this->Valid;
   if (magic_number != VTK_PROMINENT_MAGIC_NUMBER)
   {
     vtkErrorMacro("Magic number mismatch.");
@@ -614,7 +646,8 @@ void vtkPVProminentValuesInformation::AddDistinctValues(vtkPVProminentValuesInfo
       for (eit = bit->second.begin(); eit != bit->second.end(); ++eit)
       {
         if ((*this->DistinctValues)[i].insert(*eit).second &&
-          (*this->DistinctValues)[i].size() > vtkAbstractArray::MAX_DISCRETE_VALUES)
+          ((*this->DistinctValues)[i].size() > vtkAbstractArray::MAX_DISCRETE_VALUES &&
+              !this->Force))
         {
           tooManyValues = true;
           break;
@@ -626,6 +659,7 @@ void vtkPVProminentValuesInformation::AddDistinctValues(vtkPVProminentValuesInfo
     if (tooManyValues)
     {
       this->DistinctValues->erase(i);
+      this->Valid = false;
     }
   }
 }

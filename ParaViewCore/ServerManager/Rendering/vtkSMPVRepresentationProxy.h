@@ -299,15 +299,26 @@ public:
    * array used for scalar color, if any. Otherwise returns NULL.
    */
   virtual vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
-    double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
+    double uncertaintyAllowed = 1e-6, double fraction = 1e-3, bool force = false);
   static vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
-    vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3)
+    vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3, bool force = false)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self ? self->GetProminentValuesInformationForColorArray(uncertaintyAllowed, fraction)
-                : NULL;
+    return self
+      ? self->GetProminentValuesInformationForColorArray(uncertaintyAllowed, fraction, force)
+      : NULL;
   }
   //@}
+
+  /**
+   * Get an estimated number of annotation shown on this representation scalar bar
+   */
+  int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* view);
+  static int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* proxy, vtkSMProxy* view)
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->GetEstimatedNumberOfAnnotationsOnScalarBar(view) : -1;
+  }
 
   /**
    * Overridden to ensure when picking representation types that require scalar
