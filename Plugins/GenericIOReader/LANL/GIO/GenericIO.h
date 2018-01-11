@@ -183,11 +183,11 @@ public:
       , IsFloat(!std::numeric_limits<T>::is_integer)
       , IsSigned(std::numeric_limits<T>::is_signed)
       , Data((void*)D)
-      , HasExtraSpace(Flags & VarHasExtraSpace)
-      , IsPhysCoordX(Flags & VarIsPhysCoordX)
-      , IsPhysCoordY(Flags & VarIsPhysCoordY)
-      , IsPhysCoordZ(Flags & VarIsPhysCoordZ)
-      , MaybePhysGhost(Flags & VarMaybePhysGhost)
+      , HasExtraSpace((Flags & VarHasExtraSpace) != 0)
+      , IsPhysCoordX((Flags & VarIsPhysCoordX) != 0)
+      , IsPhysCoordY((Flags & VarIsPhysCoordY) != 0)
+      , IsPhysCoordZ((Flags & VarIsPhysCoordZ) != 0)
+      , MaybePhysGhost((Flags & VarMaybePhysGhost) != 0)
     {
     }
 
@@ -197,11 +197,11 @@ public:
       , IsFloat(VI.IsFloat)
       , IsSigned(VI.IsSigned)
       , Data(D)
-      , HasExtraSpace(Flags & VarHasExtraSpace)
-      , IsPhysCoordX((Flags & VarIsPhysCoordX) || VI.IsPhysCoordX)
-      , IsPhysCoordY((Flags & VarIsPhysCoordY) || VI.IsPhysCoordY)
-      , IsPhysCoordZ((Flags & VarIsPhysCoordZ) || VI.IsPhysCoordZ)
-      , MaybePhysGhost((Flags & VarMaybePhysGhost) || VI.MaybePhysGhost)
+      , HasExtraSpace((Flags & VarHasExtraSpace) != 0)
+      , IsPhysCoordX(((Flags & VarIsPhysCoordX) != 0) || VI.IsPhysCoordX)
+      , IsPhysCoordY(((Flags & VarIsPhysCoordY) != 0) || VI.IsPhysCoordY)
+      , IsPhysCoordZ(((Flags & VarIsPhysCoordZ) != 0) || VI.IsPhysCoordZ)
+      , MaybePhysGhost(((Flags & VarMaybePhysGhost) != 0) || VI.MaybePhysGhost)
     {
     }
 
@@ -338,7 +338,7 @@ public:
 
   void clearVariables() { this->Vars.clear(); };
 
-  int getNumberOfVariables() { return this->Vars.size(); };
+  int getNumberOfVariables() { return static_cast<int>(this->Vars.size()); };
 
   void getVariableInfo(std::vector<VariableInfo>& VI);
 
