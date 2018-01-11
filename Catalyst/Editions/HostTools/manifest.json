@@ -61,9 +61,6 @@
       "name":"vtkkwiml",
       "path":"VTK/Utilities/KWIML"
     },
-    { "name":"vtkUtilitiesHashSource",
-      "path":"VTK/Utilities/HashSource"
-    },
     { "name":"vtkUtilitiesWrapClientServer",
       "path":"Utilities/WrapClientServer"
     },
