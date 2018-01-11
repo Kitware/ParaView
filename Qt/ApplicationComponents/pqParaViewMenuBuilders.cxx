@@ -144,8 +144,8 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqExportReaction(ui.actionExport);
   new pqSaveDataReaction(ui.actionFileSaveData);
 
-  new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowLayout);
-  new pqLoadRestoreWindowLayoutReaction(false, ui.actionFileSaveWindowLayout);
+  new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowArrangement);
+  new pqLoadRestoreWindowLayoutReaction(false, ui.actionFileSaveWindowArrangement);
 }
 
 //-----------------------------------------------------------------------------

@@ -139,26 +139,26 @@
     <string>Export Scene...</string>
    </property>
   </action>
-  <action name="actionFileSaveWindowLayout">
+  <action name="actionFileSaveWindowArrangement">
    <property name="text">
-    <string>Save Window Layout...</string>
+    <string>Save Window Arrangement...</string>
    </property>
    <property name="toolTip">
-    <string>Save window layout to a file</string>
+    <string>Save window arrangement to a file</string>
    </property>
    <property name="statusTip">
-    <string>Save window layout to a file</string>
+    <string>Save window arrangement to a file</string>
    </property>
   </action>
-  <action name="actionFileLoadWindowLayout">
+  <action name="actionFileLoadWindowArrangement">
    <property name="text">
-    <string>Load Window Layout...</string>
+    <string>Load Window Arrangement...</string>
    </property>
    <property name="toolTip">
-    <string>Load window layout from a file</string>
+    <string>Load window arrangement from a file</string>
    </property>
    <property name="statusTip">
-    <string>Load window layout from a file</string>
+    <string>Load window arrangement from a file</string>
    </property>
   </action>
   <action name="actionFileImportCinemaDatabase">
@@ -205,8 +205,8 @@
   <addaction name="separator"/>
   <addaction name="actionFileLoadMaterials"/>
   <addaction name="separator"/>
-  <addaction name="actionFileLoadWindowLayout"/>
-  <addaction name="actionFileSaveWindowLayout"/>
+  <addaction name="actionFileLoadWindowArrangement"/>
+  <addaction name="actionFileSaveWindowArrangement"/>
   <addaction name="separator"/>
   <addaction name="actionServerConnect"/>
   <addaction name="actionServerDisconnect"/>
