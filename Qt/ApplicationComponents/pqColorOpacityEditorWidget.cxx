@@ -140,20 +140,12 @@ public:
 
     this->Ui.ColorTable->setModel(&this->ColorTableModel);
     this->Ui.ColorTable->horizontalHeader()->setHighlightSections(false);
-#if QT_VERSION >= 0x050000
     this->Ui.ColorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    this->Ui.ColorTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
     this->Ui.ColorTable->horizontalHeader()->setStretchLastSection(true);
 
     this->Ui.OpacityTable->setModel(&this->OpacityTableModel);
     this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
-#if QT_VERSION >= 0x050000
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    this->Ui.OpacityTable->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
   }
 
