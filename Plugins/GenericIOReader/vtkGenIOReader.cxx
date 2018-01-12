@@ -524,7 +524,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
     std::vector<lanl::gio::GenericIO::VariableInfo> VI;
     gioReader->getVariableInfo(VI);
 
-    numVars = VI.size();
+    numVars = static_cast<int>(VI.size());
     readInData.resize(numVars);
 
     bool foundCoord = false;
@@ -532,7 +532,7 @@ int vtkGenIOReader::RequestInformation(vtkInformation* /*rqst*/,
     {
       readInData[i].id = i;
       readInData[i].name = VI[i].Name;
-      readInData[i].size = VI[i].Size;
+      readInData[i].size = static_cast<int>(VI[i].Size);
       readInData[i].isFloat = VI[i].IsFloat;
       readInData[i].isSigned = VI[i].IsSigned;
       readInData[i].ghost = VI[i].MaybePhysGhost;
@@ -717,7 +717,7 @@ int vtkGenIOReader::RequestData(
       selections.push_back(_sel);
     else
     {
-      int numEntriesInSel = selections.size();
+      int numEntriesInSel = static_cast<int>(selections.size());
       if (!((_sel.selectedScalar == selections[numEntriesInSel - 1].selectedScalar &&
               _sel.operatorType == selections[numEntriesInSel - 1].operatorType) &&
             (_sel.selectedValue[0] == selections[numEntriesInSel - 1].selectedValue[0] &&
@@ -725,7 +725,7 @@ int vtkGenIOReader::RequestData(
         selections.push_back(_sel);
     }
 
-    numSelections = selections.size();
+    numSelections = static_cast<int>(selections.size());
 
     msgLog << "numSelections: " << numSelections << "\n";
     for (int i = 0; i < numSelections; i++)
@@ -743,8 +743,8 @@ int vtkGenIOReader::RequestData(
     const char* _name = CellDataArraySelection->GetArrayName(i);
     int _status = GetCellArrayStatus(_name);
 
-    paraviewData[i].show = _status;
-    paraviewData[i].load = _status;
+    paraviewData[i].show = _status != 0;
+    paraviewData[i].load = _status != 0;
 
     // override above if it's a position scalar
     if (paraviewData[i].position)
@@ -991,7 +991,7 @@ int vtkGenIOReader::RequestData(
       msgLog << "Selecting based on ... \n";
 
       // Set selected variable
-      numSelections = selections.size();
+      numSelections = static_cast<int>(selections.size());
       bool foundSelected = false;
       for (int i = 0; i < numSelections; i++)
       {

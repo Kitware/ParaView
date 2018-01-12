@@ -112,7 +112,7 @@ void usleep(int waitTime)
 // Convert a POSIX ftruncate to a windows system chsize
 int ftruncate(unsigned int fd, size_t size)
 {
-  return _chsize(fd, size);
+  return _chsize(fd, static_cast<long>(size));
 }
 
 // Convert a POSIX read to a windows system read
@@ -121,7 +121,7 @@ int pread(unsigned int fd, void* buf, size_t count, int offset)
   if (_lseek(fd, offset, SEEK_SET) != offset)
     return -1;
 
-  return _read(fd, (char*)buf, count);
+  return _read(fd, (char*)buf, static_cast<unsigned int>(count));
 }
 
 // Convert a POSIX write to a windows system write
@@ -130,7 +130,7 @@ int pwrite(unsigned int fd, const void* buf, size_t count, int offset)
   if (_lseek(fd, offset, SEEK_SET) != offset)
     return -1;
 
-  return _write(fd, (char*)buf, count);
+  return _write(fd, (char*)buf, static_cast<unsigned int>(count));
 }
 #endif
 
@@ -251,18 +251,18 @@ GenericFileIO_POSIX::~GenericFileIO_POSIX()
 void GenericFileIO_POSIX::open(const std::string& FN, bool ForReading)
 {
   FileName = FN;
+  errno = 0;
 
 #ifdef _WIN32
   // Windows POSIX Must explicitely define O_BINARY otherwise it defaults to text mode
   int flags = ForReading ? (O_RDONLY | O_BINARY) : (O_WRONLY | O_CREAT | O_BINARY);
   int mode = S_IRUSR | S_IWUSR;
+  if ((FH = lanl::open(FileName.c_str(), flags, mode)) == -1)
 #else
   int flags = ForReading ? O_RDONLY : (O_WRONLY | O_CREAT);
   int mode = S_IRUSR | S_IWUSR | S_IRGRP;
-#endif
-
-  errno = 0;
   if ((FH = ::open(FileName.c_str(), flags, mode)) == -1)
+#endif
     throw runtime_error(
       (!ForReading ? "Unable to create the file: " : "Unable to open the file: ") + FileName +
       ": " + strerror(errno));
@@ -291,7 +291,7 @@ void GenericFileIO_POSIX::read(void* buf, size_t count, off_t offset, const std:
 
     count -= scount;
     buf = ((char*)buf) + scount;
-    offset += scount;
+    offset += static_cast<off_t>(scount);
   }
 }
 
@@ -312,7 +312,7 @@ void GenericFileIO_POSIX::write(const void* buf, size_t count, off_t offset, con
 
     count -= scount;
     buf = ((char*)buf) + scount;
-    offset += scount;
+    offset += static_cast<off_t>(scount);
   }
 }
 
@@ -963,7 +963,7 @@ void GenericIO::readHeaderLeader(void* GHPtr, MismatchBehavior MB, int NRanks, i
   }
 
   HeaderSize = GH.HeaderSize;
-  Header.resize(HeaderSize + CRCSize, 0xFE /* poison */);
+  Header.resize(HeaderSize + CRCSize, static_cast<char>(0xFE) /* poison */);
   FH.get()->read(&Header[0], HeaderSize + CRCSize, 0, "header");
 
   uint64_t CRC = crc64_omp(&Header[0], HeaderSize + CRCSize);
@@ -1003,7 +1003,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
         GenericIO GIO(FileName, FileIOType);
 #endif
         GIO.openAndReadHeader(MismatchDisallowed, 0, false);
-        RanksInMap = GIO.readNumElems();
+        RanksInMap = static_cast<unsigned long>(GIO.readNumElems());
 
         RankMap.resize(RanksInMap + GIO.requestedExtraSpace() / sizeof(int));
         GIO.addVariable("$partition", RankMap, true);
@@ -1143,7 +1143,7 @@ void GenericIO::openAndReadHeader(MismatchBehavior MB, int EffRank, bool CheckPa
   MPI_Bcast(&HeaderSize, 1, MPI_UINT64_T, 0, SplitComm);
 #endif
 
-  Header.resize(HeaderSize, 0xFD /* poison */);
+  Header.resize(HeaderSize, static_cast<char>(0xFD) /* poison */);
 #ifndef LANL_GENERICIO_NO_MPI
   MPI_Bcast(&Header[0], HeaderSize, MPI_BYTE, 0, SplitComm);
 #endif
@@ -1202,7 +1202,7 @@ template <bool IsBigEndian>
 int GenericIO::readNRanks()
 {
   if (RankMap.size())
-    return RankMap.size();
+    return static_cast<int>(RankMap.size());
 
   assert(FH.getHeaderCache().size() && "HeaderCache must not be empty");
   GlobalHeader<IsBigEndian>* GH = (GlobalHeader<IsBigEndian>*)&FH.getHeaderCache()[0];
@@ -1222,7 +1222,9 @@ void GenericIO::readDims(int Dims[3])
 {
   assert(FH.getHeaderCache().size() && "HeaderCache must not be empty");
   GlobalHeader<IsBigEndian>* GH = (GlobalHeader<IsBigEndian>*)&FH.getHeaderCache()[0];
-  std::copy(GH->Dims, GH->Dims + 3, Dims);
+  Dims[0] = static_cast<int>(GH->Dims[0]);
+  Dims[1] = static_cast<int>(GH->Dims[1]);
+  Dims[2] = static_cast<int>(GH->Dims[2]);
 }
 
 uint64_t GenericIO::readTotalNumElems()
@@ -1377,7 +1379,7 @@ size_t GenericIO::readNumElems(int EffRank)
     DisableCollErrChecking = true;
 
     size_t TotalSize = 0;
-    for (int i = 0, ie = SourceRanks.size(); i != ie; ++i)
+    for (size_t i = 0, ie = SourceRanks.size(); i != ie; ++i)
       TotalSize += readNumElems(SourceRanks[i]);
 
     DisableCollErrChecking = false;
@@ -1449,7 +1451,7 @@ void GenericIO::readDataSection(
     DisableCollErrChecking = true;
 
     size_t RowOffset = 0;
-    for (int i = 0, ie = SourceRanks.size(); i != ie; ++i)
+    for (size_t i = 0, ie = SourceRanks.size(); i != ie; ++i)
     {
       readDataSection(
         readOffset, readNumRows, SourceRanks[i], RowOffset, Rank, TotalReadSize, NErrs);
@@ -1559,7 +1561,7 @@ void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRa
       }
 
       VarFound = true;
-      bool IsFloat = (bool)(VH->Flags & FloatValue), IsSigned = (bool)(VH->Flags & SignedValue);
+      bool IsFloat = (VH->Flags & FloatValue) != 0, IsSigned = (VH->Flags & SignedValue) != 0;
       if (VH->Size != Vars[i].Size)
       {
         stringstream ss;
@@ -1638,7 +1640,7 @@ void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRa
             // Read section
             ReadSize = readNumRows * VH->Size;
             Offset = Offset + readOffset * VH->Size;
-            FH.get()->read(Data, ReadSize, Offset, Vars[i].Name);
+            FH.get()->read(Data, ReadSize, static_cast<off_t>(Offset), Vars[i].Name);
 
             break;
           }
@@ -1762,7 +1764,7 @@ void GenericIO::readData(int EffRank, bool PrintStats, bool CollStats)
     DisableCollErrChecking = true;
 
     size_t RowOffset = 0;
-    for (int i = 0, ie = SourceRanks.size(); i != ie; ++i)
+    for (size_t i = 0, ie = SourceRanks.size(); i != ie; ++i)
     {
       readData(SourceRanks[i], RowOffset, Rank, TotalReadSize, NErrs);
       RowOffset += readNumElems(SourceRanks[i]);
@@ -1880,7 +1882,7 @@ void GenericIO::readData(
       }
 
       VarFound = true;
-      bool IsFloat = (bool)(VH->Flags & FloatValue), IsSigned = (bool)(VH->Flags & SignedValue);
+      bool IsFloat = (VH->Flags & FloatValue) != 0, IsSigned = (VH->Flags & SignedValue) != 0;
       if (VH->Size != Vars[i].Size)
       {
         stringstream ss;
@@ -1958,7 +1960,7 @@ void GenericIO::readData(
         {
           try
           {
-            FH.get()->read(Data, ReadSize, Offset, Vars[i].Name);
+            FH.get()->read(Data, ReadSize, static_cast<off_t>(Offset), Vars[i].Name);
             break;
           }
           catch (...)
@@ -2016,7 +2018,7 @@ void GenericIO::readData(
         string dn = "gio_crc_errors";
         mkdir(dn.c_str(), 0777);
 
-        srand(time(0));
+        srand(static_cast<unsigned int>(time(0)));
         int DumpNum = rand();
         stringstream ssd;
         ssd << dn << "/gio_crc_error_dump." << RankTmp << "." << DumpNum << ".bin";
@@ -2156,11 +2158,11 @@ void GenericIO::getVariableInfo(vector<VariableInfo>& VI)
     if (VNameNull < NameSize)
       VName.resize(VNameNull);
 
-    bool IsFloat = (bool)(VH->Flags & FloatValue), IsSigned = (bool)(VH->Flags & SignedValue),
-         IsPhysCoordX = (bool)(VH->Flags & ValueIsPhysCoordX),
-         IsPhysCoordY = (bool)(VH->Flags & ValueIsPhysCoordY),
-         IsPhysCoordZ = (bool)(VH->Flags & ValueIsPhysCoordZ),
-         MaybePhysGhost = (bool)(VH->Flags & ValueMaybePhysGhost);
+    bool IsFloat = (VH->Flags & FloatValue) != 0, IsSigned = (VH->Flags & SignedValue) != 0,
+         IsPhysCoordX = ((VH->Flags & ValueIsPhysCoordX) != 0),
+         IsPhysCoordY = ((VH->Flags & ValueIsPhysCoordY) != 0),
+         IsPhysCoordZ = ((VH->Flags & ValueIsPhysCoordZ) != 0),
+         MaybePhysGhost = ((VH->Flags & ValueMaybePhysGhost) != 0);
     VI.push_back(VariableInfo(VName, (size_t)VH->Size, IsFloat, IsSigned, IsPhysCoordX,
       IsPhysCoordY, IsPhysCoordZ, MaybePhysGhost));
   }
