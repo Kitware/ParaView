@@ -178,6 +178,8 @@ public:
   virtual void SetSpecularColor(double r, double g, double b);
   virtual void SetSpecularPower(double val);
   virtual void SetLuminosity(double val);
+  virtual void SetRenderPointsAsSpheres(bool);
+  virtual void SetRenderLinesAsTubes(bool);
 
   //***************************************************************************
   // Forwarded to Actor.

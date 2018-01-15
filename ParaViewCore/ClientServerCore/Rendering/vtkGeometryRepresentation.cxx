@@ -676,8 +676,16 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
 
   if (this->Representation != SURFACE && this->Representation != SURFACE_WITH_EDGES)
   {
-    diffuse = 0.0;
-    ambient = 1.0;
+    if ((this->Representation == WIREFRAME && this->Property->GetRenderLinesAsTubes()) ||
+      (this->Representation == POINTS && this->Property->GetRenderPointsAsSpheres()))
+    {
+      // use diffuse lighting, since we're rendering as tubes or spheres.
+    }
+    else
+    {
+      diffuse = 0.0;
+      ambient = 1.0;
+    }
   }
 
   this->Property->SetAmbient(ambient);
@@ -774,6 +782,18 @@ void vtkGeometryRepresentation::SetLuminosity(double val)
 #else
   (void)val;
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetRenderPointsAsSpheres(bool val)
+{
+  this->Property->SetRenderPointsAsSpheres(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetRenderLinesAsTubes(bool val)
+{
+  this->Property->SetRenderLinesAsTubes(val);
 }
 
 //----------------------------------------------------------------------------

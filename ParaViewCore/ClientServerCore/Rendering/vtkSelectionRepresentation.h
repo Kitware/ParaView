@@ -94,6 +94,8 @@ public:
   void SetPointSize(double val);
   void SetRepresentation(int val);
   void SetUseOutline(int);
+  void SetRenderPointsAsSpheres(bool);
+  void SetRenderLinesAsTubes(bool);
   //@}
 
   //@{
