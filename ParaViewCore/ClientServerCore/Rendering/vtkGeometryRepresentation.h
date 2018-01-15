@@ -359,6 +359,12 @@ protected:
    */
   void UpdateBlockAttributes(vtkMapper* mapper);
 
+  /**
+   * Computes the bounds of the visible data based on the block visiblities in the
+   * composite data attributes of the mapper.
+   */
+  void ComputeVisibleDataBounds();
+
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;
@@ -376,7 +382,9 @@ protected:
   int Representation;
   bool SuppressLOD;
   bool RequestGhostCellsIfNeeded;
-  double DataBounds[6];
+  double VisibleDataBounds[6];
+
+  vtkTimeStamp VisibleDataBoundsTime;
 
   vtkPiecewiseFunction* PWF;
 
