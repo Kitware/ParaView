@@ -1057,7 +1057,7 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
     box->addButton(QMessageBox::Cancel);
     if (box->exec() != QMessageBox::Cancel)
     {
-      QAction action;
+      QAction action(nullptr);
       pqScalarBarVisibilityReaction reaction(&action);
       reaction.setScalarBarVisibility(false);
 
@@ -1141,7 +1141,7 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
     box->addButton(QMessageBox::Cancel);
     if (box->exec() != QMessageBox::Cancel)
     {
-      QAction action;
+      QAction action(nullptr);
       pqScalarBarVisibilityReaction reaction(&action);
       reaction.setScalarBarVisibility(false);
 
