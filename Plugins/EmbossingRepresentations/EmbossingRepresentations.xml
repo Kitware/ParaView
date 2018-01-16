@@ -1,0 +1,401 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <RepresentationProxy name="BumpMapRepresentation"
+      class="vtkBumpMapRepresentation"
+      processes="client|renderserver|dataserver"
+      base_proxygroup="representations"
+      base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        This representation displays the input data with a bump mapping effect
+        on the surface according an input data array.
+      </Documentation>
+
+      <StringVectorProperty name="BumpMapInputDataArray"
+                            label="Data Array"
+                            command="SetInputDataArray"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Scalars"
+                         input_domain_name="input_array_point_1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          Select the data used to compute bump mapping.
+          Only scalar point data arrays are accepted.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="BumpMappingFactor"
+                            label="Factor"
+                            command="SetBumpMappingFactor"
+                            number_of_elements="1"
+                            default_values="10">
+        <Documentation>
+          Set the factor to increase or decrease bump mapping effect.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </RepresentationProxy>
+
+    <RepresentationProxy name="ExtrusionRepresentation"
+                         class="vtkExtrusionRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        This representation extrudes cells or generate height field depending
+        on the selected data array type.
+      </Documentation>
+
+      <StringVectorProperty name="ExtrusionInputDataArray"
+                            label="Data Array"
+                            command="SetInputDataArray"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2">
+        <ArrayListDomain name="array_list"
+                         attribute_type="Scalars"
+                         input_domain_name="inputs_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          Select a cell data array in order to extrude cells.
+          Select a point data array in order to generate a height field.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="ExtrusionFactor"
+                            label="Factor"
+                            command="SetExtrusionFactor"
+                            default_values="10"
+                            number_of_elements="1">
+        <Documentation>
+          Set a factor used to determine the height of extrusion.
+          This parameter can be negative or positive.
+          The value is a percentage of a characteristic length of the model.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ExtrusionNormalizeData"
+                         label="Normalize Data"
+                         command="SetNormalizeData"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When enabled, data will be normalized, otherwise raw values will be
+          used for the extrusion.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ExtrusionAutoScaling"
+                         label="Auto scaling"
+                         command="SetAutoScaling"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable autoscaling based on actual range of values.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ExtrusionNormalizeData"
+                                   value="1" />
+          <!-- enable this widget when ExtrusionNormalizeData==1 -->
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ExtrusionScalingRange"
+                            label="Range"
+                            command="SetScalingRange"
+                            default_values="0 1"
+                            number_of_elements="2"
+                            panel_visibility="advanced">
+        <Documentation>
+          Set an absolude data range. All values outside this range will be clamped.
+          These parameters can be either negative or positive.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ExtrusionPropertyWidgetDecorator" />
+          <!-- enable this widget when ExtrusionAutoScaling==1 && ExtrusionNormalizeData==0 -->
+        </Hints>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ExtrusionBasisVisibility"
+                         label="Draw basis"
+                         command="SetBasisVisibility"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Set the visibility of the basis i.e. the initial cell. This option
+          only has an effect if input data array is a cell data array.
+        </Documentation>
+      </IntVectorProperty>
+
+    </RepresentationProxy>
+
+    <!-- BumpMap Representation extensions -->
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        BumpMapRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BumpMapRepresentation"
+                          text="Bump Mapped Surface"/>
+      <SubProxy>
+        <Proxy name="BumpMapRepresentation"
+               proxygroup="representations"
+               proxyname="BumpMapRepresentation"/>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Bump Mapped Surface">
+            <Property name="BumpMapInputDataArray"/>
+            <Property name="BumpMappingFactor"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bump Mapped Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        BumpMapRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BumpMapRepresentation"
+                          text="Bump Mapped Surface"/>
+      <SubProxy>
+        <Proxy name="BumpMapRepresentation"
+               proxygroup="representations"
+               proxyname="BumpMapRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Bump Mapped Surface">
+            <Property name="BumpMapInputDataArray"/>
+            <Property name="BumpMappingFactor"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bump Mapped Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="UniformGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        BumpMapRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BumpMapRepresentation"
+                          text="Bump Mapped Surface"/>
+      <SubProxy>
+        <Proxy name="BumpMapRepresentation"
+               proxygroup="representations"
+               proxyname="BumpMapRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Bump Mapped Surface">
+            <Property name="BumpMapInputDataArray"/>
+            <Property name="BumpMappingFactor"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bump Mapped Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="StructuredGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        BumpMapRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="BumpMapRepresentation"
+                          text="Bump Mapped Surface"/>
+      <SubProxy>
+        <Proxy name="BumpMapRepresentation"
+               proxygroup="representations"
+               proxyname="BumpMapRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Bump Mapped Surface">
+            <Property name="BumpMapInputDataArray"/>
+            <Property name="BumpMappingFactor"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Bump Mapped Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+      </SubProxy>
+    </Extension>
+
+    <!-- Extrusion Representation extensions -->
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        ExtrusionRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="ExtrusionRepresentation"
+                          text="Extrusion Surface"/>
+      <SubProxy>
+        <Proxy name="ExtrusionRepresentation"
+               proxygroup="representations"
+               proxyname="ExtrusionRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Extrusion Surface">
+            <Property name="ExtrusionInputDataArray"/>
+            <Property name="ExtrusionFactor"/>
+            <Property name="ExtrusionNormalizeData"/>
+            <Property name="ExtrusionAutoScaling"/>
+            <Property name="ExtrusionScalingRange"/>
+            <Property name="ExtrusionBasisVisibility"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Extrusion Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        ExtrusionRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="ExtrusionRepresentation"
+                          text="Extrusion Surface"/>
+      <SubProxy>
+        <Proxy name="ExtrusionRepresentation"
+               proxygroup="representations"
+               proxyname="ExtrusionRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Extrusion Surface">
+            <Property name="ExtrusionInputDataArray"/>
+            <Property name="ExtrusionFactor"/>
+            <Property name="ExtrusionNormalizeData"/>
+            <Property name="ExtrusionAutoScaling"/>
+            <Property name="ExtrusionScalingRange"/>
+            <Property name="ExtrusionBasisVisibility"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Extrusion Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="UniformGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        ExtrusionRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="ExtrusionRepresentation"
+                          text="Extrusion Surface"/>
+      <SubProxy>
+        <Proxy name="ExtrusionRepresentation"
+               proxygroup="representations"
+               proxyname="ExtrusionRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Extrusion Surface">
+            <Property name="ExtrusionInputDataArray"/>
+            <Property name="ExtrusionFactor"/>
+            <Property name="ExtrusionNormalizeData"/>
+            <Property name="ExtrusionAutoScaling"/>
+            <Property name="ExtrusionScalingRange"/>
+            <Property name="ExtrusionBasisVisibility"/>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="Representation"
+                                       value="Extrusion Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+      </SubProxy>
+    </Extension>
+
+    <Extension name="StructuredGridRepresentation">
+      <Documentation>
+        Extends standard UniformGridRepresentation by adding
+        ExtrusionRepresentation as a new type of representation.
+      </Documentation>
+
+      <RepresentationType subproxy="ExtrusionRepresentation"
+                          text="Extrusion Surface"/>
+      <SubProxy>
+        <Proxy name="ExtrusionRepresentation"
+               proxygroup="representations"
+               proxyname="ExtrusionRepresentation"/>
+        <ExposedProperties>
+          <PropertyGroup label="Extrusion Surface">
+            <Property name="ExtrusionInputDataArray"/>
+            <Property name="ExtrusionFactor"/>
+            <Property name="ExtrusionNormalizeData"/>
+            <Property name="ExtrusionAutoScaling"/>
+            <Property name="ExtrusionScalingRange"/>
+            <Property name="ExtrusionBasisVisibility"/>
+             <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                         mode="visibility"
+                                         property="Representation"
+                                         value="Extrusion Surface"/>
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation"/>
+      </SubProxy>
+    </Extension>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>
