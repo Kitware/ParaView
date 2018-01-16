@@ -788,7 +788,10 @@ public:
           this->GetSettingBelowPriority(propertySettingCString, highestPriority);
         if (lowerPriorityValue.isNull())
         {
-          if (!proxyValue.removeMember(property->GetXMLName()).isNull())
+          // Allocated as done in Json::Value removeMember(const char* key).
+          Json::Value removedValue;
+          if (proxyValue.removeMember(property->GetXMLName(), &removedValue) &&
+            !removedValue.isNull())
           {
             this->Modified();
           }
