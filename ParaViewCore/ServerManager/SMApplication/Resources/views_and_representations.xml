@@ -4761,7 +4761,7 @@
                             name="GaussianRadius"
                             label="Gaussian Radius"
                             number_of_elements="1">
-        <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.05">
+        <BoundsDomain name="range" mode="scaled_extent" scale_factor="0.005">
           <RequiredProperties>
             <Property function="Input" name="Input" />
           </RequiredProperties>
