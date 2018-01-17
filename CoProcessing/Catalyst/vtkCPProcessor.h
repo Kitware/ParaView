@@ -86,6 +86,13 @@ public:
   virtual int Initialize(vtkMPICommunicatorOpaqueComm& comm);
 #endif
 
+  /// The Catalyst input field data string array name. This array will
+  /// be generated automatically by Catalyst and have a single entry
+  /// that has the input name for identifying the associated
+  /// vtkCPInputDataDescription. This will allow automatically mapping
+  // adaptor inputs to pipeline sources.
+  static const char* GetInputArrayName() { return "__CatalystChannel__"; }
+
   /// Configuration Step:
   /// The coprocessor first determines if any coprocessing needs to be done
   /// at this TimeStep/Time combination returning 1 if it does and 0

@@ -20,18 +20,22 @@
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPPipeline.h"
+#include "vtkDataObject.h"
+#include "vtkFieldData.h"
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMPI.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
 #endif
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 
 #include <list>
 
@@ -206,6 +210,16 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
     return 0;
   }
   int success = 1;
+  for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
+  {
+    if (vtkDataObject* input = dataDescription->GetInputDescription(i)->GetGrid())
+    {
+      vtkNew<vtkStringArray> catalystChannel;
+      catalystChannel->SetName(this->GetInputArrayName());
+      catalystChannel->InsertNextValue(dataDescription->GetInputDescriptionName(i));
+      input->GetFieldData()->AddArray(catalystChannel);
+    }
+  }
   for (vtkCPProcessorInternals::PipelineListIterator iter = this->Internal->Pipelines.begin();
        iter != this->Internal->Pipelines.end(); iter++)
   {
