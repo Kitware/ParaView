@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSetGet.h" // for LEGACY_REMOVE
 
+class pqOutputWidget;
+
 Q_DECLARE_METATYPE(QtMsgType)
 /**
  * @class MessageHandler
@@ -46,6 +48,9 @@ Q_DECLARE_METATYPE(QtMsgType)
  *
  * This utility class allows us to install a Qt message handler. We are using a
  * signal/slot to ensure that the messages are written on the main thread.
+ *
+ * This utility class also helps us support VTK messages coming from different
+ * threads.
  *
  * N.B. This is really a internal class however has to be exported so it can
  * be used inside a message handler function inside Qt.
@@ -62,15 +67,21 @@ public:
    * messages to be forwarded to VTK for output using the same mechanisms setup
    * for handling VTK messages.
    */
-  static void install();
+  static void install(pqOutputWidget* widget);
 
   /**
    * This is the function installed with Qt.
    */
   static void handler(QtMsgType type, const QMessageLogContext&, const QString& msg);
 
+  /**
+   * This function is used for VTK messages that don't have QMessageLogContext.
+   */
+  static void handlerVTK(QtMsgType type, const QString& msg);
+
 signals:
   void message(QtMsgType type, const QString& msg);
+  void showMessage(QString msg, QtMsgType type);
 
 private:
   static MessageHandler* instance();

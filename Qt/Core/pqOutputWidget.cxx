@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
+#include "vtkCriticalSection.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
@@ -78,56 +79,68 @@ public:
 
   void DisplayText(const char* msg) VTK_OVERRIDE
   {
-    bool display = true;
+    this->CriticalSectionGeneric->Lock();
     if (this->Widget)
     {
-      display = this->Widget->displayMessage(msg, this->CurrentMessageType);
+      MessageHandler::handlerVTK(this->CurrentMessageType, QString(msg));
     }
-    if (display)
-    {
-      switch (this->CurrentMessageType)
-      {
-        case QtCriticalMsg:
-        case QtWarningMsg:
-          cerr << msg;
-          cerr.flush();
-          break;
 
-        default:
-          cout << msg;
-          cout.flush();
-          break;
-      }
-      // Ideally, we'd simply call superclass. However there's a bad interaction
-      // between pqProgressManager, vtkPVProgressHandler and support for
-      // server-side messages that leads this to be an infinite recursion. We
-      // will fix that separately as that's beyond the scope of this changeset.
-      // this->Superclass::DisplayText(msg);
+    switch (this->CurrentMessageType)
+    {
+      case QtCriticalMsg:
+      case QtWarningMsg:
+        cerr << msg;
+        cerr.flush();
+        break;
+
+      default:
+        cout << msg;
+        cout.flush();
+        break;
+        // Ideally, we'd simply call superclass. However there's a bad interaction
+        // between pqProgressManager, vtkPVProgressHandler and support for
+        // server-side messages that leads this to be an infinite recursion. We
+        // will fix that separately as that's beyond the scope of this changeset.
+        // this->Superclass::DisplayText(msg);
     }
+    // Ideally, we'd simply call superclass. However there's a bad interaction
+    // between pqProgressManager, vtkPVProgressHandler and support for
+    // server-side messages that leads this to be an infinite recursion. We
+    // will fix that separately as that's beyond the scope of this changeset.
+    // this->Superclass::DisplayText(msg);
+    this->CriticalSectionGeneric->Unlock();
   }
 
   void DisplayErrorText(const char* msg) VTK_OVERRIDE
   {
+    this->CriticalSectionTyped->Lock();
     ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtCriticalMsg);
     this->Superclass::DisplayErrorText(msg); // this calls DisplayText();
+    this->CriticalSectionTyped->Unlock();
   }
 
   void DisplayWarningText(const char* msg) VTK_OVERRIDE
   {
+    this->CriticalSectionTyped->Lock();
     ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
     this->Superclass::DisplayWarningText(msg); // this calls DisplayText();
+    this->CriticalSectionTyped->Unlock();
   }
 
   void DisplayGenericWarningText(const char* msg) VTK_OVERRIDE
   {
+    this->CriticalSectionTyped->Lock();
     ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
     this->Superclass::DisplayGenericWarningText(msg); // this calls DisplayText();
+    this->CriticalSectionTyped->Unlock();
   }
 
   void DisplayDebugText(const char* msg) VTK_OVERRIDE
   {
+    this->CriticalSectionTyped->Lock();
     ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtDebugMsg);
     this->Superclass::DisplayDebugText(msg); // this calls DisplayText();
+    this->CriticalSectionTyped->Unlock();
   }
 
 protected:
@@ -140,6 +153,9 @@ protected:
 
   QtMsgType CurrentMessageType;
   QPointer<pqOutputWidget> Widget;
+
+  vtkNew<vtkCriticalSection> CriticalSectionTyped;
+  vtkNew<vtkCriticalSection> CriticalSectionGeneric;
 
 private:
   OutputWindow(const OutputWindow&) = delete;
@@ -155,12 +171,18 @@ MessageHandler::MessageHandler(QObject* parent)
   connect(this, &MessageHandler::message, this, &MessageHandler::displayMessage);
 }
 
-void MessageHandler::install()
+void MessageHandler::install(pqOutputWidget* widget)
 {
   // Call instance() to ensure we create the MessageHandler object on the main
   // thread.
   MessageHandler::instance();
   qInstallMessageHandler(MessageHandler::handler);
+
+  if (widget)
+  {
+    connect(MessageHandler::instance(), &MessageHandler::showMessage, widget,
+      &pqOutputWidget::displayMessage);
+  }
 }
 
 void MessageHandler::handler(QtMsgType type, const QMessageLogContext& cntxt, const QString& msg)
@@ -168,6 +190,11 @@ void MessageHandler::handler(QtMsgType type, const QMessageLogContext& cntxt, co
   QString formattedMsg = qFormatLogMessage(type, cntxt, msg);
   formattedMsg += "\n";
   emit instance()->message(type, formattedMsg);
+}
+
+void MessageHandler::handlerVTK(QtMsgType type, const QString& msg)
+{
+  emit instance()->showMessage(msg, type);
 }
 
 MessageHandler* MessageHandler::instance()
@@ -396,7 +423,7 @@ pqOutputWidget::pqOutputWidget(QWidget* parentObject, Qt::WindowFlags f)
   vtkOutputWindow::SetInstance(internals.VTKOutputWindow.Get());
 
   // Install the message handler
-  MessageHandler::install();
+  MessageHandler::install(this);
 
   this->setSettingsKey("pqOutputWidget");
 }
