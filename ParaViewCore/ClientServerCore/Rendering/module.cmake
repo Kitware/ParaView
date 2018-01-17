@@ -12,7 +12,7 @@ endif()
 if(PARAVIEW_USE_VTKM)
   list(APPEND __private_dependencies
     vtkAcceleratorsVTKm
-    vtkm
+    vtkVTKm
   )
 endif()
 
