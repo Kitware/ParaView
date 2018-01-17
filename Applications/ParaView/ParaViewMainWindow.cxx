@@ -405,7 +405,7 @@ void ParaViewMainWindow::updateFontSize()
 void ParaViewMainWindow::handleMessage(const QString&, int type)
 {
   QDockWidget* dock = this->Internals->outputWidgetDock;
-  if (!dock->isVisible() && (type == pqOutputWidget::ERROR || type == pqOutputWidget::WARNING))
+  if (!dock->isVisible() && (type == QtCriticalMsg || type == QtFatalMsg || type == QtWarningMsg))
   {
     // if dock is not visible, we always pop it up as a floating dialog. This
     // avoids causing re-renders which may cause more errors and more confusion.

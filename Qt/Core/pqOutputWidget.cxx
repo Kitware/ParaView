@@ -87,7 +87,8 @@ public:
     {
       switch (this->CurrentMessageType)
       {
-        case pqOutputWidget::ERROR:
+        case QtCriticalMsg:
+        case QtWarningMsg:
           cerr << msg;
           cerr.flush();
           break;
@@ -107,37 +108,37 @@ public:
 
   void DisplayErrorText(const char* msg) VTK_OVERRIDE
   {
-    ScopedSetter<pqOutputWidget::MessageTypes> a(this->CurrentMessageType, pqOutputWidget::ERROR);
+    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtCriticalMsg);
     this->Superclass::DisplayErrorText(msg); // this calls DisplayText();
   }
 
   void DisplayWarningText(const char* msg) VTK_OVERRIDE
   {
-    ScopedSetter<pqOutputWidget::MessageTypes> a(this->CurrentMessageType, pqOutputWidget::WARNING);
+    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
     this->Superclass::DisplayWarningText(msg); // this calls DisplayText();
   }
 
   void DisplayGenericWarningText(const char* msg) VTK_OVERRIDE
   {
-    ScopedSetter<pqOutputWidget::MessageTypes> a(this->CurrentMessageType, pqOutputWidget::WARNING);
+    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
     this->Superclass::DisplayGenericWarningText(msg); // this calls DisplayText();
   }
 
   void DisplayDebugText(const char* msg) VTK_OVERRIDE
   {
-    ScopedSetter<pqOutputWidget::MessageTypes> a(this->CurrentMessageType, pqOutputWidget::DEBUG);
+    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtDebugMsg);
     this->Superclass::DisplayDebugText(msg); // this calls DisplayText();
   }
 
 protected:
   OutputWindow()
-    : CurrentMessageType(pqOutputWidget::MESSAGE)
+    : CurrentMessageType(QtInfoMsg)
   {
     this->PromptUserOff();
   }
   ~OutputWindow() override {}
 
-  pqOutputWidget::MessageTypes CurrentMessageType;
+  QtMsgType CurrentMessageType;
   QPointer<pqOutputWidget> Widget;
 
 private:
@@ -254,7 +255,7 @@ public:
       << "QWindowsWindow::setGeometry: Unable to set geometry";
   }
 
-  void displayMessageInConsole(const QString& message, pqOutputWidget::MessageTypes type)
+  void displayMessageInConsole(const QString& message, QtMsgType type)
   {
     QTextCharFormat originalFormat = this->Ui.consoleWidget->getFormat();
     QTextCharFormat curFormat(originalFormat);
@@ -265,8 +266,7 @@ public:
     this->Ui.consoleWidget->setFormat(originalFormat);
   }
 
-  void addMessageToTree(
-    const QString& message, pqOutputWidget::MessageTypes type, const QString& summary)
+  void addMessageToTree(const QString& message, QtMsgType type, const QString& summary)
   {
     // Check if message is duplicate of the last one. If so, we just increment
     // the counter.
@@ -313,35 +313,37 @@ public:
     this->Ui.treeView->header()->moveSection(COLUMN_COUNT, COLUMN_DATA);
   }
 
-  QIcon icon(pqOutputWidget::MessageTypes type)
+  QIcon icon(QtMsgType type)
   {
     switch (type)
     {
-      case DEBUG:
+      case QtDebugMsg:
         return this->Parent->style()->standardIcon(QStyle::SP_MessageBoxInformation);
 
-      case ERROR:
+      case QtCriticalMsg:
+      case QtFatalMsg:
         return this->Parent->style()->standardIcon(QStyle::SP_MessageBoxCritical);
 
-      case WARNING:
+      case QtWarningMsg:
         return this->Parent->style()->standardIcon(QStyle::SP_MessageBoxWarning);
 
-      case MESSAGE:
+      case QtInfoMsg:
       default:
         return QIcon();
     }
   }
 
-  QColor foregroundColor(pqOutputWidget::MessageTypes type)
+  QColor foregroundColor(QtMsgType type)
   {
     switch (type)
     {
-      case MESSAGE:
-      case DEBUG:
+      case QtInfoMsg:
+      case QtDebugMsg:
         return QColor(Qt::darkGreen);
 
-      case ERROR:
-      case WARNING:
+      case QtCriticalMsg:
+      case QtFatalMsg:
+      case QtWarningMsg:
         return QColor(Qt::darkRed);
 
       default:
@@ -423,7 +425,7 @@ void pqOutputWidget::clear()
 }
 
 //-----------------------------------------------------------------------------
-bool pqOutputWidget::displayMessage(const QString& message, MessageTypes type)
+bool pqOutputWidget::displayMessage(const QString& message, QtMsgType type)
 {
   QString tmessage = message.trimmed();
   if (!this->suppress(tmessage, type))
@@ -439,7 +441,7 @@ bool pqOutputWidget::displayMessage(const QString& message, MessageTypes type)
 }
 
 //-----------------------------------------------------------------------------
-bool pqOutputWidget::suppress(const QString& message, MessageTypes)
+bool pqOutputWidget::suppress(const QString& message, QtMsgType)
 {
   pqInternals& internals = (*this->Internals);
   foreach (const QString& substr, internals.SuppressedStrings)
@@ -453,7 +455,7 @@ bool pqOutputWidget::suppress(const QString& message, MessageTypes)
 }
 
 //-----------------------------------------------------------------------------
-QString pqOutputWidget::extractSummary(const QString& message, MessageTypes)
+QString pqOutputWidget::extractSummary(const QString& message, QtMsgType)
 {
   // check if python traceback, if so, simply return the last line as the
   // summary.
