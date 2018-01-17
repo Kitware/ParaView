@@ -1,5 +1,12 @@
 include(ParaViewTestingMacros)
 
+paraview_test_load_data(""
+  bluntfin.vts
+  cow.vtp
+  cth.vtr
+  )
+
+
 paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_DATA NO_VALID NO_OUTPUT
   SimpleDriver.cxx
@@ -7,6 +14,10 @@ paraview_add_test_cxx(${vtk-module}CxxTests tests
   AdaptorDriver.cxx
   )
 
+paraview_add_test_cxx(${vtk-module}CxxTests tests
+  NO_VALID
+  CPXMLPWriterPipeline.cxx
+  )
 # the CoProcessingTestOutputs needs to be run with ${MPIEXEC} if
 # the executable was built with MPI because certain machines only
 # allow running MPI programs with the proper ${MPIEXEC}
