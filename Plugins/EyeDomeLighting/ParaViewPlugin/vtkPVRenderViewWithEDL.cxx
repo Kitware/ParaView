@@ -38,30 +38,21 @@ Ph.D. thesis of Christian BOUCHENY.
 #include "vtkPVRenderViewWithEDL.h"
 
 #include "vtkEDLShading.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVRenderViewWithEDL);
-//----------------------------------------------------------------------------
-vtkPVRenderViewWithEDL::vtkPVRenderViewWithEDL()
-{
-}
-
-//----------------------------------------------------------------------------
-vtkPVRenderViewWithEDL::~vtkPVRenderViewWithEDL()
-{
-}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderViewWithEDL::Initialize(unsigned int id)
 {
   this->Superclass::Initialize(id);
 
-  vtkEDLShading* EDLpass = vtkEDLShading::New();
-  this->SynchronizedRenderers->SetImageProcessingPass(EDLpass);
+  vtkNew<vtkEDLShading> pass;
+  this->SynchronizedRenderers->SetImageProcessingPass(pass);
   this->SynchronizedRenderers->SetUseDepthBuffer(true);
-  EDLpass->Delete();
 }
 
 //----------------------------------------------------------------------------
