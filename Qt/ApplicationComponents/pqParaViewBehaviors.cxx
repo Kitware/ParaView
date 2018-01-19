@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
 #include "pqPluginSettingsBehavior.h"
+#include "pqPluginToolBarBehavior.h"
 #include "pqPropertiesPanel.h"
 #include "pqServerManagerModel.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
@@ -86,6 +87,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(AutoLoadPluginXMLBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginDockWidgetsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(VerifyRequiredPluginBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PluginActionGroupBehavior, true);
+PQ_BEHAVIOR_DEFINE_FLAG(PluginToolBarBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CommandLineOptionsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PersistentMainWindowStateBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(CollaborationBehavior, true);
@@ -176,6 +178,10 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   if (PQ_IS_BEHAVIOR_ENABLED(PluginActionGroupBehavior))
   {
     new pqPluginActionGroupBehavior(mainWindow);
+  }
+  if (PQ_IS_BEHAVIOR_ENABLED(PluginToolBarBehavior))
+  {
+    new pqPluginToolBarBehavior(mainWindow);
   }
   if (PQ_IS_BEHAVIOR_ENABLED(CommandLineOptionsBehavior))
   {
