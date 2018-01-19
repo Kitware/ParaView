@@ -127,7 +127,10 @@ if(NOT VTK_LEGACY_REMOVE)
     vtkPVOpenGLExtensionsInformation.cxx)
 endif()
 
-set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
+set (${vtk-module}_HDRS
+  vtkStreamingPriorityQueue.h
+  vtkGeometryRepresentationInternal.h
+)
 
 vtk_module_library(vtkPVClientServerCoreRendering ${Module_SRCS})
 include(vtkOpenGL)
