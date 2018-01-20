@@ -157,13 +157,8 @@ protected:
   void ReadXMLData() override;
   void ReadXMLDataImpl();
 
-  // Callback registered with the InternalProgressObserver.
-  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void*, void*);
   // Progress callback from XMLParser.
   virtual void InternalProgressCallback();
-
-  // The observer to report progress from the internal readers.
-  vtkCallbackCommand* InternalProgressObserver;
 
   // Internal implementation details.
   vtkXMLCollectionReaderInternals* Internal;

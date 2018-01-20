@@ -14,8 +14,8 @@
 =========================================================================*/
 #include "vtkXMLCollectionReader.h"
 
-#include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
+#include "vtkCommand.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkInformation.h"
@@ -82,23 +82,14 @@ public:
 vtkXMLCollectionReader::vtkXMLCollectionReader()
 {
   this->Internal = new vtkXMLCollectionReaderInternals;
-
-  // Setup a callback for the internal readers to report progress.
-  this->InternalProgressObserver = vtkCallbackCommand::New();
-  this->InternalProgressObserver->SetCallback(
-    &vtkXMLCollectionReader::InternalProgressCallbackFunction);
-  this->InternalProgressObserver->SetClientData(this);
-
   this->InternalForceMultiBlock = false;
   this->ForceOutputTypeToMultiBlock = 0;
-
   this->CurrentOutput = -1;
 }
 
 //----------------------------------------------------------------------------
 vtkXMLCollectionReader::~vtkXMLCollectionReader()
 {
-  this->InternalProgressObserver->Delete();
   delete this->Internal;
 }
 
@@ -179,13 +170,6 @@ void vtkXMLCollectionReader::SetRestrictionAsIndex(const char* name, int index)
 int vtkXMLCollectionReader::GetRestrictionAsIndex(const char* name)
 {
   return this->GetAttributeValueIndex(name, this->GetRestriction(name));
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLCollectionReader::InternalProgressCallbackFunction(
-  vtkObject*, unsigned long, void* clientdata, void*)
-{
-  reinterpret_cast<vtkXMLCollectionReader*>(clientdata)->InternalProgressCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -529,7 +513,8 @@ void vtkXMLCollectionReader::ReadAFile(int index, int updatePiece, int updateNum
   if (r)
   {
     // Observe the progress of the internal reader.
-    r->AddObserver(vtkCommand::ProgressEvent, this->InternalProgressObserver);
+    const auto oid = r->AddObserver(
+      vtkCommand::ProgressEvent, this, &vtkXMLCollectionReader::InternalProgressCallback);
 
     // Give the update request from this output to its internal
     // reader.
@@ -538,7 +523,7 @@ void vtkXMLCollectionReader::ReadAFile(int index, int updatePiece, int updateNum
 
     // The internal reader is finished.  Remove the observer in case
     // we delete the reader later.
-    r->RemoveObserver(this->InternalProgressObserver);
+    r->RemoveObserver(oid);
 
     // Share the new data with our output.
     actualOutput->ShallowCopy(r->GetOutputDataObject(0));
