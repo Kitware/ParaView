@@ -141,7 +141,7 @@ protected:
   int ReadPrimaryElement(vtkXMLDataElement* ePrimary) VTK_OVERRIDE;
   int FillOutputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
 
-  vtkDataObject* SetupOutput(const char* filePath, int index);
+  vtkDataObject* SetupOutput(const std::string& filePath, int index);
 
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;

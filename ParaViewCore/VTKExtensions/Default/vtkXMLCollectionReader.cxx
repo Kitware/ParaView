@@ -27,6 +27,8 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkXMLDataElement.h"
 
+#include <vtksys/SystemTools.hxx>
+
 #include <algorithm>
 #include <map>
 #include <string>
@@ -262,30 +264,19 @@ void vtkXMLCollectionReader::SetupEmptyOutput()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkXMLCollectionReader::SetupOutput(const char* filePath, int index)
+vtkDataObject* vtkXMLCollectionReader::SetupOutput(const std::string& filePath, int index)
 {
   vtkXMLDataElement* ds = this->Internal->RestrictedDataSets[index];
 
   // Construct the name of the internal file.
-  std::string fileName;
   const char* file = ds->GetAttribute("file");
-  if (!(file[0] == '/' || file[1] == ':'))
-  {
-    fileName = filePath;
-    if (fileName.length())
-    {
-      fileName += "/";
-    }
-  }
-  fileName += file;
+  const std::string fileName =
+    file ? vtksys::SystemTools::CollapseFullPath(file, filePath) : std::string();
 
   // Get the file extension.
-  std::string ext;
-  std::string::size_type pos = fileName.rfind('.');
-  if (pos != fileName.npos)
-  {
-    ext = fileName.substr(pos + 1);
-  }
+  std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fileName);
+  // remove "." from extension.
+  ext.erase(ext.begin());
 
   // Search for the reader matching this extension.
   const char* rname = 0;
@@ -390,16 +381,7 @@ int vtkXMLCollectionReader::RequestDataObject(
 
   // Find the path to this file in case the internal files are
   // specified as relative paths.
-  std::string filePath = this->FileName;
-  std::string::size_type pos = filePath.find_last_of("/\\");
-  if (pos != filePath.npos)
-  {
-    filePath = filePath.substr(0, pos);
-  }
-  else
-  {
-    filePath = "";
-  }
+  const std::string filePath = vtksys::SystemTools::GetFilenamePath(this->FileName);
 
   // Create the readers for each data set to be read.
   int n = static_cast<int>(this->Internal->RestrictedDataSets.size());
@@ -407,7 +389,7 @@ int vtkXMLCollectionReader::RequestDataObject(
 
   if (n == 1 && !this->ForceOutputTypeToMultiBlock)
   {
-    vtkDataObject* output = this->SetupOutput(filePath.c_str(), 0);
+    vtkDataObject* output = this->SetupOutput(filePath, 0);
     if (!output)
     {
       vtkErrorMacro("Could not determine the data type for the first dataset. "
@@ -487,21 +469,12 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
 
   // Find the path to this file in case the internal files are
   // specified as relative paths.
-  std::string filePath = this->FileName;
-  std::string::size_type pos = filePath.find_last_of("/\\");
-  if (pos != filePath.npos)
-  {
-    filePath = filePath.substr(0, pos);
-  }
-  else
-  {
-    filePath = "";
-  }
+  const std::string filePath = vtksys::SystemTools::GetFilenamePath(this->FileName);
 
   if (!this->InternalForceMultiBlock)
   {
     vtkSmartPointer<vtkDataObject> actualOutput;
-    actualOutput.TakeReference(this->SetupOutput(filePath.c_str(), 0));
+    actualOutput.TakeReference(this->SetupOutput(filePath, 0));
     vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
     if (!output->IsA(actualOutput->GetClassName()))
     {
@@ -529,7 +502,7 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
       }
 
       this->CurrentOutput = i;
-      vtkDataObject* actualOutput = this->SetupOutput(filePath.c_str(), i);
+      vtkDataObject* actualOutput = this->SetupOutput(filePath, i);
       this->ReadAFile(i, updatePiece, updateNumPieces, updateGhostLevels, actualOutput);
       block->SetNumberOfBlocks(updateNumPieces);
       block->SetBlock(updatePiece, actualOutput);
