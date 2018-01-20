@@ -288,6 +288,8 @@ set (Module_SRCS
   pqTextureSelectorPropertyWidget.h
   pqTimerLogDisplay.cxx
   pqTimerLogDisplay.h
+  pqToolBarInterface.cxx
+  pqToolBarInterface.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
   pqTransferFunctionWidget.cxx
@@ -439,6 +441,7 @@ set (Module_MOC_HDRS
   pqTextureComboBox.h
   pqTextureSelectorPropertyWidget.h
   pqTimerLogDisplay.h
+  pqToolBarInterface.h
   pqToolTipTrapper.h
   pqTransferFunctionWidget.h
   pqTriggerOnIdleHelper.h

@@ -421,7 +421,7 @@ anymore.")
 ENDMACRO()
 #------------------------------------------------------------------------
 
-# create implementation for a custom menu or toolbar
+# create implementation for a custom menu or a toolbar from an QActionGroup.
 # ADD_PARAVIEW_ACTION_GROUP(
 #    OUTIFACES
 #    OUTSRCS
@@ -450,6 +450,31 @@ MACRO(ADD_PARAVIEW_ACTION_GROUP OUTIFACES OUTSRCS)
       ${ACTION_MOC_SRCS}
       )
 ENDMACRO()
+
+# Add a custom toolbar to the application.
+# ADD_PARAVIEW_TOOLBAR(
+#    OUTIFACES
+#    OUTSRCS
+#    CLASS_NAME classname)
+#
+#    CLASS_NAME QToolBar subclass that corresponds to the custom toolbar.
+function(ADD_PARAVIEW_TOOLBAR OUTIFACES OUTSRCS)
+  pv_plugin_parse_arguments(ARG "CLASS_NAME;GROUP_NAME" "" ${ARGN} )
+  set(${OUTIFACES} ${ARG_CLASS_NAME} PARENT_SCOPE)
+  configure_file(${ParaView_CMAKE_DIR}/pqToolBarImplementation.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
+  configure_file(${ParaView_CMAKE_DIR}/pqToolBarImplementation.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
+
+  set(ACTION_MOC_SRCS)
+  qt5_wrap_cpp(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
+  set(${OUTSRCS}
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h
+      ${ACTION_MOC_SRCS}
+      PARENT_SCOPE
+      )
+endfunction()
 
 # create implementation for a custom view frame action interface
 # ADD_PARAVIEW_VIEW_FRAME_ACTION_GROUP(
