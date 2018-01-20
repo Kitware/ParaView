@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h" // for exports
 #include <QScopedPointer> // for QScopedPointer.
 
+#include "vtkSetGet.h" // for LEGACY_REMOVE
+
+class pqOutputWidget;
+
 Q_DECLARE_METATYPE(QtMsgType)
 /**
  * @class MessageHandler
@@ -44,6 +48,9 @@ Q_DECLARE_METATYPE(QtMsgType)
  *
  * This utility class allows us to install a Qt message handler. We are using a
  * signal/slot to ensure that the messages are written on the main thread.
+ *
+ * This utility class also helps us support VTK messages coming from different
+ * threads.
  *
  * N.B. This is really a internal class however has to be exported so it can
  * be used inside a message handler function inside Qt.
@@ -60,15 +67,21 @@ public:
    * messages to be forwarded to VTK for output using the same mechanisms setup
    * for handling VTK messages.
    */
-  static void install();
+  static void install(pqOutputWidget* widget);
 
   /**
    * This is the function installed with Qt.
    */
   static void handler(QtMsgType type, const QMessageLogContext&, const QString& msg);
 
+  /**
+   * This function is used for VTK messages that don't have QMessageLogContext.
+   */
+  static void handlerVTK(QtMsgType type, const QString& msg);
+
 signals:
   void message(QtMsgType type, const QString& msg);
+  void showMessage(QString msg, QtMsgType type);
 
 private:
   static MessageHandler* instance();
@@ -96,13 +109,18 @@ public:
   pqOutputWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   ~pqOutputWidget() override;
 
+#if !defined(VTK_LEGACY_REMOVE)
+  /*
+   * @deprecated in ParaView 5.5. Simply use QtMsgType.
+   */
   enum MessageTypes
   {
-    MESSAGE,
-    ERROR,
-    WARNING,
-    DEBUG
+    MESSAGE = QtInfoMsg,
+    ERROR = QtCriticalMsg,
+    WARNING = QtWarningMsg,
+    DEBUG = QtDebugMsg
   };
+#endif
 
   /**
    * Add substrings to match with message to determine whether they should be
@@ -127,7 +145,7 @@ public slots:
    *
    * @returns true if the message was displayed, otherwise false.
    */
-  bool displayMessage(const QString& message, MessageTypes type = MESSAGE);
+  bool displayMessage(const QString& message, QtMsgType type = QtInfoMsg);
 
   /**
    * Show full messages instead of grouped messages.
@@ -149,12 +167,12 @@ protected:
   /**
    * Returns `true` if the message must be suppressed/ignored.
    */
-  virtual bool suppress(const QString& message, MessageTypes type);
+  virtual bool suppress(const QString& message, QtMsgType type);
 
   /**
    * Extract a summary string from the message and returns that.
    */
-  virtual QString extractSummary(const QString& message, MessageTypes type);
+  virtual QString extractSummary(const QString& message, QtMsgType type);
 
 private:
   Q_DISABLE_COPY(pqOutputWidget)
