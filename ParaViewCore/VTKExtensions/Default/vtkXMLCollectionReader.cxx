@@ -14,18 +14,35 @@
 =========================================================================*/
 #include "vtkXMLCollectionReader.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
-#include "vtkCommand.h"
+#include "vtkDataArraySelection.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVInstantiator.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkXMLDataElement.h"
+#include "vtkXMLHierarchicalBoxDataReader.h"
+#include "vtkXMLHierarchicalDataReader.h" // legacy reader - produces vtkMultiBlockDataSet.
+#include "vtkXMLImageDataReader.h"
+#include "vtkXMLMultiBlockDataReader.h"
+#include "vtkXMLMultiGroupDataReader.h" // legacy reader - produces vtkMultiBlockDataSet.
+#include "vtkXMLPImageDataReader.h"
+#include "vtkXMLPPolyDataReader.h"
+#include "vtkXMLPRectilinearGridReader.h"
+#include "vtkXMLPStructuredGridReader.h"
+#include "vtkXMLPTableReader.h"
+#include "vtkXMLPUnstructuredGridReader.h"
+#include "vtkXMLPolyDataReader.h"
+#include "vtkXMLRectilinearGridReader.h"
+#include "vtkXMLStructuredGridReader.h"
+#include "vtkXMLTableReader.h"
+#include "vtkXMLUnstructuredGridReader.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -34,8 +51,28 @@
 #include <string>
 #include <vector>
 
-vtkStandardNewMacro(vtkXMLCollectionReader);
+namespace
+{
+// Update `dest` with array statuses from `src` for arrays already in `dest`.
+void vtkPropagateSelection(vtkDataArraySelection* dest, vtkDataArraySelection* src)
+{
+  if (dest == nullptr || src == nullptr)
+  {
+    return;
+  }
 
+  for (int cc = 0, max = dest->GetNumberOfArrays(); cc < max; ++cc)
+  {
+    const char* aname = dest->GetArrayName(cc);
+    if (src->ArrayExists(aname))
+    {
+      dest->SetArraySetting(aname, src->GetArraySetting(aname));
+    }
+  }
+}
+}
+
+vtkStandardNewMacro(vtkXMLCollectionReader);
 //----------------------------------------------------------------------------
 
 struct vtkXMLCollectionReaderEntry
@@ -75,8 +112,37 @@ public:
   vtkXMLCollectionReaderAttributeValueSets AttributeValueSets;
   vtkXMLCollectionReaderRestrictions Restrictions;
   std::vector<vtkSmartPointer<vtkXMLReader> > Readers;
-  static const vtkXMLCollectionReaderEntry ReaderList[];
+
+  typedef vtkXMLReader* (*Constructor)(void); // function pointer type
+  typedef std::map<std::string, std::pair<std::string, Constructor> > ReaderConstructorsType;
+  static const ReaderConstructorsType ReaderConstructors;
 };
+
+#define GET_NEW_FUNCTOR(x)                                                                         \
+  {                                                                                                \
+    #x, [](void) -> vtkXMLReader* { return x::New(); }                                             \
+  }
+const vtkXMLCollectionReaderInternals::ReaderConstructorsType
+  vtkXMLCollectionReaderInternals::ReaderConstructors = { { "vtp",
+                                                            GET_NEW_FUNCTOR(vtkXMLPolyDataReader) },
+    { "vtu", GET_NEW_FUNCTOR(vtkXMLUnstructuredGridReader) },
+    { "vti", GET_NEW_FUNCTOR(vtkXMLImageDataReader) },
+    { "vtr", GET_NEW_FUNCTOR(vtkXMLRectilinearGridReader) },
+    { "vtm", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
+    { "vtmb", GET_NEW_FUNCTOR(vtkXMLMultiBlockDataReader) },
+    { "vtmg", GET_NEW_FUNCTOR(
+                vtkXMLMultiGroupDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
+    { "vthd", GET_NEW_FUNCTOR(
+                vtkXMLHierarchicalDataReader) }, // legacy reader - produces vtkMultiBlockDataSet.
+    { "vthb", GET_NEW_FUNCTOR(vtkXMLHierarchicalBoxDataReader) },
+    { "vts", GET_NEW_FUNCTOR(vtkXMLStructuredGridReader) },
+    { "vtt", GET_NEW_FUNCTOR(vtkXMLTableReader) },
+    { "pvtp", GET_NEW_FUNCTOR(vtkXMLPPolyDataReader) },
+    { "pvtu", GET_NEW_FUNCTOR(vtkXMLPUnstructuredGridReader) },
+    { "pvti", GET_NEW_FUNCTOR(vtkXMLPImageDataReader) },
+    { "pvtr", GET_NEW_FUNCTOR(vtkXMLPRectilinearGridReader) },
+    { "pvts", GET_NEW_FUNCTOR(vtkXMLPStructuredGridReader) },
+    { "pvtt", GET_NEW_FUNCTOR(vtkXMLPTableReader) } };
 
 //----------------------------------------------------------------------------
 vtkXMLCollectionReader::vtkXMLCollectionReader()
@@ -248,7 +314,7 @@ void vtkXMLCollectionReader::SetupEmptyOutput()
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkXMLCollectionReader::SetupOutput(const std::string& filePath, int index)
+vtkXMLReader* vtkXMLCollectionReader::SetupReader(const std::string& filePath, int index)
 {
   vtkXMLDataElement* ds = this->Internal->RestrictedDataSets[index];
 
@@ -263,25 +329,16 @@ vtkDataObject* vtkXMLCollectionReader::SetupOutput(const std::string& filePath, 
   ext.erase(ext.begin());
 
   // Search for the reader matching this extension.
-  const char* rname = 0;
-  for (const vtkXMLCollectionReaderEntry* r = this->Internal->ReaderList; !rname && r->extension;
-       ++r)
-  {
-    if (ext == r->extension)
-    {
-      rname = r->name;
-    }
-  }
-
+  auto iter = this->Internal->ReaderConstructors.find(ext);
   // If a reader was found, allocate an instance of it for this output.
-  if (rname)
+  if (iter != this->Internal->ReaderConstructors.end())
   {
+    const std::string& rname = iter->second.first;
     if (!(this->Internal->Readers[index].GetPointer() &&
-          strcmp(this->Internal->Readers[index]->GetClassName(), rname) == 0))
+          rname == this->Internal->Readers[index]->GetClassName()))
     {
       // Use the instantiator to create the reader.
-      vtkObject* o = vtkPVInstantiator::CreateInstance(rname);
-      vtkXMLReader* reader = vtkXMLReader::SafeDownCast(o);
+      vtkXMLReader* reader = (*iter->second.second)();
       this->Internal->Readers[index] = reader;
       if (reader)
       {
@@ -290,17 +347,13 @@ vtkDataObject* vtkXMLCollectionReader::SetupOutput(const std::string& filePath, 
       else
       {
         // The class was not registered with the instantiator.
-        vtkErrorMacro("Error creating \"" << rname << "\" using vtkPVInstantiator.");
-        if (o)
-        {
-          o->Delete();
-        }
+        vtkErrorMacro("Error creating \"" << rname << "\".");
       }
     }
   }
   else
   {
-    this->Internal->Readers[index] = 0;
+    this->Internal->Readers[index] = nullptr;
   }
 
   // If we have a reader for this output, connect its output to our
@@ -312,13 +365,22 @@ vtkDataObject* vtkXMLCollectionReader::SetupOutput(const std::string& filePath, 
 
     // Update the information on the internal reader's output.
     this->Internal->Readers[index]->UpdateInformation();
+  }
 
+  return this->Internal->Readers[index];
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkXMLCollectionReader::SetupOutput(const std::string& filePath, int index)
+{
+  if (auto* reader = this->SetupReader(filePath, index))
+  {
     // Allocate an instance of the same output type for our output.
-    vtkDataObject* out = this->Internal->Readers[index]->GetOutputDataObject(0);
-
+    vtkDataObject* out = reader->GetOutputDataObject(0);
     return out->NewInstance();
   }
-  return 0;
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -391,6 +453,11 @@ int vtkXMLCollectionReader::RequestDataObject(
     output->Delete();
     this->InternalForceMultiBlock = true;
   }
+
+  // iterating over all readers (which corresponds to number of distinct
+  // datasets in the file, and not distinct timesteps), populate
+  // this->*ArraySelection objects.
+  this->FillArraySelectionUsingReaders(filePath);
 
   return 1;
 }
@@ -515,6 +582,11 @@ void vtkXMLCollectionReader::ReadAFile(int index, int updatePiece, int updateNum
     // Observe the progress of the internal reader.
     const auto oid = r->AddObserver(
       vtkCommand::ProgressEvent, this, &vtkXMLCollectionReader::InternalProgressCallback);
+
+    // Propagate array selections to the reader.
+    vtkPropagateSelection(r->GetPointDataArraySelection(), this->PointDataArraySelection);
+    vtkPropagateSelection(r->GetCellDataArraySelection(), this->CellDataArraySelection);
+    vtkPropagateSelection(r->GetColumnArraySelection(), this->ColumnArraySelection);
 
     // Give the update request from this output to its internal
     // reader.
@@ -685,15 +757,22 @@ vtkXMLDataElement* vtkXMLCollectionReader::GetOutputXMLDataElement(int index)
 }
 
 //----------------------------------------------------------------------------
-const vtkXMLCollectionReaderEntry vtkXMLCollectionReaderInternals::ReaderList[] = {
-  { "vtp", "vtkXMLPolyDataReader" }, { "vtu", "vtkXMLUnstructuredGridReader" },
-  { "vti", "vtkXMLImageDataReader" }, { "vtr", "vtkXMLRectilinearGridReader" },
-  { "vtm", "vtkXMLMultiBlockDataReader" }, { "vtmb", "vtkXMLMultiBlockDataReader" },
-  { "vtmg", "vtkXMLMultiGroupDataReader" },   // legacy reader - produces vtkMultiBlockDataSet.
-  { "vthd", "vtkXMLHierarchicalDataReader" }, // legacy reader - produces vtkMultiBlockDataSet.
-  { "vthb", "vtkXMLHierarchicalBoxDataReader" }, { "vts", "vtkXMLStructuredGridReader" },
-  { "vtt", "vtkXMLTableReader" }, { "pvtp", "vtkXMLPPolyDataReader" },
-  { "pvtu", "vtkXMLPUnstructuredGridReader" }, { "pvti", "vtkXMLPImageDataReader" },
-  { "pvtr", "vtkXMLPRectilinearGridReader" }, { "pvts", "vtkXMLPStructuredGridReader" },
-  { "pvtt", "vtkXMLPTableReader" }, { 0, 0 }
-};
+void vtkXMLCollectionReader::FillArraySelectionUsingReaders(const std::string& filePath)
+{
+  this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
+  this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
+  this->ColumnArraySelection->RemoveObserver(this->SelectionObserver);
+  const size_t nBlocks = this->Internal->Readers.size();
+  for (size_t cc = 0; cc < nBlocks; ++cc)
+  {
+    if (auto* reader = this->SetupReader(filePath, static_cast<int>(cc)))
+    {
+      this->PointDataArraySelection->Union(reader->GetPointDataArraySelection());
+      this->CellDataArraySelection->Union(reader->GetCellDataArraySelection());
+      this->ColumnArraySelection->Union(reader->GetColumnArraySelection());
+    }
+  }
+  this->PointDataArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
+  this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
+  this->ColumnArraySelection->AddObserver(vtkCommand::ModifiedEvent, this->SelectionObserver);
+}

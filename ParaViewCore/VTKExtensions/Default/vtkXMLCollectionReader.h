@@ -143,6 +143,11 @@ protected:
 
   vtkDataObject* SetupOutput(const std::string& filePath, int index);
 
+  /**
+   * Ensures that an appropriate reader is setup for the specified index.
+   */
+  vtkXMLReader* SetupReader(const std::string& filePath, int index);
+
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) override;
 
@@ -169,6 +174,13 @@ protected:
 
   void ReadAFile(int index, int updatePiece, int updateNumPieces, int updateGhostLevels,
     vtkDataObject* actualOutput);
+
+  /**
+   * iterating over all readers (which corresponds to number of distinct
+   * datasets in the file, and not distinct timesteps), populate
+   * this->*ArraySelection objects.
+   */
+  void FillArraySelectionUsingReaders(const std::string& filePath);
 
 private:
   vtkXMLCollectionReader(const vtkXMLCollectionReader&) = delete;
