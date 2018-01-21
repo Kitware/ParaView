@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QLineEdit>
 #include <QList>
+#include <QPointer>
+#include <QPushButton>
 #include <QString>
 #include <QStringList>
 
@@ -72,19 +74,39 @@ public:
    */
   const static QString DEFAULT_TOOLTIP;
 
+  /**
+   * Constant variable that defines the minimum number of items.
+   */
+  const static int MINIMUM_NUMBER_OF_ITEMS;
+
+  /**
+   * Constant variable that defines the maximum number of items.
+   */
+  const static int MAXIMUM_NUMBER_OF_ITEMS;
+
+  /**
+   * Set the list of tool tips and configurations. This is the preferred way of
+   * settings these as it supports changing the number of items.
+   */
+  void setToolTipsAndConfigurations(const QStringList& toolTips, const QStringList& configs);
+
   //@{
   /**
-   * Set/get a list of tool tips, one for each button.
+   * Set/get a list of tool tips, one for each button. The number of items in
+   * the `toolTips` list must match the current number of tooltips being shown.
+   * Use `setToolTipsAndConfigurations` to change the number of items.
    */
-  void setToolTips(QStringList& toolTips);
+  void setToolTips(const QStringList& toolTips);
   QStringList getToolTips();
   //@}
 
   //@{
   /**
-   * Set/get a list of camera configurations, one for each buttton.
+   * Set/get a list of camera configurations, one for each button. The number of
+   * items in `configs` must match the current number of configs.
+   * Use `setToolTipsAndConfigurations` to change the number of items.
    */
-  void setConfigurations(QStringList& configs);
+  void setConfigurations(const QStringList& configs);
   QStringList getConfigurations();
   //@}
 
@@ -92,30 +114,25 @@ public:
   /**
    * Set/get the current camera configuration.
    */
-  void setCurrentConfiguration(QString& config);
+  void setCurrentConfiguration(const QString& config);
   QString getCurrentConfiguration();
   //@}
 
 private slots:
+  void appendRow();
   void importConfigurations();
   void exportConfigurations();
   void clearAll();
 
-  void assignCurrentView(int id);
-  void assignCurrentView0() { this->assignCurrentView(0); }
-  void assignCurrentView1() { this->assignCurrentView(1); }
-  void assignCurrentView2() { this->assignCurrentView(2); }
-  void assignCurrentView3() { this->assignCurrentView(3); }
+  void assignCurrentView();
+  void deleteRow();
 
 private:
   pqCustomViewButtonDialog() {}
-
-  int NButtons;
-
-  QList<QLineEdit*> ToolTips;
   QStringList Configurations;
   QString CurrentConfiguration;
-
   pqCustomViewButtonDialogUI* ui;
+
+  friend class pqCustomViewButtonDialogUI;
 };
 #endif
