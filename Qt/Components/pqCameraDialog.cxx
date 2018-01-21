@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QPointer>
 #include <QString>
+#include <QToolButton>
 
 // ParaView Client includes.
 #include "pqActiveObjects.h"
@@ -116,17 +117,68 @@ void RotateElevation(vtkCamera* camera, double angle)
   temp = camera->GetPosition();
   camera->SetPosition(temp[0] * scale, temp[1] * scale, temp[2] * scale);
 }
+
+QStringList getListOfStrings(pqSettings* settings, const QString& defaultTxt, int min, int max)
+{
+  QStringList val;
+  for (int cc = 0; cc < max; ++cc)
+  {
+    const QString key = QString::number(cc);
+    if (cc < min || settings->contains(key))
+    {
+      val << settings->value(key, defaultTxt).toString();
+    }
+    else
+    {
+      break;
+    }
+  }
+  return val;
+}
 };
 
 //=============================================================================
 class pqCameraDialogInternal : public Ui::pqCameraDialog
 {
+  QList<QPointer<QToolButton> > CustomViewButtons;
+
 public:
   QPointer<pqRenderView> RenderModule;
   pqPropertyLinks CameraLinks;
 
   pqCameraDialogInternal() {}
   ~pqCameraDialogInternal() {}
+
+  void configureCustomViewButtons(const QStringList& tooltips, ::pqCameraDialog* self)
+  {
+    // remove extra buttons.
+    for (int cc = this->CustomViewButtons.size() - 1; cc >= tooltips.size(); --cc)
+    {
+      this->customViewGridLayout->removeWidget(this->CustomViewButtons[cc]);
+      delete this->CustomViewButtons[cc];
+      this->CustomViewButtons.pop_back();
+    }
+
+    // update current buttons.
+    for (int cc = 0; cc < this->CustomViewButtons.size(); ++cc)
+    {
+      this->CustomViewButtons[cc]->setToolTip(tooltips[cc]);
+    }
+
+    // add any new buttons.
+    for (int cc = this->CustomViewButtons.size(); cc < tooltips.size(); ++cc)
+    {
+      QToolButton* tb = new QToolButton(self);
+      tb->setObjectName(QString("customView%1").arg(cc));
+      tb->setText(QString::number(cc + 1));
+      tb->setToolTip(tooltips[cc]);
+      tb->setProperty("pqCameraDialog_INDEX", cc);
+      tb->setMinimumSize(QSize(34, 34));
+      self->connect(tb, SIGNAL(clicked()), SLOT(applyCustomView()));
+      this->CustomViewButtons.push_back(tb);
+      this->customViewGridLayout->addWidget(tb, cc / 6, cc % 6);
+    }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -166,14 +218,6 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=null*/, Qt::WindowFlags f /*=0*/)
   QObject::connect(this->Internal->loadCameraConfiguration, SIGNAL(clicked()), this,
     SLOT(loadCameraConfiguration()));
 
-  QObject::connect(this->Internal->customView0, SIGNAL(clicked()), this, SLOT(applyCustomView0()));
-
-  QObject::connect(this->Internal->customView1, SIGNAL(clicked()), this, SLOT(applyCustomView1()));
-
-  QObject::connect(this->Internal->customView2, SIGNAL(clicked()), this, SLOT(applyCustomView2()));
-
-  QObject::connect(this->Internal->customView3, SIGNAL(clicked()), this, SLOT(applyCustomView3()));
-
   QObject::connect(
     this->Internal->configureCustomViews, SIGNAL(clicked()), this, SLOT(configureCustomViews()));
 
@@ -195,16 +239,12 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=null*/, Qt::WindowFlags f /*=0*/)
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
   settings->beginGroup("ToolTips");
-  w->customView0->setToolTip(
-    settings->value("0", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
-  w->customView1->setToolTip(
-    settings->value("1", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
-  w->customView2->setToolTip(
-    settings->value("2", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
-  w->customView3->setToolTip(
-    settings->value("3", pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  const QStringList toolTips = getListOfStrings(settings, pqCustomViewButtonDialog::DEFAULT_TOOLTIP,
+    pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
+    pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
   settings->endGroup();
   settings->endGroup();
+  w->configureCustomViewButtons(toolTips, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -481,26 +521,22 @@ void pqCameraDialog::configureCustomViews()
   pqCameraDialogInternal* ui = this->Internal;
 
   // load the existing button configurations from the app wide settings.
-  QStringList toolTips;
-  QStringList configs;
+  pqSettings* settings = pqApplicationCore::instance()->settings();
 
-  pqSettings* settings;
-  settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
 
   settings->beginGroup("Configurations");
-  configs << settings->value("0", "").toString();
-  configs << settings->value("1", "").toString();
-  configs << settings->value("2", "").toString();
-  configs << settings->value("3", "").toString();
+  QStringList configs =
+    getListOfStrings(settings, QString(), pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
+      pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
   settings->endGroup();
 
   settings->beginGroup("ToolTips");
-  toolTips << settings->value("0", ui->customView0->toolTip()).toString();
-  toolTips << settings->value("1", ui->customView1->toolTip()).toString();
-  toolTips << settings->value("2", ui->customView2->toolTip()).toString();
-  toolTips << settings->value("3", ui->customView3->toolTip()).toString();
+  QStringList toolTips = getListOfStrings(settings, pqCustomViewButtonDialog::DEFAULT_TOOLTIP,
+    pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
+    pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
   settings->endGroup();
+
   settings->endGroup();
 
   // grab the current camera configuration.
@@ -520,33 +556,42 @@ void pqCameraDialog::configureCustomViews()
     configs = dialog.getConfigurations();
     settings->beginGroup("CustomViewButtons");
     settings->beginGroup("Configurations");
-    settings->setValue("0", configs[0]);
-    settings->setValue("1", configs[1]);
-    settings->setValue("2", configs[2]);
-    settings->setValue("3", configs[3]);
+    settings->remove(""); // remove all items in the group.
+    int index = 0;
+    for (const QString& config : configs)
+    {
+      settings->setValue(QString::number(index++), config);
+    }
     settings->endGroup();
 
     toolTips = dialog.getToolTips();
     settings->beginGroup("ToolTips");
-    settings->setValue("0", toolTips[0]);
-    settings->setValue("1", toolTips[1]);
-    settings->setValue("2", toolTips[2]);
-    settings->setValue("3", toolTips[3]);
+    settings->remove(""); // remove all items in the group.
+    index = 0;
+    for (const QString& toolTip : toolTips)
+    {
+      settings->setValue(QString::number(index++), toolTip);
+    }
     settings->endGroup();
     settings->endGroup();
-
-    ui->customView0->setToolTip(toolTips[0]);
-    ui->customView1->setToolTip(toolTips[1]);
-    ui->customView2->setToolTip(toolTips[2]);
-    ui->customView3->setToolTip(toolTips[3]);
+    ui->configureCustomViewButtons(toolTips, this);
   }
-
   writer->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCustomView(int buttonId)
+void pqCameraDialog::applyCustomView()
 {
+  int buttonId = -1;
+  if (QObject* asender = this->sender())
+  {
+    buttonId = asender->property("pqCameraDialog_INDEX").toInt();
+  }
+  else
+  {
+    return;
+  }
+
   pqCameraDialogInternal* ui = this->Internal;
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
