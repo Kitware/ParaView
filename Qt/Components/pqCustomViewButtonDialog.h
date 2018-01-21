@@ -31,18 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #ifndef pqCustomViewDialog_h
 #define pqCustomViewDialog_h
-// .NAME pqCustomViewDialog - Dialog for configuring custom view buttons.
-//
-// .SECTION Description
-// Provides the machinery for associating the current camera configuration
-// to a custom view button, and importing or exporting all of the custom view
-// button configurations.
-//
-// .SECTION See Also
-// pqCameraDialog
-//
-// .SECTION Thanks
-// This class was contributed by SciberQuest Inc.
 
 #include <QDialog>
 #include <QLineEdit>
@@ -53,36 +41,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCustomViewButtonDialogUI;
 class vtkSMCameraConfigurationReader;
 
+/*
+ * @class pqCustomViewDialog
+ * @brief Dialog for configuring custom view buttons.
+ *
+ * Provides the machinery for associating the current camera configuration
+ * to a custom view button, and importing or exporting all of the custom view
+ * button configurations.
+ *
+ * @section thanks Thanks
+ * This class was contributed by SciberQuest Inc.
+ *
+ * @sa pqCameraDialog
+ */
 class pqCustomViewButtonDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  // Description:
-  // Create and initialize the dialog.
+  /**
+   * Create and initialize the dialog.
+   */
   pqCustomViewButtonDialog(QWidget* parent, Qt::WindowFlags f, QStringList& toolTips,
     QStringList& configurations, QString& currentConfig);
 
   ~pqCustomViewButtonDialog() override;
 
-  // Description:
-  // Constant variable that contains the default name for the tool tips.
+  /**
+   * Constant variable that contains the default name for the tool tips.
+   */
   const static QString DEFAULT_TOOLTIP;
 
-  // Description:
-  // Set/get a list of tool tips, one for each button.
+  //@{
+  /**
+   * Set/get a list of tool tips, one for each button.
+   */
   void setToolTips(QStringList& toolTips);
   QStringList getToolTips();
+  //@}
 
-  // Description:
-  // Set/get a list of camera configurations, one for each buttton.
+  //@{
+  /**
+   * Set/get a list of camera configurations, one for each buttton.
+   */
   void setConfigurations(QStringList& configs);
   QStringList getConfigurations();
+  //@}
 
-  // Descrition:
-  // Set/get the current camera configuration.
+  //@{
+  /**
+   * Set/get the current camera configuration.
+   */
   void setCurrentConfiguration(QString& config);
   QString getCurrentConfiguration();
+  //@}
 
 private slots:
   void importConfigurations();
