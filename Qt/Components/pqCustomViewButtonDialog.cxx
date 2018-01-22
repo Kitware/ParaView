@@ -1,19 +1,16 @@
 #include "pqCustomViewButtonDialog.h"
-
 #include "ui_pqCustomViewButtonDialog.h"
 
 #include <QDebug>
-
-#include "vtkIndent.h"
-#include "vtkPVXMLElement.h"
-#include "vtkPVXMLParser.h"
-#include "vtkSMCameraConfigurationFileInfo.h"
-#include "vtkSmartPointer.h"
+#include <QToolButton>
 
 #include "pqFileDialog.h"
+#include "vtkIndent.h"
+#include "vtkSMCameraConfigurationFileInfo.h"
 
 #include <sstream>
 #include <string>
+#include <vtk_pugixml.h>
 
 #define pqErrorMacro(estr)                                                                         \
   qDebug() << "Error in:" << endl << __FILE__ << ", line " << __LINE__ << endl << "" estr << endl;
@@ -22,6 +19,153 @@
 //=============================================================================
 class pqCustomViewButtonDialogUI : public Ui::pqCustomViewButtonDialog
 {
+  struct RowData
+  {
+    QPointer<QLabel> IndexLabel;
+    QPointer<QLineEdit> ToolTipEdit;
+    QPointer<QPushButton> AssignButton;
+    QPointer<QToolButton> DeleteButton;
+  };
+
+  QPointer< ::pqCustomViewButtonDialog> Parent;
+  QList<RowData> Rows;
+
+public:
+  pqCustomViewButtonDialogUI(::pqCustomViewButtonDialog* parent)
+    : Parent(parent)
+  {
+  }
+  ~pqCustomViewButtonDialogUI() { this->setNumberOfRows(0); }
+
+  void setNumberOfRows(int rows)
+  {
+    if (this->Rows.size() == rows)
+    {
+      return;
+    }
+
+    // enable/disable add button.
+    this->add->setEnabled(rows < ::pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+
+    // remove extra rows.
+    for (int cc = this->Rows.size() - 1; cc >= rows; --cc)
+    {
+      auto& arow = this->Rows[cc];
+      this->gridLayout->removeWidget(arow.IndexLabel);
+      this->gridLayout->removeWidget(arow.ToolTipEdit);
+      this->gridLayout->removeWidget(arow.AssignButton);
+      if (arow.DeleteButton)
+      {
+        this->gridLayout->removeWidget(arow.DeleteButton);
+      }
+      delete arow.IndexLabel;
+      delete arow.ToolTipEdit;
+      delete arow.AssignButton;
+      delete arow.DeleteButton;
+      this->Rows.pop_back();
+    }
+
+    // add new rows.
+    for (int cc = this->Rows.size(); cc < rows; ++cc)
+    {
+      RowData arow;
+      arow.IndexLabel = new QLabel(QString::number(cc + 1), this->Parent);
+      arow.IndexLabel->setAlignment(Qt::AlignCenter);
+      arow.ToolTipEdit = new QLineEdit(this->Parent);
+      arow.ToolTipEdit->setToolTip("This text will be set to the buttons tool tip.");
+      arow.ToolTipEdit->setText(::pqCustomViewButtonDialog::DEFAULT_TOOLTIP);
+      arow.ToolTipEdit->setObjectName(QString("toolTip%1").arg(cc));
+      arow.AssignButton = new QPushButton("current view", this->Parent);
+      arow.AssignButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
+      arow.AssignButton->setObjectName(QString("currentView%1").arg(cc));
+      this->Parent->connect(arow.AssignButton, SIGNAL(clicked()), SLOT(assignCurrentView()));
+      this->gridLayout->addWidget(arow.IndexLabel, cc + 1, 0);
+      this->gridLayout->addWidget(arow.ToolTipEdit, cc + 1, 1);
+      this->gridLayout->addWidget(arow.AssignButton, cc + 1, 2);
+      if (cc >= ::pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS)
+      {
+        arow.DeleteButton = new QToolButton(this->Parent);
+        arow.DeleteButton->setObjectName(QString("delete%1").arg(cc));
+        arow.DeleteButton->setIcon(QIcon(":/QtWidgets/Icons/pqDelete24.png"));
+        arow.DeleteButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
+        this->gridLayout->addWidget(arow.DeleteButton, cc + 1, 3);
+        this->Parent->connect(arow.DeleteButton, SIGNAL(clicked()), SLOT(deleteRow()));
+      }
+      this->Rows.push_back(arow);
+    }
+  }
+
+  int rowCount() const { return this->Rows.size(); }
+
+  void setToolTips(const QStringList& txts)
+  {
+    Q_ASSERT(this->Rows.size() == txts.size());
+    for (int cc = 0, max = this->Rows.size(); cc < max; ++cc)
+    {
+      this->Rows[cc].ToolTipEdit->setText(txts[cc]);
+    }
+  }
+
+  QStringList toolTips() const
+  {
+    QStringList tips;
+    for (const auto& arow : this->Rows)
+    {
+      tips.push_back(arow.ToolTipEdit->text());
+    }
+    return tips;
+  }
+
+  void setToolTip(int index, const QString& txt)
+  {
+    Q_ASSERT(index >= 0 && index < this->Rows.size());
+    this->Rows[index].ToolTipEdit->setText(txt);
+    this->Rows[index].ToolTipEdit->selectAll();
+    this->Rows[index].ToolTipEdit->setFocus();
+  }
+
+  QString toolTip(int index) const
+  {
+    Q_ASSERT(index >= 0 && index < this->Rows.size());
+    return this->Rows[index].ToolTipEdit->text();
+  }
+
+  void deleteRow(int index)
+  {
+    Q_ASSERT(index >= 0 && index < this->Rows.size());
+    auto& arow = this->Rows[index];
+    this->gridLayout->removeWidget(arow.IndexLabel);
+    this->gridLayout->removeWidget(arow.ToolTipEdit);
+    this->gridLayout->removeWidget(arow.AssignButton);
+    if (arow.DeleteButton)
+    {
+      this->gridLayout->removeWidget(arow.DeleteButton);
+    }
+    delete arow.IndexLabel;
+    delete arow.ToolTipEdit;
+    delete arow.AssignButton;
+    delete arow.DeleteButton;
+    this->Rows.removeAt(index);
+
+    // now update names and widget layout in the grid
+    for (int cc = index; cc < this->Rows.size(); ++cc)
+    {
+      auto& currentRow = this->Rows[cc];
+      currentRow.IndexLabel->setText(QString::number(cc + 1));
+      currentRow.AssignButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
+      this->gridLayout->addWidget(currentRow.IndexLabel, cc + 1, 0);
+      this->gridLayout->addWidget(currentRow.ToolTipEdit, cc + 1, 1);
+      this->gridLayout->addWidget(currentRow.AssignButton, cc + 1, 2);
+      if (currentRow.DeleteButton)
+      {
+        currentRow.DeleteButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
+        this->gridLayout->addWidget(currentRow.DeleteButton, cc + 1, 3);
+      }
+    }
+
+    // enable/disable add button.
+    this->add->setEnabled(this->Rows.size() < ::pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+  }
 };
 
 // Organizes button config file info in a single location.
@@ -44,42 +188,23 @@ public:
 
 //------------------------------------------------------------------------------
 const QString pqCustomViewButtonDialog::DEFAULT_TOOLTIP = QString("not configured.");
+const int pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS = 4;
+const int pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS = 30;
 
 //------------------------------------------------------------------------------
 pqCustomViewButtonDialog::pqCustomViewButtonDialog(QWidget* Parent, Qt::WindowFlags flags,
   QStringList& toolTips, QStringList& configs, QString& curConfig)
   : QDialog(Parent, flags)
-  , NButtons(0)
-  , ui(0)
+  , ui(nullptr)
 {
-  this->ui = new pqCustomViewButtonDialogUI;
+  this->ui = new pqCustomViewButtonDialogUI(this);
   this->ui->setupUi(this);
-
-  this->ToolTips << this->ui->toolTip0 << this->ui->toolTip1 << this->ui->toolTip2
-                 << this->ui->toolTip3;
-  this->NButtons = 4;
-
-  this->setToolTips(toolTips);
-  this->setConfigurations(configs);
+  this->setToolTipsAndConfigurations(toolTips, configs);
   this->setCurrentConfiguration(curConfig);
-
+  QObject::connect(this->ui->add, SIGNAL(clicked()), this, SLOT(appendRow()));
   QObject::connect(this->ui->clearAll, SIGNAL(clicked()), this, SLOT(clearAll()));
-
   QObject::connect(this->ui->importAll, SIGNAL(clicked()), this, SLOT(importConfigurations()));
-
   QObject::connect(this->ui->exportAll, SIGNAL(clicked()), this, SLOT(exportConfigurations()));
-
-  QObject::connect(
-    this->ui->assignCurrentView0, SIGNAL(clicked()), this, SLOT(assignCurrentView0()));
-
-  QObject::connect(
-    this->ui->assignCurrentView1, SIGNAL(clicked()), this, SLOT(assignCurrentView1()));
-
-  QObject::connect(
-    this->ui->assignCurrentView2, SIGNAL(clicked()), this, SLOT(assignCurrentView2()));
-
-  QObject::connect(
-    this->ui->assignCurrentView3, SIGNAL(clicked()), this, SLOT(assignCurrentView3()));
 }
 
 //------------------------------------------------------------------------------
@@ -90,40 +215,61 @@ pqCustomViewButtonDialog::~pqCustomViewButtonDialog()
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::setToolTips(QStringList& toolTips)
+void pqCustomViewButtonDialog::setToolTipsAndConfigurations(
+  const QStringList& toolTips, const QStringList& configs)
 {
-  if (toolTips.length() != this->NButtons)
+  if (toolTips.size() != configs.size())
+  {
+    qWarning("`setToolTipsAndConfigurations` called with mismatched lengths.");
+  }
+
+  int minSize = std::min(toolTips.size(), configs.size());
+  if (minSize > MAXIMUM_NUMBER_OF_ITEMS)
+  {
+    qWarning() << "configs greater than " << MAXIMUM_NUMBER_OF_ITEMS << " will be ignored.";
+    minSize = MAXIMUM_NUMBER_OF_ITEMS;
+  }
+
+  QStringList realToolTips = toolTips.mid(0, minSize);
+  QStringList realConfigs = configs.mid(0, minSize);
+
+  // ensure there are at least MINIMUM_NUMBER_OF_ITEMS items.
+  for (int cc = minSize; cc < MINIMUM_NUMBER_OF_ITEMS; ++cc)
+  {
+    realToolTips.push_back(DEFAULT_TOOLTIP);
+    realConfigs.push_back(QString());
+  }
+
+  this->ui->setNumberOfRows(realToolTips.size());
+  this->ui->setToolTips(realToolTips);
+  this->setConfigurations(realConfigs);
+}
+
+//------------------------------------------------------------------------------
+void pqCustomViewButtonDialog::setToolTips(const QStringList& toolTips)
+{
+  if (toolTips.length() != this->ui->rowCount())
   {
     pqErrorMacro("Error: Wrong number of tool tips.");
     return;
   }
-
-  for (int i = 0; i < this->NButtons; ++i)
-  {
-    this->ToolTips[i]->setText(toolTips[i]);
-  }
+  this->ui->setToolTips(toolTips);
 }
 
 //------------------------------------------------------------------------------
 QStringList pqCustomViewButtonDialog::getToolTips()
 {
-  QStringList toolTips;
-  for (int i = 0; i < this->NButtons; ++i)
-  {
-    toolTips << this->ToolTips[i]->text();
-  }
-  return toolTips;
+  return this->ui->toolTips();
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::setConfigurations(QStringList& configs)
+void pqCustomViewButtonDialog::setConfigurations(const QStringList& configs)
 {
-  if (configs.length() != this->NButtons)
+  if (configs.length() != this->ui->rowCount())
   {
     pqErrorMacro("Error: Wrong number of configurations.");
     return;
   }
-
   this->Configurations = configs;
 }
 
@@ -134,7 +280,7 @@ QStringList pqCustomViewButtonDialog::getConfigurations()
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::setCurrentConfiguration(QString& config)
+void pqCustomViewButtonDialog::setCurrentConfiguration(const QString& config)
 {
   this->CurrentConfiguration = config;
 }
@@ -165,118 +311,100 @@ void pqCustomViewButtonDialog::importConfigurations()
     QString filename;
     filename = dialog.getSelectedFiles()[0];
 
-    vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
-    parser->SetFileName(filename.toStdString().c_str());
-    if (parser->Parse() == 0)
+    pugi::xml_document doc;
+    auto result = doc.load_file(filename.toLocal8Bit().data());
+    if (!result)
     {
-      pqErrorMacro("Invalid XML in file: " << filename << ".");
-      return;
-    }
-
-    vtkPVXMLElement* root = parser->GetRootElement();
-    if (root == 0)
-    {
-      pqErrorMacro("Invalid XML in file: " << filename << ".");
+      qCritical() << "XML Parsing errors (" << filename << ")\n\n"
+                  << "Error description: " << result.description() << "\n"
+                  << "Error offset: " << result.offset;
       return;
     }
 
     // check type
-    std::string requiredType(fileInfo.FileIdentifier);
-    const char* foundType = root->GetName();
-    if (foundType == 0 || foundType != requiredType)
+    auto root = doc.child(fileInfo.FileIdentifier);
+    if (!root)
     {
       pqErrorMacro(<< "This is not a valid " << fileInfo.FileDescription << " XML hierarchy.");
       return;
     }
 
     // check version
-    const char* foundVersion = root->GetAttribute("version");
-    if (foundVersion == 0)
+    if (!root.attribute("version"))
     {
       pqErrorMacro("No version attribute was found.");
       return;
     }
-    std::string requiredVersion(fileInfo.WriterVersion);
-    if (foundVersion != requiredVersion)
+    if (strcmp(root.attribute("version").value(), fileInfo.WriterVersion) != 0)
     {
-      pqErrorMacro("Unsupported version " << foundVersion << ".");
+      pqErrorMacro("Unsupported version " << root.attribute("version").value() << ".");
       return;
     }
 
     // read buttons, their toolTips, and configurations.
     QStringList toolTips;
     QStringList configs;
-    for (int i = 0; i < this->NButtons; ++i)
+
+    for (auto button : root.children())
     {
-      // button
-      QString buttonTagId = QString("CustomViewButton%1").arg(i);
-      vtkPVXMLElement* button = root->FindNestedElementByName(buttonTagId.toStdString().c_str());
-      if (button == 0)
+      if (strncmp(button.name(), "CustomViewButton", strlen("CustomViewButton")) != 0)
       {
-        pqErrorMacro("Missing " << buttonTagId << " representation.");
-        return;
+        qWarning() << "Unexpected element found '" << button.name() << "'. Skipping.";
+        continue;
       }
 
       // tool tip
-      vtkPVXMLElement* tip = button->FindNestedElementByName("ToolTip");
-      if (tip == 0)
+      auto tip = button.child("ToolTip");
+      if (!tip)
       {
-        pqErrorMacro(<< buttonTagId << " is missing ToolTip.");
-        return;
-      }
-      const char* tipValue = tip->GetAttribute("value");
-      if (tipValue == 0)
-      {
-        pqErrorMacro("In " << buttonTagId << " ToolTip is missing value attribute.");
+        pqErrorMacro(<< button.name() << " is missing ToolTip.");
         return;
       }
 
-      toolTips << tipValue;
+      auto tipValue = tip.attribute("value");
+      if (!tipValue)
+      {
+        pqErrorMacro("In " << button.name() << " ToolTip is missing value attribute.");
+        return;
+      }
+
+      toolTips << tipValue.value();
 
       // Here are the optionally nested Camera Configurations.
-      vtkPVXMLElement* config = button->FindNestedElementByName("Configuration");
-      if (config == 0)
+      auto config = button.child("Configuration");
+      if (!config)
       {
-        pqErrorMacro(<< buttonTagId << " is missing Configuration.");
+        pqErrorMacro(<< button.name() << " is missing Configuration.");
         return;
       }
-      const char* isEmptyValue = config->GetAttribute("is_empty");
-      if (isEmptyValue == 0)
-      {
-        pqErrorMacro("In " << buttonTagId << " Configuration is missing is_empty attribute.");
-        return;
-      }
-      int isEmpty;
-      std::istringstream is(isEmptyValue);
-      is >> isEmpty;
-      if (isEmpty)
+
+      if (config.attribute("is_empty").as_int(1) == 1)
       {
         // Configuration for this button is un-assigned.
-        configs << "";
+        configs << QString();
       }
       else
       {
         vtkSMCameraConfigurationFileInfo pvccInfo;
+
         // Configuration for this button is assigned.
-        vtkPVXMLElement* cameraConfig = config->FindNestedElementByName(pvccInfo.FileIdentifier);
-        if (cameraConfig == 0)
+        auto cameraConfig = config.child(pvccInfo.FileIdentifier);
+        if (!cameraConfig)
         {
-          pqErrorMacro(<< "In " << buttonTagId << " invalid " << pvccInfo.FileDescription << ".");
+          pqErrorMacro(<< "In " << button.name() << " invalid " << pvccInfo.FileDescription << ".");
           return;
         }
 
         // Extract configuration hierarchy from the stream
         // we should validate it but PV state doesn't support this.
         std::ostringstream os;
-        cameraConfig->PrintXML(os, vtkIndent());
-
+        cameraConfig.print(os, "  ");
         configs << os.str().c_str();
       }
     }
 
     // Pass the newly loaded configuration to the GUI.
-    this->setToolTips(toolTips);
-    this->setConfigurations(configs);
+    this->setToolTipsAndConfigurations(toolTips, configs);
     // this->accept();
   }
 }
@@ -297,86 +425,84 @@ void pqCustomViewButtonDialog::exportConfigurations()
     QString filename;
     filename = dialog.getSelectedFiles()[0];
 
-    vtkPVXMLElement* xmlStream = vtkPVXMLElement::New();
-    xmlStream->SetName(fileInfo.FileIdentifier);
-    xmlStream->SetAttribute("version", fileInfo.WriterVersion);
+    pugi::xml_document doc;
+    auto root = doc.append_child(fileInfo.FileIdentifier);
+    root.append_attribute("version").set_value(fileInfo.WriterVersion);
 
-    for (int i = 0; i < this->NButtons; ++i)
+    const QStringList toolTipTexts = this->ui->toolTips();
+    Q_ASSERT(toolTipTexts.size() == this->Configurations.size());
+    for (int i = 0, max = this->ui->rowCount(); i < max; ++i)
     {
+      auto button = root.append_child(QString("CustomViewButton%1").arg(i).toStdString().c_str());
+
       // tool tip
-      vtkPVXMLElement* tip = vtkPVXMLElement::New();
-      tip->SetName("ToolTip");
-      tip->SetAttribute("value", this->ToolTips[i]->text().toStdString().c_str());
+      auto tip = button.append_child("ToolTip");
+      tip.append_attribute("value").set_value(toolTipTexts[i].toStdString().c_str());
 
       // camera configuration
-      std::ostringstream os;
-      os << (this->Configurations[i].isEmpty() ? 1 : 0);
-
-      vtkPVXMLElement* config = vtkPVXMLElement::New();
-      config->SetName("Configuration");
-      config->AddAttribute("is_empty", os.str().c_str());
+      auto config = button.append_child("Configuration");
+      config.append_attribute("is_empty").set_value(this->Configurations[i].isEmpty() ? 1 : 0);
 
       if (!this->Configurations[i].isEmpty())
       {
-        std::string camConfig(this->Configurations[i].toStdString());
-
-        vtkPVXMLParser* parser = vtkPVXMLParser::New();
-        parser->InitializeParser();
-        parser->ParseChunk(camConfig.c_str(), static_cast<unsigned int>(camConfig.size()));
-        parser->CleanupParser();
-
-        vtkPVXMLElement* camConfigXml = parser->GetRootElement();
-
-        config->AddNestedElement(camConfigXml);
-        parser->Delete();
+        pugi::xml_document camConfigDoc;
+        camConfigDoc.load(this->Configurations[i].toStdString().c_str());
+        config.append_copy(camConfigDoc.first_child());
       }
-
-      vtkPVXMLElement* button = vtkPVXMLElement::New();
-      button->SetName(QString("CustomViewButton%1").arg(i).toStdString().c_str());
-      button->AddNestedElement(tip);
-      button->AddNestedElement(config);
-
-      xmlStream->AddNestedElement(button);
-
-      tip->Delete();
-      config->Delete();
-      button->Delete();
     }
-
-    ofstream os(filename.toStdString().c_str(), ios::out);
-    xmlStream->PrintXML(os, vtkIndent());
-    os << endl;
-    os.close();
-
-    xmlStream->Delete();
+    if (!doc.save_file(filename.toLocal8Bit().data(), /*indent =*/"  "))
+    {
+      qCritical() << "Failed to save '" << filename << "'.";
+    }
   }
+}
+
+//------------------------------------------------------------------------------
+void pqCustomViewButtonDialog::appendRow()
+{
+  const int numRows = this->ui->rowCount();
+  Q_ASSERT(numRows < MAXIMUM_NUMBER_OF_ITEMS);
+  this->ui->setNumberOfRows(numRows + 1);
+  this->Configurations.push_back(QString());
 }
 
 //------------------------------------------------------------------------------
 void pqCustomViewButtonDialog::clearAll()
 {
-  QStringList toolTips;
-  toolTips << pqCustomViewButtonDialog::DEFAULT_TOOLTIP << pqCustomViewButtonDialog::DEFAULT_TOOLTIP
-           << pqCustomViewButtonDialog::DEFAULT_TOOLTIP
-           << pqCustomViewButtonDialog::DEFAULT_TOOLTIP;
-  this->setToolTips(toolTips);
-
-  QStringList configs;
-  configs << ""
-          << ""
-          << ""
-          << "";
-  this->setConfigurations(configs);
+  this->setToolTipsAndConfigurations(QStringList(), QStringList());
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::assignCurrentView(int id)
+void pqCustomViewButtonDialog::assignCurrentView()
 {
-  this->Configurations[id] = this->CurrentConfiguration;
-  if (this->ToolTips[id]->text() == pqCustomViewButtonDialog::DEFAULT_TOOLTIP)
+  int row = -1;
+  if (QObject* asender = this->sender())
   {
-    this->ToolTips[id]->setText("Current View " + QString::number(id + 1));
+    row = asender->property("pqCustomViewButtonDialog_INDEX").toInt();
   }
-  this->ToolTips[id]->selectAll();
-  this->ToolTips[id]->setFocus();
+
+  if (row >= 0 && row < this->ui->rowCount())
+  {
+    this->Configurations[row] = this->CurrentConfiguration;
+    if (this->ui->toolTip(row) == pqCustomViewButtonDialog::DEFAULT_TOOLTIP)
+    {
+      this->ui->setToolTip(row, "Current View " + QString::number(row + 1));
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+void pqCustomViewButtonDialog::deleteRow()
+{
+  int row = -1;
+  if (QObject* asender = this->sender())
+  {
+    row = asender->property("pqCustomViewButtonDialog_INDEX").toInt();
+  }
+
+  if (row >= 0 && row < this->ui->rowCount())
+  {
+    this->ui->deleteRow(row);
+    this->Configurations.removeAt(row);
+  }
 }
