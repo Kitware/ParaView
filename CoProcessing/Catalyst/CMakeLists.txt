@@ -36,6 +36,7 @@ set (Module_SRCS
   vtkCPInputDataDescription.cxx
   vtkCPPipeline.cxx
   vtkCPProcessor.cxx
+  vtkCPXMLPWriterPipeline.cxx
 )
 
 set (${vtk-module}_HDRS CAdaptorAPI.h)
