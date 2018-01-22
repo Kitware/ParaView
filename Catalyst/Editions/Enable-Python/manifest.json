@@ -36,9 +36,6 @@
       ],
       "pythonwrap":true
     },
-    { "name":"vtkmpi4py",
-      "path":"VTK/ThirdParty/mpi4py"
-    },
     { "path":"VTK/Utilities/PythonInterpreter" },
     { "path":"VTK/Utilities/Python" },
     { "path":"VTK/Wrapping/PythonCore" },
