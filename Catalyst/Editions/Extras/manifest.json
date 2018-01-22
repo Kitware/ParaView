@@ -61,6 +61,7 @@
       "path":"VTK/Filters/Extraction",
       "include":[
         { "class":"vtkConvertSelection" },
+        { "class":"vtkExtractBlock" },
         { "class":"vtkExtractCells" },
         { "class":"vtkExtractSelectedBlock" },
         { "class":"vtkExtractSelectedIds" },
@@ -91,7 +92,8 @@
     { "name": "vtkFiltersParallel",
       "path": "VTK/Filters/Parallel",
       "include": [
-        { "class": "vtkAggregateDataSetFilter" }
+        { "class": "vtkAggregateDataSetFilter" },
+        { "class": "vtkPCellDataToPointData" }
       ],
       "replace": [
         { "path": "VTK/Filters/Parallel/module.cmake" },
@@ -248,13 +250,19 @@
   "proxies":[
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
       "proxies":[
-        "PVExtractSelection",
+        "AppendReductionFilter",
+        "CellDataToPointData",
+        "DataSetSurfaceFilter",
+        "ExtractBlock",
         "ExtractHistogram",
         "Glyph",
-        "WarpScalar",
-        "WarpVector",
+        "ImageDataToPointSet",
         "IntegrateAttributes",
-        "DataSetSurfaceFilter"
+        "PVExtractSelection",
+        "RectilinearGridToPointSet",
+        "TransformFilter",
+        "WarpScalar",
+        "WarpVector"
       ]
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
