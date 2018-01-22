@@ -373,7 +373,7 @@
                       name="PointArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which node-based arrays to
+        <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
       <Hints>
@@ -480,7 +480,7 @@
                       name="PointArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which node-based arrays to
+        <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
       <Hints>
