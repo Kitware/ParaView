@@ -28,6 +28,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkXMLHyperTreeGridWriter.h"
 #include "vtkXMLImageDataWriter.h"
 #include "vtkXMLPDataWriter.h"
 #include "vtkXMLPImageDataWriter.h"
@@ -539,6 +540,16 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
           }
+        }
+        break;
+
+      case VTK_HYPER_TREE_GRID:
+        if (!this->Internal->Writers[i].GetPointer() ||
+          (this->Internal->Writers[i]->IsA("vtkXMLHyperTreeGridWriter")))
+        {
+          vtkXMLHyperTreeGridWriter* w = vtkXMLHyperTreeGridWriter::New();
+          this->Internal->Writers[i] = w;
+          w->Delete();
         }
         break;
 

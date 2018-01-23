@@ -8083,7 +8083,6 @@ series.
       </Hints>
     </EnsembleDataReaderProxy>
     <!-- End Ensemble Data Reader -->
-
     <!-- GE/LANL TRUCHAS Reader -->
     <SourceProxy class="vtkTRUCHASReader"
                  label="TRUCHAS Reader"
@@ -8173,6 +8172,26 @@ series.
       <Hints>
         <ReaderFactory extensions="hdf5 h5"
                        file_description="TRUCHAS dataset" />
+      </Hints>
+    </SourceProxy>
+    <!-- HyperTreeGrid Reader -->
+    <SourceProxy class="vtkXMLHyperTreeGridReader"
+                 label="HyperTreeGrid Reader"
+                 name="HyperTreeGridReader">
+      <Documentation long_help="Reads HyperTreeGrid .htg files"
+                     short_help="Reads HyperTreeGrid data">Reads HyperTreeGrid data files</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="htg"
+                       file_description="HyperTreeGrid" />
       </Hints>
     </SourceProxy>
 
