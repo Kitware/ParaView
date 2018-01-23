@@ -255,6 +255,7 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   else
   {
     ui.EnableOpacityMapping->hide();
+    ui.UseLogScaleOpacity->hide();
   }
 
   smproperty = smgroup->GetProperty("UseLogScale");

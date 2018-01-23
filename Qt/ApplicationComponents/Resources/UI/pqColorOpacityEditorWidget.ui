@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>758</height>
+    <width>334</width>
+    <height>774</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -233,22 +233,20 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="EnableOpacityMapping">
-     <property name="title">
+    <widget class="QCheckBox" name="EnableOpacityMapping">
+     <property name="text">
       <string>Enable opacity mapping for surfaces</string>
      </property>
-     <property name="checkable">
-      <bool>true</bool>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="UseLogScaleOpacity">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QCheckBox" name="UseLogScaleOpacity">
-        <property name="text">
-         <string>Use log scale when mapping data to opacity</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="text">
+      <string>Use log scale when mapping data to opacity</string>
+     </property>
     </widget>
    </item>
    <item>
@@ -326,5 +324,22 @@
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>EnableOpacityMapping</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>UseLogScaleOpacity</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>166</x>
+     <y>279</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>166</x>
+     <y>305</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
