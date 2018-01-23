@@ -32,14 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSourcesMenuReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqCollaborationManager.h"
+#include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
 #include "pqUndoStack.h"
-
-#include "pqCollaborationManager.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
 
 //-----------------------------------------------------------------------------
 pqSourcesMenuReaction::pqSourcesMenuReaction(pqProxyGroupMenuManager* menuManager)
@@ -76,14 +79,51 @@ void pqSourcesMenuReaction::updateEnableState(bool enabled)
 }
 
 //-----------------------------------------------------------------------------
+bool pqSourcesMenuReaction::warnOnCreate(
+  const QString& xmlgroup, const QString& xmlname, pqServer* server)
+{
+  server = server ? server : pqActiveObjects::instance().activeServer();
+  if (server)
+  {
+    vtkSMSessionProxyManager* pxm = server->proxyManager();
+    vtkSMProxy* prototype =
+      pxm->GetPrototypeProxy(xmlgroup.toLocal8Bit().data(), xmlname.toLocal8Bit().data());
+    if (!prototype)
+    {
+      // skip the prompt.
+      return true;
+    }
+
+    if (vtkPVXMLElement* hints = prototype->GetHints()
+        ? prototype->GetHints()->FindNestedElementByName("WarnOnCreate")
+        : nullptr)
+    {
+      const char* title = hints->GetAttributeOrDefault("title", "Are you sure?");
+      QString txt = hints->GetCharacterData();
+      if (txt.isEmpty())
+      {
+        txt = QString("Creating '%1'. Do you want to continue?").arg(prototype->GetXMLLabel());
+      }
+      return pqCoreUtilities::promptUser(QString("WarnOnCreate/%1/%2").arg(xmlgroup).arg(xmlname),
+        QMessageBox::Information, QString::fromStdString(pqProxy::rstToHtml(title)),
+        pqProxy::rstToHtml(txt), QMessageBox::Yes | QMessageBox::No | QMessageBox::Save);
+    }
+  }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 pqPipelineSource* pqSourcesMenuReaction::createSource(const QString& group, const QString& name)
 {
-  pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();
-
-  BEGIN_UNDO_SET(QString("Create '%1'").arg(name));
-  pqPipelineSource* source = builder->createSource(group, name, activeObjects->activeServer());
-  END_UNDO_SET();
-  return source;
+  if (pqSourcesMenuReaction::warnOnCreate(group, name))
+  {
+    pqApplicationCore* core = pqApplicationCore::instance();
+    pqObjectBuilder* builder = core->getObjectBuilder();
+    BEGIN_UNDO_SET(QString("Create '%1'").arg(name));
+    pqPipelineSource* source =
+      builder->createSource(group, name, pqActiveObjects::instance().activeServer());
+    END_UNDO_SET();
+    return source;
+  }
+  return nullptr;
 }

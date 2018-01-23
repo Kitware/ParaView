@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSourcesMenuReaction.h"
 #include "pqUndoStack.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMDataTypeDomain.h"
@@ -330,13 +331,18 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   pqObjectBuilder* builder = core->getObjectBuilder();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
+  if (!pqSourcesMenuReaction::warnOnCreate(xmlgroup, xmlname))
+  {
+    return nullptr;
+  }
+
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* prototype =
     pxm->GetPrototypeProxy(xmlgroup.toLocal8Bit().data(), xmlname.toLocal8Bit().data());
   if (!prototype)
   {
     qCritical() << "Unknown proxy type: " << xmlname;
-    return 0;
+    return nullptr;
   }
 
   // Get the list of selected sources.
@@ -385,7 +391,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
     {
       helper.RemoveAllValues();
       // User aborted creation.
-      return 0;
+      return nullptr;
     }
     helper.RemoveAllValues();
     namedInputs = dialog.selectedInputs();
