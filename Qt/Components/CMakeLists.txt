@@ -489,7 +489,6 @@ set (Module_UI_FILES
   Resources/UI/pqCustomFilterManager.ui
   Resources/UI/pqCustomViewpointButtonDialog.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
-  Resources/UI/pqEmptyView.ui
   Resources/UI/pqFindDataCreateSelectionFrame.ui
   Resources/UI/pqFindDataCurrentSelectionFrame.ui
   Resources/UI/pqFindDataDialog.ui
