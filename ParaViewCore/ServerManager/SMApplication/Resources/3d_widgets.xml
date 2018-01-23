@@ -451,9 +451,9 @@
             <Property name="Orientation" />
             <Property name="OrientationInfo" />
             <Property name="WindowLocation" />
+            <Property name="Position" />
+            <Property name="PositionInfo" />
           </PropertyGroup>
-          <Property name="Position" panel_visibility="never"/>
-          <Property name="PositionInfo" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1408,6 +1408,18 @@
         <DoubleRangeDomain max="1 1"
                            min="0 0"
                            name="range" />
+        <Documentation>
+          Specify the anchor position (bottom-left corner of the scalar bar) in normalized
+          viewport coordinates in range [0, 1]. This is used only when **Window Location**
+          is set to **AnyLocation**.
+        </Documentation>
+        <Hints>
+          <!-- Enable "Position" widget only when WindowLocation == AnyLocation -->
+          <PropertyWidgetDecorator type="GenericDecorator"
+            mode="enabled_state"
+            property="WindowLocation"
+            value="0" />
+        </Hints>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="GetPosition"
                             information_only="1"
