@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 
 #include <QColorDialog>
 #include <QIdentityProxyModel>
@@ -681,8 +682,14 @@ public:
 
   void resetModel()
   {
+    vtkTimerLogScope mark("resetModel");
+    (void)mark;
+
     pqTreeViewExpandState expandState;
+
+    vtkTimerLog::MarkStartEvent("Expand state: save");
     expandState.save(this->Ui.treeView);
+    vtkTimerLog::MarkEndEvent("Expand state: save");
 
     bool prev = this->SelectionModel->blockSelectionPropagation(true);
     pqOutputPort* port = this->OutputPort;
@@ -709,7 +716,9 @@ public:
     else
     {
       this->ProxyModel->setSourceModel(this->CDTModel);
+      vtkTimerLog::MarkStartEvent("QTreeView::expandToDepth");
       this->Ui.treeView->expandToDepth(1);
+      vtkTimerLog::MarkEndEvent("QTreeView::expandToDepth");
 
       QHeaderView* header = this->Ui.treeView->header();
       if (header->count() == 3 && header->logicalIndex(2) != 0)
@@ -718,7 +727,9 @@ public:
       }
     }
 
+    vtkTimerLog::MarkStartEvent("Expand state: restore");
     expandState.restore(this->Ui.treeView);
+    vtkTimerLog::MarkEndEvent("Expand state: restore");
     this->SelectionModel->blockSelectionPropagation(prev);
   }
 
@@ -733,6 +744,8 @@ public:
 
   void restoreCachedValues()
   {
+    vtkTimerLogScope mark("restoreCachedValues");
+    (void)mark;
     if (this->Representation)
     {
       // restore check-state, property state, if possible.
@@ -986,6 +999,9 @@ void pqMultiBlockInspectorWidget::resetEventually()
 //-----------------------------------------------------------------------------
 void pqMultiBlockInspectorWidget::resetNow()
 {
+  vtkTimerLogScope mark("pqMultiBlockInspectorWidget::resetNow");
+  (void)mark;
+
   QSignalBlocker b(this);
   pqInternals& internals = (*this->Internals);
   internals.ResetTimer.stop();

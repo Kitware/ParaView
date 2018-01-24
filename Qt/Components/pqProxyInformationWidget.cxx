@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMOutputPort.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 
 // ParaView widget includes
 
@@ -146,6 +147,9 @@ pqOutputPort* pqProxyInformationWidget::getOutputPort()
 //-----------------------------------------------------------------------------
 void pqProxyInformationWidget::updateInformation()
 {
+  vtkTimerLogScope mark("pqProxyInformationWidget::updateInformation");
+  (void)mark;
+
   this->Ui->compositeTreeModel->reset(nullptr);
   this->Ui->compositeTree->setVisible(false);
   this->Ui->filename->setText(tr("NA"));
