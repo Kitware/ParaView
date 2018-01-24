@@ -373,7 +373,7 @@
                       name="PointArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which node-based arrays to
+        <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
       <Hints>
@@ -480,7 +480,7 @@
                       name="PointArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which node-based arrays to
+        <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
       <Hints>
@@ -3552,7 +3552,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the PVD
         reader.</Documentation>
@@ -3563,6 +3564,82 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+
+      <!--  Array Selection GUI Component -->
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="PointArrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ColumnArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Column" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColumnArrayStatus"
+                            element_types="2 0"
+                            information_property="ColumnArrayInfo"
+                            label="Column Arrays"
+                            name="ColumnArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ColumnArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which columns to
+        read.</Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Point/Cell/Column Array Status"
+                     name="ArrayStatus"
+                     panel_visibility="default"
+                     panel_widget="ArrayStatus">
+        <Property name="CellArrayInfo" />
+        <Property name="CellArrayStatus" />
+        <Property name="PointArrayInfo" />
+        <Property name="PointArrayStatus" />
+        <Property name="ColumnArrayInfo" />
+        <Property name="ColumnArrayStatus" />
+      </PropertyGroup>
       <Hints>
         <ReaderFactory extensions="pvd"
                        file_description="ParaView Data Files" />
