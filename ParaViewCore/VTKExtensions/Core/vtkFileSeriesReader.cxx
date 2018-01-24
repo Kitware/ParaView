@@ -38,6 +38,8 @@
 #include "vtkStringArray.h"
 #include "vtkTypeTraits.h"
 
+#include <vtksys/SystemTools.hxx>
+
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
@@ -47,6 +49,8 @@
 #include <set>
 #include <string>
 #include <vector>
+
+#include "vtk_jsoncpp.h"
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
@@ -359,6 +363,8 @@ private:
 struct vtkFileSeriesReaderInternals
 {
   std::vector<std::string> FileNames;
+  std::vector<std::string> RealFileNames;
+  std::vector<double> TimeValues;
   bool FileNameIsSet;
   vtkFileSeriesReaderTimeRanges* TimeRanges;
 };
@@ -374,8 +380,9 @@ vtkFileSeriesReader::vtkFileSeriesReader()
   this->Internal->TimeRanges = new vtkFileSeriesReaderTimeRanges;
 
   this->UseMetaFile = 0;
+  this->UseJsonMetaFile = false;
 
-  this->IgnoreReaderTime = 0;
+  this->IgnoreReaderTime = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -414,17 +421,17 @@ void vtkFileSeriesReader::RemoveAllFileNamesInternal()
 //----------------------------------------------------------------------------
 unsigned int vtkFileSeriesReader::GetNumberOfFileNames()
 {
-  return static_cast<unsigned int>(this->Internal->FileNames.size());
+  return static_cast<unsigned int>(this->Internal->RealFileNames.size());
 }
 
 //----------------------------------------------------------------------------
 const char* vtkFileSeriesReader::GetFileName(unsigned int idx)
 {
-  if (idx >= this->Internal->FileNames.size())
+  if (idx >= this->Internal->RealFileNames.size())
   {
     return 0;
   }
-  return this->Internal->FileNames[idx].c_str();
+  return this->Internal->RealFileNames[idx].c_str();
 }
 
 //----------------------------------------------------------------------------
@@ -435,11 +442,24 @@ int vtkFileSeriesReader::CanReadFile(const char* filename)
     return 0;
   }
 
-  if (this->UseMetaFile)
+  if (!this->UseMetaFile && !this->UseJsonMetaFile)
+  {
+    if (filename)
+    {
+      std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
+      if (ext == ".series")
+      {
+        this->UseJsonMetaFile = true;
+      }
+    }
+  }
+
+  if (this->UseMetaFile || this->UseJsonMetaFile)
   {
     // filename really points to a metafile.
     VTK_CREATE(vtkStringArray, dataFiles);
-    if (this->ReadMetaDataFile(filename, dataFiles, 1))
+    std::vector<double> timeValues;
+    if (this->ReadMetaDataFile(filename, dataFiles, timeValues, 1))
     {
       if (dataFiles->GetNumberOfValues() > 0)
       {
@@ -532,7 +552,7 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
   assert(requestFromPort < this->GetNumberOfOutputPorts());
 
   vtkInformation* outInfo = outputVector->GetInformationObject(requestFromPort);
-  int numFiles = (int)this->GetNumberOfFileNames();
+  unsigned int numFiles = this->GetNumberOfFileNames();
   if (numFiles < 1)
   {
     // This can happen in special cases, like Plot3DReader where the
@@ -553,19 +573,26 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
   outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
   this->RequestInformationForInput(0, request, outputVector);
 
+  bool ignoreReaderTime = this->IgnoreReaderTime;
+  ignoreReaderTime |= !this->Internal->TimeValues.empty();
+
   // Does the reader have time?
-  if (this->IgnoreReaderTime || (!outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) &&
-                                  !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE())))
+  if (ignoreReaderTime || (!outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) &&
+                            !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE())))
   {
     // Input files have no time steps.  Fake a time step for each equal to the
     // index.
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-    for (int i = 0; i < numFiles; i++)
+    for (unsigned int i = 0; i < numFiles; i++)
     {
       double time = (double)i;
+      if (this->UseJsonMetaFile && this->Internal->TimeValues.size() == numFiles)
+      {
+        time = this->Internal->TimeValues[i];
+      }
       outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &time, 1);
-      this->Internal->TimeRanges->AddTimeRange(i, outInfo);
+      this->Internal->TimeRanges->AddTimeRange(static_cast<int>(i), outInfo);
     }
   }
   else
@@ -574,10 +601,10 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
     this->Internal->TimeRanges->AddTimeRange(0, outInfo);
 
     // Query all the other files for time info.
-    for (int i = 1; i < numFiles; i++)
+    for (unsigned int i = 1; i < numFiles; i++)
     {
-      this->RequestInformationForInput(i, request, outputVector);
-      this->Internal->TimeRanges->AddTimeRange(i, outInfo);
+      this->RequestInformationForInput(static_cast<int>(i), request, outputVector);
+      this->Internal->TimeRanges->AddTimeRange(static_cast<int>(i), outInfo);
     }
   }
 
@@ -720,8 +747,8 @@ int vtkFileSeriesReader::FillOutputPortInformation(int port, vtkInformation* inf
 }
 
 //-----------------------------------------------------------------------------
-int vtkFileSeriesReader::ReadMetaDataFile(
-  const char* metafilename, vtkStringArray* filesToRead, int maxFilesToRead /*= VTK_INT_MAX*/)
+int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArray* filesToRead,
+  std::vector<double>& timeValues, int maxFilesToRead /*= VTK_INT_MAX*/)
 {
   // Open the metafile.
   ifstream metafile(metafilename);
@@ -730,53 +757,163 @@ int vtkFileSeriesReader::ReadMetaDataFile(
     return 0;
   }
 
-  // Iterate over all files pointed to by the metafile.
-  filesToRead->SetNumberOfTuples(0);
-  filesToRead->SetNumberOfComponents(1);
-  while (metafile.good() && !metafile.eof() && (filesToRead->GetNumberOfTuples() < maxFilesToRead))
+  if (this->UseJsonMetaFile)
   {
-    vtkStdString fname;
-    metafile >> fname;
-    if (fname.empty())
-      continue;
-    for (size_t cc = 0; cc < fname.size(); cc++)
+    Json::Value root;
+    Json::Reader reader;
+    bool parsingSuccessful = reader.parse(metafile, root);
+    if (parsingSuccessful)
     {
-      int ch = fname[cc];
-      // to avoid assert() in debug MSVC, we need to ensure 0 <= ch < 256.
-      if (static_cast<unsigned int>(ch) >= 256 || !isprint(ch))
+      if (!root.isMember("file-series-version"))
       {
-        // must not be an ASCII file.
+        vtkErrorMacro("Syntax error in meta-file. A list of file names is required.");
         return 0;
       }
+      if (!root.isMember("files"))
+      {
+        vtkErrorMacro("Syntax error in meta-file. A list of file names is required.") return 0;
+      }
+      const Json::Value& filenames = root["files"];
+      for (size_t index = 0; index < filenames.size(); ++index)
+      {
+        const Json::Value& astep = filenames[(int)index];
+        if (astep.isString())
+        {
+          std::string name = astep.asString();
+          std::cout << name << std::endl;
+          filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, name.c_str()));
+        }
+        else if (astep.isObject())
+        {
+          if (!astep.isMember("name"))
+          {
+            vtkErrorMacro("Syntax error in meta-file. A filename is required.");
+            filesToRead->Initialize();
+            timeValues.clear();
+            return 0;
+          }
+          std::string name = astep["name"].asString();
+          filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, name.c_str()));
+          if (!astep.isMember("time"))
+          {
+            vtkErrorMacro("Syntax error in meta-file. A time value is required.");
+            filesToRead->Initialize();
+            timeValues.clear();
+            return 0;
+          }
+          double value = astep["time"].asDouble();
+          timeValues.push_back(value);
+        }
+        else
+        {
+          vtkErrorMacro("Syntax error in meta-file. Can't read.");
+          return 0;
+        }
+      }
+      return 1;
     }
-    filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, fname));
+    else
+    {
+      vtkErrorMacro("Syntax error in meta-file. Can't read.");
+      return 0;
+    }
+    return 1;
   }
-  return 1;
+  else
+  {
+    // Iterate over all files pointed to by the metafile.
+    filesToRead->SetNumberOfTuples(0);
+    filesToRead->SetNumberOfComponents(1);
+    while (
+      metafile.good() && !metafile.eof() && (filesToRead->GetNumberOfTuples() < maxFilesToRead))
+    {
+      vtkStdString fname;
+      metafile >> fname;
+      if (fname.empty())
+        continue;
+      for (size_t cc = 0; cc < fname.size(); cc++)
+      {
+        int ch = fname[cc];
+        // to avoid assert() in debug MSVC, we need to ensure 0 <= ch < 256.
+        if (static_cast<unsigned int>(ch) >= 256 || !isprint(ch))
+        {
+          // must not be an ASCII file.
+          return 0;
+        }
+      }
+      filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, fname));
+    }
+    return 1;
+  }
 }
 
 //-----------------------------------------------------------------------------
 void vtkFileSeriesReader::UpdateMetaData()
 {
-  if (this->UseMetaFile && (this->MetaFileReadTime < this->MetaFileNameMTime))
+  if (this->MetaFileReadTime > this->GetMTime())
+  {
+    return;
+  }
+
+  if (!this->UseMetaFile)
+  {
+    if (!this->Internal->FileNames.empty())
+    {
+      const char* fname = this->Internal->FileNames[0].c_str();
+      if (fname)
+      {
+        std::string ext = vtksys::SystemTools::GetFilenameLastExtension(fname);
+        if (ext == ".series")
+        {
+          this->UseJsonMetaFile = true;
+          this->MetaFileNameMTime = this->vtkDataObjectAlgorithm::GetMTime();
+          size_t len = strlen(fname) + 1;
+          if (this->_MetaFileName)
+          {
+            delete[] this->_MetaFileName;
+          }
+          this->_MetaFileName = new char[len];
+          memcpy(this->_MetaFileName, fname, len);
+        }
+      }
+    }
+  }
+
+  if (this->UseMetaFile || this->UseJsonMetaFile)
   {
     VTK_CREATE(vtkStringArray, dataFiles);
-    if (!this->ReadMetaDataFile(this->_MetaFileName, dataFiles))
+    std::vector<double> timeValues;
+    if (!this->ReadMetaDataFile(this->_MetaFileName, dataFiles, timeValues))
     {
       vtkErrorMacro(<< "Could not open metafile " << this->_MetaFileName);
       return;
     }
 
+    vtkIdType numFiles = dataFiles->GetNumberOfValues();
     // essential that we don't use the public methods AddFileName(),
     // RemoveAllFileNames() since those change the MTime of this class in
     // ProcessRequest() method.
-    this->Internal->FileNames.clear();
-    for (int i = 0; i < dataFiles->GetNumberOfValues(); i++)
+    this->Internal->RealFileNames.clear();
+    for (int i = 0; i < numFiles; i++)
     {
-      this->Internal->FileNames.push_back(dataFiles->GetValue(i));
+      this->Internal->RealFileNames.push_back(dataFiles->GetValue(i));
     }
 
-    this->MetaFileReadTime.Modified();
+    this->Internal->TimeValues.clear();
+    if ((size_t)numFiles == timeValues.size())
+    {
+      for (int i = 0; i < numFiles; i++)
+      {
+        this->Internal->TimeValues.push_back(timeValues[i]);
+      }
+    }
   }
+  else
+  {
+    this->Internal->RealFileNames = this->Internal->FileNames;
+  }
+
+  this->MetaFileReadTime.Modified();
 }
 
 //-----------------------------------------------------------------------------

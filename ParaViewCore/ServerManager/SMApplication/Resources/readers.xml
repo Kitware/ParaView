@@ -4646,7 +4646,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vtk"
+        <ReaderFactory extensions="vtk vtk.series"
                        file_description="Legacy VTK files" />
       </Hints>
       <!-- End LegacyVTKFileReader -->
