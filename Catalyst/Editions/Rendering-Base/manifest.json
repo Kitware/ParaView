@@ -1019,6 +1019,12 @@
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
       "proxies":[
         "GridAxes3DActor",
+        "DefaultBackground",
+        "PrintBackground",
+        "GrayBackground",
+        "WhiteBackground",
+        "BlackBackground",
+        "GradientBackground",
         "PiecewiseFunction",
         "PVLookupTable",
         "SaveScreenshot",
