@@ -81,7 +81,7 @@ vtkCxxSetObjectMacro(vtkAMRDualClip, Controller, vtkMultiProcessController);
 // Locators are created on demand and deleted right after a block is complete.
 
 // Setup of the level mask.
-// Centers are computed independantly.
+// Centers are computed independently.
 // Centers must be computed before anypoints are added.
 // Centers must be computed before they are used to set ghost values in neighbors.
 // Ghost values must be copied from neighbor before points are added.
@@ -101,7 +101,7 @@ public:
   void Initialize(int xDualCellDim, int yDualCellDim, int zDualCellDim);
 
   // Description:
-  // Lookup and seting uses this pointer. Using a pointer keeps
+  // Lookup and setting uses this pointer. Using a pointer keeps
   // the contour filter from having to lookup a point and second
   // adding a point (both are very similar).
   // The edge index uses VTK voxel edge indexing scheme.
@@ -133,7 +133,7 @@ public:
   // (so it is ok to call this multiple times).
   void ComputeLevelMask(vtkDataArray* scalars, double isoValue, int decimate);
 
-  // This is used to syncronize the ghost level mask with neighbors.
+  // This is used to synchronize the ghost level mask with neighbors.
   void CopyNeighborLevelMask(
     vtkAMRDualGridHelperBlock* myBlock, vtkAMRDualGridHelperBlock* neighborBlock);
 
@@ -220,7 +220,7 @@ void vtkDualGridClipInitializeLevelMask(
   // We only set the inside because the ghost regions can already be set.
   scalarPtr += 1 + dims[0] + dims[0] * dims[1];
   levelMask += 1 + dims[0] + dims[0] * dims[1];
-  // Start with two because skiping from and back ghost.
+  // Start with two because skipping from and back ghost.
   // The exact value of zz does not matter.
   // This is easier than comparing < dim-1.
   for (int zz = 2; zz < dims[2]; ++zz)
@@ -363,7 +363,7 @@ void vtkAMRDualClipLocator::CapLevelMaskFace(int axis, int face)
 //----------------------------------------------------------------------------
 void vtkAMRDualClipLocator::RecursiveComputeLevelMask(int depth)
 {
-  // Recusion depth is small so stack size is not an issue.
+  // Recursion depth is small so stack size is not an issue.
   int xInc = (1 << depth);
   int yInc = this->YIncrement << depth;
   int zInc = this->ZIncrement << depth;
@@ -867,7 +867,7 @@ void vtkAMRDualClipLocator::ShareBlockLocatorWithNeighbor(
   vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
   vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
 
-  // Working on the logic to parallize level mask.
+  // Working on the logic to parallelize level mask.
   if (blockLocator == 0 || neighborLocator == 0)
   { // This occurs if the block is owned by a different process.
     return;
@@ -1597,7 +1597,7 @@ void vtkAMRDualClip::ProcessBlock(
     // that the block is already processes.
     // This will keep neighbors from recreating the locator.
     // Another option would be to create the locator object for
-    // all blocks but do not allocate until needed.  Then the existance of the locator
+    // all blocks but do not allocate until needed.  Then the existence of the locator
     // would tell whether the block was processed.
     block->RegionBits[1][1][1] = 0;
   }
@@ -2006,7 +2006,7 @@ void vtkAMRDualClip::DistributeLevelMasks()
                 // We can ignore pairs in the same process.
                 if (neighborBlock && neighborBlock->ProcessId != block->ProcessId)
                 {
-                  // We can ingnore pairs if both are in other processses.
+                  // We can ignore pairs if both are in other processes.
                   if (block->ProcessId == myProcessId || neighborBlock->ProcessId == myProcessId)
                   {
                     const char* arrayName = this->Helper->GetArrayName();

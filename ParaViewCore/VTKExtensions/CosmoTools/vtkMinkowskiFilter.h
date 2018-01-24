@@ -16,7 +16,7 @@
  * @class   vtkMinkowskiFilter
  *
  *
- * Given as input a voronoi tesselation, stored in a vtkUnstructuredGrid, this
+ * Given as input a voronoi tessellation, stored in a vtkUnstructuredGrid, this
  * filter computes the Minkowski functionals on each cell.
 */
 

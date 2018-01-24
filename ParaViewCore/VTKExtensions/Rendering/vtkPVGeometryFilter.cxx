@@ -141,7 +141,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->BlockColorsDistinctValues = 7;
   this->UseStrips = 0;
   // generating cell normals by default really slows down paraview
-  // it is especially noticable with the OpenGL2 backend.  Leaving
+  // it is especially noticeable with the OpenGL2 backend.  Leaving
   // it on for the old backend as some tests rely on the cell normals
   // to be there as they use them for other purposes/etc.
   this->GenerateCellNormals = 0;
@@ -786,7 +786,7 @@ int vtkPVGeometryFilter::RequestAMRData(
 
       if (overlappingAMR != NULL && !this->UseNonOverlappingAMRMetaDataForOutlines && ug == NULL)
       {
-        // for non-overlapping AMR, if we were told to not use meta-data, dont.
+        // for non-overlapping AMR, if we were told to not use meta-data, don't.
         continue;
       }
 
@@ -991,7 +991,7 @@ int vtkPVGeometryFilter::RequestCompositeData(
   }
 
   // Now, when running in parallel, processes may have NULL-leaf nodes at
-  // different locations. To make our life easier in subsquent filtering such as
+  // different locations. To make our life easier in subsequent filtering such as
   // vtkAllToNRedistributeCompositePolyData or vtkKdTreeManager we ensure that
   // all NULL-leafs match up across processes i.e. if any leaf is non-null on
   // any process, then all other processes add empty polydatas for that leaf.

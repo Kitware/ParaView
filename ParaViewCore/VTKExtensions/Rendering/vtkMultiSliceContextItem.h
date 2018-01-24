@@ -97,7 +97,7 @@ public:
   bool MouseMoveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE;
 
   /**
-   * Get access to the data model. Return a pointer array to the differents
+   * Get access to the data model. Return a pointer array to the different
    * visible slices
    */
   const double* GetVisibleSlices(int& nbSlices) const;
@@ -108,7 +108,7 @@ public:
   const double* GetSlices(int& nbSlices) const;
 
   /**
-   * Allow user to programatically update the data model. Note, this does not
+   * Allow user to programmatically update the data model. Note, this does not
    * fire any of the slice modification/addition/deletion events.
    */
   void SetSlices(double* values, bool* visibility, int numberOfSlices);

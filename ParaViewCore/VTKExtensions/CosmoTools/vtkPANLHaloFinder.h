@@ -120,7 +120,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLHaloFinder : public vtkUnstruct
 
     //@{
     /**
-     * Gets/Sets beta factor.  This controlls how saddle points between
+     * Gets/Sets beta factor.  This controls how saddle points between
      * subhalos are treated.  Larger values allow identification of smaller
      * scale structures such as tails.
      * Default: 0.0

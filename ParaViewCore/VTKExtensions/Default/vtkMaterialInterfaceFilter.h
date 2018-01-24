@@ -351,7 +351,7 @@ protected:
   // Process each cell, looking for fragments.
   int ProcessBlock(int blockId);
   // Cell has been identified as inside the fragment. Integrate, and
-  // generate fragement surface etc...
+  // generate fragment surface etc...
   void ConnectFragment(vtkMaterialInterfaceFilterRingBuffer* iterator);
   void GetNeighborIterator(vtkMaterialInterfaceFilterIterator* next,
     vtkMaterialInterfaceFilterIterator* iterator, int axis0, int maxFlag0, int axis1, int maxFlag1,
@@ -431,7 +431,7 @@ protected:
     std::vector<std::vector<vtkDoubleArray*> >& sums);
   // Send my integrated attributes to all other processes.
   int BroadcastIntegratedAttributes(const int sourceProcessId);
-  // Send my geometric attribuites to a controler.
+  // Send my geometric attribuites to a controller.
   int SendGeometricAttributes(const int controllingProcId);
   // size buffers & new containers
   int PrepareToCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
@@ -441,7 +441,7 @@ protected:
   int CleanUpAfterCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<vtkDoubleArray*>& coaabb, std::vector<vtkDoubleArray*>& obb,
     std::vector<int*>& ids);
-  // Recieve all geometric attributes from all other
+  // Receive all geometric attributes from all other
   // processes.
   int CollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<vtkDoubleArray*>& coaabb, std::vector<vtkDoubleArray*>& obb,
@@ -529,12 +529,12 @@ protected:
   // a pointer to the output poly data
   // data set
   vtkPolyData* CurrentFragmentMesh;
-  // As peices/fragments are found they are stored here
+  // As pieces/fragments are found they are stored here
   // until resolution.
   std::vector<vtkPolyData*> FragmentMeshes;
 
   // TODO? this could be cleaned up (somewhat) by
-  // addding an integration class which encapsulates
+  // adding an integration class which encapsulates
   // all of the supported operations.
   /// class vtkMaterialInterfaceFilterIntegrator
   ///{

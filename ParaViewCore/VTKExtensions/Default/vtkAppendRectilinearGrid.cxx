@@ -129,7 +129,7 @@ int vtkAppendRectilinearGrid::RequestData(vtkInformation* vtkNotUsed(request),
   // get the info object
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  // get the ouptut
+  // get the output
   vtkRectilinearGrid* output =
     vtkRectilinearGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
@@ -181,7 +181,7 @@ int vtkAppendRectilinearGrid::RequestData(vtkInformation* vtkNotUsed(request),
 
     for (int cc = 0; cc < output->GetPointData()->GetNumberOfArrays(); cc++)
     {
-      // Set number of tuples explictly since CopyAllocate() does not set
+      // Set number of tuples explicitly since CopyAllocate() does not set
       // number of tuples.
       output->GetPointData()->GetArray(cc)->SetNumberOfTuples(numTuples);
       this->CopyArray(output->GetPointData()->GetArray(cc), outUpdateExt,
@@ -193,7 +193,7 @@ int vtkAppendRectilinearGrid::RequestData(vtkInformation* vtkNotUsed(request),
 
     for (int cc = 0; cc < output->GetCellData()->GetNumberOfArrays(); cc++)
     {
-      // Set number of tuples explictly since CopyAllocate() does not set
+      // Set number of tuples explicitly since CopyAllocate() does not set
       // number of tuples.
       output->GetCellData()->GetArray(cc)->SetNumberOfTuples(numCellTuples);
       this->CopyArray(output->GetCellData()->GetArray(cc), outCellExtent,

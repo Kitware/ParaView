@@ -100,7 +100,7 @@ protected:
   // Free resources.
   int CleanUpAfterCollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<std::vector<vtkDoubleArray*> >& centers, std::vector<std::vector<int*> >& ids);
-  // Recieve all geometric attributes from all other
+  // Receive all geometric attributes from all other
   // processes.
   int CollectGeometricAttributes(std::vector<vtkMaterialInterfaceCommBuffer>& buffers,
     std::vector<std::vector<vtkDoubleArray*> >& centers, std::vector<std::vector<int*> >& ids);

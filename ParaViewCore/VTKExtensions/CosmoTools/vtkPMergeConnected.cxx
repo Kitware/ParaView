@@ -84,7 +84,7 @@ int vtkPMergeConnected::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  // Get the input and ouptut
+  // Get the input and output
   vtkMultiBlockDataSet* input =
     vtkMultiBlockDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkMultiBlockDataSet* output =
@@ -245,7 +245,7 @@ void vtkPMergeConnected::LocalToGlobalRegionId(
   }
 }
 
-// Comparision function to sort point id list
+// Comparison function to sort point id list
 int compare_ids(const void* a, const void* b)
 {
   vtkIdType A = *(static_cast<const vtkIdType*>(a));
