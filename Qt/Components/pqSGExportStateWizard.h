@@ -103,6 +103,8 @@ public:
 
 class pqSGExportStateWizard::pqInternals : public Ui::ExportStateWizard
 {
+public:
+  std::map<QString, pqPipelineSource*> usedSources;
 };
 
 #endif

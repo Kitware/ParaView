@@ -37,6 +37,7 @@ endif()
 
 set (Module_SRCS
   vtkNetworkImageSource.cxx
+  vtkPVCatalystChannelInformation.cxx
   vtkPVEnsembleDataReaderInformation.cxx
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx
