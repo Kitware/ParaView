@@ -357,6 +357,12 @@ void pqProxy::onProxyUnRegistered(const QString& group, const QString& name, vtk
 }
 
 //-----------------------------------------------------------------------------
+QString pqProxy::rstToHtml(const QString& rstStr)
+{
+  return QString::fromStdString(pqProxy::rstToHtml(rstStr.toUtf8().data()));
+}
+
+//-----------------------------------------------------------------------------
 std::string pqProxy::rstToHtml(const char* rstStr)
 {
   std::string htmlStr = rstStr;

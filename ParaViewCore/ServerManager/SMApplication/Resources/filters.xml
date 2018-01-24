@@ -773,6 +773,11 @@
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="QuartileChartView" />
+        <WarnOnCreate title="Potentially slow operation">
+          **Plot Selection Over Time** filter needs to process all timesteps
+          available in your dataset and can potentially take a long time to complete.
+          Do you want to continue?
+        </WarnOnCreate>
       </Hints>
       <!-- End of ExtractSelectionOverTime -->
     </SourceProxy>
@@ -9844,6 +9849,14 @@ source.</Documentation>
         <Documentation>Compute the standard deviation of each point and cell
         variable over time.</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <WarnOnCreate title="Potentially slow operation">
+          **Temporal Statistics** filter needs to process all timesteps
+          available in your dataset and can potentially take a long time to complete.
+          Do you want to continue?
+        </WarnOnCreate>
+      </Hints>
+
       <!-- End TemporalStatistics -->
     </SourceProxy>
     <!-- ==================================================================== -->

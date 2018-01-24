@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineSource;
 class pqProxyGroupMenuManager;
-
+class pqServer;
 /**
 * @ingroup Reactions
 * Reaction to handle creation of sources from the sources menu.
@@ -51,6 +51,16 @@ public:
   pqSourcesMenuReaction(pqProxyGroupMenuManager* menuManager);
 
   static pqPipelineSource* createSource(const QString& group, const QString& name);
+
+  /**
+   * Method used to prompt user before creating a proxy. If the proxy hints has
+   * "WarnOnCreate" hint, then the user will be prompted according to the
+   * contents on the hint. Returns `false` if the user rejects the confirmation,
+   * `true` otherwise.
+   *
+   * If `server` is null, then the active server is used.
+   */
+  static bool warnOnCreate(const QString& group, const QString& name, pqServer* server = nullptr);
 
 public slots:
   /**
