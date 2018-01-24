@@ -371,15 +371,14 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
   std::string runscript;
 
   runscript += "from paraview import vtk\n";
-  runscript += "from paraview import vtk\n";
   runscript += "hasnumpy = True\n";
   runscript += "try:\n";
   runscript += "  from numpy import *\n";
   runscript += "except ImportError:\n";
   runscript += "  hasnumpy = False\n";
   runscript += "if hasnumpy:\n";
-  runscript += "  from vtk.numpy_interface import dataset_adapter\n";
-  runscript += "  from vtk.numpy_interface.algorithms import *\n";
+  runscript += "  from paraview.vtk.numpy_interface import dataset_adapter\n";
+  runscript += "  from paraview.vtk.numpy_interface.algorithms import *\n";
 
   // Set self to point to this
   char addrofthis[1024];

@@ -12,4 +12,6 @@ a = AnnotateAttributeData(
         ProcessId=0
         )
 UpdatePipeline()
-assert a.GetClientSideObject().GetComputedAnnotationValue() == "Hello: 0.666667"
+annotatedValue = a.GetClientSideObject().GetComputedAnnotationValue()
+print(annotatedValue)
+assert annotatedValue == "Hello: 0.666667" or annotatedValue == "Hello: 0.6666667"
