@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaClipDataSet
 {
 public:
   vtkTypeMacro(vtkPVMetaClipDataSet, vtkPVDataSetAlgorithmSelectorFilter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVMetaClipDataSet* New();
 
@@ -57,13 +57,25 @@ public:
   void SetValue(double value);
 
   void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, const char* name) VTK_OVERRIDE;
+    int idx, int port, int connection, int fieldAssociation, const char* name) override;
   void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) VTK_OVERRIDE;
-  void SetInputArrayToProcess(int idx, vtkInformation* info) VTK_OVERRIDE;
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) override;
+  void SetInputArrayToProcess(int idx, vtkInformation* info) override;
 
   void SetInputArrayToProcess(
-    int idx, int port, int connection, const char* fieldName, const char* fieldType) VTK_OVERRIDE;
+    int idx, int port, int connection, const char* fieldName, const char* fieldType) override;
+
+  //@{
+  /**
+   * For clipping a box we will only get an approximate box from the vtkPVBox implicit function
+   * which can give undesired results. In order to get the exact box geometry output we need
+   * to perform 6 plane clips which is very expensive. The default is to not use the exact option.
+   * Additionally, the exact box clip must have inside out enabled.
+   */
+  vtkSetMacro(ExactBoxClip, bool);
+  vtkGetMacro(ExactBoxClip, bool);
+  vtkBooleanMacro(ExactBoxClip, bool);
+  //@}
 
   /**
    * Expose method from vtkClip
@@ -74,13 +86,13 @@ public:
    * Add validation for active filter so that the vtkExtractGeometry
    * won't be used without ImplicifFuntion being set.
    */
-  int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
-    vtkInformationVector* outInfo) VTK_OVERRIDE;
+  int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) override;
 
   // Add validation for active filter so that the vtkExtractGeometry
   // won't be used without ImplicifFuntion being set.
   int ProcessRequest(
-    vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo) VTK_OVERRIDE;
+    vtkInformation* request, vtkCollection* inInfo, vtkInformationVector* outInfo) override;
 
 protected:
   vtkPVMetaClipDataSet();
@@ -93,6 +105,8 @@ protected:
 private:
   vtkPVMetaClipDataSet(const vtkPVMetaClipDataSet&) = delete;
   void operator=(const vtkPVMetaClipDataSet&) = delete;
+
+  bool ExactBoxClip;
 
   class vtkInternals;
   vtkInternals* Internal;

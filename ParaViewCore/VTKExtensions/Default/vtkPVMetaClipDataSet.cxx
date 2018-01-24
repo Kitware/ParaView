@@ -41,6 +41,7 @@ public:
 vtkStandardNewMacro(vtkPVMetaClipDataSet);
 //----------------------------------------------------------------------------
 vtkPVMetaClipDataSet::vtkPVMetaClipDataSet()
+  : ExactBoxClip(false)
 {
   // Setup default configuration
   this->SetOutputType(VTK_UNSTRUCTURED_GRID);
@@ -64,6 +65,7 @@ vtkPVMetaClipDataSet::~vtkPVMetaClipDataSet()
 void vtkPVMetaClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ExactBoxClip: " << this->ExactBoxClip << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -150,6 +152,7 @@ int vtkPVMetaClipDataSet::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   bool needSwitch = this->SwitchFilterForCrinkle();
+  this->Internal->Clip->SetExactBoxClip(this->ExactBoxClip);
   int res = this->Superclass::ProcessRequest(request, inputVector, outputVector);
   if (needSwitch)
   {
@@ -163,6 +166,7 @@ int vtkPVMetaClipDataSet::ProcessRequest(
   vtkInformation* request, vtkCollection* inputVector, vtkInformationVector* outputVector)
 {
   bool needSwitch = this->SwitchFilterForCrinkle();
+  this->Internal->Clip->SetExactBoxClip(this->ExactBoxClip);
   int res = this->Superclass::ProcessRequest(request, inputVector, outputVector);
   if (needSwitch)
   {
