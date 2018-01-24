@@ -140,6 +140,7 @@ protected:
    */
   vtkSMProxy* GetFormatProxy(const std::string& filename);
 
+  friend class pqCatalystExportReaction; // access to GetView,FormatProxy
 private:
   vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) = delete;
   void operator=(const vtkSMSaveScreenshotProxy&) = delete;

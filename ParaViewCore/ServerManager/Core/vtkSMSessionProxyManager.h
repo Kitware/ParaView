@@ -122,6 +122,7 @@ class vtkEventForwarderCommand;
 class vtkPVXMLElement;
 class vtkSMCompoundSourceProxy;
 class vtkSMDocumentation;
+class vtkSMExportProxyDepot;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
@@ -573,6 +574,11 @@ public:
    */
   vtkSMProxy* FindProxy(const char* reggroup, const char* xmlgroup, const char* xmltype);
 
+  /**
+   * Get access the the export depot.
+   */
+  vtkGetObjectMacro(ExportDepot, vtkSMExportProxyDepot);
+
 protected:
   vtkSMSessionProxyManager(vtkSMSession*);
   ~vtkSMSessionProxyManager() override;
@@ -637,6 +643,8 @@ private:
   vtkSMSessionProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;
   bool InLoadXMLState;
+
+  vtkSMExportProxyDepot* ExportDepot;
 
 #ifndef __WRAP__
   static vtkSMSessionProxyManager* New() { return NULL; }

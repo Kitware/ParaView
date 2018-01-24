@@ -83,7 +83,7 @@ public:
   /**
   * Builds the "Catalyst" menu
   */
-  static void buildCatalystMenu(QMenu& menu);
+  static void buildCatalystMenu(QMenu& menu, QWidget* confpanel);
 
   /**
   * Builds the "View" menu.

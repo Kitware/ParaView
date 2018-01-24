@@ -375,6 +375,17 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -386,6 +397,7 @@
                   show="0" />
         <WriterFactory extensions="pvtp"
                        file_description="PVTK PolyData Files" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of XMLPPolyDataWriter -->
     </WriterProxy>
@@ -424,6 +436,17 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -435,6 +458,7 @@
                   show="0" />
         <WriterFactory extensions="pvtu"
                        file_description="PVTK UnstructuredGrid Files" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of XMLPUnstructuredGridWriter -->
     </WriterProxy>
@@ -518,6 +542,17 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -527,6 +562,7 @@
                   show="0" />
         <WriterFactory extensions="pvts"
                        file_description="PVTK StructuredGrid Files" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of XMLPStructuredGridWriter -->
     </WriterProxy>
@@ -563,6 +599,17 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -572,6 +619,7 @@
                   show="0" />
         <WriterFactory extensions="pvtr"
                        file_description="PVTK RectilinearGrid Files" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of XMLPRectilinearGridWriter -->
     </WriterProxy>
@@ -608,6 +656,17 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -617,6 +676,7 @@
                   show="0" />
         <WriterFactory extensions="pvti"
                        file_description="PVTK ImageData Files" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of XMLPImageDataWriter -->
     </WriterProxy>
@@ -654,6 +714,17 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -663,6 +734,7 @@
                   show="0" />
         <WriterFactory extensions="vtm"
                        file_description="VTK Multi Block Files" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of XMLMultiBlockDataWriter -->
     </WriterProxy>
@@ -1337,6 +1409,26 @@
         <Documentation>In certain cases like Catalyst we know that metadata doesn't exist and
         we want to ignore that warning.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="WriteFrequency"
+                       label="Catalyst Write Frequency"
+                       default_values="1"
+                       number_of_elements="1">
+        <Documentation>Set how often Catalyst runs will export this data product.
+        </Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <StringVectorProperty name="CatalystFilePattern"
+                          default_values="filename.e-s"
+                          number_of_elements="1">
+        <Documentation>Set the filename pattern Catalyst runs will use to export this data product.
+        </Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Catalyst Options">
+        <Property name="CatalystFilePattern" />
+        <Property name="WriteFrequency" />
+      </PropertyGroup>
+
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -1348,6 +1440,7 @@
                   show="0" />
         <WriterFactory extensions="g e ex2 ex2v2 exo gen exoII exoii"
                        file_description="Exodus II File" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of ExodusIIWriter -->
     </PWriterProxy>
@@ -1492,6 +1585,17 @@
         <Proxy class="vtkPVMergeTables"
                name="PostGatherHelper" />
       </SubProxy>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"
                   show="0" />
@@ -1502,6 +1606,7 @@
         <WriterFactory extensions="csv txt tsv"
                        file_description="Comma or Tab Delimited Files" />
         <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of CSVWriter -->
     </PSWriterProxy>
@@ -1736,5 +1841,109 @@
       </Hints>
       <!-- End of HyperTreeGridWriter -->
     </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy name="Cinema image options"
+                 class="vtkPassThroughFilter">
+      <Documentation short_help="Per object setup for Cinema Image Database output."/>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1">
+        </DataTypeDomain>
+        <Documentation>The filter/source whose output dataset is to
+        written as a layer in the cinema database.</Documentation>
+      </InputProperty>
+      <StringVectorProperty name="FileName"
+                            number_of_elements="1"
+                            immediate_update="1">
+        <Documentation>A dummy placeholder to satisfy writer infrastructure.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty default_values="1"
+                         name="CellAttributes"
+                         number_of_elements="1"
+                         panel_visibility="never"
+                         immediate_update="1"
+                         >
+        <Documentation>Non user facing property exists only to constrain the cell array UI.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty clean_command="SetCellArrayNames"
+                            label="Cell Arrays"
+                            name="Cell Arrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            immediate_update="1"
+                            >
+        <Documentation>This property specifies the name(s) of the cell aligned array(s) to export.</Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="CellAttributes"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="PointAttributes"
+                         number_of_elements="1"
+                         panel_visibility="never"
+                         immediate_update="1"
+                         >
+        <Documentation>Non user facing property exists only to constrain the point array UI.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty clean_command="SetPointArrayNames"
+                            label="Point Arrays"
+                            name="Point Arrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            immediate_update="1"
+                            >
+        <Documentation>This property specifies the name(s) of the point aligned array(s) to export.</Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input"/>
+            <Property function="FieldDataSelection"
+                      name="PointAttributes"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="Cinema Parameters"
+                            number_of_elements="1"
+                            default_values=""
+                            immediate_update="1">
+        <Documentation>A set of values to explore inside the cinema database. Empty means use only the default value from pipeline.
+        A comma separated list of values for a contour, slice or clip filter will cause the filter to iterate through the set.
+        </Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="cdb"
+                       file_description="cdb Image Layers" />
+        <CatalystApproved/>
+      </Hints>
+      <!-- End of Cinema Options -->
+    </WriterProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

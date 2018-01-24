@@ -84,12 +84,14 @@ from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
     padding_amount, rescale_data_range, enable_live_viz, live_viz_frequency,
-    cinema_tracks, cinema_arrays, filename=None):
+                           cinema_tracks, cinema_arrays, filename=None, write_start=0):
     """Returns a string with the generated CoProcessing script based on the
     options specified.
 
     First three arguments are same as those expected by
     cpstate.DumpPipeline() function.
+
+    :param write_start: integer (0-) how many cycles catalyst should wait before executing
 
     :param padding_amount: integer (0-10) to set image output filename padding
 
@@ -111,7 +113,7 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
     # TODO: Once we're starting work on the PV export dialog we will need to
     # fill in timeStepToStartOutputAt, forceOutputAtFirstCall and requestSpecificNames
     # from the export options
-    timeStepToStartOutputAt=0
+    timeStepToStartOutputAt=write_start
     forceOutputAtFirstCall=False
     requestSpecificNames=False
 
