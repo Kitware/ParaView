@@ -154,7 +154,7 @@ vtkSMTrace* vtkSMTrace::StartTrace()
 #ifdef PARAVIEW_ENABLE_PYTHON
     if (!vtkSMTrace::ActiveTracer->Internals->TraceModule)
     {
-      vtkGenericWarningMacro("Start not started since required Python modules are missing.");
+      vtkGenericWarningMacro("Trace not started since required Python modules are missing.");
       vtkSMTrace::ActiveTracer = NULL;
     }
     else
