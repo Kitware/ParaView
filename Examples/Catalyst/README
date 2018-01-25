@@ -52,12 +52,29 @@ correctness of outputs. A description of the examples are:
 * CxxSOADataArrayExample -- An example of an adaptor where we use
                             vtkSOADataArrayTemplate to reuse simulation memory
                             for VTK field arrays.
+* CxxMultiChannelInputExample -- An example that has two adaptor channels/inputs.
+                                 The first is an unstructured volumetric grid
+                                 with the "volumetric grid" identifier and the
+                                 second is a particle grid with the "particles"
+                                 identifier. It is tested with the allinputsgridwriter.py
+                                 Catalyst Python pipeline script available under the
+                                 SampleScripts subdirectory.
 
 Other objects of interest:
 * LICENSE.md -- The license of this software.
 * SampleScripts -- A directory with some useful sample Catalyst Python pipelines.
-                   Currently the only file in this is a script that writes out
-                   the entire "input" grid at each time step. This can be useful
-                   for creating other Catalyst Python pipelines with the
-                   co-processing plugin in the ParaView GUI.
+                   The scripts are gridwriter.py and allinputsgridwriter.py which
+                   write out the full dataset/s at a given output frequency specified
+                   by the outputfrequency variable in each script. This can be useful
+                   for creating other Catalyst Python pipelines with the Catalyst Script
+                   Generator plugin in the ParaView GUI. gridwriter.py assumes that
+                   there is a single adaptor channel/input that uses the "input"
+                   identifier. allinputsgridwriter.py will write out all adaptor
+                   channel/inputs. Both of these scripts will automatically set
+                   the filename based on the channel/inputs identifer string. For
+                   example, for gridwriter.py which assumes the "input" identifier
+                   string the generated datasets will be called
+                   "input_<time step>.<file extension>". The file extension is
+                   automatically specified based on the dataset type (e.g. polydata,
+                   unstructured grid, etc.).
 * CMakeLists.txt -- The file used to build all of the examples in a single shot.
