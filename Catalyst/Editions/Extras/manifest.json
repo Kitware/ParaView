@@ -206,7 +206,6 @@
         { "path": "vtkXMLReaderVersion.h" },
         { "class": "vtkXMLCompositeDataWriter" },
         { "class": "vtkXMLDataObjectWriter" },
-        { "class": "vtkXMLHyperOctreeWriter" },
         { "class": "vtkXMLImageDataWriter" },
         { "class": "vtkXMLMultiBlockDataWriter" },
         { "class": "vtkXMLPolyDataWriter" },

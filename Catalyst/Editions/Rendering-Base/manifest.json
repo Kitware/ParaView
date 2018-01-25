@@ -182,7 +182,6 @@
       "path": "VTK/Filters/HyperTree",
       "include": [
         { "path": "module.cmake" },
-        { "class": "vtkHyperOctreeSurfaceFilter" },
         { "class": "vtkHyperTreeGridGeometry" }
       ],
       "replace": [
