@@ -206,6 +206,9 @@
     { "name":"vtkThirdPartyzlib",
       "path":"VTK/ThirdParty/zlib"
     },
+    { "name":"vtkThirdPartylzma",
+      "path":"VTK/ThirdParty/lzma"
+    },
     { "name":"vtkThirdPartylz4",
       "path":"VTK/ThirdParty/lz4"
     },
