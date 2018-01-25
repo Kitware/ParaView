@@ -210,6 +210,18 @@ void vtkSelectionRepresentation::SetUseOutline(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkSelectionRepresentation::SetRenderPointsAsSpheres(bool val)
+{
+  this->GeometryRepresentation->SetRenderPointsAsSpheres(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkSelectionRepresentation::SetRenderLinesAsTubes(bool val)
+{
+  this->GeometryRepresentation->SetRenderLinesAsTubes(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkSelectionRepresentation::SetRepresentation(int val)
 {
   this->GeometryRepresentation->SetRepresentation(val);

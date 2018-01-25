@@ -340,6 +340,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/InteractiveViewLinkOffscreen.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/InteractiveViewLinkOnscreen.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/InteractiveViewLinkState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LinesAsTubes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPartiallyUpdatedStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml

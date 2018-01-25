@@ -3706,6 +3706,12 @@
             <Property name="LineWidth"
                       panel_visibility="advanced"
                       panel_visibility_default_for_representation="wireframe" />
+            <Property name="RenderLinesAsTubes"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="wireframe"/>
+            <Property name="RenderPointsAsSpheres"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="points"/>
           </PropertyGroup>
 
           <PropertyGroup label="Lighting">
@@ -6062,6 +6068,24 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetRenderLinesAsTubes"
+                         default_values="0"
+                         name="RenderLinesAsTubes"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, all lines are rendered as 3D tubes, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRenderPointsAsSpheres"
+                         default_values="0"
+                         name="RenderPointsAsSpheres"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, all points are rendered as 3D spheres, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetRepresentation"
                          default_values="1"
                          name="Representation"
@@ -10849,6 +10873,26 @@
         <DoubleRangeDomain min="0"
                            name="range" />
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetRenderLinesAsTubes"
+                         default_values="0"
+                         name="RenderLinesAsTubes"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, all lines are rendered as 3D tubes, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRenderPointsAsSpheres"
+                         default_values="0"
+                         name="RenderPointsAsSpheres"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, all points are rendered as 3D spheres, if supported by OpenGL driver.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetInterpolation"
                          default_values="1"
                          name="Interpolation"
