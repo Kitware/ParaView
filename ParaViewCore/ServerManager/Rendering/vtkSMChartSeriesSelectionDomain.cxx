@@ -243,6 +243,12 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     {
       continue;
     }
+    vtkPVCompositeDataInformation* childCompositeInfo = childInfo->GetCompositeDataInformation();
+    if (childCompositeInfo->GetNumberOfChildren() != 0)
+    {
+      // Ignore non leaf block
+      continue;
+    }
     std::ostringstream blockNameStream;
     if (compositeIndex->GetRepeatCommand())
     {
