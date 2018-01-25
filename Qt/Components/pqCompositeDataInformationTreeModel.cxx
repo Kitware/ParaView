@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataObjectTypes.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkTimerLog.h"
 
 #include <QList>
 #include <QSet>
@@ -41,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include <cassert>
+#include <unordered_map>
 #include <vector>
 
 namespace pqCompositeDataInformationTreeModelNS
@@ -346,36 +348,13 @@ public:
     }
   }
 
-  CNode& find(unsigned int findex)
-  {
-    if (this->Index == findex)
-    {
-      return (*this);
-    }
-
-    for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
-    {
-      auto next_sibling = (iter + 1);
-      if (next_sibling != this->Children.end() && next_sibling->Index <= findex)
-      {
-        // skip this sub-tree. We're not going to find what we're looking for.
-        continue;
-      }
-
-      CNode& found = iter->find(findex);
-      if (found != CNode::nullNode())
-      {
-        return found;
-      }
-    }
-    return CNode::nullNode();
-  }
-
   bool build(vtkPVDataInformation* info, bool expand_multi_piece, unsigned int& index,
-    unsigned int& leaf_index, int custom_column_count)
+    unsigned int& leaf_index, int custom_column_count,
+    std::unordered_map<unsigned int, CNode*>& lookupMap)
   {
     this->reset();
     this->Index = index++;
+    lookupMap[this->Index] = this;
     if (info == nullptr || info->GetCompositeDataClassName() == 0)
     {
       this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "(empty)";
@@ -402,7 +381,7 @@ public:
       {
         CNode& childNode = this->Children[cc];
         childNode.build(cinfo->GetDataInformation(cc), expand_multi_piece, index, leaf_index,
-          custom_column_count);
+          custom_column_count, lookupMap);
         // note:  build() will reset childNode, so don't set any ivars before calling it.
         childNode.Parent = this;
         // if Name for block was provided, use that instead of the data type.
@@ -451,23 +430,14 @@ public:
       return nullNode();
     }
 
-    vtkIdType findex = static_cast<unsigned int>(idx.internalId());
+    unsigned int findex = static_cast<unsigned int>(idx.internalId());
     return this->find(findex);
   }
 
-  CNode& find(unsigned int findex)
+  inline CNode& find(unsigned int findex)
   {
-    if (findex == VTK_UNSIGNED_INT_MAX)
-    {
-      return nullNode();
-    }
-
-    if (findex == 0)
-    {
-      return this->Root;
-    }
-
-    return this->Root.find(findex);
+    auto iter = this->CNodeMap.find(findex);
+    return (iter != this->CNodeMap.end()) ? (*iter->second) : nullNode();
   }
 
   /**
@@ -479,8 +449,12 @@ public:
   {
     unsigned int index = 0;
     unsigned int leaf_index = 0;
-    return this->Root.build(
-      info, expand_multi_piece, index, leaf_index, this->CustomColumns.size());
+
+    this->CNodeMap.clear();
+    bool retVal = this->Root.build(
+      info, expand_multi_piece, index, leaf_index, this->CustomColumns.size(), this->CNodeMap);
+
+    return retVal;
   }
 
   CNode& rootNode() { return this->Root; }
@@ -503,6 +477,7 @@ public:
 private:
   CNode Root;
   QStringList CustomColumns;
+  std::unordered_map<unsigned int, CNode*> CNodeMap;
 };
 
 //-----------------------------------------------------------------------------
@@ -738,6 +713,9 @@ bool pqCompositeDataInformationTreeModel::setHeaderData(
 //-----------------------------------------------------------------------------
 bool pqCompositeDataInformationTreeModel::reset(vtkPVDataInformation* info)
 {
+  vtkTimerLogScope mark("pqCompositeDataInformationTreeModel::reset");
+  (void)mark;
+
   pqInternals& internals = (*this->Internals);
 
   this->beginResetModel();
