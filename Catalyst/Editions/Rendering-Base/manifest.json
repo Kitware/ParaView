@@ -276,6 +276,7 @@
       "path": "VTK/Filters/Core",
       "include": [
         { "class": "vtkAppendSelection" },
+        { "class": "vtkDecimatePro" },
         { "class": "vtkStripper" },
         { "class": "vtkStructuredGridOutlineFilter" },
         { "class": "vtkTriangleFilter" },
@@ -973,6 +974,7 @@
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
       "proxies":[
         "DataSetSurfaceFilter",
+        "DecimatePro",
         "ExtractHistogram",
         "IntegrateAttributes",
         "PipelineConnection",
