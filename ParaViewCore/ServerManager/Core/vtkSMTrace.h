@@ -84,8 +84,13 @@ public:
    * Methods to start/stop tracing. This will create a new instance of
    * vtkSMTrace and set that up as the active tracer. If an active tracer is
    * already present, then this will simply return the current active tracer.
+   *
+   * @arg `preamble` non-null string to use as the header for the generated
+   *      trace. If nullptr, then a default preamble using ParaView version
+   *      number will be used. If empty string, then no preamble will
+   *      be added added.
    */
-  static vtkSMTrace* StartTrace();
+  static vtkSMTrace* StartTrace(const char* preamble = nullptr);
 
   /**
    * Stop trace and return the generated trace script.

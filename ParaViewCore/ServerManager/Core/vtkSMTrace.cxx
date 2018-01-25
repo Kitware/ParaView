@@ -30,6 +30,7 @@
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMSessionProxyManager.h"
 
@@ -146,7 +147,7 @@ vtkStdString vtkSMTrace::GetState(int propertiesToTraceOnCreate, bool skipHidden
 }
 
 //----------------------------------------------------------------------------
-vtkSMTrace* vtkSMTrace::StartTrace()
+vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
 {
   if (vtkSMTrace::ActiveTracer.GetPointer() == NULL)
   {
@@ -160,9 +161,11 @@ vtkSMTrace* vtkSMTrace::StartTrace()
     else
     {
       vtkPythonScopeGilEnsurer gilEnsurer;
-      vtkSmartPyObject _start_trace_internal(
-        PyObject_CallMethod(vtkSMTrace::ActiveTracer->GetTraceModule(),
-          const_cast<char*>("_start_trace_internal"), NULL));
+      std::ostringstream str;
+      str << "# trace generated using " << vtkSMProxyManager::GetParaViewSourceVersion() << "\n";
+      vtkSmartPyObject _start_trace_internal(PyObject_CallMethod(
+        vtkSMTrace::ActiveTracer->GetTraceModule(), const_cast<char*>("_start_trace_internal"),
+        const_cast<char*>("(s)"), const_cast<char*>(preamble ? preamble : str.str().c_str())));
       vtkSMTrace::ActiveTracer->CheckForError();
     }
 #endif

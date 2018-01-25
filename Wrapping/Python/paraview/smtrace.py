@@ -1453,9 +1453,11 @@ def _create_trace_item_internal(key, args=None, kwargs=None):
     #print ("Hello again", key, args)
     #return A(key)
 
-def _start_trace_internal():
+def _start_trace_internal(preamble=None):
     """**internal** starts tracing. Called by vtkSMTrace::StartTrace()."""
     Trace.reset()
+    if preamble:
+        Trace.Output.append(preamble)
     Trace.Output.append([\
         "#### import the simple module from the paraview",
         "from paraview.simple import *",
