@@ -16,7 +16,8 @@ paraview_test_load_data(""
   TestRepresentationTypePlugin.xml
   )
 paraview_test_load_data_dirs(""
-  dualSphereAnimation)
+  dualSphereAnimation
+  FileSeries)
 
 ###############################################################################
 # For python scripts for testing.
@@ -53,6 +54,7 @@ set(PY_TESTS
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   ScalarBarActorBackwardsCompatibility.py,NO_VALID
+  TestVTKSeriesWithMeta.py
   ValidateSources.py,NO_VALID
   VRMLSource.py,NO_VALID
   )
