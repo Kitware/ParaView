@@ -14,6 +14,7 @@ vtk_module(pqComponents
     vtkIOImage
     vtkpugixml
     vtkPVAnimation
+    vtkPVClientServerCoreDefault
     vtkPVServerManagerDefault
     vtkPVServerManagerRendering
     vtksys
