@@ -176,6 +176,11 @@ int vtkCPProcessor::RequestDataDescription(vtkCPDataDescription* dataDescription
   }
   if (dataDescription->GetForceOutput() == true)
   {
+    for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
+    {
+      dataDescription->GetInputDescription(i)->GenerateMeshOn();
+      dataDescription->GetInputDescription(i)->AllFieldsOn();
+    }
     return 1;
   }
 
