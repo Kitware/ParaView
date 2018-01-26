@@ -34,7 +34,10 @@ add_subdirectory(CxxMappedDataArrayExample)
 add_subdirectory(MPISubCommunicatorExample)
 add_subdirectory(PythonDolfinExample)
 add_subdirectory(CxxParticlePathExample)
-add_subdirectory(CxxSOADataArrayExample)
+if(USE_CATALYST)
+  # this example requires Catalyst
+  add_subdirectory(CxxGhostCellsExample)
+endif()
 
 set(BUILD_FORTRAN_EXAMPLES OFF CACHE BOOL "Build Fortran Catalyst Examples")
 if(BUILD_FORTRAN_EXAMPLES)
