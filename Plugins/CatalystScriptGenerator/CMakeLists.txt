@@ -68,7 +68,7 @@ ADD_PARAVIEW_PLUGIN(
     ${PARAVIEW_PLUGIN_SRCS}
     ${PARAVIEW_PLUGIN_SRCS2}
 )
-target_link_libraries(CatalystScriptGeneratorPlugin LINK_PRIVATE ${qt_targets})
+target_link_libraries(CatalystScriptGeneratorPlugin LINK_PRIVATE ${qt_targets} vtkPVClientServerCoreDefault)
 
 IF (BUILD_TESTING)
   include(ParaViewTestingMacros)
