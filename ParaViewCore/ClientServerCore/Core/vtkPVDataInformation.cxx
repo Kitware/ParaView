@@ -29,6 +29,7 @@
 #include "vtkExecutive.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGraph.h"
+#include "vtkHyperTreeGrid.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMath.h"
@@ -69,6 +70,9 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->NumberOfRows = 0;
+  this->NumberOfTrees = 0;
+  this->NumberOfVertices = 0;
+  this->NumberOfLeaves = 0;
   this->MemorySize = 0;
   this->PolygonCount = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
@@ -160,8 +164,11 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DataSetType: " << this->DataSetType << endl;
   os << indent << "CompositeDataSetType: " << this->CompositeDataSetType << endl;
   os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
-  os << indent << "NumberOfRows: " << this->NumberOfRows << endl;
   os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
+  os << indent << "NumberOfRows: " << this->NumberOfRows << endl;
+  os << indent << "NumberOfTrees: " << this->NumberOfTrees << endl;
+  os << indent << "NumberOfVertices: " << this->NumberOfVertices << endl;
+  os << indent << "NumberOfLeaves: " << this->NumberOfLeaves << endl;
   os << indent << "NumberOfDataSets: " << this->NumberOfDataSets << endl;
   os << indent << "MemorySize: " << this->MemorySize << endl;
   os << indent << "PolygonCount: " << this->PolygonCount << endl;
@@ -241,6 +248,9 @@ void vtkPVDataInformation::Initialize()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->NumberOfRows = 0;
+  this->NumberOfTrees = 0;
+  this->NumberOfVertices = 0;
+  this->NumberOfLeaves = 0;
   this->NumberOfDataSets = 0;
   this->MemorySize = 0;
   this->PolygonCount = 0;
@@ -286,6 +296,9 @@ void vtkPVDataInformation::DeepCopy(
   this->NumberOfPoints = dataInfo->GetNumberOfPoints();
   this->NumberOfCells = dataInfo->GetNumberOfCells();
   this->NumberOfRows = dataInfo->GetNumberOfRows();
+  this->NumberOfTrees = dataInfo->GetNumberOfTrees();
+  this->NumberOfVertices = dataInfo->GetNumberOfVertices();
+  this->NumberOfLeaves = dataInfo->GetNumberOfLeaves();
   this->MemorySize = dataInfo->GetMemorySize();
   this->PolygonCount = dataInfo->GetPolygonCount();
 
@@ -682,6 +695,15 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromHyperTreeGrid(vtkHyperTreeGrid* data)
+{
+  // Most of the work for these is done in CopyFromDataSet.
+  this->NumberOfTrees = data->GetNumberOfTrees();
+  this->NumberOfVertices = data->GetNumberOfVertices();
+  this->NumberOfLeaves = data->GetNumberOfLeaves();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
   vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
@@ -739,6 +761,15 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     this->CopyFromCompositeDataSet(cds);
     this->CopyCommonMetaData(dobj, info);
     return;
+  }
+
+  // vtkHyperTreeGrid inherits vtkDataSet, so we check for it first:
+  vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(dobj);
+  if (htg)
+  {
+    this->CopyFromHyperTreeGrid(htg);
+    this->CopyFromDataSet(htg);
+    this->CopyCommonMetaData(htg, info);
   }
 
   vtkDataSet* ds = vtkDataSet::SafeDownCast(dobj);
@@ -1242,8 +1273,9 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   css->Reset();
   *css << vtkClientServerStream::Reply;
   *css << this->DataClassName << this->DataSetType << this->NumberOfDataSets << this->NumberOfPoints
-       << this->NumberOfCells << this->NumberOfRows << this->MemorySize << this->PolygonCount
-       << this->Time << this->HasTime << this->NumberOfTimeSteps << this->TimeLabel
+       << this->NumberOfCells << this->NumberOfRows << this->NumberOfTrees << this->NumberOfVertices
+       << this->NumberOfLeaves << this->MemorySize << this->PolygonCount << this->Time
+       << this->HasTime << this->NumberOfTimeSteps << this->TimeLabel
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6);
 
@@ -1359,6 +1391,21 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfRows))
   {
     vtkErrorMacro("Error parsing number of cells.");
+    return;
+  }
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfTrees))
+  {
+    vtkErrorMacro("Error parsing number of trees.");
+    return;
+  }
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfVertices))
+  {
+    vtkErrorMacro("Error parsing number of vertices.");
+    return;
+  }
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfLeaves))
+  {
+    vtkErrorMacro("Error parsing number of leaves.");
     return;
   }
   if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->MemorySize))

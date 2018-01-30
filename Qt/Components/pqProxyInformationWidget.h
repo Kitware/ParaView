@@ -73,6 +73,10 @@ public slots:
 private slots:
   void onCurrentChanged(const QModelIndex& item);
 
+  // This is used to ensure that we don't have extra space in the
+  // dataTypeProperties QStackedWidget.
+  void onDataTypePropertiesWidgetChanged(int);
+
 private:
   void fillDataInformation(vtkPVDataInformation* info);
 
