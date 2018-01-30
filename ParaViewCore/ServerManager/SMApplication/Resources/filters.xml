@@ -6891,15 +6891,23 @@ array.
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1 it will clip to the exact specifications
-        for the Box option, otherwise the clip will only approximate the box geometry. The
+        for the **Box** option, otherwise the clip will only approximate the box geometry. The
         exact clip is very expensive as it requires generating 6 plane clips. Additionally,
-        Inside Out must be checked and Crinkle clip must be unchecked.</Documentation>
+        **Inside Out** must be checked and **Crinkle clip** must be unchecked.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="ClipFunction"
                                    value="Box"
                                    inverse="0" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="InsideOut"
+                                   value="1" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="PreserveInputCells"
+                                   value="0" />
         </Hints>
       </IntVectorProperty>
       <Hints>
