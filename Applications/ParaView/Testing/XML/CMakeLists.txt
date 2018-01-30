@@ -708,6 +708,7 @@ set (SaveTSV_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (DisconnectAndSaveAnimation_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
+set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
 
 set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 # We don't support volume rendering of image data in data server & render server mode
