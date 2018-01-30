@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="internal_sources">
-    <SourceProxy label="Image Reader Core" name="ImageReaderCore" class="vtkPVImageReader">
+    <Proxy label="Image Reader Core" name="ImageReaderCore" class="vtkPVImageReader">
       <Documentation long_help="Reads raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified."
                      short_help="Read raw regular rectilinear grid data from a file.">
                      The Image reader reads raw, regular, rectilinear grid
@@ -94,9 +94,9 @@
         image from the upper left corner.</Documentation>
       </IntVectorProperty>
       <!-- End ImageReaderCore -->
-    </SourceProxy>
+    </Proxy>
     <!--  FLASH AMR Particles Reader -->
-    <SourceProxy class="vtkAMRFlashParticlesReader"
+    <Proxy class="vtkAMRFlashParticlesReader"
                  label="FLASH Particles AMR Reader"
                  name="FlashParticlesReaderCore">
       <Documentation long_help="Reads AMR particles from FLASH dataset"
@@ -181,9 +181,9 @@
         <ReaderFactory extensions="Flash flash"
                        file_description="AMR flash particles dataset" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!--  ENZO AMR Particles Reader -->
-    <SourceProxy class="vtkAMREnzoParticlesReader"
+    <Proxy class="vtkAMREnzoParticlesReader"
                  label="Enzo Particles AMR Reader"
                  name="EnzoParticlesReaderCore">
       <Documentation long_help="Reads AMR particles from an ENZO dataset"
@@ -283,9 +283,9 @@
         <ReaderFactory extensions="boundary hierarchy"
                        file_description="Enzo AMR Particles dataset" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- FLASH AMR Core Reader definition -->
-    <SourceProxy class="vtkAMRFlashReader"
+    <Proxy class="vtkAMRFlashReader"
                  label="Flash AMR Reader"
                  name="FlashReaderCore">
       <Documentation long_help="Read hierarchical box dataset from a Flash dataset."
@@ -376,14 +376,10 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="Flash flash"
-                       file_description="AMR Flash dataset" />
-      </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- FLASH AMR Core Reader definition -->
     <!-- ENZO AMR Core Reader definition -->
-    <SourceProxy class="vtkAMREnzoReader"
+    <Proxy class="vtkAMREnzoReader"
                  label="Enzo AMR Reader"
                  name="EnzoReaderCore">
       <Documentation long_help="Read hierarchical box dataset from an Enzo file."
@@ -483,13 +479,9 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="boundary hierarchy"
-                       file_description="AMR Enzo Files" />
-      </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- END ENZO AMR Core Reader definition -->
-    <SourceProxy class="vtkAVSucdReader"
+    <Proxy class="vtkAVSucdReader"
                  label="AVS UCD Reader"
                  name="AVSucdReader">
       <Documentation long_help="Reads binary or ASCII files stored in AVS UCD format."
@@ -549,8 +541,8 @@
         arrays to read.</Documentation>
       </StringVectorProperty>
       <!-- End AVSucdReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkMetaImageReader"
+    </Proxy>
+    <Proxy class="vtkMetaImageReader"
                  label="Meta Image reader"
                  name="MetaImageReaderCore">
       <Documentation long_help="Reads binary UNC meta image data."
@@ -572,8 +564,8 @@
                        file_description="Meta Image Data Files" />
       </Hints>
       <!-- End Meta Image Reader -->
-    </SourceProxy>
-    <SourceProxy class="vtkPDataSetReader"
+    </Proxy>
+    <Proxy class="vtkPDataSetReader"
                  label="Legacy VTK Reader"
                  name="legacyreader">
       <Documentation long_help="Reads files stored in VTK's legacy file format."
@@ -593,8 +585,8 @@
         reader.</Documentation>
       </StringVectorProperty>
       <!-- End legacyreader -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPolyDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLPolyDataReader"
                  label="XML PolyData Reader"
                  name="XMLPolyDataReaderCore">
       <Documentation long_help="Reads serial VTK XML polydata files."
@@ -659,8 +651,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPolyDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLTableReader"
+    </Proxy>
+    <Proxy class="vtkXMLTableReader"
                  label="XML Table Reader"
                  name="XMLTableReaderCore">
       <Documentation long_help="Reads serial VTK XML table files."
@@ -704,8 +696,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLTableReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLUnstructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLUnstructuredGridReader"
                  label="XML Unstructured Grid reader"
                  name="XMLUnstructuredGridReaderCore">
       <Documentation long_help="Reads serial VTK XML unstructured grid data files."
@@ -771,8 +763,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLUnstructuredGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLImageDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLImageDataReader"
                  label="XML Image Data Reader"
                  name="XMLImageDataReaderCore">
       <Documentation long_help="Reads serial VTK XML image data files."
@@ -837,8 +829,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLImageDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLStructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLStructuredGridReader"
                  label="XML Structured Grid Reader"
                  name="XMLStructuredGridReaderCore">
       <Documentation long_help="Reads serial VTK XML structured grid data files."
@@ -904,8 +896,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLStructuredGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLRectilinearGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLRectilinearGridReader"
                  label="XML Rectilinear Grid Reader"
                  name="XMLRectilinearGridReaderCore">
       <Documentation long_help="Reads serial VTK XML rectilinear grid data files."
@@ -971,8 +963,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLRectilinearGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPPolyDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLPPolyDataReader"
                  label="XML Partitioned Polydata Reader"
                  name="XMLPPolyDataReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML polydata files."
@@ -1034,8 +1026,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPPolyDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPUnstructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLPUnstructuredGridReader"
                  label="XML Partitioned Unstructured Grid Reader"
                  name="XMLPUnstructuredGridReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML unstructured grid files."
@@ -1097,8 +1089,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPUnstructuredGridReaderCore -->
-    </SourceProxy>
-        <SourceProxy class="vtkXMLPTableReader"
+    </Proxy>
+        <Proxy class="vtkXMLPTableReader"
                  label="XML Partitioned Table Reader"
                  name="XMLPTableReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML table files."
@@ -1143,8 +1135,8 @@
         <ArraySelectionInformationHelper attribute_name="Point" />
       </StringVectorProperty>
       <!-- End XMLPTableReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPImageDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLPImageDataReader"
                  label="XML Partitioned Image Data Reader"
                  name="XMLPImageDataReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML image data files."
@@ -1207,8 +1199,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPImageDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPStructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLPStructuredGridReader"
                  label="XML Partitioned Structured Grid Reader"
                  name="XMLPStructuredGridReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML structured grid files."
@@ -1270,8 +1262,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPStructuredGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPRectilinearGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLPRectilinearGridReader"
                  label="XML Partitioned Rectilinear Grid Reader"
                  name="XMLPRectilinearGridReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML rectilinear grid files."
@@ -1334,8 +1326,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPRectilinearGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkSTLReader"
+    </Proxy>
+    <Proxy class="vtkSTLReader"
                  label="STL Reader"
                  name="stlreadercore">
       <Documentation long_help="Reads ASCII or binary stereo lithography (STL) files."
@@ -1361,8 +1353,8 @@
         describing which solid a cell belongs to.</Documentation>
       </IntVectorProperty>
       <!-- End stlreader -->
-    </SourceProxy>
-    <SourceProxy class="vtkDelimitedTextReader"
+    </Proxy>
+    <Proxy class="vtkDelimitedTextReader"
                  label="CSV Reader"
                  name="CSVReaderCore">
       <Documentation long_help="Reads a comma-separated values file into a 1D rectilinear grid."
@@ -1436,8 +1428,8 @@
         how many.</Documentation>
       </IntVectorProperty>
       <!-- End of CSVReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLMultiBlockDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLMultiBlockDataReader"
                  label="XML Multi-Block Data reader"
                  name="XMLMultiBlockDataReaderCore">
       <Documentation>Internal proxy used by
@@ -1464,8 +1456,8 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <!-- End MultiBlockDataReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLHierarchicalBoxDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLHierarchicalBoxDataReader"
                  label="XML Hierarchical Box Data reader"
                  name="XMLHierarchicalBoxDataReaderCore">
       <StringVectorProperty animateable="0"
@@ -1478,9 +1470,9 @@
         hierarchical box data reader.</Documentation>
       </StringVectorProperty>
       <!-- End HierarchicalBoxDataReader -->
-    </SourceProxy>
+    </Proxy>
 
-    <SourceProxy class="vtkXMLUniformGridAMRReader"
+    <Proxy class="vtkXMLUniformGridAMRReader"
                  label="XML UniformGrid AMR reader"
                  name="XMLUniformGridAMRReaderCore">
       <IntVectorProperty command="SetMaximumLevelsToReadByDefault"
@@ -1500,9 +1492,9 @@
         </Documentation>
       </IntVectorProperty>
       <!-- End XMLUniformGridAMRReaderCore -->
-    </SourceProxy>
+    </Proxy>
 
-    <SourceProxy class="vtkSLACParticleReader"
+    <Proxy class="vtkSLACParticleReader"
                  label="SLAC Particle Data Reader"
                  name="SLACParticleReaderCore">
       <Documentation>The SLAC Particle data reader.</Documentation>
@@ -1514,9 +1506,9 @@
         <FileListDomain name="files" />
         <Documentation>The name of the file to load.</Documentation>
       </StringVectorProperty>
-    </SourceProxy>
+    </Proxy>
     <!-- SLACParticleReaderCore -->
-    <SourceProxy class="vtkParticleReader"
+    <Proxy class="vtkParticleReader"
                  label="VTK Particle Reader"
                  name="ParticleReaderCore">
       <Documentation>Core for ParticleReader.</Documentation>
@@ -1580,7 +1572,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <!-- ParticleReaderCore -->
-    </SourceProxy>
+    </Proxy>
     <SourceProxy class="vtkPExodusIIReader"
                  name="ExodusIIReaderCore">
       <Documentation long_help="Reads an Exodus II file to produce an unstructured grid."
@@ -2382,7 +2374,7 @@
       </StringVectorProperty>
       <!-- End ExodusIIReaderCore -->
     </SourceProxy>
-    <SourceProxy class="vtkTecplotReader"
+    <Proxy class="vtkTecplotReader"
                  label="VTK Tecplot Reader"
                  name="TecplotReaderCore">
       <Documentation>Core for TecplotReader</Documentation>
@@ -2415,8 +2407,8 @@
         data and cell data) to read.</Documentation>
       </StringVectorProperty>
       <!-- End TecplotReaderCore-->
-    </SourceProxy>
-    <SourceProxy class="vtkNetCDFCAMReader"
+    </Proxy>
+    <Proxy class="vtkNetCDFCAMReader"
                  label="NetCDF CAM reader"
                  name="NetCDFCAMReaderCore">
       <Documentation>Core for NetCDF CAM reader.</Documentation>
@@ -2572,9 +2564,9 @@
         <ReaderFactory extensions="nc ncdf"
                        file_description="CAM NetCDF (Unstructured)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End NetCDFCAMReaderCore -->
-    <SourceProxy class="vtkNetCDFPOPReader"
+    <Proxy class="vtkNetCDFPOPReader"
                  label="NetCDF POP reader"
                  name="NetCDFPOPReaderCore">
       <Documentation>Core for NetCDF POP reader.</Documentation>
@@ -2623,9 +2615,9 @@
         <ReaderFactory extensions="pop.ncdf pop.nc"
                        file_description="POP Ocean NetCDF (Rectilinear)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End NetCDFPOPReaderCore -->
-    <SourceProxy class="vtkUnstructuredPOPReader"
+    <Proxy class="vtkUnstructuredPOPReader"
                  label="Unstructured NetCDF POP reader"
                  name="UnstructuredPOPReaderCore">
       <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file and converts it into unstructured data."
@@ -2680,9 +2672,9 @@
         <ReaderFactory extensions="pop.ncdf pop.nc"
                        file_description="POP Ocean NetCDF (Unstructured)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End UnstructuredPOPReaderCore -->
-    <SourceProxy class="vtkPNetCDFPOPReader"
+    <Proxy class="vtkPNetCDFPOPReader"
                  label="Parallel NetCDF POP reader"
                  name="PNetCDFPOPReaderCore">
       <Documentation>Core for Parallel NetCDF POP reader.</Documentation>
@@ -2731,12 +2723,12 @@
         <ReaderFactory extensions="pop.ncdf pop.nc"
                        file_description="Parallel POP Ocean NetCDF (Rectilinear)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End PNetCDFPOPReaderCore -->
 
 
     <!-- ============================================================= -->
-    <SourceProxy class="vtkPNGReader"
+    <Proxy class="vtkPNGReader"
                  label="PNG Reader"
                  name="PNGReader">
       <Documentation long_help="Reads a PNG file into an image data."
@@ -2767,8 +2759,8 @@
                        file_description="PNG Image Files" />
       </Hints>
       <!-- End PNGReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkJPEGReader"
+    </Proxy>
+    <Proxy class="vtkJPEGReader"
                  label="JPEG Reader"
                  name="JPEGReader">
       <Documentation long_help="Reads a JPEG file into an image data."
@@ -2799,8 +2791,8 @@
                        file_description="JPEG Image Files" />
       </Hints>
       <!-- End JPEGReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkTIFFReader"
+    </Proxy>
+    <Proxy class="vtkTIFFReader"
                  label="TIFF Reader"
                  name="TIFFReader">
       <Documentation long_help="Reads a TIFF file into an image data."
@@ -2852,8 +2844,8 @@
                        file_description="TIFF Image Files" />
       </Hints>
       <!-- End TIFFReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkMRCReader"
+    </Proxy>
+    <Proxy class="vtkMRCReader"
                  label="MRC Reader"
                  name="MRCReader">
       <Documentation long_help="Reads a MRC file into an image data."
@@ -2875,8 +2867,8 @@
                        file_description="MRC Image Files" />
       </Hints>
       <!-- End MRCReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkNetCDFCFReader"
+    </Proxy>
+    <Proxy class="vtkNetCDFCFReader"
                  name="netCDFReaderCore">
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -3003,9 +2995,9 @@
         animation panel. ParaView will then automatically set up the animation
         to visit the time steps defined in the file.</Documentation>
       </DoubleVectorProperty>
-    </SourceProxy>
+    </Proxy>
     <!-- netCDFReaderCore -->
-    <SourceProxy class="vtkMultiBlockPLOT3DReader"
+    <Proxy class="vtkMultiBlockPLOT3DReader"
                  name="P3DReaderCore">
       <Documentation long_help="Reads ASCII or binary PLOT3D files."
                      short_help="Read PLOT3D files.">PLOT3D is a plotting
@@ -3184,9 +3176,9 @@
         </Documentation>
       </IntVectorProperty>
       <!-- End P3DReaderCore -->
-    </SourceProxy>
+    </Proxy>
     <!-- Beginning of FLUENTReaderCore -->
-    <SourceProxy class="vtkFLUENTReader"
+    <Proxy class="vtkFLUENTReader"
                  name="FLUENTReaderCore">
       <StringVectorProperty information_only="1"
                             name="CellArrayInfo">
@@ -3209,10 +3201,10 @@
         <Documentation>Select which cell-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-    </SourceProxy>
+    </Proxy>
     <!-- End of FLUENTReaderCore -->
 
-    <SourceProxy class="vtkPLYReader" name="PLYReaderCore">
+    <Proxy class="vtkPLYReader" name="PLYReaderCore">
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
@@ -3223,7 +3215,7 @@
         reader.</Documentation>
       </StringVectorProperty>
       <!-- End PLYReaderCore -->
-    </SourceProxy>
+    </Proxy>
 
     <!-- End of "internal_sources" -->
   </ProxyGroup>
