@@ -263,12 +263,11 @@ protected:
   //@}
 
   /**
-   * Create program for texture mapping.
+   * Create program (if needed) and prepare it for texture mapping.
    * \pre context_exists: context!=0
-   * \pre Program_void: this->Program==0
    * \post Program_exists: this->Program!=0
    */
-  void CreateProgram(vtkOpenGLRenderWindow* context);
+  void ReadyProgram(vtkOpenGLRenderWindow* context);
 
   /**
    * Updates the IceT tile information during each render.
