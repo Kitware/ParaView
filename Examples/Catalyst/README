@@ -59,6 +59,10 @@ correctness of outputs. A description of the examples are:
                                  identifier. It is tested with the allinputsgridwriter.py
                                  Catalyst Python pipeline script available under the
                                  SampleScripts subdirectory.
+* CxxGhostCellsExample -- An example where Catalyst is passed in ghost levels.
+                          This example is meant to be used as an example of how
+                          Catalyst deals with ghost cells for an unstructured grid
+                          or an image data. This example requires a Catalyst build.
 
 Other objects of interest:
 * LICENSE.md -- The license of this software.
