@@ -557,14 +557,23 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
 }
 
 // ----------------------------------------------------------------------------
-void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow* context)
+void vtkIceTCompositePass::ReadyProgram(vtkOpenGLRenderWindow* context)
 {
   assert("pre: context_exists" && context != 0);
-  assert("pre: Program_void" && this->Program == 0);
 
-  this->Program = new vtkOpenGLHelper;
-  this->Program->Program =
-    context->GetShaderCache()->ReadyShaderProgram(vtkTextureObjectVS, vtkCompositeZPassFS, "");
+  if (!this->Program)
+  {
+    this->Program = new vtkOpenGLHelper;
+  }
+  if (!this->Program->Program)
+  {
+    this->Program->Program =
+      context->GetShaderCache()->ReadyShaderProgram(vtkTextureObjectVS, vtkCompositeZPassFS, "");
+  }
+  else
+  {
+    context->GetShaderCache()->ReadyShaderProgram(this->Program->Program);
+  }
   if (!this->Program->Program)
   {
     vtkErrorMacro("Shader program failed to build.");
@@ -976,12 +985,8 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
   glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
   glDepthFunc(GL_ALWAYS);
 
-  if (this->Program == 0)
-  {
-    this->CreateProgram(context);
-  }
+  this->ReadyProgram(context);
 
-  context->GetShaderCache()->ReadyShaderProgram(this->Program->Program);
   this->ZTexture->Activate();
   this->Program->Program->SetUniformi("depth", this->ZTexture->GetTextureUnit());
   this->ZTexture->CopyToFrameBuffer(
