@@ -203,7 +203,10 @@ void vtkSMProxySelectionModel::Select(
     vtkSMProxy* proxy = iter->GetPointer();
     if (proxy && (command & vtkSMProxySelectionModel::SELECT) != 0)
     {
-      new_selection.push_back(proxy);
+      if (std::find(new_selection.begin(), new_selection.end(), proxy) == new_selection.end())
+      {
+        new_selection.push_back(proxy);
+      }
     }
     if (proxy && (command & vtkSMProxySelectionModel::DESELECT) != 0)
     {
@@ -356,7 +359,10 @@ void vtkSMProxySelectionModel::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
       }
 
       // Just add the proxy in the set
-      new_selection.push_back(proxy);
+      if (std::find(new_selection.begin(), new_selection.end(), proxy) == new_selection.end())
+      {
+        new_selection.push_back(proxy);
+      }
     }
   }
 
