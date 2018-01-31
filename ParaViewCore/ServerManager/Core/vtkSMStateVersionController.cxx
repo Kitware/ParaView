@@ -612,7 +612,8 @@ struct Process_5_4_to_5_5
   bool operator()(xml_document& document)
   {
     return LockScalarRange(document) && CalculatorAttributeMode(document) &&
-      CGNSReaderUpdates(document) && HeadlightToAdditionalLight(document);
+      CGNSReaderUpdates(document) && HeadlightToAdditionalLight(document) &&
+      DataBoundsInflateScaleFactor(document);
   }
 
   bool LockScalarRange(xml_document& document)
@@ -895,6 +896,33 @@ struct Process_5_4_to_5_5
                                            "or @name='LightIntensity' "
                                            "or @name='LightSwitch' "
                                            "or @name='LightType']"));
+    }
+    return true;
+  }
+
+  bool DataBoundsInflateScaleFactor(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes =
+      document.select_nodes("//ServerManagerState/Proxy[@group='annotations' and "
+                            "@type='GridAxes3DActor']");
+
+    for (auto xnode : proxy_nodes)
+    {
+      auto proxyNode = xnode.node();
+      if (proxyNode.select_nodes("//Property[@name='DataBoundsInflateFactor']").empty())
+      {
+        // state is already newer.
+        continue;
+      }
+
+      auto prop =
+        proxyNode.select_single_node("//Property[@name='DataBoundsInflateFactor']").node();
+      auto valueElt = prop.child("Element");
+      double inflateFactor = valueElt.attribute("value").as_double();
+
+      prop.attribute("name").set_value("DataBoundsScaleFactor");
+      valueElt.attribute("value").set_value(inflateFactor + 1);
+      prop.remove_child("Domain");
     }
     return true;
   }

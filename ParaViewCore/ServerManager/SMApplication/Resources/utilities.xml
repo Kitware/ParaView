@@ -1819,19 +1819,18 @@
         </Hints>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="DataBoundsInflateFactor"
-                            command="SetDataBoundsInflateFactor"
+      <DoubleVectorProperty name="DataBoundsScaleFactor"
+                            command="SetDataBoundsScaleFactor"
                             number_of_elements="1"
-                            default_values="0.0008"
+                            default_values="1.0008"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" min="0" max="1"/>
+        <DoubleRangeDomain name="range" min="0" max="2"/>
         <Documentation>
-          After the data bounds have been computed, this property enables to inflate the
+          After the data bounds have been computed, this property enables to scale the
           bounds used to generate the axes grid, so it will be slightly larger than the
-          data bounds. It inflates the axes grid bounds using the diagonal length of the
-          bounding box multiplied by this factor.
+          data bounds.
           Data bounds are not modified, only the aspect of the AxesGrid is modified.
-          The default value (0.0008) ensures that there is no concident lines drawn when
+          The default value (1.0008) ensures that there is no concident lines drawn when
           zooming close enough to the model.
         </Documentation>
         <Hints>
@@ -1846,7 +1845,7 @@
       <PropertyGroup label="Data Transform">
         <Property name="DataScale" />
         <Property name="DataPosition" />
-        <Property name="DataBoundsInflateFactor" />
+        <Property name="DataBoundsScaleFactor" />
       </PropertyGroup>
 
       <DoubleVectorProperty name="ModelTransformMatrix"
