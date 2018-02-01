@@ -159,7 +159,7 @@ class CoProcessor(object):
             for view in self.__ViewsList:
                 if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
                    datadescription.GetForceOutput() == True:
-                    viewinputs = cpstate.locate_simulation_inputs(writer)
+                    viewinputs = cpstate.locate_simulation_inputs_for_view(view)
                     for viewinput in viewinputs:
                         datadescription.GetInputDescriptionByName(viewinput).AllFieldsOn()
                         datadescription.GetInputDescriptionByName(viewinput).GenerateMeshOn()
