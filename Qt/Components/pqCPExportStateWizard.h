@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPActionsGroup.h
+   Module:    pqCPExportStateWizard.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,26 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqCPActionsGroup_h
-#define pqCPActionsGroup_h
+#ifndef pqCPExportStateWizard_h
+#define pqCPExportStateWizard_h
 
-#include <QActionGroup>
+#include "pqComponentsModule.h"
+#include "pqSGExportStateWizard.h"
 
-// Adds actions for co-processing.
-class pqCPActionsGroup : public QActionGroup
+class PQCOMPONENTS_EXPORT pqCPExportStateWizard : public pqSGExportStateWizard
 {
   Q_OBJECT
-  typedef QActionGroup Superclass;
+  typedef pqSGExportStateWizard Superclass;
 
 public:
-  pqCPActionsGroup(QObject* parent = 0);
-  virtual ~pqCPActionsGroup();
+  pqCPExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
+  virtual ~pqCPExportStateWizard();
 
-protected slots:
-  void exportState();
+  virtual void customize();
+
+protected:
+  virtual bool getCommandString(QString& command);
 
 private:
-  Q_DISABLE_COPY(pqCPActionsGroup)
+  Q_DISABLE_COPY(pqCPExportStateWizard)
 };
 
 #endif

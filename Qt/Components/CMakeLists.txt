@@ -531,6 +531,8 @@ if(PARAVIEW_ENABLE_PYTHON)
     pqSGPluginManager.h
     pqSGWritersMenuManager.cxx
     pqSGWritersMenuManager.h
+    pqCPExportStateWizard.cxx
+    pqCPExportStateWizard.h
     )
   LIST(APPEND Module_MOC_HDRS
     pqImageOutputInfo.h
@@ -541,6 +543,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     pqSGExportStateWizard.h
     pqSGPluginManager.h
     pqSGWritersMenuManager.h
+    pqCPExportStateWizard.h
     )
   LIST(APPEND Module_UI_FILES
     Resources/UI/pqImageOutputInfo.ui

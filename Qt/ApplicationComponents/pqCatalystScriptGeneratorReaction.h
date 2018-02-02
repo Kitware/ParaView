@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPPluginManager.cxx
+   Module:    pqCatalystScriptGeneratorReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,27 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPPluginManager.h"
+#ifndef pqCatalystScriptGeneratorReaction_h
+#define pqCatalystScriptGeneratorReaction_h
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::pqCPPluginManager(QObject* parentObject)
-  : Superclass(parentObject)
-{
-}
+#include "pqApplicationComponentsModule.h"
+#include "pqReaction.h"
 
-//-----------------------------------------------------------------------------
-pqCPPluginManager::~pqCPPluginManager()
-{
-}
+/**
+* @ingroup Reactions
+* Reaction to open up the Script Generator Dialog.
+*/
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getWritersMenuName()
-{
-  return "&Writers";
-}
+class pqCPExportStateWizard;
 
-//-----------------------------------------------------------------------------
-const char* pqCPPluginManager::getObjectMenuName()
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystScriptGeneratorReaction : public pqReaction
 {
-  return "CPProxyWritersMenu";
-}
+  Q_OBJECT
+  typedef pqReaction Superclass;
+
+public:
+  pqCatalystScriptGeneratorReaction(QAction* parent);
+  ~pqCatalystScriptGeneratorReaction();
+
+protected slots:
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered();
+
+private:
+  Q_DISABLE_COPY(pqCatalystScriptGeneratorReaction)
+  pqCPExportStateWizard* esq;
+};
+
+#endif

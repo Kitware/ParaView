@@ -83,10 +83,16 @@ static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
 
 //-----------------------------------------------------------------------------
 pqSGWritersMenuManager::pqSGWritersMenuManager(
-  const char* writersMenuName, const char* objectMenuName, QObject* parentObject)
+  QMenu* mymenu, const char* writersMenuName, const char* objectMenuName, QObject* parentObject)
   : Superclass(parentObject)
 {
-  this->Menu = 0;
+  this->Menu = mymenu;
+  this->AsSubMenu = false;
+  this->AlreadyConnected = false;
+  if (mymenu != nullptr)
+  {
+    this->AsSubMenu = true;
+  }
   this->WritersMenuName = writersMenuName;
   this->ObjectMenuName = objectMenuName;
 
@@ -112,10 +118,18 @@ pqSGWritersMenuManager::pqSGWritersMenuManager(
 }
 
 //-----------------------------------------------------------------------------
+pqSGWritersMenuManager::pqSGWritersMenuManager(
+  const char* writersMenuName, const char* objectMenuName, QObject* parentObject)
+  : pqSGWritersMenuManager(nullptr, writersMenuName, objectMenuName, parentObject)
+{
+}
+
+//-----------------------------------------------------------------------------
 pqSGWritersMenuManager::~pqSGWritersMenuManager()
 {
 }
 
+//-----------------------------------------------------------------------------
 namespace
 {
 QAction* findHelpMenuAction(QMenuBar* menubar)
@@ -145,20 +159,31 @@ void pqSGWritersMenuManager::createMenu()
     return;
   }
 
-  if (this->Menu == NULL)
+  if (this->AsSubMenu)
   {
-    this->Menu = new QMenu(this->WritersMenuName, mainWindow);
-    this->Menu->setObjectName(this->ObjectMenuName);
-    mainWindow->menuBar()->insertMenu(::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
-
-    QObject::connect(this->Menu, SIGNAL(triggered(QAction*)), this,
-      SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
+    if (!this->AlreadyConnected)
+    {
+      QObject::connect(this->Menu, SIGNAL(triggered(QAction*)), this,
+        SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
+      this->AlreadyConnected = true;
+    }
   }
-  this->Menu->clear();
+  else
+  {
+    if (this->Menu == NULL)
+    {
+      this->Menu = new QMenu(this->WritersMenuName, mainWindow);
+      this->Menu->setObjectName(this->ObjectMenuName);
+      mainWindow->menuBar()->insertMenu(::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
+
+      QObject::connect(this->Menu, SIGNAL(triggered(QAction*)), this,
+        SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
+    }
+    this->Menu->clear();
+  }
 
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-
   if (pxm == NULL)
   {
     return;
@@ -237,6 +262,10 @@ void pqSGWritersMenuManager::updateEnableState()
     {
       continue;
     }
+    if (filterType[0] != "insitu_writer_parameters")
+    {
+      continue;
+    }
     if (outputPorts.size() == 0)
     {
       action->setEnabled(false);
@@ -291,7 +320,10 @@ void pqSGWritersMenuManager::updateEnableState()
     }
   }
 
-  this->Menu->setEnabled(some_enabled);
+  if (!this->AsSubMenu)
+  {
+    this->Menu->setEnabled(some_enabled);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -300,6 +332,10 @@ void pqSGWritersMenuManager::onActionTriggered(QAction* action)
   QStringList filterType = action->data().toStringList();
   if (filterType.size() == 2)
   {
+    if (filterType[0] != "insitu_writer_parameters")
+    {
+      return;
+    }
     this->createWriter(filterType[0], filterType[1]);
   }
 }

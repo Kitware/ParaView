@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPActionsGroup.cxx
+   Module:    pqCatalystScriptGeneratorReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPActionsGroup.h"
+#include "pqCatalystScriptGeneratorReaction.h"
+#include "vtkPVConfig.h"
 
-#include "pqCPExportStateWizard.h"
 #include "pqCoreUtilities.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqCPExportStateWizard.h"
+#endif
+#include <iostream>
 
 //-----------------------------------------------------------------------------
-pqCPActionsGroup::pqCPActionsGroup(QObject* parentObject)
+pqCatalystScriptGeneratorReaction::pqCatalystScriptGeneratorReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  QAction* export_action = this->addAction("Export State");
-  export_action->setToolTip("Export state for co-processing");
-  export_action->setStatusTip("Export state for co-processing");
-
-  QObject::connect(export_action, SIGNAL(triggered()), this, SLOT(exportState()));
 }
 
 //-----------------------------------------------------------------------------
-pqCPActionsGroup::~pqCPActionsGroup()
+pqCatalystScriptGeneratorReaction::~pqCatalystScriptGeneratorReaction()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqCPActionsGroup::exportState()
+void pqCatalystScriptGeneratorReaction::onTriggered()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqCPExportStateWizard wizard(pqCoreUtilities::mainWidget());
   wizard.customize();
   wizard.exec();
+#endif
 }

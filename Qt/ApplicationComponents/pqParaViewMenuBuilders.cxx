@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCatalystContinueReaction.h"
 #include "pqCatalystPauseSimulationReaction.h"
 #include "pqCatalystRemoveBreakpointReaction.h"
+#include "pqCatalystScriptGeneratorReaction.h"
 #include "pqCatalystSetBreakpointReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
@@ -97,6 +98,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqMacroReaction.h"
 #include "pqPythonManager.h"
+#include "pqSGWritersMenuManager.h"
 #include "pqTraceReaction.h"
 #endif
 
@@ -615,4 +617,15 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 
   new pqCatalystRemoveBreakpointReaction(
     menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+  menu.addSeparator(); // --------------------------------------------------
+  QAction* csg = menu.addAction("Script Generator") << pqSetName("actionCatalystScriptGenerator");
+  new pqCatalystScriptGeneratorReaction(csg);
+
+  menu.addSeparator(); // --------------------------------------------------
+  pqSGWritersMenuManager* menuMgr =
+    new pqSGWritersMenuManager(&menu, "&Writers", "CPProxyWritersMenu", nullptr);
+  menuMgr->createMenu();
+#endif
 }
