@@ -14,4 +14,15 @@ a = AnnotateAttributeData(
 UpdatePipeline()
 annotatedValue = a.GetClientSideObject().GetComputedAnnotationValue()
 print(annotatedValue)
-assert annotatedValue == "Hello: 0.666667" or annotatedValue == "Hello: 0.6666667"
+assert annotatedValue[0:14] == "Hello: 0.66666"
+
+
+text1 = Text()
+annotateAttributeData1 = AnnotateAttributeData(Input=text1)
+annotateAttributeData1.ArrayName = 'Text'
+annotateAttributeData1.ArrayAssociation = 'Row Data'
+
+UpdatePipeline()
+annotatedValue = annotateAttributeData1.GetClientSideObject().GetComputedAnnotationValue()
+print(annotatedValue)
+assert annotatedValue == "Value is: Text"
