@@ -40,10 +40,11 @@ def locate_simulation_inputs(proxy):
 
     simulation_inputs = []
     for input in input_proxies:
-        cur_si = locate_simulation_inputs(input.SMProxy)
-        for cur in cur_si:
-            if not cur in simulation_inputs:
-                simulation_inputs.append(cur)
+        if input:
+            cur_si = locate_simulation_inputs(input.SMProxy)
+            for cur in cur_si:
+                if not cur in simulation_inputs:
+                    simulation_inputs.append(cur)
     return simulation_inputs
 
 # -----------------------------------------------------------------------------
