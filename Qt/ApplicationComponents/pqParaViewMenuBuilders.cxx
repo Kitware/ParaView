@@ -620,7 +620,7 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 
 #ifdef PARAVIEW_ENABLE_PYTHON
   menu.addSeparator(); // --------------------------------------------------
-  QAction* csg = menu.addAction("Script Generator") << pqSetName("actionCatalystScriptGenerator");
+  QAction* csg = menu.addAction("Generate Script") << pqSetName("Export State");
   new pqCatalystScriptGeneratorReaction(csg);
 
   menu.addSeparator(); // --------------------------------------------------
