@@ -9635,7 +9635,7 @@ source.</Documentation>
         range of the data of the input filter, which may be different from
         other pipeline objects or the range defined in the animation
         inspector.) This is a useful option to use if you have a dataset with
-        one missing time step and wish to 'file-in' the missing data with an
+        one missing time step and wish to 'fill in' the missing data with an
         interpolated value from the steps on either side.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty information_only="1"
