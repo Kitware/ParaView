@@ -168,6 +168,8 @@ vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
         const_cast<char*>("(s)"), const_cast<char*>(preamble ? preamble : str.str().c_str())));
       vtkSMTrace::ActiveTracer->CheckForError();
     }
+#else
+    (void)preamble;
 #endif
   }
   else
