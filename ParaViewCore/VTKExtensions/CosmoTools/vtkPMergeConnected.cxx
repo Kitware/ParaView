@@ -100,7 +100,7 @@ int vtkPMergeConnected::RequestData(vtkInformation* vtkNotUsed(request),
   int sum = 0;
   int oops = ((piece != this->MyId) || (numPieces != this->NumProcesses));
 
-  for (int i = piece; i < input->GetNumberOfBlocks(); i += numPieces)
+  for (unsigned int i = piece; i < input->GetNumberOfBlocks(); i += numPieces)
   {
     vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(input->GetBlock(i));
     if (!ugrid)
