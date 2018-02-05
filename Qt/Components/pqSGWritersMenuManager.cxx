@@ -159,14 +159,40 @@ void pqSGWritersMenuManager::createMenu()
     return;
   }
 
+  vtkSMSessionProxyManager* pxm =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+  if (pxm == NULL)
+  {
+    return;
+  }
+
+  // in rebuild after plugin case, find the submenu to add under
+  QMenu* submenu = nullptr;
+  QList<QAction*> menu_actions = this->Menu->findChildren<QAction*>();
+  foreach (QAction* action, menu_actions)
+  {
+    submenu = action->menu();
+    if (submenu && (submenu->title().toStdString() == "Data Extract Writers"))
+    {
+      break;
+    }
+    submenu = nullptr;
+  }
+
+  // connect writer menu item actions to createWriters() method
   if (this->AsSubMenu)
   {
     if (!this->AlreadyConnected)
     {
-      QObject::connect(this->Menu, SIGNAL(triggered(QAction*)), this,
+      // make the submenu
+      submenu = new QMenu("Data Extract Writers", this->Menu);
+      submenu->setObjectName("Writers");
+      this->Menu->addMenu(submenu);
+      // connect its actions up
+      QObject::connect(submenu, SIGNAL(triggered(QAction*)), this,
         SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);
-      this->AlreadyConnected = true;
     }
+    submenu->clear();
   }
   else
   {
@@ -182,17 +208,12 @@ void pqSGWritersMenuManager::createMenu()
     this->Menu->clear();
   }
 
-  vtkSMSessionProxyManager* pxm =
-    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
-  if (pxm == NULL)
-  {
-    return;
-  }
   vtkSMProxyDefinitionManager* proxyDefinitions = pxm->GetProxyDefinitionManager();
 
   // For search proxies in the insitu_writer_parameters group and
   // we search specifically for proxies with a proxy writer hint
   // since we've marked them as special
+  QMenu* addTo = submenu ? submenu : this->Menu;
   const char proxyGroup[] = "insitu_writer_parameters";
   vtkPVProxyDefinitionIterator* iter = proxyDefinitions->NewSingleGroupIterator(proxyGroup);
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -208,7 +229,7 @@ void pqSGWritersMenuManager::createMenu()
           qWarning() << "Failed to locate proxy for writer: " << proxyGroup << " , " << proxyName;
           continue;
         }
-        QAction* action = this->Menu->addAction(
+        QAction* action = addTo->addAction(
           prototype->GetXMLLabel() ? prototype->GetXMLLabel() : prototype->GetXMLName());
         QStringList list;
         list << proxyGroup << proxyName;
@@ -219,6 +240,8 @@ void pqSGWritersMenuManager::createMenu()
   iter->Delete();
 
   this->updateEnableState();
+
+  this->AlreadyConnected = true;
 }
 
 //-----------------------------------------------------------------------------
