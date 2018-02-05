@@ -516,6 +516,34 @@ void vtkGlyph3DRepresentation::SetUseSourceTableTree(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetUseCullingAndLOD(bool val)
+{
+  this->GlyphMapper->SetCullingAndLOD(val);
+  this->LODGlyphMapper->SetCullingAndLOD(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetNumberOfLOD(int val)
+{
+  this->GlyphMapper->SetNumberOfLOD(val);
+  this->LODGlyphMapper->SetNumberOfLOD(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetLODDistanceAndTargetReduction(int index, float dist, float reduc)
+{
+  this->GlyphMapper->SetLODDistanceAndTargetReduction(index, dist, reduc);
+  this->LODGlyphMapper->SetLODDistanceAndTargetReduction(index, dist, reduc);
+}
+
+//----------------------------------------------------------------------------
+void vtkGlyph3DRepresentation::SetColorByLODIndex(bool val)
+{
+  this->GlyphMapper->SetLODColoring(val);
+  this->LODGlyphMapper->SetLODColoring(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkGlyph3DRepresentation::SetOrientation(double x, double y, double z)
 {
   this->GlyphActor->SetOrientation(x, y, z);

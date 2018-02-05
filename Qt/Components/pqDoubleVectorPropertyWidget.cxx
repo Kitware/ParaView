@@ -76,9 +76,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   }
 
   // find the domain
-  vtkSMDoubleRangeDomain* defaultDomain = NULL;
+  vtkSMDoubleRangeDomain* defaultDomain = nullptr;
 
-  vtkSMDomain* domain = 0;
+  vtkSMDomain* domain = nullptr;
   vtkSMDomainIterator* domainIter = dvp->NewDomainIterator();
   for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
   {
@@ -100,10 +100,40 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 
   // Fill Layout
   vtkPVXMLElement* hints = dvp->GetHints();
-  vtkPVXMLElement* showLabels = NULL;
-  if (hints != NULL)
+  vtkPVXMLElement* showLabels = nullptr;
+  if (hints != nullptr)
   {
     showLabels = hints->FindNestedElementByName("ShowComponentLabels");
+  }
+
+  int elementCount = dvp->GetNumberOfElements();
+
+  std::vector<const char*> componentLabels(elementCount);
+  if (showLabels)
+  {
+    vtkNew<vtkCollection> elements;
+    showLabels->GetElementsByName("ComponentLabel", elements.GetPointer());
+    int nbCompLabels = elements->GetNumberOfItems();
+    if (elementCount == 0)
+    {
+      elementCount = nbCompLabels;
+      componentLabels.resize(nbCompLabels);
+    }
+    for (int i = 0; i < nbCompLabels; ++i)
+    {
+      vtkPVXMLElement* labelElement = vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(i));
+      if (labelElement)
+      {
+        int component;
+        if (labelElement->GetScalarAttribute("component", &component))
+        {
+          if (component < elementCount)
+          {
+            componentLabels[component] = labelElement->GetAttributeOrEmpty("label");
+          }
+        }
+      }
+    }
   }
 
   vtkSMDoubleRangeDomain* range = vtkSMDoubleRangeDomain::SafeDownCast(domain);
@@ -114,10 +144,15 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     widget->setObjectName("ScalarValueList");
     widget->setRangeDomain(range);
     this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+    widget->setShowLabels(showLabels);
+    if (showLabels)
+    {
+      widget->setLabels(componentLabels);
+    }
 
     this->setChangeAvailableAsChangeFinished(true);
     layoutLocal->addWidget(widget);
-    this->setShowLabel(false);
+    this->setShowLabel(showLabels != nullptr);
 
     if (range)
     {
@@ -135,8 +170,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   {
     if (dvp->GetNumberOfElements() == 1 &&
       ((range->GetMinimumExists(0) && range->GetMaximumExists(0)) ||
-          (dvp->FindDomain("vtkSMArrayRangeDomain") != NULL ||
-            dvp->FindDomain("vtkSMBoundsDomain") != NULL)))
+          (dvp->FindDomain("vtkSMArrayRangeDomain") != nullptr ||
+            dvp->FindDomain("vtkSMBoundsDomain") != nullptr)))
     {
       // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget* widget = new pqDoubleRangeWidget(this);
@@ -164,31 +199,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     else
     {
       // unbounded ranges are represented with a line edit
-      int elementCount = dvp->GetNumberOfElements();
-
-      std::vector<const char*> componentLabels;
-      componentLabels.resize(elementCount);
-
-      if (showLabels)
-      {
-        vtkNew<vtkCollection> elements;
-        showLabels->GetElementsByName("ComponentLabel", elements.GetPointer());
-        for (int i = 0; i < elements->GetNumberOfItems(); ++i)
-        {
-          vtkPVXMLElement* labelElement =
-            vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(i));
-          if (!labelElement)
-          {
-            continue;
-          }
-          int component;
-          if (labelElement->GetScalarAttribute("component", &component))
-          {
-            componentLabels[component] = labelElement->GetAttributeOrEmpty("label");
-          }
-        }
-      }
-
       if (elementCount == 6)
       {
         QGridLayout* gridLayout = new QGridLayout;
@@ -294,12 +304,12 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     }
     else
     {
-      vtkErrorWithObjectMacro(NULL, "vtkSMDiscreteDoubleDomain does not contain any value.");
+      qCritical("vtkSMDiscreteDoubleDomain does not contain any value.");
     }
   }
 
-  if (dvp->FindDomain("vtkSMArrayRangeDomain") != NULL ||
-    dvp->FindDomain("vtkSMBoundsDomain") != NULL)
+  if (dvp->FindDomain("vtkSMArrayRangeDomain") != nullptr ||
+    dvp->FindDomain("vtkSMBoundsDomain") != nullptr)
   {
     PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
     pqScaleByButton* scaleButton = new pqScaleByButton(this);

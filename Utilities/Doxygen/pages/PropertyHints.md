@@ -36,7 +36,7 @@ to designate which type of vector is being represented.
       ...
       <Hints>
         <ShowComponentLabels>
-          <Label component="0" label="X:"/>
+          <ComponentLabel component="0" label="X:"/>
           ...
         </ShowComponentLabels>
       </Hints>

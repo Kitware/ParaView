@@ -3843,6 +3843,12 @@
                       panel_visibility="advanced"/>
             <Property name="UseCompositeGlyphTable"
                       panel_visibility="advanced"/>
+            <Property name="UseGlyphCullingAndLOD"
+                      panel_visibility="advanced"/>
+            <Property name="LODValues"
+                      panel_visibility="advanced"/>
+            <Property name="ColorByLODIndex"
+                      panel_visibility="advanced"/>
             <Hints>
                 <PropertyWidgetDecorator type="GenericDecorator"
                                          mode="visibility"
@@ -5703,6 +5709,68 @@
         <Documentation>When true, the glyph data is expected to be a multiblock
         dataset, where each top-level node contains a separate glyph which may
         be selected by a point data array on the input dataset.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseCullingAndLOD"
+                         default_values="0"
+                         name="UseGlyphCullingAndLOD"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When true, culling pass and level of details are enabled.
+        The culling pass detects points outside the frustum view and LOD displays
+        decimated geometry based on the distance between the camera and the instance.
+        This allows to render a higher number of glyphs at interactive rate.
+        This feature works only with OpenGL driver >= 4.0.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetLODDistanceAndTargetReduction"
+                            label="LOD Values"
+                            name="LODValues"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfLOD"
+                            use_index="1">
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="Input"
+                      name="UseGlyphCullingAndLOD" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+        Configure LODs. The first value is the distance after which it is enabled.
+        The second value is the decimation parameter (0 displays full geometry,
+        1 displays only a point)
+        The maximum number of LODs depends on the GPU capacity.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseGlyphCullingAndLOD"
+                                   value="1" />
+          <!-- enable this widget when UseGlyphCullingAndLOD==1 -->+
+          <ShowComponentLabels>
+            <ComponentLabel component="0" label="Distance"/>
+            <ComponentLabel component="1" label="Decimation"/>
+          </ShowComponentLabels>
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetColorByLODIndex"
+                         default_values="0"
+                         label = "Color By LOD Index"
+                         name="ColorByLODIndex"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When true, each level of detail has its own color based on its index.
+        It can be useful to correctly configure the levels of details.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseGlyphCullingAndLOD"
+                                   value="1" />
+        </Hints>
       </IntVectorProperty>
       <!-- end of Glyph3DRepresentation -->
     </RepresentationProxy>

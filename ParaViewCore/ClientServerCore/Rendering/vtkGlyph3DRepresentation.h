@@ -75,6 +75,10 @@ public:
   void SetMasking(bool val);
   void SetSourceIndexing(bool val);
   void SetUseSourceTableTree(bool val);
+  void SetUseCullingAndLOD(bool val);
+  void SetNumberOfLOD(int val);
+  void SetLODDistanceAndTargetReduction(int index, float dist, float reduc);
+  void SetColorByLODIndex(bool val);
 
   //***************************************************************************
   // Overridden to forward to the vtkGlyph3DMapper.

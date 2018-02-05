@@ -58,6 +58,7 @@ class pqTableModel : public QAbstractTableModel
   typedef QAbstractTableModel Superclass;
   int NumberOfColumns;
   QVector<QVariant> Values;
+  QVector<QVariant> Labels;
   bool AllowIntegralValuesOnly;
 
   int computeOffset(const QModelIndex& idx) const
@@ -80,6 +81,15 @@ public:
 
   ~pqTableModel() override {}
 
+  void setLabels(std::vector<const char*>& labels)
+  {
+    this->Labels.resize(static_cast<int>(labels.size()));
+    for (size_t i = 0; i < labels.size(); i++)
+    {
+      this->Labels[i] = QVariant(labels[i]);
+    }
+  }
+
   void setAllowIntegerValuesOnly(bool allow) { this->AllowIntegralValuesOnly = allow; }
 
   // QAbstractTableModel API -------------------------------------------------
@@ -97,6 +107,17 @@ public:
   {
     Q_UNUSED(prnt);
     return this->NumberOfColumns;
+  }
+
+  QVariant headerData(
+    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
+  {
+    if (section < this->Labels.size() && orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+      return this->Labels[section];
+    }
+
+    return this->Superclass::headerData(section, orientation, role);
   }
 
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override
@@ -404,6 +425,18 @@ void pqScalarValueListPropertyWidget::setScalars(const QVariantList& values)
 QVariantList pqScalarValueListPropertyWidget::scalars() const
 {
   return this->Internals->Model.value().toList();
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarValueListPropertyWidget::setShowLabels(bool showLabels)
+{
+  this->Internals->Ui.Table->horizontalHeader()->setVisible(showLabels);
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarValueListPropertyWidget::setLabels(std::vector<const char*>& labels)
+{
+  this->Internals->Model.setLabels(labels);
 }
 
 //-----------------------------------------------------------------------------
