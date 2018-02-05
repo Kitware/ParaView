@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPExportStateWizard.h
+   Module:    pqCatalystExportStateWizard.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,20 +29,20 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqCPExportStateWizard_h
-#define pqCPExportStateWizard_h
+#ifndef pqCatalystExportStateWizard_h
+#define pqCatalystExportStateWizard_h
 
 #include "pqComponentsModule.h"
 #include "pqSGExportStateWizard.h"
 
-class PQCOMPONENTS_EXPORT pqCPExportStateWizard : public pqSGExportStateWizard
+class PQCOMPONENTS_EXPORT pqCatalystExportStateWizard : public pqSGExportStateWizard
 {
   Q_OBJECT
   typedef pqSGExportStateWizard Superclass;
 
 public:
-  pqCPExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
-  virtual ~pqCPExportStateWizard();
+  pqCatalystExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
+  virtual ~pqCatalystExportStateWizard();
 
   virtual void customize();
 
@@ -50,7 +50,7 @@ protected:
   virtual bool getCommandString(QString& command);
 
 private:
-  Q_DISABLE_COPY(pqCPExportStateWizard)
+  Q_DISABLE_COPY(pqCatalystExportStateWizard)
 };
 
 #endif

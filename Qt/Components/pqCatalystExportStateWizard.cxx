@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCinemaTrack.cxx
+   Module:    pqCatalystExportStateWizard.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPExportStateWizard.h"
+#include "pqCatalystExportStateWizard.h"
 
 #include <vtkCamera.h>
 #include <vtkPVXMLElement.h>
@@ -66,25 +66,26 @@ static const char* cp_python_export_code = "from paraview import cpexport\n"
 }
 
 //-----------------------------------------------------------------------------
-pqCPExportStateWizard::pqCPExportStateWizard(QWidget* parentObject, Qt::WindowFlags parentFlags)
+pqCatalystExportStateWizard::pqCatalystExportStateWizard(
+  QWidget* parentObject, Qt::WindowFlags parentFlags)
   : Superclass(parentObject, parentFlags)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqCPExportStateWizard::~pqCPExportStateWizard()
+pqCatalystExportStateWizard::~pqCatalystExportStateWizard()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqCPExportStateWizard::customize()
+void pqCatalystExportStateWizard::customize()
 {
   this->Internals->timeCompartmentSize->hide();
   this->Internals->label_2->hide();
 }
 
 //-----------------------------------------------------------------------------
-bool pqCPExportStateWizard::getCommandString(QString& command)
+bool pqCatalystExportStateWizard::getCommandString(QString& command)
 {
   QString export_rendering = this->Internals->outputRendering->isChecked() ? "True" : "False";
   QString rendering_info; // a map from the render view name to render output params

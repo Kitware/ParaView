@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqCPExportStateWizard.h"
+#include "pqCatalystExportStateWizard.h"
 #endif
 #include <iostream>
 
@@ -53,7 +53,7 @@ pqCatalystScriptGeneratorReaction::~pqCatalystScriptGeneratorReaction()
 void pqCatalystScriptGeneratorReaction::onTriggered()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
-  pqCPExportStateWizard wizard(pqCoreUtilities::mainWidget());
+  pqCatalystExportStateWizard wizard(pqCoreUtilities::mainWidget());
   wizard.customize();
   wizard.exec();
 #endif
