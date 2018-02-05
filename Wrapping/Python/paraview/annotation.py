@@ -33,7 +33,7 @@ def _get_ns(self, do, association):
     if association == vtkDataObject.FIELD:
         # For FieldData, it gets tricky. In general, one would think we are going
         # to look at field data in inputDO directly -- same for composite datasets.
-        # However, ExodusIIReader likes to put field data on leaf nodes insead.
+        # However, ExodusIIReader likes to put field data on leaf nodes instead.
         # So we also check leaf nodes, if the FieldData on the root is empty.
 
         # We explicitly call dsa.DataObject.GetFieldData to ensure that
@@ -166,7 +166,7 @@ def execute_on_attribute_data(self, evaluate_locally):
         return True
 
     array = ns[self.GetArrayName()]
-    chosen_element = array[self.GetElementId()]
+    chosen_element = array.GetValue(self.GetElementId())
     expression = self.GetPrefix() if self.GetPrefix() else ""
     expression += str(chosen_element)
     self.SetComputedAnnotationValue(expression)
