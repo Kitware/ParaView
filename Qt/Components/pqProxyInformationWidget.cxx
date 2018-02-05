@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes
 #include <QHeaderView>
 #include <QLineEdit>
+#include <QStackedWidget>
 #include <QStringList>
 
 // VTK includes
@@ -97,7 +98,10 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
   this->connect(this->Ui->compositeTree->selectionModel(),
     SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
     SLOT(onCurrentChanged(const QModelIndex&)));
-  this->updateInformation(); // initialize state.
+  this->connect(this->Ui->dataTypeProperties, SIGNAL(currentChanged(int)),
+    SLOT(onDataTypePropertiesWidgetChanged(int)));
+  this->onDataTypePropertiesWidgetChanged(0); // set initial size
+  this->updateInformation();                  // initialize state.
 
   this->connect(&pqActiveObjects::instance(), SIGNAL(portChanged(pqOutputPort*)), this,
     SLOT(setOutputPort(pqOutputPort*)));
@@ -264,6 +268,9 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
   this->Ui->numberOfPoints->setText(tr("NA"));
   this->Ui->numberOfRows->setText(tr("NA"));
   this->Ui->numberOfColumns->setText(tr("NA"));
+  this->Ui->numberOfTrees->setText(tr("NA"));
+  this->Ui->numberOfVertices->setText(tr("NA"));
+  this->Ui->numberOfLeaves->setText(tr("NA"));
   this->Ui->memory->setText(tr("NA"));
 
   this->Ui->dataArrays->clear();
@@ -297,13 +304,28 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
     QString("%1").arg(dataInformation->GetRowDataInformation()->GetNumberOfArrays());
   this->Ui->numberOfColumns->setText(numColumns);
 
-  if (dataInformation->GetDataSetType() == VTK_TABLE)
+  QString numTrees = QString("%1").arg(dataInformation->GetNumberOfTrees());
+  this->Ui->numberOfTrees->setText(numTrees);
+
+  QString numVertices = QString("%1").arg(dataInformation->GetNumberOfVertices());
+  this->Ui->numberOfVertices->setText(numVertices);
+
+  QString numLeaves = QString("%1").arg(dataInformation->GetNumberOfLeaves());
+  this->Ui->numberOfLeaves->setText(numLeaves);
+
+  switch (dataInformation->GetDataSetType())
   {
-    this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->Table);
-  }
-  else
-  {
-    this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->DataSet);
+    case VTK_TABLE:
+      this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->Table);
+      break;
+
+    case VTK_HYPER_TREE_GRID:
+      this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->HyperTreeGrid);
+      break;
+
+    default:
+      this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->DataSet);
+      break;
   }
 
   QString memory = QString("%1 MB").arg(dataInformation->GetMemorySize() / 1000.0, 0, 'g', 2);
@@ -464,5 +486,16 @@ void pqProxyInformationWidget::onCurrentChanged(const QModelIndex& idx)
     unsigned int cid = this->Ui->compositeTreeModel->compositeIndex(idx);
     vtkPVDataInformation* info = dataInformation->GetDataInformationForCompositeIndex(cid);
     this->fillDataInformation(info);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyInformationWidget::onDataTypePropertiesWidgetChanged(int idx)
+{
+  QStackedWidget* stack = this->Ui->dataTypeProperties;
+  for (int i = 0; i < stack->count(); ++i)
+  {
+    QSizePolicy::Policy policy = i == idx ? QSizePolicy::Expanding : QSizePolicy::Ignored;
+    stack->widget(i)->setSizePolicy(policy, policy);
   }
 }

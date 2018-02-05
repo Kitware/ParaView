@@ -147,6 +147,29 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="memory">
+        <property name="cursor">
+         <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="acceptDrops">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Memory:</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" colspan="2">
        <widget class="QStackedWidget" name="dataTypeProperties">
         <property name="currentIndex">
@@ -285,29 +308,94 @@
           </item>
          </layout>
         </widget>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Memory:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="memory">
-        <property name="cursor">
-         <cursorShape>ArrowCursor</cursorShape>
-        </property>
-        <property name="acceptDrops">
-         <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
+        <widget class="QWidget" name="HyperTreeGrid">
+         <layout class="QGridLayout" name="_2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>4</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Number of Trees:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="numberOfTrees">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>Number of Vertices:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="numberOfVertices">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="numberOfLeaves">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Number of Leaves:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
