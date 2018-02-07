@@ -40,7 +40,7 @@ namespace
 template <class B>
 B vtkSMVPConvertFromString(const std::string& string_representation)
 {
-  B value;
+  B value = B();
   std::istringstream buffer(string_representation);
   buffer >> value;
   return value;
