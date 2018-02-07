@@ -4325,6 +4325,9 @@
         <ProxyListDomain name="proxy_list">
           <Group name="screenshot_writers" />
         </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
       </ProxyProperty>
 
       <!-- FIXME:: depreacated
