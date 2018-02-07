@@ -16,24 +16,29 @@
 
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkImageWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyListDomain.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
-#include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 #include "vtkVectorOperators.h"
 
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <set>
+#include <sstream>
+#include <vtksys/SystemTools.hxx>
 
 //============================================================================
 /**
@@ -396,6 +401,13 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* filename)
     return false;
   }
 
+  auto format = this->GetFormatProxy(filename);
+  if (!format)
+  {
+    vtkErrorMacro("Failed to determine format for '" << filename << "'");
+    return false;
+  }
+
   SM_SCOPED_TRACE(SaveCameras)
     .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
@@ -407,12 +419,25 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* filename)
     .arg("mode_screenshot", 1);
 
   vtkSmartPointer<vtkImageData> img = this->CaptureImage();
-  int quality = vtkSMPropertyHelper(this, "ImageQuality").GetAsInt();
-  quality = std::max(0, quality);
-  quality = std::min(100, quality);
   if (img && vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
   {
-    return vtkSMUtilities::SaveImage(img.GetPointer(), filename, quality) == vtkErrorCode::NoError;
+    auto writer = vtkImageWriter::SafeDownCast(format->GetClientSideObject());
+    if (writer)
+    {
+      vtkTimerLog::MarkStartEvent("Write image to disk");
+      writer->SetFileName(filename);
+      writer->SetInputData(img);
+      writer->Write();
+      writer->SetInputData(nullptr);
+      vtkTimerLog::MarkEndEvent("Write image to disk");
+      return writer->GetErrorCode() == vtkErrorCode::NoError;
+    }
+    else
+    {
+      vtkErrorMacro("Format writer not a 'vtkImageWriter'. "
+                    " Failed to write '"
+        << filename << "'.");
+    }
   }
   return false;
 }
@@ -633,8 +658,17 @@ bool vtkSMSaveScreenshotProxy::Cleanup()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSaveScreenshotProxy::UpdateSaveAllViewsPanelVisibility()
+void vtkSMSaveScreenshotProxy::UpdateDefaultsAndVisibilities(const char* filename)
 {
+  if (filename)
+  {
+    // pick correct "format" as the default.
+    if (auto proxy = this->GetFormatProxy(filename))
+    {
+      vtkSMPropertyHelper(this, "Format").Set(proxy);
+    }
+  }
+
   vtkSMViewLayoutProxy* layout =
     vtkSMViewLayoutProxy::SafeDownCast(vtkSMPropertyHelper(this, "Layout").GetAsProxy());
   if (layout == NULL || (layout->GetViews().size() <= 1))
@@ -642,10 +676,7 @@ bool vtkSMSaveScreenshotProxy::UpdateSaveAllViewsPanelVisibility()
     this->GetProperty("SaveAllViews")->SetPanelVisibility("never");
     this->GetProperty("SeparatorWidth")->SetPanelVisibility("never");
     this->GetProperty("SeparatorColor")->SetPanelVisibility("never");
-    return false;
   }
-
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -704,6 +735,93 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage(
   vtkSMPropertyHelper(shProxy, "ImageResolution").Set(size.GetData(), 2);
   controller->PostInitializeProxy(shProxy);
   return shProxy->CaptureImage();
+}
+
+namespace detail
+{
+std::pair<std::string, std::vector<vtksys::String> > GetFormatOptions(vtkSMProxy* proxy)
+{
+  using pair_type = std::pair<std::string, std::vector<vtksys::String> >;
+  vtkPVXMLElement* hints =
+    proxy->GetHints() ? proxy->GetHints()->FindNestedElementByName("FormatOptions") : nullptr;
+  if (hints && hints->GetAttribute("extensions") && hints->GetAttribute("file_description"))
+  {
+    const std::string desc(hints->GetAttribute("file_description"));
+    const auto exts = vtksys::SystemTools::SplitString(hints->GetAttribute("extensions"), ' ');
+    return pair_type(desc, exts);
+  }
+  return pair_type();
+}
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSaveScreenshotProxy::GetFileFormatFilters()
+{
+  std::ostringstream str;
+  auto pxm = this->GetSessionProxyManager();
+  const auto pld = this->GetProperty("Format")->FindDomain<vtkSMProxyListDomain>();
+  for (const auto& proxyType : pld->GetProxyTypes())
+  {
+    if (auto formatProxy =
+          pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
+    {
+      const auto options = detail::GetFormatOptions(formatProxy);
+      if (options.second.size() == 0)
+      {
+        continue;
+      }
+      if (str.tellp() != std::ostringstream::pos_type(0))
+      {
+        str << ";;";
+      }
+      str << options.first << " (";
+      bool add_space = false;
+      for (const auto& anext : options.second)
+      {
+        if (add_space)
+        {
+          str << " ";
+        }
+        str << "*." << anext;
+        add_space = true;
+      }
+      str << ")";
+    }
+  }
+  return str.str();
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSaveScreenshotProxy::GetFormatProxy(const std::string& filename)
+{
+  auto extension = vtksys::SystemTools::GetFilenameLastExtension(filename);
+  extension.erase(0, 1);
+  if (extension.size() == 0)
+  {
+    vtkErrorMacro("Unknown file format for '" << filename << "'.");
+  }
+  auto pxm = this->GetSessionProxyManager();
+  const auto pld = this->GetProperty("Format")->FindDomain<vtkSMProxyListDomain>();
+  for (const auto& proxyType : pld->GetProxyTypes())
+  {
+    if (auto formatProxy =
+          pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
+    {
+      const auto options = detail::GetFormatOptions(formatProxy);
+      if (options.second.size() > 0)
+      {
+        const auto& exts = options.second;
+        auto iter = std::find(exts.begin(), exts.end(), extension);
+        if (iter != exts.end())
+        {
+          auto proxy = pld->FindProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str());
+          assert(proxy != nullptr);
+          return proxy;
+        }
+      }
+    }
+  }
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

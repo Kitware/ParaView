@@ -58,11 +58,9 @@ public:
   virtual vtkSmartPointer<vtkImageData> CaptureImage();
 
   /**
-   * Convenience method to update the panel visibility for properties that may
-   * not be relevant if only 1 view is available.
-   * @returns true if saving multiple views is feasible, otherwise false.
+   * Updates default property values for saving the given file.
    */
-  bool UpdateSaveAllViewsPanelVisibility();
+  virtual void UpdateDefaultsAndVisibilities(const char* filename);
 
   /**
    * This method can be used to capture an image for a view for a specific resolution
@@ -103,6 +101,14 @@ public:
    */
   static int ComputeMagnification(const vtkVector2i& targetSize, vtkVector2i& size);
 
+  //@{
+  /**
+   * Convenience method to derive a QFileDialog friendly format string for
+   * extensions supported by this proxy.
+   */
+  std::string GetFileFormatFilters();
+  //@}
+
 protected:
   vtkSMSaveScreenshotProxy();
   ~vtkSMSaveScreenshotProxy() override;
@@ -126,6 +132,13 @@ protected:
 
   vtkSMViewLayoutProxy* GetLayout();
   vtkSMViewProxy* GetView();
+
+  /**
+   * Select the format proxy to match the given extension. In otherwords, this
+   * changes the "Format" proxy-property to have the writer proxy from the
+   * domain that supports the given filename.
+   */
+  vtkSMProxy* GetFormatProxy(const std::string& filename);
 
 private:
   vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) = delete;

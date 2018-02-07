@@ -10,9 +10,9 @@
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/Height" command="set_string" arguments="300" />
   <pqevent object="pqClientMainWindow/pqLockViewSizeCustomDialog/ButtonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/colorlegendscaledscreenshot.png" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/scaleBy/2X" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/colorlegendscaledscreenshot.png" />
 
   <!-- compare the saved screenshot -->
   <pqcompareimage image="$PARAVIEW_TEST_ROOT/colorlegendscaledscreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/ColorLegendScaledScreenshot.png" />

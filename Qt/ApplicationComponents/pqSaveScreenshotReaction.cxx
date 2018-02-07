@@ -78,23 +78,33 @@ void pqSaveScreenshotReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-QString pqSaveScreenshotReaction::promptFileName()
+QString pqSaveScreenshotReaction::promptFileName(
+  vtkSMSaveScreenshotProxy* prototype, const QString& defaultExtension)
 {
-  QString lastUsedExt;
-  // Load the most recently used file extensions from QSettings, if available.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings->contains("extensions/ScreenshotExtension"))
+  if (!prototype)
   {
-    lastUsedExt = settings->value("extensions/ScreenshotExtension").toString();
+    qWarning("No `prototype` proxy specified.");
+    return QString();
   }
 
-  QString filters("PNG image (*.png);;JPG image (*.jpg);;TIFF image (*.tif)"
-                  ";;BMP image (*.bmp);;PPM image (*.ppm)");
+  const QString skey =
+    QString("extensions/%1/%2").arg(prototype->GetXMLGroup()).arg(prototype->GetXMLName());
+
+  // Load the most recently used file extensions from QSettings, if available.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  const QString lastUsedExt = settings->value(skey, defaultExtension).toString();
+
+  auto filters = prototype->GetFileFormatFilters();
+  if (filters.size() == 0)
+  {
+    qWarning("No image writers detected.");
+    return QString();
+  }
 
   pqFileDialog file_dialog(
-    NULL, pqCoreUtilities::mainWidget(), tr("Save Screenshot:"), QString(), filters);
+    NULL, pqCoreUtilities::mainWidget(), tr(prototype->GetXMLLabel()), QString(), filters.c_str());
   file_dialog.setRecentlyUsedExtension(lastUsedExt);
-  file_dialog.setObjectName("FileSaveScreenshotDialog");
+  file_dialog.setObjectName(QString("%1FileDialog").arg(prototype->GetXMLName()));
   file_dialog.setFileMode(pqFileDialog::AnyFile);
   if (file_dialog.exec() != QDialog::Accepted)
   {
@@ -103,8 +113,7 @@ QString pqSaveScreenshotReaction::promptFileName()
 
   QString file = file_dialog.getSelectedFiles()[0];
   QFileInfo fileInfo(file);
-  lastUsedExt = QString("*.") + fileInfo.suffix();
-  settings->setValue("extensions/ScreenshotExtension", lastUsedExt);
+  settings->setValue(skey, fileInfo.suffix().prepend("*."));
   return file;
 }
 
@@ -120,7 +129,6 @@ void pqSaveScreenshotReaction::saveScreenshot()
 
   vtkSMViewProxy* viewProxy = view->getViewProxy();
   vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
-
   vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("misc", "SaveScreenshot"));
@@ -128,6 +136,13 @@ void pqSaveScreenshotReaction::saveScreenshot()
   if (!shProxy)
   {
     qCritical() << "Incorrect type for `SaveScreenshot` proxy.";
+    return;
+  }
+
+  // Get the filename first, this will determine some of the options shown.
+  QString filename = pqSaveScreenshotReaction::promptFileName(shProxy, "*.png");
+  if (filename.isEmpty())
+  {
     return;
   }
 
@@ -152,9 +167,9 @@ void pqSaveScreenshotReaction::saveScreenshot()
   controller->PreInitializeProxy(shProxy);
   vtkSMPropertyHelper(shProxy, "View").Set(viewProxy);
   vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
+  shProxy->UpdateDefaultsAndVisibilities(filename.toLocal8Bit().data());
   controller->PostInitializeProxy(shProxy);
 
-  shProxy->UpdateSaveAllViewsPanelVisibility();
   if (layout)
   {
     int previewMode[2] = { -1, -1 };
@@ -182,11 +197,7 @@ void pqSaveScreenshotReaction::saveScreenshot()
   dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)
   {
-    QString filename = pqSaveScreenshotReaction::promptFileName();
-    if (!filename.isEmpty())
-    {
-      shProxy->WriteImage(filename.toLocal8Bit().data());
-    }
+    shProxy->WriteImage(filename.toLocal8Bit().data());
   }
 
   if (layout)
