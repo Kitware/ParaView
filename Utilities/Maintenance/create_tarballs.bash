@@ -115,7 +115,7 @@ find_data_objects () {
             case "$path" in
                 *.md5)
                     # Build the path to the object.
-                    echo "MD5/$( git cat-file blob $obj )"
+                    echo "MD5,$( git cat-file blob $obj ),$path"
                     ;;
                 *)
                     die "unknown ExternalData content link: $path"
@@ -134,8 +134,12 @@ index_data_objects () {
     local path
     local file
     local obj
+    local realpath
+    local userealpath="$1"
+    readonly userealpath
+    shift
 
-    while IFS=/ read algo hash; do
+    while IFS=, read algo hash realpath; do
         # Final path in the source tarball.
         path=".ExternalData/$algo/$hash"
 
@@ -148,17 +152,30 @@ index_data_objects () {
         # Validate the file (catches 404 pages and the like).
         validate "$algo" "$file" "$hash"
         obj="$( git hash-object -t blob -w "$file" )"
-        echo "100644 blob $obj	$path"
+        case "$userealpath" in
+          "1")
+            echo "100644 blob $obj	$realpath"
+            ;;
+          *)
+            echo "100644 blob $obj	$path"
+            ;;
+        esac
     done | \
         git update-index --index-info
 
     check_pipeline
 }
 
-# Puts data objects into an index file.
+# Puts test-data objects into an index file.
+load_testdata_objects () {
+    find_data_objects "$@" | \
+        index_data_objects "0"
+}
+
+# Puts paraview-data objects into an index file.
 load_data_objects () {
     find_data_objects "$@" | \
-        index_data_objects
+        index_data_objects "1"
 }
 
 # Loads existing data files into an index file.
@@ -355,7 +372,19 @@ for format in $formats; do
         result=1
 done
 
-info "Loading data for $commit..."
+info "Loading testing data for $commit..."
+rm -f "$GIT_INDEX_FILE"
+load_testdata_objects "$commit"
+load_data_files "$commit"
+tree="$( git write-tree )"
+
+info "Generating testing data archive(s)..."
+for format in $formats; do
+    git_archive "$format" "$tree" "ParaViewTestingData-$version" "ParaView-$version" || \
+        result=1
+done
+
+info "Loading data tree from $commit..."
 rm -f "$GIT_INDEX_FILE"
 load_data_objects "$commit"
 load_data_files "$commit"
