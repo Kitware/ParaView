@@ -3310,7 +3310,7 @@ array.
         <Documentation>This property specifies the input of the
         filter.</Documentation>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkNonOverlappingAMR" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
                           name="input_array"
