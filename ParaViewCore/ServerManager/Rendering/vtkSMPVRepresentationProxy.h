@@ -360,6 +360,12 @@ protected:
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
+   * In case of UseSeparateColorMap enabled, this function prefix the given
+   * arrayname with unique identifier, otherwise it acts as a passthrough.
+   */
+  std::string GetDecoratedArrayName(const std::string& arrayname);
+
+  /**
    * Internal method to set scalar coloring, do not use directly.
    */
   virtual bool SetScalarColoringInternal(

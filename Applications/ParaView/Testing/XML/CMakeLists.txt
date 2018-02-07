@@ -414,6 +414,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReaction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLinkReactionNonConverted.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SeparatedColorMap.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SeparatedColorMapOpacity.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SliceWithPlane.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SliceWithPlaneMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SortLineChartData.xml
@@ -713,6 +714,7 @@ set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 # We don't support volume rendering of image data in data server & render server mode
 set(LoadSaveStateVolume_DISABLE_CRS TRUE)
+set(SeparatedColorMapOpacity_DISABLE_CRS TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRContour_DISABLE_CS TRUE)
