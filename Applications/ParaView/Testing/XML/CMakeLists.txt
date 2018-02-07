@@ -199,9 +199,18 @@ if (NOT APPLE)
     ${CMAKE_CURRENT_SOURCE_DIR}/HistogramSelection.xml)
 endif()
 
-# Catalyst-Live tests
+# Catalyst tests
 # ----------------------------------------------------------------------
 if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
+
+  add_client_tests("pv"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/CatalystGUI.xml )
+  set_tests_properties(pv.CatalystGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+  add_client_tests("pv"
+    LOAD_PLUGIN "CatalystScriptGeneratorPlugin"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/CatalystCinemaGUI.xml )
+  set_tests_properties(pv.CatalystCinemaGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+
   set (catalyst_live_tests
     CatalystLiveSetBreakpoint
     CatalystLivePause)

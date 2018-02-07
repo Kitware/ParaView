@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPActionsGroup.cxx
+   Module:    pqCatalystExportStateWizard.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCPActionsGroup.h"
+#ifndef pqCatalystExportStateWizard_h
+#define pqCatalystExportStateWizard_h
 
-#include "pqCPExportStateWizard.h"
-#include "pqCoreUtilities.h"
+#include "pqComponentsModule.h"
+#include "pqSGExportStateWizard.h"
 
-//-----------------------------------------------------------------------------
-pqCPActionsGroup::pqCPActionsGroup(QObject* parentObject)
-  : Superclass(parentObject)
+class PQCOMPONENTS_EXPORT pqCatalystExportStateWizard : public pqSGExportStateWizard
 {
-  QAction* export_action = this->addAction("Export State");
-  export_action->setToolTip("Export state for co-processing");
-  export_action->setStatusTip("Export state for co-processing");
+  Q_OBJECT
+  typedef pqSGExportStateWizard Superclass;
 
-  QObject::connect(export_action, SIGNAL(triggered()), this, SLOT(exportState()));
-}
+public:
+  pqCatalystExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
+  virtual ~pqCatalystExportStateWizard();
 
-//-----------------------------------------------------------------------------
-pqCPActionsGroup::~pqCPActionsGroup()
-{
-}
+  virtual void customize();
 
-//-----------------------------------------------------------------------------
-void pqCPActionsGroup::exportState()
-{
-  pqCPExportStateWizard wizard(pqCoreUtilities::mainWidget());
-  wizard.customize();
-  wizard.exec();
-}
+protected:
+  virtual bool getCommandString(QString& command);
+
+private:
+  Q_DISABLE_COPY(pqCatalystExportStateWizard)
+};
+
+#endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCPActionsGroup.h
+   Module:    pqCatalystScriptGeneratorReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,26 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqCPActionsGroup_h
-#define pqCPActionsGroup_h
+#include "pqCatalystScriptGeneratorReaction.h"
+#include "vtkPVConfig.h"
 
-#include <QActionGroup>
-
-// Adds actions for co-processing.
-class pqCPActionsGroup : public QActionGroup
-{
-  Q_OBJECT
-  typedef QActionGroup Superclass;
-
-public:
-  pqCPActionsGroup(QObject* parent = 0);
-  virtual ~pqCPActionsGroup();
-
-protected slots:
-  void exportState();
-
-private:
-  Q_DISABLE_COPY(pqCPActionsGroup)
-};
-
+#include "pqCoreUtilities.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqCatalystExportStateWizard.h"
 #endif
+#include <iostream>
+
+//-----------------------------------------------------------------------------
+pqCatalystScriptGeneratorReaction::pqCatalystScriptGeneratorReaction(QAction* parentObject)
+  : Superclass(parentObject)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqCatalystScriptGeneratorReaction::~pqCatalystScriptGeneratorReaction()
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqCatalystScriptGeneratorReaction::onTriggered()
+{
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqCatalystExportStateWizard wizard(pqCoreUtilities::mainWidget());
+  wizard.customize();
+  wizard.exec();
+#endif
+}
