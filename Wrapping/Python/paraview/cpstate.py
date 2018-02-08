@@ -422,7 +422,6 @@ def run(filename=None):
         specified, if any, else dumps it out on stdout."""
 
     from paraview import simple, servermanager
-    simple.LoadDistributedPlugin("CatalystScriptGeneratorPlugin")
     wavelet = simple.Wavelet(registrationName="Wavelet1")
     contour = simple.Contour()
     display = simple.Show()
