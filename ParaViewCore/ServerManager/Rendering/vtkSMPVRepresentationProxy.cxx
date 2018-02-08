@@ -510,26 +510,13 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
 
   // Now, setup transfer functions.
   bool haveComponent = useComponent;
-  bool separate = false;
+  bool separate = (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt() != 0);
+  std::string decoratedArrayName = this->GetDecoratedArrayName(arrayname);
   vtkNew<vtkSMTransferFunctionManager> mgr;
   if (vtkSMProperty* lutProperty = this->GetProperty("LookupTable"))
   {
-    std::string name;
-    if (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt())
-    {
-      // Use global id for separate color map
-      std::ostringstream ss;
-      ss << "Separate_" << this->GetGlobalIDAsString() << "_" << arrayname;
-      name = ss.str();
-      separate = true;
-    }
-    else
-    {
-      name = arrayname;
-    }
-
     vtkSMProxy* lutProxy =
-      mgr->GetColorTransferFunction(name.c_str(), this->GetSessionProxyManager());
+      mgr->GetColorTransferFunction(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     if (useComponent)
     {
       if (component >= 0)
@@ -603,12 +590,25 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
   if (vtkSMProperty* sofProperty = this->GetProperty("ScalarOpacityFunction"))
   {
     vtkSMProxy* sofProxy =
-      mgr->GetOpacityTransferFunction(arrayname, this->GetSessionProxyManager());
+      mgr->GetOpacityTransferFunction(decoratedArrayName.c_str(), this->GetSessionProxyManager());
     vtkSMPropertyHelper(sofProperty).Set(sofProxy);
   }
 
   this->UpdateVTKObjects();
   return true;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMPVRepresentationProxy::GetDecoratedArrayName(const std::string& arrayname)
+{
+  if (vtkSMPropertyHelper(this, "UseSeparateColorMap", true).GetAsInt())
+  {
+    // Use global id for separate color map
+    std::ostringstream ss;
+    ss << "Separate_" << this->GetGlobalIDAsString() << "_" << arrayname;
+    return ss.str();
+  }
+  return arrayname;
 }
 
 //----------------------------------------------------------------------------
