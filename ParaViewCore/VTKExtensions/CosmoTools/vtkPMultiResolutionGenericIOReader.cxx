@@ -48,7 +48,6 @@ class vtkPMultiResolutionGenericIOReader::vtkInternal
 public:
   std::vector<resolution_t> Resolutions;
   int NumberOfBlocksPerLevel;
-  Json::Reader JsonReader;
 
   void AddLevel(int level)
   {
@@ -77,8 +76,11 @@ public:
 
   bool ParseJson(const std::string& parentDir, std::istream& jsonIn)
   {
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
+
     Json::Value root;
-    if (!JsonReader.parse(jsonIn, root))
+    if (!parseFromStream(builder, jsonIn, &root, nullptr))
     {
       JSON_READ_ERROR();
     }

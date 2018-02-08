@@ -760,8 +760,9 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArr
   if (this->UseJsonMetaFile)
   {
     Json::Value root;
-    Json::Reader reader;
-    bool parsingSuccessful = reader.parse(metafile, root);
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
+    bool parsingSuccessful = parseFromStream(builder, metafile, &root, nullptr);
     if (parsingSuccessful)
     {
       if (!root.isMember("file-series-version"))
