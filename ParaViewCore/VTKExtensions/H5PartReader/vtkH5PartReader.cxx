@@ -336,7 +336,7 @@ int vtkH5PartReader::RequestInformation(vtkInformation* vtkNotUsed(request),
             this->H5FileId, a, attribName, attribNameLength, &attribType, &attribNelem);
           if (status == H5PART_SUCCESS && !strncmp("TimeValue", attribName, attribNameLength))
           {
-            if (H5Tequal(attribType, H5T_NATIVE_DOUBLE) && attribNelem == 1)
+            if (H5Tequal(attribType, H5T_NATIVE_DOUBLE) > 0 && attribNelem == 1)
             {
               status = H5PartReadStepAttrib(this->H5FileId, attribName, &this->TimeStepValues[i]);
               if (status == H5PART_SUCCESS)
@@ -388,41 +388,41 @@ int vtkH5PartReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   return 1;
 }
 
-int GetVTKDataType(int datatype)
+int GetVTKDataType(hid_t datatype)
 {
-  if (H5Tequal(datatype, H5T_NATIVE_FLOAT))
+  if (H5Tequal(datatype, H5T_NATIVE_FLOAT) > 0)
   {
     return VTK_FLOAT;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_DOUBLE))
+  else if (H5Tequal(datatype, H5T_NATIVE_DOUBLE) > 0)
   {
     return VTK_DOUBLE;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_SCHAR))
+  else if (H5Tequal(datatype, H5T_NATIVE_SCHAR) > 0)
   {
     return VTK_CHAR;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_UCHAR))
+  else if (H5Tequal(datatype, H5T_NATIVE_UCHAR) > 0)
   {
     return VTK_UNSIGNED_CHAR;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_SHORT))
+  else if (H5Tequal(datatype, H5T_NATIVE_SHORT) > 0)
   {
     return VTK_SHORT;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_USHORT))
+  else if (H5Tequal(datatype, H5T_NATIVE_USHORT) > 0)
   {
     return VTK_UNSIGNED_SHORT;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_INT))
+  else if (H5Tequal(datatype, H5T_NATIVE_INT) > 0)
   {
     return VTK_INT;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_UINT))
+  else if (H5Tequal(datatype, H5T_NATIVE_UINT) > 0)
   {
     return VTK_UNSIGNED_INT;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_LONG))
+  else if (H5Tequal(datatype, H5T_NATIVE_LONG) > 0)
   {
 #if VTK_SIZEOF_LONG == VTK_SIZEOF_INT
     return VTK_INT;
@@ -430,7 +430,7 @@ int GetVTKDataType(int datatype)
     return VTK_LONG_LONG;
 #endif
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_ULONG))
+  else if (H5Tequal(datatype, H5T_NATIVE_ULONG) > 0)
   {
 #if VTK_SIZEOF_LONG == VTK_SIZEOF_INT
     return VTK_UNSIGNED_INT;
@@ -438,11 +438,11 @@ int GetVTKDataType(int datatype)
     return VTK_UNSIGNED_LONG_LONG;
 #endif
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_LLONG))
+  else if (H5Tequal(datatype, H5T_NATIVE_LLONG) > 0)
   {
     return VTK_LONG_LONG;
   }
-  else if (H5Tequal(datatype, H5T_NATIVE_ULLONG))
+  else if (H5Tequal(datatype, H5T_NATIVE_ULLONG) > 0)
   {
     return VTK_UNSIGNED_LONG_LONG;
   }
@@ -762,7 +762,7 @@ int vtkH5PartReader::RequestData(vtkInformation* vtkNotUsed(request),
         offset_mem[0] = c;
         H5Sselect_hyperslab(memspace, H5S_SELECT_SET, offset_mem, stride_mem, count2_mem, nullptr);
 
-        if (component_datatype == datatype)
+        if (H5Tequal(component_datatype, datatype) > 0)
         {
           H5Dread(
             dataset, datatype, memspace, diskshape, H5P_DEFAULT, dataarray->GetVoidPointer(0));
