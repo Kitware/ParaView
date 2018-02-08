@@ -625,7 +625,7 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 
   menu.addSeparator(); // --------------------------------------------------
   pqSGWritersMenuManager* menuMgr =
-    new pqSGWritersMenuManager(&menu, "&Writers", "CPProxyWritersMenu", nullptr);
+    new pqSGWritersMenuManager(&menu, "&Writers", "CatalystWritersMenu", nullptr);
   menuMgr->createMenu();
 #endif
 }
