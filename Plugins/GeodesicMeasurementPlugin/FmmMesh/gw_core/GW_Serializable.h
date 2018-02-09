@@ -147,7 +147,7 @@ public:
     {
         // nothing
     }
-    /** get the name of the class, usefull for the class factory */
+    /** get the name of the class, useful for the class factory */
     virtual string GetClassName()
     {
         return string("undefined");

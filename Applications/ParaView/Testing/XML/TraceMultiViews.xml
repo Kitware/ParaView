@@ -96,5 +96,5 @@
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 
   <!-- FIXME: this test doesn't do baseline compares yet. Some issue with state
-       not saveing view layout and GUI not respecting active view from Python need to be fixed first. -->
+       not saving view layout and GUI not respecting active view from Python need to be fixed first. -->
 </pqevents>

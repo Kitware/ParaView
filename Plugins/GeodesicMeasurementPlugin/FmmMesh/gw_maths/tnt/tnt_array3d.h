@@ -59,7 +59,7 @@ namespace TNT
     This class employs its own garbage collection via
     the use of reference counts.  That is, whenever
     an internal array storage no longer has any references
-    to it, it is destoryed.
+    to it, it is destroyed.
 */
 template <class T>
 class Array3D
@@ -122,7 +122,7 @@ Array3D<T>::Array3D(const Array3D<T> &A) : v_(A.v_), m_(A.m_),
 
 
 /**
-    Create a new (m x n x k) array, WIHOUT initializing array elements.
+    Create a new (m x n x k) array, WITHOUT initializing array elements.
     To create an initialized array of constants, see Array3D(m,n,k, value).
 
     <p>
@@ -184,7 +184,7 @@ Array3D<T>::Array3D(int m, int n, int k, T *a) : v_(0), m_(m), n_(n) ,
 {
     initialize_(a, m, n, k);
     ref_count_ = new int;
-    *ref_count_ = 2;        /* this avoids destorying original data. */
+    *ref_count_ = 2;        /* this avoids destroying original data. */
 
 }
 
@@ -256,7 +256,7 @@ Array3D<T> Array3D<T>::copy() const
     a new array B which shares no data with C or A.
 
     @param A the array from elements will be copied
-    @return an instance of the modifed array. That is, in B.inject(A),
+    @return an instance of the modified array. That is, in B.inject(A),
     it returns B.  If A and B are not conformat, no modifications to
     B are made.
 

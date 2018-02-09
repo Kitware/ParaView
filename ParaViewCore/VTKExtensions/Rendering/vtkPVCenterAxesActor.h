@@ -36,7 +36,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * If Symetric is on, the the axis continue to negative values.
+   * If Symmetric is on, the the axis continue to negative values.
    */
   void SetSymmetric(int);
 

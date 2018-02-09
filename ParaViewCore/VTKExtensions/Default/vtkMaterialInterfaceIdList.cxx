@@ -101,7 +101,7 @@ void vtkMaterialInterfaceIdList::Initialize(const std::vector<int>& ids, bool pr
 //
 int vtkMaterialInterfaceIdList::GetLocalId(int globalId)
 {
-  assert("The object must be intialized before querries are made." && this->IsInitialized);
+  assert("The object must be initialized before queries are made." && this->IsInitialized);
 
   const int firstListItem = 0;
   const int lastListItem = static_cast<int>(this->IdList->size()) - 1;

@@ -22,7 +22,7 @@ GW_Vector3D operator^( const GW_VectorStatic<3,GW_Float>& v1, const GW_VectorSta
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_Vector3D
- *  \brief  A 3D vector, with usefull operators and methods.
+ *  \brief  A 3D vector, with useful operators and methods.
  *  \author Gabriel Peyré 2001-09-10
  *
  *    This class is used every where ...

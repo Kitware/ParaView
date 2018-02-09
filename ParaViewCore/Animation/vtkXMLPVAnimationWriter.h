@@ -17,7 +17,7 @@
  * @brief   Data writer for ParaView
  *
  * vtkXMLPVAnimationWriter is used to save all parts of a current
- * source to a file with pieces spread across ther server processes.
+ * source to a file with pieces spread across other server processes.
 */
 
 #ifndef vtkXMLPVAnimationWriter_h

@@ -150,7 +150,7 @@ public:
   //---------------------------------------------------------------------------
 
   // Called before application quit or session disconnection
-  // Used to prevent quiting client to delete proxy of a running session.
+  // Used to prevent quitting client to delete proxy of a running session.
   void PreDisconnection() override;
 
   /**
@@ -159,13 +159,13 @@ public:
   virtual bool IsNotBusy();
   /**
    * BusyWork should be declared inside method that will request several
-   * network call that we don't want to interupt such as GatherInformation
+   * network call that we don't want to interrupt such as GatherInformation
    * and Pull.
    */
   virtual void StartBusyWork();
   /**
    * BusyWork should be declared inside method that will request several
-   * network call that we don't want to interupt such as GatherInformation
+   * network call that we don't want to interrupt such as GatherInformation
    * and Pull.
    */
   virtual void EndBusyWork();
@@ -197,7 +197,7 @@ public:
   /**
    * Provides the next available identifier. This implementation works locally.
    * without any code distribution. To support the distributed architecture
-   * the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+   * the vtkSMSessionClient override those method to call them on the DATA_SERVER
    * vtkPVSessionBase instance.
    */
   vtkTypeUInt32 GetNextGlobalUniqueIdentifier() override;

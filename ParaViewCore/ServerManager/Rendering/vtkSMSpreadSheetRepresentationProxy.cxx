@@ -47,7 +47,7 @@ void vtkSMSpreadSheetRepresentationProxy::SetPropertyModifiedFlag(const char* na
         }
         else
         {
-          // We use these internal properties since we need to add consumer dependecy
+          // We use these internal properties since we need to add consumer dependency
           // on this proxy so that MarkModified() is called correctly.
           vtkSMPropertyHelper(this, "InternalInput1").Set(esProxy, 0);
           this->UpdateProperty("InternalInput1");

@@ -339,7 +339,7 @@ bool vtkMPIMoveData::GetOutputGeneratedOnProcess()
 }
 
 //-----------------------------------------------------------------------------
-// This filter  is going to replace the many variations of collection fitlers.
+// This filter  is going to replace the many variations of collection filters.
 // It handles collection and duplication.
 // It handles poly data and unstructured grid.
 // It handles rendering on the data server and render server.
@@ -924,7 +924,7 @@ void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataObject* output)
   com = this->ClientDataServerSocketController->GetCommunicator();
   if (com == 0)
   {
-    vtkErrorMacro("Missing socket controler on cleint.");
+    vtkErrorMacro("Missing socket controler on client.");
     return;
   }
 

@@ -6,7 +6,7 @@
 
 
 /** \file
-    This file contains the defintion of a quaternion, wich can be used to
+    This file contains the definition of a quaternion, which can be used to
     represent a rotation, and is mainly used for animation purposes.
     \author Gabriel.
 **/

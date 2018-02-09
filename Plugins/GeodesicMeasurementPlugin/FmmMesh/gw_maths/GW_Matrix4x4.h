@@ -105,10 +105,10 @@ public:
     /**
     * Name : GW_Matrix4x4::TransformOnZ
     *
-    *  \param  x X component of the orginal vector.
-    *  \param  y Y component of the orginal vector.
-    *  \param  z Z component of the orginal vector.
-    *  \return The X coordinate of the oringal vector tranformed by the matrix.
+    *  \param  x X component of the original vector.
+    *  \param  y Y component of the original vector.
+    *  \param  z Z component of the original vector.
+    *  \return The X coordinate of the oringal vector transformed by the matrix.
     *  \author Gabriel Peyré 2001-10-30
     *
     *    This speed up computation when you only needs depth information (used by
@@ -123,8 +123,8 @@ public:
     /**
     * Name : GW_Matrix4x4::TransformOnZ
     *
-    *  \param  v the orginal vector.
-    *  \return The X coordinate of the oringal vector tranformed by the matrix.
+    *  \param  v the original vector.
+    *  \return The X coordinate of the oringal vector transformed by the matrix.
     *  \author Gabriel Peyré 2001-10-30
     *
     *    This speed up computation when you only needs depth information (used by

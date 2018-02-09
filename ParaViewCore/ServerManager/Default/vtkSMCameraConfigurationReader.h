@@ -18,7 +18,7 @@
  *
  *
  * A reader for XML camera configuration. Reades camera configuration files.
- * writen by the vtkSMCameraConfigurationWriter.
+ * written by the vtkSMCameraConfigurationWriter.
  *
  * @sa
  * vtkSMCameraConfigurationWriter, vtkSMProxyConfigurationReader

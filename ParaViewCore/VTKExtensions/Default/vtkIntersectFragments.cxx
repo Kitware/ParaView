@@ -493,7 +493,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
     // computed directly.
     vector<int> intersectSplitMarker;
     // intilize to (bool)0 not split. All local ops
-    // on fragments check here. It's coppied to geometry.
+    // on fragments check here. It's copied to geometry.
     intersectSplitMarker.resize(nLocal, 0);
     // Size the attribute arrays
     this->IntersectionCenters[blockId]->SetNumberOfComponents(3);
@@ -1192,7 +1192,7 @@ int vtkIntersectFragments::CopyAttributesToStatsOutput(const int controllingProc
     cells->Delete();
     va->Delete();
     // copy attributes, the output already has had
-    // the structure coppied, including names and
+    // the structure copied, including names and
     // number of comps.
     vtkPointData* pdSrc =
       dynamic_cast<vtkPolyData*>(this->StatsIn->GetBlock(blockId))->GetPointData();

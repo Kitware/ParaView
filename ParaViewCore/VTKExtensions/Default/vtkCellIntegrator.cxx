@@ -118,7 +118,7 @@ double vtkCellIntegrator::IntegratePolygon(vtkDataSet* input, vtkIdType cellId, 
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned rectangular cells
+// For axis aligned rectangular cells
 double vtkCellIntegrator::IntegratePixel(
   vtkDataSet* input, vtkIdType /*cellId*/, vtkIdList* cellPtIds)
 {
@@ -201,7 +201,7 @@ double vtkCellIntegrator::IntegrateGeneral2DCell(
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned hexahedral cells
+// For axis aligned hexahedral cells
 double vtkCellIntegrator::IntegrateVoxel(
   vtkDataSet* input, vtkIdType vtkNotUsed(cellId), vtkIdList* cellPtIds)
 {
@@ -220,7 +220,7 @@ double vtkCellIntegrator::IntegrateVoxel(
 
   double l, w, h;
 
-  // Calulate the volume of the voxel
+  // Calculate the volume of the voxel
   l = pts[1][0] - pts[0][0];
   w = pts[2][1] - pts[0][1];
   h = pts[4][2] - pts[0][2];
@@ -250,7 +250,7 @@ double vtkCellIntegrator::IntegrateTetrahedron(vtkDataSet* input, vtkIdType vtkN
     c[i] = pts[3][i] - pts[0][i];
   }
 
-  // Calulate the volume of the tet which is 1/6 * the box product
+  // Calculate the volume of the tet which is 1/6 * the box product
   vtkMath::Cross(a, b, n);
   volume = vtkMath::Dot(c, n) / 6.0;
   return volume;

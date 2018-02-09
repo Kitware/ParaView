@@ -106,7 +106,7 @@ public:
   void SetHistogramLineStyle(int style);
 
   /**
-   * Method to be overrided to transform input data to a vtkTable.
+   * Method to be overridden to transform input data to a vtkTable.
    */
   vtkDataObject* TransformInputData(
     vtkInformationVector** inputVector, vtkDataObject* data) VTK_OVERRIDE;

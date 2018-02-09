@@ -233,7 +233,7 @@ int vtkPVLegacyGlyphFilter::RequestData(
   newInInfo->Delete();
   inputVs[1] = inputVector[1];
 
-  // We have set all ofthe parameters that will be used in
+  // We have set all of the parameters that will be used in
   // our overloaded IsPoitVisible. Now let the glypher take over.
   newInInfo->Set(vtkDataObject::DATA_OBJECT(), dsInput);
   int retVal = this->Superclass::RequestData(request, inputVs, outputVector);
@@ -244,7 +244,7 @@ int vtkPVLegacyGlyphFilter::RequestData(
 
 //----------------------------------------------------------------------------
 // We are overloading this so that blanking will be supported
-// otehrwise we could use vtkMaskPoints filter.
+// otherwise we could use vtkMaskPoints filter.
 int vtkPVLegacyGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 {
   if (this->BlockGlyphAllPoints == 1)

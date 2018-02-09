@@ -365,7 +365,7 @@ bool vtkSMRangeDomainTemplate<T>::GetComputedDefaultValue(unsigned int index, T&
   int minExists, maxExists;
   T min, max;
 
-  // Using a modulo to be able to recover correct minium and maximum with repeatable properties
+  // Using a modulo to be able to recover correct minimum and maximum with repeatable properties
   min = this->GetMinimum(
     this->GetNumberOfEntries() > 0 ? index % this->GetNumberOfEntries() : index, minExists);
   max = this->GetMaximum(

@@ -301,7 +301,7 @@ void vtkCinemaLayerRepresentation::UpdateMapper()
       center[1] = (bounds[3] + bounds[2]) / 2.0;
       center[2] = (bounds[5] + bounds[4]) / 2.0;
 
-      // Get angle beetween the active camera and the layer one.
+      // Get angle between the active camera and the layer one.
       double activeUp[3];
       activeCamera->GetViewUp(activeUp);
       double layerUp[3];

@@ -2484,7 +2484,7 @@
                      name="SuppressedTimeSources"
                      remove_command="RemoveSuppressedTimeSource"
                      repeatable="1">
-        <Documentation>List of proxies that are to supressed i.e their times
+        <Documentation>List of proxies that are to suppressed i.e their times
           to be ignored.
         </Documentation>
       </ProxyProperty>
@@ -2668,7 +2668,7 @@
            processes="client|renderserver">
       <Documentation>This proxy is useful for changing global mapper settings
       such as the coincident topology resolution setting on all rendering
-      proceses.</Documentation>
+      processes.</Documentation>
       <IntVectorProperty command="SetResolveCoincidentTopology"
                          default_values="none"
                          name="Mode"
@@ -2736,7 +2736,7 @@
     </Proxy>
     <ViewLayoutProxy name="ViewLayout"
                      processes="client">
-      <Documentation>Proxy used to manage layout for mutliple views.</Documentation>
+      <Documentation>Proxy used to manage layout for multiple views.</Documentation>
       <IntVectorProperty name="PreviewMode"
         number_of_elements="2"
         default_values="0 0">
@@ -2765,7 +2765,7 @@
     <Proxy class="vtkViewLayout"
            name="InternalViewLayoutHelper"
            processes="renderserver">
-      <Documentation>Proxy used to manage layout for mutliple
+      <Documentation>Proxy used to manage layout for multiple
       views.</Documentation>
     </Proxy>
     <Proxy class="vtkPVRayCastPickingHelper"

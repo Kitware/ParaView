@@ -35,8 +35,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Provide a global method to store a data object accross processes and allow
-   * a given instance of TrivialProducer to use it based on its registred key.
+   * Provide a global method to store a data object across processes and allow
+   * a given instance of TrivialProducer to use it based on its registered key.
    */
   static void SetGlobalOutput(const char* key, vtkDataObject* output);
 
@@ -47,7 +47,7 @@ public:
   static void ReleaseGlobalOutput(const char* key);
 
   /**
-   * Update the current instance to use a previously registred global data object
+   * Update the current instance to use a previously registered global data object
    * as current output.
    */
   virtual void UpdateFromGlobal(const char* key);

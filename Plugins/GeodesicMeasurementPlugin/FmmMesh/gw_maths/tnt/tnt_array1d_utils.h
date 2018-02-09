@@ -36,7 +36,7 @@ std::ostream& operator<<(std::ostream &s, const Array1D<T> &A)
 /**
     Read an array from a character stream.  Input format
     is one integer, denoting the dimension (n), followed
-    by n whitespace-separated elments.  Newlines are ignored
+    by n whitespace-separated elements.  Newlines are ignored
 
     <p>
     Note: the array being read into references new memory
@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream &s, const Array1D<T> &A)
     array, use <code> cin >> B;  A.inject(B) ); </code>
     instead or read the elements in one-a-time by hand.
 
-    @param s the charater to read from (typically <code>std::in</code>)
+    @param s the character to read from (typically <code>std::in</code>)
     @param A the array to read into.
 */
 template <class T>

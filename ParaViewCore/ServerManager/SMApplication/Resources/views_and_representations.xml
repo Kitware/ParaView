@@ -22,7 +22,7 @@
                             panel_visibility="never"
                             state_ignored="1">
         <DoubleRangeDomain name="range" />
-        <Documentation>This is the cache key used to indentify which cache
+        <Documentation>This is the cache key used to identify which cache
         entry to use for rendering when caching is enabled.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetUseCache"
@@ -1501,7 +1501,7 @@
                             state_ignored="1"
                             is_internal="1">
         <DoubleRangeDomain name="range" />
-        <Documentation>This is the cache key used to indentify which cache
+        <Documentation>This is the cache key used to identify which cache
         entry to use for rendering when caching is enabled.</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty default_values="0"
@@ -4489,7 +4489,7 @@
                          name="MapScalars"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Enable/Disable independant component usage such a
+        <Documentation>Enable/Disable independent component usage such a
         unsigned char RGBA data array.</Documentation>
       </IntVectorProperty>
       <ProxyProperty command="SetScalarOpacity"
@@ -6142,7 +6142,7 @@
           use. This transformation is concatenated with the actor's internal
           transformation, which you implicitly create through the use of
           Position, Origin, Orientation. The value is 4x4 matrix for the linear
-          tranform to use.
+          transform to use.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -11006,7 +11006,7 @@
           use. This transformation is concatenated with the actor's internal
           transformation, which you implicitly create through the use of
           Position, Origin, Orientation. The value is 4x4 matrix for the linear
-          tranform to use.
+          transform to use.
         </Documentation>
       </DoubleVectorProperty>
 

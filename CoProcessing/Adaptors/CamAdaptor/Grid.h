@@ -93,7 +93,7 @@ private:
   /// These transformations match the transformation in the history file.
   double LevelToRadius(double level) const;
 
-  /// Compute the  location of  the points surounding  a cell  at index
+  /// Compute the  location of  the points surrounding  a cell  at index
   /// 'levIndex', 'latIndex' or 'lonIndex'
   void GetLevMinusPlus(int levIndex, double* levMinus, double* levPlus) const;
   void GetLatMinusPlus(int latIndex, double* latMinus, double* latPlus) const;

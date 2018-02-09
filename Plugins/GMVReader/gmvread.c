@@ -615,7 +615,7 @@ void gmvread_data()
       if ((feof(gmvinGlobal) != 0) | (ferror(gmvinGlobal) != 0)) iend = 1;
 
       /*  If comments keyword, read through comments,  */
-      /*  then read and proces next keyword.           */
+      /*  then read and process next keyword.           */
       if (strncmp(keyword,"comments",8) == 0)
         {
          readcomments(gmvinGlobal,ftypeGlobal);

@@ -132,7 +132,7 @@ public:
 
   //@{
   /**
-   * Turn off to not generate the markers for the tick positions. Which egdes
+   * Turn off to not generate the markers for the tick positions. Which edges
    * are rendered is defined by the TickMask.
    */
   void SetGenerateTicks(bool val);

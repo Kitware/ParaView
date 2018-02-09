@@ -254,7 +254,7 @@ void GenericFileIO_POSIX::open(const std::string& FN, bool ForReading)
   errno = 0;
 
 #ifdef _WIN32
-  // Windows POSIX Must explicitely define O_BINARY otherwise it defaults to text mode
+  // Windows POSIX Must explicitly define O_BINARY otherwise it defaults to text mode
   int flags = ForReading ? (O_RDONLY | O_BINARY) : (O_WRONLY | O_CREAT | O_BINARY);
   int mode = S_IRUSR | S_IWUSR;
   if ((FH = lanl::open(FileName.c_str(), flags, mode)) == -1)

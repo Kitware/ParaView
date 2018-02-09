@@ -58,7 +58,7 @@ namespace TNT
     This class employs its own garbage collection via
     the use of reference counts.  That is, whenever
     an internal array storage no longer has any references
-    to it, it is destoryed.
+    to it, it is destroyed.
 */
 template <class T>
 class Array2D
@@ -119,7 +119,7 @@ Array2D<T>::Array2D(const Array2D<T> &A) : v_(A.v_), m_(A.m_),
 
 
 /**
-    Create a new (m x n) array, WIHOUT initializing array elements.
+    Create a new (m x n) array, WITHOUT initializing array elements.
     To create an initialized array of constants, see Array2D(m,n,value).
 
     <p>
@@ -183,7 +183,7 @@ Array2D<T>::Array2D(int m, int n, T *a) : v_(0), m_(m), n_(n) ,
         p += n;
     }
     ref_count_ = new int;
-    *ref_count_ = 2;        /* this avoid destorying original data. */
+    *ref_count_ = 2;        /* this avoid destroying original data. */
 
 }
 
@@ -257,7 +257,7 @@ Array2D<T> Array2D<T>::copy() const
     a new array B which shares no data with C or A.
 
     @param A the array from elements will be copied
-    @return an instance of the modifed array. That is, in B.inject(A),
+    @return an instance of the modified array. That is, in B.inject(A),
     it returns B.  If A and B are not conformat, no modifications to
     B are made.
 

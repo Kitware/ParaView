@@ -1652,7 +1652,7 @@ double vtkGridConnectivity::ComputeTetrahedronVolume(
     c[i] = pts3[i] - pts0[i];
   }
 
-  // Calulate the volume of the tet which is 1/6 * the box product
+  // Calculate the volume of the tet which is 1/6 * the box product
   vtkMath::Cross(a, b, n);
   return fabs(vtkMath::Dot(c, n) / 6.0);
 }
@@ -1711,7 +1711,7 @@ double vtkGridConnectivity::IntegrateTetrahedron(
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned hexahedral cells
+// For axis aligned hexahedral cells
 double vtkGridConnectivity::IntegrateHex(vtkCell* hex, vtkUnstructuredGrid* input, int fragmentId)
 {
   vtkPoints* points = hex->GetPoints();
@@ -1766,7 +1766,7 @@ double vtkGridConnectivity::IntegrateHex(vtkCell* hex, vtkUnstructuredGrid* inpu
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned hexahedral cells
+// For axis aligned hexahedral cells
 double vtkGridConnectivity::IntegrateVoxel(
   vtkCell* voxel, vtkUnstructuredGrid* input, int fragmentId)
 {

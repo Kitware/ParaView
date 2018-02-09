@@ -65,7 +65,7 @@ protected:
   ~vtkSpyPlotHistoryReader() override;
 
   // Read the case file and the first binary file do get meta
-  // informations (number of files, number of fields, number of timestep).
+  // information (number of files, number of fields, number of timestep).
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 

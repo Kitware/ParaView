@@ -53,7 +53,7 @@ namespace TNT
     This class employs its own garbage collection via
     the use of reference counts.  That is, whenever
     an internal array storage no longer has any references
-    to it, it is destoryed.
+    to it, it is destroyed.
 */
 template <class T>
 class Fortran_Array1D
@@ -106,7 +106,7 @@ Fortran_Array1D<T>::Fortran_Array1D(const Fortran_Array1D<T> &A) : A_(A.A_) {}
 
 
 /**
-    Create a new (n) array, WIHOUT initializing array elements.
+    Create a new (n) array, WITHOUT initializing array elements.
     To create an initialized array of constants, see Fortran_Array1D(n, value).
 
     <p>
@@ -231,7 +231,7 @@ Fortran_Array1D<T> Fortran_Array1D<T>::copy()
     a new array B which shares no data with C or A.
 
     @param A the array from elements will be copied
-    @return an instance of the modifed array. That is, in B.inject(A),
+    @return an instance of the modified array. That is, in B.inject(A),
     it returns B.  If A and B are not conformat, no modifications to
     B are made.
 

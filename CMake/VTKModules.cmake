@@ -42,7 +42,7 @@ if (NOT WIN32)
 endif()
 
 set(_vtk_modules
-  # VTK modules which ParaView has a explicity compile
+  # VTK modules which ParaView has a explicitly compile
   # time dependency on
   vtkRenderingVolume
   vtkRenderingLabel

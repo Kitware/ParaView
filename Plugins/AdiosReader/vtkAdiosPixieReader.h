@@ -37,13 +37,13 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
-  // Decription:
+  // Description:
   // Set Read method (ADIOS_READ_METHOD_BP=0, ADIOS_READ_METHOD_DATASPACES=3)
   // The default value is 0, to be file base
   void SetReadMethod(int methodEnum);
 
   // Description:
-  // Set the Adios advanced paramters:
+  // Set the Adios advanced parameters:
   // Parameters are a series of name=value pairs separated by ";".
   // E.g. "max_chunk_size=200; app_id = 1".
   // List of parameters is documented for each method separately.

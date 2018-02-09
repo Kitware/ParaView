@@ -849,7 +849,7 @@ void vtkPVXYChartView::Update()
   // axes range until paint.
   // Also, when new data arrays show up in the representation's input,
   // the ServerManager sets up default series visibilities, and that code
-  // excutes in "PostUpdate". Hence, we don't trigger
+  // executes in "PostUpdate". Hence, we don't trigger
   // vtkChartRepresentation::PrepareForRendering() here, instead wait for the
   // subsequent render call.
 }

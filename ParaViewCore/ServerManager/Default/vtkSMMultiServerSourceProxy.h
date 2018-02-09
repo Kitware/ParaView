@@ -16,7 +16,7 @@
  * @class   vtkSMMultiServerSourceProxy
  *       - proxy use to fetch data from distributed servers
  *
- * vtkSMMultiServerSourceProxy can be usefull in case of multi-server setup
+ * vtkSMMultiServerSourceProxy can be useful in case of multi-server setup
  * when the user want to display a data object that belong to another server
  * into its local built-in view.
 */

@@ -133,7 +133,7 @@
     <string>Show Standard Viewpoint</string>
    </property>
    <property name="toolTip">
-    <string>Position the camera in a position convienient to see the entire mesh.</string>
+    <string>Position the camera in a position convenient to see the entire mesh.</string>
    </property>
   </action>
   <action name="actionTemporalResetRange">

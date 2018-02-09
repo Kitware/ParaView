@@ -18,7 +18,7 @@
  * elements.
  *
  * Abstract superclass for Server Manager undo elements.
- * This class keeps the session, so undoelement could work accross a set of
+ * This class keeps the session, so undoelement could work across a set of
  * communication Sessions.
 */
 

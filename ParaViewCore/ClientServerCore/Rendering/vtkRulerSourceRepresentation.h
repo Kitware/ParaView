@@ -71,7 +71,7 @@ public:
   void SetVisibility(bool) VTK_OVERRIDE;
 
   /**
-   * Specify the format to use for labelling the distance. Note that an empty
+   * Specify the format to use for labeling the distance. Note that an empty
    * string results in no label, or a format string without a "%" character
    * will not print the distance value.
    */

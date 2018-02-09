@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVMultiSliceView
  *
- * vtkPVMultiSliceView extends vtkPVRenderView but add meta-data informations
+ * vtkPVMultiSliceView extends vtkPVRenderView but add meta-data information
  * used by SliceRepresentation as a data model.
 */
 

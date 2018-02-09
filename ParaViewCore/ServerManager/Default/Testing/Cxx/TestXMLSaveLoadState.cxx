@@ -92,7 +92,7 @@ int TestXMLSaveLoadState(int argc, char* argv[])
   if (pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink") &&
     return_value == EXIT_SUCCESS)
   {
-    cout << endl << " ### SUCESS: States are equals ###" << endl;
+    cout << endl << " ### SUCCESS: States are equals ###" << endl;
   }
   else
   {

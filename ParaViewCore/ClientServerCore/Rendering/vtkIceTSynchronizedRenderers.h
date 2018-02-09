@@ -48,7 +48,7 @@ public:
 
   //@{
   /**
-   * Identifier used to indentify the view to the vtkTileDisplayHelper.
+   * Identifier used to identify the view to the vtkTileDisplayHelper.
    */
   vtkSetMacro(Identifier, unsigned int);
   vtkGetMacro(Identifier, unsigned int);

@@ -117,7 +117,7 @@ public:
    * any writers are specified by passing their group name and reader name to
    * this function, then only those writers will be available in any reader
    * factories created by the application.  This is intended to be called at
-   * the begining of the application's execution before any sessions are
+   * the beginning of the application's execution before any sessions are
    * created.
    */
   static void AddWriterToWhitelist(const char* writerxmlgroup, const char* writerxmlname);

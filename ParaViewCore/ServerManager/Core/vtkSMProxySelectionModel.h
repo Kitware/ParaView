@@ -143,7 +143,7 @@ public:
    * This method return the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
   const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 

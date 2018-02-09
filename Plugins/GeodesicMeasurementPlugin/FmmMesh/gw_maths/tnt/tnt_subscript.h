@@ -26,7 +26,7 @@
 // This definition describes the default TNT data type used for
 // indexing into TNT matrices and vectors.  The data type should
 // be wide enough to index into large arrays.  It defaults to an
-// "int", but can be overriden at compile time redefining TNT_SUBSCRIPT_TYPE,
+// "int", but can be overridden at compile time redefining TNT_SUBSCRIPT_TYPE,
 // e.g.
 //
 //      c++ -DTNT_SUBSCRIPT_TYPE='unsigned int'  ...

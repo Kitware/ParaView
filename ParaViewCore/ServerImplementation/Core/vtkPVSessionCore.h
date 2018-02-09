@@ -17,7 +17,7 @@
  *
  * vtkPVSessionCore is used by vtkSMSession.
  * vtkPVSessionCore handle the communication to MPI satellites and
- * ServerImplementation code instanciation and execution.
+ * ServerImplementation code instantiation and execution.
  * On the other hand, the vtkSMSession dispatch the request to the right
  * process and therefore to the right vtkPVSessionCore instance.
 */
@@ -135,7 +135,7 @@ public:
 
   //@{
   /**
-   * Get/Set the socket connection used to communicate betweeen data=server and
+   * Get/Set the socket connection used to communicate between data=server and
    * render-server processes. This is valid only on data-server and
    * render-server processes.
    */
@@ -146,7 +146,7 @@ public:
   /**
    * Provides the next available identifier. This implementation works locally.
    * without any code distribution. To support the distributed architecture
-   * the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+   * the vtkSMSessionClient override those method to call them on the DATA_SERVER
    * vtkPVSessionBase instance.
    */
   virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
@@ -177,13 +177,13 @@ public:
 
   /**
    * Allow the user to fill a vtkCollection with all RemoteObjects
-   * This is usefull when you want to hold a reference to them to
+   * This is useful when you want to hold a reference to them to
    * prevent any deletion across several method call.
    */
   virtual void GetAllRemoteObjects(vtkCollection* collection);
 
   /**
-   * Delete SIObject that are held by clients that disapeared
+   * Delete SIObject that are held by clients that disappeared
    * from the given list.
    */
   void GarbageCollectSIObject(int* clientIds, int nbClients);
@@ -205,13 +205,13 @@ protected:
   virtual void ExecuteStreamInternal(const vtkClientServerStream& stream, bool ignore_errors);
 
   /**
-   * This will gather informations on the local vtkObjects
+   * This will gather information on the local vtkObjects
    * through the local vtkSIObjects.
    */
   bool GatherInformationInternal(vtkPVInformation* information, vtkTypeUInt32 globalid);
 
   /**
-   * Gather informations across MPI satellites.
+   * Gather information across MPI satellites.
    */
   bool CollectInformation(vtkPVInformation*);
 

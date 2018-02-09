@@ -17,7 +17,7 @@
  * @brief   Abstract base class for proxy/property links.
  *
  * Abstract base class for proxy/property links. Links provide a means
- * to connect two properies(or proxies) together, thus when one is updated,
+ * to connect two properties(or proxies) together, thus when one is updated,
  * the dependent one is also updated accordingly.
 */
 
@@ -74,7 +74,7 @@ public:
    * This method returns the full object state that can be used to create the
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
   const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 

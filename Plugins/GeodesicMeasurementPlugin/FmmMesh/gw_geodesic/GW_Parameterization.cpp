@@ -242,7 +242,7 @@ void GW_Parameterization::SegmentAllRegions( GW_GeodesicMesh& Mesh, T_GeodesicVe
 {
     CutEdgeMap_.clear();
     /* recompute the whole distance map */
-    GW_OutputComment("Recomputing the whole Voronoi tesselation.");
+    GW_OutputComment("Recomputing the whole Voronoi tessellation.");
     this->PerformFastMarching( Mesh, VertList );
     cout << "  * Segmenting each region ";
     GW_U32 num = 0;
@@ -413,13 +413,13 @@ void GW_Parameterization::ExtractSubMeshes( GW_GeodesicMesh& Mesh, T_GeodesicVer
             const GW_Vertex& OriginalVert = *Mesh.GetVertex(nID);
             NewVert = OriginalVert;
             NewVert.SetID(i);    // this was changed by the copy
-            /* keep track of the correspondance */
+            /* keep track of the correspondence */
             if( pGlobal2LocalID!=NULL )
             {
                 GW_ASSERT( nID<pGlobal2LocalID->size() );
                 (*pGlobal2LocalID)[nID] = i;
             }
-            /* resolve face attachement */
+            /* resolve face attachment */
             const GW_Face* pFace = OriginalVert.GetFace();
             if( pFace!=NULL )
             {
@@ -478,7 +478,7 @@ void GW_Parameterization::ExtractSubMeshes( GW_GeodesicMesh& Mesh, T_GeodesicVer
  *  \author Gabriel Peyré
  *  \date   1-19-2004
  *
- *  Split a mesh into 2 equal parts. Work only for cylindricaly (whithout cap)
+ *  Split a mesh into 2 equal parts. Work only for cylindricaly (without cap)
  *  shaped mesh.
  */
 /*------------------------------------------------------------------------------*/
@@ -1139,7 +1139,7 @@ void GW_Parameterization::ResolutionBoundaryFixed( GW_Mesh& Mesh, GW_SparseMatri
                 break;
             num++;
         };
-        /* normaly we should have extracted as many piece as they were setted position */
+        /* normally we should have extracted as many piece as they were setted position */
         GW_U32 nNbrPieces = (GW_U32) boundary_pieces.size();
         GW_ASSERT( nNbrPieces==pTrissectorInfoMap->size() );
         /* set up the position for each base point */

@@ -1,5 +1,5 @@
 /*
-  System dependend definitions
+  System dependent definitions
 */
 
 #ifndef _H5PARTTYPES_H_

@@ -106,7 +106,7 @@ public slots:
 
 protected:
   // Creates a plot over time.
-  //  returns true if plot successfuly created, false otherwise;
+  //  returns true if plot successfully created, false otherwise;
   virtual bool createPlotOverTime();
 
   /// Finds a pipeline source with the given SM XML name.  If there is more than

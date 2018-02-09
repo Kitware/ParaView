@@ -482,7 +482,7 @@ void vtkAnalyzeReaderUpdate2(vtkAnalyzeReader* self, vtkImageData* vtkNotUsed(da
   // are not in gzip fromat.
   // This greatly simplifies the following code, and gzFile types are used
   // everywhere.
-  // In addition, it has the added benifit of reading gzip compressed image
+  // In addition, it has the added benefit of reading gzip compressed image
   // files that do not have a .gz ending.
   gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
   if (file_p == NULL)
@@ -578,7 +578,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
   // are not in gzip fromat.
   // This greatly simplifies the following code, and gzFile types are used
   // everywhere.
-  // In addition, it has the added benifit of reading gzip compressed image
+  // In addition, it has the added benefit of reading gzip compressed image
   // files that do not have a .gz ending.
   gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
   if (file_p == NULL)

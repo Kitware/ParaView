@@ -91,7 +91,7 @@ int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
   // Check for bad input that would make us hang.
   if (!this->DoubleCheckArrays(input))
   {
-    vtkDebugMacro("Skiping redistribute to avoid hanging.");
+    vtkDebugMacro("Skipping redistribute to avoid hanging.");
     output->CopyStructure(tmp);
     output->GetPointData()->ShallowCopy(tmp->GetPointData());
     output->GetCellData()->ShallowCopy(tmp->GetCellData());
@@ -1546,7 +1546,7 @@ void vtkRedistributePolyData::SendCells(vtkIdType* startCell, vtkIdType* stopCel
 
   this->Controller->Send(outputPointsArrayData, 3 * numPoints, sendTo, POINTS_TAG);
 
-  // ... use output for flags only to avoid unneccessary sends ...
+  // ... use output for flags only to avoid unnecessary sends ...
   vtkPointData* inputPointData = input->GetPointData();
   vtkPointData* outputPointData = output->GetPointData();
 
@@ -1795,7 +1795,7 @@ void vtkRedistributePolyData::SendDataArrays(vtkDataSetAttributes* fromPd,
   vtkDataArray* Data;
   int numArrays = fromPd->GetNumberOfArrays();
 
-  // Note: sendTag is just mpi tag to keep sends seperate
+  // Note: sendTag is just mpi tag to keep sends separate
   int sendTag;
 
   for (int i = 0; i < numArrays; i++)
@@ -1917,7 +1917,7 @@ void vtkRedistributePolyData::ReceiveDataArrays(
   vtkDataArray* Data;
   int numArrays = toPd->GetNumberOfArrays();
 
-  // Note: recTag is just mpi tag to keep receives seperate
+  // Note: recTag is just mpi tag to keep receives separate
   int recTag;
 
   for (int i = 0; i < numArrays; i++)
@@ -2092,7 +2092,7 @@ int vtkRedistributePolyData::DoubleCheckArrays(vtkPolyData* input)
 }
 
 //--------------------------------------------------------------------
-// I am using no points as the indicator that arrays need completetion.
+// I am using no points as the indicator that arrays need completion.
 // It is possible that no cells could also cause trouble.
 void vtkRedistributePolyData::CompleteInputArrays(vtkPolyData* input)
 {
@@ -2302,7 +2302,7 @@ void vtkRedistributePolyData::SendInputArrays(vtkDataSetAttributes* attr, int se
 
 vtkRedistributePolyData::vtkCommSched::vtkCommSched()
 {
-  // ... initalize a communication schedule to do nothing ...
+  // ... initialize a communication schedule to do nothing ...
   this->NumberOfCells = 0;
   this->SendCount = 0;
   this->ReceiveCount = 0;

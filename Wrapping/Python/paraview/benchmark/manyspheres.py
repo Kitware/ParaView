@@ -137,7 +137,7 @@ p = controller.GetLocalProcessId()
 
 ns=lambda rank:num_spheres/np + (1 if rank >= np-num_spheres%np else 0)
 
-# Not sure why but the builtin sum() gives wierd results here so we'll just
+# Not sure why but the builtin sum() gives weird results here so we'll just
 # so it manually
 start=0
 for r in range(0,p):

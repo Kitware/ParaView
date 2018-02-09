@@ -2397,7 +2397,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(int blockIdx, vtkPoly
           if (minIndex > hashFace->FragmentId) // --- case A
           {
             // The first face (certainly internal, since hashFace->FragmentId
-            // > 0 holds above) of this volume is guranteed to come here. In
+            // > 0 holds above) of this volume is guaranteed to come here. In
             // addition, non-first internal faces (of this volume) that are
             // shared by new volumes also come here. In either case, minIndex
             // is updated below to reflect the smallest fragment Id so far and
@@ -3087,7 +3087,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
             if (minIndex > hashFace->FragmentId) // --- case A
             {
               // The first face (certainly internal, since hashFace->FragmentId
-              // > 0 holds above) of this 'macro' volume is guranteed to come here.
+              // > 0 holds above) of this 'macro' volume is guaranteed to come here.
               // In addition, non-first internal faces (of this 'macro' volume) that
               // are shared by new 'macro' volumes also come here. In either case,
               // minIndex is updated below to reflect the smallest fragment Id so
@@ -3330,7 +3330,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
   surfPnts = NULL;
   faceCell = NULL;
 
-  // fille the output vtkPolyData
+  // fill the output vtkPolyData
   polyData->SetPoints(polyPnts);
   polyData->SetPolys(polygons);
   polyData->GetCellData()->AddArray(fragIdxs);
@@ -3761,7 +3761,7 @@ void vtkRectilinearGridConnectivity::AddInterProcessPolygonsToFaceHash(
             if (minIndex > hashFace->FragmentId) // --- case A
             {
               // The first face (certainly internal, since hashFace->FragmentId
-              // > 0 holds above) of this 'macro' volume is guranteed to come here.
+              // > 0 holds above) of this 'macro' volume is guaranteed to come here.
               // In addition, non-first internal faces (of this 'macro' volume) that
               // are shared by new 'macro' volumes also come here. In either case,
               // minIndex is updated below to reflect the smallest fragment Id so

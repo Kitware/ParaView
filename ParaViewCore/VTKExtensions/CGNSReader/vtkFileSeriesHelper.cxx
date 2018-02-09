@@ -339,7 +339,7 @@ bool vtkFileSeriesHelper::UpdateInformation(
   // Currently we don't support a combination of both -- we should look into
   // adding support for that in the future.
 
-  // If the time informations are identical for 1st and 2nd files, then we
+  // If the time information are identical for 1st and 2nd files, then we
   // assume it's a collection of partitioned files.
   this->PartitionedFiles =
     (this->Information.size() >= 2 && this->Information[0] == this->Information[1]);

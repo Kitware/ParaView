@@ -165,7 +165,7 @@ void output_temp(FILE* fp, int i, unsigned int argType, const char* Id, int coun
     return;
   }
 
-  /* handle array arguements */
+  /* handle array arguments */
   if (count > 1)
   {
     fprintf(fp, "temp%i[%i];\n", i, count);
@@ -753,7 +753,7 @@ int managableArguments(FunctionInfo* curFunction)
     args_ok = 0;
   }
 
-  /* watch out for functions that dont have enough info */
+  /* watch out for functions that don't have enough info */
   if ((returnType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
   {
     switch (returnType & VTK_PARSE_BASE_TYPE)

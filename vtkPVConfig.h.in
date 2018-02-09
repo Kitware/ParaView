@@ -55,7 +55,7 @@
 #define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
 #define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
 
-// Some runtime informations to be displayed in About box:
+// Some runtime information to be displayed in About box:
 #define OPENGL_gl_LIBRARY   "@OPENGL_gl_LIBRARY@"
 #define OPENGL_INCLUDE_DIR  "@OPENGL_INCLUDE_DIR@"
 #define CMAKE_BUILD_TYPE    "@CMAKE_BUILD_TYPE@"

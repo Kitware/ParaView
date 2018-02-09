@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- This test ensures that Python Console continues to work even after
-  mutliple disconnects and that Connect/Disconnect from Python Console works.
+  multiple disconnects and that Connect/Disconnect from Python Console works.
   -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />

@@ -512,7 +512,7 @@ h5pt_readdata_i8 (
 
 /*=================== Attributes ================*/
 
-/* Writeing attributes */
+/* Writing attributes */
 h5part_int64_t
 h5pt_writefileattrib_r8 (
  const h5part_int64_t *f,

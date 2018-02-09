@@ -49,7 +49,7 @@ public:
   int Redo() VTK_OVERRIDE;
 
   /**
-   * Provide the informations needed to restore the previous state
+   * Provide the information needed to restore the previous state
    */
   void SetLinkState(const char* mgrname, const char* globalpropname, vtkSMProxy* proxy,
     const char* propname, bool isAddAction);

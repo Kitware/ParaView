@@ -838,7 +838,7 @@ IF (PARAVIEW_USE_MPI)
   endif()
 ENDIF ()
 
-# Composite Surface Selection is currently broken in everything but bultin
+# Composite Surface Selection is currently broken in everything but builtin
 SET (CompositeSurfaceSelection_DISABLE_CS TRUE)
 SET (CompositeSurfaceSelection_DISABLE_CRS TRUE)
 
@@ -870,7 +870,7 @@ SET (SaveTXT_BASELINE SaveCSV.png)
 
 ## Disable ClientRenderServer tests for FFTOverTime. This is done since
 ## selection is not supported in render server mode esp. when number of render
-## server processess is not same as the data server processes
+## server processes is not the same as the data server processes
 set (FFTOverTime_DISABLE_CRS TRUE)
 set (FFTOverTime_THRESHOLD 70) # since there's a plot, account for minor
                                # rendering differences.

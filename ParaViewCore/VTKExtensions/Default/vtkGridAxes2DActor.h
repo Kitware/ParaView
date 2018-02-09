@@ -20,10 +20,10 @@
  * face). Despite the name, it renders a prop in 3D with ability to render lines
  * for the axes bounds along with labels on them.
  *
- * To use this, one sets the `GridBounds` and then the `Face` which indentifies
+ * To use this, one sets the `GridBounds` and then the `Face` which identifies
  * the face of the cube defined by the `GridBounds` along which this prop will
  * render the grid. Parameters available allow additional controls including
- * labelling, grid rendering, edge rendering etc.
+ * labeling, grid rendering, edge rendering etc.
  *
  * @sa vtkGridAxes3DActor
 */
@@ -189,7 +189,7 @@ public:
 
   //@{
   /**
-   * Turn off to not generate the markers for the tick positions. Which egdes
+   * Turn off to not generate the markers for the tick positions. Which edges
    * are rendered is defined by the TickMask.
    */
   void SetGenerateTicks(bool val) { this->PlaneActor->SetGenerateTicks(val); }

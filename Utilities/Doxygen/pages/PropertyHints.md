@@ -8,7 +8,7 @@ for a *Property* element in Server-Manager configuration XMLs.
 
 NoDefault
 ----------
-Skip setting run-time defaults during initalization.
+Skip setting run-time defaults during initialization.
 
 Any property with a domain that is dynamic i.e. depends on run-time
 values such as data information or the information-only properties, often

@@ -22,7 +22,7 @@
  * all cells/points. Data arrays not available in all inputs
  * are discarded. The attribute to reduce can be set to point or cell or field
  * or all. Only selected attributes will be reduced according to the
- * type choosen, all other attributes are those at the first input.
+ * type chosen, all other attributes are those at the first input.
 */
 
 #ifndef vtkAttributeDataReductionFilter_h
@@ -53,7 +53,7 @@ public:
     ROW_DATA = 0x08
   };
 
-  // Set the attributes to reduce. Only the choosen type of attributes will be
+  // Set the attributes to reduce. Only the chosen type of attributes will be
   // reduced by this filter. The not-choosen attributes are passed through
   // from the first input unchanged. Default is (POINT_DATA|CELL_DATA)
   // i.e. point data and cell data will be reduced.

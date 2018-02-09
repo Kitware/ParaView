@@ -267,7 +267,7 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
 
   if (!FOUND)
   {
-    fprintf(stderr, "Error: Cound not find: %s\n", phrase);
+    fprintf(stderr, "Error: Could not find: %s\n", phrase);
     return 1;
   }
   return 0;
@@ -399,12 +399,12 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
   }
 
   // error check..
-  // since we require that a consistant header always preceed the data block
+  // since we require that a consistent header always precede the data block
   // let us check to see that it is actually the case.
 
   if (!cscompare(LastHeaderKey[filePtr], keyphrase))
   {
-    fprintf(stderr, "Header not consistant with data block\n");
+    fprintf(stderr, "Header not consistent with data block\n");
     fprintf(stderr, "Header: %s\n", LastHeaderKey[filePtr]);
     fprintf(stderr, "DataBlock: %s\n ", keyphrase);
     fprintf(stderr, "Please recheck read sequence \n");
@@ -654,7 +654,7 @@ void vtkPhastaReader::ReadGeomFile(
   // TEST *******************
   if (num_nodes != array[0])
   {
-    vtkErrorMacro(<< "Ambigous information in geom.data file, number of nodes does not match the "
+    vtkErrorMacro(<< "Ambiguous information in geom.data file, number of nodes does not match the "
                      "co-ordinates size. Nodes: "
                   << num_nodes << " Coordinates: " << array[0]);
     return;

@@ -423,7 +423,7 @@ private:
         for ( i = 0; i < DIM; i++ )
             p[i] = a[i];
     }
-    /** Returns TRUE iff point c lies on the closed segement ab.
+    /** Returns TRUE iff point c lies on the closed segment ab.
         Assumes it is already known that abc are collinear. */
     bool    Between( tPointi a, tPointi b, tPointi c )
     {

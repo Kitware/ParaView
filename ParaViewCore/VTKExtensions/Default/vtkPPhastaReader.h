@@ -107,7 +107,7 @@
  * number_of_components = 1
  * data_dependency = 0
  * data_type = double
- * If no Field(s) is/are specfied then the default is following 3 fields :
+ * If no Field(s) is/are specified then the default is following 3 fields :
  * pressure (index 0 under solution),
  * velocity (index 1-3 under solution)
  * temperature (index 4 under soltuion)

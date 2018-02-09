@@ -19,7 +19,7 @@
  * When a link is created between camera A->B, whenever any property
  * on camera A is modified, a property with the same name as the modified
  * property (if any) on camera B is also modified to be the same as the property
- * on the camera A. Similary whenever camera A->UpdateVTKObjects() is called,
+ * on the camera A. Similarly whenever camera A->UpdateVTKObjects() is called,
  * B->UpdateVTKObjects() is also fired.
 */
 

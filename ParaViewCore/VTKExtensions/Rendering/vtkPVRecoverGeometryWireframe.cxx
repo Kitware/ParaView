@@ -262,7 +262,7 @@ int vtkPVRecoverGeometryWireframe::RequestData(vtkInformation* vtkNotUsed(reques
         return 0;
     }
     // Record the original points of the polygon.  As we iterate over edges,
-    // we may change the indices, but we allways compare edges by the original
+    // we may change the indices, but we always compare edges by the original
     // indices.
     originalPts.resize(npts);
     std::copy(pts, pts + npts, originalPts.begin());

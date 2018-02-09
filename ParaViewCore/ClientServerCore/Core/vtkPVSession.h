@@ -84,7 +84,7 @@ public:
    * about the server processes. These include server-side capabilities as well
    * as server-side command line arguments e.g. tile-display parameters. Use
    * this method to obtain the server-side information.
-   * NOTE: For now, we are not bothering to provide separate informations from
+   * NOTE: For now, we are not bothering to provide separate information from
    * data-server and render-server (as was the case earlier). We can easily add
    * API for the same if needed.
    */

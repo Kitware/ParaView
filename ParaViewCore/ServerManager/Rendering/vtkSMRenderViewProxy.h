@@ -18,7 +18,7 @@
  * render window and renderers.
  *
  * vtkSMRenderViewProxy is a 3D view consisting for a render window and two
- * renderers: 1 for 3D geometry and 1 for overlayed 2D geometry.
+ * renderers: 1 for 3D geometry and 1 for overlaid 2D geometry.
 */
 
 #ifndef vtkSMRenderViewProxy_h

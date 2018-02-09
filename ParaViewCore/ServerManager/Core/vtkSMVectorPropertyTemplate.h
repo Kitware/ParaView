@@ -109,7 +109,7 @@ public:
     this->UncheckedValues.resize(num);
     if (num == 0)
     {
-      // If num == 0, then we already have the intialized values (so to speak).
+      // If num == 0, then we already have the initialized values (so to speak).
       this->Initialized = true;
     }
     else

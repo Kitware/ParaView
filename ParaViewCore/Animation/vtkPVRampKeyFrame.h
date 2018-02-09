@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVRampKeyFrame
  *
- * Interplates lineraly between consequtive key frames.
+ * Interplates lineraly between consecutive key frames.
 */
 
 #ifndef vtkPVRampKeyFrame_h

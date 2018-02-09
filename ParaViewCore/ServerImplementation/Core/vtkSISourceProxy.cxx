@@ -196,7 +196,7 @@ bool vtkSISourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 
 //----------------------------------------------------------------------------
 // FIXME: avoid code-duplication with vtkGeometryRepresentation. However I
-// cannot add dependecy on vtkGeometryRepresentation here. Fix it!!!
+// cannot add dependency on vtkGeometryRepresentation here. Fix it!!!
 namespace
 {
 bool vtkGeometryRepresentationDoRequestGhostCells(vtkInformation* info)

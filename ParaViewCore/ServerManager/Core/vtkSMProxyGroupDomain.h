@@ -17,13 +17,13 @@
  * @brief   union of proxy groups
  *
  * The proxy group domain consists of all proxies in a list of groups.
- * This domain is commonly used together with vtkSMProxyPropery
+ * This domain is commonly used together with vtkSMProxyproperty
  * Valid XML elements are:
  * @verbatim
  * * <Group name=""> where name is the groupname used by the proxy
  * manager to refer to a group of proxies.
  * @endverbatim// .SECTION See Also
- * vtkSMDomain vtkSMProxyPropery
+ * vtkSMDomain vtkSMProxyproperty
 */
 
 #ifndef vtkSMProxyGroupDomain_h
@@ -51,8 +51,8 @@ public:
   void AddGroup(const char* group);
 
   /**
-   * Returns true if the value of the propery is in the domain.
-   * The propery has to be a vtkSMProxyPropery or a sub-class. All
+   * Returns true if the value of the property is in the domain.
+   * The property has to be a vtkSMProxyproperty or a sub-class. All
    * proxies pointed by the property have to be in the domain.
    */
   int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;

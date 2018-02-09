@@ -29,7 +29,7 @@
   <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/LoadStateMultiView.pvsm" />
 
   <!-- now save a multiview screenshot with a size deliberately less than the application window.
-       This excercises a different component of the screen capture than when the size is greater,
+       This exercises a different component of the screen capture than when the size is greater,
        which is already tested by another test. -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />

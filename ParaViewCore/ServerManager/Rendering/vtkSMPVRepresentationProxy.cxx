@@ -440,7 +440,7 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToVisibleRange(
   }
   if (component >= info->GetNumberOfComponents())
   {
-    // somethign amiss, the component request is not present in the dataset.
+    // something amiss, the component request is not present in the dataset.
     // give up.
     return false;
   }

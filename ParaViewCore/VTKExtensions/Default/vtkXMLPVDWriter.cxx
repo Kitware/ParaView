@@ -356,7 +356,7 @@ void vtkXMLPVDWriter::MakeDirectory(const char* name)
   if (!vtksys::SystemTools::MakeDirectory(name))
   {
     vtkErrorMacro(<< "Sorry unable to create directory: " << name << endl
-                  << "Last systen error was: "
+                  << "Last system error was: "
                   << vtksys::SystemTools::GetLastSystemError().c_str());
   }
 }
@@ -367,7 +367,7 @@ void vtkXMLPVDWriter::RemoveADirectory(const char* name)
   if (!vtksys::SystemTools::RemoveADirectory(name))
   {
     vtkErrorMacro(<< "Sorry unable to remove a directory: " << name << endl
-                  << "Last systen error was: "
+                  << "Last system error was: "
                   << vtksys::SystemTools::GetLastSystemError().c_str());
   }
 }

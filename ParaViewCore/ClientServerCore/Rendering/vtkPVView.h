@@ -215,7 +215,7 @@ public:
   bool GetLocalProcessSupportsInteraction();
 
   /**
-   * Returns the unique indentifier used for this view. This gets set in
+   * Returns the unique identifier used for this view. This gets set in
    * `Initialize()`.
    */
   vtkGetMacro(Identifier, unsigned int);

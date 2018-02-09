@@ -1016,7 +1016,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                 // name to every component. Try to reduce that possible redundancy by removing
                 // redundant substrings:
                 // * For auto-generated component names strip the trailing vector name
-                // * For explicitely named components, try to remove a leading vector name plus an
+                // * For explicitly named components, try to remove a leading vector name plus an
                 //   underscore - because users tend to follow the pattern from the GMV User's
                 //   Manual which states:
                 //        vectors
@@ -1035,7 +1035,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                 }
                 else
                 {
-                  // Try to strip vector name from explicitely named components to avoid redundantly
+                  // Try to strip vector name from explicitly named components to avoid redundantly
                   // named variables
                   pos = componentname.find(vectorname + "_");
                   if (pos != std::string::npos)
@@ -1109,7 +1109,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                 // name to every component. Try to reduce that possible redundancy by removing
                 // redundant substrings:
                 // * For auto-generated component names strip the trailing vector name plus the dash
-                // * For explicitely named components, try to remove a leading vector name plus an
+                // * For explicitly named components, try to remove a leading vector name plus an
                 //   underscore - because users tend to follow the pattern from the GMV User's
                 //   Manual which states:
                 //        vectors
@@ -1128,7 +1128,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
                 }
                 else
                 {
-                  // Try to strip vector name from explicitely named components to avoid redundantly
+                  // Try to strip vector name from explicitly named components to avoid redundantly
                   // named variables
                   pos = componentname.find(vectorname + "_");
                   if (pos != std::string::npos)

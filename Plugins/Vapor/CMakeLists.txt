@@ -25,7 +25,7 @@ INCLUDE_DIRECTORIES(${VAPOR_HEADERS})
 
 #link to the parts of vapor lib that we need to run/compile the reader
 FIND_LIBRARY(VAPOR_VDF_LIB vdf DOC "NCAR Vapor Data Format library")
-FIND_LIBRARY(VAPOR_COMMON_LIB common DOC "NCAR Vapor common libary")
+FIND_LIBRARY(VAPOR_COMMON_LIB common DOC "NCAR Vapor common library")
 
 #find expat and netcdf libs that vapor library itself uses
 FIND_PACKAGE(EXPAT REQUIRED)

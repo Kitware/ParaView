@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkSMStateLocator
- * @brief   Class used to retreive a given message state based
+ * @brief   Class used to retrieve a given message state based
  * on its GlobalID.
  *
  * vtkSMStateLocator allow a hierarchical way of finding a message state.
@@ -88,7 +88,7 @@ public:
   virtual bool IsStateLocal(vtkTypeUInt32 globalID);
 
   /**
-   * Return true if the given state do exist in the locator hierachy
+   * Return true if the given state do exist in the locator hierarchy
    */
   virtual bool IsStateAvailable(vtkTypeUInt32 globalID);
 

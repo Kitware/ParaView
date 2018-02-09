@@ -172,7 +172,7 @@ public:
   virtual double GetDeltaRangeMinor();
   virtual double GetDeltaRangeMajor();
 
-  // Desription:
+  // Description:
   // Set the renderer to use. Default is to use the
   // vtkPVRenderView::DEFAULT_RENDERER.
   vtkSetMacro(RendererType, int);

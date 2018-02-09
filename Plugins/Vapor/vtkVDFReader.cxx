@@ -199,7 +199,7 @@ int vtkVDFReader::RequestData(
   updateExt = info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
   if (true /*! extentsMatch(updateExt, ext)*/)
   {
-    // printf("Recived sub-block of extents: %d %d %d %d %d %d\n",
+    // printf("Received sub-block of extents: %d %d %d %d %d %d\n",
     //	updateExt[0], updateExt[1], updateExt[2],
     //	updateExt[3], updateExt[4], updateExt[5]);
 
@@ -230,7 +230,7 @@ int vtkVDFReader::RequestData(
     double TimeStepsReq = info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     TimeStep = (int)floor(TimeStepsReq);
     SetExtents(info);
-    // printf("Recieved updated timestep: %d\n", TimeStep);
+    // printf("Received updated timestep: %d\n", TimeStep);
   }
 
   // load data for all enabled point arrays

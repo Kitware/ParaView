@@ -134,10 +134,10 @@ protected:
 
   /**
    * This method is called when the AnimationCue's StartAnimationCueEvent is
-   * triggerred, to let the animation manipulator know that the cue has
+   * triggered, to let the animation manipulator know that the cue has
    * been restarted. This is here for one major reason: after the last key
    * frame, the state of the scene must be as it was left a the the last key
-   * frame. This does not happend automatically, since if while animating the
+   * frame. This does not happen automatically, since if while animating the
    * currentime never coincides with the last key frame's key time, then it
    * never gets a chance to update the properties value.
    * Hence, we note when the cue begins. Then, if the currentime is beyond

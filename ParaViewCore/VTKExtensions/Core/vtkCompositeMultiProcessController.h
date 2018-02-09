@@ -71,7 +71,7 @@ public:
   void SetMasterController(int id);
 
   /**
-   * Retrun the ID of the designed "Master" controller. That master controller
+   * Return the ID of the designed "Master" controller. That master controller
    * is nothing else than a tag that can only be set on a single controller at
    * a time.
    */
@@ -89,7 +89,7 @@ public:
   void UnRegisterController(vtkMultiProcessController* controller);
 
   /**
-   * Remove the active controller and return the number of registered controler
+   * Remove the active controller and return the number of registered controller
    * left.
    */
   int UnRegisterActiveController();

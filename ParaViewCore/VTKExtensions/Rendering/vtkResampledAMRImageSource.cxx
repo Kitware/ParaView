@@ -215,7 +215,7 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   }
   if (!reference)
   {
-    // cannnot initialize.
+    // cannot initialize.
     vtkStreamingStatusMacro("Insufficient data. AMR is empty.");
     return false;
   }

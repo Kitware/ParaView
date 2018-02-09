@@ -292,8 +292,8 @@ public:
   // and have no neighbors.
   unsigned char BoundaryBits;
 
-  // Different algorithms need to store differnt information
-  // with the blocks.  I could make this a vtkObject so the desctructor
+  // Different algorithms need to store different information
+  // with the blocks.  I could make this a vtkObject so the destructor
   // would delete it.
   void* UserData;
 

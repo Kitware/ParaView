@@ -241,7 +241,7 @@ void vtkPVArrayInformation::SetComponentName(vtkIdType component, const char* na
     this->ComponentNames->resize(index + 1, NULL);
   }
 
-  // replace an exisiting element
+  // replace an existing element
   vtkStdString* compName = this->ComponentNames->at(index);
   if (!compName)
   {

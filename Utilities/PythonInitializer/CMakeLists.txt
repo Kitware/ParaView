@@ -12,7 +12,7 @@ vtk_module(vtkUtilitiesPythonInitializer
 set (vtk-module vtkUtilitiesPythonInitializer)
 #------------------------------------------------------------------------------
 # To simplify static builds with Python-enabled, we create a new library that
-# manages the Python intialization necessary for static builds.
+# manages the Python initialization necessary for static builds.
 include(vtkPythonWrapping)
 
 set (dependencies)

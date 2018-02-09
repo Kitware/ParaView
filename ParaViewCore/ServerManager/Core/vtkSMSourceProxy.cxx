@@ -155,7 +155,7 @@ vtkSMOutputPort* vtkSMSourceProxy::GetOutputPort(const char* portname)
 unsigned int vtkSMSourceProxy::GetOutputPortIndex(const char* portname)
 {
   // Since there are not really going to be hundreds of output ports, the is not
-  // going to be any noticable difference in accessing output ports by index or
+  // going to be any noticeable difference in accessing output ports by index or
   // by name.
   vtkSMSourceProxyInternals::VectorOfPorts::iterator it = this->PInternals->OutputPorts.begin();
   for (unsigned int idx = 0; it != this->PInternals->OutputPorts.end(); it++, idx++)

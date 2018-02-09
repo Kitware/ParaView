@@ -599,7 +599,7 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
   // ensure that VTK objects are created.
   proxy->UpdateVTKObjects();
 
-  // creat a helper for calling CanReadFile on vtk objects
+  // create a helper for calling CanReadFile on vtk objects
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   vtkSmartPointer<vtkSMProxy> helper;

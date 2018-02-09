@@ -1615,7 +1615,7 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
 
 def GetCameraTrack(view=None):
     """Returns the camera animation track for the given view. If no view is
-    specified, active view will be used. If no exisiting camera animation track
+    specified, active view will be used. If no existing camera animation track
     is found, a new one will be created."""
     if not view:
         view = GetActiveView()

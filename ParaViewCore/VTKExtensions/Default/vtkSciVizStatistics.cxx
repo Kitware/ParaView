@@ -252,7 +252,7 @@ int vtkSciVizStatistics::RequestData(
         "Output model data object of incorrect type \"" << modelObjOu->GetClassName() << "\"");
       return 0;
     }
-    // Copy the stucture of the input dataset to the model output.
+    // Copy the structure of the input dataset to the model output.
     // If we have input models in the proper structure, then we'll copy them into this structure
     // later.
     ouModelRoot->CopyStructure(compDataObjIn);

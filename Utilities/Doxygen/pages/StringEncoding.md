@@ -18,7 +18,7 @@ This works fine most of the time, except in some cases, when the string
 contains special characters. And it can happens a lot with filenames.
 
 They were two reasons for it not to work. First the client/server communication
-is done via a library called protobuf, wich support only UTF8 string.
+is done via a library called protobuf, which support only UTF8 string.
 Second, Latin1 is a specific encoding, which can be different from the
 local 8 Bits encoding of strings.
 
@@ -33,7 +33,7 @@ to local 8 bit encoding when used locally.
 QString in pq classes given as an argument of SM classes that will transfer it to the server
 should be encoded to utf8.
 In SI classes, string should then reencoded to local 8 bit before being given to vtk classes
-SI classes recovering string from vtk classes should reencode string in utf8.
+SI classes recovering string from vtk classes should re-encode string in utf8.
 
 ##Usage##
 
@@ -41,7 +41,7 @@ When developping a new feature, especially a Qt feature handling filenames, one 
 use the following pattern :
  * Filename QString that need to be converted to c-string and used **locally** should be encoded
 using **QString::toLocal8Bit**.
- * Filename QString that need to be converted to c-string and **transfered to the server**
+ * Filename QString that need to be converted to c-string and **transferred to the server**
 should be encoded using **QString::toUtf8**.
  * All **other** QString should be converted **using QString::toUtf8** unless specific reasons.
 

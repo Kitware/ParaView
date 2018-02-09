@@ -1168,7 +1168,7 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>Enable/disable tubing of the wire outline of the cylinder
-        intersecton (against the bounding box). The tube thickens the
+        intersection (against the bounding box). The tube thickens the
         line by wrapping with a vtkTubeFilter..</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetOutlineTranslation"

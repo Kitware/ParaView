@@ -2427,7 +2427,7 @@ H5PartGetErrno (
 /*!
   \ingroup h5part_errhandle
 
-  This is the H5Part default error handler.  If an error occures, an
+  This is the H5Part default error handler.  If an error occurs, an
   error message will be printed and an error number will be returned.
 
   \return value given in \c eno
@@ -2453,7 +2453,7 @@ H5PartReportErrorHandler (
 /*!
   \ingroup h5part_errhandle
 
-  If an error occures, an error message will be printed and the
+  If an error occurs, an error message will be printed and the
   program exists with the error code given in \c eno.
 */
 h5part_int64_t

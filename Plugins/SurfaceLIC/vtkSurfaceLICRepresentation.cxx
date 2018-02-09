@@ -75,7 +75,7 @@ int vtkSurfaceLICRepresentation::ProcessViewRequest(
   }
 
   // the Surface LIC painter will make use of
-  // MPI global collective comunication calls
+  // MPI global collective communication calls
   // need to disable IceT's empty image
   // optimization
   if (request_type == vtkPVView::REQUEST_UPDATE())
@@ -101,7 +101,7 @@ void vtkSurfaceLICRepresentation::SetEnable(bool val)
 
 // These are some settings that would help lod painter run faster.
 // If the user really cares about speed then best to use a wireframe
-// durring interaction
+// during interaction
 #if defined(vtkSurfaceLICRepresentationFASTLOD)
 //----------------------------------------------------------------------------
 void vtkSurfaceLICRepresentation::SetStepSize(double val)

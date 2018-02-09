@@ -17,7 +17,7 @@
  * @brief   Gets features of the server.
  *
  * This objects is used by the client to get the features
- * suported by the server.
+ * supported by the server.
  * At the moment, server information is only on the root.
 */
 

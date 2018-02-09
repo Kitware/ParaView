@@ -75,7 +75,7 @@ public:
     size_t AvailableVirtualMemory;
   };
 
-  //  Provides access to the vector of informations.
+  //  Provides access to the vector of information.
   const std::vector<SystemInformationType>& GetSystemInformations()
   {
     return this->SystemInformations;

@@ -186,7 +186,7 @@ void vtkVRStyleGrabNRotateWorld::HandleTracker(const vtkVREventData& data)
 
   // check if the button is clicked
   // if it is then get the active proxy and property
-  // check if the proxy and property are successfull obtained
+  // check if the proxy and property are successful obtained
   //
   if (this->Enabled)
   {
@@ -370,7 +370,7 @@ void vtkVRStyleGrabNRotateWorld::UpdateOrientation(const vtkVREventData& data)
   //      fabs( deltaQuat[2] ) > 0 ||
   //      fabs( deltaQuat[3] ) > 0 ) )
   //   {
-  // Multiply new quaternion into inital quaternion
+  // Multiply new quaternion into initial quaternion
 
   // double mag = fabs( sqrt ( deltaQuat[0]*deltaQuat[0] +
   //                        deltaQuat[1]*deltaQuat[1] +

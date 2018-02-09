@@ -174,7 +174,7 @@ public:
 
   /**
    * This method is used to either load its internal connected clients
-   * informations or to forward messages across clients
+   * information or to forward messages across clients
    */
   void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 

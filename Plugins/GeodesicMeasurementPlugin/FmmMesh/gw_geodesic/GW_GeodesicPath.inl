@@ -67,7 +67,7 @@ T_GeodesicPointList& GW_GeodesicPath::GetPointList()
  *  \author Gabriel Peyré
  *  \date   4-12-2003
  *
- *  Set the size of the step. This mesured in barycentric coords.
+ *  Set the size of the step. This measured in barycentric coords.
  */
 /*------------------------------------------------------------------------------*/
 GW_INLINE

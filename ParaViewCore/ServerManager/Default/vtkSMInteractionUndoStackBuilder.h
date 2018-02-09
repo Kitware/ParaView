@@ -67,7 +67,7 @@ public:
    * Usually, this method isn't called directly, since the builder
    * listens to interaction events on the interactor and calls it
    * automatically. May be used when changing the camera
-   * programatically.
+   * programmatically.
    */
   void StartInteraction();
 
@@ -77,7 +77,7 @@ public:
    * Usually, this method isn't called directly, since the builder
    * listens to interaction events on the interactor and calls it
    * automatically. May be used when changing the camera
-   * programatically.
+   * programmatically.
    */
   void EndInteraction();
 

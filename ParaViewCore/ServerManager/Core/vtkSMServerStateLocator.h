@@ -14,10 +14,10 @@
 =========================================================================*/
 /**
  * @class   vtkSMServerStateLocator
- * @brief   Class used to retreive a given message state based
+ * @brief   Class used to retrieve a given message state based
  * on its GlobalID from the DataServer.
  *
- * Retreive a given state from the server.
+ * Retrieve a given state from the server.
 */
 
 #ifndef vtkSMServerStateLocator_h

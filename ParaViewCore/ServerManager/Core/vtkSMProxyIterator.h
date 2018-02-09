@@ -42,7 +42,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Override the set sesssion so the SessionProxyManager could be cache for
+   * Override the set session so the SessionProxyManager could be cache for
    */
   void SetSessionProxyManager(vtkSMSessionProxyManager*);
 

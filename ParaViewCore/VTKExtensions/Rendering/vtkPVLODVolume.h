@@ -79,7 +79,7 @@ public:
   //@}
 
   /**
-   * Sets the volume propery.  Overloads the virtual vtkVolume method.
+   * Sets the volume property.  Overloads the virtual vtkVolume method.
    */
   virtual void SetProperty(vtkVolumeProperty* property) VTK_OVERRIDE;
 

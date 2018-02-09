@@ -114,7 +114,7 @@ protected:
    */
   int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
-  // Obtain the data information from the requried property with
+  // Obtain the data information from the required property with
   // function "Input", if any.
   vtkPVDataInformation* GetInputInformation();
 

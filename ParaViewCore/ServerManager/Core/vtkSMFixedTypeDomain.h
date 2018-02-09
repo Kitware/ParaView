@@ -41,8 +41,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Returns true if the value of the propery is in the domain.
-   * The propery has to be a vtkSMProxyProperty which points
+   * Returns true if the value of the property is in the domain.
+   * The property has to be a vtkSMProxyProperty which points
    * to a vtkSMSourceProxy. If the new (unchecked) source proxy
    * has the same number of parts and data types as the old
    * (checked) one, it returns 1. Returns 0 otherwise.

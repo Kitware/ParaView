@@ -584,7 +584,7 @@ protected:
 
   // Unique list of all integrated array names
   // it's used construct list of arrays that
-  // will be coppied into output.
+  // will be copied into output.
   std::vector<std::string> IntegratedArrayNames;
   std::vector<int> IntegratedArrayNComp;
   // number of integrated arrays

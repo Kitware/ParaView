@@ -165,7 +165,7 @@ public:
     int ret = this->Superclass::RequestData(req, inputVector, outputVector);
     inputVector[0]->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), inputDO);
 
-    // Add input bounds to the ouput field data so it gets cached for use in
+    // Add input bounds to the output field data so it gets cached for use in
     // vtkGeometrySliceRepresentation::RequestData().
     vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
     double inputBds[6];

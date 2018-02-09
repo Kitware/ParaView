@@ -633,7 +633,7 @@ public:
     // 3 case:
     //    - scalar    => no ratio (=1)
     //    - magniture => ratio    (>0)
-    //    - no data   => ratio ? MUST be overriden by other
+    //    - no data   => ratio ? MUST be overridden by other
 
     double localRatio = 1;
     double globalRatio;
@@ -985,7 +985,7 @@ public:
   }
 
   // --------------------------------------------------------------------------
-  // nbGlobalToSkip is the number of elements that should be skiped at the end
+  // nbGlobalToSkip is the number of elements that should be skipped at the end
   // if you exactly want to reach the searchedGlobalIndex.
   // localOffset is the corresponding local index in the sorted table to the
   // global index of (searchedGlobalIndex - nbGlobalToSkip)
@@ -1005,7 +1005,7 @@ public:
     double currentRange[2];
     vtkIdType idx, idxEnd;
 
-    // Setup inital hitogram range and values
+    // Setup initial hitogram range and values
     Histogram _globalHistogram;
     Histogram _localHistogram;
     localHistogram->CopyTo(_localHistogram);
@@ -1206,7 +1206,7 @@ public:
       }
     }
 
-    // Make sure that no values have been skiped while adding them
+    // Make sure that no values have been skipped while adding them
     if (histPart1.TotalValues + histPart2.TotalValues != dataA->GetNumberOfTuples())
     {
       cout << "Invalid number of elements in the histogram. Expected " << dataA->GetNumberOfTuples()
@@ -1214,7 +1214,7 @@ public:
       return false;
     }
 
-    // Make sure that no values have been skiped while merging histo
+    // Make sure that no values have been skipped while merging histo
     histMerge.Merge(histPart1);
     histMerge.Merge(histPart2);
     if (histMerge.TotalValues != dataA->GetNumberOfTuples())

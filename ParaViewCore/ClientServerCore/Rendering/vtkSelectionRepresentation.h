@@ -119,7 +119,7 @@ public:
 
   /**
    * Override because of internal composite representations that need to be
-   * initilized as well.
+   * initialized as well.
    */
   unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 

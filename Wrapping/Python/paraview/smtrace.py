@@ -51,7 +51,7 @@ new accessor for proxies create before the tracing began
 
 Additionally, there are filters such as :class:`.ProxyFilter`,
 :class:`.PipelineProxyFilter`, etc. which are used to filter properties that get
-traced and where they get traced i.e. in contructor call or right after it.
+traced and where they get traced i.e. in constructor call or right after it.
 
 ===============================
 Notes about references
@@ -179,7 +179,7 @@ class Trace(object):
         """Create a new accessor for a proxy. This returns True when a
         ProxyAccessor has been created, other returns False. This is needed to
         bring into trace proxies that were either already created when the trace
-        was started or were created indirectly and hence not explictly traced."""
+        was started or were created indirectly and hence not explicitly traced."""
         if isinstance(obj, sm.SourceProxy):
             # handle pipeline source/filter proxy.
             pname = obj.SMProxy.GetSessionProxyManager().GetProxyName("sources", obj.SMProxy)
@@ -541,7 +541,7 @@ def ProxyAccessor(*args, **kwargs):
 
 class PropertyTraceHelper(object):
     """PropertyTraceHelper is used by RealProxyAccessor to help with tracing
-    properites. In its contructor, RealProxyAccessor creates a
+    properites. In its constructor, RealProxyAccessor creates a
     PropertyTraceHelper for each of its properties that could potentially need
     to be traced."""
     def __init__(self, propertyname, proxyAccessor):
@@ -617,7 +617,7 @@ class PropertyTraceHelper(object):
         return self.PropertyName if not_fully_scoped else self.FullScopedName
 
     def get_value(self):
-        """Returns the propery value as a string. For proxy properties, this
+        """Returns the property value as a string. For proxy properties, this
         will either be a string used to refer to another proxy or a string used
         to refer to the proxy in a proxy list domain."""
         myobject = self.get_object()
@@ -806,7 +806,7 @@ def SupplementalProxy(cls):
 
 # ===================================================================================================
 # === TraceItem types ==
-# TraceItems are units of traceable actions triggerred by the application using vtkSMTrace
+# TraceItems are units of traceable actions triggered by the application using vtkSMTrace
 # ===================================================================================================
 
 class TraceItem(object):
@@ -920,7 +920,7 @@ class PropertiesModified(NestableTraceItem):
         except AttributeError: pass
 
 class ScalarBarInteraction(NestableTraceItem):
-    """Traces scalar bar interations"""
+    """Traces scalar bar interactions"""
     def __init__(self, proxy, comment=None):
         TraceItem.__init__(self)
         proxy = sm._getPyProxy(proxy)

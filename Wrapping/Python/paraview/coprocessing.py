@@ -2,7 +2,7 @@ r"""
 This module is designed for use in co-processing Python scripts. It provides a
 class, Pipeline, which is designed to be used as the base-class for Python
 pipeline. Additionally, this module has several other utility functions that are
-approriate for co-processing.
+appropriate for co-processing.
 """
 
 # for Python2 print statmements to output like Python3 print statements
@@ -108,7 +108,7 @@ class CoProcessor(object):
            Default implementation uses the update-frequencies set using
            SetUpdateFrequencies() to determine if the current timestep needs to
            be processed and then requests all fields. Subclasses can override
-           this method to provide addtional customizations."""
+           this method to provide additional customizations."""
 
         timestep = datadescription.GetTimeStep()
 
@@ -230,7 +230,7 @@ class CoProcessor(object):
               least image size.
 
               If not specified, for saving PNGs 0 is assumed to minimize
-              preformance impact.
+              performance impact.
 
             padding_amount (int, optional)
               Amount to pad the time index by.
@@ -514,7 +514,7 @@ class CoProcessor(object):
                 not hasattr(rep, 'MapScalars') or \
                 not rep.MapScalars or \
                 not rep.LookupTable:
-                # rep is either not visibile or not mapping scalars using a LUT.
+                # rep is either not visible or not mapping scalars using a LUT.
                 continue;
 
             input = rep.Input

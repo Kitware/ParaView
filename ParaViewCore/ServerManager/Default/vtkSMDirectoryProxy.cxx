@@ -64,7 +64,7 @@ bool vtkSMDirectoryProxy::CallDirectoryMethod(
     return false;
   }
 
-  // creat a helper for calling a method on vtk objects
+  // create a helper for calling a method on vtk objects
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(this->GetSession());
   vtkSmartPointer<vtkSMProxy> helper;

@@ -524,7 +524,7 @@ void vtkSpyPlotBlock::SetCoordinateSystem(const int& coordinateSystem)
       this->CoordSystem = vtkSpyPlotBlock::Cylinder2D;
       break;
     case vtkSpyPlotBlock::Cartesian3D:
-    default: // if unkown make it 3D
+    default: // if unknown make it 3D
       this->CoordSystem = vtkSpyPlotBlock::Cartesian3D;
       break;
   }
@@ -786,7 +786,7 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
         if (compIndex >= compSize)
         {
           vtkErrorWithObjectMacro(NULL, "Problem doing RLD decode. "
-              << "Too much data generated. Excpected: " << compSize);
+              << "Too much data generated. Expected: " << compSize);
           return 0;
         }
         comp[compIndex] = val + compIndex * delta;
@@ -802,7 +802,7 @@ int vtkSpyPlotBlock::SetGeometry(int dir, const unsigned char* encodedInfo, int 
         if (compIndex >= compSize)
         {
           vtkErrorWithObjectMacro(NULL, "Problem doing RLD decode. "
-              << "Too much data generated. Excpected: " << compSize);
+              << "Too much data generated. Expected: " << compSize);
           return 0;
         }
         float nval;

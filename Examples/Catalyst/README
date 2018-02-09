@@ -15,7 +15,7 @@ correctness of outputs. A description of the examples are:
                   methods from Catalyst for storing VTK data structures. This
                   assumes a vtkUnstructuredGrid.
 * CFullExample2 -- An example of a simulation code written in C. This improves
-                   upon the CFullExample by explictly storing VTK data structures.
+                   upon the CFullExample by explicitly storing VTK data structures.
                    This assumes a vtkUnstructuredGrid.
 * CxxFullExample -- A C++ example of a simulation code interfacing with Catalyst.
                     This assumes a vtkUnstructuredGrid.

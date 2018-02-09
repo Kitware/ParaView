@@ -48,7 +48,7 @@ public:
   //@{
   /**
    * Get/Set if the update suppressor is enabled. If the update suppressor
-   * is not enabled, it won't supress any updates. Enabled by default.
+   * is not enabled, it won't suppress any updates. Enabled by default.
    */
   void SetEnabled(bool);
   vtkGetMacro(Enabled, bool);

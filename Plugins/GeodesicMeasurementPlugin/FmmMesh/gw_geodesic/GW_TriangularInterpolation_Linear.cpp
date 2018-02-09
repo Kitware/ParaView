@@ -58,7 +58,7 @@ void GW_TriangularInterpolation_Linear::ComputeGradient( GW_GeodesicVertex& v0, 
     /* The gradient in direction (e1,e2) is:
             |<grad(d),e0>|   |(d0-d2)/l0|   |gu|
         D = |<grad(d),e1>| = |(d1-d2)/l1| = |gv|
-    We are searching for grad(d) = dx e0 + dy e1 wich gives rise to the system :
+    We are searching for grad(d) = dx e0 + dy e1 which gives rise to the system :
         | 1  dot|   |dx|
         |dot  1 | * |dy| = D            where dot=<e0,e2>
     ie it is:

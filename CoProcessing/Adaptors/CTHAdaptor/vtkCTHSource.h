@@ -28,7 +28,7 @@ public:
   void InitializeBlock(int block_id, int Nx, int Ny, int Nz, double* x, double* y, double* z,
     int active, int active1, int level);
   // Description:
-  // Initialize field parmaeters for field_id
+  // Initialize field parameters for field_id
   void SetCellFieldName(int field_id, char* field_name, char* comment, int matid);
   void SetMaterialFieldName(int field_id, char* field_name, char* command);
   // Description:

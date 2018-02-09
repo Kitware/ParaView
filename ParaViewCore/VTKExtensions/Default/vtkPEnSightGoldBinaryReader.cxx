@@ -341,7 +341,7 @@ int vtkPEnSightGoldBinaryReader::ReadGeometryFile(
     }
     realId = this->InsertNewPartId(partId);
 
-    // Increment the number of geoemtry parts such that the measured geomtry,
+    // Increment the number of geometry parts such that the measured geometry,
     // if any, can be properly combined into a vtkMultiBlockDataSet object.
     // --- fix to bug #7453
     this->NumberOfGeometryParts++;
