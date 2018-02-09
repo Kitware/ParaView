@@ -506,26 +506,6 @@
     <!-- end of keyframes -->
   </ProxyGroup>
   <!-- ==================================================================== -->
-  <ProxyGroup name="remote_player">
-    <!-- .................................................................. -->
-    <!-- Proxy used to save animation remotely when the client disconnect -->
-    <!-- FIXME: to remove -->
-    <Proxy class="vtkPVServerSideAnimationPlayer" name="AnimationPlayer">
-      <StringVectorProperty command="SetSessionProxyManagerState"
-                            default_values=""
-                            name="SessionProxyManagerState"
-                            number_of_elements="1">
-        <Documentation>Set the XML content of the vtkSMSessionProxyManager
-        state.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetFileName"
-                            default_values=""
-                            name="FileName"
-                            number_of_elements="1" />
-      <Property name="Activate" command="Activate" />
-    </Proxy>
-  </ProxyGroup>
-  <!-- ==================================================================== -->
   <ProxyGroup name="animation_writers">
     <Proxy name="JPEG" class="vtkJPEGWriter" process="client"
       base_proxygroup="screenshot_writers"

@@ -116,7 +116,6 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartLoadNoVariables.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ClampAndUpdateColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Ensemble.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LightAddRemove.xml
@@ -714,7 +713,6 @@ set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (SaveTSV_FORCE_SERIAL TRUE) # Seems to works better in serial
-set (DisconnectAndSaveAnimation_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
@@ -775,11 +773,6 @@ set (PlotOverTimeAutoApply_DISABLE_CRS TRUE) # since this uses surface selection
 set (QuartilePlot_THRESHOLD 20)
 # The ExportLinePlotToTSV test uses the same image baseline as the ExportLinePlotToCSV test
 set (ExportLinePlotToTSV_BASELINE ExportLinePlotToCSV.png)
-
-# DisconnectAndSaveAnimation is only support in Client-Server mode.
-set (DisconnectAndSaveAnimation_DISABLE_C TRUE)
-set (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
-set (DisconnectAndSaveAnimation_BREAK TRUE)
 
 # ExportSceneSpreadSheetView2 won't work in parallel CS because of ghost cells
 # than cannot be processed by TableToStructuredGrid.

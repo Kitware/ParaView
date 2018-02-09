@@ -45,7 +45,6 @@ set (Module_SRCS
   vtkPVKeyFrame.cxx
   vtkPVRampKeyFrame.cxx
   vtkPVRepresentationAnimationHelper.cxx
-  vtkPVServerSideAnimationPlayer.cxx
   vtkPVSinusoidKeyFrame.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkSequenceAnimationPlayer.cxx
