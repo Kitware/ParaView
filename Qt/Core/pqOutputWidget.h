@@ -41,6 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqOutputWidget;
 
+namespace OutputWidgetInternals
+{
+class OutputWindow;
+};
+
 Q_DECLARE_METATYPE(QtMsgType)
 /**
  * @class MessageHandler
@@ -179,6 +184,7 @@ private:
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
+  friend class OutputWidgetInternals::OutputWindow;
 };
 
 #endif

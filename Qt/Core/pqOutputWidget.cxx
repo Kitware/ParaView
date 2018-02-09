@@ -34,39 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
-#include "vtkCriticalSection.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 
+#include <QMutexLocker>
 #include <QPointer>
+#include <QScopedValueRollback>
 #include <QStandardItemModel>
 #include <QStringList>
 #include <QStyle>
 
 namespace OutputWidgetInternals
 {
-
-template <class T>
-class ScopedSetter
-{
-private:
-  T& Ref;
-  T OldValue;
-
-public:
-  ScopedSetter(T& ref, const T& newvalue)
-    : Ref(ref)
-    , OldValue(ref)
-  {
-    this->Ref = newvalue;
-  }
-  ~ScopedSetter() { this->Ref = this->OldValue; }
-private:
-  ScopedSetter(const ScopedSetter&) = delete;
-  void operator=(const ScopedSetter&) = delete;
-};
-
 /// Used when pqOutputWidget is registered with vtkOutputWindow as the default
 /// output window for VTK messages.
 class OutputWindow : public vtkOutputWindow
@@ -79,10 +59,15 @@ public:
 
   void DisplayText(const char* msg) VTK_OVERRIDE
   {
-    this->CriticalSectionGeneric->Lock();
+    QMutexLocker locker(&this->MutexGenericMessage);
     if (this->Widget)
     {
-      MessageHandler::handlerVTK(this->CurrentMessageType, QString(msg));
+      const QString qmsg(msg);
+      MessageHandler::handlerVTK(this->CurrentMessageType, qmsg);
+      if (this->Widget->suppress(qmsg, this->CurrentMessageType))
+      {
+        return;
+      }
     }
 
     switch (this->CurrentMessageType)
@@ -108,39 +93,34 @@ public:
     // server-side messages that leads this to be an infinite recursion. We
     // will fix that separately as that's beyond the scope of this changeset.
     // this->Superclass::DisplayText(msg);
-    this->CriticalSectionGeneric->Unlock();
   }
 
   void DisplayErrorText(const char* msg) VTK_OVERRIDE
   {
-    this->CriticalSectionTyped->Lock();
-    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtCriticalMsg);
+    QMutexLocker locker(&this->MutexTypedMessage);
+    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtCriticalMsg);
     this->Superclass::DisplayErrorText(msg); // this calls DisplayText();
-    this->CriticalSectionTyped->Unlock();
   }
 
   void DisplayWarningText(const char* msg) VTK_OVERRIDE
   {
-    this->CriticalSectionTyped->Lock();
-    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
+    QMutexLocker locker(&this->MutexTypedMessage);
+    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
     this->Superclass::DisplayWarningText(msg); // this calls DisplayText();
-    this->CriticalSectionTyped->Unlock();
   }
 
   void DisplayGenericWarningText(const char* msg) VTK_OVERRIDE
   {
-    this->CriticalSectionTyped->Lock();
-    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
+    QMutexLocker locker(&this->MutexTypedMessage);
+    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
     this->Superclass::DisplayGenericWarningText(msg); // this calls DisplayText();
-    this->CriticalSectionTyped->Unlock();
   }
 
   void DisplayDebugText(const char* msg) VTK_OVERRIDE
   {
-    this->CriticalSectionTyped->Lock();
-    ScopedSetter<QtMsgType> a(this->CurrentMessageType, QtDebugMsg);
+    QMutexLocker locker(&this->MutexTypedMessage);
+    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtDebugMsg);
     this->Superclass::DisplayDebugText(msg); // this calls DisplayText();
-    this->CriticalSectionTyped->Unlock();
   }
 
 protected:
@@ -154,8 +134,8 @@ protected:
   QtMsgType CurrentMessageType;
   QPointer<pqOutputWidget> Widget;
 
-  vtkNew<vtkCriticalSection> CriticalSectionTyped;
-  vtkNew<vtkCriticalSection> CriticalSectionGeneric;
+  QMutex MutexTypedMessage;
+  QMutex MutexGenericMessage;
 
 private:
   OutputWindow(const OutputWindow&) = delete;
@@ -173,15 +153,11 @@ MessageHandler::MessageHandler(QObject* parent)
 
 void MessageHandler::install(pqOutputWidget* widget)
 {
-  // Call instance() to ensure we create the MessageHandler object on the main
-  // thread.
-  MessageHandler::instance();
+  auto self = MessageHandler::instance();
   qInstallMessageHandler(MessageHandler::handler);
-
   if (widget)
   {
-    connect(MessageHandler::instance(), &MessageHandler::showMessage, widget,
-      &pqOutputWidget::displayMessage);
+    connect(self, &MessageHandler::showMessage, widget, &pqOutputWidget::displayMessage);
   }
 }
 
@@ -401,12 +377,40 @@ public:
 
   const QString& settingsKey() const { return this->SettingsKey; }
 
+  /**
+   * add a list of strings to be subpressed
+   * this is thread safe.
+   */
+  void suppress(const QStringList& substrs)
+  {
+    QMutexLocker locker(&this->SuppressionMutex);
+    this->SuppressedStrings.append(substrs);
+  }
+
+  /**
+   * returns true if the message should be/is suppressed.
+   * this is thread safe.
+   */
+  bool suppress(const QString& message, QtMsgType)
+  {
+    QMutexLocker locker(&this->SuppressionMutex);
+    foreach (const QString& substr, this->SuppressedStrings)
+    {
+      if (message.contains(substr))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
 private:
   QString tr(const QString& sourceText) const
   {
     return QApplication::translate("pqOutputWidget", sourceText.toUtf8().data());
   }
   QString SettingsKey;
+  QMutex SuppressionMutex;
 };
 
 //-----------------------------------------------------------------------------
@@ -440,8 +444,7 @@ pqOutputWidget::~pqOutputWidget()
 //-----------------------------------------------------------------------------
 void pqOutputWidget::suppress(const QStringList& substrs)
 {
-  pqInternals& internals = (*this->Internals);
-  internals.SuppressedStrings.append(substrs);
+  this->Internals->suppress(substrs);
 }
 
 //-----------------------------------------------------------------------------
@@ -468,17 +471,9 @@ bool pqOutputWidget::displayMessage(const QString& message, QtMsgType type)
 }
 
 //-----------------------------------------------------------------------------
-bool pqOutputWidget::suppress(const QString& message, QtMsgType)
+bool pqOutputWidget::suppress(const QString& message, QtMsgType mtype)
 {
-  pqInternals& internals = (*this->Internals);
-  foreach (const QString& substr, internals.SuppressedStrings)
-  {
-    if (message.contains(substr))
-    {
-      return true;
-    }
-  }
-  return false;
+  return this->Internals->suppress(message, mtype);
 }
 
 //-----------------------------------------------------------------------------
