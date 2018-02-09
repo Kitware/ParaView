@@ -4144,7 +4144,7 @@
           maximum compression.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="No compression" value="0" />
+          <Entry text="0" value="0" info="no compression" />
           <Entry text="1" value="1" />
           <Entry text="2" value="2" />
           <Entry text="3" value="3" />
@@ -4153,7 +4153,7 @@
           <Entry text="6" value="6" />
           <Entry text="7" value="7" />
           <Entry text="8" value="8" />
-          <Entry text="Maximum compression" value="9" />
+          <Entry text="9" value="9" info="Maximum compression" />
         </EnumerationDomain>
       </IntVectorProperty>
       <Hints>
@@ -4316,6 +4316,7 @@
     </SaveScreenshotProxy>
 
     <SaveScreenshotProxy name="SaveScreenshot" processes="client"
+      label="Save Screenshot"
       base_proxygroup="misc"
       base_proxyname="SaveScreenshotBase">
       <Documentation>

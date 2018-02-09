@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
 #include "pqProxyWidgetDialog.h"
+#include "pqSaveScreenshotReaction.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
+
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
@@ -71,52 +73,6 @@ void pqSaveAnimationReaction::updateEnableState()
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   bool is_enabled = (activeObjects->activeServer() != NULL);
   this->parentAction()->setEnabled(is_enabled);
-}
-
-//-----------------------------------------------------------------------------
-QString pqSaveAnimationReaction::promptFileName(pqServer* server, bool remote)
-{
-  QString lastUsedExt;
-
-  // Load the most recently used file extensions from QSettings, if available.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings->contains("extensions/AnimationExtension"))
-  {
-    lastUsedExt = settings->value("extensions/AnimationExtension").toString();
-  }
-
-  vtkSMSession* session = server->session();
-
-  QStringList filters;
-  if (vtkSMSaveAnimationProxy::SupportsAVI(session, remote))
-  {
-    filters << "AVI files (*.avi)";
-  }
-  if (vtkSMSaveAnimationProxy::SupportsOGV(session, remote))
-  {
-    filters << "Ogg/Theora files (*.ogv)";
-  }
-  filters << "PNG images (*.png)"
-          << "JPG images (*.jpg)"
-          << "TIFF images (*.tif)"
-          << "BMP images (*.bmp)"
-          << "PPM images (*.ppm)";
-
-  pqFileDialog file_dialog(remote ? server : NULL, pqCoreUtilities::mainWidget(),
-    tr("Save Animation"), QString(), filters.join(";;"));
-  file_dialog.setRecentlyUsedExtension(lastUsedExt);
-  file_dialog.setObjectName("FileSaveAnimationDialog");
-  file_dialog.setFileMode(pqFileDialog::AnyFile);
-  if (file_dialog.exec() != QDialog::Accepted)
-  {
-    return QString();
-  }
-
-  QString file = file_dialog.getSelectedFiles()[0];
-  QFileInfo fileInfo(file);
-  lastUsedExt = QString("*.") + fileInfo.suffix();
-  settings->setValue("extensions/AnimationExtension", lastUsedExt);
-  return file;
 }
 
 //-----------------------------------------------------------------------------
@@ -146,6 +102,13 @@ void pqSaveAnimationReaction::saveAnimation()
     return;
   }
 
+  // Get the filename first, this will determine some of the options shown.
+  QString filename = pqSaveScreenshotReaction::promptFileName(ahProxy, "*.png");
+  if (filename.isEmpty())
+  {
+    return;
+  }
+
   bool restorePreviewMode = false;
 
   // Cache the separator width and color
@@ -167,9 +130,9 @@ void pqSaveAnimationReaction::saveAnimation()
   vtkSMPropertyHelper(ahProxy, "View").Set(viewProxy);
   vtkSMPropertyHelper(ahProxy, "Layout").Set(layout);
   vtkSMPropertyHelper(ahProxy, "AnimationScene").Set(scene);
+  ahProxy->UpdateDefaultsAndVisibilities(filename.toLocal8Bit().data());
   controller->PostInitializeProxy(ahProxy);
 
-  ahProxy->UpdateSaveAllViewsPanelVisibility();
   if (layout)
   {
     int previewMode[2] = { -1, -1 };
@@ -189,56 +152,16 @@ void pqSaveAnimationReaction::saveAnimation()
     }
   }
 
-  if (!vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(session))
+  pqProxyWidgetDialog dialog(ahProxy, pqCoreUtilities::mainWidget());
+  dialog.setObjectName("SaveAnimationDialog");
+  dialog.setApplyChangesImmediately(true);
+  dialog.setWindowTitle("Save Animation Options");
+  dialog.setEnableSearchBar(true);
+  dialog.setSettingsKey("SaveAnimationDialog");
+
+  if (dialog.exec() == QDialog::Accepted)
   {
-    vtkSMPropertyHelper(ahProxy, "DisconnectAndSave").Set(0);
-    ahProxy->GetProperty("DisconnectAndSave")->SetPanelVisibility("never");
-  }
-
-  // scope to ensure that pqProxyWidgetDialog is destroyed and releases the
-  // ahProxy reference when it's done.
-  {
-    pqProxyWidgetDialog dialog(ahProxy, pqCoreUtilities::mainWidget());
-    dialog.setObjectName("SaveAnimationDialog");
-    dialog.setApplyChangesImmediately(true);
-    dialog.setWindowTitle("Save Animation Options");
-    dialog.setEnableSearchBar(true);
-    dialog.setSettingsKey("SaveAnimationDialog");
-
-    if (dialog.exec() != QDialog::Accepted)
-    {
-      if (layout)
-      {
-        // Reset the separator width and color
-        vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
-        vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
-        // Reset to the previous preview resolution or exit preview mode
-        if (restorePreviewMode)
-        {
-          int psize[2] = { 0, 0 };
-          vtkSMPropertyHelper(layout, "PreviewMode").Set(psize, 2);
-        }
-        layout->UpdateVTKObjects();
-        widthLink->RemoveAllLinks();
-        colorLink->RemoveAllLinks();
-      }
-      return;
-    }
-  }
-
-  bool disconnectAndSave = vtkSMPropertyHelper(ahProxy, "DisconnectAndSave").GetAsInt() != 0;
-  QString filename = pqSaveAnimationReaction::promptFileName(server, disconnectAndSave);
-  if (!filename.isEmpty())
-  {
-    if (ahProxy->WriteAnimation(filename.toUtf8().data()) && disconnectAndSave)
-    {
-      Q_ASSERT(ahProxy->GetReferenceCount() == 1);
-      ahProxy = NULL;
-      proxy = NULL; // release reference.
-
-      pqObjectBuilder* ob = pqApplicationCore::instance()->getObjectBuilder();
-      ob->removeServer(server);
-    }
+    ahProxy->WriteAnimation(filename.toUtf8().data());
   }
 
   if (layout)
@@ -257,11 +180,8 @@ void pqSaveAnimationReaction::saveAnimation()
     colorLink->RemoveAllLinks();
   }
 
-  if (!disconnectAndSave)
-  {
-    // This should not be needed as image capturing code only affects back buffer,
-    // however it is currently needed due to paraview/paraview#17256. Once that's
-    // fixed, we should remove this.
-    pqApplicationCore::instance()->render();
-  }
+  // This should not be needed as image capturing code only affects back buffer,
+  // however it is currently needed due to paraview/paraview#17256. Once that's
+  // fixed, we should remove this.
+  pqApplicationCore::instance()->render();
 }

@@ -22,7 +22,7 @@
  * calls vtkSMSaveAnimationProxy::WriteAnimation` to save out the animation.
  *
  * vtkSMSaveAnimationProxy provides static methods such as
- * `SupportsDisconnectAndSave`, `SupportsAVI`, and `SupportsOGV` that
+ * `SupportsAVI`, and `SupportsOGV` that
  * applications can use to determine support for specific functionality in the
  * current session/application.
  */
@@ -34,7 +34,7 @@
 #include "vtkSMSaveScreenshotProxy.h"
 namespace vtkSMSaveAnimationProxyNS
 {
-class SceneImageWriter;
+class SceneGrabber;
 }
 
 class vtkPVXMLElement;
@@ -56,7 +56,7 @@ public:
    * Returns true if the session can support disconnecting and saving
    * animations.
    */
-  static bool SupportsDisconnectAndSave(vtkSMSession* session);
+  VTK_LEGACY(static bool SupportsDisconnectAndSave(vtkSMSession* session));
 
   /**
    * Returns true if the session supports AVI file writing.
@@ -68,6 +68,11 @@ public:
    */
   static bool SupportsOGV(vtkSMSession* session, bool remote = false);
 
+  /**
+   * Overridden to update visibility state of "FrameRate" property.
+   */
+  void UpdateDefaultsAndVisibilities(const char* filename) override;
+
 protected:
   vtkSMSaveAnimationProxy();
   ~vtkSMSaveAnimationProxy() override;
@@ -76,11 +81,6 @@ protected:
    * Write animation on local process.
    */
   virtual bool WriteAnimationLocally(const char* filename);
-
-  /**
-   * Write animation on server after disconnecting from it.
-   */
-  virtual bool DisconnectAndWriteAnimation(const char* filename);
 
   /**
    * Prepares for saving animation.
@@ -107,7 +107,7 @@ private:
   vtkSMSaveAnimationProxy(const vtkSMSaveAnimationProxy&) = delete;
   void operator=(const vtkSMSaveAnimationProxy&) = delete;
 
-  friend class vtkSMSaveAnimationProxyNS::SceneImageWriter;
+  friend class vtkSMSaveAnimationProxyNS::SceneGrabber;
 
   vtkSmartPointer<vtkPVXMLElement> SceneState;
 };

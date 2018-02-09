@@ -71,12 +71,6 @@ protected:
   */
   void onTriggered() override { pqSaveAnimationReaction::saveAnimation(); }
 
-  /**
-   * Prompt for a filename. Will return empty string if user
-   * cancelled the operation.
-   */
-  static QString promptFileName(pqServer* server, bool remote);
-
 private:
   Q_DISABLE_COPY(pqSaveAnimationReaction)
 };
