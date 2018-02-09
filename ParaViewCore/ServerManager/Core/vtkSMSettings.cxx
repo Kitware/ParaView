@@ -37,6 +37,7 @@
 
 #include <algorithm>
 #include <cfloat>
+#include <memory>
 #include <string>
 
 #define vtkSMSettingsDebugMacro(x)                                                                 \
@@ -963,9 +964,13 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
     processedSettings.append("{}");
   }
 
-  // Parse the user settings
-  Json::Reader reader;
-  bool success = reader.parse(processedSettings, collection.Value, true);
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = true;
+
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+
+  const char* input = processedSettings.c_str();
+  bool success = reader->parse(input, input + strlen(input), &collection.Value, nullptr);
   if (success)
   {
     this->Internal->SettingCollections.push_back(collection);

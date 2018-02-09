@@ -27,6 +27,7 @@
 
 #include <cassert>
 #include <list>
+#include <memory>
 #include <set>
 #include <sstream>
 
@@ -133,7 +134,8 @@ public:
 
   bool ImportPresets(const char* filename)
   {
-    Json::Reader reader;
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
     Json::Value root;
     ifstream file;
     file.open(filename);
@@ -142,7 +144,7 @@ public:
       vtkGenericWarningMacro("Failed to open file: " << filename);
       return false;
     }
-    if (!reader.parse(file, root))
+    if (!parseFromStream(builder, file, &root, nullptr))
     {
       vtkGenericWarningMacro("File is not is a format suitable for presets: " << filename);
       return false;
@@ -178,12 +180,15 @@ private:
       return;
     }
     char* rawJSON = vtkSMTransferFunctionPresetsColorMapsJSON();
-    Json::Reader reader;
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
+    std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+    std::string formattedErrors;
     Json::Value value;
-    if (!reader.parse(std::string(rawJSON), value))
+    if (!reader->parse(rawJSON, rawJSON + strlen(rawJSON), &value, &formattedErrors))
     {
       vtkGenericWarningMacro(<< "Failed to parse builtin transfer function presets: "
-                             << reader.getFormattedErrorMessages().c_str());
+                             << formattedErrors);
     }
     delete[] rawJSON;
     this->BuiltinPresets.insert(this->BuiltinPresets.end(), value.begin(), value.end());
@@ -205,12 +210,17 @@ private:
     }
 
     std::string presetJSON = settings->GetSettingAsString(settingsKey, "");
-    Json::Reader reader;
+    const char* input = presetJSON.c_str();
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = false;
+    std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+    std::string formattedErrors;
     Json::Value value;
-    if (!presetJSON.empty() && !reader.parse(presetJSON, value))
+    if (!presetJSON.empty() &&
+      !reader->parse(input, input + strlen(input), &value, &formattedErrors))
     {
       vtkGenericWarningMacro(<< "Failed to parse custom transfer function presets: "
-                             << reader.getFormattedErrorMessages().c_str());
+                             << formattedErrors);
     }
     this->CustomPresets.insert(this->CustomPresets.end(), value.begin(), value.end());
   }
@@ -290,12 +300,16 @@ bool vtkSMTransferFunctionPresets::AddPreset(const char* name, const vtkStdStrin
   }
 
   Json::Value value;
-  Json::Reader reader;
-  if (!reader.parse(preset, value))
+  const char* input = preset.c_str();
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = false;
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+  std::string formattedErrors;
+  if (!reader->parse(input, input + strlen(input), &value, &formattedErrors))
   {
     vtkErrorMacro("Invalid preset string.");
     vtkGenericWarningMacro(<< "Failed to parse builtin transfer function presets: "
-                           << reader.getFormattedErrorMessages().c_str());
+                           << formattedErrors);
     return false;
   }
   this->Internals->AddPreset(name, value);
