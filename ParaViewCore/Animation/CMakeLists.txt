@@ -52,7 +52,6 @@ set (Module_SRCS
   vtkSMAnimationFrameWindowDomain.cxx
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
-  vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMSaveAnimationProxy.cxx

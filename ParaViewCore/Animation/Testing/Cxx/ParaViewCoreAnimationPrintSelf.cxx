@@ -22,7 +22,6 @@
 #include "vtkSIXMLAnimationWriterRepresentationProperty.h"
 #include "vtkSMAnimationScene.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
-#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSequenceAnimationPlayer.h"
 #include "vtkTimestepsAnimationPlayer.h"
@@ -49,7 +48,6 @@ int ParaViewCoreAnimationPrintSelf(int, char* [])
   PRINT_SELF(vtkSIXMLAnimationWriterRepresentationProperty);
   PRINT_SELF(vtkSMAnimationScene);
   PRINT_SELF(vtkSMAnimationSceneGeometryWriter);
-  PRINT_SELF(vtkSMAnimationSceneImageWriter);
   PRINT_SELF(vtkSMAnimationSceneProxy);
   PRINT_SELF(vtkTimestepsAnimationPlayer);
   PRINT_SELF(vtkXMLPVAnimationWriter);
