@@ -1055,10 +1055,23 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
           Set to 1 (or True) to save an image with background set to alpha=0, if
           supported by the output image format.
 
-        ImageQuality (int)
-          Set a number in the range [0, 100] to specify the output image
-          quality/compression. 0 is least quality/most compressed, while 100
-          means best quality/least compressed.
+    In addition, several format-specific keyword parameters can be specified.
+    The format is chosen based on the file extension.
+
+    For JPEG (`*.jpg`), the following parameters are available (optional)
+
+        Quality (int) [0, 100]
+          Specify the JPEG compression quality. `O` is low quality (maximum compression)
+          and `100` is high quality (least compression).
+
+        Progressive (int):
+          Set to 1 (or True) to save progressive JPEG.
+
+    For PNG (`*.png`), the following parameters are available (optional)
+
+        CompressionLevel (int) [0, 9]
+          Specify the *zlib* compression level. `0` is no compression, while `9` is
+          maximum compression.
 
     **Legacy Parameters**
 
@@ -1078,6 +1091,11 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
 
         quality (int)
           Output image quality, a number in the range [0, 100].
+
+        ImageQuality (int)
+            For ParaView 5.4, the following parameters were available, however
+            it is ignored starting with ParaView 5.5. Instead, it is recommended
+            to use format-specific quality parameters based on the file format being used.
     """
     # Let's handle backwards compatibility.
     # Previous API for this method took the following arguments:
@@ -1109,8 +1127,25 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
     options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
     options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
 
-    SetProperties(options, **params)
+    # this will choose the correct format.
+    options.UpdateDefaultsAndVisibilities(filename)
+
     controller.PostInitializeProxy(options)
+
+    # explicitly process format properties.
+    formatProxy = options.Format
+    formatProperties = formatProxy.ListProperties()
+    for prop in formatProperties:
+        if prop in params:
+            formatProxy.SetPropertyWithName(prop, params[prop])
+            del params[prop]
+
+    if "ImageQuality" in params:
+        import warnings
+        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
+        del params["ImageQuality"]
+
+    SetProperties(options, **params)
     return options.WriteImage(filename)
 
 # -----------------------------------------------------------------------------
@@ -1143,13 +1178,6 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
         `SaveAnimation` supports all keyword parameters supported by
         `SaveScreenshot`. In addition, the following parameters are supported:
 
-        DisconnectAndSave (int):
-          In client-server mode (with rendering-capable server), set this to 1
-          to disconnect from the server and let the server save the animation
-          out before terminating. In that case, the filename specifies a path on
-          the server. Defaults to 0, in which case the animation is saved on the
-          client.
-
         FrameRate (int):
           Frame rate in frames per second for the output. This only affects the
           output when generated movies (`avi` or `ogv`), and not when saving the
@@ -1158,6 +1186,52 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
         FrameWindow (tuple(int,int))
           To save a part of the animation, provide the range in frames or
           timesteps index.
+
+    In addition, several format-specific keyword parameters can be specified.
+    The format is chosen based on the file extension.
+
+    For Image-based file-formats that save series of images e.g. PNG, JPEG,
+    following parameters are available.
+
+        SuffixFormat (string):
+          Format string used to convert the frame number to file name suffix.
+
+    FFMPEG avi file format supports following parameters.
+
+        Compression (int)
+          Set to 1 or True to enable compression.
+
+        Quality:
+          When compression is 1 (or True), this specifies the compression
+          quality. `0` is worst quality (smallest file size) and `2` is best
+          quality (largest file size).
+
+    VideoForWindows (VFW) avi file format supports following parameters.
+
+        Quality:
+          This specifies the compression quality. `0` is worst quality
+          (smallest file size) and `2` is best quality (largest file size).
+
+    OGG/Theora file format supports following parameters.
+
+        Quality:
+          This specifies the compression quality. `0` is worst quality
+          (smallest file size) and `2` is best quality (largest file size).
+
+        UseSubsampling:
+          When set to 1 (or True), the video will be encoded uisng 4:2:0
+          subsampling for the color channels.
+
+    **Obsolete Parameters**
+
+        DisconnectAndSave (int):
+          This mode is no longer supported as of ParaView 5.5, and will be
+          ignored.
+
+        ImageQuality (int)
+            For ParaView 5.4, the following parameters were available, however
+            it is ignored starting with ParaView 5.5. Instead, it is recommended
+            to use format-specific quality parameters based on the file format being used.
     """
     # use active view if no view or layout is specified.
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
@@ -1169,6 +1243,11 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     if not scene:
         raise RuntimeError("Missing animation scene.")
 
+    if "DisconnectAndSave" in params:
+        import warnings
+        warnings.warn("'DisconnectAndSave' is deprecated and will be ignored.", DeprecationWarning)
+        del params["DisconnectAndSave"]
+
     controller = servermanager.ParaViewPipelineController()
     options = servermanager.misc.SaveAnimation()
     controller.PreInitializeProxy(options)
@@ -1178,9 +1257,25 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
     options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
 
-    SetProperties(options, **params)
+    # this will choose the correct format.
+    options.UpdateDefaultsAndVisibilities(filename)
+
     controller.PostInitializeProxy(options)
 
+    # explicitly process format properties.
+    formatProxy = options.Format
+    formatProperties = formatProxy.ListProperties()
+    for prop in formatProperties:
+        if prop in params:
+            formatProxy.SetPropertyWithName(prop, params[prop])
+            del params[prop]
+
+    if "ImageQuality" in params:
+        import warnings
+        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
+        del params["ImageQuality"]
+
+    SetProperties(options, **params)
     return options.WriteAnimation(filename)
 
 def WriteAnimation(filename, **params):
