@@ -191,7 +191,7 @@ void pqChooseColorPresetReaction::applyCurrentPreset()
       }
     }
   }
-  else if (dialog->loadAnnotations())
+  if (dialog->loadAnnotations())
   {
     vtkSMTransferFunctionProxy::ApplyPreset(
       lut, dialog->currentPreset(), !dialog->loadAnnotations());
