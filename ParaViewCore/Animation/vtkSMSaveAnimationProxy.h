@@ -21,10 +21,6 @@
  * configure when saving animations. Once those properties are setup, one
  * calls vtkSMSaveAnimationProxy::WriteAnimation` to save out the animation.
  *
- * vtkSMSaveAnimationProxy provides static methods such as
- * `SupportsAVI`, and `SupportsOGV` that
- * applications can use to determine support for specific functionality in the
- * current session/application.
  */
 
 #ifndef vtkSMSaveAnimationProxy_h
@@ -60,13 +56,15 @@ public:
 
   /**
    * Returns true if the session supports AVI file writing.
+   * @deprecated in ParaView 5.5
    */
-  static bool SupportsAVI(vtkSMSession* session, bool remote = false);
+  VTK_LEGACY(static bool SupportsAVI(vtkSMSession* session, bool remote = false));
 
   /**
    * Returns true if the session supports OGV file writing.
+   * @deprecated in ParaView 5.5
    */
-  static bool SupportsOGV(vtkSMSession* session, bool remote = false);
+  VTK_LEGACY(static bool SupportsOGV(vtkSMSession* session, bool remote = false));
 
   /**
    * Overridden to update visibility state of "FrameRate" property.

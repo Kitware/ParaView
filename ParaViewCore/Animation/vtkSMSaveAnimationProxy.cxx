@@ -249,14 +249,16 @@ vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy()
 #ifndef VTK_LEGACY_REMOVE
 bool vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(vtkSMSession* session)
 {
-  VTK_LEGACY_BODY(vtkSMSaveScreenshotProxy::SupportsDisconnectAndSave, "ParaView 5.5");
+  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsDisconnectAndSave, "ParaView 5.5");
   return false;
 }
 #endif
 
 //----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
 bool vtkSMSaveAnimationProxy::SupportsAVI(vtkSMSession* session, bool remote)
 {
+  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsAVI, "ParaView 5.5");
   vtkSmartPointer<vtkPVServerInformation> info;
   if (remote)
   {
@@ -271,10 +273,13 @@ bool vtkSMSaveAnimationProxy::SupportsAVI(vtkSMSession* session, bool remote)
 
   return info->GetAVISupport() != 0;
 }
+#endif
 
 //----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
 bool vtkSMSaveAnimationProxy::SupportsOGV(vtkSMSession* session, bool remote)
 {
+  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsOGV, "ParaView 5.5");
   vtkSmartPointer<vtkPVServerInformation> info;
   if (remote)
   {
@@ -289,6 +294,7 @@ bool vtkSMSaveAnimationProxy::SupportsOGV(vtkSMSession* session, bool remote)
 
   return info->GetOGVSupport() != 0;
 }
+#endif
 
 //----------------------------------------------------------------------------
 bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)
