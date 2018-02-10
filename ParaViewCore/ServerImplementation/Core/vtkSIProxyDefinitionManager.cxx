@@ -44,9 +44,6 @@
 
 #include <assert.h>
 
-// this file must be included after vtkPVConfig etc. are included.
-// #include "vtkSMGeneratedModules.h"
-
 //****************************************************************************/
 //                    Internal Classes and typedefs
 //****************************************************************************/
