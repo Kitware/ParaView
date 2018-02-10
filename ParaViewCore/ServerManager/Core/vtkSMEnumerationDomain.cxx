@@ -21,9 +21,35 @@
 #include <algorithm>
 #include <sstream>
 
-struct vtkSMEnumerationDomainInternals
+namespace
 {
-  using EntryType = std::pair<std::string, int>;
+struct EntryType
+{
+  std::string Text;
+  int Value;
+  std::string Info;
+
+  EntryType()
+    : Value(-1)
+  {
+  }
+  EntryType(const char* text, int val, const char* info)
+    : Value(val)
+  {
+    if (text)
+    {
+      this->Text = text;
+    }
+    if (info)
+    {
+      this->Info = info;
+    }
+  }
+};
+}
+
+struct vtkSMEnumerationDomain::vtkEDInternals
+{
   using EntriesType = std::vector<EntryType>;
   EntriesType Entries;
 };
@@ -31,8 +57,8 @@ struct vtkSMEnumerationDomainInternals
 vtkStandardNewMacro(vtkSMEnumerationDomain);
 //---------------------------------------------------------------------------
 vtkSMEnumerationDomain::vtkSMEnumerationDomain()
+  : EInternals(new vtkSMEnumerationDomain::vtkEDInternals())
 {
-  this->EInternals = new vtkSMEnumerationDomainInternals;
 }
 
 //---------------------------------------------------------------------------
@@ -55,7 +81,7 @@ int vtkSMEnumerationDomain::GetEntryValue(unsigned int idx)
     vtkErrorMacro("Invalid idx: " << idx);
     return 0;
   }
-  return this->EInternals->Entries[idx].second;
+  return this->EInternals->Entries[idx].Value;
 }
 
 //---------------------------------------------------------------------------
@@ -64,9 +90,21 @@ const char* vtkSMEnumerationDomain::GetEntryText(unsigned int idx)
   if (idx >= static_cast<unsigned int>(this->EInternals->Entries.size()))
   {
     vtkErrorMacro("Invalid idx: " << idx);
-    return NULL;
+    return nullptr;
   }
-  return this->EInternals->Entries[idx].first.c_str();
+  return this->EInternals->Entries[idx].Text.c_str();
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMEnumerationDomain::GetInfoText(unsigned int idx)
+{
+  if (idx >= static_cast<unsigned int>(this->EInternals->Entries.size()))
+  {
+    vtkErrorMacro("Invalid idx: " << idx);
+    return nullptr;
+  }
+  const auto& item = this->EInternals->Entries[idx];
+  return item.Info.empty() ? nullptr : item.Info.c_str();
 }
 
 //---------------------------------------------------------------------------
@@ -75,7 +113,7 @@ const char* vtkSMEnumerationDomain::GetEntryTextForValue(int value)
   unsigned int idx = 0;
   if (!this->IsInDomain(value, idx))
   {
-    return NULL;
+    return nullptr;
   }
   return this->GetEntryText(idx);
 }
@@ -107,13 +145,11 @@ int vtkSMEnumerationDomain::GetEntryValue(const char* text, int& valid)
   const std::string str_text(text);
   const auto& entries = this->EInternals->Entries;
   auto iter = std::find_if(
-    entries.begin(), entries.end(), [&](const vtkSMEnumerationDomainInternals::EntryType& apair) {
-      return apair.first == str_text;
-    });
+    entries.begin(), entries.end(), [&](const EntryType& item) { return item.Text == str_text; });
   if (iter != entries.end())
   {
     valid = 1;
-    return iter->second;
+    return iter->Value;
   }
 
   return -1;
@@ -159,8 +195,8 @@ int vtkSMEnumerationDomain::IsInDomain(int val, unsigned int& idx)
   }
 
   const auto& entries = this->EInternals->Entries;
-  auto iter = std::find_if(entries.begin(), entries.end(),
-    [&](const vtkSMEnumerationDomainInternals::EntryType& apair) { return apair.second == val; });
+  auto iter = std::find_if(
+    entries.begin(), entries.end(), [&](const EntryType& item) { return item.Value == val; });
   if (iter != entries.end())
   {
     idx = static_cast<int>(iter - entries.begin());
@@ -187,9 +223,9 @@ void vtkSMEnumerationDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMEnumerationDomain::AddEntry(const char* text, int value)
+void vtkSMEnumerationDomain::AddEntry(const char* text, int value, const char* info /*=nullptr*/)
 {
-  this->EInternals->Entries.push_back(vtkSMEnumerationDomainInternals::EntryType(text, value));
+  this->EInternals->Entries.push_back(EntryType(text, value, info));
   this->Modified();
 }
 
@@ -231,7 +267,8 @@ int vtkSMEnumerationDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEleme
       return 0;
     }
 
-    this->AddEntry(text, value);
+    const char* info = selement->GetAttribute("info");
+    this->AddEntry(text, value, info);
   }
   return 1;
 }
@@ -275,12 +312,6 @@ int vtkSMEnumerationDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unche
     }
   }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
-}
-
-//---------------------------------------------------------------------------
-const std::vector<std::pair<std::string, int> >& vtkSMEnumerationDomain::GetEntries() const
-{
-  return this->EInternals->Entries;
 }
 
 //---------------------------------------------------------------------------

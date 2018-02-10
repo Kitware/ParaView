@@ -159,7 +159,15 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
       comboBox->setObjectName("ComboBox");
       for (unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
       {
-        comboBox->addItem(ed->GetEntryText(i));
+        const char* entryText = ed->GetEntryText(i);
+        if (const char* info = ed->GetInfoText(i))
+        {
+          comboBox->addItem(QString("%1 (%2)").arg(entryText).arg(info), entryText);
+        }
+        else
+        {
+          comboBox->addItem(entryText, entryText);
+        }
       }
       // vtkSMNumberOfComponentsDomain is a dynamic domain
       // hence we need to connect it to a pqComboBoxDomain
@@ -171,7 +179,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
 
       pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
       this->addPropertyLink(
-        adaptor, "currentText", SIGNAL(currentTextChanged(QString)), smproperty);
+        adaptor, "currentData", SIGNAL(currentTextChanged(QString)), smproperty);
       this->setChangeAvailableAsChangeFinished(true);
       layoutLocal->addWidget(comboBox);
 
