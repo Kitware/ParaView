@@ -31,25 +31,24 @@
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 
+#include <cassert>
 #include <map>
 #include <set>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <vtksys/RegularExpression.hxx>
 
-#include <assert.h>
+#include <vtksys/RegularExpression.hxx>
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
 //****************************************************************************/
 typedef vtkSmartPointer<vtkPVXMLElement> XMLElement;
-typedef std::map<vtkStdString, XMLElement> StrToXmlMap;
-typedef std::map<vtkStdString, StrToXmlMap> StrToStrToXmlMap;
+typedef std::map<std::string, XMLElement> StrToXmlMap;
+typedef std::map<std::string, StrToXmlMap> StrToStrToXmlMap;
 
 class vtkSIProxyDefinitionManager::vtkInternals
 {
@@ -279,7 +278,7 @@ public:
   //-------------------------------------------------------------------------
   void AddTraversalGroupName(const char* groupName) VTK_OVERRIDE
   {
-    this->GroupNames.insert(vtkStdString(groupName));
+    this->GroupNames.insert(std::string(groupName));
   }
   //-------------------------------------------------------------------------
   void RegisterCoreDefinitionMap(StrToStrToXmlMap* map)
@@ -398,15 +397,15 @@ protected:
 
 private:
   bool Initialized;
-  vtkStdString CurrentGroupName;
+  std::string CurrentGroupName;
   StrToXmlMap::iterator CoreProxyIterator;
   StrToXmlMap::iterator CoreProxyIteratorEnd;
   StrToXmlMap::iterator CustomProxyIterator;
   StrToXmlMap::iterator CustomProxyIteratorEnd;
   StrToStrToXmlMap* CoreDefinitionMap;
   StrToStrToXmlMap* CustomDefinitionMap;
-  std::set<vtkStdString> GroupNames;
-  std::set<vtkStdString>::iterator GroupNameIterator;
+  std::set<std::string> GroupNames;
+  std::set<std::string>::iterator GroupNameIterator;
   bool InvalidCoreIterator;
   bool InvalidCustomIterator;
 };
