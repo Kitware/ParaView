@@ -30,6 +30,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVLastSelectionInformation.h"
@@ -48,6 +49,7 @@
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMaterialLibraryProxy.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -473,6 +475,27 @@ const char* vtkSMRenderViewProxy::GetRepresentationType(vtkSMSourceProxy* produc
       if (acceptable)
       {
         return representationsToTry[cc];
+      }
+    }
+  }
+
+  // check if the data type is a vtkTable with a single row and column with
+  // a vtkStringArray named "Text". If it is, we render this in a render view
+  // with the value shown in the view.
+  if (vtkSMOutputPort* port = producer->GetOutputPort(outputPort))
+  {
+    if (vtkPVDataInformation* dataInformation = port->GetDataInformation())
+    {
+      if (dataInformation->GetDataSetType() == VTK_TABLE)
+      {
+        if (vtkPVArrayInformation* ai =
+              dataInformation->GetArrayInformation("Text", vtkDataObject::ROW))
+        {
+          if (ai->GetNumberOfComponents() == 1 && ai->GetNumberOfTuples() == 1)
+          {
+            return "TextSourceRepresentation";
+          }
+        }
       }
     }
   }
