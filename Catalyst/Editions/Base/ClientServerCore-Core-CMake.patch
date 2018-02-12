@@ -28,5 +28,5 @@ index f17c4df..f0db074 100644
 -    vtkFiltersExtraction
 -    vtkFiltersParallel
      # Explicitly list (rather than transiently through
-     # vtkPVVTKExtensionsCore) because it allows us to turn of wrapping
-     # of vtkPVVTKExtensionsCore off but still satisfy API dependcy.
+     # vtkPVVTKExtensionsCore) because it allows us to turn wrapping
+     # of vtkPVVTKExtensionsCore off but still satisfy API dependency.

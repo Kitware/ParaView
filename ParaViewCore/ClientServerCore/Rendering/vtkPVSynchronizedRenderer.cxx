@@ -170,7 +170,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session, unsigned int i
     }
       VTK_FALLTHROUGH;
 
-    // DONT BREAK, server needs to setup everything in the BATCH case
+    // DON'T BREAK, server needs to setup everything in the BATCH case
 
     case BATCH:
       if (in_cave_mode)

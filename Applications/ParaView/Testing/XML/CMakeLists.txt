@@ -749,7 +749,7 @@ SET (Flow2_THRESHOLD 15)
 SET (UndoRedo1_THRESHOLD 15)
 SET (UndoRedo4_THRESHOLD 15)
 
-# Differnces between systems on whether the lines are anti-aliased or not
+# Differences between systems on whether the lines are anti-aliased or not
 SET (SortLineChartData_THRESHOLD 50)
 
 # Since often there are issues with fonts etc.

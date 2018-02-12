@@ -21,7 +21,7 @@
 
 /**
  * @class   vtkPVRecoverGeometryWireframe
- * @brief   Get corrected wireframe from tesselated facets
+ * @brief   Get corrected wireframe from tessellated facets
  *
  *
  *

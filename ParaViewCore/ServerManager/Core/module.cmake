@@ -8,8 +8,8 @@ vtk_module(vtkPVServerManagerCore
     ParaViewCore
   DEPENDS
     # Explicitly list (rather than transiently through
-    # vtkPVServerImplementationCore) because it allows us to turn of wrapping
-    # of vtkPVServerImplementationCore off but still satisfy API dependcy.
+    # vtkPVServerImplementationCore) because it allows us to turn wrapping
+    # of vtkPVServerImplementationCore off but still satisfy API dependency.
     vtkCommonCore
     vtkPVServerImplementationCore
     vtkjsoncpp

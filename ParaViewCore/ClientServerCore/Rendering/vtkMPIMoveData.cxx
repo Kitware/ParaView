@@ -924,7 +924,7 @@ void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataObject* output)
   com = this->ClientDataServerSocketController->GetCommunicator();
   if (com == 0)
   {
-    vtkErrorMacro("Missing socket controler on client.");
+    vtkErrorMacro("Missing socket controller on client.");
     return;
   }
 

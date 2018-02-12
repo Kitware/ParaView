@@ -219,7 +219,7 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   }
 
   // vtkSMProxy::MarkDirty does not call MarkConsumersAsDirty unless
-  // this->NeedsUpdate is false. Generally, that's indeed correct since we we
+  // this->NeedsUpdate is false. Generally, that's indeed correct since we
   // have marked the consumer dirty previously, we don't need to do it again.
   // However since consumers of representations are generally views, they need
   // to marked dirty everytime (otherwise unhiding a representation would not

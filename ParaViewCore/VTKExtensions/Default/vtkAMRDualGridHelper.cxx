@@ -991,7 +991,7 @@ void vtkAMRDualGridHelper::FindExistingFaces(
   int levelDifference;
   int ext[6];
   int ext2[6]; // Extent of grid in lower level.
-  int ext3[6]; // Convert ext back to orignal level
+  int ext3[6]; // Convert ext back to original level
   ext[0] = x;
   ext[1] = x + 1;
   ext[2] = y;
@@ -1156,7 +1156,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(vtkAMRDualGridHelperBlock* bloc
   int ii;
   int ext1[6]; // Point extent of the single block
   int ext2[6]; // Point extent of block in lower level.
-  int ext3[6]; // Extent2 converted back to orignal level.
+  int ext3[6]; // Extent2 converted back to original level.
 
   ext1[0] = blockX;
   ext1[1] = blockX + 1;
