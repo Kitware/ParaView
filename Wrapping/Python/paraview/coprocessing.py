@@ -246,6 +246,7 @@ class CoProcessor(object):
                 ts = str(timestep).rjust(padding_amount, '0')
                 fname = fname.replace("%t", ts)
                 if view.cpFitToScreen != 0:
+                    view.ViewTime = datadescription.GetTime()
                     if view.IsA("vtkSMRenderViewProxy") == True:
                         view.ResetCamera()
                     elif view.IsA("vtkSMContextViewProxy") == True:
