@@ -2981,6 +2981,20 @@
         <ExporterFactory extensions="x3db" />
       </Hints>
     </RenderViewExporterProxy>
+    <RenderViewExporterProxy class="vtkSingleVTPExporter"
+                             name="SingleExporter">
+      <Documentation>Exporter to export a single render view to a vtp
+      file and texture.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="vtp" />
+      </Hints>
+    </RenderViewExporterProxy>
     <RenderViewExporterProxy class="vtkVRMLExporter"
                              name="VRMLExporter">
       <Documentation>Exporter to export a single render view to an VRML
