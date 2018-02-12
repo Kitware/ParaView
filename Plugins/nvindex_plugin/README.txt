@@ -1,0 +1,141 @@
+NVIDIA IndeX for ParaView Plugin
+
+The NVIDIA IndeX for ParaView Plugin enables the large-scale volume data
+visualization capabilities of the NVIDIA IndeX library inside Kitware's ParaView.
+This document will provide a brief overview of the installation package, please
+refer to the user guide for detailed instructions.
+
+#-------------------------------------------------------------------------------
+# Package Structure
+#-------------------------------------------------------------------------------
+
+ installation-directory
+    |
+    | -- doc                User's Guide for the NVIDIA IndeX for ParaView Plugin.
+    |                       The users guide provides detailed installation
+    |                       instructions, describes the implemented feature set
+    |                       supported by the plugin, answers frequently asked
+    |                       questions and lists limitations and knows issues.
+    |
+    | -- lib                NVIDIA IndeX and DiCE libraries specific
+    |                       to your platform.
+    |
+    | -- EULA.pdf           NVIDIA End User License Agreement.
+    |
+    | -- license.txt        Third-party licensing information.
+    |
+    | -- README.txt         This file.
+
+#-------------------------------------------------------------------------------
+# Compatibility and Prerequisites
+#-------------------------------------------------------------------------------
+
+The NVIDIA IndeX for ParaView Plugin is compatible with:
+
+* ParaView-5.3.0 and ParaView-5.4.0
+  (depending on the downloaded package, Windows 64-bit).
+* OpenMPI-1.7.4
+  (if running in client-server mode).
+* NVIDIA IndeX 1.5
+  (installed with the ParaView plugin).
+* NVIDIA GPU(s) supporting CUDA compute capability 3.0 or higher, i.e. Kepler
+  GPU architecture generation or later.
+* NVIDIA display driver version 384.76 or later on Windows.
+
+#-------------------------------------------------------------------------------
+# Features and Licensing
+#-------------------------------------------------------------------------------
+
+The NVIDIA IndeX for ParaView plugin comes with a free workstation license that
+enables exploiting the capabilities of a single GPU.
+
+If you aim to use NVIDIA IndeX on a cluster of multiple hosts and/or
+with multiple NVIDIA GPUs, then please contact us for the appropriate licensing.
+
+# Features
+----------
+
+* Real-time and interactive high-quality volume data visualization of both,
+  structured and unstructured volume grids
+
+* Interactive visualization of time varying structured volume grids.
+
+* Supporting 8-bit and 16-bit unsigned int, and 32-bit floating point volume
+  data types.
+
+* Advanced rendering techniques with three different configurable presets for
+  Iso-surfaces, Depth enhancement and Edge enhancement.
+
+* Multiple, axis-aligned volume slice rendering combined with volumetric data.
+
+* User defined region of interest selection.
+
+* Advanced filtering and pre-integration techniques enabling high-fidelity
+  visualizations.
+
+* Depth-correct integration of ParaView geometry rendering into NVIDIA IndeX
+  volume rendering.
+
+* Free single GPU version for leveraging today's GPU performance.
+
+* Multi-GPU and and GPU cluster support for scalable real-time visualization of
+  datasets of arbitrary sizes. Requires an appropriate license
+  (please contact us).
+
+#-------------------------------------------------------------------------------
+# Known Limitations and Bugs in the BETA release
+#-------------------------------------------------------------------------------
+
+# Structured volume grids
+-------------------------
+
+* Datasets larger than a single GPU's available memory cannot be rendered.
+  This issue is plugin specific and shall be resolved in the final release
+  version.
+
+* Datasets in *.vtk format won’t distribute to the PV Server and cause
+  errors. Please use *.pvti or any other format instead for distributed data
+  This issue is ParaView specific. Please contact Kitware for additional details.
+
+# Unstructured volume grids
+---------------------------
+
+* Datasets containing degenerated faces may result in correct renderings
+  or cause Paraview to fail. The NVIDIA IndeX Paraview plugin tries to resolve
+  all invalid faces automatically.
+
+# Auxilliary
+------------
+
+* Paraview doesn't recognize updating the coloring state from 'solid color' to a
+  state that is valid for volume rendering when switching to NVIDIA IndeX's
+  volume rendering. An invalid coloring state may result into a blank rendering.
+  Please update the coloring state appropriately manually.
+
+* The Windows version of the NVIDIA IndeX plugin for ParaView is restricted
+  to run on a single workstation/computer only, i.e., cluster rendering
+  is not supported on Windows platforms.
+
+* When loading an older state file with both volumetric and geometry data without
+  NVIDIA IndeX representation saved in it, first frame shows only volumetric data and when you
+  interact the subsequent frames are correct again with both geometry and volume data.
+
+* When using the official ParaView-5.0.1 binaries please make sure that the
+  appropriate libstdc++ is used. It might be necessary to delete
+  ../lib/paraview-5.0/libstdc++.so.6 and use your system's libstdc++.
+
+* When using further NVIDIA ARC software installations (such as the NVIDIA IndeX
+  native library) in parallel, please avoid conflicts between library versions,
+  e.g., by setting your environment LD_LIBRARY_PATH appropriately.
+
+* There is also a known crash on exit on certain Ubuntu releases.
+
+#-------------------------------------------------------------------------------
+# Contact
+#-------------------------------------------------------------------------------
+
+Please do not hesitate to contact us on the NVIDIA IndeX for ParaView Plugin
+forum for further assistance: https://forum.nvidia-arc.com
+
+
+Copyright 2018 NVIDIA Corporation. All rights reserved.
