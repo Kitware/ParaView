@@ -4126,8 +4126,74 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="screenshot_writers">
+    <Documentation>
+      This group includes all writers which can be used to write screenshots in ParaView.
+    </Documentation>
+
+    <Proxy name="PNG" class="vtkPNGWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as PNG files.
+      </Documentation>
+      <IntVectorProperty name="CompressionLevel"
+        command="SetCompressionLevel"
+        number_of_elements="1"
+        default_values="5">
+        <Documentation>
+          Specify the *zlib* compression level. **0** is no compression, while **9** is
+          maximum compression.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="0" value="0" info="no compression" />
+          <Entry text="1" value="1" />
+          <Entry text="2" value="2" />
+          <Entry text="3" value="3" />
+          <Entry text="4" value="4" />
+          <Entry text="5" value="5" />
+          <Entry text="6" value="6" />
+          <Entry text="7" value="7" />
+          <Entry text="8" value="8" />
+          <Entry text="9" value="9" info="Maximum compression" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="png"
+          file_description="PNG images" />
+      </Hints>
+    </Proxy>
+
+    <Proxy name="JPEG" class="vtkJPEGWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as JPEG files.
+      </Documentation>
+      <IntVectorProperty name="Quality"
+        command="SetQuality"
+        number_of_elements="1"
+        default_values="95">
+        <Documentation>
+          Specify the JPEG compression quality. **O** is low quality (maximum compression)
+          and **100** is high quality (least compression).
+        </Documentation>
+        <IntRangeDomain name="range" min="0" max="100" />
+      </IntVectorProperty>
+      <IntVectorProperty name="Progressive"
+        command="SetProgressive"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Save progressive JPEG.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="jpg"
+          file_description="JPEG images" />
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+
   <ProxyGroup name="misc">
-    <SaveScreenshotProxy name="SaveScreenshot" processes="client">
+    <SaveScreenshotProxy name="SaveScreenshotBase" processes="client">
       <Documentation>
         Proxy used to save screenshots from view(s) or layouts.
       </Documentation>
@@ -4247,7 +4313,25 @@
            Set whether to use a transparent background.
         </Documentation>
       </IntVectorProperty>
+    </SaveScreenshotProxy>
 
+    <SaveScreenshotProxy name="SaveScreenshot" processes="client"
+      label="Save Screenshot"
+      base_proxygroup="misc"
+      base_proxyname="SaveScreenshotBase">
+      <Documentation>
+        Proxy used to save screenshots from view(s) or layouts.
+      </Documentation>
+      <ProxyProperty name="Format">
+        <ProxyListDomain name="proxy_list">
+          <Group name="screenshot_writers" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
+      </ProxyProperty>
+
+      <!-- FIXME:: depreacated
       <IntVectorProperty name="ImageQuality"
         number_of_elements="1"
         default_values="100"
@@ -4258,6 +4342,7 @@
           **0** - low quality, **100** - high quality.
         </Documentation>
       </IntVectorProperty>
+      -->
 
       <PropertyGroup label="Size and Scaling">
         <Property name="SaveAllViews" />
@@ -4276,8 +4361,8 @@
         <Property name="TransparentBackground" />
       </PropertyGroup>
 
-      <PropertyGroup label="Compression Options">
-        <Property name="ImageQuality" />
+      <PropertyGroup label="Image Options">
+        <Property name="Format" />
       </PropertyGroup>
 
     </SaveScreenshotProxy>

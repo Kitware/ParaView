@@ -40,13 +40,14 @@
 
   <!-- save a multiview screenshot -->
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="800" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="800" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
-  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
-  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
+
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 

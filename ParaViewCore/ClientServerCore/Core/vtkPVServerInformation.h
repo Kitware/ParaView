@@ -89,17 +89,19 @@ public:
   //@{
   /**
    * Get/Set if the server supports saving OGVs.
+   * @deprecated in ParaView 5.5
    */
-  vtkSetMacro(OGVSupport, int);
-  vtkGetMacro(OGVSupport, int);
+  VTK_LEGACY(void SetOGVSupport(int));
+  VTK_LEGACY(int GetOGVSupport());
   //@}
 
   //@{
   /**
    * Get/Set if the server supports saving AVIs.
+   * @deprecated in ParaView 5.5
    */
-  vtkSetMacro(AVISupport, int);
-  vtkGetMacro(AVISupport, int);
+  VTK_LEGACY(void SetAVISupport(int));
+  VTK_LEGACY(int GetAVISupport());
   //@}
 
   //@{

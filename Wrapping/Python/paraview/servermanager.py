@@ -2372,11 +2372,9 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     opc.UnRegister(None)
     return opc
 
-def AnimateReader(reader, view, filename=None):
+def AnimateReader(reader, view):
     """This is a utility function that, given a reader and a view
-    animates over all time steps of the reader. If the optional
-    filename is provided, a movie is created (type depends on the
-    extension of the filename."""
+    animates over all time steps of the reader."""
     if not reader:
         raise RuntimeError ("No reader was specified, cannot animate.")
     if not view:
@@ -2415,18 +2413,7 @@ def AnimateReader(reader, view, filename=None):
     cue.AnimatedProxy = view
     cue.AnimatedPropertyName = "ViewTime"
     scene.Cues = [cue]
-
-    if filename:
-        writer = vtkSMAnimationSceneImageWriter()
-        writer.SetFileName(filename)
-        writer.SetFrameRate(1)
-        writer.SetAnimationScene(scene.SMProxy)
-
-        # Now save the animation.
-        if not writer.Save():
-            raise RuntimeError ("Saving of animation failed!")
-    else:
-        scene.Play()
+    scene.Play()
     return scene
 
 def GetProgressPrintingIsEnabled():

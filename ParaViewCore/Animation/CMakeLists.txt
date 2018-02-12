@@ -45,7 +45,6 @@ set (Module_SRCS
   vtkPVKeyFrame.cxx
   vtkPVRampKeyFrame.cxx
   vtkPVRepresentationAnimationHelper.cxx
-  vtkPVServerSideAnimationPlayer.cxx
   vtkPVSinusoidKeyFrame.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkSequenceAnimationPlayer.cxx
@@ -53,7 +52,6 @@ set (Module_SRCS
   vtkSMAnimationFrameWindowDomain.cxx
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
-  vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMSaveAnimationProxy.cxx

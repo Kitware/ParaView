@@ -183,6 +183,14 @@ public:
   vtkGetMacro(ForceDisableCaching, bool);
   //@}
 
+  /**
+   * When set, we skip calling still render to render each frame.
+   * Useful to avoid updating screen when saving animations to disk, for
+   * example.
+   */
+  vtkSetMacro(OverrideStillRender, bool);
+  vtkGetMacro(OverrideStillRender, bool);
+
 protected:
   vtkSMAnimationScene();
   ~vtkSMAnimationScene() override;
@@ -215,9 +223,7 @@ protected:
   vtkCompositeAnimationPlayer* AnimationPlayer;
   vtkEventForwarderCommand* Forwarder;
 
-  friend class vtkSMAnimationSceneImageWriter;
   bool OverrideStillRender;
-  vtkSetMacro(OverrideStillRender, bool);
 
 private:
   vtkSMAnimationScene(const vtkSMAnimationScene&) = delete;

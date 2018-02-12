@@ -238,13 +238,7 @@ public:
   ~vtkSMProxyListDomainInternals() { this->ClearProxies(); }
 
 public:
-  struct ProxyInfo
-  {
-    std::string GroupName;
-    std::string ProxyName;
-  };
-  typedef std::vector<ProxyInfo> VectorOfProxyInfo;
-  VectorOfProxyInfo ProxyTypeList;
+  std::vector<vtkSMProxyListDomain::ProxyType> ProxyTypeList;
 
 private:
   VectorOfProxies ProxyList;
@@ -266,18 +260,19 @@ vtkSMProxyListDomain::~vtkSMProxyListDomain()
 }
 
 //-----------------------------------------------------------------------------
+const std::vector<vtkSMProxyListDomain::ProxyType>& vtkSMProxyListDomain::GetProxyTypes() const
+{
+  return this->Internals->ProxyTypeList;
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::CreateProxies(vtkSMSessionProxyManager* pxm)
 {
   assert(pxm);
-
   this->Internals->ClearProxies();
-
-  for (vtkSMProxyListDomainInternals::VectorOfProxyInfo::iterator iter =
-         this->Internals->ProxyTypeList.begin();
-       iter != this->Internals->ProxyTypeList.end(); ++iter)
+  for (const auto& apair : this->Internals->ProxyTypeList)
   {
-    vtkSMProxy* proxy = pxm->NewProxy(iter->GroupName.c_str(), iter->ProxyName.c_str());
-    if (proxy)
+    if (vtkSMProxy* proxy = pxm->NewProxy(apair.GroupName.c_str(), apair.ProxyName.c_str()))
     {
       this->Internals->AddProxy(proxy, this);
       proxy->FastDelete();
@@ -294,10 +289,7 @@ int vtkSMProxyListDomain::IsInDomain(vtkSMProperty* vtkNotUsed(property))
 //-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::AddProxy(const char* group, const char* name)
 {
-  vtkSMProxyListDomainInternals::ProxyInfo info;
-  info.GroupName = group;
-  info.ProxyName = name;
-  this->Internals->ProxyTypeList.push_back(info);
+  this->Internals->ProxyTypeList.push_back(ProxyType(group, name));
 }
 
 //-----------------------------------------------------------------------------

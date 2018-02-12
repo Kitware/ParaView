@@ -31,28 +31,24 @@
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 
+#include <cassert>
 #include <map>
 #include <set>
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <vtksys/RegularExpression.hxx>
-
-#include <assert.h>
-
-// this file must be included after vtkPVConfig etc. are included.
-// #include "vtkSMGeneratedModules.h"
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
 //****************************************************************************/
 typedef vtkSmartPointer<vtkPVXMLElement> XMLElement;
-typedef std::map<vtkStdString, XMLElement> StrToXmlMap;
-typedef std::map<vtkStdString, StrToXmlMap> StrToStrToXmlMap;
+typedef std::map<std::string, XMLElement> StrToXmlMap;
+typedef std::map<std::string, StrToXmlMap> StrToStrToXmlMap;
 
 class vtkSIProxyDefinitionManager::vtkInternals
 {
@@ -282,7 +278,7 @@ public:
   //-------------------------------------------------------------------------
   void AddTraversalGroupName(const char* groupName) VTK_OVERRIDE
   {
-    this->GroupNames.insert(vtkStdString(groupName));
+    this->GroupNames.insert(std::string(groupName));
   }
   //-------------------------------------------------------------------------
   void RegisterCoreDefinitionMap(StrToStrToXmlMap* map)
@@ -401,15 +397,15 @@ protected:
 
 private:
   bool Initialized;
-  vtkStdString CurrentGroupName;
+  std::string CurrentGroupName;
   StrToXmlMap::iterator CoreProxyIterator;
   StrToXmlMap::iterator CoreProxyIteratorEnd;
   StrToXmlMap::iterator CustomProxyIterator;
   StrToXmlMap::iterator CustomProxyIteratorEnd;
   StrToStrToXmlMap* CoreDefinitionMap;
   StrToStrToXmlMap* CustomDefinitionMap;
-  std::set<vtkStdString> GroupNames;
-  std::set<vtkStdString>::iterator GroupNameIterator;
+  std::set<std::string> GroupNames;
+  std::set<std::string>::iterator GroupNameIterator;
   bool InvalidCoreIterator;
   bool InvalidCustomIterator;
 };
@@ -1109,6 +1105,13 @@ void vtkSIProxyDefinitionManager::Pull(vtkSMMessage* msg)
 //---------------------------------------------------------------------------
 void vtkSIProxyDefinitionManager::Push(vtkSMMessage* msg)
 {
+  // this is hack that preserves animation_writers and screenshot_writers
+  // proxy definitions on the client side when a server's definitions are
+  // loaded. Ideally, we save all proxies that are "client" only. We will do
+  // that when we convert this class to use pugixml.
+  const auto animationWriters = this->Internals->CoreDefinitions["animation_writers"];
+  const auto screenshotWriters = this->Internals->CoreDefinitions["screenshot_writers"];
+
   vtkTimerLog::MarkStartEvent("vtkSIProxyDefinitionManager Load Definitions");
   // Init and local vars
   this->Internals->Clear();
@@ -1121,8 +1124,23 @@ void vtkSIProxyDefinitionManager::Push(vtkSMMessage* msg)
   for (int i = 0; i < size; i++)
   {
     xmlDef = &msg->GetExtension(ProxyDefinitionState::xml_definition_proxy, i);
+    if (xmlDef->group() == "animation_writers" || xmlDef->group() == "screenshot_writers")
+    {
+      continue;
+    }
     parser->Parse(xmlDef->xml().c_str());
     this->AddElement(xmlDef->group().c_str(), xmlDef->name().c_str(), parser->GetRootElement());
+  }
+
+  // restore animation and screenshot writers.
+  for (auto pair : animationWriters)
+  {
+    this->AddElement("animation_writers", pair.first.c_str(), pair.second);
+  }
+
+  for (auto pair : screenshotWriters)
+  {
+    this->AddElement("screenshot_writers", pair.first.c_str(), pair.second);
   }
 
   // Manage custom ones

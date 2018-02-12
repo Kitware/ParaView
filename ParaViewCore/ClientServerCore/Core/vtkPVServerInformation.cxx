@@ -243,6 +243,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->NVPipeSupport = false;
     }
 
+#ifndef VTK_LEGACY_REMOVE
     if (!serverInfo->GetOGVSupport())
     {
       this->OGVSupport = 0;
@@ -252,6 +253,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     {
       this->AVISupport = 0;
     }
+#endif
 
     // IceT either is there or is not.
     this->UseIceT = serverInfo->GetUseIceT();
@@ -767,3 +769,33 @@ bool vtkPVServerInformation::IsMPIInitialized() const
 {
   return this->MPIInitialized;
 }
+
+//============================================================================
+#ifndef VTK_LEGACY_REMOVE
+void vtkPVServerInformation::SetOGVSupport(int val)
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::SetOGVSupport, "ParaView 5.5");
+  this->OGVSupport = val;
+  this->Modified();
+}
+
+int vtkPVServerInformation::GetOGVSupport()
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::GetOGVSupport, "ParaView 5.5");
+  return this->OGVSupport;
+}
+
+void vtkPVServerInformation::SetAVISupport(int val)
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::SetAVISupport, "ParaView 5.5");
+  this->AVISupport = val;
+  this->Modified();
+}
+
+int vtkPVServerInformation::GetAVISupport()
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::GetAVISupport, "ParaView 5.5");
+  return this->AVISupport;
+}
+#endif // VTK_LEGACY_REMOVE
+//============================================================================

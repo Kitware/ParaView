@@ -131,6 +131,20 @@ pqProxySelectionWidget::pqProxySelectionWidget(
     strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "advanced") == 0);
   this->Internal->HideProxyWidgets = (hints &&
     strcmp(hints->GetAttributeOrDefault("selected_proxy_panel_visibility", ""), "never") == 0);
+
+  // If "ProxySelectionWidget" hint is provided, it can control the enabled
+  // state for the combo-box.
+  vtkPVXMLElement* hints2 = smproperty->GetHints()
+    ? smproperty->GetHints()->FindNestedElementByName("ProxySelectionWidget")
+    : nullptr;
+  if (hints2)
+  {
+    int enabled = 1;
+    if (hints2->GetScalarAttribute("enabled", &enabled))
+    {
+      this->Internal->Ui.comboBox->setEnabled(false);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

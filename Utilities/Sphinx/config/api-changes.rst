@@ -5,6 +5,15 @@ API Changes between ParaView versions
 Changes in 5.5
 --------------
 
+`SaveScreenshot` and `SaveAnimation` parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`ImageQuality` keyword parameter has been deprecated and will be ignored.
+Instead, users are expected to provide format spefic keyword parameters that
+control output quality. This allows for a fine grained control over the output
+quality based on the file format, rather than hiding it under a single quality
+number.
+
 Offscreen rendering
 ~~~~~~~~~~~~~~~~~~~
 
