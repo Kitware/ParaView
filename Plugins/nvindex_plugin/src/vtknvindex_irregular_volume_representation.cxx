@@ -514,7 +514,8 @@ void vtknvindex_irregular_volume_representation::SetScalarOpacityUnitDistance(do
 //
 // Configuration options set from Paraview GUI.
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_irregular_volume_representation::set_subcube_size(int x, int y, int z)
+void vtknvindex_irregular_volume_representation::set_subcube_size(
+  unsigned x, unsigned y, unsigned z)
 {
   mi::math::Vector_struct<mi::Uint32, 3> subcube_size = { x, y, z };
   m_app_config_settings->set_subcube_size(subcube_size);

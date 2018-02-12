@@ -309,9 +309,11 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
       vtknvindex_regular_volume_data* volume_data =
         static_cast<vtknvindex_regular_volume_data*>(dataset_parameters.volume_data);
 
-      mi::math::Vector_struct<mi::Uint64, 3> pernode_volume = { current_bbox.max.x -
-          current_bbox.min.x,
-        current_bbox.max.y - current_bbox.min.y, current_bbox.max.z - current_bbox.min.z };
+      mi::math::Vector_struct<mi::Uint64, 3> pernode_volume = {
+        static_cast<mi::Uint64>(current_bbox.max.x - current_bbox.min.x),
+        static_cast<mi::Uint64>(current_bbox.max.y - current_bbox.min.y),
+        static_cast<mi::Uint64>(current_bbox.max.z - current_bbox.min.z)
+      };
       mi::Uint64 volume_size =
         static_cast<mi::Uint64>(pernode_volume.x) * pernode_volume.y * pernode_volume.z;
 
@@ -582,9 +584,11 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
       if (dataset_parameters.volume_type == vtknvindex_scene::VOLUME_TYPE_REGULAR)
       {
-        mi::math::Vector_struct<mi::Uint64, 3> pernode_volume = { current_bbox.max.x -
-            current_bbox.min.x,
-          current_bbox.max.y - current_bbox.min.y, current_bbox.max.z - current_bbox.min.z };
+        mi::math::Vector_struct<mi::Uint64, 3> pernode_volume = {
+          static_cast<mi::Uint64>(current_bbox.max.x - current_bbox.min.x),
+          static_cast<mi::Uint64>(current_bbox.max.y - current_bbox.min.y),
+          static_cast<mi::Uint64>(current_bbox.max.z - current_bbox.min.z)
+        };
         mi::Uint64 volume_size = pernode_volume.x * pernode_volume.y * pernode_volume.z;
 
         const std::string& scalar_type = dataset_parameters.scalar_type;

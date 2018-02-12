@@ -682,7 +682,7 @@ mi::Sint32 vtknvindex_representation::find_time_step(
 //
 // Configuration options set by Paraview GUI.
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_representation::set_subcube_size(int x, int y, int z)
+void vtknvindex_representation::set_subcube_size(unsigned x, unsigned y, unsigned z)
 {
   mi::math::Vector_struct<mi::Uint32, 3> subcube_size = { x, y, z };
   m_app_config_settings->set_subcube_size(subcube_size);

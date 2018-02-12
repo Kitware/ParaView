@@ -94,7 +94,7 @@ public:
 
   // NVIDIA IndeX's regular volume parameters.
   // Set subcube size.
-  void set_subcube_size(int x, int y, int z);
+  void set_subcube_size(unsigned x, unsigned y, unsigned z);
 
   // Set subcube border size.
   void set_subcube_border(int border);
