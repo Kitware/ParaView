@@ -32,30 +32,23 @@
 #ifndef vtkPVMergeTablesMultiBlock_h
 #define vtkPVMergeTablesMultiBlock_h
 
-#include "vtkAlgorithm.h"
+#include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVMergeTablesMultiBlock : public vtkAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVMergeTablesMultiBlock
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPVMergeTablesMultiBlock* New();
-  vtkTypeMacro(vtkPVMergeTablesMultiBlock, vtkAlgorithm);
-  /**
-   * see vtkAlgorithm for details
-   */
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  vtkTypeMacro(vtkPVMergeTablesMultiBlock, vtkMultiBlockDataSetAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVMergeTablesMultiBlock();
   ~vtkPVMergeTablesMultiBlock() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkPVMergeTablesMultiBlock(const vtkPVMergeTablesMultiBlock&) = delete;
