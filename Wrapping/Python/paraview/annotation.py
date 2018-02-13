@@ -82,6 +82,7 @@ def execute(self):
         return True
 
     inputs = [dsa.WrapDataObject(inputDO)]
+
     association = self.GetArrayAssociation()
     ns = _get_ns(self, inputs[0], association)
 
@@ -156,16 +157,20 @@ def execute_on_attribute_data(self, evaluate_locally):
         return True
 
     inputs = [dsa.WrapDataObject(inputDO)]
-    association = self.GetArrayAssociation()
+
+    info = self.GetInputArrayInformation(0)
+    association = info.Get(vtkDataObject.FIELD_ASSOCIATION())
+    array_name = info.Get(vtkDataObject.FIELD_NAME())
+
     ns = _get_ns(self, inputs[0], association)
-    if self.GetArrayName() not in ns:
-        print("Failed to locate array '%s'." % self.GetArrayName(), file=sys.stderr)
+    if array_name not in ns:
+        print("Failed to locate array '%s'." % array_name, file=sys.stderr)
         raise RuntimeError("Failed to locate array")
 
     if not evaluate_locally:
         return True
 
-    array = ns[self.GetArrayName()]
+    array = ns[array_name]
     chosen_element = array.GetValue(self.GetElementId())
     expression = self.GetPrefix() if self.GetPrefix() else ""
     expression += str(chosen_element)
