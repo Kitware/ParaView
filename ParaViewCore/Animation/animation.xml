@@ -512,7 +512,7 @@
       base_proxyname="JPEG">
       <StringVectorProperty name="SuffixFormat"
         number_of_elements="1"
-        default_values="_%04d">
+        default_values=".%04d">
         <Documentation>
           Specify the suffix format string to use to add a suffix to the output
           filenames based on the current timestep number.
@@ -524,7 +524,7 @@
       base_proxyname="PNG">
       <StringVectorProperty name="SuffixFormat"
         number_of_elements="1"
-        default_values="_%04d">
+        default_values=".%04d">
         <Documentation>
           Specify the suffix format string to use to add a suffix to the output
           filenames based on the current timestep number.
