@@ -256,6 +256,7 @@ int pqXMLEventSource::getNextEvent(
     object = elem->GetAttribute("object");
     command = elem->GetAttribute("command");
     arguments = elem->GetAttribute("arguments");
+    arguments = arguments.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
     return SUCCESS;
   }
   else if (elem->GetName() && strcmp(elem->GetName(), "pqcheck") == 0)
