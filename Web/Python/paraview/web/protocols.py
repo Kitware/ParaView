@@ -572,8 +572,10 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
 
     # RpcName: getArray => viewport.geometry.array.get
     @exportRpc("viewport.geometry.array.get")
-    def getArray(self, dataHash):
-        return self.context.getCachedDataArray(dataHash)
+    def getArray(self, dataHash, binary = False):
+        if binary:
+            return self.addAttachment(self.context.getCachedDataArray(dataHash, binary))
+        return self.context.getCachedDataArray(dataHash, binary)
 
     # RpcName: addViewObserver => viewport.geometry.view.observer.add
     @exportRpc("viewport.geometry.view.observer.add")
