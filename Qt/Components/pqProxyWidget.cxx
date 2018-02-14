@@ -810,10 +810,12 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     }
 
     pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-    for (pqPropertyWidgetInterface* interface :
-      interfaceTracker->interfaces<pqPropertyWidgetInterface*>())
+    QList<pqPropertyWidgetInterface*> interfaces =
+      interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
+    for (pqPropertyWidgetInterface* groupWidgetInterface : interfaces)
     {
-      pqPropertyWidget* propertyWidget = interface->createWidgetForPropertyGroup(smproxy, group);
+      pqPropertyWidget* propertyWidget =
+        groupWidgetInterface->createWidgetForPropertyGroup(smproxy, group);
       if (propertyWidget)
       {
         PV_DEBUG_PANELS() << "Group " << group->GetXMLLabel() << " is controlled by widget "
@@ -825,9 +827,12 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
         {
           Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
           const QString type = decoratorXML->GetAttribute("type");
-          if (interface->createWidgetDecorator(type, decoratorXML, propertyWidget))
+          for (pqPropertyWidgetInterface* decoratorInterface : interfaces)
           {
-            break;
+            if (decoratorInterface->createWidgetDecorator(type, decoratorXML, propertyWidget))
+            {
+              break;
+            }
           }
         }
 
