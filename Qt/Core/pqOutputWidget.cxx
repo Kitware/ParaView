@@ -51,90 +51,53 @@ namespace OutputWidgetInternals
 /// output window for VTK messages.
 class OutputWindow : public vtkOutputWindow
 {
+  QtMsgType ConvertMessageType(const MessageTypes& type)
+  {
+    switch (type)
+    {
+      case vtkOutputWindow::MESSAGE_TYPE_TEXT:
+        return QtInfoMsg;
+      case vtkOutputWindow::MESSAGE_TYPE_ERROR:
+        return QtCriticalMsg;
+      case vtkOutputWindow::MESSAGE_TYPE_WARNING:
+      case vtkOutputWindow::MESSAGE_TYPE_GENERIC_WARNING:
+        return QtWarningMsg;
+      case vtkOutputWindow::MESSAGE_TYPE_DEBUG:
+        return QtDebugMsg;
+    }
+    return QtInfoMsg;
+  }
+
 public:
   static OutputWindow* New();
   vtkTypeMacro(OutputWindow, vtkOutputWindow);
-
   void SetWidget(pqOutputWidget* widget) { this->Widget = widget; }
 
-  void DisplayText(const char* msg) VTK_OVERRIDE
+  void DisplayText(const char* msg) override
   {
     QMutexLocker locker(&this->MutexGenericMessage);
+    const auto msgType = this->ConvertMessageType(this->GetCurrentMessageType());
     if (this->Widget)
     {
       const QString qmsg(msg);
-      MessageHandler::handlerVTK(this->CurrentMessageType, qmsg);
-      if (this->Widget->suppress(qmsg, this->CurrentMessageType))
+      MessageHandler::handlerVTK(msgType, qmsg);
+      if (this->Widget->suppress(qmsg, msgType))
       {
         return;
       }
     }
-
-    switch (this->CurrentMessageType)
-    {
-      case QtCriticalMsg:
-      case QtWarningMsg:
-        cerr << msg;
-        cerr.flush();
-        break;
-
-      default:
-        cout << msg;
-        cout.flush();
-        break;
-        // Ideally, we'd simply call superclass. However there's a bad interaction
-        // between pqProgressManager, vtkPVProgressHandler and support for
-        // server-side messages that leads this to be an infinite recursion. We
-        // will fix that separately as that's beyond the scope of this changeset.
-        // this->Superclass::DisplayText(msg);
-    }
-    // Ideally, we'd simply call superclass. However there's a bad interaction
-    // between pqProgressManager, vtkPVProgressHandler and support for
-    // server-side messages that leads this to be an infinite recursion. We
-    // will fix that separately as that's beyond the scope of this changeset.
-    // this->Superclass::DisplayText(msg);
-  }
-
-  void DisplayErrorText(const char* msg) VTK_OVERRIDE
-  {
-    QMutexLocker locker(&this->MutexTypedMessage);
-    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtCriticalMsg);
-    this->Superclass::DisplayErrorText(msg); // this calls DisplayText();
-  }
-
-  void DisplayWarningText(const char* msg) VTK_OVERRIDE
-  {
-    QMutexLocker locker(&this->MutexTypedMessage);
-    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
-    this->Superclass::DisplayWarningText(msg); // this calls DisplayText();
-  }
-
-  void DisplayGenericWarningText(const char* msg) VTK_OVERRIDE
-  {
-    QMutexLocker locker(&this->MutexTypedMessage);
-    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtWarningMsg);
-    this->Superclass::DisplayGenericWarningText(msg); // this calls DisplayText();
-  }
-
-  void DisplayDebugText(const char* msg) VTK_OVERRIDE
-  {
-    QMutexLocker locker(&this->MutexTypedMessage);
-    QScopedValueRollback<QtMsgType> a(this->CurrentMessageType, QtDebugMsg);
-    this->Superclass::DisplayDebugText(msg); // this calls DisplayText();
+    this->Superclass::DisplayText(msg);
   }
 
 protected:
   OutputWindow()
-    : CurrentMessageType(QtInfoMsg)
   {
     this->PromptUserOff();
+    this->UseStdErrorForAllMessagesOff();
   }
   ~OutputWindow() override {}
 
-  QtMsgType CurrentMessageType;
   QPointer<pqOutputWidget> Widget;
-
-  QMutex MutexTypedMessage;
   QMutex MutexGenericMessage;
 
 private:

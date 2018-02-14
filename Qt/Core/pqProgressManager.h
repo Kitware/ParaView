@@ -157,7 +157,6 @@ protected slots:
   void onStartProgress();
   void onEndProgress();
   void onProgress(vtkObject*);
-  void onMessage(vtkObject*);
   void onServerAdded(pqServer*);
 
 protected:

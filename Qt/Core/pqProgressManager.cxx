@@ -72,8 +72,6 @@ void pqProgressManager::onServerAdded(pqServer* server)
   pqCoreUtilities::connect(progressHandler, vtkCommand::EndEvent, this, SLOT(onEndProgress()));
   pqCoreUtilities::connect(
     progressHandler, vtkCommand::ProgressEvent, this, SLOT(onProgress(vtkObject*)));
-  pqCoreUtilities::connect(
-    progressHandler, vtkCommand::MessageEvent, this, SLOT(onMessage(vtkObject*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -235,31 +233,4 @@ void pqProgressManager::onProgress(vtkObject* caller)
     text = text.mid(3);
   }
   this->setProgress(text, oldProgress);
-}
-
-//-----------------------------------------------------------------------------
-void pqProgressManager::onMessage(vtkObject* caller)
-{
-  vtkPVProgressHandler* handler = vtkPVProgressHandler::SafeDownCast(caller);
-  QString text = handler->GetLastMessage();
-  if (text.startsWith("ERROR: "))
-  {
-    vtkOutputWindow::GetInstance()->DisplayErrorText(text.toStdString().c_str());
-  }
-  else if (text.startsWith("Warning: "))
-  {
-    vtkOutputWindow::GetInstance()->DisplayWarningText(text.toStdString().c_str());
-  }
-  else if (text.startsWith("Generic Warning: "))
-  {
-    vtkOutputWindow::GetInstance()->DisplayGenericWarningText(text.toStdString().c_str());
-  }
-  else if (text.startsWith("Debug : "))
-  {
-    vtkOutputWindow::GetInstance()->DisplayText(text.toStdString().c_str());
-  }
-  else
-  {
-    vtkOutputWindow::GetInstance()->DisplayText(text.toStdString().c_str());
-  }
 }
