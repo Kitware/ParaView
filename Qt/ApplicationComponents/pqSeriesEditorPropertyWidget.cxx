@@ -611,6 +611,7 @@ pqSeriesEditorPropertyWidget::pqSeriesEditorPropertyWidget(
     smgroup->GetProperty("SeriesVisibility"));
   this->Internals->Model.setVisibilityDomain(vtkSMChartSeriesSelectionDomain::SafeDownCast(
     smgroup->GetProperty("SeriesVisibility")->FindDomain("vtkSMChartSeriesSelectionDomain")));
+  this->Internals->Ui.SeriesTable->sortByColumn(0, Qt::AscendingOrder);
 
   this->Internals->VTKConnector->Connect(smgroup->GetProperty("SeriesVisibility"),
     vtkCommand::DomainModifiedEvent, this, SLOT(domainModified(vtkObject*)));
