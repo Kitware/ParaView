@@ -68,12 +68,11 @@ public:
 
   //@{
   /**
-   * Specify the inflate factor used to proportionally
-   * inflates the bounds of the axes grid using the diagonal length
-   * of the bounding box multiplied by this factor, when using data bounds.
+   * Specify the scale factor used to proportionally
+   * scale each axis. 1 means no change.
    */
-  vtkSetMacro(DataBoundsInflateFactor, double);
-  vtkGetMacro(DataBoundsInflateFactor, double);
+  vtkSetMacro(DataBoundsScaleFactor, double);
+  vtkGetMacro(DataBoundsScaleFactor, double);
   //@}
 
   //@{
@@ -105,7 +104,7 @@ protected:
 
   double DataScale[3];
   double DataPosition[3];
-  double DataBoundsInflateFactor;
+  double DataBoundsScaleFactor;
   double TransformedBounds[6];
 
   bool UseModelTransform;

@@ -2153,9 +2153,9 @@
         <Element index="0" value="63"/>
         <Domain name="range" id="4834.AxesToLabel.range"/>
       </Property>
-      <Property name="DataBoundsInflateFactor" id="4834.DataBoundsInflateFactor" number_of_elements="1">
-        <Element index="0" value="0.0008"/>
-        <Domain name="range" id="4834.DataBoundsInflateFactor.range"/>
+      <Property name="DataBoundsScaleFactor" id="4834.DataBoundsScaleFactor" number_of_elements="1">
+        <Element index="0" value="1.0008"/>
+        <Domain name="range" id="4834.DataBoundsScaleFactor.range"/>
       </Property>
       <Property name="DataPosition" id="4834.DataPosition" number_of_elements="3">
         <Element index="0" value="0"/>

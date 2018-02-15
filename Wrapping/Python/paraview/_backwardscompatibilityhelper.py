@@ -186,6 +186,17 @@ def setattr(proxy, pname, value):
                 raise NotSupportedException("'%s' is obsolete. Use the `Blocks` "\
                         "property to select blocks using SIL instead.")
 
+    if pname == "DataBoundsInflateFactor" and proxy.SMProxy.GetProperty("DataBoundsScaleFactor"):
+        if paraview.compatibility.GetVersion() <= 5.4:
+            # In 5.5, The axes grid data bounds inflate factor have been
+            # translated by 1 to become the scale factor.
+            proxy.GetProperty("DataBoundsScaleFactor").SetData(value + 1)
+        else:
+            #if inflat factor is being used, raise NotSupportedException
+            raise NotSupportedException(\
+                "'DataBoundsInflateFactor' is obsolete as of ParaView 5.5. Use the "\
+                "'DataBoundsScaleFactor' property to modify the axes gris data bounds instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -340,6 +351,21 @@ def getattr(proxy, pname):
         else:
             raise NotSupportedException(\
               "'%s' is obsolete. Use `Blocks` to make block based selection." % pname)
+
+    # In 5.5, we removed the DataBoundsInflateFactor property and replaced it with the
+    # DataBoundsScaleFactor property.
+    if pname == "DataBoundsInflateFactor" and proxy.SMProxy.GetProperty("DataBoundsScaleFactor"):
+        if version <= 5.4:
+            inflateValue = proxy.GetProperty("DataBoundsScaleFactor").GetData() - 1
+            if inflateValue >= 0:
+                return inflateValue
+            else:
+                return 0
+        else:
+            raise NotSupportedException(
+                    'The  DataBoundsInflateFactorproperty has been removed in ParaView '\
+                    '5.4. Please use the DataBoundsScaleFactor property instead.')
+
     raise Continue()
 
 def GetProxy(module, key):
