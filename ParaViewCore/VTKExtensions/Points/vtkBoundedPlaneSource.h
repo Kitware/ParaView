@@ -58,12 +58,34 @@ public:
   vtkGetVector6Macro(BoundingBox, double);
   //@}
 
+  enum RefinementModes
+  {
+    USE_RESOLUTION,
+    USE_CELL_SIZE
+  };
+
+  /**
+   * Get/Set how the output refinement is to be determined.
+   */
+  vtkSetClampMacro(RefinementMode, int, USE_RESOLUTION, USE_CELL_SIZE);
+  vtkGetMacro(RefinementMode, int);
+
   //@{
   /**
-   * Specify the resolution of the plane.
+   * Specify the resolution of the plane. Used only when RefinementMode is set to
+   * USE_RESOLUTION.
    */
   vtkSetClampMacro(Resolution, int, 1, VTK_INT_MAX);
   vtkGetMacro(Resolution, int);
+  //@}
+
+  //@{
+  /**
+   * Specify the cell-size of the plane. Used only when RefinementMode is set to
+   * USE_CELL_SIZE.
+   */
+  vtkSetMacro(CellSize, double);
+  vtkGetMacro(CellSize, double);
   //@}
 
 protected:
@@ -75,7 +97,9 @@ protected:
   double Center[3];
   double Normal[3];
   double BoundingBox[6];
+  int RefinementMode;
   int Resolution;
+  double CellSize;
 
 private:
   vtkBoundedPlaneSource(const vtkBoundedPlaneSource&) = delete;

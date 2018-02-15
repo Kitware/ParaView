@@ -15,6 +15,19 @@
         </BoundsDomain>
       </DoubleVectorProperty>
 
+      <IntVectorProperty name="RefinementMode"
+        command="SetRefinementMode"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Specify how refinement is computed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Use resolution" value="0" />
+          <Entry text="Use cell-size" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetResolution"
         default_values="100"
         name="Resolution"
@@ -22,7 +35,27 @@
         <IntRangeDomain min="1" name="range" />
         <Documentation>This property specifies the number of divisions along
           the X axis of the parallelogram.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="0" />
+        </Hints>
       </IntVectorProperty>
+
+      <DoubleVectorProperty name="CellSize"
+        command="SetCellSize"
+        default_values="1.0"
+        number_of_elements="1">
+        <Documentation>Specify the cell size to use to compute plane refinement.</Documentation>
+        <DoubleRangeDomain name="range" min= "1" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Center"
         command="SetCenter"
@@ -57,7 +90,9 @@
 
       <PropertyGroup label="Plane Bounds">
         <Property name="BoundingBox" />
+        <Property name="RefinementMode" />
         <Property name="Resolution" />
+        <Property name="CellSize" />
       </PropertyGroup>
 
       <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
@@ -87,6 +122,19 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty name="RefinementMode"
+        command="SetRefinementMode"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Specify how refinement is computed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Use resolution" value="0" />
+          <Entry text="Use cell-size" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="Resolution"
         command="SetResolution"
         number_of_elements="3"
@@ -95,7 +143,27 @@
         <Documentation>
           Set the sampling resolution for the generated volume.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="0" />
+        </Hints>
       </IntVectorProperty>
+
+      <DoubleVectorProperty name="CellSize"
+        command="SetCellSize"
+        default_values="1.0"
+        number_of_elements="1">
+        <Documentation>Specify the cell size to use to compute plane refinement.</Documentation>
+        <DoubleRangeDomain name="range" min= "1" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Scale"
         command="SetScale"
@@ -119,6 +187,12 @@
       <PropertyGroup label="Volume Parameters" panel_widget="InteractiveBox">
         <Property function="Position" name="Origin" />
         <Property function="Scale" name="Scale" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Volume Refinement">
+        <Property name="RefinementMode" />
+        <Property name="Resolution" />
+        <Property name="CellSize" />
       </PropertyGroup>
       <Hints>
         <ProxyList>
