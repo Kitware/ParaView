@@ -36,6 +36,8 @@
  * vtkCommand::EndEvent
  * \li fired to indicate end of progress handling
  * \li \c calldata: vtkPVProgressHandler*
+ *
+ * Starting ParaView 5.5, vtkCommand::MessageEvent is no longer fired.
 */
 
 #ifndef vtkPVProgressHandler_h
@@ -114,18 +116,6 @@ public:
   vtkGetMacro(LastProgress, int);
   //@}
 
-  //@{
-  /**
-   * Temporary storage for most recent message text.
-   */
-  vtkGetStringMacro(LastMessage);
-  //@}
-
-  /**
-   * Update the last message and invokes a message event
-   */
-  void RefreshMessage(const char* message_text);
-
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler() override;
@@ -161,7 +151,9 @@ private:
   void OnProgressEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
   /**
-   * Callback called when vtkCommand::MessageEvent is received.
+   * Callback called when events from vtkOutputWindow singleton are received.
+   * This is also called when vtkCommand::MessageEvent is received from any
+   * vtkOutput we're observing progress from.
    */
   void OnMessageEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
@@ -169,6 +161,11 @@ private:
    * Callback called when WrongTagEvent is fired by the controllers.
    */
   bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata);
+
+  /**
+   * Update the last message and invokes a message event
+   */
+  void RefreshMessage(const char* message_text, int eventid, bool is_local);
 
   bool AddedHandlers;
   class vtkInternals;
@@ -178,8 +175,9 @@ private:
   int LastProgress;
   char* LastProgressText;
 
-  vtkSetStringMacro(LastMessage);
-  char* LastMessage;
+  class RMICallback;
+  friend class RMICallback;
+  ;
 };
 
 #endif
