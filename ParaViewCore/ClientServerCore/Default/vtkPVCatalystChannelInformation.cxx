@@ -58,17 +58,19 @@ void vtkPVCatalystChannelInformation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVCatalystChannelInformation::CopyFromObject(vtkObject* obj)
 {
-  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(obj);
-  // Locate named array in dataset
-  if (vtkDataObject* dobj = algo->GetOutputDataObject(0))
+  if (vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(obj))
   {
-    if (vtkStringArray* array = vtkStringArray::SafeDownCast(
-          dobj->GetFieldData()->GetAbstractArray(InputArrayName.c_str())))
+    // Locate named array in dataset
+    if (vtkDataObject* dobj = algo->GetOutputDataObject(0))
     {
-      if (array->GetNumberOfTuples() > 0)
+      if (vtkStringArray* array = vtkStringArray::SafeDownCast(
+            dobj->GetFieldData()->GetAbstractArray(InputArrayName.c_str())))
       {
-        this->ChannelName = array->GetValue(0);
-        return;
+        if (array->GetNumberOfTuples() > 0)
+        {
+          this->ChannelName = array->GetValue(0);
+          return;
+        }
       }
     }
   }
