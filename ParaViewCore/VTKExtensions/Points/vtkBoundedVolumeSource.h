@@ -50,12 +50,34 @@ public:
   vtkGetVector3Macro(Scale, double);
   //@}
 
+  enum RefinementModes
+  {
+    USE_RESOLUTION,
+    USE_CELL_SIZE
+  };
+
+  /**
+   * Get/Set how the output refinement is to be determined.
+   */
+  vtkSetClampMacro(RefinementMode, int, USE_RESOLUTION, USE_CELL_SIZE);
+  vtkGetMacro(RefinementMode, int);
+
   //@{
   /**
-   * Get/Set the output image resolution.
+   * Get/Set the output image resolution. Used only when RefinementMode is set to
+   * USE_RESOLUTION.
    */
   vtkSetVector3Macro(Resolution, int);
   vtkGetVector3Macro(Resolution, int);
+  //@}
+
+  //@{
+  /**
+   * Specify the cell-size of the output image. Used only when RefinementMode is set to
+   * USE_CELL_SIZE.
+   */
+  vtkSetMacro(CellSize, double);
+  vtkGetMacro(CellSize, double);
   //@}
 
 protected:
@@ -68,7 +90,9 @@ protected:
 
   double Origin[3];
   double Scale[3];
+  int RefinementMode;
   int Resolution[3];
+  double CellSize;
 
 private:
   vtkBoundedVolumeSource(const vtkBoundedVolumeSource&) = delete;
