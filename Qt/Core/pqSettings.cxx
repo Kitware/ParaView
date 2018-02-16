@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 
+#ifndef VTK_LEGACY_REMOVE
 namespace
 {
 class pqSettingsCleaner : public QObject
@@ -58,12 +59,6 @@ public:
 }
 
 //-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& organization, const QString& application, QObject* p)
-  : QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application, p)
-{
-}
-
-//-----------------------------------------------------------------------------
 pqSettings::pqSettings(const QString& filename, bool temporary, QObject* parentObject)
   : QSettings(filename, QSettings::IniFormat, parentObject)
 {
@@ -72,11 +67,50 @@ pqSettings::pqSettings(const QString& filename, bool temporary, QObject* parentO
     new pqSettingsCleaner(filename, this);
   }
 }
+#endif // VTK_LEGACY_REMOVE
 
 //-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& fname, Format fmt, QObject* parentObject)
-  : Superclass(fname, fmt, parentObject)
+pqSettings::pqSettings(const QString& org, const QString& app, QObject* prnt)
+  : Superclass(org, app, prnt)
 {
+}
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(Scope spe, const QString& org, const QString& app, QObject* prnt)
+  : Superclass(spe, org, app, prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(Format fmt, Scope spe, const QString& org, const QString& app, QObject* prnt)
+  : Superclass(fmt, spe, org, app, prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(const QString& fn, Format fmt, QObject* prnt)
+  : Superclass(fn, fmt, prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(QObject* prnt)
+  : Superclass(prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::~pqSettings()
+{
+}
+
+//-----------------------------------------------------------------------------
+QString pqSettings::backup(const QString& argName)
+{
+  this->sync();
+
+  QString fname = argName.isEmpty() ? (this->fileName() + ".bak") : argName;
+  QFile::remove(fname);
+  return QFile::copy(this->fileName(), fname) ? fname : QString();
 }
 
 //-----------------------------------------------------------------------------

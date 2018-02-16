@@ -106,15 +106,6 @@ public:
   static const std::string& GetApplicationName();
   //@}
 
-protected:
-  vtkInitializationHelper(){};
-  ~vtkInitializationHelper() override{};
-
-  /**
-   * Load user and site settings
-   */
-  static void LoadSettings();
-
   /**
    * Get directory for user settings file. The last character is always the
    * file path separator appropriate for the system.
@@ -125,6 +116,15 @@ protected:
    * Get file path for the user settings file.
    */
   static std::string GetUserSettingsFilePath();
+
+protected:
+  vtkInitializationHelper(){};
+  ~vtkInitializationHelper() override{};
+
+  /**
+   * Load user and site settings
+   */
+  static void LoadSettings();
 
 private:
   vtkInitializationHelper(const vtkInitializationHelper&) = delete;
