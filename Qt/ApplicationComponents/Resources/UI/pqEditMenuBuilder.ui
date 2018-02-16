@@ -175,6 +175,17 @@
    <property name="shortcut">
     <string>V</string>
    </property>
+ </action>
+  <action name="actionRestoreUserPreferences">
+   <property name="text">
+    <string>Restore User Preferences</string>
+   </property>
+   <property name="iconText">
+    <string>Restore User Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Restore user preferences to default.</string>
+   </property>
   </action>
   <addaction name="actionEditUndo"/>
   <addaction name="actionEditRedo"/>
@@ -193,7 +204,9 @@
   <addaction name="actionDelete_All"/>
   <addaction name="separator"/>
   <addaction name="actionQuery"/>
+  <addaction name="separator"/>
   <addaction name="actionEditSettings"/>
+  <addaction name="actionRestoreUserPreferences"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

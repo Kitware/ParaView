@@ -226,6 +226,16 @@ public:
   pqSettings* settings();
 
   /**
+   * Clears the settings. Since various UI components that only
+   * read settings at creation time may get out of sync, it's best
+   * to warn the user to restart the application.
+   *
+   * Any changes made to pqSettings after calling this method will be lost and
+   * will not get restored. If that's not desired, see `QSettings::clear`.
+   */
+  void clearSettings();
+
+  /**
   * Save the ServerManager state.
   */
   vtkPVXMLElement* saveState();

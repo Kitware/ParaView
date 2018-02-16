@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 #include <QSettings>
 
+#include "vtkSetGet.h" //for VTK_LEGACY
+
 class QDialog;
 class QMainWindow;
 class QDockWidget;
@@ -50,14 +52,26 @@ class PQCORE_EXPORT pqSettings : public QSettings
   typedef QSettings Superclass;
 
 public:
-  pqSettings(const QString& organization, const QString& application, QObject* p = NULL);
-  pqSettings(const QString& fileName, Format format, QObject* parent = NULL);
+  pqSettings(
+    const QString& organization, const QString& application = QString(), QObject* parent = nullptr);
+  pqSettings(Scope scope, const QString& organization, const QString& application = QString(),
+    QObject* parent = nullptr);
+  pqSettings(Format format, Scope scope, const QString& organization,
+    const QString& application = QString(), QObject* parent = nullptr);
+  pqSettings(const QString& fileName, Format format, QObject* parent = nullptr);
+  pqSettings(QObject* parent = nullptr);
+  ~pqSettings() override;
 
+#ifndef VTK_LEGACY_REMOVE
+  //@{
   /**
-  * use this constructor to use a file. If temporary is true, then the file
-  * will be deleted when the pqSettings object is destroyed.
-  */
-  pqSettings(const QString& filename, bool temporary, QObject* parent = NULL);
+   * @deprecated ParaView 5.5. Ability to create temporary files for settings is
+   * no longer available (and is rarely necessary). See
+   * `pqApplicationCore::settings` for alternative approaches.
+   */
+  VTK_LEGACY(pqSettings(const QString& filename, bool temporary, QObject* parent = NULL));
+//@}
+#endif // VTK_LEGACY_REMOVE
 
   void saveState(const QMainWindow& window, const QString& key);
   void saveState(const QDialog& dialog, const QString& key);
@@ -74,6 +88,14 @@ public:
   * Save a property value to a given setting name
   */
   void saveInQSettings(const char* key, vtkSMProperty* smproperty);
+
+  /**
+   * Creates a new backup file for the current settings.
+   * If `filename` is empty, then a backup file name will automatically be
+   * picked. On success returns the backup file name, on failure an empty string
+   * is returned.
+   */
+  QString backup(const QString& filename = QString());
 
 private:
   /**
