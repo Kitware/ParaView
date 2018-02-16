@@ -711,7 +711,62 @@
       </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVExtractArraysOverTime"
+    <SourceProxy class="vtkPExtractDataArraysOverTime"
+                 label="Plot Data Over Time"
+                 name="PlotDataOverTime">
+      <InputProperty command="SetInputConnection"
+                     name="Input"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+          <DataType value="vtkTable" />
+          <DataType value="vtkCompositeDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input from which the selection is
+        extracted.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Points" value="0" />
+          <Entry text="Cells" value="1" />
+          <Entry text="Vertices" value="4" />
+          <Entry text="Edges" value="5" />
+          <Entry text="Rows" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetReportStatisticsOnly"
+                         default_values="1"
+                         name="Only Report Selection Statistics"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the min, max,
+          inter-quartile ranges, and (for numeric arrays) mean and standard
+          deviation of all the selected points or cells within each time step
+          are reported -- instead of breaking each selected point's or cell's
+          attributes out into separate time history tables.</Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="QuartileChartView" />
+        <WarnOnCreate title="Potentially slow operation">
+          **Plot Selection Over Time** filter needs to process all timesteps
+          available in your dataset and can potentially take a long time to complete.
+          Do you want to continue?
+        </WarnOnCreate>
+      </Hints>
+      <!-- End of ExtractSelectionOverTime -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPExtractSelectedArraysOverTime"
                  label="Plot Selection Over Time"
                  name="ExtractSelectionOverTime">
       <Documentation long_help="Extracts selection over time and then plots it."
@@ -770,6 +825,11 @@
           are reported -- instead of breaking each selected point's or cell's
           attributes out into separate time history tables.</Documentation>
       </IntVectorProperty>
+
+      <SubProxy command="SetSelectionExtractor">
+        <Proxy name="SetSelectionExtractor" class="vtkPVExtractSelection" />
+      </SubProxy>
+
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="QuartileChartView" />

@@ -14,16 +14,17 @@
 =========================================================================*/
 #include "vtkPVMergeTablesMultiBlock.h"
 
-#include "assert.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkCompositeDataPipeline.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-#include "vtkVariant.h"
+
+#include <cassert>
+#include <vector>
 
 vtkStandardNewMacro(vtkPVMergeTablesMultiBlock);
 //----------------------------------------------------------------------------
@@ -41,110 +42,111 @@ vtkPVMergeTablesMultiBlock::~vtkPVMergeTablesMultiBlock()
 //----------------------------------------------------------------------------
 int vtkPVMergeTablesMultiBlock::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVMergeTablesMultiBlock::FillOutputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
+static vtkSmartPointer<vtkTable> vtkPVMergeTablesMultiBlockMerge(
+  const std::vector<vtkTable*>& inputs)
 {
-  // now add our info
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-vtkExecutive* vtkPVMergeTablesMultiBlock::CreateDefaultExecutive()
-{
-  return vtkCompositeDataPipeline::New();
-}
-
-//----------------------------------------------------------------------------
-static void vtkPVMergeTablesMultiBlockMerge(vtkTable* output, vtkTable* inputs[], int num_inputs)
-{
-  for (int idx = 0; idx < num_inputs; ++idx)
+  assert(inputs.size() > 0);
+  if (inputs.size() == 1)
   {
-    vtkTable* curTable = inputs[idx];
-    if (!curTable || curTable->GetNumberOfRows() == 0 || curTable->GetNumberOfColumns() == 0)
-    {
-      continue;
-    }
+    return inputs[0];
+  }
 
-    if (output->GetNumberOfRows() == 0)
+  auto result = vtkSmartPointer<vtkTable>::New();
+  auto resultRowData = result->GetRowData();
+  for (vtkTable* table : inputs)
+  {
+    assert(table && table->GetNumberOfColumns() > 0 && table->GetNumberOfRows() > 0);
+    if (result->GetNumberOfRows() == 0)
     {
       // Copy output structure from the first non-empty input.
-      output->DeepCopy(curTable);
+      result->DeepCopy(table);
       continue;
     }
 
-    vtkIdType numRows = curTable->GetNumberOfRows();
-    vtkIdType numCols = curTable->GetNumberOfColumns();
-    for (vtkIdType i = 0; i < numRows; i++)
+    auto resultCount = resultRowData->GetNumberOfTuples();
+    auto tableRowData = table->GetRowData();
+    auto tableCount = tableRowData->GetNumberOfTuples();
+
+    resultRowData->SetNumberOfTuples(resultCount + tableCount);
+    for (vtkIdType cc = 0; cc < tableCount; ++cc)
     {
-      vtkIdType curRow = output->InsertNextBlankRow();
-      for (vtkIdType j = 0; j < numCols; j++)
-      {
-        output->SetValue(curRow, j, curTable->GetValue(i, j));
-      }
+      resultRowData->SetTuple(cc + resultCount, cc, tableRowData);
     }
   }
+  return result;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVMergeTablesMultiBlock::ProcessRequest(
-  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkPVMergeTablesMultiBlock::RequestData(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  if (!request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
+  vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outputVector, 0);
+  assert(output);
+  output->CopyStructure(vtkDataObjectTree::GetData(inputVector[0], 0));
+
+  // let's start by collecting all non-trivial inputs to merge.
+  std::vector<vtkDataObjectTree*> nonempty_inputs;
+  const int num_connections = this->GetNumberOfInputConnections(0);
+  for (int cc = 0; cc < num_connections; ++cc)
   {
-    return this->Superclass::ProcessRequest(request, inputVector, outputVector);
+    if (auto cd = vtkDataObjectTree::GetData(inputVector[0], cc))
+    {
+      auto iter = cd->NewIterator();
+      iter->InitTraversal();
+      if (!iter->IsDoneWithTraversal())
+      {
+        // non-empty
+        nonempty_inputs.push_back(cd);
+      }
+      iter->Delete();
+    }
   }
 
-  vtkCompositeDataSet* input0 = vtkCompositeDataSet::GetData(inputVector[0], 0);
-  vtkMultiBlockDataSet* outputTables = vtkMultiBlockDataSet::GetData(outputVector, 0);
-  outputTables->CopyStructure(input0);
-  assert(outputTables);
+  if (nonempty_inputs.size() == 0)
+  {
+    return 1;
+  }
 
-  int num_connections = this->GetNumberOfInputConnections(0);
-  vtkCompositeDataIterator* iter = input0->NewIterator();
+  auto nameKey = vtkCompositeDataSet::NAME();
+
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(output->NewIterator());
   iter->SkipEmptyNodesOff();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
   {
-    vtkTable** inputs = new vtkTable*[num_connections];
-    bool has_input = false;
-    for (int idx = 0; idx < num_connections; ++idx)
+    std::vector<vtkTable*> leaves;
+    const char* bname =
+      iter->HasCurrentMetaData() ? iter->GetCurrentMetaData()->Get(nameKey) : nullptr;
+    for (auto cd : nonempty_inputs)
     {
-      vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inputVector[0], idx);
-      if (!inputCD)
+      if (auto* table = vtkTable::SafeDownCast(cd->GetDataSet(iter)))
       {
-        continue;
-      }
-      vtkSmartPointer<vtkCompositeDataIterator> iter2;
-      iter2.TakeReference(inputCD->NewIterator());
-      if (iter2->IsDoneWithTraversal())
-      {
-        // trivial case, the composite dataset being merged is empty, simply
-        // ignore it.
-        inputs[idx] = NULL;
-      }
-      else
-      {
-        inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
-        has_input |= (inputs[idx] != NULL);
+        if (table->GetNumberOfRows() > 0 && table->GetNumberOfColumns() > 0)
+        {
+          leaves.push_back(table);
+        }
+        if (bname == nullptr && cd->HasMetaData(iter))
+        {
+          bname = cd->GetMetaData(iter)->Get(nameKey);
+        }
       }
     }
-    // don't add an empty vtkTable is all inputs are NULL.
-    if (has_input)
+    if (leaves.size())
     {
-      vtkTable* outputTable = vtkTable::New();
-      ::vtkPVMergeTablesMultiBlockMerge(outputTable, inputs, num_connections);
-      outputTables->SetDataSet(iter, outputTable);
-      outputTable->Delete();
+      auto result = ::vtkPVMergeTablesMultiBlockMerge(leaves);
+      output->SetDataSet(iter, result);
+      if (bname)
+      {
+        output->GetMetaData(iter)->Set(nameKey, bname);
+      }
     }
-    delete[] inputs;
   }
-  iter->Delete();
   return 1;
 }
 

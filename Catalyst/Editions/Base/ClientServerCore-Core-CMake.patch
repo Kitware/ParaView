@@ -10,12 +10,11 @@ index 4f283bd..f05aa2b 100644
    vtkProcessModuleAutoMPI.cxx
    vtkProcessModule.cxx
    vtkPVAlgorithmPortsInformation.cxx
-@@ -48,8 +47,6 @@ set (Module_SRCS
+@@ -48,7 +47,6 @@ set (Module_SRCS
    vtkPVDataSizeInformation.cxx
    vtkPVDisableStackTraceSignalHandler.cxx
    vtkPVEnableStackTraceSignalHandler.cxx
 -  vtkPVExtractSelection.cxx
--  vtkPVExtractArraysOverTime.cxx
    vtkPVFileInformationHelper.cxx
    vtkPVGenericAttributeInformation.cxx
    vtkPVInformation.cxx

@@ -369,6 +369,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/OrthographicView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OutOfRangeColors.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PlotDataOverTime-NonDistributed.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotGlobalVariablesOverTime.xml
@@ -763,6 +764,11 @@ set (ChartAxisRangeAndLabels_THRESHOLD 60)
 # The color and opacity are often different on different machines.
 SET (ColorEditorControls_THRESHOLD 60)
 SET (ColorEditorVolumeControls_THRESHOLD 300)
+
+# PlotDataOverTime produces different block labels in parallel
+# This leeway helps that.
+set (PlotDataOverTime-NonDistributed_THRESHOLD 25)
+
 
 # Plot image leeway.
 set (SpreadSheet2_THRESHOLD 50)

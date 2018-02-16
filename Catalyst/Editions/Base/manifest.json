@@ -97,8 +97,7 @@
       "path":"ParaViewCore/ClientServerCore/Core",
       "exclude": [
           { "path": "vtkPConvertSelection*" },
-          { "path": "vtkPVExtractSelection*" },
-          { "path": "vtkPVExtractArraysOverTime*" }
+          { "path": "vtkPVExtractSelection*" }
       ],
       "patches": [
           { "path": "ClientServerCore-Core-CMake.patch" }
