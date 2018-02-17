@@ -59,20 +59,31 @@ static vtkSmartPointer<vtkTable> vtkPVMergeTablesMultiBlockMerge(
 
   auto result = vtkSmartPointer<vtkTable>::New();
   auto resultRowData = result->GetRowData();
+  result->DeepCopy(inputs[0]);
+
+  // resize the table to avoid resize over and over again.
+  vtkIdType numrows = 0;
   for (vtkTable* table : inputs)
   {
+    numrows += table->GetNumberOfRows();
+  }
+  for (int cc = 0, max = resultRowData->GetNumberOfArrays(); cc < max; cc++)
+  {
+    // note: this does not update MaxId i.e. resultRowData->GetNumberOfTuples()
+    // remains unchanged.
+    resultRowData->GetAbstractArray(cc)->Resize(numrows);
+  }
+
+  for (size_t idx = 1; idx < inputs.size(); ++idx)
+  {
+    auto table = inputs[idx];
     assert(table && table->GetNumberOfColumns() > 0 && table->GetNumberOfRows() > 0);
-    if (result->GetNumberOfRows() == 0)
-    {
-      // Copy output structure from the first non-empty input.
-      result->DeepCopy(table);
-      continue;
-    }
 
     auto resultCount = resultRowData->GetNumberOfTuples();
     auto tableRowData = table->GetRowData();
     auto tableCount = tableRowData->GetNumberOfTuples();
 
+    // note: won't cause any resizes, since we resized already.
     resultRowData->SetNumberOfTuples(resultCount + tableCount);
     for (vtkIdType cc = 0; cc < tableCount; ++cc)
     {
