@@ -6946,8 +6946,7 @@ array.
       <IntVectorProperty command="SetExactBoxClip"
                          default_values="0"
                          name="Exact"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1 it will clip to the exact specifications
         for the **Box** option, otherwise the clip will only approximate the box geometry. The
