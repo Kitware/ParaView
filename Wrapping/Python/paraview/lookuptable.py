@@ -14,12 +14,12 @@ This module is intended for use with by simple.py."""
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-
+from __future__ import absolute_import
 import os
 from math import sqrt
 
-from paraview import servermanager
-from _colorMaps import getColorMaps
+from . import servermanager
+from ._colorMaps import getColorMaps
 
 # -----------------------------------------------------------------------------
 
