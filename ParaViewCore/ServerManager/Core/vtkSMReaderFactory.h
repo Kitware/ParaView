@@ -182,6 +182,11 @@ protected:
   void RegisterPrototype(
     const char* xmlgroup, const char* xmlname, const char* extensions, const char* description);
 
+  /**
+   * Returns true if the fname refers to a directory or a link to a directory.
+   */
+  static bool GetFilenameIsDirectory(const char* fname, vtkSMSession* session);
+
   vtkSetStringMacro(ReaderName);
   vtkSetStringMacro(ReaderGroup);
 

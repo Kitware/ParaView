@@ -63,6 +63,12 @@ public:
     std::vector<vtksys::RegularExpression> FilenameRegExs;
     std::vector<std::string> FilenamePatterns;
     std::string Description;
+    bool IsDirectory;
+
+    vtkValue()
+      : IsDirectory(false)
+    {
+    }
 
     vtkSMSessionProxyManager* GetProxyManager(vtkSMSession* session)
     {
@@ -111,6 +117,12 @@ public:
         }
       }
       this->Description = rfHint->GetAttribute("file_description");
+
+      int is_directory = 0;
+      if (rfHint->GetScalarAttribute("is_directory", &is_directory))
+      {
+        this->IsDirectory = (is_directory == 1);
+      }
     }
 
     // Returns true is a prototype proxy can be created on the given connection.
@@ -123,7 +135,8 @@ public:
 
     // Returns true if the reader can read the file. More correctly, it returns
     // false is the reader reports that it cannot read the file.
-    bool CanReadFile(const char* filename, const std::vector<std::string>& extensions,
+    // is_dir == true, if filename refers to a directory.
+    bool CanReadFile(const char* filename, bool is_dir, const std::vector<std::string>& extensions,
       vtkSMSession* session, bool skip_filename_test = false);
 
     // Tests if 'any' of the strings in extensions is contained in
@@ -230,13 +243,18 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(const char* f
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(const char* filename,
+bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(const char* filename, bool is_dir,
   const std::vector<std::string>& extensions, vtkSMSession* session,
   bool skip_filename_test /*=false*/)
 {
   vtkSMSessionProxyManager* pxm = this->GetProxyManager(session);
   vtkSMProxy* prototype = this->GetPrototypeProxy(session, this->Group.c_str(), this->Name.c_str());
   if (!prototype)
+  {
+    return false;
+  }
+
+  if (is_dir != this->IsDirectory)
   {
     return false;
   }
@@ -393,12 +411,13 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename, vtkSMSession
   std::vector<std::string> extensions;
   this->Internals->BuildExtensions(filename, extensions);
 
+  const bool is_dir = vtkSMReaderFactory::GetFilenameIsDirectory(filename, session);
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
        ++iter)
   {
     if (iter->second.CanCreatePrototype(session) &&
-      iter->second.CanReadFile(filename, extensions, session))
+      iter->second.CanReadFile(filename, is_dir, extensions, session))
     {
       iter->second.FillInformation(session);
       this->Readers->AddString(iter->second.Group.c_str());
@@ -417,6 +436,9 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename, vtkS
 
   bool empty_filename = (!filename || filename[0] == 0);
 
+  const bool is_dir =
+    empty_filename ? false : vtkSMReaderFactory::GetFilenameIsDirectory(filename, session);
+
   std::vector<std::string> extensions;
   // purposefully set the extensions to empty, since we don't want the extension
   // test to be used for this case.
@@ -426,7 +448,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename, vtkS
        ++iter)
   {
     if (iter->second.CanCreatePrototype(session) &&
-      (empty_filename || iter->second.CanReadFile(filename, extensions, session, true)))
+      (empty_filename || iter->second.CanReadFile(filename, is_dir, extensions, session, true)))
     {
       iter->second.FillInformation(session);
       this->Readers->AddString(iter->second.Group.c_str());
@@ -449,6 +471,8 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session
     return false;
   }
 
+  const bool is_dir = vtkSMReaderFactory::GetFilenameIsDirectory(filename, session);
+
   std::vector<std::string> extensions;
   this->Internals->BuildExtensions(filename, extensions);
 
@@ -457,7 +481,7 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session
        ++iter)
   {
     if (iter->second.CanCreatePrototype(session) &&
-      iter->second.CanReadFile(filename, extensions, session))
+      iter->second.CanReadFile(filename, is_dir, extensions, session))
     {
       this->SetReaderGroup(iter->second.Group.c_str());
       this->SetReaderName(iter->second.Name.c_str());
@@ -646,4 +670,33 @@ void vtkSMReaderFactory::AddReaderToWhitelist(const char* readerxmlgroup, const 
     vtkSMReaderFactory::vtkInternals::ReaderWhitelist.insert(
       std::pair<std::string, std::string>(readerxmlgroup, readerxmlname));
   }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMReaderFactory::GetFilenameIsDirectory(const char* fname, vtkSMSession* session)
+{
+  if (session && fname && fname[0])
+  {
+    bool is_dir = false;
+    auto pxm = session->GetSessionProxyManager();
+    if (vtkSMProxy* proxy = pxm->NewProxy("misc", "Directory"))
+    {
+      proxy->SetLocation(vtkProcessModule::DATA_SERVER_ROOT);
+      proxy->UpdateVTKObjects();
+      if (vtkSMProxy* helper = pxm->NewProxy("misc", "FilePathEncodingHelper"))
+      {
+        vtkSMPropertyHelper(helper, "ActiveFileName").Set(fname);
+        vtkSMPropertyHelper(helper, "ActiveGlobalId")
+          .Set(static_cast<vtkIdType>(proxy->GetGlobalID()));
+        helper->UpdateVTKObjects();
+        helper->UpdatePropertyInformation(helper->GetProperty("IsDirectory"));
+        is_dir = vtkSMPropertyHelper(helper->GetProperty("IsDirectory")).GetAsInt() == 1;
+        helper->Delete();
+      }
+      proxy->Delete();
+    }
+    return is_dir;
+  }
+
+  return false;
 }
