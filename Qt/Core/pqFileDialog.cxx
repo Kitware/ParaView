@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMessageBox>
 #include <QPoint>
+#include <QScopedValueRollback>
 #include <QtDebug>
 
 #include <QKeyEvent>
@@ -147,6 +148,9 @@ public:
   bool SuppressOverwriteWarning;
   bool ShowMultipleFileHelp;
   QString FileNamesSeperator;
+  bool InDoubleClickHandler; //< used to determine if we're "accept"ing as a result of
+                             //  double-clicking as that elicits a different
+                             //  response.
 
   // remember the last locations we browsed
   static QMap<QPointer<pqServer>, QString> ServerFilePaths;
@@ -163,6 +167,7 @@ public:
     , SuppressOverwriteWarning(false)
     , ShowMultipleFileHelp(false)
     , FileNamesSeperator(";")
+    , InDoubleClickHandler(false)
   {
     QObject::connect(p, SIGNAL(filesSelected(const QList<QStringList>&)), this->RecentModel,
       SLOT(setChosenFiles(const QList<QStringList>&)));
@@ -517,6 +522,7 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       selectionMode = QAbstractItemView::SingleSelection;
       break;
     case ExistingFiles:
+    case ExistingFilesAndDirectories:
       setupMutlipleFileHelp = (this->Implementation->ShowMultipleFileHelp != true);
       selectionMode = QAbstractItemView::ExtendedSelection;
       break;
@@ -600,6 +606,7 @@ void pqFileDialog::accept()
       break;
     case ExistingFiles:
     case ExistingFile:
+    case ExistingFilesAndDirectories:
       loadedFile = this->acceptExistingFiles();
       break;
   }
@@ -626,7 +633,7 @@ bool pqFileDialog::acceptExistingFiles()
 
     QString fullFilePath = this->Implementation->Model->absoluteFilePath(filename);
     emit this->fileAccepted(fullFilePath);
-    loadedFiles = (this->acceptInternal(this->buildFileGroup(filename), false) || loadedFiles);
+    loadedFiles = (this->acceptInternal(this->buildFileGroup(filename)) || loadedFiles);
   }
   return loadedFiles;
 }
@@ -649,7 +656,7 @@ bool pqFileDialog::acceptDefault(const bool& checkForGrouping)
   {
     files = QStringList(fullFilePath);
   }
-  return this->acceptInternal(files, false);
+  return this->acceptInternal(files);
 }
 
 //-----------------------------------------------------------------------------
@@ -846,29 +853,10 @@ void pqFileDialog::onActivateRecent(const QModelIndex& index)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onDoubleClickFile(const QModelIndex& index)
+void pqFileDialog::onDoubleClickFile(const QModelIndex&)
 {
-  if (this->Implementation->Mode == Directory)
-  {
-    QModelIndex actual_index = index;
-    if (actual_index.model() == &this->Implementation->FileFilter)
-      actual_index = this->Implementation->FileFilter.mapToSource(actual_index);
-
-    QStringList selected_files;
-    QStringList paths;
-    QString path;
-
-    paths = this->Implementation->Model->getFilePaths(actual_index);
-    foreach (path, paths)
-    {
-      selected_files << this->Implementation->Model->absoluteFilePath(path);
-    }
-    this->acceptInternal(selected_files, true);
-  }
-  else
-  {
-    this->accept();
-  }
+  QScopedValueRollback<bool> setter(this->Implementation->InDoubleClickHandler, true);
+  this->accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -979,7 +967,7 @@ QString pqFileDialog::fixFileExtension(const QString& filename, const QString& f
 }
 
 //-----------------------------------------------------------------------------
-bool pqFileDialog::acceptInternal(const QStringList& selected_files, const bool& doubleclicked)
+bool pqFileDialog::acceptInternal(const QStringList& selected_files)
 {
   if (selected_files.empty())
   {
@@ -992,8 +980,15 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files, const bool&
   {
     switch (this->Implementation->Mode)
     {
+      case ExistingFilesAndDirectories:
+        if (!this->Implementation->InDoubleClickHandler)
+        {
+          this->addToFilesSelected(selected_files);
+          return true;
+        }
+        VTK_FALLTHROUGH;
       case Directory:
-        if (!doubleclicked)
+        if (!this->Implementation->InDoubleClickHandler)
         {
           this->addToFilesSelected(QStringList(file));
           this->onNavigate(file);
@@ -1038,6 +1033,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files, const bool&
         break;
       case ExistingFile:
       case ExistingFiles:
+      case ExistingFilesAndDirectories:
         this->addToFilesSelected(selected_files);
         break;
       case AnyFile:
@@ -1064,6 +1060,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files, const bool&
       case Directory:
       case ExistingFile:
       case ExistingFiles:
+      case ExistingFilesAndDirectories:
         this->Implementation->Ui.FileName->selectAll();
         return false;
 
