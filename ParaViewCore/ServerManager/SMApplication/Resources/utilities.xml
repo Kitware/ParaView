@@ -2384,6 +2384,11 @@
                          name="RenameDirectory">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
+      <IntVectorProperty command="IsDirectory"
+                         information_only="1"
+                         name="IsDirectory">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
       <IntVectorProperty command="GetActiveFileIsReadable"
                          information_only="1"
                          name="ActiveFileIsReadable">
