@@ -69,7 +69,8 @@ public:
     NETWORK_ROOT,
     NETWORK_DOMAIN,
     NETWORK_SERVER,
-    NETWORK_SHARE
+    NETWORK_SHARE,
+    DIRECTORY_GROUP
   };
 
   /**
@@ -118,8 +119,9 @@ public:
   /**
    * Get the Contents for this directory.
    * Returns a collection with vtkPVFileInformation objects
-   * for the contents of this directory if Type = DIRECTORY
-   * or the contents of this file group if Type ==FILE_GROUP.
+   * for the contents of this directory if Type == DIRECTORY
+   * or the contents of this file group if Type == FILE_GROUP
+   * or the contents of this directory group if Type == DIRECTORY_GROUP.
    */
   vtkGetObjectMacro(Contents, vtkCollection);
   vtkGetStringMacro(Extension);
