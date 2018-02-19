@@ -613,7 +613,7 @@ struct Process_5_4_to_5_5
   {
     return LockScalarRange(document) && CalculatorAttributeMode(document) &&
       CGNSReaderUpdates(document) && HeadlightToAdditionalLight(document) &&
-      DataBoundsInflateScaleFactor(document);
+      DataBoundsInflateScaleFactor(document) && AnnotateAttributesInput(document);
   }
 
   bool LockScalarRange(xml_document& document)
@@ -658,6 +658,53 @@ struct Process_5_4_to_5_5
       }
     }
 
+    return true;
+  }
+
+  bool AnnotateAttributesInput(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and "
+                            "@type='AnnotateAttributeData']");
+
+    for (auto iter = proxy_nodes.begin(); iter != proxy_nodes.end(); ++iter)
+    {
+      pugi::xml_node proxy_node = iter->node();
+      pugi::xml_node association_node =
+        proxy_node.find_child_by_attribute("Property", "name", "ArrayAssociation");
+      pugi::xml_node arrayname_node =
+        proxy_node.find_child_by_attribute("Property", "name", "ArrayName");
+      if (!association_node || !arrayname_node)
+      {
+        continue;
+      }
+
+      pugi::xml_node newInputNode = proxy_node.append_child("Property");
+      newInputNode.append_attribute("name").set_value("SelectInputArray");
+      newInputNode.append_attribute("number_of_elements").set_value(5);
+
+      pugi::xml_node childNode = newInputNode.append_child("Element");
+      childNode.append_attribute("index").set_value(0);
+      childNode.append_attribute("value").set_value("");
+
+      childNode = newInputNode.append_child("Element");
+      childNode.append_attribute("index").set_value(1);
+      childNode.append_attribute("value").set_value("");
+
+      childNode = newInputNode.append_child("Element");
+      childNode.append_attribute("index").set_value(2);
+      childNode.append_attribute("value").set_value("");
+
+      childNode = newInputNode.append_child("Element");
+      childNode.append_attribute("index").set_value(3);
+      childNode.append_attribute("value").set_value(
+        association_node.child("Element").attribute("value").as_int());
+
+      childNode = newInputNode.append_child("Element");
+      childNode.append_attribute("index").set_value(4);
+      childNode.append_attribute("value").set_value(
+        arrayname_node.child("Element").attribute("value").as_string());
+    }
     return true;
   }
 

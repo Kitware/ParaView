@@ -173,28 +173,26 @@ annotation text.
              currently.
            </Documentation>
       </InputProperty>
-      <IntVectorProperty command="SetArrayAssociation"
-                         default_values="2"
-                         name="ArrayAssociation"
-                         number_of_elements="1">
-        <Documentation>Select the attribute to use to popular array names from.</Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Point Data" value="0" />
-          <Entry text="Cell Data" value="1" />
-          <Entry text="Field Data" value="2" />
-          <Entry text="Row Data" value="6" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetArrayName"
-                            name="ArrayName"
-                            number_of_elements="1">
-        <ArrayListDomain name="array_list">
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Choose arrays that is going to be displayed</Documentation>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty name="ElementId"
                          command="SetElementId"

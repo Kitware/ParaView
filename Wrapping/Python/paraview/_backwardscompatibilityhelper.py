@@ -197,6 +197,40 @@ def setattr(proxy, pname, value):
                 "'DataBoundsInflateFactor' is obsolete as of ParaView 5.5. Use the "\
                 "'DataBoundsScaleFactor' property to modify the axes gris data bounds instead.")
 
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "AnnotateAttributeData":
+        # in 5.5, Annotate Attribute Data changed how it sets the array to annotate
+        if pname == "ArrayAssociation":
+            if paraview.compatibility.GetVersion() <= 5.4:
+                paraview.print_warning(\
+                "'ArrayAssociation' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
+
+                if value == "Point Data":
+                    value = "POINTS"
+                elif value == "Cell Data":
+                    value = "CELLS"
+                elif value == "Field Data":
+                    value = "FIELD"
+                elif value == "Row Data":
+                    value = "ROWS"
+
+                arrayProp = proxy.GetProperty("SelectInputArray")
+                proxy.GetProperty("SelectInputArray").SetData((value, arrayProp[1]))
+                raise Continue()
+            else:
+                raise NotSupportedException(\
+                    "'ArrayAssociation' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
+        elif pname == "ArrayName":
+            if paraview.compatibility.GetVersion() <= 5.4:
+                paraview.print_warning(\
+                "'ArrayName' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
+
+                arrayProp = proxy.GetProperty("SelectInputArray")
+                proxy.GetProperty("SelectInputArray").SetData((arrayProp[0], value))
+                raise Continue()
+            else:
+                raise NotSupportedException(\
+                    "'ArrayName' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -366,6 +400,33 @@ def getattr(proxy, pname):
                     'The  DataBoundsInflateFactorproperty has been removed in ParaView '\
                     '5.4. Please use the DataBoundsScaleFactor property instead.')
 
+    if proxy.SMProxy and proxy.SMProxy.GetXMLName() == "AnnotateAttributeData":
+        # in 5.5, Annotate Attribute Data changed how it sets the array to annotate
+        if pname == "ArrayAssociation":
+            if paraview.compatibility.GetVersion() <= 5.4:
+                paraview.print_warning(\
+                "'ArrayAssociation' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
+
+                value = proxy.GetProperty("SelectInputArray")[0]
+                if value == "CELLS":
+                    return "Cell Data"
+                elif value == "FIELD":
+                    return "Field Data"
+                elif value == "ROWS":
+                    return "Row Data"
+                else:
+                    return "Point Data"
+            else:
+                raise NotSupportedException(\
+                    "'ArrayAssociation' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
+        elif pname == "ArrayName":
+            if paraview.compatibility.GetVersion() <= 5.4:
+                paraview.print_warning(\
+                "'ArrayName' is obsolete.  Use 'SelectInputArray' property of AnnotateAttributeData instead.")
+                return proxy.GetProperty("SelectInputArray")[1]
+            else:
+                raise NotSupportedException(\
+                    "'ArrayName' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
     raise Continue()
 
 def GetProxy(module, key):

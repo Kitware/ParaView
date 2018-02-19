@@ -6,8 +6,7 @@ e = Elevation(LowPoint=[-0.5,-0.5,-0.5],
 UpdatePipeline()
 a = AnnotateAttributeData(
         Prefix="Hello: ",
-        ArrayName= "Elevation",
-        ArrayAssociation="Point Data",
+        SelectInputArray= ('POINTS', 'Elevation'),
         ElementId=0,
         ProcessId=0
         )
@@ -19,8 +18,7 @@ assert annotatedValue[0:14] == "Hello: 0.66666"
 
 text1 = Text()
 annotateAttributeData1 = AnnotateAttributeData(Input=text1)
-annotateAttributeData1.ArrayName = 'Text'
-annotateAttributeData1.ArrayAssociation = 'Row Data'
+annotateAttributeData1.SelectInputArray = ('ROWS', 'Text')
 
 UpdatePipeline()
 annotatedValue = annotateAttributeData1.GetClientSideObject().GetComputedAnnotationValue()
