@@ -206,7 +206,7 @@ int vtkCompleteArrays::RequestData(
   vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
 
   vtkTable* inputTable = vtkTable::SafeDownCast(input);
-  // let vtkTable pass-trough this filter
+  // let vtkTable pass-through this filter
   if (inputTable)
   {
     vtkTable* outputTable = vtkTable::SafeDownCast(output);

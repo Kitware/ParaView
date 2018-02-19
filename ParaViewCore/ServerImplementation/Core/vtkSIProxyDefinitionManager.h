@@ -24,7 +24,7 @@
  * This class fires the following events:
  * \li \c vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated - Fired any time
  * any definitions are updated. If a group of definitions are being updated (i.e.
- * a new definition is registered, or unregistred, or modified)
+ * a new definition is registered, or unregistered, or modified)
  * then this event gets fired after all of them are updated.
  * \li \c vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated - Fired
  * when a custom proxy definition is updated. Similar to

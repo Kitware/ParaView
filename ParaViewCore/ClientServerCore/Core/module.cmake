@@ -22,7 +22,7 @@ vtk_module(vtkPVClientServerCoreCore
     vtkFiltersParallel
     # Explicitly list (rather than transiently through
     # vtkPVVTKExtensionsCore) because it allows us to turn of wrapping
-    # of vtkPVVTKExtensionsCore off but still satisfy API dependcy.
+    # of vtkPVVTKExtensionsCore off but still satisfy API dependency.
     vtkPVCommon
     vtkPVVTKExtensionsCore
     vtkPVCommon

@@ -638,7 +638,7 @@ void vtkGridConnectivityExecuteProcess(vtkGridConnectivity* self, vtkUnstructure
           equivalenceSet->AddEquivalence(nextFragmentId, nextFragmentId);
           nextFragmentId++;
         }
-        // I do not think that the equivalence set has a more upto date id,
+        // I do not think that the equivalence set has a more up to date id,
         // but it cannot hurt to check/
         minFragmentId = equivalenceSet->GetEquivalentSetId(minFragmentId);
         // Label the faces with the fragment id we computed.

@@ -990,7 +990,7 @@ public:
   // localOffset is the corresponding local index in the sorted table to the
   // global index of (searchedGlobalIndex - nbGlobalToSkip)
   // nbInLocalBar is the local number of elements that are available
-  // in the hitogram bar where the searchedGlobalIndex has been found.
+  // in the histogram bar where the searchedGlobalIndex has been found.
   // nbInLocalBar is used when you want to get an upper bound that
   // will include the searchedGlobalIndex.
   void SearchGlobalIndexLocation(vtkIdType searchedGlobalIndex, Histogram* localHistogram,
@@ -1005,7 +1005,7 @@ public:
     double currentRange[2];
     vtkIdType idx, idxEnd;
 
-    // Setup initial hitogram range and values
+    // Setup initial histogram range and values
     Histogram _globalHistogram;
     Histogram _localHistogram;
     localHistogram->CopyTo(_localHistogram);
@@ -1236,7 +1236,7 @@ public:
 
     if (sortedArray.ArraySize != dataA->GetNumberOfTuples())
     {
-      cout << "Invalide sorted array size. Expected " << dataA->GetNumberOfTuples() << " and got "
+      cout << "Invalid sorted array size. Expected " << dataA->GetNumberOfTuples() << " and got "
            << sortedArray.ArraySize << endl;
       return false;
     }
@@ -1261,7 +1261,7 @@ public:
 
     if (sortedArray.ArraySize != dataA->GetNumberOfTuples())
     {
-      cout << "Invalide sorted array size. Expected " << dataA->GetNumberOfTuples() << " and got "
+      cout << "Invalid sorted array size. Expected " << dataA->GetNumberOfTuples() << " and got "
            << sortedArray.ArraySize << endl;
       return false;
     }

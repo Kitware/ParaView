@@ -16,7 +16,7 @@
  * @class   vtkMaterialInterfacePieceTransactionMatrix
  *
  * Container to hold  a sets of transactions (sends/recvs)
- * indexed by fragment and proc, inteneded to facilitiate
+ * indexed by fragment and proc, intended to facilitate
  * moving fragment pieces around.
  *
  * Internaly we have a 2D matrix. On one axis is fragment id

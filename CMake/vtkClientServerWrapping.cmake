@@ -107,7 +107,7 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
   endforeach()
 
   if(hints_added AND COMBINED_HINTS)
-    # combined hints are generated only we we have more than the default hints
+    # combined hints are generated only when we have more than the default hints
     # specified by VTK_WRAP_HINTS that need to be used.
     string(STRIP "${COMBINED_HINTS}" CMAKE_CONFIGURABLE_FILE_CONTENT)
     configure_file(

@@ -583,7 +583,7 @@ private:
     }
   }
 
-  // We don't use vtksys::SystemTools since it doesnt' handle "//foo" correctly.
+  // We don't use vtksys::SystemTools since it doesn't handle "//foo" correctly.
   static std::vector<std::string> SplitString(const std::string& str, bool& startsWithSep)
   {
     std::vector<std::string> ret;

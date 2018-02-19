@@ -1032,7 +1032,7 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(
     mapIter++;
   }
 
-  // By default alway override the documentation
+  // By default always override the documentation
   if (element->FindNestedElementByName("Documentation") &&
     elementToFill->FindNestedElementByName("Documentation"))
   {

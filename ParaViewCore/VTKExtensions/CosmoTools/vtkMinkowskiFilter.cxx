@@ -385,7 +385,7 @@ double vtkMinkowskiFilter::compute_face_area(vtkCell* face)
   else if (coord == 3)
     area *= an / (2 * az);
 
-  return fabs(area); // area is alway positive
+  return fabs(area); // area is always positive
 }
 
 double vtkMinkowskiFilter::compute_edge_length(vtkCell* edge)

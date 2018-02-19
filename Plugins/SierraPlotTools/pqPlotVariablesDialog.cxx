@@ -405,7 +405,7 @@ public:
       return true;
     }
 
-    // qWarning() << "pqPlotVariablesDialog::pqInternal: * Error * Invalide range separator " << ;
+    // qWarning() << "pqPlotVariablesDialog::pqInternal: * Error * Invalid range separator " << ;
 
     return false;
   }

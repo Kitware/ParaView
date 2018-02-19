@@ -4,7 +4,7 @@
     <!-- =================================================================== -->
     <SourceProxy class="vtkXdmfReader" name="XdmfReaderCore">
       <Documentation>
-        The actual reader proxy for Xdmf Reader. Make internal since it doesnt'
+        The actual reader proxy for Xdmf Reader. Make internal since it doesn't
         support file-series.
       </Documentation>
       <StringVectorProperty information_only="1"

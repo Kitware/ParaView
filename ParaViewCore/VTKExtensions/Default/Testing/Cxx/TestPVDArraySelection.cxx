@@ -27,7 +27,7 @@
     return EXIT_FAILURE;                                                                           \
   }
 
-bool HasArray(vtkDataObject* dobj, int assocation, const char* aname)
+bool HasArray(vtkDataObject* dobj, int association, const char* aname)
 {
   if (auto cd = vtkCompositeDataSet::SafeDownCast(dobj))
   {
@@ -35,14 +35,14 @@ bool HasArray(vtkDataObject* dobj, int assocation, const char* aname)
     auto iter = cd->NewIterator();
     for (iter->InitTraversal(); !has_array && !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-      has_array = has_array || HasArray(iter->GetCurrentDataObject(), assocation, aname);
+      has_array = has_array || HasArray(iter->GetCurrentDataObject(), association, aname);
     }
     iter->Delete();
     return has_array;
   }
   else
   {
-    return dobj->GetAttributes(assocation)->GetArray(aname) != nullptr;
+    return dobj->GetAttributes(association)->GetArray(aname) != nullptr;
   }
 }
 

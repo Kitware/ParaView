@@ -4783,7 +4783,7 @@
                          panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
-          Should the splat be emissive lke a light source or not. For cosmology emissive should be on. For scanned point clouds typically it woudl be off.
+          Should the splat be emissive like a light source or not. For cosmology emissive should be on. For scanned point clouds typically it would be off.
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetColor"

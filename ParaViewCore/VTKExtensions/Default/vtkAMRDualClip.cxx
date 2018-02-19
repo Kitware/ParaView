@@ -654,7 +654,7 @@ void vtkAMRDualClipLocator::Initialize(int xDualCellDim, int yDualCellDim, int z
 //----------------------------------------------------------------------------
 // No bounds checking.
 // I am going to move points that are very close to a corner to a corner
-// I assume this will imporve the mesh.
+// I assume this will improve the mesh.
 vtkIdType* vtkAMRDualClipLocator::GetEdgePointer(int xCell, int yCell, int zCell, int edgeIdx)
 {
   // In the past, I move edge points to corner points when they were close,
@@ -1709,7 +1709,7 @@ void vtkAMRDualClip::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int block
   // Loop over the corners.
   for (int c = 0; c < 8; ++c)
   {
-    // The varibles dx,dy,dz handle boundary cells.
+    // The variables dx,dy,dz handle boundary cells.
     // They shift point by half a pixel on the boundary.
     dx = dy = dz = 0.5;
     // Place the point in one of the 26 ghost regions.

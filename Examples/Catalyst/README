@@ -75,7 +75,7 @@ Other objects of interest:
                    there is a single adaptor channel/input that uses the "input"
                    identifier. allinputsgridwriter.py will write out all adaptor
                    channel/inputs. Both of these scripts will automatically set
-                   the filename based on the channel/inputs identifer string. For
+                   the filename based on the channel/inputs identifier string. For
                    example, for gridwriter.py which assumes the "input" identifier
                    string the generated datasets will be called
                    "input_<time step>.<file extension>". The file extension is

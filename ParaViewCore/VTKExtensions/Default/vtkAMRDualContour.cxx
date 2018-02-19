@@ -208,7 +208,7 @@ void vtkAMRDualContourEdgeLocator::Initialize(int xDualCellDim, int yDualCellDim
 //----------------------------------------------------------------------------
 // No bounds checking.
 // I am going to move points that are very close to a corner to a corner
-// I assume this will imporve the mesh.
+// I assume this will improve the mesh.
 vtkIdType* vtkAMRDualContourEdgeLocator::GetEdgePointer(
   int xCell, int yCell, int zCell, int edgeIdx)
 {
@@ -1196,7 +1196,7 @@ void vtkAMRDualContour::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int bl
   // Loop over the corners.
   for (int c = 0; c < 8; ++c)
   {
-    // The varibles dx,dy,dz handle boundary cells.
+    // The variables dx,dy,dz handle boundary cells.
     // They shift point by half a pixel on the boundary.
     dx = dy = dz = 0.5;
     // Place the point in one of the 26 ghost regions.
@@ -1310,7 +1310,7 @@ void vtkAMRDualContour::ProcessDualCell(vtkAMRDualGridHelperBlock* block, int bl
   edge = triCase->edges;
   double pt[3];
 
-  // Save the edge point ids incase we need to create a capping surface.
+  // Save the edge point ids in case we need to create a capping surface.
   vtkIdType edgePointIds[12]; // Is six the maximum?
   // For debugging
   // My capping permutations were giving me bad edges.

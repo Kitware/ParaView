@@ -70,7 +70,7 @@ public:
 
   //@{
   /**
-   * Varibles (command line argurments) set to render to a tiled display.
+   * Variables (command line argurments) set to render to a tiled display.
    */
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
