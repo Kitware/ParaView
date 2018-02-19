@@ -37,7 +37,6 @@
 #endif // WIN32
 
 #include <GL/glu.h>
-#include <GL/glut.h>
 
 #include "vtkCellData.h"
 #include "vtkCellIterator.h"
