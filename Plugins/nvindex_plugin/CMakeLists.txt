@@ -50,6 +50,9 @@ ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.1"
         src/vtknvindex_volume_importer.cxx
 )
 
+include(vtkOpenGL)
+vtk_opengl_link(pvNVIDIAIndeX)
+
 IF(UNIX)
 SET_TARGET_PROPERTIES(pvNVIDIAIndeX PROPERTIES LINK_FLAGS "-Wl,--as-needed")
 ENDIF()
