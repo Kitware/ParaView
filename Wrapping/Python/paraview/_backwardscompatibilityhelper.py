@@ -146,7 +146,7 @@ def setattr(proxy, pname, value):
                     "'LockScalarRange' is obsolete as of ParaView 5.5. Use "\
                     "'AutomaticRescaleRangeMode' property instead.")
 
-    # In 5.5, we changed the vtkArrayCalcualtor to use a different set of constants to control which
+    # In 5.5, we changed the vtkArrayCalculator to use a different set of constants to control which
     # data it operates on.  This change changed the method and property name from AttributeMode to
     # AttributeType
     if pname == "AttributeMode" and proxy.SMProxy.GetXMLName() == "Calculator":
@@ -308,7 +308,7 @@ def getattr(proxy, pname):
                     'The PVLookupTable.LockScalarRange property has been removed '\
                     'in ParaView 5.5. Please set the AutomaticRescaleRangeMode property '\
                     'instead.')
-    # In 5.5, we changed the vtkArrayCalcualtor to use a different set of constants to control which
+    # In 5.5, we changed the vtkArrayCalculator to use a different set of constants to control which
     # data it operates on.  This change changed the method and property name from AttributeMode to
     # AttributeType
     if pname == "AttributeMode" and proxy.SMProxy.GetName() == "Calculator":
@@ -378,4 +378,10 @@ def GetProxy(module, key):
             # note the case. The old reader didn't support `FileNames` property,
             # only `FileName`.
             return module.__dict__["plyreader"]()
+    if version < 5.5:
+        if key == "Clip":
+            # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
+            clip = module.__dict__[key]()
+            clip.InsideOut = 0
+            return clip
     return module.__dict__[key]()

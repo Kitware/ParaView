@@ -6804,9 +6804,10 @@ array.
       <Documentation long_help="Clip with an implicit plane. Clipping does not reduce the dimensionality of the data set. The output data type of this filter is always an unstructured grid."
                      short_help="Clip with an implicit plane.">The Clip filter
                      cuts away a portion of the input data set using an
-                     implicit plane. This filter operates on all types of data
+                     implicit function. This filter operates on all types of data
                      sets, and it returns unstructured grid data on
-                     output.</Documentation>
+                     output. The **InsideOut** parameter is with respect to the clip
+                     function's normal and not relative to the Clip Type geometry.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -6841,7 +6842,7 @@ array.
                  name="Scalar" />
         </ProxyListDomain>
         <Documentation>This property specifies the parameters of the clip
-        function (an implicit plane) used to clip the dataset.</Documentation>
+        function (an implicit description) used to clip the dataset.</Documentation>
       </ProxyProperty>
       <DoubleVectorProperty information_only="1"
                             name="InputBounds">
@@ -6907,14 +6908,16 @@ array.
         </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetInsideOut"
-                         default_values="0"
+                         default_values="1"
                          name="InsideOut"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 0, the clip filter will
         return that portion of the dataset that lies within the clip function.
         If set to 1, the portions of the dataset that lie outside the clip
-        function will be returned instead.</Documentation>
+        function will be returned instead. The normal of the clip function
+        points to the portion of the domain within the clip function. For
+        the **Box**, **Cylinder**, and **Sphere** the normals point outwards.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseValueAsOffset"
                          default_values="0"
