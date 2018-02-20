@@ -1,5 +1,4 @@
-get_filename_component(_ParaViewExternalData_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-include(${_ParaViewExternalData_DIR}/ExternalData.cmake)
+include(ExternalData)
 
 if(NOT PARAVIEW_DATA_STORE)
   # Select a default from the following.
