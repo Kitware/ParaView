@@ -33,10 +33,6 @@
 #include "vtkOpenGLRenderer.h"
 #include "vtkRenderWindow.h"
 
-#ifndef VTK_OPENGL2
-#include "vtkgl.h"
-#endif
-
 #include <GL/glu.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -108,15 +104,10 @@ void vtknvindex_opengl_canvas::receive_tile(
 
   vtkOpenGLClearErrorMacro();
 
-#ifdef VTK_OPENGL2
   vtkOpenGLRenderWindow* vtk_gl_render_window =
     vtkOpenGLRenderWindow::SafeDownCast(m_vtk_renderer->GetVTKWindow());
   vtk_gl_render_window->DrawPixels(area.min.x, area.min.y, area.max.x - 1, area.max.y - 1, 0, 0,
     x_range - 1, y_range - 1, x_range, y_range, 4, VTK_UNSIGNED_CHAR, buffer);
-#else
-  glRasterPos2i(area.min.x, area.min.y);
-  glDrawPixels(x_range, y_range, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-#endif
 
   vtkOpenGLStaticCheckErrorMacro("Failed after vtknvindex_opengl_canvas::receive_tile.");
 }
