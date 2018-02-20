@@ -345,7 +345,7 @@ public:
   /// The default constructor leaves the vector elements uninitialized.
   inline Vector()
   {
-#if defined(DEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
+#if !defined(NDEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
     // In debug mode, default-constructed vectors are initialized with signaling NaNs or, if not
     // applicable, with a maximum value to increase the chances of diagnosing incorrect use of
     // an uninitialized vector.

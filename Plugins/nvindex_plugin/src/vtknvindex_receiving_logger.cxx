@@ -50,7 +50,7 @@ vtknvindex_receiving_logger::vtknvindex_receiving_logger()
 //----------------------------------------------------------------------
 vtknvindex_receiving_logger::~vtknvindex_receiving_logger()
 {
-#ifndef DEBUG
+#ifdef NDEBUG
   if (m_level >= mi::base::MESSAGE_SEVERITY_DEBUG) // No debug output in an optimized build.
     return;
 #endif

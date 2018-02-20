@@ -119,7 +119,7 @@ vtknvindex_forwarding_logger::~vtknvindex_forwarding_logger()
       }
     }
   }
-#ifdef DEBUG
+#ifndef NDEBUG
   else
   {
     // Show message with level DEBUG only in debug build.

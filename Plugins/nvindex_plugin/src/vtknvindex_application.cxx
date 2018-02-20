@@ -69,11 +69,11 @@ bool vtknvindex_application::load_nvindex_library()
   std::string lib_name = "libnvindex";
 
 #ifdef WIN32
-#ifdef DEBUG
-  lib_name += "d.dll";
-#else  //  DEBUG
+#ifdef NDEBUG
   lib_name += ".dll";
-#endif // DEBUG
+#else  //  NDEBUG
+  lib_name += "d.dll";
+#endif // NDEBUG
 #else  // WIN32
   lib_name += ".so";
 #endif // WIN32
