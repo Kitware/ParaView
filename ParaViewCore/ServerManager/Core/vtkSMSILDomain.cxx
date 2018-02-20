@@ -58,7 +58,7 @@ vtkGraph* vtkSMSILDomain::GetSIL()
 
   if (timestamp != NULL)
   {
-    // Check timestamp to know if the SIL fecth is needed
+    // Check timestamp to know if the SIL fetch is needed
     timestamp->GetParent()->UpdatePropertyInformation(timestamp);
 
     if (timestamp->GetNumberOfElements() == 0)
