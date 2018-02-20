@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInEdgeIterator.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkOutEdgeIterator.h"
+#include "vtkSMSILDomain.h"
 #include "vtkSMSILModel.h"
 #include "vtkStringArray.h"
 
@@ -60,7 +61,8 @@ inline bool INDEX_IS_VALID(const QModelIndex& idx)
 pqSILModel::pqSILModel(QObject* _parent /*=0*/)
   : Superclass(_parent)
 {
-  this->SIL = 0;
+  this->SILDomain = nullptr;
+  this->SILDomainObserverId = 0;
   this->SILModel = vtkSMSILModel::New();
   vtkCommand* observer = vtkMakeMemberFunctionCommand(*this, &pqSILModel::checkStateUpdated);
   this->SILModel->AddObserver(vtkCommand::UpdateDataEvent, observer);
@@ -74,14 +76,16 @@ pqSILModel::~pqSILModel()
   delete this->ModelIndexCache;
   this->ModelIndexCache = 0;
   this->SILModel->Delete();
+
+  this->setSILDomain(nullptr);
 }
 
 //-----------------------------------------------------------------------------
-void pqSILModel::update(vtkGraph* sil)
+void pqSILModel::update()
 {
   this->beginResetModel();
   bool prev = this->blockSignals(true);
-  this->SIL = sil;
+  auto sil = this->SILDomain->GetSIL();
   this->SILModel->Initialize(sil);
   this->ModelIndexCache->clear();
 
@@ -90,9 +94,9 @@ void pqSILModel::update(vtkGraph* sil)
   this->HierarchyVertexIds.clear();
 
   vtkStringArray* names =
-    vtkStringArray::SafeDownCast(this->SIL->GetVertexData()->GetAbstractArray("Names"));
+    vtkStringArray::SafeDownCast(sil->GetVertexData()->GetAbstractArray("Names"));
   vtkAdjacentVertexIterator* iter = vtkAdjacentVertexIterator::New();
-  this->SIL->GetAdjacentVertices(0, iter);
+  sil->GetAdjacentVertices(0, iter);
   int childNo = 0;
   while (iter->HasNext())
   {
@@ -166,6 +170,38 @@ void pqSILModel::setStatus(const QString& hierarchyName, const QList<QVariant>& 
 }
 
 //-----------------------------------------------------------------------------
+void pqSILModel::setSILDomain(vtkSMSILDomain* domain)
+{
+  if (this->SILDomain == domain)
+  {
+    // Nothing to do
+    return;
+  }
+
+  if (this->SILDomain && this->SILDomainObserverId != 0)
+  {
+    this->SILDomain->RemoveObserver(this->SILDomainObserverId);
+    this->SILDomainObserverId = 0;
+  }
+
+  this->SILDomain = domain;
+  if (this->SILDomain)
+  {
+    this->SILDomainObserverId = this->SILDomain->AddObserver(
+      vtkCommand::DomainModifiedEvent, this, &pqSILModel::domainModified);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqSILModel::domainModified()
+{
+  if (this->SILDomain)
+  {
+    this->update();
+  }
+}
+
+//-----------------------------------------------------------------------------
 QModelIndex pqSILModel::hierarchyIndex(const QString& hierarchyName) const
 {
   if (this->Hierarchies.contains(hierarchyName))
@@ -193,11 +229,17 @@ QModelIndex pqSILModel::index(
   }
 
   // Ensure that the vertexId refers to a non-leaf node.
-  if (this->SIL && !this->isLeaf(vertexId))
+  if (!this->SILDomain)
   {
-    if (row < this->SIL->GetOutDegree(vertexId))
+    return QModelIndex();
+  }
+
+  auto sil = this->SILDomain->GetSIL();
+  if (sil && !this->isLeaf(vertexId))
+  {
+    if (row < sil->GetOutDegree(vertexId))
     {
-      vtkOutEdgeType edge = this->SIL->GetOutEdge(vertexId, row);
+      vtkOutEdgeType edge = sil->GetOutEdge(vertexId, row);
       return this->createIndex(row, column, static_cast<quint32>(edge.Target));
     }
   }
@@ -317,9 +359,10 @@ QModelIndex pqSILModel::makeIndex(vtkIdType vertexid) const
 
   int count = 0;
   vtkSmartPointer<vtkOutEdgeIterator> iter = vtkSmartPointer<vtkOutEdgeIterator>::New();
-  this->SIL->GetOutEdges(parentId, iter);
+  auto sil = this->SILDomain->GetSIL();
+  sil->GetOutEdges(parentId, iter);
   vtkDataArray* crossEdgesArray =
-    vtkDataArray::SafeDownCast(this->SIL->GetEdgeData()->GetAbstractArray("CrossEdges"));
+    vtkDataArray::SafeDownCast(sil->GetEdgeData()->GetAbstractArray("CrossEdges"));
   while (iter->HasNext())
   {
     vtkOutEdgeType edge = iter->Next();

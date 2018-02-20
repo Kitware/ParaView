@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 class vtkGraph;
+class vtkSMSILDomain;
 class vtkSMSILModel;
 /**
  * @class pqSILModel
@@ -169,6 +170,10 @@ public:
   QList<QVariant> status(const QString& hierarchyName) const;
   void setStatus(const QString& hierarchyName, const QList<QVariant>& values);
 
+  void setSILDomain(vtkSMSILDomain* domain);
+
+  void domainModified();
+
   /**
   * Returns the model index for a vertex.
   */
@@ -187,7 +192,7 @@ public slots:
   /**
   * Used to reset the model based on the sil.
   */
-  void update(vtkGraph* sil);
+  void update();
 
 protected:
   /**
@@ -232,7 +237,8 @@ protected:
   * hierarchy.
   */
   QMap<QString, std::set<vtkIdType> > HierarchyVertexIds;
-  vtkSmartPointer<vtkGraph> SIL;
+  vtkSmartPointer<vtkSMSILDomain> SILDomain;
+  unsigned long SILDomainObserverId;
 
 private:
   Q_DISABLE_COPY(pqSILModel)
