@@ -98,7 +98,7 @@ std::ostringstream& vtknvindex_receiving_logger::get_message(mi::Uint32 level)
 
 //----------------------------------------------------------------------
 void vtknvindex_receiving_logger::message(
-  mi::base::Message_severity level, const char* category, const char* message)
+  mi::base::Message_severity level, const char* /*category*/, const char* message)
 {
   vtknvindex_receiving_logger().get_message(level) << message;
 }

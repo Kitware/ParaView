@@ -67,7 +67,7 @@ vtknvindex_volume_importer::~vtknvindex_volume_importer()
 // Give an estimate of the size in bytes of this subcube.
 mi::Size vtknvindex_volume_importer::estimate(
   const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
-  mi::neuraylib::IDice_transaction* dice_transaction) const
+  mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
 {
   const mi::Size dx = bounding_box.max.x - bounding_box.min.x;
   const mi::Size dy = bounding_box.max.y - bounding_box.min.y;
@@ -96,7 +96,7 @@ void vtknvindex_volume_importer::set_cluster_properties(
 template <typename T>
 bool vtknvindex_volume_importer::resolve_voxel_type(T* shmem_volume, T* voxel_data_storage,
   const mi::math::Bbox<mi::Sint32, 3>& bounds, const mi::math::Bbox<mi::Sint32, 3>& shmbbox,
-  mi::neuraylib::IDice_transaction* dice_transaction, bool zyx_to_xyz) const
+  mi::neuraylib::IDice_transaction* /*dice_transaction*/, bool zyx_to_xyz) const
 {
   if (voxel_data_storage == NULL)
   {
@@ -569,7 +569,7 @@ void vtknvindex_volume_importer::deserialize(mi::neuraylib::IDeserializer* deser
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_volume_importer::get_references(mi::neuraylib::ITag_set* result) const
+void vtknvindex_volume_importer::get_references(mi::neuraylib::ITag_set* /*result*/) const
 {
   // empty
 }

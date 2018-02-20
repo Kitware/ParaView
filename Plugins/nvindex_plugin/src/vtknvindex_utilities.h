@@ -210,6 +210,7 @@ inline void unmap_shm(void* shm_ptr, const mi::Uint64 shared_seg_size)
 {
 #ifdef _WIN32
   UnmapViewOfFile(shm_ptr);
+  (void)shared_seg_size;
 #else
   munmap(shm_ptr, shared_seg_size);
 #endif

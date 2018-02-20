@@ -62,8 +62,8 @@ vtknvindex_irregular_volume_importer::~vtknvindex_irregular_volume_importer()
 
 //-------------------------------------------------------------------------------------------------
 mi::Size vtknvindex_irregular_volume_importer::estimate(
-  const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
-  mi::neuraylib::IDice_transaction* dice_transaction) const
+  const mi::math::Bbox_struct<mi::Float32, 3>& /*bounding_box*/,
+  mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
 {
   return 0;
 }
@@ -79,7 +79,7 @@ void vtknvindex_irregular_volume_importer::set_cluster_properties(
 nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::create(
   const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
   nv::index::IData_subset_factory* factory,
-  mi::neuraylib::IDice_transaction* dice_transaction) const
+  mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   mi::Sint32 rank_id = controller ? controller->GetLocalProcessId() : 0;
@@ -470,7 +470,7 @@ void vtknvindex_irregular_volume_importer::deserialize(mi::neuraylib::IDeseriali
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_irregular_volume_importer::get_references(mi::neuraylib::ITag_set* result) const
+void vtknvindex_irregular_volume_importer::get_references(mi::neuraylib::ITag_set* /*result*/) const
 {
   // empty
 }

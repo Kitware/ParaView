@@ -100,9 +100,9 @@ class Irregular_volume_compute_task
 public:
   /// Empty implementations
   virtual nv::index::IIrregular_volume_subset* edit(
-    const mi::math::Bbox_struct<mi::Float32, 3>& bbox, const IIrregular_volume_subset* subset_data,
-    nv::index::IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const
+    const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
+    const IIrregular_volume_subset* /*subset_data*/, nv::index::IData_subset_factory* /*factory*/,
+    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
   {
     return 0;
   }

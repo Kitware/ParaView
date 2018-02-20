@@ -88,7 +88,7 @@ void vtknvindex_opengl_canvas::prepare()
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_opengl_canvas::receive_tile(
-  mi::Uint8* buffer, mi::Uint32 buffer_size, const mi::math::Bbox_struct<mi::Uint32, 2>& area)
+  mi::Uint8* buffer, mi::Uint32 /*buffer_size*/, const mi::math::Bbox_struct<mi::Uint32, 2>& area)
 {
   m_vtk_renderer->GetRenderWindow()->MakeCurrent();
 

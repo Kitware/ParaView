@@ -195,7 +195,7 @@ void vtknvindex_irregular_volume_mapper::volume_changed()
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* ren, vtkVolume* vol)
+bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume* vol)
 {
 
 #if defined(MI_VERSION_STRING) && defined(MI_DATE_STRING)

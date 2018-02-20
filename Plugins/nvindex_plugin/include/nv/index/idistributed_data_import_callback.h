@@ -243,9 +243,9 @@ public:
   /// \return                             Returns the portion of the dataset contained in the
   ///                                     3D area.
   ///
-  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
-    mi::Uint32 time_step, IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const
+  virtual IDistributed_data_subset* create(
+    const mi::math::Bbox_struct<mi::Sint32, 3>& /*bounding_box*/, mi::Uint32 /*time_step*/,
+    IData_subset_factory* /*factory*/, mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
   {
     return 0;
   }
@@ -320,9 +320,9 @@ public:
   /// \param[in] factory                  unused.
   /// \param[in] dice_transaction         unused.
   /// \return                             0.
-  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& bbox,
-    mi::Uint32 time_step, IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const
+  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
+    mi::Uint32 /*time_step*/, IData_subset_factory* /*factory*/,
+    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
   {
     return 0;
   }

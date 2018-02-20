@@ -109,7 +109,7 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, std::string s
 
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_host_properties::mark_shm_used(
-  const std::string& shmname, void* shmpointer, const mi::Uint64& shmsize)
+  const std::string& /*shmname*/, void* /*shmpointer*/, const mi::Uint64& /*shmsize*/)
 {
   // std::map<std::string, mi::Uint32>::iterator shmit = m_shmref.find(shmname);
 

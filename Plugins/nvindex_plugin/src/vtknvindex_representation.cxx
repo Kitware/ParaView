@@ -794,7 +794,7 @@ void vtknvindex_representation::show_volume(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void vtknvindex_representation::set_selected_slice(int selected_slice)
+void vtknvindex_representation::set_selected_slice(int /*selected_slice*/)
 {
 }
 

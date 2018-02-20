@@ -192,7 +192,7 @@ bool vtknvindex_volumemapper::initialize_nvindex()
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* vol)
+bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* /*vol*/)
 {
   vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Preparing data");
 
@@ -238,7 +238,7 @@ bool vtknvindex_volumemapper::prepare_data(mi::Sint32 time_step, vtkVolume* vol)
 }
 
 //-------------------------------------------------------------------------------------------------
-bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* ren, vtkVolume* vol)
+bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume* vol)
 {
 
 #if defined(MI_VERSION_STRING) && defined(MI_DATE_STRING)
