@@ -205,7 +205,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     // Dataset subcube border size.
     mi::Sint32 subcube_border = m_cluster_properties->get_config_settings()->get_subcube_border();
 
-    // Print cluster details in Paraview's console.
+    // Print cluster details in ParaView's console.
     m_cluster_properties->print_info();
 
     vtknvindex_regular_volume_properties* regular_volume_properties =
@@ -861,7 +861,7 @@ void vtknvindex_scene::update_camera(
   mi::Float32 aperture = 0.033f;
   nvindex_camera->set_aperture(aperture);
 
-  // Focal distance is set to match Paraview's fixed vertical FOV of 30 deg.
+  // Focal distance is set to match ParaView's fixed vertical FOV of 30 deg.
   mi::Float64 focal_distance = (aperture / (aspect_ratio * 0.53589838529));
   nvindex_camera->set_focal(focal_distance);
 

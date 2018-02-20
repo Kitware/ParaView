@@ -580,7 +580,7 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
           0,    // No Frame information
           true, // = g_immediate_final_parallel_compositing
           ren->GetNumberOfPropsRendered() ? &(m_application_context.m_opengl_app_buffer)
-                                          : NULL) // Paraview depth buffer, if present.
+                                          : NULL) // ParaView depth buffer, if present.
         );
 
       const mi::base::Handle<nv::index::IError_set> err_set(frame_results->get_error_set());

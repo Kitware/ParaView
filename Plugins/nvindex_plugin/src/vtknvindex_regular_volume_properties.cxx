@@ -420,7 +420,7 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   memcpy(shm_offset, ivol_data->scalars, size_elm);
   shm_offset += size_elm;
 
-  // max edge lenght
+  // max edge length
   size_elm = sizeof(ivol_data->max_edge_length2);
   memcpy(shm_offset, &ivol_data->max_edge_length2, size_elm);
   shm_offset += size_elm;

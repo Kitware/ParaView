@@ -122,7 +122,7 @@ private:
   // Is data prepared for given time step?
   bool is_data_prepared(mi::Sint32 time_step);
 
-  bool m_is_caching;              // True when PV is caching data on animation loops.
+  bool m_is_caching;              // True when ParaView is caching data on animation loops.
   bool m_is_mapper_intialized;    // True if mapper was initialized.
   bool m_is_index_initialized;    // True if index library was initialized.
   bool m_is_viewer;               // True if this is viewer node.
@@ -141,9 +141,9 @@ private:
     m_time_step_data_prepared;                  // Is data for given frame ready for importer?
   vtknvindex_application m_application_context; // NVIDIA IndeX application context.-
   vtknvindex_scene m_scene;                     // NVIDIA IndeX scene.
-  vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties gathered from Paraview.
+  vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties gathered from ParaView.
   vtknvindex_performance_values m_performance_values;  // Performance values logger.
-  vtkMultiProcessController* m_controller;             // MPI controller from Paraview.
+  vtkMultiProcessController* m_controller;             // MPI controller from ParaView.
   vtkDataArray* m_scalar_array;                        // Scalar array containing actual data.
 
   mi::Float64 m_cached_bounds[6]; // Cached bounds used on animation loops.

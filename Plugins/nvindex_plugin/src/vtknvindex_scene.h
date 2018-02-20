@@ -110,7 +110,7 @@ private:
   bool m_scene_created; // True if scene is already initialized.
   bool m_only_init;     // Some config settings need to be updated only once.
 
-  vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties gathered from Paraview.
+  vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties gathered from ParaView.
 
   mi::neuraylib::Tag m_vol_properties_tag;               // Volume properties tag.
   mi::neuraylib::Tag m_camera_tag;                       // Camera database tag.

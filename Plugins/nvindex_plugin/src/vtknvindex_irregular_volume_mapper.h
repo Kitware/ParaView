@@ -51,7 +51,7 @@
 class vtknvindex_cluster_properties;
 class vtkPKdTree;
 
-// The class vtknvindex_irregular_volume_mapper maps Paraview's data to NVIDAI IndeX's data
+// The class vtknvindex_irregular_volume_mapper maps ParaView's data to NVIDIA IndeX's data
 // representations.
 // All NVIDIA IndeX data preparation, scene creation,
 // update and rendering for irregular volumes is triggered by an instance of this class.
@@ -120,13 +120,13 @@ private:
 
   vtknvindex_application m_application_context;        // NVIDIA IndeX application context.
   vtknvindex_scene m_scene;                            // NVIDIA IndeX scene.
-  vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties gathered from Paraview.
+  vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties gathered from ParaView.
   vtknvindex_performance_values m_performance_values;  // Performance values logger.
-  vtkMultiProcessController* m_controller;             // MPI controller from Paraview.
+  vtkMultiProcessController* m_controller;             // MPI controller from ParaView.
   vtkDataArray* m_scalar_array;                        // Scalar array containing actual data.
   vtknvindex_irregular_volume_data m_volume_data;      // Tetrahedral volume data.
 
-  vtkPKdTree* m_kd_tree; // Paraview domain subdivision.
+  vtkPKdTree* m_kd_tree; // ParaView domain subdivision.
   // ETX
 };
 

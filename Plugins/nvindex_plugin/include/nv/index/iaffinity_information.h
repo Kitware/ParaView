@@ -100,7 +100,7 @@ class IDomain_specific_subdivision
 {
 public:
   /// Provides the number of spatial regions that span the application's decomposition scheme.
-  /// NVIDIA IndeX requires the number of regions to interate through them using
+  /// NVIDIA IndeX requires the number of regions to iterate through them using
   /// \c get_subregion().
   ///
   /// \return         The number of the domain-specific spatial regions.

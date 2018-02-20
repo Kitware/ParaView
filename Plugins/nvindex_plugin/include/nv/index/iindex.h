@@ -284,7 +284,7 @@ public:
   virtual void update(
     mi::neuraylib::Tag_struct session_tag, mi::neuraylib::IDice_transaction* dice_transaction) = 0;
 
-  /// A custom clock generates time tickes for time-dependent data visualizations.
+  /// A custom clock generates time ticks for time-dependent data visualizations.
   ///
   /// \param[in] clock_pulse_generator        A user-defined clock, this class takes ownership.
   ///
@@ -299,7 +299,7 @@ public:
 
 /// Enables rendering of data to a user-defined canvas.
 /// Technically, the canvas wraps a frame buffer that contains one or more rendering targets
-/// or frame buffer layer. The the NVIDIA IndeX library renders its rendering/visualization
+/// or frame buffer layer. The NVIDIA IndeX library renders its rendering/visualization
 /// results into the associated frame buffer layers.
 /// Typical use cases include the rendering (blending) of all image tiles (a.k.a horizontal
 /// spans) into an OpenGL framebuffer, into main memory or CUDA buffer for
@@ -322,7 +322,7 @@ public:
 
   /// This interface method receives multiple tiles for each layer.
   /// The method is called for each tile and each layer between \c prepare() and
-  /// and \c finish().
+  /// \c finish().
   ///
   /// \note This method must be thread safe since the library may
   ///       call this method from different threads simultaneously.
@@ -336,7 +336,7 @@ public:
 
   /// This interface method receives multiple tiles.
   /// The method is called for each tile and between \c prepare() and
-  /// and \c finish().
+  /// \c finish().
   ///
   /// \note This method must be thread safe since the library may
   ///       call this method from different threads simultaneously.
@@ -352,7 +352,7 @@ public:
 
   /// This interface method receives multiple tiles.
   /// The method is called for each tile and between \c prepare() and
-  /// and \c finish().
+  /// \c finish().
   ///
   /// This method blends the received image over existing image data.
   ///
@@ -403,7 +403,7 @@ public:
 
   /// Returns the resolution of the canvas in pixels.
   ///
-  /// \return The resolution of the canvase in pixels.
+  /// \return The resolution of the canvas in pixels.
   ///
   virtual mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const = 0;
 };
@@ -450,7 +450,7 @@ public:
   /// \note Use the \c mi::base::Handle template to store the returned interface pointer in order
   ///       to guarantee the correct destruction of the returned interface.
   ///
-  /// \return         The the detailed performance values information
+  /// \return         The detailed performance values information
   ///                 gathered during the rendering process.
   ///
   virtual IPerformance_values* get_performance_values() const = 0;
@@ -608,7 +608,7 @@ public:
   /// \note This method internally creates and commits a \c
   /// mi::neuraylib::IDice_transaction for each viewport and
   /// therefore all transactions editing the scene should be
-  /// commited. Also, in contrast to the non-viewport version of
+  /// committed. Also, in contrast to the non-viewport version of
   /// this method, this one does not require \c
   /// IIndex_session::update() to be called.
   ///

@@ -151,7 +151,7 @@ public:
   ///                                         optional border
   ///                                         of ghost voxels around the actual brick data. The
   ///                                         effective brick
-  ///                                         dimensions then are calclulated as brick_dimensions -
+  ///                                         dimensions then are calculated as brick_dimensions -
   ///                                         2 * brick_overlap.
   /// \param[in]      brick_overlap           Size of an optional brick border of ghost voxels used
   /// for
@@ -171,7 +171,7 @@ public:
   ///                                         volume brick and
   ///                                         smaller than the requested volume pool capacity.
   ///
-  /// \returns        Returns valid attribute index (0-based) at which the the newly generated
+  /// \returns        Returns valid attribute index (0-based) at which the newly generated
   /// attribute
   ///                 brick pool is generated at. Failure at generating an appropriate brick pool is
   ///                 indicated by the return value -1. A valid attribute index can be used to

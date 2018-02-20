@@ -23,7 +23,7 @@ namespace index
 ///
 /// The access functionality, for instance, allows implementing
 /// user-defined computing algorithms operating on the distributed
-/// volume data to facilitate todays and future workflow
+/// volume data to facilitate today's and future workflow
 /// functionalities.
 ///
 /// The amount of amplitude data queried from the
@@ -111,7 +111,7 @@ public:
 ///
 /// The access functionality, for instance, allows implementing
 /// user-defined computing algorithms operating on the distributed
-/// elevation data to facilitate todays and future workflow
+/// elevation data to facilitate today's and future workflow
 /// functionalities.
 ///
 /// The amount of elevation values queried from the
@@ -181,7 +181,7 @@ public:
   /// extent of the stored values is defined by the computed 2D
   /// bounding box.  The method returns the pointer to the elevation
   /// value array.  The interface class 'owns' the elevation values,
-  /// i.e., the destructer of the implemented interface class
+  /// i.e., the destructor of the implemented interface class
   /// deletes the local data.
   ///
   /// \return         The pointer to the first element of the accessed

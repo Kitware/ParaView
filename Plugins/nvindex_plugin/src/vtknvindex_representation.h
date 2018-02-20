@@ -88,7 +88,7 @@ public:
     vtkInformationVector* outputVector);
 
   //
-  // Configuration options set by Paraview GUI.
+  // Configuration options set by ParaView GUI.
   // These values are stored in an instance of the vtknvindex_config_settings class.
   //
 
@@ -211,13 +211,13 @@ private:
   double m_roi_range_J[2];
   double m_roi_range_K[2];
 
-  vtkMultiProcessController* m_controller;           // MPI controller from Paraview.
+  vtkMultiProcessController* m_controller;           // MPI controller from ParaView.
   vtknvindex_config_settings* m_app_config_settings; // Application side config settings.
   vtknvindex_cluster_properties*
     m_cluster_properties; // Cluster wide properties, refer class documentation.
   mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
 
-  // bacukup of original Image Reduction Factors
+  // backup of original Image Reduction Factors
   mi::Sint32 m_still_image_reduction_factor;
   mi::Sint32 m_interactive_image_reduction_factor;
 

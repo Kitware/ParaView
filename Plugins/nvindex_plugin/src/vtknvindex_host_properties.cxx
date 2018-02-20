@@ -40,7 +40,7 @@ vtknvindex_host_properties::vtknvindex_host_properties()
   : m_hostid(0)
   , m_nvrankid(-1)
 {
-  // emtpy
+  // empty
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ vtknvindex_host_properties::vtknvindex_host_properties(
   , m_nvrankid(rankid)
   , m_hostname(hostname)
 {
-  // emtpy
+  // empty
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
   if (shmit == m_shmlist.end())
   {
     ERROR_LOG << "The shared memory information in vtknvindex_host_properties::get_shminfo is not "
-                 "avaialble for the time step: "
+                 "available for the time step: "
               << time_step << ".";
 
     return NULL;
@@ -199,7 +199,7 @@ vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
 
   if (shmlist.empty())
   {
-    ERROR_LOG << "The sahred memory list in vtknvindex_host_properties::get_shminfo is empty.";
+    ERROR_LOG << "The shared memory list in vtknvindex_host_properties::get_shminfo is empty.";
     return NULL;
   }
 

@@ -681,7 +681,7 @@ mi::Sint32 vtknvindex_representation::find_time_step(
 }
 
 //
-// Configuration options set by Paraview GUI.
+// Configuration options set by ParaView GUI.
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_representation::set_subcube_size(unsigned x, unsigned y, unsigned z)
 {

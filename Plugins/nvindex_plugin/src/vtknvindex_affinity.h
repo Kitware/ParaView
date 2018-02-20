@@ -85,10 +85,10 @@ public:
   // Set the host properties.
   void set_hostinfo(std::map<mi::Uint32, vtknvindex_host_properties*>& host_info);
 
-  // Reset all affinity infotmation.
+  // Reset all affinity information.
   void reset_affinity();
 
-  // Add paraView's affinity information indicating where the data is located for a given bbox.
+  // Add ParaView's affinity information indicating where the data is located for a given bbox.
   void add_affinity(
     const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id = ~0u, mi::Uint32 gpu_id = ~0u);
 

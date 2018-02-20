@@ -261,7 +261,7 @@ public:
   //  Returns the unique index into the private storage of std::ios_base.
   static int get_index()
   {
-    // Static initiliazation is guaranteed to be thread-safe with C++11 and later. The method
+    // Static initialization is guaranteed to be thread-safe with C++11 and later. The method
     // std::ios_base::xalloc() is guaranteed to be thread-safe with C++14 and later.
     static int s_index = std::ios_base::xalloc();
     return s_index;

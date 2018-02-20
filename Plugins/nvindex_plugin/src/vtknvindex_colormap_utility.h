@@ -68,7 +68,7 @@ public:
     const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction,
     vtknvindex_regular_volume_properties* regular_volume_properties);
 
-  // Check for any changes on PV's transfer function.
+  // Check for any changes on ParaView's transfer function.
   bool changed() const;
 
 private:
@@ -80,12 +80,12 @@ private:
     const mi::math::Vector<mi::Float32, 2>& scale_range,
     mi::math::Vector<mi::Float32, 2>& output_range);
 
-  // Get Paraview's transfer function and write it to an IndeX colormap.
+  // Get ParaView's transfer function and write it to an IndeX colormap.
   void get_paraview_colormap(vtkVolume* vol,
     vtknvindex_regular_volume_properties* regular_volume_properties,
     mi::base::Handle<nv::index::IColormap>& colormap);
 
-  // Get Paraview's transfer function and write it to an IndeX colormap including slices.
+  // Get ParaView's transfer function and write it to an IndeX colormap including slices.
   void get_paraview_colormaps(vtkVolume* vol,
     vtknvindex_regular_volume_properties* regular_volume_properties,
     mi::base::Handle<nv::index::IColormap>& volume_colormap,

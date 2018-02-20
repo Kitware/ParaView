@@ -307,9 +307,9 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
     vtknvindex_scene::VOLUME_TYPE_REGULAR; // vtknviVTKNVINDEX_VOLUME_TYPE_REGULAR;
   dataset_parameters.scalar_type = m_scalar_array->GetDataTypeAsString();
   dataset_parameters.voxel_range[0] = static_cast<mi::Float32>(
-    m_scalar_array->GetRange(0)[0]); // '0' is component ID TOOD: do this in a clean way
+    m_scalar_array->GetRange(0)[0]); // '0' is component ID TODO: do this in a clean way
   dataset_parameters.voxel_range[1] = static_cast<mi::Float32>(
-    m_scalar_array->GetRange(0)[1]); // '0' is component ID TOOD: do this in a clean way
+    m_scalar_array->GetRange(0)[1]); // '0' is component ID TODO: do this in a clean way
   dataset_parameters.scalar_range[0] = static_cast<mi::Float32>(m_scalar_array->GetDataTypeMin());
   dataset_parameters.scalar_range[1] = static_cast<mi::Float32>(m_scalar_array->GetDataTypeMax());
 
@@ -454,7 +454,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
               << "vtknvindex_volumemapper::Render().";
   }
 
-  // Prepare data to be renderered
+  // Prepare data to be rendered
   mi::Sint32 cur_time_step =
     m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
 
@@ -523,7 +523,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
           0,    // No Frame information.
           true, // = g_immediate_final_parallel_compositing
           ren->GetNumberOfPropsRendered() ? &(m_application_context.m_opengl_app_buffer)
-                                          : NULL) // Paraview depth buffer, if present.
+                                          : NULL) // ParaView depth buffer, if present.
         );
 
       // check for errors during rendering

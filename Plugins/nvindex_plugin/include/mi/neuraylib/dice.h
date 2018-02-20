@@ -1172,7 +1172,7 @@ public:
   /// remote host.
   ///
   /// Note that all fragments of a fragmented job which are executed on the same host will use the
-  /// same replica of the the original fragmented job instance. That means the replica can contain
+  /// same replica of the original fragmented job instance. That means the replica can contain
   /// data shared between different fragments, like caches, etc.
   ///
   /// As in the case of local execution other fragments executed on that host might be executed in
@@ -1246,7 +1246,7 @@ public:
   /// The serialization shall include all members required for remote fragment execution. If the
   /// fragmented job references objects by means of tags it suffices to serializes the tags only.
   /// The remote execution can then access these tags and the distributed database ensures that
-  /// the objects get transfered to the requesting remote host.
+  /// the objects get transferred to the requesting remote host.
   ///
   /// \param serializer   The serializer to which to write the job content to.
   virtual void serialize(ISerializer* serializer) const = 0;

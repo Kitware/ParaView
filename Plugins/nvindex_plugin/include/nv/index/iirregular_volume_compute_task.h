@@ -36,7 +36,7 @@ public:
   {
     /// Updating the scala values attached at cell vertices.
     OPERATION_MODE_SCALA_VALUE_EDITING = 1,
-    /// Updating the poitions and possibly scala values at the
+    /// Updating the positions and possibly scala values at the
     /// cell vertices but not changing the volumes topology.
     OPERATION_MODE_VERTEX_EDITING = 2,
     /// Reset the irregular volume subset that is contained in the given

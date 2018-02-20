@@ -258,7 +258,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
           subset_scalars_uint16.push_back((reinterpret_cast<mi::Uint16*>(scalars))[vtx_index]);
         else if (*scalar_type_info == typeid(mi::Float32))
           subset_scalars_float32.push_back((reinterpret_cast<mi::Float32*>(scalars))[vtx_index]);
-        else // typeif(mi::Float64)
+        else // typeid(mi::Float64)
           subset_scalars_float32.push_back(
             static_cast<mi::Float32>((reinterpret_cast<mi::Float64*>(scalars))[vtx_index]));
 

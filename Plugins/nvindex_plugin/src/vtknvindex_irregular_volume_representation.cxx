@@ -337,7 +337,7 @@ int vtknvindex_irregular_volume_representation::ProcessViewRequest(
     vtkPVDataDeliveryManager* ddm = view->GetDeliveryManager();
     vtkPKdTree* kd_tree = ddm->GetKdTree();
 
-    // Retrieve ParaView's KDTRee in order to obtain domain subdivision bounding boxes.
+    // Retrieve ParaView's KdTree in order to obtain domain subdivision bounding boxes.
     if (kd_tree)
     {
       DefaultMapper->set_domain_kdtree(kd_tree);
@@ -511,7 +511,7 @@ void vtknvindex_irregular_volume_representation::SetScalarOpacityUnitDistance(do
 }
 
 //
-// Configuration options set from Paraview GUI.
+// Configuration options set from ParaView GUI.
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_subcube_size(
   unsigned x, unsigned y, unsigned z)

@@ -541,7 +541,7 @@ public:
   ///
   /// Video contexts must first be created by the client and can then be retrieved on the server
   /// via this method. The video context ID is assigned when the video context is created on the
-  /// client side and must be transfered to the server before calling this method. The recommended
+  /// client side and must be transferred to the server before calling this method. The recommended
   /// way to do this is to execute a Bridge job containing the video context ID and optionally
   /// other data that is required for the server-side application to set up the video source and
   /// to start producing frames.

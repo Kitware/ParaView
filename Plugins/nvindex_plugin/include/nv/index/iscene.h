@@ -295,7 +295,7 @@ public:
 
   /// Returns the bounding box that clips the space that contains the scene contents.
   ///
-  /// \return Returns the bounding box that clips the space contaiing the scene contents.
+  /// \return Returns the bounding box that clips the space containing the scene contents.
   ///         The bounding box is defined in the joint subdivision space.
   ///
   virtual mi::math::Bbox_struct<mi::Float32, 3> get_clipped_bounding_box() const = 0;

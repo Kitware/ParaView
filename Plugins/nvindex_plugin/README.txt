@@ -78,7 +78,7 @@ with multiple NVIDIA GPUs, then please contact us for the appropriate licensing.
 
 * Free single GPU version for leveraging today's GPU performance.
 
-* Multi-GPU and and GPU cluster support for scalable real-time visualization of
+* Multi-GPU and GPU cluster support for scalable real-time visualization of
   datasets of arbitrary sizes. Requires an appropriate license
   (please contact us).
 
@@ -101,13 +101,13 @@ with multiple NVIDIA GPUs, then please contact us for the appropriate licensing.
 ---------------------------
 
 * Datasets containing degenerated faces may result in correct renderings
-  or cause Paraview to fail. The NVIDIA IndeX Paraview plugin tries to resolve
+  or cause ParaView to fail. The NVIDIA IndeX ParaView plugin tries to resolve
   all invalid faces automatically.
 
-# Auxilliary
-------------
+# Auxiliary
+-----------
 
-* Paraview doesn't recognize updating the coloring state from 'solid color' to a
+* ParaView doesn't recognize updating the coloring state from 'solid color' to a
   state that is valid for volume rendering when switching to NVIDIA IndeX's
   volume rendering. An invalid coloring state may result into a blank rendering.
   Please update the coloring state appropriately manually.

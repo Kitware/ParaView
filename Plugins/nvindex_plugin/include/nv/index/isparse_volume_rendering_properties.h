@@ -63,7 +63,7 @@ public:
   /// ISparse_volume_scene_element).
   /// Per default this is disabled.
   ///
-  /// \param[in] enable           Enables the pre-integrated volume renderingn technique
+  /// \param[in] enable           Enables the pre-integrated volume rendering technique
   ///                             if (\c true) otherwise the technique will be disabled (\c false).
   ///
   virtual void set_preintegrated_volume_rendering(bool enable) = 0;

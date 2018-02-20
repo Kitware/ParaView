@@ -41,12 +41,12 @@ namespace index
 ///
 /// A common use case that requires the data locality is the invocation of
 /// parallel and distributed compute tasks applied to the distributed data.
-/// DiCE provides a fragmented job infrastrucute (\c IFragmented_job) that allows
+/// DiCE provides a fragmented job infrastructure (\c IFragmented_job) that allows
 /// invoking operations in the cluster.
 /// Each job invocation usually requires information about
 /// the number of operations (a.k.a. fragments) that shall be launched and the
-/// target cluster nodes to which the the launched fragments shall be sent to
-/// process or analzse the distributed data.
+/// target cluster nodes to which the launched fragments shall be sent to
+/// process or analyze the distributed data.
 ///
 ///
 /// \deprecated This interface class is subject to change!
@@ -153,7 +153,7 @@ public:
   /// The method may only be called on the cluster node that stores the data.
   ///
   /// \deprecated This call is supposed to be removed soon as
-  ///             it used to be a workarond in the past.
+  ///             it used to be a workaround in the past.
   ///
   /// \param[in] dice_transaction     The DiCE transaction used for this operation.
   ///

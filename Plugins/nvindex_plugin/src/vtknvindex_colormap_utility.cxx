@@ -98,7 +98,7 @@ void vtknvindex_colormap::get_paraview_colormap(vtkVolume* vol,
   regular_volume_properties->get_voxel_range(voxel_range);
 
   // Normalize the range only if it is not floating point data.
-  // If float, then set the domain values as-is from Paraview.
+  // If float, then set the domain values as-is from ParaView.
   std::string scalar_type;
   regular_volume_properties->get_scalar_type(scalar_type);
 
@@ -167,7 +167,7 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
   regular_volume_properties->get_voxel_range(voxel_range);
 
   // Normalize the range only if it is not floating point data.
-  // If float, set the domain values as-is from Paraview.
+  // If float, set the domain values as-is from ParaView.
   std::string scalar_type;
   regular_volume_properties->get_scalar_type(scalar_type);
 

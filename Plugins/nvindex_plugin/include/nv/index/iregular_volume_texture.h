@@ -19,7 +19,7 @@ namespace index
 
 /// @ingroup nv_index_scene_description_attribute
 
-/// The interface class representing a regular volume texture attibute.
+/// The interface class representing a regular volume texture attribute.
 ///
 class IRegular_volume_texture : public mi::base::Interface_declare<0xcffdcde9, 0x3f88, 0x4147, 0xa4,
                                   0xfa, 0x4b, 0xc9, 0xe2, 0x63, 0xb6, 0x53, nv::index::IAttribute>

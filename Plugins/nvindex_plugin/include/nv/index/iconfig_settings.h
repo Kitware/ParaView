@@ -31,7 +31,7 @@ public:
   /// In GPU rendering mode, all the filters below including those tagged as 'software' are
   /// implemented using CUDA. Those filters that are are tagged 'hardware' leverage the
   /// texture hardware, e.g., linear filters, exposed through CUDA to further optimize the
-  /// the filtering performance.
+  /// filtering performance.
   ///
   enum Volume_filtering_modes
   {

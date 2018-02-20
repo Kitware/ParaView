@@ -49,7 +49,7 @@ struct vtknvindex_regular_volume_data
 // Representing irregular volume data.
 struct vtknvindex_irregular_volume_data
 {
-  // Subregion info on PV's domain subdivision kd-tree.
+  // Subregion info on ParaView's domain subdivision kd-tree.
   mi::Sint32 subregion_id;
   mi::math::Bbox<mi::Float32, 3> subregion_bbox;
 
@@ -143,7 +143,7 @@ private:
   vtknvindex_regular_volume_properties*
     m_regular_vol_properties;                             // Regular/irregular volume properties.
   mi::Uint32 m_num_ranks;                                 // Total number of MPI ranks.
-  std::vector<mi::Sint32> m_all_rank_ids;                 // All the MPI rank ids from Paraview.
+  std::vector<mi::Sint32> m_all_rank_ids;                 // All the MPI rank ids from ParaView.
   std::vector<std::string> m_host_names;                  // Host names for the whole cluster
   std::map<std::string, mi::Uint32> m_hostname_to_hostid; // Host names to host ids.
   std::map<mi::Sint32, mi::Uint32> m_rankid_to_hostid;    // Rank_id to host id.

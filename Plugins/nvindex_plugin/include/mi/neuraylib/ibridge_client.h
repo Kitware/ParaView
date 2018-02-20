@@ -610,7 +610,7 @@ public:
 
   /// Creates a new video context.
   ///
-  /// The video context will be assigned an id which needs to be transfered to the server, along
+  /// The video context will be assigned an id which needs to be transferred to the server, along
   /// with any other data required to set up the video source properly. The server use this id to
   /// get the corresponding server-side video context which can be used to stream video frames to
   /// the client. The recommended way of transferring the id to the server is by executing a
