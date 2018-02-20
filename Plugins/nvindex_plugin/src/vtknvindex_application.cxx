@@ -26,7 +26,7 @@
 */
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #else // WIN32
 #include <dlfcn.h>
 #endif // WIN32

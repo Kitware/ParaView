@@ -33,7 +33,7 @@
 #include <sstream>
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif // WIN32
 
 #include <GL/glu.h>
