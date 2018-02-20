@@ -114,12 +114,9 @@ bool vtknvindex_volume_importer::resolve_voxel_type(T* shmem_volume, T* voxel_da
   mi::Sint64 dx = bounds.max.x - bounds.min.x;
   mi::Sint64 dy = bounds.max.y - bounds.min.y;
   mi::Sint64 dz = bounds.max.z - bounds.min.z;
-  mi::Uint64 volume_brick_size = dx * dy * dz;
 
   const mi::math::Vector<mi::Sint64, 3> vtkvolume_size((shmbbox.max.x - shmbbox.min.x),
     (shmbbox.max.y - shmbbox.min.y), (shmbbox.max.z - shmbbox.min.z));
-  mi::Uint64 vtkvolume =
-    static_cast<mi::Uint64>(vtkvolume_size.x) * vtkvolume_size.y * vtkvolume_size.z;
 
   mi::Uint64 X_DST, Y_DST, Z_DST;
   mi::Sint64 min_x, min_y, min_z, max_x, max_y, max_z;

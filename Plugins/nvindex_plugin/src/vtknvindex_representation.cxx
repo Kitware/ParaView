@@ -505,6 +505,7 @@ int vtknvindex_representation::RequestData(
   m_cur_time = cur_time_step;
 
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
+  (void)input;
   assert(input != NULL);
 
   this->CacheKeeper->Update();

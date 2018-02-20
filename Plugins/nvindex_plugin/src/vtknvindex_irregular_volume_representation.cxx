@@ -211,7 +211,6 @@ int vtknvindex_irregular_volume_representation::RequestData(
     if (has_time_steps)
     {
       nb_time_steps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-      mi::Float64* time_steps = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
       cur_time_step = inInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     }

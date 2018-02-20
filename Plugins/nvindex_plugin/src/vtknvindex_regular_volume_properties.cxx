@@ -208,7 +208,6 @@ void vtknvindex_regular_volume_properties::transform_zyx_to_xyz(
   mi::Uint64 dy = bounds[3] - bounds[2] + 1;
   mi::Uint64 dz = bounds[5] - bounds[4] + 1;
   mi::Uint64 dxdy = dx * dy;
-  mi::Uint64 dzdy = dz * dy;
 
   mi::Uint64 index_offset = 0;
   for (mi::Uint64 x = 0; x < dx; ++x)

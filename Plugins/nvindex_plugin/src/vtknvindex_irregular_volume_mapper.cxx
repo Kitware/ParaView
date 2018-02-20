@@ -263,8 +263,8 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     // get subset bounds
     if (m_kd_tree)
     {
-      mi::Sint32 num_datasets = m_kd_tree->GetNumberOfDataSets();
-      mi::Sint32 num_regions = m_kd_tree->GetNumberOfRegions();
+      /* mi::Sint32 num_datasets = m_kd_tree->GetNumberOfDataSets(); */
+      /* mi::Sint32 num_regions = m_kd_tree->GetNumberOfRegions(); */
       // INFO_LOG << "KdTree | datasets, regions: " << num_datasets << ", " << num_regions;
 
       vtkIntArray* region_id_array = vtkIntArray::New();
