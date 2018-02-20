@@ -381,44 +381,42 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
 
     const Vec3f centroid = (av + bv + cv + dv) * 0.25f;
 
-// TODO: when available, use C++11 lambda
-// * adds a face to the ivol mesh storage
-// * tries to orient faces to have correct CCW vertex ordering
-#define IVOL_ADD_TET_FACE(i0, i1, i2, p0, p1, p2)                                                  \
-  do                                                                                               \
-  {                                                                                                \
-    const Vec3f e1 = ((p1) - (p0));                                                                \
-    const Vec3f e2 = ((p2) - (p0));                                                                \
-                                                                                                   \
-    /* face plane */                                                                               \
-    Vec3f n = cross(e1, e2);                                                                       \
-    n.normalize();                                                                                 \
-    const mi::Float32 dst = -(dot(n, (p0)));                                                       \
-                                                                                                   \
-    /* tetrahedron centroid distance to face plane */                                              \
-    const mi::Float32 cd = dot(n, centroid) + dst;                                                 \
-                                                                                                   \
-    if (cd < 0.0f)                                                                                 \
-    {                                                                                              \
-      /* correct ordering */                                                                       \
-      mesh_storage.face_vtx_indices[next_vidx + 0u] = (i0);                                        \
-      mesh_storage.face_vtx_indices[next_vidx + 1u] = (i1);                                        \
-      mesh_storage.face_vtx_indices[next_vidx + 2u] = (i2);                                        \
-    }                                                                                              \
-    else                                                                                           \
-    {                                                                                              \
-      /* invert ordering */                                                                        \
-      mesh_storage.face_vtx_indices[next_vidx + 0u] = (i0);                                        \
-      mesh_storage.face_vtx_indices[next_vidx + 1u] = (i2);                                        \
-      mesh_storage.face_vtx_indices[next_vidx + 2u] = (i1);                                        \
-    }                                                                                              \
-                                                                                                   \
-    mesh_storage.faces[next_fidx].nb_vertices = 3u;                                                \
-    mesh_storage.faces[next_fidx].start_vertex_index = next_vidx;                                  \
-                                                                                                   \
-    next_fidx += 1;                                                                                \
-    next_vidx += 3;                                                                                \
-  } while (0)
+    // * adds a face to the ivol mesh storage
+    // * tries to orient faces to have correct CCW vertex ordering
+    auto ivol_add_tet_face = [&](mi::Uint32 i0, mi::Uint32 i1, mi::Uint32 i2, Vec3f const& p0,
+      Vec3f const& p1, Vec3f const& p2) {
+      const Vec3f e1 = (p1 - p0);
+      const Vec3f e2 = (p2 - p0);
+
+      // face plane
+      Vec3f n = cross(e1, e2);
+      n.normalize();
+      const mi::Float32 dst = -(dot(n, p0));
+
+      // tetrahedron centroid distance to face plane
+      const mi::Float32 cd = dot(n, centroid) + dst;
+
+      if (cd < 0.0f)
+      {
+        // correct ordering
+        mesh_storage.face_vtx_indices[next_vidx + 0u] = i0;
+        mesh_storage.face_vtx_indices[next_vidx + 1u] = i1;
+        mesh_storage.face_vtx_indices[next_vidx + 2u] = i2;
+      }
+      else
+      {
+        // invert ordering
+        mesh_storage.face_vtx_indices[next_vidx + 0u] = i0;
+        mesh_storage.face_vtx_indices[next_vidx + 1u] = i2;
+        mesh_storage.face_vtx_indices[next_vidx + 2u] = i1;
+      }
+
+      mesh_storage.faces[next_fidx].nb_vertices = 3u;
+      mesh_storage.faces[next_fidx].start_vertex_index = next_vidx;
+
+      next_fidx += 1;
+      next_vidx += 3;
+    };
 
     // cell's face indices
     // * this might seem redundant here, but consider datasets with shared faces among cells
@@ -432,12 +430,10 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     mesh_storage.cells[t].start_face_index = next_fidx;
 
     // Needs to happen down here as it increases next_fidx and next_vidx.
-    IVOL_ADD_TET_FACE(a, c, d, av, cv, dv);
-    IVOL_ADD_TET_FACE(a, b, c, av, bv, cv);
-    IVOL_ADD_TET_FACE(a, d, b, av, dv, bv);
-    IVOL_ADD_TET_FACE(b, d, c, bv, dv, cv);
-
-#undef IVOL_ADD_TET_FACE
+    ivol_add_tet_face(a, c, d, av, cv, dv);
+    ivol_add_tet_face(a, b, c, av, bv, cv);
+    ivol_add_tet_face(a, d, b, av, dv, bv);
+    ivol_add_tet_face(b, d, c, bv, dv, cv);
   }
 
   irregular_volume_subset->retain();
