@@ -157,7 +157,7 @@ struct vtknvindex_edge_enhancement_params
     : sample_range(1.0f)
     , rh(1.0f)
     , stp_num(6)
-    , min_alpha(0.2)
+    , min_alpha(0.2f)
   {
   }
 };
