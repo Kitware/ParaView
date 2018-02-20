@@ -194,8 +194,8 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     static_cast<mi::Float32>(bounding_box.max.x), static_cast<mi::Float32>(bounding_box.max.y),
     static_cast<mi::Float32>(bounding_box.max.z));
 
-  mi::Uint32 nb_subset_vertices = 0u;
-  mi::Uint32 nb_subset_tetrahedrons = 0u;
+  mi::Size nb_subset_vertices = 0u;
+  mi::Size nb_subset_tetrahedrons = 0u;
 
   std::vector<Vec4ui> subset_tetrahedrons;
   std::vector<Vec3f> subset_vertices;
@@ -247,7 +247,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
       }
       else
       {
-        const mi::Uint32 new_vtx_idx = subset_vertices.size();
+        const mi::Uint32 new_vtx_idx = static_cast<mi::Uint32>(subset_vertices.size());
         global_to_local_vtx_idx_map[vtx_index] = new_vtx_idx;
 
         subset_vertices.push_back(points[vtx_index]);
@@ -272,11 +272,11 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     vtknvindex::util::unmap_shm(shm_ivol, shm_size);
 
   nb_subset_vertices = subset_vertices.size();
-  mi::Uint32 nb_cells = nb_subset_tetrahedrons;
-  mi::Uint32 nb_cell_face_indices = nb_cells * 4u;
+  mi::Size nb_cells = nb_subset_tetrahedrons;
+  mi::Size nb_cell_face_indices = nb_cells * 4u;
 
-  mi::Uint32 nb_faces = nb_cell_face_indices;
-  mi::Uint32 nb_face_vtx_indices = nb_faces * 3u;
+  mi::Size nb_faces = nb_cell_face_indices;
+  mi::Size nb_face_vtx_indices = nb_faces * 3u;
 
   nv::index::IIrregular_volume_subset::Mesh_parameters mesh_params;
 
@@ -367,7 +367,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   mi::Uint32 next_fidx = 0u;
 
   // generate cells, cell's face indices, faces, face's vertex indices.
-  for (mi::Uint32 t = 0u; t < nb_subset_tetrahedrons; ++t)
+  for (mi::Size t = 0u; t < nb_subset_tetrahedrons; ++t)
   {
     const mi::Uint32 a = subset_tetrahedrons[t].x;
     const mi::Uint32 b = subset_tetrahedrons[t].y;

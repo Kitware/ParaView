@@ -241,7 +241,7 @@ void vtknvindex_colormap::create_scene_colormaps(vtkVolume* vol,
   mi::base::Handle<nv::index::IColormap> volume_colormap(
     scene->create_attribute<nv::index::IColormap>());
 
-  mi::Uint32 nb_slice_colormaps = slices_colormap_tags.size();
+  mi::Size nb_slice_colormaps = slices_colormap_tags.size();
   std::vector<mi::base::Handle<nv::index::IColormap> > slice_colormaps;
   slice_colormaps.resize(nb_slice_colormaps);
 
@@ -289,7 +289,7 @@ void vtknvindex_colormap::update_scene_colormaps(vtkVolume* vol,
     dice_transaction->edit<nv::index::IColormap>(volume_colormap_tag));
   assert(colormap.is_valid_interface());
 
-  mi::Uint32 nb_slice_colormaps = slices_colormap_tags.size();
+  mi::Size nb_slice_colormaps = slices_colormap_tags.size();
   std::vector<mi::base::Handle<nv::index::IColormap> > slice_colormaps;
   slice_colormaps.resize(nb_slice_colormaps);
 

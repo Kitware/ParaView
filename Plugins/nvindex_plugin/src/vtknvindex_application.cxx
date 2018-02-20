@@ -195,9 +195,10 @@ bool vtknvindex_application::authenticate_nvindex_library()
     index_secret_key = "776532b335999674f8492574fbccd8defeac1b30e9804d5d42b383c57dcfab8f";
   }
 
-  return (m_nvindex_interface->authenticate(index_vendor_key.c_str(), index_vendor_key.length(),
-            index_secret_key.c_str(), index_secret_key.length(), flexnet_lic_path.c_str(),
-            flexnet_lic_path.length()) == 0);
+  return (m_nvindex_interface->authenticate(index_vendor_key.c_str(),
+            static_cast<mi::Sint32>(index_vendor_key.length()), index_secret_key.c_str(),
+            static_cast<mi::Sint32>(index_secret_key.length()), flexnet_lic_path.c_str(),
+            static_cast<mi::Sint32>(flexnet_lic_path.length())) == 0);
 }
 
 //-------------------------------------------------------------------------------------------------

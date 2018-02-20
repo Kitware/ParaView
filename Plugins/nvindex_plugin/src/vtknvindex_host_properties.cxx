@@ -101,10 +101,10 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, std::string s
   shmvolume.x = shmbbox.max.x - shmbbox.min.x;
   shmvolume.y = shmbbox.max.y - shmbbox.min.y;
   shmvolume.z = shmbbox.max.z - shmbbox.min.z;
-  mi::Uint32 shm_reference_count = ceil((shmvolume.x / subcube_size)) *
+  mi::Float32 shm_reference_count = ceil((shmvolume.x / subcube_size)) *
     ceil((shmvolume.y / subcube_size)) * ceil((shmvolume.z / subcube_size));
 
-  m_shmref[shmname] = shm_reference_count;
+  m_shmref[shmname] = static_cast<mi::Uint32>(shm_reference_count);
 }
 
 // ------------------------------------------------------------------------------------------------

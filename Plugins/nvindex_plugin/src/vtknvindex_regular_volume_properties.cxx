@@ -425,7 +425,7 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   memcpy(shm_offset, &ivol_data->max_edge_length2, size_elm);
   shm_offset += size_elm;
 
-  if (shm_offset - shm_ptr != shm_size)
+  if (shm_offset - shm_ptr != static_cast<mi::Difference>(shm_size))
   {
     ERROR_LOG << "Encountered a shared memory copy mismatch, diff: " << shm_offset - shm_ptr
               << ", size: " << shm_size << ".";
