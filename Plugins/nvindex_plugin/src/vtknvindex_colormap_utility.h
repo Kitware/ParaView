@@ -72,8 +72,8 @@ public:
   bool changed() const;
 
 private:
-  vtknvindex_colormap(const vtknvindex_colormap&); // Not implemented.
-  void operator=(const vtknvindex_colormap&);      // Not implemented.
+  vtknvindex_colormap(const vtknvindex_colormap&) = delete;
+  void operator=(const vtknvindex_colormap&) = delete;
 
   // Normalize input range to scale range.
   void normalize(const mi::math::Vector<mi::Float32, 2>& input_range,

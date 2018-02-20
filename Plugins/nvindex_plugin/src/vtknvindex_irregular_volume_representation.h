@@ -214,8 +214,8 @@ protected:
 
 private:
   vtknvindex_irregular_volume_representation(
-    const vtknvindex_irregular_volume_representation&);              // Not implemented.
-  void operator=(const vtknvindex_irregular_volume_representation&); // Not implemented.
+    const vtknvindex_irregular_volume_representation&) = delete;
+  void operator=(const vtknvindex_irregular_volume_representation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

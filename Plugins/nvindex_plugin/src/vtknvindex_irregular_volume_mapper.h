@@ -105,8 +105,8 @@ public:
   // BTX
 
 private:
-  vtknvindex_irregular_volume_mapper(const vtknvindex_irregular_volume_mapper&); // Not implemented.
-  void operator=(const vtknvindex_irregular_volume_mapper&);                     // Not implemented.
+  vtknvindex_irregular_volume_mapper(const vtknvindex_irregular_volume_mapper&) = delete;
+  void operator=(const vtknvindex_irregular_volume_mapper&) = delete;
 
   bool m_is_mapper_initialized;   // True if mapper is initialized.
   bool m_is_index_initialized;    // True if index library is initialized.

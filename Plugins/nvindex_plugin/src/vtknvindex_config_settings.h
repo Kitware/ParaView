@@ -171,8 +171,8 @@ public:
   const vtknvindex_slice_params& get_slice_params(mi::Uint32 id) const;
 
 private:
-  vtknvindex_config_settings(const vtknvindex_config_settings&); // Not implemented.
-  void operator=(const vtknvindex_config_settings&);             // Not implemented.
+  vtknvindex_config_settings(const vtknvindex_config_settings&) = delete;
+  void operator=(const vtknvindex_config_settings&) = delete;
 
   bool m_enable_preintegration;                               // Use pre-integration tables.
   bool m_dump_internal_state;                                 // Dump scene to file.

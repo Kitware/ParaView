@@ -78,8 +78,8 @@ public:
   std::string get_class_name() const;
 
 private:
-  vtknvindex_opengl_canvas(vtknvindex_opengl_canvas const&);
-  vtknvindex_opengl_canvas const& operator=(vtknvindex_opengl_canvas const&);
+  vtknvindex_opengl_canvas(vtknvindex_opengl_canvas const&) = delete;
+  void operator=(vtknvindex_opengl_canvas const&) = delete;
 
   // Set main window size.
   mi::math::Vector_struct<mi::Sint32, 2> m_main_window_size;

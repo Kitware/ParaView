@@ -116,8 +116,8 @@ public:
   // BTX
 
 private:
-  vtknvindex_volumemapper(const vtknvindex_volumemapper&); // Not implemented
-  void operator=(const vtknvindex_volumemapper&);          // Not implemented
+  vtknvindex_volumemapper(const vtknvindex_volumemapper&) = delete;
+  void operator=(const vtknvindex_volumemapper&) = delete;
 
   // Is data prepared for given time step?
   bool is_data_prepared(mi::Sint32 time_step);

@@ -60,8 +60,8 @@ private:
   // Message severity level.
   mi::Uint32 m_level;
 
-  vtknvindex_receiving_logger(const vtknvindex_receiving_logger&);            // Forbid this.
-  vtknvindex_receiving_logger& operator=(const vtknvindex_receiving_logger&); // Forbid this.
+  vtknvindex_receiving_logger(const vtknvindex_receiving_logger&) = delete;
+  void operator=(const vtknvindex_receiving_logger&) = delete;
 };
 }
 } // namespace

@@ -134,8 +134,8 @@ public:
   void build_hosts_rank_distribution();
 
 private:
-  vtknvindex_cluster_properties(const vtknvindex_cluster_properties&); // Not implemented.
-  void operator=(const vtknvindex_cluster_properties&);                // Not implemented.
+  vtknvindex_cluster_properties(const vtknvindex_cluster_properties&) = delete;
+  void operator=(const vtknvindex_cluster_properties&) = delete;
 
   mi::Sint32 m_rank_id;                             // Rank id for the host.
   mi::base::Handle<vtknvindex_affinity> m_affinity; // Affinity for NVIDIA IndeX.

@@ -49,8 +49,8 @@ public:
     vtknvindex_application& application, mi::base::Handle<nv::index::IFrame_results> frame_results);
 
 private:
-  vtknvindex_performance_values(const vtknvindex_performance_values&); // Not implemented.
-  void operator=(const vtknvindex_performance_values&);                // Not implemented.
+  vtknvindex_performance_values(const vtknvindex_performance_values&) = delete;
+  void operator=(const vtknvindex_performance_values&) = delete;
 
   // Represent some memory block as string including units.
   std::string to_string(mi::Uint64 memory) const;

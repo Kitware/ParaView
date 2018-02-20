@@ -112,9 +112,8 @@ public:
   virtual const char* get_class_name() const;
 
 private:
-  vtknvindex_regular_volume_properties(
-    const vtknvindex_regular_volume_properties&);              // Not implemented
-  void operator=(const vtknvindex_regular_volume_properties&); // Not implemented
+  vtknvindex_regular_volume_properties(const vtknvindex_regular_volume_properties&) = delete;
+  void operator=(const vtknvindex_regular_volume_properties&) = delete;
 
   // Converts volume data from ParaView's zyx format to Index's xyz format
   template <typename T>

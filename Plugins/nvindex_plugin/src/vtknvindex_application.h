@@ -93,8 +93,8 @@ public:
   vtknvindex_opengl_app_buffer m_opengl_app_buffer;
 
 private:
-  vtknvindex_application(vtknvindex_application const&);
-  vtknvindex_application const& operator=(vtknvindex_application const&);
+  vtknvindex_application(vtknvindex_application const&) = delete;
+  void operator=(vtknvindex_application const&) = delete;
 
   std::string m_nvindexlib_fname;                          // libnvindex.so/dll string name.
   void* m_p_handle;                                        // Library handle.

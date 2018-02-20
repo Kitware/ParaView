@@ -193,8 +193,8 @@ protected:
   ~vtknvindex_representation();
 
 private:
-  vtknvindex_representation(const vtknvindex_representation&); // Not implemented.
-  void operator=(const vtknvindex_representation&);            // Not implemented.
+  vtknvindex_representation(const vtknvindex_representation&) = delete;
+  void operator=(const vtknvindex_representation&) = delete;
 
   vtknvindex_cached_bounds* get_cached_bounds(mi::Sint32 time);
   void set_cached_bounds(mi::Sint32 time);

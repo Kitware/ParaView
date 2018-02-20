@@ -57,8 +57,8 @@ public:
   static std::string level_to_string(mi::base::Message_severity level);
 
 private:
-  vtknvindex_forwarding_logger(const vtknvindex_forwarding_logger&);
-  vtknvindex_forwarding_logger& operator=(const vtknvindex_forwarding_logger&);
+  vtknvindex_forwarding_logger(const vtknvindex_forwarding_logger&) = delete;
+  void operator=(const vtknvindex_forwarding_logger&) = delete;
 
   std::ostringstream m_os;                                 // Output stream.
   mi::base::Message_severity m_level;                      // Message severity level.
@@ -112,8 +112,8 @@ public:
   mi::base::ILogger* get_forwarding_logger() const;
 
 private:
-  vtknvindex_forwarding_logger_factory(const vtknvindex_forwarding_logger_factory&);
-  vtknvindex_forwarding_logger_factory& operator=(const vtknvindex_forwarding_logger_factory&);
+  vtknvindex_forwarding_logger_factory(const vtknvindex_forwarding_logger_factory&) = delete;
+  void operator=(const vtknvindex_forwarding_logger_factory&) = delete;
 
   static vtknvindex_forwarding_logger_factory* G_p_forwarding_logger_factory; // Singleton.
 

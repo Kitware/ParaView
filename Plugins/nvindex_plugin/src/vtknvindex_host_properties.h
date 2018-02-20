@@ -110,8 +110,8 @@ public:
   virtual const char* get_class_name() const;
 
 private:
-  vtknvindex_host_properties(const vtknvindex_host_properties&); // Not implemented.
-  void operator=(const vtknvindex_host_properties&);             // Not implemented.
+  vtknvindex_host_properties(const vtknvindex_host_properties&) = delete;
+  void operator=(const vtknvindex_host_properties&) = delete;
 
   mi::Uint32 m_hostid;               // Host id of the machine, matches IndeX host id.
   mi::Sint32 m_nvrankid;             // MPI rankid running NVIDIA IndeX.

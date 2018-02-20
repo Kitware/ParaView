@@ -74,8 +74,8 @@ public:
   }
 
 private:
-  vtknvindex_opengl_app_buffer(vtknvindex_opengl_app_buffer const&);
-  vtknvindex_opengl_app_buffer const& operator=(vtknvindex_opengl_app_buffer const&);
+  vtknvindex_opengl_app_buffer(vtknvindex_opengl_app_buffer const&) = delete;
+  void operator=(vtknvindex_opengl_app_buffer const&) = delete;
 
   // Deallocate memory
   void delete_memory();
