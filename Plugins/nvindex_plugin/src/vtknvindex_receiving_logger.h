@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_receiving_logger_h
-#define __vtknvindex_receiving_logger_h
+#ifndef vtknvindex_receiving_logger_h
+#define vtknvindex_receiving_logger_h
 
 #include <sstream>
 
@@ -66,4 +66,4 @@ private:
 }
 } // namespace
 
-#endif // __vtknvindex_receiving_logger_h
+#endif // vtknvindex_receiving_logger_h

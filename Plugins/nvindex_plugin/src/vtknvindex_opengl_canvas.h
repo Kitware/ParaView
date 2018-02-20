@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_opengl_canvas_h
-#define __vtknvindex_opengl_canvas_h
+#ifndef vtknvindex_opengl_canvas_h
+#define vtknvindex_opengl_canvas_h
 
 #include <string>
 
@@ -86,4 +86,4 @@ private:
   vtkRenderer* m_vtk_renderer;
 };
 
-#endif // __vtknvindex_opengl_canvas_h
+#endif // vtknvindex_opengl_canvas_h

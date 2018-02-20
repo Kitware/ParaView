@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_affinity_h
-#define __vtknvindex_affinity_h
+#ifndef vtknvindex_affinity_h
+#define vtknvindex_affinity_h
 
 #include <fstream>
 #include <map>

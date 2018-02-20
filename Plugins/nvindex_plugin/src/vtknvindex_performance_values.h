@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_performance_values_h
-#define __vtknvindex_performance_values_h
+#ifndef vtknvindex_performance_values_h
+#define vtknvindex_performance_values_h
 
 #include <fstream>
 #include <nv/index/iindex.h>

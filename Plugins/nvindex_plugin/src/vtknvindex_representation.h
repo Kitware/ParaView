@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_representation_h
-#define __vtknvindex_representation_h
+#ifndef vtknvindex_representation_h
+#define vtknvindex_representation_h
 
 #include <map>
 
@@ -236,4 +236,4 @@ private:
   // ETX
 };
 
-#endif // __vtknvindex_representation_h
+#endif // vtknvindex_representation_h

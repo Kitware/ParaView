@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_config_settings_h
-#define __vtknvindex_config_settings_h
+#ifndef vtknvindex_config_settings_h
+#define vtknvindex_config_settings_h
 
 #include <map>
 #include <string>

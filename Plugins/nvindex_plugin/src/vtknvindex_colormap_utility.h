@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_colormap_utility_h
-#define __vtknvindex_colormap_utility_h
+#ifndef vtknvindex_colormap_utility_h
+#define vtknvindex_colormap_utility_h
 
 #include <mi/dice.h>
 

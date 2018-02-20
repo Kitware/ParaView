@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_clock_pulse_generator_h
-#define __vtknvindex_clock_pulse_generator_h
+#ifndef vtknvindex_clock_pulse_generator_h
+#define vtknvindex_clock_pulse_generator_h
 
 #include <mi/base/interface_declare.h>
 #include <mi/base/types.h>
@@ -61,4 +61,4 @@ private:
   mi::Float64 m_t_start;
   mi::Float64 m_t_end;
 };
-#endif // __vtknvindex_clock_pulse_generator_h
+#endif // vtknvindex_clock_pulse_generator_h

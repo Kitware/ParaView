@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_regular_volume_properties_h
-#define __vtknvindex_regular_volume_properties_h
+#ifndef vtknvindex_regular_volume_properties_h
+#define vtknvindex_regular_volume_properties_h
 
 #include <string>
 

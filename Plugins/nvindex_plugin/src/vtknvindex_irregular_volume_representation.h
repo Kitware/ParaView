@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_irregular_volume_representation_h
-#define __vtknvindex_irregular_volume_representation_h
+#ifndef vtknvindex_irregular_volume_representation_h
+#define vtknvindex_irregular_volume_representation_h
 
 #include <mi/math/bbox.h>
 
@@ -237,4 +237,4 @@ private:
   mi::Float32 m_prev_time_step;
 };
 
-#endif // __vtknvindex_irregular_volume_representation_h
+#endif // vtknvindex_irregular_volume_representation_h

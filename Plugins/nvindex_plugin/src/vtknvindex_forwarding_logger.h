@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_forwarding_logger_h
-#define __vtknvindex_forwarding_logger_h
+#ifndef vtknvindex_forwarding_logger_h
+#define vtknvindex_forwarding_logger_h
 
 #include <sstream>
 #include <string>
@@ -335,4 +335,4 @@ inline std::ostream& operator<<(std::ostream& str, const mi::neuraylib::Tag& tag
 #define ERROR_LOG                                                                                  \
   vtknvindex::logger::vtknvindex_forwarding_logger().get_message(mi::base::MESSAGE_SEVERITY_ERROR)
 
-#endif // __vtknvindex_forwarding_logger_h
+#endif // vtknvindex_forwarding_logger_h

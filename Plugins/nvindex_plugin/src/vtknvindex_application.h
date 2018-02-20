@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_application_h
-#define __vtknvindex_application_h
+#ifndef vtknvindex_application_h
+#define vtknvindex_application_h
 
 #include <vector>
 

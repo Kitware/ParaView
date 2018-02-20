@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_host_properties_h
-#define __vtknvindex_host_properties_h
+#ifndef vtknvindex_host_properties_h
+#define vtknvindex_host_properties_h
 
 #include <map>
 #include <string>
@@ -124,4 +124,4 @@ private:
     m_shmlist; // List of shared memory pieces on the present host.
 };
 
-#endif // __vtknvindex_host_properties_h
+#endif // vtknvindex_host_properties_h

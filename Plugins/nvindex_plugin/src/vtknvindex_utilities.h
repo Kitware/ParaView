@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_utilities_h
-#define __vtknvindex_utilities_h
+#ifndef vtknvindex_utilities_h
+#define vtknvindex_utilities_h
 
 #include <assert.h>
 #include <fstream>

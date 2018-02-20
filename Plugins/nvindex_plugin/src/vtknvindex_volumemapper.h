@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_volumemapper_h
-#define __vtknvindex_volumemapper_h
+#ifndef vtknvindex_volumemapper_h
+#define vtknvindex_volumemapper_h
 
 #include <cstdio>
 #include <map>

@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_cluster_properties_h
-#define __vtknvindex_cluster_properties_h
+#ifndef vtknvindex_cluster_properties_h
+#define vtknvindex_cluster_properties_h
 
 #include <map>
 

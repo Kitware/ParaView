@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_scene_h
-#define __vtknvindex_scene_h
+#ifndef vtknvindex_scene_h
+#define vtknvindex_scene_h
 
 #include "vtkVolume.h"
 #include <vector>
@@ -128,4 +128,4 @@ private:
   vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The current volume CUDA code.
 };
 
-#endif // __vtknvindex_scene_h
+#endif // vtknvindex_scene_h

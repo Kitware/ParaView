@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_volume_importer_h
-#define __vtknvindex_volume_importer_h
+#ifndef vtknvindex_volume_importer_h
+#define vtknvindex_volume_importer_h
 
 #include <mi/dice.h>
 #include <nv/index/idistributed_data_import_callback.h>
@@ -85,4 +85,4 @@ private:
   vtknvindex_cluster_properties* m_cluster_properties; // Cluster properties.
 };
 
-#endif // __vtknvindex_volume_importer_h
+#endif // vtknvindex_volume_importer_h

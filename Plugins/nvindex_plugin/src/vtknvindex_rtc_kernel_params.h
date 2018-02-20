@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_rtc_kernel_params_h__
-#define __vtknvindex_rtc_kernel_params_h__
+#ifndef vtknvindex_rtc_kernel_params_h
+#define vtknvindex_rtc_kernel_params_h
 
 // list of kernels
 enum vtknvindex_rtc_kernels
@@ -252,4 +252,4 @@ extern const char* KERNEL_EDGE_ENHANCEMENT_STRING;
 extern const char* KERNEL_SINGLE_SCATTERING_STRING;
 extern const char* KERNEL_ISORAYCAST_STRING;
 
-#endif // __vtknvindex_rtc_kernel_params_h__
+#endif // vtknvindex_rtc_kernel_params_h

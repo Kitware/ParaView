@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_opengl_app_buffer_h
-#define __vtknvindex_opengl_app_buffer_h
+#ifndef vtknvindex_opengl_app_buffer_h
+#define vtknvindex_opengl_app_buffer_h
 
 #include <nv/index/iopengl_application_buffer.h>
 
