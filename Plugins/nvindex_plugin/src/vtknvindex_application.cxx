@@ -171,9 +171,8 @@ bool vtknvindex_application::authenticate_nvindex_library()
   bool found_license = false;
 
   // Try reading license from environment.
-  vtksys::SystemTools sys_tools;
-  const char* env_vendor_key = sys_tools.GetEnv("NVINDEX_VENDOR_KEY");
-  const char* env_secret_key = sys_tools.GetEnv("NVINDEX_SECRET_KEY");
+  const char* env_vendor_key = vtksys::SystemTools::GetEnv("NVINDEX_VENDOR_KEY");
+  const char* env_secret_key = vtksys::SystemTools::GetEnv("NVINDEX_SECRET_KEY");
 
   if (env_vendor_key != NULL && env_secret_key != NULL)
   {

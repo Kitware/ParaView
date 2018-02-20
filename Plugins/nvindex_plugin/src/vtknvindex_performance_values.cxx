@@ -64,7 +64,6 @@ void vtknvindex_performance_values::print_perf_values(
     std::ostringstream header_str;
 
     // Prepare header report with current time, OS, SW/HW info.
-    vtksys::SystemTools sys_tools;
     vtksys::SystemInformation sys_info;
     sys_info.RunOSCheck();
     sys_info.RunCPUCheck();
@@ -72,7 +71,8 @@ void vtknvindex_performance_values::print_perf_values(
     header_str << "--------------------------------------------------------------------------------"
                   "------------------------------------------------------------------------"
                << "\n";
-    header_str << "IndeX Performance Values: " << sys_tools.GetCurrentDateTime("%c") << "\n";
+    header_str << "IndeX Performance Values: " << vtksys::SystemTools::GetCurrentDateTime("%c")
+               << "\n";
     header_str << "--------------------------------------------------------------------------------"
                   "------------------------------------------------------------------------"
                << "\n";
