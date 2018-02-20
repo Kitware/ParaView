@@ -22,6 +22,24 @@ ENDIF()
 
 pv_process_modules()
 
+set(kernel_sources
+  src/kernel_depth_enhancement.cu
+  src/kernel_edge_enhancement.cu
+  src/kernel_isoraycast.cu
+  src/kernel_isosurface.cu
+  src/kernel_single_scattering.cu)
+set(kernel_string_sources)
+foreach (kernel_source IN LISTS kernel_sources)
+  get_filename_component(kernel_name "${kernel_source}" NAME_WE)
+  string(TOUPPER "${kernel_name}" variable_name)
+  vtk_encode_string(
+    INPUT "${kernel_source}"
+    NAME  "${variable_name}_STRING"
+    SOURCE_OUTPUT source)
+  list(APPEND kernel_string_sources
+    "${source}")
+endforeach ()
+
 ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.1"
     EULA "EULA.txt"
     SERVER_MANAGER_XML src/nvindex.xml
@@ -45,9 +63,9 @@ ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.1"
         src/vtknvindex_performance_values.cxx
         src/vtknvindex_receiving_logger.cxx
         src/vtknvindex_regular_volume_properties.cxx
-        src/vtknvindex_rtc_kernel_params.cxx
         src/vtknvindex_scene.cxx
         src/vtknvindex_volume_importer.cxx
+        ${kernel_string_sources}
 )
 
 include(vtkOpenGL)
