@@ -32,13 +32,13 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef WIN32
-#else // WIN32
+#ifdef _WIN32
+#else // _WIN32
 #include <pwd.h>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
-#endif // WIN32
+#endif // _WIN32
 
 #include <fcntl.h>
 #include <vector>
@@ -78,7 +78,7 @@ inline void sleep(mi::Float32 seconds)
 // \return get Float64 epoch time in second.
 inline mi::Float64 get_time()
 {
-#ifdef WIN32
+#ifdef _WIN32
   static bool init = false;
   static mi::Float64 frequency;
   if (!init)
@@ -124,7 +124,7 @@ inline std::string get_host_name()
   return host_name;
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 //----------------------------------------------------------------------
 // Retrieves the process user name.
 // \return Returns the process user name.
@@ -139,7 +139,7 @@ inline const char* get_process_user_name()
 
   return "";
 }
-#endif // WIN32
+#endif // _WIN32
 
 //-------------------------------------------------------------------------------------------------
 // Return shared memory pointer to given name of the shared memory of size shared_seg_size
@@ -148,7 +148,7 @@ template <typename T>
 inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_size)
 {
 
-#ifdef WIN32
+#ifdef _WIN32
   HANDLE hMapFile;
 
   hMapFile = CreateFileMapping(
@@ -208,7 +208,7 @@ inline T* get_vol_shm(const std::string& shmname, const mi::Uint64& shared_seg_s
 // Unmap shared memory from memory address space
 inline void unmap_shm(void* shm_ptr, const mi::Uint64 shared_seg_size)
 {
-#ifdef WIN32
+#ifdef _WIN32
   UnmapViewOfFile(shm_ptr);
 #else
   munmap(shm_ptr, shared_seg_size);

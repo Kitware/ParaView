@@ -295,7 +295,7 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
     ss << "_timestep_";
     ss << time_step;
 
-#ifndef WIN32
+#ifndef _WIN32
     ss << "_" << vtknvindex::util::get_process_user_name();
 #endif
 
@@ -574,7 +574,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       ss << "_timestep_";
       ss << time_step;
 
-#ifndef WIN32
+#ifndef _WIN32
       ss << "_" << vtknvindex::util::get_process_user_name();
 #endif
 

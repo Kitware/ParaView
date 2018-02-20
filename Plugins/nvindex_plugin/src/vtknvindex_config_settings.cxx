@@ -26,9 +26,9 @@
 */
 
 #include <sys/stat.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include "shlobj.h"
-#endif // WIN32
+#endif // _WIN32
 
 #include "vtkSetGet.h"
 #include "vtkXMLDataSetWriter.h"
@@ -164,7 +164,7 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
   {
     home_path = std::string(env_home_path);
 
-#ifdef WIN32
+#ifdef _WIN32
     home_path += "\\";
 #else
     home_path += "/";
@@ -174,7 +174,7 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
   }
 
 // get home path from ParaView configuration folder
-#ifdef WIN32
+#ifdef _WIN32
   TCHAR app_data_path[MAX_PATH];
   if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, app_data_path)))
   {
@@ -189,7 +189,7 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
     home_path = std::string(home) + std::string("/.config/ParaView/");
     return true;
   }
-#endif // WIN32
+#endif // _WIN32
 
   home_path = "";
   return false;
@@ -198,7 +198,7 @@ bool vtknvindex_xml_config_parser::get_home_path(std::string& home_path)
 //-------------------------------------------------------------------------------------------------
 bool vtknvindex_xml_config_parser::get_temp_path(std::string& temp_path)
 {
-#ifdef WIN32
+#ifdef _WIN32
 
   char path[MAX_PATH];
   if (GetTempPath(MAX_PATH, path) != 0)
@@ -234,7 +234,7 @@ bool vtknvindex_xml_config_parser::get_temp_path(std::string& temp_path)
 
   return true;
 
-#endif // WIN32
+#endif // _WIN32
 }
 
 //-------------------------------------------------------------------------------------------------

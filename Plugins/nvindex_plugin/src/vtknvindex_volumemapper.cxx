@@ -32,9 +32,9 @@
 #include <memory>
 #include <sstream>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
-#endif // WIN32
+#endif // _WIN32
 
 #include <GL/glu.h>
 

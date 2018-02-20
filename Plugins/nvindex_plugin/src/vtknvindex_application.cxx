@@ -25,11 +25,11 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
-#else // WIN32
+#else // _WIN32
 #include <dlfcn.h>
-#endif // WIN32
+#endif // _WIN32
 
 #include "vtksys/SystemTools.hxx"
 
@@ -68,17 +68,17 @@ bool vtknvindex_application::load_nvindex_library()
   // Load shared libraries.
   std::string lib_name = "libnvindex";
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef NDEBUG
   lib_name += ".dll";
 #else  //  NDEBUG
   lib_name += "d.dll";
 #endif // NDEBUG
-#else  // WIN32
+#else  // _WIN32
   lib_name += ".so";
-#endif // WIN32
+#endif // _WIN32
 
-#ifdef WIN32
+#ifdef _WIN32
   m_p_handle = LoadLibrary(TEXT(lib_name.c_str()));
   if (!m_p_handle)
   {
@@ -91,7 +91,7 @@ bool vtknvindex_application::load_nvindex_library()
     ERROR_LOG << "Unable to retrieve the entry point into the " << lib_name.c_str() << " library.";
     return false;
   }
-#else // WIN32
+#else // _WIN32
   m_p_handle = dlopen(lib_name.c_str(), RTLD_LAZY);
   if (!m_p_handle)
   {
@@ -106,7 +106,7 @@ bool vtknvindex_application::load_nvindex_library()
     return false;
   }
 
-#endif // WIN32
+#endif // _WIN32
 
   m_nvindexlib_fname = lib_name;
 
@@ -118,13 +118,13 @@ bool vtknvindex_application::load_nvindex_library()
   {
     ERROR_LOG << "Failed to Initialize NVIDIA IndeX library.";
 
-#ifdef WIN32
+#ifdef _WIN32
     ERROR_LOG << "Please verify that the PATH variable has been set appropriately and points to "
                  "the location of the NVIDIA IndeX libraries.";
-#else  // WIN32
+#else  // _WIN32
     ERROR_LOG << "Please verify that the environment variable LD_LIBRARY_PATH has been set "
                  "appropriately and points to the location of the NVIDIA IndeX libraries.";
-#endif // WIN32
+#endif // _WIN32
     return false;
   }
 
@@ -551,21 +551,21 @@ bool vtknvindex_application::unload_iindex()
 {
   assert(m_p_handle != 0);
 
-#ifdef WIN32
+#ifdef _WIN32
   if (TRUE != FreeLibrary((HMODULE)m_p_handle))
   {
     const std::string nvindex_fname = m_nvindexlib_fname;
     ERROR_LOG << "Failed to unload the NVIDIA IndeX library (" << nvindex_fname << ").";
     return false;
   }
-#else  // WIN32
+#else  // _WIN32
   int result = dlclose(m_p_handle);
   if (result != 0)
   {
     ERROR_LOG << "Failed to unload the NVIDIA IndeX library: " << dlerror() << ".";
     return false;
   }
-#endif // WIN32
+#endif // _WIN32
 
   return true;
 }

@@ -27,10 +27,10 @@
 
 #include <iostream>
 
-#ifdef WIN32
-#else // WIN32
+#ifdef _WIN32
+#else // _WIN32
 #include <sys/mman.h>
-#endif // WIN32
+#endif // _WIN32
 
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_host_properties.h"
@@ -70,11 +70,11 @@ void vtknvindex_host_properties::shm_cleanup()
     for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
     {
       shm_info current_shm = shmlist[i];
-#ifdef WIN32
+#ifdef _WIN32
 // TODO: Unlink using windows functions
-#else  // WIN32
+#else  // _WIN32
       shm_unlink(current_shm.m_shm_name.c_str());
-#endif // WIN32
+#endif // _WIN32
     }
   }
 }
