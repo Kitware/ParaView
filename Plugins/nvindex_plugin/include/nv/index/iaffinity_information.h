@@ -40,7 +40,7 @@ class IAffinity_information
 {
 public:
   /// Flags for setting specific affinity modes.
-  enum Affinity_flags
+  enum Affinity_flags : mi::Uint32
   {
     ANY_GPU = 0xffffffff ///< The GPU should be assigned automatically.
   };
