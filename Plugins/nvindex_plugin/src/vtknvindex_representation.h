@@ -187,7 +187,6 @@ public:
   vtkGetVector2Macro(m_roi_range_K, double);
   vtkSetVector2Macro(m_roi_range_K, double);
 
-  // BTX
 protected:
   vtknvindex_representation();
   ~vtknvindex_representation();
@@ -232,8 +231,6 @@ private:
   vtknvindex_edge_enhancement_params m_edge_enhancement_params;
   vtknvindex_single_scattering_params m_single_scattering_params;
   vtknvindex_isoraycast_params m_isoraycast_params;
-
-  // ETX
 };
 
 #endif // vtknvindex_representation_h

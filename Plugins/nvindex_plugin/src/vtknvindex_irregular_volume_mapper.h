@@ -102,8 +102,6 @@ public:
   // Initialize the mapper.
   bool initialize_mapper(vtkRenderer* ren, vtkVolume* vol);
 
-  // BTX
-
 private:
   vtknvindex_irregular_volume_mapper(const vtknvindex_irregular_volume_mapper&) = delete;
   void operator=(const vtknvindex_irregular_volume_mapper&) = delete;
@@ -127,7 +125,6 @@ private:
   vtknvindex_irregular_volume_data m_volume_data;      // Tetrahedral volume data.
 
   vtkPKdTree* m_kd_tree; // ParaView domain subdivision.
-  // ETX
 };
 
 #endif

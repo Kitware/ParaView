@@ -113,8 +113,6 @@ public:
   void is_caching(bool is_caching);
   bool is_caching() const;
 
-  // BTX
-
 private:
   vtknvindex_volumemapper(const vtknvindex_volumemapper&) = delete;
   void operator=(const vtknvindex_volumemapper&) = delete;
@@ -149,8 +147,6 @@ private:
   mi::Float64 m_cached_bounds[6]; // Cached bounds used on animation loops.
 
   vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The CUDA code applied to the current volume.
-
-  // ETX
 };
 
 #endif

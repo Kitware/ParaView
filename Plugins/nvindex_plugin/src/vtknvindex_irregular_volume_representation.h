@@ -172,7 +172,6 @@ public:
   void set_roi_maxK(double val);
   vtkGetVector2Macro(m_roi_range_K, double);
 
-  // BTX
 protected:
   vtknvindex_irregular_volume_representation();
   ~vtknvindex_irregular_volume_representation();
@@ -231,8 +230,6 @@ private:
   vtknvindex_cluster_properties*
     m_cluster_properties; // Cluster wide properties, refer class documentation.
   mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
-
-  // ETX
 
   mi::Float32 m_prev_time_step;
 };
