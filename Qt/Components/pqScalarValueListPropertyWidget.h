@@ -64,6 +64,9 @@ public:
   void setRangeDomain(vtkSMDoubleRangeDomain* smRangeDomain);
   void setRangeDomain(vtkSMIntRangeDomain* smRangeDomain);
 
+  void setShowLabels(bool);
+  void setLabels(std::vector<const char*>&);
+
 signals:
   void scalarsChanged();
 
