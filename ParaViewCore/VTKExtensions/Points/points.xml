@@ -15,6 +15,17 @@
         </BoundsDomain>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty command="SetPadding"
+        name="Padding"
+        default_values="0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify a padding to use to inflate the bounds in all directions
+          before generating the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty name="RefinementMode"
         command="SetRefinementMode"
         number_of_elements="1"
@@ -122,6 +133,32 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1">
+        <BoundsDomain name="range" mode="extents">
+          <RequiredProperties>
+            <Property function="Input" name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+
+        <Documentation>
+          Set scale factor for a unit volume.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetPadding"
+        name="Padding"
+        default_values="0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify a padding to use to inflate the bounds in all directions
+          before generating the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty name="RefinementMode"
         command="SetRefinementMode"
         number_of_elements="1"
@@ -163,21 +200,6 @@
                                    property="RefinementMode"
                                    value="1" />
         </Hints>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Scale"
-        command="SetScale"
-        number_of_elements="3"
-        default_values="1 1 1">
-        <BoundsDomain name="range" mode="extents">
-          <RequiredProperties>
-            <Property function="Input" name="DummyInput" />
-          </RequiredProperties>
-        </BoundsDomain>
-
-        <Documentation>
-          Set scale factor for a unit volume.
-        </Documentation>
       </DoubleVectorProperty>
 
       <InputProperty is_internal="1" name="DummyInput">

@@ -88,6 +88,16 @@ public:
   vtkGetMacro(CellSize, double);
   //@}
 
+  //@{
+  /**
+   * Specify the padding to use along each of the directions. This is used to
+   * inflate the bounds by a fixed factor in all directions before generating
+   * the plane.
+   */
+  vtkSetClampMacro(Padding, double, 0, VTK_DOUBLE_MAX);
+  vtkGetMacro(Padding, double);
+  //@}
+
 protected:
   vtkBoundedPlaneSource();
   ~vtkBoundedPlaneSource() override;
@@ -100,6 +110,7 @@ protected:
   int RefinementMode;
   int Resolution;
   double CellSize;
+  double Padding;
 
 private:
   vtkBoundedPlaneSource(const vtkBoundedPlaneSource&) = delete;

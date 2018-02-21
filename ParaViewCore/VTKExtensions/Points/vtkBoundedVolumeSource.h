@@ -25,6 +25,9 @@
 
 #include "vtkImageAlgorithm.h"
 #include "vtkPVVTKExtensionsPointsModule.h" // for export macro
+#include "vtkVector.h"                      // for vtkVector
+
+class vtkBoundingBox;
 
 class VTKPVVTKEXTENSIONSPOINTS_EXPORT vtkBoundedVolumeSource : public vtkImageAlgorithm
 {
@@ -80,6 +83,26 @@ public:
   vtkGetMacro(CellSize, double);
   //@}
 
+  //@{
+  /**
+   * Specify the padding to use along each of the directions. This is used to
+   * inflate the bounds by a fixed factor in all directions.
+   */
+  vtkSetClampMacro(Padding, double, 0, VTK_DOUBLE_MAX);
+  vtkGetMacro(Padding, double);
+  //@}
+
+  //@{
+  /**
+   * Convenience methods that setup a image extents, origin and spacing given
+   * the bounding box, and either the target image resolution or unit cell size.
+   */
+  static bool SetImageParameters(
+    vtkImageData* image, const vtkBoundingBox& bbox, const vtkVector3i& resolution);
+  static bool SetImageParameters(
+    vtkImageData* image, const vtkBoundingBox& bbox, const double cellSize);
+  //@}
+
 protected:
   vtkBoundedVolumeSource();
   ~vtkBoundedVolumeSource() override;
@@ -93,6 +116,7 @@ protected:
   int RefinementMode;
   int Resolution[3];
   double CellSize;
+  double Padding;
 
 private:
   vtkBoundedVolumeSource(const vtkBoundedVolumeSource&) = delete;
