@@ -37,6 +37,7 @@
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkStringList.h"
+#include "vtksys/SystemTools.hxx"
 
 #include <cmath>
 #include <set>
@@ -799,7 +800,8 @@ bool vtkSMPVRepresentationProxy::SetRepresentationType(const char* type)
       throw CALL_SUPERCLASS;
     }
 
-    if (strcmp(type, "Volume") != 0 && strcmp(type, "Slice") != 0)
+    if (strcmp(type, "Volume") != 0 && strcmp(type, "Slice") != 0 &&
+      vtksys::SystemTools::Strucmp(type, "nvidia index") != 0)
     {
       throw CALL_SUPERCLASS;
     }
