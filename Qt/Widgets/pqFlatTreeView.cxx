@@ -2372,18 +2372,6 @@ void pqFlatTreeView::mouseDoubleClickEvent(QMouseEvent* e)
   }
 }
 
-void pqFlatTreeView::wheelEvent(QWheelEvent* e)
-{
-  if (this->verticalScrollBar()->isVisible())
-  {
-    QApplication::sendEvent(this->verticalScrollBar(), e);
-  }
-  else
-  {
-    e->ignore();
-  }
-}
-
 // Handle proxy with "tooltip" annotation so they can display their custom
 // tooltip information instead of the default behaviour.
 bool pqFlatTreeView::event(QEvent* e)
