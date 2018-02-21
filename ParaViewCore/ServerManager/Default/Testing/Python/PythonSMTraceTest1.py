@@ -6,7 +6,7 @@
 #  An octree fractal source is created, dimension set to 3, contour filter is
 #  applied, then the active source is changed back to the fractal source and
 #  an extract cells by region filter is applied.  The clip plane of the extract
-#  filter is adjusted, the camera is adjusted, a colormap is applied, and a 
+#  filter is adjusted, the camera is adjusted, a colormap is applied, and a
 #  scalar bar widget is added to the scene and its position is adjusted.
 #
 
@@ -99,6 +99,8 @@ clip = [x for x in GetSources().values() if x.GetXMLLabel() == "Clip"]
 if not clip:
     print("After replaying trace, could not find Clip filter.")
     sys.exit(1)
+
+clip[0].InsideOut = 0
 
 # Do a screenshot regression test
 if not smtesting.DoRegressionTesting(ren.SMProxy):
