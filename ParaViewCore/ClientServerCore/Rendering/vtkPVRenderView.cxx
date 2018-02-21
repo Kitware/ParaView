@@ -1677,6 +1677,48 @@ void vtkPVRenderView::MarkAsRedistributable(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetRedistributionMode(
+  vtkInformation* info, vtkPVDataRepresentation* repr, int mode, int port)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+  {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+  }
+
+  view->GetDeliveryManager()->SetRedistributionMode(repr, mode, port);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetRedistributionModeToSplitBoundaryCells(
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+  {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+  }
+
+  view->GetDeliveryManager()->SetRedistributionModeToSplitBoundaryCells(repr, port);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetRedistributionModeToDuplicateBoundaryCells(
+  vtkInformation* info, vtkPVDataRepresentation* repr, int port)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+  {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+  }
+
+  view->GetDeliveryManager()->SetRedistributionModeToDuplicateBoundaryCells(repr, port);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetStreamable(vtkInformation* info, vtkPVDataRepresentation* repr, bool val)
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));

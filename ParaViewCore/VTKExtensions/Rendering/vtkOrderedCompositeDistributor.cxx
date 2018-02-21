@@ -63,6 +63,7 @@ vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, Controller, vtkMultiProcess
 //-----------------------------------------------------------------------------
 vtkOrderedCompositeDistributor::vtkOrderedCompositeDistributor()
 {
+  this->BoundaryMode = SPLIT_BOUNDARY_CELLS;
   this->PKdTree = NULL;
   this->Controller = NULL;
   this->PassThrough = false;
@@ -82,6 +83,7 @@ vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
 void vtkOrderedCompositeDistributor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "BoundaryMode: " << this->BoundaryMode << endl;
   os << indent << "PKdTree: " << this->PKdTree << endl;
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "PassThrough: " << this->PassThrough << endl;
@@ -200,8 +202,18 @@ int vtkOrderedCompositeDistributor::RequestData(vtkInformation* vtkNotUsed(reque
   cbc->SetClientData(this);
   cbc->SetCallback(D3UpdateProgress);
   d3->AddObserver(vtkCommand::ProgressEvent, cbc.GetPointer());
-
-  d3->SetBoundaryModeToSplitBoundaryCells();
+  switch (this->BoundaryMode)
+  {
+    case SPLIT_BOUNDARY_CELLS:
+      d3->SetBoundaryModeToSplitBoundaryCells();
+      break;
+    case ASSIGN_TO_ONE_REGION:
+      d3->SetBoundaryModeToAssignToOneRegion();
+      break;
+    case ASSIGN_TO_ALL_INTERSECTING_REGIONS:
+      d3->SetBoundaryModeToAssignToAllIntersectingRegions();
+      break;
+  }
   d3->SetInputData(input);
   d3->SetCuts(cuts);
 
