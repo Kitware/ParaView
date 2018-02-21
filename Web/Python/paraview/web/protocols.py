@@ -188,6 +188,7 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
         RPC Callback for mouse interactions.
         """
         view = self.getView(event['view'])
+        realViewId = view.GetGlobalIDAsString()
 
         if hasattr(view, 'UseInteractiveRenderingForScreenshots'):
             if event["action"] == 'down':
@@ -222,8 +223,14 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
         retVal = self.getApplication().HandleInteractionEvent(view.SMProxy, pvevent)
         del pvevent
 
+        if event["action"] == 'down':
+            self.getApplication().InvokeEvent('StartInteractionEvent')
+
+        if event["action"] == 'up':
+            self.getApplication().InvokeEvent('EndInteractionEvent')
+
         if retVal:
-            self.getApplication().InvokeEvent('PushRender')
+            self.getApplication().InvokeEvent('UpdateEvent')
 
         return retVal
 
@@ -256,7 +263,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
             pass
 
         self.getApplication().InvalidateCache(view.SMProxy)
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return view.GetGlobalIDAsString()
 
@@ -270,7 +277,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         view.OrientationAxesVisibility = (showAxis if 1 else 0);
 
         self.getApplication().InvalidateCache(view.SMProxy)
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return view.GetGlobalIDAsString()
 
@@ -284,7 +291,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         view.CenterAxesVisibility = (showAxis if 1 else 0);
 
         self.getApplication().InvalidateCache(view.SMProxy)
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return view.GetGlobalIDAsString()
 
@@ -297,7 +304,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
         view.CameraViewUp = view_up
         view.CameraPosition = position
         self.getApplication().InvalidateCache(view.SMProxy)
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
     @exportRpc("viewport.camera.get")
     def getCamera(self, view_id):
@@ -322,7 +329,7 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
             w *= s
             h *= s
         view.ViewSize = [ int(w), int(h) ]
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
 # =============================================================================
 #
@@ -389,12 +396,128 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
 #
 # =============================================================================
 
-class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebPublishImageDelivery):
+class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
     def __init__(self, decode=True):
-        # multiple inheritance - ParaViewWebProtocol methods take priority, i.e. stillRender()
-        # PVW init called second so Application is initialized properly.
-        vtk_protocols.vtkWebPublishImageDelivery.__init__(self, decode)
         ParaViewWebProtocol.__init__(self)
+        self.trackingViews = {}
+        self.lastStaleTime = 0
+        self.staleHandlerCount = 0
+        self.deltaStaleTimeBeforeRender = 0.5 # 0.5s
+        self.decode = decode
+        self.viewsInAnimations = []
+        self.targetFrameRate = 30.0
+        self.minFrameRate = 12.0
+        self.maxFrameRate = 30.0
+
+
+    def pushRender(self, vId, ignoreAnimation = False):
+        if vId not in self.trackingViews:
+            return
+
+        if not self.trackingViews[vId]["enabled"]:
+            return
+
+        if not ignoreAnimation and len(self.viewsInAnimations) > 0:
+            return
+
+        if "originalSize" not in self.trackingViews[vId]:
+            view = self.getView(vId)
+            self.trackingViews[vId]["originalSize"] = list(view.ViewSize);
+
+        if "ratio" not in self.trackingViews[vId]:
+            self.trackingViews[vId]["ratio"] = 1
+
+        ratio = self.trackingViews[vId]["ratio"]
+        mtime = self.trackingViews[vId]["mtime"]
+        quality = self.trackingViews[vId]["quality"]
+        size = [int(s * ratio) for s in self.trackingViews[vId]["originalSize"]]
+
+        reply = self.stillRender({ "view": vId, "mtime": mtime, "quality": quality, "size": size })
+        stale = reply["stale"]
+        if reply["image"]:
+            # depending on whether the app has encoding enabled:
+            if self.decode:
+                reply["image"] = base64.standard_b64decode(reply["image"]);
+
+            reply["image"] = self.addAttachment(reply["image"]);
+            reply["format"] = "jpeg"
+            # save mtime for next call.
+            self.trackingViews[vId]["mtime"] = reply["mtime"]
+            # echo back real ID, instead of -1 for 'active'
+            reply["id"] = vId
+            self.publish('viewport.image.push.subscription', reply)
+        if stale:
+            self.lastStaleTime = time.time()
+            if self.staleHandlerCount == 0:
+                self.staleHandlerCount += 1
+                reactor.callLater(self.deltaStaleTimeBeforeRender, lambda: self.renderStaleImage(vId))
+        else:
+            self.lastStaleTime = 0
+
+    def renderStaleImage(self, vId):
+        self.staleHandlerCount -= 1
+
+        if self.lastStaleTime != 0:
+            delta = (time.time() - self.lastStaleTime)
+            if delta >= self.deltaStaleTimeBeforeRender:
+                self.pushRender(vId)
+            else:
+                self.staleHandlerCount += 1
+                reactor.callLater(self.deltaStaleTimeBeforeRender - delta + 0.001, lambda: self.renderStaleImage(vId))
+
+
+    def animate(self):
+        if len(self.viewsInAnimations) == 0:
+            return
+
+        nextAnimateTime = time.time() + 1.0 /  self.targetFrameRate
+        for vId in self.viewsInAnimations:
+            self.pushRender(vId, True)
+
+        nextAnimateTime -= time.time()
+
+        if self.targetFrameRate > self.maxFrameRate:
+            self.targetFrameRate = self.maxFrameRate
+
+        if nextAnimateTime < 0:
+            if self.targetFrameRate > self.minFrameRate:
+                self.targetFrameRate -= 1.0
+            reactor.callLater(0.001, lambda: self.animate())
+        else:
+            if self.targetFrameRate < self.maxFrameRate and nextAnimateTime > 0.005:
+                self.targetFrameRate += 1.0
+            reactor.callLater(nextAnimateTime, lambda: self.animate())
+
+
+    @exportRpc("viewport.image.animation.fps.max")
+    def setMaxFrameRate(self, fps = 30):
+        self.maxFrameRate = fps
+
+
+    @exportRpc("viewport.image.animation.fps.get")
+    def getCurrentFrameRate(self):
+        return self.targetFrameRate
+
+
+    @exportRpc("viewport.image.animation.start")
+    def startViewAnimation(self, viewId = '-1'):
+        sView = self.getView(viewId)
+        realViewId = sView.GetGlobalIDAsString()
+
+        if realViewId not in self.viewsInAnimations:
+            self.viewsInAnimations.append(realViewId)
+            if len(self.viewsInAnimations) == 1:
+                self.animate()
+
+
+    @exportRpc("viewport.image.animation.stop")
+    def stopViewAnimation(self, viewId = '-1'):
+        sView = self.getView(viewId)
+        realViewId = sView.GetGlobalIDAsString()
+
+        if realViewId in self.viewsInAnimations:
+            self.viewsInAnimations.remove(realViewId)
+
 
     @exportRpc("viewport.image.push")
     def stillRender(self, options):
@@ -419,6 +542,8 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebP
             localTime = options["localTime"]
         reply = {}
         app = self.getApplication()
+        if t == 0:
+            app.InvalidateCache(view.SMProxy)
         if self.decode:
             stillRender = app.StillRenderToString
         else:
@@ -455,6 +580,133 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol, vtk_protocols.vtkWebP
         reply["workTime"] = (endTime - beginTime)
 
         return reply
+
+
+    @exportRpc("viewport.image.push.observer.add")
+    def addRenderObserver(self, viewId):
+        sView = self.getView(viewId)
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        realViewId = sView.GetGlobalIDAsString()
+
+        if not realViewId in self.trackingViews:
+            observerCallback = lambda *args, **kwargs: self.pushRender(realViewId)
+            startCallback = lambda *args, **kwargs: self.startViewAnimation()
+            stopCallback = lambda *args, **kwargs: self.stopViewAnimation()
+            tag = self.getApplication().AddObserver('UpdateEvent', observerCallback)
+            tagStart = self.getApplication().AddObserver('StartInteractionEvent', startCallback)
+            tagStop = self.getApplication().AddObserver('EndInteractionEvent', stopCallback)
+            # TODO do we need self.getApplication().AddObserver('ResetActiveView', resetActiveView())
+            self.trackingViews[realViewId] = { 'tags': [tag, tagStart, tagStop], 'observerCount': 1, 'mtime': 0, 'enabled': True, 'quality': 100 }
+        else:
+            # There is an observer on this view already
+            self.trackingViews[realViewId]['observerCount'] += 1
+
+        self.publish('viewport.image.push.subscription', self.pushRender(realViewId))
+        return { 'success': True, 'viewId': realViewId }
+
+
+    @exportRpc("viewport.image.push.observer.remove")
+    def removeRenderObserver(self, viewId):
+        sView = self.getView(viewId)
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        realViewId = sView.GetGlobalIDAsString()
+
+        observerInfo = None
+        if realViewId in self.trackingViews:
+            observerInfo = self.trackingViews[realViewId]
+
+        if not observerInfo:
+            return { 'error': 'Unable to find subscription for view %s' % realViewId }
+
+        observerInfo['observerCount'] -= 1
+
+        if observerInfo['observerCount'] <= 0:
+            for tag in observerInfo['tags']:
+                self.getApplication().RemoveObserver(tag)
+            del self.trackingViews[realViewId]
+
+        return { 'result': 'success' }
+
+
+    @exportRpc("viewport.image.push.quality")
+    def setViewQuality(self, viewId, quality, ratio = 1):
+        sView = self.getView(viewId)
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        realViewId = sView.GetGlobalIDAsString()
+        observerInfo = None
+        if realViewId in self.trackingViews:
+            observerInfo = self.trackingViews[realViewId]
+
+        if not observerInfo:
+            return { 'error': 'Unable to find subscription for view %s' % realViewId }
+
+        observerInfo['quality'] = quality
+        observerInfo['ratio'] = ratio
+
+        # Update image size right now!
+        if "originalSize" in self.trackingViews[viewId]:
+            size = [int(s * ratio) for s in self.trackingViews[viewId]["originalSize"]]
+            if 'SetSize' in sView:
+                sView.SetSize(size)
+            else:
+                sView.ViewSize = size
+
+        return { 'result': 'success' }
+
+
+    @exportRpc("viewport.image.push.original.size")
+    def setViewSize(self, viewId, width, height):
+        sView = self.getView(viewId)
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        realViewId = sView.GetGlobalIDAsString()
+        observerInfo = None
+        if realViewId in self.trackingViews:
+            observerInfo = self.trackingViews[realViewId]
+
+        if not observerInfo:
+            return { 'error': 'Unable to find subscription for view %s' % realViewId }
+
+        observerInfo['originalSize'] = [width, height]
+
+        return { 'result': 'success' }
+
+
+    @exportRpc("viewport.image.push.enabled")
+    def enableView(self, viewId, enabled):
+        sView = self.getView(viewId)
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        realViewId = sView.GetGlobalIDAsString()
+        observerInfo = None
+        if realViewId in self.trackingViews:
+            observerInfo = self.trackingViews[realViewId]
+
+        if not observerInfo:
+            return { 'error': 'Unable to find subscription for view %s' % realViewId }
+
+        observerInfo['enabled'] = enabled
+
+        return { 'result': 'success' }
+
+
+    @exportRpc("viewport.image.push.invalidate.cache")
+    def invalidateCache(self, viewId):
+        sView = self.getView(viewId)
+        if not sView:
+            return { 'error': 'Unable to get view with id %s' % viewId }
+
+        self.getApplication().InvalidateCache(sView.SMProxy)
+        self.getApplication().InvokeEvent('UpdateEvent')
+        return { 'result': 'success' }
 
 
 # =============================================================================
@@ -595,8 +847,8 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
 
         if not realViewId in self.trackingViews:
             observerCallback = lambda *args, **kwargs: self.publish('viewport.geometry.view.subscription', pushGeometry())
-            tag = self.getApplication().AddObserver('PushRender', observerCallback)
-            self.trackingViews[realViewId] = { 'tag': tag, 'observerCount': 1 }
+            tag = self.getApplication().AddObserver('UpdateEvent', observerCallback)
+            self.trackingViews[realViewId] = { 'tags': [tag], 'observerCount': 1 }
         else:
             # There is an observer on this view already
             self.trackingViews[realViewId]['observerCount'] += 1
@@ -623,7 +875,8 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
         observerInfo['observerCount'] -= 1
 
         if observerInfo['observerCount'] <= 0:
-            self.getApplication().RemoveObserver(observerInfo['tag'])
+            for tag in observerInfo['tags']:
+                self.getApplication().RemoveObserver(tag)
             del self.trackingViews[realViewId]
 
         return { 'result': 'success' }
@@ -700,7 +953,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         timestep = list(animationScene.TimeKeeper.TimestepValues).index(animationScene.TimeKeeper.Time)
         self.publish("pv.time.change", { 'time': float(view.ViewTime), 'timeStep': timestep } )
 
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return view.ViewTime
 
@@ -709,7 +962,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         anim = simple.GetAnimationScene()
         anim.TimeKeeper.Time = anim.TimeKeeper.TimestepValues[timeIdx]
 
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return anim.TimeKeeper.Time
 
@@ -728,7 +981,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         try:
             step = list(anim.TimeKeeper.TimestepValues).index(t)
             anim.TimeKeeper.Time = anim.TimeKeeper.TimestepValues[step]
-            self.getApplication().InvokeEvent('PushRender')
+            self.getApplication().InvokeEvent('UpdateEvent')
         except:
             print ('Try to update time with', t, 'but value not found in the list')
 
@@ -807,7 +1060,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
 
         # Render to get scalar bars in correct position when doing local rendering (webgl)
         simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return visibilities
 
@@ -853,7 +1106,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             currentRange = self.getCurrentScalarRange(proxyId)
             status['range'] = currentRange
 
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return status
 
@@ -895,7 +1148,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         self.updateScalarBars()
 
         simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
     # RpcName: setOpacityFunctionPoints => pv.color.manager.opacity.points.set
     @exportRpc("pv.color.manager.opacity.points.set")
@@ -920,7 +1173,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         lutProxy.EnableOpacityMapping = enableOpacityMapping
 
         simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
     # RpcName: getOpacityFunctionPoints => pv.color.manager.opacity.points.get
     @exportRpc("pv.color.manager.opacity.points.get")
@@ -1091,7 +1344,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
             lutProxy.InterpretValuesAsCategories = 1
 
         simple.Render();
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
     # RpcName: getLutImage => pv.color.manager.lut.image.get
     @exportRpc("pv.color.manager.lut.image.get")
@@ -1179,7 +1432,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         lutProxy.EnableOpacityMapping = enabled
 
         simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
     # RpcName: getSurfaceOpacity => pv.color.manager.surface.opacity.get
     @exportRpc("pv.color.manager.surface.opacity.get")
@@ -1197,7 +1450,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         lutProxy.EnableOpacityMapping = enabled
 
         simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
     # RpcName: getSurfaceOpacityByArray => pv.color.manager.surface.opacity.by.array.get
     @exportRpc("pv.color.manager.surface.opacity.by.array.get")
@@ -1217,7 +1470,7 @@ class ParaViewWebColorManager(ParaViewWebProtocol):
         if lutProxy is not None:
             lutProxy.ApplyPreset(paletteName, True)
             simple.Render()
-            self.getApplication().InvokeEvent('PushRender')
+            self.getApplication().InvokeEvent('UpdateEvent')
             return { 'result': 'success' }
         else:
             return { 'result': 'Representation proxy ' + representation + ' is missing lookup table' }
@@ -2194,7 +2447,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # To make WebGL export work
         simple.Show()
         simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         try:
             self.applyDomains(parentProxy, newProxy.GetGlobalIDAsString())
@@ -2235,7 +2488,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             simple.SetActiveView(newView)
             if self.getApplication():
                 self.getApplication().InvokeEvent('ResetActiveView')
-                self.getApplication().InvokeEvent('PushRender')
+                self.getApplication().InvokeEvent('UpdateEvent')
 
             return { 'success': True, 'view': newView.GetGlobalIDAsString() }
 
@@ -2271,7 +2524,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         simple.Render()
         simple.ResetCamera()
         if self.getApplication():
-            self.getApplication().InvokeEvent('PushRender')
+            self.getApplication().InvokeEvent('UpdateEvent')
 
         return { 'success': True, 'id': reader.GetGlobalIDAsString() }
 
@@ -2341,7 +2594,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             return { 'success': False,
                      'errorList': failureList }
 
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return { 'success': True }
 
@@ -2363,10 +2616,10 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         if proxy is not None and canDelete is True:
             simple.Delete(proxy)
             self.updateScalarBars()
-            self.getApplication().InvokeEvent('PushRender')
+            self.getApplication().InvokeEvent('UpdateEvent')
             return { 'success': 1, 'id': pid }
 
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
         return { 'success': 0, 'id': '0' }
 
     @exportRpc("pv.proxy.manager.list")
@@ -2664,7 +2917,7 @@ class ParaViewWebStateLoader(ParaViewWebProtocol):
         for view in simple.GetRenderViews():
             ids.append(view.GetGlobalIDAsString())
 
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
         return ids
 
@@ -2844,7 +3097,7 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
                     extract = simple.ExtractSelection(Input=rep.Input, Selection=selection)
                     simple.Show(extract)
                     simple.Render()
-                    self.getApplication().InvokeEvent('PushRender')
+                    self.getApplication().InvokeEvent('UpdateEvent')
                 else:
                     rep.Input.SMProxy.SetSelectionInput(0, selection.SMProxy, 0)
 
@@ -2890,7 +3143,7 @@ class ParaViewWebTestProtocols(ParaViewWebProtocol):
         view = simple.GetRenderView()
         simple.SetActiveView(view)
         simple.Render()
-        self.getApplication().InvokeEvent('PushRender')
+        self.getApplication().InvokeEvent('UpdateEvent')
 
     # RpcName: getColoringInfo => pv.test.color.info.get
     @exportRpc("pv.test.color.info.get")
