@@ -68,8 +68,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonShell.h"
 #endif
 
+#include <QAbstractSpinBox>
+#include <QApplication>
+#include <QComboBox>
 #include <QMainWindow>
 #include <QShortcut>
+#include <QSlider>
+
+namespace
+{
+class WheelFilter : public QObject
+{
+public:
+  WheelFilter(QObject* obj)
+    : QObject(obj)
+  {
+  }
+  ~WheelFilter() {}
+  bool eventFilter(QObject* obj, QEvent* evt) override
+  {
+    Q_ASSERT(obj && evt);
+    if (obj->isWidgetType()) // shortcut to avoid doing work when not a widget.
+    {
+      QWidget* wdg = reinterpret_cast<QWidget*>(obj);
+      if (evt->type() == QEvent::Wheel)
+      {
+        if (qobject_cast<QComboBox*>(obj) != nullptr || qobject_cast<QSlider*>(obj) != nullptr ||
+          qobject_cast<QAbstractSpinBox*>(obj) != nullptr)
+        {
+          if (!wdg->hasFocus())
+          {
+            return true;
+          }
+        }
+      }
+      else if (evt->type() == QEvent::Show)
+      {
+        // we need to change focus policy to StrongFocus so that these widgets
+        // don't get focus and subsequently, wheel events on mouse-wheel
+        // unless the widget has focus. To avoid having to go through all
+        // instances of combo-box & slider creations to change focus policy,
+        // we use an event filter to do that.
+        if (wdg->focusPolicy() == Qt::WheelFocus)
+        {
+          if (qobject_cast<QComboBox*>(obj) != nullptr || qobject_cast<QSlider*>(obj) != nullptr ||
+            qobject_cast<QAbstractSpinBox*>(obj) != nullptr)
+          {
+            wdg->setFocusPolicy(Qt::StrongFocus);
+          }
+        }
+      }
+    }
+    return QObject::eventFilter(obj, evt);
+  }
+};
+}
 
 #define PQ_BEHAVIOR_DEFINE_FLAG(_name, _default) bool pqParaViewBehaviors::_name = _default;
 PQ_BEHAVIOR_DEFINE_FLAG(StandardPropertyWidgets, true);
@@ -97,7 +150,7 @@ PQ_BEHAVIOR_DEFINE_FLAG(ApplyBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(QuickLaunchShortcuts, true);
 PQ_BEHAVIOR_DEFINE_FLAG(LockPanelsBehavior, true);
 PQ_BEHAVIOR_DEFINE_FLAG(PythonShellResetBehavior, true);
-
+PQ_BEHAVIOR_DEFINE_FLAG(WheelNeedsFocusBehavior, true);
 #undef PQ_BEHAVIOR_DEFINE_FLAG
 
 #define PQ_IS_BEHAVIOR_ENABLED(_name) enable##_name()
@@ -264,6 +317,11 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
   }
 #endif
 
+  if (PQ_IS_BEHAVIOR_ENABLED(WheelNeedsFocusBehavior))
+  {
+    auto afilter = new WheelFilter(mainWindow);
+    qApp->installEventFilter(afilter);
+  }
   CLEAR_UNDO_STACK();
 }
 
