@@ -169,6 +169,7 @@
   <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
   <Proxy group="filters" name="DataSetTriangleFilter" />
   <Proxy group="filters" name="DecimatePro" />
+  <Proxy group="filters" name="DecimatePolyline" />
   <Proxy group="filters" name="Delaunay2D" />
   <Proxy group="filters" name="Delaunay3D" />
   <Proxy group="filters" name="ElevationFilter" />
