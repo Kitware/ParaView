@@ -312,7 +312,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     // FIXME: This needs to be automated, we want the model to automatically
     // fetch the SIL when the domain is updated.
-    silModel->update(silDomain->GetSIL());
+    silModel->setSILDomain(silDomain);
+    silModel->update();
     tree->setModel(silModel);
 
     this->addPropertyLink(tree->activeModel(), "values", SIGNAL(valuesChanged()), smProperty);

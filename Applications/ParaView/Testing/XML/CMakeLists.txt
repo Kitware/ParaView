@@ -319,9 +319,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSight.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSightTensorInversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSightTensorInversionBin.xml
-  # Disable ExodusXML.xml test until issue with
-  # vtkExodusIIReader::SetXMLFileName() is resolved.
-  #${CMAKE_CURRENT_SOURCE_DIR}/ExodusXML.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ExodusXML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportLinePlotToCSV.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportLinePlotToTSV.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportSceneSpreadSheetView2.xml
