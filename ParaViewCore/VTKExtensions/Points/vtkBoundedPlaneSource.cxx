@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkBoundedPlaneSource.h"
 
+#include "vtkBoundedVolumeSource.h"
 #include "vtkBoundingBox.h"
 #include "vtkFlyingEdgesPlaneCutter.h"
 #include "vtkImageData.h"
@@ -22,7 +23,6 @@
 #include "vtkPlane.h"
 #include "vtkPolyData.h"
 #include "vtkVector.h"
-#include "vtkVectorOperators.h"
 
 vtkStandardNewMacro(vtkBoundedPlaneSource);
 //----------------------------------------------------------------------------
@@ -37,6 +37,7 @@ vtkBoundedPlaneSource::vtkBoundedPlaneSource()
   this->Resolution = 100;
   this->RefinementMode = USE_RESOLUTION;
   this->CellSize = 1.0;
+  this->Padding = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -51,6 +52,7 @@ int vtkBoundedPlaneSource::RequestData(
   vtkPolyData* output = vtkPolyData::GetData(outputVector, 0);
 
   vtkBoundingBox bbox(this->BoundingBox);
+  bbox.Inflate(this->Padding);
   if (!bbox.IsValid())
   {
     vtkErrorMacro("Invalid bounding box specified. Please choose a valid BoundingBox.");
@@ -61,45 +63,19 @@ int vtkBoundedPlaneSource::RequestData(
 
   if (this->RefinementMode == USE_RESOLUTION)
   {
-    image->SetExtent(0, this->Resolution, 0, this->Resolution, 0, this->Resolution);
-
-    vtkVector3d lengths;
-    bbox.GetLengths(lengths.GetData());
-
-    vtkVector3d origin;
-    bbox.GetMinPoint(origin[0], origin[1], origin[2]);
-    image->SetOrigin(origin.GetData());
-
-    vtkVector3d spacing = lengths / vtkVector3d(static_cast<double>(this->Resolution));
-    image->SetSpacing(spacing.GetData());
+    if (!vtkBoundedVolumeSource::SetImageParameters(image, bbox, vtkVector3i(this->Resolution)))
+    {
+      vtkErrorMacro("Failed to determine image parameters.");
+      return 0;
+    }
   }
   else
   {
-    if (this->CellSize <= 0)
+    if (!vtkBoundedVolumeSource::SetImageParameters(image, bbox, this->CellSize))
     {
-      vtkErrorMacro("CellSize must be > 0.0");
+      vtkErrorMacro("Failed to determine image parameters.");
       return 0;
     }
-
-    vtkVector3d lengths;
-    bbox.GetLengths(lengths.GetData());
-
-    vtkVector3i resolution;
-    resolution[0] = static_cast<int>(std::ceil(lengths[0] / this->CellSize));
-    resolution[1] = static_cast<int>(std::ceil(lengths[1] / this->CellSize));
-    resolution[2] = static_cast<int>(std::ceil(lengths[2] / this->CellSize));
-    assert(resolution[0] > 0 && resolution[1] > 0 && resolution[2] > 0);
-
-    image->SetExtent(0, resolution[0], 0, resolution[1], 0, resolution[2]);
-
-    // since old bounds may not exactly match, we compute new bounds keeping the
-    // center same.
-    vtkVector3d center;
-    bbox.GetCenter(center.GetData());
-
-    vtkVector3d origin = center - (lengths / vtkVector3d(2.0));
-    image->SetOrigin(origin.GetData());
-    image->SetSpacing(this->CellSize, this->CellSize, this->CellSize);
   }
 
   // AllocateScalars, alas, is needed since vtkFlyingEdgesPlaneCutter cannot work without
@@ -134,4 +110,5 @@ void vtkBoundedPlaneSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RefinementMode: " << this->RefinementMode << endl;
   os << indent << "Resolution: " << this->Resolution << endl;
   os << indent << "CellSize: " << this->CellSize << endl;
+  os << indent << "Padding: " << this->Padding << endl;
 }
