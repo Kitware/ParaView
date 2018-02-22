@@ -25,6 +25,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLCamera.h"
 #include "vtkOpenGLError.h"
+#include "vtkOpenGLRenderUtilities.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkPartitionOrderingInterface.h"
 #include "vtkPixelBufferObject.h"
@@ -439,6 +440,7 @@ void vtkIceTCompositePass::CleanupContext(const vtkRenderState*)
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
 {
+  vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass::Render Start");
   this->IceTContext->SetController(this->Controller);
   if (!this->IceTContext->IsValid())
   {
@@ -465,7 +467,10 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   glGetIntegerv(GL_VIEWPORT, physical_viewport);
   icetPhysicalRenderSize(physical_viewport[2], physical_viewport[3]);
 
+  vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: icetDrawFrame Start");
   IceTImage renderedImage = icetDrawFrame(vcdc->Element[0], wcvc->Element[0], background);
+  vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: icetDrawFrame End");
+
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
 
@@ -487,6 +492,7 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   vtkIdType numPixels = icetImageGetNumPixels(renderedImage);
   if (icetImageGetColorFormat(renderedImage) != ICET_IMAGE_COLOR_NONE)
   {
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: RGBA Grab Start");
     switch (format)
     {
       case ICET_IMAGE_COLOR_RGBA_FLOAT:
@@ -509,18 +515,22 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
         this->LastRenderedRGBA32F->SetNumberOfTuples(0);
         break;
     }
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: RGBA Grab End");
   }
   else
   {
     this->LastRenderedRGBAColors->MarkInValid();
     this->LastRenderedRGBA32F->SetNumberOfTuples(0);
   }
+
   if (icetImageGetDepthFormat(renderedImage) != ICET_IMAGE_DEPTH_NONE)
   {
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: Depth Grab Start");
     this->LastRenderedDepths->SetNumberOfComponents(1);
     this->LastRenderedDepths->SetNumberOfTuples(numPixels);
     icetImageCopyDepthf(
       renderedImage, this->LastRenderedDepths->GetPointer(0), ICET_IMAGE_DEPTH_FLOAT);
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: Depth Grab End");
   }
   else
   {
@@ -554,6 +564,8 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   vtkTimerLog::InsertTimedEvent("ICET_BUFFER_READ_TIME", val, 0);
   icetGetDoublev(ICET_BUFFER_WRITE_TIME, &val);
   vtkTimerLog::InsertTimedEvent("ICET_BUFFER_WRITE_TIME", val, 0);
+
+  vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass::Render End");
 }
 
 // ----------------------------------------------------------------------------
@@ -902,6 +914,8 @@ vtkFloatArray* vtkIceTCompositePass::GetLastRenderedRGBA32F()
 void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* render_state)
 {
   vtkOpenGLClearErrorMacro();
+  vtkOpenGLRenderUtilities::MarkDebugEvent(
+    "Start vtkIceTCompositePass::PushIceTDepthBufferToScreen");
 
   // OpenGL code to copy it back
   // merly the code from vtkCompositeZPass
@@ -1007,11 +1021,14 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
   glColorMask(prevColorMask[0], prevColorMask[1], prevColorMask[2], prevColorMask[3]);
 
   vtkOpenGLCheckErrorMacro("failed after PushIceTDepthBufferToScreen");
+  vtkOpenGLRenderUtilities::MarkDebugEvent("End vtkIceTCompositePass::PushIceTDepthBufferToScreen");
 }
 
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::PushIceTColorBufferToScreen(const vtkRenderState* render_state)
 {
+  vtkOpenGLRenderUtilities::MarkDebugEvent(
+    "Start vtkIceTCompositePass::PushIceTColorBufferToScreen");
   vtkOpenGLClearErrorMacro();
 
   // get the dimension of the buffer
@@ -1113,6 +1130,7 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(const vtkRenderState* ren
   glPopAttrib();
 
   vtkOpenGLCheckErrorMacro("failed after PushIceTColorBufferToScreen");
+  vtkOpenGLRenderUtilities::MarkDebugEvent("End vtkIceTCompositePass::PushIceTColorBufferToScreen");
 }
 
 //----------------------------------------------------------------------------
