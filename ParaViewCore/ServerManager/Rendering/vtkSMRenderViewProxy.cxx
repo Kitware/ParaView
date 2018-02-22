@@ -196,7 +196,7 @@ void vtkSMRenderViewProxy::UpdateLOD()
 bool vtkSMRenderViewProxy::GetNeedsUpdate()
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  if (view->GetUseInteractiveRenderingForScreenshots())
+  if (view->GetUseInteractiveRenderingForScreenshots() && view->GetUseLODForInteractiveRender())
   {
     return this->NeedsUpdateLOD;
   }
