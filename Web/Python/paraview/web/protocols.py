@@ -650,8 +650,8 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         observerInfo['ratio'] = ratio
 
         # Update image size right now!
-        if "originalSize" in self.trackingViews[viewId]:
-            size = [int(s * ratio) for s in self.trackingViews[viewId]["originalSize"]]
+        if "originalSize" in self.trackingViews[realViewId]:
+            size = [int(s * ratio) for s in self.trackingViews[realViewId]["originalSize"]]
             if 'SetSize' in sView:
                 sView.SetSize(size)
             else:
