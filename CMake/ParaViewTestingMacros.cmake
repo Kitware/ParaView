@@ -99,7 +99,7 @@ function (paraview_test_load_data_dirs name)
   set(data)
   foreach (datafile IN LISTS ARGN)
     list(APPEND data
-      "DATA{${PARAVIEW_TEST_DATA_DIR}/${datafile}/,REGEX:.*}")
+      "DATA{${PARAVIEW_TEST_DATA_DIR}/${datafile}/,RECURSE:,REGEX:.*}")
   endforeach ()
   _paraview_test_load_data(${data})
 endfunction ()

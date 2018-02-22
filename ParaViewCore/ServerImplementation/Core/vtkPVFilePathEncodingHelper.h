@@ -80,6 +80,11 @@ public:
   bool RenameDirectory();
 
   /**
+   * Check is directory named Path exists.
+   */
+  bool IsDirectory();
+
+  /**
    * Returns if this->Path is a readable file.
    */
   bool GetActiveFileIsReadable();

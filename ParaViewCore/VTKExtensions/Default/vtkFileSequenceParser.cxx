@@ -45,7 +45,7 @@ vtkFileSequenceParser::vtkFileSequenceParser()
   ,
   // fallback: any sequence with a number in the middle (taking the last number
   // if multiple exist).
-  reg_ex_last(new vtksys::RegularExpression("^(.*[^0-9])([0-9]+)([^0-9]+)$"))
+  reg_ex_last(new vtksys::RegularExpression("^(.*[^0-9])([0-9]+)([^0-9]*)$"))
   , SequenceIndex(-1)
   , SequenceName(NULL)
 {

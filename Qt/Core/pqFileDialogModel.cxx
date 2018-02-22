@@ -422,14 +422,16 @@ public:
           static_cast<vtkPVFileInformation::FileTypes>(info->GetType()), info->GetHidden(),
           info->GetExtension(), info->GetSize(), info->GetModificationTime()));
       }
-      else if (info->GetType() != vtkPVFileInformation::FILE_GROUP)
+      else if (info->GetType() != vtkPVFileInformation::FILE_GROUP &&
+        info->GetType() != vtkPVFileInformation::DIRECTORY_GROUP)
       {
         files.push_back(pqFileDialogModelFileInfo(QString::fromUtf8(info->GetName()),
           QString::fromUtf8(info->GetFullPath()),
           static_cast<vtkPVFileInformation::FileTypes>(info->GetType()), info->GetHidden(),
           info->GetExtension(), info->GetSize(), info->GetModificationTime()));
       }
-      else if (info->GetType() == vtkPVFileInformation::FILE_GROUP)
+      else if (info->GetType() == vtkPVFileInformation::FILE_GROUP ||
+        info->GetType() == vtkPVFileInformation::DIRECTORY_GROUP)
       {
         QList<pqFileDialogModelFileInfo> groupFiles;
         vtkSmartPointer<vtkCollectionIterator> childIter;
@@ -444,9 +446,14 @@ public:
             static_cast<vtkPVFileInformation::FileTypes>(child->GetType()), child->GetHidden(),
             child->GetExtension(), child->GetSize(), child->GetModificationTime()));
         }
-        files.push_back(pqFileDialogModelFileInfo(/*QString::fromUtf8*/ (info->GetName()),
-          groupFiles[0].filePath(), vtkPVFileInformation::SINGLE_FILE, info->GetHidden(),
-          info->GetExtension(), info->GetSize(), info->GetModificationTime(), groupFiles));
+
+        const bool as_files = (info->GetType() == vtkPVFileInformation::FILE_GROUP);
+        auto& container = as_files ? files : dirs;
+        container.push_back(pqFileDialogModelFileInfo(/*QString::fromUtf8*/ (info->GetName()),
+          groupFiles[0].filePath(),
+          (as_files ? vtkPVFileInformation::SINGLE_FILE : vtkPVFileInformation::DIRECTORY),
+          info->GetHidden(), info->GetExtension(), info->GetSize(), info->GetModificationTime(),
+          groupFiles));
       }
     }
 

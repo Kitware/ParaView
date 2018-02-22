@@ -37,17 +37,18 @@ set (Module_SRCS
   vtkPVSessionCoreInterpreterHelper.cxx
   vtkPVSessionServer.cxx
   vtkSIArraySelectionProperty.cxx
-  vtkSIIndexSelectionProperty.cxx
   vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
   vtkSIDataArrayProperty.cxx
+  vtkSIDataArraySelectionProperty.cxx
   vtkSIDirectoryProxy.cxx
   vtkSIDoubleMapProperty.cxx
   vtkSIDoubleVectorProperty.cxx
-  vtkSIMetaReaderProxy.cxx
   vtkSIIdTypeVectorProperty.cxx
+  vtkSIIndexSelectionProperty.cxx
   vtkSIInputProperty.cxx
   vtkSIIntVectorProperty.cxx
+  vtkSIMetaReaderProxy.cxx
   vtkSIObject.cxx
   vtkSIProperty.cxx
   vtkSIProxy.cxx

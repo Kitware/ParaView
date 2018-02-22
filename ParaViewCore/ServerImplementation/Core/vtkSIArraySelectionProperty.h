@@ -17,7 +17,9 @@
  * @brief   InformationOnly property
  *
  * SIProperty that deals with ArraySelection object
-*/
+ * vtkSIDataArraySelectionProperty is recommended instead of
+ * vtkSIArraySelectionProperty.
+ */
 
 #ifndef vtkSIArraySelectionProperty_h
 #define vtkSIArraySelectionProperty_h

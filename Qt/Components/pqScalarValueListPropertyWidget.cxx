@@ -84,7 +84,7 @@ public:
   void setLabels(std::vector<const char*>& labels)
   {
     this->Labels.resize(static_cast<int>(labels.size()));
-    for (size_t i = 0; i < labels.size(); i++)
+    for (int i = 0; i < static_cast<int>(labels.size()); i++)
     {
       this->Labels[i] = QVariant(labels[i]);
     }

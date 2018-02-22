@@ -56,6 +56,7 @@ int TestFileSequenceParser(int, char* argv[])
   check_group(seqParser.Get(), "Project_01_solution.cgns", "Project_.._solution.cgns");
   check_group(seqParser.Get(), "prefix-021-suffix.ext", "prefix-..-suffix.ext");
   check_group(seqParser.Get(), "prefix021suffix.ext", "prefix..suffix.ext");
+  check_group(seqParser.Get(), "plt0001000", "plt..");
 
   check_no_group(seqParser.Get(), "foo.3dm");
   check_no_group(seqParser.Get(), "foo.2dm");

@@ -3217,6 +3217,45 @@
       <!-- End PLYReaderCore -->
     </Proxy>
 
+    <SourceProxy name="AMReXParticlesReaderCore"
+      class="vtkAMReXParticlesReader">
+      <Documentation short_help="Reader for AMReX particle data">
+        Internal reader proxy for AMReX particles.
+      </Documentation>
+
+      <StringVectorProperty name="ParticleType"
+        command="SetParticleType"
+        number_of_elements="1"
+        default_values="particles">
+        <Documentation>
+          Set the type of particles to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PointArrayInfo"
+        command="GetPointDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointArrayStatus"
+        command="GetPointDataArraySelection"
+        information_property="PointArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the point arrays to read load.</Documentation>
+      </StringVectorProperty>
+      <!-- End AMReXParticlesReaderCore -->
+    </SourceProxy>
+
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -8135,6 +8174,51 @@ series.
         <ReaderFactory extensions="hdf5 h5"
                        file_description="TRUCHAS dataset" />
       </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="AMReXParticlesReader"
+      class="vtkFileSeriesReader"
+      file_name_method="SetPlotFileName"
+      label="AMReX Particles Reader"
+      si_class="vtkSIMetaReaderProxy">
+      <Documentation short_help="Reader for AMReX particle data">
+        Reads particle data from AMReX plotfiles.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Reader" proxygroup="internal_sources" proxyname="AMReXParticlesReaderCore" />
+        <ExposedProperties>
+          <Property name="ParticleType" />
+          <Property name="PointArrayInfo" />
+          <Property name="PointArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of plotfiles to be read by the reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1" name="TimestepValues" repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory
+          filename_patterns="plt*"
+          file_description="AMReX plotfiles (particles)"
+          is_directory="1" />
+      </Hints>
+      <!-- end AMReXParticlesReader -->
     </SourceProxy>
 
   </ProxyGroup>

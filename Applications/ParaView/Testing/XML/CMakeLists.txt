@@ -2,6 +2,7 @@
 # the data.
 paraview_test_load_data_dirs(""
   amr
+  AMReX-MFIX
   ANALYZE
   cgns_np01
   cgns_np04
@@ -277,6 +278,7 @@ endif()
 list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/4AxesContextView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AccentuatedFilename.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/AMReXParticlesReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Annotations.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CopyPasteProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseline.xml
