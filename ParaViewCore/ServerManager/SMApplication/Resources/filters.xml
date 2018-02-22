@@ -1963,6 +1963,66 @@ found and the point will be rejected.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkDecimatePolylineFilter"
+                 label="Decimate Polyline"
+                 name="DecimatePolyline">
+      <Documentation long_help="Reduce the number of lines in a polyline by evaluating an error metric for each vertex and removing first vertices with smaller errors."
+                     short_help="Reduce the number of lines in a polyline.">
+        Decimate Polyline is a filter to reduce the number of lines in a
+        polyline. The algorithm functions by evaluating an error metric for each
+        vertex (i.e., the distance of the vertex to a line defined from the two
+        vertices on either side of the vertex). Then, these vertices are placed
+        into a priority queue, and those with smaller errors are deleted first.
+        The decimation continues until the target reduction is reached. While the
+        filter will not delete end points, it will decimate closed loops down to a
+        single line, thereby changing topology.
+
+        As this filter works on polylines, you may need to call Triangle Strips before calling
+        this filter.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Decimate Polyline
+        filter.</Documentation>
+      </InputProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetTargetReduction"
+                            default_values="0.9"
+                            name="TargetReduction"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1"
+                           min="0"
+                           name="range" />
+        <Documentation>This property specifies the desired reduction in the
+        total number of lines in the output dataset. For example, if the
+        TargetReduction value is 0.9, the Decimate Polyline filter will attempt to
+        produce an output dataset that is 10% the size of the
+        input.)</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaximumError"
+                            default_values="1.79769e+308"
+                            name="MaximumError"
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the largest decimation error that is allowed during the decimation
+          process. This may limit the maximum reduction that may be achieved. The
+          maximum error is specified as a fraction of the maximum length of
+          the input data bounding box.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End DecimatePolyline -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkElevationFilter"
                  label="Elevation"
                  name="ElevationFilter">
