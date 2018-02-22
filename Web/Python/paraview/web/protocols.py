@@ -454,6 +454,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         else:
             self.lastStaleTime = 0
 
+
     def renderStaleImage(self, vId):
         self.staleHandlerCount -= 1
 
@@ -530,7 +531,8 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         resize = size != options.get("size", size)
         if resize:
             size = options["size"]
-            view.ViewSize = size
+            if size[0] > 10 and size[1] > 10:
+              view.ViewSize = size
         t = 0
         if options and "mtime" in options:
             t = options["mtime"]
@@ -551,7 +553,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         reply_image = stillRender(view.SMProxy, t, quality)
 
         # Check that we are getting image size we have set if not wait until we
-        # do.
+        # do. The render call will set the actual window size.
         tries = 10;
         while resize and list(app.GetLastStillRenderImageSize()) != size \
               and size != [0, 0] and tries > 0:
