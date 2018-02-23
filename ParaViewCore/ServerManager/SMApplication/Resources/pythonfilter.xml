@@ -165,8 +165,7 @@ annotation text.
           <DataType value="vtkTable" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="any"
-                          name="input_array"
-                          number_of_components="1" />
+                          name="input_array" />
            <Documentation>
              Set the input of the filter. To avoid the complications/confusion when identifying
              elements in a composite dataset, this filter doesn't support composite datasets

@@ -171,7 +171,10 @@ def execute_on_attribute_data(self, evaluate_locally):
         return True
 
     array = ns[array_name]
-    chosen_element = array.GetValue(self.GetElementId())
+    if array.IsA("vtkStringArray"):
+        chosen_element = array.GetValue(self.GetElementId())
+    else:
+        chosen_element = array[self.GetElementId()]
     expression = self.GetPrefix() if self.GetPrefix() else ""
     expression += str(chosen_element)
     self.SetComputedAnnotationValue(expression)
