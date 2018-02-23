@@ -96,6 +96,8 @@ public:
       }
 
       this->Extensions.clear();
+      this->FilenamePatterns.clear();
+      this->FilenameRegExs.clear();
       const char* exts = rfHint->GetAttribute("extensions");
       if (exts)
       {
@@ -122,6 +124,10 @@ public:
       if (rfHint->GetScalarAttribute("is_directory", &is_directory))
       {
         this->IsDirectory = (is_directory == 1);
+      }
+      else
+      {
+        this->IsDirectory = false;
       }
     }
 
@@ -493,13 +499,14 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMSession* session
 
 //----------------------------------------------------------------------------
 static std::string vtkJoin(
-  const std::vector<std::string> exts, const char* prefix, const char* suffix)
+  const std::vector<std::string>& exts, const char* prefix, const char* separator)
 {
+  bool is_head = true;
   std::ostringstream stream;
-  std::vector<std::string>::const_iterator iter;
-  for (iter = exts.begin(); iter != exts.end(); ++iter)
+  for (const auto& an_ext : exts)
   {
-    stream << prefix << *iter << suffix;
+    stream << (is_head == false ? separator : "") << prefix << an_ext;
+    is_head = false;
   }
   return stream.str();
 }
@@ -542,7 +549,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkSMSession* session)
       if (ext_list.size() > 0)
       {
         std::ostringstream stream;
-        stream << iter->second.Description << "(" << ext_list << ")";
+        stream << iter->second.Description << " (" << ext_list << ")";
         sorted_types.insert(stream.str());
         all_types << ext_list << " ";
       }
