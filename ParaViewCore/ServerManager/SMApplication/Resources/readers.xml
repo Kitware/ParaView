@@ -320,7 +320,7 @@
                          name="EnableCaching"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Turn cahcing on/off</Documentation>
+        <Documentation>Turn caching on/off</Documentation>
       </IntVectorProperty>
       <!--  Define MaxLevel property -->
       <IntVectorProperty command="SetMaxLevel"
@@ -414,7 +414,7 @@
                          name="EnableCaching"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Turn cahcing on/off</Documentation>
+        <Documentation>Turn caching on/off</Documentation>
       </IntVectorProperty>
       <!--  Define MaxLevel property -->
       <IntVectorProperty command="SetMaxLevel"
@@ -573,7 +573,7 @@
                      loads files stored in VTK's legacy file format. The
                      expected file extension is .vtk. The type of the dataset
                      may be structured grid, uniform rectilinear grid
-                     (image/volume), non-uniform rectiinear grid, unstructured
+                     (image/volume), non-uniform rectilinear grid, unstructured
                      grid, or polygonal.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -1174,7 +1174,7 @@
                       name="CellArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This propert lists which cell-centered arrays to
+        <Documentation>This property lists which cell-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
@@ -1441,7 +1441,7 @@
                             panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the VTK
-        multi-block reader.</Documentation>
+        multiblock reader.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetPieceDistribution"
                          default_values="0"
@@ -2597,7 +2597,7 @@
                       name="VariableArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which netCDF variables to
+        <Documentation>This property lists which NetCDF variables to
         load.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
@@ -2705,7 +2705,7 @@
                       name="VariableArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which netCDF variables to
+        <Documentation>This property lists which NetCDF variables to
         load.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
@@ -3005,7 +3005,7 @@
                      ASCII and binary PLOT3D files. The default file extension
                      for the geometry files is .xyz, and the default file
                      extension for the solution files is .q. The output of this
-                     reader is a multi-block dataset containing curvilinear
+                     reader is a multiblock dataset containing curvilinear
                      (structured grid) datasets.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -3044,7 +3044,7 @@
         <BooleanDomain name="bool" />
         <Documentation>When this options is enabled, the reader will try to
   automatically figure out various settings for a binary file. The other
-  options are ignored. Does not work for text (ascii) files.</Documentation>
+  options are ignored. Does not work for text (ASCII) files.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetBinaryFile"
                          default_values="1"
@@ -3726,10 +3726,10 @@
                  label="XML MultiBlock Data Reader"
                  name="XMLMultiBlockDataReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Documentation long_help="Reads a VTK XML multi-block data file and the serial VTK XML data files to which it points."
-                     short_help="Read VTK XML multi-block datasets.">The XML
-                     Multi-Block Data reader reads the VTK XML multi-block data
-                     file format. XML multi-block data files are meta-files
+      <Documentation long_help="Reads a VTK XML multiblock data file and the serial VTK XML data files to which it points."
+                     short_help="Read VTK XML multiblock datasets.">The XML
+                     Multiblock Data reader reads the VTK XML multiblock data
+                     file format. XML multiblock data files are meta-files
                      that point to a list of serial VTK XML files. When reading
                      in parallel, this reader will distribute sub-blocks among
                      processors. The expected file extensions are .vtm and
@@ -4643,7 +4643,7 @@
                      4.2, although still supported). The expected file
                      extension is .vtk. The type of the dataset may be
                      structured grid, uniform rectilinear grid (image/volume),
-                     non-uniform rectiinear grid, unstructured grid, or
+                     non-uniform rectilinear grid, unstructured grid, or
                      polygonal. This reader also supports file
                      series.</Documentation>
       <SubProxy>
@@ -4688,7 +4688,7 @@
       <Documentation long_help="Reads files stored in VTK partitioned legacy format."
                      short_help="Read partitioned legacy VTK files.">The
                      Partitioned Legacy VTK reader loads files stored in VTK's
-                     partitioned legac file format (before VTK 4.2, although
+                     partitioned legacy file format (before VTK 4.2, although
                      still supported). The expected file extension is .pvtk.
                      The type of the dataset may be structured grid, uniform
                      rectilinear grid (image/volume), non-uniform rectilinear
@@ -4715,7 +4715,7 @@
                      files in the format produced by CEI's EnSight. EnSight 6
                      and Gold files (both ASCII and binary) are supported. The
                      default extension is .case. The output of this reader is a
-                     multi-block dataset.</Documentation>
+                     multiblock dataset.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetCaseFileName"
                             name="CaseFileName"
@@ -5012,7 +5012,7 @@
                             default_values=","
                             name="Delimeter"
                             number_of_elements="1">
-        <Documentation>Character that is used as the delimeter.</Documentation>
+        <Documentation>Character that is used as the delimiter.</Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
@@ -5316,7 +5316,7 @@
                      short_help="Read parallel EnSight files.">The EnSight
                      Master Server reader reads EnSight's parallel files. The
                      master file usually has a .sos extension and may point to
-                     multiple .case files. The output is a multi-block
+                     multiple .case files. The output is a multiblock
                      dataset.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetCaseFileName"
@@ -6203,9 +6203,9 @@
     <!-- Beginning of OpenFOAM Reader -->
     <SourceProxy class="vtkPOpenFOAMReader"
                  name="OpenFOAMReader">
-      <Documentation long_help="Reads OpenFOAM data files, producing multi-block dataset."
+      <Documentation long_help="Reads OpenFOAM data files, producing multiblock dataset."
                      short_help="Read OpenFOAM data files.">The OpenFOAM reader
-                     reads OpenFOAM data files and outputs multi-block
+                     reads OpenFOAM data files and outputs multiblock
                      datasets. Mesh information and time dependent data are
                      supported. The OpenFOAM format is described fully at
                      http://www.openfoam.com/docs/user/basic-file-format.php</Documentation>
@@ -6777,9 +6777,9 @@
                  label="NetCDF Reader"
                  name="netCDFReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Documentation long_help="Reads regular arrays from netCDF files. Will also read any topological information specified by the COARDS and CF conventions."
-                     short_help="Read regular arrays from netCDF files.">Reads
-                     arrays from netCDF files into structured VTK data sets. In
+      <Documentation long_help="Reads regular arrays from NetCDF files. Will also read any topological information specified by the COARDS and CF conventions."
+                     short_help="Read regular arrays from NetCDF files.">Reads
+                     arrays from NetCDF files into structured VTK data sets. In
                      the absence of any other information, the files will be
                      read as image data. This reader will also look for meta
                      information specified by the CF convention that specify
@@ -6838,7 +6838,7 @@
       Linear Accelerator Center (SLAC)">A reader for a data format
       used by Omega3p, Tau3p, and several other tools used at the
       Standford Linear Accelerator Center (SLAC). The underlying
-      format uses netCDF to store arrays, but also imposes several
+      format uses NetCDF to store arrays, but also imposes several
       conventions to form an unstructured grid of
       elements.</Documentation>
       <OutputPort index="0"
@@ -7853,7 +7853,7 @@
                      ASCII and binary PLOT3D files. The default file extension
                      for the geometry files is .xyz, and the default file
                      extension for the solution files is .q. The output of this
-                     reader is a multi-block dataset containing curvilinear
+                     reader is a multiblock dataset containing curvilinear
                      (structured grid) datasets.</Documentation>
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
@@ -8088,15 +8088,15 @@ series.
     <SourceProxy class="vtkTRUCHASReader"
                  label="TRUCHAS Reader"
                  name="TruchasReader">
-      <Documentation long_help="Reads TRUCHAS data from hdf5"
-                     short_help="Reads TRUCHAS data">Reads TRUCHAS simulation output stored in hdf5.</Documentation>
+      <Documentation long_help="Reads TRUCHAS data from HDF5"
+                     short_help="Reads TRUCHAS data">Reads TRUCHAS simulation output stored in HDF5.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
                             number_of_elements="1"
                             panel_visibility="never">
         <FileListDomain name="files" />
-        <Documentation>This property specifies the hdf5 file name</Documentation>
+        <Documentation>This property specifies the HDF5 file name</Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"

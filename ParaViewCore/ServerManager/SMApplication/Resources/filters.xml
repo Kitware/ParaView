@@ -773,7 +773,7 @@
                      short_help="Extracts selection over time and then plots it.">
                      This filter extracts the selection over time, i.e. cell
                      and/or point variables at a cells/point selected are
-                     extracted over time The output multi-block consists of 1D
+                     extracted over time The output multiblock consists of 1D
                      rectilinear grids where the x coordinate corresponds to
                      time (the same array is also copied to a point array named
                      Time or TimeData (if Time exists in the input)). If
@@ -890,7 +890,7 @@
                      short_help="Subsample an image/volume.">The Image Shrink
                      filter reduces the size of an image/volume dataset by
                      subsampling it (i.e., extracting every nth pixel/voxel in
-                     integer multiples). The sbsampling rate can be set
+                     integer multiples). The subsampling rate can be set
                      separately for each dimension of the
                      image/volume.</Documentation>
       <InputProperty command="SetInputConnection"
@@ -1180,7 +1180,7 @@
                      bounding box center. The cell attributes of the input will
                      be associated with these newly created points of the
                      output. You have the option of creating a vertex cell per
-                     point in the outpuut. This is useful because vertex cells
+                     point in the output. This is useful because vertex cells
                      are rendered, but points are not. The points themselves
                      could be used for placing glyphs (using the Glyph filter).
                      The Cell Centers filter takes any type of data set as
@@ -1966,7 +1966,7 @@ found and the point will be rejected.</Documentation>
     <SourceProxy class="vtkDecimatePolylineFilter"
                  label="Decimate Polyline"
                  name="DecimatePolyline">
-      <Documentation long_help="Reduce the number of lines in a polyline by evaluating an error metric for each vertex and removing first vertices with smaller errors."
+      <Documentation long_help="Reduce the number of lines in a polyline by evaluating an error metric for each vertex and removing the vertices with smaller errors first."
                      short_help="Reduce the number of lines in a polyline.">
         Decimate Polyline is a filter to reduce the number of lines in a
         polyline. The algorithm functions by evaluating an error metric for each
@@ -2004,7 +2004,7 @@ found and the point will be rejected.</Documentation>
         total number of lines in the output dataset. For example, if the
         TargetReduction value is 0.9, the Decimate Polyline filter will attempt to
         produce an output dataset that is 10% the size of the
-        input.)</Documentation>
+        input.</Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetMaximumError"
                             default_values="1.79769e+308"
@@ -2281,7 +2281,7 @@ found and the point will be rejected.</Documentation>
         <Documentation>If the input is an unstructured grid with nonlinear
         faces, this parameter determines how many times the face is subdivided
         into linear faces. If 0, the output is the equivalent of its linear
-        couterpart (and the midpoints determining the nonlinear interpolation
+        counterpart (and the midpoints determining the nonlinear interpolation
         are discarded). If 1, the nonlinear face is triangulated based on the
         midpoints. If greater than 1, the triangulated pieces are recursively
         subdivided to reach the desired subdivision. Setting the value to
@@ -2333,7 +2333,7 @@ found and the point will be rejected.</Documentation>
         <Documentation>If the input is an unstructured grid with nonlinear
         faces, this parameter determines how many times the face is subdivided
         into linear faces. If 0, the output is the equivalent of its linear
-        couterpart (and the midpoints determining the nonlinear interpolation
+        counterpart (and the midpoints determining the nonlinear interpolation
         are discarded). If 1, the nonlinear face is triangulated based on the
         midpoints. If greater than 1, the triangulated pieces are recursively
         subdivided to reach the desired subdivision. Setting the value to
@@ -2642,7 +2642,7 @@ array.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is set to 1, non-manifold
-        ediges will be extracted. Non-manifold edges are defined as edges that
+        edges will be extracted. Non-manifold edges are defined as edges that
         are use by three or more polygons.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetManifoldEdges"
@@ -3125,7 +3125,7 @@ array.
                  name="RectilinearGridConnectivity">
       <Documentation long_help="Parallel fragments extraction and attributes integration on rectilinear grids."
                      short_help="Parallel fragments extraction and attributes integration on rectilinear grids.">
-      Extracts material fragments from multi-block vtkRectilinearGrid datasets
+      Extracts material fragments from multiblock vtkRectilinearGrid datasets
       based on the selected volume fraction array(s) and a fraction isovalue
       and integrates the associated attributes.</Documentation>
       <InputProperty command="SetInputConnection"
@@ -6681,7 +6681,7 @@ array.
                      extracts the portion of the input dataset that lies along
                      the specified plane. The Slice filter takes any type of
                      dataset as input. The output of this filter is a multiblock of multipiece
-                     polygonal data. This is a multithreded implementation.
+                     polygonal data. This is a multithreaded implementation.
                      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -6783,7 +6783,7 @@ array.
       completely inside or outside of a specified region (implicit function).
       On output, the filter generates an unstructured grid. To use this filter
       you must specify a region (implicit function). You must also specify
-      whethter to extract cells lying inside or outside of the region. An
+      whether to extract cells lying inside or outside of the region. An
       option exists to extract cells that are neither inside or outside (i.e.,
       boundary).</Documentation>
       <InputProperty command="SetInputConnection"
@@ -7245,7 +7245,7 @@ array.
           are treated as a continuous interval over the minimum and maximum. One
           important "on" use case: When setting lower and upper threshold
           equal to some value and turning AllScalars off, the results are
-          cells containing the iso-surface for that value.  WARNING: Whether on
+          cells containing the isosurface for that value.  WARNING: Whether on
           or off, for higher order input, the filter will not give accurate
           results.
         </Documentation>
@@ -7522,9 +7522,9 @@ selected **Vectors**, use **Orient** property.  To scale the glyphs using
 the selected **Scalars** or **Vectors**, use the **Scale Mode** property.
 
 The **Glyph Mode** property controls which points in the input dataset
-are selected for glyphing (since in most cases, glyping all points in
+are selected for glyphing (since in most cases, glyphing all points in
 the input dataset can be both performance impeding as well as visually
-cluttred.
+cluttered.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -7543,7 +7543,7 @@ cluttred.
                           optional="1" />
         <Documentation>
 This property specifies the input to the Glyph filter.  This is the
-dataset from which the points are selecetd to be glyphed.
+dataset from which the points are selected to be glyphed.
         </Documentation>
       </InputProperty>
       <InputProperty command="SetSourceConnection"
@@ -8067,7 +8067,7 @@ source.</Documentation>
                           number_of_components="3"
                           optional="1" />
         <Documentation>This property specifies the input to the Glyph filter.
-        This is the dataset from which the points are selecetd to be glyphed.
+        This is the dataset from which the points are selected to be glyphed.
         </Documentation>
       </InputProperty>
       <InputProperty command="SetSourceConnection"
@@ -8911,7 +8911,7 @@ source.</Documentation>
             <Property name="ComputeTolerance" function="boolean_invert" />
           </PropertyWidgetDecorator>
         </Hints>
-        <Documentation>Set the tolernce to use for
+        <Documentation>Set the tolerance to use for
         vtkDataSet::FindCell</Documentation>
       </DoubleVectorProperty>
 
@@ -9879,7 +9879,7 @@ source.</Documentation>
         shifted and scaled time frame of reference. Note: Since the input time
         may not start at zero, the wrapping of time from the end of one period
         to the start of the next, will subtract the initial time - a source
-        with T{5..6} repeated periodicaly will have output time {5..6..7..8}
+        with T{5..6} repeated periodically will have output time {5..6..7..8}
         etc.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetPeriodicEndCorrection"
@@ -10039,7 +10039,7 @@ source.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <Documentation>Specify the seed dataset. Typically fron where the
+        <Documentation>Specify the seed dataset. Typically from where the
         vector field integration should begin. Usually a point/radius or a line
         with a given resolution.</Documentation>
       </InputProperty>
@@ -10199,7 +10199,7 @@ source.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <Documentation>Specify the seed dataset. Typically fron where the
+        <Documentation>Specify the seed dataset. Typically from where the
         vector field integration should begin. Usually a point/radius or a line
         with a given resolution.</Documentation>
       </InputProperty>
@@ -10356,7 +10356,7 @@ source.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <Documentation>Specify the seed dataset. Typically fron where the
+        <Documentation>Specify the seed dataset. Typically from where the
         vector field integration should begin. Usually a point/radius or a line
         with a given resolution.</Documentation>
       </InputProperty>
@@ -10499,7 +10499,7 @@ source.</Documentation>
           or traces will become long and stringy. Setting the
           MaxTraceTimeLength will limit how much of the trace is
           displayed. Tracks longer then the Max will disappear and the
-          trace will apppear like a snake of fixed length which progresses
+          trace will appear like a snake of fixed length which progresses
           as the particle moves.  This length is given with respect to
           timesteps.
         </Documentation>
@@ -11415,7 +11415,7 @@ source.</Documentation>
                          name="PassThroughIds"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>If on, the output polygonal dataset will have a celldata
+        <Documentation>If on, the output polygonal dataset will have a cell data
         array that holds the cell index of the original 3D cell that produced
         each output cell. This is useful for cell picking.</Documentation>
       </IntVectorProperty>
@@ -11426,7 +11426,7 @@ source.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If on, the output polygonal dataset will have a
-        pointdata array that holds the point index of the original 3D vertex
+        point data array that holds the point index of the original 3D vertex
         that produced each output vertex. This is useful for
         picking.</Documentation>
       </IntVectorProperty>
@@ -13018,7 +13018,7 @@ source.</Documentation>
                  name="MergeBlocks">
       <Documentation short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid">
       vtkCompositeDataToUnstructuredGridFilter appends all vtkDataSet leaves of
-      the input composite dataset to a single unstructure grid. The subtree to
+      the input composite dataset to a single unstructured grid. The subtree to
       be combined can be chosen using the SubTreeCompositeIndex. If the
       SubTreeCompositeIndex is a leaf node, then no appending is
       required.</Documentation>
@@ -13755,7 +13755,7 @@ source.</Documentation>
       <Documentation long_help="Extract attribute data as a table."
                      short_help="Extract attribute data as a table.">This is a
                      filter that produces a vtkTable from the chosen attribute
-                     in the input dataobject. This filter can accept composite
+                     in the input data object. This filter can accept composite
                      datasets. If the input is a composite dataset, the output
                      is a multiblock with vtkTable leaves.</Documentation>
       <InputProperty command="SetInputConnection"
@@ -14494,7 +14494,7 @@ source.</Documentation>
       table specified in the multicorrelative documentation. The second table
       in the multiblock dataset comprising the model output is an expanded
       version of the multicorrelative version. &lt;p&gt; As with the
-      multicorrlative filter, the second model table contains the mean values,
+      multicorrelative filter, the second model table contains the mean values,
       the upper-triangular portion of the symmetric covariance matrix, and the
       non-zero lower-triangular portion of the Cholesky decomposition of the
       covariance matrix. Below these entries are the eigenvalues of the
@@ -14735,7 +14735,7 @@ source.</Documentation>
       "obb representation" output, containing OBB representations (poly data).
       All computed attributes are copied into the statistics and geometry
       output. The obb representation output is used for validation and
-      debugging puproses and is turned off by default. To measure the size of
+      debugging purposes and is turned off by default. To measure the size of
       craters, the filter can invert a volume fraction and clip the volume
       fraction with a sphere and/or a plane.</Documentation>
       <OutputPort index="0"
@@ -14754,7 +14754,7 @@ source.</Documentation>
         <InputArrayDomain attribute_type="cell"
                           name="input_array" />
         <Documentation>Input to the filter can be a hierarchical box data set
-        containing image data or a multi-block of rectilinear
+        containing image data or a multiblock of rectilinear
         grids.</Documentation>
       </InputProperty>
       <!-- Material Fraction Array-->
@@ -14944,7 +14944,7 @@ source.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set, then the geometry output is
-        written to a text file. The file name will be coonstructed using the
+        written to a text file. The file name will be constructed using the
         path in the "Output Base Name" widget.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetWriteStatisticsOutput"
@@ -14953,7 +14953,7 @@ source.</Documentation>
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set, then the statistics output is
-        written to a text file. The file name will be coonstructed using the
+        written to a text file. The file name will be constructed using the
         path in the "Output Base Name" widget.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty animateable="0"
@@ -14961,7 +14961,7 @@ source.</Documentation>
                             name="OutputBaseName"
                             number_of_elements="1">
         <Documentation>This property specifies the base including path of where
-        to write the statistics and gemoetry output text files. It follows the
+        to write the statistics and geometry output text files. It follows the
         pattern "/path/to/folder/and/file" here file has no extension, as the
         filter will generate a unique extension.</Documentation>
       </StringVectorProperty>
@@ -15251,7 +15251,7 @@ source.</Documentation>
         <BooleanDomain name="bool" />
         <Documentation>Turn on/off the capping of the outer boundary of the
         volume to a specified cap value. This can be used to close surfaces
-        (after iso-surfacing) and create other effects.</Documentation>
+        (after isosurfacing) and create other effects.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetCapValue"
                             default_values="0.0"
@@ -15551,7 +15551,7 @@ source.</Documentation>
                         min="1"
                         name="range" />
         <Documentation>
-          This property specifies the number of levels in the amr data structure.
+          This property specifies the number of levels in the AMR data structure.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfBlocks"
@@ -15564,7 +15564,7 @@ source.</Documentation>
                         name="range" />
         <Documentation>
           This property specifies the maximum number of blocks in the output
-          amr data structure.
+          AMR data structure.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetRefinementRatio"
@@ -15772,7 +15772,7 @@ source.</Documentation>
                                    value="1" />
           <!-- show this widget when RotationMode==1 -->
         </Hints>
-        <Documentation>Field array name that contains the rotation angle in radian.
+        <Documentation>Field array name that contains the rotation angle in radians.
         </Documentation>
       </StringVectorProperty>
 

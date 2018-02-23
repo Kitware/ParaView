@@ -848,7 +848,7 @@
         A cell block may be divided into multiple cells (e.g. there will be
         6 pyramid cells in a cell block). If a 1D cell type is chosen only
         the first blocks dimension will be used. If a 2D cell type is chosen the
-        first and second blocks dimensinos will be used.
+        first and second blocks dimensions will be used.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCellOrder"
@@ -1669,7 +1669,7 @@
                             information_only="1"
                             name="UserFriendlyText">
         <SimpleStringInformationHelper />
-        <Documentation>Reconstructs the query as a user friendly text eg. "IDs
+        <Documentation>Reconstructs the query as a user friendly text, e.g., "IDs
         &gt;= 12".</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetInverse"
@@ -2018,15 +2018,15 @@
       &quot;UF1&quot;, &quot;RG1&quot;, &quot;SG1&quot;, &quot;PD1&quot;, and
       &quot;UG1&quot; will produce vtkUniformGrid, vtkRectilinearGrid,
       vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid respectively.
-      &quot;PD2&quot; will produce an alternate vtkPolydata. You can compose
+      &quot;PD2&quot; will produce an alternate vtkPolyData. You can compose
       composite datasets from the atomic ones listed above - &quot;MB{}&quot;
       or &quot;HB[]&quot;. &quot;MB{ ID1 PD1 MB{} }&quot; for example will
       create a vtkMultiBlockDataSet consisting of three blocks: image data,
-      poly data, multi-block (empty). Hierarchical Box data sets additionally
+      poly data, multiblock (empty). Hierarchical Box data sets additionally
       require the notion of groups, declared within &quot;()&quot; braces, to
       specify AMR depth. &quot;HB[ (UF1)(UF1)(UF1) ]&quot; will create a
       vtkHierarchicalBoxDataSet representing an octree that is three levels
-      deep, in which the firstmost cell in each level is
+      deep, in which the first cell in each level is
       refined.</Documentation>
       <StringVectorProperty command="SetProgram"
                             default_values="ID1"
