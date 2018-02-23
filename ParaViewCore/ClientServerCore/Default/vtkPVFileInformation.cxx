@@ -906,18 +906,10 @@ void vtkPVFileInformation::GetDirectoryListing()
     {
       info->Type = DIRECTORY;
     }
-    else
-    {
-      info->Type = SINGLE_FILE;
-    }
 #else
     if (d->d_type & DT_DIR)
     {
       info->Type = DIRECTORY;
-    }
-    else
-    {
-      info->Type = SINGLE_FILE;
     }
 #endif
 
@@ -1038,8 +1030,12 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   for (vtkPVFileInformationSet::iterator iter = info_set.begin(); iter != info_set.end();)
   {
     vtkSmartPointer<vtkPVFileInformation> obj = *iter;
-    if (obj->Type == SINGLE_FILE || obj->Type == SINGLE_FILE_LINK || obj->Type == DIRECTORY ||
-      obj->Type == DIRECTORY_LINK)
+    // we're going to skip non-groupable file types. Note, we may get INVALID
+    // here since when this->FastFileTypeDetection is true, the grouping
+    // happens before the file types are detected.
+    if (obj->Type != FILE_GROUP && obj->Type != DRIVE && obj->Type != NETWORK_ROOT &&
+      obj->Type != NETWORK_DOMAIN && obj->Type != NETWORK_SERVER && obj->Type != NETWORK_SHARE &&
+      obj->Type != DIRECTORY_GROUP)
     {
       if (this->SequenceParser->ParseFileSequence(obj->GetName()))
       {
