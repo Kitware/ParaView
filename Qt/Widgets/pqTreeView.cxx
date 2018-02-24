@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeView.cxx
+   Module:  pqTreeView.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,13 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqTreeView.cxx
-/// \date 8/20/2007
-
 #include "pqTreeView.h"
 
 #include "pqCheckableHeaderView.h"
+
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QEvent>
@@ -85,6 +82,9 @@ pqTreeView::pqTreeView(QWidget* widgetParent)
 
   // Listen for the show/hide events of the horizontal scroll bar.
   this->horizontalScrollBar()->installEventFilter(this);
+
+  // better handle scrolling in panels with nested scrollbars.
+  this->setFocusPolicy(Qt::StrongFocus);
 }
 
 bool pqTreeView::eventFilter(QObject* object, QEvent* e)
@@ -104,6 +104,17 @@ bool pqTreeView::eventFilter(QObject* object, QEvent* e)
   }
 
   return QTreeView::eventFilter(object, e);
+}
+
+void pqTreeView::wheelEvent(QWheelEvent* evt)
+{
+  // don't handle wheel events unless widget had focus.
+  // this improves scrolling when scrollable widgets are nested
+  // together with setFocusPolicy(Qt::StrongFocus).
+  if (this->hasFocus())
+  {
+    this->Superclass::wheelEvent(evt);
+  }
 }
 
 void pqTreeView::setModel(QAbstractItemModel* newModel)
