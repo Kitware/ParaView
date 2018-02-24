@@ -130,8 +130,6 @@ set(Module_SRCS
   pqTreeWidgetSelectionHelper.h
   pqWaitCursor.cxx
   pqWaitCursor.h
-#  QtWidgetsPlugin.cxx
-#  QtWidgetsPlugin.h
 )
 
 ##########################################################################
@@ -259,30 +257,3 @@ vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
 target_link_libraries(${vtk-module}
   LINK_PRIVATE ${qt_private_targets}
   LINK_PUBLIC ${qt_public_targets})
-#IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-#  # Headers
-#  GLOB_INSTALL_DEVELOPMENT(
-#      ${CMAKE_CURRENT_SOURCE_DIR}
-#      ${PV_INSTALL_INCLUDE_DIR} 
-#      "*.h;*.hxx;*.txx")
-#  INSTALL(
-#      FILES ${dynamicHeaders}
-#      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-#      COMPONENT Development)
-#  # QT resources
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources/UI"
-#    "${resPath}/*.ui")
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources/Icons"
-#    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources"
-#    "${resPath}/*.ui;${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc;${resPath}/*.qrc")
-#ENDIF ()
