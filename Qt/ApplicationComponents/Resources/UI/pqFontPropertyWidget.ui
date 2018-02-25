@@ -6,16 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
-    <height>90</height>
+    <width>404</width>
+    <height>55</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>2</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <layout class="QHBoxLayout" name="mainLayout" stretch="0,1,0,0,0,0,0,0">
+    <layout class="QHBoxLayout" name="mainLayout" stretch="1,0,0,0,0,0,0,0">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item>
       <widget class="QComboBox" name="FontFamily">
        <property name="toolTip">
