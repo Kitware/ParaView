@@ -60,6 +60,7 @@ pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   this->Slider->setRange(0, 1);
   l->addWidget(this->Slider);
   this->Slider->setObjectName("Slider");
+  this->Slider->setFocusPolicy(Qt::StrongFocus); // change from the default Qt::WheelFocus
   this->LineEdit = new pqLineEdit(this);
   l->addWidget(this->LineEdit);
   this->LineEdit->setObjectName("LineEdit");

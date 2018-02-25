@@ -127,6 +127,9 @@ pqTreeWidget::pqTreeWidget(QWidget* p)
   this->Timer->setSingleShot(true);
   this->Timer->setInterval(10);
   QObject::connect(this->Timer, SIGNAL(timeout()), this, SLOT(updateCheckStateInternal()));
+
+  // better handle scrolling in panels with nested scrollbars.
+  this->setFocusPolicy(Qt::StrongFocus);
 }
 
 //-----------------------------------------------------------------------------
@@ -156,6 +159,18 @@ bool pqTreeWidget::event(QEvent* e)
   }
 
   return Superclass::event(e);
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeWidget::wheelEvent(QWheelEvent* evt)
+{
+  // don't handle wheel events unless widget had focus.
+  // this improves scrolling when scrollable widgets are nested
+  // together with setFocusPolicy(Qt::StrongFocus).
+  if (this->hasFocus())
+  {
+    this->Superclass::wheelEvent(evt);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -36,11 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTableView>
 
 /**
-* pqTableView extends QTableView (in the spirit of pqTableView) to resize the
-* view vertically to fit contents. It servers to purposes:
-* \li Avoids putting a scroll bar until the table reaches a certain length.
-* \li Avoids taking too much space when table has fewer rows.
-*/
+ * @class pqTableView
+ * @brief a QTableView subclass for ParaView specific customizations.
+ *
+ * pqTableView extends QTableView (in the spirit of pqTableView) to support the
+ * following:
+ * \li Avoids putting a scroll bar until the table reaches a certain length.
+ * \li Avoids taking too much space when table has fewer rows.
+ * \li Avoid grabbing scroll focus: Wheel events are not handled by the widget
+ *     unless the widget has focus. Together with change in focus policy to
+ *     Qt::StrongFocus instead of the default Qt::WheelFocus, we improve the
+ *     widget scroll behavior when nested in other scrollable panels.
+ */
 class PQWIDGETS_EXPORT pqTableView : public QTableView
 {
   Q_OBJECT
@@ -118,6 +125,11 @@ public:
   * Overridden to handle events from QScrollBar.
   */
   bool eventFilter(QObject* watched, QEvent* evt) override;
+
+  /**
+   * Overridden to eat wheel events unless this->hasFocus().
+   */
+  void wheelEvent(QWheelEvent* event) override;
 
 private slots:
   void invalidateLayout();

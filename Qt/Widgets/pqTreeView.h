@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeView.h
+   Module:  pqTreeView.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,18 +29,29 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/**
-* \file pqTreeView.h
-* \date 8/20/2007
-*/
-
-#ifndef _pqTreeView_h
-#define _pqTreeView_h
+#ifndef pqTreeView_h
+#define pqTreeView_h
 
 #include "pqWidgetsModule.h"
 #include <QTreeView>
 
+/**
+ * class: pqTreeView
+ * brief: QTreeView subclass that add ParaView specific customizations.
+ *
+ * pqTreeView adds ParaView specific customizations to the QTreeView. These
+ * include the following:
+ *
+ * \li Auto-resize: Oftentimes we want the view to as compact as possible, but
+ *     if has up to a certain number of items, it should grow to fit those items
+ *     so that the vertical scroll bars don't show up. This is supported using
+ *     the `MaximumRowCountBeforeScrolling` property. The pqTreeView will grown
+ *     in size vertically to fit the number of items indicated.
+ * \li Avoid grabbing scroll focus: Wheel events are not handled by the widget
+ *     unless the widget has focus. Together with change in focus policy to
+ *     Qt::StrongFocus instead of the default Qt::WheelFocus, we improve the
+ *     widget scroll behavior when nested in other scrollable panels.
+ */
 class PQWIDGETS_EXPORT pqTreeView : public QTreeView
 {
   Q_OBJECT
@@ -60,6 +71,11 @@ public:
   ~pqTreeView() override {}
 
   bool eventFilter(QObject* object, QEvent* e) override;
+
+  /**
+   * Overridden to eat wheel events unless this->hasFocus().
+   */
+  void wheelEvent(QWheelEvent* event) override;
 
   void setModel(QAbstractItemModel* model) override;
   void setRootIndex(const QModelIndex& index) override;
