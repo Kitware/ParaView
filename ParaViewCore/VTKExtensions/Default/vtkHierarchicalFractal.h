@@ -132,7 +132,7 @@ public:
 
 protected:
   vtkHierarchicalFractal();
-  ~vtkHierarchicalFractal();
+  ~vtkHierarchicalFractal() override;
 
   int StartBlock;
   int EndBlock;
@@ -142,21 +142,21 @@ protected:
 
   // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
   // the GenerateRectilinearGrids flag.
-  virtual int RequestDataObject(
+  int RequestDataObject(
     vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) VTK_OVERRIDE;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   void Traverse(int& blockId, int level, vtkCompositeDataSet* output, int x0, int x1, int y0,
@@ -205,7 +205,7 @@ protected:
   vtkIntArray* Levels;
   int TwoDimensional;
 
-  // New method of specifing blocks.
+  // New method of specifying blocks.
   double TopLevelSpacing[3];
   double TopLevelOrigin[3];
 
@@ -215,8 +215,8 @@ protected:
     OutputUtil; // convenient class to create composite output
 
 private:
-  vtkHierarchicalFractal(const vtkHierarchicalFractal&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkHierarchicalFractal&) VTK_DELETE_FUNCTION;
+  vtkHierarchicalFractal(const vtkHierarchicalFractal&) = delete;
+  void operator=(const vtkHierarchicalFractal&) = delete;
 };
 
 #endif

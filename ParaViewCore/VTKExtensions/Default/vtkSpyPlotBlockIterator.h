@@ -1,5 +1,6 @@
 #ifndef vtkSpyPlotBlockIterator_h
 #define vtkSpyPlotBlockIterator_h
+#ifndef __VTK_WRAP__
 
 #include "assert.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
@@ -15,7 +16,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotBlockIterator
 {
 public:
   // Description:
-  // Initialize the iterator with informations about processors,
+  // Initialize the iterator with information about processors,
   // files and timestep.
   virtual void Init(int numberOfProcessors, int processorId, vtkSpyPlotReader* parent,
     vtkSpyPlotReaderMap* fileMap, int currentTimeStep);
@@ -97,12 +98,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotBlockDistributionBlockIterator
 {
 public:
   vtkSpyPlotBlockDistributionBlockIterator() {}
-  virtual ~vtkSpyPlotBlockDistributionBlockIterator() {}
-  virtual void Start();
-  virtual int GetNumberOfBlocksToProcess();
+  ~vtkSpyPlotBlockDistributionBlockIterator() override {}
+  void Start() override;
+  int GetNumberOfBlocksToProcess() override;
 
 protected:
-  virtual void FindFirstBlockOfCurrentOrNextFile();
+  void FindFirstBlockOfCurrentOrNextFile() override;
 };
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotFileDistributionBlockIterator
@@ -110,14 +111,14 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotFileDistributionBlockIterator
 {
 public:
   vtkSpyPlotFileDistributionBlockIterator();
-  virtual ~vtkSpyPlotFileDistributionBlockIterator() {}
-  virtual void Init(int numberOfProcessors, int processorId, vtkSpyPlotReader* parent,
-    vtkSpyPlotReaderMap* fileMap, int currentTimeStep);
-  virtual void Start();
-  virtual int GetNumberOfBlocksToProcess();
+  ~vtkSpyPlotFileDistributionBlockIterator() override {}
+  void Init(int numberOfProcessors, int processorId, vtkSpyPlotReader* parent,
+    vtkSpyPlotReaderMap* fileMap, int currentTimeStep) override;
+  void Start() override;
+  int GetNumberOfBlocksToProcess() override;
 
 protected:
-  virtual void FindFirstBlockOfCurrentOrNextFile();
+  void FindFirstBlockOfCurrentOrNextFile() override;
   int FileStart;
   int FileEnd;
 };
@@ -174,6 +175,7 @@ inline int vtkSpyPlotBlockIterator::GetNumberOfFields() const
   return this->NumberOfFields;
 }
 
+#endif
 #endif
 
 // VTK-HeaderTest-Exclude: vtkSpyPlotBlockIterator.h

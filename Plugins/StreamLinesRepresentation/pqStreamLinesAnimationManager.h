@@ -58,7 +58,7 @@ class pqStreamLinesAnimationManager : public QObject
 
 public:
   pqStreamLinesAnimationManager(QObject* p = 0);
-  ~pqStreamLinesAnimationManager();
+  ~pqStreamLinesAnimationManager() override;
 
   void onShutdown() {}
   void onStartup() {}

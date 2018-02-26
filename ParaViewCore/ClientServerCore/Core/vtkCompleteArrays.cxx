@@ -25,6 +25,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPointData.h"
 #include "vtkPointSet.h"
+#include "vtkTable.h"
 
 // this doesn't directly use vtkPVDataSetAttributesInformation since
 // vtkPVDataSetAttributesInformation sorts arrays. We instead explicitly use
@@ -142,23 +143,84 @@ vtkCompleteArrays::~vtkCompleteArrays()
   }
 }
 
+//----------------------------------------------------------------------------
+int vtkCompleteArrays::FillInputPortInformation(int port, vtkInformation* info)
+{
+  this->Superclass::FillInputPortInformation(port, info);
+  if (port == 0)
+  {
+    info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
+  }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkCompleteArrays::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info)
+{
+  // now add our info
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkCompleteArrays::RequestDataObject(
+  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (!inInfo)
+  {
+    return 0;
+  }
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+
+  if (input)
+  {
+    // for each output
+    for (int i = 0; i < this->GetNumberOfOutputPorts(); ++i)
+    {
+      vtkInformation* info = outputVector->GetInformationObject(i);
+      vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
+
+      if (!output || !output->IsA(input->GetClassName()))
+      {
+        vtkDataObject* newOutput = input->NewInstance();
+        info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
+        newOutput->FastDelete();
+      }
+    }
+    return 1;
+  }
+  return 0;
+}
+
 //-----------------------------------------------------------------------------
 int vtkCompleteArrays::RequestData(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformation* info = outputVector->GetInformationObject(0);
-  vtkDataSet* output = vtkDataSet::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataSet* outputDS = vtkDataSet::SafeDownCast(output);
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkDataSet* input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataSet* inputDS = vtkDataSet::SafeDownCast(input);
+
+  vtkTable* inputTable = vtkTable::SafeDownCast(input);
+  // let vtkTable pass-through this filter
+  if (inputTable)
+  {
+    vtkTable* outputTable = vtkTable::SafeDownCast(output);
+    outputTable->ShallowCopy(inputTable);
+    return 1;
+  }
 
   // Initialize
   //
   vtkDebugMacro(<< "Completing array");
 
-  output->CopyStructure(input);
-  output->GetPointData()->PassData(input->GetPointData());
-  output->GetCellData()->PassData(input->GetCellData());
+  outputDS->CopyStructure(inputDS);
+  outputDS->GetPointData()->PassData(inputDS->GetPointData());
+  outputDS->GetCellData()->PassData(inputDS->GetCellData());
 
   if (this->Controller->GetNumberOfProcesses() <= 1)
   {
@@ -171,18 +233,18 @@ int vtkCompleteArrays::RequestData(
   //           proc id if this process has point,
   //           proc id if this process has cells]
 
-  vtkIdType localInfo[6] = { -1, -1, input->GetNumberOfPoints(), input->GetNumberOfCells(), -1,
+  vtkIdType localInfo[6] = { -1, -1, inputDS->GetNumberOfPoints(), inputDS->GetNumberOfCells(), -1,
     -1 };
   if (myProcId == 0)
   {
-    localInfo[0] = input->GetNumberOfPoints();
-    localInfo[1] = input->GetNumberOfCells();
+    localInfo[0] = inputDS->GetNumberOfPoints();
+    localInfo[1] = inputDS->GetNumberOfCells();
   }
-  if (input->GetNumberOfPoints() > 0)
+  if (inputDS->GetNumberOfPoints() > 0)
   {
     localInfo[4] = myProcId;
   }
-  if (input->GetNumberOfCells() > 0)
+  if (inputDS->GetNumberOfCells() > 0)
   {
     localInfo[5] = myProcId;
   }
@@ -220,9 +282,9 @@ int vtkCompleteArrays::RequestData(
     vtkClientServerStream css;
     css.SetData(&data[0], length);
 
-    vtkDeserialize(css, 0, output->GetPointData());
-    vtkDeserialize(css, 1, output->GetCellData());
-    vtkPointSet* ps = vtkPointSet::SafeDownCast(output);
+    vtkDeserialize(css, 0, outputDS->GetPointData());
+    vtkDeserialize(css, 1, outputDS->GetCellData());
+    vtkPointSet* ps = vtkPointSet::SafeDownCast(outputDS);
     if (ps)
     {
       vtkNew<vtkPoints> pts;
@@ -237,10 +299,10 @@ int vtkCompleteArrays::RequestData(
   else if (myProcId == infoProc)
   {
     vtkClientServerStream css;
-    vtkSerialize(css, input->GetPointData());
-    vtkSerialize(css, input->GetCellData());
+    vtkSerialize(css, inputDS->GetPointData());
+    vtkSerialize(css, inputDS->GetCellData());
 
-    if (vtkPointSet* ps = vtkPointSet::SafeDownCast(input))
+    if (vtkPointSet* ps = vtkPointSet::SafeDownCast(inputDS))
     {
       css << vtkClientServerStream::Reply << ps->GetPoints()->GetDataType()
           << vtkClientServerStream::End;

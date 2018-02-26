@@ -95,7 +95,7 @@ vtkVRUIPipe::MessageTag vtkVRUIPipe::Receive()
 
   while (bytes != sizeof(MessageTagPropocol)) // 2
   {
-// std::cout<< "Waiting to recieve" <<std::endl;
+// std::cout<< "Waiting to receive" <<std::endl;
 #ifdef QTSOCK
     bytes = this->Socket->read(reinterpret_cast<char*>(&message), sizeof(MessageTagPropocol));
 #else
@@ -110,7 +110,7 @@ vtkVRUIPipe::MessageTag vtkVRUIPipe::Receive()
       cout << "bytes=" << bytes << endl;
 
     cout << "sizeof=" << sizeof(MessageTagPropocol) << endl;
-    std::cout << "Recieved : " << this->GetString(static_cast<MessageTag>(message))
+    std::cout << "Received : " << this->GetString(static_cast<MessageTag>(message))
               << static_cast<MessageTag>(message) << std::endl;
 #endif
   }

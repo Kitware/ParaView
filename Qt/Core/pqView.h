@@ -43,7 +43,6 @@ class pqServer;
 class pqUndoStack;
 class pqViewInternal;
 class QWidget;
-class vtkImageData;
 class vtkSMSourceProxy;
 class vtkSMViewProxy;
 class vtkView;
@@ -67,7 +66,7 @@ public:
     PV_SELECTION_TOGGLE
   };
 
-  virtual ~pqView();
+  ~pqView() override;
 
   /**
   * Returns the internal render Module proxy associated with this object.
@@ -195,17 +194,6 @@ public:
   * argument.
   */
   virtual void emitSelectionSignals(bool frustum);
-
-  //@{
-  /**
-   * @deprecated in ParaView 5.4. `vtkSMSaveScreenshotProxy` now encapsulates
-   * all logic to capture images. See `pqSaveScreenshotReaction` for details on
-   * using it.
-   */
-  VTK_LEGACY(virtual vtkImageData* captureImage(int magnification) final);
-  VTK_LEGACY(virtual vtkImageData* captureImage(const QSize& size) final);
-  VTK_LEGACY(bool writeImage(const QString& filename, const QSize&, int quality = -1));
-  //@}
 
 signals:
   /**
@@ -356,7 +344,7 @@ protected:
   * after the object has been created.
   * Overridden to update the list of representations currently available.
   */
-  virtual void initialize();
+  void initialize() override;
 
   /**
   * Subclasses must override this method to create a widget for the view.

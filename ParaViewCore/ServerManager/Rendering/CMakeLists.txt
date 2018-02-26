@@ -47,6 +47,9 @@ set (Module_SRCS
   vtkSMDataDeliveryManager.cxx
   vtkSMFunctionalBagChartSeriesSelectionDomain.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
+  vtkSMLightProxy.cxx
+  vtkSMMaterialDomain.cxx
+  vtkSMMaterialLibraryProxy.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOrthographicSliceViewProxy.cxx
@@ -56,8 +59,8 @@ set (Module_SRCS
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationTypeDomain.cxx
   vtkSMRepresentedArrayListDomain.cxx
-  vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSaveScreenshotProxy.cxx
+  vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
   vtkSMSelectionLink.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
@@ -83,8 +86,6 @@ endif()
 list(APPEND Module_SRCS
   vtkSMParaViewPipelineControllerWithRendering.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
-
-set_source_files_properties(${vtk-module}ObjectFactory WRAP_EXCLUDE)
 
 # Override some rendering classes. Create object factory:
 set(vtk_module_overrides "vtkSMParaViewPipelineController")
@@ -128,10 +129,6 @@ set(${vtk-module}_HDRS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h)
 set_source_files_properties(
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
-  HEADER_FILE_ONLY
-  WRAP_EXCLUDE)
+  HEADER_FILE_ONLY)
 #-----------------------------------------------------------------------------
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
 vtk_module_library(vtkPVServerManagerRendering ${Module_SRCS})

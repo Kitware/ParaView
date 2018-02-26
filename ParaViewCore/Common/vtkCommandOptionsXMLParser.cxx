@@ -208,13 +208,13 @@ void vtkCommandOptionsXMLParser::StartElement(const char* name, const char** att
 //----------------------------------------------------------------------------
 void vtkCommandOptionsXMLParser::HandleProcessType(const char** atts)
 {
-  if (!atts[0] && strcmp(atts[0], "Type"))
+  if (atts == nullptr || atts[0] == nullptr || strcmp(atts[0], "Type") != 0)
   {
     vtkErrorMacro(
       "Bad XML Format 0 attributes found in Process Type, expected  Process Type=\"..\" ");
     return;
   }
-  if (!atts[1])
+  if (atts[1] == nullptr)
   {
     vtkErrorMacro("Bad XML Format 1 attributes found in Process Process Type=\"..\" ");
     return;
@@ -238,7 +238,7 @@ void vtkCommandOptionsXMLParser::HandleOption(const char** atts)
   }
   // Set name to be the next attribute
   name = atts[1];
-  // make sure Name=somthing
+  // make sure Name=something
   if (!name)
   {
     vtkErrorMacro("Bad XML Format, Name has no name.");
@@ -248,7 +248,7 @@ void vtkCommandOptionsXMLParser::HandleOption(const char** atts)
   // Now look for Value tag
   const char* valueTag = atts[2];
   const char* value = 0;
-  // if there is a value tag and it is "Vaule"
+  // if there is a value tag and it is "Value"
   if (valueTag && (strcmp(valueTag, "Value") != 0))
   {
     vtkErrorMacro("Bad XML Format missing value tag");

@@ -6,9 +6,4 @@ foreach (cmake_file IN LISTS cmake_files)
   include("${cmake_file}")
 endforeach ()
 
-set_source_files_properties(
-  vtkContextKeyEvent.cxx
-  vtkContextMouseEvent.cxx
-  WRAP_EXCLUDE)
-
 vtk_module_library(vtkRenderingContext2D ${Module_SRCS})

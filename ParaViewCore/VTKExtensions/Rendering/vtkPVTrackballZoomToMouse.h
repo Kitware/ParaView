@@ -38,20 +38,18 @@ public:
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
-  virtual void OnButtonDown(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
   //@}
 
 protected:
   vtkPVTrackballZoomToMouse();
-  ~vtkPVTrackballZoomToMouse();
+  ~vtkPVTrackballZoomToMouse() override;
 
   int ZoomPosition[2];
 
-  vtkPVTrackballZoomToMouse(const vtkPVTrackballZoomToMouse&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballZoomToMouse&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballZoomToMouse(const vtkPVTrackballZoomToMouse&) = delete;
+  void operator=(const vtkPVTrackballZoomToMouse&) = delete;
 };
 
 #endif

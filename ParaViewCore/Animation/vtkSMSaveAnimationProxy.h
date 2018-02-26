@@ -21,10 +21,6 @@
  * configure when saving animations. Once those properties are setup, one
  * calls vtkSMSaveAnimationProxy::WriteAnimation` to save out the animation.
  *
- * vtkSMSaveAnimationProxy provides static methods such as
- * `SupportsDisconnectAndSave`, `SupportsAVI`, and `SupportsOGV` that
- * applications can use to determine support for specific functionality in the
- * current session/application.
  */
 
 #ifndef vtkSMSaveAnimationProxy_h
@@ -34,7 +30,7 @@
 #include "vtkSMSaveScreenshotProxy.h"
 namespace vtkSMSaveAnimationProxyNS
 {
-class SceneImageWriter;
+class SceneGrabber;
 }
 
 class vtkPVXMLElement;
@@ -56,31 +52,33 @@ public:
    * Returns true if the session can support disconnecting and saving
    * animations.
    */
-  static bool SupportsDisconnectAndSave(vtkSMSession* session);
+  VTK_LEGACY(static bool SupportsDisconnectAndSave(vtkSMSession* session));
 
   /**
    * Returns true if the session supports AVI file writing.
+   * @deprecated in ParaView 5.5
    */
-  static bool SupportsAVI(vtkSMSession* session, bool remote = false);
+  VTK_LEGACY(static bool SupportsAVI(vtkSMSession* session, bool remote = false));
 
   /**
    * Returns true if the session supports OGV file writing.
+   * @deprecated in ParaView 5.5
    */
-  static bool SupportsOGV(vtkSMSession* session, bool remote = false);
+  VTK_LEGACY(static bool SupportsOGV(vtkSMSession* session, bool remote = false));
+
+  /**
+   * Overridden to update visibility state of "FrameRate" property.
+   */
+  void UpdateDefaultsAndVisibilities(const char* filename) override;
 
 protected:
   vtkSMSaveAnimationProxy();
-  ~vtkSMSaveAnimationProxy();
+  ~vtkSMSaveAnimationProxy() override;
 
   /**
    * Write animation on local process.
    */
   virtual bool WriteAnimationLocally(const char* filename);
-
-  /**
-   * Write animation on server after disconnecting from it.
-   */
-  virtual bool DisconnectAndWriteAnimation(const char* filename);
 
   /**
    * Prepares for saving animation.
@@ -104,10 +102,10 @@ protected:
   vtkSMProxy* GetAnimationScene();
 
 private:
-  vtkSMSaveAnimationProxy(const vtkSMSaveAnimationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSaveAnimationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSaveAnimationProxy(const vtkSMSaveAnimationProxy&) = delete;
+  void operator=(const vtkSMSaveAnimationProxy&) = delete;
 
-  friend class vtkSMSaveAnimationProxyNS::SceneImageWriter;
+  friend class vtkSMSaveAnimationProxyNS::SceneGrabber;
 
   vtkSmartPointer<vtkPVXMLElement> SceneState;
 };

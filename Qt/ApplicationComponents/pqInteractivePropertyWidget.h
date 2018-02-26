@@ -62,12 +62,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqInteractivePropertyWidget : public pqProp
 public:
   pqInteractivePropertyWidget(const char* widget_smgroup, const char* widget_smname,
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqInteractivePropertyWidget();
+  ~pqInteractivePropertyWidget() override;
 
   /**
   * Overridden to call this->render() to ensure that the widget is redrawn.
   */
-  virtual void reset();
+  void reset() override;
 
   /**
   * Returns the proxy for the interactive widget.
@@ -77,7 +77,7 @@ public:
   /**
   * Overridden to show the widget proxy in the new view.
   */
-  virtual void setView(pqView* view);
+  void setView(pqView* view) override;
 
   /**
   * Returns the interactive widget's visibility. Note that the widget may
@@ -97,8 +97,8 @@ public:
   * In these methods, we show/hide the widget since the interactive widget is not
   * supposed to be visible except when the panel is "active" or "selected".
   */
-  virtual void select();
-  virtual void deselect();
+  void select() override;
+  void deselect() override;
 
   /**
   * Returns bounds from the dataSource, if possible. May return invalid bounds

@@ -142,7 +142,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
       -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystGUI.xml
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystGUI.xml
       -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
       -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
       -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
@@ -153,11 +153,26 @@ if (PARAVIEW_BUILD_QT_GUI)
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES LABELS "${CP_LABELS}")
 
+    add_test(NAME CoProcessingFullWorkflowWithOnlyExtracts
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystGUIOnlyExtracts.xml
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
+      -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+      -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
+      -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}
+      -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
+      -DTEST_NAME:STRING=CoProcessingFullWorkflowWithOnlyExtracts
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+    set_tests_properties(CoProcessingFullWorkflowWithOnlyExtracts PROPERTIES RUN_SERIAL ON)
+    set_tests_properties(CoProcessingFullWorkflowWithOnlyExtracts PROPERTIES LABELS "${CP_LABELS}")
+
     ExternalData_add_test(ParaViewData NAME CoProcessingFullWorkflowWithPlots
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
       -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystGUIPlots.xml
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystGUIPlots.xml
       -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
       -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
       -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
@@ -174,7 +189,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
       -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystGUIOnlyPlots.xml
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystGUIOnlyPlots.xml
       -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
       -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
       -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
@@ -192,7 +207,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
         -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystCinemaGUI.xml
+        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaGUI.xml
         -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
         -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinema
@@ -204,7 +219,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
         -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystCinemaCompositeGUI.xml
+        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaCompositeGUI.xml
         -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
         -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaComposite
@@ -216,7 +231,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
         -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CatalystScriptGenerator/Testing/CatalystCinemaCompositeFloatGUI.xml
+        -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/CatalystCinemaCompositeFloatGUI.xml
         -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
         -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaCompositeFloat

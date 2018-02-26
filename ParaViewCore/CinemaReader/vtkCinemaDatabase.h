@@ -43,6 +43,13 @@ public:
   vtkTypeMacro(vtkCinemaDatabase, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
+  enum Spec
+  {
+    UNKNOWN = -1,
+    CINEMA_SPEC_A,
+    CINEMA_SPEC_C
+  };
+
   /**
    * Loads the cinema database.
    * @param[in] fname path to the `info.json` file corresponding to a Cinema store.
@@ -111,13 +118,28 @@ public:
   std::vector<vtkSmartPointer<vtkCamera> > Cameras(
     const std::string& timestep = std::string()) const;
 
+  /**
+   * Gets the spec used by the database.
+   * @return value from Spec enum.
+   */
+  int GetSpec() const;
+
+  /**
+   * Gets the nearest value in parameter list as a string.
+   * Values should be double and in ascending order.
+   * @param param parameter name
+   * @param value input data
+   * @return the nearest value as string
+   */
+  std::string GetNearestParameterValue(const std::string& param, double value) const;
+
 protected:
   vtkCinemaDatabase();
-  ~vtkCinemaDatabase();
+  ~vtkCinemaDatabase() override;
 
 private:
-  vtkCinemaDatabase(const vtkCinemaDatabase&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCinemaDatabase&) VTK_DELETE_FUNCTION;
+  vtkCinemaDatabase(const vtkCinemaDatabase&) = delete;
+  void operator=(const vtkCinemaDatabase&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

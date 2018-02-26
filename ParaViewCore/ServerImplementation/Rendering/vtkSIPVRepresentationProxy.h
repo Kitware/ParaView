@@ -31,21 +31,21 @@ public:
   vtkTypeMacro(vtkSIPVRepresentationProxy, vtkSIProxy);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void AboutToDelete() VTK_OVERRIDE;
+  void AboutToDelete() VTK_OVERRIDE;
 
 protected:
   vtkSIPVRepresentationProxy();
-  ~vtkSIPVRepresentationProxy();
+  ~vtkSIPVRepresentationProxy() override;
 
   /**
    * Parses the XML to create property/subproxy helpers.
    * Overridden to parse all the "RepresentationType" elements.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
-  vtkSIPVRepresentationProxy(const vtkSIPVRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIPVRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSIPVRepresentationProxy(const vtkSIPVRepresentationProxy&) = delete;
+  void operator=(const vtkSIPVRepresentationProxy&) = delete;
 
   void OnVTKObjectModified();
 

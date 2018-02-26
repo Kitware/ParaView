@@ -56,7 +56,7 @@ public:
   // \c parent:- QObject parent.
   pqRepresentation(const QString& group, const QString& name, vtkSMProxy* repr, pqServer* server,
     QObject* parent = NULL);
-  virtual ~pqRepresentation();
+  ~pqRepresentation() override;
 
   /**
   * Returns if the status of the visbility property of this display.

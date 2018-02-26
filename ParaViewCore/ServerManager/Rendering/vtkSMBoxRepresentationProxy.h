@@ -17,7 +17,7 @@
  * @brief   proxy for vtkBoxRepresentation
  *
  * vtkSMBoxRepresentationProxy is a proxy for vtkBoxRepresentation. A
- * specialization is needed to set the tranform on the vtkBoxRepresentation.
+ * specialization is needed to set the transform on the vtkBoxRepresentation.
 */
 
 #ifndef vtkSMBoxRepresentationProxy_h
@@ -34,23 +34,23 @@ public:
   vtkTypeMacro(vtkSMBoxRepresentationProxy, vtkSMWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void UpdateVTKObjects() VTK_OVERRIDE;
-  virtual void UpdatePropertyInformation() VTK_OVERRIDE;
-  virtual void UpdatePropertyInformation(vtkSMProperty* prop) VTK_OVERRIDE
+  void UpdateVTKObjects() VTK_OVERRIDE;
+  void UpdatePropertyInformation() VTK_OVERRIDE;
+  void UpdatePropertyInformation(vtkSMProperty* prop) VTK_OVERRIDE
   {
     this->Superclass::UpdatePropertyInformation(prop);
   }
 
 protected:
   vtkSMBoxRepresentationProxy();
-  ~vtkSMBoxRepresentationProxy();
+  ~vtkSMBoxRepresentationProxy() override;
 
   // This method is overridden to set the transform on the vtkWidgetRepresentation.
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMBoxRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&) = delete;
+  void operator=(const vtkSMBoxRepresentationProxy&) = delete;
 };
 
 #endif

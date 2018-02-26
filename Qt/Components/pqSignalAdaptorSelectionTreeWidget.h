@@ -65,7 +65,7 @@ public:
   */
   pqSignalAdaptorSelectionTreeWidget(QTreeWidget* treeWidget, vtkSMProperty* property);
 
-  virtual ~pqSignalAdaptorSelectionTreeWidget();
+  ~pqSignalAdaptorSelectionTreeWidget() override;
 
   /**
   * Returns a list of strings which  correspond to the currently

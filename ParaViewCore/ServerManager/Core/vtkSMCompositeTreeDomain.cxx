@@ -253,6 +253,7 @@ void vtkSMCompositeTreeDomain::PrintSelf(ostream& os, vtkIndent indent)
       break;
     case AMR:
       os << "AMR";
+      break;
     default:
       os << "UNKNOWN";
   }

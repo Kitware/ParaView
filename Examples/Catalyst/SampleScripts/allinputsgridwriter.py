@@ -5,17 +5,14 @@ from paraview import coprocessing
 # the frequency to output everything
 outputfrequency = 5
 
-# the name of the inputs that the adaptor provides
-# for most it will just be 'input' by convention
-namedinputs = ['input']
-
 # ----------------------- CoProcessor definition -----------------------
 
 def CreateCoProcessor():
   def _CreatePipeline(coprocessor, datadescription):
     class Pipeline:
-      for name in namedinputs:
-        inputdescription = datadescription.GetInputDescriptionByName(name)
+      for i in range(datadescription.GetNumberOfInputDescriptions()):
+        inputdescription = datadescription.GetInputDescription(i)
+        name = datadescription.GetInputDescriptionName(i)
         adaptorinput = coprocessor.CreateProducer( datadescription, name )
         grid = adaptorinput.GetClientSideObject().GetOutputDataObject(0)
         extension = None
@@ -46,20 +43,13 @@ def CreateCoProcessor():
         if extension:
           coprocessor.RegisterWriter(writer, filename=name+'_%t'+extension, freq=outputfrequency)
 
-
     return Pipeline()
 
   class CoProcessor(coprocessing.CoProcessor):
     def CreatePipeline(self, datadescription):
       self.Pipeline = _CreatePipeline(self, datadescription)
 
-  coprocessor = CoProcessor()
-  freqs = {}
-  for name in namedinputs:
-    freqs[name] = [outputfrequency]
-
-  coprocessor.SetUpdateFrequencies(freqs)
-  return coprocessor
+  return CoProcessor()
 
 #--------------------------------------------------------------
 # Global variables that will hold the pipeline for each timestep
@@ -78,7 +68,7 @@ coprocessor.EnableLiveVisualization(False)
 def RequestDataDescription(datadescription):
     "Callback to populate the request for current timestep"
     global coprocessor
-    if datadescription.GetForceOutput() == True:
+    if datadescription.GetForceOutput() == True or datadescription.GetTimeStep() % outputfrequency == 0:
         # We are just going to request all fields and meshes from the simulation
         # code/adaptor.
         for i in range(datadescription.GetNumberOfInputDescriptions()):

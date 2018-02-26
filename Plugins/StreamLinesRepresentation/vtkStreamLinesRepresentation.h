@@ -156,7 +156,7 @@ public:
 
 protected:
   vtkStreamLinesRepresentation();
-  ~vtkStreamLinesRepresentation();
+  ~vtkStreamLinesRepresentation() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
@@ -207,8 +207,8 @@ protected:
   int WholeExtent[6];
 
 private:
-  vtkStreamLinesRepresentation(const vtkStreamLinesRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkStreamLinesRepresentation&) VTK_DELETE_FUNCTION;
+  vtkStreamLinesRepresentation(const vtkStreamLinesRepresentation&) = delete;
+  void operator=(const vtkStreamLinesRepresentation&) = delete;
 };
 
 #endif

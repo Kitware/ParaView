@@ -2372,18 +2372,6 @@ void pqFlatTreeView::mouseDoubleClickEvent(QMouseEvent* e)
   }
 }
 
-void pqFlatTreeView::wheelEvent(QWheelEvent* e)
-{
-  if (this->verticalScrollBar()->isVisible())
-  {
-    qApp->notify(this->verticalScrollBar(), e);
-  }
-  else
-  {
-    e->ignore();
-  }
-}
-
 // Handle proxy with "tooltip" annotation so they can display their custom
 // tooltip information instead of the default behaviour.
 bool pqFlatTreeView::event(QEvent* e)
@@ -3740,9 +3728,14 @@ void pqFlatTreeView::drawData(QPainter& painter, int px, int py, const QModelInd
     {
       // Set the text color based on the highlighted state.
       painter.save();
+      QVariant color = this->Model->data(index, Qt::TextColorRole);
       if (selected)
       {
         painter.setPen(options.palette.color(QPalette::Normal, QPalette::HighlightedText));
+      }
+      else if (color.canConvert<QColor>())
+      {
+        painter.setPen(color.value<QColor>());
       }
       else
       {

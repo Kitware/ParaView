@@ -75,12 +75,12 @@ public:
 
 private:
   vtkExtractScatterPlot();
-  vtkExtractScatterPlot(const vtkExtractScatterPlot&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkExtractScatterPlot&) VTK_DELETE_FUNCTION;
-  ~vtkExtractScatterPlot();
+  vtkExtractScatterPlot(const vtkExtractScatterPlot&) = delete;
+  void operator=(const vtkExtractScatterPlot&) = delete;
+  ~vtkExtractScatterPlot() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int XComponent;

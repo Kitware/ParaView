@@ -57,7 +57,7 @@ public:
 
   /**
    * Calls SaveImage(image, filename, writerName) only on process 0.
-   * Other processes will recieve the return code through a broadcast.
+   * Other processes will receive the return code through a broadcast.
    */
   static int SaveImageOnProcessZero(
     vtkImageData* image, const char* filename, const char* writerName);
@@ -100,11 +100,11 @@ public:
 
 protected:
   vtkSMUtilities() {}
-  ~vtkSMUtilities() {}
+  ~vtkSMUtilities() override {}
 
 private:
-  vtkSMUtilities(const vtkSMUtilities&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMUtilities&) VTK_DELETE_FUNCTION;
+  vtkSMUtilities(const vtkSMUtilities&) = delete;
+  void operator=(const vtkSMUtilities&) = delete;
 };
 
 #endif

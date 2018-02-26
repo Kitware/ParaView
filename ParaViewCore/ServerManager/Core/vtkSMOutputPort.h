@@ -92,7 +92,7 @@ public:
 
 protected:
   vtkSMOutputPort();
-  ~vtkSMOutputPort();
+  ~vtkSMOutputPort() override;
 
   /**
    * Get the classname of the dataset from server.
@@ -139,8 +139,8 @@ protected:
   bool TemporalDataInformationValid;
 
 private:
-  vtkSMOutputPort(const vtkSMOutputPort&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMOutputPort&) VTK_DELETE_FUNCTION;
+  vtkSMOutputPort(const vtkSMOutputPort&) = delete;
+  void operator=(const vtkSMOutputPort&) = delete;
 
   friend class vtkSMSourceProxy;
   friend class vtkSMCompoundSourceProxy;

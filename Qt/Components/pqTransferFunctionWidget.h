@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqTransferFunctionWidget : public QWidget
 
 public:
   pqTransferFunctionWidget(QWidget* parent = 0);
-  virtual ~pqTransferFunctionWidget();
+  ~pqTransferFunctionWidget() override;
 
   /**
   * Initialize the pqTransferFunctionWidget with the given
@@ -72,6 +72,12 @@ public:
   * Returns the number of control points in the editor widget.
   */
   vtkIdType numberOfControlPoints() const;
+
+  /**
+   * Switches the chart to use a log scaled X axis.
+   */
+  void SetLogScaleXAxis(bool logScale);
+  bool GetLogScaleXAxis() const;
 
 public slots:
   /**

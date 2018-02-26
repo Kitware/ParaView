@@ -79,8 +79,8 @@ protected:
   ~vtkCPTestDriver();
 
 private:
-  vtkCPTestDriver(const vtkCPTestDriver&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPTestDriver&) VTK_DELETE_FUNCTION;
+  vtkCPTestDriver(const vtkCPTestDriver&) = delete;
+  void operator=(const vtkCPTestDriver&) = delete;
 
   /**
    * The grid builder for creating the input grids to the coprocessing library.

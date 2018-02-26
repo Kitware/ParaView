@@ -29,7 +29,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIVectorPropertyTemplate : public 
 {
 public:
   typedef vtkSIVectorProperty Superclass;
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -49,22 +49,22 @@ public:
 
 protected:
   vtkSIVectorPropertyTemplate();
-  ~vtkSIVectorPropertyTemplate();
+  ~vtkSIVectorPropertyTemplate() override;
 
   /**
    * Push a new state to the underneath implementation
    */
-  virtual bool Push(vtkSMMessage*, int);
+  bool Push(vtkSMMessage*, int) override;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*);
+  bool Pull(vtkSMMessage*) override;
 
   /**
    * Parse the xml for the property.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element);
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) override;
 
   /**
    * Implements the actual push.
@@ -74,8 +74,8 @@ protected:
   bool ArgumentIsArray;
 
 private:
-  vtkSIVectorPropertyTemplate(const vtkSIVectorPropertyTemplate&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIVectorPropertyTemplate&) VTK_DELETE_FUNCTION;
+  vtkSIVectorPropertyTemplate(const vtkSIVectorPropertyTemplate&) = delete;
+  void operator=(const vtkSIVectorPropertyTemplate&) = delete;
 };
 
 #endif

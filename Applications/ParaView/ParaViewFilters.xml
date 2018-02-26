@@ -152,6 +152,7 @@
   <Proxy group="filters" name="CellCenters" />
   <Proxy group="filters" name="CellDataToPointData" />
   <Proxy group="filters" name="CellDerivatives"/>
+  <Proxy group="filters" name="CellSize" />
   <Proxy group="filters" name="CleanPolyData" />
   <Proxy group="filters" name="CleanUnstructuredGrid" />
   <Proxy group="filters" name="CleanUnstructuredGridCells" />
@@ -168,9 +169,11 @@
   <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
   <Proxy group="filters" name="DataSetTriangleFilter" />
   <Proxy group="filters" name="DecimatePro" />
+  <Proxy group="filters" name="DecimatePolyline" />
   <Proxy group="filters" name="Delaunay2D" />
   <Proxy group="filters" name="Delaunay3D" />
   <Proxy group="filters" name="ElevationFilter" />
+  <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
   <Proxy group="filters" name="ExtractBlock" />
   <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
@@ -179,6 +182,7 @@
   <Proxy group="filters" name="ExtractHistogram" />
   <Proxy group="filters" name="ExtractSelection" />
   <Proxy group="filters" name="ExtractSelectionOverTime" />
+  <Proxy group="filters" name="PlotDataOverTime" />
   <Proxy group="filters" name="FeatureEdges" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
   <Proxy group="filters" name="GaussianSplatter"/>
@@ -200,8 +204,8 @@
   <Proxy group="filters" name="Median" />
   <Proxy group="filters" name="MergeBlocks" />
   <Proxy group="filters" name="MeshQuality" />
-  <Proxy group="filters" name="OctreeDepthLimit" />
-  <Proxy group="filters" name="OctreeDepthScalars" />
+  <Proxy group="filters" name="OTKernelSmoothing" />
+  <Proxy group="filters" name="OTDensityMap" />
   <Proxy group="filters" name="OutlineCornerFilter" />
   <Proxy group="filters" name="OutlineFilter" />
   <Proxy group="filters" name="ParticlePathLines" />
@@ -224,6 +228,7 @@
   <Proxy group="filters" name="RectilinearGridConnectivity" />
   <Proxy group="filters" name="RectilinearGridToPointSet" />
   <Proxy group="filters" name="ReflectionFilter" />
+  <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="ResampleToImage" />
   <Proxy group="filters" name="ResampleWithDataset" />
   <Proxy group="filters" name="RibbonFilter" />
@@ -265,5 +270,6 @@
   <Proxy group="filters" name="GenericStreamTracer" />
   <Proxy group="filters" name="GenericGeometryFilter" />
   <Proxy group="filters" name="SliceAlongPolyLine" />
+  <Proxy group="filters" name="SliceWithPlane" />
   <Proxy group="filters" name="RulerFilter" />
 </ParaViewFilters>

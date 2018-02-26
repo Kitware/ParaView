@@ -4,10 +4,95 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.5
+--------------
+
+###Changes to Python shell###
+
+`pqPythonShell` now is a fairly self contained class. One no longer has to go
+through `pqPythonManager` or `pqPythonDialog` to create it. `pqPythonDialog` has
+been deprecated. `pqPythonManager` has been relegated to a helper class to
+support macros (together with `pqPythonMacroSupervisor`). The Python macro
+infrastructure may be revamped in future, but is left unchanged for now.
+
+If you want a Python shell in your application, simply create an instance of
+`pqPythonShell` and add it where ever you choose. Multiple instances are also
+supported.
+
+###Changes to offscreen rendering options###
+
+ParaView executables now automatically choose to create on-screen or off-screen
+render windows for rendering based on the executable type and current
+configuration. As a result **"UseOffscreenRendering"** property on views has
+been removed to avoid conflicting with the new approach. Executables have new
+command line arguments: `--force-offscreen-rendering` and
+`--force-onscreen-rendering` that can be used to override the default behavior
+for the process.
+
+###Changes to vtkArrayCalculator
+`vtkArrayCalculator::SetAttributeMode` is deprecated in favor of `vtkArrayCalculator::SetAttributeType`
+which takes vtkDataObject attribute modes instead of custom constants as its parameter value.
+The ParaView calculator filter's AttributeMode property's values changed as a result of this.
+
+###Changes to vtkSMViewProxy::CaptureWindowInternal###
+
+`vtkSMViewProxy::CaptureWindowInternal` now takes a 2-component magnification
+factor rather than a single component. That allows for more accurate target image
+resolution than before (see #17567).
+
+###Replaced LockScalarRange property in PVLookupTable with AutomaticRescaleRangeMode###
+
+The `LockScalarRange` property in the `PVLookupTable` proxy has been removed. It
+has been replaced by the `AutomaticRescaleRangeMode` property. When
+`AutomaticRescaleRangeMode` is set to `vtkSMTransferFunctionManager::Never`,
+the transfer function minimum and maximum value is never updated, no matter what
+event occurs. This corresponds to when `LockScalarRange` was set to "on" in
+previous versions of ParaView. When `AutomaticRescaleRangeMode` is set to a
+different option, that option governs how and when the transfer function is
+reset. This option overrides whichever option is set in the `GeneralSettings`
+property `TransferFunctionResetMode`.
+
+The `TransferFunctionResetMode` property still exists, but it has been slightly
+repurposed. No longer does it control the range reset mode for ALL transfer
+functions. Instead, it serves the following functions:
+
+* determining the `AutomaticRescaleRangeMode` when a lookup table is created, and
+
+* determining what the `AutomaticRescaleRangeMode` should be when the data array
+  range is updated to the data range of the selected representation
+
+As part of this change, the enum values
+
+    GROW_ON_APPLY
+    GROW_ON_APPLY_AND_TIMESTEP
+    RESET_ON_APPLY
+    RESET_ON_APPLY_AND_TIMESTEP
+
+have been moved from `vtkPVGeneralSettings.h` to `vtkSMTransferFunctionManager.h`.
+
+###Deprecated pqDisplayPolicy###
+
+`pqDisplayPolicy`, a class that has been unofficially deprecated since
+`vtkSMParaViewPipelineControllerWithRendering` was introduced is now officially
+deprecated and will be removed in future. Use
+`vtkSMParaViewPipelineControllerWithRendering` to show/hide data in views
+instead of `pqDisplayPolicy`.
+
+###Changes to pqParaViewMenuBuilders###
+
+The signature of `pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget&)`
+has changed to `pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu&)` and
+now requires a `QMenu` to populate rather than populating the implicitly created context
+menu in a widget.
+
+Note that the `contextMenuPolicy` set in the widget providing the context menu must be
+set to `Qt::DefaultContextMenu` for the context menu to appear. in `pqPipelineBrowserWidget`,
+this used to be set to `Qt::ActionsContextMenu`.
+
 Changes in 5.4
 --------------
 
-### Moved vtkAppendArcLength to VTK and exposed this filter in the UI.
+###Moved vtkAppendArcLength to VTK and exposed this filter in the UI.
 
 As a result of this change, `vtkAppendArcLength` was moved from
 the `internal_filters` to the `filters` group.

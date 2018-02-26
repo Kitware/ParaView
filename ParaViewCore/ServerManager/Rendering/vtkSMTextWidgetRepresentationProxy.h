@@ -35,9 +35,9 @@ public:
 
 protected:
   vtkSMTextWidgetRepresentationProxy();
-  ~vtkSMTextWidgetRepresentationProxy();
+  ~vtkSMTextWidgetRepresentationProxy() override;
 
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   vtkSMProxy* TextActorProxy;
   vtkSMProxy* TextPropertyProxy;
@@ -45,8 +45,8 @@ protected:
   friend class vtkSMTextSourceRepresentationProxy;
 
 private:
-  vtkSMTextWidgetRepresentationProxy(const vtkSMTextWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTextWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMTextWidgetRepresentationProxy(const vtkSMTextWidgetRepresentationProxy&) = delete;
+  void operator=(const vtkSMTextWidgetRepresentationProxy&) = delete;
 };
 
 #endif

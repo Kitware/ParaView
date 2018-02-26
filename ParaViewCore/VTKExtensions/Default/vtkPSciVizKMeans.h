@@ -42,7 +42,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizKMeans : public vtkSciVizStatis
 public:
   static vtkPSciVizKMeans* New();
   vtkTypeMacro(vtkPSciVizKMeans, vtkSciVizStatistics);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -75,10 +75,10 @@ public:
 
 protected:
   vtkPSciVizKMeans();
-  virtual ~vtkPSciVizKMeans();
+  ~vtkPSciVizKMeans() override;
 
-  virtual int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) VTK_OVERRIDE;
-  virtual int AssessData(
+  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) VTK_OVERRIDE;
+  int AssessData(
     vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
 
   int K;
@@ -86,8 +86,8 @@ protected:
   double Tolerance;
 
 private:
-  vtkPSciVizKMeans(const vtkPSciVizKMeans&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPSciVizKMeans&) VTK_DELETE_FUNCTION;
+  vtkPSciVizKMeans(const vtkPSciVizKMeans&) = delete;
+  void operator=(const vtkPSciVizKMeans&) = delete;
 };
 
 #endif // vtkPSciVizKMeans_h

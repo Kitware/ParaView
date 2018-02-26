@@ -66,8 +66,8 @@ protected:
   vtkNew<vtkMatrix4x4> InitialInvertedPose;
 
 private:
-  vtkVRControlSlicePositionStyle(const vtkVRControlSlicePositionStyle&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVRControlSlicePositionStyle&) VTK_DELETE_FUNCTION;
+  vtkVRControlSlicePositionStyle(const vtkVRControlSlicePositionStyle&) = delete;
+  void operator=(const vtkVRControlSlicePositionStyle&) = delete;
 };
 
 #endif

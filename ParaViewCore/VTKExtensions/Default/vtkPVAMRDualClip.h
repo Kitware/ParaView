@@ -40,7 +40,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkPVAMRDualClip();
-  ~vtkPVAMRDualClip();
+  ~vtkPVAMRDualClip() override;
 
   //@{
   /**
@@ -58,12 +58,11 @@ public:
   vtkSetMacro(VolumeFractionSurfaceValue, double);
   //@}
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkPVAMRDualClip(const vtkPVAMRDualClip&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAMRDualClip&) VTK_DELETE_FUNCTION;
+  vtkPVAMRDualClip(const vtkPVAMRDualClip&) = delete;
+  void operator=(const vtkPVAMRDualClip&) = delete;
 
 protected:
   double VolumeFractionSurfaceValue;

@@ -68,10 +68,10 @@ class pqCustomFilterDefinitionModelSource : public pqCustomFilterDefinitionModel
 public:
   pqCustomFilterDefinitionModelSource(
     pqCustomFilterDefinitionModelItem* parent = 0, pqPipelineSource* source = 0);
-  virtual ~pqCustomFilterDefinitionModelSource() {}
+  ~pqCustomFilterDefinitionModelSource() override {}
 
-  virtual QString GetName() const;
-  virtual pqPipelineSource* GetPipelineSource() const;
+  QString GetName() const override;
+  pqPipelineSource* GetPipelineSource() const override;
 
   pqPipelineSource* Source;
 };
@@ -82,10 +82,10 @@ class pqCustomFilterDefinitionModelLink : public pqCustomFilterDefinitionModelIt
 public:
   pqCustomFilterDefinitionModelLink(
     pqCustomFilterDefinitionModelItem* parent = 0, pqCustomFilterDefinitionModelSource* link = 0);
-  virtual ~pqCustomFilterDefinitionModelLink() {}
+  ~pqCustomFilterDefinitionModelLink() override {}
 
-  virtual QString GetName() const;
-  virtual pqPipelineSource* GetPipelineSource() const;
+  QString GetName() const override;
+  pqPipelineSource* GetPipelineSource() const override;
 
   pqCustomFilterDefinitionModelSource* Link;
 };

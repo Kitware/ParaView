@@ -31,7 +31,6 @@
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
@@ -406,7 +405,7 @@ public:
       return true;
     }
 
-    // qWarning() << "pqPlotVariablesDialog::pqInternal: * Error * Invalide range separator " << ;
+    // qWarning() << "pqPlotVariablesDialog::pqInternal: * Error * Invalid range separator " << ;
 
     return false;
   }

@@ -12,7 +12,9 @@ vtk_module(pqComponents
   PRIVATE_DEPENDS
     vtkChartsCore
     vtkIOImage
+    vtkpugixml
     vtkPVAnimation
+    vtkPVClientServerCoreDefault
     vtkPVServerManagerDefault
     vtkPVServerManagerRendering
     vtksys

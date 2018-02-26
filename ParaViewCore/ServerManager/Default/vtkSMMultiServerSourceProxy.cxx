@@ -69,7 +69,7 @@ void vtkSMMultiServerSourceProxy::SetExternalProxy(
     previousRemoteProxy->RemoveConsumer(this->GetProperty("DependencyLink"), this);
   }
 
-  // Store data informations
+  // Store data information
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   this->RemoteProxySessionID = pm->GetSessionID(proxyFromAnotherServer->GetSession());
   this->RemoteProxyID = proxyFromAnotherServer->GetGlobalID();

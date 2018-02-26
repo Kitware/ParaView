@@ -17,17 +17,17 @@
 #include "vtkCamera.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLFXAAFilter.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkPNGWriter.h"
 #include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
-
-#include <sstream>
-#include <vtkNew.h>
 
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 
 class vtkTileDisplayHelper::vtkInternals
@@ -70,6 +70,14 @@ public:
         renderer->GetViewport(viewport);
         renderer->SetViewport(tile.PhysicalViewport);
         tile.TileImage.PushToViewport(renderer);
+        // optimization: we can cache the fxaa result and avoid having to re-run
+        // fxaa for subsequent renders.
+        if (renderer->GetUseFXAA())
+        {
+          vtkNew<vtkOpenGLFXAAFilter> fxaaFilter;
+          fxaaFilter->UpdateConfiguration(renderer->GetFXAAOptions());
+          fxaaFilter->Execute(vtkOpenGLRenderer::SafeDownCast(renderer));
+        }
         renderer->SetViewport(viewport);
       }
     }

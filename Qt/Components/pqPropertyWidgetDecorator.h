@@ -59,7 +59,7 @@ public:
   * @param parent Parent widget, cannot be NULL.
   */
   pqPropertyWidgetDecorator(vtkPVXMLElement* xml, pqPropertyWidget* parent);
-  virtual ~pqPropertyWidgetDecorator();
+  ~pqPropertyWidgetDecorator() override;
 
   /**
   * Returns the pqPropertyWidget parent.

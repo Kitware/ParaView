@@ -50,10 +50,11 @@ class PQCOMPONENTS_EXPORT pqPluginTreeWidgetEventPlayer : public pqWidgetEventPl
 
 public:
   pqPluginTreeWidgetEventPlayer(QObject* parent = 0);
-  ~pqPluginTreeWidgetEventPlayer();
+  ~pqPluginTreeWidgetEventPlayer() override;
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
+  bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error) override;
 
 private:
   Q_DISABLE_COPY(pqPluginTreeWidgetEventPlayer)

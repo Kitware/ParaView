@@ -69,16 +69,16 @@ public:
 
 protected:
   vtkSMPythonViewProxy();
-  ~vtkSMPythonViewProxy();
+  ~vtkSMPythonViewProxy() override;
 
   /**
    * Subclasses should override this method to do the actual image capture.
    */
-  virtual vtkImageData* CaptureWindowInternal(int magnification) VTK_OVERRIDE;
+  vtkImageData* CaptureWindowInternal(int magX, int magY) VTK_OVERRIDE;
 
 private:
-  vtkSMPythonViewProxy(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPythonViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMPythonViewProxy(const vtkSMPythonViewProxy&) = delete;
+  void operator=(const vtkSMPythonViewProxy&) = delete;
 
   vtkNew<vtkSMViewProxyInteractorHelper> InteractorHelper;
 };

@@ -18,7 +18,7 @@
  * render window and renderers.
  *
  * vtkSMRenderViewProxy is a 3D view consisting for a render window and two
- * renderers: 1 for 3D geometry and 1 for overlayed 2D geometry.
+ * renderers: 1 for 3D geometry and 1 for overlaid 2D geometry.
 */
 
 #ifndef vtkSMRenderViewProxy_h
@@ -130,12 +130,12 @@ public:
    * RenderView. This include changing the interactor style as well as
    * overriding VTK rendering to use the Proxy/ViewProxy API instead.
    */
-  virtual void SetupInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void SetupInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
 
   /**
    * Returns the interactor.
    */
-  virtual vtkRenderWindowInteractor* GetInteractor() VTK_OVERRIDE;
+  vtkRenderWindowInteractor* GetInteractor() VTK_OVERRIDE;
 
   /**
    * Returns the client-side renderer (composited or 3D).
@@ -171,12 +171,12 @@ public:
    * Called vtkPVView::Update on the server-side. Overridden to update the state
    * of NeedsUpdateLOD flag.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * We override that method to handle LOD and non-LOD NeedsUpdate in transparent manner.
    */
-  virtual bool GetNeedsUpdate() VTK_OVERRIDE;
+  bool GetNeedsUpdate() VTK_OVERRIDE;
 
   /**
    * Called to render a streaming pass. Returns true if the view "streamed" some
@@ -188,13 +188,12 @@ public:
    * Overridden to check through the various representations that this view can
    * create.
    */
-  virtual const char* GetRepresentationType(
-    vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
 
   /**
    * Returns the render window used by this view.
    */
-  virtual vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
    * Provides access to the vtkSMViewProxyInteractorHelper object that handles
@@ -231,7 +230,7 @@ public:
 
 protected:
   vtkSMRenderViewProxy();
-  ~vtkSMRenderViewProxy();
+  ~vtkSMRenderViewProxy() override;
 
   /**
    * Overridden to call this->InteractiveRender() if
@@ -248,15 +247,15 @@ protected:
    * Overridden to ensure that we clean up the selection cache on the server
    * side.
    */
-  virtual void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
+  void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
 
   bool SelectFrustumInternal(const int region[4], vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections, int fieldAssociation);
   bool SelectPolygonInternal(vtkIntArray* polygon, vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, bool multiple_selections, const char* method);
 
-  virtual vtkTypeUInt32 PreRender(bool interactive) VTK_OVERRIDE;
-  virtual void PostRender(bool interactive) VTK_OVERRIDE;
+  vtkTypeUInt32 PreRender(bool interactive) VTK_OVERRIDE;
+  void PostRender(bool interactive) VTK_OVERRIDE;
 
   /**
    * Fetches the LastSelection from the data-server and then converts it to a
@@ -268,7 +267,7 @@ protected:
   /**
    * Called at the end of CreateVTKObjects().
    */
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   /**
    * Returns true if the proxy is in interaction mode that corresponds to making
@@ -289,8 +288,8 @@ protected:
   bool NeedsUpdateLOD;
 
 private:
-  vtkSMRenderViewProxy(const vtkSMRenderViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRenderViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMRenderViewProxy(const vtkSMRenderViewProxy&) = delete;
+  void operator=(const vtkSMRenderViewProxy&) = delete;
 
   /**
    * Internal method to execute `cmd` on the rendering processes to do rendering

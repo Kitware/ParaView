@@ -102,7 +102,7 @@
         </property>
         <property name="icon">
          <iconset resource="../pqComponents.qrc">
-          <normaloff>:/pqWidgets/Icons/pqEyeballd16.png</normaloff>:/pqWidgets/Icons/pqEyeballd16.png</iconset>
+          <normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</iconset>
         </property>
        </column>
        <item row="0" column="0">
@@ -128,6 +128,66 @@
        <property name="text">
         <string>Share mouse pointer</string>
        </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QWidget" name="masterControl" native="true">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="disableFurtherConnections">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
+          <property name="text">
+           <string>Disable further connections</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="connectIdLabel">
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Server Connect ID </string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="connectId">
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </item>
      <item>

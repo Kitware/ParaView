@@ -98,10 +98,10 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~pqTraceablePropertyLinksConnection() {}
+  ~pqTraceablePropertyLinksConnection() override {}
 protected:
   /// Called to update the ServerManager Property due to UI change.
-  virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
+  void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
     SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxySM());
     this->Superclass::setServerManagerValue(use_unchecked, value);

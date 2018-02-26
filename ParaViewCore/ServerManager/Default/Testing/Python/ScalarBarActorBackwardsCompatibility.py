@@ -17,14 +17,14 @@ assert (type(cb.ScalarBarThickness) == int),\
 # check that removed properties are not available
 try:
     a = cb.AspectRatio
-except AttributeError:
+except paraview.NotSupportedException:
     pass
 else:
     raise RuntimeError("Accessing 'AspectRatio' must raise an exception.")
 
 try:
     p = cb.Position2
-except AttributeError:
+except paraview.NotSupportedException:
     pass
 else:
     raise RuntimeError("Accessing 'Position2' must raise an exception.")
@@ -41,14 +41,14 @@ assert (len(cb.Position2) == 2), "'Position2' must contain two elements"
 
 try:
     cb.AspectRatio = 20.0
-except AttributeError:
+except paraview.NotSupportedException:
     raise RuntimeError("Setting 'AspectRatio' must *not* have raised an exception.")
 
 assert (cb.AspectRatio == 20.0), "Value for 'AspectRatio' is not 20.0."
 
 try:
     cb.Position2 = [0.1, 0.2]
-except AttributeError:
+except paraview.NotSupportedException:
     raise RuntimeError("Setting 'Position2' must *not* have raised an exception.")
 
 assert (cb.Position2 == [0.1, 0.2]), "Value for 'Position2' is not [0.1, 0.2]."

@@ -95,7 +95,7 @@ protected:
     : Actor(NULL)
   {
   }
-  virtual ~vtkScalarBarItem() {}
+  ~vtkScalarBarItem() override {}
 };
 
 //----------------------------------------------------------------------------
@@ -113,6 +113,7 @@ vtkContext2DScalarBarActor::vtkContext2DScalarBarActor()
   this->ActorDelegate = vtkContextActor::New();
 
   this->TitleJustification = VTK_TEXT_LEFT;
+  this->ForceHorizontalTitle = false;
 
   this->ScalarBarThickness = 16;
   this->ScalarBarLength = 0.33;
@@ -159,6 +160,7 @@ vtkContext2DScalarBarActor::~vtkContext2DScalarBarActor()
   this->SetTitleTextProperty(NULL);
   this->SetLabelTextProperty(NULL);
   this->Axis->Delete();
+  this->SetRangeLabelFormat(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -262,6 +264,7 @@ void vtkContext2DScalarBarActor::UpdateScalarBarTexture(vtkImageData* image)
 
   double* lutRange = ctf->GetRange();
   const int numColors = 256;
+  unsigned char color[4];
   for (int i = 0; i < numColors; ++i)
   {
 
@@ -275,10 +278,13 @@ void vtkContext2DScalarBarActor::UpdateScalarBarTexture(vtkImageData* image)
       value = pow(10.0, value);
     }
 
-    unsigned char* color = ctf->MapValue(value);
+    const unsigned char* colorTmp = ctf->MapValue(value);
 
     // The opacity function does not take into account the logarithmic
     // mapping, so we use the original value here.
+    color[0] = colorTmp[0];
+    color[1] = colorTmp[1];
+    color[2] = colorTmp[2];
     color[3] = static_cast<unsigned char>(255.0 * ctf->GetOpacity(originalValue) + 0.5);
     colors->SetTypedTuple(i, color);
   }
@@ -900,12 +906,6 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
 
   this->Axis->Update();
   this->Axis->Paint(painter);
-
-  //-----------------------------
-  // Set up title
-  // IMPORTANT: this needs to be done *after* this->Axis->Update() is called
-  // so that we get an accurate axis bounding rectangle.
-  this->PaintTitle(painter, size);
 }
 
 //----------------------------------------------------------------------------
@@ -919,8 +919,12 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
   }
 
   // Apply the text property so that title size is up to date.
-  this->TitleTextProperty->SetOrientation(
-    this->GetOrientation() == VTK_ORIENT_HORIZONTAL ? 0.0 : 90.0);
+  double titleOrientation = 0.0;
+  if (this->GetOrientation() == VTK_ORIENT_VERTICAL && !this->GetForceHorizontalTitle())
+  {
+    titleOrientation = 90.0;
+  }
+  this->TitleTextProperty->SetOrientation(titleOrientation);
   this->TitleTextProperty->SetJustification(this->GetTitleJustification());
   painter->ApplyTextProp(this->TitleTextProperty);
 
@@ -931,21 +935,35 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
   float titleHeight = titleBounds[3];
 
   // vtkAxis::GetBoundingRect() is not accurate.  Compute it ourselves.
-  vtkRectf axisRect =
-    vtkBoundingRectContextDevice2D::GetBoundingRect(this->Axis, this->CurrentViewport);
+  // All the code in this section is needed to get the actual bounds of
+  // the axis including any offsets applied in PaintAxis().
+  vtkNew<vtkBoundingRectContextDevice2D> boundingDevice;
+  vtkNew<vtkContextDevice2D> contextDevice;
+  boundingDevice->SetDelegateDevice(contextDevice.Get());
+  boundingDevice->Begin(this->CurrentViewport);
+  vtkNew<vtkContext2D> context;
+  context->Begin(boundingDevice);
+  this->PaintAxis(context, size);
+  context->End();
+  boundingDevice->End();
 
-  vtkRectf rect = this->GetColorBarRect(size);
-  float titleX = rect.GetX() + 0.5 * rect.GetWidth();
-  float titleY = rect.GetY() + 0.5 * rect.GetHeight();
-  if (this->GetOrientation() == VTK_ORIENT_HORIZONTAL)
+  vtkRectf axisRect = boundingDevice->GetBoundingRect();
+
+  vtkRectf barAndAxisRect = axisRect;
+  vtkRectf colorBarRect = this->GetColorBarRect(size);
+  barAndAxisRect.AddRect(colorBarRect);
+
+  float titleX = barAndAxisRect.GetX() + 0.5 * barAndAxisRect.GetWidth();
+  float titleY = colorBarRect.GetY() + 0.5 * colorBarRect.GetHeight();
+  if (this->GetOrientation() == VTK_ORIENT_HORIZONTAL || this->ForceHorizontalTitle)
   {
     if (this->GetTitleJustification() == VTK_TEXT_LEFT)
     {
-      titleX = 0.0;
+      titleX = barAndAxisRect.GetX();
     }
     else if (this->GetTitleJustification() == VTK_TEXT_RIGHT)
     {
-      titleX = rect.GetX() + rect.GetWidth();
+      titleX = barAndAxisRect.GetX() + barAndAxisRect.GetWidth();
     }
     if (this->GetTextPosition() == vtkContext2DScalarBarActor::PrecedeScalarBar)
     {
@@ -956,8 +974,14 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
       // Handle zero-height axis.
       if (axisRect.GetHeight() < 1.0)
       {
-        axisRect.SetHeight(rect.GetHeight());
+        axisRect.SetHeight(colorBarRect.GetHeight());
       }
+      titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
+    }
+
+    // Move title to the top if the title is forced horizontal
+    if (this->ForceHorizontalTitle && this->GetOrientation() != VTK_ORIENT_HORIZONTAL)
+    {
       titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
     }
   }
@@ -966,23 +990,23 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
     // Handle zero-width axis.
     if (axisRect.GetWidth() < 1.0)
     {
-      axisRect.SetWidth(0.25 * rect.GetWidth());
+      axisRect.SetWidth(0.25 * colorBarRect.GetWidth());
     }
     if (this->GetTitleJustification() == VTK_TEXT_LEFT)
     {
-      titleY = 0.0;
+      titleY = barAndAxisRect.GetY();
     }
     else if (this->GetTitleJustification() == VTK_TEXT_RIGHT)
     {
-      titleY = rect.GetY() + rect.GetHeight();
+      titleY = barAndAxisRect.GetY() + barAndAxisRect.GetHeight();
     }
     if (this->GetTextPosition() == vtkContext2DScalarBarActor::PrecedeScalarBar)
     {
-      titleX = rect.GetX() - axisRect.GetWidth();
+      titleX = colorBarRect.GetX() - axisRect.GetWidth();
     }
     else
     {
-      titleX = rect.GetX() + rect.GetWidth() + axisRect.GetWidth() + titleWidth;
+      titleX = colorBarRect.GetX() + colorBarRect.GetWidth() + axisRect.GetWidth() + titleWidth;
     }
   }
 
@@ -1022,8 +1046,6 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
   // so that things like tile scale and DPI are correct.
   this->Axis->GetScene()->SetRenderer(vtkRenderer::SafeDownCast(this->CurrentViewport));
 
-  vtkWindow* renWin = this->CurrentViewport->GetVTKWindow();
-
   double size[2];
   this->GetSize(size, painter);
 
@@ -1035,6 +1057,9 @@ bool vtkContext2DScalarBarActor::Paint(vtkContext2D* painter)
 
   this->PaintColorBar(painter, size);
   this->PaintAxis(painter, size);
+  // IMPORTANT: this needs to be done *after* this->Axis->Update() is called
+  // in PaintAxis() so that we get an accurate axis bounding rectangle.
+  this->PaintTitle(painter, size);
 
   // Restore settings
   pen->DeepCopy(savePen.GetPointer());
@@ -1304,4 +1329,24 @@ void vtkContext2DScalarBarActor::PaintAnnotationsHorizontally(
 void vtkContext2DScalarBarActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+int vtkContext2DScalarBarActor::GetEstimatedNumberOfAnnotations()
+{
+  vtkDiscretizableColorTransferFunction* ctf =
+    vtkDiscretizableColorTransferFunction::SafeDownCast(this->LookupTable);
+  if (!ctf)
+  {
+    return 0;
+  }
+  if (this->GetAutomaticAnnotations() && !ctf->GetIndexedLookup())
+  {
+    // How many annotations should there be?
+    return ctf->GetNumberOfAvailableColors();
+  }
+  else // Manual annotations
+  {
+    return ctf->GetNumberOfAnnotatedValues();
+  }
 }

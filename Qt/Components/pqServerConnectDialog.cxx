@@ -93,7 +93,7 @@ public:
   }
 
 protected:
-  void highlightBlock(const QString& text)
+  void highlightBlock(const QString& text) override
   {
     // is comment.
     static QRegExp comment("#[^\n]*");
@@ -436,6 +436,7 @@ void pqServerConnectDialog::updateServerType()
     case CLIENT_SERVER:
       this->Internals->hostLabel->setVisible(true);
       this->Internals->host->setVisible(true);
+      VTK_FALLTHROUGH;
     // break; << -- don't break
 
     case CLIENT_SERVER_REVERSE_CONNECT:
@@ -448,6 +449,7 @@ void pqServerConnectDialog::updateServerType()
       this->Internals->renderServerHost->setVisible(true);
       this->Internals->dataServerHostLabel->setVisible(true);
       this->Internals->dataServerHost->setVisible(true);
+      VTK_FALLTHROUGH;
     // break; << -- don't break
 
     case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
@@ -828,6 +830,8 @@ void pqServerConnectDialog::importServersSelectionChanged()
 //-----------------------------------------------------------------------------
 void pqServerConnectDialog::importServers()
 {
+  // Make sure servers importer and server table widget are synchronized
+  this->updateImportableConfigurations();
   QList<QTableWidgetItem*> items = this->Internals->importServersTable->selectedItems();
   QSet<int> indexes;
   foreach (QTableWidgetItem* item, items)

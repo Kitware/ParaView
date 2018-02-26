@@ -46,12 +46,10 @@ public:
 
 protected:
   vtkNIfTIWriter();
-  ~vtkNIfTIWriter();
+  ~vtkNIfTIWriter() override;
 
-  virtual void WriteFile(
-    ofstream* file, vtkImageData* data, int ext[6], int wholeExtent[6]) VTK_OVERRIDE;
-  virtual void WriteFileHeader(
-    ofstream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
+  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wholeExtent[6]) VTK_OVERRIDE;
+  void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
 
 private:
   int FileType;
@@ -65,8 +63,8 @@ private:
   int sform_code;
   int qform_code;
 
-  vtkNIfTIWriter(const vtkNIfTIWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkNIfTIWriter&) VTK_DELETE_FUNCTION;
+  vtkNIfTIWriter(const vtkNIfTIWriter&) = delete;
+  void operator=(const vtkNIfTIWriter&) = delete;
 };
 
 #endif

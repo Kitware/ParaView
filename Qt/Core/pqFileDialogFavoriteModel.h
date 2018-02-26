@@ -59,7 +59,7 @@ public:
   * if the server is NULL, we get file listings locally
   */
   pqFileDialogFavoriteModel(pqServer* server, QObject* Parent);
-  ~pqFileDialogFavoriteModel();
+  ~pqFileDialogFavoriteModel() override;
 
   /**
   * return the path to the favorites item
@@ -73,17 +73,17 @@ public:
   /**
   * returns the data for an item
   */
-  QVariant data(const QModelIndex& idx, int role) const;
+  QVariant data(const QModelIndex& idx, int role) const override;
 
   /**
   * return the number of rows in the model
   */
-  int rowCount(const QModelIndex& idx) const;
+  int rowCount(const QModelIndex& idx) const override;
 
   /**
   * return header data
   */
-  QVariant headerData(int section, Qt::Orientation, int role) const;
+  QVariant headerData(int section, Qt::Orientation, int role) const override;
 
 private:
   class pqImplementation;

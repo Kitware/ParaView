@@ -10,7 +10,7 @@ from twisted.web.error import Error
 
 from paraview import simple
 from paraview.web import helper
-from vtk.vtkParaViewWebCore import vtkPVWebApplication
+from vtkmodules.vtkParaViewWebCore import vtkPVWebApplication
 
 import exceptions
 import base64
@@ -28,7 +28,7 @@ class WebGLResource(resource.Resource):
 
            vid : visualization view ID    (GlobalID of the view Proxy)
            id  : id of the object in the scene
-           part: WebGL has a size limit, therefore an object can be splitted in
+           part: WebGL has a size limit, therefore an object can be split in
            several part. This is the part index.
     """
     def _missing_parameter(self, parameter):
@@ -139,7 +139,7 @@ class WebGLResource(resource.Resource):
 
            vid : visualization view ID    (GlobalID of the view Proxy)
            id  : id of the object in the scene
-           part: WebGL has a size limit, therefore an object can be splitted in several part. This is the part index.
+           part: WebGL has a size limit, therefore an object can be split in several part. This is the part index.
         """
         try:
             q = self._get_parameter(request.args, 'q')

@@ -77,8 +77,8 @@ public:
   /**
   * Overwrite pqPropertyWidget to forward calls to vtkSMPropertyGroup
   */
-  virtual char* panelVisibility() const;
-  virtual void setPanelVisibility(const char* vis);
+  char* panelVisibility() const override;
+  void setPanelVisibility(const char* vis) override;
 
 private:
   void addCheckedPropertyLink(QWidget* button, const char* propertyName, int smindex = -1);

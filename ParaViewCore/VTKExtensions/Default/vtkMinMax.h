@@ -86,13 +86,13 @@ public:
 
 protected:
   vtkMinMax();
-  ~vtkMinMax();
+  ~vtkMinMax() override;
 
   // overridden to allow multiple inputs to port 0
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // run the algorithm
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // helper methods to break up the work
@@ -115,8 +115,8 @@ protected:
   int MismatchOccurred;
 
 private:
-  vtkMinMax(const vtkMinMax&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMinMax&) VTK_DELETE_FUNCTION;
+  vtkMinMax(const vtkMinMax&) = delete;
+  void operator=(const vtkMinMax&) = delete;
 };
 
 #endif

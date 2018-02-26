@@ -21,7 +21,7 @@
 // with optional data stored at the nodes or at the cells of the model.
 //
 // vtkGMVReader was originally created by Jens F. Acker (TU Dortmund) using
-// vtkAVSucdReader as a developement template to read unstructured grids with
+// vtkAVSucdReader as a development template to read unstructured grids with
 // point and cell data. It has since been extended by Sven H.M. Buijssen (TU
 // Dortmund) to support a larger subset of the GMV file format and maintained
 // to keep up with VTK API changes.
@@ -201,7 +201,7 @@ public:
 
 protected:
   vtkGMVReader();
-  ~vtkGMVReader();
+  ~vtkGMVReader() override;
   // int ProcessRequest( vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
@@ -248,8 +248,8 @@ protected:
 #endif
 
 private:
-  vtkGMVReader(const vtkGMVReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGMVReader&) VTK_DELETE_FUNCTION;
+  vtkGMVReader(const vtkGMVReader&) = delete;
+  void operator=(const vtkGMVReader&) = delete;
 
   vtkStringArray* FileNames; // VTK array of files
   bool ContainsProbtimeKeyword;

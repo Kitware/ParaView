@@ -41,25 +41,24 @@ public:
 
 protected:
   vtkIntegrateFlowThroughSurface();
-  ~vtkIntegrateFlowThroughSurface();
+  ~vtkIntegrateFlowThroughSurface() override;
 
   // Usual data generation method
   // Usual data generation method
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestUpdateExtent(
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestUpdateExtent(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   vtkDataSet* GenerateSurfaceVectors(vtkDataSet* input);
 
 private:
-  vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIntegrateFlowThroughSurface&) VTK_DELETE_FUNCTION;
+  vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&) = delete;
+  void operator=(const vtkIntegrateFlowThroughSurface&) = delete;
 };
 
 #endif

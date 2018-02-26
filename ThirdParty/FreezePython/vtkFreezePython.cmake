@@ -4,13 +4,15 @@
 #       -DOUTPUT_DIRECTORY:PATH="..."
 #       -DPACKAGE_ROOT:PATH="..."
 #       -DPYTHON_EXECUTABLE:FILEPATH="Python executable"
-#       -DOUTPUT_HEADER_PREFIX:STRING"..."
+#       -DOUTPUT_HEADER_PREFIX:STRING="..."
+#       -DPYTHON_LIBRARY_PATH:PATH="Path to python libs"
 #       -P vtkFreezePython.cmake
 # Example:
 # cmake -DOUTPUT_HEADER_PREFIX:STRING=FrozenPython
 #       -DOUTPUT_DIRECTORY:PATH=/tmp/frozen_paraview
 #       -DPACKAGE_ROOT=/home/utkarsh/Kitware/ParaView3/ParaViewBin/lib/site-packages
 #       -DPYTHON_EXECUTABLE:FILEPATH=/usr/bin/python
+#       -DPYTHON_LIBRARY_PATH:PATH=/usr/lib/python2.7/
 #       -P ThirdParty/FreezePython/vtkFreezePython.cmake
 
 if (NOT OUTPUT_DIRECTORY)
@@ -53,6 +55,7 @@ execute_process(
             -X zope
             -X twisted
             -X autobahn
+            -D ${PYTHON_LIBRARY_PATH}
 
             "${CMAKE_CURRENT_LIST_DIR}/dummy.py"
             -p "${PACKAGE_ROOT}"

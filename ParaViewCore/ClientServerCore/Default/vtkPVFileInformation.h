@@ -47,14 +47,14 @@ public:
    * Transfer information about a single object into this object.
    * The object must be a vtkPVFileInformationHelper.
    */
-  virtual void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   enum FileTypes
@@ -69,7 +69,8 @@ public:
     NETWORK_ROOT,
     NETWORK_DOMAIN,
     NETWORK_SERVER,
-    NETWORK_SHARE
+    NETWORK_SHARE,
+    DIRECTORY_GROUP
   };
 
   /**
@@ -118,8 +119,9 @@ public:
   /**
    * Get the Contents for this directory.
    * Returns a collection with vtkPVFileInformation objects
-   * for the contents of this directory if Type = DIRECTORY
-   * or the contents of this file group if Type ==FILE_GROUP.
+   * for the contents of this directory if Type == DIRECTORY
+   * or the contents of this file group if Type == FILE_GROUP
+   * or the contents of this directory group if Type == DIRECTORY_GROUP.
    */
   vtkGetObjectMacro(Contents, vtkCollection);
   vtkGetStringMacro(Extension);
@@ -129,7 +131,7 @@ public:
 
 protected:
   vtkPVFileInformation();
-  ~vtkPVFileInformation();
+  ~vtkPVFileInformation() override;
 
   vtkCollection* Contents;
   vtkFileSequenceParser* SequenceParser;
@@ -160,8 +162,8 @@ protected:
   bool ReadDetailedFileInformation;
 
 private:
-  vtkPVFileInformation(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVFileInformation&) VTK_DELETE_FUNCTION;
+  vtkPVFileInformation(const vtkPVFileInformation&) = delete;
+  void operator=(const vtkPVFileInformation&) = delete;
 
   struct vtkInfo;
 };

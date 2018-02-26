@@ -1,8 +1,11 @@
 import os, math
 
 from paraview import simple
-from vtk import *
-from vtk.web import buffer
+
+from vtkmodules.vtkIOImage import vtkPNGReader
+from vtkmodules.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
+
+from vtkmodules.web import buffer
 
 VTK_DATA_TYPES = [ 'void',            # 0
                    'bit',             # 1

@@ -10,10 +10,6 @@
       </Documentation>
 
       <InputProperty name="Input" command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
         <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkImageData"/>
         </DataTypeDomain>

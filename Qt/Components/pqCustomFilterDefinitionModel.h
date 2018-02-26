@@ -73,7 +73,7 @@ public:
 
 public:
   pqCustomFilterDefinitionModel(QObject* parent = 0);
-  virtual ~pqCustomFilterDefinitionModel();
+  ~pqCustomFilterDefinitionModel() override;
 
   /**
   * \name QAbstractItemModel Methods
@@ -86,7 +86,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -95,7 +95,7 @@ public:
   * \return
   *   The number of columns for the given index.
   */
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -104,7 +104,7 @@ public:
   * \return
   *   True if the given index has child items.
   */
-  virtual bool hasChildren(const QModelIndex& parent = QModelIndex()) const;
+  bool hasChildren(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -115,7 +115,7 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+  QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -124,7 +124,7 @@ public:
   * \return
   *   A model index for the parent of the given index.
   */
-  virtual QModelIndex parent(const QModelIndex& index) const;
+  QModelIndex parent(const QModelIndex& index) const override;
 
   /**
   * \brief
@@ -134,7 +134,7 @@ public:
   * \return
   *   The data for the given model index.
   */
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   /**
   * \brief
@@ -146,7 +146,7 @@ public:
   * \return
   *   The flags for the given model index.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
   //@}
 
   /**

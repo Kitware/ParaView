@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqWidgetRangeDomain : public QObject
 public:
   pqWidgetRangeDomain(QWidget* p, const QString& minProp, const QString& maxProp,
     vtkSMProperty* prop, int index = -1);
-  ~pqWidgetRangeDomain();
+  ~pqWidgetRangeDomain() override;
 
 public slots:
   void domainChanged();

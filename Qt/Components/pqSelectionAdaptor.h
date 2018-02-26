@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqSelectionAdaptor : public QObject
 {
   Q_OBJECT
 public:
-  virtual ~pqSelectionAdaptor();
+  ~pqSelectionAdaptor() override;
 
   /**
   * Returns a pointer to the QItemSelectionModel.

@@ -40,7 +40,7 @@ public:
 
 protected:
   vtkSMDeserializerXML();
-  ~vtkSMDeserializerXML();
+  ~vtkSMDeserializerXML() override;
 
   // Friend to access NewProxy().
   friend class vtkSMProxyLocator;
@@ -48,7 +48,7 @@ protected:
   /**
    * Create a new proxy with the \c id if possible.
    */
-  virtual vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Locate the XML for the proxy with the given id.
@@ -58,7 +58,7 @@ protected:
   /**
    * TEMPORARY. Used to load the state on the proxy. This is only for the sake
    * of the lookmark state loader until we get the chance to clean it up.
-   * DONT override this method.
+   * DON'T override this method.
    */
   virtual int LoadProxyState(vtkPVXMLElement* element, vtkSMProxy*, vtkSMProxyLocator* locator);
 
@@ -66,7 +66,7 @@ protected:
    * Create a new proxy of the given group and name. Default implementation
    * simply asks the proxy manager to create a new proxy of the requested type.
    */
-  virtual vtkSMProxy* CreateProxy(
+  vtkSMProxy* CreateProxy(
     const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL) VTK_OVERRIDE;
 
   /**
@@ -77,8 +77,8 @@ protected:
   virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy);
 
 private:
-  vtkSMDeserializerXML(const vtkSMDeserializerXML&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDeserializerXML&) VTK_DELETE_FUNCTION;
+  vtkSMDeserializerXML(const vtkSMDeserializerXML&) = delete;
+  void operator=(const vtkSMDeserializerXML&) = delete;
 };
 
 #endif

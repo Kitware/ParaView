@@ -303,6 +303,20 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr, unsign
 
     this->Menu->addSeparator();
   }
+  else
+  {
+    repr = pqActiveObjects::instance().activeRepresentation();
+    if (repr)
+    {
+      vtkPVDataInformation* info = repr->getInputDataInformation();
+      vtkPVCompositeDataInformation* compositeInfo = info->GetCompositeDataInformation();
+      if (compositeInfo && compositeInfo->GetDataIsComposite())
+      {
+        QAction* showAllBlocksAction = this->Menu->addAction("Show All Blocks");
+        this->connect(showAllBlocksAction, SIGNAL(triggered()), this, SLOT(showAllBlocks()));
+      }
+    }
+  }
 
   // when nothing was picked we show the "link camera" menu.
   this->Menu->addAction("Link Camera...", view, SLOT(linkToOtherView()));
@@ -508,7 +522,20 @@ void pqPipelineContextMenuBehavior::showOnlyBlock()
 //-----------------------------------------------------------------------------
 void pqPipelineContextMenuBehavior::showAllBlocks()
 {
-  vtkSMProxy* proxy = this->PickedRepresentation->getProxy();
+  pqRepresentation* repr = this->PickedRepresentation;
+  if (!repr)
+  {
+    repr = pqActiveObjects::instance().activeRepresentation();
+    if (!repr)
+    {
+      return;
+    }
+  }
+  vtkSMProxy* proxy = repr->getProxy();
+  if (!proxy)
+  {
+    return;
+  }
   vtkSMProperty* property = proxy->GetProperty("BlockVisibility");
   if (property)
   {
@@ -517,7 +544,7 @@ void pqPipelineContextMenuBehavior::showAllBlocks()
     visibilities[0] = 1;
     setVisibilitiesFromMap(ivp, visibilities, proxy);
   }
-  this->PickedRepresentation->renderViewEventually();
+  repr->renderViewEventually();
 }
 
 //-----------------------------------------------------------------------------

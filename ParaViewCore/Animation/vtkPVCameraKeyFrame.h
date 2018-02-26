@@ -43,12 +43,11 @@ public:
    * this method is called to allow the key frame to use vtkCameraInterpolator2
    * to do path-based interpolations for the camera.
    */
-  virtual void UpdateValue(
-    double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
 
   // Overridden, since these methods are not supported by this class.
-  virtual void SetKeyValue(unsigned int, double) VTK_OVERRIDE {}
-  virtual void SetKeyValue(double) VTK_OVERRIDE {}
+  void SetKeyValue(unsigned int, double) VTK_OVERRIDE {}
+  void SetKeyValue(double) VTK_OVERRIDE {}
   virtual double GetKeyValue(unsigned int) { return 0; }
 
   //@{
@@ -85,14 +84,14 @@ public:
 
 protected:
   vtkPVCameraKeyFrame();
-  ~vtkPVCameraKeyFrame();
+  ~vtkPVCameraKeyFrame() override;
 
   vtkCamera* Camera;
   vtkCameraInterpolator2* Interpolator;
 
 private:
-  vtkPVCameraKeyFrame(const vtkPVCameraKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCameraKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVCameraKeyFrame(const vtkPVCameraKeyFrame&) = delete;
+  void operator=(const vtkPVCameraKeyFrame&) = delete;
 };
 
 #endif

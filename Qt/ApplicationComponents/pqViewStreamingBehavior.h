@@ -58,7 +58,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqViewStreamingBehavior : public QObject
 
 public:
   pqViewStreamingBehavior(QObject* parent = 0);
-  virtual ~pqViewStreamingBehavior();
+  ~pqViewStreamingBehavior() override;
 
   /**
   * This API is for testing purposes. It enables pausing/stepping/resuming

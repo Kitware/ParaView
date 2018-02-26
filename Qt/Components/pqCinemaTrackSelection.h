@@ -67,7 +67,7 @@ public:
   typedef std::map<pqPipelineSource*, ItemValues> ItemValuesMap;
 
   pqCinemaTrackSelection(QWidget* parent_ = NULL);
-  ~pqCinemaTrackSelection();
+  ~pqCinemaTrackSelection() override;
 
   QList<pqCinemaTrack*> getTracks();
 

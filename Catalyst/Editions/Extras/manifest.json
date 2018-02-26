@@ -61,6 +61,7 @@
       "path":"VTK/Filters/Extraction",
       "include":[
         { "class":"vtkConvertSelection" },
+        { "class":"vtkExtractBlock" },
         { "class":"vtkExtractCells" },
         { "class":"vtkExtractSelectedBlock" },
         { "class":"vtkExtractSelectedIds" },
@@ -79,6 +80,7 @@
         { "path":"module.cmake" },
         { "class":"vtkDataSetSurfaceFilter" },
         { "class":"vtkStructuredGridGeometryFilter" },
+        { "class":"vtkRectilinearGridGeometryFilter" },
         { "class":"vtkUnstructuredGridGeometryFilter" }
       ],
       "replace":[
@@ -90,7 +92,8 @@
     { "name": "vtkFiltersParallel",
       "path": "VTK/Filters/Parallel",
       "include": [
-        { "class": "vtkAggregateDataSetFilter" }
+        { "class": "vtkAggregateDataSetFilter" },
+        { "class": "vtkPCellDataToPointData" }
       ],
       "replace": [
         { "path": "VTK/Filters/Parallel/module.cmake" },
@@ -122,6 +125,7 @@
       "include":[
         { "class":"vtkExtractSelectedFrustum" },
         { "class":"vtkExtractSelectionBase" },
+        { "class":"vtkGradientFilter" },
         { "class":"vtkImageDataToPointSet" },
         { "class":"vtkRectilinearGridToPointSet" },
         { "class":"vtkTransformFilter" },
@@ -201,14 +205,15 @@
         { "path": "vtkXMLOffsetsManager.h" },
         { "path": "vtkXMLReaderVersion.h" },
         { "class": "vtkXMLCompositeDataWriter" },
-        { "class": "vtkXMLDataSetWriter" },
-        { "class": "vtkXMLHyperOctreeWriter" },
+        { "class": "vtkXMLDataObjectWriter" },
+        { "class": "vtkXMLHyperTreeGridWriter" },
         { "class": "vtkXMLImageDataWriter" },
         { "class": "vtkXMLMultiBlockDataWriter" },
         { "class": "vtkXMLPolyDataWriter" },
         { "class": "vtkXMLRectilinearGridWriter" },
         { "class": "vtkXMLStructuredDataWriter" },
         { "class": "vtkXMLStructuredGridWriter" },
+        { "class": "vtkXMLTableWriter" },
         { "class": "vtkXMLUnstructuredDataWriter" },
         { "class": "vtkXMLUnstructuredGridWriter" },
         { "class": "vtkXMLWriter" }
@@ -225,6 +230,7 @@
       "include": [
         { "path": "module.cmake" },
         { "class": "vtkXMLPDataWriter" },
+        { "class": "vtkXMLPDataObjectWriter" },
         { "class": "vtkXMLPImageDataWriter" },
         { "class": "vtkXMLPMultiBlockDataWriter" },
         { "class": "vtkXMLPPolyDataWriter" },
@@ -244,13 +250,19 @@
   "proxies":[
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
       "proxies":[
-        "PVExtractSelection",
+        "AppendReductionFilter",
+        "CellDataToPointData",
+        "DataSetSurfaceFilter",
+        "ExtractBlock",
         "ExtractHistogram",
         "Glyph",
-        "WarpScalar",
-        "WarpVector",
+        "ImageDataToPointSet",
         "IntegrateAttributes",
-        "DataSetSurfaceFilter"
+        "PVExtractSelection",
+        "RectilinearGridToPointSet",
+        "TransformFilter",
+        "WarpScalar",
+        "WarpVector"
       ]
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/utilities.xml",
@@ -278,7 +290,7 @@
     },
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/writers.xml",
       "proxies":[
-        "XMLDataSetWriter",
+        "XMLDataObjectWriter",
         "XMLMultiBlockDataWriter",
         "XMLPImageDataWriter",
         "XMLPPolyDataWriter",
@@ -291,7 +303,7 @@
       "proxies":[
         "FileSeriesWriter",
         "ParallelFileSeriesWriter",
-        "XMLDataSetWriterCore",
+        "XMLDataObjectWriterCore",
         "XMLPDataSetWriterCore",
         "XMLPImageDataWriterCore",
         "XMLPMultiBlockDataWriterCore",

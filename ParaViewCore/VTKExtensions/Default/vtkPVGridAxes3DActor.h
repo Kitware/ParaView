@@ -53,7 +53,7 @@ public:
   /**
    * Shallow copy from another vtkPVGridAxes3DActor.
    */
-  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   //@{
   /**
@@ -68,12 +68,11 @@ public:
 
   //@{
   /**
-   * Specify the inflate factor used to proportionally
-   * inflates the bounds of the axes grid using the diagonal length
-   * of the bounding box multiplied by this factor, when using data bounds.
+   * Specify the scale factor used to proportionally
+   * scale each axis. 1 means no change.
    */
-  vtkSetMacro(DataBoundsInflateFactor, double);
-  vtkGetMacro(DataBoundsInflateFactor, double);
+  vtkSetMacro(DataBoundsScaleFactor, double);
+  vtkGetMacro(DataBoundsScaleFactor, double);
   //@}
 
   //@{
@@ -92,20 +91,20 @@ public:
    * Overridden to ensure that the transform information is passed on the
    * superclass.
    */
-  virtual double* GetBounds() VTK_OVERRIDE;
+  double* GetBounds() VTK_OVERRIDE;
 
 protected:
   vtkPVGridAxes3DActor();
-  ~vtkPVGridAxes3DActor();
+  ~vtkPVGridAxes3DActor() override;
 
-  virtual void Update(vtkViewport* viewport) VTK_OVERRIDE;
+  void Update(vtkViewport* viewport) VTK_OVERRIDE;
   void UpdateGridBounds();
   void UpdateGridBoundsUsingDataBounds();
   void UpdateGridBoundsUsingModelTransform();
 
   double DataScale[3];
   double DataPosition[3];
-  double DataBoundsInflateFactor;
+  double DataBoundsScaleFactor;
   double TransformedBounds[6];
 
   bool UseModelTransform;
@@ -113,8 +112,8 @@ protected:
   vtkNew<vtkMatrix4x4> ModelTransformMatrix;
 
 private:
-  vtkPVGridAxes3DActor(const vtkPVGridAxes3DActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVGridAxes3DActor&) VTK_DELETE_FUNCTION;
+  vtkPVGridAxes3DActor(const vtkPVGridAxes3DActor&) = delete;
+  void operator=(const vtkPVGridAxes3DActor&) = delete;
 
   vtkTimeStamp BoundsUpdateTime;
 };

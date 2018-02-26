@@ -53,7 +53,7 @@ class PQCOMPONENTS_EXPORT pqCollaborationPanel : public QWidget
 
 public:
   pqCollaborationPanel(QWidget* parent = 0);
-  ~pqCollaborationPanel();
+  ~pqCollaborationPanel() override;
 
 signals:
   /**
@@ -70,10 +70,21 @@ signals:
   void shareLocalMousePointer(bool);
 
   /**
+   * This signal is triggered when user has allowed/disallowed
+   * further connections to the server.
+   */
+  void disableFurtherConnections(bool);
+
+  /**
   * This get triggered internally when it's not a good time to update the camera
   * so the request get pushed to QueuedConnection
   */
   void delayUpdateCamera(vtkSMMessage* msg);
+
+  /**
+   * This signal is triggered when user changes the connect-id.
+   */
+  void connectIDChanged(int);
 
 public slots:
   /**
@@ -120,6 +131,11 @@ protected slots:
   void followUserCamera(int userId);
 
   void onServerChanged();
+
+  /**
+   * Called when the user changes the connect-id. Emit signal with new value.
+   */
+  void onConnectIDChanged();
 
 protected:
   /**

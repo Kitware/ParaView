@@ -47,14 +47,14 @@ public:
    * representations or ask them to perform certain tasks e.g.
    * PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
    * representation of false, all view passes are ignored.
    */
-  virtual void SetVisibility(bool val) VTK_OVERRIDE;
+  void SetVisibility(bool val) VTK_OVERRIDE;
 
   //@{
   /**
@@ -65,14 +65,14 @@ public:
   //@}
 
   //***************************************************************************
-  // Forwaded to vtkProperty(BackfaceProperty)
+  // Forwarded to vtkProperty(BackfaceProperty)
   void SetBackfaceAmbientColor(double r, double g, double b);
   void SetBackfaceDiffuseColor(double r, double g, double b);
   void SetBackfaceOpacity(double val);
 
 protected:
   vtkGeometryRepresentationWithFaces();
-  ~vtkGeometryRepresentationWithFaces();
+  ~vtkGeometryRepresentationWithFaces() override;
 
   /**
    * This method is called in the constructor. If the subclasses override any of
@@ -80,26 +80,26 @@ protected:
    * they should call this method again in their constructor. It must be totally
    * safe to call this method repeatedly.
    */
-  virtual void SetupDefaults() VTK_OVERRIDE;
+  void SetupDefaults() VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Passes on parameters to vtkProperty and vtkMapper
    */
-  virtual void UpdateColoringParameters() VTK_OVERRIDE;
+  void UpdateColoringParameters() VTK_OVERRIDE;
 
   vtkMapper* BackfaceMapper;
   vtkMapper* LODBackfaceMapper;
@@ -108,8 +108,8 @@ protected:
   int BackfaceRepresentation;
 
 private:
-  vtkGeometryRepresentationWithFaces(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGeometryRepresentationWithFaces&) VTK_DELETE_FUNCTION;
+  vtkGeometryRepresentationWithFaces(const vtkGeometryRepresentationWithFaces&) = delete;
+  void operator=(const vtkGeometryRepresentationWithFaces&) = delete;
 };
 
 #endif

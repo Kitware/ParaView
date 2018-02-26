@@ -50,19 +50,19 @@ public:
    * Update the domain using the "unchecked" values (if available) for all
    * required properties.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
 protected:
   vtkSMDimensionsDomain();
-  ~vtkSMDimensionsDomain();
+  ~vtkSMDimensionsDomain() override;
 
   void Update(vtkSMProxyProperty* pp, vtkSMIntVectorProperty* ivp);
   int GetDirection(vtkSMIntVectorProperty* ivp);
   void GetExtent(vtkSMProxyProperty* pp, int extent[6]);
 
 private:
-  vtkSMDimensionsDomain(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDimensionsDomain&) VTK_DELETE_FUNCTION;
+  vtkSMDimensionsDomain(const vtkSMDimensionsDomain&) = delete;
+  void operator=(const vtkSMDimensionsDomain&) = delete;
 };
 
 #endif

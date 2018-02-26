@@ -49,10 +49,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDoubleRangeSliderPropertyWidget : public 
 public:
   pqDoubleRangeSliderPropertyWidget(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  virtual ~pqDoubleRangeSliderPropertyWidget();
+  ~pqDoubleRangeSliderPropertyWidget() override;
 
-  virtual void apply();
-  virtual void reset();
+  void apply() override;
+  void reset() override;
 
 protected slots:
   void highlightResetButton(bool highlight = true);

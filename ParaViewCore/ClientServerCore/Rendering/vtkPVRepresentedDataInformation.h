@@ -36,15 +36,15 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
 protected:
   vtkPVRepresentedDataInformation();
-  ~vtkPVRepresentedDataInformation();
+  ~vtkPVRepresentedDataInformation() override;
 
 private:
-  vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRepresentedDataInformation&) VTK_DELETE_FUNCTION;
+  vtkPVRepresentedDataInformation(const vtkPVRepresentedDataInformation&) = delete;
+  void operator=(const vtkPVRepresentedDataInformation&) = delete;
 };
 
 #endif

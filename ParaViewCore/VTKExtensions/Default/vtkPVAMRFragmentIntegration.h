@@ -41,7 +41,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkPVAMRFragmentIntegration();
-  virtual ~vtkPVAMRFragmentIntegration();
+  ~vtkPVAMRFragmentIntegration() override;
 
   //@{
   /**
@@ -77,12 +77,11 @@ public:
 
   void SetContourConnection(vtkAlgorithmOutput*);
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
+  vtkPVAMRFragmentIntegration(const vtkPVAMRFragmentIntegration&) = delete;
+  void operator=(const vtkPVAMRFragmentIntegration&) = delete;
 
 protected:
   double VolumeFractionSurfaceValue;

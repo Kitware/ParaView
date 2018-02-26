@@ -41,20 +41,17 @@ public:
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
-  virtual void OnButtonDown(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
-  virtual void OnButtonUp(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
   //@}
 
 protected:
   vtkPVTrackballPan();
-  ~vtkPVTrackballPan();
+  ~vtkPVTrackballPan() override;
 
-  vtkPVTrackballPan(const vtkPVTrackballPan&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballPan&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballPan(const vtkPVTrackballPan&) = delete;
+  void operator=(const vtkPVTrackballPan&) = delete;
 };
 
 #endif

@@ -64,7 +64,7 @@ class PQCORE_EXPORT pqServerConfigurationCollection : public QObject
 
 public:
   pqServerConfigurationCollection(QObject* parent = 0);
-  virtual ~pqServerConfigurationCollection();
+  ~pqServerConfigurationCollection() override;
 
   /**
   * load a pvsc txt. If mutable_configs==true, then the server-configurations

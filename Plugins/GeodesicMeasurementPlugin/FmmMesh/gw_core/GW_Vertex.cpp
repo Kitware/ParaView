@@ -2,14 +2,14 @@
 /**
  *  \file   GW_Vertex.cpp
  *  \brief  Definition of class \c GW_Vertex
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_Vertex.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_Vertex.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -30,7 +30,7 @@ using namespace GW;
 /**
  *  \param  v [GW_Vertex&] Vertex
  *  \return [GW_Vertex&] *this
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   1-13-2004
  *
  *  Copy operator
@@ -56,7 +56,7 @@ GW_Vertex& GW_Vertex::operator=(const GW_Vertex& Vert)
 // Name : GW_Vertex::SetFace
 /**
  *  \param  Face [GW_Face&] The parent face we are managed by.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Set the parent face.
@@ -71,7 +71,7 @@ void GW_Vertex::SetFace( GW_Face& Face )
 // Name : GW_Vertex::GetFace
 /**
  *  \return [GW_Face*] The face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-15-2003
  *
  *  Set the face we are managed by.
@@ -86,7 +86,7 @@ GW_Face* GW_Vertex::GetFace()
 // Name : GW_Vertex::GetFace
 /**
 *  \return [GW_Face*] The face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   2-15-2003
 *
 *  Set the face we are managed by.
@@ -102,7 +102,7 @@ const GW_Face* GW_Vertex::GetFace() const
 // Name : GW_Vertex::BeginFaceIterator
 /**
  *  \return [GW_FaceIterator] The iterator.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-1-2003
  *
  *  Begin iterator on the surrounding of the vertex.
@@ -124,7 +124,7 @@ GW_FaceIterator GW_Vertex::BeginFaceIterator()
 // Name : GW_Vertex::EndFaceIterator
 /**
  *  \return [GW_FaceIterator] The iterator.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-1-2003
  *
  *  End iterator for the surrounding of the vertex.
@@ -140,7 +140,7 @@ GW_FaceIterator GW_Vertex::EndFaceIterator()
 // Name : GW_Vertex::BeginVertexIterator
 /**
 *  \return [GW_VertexIterator] The iterator.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-1-2003
 *
 *  Begin iterator on the surrounding of the vertex.
@@ -162,7 +162,7 @@ GW_VertexIterator GW_Vertex::BeginVertexIterator()
 // Name : GW_Vertex::EndVertexIterator
 /**
 *  \return [GW_VertexIterator] The iterator.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-1-2003
 *
 *  End iterator for the surrounding of the vertex.
@@ -179,7 +179,7 @@ GW_VertexIterator GW_Vertex::EndVertexIterator()
  *  \param  Vert [GW_Vertex&] The other vertex.
  *  \param  pFace1 [GW_Face*&] First face.
  *  \param  pFace2 [GW_Face*&] Second face.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-19-2003
  *
  *  Get the face around this vertex and another one.
@@ -207,7 +207,7 @@ void GW_Vertex::GetFaces( const GW_Vertex& Vert, GW_Face*& pFace1, GW_Face*& pFa
 /*------------------------------------------------------------------------------*/
 // Name : GW_Vertex::BuildRawNormal
 /**
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-2-2003
 *
 *  Compute the normal at the vertex using a very simple scheme.
@@ -238,7 +238,7 @@ GW_Float GW_Vertex::rTotalArea_ = 0;
 /*------------------------------------------------------------------------------*/
 // Name : GW_Vertex::BuildCurvatureData
 /**
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-2-2003
 *
 *  Compute all curvature data using comlex schemes. This includes
@@ -264,7 +264,7 @@ void GW_Vertex::BuildCurvatureData()
 /*------------------------------------------------------------------------------*/
 // Name : GW_Vertex::ComputeNormalAndCurvature
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-14-2003
  *
  *  Compute the normal via local averaging. Compute also the normal.
@@ -336,7 +336,7 @@ void GW_Vertex::ComputeNormalAndCurvature( GW_Float& rArea )
                 && rInnerAngle<GW_HALFPI                    // condition on 2nd angle
                 && (GW_PI-rAngle-rInnerAngle)<GW_HALFPI )    // condition on 3rd angle
             {
-                /* non-obtuse : 1/8*( |PR|²cot(Q)+|PQ|²cot(R) ) where P=this, Q=pVert, R=pTempVert   */
+                /* non-obtuse : 1/8*( |PR|Â²cot(Q)+|PQ|Â²cot(R) ) where P=this, Q=pVert, R=pTempVert   */
                 rArea += ( rCurEdgeLength*rCurEdgeLength*rDotP/sqrt(1-rDotP*rDotP)
                     + rTempEdge1Length*rTempEdge1Length/tan(GW_PI-rAngle-rInnerAngle) )*0.125;
             }
@@ -395,7 +395,7 @@ void GW_Vertex::ComputeNormalAndCurvature( GW_Float& rArea )
 /*------------------------------------------------------------------------------*/
 // Name : GW_Vertex::ComputeCurvatureDirections
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-14-2003
  *
  *  Compute the principal curvature directions via least square
@@ -428,7 +428,7 @@ void GW_Vertex::ComputeCurvatureDirections( GW_Float rArea )
     GW_Vector3D v2 = Normal_ ^ v1;
 
     /* now we must find the curvature matrix entry by minimising a mean square problem
-    the 3 entry of the symetric curvature matrix in (v1,v2) basis are (a,b,c), stored in vector x.
+    the 3 entry of the symmetric curvature matrix in (v1,v2) basis are (a,b,c), stored in vector x.
     IMPORTANT : we must ensure a<c, so that eigenvalues are in correct order. */
     GW_Float a = 0, b = 0, c = 0;            // the vector (a,b,c) we are searching. We use a+c=2*MeanCurv so we don't take care of c.
     GW_Float D[2] = {0,0};                    // the right side of the equation.
@@ -566,7 +566,7 @@ void GW_Vertex::ComputeCurvatureDirections( GW_Float rArea )
 // Name : GW_Vertex::GetNumberNeighbor
 /**
  *  \return [GW_U32] Answer.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-6-2003
  *
  *  Get the number of neighbors around this vertex.
@@ -585,7 +585,7 @@ GW_U32 GW_Vertex::GetNumberNeighbor()
 // Name : GW_Vertex::IsBoundaryVertex
 /**
  *  \return [GW_U32] Answer.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-6-2003
  *
  *  Test if the vertex is a boundary one.
@@ -603,7 +603,7 @@ GW_Bool GW_Vertex::IsBoundaryVertex()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

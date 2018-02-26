@@ -61,6 +61,8 @@ public:
     AMR_BLOCK = 0x40,
     PROCESSID = 0x80,
     QUERY = 0x8,
+    POINTS_NEAR = 0x100,
+    POINT_IN_CELL = 0x200,
     ANY = 0xffff
   };
 
@@ -83,12 +85,14 @@ public:
     SINGLE_VALUE_MAX,
     SINGLE_VALUE_LE_MEAN,
     SINGLE_VALUE_GE_MEAN,
-    SINGLE_VALUE_MEAN_WITH_TOLERANCE
+    SINGLE_VALUE_MEAN_WITH_TOLERANCE,
+    LOCATION_AND_TOLERANCE,
+    LOCATION
   };
 
 public:
   pqQueryClauseWidget(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  virtual ~pqQueryClauseWidget();
+  ~pqQueryClauseWidget() override;
 
   /**
   * Set/Get the data producer.
@@ -132,12 +136,6 @@ public slots:
   * being used as a qualifier or not.
   */
   void initialize(CriteriaTypes type_flags, bool qualifier_mode = false);
-
-signals:
-  /**
-  * Fired when the user clicks on the help button.
-  */
-  void helpRequested();
 
 protected slots:
   /**

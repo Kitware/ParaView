@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
 
 public:
   pqDisplayRepresentationWidget(QWidget* parent = 0);
-  virtual ~pqDisplayRepresentationWidget();
+  ~pqDisplayRepresentationWidget() override;
 
   /**
   * Returns the selected representation as a string.
@@ -102,7 +102,7 @@ class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPrope
 
 public:
   pqDisplayRepresentationPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
-  ~pqDisplayRepresentationPropertyWidget();
+  ~pqDisplayRepresentationPropertyWidget() override;
 
 private:
   pqDisplayRepresentationWidget* Widget;

@@ -64,7 +64,7 @@ public:
     vtkSMViewProxy* renModule, pqServer* server, QObject* parent = NULL);
 
   // Destructor.
-  virtual ~pqRenderView();
+  ~pqRenderView() override;
 
   /**
   * Returns the render view proxy associated with this object.
@@ -76,12 +76,18 @@ public:
   * It is essential to call this resetCamera, to ensure that the reset camera
   * action gets pushed on the interaction undo stack.
   */
-  virtual void resetCamera();
+  void resetCamera() override;
 
   /**
   * Resets the center of rotation to the focal point.
   */
   void resetCenterOfRotation();
+
+  /**
+  * Resets the parallel scale which is used for a parallel
+  * projection
+  */
+  void resetParallelScale();
 
   /**
   * Get if the orientation axes is visible.
@@ -132,14 +138,14 @@ public:
   * undo/redo. Returns false by default. Subclassess must override
   * if that's not the case.
   */
-  virtual bool supportsUndo() const { return true; }
+  bool supportsUndo() const override { return true; }
 
   /**
   * Returns if the view module can undo/redo interaction
   * given the current state of the interaction undo stack.
   */
-  virtual bool canUndo() const;
-  virtual bool canRedo() const;
+  bool canUndo() const override;
+  bool canRedo() const override;
 
   /**
   * For linking of interaction undo stacks.
@@ -243,6 +249,9 @@ public slots:
   void setCenterOfRotation(double x, double y, double z);
   void setCenterOfRotation(double xyz[3]) { this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]); }
 
+  // Set the parallel scale
+  void setParallelScale(double scale);
+
   // Toggle center axes visibility.
   void setCenterAxesVisibility(bool visible);
 
@@ -269,13 +278,13 @@ public slots:
   * Called to undo interaction.
   * View modules supporting interaction undo must override this method.
   */
-  virtual void undo();
+  void undo() override;
 
   /**
   * Called to redo interaction.
   * View modules supporting interaction undo must override this method.
   */
-  virtual void redo();
+  void redo() override;
 
   /**
   * Resets center of rotation if this->ResetCenterWithCamera is true.
@@ -327,12 +336,12 @@ protected:
   * Creates a new instance of the QWidget subclass to be used to show this
   * view. Default implementation creates a pqQVTKWidget
   */
-  virtual QWidget* createWidget();
+  QWidget* createWidget() override;
 
   /**
   * Overridden to initialize the interaction undo/redo stack.
   */
-  virtual void initialize();
+  void initialize() override;
 
 private:
   class pqInternal;

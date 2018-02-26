@@ -18,7 +18,7 @@
  * elements.
  *
  * Abstract superclass for Server Manager undo elements.
- * This class keeps the session, so undoelement could work accross a set of
+ * This class keeps the session, so undoelement could work across a set of
  * communication Sessions.
 */
 
@@ -49,14 +49,14 @@ public:
 
 protected:
   vtkSMUndoElement();
-  ~vtkSMUndoElement();
+  ~vtkSMUndoElement() override;
 
   // Identifies the session to which this object is related.
   vtkWeakPointer<vtkSMSession> Session;
 
 private:
-  vtkSMUndoElement(const vtkSMUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMUndoElement(const vtkSMUndoElement&) = delete;
+  void operator=(const vtkSMUndoElement&) = delete;
 };
 
 #endif

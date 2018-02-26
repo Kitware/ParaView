@@ -369,7 +369,7 @@ function(build_help_project name)
   pv_set_if_not_set(arg_FOLDER "${name}")
   pv_set_if_not_set(arg_DEPENDS "")
 
-  # if filename is specified, it takes precendence.
+  # if filename is specified, it takes precedence.
   # setup toc variable to refer to the TOC xml dom.
   if (DEFINED arg_TABLE_OF_CONTENTS_FILE)
     file(READ ${arg_TABLE_OF_CONTENTS_FILE} arg_TABLE_OF_CONTENTS)
@@ -471,14 +471,16 @@ function (pv_executable_install name exe_suffix)
       # install the real-binary in the lib-dir
       install(TARGETS ${name}
               DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
-              COMPONENT Runtime)
+              COMPONENT Runtime
+              EXPORT ${PV_INSTALL_EXPORT_NAME})
     endif()
 
     # install the launcher binary in the binary dir. When exe_suffix is empty, the
     # launcher binary is same as the real binary.
     install(TARGETS ${name}${exe_suffix}
             DESTINATION ${VTK_INSTALL_RUNTIME_DIR}
-            COMPONENT Runtime)
+            COMPONENT Runtime
+            EXPORT ${PV_INSTALL_EXPORT_NAME})
   endif()
 endfunction()
 

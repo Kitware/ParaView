@@ -126,21 +126,21 @@ public:
   /**
    * Get value as a variant.
    */
-  vtkVariant GetAsVariant(unsigned int index);
+  vtkVariant GetAsVariant(unsigned int index) const;
 
   /**
    * Templated method to call GetIntArray(), GetDoubleArray(), GetIdTypeArray().
    * Note, we  only provide implementations for T==double, int, vtkIdType.
    */
   template <class T>
-  std::vector<T> GetArray();
+  std::vector<T> GetArray() const;
 
   /**
    * Templated method to call GetAsInt(), GetAsDouble(), GetAsIdType()
    * Note, we  only provide implementations for T==double, int, vtkIdType.
    */
   template <class T>
-  T GetAs(unsigned int index = 0);
+  T GetAs(unsigned int index = 0) const;
 
   //@{
   /**
@@ -150,9 +150,9 @@ public:
   void Set(int value) { this->Set(0, value); }
   void Set(unsigned int index, int value);
   void Set(const int* values, unsigned int count);
-  int GetAsInt(unsigned int index = 0);
-  unsigned int Get(int* values, unsigned int count = 1);
-  std::vector<int> GetIntArray();
+  int GetAsInt(unsigned int index = 0) const;
+  unsigned int Get(int* values, unsigned int count = 1) const;
+  std::vector<int> GetIntArray() const;
   //@}
 
   //@{
@@ -163,9 +163,9 @@ public:
   void Set(double value) { this->Set(0, value); }
   void Set(unsigned int index, double value);
   void Set(const double* values, unsigned int count);
-  double GetAsDouble(unsigned int index = 0);
-  unsigned int Get(double* values, unsigned int count = 1);
-  std::vector<double> GetDoubleArray();
+  double GetAsDouble(unsigned int index = 0) const;
+  unsigned int Get(double* values, unsigned int count = 1) const;
+  std::vector<double> GetDoubleArray() const;
 //@}
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
@@ -177,10 +177,10 @@ public:
   void Set(vtkIdType value) { this->Set(0, value); }
   void Set(unsigned int index, vtkIdType value);
   void Set(const vtkIdType* values, unsigned int count);
-  unsigned int Get(vtkIdType* values, unsigned int count = 1);
+  unsigned int Get(vtkIdType* values, unsigned int count = 1) const;
 #endif
-  vtkIdType GetAsIdType(unsigned int index = 0);
-  std::vector<vtkIdType> GetIdTypeArray();
+  vtkIdType GetAsIdType(unsigned int index = 0) const;
+  std::vector<vtkIdType> GetIdTypeArray() const;
   //@}
 
   //@{
@@ -193,7 +193,7 @@ public:
    */
   void Set(const char* value) { this->Set(0, value); }
   void Set(unsigned int index, const char* value);
-  const char* GetAsString(unsigned int index = 0);
+  const char* GetAsString(unsigned int index = 0) const;
   //@}
 
   //@{
@@ -207,8 +207,8 @@ public:
   void Set(vtkSMProxy** value, unsigned int count, unsigned int* outputports = NULL);
   void Add(vtkSMProxy* value, unsigned int outputport = 0);
   void Remove(vtkSMProxy* value);
-  vtkSMProxy* GetAsProxy(unsigned int index = 0);
-  unsigned int GetOutputPort(unsigned int index = 0);
+  vtkSMProxy* GetAsProxy(unsigned int index = 0) const;
+  unsigned int GetOutputPort(unsigned int index = 0) const;
   //@}
 
   //@{
@@ -218,7 +218,7 @@ public:
    * example) and the second value is its status.
    */
   void SetStatus(const char* key, int value);
-  int GetStatus(const char* key, int default_value = 0);
+  int GetStatus(const char* key, int default_value = 0) const;
   //@}
 
   //@{
@@ -228,7 +228,7 @@ public:
    * example), the second value is its status and the third value is number of status.
    */
   void SetStatus(const char* key, double* values, int num_values);
-  bool GetStatus(const char* key, double* values, int num_values);
+  bool GetStatus(const char* key, double* values, int num_values) const;
   //@}
 
   //@{
@@ -238,7 +238,7 @@ public:
    * example), the second value is its status and the third value is number of status.
    */
   void SetStatus(const int key, int* values, int num_values);
-  bool GetStatus(const int key, int* values, int num_values);
+  bool GetStatus(const int key, int* values, int num_values) const;
   //@}
 
   //@{
@@ -248,7 +248,7 @@ public:
    * example) and the second value is its status (as a string)
    */
   void SetStatus(const char* key, const char* value);
-  const char* GetStatus(const char* key, const char* default_value);
+  const char* GetStatus(const char* key, const char* default_value) const;
   //@}
 
   //@{
@@ -258,7 +258,7 @@ public:
    * example) and the second value is its status.
    */
   void SetStatus(const int key, int value);
-  int GetStatus(const int key, int default_value = 0);
+  int GetStatus(const int key, int default_value = 0) const;
   //@}
 
   //@{
@@ -268,15 +268,15 @@ public:
    * values.
    */
   void SetInputArrayToProcess(int fieldAssociation, const char* arrayName);
-  int GetInputArrayAssociation();
-  const char* GetInputArrayNameToProcess();
+  int GetInputArrayAssociation() const;
+  const char* GetInputArrayNameToProcess() const;
   //@}
 
   /**
    * Get/Set whether to use unchecked properties.
    */
   void SetUseUnchecked(bool val) { this->UseUnchecked = val; }
-  bool GetUseUnchecked() { return this->UseUnchecked; }
+  bool GetUseUnchecked() const { return this->UseUnchecked; }
 
   /**
    * Copy property values from another vtkSMPropertyHelper. This only
@@ -285,12 +285,18 @@ public:
    */
   bool Copy(vtkSMPropertyHelper& source);
 
+  /**
+   * Set the proxy to modified if necessary before calling Set()
+   * Return reference so method chaining can be used.
+   */
+  vtkSMPropertyHelper& Modified();
+
 protected:
   void setUseUnchecked(bool useUnchecked) { this->UseUnchecked = useUnchecked; }
 
 private:
-  vtkSMPropertyHelper(const vtkSMPropertyHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPropertyHelper&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyHelper(const vtkSMPropertyHelper&) = delete;
+  void operator=(const vtkSMPropertyHelper&) = delete;
   void Initialize(vtkSMProperty* property);
 
   template <typename T>
@@ -298,7 +304,7 @@ private:
   template <typename T>
   std::vector<T> GetPropertyArray() const;
   template <typename T>
-  unsigned int GetPropertyArray(T* values, unsigned int count = 1);
+  unsigned int GetPropertyArray(T* values, unsigned int count = 1) const;
   template <typename T>
   void SetProperty(unsigned int index, T value);
   template <typename T>
@@ -336,40 +342,40 @@ private:
 };
 
 template <>
-inline std::vector<int> vtkSMPropertyHelper::GetArray()
+inline std::vector<int> vtkSMPropertyHelper::GetArray() const
 {
   return this->GetIntArray();
 }
 
 template <>
-inline std::vector<double> vtkSMPropertyHelper::GetArray()
+inline std::vector<double> vtkSMPropertyHelper::GetArray() const
 {
   return this->GetDoubleArray();
 }
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 template <>
-inline std::vector<vtkIdType> vtkSMPropertyHelper::GetArray()
+inline std::vector<vtkIdType> vtkSMPropertyHelper::GetArray() const
 {
   return this->GetIdTypeArray();
 }
 #endif
 
 template <>
-inline int vtkSMPropertyHelper::GetAs(unsigned int index)
+inline int vtkSMPropertyHelper::GetAs(unsigned int index) const
 {
   return this->GetAsInt(index);
 }
 
 template <>
-inline double vtkSMPropertyHelper::GetAs(unsigned int index)
+inline double vtkSMPropertyHelper::GetAs(unsigned int index) const
 {
   return this->GetAsDouble(index);
 }
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 template <>
-inline vtkIdType vtkSMPropertyHelper::GetAs(unsigned int index)
+inline vtkIdType vtkSMPropertyHelper::GetAs(unsigned int index) const
 {
   return this->GetAsIdType(index);
 }

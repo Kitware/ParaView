@@ -81,7 +81,7 @@ public:
   {
   }
 
-  virtual void Execute(vtkObject*, unsigned long, void*) { Target.selectionChanged(); }
+  void Execute(vtkObject*, unsigned long, void*) override { Target.selectionChanged(); }
 
   pqContextView& Target;
 

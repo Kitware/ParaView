@@ -40,7 +40,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkPVAMRDualContour();
-  virtual ~vtkPVAMRDualContour();
+  ~vtkPVAMRDualContour() override;
 
   //@{
   /**
@@ -58,12 +58,11 @@ public:
   vtkSetMacro(VolumeFractionSurfaceValue, double);
   //@}
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 private:
-  vtkPVAMRDualContour(const vtkPVAMRDualContour&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAMRDualContour&) VTK_DELETE_FUNCTION;
+  vtkPVAMRDualContour(const vtkPVAMRDualContour&) = delete;
+  void operator=(const vtkPVAMRDualContour&) = delete;
 
 protected:
   double VolumeFractionSurfaceValue;

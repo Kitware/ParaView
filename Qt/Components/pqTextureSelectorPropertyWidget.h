@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWid
 
 public:
   pqTextureSelectorPropertyWidget(vtkSMProxy* proxy, QWidget* parent = 0);
-  ~pqTextureSelectorPropertyWidget();
+  ~pqTextureSelectorPropertyWidget() override;
 
 private slots:
   void handleViewChanged(pqView* view);

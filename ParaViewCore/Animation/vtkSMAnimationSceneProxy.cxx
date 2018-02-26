@@ -162,6 +162,9 @@ bool vtkSMAnimationSceneProxy::UpdateAnimationUsingDataTimeSteps()
     .arg("methodname", "UpdateAnimationUsingDataTimeSteps")
     .arg("comment", "update animation scene based on data timesteps");
 
+  // ensure that the timekeeper has up-to-date time information (BUG #17849).
+  vtkSMTimeKeeperProxy::UpdateTimeInformation(timeKeeper);
+
   bool using_snap_to_timesteps_mode = false;
   vtkSMPropertyHelper timestepsHelper(timeKeeper, "TimestepValues");
   if (timestepsHelper.GetNumberOfElements() > 1)

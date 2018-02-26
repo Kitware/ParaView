@@ -53,7 +53,7 @@ public:
   pqXYChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
     pqServer* server, QObject* parent = NULL);
 
-  virtual ~pqXYChartView();
+  ~pqXYChartView() override;
 
 private:
   Q_DISABLE_COPY(pqXYChartView)

@@ -22,6 +22,9 @@
    </property>
    <item>
     <widget class="QCheckBox" name="show3DWidget">
+     <property name="toolTip">
+      <string>Show the interactive plane in the 3D render view.</string>
+     </property>
      <property name="text">
       <string>Show Plane</string>
      </property>
@@ -98,6 +101,9 @@
      </property>
      <item row="0" column="1">
       <widget class="QPushButton" name="useCameraNormal">
+       <property name="toolTip">
+        <string>Set the normal to the camera's view direction.</string>
+       </property>
        <property name="text">
         <string>Camera Normal</string>
        </property>
@@ -105,6 +111,9 @@
      </item>
      <item row="0" column="0">
       <widget class="QPushButton" name="useXNormal">
+       <property name="toolTip">
+        <string>Set the normal to the x-axis.</string>
+       </property>
        <property name="text">
         <string>&amp;X Normal</string>
        </property>
@@ -112,6 +121,9 @@
      </item>
      <item row="2" column="0">
       <widget class="QPushButton" name="useZNormal">
+       <property name="toolTip">
+        <string>Set the normal to the z-axis.</string>
+       </property>
        <property name="text">
         <string>&amp;Z Normal</string>
        </property>
@@ -119,6 +131,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="useYNormal">
+       <property name="toolTip">
+        <string>Set the normal to the y-axis.</string>
+       </property>
        <property name="text">
         <string>&amp;Y Normal</string>
        </property>
@@ -126,6 +141,9 @@
      </item>
      <item row="6" column="0" colspan="2">
       <widget class="QPushButton" name="resetToDataBounds">
+       <property name="toolTip">
+        <string>Reset the plane based on the data bounds.</string>
+       </property>
        <property name="text">
         <string>Reset to Data Bounds</string>
        </property>
@@ -133,6 +151,9 @@
      </item>
      <item row="5" column="0" colspan="2">
       <widget class="QPushButton" name="resetCameraToNormal">
+       <property name="toolTip">
+        <string>Reset the camera to look along the normal.</string>
+       </property>
        <property name="text">
         <string>Reset Camera to Normal</string>
        </property>

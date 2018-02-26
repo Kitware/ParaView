@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>pqSelectReaderDialog</class>
- <widget class="QDialog" name="pqSelectReaderDialog">
+ <class>SelectReaderDialog</class>
+ <widget class="QDialog" name="SelectReaderDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>600</height>
+    <width>447</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,7 +91,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>pqSelectReaderDialog</receiver>
+   <receiver>SelectReaderDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -107,7 +107,7 @@
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>pqSelectReaderDialog</receiver>
+   <receiver>SelectReaderDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -123,7 +123,7 @@
   <connection>
    <sender>listWidget</sender>
    <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>pqSelectReaderDialog</receiver>
+   <receiver>SelectReaderDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

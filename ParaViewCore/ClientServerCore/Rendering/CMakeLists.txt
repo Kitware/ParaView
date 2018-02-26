@@ -66,23 +66,24 @@ set (Module_SRCS
   vtkPVDataDeliveryManager.cxx
   vtkPVDataRepresentation.cxx
   vtkPVDataRepresentationPipeline.cxx
-  vtkPVDisplayInformation.cxx
   vtkPVGridAxes3DRepresentation.cxx
   vtkPVHardwareSelector.cxx
   vtkPVHistogramChartRepresentation.cxx
   vtkPVImageSliceMapper.cxx
-  vtkPVImplicitPlaneRepresentation.cxx
   vtkPVImplicitCylinderRepresentation.cxx
+  vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
+  vtkPVLight.cxx
   vtkPVMultiSliceView.cxx
   vtkPVOpenGLInformation.cxx
-  vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOrthographicSliceView.cxx
+  vtkPVMaterialLibrary.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlotMatrixView.cxx
   vtkPVProminentValuesInformation.cxx
   vtkPVRayCastPickingHelper.cxx
+  vtkPVRenderingCapabilitiesInformation.cxx
   vtkPVRenderView.cxx
   vtkPVRenderViewSettings.cxx
   vtkPVRepresentedDataInformation.cxx
@@ -106,11 +107,8 @@ set (Module_SRCS
   vtkXYChartRepresentation.cxx
 )
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-  list(APPEND Module_SRCS
-    vtkPointGaussianRepresentation.cxx)
-endif()
+list(APPEND Module_SRCS
+  vtkPointGaussianRepresentation.cxx)
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
@@ -118,32 +116,22 @@ if (PARAVIEW_ENABLE_PYTHON)
     vtkPythonView.cxx)
 endif()
 
-
 if (PARAVIEW_USE_ICE_T)
   list(APPEND Module_SRCS
     vtkIceTSynchronizedRenderers.cxx)
 endif()
 
-set_source_files_properties(
-  vtkCacheSizeKeeper
+if(NOT VTK_LEGACY_REMOVE)
+  list(APPEND Module_SRCS
+    vtkPVDisplayInformation.cxx
+    vtkPVOpenGLExtensionsInformation.cxx)
+endif()
 
-  # No need to wrap vtkPExtentTranslator, its an internal class.
-  vtkPExtentTranslator
-  WRAP_EXCLUDE
+set (${vtk-module}_HDRS
+  vtkStreamingPriorityQueue.h
+  vtkGeometryRepresentationInternal.h
 )
 
-set_source_files_properties(
-  vtkCacheSizeKeeper
-  vtkPVContextView
-  vtkPVDataRepresentation
-  vtkPVSynchronizedRenderWindows
-  vtkPVView
-  ABSTRACT)
-
-set (${vtk-module}_HDRS vtkStreamingPriorityQueue.h)
-
-# Use a custom hints file for this module.
-set(${vtk-module}_WRAP_HINTS "${CMAKE_CURRENT_SOURCE_DIR}/hints")
 vtk_module_library(vtkPVClientServerCoreRendering ${Module_SRCS})
 include(vtkOpenGL)
 vtk_opengl_link(vtkPVClientServerCoreRendering)

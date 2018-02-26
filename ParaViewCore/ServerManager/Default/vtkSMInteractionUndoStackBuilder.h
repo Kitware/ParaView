@@ -67,7 +67,7 @@ public:
    * Usually, this method isn't called directly, since the builder
    * listens to interaction events on the interactor and calls it
    * automatically. May be used when changing the camera
-   * programatically.
+   * programmatically.
    */
   void StartInteraction();
 
@@ -77,13 +77,13 @@ public:
    * Usually, this method isn't called directly, since the builder
    * listens to interaction events on the interactor and calls it
    * automatically. May be used when changing the camera
-   * programatically.
+   * programmatically.
    */
   void EndInteraction();
 
 protected:
   vtkSMInteractionUndoStackBuilder();
-  ~vtkSMInteractionUndoStackBuilder();
+  ~vtkSMInteractionUndoStackBuilder() override;
 
   vtkSMRenderViewProxy* RenderView;
   vtkSMUndoStack* UndoStack;
@@ -99,8 +99,8 @@ protected:
   friend class vtkSMInteractionUndoStackBuilderObserver;
 
 private:
-  vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMInteractionUndoStackBuilder&) VTK_DELETE_FUNCTION;
+  vtkSMInteractionUndoStackBuilder(const vtkSMInteractionUndoStackBuilder&) = delete;
+  void operator=(const vtkSMInteractionUndoStackBuilder&) = delete;
 
   vtkSMInteractionUndoStackBuilderObserver* Observer;
 };

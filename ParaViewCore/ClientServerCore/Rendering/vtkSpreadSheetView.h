@@ -49,19 +49,19 @@ public:
    * Triggers a high-resolution render.
    * \note CallOnAllProcesses
    */
-  virtual void StillRender() VTK_OVERRIDE { this->StreamToClient(); }
+  void StillRender() VTK_OVERRIDE { this->StreamToClient(); }
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
    * \note CallOnAllProcesses
    */
-  virtual void InteractiveRender() VTK_OVERRIDE { this->StreamToClient(); }
+  void InteractiveRender() VTK_OVERRIDE { this->StreamToClient(); }
 
   /**
    * Overridden to identify and locate the active-representation.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   //@{
   /**
@@ -172,7 +172,7 @@ public:
 
 protected:
   vtkSpreadSheetView();
-  ~vtkSpreadSheetView();
+  ~vtkSpreadSheetView() override;
 
   /**
    * On render streams all the data from the processes to the client.
@@ -202,8 +202,8 @@ protected:
   };
 
 private:
-  vtkSpreadSheetView(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpreadSheetView&) VTK_DELETE_FUNCTION;
+  vtkSpreadSheetView(const vtkSpreadSheetView&) = delete;
+  void operator=(const vtkSpreadSheetView&) = delete;
 
   class vtkInternals;
   friend class vtkInternals;

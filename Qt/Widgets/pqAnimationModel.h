@@ -72,7 +72,7 @@ public:
   };
 
   pqAnimationModel(QGraphicsView* p = 0);
-  ~pqAnimationModel();
+  ~pqAnimationModel() override;
 
   /**
   * the number of tracks
@@ -189,17 +189,17 @@ protected:
   double timeFromPosition(double pos);
   double timeFromTick(int tick);
   int tickFromTime(double pos);
-  void drawForeground(QPainter* painter, const QRectF& rect);
+  void drawForeground(QPainter* painter, const QRectF& rect) override;
   bool hitTestCurrentTimePoly(const QPointF& pos);
   pqAnimationTrack* hitTestTracks(const QPointF& pos);
   pqAnimationKeyFrame* hitTestKeyFrame(pqAnimationTrack* t, const QPointF& pos);
 
-  bool eventFilter(QObject* w, QEvent* e);
+  bool eventFilter(QObject* w, QEvent* e) override;
 
-  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
-  void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent);
-  void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent);
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent);
+  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+  void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
 
   double timeToNormalizedTime(double) const;
   double normalizedTimeToTime(double) const;

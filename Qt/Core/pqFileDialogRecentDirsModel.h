@@ -57,7 +57,7 @@ public:
   * pqFileDialogModel is used to test the validity of directories.
   */
   pqFileDialogRecentDirsModel(pqFileDialogModel* model, pqServer* server, QObject* parent);
-  ~pqFileDialogRecentDirsModel();
+  ~pqFileDialogRecentDirsModel() override;
 
   /**
   * Set the directory chosen by the user so that it gets added to the recent
@@ -73,17 +73,17 @@ public:
   /**
   * returns the data for an item
   */
-  QVariant data(const QModelIndex& idx, int role) const;
+  QVariant data(const QModelIndex& idx, int role) const override;
 
   /**
   * return the number of rows in the model
   */
-  int rowCount(const QModelIndex& idx) const;
+  int rowCount(const QModelIndex& idx) const override;
 
   /**
   * return header data
   */
-  QVariant headerData(int section, Qt::Orientation, int role) const;
+  QVariant headerData(int section, Qt::Orientation, int role) const override;
 
 public slots:
   void setChosenFiles(const QList<QStringList>& files);

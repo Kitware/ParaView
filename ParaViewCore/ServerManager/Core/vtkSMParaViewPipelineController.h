@@ -65,6 +65,11 @@ public:
    */
   virtual vtkSMProxy* FindTimeKeeper(vtkSMSession* session);
 
+  /**
+   * Returns the MaterialLibrary proxy associated with the session.
+   */
+  virtual vtkSMProxy* FindMaterialLibrary(vtkSMSession* session);
+
   //---------------------------------------------------------------------------
   /**
    * Pre-initializes a proxy i.e. prepares the proxy for initialization.
@@ -193,6 +198,17 @@ public:
     return this->RegisterOpacityTransferFunction(proxy, NULL);
   }
 
+  /**
+   * Use this method after PreInitializeProxy() and PostInitializeProxy() to
+   * register a light proxy with the proxy manager. This will also perform
+   * needed python tracing.
+   */
+  virtual bool RegisterLightProxy(vtkSMProxy* proxy, vtkSMProxy* view, const char* proxyname);
+  virtual bool RegisterLightProxy(vtkSMProxy* proxy, vtkSMProxy* view)
+  {
+    return this->RegisterLightProxy(proxy, view, NULL);
+  }
+
   //---------------------------------------------------------------------------
   // *******  Methods for Animation   *********
 
@@ -263,7 +279,7 @@ public:
 
 protected:
   vtkSMParaViewPipelineController();
-  ~vtkSMParaViewPipelineController();
+  ~vtkSMParaViewPipelineController() override;
 
   /**
    * Find proxy of the group type (xmlgroup, xmltype) registered under a
@@ -312,9 +328,14 @@ protected:
    */
   void ProcessInitializationHelper(vtkSMProxy*, vtkMTimeType initializationTimeStamp);
 
+  /**
+   * An entry point to load a catalog of OSPRay rendering materials.
+   */
+  virtual void DoMaterialSetup(vtkSMProxy* proxy);
+
 private:
-  vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMParaViewPipelineController&) VTK_DELETE_FUNCTION;
+  vtkSMParaViewPipelineController(const vtkSMParaViewPipelineController&) = delete;
+  void operator=(const vtkSMParaViewPipelineController&) = delete;
   //@}
 
   class vtkInternals;

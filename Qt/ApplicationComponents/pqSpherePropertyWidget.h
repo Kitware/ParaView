@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpherePropertyWidget : public pqInteracti
 
 public:
   pqSpherePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqSpherePropertyWidget();
+  ~pqSpherePropertyWidget() override;
 
 public slots:
   /**
@@ -66,7 +66,7 @@ protected slots:
   /**
   * Places the interactive widget using current data source information.
   */
-  virtual void placeWidget();
+  void placeWidget() override;
 
 private slots:
   void setCenter(double x, double y, double z);

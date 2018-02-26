@@ -34,10 +34,6 @@ set (Module_SRCS
   vtkCPPythonScriptPipeline.cxx
 )
 
-set_source_files_properties(
-  vtkCPPythonAdaptorAPI
-  ABSTRACT)
-
 set (${vtk-module}_HDRS CPythonAdaptorAPI.h)
 
 set (CATALYST_FORTRAN_USING_MANGLING)

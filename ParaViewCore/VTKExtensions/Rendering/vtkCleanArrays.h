@@ -59,9 +59,9 @@ public:
 
 protected:
   vtkCleanArrays();
-  ~vtkCleanArrays();
+  ~vtkCleanArrays() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;
@@ -69,8 +69,8 @@ protected:
   bool FillPartialArrays;
 
 private:
-  vtkCleanArrays(const vtkCleanArrays&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCleanArrays&) VTK_DELETE_FUNCTION;
+  vtkCleanArrays(const vtkCleanArrays&) = delete;
+  void operator=(const vtkCleanArrays&) = delete;
 
 public:
   class vtkArrayData;

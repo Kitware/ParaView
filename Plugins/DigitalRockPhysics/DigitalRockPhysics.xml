@@ -1,0 +1,162 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+   <SourceProxy name="AnalyzeMaterialClusters"
+                class="vtkPMaterialClusterAnalysisFilter"
+                label="Analyze Material Clusters">
+     <Documentation>
+       This filter produces a multiblock dataset that contains two blocks:
+       i/ the second block is a table that contains the volume (number of cells
+       of every cluster) and barycenter of every cluster (set of connected
+       cells that have the same point data material attribute) ;
+       ii/ the first block is the input data image with new point data arrays that
+       correspond to the volume and center of mass of the material cluster it
+       belongs to.
+     </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          number_of_components="1">
+        </InputArrayDomain>
+        <Documentation>
+          This property specifies the input to the cluster analysis filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ClusterLabel"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          The value of this property contains the name of the scalar array that
+          contains material labels.
+       </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="RockfillLabel"
+                         command="SetRockfillLabel"
+                         animateable="1"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          The value of this property determines what material should be considered
+          as the rockfill. Volume of rockfill material will not be computed.
+        </Documentation>
+      </IntVectorProperty>
+
+      <OutputPort index="0"
+                  name="ImageData"/>
+      <OutputPort index="1"
+                  name="Table of Volumes"/>
+
+      <Hints>
+        <ShowInMenu category="Digital Rock Physics" />
+        <View type="None" port="1" />
+      </Hints>
+   <!-- End AnalyzeMaterialClusters -->
+   </SourceProxy>
+
+   <SourceProxy name="ExplodeMaterialClusters"
+                class="vtkPMaterialClusterExplodeFilter"
+                label="Explode Material Clusters">
+     <Documentation>
+       This filter creates an exploded surface mesh of the clusters (set of connected
+       cells that have the same material attribute) described in the input image data.
+       This filter requires an initial analysis of the input data with the
+       MaterialClusterAnalysis filter. If input is not the output of this filter
+       (ie. it does not contain the metadata produced by this filter, the cluster centers
+       in particular), then the filter will be called internaly first.
+     </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          number_of_components="1">
+        </InputArrayDomain>
+        <Documentation>
+          This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="ClusterLabel"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          The value of this property contains the name of the scalar array that
+          contains material labels.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="ExplodeFactor"
+                            command="SetExplodeFactor"
+                            animateable="1"
+                            default_values="1"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="100"
+                           min="0"
+                           name="range" />
+        <Documentation>
+          The value of this property determines how far the points will be moved.
+          The cluster points will be translated by this value times the vector
+          that goes from the dataset center to the cluster barycenter.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="RockfillLabel"
+                         command="SetRockfillLabel"
+                         animateable="1"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          The value of this property determines what material should be considered
+          as the rockfill. Rockfill material surface will not be exploded/computed.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="Digital Rock Physics" />
+      </Hints>
+   <!-- End ExplodeMaterialClusters -->
+   </SourceProxy>
+
+ </ProxyGroup>
+</ServerManagerConfiguration>

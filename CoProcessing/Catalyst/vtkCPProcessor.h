@@ -39,11 +39,11 @@ class vtkMultiProcessController;
 /// 2) Processing (see vtkCPProcessor::ProcessData).
 ///
 /// Configuration step:\n
-/// In the first step the Co-Processor implemntation is called with a
+/// In the first step the Co-Processor implementation is called with a
 /// vtkDataDescription describing the data that the simulation can provide
-/// This gives the Co-Processor implemntation a chance to identify what
+/// This gives the Co-Processor implementation a chance to identify what
 /// (if any) of the available data it will process during this pass. By
-/// default all of the avaible data is selected, so that if the Co-Processor
+/// default all of the available data is selected, so that if the Co-Processor
 /// implementation does nothing it will receive all data during the Processing
 /// step. The Co-Processor implementation should extract what ever meta-data
 /// it will need (or alternatively can save a reference to the DataDescription),
@@ -86,6 +86,13 @@ public:
   virtual int Initialize(vtkMPICommunicatorOpaqueComm& comm);
 #endif
 
+  /// The Catalyst input field data string array name. This array will
+  /// be generated automatically by Catalyst and have a single entry
+  /// that has the input name for identifying the associated
+  /// vtkCPInputDataDescription. This will allow automatically mapping
+  // adaptor inputs to pipeline sources.
+  static const char* GetInputArrayName() { return "__CatalystChannel__"; }
+
   /// Configuration Step:
   /// The coprocessor first determines if any coprocessing needs to be done
   /// at this TimeStep/Time combination returning 1 if it does and 0
@@ -112,8 +119,8 @@ protected:
   virtual vtkObject* NewInitializationHelper();
 
 private:
-  vtkCPProcessor(const vtkCPProcessor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPProcessor&) VTK_DELETE_FUNCTION;
+  vtkCPProcessor(const vtkCPProcessor&) = delete;
+  void operator=(const vtkCPProcessor&) = delete;
 
   vtkCPProcessorInternals* Internal;
   vtkObject* InitializationHelper;

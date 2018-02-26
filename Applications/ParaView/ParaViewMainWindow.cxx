@@ -44,6 +44,7 @@ void vtkPVInitializePythonModules();
 #include "pqCoreUtilities.h"
 #include "pqDeleteReaction.h"
 #include "pqLoadDataReaction.h"
+#include "pqLoadStateReaction.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
@@ -78,6 +79,7 @@ void vtkPVInitializePythonModules();
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonDebugLeaksView.h"
+#include "pqPythonShell.h"
 typedef pqPythonDebugLeaksView DebugLeaksViewType;
 #else
 #include "vtkQtDebugLeaksView.h"
@@ -102,17 +104,12 @@ public:
 //-----------------------------------------------------------------------------
 ParaViewMainWindow::ParaViewMainWindow()
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  // force the use of UTF-8 text codec (Latin1 is default with Qt 4.8)
-  // this is important for support of accentuated paths.
-  QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-#endif
-
   // the debug leaks view should be constructed as early as possible
   // so that it can monitor vtk objects created at application startup.
+  DebugLeaksViewType* leaksView = nullptr;
   if (getenv("PV_DEBUG_LEAKS_VIEW"))
   {
-    vtkQtDebugLeaksView* leaksView = new DebugLeaksViewType(this);
+    leaksView = new DebugLeaksViewType(this);
     leaksView->setWindowFlags(Qt::Window);
     leaksView->show();
   }
@@ -129,6 +126,16 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   this->Internals->outputWidgetDock->hide();
+  this->Internals->pythonShellDock->hide();
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonShell* shell = new pqPythonShell(this);
+  shell->setObjectName("pythonShell");
+  this->Internals->pythonShellDock->setWidget(shell);
+  if (leaksView)
+  {
+    leaksView->setShell(shell);
+  }
+#endif
 
   // show output widget if we received an error message.
   this->connect(this->Internals->outputWidget, SIGNAL(messageDisplayed(const QString&, int)),
@@ -147,6 +154,7 @@ ParaViewMainWindow::ParaViewMainWindow()
     this->Internals->colorMapEditorDock, this->Internals->comparativePanelDock);
   this->tabifyDockWidget(
     this->Internals->colorMapEditorDock, this->Internals->collaborationPanelDock);
+  this->tabifyDockWidget(this->Internals->colorMapEditorDock, this->Internals->lightInspectorDock);
 
   this->Internals->selectionDisplayDock->hide();
   this->Internals->animationViewDock->hide();
@@ -157,9 +165,11 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->Internals->multiBlockInspectorDock->hide();
   this->Internals->colorMapEditorDock->hide();
   this->Internals->timeInspectorDock->hide();
+  this->Internals->lightInspectorDock->hide();
 
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->statisticsDock);
   this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->outputWidgetDock);
+  this->tabifyDockWidget(this->Internals->animationViewDock, this->Internals->pythonShellDock);
 
   // setup properties dock
   this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->viewPropertiesDock);
@@ -253,7 +263,8 @@ ParaViewMainWindow::ParaViewMainWindow()
   pqParaViewMenuBuilders::buildCatalystMenu(*this->Internals->menu_Catalyst);
 
   // setup the context menu for the pipeline browser.
-  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(*this->Internals->pipelineBrowser);
+  pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(
+    *this->Internals->pipelineBrowser->contextMenu());
 
   pqParaViewMenuBuilders::buildToolbars(*this);
 
@@ -307,7 +318,15 @@ void ParaViewMainWindow::dropEvent(QDropEvent* evt)
   {
     if (!url.toLocalFile().isEmpty())
     {
-      files.append(url.toLocalFile());
+      QString path = url.toLocalFile();
+      if (path.endsWith(".pvsm", Qt::CaseInsensitive))
+      {
+        pqLoadStateReaction::loadState(path);
+      }
+      else
+      {
+        files.append(url.toLocalFile());
+      }
     }
   }
 
@@ -386,7 +405,7 @@ void ParaViewMainWindow::updateFontSize()
 void ParaViewMainWindow::handleMessage(const QString&, int type)
 {
   QDockWidget* dock = this->Internals->outputWidgetDock;
-  if (!dock->isVisible() && (type == pqOutputWidget::ERROR || type == pqOutputWidget::WARNING))
+  if (!dock->isVisible() && (type == QtCriticalMsg || type == QtFatalMsg || type == QtWarningMsg))
   {
     // if dock is not visible, we always pop it up as a floating dialog. This
     // avoids causing re-renders which may cause more errors and more confusion.

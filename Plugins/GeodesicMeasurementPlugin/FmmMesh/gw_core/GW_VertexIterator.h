@@ -3,7 +3,7 @@
 /**
  *  \file   GW_VertexIterator.h
  *  \brief  Definition of class \c GW_VertexIterator
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ class GW_Vertex;
 /**
  *  \class  GW_VertexIterator
  *  \brief  An iterator on the vertex around a given vertex.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-2-2003
  *
  *  To iterate on vertex.
@@ -36,7 +36,7 @@ public:
 
     GW_VertexIterator(  GW_Face* pFace, GW_Vertex* pOrigin, GW_Vertex* pDirection, GW_Face* pPrevFace, GW_U32 nNbrIncrement = 0 );
 
-    /* assignement */
+    /* assignment */
     //GW_VertexIterator& operator=( const GW_VertexIterator& it);
 
     /* evaluation */
@@ -70,7 +70,7 @@ private:
 
 
 
-/* assignement */
+/* assignment */
 /*
 inline GW_VertexIterator& GW_VertexIterator::operator=( const GW_VertexIterator& it)
 {
@@ -119,7 +119,7 @@ inline GW_Vertex* GW_VertexIterator::operator*(  )
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

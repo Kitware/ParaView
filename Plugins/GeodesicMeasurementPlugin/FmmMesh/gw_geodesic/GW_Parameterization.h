@@ -3,7 +3,7 @@
 /**
  *  \file   GW_Parameterization.h
  *  \brief  Definition of class \c GW_Parameterization
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-1-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -128,10 +128,10 @@ typedef T_TrissectorInfoVector::const_reverse_iterator CRIT_TrissectorInfoVector
 /**
  *  \class  GW_Parameterization
  *  \brief  Build a parameterization of a mesh.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   7-1-2003
  *
- *  First segement the mesh using a Lloyd method.
+ *  First segment the mesh using a Lloyd method.
  *    Then parameterize each region.
  */
 /*------------------------------------------------------------------------------*/
@@ -160,7 +160,7 @@ public:
     //@}
 
     //-------------------------------------------------------------------------
-    /** \name Segementation. */
+    /** \name Segmentation. */
     //-------------------------------------------------------------------------
     //@{
     void SegmentRegion( GW_GeodesicMesh& Mesh, GW_GeodesicVertex& Vert, T_TrissectorInfoMap* pTrissectorInfoMap = NULL );
@@ -308,7 +308,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

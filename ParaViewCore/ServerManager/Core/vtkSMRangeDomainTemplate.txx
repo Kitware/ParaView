@@ -29,6 +29,7 @@ template <class T>
 vtkSMRangeDomainTemplate<T>::vtkSMRangeDomainTemplate()
 {
   this->DefaultDefaultMode = MID;
+  this->Resolution = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -109,6 +110,13 @@ T vtkSMRangeDomainTemplate<T>::GetMaximum(unsigned int idx, int& exists)
 
 //-----------------------------------------------------------------------------
 template <class T>
+int vtkSMRangeDomainTemplate<T>::GetResolution()
+{
+  return this->Resolution;
+}
+
+//-----------------------------------------------------------------------------
+template <class T>
 bool vtkSMRangeDomainTemplate<T>::GetMinimumExists(unsigned int idx)
 {
   return (
@@ -121,6 +129,13 @@ bool vtkSMRangeDomainTemplate<T>::GetMaximumExists(unsigned int idx)
 {
   return (
     idx < static_cast<unsigned int>(this->Entries.size()) ? this->Entries[idx].Valid[1] : false);
+}
+
+//-----------------------------------------------------------------------------
+template <class T>
+bool vtkSMRangeDomainTemplate<T>::GetResolutionExists()
+{
+  return this->Resolution != -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -239,6 +254,14 @@ int vtkSMRangeDomainTemplate<T>::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXML
       }
     }
   }
+
+  double resolution;
+  numRead = element->GetScalarAttribute("resolution", &resolution);
+  if (numRead > 0)
+  {
+    this->Resolution = resolution;
+  }
+
   this->SetEntries(new_entries);
   return 1;
 }
@@ -267,13 +290,31 @@ int vtkSMRangeDomainTemplate<T>::SetDefaultValues(
   helper.SetUseUnchecked(use_unchecked_values);
   if (vp->GetRepeatCommand())
   {
-    // this is a resizable property, set just 1 value in it. This happens in
-    // cases like ContourValues for ContourFilter.
-    T value;
-    if (this->GetComputedDefaultValue(0, value))
+    unsigned int vectorSize = static_cast<unsigned int>(this->DefaultModeVector.size());
+    if (helper.GetNumberOfElements() > 0 && helper.GetNumberOfElements() == vectorSize)
     {
-      helper.Set(&value, 1);
+      // The domain is defining exactly the same number of modes than number
+      // of elements in the property, let's use them
+      for (unsigned int cc = 0; cc < vectorSize; cc++)
+      {
+        T value;
+        if (this->GetComputedDefaultValue(cc, value))
+        {
+          helper.Set(cc, value);
+        }
+      }
       return 1;
+    }
+    else
+    {
+      // this is a resizable property, set just 1 value in it. This happens in
+      // cases like ContourValues for ContourFilter.
+      T value;
+      if (this->GetComputedDefaultValue(0, value))
+      {
+        helper.Set(&value, 1);
+        return 1;
+      }
     }
   }
   else if (helper.GetNumberOfElements() == this->GetNumberOfEntries() * 2)
@@ -323,8 +364,12 @@ bool vtkSMRangeDomainTemplate<T>::GetComputedDefaultValue(unsigned int index, T&
 {
   int minExists, maxExists;
   T min, max;
-  min = this->GetMinimum(index, minExists);
-  max = this->GetMaximum(index, maxExists);
+
+  // Using a modulo to be able to recover correct minimum and maximum with repeatable properties
+  min = this->GetMinimum(
+    this->GetNumberOfEntries() > 0 ? index % this->GetNumberOfEntries() : index, minExists);
+  max = this->GetMaximum(
+    this->GetNumberOfEntries() > 0 ? index % this->GetNumberOfEntries() : index, maxExists);
 
   DefaultModes defaultMode = this->GetDefaultMode(index);
 
@@ -380,5 +425,6 @@ void vtkSMRangeDomainTemplate<T>::PrintSelf(ostream& os, vtkIndent indent)
     }
   }
   os << endl;
+  os << indent << "Resolution: " << this->Resolution << std::endl;
 }
 #endif

@@ -88,8 +88,8 @@ protected:
   virtual vtkDoubleArray* GetColumn(vtkTable* table, const char* name);
 
 private:
-  vtkTemporalRanges(const vtkTemporalRanges&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTemporalRanges&) VTK_DELETE_FUNCTION;
+  vtkTemporalRanges(const vtkTemporalRanges&) = delete;
+  void operator=(const vtkTemporalRanges&) = delete;
 };
 
 #endif // vtkTemporalRanges_h

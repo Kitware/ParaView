@@ -71,11 +71,11 @@ public:
 
 protected:
   vtkSelectionSerializer();
-  ~vtkSelectionSerializer();
+  ~vtkSelectionSerializer() override;
 
 private:
-  vtkSelectionSerializer(const vtkSelectionSerializer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSelectionSerializer&) VTK_DELETE_FUNCTION;
+  vtkSelectionSerializer(const vtkSelectionSerializer&) = delete;
+  void operator=(const vtkSelectionSerializer&) = delete;
 
   static void WriteSelectionData(ostream& os, vtkIndent indent, vtkSelectionNode* selection);
   static void Parse(vtkPVXMLElement* rootElem, vtkSelection* root);

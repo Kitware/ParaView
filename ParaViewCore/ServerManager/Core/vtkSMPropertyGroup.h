@@ -106,7 +106,7 @@ public:
 
 protected:
   vtkSMPropertyGroup();
-  ~vtkSMPropertyGroup();
+  ~vtkSMPropertyGroup() override;
 
   friend class vtkSMProxy;
   virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element);
@@ -117,8 +117,8 @@ protected:
   vtkSMDocumentation* Documentation;
 
 private:
-  vtkSMPropertyGroup(const vtkSMPropertyGroup&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPropertyGroup&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyGroup(const vtkSMPropertyGroup&) = delete;
+  void operator=(const vtkSMPropertyGroup&) = delete;
 
   char* Name;
   char* XMLLabel;

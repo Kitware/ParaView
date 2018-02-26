@@ -61,8 +61,8 @@ protected:
   std::vector<float> ValuatorStates;
 
 private:
-  vtkVRUIServerState(const vtkVRUIServerState&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkVRUIServerState&) VTK_DELETE_FUNCTION;
+  vtkVRUIServerState(const vtkVRUIServerState&) = delete;
+  void operator=(const vtkVRUIServerState&) = delete;
 };
 
 #endif // #ifndef vtkVRUIServerState_h

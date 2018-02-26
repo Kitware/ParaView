@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLockPanelsReaction.h"
 #include "pqPVApplicationCore.h"
+#include "pqPreviewMenuManager.h"
 #include "pqSetName.h"
 #include "pqTabbedMultiViewWidget.h"
 
@@ -51,10 +52,10 @@ pqViewMenuManager::pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu)
   this->Menu = menu;
   this->Window = mainWindow;
 
-  // essential to ensure that the full screen shortcut is setup correctly.
   this->buildMenu();
 
-  QObject::connect(menu, SIGNAL(aboutToShow()), this, SLOT(buildMenu()));
+  // update variants in the menu before each show.
+  this->connect(menu, SIGNAL(aboutToShow()), SLOT(updateMenu()));
 }
 
 namespace
@@ -69,50 +70,29 @@ bool dockWidgetLessThan(const QDockWidget* tb1, const QDockWidget* tb2)
   return tb1->toggleViewAction()->text() < tb2->toggleViewAction()->text();
 }
 }
+
 //-----------------------------------------------------------------------------
 void pqViewMenuManager::buildMenu()
 {
+  // this is done to keep consistent with previous behavior.
   this->Menu->clear();
-  QList<QMenu*> child_menus = this->Menu->findChildren<QMenu*>();
-  foreach (QMenu* menu, child_menus)
-  {
-    delete menu;
-  }
 
-  QMenu* toolbars = this->Menu->addMenu("Toolbars") << pqSetName("Toolbars");
-  QList<QToolBar*> all_toolbars = this->Window->findChildren<QToolBar*>();
-  qSort(all_toolbars.begin(), all_toolbars.end(), toolbarLessThan);
+  // Add invariant items to the menu.
+  this->ToolbarsMenu = this->Menu->addMenu("Toolbars") << pqSetName("Toolbars");
+  this->DockPanelSeparators[0] = this->Menu->addSeparator();
+  this->DockPanelSeparators[1] = this->Menu->addSeparator();
 
-  foreach (QToolBar* toolbar, all_toolbars)
-  {
-    // Nested toolbars should be skipped. These are the non-top-level toolbars
-    // such as those on the view frame or other widgets.
-    if (toolbar->parentWidget() == this->Window)
-    {
-      toolbars->addAction(toolbar->toggleViewAction());
-    }
-  }
-  this->Menu->addSeparator();
-
-  QList<QDockWidget*> all_docks = this->Window->findChildren<QDockWidget*>();
-  qSort(all_docks.begin(), all_docks.end(), dockWidgetLessThan);
-  foreach (QDockWidget* dock_widget, all_docks)
-  {
-    this->Menu->addAction(dock_widget->toggleViewAction());
-  }
-  this->Menu->addSeparator();
+  // Add dynamic menu items. We add them here too to ensure that test playback
+  // doesn't have to rely on showing the menu before it can activate dynamic
+  // actions.
+  this->updateMenu();
 
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)
   {
-    QAction* toggleDecoration = this->Menu->addAction("Toggle Borders");
-    toggleDecoration->setObjectName("actionToggleWindowBorders");
-    toggleDecoration->setShortcut(QKeySequence("Ctrl+D"));
-    toggleDecoration->setToolTip("Hide window borders/decoration\
-      to stage the scene for a screenshot");
-    QObject::connect(
-      toggleDecoration, SIGNAL(triggered()), viewManager, SLOT(toggleWidgetDecoration()));
+    new pqPreviewMenuManager((this->Menu->addMenu("Preview") << pqSetName("Preview")));
+
     QAction* fullscreen = this->Menu->addAction("Full Screen");
     fullscreen->setObjectName("actionFullScreen");
     fullscreen->setShortcut(QKeySequence("F11"));
@@ -123,6 +103,45 @@ void pqViewMenuManager::buildMenu()
   lockDockWidgetsAction->setObjectName("actionLockDockWidgets");
   lockDockWidgetsAction->setToolTip("Toggle locking of dockable panels so they\
     cannot be moved");
-
   new pqLockPanelsReaction(lockDockWidgetsAction);
+}
+
+//-----------------------------------------------------------------------------
+void pqViewMenuManager::updateMenu()
+{
+  // update invariants only.
+  Q_ASSERT(this->ToolbarsMenu);
+
+  this->ToolbarsMenu->clear();
+  QList<QToolBar*> all_toolbars = this->Window->findChildren<QToolBar*>();
+  qSort(all_toolbars.begin(), all_toolbars.end(), toolbarLessThan);
+
+  foreach (QToolBar* toolbar, all_toolbars)
+  {
+    // Nested toolbars should be skipped. These are the non-top-level toolbars
+    // such as those on the view frame or other widgets.
+    if (toolbar->parentWidget() == this->Window)
+    {
+      this->ToolbarsMenu->addAction(toolbar->toggleViewAction());
+    }
+  }
+
+  Q_ASSERT(this->DockPanelSeparators[0] && this->DockPanelSeparators[1]);
+  // remove all dock panel actions and add them back in.
+  QList<QAction*> acts = this->Menu->actions();
+  int start = acts.indexOf(this->DockPanelSeparators[0]);
+  int end = acts.indexOf(this->DockPanelSeparators[1]);
+  Q_ASSERT(start != -1 && end != -1);
+  for (int cc = start + 1; cc < end; ++cc)
+  {
+    this->Menu->removeAction(acts[cc]);
+  }
+
+  QList<QDockWidget*> all_docks = this->Window->findChildren<QDockWidget*>();
+  qSort(all_docks.begin(), all_docks.end(), dockWidgetLessThan);
+  foreach (QDockWidget* dock_widget, all_docks)
+  {
+    this->Menu->insertAction(
+      /*before*/ this->DockPanelSeparators[1], dock_widget->toggleViewAction());
+  }
 }

@@ -243,7 +243,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Orientation/LineEdit2" command="set_string" arguments="100" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Orientation/LineEdit2" command="key" arguments="16777221" />
 
-  <!-- To minimise tiny picture norm deviations among platforms: -->
+  <!-- To minimize tiny picture norm deviations among platforms: -->
   <!-- a) 2D view -->
   <!-- pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/ToggleInteractionMode" command="activate" arguments="" /> -->
   <!-- b) disable orientation axes actor -->

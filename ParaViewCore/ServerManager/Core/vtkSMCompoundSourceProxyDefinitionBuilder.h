@@ -111,12 +111,12 @@ public:
 
 protected:
   vtkSMCompoundSourceProxyDefinitionBuilder();
-  ~vtkSMCompoundSourceProxyDefinitionBuilder();
+  ~vtkSMCompoundSourceProxyDefinitionBuilder() override;
 
 private:
   vtkSMCompoundSourceProxyDefinitionBuilder(
-    const vtkSMCompoundSourceProxyDefinitionBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCompoundSourceProxyDefinitionBuilder&) VTK_DELETE_FUNCTION;
+    const vtkSMCompoundSourceProxyDefinitionBuilder&) = delete;
+  void operator=(const vtkSMCompoundSourceProxyDefinitionBuilder&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

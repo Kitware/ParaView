@@ -80,25 +80,26 @@ public:
   /**
   * destruct a links model
   */
-  ~pqLinksModel();
+  ~pqLinksModel() override;
 
   // implementation to satisfy api
   /**
   * the number of rows (number of links)
   */
-  int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   /**
   * the number of columns
   */
-  int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
   /**
   * data for an index
   */
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
   /**
   * header data
   */
-  QVariant headerData(int section, Qt::Orientation orient, int role = Qt::DisplayRole) const;
+  QVariant headerData(
+    int section, Qt::Orientation orient, int role = Qt::DisplayRole) const override;
 
   // subclass specific implementation
   /**
@@ -256,7 +257,7 @@ class pqLinksModelObject : public QObject
   Q_OBJECT
 public:
   pqLinksModelObject(QString name, pqLinksModel* p, pqServer*);
-  ~pqLinksModelObject();
+  ~pqLinksModelObject() override;
 
   QString name() const;
   vtkSMLink* link() const;

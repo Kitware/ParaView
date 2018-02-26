@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqSGPluginManager : public QObject
 
 public:
   pqSGPluginManager(QObject* parent = 0);
-  ~pqSGPluginManager();
+  ~pqSGPluginManager() override;
 
   /**
   * Methods used to shartup and shutdown the plugin.

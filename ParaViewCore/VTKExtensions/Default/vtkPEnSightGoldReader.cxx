@@ -3034,7 +3034,7 @@ int vtkPEnSightGoldReader::CheckForUndefOrPartial(const char* line)
           this->UndefPartial->UndefElementTypes = val;
           break;
         default:
-          vtkErrorMacro(<< "Unknow section type: " << subline);
+          vtkErrorMacro(<< "Unknown section type: " << subline);
       }
       return 0; // meaning 'undef', so no other steps is necesserary
     }
@@ -3072,7 +3072,7 @@ int vtkPEnSightGoldReader::CheckForUndefOrPartial(const char* line)
           }
           break;
         default:
-          vtkErrorMacro(<< "Unknow section type: " << subline);
+          vtkErrorMacro(<< "Unknown section type: " << subline);
       }
       return 1; // meaning 'partial', so other steps are necesserary
     }

@@ -40,7 +40,7 @@ namespace
 template <class B>
 B vtkSMVPConvertFromString(const std::string& string_representation)
 {
-  B value;
+  B value = B();
   std::istringstream buffer(string_representation);
   buffer >> value;
   return value;
@@ -109,7 +109,7 @@ public:
     this->UncheckedValues.resize(num);
     if (num == 0)
     {
-      // If num == 0, then we already have the intialized values (so to speak).
+      // If num == 0, then we already have the initialized values (so to speak).
       this->Initialized = true;
     }
     else

@@ -64,10 +64,14 @@ set(Module_SRCS
   pqConsoleWidget.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
+  pqDiscreteDoubleWidget.cxx
+  pqDiscreteDoubleWidget.h
   pqDoubleRangeDialog.cxx
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.cxx
   pqDoubleRangeWidget.h
+  pqDoubleSliderWidget.h
+  pqDoubleSliderWidget.cxx
   pqDoubleSpinBox.cxx
   pqDoubleSpinBox.h
   pqExpandableTableView.cxx
@@ -78,6 +82,8 @@ set(Module_SRCS
   pqFlatTreeView.h
   pqHighlightablePushButton.cxx
   pqHighlightablePushButton.h
+  pqHighlightableToolButton.cxx
+  pqHighlightableToolButton.h
   pqLineEdit.cxx
   pqLineEditEventPlayer.cxx
   pqLineEditEventPlayer.h
@@ -86,12 +92,12 @@ set(Module_SRCS
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
-  pqProgressBar.cxx
-  pqProgressBar.h
   pqProgressWidget.cxx
   pqProgressWidget.h
   pqQuickLaunchDialog.cxx
   pqQuickLaunchDialog.h
+  pqScaleByButton.cxx
+  pqScaleByButton.h
   pqSectionVisibilityContextMenu.cxx
   pqSectionVisibilityContextMenu.h
   pqSetData.cxx
@@ -124,8 +130,6 @@ set(Module_SRCS
   pqTreeWidgetSelectionHelper.h
   pqWaitCursor.cxx
   pqWaitCursor.h
-#  QtWidgetsPlugin.cxx
-#  QtWidgetsPlugin.h
 )
 
 ##########################################################################
@@ -149,20 +153,23 @@ set (QtWidgets_SRCS
   pqConsoleWidgetEventTranslator.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
+  pqDiscreteDoubleWidget.h
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.h
+  pqDoubleSliderWidget.h
   pqDoubleSpinBox.h
   pqExpandableTableView.h
   pqExpanderButton.h
   pqFlatTreeView.h
   pqHighlightablePushButton.h
+  pqHighlightableToolButton.h
   pqLineEditEventPlayer.h
   pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
-  pqProgressBar.h
   pqProgressWidget.h
   pqQuickLaunchDialog.h
+  pqScaleByButton.h
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqSpinBox.h
@@ -179,14 +186,8 @@ set (QtWidgets_SRCS
 
 include(ParaViewQt)
 
-set(qt4_public_comps QtGui)
-set(qt4_private_comps QtNetwork)
-
 set(qt5_public_comps Core Gui Widgets)
 set(qt5_private_comps Network)
-if(PARAVIEW_USE_QTWEBKIT)
-  list(APPEND qt4_private_comps QtWebKit)
-endif()
 if(APPLE)
   list(APPEND qt5_private_comps PrintSupport)
 endif()
@@ -196,21 +197,17 @@ if (PARAVIEW_USE_QTHELP)
   list(APPEND QtWidgets_SRCS pqHelpWindow.h)
   set(${vtk-module}_EXPORT_CODE
     "#ifndef PARAVIEW_USE_QTHELP\n#  define PARAVIEW_USE_QTHELP\n#endif\n")
-  list(APPEND qt4_private_comps QtHelp)
   list(APPEND qt5_private_comps Help)
 endif()
 
 pv_find_package_qt(qt_public_targets REQUIRED
-  QT4_COMPONENTS ${qt4_public_comps}
   QT5_COMPONENTS ${qt5_public_comps})
 pv_find_package_qt(qt_private_targets REQUIRED
-  QT4_COMPONENTS ${qt4_private_comps}
   QT5_COMPONENTS ${qt5_private_comps})
 
 set(${vtk-module}_EXPORT_CODE_INSTALL
   "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
   pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-    QT4_COMPONENTS ${qt4_public_comps}
     QT5_COMPONENTS ${qt5_public_comps})")
 set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
 
@@ -255,40 +252,8 @@ if(PARAVIEW_USE_QTWEBKIT)
   add_definitions(-DPARAVIEW_USE_QTWEBKIT)
 endif()
 
-if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  vtk_module_export_code_find_package(Qt5 COMPONENTS ${qt5_public_comps})
-else()
-  vtk_module_export_code_find_package(Qt4 COMPONENTS ${qt4_public_comps})
-endif()
-
+vtk_module_export_code_find_package(Qt5 COMPONENTS ${qt5_public_comps})
 vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
 target_link_libraries(${vtk-module}
   LINK_PRIVATE ${qt_private_targets}
   LINK_PUBLIC ${qt_public_targets})
-#IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-#  # Headers
-#  GLOB_INSTALL_DEVELOPMENT(
-#      ${CMAKE_CURRENT_SOURCE_DIR}
-#      ${PV_INSTALL_INCLUDE_DIR} 
-#      "*.h;*.hxx;*.txx")
-#  INSTALL(
-#      FILES ${dynamicHeaders}
-#      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-#      COMPONENT Development)
-#  # QT resources
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources/UI"
-#    "${resPath}/*.ui")
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources/Icons"
-#    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources"
-#    "${resPath}/*.ui;${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc;${resPath}/*.qrc")
-#ENDIF ()

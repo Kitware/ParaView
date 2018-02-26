@@ -320,63 +320,6 @@ void vtkSMInputArrayDomain::SetAttributeType(const char* type)
   vtkErrorMacro("Unrecognized attribute type: " << type);
 }
 
-#ifndef VTK_LEGACY_REMOVE
-//---------------------------------------------------------------------------
-int vtkSMInputArrayDomain::GetNumberOfComponents()
-{
-  VTK_LEGACY_REPLACED_BODY(vtkSMInputArrayDomain::GetNumberOfComponents(), "ParaView 5.2",
-    vtkSMInputArrayDomain::GetAcceptableNumbersOfComponents());
-  return this->AcceptableNumbersOfComponents.size() == 0 ? 0
-                                                         : this->AcceptableNumbersOfComponents[0];
-}
-
-//---------------------------------------------------------------------------
-void vtkSMInputArrayDomain::SetNumberOfComponents(int nComps)
-{
-  VTK_LEGACY_BODY(vtkSMInputArrayDomain::SetNumberOfComponents(), "ParaView 5.2");
-  if (this->AcceptableNumbersOfComponents.size() == 0)
-  {
-    this->AcceptableNumbersOfComponents.push_back(nComps);
-  }
-  else
-  {
-    this->AcceptableNumbersOfComponents[0] = nComps;
-  }
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMInputArrayDomain::IsArrayAcceptable(
-  int required_number_of_components, vtkPVArrayInformation* arrayInfo)
-{
-  VTK_LEGACY_REPLACED_BODY(static vtkSMInputArrayDomain::IsArrayAcceptable(), "ParaView 5.2",
-    vtkSMInputArrayDomain::IsArrayAcceptable());
-  if (arrayInfo == NULL)
-  {
-    return false;
-  }
-
-  if (
-    // acceptable if the domain doesn't dictate any component requirements.
-    required_number_of_components <= 0 ||
-
-    // acceptable if the components match those in array
-    arrayInfo->GetNumberOfComponents() == required_number_of_components ||
-
-    // when using automatic property conversion, we support automatic extraction
-    // of a single component from multi-component arrays. However, we still
-    // don't support automatic extraction of multiple components, so if the
-    // filter needs more than 1 component, then the number of components must
-    // match.
-    (vtkSMInputArrayDomain::AutomaticPropertyConversion && required_number_of_components == 1 &&
-      arrayInfo->GetNumberOfComponents() > 1))
-  {
-    return true;
-  }
-
-  return false;
-}
-#endif // VTK_LEGACY_REMOVE
-
 //---------------------------------------------------------------------------
 std::vector<int> vtkSMInputArrayDomain::GetAcceptableNumbersOfComponents() const
 {

@@ -638,7 +638,7 @@ void vtkGridConnectivityExecuteProcess(vtkGridConnectivity* self, vtkUnstructure
           equivalenceSet->AddEquivalence(nextFragmentId, nextFragmentId);
           nextFragmentId++;
         }
-        // I do not think that the equivalence set has a more upto date id,
+        // I do not think that the equivalence set has a more up to date id,
         // but it cannot hurt to check/
         minFragmentId = equivalenceSet->GetEquivalentSetId(minFragmentId);
         // Label the faces with the fragment id we computed.
@@ -1652,7 +1652,7 @@ double vtkGridConnectivity::ComputeTetrahedronVolume(
     c[i] = pts3[i] - pts0[i];
   }
 
-  // Calulate the volume of the tet which is 1/6 * the box product
+  // Calculate the volume of the tet which is 1/6 * the box product
   vtkMath::Cross(a, b, n);
   return fabs(vtkMath::Dot(c, n) / 6.0);
 }
@@ -1711,7 +1711,7 @@ double vtkGridConnectivity::IntegrateTetrahedron(
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned hexahedral cells
+// For axis aligned hexahedral cells
 double vtkGridConnectivity::IntegrateHex(vtkCell* hex, vtkUnstructuredGrid* input, int fragmentId)
 {
   vtkPoints* points = hex->GetPoints();
@@ -1766,7 +1766,7 @@ double vtkGridConnectivity::IntegrateHex(vtkCell* hex, vtkUnstructuredGrid* inpu
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned hexahedral cells
+// For axis aligned hexahedral cells
 double vtkGridConnectivity::IntegrateVoxel(
   vtkCell* voxel, vtkUnstructuredGrid* input, int fragmentId)
 {

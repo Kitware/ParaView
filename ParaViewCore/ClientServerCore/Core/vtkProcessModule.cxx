@@ -41,7 +41,7 @@
 #endif
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "vtkProcessModuleInitializePython.h"
+#include "vtkPythonInterpreter.h"
 #endif
 
 #ifdef _WIN32
@@ -86,7 +86,7 @@ public:
 
 private:
   vtkPVGenericOutputWindow() {}
-  ~vtkPVGenericOutputWindow() {}
+  ~vtkPVGenericOutputWindow() override {}
 };
 vtkStandardNewMacro(vtkPVGenericOutputWindow);
 }
@@ -111,27 +111,30 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
   vtkProcessModule::GlobalController = vtkSmartPointer<vtkDummyController>::New();
 
 #ifdef PARAVIEW_USE_MPI
-  bool use_mpi = (type != PROCESS_CLIENT);
   // scan the arguments to determine if we need to initialize MPI on client.
-  bool default_use_mpi = use_mpi;
-
-  if (!use_mpi) // i.e. type == PROCESS_CLIENT.
+  bool use_mpi;
+  if (type == PROCESS_CLIENT)
   {
 #if defined(PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
-    default_use_mpi = true;
+    use_mpi = true;
+#else
+    use_mpi = false;
 #endif
+  }
+  else
+  {
+    use_mpi = true;
   }
 
   // Refer to vtkPVOptions.cxx for details.
   if (vtkFindArgument("--mpi", argc, argv))
   {
-    default_use_mpi = true;
+    use_mpi = true;
   }
   else if (vtkFindArgument("--no-mpi", argc, argv))
   {
-    default_use_mpi = false;
+    use_mpi = false;
   }
-  use_mpi = default_use_mpi;
 
   // initialize MPI only on all processes if paraview is compiled w/MPI.
   int mpi_already_initialized = 0;
@@ -149,7 +152,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
     // created before MPI_Init().
     MPI_Init(&argc, &argv);
 
-    // restore CWD to what it was before the MPI intialization.
+    // restore CWD to what it was before the MPI initialization.
     vtksys::SystemTools::ChangeDirectory(cwd.c_str());
 
     vtkProcessModule::FinalizeMPI = true;
@@ -571,9 +574,6 @@ bool vtkProcessModule::InitializePythonEnvironment()
     // where ParaView modules are directly imported in python (not pvpython).
     vtkProcessModule::FinalizePython = true;
   }
-
-  vtkPythonInterpreter::SetProgramName(this->ProgramPath.c_str());
-  vtkPythonAppInitPrependPath(this->SelfDir);
 #endif
   return true;
 }

@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkSMPreselectionPipeline();
-  ~vtkSMPreselectionPipeline();
+  ~vtkSMPreselectionPipeline() override;
   static void OnColorModified(
     vtkObject* source, unsigned long eid, void* clientdata, void* calldata);
   static void ClearCache(vtkObject* source, unsigned long eid, void* clientdata, void* calldata);
@@ -81,8 +81,8 @@ protected:
     vtkSMSourceProxy* source, unsigned int sourceOutputPort, vtkSMSourceProxy* selection);
 
 private:
-  vtkSMPreselectionPipeline(const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPreselectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMPreselectionPipeline(const vtkSMPreselectionPipeline&) = delete;
+  void operator=(const vtkSMPreselectionPipeline&) = delete;
 
 protected:
   vtkSMSourceProxy* ExtractInteractiveSelection;

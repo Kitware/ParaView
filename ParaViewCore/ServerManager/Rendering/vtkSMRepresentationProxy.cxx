@@ -219,7 +219,7 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   }
 
   // vtkSMProxy::MarkDirty does not call MarkConsumersAsDirty unless
-  // this->NeedsUpdate is false. Generally, that's indeed correct since we we
+  // this->NeedsUpdate is false. Generally, that's indeed correct since we
   // have marked the consumer dirty previously, we don't need to do it again.
   // However since consumers of representations are generally views, they need
   // to marked dirty everytime (otherwise unhiding a representation would not
@@ -314,7 +314,8 @@ vtkPVDataInformation* vtkSMRepresentationProxy::GetRepresentedDataInformation()
 
 //----------------------------------------------------------------------------
 vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInformation(
-  vtkStdString name, int fieldAssoc, int numComponents, double uncertaintyAllowed, double fraction)
+  vtkStdString name, int fieldAssoc, int numComponents, double uncertaintyAllowed, double fraction,
+  bool force)
 {
   bool differentAttribute =
     this->ProminentValuesInformation->GetNumberOfComponents() != numComponents ||
@@ -326,7 +327,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   bool largerFractionOrLessCertain = this->ProminentValuesFraction < fraction ||
     this->ProminentValuesUncertainty > uncertaintyAllowed;
   if (!this->ProminentValuesInformationValid || differentAttribute || invalid ||
-    largerFractionOrLessCertain)
+    largerFractionOrLessCertain || force)
   {
     vtkTimerLog::MarkStartEvent("vtkSMRepresentationProxy::GetProminentValues");
     this->CreateVTKObjects();
@@ -339,6 +340,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
     this->ProminentValuesInformation->SetNumberOfComponents(numComponents);
     this->ProminentValuesInformation->SetUncertainty(uncertaintyAllowed);
     this->ProminentValuesInformation->SetFraction(fraction);
+    this->ProminentValuesInformation->SetForce(force);
 
     // Ask the server to fill out the rest of the information:
     this->GatherInformation(this->ProminentValuesInformation);

@@ -113,13 +113,18 @@ public:
    */
   virtual vtkSMRepresentationProxy* FindRepresentation(vtkSMSourceProxy* producer, int outputPort);
 
+  //@{
   /**
    * Captures a image from this view. Default implementation returns NULL.
    * Subclasses should override CaptureWindowInternal() to do the actual image
    * capture.
    */
-  vtkImageData* CaptureWindow(int magnification);
-
+  vtkImageData* CaptureWindow(int magnification)
+  {
+    return this->CaptureWindow(magnification, magnification);
+  }
+  vtkImageData* CaptureWindow(int magnificationX, int magnificationY);
+  //@}
   /**
    * Returns the client-side vtkView, if any.
    */
@@ -130,9 +135,11 @@ public:
    * the vtkImageWriter subclass to use.
    */
   int WriteImage(const char* filename, const char* writerName, int magnification = 1);
+  int WriteImage(
+    const char* filename, const char* writerName, int magnificationX, int magnificationY);
 
   /**
-   * Return true any internal representation is dirty. This can be usefull to
+   * Return true any internal representation is dirty. This can be useful to
    * know if the internal geometry has changed.
    * DEPRECATED: Use GetNeedsUpdate() instead.
    */
@@ -211,18 +218,19 @@ public:
 
 protected:
   vtkSMViewProxy();
-  ~vtkSMViewProxy();
+  ~vtkSMViewProxy() override;
 
   /**
    * Capture an image from the view's render window. Default implementation
    * simply captures the image from the render window for the view. Subclasses
    * may override this for cases where that's not sufficient.
    *
-   * @param[in] magnification The magnification factor to use for generating the image.
+   * @param[in] magnificationX The X magnification factor to use for generating the image.
+   * @param[in] magnificationY The Y magnification factor to use for generating the image.
    * @returns A new vtkImageData instance or nullptr. Caller is responsible for
    *          calling `vtkImageData::Delete()` on the returned non-null value.
    */
-  virtual vtkImageData* CaptureWindowInternal(int magnification);
+  virtual vtkImageData* CaptureWindowInternal(int magnificationX, int magnificationY);
 
   /**
    * This method is called whenever the view wants to render to during image
@@ -247,13 +255,12 @@ protected:
   /**
    * Called at the end of CreateVTKObjects().
    */
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   /**
    * Read attributes from an XML element.
    */
-  virtual int ReadXMLAttributes(
-    vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Convenience method to call
@@ -267,8 +274,8 @@ protected:
   bool Enable;
 
 private:
-  vtkSMViewProxy(const vtkSMViewProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMViewProxy&) VTK_DELETE_FUNCTION;
+  vtkSMViewProxy(const vtkSMViewProxy&) = delete;
+  void operator=(const vtkSMViewProxy&) = delete;
 
   static bool TransparentBackground;
 
@@ -278,7 +285,7 @@ private:
   void ViewTimeChanged();
 
   // Actual logic for taking a screenshot.
-  vtkImageData* CaptureWindowSingle(int magnification);
+  vtkImageData* CaptureWindowSingle(int magnificationX, int magnificationY);
   class vtkRendererSaveInfo;
   vtkRendererSaveInfo* PrepareRendererBackground(vtkRenderer*, double, double, double, bool);
   void RestoreRendererBackground(vtkRenderer*, vtkRendererSaveInfo*);

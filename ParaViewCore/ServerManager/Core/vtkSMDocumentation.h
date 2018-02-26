@@ -61,14 +61,14 @@ public:
 
 protected:
   vtkSMDocumentation();
-  ~vtkSMDocumentation();
+  ~vtkSMDocumentation() override;
   //@}
 
   vtkPVXMLElement* DocumentationElement;
 
 private:
-  vtkSMDocumentation(const vtkSMDocumentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDocumentation&) VTK_DELETE_FUNCTION;
+  vtkSMDocumentation(const vtkSMDocumentation&) = delete;
+  void operator=(const vtkSMDocumentation&) = delete;
 };
 
 #endif

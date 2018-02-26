@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqPVApplicationCore.h"
 #include "pqPersistentMainWindowStateBehavior.h"
-#include "pqPythonShellReaction.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
@@ -52,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqTimeKeeper.h"
+#include "pqTimer.h"
 #include "pqUndoStack.h"
 #include "vtkPVConfig.h"
 #include "vtkProcessModule.h"
@@ -62,16 +62,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QDebug>
+#include <QFile>
 #include <QMainWindow>
 #include <QString>
 #include <QStringList>
-#include <QTimer>
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "vtkPythonInterpreter.h"
+#endif
 
 //-----------------------------------------------------------------------------
 pqCommandLineOptionsBehavior::pqCommandLineOptionsBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-  QTimer::singleShot(100, this, SLOT(processCommandLineOptions()));
+  pqTimer::singleShot(100, this, SLOT(processCommandLineOptions()));
 }
 
 //-----------------------------------------------------------------------------
@@ -137,22 +141,33 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // check for --data option.
   if (options->GetParaViewDataName())
   {
-    // We don't directly set the data file name instead use the dialog. This
-    // makes it possible to select a file group.
-    pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
-      tr("Internal Open File"), QString(), QString());
-    dialog.setFileMode(pqFileDialog::ExistingFiles);
-    if (!dialog.selectFile(QString::fromLocal8Bit(options->GetParaViewDataName())))
+    QString path = QString::fromLocal8Bit(options->GetParaViewDataName());
+    // Check if dataname has a state file extension.
+    // This allows to pass a state file as last argument without --state option.
+    if (path.endsWith(".pvsm", Qt::CaseInsensitive))
     {
-      qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
+      // Load state file without fix-filenames dialog.
+      pqLoadStateReaction::loadState(path, true);
     }
-    QList<QStringList> files = dialog.getAllSelectedFiles();
-    QStringList file;
-    foreach (file, files)
+    else
     {
-      if (pqLoadDataReaction::loadData(file) == NULL)
+      // We don't directly set the data file name instead use the dialog. This
+      // makes it possible to select a file group.
+      pqFileDialog dialog(pqActiveObjects::instance().activeServer(), pqCoreUtilities::mainWidget(),
+        tr("Internal Open File"), QString(), QString());
+      dialog.setFileMode(pqFileDialog::ExistingFiles);
+      if (!dialog.selectFile(QString::fromLocal8Bit(options->GetParaViewDataName())))
       {
-        qCritical() << "Failed to load data file: " << options->GetParaViewDataName();
+        qCritical() << "Cannot open data file \"" << options->GetParaViewDataName() << "\"";
+      }
+      QList<QStringList> files = dialog.getAllSelectedFiles();
+      QStringList file;
+      foreach (file, files)
+      {
+        if (pqLoadDataReaction::loadData(file) == NULL)
+        {
+          qCritical() << "Failed to load data file: " << options->GetParaViewDataName();
+        }
       }
     }
   }
@@ -168,7 +183,16 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   if (options->GetPythonScript())
   {
 #ifdef PARAVIEW_ENABLE_PYTHON
-    pqPythonShellReaction::executeScript(options->GetPythonScript());
+    QFile file(options->GetPythonScript());
+    if (file.open(QIODevice::ReadOnly))
+    {
+      QByteArray code = file.readAll();
+      vtkPythonInterpreter::RunSimpleString(code.data());
+    }
+    else
+    {
+      qCritical() << "Cannot open Python script specified: '" << options->GetPythonScript() << "'";
+    }
 #else
     qCritical() << "Python support not enabled. Cannot run python scripts.";
 #endif
@@ -210,7 +234,7 @@ void pqCommandLineOptionsBehavior::playTests()
       }
       else if (options->GetTestSlave())
       {
-        pqCollaborationEventPlayer::waitForMaster();
+        pqCollaborationEventPlayer::waitForMaster(5000);
       }
     }
 

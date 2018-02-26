@@ -111,11 +111,8 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI)
 ENDIF()
 
 
-if(Module_vtkRendering${VTK_RENDERING_BACKEND})
+if(Module_vtkRenderingOpenGL2)
   paraview_add_test_cxx(${vtk-module}CxxTests-Rendering tests
-    # Enable these after the transfer function can take the vtkTable histograms.
-    #TestTransferFunctionEditor
-    #TestTransferFunctionEditor2
     TestPVAMRDualClip.cxx
     )
   paraview_test_cxx_executable(${vtk-module}CxxTest-Renderings tests)

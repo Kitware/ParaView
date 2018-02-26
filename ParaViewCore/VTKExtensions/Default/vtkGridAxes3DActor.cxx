@@ -20,6 +20,7 @@
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkVectorOperators.h"
 
@@ -42,6 +43,7 @@ vtkGridAxes3DActor::vtkGridAxes3DActor()
   , LabelUniqueEdgesOnly(true)
   , UseCustomLabels(false)
   , CustomLabelsMTime(0)
+  , ForceOpaque(false)
   , GetBoundsMTime(0)
 {
   this->GridBounds[0] = this->GridBounds[2] = this->GridBounds[4] = 0.0;
@@ -378,7 +380,11 @@ void vtkGridAxes3DActor::GetRenderedBounds(double bounds[6])
 //----------------------------------------------------------------------------
 int vtkGridAxes3DActor::RenderOpaqueGeometry(vtkViewport* viewport)
 {
-  this->Update(viewport);
+  vtkRenderWindow* rWin = vtkRenderWindow::SafeDownCast(viewport->GetVTKWindow());
+  if (rWin == nullptr || rWin->GetDesiredUpdateRate() < 1.0)
+  {
+    this->Update(viewport);
+  }
 
   int counter = 0;
   for (int cc = 0; cc < 6; cc++)
@@ -558,6 +564,7 @@ void vtkGridAxes3DActor::ShallowCopy(vtkProp* prop)
   this->SetGenerateEdges(other->GetGenerateEdges());
   this->SetGenerateTicks(other->GetGenerateTicks());
   this->SetProperty(other->GetProperty());
+  this->SetForceOpaque(other->GetForceOpaque());
   for (int cc = 0; cc < 3; cc++)
   {
     this->SetTitleTextProperty(cc, other->GetTitleTextProperty(cc));

@@ -35,11 +35,11 @@ public:
 
 protected:
   vtkPVJoystickFlyOut();
-  ~vtkPVJoystickFlyOut();
+  ~vtkPVJoystickFlyOut() override;
 
 private:
-  vtkPVJoystickFlyOut(const vtkPVJoystickFlyOut&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVJoystickFlyOut&) VTK_DELETE_FUNCTION;
+  vtkPVJoystickFlyOut(const vtkPVJoystickFlyOut&) = delete;
+  void operator=(const vtkPVJoystickFlyOut&) = delete;
 };
 
 #endif

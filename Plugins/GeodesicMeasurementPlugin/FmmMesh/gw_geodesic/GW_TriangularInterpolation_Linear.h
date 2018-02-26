@@ -3,7 +3,7 @@
 /**
  *  \file   GW_TriangularInterpolation_Linear.h
  *  \brief  Definition of class \c GW_TriangularInterpolation_Linear
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-5-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -20,7 +20,7 @@ namespace GW {
 /**
  *  \class  GW_TriangularInterpolation_Linear
  *  \brief  Perform linear interpolation
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-5-2003
  *
  *  No data is stored in this class.
@@ -32,14 +32,14 @@ class GW_TriangularInterpolation_Linear: public GW_TriangularInterpolation_ABC
 
 public:
 
-    virtual void SetUpTriangularInterpolation( GW_GeodesicFace& /*Face*/ ) {};
+    void SetUpTriangularInterpolation( GW_GeodesicFace& /*Face*/ ) override {};
     void ComputeGradient( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2,
-            GW_Float x, GW_Float y, GW_Float& dx, GW_Float& dy );
+            GW_Float x, GW_Float y, GW_Float& dx, GW_Float& dy ) override;
     GW_Float ComputeValue( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2,
-        GW_Float x, GW_Float y );
+        GW_Float x, GW_Float y ) override;
 
 
-    T_TriangulationInterpolationType GetType()
+    T_TriangulationInterpolationType GetType() override
     { return kLinearTriangulationInterpolation; }
 
 private:
@@ -57,7 +57,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

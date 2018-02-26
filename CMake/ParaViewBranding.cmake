@@ -200,11 +200,15 @@ FUNCTION(build_paraview_client BPC_NAME)
   # If a splash image is specified, put that in a Qt resource file
   # and pass the name along to branded_paraview_initializer.cxx.
   if(DEFINED BPC_SPLASH_IMAGE)
-    get_filename_component(splash_image_name "${BPC_SPLASH_IMAGE}" NAME)
-    set(BPC_SPLASH_RESOURCE ":/${BPC_NAME}/${splash_image_name}")
+    # We name the splash image as "SplashImage.img". That way, the
+    # pqAboutDialog and other UI components can automatically pick
+    # it up.
+    set(splash_img "${CMAKE_CURRENT_BINARY_DIR}/SplashImage.img")
+    configure_file("${BPC_SPLASH_IMAGE}" "${splash_img}" COPYONLY)
+    set(BPC_SPLASH_RESOURCE ":/${BPC_NAME}/SplashImage.img")
     # Generate a resource file for the splash image.
     set(splash_qrc "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_splash.qrc")
-    generate_qt_resource_from_files("${splash_qrc}" "/${BPC_NAME}" ${BPC_SPLASH_IMAGE})
+    generate_qt_resource_from_files("${splash_qrc}" "/${BPC_NAME}" ${splash_img})
     list(APPEND ui_resources "${splash_qrc}")
     set(ui_resource_init
       "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_splash);\n")
@@ -237,7 +241,6 @@ FUNCTION(build_paraview_client BPC_NAME)
 
   INCLUDE(ParaViewQt)
   pv_find_package_qt(qt_targets REQUIRED QUIET
-    QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)
   pv_qt_add_resources(rcs_sources ${ui_resources})
 

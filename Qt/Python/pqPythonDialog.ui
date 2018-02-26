@@ -1,117 +1,30 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqPythonDialog</class>
- <widget class="QDialog" name="pqPythonDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="pqPythonDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>400</height>
+    <width>524</width>
+    <height>338</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Python Shell</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" >
-   <property name="spacing" >
-    <number>6</number>
-   </property>
-   <property name="margin" >
-    <number>6</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1">
    <item>
-    <widget class="QSplitter" name="splitter" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <widget class="QWidget" name="verticalLayoutWidget" >
-      <layout class="QVBoxLayout" name="verticalLayout" >
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <property name="margin" >
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="pqPythonShell" name="shellWidget" />
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="buttonsLayout" >
-         <property name="spacing" >
-          <number>6</number>
-         </property>
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="runScript" >
-           <property name="text" >
-            <string>Run Script</string>
-           </property>
-           <property name="autoDefault" >
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="clear" >
-           <property name="focusPolicy" >
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="text" >
-            <string>Clear</string>
-           </property>
-           <property name="autoDefault" >
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="reset" >
-           <property name="text" >
-            <string>Reset</string>
-           </property>
-           <property name="autoDefault" >
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="spacer" >
-           <property name="orientation" >
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0" >
-            <size>
-             <width>131</width>
-             <height>31</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="close" >
-           <property name="text" >
-            <string>Close</string>
-           </property>
-           <property name="autoDefault" >
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </widget>
+    <widget class="pqPythonShell" name="shellWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>pqPythonShell</class>
-   <extends>QTextEdit</extends>
+   <extends>QWidget</extends>
    <header>pqPythonShell.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

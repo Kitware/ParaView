@@ -62,7 +62,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqLinePropertyWidget : public pqInteractive
 
 public:
   pqLinePropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqLinePropertyWidget();
+  ~pqLinePropertyWidget() override;
 
 public slots:
   void useXAxis();
@@ -79,7 +79,7 @@ protected slots:
   /**
   * Places the interactive widget using current data source information.
   */
-  virtual void placeWidget();
+  void placeWidget() override;
 
   /**
   * Called when user picks a point using the pick shortcut keys.

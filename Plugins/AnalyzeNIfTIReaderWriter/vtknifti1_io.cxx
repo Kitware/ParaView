@@ -45,7 +45,7 @@ static char const * const gni_history[] =
   "     (FMRIB Centre, University of Oxford, UK)\n"
   "   - Mainly adding low-level IO and changing things to allow gzipped\n"
   "     files to be read and written\n"
-  "   - Full backwards compatability should have been maintained\n"
+  "   - Full backwards compatibility should have been maintained\n"
   "\n",
   "0.2  16 Nov 2004 [rickr]\n"
   "     (Rick Reynolds of the National Institutes of Health, SSCC/DIRP/NIMH)\n"
@@ -268,7 +268,7 @@ static char const * const gni_history[] =
   "1.12b 25 August 2005 [rickr] - changes by Hans Johnson\n",
   "1.13  25 August 2005 [rickr]\n",
   "   - finished changes by Hans for Insight\n"
-  "   - added const in all appropraite parameter locations (30-40)\n"
+  "   - added const in all appropriate parameter locations (30-40)\n"
   "     (any pointer referencing data that will not change)\n"
   "   - shortened all string constants below 509 character limit\n"
   "1.14  28 October 2005 [HJohnson]\n",
@@ -1018,7 +1018,7 @@ int vtknifti1_io::valid_nifti_brick_list(nifti_image * nim , int nbricks,
 
    if( nim->dim[0] < 3 ){
       if( disp_error || g_opts.debug > 1 )
-         fprintf(stderr,"** cannot read explict brick list from %d-D dataset\n",
+         fprintf(stderr,"** cannot read explicit brick list from %d-D dataset\n",
                  nim->dim[0]);
       return 0;
    }
@@ -1917,7 +1917,7 @@ mat33 vtknifti1_io::nifti_mat33_polar( mat33 A )
 }
 
 /*---------------------------------------------------------------------------*/
-/*! compute the (closest) orientation from a 4x4 ijk->xyz tranformation matrix
+/*! compute the (closest) orientation from a 4x4 ijk->xyz transformation matrix
 
    <pre>
    Input:  4x4 matrix that transforms (i,j,k) indexes to (x,y,z) coordinates,
@@ -2109,7 +2109,7 @@ void vtknifti1_io::nifti_mat44_to_orientation( mat44 R , int *icod, int *jcod, i
 /*! swap each byte pair from the given list of n pairs
  * 
  *  Due to alignment of structures at some architectures (e.g. on ARM),
- *  stick to char varaibles.
+ *  stick to char variables.
  *  Fixes http://bugs.debian.org/446893   Yaroslav <debian@onerussian.com>
  *
 *//*--------------------------------------------------------------------*/
@@ -5345,7 +5345,7 @@ nifti_1_header * vtknifti1_io::nifti_make_new_header(const int arg_dims[], int a
 /*! basic creation of a nifti_image struct
 
    Create a nifti_image from the given dimensions and data type.
-   Optinally, allocate zero-filled data.
+   Optionally, allocate zero-filled data.
   
    \param dims      : optional dim[8]   (default {3,1,1,1,0,0,0,0})
    \param datatype  : optional datatype (default DT_FLOAT32)
@@ -5549,7 +5549,7 @@ int vtknifti1_io::nifti_copy_extensions(nifti_image * nim_dest, const nifti_imag
       /* data length is size-8, as esize includes space for esize and ecode */
       data = (char *)calloc(size-8,sizeof(char));      /* maybe size > old */
       if( !data ){
-         fprintf(stderr,"** failed to alloc %d bytes for extention\n", size);
+         fprintf(stderr,"** failed to alloc %d bytes for extension\n", size);
          if( c == 0 ) { free(nim_dest->ext_list); nim_dest->ext_list = NULL; }
          /* otherwise, keep what we have (a.o.t. deleting them all) */
          return -1;
@@ -6108,14 +6108,14 @@ char *vtknifti1_io::nifti_image_to_ascii( const nifti_image *nim )
    sprintf( buf+strlen(buf) , "  image_offset = '%d'\n" , nim->iname_offset );
 
                        sprintf( buf+strlen(buf), "  ndim = '%d'\n", nim->ndim);
-                       sprintf( buf+strlen(buf), "  nx = '%d'\n",   nim->nx  );
+   if( true )          sprintf( buf+strlen(buf), "  nx = '%d'\n",   nim->nx  );
    if( nim->ndim > 1 ) sprintf( buf+strlen(buf), "  ny = '%d'\n",   nim->ny  );
    if( nim->ndim > 2 ) sprintf( buf+strlen(buf), "  nz = '%d'\n",   nim->nz  );
    if( nim->ndim > 3 ) sprintf( buf+strlen(buf), "  nt = '%d'\n",   nim->nt  );
    if( nim->ndim > 4 ) sprintf( buf+strlen(buf), "  nu = '%d'\n",   nim->nu  );
    if( nim->ndim > 5 ) sprintf( buf+strlen(buf), "  nv = '%d'\n",   nim->nv  );
    if( nim->ndim > 6 ) sprintf( buf+strlen(buf), "  nw = '%d'\n",   nim->nw  );
-                       sprintf( buf+strlen(buf), "  dx = '%g'\n",   nim->dx  );
+   if( true )          sprintf( buf+strlen(buf), "  dx = '%g'\n",   nim->dx  );
    if( nim->ndim > 1 ) sprintf( buf+strlen(buf), "  dy = '%g'\n",   nim->dy  );
    if( nim->ndim > 2 ) sprintf( buf+strlen(buf), "  dz = '%g'\n",   nim->dz  );
    if( nim->ndim > 3 ) sprintf( buf+strlen(buf), "  dt = '%g'\n",   nim->dt  );
@@ -6810,7 +6810,7 @@ void vtknifti1_io::compute_strides(int *strides,const int *size,int nbyper)
 /*---------------------------------------------------------------------------*/
 /*! read an arbitrary subregion from a nifti image
 
-    This function may be used to read a single arbitary subregion of any
+    This function may be used to read a single arbitrary subregion of any
     rectangular size from a nifti dataset, such as a small 5x5x5 subregion
     around the center of a 3D image.
 

@@ -18,34 +18,47 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMIntVectorProperty.h"
 
+#include <algorithm>
 #include <sstream>
-#include <vector>
 
-#include "vtkStdString.h"
-
-vtkStandardNewMacro(vtkSMEnumerationDomain);
-
-struct vtkSMEnumerationDomainInternals
+namespace
 {
-  struct EntryType
-  {
-    EntryType(vtkStdString text, int value)
-      : Text(text)
-      , Value(value)
-    {
-    }
-    vtkStdString Text;
-    int Value;
-  };
+struct EntryType
+{
+  std::string Text;
+  int Value;
+  std::string Info;
 
-  typedef std::vector<EntryType> EntriesType;
+  EntryType()
+    : Value(-1)
+  {
+  }
+  EntryType(const char* text, int val, const char* info)
+    : Value(val)
+  {
+    if (text)
+    {
+      this->Text = text;
+    }
+    if (info)
+    {
+      this->Info = info;
+    }
+  }
+};
+}
+
+struct vtkSMEnumerationDomain::vtkEDInternals
+{
+  using EntriesType = std::vector<EntryType>;
   EntriesType Entries;
 };
 
+vtkStandardNewMacro(vtkSMEnumerationDomain);
 //---------------------------------------------------------------------------
 vtkSMEnumerationDomain::vtkSMEnumerationDomain()
+  : EInternals(new vtkSMEnumerationDomain::vtkEDInternals())
 {
-  this->EInternals = new vtkSMEnumerationDomainInternals;
 }
 
 //---------------------------------------------------------------------------
@@ -77,9 +90,21 @@ const char* vtkSMEnumerationDomain::GetEntryText(unsigned int idx)
   if (idx >= static_cast<unsigned int>(this->EInternals->Entries.size()))
   {
     vtkErrorMacro("Invalid idx: " << idx);
-    return NULL;
+    return nullptr;
   }
   return this->EInternals->Entries[idx].Text.c_str();
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMEnumerationDomain::GetInfoText(unsigned int idx)
+{
+  if (idx >= static_cast<unsigned int>(this->EInternals->Entries.size()))
+  {
+    vtkErrorMacro("Invalid idx: " << idx);
+    return nullptr;
+  }
+  const auto& item = this->EInternals->Entries[idx];
+  return item.Info.empty() ? nullptr : item.Info.c_str();
 }
 
 //---------------------------------------------------------------------------
@@ -88,7 +113,7 @@ const char* vtkSMEnumerationDomain::GetEntryTextForValue(int value)
   unsigned int idx = 0;
   if (!this->IsInDomain(value, idx))
   {
-    return NULL;
+    return nullptr;
   }
   return this->GetEntryText(idx);
 }
@@ -112,20 +137,19 @@ int vtkSMEnumerationDomain::GetEntryValueForText(const char* text)
 int vtkSMEnumerationDomain::GetEntryValue(const char* text, int& valid)
 {
   valid = 0;
-
   if (!text)
   {
     return -1;
   }
 
-  vtkSMEnumerationDomainInternals::EntriesType::iterator iter = this->EInternals->Entries.begin();
-  for (; iter != this->EInternals->Entries.end(); ++iter)
+  const std::string str_text(text);
+  const auto& entries = this->EInternals->Entries;
+  auto iter = std::find_if(
+    entries.begin(), entries.end(), [&](const EntryType& item) { return item.Text == str_text; });
+  if (iter != entries.end())
   {
-    if (iter->Text == text)
-    {
-      valid = 1;
-      return iter->Value;
-    }
+    valid = 1;
+    return iter->Value;
   }
 
   return -1;
@@ -170,14 +194,15 @@ int vtkSMEnumerationDomain::IsInDomain(int val, unsigned int& idx)
     return 0;
   }
 
-  for (unsigned int i = 0; i < numEntries; i++)
+  const auto& entries = this->EInternals->Entries;
+  auto iter = std::find_if(
+    entries.begin(), entries.end(), [&](const EntryType& item) { return item.Value == val; });
+  if (iter != entries.end())
   {
-    if (val == this->GetEntryValue(i))
-    {
-      idx = i;
-      return 1;
-    }
+    idx = static_cast<int>(iter - entries.begin());
+    return 1;
   }
+
   return 0;
 }
 
@@ -198,9 +223,9 @@ void vtkSMEnumerationDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMEnumerationDomain::AddEntry(const char* text, int value)
+void vtkSMEnumerationDomain::AddEntry(const char* text, int value, const char* info /*=nullptr*/)
 {
-  this->EInternals->Entries.push_back(vtkSMEnumerationDomainInternals::EntryType(text, value));
+  this->EInternals->Entries.push_back(EntryType(text, value, info));
   this->Modified();
 }
 
@@ -242,7 +267,8 @@ int vtkSMEnumerationDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLEleme
       return 0;
     }
 
-    this->AddEntry(text, value);
+    const char* info = selement->GetAttribute("info");
+    this->AddEntry(text, value, info);
   }
   return 1;
 }

@@ -37,13 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
 #include "pqProxyWidgetDialog.h"
+#include "pqSaveScreenshotReaction.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMSaveAnimationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewLayoutProxy.h"
@@ -73,52 +76,6 @@ void pqSaveAnimationReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-QString pqSaveAnimationReaction::promptFileName(pqServer* server, bool remote)
-{
-  QString lastUsedExt;
-
-  // Load the most recently used file extensions from QSettings, if available.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings->contains("extensions/AnimationExtension"))
-  {
-    lastUsedExt = settings->value("extensions/AnimationExtension").toString();
-  }
-
-  vtkSMSession* session = server->session();
-
-  QStringList filters;
-  if (vtkSMSaveAnimationProxy::SupportsAVI(session, remote))
-  {
-    filters << "AVI files (*.avi)";
-  }
-  if (vtkSMSaveAnimationProxy::SupportsOGV(session, remote))
-  {
-    filters << "Ogg/Theora files (*.ogv)";
-  }
-  filters << "PNG images (*.png)"
-          << "JPG images (*.jpg)"
-          << "TIFF images (*.tif)"
-          << "BMP images (*.bmp)"
-          << "PPM images (*.ppm)";
-
-  pqFileDialog file_dialog(remote ? server : NULL, pqCoreUtilities::mainWidget(),
-    tr("Save Animation"), QString(), filters.join(";;"));
-  file_dialog.setRecentlyUsedExtension(lastUsedExt);
-  file_dialog.setObjectName("FileSaveAnimationDialog");
-  file_dialog.setFileMode(pqFileDialog::AnyFile);
-  if (file_dialog.exec() != QDialog::Accepted)
-  {
-    return QString();
-  }
-
-  QString file = file_dialog.getSelectedFiles()[0];
-  QFileInfo fileInfo(file);
-  lastUsedExt = QString("*.") + fileInfo.suffix();
-  settings->setValue("extensions/AnimationExtension", lastUsedExt);
-  return file;
-}
-
-//-----------------------------------------------------------------------------
 void pqSaveAnimationReaction::saveAnimation()
 {
   pqView* view = pqActiveObjects::instance().activeView();
@@ -135,7 +92,6 @@ void pqSaveAnimationReaction::saveAnimation()
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkWeakPointer<vtkSMViewProxy> viewProxy = view->getViewProxy();
   vtkWeakPointer<vtkSMViewLayoutProxy> layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
-  int showWindowDecorations = -1;
 
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("misc", "SaveAnimation"));
@@ -146,73 +102,86 @@ void pqSaveAnimationReaction::saveAnimation()
     return;
   }
 
+  // Get the filename first, this will determine some of the options shown.
+  QString filename = pqSaveScreenshotReaction::promptFileName(ahProxy, "*.png");
+  if (filename.isEmpty())
+  {
+    return;
+  }
+
+  bool restorePreviewMode = false;
+
+  // Cache the separator width and color
+  int width = vtkSMPropertyHelper(ahProxy, "SeparatorWidth").GetAsInt();
+  double color[3];
+  vtkSMPropertyHelper(ahProxy, "SeparatorColor").Get(color, 3);
+  // Link the vtkSMViewLayoutProxy to vtkSMSaveScreenshotProxy to update
+  // the SeparatorWidth and SeparatorColor
+  vtkNew<vtkSMPropertyLink> widthLink, colorLink;
+  if (layout)
+  {
+    widthLink->AddLinkedProperty(ahProxy, "SeparatorWidth", vtkSMLink::INPUT);
+    widthLink->AddLinkedProperty(layout, "SeparatorWidth", vtkSMLink::OUTPUT);
+    colorLink->AddLinkedProperty(ahProxy, "SeparatorColor", vtkSMLink::INPUT);
+    colorLink->AddLinkedProperty(layout, "SeparatorColor", vtkSMLink::OUTPUT);
+  }
+
   controller->PreInitializeProxy(ahProxy);
   vtkSMPropertyHelper(ahProxy, "View").Set(viewProxy);
   vtkSMPropertyHelper(ahProxy, "Layout").Set(layout);
   vtkSMPropertyHelper(ahProxy, "AnimationScene").Set(scene);
+  ahProxy->UpdateDefaultsAndVisibilities(filename.toLocal8Bit().data());
   controller->PostInitializeProxy(ahProxy);
 
-  if (ahProxy->UpdateSaveAllViewsPanelVisibility())
+  if (layout)
   {
-    Q_ASSERT(layout != NULL);
-    // let's hide window decorations.
-    vtkSMPropertyHelper helper(layout, "ShowWindowDecorations");
-    showWindowDecorations = helper.GetAsInt();
-    helper.Set(0);
-  }
-
-  if (!vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(session))
-  {
-    vtkSMPropertyHelper(ahProxy, "DisconnectAndSave").Set(0);
-    ahProxy->GetProperty("DisconnectAndSave")->SetPanelVisibility("never");
-  }
-
-  // scope to ensure that pqProxyWidgetDialog is destroyed and releases the
-  // ahProxy reference when it's done.
-  {
-    pqProxyWidgetDialog dialog(ahProxy, pqCoreUtilities::mainWidget());
-    dialog.setObjectName("SaveAnimationDialog");
-    dialog.setApplyChangesImmediately(true);
-    dialog.setWindowTitle("Save Animation Options");
-    dialog.setEnableSearchBar(true);
-    dialog.setSettingsKey("SaveAnimationDialog");
-    if (dialog.exec() != QDialog::Accepted)
+    int previewMode[2] = { -1, -1 };
+    vtkSMPropertyHelper previewHelper(layout, "PreviewMode");
+    previewHelper.Get(previewMode, 2);
+    if (previewMode[0] == 0 && previewMode[1] == 0)
     {
-      if (layout)
-      {
-        vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
-        layout->UpdateVTKObjects();
-      }
-      return;
+      // If we are not in the preview mode, enter it with maximum size possible
+      vtkVector2i layoutSize = layout->GetSize();
+      previewHelper.Set(layoutSize.GetData(), 2);
+      restorePreviewMode = true;
+    }
+    else
+    {
+      // if in preview mode, check "save all views".
+      vtkSMPropertyHelper(ahProxy, "SaveAllViews").Set(1);
     }
   }
 
-  bool disconnectAndSave = vtkSMPropertyHelper(ahProxy, "DisconnectAndSave").GetAsInt() != 0;
-  QString filename = pqSaveAnimationReaction::promptFileName(server, disconnectAndSave);
-  if (!filename.isEmpty())
-  {
-    if (ahProxy->WriteAnimation(filename.toLatin1().data()) && disconnectAndSave)
-    {
-      Q_ASSERT(ahProxy->GetReferenceCount() == 1);
-      ahProxy = NULL;
-      proxy = NULL; // release reference.
+  pqProxyWidgetDialog dialog(ahProxy, pqCoreUtilities::mainWidget());
+  dialog.setObjectName("SaveAnimationDialog");
+  dialog.setApplyChangesImmediately(true);
+  dialog.setWindowTitle("Save Animation Options");
+  dialog.setEnableSearchBar(true);
+  dialog.setSettingsKey("SaveAnimationDialog");
 
-      pqObjectBuilder* ob = pqApplicationCore::instance()->getObjectBuilder();
-      ob->removeServer(server);
-    }
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    ahProxy->WriteAnimation(filename.toUtf8().data());
   }
 
-  if (layout && showWindowDecorations != -1)
+  if (layout)
   {
-    vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+    // Reset the separator width and color
+    vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
+    vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
+    // Reset to the previous preview resolution or exit preview mode
+    if (restorePreviewMode)
+    {
+      int psize[2] = { 0, 0 };
+      vtkSMPropertyHelper(layout, "PreviewMode").Set(psize, 2);
+    }
     layout->UpdateVTKObjects();
+    widthLink->RemoveAllLinks();
+    colorLink->RemoveAllLinks();
   }
 
-  if (!disconnectAndSave)
-  {
-    // This should not be needed as image capturing code only affects back buffer,
-    // however it is currently needed due to paraview/paraview#17256. Once that's
-    // fixed, we should remove this.
-    pqApplicationCore::instance()->render();
-  }
+  // This should not be needed as image capturing code only affects back buffer,
+  // however it is currently needed due to paraview/paraview#17256. Once that's
+  // fixed, we should remove this.
+  pqApplicationCore::instance()->render();
 }

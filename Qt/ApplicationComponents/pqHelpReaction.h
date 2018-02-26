@@ -67,7 +67,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqHelpReaction::showHelp(); }
+  void onTriggered() override { pqHelpReaction::showHelp(); }
 
 private:
   Q_DISABLE_COPY(pqHelpReaction)

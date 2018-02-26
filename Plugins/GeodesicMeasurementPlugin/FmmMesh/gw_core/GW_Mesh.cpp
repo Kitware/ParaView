@@ -35,7 +35,7 @@ GW_Mesh& GW_Mesh::operator=(const GW_Mesh& Mesh)
         GW_Vertex& NewVert = *this->GetVertex(i);
         const GW_Vertex& OriginalVert = *Mesh.GetVertex(i);
         NewVert = OriginalVert;
-        /* resolve face attachement */
+        /* resolve face attachment */
         const GW_Face* pFace = OriginalVert.GetFace();
         if( pFace!=NULL )
             NewVert.SetFace( *this->GetFace( pFace->GetID() ) );
@@ -328,7 +328,7 @@ void GW_Mesh::BuildConnectivity()
                 }
             }
             pFace->SetFaceNeighbor( pNeighbor, i );
-            /* make some test on the neighbor to assure symetry in the connectivity relationship */
+            /* make some test on the neighbor to assure symmetry in the connectivity relationship */
             if( pNeighbor!=NULL )
             {
                 GW_I32 nEdgeNumber = pNeighbor->GetEdgeNumber( *pFace->GetVertex(i1),*pFace->GetVertex(i2) );
@@ -434,7 +434,7 @@ GW_Vertex* GW_Mesh::InsertVertexInFace( GW_Face& Face, GW_Float x, GW_Float y, G
     pFace1->SetVertex( *pVert0, *pVert1, *pNewVert );
     pFace2->SetVertex( *pNewVert, *pVert1, *pVert2 );
     Face.SetVertex( *pVert0, *pNewVert, *pVert2 );
-    /* assign dependance vertex->mother face */
+    /* assign dependence vertex->mother face */
     pNewVert->SetFace( Face );
     pVert0->SetFace( Face );
     pVert1->SetFace( *pFace1 );

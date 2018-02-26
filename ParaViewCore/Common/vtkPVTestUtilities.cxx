@@ -97,7 +97,7 @@ char vtkPVTestUtilities::GetPathSep()
 //-----------------------------------------------------------------------------
 // Concat the data root path to the name supplied.
 // The return is a c string that has the correct
-// path seperators.
+// path separators.
 char* vtkPVTestUtilities::GetFilePath(const char* base, const char* name)
 {
   int baseLen = static_cast<int>(strlen(base));

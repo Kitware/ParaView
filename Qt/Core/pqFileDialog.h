@@ -89,23 +89,30 @@ class PQCORE_EXPORT pqFileDialog : public QDialog
 public:
   /**
   * choose mode for selecting file/folder.
-  * AnyFile: The name of a file, whether it exists or not.
-  *   Typically used by "Save As..."
-  * ExistingFile: The name of a single existing file.
-  *   Typically used by "Open..."
-  *   This mode allows the user to select a single file, or one time series group of files.
-  * ExistingFiles: The names of zero or more existing files.
-  *   Typically used by "Open..." when you want multiple file selection
-  *   This mode allows the user to select multiples files, and multiple time series groups at the
-  * same time.
-  * Directory: The name of a directory.
+  * \li \c AnyFile:
+  *         The name of a file, whether it exists or not. Typically used by "Save As..."
+  * \li \c ExistingFile:
+  *         The name of a single existing file. Typically used by "Open..."
+  *         This mode allows the user to select a single file, or a group of files.
+  * \li \c ExistingFiles:
+  *         The names of zero or more existing files (or groups of
+  *         files). Typically used by "Open..." when you want multiple file selection.
+  *         This mode allows the user to select multiples files, and multiple time series groups at
+  * the
+  *         same time.
+  * \li \c Directory:
+  *         The name of a directory.
+  * \li \c ExistingFilesAndDirectories:
+  *         This mode is combination of `ExistingFiles` and `Directory` where
+  *         either a collection of files or directories can be selected.
   */
   enum FileMode
   {
     AnyFile,
     ExistingFile,
     ExistingFiles,
-    Directory
+    Directory,
+    ExistingFilesAndDirectories
   };
 
   /**
@@ -114,9 +121,9 @@ public:
   * the title, and start directory may be specified
   * the filter is a string of semi-colon separated filters
   */
-  pqFileDialog(pqServer*, QWidget* Parent, const QString& Title = QString(),
-    const QString& Directory = QString(), const QString& Filter = QString());
-  ~pqFileDialog();
+  pqFileDialog(pqServer* server, QWidget* parent, const QString& title = QString(),
+    const QString& directory = QString(), const QString& filter = QString());
+  ~pqFileDialog() override;
 
   /**
   * set the file mode
@@ -141,7 +148,7 @@ public:
   /**
   * accept this dialog
   */
-  void accept();
+  void accept() override;
 
   /**
   * set a file current to support test playback
@@ -193,7 +200,7 @@ protected:
 
   QStringList buildFileGroup(const QString& filename);
 
-  virtual void showEvent(QShowEvent* showEvent);
+  void showEvent(QShowEvent* showEvent) override;
 
 private slots:
   void onModelReset();
@@ -245,7 +252,7 @@ private:
   pqImplementation* const Implementation;
 
   // returns if true if files are loaded
-  bool acceptInternal(const QStringList& selected_files, const bool& doubleclicked);
+  bool acceptInternal(const QStringList& selected_files);
   QString fixFileExtension(const QString& filename, const QString& filter);
 
   /**

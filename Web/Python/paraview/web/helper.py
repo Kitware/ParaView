@@ -13,18 +13,14 @@ import paraview
 from paraview import simple, servermanager
 from paraview.servermanager import ProxyProperty, InputProperty
 
-from vtk.vtkPVServerManagerCore import *
-
-# Needed for:
-#    vtkSMPVRepresentationProxy
-from vtk.vtkPVServerManagerRendering import *
+from vtkmodules.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy
 
 PY3 = False
 if sys.version_info >= (3,):
     xrange = range
     PY3 = True
 
-from vtk.web import buffer
+from vtkmodules.web import buffer
 
 # =============================================================================
 # Pipeline management

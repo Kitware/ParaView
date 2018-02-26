@@ -91,7 +91,7 @@ public:
 
 protected:
   vtkPartitionOrdering();
-  ~vtkPartitionOrdering();
+  ~vtkPartitionOrdering() override;
 
 private:
   vtkMultiProcessController* Controller;
@@ -99,8 +99,8 @@ private:
   std::vector<double> ProcessBounds;
   double GlobalBounds[6];
 
-  vtkPartitionOrdering(const vtkPartitionOrdering&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPartitionOrdering&) VTK_DELETE_FUNCTION;
+  vtkPartitionOrdering(const vtkPartitionOrdering&) = delete;
+  void operator=(const vtkPartitionOrdering&) = delete;
 };
 
 #endif

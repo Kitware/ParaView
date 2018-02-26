@@ -62,24 +62,24 @@ public:
 
 protected:
   vtkSMAnimationSceneProxy();
-  ~vtkSMAnimationSceneProxy();
+  ~vtkSMAnimationSceneProxy() override;
 
   /**
    * Overridden to prune start/end time properties if not applicable to the
    * state being loaded.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Given a class name (by setting VTKClassName) and server ids (by
    * setting ServerIDs), this methods instantiates the objects on the
    * server(s)
    */
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMAnimationSceneProxy&) VTK_DELETE_FUNCTION;
+  vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&) = delete;
+  void operator=(const vtkSMAnimationSceneProxy&) = delete;
 
   // Called when vtkSMAnimationScene::UpdateStartEndTimesEvent is fired.
   void OnUpdateStartEndTimesEvent(vtkObject*, unsigned long, void*);

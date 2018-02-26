@@ -181,7 +181,7 @@ public:
 
 protected:
   vtkGridAxesHelper();
-  ~vtkGridAxesHelper();
+  ~vtkGridAxesHelper() override;
 
   /**
    * Get/Set label visibility overrides. This is more of a hack. We needed a
@@ -219,8 +219,8 @@ protected:
   vtkMTimeType GetTransformedPointsMTime;
 
 private:
-  vtkGridAxesHelper(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGridAxesHelper&) VTK_DELETE_FUNCTION;
+  vtkGridAxesHelper(const vtkGridAxesHelper&) = delete;
+  void operator=(const vtkGridAxesHelper&) = delete;
 };
 
 #endif

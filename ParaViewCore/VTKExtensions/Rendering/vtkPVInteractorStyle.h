@@ -46,13 +46,13 @@ public:
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove() VTK_OVERRIDE;
-  virtual void OnLeftButtonDown() VTK_OVERRIDE;
-  virtual void OnLeftButtonUp() VTK_OVERRIDE;
-  virtual void OnMiddleButtonDown() VTK_OVERRIDE;
-  virtual void OnMiddleButtonUp() VTK_OVERRIDE;
-  virtual void OnRightButtonDown() VTK_OVERRIDE;
-  virtual void OnRightButtonUp() VTK_OVERRIDE;
+  void OnMouseMove() VTK_OVERRIDE;
+  void OnLeftButtonDown() VTK_OVERRIDE;
+  void OnLeftButtonUp() VTK_OVERRIDE;
+  void OnMiddleButtonDown() VTK_OVERRIDE;
+  void OnMiddleButtonUp() VTK_OVERRIDE;
+  void OnRightButtonDown() VTK_OVERRIDE;
+  void OnRightButtonUp() VTK_OVERRIDE;
   //@}
 
   //@{
@@ -61,15 +61,15 @@ public:
    * since we don't have a mechanism to activate a manipulator by key presses
    * currently.
    */
-  virtual void OnKeyDown() VTK_OVERRIDE;
-  virtual void OnKeyUp() VTK_OVERRIDE;
+  void OnKeyDown() VTK_OVERRIDE;
+  void OnKeyUp() VTK_OVERRIDE;
   //@}
 
   /**
    * Overrides superclass behaviors to only support the key codes that make
    * sense in a ParaView application.
    */
-  virtual void OnChar() VTK_OVERRIDE;
+  void OnChar() VTK_OVERRIDE;
 
   /**
    * Access to adding or removing manipulators.
@@ -91,7 +91,7 @@ public:
   //@{
   /**
    * Propagates the center to the manipulators.
-   * This simply sets an interal ivar.
+   * This simply sets an internal ivar.
    * It is propagated to a manipulator before the event
    * is sent to it.
    * Also changing the CenterOfRotation during interaction
@@ -105,7 +105,7 @@ public:
   //@{
   /**
    * Propagates the rotation factor to the manipulators.
-   * This simply sets an interal ivar.
+   * This simply sets an internal ivar.
    * It is propagated to a manipulator before the event
    * is sent to it.
    * Also changing the RotationFactor during interaction
@@ -135,9 +135,9 @@ public:
 
 protected:
   vtkPVInteractorStyle();
-  ~vtkPVInteractorStyle();
+  ~vtkPVInteractorStyle() override;
 
-  virtual void Dolly(double factor) VTK_OVERRIDE;
+  void Dolly(double factor) VTK_OVERRIDE;
 
   vtkCameraManipulator* CurrentManipulator;
   double CenterOfRotation[3];
@@ -150,8 +150,8 @@ protected:
   void OnButtonUp(int button);
   void ResetLights();
 
-  vtkPVInteractorStyle(const vtkPVInteractorStyle&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVInteractorStyle&) VTK_DELETE_FUNCTION;
+  vtkPVInteractorStyle(const vtkPVInteractorStyle&) = delete;
+  void operator=(const vtkPVInteractorStyle&) = delete;
 };
 
 #endif

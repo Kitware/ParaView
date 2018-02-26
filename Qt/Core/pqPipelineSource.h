@@ -64,7 +64,7 @@ class PQCORE_EXPORT pqPipelineSource : public pqProxy
 public:
   pqPipelineSource(
     const QString& name, vtkSMProxy* proxy, pqServer* server, QObject* parent = NULL);
-  virtual ~pqPipelineSource();
+  ~pqPipelineSource() override;
 
   /**
   * A source may have multiple output ports. This method returns the number of

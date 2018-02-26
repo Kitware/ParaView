@@ -19,13 +19,14 @@
 #include "vtkProcessModule.h"
 #include "vtkSMViewProxy.h"
 
+#include <vtksys/SystemTools.hxx>
+
 vtkCxxSetObjectMacro(vtkSMExporterProxy, View, vtkSMViewProxy);
 //----------------------------------------------------------------------------
 vtkSMExporterProxy::vtkSMExporterProxy()
 {
   this->View = 0;
-  this->FileExtension = 0;
-  this->SetFileExtension("txt");
+  this->FileExtensions.push_back("txt");
   this->SetLocation(vtkProcessModule::CLIENT);
 }
 
@@ -33,19 +34,64 @@ vtkSMExporterProxy::vtkSMExporterProxy()
 vtkSMExporterProxy::~vtkSMExporterProxy()
 {
   this->SetView(0);
-  this->SetFileExtension(0);
 }
+
+#ifndef VTK_LEGACY_REMOVE
+//----------------------------------------------------------------------------
+const char* vtkSMExporterProxy::GetFileExtension()
+{
+  VTK_LEGACY_BODY(vtkSMExporterProxy::GetFileExtension, "ParaView 5.5")
+  if (this->FileExtensions.empty())
+  {
+    return nullptr;
+  }
+  return this->FileExtensions[0].c_str();
+}
+#endif
 
 //----------------------------------------------------------------------------
 int vtkSMExporterProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pxm, vtkPVXMLElement* element)
 {
-  const char* exts = element->GetAttribute("file_extension");
-  if (exts)
-  {
-    this->SetFileExtension(exts);
-  }
+  // we let the superclass read in information first so that we can just
+  // get the proper hints (i.e. not hints from base proxies) after that to
+  // figure out file extensions
+  int retVal = this->Superclass::ReadXMLAttributes(pxm, element);
 
-  return this->Superclass::ReadXMLAttributes(pxm, element);
+  bool addedExtension = false;
+  if (const char* exts = element->GetAttribute("file_extension"))
+  {
+    vtkWarningMacro("Export proxy definition for file_extension has been deprecated."
+      << " Use ExporterFactory extensions in Hints instead.");
+    this->FileExtensions[0] = exts;
+    addedExtension = true;
+  }
+  if (vtkPVXMLElement* hintElement = this->GetHints())
+  {
+    vtkPVXMLElement* exporterFactoryElement =
+      hintElement->FindNestedElementByName("ExporterFactory");
+    if (exporterFactoryElement)
+    {
+      if (const char* e = exporterFactoryElement->GetAttribute("extensions"))
+      {
+        std::string extensions = e;
+        std::vector<std::string> extensionsVec;
+        vtksys::SystemTools::Split(extensions, extensionsVec, ' ');
+        for (auto iter = extensionsVec.begin(); iter != extensionsVec.end(); iter++)
+        {
+          if (addedExtension)
+          {
+            this->FileExtensions.push_back(*iter);
+          }
+          else
+          {
+            this->FileExtensions[0] = *iter;
+            addedExtension = true;
+          }
+        }
+      }
+    }
+  }
+  return retVal;
 }
 
 //----------------------------------------------------------------------------
@@ -53,6 +99,10 @@ void vtkSMExporterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "View: " << this->View << endl;
-  os << indent << "FileExtension: " << (this->FileExtension ? this->FileExtension : "(none)")
-     << endl;
+  os << indent << "FileExtensions:";
+  for (const auto& fname : this->FileExtensions)
+  {
+    os << " " << fname;
+  }
+  os << endl;
 }

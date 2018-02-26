@@ -4,6 +4,7 @@
   Module:    vtkPVServerInformation.cxx
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -25,6 +26,9 @@
 #include "vtkPVServerOptionsInternals.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
+#ifdef PARAVIEW_ENABLE_NVPIPE
+#include <nvpipe.h>
+#endif
 
 // ------------------------
 // NOTE for OGVSupport
@@ -36,6 +40,21 @@
 // module, that can indeed check is OGGTHEORA support is available. So it's
 // reasonably safe to assume OGGTHEORA is always enabled here.
 // #include "vtkIOMovieConfigure.h"
+
+#ifdef PARAVIEW_ENABLE_NVPIPE
+//----------------------------------------------------------------------------
+// NVPipe requires Kepler-class (or newer) NVIDIA hardware at runtime.  This
+// verifies that such hardware is available.
+static bool NVPipeAvailable()
+{
+  // Instantiate an encoder; this initializes CUDA and the NVEncode side of the
+  // Video SDK, so if it succeeds we are good to go.
+  nvpipe* dummy = nvpipe_create_encoder(NVPIPE_H264_NV, 1024);
+  const bool success = dummy != nullptr;
+  nvpipe_destroy(dummy);
+  return success;
+}
+#endif
 
 vtkStandardNewMacro(vtkPVServerInformation);
 
@@ -52,7 +71,6 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
   this->TileMullions[0] = this->TileMullions[1] = 0;
-  this->UseOffscreenRendering = 0;
   this->Timeout = 0;
 #if defined(PARAVIEW_USE_ICE_T) && defined(PARAVIEW_USE_MPI)
   this->UseIceT = 1;
@@ -67,6 +85,14 @@ vtkPVServerInformation::vtkPVServerInformation()
 #if defined(PARAVIEW_ENABLE_FFMPEG)
   this->AVISupport = 1;
 #endif
+#endif
+
+  this->NVPipeSupport = false;
+#if defined(PARAVIEW_ENABLE_NVPIPE)
+  if (NVPipeAvailable())
+  {
+    this->NVPipeSupport = true;
+  }
 #endif
 
   // Refer to note at the top of this file abount OGVSupport.
@@ -86,7 +112,6 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "RemoteRendering: " << this->RemoteRendering << endl;
-  os << indent << "UseOffscreenRendering: " << this->UseOffscreenRendering << endl;
   os << indent << "TileDimensions: " << this->TileDimensions[0] << ", " << this->TileDimensions[1]
      << endl;
   os << indent << "TileMullions: " << this->TileMullions[0] << ", " << this->TileMullions[1]
@@ -100,6 +125,7 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MultiClientsEnable: " << this->MultiClientsEnable << endl;
   os << indent << "ClientId: " << this->ClientId << endl;
   os << indent << "IdTypeSize: " << this->IdTypeSize << endl;
+  os << indent << "NVPipeSupport: " << this->NVPipeSupport << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -111,7 +137,6 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
   this->RemoteRendering = info->GetRemoteRendering();
   info->GetTileDimensions(this->TileDimensions);
   info->GetTileMullions(this->TileMullions);
-  this->UseOffscreenRendering = info->GetUseOffscreenRendering();
   this->UseIceT = info->GetUseIceT();
   this->Timeout = info->GetTimeout();
   this->SetNumberOfMachines(info->GetNumberOfMachines());
@@ -130,6 +155,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation* info)
   this->SetEyeSeparation(info->GetEyeSeparation());
   this->NumberOfProcesses = info->NumberOfProcesses;
   this->MPIInitialized = info->MPIInitialized;
+  this->NVPipeSupport = info->NVPipeSupport;
 }
 
 //----------------------------------------------------------------------------
@@ -146,11 +172,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   vtkPVOptions* options = pm->GetOptions();
   options->GetTileDimensions(this->TileDimensions);
   options->GetTileMullions(this->TileMullions);
-#if !defined(__APPLE__)
-  this->UseOffscreenRendering = options->GetUseOffscreenRendering();
-#else
-  this->UseOffscreenRendering = 0;
-#endif
+
   this->Timeout = options->GetTimeout();
 
   // Server options
@@ -210,17 +232,18 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     {
       serverInfo->GetTileMullions(this->TileMullions);
     }
-    if (serverInfo->GetUseOffscreenRendering())
-    {
-      this->UseOffscreenRendering = 1;
-    }
-
     if (this->Timeout <= 0 ||
       (serverInfo->GetTimeout() > 0 && serverInfo->GetTimeout() < this->Timeout))
     {
       this->Timeout = serverInfo->GetTimeout();
     }
 
+    if (!serverInfo->GetNVPipeSupport())
+    {
+      this->NVPipeSupport = false;
+    }
+
+#ifndef VTK_LEGACY_REMOVE
     if (!serverInfo->GetOGVSupport())
     {
       this->OGVSupport = 0;
@@ -230,6 +253,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     {
       this->AVISupport = 0;
     }
+#endif
 
     // IceT either is there or is not.
     this->UseIceT = serverInfo->GetUseIceT();
@@ -273,7 +297,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->RemoteRendering;
   *css << this->TileDimensions[0] << this->TileDimensions[1];
   *css << this->TileMullions[0] << this->TileMullions[1];
-  *css << this->UseOffscreenRendering;
+  *css << 0; // we used to pass `>UseOffscreenRendering`.
   *css << this->Timeout;
   *css << this->UseIceT;
   *css << "<obsolete>"; // we used to pass RenderModuleName.
@@ -301,6 +325,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->MultiClientsEnable;
   *css << this->ClientId;
   *css << this->IdTypeSize;
+  *css << this->NVPipeSupport;
   *css << vtkClientServerStream::End;
 }
 
@@ -324,7 +349,8 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing TileMullions from message.");
     return;
   }
-  if (!css->GetArgument(0, 5, &this->UseOffscreenRendering))
+  int obsolete_arg;
+  if (!css->GetArgument(0, 5, &obsolete_arg))
   {
     vtkErrorMacro("Error parsing UseOffscreenRendering from message.");
     return;
@@ -478,6 +504,11 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!css->GetArgument(0, epilogueOffset + 3, &this->IdTypeSize))
   {
     vtkErrorMacro("Error parsing IdTypeSize from message.");
+    return;
+  }
+  if (!css->GetArgument(0, epilogueOffset + 4, &this->NVPipeSupport))
+  {
+    vtkErrorMacro("Error parsing NVPipeSupport from message.");
     return;
   }
 }
@@ -738,3 +769,33 @@ bool vtkPVServerInformation::IsMPIInitialized() const
 {
   return this->MPIInitialized;
 }
+
+//============================================================================
+#ifndef VTK_LEGACY_REMOVE
+void vtkPVServerInformation::SetOGVSupport(int val)
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::SetOGVSupport, "ParaView 5.5");
+  this->OGVSupport = val;
+  this->Modified();
+}
+
+int vtkPVServerInformation::GetOGVSupport()
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::GetOGVSupport, "ParaView 5.5");
+  return this->OGVSupport;
+}
+
+void vtkPVServerInformation::SetAVISupport(int val)
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::SetAVISupport, "ParaView 5.5");
+  this->AVISupport = val;
+  this->Modified();
+}
+
+int vtkPVServerInformation::GetAVISupport()
+{
+  VTK_LEGACY_BODY(vtkPVServerInformation::GetAVISupport, "ParaView 5.5");
+  return this->AVISupport;
+}
+#endif // VTK_LEGACY_REMOVE
+//============================================================================

@@ -42,17 +42,17 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
 protected:
   vtkSMTimeStepIndexDomain();
-  ~vtkSMTimeStepIndexDomain();
+  ~vtkSMTimeStepIndexDomain() override;
 
   void Update(vtkSMProxyProperty* pp);
 
 private:
-  vtkSMTimeStepIndexDomain(const vtkSMTimeStepIndexDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTimeStepIndexDomain&) VTK_DELETE_FUNCTION;
+  vtkSMTimeStepIndexDomain(const vtkSMTimeStepIndexDomain&) = delete;
+  void operator=(const vtkSMTimeStepIndexDomain&) = delete;
 };
 
 #endif // vtkSMTimeStepIndexDomain_h

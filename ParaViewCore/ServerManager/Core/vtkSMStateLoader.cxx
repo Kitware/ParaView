@@ -155,6 +155,18 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
       return timekeeper;
     }
   }
+  else if (xml_group && xml_name && strcmp(xml_group, "materials") == 0 &&
+    strcmp(xml_name, "MaterialLibrary") == 0)
+  {
+    // There is only one material library proxy as well.
+    vtkSMProxy* materiallibrary = pxm->FindProxy("materiallibrary", "materials", "MaterialLibrary");
+    if (materiallibrary)
+    {
+      materiallibrary->Register(this);
+      return materiallibrary;
+    }
+  }
+
   //**************************************************************************
 
   // If all else fails, let the superclass handle it:
@@ -227,7 +239,7 @@ void vtkSMStateLoader::RegisterProxyInternal(
 
 //---------------------------------------------------------------------------
 bool vtkSMStateLoader::UpdateRegistrationInfo(
-  std::string& group, std::string& vtkNotUsed(name), vtkSMProxy* vtkNotUsed(proxy))
+  std::string& group, std::string& name, vtkSMProxy* vtkNotUsed(proxy))
 {
   static const char* helper_proxies_prefix = "pq_helper_proxies.";
   static size_t len = strlen(helper_proxies_prefix);
@@ -242,6 +254,25 @@ bool vtkSMStateLoader::UpdateRegistrationInfo(
       group += helpedProxy->GetGlobalIDAsString();
     }
   }
+
+  if (group == "lookup_tables" || group == "piecewise_functions")
+  {
+    // A separated lookup table or piecewise function, must update it.
+    const std::string separatePrefix = "Separate_";
+    const size_t separateLen = separatePrefix.size();
+    if (name.substr(0, separateLen) == separatePrefix)
+    {
+      // This will change any "Separate_OLDGID_ArrayName" into "Separate_NEWGID_ArrayName"
+      size_t gidLen = name.find_first_of("_", separateLen) - separateLen;
+      std::string gidStr = name.substr(separateLen, gidLen);
+      vtkTypeUInt32 gid = static_cast<vtkTypeUInt32>(std::atoi(gidStr.c_str()));
+      if (vtkSMProxy* helpedProxy = this->ProxyLocator->LocateProxy(gid))
+      {
+        name.replace(separateLen, gidLen, helpedProxy->GetGlobalIDAsString());
+      }
+    }
+  }
+
   return true;
 }
 
@@ -501,13 +532,13 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
     }
   }
 
-  vtkSMStateVersionController* convertor = vtkSMStateVersionController::New();
-  if (!convertor->Process(parent))
+  vtkSMStateVersionController* converter = vtkSMStateVersionController::New();
+  if (!converter->Process(parent, this->GetSession()))
   {
-    vtkWarningMacro("State convertor was not able to convert the state to current "
+    vtkWarningMacro("State converter was not able to convert the state to current "
                     "version successfully");
   }
-  convertor->Delete();
+  converter->Delete();
 
   if (!this->VerifyXMLVersion(rootElement))
   {

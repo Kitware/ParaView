@@ -75,9 +75,9 @@ public:
 
 protected:
   vtkAnnotateGlobalDataFilter();
-  ~vtkAnnotateGlobalDataFilter();
+  ~vtkAnnotateGlobalDataFilter() override;
 
-  virtual void EvaluateExpression() VTK_OVERRIDE;
+  void EvaluateExpression() VTK_OVERRIDE;
 
   char* Prefix;
   char* Postfix;
@@ -85,8 +85,8 @@ protected:
   char* Format;
 
 private:
-  vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAnnotateGlobalDataFilter&) VTK_DELETE_FUNCTION;
+  vtkAnnotateGlobalDataFilter(const vtkAnnotateGlobalDataFilter&) = delete;
+  void operator=(const vtkAnnotateGlobalDataFilter&) = delete;
 };
 
 #endif

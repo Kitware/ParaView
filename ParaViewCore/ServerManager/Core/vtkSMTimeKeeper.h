@@ -91,9 +91,18 @@ public:
   void RemoveSuppressedTimeSource(vtkSMSourceProxy*);
   //@}
 
+  //@{
+  /**
+   * Iterates over all sources providing time and calls
+   * `vtkSMSourceProxy::UpdatePipelineInformation` on them. That ensures that
+   * timekeeper is using the latest time information available to it.
+   */
+  void UpdateTimeInformation();
+  //@}
+
 protected:
   vtkSMTimeKeeper();
-  ~vtkSMTimeKeeper();
+  ~vtkSMTimeKeeper() override;
 
   friend class vtkSMTimeKeeperProxy;
   void SetTimestepValuesProperty(vtkSMProperty*);
@@ -108,11 +117,13 @@ protected:
   double Time;
 
 private:
-  vtkSMTimeKeeper(const vtkSMTimeKeeper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTimeKeeper&) VTK_DELETE_FUNCTION;
+  vtkSMTimeKeeper(const vtkSMTimeKeeper&) = delete;
+  void operator=(const vtkSMTimeKeeper&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;
+
+  bool DeferUpdateTimeSteps;
 };
 
 #endif

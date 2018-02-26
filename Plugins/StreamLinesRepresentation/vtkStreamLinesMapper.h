@@ -121,7 +121,7 @@ public:
 
 protected:
   vtkStreamLinesMapper();
-  ~vtkStreamLinesMapper();
+  ~vtkStreamLinesMapper() override;
 
   double Alpha;
   double StepLength;
@@ -138,8 +138,8 @@ protected:
   // see algorithm for more info
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  vtkStreamLinesMapper(const vtkStreamLinesMapper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkStreamLinesMapper&) VTK_DELETE_FUNCTION;
+  vtkStreamLinesMapper(const vtkStreamLinesMapper&) = delete;
+  void operator=(const vtkStreamLinesMapper&) = delete;
 };
 
 #endif

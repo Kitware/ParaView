@@ -137,6 +137,33 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="nvpLabel">
+     <property name="text">
+      <string>Set the NvPipe compression level. 1 is high image quality; 5 is low image quality. Even at the highest setting the bandwidth cost is well below LZ4 or Squirt.
+      </string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqIntRangeWidget" name="nvpLevel" native="true">
+     <property name="minimum" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="maximum" stdset="0">
+      <number>5</number>
+     </property>
+     <property name="value" stdset="0">
+      <number>4</number>
+     </property>
+     <property name="strictRange" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="compressorBWLayout">
      <item>
       <widget class="QLabel" name="label_9">

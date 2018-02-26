@@ -21,7 +21,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
 
-  <!-- To minimise tiny picture norm deviations among platforms: -->
+  <!-- To minimize tiny picture norm deviations among platforms: -->
   <!-- a) disable orientation axes actor -->
   <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
   <!-- b) disable center axes actor -->

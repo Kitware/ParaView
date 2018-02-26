@@ -46,15 +46,15 @@ class pqConsoleWidgetCompleter;
   console by calling printString() and receive user input by connecting to the
   executeCommand() slot.
 
-  \sa pqPythonShell, pqOutputWindow
+  \sa pqPythonShell
 */
 class PQWIDGETS_EXPORT pqConsoleWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  pqConsoleWidget(QWidget* Parent);
-  virtual ~pqConsoleWidget();
+  pqConsoleWidget(QWidget* parent = nullptr);
+  ~pqConsoleWidget() override;
 
   /**
   * Returns the current formatting that will be used by printString
@@ -77,6 +77,11 @@ signals:
   * Signal emitted whenever the user enters a command
   */
   void executeCommand(const QString& Command);
+
+  /**
+   * Fired to indicate to the application that the console has focus.
+   */
+  void consoleFocusInEvent();
 
 public slots:
   /**
@@ -109,6 +114,11 @@ public slots:
   * Determines the word using QTextCursor::StartOfWord, EndOfWord.
   */
   void insertCompletion(const QString& text);
+
+  /**
+   * This method can be called to make the internal QTextEdit take focus.
+   */
+  void takeFocus();
 
 private:
   pqConsoleWidget(const pqConsoleWidget&);

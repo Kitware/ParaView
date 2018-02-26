@@ -69,7 +69,7 @@ private:
     this->UpdateObserverTag = 0;
     this->UpdateInformationObserverTag = 0;
   }
-  ~vtkSMProxyManagerProxyInfo()
+  ~vtkSMProxyManagerProxyInfo() override
   {
     // Remove observers.
     if (this->ModifiedObserverTag && this->Proxy.GetPointer())
@@ -401,7 +401,7 @@ struct vtkSMSessionProxyManagerInternals
     std::string groupString = group;
     std::string nameString = name;
 
-    // Will be overriden if the proxy is found
+    // Will be overridden if the proxy is found
     bool found = false;
 
     // Deal with set

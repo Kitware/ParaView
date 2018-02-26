@@ -3,7 +3,7 @@
 /**
  *  \file   GW_VoronoiMesh.h
  *  \brief  Definition of class \c GW_VoronoiMesh
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -58,8 +58,8 @@ typedef T_VertexPathMultiMap::const_reverse_iterator CRIT_VertexPathMultiMap;
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_VoronoiMesh
- *  \brief  Iterate an algorithm wich find base vertex at Voronoy crossing points.
- *  \author Gabriel Peyré
+ *  \brief  Iterate an algorithm which find base vertex at Voronoy crossing points.
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Remesh the resulting point in a Delaunay fashion.
@@ -154,7 +154,7 @@ public:
         GW_GeodesicVertex* pFront_;
     };
 
-    /** intermediate variable for boundaries bulding */
+    /** intermediate variable for boundaries building */
     static T_VertexPathMultiMap BoundaryEdgeMap_;
     static void AddPathToMeshVertex( GW_GeodesicMesh& Mesh, GW_GeodesicPath& GeodesicPath, T_GeodesicVertexList& VertexPath );
 
@@ -219,7 +219,7 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

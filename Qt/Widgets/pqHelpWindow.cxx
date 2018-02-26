@@ -65,9 +65,9 @@ public:
   {
     this->Widget = T::newInstance(engine, self);
   }
-  virtual ~pqBrowserTemplate() { delete this->Widget; }
-  virtual QWidget* widget() const { return this->Widget; }
-  virtual void setUrl(const QUrl& url) { this->Widget->setUrl(url); }
+  ~pqBrowserTemplate() override { delete this->Widget; }
+  QWidget* widget() const override { return this->Widget; }
+  void setUrl(const QUrl& url) override { this->Widget->setUrl(url); }
 };
 
 #ifdef PARAVIEW_USE_QTWEBKIT

@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqDesktopServicesReaction : public pqReacti
 
 public:
   pqDesktopServicesReaction(const QUrl& url, QAction* parent);
-  virtual ~pqDesktopServicesReaction();
+  ~pqDesktopServicesReaction() override;
 
   /**
   * Attempt to open a file (local or on the Web) using QDesktopServices.
@@ -63,7 +63,7 @@ public:
   static bool openUrl(const QUrl& url);
 
 protected:
-  virtual void onTriggered() { pqDesktopServicesReaction::openUrl(this->URL); }
+  void onTriggered() override { pqDesktopServicesReaction::openUrl(this->URL); }
 
 private:
   Q_DISABLE_COPY(pqDesktopServicesReaction)

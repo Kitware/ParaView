@@ -39,7 +39,7 @@ class PQCOMPONENTS_EXPORT pqMemoryInspectorPanel : public QWidget
   Q_OBJECT
 public:
   pqMemoryInspectorPanel(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~pqMemoryInspectorPanel();
+  ~pqMemoryInspectorPanel() override;
 
   // Description:
   // Test for successful initialization.
@@ -48,7 +48,7 @@ public:
 protected:
   // Description:
   // Update when the panel is made visible.
-  virtual void showEvent(QShowEvent* event);
+  void showEvent(QShowEvent* event) override;
 
 protected slots:
 

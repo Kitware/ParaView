@@ -39,14 +39,14 @@ public:
 
 protected:
   vtkSIMetaReaderProxy();
-  ~vtkSIMetaReaderProxy();
+  ~vtkSIMetaReaderProxy() override;
 
   void OnCreateVTKObjects() VTK_OVERRIDE;
 
   /**
    * Read xml-attributes.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   // This is the name of the method used to set the file name on the
   // internal reader. See vtkFileSeriesReader for details.
@@ -56,8 +56,8 @@ protected:
   char* FileNameMethod;
 
 private:
-  vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIMetaReaderProxy&) VTK_DELETE_FUNCTION;
+  vtkSIMetaReaderProxy(const vtkSIMetaReaderProxy&) = delete;
+  void operator=(const vtkSIMetaReaderProxy&) = delete;
 };
 
 #endif

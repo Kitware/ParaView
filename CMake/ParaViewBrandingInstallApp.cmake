@@ -24,20 +24,15 @@ macro(cleanup_bundle app app_root libdir pluginsdir datadir)
        DESTINATION ${app_root}/Contents/Plugins
        USE_SOURCE_PERMISSIONS)
 
-  file(GLOB pyfiles ${libdir}/*.py)
-  file(GLOB pycfiles ${libdir}/*.pyc)
-  if (pycfiles OR pyfiles)
-    file(INSTALL ${pyfiles} ${pycfiles}
-         DESTINATION ${app_root}/Contents/Python
-         USE_SOURCE_PERMISSIONS)
-  endif()
-
-  # Handle any python package/module
-  if (IS_DIRECTORY "${libdir}/site-packages")
-    file(INSTALL "${libdir}/site-packages/"
+  # Handle Python packages and modules.
+  # since we don't know which Python version we used to build,
+  # let's locate the Python modules dir.
+  file(GLOB python_dir "${libdir}/python*")
+  if(python_dir AND IS_DIRECTORY "${python_dir}/site-packages")
+    file(INSTALL "${python_dir}/site-packages/"
        DESTINATION ${app_root}/Contents/Python
        USE_SOURCE_PERMISSIONS)
-  endif ()
+  endif()
 
   # Package web server content
   if (IS_DIRECTORY "${datadir}/www")

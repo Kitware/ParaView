@@ -57,7 +57,7 @@ c     We do need the grid.
 
         do iblk=1,nelblk
             nenl = lcblk(5,iblk) ! no. of vertices per element
-            npro = lcblk(1,iblk+1) - lcblk(1,iblk) ! no. of elemens in block
+            npro = lcblk(1,iblk+1) - lcblk(1,iblk) ! no. of elements in block
             call insertblockofcells(npro, nenl, mien(iblk)%p(1,1))
         enddo
       endif ! if needflag .ne. 0 --

@@ -47,22 +47,22 @@ class pqOpacityTableModel : public QAbstractTableModel
 public:
   pqOpacityTableModel(pqColorOpacityEditorWidget* widget, QObject* parentObject = 0);
 
-  virtual ~pqOpacityTableModel() {}
+  ~pqOpacityTableModel() override {}
 
   /**
   * All columns are editable.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex& idx) const;
+  Qt::ItemFlags flags(const QModelIndex& idx) const override;
 
-  virtual bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole);
+  bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole) override;
 
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
-  virtual QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
   virtual void refresh();
 

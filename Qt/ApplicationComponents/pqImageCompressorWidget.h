@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqImageCompressorWidget : public pqProperty
 
 public:
   pqImageCompressorWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  virtual ~pqImageCompressorWidget();
+  ~pqImageCompressorWidget() override;
 
   QString compressorConfig() const;
 

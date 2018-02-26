@@ -29,6 +29,7 @@
 #include "vtkExecutive.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGraph.h"
+#include "vtkHyperTreeGrid.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMath.h"
@@ -53,6 +54,7 @@
 
 #include <algorithm>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -68,6 +70,9 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->NumberOfRows = 0;
+  this->NumberOfTrees = 0;
+  this->NumberOfVertices = 0;
+  this->NumberOfLeaves = 0;
   this->MemorySize = 0;
   this->PolygonCount = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
@@ -159,8 +164,11 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DataSetType: " << this->DataSetType << endl;
   os << indent << "CompositeDataSetType: " << this->CompositeDataSetType << endl;
   os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
-  os << indent << "NumberOfRows: " << this->NumberOfRows << endl;
   os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
+  os << indent << "NumberOfRows: " << this->NumberOfRows << endl;
+  os << indent << "NumberOfTrees: " << this->NumberOfTrees << endl;
+  os << indent << "NumberOfVertices: " << this->NumberOfVertices << endl;
+  os << indent << "NumberOfLeaves: " << this->NumberOfLeaves << endl;
   os << indent << "NumberOfDataSets: " << this->NumberOfDataSets << endl;
   os << indent << "MemorySize: " << this->MemorySize << endl;
   os << indent << "PolygonCount: " << this->PolygonCount << endl;
@@ -240,6 +248,9 @@ void vtkPVDataInformation::Initialize()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->NumberOfRows = 0;
+  this->NumberOfTrees = 0;
+  this->NumberOfVertices = 0;
+  this->NumberOfLeaves = 0;
   this->NumberOfDataSets = 0;
   this->MemorySize = 0;
   this->PolygonCount = 0;
@@ -285,6 +296,9 @@ void vtkPVDataInformation::DeepCopy(
   this->NumberOfPoints = dataInfo->GetNumberOfPoints();
   this->NumberOfCells = dataInfo->GetNumberOfCells();
   this->NumberOfRows = dataInfo->GetNumberOfRows();
+  this->NumberOfTrees = dataInfo->GetNumberOfTrees();
+  this->NumberOfVertices = dataInfo->GetNumberOfVertices();
+  this->NumberOfLeaves = dataInfo->GetNumberOfLeaves();
   this->MemorySize = dataInfo->GetMemorySize();
   this->PolygonCount = dataInfo->GetPolygonCount();
 
@@ -345,13 +359,6 @@ void vtkPVDataInformation::CopyFromCompositeDataSetInitialize(vtkCompositeDataSe
 {
   this->Initialize();
   this->CompositeDataInformation->CopyFromObject(data);
-
-  // Copy Field Data information, if any
-  vtkFieldData* fd = data->GetFieldData();
-  if (fd && fd->GetNumberOfArrays() > 0)
-  {
-    this->FieldDataInformation->CopyFromFieldData(fd);
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -359,13 +366,49 @@ void vtkPVDataInformation::CopyFromCompositeDataSetFinalize(vtkCompositeDataSet*
 {
   this->SetCompositeDataClassName(data->GetClassName());
   this->CompositeDataSetType = data->GetDataObjectType();
-
   if (this->DataSetType == -1)
   {
     // This is a composite dataset with no non-empty leaf node. Set some data
     // type (Look at BUG #7144).
     this->SetDataClassName("vtkDataSet");
     this->DataSetType = VTK_DATA_SET;
+  }
+
+  // Copy Field Data information, if any
+  vtkFieldData* fd = data->GetFieldData();
+  if (fd && fd->GetNumberOfArrays() > 0)
+  {
+    if (this->FieldDataInformation->GetNumberOfArrays() > 0)
+    {
+      // Issue #17793. We need to take extra care when merging field data
+      // information to ensure that we don't mark arrays only present on the
+      // non-leaf node as partial.
+      vtkNew<vtkPVDataSetAttributesInformation> myfdInformation;
+      myfdInformation->CopyFromFieldData(fd);
+
+      std::set<std::string> my_unique_arrays;
+      for (int cc = 0, max = myfdInformation->GetNumberOfArrays(); cc < max; ++cc)
+      {
+        const char* aname = myfdInformation->GetArrayInformation(cc)->GetName();
+        if (aname && this->FieldDataInformation->GetArrayInformation(aname) == nullptr)
+        {
+          my_unique_arrays.insert(aname);
+        }
+      }
+      this->FieldDataInformation->AddInformation(myfdInformation);
+      // now unmark arrays in my_unique_arrays as not partial.
+      for (const auto& aname : my_unique_arrays)
+      {
+        if (auto ainfo = this->FieldDataInformation->GetArrayInformation(aname.c_str()))
+        {
+          ainfo->SetIsPartial(0);
+        }
+      }
+    }
+    else
+    {
+      this->FieldDataInformation->CopyFromFieldData(fd);
+    }
   }
 }
 
@@ -471,10 +514,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   }
 
   this->NumberOfPoints = data->GetNumberOfPoints();
-  if (!this->NumberOfPoints)
-  {
-    return;
-  }
 
   // We do not want to get the number of dual cells from an octree
   // because this triggers generation of connectivity arrays.
@@ -503,10 +542,13 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     }
 #endif
 
-  bds = data->GetBounds();
-  for (idx = 0; idx < 6; ++idx)
+  if (this->NumberOfPoints > 0)
   {
-    this->Bounds[idx] = bds[idx];
+    bds = data->GetBounds();
+    for (idx = 0; idx < 6; ++idx)
+    {
+      this->Bounds[idx] = bds[idx];
+    }
   }
   this->MemorySize = data->GetActualMemorySize();
 
@@ -653,6 +695,15 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromHyperTreeGrid(vtkHyperTreeGrid* data)
+{
+  // Most of the work for these is done in CopyFromDataSet.
+  this->NumberOfTrees = data->GetNumberOfTrees();
+  this->NumberOfVertices = data->GetNumberOfVertices();
+  this->NumberOfLeaves = data->GetNumberOfLeaves();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
   vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
@@ -710,6 +761,15 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     this->CopyFromCompositeDataSet(cds);
     this->CopyCommonMetaData(dobj, info);
     return;
+  }
+
+  // vtkHyperTreeGrid inherits vtkDataSet, so we check for it first:
+  vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(dobj);
+  if (htg)
+  {
+    this->CopyFromHyperTreeGrid(htg);
+    this->CopyFromDataSet(htg);
+    this->CopyCommonMetaData(htg, info);
   }
 
   vtkDataSet* ds = vtkDataSet::SafeDownCast(dobj);
@@ -785,7 +845,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
   info = vtkPVDataInformation::SafeDownCast(pvi);
   if (info == NULL)
   {
-    vtkErrorMacro("Cound not cast object to data information.");
+    vtkErrorMacro("Could not cast object to data information.");
     return;
   }
 
@@ -1070,6 +1130,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Multi-piece Dataset";
     case VTK_DIRECTED_ACYCLIC_GRAPH:
       return "Directed Acyclic Graph";
+    case VTK_MOLECULE:
+      return "Molecule";
     default:
       vtkPVDataInformationHelper* dhelper = vtkPVDataInformation::FindHelper(this->DataClassName);
       if (dhelper)
@@ -1211,8 +1273,9 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   css->Reset();
   *css << vtkClientServerStream::Reply;
   *css << this->DataClassName << this->DataSetType << this->NumberOfDataSets << this->NumberOfPoints
-       << this->NumberOfCells << this->NumberOfRows << this->MemorySize << this->PolygonCount
-       << this->Time << this->HasTime << this->NumberOfTimeSteps << this->TimeLabel
+       << this->NumberOfCells << this->NumberOfRows << this->NumberOfTrees << this->NumberOfVertices
+       << this->NumberOfLeaves << this->MemorySize << this->PolygonCount << this->Time
+       << this->HasTime << this->NumberOfTimeSteps << this->TimeLabel
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6);
 
@@ -1328,6 +1391,21 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfRows))
   {
     vtkErrorMacro("Error parsing number of cells.");
+    return;
+  }
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfTrees))
+  {
+    vtkErrorMacro("Error parsing number of trees.");
+    return;
+  }
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfVertices))
+  {
+    vtkErrorMacro("Error parsing number of vertices.");
+    return;
+  }
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfLeaves))
+  {
+    vtkErrorMacro("Error parsing number of leaves.");
     return;
   }
   if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->MemorySize))

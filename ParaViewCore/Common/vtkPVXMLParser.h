@@ -66,7 +66,7 @@ public:
 
 protected:
   vtkPVXMLParser();
-  ~vtkPVXMLParser();
+  ~vtkPVXMLParser() override;
 
   int SuppressErrorMessages;
 
@@ -91,14 +91,14 @@ protected:
 
   // Called by Parse() to read the stream and call ParseBuffer.  Can
   // be replaced by subclasses to change how input is read.
-  virtual int ParseXML() VTK_OVERRIDE;
+  int ParseXML() VTK_OVERRIDE;
 
   // Overridden to implement the SuppressErrorMessages feature.
-  virtual void ReportXmlParseError() VTK_OVERRIDE;
+  void ReportXmlParseError() VTK_OVERRIDE;
 
 private:
-  vtkPVXMLParser(const vtkPVXMLParser&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVXMLParser&) VTK_DELETE_FUNCTION;
+  vtkPVXMLParser(const vtkPVXMLParser&) = delete;
+  void operator=(const vtkPVXMLParser&) = delete;
 };
 
 #endif

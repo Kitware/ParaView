@@ -42,8 +42,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 class vtkGraph;
+class vtkSMSILDomain;
 class vtkSMSILModel;
-
+/**
+ * @class pqSILModel
+ * @brief QAbstractItemModel for legacy SIL (vtkGraph-based SIL)
+ *
+ * pqSILModel is QAbstractItemModel implementation for legacy SIL.
+ *
+ * @section pqSILModelLegayWarning Legacy Warning
+ *
+ * While not deprecated, this class exists to support readers that use legacy
+ * representation for SIL which used a `vtkGraph` to represent the SIL. It is
+ * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
+ * represent the SIL. In that case, you should use
+ * `pqSubsetInclusionLatticeTreeModel` instead.
+ */
 class PQCOMPONENTS_EXPORT pqSILModel : public QAbstractItemModel
 {
   Q_OBJECT
@@ -51,7 +65,7 @@ class PQCOMPONENTS_EXPORT pqSILModel : public QAbstractItemModel
 
 public:
   pqSILModel(QObject* parent = 0);
-  virtual ~pqSILModel();
+  ~pqSILModel() override;
 
   /**
   * \name QAbstractItemModel Methods
@@ -64,7 +78,7 @@ public:
   * \return
   *   The number of rows for the given index.
   */
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -73,7 +87,7 @@ public:
   * \return
   *   The number of columns for the given index.
   */
-  virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -82,7 +96,7 @@ public:
   * \return
   *   True if the given index has child items.
   */
-  virtual bool hasChildren(const QModelIndex& parent = QModelIndex()) const;
+  bool hasChildren(const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -93,7 +107,7 @@ public:
   * \return
   *   A model index for the given location.
   */
-  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+  QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 
   /**
   * \brief
@@ -102,7 +116,7 @@ public:
   * \return
   *   A model index for the parent of the given index.
   */
-  virtual QModelIndex parent(const QModelIndex& index) const;
+  QModelIndex parent(const QModelIndex& index) const override;
 
   /**
   * \brief
@@ -112,7 +126,7 @@ public:
   * \return
   *   The data for the given model index.
   */
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   /**
   * \brief
@@ -124,14 +138,14 @@ public:
   * \return
   *   The flags for the given model index.
   */
-  virtual Qt::ItemFlags flags(const QModelIndex& index) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
 
   /**
   * \brief
   *  Sets the role data for the item at index to value. Returns
   *  true if successful; otherwise returns false.
   */
-  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+  bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
   //@}
 
   /**
@@ -141,7 +155,7 @@ public:
   */
   QModelIndex hierarchyIndex(const QString& hierarchyName) const;
 
-  virtual QVariant headerData(int, Qt::Orientation, int role = Qt::DisplayRole) const
+  QVariant headerData(int, Qt::Orientation, int role = Qt::DisplayRole) const override
   {
     if (role == Qt::DisplayRole)
     {
@@ -155,6 +169,10 @@ public:
   */
   QList<QVariant> status(const QString& hierarchyName) const;
   void setStatus(const QString& hierarchyName, const QList<QVariant>& values);
+
+  void setSILDomain(vtkSMSILDomain* domain);
+
+  void domainModified();
 
   /**
   * Returns the model index for a vertex.
@@ -174,7 +192,7 @@ public slots:
   /**
   * Used to reset the model based on the sil.
   */
-  void update(vtkGraph* sil);
+  void update();
 
 protected:
   /**
@@ -219,7 +237,8 @@ protected:
   * hierarchy.
   */
   QMap<QString, std::set<vtkIdType> > HierarchyVertexIds;
-  vtkSmartPointer<vtkGraph> SIL;
+  vtkSmartPointer<vtkSMSILDomain> SILDomain;
+  unsigned long SILDomainObserverId;
 
 private:
   Q_DISABLE_COPY(pqSILModel)

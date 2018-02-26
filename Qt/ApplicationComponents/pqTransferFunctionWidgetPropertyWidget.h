@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 class vtkSMTransferFunctionProxy;
+class vtkEventQtSlotConnect;
+class vtkSMRangedTransferFunctionDomain;
 
 /**
 * A property widget for editing a transfer function.
@@ -51,19 +53,29 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyWidget
 public:
   explicit pqTransferFunctionWidgetPropertyWidget(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  ~pqTransferFunctionWidgetPropertyWidget();
+  ~pqTransferFunctionWidgetPropertyWidget() override;
 
-private slots:
+  const double* getRange() { return this->Range; };
+  void setRange(const double& min, const double& max);
+
+signals:
+  void domainChanged();
+
+protected:
+  void UpdateProperty();
+
+protected slots:
   void buttonClicked();
-  void minXChanged(double newMinX);
-  void maxXChanged(double newMaxX);
+  void updateRange();
+  void propagateProxyPointsProperty();
+  void onDomainChanged();
 
 private:
-  vtkSMProperty* Property;
-  double xRange[2];
-
-  void propagateProxyPointsProperty(vtkSMTransferFunctionProxy* tfp);
-  void updateTransferFunctionRanges(vtkSMTransferFunctionProxy* tfp);
+  vtkEventQtSlotConnect* Connection;
+  vtkSMTransferFunctionProxy* TFProxy;
+  QDialog* Dialog;
+  vtkSMRangedTransferFunctionDomain* Domain;
+  double Range[2];
 };
 
 #endif // _pqTransferFunctionWidgetPropertyWidget_h

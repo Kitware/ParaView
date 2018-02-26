@@ -42,7 +42,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Override the set sesssion so the SessionProxyManager could be cache for
+   * Override the set session so the SessionProxyManager could be cache for
    */
   void SetSessionProxyManager(vtkSMSessionProxyManager*);
 
@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkSMProxyIterator();
-  ~vtkSMProxyIterator();
+  ~vtkSMProxyIterator() override;
 
   bool SkipPrototypes;
   int Mode;
@@ -128,8 +128,8 @@ protected:
 private:
   vtkSMProxyIteratorInternals* Internals;
 
-  vtkSMProxyIterator(const vtkSMProxyIterator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyIterator&) VTK_DELETE_FUNCTION;
+  vtkSMProxyIterator(const vtkSMProxyIterator&) = delete;
+  void operator=(const vtkSMProxyIterator&) = delete;
 };
 
 #endif

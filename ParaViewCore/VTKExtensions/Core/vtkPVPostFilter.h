@@ -50,13 +50,12 @@ public:
 
 protected:
   vtkPVPostFilter();
-  ~vtkPVPostFilter();
+  ~vtkPVPostFilter() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestDataObject(
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestDataObject(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int DoAnyNeededConversions(vtkDataObject* output);
   int DoAnyNeededConversions(vtkDataSet* output, const char* requested_name, int fieldAssociation,
@@ -67,8 +66,8 @@ protected:
     const char* demangled_name, const char* demagled_component_name);
 
 private:
-  vtkPVPostFilter(const vtkPVPostFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPostFilter&) VTK_DELETE_FUNCTION;
+  vtkPVPostFilter(const vtkPVPostFilter&) = delete;
+  void operator=(const vtkPVPostFilter&) = delete;
 };
 
 #endif

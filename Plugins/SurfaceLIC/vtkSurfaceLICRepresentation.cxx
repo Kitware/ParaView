@@ -20,14 +20,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 
-#ifndef VTKGL2
-#include "vtkCompositePolyDataMapper2.h"
-#include "vtkSurfaceLICDefaultPainter.h"
-#include "vtkSurfaceLICPainter.h"
-#else
 #include "vtkCompositeSurfaceLICMapper.h"
 #include "vtkSurfaceLICInterface.h"
-#endif
 
 // send LOD painter parameters that let it run faster.
 // but lic result will be slightly degraded.
@@ -39,31 +33,6 @@ vtkStandardNewMacro(vtkSurfaceLICRepresentation);
 //----------------------------------------------------------------------------
 vtkSurfaceLICRepresentation::vtkSurfaceLICRepresentation()
 {
-#ifndef VTKGL2
-  vtkCompositePolyDataMapper2* mapper;
-  vtkSurfaceLICDefaultPainter* painter;
-  // painter chain
-  painter = vtkSurfaceLICDefaultPainter::New();
-  mapper = dynamic_cast<vtkCompositePolyDataMapper2*>(this->Mapper);
-
-  painter->SetDelegatePainter(mapper->GetPainter()->GetDelegatePainter());
-  mapper->SetPainter(painter);
-  painter->Delete();
-
-  this->Painter = painter->GetSurfaceLICPainter();
-  this->Painter->Register(NULL);
-
-  // lod painter chain
-  painter = vtkSurfaceLICDefaultPainter::New();
-  mapper = dynamic_cast<vtkCompositePolyDataMapper2*>(this->LODMapper);
-
-  painter->SetDelegatePainter(mapper->GetPainter()->GetDelegatePainter());
-  mapper->SetPainter(painter);
-  painter->Delete();
-
-  this->LODPainter = painter->GetSurfaceLICPainter();
-  this->LODPainter->Register(NULL);
-#else
   this->Mapper->Delete();
   this->LODMapper->Delete();
 
@@ -80,28 +49,19 @@ vtkSurfaceLICRepresentation::vtkSurfaceLICRepresentation()
 
   // This will add the new mappers to the pipeline.
   this->SetupDefaults();
-#endif
 }
 
 //----------------------------------------------------------------------------
 vtkSurfaceLICRepresentation::~vtkSurfaceLICRepresentation()
 {
-#ifndef VTKGL2
-  this->Painter->Delete();
-  this->LODPainter->Delete();
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkSurfaceLICRepresentation::SetUseLICForLOD(bool val)
 {
   this->UseLICForLOD = val;
-#ifndef VTKGL2
-  this->LODPainter->SetEnable(this->Painter->GetEnable() && this->UseLICForLOD);
-#else
   this->SurfaceLICLODMapper->GetLICInterface()->SetEnable(
     (this->SurfaceLICMapper->GetLICInterface()->GetEnable() && this->UseLICForLOD) ? 1 : 0);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -115,7 +75,7 @@ int vtkSurfaceLICRepresentation::ProcessViewRequest(
   }
 
   // the Surface LIC painter will make use of
-  // MPI global collective comunication calls
+  // MPI global collective communication calls
   // need to disable IceT's empty image
   // optimization
   if (request_type == vtkPVView::REQUEST_UPDATE())
@@ -135,18 +95,13 @@ void vtkSurfaceLICRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSurfaceLICRepresentation::SetEnable(bool val)
 {
-#ifndef VTKGL2
-  this->Painter->SetEnable(val);
-  this->LODPainter->SetEnable(this->Painter->GetEnable() && this->UseLICForLOD);
-#else
   this->SurfaceLICMapper->GetLICInterface()->SetEnable(val ? 1 : 0);
   this->SurfaceLICLODMapper->GetLICInterface()->SetEnable((val && this->UseLICForLOD) ? 1 : 0);
-#endif
 }
 
 // These are some settings that would help lod painter run faster.
 // If the user really cares about speed then best to use a wireframe
-// durring interaction
+// during interaction
 #if defined(vtkSurfaceLICRepresentationFASTLOD)
 //----------------------------------------------------------------------------
 void vtkSurfaceLICRepresentation::SetStepSize(double val)
@@ -156,23 +111,14 @@ void vtkSurfaceLICRepresentation::SetStepSize(double val)
   // step size.
   double twiceVal = val * 2.0;
 
-#ifndef VTKGL2
-  this->Painter->SetStepSize(val);
-  this->LODPainter->SetStepSize(twiceVal);
-#else
   this->SurfaceLICMapper->GetLICInterface()->SetStepSize(val);
   this->SurfaceLICLODMapper->GetLICInterface()->SetStepSize(twiceVal);
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkSurfaceLICRepresentation::SetNumberOfSteps(int val)
 {
-#ifndef VTKGL2
-  this->Painter->SetNumberOfSteps(val);
-#else
   this->SurfaceLICMapper->SetNumberOfSteps(val);
-#endif
 
   // when interacting take half the number of steps at twice the
   // step size.
@@ -181,20 +127,14 @@ void vtkSurfaceLICRepresentation::SetNumberOfSteps(int val)
   {
     halfVal = 1;
   }
-#ifndef VTKGL2
-  this->LODPainter->GetLICInterface()->SetNumberOfSteps(halfVal);
-#else
   this->SurfaceLICLODMapper->GetLICInterface()->SetNumberOfSteps(halfVal);
-#endif
 }
 
 //----------------------------------------------------------------------------
 #define vtkSurfaceLICRepresentationPassParameterMacro(_name, _type)                                \
   void vtkSurfaceLICRepresentation::Set##_name(_type val)                                          \
   {                                                                                                \
-    #ifndef VTKGL2 this->Painter->Set##_name(val);                                                 \
-    #else this->SurfaceLICMapper->GetLICInterface()->Set##_name(val);                              \
-    #endif                                                                                         \
+    this->SurfaceLICMapper->GetLICInterface()->Set##_name(val);                                    \
   }
 vtkSurfaceLICRepresentationPassParameterMacro(
   EnhancedLIC, int) vtkSurfaceLICRepresentationPassParameterMacro(EnhanceContrast,
@@ -206,21 +146,12 @@ vtkSurfaceLICRepresentationPassParameterMacro(
 #endif
 
 //----------------------------------------------------------------------------
-#ifndef VTKGL2
-#define vtkSurfaceLICRepresentationPassParameterWithLODMacro(_name, _type)                         \
-  void vtkSurfaceLICRepresentation::Set##_name(_type val)                                          \
-  {                                                                                                \
-    this->Painter->Set##_name(val);                                                                \
-    this->LODPainter->Set##_name(val);                                                             \
-  }
-#else
 #define vtkSurfaceLICRepresentationPassParameterWithLODMacro(_name, _type)                         \
   void vtkSurfaceLICRepresentation::Set##_name(_type val)                                          \
   {                                                                                                \
     this->SurfaceLICMapper->GetLICInterface()->Set##_name(val);                                    \
     this->SurfaceLICLODMapper->GetLICInterface()->Set##_name(val);                                 \
   }
-#endif
 
 #if !defined(vtkSurfaceLICRepresentationFASTLOD)
   vtkSurfaceLICRepresentationPassParameterWithLODMacro(
@@ -262,16 +193,8 @@ vtkSurfaceLICRepresentationPassParameterMacro(
   void vtkSurfaceLICRepresentation::SelectInputVectors(
     int a, int b, int c, int attributeMode, const char* name)
 {
-#ifndef VTKGL2
-  (void)a;
-  (void)b;
-  (void)c;
-  this->Painter->SetInputArrayToProcess(attributeMode, name);
-  this->LODPainter->SetInputArrayToProcess(attributeMode, name);
-#else
   this->SurfaceLICMapper->SetInputArrayToProcess(a, b, c, attributeMode, name);
   this->SurfaceLICLODMapper->SetInputArrayToProcess(a, b, c, attributeMode, name);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -280,11 +203,7 @@ void vtkSurfaceLICRepresentation::WriteTimerLog(const char* fileName)
 #if !defined(vtkSurfaceLICPainterTIME) && !defined(vtkLineIntegralConvolution2DTIME)
   (void)fileName;
 #else
-#ifndef VTKGL2
-  this->Painter->WriteTimerLog(fileName);
-#else
   this->SurfaceLICMapper->WriteTimerLog(fileName);
-#endif
 #endif
 }
 

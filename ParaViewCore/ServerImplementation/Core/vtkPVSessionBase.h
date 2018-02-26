@@ -60,7 +60,7 @@ public:
    * DATA_SERVER | RENDER_SERVER. The implementation provided is suitable for
    * server processes such as pvserver, pvdataserver (both root and satellites).
    */
-  virtual ServerFlags GetProcessRoles() VTK_OVERRIDE;
+  ServerFlags GetProcessRoles() VTK_OVERRIDE;
 
   /**
    * vtkPVServerInformation is an information-object that provides information
@@ -70,13 +70,13 @@ public:
    * Overridden to provide support for non-remote-server case. We simply read
    * the local process information and return it.
    */
-  virtual vtkPVServerInformation* GetServerInformation() VTK_OVERRIDE;
+  vtkPVServerInformation* GetServerInformation() VTK_OVERRIDE;
 
   /**
    * This is socket connection, if any to communicate between the data-server
    * and render-server nodes. Forwarded for vtkPVSessionCore.
    */
-  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection() VTK_OVERRIDE;
+  vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection() VTK_OVERRIDE;
 
   //---------------------------------------------------------------------------
   // Remote communication API. This API is used for communication in the
@@ -173,7 +173,7 @@ public:
 
   /**
    * Allow the user to fill its vtkCollection with all RemoteObject
-   * This could be usefull when you want to hold a reference to them to
+   * This could be useful when you want to hold a reference to them to
    * prevent any deletion across several method call.
    */
   virtual void GetAllRemoteObjects(vtkCollection* collection);
@@ -185,7 +185,7 @@ public:
   /**
    * Provides the next available identifier. This implementation works locally.
    * without any code distribution. To support the distributed architecture
-   * the vtkSMSessionClient overide those method to call them on the DATA_SERVER
+   * the vtkSMSessionClient override those method to call them on the DATA_SERVER
    * vtkPVSessionBase instance.
    */
   virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier();
@@ -199,7 +199,7 @@ public:
   virtual vtkTypeUInt32 GetNextChunkGlobalUniqueIdentifier(vtkTypeUInt32 chunkSize);
 
   /**
-   * This propertie is used to discard ignore_synchronization proxy property
+   * This property is used to discard ignore_synchronization proxy property
    * when we load protobuf states.
    * Therefore, if we load any camera state while that property is true, this
    * won't affect the proxy/property state at all. It will simply remain the same.
@@ -214,7 +214,7 @@ public:
 protected:
   vtkPVSessionBase();
   vtkPVSessionBase(vtkPVSessionCore* coreToUse);
-  ~vtkPVSessionBase();
+  ~vtkPVSessionBase() override;
 
   //@{
   /**
@@ -230,8 +230,8 @@ protected:
    * Should be called to begin/end receiving progresses on this session.
    * Overridden to relay to the server(s).
    */
-  virtual void PrepareProgressInternal() VTK_OVERRIDE;
-  virtual void CleanupPendingProgressInternal() VTK_OVERRIDE;
+  void PrepareProgressInternal() VTK_OVERRIDE;
+  void CleanupPendingProgressInternal() VTK_OVERRIDE;
   //@}
 
   friend class vtkSMRemoteObject;
@@ -242,7 +242,7 @@ protected:
   /**
    * Methods used to monitor if we are currently processing a server notification
    * Only vtkSMSessionClient use the flag to disable ignore_synchronization
-   * properties from beeing updated.
+   * properties from being updated.
    */
   virtual bool StartProcessingRemoteNotification();
   virtual void StopProcessingRemoteNotification(bool previousValue);
@@ -262,8 +262,8 @@ protected:
   vtkPVSessionCore* SessionCore;
 
 private:
-  vtkPVSessionBase(const vtkPVSessionBase&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSessionBase&) VTK_DELETE_FUNCTION;
+  vtkPVSessionBase(const vtkPVSessionBase&) = delete;
+  void operator=(const vtkPVSessionBase&) = delete;
 
   // Shared constructor method
   void InitSessionBase(vtkPVSessionCore* coreToUse);

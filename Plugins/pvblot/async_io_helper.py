@@ -103,7 +103,7 @@ class _helper(object):
 # You can call start_prompt(helper, locals()) to an interpreter that mimics
 # the standard python prompt but allows you to call asynchronous IO methods
 # that use the helper passed to start_prompt.  You can use this for testing
-# or from a gui with embeded python.
+# or from a gui with embedded python.
 #
 
 import cmd

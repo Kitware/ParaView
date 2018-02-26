@@ -96,7 +96,7 @@ class vtkznzlib : public vtkObject
 public:
   static vtkznzlib *New();
   vtkTypeMacro(vtkznzlib,vtkObject);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 static znzFile znzopen(const char *path, const char *mode, int use_compression);
 
@@ -124,15 +124,15 @@ static int znzgetc(znzFile file);
 
 protected:
   vtkznzlib();
-  ~vtkznzlib();
+  ~vtkznzlib() override;
 
 static int znzflush(znzFile file);
 static int znzeof(znzFile file);
 
 
 private:
-  vtkznzlib(const vtkznzlib&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkznzlib&) VTK_DELETE_FUNCTION;
+  vtkznzlib(const vtkznzlib&) = delete;
+  void operator=(const vtkznzlib&) = delete;
 
 };
 

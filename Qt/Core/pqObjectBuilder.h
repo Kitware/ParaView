@@ -72,7 +72,7 @@ class PQCORE_EXPORT pqObjectBuilder : public QObject
 
 public:
   pqObjectBuilder(QObject* parent = 0);
-  virtual ~pqObjectBuilder();
+  ~pqObjectBuilder() override;
 
   /**
   * Create a server connection give a server resource.
@@ -222,7 +222,18 @@ public:
   /**
   * Returns true while pqObjectBuilder is in createServer() call.
   */
-  bool waitingForConnection() const { return this->WaitingForConnection; }
+  bool waitingForConnection() const
+  {
+    return this->ForceWaitingForConnection ? true : this->WaitingForConnection;
+  }
+
+  /**
+  * Set ForceWaitingForConnection
+  * When set to true, WaitingForConnection() will always return true
+  * When set to false, no effect.
+  * Returns the previous state
+  */
+  bool forceWaitingForConnection(bool force);
 
 public slots:
   /**
@@ -344,6 +355,7 @@ protected:
 private:
   Q_DISABLE_COPY(pqObjectBuilder)
 
+  bool ForceWaitingForConnection;
   bool WaitingForConnection;
 };
 

@@ -157,6 +157,11 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
             traceitem.finalize()
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+        trace.append_separated([\
+            "# ----------------------------------------------------------------",
+            "# restore active view",
+            "SetActiveView(%s)" % smtrace.Trace.get_accessor(simple.GetActiveView()),
+            "# ----------------------------------------------------------------"])
 
     #--------------------------------------------------------------------------
     # Next, trace data processing pipelines.
@@ -172,22 +177,6 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
             traceitem = smtrace.RegisterPipelineProxy(source)
             traceitem.finalize()
             del traceitem
-        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
-
-    #--------------------------------------------------------------------------
-    # Now, trace the transfer functions (color maps and opacity maps) used.
-    ctfs = set([x for x in proxies_of_interest \
-        if smtrace.Trace.get_registered_name(x, "lookup_tables")])
-    if ctfs:
-        trace.append_separated([\
-            "# ----------------------------------------------------------------",
-            "# setup color maps and opacity mapes used in the visualization",
-            "# note: the Get..() functions create a new object, if needed",
-            "# ----------------------------------------------------------------"])
-        for ctf in ctfs:
-            smtrace.Trace.get_accessor(ctf)
-            if ctf.ScalarOpacityFunction in proxies_of_interest:
-                smtrace.Trace.get_accessor(ctf.ScalarOpacityFunction)
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     #--------------------------------------------------------------------------
@@ -220,6 +209,29 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
                     del traceitem
                     trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
+                    if rep.UseSeparateColorMap:
+                        trace.append_separated([\
+                            "# set separate color map",
+                            "%s.UseSeparateColorMap = True" % (\
+                                smtrace.Trace.get_accessor(rep))])
+
+                except AttributeError: pass
+            # save the scalar bar properties themselves.
+            if view_scalarbars:
+                trace.append_separated("# setup the color legend parameters for each legend in this view")
+                for rep in view_scalarbars:
+                    smtrace.Trace.get_accessor(rep)
+                    trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+                    trace.append_separated([\
+                      "# set color bar visibility", "%s.Visibility = %s" % (\
+                    smtrace.Trace.get_accessor(rep), rep.Visibility)])
+
+
+            for rep in view_representations:
+                try:
+                    producer = rep.Input
+                    port = rep.Input.Port
+
                     if rep.IsScalarBarVisible(view):
                         # FIXME: this will save this multiple times, right now,
                         # if two representations use the same LUT.
@@ -228,13 +240,30 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
                             "%s.SetScalarBarVisibility(%s, True)" % (\
                                 smtrace.Trace.get_accessor(rep),
                                 smtrace.Trace.get_accessor(view))])
+
+                    if not rep.Visibility:
+                      traceitem = smtrace.Hide(producer, port, view)
+                      traceitem.finalize()
+                      del traceitem
+                      trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+
                 except AttributeError: pass
-            # save the scalar bar properties themselves.
-            if view_scalarbars:
-                trace.append_separated("# setup the color legend parameters for each legend in this view")
-                for rep in view_scalarbars:
-                    smtrace.Trace.get_accessor(rep)
-            trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+
+    #--------------------------------------------------------------------------
+    # Now, trace the transfer functions (color maps and opacity maps) used.
+    ctfs = set([x for x in proxies_of_interest \
+        if smtrace.Trace.get_registered_name(x, "lookup_tables")])
+    if ctfs:
+        trace.append_separated([\
+            "# ----------------------------------------------------------------",
+            "# setup color maps and opacity mapes used in the visualization",
+            "# note: the Get..() functions create a new object, if needed",
+            "# ----------------------------------------------------------------"])
+        for ctf in ctfs:
+            smtrace.Trace.get_accessor(ctf)
+            if ctf.ScalarOpacityFunction in proxies_of_interest:
+                smtrace.Trace.get_accessor(ctf.ScalarOpacityFunction)
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
 
     # restore the active source since the order in which the pipeline is created
     # in the state file can end up changing the active source to be different

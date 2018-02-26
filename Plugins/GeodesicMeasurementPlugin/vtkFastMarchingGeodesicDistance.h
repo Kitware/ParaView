@@ -47,7 +47,7 @@
 //
 // .SECTION Exclusion Regions
 // Optionally, an exclusion region may be specified. Vertices with ids that
-// are in the exclusion list are ommitted from inclusion in the fast marching
+// are in the exclusion list are omitted from inclusion in the fast marching
 // front. This can be used to prevent fast from bleeding into certain regions
 // by supplying the point ids of the region boundary/boundaries. Conversely, it
 // can be used to confine fast marching to a specific region.
@@ -113,14 +113,14 @@ public:
 
   // Description:
   // Optionally stopping criteria may be specified. This method may be used to
-  // stop fast marching when a specifc destination vertex (or vertices) have
+  // stop fast marching when a specific destination vertex (or vertices) have
   // been reached. The default is to have no stopping criteria.
   virtual void SetDestinationVertexStopCriterion(vtkIdList* vertices);
   vtkGetObjectMacro(DestinationVertexStopCriterion, vtkIdList);
 
   // Description:
   // Optionally, an exclusion region may be specified. Vertices with ids that
-  // are in the exclusion list are ommitted from inclusion in the fast marching
+  // are in the exclusion list are omitted from inclusion in the fast marching
   // front. This can be used to prevent fast from bleeding into certain regions
   // by supplying the point ids of the region boundary/boundaries.
   virtual void SetExclusionPointIds(vtkIdList* vertices);
@@ -147,10 +147,9 @@ public:
 
 protected:
   vtkFastMarchingGeodesicDistance();
-  ~vtkFastMarchingGeodesicDistance();
+  ~vtkFastMarchingGeodesicDistance() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Create GW_GeodesicMesh given an instance of a vtkPolyData
   void SetupGeodesicMesh(vtkPolyData* in);
@@ -159,7 +158,7 @@ protected:
   void SetupCallbacks();
 
   // Do the fast marching
-  virtual int Compute() VTK_OVERRIDE;
+  int Compute() VTK_OVERRIDE;
 
   // Add the seeds
   virtual void AddSeedsInternal();
@@ -206,8 +205,8 @@ protected:
   unsigned long IterationIndex;
 
 private:
-  vtkFastMarchingGeodesicDistance(const vtkFastMarchingGeodesicDistance&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFastMarchingGeodesicDistance&) VTK_DELETE_FUNCTION;
+  vtkFastMarchingGeodesicDistance(const vtkFastMarchingGeodesicDistance&) = delete;
+  void operator=(const vtkFastMarchingGeodesicDistance&) = delete;
 };
 
 #endif

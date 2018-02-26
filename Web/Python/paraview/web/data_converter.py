@@ -1,7 +1,10 @@
-from vtk import *
+from vtkmodules.vtkIOImage import vtkPNGReader
+from vtkmodules.vtkCommonCore import vtkFloatArray, vtkUnsignedCharArray
+from vtkmodules.vtkCommonDataModel import vtkImageData
+from vtkmodules.vtkIOLegacy import vtkDataSetWriter
 
-from vtk.web.camera import *
-from vtk.web import iteritems, buffer
+from vtkmodules.web.camera import *
+from vtkmodules.web import iteritems, buffer
 
 import json, os, math, gzip, shutil, array
 

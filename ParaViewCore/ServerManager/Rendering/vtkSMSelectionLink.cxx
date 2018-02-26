@@ -43,9 +43,9 @@ public:
     this->Link = 0;
     this->InProgress = false;
   }
-  ~vtkSMSelectionLinkObserver() { this->Link = 0; }
+  ~vtkSMSelectionLinkObserver() override { this->Link = 0; }
 
-  virtual void Execute(vtkObject* c, unsigned long event, void* port)
+  void Execute(vtkObject* c, unsigned long event, void* port) override
   {
     if (this->InProgress)
     {

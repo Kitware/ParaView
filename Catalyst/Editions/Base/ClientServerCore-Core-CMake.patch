@@ -10,12 +10,11 @@ index 4f283bd..f05aa2b 100644
    vtkProcessModuleAutoMPI.cxx
    vtkProcessModule.cxx
    vtkPVAlgorithmPortsInformation.cxx
-@@ -48,8 +47,6 @@ set (Module_SRCS
+@@ -48,7 +47,6 @@ set (Module_SRCS
    vtkPVDataSizeInformation.cxx
    vtkPVDisableStackTraceSignalHandler.cxx
    vtkPVEnableStackTraceSignalHandler.cxx
 -  vtkPVExtractSelection.cxx
--  vtkPVExtractArraysOverTime.cxx
    vtkPVFileInformationHelper.cxx
    vtkPVGenericAttributeInformation.cxx
    vtkPVInformation.cxx
@@ -28,6 +27,6 @@ index f17c4df..f0db074 100644
    DEPENDS
 -    vtkFiltersExtraction
 -    vtkFiltersParallel
-     # Explicitely list (rather than transiently through
-     # vtkPVVTKExtensionsCore) because it allows us to turn of wrapping
-     # of vtkPVVTKExtensionsCore off but still satisfy API dependcy.
+     # Explicitly list (rather than transiently through
+     # vtkPVVTKExtensionsCore) because it allows us to turn wrapping
+     # of vtkPVVTKExtensionsCore off but still satisfy API dependency.

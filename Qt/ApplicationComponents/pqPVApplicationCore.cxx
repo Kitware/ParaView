@@ -60,10 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QShortcut>
 
-#if !defined(VTK_LEGACY_REMOVE)
-#include "pqSaveAnimationReaction.h"
-#endif
-
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* options)
   : Superclass(argc, argv, options)
@@ -86,9 +82,6 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* opti
 
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
     this->AnimationManager, SLOT(onActiveServerChanged(pqServer*)));
-
-  this->connect(this->AnimationManager, SIGNAL(deprecatedSaveAnimationCalled()),
-    SLOT(deprecatedSaveAnimationCalled()));
 }
 
 //-----------------------------------------------------------------------------
@@ -212,13 +205,16 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
       QList<QString> files;
       files.append(fileEvent->file());
 
-      // By default we always update the options
-      this->Options->SetParaViewDataName(files[0].toLocal8Bit().data());
-
       // If the application is already started just load the data
       if (vtkProcessModule::GetProcessModule()->GetSession())
       {
         pqLoadDataReaction::loadData(files);
+      }
+      else
+      {
+        // If the application has not yet started, treat it as a --data argument
+        // to be processed after the application starts.
+        this->Options->SetParaViewDataName(files[0].toLocal8Bit().data());
       }
     }
     return false;
@@ -246,13 +242,5 @@ void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqSer
   (void)filename;
   (void)server;
   qCritical() << "Cannot load a python state file since ParaView was not built with Python.";
-#endif
-}
-
-//-----------------------------------------------------------------------------
-void pqPVApplicationCore::deprecatedSaveAnimationCalled()
-{
-#if !defined(VTK_LEGACY_REMOVE)
-  pqSaveAnimationReaction::saveAnimation();
 #endif
 }

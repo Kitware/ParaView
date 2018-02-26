@@ -66,7 +66,7 @@ class PQCORE_EXPORT pqServer : public pqServerManagerModelItem
   Q_OBJECT
 public:
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
-  virtual ~pqServer();
+  ~pqServer() override;
 
   const pqServerResource& getResource();
   void setResource(const pqServerResource& server_resource);
@@ -165,6 +165,11 @@ public:
   */
   void setMonitorServerNotifications(bool);
 
+  /**
+   * Get the server remaining life time in minutes.
+   */
+  int getRemainingLifeTime() const;
+
 signals:
   /**
   * Fired when the name of the proxy is changed.
@@ -239,6 +244,11 @@ protected slots:
   * Called to send a heartbeat to the server.
   */
   void heartBeat();
+
+  /**
+   * Called to update the server life time.
+   */
+  void updateRemainingLifeTime();
 
   /**
   * Called when idle to look for server notification for collaboration purpose

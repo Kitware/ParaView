@@ -37,7 +37,7 @@ static int class_is_wrapped(const char* classname)
     if (entry)
     {
       /* only allow non-excluded vtkObjects as args */
-      if (vtkParseHierarchy_GetProperty(entry, "WRAP_EXCLUDE") ||
+      if (vtkParseHierarchy_GetProperty(entry, "WRAP_EXCLUDE_PYTHON") ||
         !vtkParseHierarchy_IsTypeOf(hierarchyInfo, entry, "vtkObjectBase"))
       {
         return 0;
@@ -165,7 +165,7 @@ void output_temp(FILE* fp, int i, unsigned int argType, const char* Id, int coun
     return;
   }
 
-  /* handle array arguements */
+  /* handle array arguments */
   if (count > 1)
   {
     fprintf(fp, "temp%i[%i];\n", i, count);
@@ -572,7 +572,7 @@ typedef struct _NewClassInfo
 int notWrappable(FunctionInfo* curFunction)
 {
   return (curFunction->IsOperator || curFunction->ArrayFailure || !curFunction->IsPublic ||
-    !curFunction->Name);
+    !curFunction->Name || curFunction->Template);
 }
 
 //--------------------------------------------------------------------------nix
@@ -753,7 +753,7 @@ int managableArguments(FunctionInfo* curFunction)
     args_ok = 0;
   }
 
-  /* watch out for functions that dont have enough info */
+  /* watch out for functions that don't have enough info */
   if ((returnType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
   {
     switch (returnType & VTK_PARSE_BASE_TYPE)
@@ -1107,6 +1107,30 @@ int extractOtherClassesUsed(NewClassInfo* data, const char* classes[])
  * @param fp file to write into
  * @param data data which will be used to write into file
  */
+void output_DummyInitFunction(FILE* fp, const char* filename)
+{
+  char* basename = strrchr(filename, '/');
+  char* basename_dup = strdup(basename + 1);
+  *strchr(basename_dup, '.') = '\0';
+  fprintf(fp, "#include \"vtkSystemIncludes.h\"\n"
+              "#include \"vtkClientServerInterpreter.h\"\n"
+              "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* /*csi*/)\n"
+              "{\n"
+              "}\n",
+    basename_dup);
+  free(basename_dup);
+}
+
+//--------------------------------------------------------------------------nix
+/*
+ * outputs the "Object"_Init(vtkClientServerInterpreter*csi) file. This is
+ * used to register and initialize the classes and their dependent objects
+ * to the ClientServerInterpreter. Dependent objects include superclasses
+ * Objects passed as parameters and object types returned.
+ *
+ * @param fp file to write into
+ * @param data data which will be used to write into file
+ */
 void output_InitFunction(FILE* fp, NewClassInfo* data)
 {
   fprintf(fp, "\n");
@@ -1174,11 +1198,20 @@ int main(int argc, char* argv[])
   NewClassInfo* classData;
   int i;
 
+  /* pre-define a macro to identify the language */
+  vtkParse_DefineMacro("__VTK_WRAP_CLIENTSERVER__", 0);
+
   /* get command-line args and parse the header file */
   fileInfo = vtkParse_Main(argc, argv);
 
   /* get the command-line options */
   options = vtkParse_GetCommandLineOptions();
+
+  /* get the hierarchy info for accurate typing */
+  if (options->HierarchyFileName)
+  {
+    hierarchyInfo = vtkParseHierarchy_ReadFile(options->HierarchyFileName);
+  }
 
   /* get the output file */
   fp = fopen(options->OutputFileName, "w");
@@ -1245,21 +1278,41 @@ int main(int argc, char* argv[])
 
   if (!data)
   {
+    output_DummyInitFunction(fp, fileInfo->FileName);
     fclose(fp);
-    exit(1);
+    exit(0);
   }
 
-  /* get the hierarchy info for accurate typing */
-  if (options->HierarchyFileName)
+  if (data->Template)
   {
-    hierarchyInfo = vtkParseHierarchy_ReadFile(options->HierarchyFileName);
-    if (hierarchyInfo)
-    {
-      /* resolve using declarations within the header files */
-      vtkWrap_ApplyUsingDeclarations(data, fileInfo, hierarchyInfo);
+    output_DummyInitFunction(fp, fileInfo->FileName);
+    fclose(fp);
+    exit(0);
+  }
 
-      /* expand typedefs */
-      vtkWrap_ExpandTypedefs(data, fileInfo, hierarchyInfo);
+  for (i = 0; i < data->NumberOfSuperClasses; ++i)
+  {
+    if (strchr(data->SuperClasses[i], '<'))
+    {
+      output_DummyInitFunction(fp, fileInfo->FileName);
+      fclose(fp);
+      exit(0);
+    }
+  }
+
+  if (hierarchyInfo)
+  {
+    /* resolve using declarations within the header files */
+    vtkWrap_ApplyUsingDeclarations(data, fileInfo, hierarchyInfo);
+
+    /* expand typedefs */
+    vtkWrap_ExpandTypedefs(data, fileInfo, hierarchyInfo);
+
+    if (!vtkWrap_IsTypeOf(hierarchyInfo, data->Name, "vtkObjectBase"))
+    {
+      output_DummyInitFunction(fp, fileInfo->FileName);
+      fclose(fp);
+      exit(0);
     }
   }
 

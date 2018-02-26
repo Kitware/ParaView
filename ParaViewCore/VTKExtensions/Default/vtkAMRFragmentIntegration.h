@@ -46,13 +46,12 @@ public:
 
 protected:
   vtkAMRFragmentIntegration();
-  virtual ~vtkAMRFragmentIntegration();
+  ~vtkAMRFragmentIntegration() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Pipeline helper.  Run on each material independently.
@@ -62,8 +61,8 @@ protected:
     std::vector<std::string> massWeightedNames);
 
 private:
-  vtkAMRFragmentIntegration(const vtkAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRFragmentIntegration&) VTK_DELETE_FUNCTION;
+  vtkAMRFragmentIntegration(const vtkAMRFragmentIntegration&) = delete;
+  void operator=(const vtkAMRFragmentIntegration&) = delete;
 };
 
 #endif /* vtkAMRFragmentIntegration_h */

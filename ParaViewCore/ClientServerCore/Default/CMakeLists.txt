@@ -37,6 +37,7 @@ endif()
 
 set (Module_SRCS
   vtkNetworkImageSource.cxx
+  vtkPVCatalystChannelInformation.cxx
   vtkPVEnsembleDataReaderInformation.cxx
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx
@@ -50,8 +51,6 @@ if (APPLE)
   set_source_files_properties(
     vtkPVMacFileInformationHelper
     PROPERTIES
-      WRAP_EXCLUDE 1
-      WRAP_EXCLUDE_PYTHON 1
       SKIP_HEADER_INSTALL 1
   )
 endif()
@@ -63,10 +62,6 @@ if (PARAVIEW_ENABLE_PYTHON)
     vtkAnnotateAttributeDataFilter.cxx
     )
 endif()
-
-set_source_files_properties(
-  vtkNetworkAccessManager
-  ABSTRACT)
 
 vtk_module_library(vtkPVClientServerCoreDefault ${Module_SRCS})
 

@@ -131,7 +131,7 @@ public:
 
 protected:
   vtkCinemaLayerMapper();
-  ~vtkCinemaLayerMapper();
+  ~vtkCinemaLayerMapper() override;
 
   bool ScalarVisibility;
   vtkScalarsToColors* LookupTable;
@@ -146,8 +146,8 @@ protected:
   bool RenderLayersAsImage;
 
 private:
-  vtkCinemaLayerMapper(const vtkCinemaLayerMapper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCinemaLayerMapper&) VTK_DELETE_FUNCTION;
+  vtkCinemaLayerMapper(const vtkCinemaLayerMapper&) = delete;
+  void operator=(const vtkCinemaLayerMapper&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

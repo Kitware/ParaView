@@ -54,7 +54,7 @@ public:
   * pqActiveObjects automatically.
   */
   pqScalarBarVisibilityReaction(QAction* parent, bool track_active_objects = true);
-  virtual ~pqScalarBarVisibilityReaction();
+  ~pqScalarBarVisibilityReaction() override;
 
   /**
   * Returns the representation currently being used by the reaction.
@@ -82,13 +82,13 @@ protected slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { this->setScalarBarVisibility(this->parentAction()->isChecked()); }
+  void onTriggered() override { this->setScalarBarVisibility(this->parentAction()->isChecked()); }
 
 private:
   Q_DISABLE_COPY(pqScalarBarVisibilityReaction)

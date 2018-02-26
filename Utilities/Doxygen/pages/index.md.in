@@ -18,6 +18,7 @@ Page | Description
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.
 [Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
 [Community Admosphere Model (CAM5) Catalyst Adaptor](@ref Cam5Adaptor) | Analyze Cam5 output with ParaView Catalyst.
+[ParaView and Offscreen Rendering](@ref Offscreen) | Configuring and using ParaView in offscreen and/or headless environments.
 
 Design/Implementation Details
 -----------------------------
@@ -26,6 +27,7 @@ Page | Description
 -----|---------------------------------------------------------------
 [Slice View](@ref DesignSliceView) | Implementing the **Slice View**
 [String Encoding](@ref DesignStringEncoding) | How to encode string when developing for ParaView
+[Subset Inclusion Lattice](@ref SubsetInclusionLattice) | Selecting blocks to read or process
 
 Developer notes
 ----------------

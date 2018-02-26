@@ -143,7 +143,7 @@ public:
    * overrides, we must keep such overrides to a minimal and opting for domains
    * that set appropriate defaults where as much as possible.
    */
-  virtual bool RegisterRepresentationProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
+  bool RegisterRepresentationProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
 
   /**
    * Control how scalar bar visibility is updated by the Hide call.
@@ -161,26 +161,16 @@ public:
   static bool GetInheritRepresentationProperties();
   //@}
 
-  //@{
-  /*
-   * @deprecated since ParaView 5.4. Use vtkSMSaveScreenshotProxy instead.
-   */
-  VTK_LEGACY(virtual bool WriteImage(
-    vtkSMViewProxy* view, const char* filename, int magnification, int quality) VTK_FINAL);
-  VTK_LEGACY(virtual bool WriteImage(
-    vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality) VTK_FINAL);
-  //@}
-
   /**
    * Overridden to handle default ColorArrayName for representations correctly.
    */
-  virtual bool PostInitializeProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
+  bool PostInitializeProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
 
   //@{
   /**
    * Overridden to place the view in a layout on creation.
    */
-  virtual bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname) VTK_OVERRIDE;
+  bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname) VTK_OVERRIDE;
   using Superclass::RegisterViewProxy;
   //@}
 
@@ -191,7 +181,7 @@ public:
 
 protected:
   vtkSMParaViewPipelineControllerWithRendering();
-  ~vtkSMParaViewPipelineControllerWithRendering();
+  ~vtkSMParaViewPipelineControllerWithRendering() override;
 
   virtual void UpdatePipelineBeforeDisplay(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
@@ -203,10 +193,15 @@ protected:
   virtual bool AlsoShowInCurrentView(
     vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* currentView);
 
+  /**
+   * Overridden here where the library has link access to rendering classes.
+   */
+  virtual void DoMaterialSetup(vtkSMProxy* proxy) override;
+
 private:
   vtkSMParaViewPipelineControllerWithRendering(
-    const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMParaViewPipelineControllerWithRendering&) VTK_DELETE_FUNCTION;
+    const vtkSMParaViewPipelineControllerWithRendering&) = delete;
+  void operator=(const vtkSMParaViewPipelineControllerWithRendering&) = delete;
   static bool HideScalarBarOnHide;
   static bool InheritRepresentationProperties;
 };

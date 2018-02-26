@@ -41,7 +41,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVScalarBarRepresentation
   : public vtkScalarBarRepresentation
 {
 public:
-  vtkTypeMacro(vtkPVScalarBarRepresentation, vtkScalarBarRepresentation) virtual void PrintSelf(
+  vtkTypeMacro(vtkPVScalarBarRepresentation, vtkScalarBarRepresentation) void PrintSelf(
     ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkPVScalarBarRepresentation* New();
 
@@ -76,17 +76,17 @@ public:
    * Override to obtain viewport size and potentially adjust placement
    * of the representation.
    */
-  virtual int RenderOverlay(vtkViewport*) VTK_OVERRIDE;
+  int RenderOverlay(vtkViewport*) VTK_OVERRIDE;
 
 protected:
   vtkPVScalarBarRepresentation();
-  virtual ~vtkPVScalarBarRepresentation();
+  ~vtkPVScalarBarRepresentation() override;
 
   int WindowLocation;
 
 private:
-  vtkPVScalarBarRepresentation(const vtkPVScalarBarRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVScalarBarRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVScalarBarRepresentation(const vtkPVScalarBarRepresentation&) = delete;
+  void operator=(const vtkPVScalarBarRepresentation&) = delete;
 };
 
 #endif // vtkPVScalarBarRepresentation

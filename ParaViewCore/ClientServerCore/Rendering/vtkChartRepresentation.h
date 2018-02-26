@@ -60,7 +60,7 @@ public:
   /**
    * Set visibility of the representation.
    */
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -68,7 +68,7 @@ public:
    * have any real-input on the client side which messes with the Update
    * requests.
    */
-  virtual void MarkModified() VTK_OVERRIDE;
+  void MarkModified() VTK_OVERRIDE;
 
   // *************************************************************************
 
@@ -91,8 +91,7 @@ public:
    * Override because of internal selection representations that need to be
    * initialized as well.
    */
-  virtual unsigned int Initialize(
-    unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
+  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -101,7 +100,7 @@ public:
    * PrepareForRendering.
    * Overridden to handle REQUEST_RENDER() to call PrepareForRendering.
    */
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
   /**
@@ -159,12 +158,12 @@ public:
 
 protected:
   vtkChartRepresentation();
-  ~vtkChartRepresentation();
+  ~vtkChartRepresentation() override;
 
   /**
    * Fill input port information.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * This method is called before actual render if this->MTime was modified
@@ -188,27 +187,26 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
-  virtual bool IsCached(double cache_key) VTK_OVERRIDE;
+  bool IsCached(double cache_key) VTK_OVERRIDE;
 
   /**
    * Convenience method to get the first vtkTable from LocalOutput, if any.
@@ -216,7 +214,7 @@ protected:
   vtkTable* GetLocalOutput();
 
   /**
-   * Method to be overrided to transform input data to a vtkTable.
+   * Method to be overridden to transform input data to a vtkTable.
    * The default implementation just returns the data object provided in parameter.
    */
   virtual vtkDataObject* TransformInputData(
@@ -249,8 +247,8 @@ protected:
   vtkWeakPointer<vtkChartSelectionRepresentation> SelectionRepresentation;
 
 private:
-  vtkChartRepresentation(const vtkChartRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkChartRepresentation&) VTK_DELETE_FUNCTION;
+  vtkChartRepresentation(const vtkChartRepresentation&) = delete;
+  void operator=(const vtkChartRepresentation&) = delete;
 
   vtkTimeStamp PrepareForRenderingTime;
   vtkSmartPointer<vtkChartSelectionRepresentation> DummyRepresentation;

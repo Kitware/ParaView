@@ -67,10 +67,10 @@ public:
 
 protected:
   vtkExtractSelectionRange();
-  ~vtkExtractSelectionRange();
+  ~vtkExtractSelectionRange() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int FieldType;
@@ -79,8 +79,8 @@ protected:
   double Range[2];
 
 private:
-  vtkExtractSelectionRange(const vtkExtractSelectionRange&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkExtractSelectionRange&) VTK_DELETE_FUNCTION;
+  vtkExtractSelectionRange(const vtkExtractSelectionRange&) = delete;
+  void operator=(const vtkExtractSelectionRange&) = delete;
 };
 
 #endif

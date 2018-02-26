@@ -34,17 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 
@@ -422,50 +419,3 @@ void pqView::onEndRender()
   emit this->endRender();
   END_UNDO_EXCLUDE();
 }
-
-//=================================================================================
-// LEGACY METHODS
-//=================================================================================
-#if !defined(VTK_LEGACY_REMOVE)
-vtkImageData* pqView::captureImage(int magnification)
-{
-  VTK_LEGACY_BODY(pqView::captureImage, "ParaView 5.4");
-
-  QSize mysize = this->getSize();
-  vtkSmartPointer<vtkImageData> img = vtkSMSaveScreenshotProxy::CaptureImage(this->getViewProxy(),
-    vtkVector2i(mysize.width() * magnification, mysize.height() * magnification));
-  if (img)
-  {
-    img->Register(nullptr);
-    return img;
-  }
-  return nullptr;
-}
-vtkImageData* pqView::captureImage(const QSize& asize)
-{
-  VTK_LEGACY_BODY(pqView::captureImage, "ParaView 5.4");
-  vtkSmartPointer<vtkImageData> img = vtkSMSaveScreenshotProxy::CaptureImage(
-    this->getViewProxy(), vtkVector2i(asize.width(), asize.height()));
-  if (img)
-  {
-    img->Register(nullptr);
-    return img;
-  }
-  return nullptr;
-}
-
-bool pqView::writeImage(const QString& filename, const QSize& asize, int quality)
-{
-  VTK_LEGACY_BODY(pqView::writeImage, "ParaView 5.4");
-  vtkSmartPointer<vtkImageData> img = vtkSMSaveScreenshotProxy::CaptureImage(
-    this->getViewProxy(), vtkVector2i(asize.width(), asize.height()));
-  if (img)
-  {
-    return vtkSMUtilities::SaveImage(img.GetPointer(), filename.toLocal8Bit().data(), quality) ==
-      vtkErrorCode::NoError;
-  }
-  return false;
-}
-
-#endif // !defined(VTK_LEGACY_REMOVE)
-//=================================================================================

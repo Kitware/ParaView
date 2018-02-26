@@ -147,8 +147,13 @@ void pqProxySILModel::onCheckStatusChanged()
 }
 
 //-----------------------------------------------------------------------------
-QVariant pqProxySILModel::headerData(int, Qt::Orientation, int role /*= Qt::DisplayRole*/) const
+QVariant pqProxySILModel::headerData(
+  int section, Qt::Orientation, int role /*= Qt::DisplayRole*/) const
 {
+  if (section == (this->columnCount() - 1))
+  {
+    return QVariant();
+  }
   if (this->noCheckBoxes && (role == Qt::DecorationRole || role == Qt::CheckStateRole))
   {
     return QVariant();
@@ -190,6 +195,18 @@ QVariant pqProxySILModel::headerData(int, Qt::Orientation, int role /*= Qt::Disp
 //-----------------------------------------------------------------------------
 QVariant pqProxySILModel::data(const QModelIndex& proxyIndex, int role) const
 {
+  if (proxyIndex.column() == (this->columnCount() - 1))
+  {
+    if (role == Qt::DisplayRole)
+    {
+      // One based indexing works well with Exodus block ids
+      return QVariant(proxyIndex.row() + 1);
+    }
+    else
+    {
+      return QVariant();
+    }
+  }
   if (this->noCheckBoxes && (role == Qt::DecorationRole || role == Qt::CheckStateRole))
   {
     return QVariant();

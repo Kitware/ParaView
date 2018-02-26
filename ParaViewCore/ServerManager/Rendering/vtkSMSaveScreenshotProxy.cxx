@@ -16,23 +16,29 @@
 
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkImageWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyListDomain.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
-#include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 #include "vtkVectorOperators.h"
 
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <set>
+#include <sstream>
+#include <vtksys/SystemTools.hxx>
 
 //============================================================================
 /**
@@ -104,14 +110,14 @@ private:
   }
 
 protected:
-  int Magnification;
+  vtkVector2i Magnification;
   vtkVector2i OriginalSize;
 
 public:
   vtkState(vtkSMSessionProxyManager* pxm)
     : ProxyManager(pxm)
     , TransparentBackground(false)
-    , Magnification(1)
+    , Magnification(1, 1)
     , OriginalSize(0, 0)
   {
     this->TransparentBackground = vtkSMViewProxy::GetTransparentBackground();
@@ -174,7 +180,16 @@ public:
     if (cursize != size)
     {
       this->OriginalSize = cursize;
-      this->Magnification = vtkSMSaveScreenshotProxy::ComputeMagnification(size, cursize);
+      bool approx = false;
+      this->Magnification =
+        vtkSMSaveScreenshotProxy::GetScaleFactorsAndSize(size, cursize, &approx);
+      if (approx)
+      {
+        const vtkVector2i approxSize = cursize * this->Magnification;
+        vtkGenericWarningMacro(<< "Cannot render at '(" << size[0] << ", " << size[1]
+                               << ")'. Using "
+                               << "'(" << approxSize[0] << ", " << approxSize[1] << ")'");
+      }
       this->Resize(cursize);
     }
   }
@@ -228,13 +243,14 @@ protected:
     dpis.View = view;
     dpis.ViewPPI = vppi.GetAsInt();
     this->SavedPPIValues.push_back(dpis);
-    vppi.Set(vppi.GetAsInt() / this->Magnification);
+    // not entirely sure how to best scale ppi.
+    vppi.Set(vppi.GetAsInt() / std::max(this->Magnification[0], this->Magnification[1]));
     view->UpdateVTKObjects();
   }
 
 private:
-  vtkState(const vtkState&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkState&) VTK_DELETE_FUNCTION;
+  vtkState(const vtkState&) = delete;
+  void operator=(const vtkState&) = delete;
 };
 
 //============================================================================
@@ -250,7 +266,7 @@ public:
   {
   }
 
-  ~vtkStateView()
+  ~vtkStateView() override
   {
     if (this->OriginalSize[0] > 0 && this->OriginalSize[1] > 0)
     {
@@ -268,7 +284,7 @@ public:
   vtkSmartPointer<vtkImageData> CaptureImage() VTK_OVERRIDE
   {
     vtkSmartPointer<vtkImageData> img;
-    img.TakeReference(this->View->CaptureWindow(this->Magnification));
+    img.TakeReference(this->View->CaptureWindow(this->Magnification[0], this->Magnification[1]));
     return img;
   }
 
@@ -286,7 +302,7 @@ protected:
 //============================================================================
 class vtkSMSaveScreenshotProxy::vtkStateLayout : public vtkSMSaveScreenshotProxy::vtkState
 {
-  int ShowWindowDecorations;
+  int PreviewMode[2];
   vtkWeakPointer<vtkSMViewLayoutProxy> Layout;
   int OriginalSeparatorWidth;
   double OriginalSeparatorColor[3];
@@ -300,17 +316,16 @@ public:
     // we're doing this here just for completeness, but in reality this should
     // happen on the UI side since the UI may need to refresh after decorations
     // are hidden.
-    vtkSMPropertyHelper swdHelper(layout, "ShowWindowDecorations");
-    this->ShowWindowDecorations = swdHelper.GetAsInt();
-    swdHelper.Set(0);
+    vtkSMPropertyHelper swdHelper(layout, "PreviewMode");
+    swdHelper.Get(this->PreviewMode, 2);
 
     this->OriginalSeparatorWidth = layout->GetSeparatorWidth();
     layout->GetSeparatorColor(this->OriginalSeparatorColor);
   }
 
-  ~vtkStateLayout()
+  ~vtkStateLayout() override
   {
-    vtkSMPropertyHelper(this->Layout, "ShowWindowDecorations").Set(this->ShowWindowDecorations);
+    vtkSMPropertyHelper(this->Layout, "PreviewMode").Set(this->PreviewMode, 2);
     if (this->OriginalSize[0] > 0 && this->OriginalSize[1] > 0)
     {
       this->Resize(this->OriginalSize);
@@ -321,20 +336,12 @@ public:
     this->Layout->UpdateVTKObjects();
   }
 
-  vtkVector2i GetSize() const VTK_OVERRIDE
-  {
-    vtkVector2i size;
-    int ext[4];
-    this->Layout->GetLayoutExtent(ext);
-    size[0] = ext[1] - ext[0] + 1;
-    size[1] = ext[3] - ext[2] + 1;
-    return size;
-  }
+  vtkVector2i GetSize() const VTK_OVERRIDE { return this->Layout->GetSize(); }
 
   vtkSmartPointer<vtkImageData> CaptureImage() VTK_OVERRIDE
   {
     vtkSmartPointer<vtkImageData> img;
-    img.TakeReference(this->Layout->CaptureWindow(this->Magnification));
+    img.TakeReference(this->Layout->CaptureWindow(this->Magnification[0], this->Magnification[1]));
     return img;
   }
 
@@ -394,6 +401,13 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* filename)
     return false;
   }
 
+  auto format = this->GetFormatProxy(filename);
+  if (!format)
+  {
+    vtkErrorMacro("Failed to determine format for '" << filename << "'");
+    return false;
+  }
+
   SM_SCOPED_TRACE(SaveCameras)
     .arg("proxy", view != NULL ? static_cast<vtkSMProxy*>(view) : static_cast<vtkSMProxy*>(layout));
 
@@ -405,12 +419,25 @@ bool vtkSMSaveScreenshotProxy::WriteImage(const char* filename)
     .arg("mode_screenshot", 1);
 
   vtkSmartPointer<vtkImageData> img = this->CaptureImage();
-  int quality = vtkSMPropertyHelper(this, "ImageQuality").GetAsInt();
-  quality = std::max(0, quality);
-  quality = std::min(100, quality);
   if (img && vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
   {
-    return vtkSMUtilities::SaveImage(img.GetPointer(), filename, quality) == vtkErrorCode::NoError;
+    auto writer = vtkImageWriter::SafeDownCast(format->GetClientSideObject());
+    if (writer)
+    {
+      vtkTimerLog::MarkStartEvent("Write image to disk");
+      writer->SetFileName(filename);
+      writer->SetInputData(img);
+      writer->Write();
+      writer->SetInputData(nullptr);
+      vtkTimerLog::MarkEndEvent("Write image to disk");
+      return writer->GetErrorCode() == vtkErrorCode::NoError;
+    }
+    else
+    {
+      vtkErrorMacro("Format writer not a 'vtkImageWriter'. "
+                    " Failed to write '"
+        << filename << "'.");
+    }
   }
   return false;
 }
@@ -445,10 +472,117 @@ int vtkSMSaveScreenshotProxy::ComputeMagnification(const vtkVector2i& targetSize
   // If fullsize > viewsize, then magnification is involved.
   int temp = std::ceil(targetSize[0] / static_cast<double>(size[0]));
   magnification = std::max(temp, magnification);
-
   temp = std::ceil(targetSize[1] / static_cast<double>(size[1]));
+
   magnification = std::max(temp, magnification);
   size = targetSize / vtkVector2i(magnification);
+  return magnification;
+}
+
+//----------------------------------------------------------------------------
+namespace
+{
+int computeGCD(int a, int b)
+{
+  return b == 0 ? a : computeGCD(b, a % b);
+}
+
+std::set<int> computeFactors(int num)
+{
+  std::set<int> result;
+  const int sroot = std::sqrt(num);
+  for (int cc = 1; cc <= sroot; ++cc)
+  {
+    if (num % cc == 0)
+    {
+      result.insert(cc);
+      if (cc * cc != num)
+      {
+        result.insert(num / cc);
+      }
+    }
+  }
+  return result;
+}
+}
+
+//----------------------------------------------------------------------------
+vtkVector2i vtkSMSaveScreenshotProxy::GetScaleFactorsAndSize(
+  const vtkVector2i& targetSize, vtkVector2i& size, bool* approximate)
+{
+  if (approximate)
+  {
+    *approximate = false;
+  }
+
+  if (targetSize[0] <= size[0] && targetSize[1] <= size[1])
+  {
+    // easy! It just fits.
+    size = targetSize;
+    return vtkVector2i(1, 1);
+  }
+
+  // First we need to see if we can find a magnification factor that preserves
+  // aspect ratio. This is the best magnification factor. Do that, we get the
+  // GCD for the target width and height and then see if factors of the GCD are
+  // a good match.
+  const int gcd = computeGCD(targetSize[0], targetSize[1]);
+  if (gcd > 1)
+  {
+    const auto factors = computeFactors(gcd);
+    for (auto fiter = factors.begin(); fiter != factors.end(); ++fiter)
+    {
+      const int magnification = *fiter;
+      vtkVector2i potentialSize = targetSize / vtkVector2i(magnification, magnification);
+      if (potentialSize[0] > 1 && potentialSize[1] > 1 && potentialSize[0] <= size[0] &&
+        potentialSize[1] <= size[1])
+      {
+        // found a good fit that's non-trivial.
+        size = potentialSize;
+        return vtkVector2i(magnification, magnification);
+      }
+    }
+  }
+
+  // Next, try to find scale factors at the cost of preserving aspect ratios
+  // since that's not possible. For this, we don't worry about GCD. Instead deal
+  // with each dimension separately, finding factors for target size and seeing
+  // if we can find a good scale factor.
+  vtkVector2i magnification;
+  for (int cc = 0; cc < 2; ++cc)
+  {
+    if (targetSize[cc] > size[cc])
+    {
+      // first, do a quick guess.
+      magnification[cc] = std::ceil(targetSize[cc] / static_cast<double>(size[cc]));
+
+      // now for a more accurate magnification; it may not be possible to find one,
+      // and hence we first do an approximate calculation.
+      const auto factors = computeFactors(targetSize[cc]);
+      for (auto fiter = factors.begin(); fiter != factors.end(); ++fiter)
+      {
+        const int potentialSize = targetSize[cc] / *fiter;
+        if (potentialSize > 1 && potentialSize <= size[cc])
+        {
+          // kaching!
+          magnification[cc] = *fiter;
+          break;
+        }
+      }
+      size[cc] = targetSize[cc] / magnification[cc];
+    }
+    else
+    {
+      size[cc] = targetSize[cc];
+      magnification[cc] = 1;
+    }
+  }
+
+  if (approximate != nullptr)
+  {
+    *approximate = (size * magnification != targetSize);
+  }
+
   return magnification;
 }
 
@@ -524,8 +658,17 @@ bool vtkSMSaveScreenshotProxy::Cleanup()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSaveScreenshotProxy::UpdateSaveAllViewsPanelVisibility()
+void vtkSMSaveScreenshotProxy::UpdateDefaultsAndVisibilities(const char* filename)
 {
+  if (filename)
+  {
+    // pick correct "format" as the default.
+    if (auto proxy = this->GetFormatProxy(filename))
+    {
+      vtkSMPropertyHelper(this, "Format").Set(proxy);
+    }
+  }
+
   vtkSMViewLayoutProxy* layout =
     vtkSMViewLayoutProxy::SafeDownCast(vtkSMPropertyHelper(this, "Layout").GetAsProxy());
   if (layout == NULL || (layout->GetViews().size() <= 1))
@@ -533,10 +676,7 @@ bool vtkSMSaveScreenshotProxy::UpdateSaveAllViewsPanelVisibility()
     this->GetProperty("SaveAllViews")->SetPanelVisibility("never");
     this->GetProperty("SeparatorWidth")->SetPanelVisibility("never");
     this->GetProperty("SeparatorColor")->SetPanelVisibility("never");
-    return false;
   }
-
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -595,6 +735,93 @@ vtkSmartPointer<vtkImageData> vtkSMSaveScreenshotProxy::CaptureImage(
   vtkSMPropertyHelper(shProxy, "ImageResolution").Set(size.GetData(), 2);
   controller->PostInitializeProxy(shProxy);
   return shProxy->CaptureImage();
+}
+
+namespace detail
+{
+std::pair<std::string, std::vector<vtksys::String> > GetFormatOptions(vtkSMProxy* proxy)
+{
+  using pair_type = std::pair<std::string, std::vector<vtksys::String> >;
+  vtkPVXMLElement* hints =
+    proxy->GetHints() ? proxy->GetHints()->FindNestedElementByName("FormatOptions") : nullptr;
+  if (hints && hints->GetAttribute("extensions") && hints->GetAttribute("file_description"))
+  {
+    const std::string desc(hints->GetAttribute("file_description"));
+    const auto exts = vtksys::SystemTools::SplitString(hints->GetAttribute("extensions"), ' ');
+    return pair_type(desc, exts);
+  }
+  return pair_type();
+}
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMSaveScreenshotProxy::GetFileFormatFilters()
+{
+  std::ostringstream str;
+  auto pxm = this->GetSessionProxyManager();
+  const auto pld = this->GetProperty("Format")->FindDomain<vtkSMProxyListDomain>();
+  for (const auto& proxyType : pld->GetProxyTypes())
+  {
+    if (auto formatProxy =
+          pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
+    {
+      const auto options = detail::GetFormatOptions(formatProxy);
+      if (options.second.size() == 0)
+      {
+        continue;
+      }
+      if (str.tellp() != std::ostringstream::pos_type(0))
+      {
+        str << ";;";
+      }
+      str << options.first << " (";
+      bool add_space = false;
+      for (const auto& anext : options.second)
+      {
+        if (add_space)
+        {
+          str << " ";
+        }
+        str << "*." << anext;
+        add_space = true;
+      }
+      str << ")";
+    }
+  }
+  return str.str();
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMSaveScreenshotProxy::GetFormatProxy(const std::string& filename)
+{
+  auto extension = vtksys::SystemTools::GetFilenameLastExtension(filename);
+  extension.erase(0, 1);
+  if (extension.size() == 0)
+  {
+    vtkErrorMacro("Unknown file format for '" << filename << "'.");
+  }
+  auto pxm = this->GetSessionProxyManager();
+  const auto pld = this->GetProperty("Format")->FindDomain<vtkSMProxyListDomain>();
+  for (const auto& proxyType : pld->GetProxyTypes())
+  {
+    if (auto formatProxy =
+          pxm->GetPrototypeProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str()))
+    {
+      const auto options = detail::GetFormatOptions(formatProxy);
+      if (options.second.size() > 0)
+      {
+        const auto& exts = options.second;
+        auto iter = std::find(exts.begin(), exts.end(), extension);
+        if (iter != exts.end())
+        {
+          auto proxy = pld->FindProxy(proxyType.GroupName.c_str(), proxyType.ProxyName.c_str());
+          assert(proxy != nullptr);
+          return proxy;
+        }
+      }
+    }
+  }
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

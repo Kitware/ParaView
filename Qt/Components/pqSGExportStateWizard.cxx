@@ -1,34 +1,34 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pqSGExportStateWizard.cxx
+  Program: ParaView
+  Module:    pqSGExportStateWizard.cxx
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
-   All rights reserved.
+  Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+  All rights reserved.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2.
+  ParaView is a free software; you can redistribute it and/or modify it
+  under the terms of the ParaView license version 1.2.
 
-   See License_v1.2.txt for the full ParaView license.
-   A copy of this license can be obtained by contacting
-   Kitware Inc.
-   28 Corporate Drive
-   Clifton Park, NY 12065
-   USA
+  See License_v1.2.txt for the full ParaView license.
+  A copy of this license can be obtained by contacting
+  Kitware Inc.
+  28 Corporate Drive
+  Clifton Park, NY 12065
+  USA
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
+  ========================================================================*/
 #include "pqSGExportStateWizard.h"
 
 #include "pqApplicationCore.h"
@@ -37,8 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqRenderViewBase.h"
 #include "pqServerManagerModel.h"
+#include "vtkPVCatalystChannelInformation.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSMCoreUtilities.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSmartPointer.h"
 
 #include "pqCinemaTrack.h"
@@ -62,7 +64,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 static QPointer<pqSGExportStateWizard> ActiveWizard;
+
+//----------------------------------------------------------------------------
+// copied from vtkSMRepresentationProxy::GetProminentValuesInformation()
+// std::string GetCatalystChannelInformation(vtkSMRepresentationProxy* proxy)
+std::string GetCatalystChannelInformation(vtkSMSourceProxy* proxy)
+{
+  vtkNew<vtkPVCatalystChannelInformation> information;
+  // proxy->CreateVTKObjects();
+  proxy->UpdatePipeline();
+  // Initialize parameters with specified values:
+  information->Initialize();
+
+  // Ask the server to fill out the rest of the information:
+  proxy->GatherInformation(information);
+  return information->GetChannelName();
 }
+} // end anonymous namespace
 
 pqSGExportStateWizardPage2::pqSGExportStateWizardPage2(QWidget* _parent)
   : QWizardPage(_parent)
@@ -81,6 +99,7 @@ void pqSGExportStateWizardPage2::initializePage()
 {
   this->Internals->simulationInputs->clear();
   this->Internals->allInputs->clear();
+  this->Internals->usedSources.clear();
   QList<pqPipelineSource*> sources =
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqPipelineSource*>();
   foreach (pqPipelineSource* source, sources)
@@ -92,12 +111,14 @@ void pqSGExportStateWizardPage2::initializePage()
     if (this->Internals->showAllSources->isChecked())
     {
       this->Internals->allInputs->addItem(source->getSMName());
+      this->Internals->usedSources[source->getSMName()] = source;
     }
     else
     { // determine if the source is a reader or not, only include readers
       if (vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()))
       {
         this->Internals->allInputs->addItem(source->getSMName());
+        this->Internals->usedSources[source->getSMName()] = source;
       }
     }
   }
@@ -119,15 +140,33 @@ void pqSGExportStateWizardPage3::initializePage()
     QListWidgetItem* item = this->Internals->simulationInputs->item(cc);
     QString text = item->text();
     this->Internals->nameWidget->setItem(cc, 0, new QTableWidgetItem(text));
-    // if there is only 1 input then call it input, otherwise
-    // use the same name as the filter
-    if (this->Internals->simulationInputs->count() == 1)
+    std::string channelName;
+    // first see if the source dataset has the channel information which
+    // provides the name of the channel. if it does then use that, otherwise
+    // use a decent default
+    auto source = this->Internals->usedSources.find(text);
+    if (source != this->Internals->usedSources.end())
     {
-      this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem("input"));
+      vtkSMSourceProxy* proxy = source->second->getSourceProxy();
+      channelName = GetCatalystChannelInformation(proxy);
+    }
+    if (!channelName.empty())
+    {
+      this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(channelName.c_str()));
     }
     else
     {
-      this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
+      // we don't have a valid channel name from the input.
+      // if there is only 1 input then call it input, otherwise
+      // use the same name as the filter
+      if (this->Internals->simulationInputs->count() == 1)
+      {
+        this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem("input"));
+      }
+      else
+      {
+        this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
+      }
     }
     QTableWidgetItem* tableItem = this->Internals->nameWidget->item(cc, 1);
     tableItem->setFlags(tableItem->flags() | Qt::ItemIsEditable);

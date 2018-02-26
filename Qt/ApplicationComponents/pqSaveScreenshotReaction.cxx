@@ -38,12 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyWidgetDialog.h"
 #include "pqServer.h"
 #include "pqSettings.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
 #include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMSaveScreenshotProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
@@ -76,23 +78,33 @@ void pqSaveScreenshotReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-QString pqSaveScreenshotReaction::promptFileName()
+QString pqSaveScreenshotReaction::promptFileName(
+  vtkSMSaveScreenshotProxy* prototype, const QString& defaultExtension)
 {
-  QString lastUsedExt;
-  // Load the most recently used file extensions from QSettings, if available.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  if (settings->contains("extensions/ScreenshotExtension"))
+  if (!prototype)
   {
-    lastUsedExt = settings->value("extensions/ScreenshotExtension").toString();
+    qWarning("No `prototype` proxy specified.");
+    return QString();
   }
 
-  QString filters("PNG image (*.png);;JPG image (*.jpg);;TIFF image (*.tif)"
-                  ";;BMP image (*.bmp);;PPM image (*.ppm)");
+  const QString skey =
+    QString("extensions/%1/%2").arg(prototype->GetXMLGroup()).arg(prototype->GetXMLName());
+
+  // Load the most recently used file extensions from QSettings, if available.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  const QString lastUsedExt = settings->value(skey, defaultExtension).toString();
+
+  auto filters = prototype->GetFileFormatFilters();
+  if (filters.size() == 0)
+  {
+    qWarning("No image writers detected.");
+    return QString();
+  }
 
   pqFileDialog file_dialog(
-    NULL, pqCoreUtilities::mainWidget(), tr("Save Screenshot:"), QString(), filters);
+    NULL, pqCoreUtilities::mainWidget(), tr(prototype->GetXMLLabel()), QString(), filters.c_str());
   file_dialog.setRecentlyUsedExtension(lastUsedExt);
-  file_dialog.setObjectName("FileSaveScreenshotDialog");
+  file_dialog.setObjectName(QString("%1FileDialog").arg(prototype->GetXMLName()));
   file_dialog.setFileMode(pqFileDialog::AnyFile);
   if (file_dialog.exec() != QDialog::Accepted)
   {
@@ -101,8 +113,7 @@ QString pqSaveScreenshotReaction::promptFileName()
 
   QString file = file_dialog.getSelectedFiles()[0];
   QFileInfo fileInfo(file);
-  lastUsedExt = QString("*.") + fileInfo.suffix();
-  settings->setValue("extensions/ScreenshotExtension", lastUsedExt);
+  settings->setValue(skey, fileInfo.suffix().prepend("*."));
   return file;
 }
 
@@ -118,8 +129,6 @@ void pqSaveScreenshotReaction::saveScreenshot()
 
   vtkSMViewProxy* viewProxy = view->getViewProxy();
   vtkSMViewLayoutProxy* layout = vtkSMViewLayoutProxy::FindLayout(viewProxy);
-  int showWindowDecorations = -1;
-
   vtkSMSessionProxyManager* pxm = view->getServer()->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("misc", "SaveScreenshot"));
@@ -130,19 +139,54 @@ void pqSaveScreenshotReaction::saveScreenshot()
     return;
   }
 
+  // Get the filename first, this will determine some of the options shown.
+  QString filename = pqSaveScreenshotReaction::promptFileName(shProxy, "*.png");
+  if (filename.isEmpty())
+  {
+    return;
+  }
+
+  bool restorePreviewMode = false;
+
+  // Cache the separator width and color
+  int width = vtkSMPropertyHelper(shProxy, "SeparatorWidth").GetAsInt();
+  double color[3];
+  vtkSMPropertyHelper(shProxy, "SeparatorColor").Get(color, 3);
+  // Link the vtkSMViewLayoutProxy to vtkSMSaveScreenshotProxy to update
+  // the SeparatorWidth and SeparatorColor
+  vtkNew<vtkSMPropertyLink> widthLink, colorLink;
+  if (layout)
+  {
+    widthLink->AddLinkedProperty(shProxy, "SeparatorWidth", vtkSMLink::INPUT);
+    widthLink->AddLinkedProperty(layout, "SeparatorWidth", vtkSMLink::OUTPUT);
+    colorLink->AddLinkedProperty(shProxy, "SeparatorColor", vtkSMLink::INPUT);
+    colorLink->AddLinkedProperty(layout, "SeparatorColor", vtkSMLink::OUTPUT);
+  }
+
   vtkNew<vtkSMParaViewPipelineController> controller;
   controller->PreInitializeProxy(shProxy);
   vtkSMPropertyHelper(shProxy, "View").Set(viewProxy);
   vtkSMPropertyHelper(shProxy, "Layout").Set(layout);
+  shProxy->UpdateDefaultsAndVisibilities(filename.toLocal8Bit().data());
   controller->PostInitializeProxy(shProxy);
 
-  if (shProxy->UpdateSaveAllViewsPanelVisibility())
+  if (layout)
   {
-    Q_ASSERT(layout != NULL);
-    // let's hide window decorations.
-    vtkSMPropertyHelper helper(layout, "ShowWindowDecorations");
-    showWindowDecorations = helper.GetAsInt();
-    helper.Set(0);
+    int previewMode[2] = { -1, -1 };
+    vtkSMPropertyHelper previewHelper(layout, "PreviewMode");
+    previewHelper.Get(previewMode, 2);
+    if (previewMode[0] == 0 && previewMode[1] == 0)
+    {
+      // If we are not in the preview mode, enter it with maximum size possible
+      vtkVector2i layoutSize = layout->GetSize();
+      previewHelper.Set(layoutSize.GetData(), 2);
+      restorePreviewMode = true;
+    }
+    else
+    {
+      // if in preview mode, check "save all views".
+      vtkSMPropertyHelper(shProxy, "SaveAllViews").Set(1);
+    }
   }
 
   pqProxyWidgetDialog dialog(shProxy, pqCoreUtilities::mainWidget());
@@ -153,19 +197,24 @@ void pqSaveScreenshotReaction::saveScreenshot()
   dialog.setSettingsKey("SaveScreenshotDialog");
   if (dialog.exec() == QDialog::Accepted)
   {
-    QString filename = pqSaveScreenshotReaction::promptFileName();
-    if (!filename.isEmpty())
-    {
-      shProxy->WriteImage(filename.toLocal8Bit().data());
-    }
+    shProxy->WriteImage(filename.toLocal8Bit().data());
   }
 
-  if (layout && showWindowDecorations != -1)
+  if (layout)
   {
-    vtkSMPropertyHelper(layout, "ShowWindowDecorations").Set(showWindowDecorations);
+    // Reset the separator width and color
+    vtkSMPropertyHelper(layout, "SeparatorWidth").Set(width);
+    vtkSMPropertyHelper(layout, "SeparatorColor").Set(color, 3);
+    // Reset to the previous preview resolution or exit preview mode
+    if (restorePreviewMode)
+    {
+      int psize[2] = { 0, 0 };
+      vtkSMPropertyHelper(layout, "PreviewMode").Set(psize, 2);
+    }
     layout->UpdateVTKObjects();
+    widthLink->RemoveAllLinks();
+    colorLink->RemoveAllLinks();
   }
-
   // This should not be needed as image capturing code only affects back buffer,
   // however it is currently needed due to paraview/paraview#17256. Once that's
   // fixed, we should remove this.

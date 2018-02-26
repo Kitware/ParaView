@@ -13,7 +13,12 @@
 
 =========================================================================*/
 /**
- * @class   vtkGridAxes3DActor
+ * @class vtkGridAxes3DActor
+ * @brief actor for a cube-axes like prop in the 3D view.
+ *
+ * vtkGridAxes3DActor is an alternate implementation for something like the
+ * vtkCubeAxesActor which can be used to render a 3D grid in a scene.
+ * It uses vtkGridAxes2DActor to render individual axes planes for the box.
  *
 */
 
@@ -42,7 +47,7 @@ public:
   /**
    * Shallow copy from another vtkGridAxes3DActor.
    */
-  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   //@{
   /**
@@ -127,7 +132,7 @@ public:
 
   //@{
   /**
-   * Turn off to not generate the markers for the tick positions. Which egdes
+   * Turn off to not generate the markers for the tick positions. Which edges
    * are rendered is defined by the TickMask.
    */
   void SetGenerateTicks(bool val);
@@ -249,10 +254,12 @@ public:
   /**
    * If true, the actor will always be rendered during the opaque pass.
    */
-  vtkSetMacro(ForceOpaque, bool) vtkGetMacro(ForceOpaque, bool) vtkBooleanMacro(ForceOpaque, bool)
-    //@}
+  vtkSetMacro(ForceOpaque, bool);
+  vtkGetMacro(ForceOpaque, bool);
+  vtkBooleanMacro(ForceOpaque, bool);
+  //@}
 
-    int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
   int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
   int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
   int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
@@ -260,7 +267,7 @@ public:
 
 protected:
   vtkGridAxes3DActor();
-  ~vtkGridAxes3DActor();
+  ~vtkGridAxes3DActor() override;
 
   virtual void Update(vtkViewport* viewport);
 
@@ -277,8 +284,8 @@ protected:
   bool ForceOpaque;
 
 private:
-  vtkGridAxes3DActor(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGridAxes3DActor&) VTK_DELETE_FUNCTION;
+  vtkGridAxes3DActor(const vtkGridAxes3DActor&) = delete;
+  void operator=(const vtkGridAxes3DActor&) = delete;
 
   vtkMTimeType GetBoundsMTime;
 };

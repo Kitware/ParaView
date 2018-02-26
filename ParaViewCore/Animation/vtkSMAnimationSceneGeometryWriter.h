@@ -44,29 +44,29 @@ public:
 
 protected:
   vtkSMAnimationSceneGeometryWriter();
-  ~vtkSMAnimationSceneGeometryWriter();
+  ~vtkSMAnimationSceneGeometryWriter() override;
 
   /**
    * Called to initialize saving.
    */
-  virtual bool SaveInitialize(int startCount) VTK_OVERRIDE;
+  bool SaveInitialize(int startCount) VTK_OVERRIDE;
 
   /**
    * Called to save a particular frame.
    */
-  virtual bool SaveFrame(double time) VTK_OVERRIDE;
+  bool SaveFrame(double time) VTK_OVERRIDE;
 
   /**
    * Called to finalize saving.
    */
-  virtual bool SaveFinalize() VTK_OVERRIDE;
+  bool SaveFinalize() VTK_OVERRIDE;
 
   vtkSMProxy* GeometryWriter;
   vtkSMProxy* ViewModule;
 
 private:
-  vtkSMAnimationSceneGeometryWriter(const vtkSMAnimationSceneGeometryWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMAnimationSceneGeometryWriter&) VTK_DELETE_FUNCTION;
+  vtkSMAnimationSceneGeometryWriter(const vtkSMAnimationSceneGeometryWriter&) = delete;
+  void operator=(const vtkSMAnimationSceneGeometryWriter&) = delete;
 };
 
 #endif

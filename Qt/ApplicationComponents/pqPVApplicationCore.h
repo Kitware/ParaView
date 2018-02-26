@@ -57,7 +57,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPVApplicationCore : public pqApplicationC
 
 public:
   pqPVApplicationCore(int& argc, char** argv, pqOptions* options = 0);
-  ~pqPVApplicationCore();
+  ~pqPVApplicationCore() override;
 
   /**
   * Returns the pqPVApplicationCore instance. If no pqPVApplicationCore has been
@@ -84,7 +84,7 @@ public:
   /**
   * Provides access to the test utility.
   */
-  virtual pqTestUtility* testUtility();
+  pqTestUtility* testUtility() override;
 
   /**
   * Provides access to the python manager. This is non-null only when paraview
@@ -125,16 +125,13 @@ protected:
   /**
   * Override event filter in order to catch file association mechanism
   */
-  virtual bool eventFilter(QObject* obj, QEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event) override;
 
   QPointer<pqSelectionManager> SelectionManager;
   QPointer<pqAnimationManager> AnimationManager;
 
   pqPythonManager* PythonManager;
   QList<QPointer<QWidget> > QuickLaunchMenus;
-
-private slots:
-  void deprecatedSaveAnimationCalled();
 
 private:
   Q_DISABLE_COPY(pqPVApplicationCore)

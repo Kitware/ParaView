@@ -18,6 +18,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMInputProperty.h"
@@ -28,11 +29,30 @@ vtkStandardNewMacro(vtkSMNumberOfComponentsDomain);
 //----------------------------------------------------------------------------
 vtkSMNumberOfComponentsDomain::vtkSMNumberOfComponentsDomain()
 {
+  this->EnableMagnitude = false;
 }
 
 //----------------------------------------------------------------------------
 vtkSMNumberOfComponentsDomain::~vtkSMNumberOfComponentsDomain()
 {
+}
+
+//---------------------------------------------------------------------------
+int vtkSMNumberOfComponentsDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(prop, element))
+  {
+    return 0;
+  }
+
+  // Check for enable magnitude
+  int enable_magnitude = 0;
+  if (element->GetScalarAttribute("enable_magnitude", &enable_magnitude))
+  {
+    this->EnableMagnitude = (enable_magnitude != 0);
+  }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -164,6 +184,10 @@ void vtkSMNumberOfComponentsDomain::Update(
     {
       const char* name = ai->GetComponentName(i);
       this->AddEntry(name, i);
+    }
+    if (this->EnableMagnitude && ai->GetNumberOfComponents() > 1)
+    {
+      this->AddEntry("Magnitude", ai->GetNumberOfComponents());
     }
     this->DomainModified();
   }

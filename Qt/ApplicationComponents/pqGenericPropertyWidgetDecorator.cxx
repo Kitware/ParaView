@@ -40,12 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 #include <QtDebug>
+#include <sstream>
 
 class pqGenericPropertyWidgetDecorator::pqInternals
 {
 public:
   vtkWeakPointer<vtkSMProperty> Property;
-  std::string Value;
+  std::vector<std::string> Values;
   bool Inverse;
   bool Enabled;
   bool Visible;
@@ -91,12 +92,21 @@ public:
         return false;
       }
 
-      bool status = (helper.GetAsProxy(0) && (helper.GetAsProxy(0)->GetXMLName() == this->Value));
+      bool status = false;
+      for (auto it = this->Values.begin(); helper.GetAsProxy(0) && it != this->Values.end(); ++it)
+      {
+        status |= (helper.GetAsProxy(0)->GetXMLName() == *it);
+      }
       return this->Inverse ? !status : status;
     }
 
     vtkVariant val = helper.GetAsVariant(0);
-    bool status = (val.ToString() == this->Value);
+    bool status = false;
+    for (auto it = this->Values.begin(); it != this->Values.end(); ++it)
+    {
+      status |= (val.ToString() == *it);
+    }
+
     return this->Inverse ? !status : status;
   }
 };
@@ -130,10 +140,26 @@ pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
   const char* value = config->GetAttribute("value");
   if (value == NULL)
   {
-    qCritical() << "Missing 'value' in the specified configuration.";
-    return;
+    // see if there are multiple values instead.
+    value = config->GetAttribute("values");
+    if (value == NULL)
+    {
+      qCritical() << "Missing 'value' in the specified configuration.";
+      return;
+    }
+    std::stringstream ss;
+    ss.str(value);
+    std::string item;
+    auto vec_inserter = std::back_inserter(this->Internals->Values);
+    while (std::getline(ss, item, ' '))
+    {
+      *(vec_inserter++) = item;
+    }
   }
-  this->Internals->Value = value;
+  else
+  {
+    this->Internals->Values.push_back(value);
+  }
 
   const char* mode = config->GetAttribute("mode");
   if (mode && strcmp(mode, "visibility") == 0)

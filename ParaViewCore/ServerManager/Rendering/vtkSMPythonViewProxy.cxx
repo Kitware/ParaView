@@ -24,7 +24,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSMViewProxyInteractorHelper.h"
-#include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMPythonViewProxy);
 
@@ -75,17 +74,17 @@ vtkRenderWindow* vtkSMPythonViewProxy::GetRenderWindow()
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMPythonViewProxy::CaptureWindowInternal(int magnification)
+vtkImageData* vtkSMPythonViewProxy::CaptureWindowInternal(int magX, int magY)
 {
   vtkPythonView* pv = vtkPythonView::SafeDownCast(this->GetClientSideObject());
   if (pv)
   {
-    pv->SetMagnification(magnification);
+    pv->SetMagnification(magX, magY);
   }
-  vtkImageData* image = this->Superclass::CaptureWindowInternal(magnification);
+  vtkImageData* image = this->Superclass::CaptureWindowInternal(magX, magY);
   if (pv)
   {
-    pv->SetMagnification(1);
+    pv->SetMagnification(1, 1);
   }
   return image;
 }

@@ -103,7 +103,7 @@ public:
   void Update();
 
   /**
-   * Get all the internal views. The views should only be used to be layed out
+   * Get all the internal views. The views should only be used to be laid out
    * by the GUI. It's not recommended to directly change the properties of the
    * views.
    */
@@ -193,11 +193,11 @@ public:
    */
   void PrepareForScreenshot() {}
   void CleanupAfterScreenshot() {}
-  vtkImageData* CaptureWindow(int magnification);
+  vtkImageData* CaptureWindow(int magX, int magY);
 
 protected:
   vtkPVComparativeView();
-  ~vtkPVComparativeView();
+  ~vtkPVComparativeView() override;
 
   /**
    * Update layout for internal views.
@@ -216,8 +216,8 @@ protected:
   vtkSMViewProxy* RootView;
 
 private:
-  vtkPVComparativeView(const vtkPVComparativeView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVComparativeView&) VTK_DELETE_FUNCTION;
+  vtkPVComparativeView(const vtkPVComparativeView&) = delete;
+  void operator=(const vtkPVComparativeView&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

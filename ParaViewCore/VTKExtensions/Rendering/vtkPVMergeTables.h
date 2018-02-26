@@ -44,16 +44,16 @@ public:
 
 protected:
   vtkPVMergeTables();
-  ~vtkPVMergeTables();
+  ~vtkPVMergeTables() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
 private:
-  vtkPVMergeTables(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVMergeTables&) VTK_DELETE_FUNCTION;
+  vtkPVMergeTables(const vtkPVMergeTables&) = delete;
+  void operator=(const vtkPVMergeTables&) = delete;
 };
 
 #endif

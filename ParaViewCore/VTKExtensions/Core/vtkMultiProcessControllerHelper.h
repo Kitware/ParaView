@@ -65,11 +65,11 @@ public:
 
 protected:
   vtkMultiProcessControllerHelper();
-  ~vtkMultiProcessControllerHelper();
+  ~vtkMultiProcessControllerHelper() override;
 
 private:
-  vtkMultiProcessControllerHelper(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMultiProcessControllerHelper&) VTK_DELETE_FUNCTION;
+  vtkMultiProcessControllerHelper(const vtkMultiProcessControllerHelper&) = delete;
+  void operator=(const vtkMultiProcessControllerHelper&) = delete;
 };
 
 #endif

@@ -116,7 +116,7 @@ bool vtkSIStringVectorProperty::Pull(vtkSMMessage* message)
   int retVal = res.GetArgument(0, 0, &arg);
   if (!arg)
   {
-    var->add_txt("Invalid result");
+    var->add_txt(std::string());
   }
   else
   {

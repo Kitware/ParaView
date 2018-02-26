@@ -25,6 +25,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkPVOptions.h"
+#include "vtkPVProgressHandler.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionServer.h"
 #include "vtkProcessModule.h"
@@ -160,19 +161,15 @@ bool vtkSMSessionClient::Connect(const char* url)
   vtkPVOptions* options = pm->GetOptions();
 
   std::ostringstream handshake;
-  handshake << "handshake=paraview." << PARAVIEW_VERSION;
+  handshake << "handshake=paraview-" << PARAVIEW_VERSION;
   // Add connect-id if needed. The connect-id is added to the handshake that
   // must match on client and server processes.
   if (options->GetConnectID() != 0)
   {
     handshake << ".connect_id." << options->GetConnectID();
   }
-// Add rendering backend information.
-#ifdef VTKGL2
+  // Add rendering backend information.
   handshake << ".renderingbackend.opengl2";
-#else
-  handshake << ".renderingbackend.opengl";
-#endif
 
   std::string data_server_url;
   std::string render_server_url;
@@ -254,7 +251,6 @@ bool vtkSMSessionClient::Connect(const char* url)
     }
     else if (result == -1)
     {
-      vtkErrorMacro("Some error in socket processing.");
       break;
     }
   }
@@ -320,11 +316,12 @@ void vtkSMSessionClient::Initialize()
 {
   this->Superclass::Initialize();
 
-  // Setup the socket connnection between data-server and render-server.
+  // Setup the socket connection between data-server and render-server.
   if (this->DataServerController && this->RenderServerController)
   {
     this->SetupDataServerRenderServerConnection();
   }
+  this->ProgressHandler->AddHandlers();
 }
 
 //----------------------------------------------------------------------------
@@ -559,7 +556,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
         // This issue seems to happen only sometime on amber12 in collaboration
         // and are hard to reproduce
         // If we get time to figure out how this situation happen and why that
-        // would be nice but for now, we'll just keep a warning arround as
+        // would be nice but for now, we'll just keep a warning around as
         // this case is harmless.
         vtkWarningMacro("No remote object found for corresponding state: " << message->global_id());
         message->PrintDebugString();
@@ -1012,4 +1009,34 @@ vtkSMCollaborationManager* vtkSMSessionClient::GetCollaborationManager()
     this->CollaborationCommunicator->SetSession(this);
   }
   return this->CollaborationCommunicator;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMSessionClient::GetConnectID()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVOptions* options = pm->GetOptions();
+  return options->GetConnectID();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::PrepareProgressInternal()
+{
+  // Only for master client
+  if (!this->IsMultiClients() ||
+    (this->IsMultiClients() && this->GetCollaborationManager()->IsMaster()))
+  {
+    this->Superclass::PrepareProgressInternal();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::CleanupPendingProgressInternal()
+{
+  // Only for master client
+  if (!this->IsMultiClients() ||
+    (this->IsMultiClients() && this->GetCollaborationManager()->IsMaster()))
+  {
+    this->Superclass::CleanupPendingProgressInternal();
+  }
 }

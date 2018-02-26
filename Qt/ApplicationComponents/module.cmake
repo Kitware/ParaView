@@ -1,5 +1,5 @@
 set(__dependencies)
-if(PARAVIEW_ENABLE_PYTHON AND ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2"))
+if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND __dependencies vtkPVCinemaReader)
 endif()
 
@@ -12,6 +12,7 @@ vtk_module(pqApplicationComponents
   PRIVATE_DEPENDS
     vtkjsoncpp
     vtkPVAnimation
+    vtkPVServerManagerApplication
     vtkPVServerManagerDefault
     vtkPVServerManagerRendering
     vtksys

@@ -39,9 +39,9 @@ public:
 
 protected:
   vtkPlotEdges();
-  virtual ~vtkPlotEdges();
+  ~vtkPlotEdges() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   // Usual data generation method
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
@@ -59,8 +59,8 @@ protected:
   static void PrintSegments(vtkCollection* segments);
 
 private:
-  vtkPlotEdges(const vtkPlotEdges&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPlotEdges&) VTK_DELETE_FUNCTION;
+  vtkPlotEdges(const vtkPlotEdges&) = delete;
+  void operator=(const vtkPlotEdges&) = delete;
 };
 
 #endif

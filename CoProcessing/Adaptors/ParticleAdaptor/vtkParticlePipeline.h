@@ -104,8 +104,8 @@ protected:
   vtkPNGWriter* writer;
 
 private:
-  vtkParticlePipeline(const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkParticlePipeline&) VTK_DELETE_FUNCTION;
+  vtkParticlePipeline(const vtkParticlePipeline&) = delete;
+  void operator=(const vtkParticlePipeline&) = delete;
 };
 
 #endif /* vtkParticlePipeline_H */

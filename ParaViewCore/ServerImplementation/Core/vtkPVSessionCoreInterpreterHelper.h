@@ -87,14 +87,14 @@ public:
 
 protected:
   vtkPVSessionCoreInterpreterHelper();
-  ~vtkPVSessionCoreInterpreterHelper();
+  ~vtkPVSessionCoreInterpreterHelper() override;
 
   vtkWeakPointer<vtkPVSessionCore> Core;
   int LogLevel;
 
 private:
-  vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSessionCoreInterpreterHelper&) VTK_DELETE_FUNCTION;
+  vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&) = delete;
+  void operator=(const vtkPVSessionCoreInterpreterHelper&) = delete;
 };
 
 #endif

@@ -61,9 +61,6 @@
       "name":"vtkkwiml",
       "path":"VTK/Utilities/KWIML"
     },
-    { "name":"vtkUtilitiesHashSource",
-      "path":"VTK/Utilities/HashSource"
-    },
     { "name":"vtkUtilitiesWrapClientServer",
       "path":"Utilities/WrapClientServer"
     },
@@ -98,11 +95,8 @@
     { "path":"VTK/vtkLogo.ico" },
     { "path":"VTK/README.md" },
     { "path":"VTK/ThirdParty/utf8" },
-    { "name": "vtkEncodeString",
-    "path": "VTK/Utilities/EncodeString"
-    },
     { "name": "vtkParseOGLExt",
-    "path": "VTK/Utilities/ParseOGLExt"
+      "path": "VTK/Utilities/ParseOGLExt"
     }
   ]
 }

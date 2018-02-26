@@ -38,38 +38,25 @@ set(Module_SRCS
   vtkFileSeriesWriter.cxx
   vtkImageFileSeriesReader.cxx
   vtkIntegrateAttributes.cxx
+  vtkMemberFunctionCommand.h
   vtkMetaReader.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkParallelSerialWriter.cxx
   vtkPExtractHistogram.cxx
+  vtkPResourceFileLocator.cxx
   vtkPVCompositeDataPipeline.cxx
-  vtkPVNullSource.cxx
-  vtkPVPostFilter.cxx
-  vtkPVPostFilterExecutive.cxx
   vtkPVInformationKeys.cxx
+  vtkPVNullSource.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVTransform.cxx
   vtkPVTrivialProducer.cxx
+  vtkRawImageFileSeriesReader.cxx
   vtkReductionFilter.cxx
   vtkSelectionSerializer.cxx
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
-  vtkMemberFunctionCommand.h
 )
-
-set_source_files_properties(
-  vtkCommunicationErrorCatcher
-  vtkMultiProcessControllerHelper
-  vtkPVInformationKeys
-  vtkMemberFunctionCommand
-  WRAP_EXCLUDE
-  )
-
-set_source_files_properties(
-  vtkCommunicationErrorCatcher
-  vtkUndoElement
-  ABSTRACT)
 
 vtk_module_library(vtkPVVTKExtensionsCore ${Module_SRCS})

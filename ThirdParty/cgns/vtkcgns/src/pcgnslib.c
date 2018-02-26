@@ -37,8 +37,11 @@ freely, subject to the following restrictions:
 
 /* MPI-2 info object */
 extern MPI_Info pcg_mpi_info;
+extern MPI_Comm pcg_mpi_comm;
 extern int pcg_mpi_comm_size;
 extern int pcg_mpi_comm_rank;
+/* Flag indicating if HDF5 file accesses is PARALLEL or NATIVE */
+extern char hdf5_access[64];
 /* flag indicating if mpi_initialized was called */
 extern int pcg_mpi_initialized;
 
@@ -104,6 +107,11 @@ static int readwrite_data_parallel(hid_t group_id, CGNS_ENUMT(DataType_t) type,
       for (k = 0; k < ndims; k++) {
 	start[k] = rmin[ndims-k-1] - 1;
 	dims[k] = rmax[ndims-k-1] - start[k];
+      }
+  }
+  else { /* no data to read or write, but must still call H5Screate_simple */
+      for (k = 0; k < ndims; k++) {
+        dims[k] = 0;
       }
   }
 
@@ -193,7 +201,7 @@ static int check_parallel(cgns_file *cgfile)
 
     if (cgfile == NULL) return CG_ERROR;
     if (cgio_get_file_type(cgfile->cgio, &type) ||
-        type != CGIO_FILE_PHDF5) {
+        type != CGIO_FILE_HDF5) {
         cgi_error("file not opened for parallel IO");
         return CG_ERROR;
     }
@@ -206,6 +214,7 @@ static int check_parallel(cgns_file *cgfile)
 
 int cgp_mpi_comm(MPI_Comm comm)
 {
+    pcg_mpi_comm=comm;
     return cgio_configure(CG_CONFIG_HDF5_MPI_COMM, (void *)(comm));
 }
 
@@ -252,18 +261,25 @@ int cgp_open(const char *filename, int mode, int *fn)
     int ierr, old_type = cgns_filetype;
 
 
-    MPI_Comm_rank(MPI_COMM_WORLD, &pcg_mpi_comm_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &pcg_mpi_comm_size);
+    MPI_Comm_rank(pcg_mpi_comm, &pcg_mpi_comm_rank);
+    MPI_Comm_size(pcg_mpi_comm, &pcg_mpi_comm_size);
 
     /* Flag is true if MPI_Init or MPI_Init_thread has been called and false otherwise. */
     pcg_mpi_initialized = 0;
     /* check if we are actually running a parallel program */
     MPI_Initialized(&pcg_mpi_initialized);
 
-    ierr = cg_set_file_type(CG_FILE_PHDF5);
+    /* Flag this as a parallel access */
+    strcpy(hdf5_access,"PARALLEL");	
+
+    ierr = cg_set_file_type(CG_FILE_HDF5);
     if (ierr) return ierr;
     ierr = cg_open(filename, mode, fn);
     cgns_filetype = old_type;
+
+    /* reset parallel access */
+    strcpy(hdf5_access,"NATIVE");
+
     return ierr;
 }
 
@@ -421,11 +437,13 @@ int cgp_elements_write_data(int fn, int B, int Z, int S, cgsize_t start,
     section = cgi_get_section(cg, B, Z, S);
     if (section == 0 || section->connect == 0) return CG_ERROR;
 
-    if (start > end ||
-        start < section->range[0] ||
-        end > section->range[1]) {
-	cgi_error("Error in requested element data range.");
-        return CG_ERROR;
+    if (elements) {
+    	if (start > end ||
+            start < section->range[0] ||
+            end > section->range[1]) {
+	    cgi_error("Error in requested element data range.");
+            return CG_ERROR;
+        }    
     }
     if (!IS_FIXED_SIZE(section->el_type)) {
         cgi_error("element must be a fixed size for parallel IO");
@@ -466,11 +484,13 @@ int cgp_elements_read_data(int fn, int B, int Z, int S, cgsize_t start,
     section = cgi_get_section(cg, B, Z, S);
     if (section == 0 || section->connect == 0) return CG_ERROR;
 
-    if (start > end ||
-        start < section->range[0] ||
-        end > section->range[1]) {
-	cgi_error("Error in requested element data range.");
-        return CG_ERROR;
+    if (elements) { /* A processor may have nothing to read */
+    	if (start > end ||
+            start < section->range[0] ||
+            end > section->range[1]) {
+	   cgi_error("Error in requested element data range.");
+           return CG_ERROR;
+        }
     }
     if (!IS_FIXED_SIZE(section->el_type)) {
         cgi_error("element must be a fixed size for parallel IO");
@@ -487,6 +507,119 @@ int cgp_elements_read_data(int fn, int B, int Z, int S, cgsize_t start,
     Data.u.rbuf = elements;
     return readwrite_data_parallel(hid, type,
 			      1, &rmin, &rmax, &Data, CG_PAR_READ);
+}
+
+int cgp_parent_data_write(int fn, int B, int Z, int S,
+			  cgsize_t start, cgsize_t end,
+			  const cgsize_t *parent_data)
+{
+    cgns_section *section;
+    cgsize_t *data, i, j, n;
+    hid_t hid;
+    cgsize_t rmin[2], rmax[2];
+    CGNS_ENUMT(DataType_t) type;
+
+     /* get file and check mode */
+    cg = cgi_get_file(fn);
+    if (cg == 0) return CG_ERROR;
+
+    if (cgi_check_mode(cg->filename, cg->mode, CG_MODE_WRITE))
+      return CG_ERROR;
+
+    section = cgi_get_section(cg, B, Z, S);
+    if (section == 0) return CG_ERROR;
+
+    /* check input range */
+    if (parent_data) {
+      if (start > end ||
+	  start < section->range[0] ||
+	  end > section->range[1]) {
+	cgi_error("Error in requested element data range.");
+	return CG_ERROR;
+      }    
+    }
+
+    if (!IS_FIXED_SIZE(section->el_type)) {
+        cgi_error("element must be a fixed size for parallel IO");
+        return CG_ERROR;
+    }
+
+    /* ParentElements ... */
+    if (section->parelem) {
+        if (cg->mode == CG_MODE_WRITE) {
+            cgi_error("ParentElements is already defined under Elements_t '%s'",
+                   section->name);
+            return CG_ERROR;
+        }
+        if (cgi_delete_node(section->id, section->parelem->id))
+            return CG_ERROR;
+        cgi_free_array(section->parelem);
+        memset(section->parelem, 0, sizeof(cgns_array));
+    } else {
+        section->parelem = CGNS_NEW(cgns_array, 1);
+    }
+
+    /* Get total size across all processors */
+    cgsize_t num = end == 0 ? 0 : end - start + 1;
+    num = num < 0 ? 0 : num;
+    MPI_Datatype mpi_type = sizeof(cgsize_t) == 32 ? MPI_INT : MPI_LONG_LONG_INT;
+    MPI_Allreduce(MPI_IN_PLACE, &num, 1, mpi_type, MPI_SUM, MPI_COMM_WORLD);
+
+    strcpy(section->parelem->data_type, CG_SIZE_DATATYPE);
+    section->parelem->data_dim = 2;
+    section->parelem->dim_vals[0] = num;
+    section->parelem->dim_vals[1] = 2;
+    strcpy(section->parelem->name, "ParentElements");
+
+    if (cgi_write_array(section->id, section->parelem)) return CG_ERROR;
+
+    /* ParentElementsPosition ... */
+    if (section->parface) {
+        if (cg->mode==CG_MODE_WRITE) {
+            cgi_error("ParentElementsPosition is already defined under Elements_t '%s'",
+                   section->name);
+            return CG_ERROR;
+        }
+        if (cgi_delete_node(section->id, section->parface->id))
+            return CG_ERROR;
+        cgi_free_array(section->parface);
+        memset(section->parface, 0, sizeof(cgns_array));
+    } else {
+        section->parface = CGNS_NEW(cgns_array, 1);
+    }
+
+    strcpy(section->parface->data_type, CG_SIZE_DATATYPE);
+    section->parface->data_dim = 2;
+    section->parface->dim_vals[0] = num;
+    section->parface->dim_vals[1] = 2;
+    strcpy(section->parface->name, "ParentElementsPosition");
+
+    if (cgi_write_array(section->id, section->parface)) return CG_ERROR;
+
+    /* ParentElements -- write data */
+    rmin[0] = start - section->range[0] + 1;
+    rmax[0] = end - section->range[0] + 1;
+    rmin[1] = 1;
+    rmax[1] = 2;
+    type = cgi_datatype(section->parelem->data_type);
+
+    cg_rw_t Data;
+    Data.u.wbuf = parent_data;
+
+    to_HDF_ID(section->parelem->id, hid);
+    int herr = readwrite_data_parallel(hid, type, 2, rmin, rmax, &Data, CG_PAR_WRITE);
+    if (herr != CG_OK)
+      return herr;
+
+    /* ParentElementsPosition -- data follows ParentElements data */
+    type = cgi_datatype(section->parface->data_type);
+
+    if (parent_data) {
+      cgsize_t delta = rmax[0] - rmin[0] + 1;
+      Data.u.wbuf = &parent_data[2*delta];
+    }
+    to_HDF_ID(section->parface->id, hid);
+    return readwrite_data_parallel(hid, type, 2, rmin, rmax, &Data, CG_PAR_WRITE);
 }
 
 /*===== Solution IO Prototypes ============================*/

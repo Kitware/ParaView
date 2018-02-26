@@ -71,12 +71,12 @@ public:
 
 protected:
   vtkCameraManipulatorGUIHelper();
-  ~vtkCameraManipulatorGUIHelper();
+  ~vtkCameraManipulatorGUIHelper() override;
   //@}
 
 private:
-  vtkCameraManipulatorGUIHelper(const vtkCameraManipulatorGUIHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCameraManipulatorGUIHelper&) VTK_DELETE_FUNCTION;
+  vtkCameraManipulatorGUIHelper(const vtkCameraManipulatorGUIHelper&) = delete;
+  void operator=(const vtkCameraManipulatorGUIHelper&) = delete;
 };
 
 #endif

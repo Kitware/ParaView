@@ -12,20 +12,19 @@ if (WIN32)
 endif()
 
 set(Module_SRCS
-cgio_helpers.cxx
-vtkCGNSFileSeriesReader.cxx
-vtkCGNSReader.cxx
-vtkCGNSReaderInternal.cxx
-vtkFileSeriesHelper.cxx
-)
+  cgio_helpers.cxx
+  vtkCGNSFileSeriesReader.cxx
+  vtkCGNSReader.cxx
+  vtkCGNSReaderInternal.cxx
+  vtkCGNSSubsetInclusionLattice.cxx
+  vtkFileSeriesHelper.cxx
+  )
 
 set_source_files_properties(
   cgio_helpers
   vtkCGNSReaderInternal
   vtkFileSeriesHelper
   PROPERTIES
-    WRAP_EXCLUDE 1
-    WRAP_EXCLUDE_PYTHON 1
     SKIP_HEADER_INSTALL 1
 )
 

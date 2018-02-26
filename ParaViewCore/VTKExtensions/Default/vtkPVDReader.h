@@ -46,19 +46,19 @@ public:
 
 protected:
   vtkPVDReader();
-  ~vtkPVDReader();
+  ~vtkPVDReader() override;
 
   void ReadXMLData() VTK_OVERRIDE;
 
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Set TimeStepRange
-  virtual void SetupOutputInformation(vtkInformation* outInfo) VTK_OVERRIDE;
+  void SetupOutputInformation(vtkInformation* outInfo) VTK_OVERRIDE;
 
 private:
-  vtkPVDReader(const vtkPVDReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDReader&) VTK_DELETE_FUNCTION;
+  vtkPVDReader(const vtkPVDReader&) = delete;
+  void operator=(const vtkPVDReader&) = delete;
 };
 
 #endif

@@ -2,14 +2,14 @@
 /**
  *  \file   GW_GeodesicPoint.cpp
  *  \brief  Definition of class \c GW_GeodesicPoint
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  */
 /*------------------------------------------------------------------------------*/
 
 
 #ifdef GW_SCCSID
-    static const char* sccsid = "@(#) GW_GeodesicPoint.cpp(c) Gabriel Peyré2003";
+    static const char* sccsid = "@(#) GW_GeodesicPoint.cpp(c) Gabriel PeyrÃ©2003";
 #endif // GW_SCCSID
 
 #include "stdafx.h"
@@ -26,7 +26,7 @@ using namespace GW;
 // Name : GW_GeodesicPoint::SetCurFace
 /**
 *  \param  CurFace [GW_GeodesicFace&] The face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-3-2003
 *
 *  Set the current face.
@@ -41,7 +41,7 @@ void GW_GeodesicPoint::SetCurFace( GW_GeodesicFace& CurFace )
 // Name : GW_GeodesicPoint::GetCurFace
 /**
 *  \return [GW_GeodesicFace*] The face.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   5-3-2003
 *
 *  Get the current face.
@@ -53,7 +53,7 @@ GW_GeodesicFace* GW_GeodesicPoint::GetCurFace()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

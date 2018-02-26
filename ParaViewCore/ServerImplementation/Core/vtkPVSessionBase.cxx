@@ -73,7 +73,7 @@ void vtkPVSessionBase::InitSessionBase(vtkPVSessionCore* coreToUse)
 //----------------------------------------------------------------------------
 vtkPVSessionBase::~vtkPVSessionBase()
 {
-  // Make sure we disable Activate/Desactivate observer
+  // Make sure we disable Activate/Deactivate observer
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   if (controller && this->ActivateObserverTag && this->DesactivateObserverTag)
   {
@@ -217,7 +217,7 @@ void vtkPVSessionBase::PrepareProgressInternal()
          << vtkClientServerStream::End;
   this->ExecuteStream(vtkPVSession::CLIENT_AND_SERVERS, stream, false);
   // this->Superclass::PrepareProgressInternal();
-  // FIXME_COLLABORATION - I don't like code that skips superclass implentations.
+  // FIXME_COLLABORATION - I don't like code that skips superclass implementations.
   // Rethink this.
 }
 

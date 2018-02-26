@@ -73,19 +73,19 @@ public:
 
 protected:
   vtkCompositeAnimationPlayer();
-  ~vtkCompositeAnimationPlayer();
+  ~vtkCompositeAnimationPlayer() override;
 
   //@{
   /**
    * Delegated to the active animation player.
    */
-  virtual void StartLoop(double starttime, double endtime, double* playbackWindow) VTK_OVERRIDE;
-  virtual void EndLoop() VTK_OVERRIDE;
-  virtual double GetNextTime(double currentime) VTK_OVERRIDE;
+  void StartLoop(double starttime, double endtime, double* playbackWindow) VTK_OVERRIDE;
+  void EndLoop() VTK_OVERRIDE;
+  double GetNextTime(double currentime) VTK_OVERRIDE;
   //@}
 
-  virtual double GoToNext(double start, double end, double currenttime) VTK_OVERRIDE;
-  virtual double GoToPrevious(double start, double end, double currenttime) VTK_OVERRIDE;
+  double GoToNext(double start, double end, double currenttime) VTK_OVERRIDE;
+  double GoToPrevious(double start, double end, double currenttime) VTK_OVERRIDE;
 
   vtkAnimationPlayer* GetActivePlayer();
 
@@ -96,8 +96,8 @@ protected:
   int PlayMode;
 
 private:
-  vtkCompositeAnimationPlayer(const vtkCompositeAnimationPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCompositeAnimationPlayer&) VTK_DELETE_FUNCTION;
+  vtkCompositeAnimationPlayer(const vtkCompositeAnimationPlayer&) = delete;
+  void operator=(const vtkCompositeAnimationPlayer&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

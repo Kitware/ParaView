@@ -65,7 +65,7 @@ public:
   * selector's scheme and hostname are shown.
   */
   pqServerConnectDialog(QWidget* parent = 0, const pqServerResource& selector = pqServerResource());
-  virtual ~pqServerConnectDialog();
+  ~pqServerConnectDialog() override;
 
   /**
   * returns the configuration to connect to. This returns a valid response

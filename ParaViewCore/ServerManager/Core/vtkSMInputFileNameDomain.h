@@ -40,7 +40,7 @@ public:
 
   // Update self checking the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
   vtkGetMacro(FileName, std::string);
 
@@ -50,15 +50,15 @@ public:
    * depends on the filename of the source.
    * Returns 1 if the domain updated the property.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMInputFileNameDomain();
-  ~vtkSMInputFileNameDomain();
+  ~vtkSMInputFileNameDomain() override;
 
 private:
-  vtkSMInputFileNameDomain(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMInputFileNameDomain&) VTK_DELETE_FUNCTION;
+  vtkSMInputFileNameDomain(const vtkSMInputFileNameDomain&) = delete;
+  void operator=(const vtkSMInputFileNameDomain&) = delete;
 
   std::string FileName;
 };

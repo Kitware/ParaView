@@ -196,7 +196,7 @@ public:
 
 protected:
   vtkLiveInsituLink();
-  ~vtkLiveInsituLink();
+  ~vtkLiveInsituLink() override;
 
   enum RMITags
   {
@@ -252,8 +252,8 @@ protected:
   vtkSmartPointer<vtkExtractsDeliveryHelper> ExtractsDeliveryHelper;
 
 private:
-  vtkLiveInsituLink(const vtkLiveInsituLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkLiveInsituLink&) VTK_DELETE_FUNCTION;
+  vtkLiveInsituLink(const vtkLiveInsituLink&) = delete;
+  void operator=(const vtkLiveInsituLink&) = delete;
 
   vtkWeakPointer<vtkSMSessionProxyManager> InsituProxyManager;
 

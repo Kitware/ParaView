@@ -49,11 +49,11 @@ public:
    * Overridden to use input data information to pick appropriate representation
    * type.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMRepresentationTypeDomain();
-  ~vtkSMRepresentationTypeDomain();
+  ~vtkSMRepresentationTypeDomain() override;
 
   /**
    * Returns the datainformation from the current input, if possible.
@@ -61,8 +61,8 @@ protected:
   vtkPVDataInformation* GetInputInformation();
 
 private:
-  vtkSMRepresentationTypeDomain(const vtkSMRepresentationTypeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRepresentationTypeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMRepresentationTypeDomain(const vtkSMRepresentationTypeDomain&) = delete;
+  void operator=(const vtkSMRepresentationTypeDomain&) = delete;
 };
 
 #endif

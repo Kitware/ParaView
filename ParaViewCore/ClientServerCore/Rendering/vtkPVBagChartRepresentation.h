@@ -40,7 +40,7 @@ public:
   /**
    * Set visibility of the representation.
    */
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   /**
    * Provides access to the underlying VTK representation.
@@ -186,30 +186,30 @@ public:
 
 protected:
   vtkPVBagChartRepresentation();
-  ~vtkPVBagChartRepresentation();
+  ~vtkPVBagChartRepresentation() override;
 
   /**
    * Overridden to pass information about changes to series visibility etc. to
    * the plot-matrix.
    */
-  virtual void PrepareForRendering() VTK_OVERRIDE;
+  void PrepareForRendering() VTK_OVERRIDE;
 
   void SetPolyLineToTable(vtkPolyData* polydata, vtkTable* table);
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVBagChartRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) = delete;
+  void operator=(const vtkPVBagChartRepresentation&) = delete;
 
   int LineThickness;
   int LineStyle;

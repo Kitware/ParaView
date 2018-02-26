@@ -59,6 +59,7 @@ class vtkPVDataRepresentation;
 class vtkPVGridAxes3DActor;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
+class vtkPVMaterialLibrary;
 class vtkPVSynchronizedRenderer;
 class vtkRenderer;
 class vtkRenderViewBase;
@@ -108,15 +109,15 @@ public:
    * must be called before calling any other methods on this class.
    * \note CallOnAllProcesses
    */
-  virtual void Initialize(unsigned int id) VTK_OVERRIDE;
+  void Initialize(unsigned int id) VTK_OVERRIDE;
 
   //@{
   /**
    * Overridden to call InvalidateCachedSelection() whenever the render window
    * parameters change.
    */
-  virtual void SetSize(int, int) VTK_OVERRIDE;
-  virtual void SetPosition(int, int) VTK_OVERRIDE;
+  void SetSize(int, int) VTK_OVERRIDE;
+  void SetPosition(int, int) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -156,7 +157,7 @@ public:
   /**
    * Returns the render window.
    */
-  vtkRenderWindow* GetRenderWindow();
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
    * Returns the interactor.
@@ -191,7 +192,7 @@ public:
    * \note Can be called on processes involved in rendering i.e those returned
    * by `this->GetStillRenderProcesses()`.
    */
-  virtual void StillRender() VTK_OVERRIDE;
+  void StillRender() VTK_OVERRIDE;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
@@ -199,7 +200,7 @@ public:
    * \note Can be called on processes involved in rendering i.e those returned
    * by `this->GetInteractiveRenderProcesses()`.
    */
-  virtual void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() VTK_OVERRIDE;
 
   //@{
   /**
@@ -403,44 +404,18 @@ public:
 
   //@{
   /**
-   * Set or get whether offscreen rendering should be used during
-   * CaptureWindow calls. On Apple machines, this flag has no effect.
-   */
-  vtkSetMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkBooleanMacro(UseOffscreenRenderingForScreenshots, bool);
-  vtkGetMacro(UseOffscreenRenderingForScreenshots, bool);
-  //@}
-
-  //@{
-  /**
-   * Get/Set whether to use offscreen rendering for all rendering. This is
-   * merely a suggestion. If --use-offscreen-rendering command line option is
-   * specified, then setting this flag to 0 on that process has no effect.
-   * Setting it to true, however, will ensure that even is
-   * --use-offscreen-rendering is not specified, it will use offscreen
-   * rendering.
-   */
-  virtual void SetUseOffscreenRendering(bool);
-  vtkBooleanMacro(UseOffscreenRendering, bool);
-  vtkGetMacro(UseOffscreenRendering, bool);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the EGL device index (graphics card) used for rendering. This needs to
-   * be set before rendering. The graphics card needs to have the right extensions
-   * for this to work.
-   */
-  virtual void SetEGLDeviceIndex(int);
-  vtkGetMacro(EGLDeviceIndex, int);
-  //@}
-
-  //@{
-  /**
    * Returns if remote-rendering is possible on the current group of processes.
    */
   vtkGetMacro(RemoteRenderingAvailable, bool);
   void RemoteRenderingAvailableOff() { this->RemoteRenderingAvailable = false; }
+  //@}
+
+  //@{
+  /**
+   * Determine if NVPipe is an available compressor option.
+   */
+  void NVPipeAvailableOn();
+  void NVPipeAvailableOff();
   //@}
 
   //@{
@@ -580,15 +555,6 @@ public:
 
   //@{
   /**
-   * Turn on/off the default light in the 3D renderer.
-   */
-  void SetLightSwitch(bool enable);
-  bool GetLightSwitch();
-  vtkBooleanMacro(LightSwitch, bool);
-  //@}
-
-  //@{
-  /**
    * Enable/disable showing of annotation for developers.
    */
   void SetShowAnnotation(bool val);
@@ -644,6 +610,7 @@ public:
   //*****************************************************************
   // Forward to 3D renderer.
   vtkSetMacro(UseHiddenLineRemoval, bool) virtual void SetUseDepthPeeling(int val);
+  virtual void SetUseDepthPeelingForVolumes(bool val);
   virtual void SetMaximumNumberOfPeels(int val);
   virtual void SetBackground(double r, double g, double b);
   virtual void SetBackground2(double r, double g, double b);
@@ -652,12 +619,9 @@ public:
   virtual void SetTexturedBackground(int val);
 
   //*****************************************************************
-  // Forward to vtkLight.
-  void SetAmbientColor(double r, double g, double b);
-  void SetSpecularColor(double r, double g, double b);
-  void SetDiffuseColor(double r, double g, double b);
-  void SetIntensity(double val);
-  void SetLightType(int val);
+  // Entry point for dynamic lights
+  void AddLight(vtkLight*);
+  void RemoveLight(vtkLight*);
 
   //*****************************************************************
   // Forward to vtkRenderWindow.
@@ -688,7 +652,7 @@ public:
    * their inputs. Hence it's okay to do some extra inter-process communication
    * here.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * Asks representations to update their LOD geometries.
@@ -866,13 +830,6 @@ public:
   vtkFloatArray* GetCapturedZBuffer();
   //@}
 
-  /**
-   * Sends the current renderer to OpenVR Virtual Reality.
-   * Control will return to paraview once the user is done
-   * in VR.
-   */
-  void SendToOpenVR();
-
   //@{
   /**
    * Switches between rasterization and ray tracing.
@@ -919,6 +876,22 @@ public:
   void SetLightScale(double);
   double GetLightScale();
   //@}
+  /**
+   * Set the OSPRay renderer to use.
+   * May be either scivis (default) or pathtracer.
+   */
+  void SetOSPRayRendererType(std::string);
+  //@{
+  /**
+   * Control of background orientation for OSPRay.
+   */
+  void SetBackgroundNorth(double x, double y, double z);
+  void SetBackgroundEast(double x, double y, double z);
+  //@}
+  /**
+   * For OSPRay, set the library of materials.
+   */
+  virtual void SetMaterialLibrary(vtkPVMaterialLibrary*);
 
   //@{
   /**
@@ -950,9 +923,13 @@ public:
   static void SetDiscreteCameras(
     vtkInformation* info, vtkPVDataRepresentation* repr, vtkPVCameraCollection* style);
   //@}
+
+  // Get the RenderViewBase used by this
+  vtkGetObjectMacro(RenderView, vtkRenderViewBase);
+
 protected:
   vtkPVRenderView();
-  ~vtkPVRenderView();
+  ~vtkPVRenderView() override;
 
   //@{
   /**
@@ -963,8 +940,8 @@ protected:
    * does any data-delivery, we don't assign IDs for these, nor affect the ID
    * uniquifier when a vtk3DWidgetRepresentation is added.
    */
-  virtual void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
-  virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  void RemoveRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
   //@}
 
   /**
@@ -1064,7 +1041,6 @@ protected:
    */
   void PostSelect(vtkSelection* sel);
 
-  vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
   vtkRenderer* NonCompositedRenderer;
@@ -1103,9 +1079,6 @@ protected:
   double LODRenderingThreshold;
   vtkBoundingBox GeometryBounds;
 
-  bool UseOffscreenRendering;
-  int EGLDeviceIndex;
-  bool UseOffscreenRenderingForScreenshots;
   bool UseInteractiveRenderingForScreenshots;
   bool NeedsOrderedCompositing;
   bool RenderEmptyImages;
@@ -1139,8 +1112,8 @@ protected:
   bool LockBounds;
 
 private:
-  vtkPVRenderView(const vtkPVRenderView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRenderView&) VTK_DELETE_FUNCTION;
+  vtkPVRenderView(const vtkPVRenderView&) = delete;
+  void operator=(const vtkPVRenderView&) = delete;
 
   bool MakingSelection;
   int PreviousSwapBuffers;

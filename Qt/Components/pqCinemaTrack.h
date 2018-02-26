@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqCinemaTrack : public QWidget
 
 public:
   pqCinemaTrack(QWidget* parentObject, Qt::WindowFlags parentFlags, pqPipelineFilter* filter);
-  ~pqCinemaTrack();
+  ~pqCinemaTrack() override;
 
   bool explore() const;
   QVariantList scalars() const;

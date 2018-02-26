@@ -57,7 +57,7 @@ public:
   /**
   * overload setData() to emit changed signal
   */
-  virtual void setData(int column, int role, const QVariant& v);
+  void setData(int column, int role, const QVariant& v) override;
 
 public slots:
   /**

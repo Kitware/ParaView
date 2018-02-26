@@ -55,7 +55,7 @@ class PQWIDGETS_EXPORT pqTreeWidgetSelectionHelper : public QObject
 
 public:
   pqTreeWidgetSelectionHelper(QTreeWidget* treeWidget);
-  ~pqTreeWidgetSelectionHelper();
+  ~pqTreeWidgetSelectionHelper() override;
 
 protected slots:
   void onItemPressed(QTreeWidgetItem* item, int column);

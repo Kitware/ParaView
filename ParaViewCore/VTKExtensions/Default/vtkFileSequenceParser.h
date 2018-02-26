@@ -54,13 +54,14 @@ public:
 
 protected:
   vtkFileSequenceParser();
-  ~vtkFileSequenceParser();
+  ~vtkFileSequenceParser() override;
 
   vtksys::RegularExpression* reg_ex;
   vtksys::RegularExpression* reg_ex2;
   vtksys::RegularExpression* reg_ex3;
   vtksys::RegularExpression* reg_ex4;
   vtksys::RegularExpression* reg_ex5;
+  vtksys::RegularExpression* reg_ex_last;
 
   // Used internall so char * allocations are done automatically.
   vtkSetStringMacro(SequenceName);
@@ -69,8 +70,8 @@ protected:
   char* SequenceName;
 
 private:
-  vtkFileSequenceParser(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFileSequenceParser&) VTK_DELETE_FUNCTION;
+  vtkFileSequenceParser(const vtkFileSequenceParser&) = delete;
+  void operator=(const vtkFileSequenceParser&) = delete;
 };
 
 #endif

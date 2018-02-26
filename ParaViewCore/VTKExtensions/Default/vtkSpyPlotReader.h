@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notice for more information.
  *
  * @par Implementation Details:
  * - All processors read the first binary file listed in the case file to get
- * informations about the fields.
+ * information about the fields.
  * - Each block of data is already surrounded by ghost cells in the file,
  * even on part of the block that don't have actual neighbor cells. The
  * reader removes those wrong ghost cells.
@@ -230,7 +230,7 @@ public:
 
 protected:
   vtkSpyPlotReader();
-  ~vtkSpyPlotReader();
+  ~vtkSpyPlotReader() override;
 
   // Determine the bounds of just this reader
   void GetLocalBounds(vtkSpyPlotBlockIterator* biter, int nBlocks, int progressInterval);
@@ -284,21 +284,21 @@ protected:
   // The array selections.
   vtkDataArraySelection* CellDataArraySelection;
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   // Create either vtkNonOverlappingAMR or vtkMultiBlockDataSet based on
   // whether the dataset is AMR.
-  virtual int RequestDataObject(
+  int RequestDataObject(
     vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) VTK_OVERRIDE;
 
   // Read the case file and the first binary file do get meta
-  // informations (number of files, number of fields, number of timestep).
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  // information (number of files, number of fields, number of timestep).
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Read the data: get the number of pieces (=processors) and get
   // my piece id (=my processor id).
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   /**
@@ -343,7 +343,7 @@ protected:
   /**
    * Overwritten to avoid hiding.
    */
-  virtual int UpdateTimeStep(double time, int piece = -1, int numPieces = 1, int ghostLevels = 0,
+  int UpdateTimeStep(double time, int piece = -1, int numPieces = 1, int ghostLevels = 0,
     const int extents[6] = 0) VTK_OVERRIDE
   {
     return this->Superclass::UpdateTimeStep(time, piece, numPieces, ghostLevels, extents);
@@ -395,8 +395,8 @@ protected:
   bool FileNameChanged;
 
 private:
-  vtkSpyPlotReader(const vtkSpyPlotReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpyPlotReader&) VTK_DELETE_FUNCTION;
+  vtkSpyPlotReader(const vtkSpyPlotReader&) = delete;
+  void operator=(const vtkSpyPlotReader&) = delete;
 
   class VectorOfDoubles;
 

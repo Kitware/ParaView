@@ -15,6 +15,30 @@
         </BoundsDomain>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty command="SetPadding"
+        name="Padding"
+        default_values="0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify a padding to use to inflate the bounds in all directions
+          before generating the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="RefinementMode"
+        command="SetRefinementMode"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Specify how refinement is computed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Use resolution" value="0" />
+          <Entry text="Use cell-size" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetResolution"
         default_values="100"
         name="Resolution"
@@ -22,7 +46,27 @@
         <IntRangeDomain min="1" name="range" />
         <Documentation>This property specifies the number of divisions along
           the X axis of the parallelogram.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="0" />
+        </Hints>
       </IntVectorProperty>
+
+      <DoubleVectorProperty name="CellSize"
+        command="SetCellSize"
+        default_values="1.0"
+        number_of_elements="1">
+        <Documentation>Specify the cell size to use to compute plane refinement.</Documentation>
+        <DoubleRangeDomain name="range" min= "1" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Center"
         command="SetCenter"
@@ -57,7 +101,9 @@
 
       <PropertyGroup label="Plane Bounds">
         <Property name="BoundingBox" />
+        <Property name="RefinementMode" />
         <Property name="Resolution" />
+        <Property name="CellSize" />
       </PropertyGroup>
 
       <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
@@ -87,16 +133,6 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <IntVectorProperty name="Resolution"
-        command="SetResolution"
-        number_of_elements="3"
-        default_values="100 100 100">
-        <IntRangeDomain name="range" min="1 1 1" />
-        <Documentation>
-          Set the sampling resolution for the generated volume.
-        </Documentation>
-      </IntVectorProperty>
-
       <DoubleVectorProperty name="Scale"
         command="SetScale"
         number_of_elements="3"
@@ -112,6 +148,60 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty command="SetPadding"
+        name="Padding"
+        default_values="0"
+        number_of_elements="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+          Specify a padding to use to inflate the bounds in all directions
+          before generating the plane.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="RefinementMode"
+        command="SetRefinementMode"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Specify how refinement is computed.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Use resolution" value="0" />
+          <Entry text="Use cell-size" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Resolution"
+        command="SetResolution"
+        number_of_elements="3"
+        default_values="100 100 100">
+        <IntRangeDomain name="range" min="1 1 1" />
+        <Documentation>
+          Set the sampling resolution for the generated volume.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="0" />
+        </Hints>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CellSize"
+        command="SetCellSize"
+        default_values="1.0"
+        number_of_elements="1">
+        <Documentation>Specify the cell size to use to compute plane refinement.</Documentation>
+        <DoubleRangeDomain name="range" min= "1" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="RefinementMode"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+
       <InputProperty is_internal="1" name="DummyInput">
         <!-- Used when this source is added to a proxy list domain. -->
       </InputProperty>
@@ -119,6 +209,12 @@
       <PropertyGroup label="Volume Parameters" panel_widget="InteractiveBox">
         <Property function="Position" name="Origin" />
         <Property function="Scale" name="Scale" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Volume Refinement">
+        <Property name="RefinementMode" />
+        <Property name="Resolution" />
+        <Property name="CellSize" />
       </PropertyGroup>
       <Hints>
         <ProxyList>
@@ -325,7 +421,7 @@
         default_values="0.0001">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
-          Specify the intial particle spatial step.
+          Specify the initial particle spatial step.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -778,7 +874,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -823,7 +919,7 @@
         <EnumerationDomain name="enum">
           <Entry text="Mask Points" value="0" />
           <Entry text="Null Value" value="1" />
-          <Entry text="Closet Point" value="1" />
+          <Entry text="Closest Point" value="1" />
         </EnumerationDomain>
         <Documentation>
           Specify a strategy to use when encountering a "null" point during the
@@ -922,7 +1018,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -956,7 +1052,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -987,7 +1083,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>
@@ -1017,7 +1113,7 @@
         set of points `P` (the filter *Source*), interpolating the data values from `PC`
         onto `P`. Note however that the descriptive phrase "point cloud" is a
         misnomer: PC can be represented by any dataset type, with the points of
-        the dataset forming PC. Similary, the output P can also be represented by
+        the dataset forming PC. Similarly, the output P can also be represented by
         any vtkDataSet type; and the topology/geometry structure of P is passed
         through to the output along with the newly interpolated arrays.
       </Documentation>

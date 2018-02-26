@@ -31,23 +31,23 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIndexSelectionDomain : public vtkSMDoma
 {
 public:
   vtkTypeMacro(vtkSMIndexSelectionDomain, vtkSMDomain);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   static vtkSMIndexSelectionDomain* New();
 
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
-  virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) VTK_OVERRIDE;
 
   vtkSMProperty* GetInfoProperty() { return this->GetRequiredProperty("Info"); }
 
 protected:
   vtkSMIndexSelectionDomain();
-  ~vtkSMIndexSelectionDomain();
+  ~vtkSMIndexSelectionDomain() override;
 
 private:
-  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMIndexSelectionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMIndexSelectionDomain(const vtkSMIndexSelectionDomain&) = delete;
+  void operator=(const vtkSMIndexSelectionDomain&) = delete;
 };
 
 #endif // vtkSMIndexSelectionDomain_h

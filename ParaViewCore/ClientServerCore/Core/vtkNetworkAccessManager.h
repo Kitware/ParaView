@@ -86,13 +86,23 @@ public:
    */
   virtual bool GetPendingConnectionsPresent() = 0;
 
+  /**
+   * Enable/disable further connections for given port.
+   */
+  virtual void DisableFurtherConnections(int port, bool disable) = 0;
+
+  /**
+   * Returns true if the last check of connect ids was wrong.
+   */
+  virtual bool GetWrongConnectID() = 0;
+
 protected:
   vtkNetworkAccessManager();
-  ~vtkNetworkAccessManager();
+  ~vtkNetworkAccessManager() override;
 
 private:
-  vtkNetworkAccessManager(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkNetworkAccessManager&) VTK_DELETE_FUNCTION;
+  vtkNetworkAccessManager(const vtkNetworkAccessManager&) = delete;
+  void operator=(const vtkNetworkAccessManager&) = delete;
 };
 
 #endif

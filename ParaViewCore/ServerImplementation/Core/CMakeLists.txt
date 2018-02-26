@@ -37,17 +37,18 @@ set (Module_SRCS
   vtkPVSessionCoreInterpreterHelper.cxx
   vtkPVSessionServer.cxx
   vtkSIArraySelectionProperty.cxx
-  vtkSIIndexSelectionProperty.cxx
   vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
   vtkSIDataArrayProperty.cxx
+  vtkSIDataArraySelectionProperty.cxx
   vtkSIDirectoryProxy.cxx
   vtkSIDoubleMapProperty.cxx
   vtkSIDoubleVectorProperty.cxx
-  vtkSIMetaReaderProxy.cxx
   vtkSIIdTypeVectorProperty.cxx
+  vtkSIIndexSelectionProperty.cxx
   vtkSIInputProperty.cxx
   vtkSIIntVectorProperty.cxx
+  vtkSIMetaReaderProxy.cxx
   vtkSIObject.cxx
   vtkSIProperty.cxx
   vtkSIProxy.cxx
@@ -63,17 +64,6 @@ set (Module_SRCS
   vtkSIWriterProxy.cxx
   vtkSMMessage.cxx
 )
-
-set_source_files_properties(
-  vtkSMMessage
-  WRAP_EXCLUDE)
-
-set_source_files_properties(
-  vtkPVProxyDefinitionIterator.cxx
-  vtkPVSessionBase.cxx
-  vtkSIVectorProperty.cxx
-  vtkSMMessage.cxx
-  ABSTRACT)
 
 # Add header-only files so they get installed correctly.
 set (${vtk-module}_HDRS
@@ -105,11 +95,6 @@ add_custom_target(
 )
 
 #------------------------------------------------------------------------------
-# OpenGL2 specific definitions
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
-
 vtk_module_library(vtkPVServerImplementationCore
   ${Module_SRCS})
 

@@ -79,12 +79,12 @@ public:
 
 protected:
   vtkPVHardwareSelector();
-  ~vtkPVHardwareSelector();
+  ~vtkPVHardwareSelector() override;
 
   /**
    * Return a unique ID for the prop.
    */
-  virtual int GetPropID(int idx, vtkProp* prop) VTK_OVERRIDE;
+  int GetPropID(int idx, vtkProp* prop) VTK_OVERRIDE;
 
   /**
    * Returns is the pass indicated is needed.
@@ -92,7 +92,7 @@ protected:
    * can be smart about it by only requiring it for sessions with more than 1
    * data-server.
    */
-  virtual bool PassRequired(int pass) VTK_OVERRIDE;
+  bool PassRequired(int pass) VTK_OVERRIDE;
 
   /**
    * Prepare for selection.
@@ -100,15 +100,15 @@ protected:
    */
   bool PrepareSelect();
 
-  virtual void SavePixelBuffer(int passNo) VTK_OVERRIDE;
+  void SavePixelBuffer(int passNo) VTK_OVERRIDE;
 
   vtkTimeStamp CaptureTime;
   int UniqueId;
   vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
 
 private:
-  vtkPVHardwareSelector(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVHardwareSelector&) VTK_DELETE_FUNCTION;
+  vtkPVHardwareSelector(const vtkPVHardwareSelector&) = delete;
+  void operator=(const vtkPVHardwareSelector&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

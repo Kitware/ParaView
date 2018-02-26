@@ -33,8 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMTransferFunctionManager.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 #include <QList>
 #include <QPointer>
@@ -48,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "vtkSMProperty.h"
-#include "vtkSMTransferFunctionProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarsToColorsInternal
@@ -101,10 +105,20 @@ pqScalarBarRepresentation* pqScalarsToColors::getScalarBar(pqRenderViewBase* ren
 //-----------------------------------------------------------------------------
 void pqScalarsToColors::setScalarRangeLock(bool lock)
 {
-  vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
+  vtkSMProperty* prop = this->getProxy()->GetProperty("AutomaticRescaleRangeMode");
   if (prop)
   {
-    pqSMAdaptor::setElementProperty(prop, (lock ? 1 : 0));
+    if (lock)
+    {
+      pqSMAdaptor::setElementProperty(prop, vtkSMTransferFunctionManager::NEVER);
+    }
+    else
+    {
+      // Reset the AutomaticRescaleRangeMode to the current global setting.
+      vtkSMTransferFunctionProxy* tfProxy =
+        vtkSMTransferFunctionProxy::SafeDownCast(this->getProxy());
+      tfProxy->ResetRescaleModeToGlobalSetting();
+    }
   }
   this->getProxy()->UpdateVTKObjects();
 }
@@ -112,8 +126,8 @@ void pqScalarsToColors::setScalarRangeLock(bool lock)
 //-----------------------------------------------------------------------------
 bool pqScalarsToColors::getScalarRangeLock() const
 {
-  vtkSMProperty* prop = this->getProxy()->GetProperty("LockScalarRange");
-  if (prop && pqSMAdaptor::getElementProperty(prop).toInt() != 0)
+  vtkSMProperty* prop = this->getProxy()->GetProperty("AutomaticRescaleRangeMode");
+  if (prop && pqSMAdaptor::getElementProperty(prop).toInt() == vtkSMTransferFunctionManager::NEVER)
   {
     return true;
   }

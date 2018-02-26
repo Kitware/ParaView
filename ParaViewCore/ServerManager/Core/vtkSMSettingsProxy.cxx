@@ -27,7 +27,7 @@ class vtkSMSettingsObserver : public vtkCommand
 public:
   static vtkSMSettingsObserver* New() { return new vtkSMSettingsObserver; }
 
-  virtual void Execute(vtkObject*, unsigned long eventId, void*)
+  void Execute(vtkObject*, unsigned long eventId, void*) override
   {
     if (this->Proxy)
     {

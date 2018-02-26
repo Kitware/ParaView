@@ -33,18 +33,18 @@ public:
 
 protected:
   vtkSITimeLabelProperty();
-  ~vtkSITimeLabelProperty();
+  ~vtkSITimeLabelProperty() override;
 
   friend class vtkSIProxy;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
 private:
-  vtkSITimeLabelProperty(const vtkSITimeLabelProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSITimeLabelProperty&) VTK_DELETE_FUNCTION;
+  vtkSITimeLabelProperty(const vtkSITimeLabelProperty&) = delete;
+  void operator=(const vtkSITimeLabelProperty&) = delete;
 };
 
 #endif

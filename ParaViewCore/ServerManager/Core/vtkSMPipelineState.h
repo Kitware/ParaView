@@ -48,14 +48,14 @@ public:
    * This method return the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
-  virtual const vtkSMMessage* GetFullState() VTK_OVERRIDE;
+  const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 
   /**
    * This method is used to initialise the object to the given state
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   void ValidateState();
 
@@ -68,11 +68,11 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkSMPipelineState();
+  ~vtkSMPipelineState() override;
 
 private:
-  vtkSMPipelineState(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPipelineState&) VTK_DELETE_FUNCTION;
+  vtkSMPipelineState(const vtkSMPipelineState&) = delete;
+  void operator=(const vtkSMPipelineState&) = delete;
 };
 
 #endif // #ifndef vtkSMPipelineState_h

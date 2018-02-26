@@ -49,8 +49,8 @@ public:
   /**
    * Re-implemented from vtkSMPreselectionPipeline
    */
-  virtual void Hide(vtkSMRenderViewProxy* view) VTK_OVERRIDE;
-  virtual void Show(vtkSMSourceProxy* sourceRepresentation, vtkSMSourceProxy* selection,
+  void Hide(vtkSMRenderViewProxy* view) VTK_OVERRIDE;
+  void Show(vtkSMSourceProxy* sourceRepresentation, vtkSMSourceProxy* selection,
     vtkSMRenderViewProxy* view) VTK_OVERRIDE;
   //@}
 
@@ -69,7 +69,7 @@ public:
 
 protected:
   vtkSMTooltipSelectionPipeline();
-  ~vtkSMTooltipSelectionPipeline();
+  ~vtkSMTooltipSelectionPipeline() override;
 
   /**
    * Re-implemented from vtkSMPreselectionPipeline
@@ -101,8 +101,8 @@ protected:
   bool TooltipEnabled;
 
 private:
-  vtkSMTooltipSelectionPipeline(const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTooltipSelectionPipeline&) VTK_DELETE_FUNCTION;
+  vtkSMTooltipSelectionPipeline(const vtkSMTooltipSelectionPipeline&) = delete;
+  void operator=(const vtkSMTooltipSelectionPipeline&) = delete;
 };
 
 #endif

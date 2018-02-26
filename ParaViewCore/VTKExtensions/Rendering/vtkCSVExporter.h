@@ -122,7 +122,7 @@ public:
 
 protected:
   vtkCSVExporter();
-  ~vtkCSVExporter();
+  ~vtkCSVExporter() override;
 
   char* FileName;
   char* FieldDelimiter;
@@ -131,8 +131,8 @@ protected:
   ExporterModes Mode;
 
 private:
-  vtkCSVExporter(const vtkCSVExporter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCSVExporter&) VTK_DELETE_FUNCTION;
+  vtkCSVExporter(const vtkCSVExporter&) = delete;
+  void operator=(const vtkCSVExporter&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

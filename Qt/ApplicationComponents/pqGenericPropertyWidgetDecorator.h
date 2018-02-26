@@ -58,13 +58,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqGenericPropertyWidgetDecorator
 
 public:
   pqGenericPropertyWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  virtual ~pqGenericPropertyWidgetDecorator();
+  ~pqGenericPropertyWidgetDecorator() override;
 
   /**
   * Methods overridden from pqPropertyWidget.
   */
-  virtual bool canShowWidget(bool show_advanced) const;
-  virtual bool enableWidget() const;
+  bool canShowWidget(bool show_advanced) const override;
+  bool enableWidget() const override;
 
 private slots:
   void updateState();

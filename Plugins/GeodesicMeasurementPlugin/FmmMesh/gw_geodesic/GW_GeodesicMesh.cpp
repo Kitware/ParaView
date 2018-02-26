@@ -83,7 +83,7 @@ void GW_GeodesicMesh::SetUpFastMarching( GW_GeodesicVertex* pStartVertex )
 /*------------------------------------------------------------------------------*/
 // Name : GW_GeodesicMesh::PerformFastMarchingFlush
 /**
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-13-2003
  *
  *  Continue the algorithm until it termins.
@@ -105,7 +105,7 @@ void GW_GeodesicMesh::PerformFastMarchingFlush()
 // Name : GW_GeodesicMesh::IsFastMarchingFinished
 /**
  *  \return [GW_Bool] Response.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-13-2003
  *
  *  Is the algorhm finished ?
@@ -121,7 +121,7 @@ GW_Bool GW_GeodesicMesh::IsFastMarchingFinished()
 // Name : GW_GeodesicMesh::GetRandomVertex
 /**
 *  \return [GW_Vertex*] The vertex. NULL if it was impossible.
-*  \author Gabriel Peyré
+*  \author Gabriel PeyrÃ©
 *  \date   4-14-2003
 *
 *  Get Return a vertex at random.
@@ -147,7 +147,7 @@ GW_Vertex* GW_GeodesicMesh::GetRandomVertex(GW_Bool bForceFar)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

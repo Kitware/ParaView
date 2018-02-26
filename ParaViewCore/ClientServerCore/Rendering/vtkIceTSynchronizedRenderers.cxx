@@ -21,6 +21,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLError.h"
+#include "vtkOpenGLRenderUtilities.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkRenderState.h"
@@ -32,6 +33,8 @@
 
 #include <IceTGL.h>
 #include <assert.h>
+
+using RenUtils = vtkOpenGLRenderUtilities;
 
 // This pass is used to simply render an image onto the frame buffer. Used when
 // an ImageProcessingPass is set to paste the IceT composited image into the
@@ -51,20 +54,28 @@ public:
     vtkOpenGLClearErrorMacro();
     if (this->DelegatePass)
     {
+      RenUtils::MarkDebugEvent("vtkMyImagePasterPass: Delegate Begin");
       this->DelegatePass->Render(render_state);
       vtkOpenGLCheckErrorMacro("failed after delegate pass render");
+      RenUtils::MarkDebugEvent("vtkMyImagePasterPass: Delegate End");
     }
     if (this->IceTCompositePass)
     {
+      RenUtils::MarkDebugEvent("vtkMyImagePasterPass: Image Extract Begin");
       this->IceTCompositePass->GetLastRenderedTile(this->Image);
+      RenUtils::MarkDebugEvent("vtkMyImagePasterPass: Image Extract End");
     }
     if (this->Image.IsValid())
     {
+      RenUtils::MarkDebugEvent("vtkMyImagePasterPass: RGBA Push Begin");
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->Image.PushToFrameBuffer(render_state->GetRenderer());
+      RenUtils::MarkDebugEvent("vtkMyImagePasterPass: RGBA Push End");
       if (this->UseDepthBuffer)
       {
+        RenUtils::MarkDebugEvent("vtkMyImagePasterPass: Depth Push Begin");
         this->IceTCompositePass->PushIceTDepthBufferToScreen(render_state);
+        RenUtils::MarkDebugEvent("vtkMyImagePasterPass: Depth Push End");
       }
     }
     glFinish();
@@ -412,7 +423,6 @@ void vtkIceTSynchronizedRenderers::SlaveStartRender()
 {
   this->Superclass::SlaveStartRender();
 
-#ifdef VTKGL2
   int x, y;
   this->IceTCompositePass->GetTileDimensions(x, y);
   if (!(x == 1 && y == 1))
@@ -427,5 +437,4 @@ void vtkIceTSynchronizedRenderers::SlaveStartRender()
   this->Renderer->SetBackground(0, 0, 0);
   this->Renderer->SetGradientBackground(false);
   this->Renderer->SetTexturedBackground(false);
-#endif
 }

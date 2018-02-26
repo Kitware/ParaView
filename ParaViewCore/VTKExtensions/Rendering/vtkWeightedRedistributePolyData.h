@@ -64,8 +64,8 @@ protected:
   float* Weights;
 
 private:
-  vtkWeightedRedistributePolyData(const vtkWeightedRedistributePolyData&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkWeightedRedistributePolyData&) VTK_DELETE_FUNCTION;
+  vtkWeightedRedistributePolyData(const vtkWeightedRedistributePolyData&) = delete;
+  void operator=(const vtkWeightedRedistributePolyData&) = delete;
 };
 
 //****************************************************************

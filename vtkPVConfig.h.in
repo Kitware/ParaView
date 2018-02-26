@@ -55,7 +55,7 @@
 #define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
 #define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
 
-// Some runtime informations to be displayed in About box:
+// Some runtime information to be displayed in About box:
 #define OPENGL_gl_LIBRARY   "@OPENGL_gl_LIBRARY@"
 #define OPENGL_INCLUDE_DIR  "@OPENGL_INCLUDE_DIR@"
 #define CMAKE_BUILD_TYPE    "@CMAKE_BUILD_TYPE@"
@@ -79,6 +79,9 @@
 # define PARAVIEW_QT_VERSION @PARAVIEW_QT_VERSION@
 #endif
 
+// defined when vtk-m support is enabled
+#cmakedefine PARAVIEW_USE_VTKM
+
 // ParaView data root (useful for testing).
 #define PARAVIEW_DATA_ROOT "@PARAVIEW_DATA_ROOT@"
 
@@ -100,8 +103,10 @@
 
 #cmakedefine PARAVIEW_USE_OSPRAY
 
-#cmakedefine PARAVIEW_USE_OPENVR
+#cmakedefine PARAVIEW_USE_OPENTURNS
 
 #cmakedefine PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
+
+#cmakedefine PARAVIEW_ENABLE_NVPIPE
 
 #endif

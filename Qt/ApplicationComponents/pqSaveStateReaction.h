@@ -48,7 +48,7 @@ public:
   * Constructor. Parent cannot be NULL.
   */
   pqSaveStateReaction(QAction* parent);
-  ~pqSaveStateReaction() {}
+  ~pqSaveStateReaction() override {}
 
   /**
   * Open File dialog in order to choose the location and the type of
@@ -76,13 +76,13 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqSaveStateReaction::saveState(); }
+  void onTriggered() override { pqSaveStateReaction::saveState(); }
 
 private:
   Q_DISABLE_COPY(pqSaveStateReaction)

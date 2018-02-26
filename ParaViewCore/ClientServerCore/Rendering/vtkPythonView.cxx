@@ -186,7 +186,7 @@ vtkPythonView::vtkPythonView()
   this->Renderer->SetBackgroundTexture(this->RenderTexture);
   this->RenderWindow.TakeReference(this->SynchronizedWindows->NewRenderWindow());
   this->RenderWindow->AddRenderer(this->Renderer);
-  this->Magnification = 1;
+  this->Magnification[0] = this->Magnification[1] = 1;
   this->ImageData = NULL;
 
   this->Script = NULL;
@@ -443,8 +443,8 @@ void vtkPythonView::StillRender()
     this->SetImageData(NULL);
 
     // Now draw the image
-    int width = this->Size[0] * this->Magnification;
-    int height = this->Size[1] * this->Magnification;
+    int width = this->Size[0] * this->Magnification[0];
+    int height = this->Size[1] * this->Magnification[1];
 
     this->Internals->CallRender(this, width, height);
 
@@ -529,7 +529,8 @@ void vtkPythonView::PrintSelf(ostream& os, vtkIndent indent)
   {
     os << "(none)" << endl;
   }
-  os << indent << "Magnification: " << this->Magnification << endl;
+  os << indent << "Magnification: " << this->Magnification[0] << ", " << this->Magnification[1]
+     << endl;
   os << indent << "Script: \n" << this->Script << endl;
   os << indent << "ImageData: ";
   if (this->ImageData)

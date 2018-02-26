@@ -25,10 +25,14 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVBox.h"
+#include "vtkPlane.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkThreshold.h"
+#include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtkInformationStringVectorKey.h"
@@ -45,6 +49,7 @@ vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction* vtkNotUsed(cf))
   this->SetNumberOfOutputPorts(1);
 
   this->UseAMRDualClipForAMR = true;
+  this->ExactBoxClip = false;
 }
 
 //----------------------------------------------------------------------------
@@ -221,6 +226,63 @@ int vtkPVClipDataSet::ClipUsingThreshold(
 int vtkPVClipDataSet::ClipUsingSuperclass(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  if (vtkImplicitFunction* clipFunction = this->GetClipFunction())
+  {
+    if (clipFunction->IsA("vtkPVBox") && this->ExactBoxClip && this->GetInsideOut())
+    {
+      int retVal = 1;
+      // create 3 implicit functions representing the matching outside pairs of the box
+      vtkAbstractTransform* transform = clipFunction->GetTransform();
+      vtkPVBox* pvBox = vtkPVBox::SafeDownCast(clipFunction);
+      double bounds[6];
+      pvBox->GetBounds(bounds);
+      vtkSmartPointer<vtkDataObject> currentInputDO = vtkDataObject::GetData(inputVector[0], 0);
+      for (int i = 0; i < 3; i++)
+      {
+        for (int j = 0; j < 2; j++)
+        {
+          vtkNew<vtkPlane> plane;
+          double normal[3] = { 0, 0, 0 };
+          if (j == 0)
+          {
+            normal[i] = -1;
+            plane->SetOrigin(bounds[0], bounds[2], bounds[4]);
+          }
+          else
+          {
+            normal[i] = 1;
+            plane->SetOrigin(bounds[1], bounds[3], bounds[5]);
+          }
+          plane->SetNormal(normal);
+          plane->SetTransform(transform);
+          this->ClipFunction = plane; // temporarily set it without changing MTime of the filter
+
+          // Creating new input information.
+          vtkSmartPointer<vtkInformationVector> newInInfoVec =
+            vtkSmartPointer<vtkInformationVector>::New();
+          vtkSmartPointer<vtkInformation> newInInfo = vtkSmartPointer<vtkInformation>::New();
+          newInInfo->Set(vtkDataObject::DATA_OBJECT(), currentInputDO);
+          newInInfoVec->SetInformationObject(0, newInInfo);
+
+          // Creating new output information.
+          vtkSmartPointer<vtkUnstructuredGrid> usGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+          vtkSmartPointer<vtkInformationVector> newOutInfoVec =
+            vtkSmartPointer<vtkInformationVector>::New();
+          vtkSmartPointer<vtkInformation> newOutInfo = vtkSmartPointer<vtkInformation>::New();
+          newOutInfo->Set(vtkDataObject::DATA_OBJECT(), usGrid);
+          newOutInfoVec->SetInformationObject(0, newOutInfo);
+
+          vtkInformationVector* newInInfoVecPtr = newInInfoVec.GetPointer();
+          retVal = retVal && this->ClipUsingSuperclass(request, &newInInfoVecPtr, newOutInfoVec);
+          currentInputDO = usGrid;
+        }
+      }
+      vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
+      outputDO->ShallowCopy(currentInputDO);
+      this->ClipFunction = clipFunction; // set back to original clip function
+      return retVal;
+    }
+  }
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
@@ -256,7 +318,7 @@ int vtkPVClipDataSet::ClipUsingSuperclass(
     newOutInfoVec->SetInformationObject(0, newOutInfo);
 
     vtkInformationVector* newInInfoVecPtr = newInInfoVec.GetPointer();
-    if (!this->Superclass::RequestData(request, &newInInfoVecPtr, newOutInfoVec.GetPointer()))
+    if (!this->Superclass::RequestData(request, &newInInfoVecPtr, newOutInfoVec))
     {
       return 0;
     }

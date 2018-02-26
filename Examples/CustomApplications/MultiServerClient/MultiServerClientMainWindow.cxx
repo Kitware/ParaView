@@ -71,7 +71,7 @@ MultiServerClientMainWindow::MultiServerClientMainWindow(
   pqParaViewMenuBuilders::buildSourcesMenu(*ui.menu_Sources, this);
   new pqParaViewBehaviors(this, this);
 
-  // Keep arround GUI components
+  // Keep around GUI components
   this->pipelineBrowser = ui.pipelineBrowser;
   this->comboBox = ui.filteringServer;
 

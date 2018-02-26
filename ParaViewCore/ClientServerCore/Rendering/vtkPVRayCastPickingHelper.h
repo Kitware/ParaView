@@ -73,13 +73,13 @@ public:
    */
   void ComputeIntersection();
 
-  // Descritpion:
+  // Description:
   // Provide access to the resulting intersection
   vtkGetVector3Macro(Intersection, double);
 
 protected:
   vtkPVRayCastPickingHelper();
-  ~vtkPVRayCastPickingHelper();
+  ~vtkPVRayCastPickingHelper() override;
 
   /**
    * Compute the intersection using provided dataset
@@ -94,8 +94,8 @@ protected:
   vtkAlgorithm* Selection;
 
 private:
-  vtkPVRayCastPickingHelper(const vtkPVRayCastPickingHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRayCastPickingHelper&) VTK_DELETE_FUNCTION;
+  vtkPVRayCastPickingHelper(const vtkPVRayCastPickingHelper&) = delete;
+  void operator=(const vtkPVRayCastPickingHelper&) = delete;
 };
 
 #endif

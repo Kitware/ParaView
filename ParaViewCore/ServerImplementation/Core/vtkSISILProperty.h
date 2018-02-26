@@ -35,7 +35,7 @@ public:
 
 protected:
   vtkSISILProperty();
-  ~vtkSISILProperty();
+  ~vtkSISILProperty() override;
 
   friend class vtkSIProxy;
 
@@ -44,12 +44,12 @@ protected:
    * and the "output_port" if this one is different than the default one which
    * is 0.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
 
   vtkSetStringMacro(SubTree);
 
@@ -58,8 +58,8 @@ protected:
     vtkGraph* sil, vtkIdType vertexid, vtkIdTypeSet& list, bool traverse_cross_edges);
 
 private:
-  vtkSISILProperty(const vtkSISILProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSISILProperty&) VTK_DELETE_FUNCTION;
+  vtkSISILProperty(const vtkSISILProperty&) = delete;
+  void operator=(const vtkSISILProperty&) = delete;
 
   char* SubTree;
   int OutputPort;

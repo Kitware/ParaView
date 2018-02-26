@@ -56,17 +56,17 @@ public:
 
 protected:
   vtkPVPostFilterExecutive();
-  ~vtkPVPostFilterExecutive();
+  ~vtkPVPostFilterExecutive() override;
 
-  // Overriden to always return true
-  virtual int NeedToExecuteData(int outputPort, vtkInformationVector** inInfoVec,
+  // Overridden to always return true
+  int NeedToExecuteData(int outputPort, vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec) VTK_OVERRIDE;
 
   bool MatchingPropertyInformation(vtkInformation* inputArrayInfo, vtkInformation* postArrayInfo);
 
 private:
-  vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPostFilterExecutive&) VTK_DELETE_FUNCTION;
+  vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&) = delete;
+  void operator=(const vtkPVPostFilterExecutive&) = delete;
 };
 
 #endif

@@ -46,7 +46,7 @@ class Segment : public vtkObject
 {
   vtkTypeMacro(Segment, vtkObject);
   static Segment* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   vtkSetObjectMacro(PolyData, vtkPolyData);
   vtkGetObjectMacro(PolyData, vtkPolyData);
@@ -73,7 +73,7 @@ class Segment : public vtkObject
 
 protected:
   Segment();
-  virtual ~Segment();
+  ~Segment() override;
 
   void ComputeDirection(vtkIdType pointIndex, bool increment, double* direction) const;
 
@@ -89,8 +89,8 @@ protected:
   mutable double EndDirection[3];
 
 private:
-  Segment(const vtkObject&) VTK_DELETE_FUNCTION;
-  void operator=(const Segment&) VTK_DELETE_FUNCTION;
+  Segment(const vtkObject&) = delete;
+  void operator=(const Segment&) = delete;
 };
 
 class Node : public vtkObject
@@ -111,15 +111,15 @@ class Node : public vtkObject
 
 protected:
   Node();
-  virtual ~Node();
+  ~Node() override;
 
   vtkPolyData* PolyData;
   vtkIdType PointId;
   vtkCollection* Segments;
 
 private:
-  Node(const vtkObject&) VTK_DELETE_FUNCTION;
-  void operator=(const Node&) VTK_DELETE_FUNCTION;
+  Node(const vtkObject&) = delete;
+  void operator=(const Node&) = delete;
 };
 
 vtkStandardNewMacro(Segment);

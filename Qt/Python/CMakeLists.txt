@@ -31,8 +31,6 @@
 set(Module_SRCS
   pqPythonDebugLeaksView.cxx
   pqPythonDebugLeaksView.h
-  pqPythonDialog.cxx
-  pqPythonDialog.h
   pqPythonMacroSupervisor.cxx
   pqPythonMacroSupervisor.h
   pqPythonManager.cxx
@@ -47,7 +45,6 @@ set(Module_SRCS
 
 set (Module_MOC_HDRS
   pqPythonDebugLeaksView.h
-  pqPythonDialog.h
   pqPythonMacroSupervisor.h
   pqPythonManager.h
   pqPythonScriptEditor.h
@@ -56,8 +53,14 @@ set (Module_MOC_HDRS
 )
 
 set (Module_UI_FILES
-  pqPythonDialog.ui
+  pqPythonShell.ui
 )
+
+if(NOT VTK_LEGACY_REMOVE)
+  list(APPEND Module_SRCS pqPythonDialog.cxx pqPythonDialog.h)
+  list(APPEND Module_MOC_HDRS pqPythonDialog.h)
+  list(APPEND Module_UI_FILES pqPythonDialog.ui)
+endif()
 
 find_package(PythonLibs REQUIRED)
 
@@ -72,7 +75,6 @@ set(${vtk-module}_NO_HeaderTest 1)
 
 include(ParaViewQt)
 pv_find_package_qt(qt_private_targets REQUIRED
-                QT4_COMPONENTS QtGui
                 QT5_COMPONENTS Widgets)
 pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
@@ -80,7 +82,6 @@ pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 set(${vtk-module}_EXPORT_CODE_INSTALL
   "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
   pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-    QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)")
 set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
 

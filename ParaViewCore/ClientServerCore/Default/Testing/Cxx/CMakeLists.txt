@@ -1,9 +1,5 @@
 include(ParaViewTestingMacros)
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
-
 paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ParaViewCoreClientServerCorePrintSelf.cxx

@@ -52,7 +52,7 @@ public:
   /**
    * Return whether we can read the file given.
    */
-  virtual int CanReadFile(const char*);
+  int CanReadFile(const char*) override;
 
   //@{
   /**
@@ -64,12 +64,11 @@ public:
 
 protected:
   vtkPVEnSightMasterServerReader();
-  ~vtkPVEnSightMasterServerReader();
+  ~vtkPVEnSightMasterServerReader() override;
 
-  virtual int RequestInformation(
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   int ParseMasterServerFile();
 
   void SuperclassExecuteInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
@@ -93,8 +92,8 @@ protected:
   int InformationError;
 
 private:
-  vtkPVEnSightMasterServerReader(const vtkPVEnSightMasterServerReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVEnSightMasterServerReader&) VTK_DELETE_FUNCTION;
+  vtkPVEnSightMasterServerReader(const vtkPVEnSightMasterServerReader&) = delete;
+  void operator=(const vtkPVEnSightMasterServerReader&) = delete;
 };
 
 #endif

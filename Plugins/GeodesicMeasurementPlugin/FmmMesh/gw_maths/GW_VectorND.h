@@ -3,7 +3,7 @@
 /**
  *  \file   GW_VectorND.h
  *  \brief  Definition of class \c GW_VectorND
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-31-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -32,7 +32,7 @@ typedef TNT::Array1D<GW_Float> GW_TNTArray1D;
 /**
  *  \class  GW_VectorND
  *  \brief  A vector of size N
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-31-2003
  *
  *  Use \b TNT lib
@@ -69,9 +69,9 @@ public:
     /**
     * Name : GW_VectorND::operator
     *
-    *  \param  f Rigth hand statement
+    *  \param  f Right hand statement
     *  \return the vector scaled.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorND GW_VectorND::operator*(const GW_Float& f) const
@@ -87,7 +87,7 @@ public:
     *  \param  f left hand statement.
     *  \param  v right hand statement.
     *  \param  r vector v scaled by f.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     static void GW_VectorND::Multiply(const GW_Float f, const GW_VectorND& v, GW_VectorND& r)
@@ -102,7 +102,7 @@ public:
     * Name : GW_VectorND::*=
     *
     *  \param  f scale factOML
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     *
     *    Auto-scale the vector.
     */
@@ -116,7 +116,7 @@ public:
     * Name : GW_VectorND::+
     *
     *  \param  v right hand statement
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorND GW_VectorND::operator+(const GW_VectorND& v) const
@@ -132,7 +132,7 @@ public:
     *  \param  a left hand statement
     *  \param  b right hand statement
     *  \param  r result
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     *
     *    Add the two vectOMLs.
     */
@@ -150,7 +150,7 @@ public:
     * Name : GW_VectorND::-
     *
     *  \param  v right hand statement
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorND  GW_VectorND::operator-(const GW_VectorND & v) const
@@ -166,7 +166,7 @@ public:
     *  \param  a left hand statement
     *  \param  b right hand statement
     *  \param  r result
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     *
     *    Substract the two vectOMLs.
     */
@@ -184,7 +184,7 @@ public:
     * Name : operator GW_VectorND::-
     *
     *  \return The opposite of the vector.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     GW_VectorND  GW_VectorND::operator-() const
@@ -199,7 +199,7 @@ public:
     *
     *  \param  a right hand statement
     *  \param  r result
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     static void GW_VectorND::UMinus(const GW_VectorND& a, GW_VectorND& r)
@@ -213,8 +213,8 @@ public:
     /**
     * Name : GW_VectorND::+=
     *
-    *  \param  v rigth hand statement.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \param  v right hand statement.
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void  GW_VectorND::operator+=(const GW_VectorND & v)
@@ -225,8 +225,8 @@ public:
     /**
     * Name : GW_VectorND::-=
     *
-    *  \param  v rigth hand statement.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \param  v right hand statement.
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void  GW_VectorND::operator-=(const GW_VectorND & v)
@@ -237,9 +237,9 @@ public:
     /**
     * Name : GW_VectorND::*
     *
-    *  \param  v rigth hand statement.
+    *  \param  v right hand statement.
     *    \return Dot product of the two vectOMLs.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_VectorND::operator*(const GW_VectorND& v)
@@ -259,9 +259,9 @@ public:
     * Name : GW_VectorND::NormInf
     *
     *  \return Infinite norm of the vector.
-    *  \author Gabriel Peyré 2001-09-30
+    *  \author Gabriel PeyrÃ© 2001-09-30
     *
-    *    The infinte norm is the maximum of the absolute value of the coordonates.
+    *    The infinite norm is the maximum of the absolute value of the coordinates.
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_VectorND::NormInf()
@@ -286,7 +286,7 @@ public:
     * Name : GW_VectorND::Norm2
     *
     *  \return Norm 2 of the vector.
-    *  \author Gabriel Peyré 2001-09-30
+    *  \author Gabriel PeyrÃ© 2001-09-30
     *
     *    The eclidian norm of the vector.
     */
@@ -310,7 +310,7 @@ public:
     * Name : GW_VectorND::Norm1
     *
     *  \return Norm 1 of the vector.
-    *  \author Gabriel Peyré 2001-09-30
+    *  \author Gabriel PeyrÃ© 2001-09-30
     *
     *    The norm 1 is the sum of the absolute value of the coords.
     */
@@ -330,7 +330,7 @@ public:
     *
     *  \param  i offset in the vector.
     *  \return the value of the given coord.
-    *  \authOML Gabriel Peyré 2001-09-29
+    *  \authOML Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     GW_Float GW_VectorND::GetData(GW_U32 i) const
@@ -346,7 +346,7 @@ public:
     *
     *  \param  i offset in the vector.
     *  \param  rVal value to set to this coord.
-    *  \authOML Gabriel Peyré 2001-09-29
+    *  \authOML Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void GW_VectorND::SetData(GW_U32 i, GW_Float rVal)
@@ -362,7 +362,7 @@ public:
     *
     *  \param  rMin=0 minimum value.
     *  \param  rMax=1 maximum value.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void GW_VectorND::Randomize(GW_Float rMin = 0, GW_Float rMax = 1)
@@ -375,7 +375,7 @@ public:
     /**
     * Name : GW_VectorND::SetZero
     *
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     *
     *    set the vector to zero.
     */
@@ -389,7 +389,7 @@ public:
     * Name : GW_VectorND::SetValue
     *
     *  \param  rVal the value to set to the vector.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void GW_VectorND::SetValue(GW_Float rVal)
@@ -417,9 +417,9 @@ private:
 /**
 * Name : GW_VectorND::operator
 *
-*  \param  f Rigth hand statement
+*  \param  f Right hand statement
 *  \return the vector scaled.
-*  \author Gabriel Peyré 2001-09-29
+*  \author Gabriel PeyrÃ© 2001-09-29
 */
 /*------------------------------------------------------------------------------*/
 inline
@@ -454,7 +454,7 @@ std::ostream& operator<<(std::ostream &s, GW_VectorND& v)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

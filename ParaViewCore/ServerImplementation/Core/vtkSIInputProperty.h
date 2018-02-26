@@ -43,24 +43,24 @@ public:
 
 protected:
   vtkSIInputProperty();
-  ~vtkSIInputProperty();
+  ~vtkSIInputProperty() override;
 
   /**
    * Push a new state to the underneath implementation
    */
-  virtual bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
 
   /**
    * Parse the xml for the property.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   vtkSetMacro(PortIndex, int);
   int PortIndex;
 
 private:
-  vtkSIInputProperty(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIInputProperty&) VTK_DELETE_FUNCTION;
+  vtkSIInputProperty(const vtkSIInputProperty&) = delete;
+  void operator=(const vtkSIInputProperty&) = delete;
 };
 
 #endif

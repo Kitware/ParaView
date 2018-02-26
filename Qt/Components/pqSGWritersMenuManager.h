@@ -56,7 +56,9 @@ class PQCOMPONENTS_EXPORT pqSGWritersMenuManager : public QObject
 public:
   pqSGWritersMenuManager(
     const char* writersMenuName, const char* objectMenuName, QObject* parent = 0);
-  ~pqSGWritersMenuManager();
+  pqSGWritersMenuManager(
+    QMenu* inside, const char* writersMenuName, const char* objectMenuName, QObject* parent = 0);
+  ~pqSGWritersMenuManager() override;
 
 public slots:
   /**
@@ -82,6 +84,8 @@ protected:
 
 private:
   QMenu* Menu;
+  bool AsSubMenu;
+  bool AlreadyConnected;
   /**
   * The name of the Qt writers menu object will be ObjectMenuName
   * and the the name of GUI menu will be WritersMenuName.

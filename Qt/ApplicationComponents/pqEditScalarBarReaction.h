@@ -55,7 +55,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqEditScalarBarReaction : public pqReaction
 
 public:
   pqEditScalarBarReaction(QAction* parent = 0, bool track_active_objects = true);
-  virtual ~pqEditScalarBarReaction();
+  ~pqEditScalarBarReaction() override;
 
 public slots:
   /**
@@ -76,12 +76,12 @@ protected slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  virtual void updateEnableState();
+  void updateEnableState() override;
 
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered();
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqEditScalarBarReaction)

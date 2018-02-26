@@ -30,9 +30,9 @@
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
-#include <set>
-#include <vector>
 #include <vtkNew.h>
+
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMProxySelectionModel);
@@ -142,7 +142,7 @@ void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy* proxy, int command)
 //-----------------------------------------------------------------------------
 bool vtkSMProxySelectionModel::IsSelected(vtkSMProxy* proxy)
 {
-  return this->Selection.find(proxy) != this->Selection.end();
+  return std::find(this->Selection.begin(), this->Selection.end(), proxy) != this->Selection.end();
 }
 
 //-----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ void vtkSMProxySelectionModel::Select(vtkSMProxy* proxy, int command)
   SelectionType selection;
   if (proxy)
   {
-    selection.insert(proxy);
+    selection.push_back(proxy);
   }
   this->Select(selection, command);
 }
@@ -203,11 +203,14 @@ void vtkSMProxySelectionModel::Select(
     vtkSMProxy* proxy = iter->GetPointer();
     if (proxy && (command & vtkSMProxySelectionModel::SELECT) != 0)
     {
-      new_selection.insert(proxy);
+      if (std::find(new_selection.begin(), new_selection.end(), proxy) == new_selection.end())
+      {
+        new_selection.push_back(proxy);
+      }
     }
     if (proxy && (command & vtkSMProxySelectionModel::DESELECT) != 0)
     {
-      new_selection.erase(proxy);
+      new_selection.remove(proxy);
     }
   }
 
@@ -356,7 +359,10 @@ void vtkSMProxySelectionModel::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
       }
 
       // Just add the proxy in the set
-      new_selection.insert(proxy);
+      if (std::find(new_selection.begin(), new_selection.end(), proxy) == new_selection.end())
+      {
+        new_selection.push_back(proxy);
+      }
     }
   }
 

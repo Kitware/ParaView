@@ -38,16 +38,16 @@ public:
 
 protected:
   vtkThickenLayeredCells();
-  ~vtkThickenLayeredCells();
+  ~vtkThickenLayeredCells() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   bool EnableThickening;
 
 private:
-  vtkThickenLayeredCells(const vtkThickenLayeredCells&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkThickenLayeredCells&) VTK_DELETE_FUNCTION;
+  vtkThickenLayeredCells(const vtkThickenLayeredCells&) = delete;
+  void operator=(const vtkThickenLayeredCells&) = delete;
 };
 
 #endif

@@ -33,7 +33,7 @@ public:
   static void SetNumberOfCores(int val);
 
   vtkProcessModuleAutoMPI();
-  ~vtkProcessModuleAutoMPI();
+  ~vtkProcessModuleAutoMPI() override;
 
   // Description:
   // To determine if it is possible to use multi-core on the system.
@@ -50,8 +50,8 @@ public:
   int ConnectToRemoteBuiltInSelf();
 
 private:
-  vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkProcessModuleAutoMPI&) VTK_DELETE_FUNCTION;
+  vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&) = delete;
+  void operator=(const vtkProcessModuleAutoMPI&) = delete;
   vtkProcessModuleAutoMPIInternals* Internals;
 };
 

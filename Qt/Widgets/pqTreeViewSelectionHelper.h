@@ -47,23 +47,24 @@ class PQWIDGETS_EXPORT pqTreeViewSelectionHelper : public QObject
 
 public:
   pqTreeViewSelectionHelper(QTreeView* view);
-  virtual ~pqTreeViewSelectionHelper();
+  ~pqTreeViewSelectionHelper() override;
 
 protected slots:
   void onClicked(QModelIndex idx);
   void onPressed(QModelIndex idx);
-  void showContextMenu(const QPoint&);
+  virtual void showContextMenu(const QPoint&);
   void saveSelection();
 
-private:
-  Q_DISABLE_COPY(pqTreeViewSelectionHelper)
-
+protected:
   void setSelectedItemsCheckState(Qt::CheckState state);
 
   QTreeView* TreeView;
   QItemSelection PrevSelection;
   QItemSelection CurrentSelection;
   int PressState;
+
+private:
+  Q_DISABLE_COPY(pqTreeViewSelectionHelper)
 };
 
 #endif

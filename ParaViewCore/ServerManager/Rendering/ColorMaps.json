@@ -672,7 +672,7 @@
       ]
    },
    {
-      "ColorSpace" : "CIELAB",
+      "ColorSpace" : "Lab",
       "Creator" : "Francesca Samsel",
       "Name" : "Linear Green (Gr4L)",
       "NanColor" : [ 0.25, 0, 0 ],

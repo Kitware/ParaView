@@ -35,8 +35,6 @@ endif()
 set_source_files_properties(
   ${Module_SRCS}
   PROPERTIES
-    WRAP_EXCLUDE 1
-    WRAP_EXCLUDE_PYTHON 1
     SKIP_HEADER_INSTALL 1)
 
 SET_SOURCE_FILES_PROPERTIES(

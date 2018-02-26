@@ -159,11 +159,11 @@ public:
 
 protected:
   vtkPVSelectionSource();
-  ~vtkPVSelectionSource();
+  ~vtkPVSelectionSource() override;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   enum Modes
@@ -189,8 +189,8 @@ protected:
   char* QueryString;
 
 private:
-  vtkPVSelectionSource(const vtkPVSelectionSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSelectionSource&) VTK_DELETE_FUNCTION;
+  vtkPVSelectionSource(const vtkPVSelectionSource&) = delete;
+  void operator=(const vtkPVSelectionSource&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

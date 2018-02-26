@@ -2,7 +2,7 @@
 /**
  *  \file   GW_MathsWrapper.h
  *  \brief  Definition of class \c GW_MathsWrapper
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   6-8-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -67,7 +67,7 @@ typedef T_Vector2DMap::const_reverse_iterator CRIT_Vector2DMap;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

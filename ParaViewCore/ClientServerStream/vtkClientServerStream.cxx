@@ -2138,7 +2138,7 @@ void vtkClientServerStreamValueToString(
   const vtkClientServerStream* self, ostream& os, int m, int a, T*)
 {
   typedef VTK_CSS_TYPENAME vtkTypeTraits<T>::PrintType PrintType;
-  T arg;
+  T arg = T();
   self->GetArgument(m, a, &arg);
   os << static_cast<PrintType>(arg);
 }
@@ -3062,6 +3062,7 @@ int vtkClientServerStream::AddArgumentFromString(
             {
               *out++ = *c;
             }
+            VTK_FALLTHROUGH;
           default:
             *out++ = *c;
             break;

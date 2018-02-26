@@ -47,16 +47,16 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExodusFileSeriesReader : public vtkFil
 public:
   vtkTypeMacro(vtkExodusFileSeriesReader, vtkFileSeriesReader);
   static vtkExodusFileSeriesReader* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 protected:
   vtkExodusFileSeriesReader();
-  ~vtkExodusFileSeriesReader();
+  ~vtkExodusFileSeriesReader() override;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int RequestInformationForInput(
+  int RequestInformationForInput(
     int index, vtkInformation* request, vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Replaces the filenames, which probably represents partitions of the data,
@@ -65,8 +65,8 @@ protected:
   virtual void FindRestartedResults();
 
 private:
-  vtkExodusFileSeriesReader(const vtkExodusFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkExodusFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkExodusFileSeriesReader(const vtkExodusFileSeriesReader&) = delete;
+  void operator=(const vtkExodusFileSeriesReader&) = delete;
 };
 
 #endif // vtkExodusFileSeriesReader_h

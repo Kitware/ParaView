@@ -10,7 +10,7 @@ Adapted from the [Paraview wiki](http://www.paraview.org/Wiki/ParaView:Build_And
 Prerequisites
 =============
 * The ParaView build process requires [CMake](http://www.cmake.org/) version 2.8.8 or higher and a working compiler. On Unix-like operating systems, it also requires Make, while on Windows it requires Visual Studio and Ninja build.
-* Building ParaView's user interface requires [Qt](http://www.qt.io/download-open-source/), version 4.7+ (4.8.\* is recommended, 5.7.\* also works). To compile ParaView, either the LGPL or commercial versions of Qt may be used. Also note that on Windows you need to choose a Visual Studio version to match binaries available for your Qt version.
+* Building ParaView's user interface requires [Qt](http://www.qt.io/download-open-source/), version 5.6+ (5.9.\* is recommended, 5.7.\* and 5.8\* also work). To compile ParaView, either the LGPL or commercial versions of Qt may be used. Also note that on Windows you need to choose a Visual Studio version to match binaries available for your Qt version.
 * For Windows builds, unix-like environments such as Cygwin, or MinGW are not supported.
 
 Download And Install CMake
@@ -26,7 +26,7 @@ Download And Install Qt
 ParaView uses Qt as its GUI library. Qt is required whenever the ParaView client is built with a GUI.
 
 * [Download a release](http://download.qt.io/official_releases/qt/).
-    - For binaries, use the latest stable version of qt-PLATFORM-opensource-VERSION.[tar.gz or zip or dmg or exe]. If this gives you trouble, version 4.8.2 is known to work. When downloading binaries, ensure that your compiler version matches the Qt compiler indicated. Verion 5.6+ supports Visual Studio 2015.
+    - For binaries, use the latest stable version of qt-PLATFORM-opensource-VERSION.[tar.gz or zip or dmg or exe]. If this gives you trouble, version 4.8.2 is known to work. When downloading binaries, ensure that your compiler version matches the Qt compiler indicated. Version 5.6+ supports Visual Studio 2015.
     - For source code, use the latest stable version of qt-everywhere-opensource-src-VERSION.[tar.gz or zip or dmg]. If this gives you trouble, version 4.8.2 is known to work.
 * Developers have reported some issues with QT 5 on Mac and linux.
 
@@ -42,6 +42,14 @@ Linux Ubuntu/Debian (16.04):
 * sudo apt-get install ninja-build
     - ninja is a speedy replacement for make, highly recommended.
 
+**Note for Ubuntu 16.04**. The official Qt 5.9.1 binaries downloaded from `qt.io`
+are linked against a different version of `libprotobuf` than what ParaView uses,
+which causes runtime errors in ParaView. To avoid this, you can move the file
+`libqgtk3.so` out from `Qt5.9.1/plugins/platformthemes`. This platform theme is
+linked against a different `libprotobuf` than ParaView. Moving it causes it not
+to be loaded, thereby avoiding the runtime errors with no negative effects on
+running ParaView.
+
 Windows:
 
 * Visual Studio 2015 Community Edition
@@ -56,7 +64,7 @@ Optional Additions
 When the ability to write .avi files is desired, and writing these files is not supported by the OS, ParaView can attach to an ffmpeg library. This is generally true for Linux. Ffmpeg library source code is found here: [6](http://www.ffmpeg.org/)
 
 ### MPI
-In order to run ParaView in parallel, MPI [1](http://www-unix.mcs.anl.gov/mpi/), [2](http://www.lam-mpi.org/) is also required.
+To run ParaView in parallel, an [MPI](http://www-unix.mcs.anl.gov/mpi/) implementation is required. If an MPI implementation that exploits special interconnect hardware is provided on your system, we suggest using it for optimal performance. Otherwise, on Linux/Mac, we suggest either [OpenMPI](http://www.open-mpi.org/) or [MPICH](http://www.mpich.org/). On Windows, we suggest [Microsoft MPI](https://msdn.microsoft.com/en-us/library/bb524831.aspx).
 
 ### Python
 In order to use scripting, [Python](http://www.python.org/) is required (version 2.7 is supported, whereas version 3.5 support is under development).
@@ -84,7 +92,6 @@ Run CMake
 
 | Variable | Value | Description |
 | -------- | ----- | ------------|
-| VTK_RENDERING_BACKEND | OpenGL2 | Use modern OpenGL |
 | PARAVIEW_ENABLE_PYTHON | ON | Add python scripting support |
 | BUILD_TESTING | ON/OFF | Build tests if you are contributing to ParaView |
 

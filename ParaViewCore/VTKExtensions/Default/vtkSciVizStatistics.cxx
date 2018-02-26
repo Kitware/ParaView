@@ -14,6 +14,7 @@
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkNew.h"
 #include "vtkPointData.h"
 #include "vtkStatisticsAlgorithm.h"
 #include "vtkStdString.h"
@@ -251,7 +252,7 @@ int vtkSciVizStatistics::RequestData(
         "Output model data object of incorrect type \"" << modelObjOu->GetClassName() << "\"");
       return 0;
     }
-    // Copy the stucture of the input dataset to the model output.
+    // Copy the structure of the input dataset to the model output.
     // If we have input models in the proper structure, then we'll copy them into this structure
     // later.
     ouModelRoot->CopyStructure(compDataObjIn);
@@ -263,7 +264,7 @@ int vtkSciVizStatistics::RequestData(
   }
 
   // II. Create/update the output sci-viz data
-  dataObjOu->ShallowCopy(dataObjIn);
+  this->ShallowCopy(dataObjOu, dataObjIn);
 
   if (compDataObjIn)
   {
@@ -271,6 +272,7 @@ int vtkSciVizStatistics::RequestData(
     vtkCompositeDataSet* compModelObjIn = vtkCompositeDataSet::SafeDownCast(modelObjIn);
     vtkCompositeDataSet* compModelObjOu = vtkCompositeDataSet::SafeDownCast(modelObjOu);
     vtkCompositeDataSet* compDataObjOu = vtkCompositeDataSet::SafeDownCast(dataObjOu);
+
     // We may have a single model for all blocks or one per block
     // This is too tricky to detect automagically (because a single model may be a composite
     // dataset),
@@ -413,11 +415,10 @@ int vtkSciVizStatistics::RequestData(
   }
 
   // Create a table with all the data
-  vtkTable* inTable = vtkTable::New();
+  vtkNew<vtkTable> inTable;
   int stat = this->PrepareFullDataTable(inTable, dataAttrIn);
   if (stat < 1)
   { // return an error (stat=0) or success (stat=-1)
-    inTable->FastDelete();
     return -stat;
   }
 
@@ -426,13 +427,12 @@ int vtkSciVizStatistics::RequestData(
   {
     // We are creating a model by executing Learn and Derive operations on the input data
     // Create a table to hold the input data (unless the TrainingFraction is exactly 1.0)
-    vtkTable* train = 0;
+    vtkSmartPointer<vtkTable> train = nullptr;
     vtkIdType N = inTable->GetNumberOfRows();
     vtkIdType M = this->Task == MODEL_INPUT ? N : this->GetNumberOfObservationsForTraining(inTable);
     if (M == N)
     {
       train = inTable;
-      train->Register(this);
       if (this->Task != MODEL_INPUT && this->TrainingFraction < 1.)
       {
         vtkWarningMacro(<< "Either TrainingFraction (" << this->TrainingFraction
@@ -444,7 +444,7 @@ int vtkSciVizStatistics::RequestData(
     }
     else
     {
-      train = vtkTable::New();
+      train = vtkSmartPointer<vtkTable>::New();
       this->PrepareTrainingTable(train, inTable, M);
     }
 
@@ -459,11 +459,6 @@ int vtkSciVizStatistics::RequestData(
     {
       outModel->Initialize();
       stat = this->LearnAndDerive(outModelDS, train);
-    }
-
-    if (train)
-    {
-      train->Delete();
     }
   }
   else
@@ -480,7 +475,6 @@ int vtkSciVizStatistics::RequestData(
 
   if (stat < 1)
   { // Exit on failure (0) or early success (-1)
-    inTable->Delete();
     return -stat;
   }
 
@@ -502,8 +496,6 @@ int vtkSciVizStatistics::RequestData(
       stat = this->AssessData(inTable, outData, outModelDS);
     }
   }
-  inTable->Delete();
-
   return stat ? 1 : 0;
 }
 
@@ -586,7 +578,8 @@ int vtkSciVizStatistics::PrepareFullDataTable(vtkTable* inTable, vtkFieldData* d
   vtkIdType ncols = inTable->GetNumberOfColumns();
   if (ncols < 1)
   {
-    vtkWarningMacro("Every requested array wasn't a scalar or wasn't present.") return -1;
+    vtkWarningMacro("Every requested array wasn't a scalar or wasn't present.");
+    return -1;
   }
 
   return 1;
@@ -630,14 +623,13 @@ int vtkSciVizStatistics::PrepareTrainingTable(
     dstCol->FastDelete();
   }
   trainingTable->SetNumberOfRows(M);
-  vtkVariantArray* row = vtkVariantArray::New();
+  vtkNew<vtkVariantArray> row;
   vtkIdType dstRow = 0;
   for (std::set<vtkIdType>::iterator it = trainRows.begin(); it != trainRows.end(); ++it, ++dstRow)
   {
     fullDataTable->GetRow(*it, row);
     trainingTable->SetRow(dstRow, row);
   }
-  row->Delete();
   return 1;
 }
 
@@ -646,4 +638,31 @@ vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining(vtkTable* obse
   vtkIdType N = observations->GetNumberOfRows();
   vtkIdType M = static_cast<vtkIdType>(N * this->TrainingFraction);
   return M < 100 ? (N < 100 ? N : 100) : M;
+}
+
+void vtkSciVizStatistics::ShallowCopy(vtkDataObject* out, vtkDataObject* in)
+{
+  out->ShallowCopy(in);
+  vtkCompositeDataSet* cdIn = vtkCompositeDataSet::SafeDownCast(in);
+  vtkCompositeDataSet* cdOut = vtkCompositeDataSet::SafeDownCast(out);
+  if (cdIn == nullptr || cdOut == nullptr)
+  {
+    return;
+  }
+
+  // this is needed since vtkCompositeDataSet::ShallowCopy() doesn't clone
+  // leaf nodes, but simply passes them through.
+  vtkSmartPointer<vtkCompositeDataIterator> iterOut;
+  iterOut.TakeReference(cdOut->NewIterator());
+  for (iterOut->InitTraversal(); !iterOut->IsDoneWithTraversal(); iterOut->GoToNextItem())
+  {
+    vtkSmartPointer<vtkDataObject> curDO = iterOut->GetCurrentDataObject();
+    if (vtkCompositeDataSet::SafeDownCast(curDO) == nullptr && curDO != nullptr)
+    {
+      vtkDataObject* clone = curDO->NewInstance();
+      clone->ShallowCopy(curDO);
+      cdOut->SetDataSet(iterOut, clone);
+      clone->FastDelete();
+    }
+  }
 }

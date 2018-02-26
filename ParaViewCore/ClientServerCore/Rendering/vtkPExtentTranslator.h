@@ -47,14 +47,14 @@ public:
 
 protected:
   vtkPExtentTranslator();
-  ~vtkPExtentTranslator();
-  virtual int PieceToExtentThreadSafe(int vtkNotUsed(piece), int vtkNotUsed(numPieces),
+  ~vtkPExtentTranslator() override;
+  int PieceToExtentThreadSafe(int vtkNotUsed(piece), int vtkNotUsed(numPieces),
     int vtkNotUsed(ghostLevel), int* wholeExtent, int* resultExtent, int vtkNotUsed(splitMode),
     int vtkNotUsed(byPoints)) VTK_OVERRIDE;
 
 private:
-  vtkPExtentTranslator(const vtkPExtentTranslator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPExtentTranslator&) VTK_DELETE_FUNCTION;
+  vtkPExtentTranslator(const vtkPExtentTranslator&) = delete;
+  void operator=(const vtkPExtentTranslator&) = delete;
 
   vtkPExtentTranslatorInternals* Internals;
 };

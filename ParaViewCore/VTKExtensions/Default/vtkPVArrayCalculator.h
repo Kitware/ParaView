@@ -47,10 +47,9 @@ public:
 
 protected:
   vtkPVArrayCalculator();
-  ~vtkPVArrayCalculator();
+  ~vtkPVArrayCalculator() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -65,8 +64,8 @@ protected:
   void UpdateArrayAndVariableNames(vtkDataObject* theInputObj, vtkDataSetAttributes* inDataAttrs);
 
 private:
-  vtkPVArrayCalculator(const vtkPVArrayCalculator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVArrayCalculator&) VTK_DELETE_FUNCTION;
+  vtkPVArrayCalculator(const vtkPVArrayCalculator&) = delete;
+  void operator=(const vtkPVArrayCalculator&) = delete;
 };
 //@}
 

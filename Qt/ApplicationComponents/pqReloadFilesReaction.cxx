@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineSource.h"
+#include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "vtkNew.h"
 #include "vtkSMReaderReloadHelper.h"
@@ -46,8 +47,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-bool PromptForNewFiles()
+bool PromptForNewFiles(vtkSMSourceProxy* reader)
 {
+  pqProxy* pqreader =
+    pqApplicationCore::instance()->getServerManagerModel()->findItem<pqProxy*>(reader);
+  if (pqreader && pqreader->property("pqReloadFilesReaction::CachedState").isValid())
+  {
+    return pqreader->property("pqReloadFilesReaction::CachedState").toBool();
+  }
+
   QMessageBox mbox(QMessageBox::Question, QObject::tr("Reload Options"),
     QObject::tr("This reader supports file series. Do you want to look for new files "
                 "in the series and load those, or reload the existing files?"),
@@ -59,7 +67,14 @@ bool PromptForNewFiles()
   mbox.button(QMessageBox::No)->setObjectName("reloadExistingButton");
   mbox.button(QMessageBox::No)->setText(QObject::tr("Reload existing file(s)"));
   mbox.exec();
-  return mbox.clickedButton() == mbox.button(QMessageBox::Yes);
+
+  bool retval = mbox.clickedButton() == mbox.button(QMessageBox::Yes);
+  // cache response for future use.
+  if (pqreader)
+  {
+    pqreader->setProperty("pqReloadFilesReaction::CachedState", retval);
+  }
+  return retval;
 }
 }
 
@@ -107,7 +122,7 @@ bool pqReloadFilesReaction::reload(vtkSMSourceProxy* proxy)
   }
 
   BEGIN_UNDO_EXCLUDE();
-  if (helper->SupportsFileSeries(proxy) && PromptForNewFiles())
+  if (helper->SupportsFileSeries(proxy) && PromptForNewFiles(proxy))
   {
     helper->ExtendFileSeries(proxy);
   }

@@ -48,7 +48,7 @@ public:
 
   //@{
   /**
-   * Identifier used to indentify the view to the vtkTileDisplayHelper.
+   * Identifier used to identify the view to the vtkTileDisplayHelper.
    */
   vtkSetMacro(Identifier, unsigned int);
   vtkGetMacro(Identifier, unsigned int);
@@ -190,8 +190,8 @@ protected:
   virtual void SlaveStartRender() VTK_OVERRIDE;
 
 private:
-  vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIceTSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&) = delete;
+  void operator=(const vtkIceTSynchronizedRenderers&) = delete;
 };
 
 #endif

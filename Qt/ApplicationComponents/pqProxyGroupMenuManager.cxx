@@ -149,6 +149,8 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(QMenu* _menu, const QString& re
   this->Internal->ProxyManagerCallBackId =
     pqCoreUtilities::connect(vtkSMProxyManager::GetProxyManager(),
       vtkSMProxyManager::ActiveSessionChanged, this, SLOT(switchActiveServer()));
+
+  QObject::connect(this->menu(), SIGNAL(aboutToShow()), this, SLOT(updateMenuStyle()));
 }
 
 //-----------------------------------------------------------------------------
@@ -372,6 +374,7 @@ void pqProxyGroupMenuManager::populateMenu()
   // actions that are no longer shown in the menu. Hence we disconnect all
   // signal connections.
   QMenu* _menu = this->menu();
+
   QList<QAction*> menuActions = _menu->actions();
   foreach (QAction* action, menuActions)
   {
@@ -448,6 +451,14 @@ void pqProxyGroupMenuManager::populateMenu()
   }
 
   emit this->menuPopulated();
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::updateMenuStyle()
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  bool sc = settings->value("GeneralSettings.ForceSingleColumnMenus", false).toBool();
+  this->menu()->setStyleSheet(QString("QMenu { menu-scrollable: %1; }").arg(sc ? 1 : 0));
 }
 
 //-----------------------------------------------------------------------------
@@ -800,21 +811,6 @@ void pqProxyGroupMenuManager::lookForNewDefinitions()
       }
     }
   }
-
-  // Removing old definitions that don't exist anymore.
-  QSet<QPair<QString, QString> > setToRemove = this->Internal->Proxies.keys().toSet();
-  setToRemove.subtract(definitionSet);
-  QPair<QString, QString> key;
-  foreach (key, setToRemove)
-  {
-    // This extra test should be removed once the main definition has been updated
-    // with the Hints/ShowInMenu...
-    if (!pxdm->HasDefinition(key.first.toLocal8Bit().data(), key.second.toLocal8Bit().data()))
-    {
-      this->Internal->removeProxy(key.first, key.second);
-    }
-  }
-
   // Update the menu with the current definition
   this->populateMenu();
 }

@@ -15,7 +15,6 @@ endif()
 
 include(ParaViewQt)
 pv_find_package_qt(qt_targets REQUIRED QUIET
-                QT4_COMPONENTS QtCore QtGui QtTest
                 QT5_COMPONENTS Core Widgets Test)
 pv_qt_wrap_cpp(Tests_MOC_SOURCES ${MocSources})
 

@@ -29,7 +29,7 @@ typedef T_GeodesicPointList::const_reverse_iterator CRIT_GeodesicPointList;
 /**
  *  \class  GW_GeodesicPath
  *  \brief  A geodesic path, composed of point located on edge.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-10-2003
  *
  *  Just a linked list of point.
@@ -83,7 +83,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

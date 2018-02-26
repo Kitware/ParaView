@@ -33,15 +33,15 @@ public:
   vtkTypeMacro(vtkPVLastSelectionInformation, vtkPVSelectionInformation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
 protected:
   vtkPVLastSelectionInformation();
-  ~vtkPVLastSelectionInformation();
+  ~vtkPVLastSelectionInformation() override;
 
 private:
-  vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLastSelectionInformation&) VTK_DELETE_FUNCTION;
+  vtkPVLastSelectionInformation(const vtkPVLastSelectionInformation&) = delete;
+  void operator=(const vtkPVLastSelectionInformation&) = delete;
 };
 
 #endif

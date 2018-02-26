@@ -48,6 +48,9 @@ pqTableView::pqTableView(QWidget* parentObject)
 {
   // listen for show/hide events on the horizontal scroll bar.
   this->horizontalScrollBar()->installEventFilter(this);
+
+  // better handle scrolling in panels with nested scrollbars.
+  this->setFocusPolicy(Qt::StrongFocus);
 }
 
 //-----------------------------------------------------------------------------
@@ -75,6 +78,18 @@ bool pqTableView::eventFilter(QObject* object, QEvent* e)
     }
   }
   return this->Superclass::eventFilter(object, e);
+}
+
+//-----------------------------------------------------------------------------
+void pqTableView::wheelEvent(QWheelEvent* evt)
+{
+  // don't handle wheel events unless widget had focus.
+  // this improves scrolling when scrollable widgets are nested
+  // together with setFocusPolicy(Qt::StrongFocus).
+  if (this->hasFocus())
+  {
+    this->Superclass::wheelEvent(evt);
+  }
 }
 
 //-----------------------------------------------------------------------------

@@ -49,13 +49,13 @@ class PQWIDGETS_EXPORT pqConsoleWidgetEventTranslator : public pqWidgetEventTran
 
 public:
   pqConsoleWidgetEventTranslator(QObject* parent = 0);
-  virtual ~pqConsoleWidgetEventTranslator();
+  ~pqConsoleWidgetEventTranslator() override;
 
   /**
   * Translate the event, if possible.
   */
   using Superclass::translateEvent;
-  virtual bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag);
+  bool translateEvent(QObject* target, QEvent* qtevent, bool& errorFlag) override;
 
 protected slots:
   void recordCommand(const QString& text);

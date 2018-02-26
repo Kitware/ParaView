@@ -21,7 +21,6 @@
 
 vtkSmartPointer<vtkPVRenderViewSettings> vtkPVRenderViewSettings::Instance;
 
-vtkInstantiatorNewMacro(vtkPVRenderViewSettings);
 //----------------------------------------------------------------------------
 vtkPVRenderViewSettings* vtkPVRenderViewSettings::New()
 {
@@ -54,14 +53,6 @@ vtkPVRenderViewSettings::vtkPVRenderViewSettings()
 //----------------------------------------------------------------------------
 vtkPVRenderViewSettings::~vtkPVRenderViewSettings()
 {
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderViewSettings::SetUseDisplayLists(bool val)
-{
-  // note: this is inverted.
-  vtkMapper::SetGlobalImmediateModeRendering(val ? 0 : 1);
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------

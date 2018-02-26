@@ -44,13 +44,13 @@ public:
 
 protected:
   vtkPVEnvironmentInformationHelper();
-  ~vtkPVEnvironmentInformationHelper();
+  ~vtkPVEnvironmentInformationHelper() override;
 
   char* Variable;
 
 private:
-  vtkPVEnvironmentInformationHelper(const vtkPVEnvironmentInformationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVEnvironmentInformationHelper&) VTK_DELETE_FUNCTION;
+  vtkPVEnvironmentInformationHelper(const vtkPVEnvironmentInformationHelper&) = delete;
+  void operator=(const vtkPVEnvironmentInformationHelper&) = delete;
 };
 
 #endif

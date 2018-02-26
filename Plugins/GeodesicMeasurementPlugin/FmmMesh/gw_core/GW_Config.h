@@ -156,7 +156,7 @@ namespace GW {
 //@{
 #define GW_True  true
 #define GW_False false
-/** to make aproximate computations (derivation, GW_Float comparaisons ...) */
+/** to make approximate computations (derivation, GW_Float comparaisons ...) */
 #define GW_EPSILON 1e-9
 /** very big number */
 #define GW_INFINITE 1e9
@@ -232,7 +232,7 @@ enum GW_Coord_RVBA { R, V, B, A };
 //@}
 
 //-------------------------------------------------------------------------
-/** \name The different kind of transform we suppport for the moment. */
+/** \name The different kind of transform we support for the moment. */
 //-------------------------------------------------------------------------
 //@{
 enum T_WaveletTransformType

@@ -47,12 +47,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Returns true if the value of the propery is in the domain.
-   * The propery has to be a vtkSMProxyProperty which points
+   * Returns true if the value of the property is in the domain.
+   * The property has to be a vtkSMProxyProperty which points
    * to a vtkSMSourceProxy. If all data types of the input's
    * parts are in the domain, it returns. It returns 0 otherwise.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if all parts of the source proxy are in the domain.
@@ -71,13 +71,13 @@ public:
 
 protected:
   vtkSMDataTypeDomain();
-  ~vtkSMDataTypeDomain();
+  ~vtkSMDataTypeDomain() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   vtkSMDataTypeDomainInternals* DTInternals;
 
@@ -86,8 +86,8 @@ protected:
   vtkGetMacro(CompositeDataSupported, int);
 
 private:
-  vtkSMDataTypeDomain(const vtkSMDataTypeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDataTypeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMDataTypeDomain(const vtkSMDataTypeDomain&) = delete;
+  void operator=(const vtkSMDataTypeDomain&) = delete;
 };
 
 #endif

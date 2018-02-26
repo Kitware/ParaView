@@ -80,13 +80,18 @@ public:
   bool RenameDirectory();
 
   /**
+   * Check is directory named Path exists.
+   */
+  bool IsDirectory();
+
+  /**
    * Returns if this->Path is a readable file.
    */
   bool GetActiveFileIsReadable();
 
 protected:
   vtkPVFilePathEncodingHelper();
-  ~vtkPVFilePathEncodingHelper();
+  ~vtkPVFilePathEncodingHelper() override;
 
   bool CallObjectMethod(const char* method, bool ignoreError = false);
 
@@ -95,8 +100,8 @@ protected:
   int ActiveGlobalId;
 
 private:
-  vtkPVFilePathEncodingHelper(const vtkPVFilePathEncodingHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVFilePathEncodingHelper&) VTK_DELETE_FUNCTION;
+  vtkPVFilePathEncodingHelper(const vtkPVFilePathEncodingHelper&) = delete;
+  void operator=(const vtkPVFilePathEncodingHelper&) = delete;
 };
 
 #endif

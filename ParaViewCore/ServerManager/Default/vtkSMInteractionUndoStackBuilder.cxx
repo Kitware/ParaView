@@ -33,7 +33,7 @@ public:
 
   void SetTarget(vtkSMInteractionUndoStackBuilder* target) { this->Target = target; }
 
-  virtual void Execute(vtkObject* caller, unsigned long event, void* data)
+  void Execute(vtkObject* caller, unsigned long event, void* data) override
   {
     if (this->Target)
     {

@@ -249,7 +249,7 @@ bool vtkExtractsDeliveryHelper::Update()
           vtkWarningMacro("Received unidentified extract " << key.c_str() << ". Ignoring.");
         }
 
-        // Composite dataset need to convey their data structure accross
+        // Composite dataset need to convey their data structure across
         // processes, let's create those empty data object with the proper
         // data structure to share ONLY if needed.
         if (extract->IsA("vtkCompositeDataSet"))

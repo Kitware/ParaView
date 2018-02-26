@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>402</width>
-    <height>148</height>
+    <height>157</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,6 +22,9 @@
    </property>
    <item row="0" column="0" colspan="2">
     <widget class="QCheckBox" name="show3DWidget">
+     <property name="toolTip">
+      <string>Enable/disable showing the interactive sphere widget in the 3D render view.</string>
+     </property>
      <property name="text">
       <string>Show Sphere</string>
      </property>

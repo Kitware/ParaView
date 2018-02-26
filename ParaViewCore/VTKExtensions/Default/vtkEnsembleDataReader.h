@@ -82,10 +82,9 @@ public:
 
 protected:
   vtkEnsembleDataReader();
-  ~vtkEnsembleDataReader();
+  ~vtkEnsembleDataReader() override;
 
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
   vtkAlgorithm* GetCurrentReader();
 
 private:
@@ -96,8 +95,8 @@ private:
   class vtkInternal;
   vtkInternal* Internal;
 
-  vtkEnsembleDataReader(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkEnsembleDataReader&) VTK_DELETE_FUNCTION;
+  vtkEnsembleDataReader(const vtkEnsembleDataReader&) = delete;
+  void operator=(const vtkEnsembleDataReader&) = delete;
 };
 
 #endif

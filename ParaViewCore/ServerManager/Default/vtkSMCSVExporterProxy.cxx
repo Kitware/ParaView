@@ -17,8 +17,12 @@
 #include "vtkCSVExporter.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXYChartView.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSpreadSheetView.h"
+
+#include <string>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMCSVExporterProxy);
 //----------------------------------------------------------------------------
@@ -55,6 +59,16 @@ void vtkSMCSVExporterProxy::Write()
   {
     vtkErrorMacro("No vtkCSVExporter.");
     return;
+  }
+
+  std::string fileName = vtkSMPropertyHelper(this, "FileName").GetAsString();
+  if (fileName.empty())
+  {
+    return;
+  }
+  if (vtksys::SystemTools::GetFilenameLastExtension(fileName) == ".tsv")
+  {
+    exporter->SetFieldDelimiter("\t");
   }
   vtkObjectBase* obj = this->View->GetClientSideObject();
   if (vtkSpreadSheetView* sview = vtkSpreadSheetView::SafeDownCast(obj))

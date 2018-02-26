@@ -84,7 +84,7 @@ public:
 
 protected:
   vtkSIVectorProperty();
-  ~vtkSIVectorProperty();
+  ~vtkSIVectorProperty() override;
   vtkSetStringMacro(CleanCommand);
   vtkSetStringMacro(SetNumberCommand);
   vtkSetStringMacro(InitialString);
@@ -98,11 +98,11 @@ protected:
   /**
    * Set the appropriate ivars from the xml element.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
-  vtkSIVectorProperty(const vtkSIVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSIVectorProperty(const vtkSIVectorProperty&) = delete;
+  void operator=(const vtkSIVectorProperty&) = delete;
 };
 
 #endif

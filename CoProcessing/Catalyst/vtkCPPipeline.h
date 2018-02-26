@@ -30,7 +30,7 @@ class VTKPVCATALYST_EXPORT vtkCPPipeline : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPPipeline, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// Configuration Step:
   /// The coprocessor first determines if any coprocessing needs to be done
@@ -39,10 +39,10 @@ public:
   /// it fills in the FieldNames array that the coprocessor requires
   /// in order to fulfill all the coprocessing requests for this
   /// TimeStep/Time combination.
-  virtual int RequestDataDescription(vtkCPDataDescription* DataDescription) = 0;
+  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) = 0;
 
   /// Execute the pipeline. Returns 1 for success and 0 for failure.
-  virtual int CoProcess(vtkCPDataDescription* DataDescription) = 0;
+  virtual int CoProcess(vtkCPDataDescription* dataDescription) = 0;
 
   /// Finalize the pipeline before deleting it. A default no-op implementation
   /// is given. Returns 1 for success and 0 for failure.
@@ -53,8 +53,8 @@ protected:
   virtual ~vtkCPPipeline();
 
 private:
-  vtkCPPipeline(const vtkCPPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPPipeline&) VTK_DELETE_FUNCTION;
+  vtkCPPipeline(const vtkCPPipeline&) = delete;
+  void operator=(const vtkCPPipeline&) = delete;
 };
 
 #endif

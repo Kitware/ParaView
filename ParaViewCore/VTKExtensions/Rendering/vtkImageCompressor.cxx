@@ -34,7 +34,7 @@ vtkImageCompressor::vtkImageCompressor()
   , LossLessMode(0)
   , Configuration(0)
 {
-  // Always allocate output array as a convinience.
+  // Always allocate output array as a convenience.
   vtkUnsignedCharArray* data = vtkUnsignedCharArray::New();
   this->SetOutput(data);
   data->Delete();
@@ -46,6 +46,11 @@ vtkImageCompressor::~vtkImageCompressor()
   this->SetOutput(0);
   this->SetInput(0);
   this->SetConfiguration(NULL);
+}
+
+//-----------------------------------------------------------------------------
+void vtkImageCompressor::SetImageResolution(int, int)
+{
 }
 
 //-----------------------------------------------------------------------------

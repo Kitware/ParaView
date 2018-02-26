@@ -52,7 +52,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSciVizStatistics : public vtkTableAlgo
 {
 public:
   vtkTypeMacro(vtkSciVizStatistics, vtkTableAlgorithm);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -142,16 +142,16 @@ public:
 
 protected:
   vtkSciVizStatistics();
-  virtual ~vtkSciVizStatistics();
+  ~vtkSciVizStatistics() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** input,
+  int ProcessRequest(vtkInformation* request, vtkInformationVector** input,
     vtkInformationVector* output) VTK_OVERRIDE;
   virtual int RequestDataObject(
     vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output);
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** input,
+  int RequestData(vtkInformation* request, vtkInformationVector** input,
     vtkInformationVector* output) VTK_OVERRIDE;
   virtual int RequestData(vtkCompositeDataSet* compDataOu, vtkCompositeDataSet* compModelOu,
     vtkCompositeDataSet* compDataIn, vtkCompositeDataSet* compModelIn, vtkDataObject* singleModel);
@@ -199,14 +199,21 @@ protected:
    */
   virtual vtkIdType GetNumberOfObservationsForTraining(vtkTable* observations);
 
+  /**
+   * A variant of shallow copy that calls vtkDataObject::ShallowCopy() and then
+   * for composite datasets, creates clones for each leaf node that then shallow
+   * copies the fields and geometry.
+   */
+  void ShallowCopy(vtkDataObject* out, vtkDataObject* in);
+
   int AttributeMode;
   int Task;
   double TrainingFraction;
   vtkSciVizStatisticsP* P;
 
 private:
-  vtkSciVizStatistics(const vtkSciVizStatistics&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSciVizStatistics&) VTK_DELETE_FUNCTION;
+  vtkSciVizStatistics(const vtkSciVizStatistics&) = delete;
+  void operator=(const vtkSciVizStatistics&) = delete;
 };
 
 #endif // vtkSciVizStatistics_h

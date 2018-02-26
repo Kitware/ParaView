@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqCameraKeyFrameWidget : public QWidget
 
 public:
   pqCameraKeyFrameWidget(QWidget* parent = 0);
-  virtual ~pqCameraKeyFrameWidget();
+  ~pqCameraKeyFrameWidget() override;
 
   bool usePathBasedMode() const;
 
@@ -87,8 +87,8 @@ public slots:
 
 protected:
   // Overridden to update the 3D widget's visibility states.
-  virtual void showEvent(QShowEvent*);
-  virtual void hideEvent(QHideEvent*);
+  void showEvent(QShowEvent*) override;
+  void hideEvent(QHideEvent*) override;
 
 private slots:
   /**

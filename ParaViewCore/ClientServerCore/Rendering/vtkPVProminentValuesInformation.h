@@ -104,6 +104,26 @@ public:
   vtkGetMacro(Uncertainty, double);
   //@}
 
+  //@{
+  /**
+   * Set/get the force flag that will be used when recovering the prominents values.
+   * If not set, a maximum of vtkAbstractArray::MAX_DISCRETE_VALUES (32) values
+   * will be recovered, if there is more, none will be recovered and the information
+   * will be considered invalid. If the force flag is set, there is no maximum number
+   * of prominent values recovered and the information should be valid even with a high
+   * number of prominent values.
+   */
+  vtkSetMacro(Force, bool);
+  vtkGetMacro(Force, bool);
+
+  //@{
+  /**
+   * Get the validity of the information. The flag has a meaning after trying to recover
+   * prominent values, if true, the data can be used, if false, this information should
+   * be considered invalid.
+   */
+  vtkGetMacro(Valid, bool);
+
   /**
    * Returns 1 if the array can be combined.
    * It must have the same name and number of components.
@@ -118,7 +138,7 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Transfer information about a single vtkAbstractArray's prominent values into this object.
@@ -131,22 +151,22 @@ public:
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation* other) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* other) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
    * Push/pop parameters controlling which array to sample onto/off of the stream.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
   //@}
 
   /**
@@ -179,7 +199,7 @@ public:
 
 protected:
   vtkPVProminentValuesInformation();
-  ~vtkPVProminentValuesInformation();
+  ~vtkPVProminentValuesInformation() override;
 
   void DeepCopyParameters(vtkPVProminentValuesInformation* other);
   void CopyFromCompositeDataSet(vtkCompositeDataSet*);
@@ -193,6 +213,8 @@ protected:
   char* FieldAssociation;
   double Fraction;
   double Uncertainty;
+  bool Force;
+  bool Valid;
   //@}
 
   /// Information results
@@ -203,8 +225,8 @@ protected:
 
   //@}
 
-  vtkPVProminentValuesInformation(const vtkPVProminentValuesInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVProminentValuesInformation&) VTK_DELETE_FUNCTION;
+  vtkPVProminentValuesInformation(const vtkPVProminentValuesInformation&) = delete;
+  void operator=(const vtkPVProminentValuesInformation&) = delete;
 };
 
 #endif

@@ -16,7 +16,7 @@
  * @class   vtkSIProperty
  *
  * Basic ServerImplementation property used to call a method with no argument
- * on a VTK object. If overriden, we naturally allow to call a method either
+ * on a VTK object. If overridden, we naturally allow to call a method either
  * to set or get a set of values.
 */
 
@@ -85,7 +85,7 @@ public:
 
 protected:
   vtkSIProperty();
-  ~vtkSIProperty();
+  ~vtkSIProperty() override;
 
   friend class vtkSIProxy;
 
@@ -133,8 +133,8 @@ protected:
   void SaveValueToCache(vtkSMMessage* proxyStateUpdate, int offset);
 
 private:
-  vtkSIProperty(const vtkSIProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIProperty&) VTK_DELETE_FUNCTION;
+  vtkSIProperty(const vtkSIProperty&) = delete;
+  void operator=(const vtkSIProperty&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

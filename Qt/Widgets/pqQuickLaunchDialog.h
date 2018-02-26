@@ -46,7 +46,7 @@ class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 
 public:
   pqQuickLaunchDialog(QWidget* parent = 0);
-  virtual ~pqQuickLaunchDialog();
+  ~pqQuickLaunchDialog() override;
 
   /**
   * Set the actions to be launched using this dialog.
@@ -64,7 +64,7 @@ public slots:
   /**
   * Overridden to trigger the user selected action.
   */
-  virtual void accept();
+  void accept() override;
 
 protected slots:
   /**
@@ -77,7 +77,7 @@ protected:
   /**
   * Overridden to capture key presses.
   */
-  virtual bool eventFilter(QObject* watched, QEvent* event);
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
   /**
   * Given the user entered text, update the GUI.

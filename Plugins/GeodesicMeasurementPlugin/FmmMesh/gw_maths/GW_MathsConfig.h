@@ -2,7 +2,7 @@
 /**
  *  \file   GW_Config.h
  *  \brief  Main configuration file.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   10-26-2002
  */
 /*------------------------------------------------------------------------------*/
@@ -197,7 +197,7 @@ namespace GW {
 //@{
 #define GW_True  true
 #define GW_False false
-/** to make aproximate computations (derivation, GW_Float comparaisons ...) */
+/** to make approximate computations (derivation, GW_Float comparaisons ...) */
 #define GW_EPSILON 1e-9
 /** very big number */
 #define GW_INFINITE 1e9
@@ -287,7 +287,7 @@ inline
 void TestClassHeader(const char* class_name, std::ostream &s)
 {
     s << "---------------------------------------------------------" << endl;
-    s << "Begining test for class " << class_name << " ..." << endl;
+    s << "Beginning test for class " << class_name << " ..." << endl;
 }
 inline
 void TestClassFooter(const char* class_name, std::ostream &s)
@@ -297,7 +297,7 @@ void TestClassFooter(const char* class_name, std::ostream &s)
 
 
 #if 1
-/** Traits class. This is the basic traits from wich each
+/** Traits class. This is the basic traits from which each
     implementation for standard traits (float, double, etc) will use.
     Gives default implementations. */
 template<class numT>
@@ -310,7 +310,7 @@ struct gw_basic_type_traits
     /** A value used for equality test. */
     numT Epsilon()
     { return 1e-9; }
-    /** must retrun a number at random between say [0,1] */
+    /** must return a number at random between say [0,1] */
     static numT Random(const numT& min, const numT& max)
     { return GW_RAND_RANGE(min,max); }
     static const char* GetBasicTypeName()
@@ -326,7 +326,7 @@ struct gw_basic_type_traits<GW_Float>
     /** A value used for equality test. */
     static GW_Float Epsilon()
     { return 1e-9; }
-    /** must retrun a number at random between say [0,1] */
+    /** must return a number at random between say [0,1] */
     static GW_Float Random(const GW_Float& min, const GW_Float& max)
     { return GW_RAND_RANGE(min,max); }
     static const char* GetBasicTypeName()
@@ -338,7 +338,7 @@ struct gw_basic_type_traits<int>
     /** A value used for equality test. */
     static double Epsilon()
     { return 1e-5; }
-    /** must retrun a number at random between say [0,1] */
+    /** must return a number at random between say [0,1] */
     static int Random(const int& min, const int& max)
     {
 #if defined(_MSC_VER)

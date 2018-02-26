@@ -24,9 +24,9 @@ def get_render_view(size):
 
 def save_render_buffer(fname):
     '''Similar to SaveScreenshot except a re-render will not be triggered'''
-    import vtk
+    from vtkmodules.vtkRenderingCore import vtkWindowToImageFilter
     w = GetRenderView().SMProxy.GetRenderWindow()
-    w2i = vtk.vtkWindowToImageFilter()
+    w2i = vtkWindowToImageFilter()
     w2i.ReadFrontBufferOff()
     w2i.ShouldRerenderOff()
     w2i.SetInput(w)
@@ -51,16 +51,17 @@ def flush_render_buffer():
     if not w.GetOffScreenRendering():
         return
 
-    import vtk
+    from vtkmodules.vtkRenderingCore import vtkWindowToImageFilter
+    from vtkmodules.vtkParallelCore import vtkMultiProcessController
 
     # If we're using MPI we can also bypass this since compositing will
     # for a GL flush
-    controller = vtk.vtkMultiProcessController.GetGlobalController()
+    controller = vtkMultiProcessController.GetGlobalController()
     if controller.GetNumberOfProcesses() > 1:
         return
 
     # Force a GL flush by retrieving the frame buffer image
-    w2i = vtk.vtkWindowToImageFilter()
+    w2i = vtkWindowToImageFilter()
     w2i.ReadFrontBufferOff()
     w2i.ShouldRerenderOff()
     w2i.SetInput(w)
@@ -85,8 +86,10 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     if num_spheres_in_scene is None:
         num_spheres_in_scene = num_spheres
 
-    import vtk
-    controller = vtk.vtkMultiProcessController.GetGlobalController()
+    from vtkmodules.vtkParallelCore import vtkMultiProcessController
+    from vtkmodules.vtkCommonSystem import vtkTimerLog
+
+    controller = vtkMultiProcessController.GetGlobalController()
 
     view = get_render_view(view_size)
     if ospray:
@@ -106,7 +109,10 @@ def run(output_basename='log', num_spheres=8, num_spheres_in_scene=None,
     print('Generating all spheres')
     gen = ProgrammableSource(Script='''
 import math
-import vtk
+from vtkmodules.vtkParallelCore import vtkMultiProcessController
+from vtkmodules.vtkFiltersSources import vtkSphereSource
+from vtkmodules.vtkFiltersCore import vtkAppendPolyData
+from vtkmodules.vtkCommonDataModel import vtkPolyData
 
 try:
     num_spheres
@@ -125,24 +131,24 @@ except:
 
 edge = math.ceil(math.pow(num_spheres_in_scene, (1.0 / 3.0)))
 
-controller = vtk.vtkMultiProcessController.GetGlobalController()
+controller = vtkMultiProcessController.GetGlobalController()
 np = controller.GetNumberOfProcesses()
 p = controller.GetLocalProcessId()
 
 ns=lambda rank:num_spheres/np + (1 if rank >= np-num_spheres%np else 0)
 
-# Not sure why but the builtin sum() gives wierd results here so we'll just
+# Not sure why but the builtin sum() gives weird results here so we'll just
 # so it manually
 start=0
 for r in range(0,p):
     start += int(ns(r))
 end=start+ns(p)
 
-ss = vtk.vtkSphereSource()
+ss = vtkSphereSource()
 ss.SetPhiResolution(res)
 ss.SetThetaResolution(res)
 
-ap = vtk.vtkAppendPolyData()
+ap = vtkAppendPolyData()
 print('  source %d: generating %d spheres from %d to %d' % (p, end-start, start, end))
 for x in range(start,end):
     i = x%edge
@@ -150,7 +156,7 @@ for x in range(start,end):
     k = math.floor((x / (edge * edge)))
     ss.SetCenter(i + 0.5,j + 0.5,k + 0.5)
     ss.Update()
-    pd = vtk.vtkPolyData()
+    pd = vtkPolyData()
     pd.ShallowCopy(ss.GetOutput())
     # pd.GetPointData().RemoveArray('Normals')
     ap.AddInputData(pd)
@@ -191,13 +197,13 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
     SaveScreenshot(frame_fname_fmt % {'f': 0})
 
     print('Gathering geometry counts')
-    vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
+    vtkTimerLog.MarkStartEvent('GetViewItemStats')
     num_polys = 0
     num_points = 0
     for r in view.Representations:
         num_polys  += r.GetRepresentedDataInformation().GetNumberOfCells()
         num_points += r.GetRepresentedDataInformation().GetNumberOfPoints()
-    vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
+    vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
     print('Beginning benchmark loop')
     deltaAz = 45.0 / num_frames

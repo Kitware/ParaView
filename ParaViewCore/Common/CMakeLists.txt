@@ -46,12 +46,4 @@ set(Module_SRCS
   vtkPVInstantiator.h
 )
 
-set_source_files_properties(
-  vtkClientServerInterpreterInitializer
-  WRAP_EXCLUDE)
-
-set_source_files_properties(
-  vtkClientServerInterpreterInitializer
-  ABSTRACT)
-
 vtk_module_library(vtkPVCommon ${Module_SRCS})

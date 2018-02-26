@@ -217,23 +217,8 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
   // If user chose it, update all transfer function data range.
   // FIXME: This should happen for all servers available.
   vtkNew<vtkSMTransferFunctionManager> tmgr;
-  int mode = gsettings->GetTransferFunctionResetMode();
-  switch (mode)
-  {
-    case vtkPVGeneralSettings::RESET_ON_APPLY:
-    case vtkPVGeneralSettings::RESET_ON_APPLY_AND_TIMESTEP:
-      tmgr->ResetAllTransferFunctionRangesUsingCurrentData(
-        pqActiveObjects::instance().activeServer()->proxyManager(), false);
-      break;
-
-    case vtkPVGeneralSettings::GROW_ON_APPLY:
-    case vtkPVGeneralSettings::GROW_ON_APPLY_AND_TIMESTEP:
-    default:
-      tmgr->ResetAllTransferFunctionRangesUsingCurrentData(
-        pqActiveObjects::instance().activeServer()->proxyManager(),
-        /*extend*/ true);
-      break;
-  }
+  tmgr->ResetAllTransferFunctionRangesUsingCurrentData(
+    pqActiveObjects::instance().activeServer()->proxyManager(), false /*animating*/);
 
   //---------------------------------------------------------------------------
   // Perform the render on visible views.

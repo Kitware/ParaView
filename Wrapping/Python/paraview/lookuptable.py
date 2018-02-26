@@ -14,11 +14,12 @@ This module is intended for use with by simple.py."""
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-
-import paraview.simple
-from paraview import servermanager
+from __future__ import absolute_import
 import os
 from math import sqrt
+
+from . import servermanager
+from ._colorMaps import getColorMaps
 
 # -----------------------------------------------------------------------------
 
@@ -95,6 +96,9 @@ class vtkPVLUTReader:
   number of ParaView's "ColorMap" elements define LUT entries.
 
   Usage:
+
+  ::
+
      # at the top of your script
      # create the reader and load LUT's
      lr = lookuptable.vtkPVLUTReader()
@@ -118,6 +122,9 @@ class vtkPVLUTReader:
      Render()
 
   File Format:
+
+  ::
+
       <ColorMaps>
           ...
         <ColorMap name="LUTName" space="Lab,RGB,HSV" indexedLookup="true,false">
@@ -127,7 +134,7 @@ class vtkPVLUTReader:
           <NaN r="val" g="val" b="val"/>
         </ColorMap>
           ...
-        <ColorMaps>
+        <ColorMap>
           ...
         </ColorMap>
           ...
@@ -138,12 +145,12 @@ class vtkPVLUTReader:
     self.LUTS={}
     self.DefaultLUT=None
     self.Globals=ns
-    baseDir=os.path.dirname(paraview.simple.__file__)
-    defaultLUTFile=os.path.join(baseDir,'ColorMaps.xml')
-    if (os.path.exists(defaultLUTFile)):
-      self.Read(defaultLUTFile)
+
+    defaultColorMaps = getColorMaps()
+    if defaultColorMaps:
+      self._Read(defaultColorMaps)
     else:
-      print ('WARNING: default LUTs not found at %s'%(defaultLUTFile))
+      print('WARNING: default LUTs not found.')
     return
 
   def Clear(self):
@@ -169,6 +176,9 @@ class vtkPVLUTReader:
       print ('ERROR: parsing LUT file %s'%(aFileName))
       print ('ERROR: root element must be <ColorMaps>')
       return
+    return self._Read(root)
+
+  def _Read(self, root):
     nElems=root.GetNumberOfNestedElements()
     i=0
     nFound=0
@@ -294,7 +304,7 @@ class vtkPVLUTReader:
   def __GetRange(self,aArray,aRangeOveride):
     """
     Get the range from an array proxy object or if
-    an overide is provided use that.
+    an override is provided use that.
     """
     nComps = aArray.GetNumberOfComponents()
     range = [0.0, 1.0]

@@ -32,13 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPythonShellReaction_h
 #define pqPythonShellReaction_h
 
-#include "pqApplicationComponentsModule.h"
+#include "pqApplicationComponentsModule.h" // for exports
+#include "vtkSetGet.h"                     // for VTK_LEGACY
+
 #include "pqReaction.h"
 
 /**
-* @ingroup Reactions
-* pqPythonShellReaction is a reaction to handle showing of the python shell.
-*/
+ * @ingroup Reactions
+ * pqPythonShellReaction is a reaction to handle showing of the python shell.
+ * @deprecated ParaView 5.5. Simply create a pqPythonShell in your application as
+ * needed.
+ */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPythonShellReaction : public pqReaction
 {
   Q_OBJECT
@@ -51,18 +55,18 @@ public:
   * Pops up the python shell dialog when compiled with PARAVIEW_ENABLE_PYTHON
   * flag on.
   */
-  static void showPythonShell();
+  VTK_LEGACY(static void showPythonShell());
 
   /**
   * Executes a python script.
   */
-  static void executeScript(const char* filename);
+  VTK_LEGACY(static void executeScript(const char* filename));
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqPythonShellReaction::showPythonShell(); }
+  void onTriggered() override { pqPythonShellReaction::showPythonShell(); }
 
 private:
   Q_DISABLE_COPY(pqPythonShellReaction)

@@ -48,13 +48,13 @@ class PQCORE_EXPORT pqXYFunctionalBagChartView : public pqContextView
 public:
   static QString XYFunctionalBagChartViewType() { return "XYFunctionalBagChartView"; }
 
-  virtual bool supportsSelection() const { return true; }
+  bool supportsSelection() const override { return true; }
 
 public:
   pqXYFunctionalBagChartView(const QString& group, const QString& name,
     vtkSMContextViewProxy* viewModule, pqServer* server, QObject* parent = NULL);
 
-  virtual ~pqXYFunctionalBagChartView();
+  ~pqXYFunctionalBagChartView() override;
 
 private:
   Q_DISABLE_COPY(pqXYFunctionalBagChartView)

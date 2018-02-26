@@ -268,7 +268,7 @@ void vtkPVCompositeDataInformation::CopyFromAMR(vtkUniformGridAMR* amr)
 }
 
 //----------------------------------------------------------------------------
-// Called to merge informations from two processess.
+// Called to merge information from two processes.
 void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
 {
   vtkPVCompositeDataInformation* info;
@@ -276,7 +276,7 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
   info = vtkPVCompositeDataInformation::SafeDownCast(pvi);
   if (info == NULL)
   {
-    vtkErrorMacro("Cound not cast object to data information.");
+    vtkErrorMacro("Could not cast object to data information.");
     return;
   }
 
@@ -349,19 +349,18 @@ void vtkPVCompositeDataInformation::CopyToStream(vtkClientServerStream* css)
 
   for (unsigned i = 0; i < numChildren; i++)
   {
+    *css << i << this->Internal->ChildrenInformation[i].Name.c_str();
     vtkPVDataInformation* dataInf = this->Internal->ChildrenInformation[i].Info;
+    vtkClientServerStream dcss;
     if (dataInf)
     {
-      *css << i << this->Internal->ChildrenInformation[i].Name.c_str();
-
-      vtkClientServerStream dcss;
       dataInf->CopyToStream(&dcss);
-
-      size_t length;
-      const unsigned char* data;
-      dcss.GetData(&data, &length);
-      *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
     }
+
+    size_t length;
+    const unsigned char* data;
+    dcss.GetData(&data, &length);
+    *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
   }
   *css << numChildren; // DONE marker
   *css << vtkClientServerStream::End;
@@ -421,6 +420,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(const vtkClientServerStream* 
       vtkErrorMacro("Error parsing the name for the block.");
       return;
     }
+    this->Internal->ChildrenInformation[childIdx].Name = name ? name : "";
 
     vtkTypeUInt32 length;
     std::vector<unsigned char> data;
@@ -428,24 +428,23 @@ void vtkPVCompositeDataInformation::CopyFromStream(const vtkClientServerStream* 
 
     msgIdx++;
     // Data information.
-    vtkPVDataInformation* dataInf = vtkPVDataInformation::New();
     if (!css->GetArgumentLength(0, msgIdx, &length))
     {
       vtkErrorMacro("Error parsing length of cell data information.");
-      dataInf->Delete();
       return;
     }
     data.resize(length);
     if (!css->GetArgument(0, msgIdx, &*data.begin(), length))
     {
       vtkErrorMacro("Error parsing cell data information.");
-      dataInf->Delete();
       return;
     }
     dcss.SetData(&*data.begin(), length);
-    dataInf->CopyFromStream(&dcss);
-    this->Internal->ChildrenInformation[childIdx].Info = dataInf;
-    this->Internal->ChildrenInformation[childIdx].Name = name;
-    dataInf->Delete();
+    if (dcss.GetNumberOfMessages() > 0)
+    {
+      vtkNew<vtkPVDataInformation> dataInf;
+      dataInf->CopyFromStream(&dcss);
+      this->Internal->ChildrenInformation[childIdx].Info = dataInf;
+    }
   }
 }

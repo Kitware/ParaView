@@ -98,7 +98,7 @@ void vtkPVMultiClientsInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   vtkPVServerOptions* serverOptions = vtkPVServerOptions::SafeDownCast(options);
   this->MultiClientEnable = serverOptions ? serverOptions->GetMultiClientMode() : 0;
 
-  // Retreive the current client connection ID
+  // Retrieve the current client connection ID
   vtkPVSession* session = vtkPVSession::SafeDownCast(pm->GetSession());
   vtkCompositeMultiProcessController* ctrl;
   if (this->ClientIds)

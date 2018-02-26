@@ -34,15 +34,15 @@ public:
   static vtkPEquivalenceSet* New();
 
   // Globally equivalent set IDs are reassigned to be sequential.
-  virtual int ResolveEquivalences() VTK_OVERRIDE;
+  int ResolveEquivalences() VTK_OVERRIDE;
 
 protected:
   vtkPEquivalenceSet();
-  ~vtkPEquivalenceSet();
+  ~vtkPEquivalenceSet() override;
 
 private:
-  vtkPEquivalenceSet(const vtkPEquivalenceSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPEquivalenceSet&) VTK_DELETE_FUNCTION;
+  vtkPEquivalenceSet(const vtkPEquivalenceSet&) = delete;
+  void operator=(const vtkPEquivalenceSet&) = delete;
 };
 
 #endif /* vtkPEquivalenceSet_h */

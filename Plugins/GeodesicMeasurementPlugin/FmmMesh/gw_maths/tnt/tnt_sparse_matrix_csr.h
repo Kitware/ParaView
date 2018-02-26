@@ -87,7 +87,7 @@ public:
     @param N the  number of columns of sparse matrix
     @param nz the number of nonzeros
     @param val a contiguous list of nonzero values
-    @param r row-pointers: r[i] denotes the begining position of row i
+    @param r row-pointers: r[i] denotes the beginning position of row i
         (i.e. the ith row begins at val[row[i]]).
     @param c column-indices: c[i] denotes the column location of val[i]
 */

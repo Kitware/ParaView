@@ -23,6 +23,7 @@
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMTrace.h"
+#include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 
@@ -30,7 +31,6 @@
 
 vtkSmartPointer<vtkPVGeneralSettings> vtkPVGeneralSettings::Instance;
 
-vtkInstantiatorNewMacro(vtkPVGeneralSettings);
 //----------------------------------------------------------------------------
 vtkPVGeneralSettings* vtkPVGeneralSettings::New()
 {
@@ -46,11 +46,12 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , AutoApply(false)
   , AutoApplyActiveOnly(false)
   , DefaultViewType(NULL)
-  , TransferFunctionResetMode(vtkPVGeneralSettings::GROW_ON_APPLY)
+  , TransferFunctionResetMode(vtkSMTransferFunctionManager::GROW_ON_APPLY)
   , ScalarBarMode(vtkPVGeneralSettings::AUTOMATICALLY_HIDE_SCALAR_BARS)
   , CacheGeometryForAnimation(false)
   , AnimationGeometryCacheLimit(0)
   , AnimationTimePrecision(17)
+  , ShowAnimationShortcuts(0)
   , PropertiesPanelMode(vtkPVGeneralSettings::ALL_IN_ONE)
   , LockPanels(false)
   , GUIFontSize(0)

@@ -40,6 +40,10 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
+#include <string>  // for std::string
+#include <utility> // for std::pair
+#include <vector>  // for std::vector
+
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyListDomainInternals;
@@ -51,6 +55,26 @@ public:
   static vtkSMProxyListDomain* New();
   vtkTypeMacro(vtkSMProxyListDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+
+  /**
+   * Used to identify a proxy type.
+   */
+  struct ProxyType
+  {
+    std::string GroupName;
+    std::string ProxyName;
+    ProxyType() {}
+    ProxyType(const std::string& group, const std::string& name)
+      : GroupName(group)
+      , ProxyName(name)
+    {
+    }
+  };
+
+  /**
+   * Returns a vector of proxy types for the proxies in the domain.
+   */
+  const std::vector<ProxyType>& GetProxyTypes() const;
 
   /**
    * Returns the number of proxies in the domain.
@@ -81,7 +105,7 @@ public:
   /**
    * This always returns true.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Add a proxy to the domain.
@@ -109,7 +133,7 @@ public:
   vtkSMProxy* FindProxy(const char* xmlgroup, const char* xmlname);
 
   /**
-   * Removes the first occurence of the \c proxy in the domain.
+   * Removes the first occurrence of the \c proxy in the domain.
    * Returns if the proxy was removed.
    */
   int RemoveProxy(vtkSMProxy* proxy);
@@ -137,11 +161,11 @@ public:
    * application must explicitly call this method to initialize the
    * property.
    */
-  virtual int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMProxyListDomain();
-  ~vtkSMProxyListDomain();
+  ~vtkSMProxyListDomain() override;
   //@}
 
   /**
@@ -158,17 +182,17 @@ protected:
   /**
    * Save state for this domain.
    */
-  virtual void ChildSaveState(vtkPVXMLElement* propertyElement) VTK_OVERRIDE;
+  void ChildSaveState(vtkPVXMLElement* propertyElement) VTK_OVERRIDE;
 
   // Load the state of the domain from the XML.
-  virtual int LoadState(vtkPVXMLElement* domainElement, vtkSMProxyLocator* loader) VTK_OVERRIDE;
+  int LoadState(vtkPVXMLElement* domainElement, vtkSMProxyLocator* loader) VTK_OVERRIDE;
 
   friend class vtkSMProxyProperty;
   void SetProxies(vtkSMProxy** proxies, unsigned int count);
 
 private:
-  vtkSMProxyListDomain(const vtkSMProxyListDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyListDomain&) VTK_DELETE_FUNCTION;
+  vtkSMProxyListDomain(const vtkSMProxyListDomain&) = delete;
+  void operator=(const vtkSMProxyListDomain&) = delete;
 
   vtkSMProxyListDomainInternals* Internals;
 };

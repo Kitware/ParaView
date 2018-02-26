@@ -45,7 +45,7 @@ class PQCORE_EXPORT pqComparativeXYBarChartView : public pqComparativeContextVie
 public:
   pqComparativeXYBarChartView(const QString& group, const QString& name,
     vtkSMComparativeViewProxy* view, pqServer* server, QObject* parent = NULL);
-  ~pqComparativeXYBarChartView();
+  ~pqComparativeXYBarChartView() override;
 
   static QString chartViewType() { return "ComparativeXYBarChartView"; }
   static QString chartViewTypeName() { return "Bar Chart View (Comparative)"; }

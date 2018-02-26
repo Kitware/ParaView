@@ -45,7 +45,7 @@ public:
   int GetStripAlpha() { return this->StripAlpha; }
   // Description:
   // Pre-process the provided image, pre-processed data is return
-  // via the "out" paramter. A flag is returned through the "freeOut"
+  // via the "out" parameter. A flag is returned through the "freeOut"
   // parameter indicating weather or not the caller needs to call free
   // on the returned array.
   void PreProcess(vtkUnsignedCharArray* in, unsigned char*& out, int& nCompsOut, vtkIdType& outSize,

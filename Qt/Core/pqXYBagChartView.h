@@ -50,13 +50,13 @@ public:
   /**
   * Currently theis chart view is not supporting selection.
   */
-  virtual bool supportsSelection() const { return true; }
+  bool supportsSelection() const override { return true; }
 
 public:
   pqXYBagChartView(const QString& group, const QString& name, vtkSMContextViewProxy* viewModule,
     pqServer* server, QObject* parent = NULL);
 
-  virtual ~pqXYBagChartView();
+  ~pqXYBagChartView() override;
 
 private:
   Q_DISABLE_COPY(pqXYBagChartView)

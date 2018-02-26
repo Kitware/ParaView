@@ -35,61 +35,49 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Transfer information about a single object into this object.
+   * Collects OpenGL information from the \c object. \c object must be
+   * either a vtkPVView or a vtkRenderWindow. If not, this call will create a
+   * vtkRenderWindow temporarily and use it to obtain OpenGL capabilities
+   * information (see
+   * vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow()).
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
-   * Serialize/Deserialize the parameters that control how/what information is
-   * gathered. This are different from the ivars that constitute the gathered
-   * information itself. For example, PortNumber on vtkPVDataInformation
-   * controls what output port the data-information is gathered from.
+   * Methods provide access to OpenGL information.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE{};
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE{};
+  const std::string& GetVendor() const { return this->Vendor; }
+  const std::string& GetVersion() const { return this->Version; }
+  const std::string& GetRenderer() const { return this->Renderer; }
+  const std::string& GetCapabilities() const { return this->Capabilities; }
   //@}
-
-  const std::string& GetVendor();
-  const std::string& GetVersion();
-  const std::string& GetRenderer();
-
-  bool GetLocalDisplay();
 
 protected:
   vtkPVOpenGLInformation();
-  ~vtkPVOpenGLInformation();
-
-  void SetVendor();
-
-  void SetVersion();
-
-  void SetRenderer();
-
-  void SetLocalDisplay(bool);
+  ~vtkPVOpenGLInformation() override;
 
 private:
-  vtkPVOpenGLInformation(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOpenGLInformation&) VTK_DELETE_FUNCTION;
-
-  bool LocalDisplay;
+  vtkPVOpenGLInformation(const vtkPVOpenGLInformation&) = delete;
+  void operator=(const vtkPVOpenGLInformation&) = delete;
 
   std::string Vendor;
   std::string Version;
   std::string Renderer;
+  std::string Capabilities;
 };
 
 #endif

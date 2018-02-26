@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqPipelineInputComboBox : public QComboBox
 
 public:
   pqPipelineInputComboBox(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = NULL);
-  virtual ~pqPipelineInputComboBox();
+  ~pqPipelineInputComboBox() override;
 
   vtkSMProxy* currentProxy() const;
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Wavelet" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="activated" arguments="RTData" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Surface" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/EditScalarBar" command="activate" arguments="" />
+  <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/HorizontalTitle/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="ColorLegendEditor/widget/ApplyButton" command="activate" arguments="" />
+  <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
+</pqevents>

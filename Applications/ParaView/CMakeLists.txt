@@ -1,12 +1,7 @@
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
 include(ParaViewQt)
-set(qt5_comps Widgets)
-set(qt4_comps QtGui)
-
-pv_find_package_qt(qt_targets REQUIRED QUIET
-                QT4_COMPONENTS ${qt4_comps}
-                QT5_COMPONENTS ${qt5_comps})
+pv_find_package_qt(qt_targets REQUIRED QUIET QT5_COMPONENTS Widgets)
 pv_qt_wrap_cpp(MOC_BUILT_SOURCES ParaViewMainWindow.h)
 pv_qt_wrap_ui(UI_BUILT_SOURCES ParaViewMainWindow.ui)
 include_directories(
@@ -61,10 +56,12 @@ endif()
 # ParaView itself needs vtkPVStaticPluginsInit as well.
 set(SUPPORT_STATIC_PLUGINS TRUE)
 
-set(title "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  set(title "${title} (Legacy Rendering Backend)")
+if (PARAVIEW_VERSION_NICKNAME)
+  set(title "ParaView ${PARAVIEW_VERSION_NICKNAME} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
+else()
+  set(title "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
 endif()
+
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
@@ -96,7 +93,7 @@ if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 endif()
 
 # link enabled plugins if not building in shared library mode and
-# add dependecies to linked python modules These are non-empty only when
+# add dependencies to linked python modules These are non-empty only when
 # building statically.
 if (PARAVIEW_ENABLE_PYTHON)
   target_link_libraries(paraview 
@@ -128,7 +125,7 @@ if (APPLE AND NOT PARAVIEW_DO_UNIX_STYLE_INSTALLS)
      \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR}/paraview.app/Contents/MacOS/paraview
      \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR}/paraview.app
      \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_LIBRARY_DIR}
-     \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_PLUGIN_DIR}
+     \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${PARAVIEW_INSTALL_PLUGINS_DIR}
      \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_DATA_DIR})
 
    # Place the App at the requested location.

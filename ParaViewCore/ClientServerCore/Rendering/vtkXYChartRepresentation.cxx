@@ -44,7 +44,7 @@ protected:
     : ArrayToSortBy(NULL)
   {
   }
-  ~SortTableFilter() {}
+  ~SortTableFilter() override {}
 public:
   static SortTableFilter* New();
   int RequestData(
@@ -162,6 +162,7 @@ void vtkXYChartRepresentation::SetSeriesVisibility(const char* seriesname, bool 
 {
   assert(seriesname != NULL);
   this->Internals->SeriesVisibilities[seriesname] = visible;
+  this->Internals->SeriesOrder[seriesname] = static_cast<int>(this->Internals->SeriesOrder.size());
   this->Modified();
 }
 
@@ -242,6 +243,7 @@ const char* vtkXYChartRepresentation::GetLabel(const char* seriesname) const
 void vtkXYChartRepresentation::ClearSeriesVisibilities()
 {
   this->Internals->SeriesVisibilities.clear();
+  this->Internals->SeriesOrder.clear();
   this->Modified();
 }
 

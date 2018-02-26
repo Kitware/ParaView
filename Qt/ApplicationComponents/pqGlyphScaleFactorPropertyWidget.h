@@ -48,13 +48,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqGlyphScaleFactorPropertyWidget
 
 public:
   pqGlyphScaleFactorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  virtual ~pqGlyphScaleFactorPropertyWidget();
+  ~pqGlyphScaleFactorPropertyWidget() override;
 
 protected slots:
   /**
   * update the property's value using the domain.
   */
-  virtual void resetButtonClicked();
+  void resetButtonClicked() override;
 
 private:
   Q_DISABLE_COPY(pqGlyphScaleFactorPropertyWidget)

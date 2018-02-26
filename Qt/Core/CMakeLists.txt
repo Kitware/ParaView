@@ -65,8 +65,6 @@ set(Module_SRCS
   pqDataRepresentation.h
   pqDebug.cxx
   pqDebug.h
-  pqDisplayPolicy.cxx
-  pqDisplayPolicy.h
   pqFileDialog.cxx
   pqFileDialogEventPlayer.cxx
   pqFileDialogEventPlayer.h
@@ -111,12 +109,6 @@ set(Module_SRCS
   pqOutputPort.h
   pqOutputWidget.cxx
   pqOutputWidget.h
-  pqOutputWindowAdapter.cxx
-  pqOutputWindowAdapter.h
-  pqOutputWindow.cxx
-  pqOutputWindow.h
-  pqOutputWindowModel.cxx
-  pqOutputWindowModel.h
   pqParallelCoordinatesChartView.cxx
   pqParallelCoordinatesChartView.h
   pqPipelineFilter.cxx
@@ -240,7 +232,6 @@ set (Module_MOC_HDRS
   pqCoreTestUtility.h
   pqCoreUtilities.h
   pqDataRepresentation.h
-  pqDisplayPolicy.h
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.h
   pqFileDialogFavoriteModel.h
@@ -260,9 +251,6 @@ set (Module_MOC_HDRS
   pqObjectBuilder.h
   pqOutputPort.h
   pqOutputWidget.h
-  pqOutputWindowAdapter.h
-  pqOutputWindow.h
-  pqOutputWindowModel.h
   pqParallelCoordinatesChartView.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h
@@ -307,9 +295,16 @@ set (Module_MOC_HDRS
   pqXYChartView.h
 )
 
+if(NOT VTK_LEGACY_REMOVE)
+  list(APPEND Module_SRCS
+    pqDisplayPolicy.cxx
+    pqDisplayPolicy.h)
+  list(APPEND Module_MOC_HDRS
+    pqDisplayPolicy.h)
+endif()
+
 set (Module_UI_FILES
   Resources/UI/pqOutputWidget.ui
-  Resources/UI/pqOutputWindow.ui
   Resources/UI/pqFileDialog.ui
 )
 
@@ -331,23 +326,19 @@ endif()
 include(ParaViewQt)
 if (PARAVIEW_USE_QTHELP)
   pv_find_package_qt(qt_private_targets REQUIRED QUIET
-    QT4_COMPONENTS QtHelp
     QT5_COMPONENTS Help)
 
   set(${vtk-module}_EXPORT_CODE_INSTALL
     "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
     pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-      QT4_COMPONENTS QtHelp
       QT5_COMPONENTS Help)")
 else()
   pv_find_package_qt(qt_private_targets REQUIRED QUIET
-    QT4_COMPONENTS QtGui
     QT5_COMPONENTS Widgets)
 
   set(${vtk-module}_EXPORT_CODE_INSTALL
     "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
     pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-      QT4_COMPONENTS QtGui
       QT5_COMPONENTS Widgets)")
 endif()
 set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")

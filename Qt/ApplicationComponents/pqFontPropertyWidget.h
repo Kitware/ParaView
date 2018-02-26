@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqFontPropertyWidget : public pqPropertyGro
 
 public:
   pqFontPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqFontPropertyWidget();
+  ~pqFontPropertyWidget() override;
 
   QString justification() const;
 signals:
@@ -65,6 +65,7 @@ protected:
 
 protected slots:
   void changeJustificationIcon(QAction*);
+  void onFontFamilyChanged();
 
 private:
   Q_DISABLE_COPY(pqFontPropertyWidget)

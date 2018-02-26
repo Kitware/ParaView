@@ -17,16 +17,18 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMVectorProperty.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkPVKeyFrameAnimationCueForProxies);
 vtkCxxSetObjectMacro(vtkPVKeyFrameAnimationCueForProxies, AnimatedProxy, vtkSMProxy);
 //----------------------------------------------------------------------------
 vtkPVKeyFrameAnimationCueForProxies::vtkPVKeyFrameAnimationCueForProxies()
-  : AnimatedProxy(NULL)
-  , AnimatedPropertyName(NULL)
-  , AnimatedDomainName(NULL)
+  : AnimatedProxy(nullptr)
+  , AnimatedPropertyName(nullptr)
+  , AnimatedDomainName(nullptr)
   , ValueIndexMax(-1)
 {
 }
@@ -50,7 +52,7 @@ vtkSMProperty* vtkPVKeyFrameAnimationCueForProxies::GetAnimatedProperty()
 {
   if (!this->AnimatedPropertyName || !this->AnimatedProxy)
   {
-    return NULL;
+    return nullptr;
   }
 
   return this->AnimatedProxy->GetProperty(this->AnimatedPropertyName);
@@ -62,17 +64,17 @@ vtkSMDomain* vtkPVKeyFrameAnimationCueForProxies::GetAnimatedDomain()
   vtkSMProperty* property = this->GetAnimatedProperty();
   if (!property)
   {
-    return NULL;
+    return nullptr;
   }
-  vtkSMDomain* domain = NULL;
-  vtkSMDomainIterator* iter = property->NewDomainIterator();
+
+  auto iter = vtkSmartPointer<vtkSMDomainIterator>::Take(property->NewDomainIterator());
   iter->Begin();
   if (!iter->IsAtEnd())
   {
-    domain = iter->GetDomain();
+    return iter->GetDomain();
   }
-  iter->Delete();
-  return domain;
+
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -84,16 +86,26 @@ void vtkPVKeyFrameAnimationCueForProxies::BeginUpdateAnimationValues()
 //----------------------------------------------------------------------------
 void vtkPVKeyFrameAnimationCueForProxies::SetAnimationValue(int index, double value)
 {
-
-  vtkSMDomain* domain = this->GetAnimatedDomain();
   vtkSMProperty* property = this->GetAnimatedProperty();
   vtkSMProxy* proxy = this->GetAnimatedProxy();
-  if (!proxy || !domain || !property)
+  if (!proxy || !property)
   {
-    vtkErrorMacro("Cue does not have domain or property set!");
+    vtkErrorMacro("Cue does not have a property set. Cannot animate.");
     return;
   }
-  domain->SetAnimationValue(property, index, value);
+
+  if (vtkSMDomain* domain = this->GetAnimatedDomain())
+  {
+    // Try to use the domain, if present to animate the property.
+    domain->SetAnimationValue(property, index, value);
+  }
+  else
+  {
+    // If no domain is available, let use the vtkSMPropertyHelper to simply set
+    // the value on the property.
+    vtkSMPropertyHelper(property).Set(index, value);
+  }
+
   if (this->ValueIndexMax < index)
   {
     this->ValueIndexMax = index;

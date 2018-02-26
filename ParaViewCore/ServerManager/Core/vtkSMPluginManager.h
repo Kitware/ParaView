@@ -103,7 +103,7 @@ public:
 
 protected:
   vtkSMPluginManager();
-  ~vtkSMPluginManager();
+  ~vtkSMPluginManager() override;
 
   bool InLoadPlugin;
   void OnPluginRegistered();
@@ -111,8 +111,8 @@ protected:
   vtkPVPluginsInformation* LocalInformation;
 
 private:
-  vtkSMPluginManager(const vtkSMPluginManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPluginManager&) VTK_DELETE_FUNCTION;
+  vtkSMPluginManager(const vtkSMPluginManager&) = delete;
+  void operator=(const vtkSMPluginManager&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -71,7 +71,7 @@ class PQCOMPONENTS_EXPORT pqSelectionManager : public QObject
 
 public:
   pqSelectionManager(QObject* parent = NULL);
-  virtual ~pqSelectionManager();
+  ~pqSelectionManager() override;
 
   /**
   * Returns the first currently selected pqOutputPort, if any.

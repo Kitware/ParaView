@@ -79,7 +79,7 @@ public:
 
 protected:
   vtkSMStateLoader();
-  ~vtkSMStateLoader();
+  ~vtkSMStateLoader() override;
   //@}
 
   /**
@@ -101,13 +101,13 @@ protected:
    * This order is a dependency order too and hence helps us register proxies in
    * order of dependencies.
    */
-  virtual void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy) VTK_OVERRIDE;
+  void CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy) VTK_OVERRIDE;
 
   /**
    * Overridden so that when new views are to be created, we create views
    * suitable for the connection.
    */
-  virtual vtkSMProxy* CreateProxy(
+  vtkSMProxy* CreateProxy(
     const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL) VTK_OVERRIDE;
 
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
@@ -143,7 +143,7 @@ protected:
    * This is used by NewProxy() when the proxy with the given id
    * is not located in the internal CreatedProxies map.
    */
-  virtual vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
+  vtkPVXMLElement* LocateProxyElement(vtkTypeUInt32 id) VTK_OVERRIDE;
 
   /**
    * Used by LocateProxyElement(). Recursively tries to locate the
@@ -167,8 +167,8 @@ protected:
   int KeepIdMapping;
 
 private:
-  vtkSMStateLoader(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMStateLoader&) VTK_DELETE_FUNCTION;
+  vtkSMStateLoader(const vtkSMStateLoader&) = delete;
+  void operator=(const vtkSMStateLoader&) = delete;
 
   vtkSMStateLoaderInternals* Internal;
 };

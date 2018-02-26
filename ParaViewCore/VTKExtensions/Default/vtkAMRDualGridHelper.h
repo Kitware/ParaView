@@ -144,7 +144,7 @@ public:
 
 private:
   vtkAMRDualGridHelper();
-  ~vtkAMRDualGridHelper();
+  ~vtkAMRDualGridHelper() override;
 
   char* ArrayName;
   int DataTypeSize;
@@ -225,8 +225,8 @@ private:
   int EnableAsynchronousCommunication;
 
 private:
-  vtkAMRDualGridHelper(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRDualGridHelper&) VTK_DELETE_FUNCTION;
+  vtkAMRDualGridHelper(const vtkAMRDualGridHelper&) = delete;
+  void operator=(const vtkAMRDualGridHelper&) = delete;
 };
 
 // I need to define this small object in the namespace of this class.
@@ -292,8 +292,8 @@ public:
   // and have no neighbors.
   unsigned char BoundaryBits;
 
-  // Different algorithms need to store differnt information
-  // with the blocks.  I could make this a vtkObject so the desctructor
+  // Different algorithms need to store different information
+  // with the blocks.  I could make this a vtkObject so the destructor
   // would delete it.
   void* UserData;
 

@@ -97,8 +97,8 @@ public:
   {
     this->SetComponentRange(comp, range[0], range[1]);
   }
-  double* GetComponentRange(int component);
-  void GetComponentRange(int comp, double* range);
+  double* GetComponentRange(int component) VTK_SIZEHINT(2);
+  void GetComponentRange(int comp, double range[2]);
   //@}
 
   //@{
@@ -113,7 +113,7 @@ public:
     this->SetComponentFiniteRange(comp, range[0], range[1]);
   }
   double* GetComponentFiniteRange(int component);
-  void GetComponentFiniteRange(int comp, double* range);
+  void GetComponentFiniteRange(int comp, double range[2]);
   //@}
 
   /**
@@ -141,19 +141,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -192,7 +192,7 @@ public:
 
 protected:
   vtkPVArrayInformation();
-  ~vtkPVArrayInformation();
+  ~vtkPVArrayInformation() override;
 
   int IsPartial;
   int DataType;
@@ -217,8 +217,8 @@ protected:
   class vtkInternalComponentNames;
   vtkInternalComponentNames* ComponentNames;
 
-  vtkPVArrayInformation(const vtkPVArrayInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVArrayInformation&) VTK_DELETE_FUNCTION;
+  vtkPVArrayInformation(const vtkPVArrayInformation&) = delete;
+  void operator=(const vtkPVArrayInformation&) = delete;
 };
 
 #endif

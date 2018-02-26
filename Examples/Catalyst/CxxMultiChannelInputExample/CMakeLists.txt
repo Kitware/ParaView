@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.3)
+project(CxxMultiChannelInputExample)
+
+set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
+if(USE_CATALYST)
+  find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
+  include("${PARAVIEW_USE_FILE}")
+  set(Adaptor_SRCS
+    FEAdaptor.cxx
+    )
+  add_library(CxxMultiChannelInputExampleAdaptor ${Adaptor_SRCS})
+  target_link_libraries(CxxMultiChannelInputExampleAdaptor vtkPVPythonCatalyst vtkParallelMPI)
+  add_definitions("-DUSE_CATALYST")
+  if(NOT PARAVIEW_USE_MPI)
+    message(SEND_ERROR "ParaView must be built with MPI enabled")
+  endif()
+else()
+  find_package(MPI REQUIRED)
+  include_directories(${MPI_C_INCLUDE_PATH})
+endif()
+
+add_executable(CxxMultiChannelInputExample FEDriver.cxx FEDataStructures.cxx)
+if(USE_CATALYST)
+  target_link_libraries(CxxMultiChannelInputExample LINK_PRIVATE CxxMultiChannelInputExampleAdaptor)
+  include(vtkModuleMacros)
+  include(vtkMPI)
+  vtk_mpi_link(CxxMultiChannelInputExample)
+else()
+  target_link_libraries(CxxMultiChannelInputExample LINK_PRIVATE ${MPI_LIBRARIES})
+endif()
+
+option(BUILD_TESTING "Build Testing" OFF)
+# Setup testing.
+if (BUILD_TESTING)
+  include(CTest)
+  add_test(NAME CxxMultiChannelInputExampleTest COMMAND CxxMultiChannelInputExample ${CMAKE_CURRENT_SOURCE_DIR}/../SampleScripts/allinputsgridwriter.py)
+  set_tests_properties(CxxMultiChannelInputExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
+endif()

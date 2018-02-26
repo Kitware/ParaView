@@ -19,7 +19,7 @@
  * When a link is created between proxy A->B, whenever any property
  * on proxy A is modified, a property with the same name as the modified
  * property (if any) on proxy B is also modified to be the same as the property
- * on the proxy A. Similary whenever proxy A->UpdateVTKObjects() is called,
+ * on the proxy A. Similarly whenever proxy A->UpdateVTKObjects() is called,
  * B->UpdateVTKObjects() is also fired.
 */
 
@@ -87,7 +87,7 @@ public:
   /**
    * Remove all links.
    */
-  virtual void RemoveAllLinks() VTK_OVERRIDE;
+  void RemoveAllLinks() VTK_OVERRIDE;
 
   /**
    * This method is used to initialise the object to the given state
@@ -96,52 +96,52 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMProxyLink();
-  ~vtkSMProxyLink();
+  ~vtkSMProxyLink() override;
 
   /**
    * Called when an input proxy is updated (UpdateVTKObjects).
    * Argument is the input proxy.
    */
-  virtual void UpdateVTKObjects(vtkSMProxy* proxy) VTK_OVERRIDE;
+  void UpdateVTKObjects(vtkSMProxy* proxy) VTK_OVERRIDE;
 
   /**
    * Called when a property of an input proxy is modified.
    * caller:- the input proxy.
    * pname:- name of the property being modified.
    */
-  virtual void PropertyModified(vtkSMProxy* proxy, const char* pname) VTK_OVERRIDE;
+  void PropertyModified(vtkSMProxy* proxy, const char* pname) VTK_OVERRIDE;
 
   /**
    * Called when a property is pushed.
    * caller :- the input proxy.
    * pname :- name of property that was pushed.
    */
-  virtual void UpdateProperty(vtkSMProxy* caller, const char* pname) VTK_OVERRIDE;
+  void UpdateProperty(vtkSMProxy* caller, const char* pname) VTK_OVERRIDE;
 
   /**
    * Save the state of the link.
    */
-  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
+  void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
 
   /**
    * Load the link state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Update the internal protobuf state
    */
-  virtual void UpdateState() VTK_OVERRIDE;
+  void UpdateState() VTK_OVERRIDE;
 
 private:
   vtkSMProxyLinkInternals* Internals;
 
-  vtkSMProxyLink(const vtkSMProxyLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyLink&) VTK_DELETE_FUNCTION;
+  vtkSMProxyLink(const vtkSMProxyLink&) = delete;
+  void operator=(const vtkSMProxyLink&) = delete;
 };
 
 #endif

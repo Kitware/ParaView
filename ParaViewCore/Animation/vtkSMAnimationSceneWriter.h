@@ -83,7 +83,7 @@ public:
 
 protected:
   vtkSMAnimationSceneWriter();
-  ~vtkSMAnimationSceneWriter();
+  ~vtkSMAnimationSceneWriter() override;
 
   unsigned long ObserverID;
   vtkSMAnimationScene* AnimationScene;
@@ -117,8 +117,8 @@ protected:
   int StartFileCount;
 
 private:
-  vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMAnimationSceneWriter&) VTK_DELETE_FUNCTION;
+  vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&) = delete;
+  void operator=(const vtkSMAnimationSceneWriter&) = delete;
 };
 
 #endif

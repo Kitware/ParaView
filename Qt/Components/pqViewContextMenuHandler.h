@@ -60,7 +60,7 @@ public:
   * \param parent The parent object.
   */
   pqViewContextMenuHandler(QObject* parent = 0);
-  virtual ~pqViewContextMenuHandler() {}
+  ~pqViewContextMenuHandler() override {}
 
   /**
   * \brief

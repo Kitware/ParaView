@@ -42,19 +42,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object. Calls AddInformation(info, 0).
    */
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   /**
@@ -64,11 +64,11 @@ public:
 
 protected:
   vtkPVStreamingPiecesInformation();
-  ~vtkPVStreamingPiecesInformation();
+  ~vtkPVStreamingPiecesInformation() override;
 
 private:
-  vtkPVStreamingPiecesInformation(const vtkPVStreamingPiecesInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVStreamingPiecesInformation&) VTK_DELETE_FUNCTION;
+  vtkPVStreamingPiecesInformation(const vtkPVStreamingPiecesInformation&) = delete;
+  void operator=(const vtkPVStreamingPiecesInformation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

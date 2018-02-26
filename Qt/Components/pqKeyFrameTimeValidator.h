@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqKeyFrameTimeValidator : public QDoubleValidator
 
 public:
   pqKeyFrameTimeValidator(QObject* parent);
-  virtual ~pqKeyFrameTimeValidator();
+  ~pqKeyFrameTimeValidator() override;
 
   // Set the AnimationScene. The ClockTimeRange from the time
   // keeper is used to determine the scale factor for the

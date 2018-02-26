@@ -67,30 +67,30 @@ public:
 
   /**
    * Set the data soruce proxy. This is used when in the FOLLOW_DATA mode. The
-   * camera will track the data refered to by the data source proxy.
+   * camera will track the data referred to by the data source proxy.
    */
   void SetDataSourceProxy(vtkSMProxy* dataSourceProxy);
 
 protected:
   vtkPVCameraCueManipulator();
-  ~vtkPVCameraCueManipulator();
+  ~vtkPVCameraCueManipulator() override;
 
   int Mode;
 
-  virtual void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
-  virtual void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
   /**
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
 
   vtkCameraInterpolator* CameraInterpolator;
   vtkSMProxy* DataSourceProxy;
 
 private:
-  vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCameraCueManipulator&) VTK_DELETE_FUNCTION;
+  vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&) = delete;
+  void operator=(const vtkPVCameraCueManipulator&) = delete;
 };
 
 #endif

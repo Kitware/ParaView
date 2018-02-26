@@ -36,19 +36,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   vtkGetMacro(CacheSize, unsigned long);
@@ -56,13 +56,13 @@ public:
 
 protected:
   vtkPVCacheSizeInformation();
-  ~vtkPVCacheSizeInformation();
+  ~vtkPVCacheSizeInformation() override;
 
   unsigned long CacheSize;
 
 private:
-  vtkPVCacheSizeInformation(const vtkPVCacheSizeInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCacheSizeInformation&) VTK_DELETE_FUNCTION;
+  vtkPVCacheSizeInformation(const vtkPVCacheSizeInformation&) = delete;
+  void operator=(const vtkPVCacheSizeInformation&) = delete;
 };
 
 #endif

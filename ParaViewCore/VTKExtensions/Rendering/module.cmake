@@ -9,21 +9,12 @@ if (PARAVIEW_USE_MPI)
   endif()
 endif()
 
+if(PARAVIEW_ENABLE_NVPIPE)
+  list(APPEND __dependencies vtknvpipe vtkPVClientServerCoreCore)
+endif()
+
 if(PARAVIEW_ENABLE_MATPLOTLIB)
   list(APPEND __dependencies vtkRenderingMatplotlib)
-endif()
-
-if (PARAVIEW_ENABLE_QT_SUPPORT)
-  list(APPEND __dependencies vtkGUISupportQt)
-endif()
-
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND __dependencies vtkRenderingLIC)
-  if (PARAVIEW_USE_MPI)
-    list (APPEND __dependencies vtkRenderingParallelLIC)
-  endif()
-else()
-    set(opengl2_private_depends vtkglew)
 endif()
 
 if(PARAVIEW_USE_OSPRAY)
@@ -36,7 +27,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     ParaViewRendering
   PRIVATE_DEPENDS
     vtkCommonColor
-    ${opengl2_private_depends}
+    vtkglew
   DEPENDS
     vtkChartsCore
     vtkFiltersExtraction
@@ -49,11 +40,11 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
     vtkRenderingFreeType
-    vtkRendering${VTK_RENDERING_BACKEND}
-    vtkRenderingContext${VTK_RENDERING_BACKEND}
+    vtkRenderingOpenGL2
+    vtkRenderingContextOpenGL2
     vtkRenderingParallel
     vtkIOExport
-    vtkIOExport${VTK_RENDERING_BACKEND}
+    vtkIOExportOpenGL2
     ${__dependencies}
     vtkRenderingVolumeAMR
     vtkCommonComputationalGeometry
@@ -62,8 +53,6 @@ vtk_module(vtkPVVTKExtensionsRendering
   PRIVATE_DEPENDS
     vtkzlib
     vtklz4
-  COMPILE_DEPENDS
-    vtkUtilitiesEncodeString
 
   TEST_DEPENDS
     vtkInteractionStyle

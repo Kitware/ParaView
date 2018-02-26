@@ -49,10 +49,10 @@ class PQCORE_EXPORT pqQVTKWidgetEventTranslator : public pqWidgetEventTranslator
 
 public:
   pqQVTKWidgetEventTranslator(QObject* p = 0);
-  ~pqQVTKWidgetEventTranslator();
+  ~pqQVTKWidgetEventTranslator() override;
 
   using Superclass::translateEvent;
-  virtual bool translateEvent(QObject* Object, QEvent* Event, int eventType, bool& Error);
+  bool translateEvent(QObject* Object, QEvent* Event, int eventType, bool& Error) override;
 
 private:
   pqQVTKWidgetEventTranslator(const pqQVTKWidgetEventTranslator&);

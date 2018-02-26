@@ -259,7 +259,7 @@ public:
 
 protected:
   vtkPVXMLElement();
-  ~vtkPVXMLElement();
+  ~vtkPVXMLElement() override;
 
   vtkPVXMLElementInternals* Internal;
 
@@ -282,8 +282,8 @@ protected:
   friend class vtkPVXMLParser;
 
 private:
-  vtkPVXMLElement(const vtkPVXMLElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVXMLElement&) VTK_DELETE_FUNCTION;
+  vtkPVXMLElement(const vtkPVXMLElement&) = delete;
+  void operator=(const vtkPVXMLElement&) = delete;
 };
 
 #endif

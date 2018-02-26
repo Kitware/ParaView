@@ -136,7 +136,7 @@ public:
    * Get/Set the Playback Window for this cue.
    * The Playback Window is use to mask out time that belong to a given cue
    * but that we don't want to play back.
-   * This is particulary useful when we want to export a subset of an animation
+   * This is particularly useful when we want to export a subset of an animation
    * without recomputing any start and end value relative to the cue and the
    * number of frame associated to it.
    * This is used by the Animation Player to only play a subset of the cue.
@@ -183,18 +183,26 @@ public:
   vtkGetMacro(ForceDisableCaching, bool);
   //@}
 
+  /**
+   * When set, we skip calling still render to render each frame.
+   * Useful to avoid updating screen when saving animations to disk, for
+   * example.
+   */
+  vtkSetMacro(OverrideStillRender, bool);
+  vtkGetMacro(OverrideStillRender, bool);
+
 protected:
   vtkSMAnimationScene();
-  ~vtkSMAnimationScene();
+  ~vtkSMAnimationScene() override;
 
   //@{
   /**
    * Overridden to ensure that caching parameters are passed to the view
    * correctly.
    */
-  virtual void StartCueInternal() VTK_OVERRIDE;
-  virtual void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
-  virtual void EndCueInternal() VTK_OVERRIDE;
+  void StartCueInternal() VTK_OVERRIDE;
+  void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
+  void EndCueInternal() VTK_OVERRIDE;
   //@}
 
   //@{
@@ -215,13 +223,11 @@ protected:
   vtkCompositeAnimationPlayer* AnimationPlayer;
   vtkEventForwarderCommand* Forwarder;
 
-  friend class vtkSMAnimationSceneImageWriter;
   bool OverrideStillRender;
-  vtkSetMacro(OverrideStillRender, bool);
 
 private:
-  vtkSMAnimationScene(const vtkSMAnimationScene&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMAnimationScene&) VTK_DELETE_FUNCTION;
+  vtkSMAnimationScene(const vtkSMAnimationScene&) = delete;
+  void operator=(const vtkSMAnimationScene&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

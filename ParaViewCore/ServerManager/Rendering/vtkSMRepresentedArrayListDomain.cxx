@@ -77,7 +77,7 @@ public:
   vtkWeakPointer<vtkSMRepresentedArrayListDomain> Domain;
   typedef vtkCommand Superclass;
   vtkSMRepresentedArrayListDomainUpdateCommand() { this->Domain = NULL; }
-  virtual const char* GetClassNameInternal() const
+  const char* GetClassNameInternal() const override
   {
     return "vtkSMRepresentedArrayListDomainUpdateCommand";
   }
@@ -85,7 +85,7 @@ public:
   {
     return new vtkSMRepresentedArrayListDomainUpdateCommand();
   }
-  virtual void Execute(vtkObject*, unsigned long, void*)
+  void Execute(vtkObject*, unsigned long, void*) override
   {
     if (this->Domain)
     {
@@ -148,8 +148,8 @@ void vtkSMRepresentedArrayListDomain::Update(vtkSMProperty* property)
     // information of the composite-representation rather than the internal
     // representation (which is what was causing the reported bug, since we always
     // ended up getting represented-data information from the "Surface
-    // Representation". Adding a mechanism to tell the domain to the use teh
-    // represented-data information from the outer most representation overcomes
+    // Representation". Adding a mechanism to tell the domain to use the
+    // represented-data information from the outer most representation, overcomes
     // this issue with less XML tricks and better backwards compatibility.
     vtkSMRepresentationProxy* outerMostRepresentation =
       (selfProxy && this->UseTrueParentForRepresentatedDataInformation)

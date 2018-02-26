@@ -42,7 +42,8 @@
 
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
-#include <vector> // needed for std::vector.
+#include "vtkVector.h" // needed for vtkVector2i
+#include <vector>      // needed for std::vector.
 
 class vtkSMViewProxy;
 class vtkImageData;
@@ -212,25 +213,30 @@ public:
    */
   void ShowViewsOnTileDisplay();
 
+  //@{
   /**
    * Captures an image from the layout (including all the views in the layout.
    */
-  vtkImageData* CaptureWindow(int magnification);
+  vtkImageData* CaptureWindow(int magnification)
+  {
+    return this->CaptureWindow(magnification, magnification);
+  }
+  vtkImageData* CaptureWindow(int magnificationX, int magnificationY);
+  //@}
 
   /**
    * Overridden to save custom XML state.
    */
-  virtual vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root) VTK_OVERRIDE
+  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root) VTK_OVERRIDE
   {
     return this->Superclass::SaveXMLState(root);
   }
-  virtual vtkPVXMLElement* SaveXMLState(
-    vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
+  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
 
   /**
    * Overridden to load custom XML state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Resets the layout.
@@ -247,6 +253,12 @@ public:
    * provided for the whole layout.
    */
   void SetSize(const int size[2]);
+  vtkVector2i GetSize()
+  {
+    int extent[4];
+    this->GetLayoutExtent(extent);
+    return vtkVector2i(extent[1] - extent[0] + 1, extent[3] - extent[2] + 1);
+  }
 
   /**
    * Helper method to locate a layout, if any that contains the specified view
@@ -290,12 +302,12 @@ public:
 
 protected:
   vtkSMViewLayoutProxy();
-  ~vtkSMViewLayoutProxy();
+  ~vtkSMViewLayoutProxy() override;
 
   /**
    * Called to load state from protobuf message.
    */
-  virtual void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Although this class is a proxy, it's not really a proxy in the traditional
@@ -322,8 +334,8 @@ protected:
   int SeparatorWidth;
 
 private:
-  vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMViewLayoutProxy&) VTK_DELETE_FUNCTION;
+  vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) = delete;
+  void operator=(const vtkSMViewLayoutProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

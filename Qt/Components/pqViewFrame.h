@@ -63,7 +63,7 @@ class PQCOMPONENTS_EXPORT pqViewFrame : public QWidget
 
 public:
   pqViewFrame(QWidget* parent = 0);
-  virtual ~pqViewFrame();
+  ~pqViewFrame() override;
 
   /**
   * Get/Set the window title. If not empty, the title is shown in the
@@ -196,7 +196,7 @@ public slots:
   /**
   * event filter to handle drag/drop events.
   */
-  virtual bool eventFilter(QObject*, QEvent*);
+  bool eventFilter(QObject*, QEvent*) override;
 
 protected:
   /**

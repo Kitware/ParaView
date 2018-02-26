@@ -78,32 +78,32 @@ public:
    * Compress/Decompress data array on the objects input with results
    * in the objects output. See also Set/GetInput/Output.
    */
-  virtual int Compress() VTK_OVERRIDE;
-  virtual int Decompress() VTK_OVERRIDE;
+  int Compress() VTK_OVERRIDE;
+  int Decompress() VTK_OVERRIDE;
   //@}
 
   //@{
   /**
    * Serialize/Restore compressor configuration (but not the data) into the stream.
    */
-  virtual void SaveConfiguration(vtkMultiProcessStream* stream) VTK_OVERRIDE;
-  virtual bool RestoreConfiguration(vtkMultiProcessStream* stream) VTK_OVERRIDE;
+  void SaveConfiguration(vtkMultiProcessStream* stream) VTK_OVERRIDE;
+  bool RestoreConfiguration(vtkMultiProcessStream* stream) VTK_OVERRIDE;
   //@}
 
-  virtual const char* SaveConfiguration() VTK_OVERRIDE;
-  virtual const char* RestoreConfiguration(const char* stream) VTK_OVERRIDE;
+  const char* SaveConfiguration() VTK_OVERRIDE;
+  const char* RestoreConfiguration(const char* stream) VTK_OVERRIDE;
 
 protected:
   vtkSquirtCompressor();
-  virtual ~vtkSquirtCompressor();
+  ~vtkSquirtCompressor() override;
   int DecompressRGB();
   int DecompressRGBA();
 
   int SquirtLevel;
 
 private:
-  vtkSquirtCompressor(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSquirtCompressor&) VTK_DELETE_FUNCTION;
+  vtkSquirtCompressor(const vtkSquirtCompressor&) = delete;
+  void operator=(const vtkSquirtCompressor&) = delete;
 };
 
 #endif

@@ -79,7 +79,9 @@ void pqToggleInteractionViewMode::onTriggered()
   // Update the interaction
   vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Set(interactionMode);
   view->getProxy()->UpdateProperty("InteractionMode", 1);
+  view->render();
 }
+
 //-----------------------------------------------------------------------------
 void pqToggleInteractionViewMode::updateInteractionLabel(int mode)
 {

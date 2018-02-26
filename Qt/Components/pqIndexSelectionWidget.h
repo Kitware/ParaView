@@ -54,7 +54,7 @@ class PQCOMPONENTS_EXPORT pqIndexSelectionWidget : public pqPropertyWidget
 
 public:
   pqIndexSelectionWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  virtual ~pqIndexSelectionWidget();
+  ~pqIndexSelectionWidget() override;
 
 public slots:
   void setHeaderLabel(const QString& str);
@@ -79,7 +79,7 @@ protected slots:
   void updatePropertyImpl();
 
 protected:
-  bool eventFilter(QObject* obj, QEvent* e);
+  bool eventFilter(QObject* obj, QEvent* e) override;
   /**
   * Update the widget state from the PropertyLink Qt property.
   */

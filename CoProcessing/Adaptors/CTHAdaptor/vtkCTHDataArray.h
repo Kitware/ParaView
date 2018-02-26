@@ -267,12 +267,12 @@ protected:
   int TupleSize;
 
   void BuildFallback();
-  // A writeable version of this array, delegated.
+  // A writable version of this array, delegated.
   vtkDoubleArray* Fallback;
 
 private:
-  vtkCTHDataArray(const vtkCTHDataArray&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCTHDataArray&) VTK_DELETE_FUNCTION;
+  vtkCTHDataArray(const vtkCTHDataArray&) = delete;
+  void operator=(const vtkCTHDataArray&) = delete;
 };
 
 #endif /* vtkCTHDataArray_h */

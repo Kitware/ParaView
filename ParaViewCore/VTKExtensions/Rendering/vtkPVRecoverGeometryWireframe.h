@@ -21,7 +21,7 @@
 
 /**
  * @class   vtkPVRecoverGeometryWireframe
- * @brief   Get corrected wireframe from tesselated facets
+ * @brief   Get corrected wireframe from tessellated facets
  *
  *
  *
@@ -50,27 +50,27 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVRecoverGeometryWireframe : public 
 public:
   vtkTypeMacro(vtkPVRecoverGeometryWireframe, vtkPolyDataAlgorithm);
   static vtkPVRecoverGeometryWireframe* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * In order to determine which edges existed in the original data, we need an
    * identifier on each cell determining which face (not cell) it originally
    * came from.  The ids should be put in a cell data array with this name.  The
-   * existance of this field is also a signal that this wireframe extraction is
+   * existence of this field is also a signal that this wireframe extraction is
    * necessary.
    */
   static const char* ORIGINAL_FACE_IDS() { return "vtkPVRecoverWireframeOriginalFaceIds"; }
 
 protected:
   vtkPVRecoverGeometryWireframe();
-  ~vtkPVRecoverGeometryWireframe();
+  ~vtkPVRecoverGeometryWireframe() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkPVRecoverGeometryWireframe(const vtkPVRecoverGeometryWireframe&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRecoverGeometryWireframe&) VTK_DELETE_FUNCTION;
+  vtkPVRecoverGeometryWireframe(const vtkPVRecoverGeometryWireframe&) = delete;
+  void operator=(const vtkPVRecoverGeometryWireframe&) = delete;
 };
 
 #endif // vtkPVRecoverGeometryWireframe_h

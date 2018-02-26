@@ -18,11 +18,53 @@
  *
  * vtkSMEnumerationDomain represents an enumeration of integer values
  * with associated descriptive strings.
- * Valid XML elements are:
- * @verbatim
- * * <Entry text="" value=""/> where text is the descriptive
- * string and value is the integer value.
- * @endverbatim
+ *
+ * A typical enumeration domain is described as follows in the servermanager
+ * configuration xmls.
+ *
+ * @code{xml}
+ *
+ *  <IntVectorProperty ...>
+ *    <EnumerationDomain name="enum">
+ *      <Entry text="PNG" value="0"/>
+ *      <Entry text="JPEG" value="1"/>
+ *      ...
+ *    </EnumerationDomain>
+ *  </IntVectorProperty>
+ *
+ * @endcode
+ *
+ * Where, `value` is the integral value to use to set the element on the
+ * property and `text` is the descriptive text used in UI and Python script.
+ *
+ * Starting with ParaView 5.5, the `info` attribute is supported on an `Entry`
+ * The value is an additional qualifier for the entry that used in UI to explain
+ * the item e.g.
+ *
+ * @code{xml}
+ *
+ *  <IntVectorProperty name="Quality">
+ *    <EnumerationDomain name="enum">
+ *      <Entry text="one" value="0" info="no compression" />
+ *      ...
+ *      <Entry text="ten" value="10" info="max compression" />
+ *      ...
+ *    </EnumerationDomain>
+ *  </IntVectorProperty>*
+ * @endcode
+ *
+ * If `info` is specified and non-empty, then the UI will show that text in the
+ * combo-box rendered in addition to the `text`. `info` has no effect on  the
+ * Python API i.e.
+ *
+ * @code{python}
+ *
+ *  # either of the following is acceptable, note how `info` has no effect.
+ *  writer.Quality = "ten"
+ *  # or
+ *  writer.Quality = 10
+ *
+ * @endcode
 */
 
 #ifndef vtkSMEnumerationDomain_h
@@ -31,7 +73,8 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
-struct vtkSMEnumerationDomainInternals;
+#include <utility> // for std::pair
+#include <vector>  //  for std::vector
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
 {
@@ -41,12 +84,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Returns true if the value of the propery is in the domain.
-   * The propery has to be a vtkSMIntVectorProperty. If all
+   * Returns true if the value of the property is in the domain.
+   * The property has to be a vtkSMIntVectorProperty. If all
    * vector values are in the domain, it returns 1. It returns
    * 0 otherwise.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Returns true if the int is in the domain. If value is
@@ -93,9 +136,17 @@ public:
   int GetEntryValue(const char* text, int& valid);
 
   /**
+   * Returns the `info` text for an enumeration entry.
+   *
+   * @param[in] idx - index for the entry (not to confused with `value`).
+   * @returns info-text, if non-empty else `nullptr`.
+   */
+  const char* GetInfoText(unsigned int idx);
+
+  /**
    * Add a new enumeration entry. text cannot be null.
    */
-  void AddEntry(const char* text, int value);
+  void AddEntry(const char* text, int value, const char* info = nullptr);
 
   /**
    * Clear all entries.
@@ -106,33 +157,34 @@ public:
    * Update self based on the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  virtual void Update(vtkSMProperty* property) VTK_OVERRIDE;
+  void Update(vtkSMProperty* property) VTK_OVERRIDE;
 
   //@{
   /**
    * Overridden to ensure that the property's default value is valid for the
    * enumeration, if not it will be set to the first enumeration value.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMEnumerationDomain();
-  ~vtkSMEnumerationDomain();
+  ~vtkSMEnumerationDomain() override;
   //@}
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
-  virtual void ChildSaveState(vtkPVXMLElement* domainElement) VTK_OVERRIDE;
-
-  vtkSMEnumerationDomainInternals* EInternals;
+  void ChildSaveState(vtkPVXMLElement* domainElement) VTK_OVERRIDE;
 
 private:
-  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMEnumerationDomain&) VTK_DELETE_FUNCTION;
+  vtkSMEnumerationDomain(const vtkSMEnumerationDomain&) = delete;
+  void operator=(const vtkSMEnumerationDomain&) = delete;
+
+  struct vtkEDInternals;
+  vtkEDInternals* EInternals;
 };
 
 #endif

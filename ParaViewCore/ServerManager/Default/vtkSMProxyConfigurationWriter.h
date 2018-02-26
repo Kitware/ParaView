@@ -50,7 +50,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMProxyConfigurationWriter : public vt
 public:
   static vtkSMProxyConfigurationWriter* New();
   vtkTypeMacro(vtkSMProxyConfigurationWriter, vtkSMObject);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -110,11 +110,11 @@ public:
 
 protected:
   vtkSMProxyConfigurationWriter();
-  virtual ~vtkSMProxyConfigurationWriter();
+  ~vtkSMProxyConfigurationWriter() override;
 
 private:
-  vtkSMProxyConfigurationWriter(const vtkSMProxyConfigurationWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxyConfigurationWriter&) VTK_DELETE_FUNCTION;
+  vtkSMProxyConfigurationWriter(const vtkSMProxyConfigurationWriter&) = delete;
+  void operator=(const vtkSMProxyConfigurationWriter&) = delete;
 
 private:
   char* FileName;

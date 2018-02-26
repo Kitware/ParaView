@@ -34,8 +34,8 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVGridAxes3DRepresentation
 {
 public:
   static vtkPVGridAxes3DRepresentation* New();
-  vtkTypeMacro(vtkPVGridAxes3DRepresentation, vtkPVDataRepresentation) void PrintSelf(
-    ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  vtkTypeMacro(vtkPVGridAxes3DRepresentation, vtkPVDataRepresentation);
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   void SetGridAxes(vtkPVGridAxes3DActor* gridAxes);
   vtkGetObjectMacro(GridAxes, vtkPVGridAxes3DActor)
@@ -53,7 +53,7 @@ public:
 
 protected:
   vtkPVGridAxes3DRepresentation();
-  ~vtkPVGridAxes3DRepresentation();
+  ~vtkPVGridAxes3DRepresentation() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int RequestData(vtkInformation* req, vtkInformationVector** inInfoVec,
@@ -74,8 +74,8 @@ protected:
   vtkPVGridAxes3DActor* GridAxes;
 
 private:
-  vtkPVGridAxes3DRepresentation(const vtkPVGridAxes3DRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVGridAxes3DRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVGridAxes3DRepresentation(const vtkPVGridAxes3DRepresentation&) = delete;
+  void operator=(const vtkPVGridAxes3DRepresentation&) = delete;
 };
 
 #endif // vtkPVGridAxes3DRepresentation_h

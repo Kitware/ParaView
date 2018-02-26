@@ -18,6 +18,7 @@
 #include "vtkCleanArrays.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTreeIterator.h"
+#include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkUnstructuredGrid.h"
@@ -102,6 +103,10 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(vtkInformation* vtkNot
   {
     appender->Update();
     output->ShallowCopy(appender->GetOutput());
+    // this will override field data the vtkAppendFilter passed from the first
+    // block. It seems like a reasonable approach, if global field data is
+    // present.
+    output->GetFieldData()->PassData(cd->GetFieldData());
   }
 
   appender->Delete();

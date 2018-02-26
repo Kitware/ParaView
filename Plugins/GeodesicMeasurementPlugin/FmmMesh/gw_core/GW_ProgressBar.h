@@ -2,7 +2,7 @@
 /**
  *  \file   GW_ProgressBar.h
  *  \brief  Definition of class \c GW_ProgressBar
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-9-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -21,7 +21,7 @@ class GW_VoronoiVertex;
 /**
  *  \class  GW_ProgressBar
  *  \brief  An ASCII progress bar
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   1-02-2004
  */
 /*------------------------------------------------------------------------------*/
@@ -95,7 +95,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

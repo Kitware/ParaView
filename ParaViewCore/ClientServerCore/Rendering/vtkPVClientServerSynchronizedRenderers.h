@@ -4,6 +4,7 @@
   Module:    vtkPVClientServerSynchronizedRenderers.h
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -37,12 +38,19 @@ public:
   vtkTypeMacro(vtkPVClientServerSynchronizedRenderers, vtkSynchronizedRenderers);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  // Descritpion:
+  // Description:
   // This flag is set by the renderer during still renderers. When set
   // compressor must use loss-less compression. When unset compressor
   // can (if it's enabled) use lossy compression.
   vtkSetMacro(LossLessCompression, bool);
   vtkGetMacro(LossLessCompression, bool);
+
+  // Description:
+  // This flag is set when NVPipe is supported.  NVPipe may not be available
+  // even when compiled in, if the system is not using an NVIDIA GPU, for
+  // example.
+  vtkSetMacro(NVPipeSupport, bool);
+  vtkGetMacro(NVPipeSupport, bool);
 
   /**
    * Set and configure a compressor from it's own configuration stream. This
@@ -53,14 +61,14 @@ public:
 
 protected:
   vtkPVClientServerSynchronizedRenderers();
-  ~vtkPVClientServerSynchronizedRenderers();
+  ~vtkPVClientServerSynchronizedRenderers() override;
 
   /**
    * Overridden to not clear the color buffer before pasting back image from
    * the server. This ensures that any annotations rendered on the back of any
    * 3D geometry will be preserved.
    */
-  virtual void PushImageToScreen() VTK_OVERRIDE;
+  void PushImageToScreen() VTK_OVERRIDE;
 
   //@{
   /**
@@ -73,17 +81,17 @@ protected:
   vtkUnsignedCharArray* Compress(vtkUnsignedCharArray*);
   void Decompress(vtkUnsignedCharArray* input, vtkUnsignedCharArray* outputBuffer);
 
-  virtual void MasterEndRender() VTK_OVERRIDE;
-  virtual void SlaveStartRender() VTK_OVERRIDE;
-  virtual void SlaveEndRender() VTK_OVERRIDE;
+  void MasterEndRender() VTK_OVERRIDE;
+  void SlaveStartRender() VTK_OVERRIDE;
+  void SlaveEndRender() VTK_OVERRIDE;
 
   vtkImageCompressor* Compressor;
   bool LossLessCompression;
+  bool NVPipeSupport;
 
 private:
-  vtkPVClientServerSynchronizedRenderers(
-    const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClientServerSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  vtkPVClientServerSynchronizedRenderers(const vtkPVClientServerSynchronizedRenderers&) = delete;
+  void operator=(const vtkPVClientServerSynchronizedRenderers&) = delete;
 };
 
 #endif

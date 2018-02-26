@@ -45,13 +45,13 @@ public:
 
 protected:
   vtkPVKeyFrameAnimationCue();
-  ~vtkPVKeyFrameAnimationCue();
+  ~vtkPVKeyFrameAnimationCue() override;
 
   vtkPVKeyFrameCueManipulator* GetKeyFrameManipulator();
 
 private:
-  vtkPVKeyFrameAnimationCue(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVKeyFrameAnimationCue&) VTK_DELETE_FUNCTION;
+  vtkPVKeyFrameAnimationCue(const vtkPVKeyFrameAnimationCue&) = delete;
+  void operator=(const vtkPVKeyFrameAnimationCue&) = delete;
 };
 
 #endif

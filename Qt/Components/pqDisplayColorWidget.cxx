@@ -98,7 +98,7 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~PropertyLinksConnection() {}
+  ~PropertyLinksConnection() override {}
 
   // Methods to convert between ValueType and QVariant. Since QVariant doesn't
   // support == operations of non-default Qt types, we are forced to convert the
@@ -128,7 +128,7 @@ public:
 
 protected:
   /// Called to update the ServerManager Property due to UI change.
-  virtual void setServerManagerValue(bool use_unchecked, const QVariant& value)
+  void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
     Q_ASSERT(use_unchecked == false);
     Q_UNUSED(use_unchecked);
@@ -184,7 +184,7 @@ protected:
   }
 
   /// called to get the current value for the ServerManager Property.
-  virtual QVariant currentServerManagerValue(bool use_unchecked) const
+  QVariant currentServerManagerValue(bool use_unchecked) const override
   {
     Q_ASSERT(use_unchecked == false);
     Q_UNUSED(use_unchecked);
@@ -200,14 +200,14 @@ protected:
   }
 
   /// called to set the UI due to a ServerManager Property change.
-  virtual void setQtValue(const QVariant& value)
+  void setQtValue(const QVariant& value) override
   {
     ValueType val = this->convert(value);
     qobject_cast<pqDisplayColorWidget*>(this->objectQt())->setArraySelection(val);
   }
 
   /// called to get the UI value.
-  virtual QVariant currentQtValue() const
+  QVariant currentQtValue() const override
   {
     ValueType curVal = qobject_cast<pqDisplayColorWidget*>(this->objectQt())->arraySelection();
     return this->convert(curVal);

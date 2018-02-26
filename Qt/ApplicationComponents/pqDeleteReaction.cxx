@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"
 #include "pqAnimationScene.h"
+#include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPVApplicationCore.h"
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 
 #include <QDebug>
+#include <QMessageBox>
 #include <QSet>
 
 //-----------------------------------------------------------------------------
@@ -314,4 +316,24 @@ void pqDeleteReaction::aboutToDelete(pqPipelineSource* source)
     }
   }
   //---------------------------------------------------------------------------
+}
+
+//-----------------------------------------------------------------------------
+void pqDeleteReaction::onTriggered()
+{
+  if (this->DeleteAll)
+  {
+    if (pqCoreUtilities::promptUser("pqDeleteReaction::onTriggered", QMessageBox::Question,
+          "Delete All?", tr("The current visualization will be reset \n"
+                            "and the state will be discarded.\n\n"
+                            "Are you sure you want to continue?"),
+          QMessageBox::Yes | QMessageBox::No | QMessageBox::Save))
+    {
+      pqDeleteReaction::deleteAll();
+    }
+  }
+  else
+  {
+    pqDeleteReaction::deleteSelected();
+  }
 }

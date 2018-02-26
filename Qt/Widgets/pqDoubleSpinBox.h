@@ -51,7 +51,7 @@ public:
   * Virtual function that is called whenever the user triggers a step.  We are
   * overridding this so that we can emit editingFinished() signal
   */
-  virtual void stepBy(int steps);
+  void stepBy(int steps) override;
 
 private:
   Q_DISABLE_COPY(pqDoubleSpinBox)

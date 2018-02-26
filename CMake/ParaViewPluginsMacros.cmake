@@ -42,7 +42,7 @@
 # based on certain cmake variables). This call provides information about the
 # plugin to paraview even before trying to process it.
 # Then the CMakeLists.txt file has the pertinant code to build the plugin. The
-# CMakeLists.txt file will be processed automaticall if the plugin is enabled.
+# CMakeLists.txt file will be processed automatically if the plugin is enabled.
 # pv_plugin() macro provides options that can be used to control if the plugin
 # is enabled by default, or autoloaded or is named differently (or comprises of multiple
 # plugins -- which is rare).
@@ -157,7 +157,7 @@ mark_as_advanced(PARAVIEW_EXTRA_EXTERNAL_PLUGINS)
 # then processing the cmake files for enabled plugins.
 macro(pv_process_plugins root_src root_build)
   set(PARAVIEW_EXTERNAL_PLUGIN_DIRS "" CACHE STRING
-      "Semi-colon seperated paths to extrenal plugin directories.")
+      "Semi-colon separated paths to external plugin directories.")
   mark_as_advanced(PARAVIEW_EXTERNAL_PLUGIN_DIRS)
 
   set (PARAVIEW_PLUGINS_ALL)
@@ -242,12 +242,12 @@ macro(pv_process_plugins root_src root_build)
     endif()
   endforeach()
   set (plugin_ini "${plugin_ini}</Plugins>\n")
-  file(WRITE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/.plugins" "${plugin_ini}")
+  file(WRITE "${PARAVIEW_BUILD_PLUGINS_DIR}/.plugins" "${plugin_ini}")
 
   # Install the .plugins configuration file.
-  install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/.plugins"
-          DESTINATION "${PV_INSTALL_PLUGIN_DIR}"
-          COMPONENT Runtime)
+  install(FILES "${PARAVIEW_BUILD_PLUGINS_DIR}/.plugins"
+    DESTINATION "${PARAVIEW_INSTALL_PLUGINS_DIR}"
+    COMPONENT Runtime)
 
   if (NOT BUILD_SHARED_LIBS)
     # write the static plugins init file.

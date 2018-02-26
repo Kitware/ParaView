@@ -52,12 +52,12 @@ public:
    * won't need this if vtkPVDataRepresentation correctly respected in the
    * arguments passed to it during ProcessRequest() etc.
    */
-  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  virtual void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
+  void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
   //@}
 
   /**
@@ -66,15 +66,15 @@ public:
    * have any real-input on the client side which messes with the Update
    * requests.
    */
-  virtual void MarkModified() VTK_OVERRIDE;
+  void MarkModified() VTK_OVERRIDE;
 
   //@{
   /**
    * Passed on to internal representations as well.
    */
-  virtual void SetUpdateTime(double time) VTK_OVERRIDE;
-  virtual void SetForceUseCache(bool val) VTK_OVERRIDE;
-  virtual void SetForcedCacheKey(double val) VTK_OVERRIDE;
+  void SetUpdateTime(double time) VTK_OVERRIDE;
+  void SetForceUseCache(bool val) VTK_OVERRIDE;
+  void SetForcedCacheKey(double val) VTK_OVERRIDE;
   //@}
 
   /**
@@ -82,7 +82,7 @@ public:
    * representation of false, all view passes are ignored.
    * Overridden to propagate to the active representation.
    */
-  virtual void SetVisibility(bool val) VTK_OVERRIDE;
+  void SetVisibility(bool val) VTK_OVERRIDE;
 
   //@{
   /**
@@ -94,6 +94,8 @@ public:
   void SetPointSize(double val);
   void SetRepresentation(int val);
   void SetUseOutline(int);
+  void SetRenderPointsAsSpheres(bool);
+  void SetRenderLinesAsTubes(bool);
   //@}
 
   //@{
@@ -117,30 +119,29 @@ public:
 
   /**
    * Override because of internal composite representations that need to be
-   * initilized as well.
+   * initialized as well.
    */
-  virtual unsigned int Initialize(
-    unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
+  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
 
 protected:
   vtkSelectionRepresentation();
-  ~vtkSelectionRepresentation();
+  ~vtkSelectionRepresentation() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Fires UpdateDataEvent
@@ -151,8 +152,8 @@ protected:
   vtkDataLabelRepresentation* LabelRepresentation;
 
 private:
-  vtkSelectionRepresentation(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSelectionRepresentation&) VTK_DELETE_FUNCTION;
+  vtkSelectionRepresentation(const vtkSelectionRepresentation&) = delete;
+  void operator=(const vtkSelectionRepresentation&) = delete;
 };
 
 #endif

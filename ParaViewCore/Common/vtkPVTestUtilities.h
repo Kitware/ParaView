@@ -44,7 +44,7 @@ public:
    * Given a path relative to the Data root (provided
    * in argv by -D option), construct a OS independent path
    * to the file specified by "name". "name" should not start
-   * with a path seperator and if path seperators are needed
+   * with a path separator and if path separators are needed
    * use '/'. Be sure to delete [] the return when you are
    * finished.
    */
@@ -53,7 +53,7 @@ public:
    * Given a path relative to the working directory (provided
    * in argv by -T option), construct a OS independent path
    * to the file specified by "name". "name" should not start
-   * with a path seperator and if path seperators are needed
+   * with a path separator and if path separators are needed
    * use '/'. Be sure to delete [] the return when you are
    * finished.
    */
@@ -61,11 +61,11 @@ public:
 
 protected:
   vtkPVTestUtilities() { this->Initialize(0, 0); }
-  ~vtkPVTestUtilities() { this->Initialize(0, 0); }
+  ~vtkPVTestUtilities() override { this->Initialize(0, 0); }
 
 private:
-  vtkPVTestUtilities(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTestUtilities&) VTK_DELETE_FUNCTION;
+  vtkPVTestUtilities(const vtkPVTestUtilities&) = delete;
+  void operator=(const vtkPVTestUtilities&) = delete;
   ///
   char GetPathSep();
   char* GetDataRoot();

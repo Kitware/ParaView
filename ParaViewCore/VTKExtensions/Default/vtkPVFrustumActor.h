@@ -50,14 +50,14 @@ public:
 
 protected:
   vtkPVFrustumActor();
-  ~vtkPVFrustumActor();
+  ~vtkPVFrustumActor() override;
 
   vtkOutlineSource* Outline;
   vtkPolyDataMapper* Mapper;
 
 private:
-  vtkPVFrustumActor(const vtkPVFrustumActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVFrustumActor&) VTK_DELETE_FUNCTION;
+  vtkPVFrustumActor(const vtkPVFrustumActor&) = delete;
+  void operator=(const vtkPVFrustumActor&) = delete;
 };
 
 #endif

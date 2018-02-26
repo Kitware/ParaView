@@ -41,6 +41,7 @@ class pqProxy;
 class pqView;
 class pqViewFrame;
 class vtkImageData;
+class vtkObject;
 class vtkSMProxy;
 class vtkSMViewLayoutProxy;
 class vtkSMViewProxy;
@@ -59,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
       decorationsVisibilityChanged)
 public:
   pqMultiViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqMultiViewWidget();
+  ~pqMultiViewWidget() override;
 
   /**
   * Get/Set the vtkSMViewLayoutProxy instance this widget is using as the layout
@@ -91,17 +92,25 @@ public:
   */
   bool togglePopout();
 
-  //@{
   /**
-   * @deprecated in ParaView 5.4. `vtkSMSaveScreenshotProxy` now encapsulates
-   * all logic to capture images. See `pqSaveScreenshotReaction` for details on
-   * using it.
+   * Enter (or exit) preview mode.
+   *
+   * Preview mode is a mode were various widget's decorations
+   * are hidden and the widget is locked to the specified size. If the widget's
+   * current size is less than the size specified, then the widget is locked to
+   * a size with similar aspect ratio as requested. Pass in invalid (or empty)
+   * size to exit preview mode.
+   *
+   * Preview mode is preferred over `toggleWidgetDecoration` and `lockViewSize`
+   * and is mutually exclusive with either. Mixing them can have unintended
+   * consequences.
+   *
+   * @returns the size to which the widget was locked. When unlocked, this will
+   * be QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX). When entering preview mode this
+   * will same as requested `previewSize` or a smaller size preserving aspect
+   * ratio as much as possible.
    */
-  VTK_LEGACY(vtkImageData* captureImage(int width, int height));
-  VTK_LEGACY(int prepareForCapture(int width, int height));
-  VTK_LEGACY(void cleanupAfterCapture());
-  VTK_LEGACY(bool writeImage(const QString& filename, int width, int height, int quality = -1));
-  //@}
+  QSize preview(const QSize& previewSize = QSize());
 
 signals:
   /**
@@ -215,10 +224,22 @@ protected:
   * Event filter callback to detect when a sub-frame becomes active, so that
   * we can mark it as such.
   */
-  virtual bool eventFilter(QObject* caller, QEvent* evt);
+  bool eventFilter(QObject* caller, QEvent* evt) override;
 
 private:
   QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg, int& maxIndex);
+  void layoutPropertyModified(vtkObject*, unsigned long, void*);
+
+  /**
+  * called when the vtkSMViewLayoutProxy is changed in order to synchronize
+  * the separator width and color with the user inputs.
+  */
+  void updateSplitter();
+
+  /**
+   * called when the vtkSMViewLayoutProxy's "PreviewMode" property is changed.
+   */
+  void updatePreviewMode();
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget)
@@ -227,7 +248,6 @@ private:
   pqInternals* Internals;
 
   bool DecorationsVisible;
-
   QSize LockViewSize;
 };
 

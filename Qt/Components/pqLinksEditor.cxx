@@ -104,7 +104,7 @@ public:
   {
     Q_ASSERT(sizeof(RowIndex) == sizeof(void*));
   }
-  ~pqLinksEditorProxyModel() {}
+  ~pqLinksEditorProxyModel() override {}
 
   struct RowIndex
   {
@@ -141,7 +141,7 @@ public:
     return ri;
   }
 
-  QModelIndex index(int row, int column, const QModelIndex& pidx) const
+  QModelIndex index(int row, int column, const QModelIndex& pidx) const override
   {
     if (this->rowCount(pidx) <= row)
     {
@@ -163,7 +163,7 @@ public:
     return this->createIndex(row, column, this->encodeIndex(ri));
   }
 
-  QModelIndex parent(const QModelIndex& idx) const
+  QModelIndex parent(const QModelIndex& idx) const override
   {
     if (!idx.isValid() || idx.internalPointer() == NULL)
     {
@@ -188,7 +188,7 @@ public:
     return pqLinksModel::proxyListDomain(pxy);
   }
 
-  int rowCount(const QModelIndex& idx) const
+  int rowCount(const QModelIndex& idx) const override
   {
     if (!idx.isValid())
     {
@@ -220,11 +220,11 @@ public:
     return 0;
   }
 
-  int columnCount(const QModelIndex& /*idx*/) const { return 1; }
+  int columnCount(const QModelIndex& /*idx*/) const override { return 1; }
 
-  QVariant headerData(int, Qt::Orientation, int) const { return QVariant(); }
+  QVariant headerData(int, Qt::Orientation, int) const override { return QVariant(); }
 
-  QVariant data(const QModelIndex& idx, int role) const
+  QVariant data(const QModelIndex& idx, int role) const override
   {
     if (!idx.isValid())
     {

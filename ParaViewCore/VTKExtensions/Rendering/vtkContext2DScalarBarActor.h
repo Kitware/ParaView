@@ -52,7 +52,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkContext2DScalarBarActor : public vtk
 {
 public:
   vtkTypeMacro(vtkContext2DScalarBarActor, vtkScalarBarActor);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkContext2DScalarBarActor* New();
 
   //@{
@@ -62,6 +62,16 @@ public:
    */
   vtkGetMacro(TitleJustification, int);
   vtkSetClampMacro(TitleJustification, int, VTK_TEXT_LEFT, VTK_TEXT_RIGHT);
+  //@}
+
+  //@{
+  /**
+   * If this flag is on, the title will be drawn horizontally above the
+   * scalar bar. Off by default.
+   */
+  vtkSetMacro(ForceHorizontalTitle, bool);
+  vtkGetMacro(ForceHorizontalTitle, bool);
+  vtkBooleanMacro(ForceHorizontalTitle, bool);
   //@}
 
   enum
@@ -174,7 +184,7 @@ public:
   /**
    * We only render in the overlay for the context scene.
    */
-  virtual int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
 
   /**
    * Draw the scalar bar and annotation text to the screen.
@@ -186,7 +196,7 @@ public:
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  virtual void ReleaseGraphicsResources(vtkWindow* window) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow* window) VTK_OVERRIDE;
 
   /**
    * Responsible for actually drawing the scalar bar.
@@ -199,17 +209,31 @@ public:
    */
   vtkRectf GetBoundingRect();
 
+  /**
+   * Get an estimated number of annotations emulating loosely the
+   * algorithm generating the annotations. The actual number of annotations
+   * can be slightly lower than the return of this method when using
+   * automatic annotations.
+   */
+  int GetEstimatedNumberOfAnnotations();
+
 protected:
   vtkContext2DScalarBarActor();
-  virtual ~vtkContext2DScalarBarActor();
+  ~vtkContext2DScalarBarActor() override;
 
 private:
-  vtkContext2DScalarBarActor(const vtkContext2DScalarBarActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkContext2DScalarBarActor&) VTK_DELETE_FUNCTION;
+  vtkContext2DScalarBarActor(const vtkContext2DScalarBarActor&) = delete;
+  void operator=(const vtkContext2DScalarBarActor&) = delete;
 
   vtkContextActor* ActorDelegate;
 
   int TitleJustification;
+
+  /**
+   * Force the title orientation to horizontal when the scalar bar is in
+   * vertical orientation.
+   */
+  bool ForceHorizontalTitle;
 
   /**
    * Thickness of the color bar.

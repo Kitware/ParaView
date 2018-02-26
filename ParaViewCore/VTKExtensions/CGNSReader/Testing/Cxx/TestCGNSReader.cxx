@@ -59,10 +59,7 @@ int TestCGNSReader(int argc, char* argv[])
   delete[] fname;
 
   cout << "Opening " << mixed.c_str() << endl;
-  cout << "Opening " << nfacen.c_str() << endl;
-
   vtkNew<vtkCGNSReader> mixedReader;
-
   mixedReader->SetFileName(mixed.c_str());
   mixedReader->Update();
 
@@ -73,6 +70,7 @@ int TestCGNSReader(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  cout << "Opening " << nfacen.c_str() << endl;
   vtkNew<vtkCGNSReader> nfacenReader;
   nfacenReader->SetFileName(nfacen.c_str());
   nfacenReader->Update();

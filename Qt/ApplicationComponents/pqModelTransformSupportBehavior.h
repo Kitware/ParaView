@@ -52,7 +52,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqModelTransformSupportBehavior : public QO
 
 public:
   pqModelTransformSupportBehavior(QObject* parent = 0);
-  virtual ~pqModelTransformSupportBehavior();
+  ~pqModelTransformSupportBehavior() override;
 
   static vtkTuple<double, 16> getChangeOfBasisMatrix(
     vtkSMSourceProxy*, int outputPort = 0, bool* isvalid = NULL);

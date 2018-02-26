@@ -34,13 +34,13 @@ public:
 
 protected:
   vtkSMNullProxy();
-  ~vtkSMNullProxy();
+  ~vtkSMNullProxy() override;
 
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
 private:
-  vtkSMNullProxy(const vtkSMNullProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMNullProxy&) VTK_DELETE_FUNCTION;
+  vtkSMNullProxy(const vtkSMNullProxy&) = delete;
+  void operator=(const vtkSMNullProxy&) = delete;
 };
 
 #endif

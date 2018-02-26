@@ -35,9 +35,4 @@ list(APPEND Module_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx
   )
 
-set_source_files_properties(
-  vtkFreeTypeTools.cxx
-  WRAP_EXCLUDE
-  )
-
 vtk_module_library(vtkRenderingFreeType ${Module_SRCS})

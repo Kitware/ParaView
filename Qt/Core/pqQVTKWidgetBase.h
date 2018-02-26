@@ -32,17 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqQVTKWidgetBase_h
 #define pqQVTKWidgetBase_h
 
-#include "vtkPVConfig.h" // needed for PARAVIEW_QT_VERSION
-#if PARAVIEW_QT_VERSION == 4
-#include "QVTKWidget.h"
-class vtkRenderWindow;
-typedef QVTKWidget pqQVTKWidgetBase;
-typedef vtkRenderWindow pqQVTKWidgetBaseRenderWindowType;
-#else
 #include "QVTKOpenGLWidget.h"
 class vtkGenericOpenGLRenderWindow;
 typedef QVTKOpenGLWidget pqQVTKWidgetBase;
 typedef vtkGenericOpenGLRenderWindow pqQVTKWidgetBaseRenderWindowType;
-#endif
 
 #endif

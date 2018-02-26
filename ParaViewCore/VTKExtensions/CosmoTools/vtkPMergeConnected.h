@@ -16,7 +16,7 @@
  * @class   vtkPMergeConnected
  *
  *
- *  This filter merges connected voroni tesselation regions based on the
+ *  This filter merges connected voroni tessellation regions based on the
  *  global region ID.
 */
 
@@ -54,8 +54,8 @@ protected:
   int FillOutputPortInformation(int port, vtkInformation* info);
 
 private:
-  vtkPMergeConnected(const vtkPMergeConnected&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPMergeConnected&) VTK_DELETE_FUNCTION;
+  vtkPMergeConnected(const vtkPMergeConnected&) = delete;
+  void operator=(const vtkPMergeConnected&) = delete;
 
   // parallelism
   int NumProcesses;

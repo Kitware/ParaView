@@ -46,22 +46,22 @@ public:
 
 protected:
   vtkPExtractHistogram();
-  ~vtkPExtractHistogram();
+  ~vtkPExtractHistogram() override;
 
   /**
    * Returns the data range for the input array to process.
    * Overridden to reduce the range in parallel.
    */
-  virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]) VTK_OVERRIDE;
+  bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;
 
 private:
-  vtkPExtractHistogram(const vtkPExtractHistogram&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPExtractHistogram&) VTK_DELETE_FUNCTION;
+  vtkPExtractHistogram(const vtkPExtractHistogram&) = delete;
+  void operator=(const vtkPExtractHistogram&) = delete;
 };
 
 #endif

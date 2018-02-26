@@ -18,7 +18,9 @@
 #include "vtkByteSwap.h"
 #include "vtkCommand.h"
 #include "vtkCommunicator.h"
+#include "vtkCompositeMultiProcessController.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
@@ -51,6 +53,39 @@ inline const char* vtkGetProgressText(vtkObjectBase* o)
   return o->GetClassName();
 }
 
+class vtkPVProgressHandler::RMICallback
+{
+public:
+  // Collaboration needs rmi callback to cleanup the progress on secondary clients
+  static void LocalCleanupPendingProgress(void* localArg, void* vtkNotUsed(remoteArg),
+    int vtkNotUsed(remoteArgLength), int vtkNotUsed(remoteProcessId))
+  {
+    vtkPVProgressHandler* self = reinterpret_cast<vtkPVProgressHandler*>(localArg);
+    if (self->GetEnableProgress())
+    {
+      self->LocalCleanupPendingProgress();
+    }
+  }
+
+  // Collaboration needs rmi callback to refresh error and warning messages on secondary clients
+  static void RefreshMessage(
+    void* localArg, void* remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
+  {
+    vtkPVProgressHandler* self = reinterpret_cast<vtkPVProgressHandler*>(localArg);
+    if (self->GetEnableProgress())
+    {
+      const unsigned char* rawdata = reinterpret_cast<unsigned char*>(remoteArg);
+      vtkMultiProcessStream stream;
+      stream.SetRawData(rawdata, remoteArgLength);
+
+      std::string message;
+      int type;
+      stream >> message >> type;
+      self->RefreshMessage(message.c_str(), type, /*is_local*/ false);
+    }
+  }
+};
+
 //----------------------------------------------------------------------------
 class vtkPVProgressHandler::vtkInternals
 {
@@ -69,18 +104,11 @@ public:
   vtkInternals()
   {
     this->EnableProgress = false;
-    this->DisableProgressHandling = false;
 
 #ifdef PV_DISABLE_PROGRESS_HANDLING
     this->DisableProgressHandling = true;
 #else
-    // In symmetric mode, we disable progress although that's not really
-    // necessary anymore. Since the progress is no longer collected from anyone
-    // but the root node, it really doesn't matter if progress is enabled.
-    if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
-    {
-      this->DisableProgressHandling = pm->GetSymmetricMPIMode();
-    }
+    this->DisableProgressHandling = false;
 #endif
   }
 
@@ -102,20 +130,24 @@ vtkPVProgressHandler::vtkPVProgressHandler()
   this->Internals = new vtkInternals();
   this->LastProgress = 0;
   this->LastProgressText = NULL;
-  this->LastMessage = NULL;
-  this->ProgressFrequency = 1.0; // seconds
+
+  // use higher frequency for client while lower for server (or batch).
+  this->ProgressInterval =
+    vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT ? 0.1 : 1.0;
   this->AddedHandlers = false;
 
-  // Add observer to MessageEvents.
-  vtkOutputWindow::GetInstance()->AddObserver(
-    vtkCommand::MessageEvent, this, &vtkPVProgressHandler::OnMessageEvent);
+  if (auto owindow = vtkOutputWindow::GetInstance())
+  {
+    owindow->AddObserver(vtkCommand::TextEvent, this, &vtkPVProgressHandler::OnMessageEvent);
+    owindow->AddObserver(vtkCommand::ErrorEvent, this, &vtkPVProgressHandler::OnMessageEvent);
+    owindow->AddObserver(vtkCommand::WarningEvent, this, &vtkPVProgressHandler::OnMessageEvent);
+  }
 }
 
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
   this->SetLastProgressText(NULL);
-  this->SetLastMessage(NULL);
   this->SetSession(0);
   delete this->Internals;
 }
@@ -142,14 +174,26 @@ void vtkPVProgressHandler::SetSession(vtkPVSession* conn)
     this->Modified();
   }
 
+#ifndef PV_DISABLE_PROGRESS_HANDLING
+  this->Internals->DisableProgressHandling = conn == nullptr;
+
+  // In symmetric mode, we disable progress as it is not supported.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!this->Internals->DisableProgressHandling && pm)
+  {
+    this->Internals->DisableProgressHandling = pm->GetSymmetricMPIMode();
+  }
+#endif
+
   // NOTE: SetSession is called in constructor of vtkPVSession and that's too
   // early to be using any virtual methods on the session. So most
-  // initialization happens in PrepareProgress().
+  // initialization happens in PrepareProgress() and AddHandlers().
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::PrepareProgress()
+void vtkPVProgressHandler::AddHandlers()
 {
+  SKIP_IF_DISABLED();
   if (this->AddedHandlers == false)
   {
     vtkMultiProcessController* ds_controller =
@@ -160,24 +204,36 @@ void vtkPVProgressHandler::PrepareProgress()
     {
       rs_controller->GetCommunicator()->AddObserver(
         vtkCommand::WrongTagEvent, this, &vtkPVProgressHandler::OnWrongTagEvent);
+      rs_controller->AddRMICallback(
+        &RMICallback::LocalCleanupPendingProgress, this, vtkPVProgressHandler::CLEANUP_TAG_RMI);
+      rs_controller->AddRMICallback(
+        &RMICallback::RefreshMessage, this, vtkPVProgressHandler::MESSAGE_EVENT_TAG_RMI);
     }
     if (ds_controller)
     {
       ds_controller->GetCommunicator()->AddObserver(
         vtkCommand::WrongTagEvent, this, &vtkPVProgressHandler::OnWrongTagEvent);
+      ds_controller->AddRMICallback(
+        &RMICallback::LocalCleanupPendingProgress, this, vtkPVProgressHandler::CLEANUP_TAG_RMI);
+      ds_controller->AddRMICallback(
+        &RMICallback::RefreshMessage, this, vtkPVProgressHandler::MESSAGE_EVENT_TAG_RMI);
     }
   }
   this->AddedHandlers = true;
+}
 
-#ifndef PV_DISABLE_PROGRESS_HANDLING
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::PrepareProgress()
+{
   SKIP_IF_DISABLED();
-  this->Internals->DisableProgressHandling = this->Session ? this->Session->IsMultiClients() : true;
-#endif
-
-  SKIP_IF_DISABLED();
-
   this->InvokeEvent(vtkCommand::StartEvent, this);
   this->Internals->EnableProgress = true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVProgressHandler::GetEnableProgress()
+{
+  return this->Internals->EnableProgress;
 }
 
 //----------------------------------------------------------------------------
@@ -208,7 +264,23 @@ void vtkPVProgressHandler::CleanupPendingProgress()
   if (client_controller != NULL)
   {
     char temp = 0;
-    client_controller->Send(&temp, 1, 1, CLEANUP_TAG);
+    vtkCompositeMultiProcessController* collabController =
+      vtkCompositeMultiProcessController::SafeDownCast(client_controller);
+    if (collabController)
+    {
+      // In collaboration, the secondary clients are cleaned up with RMI call
+      vtkMultiProcessController* secondaryClientController;
+      vtkMultiProcessController* activeClientController = collabController->GetActiveController();
+      for (int i = 0; i < collabController->GetNumberOfControllers(); i++)
+      {
+        secondaryClientController = collabController->GetController(i);
+        if (secondaryClientController != activeClientController)
+        {
+          secondaryClientController->TriggerRMI(1, vtkPVProgressHandler::CLEANUP_TAG_RMI);
+        }
+      }
+    }
+    client_controller->Send(&temp, 1, 1, vtkPVProgressHandler::CLEANUP_TAG);
   }
 
   // On client-node (or builtin client) mode, we wait till the server-root-nodes
@@ -229,6 +301,13 @@ void vtkPVProgressHandler::CleanupPendingProgress()
     rs_controller->Receive(&temp, 1, 1, CLEANUP_TAG);
   }
 
+  this->LocalCleanupPendingProgress();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::LocalCleanupPendingProgress()
+{
+  SKIP_IF_DISABLED();
   this->Internals->EnableProgress = false;
   this->InvokeEvent(vtkCommand::EndEvent, this);
 }
@@ -246,7 +325,7 @@ void vtkPVProgressHandler::OnProgressEvent(vtkObject* caller, unsigned long even
   this->Internals->ProgressTimer->StopTimer();
   // cout <<"Elapsed: " << this->Internals->ProgressTimer->GetElapsedTime() <<
   //  endl;
-  if (this->Internals->ProgressTimer->GetElapsedTime() < this->ProgressFrequency)
+  if (this->Internals->ProgressTimer->GetElapsedTime() < this->ProgressInterval)
   {
     return;
   }
@@ -279,17 +358,32 @@ void vtkPVProgressHandler::RefreshProgress(const char* progress_text, double pro
     // only true of server-nodes.
     int progress_text_len = static_cast<int>(strlen(progress_text));
     int message_size = progress_text_len + sizeof(double) + sizeof(char);
-    unsigned char* buffer = new unsigned char[message_size];
+    std::vector<unsigned char> buffer(message_size);
 
     double le_progress = progress;
     vtkByteSwap::SwapLE(&progress);
-    memcpy(buffer, &le_progress, sizeof(double));
+    memcpy(buffer.data(), &le_progress, sizeof(double));
 
-    memcpy(buffer + sizeof(double), progress_text, progress_text_len);
+    memcpy(buffer.data() + sizeof(double), progress_text, progress_text_len);
     buffer[progress_text_len + sizeof(double)] = 0;
 
-    client_controller->Send(buffer, message_size, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
-    delete[] buffer;
+    vtkCompositeMultiProcessController* collabController =
+      vtkCompositeMultiProcessController::SafeDownCast(client_controller);
+    if (collabController)
+    {
+      // In collaboration, the all clients need to update their progress
+      for (int i = 0; i < collabController->GetNumberOfControllers(); i++)
+      {
+        client_controller = collabController->GetController(i);
+        client_controller->Send(
+          buffer.data(), message_size, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
+      }
+    }
+    else
+    {
+      client_controller->Send(
+        buffer.data(), message_size, 1, vtkPVProgressHandler::PROGRESS_EVENT_TAG);
+    }
   }
 
   this->SetLastProgressText(progress_text);
@@ -323,8 +417,17 @@ bool vtkPVProgressHandler::OnWrongTagEvent(vtkObject*, unsigned long eventid, vo
   if (tag == vtkPVProgressHandler::MESSAGE_EVENT_TAG)
   {
     ptr += sizeof(tag);
+    memcpy(&len, ptr, sizeof(len));
     ptr += sizeof(len);
-    this->RefreshMessage(ptr);
+
+    auto rawdata = reinterpret_cast<const unsigned char*>(ptr);
+    vtkMultiProcessStream stream;
+    stream.SetRawData(rawdata, len);
+
+    std::string message;
+    int type;
+    stream >> message >> type;
+    this->RefreshMessage(message.c_str(), type, /*is_local*/ false);
     return true;
   }
 
@@ -332,6 +435,14 @@ bool vtkPVProgressHandler::OnWrongTagEvent(vtkObject*, unsigned long eventid, vo
   // Default handler is defined in vtkPVSession::OnWrongTagEvent().
   if (tag == vtkPVProgressHandler::PROGRESS_EVENT_TAG)
   {
+    // Secondary client PrepareProgress is never called by
+    // vtkSMSessionClient::PrepareProgressInternal
+    // so we call it when it receives a progress event from the server
+    if (!this->GetEnableProgress())
+    {
+      this->PrepareProgress();
+    }
+
     ptr += sizeof(tag);
     memcpy(&len, ptr, sizeof(len));
     ptr += sizeof(len);
@@ -356,30 +467,74 @@ bool vtkPVProgressHandler::OnWrongTagEvent(vtkObject*, unsigned long eventid, vo
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::OnMessageEvent(
-  vtkObject* vtkNotUsed(caller), unsigned long eventid, void* calldata)
+void vtkPVProgressHandler::OnMessageEvent(vtkObject*, unsigned long eventid, void* calldata)
 {
-  if (eventid != vtkCommand::MessageEvent)
+  switch (eventid)
   {
-    return;
+    case vtkCommand::WarningEvent:
+    case vtkCommand::MessageEvent:
+    case vtkCommand::ErrorEvent:
+    case vtkCommand::TextEvent:
+      this->RefreshMessage(reinterpret_cast<const char*>(calldata), eventid, /*is_local*/ true);
+      break;
   }
-
-  const char* message = reinterpret_cast<const char*>(calldata);
-  this->RefreshMessage(message);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::RefreshMessage(const char* message)
+void vtkPVProgressHandler::RefreshMessage(const char* message, int etype, bool is_local)
 {
+  SKIP_IF_DISABLED();
+
   // On server-root-nodes, send the message to the client.
   vtkMultiProcessController* client_controller = this->Session->GetController(vtkPVSession::CLIENT);
-  if (client_controller != NULL && message != NULL)
+  if (client_controller != nullptr && message != nullptr)
   {
+    vtkMultiProcessStream stream;
+    stream << message << etype;
+    auto uc_vector = stream.GetRawData();
+    const int bytelength = static_cast<int>(uc_vector.size() * sizeof(unsigned char));
+
     // only true of server-nodes.
-    client_controller->Send(
-      message, strlen(message) + 1, 1, vtkPVProgressHandler::MESSAGE_EVENT_TAG);
+    vtkCompositeMultiProcessController* collabController =
+      vtkCompositeMultiProcessController::SafeDownCast(client_controller);
+    if (collabController)
+    {
+      // In collaboration, the messages of the secondary clients are updated with a RMI call
+      vtkMultiProcessController* activeClientController = collabController->GetActiveController();
+      for (int i = 0; i < collabController->GetNumberOfControllers(); i++)
+      {
+        auto secondaryClientController = collabController->GetController(i);
+        if (secondaryClientController != activeClientController)
+        {
+          secondaryClientController->TriggerRMI(
+            1, uc_vector.data(), bytelength, vtkPVProgressHandler::MESSAGE_EVENT_TAG_RMI);
+        }
+      }
+    }
+    client_controller->Send(uc_vector.data(), static_cast<int>(uc_vector.size()), 1,
+      vtkPVProgressHandler::MESSAGE_EVENT_TAG);
   }
 
-  this->SetLastMessage(message);
+  if (!is_local)
+  {
+    switch (etype)
+    {
+      case vtkCommand::WarningEvent:
+        vtkOutputWindowDisplayWarningText(message);
+        break;
+
+      case vtkCommand::ErrorEvent:
+        vtkOutputWindowDisplayErrorText(message);
+        break;
+
+      case vtkCommand::TextEvent:
+      case vtkCommand::MessageEvent:
+        vtkOutputWindowDisplayText(message);
+        break;
+    }
+  }
+
+#if !defined(VTK_LEGACY_REMOVE)
   this->InvokeEvent(vtkCommand::MessageEvent, const_cast<char*>(message));
+#endif
 }

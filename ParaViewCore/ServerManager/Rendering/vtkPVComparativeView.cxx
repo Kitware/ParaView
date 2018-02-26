@@ -283,7 +283,7 @@ public:
 
 protected:
   vtkCloningVector() {}
-  virtual ~vtkCloningVector() {}
+  ~vtkCloningVector() override {}
 
   /**
    * This must be called to initialize the vector with the "root".
@@ -331,8 +331,8 @@ protected:
   }
 
 private:
-  vtkCloningVector(const vtkCloningVector&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCloningVector&) VTK_DELETE_FUNCTION;
+  vtkCloningVector(const vtkCloningVector&) = delete;
+  void operator=(const vtkCloningVector&) = delete;
 
   /**
    * Copy all properties from source to clone, excluding the ones in
@@ -427,11 +427,11 @@ public:
 
 protected:
   vtkCloningVectorOfRepresentations() {}
-  ~vtkCloningVectorOfRepresentations() {}
+  ~vtkCloningVectorOfRepresentations() override {}
 
 private:
-  vtkCloningVectorOfRepresentations(const vtkCloningVectorOfRepresentations&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCloningVectorOfRepresentations&) VTK_DELETE_FUNCTION;
+  vtkCloningVectorOfRepresentations(const vtkCloningVectorOfRepresentations&) = delete;
+  void operator=(const vtkCloningVectorOfRepresentations&) = delete;
 };
 
 //----------------------------------------------------------------------------
@@ -495,7 +495,7 @@ public:
     {
       // We'll create 1 view, but multiple sets of representations for each comparison.
       vtkSMProxy* rootView = this->GetRoot();
-      bool changed = this->Resize(1);
+      bool changed = this->Superclass::Resize(1);
       for (auto iter = this->Representations.begin(); iter != this->Representations.end(); ++iter)
       {
         size_t old_size = (*iter)->GetNumberOfItems();
@@ -583,7 +583,7 @@ protected:
     this->CameraLink->SynchronizeInteractiveRendersOff();
   }
 
-  ~vtkCloningVectorOfViews() {}
+  ~vtkCloningVectorOfViews() override {}
 
   /**
    * A new view is being created, we need to create clones of representations too
@@ -638,8 +638,8 @@ protected:
   }
 
 private:
-  vtkCloningVectorOfViews(const vtkCloningVectorOfViews&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCloningVectorOfViews&) VTK_DELETE_FUNCTION;
+  vtkCloningVectorOfViews(const vtkCloningVectorOfViews&) = delete;
+  void operator=(const vtkCloningVectorOfViews&) = delete;
 
   vtkNew<vtkSMCameraLink> CameraLink;
   bool OverlayViews;
@@ -939,14 +939,14 @@ void vtkPVComparativeView::GetViews(vtkCollection* collection)
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkPVComparativeView::CaptureWindow(int magnification)
+vtkImageData* vtkPVComparativeView::CaptureWindow(int magX, int magY)
 {
   std::vector<vtkSmartPointer<vtkImageData> > images;
 
   vtkPVComparativeViewNS::vtkCloningVectorOfViews* views = this->Internal->Views.Get();
   for (size_t cc = 0, max = views->GetNumberOfItems(); cc < max; ++cc)
   {
-    vtkImageData* image = views->GetView(cc)->CaptureWindow(magnification);
+    vtkImageData* image = views->GetView(cc)->CaptureWindow(magX, magY);
     if (image)
     {
       images.push_back(image);

@@ -8,7 +8,7 @@ for a *Property* element in Server-Manager configuration XMLs.
 
 NoDefault
 ----------
-Skip setting run-time defaults during initalization.
+Skip setting run-time defaults during initialization.
 
 Any property with a domain that is dynamic i.e. depends on run-time
 values such as data information or the information-only properties, often
@@ -36,7 +36,7 @@ to designate which type of vector is being represented.
       ...
       <Hints>
         <ShowComponentLabels>
-          <Label component="0" label="X:"/>
+          <ComponentLabel component="0" label="X:"/>
           ...
         </ShowComponentLabels>
       </Hints>
@@ -194,3 +194,20 @@ user can still manually select these values to be loaded.
           <OmitFromLoadAllVariables />
         </Hints>
     </StringVectorProperty>
+
+ProxySelectionWidget
+---------------------
+Specify options to configure `pqProxySelectionWidget`, typically used for
+proxy-properties with a proxy-list domain.
+
+To disable the combo-box widget, so that the user cannot change the selection,
+add `enabled="0"` attribute.
+
+    <ProxyProperty name="Format">
+         <ProxyListDomain name="proxy_list">
+           <Group name="screenshot_writers" />
+         </ProxyListDomain>
+         <Hints>
+           <ProxySelectionWidget enabled="0" />
+         </Hints>
+    </ProxyProperty>

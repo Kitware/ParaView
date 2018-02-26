@@ -340,8 +340,8 @@ protected:
   int RequestDataCounter;
 
 private:
-  vtkPGenericIOReader(const vtkPGenericIOReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPGenericIOReader&) VTK_DELETE_FUNCTION;
+  vtkPGenericIOReader(const vtkPGenericIOReader&) = delete;
+  void operator=(const vtkPGenericIOReader&) = delete;
 };
 
 #endif /* vtkPGenericIOReader_h */

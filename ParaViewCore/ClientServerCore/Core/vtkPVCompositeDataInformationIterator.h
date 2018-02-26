@@ -82,15 +82,14 @@ public:
 
 protected:
   vtkPVCompositeDataInformationIterator();
-  ~vtkPVCompositeDataInformationIterator();
+  ~vtkPVCompositeDataInformationIterator() override;
 
   unsigned int CurrentFlatIndex;
   vtkPVDataInformation* DataInformation;
 
 private:
-  vtkPVCompositeDataInformationIterator(
-    const vtkPVCompositeDataInformationIterator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCompositeDataInformationIterator&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeDataInformationIterator(const vtkPVCompositeDataInformationIterator&) = delete;
+  void operator=(const vtkPVCompositeDataInformationIterator&) = delete;
 
   class vtkInternal;
   vtkInternal* Internal;

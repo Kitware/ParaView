@@ -3,7 +3,7 @@
 /**
  *  \file   GW_TriangularInterpolation_ABC.h
  *  \brief  Definition of class \c GW_TriangularInterpolation_ABC
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ class GW_GeodesicFace;
 /**
  *  \class  GW_TriangularInterpolation_ABC
  *  \brief  Data structure to interpolate data on a triangle.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-2-2003
  *
  *  Use a \c GW_GeodesicFace to compute the coefficient of a 2nd
@@ -58,7 +58,7 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

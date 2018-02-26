@@ -136,8 +136,6 @@
 #include "vtkQuerySelectionSource.h"
 #include "vtkRectilinearGridConnectivity.h"
 #include "vtkReductionFilter.h"
-#include "vtkScatterPlotMapper.h"
-#include "vtkScatterPlotPainter.h"
 #include "vtkSciVizStatistics.h"
 #include "vtkSelectionConverter.h"
 #include "vtkSelectionSerializer.h"
@@ -151,7 +149,6 @@
 #include "vtkSpyPlotUniReader.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkSurfaceVectors.h"
-#include "vtkTexturePainter.h"
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
 #include "vtkTimeToTextConvertor.h"
@@ -320,8 +317,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkQuerySelectionSource);
   PRINT_SELF(vtkRectilinearGridConnectivity);
   PRINT_SELF(vtkReductionFilter);
-  PRINT_SELF(vtkScatterPlotMapper);
-  PRINT_SELF(vtkScatterPlotPainter);
   PRINT_SELF(vtkSciVizStatistics);
   PRINT_SELF(vtkSelectionConverter);
   PRINT_SELF(vtkSelectionSerializer);
@@ -335,7 +330,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkSpyPlotUniReader);
   PRINT_SELF(vtkSquirtCompressor);
   PRINT_SELF(vtkSurfaceVectors);
-  PRINT_SELF(vtkTexturePainter);
   // PRINT_SELF(vtkTilesHelper);
   // PRINT_SELF(vtkTileDisplayHelper);
   PRINT_SELF(vtkTimeToTextConvertor);

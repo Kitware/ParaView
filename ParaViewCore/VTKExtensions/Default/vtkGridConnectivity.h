@@ -58,11 +58,11 @@ public:
 
 protected:
   vtkGridConnectivity();
-  ~vtkGridConnectivity();
+  ~vtkGridConnectivity() override;
 
   vtkMultiProcessController* Controller;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // I had to make this templated for global pointIds.
@@ -72,9 +72,9 @@ protected:
   void GenerateOutput(vtkPolyData* output, vtkUnstructuredGrid* inputs[]);
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   // This method returns 1 if the input has the necessary arrays for this filter.
   int CheckInput(vtkUnstructuredGrid* grid);
@@ -113,8 +113,8 @@ protected:
   void CollectFacesAndArraysToRootProcess(int* fragmentIdMap, int* fragmentNumFaces);
 
 private:
-  vtkGridConnectivity(const vtkGridConnectivity&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGridConnectivity&) VTK_DELETE_FUNCTION;
+  vtkGridConnectivity(const vtkGridConnectivity&) = delete;
+  void operator=(const vtkGridConnectivity&) = delete;
 };
 
 #endif

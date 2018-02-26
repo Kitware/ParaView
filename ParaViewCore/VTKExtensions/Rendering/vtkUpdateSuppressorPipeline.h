@@ -35,10 +35,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Generalized interface for asking the executive to fullfill update
+   * Generalized interface for asking the executive to fulfill update
    * requests.
    */
-  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
+  int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
     vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   //@{
@@ -51,14 +51,14 @@ public:
 
 protected:
   vtkUpdateSuppressorPipeline();
-  ~vtkUpdateSuppressorPipeline();
+  ~vtkUpdateSuppressorPipeline() override;
   //@}
 
   bool Enabled;
 
 private:
-  vtkUpdateSuppressorPipeline(const vtkUpdateSuppressorPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkUpdateSuppressorPipeline&) VTK_DELETE_FUNCTION;
+  vtkUpdateSuppressorPipeline(const vtkUpdateSuppressorPipeline&) = delete;
+  void operator=(const vtkUpdateSuppressorPipeline&) = delete;
 };
 
 #endif

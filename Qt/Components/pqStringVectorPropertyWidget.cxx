@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSILDomain.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMSubsetInclusionLatticeDomain.h"
 
 #include "pqApplicationCore.h"
 #include "pqArrayListDomain.h"
@@ -62,7 +63,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarValueListPropertyWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
+#include "pqSubsetInclusionLatticeTreeModel.h"
+#include "pqSubsetInclusionLatticeWidget.h"
 #include "pqTextEdit.h"
+#include "pqTreeView.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"
 #include "vtkPVConfig.h"
@@ -126,40 +130,25 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkSMStringListDomain* stringListDomain = 0;
   vtkSMSILDomain* silDomain = 0;
   vtkSMArraySelectionDomain* arraySelectionDomain = 0;
+  vtkSMSubsetInclusionLatticeDomain* silDomain2 = nullptr;
 
   vtkSMDomainIterator* domainIter = svp->NewDomainIterator();
   for (domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
   {
     vtkSMDomain* domain = domainIter->GetDomain();
-
-    if (!enumerationDomain)
-    {
-      enumerationDomain = vtkSMEnumerationDomain::SafeDownCast(domain);
-    }
-    if (!fileListDomain)
-    {
-      fileListDomain = vtkSMFileListDomain::SafeDownCast(domain);
-    }
-    if (!arrayListDomain)
-    {
-      arrayListDomain = vtkSMArrayListDomain::SafeDownCast(domain);
-    }
-    if (!silDomain)
-    {
-      silDomain = vtkSMSILDomain::SafeDownCast(domain);
-    }
-    if (!arraySelectionDomain)
-    {
-      arraySelectionDomain = vtkSMArraySelectionDomain::SafeDownCast(domain);
-    }
-    if (!stringListDomain)
-    {
-      stringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
-    }
-    if (!fieldDataDomain)
-    {
-      fieldDataDomain = vtkSMFieldDataDomain::SafeDownCast(domain);
-    }
+    enumerationDomain =
+      enumerationDomain ? enumerationDomain : vtkSMEnumerationDomain::SafeDownCast(domain);
+    fileListDomain = fileListDomain ? fileListDomain : vtkSMFileListDomain::SafeDownCast(domain);
+    arrayListDomain =
+      arrayListDomain ? arrayListDomain : vtkSMArrayListDomain::SafeDownCast(domain);
+    silDomain = silDomain ? silDomain : vtkSMSILDomain::SafeDownCast(domain);
+    silDomain2 = silDomain2 ? silDomain2 : vtkSMSubsetInclusionLatticeDomain::SafeDownCast(domain);
+    arraySelectionDomain =
+      arraySelectionDomain ? arraySelectionDomain : vtkSMArraySelectionDomain::SafeDownCast(domain);
+    stringListDomain =
+      stringListDomain ? stringListDomain : vtkSMStringListDomain::SafeDownCast(domain);
+    fieldDataDomain =
+      fieldDataDomain ? fieldDataDomain : vtkSMFieldDataDomain::SafeDownCast(domain);
   }
   domainIter->Delete();
 
@@ -323,7 +312,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     // FIXME: This needs to be automated, we want the model to automatically
     // fetch the SIL when the domain is updated.
-    silModel->update(silDomain->GetSIL());
+    silModel->setSILDomain(silDomain);
+    silModel->update();
     tree->setModel(silModel);
 
     this->addPropertyLink(tree->activeModel(), "values", SIGNAL(valuesChanged()), smProperty);
@@ -336,6 +326,18 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     PV_DEBUG_PANELS() << "pqSILWidget for a StringVectorProperty with a "
                       << "SILDomain (" << silDomain->GetXMLName() << ")";
+  }
+  else if (silDomain2)
+  {
+    this->setShowLabel(false);
+
+    auto model = new pqSubsetInclusionLatticeTreeModel(this);
+
+    model->setSubsetInclusionLattice(silDomain2->GetSIL());
+    pqSubsetInclusionLatticeWidget* silWidget = new pqSubsetInclusionLatticeWidget(model, this);
+    vbox->addWidget(silWidget);
+    this->addPropertyLink(model, "selection", SIGNAL(selectionModified()), smProperty);
+    this->setChangeAvailableAsChangeFinished(true);
   }
   else if (arraySelectionDomain)
   {
@@ -482,3 +484,10 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   }
   this->setLayout(vbox);
 }
+
+//-----------------------------------------------------------------------------
+pqStringVectorPropertyWidget::~pqStringVectorPropertyWidget()
+{
+}
+
+//-----------------------------------------------------------------------------

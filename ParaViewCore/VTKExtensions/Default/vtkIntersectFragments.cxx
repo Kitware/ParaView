@@ -382,10 +382,10 @@ void vtkIntersectFragments::BuildLoadingArray(vector<vtkIdType>& loadingArray, i
 }
 
 //----------------------------------------------------------------------------
-// Load a buffer containg the number of polys for each fragment
+// Load a buffer containing the number of polys for each fragment
 // or fragment piece that we own. Return the size in vtkIdType's
 // of the packed buffer and the buffer itself. Pass in a
-// pointer intialized to null, allocation is internal.
+// pointer initialized to null, allocation is internal.
 int vtkIntersectFragments::PackLoadingArray(vtkIdType*& buffer, int blockId)
 {
   assert("Buffer appears to have been pre-allocated." && buffer == 0);
@@ -415,7 +415,7 @@ int vtkIntersectFragments::PackLoadingArray(vtkIdType*& buffer, int blockId)
 
 //----------------------------------------------------------------------------
 // Given a fragment loading array that has been packed into an int array
-// unpack. The packed loading arrays are orderd locally while the unpacked
+// unpack. The packed loading arrays are ordered locally while the unpacked
 // are ordered gloably by fragment id.
 //
 // Return the number of fragments and the unpacked array.
@@ -493,7 +493,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
     // computed directly.
     vector<int> intersectSplitMarker;
     // intilize to (bool)0 not split. All local ops
-    // on fragments check here. It's coppied to geometry.
+    // on fragments check here. It's copied to geometry.
     intersectSplitMarker.resize(nLocal, 0);
     // Size the attribute arrays
     this->IntersectionCenters[blockId]->SetNumberOfComponents(3);
@@ -593,7 +593,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
         // assigning to each until all work has been alloted.
         vtkMaterialInterfaceProcessRing procRing;
         procRing.Initialize(nProcs);
-        // Decide who needs to move and build coresponding
+        // Decide who needs to move and build corresponding
         // transaction matrix.
         for (int fragmentId = 0; fragmentId < nFragments; ++fragmentId)
         {
@@ -716,7 +716,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
             this->Controller->Send(
               buffer.GetBuffer(), buffer.GetBufferSize(), ta.GetRemoteProc(), 2 * fragmentId);
 
-            // Recieve the remotely computed attributes
+            // Receive the remotely computed attributes
             double aabbCen[3];
             this->Controller->Receive(aabbCen, 3, ta.GetRemoteProc(), 3 * fragmentId);
             // save results
@@ -746,7 +746,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
               // pertaining to a single block(material)
               vtkMaterialInterfaceCommBuffer buffer;
               buffer.SizeHeader(1);
-              // recieve buffer's header
+              // receive buffer's header
               this->Controller->Receive(
                 buffer.GetHeader(), buffer.GetHeaderSize(), ta.GetRemoteProc(), fragmentId);
               // size buffer via incoming header
@@ -1115,7 +1115,7 @@ int vtkIntersectFragments::GatherGeometricAttributes(const int recipientProcId)
         int nMerged = 0;
         for (int i = 0; i < nToMerge; ++i)
         {
-          // gaurd against duplicates from split geometry
+          // guard against duplicates from split geometry
           if (unique[blockId][pRemoteIds[0]])
           {
             // mark as hit
@@ -1192,7 +1192,7 @@ int vtkIntersectFragments::CopyAttributesToStatsOutput(const int controllingProc
     cells->Delete();
     va->Delete();
     // copy attributes, the output already has had
-    // the structure coppied, including names and
+    // the structure copied, including names and
     // number of comps.
     vtkPointData* pdSrc =
       dynamic_cast<vtkPolyData*>(this->StatsIn->GetBlock(blockId))->GetPointData();

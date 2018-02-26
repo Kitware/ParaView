@@ -231,6 +231,10 @@ public:
   /**
    * Returns the prototype proxy for the given type. This method may create
    * a new prototype proxy, if one does not already exist.
+   *
+   * @note After loading a plugin, all existing prototypes are discarded. This
+   * is done because plugins can potentially alter definitions for existing
+   * proxies.
    */
   vtkSMProxy* GetPrototypeProxy(const char* groupname, const char* name);
 
@@ -298,7 +302,7 @@ public:
   /**
    * Calls UpdateVTKObjects() on all managed proxies.
    * If modified_only flag is set, then UpdateVTKObjects will be called
-   * only those proxies that have any properties that were modifed i.e.
+   * only those proxies that have any properties that were modified i.e.
    * not pushed to the VTK objects.
    */
   void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
@@ -449,6 +453,11 @@ public:
   void InstantiatePrototypes();
 
   /**
+   * Converse on `InstantiatePrototypes`, clear all prototypes.
+   */
+  void ClearPrototypes();
+
+  /**
    * Return true if the XML Definition was found by vtkSMProxyDefinitionManager
    */
   bool HasDefinition(const char* groupName, const char* proxyName);
@@ -549,7 +558,7 @@ public:
    * This method returns the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
   virtual const vtkSMMessage* GetFullState();
 
@@ -566,7 +575,7 @@ public:
 
 protected:
   vtkSMSessionProxyManager(vtkSMSession*);
-  ~vtkSMSessionProxyManager();
+  ~vtkSMSessionProxyManager() override;
 
   friend class vtkSMProxy;
   friend class vtkPVProxyDefinitionIterator;
@@ -634,8 +643,8 @@ private:
 #endif
 
 private:
-  vtkSMSessionProxyManager(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSessionProxyManager&) VTK_DELETE_FUNCTION;
+  vtkSMSessionProxyManager(const vtkSMSessionProxyManager&) = delete;
+  void operator=(const vtkSMSessionProxyManager&) = delete;
 };
 
 #endif

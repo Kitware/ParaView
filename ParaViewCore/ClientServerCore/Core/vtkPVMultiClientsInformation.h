@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVMultiClientsInformation
- * @brief   Gets Multi-clients informations from the server.
+ * @brief   Gets Multi-clients information from the server.
  *
  * This objects is used by the client to get the number of multi-clients server
  * as well as their ids.
@@ -40,19 +40,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -91,7 +91,7 @@ public:
 
 protected:
   vtkPVMultiClientsInformation();
-  ~vtkPVMultiClientsInformation();
+  ~vtkPVMultiClientsInformation() override;
 
   int ClientId;
   int* ClientIds;
@@ -99,8 +99,8 @@ protected:
   int MultiClientEnable;
   int MasterId;
 
-  vtkPVMultiClientsInformation(const vtkPVMultiClientsInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVMultiClientsInformation&) VTK_DELETE_FUNCTION;
+  vtkPVMultiClientsInformation(const vtkPVMultiClientsInformation&) = delete;
+  void operator=(const vtkPVMultiClientsInformation&) = delete;
 };
 
 #endif

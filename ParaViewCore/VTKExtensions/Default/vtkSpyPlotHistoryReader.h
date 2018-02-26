@@ -62,16 +62,16 @@ public:
 
 protected:
   vtkSpyPlotHistoryReader();
-  ~vtkSpyPlotHistoryReader();
+  ~vtkSpyPlotHistoryReader() override;
 
   // Read the case file and the first binary file do get meta
-  // informations (number of files, number of fields, number of timestep).
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  // information (number of files, number of fields, number of timestep).
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Read the data: get the number of pieces (=processors) and get
   // my piece id (=my processor id).
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   void FillCache();
@@ -98,8 +98,8 @@ private:
   CachedTables* CachedOutput;
   //@}
 
-  vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpyPlotHistoryReader&) VTK_DELETE_FUNCTION;
+  vtkSpyPlotHistoryReader(const vtkSpyPlotHistoryReader&) = delete;
+  void operator=(const vtkSpyPlotHistoryReader&) = delete;
 };
 
 #endif

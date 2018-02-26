@@ -119,8 +119,8 @@ protected:
     int& localAssignedCount) VTK_OVERRIDE;
 
 private:
-  vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkInSituPParticlePathFilter&) VTK_DELETE_FUNCTION;
+  vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&) = delete;
+  void operator=(const vtkInSituPParticlePathFilter&) = delete;
 
   /**
    * For restart input we need to mark that we will use arrays to

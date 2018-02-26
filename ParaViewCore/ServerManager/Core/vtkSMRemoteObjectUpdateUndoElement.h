@@ -42,13 +42,13 @@ public:
    * Undo the operation encapsulated by this element.
    * \return the status of the operation, 1 on success, 0 otherwise.
    */
-  virtual int Undo() VTK_OVERRIDE;
+  int Undo() VTK_OVERRIDE;
 
   /**
    * Redo the operation encaspsulated by this element.
    * \return the status of the operation, 1 on success, 0 otherwise.
    */
-  virtual int Redo() VTK_OVERRIDE;
+  int Redo() VTK_OVERRIDE;
 
   /**
    * Set ProxyLocator to use if any.
@@ -68,7 +68,7 @@ public:
 
 protected:
   vtkSMRemoteObjectUpdateUndoElement();
-  ~vtkSMRemoteObjectUpdateUndoElement();
+  ~vtkSMRemoteObjectUpdateUndoElement() override;
 
   // Internal method used to update proxy state based on the state info
   int UpdateState(const vtkSMMessage* state);
@@ -76,8 +76,8 @@ protected:
   vtkSMProxyLocator* ProxyLocator;
 
 private:
-  vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRemoteObjectUpdateUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&) = delete;
+  void operator=(const vtkSMRemoteObjectUpdateUndoElement&) = delete;
 };
 
 #endif

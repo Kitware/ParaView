@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 #include <QItemSelection>
 #include <QMenu>
+#include <QSortFilterProxyModel>
 #include <QtDebug>
 
 // ParaView Includes.
@@ -134,19 +135,16 @@ void pqTreeViewSelectionHelper::showContextMenu(const QPoint& pos)
     menu.setObjectName("TreeViewCheckMenu");
     QAction* check = new QAction("Check", &menu);
     QAction* uncheck = new QAction("Uncheck", &menu);
-    QAction* sort = new QAction("Sort by Name", &menu);
-    QAction* unsort = new QAction("Sort by Block Index", &menu);
+    QAction* sort = new QAction("Sort", &menu);
+    QAction* unsort = new QAction("Clear Sorting", &menu);
     menu.addAction(check);
     menu.addAction(uncheck);
-    menu.addAction(sort);
-    menu.addAction(unsort);
-    if (this->TreeView->isSortingEnabled())
+    QSortFilterProxyModel* sortModel =
+      qobject_cast<QSortFilterProxyModel*>(this->TreeView->model());
+    if (sortModel)
     {
-      sort->setEnabled(false);
-    }
-    else
-    {
-      unsort->setEnabled(false);
+      menu.addAction(sort);
+      menu.addAction(unsort);
     }
     QAction* result = menu.exec(this->TreeView->mapToGlobal(pos));
     if (result == check)
@@ -159,13 +157,11 @@ void pqTreeViewSelectionHelper::showContextMenu(const QPoint& pos)
     }
     else if (result == sort)
     {
-      this->TreeView->setSortingEnabled(true);
-      this->TreeView->sortByColumn(0, Qt::AscendingOrder);
+      sortModel->sort(this->TreeView->columnAt(pos.x()), Qt::AscendingOrder);
     }
     else if (result == unsort)
     {
-      this->TreeView->sortByColumn(-1);
-      this->TreeView->setSortingEnabled(false);
+      sortModel->sort(-1);
     }
   }
 }

@@ -16,8 +16,6 @@ import paraview.cpstate
 import paraview.extract_selection
 import paraview.lookuptable
 import paraview.numeric
-import paraview.pvfilters
-import paraview.pvvtkextensions
 import paraview.python_view
 import paraview.servermanager
 import paraview.simple

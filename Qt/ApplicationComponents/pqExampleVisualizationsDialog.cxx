@@ -23,6 +23,8 @@ pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parentObje
     this->ui->DiskOutRefExampleButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
   QObject::connect(
     this->ui->WaveletExampleButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
+  QObject::connect(
+    this->ui->HotGasAnalysisExampleButton, SIGNAL(clicked(bool)), this, SLOT(onButtonPressed()));
 }
 
 //-----------------------------------------------------------------------------
@@ -63,6 +65,11 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     {
       stateFile = ":/pqApplicationComponents/ExampleVisualizations/WaveletExample.pvsm";
       needsData = false;
+    }
+    else if (button == this->ui->HotGasAnalysisExampleButton)
+    {
+      stateFile = ":/pqApplicationComponents/ExampleVisualizations/HotGasAnalysisExample.pvsm";
+      needsData = true;
     }
     else
     {

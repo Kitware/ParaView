@@ -113,6 +113,10 @@
    </property>
   </action>
   <action name="actionDelete_All">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqReset24.png</normaloff>:/pqWidgets/Icons/pqReset24.png</iconset>
+   </property>
    <property name="text">
     <string>Reset Session</string>
    </property>
@@ -120,7 +124,7 @@
   <action name="actionHide_All">
    <property name="icon">
     <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-     <normaloff>:/pqWidgets/Icons/pqEyeball16.png</normaloff>:/pqWidgets/Icons/pqEyeballd16.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqEyeball.png</normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</iconset>
    </property>
    <property name="text">
     <string>Hide All</string>
@@ -171,6 +175,17 @@
    <property name="shortcut">
     <string>V</string>
    </property>
+ </action>
+  <action name="actionRestoreUserPreferences">
+   <property name="text">
+    <string>Restore User Preferences</string>
+   </property>
+   <property name="iconText">
+    <string>Restore User Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Restore user preferences to default.</string>
+   </property>
   </action>
   <addaction name="actionEditUndo"/>
   <addaction name="actionEditRedo"/>
@@ -189,7 +204,9 @@
   <addaction name="actionDelete_All"/>
   <addaction name="separator"/>
   <addaction name="actionQuery"/>
+  <addaction name="separator"/>
   <addaction name="actionEditSettings"/>
+  <addaction name="actionRestoreUserPreferences"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

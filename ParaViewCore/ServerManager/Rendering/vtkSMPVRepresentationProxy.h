@@ -299,26 +299,37 @@ public:
    * array used for scalar color, if any. Otherwise returns NULL.
    */
   virtual vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
-    double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
+    double uncertaintyAllowed = 1e-6, double fraction = 1e-3, bool force = false);
   static vtkPVProminentValuesInformation* GetProminentValuesInformationForColorArray(
-    vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3)
+    vtkSMProxy* proxy, double uncertaintyAllowed = 1e-6, double fraction = 1e-3, bool force = false)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self ? self->GetProminentValuesInformationForColorArray(uncertaintyAllowed, fraction)
-                : NULL;
+    return self
+      ? self->GetProminentValuesInformationForColorArray(uncertaintyAllowed, fraction, force)
+      : NULL;
   }
   //@}
+
+  /**
+   * Get an estimated number of annotation shown on this representation scalar bar
+   */
+  int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* view);
+  static int GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSMProxy* proxy, vtkSMProxy* view)
+  {
+    vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
+    return self ? self->GetEstimatedNumberOfAnnotationsOnScalarBar(view) : -1;
+  }
 
   /**
    * Overridden to ensure when picking representation types that require scalar
    * colors, scalar coloring it setup properly. Currently this is hard-coded for
    * Volume and Slice representation types.
    */
-  virtual bool SetRepresentationType(const char* type) VTK_OVERRIDE;
+  bool SetRepresentationType(const char* type) VTK_OVERRIDE;
 
 protected:
   vtkSMPVRepresentationProxy();
-  ~vtkSMPVRepresentationProxy();
+  ~vtkSMPVRepresentationProxy() override;
 
   /**
    * Rescales transfer function ranges using the array information provided.
@@ -330,7 +341,7 @@ protected:
    * Overridden to ensure that the RepresentationTypesInfo and
    * Representations's domain are up-to-date.
    */
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   // Whenever the "Representation" property is modified, we ensure that the
   // this->InvalidateDataInformation() is called.
@@ -341,12 +352,18 @@ protected:
    * "Input" properties for all internal representations (including setting up
    * of the link to the extract-selection representation).
    */
-  virtual void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
+  void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
   /**
    * Overridden to process "RepresentationType" elements.
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+
+  /**
+   * In case of UseSeparateColorMap enabled, this function prefix the given
+   * arrayname with unique identifier, otherwise it acts as a passthrough.
+   */
+  std::string GetDecoratedArrayName(const std::string& arrayname);
 
   /**
    * Internal method to set scalar coloring, do not use directly.
@@ -355,8 +372,8 @@ protected:
     const char* arrayname, int attribute_type, bool useComponent, int component);
 
 private:
-  vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPVRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&) = delete;
+  void operator=(const vtkSMPVRepresentationProxy&) = delete;
 
   bool InReadXMLAttributes;
   class vtkStringSet;

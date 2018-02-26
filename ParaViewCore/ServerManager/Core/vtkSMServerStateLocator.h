@@ -14,10 +14,10 @@
 =========================================================================*/
 /**
  * @class   vtkSMServerStateLocator
- * @brief   Class used to retreive a given message state based
+ * @brief   Class used to retrieve a given message state based
  * on its GlobalID from the DataServer.
  *
- * Retreive a given state from the server.
+ * Retrieve a given state from the server.
 */
 
 #ifndef vtkSMServerStateLocator_h
@@ -52,18 +52,17 @@ public:
    * successfully filled.
    * In that case useParent is not used and is set to false.
    */
-  virtual bool FindState(
-    vtkTypeUInt32 globalID, vtkSMMessage* stateToFill, bool useParent) VTK_OVERRIDE;
+  bool FindState(vtkTypeUInt32 globalID, vtkSMMessage* stateToFill, bool useParent) VTK_OVERRIDE;
 
 protected:
   vtkSMServerStateLocator();
-  ~vtkSMServerStateLocator();
+  ~vtkSMServerStateLocator() override;
 
   vtkWeakPointer<vtkSMSession> Session;
 
 private:
-  vtkSMServerStateLocator(const vtkSMServerStateLocator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMServerStateLocator&) VTK_DELETE_FUNCTION;
+  vtkSMServerStateLocator(const vtkSMServerStateLocator&) = delete;
+  void operator=(const vtkSMServerStateLocator&) = delete;
 };
 
 #endif

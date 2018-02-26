@@ -34,7 +34,7 @@ public:
   static vtkSMPropertyLinkObserver* New() { return new vtkSMPropertyLinkObserver; }
 
   void SetTarget(vtkSMPropertyLink* t) { this->Target = t; }
-  virtual void Execute(vtkObject* c, unsigned long, void*)
+  void Execute(vtkObject* c, unsigned long, void*) override
   {
     vtkSMProperty* caller = vtkSMProperty::SafeDownCast(c);
     if (this->Target && caller && this->Target->GetEnabled())
@@ -335,7 +335,7 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProxy* fromProxy, const char* pnam
   }
 
   this->ModifyingProperty = true;
-  // First verify that the property that triggerred this call is indeed
+  // First verify that the property that triggered this call is indeed
   // an input property.
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
   int propagate = 0;
@@ -388,7 +388,7 @@ void vtkSMPropertyLink::PropertyModified(vtkSMProperty* fromProp)
     return;
   }
 
-  // First verify that the property that triggerred this call is indeed
+  // First verify that the property that triggered this call is indeed
   // an input property.
   vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter;
   int propagate = 0;

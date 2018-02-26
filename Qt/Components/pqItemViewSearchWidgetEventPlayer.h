@@ -46,10 +46,11 @@ class PQCOMPONENTS_EXPORT pqItemViewSearchWidgetEventPlayer : public pqWidgetEve
 
 public:
   pqItemViewSearchWidgetEventPlayer(QObject* parent = 0);
-  ~pqItemViewSearchWidgetEventPlayer();
+  ~pqItemViewSearchWidgetEventPlayer() override;
 
   using Superclass::playEvent;
-  bool playEvent(QObject* object, const QString& command, const QString& arguments, bool& error);
+  bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error) override;
 
   static const QString& EVENT_NAME();
 

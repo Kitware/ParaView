@@ -84,7 +84,7 @@ public:
    * about the server processes. These include server-side capabilities as well
    * as server-side command line arguments e.g. tile-display parameters. Use
    * this method to obtain the server-side information.
-   * NOTE: For now, we are not bothering to provide separate informations from
+   * NOTE: For now, we are not bothering to provide separate information from
    * data-server and render-server (as was the case earlier). We can easily add
    * API for the same if needed.
    */
@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkPVSession();
-  ~vtkPVSession();
+  ~vtkPVSession() override;
 
   enum
   {
@@ -143,8 +143,8 @@ protected:
   vtkPVProgressHandler* ProgressHandler;
 
 private:
-  vtkPVSession(const vtkPVSession&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSession&) VTK_DELETE_FUNCTION;
+  vtkPVSession(const vtkPVSession&) = delete;
+  void operator=(const vtkPVSession&) = delete;
 
   int ProgressCount;
   // This flags ensures that while we are waiting for an previous progress-pair

@@ -42,11 +42,6 @@ public:
    */
   static vtkPVRenderViewSettings* GetInstance();
 
-  /**
-   * Get/Set use display lists.
-   */
-  void SetUseDisplayLists(bool val);
-
   enum
   {
     DO_NOTHING = 0,
@@ -93,15 +88,15 @@ public:
 
 protected:
   vtkPVRenderViewSettings();
-  ~vtkPVRenderViewSettings();
+  ~vtkPVRenderViewSettings() override;
 
   vtkIdType OutlineThreshold;
   int PointPickingRadius;
   bool DisableIceT;
 
 private:
-  vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVRenderViewSettings&) VTK_DELETE_FUNCTION;
+  vtkPVRenderViewSettings(const vtkPVRenderViewSettings&) = delete;
+  void operator=(const vtkPVRenderViewSettings&) = delete;
 
   static vtkSmartPointer<vtkPVRenderViewSettings> Instance;
 };

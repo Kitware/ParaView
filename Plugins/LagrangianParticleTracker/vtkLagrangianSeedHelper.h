@@ -68,14 +68,14 @@ public:
 
 protected:
   vtkLagrangianSeedHelper();
-  ~vtkLagrangianSeedHelper();
+  ~vtkLagrangianSeedHelper() override;
 
   /**
    * Creates the same output type as the input type for non composite dataset
    * In case of composite, the output will have the same type of the first block
    * of the input
    */
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
@@ -84,8 +84,8 @@ protected:
   vtkInternals* Internals;
 
 private:
-  vtkLagrangianSeedHelper(const vtkLagrangianSeedHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkLagrangianSeedHelper&) VTK_DELETE_FUNCTION;
+  vtkLagrangianSeedHelper(const vtkLagrangianSeedHelper&) = delete;
+  void operator=(const vtkLagrangianSeedHelper&) = delete;
 };
 
 #endif

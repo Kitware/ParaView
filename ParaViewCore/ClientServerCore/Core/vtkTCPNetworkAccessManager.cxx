@@ -29,6 +29,7 @@
 #include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
 
+#include <cassert>
 #include <map>
 #include <sstream>
 #include <string>
@@ -55,6 +56,7 @@ vtkTCPNetworkAccessManager::vtkTCPNetworkAccessManager()
 {
   this->Internals = new vtkInternals();
   this->AbortPendingConnectionFlag = false;
+  this->WrongConnectID = false;
 
   // It's essential to initialize the socket controller to initialize sockets on
   // Windows.
@@ -110,6 +112,8 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
       }
     }
 
+    this->WrongConnectID = false;
+
     if (parameters["listen"] == "true" && parameters["multiple"] == "true")
     {
       return this->WaitForConnection(port, false, handshake, parameters["nonblocking"] == "true");
@@ -143,6 +147,37 @@ bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
   // FIXME_COLLABORATION
   cout << "Need to fix this to report real pending connections" << endl;
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkTCPNetworkAccessManager::DisableFurtherConnections(int port, bool disable)
+{
+  if (disable)
+  {
+    if (this->Internals->ServerSockets.find(port) != this->Internals->ServerSockets.end())
+    {
+      this->Internals->ServerSockets.at(port)->CloseSocket();
+      this->Internals->ServerSockets.erase(port);
+    }
+  }
+  else
+  {
+    vtkServerSocket* server_socket = vtkServerSocket::New();
+    if (server_socket->CreateServer(port) != 0)
+    {
+      vtkErrorMacro("Failed to set up server socket.");
+      server_socket->Delete();
+      return;
+    }
+    this->Internals->ServerSockets[port] = server_socket;
+    server_socket->FastDelete();
+  }
+}
+
+//----------------------------------------------------------------------------
+bool vtkTCPNetworkAccessManager::GetWrongConnectID()
+{
+  return this->WrongConnectID;
 }
 
 //----------------------------------------------------------------------------
@@ -215,6 +250,7 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
 
   if (size == 0 || this->AbortPendingConnectionFlag)
   {
+    // Connection failed / aborted.
     return -1;
   }
 
@@ -260,6 +296,11 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
       return 1;
     }
 
+    if (can_quit_if_error)
+    {
+      vtkErrorMacro("Some error in socket processing.");
+    }
+
     // Close cleanly the socket in error
     vtkSocketCommunicator* comm =
       vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
@@ -269,6 +310,63 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
     this->InvokeEvent(vtkCommand::ConnectionClosedEvent, controller);
 
     return can_quit_if_error ? -1 /* Quit */ : 1 /* Pretend it's OK */;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkTCPNetworkAccessManager::PrintHandshakeError(int errorcode, bool server_side)
+{
+  switch (errorcode)
+  {
+    case HANDSHAKE_NO_ERROR:
+    default:
+      vtkErrorMacro("\n"
+                    "**********************************************************************\n"
+                    "Connection failed during handshake. This is likely because the connection\n"
+                    " was dropped during the handshake.\n"
+                    "**********************************************************************\n");
+      break;
+    case HANDSHAKE_SOCKET_COMMUNICATOR_DIFFERENT:
+      vtkErrorMacro("\n"
+                    "**********************************************************************\n"
+                    "Connection failed during handshake. vtkSocketCommunicator::GetVersion()\n"
+                    " returns different values on the two connecting processes\n"
+                    " (Current value: "
+        << vtkSocketCommunicator::GetVersion()
+        << ").\n"
+           "**********************************************************************\n");
+      break;
+    case HANDSHAKE_DIFFERENT_PV_VERSIONS:
+      vtkErrorMacro("\n"
+                    "**********************************************************************\n"
+                    " Connection failed during handshake.  The server has a different ParaView"
+                    " version than the client.\n"
+                    "**********************************************************************\n");
+      break;
+    case HANDSHAKE_DIFFERENT_CONNECTION_IDS:
+      if (server_side)
+      {
+        vtkWarningMacro("\n"
+                        " Connection failed during handshake. The server has a different \n"
+                        " connection id than the client.\n"
+                        "\n");
+      }
+      this->WrongConnectID = true;
+      break;
+    case HANDSHAKE_DIFFERENT_RENDERING_BACKENDS:
+      vtkErrorMacro("\n"
+                    "**********************************************************************\n"
+                    " Connection failed during handshake.  The server has a different rendering"
+                    " backend from the client.\n"
+                    "**********************************************************************\n");
+      break;
+    case HANDSHAKE_UNKNOWN_ERROR:
+      vtkErrorMacro(
+        "\n"
+        "************************************************************************\n"
+        "Connection failed during handshake.  Unknown error parsing the handshake string\n"
+        "************************************************************************\n");
+      break;
   }
 }
 
@@ -309,23 +407,13 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
   comm->LogToFile(mystr.str().c_str());
 #endif
   comm->SetSocket(cs);
-  if (!comm->Handshake() || !this->ParaViewHandshake(controller, false, handshake))
+  int errorcode = HANDSHAKE_SOCKET_COMMUNICATOR_DIFFERENT;
+  if (!comm->Handshake() || (errorcode = this->ParaViewHandshake(controller, false, handshake)))
   {
     controller->Delete();
-    vtkErrorMacro("Failed to connect to " << hostname << ":" << port);
-    vtkErrorMacro("\n"
-                  "**********************************************************************\n"
-                  "Connection failed during handshake. This can happen for the following reasons:\n"
-                  " 1. Connection dropped during the handshake.\n"
-                  " 2. vtkSocketCommunicator::GetVersion() returns different values on the\n"
-                  "    two connecting processes (Current value: "
-      << vtkSocketCommunicator::GetVersion()
-      << ").\n"
-         " 3. ParaView handshake strings are different on the two connecting\n"
-         "    processes (Current value: "
-      << (handshake ? handshake : "<empty>")
-      << ").\n"
-         "**********************************************************************\n");
+    // handshake failed, must be bogus client, continue waiting (unless
+    // this->AbortPendingConnectionFlag == true).
+    this->PrintHandshakeError(errorcode, false);
     return NULL;
   }
   this->Internals->Controllers.push_back(controller);
@@ -391,26 +479,17 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
       vtkSocketCommunicator::SafeDownCast(controller->GetCommunicator());
     comm->SetSocket(client_socket);
     client_socket->FastDelete();
-    if (comm->Handshake() == 0 || !this->ParaViewHandshake(controller, true, handshake))
+    int errorcode = HANDSHAKE_SOCKET_COMMUNICATOR_DIFFERENT;
+    if (comm->Handshake() == 0 ||
+      (errorcode = this->ParaViewHandshake(controller, true, handshake)))
     {
       controller->Delete();
       controller = NULL;
-      // handshake failed, must be bogus client, continue waiting (unless
-      // this->AbortPendingConnectionFlag == true).
-      vtkErrorMacro(
-        "\n"
-        "**********************************************************************\n"
-        "Connection failed during handshake. This can happen for the following reasons:\n"
-        " 1. Connection dropped during the handshake.\n"
-        " 2. vtkSocketCommunicator::GetVersion() returns different values on the\n"
-        "    two connecting processes (Current value: "
-        << vtkSocketCommunicator::GetVersion()
-        << ").\n"
-           " 3. ParaView handshake strings are different on the two connecting\n"
-           "    processes (Current value: "
-        << (handshake ? handshake : "<empty>")
-        << ").\n"
-           "**********************************************************************\n");
+      this->PrintHandshakeError(errorcode, true);
+      if (!once)
+      {
+        break;
+      }
     }
   }
 
@@ -428,8 +507,64 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
   return controller;
 }
 
+int vtkTCPNetworkAccessManager::AnalyzeHandshakeAndGetErrorCode(
+  const char* clientHS, const char* serverHS)
+{
+  vtksys::RegularExpression re(
+    "^paraview-([0-9]+\\.[0-9]+)\\.(connect_id\\.([0-9]+)\\.)?renderingbackend\\.([^\\.]+)$");
+  bool success = re.find(serverHS);
+  // Since this regex and the server handshake are from the same version
+  // of ParaView, if it doesn't match then something is very wrong.
+  if (!success)
+  {
+    vtkErrorMacro(
+      << "Server connect id did not match regular expression on server.  This shouldn't happen.");
+    return HANDSHAKE_UNKNOWN_ERROR;
+  }
+  std::string serverVersion = re.match(1);
+  std::string serverConnectId = re.match(3);
+  std::string serverBackend = re.match(4);
+
+  bool clientMatched = re.find(clientHS);
+  if (!clientMatched)
+  {
+    vtkErrorMacro(
+      << "Client Handshake didn't parse.  The client is likely a different version of ParaView.");
+    return HANDSHAKE_UNKNOWN_ERROR;
+  }
+  std::string clientVersion = re.match(1);
+  std::string clientConnectId = re.match(3);
+  std::string clientBackend = re.match(4);
+
+  if (clientVersion != serverVersion)
+  {
+    vtkErrorMacro(<< "Client and server are different ParaView versions. Client reports version: "
+                  << clientVersion << " but server is version " << serverVersion);
+    return HANDSHAKE_DIFFERENT_PV_VERSIONS;
+  }
+
+  if (clientConnectId != serverConnectId)
+  {
+    vtkErrorMacro(<< "Client and server connection ids do not match");
+    return HANDSHAKE_DIFFERENT_CONNECTION_IDS;
+  }
+
+  if (clientBackend != serverBackend)
+  {
+    vtkErrorMacro(<< "Client and server have different rendering backends. Client: \""
+                  << clientBackend << "\" Server: \"" << serverBackend << "\"");
+    return HANDSHAKE_DIFFERENT_RENDERING_BACKENDS;
+  }
+
+  // If this function was called, there was a difference but since we got here without detecting it
+  // we have no idea what it is.
+  vtkErrorMacro(
+    << "Unknown error in handshakes, client and server are likely different versions of ParaView.");
+  return HANDSHAKE_UNKNOWN_ERROR;
+}
+
 //----------------------------------------------------------------------------
-bool vtkTCPNetworkAccessManager::ParaViewHandshake(
+int vtkTCPNetworkAccessManager::ParaViewHandshake(
   vtkMultiProcessController* controller, bool server_side, const char* _handshake)
 {
   const std::string handshake = _handshake ? _handshake : "";
@@ -446,9 +581,13 @@ bool vtkTCPNetworkAccessManager::ParaViewHandshake(
       other_handshake = _other_handshake;
       delete[] _other_handshake;
     }
-    int accept = (handshake == other_handshake) ? 1 : 0;
-    controller->Send(&accept, 1, 1, 99990);
-    return (accept == 1);
+    int errorCode = HANDSHAKE_NO_ERROR;
+    if (handshake != other_handshake)
+    {
+      errorCode = this->AnalyzeHandshakeAndGetErrorCode(other_handshake.c_str(), handshake.c_str());
+    }
+    controller->Send(&errorCode, 1, 1, 99990);
+    return errorCode;
   }
   else
   {
@@ -457,9 +596,9 @@ bool vtkTCPNetworkAccessManager::ParaViewHandshake(
     {
       controller->Send(handshake.c_str(), size, 1, 99991);
     }
-    int accept;
-    controller->Receive(&accept, 1, 1, 99990);
-    return (accept == 1);
+    int errorCode;
+    controller->Receive(&errorCode, 1, 1, 99990);
+    return errorCode;
   }
 }
 

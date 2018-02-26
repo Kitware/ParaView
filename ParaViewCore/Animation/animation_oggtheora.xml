@@ -1,0 +1,58 @@
+<!-- Proxy definitions for OggTheora writer -->
+<ServerManagerConfiguration>
+  <ProxyGroup name="animation_writers">
+    <Proxy name="OggTheora" class="vtkOggTheoraWriter" processes="client" label="Ogg-Theora">
+      <Documentation>
+        Writer for saving ogv files.
+      </Documentation>
+
+      <IntVectorProperty name="Quality"
+        command="SetQuality"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Specify the compression quality. **0** is worst quality (smallest file size),
+          and **2** is best quality (largest file size).
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="0" value="0" info="worst quality, smaller file" />
+          <Entry text="1" value="1" />
+          <Entry text="2" value="2" info="best quality, larger file" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="Compression" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FrameRate"
+        command="SetRate"
+        number_of_elements="1"
+        default_values="15"
+        panel_visibility="never">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Specify the frame rate in frames-per-second.
+        </Documentation>
+        <!-- ideally, this property is not hidden and we remove the "FrameRate"
+             property on "SaveAnimation" proxy. However, the way the frame-window stuff is managed currently
+             makes this hard. We need to rework frame-windowing logic too.
+             -->
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseSubsampling"
+        command="SetSubsampling"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the video will be encoded using 4:2:0 subsampling for the color channels.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="ogv"
+          file_description="Ogg-Theora video files" />
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

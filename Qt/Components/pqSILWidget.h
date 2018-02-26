@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqSILWidget_h
 
 #include "pqComponentsModule.h"
+#include "pqTreeViewSelectionHelper.h"
+#include "vtkConfigure.h"
 #include <QList>
 #include <QPointer>
 #include <QTabWidget>
@@ -43,9 +45,23 @@ class pqProxySILModel;
 class QSortFilterProxyModel;
 
 /**
-* pqSILWidget is a QTabWidget that creates tabs with pqTreeView instances
-* showing the top-level categories from the SIL.
-*/
+ * @class pqSILWidget
+ * @brief a QWidget subclass to show legacy SIL (vtkGraph-based SIL)
+ *
+ * pqSILWidget is designed to show a legacy SIL (represented using vtkGraph, as
+ * against ones using vtkSubsetInclusionLattice or subclass).
+ *
+ * For top-level nodes in the SIL, it creates tabs for each and then shows
+ * subtrees for each in a separate pqTreeView under the tabs.
+ *
+ * @section pqSILWidgetWarning Legacy Warning
+ *
+ * While not deprecated, this class exists to support readers that use legacy
+ * representation for SIL which used a `vtkGraph` to represent the SIL. It is
+ * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
+ * represent the SIL. In that case, you should use
+ * `pqSubsetInclusionLatticeWidget` instead.
+ */
 class PQCOMPONENTS_EXPORT pqSILWidget : public QWidget
 {
   Q_OBJECT
@@ -57,7 +73,7 @@ public:
   * the property.
   */
   pqSILWidget(const QString& activeCategory, QWidget* parent = 0);
-  virtual ~pqSILWidget();
+  ~pqSILWidget() override;
 
   /**
   * Get/Set the SIL model. This is typically a pqSILModel instance.

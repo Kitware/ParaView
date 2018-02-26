@@ -58,29 +58,63 @@ public:
   vtkGetVector6Macro(BoundingBox, double);
   //@}
 
+  enum RefinementModes
+  {
+    USE_RESOLUTION,
+    USE_CELL_SIZE
+  };
+
+  /**
+   * Get/Set how the output refinement is to be determined.
+   */
+  vtkSetClampMacro(RefinementMode, int, USE_RESOLUTION, USE_CELL_SIZE);
+  vtkGetMacro(RefinementMode, int);
+
   //@{
   /**
-   * Specify the resolution of the plane.
+   * Specify the resolution of the plane. Used only when RefinementMode is set to
+   * USE_RESOLUTION.
    */
   vtkSetClampMacro(Resolution, int, 1, VTK_INT_MAX);
   vtkGetMacro(Resolution, int);
   //@}
 
+  //@{
+  /**
+   * Specify the cell-size of the plane. Used only when RefinementMode is set to
+   * USE_CELL_SIZE.
+   */
+  vtkSetMacro(CellSize, double);
+  vtkGetMacro(CellSize, double);
+  //@}
+
+  //@{
+  /**
+   * Specify the padding to use along each of the directions. This is used to
+   * inflate the bounds by a fixed factor in all directions before generating
+   * the plane.
+   */
+  vtkSetClampMacro(Padding, double, 0, VTK_DOUBLE_MAX);
+  vtkGetMacro(Padding, double);
+  //@}
+
 protected:
   vtkBoundedPlaneSource();
-  ~vtkBoundedPlaneSource();
+  ~vtkBoundedPlaneSource() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   double Center[3];
   double Normal[3];
   double BoundingBox[6];
+  int RefinementMode;
   int Resolution;
+  double CellSize;
+  double Padding;
 
 private:
-  vtkBoundedPlaneSource(const vtkBoundedPlaneSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkBoundedPlaneSource&) VTK_DELETE_FUNCTION;
+  vtkBoundedPlaneSource(const vtkBoundedPlaneSource&) = delete;
+  void operator=(const vtkBoundedPlaneSource&) = delete;
 };
 
 #endif

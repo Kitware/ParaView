@@ -273,16 +273,22 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   {
     case 7:
       numElts *= m_NiftiImage->nw;
+      VTK_FALLTHROUGH;
     case 6:
       numElts *= m_NiftiImage->nv;
+      VTK_FALLTHROUGH;
     case 5:
       numElts *= m_NiftiImage->nu;
+      VTK_FALLTHROUGH;
     case 4:
       numElts *= m_NiftiImage->nt;
+      VTK_FALLTHROUGH;
     case 3:
       numElts *= m_NiftiImage->nz;
+      VTK_FALLTHROUGH;
     case 2:
       numElts *= m_NiftiImage->ny;
+      VTK_FALLTHROUGH;
     case 1:
       numElts *= m_NiftiImage->nx;
       break;
@@ -476,7 +482,7 @@ void vtkAnalyzeReaderUpdate2(vtkAnalyzeReader* self, vtkImageData* vtkNotUsed(da
   // are not in gzip fromat.
   // This greatly simplifies the following code, and gzFile types are used
   // everywhere.
-  // In addition, it has the added benifit of reading gzip compressed image
+  // In addition, it has the added benefit of reading gzip compressed image
   // files that do not have a .gz ending.
   gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
   if (file_p == NULL)
@@ -572,7 +578,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
   // are not in gzip fromat.
   // This greatly simplifies the following code, and gzFile types are used
   // everywhere.
-  // In addition, it has the added benifit of reading gzip compressed image
+  // In addition, it has the added benefit of reading gzip compressed image
   // files that do not have a .gz ending.
   gzFile file_p = ::gzopen(ImageFileName.c_str(), "rb");
   if (file_p == NULL)

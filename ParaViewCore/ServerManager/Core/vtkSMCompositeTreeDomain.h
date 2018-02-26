@@ -95,7 +95,7 @@ public:
    * vtkSMInputProperty. This will obtain the composite data information for the
    * input source and then determine the valid range for the flat-index.
    */
-  virtual void Update(vtkSMProperty* input) VTK_OVERRIDE;
+  void Update(vtkSMProperty* input) VTK_OVERRIDE;
 
   //@{
   /**
@@ -123,7 +123,7 @@ public:
    * Is the (unchecked) value of the property in the domain? Overwritten by
    * sub-classes.
    */
-  virtual int IsInDomain(vtkSMProperty* vtkNotUsed(property)) VTK_OVERRIDE { return 1; }
+  int IsInDomain(vtkSMProperty* vtkNotUsed(property)) VTK_OVERRIDE { return 1; }
 
   //@{
   /**
@@ -171,13 +171,13 @@ public:
    * property.
    * Returns 1 if the domain updated the property.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMCompositeTreeDomain();
-  ~vtkSMCompositeTreeDomain();
+  ~vtkSMCompositeTreeDomain() override;
 
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Internal implementation called by Update(vtkSMProperty*);
@@ -198,8 +198,8 @@ protected:
   int SourcePort;
 
 private:
-  vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCompositeTreeDomain&) VTK_DELETE_FUNCTION;
+  vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&) = delete;
+  void operator=(const vtkSMCompositeTreeDomain&) = delete;
 };
 
 #endif

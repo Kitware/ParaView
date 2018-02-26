@@ -43,18 +43,18 @@ public:
 
 protected:
   vtkPVTextSource();
-  ~vtkPVTextSource();
+  ~vtkPVTextSource() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
   char* Text;
 
 private:
-  vtkPVTextSource(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTextSource&) VTK_DELETE_FUNCTION;
+  vtkPVTextSource(const vtkPVTextSource&) = delete;
+  void operator=(const vtkPVTextSource&) = delete;
 };
 
 #endif

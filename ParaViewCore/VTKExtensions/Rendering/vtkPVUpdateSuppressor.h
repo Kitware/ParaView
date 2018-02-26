@@ -48,7 +48,7 @@ public:
   //@{
   /**
    * Get/Set if the update suppressor is enabled. If the update suppressor
-   * is not enabled, it won't supress any updates. Enabled by default.
+   * is not enabled, it won't suppress any updates. Enabled by default.
    */
   void SetEnabled(bool);
   vtkGetMacro(Enabled, bool);
@@ -64,7 +64,7 @@ public:
 
 protected:
   vtkPVUpdateSuppressor();
-  ~vtkPVUpdateSuppressor();
+  ~vtkPVUpdateSuppressor() override;
 
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
@@ -76,11 +76,11 @@ protected:
   bool Enabled;
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
 private:
-  vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVUpdateSuppressor&) VTK_DELETE_FUNCTION;
+  vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&) = delete;
+  void operator=(const vtkPVUpdateSuppressor&) = delete;
 };
 
 #endif

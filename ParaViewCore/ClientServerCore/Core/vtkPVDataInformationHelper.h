@@ -48,7 +48,7 @@ public:
 
 protected:
   vtkPVDataInformationHelper();
-  ~vtkPVDataInformationHelper();
+  ~vtkPVDataInformationHelper() override;
 
   vtkDataObject* Data; // not reference counted
 
@@ -63,8 +63,8 @@ protected:
   virtual vtkTypeInt64 GetNumberOfRows() = 0;
 
 private:
-  vtkPVDataInformationHelper(const vtkPVDataInformationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataInformationHelper&) VTK_DELETE_FUNCTION;
+  vtkPVDataInformationHelper(const vtkPVDataInformationHelper&) = delete;
+  void operator=(const vtkPVDataInformationHelper&) = delete;
 };
 
 #endif

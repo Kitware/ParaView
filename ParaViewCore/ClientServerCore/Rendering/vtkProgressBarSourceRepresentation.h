@@ -48,12 +48,12 @@ public:
   vtkGetObjectMacro(ProgressBarWidgetRepresentation, vtk3DWidgetRepresentation);
   //@}
 
-  virtual void MarkModified() VTK_OVERRIDE;
+  void MarkModified() VTK_OVERRIDE;
 
   /**
    * Set the visibility.
    */
-  virtual void SetVisibility(bool) VTK_OVERRIDE;
+  void SetVisibility(bool) VTK_OVERRIDE;
 
   /**
    * Set the interactivity.
@@ -72,45 +72,44 @@ public:
   // BTX
 protected:
   vtkProgressBarSourceRepresentation();
-  ~vtkProgressBarSourceRepresentation();
+  ~vtkProgressBarSourceRepresentation() override;
 
   /**
    * Fill input port information.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
-  virtual bool IsCached(double cache_key) VTK_OVERRIDE;
+  bool IsCached(double cache_key) VTK_OVERRIDE;
 
   vtkPVCacheKeeper* CacheKeeper;
   vtkSmartPointer<vtkPolyData> DummyPolyData;
   vtk3DWidgetRepresentation* ProgressBarWidgetRepresentation;
 
 private:
-  vtkProgressBarSourceRepresentation(const vtkProgressBarSourceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkProgressBarSourceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkProgressBarSourceRepresentation(const vtkProgressBarSourceRepresentation&) = delete;
+  void operator=(const vtkProgressBarSourceRepresentation&) = delete;
   // ETX
 };
 

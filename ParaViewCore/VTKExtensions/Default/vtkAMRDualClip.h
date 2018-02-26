@@ -18,7 +18,7 @@
  *
  * This filter clips an AMR volume but does not copy attributes yet.
  * This filter has two important features.  First is that the level
- * transitions are handled correctly, and second is that interal
+ * transitions are handled correctly, and second is that internal
  * cells are decimated.  I use a variation of degenerate points/cells
  * used for level transitions.
 */
@@ -61,7 +61,7 @@ public:
   //@{
   /**
    * These are to evaluate performances. You can turn off degenerate cells
-   * and multiprocess comunication to see how they affect speed of execution.
+   * and multiprocess communication to see how they affect speed of execution.
    * Degenerate cells is the meshing between levels in the grid.
    */
   vtkSetMacro(EnableInternalDecimation, int);
@@ -90,7 +90,7 @@ public:
 
 protected:
   vtkAMRDualClip();
-  ~vtkAMRDualClip();
+  ~vtkAMRDualClip() override;
 
   double IsoValue;
 
@@ -103,8 +103,7 @@ protected:
   // Needed for copying cell data to point data.
   vtkUnstructuredGrid* Mesh;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   void InitializeCopyAttributes(vtkNonOverlappingAMR* hbdsInput, vtkDataSet* mesh);
 
@@ -114,8 +113,8 @@ protected:
    */
   vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input, const char* arrayNameToProcess);
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   void ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block);
 
@@ -152,8 +151,8 @@ protected:
   vtkAMRDualClipLocator* BlockLocator;
 
 private:
-  vtkAMRDualClip(const vtkAMRDualClip&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRDualClip&) VTK_DELETE_FUNCTION;
+  vtkAMRDualClip(const vtkAMRDualClip&) = delete;
+  void operator=(const vtkAMRDualClip&) = delete;
 };
 
 #endif

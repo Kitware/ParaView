@@ -96,30 +96,14 @@ bool MainWindow::compareView(
   const QString& referenceImage, double threshold, ostream& output, const QString& tempDirectory)
 {
   pqRenderView* renModule = this->RenderView;
-
   if (!renModule)
   {
     output << "ERROR: Could not locate the render module." << endl;
     return false;
   }
 
-  pqQVTKWidget* const widget = qobject_cast<pqQVTKWidget*>(renModule->widget());
-  if (!widget)
-  {
-    output << "ERROR: Not a pqQVTKWidget." << endl;
-    return false;
-  }
-
-  vtkRenderWindow* const render_window = widget->GetRenderWindow();
-
-  if (!render_window)
-  {
-    output << "ERROR: Could not locate the Render Window." << endl;
-    return false;
-  }
-
-  bool ret = pqCoreTestUtility::CompareImage(
-    render_window, referenceImage, threshold, output, tempDirectory);
+  bool ret = pqCoreTestUtility::CompareView(
+    renModule, referenceImage, threshold, tempDirectory, QSize(200, 150));
   renModule->render();
   return ret;
 }

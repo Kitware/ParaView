@@ -35,6 +35,9 @@
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
+
+#include "vtkSMMaterialLibraryProxy.h"
 
 #include <cassert>
 #include <string>
@@ -146,12 +149,26 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
     }
   }
 
+  // always copy over ospray material name
+  vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  {
+    const char* pname = iter->GetKey();
+    vtkSMProperty* dest = repr->GetProperty(pname);
+    vtkSMProperty* source = iter->GetProperty();
+    if (dest && source && strcmp("OSPRayMaterial", pname) == 0)
+    {
+      dest->Copy(source);
+    }
+  }
+  iter->Delete();
+
   if (!vtkSMParaViewPipelineControllerWithRendering::GetInheritRepresentationProperties())
   {
     return;
   }
   // copy properties from inputRepr to repr is they weren't modified.
-  vtkSMPropertyIterator* iter = inputRepr->NewPropertyIterator();
+  iter = inputRepr->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
     const char* pname = iter->GetKey();
@@ -327,6 +344,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
 vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {
+  vtkTimerLogScope scopeTimer("ParaViewPipelineControllerWithRendering::Show");
   if (producer == NULL || static_cast<int>(producer->GetNumberOfOutputPorts()) <= outputPort)
   {
     vtkErrorMacro("Invalid producer (" << producer << ") or outputPort (" << outputPort << ")");
@@ -361,6 +379,8 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // Since no repr exists, create a new one if possible.
   if (vtkSMRepresentationProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
   {
+    vtkTimerLogScope scopeTimer2(
+      "ParaViewPipelineControllerWithRendering::Show::CreatingRepresentation");
     SM_SCOPED_TRACE(Show)
       .arg("producer", producer)
       .arg("port", outputPort)
@@ -624,46 +644,13 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
   }
 
   // Update using view time, or timekeeper time.
+  vtkTimerLogScope scopeTimer(
+    "ParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay");
   double time = view
     ? vtkSMPropertyHelper(view, "ViewTime").GetAsDouble()
     : vtkSMPropertyHelper(this->FindTimeKeeper(producer->GetSession()), "Time").GetAsDouble();
   producer->UpdatePipeline(time);
 }
-
-#if !defined(VTK_LEGACY_REMOVE)
-//----------------------------------------------------------------------------
-template <class T>
-bool vtkWriteImage(T* viewOrLayout, const char* filename, int magnification, int quality)
-{
-  if (!viewOrLayout)
-  {
-    return false;
-  }
-  vtkSmartPointer<vtkImageData> img;
-  img.TakeReference(viewOrLayout->CaptureWindow(magnification));
-  if (img && vtkProcessModule::GetProcessModule()->GetPartitionId() == 0)
-  {
-    return vtkSMUtilities::SaveImage(img.GetPointer(), filename, quality) == vtkErrorCode::NoError;
-  }
-  return false;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
-  vtkSMViewProxy* view, const char* filename, int magnification, int quality)
-{
-  VTK_LEGACY_BODY(vtkSMParaViewPipelineControllerWithRendering::WriteImage, "ParaView 5.4");
-  return vtkWriteImage<vtkSMViewProxy>(view, filename, magnification, quality);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineControllerWithRendering::WriteImage(
-  vtkSMViewLayoutProxy* layout, const char* filename, int magnification, int quality)
-{
-  VTK_LEGACY_BODY(vtkSMParaViewPipelineControllerWithRendering::WriteImage, "ParaView 5.4");
-  return vtkWriteImage<vtkSMViewLayoutProxy>(layout, filename, magnification, quality);
-}
-#endif // !defined(VTK_LEGACY_REMOVE)
 
 //----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
@@ -732,4 +719,12 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterLayoutProxy(
 void vtkSMParaViewPipelineControllerWithRendering::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::DoMaterialSetup(vtkSMProxy* prox)
+{
+  vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(prox);
+  mlp->LoadDefaultMaterials();
+  mlp->Synchronize();
 }

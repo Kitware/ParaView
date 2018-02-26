@@ -65,19 +65,18 @@ public:
 
 protected:
   vtkSurfaceVectors();
-  ~vtkSurfaceVectors();
+  ~vtkSurfaceVectors() override;
 
   // Usual data generation method
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestUpdateExtent(
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestUpdateExtent(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int ConstraintMode;
 
 private:
-  vtkSurfaceVectors(const vtkSurfaceVectors&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSurfaceVectors&) VTK_DELETE_FUNCTION;
+  vtkSurfaceVectors(const vtkSurfaceVectors&) = delete;
+  void operator=(const vtkSurfaceVectors&) = delete;
 };
 
 #endif

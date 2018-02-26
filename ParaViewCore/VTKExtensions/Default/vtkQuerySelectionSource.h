@@ -84,12 +84,12 @@ public:
 
 protected:
   vtkQuerySelectionSource();
-  ~vtkQuerySelectionSource();
+  ~vtkQuerySelectionSource() override;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int FieldType;
@@ -102,8 +102,8 @@ protected:
   int ProcessID;
 
 private:
-  vtkQuerySelectionSource(const vtkQuerySelectionSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkQuerySelectionSource&) VTK_DELETE_FUNCTION;
+  vtkQuerySelectionSource(const vtkQuerySelectionSource&) = delete;
+  void operator=(const vtkQuerySelectionSource&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -107,7 +107,7 @@ public:
 
 protected:
   vtkTableExtentTranslator();
-  ~vtkTableExtentTranslator();
+  ~vtkTableExtentTranslator() override;
 
   // Store the extent table in a single array.  Every 6 values form an extent.
   int* ExtentTable;
@@ -118,8 +118,8 @@ protected:
   int* PieceAvailable;
 
 private:
-  vtkTableExtentTranslator(const vtkTableExtentTranslator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTableExtentTranslator&) VTK_DELETE_FUNCTION;
+  vtkTableExtentTranslator(const vtkTableExtentTranslator&) = delete;
+  void operator=(const vtkTableExtentTranslator&) = delete;
 };
 
 #endif

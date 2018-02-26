@@ -95,11 +95,11 @@ public:
 
 protected:
   vtkTileDisplayHelper();
-  ~vtkTileDisplayHelper();
+  ~vtkTileDisplayHelper() override;
 
 private:
-  vtkTileDisplayHelper(const vtkTileDisplayHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTileDisplayHelper&) VTK_DELETE_FUNCTION;
+  vtkTileDisplayHelper(const vtkTileDisplayHelper&) = delete;
+  void operator=(const vtkTileDisplayHelper&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

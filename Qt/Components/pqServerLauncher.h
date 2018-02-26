@@ -40,6 +40,7 @@ class pqServer;
 class pqServerConfiguration;
 class QDialog;
 class QProcessEnvironment;
+class vtkObject;
 
 /**
 * pqServerLauncher manages launching of server process using the details
@@ -60,7 +61,7 @@ class PQCOMPONENTS_EXPORT pqServerLauncher : public QObject
 
 public:
   pqServerLauncher(const pqServerConfiguration& configuration, QObject* parent = 0);
-  virtual ~pqServerLauncher();
+  ~pqServerLauncher() override;
 
   /**
   * Custom applications may want to extend the pqServerLauncher to customize
@@ -160,6 +161,7 @@ private:
   class pqInternals;
   pqInternals* Internals;
   static const QMetaObject* DefaultServerLauncherType;
+  bool WrongConnectId;
 };
 
 #endif

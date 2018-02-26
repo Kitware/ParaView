@@ -19,6 +19,7 @@
 #include "vtkErrorCode.h"
 #include "vtkGenericRenderWindowInteractor.h"
 #include "vtkImageData.h"
+#include "vtkImageTransparencyFilter.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -102,7 +103,7 @@ public:
 
 protected:
   WindowToImageFilter() {}
-  ~WindowToImageFilter() {}
+  ~WindowToImageFilter() override {}
 
   void Render() VTK_OVERRIDE
   {
@@ -115,8 +116,8 @@ protected:
   vtkWeakPointer<vtkSMViewProxy> Parent;
 
 private:
-  WindowToImageFilter(const WindowToImageFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const WindowToImageFilter&) VTK_DELETE_FUNCTION;
+  WindowToImageFilter(const WindowToImageFilter&) = delete;
+  void operator=(const WindowToImageFilter&) = delete;
 };
 vtkStandardNewMacro(WindowToImageFilter);
 };
@@ -461,12 +462,12 @@ public:
   const double Blue;
 
 private:
-  vtkRendererSaveInfo(const vtkRendererSaveInfo&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRendererSaveInfo&) VTK_DELETE_FUNCTION;
+  vtkRendererSaveInfo(const vtkRendererSaveInfo&) = delete;
+  void operator=(const vtkRendererSaveInfo&) = delete;
 };
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
+vtkImageData* vtkSMViewProxy::CaptureWindow(int magX, int magY)
 {
   vtkRenderWindow* window = this->GetRenderWindow();
 
@@ -492,99 +493,29 @@ vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
     }
 
     vtkRendererSaveInfo* info = this->PrepareRendererBackground(renderer, 255, 255, 255, true);
-    vtkImageData* captureWhite = this->CaptureWindowSingle(magnification);
+    vtkImageData* captureWhite = this->CaptureWindowSingle(magX, magY);
 
     this->PrepareRendererBackground(renderer, 0, 0, 0, false);
-    vtkImageData* captureBlack = this->CaptureWindowSingle(magnification);
+    vtkImageData* captureBlack = this->CaptureWindowSingle(magX, magY);
+
+    vtkNew<vtkImageTransparencyFilter> transparencyFilter;
+    transparencyFilter->SetInputData(captureWhite);
+    transparencyFilter->AddInputData(captureBlack);
+    transparencyFilter->Update();
 
     vtkImageData* capture = vtkImageData::New();
-    capture->CopyStructure(captureWhite);
-    capture->AllocateScalars(VTK_UNSIGNED_CHAR, 4);
-
-    const unsigned char* white;
-    const unsigned char* black;
-    unsigned char* out;
-    vtkIdType whiteStep[3];
-    vtkIdType blackStep[3];
-    vtkIdType outStep[3];
-
-    white = static_cast<const unsigned char*>(
-      captureWhite->GetScalarPointerForExtent(captureWhite->GetExtent()));
-    black = static_cast<const unsigned char*>(
-      captureBlack->GetScalarPointerForExtent(captureBlack->GetExtent()));
-    out = static_cast<unsigned char*>(capture->GetScalarPointerForExtent(capture->GetExtent()));
-
-    captureWhite->GetIncrements(whiteStep[0], whiteStep[1], whiteStep[2]);
-    captureBlack->GetIncrements(blackStep[0], blackStep[1], blackStep[2]);
-    capture->GetIncrements(outStep[0], outStep[1], outStep[2]);
-
-    int* extent = capture->GetExtent();
-
-    for (int i = extent[4]; i <= extent[5]; ++i)
-    {
-      const unsigned char* whiteRow = white;
-      const unsigned char* blackRow = black;
-      unsigned char* outRow = out;
-
-      for (int j = extent[2]; j <= extent[3]; ++j)
-      {
-        const unsigned char* whitePx = whiteRow;
-        const unsigned char* blackPx = blackRow;
-        unsigned char* outPx = outRow;
-
-        for (int k = extent[0]; k <= extent[1]; ++k)
-        {
-          if (whitePx[0] == blackPx[0] && whitePx[1] == blackPx[1] && whitePx[2] == blackPx[2])
-          {
-            outPx[0] = whitePx[0];
-            outPx[1] = whitePx[1];
-            outPx[2] = whitePx[2];
-            outPx[3] = 255;
-          }
-          else
-          {
-            // Some kind of translucency; use values from the black capture.
-            // The opacity is the derived from the V difference of the HSV
-            // colors.
-            double whiteHSV[3];
-            double blackHSV[3];
-
-            vtkMath::RGBToHSV(whitePx[0] / 255., whitePx[1] / 255., whitePx[2] / 255., whiteHSV + 0,
-              whiteHSV + 1, whiteHSV + 2);
-            vtkMath::RGBToHSV(blackPx[0] / 255., blackPx[1] / 255., blackPx[2] / 255., blackHSV + 0,
-              blackHSV + 1, blackHSV + 2);
-            double alpha = 1. - (whiteHSV[2] - blackHSV[2]);
-
-            outPx[0] = static_cast<unsigned char>(blackPx[0] / alpha);
-            outPx[1] = static_cast<unsigned char>(blackPx[1] / alpha);
-            outPx[2] = static_cast<unsigned char>(blackPx[2] / alpha);
-            outPx[3] = static_cast<unsigned char>(255 * alpha);
-          }
-
-          whitePx += whiteStep[0];
-          blackPx += blackStep[0];
-          outPx += outStep[0];
-        }
-
-        whiteRow += whiteStep[1];
-        blackRow += blackStep[1];
-        outRow += outStep[1];
-      }
-
-      white += whiteStep[2];
-      black += blackStep[2];
-      out += outStep[2];
-    }
+    capture->ShallowCopy(transparencyFilter->GetOutput());
 
     this->RestoreRendererBackground(renderer, info);
 
     captureWhite->Delete();
     captureBlack->Delete();
+
     return capture;
   }
 
   // Fall back to using no transparency.
-  return this->CaptureWindowSingle(magnification);
+  return this->CaptureWindowSingle(magX, magY);
 }
 
 //----------------------------------------------------------------------------
@@ -616,7 +547,7 @@ void vtkSMViewProxy::RestoreRendererBackground(vtkRenderer* renderer, vtkRendere
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
+vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magX, int magY)
 {
   if (this->ObjectsCreated)
   {
@@ -626,7 +557,7 @@ vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
     this->ExecuteStream(stream);
   }
 
-  vtkImageData* capture = this->CaptureWindowInternal(magnification);
+  vtkImageData* capture = this->CaptureWindowInternal(magX, magY);
 
   if (this->ObjectsCreated)
   {
@@ -644,17 +575,17 @@ vtkImageData* vtkSMViewProxy::CaptureWindowSingle(int magnification)
     // Update image extents based on ViewPosition
     int extents[6];
     capture->GetExtent(extents);
-    for (int cc = 0; cc < 4; cc++)
-    {
-      extents[cc] += position[cc / 2] * magnification;
-    }
+    extents[0] += position[0] * magX;
+    extents[1] += position[0] * magX;
+    extents[2] += position[1] * magY;
+    extents[3] += position[1] * magY;
     capture->SetExtent(extents);
   }
   return capture;
 }
 
 //-----------------------------------------------------------------------------
-vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magnification)
+vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magX, int magY)
 {
   vtkRenderWindow* renWin = this->GetRenderWindow();
   if (!renWin)
@@ -672,7 +603,7 @@ vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magnification)
   vtkNew<vtkSMViewProxyNS::WindowToImageFilter> w2i;
   w2i->SetInput(renWin);
   w2i->SetParent(this);
-  w2i->SetMagnification(magnification);
+  w2i->SetScale(magX, magY);
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff(); // WindowToImageFilter can re-render as needed too,
                             // we just don't require the first render.
@@ -692,13 +623,19 @@ vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magnification)
 //-----------------------------------------------------------------------------
 int vtkSMViewProxy::WriteImage(const char* filename, const char* writerName, int magnification)
 {
+  return this->WriteImage(filename, writerName, magnification, magnification);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMViewProxy::WriteImage(const char* filename, const char* writerName, int magX, int magY)
+{
   if (!filename || !writerName)
   {
     return vtkErrorCode::UnknownError;
   }
 
   vtkSmartPointer<vtkImageData> shot;
-  shot.TakeReference(this->CaptureWindow(magnification));
+  shot.TakeReference(this->CaptureWindow(magX, magY));
 
   if (vtkProcessModule::GetProcessModule()->GetOptions()->GetSymmetricMPIMode())
   {
@@ -744,6 +681,15 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
     return false;
   }
 
+  vtkPVXMLElement* oneRepr =
+    this->GetHints()->FindNestedElementByName("ShowOneRepresentationAtATime");
+  const char* reprType = oneRepr->GetAttribute("type");
+
+  if (reprType && strcmp(repr->GetXMLName(), reprType))
+  {
+    return false;
+  }
+
   vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
 
   bool modified = false;
@@ -753,7 +699,8 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
     vtkSMRepresentationProxy* arepr = vtkSMRepresentationProxy::SafeDownCast(helper.GetAsProxy(cc));
     if (arepr && arepr != repr)
     {
-      if (vtkSMPropertyHelper(arepr, "Visibility", /*quiet*/ true).GetAsInt() == 1)
+      if (vtkSMPropertyHelper(arepr, "Visibility", /*quiet*/ true).GetAsInt() == 1 &&
+        (!reprType || (reprType && !strcmp(arepr->GetXMLName(), reprType))))
       {
         controller->Hide(arepr, this);
         modified = true;

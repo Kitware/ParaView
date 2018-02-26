@@ -37,7 +37,7 @@ public:
 
 protected:
   vtkSIUnstructuredGridVolumeRepresentationProxy();
-  ~vtkSIUnstructuredGridVolumeRepresentationProxy();
+  ~vtkSIUnstructuredGridVolumeRepresentationProxy() override;
 
   /**
    * Register the mappers
@@ -46,8 +46,8 @@ protected:
 
 private:
   vtkSIUnstructuredGridVolumeRepresentationProxy(
-    const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIUnstructuredGridVolumeRepresentationProxy&) VTK_DELETE_FUNCTION;
+    const vtkSIUnstructuredGridVolumeRepresentationProxy&) = delete;
+  void operator=(const vtkSIUnstructuredGridVolumeRepresentationProxy&) = delete;
 };
 
 #endif

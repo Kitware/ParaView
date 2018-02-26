@@ -41,6 +41,31 @@
 //*****************************************************************************
 class vtkPVDataDeliveryManager::vtkInternals
 {
+  friend class vtkItem;
+  std::map<int, vtkSmartPointer<vtkDataObject> > EmptyDataObjectTypes;
+
+  // This helps us avoid creating new instances of various data object types to use as
+  // empty datasets. Instead, we build a map and keep reusing objects.
+  vtkDataObject* GetEmptyDataObject(vtkDataObject* ref)
+  {
+    if (ref)
+    {
+      auto iter = this->EmptyDataObjectTypes.find(ref->GetDataObjectType());
+      if (iter != this->EmptyDataObjectTypes.end())
+      {
+        return iter->second;
+      }
+      else
+      {
+        vtkSmartPointer<vtkDataObject> clone;
+        clone.TakeReference(ref->NewInstance());
+        this->EmptyDataObjectTypes[ref->GetDataObjectType()] = clone;
+        return clone;
+      }
+    }
+    return nullptr;
+  }
+
 public:
   class vtkPriorityQueueItem
   {
@@ -119,10 +144,23 @@ public:
     {
     }
 
-    void SetDataObject(vtkDataObject* data)
+    void SetDataObject(vtkDataObject* data, vtkInternals* helper)
     {
       this->DataObject = data;
+      this->DeliveredDataObject = nullptr;
+      this->RedistributedDataObject = nullptr;
       this->ActualMemorySize = data ? data->GetActualMemorySize() : 0;
+      // This method gets called when data is entirely changed. That means that any
+      // data we may have delivered or redistributed would also be obsolete.
+      // Hence we reset the `Producer` as well. This avoids #2160.
+
+      // explanation for using a clone: typically, the Producer is connected by the
+      // representation to a rendering pipeline e.g. the mapper. As that could be the
+      // case, we need to ensure the producer's input is cleaned too. Setting simply nullptr
+      // could confuse the mapper and hence we setup a data object of the same type as the data.
+      // we could simply set the data too, but that can lead to other confusion as the mapper should
+      // never directly see the representation's data.
+      this->Producer->SetOutput(helper->GetEmptyDataObject(data));
 
       vtkTimeStamp ts;
       ts.Modified();
@@ -379,9 +417,13 @@ void vtkPVDataDeliveryManager::SetPiece(vtkPVDataRepresentation* repr, vtkDataOb
     {
       data_time = data->GetMTime();
     }
+    if (repr && repr->GetPipelineDataTime() > data_time)
+    {
+      data_time = repr->GetPipelineDataTime();
+    }
     if (data_time > item->GetTimeStamp() || item->GetDataObject() != data)
     {
-      item->SetDataObject(data);
+      item->SetDataObject(data, this->Internals);
     }
     if (trueSize > 0)
     {
@@ -415,7 +457,7 @@ void vtkPVDataDeliveryManager::SetPiece(
   vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res, port, true);
   if (item)
   {
-    item->SetDataObject(data);
+    item->SetDataObject(data, this->Internals);
   }
   else
   {
@@ -549,14 +591,8 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       dataMover->SetSkipDataServerGatherToZero(item->GatherBeforeDeliveringToClient == false);
     }
     dataMover->SetInputData(data);
-
-    if (dataMover->GetOutputGeneratedOnProcess())
-    {
-      // release old memory (not necessarily, but try).
-      item->SetDeliveredDataObject(NULL);
-    }
     dataMover->Update();
-    if (item->GetDeliveredDataObject() == NULL)
+    if (dataMover->GetOutputGeneratedOnProcess())
     {
       item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
     }
@@ -597,7 +633,6 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
     }
     cutsGenerator->GenerateKdTree();
     this->KdTree = cutsGenerator->GetKdTree();
-
     vtkTimerLog::MarkEndEvent("Regenerate Kd-Tree");
   }
 

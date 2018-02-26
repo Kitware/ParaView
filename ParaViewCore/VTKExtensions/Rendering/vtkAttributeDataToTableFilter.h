@@ -87,23 +87,22 @@ public:
 
 protected:
   vtkAttributeDataToTableFilter();
-  ~vtkAttributeDataToTableFilter();
+  ~vtkAttributeDataToTableFilter() override;
 
   // Overridden to indicate to the executive that we accept non-composite
   // datasets. We let the executive manage the looping over the composite
   // dataset leaves.
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Perform the data processing
    */
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Create a default executive.
    */
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * Internal method to return the chosen field from the input. May return 0 is
@@ -125,8 +124,8 @@ protected:
   bool GenerateCellConnectivity;
 
 private:
-  vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAttributeDataToTableFilter&) VTK_DELETE_FUNCTION;
+  vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&) = delete;
+  void operator=(const vtkAttributeDataToTableFilter&) = delete;
 };
 
 #endif

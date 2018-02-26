@@ -45,21 +45,22 @@ class pqAbstractItemSelectionModel : public QAbstractItemModel
 
 protected:
   pqAbstractItemSelectionModel(QObject* parent_ = NULL);
-  virtual ~pqAbstractItemSelectionModel();
+  ~pqAbstractItemSelectionModel() override;
 
   /**
   * @{
   * QAbstractItemModel implementation
   */
-  int rowCount(const QModelIndex& parent_ = QModelIndex()) const;
-  int columnCount(const QModelIndex& parent_ = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent_ = QModelIndex()) const override;
+  int columnCount(const QModelIndex& parent_ = QModelIndex()) const override;
 
-  QModelIndex index(int row, int column, const QModelIndex& parent_ = QModelIndex()) const;
-  QModelIndex parent(const QModelIndex& index_) const;
-  QVariant data(const QModelIndex& index_, int role = Qt::DisplayRole) const;
-  bool setData(const QModelIndex& index_, const QVariant& value, int role);
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-  Qt::ItemFlags flags(const QModelIndex& index_) const;
+  QModelIndex index(int row, int column, const QModelIndex& parent_ = QModelIndex()) const override;
+  QModelIndex parent(const QModelIndex& index_) const override;
+  QVariant data(const QModelIndex& index_, int role = Qt::DisplayRole) const override;
+  bool setData(const QModelIndex& index_, const QVariant& value, int role) override;
+  QVariant headerData(
+    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  Qt::ItemFlags flags(const QModelIndex& index_) const override;
   /**
   * @}
   */

@@ -94,7 +94,7 @@ public:
       SLOT(sendMousePointerLocationToOtherClients()));
     QObject::connect(&this->CollaborativeTimer, SIGNAL(timeout()), this->Owner,
       SLOT(sendChartViewBoundsToOtherClients()));
-    this->CollaborativeTimer.start();
+    // we delay starting the timer till we have an active collaboration session.
 
     this->ProxyManager = vtkSMProxyManager::GetProxyManager();
     this->ProxyManagerObserverTag =
@@ -116,6 +116,7 @@ public:
   {
     this->ActiveCollaborationManager = NULL;
     this->AciveSession = NULL;
+    this->CollaborativeTimer.stop();
     if (!this->ProxyManager)
     {
       return; // No more proxy manager
@@ -126,6 +127,7 @@ public:
       this->ActiveCollaborationManager = this->AciveSession->GetCollaborationManager();
       this->ActiveCollaborationManager->UpdateUserInformations();
       this->LastMousePointerPosition.set_client_id(this->ActiveCollaborationManager->GetUserId());
+      this->CollaborativeTimer.start();
     }
     this->Owner->updateEnabledState();
   }
@@ -434,6 +436,25 @@ void pqCollaborationManager::enableMousePointerSharing(bool enable)
 {
   this->Internals->BroadcastMouseLocation = enable;
 }
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::disableFurtherConnections(bool disable)
+{
+  if (this->Internals->ActiveCollaborationManager)
+  {
+    this->Internals->ActiveCollaborationManager->DisableFurtherConnections(disable);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCollaborationManager::setConnectID(int connectID)
+{
+  if (this->Internals->ActiveCollaborationManager)
+  {
+    this->Internals->ActiveCollaborationManager->SetConnectID(connectID);
+  }
+}
+
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::onChartViewChange(vtkTypeUInt32 gid, double* bounds)
 {

@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqServerLauncher.h"
+#include "ui_pqConnectIdDialog.h"
 #include "ui_pqServerLauncherDialog.h"
 
 #include "pqApplicationCore.h"
@@ -40,7 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
+#include "vtkCommand.h"
 #include "vtkMath.h"
+#include "vtkNetworkAccessManager.h"
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
@@ -117,7 +120,7 @@ public:
     , ToSave(false)
   {
   }
-  virtual ~pqWidget() {}
+  ~pqWidget() override {}
 
   virtual QVariant get() const
   {
@@ -140,13 +143,13 @@ public:
   {
   }
 
-  virtual QVariant get() const
+  QVariant get() const override
   {
     QComboBox* combobox = qobject_cast<QComboBox*>(this->Widget);
     return combobox->itemData(combobox->currentIndex());
   }
 
-  virtual void set(const QVariant& value)
+  void set(const QVariant& value) override
   {
     QComboBox* combobox = qobject_cast<QComboBox*>(this->Widget);
     combobox->setCurrentIndex(combobox->findData(value));
@@ -169,13 +172,13 @@ public:
   {
   }
 
-  virtual QVariant get() const
+  QVariant get() const override
   {
     QCheckBox* checkbox = qobject_cast<QCheckBox*>(this->Widget);
     return checkbox->isChecked() ? this->TrueValue : this->FalseValue;
   }
 
-  virtual void set(const QVariant& value)
+  void set(const QVariant& value) override
   {
     QCheckBox* checkbox = qobject_cast<QCheckBox*>(this->Widget);
     checkbox->setChecked(value.toString() == this->TrueValue);
@@ -577,7 +580,25 @@ bool pqServerLauncher::connectToServer()
     }
   }
 
-  return this->connectToPrelaunchedServer();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
+  vtkPVOptions* options = pm->GetOptions();
+  QDialog dialog(pqCoreUtilities::mainWidget());
+  Ui::pqConnectIdDialog ui;
+  ui.setupUi(&dialog);
+  ui.connectId->setMaximum(VTK_INT_MAX);
+  ui.connectId->setValue(options->GetConnectID());
+
+  pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+  bool force = builder->forceWaitingForConnection(true);
+  bool launched = false;
+  while (!(launched = this->connectToPrelaunchedServer()) && nam->GetWrongConnectID() &&
+    dialog.exec() == QDialog::Accepted)
+  {
+    options->SetConnectID(ui.connectId->value());
+  }
+  builder->forceWaitingForConnection(force);
+  return launched;
 }
 
 //-----------------------------------------------------------------------------

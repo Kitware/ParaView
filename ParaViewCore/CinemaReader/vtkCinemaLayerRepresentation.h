@@ -49,6 +49,9 @@ class vtkActor2D;
 class vtkCamera;
 class vtkCinemaDatabase;
 class vtkCinemaLayerMapper;
+class vtkImageMapper;
+class vtkImageData;
+class vtkImageReslice;
 class vtkPVCacheKeeper;
 class vtkPVCameraCollection;
 class vtkScalarsToColors;
@@ -73,7 +76,7 @@ public:
 
 protected:
   vtkCinemaLayerRepresentation();
-  ~vtkCinemaLayerRepresentation();
+  ~vtkCinemaLayerRepresentation() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
@@ -82,19 +85,28 @@ protected:
   bool IsCached(double cache_key) VTK_OVERRIDE;
 
   /**
-   * Called in vtkPVView::REQUEST_RENDER() pass to update the base query with
-   * color array selection, if any
+   * Updates the Mapper. First, it creates a cinema query. Then, it sets
+   * the returned layers to the mapper.
+   * When using Spec A, the manipulated data is a screenshot,
+   * so view up may be wrong and we have to rotate.
+   * Called in vtkPVView::REQUEST_RENDER()
    */
   void UpdateMapper();
 
+  std::string GetSpecAQuery(int cameraIndex);
+  std::string GetSpecCQuery(int cameraIndex);
+
 private:
-  vtkCinemaLayerRepresentation(const vtkCinemaLayerRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCinemaLayerRepresentation&) VTK_DELETE_FUNCTION;
+  vtkCinemaLayerRepresentation(const vtkCinemaLayerRepresentation&) = delete;
+  void operator=(const vtkCinemaLayerRepresentation&) = delete;
 
   vtkNew<vtkCinemaDatabase> CinemaDatabase;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;
-  vtkNew<vtkCinemaLayerMapper> Mapper;
+  vtkNew<vtkImageMapper> MapperA;
+  vtkNew<vtkCinemaLayerMapper> MapperC;
   vtkNew<vtkActor2D> Actor;
+  vtkNew<vtkImageData> CachedImage;
+  vtkNew<vtkImageReslice> Reslice;
 
   vtkNew<vtkPVCameraCollection> Cameras;
 
@@ -106,6 +118,8 @@ private:
   std::string DefaultFieldName;
 
   std::string PreviousQueryJSON;
+
+  bool RenderLayerAsImage;
 };
 
 #endif

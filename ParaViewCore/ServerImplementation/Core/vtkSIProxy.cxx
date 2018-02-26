@@ -265,7 +265,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
     return false;
   }
 
-  // Store definition informations
+  // Store definition information
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
   this->SetXMLSubProxyName(message->HasExtension(ProxyState::xml_sub_proxy_name)

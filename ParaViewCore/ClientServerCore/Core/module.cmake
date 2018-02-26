@@ -10,10 +10,9 @@ if (PARAVIEW_ENABLE_PYTHON)
       vtkFiltersProgrammable)
 endif ()
 
-set (__compile_dependencies)
-if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
-  list(APPEND __compile_dependencies vtkmpi4py)
-endif()
+if (PARAVIEW_ENABLE_NVPIPE)
+  list(APPEND __dependencies vtknvpipe)
+endif ()
 
 vtk_module(vtkPVClientServerCoreCore
   GROUPS
@@ -21,9 +20,9 @@ vtk_module(vtkPVClientServerCoreCore
   DEPENDS
     vtkFiltersExtraction
     vtkFiltersParallel
-    # Explicitely list (rather than transiently through
+    # Explicitly list (rather than transiently through
     # vtkPVVTKExtensionsCore) because it allows us to turn of wrapping
-    # of vtkPVVTKExtensionsCore off but still satisfy API dependcy.
+    # of vtkPVVTKExtensionsCore off but still satisfy API dependency.
     vtkPVCommon
     vtkPVVTKExtensionsCore
     vtkPVCommon
@@ -31,12 +30,13 @@ vtk_module(vtkPVClientServerCoreCore
     vtkCommonSystem
     vtkIOLegacy
     vtkCommonCore
+    vtkPVVTKExtensionsSIL
   PRIVATE_DEPENDS
     vtksys
+    vtkCommonMisc
   COMPILE_DEPENDS
   # This ensures that CS wrappings will be generated 
     vtkUtilitiesWrapClientServer
-    ${__compile_dependencies}
   TEST_LABELS
     PARAVIEW
   KIT

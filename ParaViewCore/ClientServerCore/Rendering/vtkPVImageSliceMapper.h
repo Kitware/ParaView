@@ -19,7 +19,7 @@
  *
  * vtkPVImageSliceMapper is a mapper for vtkImageData that renders the image by
  * loading the image as a texture and then applying it to a quad. For 3D images,
- * this mapper only shows a single Z slice which can be choosen using SetZSlice.
+ * this mapper only shows a single Z slice which can be chosen using SetZSlice.
  * By default, the image data scalars are rendering, however, this mapper
  * provides API to select another point or cell data array. Internally, this
  * mapper uses painters similar to those employed by vtkPainterPolyDataMapper.
@@ -37,10 +37,8 @@
 class vtkImageData;
 class vtkRenderer;
 
-#ifdef VTKGL2
 class vtkOpenGLTexture;
 class vtkActor;
-#endif
 class vtkPainter;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImageSliceMapper : public vtkMapper
@@ -53,9 +51,9 @@ public:
   /**
    * This calls RenderPiece (in a for loop is streaming is necessary).
    */
-  virtual void Render(vtkRenderer* ren, vtkActor* act) VTK_OVERRIDE;
+  void Render(vtkRenderer* ren, vtkActor* act) VTK_OVERRIDE;
 
-  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -107,16 +105,13 @@ public:
   /**
    * Update that sets the update piece first.
    */
-  virtual void Update(int port) VTK_OVERRIDE;
-  virtual void Update() VTK_OVERRIDE { this->Superclass::Update(); }
-  virtual int Update(int port, vtkInformationVector* requests) VTK_OVERRIDE
+  void Update(int port) VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE { this->Superclass::Update(); }
+  int Update(int port, vtkInformationVector* requests) VTK_OVERRIDE
   {
     return this->Superclass::Update(port, requests);
   }
-  virtual int Update(vtkInformation* requests) VTK_OVERRIDE
-  {
-    return this->Superclass::Update(requests);
-  }
+  int Update(vtkInformation* requests) VTK_OVERRIDE { return this->Superclass::Update(requests); }
 
   //@{
   /**
@@ -143,8 +138,8 @@ public:
    * Return bounding box (array of six doubles) of data expressed as
    * (xmin,xmax, ymin,ymax, zmin,zmax).
    */
-  virtual double* GetBounds() VTK_OVERRIDE;
-  virtual void GetBounds(double bounds[6]) VTK_OVERRIDE { this->Superclass::GetBounds(bounds); };
+  double* GetBounds() VTK_OVERRIDE;
+  void GetBounds(double bounds[6]) VTK_OVERRIDE { this->Superclass::GetBounds(bounds); };
   //@}
 
   /**
@@ -154,35 +149,21 @@ public:
 
 protected:
   vtkPVImageSliceMapper();
-  ~vtkPVImageSliceMapper();
+  ~vtkPVImageSliceMapper() override;
 
   // Tell the executive that we accept vtkImageData.
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   /**
    * Perform the actual rendering.
    */
   virtual void RenderPiece(vtkRenderer* ren, vtkActor* act);
 
-#ifdef VTKGL2
   vtkOpenGLTexture* Texture;
   int SetupScalars(vtkImageData*);
   void RenderInternal(vtkRenderer* ren, vtkActor* act);
   vtkTimeStamp UpdateTime;
   vtkActor* PolyDataActor;
-#else
-  /**
-   * Called when the PainterInformation becomes obsolete. It is called before
-   * Render request is propogated to the painter.
-   */
-  void UpdatePainterInformation();
-
-  vtkInformation* PainterInformation;
-  vtkTimeStamp PainterInformationUpdateTime;
-
-  class vtkObserver;
-  vtkObserver* Observer;
-#endif
 
   vtkPainter* Painter;
 
@@ -196,8 +177,8 @@ protected:
   int UseXYPlane;
 
 private:
-  vtkPVImageSliceMapper(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVImageSliceMapper&) VTK_DELETE_FUNCTION;
+  vtkPVImageSliceMapper(const vtkPVImageSliceMapper&) = delete;
+  void operator=(const vtkPVImageSliceMapper&) = delete;
 };
 
 #endif

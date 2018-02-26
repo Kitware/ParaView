@@ -64,6 +64,11 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
     ui.centerLabel->setText(center->GetXMLLabel());
     ui.pickLabel->setText(
       ui.pickLabel->text().replace("'Center'", QString("'%1'").arg(center->GetXMLLabel())));
+    QString tooltip = this->getTooltip(center);
+    ui.centerX->setToolTip(tooltip);
+    ui.centerY->setToolTip(tooltip);
+    ui.centerZ->setToolTip(tooltip);
+    ui.centerLabel->setToolTip(tooltip);
   }
   else
   {
@@ -76,6 +81,11 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
     this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
     this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
     ui.normalLabel->setText(normal->GetXMLLabel());
+    QString tooltip = this->getTooltip(normal);
+    ui.normalX->setToolTip(tooltip);
+    ui.normalY->setToolTip(tooltip);
+    ui.normalZ->setToolTip(tooltip);
+    ui.normalLabel->setToolTip(tooltip);
   }
   else
   {
@@ -89,6 +99,9 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
   {
     this->addPropertyLink(ui.radius, "text2", SIGNAL(textChangedAndEditingFinished()), radius);
     ui.radiusLabel->setText(radius->GetXMLLabel());
+    QString tooltip = this->getTooltip(radius);
+    ui.radius->setToolTip(tooltip);
+    ui.radiusLabel->setToolTip(tooltip);
   }
   else
   {

@@ -66,7 +66,6 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
   Ui::ViewResolutionPropertyWidget& ui = internals.Ui;
   ui.setupUi(this);
   ui.reset->setIcon(ui.reset->style()->standardIcon(QStyle::SP_BrowserReload));
-  ui.reset->setFixedWidth(32);
 
   QIntValidator* iv = new QIntValidator(ui.width);
   iv->setBottom(1);
@@ -87,8 +86,7 @@ pqViewResolutionPropertyWidget::pqViewResolutionPropertyWidget(
   this->connect(ui.height, SIGNAL(textEdited(const QString&)),
     SLOT(heightTextEdited(const QString&)), Qt::QueuedConnection);
 
-  this->connect(ui.scaleHalf, SIGNAL(clicked()), SLOT(scaleHalf()));
-  this->connect(ui.scaleTwice, SIGNAL(clicked()), SLOT(scaleTwice()));
+  this->connect(ui.scaleBy, SIGNAL(scale(double)), SLOT(scale(double)));
   this->connect(ui.lockAspectRatio, SIGNAL(toggled(bool)), SLOT(lockAspectRatioToggled(bool)));
 
   this->connect(ui.reset, SIGNAL(clicked()), SLOT(resetButtonClicked()));
@@ -134,19 +132,13 @@ void pqViewResolutionPropertyWidget::reset()
 }
 
 //-----------------------------------------------------------------------------
-void pqViewResolutionPropertyWidget::scaleHalf()
+void pqViewResolutionPropertyWidget::scale(double factor)
 {
   Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
-  ui.width->setTextAndResetCursor(QString::number(ui.width->text().toInt() / 2));
-  ui.height->setTextAndResetCursor(QString::number(ui.height->text().toInt() / 2));
-}
-
-//-----------------------------------------------------------------------------
-void pqViewResolutionPropertyWidget::scaleTwice()
-{
-  Ui::ViewResolutionPropertyWidget& ui = this->Internals->Ui;
-  ui.width->setTextAndResetCursor(QString::number(ui.width->text().toInt() * 2));
-  ui.height->setTextAndResetCursor(QString::number(ui.height->text().toInt() * 2));
+  ui.width->setTextAndResetCursor(
+    QString::number(static_cast<int>(ui.width->text().toInt() * factor)));
+  ui.height->setTextAndResetCursor(
+    QString::number(static_cast<int>(ui.height->text().toInt() * factor)));
 }
 
 //-----------------------------------------------------------------------------

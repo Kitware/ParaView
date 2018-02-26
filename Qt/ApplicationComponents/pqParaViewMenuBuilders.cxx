@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqEditMenuBuilder.h"
 #include "ui_pqFileMenuBuilder.h"
-#include "ui_pqPipelineBrowserContextMenu.h"
 
 #include "pqAboutDialogReaction.h"
 #include "pqAnimationTimeToolbar.h"
@@ -48,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCatalystContinueReaction.h"
 #include "pqCatalystPauseSimulationReaction.h"
 #include "pqCatalystRemoveBreakpointReaction.h"
+#include "pqCatalystScriptGeneratorReaction.h"
 #include "pqCatalystSetBreakpointReaction.h"
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImportCinemaReaction.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
+#include "pqLoadMaterialsReaction.h"
 #include "pqLoadRestoreWindowLayoutReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainControlsToolbar.h"
@@ -76,10 +77,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManagePluginsReaction.h"
 #include "pqPVApplicationCore.h"
 #include "pqProxyGroupMenuManager.h"
-#include "pqPythonShellReaction.h"
 #include "pqRecentFilesMenu.h"
 #include "pqReloadFilesReaction.h"
 #include "pqRepresentationToolbar.h"
+#include "pqRestoreUserPreferencesReaction.h"
 #include "pqSaveAnimationGeometryReaction.h"
 #include "pqSaveAnimationReaction.h"
 #include "pqSaveDataReaction.h"
@@ -98,6 +99,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqMacroReaction.h"
 #include "pqPythonManager.h"
+#include "pqSGWritersMenuManager.h"
 #include "pqTraceReaction.h"
 #endif
 
@@ -124,6 +126,11 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);
   new pqImportCinemaReaction(ui.actionFileImportCinemaDatabase);
+#ifdef PARAVIEW_USE_OSPRAY
+  new pqLoadMaterialsReaction(ui.actionFileLoadMaterials);
+#else
+  delete ui.actionFileLoadMaterials;
+#endif
   new pqRecentFilesMenu(*ui.menuRecentFiles, ui.menuRecentFiles);
   new pqReloadFilesReaction(ui.actionReloadFiles);
 
@@ -140,8 +147,8 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   new pqExportReaction(ui.actionExport);
   new pqSaveDataReaction(ui.actionFileSaveData);
 
-  new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowLayout);
-  new pqLoadRestoreWindowLayoutReaction(false, ui.actionFileSaveWindowLayout);
+  new pqLoadRestoreWindowLayoutReaction(true, ui.actionFileLoadWindowArrangement);
+  new pqLoadRestoreWindowLayoutReaction(false, ui.actionFileSaveWindowArrangement);
 }
 
 //-----------------------------------------------------------------------------
@@ -166,6 +173,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
+  new pqRestoreUserPreferencesReaction(ui.actionRestoreUserPreferences);
 }
 
 //-----------------------------------------------------------------------------
@@ -183,12 +191,13 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWind
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow)
+void pqParaViewMenuBuilders::buildFiltersMenu(
+  QMenu& menu, QMainWindow* mainWindow, bool hideDisabled)
 {
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewFilters");
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
-  pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr);
+  pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
   pqPVApplicationCore* appCore = pqPVApplicationCore::instance();
   appCore->registerForQuicklaunch(mgr->widgetActionsHolder());
 
@@ -241,8 +250,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   new pqTimerLogReaction(menu.addAction("Timer Log") << pqSetName("actionToolsTimerLog"));
   menu.addSeparator(); // --------------------------------------------------
 
-  new pqPythonShellReaction(menu.addAction("Python Shell") << pqSetName("actionToolsPythonShell"));
-
 #ifdef PARAVIEW_ENABLE_PYTHON
   menu.addSeparator(); // --------------------------------------------------
   new pqTraceReaction(menu.addAction("Start Trace") << pqSetName("actionToolsStartStopTrace"),
@@ -257,45 +264,174 @@ void pqParaViewMenuBuilders::buildViewMenu(QMenu& menu, QMainWindow& mainWindow)
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
+void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
 {
-  QString objectName = widget.objectName();
-  Ui::pqPipelineBrowserContextMenu ui;
-  ui.setupUi(&widget);
-  // since the UI file tends to change the name of the menu.
-  widget.setObjectName(objectName);
-  widget.setContextMenuPolicy(Qt::ActionsContextMenu);
+  // Build the context menu manually so we can insert submenus where needed.
+  QAction* actionPBOpen = new QAction(menu.parent());
+  actionPBOpen->setObjectName(QStringLiteral("actionPBOpen"));
+  QIcon icon4;
+  icon4.addFile(
+    QStringLiteral(":/pqWidgets/Icons/pqOpen24.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionPBOpen->setIcon(icon4);
+  actionPBOpen->setShortcutContext(Qt::WidgetShortcut);
+  actionPBOpen->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "&Open", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+  actionPBOpen->setToolTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Open", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_STATUSTIP
+  actionPBOpen->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Open", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
+  QAction* actionPBHideAll = new QAction(menu.parent());
+  actionPBHideAll->setObjectName(QStringLiteral("actionPBHideAll"));
+  QIcon icon1;
+  icon1.addFile(
+    QStringLiteral(":/pqWidgets/Icons/pqEyeball.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionPBHideAll->setIcon(icon1);
+  actionPBHideAll->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "&Hide All", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBHideAll->setStatusTip(QApplication::translate(
+    "pqPipelineBrowserContextMenu", "Hide all source outputs in the pipeline", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
+  QAction* actionPBCopy = new QAction(menu.parent());
+  actionPBCopy->setObjectName(QStringLiteral("actionPBCopy"));
+  QIcon icon2;
+  icon2.addFile(
+    QStringLiteral(":/pqWidgets/Icons/pqCopy22.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionPBCopy->setIcon(icon2);
+  actionPBCopy->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "&Copy", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBCopy->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Copy Properties", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
+  QAction* actionPBPaste = new QAction(menu.parent());
+  actionPBPaste->setObjectName(QStringLiteral("actionPBPaste"));
+  QIcon icon3;
+  icon3.addFile(
+    QStringLiteral(":/pqWidgets/Icons/pqPaste22.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionPBPaste->setIcon(icon3);
+  actionPBPaste->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "&Paste", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBPaste->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Paste Properties", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
+  QAction* actionPBChangeInput = new QAction(menu.parent());
+  actionPBChangeInput->setObjectName(QStringLiteral("actionPBChangeInput"));
+  actionPBChangeInput->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change &Input...", Q_NULLPTR));
+  actionPBChangeInput->setIconText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change Input...", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+  actionPBChangeInput->setToolTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change a Filter's Input", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_STATUSTIP
+  actionPBChangeInput->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Change a Filter's Input", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
+  QAction* actionPBReloadFiles = new QAction(menu.parent());
+  actionPBReloadFiles->setObjectName(QStringLiteral("actionPBReloadFiles"));
+  actionPBReloadFiles->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Reload Files", Q_NULLPTR));
+  actionPBReloadFiles->setIconText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Reload Files", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+  actionPBReloadFiles->setToolTip(QApplication::translate("pqPipelineBrowserContextMenu",
+    "Reload data files in case they were changed externally.", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+
+  QAction* actionPBIgnoreTime = new QAction(menu.parent());
+  actionPBIgnoreTime->setObjectName(QStringLiteral("actionPBIgnoreTime"));
+  actionPBIgnoreTime->setCheckable(true);
+  actionPBIgnoreTime->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Ignore Time", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+  actionPBIgnoreTime->setToolTip(QApplication::translate("pqPipelineBrowserContextMenu",
+    "Disregard this source/filter's time from animations", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+#ifndef QT_NO_STATUSTIP
+  actionPBIgnoreTime->setStatusTip(QApplication::translate("pqPipelineBrowserContextMenu",
+    "Disregard this source/filter's time from animations", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
+  QAction* actionPBDelete = new QAction(menu.parent());
+  actionPBDelete->setObjectName(QStringLiteral("actionPBDelete"));
+  QIcon icon;
+  icon.addFile(
+    QStringLiteral(":/QtWidgets/Icons/pqDelete24.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionPBDelete->setIcon(icon);
+  actionPBDelete->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "&Delete", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBDelete->setStatusTip(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Delete", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
 
   QByteArray signalName = QMetaObject::normalizedSignature("deleteKey()");
-  if (widget.metaObject()->indexOfSignal(signalName) != -1)
+  if (menu.parent()->metaObject()->indexOfSignal(signalName) != -1)
   {
     // Trigger a delete when the user requests a delete.
     QObject::connect(
-      &widget, SIGNAL(deleteKey()), ui.actionPBDelete, SLOT(trigger()), Qt::QueuedConnection);
+      menu.parent(), SIGNAL(deleteKey()), actionPBDelete, SLOT(trigger()), Qt::QueuedConnection);
   }
+
+  QAction* actionPBCreateCustomFilter = new QAction(menu.parent());
+  actionPBCreateCustomFilter->setObjectName(QStringLiteral("actionPBCreateCustomFilter"));
+  actionPBCreateCustomFilter->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "&Create Custom Filter...", Q_NULLPTR));
+
+  QAction* actionPBLinkSelection = new QAction(menu.parent());
+  actionPBLinkSelection->setObjectName(QStringLiteral("actionPBLinkSelection"));
+  actionPBLinkSelection->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Link with selection", Q_NULLPTR));
+  actionPBLinkSelection->setIconText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "Link with selection", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+  actionPBLinkSelection->setToolTip(QApplication::translate("pqPipelineBrowserContextMenu",
+    "Link this source and current selected source as a selection link", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+
+  menu.addAction(actionPBOpen);
+  menu.addAction(actionPBHideAll);
+  menu.addAction(actionPBCopy);
+  menu.addAction(actionPBPaste);
+  menu.addAction(actionPBChangeInput);
+  QMenu* addFilterMenu = menu.addMenu("Add Filter");
+  pqParaViewMenuBuilders::buildFiltersMenu(*addFilterMenu, nullptr, true /*hide disabled*/);
+  menu.addAction(actionPBReloadFiles);
+  menu.addAction(actionPBIgnoreTime);
+  menu.addAction(actionPBDelete);
+  menu.addAction(actionPBCreateCustomFilter);
+  menu.addAction(actionPBLinkSelection);
 
   // And here the reactions come in handy! Just reuse the reaction used for
   // File | Open.
-  new pqLoadDataReaction(ui.actionPBOpen);
-  new pqChangePipelineInputReaction(ui.actionPBChangeInput);
-  new pqLinkSelectionReaction(ui.actionPBLinkSelection);
-  new pqCreateCustomFilterReaction(ui.actionPBCreateCustomFilter);
-  new pqIgnoreSourceTimeReaction(ui.actionPBIgnoreTime);
-  new pqDeleteReaction(ui.actionPBDelete);
-  new pqHideAllReaction(ui.actionPBHideAll);
-  new pqCopyReaction(ui.actionPBCopy);
-  new pqCopyReaction(ui.actionPBPaste, true);
-  new pqReloadFilesReaction(ui.actionPBReloadFiles);
+  new pqLoadDataReaction(actionPBOpen);
+  new pqHideAllReaction(actionPBHideAll);
+  new pqCopyReaction(actionPBCopy);
+  new pqCopyReaction(actionPBPaste, true);
+  new pqChangePipelineInputReaction(actionPBChangeInput);
+  new pqReloadFilesReaction(actionPBReloadFiles);
+  new pqIgnoreSourceTimeReaction(actionPBIgnoreTime);
+  new pqDeleteReaction(actionPBDelete);
+  new pqCreateCustomFilterReaction(actionPBCreateCustomFilter);
+  new pqLinkSelectionReaction(actionPBLinkSelection);
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildMacrosMenu
-#ifdef PARAVIEW_ENABLE_PYTHON
-  (QMenu& menu)
-#else
-  (QMenu&)
-#endif
+void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
 {
+  Q_UNUSED(menu);
 #ifdef PARAVIEW_ENABLE_PYTHON
   // Give the macros menu to the pqPythonMacroSupervisor
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
@@ -483,4 +619,15 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
 
   new pqCatalystRemoveBreakpointReaction(
     menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+  menu.addSeparator(); // --------------------------------------------------
+  QAction* csg = menu.addAction("Generate Script") << pqSetName("Export State");
+  new pqCatalystScriptGeneratorReaction(csg);
+
+  menu.addSeparator(); // --------------------------------------------------
+  pqSGWritersMenuManager* menuMgr =
+    new pqSGWritersMenuManager(&menu, "&Writers", "CatalystWritersMenu", nullptr);
+  menuMgr->createMenu();
+#endif
 }

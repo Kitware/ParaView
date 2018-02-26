@@ -161,8 +161,8 @@ public:
   }
 
 private:
-  vtkPointAccumulator(const vtkPointAccumulator&) VTK_DELETE_FUNCTION;
-  vtkPointAccumulator& operator=(const vtkPointAccumulator&) VTK_DELETE_FUNCTION;
+  vtkPointAccumulator(const vtkPointAccumulator&) = delete;
+  vtkPointAccumulator& operator=(const vtkPointAccumulator&) = delete;
 
   T_CPP* PtStore;
   vtkIdType NPts;

@@ -7,8 +7,10 @@ vtk_module(vtkPVVTKExtensionsCore
     vtkIOImage
     vtkParallelCore
     vtkPVCommon
+    vtkCommonMisc
   PRIVATE_DEPENDS
     vtksys
+    vtkjsoncpp
   TEST_LABELS
     PARAVIEW
   KIT

@@ -36,16 +36,15 @@ public:
   vtkTypeMacro(vtkSMPLYWriterProxyInitializationHelper, vtkSMProxyInitializationHelper);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) VTK_OVERRIDE;
+  void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) VTK_OVERRIDE;
 
 protected:
   vtkSMPLYWriterProxyInitializationHelper();
-  ~vtkSMPLYWriterProxyInitializationHelper();
+  ~vtkSMPLYWriterProxyInitializationHelper() override;
 
 private:
-  vtkSMPLYWriterProxyInitializationHelper(
-    const vtkSMPLYWriterProxyInitializationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPLYWriterProxyInitializationHelper&) VTK_DELETE_FUNCTION;
+  vtkSMPLYWriterProxyInitializationHelper(const vtkSMPLYWriterProxyInitializationHelper&) = delete;
+  void operator=(const vtkSMPLYWriterProxyInitializationHelper&) = delete;
 };
 
 #endif

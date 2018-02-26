@@ -88,7 +88,7 @@ public:
 
   void SetTarget(vtkSMSessionProxyManager* t) { this->Target = t; }
 
-  virtual void Execute(vtkObject* obj, unsigned long event, void* data)
+  void Execute(vtkObject* obj, unsigned long event, void* data) override
   {
     if (this->Target)
     {
@@ -106,7 +106,7 @@ class vtkSMProxyManagerForwarder : public vtkCommand
 public:
   static vtkSMProxyManagerForwarder* New() { return new vtkSMProxyManagerForwarder(); }
 
-  virtual void Execute(vtkObject*, unsigned long event, void* data)
+  void Execute(vtkObject*, unsigned long event, void* data) override
   {
     if (vtkSMProxyManager::IsInitialized())
     {
@@ -237,6 +237,42 @@ void vtkSMSessionProxyManager::InstantiatePrototypes()
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextGroup())
   {
     this->InstantiateGroupPrototypes(iter->GetGroupName());
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionProxyManager::ClearPrototypes()
+{
+  vtksys::RegularExpression prototypesRe("_prototypes$");
+
+  // clear items from RegisteredProxyMap.
+  for (auto group_iter = this->Internals->RegisteredProxyMap.begin();
+       group_iter != this->Internals->RegisteredProxyMap.end();)
+  {
+    const bool isPrototypeGroup = prototypesRe.find(group_iter->first);
+    if (isPrototypeGroup)
+    {
+      group_iter = this->Internals->RegisteredProxyMap.erase(group_iter);
+    }
+    else
+    {
+      ++group_iter;
+    }
+  }
+
+  // now, also clear item from RegisteredProxyTuple.
+  for (auto tuple_iter = this->Internals->RegisteredProxyTuple.begin();
+       tuple_iter != this->Internals->RegisteredProxyTuple.end();)
+  {
+    const bool isPrototypeGroup = prototypesRe.find(tuple_iter->Group);
+    if (isPrototypeGroup)
+    {
+      tuple_iter = this->Internals->RegisteredProxyTuple.erase(tuple_iter);
+    }
+    else
+    {
+      ++tuple_iter;
+    }
   }
 }
 
@@ -754,7 +790,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(const char* name)
     iter++;
   }
 
-  // Push new state only if changed occured
+  // Push new state only if changed occurred
   if (entriesToRemove.size() > 0)
   {
     this->TriggerStateUpdate();
@@ -776,7 +812,7 @@ void vtkSMSessionProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
     iter++;
   }
 
-  // Push new state only if changed occured
+  // Push new state only if changed occurred
   if (tuplesToRemove.size() > 0)
   {
     this->TriggerStateUpdate();
@@ -1073,6 +1109,12 @@ void vtkSMSessionProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
         // for this proxy type are removed, otherwise we may end up using
         // obsolete prototypes.
         this->RemovePrototype(defInfo->GroupName, defInfo->ProxyName);
+        break;
+
+      case vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated:
+        // if any definitions updated, we clear all prototypes.
+        this->ClearPrototypes();
+        this->InvokeEvent(event, data);
         break;
 
       default:
@@ -1639,7 +1681,7 @@ void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
       object->Delete();
     }
   }
-  // Remove Link that have disapeared...
+  // Remove Link that have disappeared...
   for (int i = 0; i < this->GetNumberOfLinks(); i++)
   {
     const char* currentLinkName = this->GetLinkName(i);

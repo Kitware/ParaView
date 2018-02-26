@@ -41,7 +41,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonModule : public vtkObject
 public:
   vtkTypeMacro(vtkPVPythonModule, vtkObject);
   static vtkPVPythonModule* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -93,15 +93,15 @@ public:
 
 protected:
   vtkPVPythonModule();
-  ~vtkPVPythonModule();
+  ~vtkPVPythonModule() override;
 
   char* Source;
   char* FullName;
   int IsPackage;
 
 private:
-  vtkPVPythonModule(const vtkPVPythonModule&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPythonModule&) VTK_DELETE_FUNCTION;
+  vtkPVPythonModule(const vtkPVPythonModule&) = delete;
+  void operator=(const vtkPVPythonModule&) = delete;
 };
 
 #endif // vtkPVPythonModule_h

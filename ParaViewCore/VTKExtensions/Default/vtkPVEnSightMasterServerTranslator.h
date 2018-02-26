@@ -50,15 +50,15 @@ public:
 
 protected:
   vtkPVEnSightMasterServerTranslator();
-  ~vtkPVEnSightMasterServerTranslator();
+  ~vtkPVEnSightMasterServerTranslator() override;
   //@}
 
   // The process id on which this translator is running.
   int ProcessId;
 
 private:
-  vtkPVEnSightMasterServerTranslator(const vtkPVEnSightMasterServerTranslator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVEnSightMasterServerTranslator&) VTK_DELETE_FUNCTION;
+  vtkPVEnSightMasterServerTranslator(const vtkPVEnSightMasterServerTranslator&) = delete;
+  void operator=(const vtkPVEnSightMasterServerTranslator&) = delete;
 };
 
 #endif

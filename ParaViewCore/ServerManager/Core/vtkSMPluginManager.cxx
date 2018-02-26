@@ -56,8 +56,8 @@ public:
   ~vtkFlagStateUpdated() { this->Flag = this->Prev; }
 
 private:
-  vtkFlagStateUpdated(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFlagStateUpdated&) VTK_DELETE_FUNCTION;
+  vtkFlagStateUpdated(const vtkFlagStateUpdated&) = delete;
+  void operator=(const vtkFlagStateUpdated&) = delete;
 };
 }
 

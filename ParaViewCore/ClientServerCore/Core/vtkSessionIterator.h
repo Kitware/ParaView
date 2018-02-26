@@ -64,14 +64,14 @@ public:
 
 protected:
   vtkSessionIterator();
-  ~vtkSessionIterator();
+  ~vtkSessionIterator() override;
 
   class vtkInternals;
   vtkInternals* Internals;
 
 private:
-  vtkSessionIterator(const vtkSessionIterator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSessionIterator&) VTK_DELETE_FUNCTION;
+  vtkSessionIterator(const vtkSessionIterator&) = delete;
+  void operator=(const vtkSessionIterator&) = delete;
 };
 
 #endif

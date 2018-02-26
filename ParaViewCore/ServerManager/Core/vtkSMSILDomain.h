@@ -26,6 +26,14 @@
  * similar to vtkSMArraySelectionDomain) with one notable exception. This
  * information property typically uses the vtkSMSILInformationHelper which is
  * used to access the SIL if requested by using GetSIL().
+ *
+ * @section vtkSMSILDomainLegacyWarning Legacy Warning
+ *
+ * While not deprecated, this class exists to support readers that use legacy
+ * representation for SIL which used a `vtkGraph` to represent the SIL. It is
+ * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
+ * represent the SIL. In that case, you should use
+ * vtkSMSubsetInclusionLatticeDomain instead.
 */
 
 #ifndef vtkSMSILDomain_h
@@ -63,28 +71,28 @@ public:
   /**
    * Overridden to leave defaults unchanged.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool) VTK_OVERRIDE { return 1; }
+  int SetDefaultValues(vtkSMProperty*, bool) VTK_OVERRIDE { return 1; }
 
 protected:
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
 
   // Internal method used to store the SubTree information from the XML
   vtkSetStringMacro(SubTree);
 
   vtkSMSILDomain();
-  ~vtkSMSILDomain();
+  ~vtkSMSILDomain() override;
 
   char* SubTree;
   vtkPVSILInformation* SIL;
   vtkIdType SILTimeStamp;
 
 private:
-  vtkSMSILDomain(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSILDomain&) VTK_DELETE_FUNCTION;
+  vtkSMSILDomain(const vtkSMSILDomain&) = delete;
+  void operator=(const vtkSMSILDomain&) = delete;
 };
 
 #endif

@@ -97,7 +97,7 @@ public:
   * \param parent The parent widget for this instance.
   */
   pqFlatTreeView(QWidget* parent = 0);
-  virtual ~pqFlatTreeView();
+  ~pqFlatTreeView() override;
 
   /**
   * \brief
@@ -109,7 +109,7 @@ public:
   * \param object The object which will receive the event.
   * \param e The event to be sent.
   */
-  virtual bool eventFilter(QObject* object, QEvent* e);
+  bool eventFilter(QObject* object, QEvent* e) override;
 
   /**
   * \name Model Setup Methods
@@ -238,7 +238,7 @@ protected:
   * \name Keyboard Event Handlers
   */
   //@{
-  virtual void keyPressEvent(QKeyEvent* e);
+  void keyPressEvent(QKeyEvent* e) override;
   void keyboardSearch(const QString& search);
   //@}
 
@@ -246,26 +246,25 @@ protected:
   * \name Mouse Event Handlers
   */
   //@{
-  virtual void mousePressEvent(QMouseEvent* e);
-  virtual void mouseMoveEvent(QMouseEvent* e);
-  virtual void mouseReleaseEvent(QMouseEvent* e);
-  virtual void mouseDoubleClickEvent(QMouseEvent* e);
-  virtual void wheelEvent(QWheelEvent* e);
+  void mousePressEvent(QMouseEvent* e) override;
+  void mouseMoveEvent(QMouseEvent* e) override;
+  void mouseReleaseEvent(QMouseEvent* e) override;
+  void mouseDoubleClickEvent(QMouseEvent* e) override;
   //@}
 
   /**
   * \name Event Handlers
   */
   //@{
-  virtual bool event(QEvent* e);
+  bool event(QEvent* e) override;
   //@}
 
   int horizontalOffset() const;
   int verticalOffset() const;
 
-  virtual void resizeEvent(QResizeEvent* e);
-  virtual bool viewportEvent(QEvent* e);
-  virtual void paintEvent(QPaintEvent* e);
+  void resizeEvent(QResizeEvent* e) override;
+  bool viewportEvent(QEvent* e) override;
+  void paintEvent(QPaintEvent* e) override;
   QStyleOptionViewItem getViewOptions() const;
 
 private slots:

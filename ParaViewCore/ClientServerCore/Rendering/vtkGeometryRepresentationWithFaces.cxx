@@ -180,7 +180,7 @@ void vtkGeometryRepresentationWithFaces::UpdateColoringParameters()
     this->BackfaceProperty->SetSpecular(specular);
     this->BackfaceProperty->SetDiffuse(diffuse);
 
-    // Copy paramters from this->Mapper
+    // Copy parameters from this->Mapper
     this->BackfaceMapper->SetLookupTable(this->Mapper->GetLookupTable());
     this->BackfaceMapper->SetColorMode(this->Mapper->GetColorMode());
     this->BackfaceMapper->SetInterpolateScalarsBeforeMapping(
@@ -190,7 +190,7 @@ void vtkGeometryRepresentationWithFaces::UpdateColoringParameters()
     this->BackfaceMapper->SelectColorArray(this->Mapper->GetArrayName());
     this->BackfaceMapper->SetScalarMode(this->Mapper->GetScalarMode());
 
-    // Copy paramters from this->LODMapper
+    // Copy parameters from this->LODMapper
     this->LODBackfaceMapper->SetLookupTable(this->LODMapper->GetLookupTable());
     this->LODBackfaceMapper->SetColorMode(this->LODMapper->GetColorMode());
     this->LODBackfaceMapper->SetInterpolateScalarsBeforeMapping(
@@ -225,7 +225,7 @@ void vtkGeometryRepresentationWithFaces::PrintSelf(ostream& os, vtkIndent indent
 }
 
 //***************************************************************************
-// Forwaded to vtkProperty(BackfaceProperty)
+// Forwarded to vtkProperty(BackfaceProperty)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentationWithFaces::SetBackfaceAmbientColor(double r, double g, double b)
 {

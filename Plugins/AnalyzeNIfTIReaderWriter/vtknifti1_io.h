@@ -22,7 +22,7 @@
 
       Mainly adding low-level IO and changing things to allow gzipped files
       to be read and written
-      Full backwards compatability should have been maintained
+      Full backwards compatibility should have been maintained
 
    Modified by: Rick Reynolds (SSCC/DIRP/NIMH, National Institutes of Health)
    Date: December 2004
@@ -320,7 +320,7 @@ class vtknifti1_io : public vtkObject
 public:
   static vtknifti1_io *New();
   vtkTypeMacro(vtknifti1_io,vtkObject);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
 /*****************************************************************************/
 /*--------------- Prototypes of functions defined in this file --------------*/
@@ -558,7 +558,7 @@ static int    valid_nifti_extensions(const nifti_image *nim);
 /*------------------------------------------------------------------------*/
 protected:
   vtknifti1_io();
-  ~vtknifti1_io();
+  ~vtknifti1_io() override;
 
 
 /*---------------------------------------------------------------------------*/
@@ -607,8 +607,8 @@ static int nifti_write_extensions(znzFile fp, nifti_image *nim);
 static int nifti_extension_size(nifti_image *nim);
 
   private:
-  vtknifti1_io(const vtknifti1_io&) VTK_DELETE_FUNCTION;
-  void operator=(const vtknifti1_io&) VTK_DELETE_FUNCTION;
+  vtknifti1_io(const vtknifti1_io&) = delete;
+  void operator=(const vtknifti1_io&) = delete;
 
 };
 

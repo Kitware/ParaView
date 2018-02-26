@@ -51,7 +51,7 @@ public:
    * Overrides the base class method to request an addition pass that moves data from the
    * server to the client.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * Gets the renderer for this view.
@@ -64,7 +64,7 @@ public:
   /**
    * Get a handle to the render window.
    */
-  virtual vtkRenderWindow* GetRenderWindow();
+  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
 
   /**
    * Set the render window for this view. Note that this requires special
@@ -85,8 +85,8 @@ public:
   /**
    * Magnification is needed to inform Python of the requested size of the plot
    */
-  vtkSetMacro(Magnification, int);
-  vtkGetMacro(Magnification, int);
+  vtkSetVector2Macro(Magnification, int);
+  vtkGetVector2Macro(Magnification, int);
   //@}
 
   /**
@@ -161,9 +161,9 @@ public:
    */
   void DisableAllAttributeArrays();
 
-  virtual void StillRender() VTK_OVERRIDE;
+  void StillRender() VTK_OVERRIDE;
 
-  virtual void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() VTK_OVERRIDE;
 
   //@{
   /**
@@ -176,14 +176,14 @@ public:
 
 protected:
   vtkPythonView();
-  virtual ~vtkPythonView();
+  ~vtkPythonView() override;
 
   vtkSmartPointer<vtkTexture> RenderTexture;
   vtkSmartPointer<vtkRenderer> Renderer;
   vtkSmartPointer<vtkRenderWindow> RenderWindow;
 
   // Needed to handle rendering at different magnifications
-  int Magnification;
+  int Magnification[2];
 
   /**
    * Is local data available?
@@ -191,8 +191,8 @@ protected:
   bool IsLocalDataAvailable();
 
 private:
-  vtkPythonView(const vtkPythonView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPythonView&) VTK_DELETE_FUNCTION;
+  vtkPythonView(const vtkPythonView&) = delete;
+  void operator=(const vtkPythonView&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

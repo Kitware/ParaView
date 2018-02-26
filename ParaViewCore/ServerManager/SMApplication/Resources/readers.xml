@@ -1,7 +1,102 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="internal_sources">
+    <Proxy label="Image Reader Core" name="ImageReaderCore" class="vtkPVImageReader">
+      <Documentation long_help="Reads raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified."
+                     short_help="Read raw regular rectilinear grid data from a file.">
+                     The Image reader reads raw, regular, rectilinear grid
+                     (image/volume) data from a file. Because no metadata is
+                     provided, the user must specify information about the
+                     size, spacing, dimensionality, etc. about the
+                     dataset.</Documentation>
+      <IntVectorProperty command="SetDataScalarType"
+                         default_values="4"
+                         name="DataScalarType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="char"
+                 value="2" />
+          <Entry text="unsigned char"
+                 value="3" />
+          <Entry text="short"
+                 value="4" />
+          <Entry text="unsigned short"
+                 value="5" />
+          <Entry text="int"
+                 value="6" />
+          <Entry text="unsigned int"
+                 value="7" />
+          <Entry text="long"
+                 value="8" />
+          <Entry text="unsigned long"
+                 value="9" />
+          <Entry text="float"
+                 value="10" />
+          <Entry text="double"
+                 value="11" />
+        </EnumerationDomain>
+        <Documentation>The value of this property indicates the scalar type of
+        the pixels/voxels in the file(s): short, int, float ...</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDataByteOrder"
+                         default_values="0"
+                         name="DataByteOrder"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="BigEndian"
+                 value="0" />
+          <Entry text="LittleEndian"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property indicates the byte order of the binary
+        file(s).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetDataOrigin"
+                            default_values="0.0 0.0 0.0"
+                            name="DataOrigin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The coordinate contained in this property specifies the
+        position of the point with index (0,0,0).</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetDataSpacing"
+                            default_values="1.0 1.0 1.0"
+                            name="DataSpacing"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This property specifies the size of a voxel in each
+        dimension.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetNumberOfScalarComponents"
+                         default_values="1"
+                         name="NumberOfScalarComponents"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the number of components the
+        scalar value at each pixel or voxel has (e.g., RGB - 3 scalar
+        components).</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetScalarArrayName"
+                            default_values="ImageFile"
+                            name="ScalarArrayName"
+                            number_of_elements="1">
+        <Documentation>This property contains a text string listing a name to
+        assign to the point-centered data array read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFileLowerLeft"
+                         default_values="1"
+                         name="FileLowerLeft"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property determines whether the data originates in
+        the lower left corner (on) or the upper left corner (off). Most
+        scientific data is written with a right-handed axes that originates in
+        the lower left corner. However, several 2D image file formats write the
+        image from the upper left corner.</Documentation>
+      </IntVectorProperty>
+      <!-- End ImageReaderCore -->
+    </Proxy>
     <!--  FLASH AMR Particles Reader -->
-    <SourceProxy class="vtkAMRFlashParticlesReader"
+    <Proxy class="vtkAMRFlashParticlesReader"
                  label="FLASH Particles AMR Reader"
                  name="FlashParticlesReaderCore">
       <Documentation long_help="Reads AMR particles from FLASH dataset"
@@ -86,9 +181,9 @@
         <ReaderFactory extensions="Flash flash"
                        file_description="AMR flash particles dataset" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!--  ENZO AMR Particles Reader -->
-    <SourceProxy class="vtkAMREnzoParticlesReader"
+    <Proxy class="vtkAMREnzoParticlesReader"
                  label="Enzo Particles AMR Reader"
                  name="EnzoParticlesReaderCore">
       <Documentation long_help="Reads AMR particles from an ENZO dataset"
@@ -188,9 +283,9 @@
         <ReaderFactory extensions="boundary hierarchy"
                        file_description="Enzo AMR Particles dataset" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- FLASH AMR Core Reader definition -->
-    <SourceProxy class="vtkAMRFlashReader"
+    <Proxy class="vtkAMRFlashReader"
                  label="Flash AMR Reader"
                  name="FlashReaderCore">
       <Documentation long_help="Read hierarchical box dataset from a Flash dataset."
@@ -225,7 +320,7 @@
                          name="EnableCaching"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Turn cahcing on/off</Documentation>
+        <Documentation>Turn caching on/off</Documentation>
       </IntVectorProperty>
       <!--  Define MaxLevel property -->
       <IntVectorProperty command="SetMaxLevel"
@@ -278,17 +373,13 @@
                       name="PointArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which node-based arrays to
+        <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="Flash flash"
-                       file_description="AMR Flash dataset" />
-      </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- FLASH AMR Core Reader definition -->
     <!-- ENZO AMR Core Reader definition -->
-    <SourceProxy class="vtkAMREnzoReader"
+    <Proxy class="vtkAMREnzoReader"
                  label="Enzo AMR Reader"
                  name="EnzoReaderCore">
       <Documentation long_help="Read hierarchical box dataset from an Enzo file."
@@ -323,7 +414,7 @@
                          name="EnableCaching"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Turn cahcing on/off</Documentation>
+        <Documentation>Turn caching on/off</Documentation>
       </IntVectorProperty>
       <!--  Define MaxLevel property -->
       <IntVectorProperty command="SetMaxLevel"
@@ -385,16 +476,12 @@
                       name="PointArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which node-based arrays to
+        <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="boundary hierarchy"
-                       file_description="AMR Enzo Files" />
-      </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- END ENZO AMR Core Reader definition -->
-    <SourceProxy class="vtkAVSucdReader"
+    <Proxy class="vtkAVSucdReader"
                  label="AVS UCD Reader"
                  name="AVSucdReader">
       <Documentation long_help="Reads binary or ASCII files stored in AVS UCD format."
@@ -454,8 +541,8 @@
         arrays to read.</Documentation>
       </StringVectorProperty>
       <!-- End AVSucdReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkMetaImageReader"
+    </Proxy>
+    <Proxy class="vtkMetaImageReader"
                  label="Meta Image reader"
                  name="MetaImageReaderCore">
       <Documentation long_help="Reads binary UNC meta image data."
@@ -477,8 +564,8 @@
                        file_description="Meta Image Data Files" />
       </Hints>
       <!-- End Meta Image Reader -->
-    </SourceProxy>
-    <SourceProxy class="vtkPDataSetReader"
+    </Proxy>
+    <Proxy class="vtkPDataSetReader"
                  label="Legacy VTK Reader"
                  name="legacyreader">
       <Documentation long_help="Reads files stored in VTK's legacy file format."
@@ -486,7 +573,7 @@
                      loads files stored in VTK's legacy file format. The
                      expected file extension is .vtk. The type of the dataset
                      may be structured grid, uniform rectilinear grid
-                     (image/volume), non-uniform rectiinear grid, unstructured
+                     (image/volume), non-uniform rectilinear grid, unstructured
                      grid, or polygonal.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -498,8 +585,8 @@
         reader.</Documentation>
       </StringVectorProperty>
       <!-- End legacyreader -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPolyDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLPolyDataReader"
                  label="XML PolyData Reader"
                  name="XMLPolyDataReaderCore">
       <Documentation long_help="Reads serial VTK XML polydata files."
@@ -564,8 +651,53 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPolyDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLUnstructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLTableReader"
+                 label="XML Table Reader"
+                 name="XMLTableReaderCore">
+      <Documentation long_help="Reads serial VTK XML table files."
+                     short_help="Read VTK XML table files.">The XML table
+                     reader reads the VTK XML table file format. The
+                     standard extension is .vtt.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the VTK XML
+        table reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ColumnArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Column" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColumnArrayStatus"
+                            element_types="2 0"
+                            information_property="ColumnArrayInfo"
+                            label="Column Arrays"
+                            name="ColumnArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ColumnArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which columns to
+        read.</Documentation>
+      </StringVectorProperty>
+      <!-- End XMLTableReaderCore -->
+    </Proxy>
+    <Proxy class="vtkXMLUnstructuredGridReader"
                  label="XML Unstructured Grid reader"
                  name="XMLUnstructuredGridReaderCore">
       <Documentation long_help="Reads serial VTK XML unstructured grid data files."
@@ -631,8 +763,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLUnstructuredGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLImageDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLImageDataReader"
                  label="XML Image Data Reader"
                  name="XMLImageDataReaderCore">
       <Documentation long_help="Reads serial VTK XML image data files."
@@ -697,8 +829,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLImageDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLStructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLStructuredGridReader"
                  label="XML Structured Grid Reader"
                  name="XMLStructuredGridReaderCore">
       <Documentation long_help="Reads serial VTK XML structured grid data files."
@@ -764,8 +896,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLStructuredGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLRectilinearGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLRectilinearGridReader"
                  label="XML Rectilinear Grid Reader"
                  name="XMLRectilinearGridReaderCore">
       <Documentation long_help="Reads serial VTK XML rectilinear grid data files."
@@ -831,8 +963,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLRectilinearGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPPolyDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLPPolyDataReader"
                  label="XML Partitioned Polydata Reader"
                  name="XMLPPolyDataReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML polydata files."
@@ -894,8 +1026,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPPolyDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPUnstructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLPUnstructuredGridReader"
                  label="XML Partitioned Unstructured Grid Reader"
                  name="XMLPUnstructuredGridReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML unstructured grid files."
@@ -957,8 +1089,54 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPUnstructuredGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPImageDataReader"
+    </Proxy>
+        <Proxy class="vtkXMLPTableReader"
+                 label="XML Partitioned Table Reader"
+                 name="XMLPTableReaderCore">
+      <Documentation long_help="Reads the summary file and the associated VTK XML table files."
+                     short_help="Read partitioned VTK XML table files.">
+                     The XML Partitioned Table reader reads the
+                     partitioned VTK table data file format. It
+                     reads the partitioned format's summary file and then the
+                     associated VTK XML table data files. The
+                     expected file extension is .pvtt.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        partitioned VTK XML table reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ColumnArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Column" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColumnArrayStatus"
+                            element_types="2 0"
+                            information_property="ColumnArrayInfo"
+                            label="Columns"
+                            name="ColumnArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ColumnArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which columns to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <!-- End XMLPTableReaderCore -->
+    </Proxy>
+    <Proxy class="vtkXMLPImageDataReader"
                  label="XML Partitioned Image Data Reader"
                  name="XMLPImageDataReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML image data files."
@@ -996,7 +1174,7 @@
                       name="CellArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This propert lists which cell-centered arrays to
+        <Documentation>This property lists which cell-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty information_only="1"
@@ -1021,8 +1199,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPImageDataReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPStructuredGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLPStructuredGridReader"
                  label="XML Partitioned Structured Grid Reader"
                  name="XMLPStructuredGridReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML structured grid files."
@@ -1084,8 +1262,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPStructuredGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLPRectilinearGridReader"
+    </Proxy>
+    <Proxy class="vtkXMLPRectilinearGridReader"
                  label="XML Partitioned Rectilinear Grid Reader"
                  name="XMLPRectilinearGridReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML rectilinear grid files."
@@ -1148,8 +1326,8 @@
         read.</Documentation>
       </StringVectorProperty>
       <!-- End XMLPRectilinearGridReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkSTLReader"
+    </Proxy>
+    <Proxy class="vtkSTLReader"
                  label="STL Reader"
                  name="stlreadercore">
       <Documentation long_help="Reads ASCII or binary stereo lithography (STL) files."
@@ -1175,8 +1353,8 @@
         describing which solid a cell belongs to.</Documentation>
       </IntVectorProperty>
       <!-- End stlreader -->
-    </SourceProxy>
-    <SourceProxy class="vtkDelimitedTextReader"
+    </Proxy>
+    <Proxy class="vtkDelimitedTextReader"
                  label="CSV Reader"
                  name="CSVReaderCore">
       <Documentation long_help="Reads a comma-separated values file into a 1D rectilinear grid."
@@ -1213,6 +1391,15 @@
         <Documentation>This property indicates whether to use the string
         delimiter.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetAddTabFieldDelimiter"
+                         default_values="0"
+                         name="AddTabFieldDelimiter"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to add the tab character as a
+        field delimiter to the list of other delimiter characters. This is needed
+        since in the GUI the user can't enter a tab character.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetHaveHeaders"
                          default_values="1"
                          name="HaveHeaders"
@@ -1241,8 +1428,8 @@
         how many.</Documentation>
       </IntVectorProperty>
       <!-- End of CSVReaderCore -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLMultiBlockDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLMultiBlockDataReader"
                  label="XML Multi-Block Data reader"
                  name="XMLMultiBlockDataReaderCore">
       <Documentation>Internal proxy used by
@@ -1254,11 +1441,23 @@
                             panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the VTK
-        multi-block reader.</Documentation>
+        multiblock reader.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetPieceDistribution"
+                         default_values="0"
+                         name="PieceDistribution"
+                         number_of_elements="1">
+        <Documentation>Control how datasets are loaded in parallel.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Block"
+                 value="0" />
+          <Entry text="Interleave"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <!-- End MultiBlockDataReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkXMLHierarchicalBoxDataReader"
+    </Proxy>
+    <Proxy class="vtkXMLHierarchicalBoxDataReader"
                  label="XML Hierarchical Box Data reader"
                  name="XMLHierarchicalBoxDataReaderCore">
       <StringVectorProperty animateable="0"
@@ -1271,9 +1470,9 @@
         hierarchical box data reader.</Documentation>
       </StringVectorProperty>
       <!-- End HierarchicalBoxDataReader -->
-    </SourceProxy>
+    </Proxy>
 
-    <SourceProxy class="vtkXMLUniformGridAMRReader"
+    <Proxy class="vtkXMLUniformGridAMRReader"
                  label="XML UniformGrid AMR reader"
                  name="XMLUniformGridAMRReaderCore">
       <IntVectorProperty command="SetMaximumLevelsToReadByDefault"
@@ -1293,9 +1492,9 @@
         </Documentation>
       </IntVectorProperty>
       <!-- End XMLUniformGridAMRReaderCore -->
-    </SourceProxy>
+    </Proxy>
 
-    <SourceProxy class="vtkSLACParticleReader"
+    <Proxy class="vtkSLACParticleReader"
                  label="SLAC Particle Data Reader"
                  name="SLACParticleReaderCore">
       <Documentation>The SLAC Particle data reader.</Documentation>
@@ -1307,9 +1506,9 @@
         <FileListDomain name="files" />
         <Documentation>The name of the file to load.</Documentation>
       </StringVectorProperty>
-    </SourceProxy>
+    </Proxy>
     <!-- SLACParticleReaderCore -->
-    <SourceProxy class="vtkParticleReader"
+    <Proxy class="vtkParticleReader"
                  label="VTK Particle Reader"
                  name="ParticleReaderCore">
       <Documentation>Core for ParticleReader.</Documentation>
@@ -1373,7 +1572,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <!-- ParticleReaderCore -->
-    </SourceProxy>
+    </Proxy>
     <SourceProxy class="vtkPExodusIIReader"
                  name="ExodusIIReaderCore">
       <Documentation long_help="Reads an Exodus II file to produce an unstructured grid."
@@ -1442,6 +1641,20 @@
         </IntRangeDomain>
         <Documentation>Specify which mode shape to animate when HasModeShapes
         is on.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIgnoreFileTime"
+                         animateable="0"
+                         default_values="0"
+                         name="IgnoreFileTime"
+                         label="Ignore File Time"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If on, the reader will ignore the time value reported at
+        each time step, using the index of the time step as the time value. This
+        is useful for Exodus files where different time steps are overloaded to
+        represent different aspects of a data set rather than the data set at
+        different time values.
+        </Documentation>
       </IntVectorProperty>
       <StringVectorProperty information_only="1"
                             name="EdgeBlocksInfo">
@@ -2161,7 +2374,7 @@
       </StringVectorProperty>
       <!-- End ExodusIIReaderCore -->
     </SourceProxy>
-    <SourceProxy class="vtkTecplotReader"
+    <Proxy class="vtkTecplotReader"
                  label="VTK Tecplot Reader"
                  name="TecplotReaderCore">
       <Documentation>Core for TecplotReader</Documentation>
@@ -2194,8 +2407,8 @@
         data and cell data) to read.</Documentation>
       </StringVectorProperty>
       <!-- End TecplotReaderCore-->
-    </SourceProxy>
-    <SourceProxy class="vtkNetCDFCAMReader"
+    </Proxy>
+    <Proxy class="vtkNetCDFCAMReader"
                  label="NetCDF CAM reader"
                  name="NetCDFCAMReaderCore">
       <Documentation>Core for NetCDF CAM reader.</Documentation>
@@ -2338,7 +2551,7 @@
                          name="CellLayerRight"
                          number_of_elements="1"
                          panel_visibility="never">
-        <Documentation>**DEPRECATED in ParaView 4.4.** No longer needed/suported.</Documentation>
+        <Documentation>**DEPRECATED in ParaView 4.4.** No longer needed/supported.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
@@ -2351,9 +2564,9 @@
         <ReaderFactory extensions="nc ncdf"
                        file_description="CAM NetCDF (Unstructured)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End NetCDFCAMReaderCore -->
-    <SourceProxy class="vtkNetCDFPOPReader"
+    <Proxy class="vtkNetCDFPOPReader"
                  label="NetCDF POP reader"
                  name="NetCDFPOPReaderCore">
       <Documentation>Core for NetCDF POP reader.</Documentation>
@@ -2384,7 +2597,7 @@
                       name="VariableArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which netCDF variables to
+        <Documentation>This property lists which NetCDF variables to
         load.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
@@ -2402,9 +2615,9 @@
         <ReaderFactory extensions="pop.ncdf pop.nc"
                        file_description="POP Ocean NetCDF (Rectilinear)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End NetCDFPOPReaderCore -->
-    <SourceProxy class="vtkUnstructuredPOPReader"
+    <Proxy class="vtkUnstructuredPOPReader"
                  label="Unstructured NetCDF POP reader"
                  name="UnstructuredPOPReaderCore">
       <Documentation long_help="Reads rectilinear grid data from a NetCDF POP file and converts it into unstructured data."
@@ -2459,9 +2672,9 @@
         <ReaderFactory extensions="pop.ncdf pop.nc"
                        file_description="POP Ocean NetCDF (Unstructured)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End UnstructuredPOPReaderCore -->
-    <SourceProxy class="vtkPNetCDFPOPReader"
+    <Proxy class="vtkPNetCDFPOPReader"
                  label="Parallel NetCDF POP reader"
                  name="PNetCDFPOPReaderCore">
       <Documentation>Core for Parallel NetCDF POP reader.</Documentation>
@@ -2492,7 +2705,7 @@
                       name="VariableArrayInfo" />
           </RequiredProperties>
         </ArraySelectionDomain>
-        <Documentation>This property lists which netCDF variables to
+        <Documentation>This property lists which NetCDF variables to
         load.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty animateable="0"
@@ -2510,12 +2723,12 @@
         <ReaderFactory extensions="pop.ncdf pop.nc"
                        file_description="Parallel POP Ocean NetCDF (Rectilinear)" />
       </Hints>
-    </SourceProxy>
+    </Proxy>
     <!-- End PNetCDFPOPReaderCore -->
 
 
     <!-- ============================================================= -->
-    <SourceProxy class="vtkPNGReader"
+    <Proxy class="vtkPNGReader"
                  label="PNG Reader"
                  name="PNGReader">
       <Documentation long_help="Reads a PNG file into an image data."
@@ -2546,8 +2759,8 @@
                        file_description="PNG Image Files" />
       </Hints>
       <!-- End PNGReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkJPEGReader"
+    </Proxy>
+    <Proxy class="vtkJPEGReader"
                  label="JPEG Reader"
                  name="JPEGReader">
       <Documentation long_help="Reads a JPEG file into an image data."
@@ -2578,8 +2791,8 @@
                        file_description="JPEG Image Files" />
       </Hints>
       <!-- End JPEGReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkTIFFReader"
+    </Proxy>
+    <Proxy class="vtkTIFFReader"
                  label="TIFF Reader"
                  name="TIFFReader">
       <Documentation long_help="Reads a TIFF file into an image data."
@@ -2631,8 +2844,8 @@
                        file_description="TIFF Image Files" />
       </Hints>
       <!-- End TIFFReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkMRCReader"
+    </Proxy>
+    <Proxy class="vtkMRCReader"
                  label="MRC Reader"
                  name="MRCReader">
       <Documentation long_help="Reads a MRC file into an image data."
@@ -2654,8 +2867,8 @@
                        file_description="MRC Image Files" />
       </Hints>
       <!-- End MRCReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkNetCDFCFReader"
+    </Proxy>
+    <Proxy class="vtkNetCDFCFReader"
                  name="netCDFReaderCore">
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -2782,9 +2995,9 @@
         animation panel. ParaView will then automatically set up the animation
         to visit the time steps defined in the file.</Documentation>
       </DoubleVectorProperty>
-    </SourceProxy>
+    </Proxy>
     <!-- netCDFReaderCore -->
-    <SourceProxy class="vtkMultiBlockPLOT3DReader"
+    <Proxy class="vtkMultiBlockPLOT3DReader"
                  name="P3DReaderCore">
       <Documentation long_help="Reads ASCII or binary PLOT3D files."
                      short_help="Read PLOT3D files.">PLOT3D is a plotting
@@ -2792,7 +3005,7 @@
                      ASCII and binary PLOT3D files. The default file extension
                      for the geometry files is .xyz, and the default file
                      extension for the solution files is .q. The output of this
-                     reader is a multi-block dataset containing curvilinear
+                     reader is a multiblock dataset containing curvilinear
                      (structured grid) datasets.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
@@ -2831,7 +3044,7 @@
         <BooleanDomain name="bool" />
         <Documentation>When this options is enabled, the reader will try to
   automatically figure out various settings for a binary file. The other
-  options are ignored. Does not work for text (ascii) files.</Documentation>
+  options are ignored. Does not work for text (ASCII) files.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetBinaryFile"
                          default_values="1"
@@ -2931,7 +3144,7 @@
           <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
           <Entry text="Scalar - Entropy"
                  value="170" />
-          <Entry text="Scalar - Swirl."
+          <Entry text="Scalar - Swirl"
                  value="184" />
           <Entry text="Vector - Velocity"
                  value="200" />
@@ -2940,14 +3153,32 @@
           <!-- <Entry value="202" text="Vector - Momentum"/> -->
           <Entry text="Vector - Pressure gradient"
                  value="210" />
+          <Entry text="Scalar - Vorticity magnitude"
+                 value="211" />
+          <Entry text="Vector - Strain rate"
+                 value="212" />
         </EnumerationDomain>
         <Documentation>This property lists which functions (point-centered
         arrays) to compute.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="PreserveIntermediateFunctions"
+        command="SetPreserveIntermediateFunctions"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the reader will preserve intermediate computed
+          quantities that were not explicitly requested e.g. if **Velocity magnitude** is
+          enabled, but not **Velocity**, the reader still needs to compute **Velocity**.
+          If this is unchecked, then the output will not have
+          **Velocity** array, only the requested **VelocityMagnitude**. This is useful to
+          avoid using up memory for arrays that are not relevant for the analysis.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End P3DReaderCore -->
-    </SourceProxy>
+    </Proxy>
     <!-- Beginning of FLUENTReaderCore -->
-    <SourceProxy class="vtkFLUENTReader"
+    <Proxy class="vtkFLUENTReader"
                  name="FLUENTReaderCore">
       <StringVectorProperty information_only="1"
                             name="CellArrayInfo">
@@ -2970,124 +3201,10 @@
         <Documentation>Select which cell-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-    </SourceProxy>
+    </Proxy>
     <!-- End of FLUENTReaderCore -->
 
-    <!-- =================================================================== -->
-    <SourceProxy class="vtkXdmfReader" name="XdmfReaderCore">
-      <Documentation>
-        The actual reader proxy for Xdmf Reader. Make internal since it doesnt'
-        support file-series.
-      </Documentation>
-      <StringVectorProperty information_only="1"
-                            name="PointArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Point" />
-      </StringVectorProperty>
-      <StringVectorProperty command="SetPointArrayStatus"
-                            element_types="2 0"
-                            information_property="PointArrayInfo"
-                            label="Point Arrays"
-                            name="PointArrayStatus"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            panel_visibility="default"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="PointArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>This property lists which point-centered arrays to
-        read.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="CellArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Cell" />
-      </StringVectorProperty>
-      <StringVectorProperty command="SetCellArrayStatus"
-                            element_types="2 0"
-                            information_property="CellArrayInfo"
-                            label="Cell Arrays"
-                            name="CellArrayStatus"
-                            number_of_elements="0"
-                            number_of_elements_per_command="2"
-                            panel_visibility="default"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="CellArrayInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>This property lists which cell-centered arrays to
-        read.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty information_only="1"
-                            name="SetInfo">
-        <ArraySelectionInformationHelper attribute_name="Set" />
-      </StringVectorProperty>
-      <StringVectorProperty command="SetSetStatus"
-                            element_types="2 0"
-                            information_property="SetInfo"
-                            label="Sets"
-                            name="SetStatus"
-                            number_of_elements="2"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="SetInfo" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>Select the sets to be loaded from the dataset, if
-        any.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="GetSIL"
-                            information_only="1"
-                            name="GridInfo"
-                            si_class="vtkSISILProperty"
-                            subtree="Blocks" />
-      <IdTypeVectorProperty command="GetSILUpdateStamp"
-                            default_values="0"
-                            information_only="1"
-                            name="SILTimeStamp"
-                            number_of_elements="1" />
-      <StringVectorProperty command="SetGridStatus"
-                            element_types="2 0"
-                            label="Grids"
-                            name="GridStatus"
-                            number_of_elements_per_command="2"
-                            repeat_command="1">
-        <SILDomain name="array_list"
-                   subtree="Blocks">
-          <RequiredProperties>
-            <Property function="ArrayList"
-                      name="GridInfo" />
-            <Property function="TimeStamp"
-                      name="SILTimeStamp" />
-          </RequiredProperties>
-        </SILDomain>
-        <Documentation>Controls which particular data sets to read from a file
-        that contains many data sets inside a composite data set
-        collection.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetStride"
-                         default_values="1 1 1"
-                         name="Stride"
-                         number_of_elements="3">
-        <IntRangeDomain min="1 1 1"
-                        name="range" />
-        <Documentation>If loading structured data, this property indicate the
-        number of indices per dimension (X, Y, or Z) to skip between each point
-        included in this output.</Documentation>
-      </IntVectorProperty>
-      <!-- End of XdmfReaderCore -->
-    </SourceProxy>
-
-    <SourceProxy class="vtkPLYReader" name="PLYReaderCore">
+    <Proxy class="vtkPLYReader" name="PLYReaderCore">
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
@@ -3098,7 +3215,46 @@
         reader.</Documentation>
       </StringVectorProperty>
       <!-- End PLYReaderCore -->
+    </Proxy>
+
+    <SourceProxy name="AMReXParticlesReaderCore"
+      class="vtkAMReXParticlesReader">
+      <Documentation short_help="Reader for AMReX particle data">
+        Internal reader proxy for AMReX particles.
+      </Documentation>
+
+      <StringVectorProperty name="ParticleType"
+        command="SetParticleType"
+        number_of_elements="1"
+        default_values="particles">
+        <Documentation>
+          Set the type of particles to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PointArrayInfo"
+        command="GetPointDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointArrayStatus"
+        command="GetPointDataArraySelection"
+        information_property="PointArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the point arrays to read load.</Documentation>
+      </StringVectorProperty>
+      <!-- End AMReXParticlesReaderCore -->
     </SourceProxy>
+
 
     <!-- End of "internal_sources" -->
   </ProxyGroup>
@@ -3405,7 +3561,7 @@
                                    property="LimitPointCloudToBounds"
                                    value="1" />
         </Hints>
-        <Documentation>Define the spatial volume that wil restrict the
+        <Documentation>Define the spatial volume that will restrict the
         extent of the point cloud [xmin, xmax, ymin, ymax, zmin, zmax]</Documentation>
 
       </DoubleVectorProperty>
@@ -3427,7 +3583,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the PVD
         reader.</Documentation>
@@ -3438,6 +3595,82 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+
+      <!--  Array Selection GUI Component -->
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="PointArrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="ColumnArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Column" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColumnArrayStatus"
+                            element_types="2 0"
+                            information_property="ColumnArrayInfo"
+                            label="Column Arrays"
+                            name="ColumnArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="ColumnArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which columns to
+        read.</Documentation>
+      </StringVectorProperty>
+      <PropertyGroup label="Point/Cell/Column Array Status"
+                     name="ArrayStatus"
+                     panel_visibility="default"
+                     panel_widget="ArrayStatus">
+        <Property name="CellArrayInfo" />
+        <Property name="CellArrayStatus" />
+        <Property name="PointArrayInfo" />
+        <Property name="PointArrayStatus" />
+        <Property name="ColumnArrayInfo" />
+        <Property name="ColumnArrayStatus" />
+      </PropertyGroup>
       <Hints>
         <ReaderFactory extensions="pvd"
                        file_description="ParaView Data Files" />
@@ -3493,10 +3726,10 @@
                  label="XML MultiBlock Data Reader"
                  name="XMLMultiBlockDataReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Documentation long_help="Reads a VTK XML multi-block data file and the serial VTK XML data files to which it points."
-                     short_help="Read VTK XML multi-block datasets.">The XML
-                     Multi-Block Data reader reads the VTK XML multi-block data
-                     file format. XML multi-block data files are meta-files
+      <Documentation long_help="Reads a VTK XML multiblock data file and the serial VTK XML data files to which it points."
+                     short_help="Read VTK XML multiblock datasets.">The XML
+                     Multiblock Data reader reads the VTK XML multiblock data
+                     file format. XML multiblock data files are meta-files
                      that point to a list of serial VTK XML files. When reading
                      in parallel, this reader will distribute sub-blocks among
                      processors. The expected file extensions are .vtm and
@@ -3505,6 +3738,9 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="XMLMultiBlockDataReaderCore"></Proxy>
+          <ExposedProperties>
+            <Property name="PieceDistribution" />
+          </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
@@ -3703,6 +3939,63 @@
     </SourceProxy>
 
     <!-- XMLPolyDataReader -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML Table Reader"
+                 name="XMLTableReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads serial VTK XML table files."
+                     short_help="Read VTK XML table files.">The XML Table
+                     reader reads the VTK XML Table file format. The
+                     standard extension is .vtt. This reader also supports file
+                     series.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLTableReaderCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Column Array Status"
+                         name="ColumnArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="ColumnArrayInfo" />
+            <Property name="ColumnArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the VTK XML table format. The standard
+        extension is .vtt. If more than one file is specified, the reader will
+        switch to file series mode in which it will pretend that it can support
+        time and provide one file per time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="vtt"
+                       file_description="VTK Table Files" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- XMLTableReader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="XML Unstructured Grid Reader"
@@ -4058,6 +4351,66 @@
       </Hints>
     </SourceProxy>
     <!-- XMLPUnstructuredGridReader -->
+<SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML Partitioned Table Reader"
+                 name="XMLPTableReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads the summary file and the associated VTK XML table data files."
+                     short_help="Read partitioned VTK XML table data files.">
+                     The XML Partitioned Table reader reads the
+                     partitioned VTK table data file format. It
+                     reads the partitioned format's summary file and then the
+                     associated VTK XML table data files. The
+                     expected file extension is .pvtt. This reader also
+                     supports file series.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLPTableReaderCore"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="Column Array Status"
+                         name="ColumnArrayStatus"
+                         panel_visibility="default"
+                         panel_widget="ArrayStatus">
+            <Property name="ColumnArrayInfo" />
+            <Property name="ColumnArrayStatus" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the partitioned VTK XML table data
+        format. The standard extension is .pvtt. If more than one file is
+        specified, the reader will switch to file series mode in which it will
+        pretend that it can support time and provide one file per time
+        step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="pvtt"
+                       file_description="VTK Table (partitioned)" />
+      </Hints>
+    </SourceProxy>
+    <!-- XMLPTableReader -->
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="XML Partitioned Image Data Reader"
@@ -4290,7 +4643,7 @@
                      4.2, although still supported). The expected file
                      extension is .vtk. The type of the dataset may be
                      structured grid, uniform rectilinear grid (image/volume),
-                     non-uniform rectiinear grid, unstructured grid, or
+                     non-uniform rectilinear grid, unstructured grid, or
                      polygonal. This reader also supports file
                      series.</Documentation>
       <SubProxy>
@@ -4324,7 +4677,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vtk"
+        <ReaderFactory extensions="vtk vtk.series"
                        file_description="Legacy VTK files" />
       </Hints>
       <!-- End LegacyVTKFileReader -->
@@ -4335,7 +4688,7 @@
       <Documentation long_help="Reads files stored in VTK partitioned legacy format."
                      short_help="Read partitioned legacy VTK files.">The
                      Partitioned Legacy VTK reader loads files stored in VTK's
-                     partitioned legac file format (before VTK 4.2, although
+                     partitioned legacy file format (before VTK 4.2, although
                      still supported). The expected file extension is .pvtk.
                      The type of the dataset may be structured grid, uniform
                      rectilinear grid (image/volume), non-uniform rectilinear
@@ -4362,7 +4715,7 @@
                      files in the format produced by CEI's EnSight. EnSight 6
                      and Gold files (both ASCII and binary) are supported. The
                      default extension is .case. The output of this reader is a
-                     multi-block dataset.</Documentation>
+                     multiblock dataset.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetCaseFileName"
                             name="CaseFileName"
@@ -4659,7 +5012,7 @@
                             default_values=","
                             name="Delimeter"
                             number_of_elements="1">
-        <Documentation>Character that is used as the delimeter.</Documentation>
+        <Documentation>Character that is used as the delimiter.</Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
@@ -4718,7 +5071,7 @@
                      developed at Stanford University. The PLY files that
                      ParaView can read must have the elements "vertex" and
                      "face" defined. The "vertex" elements must have the
-                     propertys "x", "y", and "z". The "face" elements must have
+                     properties "x", "y", and "z". The "face" elements must have
                      the property "vertex_indices" defined. The default file
                      extension for this reader is .ply.</Documentation>
       <SubProxy>
@@ -4962,8 +5315,8 @@
       <Documentation long_help="Reads files in EnSight's Master Server format."
                      short_help="Read parallel EnSight files.">The EnSight
                      Master Server reader reads EnSight's parallel files. The
-                     master file ususally has a .sos extension and may point to
-                     multiple .case files. The output is a multi-block
+                     master file usually has a .sos extension and may point to
+                     multiple .case files. The output is a multiblock
                      dataset.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetCaseFileName"
@@ -5050,151 +5403,6 @@
       <!-- End ensightMS -->
     </SourceProxy>
 
-    <SourceProxy label="Image Reader" name="ImageReader" class="vtkPVImageReader">
-      <Documentation long_help="Reads raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified."
-                     short_help="Read raw regular rectilinear grid data from a file.">
-                     The Image reader reads raw, regular, rectilinear grid
-                     (image/volume) data from a file. Because no metadata is
-                     provided, the user must specify information about the
-                     size, spacing, dimensionality, etc. about the
-                     dataset.</Documentation>
-      <!-- Unlike most readers, we need to show the "filename" so that users
-          can strip off the extension and replace it in the file pattern.
-          I'm creating this "Property" hint that has an attribute to force
-          whether the given property is shown in the GUI or not. -->
-      <Hints>
-        <Property name="FilePrefix"
-                  show="1" />
-        <ReaderFactory extensions="raw"
-                       file_description="Raw (binary) Files" />
-      </Hints>
-      <StringVectorProperty command="SetFilePrefix"
-                            name="FilePrefix"
-                            number_of_elements="1">
-        <FileListDomain name="files" />
-        <Documentation>The text string contained in this property specifies the
-        file prefix (directory plus common initial part of file name) for the
-        raw binary uniform rectilinear grid dataset.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetFilePattern"
-                            default_values="%s"
-                            name="FilePattern"
-                            number_of_elements="1">
-        <Documentation>The text string contained in the property specifies the
-        format string to determine the file names necessary for reading this
-        dataset. In creating the filenames, %s will be replaced by the prefix
-        and %d by a digit which represents the slice number in Z. The format
-        string is the same as that used by printf.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetDataScalarType"
-                         default_values="4"
-                         name="DataScalarType"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="char"
-                 value="2" />
-          <Entry text="unsigned char"
-                 value="3" />
-          <Entry text="short"
-                 value="4" />
-          <Entry text="unsigned short"
-                 value="5" />
-          <Entry text="int"
-                 value="6" />
-          <Entry text="unsigned int"
-                 value="7" />
-          <Entry text="long"
-                 value="8" />
-          <Entry text="unsigned long"
-                 value="9" />
-          <Entry text="float"
-                 value="10" />
-          <Entry text="double"
-                 value="11" />
-        </EnumerationDomain>
-        <Documentation>The value of this property indicates the scalar type of
-        the pixels/voxels in the file(s): short, int, float ...</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetDataByteOrder"
-                         default_values="0"
-                         name="DataByteOrder"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="BigEndian"
-                 value="0" />
-          <Entry text="LittleEndian"
-                 value="1" />
-        </EnumerationDomain>
-        <Documentation>This property indicates the byte order of the binary
-        file(s).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetFileDimensionality"
-                         default_values="3"
-                         name="FileDimensionality"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="2"
-                 value="2" />
-          <Entry text="3"
-                 value="3" />
-        </EnumerationDomain>
-        <Documentation>This property indicates whether the file(s) in this
-        dataset contain slices (2D) or volumes (3D).</Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetDataOrigin"
-                            default_values="0.0 0.0 0.0"
-                            name="DataOrigin"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-        <Documentation>The coordinate contained in this property specifies the
-        position of the point with index (0,0,0).</Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetDataSpacing"
-                            default_values="1.0 1.0 1.0"
-                            name="DataSpacing"
-                            number_of_elements="3">
-        <DoubleRangeDomain name="range" />
-        <Documentation>This property specifies the size of a voxel in each
-        dimension.</Documentation>
-      </DoubleVectorProperty>
-      <IntVectorProperty command="SetDataExtent"
-                         default_values="0 0 0 0 0 0"
-                         name="DataExtent"
-                         number_of_elements="6">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the minimum and maximum index
-        values of the data in each dimension (xmin, xmax, ymin, ymax, zmin,
-        zmax).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetNumberOfScalarComponents"
-                         default_values="1"
-                         name="NumberOfScalarComponents"
-                         number_of_elements="1">
-        <IntRangeDomain name="range" />
-        <Documentation>This property specifies the number of components the
-        scalar value at each pixel or voxel has (e.g., RGB - 3 scalar
-        components).</Documentation>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetScalarArrayName"
-                            default_values="ImageFile"
-                            name="ScalarArrayName"
-                            number_of_elements="1">
-        <Documentation>This property contains a text string listing a name to
-        assign to the point-centered data array read.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetFileLowerLeft"
-                         default_values="1"
-                         name="FileLowerLeft"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property determines whether the data originates in
-        the lower left corner (on) or the upper left corner (off). Most
-        scientific data is written with a right-handed axes that originates in
-        the lower left corner. However, several 2D image file formats write the
-        image from the upper left corner.</Documentation>
-      </IntVectorProperty>
-      <!-- End ImageReader -->
-    </SourceProxy>
     <SourceProxy class="vtkNrrdReader"
                  label="Nrrd Reader"
                  name="NrrdReader">
@@ -5497,51 +5705,28 @@
       </Hints>
       <!-- End TIFFSeriesReader -->
     </SourceProxy>
-    <SourceProxy class="vtkFileSeriesReader"
+    <SourceProxy class="vtkRawImageFileSeriesReader"
                  file_name_method="SetFileName"
-                 label="XDMF Reader"
-                 name="XdmfReader"
+                 label="Image Reader"
+                 name="ImageReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Documentation long_help="Reads XDMF (eXtensible Data Model and Format) files."
-                     short_help="Read XDMF data files.">The XDMF reader reads
-                     files in XDMF format. The expected file extension is .xmf.
-                     Metadata is stored in the XDMF file using an XML format,
-                     and large attribute arrays are stored in a corresponding
-                     HDF5 file. The output may be unstructured grid, structured
-                     grid, or rectiliner grid. See http://www.xdmf.org for a
-                     description of the file format.</Documentation>
-      <SubProxy>
-        <Proxy name="Reader"
-               proxygroup="internal_sources"
-               proxyname="XdmfReaderCore" />
-        <ExposedProperties>
-          <Property name="PointArrayInfo" />
-          <Property name="PointArrayStatus" />
-          <Property name="CellArrayInfo" />
-          <Property name="CellArrayStatus" />
-          <Property name="SetInfo" />
-          <Property name="SetStatus" />
-          <Property name="GridInfo" />
-          <Property name="GridStatus" />
-          <Property name="Stride" />
-          <Property name="SILTimeStamp" />
-        </ExposedProperties>
-      </SubProxy>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
+      <Documentation long_help="Reads a series of raw files into an time sequence of image datas."
+                     short_help="Read a series of raw files.">The raw series
+                     reader reads raw files. The output is a time sequence of
+                     uniform rectilinear (image/volume) dataset. The default
+                     file extension is .raw.</Documentation>
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
                             name="FileNames"
-                            number_of_elements="0"
+                            number_of_elements="1"
                             panel_visibility="never"
                             repeat_command="1">
         <FileListDomain name="files" />
-        <Documentation>The list of files to be read by the
-        reader.</Documentation>
+        <Documentation>The list of files to be read by the reader. If more than
+        one file is specified, the reader will switch to file series mode in
+        which it will pretend that it can support time and provide one file per
+        time step.</Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
@@ -5549,11 +5734,57 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty name="ReadAsImageStack"
+                         command="SetReadAsImageStack"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the reader will read the set of files as an image stack, rather than
+          a temporal file series.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ImageReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DataScalarType" />
+          <Property name="DataByteOrder" />
+          <Property name="DataOrigin" />
+          <Property name="DataSpacing" />
+          <Property name="NumberOfScalarComponents" />
+          <Property name="FileLowerLeft" />
+          <Property name="ScalarArrayName" />
+        </ExposedProperties>
+      </SubProxy>
+      <IntVectorProperty command="SetFileDimensionality"
+                         default_values="3"
+                         name="FileDimensionality"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="2"
+                 value="2" />
+          <Entry text="3"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>This property indicates whether the file(s) in this
+        dataset contain slices (2D) or volumes (3D).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDataExtent"
+                         default_values="0 0 0 0 0 0"
+                         name="DataExtent"
+                         number_of_elements="6">
+        <IntRangeDomain name="range" />
+        <Documentation>This property specifies the minimum and maximum index
+        values of the data in each dimension (xmin, xmax, ymin, ymax, zmin,
+        zmax).</Documentation>
+      </IntVectorProperty>
       <Hints>
-        <ReaderFactory extensions="xmf xdmf xmf2 xdmf2"
-                       file_description="Xdmf Reader" />
+        <ReaderFactory extensions="raw"
+                       file_description="Raw (binary) Files" />
       </Hints>
-      <!-- End of XdmfReader -->
+      <!-- End RAWSeriesReader -->
     </SourceProxy>
 
     <SourceProxy class="vtkExodusFileSeriesReader"
@@ -5672,6 +5903,9 @@
             <Property name="ModeShape" panel_visibility="advanced" />
             <Property name="AnimateVibrations" panel_visibility="advanced" />
             <Property name="ModeShapesRangeInfo" />
+          </PropertyGroup>
+          <PropertyGroup label="Time">
+            <Property name="IgnoreFileTime" panel_visibility="advanced" />
           </PropertyGroup>
           <PropertyGroup label="File Pattern">
             <Property name="FilePrefix" panel_visibility="advanced" />
@@ -5969,9 +6203,9 @@
     <!-- Beginning of OpenFOAM Reader -->
     <SourceProxy class="vtkPOpenFOAMReader"
                  name="OpenFOAMReader">
-      <Documentation long_help="Reads OpenFOAM data files, producing multi-block dataset."
+      <Documentation long_help="Reads OpenFOAM data files, producing multiblock dataset."
                      short_help="Read OpenFOAM data files.">The OpenFOAM reader
-                     reads OpenFOAM data files and outputs multi-block
+                     reads OpenFOAM data files and outputs multiblock
                      datasets. Mesh information and time dependent data are
                      supported. The OpenFOAM format is described fully at
                      http://www.openfoam.com/docs/user/basic-file-format.php</Documentation>
@@ -6543,9 +6777,9 @@
                  label="NetCDF Reader"
                  name="netCDFReader"
                  si_class="vtkSIMetaReaderProxy">
-      <Documentation long_help="Reads regular arrays from netCDF files. Will also read any topological information specified by the COARDS and CF conventions."
-                     short_help="Read regular arrays from netCDF files.">Reads
-                     arrays from netCDF files into structured VTK data sets. In
+      <Documentation long_help="Reads regular arrays from NetCDF files. Will also read any topological information specified by the COARDS and CF conventions."
+                     short_help="Read regular arrays from NetCDF files.">Reads
+                     arrays from NetCDF files into structured VTK data sets. In
                      the absence of any other information, the files will be
                      read as image data. This reader will also look for meta
                      information specified by the CF convention that specify
@@ -6604,7 +6838,7 @@
       Linear Accelerator Center (SLAC)">A reader for a data format
       used by Omega3p, Tau3p, and several other tools used at the
       Standford Linear Accelerator Center (SLAC). The underlying
-      format uses netCDF to store arrays, but also imposes several
+      format uses NetCDF to store arrays, but also imposes several
       conventions to form an unstructured grid of
       elements.</Documentation>
       <OutputPort index="0"
@@ -6826,14 +7060,16 @@
           <Property name="UseStringDelimiter" />
           <Property name="HaveHeaders" />
           <Property name="FieldDelimiterCharacters" />
+          <Property name="AddTabFieldDelimiter" />
           <Property name="MergeConsecutiveDelimiters" />
         </ExposedProperties>
       </SubProxy>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="SpreadSheetView" />
-        <ReaderFactory extensions="csv txt CSV TXT"
+        <ReaderFactory extensions="csv tsv txt CSV TSV TXT"
                        file_description="Delimited Text" />
+        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
       </Hints>
       <!-- End of CSVReader -->
     </SourceProxy>
@@ -6882,7 +7118,7 @@
                          name="Skip #column name fields"
                          number_of_elements="1"
                          panel_visibility="advanced">
-        <Documentation>Number of fiels to skip while reading column names.</Documentation>
+        <Documentation>Number of fields to skip while reading column names.</Documentation>
       </IntVectorProperty>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
@@ -7617,7 +7853,7 @@
                      ASCII and binary PLOT3D files. The default file extension
                      for the geometry files is .xyz, and the default file
                      extension for the solution files is .q. The output of this
-                     reader is a multi-block dataset containing curvilinear
+                     reader is a multiblock dataset containing curvilinear
                      (structured grid) datasets.</Documentation>
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
@@ -7650,6 +7886,7 @@
           <Property name="DoublePrecision" />
           <Property name="ByteOrder" />
           <Property name="Functions" />
+          <Property name="PreserveIntermediateFunctions" />
           <Property name="ForceRead" />
         </ExposedProperties>
       </SubProxy>
@@ -7846,20 +8083,19 @@ series.
       </Hints>
     </EnsembleDataReaderProxy>
     <!-- End Ensemble Data Reader -->
-
     <!-- GE/LANL TRUCHAS Reader -->
     <SourceProxy class="vtkTRUCHASReader"
                  label="TRUCHAS Reader"
                  name="TruchasReader">
-      <Documentation long_help="Reads TRUCHAS data from hdf5"
-                     short_help="Reads TRUCHAS data">Reads TRUCHAS simulation output stored in hdf5.</Documentation>
+      <Documentation long_help="Reads TRUCHAS data from HDF5"
+                     short_help="Reads TRUCHAS data">Reads TRUCHAS simulation output stored in HDF5.</Documentation>
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
                             number_of_elements="1"
                             panel_visibility="never">
         <FileListDomain name="files" />
-        <Documentation>This property specifies the hdf5 file name</Documentation>
+        <Documentation>This property specifies the HDF5 file name</Documentation>
       </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
@@ -7937,6 +8173,71 @@ series.
         <ReaderFactory extensions="hdf5 h5"
                        file_description="TRUCHAS dataset" />
       </Hints>
+    </SourceProxy>
+    <!-- HyperTreeGrid Reader -->
+    <SourceProxy class="vtkXMLHyperTreeGridReader"
+                 label="HyperTreeGrid Reader"
+                 name="HyperTreeGridReader">
+      <Documentation long_help="Reads HyperTreeGrid .htg files"
+                     short_help="Reads HyperTreeGrid data">Reads HyperTreeGrid data files</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name</Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="htg"
+                       file_description="HyperTreeGrid" />
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="AMReXParticlesReader"
+      class="vtkFileSeriesReader"
+      file_name_method="SetPlotFileName"
+      label="AMReX Particles Reader"
+      si_class="vtkSIMetaReaderProxy">
+      <Documentation short_help="Reader for AMReX particle data">
+        Reads particle data from AMReX plotfiles.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Reader" proxygroup="internal_sources" proxyname="AMReXParticlesReaderCore" />
+        <ExposedProperties>
+          <Property name="ParticleType" />
+          <Property name="PointArrayInfo" />
+          <Property name="PointArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of plotfiles to be read by the reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1" name="TimestepValues" repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory
+          filename_patterns="plt*"
+          file_description="AMReX plotfiles (particles)"
+          is_directory="1" />
+      </Hints>
+      <!-- end AMReXParticlesReader -->
     </SourceProxy>
 
   </ProxyGroup>

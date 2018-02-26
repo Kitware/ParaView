@@ -296,6 +296,12 @@ public:
   using Superclass::ResetPropertiesToXMLDefaults;
   //@}
 
+  /**
+   * Reset the transfer function's AutomaticRescaleResetMode to the global
+   * TransferFunctionRresetMode setting.
+   */
+  void ResetRescaleModeToGlobalSetting();
+
   //@{
   /**
    * Method to convert legacy color map preset XML to JSON. Use this to convert
@@ -335,11 +341,17 @@ public:
 
 protected:
   vtkSMTransferFunctionProxy();
-  ~vtkSMTransferFunctionProxy();
+  ~vtkSMTransferFunctionProxy() override;
+
+  /**
+   * Attempt to reset transfer function to site settings. If site settings are not
+   * available, then the application XML defaults are used.
+   */
+  void RestoreFromSiteSettingsOrXML(const char* arrayName);
 
 private:
-  vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMTransferFunctionProxy&) VTK_DELETE_FUNCTION;
+  vtkSMTransferFunctionProxy(const vtkSMTransferFunctionProxy&) = delete;
+  void operator=(const vtkSMTransferFunctionProxy&) = delete;
 };
 
 #endif

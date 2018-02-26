@@ -63,19 +63,13 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqSaveAnimationReaction::saveAnimation(); }
-
-  /**
-   * Prompt for a filename. Will return empty string if user
-   * cancelled the operation.
-   */
-  static QString promptFileName(pqServer* server, bool remote);
+  void onTriggered() override { pqSaveAnimationReaction::saveAnimation(); }
 
 private:
   Q_DISABLE_COPY(pqSaveAnimationReaction)

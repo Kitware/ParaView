@@ -66,7 +66,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 
 public:
   pqAnimationTimeWidget(QWidget* parent = 0);
-  virtual ~pqAnimationTimeWidget();
+  ~pqAnimationTimeWidget() override;
 
   /**
   * Provides access to the animation scene proxy currently

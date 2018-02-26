@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "ui_pqPythonDialog.h"
 
+#include "vtkObject.h"
+
 #include <QCloseEvent>
 #include <QFile>
 #include <QtDebug>
@@ -51,29 +53,13 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent)
   : Superclass(Parent)
   , Implementation(new pqImplementation())
 {
+  VTK_LEGACY_BODY(pqPythonDialog, "ParaView 5.5");
+
   this->Implementation->Ui.setupUi(this);
   this->setObjectName("pythonDialog");
   this->setWindowTitle(tr("Python Shell"));
-
-  QObject::connect(this->Implementation->Ui.clear, SIGNAL(clicked()), this, SLOT(clearConsole()));
-
-  QObject::connect(this->Implementation->Ui.close, SIGNAL(clicked()), this, SLOT(close()));
-
-  QObject::connect(this->Implementation->Ui.runScript, SIGNAL(clicked()), this, SLOT(runScript()));
-
-  QObject::connect(this->Implementation->Ui.reset, SIGNAL(clicked()),
-    this->Implementation->Ui.shellWidget, SLOT(reset()));
-
-  QObject::connect(this->Implementation->Ui.shellWidget, SIGNAL(executing(bool)),
-    this->Implementation->Ui.runScript, SLOT(setDisabled(bool)));
-
-  QObject::connect(this->Implementation->Ui.shellWidget, SIGNAL(executing(bool)),
-    this->Implementation->Ui.clear, SLOT(setDisabled(bool)));
-
-  QObject::connect(this->Implementation->Ui.shellWidget, SIGNAL(executing(bool)),
-    this->Implementation->Ui.close, SLOT(setDisabled(bool)));
-
   pqApplicationCore::instance()->settings()->restoreState("PythonDialog", *this);
+  this->Implementation->Ui.shellWidget->initialize();
 }
 
 pqPythonDialog::~pqPythonDialog()

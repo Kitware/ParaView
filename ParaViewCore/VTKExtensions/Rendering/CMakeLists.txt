@@ -39,6 +39,7 @@ set(Module_SRCS
   vtkContext2DScalarBarActor.cxx
   vtkCSVExporter.cxx
   vtkImageCompressor.cxx
+  vtkImageTransparencyFilter.cxx
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
   vtkLZ4Compressor.cxx
@@ -88,21 +89,12 @@ set(Module_SRCS
   vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkZlibImageCompressor.cxx
-  vtkCinemaExporter.cxx
 )
 
-# Disabled unless using the OpenGL backend.
-if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
+if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
-    vtkTexturePainter.cxx
+    vtkCinemaExporter.cxx
     )
-endif()
-
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  set_source_files_properties(
-    vtkPVDefaultPass.cxx
-    vtkPVGeometryFilter.cxx
-    PROPERTIES COMPILE_FLAGS -DVTKGL2)
 endif()
 
 if (PARAVIEW_USE_MPI)
@@ -119,45 +111,29 @@ if (PARAVIEW_USE_MPI)
     list(APPEND Module_SRCS
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx)
-    if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-      set_source_files_properties(vtkIceTCompositePass.cxx
-        PROPERTIES COMPILE_FLAGS -DVTKGL2)
-    endif()
   endif()
 endif()
 
-#set_source_files_properties(
-#  WRAP_EXCLUDE
-#  )
-if (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  include_directories(${Qt5Core_INCLUDE_DIRS})
-else ()
-  include_directories(${QT_INCLUDE_DIR})
-endif ()
-
-set_source_files_properties(
-  vtkCameraManipulatorGUIHelper
-  vtkImageCompressor
-  vtkPVJoystickFly
-  ABSTRACT)
+if (PARAVIEW_ENABLE_NVPIPE)
+  find_package(nvpipe REQUIRED)
+  list(APPEND Module_SRCS
+    vtkNvPipeCompressor.cxx
+    )
+  include_directories(${NVPIPE_INCLUDE_DIRS})
+endif()
 
 #---------------------------------------------------------
 # Encode glsl files.
 foreach (file vtkIceTCompositeZPassShader_fs.glsl)
   get_filename_component(file_we ${file} NAME_WE)
-  set(src  ${CMAKE_CURRENT_SOURCE_DIR}/${file})
-  set(res  ${CMAKE_CURRENT_BINARY_DIR}/${file_we}.cxx)
-  set(resh ${CMAKE_CURRENT_BINARY_DIR}/${file_we}.h)
-  list(APPEND shader_h_files ${resh})
-  add_custom_command(
-    OUTPUT ${res} ${resh}
-    DEPENDS ${src} vtkEncodeString
-    COMMAND vtkEncodeString
-    ARGS ${res} ${src} ${file_we} --build-header
-      VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVVTKExtensionsRenderingModule.h
-    )
-  list(APPEND Module_SRCS ${res})
-  set_source_files_properties(${file_we} WRAP_EXCLUDE)
+  vtk_encode_string(
+    INPUT         "${file}"
+    NAME          "${file_we}"
+    EXPORT_SYMBOL "VTKPVVTKEXTENSIONSRENDERING_EXPORT"
+    EXPORT_HEADER "vtkPVVTKExtensionsRenderingModule.h"
+    HEADER_OUTPUT header
+    SOURCE_OUTPUT source)
+  list(APPEND Module_SRCS ${source})
 endforeach()
 #---------------------------------------------------------
 
@@ -170,3 +146,8 @@ if(PARAVIEW_USE_MPI)
 endif()
 include(vtkOpenGL)
 vtk_opengl_link(vtkPVVTKExtensionsRendering)
+
+if(PARAVIEW_ENABLE_NVPIPE)
+  target_link_libraries(vtkPVVTKExtensionsRendering LINK_PRIVATE
+    ${NVPIPE_LIBRARIES})
+endif()

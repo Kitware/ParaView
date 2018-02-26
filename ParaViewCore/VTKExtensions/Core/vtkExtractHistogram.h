@@ -61,6 +61,17 @@ public:
 
   //@{
   /**
+   * Get/Set if first and last bins must be centered around the min and max
+   * data. This is only used when UseCustomBinRanges is set to false.
+   * Default is false.
+   */
+  vtkSetMacro(CenterBinsAroundMinAndMax, bool);
+  vtkGetMacro(CenterBinsAroundMinAndMax, bool);
+  vtkBooleanMacro(CenterBinsAroundMinAndMax, bool);
+  //@}
+
+  //@{
+  /**
    * Get/Set custom bin ranges to use. These are used only when
    * UseCustomBinRanges is set to true.
    */
@@ -91,7 +102,7 @@ public:
 
 protected:
   vtkExtractHistogram();
-  ~vtkExtractHistogram();
+  ~vtkExtractHistogram() override;
 
   /**
    * Returns the data range for the input array to process.
@@ -102,9 +113,9 @@ protected:
    */
   virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]);
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Initialize the bin_extents using the data range for the selected
@@ -118,6 +129,7 @@ protected:
   void FillBinExtents(vtkDoubleArray* bin_extents, double min, double max);
 
   double CustomBinRanges[2];
+  bool CenterBinsAroundMinAndMax;
   bool UseCustomBinRanges;
   int Component;
   int BinCount;
@@ -126,8 +138,8 @@ protected:
   vtkEHInternals* Internal;
 
 private:
-  void operator=(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
-  vtkExtractHistogram(const vtkExtractHistogram&) VTK_DELETE_FUNCTION;
+  void operator=(const vtkExtractHistogram&) = delete;
+  vtkExtractHistogram(const vtkExtractHistogram&) = delete;
 
   int GetInputFieldAssociation();
   vtkFieldData* GetInputFieldData(vtkDataObject* input);

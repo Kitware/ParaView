@@ -47,7 +47,7 @@ public:
 
 protected:
   vtkRulerLineForInput();
-  ~vtkRulerLineForInput();
+  ~vtkRulerLineForInput() override;
 
   int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inVectors,
@@ -59,8 +59,8 @@ private:
   vtkMultiProcessController* Controller;
   int Axis;
 
-  vtkRulerLineForInput(const vtkRulerLineForInput&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRulerLineForInput&) VTK_DELETE_FUNCTION;
+  vtkRulerLineForInput(const vtkRulerLineForInput&) = delete;
+  void operator=(const vtkRulerLineForInput&) = delete;
 };
 
 #endif

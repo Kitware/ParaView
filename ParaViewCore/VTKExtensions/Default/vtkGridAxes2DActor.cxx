@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
 #include "vtkProperty2D.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
@@ -323,7 +324,12 @@ void vtkGridAxes2DActor::SetCustomTickPositions(int axis, vtkDoubleArray* positi
 //----------------------------------------------------------------------------
 int vtkGridAxes2DActor::RenderOpaqueGeometry(vtkViewport* viewport)
 {
-  this->Update(viewport);
+  vtkRenderWindow* rWin = vtkRenderWindow::SafeDownCast(viewport->GetVTKWindow());
+  if (rWin == nullptr || rWin->GetDesiredUpdateRate() < 1.0)
+  {
+    this->Update(viewport);
+  }
+
   if (!this->DoRender)
   {
     return 0;

@@ -17,7 +17,7 @@
  * @brief   Data writer for ParaView
  *
  * vtkXMLPVAnimationWriter is used to save all parts of a current
- * source to a file with pieces spread across ther server processes.
+ * source to a file with pieces spread across other server processes.
 */
 
 #ifndef vtkXMLPVAnimationWriter_h
@@ -60,10 +60,10 @@ public:
 
 protected:
   vtkXMLPVAnimationWriter();
-  ~vtkXMLPVAnimationWriter();
+  ~vtkXMLPVAnimationWriter() override;
 
   // Replace vtkXMLWriter's writing driver method.
-  virtual int WriteInternal() VTK_OVERRIDE;
+  int WriteInternal() VTK_OVERRIDE;
 
   // Status safety check for method call ordering.
   int StartCalled;
@@ -81,8 +81,8 @@ protected:
   void AddInputInternal(const char* group);
 
 private:
-  vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkXMLPVAnimationWriter&) VTK_DELETE_FUNCTION;
+  vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&) = delete;
+  void operator=(const vtkXMLPVAnimationWriter&) = delete;
 };
 
 #endif

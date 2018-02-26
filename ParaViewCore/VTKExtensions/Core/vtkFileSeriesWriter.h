@@ -46,7 +46,7 @@ public:
   /**
    * Return the MTime also considering the internal writer.
    */
-  virtual vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   //@{
   /**
@@ -72,19 +72,57 @@ public:
 
   //@{
   /**
-   * Must be set to true to write all timesteps, otherwise only the current
-   * timestep will be written out. Off by default.
+   * If Off, which is the default, only the current timestep is written.
+   * If true the writer will write every timestep, or at least those
+   * within the range of min to max.
    */
   vtkGetMacro(WriteAllTimeSteps, int);
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
   //@}
 
+  //@{
+  /**
+   * Provides an option to pad the time step when writing out time series data.
+   * Only allow this format: ABC%.Xd where ABC is an arbitrary string which may
+   * or may not exist and d must exist and d must be the last character
+   * '.' and X may or may not exist, X must be an integer if it exists.
+   * Default is nullptr.
+   */
+  vtkGetStringMacro(FileNameSuffix);
+  vtkSetStringMacro(FileNameSuffix);
+  //@}
+
+  //@{
+  /**
+   * Sets a minimum timestep constraint on WriteAllTimeSteps.
+   */
+  vtkGetMacro(MinTimeStep, int);
+  vtkSetClampMacro(MinTimeStep, int, 0, VTK_INT_MAX);
+  //@}
+
+  //@{
+  /**
+   * Sets a maximum timestep constraint on WriteAllTimeSteps. If less than
+   * MinTimeStep, then the MaxTimeStep constraint is ignored (i.e. all time steps
+   * from MinTimeStep to the actual last time step are written out).
+   */
+  vtkGetMacro(MaxTimeStep, int);
+  vtkSetMacro(MaxTimeStep, int);
+  //@}
+
+  //@{
+  /**
+   * Sets a stride to write out time series.
+   */
+  vtkGetMacro(TimeStepStride, int);
+  vtkSetClampMacro(TimeStepStride, int, 1, VTK_INT_MAX);
+  //@}
+
   /**
    * see vtkAlgorithm for details
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Get/Set the interpreter to use to call methods on the writer.
@@ -93,7 +131,7 @@ public:
 
 protected:
   vtkFileSeriesWriter();
-  ~vtkFileSeriesWriter();
+  ~vtkFileSeriesWriter() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
@@ -103,19 +141,23 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkFileSeriesWriter(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFileSeriesWriter&) VTK_DELETE_FUNCTION;
+  vtkFileSeriesWriter(const vtkFileSeriesWriter&) = delete;
+  void operator=(const vtkFileSeriesWriter&) = delete;
 
   void SetWriterFileName(const char* fname);
-  void WriteATimestep(vtkDataObject*, vtkInformation* inInfo);
+  bool WriteATimestep(vtkDataObject*, vtkInformation* inInfo);
   void WriteInternal();
 
   vtkAlgorithm* Writer;
   char* FileNameMethod;
 
   int WriteAllTimeSteps;
+  char* FileNameSuffix;
   int NumberOfTimeSteps;
   int CurrentTimeIndex;
+  int MinTimeStep;
+  int MaxTimeStep;
+  int TimeStepStride;
 
   // The name of the output file.
   char* FileName;

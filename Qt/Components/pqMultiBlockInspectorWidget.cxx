@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 
 #include <QColorDialog>
 #include <QIdentityProxyModel>
@@ -61,28 +62,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QPointer>
 #include <QScopedValueRollback>
-#include <QStyle>
-
-#if QT_VERSION > QT_VERSION_CHECK(5, 3, 0)
 #include <QSignalBlocker>
-#else
-namespace
-{
-class QSignalBlocker
-{
-  QObject* Foo;
-  bool Prev;
-
-public:
-  QSignalBlocker(QObject* foo)
-    : Foo(foo)
-    , Prev(foo->blockSignals(true))
-  {
-  }
-  ~QSignalBlocker() { this->Foo->blockSignals(this->Prev); }
-};
-}
-#endif
+#include <QStyle>
 
 namespace
 {
@@ -190,9 +171,9 @@ public:
         use_unchecked_modified_event, parentObject)
   {
   }
-  virtual ~CConnectionType() {}
+  ~CConnectionType() override {}
 protected:
-  virtual void setServerManagerValue(bool vtkNotUsed(use_unchecked), const QVariant& value)
+  void setServerManagerValue(bool vtkNotUsed(use_unchecked), const QVariant& value) override
   {
     if (vtkSMDoubleMapProperty* dmp = vtkSMDoubleMapProperty::SafeDownCast(this->propertySM()))
     {
@@ -212,7 +193,7 @@ protected:
       }
     }
   }
-  virtual QVariant currentServerManagerValue(bool vtkNotUsed(use_unchecked)) const
+  QVariant currentServerManagerValue(bool vtkNotUsed(use_unchecked)) const override
   {
     QList<QVariant> curValue;
     if (vtkSMDoubleMapProperty* dmp = vtkSMDoubleMapProperty::SafeDownCast(this->propertySM()))
@@ -262,7 +243,7 @@ public:
   {
     this->IconSize = std::max(p->style()->pixelMetric(QStyle::PM_SmallIconSize), 16);
   }
-  virtual ~MultiBlockInspectorModel() {}
+  ~MultiBlockInspectorModel() override {}
 
   void setRootLabel(const QString& str)
   {
@@ -478,7 +459,7 @@ public:
   {
   }
 
-  virtual ~MultiBlockInspectorSelectionModel() {}
+  ~MultiBlockInspectorSelectionModel() override {}
 
   using Superclass::select;
 
@@ -538,12 +519,7 @@ public:
       return;
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QScopedValueRollback<bool> r(this->BlockSelectionPropagation);
-    this->BlockSelectionPropagation = true;
-#else
     QScopedValueRollback<bool> r(this->BlockSelectionPropagation, true);
-#endif
 
     QItemSelection aselection;
     const QAbstractProxyModel* amodel = qobject_cast<const QAbstractProxyModel*>(this->model());
@@ -569,12 +545,7 @@ private:
   void selectBlocks(const std::vector<vtkIdType>& ids)
   {
     Q_ASSERT(this->BlockSelectionPropagation == false);
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QScopedValueRollback<bool> r(this->BlockSelectionPropagation);
-    this->BlockSelectionPropagation = true;
-#else
     QScopedValueRollback<bool> r(this->BlockSelectionPropagation, true);
-#endif
 
     pqOutputPort* port = this->MBWidget->outputPort();
     if (port == nullptr)
@@ -711,8 +682,14 @@ public:
 
   void resetModel()
   {
+    vtkTimerLogScope mark("resetModel");
+    (void)mark;
+
     pqTreeViewExpandState expandState;
+
+    vtkTimerLog::MarkStartEvent("Expand state: save");
     expandState.save(this->Ui.treeView);
+    vtkTimerLog::MarkEndEvent("Expand state: save");
 
     bool prev = this->SelectionModel->blockSelectionPropagation(true);
     pqOutputPort* port = this->OutputPort;
@@ -739,7 +716,9 @@ public:
     else
     {
       this->ProxyModel->setSourceModel(this->CDTModel);
+      vtkTimerLog::MarkStartEvent("QTreeView::expandToDepth");
       this->Ui.treeView->expandToDepth(1);
+      vtkTimerLog::MarkEndEvent("QTreeView::expandToDepth");
 
       QHeaderView* header = this->Ui.treeView->header();
       if (header->count() == 3 && header->logicalIndex(2) != 0)
@@ -748,7 +727,9 @@ public:
       }
     }
 
+    vtkTimerLog::MarkStartEvent("Expand state: restore");
     expandState.restore(this->Ui.treeView);
+    vtkTimerLog::MarkEndEvent("Expand state: restore");
     this->SelectionModel->blockSelectionPropagation(prev);
   }
 
@@ -763,6 +744,8 @@ public:
 
   void restoreCachedValues()
   {
+    vtkTimerLogScope mark("restoreCachedValues");
+    (void)mark;
     if (this->Representation)
     {
       // restore check-state, property state, if possible.
@@ -1016,6 +999,9 @@ void pqMultiBlockInspectorWidget::resetEventually()
 //-----------------------------------------------------------------------------
 void pqMultiBlockInspectorWidget::resetNow()
 {
+  vtkTimerLogScope mark("pqMultiBlockInspectorWidget::resetNow");
+  (void)mark;
+
   QSignalBlocker b(this);
   pqInternals& internals = (*this->Internals);
   internals.ResetTimer.stop();

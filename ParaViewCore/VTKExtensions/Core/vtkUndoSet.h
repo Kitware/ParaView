@@ -88,14 +88,14 @@ public:
 
 protected:
   vtkUndoSet();
-  ~vtkUndoSet();
+  ~vtkUndoSet() override;
 
   vtkCollection* Collection;
   vtkCollection* TmpWorkingCollection;
 
 private:
-  vtkUndoSet(const vtkUndoSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkUndoSet&) VTK_DELETE_FUNCTION;
+  vtkUndoSet(const vtkUndoSet&) = delete;
+  void operator=(const vtkUndoSet&) = delete;
 };
 
 #endif

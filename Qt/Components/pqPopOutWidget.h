@@ -56,7 +56,7 @@ public:
   * popped out.
   */
   pqPopOutWidget(QWidget* widgetToPopOut, const QString& dialogTitle, QWidget* p = 0);
-  virtual ~pqPopOutWidget();
+  ~pqPopOutWidget() override;
 
   /**
   * Sets the button that will control when the widget is popped out

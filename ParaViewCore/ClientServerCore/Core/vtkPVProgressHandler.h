@@ -36,6 +36,8 @@
  * vtkCommand::EndEvent
  * \li fired to indicate end of progress handling
  * \li \c calldata: vtkPVProgressHandler*
+ *
+ * Starting ParaView 5.5, vtkCommand::MessageEvent is no longer fired.
 */
 
 #ifndef vtkPVProgressHandler_h
@@ -74,17 +76,36 @@ public:
   void PrepareProgress();
 
   /**
+   * This method add wrong tag event handlers and rmi call back
+   * for progress related mathods
+   */
+  void AddHandlers();
+
+  /**
+   * Get whether or not progress is currently enable and if
+   * this progress handler is ready to receive progress events
+   */
+  bool GetEnableProgress();
+
+  /**
    * This method collects all outstanding progress messages. All progress
    * events after this call are ignored.
    */
   void CleanupPendingProgress();
 
+  /**
+   * Local cleanup of progress flags
+   */
+  void LocalCleanupPendingProgress();
+
   //@{
   /**
-   * Get/Set the progress frequency in seconds. Default is 0.5 seconds.
-   */
-  vtkSetClampMacro(ProgressFrequency, double, 0.01, 30.0);
-  vtkGetMacro(ProgressFrequency, double);
+    * Get/Set the progress interval in seconds. Progress events
+    * occurring more frequently than this interval are skipped.
+    * Default is 0.1 seconds on client and 1 second on server and batch processes.
+    */
+  vtkSetClampMacro(ProgressInterval, double, 0.01, 30.0);
+  vtkGetMacro(ProgressInterval, double);
   //@}
 
   //@{
@@ -95,35 +116,34 @@ public:
   vtkGetMacro(LastProgress, int);
   //@}
 
-  //@{
-  /**
-   * Temporary storage for most recent message text.
-   */
-  vtkGetStringMacro(LastMessage);
-  //@}
-
 protected:
   vtkPVProgressHandler();
-  ~vtkPVProgressHandler();
+  ~vtkPVProgressHandler() override;
 
-  enum eTAGS
+  enum TAGS
   {
     CLEANUP_TAG = 188969,
     PROGRESS_EVENT_TAG = 188970,
     MESSAGE_EVENT_TAG = 188971
   };
 
-  //@{
+  enum RMI_TAGS
+  {
+    CLEANUP_TAG_RMI = 188972,
+    MESSAGE_EVENT_TAG_RMI = 188973
+  };
+
+  /**
+   * Update the last progress and progress text and invokes a progress event
+   */
   void RefreshProgress(const char* progress_text, double progress);
-  void RefreshMessage(const char* message_text);
-  //@}
 
   vtkPVSession* Session;
-  double ProgressFrequency;
+  double ProgressInterval;
 
 private:
-  vtkPVProgressHandler(const vtkPVProgressHandler&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVProgressHandler&) VTK_DELETE_FUNCTION;
+  vtkPVProgressHandler(const vtkPVProgressHandler&) = delete;
+  void operator=(const vtkPVProgressHandler&) = delete;
 
   /**
    * Callback called when vtkCommand::ProgressEvent is received.
@@ -131,7 +151,9 @@ private:
   void OnProgressEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
   /**
-   * Callback called when vtkCommand::MessageEvent is received.
+   * Callback called when events from vtkOutputWindow singleton are received.
+   * This is also called when vtkCommand::MessageEvent is received from any
+   * vtkOutput we're observing progress from.
    */
   void OnMessageEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
@@ -139,6 +161,11 @@ private:
    * Callback called when WrongTagEvent is fired by the controllers.
    */
   bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata);
+
+  /**
+   * Update the last message and invokes a message event
+   */
+  void RefreshMessage(const char* message_text, int eventid, bool is_local);
 
   bool AddedHandlers;
   class vtkInternals;
@@ -148,8 +175,9 @@ private:
   int LastProgress;
   char* LastProgressText;
 
-  vtkSetStringMacro(LastMessage);
-  char* LastMessage;
+  class RMICallback;
+  friend class RMICallback;
+  ;
 };
 
 #endif

@@ -74,7 +74,7 @@ class PQCOMPONENTS_EXPORT pqIntMaskPropertyWidget : public pqPropertyWidget
 
 public:
   pqIntMaskPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  virtual ~pqIntMaskPropertyWidget();
+  ~pqIntMaskPropertyWidget() override;
 
   /**
   * Returns the current mask value.

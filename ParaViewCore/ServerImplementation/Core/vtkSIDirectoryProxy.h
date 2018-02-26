@@ -40,18 +40,18 @@ public:
   /**
    * Pull the current state of the underneath implementation
    */
-  virtual void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
 
 protected:
   vtkSIDirectoryProxy();
-  ~vtkSIDirectoryProxy();
+  ~vtkSIDirectoryProxy() override;
 
   // We override it to skip the fake properties (DirectoryList, FileList)
-  virtual bool ReadXMLProperty(vtkPVXMLElement* property_element) VTK_OVERRIDE;
+  bool ReadXMLProperty(vtkPVXMLElement* property_element) VTK_OVERRIDE;
 
 private:
-  vtkSIDirectoryProxy(const vtkSIDirectoryProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIDirectoryProxy&) VTK_DELETE_FUNCTION;
+  vtkSIDirectoryProxy(const vtkSIDirectoryProxy&) = delete;
+  void operator=(const vtkSIDirectoryProxy&) = delete;
 };
 
 #endif

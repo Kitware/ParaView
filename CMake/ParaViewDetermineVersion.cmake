@@ -36,7 +36,7 @@ function(determine_version source_dir git_command var_prefix)
     # this function.
     return ()
   elseif (NOT PARAVIEW_GIT_DESCRIBE)
-    if(EXISTS ${git_command})
+    if(EXISTS ${git_command} AND EXISTS ${source_dir}/.git)
       execute_process(
         COMMAND ${git_command} describe
         WORKING_DIRECTORY ${source_dir}

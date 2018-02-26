@@ -5,13 +5,23 @@
                            post_push="Build"
                            processes="dataserver|renderserver|client">
       <IntVectorProperty default_values="0"
-                         name="LockScalarRange"
-                         label="Lock Data Range"
+                         name="AutomaticRescaleRangeMode"
                          number_of_elements="1">
-        <BooleanDomain name="bool" />
+        <EnumerationDomain name="enum">
+          <Entry value="-1" text="Never"/>
+          <Entry value="0" text="Grow and update on 'Apply'"/>
+          <Entry value="1" text="Grow and update every timestep"/>
+          <Entry value="3" text="Clamp and update every timestep"/>
+        </EnumerationDomain>
         <Documentation>
-          Uncheck to automatically update color map to fit data range for all
-          filters.
+          Choose whether and how to automatically rescale the color map range.
+          "Never" means the color map range will never be changed.
+          "Grow and update on 'Apply'" will expand the range to contain the
+          union of the current range and the range of the current data source.
+          "Grow and update every timestep" will expand the range to contain
+          the union of the current range and the range of the current data source
+          when the timestep is changed. "Clamp and update every timestep" will
+          update the color map range to the current source data range.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="IndexedLookup"
@@ -57,6 +67,7 @@
           updated when a representation's visibility changes.
         </Documentation>
       </IntVectorProperty>
+
 
       <IntVectorProperty name="EnableOpacityMapping"
                          command="SetEnableOpacityMapping"
@@ -107,6 +118,7 @@
           <Entry text="HSV" value="1" />
           <Entry text="Lab" value="2" />
           <Entry text="Diverging" value="3" />
+          <Entry text="Lab/CIEDE2000" value="4" />
         </EnumerationDomain>
         <Documentation>
           The color space used for interpolation: RGB, HSV, Lab (CIELAB), or
@@ -116,6 +128,8 @@
           (in order the match the current functionality of vtkLookupTable).
           Diverging is a special mode where colors will pass through white when
           interpolating between two saturated colors.
+          In Lab/CIEDE2000 mode, it will take the shortest path in the Lab color
+          space with respect to the CIE Delta E 2000 color distance measure.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseBelowRangeColor"
@@ -154,7 +168,7 @@
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetAboveRangeColor"
-                            default_values="1 1 1"
+                            default_values="0.5 0.5 0.5"
                             name="AboveRangeColor"
                             number_of_elements="3"
                             panel_widget="color_selector"
@@ -282,6 +296,18 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="IndexedOpacities"
+                            command="SetIndexedOpacityInFullSet"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfIndexedOpacitiesInFullSet"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Opacities used when using IndexedLookup is true.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <PropertyGroup label="Mapping Data" panel_widget="ColorOpacityEditor">
         <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="RGBPoints" function="XRGBPoints" />
@@ -301,6 +327,7 @@
 
       <PropertyGroup label="Annotations" panel_widget="AnnotationsEditor">
         <Property name="Annotations" />
+        <Property name="EnableOpacityMapping" function="EnableOpacityMapping" />
         <Property name="IndexedColors" />
       </PropertyGroup>
 
@@ -581,18 +608,30 @@
                       name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the origin of the plane.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetNormal"
                             default_values="1.0 0.0 0.0"
                             name="Normal"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the normal of the plane.  For many filters this also sets the side
+          of the plane that is of interest.  The normal points towards the
+          "outside" of the plane.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetOffset"
                             default_values="0.0"
                             name="Offset"
                             number_of_elements="1">
+        <Documentation>
+          Set the value to offset the origin by. The origin is translated along the normal
+          direction by the number specified.
+        </Documentation>
       </DoubleVectorProperty>
 
       <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
@@ -650,6 +689,9 @@
                             name="Position"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the position of the box.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetRotation"
@@ -657,6 +699,9 @@
                             name="Rotation"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the orientation of the box.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetScale"
@@ -664,6 +709,9 @@
                             name="Scale"
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
+        <Documentation>
+          Set the size of the box via a scale factor.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
         <Property function="Position" name="Position" />
@@ -690,6 +738,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the center of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetRadius"
                             default_values="1"
@@ -700,6 +751,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the radius of the sphere.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Sphere Parameters" panel_widget="InteractiveSphere">
         <Property function="Center" name="Center" />
@@ -724,11 +778,19 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the center of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetOrientedAxis"
                             default_values="0. 1. 0."
                             name="Axis"
                             number_of_elements="3">
+        <Documentation>
+          Set the axis of the cylinder.  This is the direction from the center of one end of
+          the cylinder to the center of the other end.  The cylinder created has infinite length
+          but this direction controls which line through the center point the cylinder is around.
+        </Documentation>
       </DoubleVectorProperty>
       <DoubleVectorProperty command="SetRadius"
                             default_values="0.5"
@@ -739,6 +801,9 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
+        <Documentation>
+          Set the radius of the cylinder.
+        </Documentation>
       </DoubleVectorProperty>
       <PropertyGroup label="Cylinder Parameters" panel_widget="InteractiveCylinder">
         <Property function="Center" name="Center" />
@@ -851,6 +916,12 @@
                          panel_visibility="never" >
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseLogScale"
+                         default_values="0"
+                         name="UseLogScale"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty default_values="0"
                          name="ScalarRangeInitialized"
                          number_of_elements="1"
@@ -886,6 +957,8 @@
                  value="2" />
           <Entry text="Diverging"
                  value="3" />
+          <Entry text="Lab/CIEDE2000"
+                 value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
@@ -907,6 +980,11 @@
           <Group name="lookup_tables" />
         </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty command="GetEstimatedNumberOfAnnotations"
+                         information_only="1"
+                         name="EstimatedNumberOfAnnotations">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetVisibility"
                          default_values="1"
@@ -942,6 +1020,30 @@
                  value="2" />
         </EnumerationDomain>
         <Documentation>Sets the justification of the title text with respect to the scalar color bar.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetForceHorizontalTitle"
+                         default_values="0"
+                         name="HorizontalTitle"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When on, orients the title horizontally. When off (default), the title
+          will be rotated counter-clockwise 90 degrees and lie parallel to the
+          color bar.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetForceHorizontalTitle"
+                         default_values="0"
+                         name="HorizontalTitle2"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When on, orients the title horizontally. When off (default), the title
+          will be rotated counter-clockwise 90 degrees and lie parallel to the
+          color bar.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetScalarBarThickness"
                          default_values="16"
@@ -1107,6 +1209,8 @@
                     name="Opacity" />
           <Property exposed_name="LabelFontFamily"
                     name="FontFamily" />
+          <Property exposed_name="LabelFontFile"
+                    name="FontFile" />
           <Property exposed_name="LabelBold"
                     name="Bold" />
           <Property exposed_name="LabelItalic"
@@ -1129,6 +1233,8 @@
                     name="Opacity" />
           <Property exposed_name="TitleFontFamily"
                     name="FontFamily" />
+          <Property exposed_name="TitleFontFile"
+                    name="FontFile" />
           <Property exposed_name="TitleBold"
                     name="Bold" />
           <Property exposed_name="TitleItalic"
@@ -1198,6 +1304,7 @@
           <Property exposed_name="XTitleColor" name="Color" />
           <Property exposed_name="XTitleOpacity" name="Opacity" />
           <Property exposed_name="XTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="XTitleFontFile" name="FontFile" />
           <Property exposed_name="XTitleBold" name="Bold" />
           <Property exposed_name="XTitleItalic" name="Italic" />
           <Property exposed_name="XTitleShadow" name="Shadow" />
@@ -1208,6 +1315,7 @@
       <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor">
         <Property name="XTitleColor" function="Color"/>
         <Property name="XTitleFontFamily" function="Family"/>
+        <Property name="XTitleFontFile" function="File"/>
         <Property name="XTitleBold" function="Bold" />
         <Property name="XTitleItalic" function="Italics"/>
         <Property name="XTitleFontSize" function="Size" />
@@ -1221,6 +1329,7 @@
           <Property exposed_name="YTitleColor" name="Color" />
           <Property exposed_name="YTitleOpacity" name="Opacity" />
           <Property exposed_name="YTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="YTitleFontFile" name="FontFile" />
           <Property exposed_name="YTitleBold" name="Bold" />
           <Property exposed_name="YTitleItalic" name="Italic" />
           <Property exposed_name="YTitleShadow" name="Shadow" />
@@ -1231,6 +1340,7 @@
       <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor">
         <Property name="YTitleColor" function="Color"/>
         <Property name="YTitleFontFamily" function="Family"/>
+        <Property name="YTitleFontFile" function="File"/>
         <Property name="YTitleBold" function="Bold" />
         <Property name="YTitleItalic" function="Italics"/>
         <Property name="YTitleFontSize" function="Size" />
@@ -1244,6 +1354,7 @@
           <Property exposed_name="ZTitleColor" name="Color" />
           <Property exposed_name="ZTitleOpacity" name="Opacity" />
           <Property exposed_name="ZTitleFontFamily" name="FontFamily" />
+          <Property exposed_name="ZTitleFontFile" name="FontFile" />
           <Property exposed_name="ZTitleBold" name="Bold" />
           <Property exposed_name="ZTitleItalic" name="Italic" />
           <Property exposed_name="ZTitleShadow" name="Shadow" />
@@ -1254,6 +1365,7 @@
       <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor">
         <Property name="ZTitleColor" function="Color"/>
         <Property name="ZTitleFontFamily" function="Family"/>
+        <Property name="ZTitleFontFile" function="File"/>
         <Property name="ZTitleBold" function="Bold" />
         <Property name="ZTitleItalic" function="Italics"/>
         <Property name="ZTitleFontSize" function="Size" />
@@ -1421,6 +1533,7 @@
           <Property exposed_name="XLabelColor" name="Color" />
           <Property exposed_name="XLabelOpacity" name="Opacity" />
           <Property exposed_name="XLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="XLabelFontFile" name="FontFile" />
           <Property exposed_name="XLabelBold" name="Bold" />
           <Property exposed_name="XLabelItalic" name="Italic" />
           <Property exposed_name="XLabelShadow" name="Shadow" />
@@ -1431,6 +1544,7 @@
       <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor">
         <Property name="XLabelColor" function="Color"/>
         <Property name="XLabelFontFamily" function="Family"/>
+        <Property name="XLabelFontFile" function="File"/>
         <Property name="XLabelBold" function="Bold" />
         <Property name="XLabelItalic" function="Italics"/>
         <Property name="XLabelFontSize" function="Size" />
@@ -1444,6 +1558,7 @@
           <Property exposed_name="YLabelColor" name="Color" />
           <Property exposed_name="YLabelOpacity" name="Opacity" />
           <Property exposed_name="YLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="YLabelFontFile" name="FontFile" />
           <Property exposed_name="YLabelBold" name="Bold" />
           <Property exposed_name="YLabelItalic" name="Italic" />
           <Property exposed_name="YLabelShadow" name="Shadow" />
@@ -1454,6 +1569,7 @@
       <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor">
         <Property name="YLabelColor" function="Color"/>
         <Property name="YLabelFontFamily" function="Family"/>
+        <Property name="YLabelFontFile" function="File"/>
         <Property name="YLabelBold" function="Bold" />
         <Property name="YLabelItalic" function="Italics"/>
         <Property name="YLabelFontSize" function="Size" />
@@ -1467,6 +1583,7 @@
           <Property exposed_name="ZLabelColor" name="Color" />
           <Property exposed_name="ZLabelOpacity" name="Opacity" />
           <Property exposed_name="ZLabelFontFamily" name="FontFamily" />
+          <Property exposed_name="ZLabelFontFile" name="FontFile" />
           <Property exposed_name="ZLabelBold" name="Bold" />
           <Property exposed_name="ZLabelItalic" name="Italic" />
           <Property exposed_name="ZLabelShadow" name="Shadow" />
@@ -1477,6 +1594,7 @@
       <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor">
         <Property name="ZLabelColor" function="Color"/>
         <Property name="ZLabelFontFamily" function="Family"/>
+        <Property name="ZLabelFontFile" function="File"/>
         <Property name="ZLabelBold" function="Bold" />
         <Property name="ZLabelItalic" function="Italics"/>
         <Property name="ZLabelFontSize" function="Size" />
@@ -1701,19 +1819,18 @@
         </Hints>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="DataBoundsInflateFactor"
-                            command="SetDataBoundsInflateFactor"
+      <DoubleVectorProperty name="DataBoundsScaleFactor"
+                            command="SetDataBoundsScaleFactor"
                             number_of_elements="1"
-                            default_values="0.0008"
+                            default_values="1.0008"
                             panel_visibility="advanced">
-        <DoubleRangeDomain name="range" min="0" max="1"/>
+        <DoubleRangeDomain name="range" min="0" max="2"/>
         <Documentation>
-          After the data bounds have been computed, this property enables to inflate the
+          After the data bounds have been computed, this property enables to scale the
           bounds used to generate the axes grid, so it will be slightly larger than the
-          data bounds. It inflates the axes grid bounds using the diagonal length of the
-          bounding box multiplied by this factor.
+          data bounds.
           Data bounds are not modified, only the aspect of the AxesGrid is modified.
-          The default value (0.0008) ensures that there is no concident lines drawn when
+          The default value (1.0008) ensures that there is no concident lines drawn when
           zooming close enough to the model.
         </Documentation>
         <Hints>
@@ -1728,7 +1845,7 @@
       <PropertyGroup label="Data Transform">
         <Property name="DataScale" />
         <Property name="DataPosition" />
-        <Property name="DataBoundsInflateFactor" />
+        <Property name="DataBoundsScaleFactor" />
       </PropertyGroup>
 
       <DoubleVectorProperty name="ModelTransformMatrix"
@@ -1944,6 +2061,46 @@
       </Hints>
       <!-- End HighResLineSource -->
     </SourceProxy>
+    <SourceProxy class="vtkPolyLineSource"
+                 label="Poly Line Source"
+                 name="PolyLineSource">
+      <DoubleVectorProperty command="SetPoint"
+                            default_values="0 0 0 1 0 0"
+                            name="Points"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfPoints"
+                            use_index="1">
+        <BoundsDomain default_mode="min,min,min,max,max,max"
+                      mode="normal"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="DummyInput" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <InputProperty is_internal="1" name="DummyInput">
+        <!-- Used when this source is added to a proxy list domain. -->
+      </InputProperty>
+      <PropertyGroup label="Poly-line Parameters" panel_widget="InteractivePolyLine">
+        <Property function="HandlePositions" name="Points" />
+        <Property function="Closed" name="Closed" />
+      </PropertyGroup>
+      <Hints>
+        <ProxyList>
+          <Link name="DummyInput" with_property="Input" />
+        </ProxyList>
+      </Hints>
+    </SourceProxy>
+    <!-- End PolyLineSource -->
     <SourceProxy class="vtkPointSource"
                  label="Point Source"
                  name="PointSource">
@@ -2227,6 +2384,11 @@
                          name="RenameDirectory">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
+      <IntVectorProperty command="IsDirectory"
+                         information_only="1"
+                         name="IsDirectory">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
       <IntVectorProperty command="GetActiveFileIsReadable"
                          information_only="1"
                          name="ActiveFileIsReadable">
@@ -2326,7 +2488,7 @@
                      name="SuppressedTimeSources"
                      remove_command="RemoveSuppressedTimeSource"
                      repeatable="1">
-        <Documentation>List of proxies that are to supressed i.e their times
+        <Documentation>List of proxies that are to suppressed i.e their times
           to be ignored.
         </Documentation>
       </ProxyProperty>
@@ -2510,7 +2672,7 @@
            processes="client|renderserver">
       <Documentation>This proxy is useful for changing global mapper settings
       such as the coincident topology resolution setting on all rendering
-      proceses.</Documentation>
+      processes.</Documentation>
       <IntVectorProperty command="SetResolveCoincidentTopology"
                          default_values="none"
                          name="Mode"
@@ -2550,18 +2712,6 @@
         <Documentation>Used to set the z-shift if ResolveCoincidentTopology is
         set to ShiftZBuffer. This is a global variable.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetGlobalImmediateModeRendering"
-                         default_values="none"
-                         name="GlobalImmediateModeRendering"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>Turn on/off flag to control whether data is rendered
-        using immediate mode or note. Immediate mode rendering tends to be
-        slower but it can handle larger datasets. The default value is
-        immediate mode off. If you are having problems rendering a large
-        dataset you might want to consider using immediate more
-        rendering.</Documentation>
-      </IntVectorProperty>
       <!-- End of GlobalMapperProperties -->
     </Proxy>
     <Proxy class="vtkTimerLog"
@@ -2590,20 +2740,36 @@
     </Proxy>
     <ViewLayoutProxy name="ViewLayout"
                      processes="client">
-      <Documentation>Proxy used to manage layout for mutliple views.</Documentation>
-      <IntVectorProperty name="ShowWindowDecorations"
-        number_of_elements="1"
-        default_values="1">
+      <Documentation>Proxy used to manage layout for multiple views.</Documentation>
+      <IntVectorProperty name="PreviewMode"
+        number_of_elements="2"
+        default_values="0 0">
         <Documentation>
-          Set whether the UI should show extra decorations for the layout
-          e.g. view frames, view toolbars etc.
+          Set the target resolution for the preview mode to display,
+          [0, 0] is interpreted as exiting preview.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="SeparatorWidth"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+	  The width of the separator (in pixels) to be displayed in preview mode.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="SeparatorColor"
+        number_of_elements="3"
+        default_values="0.937 0.922 0.906">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+        <Documentation>
+          The color of the separator to be displayed in preview mode.
+        </Documentation>
+      </DoubleVectorProperty>
     </ViewLayoutProxy>
     <Proxy class="vtkViewLayout"
            name="InternalViewLayoutHelper"
            processes="renderserver">
-      <Documentation>Proxy used to manage layout for mutliple
+      <Documentation>Proxy used to manage layout for multiple
       views.</Documentation>
     </Proxy>
     <Proxy class="vtkPVRayCastPickingHelper"
@@ -2761,9 +2927,9 @@
     <!-- End of group "palettes" -->
   </ProxyGroup>
   <ProxyGroup name="exporters">
-    <!-- Proxy group for exporters used to export views.  -->
-    <RenderViewExporterProxy class="vtkX3DExporter"
-                             file_extension="x3d"
+    <!-- Proxy group for exporters used to export views. the Cinema DB exporter
+         is in pythonfilter.xml since it requires Python -->
+    <RenderViewExporterProxy class="vtkPVX3DExporter"
                              name="X3DExporter">
       <Documentation long_help="Export X3D Files"
                      short_help="X3D Files">vtkX3DExporter is a render window
@@ -2778,12 +2944,24 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetExportColorLegends"
+                         name="ExportColorLegends"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When enabled, the color legends are exported to PixelTexture nodes
+          under the Scene node in the exported X3D file.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="x3d" />
+      </Hints>
       <!-- End of X3DExporter -->
     </RenderViewExporterProxy>
     <RenderViewExporterProxy base_proxygroup="exporters"
                              base_proxyname="X3DExporter"
-                             class="vtkX3DExporter"
-                             file_extension="x3db"
+                             class="vtkPVX3DExporter"
                              name="X3DExporterBinary">
       <Documentation>Binary x3d exporter</Documentation>
       <IntVectorProperty command="SetBinary"
@@ -2803,9 +2981,25 @@
         <Documentation>In binary mode use fastest instead of best
         compression.</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="x3db" />
+      </Hints>
+    </RenderViewExporterProxy>
+    <RenderViewExporterProxy class="vtkSingleVTPExporter"
+                             name="SingleExporter">
+      <Documentation>Exporter to export a single render view to a vtp
+      file and texture.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            panel_visibility="never"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="vtp" />
+      </Hints>
     </RenderViewExporterProxy>
     <RenderViewExporterProxy class="vtkVRMLExporter"
-                             file_extension="vrml"
                              name="VRMLExporter">
       <Documentation>Exporter to export a single render view to an VRML
       file.</Documentation>
@@ -2815,13 +3009,16 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="vrml" />
+      </Hints>
       <!-- End of VRMLExporter -->
     </RenderViewExporterProxy>
     <CSVExporterProxy class="vtkCSVExporter"
-                      file_extension="csv"
                       name="CSVExporter">
-      <Documentation>Exporter to export a single render view to an CSV
-      file.</Documentation>
+      <Documentation long_help="Export Comma or Tab Delimited ASCII Files"
+                     short_help="Comma or Tab Delimited Files">
+        Exporter to export a single render view to an CSV file.</Documentation>
       <StringVectorProperty command="SetFileName"
                             name="FileName"
                             panel_visibility="never"
@@ -2834,10 +3031,12 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <!-- End of VRMLExporter -->
+      <Hints>
+        <ExporterFactory extensions="csv tsv txt" />
+      </Hints>
+      <!-- End of CSVExporter -->
     </CSVExporterProxy>
     <RenderViewExporterProxy class="vtkPOVExporter"
-                             file_extension="pov"
                              name="POVExporter">
       <Documentation long_help="Export POV Ray Files"
                      short_help="POV Files">vtkPOVExporter is a render window
@@ -2849,46 +3048,10 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="pov" />
+      </Hints>
       <!-- End of POVExporter -->
-    </RenderViewExporterProxy>
-    <RenderViewExporterProxy class="vtkCinemaExporter"
-                             file_extension="cdb"
-                             name="CinemaExporter">
-      <Documentation long_help="Export view to a Cinema Database"
-                     short_help="Cinema Database">CinemaExporter is a render window
-                     exporter which writes out the renderered scene as a
-                     Cinema database.</Documentation>
-      <StringVectorProperty name="FileName"
-                            command="SetFileName"
-                            number_of_elements="1">
-        <Documentation>Name of the file to be written.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ViewSelection"
-                            command="SetViewSelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the view selection.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="TrackSelection"
-                            command="SetTrackSelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the track selection.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ArraySelection"
-                            command="SetArraySelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the arrays selected in an item.</Documentation>
-      </StringVectorProperty>
-
-      <PropertyGroup label="Cinema Configuration"
-                     panel_widget="cinema_export_selector">
-        <Property name="ViewSelection"/>
-        <Property name="TrackSelection"/>
-        <Property name="ArraySelection"/>
-      </PropertyGroup>
-      <!-- End of Cinema Exporter -->
     </RenderViewExporterProxy>
     <!-- GL2PS exporter, shared options between render and context views: -->
     <GL2PSExporterProxy class="not-used"
@@ -3044,7 +3207,6 @@
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="ps"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterPS">
       <Documentation long_help="Export PostScript (PS) Files"
@@ -3074,12 +3236,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="ps" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="eps"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterEPS">
       <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
@@ -3101,12 +3265,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="eps" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterEPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="pdf"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterPDF">
       <Documentation long_help="Export Portable Document Format (PDF) Files"
@@ -3129,12 +3295,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="pdf" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterPDF -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSRenderViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="svg"
                         viewtype="renderview"
                         name="GL2PSRenderViewExporterSVG">
       <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
@@ -3156,6 +3324,9 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="svg" />
+      </Hints>
       <!-- End of GL2PSRenderViewExporterSVG -->
     </GL2PSExporterProxy>
 
@@ -3163,7 +3334,6 @@
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="ps"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterPS">
       <Documentation long_help="Export PostScript (PS) Files"
@@ -3193,12 +3363,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="ps" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="eps"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterEPS">
       <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
@@ -3220,12 +3392,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="eps" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterEPS -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="pdf"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterPDF">
       <Documentation long_help="Export Portable Document Format (PDF) Files"
@@ -3248,12 +3422,14 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="pdf" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterPDF -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
                         base_proxyname="GL2PSContextViewExporterBase"
                         class="vtkPVGL2PSExporter"
-                        file_extension="svg"
                         viewtype="contextview"
                         name="GL2PSContextViewExporterSVG">
       <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
@@ -3275,15 +3451,20 @@
         <Documentation>Set the output file format: 0: PostScript, 1:
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="svg" />
+      </Hints>
       <!-- End of GL2PSContextViewExporterSVG -->
     </GL2PSExporterProxy>
 
-    <RenderViewExporterProxy name="WebGLExporter" class="vtkPVWebGLExporter"
-                             file_extension="webgl">
+    <RenderViewExporterProxy name="WebGLExporter" class="vtkPVWebGLExporter">
        <StringVectorProperty name="FileName" command="SetFileName"
                              number_of_elements="1">
           <Documentation>Name of the file to write into</Documentation>
        </StringVectorProperty>
+      <Hints>
+        <ExporterFactory extensions="webgl" />
+      </Hints>
       <!-- End of WebGLExporter -->
     </RenderViewExporterProxy>
 
@@ -3963,8 +4144,74 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="screenshot_writers">
+    <Documentation>
+      This group includes all writers which can be used to write screenshots in ParaView.
+    </Documentation>
+
+    <Proxy name="PNG" class="vtkPNGWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as PNG files.
+      </Documentation>
+      <IntVectorProperty name="CompressionLevel"
+        command="SetCompressionLevel"
+        number_of_elements="1"
+        default_values="5">
+        <Documentation>
+          Specify the *zlib* compression level. **0** is no compression, while **9** is
+          maximum compression.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="0" value="0" info="no compression" />
+          <Entry text="1" value="1" />
+          <Entry text="2" value="2" />
+          <Entry text="3" value="3" />
+          <Entry text="4" value="4" />
+          <Entry text="5" value="5" />
+          <Entry text="6" value="6" />
+          <Entry text="7" value="7" />
+          <Entry text="8" value="8" />
+          <Entry text="9" value="9" info="Maximum compression" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="png"
+          file_description="PNG images" />
+      </Hints>
+    </Proxy>
+
+    <Proxy name="JPEG" class="vtkJPEGWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as JPEG files.
+      </Documentation>
+      <IntVectorProperty name="Quality"
+        command="SetQuality"
+        number_of_elements="1"
+        default_values="95">
+        <Documentation>
+          Specify the JPEG compression quality. **O** is low quality (maximum compression)
+          and **100** is high quality (least compression).
+        </Documentation>
+        <IntRangeDomain name="range" min="0" max="100" />
+      </IntVectorProperty>
+      <IntVectorProperty name="Progressive"
+        command="SetProgressive"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Save progressive JPEG.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="jpg"
+          file_description="JPEG images" />
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+
   <ProxyGroup name="misc">
-    <SaveScreenshotProxy name="SaveScreenshot" processes="client">
+    <SaveScreenshotProxy name="SaveScreenshotBase" processes="client">
       <Documentation>
         Proxy used to save screenshots from view(s) or layouts.
       </Documentation>
@@ -4013,7 +4260,7 @@
 
       <IntVectorProperty name="SeparatorWidth"
         number_of_elements="1"
-        default_values="0"
+        default_values="1"
         panel_visibility="advanced">
         <IntRangeDomain name="range" min="0" max="10" />
         <Documentation>
@@ -4030,7 +4277,7 @@
 
       <DoubleVectorProperty name="SeparatorColor"
         number_of_elements="3"
-        default_values="0 0 0"
+       default_values="0.937 0.922 0.906"
         panel_widget="color_selector_with_palette"
         panel_visibility="advanced">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
@@ -4084,7 +4331,25 @@
            Set whether to use a transparent background.
         </Documentation>
       </IntVectorProperty>
+    </SaveScreenshotProxy>
 
+    <SaveScreenshotProxy name="SaveScreenshot" processes="client"
+      label="Save Screenshot"
+      base_proxygroup="misc"
+      base_proxyname="SaveScreenshotBase">
+      <Documentation>
+        Proxy used to save screenshots from view(s) or layouts.
+      </Documentation>
+      <ProxyProperty name="Format">
+        <ProxyListDomain name="proxy_list">
+          <Group name="screenshot_writers" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
+      </ProxyProperty>
+
+      <!-- FIXME:: depreacated
       <IntVectorProperty name="ImageQuality"
         number_of_elements="1"
         default_values="100"
@@ -4095,6 +4360,7 @@
           **0** - low quality, **100** - high quality.
         </Documentation>
       </IntVectorProperty>
+      -->
 
       <PropertyGroup label="Size and Scaling">
         <Property name="SaveAllViews" />
@@ -4113,8 +4379,8 @@
         <Property name="TransparentBackground" />
       </PropertyGroup>
 
-      <PropertyGroup label="Compression Options">
-        <Property name="ImageQuality" />
+      <PropertyGroup label="Image Options">
+        <Property name="Format" />
       </PropertyGroup>
 
     </SaveScreenshotProxy>

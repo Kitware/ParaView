@@ -24,7 +24,7 @@
  * This class fires the following events:
  * \li \c vtkSIProxyDefinitionManager::ProxyDefinitionsUpdated - Fired any time
  * any definitions are updated. If a group of definitions are being updated (i.e.
- * a new definition is registered, or unregistred, or modified)
+ * a new definition is registered, or unregistered, or modified)
  * then this event gets fired after all of them are updated.
  * \li \c vtkSIProxyDefinitionManager::CompoundProxyDefinitionsUpdated - Fired
  * when a custom proxy definition is updated. Similar to
@@ -200,7 +200,7 @@ public:
     const char* groupName, int scope = ALL_DEFINITIONS);
 
   /**
-   * Desactivate the modification of the ProxyDefinitions for that given
+   * Deactivate the modification of the ProxyDefinitions for that given
    * vtkSIProxyDefinitionManager to make sure update only come from the
    * remote server and not plugin loaded on the client.
    */
@@ -211,14 +211,14 @@ public:
    * The provided implementation just store the message
    * and return it at the Pull one.
    */
-  virtual void Push(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Push(vtkSMMessage* msg) VTK_OVERRIDE;
 
   /**
    * Pull the current state of the underneath implementation
    * The provided implementation update the given message with the one
    * that has been previously pushed
    */
-  virtual void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
 
   //@{
   /**
@@ -241,7 +241,7 @@ public:
 
 protected:
   vtkSIProxyDefinitionManager();
-  ~vtkSIProxyDefinitionManager();
+  ~vtkSIProxyDefinitionManager() override;
 
   /**
    * Helper method that add a ShowInMenu Hint for a proxy definition.
@@ -263,7 +263,7 @@ protected:
    * as they allow to automatically add some extra hints for those loaded
    * definition set. This is essentially used when proxy get loaded as
    * legacy proxy don't have those expected Hints.
-   * FIXME: Once those pluging get updated, this extra hint attachement
+   * FIXME: Once those pluging get updated, this extra hint attachment
    * might be removed.
    */
   bool LoadConfigurationXML(vtkPVXMLElement* root, bool attachShowInMenuHints);
@@ -291,7 +291,7 @@ protected:
 
   /**
    * Integrate a ProxyDefinition into another ProxyDefinition by merging them.
-   * If properties are overriden is the last property that will last. So when we build
+   * If properties are overridden is the last property that will last. So when we build
    * a merged definition hierarchy, we should start from the root and go down.
    */
   void MergeProxyDefinition(vtkPVXMLElement* element, vtkPVXMLElement* elementToFill);
@@ -322,8 +322,8 @@ protected:
   void InvokeCustomDefitionsUpdated();
 
 private:
-  vtkSIProxyDefinitionManager(const vtkSIProxyDefinitionManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIProxyDefinitionManager&) VTK_DELETE_FUNCTION;
+  vtkSIProxyDefinitionManager(const vtkSIProxyDefinitionManager&) = delete;
+  void operator=(const vtkSIProxyDefinitionManager&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

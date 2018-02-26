@@ -23,8 +23,8 @@ except ImportError:
             "this functionality to work. Please install numpy and try again.")
 
 from paraview import calculator
-from vtk import vtkDataObject
-from vtk.numpy_interface import dataset_adapter as dsa
+from vtkmodules.vtkCommonDataModel import vtkDataObject
+from vtkmodules.numpy_interface import dataset_adapter as dsa
 import sys # also for sys.stderr
 if sys.version_info >= (3,):
     xrange = range
@@ -33,7 +33,7 @@ def _get_ns(self, do, association):
     if association == vtkDataObject.FIELD:
         # For FieldData, it gets tricky. In general, one would think we are going
         # to look at field data in inputDO directly -- same for composite datasets.
-        # However, ExodusIIReader likes to put field data on leaf nodes insead.
+        # However, ExodusIIReader likes to put field data on leaf nodes instead.
         # So we also check leaf nodes, if the FieldData on the root is empty.
 
         # We explicitly call dsa.DataObject.GetFieldData to ensure that
@@ -82,6 +82,7 @@ def execute(self):
         return True
 
     inputs = [dsa.WrapDataObject(inputDO)]
+
     association = self.GetArrayAssociation()
     ns = _get_ns(self, inputs[0], association)
 
@@ -140,8 +141,7 @@ def execute_on_global_data(self):
     except: pass
     expression = self.GetPrefix() if self.GetPrefix() else ""
     try:
-        import vtk
-        if type(chosen_element) is not vtk.numpy_interface.dataset_adapter.VTKNoneArray:
+        if type(chosen_element) is not dsa.VTKNoneArray:
             expression += self.GetFormat() % (chosen_element,)
     except TypeError:
         expression += chosen_element
@@ -157,17 +157,24 @@ def execute_on_attribute_data(self, evaluate_locally):
         return True
 
     inputs = [dsa.WrapDataObject(inputDO)]
-    association = self.GetArrayAssociation()
+
+    info = self.GetInputArrayInformation(0)
+    association = info.Get(vtkDataObject.FIELD_ASSOCIATION())
+    array_name = info.Get(vtkDataObject.FIELD_NAME())
+
     ns = _get_ns(self, inputs[0], association)
-    if self.GetArrayName() not in ns:
-        print("Failed to locate array '%s'." % self.GetArrayName(), file=sys.stderr)
+    if array_name not in ns:
+        print("Failed to locate array '%s'." % array_name, file=sys.stderr)
         raise RuntimeError("Failed to locate array")
 
     if not evaluate_locally:
         return True
 
-    array = ns[self.GetArrayName()]
-    chosen_element = array[self.GetElementId()]
+    array = ns[array_name]
+    if array.IsA("vtkStringArray"):
+        chosen_element = array.GetValue(self.GetElementId())
+    else:
+        chosen_element = array[self.GetElementId()]
     expression = self.GetPrefix() if self.GetPrefix() else ""
     expression += str(chosen_element)
     self.SetComputedAnnotationValue(expression)

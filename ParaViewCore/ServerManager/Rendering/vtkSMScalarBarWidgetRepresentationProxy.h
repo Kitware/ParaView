@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMScalarBarWidgetRepresentationProxy
 public:
   static vtkSMScalarBarWidgetRepresentationProxy* New();
   vtkTypeMacro(vtkSMScalarBarWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxy);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -67,18 +67,18 @@ public:
 
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
-  ~vtkSMScalarBarWidgetRepresentationProxy();
+  ~vtkSMScalarBarWidgetRepresentationProxy() override;
 
   /**
    * Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
    * EndCreateVTKObjects().
    */
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   /**
    * Called every time the user interacts with the widget.
    */
-  virtual void ExecuteEvent(unsigned long event) VTK_OVERRIDE;
+  void ExecuteEvent(unsigned long event) VTK_OVERRIDE;
 
   vtkSMProxy* ActorProxy;
 
@@ -104,9 +104,8 @@ private:
   vtkSMTrace::TraceItem* TraceItem;
 
 private:
-  vtkSMScalarBarWidgetRepresentationProxy(
-    const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) VTK_DELETE_FUNCTION;
+  vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
+  void operator=(const vtkSMScalarBarWidgetRepresentationProxy&) = delete;
 };
 
 #endif

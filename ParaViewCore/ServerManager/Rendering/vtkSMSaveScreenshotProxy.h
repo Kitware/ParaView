@@ -58,11 +58,9 @@ public:
   virtual vtkSmartPointer<vtkImageData> CaptureImage();
 
   /**
-   * Convenience method to update the panel visibility for properties that may
-   * not be relevant if only 1 view is available.
-   * @returns true if saving multiple views is feasible, otherwise false.
+   * Updates default property values for saving the given file.
    */
-  bool UpdateSaveAllViewsPanelVisibility();
+  virtual void UpdateDefaultsAndVisibilities(const char* filename);
 
   /**
    * This method can be used to capture an image for a view for a specific resolution
@@ -80,13 +78,40 @@ public:
     vtkSMViewLayoutProxy* view, const vtkVector2i& size);
 
   /**
-   * Compute magnification factor and new size for target resolution.
+   * Compute scale factors and new size for target resolution. This determines
+   * integral scale factors (in X and Y) to get a box of size of \c targetSize from a
+   * box of maximum size specified by \c size. If \c approximate is non-null,
+   * then it is set to true when there no way to do that (e.g. one of the
+   * components of the \c targetSize is prime and doesn't match \c size).
+   *
+   * On success, returns the scale factors and modifies \c size such that size *
+   * scaleFactors == targetSize is possible. If not, size * scaleFactors <
+   * targetSize and approximate if non-null, is set to true.
+   *
+   */
+  static vtkVector2i GetScaleFactorsAndSize(
+    const vtkVector2i& targetSize, vtkVector2i& size, bool* approximate = nullptr);
+
+  /**
+   * Compute a single magnification factor to reach \c targetSize using a box
+   * that fits within \c size. This implementation is inaccurate and may not give
+   * target resolution correctly. Hence `GetScaleFactorsAndSize` should be preferred.
+   * This method is useful when the interest is in preserving the target aspect
+   * ratio as closely as possible than reaching the target size.
    */
   static int ComputeMagnification(const vtkVector2i& targetSize, vtkVector2i& size);
 
+  //@{
+  /**
+   * Convenience method to derive a QFileDialog friendly format string for
+   * extensions supported by this proxy.
+   */
+  std::string GetFileFormatFilters();
+  //@}
+
 protected:
   vtkSMSaveScreenshotProxy();
-  ~vtkSMSaveScreenshotProxy();
+  ~vtkSMSaveScreenshotProxy() override;
 
   /**
    * Captures rendered image, but assumes that the `Prepare` has already been
@@ -108,9 +133,16 @@ protected:
   vtkSMViewLayoutProxy* GetLayout();
   vtkSMViewProxy* GetView();
 
+  /**
+   * Select the format proxy to match the given extension. In otherwords, this
+   * changes the "Format" proxy-property to have the writer proxy from the
+   * domain that supports the given filename.
+   */
+  vtkSMProxy* GetFormatProxy(const std::string& filename);
+
 private:
-  vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSaveScreenshotProxy&) VTK_DELETE_FUNCTION;
+  vtkSMSaveScreenshotProxy(const vtkSMSaveScreenshotProxy&) = delete;
+  void operator=(const vtkSMSaveScreenshotProxy&) = delete;
 
   /**
    * used to save/restore state for the view(s).

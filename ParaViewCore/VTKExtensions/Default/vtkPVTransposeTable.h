@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVTransposeTable : public vtkTranspose
 public:
   static vtkPVTransposeTable* New();
   vtkTypeMacro(vtkPVTransposeTable, vtkTransposeTable);
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   //@{
   /**
@@ -58,7 +58,7 @@ public:
 
 protected:
   vtkPVTransposeTable();
-  virtual ~vtkPVTransposeTable();
+  ~vtkPVTransposeTable() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
@@ -67,8 +67,8 @@ protected:
   bool DoNotTranspose;
 
 private:
-  vtkPVTransposeTable(const vtkPVTransposeTable&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTransposeTable&) VTK_DELETE_FUNCTION;
+  vtkPVTransposeTable(const vtkPVTransposeTable&) = delete;
+  void operator=(const vtkPVTransposeTable&) = delete;
 };
 
 #endif // vtkPVTransposeTable_h

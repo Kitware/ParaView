@@ -47,8 +47,8 @@ public:
    * Set/Get a transformation to apply to input points before
    * executing the implicit function.
    */
-  virtual void SetTransform(vtkAbstractTransform*) VTK_OVERRIDE;
-  virtual void SetTransform(const double elements[16]) VTK_OVERRIDE
+  void SetTransform(vtkAbstractTransform*) VTK_OVERRIDE;
+  void SetTransform(const double elements[16]) VTK_OVERRIDE
   {
     this->Superclass::SetTransform(elements);
   }
@@ -60,7 +60,7 @@ public:
    * any derived class.
    */
   using Superclass::EvaluateFunction;
-  virtual double EvaluateFunction(double x[3]) VTK_OVERRIDE;
+  double EvaluateFunction(double x[3]) VTK_OVERRIDE;
 
   /**
    * Evaluate function gradient at position x-y-z and pass back vector.
@@ -68,18 +68,18 @@ public:
    * FunctionGradient() instead.  This method must be implemented by
    * any derived class.
    */
-  virtual void EvaluateGradient(double x[3], double g[3]) VTK_OVERRIDE;
+  void EvaluateGradient(double x[3], double g[3]) VTK_OVERRIDE;
 
 protected:
   vtkPVPlane();
-  ~vtkPVPlane();
+  ~vtkPVPlane() override;
 
   double Offset;
   vtkPlane* Plane;
 
 private:
-  vtkPVPlane(const vtkPVPlane&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPlane&) VTK_DELETE_FUNCTION;
+  vtkPVPlane(const vtkPVPlane&) = delete;
+  void operator=(const vtkPVPlane&) = delete;
 };
 
 #endif

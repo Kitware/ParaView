@@ -41,12 +41,12 @@ public:
   /**
    * Undo the operation encapsulated by this element.
    */
-  virtual int Undo() VTK_OVERRIDE;
+  int Undo() VTK_OVERRIDE;
 
   /**
    * Redo the operation encaspsulated by this element.
    */
-  virtual int Redo() VTK_OVERRIDE;
+  int Redo() VTK_OVERRIDE;
 
   /**
    * Set the property/proxy that was modified.
@@ -61,11 +61,11 @@ public:
    * represent change to the same property.
    * Returns if the merge was successful.
    */
-  virtual bool Merge(vtkUndoElement* vtkNotUsed(new_element)) VTK_OVERRIDE;
+  bool Merge(vtkUndoElement* vtkNotUsed(new_element)) VTK_OVERRIDE;
 
 protected:
   vtkSMPropertyModificationUndoElement();
-  ~vtkSMPropertyModificationUndoElement();
+  ~vtkSMPropertyModificationUndoElement() override;
 
   int RevertToState();
 
@@ -76,9 +76,8 @@ protected:
   vtkSMMessage* PropertyState;
 
 private:
-  vtkSMPropertyModificationUndoElement(
-    const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMPropertyModificationUndoElement&) VTK_DELETE_FUNCTION;
+  vtkSMPropertyModificationUndoElement(const vtkSMPropertyModificationUndoElement&) = delete;
+  void operator=(const vtkSMPropertyModificationUndoElement&) = delete;
 };
 
 #endif

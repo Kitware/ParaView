@@ -46,6 +46,8 @@ vtkAMRStreamingVolumeRepresentation::vtkAMRStreamingVolumeRepresentation()
 
   this->VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   this->VolumeMapper->SetInputConnection(this->Resampler->GetOutputPort());
+  this->AMRVolumeMapper = vtkSmartPointer<vtkAMRVolumeMapper>::New();
+  this->AMRVolumeMapper->SetInputConnection(this->Resampler->GetOutputPort());
 
   this->Property = vtkSmartPointer<vtkVolumeProperty>::New();
   this->Actor = vtkSmartPointer<vtkPVLODVolume>::New();
@@ -60,6 +62,7 @@ vtkAMRStreamingVolumeRepresentation::vtkAMRStreamingVolumeRepresentation()
 //----------------------------------------------------------------------------
 vtkAMRStreamingVolumeRepresentation::~vtkAMRStreamingVolumeRepresentation()
 {
+  this->AMRVolumeMapper->SetInputConnection(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -175,6 +178,23 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
         this->Resampler->UpdateResampledVolume(piece);
       }
     }
+  }
+
+  // setup amr volume mapper for OSPRay
+  vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+  vtkAlgorithm* producer = producerPort->GetProducer();
+  vtkOverlappingAMR* amr =
+    vtkOverlappingAMR::SafeDownCast(producer->GetOutputDataObject(producerPort->GetIndex()));
+  this->AMRVolumeMapper->SetInputData(amr);
+
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(inInfo->Get(vtkPVRenderView::VIEW()));
+  if (view->GetEnableOSPRay())
+  {
+    this->Actor->SetMapper(this->AMRVolumeMapper);
+  }
+  else
+  {
+    this->Actor->SetMapper(this->VolumeMapper);
   }
 
   return 1;
@@ -495,10 +515,12 @@ void vtkAMRStreamingVolumeRepresentation::SetInputArrayToProcess(
 {
   this->Superclass::SetInputArrayToProcess(idx, port, connection, fieldAssociation, name);
   this->VolumeMapper->SelectScalarArray(name);
+  this->AMRVolumeMapper->SelectScalarArray(name);
 
   // since input in AMR, all cell data on AMR becomes point field on the
   // resampled data.
   this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+  this->AMRVolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 }
 
 //***************************************************************************

@@ -96,19 +96,19 @@ public:
   /**
    * Overridden to ignore the calls when this->Enabled == false.
    */
-  virtual void Initialize() VTK_OVERRIDE;
-  virtual void Tick(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
-  virtual void Finalize() VTK_OVERRIDE;
+  void Initialize() VTK_OVERRIDE;
+  void Tick(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
+  void Finalize() VTK_OVERRIDE;
   //@}
 
 protected:
   vtkPVAnimationCue();
-  ~vtkPVAnimationCue();
+  ~vtkPVAnimationCue() override;
 
   //@{
-  virtual void StartCueInternal() VTK_OVERRIDE;
-  virtual void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
-  virtual void EndCueInternal() VTK_OVERRIDE;
+  void StartCueInternal() VTK_OVERRIDE;
+  void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
+  void EndCueInternal() VTK_OVERRIDE;
   //@}
 
   friend class vtkSMAnimationSceneProxy;
@@ -122,8 +122,8 @@ protected:
   vtkPVCueManipulator* Manipulator;
 
 private:
-  vtkPVAnimationCue(const vtkPVAnimationCue&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVAnimationCue&) VTK_DELETE_FUNCTION;
+  vtkPVAnimationCue(const vtkPVAnimationCue&) = delete;
+  void operator=(const vtkPVAnimationCue&) = delete;
 };
 
 #endif

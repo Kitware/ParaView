@@ -28,7 +28,6 @@ public:
   std::vector<std::string> FilterExpressions;
 };
 
-vtkInstantiatorNewMacro(vtkPVRepresentedArrayListSettings);
 //----------------------------------------------------------------------------
 vtkPVRepresentedArrayListSettings* vtkPVRepresentedArrayListSettings::New()
 {

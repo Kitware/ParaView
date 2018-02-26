@@ -17,15 +17,9 @@ if(NOT DEFINED CMAKE_MACOSX_RPATH)
   set(CMAKE_MACOSX_RPATH 0)
 endif()
 
-IF (PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  QT5_WRAP_CPP(MOC_SRCS
-    pqRepresentationBehaviorStarter.h
-    pqSurfaceRepresentationBehavior.h)
-ELSE ()
-  QT4_WRAP_CPP(MOC_SRCS
-    pqRepresentationBehaviorStarter.h
-    pqSurfaceRepresentationBehavior.h)
-ENDIF ()
+QT5_WRAP_CPP(MOC_SRCS
+  pqRepresentationBehaviorStarter.h
+  pqSurfaceRepresentationBehavior.h)
 
 ADD_PARAVIEW_AUTO_START(
   IFACES

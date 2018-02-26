@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataObjectTypes.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkTimerLog.h"
 
 #include <QList>
 #include <QSet>
@@ -41,13 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include <cassert>
+#include <unordered_map>
 #include <vector>
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-typedef quint32 qindexdatatype;
-#else
-typedef quintptr qindexdatatype;
-#endif
 
 namespace pqCompositeDataInformationTreeModelNS
 {
@@ -185,11 +181,11 @@ public:
     if (this->Parent)
     {
       return dmodel->createIndex(
-        this->Parent->childIndex(*this), col, static_cast<qindexdatatype>(this->flatIndex()));
+        this->Parent->childIndex(*this), col, static_cast<quintptr>(this->flatIndex()));
     }
     else
     {
-      return dmodel->createIndex(0, col, static_cast<qindexdatatype>(0));
+      return dmodel->createIndex(0, col, static_cast<quintptr>(0));
     }
   }
 
@@ -352,39 +348,16 @@ public:
     }
   }
 
-  CNode& find(unsigned int findex)
-  {
-    if (this->Index == findex)
-    {
-      return (*this);
-    }
-
-    for (auto iter = this->Children.begin(); iter != this->Children.end(); ++iter)
-    {
-      auto next_sibling = (iter + 1);
-      if (next_sibling != this->Children.end() && next_sibling->Index <= findex)
-      {
-        // skip this sub-tree. We're not going to find what we're looking for.
-        continue;
-      }
-
-      CNode& found = iter->find(findex);
-      if (found != CNode::nullNode())
-      {
-        return found;
-      }
-    }
-    return CNode::nullNode();
-  }
-
   bool build(vtkPVDataInformation* info, bool expand_multi_piece, unsigned int& index,
-    unsigned int& leaf_index, int custom_column_count)
+    unsigned int& leaf_index, int custom_column_count,
+    std::unordered_map<unsigned int, CNode*>& lookupMap)
   {
     this->reset();
     this->Index = index++;
+    lookupMap[this->Index] = this;
     if (info == nullptr || info->GetCompositeDataClassName() == 0)
     {
-      this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "";
+      this->Name = info != nullptr ? info->GetPrettyDataTypeString() : "(empty)";
       this->DataType = info != nullptr ? info->GetDataSetType() : -1;
       this->CustomColumnState.resize(custom_column_count);
       this->LeafIndex = leaf_index++;
@@ -408,7 +381,7 @@ public:
       {
         CNode& childNode = this->Children[cc];
         childNode.build(cinfo->GetDataInformation(cc), expand_multi_piece, index, leaf_index,
-          custom_column_count);
+          custom_column_count, lookupMap);
         // note:  build() will reset childNode, so don't set any ivars before calling it.
         childNode.Parent = this;
         // if Name for block was provided, use that instead of the data type.
@@ -457,23 +430,14 @@ public:
       return nullNode();
     }
 
-    vtkIdType findex = static_cast<unsigned int>(idx.internalId());
+    unsigned int findex = static_cast<unsigned int>(idx.internalId());
     return this->find(findex);
   }
 
-  CNode& find(unsigned int findex)
+  inline CNode& find(unsigned int findex)
   {
-    if (findex == VTK_UNSIGNED_INT_MAX)
-    {
-      return nullNode();
-    }
-
-    if (findex == 0)
-    {
-      return this->Root;
-    }
-
-    return this->Root.find(findex);
+    auto iter = this->CNodeMap.find(findex);
+    return (iter != this->CNodeMap.end()) ? (*iter->second) : nullNode();
   }
 
   /**
@@ -485,8 +449,12 @@ public:
   {
     unsigned int index = 0;
     unsigned int leaf_index = 0;
-    return this->Root.build(
-      info, expand_multi_piece, index, leaf_index, this->CustomColumns.size());
+
+    this->CNodeMap.clear();
+    bool retVal = this->Root.build(
+      info, expand_multi_piece, index, leaf_index, this->CustomColumns.size(), this->CNodeMap);
+
+    return retVal;
   }
 
   CNode& rootNode() { return this->Root; }
@@ -509,6 +477,7 @@ public:
 private:
   CNode Root;
   QStringList CustomColumns;
+  std::unordered_map<unsigned int, CNode*> CNodeMap;
 };
 
 //-----------------------------------------------------------------------------
@@ -554,7 +523,7 @@ QModelIndex pqCompositeDataInformationTreeModel::index(
 {
   if (!parentIdx.isValid() && row == 0)
   {
-    return this->createIndex(0, column, static_cast<qindexdatatype>(0));
+    return this->createIndex(0, column, static_cast<quintptr>(0));
   }
 
   if (row < 0 || column < 0 || column >= this->columnCount())
@@ -565,7 +534,7 @@ QModelIndex pqCompositeDataInformationTreeModel::index(
   pqInternals& internals = (*this->Internals);
   const CNode& node = internals.find(parentIdx);
   const CNode& child = node.child(row);
-  return this->createIndex(row, column, static_cast<qindexdatatype>(child.flatIndex()));
+  return this->createIndex(row, column, static_cast<quintptr>(child.flatIndex()));
 }
 
 //-----------------------------------------------------------------------------
@@ -586,12 +555,12 @@ QModelIndex pqCompositeDataInformationTreeModel::parent(const QModelIndex& idx) 
 
   if (parentNode == internals.rootNode())
   {
-    return this->createIndex(0, 0, static_cast<qindexdatatype>(0));
+    return this->createIndex(0, 0, static_cast<quintptr>(0));
   }
 
   const CNode& parentsParentNode = parentNode.parent();
-  return this->createIndex(parentsParentNode.childIndex(parentNode), 0,
-    static_cast<qindexdatatype>(parentNode.flatIndex()));
+  return this->createIndex(
+    parentsParentNode.childIndex(parentNode), 0, static_cast<quintptr>(parentNode.flatIndex()));
 }
 
 //-----------------------------------------------------------------------------
@@ -701,11 +670,7 @@ bool pqCompositeDataInformationTreeModel::setData(
 
   if (idx.column() == 0 && role == Qt::CheckStateRole)
   {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    int checkState = value.value<int>();
-#else
     Qt::CheckState checkState = value.value<Qt::CheckState>();
-#endif
     if (checkState == Qt::Checked && this->exclusivity())
     {
       internals.clearCheckState(this);
@@ -748,6 +713,9 @@ bool pqCompositeDataInformationTreeModel::setHeaderData(
 //-----------------------------------------------------------------------------
 bool pqCompositeDataInformationTreeModel::reset(vtkPVDataInformation* info)
 {
+  vtkTimerLogScope mark("pqCompositeDataInformationTreeModel::reset");
+  (void)mark;
+
   pqInternals& internals = (*this->Internals);
 
   this->beginResetModel();
@@ -918,7 +886,7 @@ QModelIndex pqCompositeDataInformationTreeModel::find(unsigned int idx) const
 //-----------------------------------------------------------------------------
 const QModelIndex pqCompositeDataInformationTreeModel::rootIndex() const
 {
-  return this->createIndex(0, 0, static_cast<qindexdatatype>(0));
+  return this->createIndex(0, 0, static_cast<quintptr>(0));
 }
 
 //-----------------------------------------------------------------------------

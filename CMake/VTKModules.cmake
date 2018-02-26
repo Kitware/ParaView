@@ -42,13 +42,13 @@ if (NOT WIN32)
 endif()
 
 set(_vtk_modules
-  # VTK modules which ParaView has a explicity compile
+  # VTK modules which ParaView has a explicitly compile
   # time dependency on
   vtkRenderingVolume
   vtkRenderingLabel
   vtkRenderingFreeType
-  vtkRenderingVolume${VTK_RENDERING_BACKEND}
-  vtkRendering${VTK_RENDERING_BACKEND}
+  vtkRenderingVolumeOpenGL2
+  vtkRenderingOpenGL2
   vtkRenderingLOD
   vtkRenderingContext2D
   vtkRenderingAnnotation
@@ -223,6 +223,11 @@ set(_vtk_modules
   vtkFiltersVerdict
   # Needed for:
   #  vtkMeshQuality
+  #  vtkCellSizeFilter
+
+  vtkFiltersParallelVerdict
+  # Needed for:
+  #  vtkPCellSizeFilter
 
   vtkImagingCore
   # Needed for:
@@ -311,7 +316,6 @@ set(_vtk_modules
   #  vtkXMLPRectilinearGridReader
   #  vtkXMLMultiBlockDataReader
   #  vtkXMLHierarchicalBoxDataReader
-  #  vtkXMLHyperOctreeWriter
   #  vtkXMLPolyDataWriter
   #  vtkXMLUnstructuredGridWriter
   #  vtkXMLStructuredGridWriter
@@ -324,9 +328,6 @@ set(_vtk_modules
   #  vtkXMLPImageDataWriter
   #  vtkXMLMultiBlockDataWriter
   #  vtkXMLHierarchicalBoxDataWriter
-
-  vtkIOXdmf2
-  #  Needed for xdmf support.
 
   vtkIOAMR
   #  Needed for AMR Readers.
@@ -366,17 +367,36 @@ set(_vtk_modules
   # needed for H5PartReader support
   )
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND _vtk_modules vtkRenderingLIC vtkIOExport)
-  list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
-else()
-  list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
-  list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
-  list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
-  if(PARAVIEW_ENABLE_PYTHON)
-    list (APPEND _vtk_modules vtkPVCinemaReader)
-  endif()
+list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
+list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
+list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
+if(PARAVIEW_ENABLE_PYTHON)
+  list (APPEND _vtk_modules vtkPVCinemaReader)
 endif()
+
+if (PARAVIEW_ENABLE_XDMF2)
+  list (APPEND _vtk_modules vtkIOXdmf2)
+endif()
+
+if (PARAVIEW_ENABLE_XDMF3)
+  list (APPEND _vtk_modules vtkIOXdmf3)
+  if (PARAVIEW_USE_MPI)
+    list (APPEND _vtk_mpi_modules vtkIOParallelXdmf3)
+  endif()
+endif ()
+
+if (PARAVIEW_ENABLE_GDAL)
+  list (APPEND _vtk_modules vtkIOGDAL)
+endif()
+
+if (PARAVIEW_ENABLE_LAS)
+  list (APPEND _vtk_modules vtkIOLAS)
+endif()
+
+if (PARAVIEW_ENABLE_PDAL)
+  list (APPEND _vtk_modules vtkIOPDAL)
+endif()
+
 
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
@@ -390,16 +410,20 @@ if (PARAVIEW_ENABLE_MATPLOTLIB)
   list (APPEND _vtk_modules vtkRenderingMatplotlib)
 endif()
 
-if (PARAVIEW_ENABLE_XDMF3)
-  list (APPEND _vtk_modules vtkIOXdmf3)
-endif ()
-
 if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules vtkFiltersPython)
   if (PARAVIEW_USE_MPI)
     list(APPEND _vtk_modules vtkParallelMPI4Py)
   endif()
 
+endif()
+
+if (PARAVIEW_BUILD_PLUGIN_OpenVR)
+  list (APPEND _vtk_modules vtkRenderingOpenVR)
+endif()
+
+if(PARAVIEW_USE_VTKM)
+  list(APPEND _vtk_modules vtkAcceleratorsVTKm)
 endif()
 
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this

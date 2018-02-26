@@ -69,7 +69,7 @@ public:
   * If you want to automatically add toolbars for filters as requested in the
   * configuration pass in a non-null main window.
   */
-  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0);
+  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0, bool hideDisabled = false);
 
   /**
   * Builds the "Tools" menu.
@@ -101,7 +101,7 @@ public:
   * Builds the context menu shown over the pipeline browser for some common
   * pipeline operations.
   */
-  static void buildPipelineBrowserContextMenu(QWidget&);
+  static void buildPipelineBrowserContextMenu(QMenu& menu);
 
   /**
   * Builds and adds all standard ParaView toolbars.

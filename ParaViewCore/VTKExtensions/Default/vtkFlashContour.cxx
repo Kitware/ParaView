@@ -288,7 +288,7 @@ int vtkFlashContour::RequestData(vtkInformation* vtkNotUsed(request),
     return 0;
   }
 
-  // This is alot to go through to get the name of the array to process.
+  // This is a lot to go through to get the name of the array to process.
   vtkInformationVector* inArrayVec = this->GetInformation()->Get(INPUT_ARRAYS_TO_PROCESS());
   if (!inArrayVec)
   {
@@ -469,7 +469,7 @@ void vtkFlashContour::RecurseTree(int neighborhood[3][3][3], vtkMultiBlockDataSe
   int* neighborChildren;
   // Check to see if the center of the neighborhood is a leaf.
   // Local map is set to -32 if node is below leaf.
-  // Local map is set to -1 if node is not loaded but decendant is.
+  // Local map is set to -1 if node is not loaded but descendant is.
   // Assume all or none children. only check 0.
   if (children[0] > 0 && this->GlobalToLocalMap[children[0]] != -32)
   { // Not a leaf.  Traverse.
@@ -483,7 +483,7 @@ void vtkFlashContour::RecurseTree(int neighborhood[3][3][3], vtkMultiBlockDataSe
       int childNeighborhood[3][3][3];
       int neighbor;
       // This assumes children are indexed x, y, z.
-      // Maybe we can find a symetry between cases and avoid a long case.
+      // Maybe we can find a symmetry between cases and avoid a long case.
       // Names are taken from the childIdx == 0 case.
       int nx0, nx2, ny0, ny2, nz0, nz2;
       int cx0, cx1, cy0, cy1, cz0, cz1;
@@ -1003,8 +1003,8 @@ void vtkFlashContour::ProcessSharedRegion(int regionDims[3], double* cornerPtrs[
   double* cornerPtrsX[8];
   double cornerPointsY[32];
   double cornerPointsX[32];
-  double* passPtrsY[8];
-  double* passPtrsX[8];
+  double* passPtrsY[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+  double* passPtrsX[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
   // Loop over the region.
   for (int z = 0; z < regionDims[2]; ++z)

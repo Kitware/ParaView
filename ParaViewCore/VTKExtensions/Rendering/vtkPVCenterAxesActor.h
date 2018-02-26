@@ -36,7 +36,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * If Symetric is on, the the axis continue to negative values.
+   * If Symmetric is on, the the axis continue to negative values.
    */
   void SetSymmetric(int);
 
@@ -47,14 +47,14 @@ public:
 
 protected:
   vtkPVCenterAxesActor();
-  ~vtkPVCenterAxesActor();
+  ~vtkPVCenterAxesActor() override;
 
   vtkAxes* Axes;
   vtkPolyDataMapper* Mapper;
 
 private:
-  vtkPVCenterAxesActor(const vtkPVCenterAxesActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCenterAxesActor&) VTK_DELETE_FUNCTION;
+  vtkPVCenterAxesActor(const vtkPVCenterAxesActor&) = delete;
+  void operator=(const vtkPVCenterAxesActor&) = delete;
 };
 
 #endif

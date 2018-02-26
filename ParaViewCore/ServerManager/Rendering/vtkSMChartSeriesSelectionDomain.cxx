@@ -115,6 +115,7 @@ vtkSMChartSeriesSelectionDomain::vtkSMChartSeriesSelectionDomain()
   this->DefaultValue = 0;
   this->SetDefaultValue("");
   this->FlattenTable = true;
+  this->HidePartialArrays = true;
 
   this->AddObserver(
     vtkCommand::DomainModifiedEvent, this, &vtkSMChartSeriesSelectionDomain::OnDomainModified);
@@ -185,6 +186,11 @@ int vtkSMChartSeriesSelectionDomain::ReadXMLAttributes(
   {
     this->FlattenTable = (strcmp(default_mode, "true") == 0);
   }
+  int hide_partial_arrays;
+  if (element->GetScalarAttribute("hide_partial_arrays", &hide_partial_arrays))
+  {
+    this->HidePartialArrays = (hide_partial_arrays == 1);
+  }
   return 1;
 }
 
@@ -237,6 +243,12 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
     {
       continue;
     }
+    vtkPVCompositeDataInformation* childCompositeInfo = childInfo->GetCompositeDataInformation();
+    if (childCompositeInfo->GetNumberOfChildren() != 0)
+    {
+      // Ignore non leaf block
+      continue;
+    }
     std::ostringstream blockNameStream;
     if (compositeIndex->GetRepeatCommand())
     {
@@ -251,10 +263,8 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
         blockNameStream << compositeIndexHelper.GetAsInt(cc);
       }
     }
-    // if there is only 1 element, use the element to avoid having partial data.
-    vtkPVDataInformation* dataInfoWithArrays = numElems == 1 ? childInfo : dataInfo;
-    this->PopulateAvailableArrays(blockNameStream.str(), column_names, dataInfoWithArrays,
-      fieldAssociation, this->FlattenTable);
+    this->PopulateAvailableArrays(
+      blockNameStream.str(), column_names, childInfo, fieldAssociation, this->FlattenTable);
   }
   this->SetStrings(column_names);
 }
@@ -303,48 +313,52 @@ void vtkSMChartSeriesSelectionDomain::PopulateArrayComponents(vtkChartRepresenta
   const std::string& blockName, std::vector<vtkStdString>& strings,
   std::set<vtkStdString>& uniquestrings, vtkPVArrayInformation* arrayInfo, bool flattenTable)
 {
-  if (arrayInfo != NULL && arrayInfo->GetIsPartial() != 1)
+  if (arrayInfo && (!this->HidePartialArrays || arrayInfo->GetIsPartial() == 0))
   {
-    if (arrayInfo->GetNumberOfComponents() > 1 && flattenTable)
+    int dataType = arrayInfo->GetDataType();
+    if (dataType != VTK_STRING && dataType != VTK_UNICODE_STRING && dataType != VTK_VARIANT)
     {
-      for (int kk = 0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
+      if (arrayInfo->GetNumberOfComponents() > 1 && flattenTable)
       {
-        std::string component_name = vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk);
-        component_name = chartRepr->GetDefaultSeriesLabel(blockName, component_name);
-        if (uniquestrings.find(component_name) == uniquestrings.end())
+        for (int kk = 0; kk <= arrayInfo->GetNumberOfComponents(); kk++)
         {
-          strings.push_back(component_name);
-          uniquestrings.insert(component_name);
-        }
-        if (kk != arrayInfo->GetNumberOfComponents())
-        {
-          // save component names so we can detect them when setting defaults
-          // later.
-          this->SetDefaultVisibilityOverride(component_name, false);
+          std::string component_name = vtkSMArrayListDomain::CreateMangledName(arrayInfo, kk);
+          component_name = chartRepr->GetDefaultSeriesLabel(blockName, component_name);
+          if (uniquestrings.find(component_name) == uniquestrings.end())
+          {
+            strings.push_back(component_name);
+            uniquestrings.insert(component_name);
+          }
+          if (kk != arrayInfo->GetNumberOfComponents())
+          {
+            // save component names so we can detect them when setting defaults
+            // later.
+            this->SetDefaultVisibilityOverride(component_name, false);
+          }
         }
       }
-    }
-    else
-    {
-      char* arrayName = arrayInfo->GetName();
-      if (arrayName != NULL)
+      else
       {
-        std::string seriesName = chartRepr->GetDefaultSeriesLabel(blockName, arrayName);
-        if (uniquestrings.find(seriesName) == uniquestrings.end())
+        char* arrayName = arrayInfo->GetName();
+        if (arrayName != nullptr)
         {
-          strings.push_back(seriesName);
-          uniquestrings.insert(seriesName);
-
-          // Special case for Quartile plots. PlotSelectionOverTime filter, when
-          // produces stats, likes to pre-split components in an array into multiple
-          // single component arrays. We still want those to be treated as
-          // components and not be shown by default. Hence, we use this hack.
-          // (See BUG #15512).
-          std::string seriesNameWithoutTableName =
-            chartRepr->GetDefaultSeriesLabel(std::string(), arrayName);
-          if (PotentailComponentNameRe.find(seriesNameWithoutTableName))
+          std::string seriesName = chartRepr->GetDefaultSeriesLabel(blockName, arrayName);
+          if (uniquestrings.find(seriesName) == uniquestrings.end())
           {
-            this->SetDefaultVisibilityOverride(seriesName, false);
+            strings.push_back(seriesName);
+            uniquestrings.insert(seriesName);
+
+            // Special case for Quartile plots. PlotSelectionOverTime filter, when
+            // produces stats, likes to pre-split components in an array into multiple
+            // single component arrays. We still want those to be treated as
+            // components and not be shown by default. Hence, we use this hack.
+            // (See BUG #15512).
+            std::string seriesNameWithoutTableName =
+              chartRepr->GetDefaultSeriesLabel(std::string(), arrayName);
+            if (PotentailComponentNameRe.find(seriesNameWithoutTableName))
+            {
+              this->SetDefaultVisibilityOverride(seriesName, false);
+            }
           }
         }
       }
@@ -502,4 +516,5 @@ void vtkSMChartSeriesSelectionDomain::SetDefaultVisibilityOverride(
 void vtkSMChartSeriesSelectionDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "HidePartialArrays: " << this->HidePartialArrays << endl;
 }

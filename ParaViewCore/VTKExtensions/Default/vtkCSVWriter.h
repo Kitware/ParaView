@@ -95,17 +95,17 @@ public:
 
 protected:
   vtkCSVWriter();
-  ~vtkCSVWriter();
+  ~vtkCSVWriter() override;
   //@}
 
   bool OpenFile();
 
-  virtual void WriteData() VTK_OVERRIDE;
+  void WriteData() VTK_OVERRIDE;
   virtual void WriteTable(vtkTable* rectilinearGrid);
 
   // see algorithm for more info.
   // This writer takes in vtkTable.
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   char* FileName;
   char* FieldDelimiter;
@@ -117,8 +117,8 @@ protected:
   ofstream* Stream;
 
 private:
-  vtkCSVWriter(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCSVWriter&) VTK_DELETE_FUNCTION;
+  vtkCSVWriter(const vtkCSVWriter&) = delete;
+  void operator=(const vtkCSVWriter&) = delete;
 };
 
 #endif

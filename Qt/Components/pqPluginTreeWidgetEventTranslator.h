@@ -47,10 +47,10 @@ class PQCOMPONENTS_EXPORT pqPluginTreeWidgetEventTranslator : public pqWidgetEve
 
 public:
   pqPluginTreeWidgetEventTranslator(QObject* parentObject = 0);
-  ~pqPluginTreeWidgetEventTranslator();
+  ~pqPluginTreeWidgetEventTranslator() override;
 
   using Superclass::translateEvent;
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+  bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
 
 private slots:
   void onItemChanged(const QModelIndex&);

@@ -38,6 +38,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="Reset">
+       <property name="toolTip">
+        <string>Resets any changed properties to their values from the last time 'Apply' was clicked.</string>
+       </property>
        <property name="text">
         <string>&amp;Reset</string>
        </property>

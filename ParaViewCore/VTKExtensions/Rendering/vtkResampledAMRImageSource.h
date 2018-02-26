@@ -90,7 +90,7 @@ public:
 
 protected:
   vtkResampledAMRImageSource();
-  ~vtkResampledAMRImageSource();
+  ~vtkResampledAMRImageSource() override;
 
   bool Initialize(vtkOverlappingAMR* amr);
   bool UpdateResampledVolume(
@@ -105,8 +105,8 @@ protected:
   vtkSmartPointer<vtkIntArray> DonorLevel;
 
 private:
-  vtkResampledAMRImageSource(const vtkResampledAMRImageSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkResampledAMRImageSource&) VTK_DELETE_FUNCTION;
+  vtkResampledAMRImageSource(const vtkResampledAMRImageSource&) = delete;
+  void operator=(const vtkResampledAMRImageSource&) = delete;
 
   vtkTimeStamp InitializationTime;
 };

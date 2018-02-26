@@ -250,27 +250,58 @@ void vtkThreeSliceFilter::Process(
   // Process dataset
   // Add CellIds to allow cell selection to work
   vtkIdType nbCells = input->GetNumberOfCells();
-  vtkNew<vtkIdTypeArray> originalCellIds;
-  originalCellIds->SetName("vtkSliceOriginalCellIds");
-  originalCellIds->SetNumberOfComponents(1);
-  originalCellIds->SetNumberOfTuples(nbCells);
-  input->GetCellData()->AddArray(originalCellIds.GetPointer());
-
-  // Fill the array with proper id values
-  for (vtkIdType id = 0; id < nbCells; ++id)
+  const char* vtkSliceOriginalCellIds = "vtkSliceOriginalCellIds";
+  if (input->GetCellData()->HasArray(vtkSliceOriginalCellIds) == 1)
   {
-    originalCellIds->SetValue(id, id);
+    vtkIdTypeArray* originalCellIds =
+      vtkIdTypeArray::FastDownCast(input->GetCellData()->GetArray(vtkSliceOriginalCellIds));
+    assert(originalCellIds != nullptr);
+    vtkIdType oldNbCells = originalCellIds->GetNumberOfTuples();
+    if (oldNbCells != nbCells)
+    {
+      originalCellIds->SetNumberOfTuples(nbCells);
+      // Fill the array with proper id values
+      for (vtkIdType id = 0; id < nbCells; ++id)
+      {
+        originalCellIds->SetValue(id, id);
+      }
+    }
+  }
+  else
+  {
+    vtkNew<vtkIdTypeArray> originalCellIds;
+    originalCellIds->SetName(vtkSliceOriginalCellIds);
+    originalCellIds->SetNumberOfComponents(1);
+    originalCellIds->SetNumberOfTuples(nbCells);
+    input->GetCellData()->AddArray(originalCellIds.GetPointer());
+    // Fill the array with proper id values
+    for (vtkIdType id = 0; id < nbCells; ++id)
+    {
+      originalCellIds->SetValue(id, id);
+    }
   }
 
   // Add composite index information if we have any
   if (compositeIndex != VTK_UNSIGNED_INT_MAX)
   {
-    vtkNew<vtkUnsignedIntArray> compositeIndexArray;
-    compositeIndexArray->SetName("vtkSliceCompositeIndex");
-    compositeIndexArray->SetNumberOfComponents(1);
-    compositeIndexArray->SetNumberOfTuples(nbCells);
-    compositeIndexArray->FillComponent(0, compositeIndex);
-    input->GetCellData()->AddArray(compositeIndexArray.GetPointer());
+    const char* vtkSliceCompositeIndex = "vtkSliceCompositeIndex";
+    if (input->GetCellData()->HasArray(vtkSliceCompositeIndex) == 1)
+    {
+      vtkUnsignedIntArray* compositeIndexArray =
+        vtkUnsignedIntArray::FastDownCast(input->GetCellData()->GetArray(vtkSliceCompositeIndex));
+      assert(compositeIndexArray != nullptr);
+      compositeIndexArray->SetNumberOfTuples(nbCells);
+      compositeIndexArray->FillComponent(0, compositeIndex);
+    }
+    else
+    {
+      vtkNew<vtkUnsignedIntArray> compositeIndexArray;
+      compositeIndexArray->SetName(vtkSliceCompositeIndex);
+      compositeIndexArray->SetNumberOfComponents(1);
+      compositeIndexArray->SetNumberOfTuples(nbCells);
+      compositeIndexArray->FillComponent(0, compositeIndex);
+      input->GetCellData()->AddArray(compositeIndexArray.GetPointer());
+    }
   }
 
   // Setup internal pipeline

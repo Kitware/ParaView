@@ -54,11 +54,11 @@ public:
   /**
    * Overridden to pass on to the internal keyframe proxies.
    */
-  virtual void RemoveAllKeyValues() VTK_OVERRIDE;
-  virtual void SetKeyTime(double time) VTK_OVERRIDE;
-  virtual void SetKeyValue(double val) VTK_OVERRIDE { this->Superclass::SetKeyValue(val); }
-  virtual void SetKeyValue(unsigned int index, double val) VTK_OVERRIDE;
-  virtual void SetNumberOfKeyValues(unsigned int num) VTK_OVERRIDE;
+  void RemoveAllKeyValues() VTK_OVERRIDE;
+  void SetKeyTime(double time) VTK_OVERRIDE;
+  void SetKeyValue(double val) VTK_OVERRIDE { this->Superclass::SetKeyValue(val); }
+  void SetKeyValue(unsigned int index, double val) VTK_OVERRIDE;
+  void SetNumberOfKeyValues(unsigned int num) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -96,12 +96,11 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  virtual void UpdateValue(
-    double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
 
 protected:
   vtkPVCompositeKeyFrame();
-  ~vtkPVCompositeKeyFrame();
+  ~vtkPVCompositeKeyFrame() override;
 
   int Type;
 
@@ -111,8 +110,8 @@ protected:
   vtkPVSinusoidKeyFrame* SinusoidKeyFrame;
 
 private:
-  vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCompositeKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&) = delete;
+  void operator=(const vtkPVCompositeKeyFrame&) = delete;
 };
 
 #endif

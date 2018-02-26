@@ -130,8 +130,8 @@ void vtkPVXYChartView::SetChartType(const char* type)
   }
 
   // Construct the correct type of chart
-  if (strcmp(type, "Line") == 0 || strcmp(type, "Bar") == 0 || strcmp(type, "Bag") == 0 ||
-    strcmp(type, "FunctionalBag") == 0 || strcmp(type, "Area") == 0)
+  if (strcmp(type, "Line") == 0 || strcmp(type, "Point") == 0 || strcmp(type, "Bar") == 0 ||
+    strcmp(type, "Bag") == 0 || strcmp(type, "FunctionalBag") == 0 || strcmp(type, "Area") == 0)
   {
     this->Chart = vtkChartXY::New();
   }
@@ -225,6 +225,15 @@ void vtkPVXYChartView::SetTitleFontFamily(const char* family)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetTitleFontFile(const char* file)
+{
+  if (this->Chart)
+  {
+    this->Chart->GetTitleProperties()->SetFontFile(file);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetTitleFontSize(int pointSize)
 {
   if (this->Chart)
@@ -276,6 +285,16 @@ void vtkPVXYChartView::SetLegendFontFamily(const char* family)
   {
     vtkTextProperty* prop = this->Chart->GetLegend()->GetLabelProperties();
     prop->SetFontFamilyAsString(family);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetLegendFontFile(const char* file)
+{
+  if (this->Chart)
+  {
+    vtkTextProperty* prop = this->Chart->GetLegend()->GetLabelProperties();
+    prop->SetFontFile(file);
   }
 }
 
@@ -435,6 +454,16 @@ void vtkPVXYChartView::SetAxisLabelFontFamily(int index, const char* family)
   {
     vtkTextProperty* prop = this->Chart->GetAxis(index)->GetLabelProperties();
     prop->SetFontFamilyAsString(family);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelFontFile(int index, const char* file)
+{
+  if (this->Chart)
+  {
+    vtkTextProperty* prop = this->Chart->GetAxis(index)->GetLabelProperties();
+    prop->SetFontFile(file);
   }
 }
 
@@ -599,6 +628,16 @@ void vtkPVXYChartView::SetAxisTitleFontFamily(int index, const char* family)
   {
     vtkTextProperty* prop = this->Chart->GetAxis(index)->GetTitleProperties();
     prop->SetFontFamilyAsString(family);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisTitleFontFile(int index, const char* file)
+{
+  if (this->Chart)
+  {
+    vtkTextProperty* prop = this->Chart->GetAxis(index)->GetTitleProperties();
+    prop->SetFontFile(file);
   }
 }
 
@@ -810,7 +849,7 @@ void vtkPVXYChartView::Update()
   // axes range until paint.
   // Also, when new data arrays show up in the representation's input,
   // the ServerManager sets up default series visibilities, and that code
-  // excutes in "PostUpdate". Hence, we don't trigger
+  // executes in "PostUpdate". Hence, we don't trigger
   // vtkChartRepresentation::PrepareForRendering() here, instead wait for the
   // subsequent render call.
 }

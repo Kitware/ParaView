@@ -36,17 +36,8 @@ set (Module_SRCS
   vtkCPInputDataDescription.cxx
   vtkCPPipeline.cxx
   vtkCPProcessor.cxx
+  vtkCPXMLPWriterPipeline.cxx
 )
-
-set_source_files_properties(
-  vtkCPAdaptorAPI
-  vtkCPPipeline
-  ABSTRACT)
-
-set_source_files_properties(
-  CAdaptorAPI
-  vtkCPCxxHelper
-  WRAP_EXCLUDE)
 
 set (${vtk-module}_HDRS CAdaptorAPI.h)
 
@@ -75,15 +66,6 @@ if (CMAKE_Fortran_COMPILER_WORKS)
        ${${vtk-module}_HDRS}
        FortranAdaptorAPI.h
        ${CMAKE_CURRENT_BINARY_DIR}/FortranAdaptorAPIMangling.h)
-
-  set_source_files_properties(
-    FortranAdaptorAPI
-    WRAP_EXCLUDE)
-
-  set_source_files_properties(
-    FortranAdaptorAPI
-    PROPERTIES
-    WRAP_EXCLUDE_PYTHON 1)
 endif()
 
 if (PARAVIEW_USE_MPI)

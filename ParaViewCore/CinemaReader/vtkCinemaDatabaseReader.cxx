@@ -101,12 +101,12 @@ void vtkCinemaDatabaseReader::ClearControlParameter(const char* pname)
 }
 
 //----------------------------------------------------------------------------
-void vtkCinemaDatabaseReader::EnableControlParameterValue(const char* pname, int value_index)
+void vtkCinemaDatabaseReader::EnableControlParameterValue(const char* pname, double value)
 {
-  std::vector<std::string> values = this->Helper->GetControlParameterValues(pname);
-  if (value_index >= 0 && value_index < static_cast<int>(values.size()))
+  std::string str = this->Helper->GetNearestParameterValue(pname, value);
+  if (!str.empty())
   {
-    this->EnableControlParameterValue(pname, values[value_index].c_str());
+    this->EnableControlParameterValue(pname, str.c_str());
   }
 }
 
@@ -122,18 +122,21 @@ std::string vtkCinemaDatabaseReader::GetQueryString(double time) const
 {
   std::ostringstream str;
   // str << "{";
-  str << "'vis': ['" << this->PipelineObject << "']";
+
+  if (this->Helper->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_C)
+  {
+    str << "'vis': ['" << this->PipelineObject << "'], ";
+  }
 
   TimeStepsMapType::const_iterator timeIter = this->TimeStepsMap.find(time);
   if (timeIter != this->TimeStepsMap.end())
   {
-    str << ", 'time' : [ '" << timeIter->second.c_str() << "']";
+    str << "'time' : [ '" << timeIter->second.c_str() << "'], ";
   }
   for (MapOfVectorOfString::const_iterator miter = this->EnabledControlParameterValues.begin();
        miter != this->EnabledControlParameterValues.end(); ++miter)
   {
-    str << ", ";
-    str << "'" << miter->first.c_str() << "' : [ ";
+    str << "'" << miter->first.c_str() << "' : [";
     for (SetOfStrings::const_iterator siter = miter->second.begin(); siter != miter->second.end();
          ++siter)
     {
@@ -143,7 +146,7 @@ std::string vtkCinemaDatabaseReader::GetQueryString(double time) const
       }
       str << siter->c_str();
     }
-    str << "]";
+    str << "], ";
   }
   // str << "}";
   // I am deliberately ditching the start/end markers.
@@ -160,7 +163,8 @@ int vtkCinemaDatabaseReader::RequestData(
     return 0;
   }
 
-  if (this->EnabledControlParameterValues.size() == 0 &&
+  if (this->Helper->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_C &&
+    this->EnabledControlParameterValues.size() == 0 &&
     this->Helper->GetControlParameters(this->PipelineObject).size() != 0)
   {
     // nothing enabled, nothing to show.

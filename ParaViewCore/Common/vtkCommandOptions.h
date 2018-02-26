@@ -110,7 +110,7 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkCommandOptions();
+  ~vtkCommandOptions() override;
 
   /**
    * Prototype for callbacks.
@@ -194,8 +194,8 @@ private:
   char* ApplicationPath;
   int ProcessType; // data-server, render-server, combined-server, client
 
-  vtkCommandOptions(const vtkCommandOptions&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCommandOptions&) VTK_DELETE_FUNCTION;
+  vtkCommandOptions(const vtkCommandOptions&) = delete;
+  void operator=(const vtkCommandOptions&) = delete;
 
   vtkCommandOptionsInternal* Internals;
 

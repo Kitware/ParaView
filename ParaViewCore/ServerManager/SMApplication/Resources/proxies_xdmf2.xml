@@ -1,0 +1,238 @@
+<ServerManagerConfiguration>
+  <!-- ******************************************************************** -->
+  <ProxyGroup name="internal_sources">
+    <!-- =================================================================== -->
+    <SourceProxy class="vtkXdmfReader" name="XdmfReaderCore">
+      <Documentation>
+        The actual reader proxy for Xdmf Reader. Make internal since it doesn't
+        support file-series.
+      </Documentation>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="SetInfo">
+        <ArraySelectionInformationHelper attribute_name="Set" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetSetStatus"
+                            element_types="2 0"
+                            information_property="SetInfo"
+                            label="Sets"
+                            name="SetStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="SetInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the sets to be loaded from the dataset, if
+        any.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="GetSIL"
+                            information_only="1"
+                            name="GridInfo"
+                            si_class="vtkSISILProperty"
+                            subtree="Blocks" />
+      <IdTypeVectorProperty command="GetSILUpdateStamp"
+                            default_values="0"
+                            information_only="1"
+                            name="SILTimeStamp"
+                            number_of_elements="1" />
+      <StringVectorProperty command="SetGridStatus"
+                            element_types="2 0"
+                            label="Grids"
+                            name="GridStatus"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <SILDomain name="array_list"
+                   subtree="Blocks">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="GridInfo" />
+            <Property function="TimeStamp"
+                      name="SILTimeStamp" />
+          </RequiredProperties>
+        </SILDomain>
+        <Documentation>Controls which particular data sets to read from a file
+        that contains many data sets inside a composite data set
+        collection.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetStride"
+                         default_values="1 1 1"
+                         name="Stride"
+                         number_of_elements="3">
+        <IntRangeDomain min="1 1 1"
+                        name="range" />
+        <Documentation>If loading structured data, this property indicate the
+        number of indices per dimension (X, Y, or Z) to skip between each point
+        included in this output.</Documentation>
+      </IntVectorProperty>
+      <!-- End of XdmfReaderCore -->
+    </SourceProxy>
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="sources">
+
+        <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XDMF Reader"
+                 name="XdmfReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads XDMF (eXtensible Data Model and Format) files."
+                     short_help="Read XDMF data files.">The XDMF reader reads
+                     files in XDMF format. The expected file extension is .xmf.
+                     Metadata is stored in the XDMF file using an XML format,
+                     and large attribute arrays are stored in a corresponding
+                     HDF5 file. The output may be unstructured grid, structured
+                     grid, or rectiliner grid. See http://www.xdmf.org for a
+                     description of the file format.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XdmfReaderCore" />
+        <ExposedProperties>
+          <Property name="PointArrayInfo" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+          <Property name="SetInfo" />
+          <Property name="SetStatus" />
+          <Property name="GridInfo" />
+          <Property name="GridStatus" />
+          <Property name="Stride" />
+          <Property name="SILTimeStamp" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="xmf xdmf xmf2 xdmf2"
+                       file_description="Xdmf Reader" />
+      </Hints>
+      <!-- End of XdmfReader -->
+    </SourceProxy>
+  </ProxyGroup>
+
+  <!-- ******************************************************************** -->
+  <ProxyGroup name="writers">
+    <!-- ================================================================= -->
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkXdmfWriter"
+                 name="XdmfWriter">
+      <Documentation short_help="Write data in Xdmf files.">Writer to write
+      data in eXtensible Data Model and Format *(XDMF) files.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="WriteAllTimeSteps"
+                         command="SetWriteAllTimeSteps"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteAllTimeSteps is turned ON, the writer is
+        executed once for each timestep available from the reader.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="MeshStaticOverTime"
+                         command="SetMeshStaticOverTime"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>When MeshStaticOverTime is turned ON, only the mesh
+          topology and geometry at the first time step will be written in the
+          heavy data file. All time steps will reference them in the Xdmf file.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="xmf"
+                       file_description="Xdmf Data File" />
+      </Hints>
+      <!-- End of XdmfWriter -->
+    </WriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

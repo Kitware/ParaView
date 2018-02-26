@@ -17,7 +17,7 @@
  * @brief   Gets features of the server.
  *
  * This objects is used by the client to get the features
- * suported by the server.
+ * supported by the server.
  * At the moment, server information is only on the root.
 */
 
@@ -53,37 +53,29 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
-   * Varibles (command line argurments) set to render to a tiled display.
+   * Variables (command line argurments) set to render to a tiled display.
    */
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
   vtkSetVector2Macro(TileMullions, int);
   vtkGetVector2Macro(TileMullions, int);
-  //@}
-
-  //@{
-  /**
-   * Variable (command line argument) to use offscreen rendering.
-   */
-  vtkSetMacro(UseOffscreenRendering, int);
-  vtkGetMacro(UseOffscreenRendering, int);
   //@}
 
   //@{
@@ -97,18 +89,28 @@ public:
   //@{
   /**
    * Get/Set if the server supports saving OGVs.
+   * @deprecated in ParaView 5.5
    */
-  vtkSetMacro(OGVSupport, int);
-  vtkGetMacro(OGVSupport, int);
+  VTK_LEGACY(void SetOGVSupport(int));
+  VTK_LEGACY(int GetOGVSupport());
   //@}
 
   //@{
   /**
    * Get/Set if the server supports saving AVIs.
+   * @deprecated in ParaView 5.5
    */
-  vtkSetMacro(AVISupport, int);
-  vtkGetMacro(AVISupport, int);
+  VTK_LEGACY(void SetAVISupport(int));
+  VTK_LEGACY(int GetAVISupport());
   //@}
+
+  //@{
+  /**
+   * if the server supports compressing images via NVPipe
+   */
+  //@}
+  vtkSetMacro(NVPipeSupport, bool);
+  vtkGetMacro(NVPipeSupport, bool);
 
   //@{
   /**
@@ -237,26 +239,26 @@ public:
 
 protected:
   vtkPVServerInformation();
-  ~vtkPVServerInformation();
+  ~vtkPVServerInformation() override;
 
   int NumberOfProcesses;
   bool MPIInitialized;
   int OGVSupport;
   int AVISupport;
+  bool NVPipeSupport;
   int RemoteRendering;
   int TileDimensions[2];
   int TileMullions[2];
   int Timeout;
   int UseIceT;
-  int UseOffscreenRendering;
   int MultiClientsEnable;
   int ClientId;
   int IdTypeSize;
 
   vtkPVServerOptionsInternals* MachinesInternals;
 
-  vtkPVServerInformation(const vtkPVServerInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVServerInformation&) VTK_DELETE_FUNCTION;
+  vtkPVServerInformation(const vtkPVServerInformation&) = delete;
+  void operator=(const vtkPVServerInformation&) = delete;
 };
 
 #endif

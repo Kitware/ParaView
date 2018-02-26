@@ -55,17 +55,17 @@ public:
 
 protected:
   vtkIsoVolume();
-  ~vtkIsoVolume();
+  ~vtkIsoVolume() override;
 
   // Usual data generation methods.
-  virtual int RequestData(
+  int RequestData(
     vtkInformation* request, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * This filter produces a vtkMultiBlockDataSet when the input is a
    * vtkCompositeDataSet otherwise, it produces a vtkUnstructuredGrid.
    */
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   vtkDataObject* Clip(
@@ -75,8 +75,8 @@ protected:
   double UpperThreshold;
 
 private:
-  vtkIsoVolume(const vtkIsoVolume&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIsoVolume&) VTK_DELETE_FUNCTION;
+  vtkIsoVolume(const vtkIsoVolume&) = delete;
+  void operator=(const vtkIsoVolume&) = delete;
 };
 
 #endif // vtkIsoVolume_h

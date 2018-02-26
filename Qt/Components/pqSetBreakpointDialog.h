@@ -57,7 +57,7 @@ class PQCOMPONENTS_EXPORT pqSetBreakpointDialog : public QDialog
 
 public:
   pqSetBreakpointDialog(QWidget* Parent);
-  ~pqSetBreakpointDialog();
+  ~pqSetBreakpointDialog() override;
 
 signals:
   void breakpointHit();

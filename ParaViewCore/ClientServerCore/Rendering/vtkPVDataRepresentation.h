@@ -118,15 +118,6 @@ public:
   vtkGetMacro(UpdateTimeValid, bool);
   //@}
 
-  //@{
-  /**
-   * @deprecated No longer needed. Simply remove these methods from your
-   * subclass implementation.
-   */
-  VTK_LEGACY(virtual void SetUseCache(bool));
-  VTK_LEGACY(virtual void SetCacheKey(double val));
-  //@}
-
   /**
    * Typically a representation decides whether to use cache based on the view's
    * values for UseCache and CacheKey.
@@ -162,8 +153,8 @@ public:
    * Making these methods public. When constructing composite representations,
    * we need to call these methods directly on internal representations.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
   //@}
 
   /**
@@ -172,24 +163,30 @@ public:
    * internal pipeline.
    * Overridden to use vtkPVTrivialProducer instead of vtkTrivialProducer
    */
-  virtual vtkAlgorithmOutput* GetInternalOutputPort() VTK_OVERRIDE
+  vtkAlgorithmOutput* GetInternalOutputPort() VTK_OVERRIDE
   {
     return this->GetInternalOutputPort(0);
   }
-  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port) VTK_OVERRIDE
+  vtkAlgorithmOutput* GetInternalOutputPort(int port) VTK_OVERRIDE
   {
     return this->GetInternalOutputPort(port, 0);
   }
-  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn) VTK_OVERRIDE;
+  vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn) VTK_OVERRIDE;
 
   /**
    * Provides access to the view.
    */
   vtkView* GetView() const;
 
+  /**
+   * Returns the timestamp when `RequestData` was executed on the
+   * representation.
+   */
+  vtkMTimeType GetPipelineDataTime();
+
 protected:
   vtkPVDataRepresentation();
-  ~vtkPVDataRepresentation();
+  ~vtkPVDataRepresentation() override;
 
   /**
    * Subclasses should override this method when they support caching to
@@ -204,18 +201,17 @@ protected:
   /**
    * Create a default executive.
    */
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int RequestUpdateTime(
+  int RequestUpdateTime(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   double UpdateTime;
@@ -223,8 +219,8 @@ protected:
   unsigned int UniqueIdentifier;
 
 private:
-  vtkPVDataRepresentation(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVDataRepresentation(const vtkPVDataRepresentation&) = delete;
+  void operator=(const vtkPVDataRepresentation&) = delete;
 
   bool Visibility;
   bool ForceUseCache;

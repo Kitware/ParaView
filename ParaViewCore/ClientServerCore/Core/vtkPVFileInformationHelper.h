@@ -119,13 +119,13 @@ public:
 
   /**
    * Transform local code page string to UTF8 string
-   * on windows only, pass through oterwise
+   * on windows only, pass through otherwise
    */
   static std::string LocalToUtf8Win32(const std::string& path);
 
   /**
    * Transform utf8 string to local code page string
-   * on windows only, pass through oterwise
+   * on windows only, pass through otherwise
    */
   static std::string Utf8ToLocalWin32(const std::string& path);
 
@@ -141,7 +141,7 @@ public:
 
 protected:
   vtkPVFileInformationHelper();
-  ~vtkPVFileInformationHelper();
+  ~vtkPVFileInformationHelper() override;
 
   char* Path;
   char* WorkingDirectory;
@@ -154,8 +154,8 @@ protected:
   vtkSetStringMacro(PathSeparator);
 
 private:
-  vtkPVFileInformationHelper(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVFileInformationHelper&) VTK_DELETE_FUNCTION;
+  vtkPVFileInformationHelper(const vtkPVFileInformationHelper&) = delete;
+  void operator=(const vtkPVFileInformationHelper&) = delete;
 };
 
 #endif

@@ -40,13 +40,14 @@
 
   <!-- save a multiview screenshot -->
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="800" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="800" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
-  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
-  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
+
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
@@ -66,11 +67,12 @@
   <!-- now reset the session and play back the trace -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionDelete_All" />
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsPythonShell" />
-  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/runScript" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pythonDialog/PythonShellRunScriptDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
-  <pqevent object="pqClientMainWindow/pythonDialog/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsTrace.py" />
-  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsTrace.py" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 
   <!-- compare the image saved in the trace -->
   <!-- I'm skipping the actual compare right now. We need to fix how charts
@@ -86,13 +88,14 @@
   <!-- close the first view as well, since state files currently just create new views -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Close" command="activate" arguments="" />
 
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsPythonShell" />
-  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/runScript" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pythonDialog/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsState.py" />
-  <pqevent object="pqClientMainWindow/pythonDialog/splitter/verticalLayoutWidget/close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsState.py" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 
   <!-- FIXME: this test doesn't do baseline compares yet. Some issue with state
-       not saveing view layout and GUI not respecting active view from Python need to be fixed first. -->
+       not saving view layout and GUI not respecting active view from Python need to be fixed first. -->
 </pqevents>

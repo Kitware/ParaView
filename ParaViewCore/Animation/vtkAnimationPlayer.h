@@ -88,7 +88,7 @@ public:
 
 protected:
   vtkAnimationPlayer();
-  ~vtkAnimationPlayer();
+  ~vtkAnimationPlayer() override;
 
   friend class vtkCompositeAnimationPlayer;
 
@@ -104,8 +104,8 @@ protected:
   virtual double GoToPrevious(double start, double end, double currenttime) = 0;
 
 private:
-  vtkAnimationPlayer(const vtkAnimationPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAnimationPlayer&) VTK_DELETE_FUNCTION;
+  vtkAnimationPlayer(const vtkAnimationPlayer&) = delete;
+  void operator=(const vtkAnimationPlayer&) = delete;
 
   vtkWeakPointer<vtkSMAnimationScene> AnimationScene;
   bool InPlay;

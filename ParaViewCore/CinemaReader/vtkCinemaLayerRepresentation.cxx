@@ -19,6 +19,8 @@
 #include "vtkCinemaDatabase.h"
 #include "vtkCinemaLayerMapper.h"
 #include "vtkImageData.h"
+#include "vtkImageMapper.h"
+#include "vtkImageReslice.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -27,7 +29,9 @@
 #include "vtkPVRenderView.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkRenderer.h"
 #include "vtkStringArray.h"
+#include "vtkTransform.h"
 
 #include <sstream>
 
@@ -35,9 +39,14 @@ vtkStandardNewMacro(vtkCinemaLayerRepresentation);
 //----------------------------------------------------------------------------
 vtkCinemaLayerRepresentation::vtkCinemaLayerRepresentation()
 {
+  this->Reslice->SetInputData(this->CachedImage);
+  this->MapperA->SetInputConnection(this->Reslice->GetOutputPort());
+  this->MapperA->SetColorWindow(255);
+  this->MapperA->SetColorLevel(127.5);
+
+  this->Actor->SetMapper(this->MapperA.Get());
   vtkNew<vtkPolyData> pd;
   this->CacheKeeper->SetInputData(pd.Get());
-  this->Actor->SetMapper(this->Mapper.Get());
   this->Actor->SetDisplayPosition(0, 0);
   this->Actor->SetWidth(1.0);
   this->Actor->SetHeight(1.0);
@@ -139,7 +148,7 @@ bool vtkCinemaLayerRepresentation::RemoveFromView(vtkView* view)
 //----------------------------------------------------------------------------
 void vtkCinemaLayerRepresentation::SetLookupTable(vtkScalarsToColors* lut)
 {
-  this->Mapper->SetLookupTable(lut);
+  this->MapperC->SetLookupTable(lut);
   this->MarkModified();
 }
 
@@ -157,8 +166,8 @@ int vtkCinemaLayerRepresentation::RequestData(
   this->CinemaTimeStep = std::string();
   this->FieldName = std::string();
   this->DefaultFieldName = std::string();
-  this->Mapper->ClearLayers();
-  this->Mapper->SetLayerProjectionMatrix(NULL);
+  this->MapperC->ClearLayers();
+  this->MapperC->SetLayerProjectionMatrix(NULL);
   this->PreviousQueryJSON = std::string();
   this->Cameras->RemoveAllCameras();
 
@@ -179,6 +188,15 @@ int vtkCinemaLayerRepresentation::RequestData(
       this->BaseQueryJSON = metaData->GetValue(2);
       this->CinemaTimeStep = metaData->GetValue(3);
       this->FieldName = this->CinemaDatabase->GetFieldName(this->PipelineObject);
+
+      if (this->CinemaDatabase->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_A)
+      {
+        this->Actor->SetMapper(this->MapperA.Get());
+      }
+      else if (this->CinemaDatabase->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_C)
+      {
+        this->Actor->SetMapper(this->MapperC.Get());
+      }
 
       // Now check what type of arrays can a layer provide
       const std::vector<std::string> values =
@@ -214,23 +232,155 @@ int vtkCinemaLayerRepresentation::RequestData(
 //----------------------------------------------------------------------------
 void vtkCinemaLayerRepresentation::UpdateMapper()
 {
-  // First, build the query for the layers to render.
+  // First, create a query.
   std::ostringstream query;
-  query << "{" << this->BaseQueryJSON;
+  query << "{";
 
-  vtkSmartPointer<vtkCamera> layerCamera;
+  // Base query contains parameters
+  if (!this->BaseQueryJSON.empty())
+  {
+    query << this->BaseQueryJSON;
+  }
 
-  // Try to get pose information from the view and add it to the query.
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(this->GetView());
   vtkCamera* activeCamera = pvview ? pvview->GetActiveCamera() : NULL;
+  int cameraIndex = -1;
+  vtkSmartPointer<vtkCamera> layerCamera;
   if (activeCamera)
   {
     // FIXME: for now, I am just picking the closest camera. In reality, we need
-    // to ensure that active camera as the located camera are compatible i.e.
+    // to ensure that active camera and the located camera are compatible i.e.
     // have same position, fp, clipping range.
-    int poseIndex = this->Cameras->FindClosestCamera(activeCamera);
-    layerCamera = this->Cameras->GetCamera(poseIndex);
-    query << ", 'pose' : " << poseIndex;
+    cameraIndex = this->Cameras->FindClosestCamera(activeCamera);
+    layerCamera = this->Cameras->GetCamera(cameraIndex);
+  }
+
+  // Spec-dependent query contains camera info
+  if (this->CinemaDatabase->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_A)
+  {
+    query << this->GetSpecAQuery(cameraIndex);
+  }
+  else if (this->CinemaDatabase->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_C)
+  {
+    query << this->GetSpecCQuery(cameraIndex);
+  }
+
+  query << "}";
+
+  std::string queryString = query.str();
+  size_t last = queryString.find_last_of(",");
+  if (last != std::string::npos)
+  {
+    queryString.erase(last, 1);
+  }
+
+  // If the query didn't change, we don't need to fetch new layers.
+  std::vector<vtkSmartPointer<vtkImageData> > layers;
+  if (queryString != this->PreviousQueryJSON)
+  {
+    this->PreviousQueryJSON = queryString;
+    layers = this->CinemaDatabase->TranslateQuery(queryString);
+    if (layers.size() > 0)
+    {
+      // Cache first layer (i.e. full image for spec A, but not for spec C)
+      this->CachedImage->DeepCopy(layers.at(0));
+    }
+  }
+  vtkImageData* image = this->CachedImage.Get();
+
+  if (this->CinemaDatabase->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_A && image != NULL &&
+    layerCamera != NULL)
+  {
+    if (!this->RenderLayerAsImage)
+    {
+      // Get image center
+      double bounds[6];
+      image->GetBounds(bounds);
+      double center[3];
+      center[0] = (bounds[1] + bounds[0]) / 2.0;
+      center[1] = (bounds[3] + bounds[2]) / 2.0;
+      center[2] = (bounds[5] + bounds[4]) / 2.0;
+
+      // Get angle between the active camera and the layer one.
+      double activeUp[3];
+      activeCamera->GetViewUp(activeUp);
+      double layerUp[3];
+      layerCamera->GetViewUp(layerUp);
+      double angle = vtkMath::AngleBetweenVectors(layerUp, activeUp);
+      double direction[3];
+      activeCamera->GetDirectionOfProjection(direction);
+      double cross[3];
+      vtkMath::Cross(layerUp, activeUp, cross);
+      if (vtkMath::Dot(cross, direction) > 0)
+      {
+        angle = -angle;
+      }
+      // Rotate around the center
+      vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+      transform->Translate(center[0], center[1], center[2]);
+      transform->RotateWXYZ(180 + vtkMath::DegreesFromRadians(angle), 0, 0, 1);
+      transform->Translate(-center[0], -center[1], -center[2]);
+
+      // scale the image to fit the view
+      vtkView* view = this->GetView();
+      vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
+      double* rendererCenter = rview->GetRenderer()->GetCenter();
+      double scalex = center[0] / rendererCenter[0];
+      double scaley = center[1] / rendererCenter[1];
+      double scale = std::max(scalex, scaley);
+      transform->Scale(scale, scale, 1);
+      transform->Update();
+
+      if (scalex > scaley)
+      {
+        transform->Translate(0, center[1] / scale - rendererCenter[1], 0);
+      }
+      else
+      {
+        transform->Translate(center[0] / scale - rendererCenter[0], 0, 0);
+      }
+
+      this->Reslice->SetResliceTransform(transform);
+
+      double* backgroundColor = rview->GetRenderer()->GetBackground();
+      // if loaded image has no opacity channel, vtkImageReslice will not consider alpha value.
+      this->Reslice->SetBackgroundColor(
+        255 * backgroundColor[0], 255 * backgroundColor[1], 255 * backgroundColor[2], 0);
+    }
+    this->Reslice->SetOutputSpacing(image->GetSpacing());
+    this->Reslice->SetOutputOrigin(image->GetOrigin());
+    this->Reslice->SetOutputExtent(image->GetExtent());
+    this->Reslice->Update();
+  }
+  else if (this->CinemaDatabase->GetSpec() == vtkCinemaDatabase::CINEMA_SPEC_C)
+  {
+    if (layers.size() > 0)
+    {
+      this->MapperC->SetLayers(layers);
+    }
+    if (image != NULL && layerCamera)
+    {
+      int dims[3];
+      image->GetDimensions(dims);
+      this->MapperC->SetLayerProjectionMatrix(layerCamera->GetProjectionTransformMatrix(
+        static_cast<double>(dims[0]) / dims[1], 0.0, 1.0));
+      this->MapperC->SetLayerCameraViewUp(layerCamera->GetViewUp());
+    }
+    else
+    {
+      this->MapperC->SetLayerProjectionMatrix(NULL);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+std::string vtkCinemaLayerRepresentation::GetSpecCQuery(int cameraIndex)
+{
+  std::ostringstream query;
+
+  if (cameraIndex != -1)
+  {
+    query << "'pose' : " << cameraIndex << ", ";
   }
 
   // Update query based on scalar coloring. If we're using scalar coloring, we
@@ -244,53 +394,53 @@ void vtkCinemaLayerRepresentation::UpdateMapper()
     // int fieldAssociation = info->Get(vtkDataObject::FIELD_ASSOCIATION());
     if (colorArrayName && colorArrayName[0])
     {
-      query << ", '" << this->FieldName.c_str() << "' : ['" << colorArrayName << "']";
+      query << "'" << this->FieldName.c_str() << "' : ['" << colorArrayName << "'],";
       using_scalar_coloring = true;
     }
   }
-  this->Mapper->SetScalarVisibility(using_scalar_coloring);
+  this->MapperC->SetScalarVisibility(using_scalar_coloring);
 
   // if not using scalar coloring, we still need to request a field for the
   // layer, so pick the default field, if provided.
   if (!using_scalar_coloring && !this->DefaultFieldName.empty())
   {
-    query << ", '" << this->FieldName.c_str() << "' : ['" << this->DefaultFieldName.c_str() << "']";
+    query << "'" << this->FieldName.c_str() << "' : ['" << this->DefaultFieldName.c_str() << "'],";
   }
 
-  query << "}";
+  return query.str();
+}
 
-  // Now check the query with previous one, if the query didn't change, we don't
-  // need to fetch new layers. Eventually, we can also support for caching.
-  if (query.str() == this->PreviousQueryJSON)
+//----------------------------------------------------------------------------
+std::string vtkCinemaLayerRepresentation::GetSpecAQuery(int cameraIndex)
+{
+  std::ostringstream query;
+
+  if (cameraIndex != -1)
   {
-    return;
+    std::vector<std::string> phiValues = this->CinemaDatabase->GetControlParameterValues("phi");
+    std::vector<std::string> thetaValues = this->CinemaDatabase->GetControlParameterValues("theta");
+
+    if (phiValues.size() > 0)
+    {
+      size_t phiIndex = cameraIndex / (thetaValues.size() > 0 ? thetaValues.size() : 1);
+      query << "'phi' : [" << phiValues[phiIndex] << "],";
+    }
+
+    if (thetaValues.size() > 0)
+    {
+      size_t thetaIndex = cameraIndex % thetaValues.size();
+      query << "'theta' : [" << thetaValues[thetaIndex] << "],";
+    }
   }
 
-  this->PreviousQueryJSON = query.str();
-
-  // Now, get the layers for this query from the cinema database.
-  const std::vector<vtkSmartPointer<vtkImageData> > layers =
-    this->CinemaDatabase->TranslateQuery(query.str());
-
-  this->Mapper->SetLayers(layers);
-  if (layers.size() > 0 && layerCamera)
-  {
-    int dims[3];
-    layers[0]->GetDimensions(dims);
-    this->Mapper->SetLayerProjectionMatrix(
-      layerCamera->GetProjectionTransformMatrix(static_cast<double>(dims[0]) / dims[1], 0.0, 1.0));
-    this->Mapper->SetLayerCameraViewUp(layerCamera->GetViewUp());
-  }
-  else
-  {
-    this->Mapper->SetLayerProjectionMatrix(NULL);
-  }
+  return query.str();
 }
 
 //----------------------------------------------------------------------------
 void vtkCinemaLayerRepresentation::SetRenderLayersAsImage(bool val)
 {
-  this->Mapper->SetRenderLayersAsImage(val);
+  this->RenderLayerAsImage = val;
+  this->MapperC->SetRenderLayersAsImage(val);
 }
 
 //----------------------------------------------------------------------------

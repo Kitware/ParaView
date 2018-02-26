@@ -53,11 +53,7 @@ class vtkTextureObject;
 class vtkOpenGLRenderWindow;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
-#ifdef VTKGL2
 class vtkOpenGLHelper;
-#else
-class vtkShaderProgram2;
-#endif
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -267,12 +263,11 @@ protected:
   //@}
 
   /**
-   * Create program for texture mapping.
+   * Create program (if needed) and prepare it for texture mapping.
    * \pre context_exists: context!=0
-   * \pre Program_void: this->Program==0
    * \post Program_exists: this->Program!=0
    */
-  void CreateProgram(vtkOpenGLRenderWindow* context);
+  void ReadyProgram(vtkOpenGLRenderWindow* context);
 
   /**
    * Updates the IceT tile information during each render.
@@ -305,11 +300,7 @@ protected:
 
   vtkPixelBufferObject* PBO;
   vtkTextureObject* ZTexture;
-#ifdef VTKGL2
   vtkOpenGLHelper* Program;
-#else
-  vtkShaderProgram2* Program;
-#endif
 
   bool FixBackground;
   vtkTextureObject* BackgroundTexture;
@@ -326,8 +317,8 @@ protected:
   vtkSynchronizedRenderers::vtkRawImage* LastRenderedEyes[2];
 
 private:
-  vtkIceTCompositePass(const vtkIceTCompositePass&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIceTCompositePass&) VTK_DELETE_FUNCTION;
+  vtkIceTCompositePass(const vtkIceTCompositePass&) = delete;
+  void operator=(const vtkIceTCompositePass&) = delete;
 };
 
 #endif

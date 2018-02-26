@@ -6073,7 +6073,7 @@ int file_fill_buffer(bfile_t *fileptr)
       Message("fileID = %d  nread   = %ld", fileptr->self, nread);
       Message("fileID = %d  offset  = %ld", fileptr->self, offset);
       Message("fileID = %d  Pos     = %ld", fileptr->self, fileptr->bufferPos);
-      Message("fileID = %d  postion = %ld", fileptr->self, fileptr->position);
+      Message("fileID = %d  position = %ld", fileptr->self, fileptr->position);
     }
 
   if ( offset > 0 )
@@ -6315,12 +6315,12 @@ int fileClose_serial(int fileID)
           fprintf(stderr, " file size        : %I64d\n", (long long) fileptr->size);
           if ( fileptr->type == FILE_TYPE_OPEN )
             fprintf(stderr, " file position    : %I64d\n", (long long) fileptr->position);
-          fprintf(stderr, " bytes transfered : %I64d\n", (long long) fileptr->byteTrans);
+          fprintf(stderr, " bytes transferred : %I64d\n", (long long) fileptr->byteTrans);
 #else
           fprintf(stderr, " file size        : %lld\n", (long long) fileptr->size);
           if ( fileptr->type == FILE_TYPE_OPEN )
             fprintf(stderr, " file position    : %lld\n", (long long) fileptr->position);
-          fprintf(stderr, " bytes transfered : %lld\n", (long long) fileptr->byteTrans);
+          fprintf(stderr, " bytes transferred : %lld\n", (long long) fileptr->byteTrans);
 #endif
         }
       else
@@ -6328,7 +6328,7 @@ int fileClose_serial(int fileID)
           fprintf(stderr, " file size        : %ld\n", (long) fileptr->size);
           if ( fileptr->type == FILE_TYPE_OPEN )
             fprintf(stderr, " file position    : %ld\n", (long) fileptr->position);
-          fprintf(stderr, " bytes transfered : %ld\n", (long) fileptr->byteTrans);
+          fprintf(stderr, " bytes transferred : %ld\n", (long) fileptr->byteTrans);
         }
 
       if ( fileptr->time_in_sec > 0 )
@@ -23106,7 +23106,7 @@ void cdfGetSliceSlapDescription(stream_t *streamptr, int varId, int levelId, boo
       if ( curDimId == UNDEFID ) continue;
       switch ( dimorder[id] )
         {
-          Error("Internal errror: Malformed dimension order encountered. Please report this bug.\n");
+          Error("Internal error: Malformed dimension order encountered. Please report this bug.\n");
           case 1:
           case 2:
             cdf_inq_dimlen(fileId, curDimId, &size);
@@ -23118,7 +23118,7 @@ void cdfGetSliceSlapDescription(stream_t *streamptr, int varId, int levelId, boo
             break;
 
           default:
-            Error("Internal errror: Malformed dimension order encountered. Please report this bug.\n");
+            Error("Internal error: Malformed dimension order encountered. Please report this bug.\n");
         }
     }
 

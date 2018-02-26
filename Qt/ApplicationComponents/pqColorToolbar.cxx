@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqResetScalarRangeReaction.h"
 #include "pqScalarBarVisibilityReaction.h"
 #include "pqSetName.h"
+#include "pqUseSeparateColorMapReaction.h"
 
 //-----------------------------------------------------------------------------
 void pqColorToolbar::constructor()
@@ -57,6 +58,8 @@ void pqColorToolbar::constructor()
 
   pqDisplayColorWidget* display_color = new pqDisplayColorWidget(this) << pqSetName("displayColor");
   this->addWidget(display_color);
+
+  new pqUseSeparateColorMapReaction(ui.actionUseSeparateColorMap, display_color);
 
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(representationChanged(pqDataRepresentation*)), display_color,

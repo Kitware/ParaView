@@ -50,7 +50,7 @@ class PQCORE_EXPORT pqScalarsToColors : public pqProxy
 public:
   pqScalarsToColors(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
     QObject* parent = NULL);
-  virtual ~pqScalarsToColors();
+  ~pqScalarsToColors() override;
 
   /**
   * Returns the first scalar bar visible in the given render module,

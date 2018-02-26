@@ -31,16 +31,15 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVClipDataSet : public vtkTableBasedCl
 {
 public:
   vtkTypeMacro(vtkPVClipDataSet, vtkTableBasedClipDataSet);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVClipDataSet* New();
 
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   //@{
   /**
-   * This filter uses vtkAMRDualClip for clipping AMR datasets. Do disable that
+   * This filter uses vtkAMRDualClip for clipping AMR datasets. To disable that
    * behavior, turn this flag off.
    */
   vtkSetMacro(UseAMRDualClipForAMR, bool);
@@ -48,17 +47,25 @@ public:
   vtkBooleanMacro(UseAMRDualClipForAMR, bool);
   //@}
 
+  //@{
+  /**
+   * For a vtkPVBlox implicit function we can do an exact clip of the exterior portion of the box.
+   */
+  vtkSetMacro(ExactBoxClip, bool);
+  vtkGetMacro(ExactBoxClip, bool);
+  vtkBooleanMacro(ExactBoxClip, bool);
+  //@}
+
 protected:
   vtkPVClipDataSet(vtkImplicitFunction* cf = NULL);
-  ~vtkPVClipDataSet();
+  ~vtkPVClipDataSet() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
-  virtual int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation* info) override;
+  int FillOutputPortInformation(int, vtkInformation* info) override;
 
   //@{
   /**
@@ -73,10 +80,11 @@ protected:
   //@}
 
   bool UseAMRDualClipForAMR;
+  bool ExactBoxClip;
 
 private:
-  vtkPVClipDataSet(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClipDataSet&) VTK_DELETE_FUNCTION;
+  vtkPVClipDataSet(const vtkPVClipDataSet&) = delete;
+  void operator=(const vtkPVClipDataSet&) = delete;
 };
 
 #endif

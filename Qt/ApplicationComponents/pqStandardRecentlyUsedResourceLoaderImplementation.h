@@ -59,12 +59,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardRecentlyUsedResourceLoaderImpleme
 
 public:
   pqStandardRecentlyUsedResourceLoaderImplementation(QObject* parent = 0);
-  virtual ~pqStandardRecentlyUsedResourceLoaderImplementation();
+  ~pqStandardRecentlyUsedResourceLoaderImplementation() override;
 
-  virtual bool canLoad(const pqServerResource& resource);
-  virtual bool load(const pqServerResource& resource, pqServer* server);
-  virtual QIcon icon(const pqServerResource& resource);
-  virtual QString label(const pqServerResource& resource);
+  bool canLoad(const pqServerResource& resource) override;
+  bool load(const pqServerResource& resource, pqServer* server) override;
+  QIcon icon(const pqServerResource& resource) override;
+  QString label(const pqServerResource& resource) override;
 
   /**
    * Add data files(s) to the recently used resources list.

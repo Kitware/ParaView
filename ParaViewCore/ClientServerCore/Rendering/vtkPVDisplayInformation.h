@@ -14,50 +14,54 @@
 =========================================================================*/
 /**
  * @class   vtkPVDisplayInformation
- * @brief   provides information about the rendering
- * display and OpenGL context.
+ * @brief   provides information about the rendering display and OpenGL context.
  *
-*/
+ * @deprecated in ParaView 5.5. Please use vtkPVRenderingCapabilitiesInformation
+ * instead.
+ */
 
 #ifndef vtkPVDisplayInformation_h
 #define vtkPVDisplayInformation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
+
+#if !defined(VTK_LEGACY_REMOVE)
+
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDisplayInformation : public vtkPVInformation
 {
 public:
-  static vtkPVDisplayInformation* New();
+  VTK_LEGACY(static vtkPVDisplayInformation* New());
   vtkTypeMacro(vtkPVDisplayInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
    * Returns if the display can be opened up on the current processes.
    */
-  static bool CanOpenDisplayLocally();
+  VTK_LEGACY(static bool CanOpenDisplayLocally());
 
   /**
    * Returns true if OpenGL context supports core features required for
    * rendering.
    */
-  static bool SupportsOpenGLLocally();
+  VTK_LEGACY(static bool SupportsOpenGLLocally());
 
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object. Calls AddInformation(info, 0).
    */
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -78,17 +82,18 @@ public:
 
 protected:
   vtkPVDisplayInformation();
-  ~vtkPVDisplayInformation();
+  ~vtkPVDisplayInformation() override;
 
   int CanOpenDisplay;
   int SupportsOpenGL;
 
 private:
-  vtkPVDisplayInformation(const vtkPVDisplayInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDisplayInformation&) VTK_DELETE_FUNCTION;
+  vtkPVDisplayInformation(const vtkPVDisplayInformation&) = delete;
+  void operator=(const vtkPVDisplayInformation&) = delete;
 
   static int GlobalCanOpenDisplayLocally;
   static int GlobalSupportsOpenGL;
 };
 
+#endif // !defined(VTK_LEGACY_REMOVE)
 #endif

@@ -68,7 +68,7 @@ public:
   //@{
   /**
    * These are to evaluate performances. You can turn off capping, degenerate cells
-   * and multiprocess comunication to see how they affect speed of execution.
+   * and multiprocess communication to see how they affect speed of execution.
    * Degenerate cells is the meshing between levels in the grid.
    */
   vtkSetMacro(EnableCapping, int);
@@ -119,7 +119,7 @@ public:
 
 protected:
   vtkAMRDualContour();
-  virtual ~vtkAMRDualContour();
+  ~vtkAMRDualContour() override;
 
   double IsoValue;
 
@@ -131,8 +131,7 @@ protected:
   int TriangulateCap;
   int SkipGhostCopy;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * This should be called before any number of calls to DoRequestData
@@ -150,8 +149,8 @@ protected:
    */
   vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input, const char* arrayNameToProcess);
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   void ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block);
 
@@ -162,7 +161,7 @@ protected:
 
   void AddCapPolygon(int ptCount, vtkIdType* pointIds, int blockId);
 
-  // This method is getting too many arguements!
+  // This method is getting too many arguments!
   // Capping was an after thought...
   void CapCell(int cellX, int cellY, int cellZ, // block coordinates
     // Which cell faces need to be capped.
@@ -173,11 +172,11 @@ protected:
     vtkIdType edgePtIds[12],
     // Locations of 8 corners. (xyz4xyz4...) 4th value is not used.
     double cornerPoints[32],
-    // The id order is VTK from marching cube cases.  Different than axis orded "cornerPoints".
+    // The id order is VTK from marching cube cases.  Different than axis ordered "cornerPoints".
     vtkIdType cornerOffsets[8],
     // For block id array (for debugging).  I should just make this an ivar.
     int blockId,
-    // For passing attirbutes to output mesh
+    // For passing attributes to output mesh
     vtkDataSet* inData);
 
   // Stuff exclusively for debugging.
@@ -207,8 +206,8 @@ protected:
   void FinalizeCopyAttributes(vtkDataSet* mesh);
 
 private:
-  vtkAMRDualContour(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAMRDualContour&) VTK_DELETE_FUNCTION;
+  vtkAMRDualContour(const vtkAMRDualContour&) = delete;
+  void operator=(const vtkAMRDualContour&) = delete;
 };
 
 #endif

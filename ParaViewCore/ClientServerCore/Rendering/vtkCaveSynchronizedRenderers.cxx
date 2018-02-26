@@ -50,7 +50,7 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
   once = 1;
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
 
-  // Initilize using pvx file specified on the command line options.
+  // Initialize using pvx file specified on the command line options.
   vtkPVServerOptions* options =
     vtkPVServerOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
   if (!options)

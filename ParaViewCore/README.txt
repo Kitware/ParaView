@@ -52,7 +52,7 @@ on the client side. Proxies provide a unique API to manipulate and handle
 objects that reside on the processing side which can either be local or
 remote. The ServerManager classes should be prefixed by vtkSM.
 The main class of that package is the vtkSMProxyManager that allow the user
-to create and retreive proxies.
+to create and retrieve proxies.
 
 --------------------
 ServerImplementation

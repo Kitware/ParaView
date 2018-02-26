@@ -59,7 +59,7 @@ class PQCORE_EXPORT pqQVTKWidget : public pqQVTKWidgetBase
 
 public:
   pqQVTKWidget(QWidget* parent = NULL, Qt::WindowFlags f = 0);
-  virtual ~pqQVTKWidget();
+  ~pqQVTKWidget() override;
 
   /**
   * Set the view proxy.
@@ -88,22 +88,11 @@ public slots:
   void paintMousePointer(int x, int y);
 
 protected:
-  /**
-  * overloaded resize handler
-  */
-  virtual void resizeEvent(QResizeEvent* event);
-
-  //@{
-  /**
-   * methods that manage skipping of rendering if ParaView is not ready for it.
-   */
-  virtual void doDeferredRender();
-  virtual bool renderVTK();
+  bool renderVTK() override;
   bool canRender();
-  //@}
+
 private slots:
   void updateSizeProperties();
-  void handleViewSizeForModifiedQt4();
 
 private:
   Q_DISABLE_COPY(pqQVTKWidget)
@@ -111,9 +100,7 @@ private:
   vtkWeakPointer<vtkSMSession> Session;
   QImage MousePointerToDraw;
   QString SizePropertyName;
-
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
-  bool SkipHandleViewSizeForModifiedQt4;
 };
 
 #endif

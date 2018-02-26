@@ -2,7 +2,7 @@
 /**
  *  \file  GW_VectorStatic.h
  *  \brief Definition of class \c GW_VectorStatic
- *  \author Gabriel Peyré 2001-09-10
+ *  \author Gabriel PeyrÃ© 2001-09-10
  */
 /*------------------------------------------------------------------------------*/
 
@@ -19,8 +19,8 @@ GW_BEGIN_NAMESPACE
 /*------------------------------------------------------------------------------*/
 /**
  *  \class  GW_VectorStatic
- *  \brief  A vector of fixed size, with usefull operators and methods.
- *  \author Gabriel Peyré 2001-09-10
+ *  \brief  A vector of fixed size, with useful operators and methods.
+ *  \author Gabriel PeyrÃ© 2001-09-10
  *
  *    This class is used every where ...
  *    A lot of operator have been defined to make common maths operations, so use them !
@@ -115,7 +115,7 @@ public:
         return (GW_Float) ::sqrt(this->SquareNorm());
     }
     /** Multiplication
-        \return The vector this multplied by \a f
+        \return The vector this multiplied by \a f
         \param f The 'v_type' to multiply the vector by.
     **/
     GW_VectorStatic operator*( v_type f ) const
@@ -222,7 +222,7 @@ public:
     /**    \return The specified coordinate of the vector. As it is a reference, you can modify it
         \param i The coordinate to retrieve (0=x, 1=y, 2=z)
     **/
-    v_type& operator[](GW_U32 i)        //< coordonées
+    v_type& operator[](GW_U32 i)        //< coordonÃ©es
     {
         GW_ASSERT( i<v_size );
         return aCoords_[i];
@@ -231,13 +231,13 @@ public:
     /** \return The specified coordinate of the vector. As it is a const reference, you cannot modify it
         \param i The coordinate to retrieve (0=x, 1=y, 2=z)
     **/
-    const v_type& operator[](GW_U32 i) const        //< coordonées
+    const v_type& operator[](GW_U32 i) const        //< coordonÃ©es
     {
         GW_ASSERT( i<v_size );
         return aCoords_[i];
     }
 
-    /** Normalizes the vector (lentgh = 1) */
+    /** Normalizes the vector (length = 1) */
     void Normalize()
     {
         GW_Float n = this->Norm();
@@ -306,7 +306,7 @@ public:
     /**
     *  \param  a [GW_Float] Angle
     *  \return [GW_VectorStatic] Rotated vector.
-    *  \author Gabriel Peyré
+    *  \author Gabriel PeyrÃ©
     *  \date   5-26-2003
     *
     *  Return a rotated vector.
@@ -327,7 +327,7 @@ public:
     * Name : GW_Vector::SetCoord
     *
     *  \param  C array of 2 floats [the 2 corrdonates]
-    *  \author Gabriel Peyré 2001-09-10
+    *  \author Gabriel PeyrÃ© 2001-09-10
     */
     /*------------------------------------------------------------------------------*/
     void SetCoord(v_type *c)
@@ -340,8 +340,8 @@ public:
     /**
     * Name : GW_Vector::SetCoord
     *
-    *  \param  xy value of the 2 coordonates.
-    *  \author Gabriel Peyré 2001-09-10
+    *  \param  xy value of the 2 coordinates.
+    *  \author Gabriel PeyrÃ© 2001-09-10
     *
     *    Assign the same value to each coordonate.
     */
@@ -357,7 +357,7 @@ public:
     * Name : GetData
     *
     *  \return The array of 'v_type' of the vector.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     v_type* GetData() const
@@ -370,7 +370,7 @@ public:
     *
     *  \param  i offset in the vector.
     *  \return the value of the given coord.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     v_type GetData(GW_I32 i) const
@@ -384,7 +384,7 @@ public:
     *
     *  \param  i offset in the vector.
     *  \param  rVal value to set to this coord.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void SetData(GW_I32 i, v_type rVal)
@@ -398,7 +398,7 @@ public:
     /**
     * Name : GW_VectorStatic::SetZero
     *
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     *
     *    set the vector to zero.
     */
@@ -412,7 +412,7 @@ public:
     * Name : GW_VectorStatic::SetValue
     *
     *  \param  rVal the value to set to the vector.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void SetValue(v_type rVal)
@@ -425,7 +425,7 @@ public:
     *
     *  \param  rMin=0 minimum value.
     *  \param  rMax=1 maximum value.
-    *  \author Gabriel Peyré 2001-09-29
+    *  \author Gabriel PeyrÃ© 2001-09-29
     */
     /*------------------------------------------------------------------------------*/
     void Randomize(v_type rMin = 0, v_type rMax = 1)
@@ -496,7 +496,7 @@ GW_END_NAMESPACE
 #endif // GW_VectorStatic_h
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -63,15 +63,15 @@ public:
    */
   void SetAxisColor(double red, double green, double blue);
 
-  virtual void MarkModified() VTK_OVERRIDE;
+  void MarkModified() VTK_OVERRIDE;
 
   /**
    * Set the visibility.
    */
-  virtual void SetVisibility(bool) VTK_OVERRIDE;
+  void SetVisibility(bool) VTK_OVERRIDE;
 
   /**
-   * Specify the format to use for labelling the distance. Note that an empty
+   * Specify the format to use for labeling the distance. Note that an empty
    * string results in no label, or a format string without a "%" character
    * will not print the distance value.
    */
@@ -127,42 +127,41 @@ public:
 
 protected:
   vtkRulerSourceRepresentation();
-  ~vtkRulerSourceRepresentation();
+  ~vtkRulerSourceRepresentation() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * Fill input port information.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
-  virtual bool IsCached(double cache_key) VTK_OVERRIDE;
+  bool IsCached(double cache_key) VTK_OVERRIDE;
 
   vtkDistanceRepresentation2D* DistanceRepresentation;
   vtkNew<vtkPVCacheKeeper> CacheKeeper;
   vtkNew<vtkPolyData> Clone;
 
 private:
-  vtkRulerSourceRepresentation(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRulerSourceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkRulerSourceRepresentation(const vtkRulerSourceRepresentation&) = delete;
+  void operator=(const vtkRulerSourceRepresentation&) = delete;
 };
 
 #endif

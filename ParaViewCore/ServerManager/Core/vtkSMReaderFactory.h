@@ -169,18 +169,23 @@ public:
    * any readers are specified by passing their group name and reader name to
    * this function, then only those readers will be available in any reader
    * factories created by the application.  This is intended to be called at
-   * the begining of the application's execution before any sessions are
+   * the beginning of the application's execution before any sessions are
    * created.
    */
   static void AddReaderToWhitelist(const char* readerxmlgroup, const char* readerxmlname);
 
 protected:
   vtkSMReaderFactory();
-  ~vtkSMReaderFactory();
+  ~vtkSMReaderFactory() override;
 
   // To support legacy configuration files.
   void RegisterPrototype(
     const char* xmlgroup, const char* xmlname, const char* extensions, const char* description);
+
+  /**
+   * Returns true if the fname refers to a directory or a link to a directory.
+   */
+  static bool GetFilenameIsDirectory(const char* fname, vtkSMSession* session);
 
   vtkSetStringMacro(ReaderName);
   vtkSetStringMacro(ReaderGroup);
@@ -190,8 +195,8 @@ protected:
   vtkStringList* Readers;
 
 private:
-  vtkSMReaderFactory(const vtkSMReaderFactory&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMReaderFactory&) VTK_DELETE_FUNCTION;
+  vtkSMReaderFactory(const vtkSMReaderFactory&) = delete;
+  void operator=(const vtkSMReaderFactory&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

@@ -129,15 +129,15 @@ public:
    */
 protected:
   vtkPVKeyFrameCueManipulator();
-  ~vtkPVKeyFrameCueManipulator();
+  ~vtkPVKeyFrameCueManipulator() override;
   //@}
 
   /**
    * This method is called when the AnimationCue's StartAnimationCueEvent is
-   * triggerred, to let the animation manipulator know that the cue has
+   * triggered, to let the animation manipulator know that the cue has
    * been restarted. This is here for one major reason: after the last key
    * frame, the state of the scene must be as it was left a the the last key
-   * frame. This does not happend automatically, since if while animating the
+   * frame. This does not happen automatically, since if while animating the
    * currentime never coincides with the last key frame's key time, then it
    * never gets a chance to update the properties value.
    * Hence, we note when the cue begins. Then, if the currentime is beyond
@@ -146,16 +146,16 @@ protected:
    * is done only once per Animation cycle. The Initialize method is used to
    * indicate that a new animation cycle has begun.
    */
-  virtual void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
 
-  virtual void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
 
   vtkPVKeyFrameCueManipulatorInternals* Internals;
   /**
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
 
   int AddKeyFrameInternal(vtkPVKeyFrame* keyframe);
   int RemoveKeyFrameInternal(vtkPVKeyFrame* keyframe);
@@ -168,8 +168,8 @@ protected:
   int LastAddedKeyFrameIndex;
 
 private:
-  vtkPVKeyFrameCueManipulator(const vtkPVKeyFrameCueManipulator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVKeyFrameCueManipulator&) VTK_DELETE_FUNCTION;
+  vtkPVKeyFrameCueManipulator(const vtkPVKeyFrameCueManipulator&) = delete;
+  void operator=(const vtkPVKeyFrameCueManipulator&) = delete;
 };
 
 #endif

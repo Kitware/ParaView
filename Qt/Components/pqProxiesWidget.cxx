@@ -167,6 +167,32 @@ void pqProxiesWidget::updateLayout()
 }
 
 //-----------------------------------------------------------------------------
+QMap<QString, bool> pqProxiesWidget::expanderState() const
+{
+  QMap<QString, bool> state;
+  const pqInternals& internals = *this->Internals;
+  for (pqExpanderButton* expander : internals.Expanders)
+  {
+    state[expander->text()] = expander->checked();
+  }
+  return state;
+}
+
+//-----------------------------------------------------------------------------
+void pqProxiesWidget::setExpanderState(const QMap<QString, bool>& state)
+{
+  pqInternals& internals = *this->Internals;
+  for (pqExpanderButton* expander : internals.Expanders)
+  {
+    auto iter = state.find(expander->text());
+    if (iter != state.end())
+    {
+      expander->setChecked(iter.value());
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqProxiesWidget::triggerChangeFinished()
 {
   if (pqProxyWidget* pwSender = qobject_cast<pqProxyWidget*>(this->sender()))

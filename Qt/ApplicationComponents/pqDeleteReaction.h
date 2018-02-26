@@ -71,7 +71,7 @@ public slots:
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
   /**
   * Request deletion of a particular source.
@@ -82,17 +82,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered()
-  {
-    if (this->DeleteAll)
-    {
-      pqDeleteReaction::deleteAll();
-    }
-    else
-    {
-      pqDeleteReaction::deleteSelected();
-    }
-  }
+  void onTriggered() override;
 
 private:
   Q_DISABLE_COPY(pqDeleteReaction)

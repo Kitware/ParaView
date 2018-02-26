@@ -23,7 +23,7 @@
  * methods with no arguments. Sub-classes support methods with different
  * arguments types and numbers.
  *
- * Property is typically meant for pushing its values to athe VTK object.
+ * vtkSMProperty is typically meant for pushing its values to a VTK object.
  * However, a property may be marked as an InformationOnly property
  * in which case its values are obtained from the server with the
  * UpdateInformation() call.
@@ -106,7 +106,7 @@
  *        are not synchronized among client-processes in collaborative mode.
  *
  * \li \b is_internal: \c {0,1}: When set, the property is treated as internal
- *        which implies that it will not be shown in the UI; it value will not
+ *        which implies that it will not be shown in the UI; its value will not
  *        be pushed when the proxy is created, nor saved in state files or
  *        undo-redo stacks.
  *
@@ -118,7 +118,7 @@
  *        default or advanced mode, or never at all.
  *
  * \li \b panel_widget: \c string: provides a hint to the UI to determine which
- *        what widget to create to edit this property.
+ *        widget to create to edit this property.
  *
  * \li \b no_custom_default: \c {0,1}: When set, vtkSMSettings will neither
  *        change the value of a property upon creation nor save the property
@@ -134,9 +134,11 @@
 #define vtkSMProperty_h
 
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkSMDomainIterator.h"          // needed for vtkSMDomainIterator
 #include "vtkSMMessageMinimal.h"          // needed for vtkSMMessage
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h" // needed for vtkweakPointer
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include "vtkWeakPointer.h"  // needed for vtkWeakPointer
 
 class vtkClientServerStream;
 class vtkPVXMLElement;
@@ -194,7 +196,7 @@ public:
    * Overloaded to break the reference loop caused by the
    * internal domain iterator.
    */
-  virtual void UnRegister(vtkObjectBase* obj) VTK_OVERRIDE;
+  void UnRegister(vtkObjectBase* obj) VTK_OVERRIDE;
 
   /**
    * Creates, initializes and returns a new domain iterator. The user
@@ -213,27 +215,28 @@ public:
   vtkSMDomain* FindDomain(const char* classname);
 
   /**
+   * Same as FindDomain(classname), except the classname is deduced from the
+   * type.
+   *
+   * @code{cpp}
+   *
+   * #include <vtkSMEnumerationDomain.h>
+   *
+   * ...
+   * vtkSMProperty* prop = ...
+   * auto enumDomain = prop->FindDomain<vtkSMEnumerationDomain>();
+   * ...
+   *
+   * @endcode
+   */
+  template <class DomainType>
+  inline DomainType* FindDomain();
+
+  /**
    * Returns the number of domains this property has. This can be
    * used to specify a valid index for GetDomain(index).
    */
   unsigned int GetNumberOfDomains();
-
-  /**
-   * Calls Update() on all domains contained by the property
-   * as well as all dependant domains. This is usually called
-   * after SetUncheckedXXX() to tell all dependant domains to
-   * update themselves according to the new value.
-   * Note that when calling Update() on domains contained by
-   * this property, a NULL is passed as the argument. This is
-   * because the domain does not really "depend" on the property.
-   * When calling Update() on dependent domains, the property
-   * passes itself as the argument.
-   * @deprecated This method is no longer needed. Dependent domains are now
-   * automatically updated when a property fires
-   * vtkCommand::UncheckedPropertyModifiedEvent. The implementation has been
-   * changed to do nothing and the method will be removed in future releases.
-   */
-  VTK_LEGACY(void UpdateDependentDomains());
 
   //@{
   /**
@@ -246,7 +249,7 @@ public:
   //@{
   /**
    * If IgnoreSynchronization is set to true, this property is used to
-   * prevent that property from beeing updated when changed remotely by another
+   * prevent that property from being updated when changed remotely by another
    * collaborative client.
    */
   vtkGetMacro(IgnoreSynchronization, int);
@@ -264,7 +267,7 @@ public:
   /**
    * Properties can have one or more domains. These are assigned by
    * the proxy manager and can be used to obtain information other
-   * than given by the type of the propery and its values.
+   * than given by the type of the property and its values.
    */
   void AddDomain(const char* name, vtkSMDomain* dom);
 
@@ -419,7 +422,7 @@ public:
    * the first one returns true i.e. indicate that it can set a default value
    * and did so. Returns true if any domain can setup a default value for this
    * property. Otherwise false.
-   * vtkSMVectorProperty overrides this method to add support for settting
+   * vtkSMVectorProperty overrides this method to add support for setting
    * default values using information_property.
    */
   virtual bool ResetToDomainDefaults(bool use_unchecked_values = false);
@@ -467,7 +470,7 @@ public:
   /**
    * Overridden to support blocking of modified events.
    */
-  virtual void Modified() VTK_OVERRIDE
+  void Modified() VTK_OVERRIDE
   {
     if (this->BlockModifiedEvents)
     {
@@ -519,7 +522,7 @@ public:
 
 protected:
   vtkSMProperty();
-  ~vtkSMProperty();
+  ~vtkSMProperty() override;
 
   friend class vtkSMSessionProxyManager;
   friend class vtkSMProxy;
@@ -580,8 +583,8 @@ protected:
 
   /**
    * Calls Update() on all domains contained by the property
-   * as well as all dependant domains. This is autimatically called
-   * after SetUncheckedXXX() to tell all dependant domains to
+   * as well as all dependent domains. This is automatically called
+   * after SetUncheckedXXX() to tell all dependent domains to
    * update themselves according to the new value.
    * Note that when calling Update() on domains contained by
    * this property, a NULL is passed as the argument. This is
@@ -599,7 +602,7 @@ protected:
   virtual void SaveState(
     vtkPVXMLElement* parent, const char* property_name, const char* uid, int saveDomains = 1);
   /**
-   * This method must be overiden by concrete class in order to save the real
+   * This method must be overridden by concrete class in order to save the real
    * property data
    */
   virtual void SaveStateValues(vtkPVXMLElement* propertyElement);
@@ -687,8 +690,8 @@ protected:
   vtkSMPropertyLink* Links;
 
 private:
-  vtkSMProperty(const vtkSMProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProperty&) VTK_DELETE_FUNCTION;
+  vtkSMProperty(const vtkSMProperty&) = delete;
+  void operator=(const vtkSMProperty&) = delete;
 
   // Callback to fire vtkCommand::DomainModifiedEvent every time any of the
   // domains change.
@@ -719,4 +722,17 @@ private:
   vtkSMPropertyTemplateMacroCase(vtkSMStringVectorProperty, vtkStdString, prop, call)
 /* clang-format on */
 
+template <class DomainType>
+DomainType* vtkSMProperty::FindDomain()
+{
+  auto iter = vtkSmartPointer<vtkSMDomainIterator>::Take(this->NewDomainIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  {
+    if (DomainType* domain = DomainType::SafeDownCast(iter->GetDomain()))
+    {
+      return domain;
+    }
+  }
+  return nullptr;
+}
 #endif

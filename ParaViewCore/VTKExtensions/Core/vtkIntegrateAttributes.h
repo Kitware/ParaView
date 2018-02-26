@@ -56,17 +56,17 @@ public:
 
 protected:
   vtkIntegrateAttributes();
-  ~vtkIntegrateAttributes();
+  ~vtkIntegrateAttributes() override;
 
   vtkMultiProcessController* Controller;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // Create a default executive.
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   int CompareIntegrationDimension(vtkDataSet* output, int dim);
   int IntegrationDimension;
@@ -112,8 +112,8 @@ protected:
     vtkDataSetAttributes* data, bool skipLastArray, double sum);
 
 private:
-  vtkIntegrateAttributes(const vtkIntegrateAttributes&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkIntegrateAttributes&) VTK_DELETE_FUNCTION;
+  vtkIntegrateAttributes(const vtkIntegrateAttributes&) = delete;
+  void operator=(const vtkIntegrateAttributes&) = delete;
 
   class vtkFieldList;
   vtkFieldList* CellFieldList;

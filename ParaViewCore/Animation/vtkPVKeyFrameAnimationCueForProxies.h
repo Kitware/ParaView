@@ -68,14 +68,14 @@ public:
    * ServerManager library. This only works since they object are created only
    * on the client.
    */
-  virtual void BeginUpdateAnimationValues() VTK_OVERRIDE;
-  virtual void SetAnimationValue(int index, double value) VTK_OVERRIDE;
-  virtual void EndUpdateAnimationValues() VTK_OVERRIDE;
+  void BeginUpdateAnimationValues() VTK_OVERRIDE;
+  void SetAnimationValue(int index, double value) VTK_OVERRIDE;
+  void EndUpdateAnimationValues() VTK_OVERRIDE;
   //@}
 
 protected:
   vtkPVKeyFrameAnimationCueForProxies();
-  ~vtkPVKeyFrameAnimationCueForProxies();
+  ~vtkPVKeyFrameAnimationCueForProxies() override;
 
   /**
    * Get the property being animated.
@@ -93,9 +93,8 @@ protected:
   int ValueIndexMax;
 
 private:
-  vtkPVKeyFrameAnimationCueForProxies(
-    const vtkPVKeyFrameAnimationCueForProxies&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVKeyFrameAnimationCueForProxies&) VTK_DELETE_FUNCTION;
+  vtkPVKeyFrameAnimationCueForProxies(const vtkPVKeyFrameAnimationCueForProxies&) = delete;
+  void operator=(const vtkPVKeyFrameAnimationCueForProxies&) = delete;
 };
 
 #endif

@@ -44,16 +44,15 @@ public:
 
 protected:
   vtkPConvertSelection();
-  ~vtkPConvertSelection();
+  ~vtkPConvertSelection() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   vtkMultiProcessController* Controller;
 
 private:
-  vtkPConvertSelection(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPConvertSelection&) VTK_DELETE_FUNCTION;
+  vtkPConvertSelection(const vtkPConvertSelection&) = delete;
+  void operator=(const vtkPConvertSelection&) = delete;
 };
 
 #endif // vtkPConvertSelection_h

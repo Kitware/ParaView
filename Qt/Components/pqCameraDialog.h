@@ -42,7 +42,7 @@ class PQCOMPONENTS_EXPORT pqCameraDialog : public pqDialog
   Q_OBJECT
 public:
   pqCameraDialog(QWidget* parent = NULL, Qt::WindowFlags f = 0);
-  virtual ~pqCameraDialog();
+  ~pqCameraDialog() override;
 
   void SetCameraGroupsEnabled(bool enabled);
 
@@ -59,11 +59,7 @@ private slots:
   // Assign/restore the current camera properties to
   // a custom view button.
   void configureCustomViews();
-  void applyCustomView(int buttonId);
-  void applyCustomView0() { this->applyCustomView(0); }
-  void applyCustomView1() { this->applyCustomView(1); }
-  void applyCustomView2() { this->applyCustomView(2); }
-  void applyCustomView3() { this->applyCustomView(3); }
+  void applyCustomView();
 
   void resetViewDirectionPosX();
   void resetViewDirectionNegX();

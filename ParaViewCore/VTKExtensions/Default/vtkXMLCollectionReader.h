@@ -39,7 +39,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLCollectionReader : public vtkXMLRea
 public:
   static vtkXMLCollectionReader* New();
   vtkTypeMacro(vtkXMLCollectionReader, vtkXMLReader);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -128,7 +128,7 @@ public:
 
 protected:
   vtkXMLCollectionReader();
-  ~vtkXMLCollectionReader();
+  ~vtkXMLCollectionReader() override;
 
   void BuildRestrictedDataSets();
 
@@ -136,34 +136,34 @@ protected:
   int ForceOutputTypeToMultiBlock;
 
   // Get the name of the data set being read.
-  virtual const char* GetDataSetName() VTK_OVERRIDE;
+  const char* GetDataSetName() override;
 
-  virtual int ReadPrimaryElement(vtkXMLDataElement* ePrimary) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
+  int ReadPrimaryElement(vtkXMLDataElement* ePrimary) override;
+  int FillOutputPortInformation(int, vtkInformation* info) override;
 
-  vtkDataObject* SetupOutput(const char* filePath, int index);
+  vtkDataObject* SetupOutput(const std::string& filePath, int index);
 
-  virtual int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+  /**
+   * Ensures that an appropriate reader is setup for the specified index.
+   */
+  vtkXMLReader* SetupReader(const std::string& filePath, int index);
+
+  int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
   // Overload of vtkXMLReader function, so we can handle updating the
   // information on multiple outputs
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
   // Setup the output with no data available.  Used in error cases.
-  virtual void SetupEmptyOutput() VTK_OVERRIDE;
+  void SetupEmptyOutput() override;
 
-  void ReadXMLData() VTK_OVERRIDE;
+  void ReadXMLData() override;
   void ReadXMLDataImpl();
 
-  // Callback registered with the InternalProgressObserver.
-  static void InternalProgressCallbackFunction(vtkObject*, unsigned long, void*, void*);
   // Progress callback from XMLParser.
   virtual void InternalProgressCallback();
-
-  // The observer to report progress from the internal readers.
-  vtkCallbackCommand* InternalProgressObserver;
 
   // Internal implementation details.
   vtkXMLCollectionReaderInternals* Internal;
@@ -175,9 +175,16 @@ protected:
   void ReadAFile(int index, int updatePiece, int updateNumPieces, int updateGhostLevels,
     vtkDataObject* actualOutput);
 
+  /**
+   * iterating over all readers (which corresponds to number of distinct
+   * datasets in the file, and not distinct timesteps), populate
+   * this->*ArraySelection objects.
+   */
+  void FillArraySelectionUsingReaders(const std::string& filePath);
+
 private:
-  vtkXMLCollectionReader(const vtkXMLCollectionReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkXMLCollectionReader&) VTK_DELETE_FUNCTION;
+  vtkXMLCollectionReader(const vtkXMLCollectionReader&) = delete;
+  void operator=(const vtkXMLCollectionReader&) = delete;
 
   int CurrentOutput;
 };

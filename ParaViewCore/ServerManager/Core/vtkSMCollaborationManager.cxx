@@ -42,6 +42,8 @@ public:
     this->ObserverTag = 0;
     this->Me = 0;
     this->UserToFollow = 0;
+    this->DisableFurtherConnections = false;
+    this->ConnectID = 0;
     this->Clear();
   }
 
@@ -102,11 +104,35 @@ public:
     return false;
   }
 
+  bool SetDisableFurtherConnections(bool disable)
+  {
+    if (disable != this->DisableFurtherConnections)
+    {
+      this->DisableFurtherConnections = disable;
+      this->UpdateState(this->UserToFollow == 0 ? this->Master : this->UserToFollow);
+      return true;
+    }
+    return false;
+  }
+
+  bool UpdateConnectID(int connectID)
+  {
+    if (this->ConnectID != connectID)
+    {
+      this->ConnectID = connectID;
+      this->UpdateState(this->UserToFollow == 0 ? this->Master : this->UserToFollow);
+      return true;
+    }
+    return false;
+  }
+
   void Clear()
   {
     this->UserNames.clear();
     this->Users.clear();
     this->Master = 0;
+    this->ConnectID = 0;
+    this->DisableFurtherConnections = false;
     this->State.Clear();
     this->PendingCameraUpdate.Clear();
     this->LocalCameraStateCache.clear();
@@ -130,6 +156,8 @@ public:
       {
         user->set_follow_cam(true);
       }
+      user->set_disable_further_connections(this->DisableFurtherConnections);
+      user->set_connect_id(this->ConnectID);
     }
   }
 
@@ -157,6 +185,9 @@ public:
       {
         foundChanges = this->UpdateMaster(id) || foundChanges;
       }
+      foundChanges =
+        this->SetDisableFurtherConnections(user->disable_further_connections()) || foundChanges;
+      foundChanges = this->UpdateConnectID(user->connect_id()) || foundChanges;
 
       if (user->follow_cam())
       {
@@ -229,10 +260,12 @@ public:
   int Me;
   int UserToFollow;
   int Master;
+  int ConnectID;
   vtkSMMessage State;
   vtkSMMessage PendingCameraUpdate;
   std::map<int, vtkSMMessage> LocalCameraStateCache;
   unsigned long ObserverTag;
+  bool DisableFurtherConnections;
 };
 //****************************************************************************
 vtkStandardNewMacro(vtkSMCollaborationManager);
@@ -289,6 +322,20 @@ void vtkSMCollaborationManager::LoadState(
     msgCopy->CopyFrom(*msg);
     this->InvokeEvent(CollaborationNotification, msgCopy);
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCollaborationManager::DisableFurtherConnections(bool disable)
+{
+  this->Internal->SetDisableFurtherConnections(disable);
+  this->UpdateUserInformations();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMCollaborationManager::SetConnectID(int connectID)
+{
+  this->Internal->UpdateConnectID(connectID);
+  this->UpdateUserInformations();
 }
 
 //----------------------------------------------------------------------------
@@ -355,6 +402,13 @@ int vtkSMCollaborationManager::GetMasterId()
 {
   return this->Internal->Master;
 }
+
+//----------------------------------------------------------------------------
+bool vtkSMCollaborationManager::GetDisableFurtherConnections()
+{
+  return this->Internal->DisableFurtherConnections;
+}
+
 //----------------------------------------------------------------------------
 int vtkSMCollaborationManager::GetUserId()
 {
@@ -417,6 +471,20 @@ void vtkSMCollaborationManager::UpdateUserInformations()
     this->LoadState(&msg, NULL);
   }
 }
+
+//----------------------------------------------------------------------------
+int vtkSMCollaborationManager::GetServerConnectID()
+{
+  return this->Internal->ConnectID;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMCollaborationManager::GetConnectID()
+{
+  vtkSMSessionClient* session = vtkSMSessionClient::SafeDownCast(this->GetSession());
+  return session ? session->GetConnectID() : -1;
+}
+
 //----------------------------------------------------------------------------
 void vtkSMCollaborationManager::SetSession(vtkSMSession* session)
 {

@@ -48,9 +48,9 @@ class PQCOMPONENTS_EXPORT pqSGExportStateWizard : public QWizard
 
 public:
   pqSGExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
-  virtual ~pqSGExportStateWizard();
+  ~pqSGExportStateWizard() override;
 
-  virtual bool validateCurrentPage();
+  bool validateCurrentPage() override;
 
   virtual void customize() = 0;
 
@@ -82,9 +82,9 @@ class pqSGExportStateWizardPage2 : public QWizardPage
 public:
   pqSGExportStateWizardPage2(QWidget* _parent = 0);
 
-  virtual void initializePage();
+  void initializePage() override;
 
-  virtual bool isComplete() const;
+  bool isComplete() const override;
 
   void emitCompleteChanged() { emit this->completeChanged(); }
 };
@@ -96,13 +96,15 @@ class pqSGExportStateWizardPage3 : public QWizardPage
 public:
   pqSGExportStateWizardPage3(QWidget* _parent = 0);
 
-  virtual void initializePage();
+  void initializePage() override;
 };
 
 #include "ui_pqExportStateWizard.h"
 
 class pqSGExportStateWizard::pqInternals : public Ui::ExportStateWizard
 {
+public:
+  std::map<QString, pqPipelineSource*> usedSources;
 };
 
 #endif

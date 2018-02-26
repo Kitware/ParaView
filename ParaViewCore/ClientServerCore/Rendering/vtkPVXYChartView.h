@@ -74,6 +74,7 @@ public:
    */
   void SetChartType(const char* type);
   void SetChartTypeToLine() { this->SetChartType("Line"); }
+  void SetChartTypeToPoint() { this->SetChartType("Point"); }
   void SetChartTypeToBar() { this->SetChartType("Bar"); }
   void SetChartTypeToBag() { this->SetChartType("Bag"); }
   void SetChartTypeToBox() { this->SetChartType("Box"); }
@@ -98,6 +99,7 @@ public:
    */
   void SetTitleFont(const char* family, int pointSize, bool bold, bool italic);
   void SetTitleFontFamily(const char* family);
+  void SetTitleFontFile(const char* file);
   void SetTitleFontSize(int pointSize);
   void SetTitleBold(bool bold);
   void SetTitleItalic(bool bold);
@@ -144,6 +146,11 @@ public:
    * Set the legend font family.
    */
   void SetLegendFontFamily(const char* family);
+
+  /**
+   * Set the legend font file.
+   */
+  void SetLegendFontFile(const char* file);
 
   /**
    * Set the legend font size.
@@ -218,6 +225,14 @@ public:
    */
   void SetAxisLabelFontFamily(int index, const char* family);
   GENERATE_AXIS_FUNCTIONS(AxisLabelFontFamily, const char*);
+  //@}
+
+  //@{
+  /**
+   * Set the axis label font file for the given axis.
+   */
+  void SetAxisLabelFontFile(int index, const char* file);
+  GENERATE_AXIS_FUNCTIONS(AxisLabelFontFile, const char*);
   //@}
 
   //@{
@@ -343,6 +358,17 @@ public:
 
   //@{
   /**
+   * Set the chart axis title's font file for the given index.
+   * These methods should not be called directly. They are made public only so
+   * that the client-server-stream-interpreter can invoke them. Use the
+   * corresponding properties to change these values.
+   */
+  void SetAxisTitleFontFile(int index, const char* file);
+  GENERATE_AXIS_FUNCTIONS(AxisTitleFontFile, const char*);
+  //@}
+
+  //@{
+  /**
    * Set the chart axis title's font size for the given index.
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
@@ -440,7 +466,7 @@ public:
   /**
    * Get the context item.
    */
-  virtual vtkAbstractContextItem* GetContextItem() VTK_OVERRIDE;
+  vtkAbstractContextItem* GetContextItem() VTK_OVERRIDE;
 
   /**
    * Representations can use this method to set the selection for a particular
@@ -449,16 +475,16 @@ public:
    * the local process alone. The view does not manage data movement for the
    * selection.
    */
-  virtual void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection) VTK_OVERRIDE;
+  void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection) VTK_OVERRIDE;
 
   /**
    * Overridden to rescale axes range on every update.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
 protected:
   vtkPVXYChartView();
-  ~vtkPVXYChartView();
+  ~vtkPVXYChartView() override;
 
   void SetAxisRangeMinimum(int index, double min);
   void SetAxisRangeMaximum(int index, double max);
@@ -466,7 +492,7 @@ protected:
   /**
    * Actual rendering implementation.
    */
-  virtual void Render(bool interactive) VTK_OVERRIDE;
+  void Render(bool interactive) VTK_OVERRIDE;
 
   //@{
   /**
@@ -495,8 +521,8 @@ protected:
   bool SortByXAxis;
 
 private:
-  vtkPVXYChartView(const vtkPVXYChartView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVXYChartView&) VTK_DELETE_FUNCTION;
+  vtkPVXYChartView(const vtkPVXYChartView&) = delete;
+  void operator=(const vtkPVXYChartView&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

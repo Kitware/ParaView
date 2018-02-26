@@ -63,7 +63,7 @@ class PQCORE_EXPORT pqCollaborationManager : public QObject
 
 public:
   pqCollaborationManager(QObject* parent);
-  virtual ~pqCollaborationManager();
+  ~pqCollaborationManager() override;
 
   /**
   * Return the vtkSMCollaborationManager
@@ -155,6 +155,16 @@ public slots:
   * Enable/disable local mouse pointer location
   */
   void enableMousePointerSharing(bool);
+
+  /**
+   * Enable/disable further connections to the server.
+   */
+  void disableFurtherConnections(bool disable);
+
+  /**
+   * Set the connect-id.
+   */
+  void setConnectID(int connectID);
 
 private slots:
   /**

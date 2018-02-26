@@ -70,18 +70,18 @@ public:
 
 protected:
   vtkPVPLYWriter();
-  ~vtkPVPLYWriter();
+  ~vtkPVPLYWriter() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual void WriteData() VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  void WriteData() VTK_OVERRIDE;
 
   bool EnableColoring;
   vtkNew<vtkPLYWriter> Writer;
   vtkSmartPointer<vtkScalarsToColors> LookupTable;
 
 private:
-  vtkPVPLYWriter(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPLYWriter&) VTK_DELETE_FUNCTION;
+  vtkPVPLYWriter(const vtkPVPLYWriter&) = delete;
+  void operator=(const vtkPVPLYWriter&) = delete;
 };
 
 #endif

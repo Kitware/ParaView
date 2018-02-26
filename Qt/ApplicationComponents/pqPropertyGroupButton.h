@@ -49,7 +49,7 @@ public:
   // the object is deleted. Note QDialog destructor is virtual so memory is
   // property deleted.
   void SetEditor(QDialog* dialog) { this->Editor = dialog; }
-  ~pqPropertyGroupButton();
+  ~pqPropertyGroupButton() override;
 
 private slots:
   void showEditor();

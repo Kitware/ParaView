@@ -84,7 +84,7 @@ int vtkPMergeConnected::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  // Get the input and ouptut
+  // Get the input and output
   vtkMultiBlockDataSet* input =
     vtkMultiBlockDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkMultiBlockDataSet* output =
@@ -99,6 +99,32 @@ int vtkPMergeConnected::RequestData(vtkInformation* vtkNotUsed(request),
 
   int sum = 0;
   int oops = ((piece != this->MyId) || (numPieces != this->NumProcesses));
+
+  for (unsigned int i = piece; i < input->GetNumberOfBlocks(); i += numPieces)
+  {
+    vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(input->GetBlock(i));
+    if (!ugrid)
+    {
+      vtkErrorMacro("Blocks in the input data are not vtkUnstructuredGrid");
+      oops += 1;
+      break;
+    }
+
+    vtkCellData* cd = ugrid->GetCellData();
+    vtkPointData* pd = ugrid->GetPointData();
+    vtkIdTypeArray* prid_array = vtkIdTypeArray::SafeDownCast(pd->GetArray("RegionId"));
+    vtkIdTypeArray* crid_array = vtkIdTypeArray::SafeDownCast(cd->GetArray("RegionId"));
+    vtkFloatArray* vol_array = vtkFloatArray::SafeDownCast(cd->GetArray("Volumes"));
+
+    if (!prid_array || !crid_array || !vol_array)
+    {
+      vtkErrorMacro(
+        "Input data does not have expected arrays.  vtkPMergeConnected expects input data"
+        " to have 'RegionId' arrays on points and cells and a 'Volumes' array on the cells.");
+      oops += 1;
+      break;
+    }
+  }
 
   contr->Reduce(&oops, &sum, 1, vtkCommunicator::SUM_OP, 0);
   contr->Broadcast(&sum, 1, 0);
@@ -245,7 +271,7 @@ void vtkPMergeConnected::LocalToGlobalRegionId(
   }
 }
 
-// Comparision function to sort point id list
+// Comparison function to sort point id list
 int compare_ids(const void* a, const void* b)
 {
   vtkIdType A = *(static_cast<const vtkIdType*>(a));

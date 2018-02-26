@@ -59,21 +59,31 @@ vtkStdString vtkSMViewExportHelper::GetSupportedFileTypes(vtkSMViewProxy* view)
   {
     vtkSMExporterProxy* prototype =
       vtkSMExporterProxy::SafeDownCast(pxm->GetPrototypeProxy("exporters", iter->GetProxyName()));
-    if (prototype && prototype->CanExport(view) && prototype->GetFileExtension() != NULL)
+    if (prototype && prototype->CanExport(view) && !prototype->GetFileExtensions().empty())
     {
       vtkSMDocumentation* doc = prototype->GetDocumentation();
       std::ostringstream helpstream;
+      std::ostringstream fileExtensionsStream;
+      std::vector<std::string> fileExtensions = prototype->GetFileExtensions();
+      for (size_t i = 0; i < fileExtensions.size(); i++)
+      {
+        fileExtensionsStream << "*." << fileExtensions[i];
+        if (i + 1 != fileExtensions.size())
+        { // don't add in the space on the last entry to make it look better
+          fileExtensionsStream << " ";
+        }
+      }
       if (doc && doc->GetShortHelp())
       {
         helpstream << doc->GetShortHelp();
       }
       else
       {
-        helpstream << vtksys::SystemTools::UpperCase(prototype->GetFileExtension()).c_str()
+        helpstream << vtksys::SystemTools::UpperCase(fileExtensionsStream.str().c_str())
                    << " Files";
       }
-      stream << (count > 0 ? ";;" : "") << helpstream.str().c_str() << " (*."
-             << prototype->GetFileExtension() << ")";
+      stream << (count > 0 ? ";;" : "") << helpstream.str() << " (" << fileExtensionsStream.str()
+             << ")";
       count++;
     }
   }
@@ -97,25 +107,28 @@ vtkSMExporterProxy* vtkSMViewExportHelper::CreateExporter(
   {
     vtkSMExporterProxy* prototype =
       vtkSMExporterProxy::SafeDownCast(pxm->GetPrototypeProxy("exporters", iter->GetProxyName()));
-    if (prototype && prototype->CanExport(view) && prototype->GetFileExtension() != NULL)
+    if (prototype && prototype->CanExport(view))
     {
-      std::ostringstream reStream;
-      reStream << "^"                                   // start
-               << ".*"                                  // leading text
-               << "\\."                                 // extension separator
-               << prototype->GetFileExtension() << "$"; // end
-      vtksys::RegularExpression re(reStream.str().c_str());
-      if (re.find(filename))
+      for (auto& ext : prototype->GetFileExtensions())
       {
-        vtkSMExporterProxy* exporter =
-          vtkSMExporterProxy::SafeDownCast(pxm->NewProxy("exporters", iter->GetProxyName()));
-        vtkNew<vtkSMParaViewPipelineController> controller;
-        controller->PreInitializeProxy(exporter);
-        exporter->SetView(view);
-        vtkSMPropertyHelper(exporter, "FileName").Set(filename);
-        controller->PostInitializeProxy(exporter);
-        exporter->UpdateVTKObjects();
-        return exporter;
+        std::ostringstream reStream;
+        reStream << "^"         // start
+                 << ".*"        // leading text
+                 << "\\."       // extension separator
+                 << ext << "$"; // end
+        vtksys::RegularExpression re(reStream.str().c_str());
+        if (re.find(filename))
+        {
+          vtkSMExporterProxy* exporter =
+            vtkSMExporterProxy::SafeDownCast(pxm->NewProxy("exporters", iter->GetProxyName()));
+          vtkNew<vtkSMParaViewPipelineController> controller;
+          controller->PreInitializeProxy(exporter);
+          exporter->SetView(view);
+          vtkSMPropertyHelper(exporter, "FileName").Set(filename);
+          controller->PostInitializeProxy(exporter);
+          exporter->UpdateVTKObjects();
+          return exporter;
+        }
       }
     }
   }

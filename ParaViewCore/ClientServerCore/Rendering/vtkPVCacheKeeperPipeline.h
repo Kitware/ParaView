@@ -35,14 +35,14 @@ public:
 
 protected:
   vtkPVCacheKeeperPipeline();
-  ~vtkPVCacheKeeperPipeline();
+  ~vtkPVCacheKeeperPipeline() override;
 
-  virtual int ForwardUpstream(int i, int j, vtkInformation* request) VTK_OVERRIDE;
-  virtual int ForwardUpstream(vtkInformation* request) VTK_OVERRIDE;
+  int ForwardUpstream(int i, int j, vtkInformation* request) VTK_OVERRIDE;
+  int ForwardUpstream(vtkInformation* request) VTK_OVERRIDE;
 
 private:
-  vtkPVCacheKeeperPipeline(const vtkPVCacheKeeperPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCacheKeeperPipeline&) VTK_DELETE_FUNCTION;
+  vtkPVCacheKeeperPipeline(const vtkPVCacheKeeperPipeline&) = delete;
+  void operator=(const vtkPVCacheKeeperPipeline&) = delete;
 };
 
 #endif

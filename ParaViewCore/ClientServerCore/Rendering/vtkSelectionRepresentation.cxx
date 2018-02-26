@@ -154,7 +154,7 @@ void vtkSelectionRepresentation::TriggerUpdateDataEvent()
   // we need to mark the geometry as always needing to be moved. The reason
   // is that in client server mode and the first interaction with the renderer
   // is a selection the geometryrepr is properly marked for modification.
-  // this shouldn't degrade preformance as the geometryRepr in most other
+  // this shouldn't degrade performance as the geometryRepr in most other
   // cases is already dirty ( Bug #11587)
   this->GeometryRepresentation->MarkModified();
 
@@ -207,6 +207,18 @@ void vtkSelectionRepresentation::SetVisibility(bool val)
 void vtkSelectionRepresentation::SetUseOutline(int val)
 {
   this->GeometryRepresentation->SetUseOutline(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkSelectionRepresentation::SetRenderPointsAsSpheres(bool val)
+{
+  this->GeometryRepresentation->SetRenderPointsAsSpheres(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkSelectionRepresentation::SetRenderLinesAsTubes(bool val)
+{
+  this->GeometryRepresentation->SetRenderLinesAsTubes(val);
 }
 
 //----------------------------------------------------------------------------

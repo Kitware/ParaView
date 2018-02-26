@@ -9,6 +9,7 @@
 #              transformation and any replacement files.
 #  output_dir - The output directory where the Catalyst source will be written.
 #
+from __future__ import print_function
 import sys
 import os
 import os.path
@@ -54,30 +55,8 @@ def filter_proxies(fin, fout, proxies, all_proxies):
   if not root.tag == 'ServerManagerConfiguration':
     raise RuntimeError('Invalid ParaView XML file input')
   new_tree = ET.Element('ServerManagerConfiguration')
-  proxy_tags = (
-    'CameraProxy',
-    'ChartRepresentationProxy',
-    'ComparativeViewProxy',
-    'ContextViewProxy',
-    'MultiSliceViewProxy',
-    'NullProxy',
-    'ParallelCoordinatesRepresentationProxy',
-    'PlotMatrixViewProxy',
-    'Proxy',
-    'PVRepresentationProxy',
-    'PSWriterProxy',
-    'PWriterProxy',
-    'PythonViewProxy',
-    'RenderViewProxy',
-    'RepresentationProxy',
-    'SourceProxy',
-    'SpreadSheetRepresentationProxy',
-    'TimeKeeperProxy',
-    'TransferFunctionProxy',
-    'ViewLayoutProxy',
-    'WriterProxy')
   def is_wanted(proxy):
-    return proxy.tag in proxy_tags and \
+    return proxy.tag.endswith("Proxy") and \
            'name' in proxy.attrib and \
            proxy.attrib['name'] in proxies
   for group in root.iter('ProxyGroup'):
@@ -88,7 +67,7 @@ def filter_proxies(fin, fout, proxies, all_proxies):
         for p in subproxy.iter('Proxy'):
           # p.attrib doesn't have proxyname it
           # means the proxy definition is inline.
-          if p.attrib.has_key('proxyname') and (p.attrib['proxyname'] not in all_proxies):
+          if 'proxyname' in p.attrib and (p.attrib['proxyname'] not in all_proxies):
             removed_subproxies.append(p.attrib['name'])
             proxy.remove(subproxy)
             break
@@ -100,10 +79,13 @@ def filter_proxies(fin, fout, proxies, all_proxies):
       map(new_group.append, new_proxies)
       new_tree.append(new_group)
 
-  fout.write(ET.tostring(new_tree))
+  write_value = ET.tostring(new_tree)
+  if hasattr(write_value, 'decode'):
+    write_value = write_value.decode('utf-8')
+  fout.write(write_value)
 
 def error(err):
-  print >> sys.stderr, "Error: %s" % str(err)
+  print ("Error: %s" % str(err), file=sys.stderr)
   sys.exit(-1)
 
 def copy_path(src, dest, exclude):
@@ -162,7 +144,7 @@ def run_patches(config, path_entry):
         continue
       p = subprocess.Popen(['patch', '-p1'], cwd=work_dir, stdin=subprocess.PIPE)
       patch_path = os.path.join(config.current_input_dir, patch['path'])
-      with open(patch_path) as patch_file:
+      with open(patch_path, 'rb') as patch_file:
         p.stdin.write(patch_file.read())
       p.stdin.close()
       p.wait()
@@ -192,7 +174,11 @@ def copy_paths(config, paths):
   try:
     for path_entry in paths:
       classes = []
-      src = os.path.join(config.repo, path_entry['path'])
+      path = config.repo
+      if not isinstance(path, str):
+        path = path.decode('utf-8')
+
+      src = os.path.join(path, path_entry['path'])
       dest = os.path.join(config.output_dir, path_entry['path'])
       dest_parent_dir = os.path.dirname(dest)
       if not os.path.exists(dest_parent_dir):
@@ -202,7 +188,9 @@ def copy_paths(config, paths):
 
       # exclude an paths listed.
       if 'exclude' in path_entry:
-        exclude = map(lambda d: d['path'], path_entry['exclude'])
+        m = map(lambda d: d['path'], path_entry['exclude'])
+        for item in m:
+          exclude.append(item)
 
       # if we are replacing the file then don't bother copying
       if 'replace' in path_entry:
@@ -242,7 +230,7 @@ def create_cmake_script(config, manifest_list):
   # what modules to client/server wrap?
 
   for manifest in manifest_list:
-    if manifest.has_key("modules"):
+    if 'modules' in manifest:
       modules = manifest["modules"]
       for module in modules:
         if 'cswrap' in module and module['cswrap']:
@@ -279,7 +267,12 @@ $cmake \\
   try:
     version = subprocess.check_output(['git', 'describe'], cwd=config.repo)
   except subprocess.CalledProcessError as err:
-    error(err)
+    try:
+      version_txt = open(config.repo+'/version.txt', 'r')
+      version = 'v'+version_txt.read()
+    except IOError:
+      err = config.repo+' is not a git repo and does not contain a versions.txt file'
+      error(err)
 
   cmake_script+='  -DPARAVIEW_GIT_DESCRIBE="%s" \\\n' % version.strip()
 
@@ -307,6 +300,18 @@ def cmake_cache(config, manifest_list):
       pass
   return cache_entries
 
+def cleanupGeneratedSourceTree(path):
+  # remove all .git* files and directories
+  for dirpath, dirnames, filenames in os.walk(path):
+    for filename in [f for f in filenames if f.startswith(".git")]:
+      shutil.rmtree(os.path.join(dirpath, filename), ignore_errors=True)
+
+  # remove other files and directories that aren't needed
+  notneeded = ['Utilities/Doxygen/', 'Utilities/GitSetup/', 'Utilities/Maintenance/', 'Utilities/MinimalBuildTools',
+               'Utilities/Scripts/', 'Utilities/SetupForDevelopment.sh', 'Utilities/Sphinx/', 'Utilities/TestDriver/']
+  for filename in notneeded:
+    shutil.rmtree(os.path.join(path, filename), ignore_errors=True)
+
 def process(config):
 
   editions = set()
@@ -314,29 +319,29 @@ def process(config):
   all_manifests = []
   all_proxies = []
   for input_dir in config.input_dirs:
-    print "Processing ", input_dir
+    print ("Processing ", input_dir)
     with open(os.path.join(input_dir, 'manifest.json'), 'r') as fp:
       manifest = json.load(fp)
       config.current_input_dir  = input_dir
       editions.add(manifest['edition'])
-      if manifest.has_key('requires'):
+      if 'requires' in manifest:
         required = set(manifest['requires'])
         diff = required.difference(editions)
         if len(diff):
           missing = ', '.join(list(diff))
           raise RuntimeError('Missing required editions: %s' % missing)
-      if manifest.has_key('after'):
+      if 'after' in manifest:
         after = set(manifest['after'])
         adiff = after.difference(editions)
         diff = adiff.intersection(all_editions)
         if len(diff):
           missing = ', '.join(list(diff))
           raise RuntimeError('Editions must come before %s: %s' % (manifest['edition'], missing))
-      if manifest.has_key('paths'):
+      if 'paths'  in manifest:
         copy_paths(config, manifest['paths'])
-      if manifest.has_key('modules'):
+      if 'modules'in manifest:
         copy_paths(config, manifest['modules'])
-      if manifest.has_key('proxies'):
+      if 'proxies' in manifest:
         all_proxies.append(manifest['proxies'])
 
       all_manifests.append(manifest)
@@ -353,7 +358,10 @@ def process(config):
   all_proxies = set(_all_proxies)
 
   for proxy_file, proxies in proxy_map.items():
-    input_path = os.path.join(config.repo, proxy_file)
+    input_path = config.repo
+    if not isinstance(input_path, str):
+      input_path = input_path.decode('utf-8')
+    input_path = os.path.join(input_path, proxy_file)
     output_path = os.path.join(config.output_dir, proxy_file)
     output_dir = os.path.dirname(output_path)
     if not os.path.exists(output_dir):
@@ -365,6 +373,8 @@ def process(config):
 
   create_cmake_script(config, all_manifests)
 
+  cleanupGeneratedSourceTree(config.output_dir)
+
 def copyTestTrees(config):
   all_dirs = config.input_dirs
   repo = config.repo
@@ -374,7 +384,7 @@ def copyTestTrees(config):
     testingSrc = os.path.join(input_dir, 'Testing')
     if os.path.isdir(testingSrc):
         for f in os.listdir(testingSrc):
-          print f
+          print (f)
           src = os.path.join(testingSrc,f)
           dst = os.path.join(testingDst,f)
           copy_path(src,dst,[])

@@ -4,20 +4,14 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   )
 
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  add_definitions(-DVTKGL2)
-endif()
-
 add_paraview_plugin(
   SurfaceLIC "2.0"
   DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
   SERVER_MANAGER_XML vtkSurfaceLICRepresentation.xml
   SERVER_MANAGER_SOURCES vtkSurfaceLICRepresentation.cxx
   )
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  target_link_libraries(SurfaceLIC
-    LINK_PRIVATE vtkRenderingLICOpenGL2)
-endif()
+target_link_libraries(SurfaceLIC
+  LINK_PRIVATE vtkRenderingLICOpenGL2)
 
 if (VTK_RENDERINGPARALLELLIC_SURFACELICPAINTER_TIMER)
   add_definitions("-DvtkSurfaceLICPainterTIME")

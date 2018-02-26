@@ -57,8 +57,8 @@ public:
   const std::string& GetErrorMessages() const { return this->ErrorMessages; }
 
 private:
-  vtkCommunicationErrorCatcher(const vtkCommunicationErrorCatcher&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCommunicationErrorCatcher&) VTK_DELETE_FUNCTION;
+  vtkCommunicationErrorCatcher(const vtkCommunicationErrorCatcher&) = delete;
+  void operator=(const vtkCommunicationErrorCatcher&) = delete;
 
   void Initialize();
   void OnErrorEvent(vtkObject* caller, unsigned long eventid, void* calldata);

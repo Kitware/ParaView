@@ -73,7 +73,7 @@ public:
   virtual bool Merge(vtkUndoElement* vtkNotUsed(new_element)) { return false; }
 
   // Set the working context if run inside a UndoSet context, so object
-  // that are cross referenced can leave long enought to be associated
+  // that are cross referenced can leave long enough to be associated
   // to another object. Otherwise the undo of a Delete will create the object
   // again but as no-one is holding a reference to that newly created object
   // it will be automatically deleted. Therefore, we provide a collection
@@ -86,7 +86,7 @@ public:
 
 protected:
   vtkUndoElement();
-  ~vtkUndoElement();
+  ~vtkUndoElement() override;
 
   //@{
   /**
@@ -99,8 +99,8 @@ protected:
   //@}
 
 private:
-  vtkUndoElement(const vtkUndoElement&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkUndoElement&) VTK_DELETE_FUNCTION;
+  vtkUndoElement(const vtkUndoElement&) = delete;
+  void operator=(const vtkUndoElement&) = delete;
 };
 
 #endif

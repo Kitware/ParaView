@@ -47,8 +47,8 @@ protected:
   ~vtkCPCellFieldBuilder();
 
 private:
-  vtkCPCellFieldBuilder(const vtkCPCellFieldBuilder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPCellFieldBuilder&) VTK_DELETE_FUNCTION;
+  vtkCPCellFieldBuilder(const vtkCPCellFieldBuilder&) = delete;
+  void operator=(const vtkCPCellFieldBuilder&) = delete;
 };
 
 #endif

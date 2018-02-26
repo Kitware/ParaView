@@ -148,6 +148,34 @@ public:
     }
   }
 
+  void ResizeCell(int root, const vtkVector2i& new_size)
+  {
+    if (root >= static_cast<int>(this->KDTree.size()))
+    {
+      return;
+    }
+
+    Cell& cell = this->KDTree[root];
+    if (cell.Direction == vtkSMViewLayoutProxy::NONE)
+    {
+      if (cell.ViewProxy)
+      {
+        vtkSMPropertyHelper(cell.ViewProxy, "ViewSize").Set(new_size.GetData(), 2);
+        cell.ViewProxy->UpdateProperty("ViewSize");
+      }
+    }
+    else
+    {
+      // distribute size by fraction.
+      vtkVector2i size_1(new_size), size_2(new_size);
+      const int index = cell.Direction == vtkSMViewLayoutProxy::HORIZONTAL ? 0 : 1;
+      size_1[index] = std::ceil(new_size[index] * cell.SplitFraction);
+      size_2[index] = new_size[index] - size_1[index];
+      this->ResizeCell(vtkSMViewLayoutProxy::GetFirstChild(root), size_1);
+      this->ResizeCell(vtkSMViewLayoutProxy::GetSecondChild(root), size_2);
+    }
+  }
+
   typedef std::vector<Cell> KDTreeType;
   KDTreeType KDTree;
   vtkCommand* Observer;
@@ -949,32 +977,12 @@ void vtkSMViewLayoutProxy::GetLayoutExtent(int extent[4])
 //----------------------------------------------------------------------------
 void vtkSMViewLayoutProxy::SetSize(const int size[2])
 {
-  int ext[4];
-  this->GetLayoutExtent(ext);
-
-  vtkVector2i osize;
-  osize[0] = ext[1] - ext[0] + 1;
-  osize[1] = ext[3] - ext[2] + 1;
-
-  const vtkVector2i newsize(size);
-
   const bool prev = this->SetBlockUpdateViewPositions(true);
 
-  for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
-       iter != this->Internals->KDTree.end(); ++iter)
-  {
-    if (iter->ViewProxy.GetPointer() != NULL)
-    {
-      vtkVector2i vsize;
-      vtkSMPropertyHelper(iter->ViewProxy, "ViewSize").Get(vsize.GetData(), 2);
-
-      vsize = (vsize * newsize) / osize;
-      vtkSMPropertyHelper(iter->ViewProxy, "ViewSize").Set(vsize.GetData(), 2);
-      iter->ViewProxy->UpdateProperty("ViewSize");
-    }
-  }
-
+  // recursively distribute space available among views.
+  this->Internals->ResizeCell(0, vtkVector2i(size));
   this->SetBlockUpdateViewPositions(prev);
+
   this->UpdateViewPositions();
 }
 
@@ -1027,20 +1035,18 @@ void vtkSMViewLayoutProxy::RestoreMaximizedState()
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
+vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magX, int magY)
 {
   if (this->MaximizedCell != -1)
   {
     vtkSMViewProxy* view = this->GetView(this->MaximizedCell);
     if (view)
     {
-      return view->CaptureWindow(magnification);
+      return view->CaptureWindow(magX, magY);
     }
     vtkErrorMacro("No view present in the layout.");
     return NULL;
   }
-
-  this->UpdateState();
 
   std::vector<vtkSmartPointer<vtkImageData> > images;
   for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
@@ -1048,7 +1054,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
   {
     if (iter->ViewProxy.GetPointer())
     {
-      vtkImageData* image = iter->ViewProxy->CaptureWindow(magnification);
+      vtkImageData* image = iter->ViewProxy->CaptureWindow(magX, magY);
       if (image)
       {
         images.push_back(image);

@@ -26,6 +26,9 @@
 #include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
+#include <string> // For storing file extensions
+#include <vector> // For storing file extensions
+
 class vtkSMViewProxy;
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMExporterProxy : public vtkSMProxy
@@ -55,27 +58,33 @@ public:
 
   //@{
   /**
-   * Returns the suggested file extension for this exporter.
+   * Returns the suggested file extensions for this exporter.
    */
-  vtkGetStringMacro(FileExtension);
+  const std::vector<std::string>& GetFileExtensions() const { return this->FileExtensions; };
+  //@}
+
+  //@{
+  /**
+   * Returns the suggested file extension for this exporter.
+   * @deprecated in ParaView 5.5. Use `GetFileExtensions` instead.
+   */
+  VTK_LEGACY(const char* GetFileExtension());
   //@}
 
 protected:
   vtkSMExporterProxy();
-  ~vtkSMExporterProxy();
+  ~vtkSMExporterProxy() override;
   /**
    * Read attributes from an XML element.
    */
-  virtual int ReadXMLAttributes(
-    vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
 
-  vtkSetStringMacro(FileExtension);
   vtkSMViewProxy* View;
-  char* FileExtension;
+  std::vector<std::string> FileExtensions;
 
 private:
-  vtkSMExporterProxy(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMExporterProxy&) VTK_DELETE_FUNCTION;
+  vtkSMExporterProxy(const vtkSMExporterProxy&) = delete;
+  void operator=(const vtkSMExporterProxy&) = delete;
 };
 
 #endif

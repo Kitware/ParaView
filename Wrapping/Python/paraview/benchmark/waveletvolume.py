@@ -24,9 +24,9 @@ def get_render_view(size):
 
 def save_render_buffer(fname):
     '''Similar to SaveScreenshot except a re-render will not be triggered'''
-    import vtk
+    from vtkmodules.vtkRenderingCore import vtkWindowToImageFilter
     w = GetRenderView().SMProxy.GetRenderWindow()
-    w2i = vtk.vtkWindowToImageFilter()
+    w2i = vtkWindowToImageFilter()
     w2i.ReadFrontBufferOff()
     w2i.ShouldRerenderOff()
     w2i.SetInput(w)
@@ -51,16 +51,17 @@ def flush_render_buffer():
     if not w.GetOffScreenRendering():
         return
 
-    import vtk
+    from vtkmodules.vtkParallelCore import vtkMultiProcessController
+    from vtkmodules.vtkRenderingCore import vtkWindowToImageFilter
 
     # If we're using MPI we can also bypass this since compositing will
     # for a GL flush
-    controller = vtk.vtkMultiProcessController.GetGlobalController()
+    controller = vtkMultiProcessController.GetGlobalController()
     if controller.GetNumberOfProcesses() > 1:
         return
 
     # Force a GL flush by retrieving the frame buffer image
-    w2i = vtk.vtkWindowToImageFilter()
+    w2i = vtkWindowToImageFilter()
     w2i.ReadFrontBufferOff()
     w2i.ShouldRerenderOff()
     w2i.SetInput(w)
@@ -82,8 +83,10 @@ def memtime_stamp():
 def run(output_basename='log', dimension=100, view_size=(1920, 1080),
         num_frames=10, save_logs=True, ospray=False):
 
-    import vtk
-    controller = vtk.vtkMultiProcessController.GetGlobalController()
+    from vtkmodules.vtkParallelCore import vtkMultiProcessController
+    from vtkmodules.vtkCommonSystem import vtkTimerLog
+
+    controller = vtkMultiProcessController.GetGlobalController()
 
     view = get_render_view(view_size)
     if ospray:
@@ -112,11 +115,11 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
     SaveScreenshot(frame_fname_fmt % {'f': 0})
 
     print('Gathering geometry counts')
-    vtk.vtkTimerLog.MarkStartEvent('GetViewItemStats')
+    vtkTimerLog.MarkStartEvent('GetViewItemStats')
     num_voxels = 0
     for r in view.Representations:
         num_voxels += r.GetRepresentedDataInformation().GetNumberOfCells()
-    vtk.vtkTimerLog.MarkEndEvent('GetViewItemStats')
+    vtkTimerLog.MarkEndEvent('GetViewItemStats')
 
     print('Beginning benchmark loop')
     deltaAz = 45.0 / num_frames

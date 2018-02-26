@@ -75,7 +75,7 @@ public:
    * (same name and number of components)to be in final.
    */
   void AddInformation(vtkPVDataSetAttributesInformation* info);
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
   //@}
 
   /**
@@ -100,7 +100,7 @@ public:
   vtkPVArrayInformation* GetAttributeInformation(int attributeType);
 
   /**
-   * Mimicks data set attribute call.  Returns -1 if array (of index) is
+   * Mimics data set attribute call.  Returns -1 if array (of index) is
    * not a standard attribute.  Returns attribute type otherwise.
    */
   int IsArrayAnAttribute(int arrayIndex);
@@ -109,20 +109,20 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
 protected:
   vtkPVDataSetAttributesInformation();
-  ~vtkPVDataSetAttributesInformation();
+  ~vtkPVDataSetAttributesInformation() override;
 
   // Standard cell attributes.
   int FieldAssociation;
 
 private:
-  vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataSetAttributesInformation&) VTK_DELETE_FUNCTION;
+  vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&) = delete;
+  void operator=(const vtkPVDataSetAttributesInformation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

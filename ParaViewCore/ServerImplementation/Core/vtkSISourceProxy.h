@@ -46,7 +46,7 @@ public:
   /**
    * Triggers UpdateInformation() on vtkObject if possible.
    */
-  virtual void UpdatePipelineInformation() VTK_OVERRIDE;
+  void UpdatePipelineInformation() VTK_OVERRIDE;
 
   /**
    * Triggers UpdatePipeline().
@@ -60,7 +60,7 @@ public:
   virtual void SetupSelectionProxy(int port, vtkSIProxy* extractSelection);
 
   /**
-   * Allow to shut down pipeline execution. This is particulary useful for
+   * Allow to shut down pipeline execution. This is particularly useful for
    * a Catalyst session that does not contains any real data.
    */
   virtual void SetDisablePipelineExecution(bool value) { this->DisablePipelineExecution = value; }
@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkSISourceProxy();
-  ~vtkSISourceProxy();
+  ~vtkSISourceProxy() override;
 
   /**
    * Overridden to setup the output ports and pipelines for the output ports.
@@ -82,7 +82,7 @@ protected:
   /**
    * Read xml-attributes.
    */
-  virtual bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
    * Create the output ports and add post filters for each output port.
@@ -106,8 +106,8 @@ protected:
   friend class vtkSICompoundSourceProxy;
 
 private:
-  vtkSISourceProxy(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSISourceProxy&) VTK_DELETE_FUNCTION;
+  vtkSISourceProxy(const vtkSISourceProxy&) = delete;
+  void operator=(const vtkSISourceProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

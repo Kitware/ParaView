@@ -75,7 +75,7 @@ public:
 protected:
   static vtkClientServerInterpreterInitializer* New();
   vtkClientServerInterpreterInitializer();
-  ~vtkClientServerInterpreterInitializer();
+  ~vtkClientServerInterpreterInitializer() override;
 
   /**
    * Registers an interpreter. This DOES NOT affect the reference count of the
@@ -84,9 +84,8 @@ protected:
   void RegisterInterpreter(vtkClientServerInterpreter*);
 
 private:
-  vtkClientServerInterpreterInitializer(
-    const vtkClientServerInterpreterInitializer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkClientServerInterpreterInitializer&) VTK_DELETE_FUNCTION;
+  vtkClientServerInterpreterInitializer(const vtkClientServerInterpreterInitializer&) = delete;
+  void operator=(const vtkClientServerInterpreterInitializer&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

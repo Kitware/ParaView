@@ -45,29 +45,29 @@ public:
   /**
    * This method is used internally by the rendering process.
    */
-  virtual int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int RenderVolumetricGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport*) VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderVolumetricGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderTranslucentPolygonalGeometry(vtkViewport*) VTK_OVERRIDE;
   //@}
 
   /**
    * Does this prop have some translucent polygonal geometry?
    */
-  virtual int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
+  int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
 
   /**
    * Release any graphics resources that are being consumed by this actor.
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
   //@{
   /**
    * Set the high res input.  Overloads the virtual vtkVolume method.
    */
   virtual void SetMapper(vtkAbstractVolumeMapper*);
-  virtual vtkAbstractVolumeMapper* GetMapper() VTK_OVERRIDE;
+  vtkAbstractVolumeMapper* GetMapper() VTK_OVERRIDE;
   //@}
 
   //@{
@@ -79,24 +79,24 @@ public:
   //@}
 
   /**
-   * Sets the volume propery.  Overloads the virtual vtkVolume method.
+   * Sets the volume property.  Overloads the virtual vtkVolume method.
    */
-  virtual void SetProperty(vtkVolumeProperty* property);
+  virtual void SetProperty(vtkVolumeProperty* property) VTK_OVERRIDE;
 
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
    */
-  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
 
   /**
    * Get the bounds of the current mapper.
    */
-  virtual double* GetBounds() VTK_OVERRIDE;
+  double* GetBounds() VTK_OVERRIDE;
 
   /**
    * Overloads the virtual vtkProp method.
    */
-  virtual void SetAllocatedRenderTime(double t, vtkViewport* v) VTK_OVERRIDE;
+  void SetAllocatedRenderTime(double t, vtkViewport* v) VTK_OVERRIDE;
 
   //@{
   /**
@@ -106,9 +106,11 @@ public:
   vtkSetMacro(EnableLOD, int);
   vtkGetMacro(EnableLOD, int);
 
+  void SetPropertyKeys(vtkInformation* keys) override;
+
 protected:
   vtkPVLODVolume();
-  ~vtkPVLODVolume();
+  ~vtkPVLODVolume() override;
   //@}
 
   /**
@@ -128,8 +130,8 @@ protected:
   virtual void UpdateLODProperty();
 
 private:
-  vtkPVLODVolume(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLODVolume&) VTK_DELETE_FUNCTION;
+  vtkPVLODVolume(const vtkPVLODVolume&) = delete;
+  void operator=(const vtkPVLODVolume&) = delete;
 };
 
 #endif

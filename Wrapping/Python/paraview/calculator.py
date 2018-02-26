@@ -10,10 +10,12 @@ except ImportError:
     "this functionality to work. Please install numpy and try again.")
 
 import paraview
-from paraview import vtk
-import vtk.numpy_interface.dataset_adapter as dsa
-from vtk.numpy_interface.algorithms import *
+import vtkmodules.numpy_interface.dataset_adapter as dsa
+from vtkmodules.numpy_interface.algorithms import *
     # -- this will import vtkMultiProcessController and vtkMPI4PyCommunicator
+
+from paraview.vtk import vtkDoubleArray, vtkSelectionNode, vtkSelection, vtkStreamingDemandDrivenPipeline
+
 import sys
 if sys.version_info >= (3,):
     xrange = range
@@ -65,6 +67,78 @@ def get_arrays(attribs, controller=None):
                 arrays[name] = dsa.NoneArray
     return arrays
 
+def pointIsNear(locations, distance, inputs):
+    array = vtkDoubleArray()
+    array.SetNumberOfComponents(3)
+    array.SetNumberOfTuples(len(locations))
+    for i in range(len(locations)):
+        array.SetTuple(i, locations[i])
+    node = vtkSelectionNode()
+    node.SetFieldType(vtkSelectionNode.POINT)
+    node.SetContentType(vtkSelectionNode.LOCATIONS)
+    node.GetProperties().Set(vtkSelectionNode.EPSILON(), distance)
+    node.SetSelectionList(array)
+
+    selection = vtkSelection()
+    selection.AddNode(node)
+    from vtkmodules.vtkFiltersExtraction import vtkExtractSelectedLocations
+    pointsNear = vtkExtractSelectedLocations()
+    pointsNear.SetInputData(0, inputs[0].VTKObject)
+    pointsNear.SetInputData(1, selection)
+    pointsNear.Update()
+
+    extractedPoints = pointsNear.GetOutput()
+    numPoints = inputs[0].GetNumberOfPoints()
+    result = np.zeros((numPoints,), dtype = np.int8)
+
+    extracted = dsa.WrapDataObject(extractedPoints)
+    pointIds = extracted.PointData.GetArray('vtkOriginalPointIds')
+
+    if isinstance(pointIds, dsa.VTKCompositeDataArray):
+        for a in pointIds.GetArrays():
+            result[a] = 1
+    else:
+         result[pointIds] = 1
+
+    import vtkmodules.util.numpy_support as np_s
+    vtkarray = np_s.numpy_to_vtk(result, deep=True)
+    return dsa.vtkDataArrayToVTKArray(vtkarray)
+
+def cellContainsPoint(inputs, locations):
+    array = vtkDoubleArray()
+    array.SetNumberOfComponents(3)
+    array.SetNumberOfTuples(len(locations))
+    for i in range(len(locations)):
+        array.SetTuple(i, locations[i])
+    node = vtkSelectionNode()
+    node.SetFieldType(vtkSelectionNode.CELL)
+    node.SetContentType(vtkSelectionNode.LOCATIONS)
+    node.SetSelectionList(array)
+
+    selection = vtkSelection()
+    selection.AddNode(node)
+    from vtkmodules.vtkFiltersExtraction import vtkExtractSelectedLocations
+    cellsNear = vtkExtractSelectedLocations()
+    cellsNear.SetInputData(0, inputs[0].VTKObject)
+    cellsNear.SetInputData(1, selection)
+    cellsNear.Update()
+
+    extractedCells = cellsNear.GetOutput()
+    numCells = inputs[0].GetNumberOfCells()
+    result = np.zeros((numCells,), dtype = np.int8)
+
+    extracted = dsa.WrapDataObject(extractedCells)
+    cellIds = extracted.CellData.GetArray('vtkOriginalCellIds')
+
+    if isinstance(cellIds, dsa.VTKCompositeDataArray):
+        for a in cellIds.GetArrays():
+            result[a] = 1
+    else:
+         result[cellIds] = 1
+
+    import vtkmodules.util.numpy_support as np_s
+    vtkarray = np_s.numpy_to_vtk(result, deep=True)
+    return dsa.vtkDataArrayToVTKArray(vtkarray)
 
 def compute(inputs, expression, ns=None):
     #  build the locals environment used to eval the expression.
@@ -84,7 +158,7 @@ def get_data_time(self, do, ininfo):
         t = dinfo.Get(do.DATA_TIME_STEP())
     else: t = None
 
-    key = vtk.vtkStreamingDemandDrivenPipeline.TIME_STEPS()
+    key = vtkStreamingDemandDrivenPipeline.TIME_STEPS()
     t_index = None
     if ininfo.Has(key):
         tsteps = [ininfo.Get(key, x) for x in range(ininfo.Length(key))]
@@ -106,7 +180,7 @@ def execute(self, expression):
     inputs = []
 
     for index in range(self.GetNumberOfInputConnections(0)):
-        # wrap all input data objects using vtk.numpy_interface.dataset_adapter
+        # wrap all input data objects using vtkmodules.numpy_interface.dataset_adapter
         wdo_input = dsa.WrapDataObject(self.GetInputDataObject(0, index))
         t, t_index = get_data_time(self, wdo_input.VTKObject, self.GetInputInformation(0, index))
         wdo_input.time_value = wdo_input.t_value = t

@@ -49,7 +49,7 @@ int vtkMinkowskiFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  // Get the input and ouptut
+  // Get the input and output
   vtkUnstructuredGrid* input =
     vtkUnstructuredGrid::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkUnstructuredGrid* output =
@@ -385,7 +385,7 @@ double vtkMinkowskiFilter::compute_face_area(vtkCell* face)
   else if (coord == 3)
     area *= an / (2 * az);
 
-  return fabs(area); // area is alway positive
+  return fabs(area); // area is always positive
 }
 
 double vtkMinkowskiFilter::compute_edge_length(vtkCell* edge)

@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqExodusIIVariableSelectionWidget : public pqTreeWidge
 
 public:
   pqExodusIIVariableSelectionWidget(QWidget* parent = 0);
-  virtual ~pqExodusIIVariableSelectionWidget();
+  ~pqExodusIIVariableSelectionWidget() override;
 
 signals:
   /**
@@ -72,7 +72,7 @@ protected:
   * overridden to handle QDynamicPropertyChangeEvent when properties are
   * added/removed/updated.
   */
-  bool eventFilter(QObject* object, QEvent* qevent);
+  bool eventFilter(QObject* object, QEvent* qevent) override;
 
   void propertyChanged(const QString& pname);
 

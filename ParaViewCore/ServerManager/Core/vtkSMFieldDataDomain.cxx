@@ -51,7 +51,7 @@ vtkSMFieldDataDomain::~vtkSMFieldDataDomain()
 void vtkSMFieldDataDomain::Update(vtkSMProperty*)
 {
   // We don't return here, since even if updating the domain values may be
-  // disbaled, we still would want to pick a good default for this domain.
+  // disabled, we still would want to pick a good default for this domain.
   // if (this->DisableUpdateDomainEntries)
   //  {
   //  return;

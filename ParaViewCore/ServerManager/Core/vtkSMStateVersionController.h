@@ -25,6 +25,8 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
+class vtkSMSession;
+
 class vtkPVXMLElement;
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateVersionController : public vtkSMObject
 {
@@ -35,20 +37,21 @@ public:
 
   /**
    * Called before a state is loaded.
-   * The argument must be the root element for the state being loaded.
-   * eg. for server manager state, it will point to \c \<ServerManagerState/\>
-   * element.
-   * Returns false if the conversion failed, else true.
+   * \param root Root element for the state being loaded, e.g. for server manager
+   * state, it will point to a \c \<ServerManagerState/\> element.
+   * \param session The current session, null by default.
+   *
+   * \return false if the conversion failed, else true.
    */
-  virtual bool Process(vtkPVXMLElement* root);
+  virtual bool Process(vtkPVXMLElement* root, vtkSMSession* session = nullptr);
 
 protected:
   vtkSMStateVersionController();
-  ~vtkSMStateVersionController();
+  ~vtkSMStateVersionController() override;
 
 private:
-  vtkSMStateVersionController(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMStateVersionController&) VTK_DELETE_FUNCTION;
+  vtkSMStateVersionController(const vtkSMStateVersionController&) = delete;
+  void operator=(const vtkSMStateVersionController&) = delete;
 };
 
 #endif

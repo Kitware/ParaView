@@ -64,7 +64,7 @@ public:
 
 protected:
   vtkPVTransform();
-  ~vtkPVTransform();
+  ~vtkPVTransform() override;
 
   void UpdateMatrix();
 
@@ -74,8 +74,8 @@ protected:
   vtkTransform* AbsoluteTransform;
 
 private:
-  vtkPVTransform(const vtkPVTransform&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTransform&) VTK_DELETE_FUNCTION;
+  vtkPVTransform(const vtkPVTransform&) = delete;
+  void operator=(const vtkPVTransform&) = delete;
 };
 
 #endif

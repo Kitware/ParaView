@@ -57,7 +57,7 @@ class vtkAbstractContextItem;
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBoundingRectContextDevice2D : public vtkContextDevice2D
 {
 public:
-  vtkTypeMacro(vtkBoundingRectContextDevice2D, vtkContextDevice2D) virtual void PrintSelf(
+  vtkTypeMacro(vtkBoundingRectContextDevice2D, vtkContextDevice2D) void PrintSelf(
     ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkBoundingRectContextDevice2D* New();
 
@@ -113,7 +113,7 @@ public:
    * scaled by scale (1.0 would match the actual dataset).
    * @warning Not currently implemented.
    */
-  virtual void DrawPolyData(float vtkNotUsed(p)[2], float vtkNotUsed(scale),
+  void DrawPolyData(float vtkNotUsed(p)[2], float vtkNotUsed(scale),
     vtkPolyData* vtkNotUsed(polyData), vtkUnsignedCharArray* vtkNotUsed(colors),
     int vtkNotUsed(scalarMode)) VTK_OVERRIDE
   {
@@ -292,7 +292,7 @@ public:
 
 protected:
   vtkBoundingRectContextDevice2D();
-  virtual ~vtkBoundingRectContextDevice2D();
+  ~vtkBoundingRectContextDevice2D() override;
 
   /**
    * Is the bounding rect initialized?
@@ -321,8 +321,8 @@ protected:
   void AddRect(const vtkRectf& rect);
 
 private:
-  vtkBoundingRectContextDevice2D(const vtkBoundingRectContextDevice2D&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkBoundingRectContextDevice2D&) VTK_DELETE_FUNCTION;
+  vtkBoundingRectContextDevice2D(const vtkBoundingRectContextDevice2D&) = delete;
+  void operator=(const vtkBoundingRectContextDevice2D&) = delete;
 };
 
 #endif // vtkBoundingRectContextDevice2D

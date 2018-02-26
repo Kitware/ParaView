@@ -51,7 +51,7 @@ SetActiveView(None)
 
 # Create a new 'Histogram View'
 histogramView1 = CreateView('XYHistogramChartView')
-histogramView1.ViewSize = [503, 781]
+histogramView1.ViewSize = [500, 780]
 
 # place view in the layout
 viewLayout1.AssignView(2, histogramView1)
@@ -78,7 +78,9 @@ try:
 except:
   print ("Could not get baseline directory. Test failed.")
 baseline_file = os.path.join(baselinePath, "TestColorHistogram.png")
-import vtk.test.Testing
-vtk.test.Testing.VTK_TEMP_DIR = vtk.util.misc.vtkGetTempDir()
-vtk.test.Testing.compareImage(histogramView1.GetRenderWindow(), baseline_file, threshold=40)
-vtk.test.Testing.interact()
+
+from paraview.vtk.test import Testing
+from paraview.vtk.util.misc import vtkGetTempDir
+Testing.VTK_TEMP_DIR = vtkGetTempDir()
+Testing.compareImage(histogramView1.GetRenderWindow(), baseline_file, threshold=40)
+Testing.interact()

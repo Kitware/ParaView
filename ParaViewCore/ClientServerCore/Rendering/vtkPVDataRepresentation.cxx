@@ -130,6 +130,7 @@ int vtkPVDataRepresentation::RequestData(
   return 1;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVDataRepresentation::RequestUpdateTime(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* vtkNotUsed(outputVector))
 {
@@ -276,21 +277,17 @@ bool vtkPVDataRepresentation::GetUseCache()
   return false;
 }
 
-#if !defined(VTK_LEGACY_REMOVE)
 //----------------------------------------------------------------------------
-void vtkPVDataRepresentation::SetUseCache(bool)
+vtkMTimeType vtkPVDataRepresentation::GetPipelineDataTime()
 {
-  VTK_LEGACY_BODY(vtkPVDataRepresentation::SetUseCache, "ParaView 5.0");
-}
-#endif
+  if (auto executive = vtkPVDataRepresentationPipeline::SafeDownCast(this->GetExecutive()))
+  {
+    return executive->GetDataTime();
+  }
 
-#if !defined(VTK_LEGACY_REMOVE)
-//----------------------------------------------------------------------------
-void vtkPVDataRepresentation::SetCacheKey(double)
-{
-  VTK_LEGACY_BODY(vtkPVDataRepresentation::SetCacheKey, "ParaView 5.0");
+  vtkErrorMacro("vtkPVDataRepresentationPipeline is expected!!!");
+  return vtkMTimeType();
 }
-#endif
 
 //----------------------------------------------------------------------------
 void vtkPVDataRepresentation::PrintSelf(ostream& os, vtkIndent indent)

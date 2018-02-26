@@ -49,7 +49,7 @@ paraview.options.batch = True
 paraview.options.symmetric = True
 
 # [SC14-Catalyst] import user co-processing script
-import vtkPVCatalystPython
+from paraview.vtk import vtkPVCatalyst
 import os
 scriptpath, scriptname = os.path.split(sys.argv[1])
 sys.path.append(scriptpath)
@@ -66,7 +66,7 @@ except:
 # [SC14-Catalyst] Co-Processing routine to be called at the end of each simulation time step
 def coProcess(grid, time, step):
     # initialize data description
-    datadescription = vtkPVCatalystPython.vtkCPDataDescription()
+    datadescription = vtkPVCatalyst.vtkCPDataDescription()
     datadescription.SetTimeData(time, step)
     datadescription.AddInput("input")
     cpscript.RequestDataDescription(datadescription)

@@ -90,7 +90,7 @@ public:
   /// Initialize the device with the name.
   bool init();
 
-  /// Tell if Init() was called succesfully bool GetInitialized() const;
+  /// Tell if Init() was called successfully bool GetInitialized() const;
 
   /// Terminate the thread
   void stop();

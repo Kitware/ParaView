@@ -35,7 +35,7 @@ class vtkSMProxySelectionModelInternal;
 class vtkCollection;
 class vtkSMProxy;
 
-#include <set> // needed for vtkset::set.
+#include <list> // needed for vtkset::list.
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
 {
@@ -48,7 +48,7 @@ public:
    * Override the set session, so we can attach an observer to the Collaboration
    * manager in order to monitor master/slave changes.
    */
-  virtual void SetSession(vtkSMSession*) VTK_OVERRIDE;
+  void SetSession(vtkSMSession*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -62,7 +62,7 @@ public:
   /**
    * Type for selection.
    */
-  typedef std::set<vtkSmartPointer<vtkSMProxy> > SelectionType;
+  typedef std::list<vtkSmartPointer<vtkSMProxy> > SelectionType;
 
   // vtkSMProxy selection flags
   enum ProxySelectionFlag
@@ -143,9 +143,9 @@ public:
    * This method return the full object state that can be used to create that
    * object from scratch.
    * This method will be used to fill the undo stack.
-   * If not overriden this will return NULL.
+   * If not overridden this will return NULL.
    */
-  virtual const vtkSMMessage* GetFullState() VTK_OVERRIDE;
+  const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 
   /**
    * This method is used to initialise the object to the given state
@@ -154,11 +154,11 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
 protected:
   vtkSMProxySelectionModel();
-  ~vtkSMProxySelectionModel();
+  ~vtkSMProxySelectionModel() override;
 
   void InvokeCurrentChanged(vtkSMProxy* proxy);
   void InvokeSelectionChanged();
@@ -176,8 +176,8 @@ protected:
   vtkSMMessage* State;
 
 private:
-  vtkSMProxySelectionModel(const vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMProxySelectionModel&) VTK_DELETE_FUNCTION;
+  vtkSMProxySelectionModel(const vtkSMProxySelectionModel&) = delete;
+  void operator=(const vtkSMProxySelectionModel&) = delete;
 
   class vtkInternal;
   friend class vtkInternal;

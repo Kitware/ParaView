@@ -99,7 +99,7 @@ int vtkCleanUnstructuredGridCells::RequestData(vtkInformation* vtkNotUsed(reques
       this->UpdateProgress(0.8 + 0.2 * (static_cast<float>(id) / numberOfCells));
     }
 
-    // duplicate points do not make poly verticies or triangle
+    // duplicate points do not make poly vertices or triangle
     // strips degenerate so don't remove them
     int cellType = input->GetCellType(id);
     if (cellType == VTK_POLY_VERTEX || cellType == VTK_TRIANGLE_STRIP)

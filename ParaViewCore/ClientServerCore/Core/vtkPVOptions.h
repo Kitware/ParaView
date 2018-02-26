@@ -48,8 +48,6 @@ public:
   //@}
 
   vtkGetMacro(ConnectID, int);
-  vtkGetMacro(UseOffscreenRendering, int);
-  vtkGetMacro(EGLDeviceIndex, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetStringMacro(StereoType);
 
@@ -57,6 +55,16 @@ public:
   vtkGetMacro(UseRenderingGroup, int);
   vtkGetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileMullions, int);
+
+  /**
+   * Returns the egl device index. -1 indicates that no value was specified.
+   */
+  vtkGetMacro(EGLDeviceIndex, int);
+
+  /**
+   * @deprecated in ParaView 5.5. Use `GetForceOnscreenRendering()` instead.
+   */
+  VTK_LEGACY(int GetUseOffscreenRendering());
 
   //@{
   /**
@@ -126,6 +134,13 @@ public:
     return (this->MultiClientMode || this->MultiClientModeWithErrorMacro) ? 1 : 0;
   }
   virtual int IsMultiClientModeDebug() { return this->MultiClientModeWithErrorMacro; }
+
+  //@{
+  /**
+   * Returns if this server does not allow connection after the first client.
+   */
+  vtkGetMacro(DisableFurtherConnections, int);
+  //@}
 
   //@{
   /**
@@ -222,6 +237,35 @@ public:
   vtkGetMacro(DisableXDisplayTests, int);
   //@}
 
+  /**
+   * When set to true, ParaView will create headless only render windows on the
+   * current process.
+   */
+  vtkGetMacro(ForceOffscreenRendering, int);
+
+  /**
+   * When set to true, ParaView will create on-screen render windows.
+   */
+  vtkGetMacro(ForceOnscreenRendering, int);
+
+  //@{
+  /**
+   * Get/Set the ForceNoMPIInitOnClient flag.
+   */
+  vtkGetMacro(ForceNoMPIInitOnClient, int);
+  vtkSetMacro(ForceNoMPIInitOnClient, int);
+  vtkBooleanMacro(ForceNoMPIInitOnClient, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the ForceMPIInitOnClient flag.
+   */
+  vtkGetMacro(ForceMPIInitOnClient, int);
+  vtkSetMacro(ForceMPIInitOnClient, int);
+  vtkBooleanMacro(ForceMPIInitOnClient, int);
+  //@}
+
   enum ProcessTypeEnum
   {
     PARAVIEW = 0x2,
@@ -242,29 +286,29 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkPVOptions();
+  ~vtkPVOptions() override;
 
   /**
    * Initialize arguments.
    */
-  virtual void Initialize() VTK_OVERRIDE;
+  void Initialize() VTK_OVERRIDE;
 
   /**
    * After parsing, process extra option dependencies.
    */
-  virtual int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
+  int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
 
   /**
    * This method is called when wrong argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  virtual int WrongArgument(const char* argument) VTK_OVERRIDE;
+  int WrongArgument(const char* argument) VTK_OVERRIDE;
 
   /**
    * This method is called when a deprecated argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  virtual int DeprecatedArgument(const char* argument) VTK_OVERRIDE;
+  int DeprecatedArgument(const char* argument) VTK_OVERRIDE;
 
   //@{
   /**
@@ -276,6 +320,7 @@ protected:
   int ClientMode;
   int RenderServerMode;
   int MultiClientMode;
+  int DisableFurtherConnections;
   int MultiClientModeWithErrorMacro;
   int MultiServerMode;
   int SymmetricMPIMode;
@@ -314,13 +359,15 @@ private:
   int ForceMPIInitOnClient;
   int ForceNoMPIInitOnClient;
   int DummyMesaFlag;
+  int ForceOffscreenRendering;
+  int ForceOnscreenRendering;
 
   // inline setters
   vtkSetStringMacro(StereoType);
 
 private:
-  vtkPVOptions(const vtkPVOptions&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOptions&) VTK_DELETE_FUNCTION;
+  vtkPVOptions(const vtkPVOptions&) = delete;
+  void operator=(const vtkPVOptions&) = delete;
 
   vtkSetStringMacro(HostName);
   char* HostName;

@@ -114,17 +114,6 @@ public:
     DEFAULT_TIME_STEP_LAST
   };
 
-  /**
-   * Enum for TransferFunctionResetMode
-   */
-  enum
-  {
-    GROW_ON_APPLY = 0,
-    GROW_ON_APPLY_AND_TIMESTEP = 1,
-    RESET_ON_APPLY = 2,
-    RESET_ON_APPLY_AND_TIMESTEP = 3
-  };
-
   //@{
   /**
    * Get/Set the transfer function reset mode.
@@ -169,6 +158,15 @@ public:
    */
   vtkSetMacro(AnimationTimePrecision, int);
   vtkGetMacro(AnimationTimePrecision, int);
+  //@}
+
+  //@{
+  /**
+   * Set when animation shortcuts are shown.
+   */
+  vtkSetMacro(ShowAnimationShortcuts, bool);
+  vtkGetMacro(ShowAnimationShortcuts, bool);
+  vtkBooleanMacro(ShowAnimationShortcuts, bool);
   //@}
 
   /**
@@ -233,7 +231,7 @@ public:
 
 protected:
   vtkPVGeneralSettings();
-  ~vtkPVGeneralSettings();
+  ~vtkPVGeneralSettings() override;
 
   int BlockColorsDistinctValues;
   bool AutoApply;
@@ -244,14 +242,15 @@ protected:
   bool CacheGeometryForAnimation;
   unsigned long AnimationGeometryCacheLimit;
   int AnimationTimePrecision;
+  bool ShowAnimationShortcuts;
   int PropertiesPanelMode;
   bool LockPanels;
   int GUIFontSize;
   bool GUIOverrideFont;
 
 private:
-  vtkPVGeneralSettings(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVGeneralSettings&) VTK_DELETE_FUNCTION;
+  vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
+  void operator=(const vtkPVGeneralSettings&) = delete;
 
   static vtkSmartPointer<vtkPVGeneralSettings> Instance;
 };

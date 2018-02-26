@@ -13,7 +13,6 @@ endif()
 
 include(ParaViewQt)
 pv_find_package_qt(qt_targets REQUIRED
-                QT4_COMPONENTS QtGui QtNetwork
                 QT5_COMPONENTS Widgets Network)
 
 # Checks to see if we want to use VRPN or VRUI.

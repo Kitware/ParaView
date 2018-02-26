@@ -34,8 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 #include <QObject>
+#include <QPointer>
+
 class QMenu;
 class QMainWindow;
+class QAction;
 
 /**
 * pqViewMenuManager keeps ParaView View menu populated with all the available
@@ -51,10 +54,26 @@ public:
   pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu);
 
 protected slots:
-  virtual void buildMenu();
+  /**
+   * build the menu from scratch. Clears all existing items in the menu before
+   * building it.
+   */
+  void buildMenu();
+
+  /**
+   * This is called to update items in the menu that are not static and may
+   * change as a result of loading of plugins, for example viz. actions for
+   * controlling visibilities of toolbars are dock panels.
+   * It removes any actions for those currently present and adds actions for
+   * toolbars and panels in the application. This slot is called when the menu
+   * triggers `aboutToShow` signal.
+   */
+  virtual void updateMenu();
 
 protected:
-  QMenu* Menu;
+  QPointer<QMenu> Menu;
+  QPointer<QMenu> ToolbarsMenu;
+  QPointer<QAction> DockPanelSeparators[2];
 
 private:
   Q_DISABLE_COPY(pqViewMenuManager)

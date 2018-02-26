@@ -944,7 +944,7 @@ typedef struct {
 /* need some of these routines exported for CGNStools */
 
 #if defined(_WIN32) && defined(BUILD_DLL)
-# define CGNSDLL _declspec(dllexport)
+# define CGNSDLL __declspec(dllexport)
 #else
 # define CGNSDLL
 #endif
@@ -988,7 +988,6 @@ CGNSDLL cgns_axisym    *cgi_get_axisym (cgns_file *cg, int B);
 CGNSDLL cgns_ziter     *cgi_get_ziter  (cgns_file *cg, int B, int Z);
 CGNSDLL cgns_zcoor     *cgi_get_zcoor  (cgns_file *cg, int B, int Z, int C);
 CGNSDLL cgns_zcoor     *cgi_get_zcoorGC(cgns_file *cg, int B, int Z);
-CGNSDLL cgns_array     *cgi_get_coord  (cgns_file *cg, int B, int Z, int C);
 CGNSDLL cgns_section   *cgi_get_section(cgns_file *cg, int B, int Z, int S);
 CGNSDLL cgns_sol       *cgi_get_sol    (cgns_file *cg, int B, int Z, int S);
 CGNSDLL cgns_array     *cgi_get_field  (cgns_file *cg, int B, int Z, int S, int F);
@@ -1282,7 +1281,6 @@ void cgi_free_bcarea(cgns_bcarea *bcarea);
 void cgi_free_cprop(cgns_cprop *cprop);
 void cgi_free_cperio(cgns_cperio *cperio);
 void cgi_free_caverage(cgns_caverage *caverage);
-void cgi_free_link(cgns_link *link);
 void cgi_free_user_data(cgns_user_data *user_data);
 void cgi_free_subreg(cgns_subreg *subreg);
 

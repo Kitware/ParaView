@@ -17,7 +17,7 @@
  * @brief   Data writer for ParaView
  *
  * vtkXMLPVDWriter is used to save all parts of a current
- * source to a file with pieces spread across ther server processes.
+ * source to a file with pieces spread across other server processes.
 */
 
 #ifndef vtkXMLPVDWriter_h
@@ -34,12 +34,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLPVDWriter : public vtkXMLWriter
 public:
   static vtkXMLPVDWriter* New();
   vtkTypeMacro(vtkXMLPVDWriter, vtkXMLWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Get the default file extension for files written by this writer.
    */
-  virtual const char* GetDefaultFileExtension() VTK_OVERRIDE;
+  const char* GetDefaultFileExtension() override;
 
   //@{
   /**
@@ -67,6 +67,16 @@ public:
   vtkSetMacro(GhostLevel, int);
   //@}
 
+  //@{
+  /**
+   * When WriteAllTimeSteps is turned ON, the writer is executed once for
+   * each timestep available from its input. The default is OFF.
+   */
+  vtkSetMacro(WriteAllTimeSteps, int);
+  vtkGetMacro(WriteAllTimeSteps, int);
+  vtkBooleanMacro(WriteAllTimeSteps, int);
+  //@}
+
   /**
    * Add an input of this algorithm.
    */
@@ -81,20 +91,23 @@ public:
   virtual void SetWriteCollectionFile(int flag);
   //@}
 
-  // See the vtkAlgorithm for a desciption of what these do
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  // See the vtkAlgorithm for a description of what these do
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
   vtkXMLPVDWriter();
-  ~vtkXMLPVDWriter();
+  ~vtkXMLPVDWriter() override;
 
   // see algorithm for more info
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+
+  // add in request update extent to set time step information
+  virtual int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
   // Replace vtkXMLWriter's writing driver method.
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int WriteData() VTK_OVERRIDE;
-  virtual const char* GetDataSetName() VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int WriteData() override;
+  const char* GetDataSetName() override;
 
   // Methods to create the set of writers matching the set of inputs.
   void CreateWriters();
@@ -143,11 +156,17 @@ protected:
   vtkCallbackCommand* ProgressObserver;
 
   // Garbage collection support.
-  virtual void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) override;
+
+  // The current time step for time series inputs.
+  int CurrentTimeIndex;
+
+  // Option to write all time steps (ON) or just the current one (OFF)
+  int WriteAllTimeSteps;
 
 private:
-  vtkXMLPVDWriter(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkXMLPVDWriter&) VTK_DELETE_FUNCTION;
+  vtkXMLPVDWriter(const vtkXMLPVDWriter&) = delete;
+  void operator=(const vtkXMLPVDWriter&) = delete;
 };
 
 #endif

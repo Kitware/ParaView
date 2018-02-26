@@ -40,7 +40,6 @@
 # #-----------------------------------------------------------------------------------
 # include(ParaViewQt)
 # pv_find_package_qt(qt_targets REQUIRED QUIET
-#   QT4_COMPONENTS QtGui
 #   QT5_COMPONENTS Widgets)
 # pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 # pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})

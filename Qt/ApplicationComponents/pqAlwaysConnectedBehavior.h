@@ -50,7 +50,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqAlwaysConnectedBehavior : public QObject
 
 public:
   pqAlwaysConnectedBehavior(QObject* parent = 0);
-  ~pqAlwaysConnectedBehavior();
+  ~pqAlwaysConnectedBehavior() override;
 
   /**
   * Get/Set the default server resource to connect to.

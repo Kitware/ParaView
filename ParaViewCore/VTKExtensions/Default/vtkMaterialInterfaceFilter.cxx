@@ -464,7 +464,7 @@ int vtkMaterialInterfaceEquivalenceSet::ResolveEquivalences()
 }
 
 //============================================================================
-// Helper object to clip hexahedra wih implicit half sphere.
+// Helper object to clip hexahedra with implicit half sphere.
 class vtkMaterialInterfaceFilterHalfSphere
 {
 public:
@@ -1195,7 +1195,7 @@ public:
   // Get the block at this grid index.
   vtkMaterialInterfaceFilterBlock* GetBlock(int xIdx, int yIdx, int zIdx);
 
-  // Decription:
+  // Description:
   // Get the cell dimensions of the blocks (base extent) stored in this level.
   // We assume that all blocks are the same size.
   void GetBlockDimensions(int dims[3]);
@@ -1375,7 +1375,7 @@ vtkMaterialInterfaceFilterBlock* vtkMaterialInterfaceLevel::GetBlock(int xIdx, i
 //----------------------------------------------------------------------------
 // A class to help traverse pointers acrosss block boundaries.
 // I am keeping this class to a minimum because many are kept on the stack
-// durring recursive connect algorithm.
+// during recursive connect algorithm.
 class vtkMaterialInterfaceFilterIterator
 {
 public:
@@ -1505,7 +1505,7 @@ void vtkMaterialInterfaceFilterRingBuffer::Push(vtkMaterialInterfaceFilterIterat
 
   // Move the the next-available-slot pointer to the next space.
   ++this->Next;
-  // End of the linear buffer moves back to the begining.
+  // End of the linear buffer moves back to the beginning.
   // This makes it a ring.
   if (this->Next == this->End)
   {
@@ -1528,7 +1528,7 @@ int vtkMaterialInterfaceFilterRingBuffer::Pop(vtkMaterialInterfaceFilterIterator
   ++this->First;
   --this->Size;
 
-  // End of the linear buffer moves back to the begining.
+  // End of the linear buffer moves back to the beginning.
   // This makes it a ring.
   if (this->First == this->End)
   {
@@ -1857,7 +1857,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
 #endif
 
   // leaving this logic alone rather than moving it into the
-  // this->ClipFunction conditional because I don't know enought of the class to
+  // this->ClipFunction conditional because I don't know enough of the class to
   // know how important the Clip* ivars are ( Robert Maynard, dec 1 2010).
   if (this->ClipWithPlane || this->ClipWithSphere)
   {
@@ -1889,7 +1889,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
   this->NumberOfInputBlocks = this->GetNumberOfLocalBlocks(input);
 
   this->InputBlocks = new vtkMaterialInterfaceFilterBlock*[this->NumberOfInputBlocks];
-  // Initilize to NULL.
+  // Initialize to NULL.
   for (int blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
   {
     this->InputBlocks[blockId] = 0;
@@ -1958,7 +1958,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(vtkNonOverlappingAMR* input,
       }
     }
 
-    // Expand the grid extent by 1 in all directions to accomadate ghost blocks.
+    // Expand the grid extent by 1 in all directions to accommodate ghost blocks.
     // We might have a problem with level 0 here since blockDims is not global yet.
     cumulativeExt[0] = cumulativeExt[0] / this->StandardBlockDimensions[0];
     cumulativeExt[1] = cumulativeExt[1] / this->StandardBlockDimensions[0];
@@ -2292,10 +2292,10 @@ int vtkMaterialInterfaceFilter::HasNeighbor(
         }
       }
       if (bdFlag)
-      { // Neighbor primative direction is on grid boundary.
+      { // Neighbor primitive direction is on grid boundary.
         neighbor = this->Levels[level]->GetBlock(idx[0], idx[1], idx[2]);
         if (neighbor && !neighbor->GetGhostFlag())
-        { // We found one.  Thats all we need.
+        { // We found one.  That's all we need.
           return 1;
         }
       }
@@ -2335,7 +2335,7 @@ int vtkMaterialInterfaceFilter::HasNeighbor(
           {
             neighbor = this->Levels[level]->GetBlock(ix, iy, iz);
             if (neighbor && !neighbor->GetGhostFlag())
-            { // We found one.  Thats all we need.
+            { // We found one.  That's all we need.
               return 1;
             }
           }
@@ -2370,7 +2370,7 @@ int vtkMaterialInterfaceFilter::GetNumberOfLocalBlocks(vtkNonOverlappingAMR* hbd
 // StandardBlockDimensions are the size of blocks without the extra
 // overlap layer put on by spyplot format.
 // RootSpacing is the spacing that blocks in level 0 would have.
-// GlobalOrigin is choosen so that there are no negative extents and
+// GlobalOrigin is chosen so that there are no negative extents and
 // base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAMR* input)
@@ -2404,7 +2404,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
   if (globalBoundsDa == NULL || standardBoxSizeIa == NULL || minLevelIa == NULL ||
     minLevelSpacingDa == NULL)
   {
-    // Need to figure out those informations
+    // Need to figure out this information
     int nbProcs = this->Controller->GetNumberOfProcesses();
 
     // - GlobalOrigin
@@ -2469,7 +2469,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
         // Block size
         localValue = receivedBlockSize[3 * j + i];
         globalValue = (globalValue == -1 || globalValue == localValue) ? localValue : globalValue;
-        assert("Block size must be the same accross all processes" && globalValue == localValue);
+        assert("Block size must be the same across all processes" && globalValue == localValue);
       }
 
       // Update block dimension
@@ -2514,7 +2514,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
   // TODO why is globalBounds insufficient for the globalOrigin??
   // in the examples I have looked at they come out to be the same.
   // TODO do we have a case specific where they differ??
-  // TODO why lowestOrigin is necessarilly from the block closest to
+  // TODO why lowestOrigin is necessarily from the block closest to
   // the data set origin?? We just grab the first non empty block but does that
   // guarantee closest to ds origin?? I don't think so.
 }
@@ -2525,7 +2525,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(vtkNonOverlappingAM
 // StandardBlockDimensions are the size of blocks without the extra
 // overlap layer put on by spyplot format.
 // RootSpacing is the spacing that blocks in level 0 would have.
-// GlobalOrigin is choosen so that there are no negative extents and
+// GlobalOrigin is chosen so that there are no negative extents and
 // base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlappingAMR* input)
@@ -2537,7 +2537,7 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(vtkNonOverlapping
 
   // This is a big pain.
   // We have to look through all blocks to get a minimum root origin.
-  // The origin must be choosen so there are no negative indexes.
+  // The origin must be chosen so there are no negative indexes.
   // Negative indexes would require the use floor or ceiling function instead
   // of simple truncation.
   //  The origin must also lie on the root grid.
@@ -4143,7 +4143,7 @@ int vtkMaterialInterfaceFilter::ComputeDisplacementFactors(
   g[1] = -t000 - t001 + t010 + t011 - t100 - t101 + t110 + t111;
   g[0] = -t000 + t001 - t010 + t011 - t100 + t101 - t110 + t111;
   // This is unusual but it can happen with a checkerboard pattern.
-  // We should break the symetry and choose a direction ...
+  // We should break the symmetry and choose a direction ...
   // The masking should take care of this, so this case should never occur.
   // It does occur at boundaries when all voxels (even padded ones)
   // are high.
@@ -5046,7 +5046,7 @@ void vtkMaterialInterfaceFilter::FindNeighbor(int faceIdx[3], int faceLevel,
 
   // I had trouble traversing into ghost blocks that were
   // not connected to the block I wanted.
-  // I am going to define a proximity measure that is independant of
+  // I am going to define a proximity measure that is independent of
   // level.
   refDist = this->ComputeProximity(faceIdx, faceLevel, refExt, refLevel);
 
@@ -5179,9 +5179,9 @@ void vtkMaterialInterfaceFilter::FindNeighbor(int faceIdx[3], int faceLevel,
 long vtkMaterialInterfaceFilter::ComputeProximity(
   const int faceIdx[3], int faceLevel, const int ext[6], int refLevel)
 {
-  // We need a distance that is independant of level.
+  // We need a distance that is independent of level.
   // All neighbors should be no more than one level away from the faces level.
-  // Lets use 2 above for a saftey margin.
+  // Lets use 2 above for a safety margin.
   long distance = 0;
   long min;
   long max;
@@ -5490,7 +5490,7 @@ void vtkMaterialInterfaceFilter::ConnectFragment(vtkMaterialInterfaceFilterRingB
     // the adds occur in so many places.
     if (iterator.Block->GetGhostFlag() == 0)
     {
-      // accumlate fragment volume
+      // accumulate fragment volume
       const double* dX = iterator.Block->GetSpacing();
 #ifdef USE_VOXEL_VOLUME
       double voxelVolumeFrac = dX[0] * dX[1] * dX[2];
@@ -6523,7 +6523,7 @@ void vtkMaterialInterfaceFilter::CleanLocalFragmentGeometry()
 
 //----------------------------------------------------------------------------
 // Identify fragments who are split across processes. These are always
-// generated and coppied to the output. We also may compute various
+// generated and copied to the output. We also may compute various
 // other geometric attributes here. For fragments whose geometry is
 // split across processes, localize points and compute geometric
 // attributes. eg OBB, AABB center.
@@ -6559,14 +6559,14 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
   int nLocal = static_cast<int>(resolvedFragmentIds.size());
 
   // Start by assuming that all fragment pieces
-  // are local(these are not peices but entire fragments).
+  // are local(these are not pieces but entire fragments).
   // If we are are running client-server later we search
   // for split fragments and mark them.For any remaining
   // un-marked fragments we can compute geometric attributes
   // directly.
   vector<int>& fragmentSplitMarker = this->FragmentSplitMarker[this->MaterialId];
   // intilize to (bool)0 not split. All local ops
-  // on fragments check here. It's coppied to geometry.
+  // on fragments check here. It's copied to geometry.
   fragmentSplitMarker.resize(nLocal, 0);
   //
   if (myProcId == controllingProcId)
@@ -6575,7 +6575,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       this->FragmentSplitGeometry, 1, this->NumberOfResolvedFragments, "SplitGeometry");
     // initialize to 1 (i.e. not split). This holds n-way
     // splitting data, only available on controller. It's
-    // coppied tothe stats output.
+    // copied to the stats output.
     this->FragmentSplitGeometry->FillComponent(0, 1);
   }
 
@@ -6607,7 +6607,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
     vtkMaterialInterfacePieceTransactionMatrix TM;
     TM.Initialize(this->NumberOfResolvedFragments, nProcs);
 
-    // controler receives loading information and
+    // controller receives loading information and
     // builds the transaction matrix.
     if (myProcId == controllingProcId)
     {
@@ -6689,7 +6689,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       cerr << endl;
 #endif
 
-      // Decide who needs to move and build coresponding
+      // Decide who needs to move and build corresponding
       // transaction matrix. Along the way store the geometry
       // split info (this eliminates some communication later).
       int* fragmentSplitGeometry = this->FragmentSplitGeometry->GetPointer(0);
@@ -6838,7 +6838,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
             this->Controller->Send(
               buffer.GetBuffer(), buffer.GetBufferSize(), ta.GetRemoteProc(), 2 * fragmentId);
 
-            // Recieve the remotely computed attributes
+            // Receive the remotely computed attributes
             this->Controller->Receive(
               attributeCommBuffer, nAttributeComps, ta.GetRemoteProc(), 3 * fragmentId);
             // save results
@@ -6881,7 +6881,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
               // pertaining to a single block(material)
               vtkMaterialInterfaceCommBuffer buffer;
               buffer.SizeHeader(1);
-              // recieve buffer's header
+              // receive buffer's header
               this->Controller->Receive(
                 buffer.GetHeader(), buffer.GetHeaderSize(), ta.GetRemoteProc(), fragmentId);
               // size buffer via incoming header
@@ -7098,10 +7098,10 @@ void vtkMaterialInterfaceFilter::BuildLoadingArray(vector<vtkIdType>& loadingArr
 }
 
 //----------------------------------------------------------------------------
-// Load a buffer containg the number of polys for each fragment
+// Load a buffer containing the number of polys for each fragment
 // or fragment piece that we own. Return the size in vtkIdType's
 // of the packed buffer and the buffer itself. Pass in a
-// pointer intialized to null, allocation is internal.
+// pointer initialized to null, allocation is internal.
 int vtkMaterialInterfaceFilter::PackLoadingArray(vtkIdType*& buffer)
 {
   assert("Buffer appears to have been pre-allocated." && buffer == 0);
@@ -7131,7 +7131,7 @@ int vtkMaterialInterfaceFilter::PackLoadingArray(vtkIdType*& buffer)
 
 //----------------------------------------------------------------------------
 // Given a fragment loading array that has been packed into an int array
-// unpack. The packed loading arrays are orderd locally while the unpacked
+// unpack. The packed loading arrays are ordered locally while the unpacked
 // are ordered gloabbly by fragment id. NOTE if memory is an issue you
 // could leave these locally indexed and search, rather than look up.
 //
@@ -7180,7 +7180,7 @@ int vtkMaterialInterfaceFilter::CollectGeometricAttributes(
   }
 
   // size buffer's header's in preparation for
-  // recieve. There's a buffer for each proc and
+  // receive. There's a buffer for each proc and
   // we're working with a single block(material) at a time.
   vtkMaterialInterfaceCommBuffer::SizeHeader(buffers, 1);
 
@@ -7197,7 +7197,7 @@ int vtkMaterialInterfaceFilter::CollectGeometricAttributes(
     this->Controller->Receive(
       buffers[procId].GetHeader(), buffers[procId].GetHeaderSize(), procId, thisMsgId);
     ++thisMsgId;
-    // size buffer to hold incomming attributes
+    // size buffer to hold incoming attributes
     buffers[procId].SizeBuffer();
     // receive attribute's data
     this->Controller->Receive(
@@ -7459,7 +7459,7 @@ int vtkMaterialInterfaceFilter::GatherGeometricAttributes(const int recipientPro
 // initialized with empty arrays.
 //
 // Buffers are allocated. when unpacked the attribute arrays
-// are not coppied from the buffer rather they point to
+// are not copied from the buffer rather they point to
 // the appropriate location in the buffer. The buffers should
 // be deleted by caller after arrays are not needed.
 //
@@ -7487,7 +7487,7 @@ int vtkMaterialInterfaceFilter::CollectIntegratedAttributes(
       continue;
     }
     int thisMsgId = msgBase;
-    // recieve buffer's header
+    // receive buffer's header
     this->Controller->Receive(
       buffers[procId].GetHeader(), buffers[procId].GetHeaderSize(), procId, thisMsgId);
     ++thisMsgId;
@@ -7549,7 +7549,7 @@ int vtkMaterialInterfaceFilter::ReceiveIntegratedAttributes(const int sourceProc
   buffer.SizeHeader(1);
 
   int thisMsgId = msgBase;
-  // recieve buffer's header
+  // receive buffer's header
   this->Controller->Receive(buffer.GetHeader(), buffer.GetHeaderSize(), sourceProcId, thisMsgId);
   ++thisMsgId;
   // size buffer via on incoming header
@@ -7720,7 +7720,7 @@ int vtkMaterialInterfaceFilter::BroadcastIntegratedAttributes(const int sourcePr
       this->SendIntegratedAttributes(procId);
     }
   }
-  // recieve from source
+  // receive from source
   else
   {
     this->ReceiveIntegratedAttributes(sourceProcId);
@@ -8460,7 +8460,7 @@ void vtkMaterialInterfaceFilter::ShareGhostEquivalences(
       sendMsg[0] = myProcId;
       sendMsg[1] = -1;
       this->Controller->Send(sendMsg, 8, otherProc, 722265);
-    } // End if we shoud send or receive.
+    } // End if we should send or receive.
   }   // End loop over all processes.
 }
 
@@ -9566,7 +9566,7 @@ int vtkMaterialInterfaceFilter::WriteGeometryOutputToTextFile()
 
 //----------------------------------------------------------------------------
 // Write the fragment attribute attached ot the statistics output
-// to a text file. This is roughly a csv format except that collumn headers
+// to a text file. This is roughly a csv format except that column headers
 // are written one per line follwed by the number of components per tuple.
 int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
 {
@@ -9671,7 +9671,7 @@ int vtkMaterialInterfaceFilter::WriteStatisticsOutputToTextFile()
 //============================================================================
 // Implementation of the object that computes the fraction of a box clipped
 // by a half sphere implicit funtcion.
-// The algorithm is to use a case table to contruct the clipped polyhedra.
+// The algorithm is to use a case table to construct the clipped polyhedra.
 // The case table is similar to marching cubes, but the result is a list
 // of triangles for the closed polyhedra.  We then use the projected areas
 // to compute the volume of the polyhedra (similar to mass properties filter).
@@ -9705,571 +9705,7 @@ struct vtkHexClipCase
 // Order of triangle points: Right hand rule points in.
 // We skipped triangels that do not contribute to the area calculation:
 // Side faces that project to a line on a z plane. Triangles on the base (dZ = 0).
-static vtkHexClipCase VTK_HEX_CLIP_TRICASES[] = {
-  { { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1 } },
-  { { 8, 4, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 1, 5, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 4, 0, 1, 5, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 9, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 9, 2, 0, 8, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 8, 1, 9, 2, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 9, 2, 5, 2, 1, 1, 2, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 5, 3, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 4, 0, 5, 3, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 3, 9, 8, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 9, 4, 0, 9, 0, 3, 3, 0, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 5, 3, 2, 4, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 5, 3, 8, 3, 0, 0, 3, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 8, 1, 4, 1, 2, 2, 1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 3, 0, 3, 2, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 0, 6, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 8, 4, 6, 10, 4, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 1, 5, 0, 6, 10, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 1, 5, 10, 5, 6, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 6, 10, 4, 9, 2, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 2, 6, 10, 2, 10, 9, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 5, 8, 0, 6, 10, 9, 2, 4, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 10, 2, 6, 1, 2, 10, 1, 9, 2, 1, 5, 9, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 5, 3, 9, 0, 6, 10, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 6, 10, 4, 10, 8, 5, 3, 9, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 3, 9, 1, 9, 8, 0, 6, 10, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 9, 1, 3, 9, 6, 1, 9, 4, 6, 6, 10, 1, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 5, 3, 4, 3, 2, 6, 10, 0, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 5, 3, 2, 5, 2, 10, 5, 10, 8, 6, 10, 2, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 10, 0, 6, 1, 2, 8, 1, 3, 2, 2, 4, 8, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 10, 2, 6, 10, 1, 2, 1, 3, 2, 24, 10, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 10, 7, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 10, 7, 8, 4, 0, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 10, 7, 5, 8, 7, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 10, 7, 0, 7, 4, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 10, 7, 9, 2, 4, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 9, 2, 8, 2, 0, 10, 7, 1, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 10, 7, 8, 7, 5, 9, 2, 4, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 9, 7, 5, 9, 0, 7, 9, 2, 0, 10, 7, 0, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 5, 3, 9, 1, 10, 7, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 0, 8, 5, 3, 9, 10, 7, 1, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 3, 9, 7, 9, 10, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 9, 7, 3, 4, 7, 9, 4, 10, 7, 4, 0, 10, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 2, 4, 3, 4, 5, 1, 10, 7, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 10, 7, 1, 8, 5, 0, 0, 5, 3, 0, 3, 2, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 8, 10, 7, 2, 8, 7, 3, 2, 2, 4, 8, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 0, 10, 7, 3, 0, 3, 2, 0, 25, 7, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 0, 6, 7, 1, 6, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 8, 4, 1, 4, 7, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 0, 6, 8, 6, 5, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 6, 7, 1, 6, 1, 0, 4, 9, 2, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 6, 7, 1, 9, 6, 1, 8, 9, 9, 2, 6, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 9, 2, 4, 8, 0, 5, 5, 0, 6, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 2, 5, 9, 2, 6, 5, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 0, 6, 1, 6, 7, 3, 9, 5, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 9, 5, 1, 8, 7, 7, 8, 4, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 0, 9, 8, 0, 7, 9, 0, 6, 7, 3, 9, 7, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 9, 7, 3, 9, 4, 7, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 0, 7, 0, 6, 7, 3, 4, 5, 3, 2, 4, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 8, 6, 7, 1, 8, 6, 8, 2, 5, 3, 8, 2, 8, 3, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1 } },
-  { { 2, 8, 3, 2, 4, 8, 3, 8, 7, 0, 6, 8, 7, 8, 6, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1 } },
-  { { 2, 7, 3, 6, 7, 2, 24, 25, 6, 7, 6, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 6, 2, 11, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 0, 8, 2, 11, 6, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 1, 5, 2, 11, 6, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 1, 5, 0, 5, 4, 2, 11, 6, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 6, 4, 9, 11, 6, 9, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 6, 0, 8, 6, 8, 11, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 9, 11, 6, 9, 6, 4, 8, 1, 5, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 5, 9, 11, 5, 11, 0, 5, 0, 1, 0, 11, 6, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 9, 5, 11, 6, 2, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 3, 9, 4, 0, 8, 11, 6, 2, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 9, 8, 1, 9, 1, 3, 11, 6, 2, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 11, 6, 2, 9, 4, 3, 3, 4, 0, 3, 0, 1, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 11, 6, 3, 6, 5, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 3, 11, 6, 5, 3, 6, 5, 6, 0, 5, 0, 8, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 6, 4, 8, 3, 6, 8, 1, 3, 11, 6, 3, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 6, 3, 11, 6, 0, 3, 0, 1, 3, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 11, 10, 0, 2, 11, 0, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 2, 11, 4, 11, 8, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 2, 11, 0, 11, 10, 1, 5, 8, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 11, 10, 1, 4, 11, 1, 5, 4, 2, 11, 4, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 4, 9, 0, 9, 10, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1 } },
-  { { 5, 8, 1, 9, 10, 4, 10, 0, 4, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 10, 1, 5, 9, 10, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 11, 10, 0, 11, 0, 2, 9, 5, 3, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 3, 9, 4, 2, 8, 8, 2, 11, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 0, 2, 10, 2, 11, 8, 1, 9, 9, 1, 3, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 4, 1, 3, 9, 4, 1, 4, 10, 2, 11, 4, 10, 4, 11, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1 } },
-  { { 0, 4, 5, 0, 5, 11, 0, 11, 10, 11, 5, 3, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 3, 8, 5, 3, 11, 8, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 4, 11, 10, 0, 4, 11, 4, 3, 8, 1, 4, 3, 4, 1, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1 } },
-  { { 3, 10, 1, 11, 10, 3, 24, 10, 26, 11, 26, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 7, 1, 6, 2, 11, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 4, 0, 10, 7, 1, 2, 11, 6, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 5, 8, 7, 8, 10, 6, 2, 11, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 2, 11, 6, 0, 10, 4, 4, 10, 7, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 6, 4, 9, 6, 9, 11, 7, 1, 10, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 10, 7, 8, 11, 0, 11, 6, 0, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 9, 11, 4, 11, 6, 5, 8, 7, 7, 8, 10, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 11, 0, 9, 11, 6, 0, 9, 0, 5, 10, 7, 0, 5, 0, 7, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1 } },
-  { { 1, 10, 7, 3, 9, 5, 6, 2, 11, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 11, 6, 2, 5, 3, 9, 8, 4, 0, 10, 7, 1, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 6, 2, 11, 7, 3, 10, 10, 3, 9, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 0, 10, 4, 10, 7, 4, 7, 9, 3, 9, 7, 2, 11, 6, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1 } },
-  { { 1, 10, 7, 3, 11, 5, 5, 11, 6, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 3, 11, 5, 11, 6, 5, 6, 8, 0, 8, 6, 1, 10, 7, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1 } },
-  { { 10, 3, 8, 10, 7, 3, 8, 3, 4, 11, 6, 3, 4, 3, 6, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1 } },
-  { { 6, 3, 11, 6, 0, 3, 7, 3, 10, 10, 3, 0, 25, 7, 10, 26, 6, 11, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 11, 7, 1, 11, 1, 2, 2, 1, 0, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 2, 11, 8, 4, 11, 8, 11, 7, 8, 7, 1, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1 } },
-  { { 8, 0, 2, 8, 2, 7, 8, 7, 5, 7, 2, 11, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1 } },
-  { { 11, 4, 2, 11, 7, 4, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 7, 1, 0, 7, 0, 9, 7, 9, 11, 4, 9, 0, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1 } },
-  { { 1, 11, 7, 1, 8, 11, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 0, 7, 5, 8, 0, 7, 0, 11, 4, 9, 0, 11, 0, 9, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1 } },
-  { { 5, 11, 7, 9, 11, 5, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 3, 9, 1, 2, 7, 1, 0, 2, 2, 11, 7, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1 } },
-  { { 8, 4, 2, 8, 2, 11, 8, 11, 1, 7, 1, 11, 5, 3, 9, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1 } },
-  { { 2, 7, 0, 2, 11, 7, 0, 7, 8, 3, 9, 7, 8, 7, 9, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1 } },
-  { { 11, 4, 2, 11, 7, 4, 9, 4, 3, 3, 4, 7, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1 } },
-  { { 5, 11, 4, 5, 3, 11, 4, 11, 0, 7, 1, 11, 0, 11, 1, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1 } },
-  { { 3, 8, 5, 3, 11, 8, 1, 8, 7, 7, 8, 11, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1 } },
-  { { 8, 0, 4, 7, 3, 11, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 3, 11, 7, 24, 25, 7, 24, 7, 11, 24, 11, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 3, 7, 11, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 4, 0, 7, 11, 3, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 5, 8, 7, 11, 3, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 4, 0, 5, 0, 1, 7, 11, 3, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 9, 2, 4, 3, 7, 11, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 2, 0, 8, 2, 8, 9, 3, 7, 11, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 1, 5, 9, 2, 4, 7, 11, 3, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 11, 3, 5, 9, 1, 1, 9, 2, 1, 2, 0, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 5, 7, 11, 9, 5, 11, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 7, 11, 5, 11, 9, 4, 0, 8, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 7, 11, 1, 11, 8, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 7, 0, 1, 7, 9, 0, 7, 11, 9, 4, 0, 9, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 11, 2, 4, 11, 4, 7, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 2, 0, 8, 7, 2, 8, 5, 7, 7, 11, 2, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 11, 2, 8, 11, 4, 8, 7, 11, 8, 1, 7, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 11, 1, 7, 11, 2, 1, 2, 0, 1, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 7, 11, 3, 10, 0, 6, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 8, 4, 10, 4, 6, 11, 3, 7, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 8, 1, 7, 11, 3, 0, 6, 10, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 7, 11, 5, 6, 1, 6, 10, 1, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 9, 2, 6, 10, 0, 3, 7, 11, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 11, 3, 10, 9, 6, 9, 2, 6, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 1, 5, 10, 0, 6, 9, 2, 4, 7, 11, 3, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 5, 9, 1, 9, 2, 1, 2, 10, 6, 10, 2, 7, 11, 3, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1 } },
-  { { 11, 9, 5, 11, 5, 7, 10, 0, 6, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 7, 9, 7, 11, 9, 4, 10, 8, 4, 6, 10, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 0, 6, 10, 1, 7, 8, 8, 7, 11, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 6, 1, 4, 6, 10, 1, 4, 1, 9, 7, 11, 1, 9, 1, 11, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1 } },
-  { { 0, 6, 10, 4, 7, 2, 7, 11, 2, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 2, 5, 7, 11, 2, 5, 2, 8, 6, 10, 2, 8, 2, 10, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1 } },
-  { { 8, 1, 7, 8, 7, 11, 8, 11, 4, 2, 4, 11, 0, 6, 10, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1 } },
-  { { 11, 1, 7, 11, 2, 1, 10, 1, 6, 6, 1, 2, 24, 10, 6, 27, 11, 7, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 1, 10, 11, 3, 10, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 11, 3, 10, 3, 1, 8, 4, 0, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 3, 5, 8, 3, 8, 11, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 5, 4, 0, 11, 5, 0, 10, 11, 11, 3, 5, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 3, 1, 10, 3, 10, 11, 2, 4, 9, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 9, 0, 9, 2, 0, 10, 3, 1, 10, 11, 3, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 9, 2, 8, 11, 5, 11, 3, 5, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 11, 5, 10, 11, 3, 5, 10, 5, 0, 9, 2, 5, 0, 5, 2, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1 } },
-  { { 5, 1, 10, 5, 10, 9, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 0, 8, 5, 1, 9, 9, 1, 10, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1 } },
-  { { 0, 9, 4, 0, 10, 9, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 10, 11, 1, 11, 4, 1, 4, 5, 2, 4, 11, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 5, 2, 0, 8, 5, 2, 5, 11, 1, 10, 5, 11, 5, 10, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1 } },
-  { { 4, 11, 2, 4, 8, 11, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 11, 0, 10, 2, 0, 11, 25, 27, 10, 11, 10, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 6, 11, 3, 6, 3, 0, 0, 3, 1, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 4, 6, 8, 6, 3, 8, 3, 1, 11, 3, 6, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1 } },
-  { { 3, 6, 11, 5, 6, 3, 5, 0, 6, 5, 8, 0, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1 } },
-  { { 3, 6, 11, 3, 5, 6, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 9, 2, 4, 3, 0, 11, 3, 1, 0, 0, 6, 11, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1 } },
-  { { 9, 6, 8, 9, 2, 6, 8, 6, 1, 11, 3, 6, 1, 6, 3, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1 } },
-  { { 5, 8, 0, 5, 0, 6, 5, 6, 3, 11, 3, 6, 9, 2, 4, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1 } },
-  { { 2, 5, 9, 2, 6, 5, 3, 5, 11, 11, 5, 6, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1 } },
-  { { 5, 11, 9, 5, 0, 11, 5, 1, 0, 0, 6, 11, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1 } },
-  { { 9, 1, 11, 9, 5, 1, 11, 1, 6, 8, 4, 1, 6, 1, 4, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1 } },
-  { { 6, 8, 0, 6, 11, 8, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 6, 9, 4, 11, 9, 6, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 11, 1, 0, 6, 11, 1, 11, 5, 2, 4, 11, 5, 11, 4, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1 } },
-  { { 8, 5, 1, 2, 6, 11, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 6, 8, 0, 6, 11, 8, 4, 8, 2, 2, 8, 11, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1 } },
-  { { 6, 11, 2, 24, 25, 6, 25, 11, 6, 25, 27, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 2, 3, 7, 6, 2, 7, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 2, 3, 7, 2, 7, 6, 0, 8, 4, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 6, 2, 7, 2, 3, 5, 8, 1, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 3, 7, 6, 3, 6, 2, 1, 5, 0, 0, 5, 4, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 9, 3, 7, 9, 7, 4, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 0, 8, 9, 0, 9, 7, 0, 7, 6, 3, 7, 9, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 5, 8, 7, 4, 3, 4, 9, 3, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 9, 0, 1, 5, 9, 0, 9, 6, 3, 7, 9, 6, 9, 7, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1 } },
-  { { 2, 9, 5, 2, 5, 6, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 4, 0, 5, 6, 9, 6, 2, 9, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 7, 6, 1, 6, 9, 1, 9, 8, 9, 6, 2, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 6, 9, 7, 6, 2, 9, 7, 9, 1, 4, 0, 9, 1, 9, 0, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1 } },
-  { { 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 6, 0, 8, 5, 6, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 4, 8, 1, 7, 4, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 6, 0, 7, 6, 1, 27, 26, 7, 6, 7, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 10, 0, 7, 0, 3, 3, 0, 2, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 7, 10, 8, 7, 8, 2, 7, 2, 3, 2, 8, 4, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1 } },
-  { { 8, 1, 5, 0, 3, 10, 0, 2, 3, 3, 7, 10, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1 } },
-  { { 3, 10, 2, 3, 7, 10, 2, 10, 4, 1, 5, 10, 4, 10, 5, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1 } },
-  { { 9, 3, 7, 4, 9, 7, 4, 7, 10, 4, 10, 0, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1 } },
-  { { 7, 9, 3, 7, 10, 9, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 9, 3, 4, 3, 7, 4, 7, 0, 10, 0, 7, 8, 1, 5, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1 } },
-  { { 7, 9, 3, 7, 10, 9, 5, 9, 1, 1, 9, 10, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1 } },
-  { { 9, 5, 7, 9, 7, 0, 9, 0, 2, 10, 0, 7, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1 } },
-  { { 8, 2, 10, 8, 4, 2, 10, 2, 7, 9, 5, 2, 7, 2, 5, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1 } },
-  { { 8, 7, 9, 8, 1, 7, 9, 7, 2, 10, 0, 7, 2, 7, 0, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1 } },
-  { { 1, 7, 10, 9, 4, 2, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 7, 10, 0, 4, 7, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 7, 10, 5, 7, 8, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 0, 7, 10, 0, 4, 7, 1, 7, 8, 8, 7, 4, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1 } },
-  { { 1, 7, 10, 24, 10, 26, 10, 7, 26, 7, 27, 26, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 6, 2, 10, 2, 1, 1, 2, 3, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 4, 0, 10, 6, 1, 1, 6, 2, 1, 2, 3, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1 } },
-  { { 5, 2, 3, 5, 10, 2, 5, 8, 10, 6, 2, 10, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1 } },
-  { { 4, 10, 5, 4, 0, 10, 5, 10, 3, 6, 2, 10, 3, 10, 2, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1 } },
-  { { 9, 3, 1, 9, 1, 6, 9, 6, 4, 6, 1, 10, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1 } },
-  { { 1, 6, 3, 1, 10, 6, 3, 6, 9, 0, 8, 6, 9, 6, 8, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1 } },
-  { { 4, 3, 6, 4, 9, 3, 6, 3, 10, 5, 8, 3, 10, 3, 8, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1 } },
-  { { 5, 9, 3, 0, 10, 6, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 6, 2, 1, 10, 2, 1, 2, 9, 1, 9, 5, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1 } },
-  { { 1, 10, 6, 1, 6, 2, 1, 2, 5, 9, 5, 2, 8, 4, 0, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1 } },
-  { { 2, 10, 6, 2, 9, 10, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 2, 10, 6, 2, 9, 10, 0, 10, 4, 4, 10, 9, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1 } },
-  { { 10, 5, 1, 10, 6, 5, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 5, 1, 10, 6, 5, 8, 5, 0, 0, 5, 6, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1 } },
-  { { 10, 4, 8, 6, 4, 10, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 10, 6, 0, 10, 25, 27, 10, 27, 6, 27, 26, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 1, 0, 3, 3, 0, 2, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 1, 8, 4, 2, 1, 2, 3, 1, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 3, 5, 8, 0, 3, 0, 2, 3, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 3, 5, 2, 3, 4, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 9, 0, 4, 9, 3, 0, 3, 1, 0, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 1, 9, 3, 8, 9, 1, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 9, 0, 4, 9, 3, 0, 8, 0, 5, 5, 0, 3, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 5, 9, 3, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 2, 9, 5, 1, 2, 1, 0, 2, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 4, 1, 8, 4, 2, 1, 5, 1, 9, 9, 1, 2, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1 } },
-  { { 8, 2, 9, 0, 2, 8, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 4, 2, 9, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 5, 0, 4, 1, 0, 5, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 5, 1, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 8, 0, 4, 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1 } },
-  { { 24, 25, 26, 27, 26, 25, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1 } }
-};
-
-#if 0
-// TODO: Improve this to skip the faces perpendicular to the z plane, or are on the z-plane base.
-// This was used to create the table above.
-// Point is in the cube [0,1][0,1][0,1],  Each point will be in {0, 0.5, or 1}
-int vtkMaterialInterfaceFilterHalfSphere::ConvertCasePointToIndex(double point[3], int pointCode[3])
-{
-  // First convert x,y,z to index min, mid, max.
-  pointCode[0] = (int)(point[0]*2.0 + 0.5);
-  pointCode[1] = (int)(point[1]*2.0 + 0.5);
-  pointCode[2] = (int)(point[2]*2.0 + 0.5);
-  if (pointCode[2]  == 1)
-    { // z edge
-    if (pointCode[0] == 1 || pointCode[1] == 1)
-      {
-      vtkGenericWarningMacro("Bad edge point.");
-      }
-    return pointCode[0]/2 + pointCode[1];
-    }
-  if (pointCode[1]  == 1)
-    { // y edge
-    if (pointCode[0] == 1 || pointCode[2] == 1)
-      {
-      vtkGenericWarningMacro("Bad edge point.");
-      }
-    return 4 + pointCode[0]/2 + pointCode[2];
-    }
-  if (pointCode[0]  == 1)
-    { // x edge
-    if (pointCode[1] == 1 || pointCode[2] == 1)
-      {
-      vtkGenericWarningMacro("Bad edge point.");
-      }
-    return 8 + pointCode[1]/2 + pointCode[2];
-    }
-  // The remaining possiblities are just he corners.  Offset the indexes by 20.
-  return 20 + pointCode[0]/2 + pointCode[1] + pointCode[2]*2;
-}
-// This was used to create the table above.
-void vtkMaterialInterfaceFilterHalfSphere::GenerateClippedVoxelCaseTable()
-{
-  FILE* fp = fopen("C:/Law/tmp/cases.txt", "w");
-  // Create a grid with a single voxel in it.
-  vtkUnstructuredGrid* grid = vtkUnstructuredGrid::New();
-  vtkPoints* points = vtkPoints::New();
-  points->InsertNextPoint(0,0,0);
-  points->InsertNextPoint(1,0,0);
-  points->InsertNextPoint(0,1,0);
-  points->InsertNextPoint(1,1,0);
-  points->InsertNextPoint(0,0,1);
-  points->InsertNextPoint(1,0,1);
-  points->InsertNextPoint(0,1,1);
-  points->InsertNextPoint(1,1,1);
-  grid->SetPoints(points);
-  points->Delete();
-  vtkIdType ptIds[8] = {0,1,2,3,4,5,6,7};
-  grid->InsertNextCell(VTK_VOXEL, 8, ptIds);
-  // Setup scalars to match the case.
-  vtkFloatArray* scalars = vtkFloatArray::New();
-  scalars->InsertNextTuple1(0.0);
-  scalars->InsertNextTuple1(0.0);
-  scalars->InsertNextTuple1(0.0);
-  scalars->InsertNextTuple1(1.0);
-  scalars->InsertNextTuple1(1.0);
-  scalars->InsertNextTuple1(1.0);
-  scalars->InsertNextTuple1(0.0);
-  scalars->InsertNextTuple1(1.0);
-  grid->GetPointData()->SetScalars(scalars);
-  scalars->Delete();
-
-  vtkContourFilter* contour = vtkContourFilter::New();
-  contour->SetInput(grid);
-  contour->SetValue(0,0.5);
-
-  vtkDataSetSurfaceFilter* surface = vtkDataSetSurfaceFilter::New();
-  surface->SetInput(grid);
-
-  vtkClipPolyData* clip = vtkClipPolyData::New();
-  clip->SetInput(surface->GetOutput());
-  clip->SetValue(0.5);
-
-  vtkTriangleFilter* tf = vtkTriangleFilter::New();
-  tf->SetInput(clip->GetOutput());
-
-  vtkAppendPolyData* append = vtkAppendPolyData::New();
-  append->AddInput(contour->GetOutput());
-  append->AddInput(tf->GetOutput());
-
-  int maxNumTris = 0;
-  for (int i = 0; i < 256; ++i)
-    {
-    for (int j = 0; j < 8; ++j)
-      {
-      double value = 0.0;
-      if ((i >> j) & 1)
-        {
-        scalars->SetTuple1(j, 1.0);
-        }
-      else
-        {
-        scalars->SetTuple1(j, 0.0);
-        }
-      }
-    grid->Modified();
-
-    // Save the surface to view in paraview.
-    vtkXMLPolyDataWriter* writer = vtkXMLPolyDataWriter::New();
-    writer->SetInput(append->GetOutput());
-    writer->SetFileName("C:/Law/tmp/case.vtp");
-    writer->Write();
-    writer->Delete();
-
-    append->Update();
-    // Now print out the triangles.
-    points = append->GetOutput()->GetPoints();
-    vtkCellArray* triangles = append->GetOutput()->GetPolys();
-
-    vtkIdType  numCells = triangles->GetNumberOfCells();
-    vtkIdType* cellPointer;
-    vtkIdType  cellId;
-    double*    point;
-    int        caseTriangles[61];
-    int*       caseTrianglePointer = caseTriangles;
-
-    //if (numCells > 20)
-    //  {
-    //  vtkGenericWarningMacro("Too many triangels in case.");
-    //  return;
-    //  }
-    //cerr << numCells << endl;
-    // We are going to skip triangles that do not contribute to the volume.
-    int triCount = 0;
-    cellPointer = triangles->GetPointer();
-    for (cellId = 0; cellId < numCells; ++cellId)
-      {
-      if (*cellPointer++ != 3)
-        {
-        vtkGenericWarningMacro("Expecting triangles.");
-        }
-      int pointCode1[3];
-      int pointCode2[3];
-      int pointCode3[3];
-      double* point1 = points->GetPoint(*cellPointer++);
-      int ptId1 = this->ConvertCasePointToIndex(point1,pointCode1);
-      double* point2 = points->GetPoint(*cellPointer++);
-      int ptId2 = this->ConvertCasePointToIndex(point2,pointCode2);
-      double* point3 = points->GetPoint(*cellPointer++);
-      int ptId3 = this->ConvertCasePointToIndex(point3,pointCode3);
-
-      // Skip points on the base z plane.
-      // If we stored the reference plane in the table we could
-      // use the top plane when it was advantageous.
-      if (pointCode1[2] > 0 || pointCode2[2] > 0 || pointCode3[2] > 0)
-        {
-        // Side faces project to a line (no area). Skip them.
-        if (pointCode1[0] != pointCode2[0] || pointCode1[0] != pointCode3[0])
-          {
-          if (pointCode1[1] != pointCode2[1] || pointCode1[1] != pointCode3[1])
-            {
-            ++triCount;
-            *caseTrianglePointer++ = ptId1;
-            *caseTrianglePointer++ = ptId2;
-            *caseTrianglePointer++ = ptId3;
-            }
-          }
-        }
-      }
-    if (triCount > maxNumTris)
-      { // We got a maximum of 8 trianges.
-      maxNumTris = triCount;
-      }
-
-    // Fill the rest of the array with -1.
-    for (cellId = triCount; cellId < 8; ++cellId)
-      {
-      *caseTrianglePointer++ = -1;
-      *caseTrianglePointer++ = -1;
-      *caseTrianglePointer++ = -1;
-      }
-    // All cases have a terminating -1
-    *caseTrianglePointer = -1;
-
-    caseTrianglePointer = caseTriangles;
-    fprintf(fp, "{{");
-    for (int k = 0; k < 8*3; ++k)
-      {
-      fprintf(fp, "%d,", caseTriangles[k]);
-      }
-    fprintf(fp, "-1}},\n");
-    }
-  fclose(fp);
-  surface->Delete();
-  clip->Delete();
-  grid->Delete();
-  contour->Delete();
-}
-#endif
+#include "vtkMaterialInterfaceFilterCases.cxx"
 
 //----------------------------------------------------------------------------
 double vtkMaterialInterfaceFilterHalfSphere::ComputeTriangleProjectionArea(
@@ -10297,7 +9733,7 @@ double vtkMaterialInterfaceFilterHalfSphere::ComputeTriangleProjectionArea(
 
 //----------------------------------------------------------------------------
 // Evaluate the half sphere over a hex cell.
-// Pass in the bounds of the axis alligned hex cell, and the method returns
+// Pass in the bounds of the axis aligned hex cell, and the method returns
 // the fraction of the cell inside the half sphere.
 double vtkMaterialInterfaceFilterHalfSphere::EvaluateHalfSphereBox(double bounds[6])
 {

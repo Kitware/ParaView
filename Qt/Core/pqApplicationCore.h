@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 
-class pqDisplayPolicy;
 class pqInterfaceTracker;
 class pqLinksModel;
 class pqObjectBuilder;
@@ -64,8 +63,7 @@ class vtkSMProxyLocator;
 class vtkSMStateLoader;
 
 #if !defined(VTK_LEGACY_REMOVE)
-class pqOutputWindow;
-class pqOutputWindowAdapter;
+class pqDisplayPolicy;
 #endif
 
 /**
@@ -196,25 +194,14 @@ public:
   pqProgressManager* getProgressManager() const { return this->ProgressManager; }
 
   /**
-  * Returns the display policy instance used by the application.
-  * pqDisplayPolicy defines the policy for creating representations
-  * for sources.
+  * @deprecated ParaView 5.5.  See vtkSMParaViewPipelineControllerWithRendering.
   */
-  pqDisplayPolicy* getDisplayPolicy() const { return this->DisplayPolicy; }
+  VTK_LEGACY(pqDisplayPolicy* getDisplayPolicy() const);
 
   /**
-  * Returns the output window.
-  * @deprecated as of ParaView 5.4. See `pqOutputWidget`.
+  * @deprecated ParaView 5.5. See vtkSMParaViewPipelineControllerWithRendering.
   */
-  VTK_LEGACY(inline pqOutputWindowAdapter* outputWindowAdapter());
-  VTK_LEGACY(inline pqOutputWindow* outputWindow());
-
-  /**
-  * It is possible to change the display policy used by
-  * the application. Used to change the active display
-  * policy. The pqApplicationCore takes over the ownership of the display policy.
-  */
-  void setDisplayPolicy(pqDisplayPolicy* dp);
+  VTK_LEGACY(void setDisplayPolicy(pqDisplayPolicy* dp));
 
   /**
   * Provides access to the test utility.
@@ -237,6 +224,16 @@ public:
   * Get the application settings.
   */
   pqSettings* settings();
+
+  /**
+   * Clears the settings. Since various UI components that only
+   * read settings at creation time may get out of sync, it's best
+   * to warn the user to restart the application.
+   *
+   * Any changes made to pqSettings after calling this method will be lost and
+   * will not get restored. If that's not desired, see `QSettings::clear`.
+   */
+  void clearSettings();
 
   /**
   * Save the ServerManager state.
@@ -301,7 +298,7 @@ public:
   /**
   * Destructor.
   */
-  virtual ~pqApplicationCore();
+  ~pqApplicationCore() override;
 public slots:
 
   /**
@@ -314,12 +311,6 @@ public slots:
   * Calls QCoreApplication::quit().
   */
   void quit();
-
-  /**
-  * Causes the output window to be shown.
-  * @deprecated as of ParaView 5.4. See `pqOutputWidget`.
-  */
-  void showOutputWindow();
 
   /**
   * Load configuration xml. This results in firing of the loadXML() signal
@@ -386,13 +377,11 @@ protected slots:
 protected:
   bool LoadingState;
 
-#if !defined(VTK_LEGACY_REMOVE)
-  pqOutputWindow* OutputWindow;
-  pqOutputWindowAdapter* OutputWindowAdapter;
-#endif
   pqOptions* Options;
 
+#if !defined(VTK_LEGACY_REMOVE)
   pqDisplayPolicy* DisplayPolicy;
+#endif
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;
@@ -416,22 +405,6 @@ private:
   pqInternals* Internal;
   static pqApplicationCore* Instance;
   void constructor();
-
-#if !defined(VTK_LEGACY_REMOVE)
-  void createOutputWindow();
-#endif
 };
-
-#if !defined(VTK_LEGACY_REMOVE)
-pqOutputWindowAdapter* pqApplicationCore::outputWindowAdapter()
-{
-  return this->OutputWindowAdapter;
-}
-
-pqOutputWindow* pqApplicationCore::outputWindow()
-{
-  return this->OutputWindow;
-}
-#endif
 
 #endif

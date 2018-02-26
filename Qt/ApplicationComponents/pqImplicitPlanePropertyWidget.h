@@ -57,13 +57,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqImplicitPlanePropertyWidget
 public:
   pqImplicitPlanePropertyWidget(
     vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqImplicitPlanePropertyWidget();
+  ~pqImplicitPlanePropertyWidget() override;
 
   /**
   * Overridden to update the DrawPlane state.
   */
-  virtual void apply();
-  virtual void reset();
+  void apply() override;
+  void reset() override;
 
 public slots:
   /**
@@ -107,7 +107,7 @@ protected slots:
   /**
   * Places the interactive widget using current data source information.
   */
-  virtual void placeWidget();
+  void placeWidget() override;
 
 private slots:
   void setOrigin(double x, double y, double z);

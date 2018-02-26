@@ -299,16 +299,12 @@ class WidgetSizer
 
 public:
   WidgetSizer(QWidget* widget, const QSize& size)
+    : Widget(widget)
   {
-    if (size.isValid())
+    if (widget != nullptr && size.isValid())
     {
       this->OldSize = widget->size();
-      this->Widget = widget;
-      widget->resize(size);
-    }
-    else
-    {
-      this->Widget = NULL;
+      widget->resize(size / widget->devicePixelRatio());
     }
   }
   ~WidgetSizer()

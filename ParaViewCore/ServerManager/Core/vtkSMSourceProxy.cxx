@@ -155,7 +155,7 @@ vtkSMOutputPort* vtkSMSourceProxy::GetOutputPort(const char* portname)
 unsigned int vtkSMSourceProxy::GetOutputPortIndex(const char* portname)
 {
   // Since there are not really going to be hundreds of output ports, the is not
-  // going to be any noticable difference in accessing output ports by index or
+  // going to be any noticeable difference in accessing output ports by index or
   // by name.
   vtkSMSourceProxyInternals::VectorOfPorts::iterator it = this->PInternals->OutputPorts.begin();
   for (unsigned int idx = 0; it != this->PInternals->OutputPorts.end(); it++, idx++)
@@ -224,6 +224,11 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLEl
   }
   if (const char* mp = element->GetAttribute("multiprocess_support"))
   {
+    // For ParaView we don't mark any sources as multiple_processes only
+    // since for things like tracing or Catalyst script generation we
+    // want to make them always available. Other tools that are built on
+    // top of ParaView though may want to be able to set multiple_processes
+    // only.
     if (strcmp(mp, "multiple_processes") == 0)
     {
       this->ProcessSupport = vtkSMSourceProxy::MULTIPLE_PROCESSES;

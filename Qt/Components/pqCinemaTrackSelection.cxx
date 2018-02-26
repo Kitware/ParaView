@@ -62,15 +62,15 @@ public:
     this->initializeRootItem();
   };
 
-  ~pqArraySelectionModel(){};
+  ~pqArraySelectionModel() override{};
 
-  void initializeRootItem()
+  void initializeRootItem() override
   {
     pqAbstractItemSelectionModel::RootItem->setData(0, Qt::DisplayRole, "Name");
     pqAbstractItemSelectionModel::RootItem->setData(1, Qt::DisplayRole, "Data Type");
   };
 
-  void populateModel(void* proxy)
+  void populateModel(void* proxy) override
   {
     vtkSMSourceProxy* sourceProxy = static_cast<vtkSMSourceProxy*>(proxy);
     vtkPVDataInformation* dataInfo = sourceProxy->GetDataInformation();

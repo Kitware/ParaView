@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
 
 public:
   pqSettingsDialog(QWidget* parent = 0, Qt::WindowFlags flags = 0);
-  virtual ~pqSettingsDialog();
+  ~pqSettingsDialog() override;
 
   /**
   * Make the tab with the given title text current, if possible.
@@ -64,7 +64,6 @@ private slots:
   void clicked(QAbstractButton*);
   void onAccepted();
   void onRejected();
-  void onRestoreDefaults();
 
   void onTabIndexChanged(int index);
   void onChangeAvailable();

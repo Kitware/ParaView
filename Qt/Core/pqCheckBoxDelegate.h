@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqOutputWindow.h
+   Module:  pqCheckBoxDelegate.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -53,11 +53,12 @@ public:
   };
 
   pqCheckBoxDelegate(QObject* parent);
-  ~pqCheckBoxDelegate();
+  ~pqCheckBoxDelegate() override;
 
-  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  void paint(
+    QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
   bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option,
-    const QModelIndex& index);
+    const QModelIndex& index) override;
 
 private:
   Q_DISABLE_COPY(pqCheckBoxDelegate)

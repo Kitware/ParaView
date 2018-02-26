@@ -34,19 +34,19 @@ void FlatTreeViewTests(pqFlatTreeView* w)
   w->setCurrentIndex(w->getModel()->index(1, 0));
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(1, 0));
 
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
   VERIFY(w->getSelectionModel()->currentIndex() == w->getModel()->index(0, 0));
-  VERIFY(w->getIndexVisibleAt(QPoint(31, 38)) == w->getModel()->index(0, 0));
+  VERIFY(w->getIndexVisibleAt(QPoint(31, 35)) == w->getModel()->index(0, 0));
 
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, 0, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, Qt::ShiftModifier, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
   QTestApp::keyDown(QApplication::focusWidget(), Qt::Key_Enter, 0, 20);
   QTestApp::mouseDown(w->viewport(), QPoint(31, 59), Qt::LeftButton, 0, 20);
 
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
-  QTestApp::mouseDown(w->viewport(), QPoint(31, 38), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
+  QTestApp::mouseDown(w->viewport(), QPoint(31, 35), Qt::LeftButton, 0, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_C, 0, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_B, Qt::ShiftModifier, 20);
   QTestApp::keyClick(QApplication::focusWidget(), Qt::Key_A, 0, 20);

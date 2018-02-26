@@ -38,23 +38,23 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Returns true if the propery is a vtkSMIntVectorProperty.
+   * Returns true if the property is a vtkSMIntVectorProperty.
    * Return 0 otherwise.
    */
-  virtual int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  virtual void SetAnimationValue(vtkSMProperty* property, int idx, double value) VTK_OVERRIDE;
+  void SetAnimationValue(vtkSMProperty* property, int idx, double value) VTK_OVERRIDE;
 
 protected:
   vtkSMBooleanDomain();
-  ~vtkSMBooleanDomain();
+  ~vtkSMBooleanDomain() override;
 
 private:
-  vtkSMBooleanDomain(const vtkSMBooleanDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMBooleanDomain&) VTK_DELETE_FUNCTION;
+  vtkSMBooleanDomain(const vtkSMBooleanDomain&) = delete;
+  void operator=(const vtkSMBooleanDomain&) = delete;
 };
 
 #endif

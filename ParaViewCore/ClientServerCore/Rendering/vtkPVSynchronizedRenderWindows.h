@@ -212,6 +212,14 @@ public:
   bool GetTileDisplayParameters(int tile_dims[2], int tile_mullions[2]);
 
   /**
+   * Returns true if in tile display mode.
+   */
+  bool GetIsInTileDisplay()
+  {
+    int not_used[2];
+    return this->GetTileDisplayParameters(not_used, not_used);
+  }
+  /**
    * Returns the z-buffer value at the given location. \c id is the view id
    * used in AddRenderWindow()/AddRenderer() etc.
    * \note CallOnClientOnly
@@ -250,7 +258,7 @@ public:
   //@}
 protected:
   vtkPVSynchronizedRenderWindows(vtkPVSession*);
-  ~vtkPVSynchronizedRenderWindows();
+  ~vtkPVSynchronizedRenderWindows() override;
 
   /**
    * Set/Get the controller used for communication among parallel processes.
@@ -323,8 +331,8 @@ protected:
   vtkWeakPointer<vtkPVSession> Session;
 
 private:
-  vtkPVSynchronizedRenderWindows(const vtkPVSynchronizedRenderWindows&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSynchronizedRenderWindows&) VTK_DELETE_FUNCTION;
+  vtkPVSynchronizedRenderWindows(const vtkPVSynchronizedRenderWindows&) = delete;
+  void operator=(const vtkPVSynchronizedRenderWindows&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;
@@ -336,7 +344,7 @@ private:
   bool ReduceTemplate(T& size, StandardOperations operation);
 
   static bool UseGenericOpenGLRenderWindow;
-  static vtkRenderWindow* NewRenderWindowInternal();
+  vtkRenderWindow* NewRenderWindowInternal();
 };
 
 #endif

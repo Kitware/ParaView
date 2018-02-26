@@ -36,6 +36,8 @@ int vtkPVDisplayInformation::GlobalSupportsOpenGL = -1;
 //----------------------------------------------------------------------------
 vtkPVDisplayInformation::vtkPVDisplayInformation()
 {
+  VTK_LEGACY_REPLACED_BODY(
+    vtkPVDisplayInformation, "ParaView 5.5", vtkPVRenderingCapabilitiesInformation)
   this->CanOpenDisplay = 1;
   this->SupportsOpenGL = 1;
 }
@@ -56,6 +58,8 @@ void vtkPVDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 {
+  VTK_LEGACY_REPLACED_BODY(
+    vtkPVDisplayInformation, "ParaView 5.5", vtkPVRenderingCapabilitiesInformation)
 #if defined(VTK_USE_X)
   if (vtkPVDisplayInformation::GlobalCanOpenDisplayLocally != -1)
   {
@@ -83,7 +87,8 @@ bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 //----------------------------------------------------------------------------
 bool vtkPVDisplayInformation::SupportsOpenGLLocally()
 {
-#ifdef VTKGL2
+  VTK_LEGACY_REPLACED_BODY(
+    vtkPVDisplayInformation, "ParaView 5.5", vtkPVRenderingCapabilitiesInformation)
   if (vtksys::SystemTools::GetEnv("PV_DEBUG_SKIP_OPENGL_VERSION_CHECK") != NULL)
   {
     return true;
@@ -109,12 +114,6 @@ bool vtkPVDisplayInformation::SupportsOpenGLLocally()
     return vtkPVDisplayInformation::GlobalSupportsOpenGL == 1;
   }
   return true;
-#else
-  // We don't do any OpenGL check for old rendering backend since the old
-  // backend requires that the window is created for SupportsOpenGL() check to
-  // pass.
-  return true;
-#endif
 }
 
 //----------------------------------------------------------------------------

@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqProgressManager : public QObject
   Q_OBJECT
 public:
   pqProgressManager(QObject* parent = 0);
-  virtual ~pqProgressManager();
+  ~pqProgressManager() override;
 
   /**
   * Locks progress to respond to progress signals
@@ -87,7 +87,7 @@ protected:
   /**
   * Filter QApplication events.
   */
-  bool eventFilter(QObject* obj, QEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event) override;
 
 public slots:
   /**
@@ -157,7 +157,6 @@ protected slots:
   void onStartProgress();
   void onEndProgress();
   void onProgress(vtkObject*);
-  void onMessage(vtkObject*);
   void onServerAdded(pqServer*);
 
 protected:
@@ -166,7 +165,6 @@ protected:
   int ProgressCount;
   bool InUpdate; // used to avoid recursive updates.
 
-  double LastProgressTime;
   bool EnableProgress;
   bool ReadyEnableProgress;
   bool UnblockEvents;

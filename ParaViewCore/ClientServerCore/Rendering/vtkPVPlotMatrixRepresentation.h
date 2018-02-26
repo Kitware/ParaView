@@ -64,7 +64,7 @@ public:
   /**
    * Sets the visibility for the plot matrix representation.
    */
-  virtual void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) VTK_OVERRIDE;
 
   //@{
   /**
@@ -112,33 +112,83 @@ public:
   void SetActivePlotMarkerSize(double size);
 
   /**
+   * Set the scatter plot density map visibility
+   */
+  void SetDensityMapVisibility(bool visible);
+
+  /**
+   * Set the active plot density map visibility
+   */
+  void SetActivePlotDensityMapVisibility(bool visible);
+
+  /**
+   * Sets the line size for the density map in the plot matrix.
+   */
+  void SetDensityLineSize(double size);
+
+  /**
+   * Sets the line size for the density map in the active plot.
+   */
+  void SetActivePlotDensityLineSize(double size);
+
+  /**
+   * Sets the color for the density map first DecileColor in the scatter plots.
+   */
+  void SetDensityMapFirstDecileColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map first DecileColor in the scatter plots.
+   */
+  void SetActivePlotDensityMapFirstDecileColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map MeanColor in the scatter plots.
+   */
+  void SetDensityMapMedianColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map MeanColor in the scatter plots.
+   */
+  void SetActivePlotDensityMapMedianColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map last DecileColor in the scatter plots.
+   */
+  void SetDensityMapLastDecileColor(double r, double g, double b);
+
+  /**
+   * Sets the color for the density map last DecileColor in the scatter plots.
+   */
+  void SetActivePlotDensityMapLastDecileColor(double r, double g, double b);
+
+  /**
    * Returns the scatter plot matrix.
    */
   vtkScatterPlotMatrix* GetPlotMatrix() const;
 
 protected:
   vtkPVPlotMatrixRepresentation();
-  ~vtkPVPlotMatrixRepresentation();
+  ~vtkPVPlotMatrixRepresentation() override;
 
   /**
    * Overridden to pass information about changes to series visibility etc. to
    * the plot-matrix.
    */
-  virtual void PrepareForRendering() VTK_OVERRIDE;
+  void PrepareForRendering() VTK_OVERRIDE;
 
   /**
    * Add the plot matrix representation to the view.
    */
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
 
   /**
    * Remove the plot matrix representation from the view.
    */
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
 private:
-  vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPlotMatrixRepresentation&) VTK_DELETE_FUNCTION;
+  vtkPVPlotMatrixRepresentation(const vtkPVPlotMatrixRepresentation&) = delete;
+  void operator=(const vtkPVPlotMatrixRepresentation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;
@@ -150,6 +200,17 @@ private:
   int ActivePlotMarkerStyle;
   double ScatterPlotMarkerSize;
   double ActivePlotMarkerSize;
+
+  bool ActivePlotDensityMapVisibility;
+  bool ScatterPlotDensityMapVisibility;
+  double ScatterPlotDensityLineSize;
+  double ActivePlotDensityLineSize;
+  vtkColor4ub ScatterPlotDensityMapFirstDecileColor;
+  vtkColor4ub ActivePlotDensityMapFirstDecileColor;
+  vtkColor4ub ScatterPlotDensityMapMedianColor;
+  vtkColor4ub ActivePlotDensityMapMedianColor;
+  vtkColor4ub ScatterPlotDensityMapLastDecileColor;
+  vtkColor4ub ActivePlotDensityMapLastDecileColor;
 };
 
 #endif

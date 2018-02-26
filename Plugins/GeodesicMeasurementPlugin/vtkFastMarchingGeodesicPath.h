@@ -81,7 +81,7 @@ public:
   // Description:
   // Interpolation order of the path traced through the surface mesh. A zeroth
   // order path passes through vertices of the mesh. A first order path passes
-  // in between vertices. Each point in the first order path is guarenteed to
+  // in between vertices. Each point in the first order path is guaranteed to
   // lie on an edge. Default is first order.
   vtkSetClampMacro(InterpolationOrder, int, 0, 1);
   vtkGetMacro(InterpolationOrder, int);
@@ -123,10 +123,9 @@ public:
 
 protected:
   vtkFastMarchingGeodesicPath();
-  ~vtkFastMarchingGeodesicPath();
+  ~vtkFastMarchingGeodesicPath() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   // Do the fast marching and gradient backtracking
   virtual void ComputePath(vtkPolyData*);
@@ -140,8 +139,8 @@ protected:
   vtkFastMarchingGeodesicDistance* Geodesic;
 
 private:
-  vtkFastMarchingGeodesicPath(const vtkFastMarchingGeodesicPath&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFastMarchingGeodesicPath&) VTK_DELETE_FUNCTION;
+  vtkFastMarchingGeodesicPath(const vtkFastMarchingGeodesicPath&) = delete;
+  void operator=(const vtkFastMarchingGeodesicPath&) = delete;
 };
 
 #endif

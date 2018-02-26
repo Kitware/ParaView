@@ -47,7 +47,7 @@ class PQWIDGETS_EXPORT pqSectionVisibilityContextMenu : public QMenu
   Q_OBJECT
 public:
   pqSectionVisibilityContextMenu(QWidget* parent = 0);
-  virtual ~pqSectionVisibilityContextMenu();
+  ~pqSectionVisibilityContextMenu() override;
 
   // Set the QHeaderView whose section visibility is affected by
   // this menu. This leads to clearing of any actions

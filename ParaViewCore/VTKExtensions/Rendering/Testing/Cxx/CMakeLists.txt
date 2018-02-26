@@ -10,13 +10,16 @@ find_file(smooth_flash
 mark_as_advanced(smooth_flash)
 
 paraview_test_load_data(""
-  NE2_ps_bath.png)
+  NE2_ps_bath.png
+  table_0.vtt
+  table_1.vtt)
 
 paraview_add_test_cxx(${vtk-module}CxxTests tests
   NO_VALID NO_OUTPUT
 # This was basically ignored in the previous version.
 #  TestResampledAMRImageSourceWithPointData.cxx
   TestImageCompressors.cxx
+  TestMergeTablesMultiBlock.cxx
   )
 
 #if (EXISTS "${smooth_flash}")

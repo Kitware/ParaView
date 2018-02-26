@@ -49,7 +49,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqBoolPropertyWidgetDecorator
 
 public:
   pqBoolPropertyWidgetDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
-  virtual ~pqBoolPropertyWidgetDecorator();
+  ~pqBoolPropertyWidgetDecorator() override;
 
   bool isBoolProperty() const { return this->BoolProperty; }
 

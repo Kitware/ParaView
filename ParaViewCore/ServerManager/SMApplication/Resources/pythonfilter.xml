@@ -165,36 +165,33 @@ annotation text.
           <DataType value="vtkTable" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="any"
-                          name="input_array"
-                          number_of_components="1" />
+                          name="input_array" />
            <Documentation>
              Set the input of the filter. To avoid the complications/confusion when identifying
              elements in a composite dataset, this filter doesn't support composite datasets
              currently.
            </Documentation>
       </InputProperty>
-      <IntVectorProperty command="SetArrayAssociation"
-                         default_values="2"
-                         name="ArrayAssociation"
-                         number_of_elements="1">
-        <Documentation>Select the attribute to use to popular array names from.</Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Point Data" value="0" />
-          <Entry text="Cell Data" value="1" />
-          <Entry text="Field Data" value="2" />
-          <Entry text="Row Data" value="6" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty command="SetArrayName"
-                            name="ArrayName"
-                            number_of_elements="1">
-        <ArrayListDomain name="array_list">
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectInputArray"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Choose arrays that is going to be displayed</Documentation>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property indicates the name of the array from which
+        to compute the histogram.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty name="ElementId"
                          command="SetElementId"
@@ -355,6 +352,8 @@ annotation text.
                  value="19" />
           <!-- <Entry value="20" text="vtkGraph"/> -->
           <!-- <Entry value="21" text="vtkTree"/> -->
+          <Entry text="vtkMolecule"
+                 value="33" />
         </EnumerationDomain>
         <Documentation>The value of this property determines the dataset type
         for the output of the programmable filter.</Documentation>
@@ -480,6 +479,8 @@ annotation text.
                  value="19" />
           <!-- <Entry value="20" text="vtkGraph"/> -->
           <!-- <Entry value="21" text="vtkTree"/> -->
+          <Entry text="vtkMolecule"
+                 value="33" />
         </EnumerationDomain>
         <Documentation>The value of this property determines the dataset type
         for the output of the programmable source.</Documentation>
@@ -576,5 +577,49 @@ annotation text.
       </StringVectorProperty>
       <!-- end of PythonAnimationCue -->
     </Proxy>
+  </ProxyGroup>
+  <ProxyGroup name="exporters">
+    <!-- Proxy group for exporters used to export views.  -->
+    <RenderViewExporterProxy class="vtkCinemaExporter"
+                             name="CinemaExporter">
+      <Documentation long_help="Export view to a Cinema Database"
+                     short_help="Cinema Database">CinemaExporter is a render window
+                     exporter which writes out the renderered scene as a
+                     Cinema database.</Documentation>
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ViewSelection"
+                            command="SetViewSelection"
+                            number_of_elements="1">
+        <Documentation>Script string defining the view selection.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="TrackSelection"
+                            command="SetTrackSelection"
+                            number_of_elements="1">
+        <Documentation>Script string defining the track selection.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ArraySelection"
+                            command="SetArraySelection"
+                            number_of_elements="1">
+        <Documentation>Script string defining the arrays selected in an item.</Documentation>
+      </StringVectorProperty>
+
+      <PropertyGroup label="Cinema Configuration"
+                     panel_widget="cinema_export_selector">
+        <Property name="ViewSelection"/>
+        <Property name="TrackSelection"/>
+        <Property name="ArraySelection"/>
+      </PropertyGroup>
+      <Hints>
+        <ExporterFactory extensions="cdb" />
+      </Hints>
+      <!-- End of Cinema Exporter -->
+    </RenderViewExporterProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

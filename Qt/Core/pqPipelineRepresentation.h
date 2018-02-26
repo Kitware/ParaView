@@ -70,14 +70,14 @@ public:
   // \c parent:- QObject parent.
   pqPipelineRepresentation(const QString& group, const QString& name, vtkSMProxy* repr,
     pqServer* server, QObject* parent = NULL);
-  virtual ~pqPipelineRepresentation();
+  ~pqPipelineRepresentation() override;
 
   // Get the internal display proxy.
   vtkSMRepresentationProxy* getRepresentationProxy() const;
 
 protected:
   // Overridden to set up some additional Qt connections
-  virtual void setView(pqView* view);
+  void setView(pqView* view) override;
 
 public slots:
   // If lookuptable is set up and is used for coloring,

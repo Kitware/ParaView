@@ -2,14 +2,15 @@ import sys
 if len(sys.argv) != 3:
     print("command is 'python <python driver code> <script name> <number of time steps>'")
     sys.exit(1)
-import paraview
-import paraview.vtk as vtk
-import paraview.simple as pvsimple
 import math
 
 # initialize and read input parameters
+import paraview
 paraview.options.batch = True
 paraview.options.symmetric = True
+
+import paraview.simple as pvsimple
+from paraview.vtk import vtkPVCatalyst
 
 def _refHolderMaker(obj):
     def _refHolder(obj2, string):
@@ -17,7 +18,6 @@ def _refHolderMaker(obj):
     return _refHolder
 
 def coProcess(grid, time, step, scriptname, wholeExtent):
-    import vtkPVCatalystPython
     import os
     scriptpath, scriptname = os.path.split(scriptname)
     sys.path.append(scriptpath)
@@ -32,7 +32,7 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
         sys.exit(1)
         return
 
-    datadescription = vtkPVCatalystPython.vtkCPDataDescription()
+    datadescription = vtkPVCatalyst.vtkCPDataDescription()
     datadescription.SetTimeData(time, step)
     datadescription.AddInput("input")
     cpscript.RequestDataDescription(datadescription)
@@ -56,12 +56,14 @@ except ValueError:
     numsteps = 10
 
 
-#imageData2 = vtk.vtkImageData()
+pm = pvsimple.servermanager.vtkProcessModule.GetProcessModule()
+rank = pm.GetPartitionId()
+nranks = pm.GetNumberOfLocalPartitions()
 
 for step in range(numsteps):
-    print("Timestep %d" % step)
     # assume simulation time starts at 0
     time = step/float(numsteps)
+    print("[%d/%d]: Timestep %d of %d (time=%f)" % (rank, nranks, step, numsteps, time))
 
     # create the input to the coprocessing library.  normally
     # this will come from the adaptor
@@ -83,3 +85,4 @@ for step in range(numsteps):
     imageData = None
     import time
     time.sleep(1)
+print("done")

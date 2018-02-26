@@ -72,6 +72,8 @@ public:
   vtkUnsignedCharArray* StillRender(vtkSMViewProxy* view, int quality = 100);
   vtkUnsignedCharArray* InteractiveRender(vtkSMViewProxy* view, int quality = 50);
   const char* StillRenderToString(vtkSMViewProxy* view, unsigned long time = 0, int quality = 100);
+  vtkUnsignedCharArray* StillRenderToBuffer(
+    vtkSMViewProxy* view, unsigned long time = 0, int quality = 100);
   //@}
 
   /**
@@ -94,9 +96,9 @@ public:
 
   //@{
   /**
-   * Return the MTime of the last array exported by StillRenderToString.
+   * Return the MTime of the last array exported by StillRenderToString, StillRenderToBuffer.
    */
-  vtkGetMacro(LastStillRenderToStringMTime, vtkMTimeType);
+  vtkGetMacro(LastStillRenderToMTime, vtkMTimeType);
   //@}
 
   /**
@@ -125,12 +127,12 @@ protected:
 
   int ImageEncoding;
   int ImageCompression;
-  vtkMTimeType LastStillRenderToStringMTime;
+  vtkMTimeType LastStillRenderToMTime;
   int LastStillRenderImageSize[3];
 
 private:
-  vtkPVWebApplication(const vtkPVWebApplication&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVWebApplication&) VTK_DELETE_FUNCTION;
+  vtkPVWebApplication(const vtkPVWebApplication&) = delete;
+  void operator=(const vtkPVWebApplication&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

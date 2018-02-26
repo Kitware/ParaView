@@ -4,6 +4,7 @@
   Module:    vtkPVSynchronizedRenderer.cxx
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -167,8 +168,9 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session, unsigned int i
       this->CSSynchronizer->SetRootProcessId(1);
       this->CSSynchronizer->SetParallelController(session->GetController(vtkPVSession::CLIENT));
     }
+      VTK_FALLTHROUGH;
 
-    // DONT BREAK, server needs to setup everything in the BATCH case
+    // DON'T BREAK, server needs to setup everything in the BATCH case
 
     case BATCH:
       if (in_cave_mode)
@@ -337,29 +339,16 @@ void vtkPVSynchronizedRenderer::SetRenderEmptyImages(bool useREI)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::SetUseFXAA(bool enable)
+void vtkPVSynchronizedRenderer::SetNVPipeSupport(bool enable)
 {
-  if (this->ParallelSynchronizer)
+  vtkPVClientServerSynchronizedRenderers* cssync =
+    vtkPVClientServerSynchronizedRenderers::SafeDownCast(this->CSSynchronizer);
+  if (!cssync)
   {
-    this->ParallelSynchronizer->SetUseFXAA(enable);
+    return;
   }
-  if (this->CSSynchronizer)
-  {
-    this->CSSynchronizer->SetUseFXAA(enable);
-  }
-}
 
-//----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::SetFXAAOptions(vtkFXAAOptions* opts)
-{
-  if (this->ParallelSynchronizer)
-  {
-    this->ParallelSynchronizer->SetFXAAOptions(opts);
-  }
-  if (this->CSSynchronizer)
-  {
-    this->CSSynchronizer->SetFXAAOptions(opts);
-  }
+  cssync->SetNVPipeSupport(enable);
 }
 
 //----------------------------------------------------------------------------

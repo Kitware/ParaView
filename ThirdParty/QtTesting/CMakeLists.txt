@@ -38,6 +38,7 @@ set (QT_TESTING_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 set (QtTesting_INSTALL_INCLUDE_DIR ${VTK_INSTALL_INCLUDE_DIR})
 set (QtTesting_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
 set (QtTesting_QT_VERSION ${PARAVIEW_QT_VERSION})
+set (QT_TESTING_CUSTOM_LIBRARY_SUFFIX ${VTK_CUSTOM_LIBRARY_SUFFIX})
 ##########################################################################
 # import Qt build settings
 vtk_module_third_party(qttesting

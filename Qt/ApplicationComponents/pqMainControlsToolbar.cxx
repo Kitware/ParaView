@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAutoApplyReaction.h"
 #include "pqDataQueryReaction.h"
+#include "pqDeleteReaction.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadPaletteReaction.h"
 #include "pqSaveDataReaction.h"
@@ -52,6 +53,7 @@ void pqMainControlsToolbar::constructor()
   new pqSaveDataReaction(ui.actionSaveData);
   new pqServerConnectReaction(ui.actionServerConnect);
   new pqServerDisconnectReaction(ui.actionServerDisconnect);
+  new pqDeleteReaction(ui.actionDelete, true);
   new pqUndoRedoReaction(ui.actionUndo, true);
   new pqUndoRedoReaction(ui.actionRedo, false);
   new pqAutoApplyReaction(ui.actionAutoApply);

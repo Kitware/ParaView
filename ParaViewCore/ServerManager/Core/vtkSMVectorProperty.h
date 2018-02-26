@@ -51,7 +51,7 @@ public:
    */
   virtual unsigned int GetNumberOfUncheckedElements() = 0;
   virtual void SetNumberOfUncheckedElements(unsigned int num) = 0;
-  virtual void ClearUncheckedElements() VTK_OVERRIDE = 0;
+  void ClearUncheckedElements() VTK_OVERRIDE = 0;
   //@}
 
   //@{
@@ -120,7 +120,7 @@ public:
   /**
    * Copy all property values.
    */
-  virtual void Copy(vtkSMProperty* src) VTK_OVERRIDE;
+  void Copy(vtkSMProperty* src) VTK_OVERRIDE;
 
   //@{
   /**
@@ -141,11 +141,11 @@ public:
    * a last resort, we check if the property has a non-empty \c information_property.
    * If so, we copy its values to this property as the default.
    */
-  virtual bool ResetToDomainDefaults(bool use_unchecked_values = false) VTK_OVERRIDE;
+  bool ResetToDomainDefaults(bool use_unchecked_values = false) VTK_OVERRIDE;
 
 protected:
   vtkSMVectorProperty();
-  ~vtkSMVectorProperty();
+  ~vtkSMVectorProperty() override;
 
   int RepeatCommand;
   int NumberOfElementsPerCommand;
@@ -158,11 +158,11 @@ protected:
   /**
    * Set the appropriate ivars from the xml element.
    */
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
 private:
-  vtkSMVectorProperty(const vtkSMVectorProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMVectorProperty&) VTK_DELETE_FUNCTION;
+  vtkSMVectorProperty(const vtkSMVectorProperty&) = delete;
+  void operator=(const vtkSMVectorProperty&) = delete;
 };
 
 #endif

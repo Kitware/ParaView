@@ -28,7 +28,12 @@ if (numpy_found)
     )
   paraview_add_test_python(
     NO_VALID NO_OUTPUT NO_RT
+    AppendAttributes.py
     UnstructuredCellTypePythonCalculator.py
+    )
+  paraview_add_test_python(
+    NO_VALID NO_RT
+    FileSeriesWriterSubTimeSteps.py
     )
   set(PARAVIEW_PYTHON_ARGS)
 
@@ -49,9 +54,11 @@ endif()
 paraview_add_test_python(
   NO_DATA NO_RT
   ColorBy.py
+  OutputImageResolution.py
   PartialArrayIndication.py
   TestClipCylinder.py
   TestColorHistogram.py
+  TestGeometryBoundsClobber.py
   TestHoudiniWriter.py
   TestLineChartLabelPrefix.py
   TestPythonViewScript.py
@@ -63,16 +70,23 @@ paraview_add_test_python(
   PointPicking.py
 )
 
-# These tests could run safely in serial and parallel (and with both GL backends).
-set(PVBATCH_TESTS
-  StructuredGridVolumeRendering.py
-  PLYWriter.py
-  )
+paraview_add_test_python(
+  NO_VALID NO_OUTPUT NO_RT
+  Plot3DReader.py
+)
 
-# Tests only concerning GL2.
-if ("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-  list(APPEND PVBATCH_TESTS VolumeCellSelection.py)
-endif ()
+# These tests could run safely in serial and parallel.
+set(PVBATCH_TESTS
+  BatchAxesGrid.py
+  PLYWriter.py
+  VolumeCellSelection.py
+)
+if(NOT APPLE)
+  # temporarily disable on mac due to bugs in
+  # ProjectedTetraHedraMapper (paraview/paraview#17620).
+  list(APPEND PVBATCH_TESTS
+    StructuredGridVolumeRendering.py)
+endif()
 
 foreach (tfile IN LISTS PVBATCH_TESTS)
   get_filename_component(test ${tfile} NAME_WE)

@@ -57,7 +57,7 @@ class PQCOMPONENTS_EXPORT pqExportViewSelection : public QWidget
 
 public:
   pqExportViewSelection(QWidget* parent_ = NULL);
-  ~pqExportViewSelection();
+  ~pqExportViewSelection() override;
 
   void populateViews(
     QList<pqRenderViewBase*> const& renderViews, QList<pqContextView*> const& contextViews);

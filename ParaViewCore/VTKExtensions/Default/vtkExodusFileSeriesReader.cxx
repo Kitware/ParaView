@@ -237,7 +237,7 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
   // extension as all restarts should have been run on that process.
   //
   // Additionally, the -s.<rs#> (which captures the restart number) is often not
-  // there on the first file set (before the first restart occured).  Thus it is
+  // there on the first file set (before the first restart occurred).  Thus it is
   // optional (although there can only be one as this is the only place we check
   // numbering).
   vtksys::RegularExpression regEx("^(.*\\.e)(-s.[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");

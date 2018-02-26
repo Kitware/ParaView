@@ -87,7 +87,7 @@ public:
 
 protected:
   vtkKdTreeGenerator();
-  ~vtkKdTreeGenerator();
+  ~vtkKdTreeGenerator() override;
 
   //@{
   /**
@@ -135,8 +135,8 @@ protected:
   int* Regions;
 
 private:
-  vtkKdTreeGenerator(const vtkKdTreeGenerator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkKdTreeGenerator&) VTK_DELETE_FUNCTION;
+  vtkKdTreeGenerator(const vtkKdTreeGenerator&) = delete;
+  void operator=(const vtkKdTreeGenerator&) = delete;
 };
 
 #endif

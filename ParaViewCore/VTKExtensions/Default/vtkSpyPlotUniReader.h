@@ -127,7 +127,7 @@ public:
 
   /**
    * Return the data array of the block's field.  The "fixed"
-   * arguement is set to 1 if the array has been corrected for
+   * argument is set to 1 if the array has been corrected for
    * bad ghost cells else it is set to 0
    */
   vtkDataArray* GetCellFieldData(int block, int field, int* fixed);
@@ -233,7 +233,7 @@ public:
 
 protected:
   vtkSpyPlotUniReader();
-  ~vtkSpyPlotUniReader();
+  ~vtkSpyPlotUniReader() override;
   vtkSpyPlotBlock* Blocks;
 
 private:
@@ -300,7 +300,7 @@ private:
 
   // Indicates that the reader needs to check its data
   // (Not its geometry) - the reason is that ReadData
-  // wil be called alot and there needs to be a way to
+  // will be called a lot and there needs to be a way to
   // optimize this
   int NeedToCheck;
 
@@ -315,8 +315,8 @@ private:
   int IsVolumeFraction(Variable* var);
 
 private:
-  vtkSpyPlotUniReader(const vtkSpyPlotUniReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSpyPlotUniReader&) VTK_DELETE_FUNCTION;
+  vtkSpyPlotUniReader(const vtkSpyPlotUniReader&) = delete;
+  void operator=(const vtkSpyPlotUniReader&) = delete;
 };
 
 inline double* vtkSpyPlotUniReader::GetTimeArray()

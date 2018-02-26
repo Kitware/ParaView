@@ -1029,43 +1029,46 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 
   for (vtkPVFileInformationSet::iterator iter = info_set.begin(); iter != info_set.end();)
   {
-    vtkPVFileInformation* obj = *iter;
-
-    if (obj->Type != FILE_GROUP && !IsDirectory(obj->Type))
+    vtkSmartPointer<vtkPVFileInformation> obj = *iter;
+    // we're going to skip non-groupable file types. Note, we may get INVALID
+    // here since when this->FastFileTypeDetection is true, the grouping
+    // happens before the file types are detected.
+    if (obj->Type != FILE_GROUP && obj->Type != DRIVE && obj->Type != NETWORK_ROOT &&
+      obj->Type != NETWORK_DOMAIN && obj->Type != NETWORK_SERVER && obj->Type != NETWORK_SHARE &&
+      obj->Type != DIRECTORY_GROUP)
     {
-      bool match = false;
-
-      match = this->SequenceParser->ParseFileSequence(obj->GetName());
-
-      if (match)
+      if (this->SequenceParser->ParseFileSequence(obj->GetName()))
       {
-        std::string groupName = this->SequenceParser->GetSequenceName();
-        int groupIndex = this->SequenceParser->GetSequenceIndex();
+        const std::string groupName = this->SequenceParser->GetSequenceName();
+        const int groupIndex = this->SequenceParser->GetSequenceIndex();
 
-        MapOfStringToInfo::iterator iter2 = fileGroups.find(groupName);
-        vtkPVFileInformation* group = 0;
+        // since I want to keep file groups and directory groups separate, for
+        // the key, I'm creating a new key by prefixing it with the group
+        // type.
+        const std::string key_prefix(vtkPVFileInformation::IsDirectory(obj->Type) ? "d." : "f.");
+        const std::string key(key_prefix + groupName);
+
+        MapOfStringToInfo::iterator iter2 = fileGroups.find(key);
         if (iter2 == fileGroups.end())
         {
-          group = vtkPVFileInformation::New();
+          vtkNew<vtkPVFileInformation> group;
+          ;
           group->SetName(groupName.c_str());
           group->SetFullPath((prefix + groupName).c_str());
-          group->Type = FILE_GROUP;
+          group->Type = vtkPVFileInformation::IsDirectory(obj->Type) ? DIRECTORY_GROUP : FILE_GROUP;
           // the group inherits the hidden flag of the first item in the group
           group->Hidden = obj->Hidden;
           group->FastFileTypeDetection = this->FastFileTypeDetection;
-          // fileGroups[groupName] = group;
-          vtkInfo info;
-          info.Group = group;
-          fileGroups[groupName] = info;
-          group->Delete();
 
-          iter2 = fileGroups.find(groupName);
+          vtkInfo info;
+          info.Group = group.GetPointer();
+          iter2 = fileGroups.insert(std::pair<std::string, vtkInfo>(key, info)).first;
         }
 
         iter2->second.Children[groupIndex] = obj;
-        vtkPVFileInformationSet::iterator prev_iter = iter++;
-        info_set.erase(prev_iter);
-        continue;
+
+        iter = info_set.erase(iter);
+        continue; // needed to skip the ++iter, since we already incremented.
       }
     }
     ++iter;

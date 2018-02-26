@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/SplitHorizontal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/XYBarChartView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Preview" command="activate" arguments="1280 x 800 (WXGA)" />
+  <!--
+  <pqevent object="pqClientMainWindow/CoreUtilitiesPromptUser/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1" command="size" arguments="640,400" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Preview" command="activate" arguments="Custom ..." />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/resolutionLabel" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/resolutionLabel" command="set_string" arguments="Custom" />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/resolutionX" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/resolutionY" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/CustomResolutionDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1" command="size" arguments="400,400" />
+
+  <!-- exit preview mode -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Preview" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Preview" command="activate" arguments="400 x 400 (Custom)" />
+
+  <!-- re-enter preview mode -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Preview" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View/Preview" command="activate" arguments="400 x 400 (Custom)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1" command="size" arguments="400,400" />
+
+</pqevents>

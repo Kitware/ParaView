@@ -78,6 +78,11 @@ public:
   */
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
+
+  /**
+   * Create all default decorators for a specific widget.
+   */
+  virtual void createDefaultWidgetDecorators(pqPropertyWidget* widget);
 };
 
 Q_DECLARE_INTERFACE(pqPropertyWidgetInterface, "com.kitware/paraview/propertywidget")

@@ -37,11 +37,11 @@ public:
 
 protected:
   vtkSMObject();
-  ~vtkSMObject();
+  ~vtkSMObject() override;
 
 private:
-  vtkSMObject(const vtkSMObject&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMObject&) VTK_DELETE_FUNCTION;
+  vtkSMObject(const vtkSMObject&) = delete;
+  void operator=(const vtkSMObject&) = delete;
 };
 
 #endif

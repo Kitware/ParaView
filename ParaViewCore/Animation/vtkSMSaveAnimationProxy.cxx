@@ -15,16 +15,21 @@
 #include "vtkSMSaveAnimationProxy.h"
 
 #include "vtkCompositeAnimationPlayer.h"
+#include "vtkErrorCode.h"
+#include "vtkGenericMovieWriter.h"
+#include "vtkImageData.h"
+#include "vtkImageWriter.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVDisplayInformation.h"
 #include "vtkPVProgressHandler.h"
+#include "vtkPVRenderingCapabilitiesInformation.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMAnimationSceneImageWriter.h"
+#include "vtkSMAnimationScene.h"
+#include "vtkSMAnimationSceneWriter.h"
 #include "vtkSMParaViewPipelineController.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMSessionClient.h"
@@ -38,45 +43,195 @@
 
 namespace vtkSMSaveAnimationProxyNS
 {
-class SceneImageWriter : public vtkSMAnimationSceneImageWriter
+
+class SceneGrabber
 {
+public:
+  static vtkSmartPointer<vtkImageData> Grab(vtkSMSaveAnimationProxy* proxy)
+  {
+    return proxy ? proxy->CapturePreppedImage() : vtkSmartPointer<vtkImageData>();
+  }
+};
+
+template <class T>
+class SceneImageWriter : public vtkSMAnimationSceneWriter
+{
+  vtkSmartPointer<T> Writer;
   vtkWeakPointer<vtkSMSaveAnimationProxy> Helper;
 
 public:
-  static SceneImageWriter* New();
-  vtkTypeMacro(SceneImageWriter, vtkSMAnimationSceneImageWriter);
+  vtkTemplateTypeMacro(SceneImageWriter, vtkSMAnimationSceneWriter);
+  /**
+   * Set the vtkSMSaveScreenshotProxy proxy.
+   */
+  void SetHelper(vtkSMSaveScreenshotProxy* helper) { this->Helper = helper; }
 
-  void SetHelper(vtkSMSaveAnimationProxy* helper) { this->Helper = helper; }
+  /**
+   * Set the writer to use.
+   */
+  void SetWriter(T* writer) { this->Writer = writer; }
+  T* GetWriter() { return this->Writer; }
 
 protected:
   SceneImageWriter() {}
   ~SceneImageWriter() {}
-
-  vtkSmartPointer<vtkImageData> CaptureFrame() VTK_OVERRIDE
+  bool SaveInitialize(int vtkNotUsed(startCount)) override
   {
-    vtkSmartPointer<vtkImageData> image =
-      this->Helper ? this->Helper->CapturePreppedImage() : vtkSmartPointer<vtkImageData>();
+    // Animation scene call render on each tick. We override that render call
+    // since it's a waste of rendering, the code to save the images will call
+    // render anyways.
+    this->AnimationScene->SetOverrideStillRender(1);
+    return true;
+  }
+
+  bool SaveFrame(double time) override
+  {
+    vtkSmartPointer<vtkImageData> image = SceneGrabber::Grab(this->Helper);
+
     // Now, in symmetric batch mode, while this method will get called on all
     // ranks, we really only to save the image on root node.
     // Note, the call to CapturePreppedImage() still needs to happen on all
     // ranks, since otherwise we may get mismatched renders.
     vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-    if (controller && controller->GetLocalProcessId() == 0)
+    if (image == nullptr || (controller && controller->GetLocalProcessId() != 0))
     {
-      return image;
+      // don't actually save anything on this rank.
+      return true;
     }
-    else
+
+    return this->WriteFrameImage(time, image);
+  }
+
+  bool SaveFinalize() override
+  {
+    this->AnimationScene->SetOverrideStillRender(0);
+    return true;
+  }
+
+  virtual bool WriteFrameImage(double time, vtkImageData* data) = 0;
+
+private:
+  SceneImageWriter(const SceneImageWriter&) = delete;
+  void operator=(const SceneImageWriter&) = delete;
+};
+
+class SceneImageWriterMovie : public SceneImageWriter<vtkGenericMovieWriter>
+{
+public:
+  static SceneImageWriterMovie* New();
+  vtkTypeMacro(SceneImageWriterMovie, SceneImageWriter<vtkGenericMovieWriter>);
+
+protected:
+  SceneImageWriterMovie()
+    : Started(false)
+  {
+  }
+  ~SceneImageWriterMovie() {}
+
+  bool SaveInitialize(int startCount) override
+  {
+    if (auto* writer = this->GetWriter())
     {
-      return vtkSmartPointer<vtkImageData>();
+      writer->SetFileName(this->GetFileName());
+      return this->Superclass::SaveInitialize(startCount);
     }
+    this->Started = false;
+    return false;
+  }
+
+  bool WriteFrameImage(double vtkNotUsed(time), vtkImageData* data) override
+  {
+    assert(data);
+    auto* writer = this->GetWriter();
+    writer->SetInputData(data);
+    if (!this->Started)
+    {
+      this->Started = true;
+      writer->Start(); // start needs input data, hence we do it here.
+    }
+    writer->Write();
+    writer->SetInputData(nullptr);
+    return (writer->GetError() == 0 && writer->GetError() == vtkErrorCode::NoError);
+  }
+
+  bool SaveFinalize() override
+  {
+    if (this->Started)
+    {
+      this->GetWriter()->End();
+    }
+    this->Started = false;
+    return this->Superclass::SaveFinalize();
   }
 
 private:
-  SceneImageWriter(const SceneImageWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const SceneImageWriter&) VTK_DELETE_FUNCTION;
+  SceneImageWriterMovie(const SceneImageWriterMovie&) = delete;
+  void operator=(const SceneImageWriterMovie&) = delete;
+  bool Started;
 };
+vtkStandardNewMacro(SceneImageWriterMovie);
 
-vtkStandardNewMacro(SceneImageWriter);
+class SceneImageWriterImageSeries : public SceneImageWriter<vtkImageWriter>
+{
+public:
+  static SceneImageWriterImageSeries* New();
+  vtkTypeMacro(SceneImageWriterImageSeries, SceneImageWriter<vtkImageWriter>);
+
+  /**
+   * The suffix format to use to format the counter
+   */
+  vtkSetStringMacro(SuffixFormat);
+  vtkGetStringMacro(SuffixFormat);
+
+protected:
+  SceneImageWriterImageSeries()
+    : Counter(0)
+    , SuffixFormat(nullptr)
+  {
+  }
+  ~SceneImageWriterImageSeries() { this->SetSuffixFormat(nullptr); }
+
+  bool SaveInitialize(int startCount) override
+  {
+    this->Counter = startCount;
+    auto path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+    auto prefix = vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
+    this->Prefix = path.empty() ? prefix : path + "/" + prefix;
+    this->Extension = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
+    return this->Superclass::SaveInitialize(startCount);
+  }
+
+  bool WriteFrameImage(double vtkNotUsed(time), vtkImageData* data) override
+  {
+    auto writer = this->GetWriter();
+    assert(data);
+    assert(this->SuffixFormat);
+    assert(writer);
+
+    char buffer[1024];
+    snprintf(buffer, 1024, this->SuffixFormat, this->Counter);
+
+    std::ostringstream str;
+    str << this->Prefix << buffer << this->Extension;
+    writer->SetInputData(data);
+    writer->SetFileName(str.str().c_str());
+    writer->Write();
+    writer->SetInputData(nullptr);
+
+    const bool success = writer->GetErrorCode() == vtkErrorCode::NoError;
+    this->Counter += success ? 1 : 0;
+    return success;
+  }
+
+private:
+  SceneImageWriterImageSeries(const SceneImageWriterImageSeries&) = delete;
+  void operator=(const SceneImageWriterImageSeries&) = delete;
+  int Counter;
+  char* SuffixFormat;
+  std::string Prefix;
+  std::string Extension;
+};
+vtkStandardNewMacro(SceneImageWriterImageSeries);
 }
 
 vtkStandardNewMacro(vtkSMSaveAnimationProxy);
@@ -91,22 +246,19 @@ vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy()
 }
 
 //----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
 bool vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(vtkSMSession* session)
 {
-  // disconnect-n-save is only possible for client-server connections.
-  if ((vtkSMSessionClient::SafeDownCast(session) != NULL) && (!session->IsMultiClients()))
-  {
-    // let's also confirm that the server supports rendering.
-    vtkNew<vtkPVDisplayInformation> dinfo;
-    session->GatherInformation(vtkPVSession::RENDER_SERVER, dinfo.Get(), 0);
-    return (dinfo->GetCanOpenDisplay() && dinfo->GetSupportsOpenGL());
-  }
+  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsDisconnectAndSave, "ParaView 5.5");
   return false;
 }
+#endif
 
 //----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
 bool vtkSMSaveAnimationProxy::SupportsAVI(vtkSMSession* session, bool remote)
 {
+  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsAVI, "ParaView 5.5");
   vtkSmartPointer<vtkPVServerInformation> info;
   if (remote)
   {
@@ -121,10 +273,13 @@ bool vtkSMSaveAnimationProxy::SupportsAVI(vtkSMSession* session, bool remote)
 
   return info->GetAVISupport() != 0;
 }
+#endif
 
 //----------------------------------------------------------------------------
+#ifndef VTK_LEGACY_REMOVE
 bool vtkSMSaveAnimationProxy::SupportsOGV(vtkSMSession* session, bool remote)
 {
+  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsOGV, "ParaView 5.5");
   vtkSmartPointer<vtkPVServerInformation> info;
   if (remote)
   {
@@ -139,6 +294,7 @@ bool vtkSMSaveAnimationProxy::SupportsOGV(vtkSMSession* session, bool remote)
 
   return info->GetOGVSupport() != 0;
 }
+#endif
 
 //----------------------------------------------------------------------------
 bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)
@@ -198,17 +354,7 @@ bool vtkSMSaveAnimationProxy::WriteAnimation(const char* filename)
     .arg("view", view)
     .arg("layout", layout)
     .arg("mode_screenshot", 0);
-
-  vtkSMSession* session = view ? view->GetSession() : layout->GetSession();
-  if (this->SupportsDisconnectAndSave(session) &&
-    vtkSMPropertyHelper(this, "DisconnectAndSave").GetAsInt() == 1)
-  {
-    return this->DisconnectAndWriteAnimation(filename);
-  }
-  else
-  {
-    return this->WriteAnimationLocally(filename);
-  }
+  return this->WriteAnimationLocally(filename);
 }
 
 //----------------------------------------------------------------------------
@@ -219,14 +365,51 @@ bool vtkSMSaveAnimationProxy::WriteAnimationLocally(const char* filename)
     return false;
   }
 
-  vtkSMProxy* sceneProxy = this->GetAnimationScene();
+  vtkSmartPointer<vtkSMAnimationSceneWriter> writer;
 
-  vtkNew<vtkSMSaveAnimationProxyNS::SceneImageWriter> imageWriter;
-  imageWriter->SetAnimationScene(sceneProxy);
-  imageWriter->SetFrameRate(vtkSMPropertyHelper(this, "FrameRate").GetAsInt());
-  imageWriter->SetQuality(vtkSMPropertyHelper(this, "ImageQuality").GetAsInt());
-  imageWriter->SetFileName(filename);
-  imageWriter->SetHelper(this);
+  vtkSMProxy* sceneProxy = this->GetAnimationScene();
+  auto formatProxy = this->GetFormatProxy(filename);
+  if (!formatProxy)
+  {
+    vtkErrorMacro("Failed to determine format for '" << filename);
+    return false;
+  }
+
+  // ideally, frame rate is directly set on the format proxy, but due to odd
+  // interactions between frame rate and window, we need frame rate on `this`.
+  // until we get around to cleaning that, I am letting this be.
+  vtkSMPropertyHelper(formatProxy, "FrameRate", true)
+    .Set(vtkSMPropertyHelper(this, "FrameRate").GetAsInt());
+  formatProxy->UpdateVTKObjects();
+
+  // based on the format, we create an appropriate SceneImageWriter.
+  auto formatObj = formatProxy->GetClientSideObject();
+  if (auto imgWriter = vtkImageWriter::SafeDownCast(formatObj))
+  {
+    vtkNew<vtkSMSaveAnimationProxyNS::SceneImageWriterImageSeries> realWriter;
+    realWriter->SetWriter(imgWriter);
+    realWriter->SetSuffixFormat(vtkSMPropertyHelper(formatProxy, "SuffixFormat").GetAsString());
+    realWriter->SetHelper(this);
+    writer = realWriter;
+  }
+  else if (auto movieWriter = vtkGenericMovieWriter::SafeDownCast(formatObj))
+  {
+    vtkNew<vtkSMSaveAnimationProxyNS::SceneImageWriterMovie> realWriter;
+    realWriter->SetWriter(movieWriter);
+    realWriter->SetHelper(this);
+    writer = realWriter;
+  }
+  else
+  {
+    vtkErrorMacro("Unknown format type "
+      << (formatObj ? formatObj->GetClassName() : "")
+      << ". Currently, on vtkImageWriter or vtkGenericMovieWriter subclasses "
+      << "are supported.");
+    return false;
+  }
+
+  writer->SetAnimationScene(sceneProxy);
+  writer->SetFileName(filename);
 
   // FIXME: we should consider cleaning up this API on vtkSMAnimationSceneWriter. For now,
   //        keeping it unchanged. This largely lifted from old code in
@@ -270,44 +453,18 @@ bool vtkSMSaveAnimationProxy::WriteAnimationLocally(const char* filename)
       // changed the play mode to SEQUENCE or SNAP_TO_TIMESTEPS.
       abort();
   }
-  imageWriter->SetStartFileCount(frameWindow[0]);
-  imageWriter->SetPlaybackTimeWindow(playbackTimeWindow);
+  writer->SetStartFileCount(frameWindow[0]);
+  writer->SetPlaybackTimeWindow(playbackTimeWindow);
 
   // register with progress handler so we monitor progress events.
   this->GetSession()->GetProgressHandler()->RegisterProgressEvent(
-    imageWriter.Get(), static_cast<int>(this->GetGlobalID()));
+    writer.Get(), static_cast<int>(this->GetGlobalID()));
   this->GetSession()->PrepareProgress();
-  bool status = imageWriter->Save();
+  bool status = writer->Save();
   this->GetSession()->CleanupPendingProgress();
 
   this->Cleanup();
   return status;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMSaveAnimationProxy::DisconnectAndWriteAnimation(const char* filename)
-{
-  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
-
-  // Register ourselves with PXM.
-  std::string pname = pxm->RegisterProxy("misc", this);
-
-  // Save proxy manager state.
-  vtkSmartPointer<vtkPVXMLElement> pxmState =
-    vtkSmartPointer<vtkPVXMLElement>::Take(pxm->SaveXMLState());
-  std::ostringstream pxmStateStream;
-  pxmState->PrintXML(pxmStateStream, vtkIndent());
-
-  pxm->UnRegisterProxy("misc", pname.c_str(), this);
-
-  // Create server-side AnimationPlayer proxy.
-  vtkSmartPointer<vtkSMProxy> proxy =
-    vtkSmartPointer<vtkSMProxy>::Take(pxm->NewProxy("remote_player", "AnimationPlayer"));
-  vtkSMPropertyHelper(proxy, "SessionProxyManagerState").Set(pxmStateStream.str().c_str());
-  vtkSMPropertyHelper(proxy, "FileName").Set(filename);
-  proxy->UpdateVTKObjects();
-  proxy->InvokeCommand("Activate");
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -334,6 +491,24 @@ vtkSMViewProxy* vtkSMSaveAnimationProxy::GetView()
 vtkSMProxy* vtkSMSaveAnimationProxy::GetAnimationScene()
 {
   return vtkSMPropertyHelper(this, "AnimationScene").GetAsProxy();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSaveAnimationProxy::UpdateDefaultsAndVisibilities(const char* filename)
+{
+  this->Superclass::UpdateDefaultsAndVisibilities(filename);
+
+  if (filename)
+  {
+    // pick correct "format" as the default.
+    if (auto proxy = this->GetFormatProxy(filename))
+    {
+      if (proxy->GetProperty("FrameRate"))
+      {
+        this->GetProperty("FrameRate")->SetPanelVisibility("default");
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

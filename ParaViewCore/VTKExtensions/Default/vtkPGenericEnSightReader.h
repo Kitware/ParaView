@@ -40,9 +40,9 @@ public:
 
 protected:
   vtkPGenericEnSightReader();
-  ~vtkPGenericEnSightReader();
+  ~vtkPGenericEnSightReader() override;
 
-  virtual int RequestInformation(
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
@@ -58,8 +58,8 @@ protected:
   int MultiProcessNumberOfProcesses;
 
 private:
-  vtkPGenericEnSightReader(const vtkPGenericEnSightReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPGenericEnSightReader&) VTK_DELETE_FUNCTION;
+  vtkPGenericEnSightReader(const vtkPGenericEnSightReader&) = delete;
+  void operator=(const vtkPGenericEnSightReader&) = delete;
 };
 
 #endif

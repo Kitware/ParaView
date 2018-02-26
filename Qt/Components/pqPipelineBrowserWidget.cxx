@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QHeaderView>
 #include <QKeyEvent>
+#include <QMenu>
 
 #include <assert.h>
 
@@ -62,6 +63,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   : Superclass(parentObject)
   , PipelineModel(new pqPipelineModel(this))
   , FilteredPipelineModel(new pqPipelineAnnotationFilterModel(this))
+  , ContextMenu(new QMenu(this))
 {
   this->configureModel();
 
@@ -71,6 +73,7 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   this->getHeader()->moveSection(1, 0);
   this->installEventFilter(this);
   this->setSelectionMode(pqFlatTreeView::ExtendedSelection);
+  this->setContextMenuPolicy(Qt::DefaultContextMenu);
 
   // Connect internal handlers
   QObject::connect(
@@ -265,6 +268,14 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, const QModelIndexList&
 }
 
 //----------------------------------------------------------------------------
+void pqPipelineBrowserWidget::contextMenuEvent(QContextMenuEvent* e)
+{
+  this->setFocus(Qt::OtherFocusReason);
+
+  this->ContextMenu->exec(this->mapToGlobal(e->pos()));
+}
+
+//----------------------------------------------------------------------------
 void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
 {
   if (port)
@@ -308,6 +319,12 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
       }
     }
   }
+}
+
+//----------------------------------------------------------------------------
+QMenu* pqPipelineBrowserWidget::contextMenu() const
+{
+  return this->ContextMenu;
 }
 
 //----------------------------------------------------------------------------

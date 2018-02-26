@@ -43,16 +43,14 @@ public:
 
 protected:
   vtkAnalyzeWriter();
-  ~vtkAnalyzeWriter();
+  ~vtkAnalyzeWriter() override;
 
-  virtual void WriteFile(
-    ofstream* file, vtkImageData* data, int ext[6], int wExtent[6]) VTK_OVERRIDE;
-  virtual void WriteFileHeader(
-    ofstream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
+  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wExtent[6]) VTK_OVERRIDE;
+  void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
 
 private:
-  vtkAnalyzeWriter(const vtkAnalyzeWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAnalyzeWriter&) VTK_DELETE_FUNCTION;
+  vtkAnalyzeWriter(const vtkAnalyzeWriter&) = delete;
+  void operator=(const vtkAnalyzeWriter&) = delete;
 
   int FileType;
   unsigned int imageSizeInBytes;

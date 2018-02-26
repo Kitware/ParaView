@@ -44,7 +44,7 @@ public:
   /**
    * Update the domain.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
   //@{
   /**
@@ -63,12 +63,12 @@ public:
 
 protected:
   vtkSMRepresentedArrayListDomain();
-  ~vtkSMRepresentedArrayListDomain();
+  ~vtkSMRepresentedArrayListDomain() override;
 
   /**
    * Overridden to process "use_true_parent".
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
 
   /**
    * Returns true if an array should be filtered out based on its name or number
@@ -76,7 +76,7 @@ protected:
    * This implementation returns true if the array name matches
    * an expression in the vtkPVColorArrayListSettings singleton.
    */
-  virtual bool IsFilteredArray(
+  bool IsFilteredArray(
     vtkPVDataInformation* info, int association, const char* arrayName) VTK_OVERRIDE;
 
   /**
@@ -84,7 +84,7 @@ protected:
    * "additional" vtkPVDataInformation instance to get available arrays list
    * from.
    */
-  virtual vtkPVDataInformation* GetExtraDataInformation() VTK_OVERRIDE;
+  vtkPVDataInformation* GetExtraDataInformation() VTK_OVERRIDE;
 
   void SetRepresentationProxy(vtkSMRepresentationProxy*);
   void OnRepresentationDataUpdated();
@@ -96,8 +96,8 @@ protected:
   bool UseTrueParentForRepresentatedDataInformation;
 
 private:
-  vtkSMRepresentedArrayListDomain(const vtkSMRepresentedArrayListDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMRepresentedArrayListDomain&) VTK_DELETE_FUNCTION;
+  vtkSMRepresentedArrayListDomain(const vtkSMRepresentedArrayListDomain&) = delete;
+  void operator=(const vtkSMRepresentedArrayListDomain&) = delete;
 };
 
 #endif

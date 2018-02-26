@@ -54,19 +54,19 @@ public:
    * Transfer information about a single object into this object.
    * This expects the \c object to be a vtkAlgorithmOutput.
    */
-  virtual void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
 
   /**
    * Merge another information object. Calls AddInformation(info, 0).
    */
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -76,8 +76,8 @@ public:
    * information itself. For example, PortNumber on vtkPVDataInformation
    * controls what output port the data-information is gathered from.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
   //@}
 
   /**
@@ -137,7 +137,7 @@ public:
 
 protected:
   vtkPVTemporalDataInformation();
-  ~vtkPVTemporalDataInformation();
+  ~vtkPVTemporalDataInformation() override;
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;
@@ -151,8 +151,8 @@ protected:
   int PortNumber;
 
 private:
-  vtkPVTemporalDataInformation(const vtkPVTemporalDataInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTemporalDataInformation&) VTK_DELETE_FUNCTION;
+  vtkPVTemporalDataInformation(const vtkPVTemporalDataInformation&) = delete;
+  void operator=(const vtkPVTemporalDataInformation&) = delete;
 };
 
 #endif

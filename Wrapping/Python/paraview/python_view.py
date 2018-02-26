@@ -17,14 +17,16 @@ convenience classes in Python.
 #
 #==============================================================================
 import paraview
-from paraview import vtk
-
+from vtkmodules.vtkCommonDataModel import vtkImageData
 
 def numpy_to_image(numpy_array):
-  """
-  @brief Convert a numpy 2D or 3D array to a vtkImageData object
-  @param numpy_array 2D or 3D numpy array containing image data
-  @return vtkImageData with the numpy_array content
+  """Convert a numpy 2D or 3D array to a vtkImageData object.
+
+  numpy_array
+    2D or 3D numpy array containing image data
+
+  return
+    vtkImageData with the numpy_array content
   """
   try:
     import numpy
@@ -45,13 +47,13 @@ def numpy_to_image(numpy_array):
   linear_array = numpy.reshape(numpy_array, (w*h, c))
 
   try:
-    from paraview.vtk.util import numpy_support
+    from vtkmodules.util import numpy_support
   except:
-    paraview.print_error("Error: Cannot import vtk.util.numpy_support")
+    paraview.print_error("Error: Cannot import vtkmodules.util.numpy_support")
 
   vtk_array = numpy_support.numpy_to_vtk(linear_array)
 
-  image = vtk.vtkImageData()
+  image = vtkImageData()
   image.SetDimensions(w, h, 1)
   image.AllocateScalars(vtk_array.GetDataType(), 4)
   image.GetPointData().GetScalars().DeepCopy(vtk_array)
@@ -60,10 +62,14 @@ def numpy_to_image(numpy_array):
 
 
 def figure_to_data(figure):
-  """
-  @brief Convert a Matplotlib figure to a numpy 2D array with RGBA uint8 channels and return it.
-  @param figure A matplotlib figure.
-  @return A numpy 2D array of RGBA values.
+  """Convert a Matplotlib figure to a numpy 2D array with RGBA uint8 channels
+  and return it.
+
+  figure
+    A matplotlib figure.
+
+  return
+    A numpy 2D array of RGBA values.
   """
   # Draw the renderer
   try:
@@ -91,10 +97,14 @@ def figure_to_data(figure):
 
 
 def figure_to_image(figure):
-  """
-  @brief Convert a Matplotlib figure to a vtkImageData with RGBA unsigned char channels
-  @param figure A matplotlib figure.
-  @return a vtkImageData with the Matplotlib figure content
+  """Convert a Matplotlib figure to a vtkImageData with RGBA unsigned char
+  channels.
+
+  figure
+    A matplotlib figure.
+
+  return
+    A vtkImageData with the Matplotlib figure content.
   """
   buf = figure_to_data(figure)
 
@@ -105,11 +115,15 @@ def figure_to_image(figure):
 
 
 def matplotlib_figure(width, height):
-  """
-  @brief Create a Matplotlib figure with specified width and height for rendering
-  @param w Width of desired plot
-  @param h Height of desired plot
-  @return A Matplotlib figure
+  """Create a Matplotlib figure with specified width and height for rendering.
+
+  w
+    Width of desired plot.
+  h
+    Height of desired plot.
+
+  return
+    A Matplotlib figure.
   """
   try:
     from matplotlib.backends.backend_agg import FigureCanvasAgg
@@ -129,12 +143,17 @@ def matplotlib_figure(width, height):
 
 
 def call_render(render_function, view, width, height):
-  """
-  @brief Utility function to call the user-defined render function. This is
-         called by the C++ side of the vtkPythonView class.
-  @parameter view vtkPythonView object
-  @parameter width Width of view
-  @parameter height Height of view
+  """Utility function to call the user-defined render function. This is called
+  by the C++ side of the vtkPythonView class.
+
+  view
+    vtkPythonView object
+
+  width
+    Width of view
+
+  height
+    Height of view
   """
   if render_function == None:
     return

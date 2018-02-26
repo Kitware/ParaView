@@ -65,7 +65,7 @@ public:
 
 protected:
   vtkPolyDataGeodesicDistance();
-  ~vtkPolyDataGeodesicDistance();
+  ~vtkPolyDataGeodesicDistance() override;
 
   // Get the distance field array on the polydata
   vtkFloatArray* GetGeodesicDistanceField(vtkPolyData* pd);
@@ -78,8 +78,8 @@ protected:
   vtkIdList* Seeds;
 
 private:
-  vtkPolyDataGeodesicDistance(const vtkPolyDataGeodesicDistance&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPolyDataGeodesicDistance&) VTK_DELETE_FUNCTION;
+  vtkPolyDataGeodesicDistance(const vtkPolyDataGeodesicDistance&) = delete;
+  void operator=(const vtkPolyDataGeodesicDistance&) = delete;
 };
 
 #endif

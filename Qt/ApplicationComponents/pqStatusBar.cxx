@@ -35,10 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 #include "pqProgressWidget.h"
 
-#include <QFrame>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPixmap>
 #include <QToolButton>
 
 #include <iostream>
@@ -47,17 +43,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqStatusBar::pqStatusBar(QWidget* parentObject)
   : Superclass(parentObject)
 {
-  QFrame* widget = new QFrame(this);
-  widget->setFrameShape(QFrame::NoFrame);
-  QHBoxLayout* hbox = new QHBoxLayout(widget);
-  hbox->setMargin(0);
-  hbox->setSpacing(0);
   pqProgressManager* progress_manager = pqApplicationCore::instance()->getProgressManager();
 
   // Progress bar/button management
-  pqProgressWidget* const progress_bar = new pqProgressWidget(widget);
+  pqProgressWidget* const progress_bar = new pqProgressWidget(this);
   progress_manager->addNonBlockableObject(progress_bar);
-  progress_manager->addNonBlockableObject(progress_bar->getAbortButton());
+  progress_manager->addNonBlockableObject(progress_bar->abortButton());
 
   QObject::connect(
     progress_manager, SIGNAL(enableProgress(bool)), progress_bar, SLOT(enableProgress(bool)));
@@ -71,9 +62,7 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
   QObject::connect(progress_bar, SIGNAL(abortPressed()), progress_manager, SLOT(triggerAbort()));
 
   // Final ui setup
-  hbox->addWidget(progress_bar);
-  this->addPermanentWidget(widget);
-  widget->setEnabled(true);
+  this->addPermanentWidget(progress_bar);
 }
 
 //-----------------------------------------------------------------------------

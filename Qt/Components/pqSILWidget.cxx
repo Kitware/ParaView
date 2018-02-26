@@ -32,8 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSILWidget.h"
 
 #include <QDebug>
+
+#include <QAction>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QMenu>
 #include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QVBoxLayout>
@@ -140,11 +143,14 @@ void pqSILWidget::onModelReset()
 #else
   activeTree->header()->setClickable(true);
 #endif
+  activeTree->header()->moveSection(0, 1);
 
   QObject::connect(activeTree->header(), SIGNAL(sectionClicked(int)), this->ActiveModel,
     SLOT(toggleRootCheckState()), Qt::QueuedConnection);
   activeTree->setModel(this->SortModel);
   activeTree->expandAll();
+  activeTree->header()->swapSections(0, 1);
+  activeTree->resizeColumnToContents(1);
   this->TabWidget->addTab(activeTree, this->ActiveCategory);
   new pqTreeViewSelectionHelper(activeTree);
 
@@ -164,8 +170,8 @@ void pqSILWidget::onModelReset()
     tree->header()->setStretchLastSection(true);
     tree->setRootIsDecorated(false);
 
-    pqProxySILModel* proxyModel =
-      new pqProxySILModel(this->Model->data(this->Model->index(cc, 0)).toString(), tree);
+    QString category = this->Model->data(this->Model->index(cc, 0)).toString();
+    pqProxySILModel* proxyModel = new pqProxySILModel(category, tree);
     proxyModel->setSourceModel(this->Model);
 
 #if QT_VERSION >= 0x050000
@@ -173,13 +179,19 @@ void pqSILWidget::onModelReset()
 #else
     tree->header()->setClickable(true);
 #endif
+    tree->header()->moveSection(0, 1);
     QObject::connect(tree->header(), SIGNAL(sectionClicked(int)), proxyModel,
       SLOT(toggleRootCheckState()), Qt::QueuedConnection);
-    tree->setModel(proxyModel);
+
+    QSortFilterProxyModel* sortModel = new QSortFilterProxyModel(tree);
+    sortModel->setSourceModel(proxyModel);
+    tree->setModel(sortModel);
     tree->expandAll();
     new pqTreeViewSelectionHelper(tree);
+    tree->header()->swapSections(0, 1);
+    tree->resizeColumnToContents(1);
 
-    this->TabWidget->addTab(tree, proxyModel->headerData(cc, Qt::Horizontal).toString());
+    this->TabWidget->addTab(tree, category);
   }
 }
 
@@ -197,11 +209,41 @@ void pqSILWidget::toggleSelectedBlocks(bool checked)
   vtkSMProxy* activeSelection = port->getSelectionInput();
   vtkPVDataInformation* dataInfo = port->getDataInformation();
 
-  vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
   std::vector<vtkIdType> block_ids;
-  block_ids.resize(blocksProp.GetNumberOfElements());
-  blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+  if (activeSelection->GetProperty("Blocks"))
+  {
+    vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+    block_ids.resize(blocksProp.GetNumberOfElements());
+    blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+    std::sort(block_ids.begin(), block_ids.end());
+  }
+  else if (activeSelection->GetXMLName() == std::string("CompositeDataIDSelectionSource") &&
+    activeSelection->GetProperty("IDs"))
+  {
+    vtkSMPropertyHelper idsProp(activeSelection, "IDs");
+
+    // Elements in the block_ids are 3-tuples (block flat-index, process number, id).
+    // Remove the process number and id elements and put the block ids into a set -
+    // we need only the unique block ids.
+    std::set<int> unique_ids;
+    for (unsigned int i = 0; i < idsProp.GetNumberOfElements(); i += 3)
+    {
+      unique_ids.insert(idsProp.GetAsInt(i));
+    }
+    block_ids.resize(unique_ids.size());
+
+    // ids will already be sorted coming out of the set.
+    block_ids.insert(block_ids.begin(), unique_ids.begin(), unique_ids.end());
+  }
+  else
+  {
+    // Exit early as we don't know what blocks have been selected.
+    return;
+  }
+
   std::sort(block_ids.begin(), block_ids.end());
+  auto new_end = std::unique(block_ids.begin(), block_ids.end());
+  block_ids.erase(new_end, block_ids.end());
 
   // if check is true then we are checking only the selected blocks,
   // if check is false, then we are un-checking the selected blocks, leaving

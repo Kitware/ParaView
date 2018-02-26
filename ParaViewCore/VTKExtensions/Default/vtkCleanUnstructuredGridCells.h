@@ -48,15 +48,14 @@ public:
 
 protected:
   vtkCleanUnstructuredGridCells();
-  ~vtkCleanUnstructuredGridCells();
+  ~vtkCleanUnstructuredGridCells() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
 private:
-  vtkCleanUnstructuredGridCells(const vtkCleanUnstructuredGridCells&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCleanUnstructuredGridCells&) VTK_DELETE_FUNCTION;
+  vtkCleanUnstructuredGridCells(const vtkCleanUnstructuredGridCells&) = delete;
+  void operator=(const vtkCleanUnstructuredGridCells&) = delete;
 };
 
 #endif

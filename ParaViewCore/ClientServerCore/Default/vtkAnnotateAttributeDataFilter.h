@@ -71,9 +71,9 @@ public:
 
 protected:
   vtkAnnotateAttributeDataFilter();
-  ~vtkAnnotateAttributeDataFilter();
+  ~vtkAnnotateAttributeDataFilter() override;
 
-  virtual void EvaluateExpression() VTK_OVERRIDE;
+  void EvaluateExpression() VTK_OVERRIDE;
 
   char* ArrayName;
   char* Prefix;
@@ -81,8 +81,8 @@ protected:
   vtkIdType ElementId;
 
 private:
-  vtkAnnotateAttributeDataFilter(const vtkAnnotateAttributeDataFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkAnnotateAttributeDataFilter&) VTK_DELETE_FUNCTION;
+  vtkAnnotateAttributeDataFilter(const vtkAnnotateAttributeDataFilter&) = delete;
+  void operator=(const vtkAnnotateAttributeDataFilter&) = delete;
 };
 
 #endif

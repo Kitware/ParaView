@@ -107,7 +107,7 @@
  * number_of_components = 1
  * data_dependency = 0
  * data_type = double
- * If no Field(s) is/are specfied then the default is following 3 fields :
+ * If no Field(s) is/are specified then the default is following 3 fields :
  * pressure (index 0 under solution),
  * velocity (index 1-3 under solution)
  * temperature (index 4 under soltuion)
@@ -161,11 +161,11 @@ public:
 
 protected:
   vtkPPhastaReader();
-  ~vtkPPhastaReader();
+  ~vtkPPhastaReader() override;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   char* FileName;
@@ -185,8 +185,8 @@ protected:
 private:
   vtkPPhastaReaderInternal* Internal;
 
-  vtkPPhastaReader(const vtkPPhastaReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPPhastaReader&) VTK_DELETE_FUNCTION;
+  vtkPPhastaReader(const vtkPPhastaReader&) = delete;
+  void operator=(const vtkPPhastaReader&) = delete;
 };
 
 #endif

@@ -2,13 +2,13 @@ r"""
 This module is designed for use in co-processing Python scripts. It provides a
 class, Pipeline, which is designed to be used as the base-class for Python
 pipeline. Additionally, this module has several other utility functions that are
-approriate for co-processing.
+appropriate for co-processing.
 """
 
 # for Python2 print statmements to output like Python3 print statements
 from __future__ import print_function
 from paraview import simple, servermanager
-from vtk.vtkPVVTKExtensionsCore import *
+from paraview.vtk.vtkPVVTKExtensionsCore import *
 import math
 
 # -----------------------------------------------------------------------------
@@ -29,24 +29,29 @@ def IsInModulo(timestep, frequencyArray):
     return False
 
 class CoProcessor(object):
-    """Base class for co-processing Pipelines. paraview.cpstate Module can
-       be used to dump out ParaView states as co-processing pipelines. Those are
-       typically subclasses of this. The subclasses must provide an
-       implementation for the CreatePipeline() method.
+    """Base class for co-processing Pipelines.
 
-	   Cinema Tracks
-	   =============
-	   CoProcessor maintains user-defined information for the Cinema generation in
-       __CinemaTracks. This information includes track parameter values, data array
-       names, etc. __CinemaTracks holds this information in the following structure:
+    paraview.cpstate Module can be used to dump out ParaView states as
+    co-processing pipelines. Those are typically subclasses of this. The
+    subclasses must provide an implementation for the CreatePipeline() method.
 
-        { proxy_reference : { 'ControlName' : [value_1, value_2, ..., value_n],
-                              'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n'] } }
+    **Cinema Tracks**
 
-		__CinemaTracks is populated when defining the co-processing pipline through
-		paraview.cpstate. paraview.cpstate uses accessor instances to set values and
-		array names through the RegisterCinemaTrack and AddArraysToCinemaTrack methods
-        of this class.
+    CoProcessor maintains user-defined information for the Cinema generation in
+    __CinemaTracks. This information includes track parameter values, data array
+    names, etc. __CinemaTracks holds this information in the following structure::
+
+        {
+          proxy_reference : {
+          'ControlName' : [value_1, value_2, ..., value_n],
+          'arraySelection' : ['ArrayName_1', ..., 'ArrayName_n']
+          }
+        }
+
+    __CinemaTracks is populated when defining the co-processing pipline through
+    paraview.cpstate. paraview.cpstate uses accessor instances to set values and
+    array names through the RegisterCinemaTrack and AddArraysToCinemaTrack
+    methods of this class.
     """
 
     def __init__(self):
@@ -103,7 +108,7 @@ class CoProcessor(object):
            Default implementation uses the update-frequencies set using
            SetUpdateFrequencies() to determine if the current timestep needs to
            be processed and then requests all fields. Subclasses can override
-           this method to provide addtional customizations."""
+           this method to provide additional customizations."""
 
         timestep = datadescription.GetTimeStep()
 
@@ -154,7 +159,7 @@ class CoProcessor(object):
             for view in self.__ViewsList:
                 if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
                    datadescription.GetForceOutput() == True:
-                    viewinputs = cpstate.locate_simulation_inputs(writer)
+                    viewinputs = cpstate.locate_simulation_inputs_for_view(view)
                     for viewinput in viewinputs:
                         datadescription.GetInputDescriptionByName(viewinput).AllFieldsOn()
                         datadescription.GetInputDescriptionByName(viewinput).GenerateMeshOn()
@@ -205,26 +210,30 @@ class CoProcessor(object):
         """This method will update all views, if present and write output
         images, as needed.
 
-        Parameters:
-        ----------
-            datadescription : Catalyst data-description object
+        **Parameters**
 
-            rescale_lookuptable (bool, optional): If True, when all lookup tables
-                are rescaled using current data ranges before saving the images.
-                Defaults to False.
+            datadescription
+              Catalyst data-description object
 
-            image_quality (int, optional): If specified, should be a value in
-                the range (0, 100) that specifies the image quality. For JPEG, 0
-                is low quality i.e. max compression, 100 is best quality i.e.
-                least compression. For legacy reasons, this is inverted for PNG
-                (which uses lossless compression). For PNG, 0 is no compression
-                i.e maximum image size, while 100 is most compressed and hence
-                least image size.
+            rescale_lookuptable (bool, optional)
+              If True, when all lookup tables
+              are rescaled using current data ranges before saving the images.
+              Defaults to False.
 
-                If not specified, for saving PNGs 0 is assumed to minimize
-                preformance impact.
+            image_quality (int, optional)
+              If specified, should be a value in
+              the range (0, 100) that specifies the image quality. For JPEG, 0
+              is low quality i.e. max compression, 100 is best quality i.e.
+              least compression. For legacy reasons, this is inverted for PNG
+              (which uses lossless compression). For PNG, 0 is no compression
+              i.e maximum image size, while 100 is most compressed and hence
+              least image size.
 
-            padding_amount (int, optional): Amount to pad the time index by.
+              If not specified, for saving PNGs 0 is assumed to minimize
+              performance impact.
+
+            padding_amount (int, optional)
+              Amount to pad the time index by.
 
         """
         timestep = datadescription.GetTimeStep()
@@ -237,6 +246,7 @@ class CoProcessor(object):
                 ts = str(timestep).rjust(padding_amount, '0')
                 fname = fname.replace("%t", ts)
                 if view.cpFitToScreen != 0:
+                    view.ViewTime = datadescription.GetTime()
                     if view.IsA("vtkSMRenderViewProxy") == True:
                         view.ResetCamera()
                     elif view.IsA("vtkSMContextViewProxy") == True:
@@ -313,7 +323,6 @@ class CoProcessor(object):
             # code. vtkLiveInsituLink never updates the pipeline, it
             # simply uses the data available at the end of the
             # pipeline, if any.
-            from paraview import simple
             for source in simple.GetSources().values():
                 source.UpdatePipeline(time)
 
@@ -369,8 +378,7 @@ class CoProcessor(object):
 
         # optionally print message so that people know what file string to use to open in Ensight
         if self.__PrintEnsightFormatString:
-            import paraview.servermanager as pvsm
-            pm = pvsm.vtkProcessModule.GetProcessModule()
+            pm = servermanager.vtkProcessModule.GetProcessModule()
             pid = pm.GetGlobalController().GetLocalProcessId()
             if pid == 0:
                 nump = pm.GetGlobalController().GetNumberOfProcesses()
@@ -473,17 +481,19 @@ class CoProcessor(object):
         return view
 
     def CreateWriter(self, proxy_ctor, filename, freq):
-        """ **** DEPRECATED!!! Use RegisterWriter instead ****
-           Creates a writer proxy. This method is generally used in
-           CreatePipeline() to create writers. All writes created as such will
-           write the output files appropriately in WriteData() is called."""
+        """**DEPRECATED!!! Use RegisterWriter instead**
+        Creates a writer proxy. This method is generally used in
+        reatePipeline() to create writers. All writes created as such will
+        write the output files appropriately in WriteData() is called.
+        """
         writer = proxy_ctor()
         return self.RegisterWriter(writer, filename, freq)
 
     def CreateView(self, proxy_ctor, filename, freq, fittoscreen, magnification, width, height):
-        """ **** DEPRECATED!!! Use RegisterView instead ****
-           Create a CoProcessing view for image capture with extra meta-data
-           such as magnification, size and frequency."""
+        """**DEPRECATED!!! Use RegisterView instead**
+        Create a CoProcessing view for image capture with extra meta-data
+        such as magnification, size and frequency.
+        """
         view = proxy_ctor()
         return self.RegisterView(view, filename, freq, fittoscreen, magnification, width, height, None)
 
@@ -505,7 +515,7 @@ class CoProcessor(object):
                 not hasattr(rep, 'MapScalars') or \
                 not rep.MapScalars or \
                 not rep.LookupTable:
-                # rep is either not visibile or not mapping scalars using a LUT.
+                # rep is either not visible or not mapping scalars using a LUT.
                 continue;
 
             input = rep.Input
@@ -514,25 +524,25 @@ class CoProcessor(object):
 
             colorArrayInfo = rep.GetArrayInformationForColorArray()
             if not colorArrayInfo:
-                continue
-
-            if lut.VectorMode != 'Magnitude' or \
-               colorArrayInfo.GetNumberOfComponents() == 1:
-                datarange = colorArrayInfo.GetComponentRange(lut.VectorComponent)
+                import sys
+                datarange = [sys.float_info.max, -sys.float_info.max]
             else:
-                # -1 corresponds to the magnitude.
-                datarange = colorArrayInfo.GetComponentRange(-1)
+                if lut.VectorMode != 'Magnitude' or \
+                   colorArrayInfo.GetNumberOfComponents() == 1:
+                    datarange = colorArrayInfo.GetComponentRange(lut.VectorComponent)
+                else:
+                    # -1 corresponds to the magnitude.
+                    datarange = colorArrayInfo.GetComponentRange(-1)
 
-            import vtkParallelCorePython
-            import paraview.vtk as vtk
+            from paraview.vtk import vtkDoubleArray
             import paraview.servermanager
             pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
             globalController = pm.GetGlobalController()
-            localarray = vtk.vtkDoubleArray()
+            localarray = vtkDoubleArray()
             localarray.SetNumberOfTuples(2)
             localarray.SetValue(0, -datarange[0]) # negate so that MPI_MAX gets min instead of doing a MPI_MIN and MPI_MAX
             localarray.SetValue(1, datarange[1])
-            globalarray = vtk.vtkDoubleArray()
+            globalarray = vtkDoubleArray()
             globalarray.SetNumberOfTuples(2)
             globalController.AllReduce(localarray, globalarray, 0)
             globaldatarange = [-globalarray.GetValue(0), globalarray.GetValue(1)]
@@ -567,12 +577,11 @@ class CoProcessor(object):
             import cinema_python.adaptors.explorers as explorers
             import cinema_python.adaptors.paraview.pv_explorers as pv_explorers
             import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
-            import paraview.simple as simple
         except ImportError as e:
+            import paraview
             paraview.print_error("Cannot import cinema")
             paraview.print_error(e)
             return
-
 
         #figure out where to put this store
         import os.path

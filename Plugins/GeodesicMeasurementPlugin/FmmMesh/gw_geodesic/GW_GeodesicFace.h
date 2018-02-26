@@ -3,7 +3,7 @@
 /**
  *  \file   GW_GeodesicFace.h
  *  \brief  Definition of class \c GW_GeodesicFace
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ namespace GW {
 /**
  *  \class  GW_GeodesicFace
  *  \brief  A face to make geodesic computations.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   4-12-2003
  *
  *  Should contains geodesic vertex.
@@ -35,7 +35,7 @@ class FMMMESH_EXPORT GW_GeodesicFace:    public GW_Face
 public:
 
     GW_GeodesicFace();
-    virtual ~GW_GeodesicFace();
+    ~GW_GeodesicFace() override;
     using GW_Face::operator=;
     void SetUpTriangularInterpolation();
     void ComputeGradient( GW_GeodesicVertex& v0, GW_GeodesicVertex& v1, GW_GeodesicVertex& v2,
@@ -67,7 +67,7 @@ private:
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

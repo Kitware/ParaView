@@ -39,6 +39,7 @@ class vtkDataObject;
 class vtkDataSet;
 class vtkGenericDataSet;
 class vtkGraph;
+class vtkHyperTreeGrid;
 class vtkInformation;
 class vtkPVArrayInformation;
 class vtkPVCompositeDataInformation;
@@ -78,12 +79,12 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object. Calls AddInformation(info, 0).
    */
-  virtual void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
 
   /**
    * Merge another information object. If adding information of
@@ -96,8 +97,8 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -107,8 +108,8 @@ public:
    * information itself. For example, PortNumber on vtkPVDataInformation
    * controls what output port the data-information is gathered from.
    */
-  virtual void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
-  virtual void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
   //@}
 
   /**
@@ -128,6 +129,9 @@ public:
   vtkGetMacro(NumberOfPoints, vtkTypeInt64);
   vtkGetMacro(NumberOfCells, vtkTypeInt64);
   vtkGetMacro(NumberOfRows, vtkTypeInt64);
+  vtkGetMacro(NumberOfTrees, vtkTypeInt64);
+  vtkGetMacro(NumberOfVertices, vtkTypeInt64);
+  vtkGetMacro(NumberOfLeaves, vtkTypeInt64);
   vtkGetMacro(MemorySize, int);
   vtkGetMacro(PolygonCount, int);
   vtkGetMacro(NumberOfDataSets, int);
@@ -280,7 +284,7 @@ public:
 
 protected:
   vtkPVDataInformation();
-  ~vtkPVDataInformation();
+  ~vtkPVDataInformation() override;
 
   void DeepCopy(vtkPVDataInformation* dataInfo, bool copyCompositeInformation = true);
 
@@ -292,6 +296,7 @@ protected:
   void CopyFromGenericDataSet(vtkGenericDataSet* data);
   void CopyFromGraph(vtkGraph* graph);
   void CopyFromTable(vtkTable* table);
+  void CopyFromHyperTreeGrid(vtkHyperTreeGrid* data);
   void CopyFromSelection(vtkSelection* selection);
   void CopyCommonMetaData(vtkDataObject*, vtkInformation*);
 
@@ -301,9 +306,12 @@ protected:
   int DataSetType;
   int CompositeDataSetType;
   int NumberOfDataSets;
-  vtkTypeInt64 NumberOfPoints;
+  vtkTypeInt64 NumberOfPoints; // data sets
   vtkTypeInt64 NumberOfCells;
-  vtkTypeInt64 NumberOfRows;
+  vtkTypeInt64 NumberOfRows;  // tables
+  vtkTypeInt64 NumberOfTrees; // hypertreegrids
+  vtkTypeInt64 NumberOfVertices;
+  vtkTypeInt64 NumberOfLeaves;
   int MemorySize;
   vtkIdType PolygonCount;
   double Bounds[6];
@@ -340,8 +348,8 @@ protected:
   friend class vtkPVCompositeDataInformation;
 
 private:
-  vtkPVDataInformation(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataInformation&) VTK_DELETE_FUNCTION;
+  vtkPVDataInformation(const vtkPVDataInformation&) = delete;
+  void operator=(const vtkPVDataInformation&) = delete;
 
   int PortNumber;
 };

@@ -33,21 +33,21 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkSMEnsembleDataReaderProxy* New();
 
-  virtual void UpdateVTKObjects() VTK_OVERRIDE;
+  void UpdateVTKObjects() VTK_OVERRIDE;
 
 protected:
   vtkSMEnsembleDataReaderProxy();
-  virtual ~vtkSMEnsembleDataReaderProxy();
+  ~vtkSMEnsembleDataReaderProxy() override;
 
-  virtual void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
+  void SetPropertyModifiedFlag(const char* name, int flag) VTK_OVERRIDE;
 
   bool FileNamePotentiallyModified;
 
 private:
   bool FetchFileNames();
 
-  vtkSMEnsembleDataReaderProxy(const vtkSMEnsembleDataReaderProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMEnsembleDataReaderProxy&) VTK_DELETE_FUNCTION;
+  vtkSMEnsembleDataReaderProxy(const vtkSMEnsembleDataReaderProxy&) = delete;
+  void operator=(const vtkSMEnsembleDataReaderProxy&) = delete;
 };
 
 #endif

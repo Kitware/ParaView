@@ -110,7 +110,7 @@ public:
 
 protected:
   vtkSMDomain();
-  ~vtkSMDomain();
+  ~vtkSMDomain() override;
 
   //@{
   /**
@@ -220,8 +220,8 @@ protected:
   vtkSMDomainInternals* Internals;
 
 private:
-  vtkSMDomain(const vtkSMDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMDomain&) VTK_DELETE_FUNCTION;
+  vtkSMDomain(const vtkSMDomain&) = delete;
+  void operator=(const vtkSMDomain&) = delete;
 };
 
 #endif

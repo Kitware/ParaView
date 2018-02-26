@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>437</width>
-    <height>221</height>
+    <height>227</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,23 +22,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-         <underline>true</underline>
-        </font>
-       </property>
-       <property name="text">
-        <string>Button</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QLabel" name="label_8">
        <property name="font">
@@ -73,99 +56,20 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+         <underline>true</underline>
+        </font>
+       </property>
        <property name="text">
-        <string>1</string>
+        <string>Button</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="toolTip0">
-       <property name="toolTip">
-        <string>This text will be set to the buttons tool tip.</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QPushButton" name="assignCurrentView0">
-       <property name="text">
-        <string>current view</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>2</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="toolTip1">
-       <property name="toolTip">
-        <string>This text will be set to the buttons tool tip.</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="assignCurrentView1">
-       <property name="text">
-        <string>current view</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>3</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="toolTip2">
-       <property name="toolTip">
-        <string>This text will be set to the buttons tool tip.</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QPushButton" name="assignCurrentView2">
-       <property name="text">
-        <string>current view</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>4</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="toolTip3">
-       <property name="toolTip">
-        <string>This text will be set to the buttons tool tip.</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QPushButton" name="assignCurrentView3">
-       <property name="text">
-        <string>current view</string>
        </property>
       </widget>
      </item>
@@ -185,6 +89,20 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="add">
+       <property name="toolTip">
+        <string>Add new custom view button</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+         <normaloff>:/QtWidgets/Icons/pqPlus16.png</normaloff>:/QtWidgets/Icons/pqPlus16.png</iconset>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="clearAll">
@@ -231,7 +149,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

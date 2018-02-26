@@ -21,7 +21,6 @@
 #include "vtkPVRepresentationAnimationHelper.h"
 #include "vtkSMAnimationScene.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
-#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMAnimationSceneWriter.h"
 #include "vtkSMArrayListDomain.h"
@@ -147,7 +146,6 @@ int ParaViewCoreServerManagerPrintSelf(int, char* [])
   PRINT_SELF(vtkPVRepresentationAnimationHelper);
   PRINT_SELF(vtkSMAnimationScene);
   PRINT_SELF(vtkSMAnimationSceneGeometryWriter);
-  PRINT_SELF(vtkSMAnimationSceneImageWriter);
   PRINT_SELF(vtkSMAnimationSceneProxy);
   PRINT_SELF(vtkSMAnimationSceneWriter);
   PRINT_SELF(vtkSMArrayListDomain);

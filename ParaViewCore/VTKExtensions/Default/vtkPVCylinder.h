@@ -43,20 +43,20 @@ public:
   //@}
 
   // Reimplemented to update transform on change:
-  virtual void SetCenter(double x, double y, double z) VTK_OVERRIDE;
-  virtual void SetCenter(double xyz[3]) VTK_OVERRIDE;
+  void SetCenter(double x, double y, double z) VTK_OVERRIDE;
+  void SetCenter(double xyz[3]) VTK_OVERRIDE;
 
 protected:
   vtkPVCylinder();
-  ~vtkPVCylinder();
+  ~vtkPVCylinder() override;
 
   void UpdateTransform();
 
   double OrientedAxis[3];
 
 private:
-  vtkPVCylinder(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVCylinder&) VTK_DELETE_FUNCTION;
+  vtkPVCylinder(const vtkPVCylinder&) = delete;
+  void operator=(const vtkPVCylinder&) = delete;
 };
 
 inline void vtkPVCylinder::SetOrientedAxis(double x, double y, double z)

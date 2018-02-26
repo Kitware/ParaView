@@ -24,7 +24,7 @@ public:
     };
 
     GW_GeodesicVertex();
-    virtual ~GW_GeodesicVertex();
+    ~GW_GeodesicVertex() override;
     using GW_Vertex::operator=;
     GW_Float GetDistance();
     void SetDistance( GW_Float rDistance );
@@ -177,7 +177,7 @@ typedef T_GeodesicVertexMap::const_reverse_iterator CRIT_GeodesicVertexMap;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -4,6 +4,7 @@
   Module:    vtkPVClientServerSynchronizedRenderers.cxx
 
   Copyright (c) Kitware, Inc.
+  Copyright (c) 2017, NVIDIA CORPORATION.
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
@@ -18,9 +19,13 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLRenderer.h"
+#include "vtkPVConfig.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkZlibImageCompressor.h"
+#ifdef PARAVIEW_ENABLE_NVPIPE
+#include "vtkNvPipeCompressor.h"
+#endif
 
 #include <assert.h>
 #include <sstream>
@@ -29,10 +34,11 @@ vtkStandardNewMacro(vtkPVClientServerSynchronizedRenderers);
 vtkCxxSetObjectMacro(vtkPVClientServerSynchronizedRenderers, Compressor, vtkImageCompressor);
 //----------------------------------------------------------------------------
 vtkPVClientServerSynchronizedRenderers::vtkPVClientServerSynchronizedRenderers()
+  : Compressor(NULL)
+  , LossLessCompression(true)
+  , NVPipeSupport(false)
 {
-  this->Compressor = NULL;
   this->ConfigureCompressor("vtkLZ4Compressor 0 3");
-  this->LossLessCompression = true;
 }
 
 //----------------------------------------------------------------------------
@@ -59,6 +65,7 @@ void vtkPVClientServerSynchronizedRenderers::MasterEndRender()
     {
       vtkUnsignedCharArray* data = vtkUnsignedCharArray::New();
       this->ParallelController->Receive(data, 1, 0x023430);
+      this->Compressor->SetImageResolution(header[1], header[2]);
       this->Decompress(data, rawImage.GetRawPtr());
       data->Delete();
     }
@@ -75,7 +82,6 @@ void vtkPVClientServerSynchronizedRenderers::SlaveStartRender()
 {
   this->Superclass::SlaveStartRender();
 
-#ifdef VTKGL2
   // In client-server mode, we want all the server ranks to simply render using
   // a black background. That makes it easier to blend the image we obtain from
   // the server rank on top of the background rendered locally on the client.
@@ -87,7 +93,6 @@ void vtkPVClientServerSynchronizedRenderers::SlaveStartRender()
   this->Renderer->SetBackground(0, 0, 0);
   this->Renderer->SetGradientBackground(false);
   this->Renderer->SetTexturedBackground(false);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -106,9 +111,18 @@ void vtkPVClientServerSynchronizedRenderers::SlaveEndRender()
 
   // send the image to the client.
   this->ParallelController->Send(header, 4, 1, 0x023430);
+
   if (rawImage.IsValid())
   {
-    this->ParallelController->Send(this->Compress(rawImage.GetRawPtr()), 1, 0x023430);
+    if (this->Compressor)
+    {
+      this->Compressor->SetImageResolution(header[1], header[2]);
+      this->ParallelController->Send(this->Compress(rawImage.GetRawPtr()), 1, 0x023430);
+    }
+    else
+    {
+      this->ParallelController->Send(rawImage.GetRawPtr(), 1, 0x023430);
+    }
   }
 }
 
@@ -153,8 +167,6 @@ void vtkPVClientServerSynchronizedRenderers::Decompress(
 //----------------------------------------------------------------------------
 void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* stream)
 {
-  // cerr << this->GetClassName() << "::ConfigureCompressor " << stream << endl;
-
   // Configure the compressor from a string. The string will
   // contain the class name of the compressor type to use,
   // follwed by a stream that the named class will restore itself
@@ -162,9 +174,8 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
   std::istringstream iss(stream);
   std::string className;
   iss >> className;
-
   // Allocate the desired compressor unless we have one in hand.
-  if (!(this->Compressor && this->Compressor->IsA(className.c_str())))
+  if (this->Compressor == nullptr || !this->Compressor->IsA(className.c_str()))
   {
     vtkImageCompressor* comp = 0;
     if (className == "vtkSquirtCompressor")
@@ -179,11 +190,29 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
     {
       comp = vtkLZ4Compressor::New();
     }
+    else if (className == "vtkNvPipeCompressor" && this->NVPipeSupport)
+    {
+#ifdef PARAVIEW_ENABLE_NVPIPE
+      comp = vtkNvPipeCompressor::New();
+#else
+      assert(false);
+      vtkErrorMacro("NVPipe not compiled in!");
+      return;
+#endif
+    }
+    else if (className == "vtkNvPipeCompressor")
+    {
+      // NVPipe was requested but not available.  Fall back to LZ4.
+      comp = vtkLZ4Compressor::New();
+      // We also need to rewrite the stream to have the correct type.
+      stream = "vtkLZ4Compressor 0 3";
+    }
     else if (className == "NULL" || className.empty())
     {
       this->SetCompressor(0);
       return;
     }
+
     if (comp == 0)
     {
       vtkWarningMacro("Could not create the compressor by name " << className << ".");
@@ -192,6 +221,7 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
     this->SetCompressor(comp);
     comp->Delete();
   }
+
   // move passed the class name and let the compressor configure itself
   // from the stream.
   const char* ok = this->Compressor->RestoreConfiguration(stream);

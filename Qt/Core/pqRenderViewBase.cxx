@@ -195,15 +195,6 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
     QObject::connect(
       this->InteractiveDelayUpdateTimer, SIGNAL(timeout()), this, SLOT(updateStatusMessage()));
   }
-
-  // when PV_NO_OFFSCREEN_SCREENSHOTS is set, by default, we disable offscreen
-  // screenshots.
-  vtkSMProxy* proxy = this->getProxy();
-  if (getenv("PV_NO_OFFSCREEN_SCREENSHOTS"))
-  {
-    vtkSMPropertyHelper(proxy, "UseOffscreenRenderingForScreenshots", /*quiet*/ true).Set(0);
-  }
-  proxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

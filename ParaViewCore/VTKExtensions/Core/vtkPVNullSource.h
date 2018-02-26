@@ -36,11 +36,11 @@ public:
 
 protected:
   vtkPVNullSource();
-  ~vtkPVNullSource();
+  ~vtkPVNullSource() override;
 
 private:
-  vtkPVNullSource(const vtkPVNullSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVNullSource&) VTK_DELETE_FUNCTION;
+  vtkPVNullSource(const vtkPVNullSource&) = delete;
+  void operator=(const vtkPVNullSource&) = delete;
 };
 
 #endif

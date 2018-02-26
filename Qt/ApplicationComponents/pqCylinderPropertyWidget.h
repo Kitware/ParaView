@@ -59,7 +59,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqCylinderPropertyWidget : public pqInterac
 
 public:
   pqCylinderPropertyWidget(vtkSMProxy* proxy, vtkSMPropertyGroup* smgroup, QWidget* parent = 0);
-  virtual ~pqCylinderPropertyWidget();
+  ~pqCylinderPropertyWidget() override;
 
 public slots:
   /**
@@ -91,7 +91,7 @@ protected slots:
   /**
   * Places the interactive widget using current data source information.
   */
-  virtual void placeWidget();
+  void placeWidget() override;
 
   void resetBounds();
 
@@ -99,7 +99,7 @@ private:
   Q_DISABLE_COPY(pqCylinderPropertyWidget)
 
   void setAxis(double x, double y, double z);
-  void updateWidget(bool showing_advanced_properties);
+  void updateWidget(bool showing_advanced_properties) override;
 
   pqPropertyLinks WidgetLinks;
   QWidget* AdvancedPropertyWidgets[2];

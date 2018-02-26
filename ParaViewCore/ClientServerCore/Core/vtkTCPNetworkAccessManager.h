@@ -71,34 +71,44 @@ public:
    * connect to the host/port. If absent, default is 60s. 0 or
    * negative implies no retry attempts.
    */
-  virtual vtkMultiProcessController* NewConnection(const char* url) VTK_OVERRIDE;
+  vtkMultiProcessController* NewConnection(const char* url) VTK_OVERRIDE;
 
   /**
    * Used to abort pending connection creation, if any. Refer to
    * NewConnection() for details.
    */
-  virtual void AbortPendingConnection() VTK_OVERRIDE;
+  void AbortPendingConnection() VTK_OVERRIDE;
 
   /**
    * Process any network activity.
    */
-  virtual int ProcessEvents(unsigned long timeout_msecs) VTK_OVERRIDE;
+  int ProcessEvents(unsigned long timeout_msecs) VTK_OVERRIDE;
 
   /**
    * Peeks to check if any activity is available. When this call returns true,
    * ProcessEvents() will always result in some activity processing if called
    * afterword.
    */
-  virtual bool GetNetworkEventsAvailable() VTK_OVERRIDE;
+  bool GetNetworkEventsAvailable() VTK_OVERRIDE;
 
   /**
    * Returns true is the manager is currently waiting for any connections.
    */
-  virtual bool GetPendingConnectionsPresent() VTK_OVERRIDE;
+  bool GetPendingConnectionsPresent() VTK_OVERRIDE;
+
+  /**
+   * Enable/disable further connections for given port.
+   */
+  virtual void DisableFurtherConnections(int port, bool disable) VTK_OVERRIDE;
+
+  /**
+   * Returns true if the last check of connect ids was wrong.
+   */
+  virtual bool GetWrongConnectID() VTK_OVERRIDE;
 
 protected:
   vtkTCPNetworkAccessManager();
-  ~vtkTCPNetworkAccessManager();
+  ~vtkTCPNetworkAccessManager() override;
 
   // used by GetPendingConnectionsPresent and ProcessEvents
   int ProcessEventsInternal(unsigned long timeout_msecs, bool do_processing);
@@ -115,14 +125,27 @@ protected:
   vtkMultiProcessController* WaitForConnection(
     int port, bool once, const char* handshake, bool nonblocking);
 
-  bool ParaViewHandshake(
+  enum HandshakeErrors
+  {
+    HANDSHAKE_NO_ERROR = 0,
+    HANDSHAKE_SOCKET_COMMUNICATOR_DIFFERENT,
+    HANDSHAKE_DIFFERENT_PV_VERSIONS,
+    HANDSHAKE_DIFFERENT_CONNECTION_IDS,
+    HANDSHAKE_DIFFERENT_RENDERING_BACKENDS,
+    HANDSHAKE_UNKNOWN_ERROR
+  };
+
+  int ParaViewHandshake(
     vtkMultiProcessController* controller, bool server_side, const char* handshake);
+  void PrintHandshakeError(int errorcode, bool server_side);
+  int AnalyzeHandshakeAndGetErrorCode(const char* clientHS, const char* serverHS);
 
   bool AbortPendingConnectionFlag;
+  bool WrongConnectID;
 
 private:
-  vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTCPNetworkAccessManager&) VTK_DELETE_FUNCTION;
+  vtkTCPNetworkAccessManager(const vtkTCPNetworkAccessManager&) = delete;
+  void operator=(const vtkTCPNetworkAccessManager&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

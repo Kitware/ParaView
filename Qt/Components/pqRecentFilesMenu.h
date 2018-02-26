@@ -69,7 +69,7 @@ public:
   * Assigns the menu that will display the list of files
   */
   pqRecentFilesMenu(QMenu& menu, QObject* p = 0);
-  virtual ~pqRecentFilesMenu();
+  ~pqRecentFilesMenu() override;
 
   /**
   * Open a resource on the given server

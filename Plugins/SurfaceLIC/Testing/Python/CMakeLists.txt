@@ -44,6 +44,8 @@ IF (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
     SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
+  SET(SurfaceLIC-OfficeSlices_THRESHOLD 30)
+  SET(SurfaceLIC-OfficeVSlice_THRESHOLD 30)
 ELSE()
   # run the test serially
   FOREACH (tfile ${PVBATCH_TESTS})
@@ -60,3 +62,6 @@ ELSE()
     SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
 ENDIF()
+
+# add test that tests loading of SurfaceLIC plugin in Python and then using it.
+paraview_add_test_python(TestSuraceLICPlugin.py,NO_VALID)

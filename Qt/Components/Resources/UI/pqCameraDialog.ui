@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>349</width>
-    <height>712</height>
+    <width>374</width>
+    <height>827</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -199,92 +199,7 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QToolButton" name="customView0">
-           <property name="minimumSize">
-            <size>
-             <width>34</width>
-             <height>33</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>not configured</string>
-           </property>
-           <property name="text">
-            <string>1</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="customView1">
-           <property name="minimumSize">
-            <size>
-             <width>34</width>
-             <height>33</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>not configured</string>
-           </property>
-           <property name="text">
-            <string>2</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="customView2">
-           <property name="minimumSize">
-            <size>
-             <width>34</width>
-             <height>33</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>not configured</string>
-           </property>
-           <property name="text">
-            <string>3</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="customView3">
-           <property name="minimumSize">
-            <size>
-             <width>34</width>
-             <height>33</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>not configured</string>
-           </property>
-           <property name="text">
-            <string>4</string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
+          <layout class="QGridLayout" name="customViewGridLayout"/>
          </item>
          <item>
           <spacer name="horizontalSpacer_2">
@@ -324,7 +239,16 @@
       <string>Configuration</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
        <number>6</number>
       </property>
       <item>
@@ -369,11 +293,11 @@
         <layout class="QGridLayout">
          <item row="0" column="0">
           <widget class="pqDoubleRangeWidget" name="rotationFactor" native="true">
-           <property name="StrictRange" stdset="1">
-            <bool>true</bool>
-           </property>
            <property name="toolTip">
             <string>Define the rotation speed factor.</string>
+           </property>
+           <property name="StrictRange" stdset="0">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -389,11 +313,20 @@
          <bool>true</bool>
         </property>
         <layout class="QGridLayout">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>4</number>
+         </property>
+         <property name="topMargin">
+          <number>4</number>
+         </property>
+         <property name="rightMargin">
+          <number>4</number>
+         </property>
+         <property name="bottomMargin">
           <number>4</number>
          </property>
          <property name="spacing">
-          <number>-1</number>
+          <number>6</number>
          </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label_22">
@@ -509,7 +442,16 @@
       <string>Apply Manipulation</string>
      </property>
      <layout class="QGridLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <property name="spacing">
@@ -541,8 +483,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff/>
-         </iconset>
+          <normaloff>.</normaloff>.</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -562,8 +503,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff/>
-         </iconset>
+          <normaloff>.</normaloff>.</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -583,8 +523,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff/>
-         </iconset>
+          <normaloff>.</normaloff>.</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -655,54 +594,65 @@
    </item>
    <item>
     <widget class="pqCollapsedGroup" name="interactiveViewLinkGroup">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Interactive View Link</string>
      </property>
      <layout class="QGridLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>4</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
        <number>4</number>
       </property>
       <property name="spacing">
        <number>4</number>
       </property>
-       <item row="0" column="0" colspan="2">
-        <widget class="QComboBox" name="interactiveViewLinkComboBox">
-         <property name="toolTip">
-          <string>Select Interactive View Link to manage.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QCheckBox" name="interactiveViewLinkBackground">
-         <property name="toolTip">
-          <string>Hide background from linked view.</string>
-         </property>
-         <property name="text">
-          <string>Hide background from linked view.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_InteractiveViewLinkOpacity">
-         <property name="text">
-          <string>Opacity:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="pqDoubleRangeWidget" name="interactiveViewLinkOpacity" native="true">
-         <property name="StrictRange" stdset="1">
-          <bool>true</bool>
-         </property>
-         <property name="toolTip">
-          <string>Define the view link opacity.</string>
-         </property>
-        </widget>
-       </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QComboBox" name="interactiveViewLinkComboBox">
+        <property name="toolTip">
+         <string>Select Interactive View Link to manage.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="interactiveViewLinkBackground">
+        <property name="toolTip">
+         <string>Hide background from linked view.</string>
+        </property>
+        <property name="text">
+         <string>Hide background from linked view.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_InteractiveViewLinkOpacity">
+        <property name="text">
+         <string>Opacity:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="pqDoubleRangeWidget" name="interactiveViewLinkOpacity" native="true">
+        <property name="toolTip">
+         <string>Define the view link opacity.</string>
+        </property>
+        <property name="StrictRange" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>

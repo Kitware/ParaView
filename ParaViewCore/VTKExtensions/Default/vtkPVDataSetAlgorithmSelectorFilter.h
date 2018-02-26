@@ -86,7 +86,7 @@ public:
   /**
    * Forward those methods to the underneath filters
    */
-  virtual int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
+  int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
     vtkInformationVector* outInfo) VTK_OVERRIDE;
 
   /**
@@ -97,12 +97,12 @@ public:
 
 protected:
   vtkPVDataSetAlgorithmSelectorFilter();
-  ~vtkPVDataSetAlgorithmSelectorFilter();
+  ~vtkPVDataSetAlgorithmSelectorFilter() override;
 
   virtual int RequestDataObject(
     vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector);
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   vtkGetMacro(OutputType, int);
   vtkSetMacro(OutputType, int);
@@ -115,9 +115,8 @@ protected:
   vtkCallbackCommand* InternalProgressObserver;
 
 private:
-  vtkPVDataSetAlgorithmSelectorFilter(
-    const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVDataSetAlgorithmSelectorFilter&) VTK_DELETE_FUNCTION;
+  vtkPVDataSetAlgorithmSelectorFilter(const vtkPVDataSetAlgorithmSelectorFilter&) = delete;
+  void operator=(const vtkPVDataSetAlgorithmSelectorFilter&) = delete;
 
   class vtkInternals;
   vtkInternals* Internal;

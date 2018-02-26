@@ -42,19 +42,18 @@ public:
 
 protected:
   vtkPVExtractComponent();
-  ~vtkPVExtractComponent();
+  ~vtkPVExtractComponent() override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   int InputArrayComponent;
   char* OutputArrayName;
 
 private:
-  vtkPVExtractComponent(const vtkPVExtractComponent&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExtractComponent&) VTK_DELETE_FUNCTION;
+  vtkPVExtractComponent(const vtkPVExtractComponent&) = delete;
+  void operator=(const vtkPVExtractComponent&) = delete;
 };
 
 #endif

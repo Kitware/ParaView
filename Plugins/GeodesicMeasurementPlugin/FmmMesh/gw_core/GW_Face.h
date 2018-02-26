@@ -3,7 +3,7 @@
 /**
  *  \file   GW_Face.h
  *  \brief  Definition of class \c GW_Face
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-12-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -22,17 +22,17 @@ namespace GW {
 /**
  *  \class  GW_Face
  *  \brief  A triangle, with its three vertex and its three neighbors.
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   2-12-2003
  *
- *  We use smart counter to check wether the face should descallocate a
+ *  We use smart counter to check whether the face should deallocate a
  *    vertex.
  *
  *    For vertex processing, a face is responsible for the vertex that caries
  *    a pointer on it. In fact, each vertex has a pointer on a single face
  *    that is responsible for that vertex.
  *
- *    Vertex, face and edge are labeled in a consistant way.
+ *    Vertex, face and edge are labeled in a consistent way.
  *    This means :
  *        - edge are labeled by the number of the opposite vertex.
  *        - neighbor faces are labeled by the edge number, i.e. by the opposite vertex number.
@@ -51,7 +51,7 @@ public:
     /*------------------------------------------------------------------------------*/
     //@{
     GW_Face();
-    virtual ~GW_Face();
+    ~GW_Face() override;
     virtual GW_Face& operator=(const GW_Face& Face);
     //@}
 
@@ -90,7 +90,7 @@ private:
 
     /** our defining vertex */
     GW_Vertex*        Vertex_[3];
-    /** the 2 faces arround us */
+    /** the 2 faces around us */
     GW_Face*        FaceNeighbors_[3];
     /** The ID the face, given by the Mesh. Should be in the range [0,...,NbrVertex] */
     GW_U32 nID_;
@@ -144,7 +144,7 @@ typedef T_FaceMap::const_reverse_iterator CRIT_FaceMap;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

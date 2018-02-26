@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPythonManager_h
 #define pqPythonManager_h
 
-#include "pqPythonModule.h"
+#include "pqPythonModule.h" // for exports
+#include "vtkSetGet.h"      // for VTK_LEGACY
+
 #include <QObject>
 
 class QWidget;
@@ -42,17 +44,13 @@ class pqPythonDialog;
 
 /**
 * pqPythonManager is a class to facilitate the use of a python interpreter
-* by various paraview GUI components.  The manager has a single instance
-* of the pqPythonDialog.  Currently the pqPythonDialog "owns" the
-* python interpreter.  Anyone who wants to execute python code should call
-* pythonShellDialog() to get a pointer to the pqPythonDialog instance.  This
-* manager class provides global access to the python dialog and methods to
-* ensure the python dialog's interpreter stays in sync with the current active
-* server.
+* by various paraview GUI components.
 *
-* Note: because the interpreter is initialized lazily, a number of the member
-* functions on this class have the side effect of initializing the python
-* interpreter first.
+* @section Roadmap Roadmap
+*
+* pqPythonManager is slated for deprecation. It's unclear there's a need for
+* such a manager anymore since Python interpreter is globally accessible via
+* vtkPythonInterpreter.
 */
 class PQPYTHON_EXPORT pqPythonManager : public QObject
 {
@@ -60,18 +58,21 @@ class PQPYTHON_EXPORT pqPythonManager : public QObject
 
 public:
   pqPythonManager(QObject* parent = NULL);
-  virtual ~pqPythonManager();
+  ~pqPythonManager() override;
 
   /**
    * Returns true if the interpreter has been initialized.
+   * Same as calling `vtkPythonInterpreter::IsInitialized()`.
    */
   bool interpreterIsInitialized();
 
   /**
    * Return the python shell dialog.  This will cause the interpreter to be initialized
    * if it has not been already.
+   * @deprecated ParaView 5.5. Applications should directly create pqPythonShell
+   * as needed.
    */
-  pqPythonDialog* pythonShellDialog();
+  VTK_LEGACY(pqPythonDialog* pythonShellDialog());
 
   //@{
   /**
@@ -88,8 +89,10 @@ public:
    * Show the python editor with the trace in it.
    * If txt is empty, the editor will obtain the state from active vtkSMTrace
    * instance, if any.
+   * @deprecated ParaView 5.5. Applications should directly create and use
+   * pqPythonScriptEditor as needed.
    */
-  void editTrace(const QString& txt = QString(), bool update = false);
+  VTK_LEGACY(void editTrace(const QString& txt = QString(), bool update = false));
 
   /**
    * Save the macro in ParaView configuration and update widget automatically
@@ -101,9 +104,6 @@ public:
    * the content of the Macros directories...
    */
   void updateMacroList();
-
-signals:
-  void paraviewPythonModulesImported();
 
 public slots:
   /**
@@ -124,11 +124,6 @@ public slots:
    */
   void editMacro(const QString& fileName);
 
-  /**
-   * Print on the status bar "Python Trace is currently ON" if currently tracing...
-   */
-  void updateStatusMessage();
-
 protected slots:
   /**
    * Whenever we are about to disconnect from a server, we "reset" the Python
@@ -138,7 +133,7 @@ protected slots:
   void onRemovingServer(pqServer* server);
 
 protected:
-  QString getTraceString();
+  VTK_LEGACY(QString getTraceString());
 
 private:
   class pqInternal;

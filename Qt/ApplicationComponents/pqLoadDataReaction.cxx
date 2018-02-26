@@ -81,7 +81,7 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
   pqFileDialog fileDialog(
     server, pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filters);
   fileDialog.setObjectName("FileOpenDialog");
-  fileDialog.setFileMode(pqFileDialog::ExistingFiles);
+  fileDialog.setFileMode(pqFileDialog::ExistingFilesAndDirectories);
   QList<pqPipelineSource*> sources;
   if (fileDialog.exec() == QDialog::Accepted)
   {
@@ -202,11 +202,11 @@ bool pqLoadDataReaction::DetermineFileReader(const QString& filename, pqServer* 
       return false;
     }
   }
-  else if (factory->CanReadFile(filename.toUtf8().data(), server->session()))
+  else if (list->GetLength() == 3)
   {
     // reader knows the type
-    readerType = factory->GetReaderName();
-    readerGroup = factory->GetReaderGroup();
+    readerGroup = list->GetString(0);
+    readerType = list->GetString(1);
   }
   else
   {

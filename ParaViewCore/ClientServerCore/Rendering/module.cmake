@@ -1,15 +1,19 @@
 set (__dependencies)
+set (__private_dependencies)
 if(PARAVIEW_USE_PISTON)
   list(APPEND __dependencies vtkAcceleratorsPiston)
 endif()
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL")
-  list(APPEND __dependencies vtkWebGLExporter vtkRenderingVolumeAMR)
-endif()
-if (PARAVIEW_USE_OPENVR)
-  list(APPEND __dependencies vtkRenderingOpenVR)
-endif()
 if(PARAVIEW_USE_OSPRAY)
   list(APPEND __dependencies vtkRenderingOSPRay)
+endif()
+if(PARAVIEW_USE_OPENTURNS)
+  list(APPEND __dependencies vtkFiltersOpenTurns)
+endif()
+if(PARAVIEW_USE_VTKM)
+  list(APPEND __private_dependencies
+    vtkAcceleratorsVTKm
+    vtkVTKm
+  )
 endif()
 
 vtk_module(vtkPVClientServerCoreRendering
@@ -22,13 +26,14 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkPVVTKExtensionsDefault
     vtkPVVTKExtensionsRendering
     vtkRenderingLabel
-    vtkRenderingVolume${VTK_RENDERING_BACKEND}
+    vtkRenderingVolumeOpenGL2
     vtkViewsContext2D
     vtkViewsCore
     ${__dependencies}
   PRIVATE_DEPENDS
     vtksys
     vtkzlib
+    ${__private_dependencies}
   TEST_LABELS
     PARAVIEW
   KIT

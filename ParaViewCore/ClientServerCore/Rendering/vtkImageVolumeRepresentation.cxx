@@ -18,6 +18,7 @@
 #include "vtkCellData.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
+#include "vtkContourValues.h"
 #include "vtkExtentTranslator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -196,19 +197,6 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
-#ifndef VTK_LEGACY_REMOVE
-void vtkImageVolumeRepresentation::PassOrderedCompositingInformation(
-  vtkPVDataRepresentation* vtkNotUsed(self), vtkInformation* vtkNotUsed(inInfo))
-{
-  vtkGenericWarningMacro(
-    "vtkImageVolumeRepresentation::PassOrderedCompositingInformation was deprecated in "
-    "ParaView 5.0 and will be removed in a future version. Change your representation "
-    "to cache information about image and then pass to "
-    "vtkPVRenderView::SetOrderedCompositingInformation() directly.");
-}
-#endif
-
-//----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -352,19 +340,23 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
   // this is necessary since volume mappers don't like empty arrays.
   this->Actor->SetVisibility(colorArrayName != NULL && colorArrayName[0] != 0);
 
-#ifdef VTKGL2
   if (this->Property)
   {
     // Update the mapper's vector mode
     vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
 
-    int const mode = ctf->GetVectorMode();
-    int const comp = ctf->GetVectorComponent();
+    // When vtkScalarsToColors::MAGNITUDE mode is active, vtkSmartVolumeMapper
+    // uses an internally generated (single-component) dataset.  However,
+    // unchecking MapScalars (e.g. IndependentComponents == 0) requires 2C or 4C
+    // data. In that case, vtkScalarsToColors::COMPONENT is forced in order to
+    // make vtkSmartVolumeMapper use the original multiple-component dataset.
+    int const indep = this->Property->GetIndependentComponents();
+    int const mode = indep ? ctf->GetVectorMode() : vtkScalarsToColors::COMPONENT;
+    int const comp = indep ? ctf->GetVectorComponent() : 0;
 
     this->VolumeMapper->SetVectorMode(mode);
     this->VolumeMapper->SetVectorComponent(comp);
   }
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -468,7 +460,7 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
+void vtkImageVolumeRepresentation::SetIndependentComponents(bool val)
 {
   this->Property->SetIndependentComponents(val);
 }
@@ -477,4 +469,23 @@ void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
 void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
   this->VolumeMapper->SetRequestedRenderMode(mode);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetShowIsosurfaces(int show)
+{
+  this->VolumeMapper->SetBlendMode(
+    show ? vtkVolumeMapper::ISOSURFACE_BLEND : vtkVolumeMapper::COMPOSITE_BLEND);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetIsosurfaceValue(int i, double value)
+{
+  this->Property->GetIsoSurfaceValues()->SetValue(i, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetNumberOfIsosurfaces(int number)
+{
+  this->Property->GetIsoSurfaceValues()->SetNumberOfContours(number);
 }

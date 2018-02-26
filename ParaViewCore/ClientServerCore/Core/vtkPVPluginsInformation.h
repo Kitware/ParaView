@@ -73,12 +73,12 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   /**
    * Updates the local information with elements from other without overriding
@@ -90,8 +90,8 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -112,14 +112,14 @@ public:
 
 protected:
   vtkPVPluginsInformation();
-  ~vtkPVPluginsInformation();
+  ~vtkPVPluginsInformation() override;
 
   char* SearchPaths;
   vtkSetStringMacro(SearchPaths);
 
 private:
-  vtkPVPluginsInformation(const vtkPVPluginsInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPluginsInformation&) VTK_DELETE_FUNCTION;
+  vtkPVPluginsInformation(const vtkPVPluginsInformation&) = delete;
+  void operator=(const vtkPVPluginsInformation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

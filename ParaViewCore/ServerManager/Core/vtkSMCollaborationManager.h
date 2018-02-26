@@ -61,13 +61,13 @@ public:
    * Get the global unique id for this object. If none is set and the session is
    * valid, a new global id will be assigned automatically.
    */
-  virtual vtkTypeUInt32 GetGlobalID() VTK_OVERRIDE;
+  vtkTypeUInt32 GetGlobalID() VTK_OVERRIDE;
 
   /**
    * Override the session setting in order to update only once our current
    * local user id
    */
-  virtual void SetSession(vtkSMSession*) VTK_OVERRIDE;
+  void SetSession(vtkSMSession*) VTK_OVERRIDE;
 
   /**
    * This method is used promote a new Master user. Master/Slave user doesn't
@@ -98,6 +98,11 @@ public:
    * Return the userId of the current master
    */
   virtual int GetMasterId();
+
+  /**
+   * Return true if further connections are disabled.
+   */
+  bool GetDisableFurtherConnections();
 
   /**
    * Return the id of the current client
@@ -136,6 +141,17 @@ public:
    */
   void UpdateUserInformations();
 
+  /**
+   * Return the server connect id if this is the master.
+   * Else return -1.
+   */
+  int GetServerConnectID();
+
+  /**
+   * Return the client connect id.
+   */
+  int GetConnectID();
+
   enum EventType
   {
     CollaborationNotification = 12345,
@@ -154,13 +170,25 @@ public:
   /**
    * This method return the state of the connected clients
    */
-  virtual const vtkSMMessage* GetFullState() VTK_OVERRIDE;
+  const vtkSMMessage* GetFullState() VTK_OVERRIDE;
 
   /**
    * This method is used to either load its internal connected clients
-   * informations or to forward messages across clients
+   * information or to forward messages across clients
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+
+  /**
+   * Enable or disable further connections to the server.
+   * Already connected clients stay connected.
+   */
+  void DisableFurtherConnections(bool disable);
+
+  /**
+   * Change the connect-id. Already connected clients stay connected.
+   * @param connectID the new connect-id for the server.
+   */
+  void SetConnectID(int connectID);
 
 protected:
   /**
@@ -171,13 +199,13 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkSMCollaborationManager();
+  ~vtkSMCollaborationManager() override;
 
 private:
   class vtkInternal;
   vtkInternal* Internal;
 
-  vtkSMCollaborationManager(const vtkSMCollaborationManager&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCollaborationManager&) VTK_DELETE_FUNCTION;
+  vtkSMCollaborationManager(const vtkSMCollaborationManager&) = delete;
+  void operator=(const vtkSMCollaborationManager&) = delete;
 };
 #endif // #ifndef vtkSMCollaborationManager_h

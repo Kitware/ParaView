@@ -157,22 +157,22 @@ public:
   /**
    * Returns the prop bounds.
    */
-  virtual double* GetBounds() VTK_OVERRIDE
+  double* GetBounds() VTK_OVERRIDE
   {
     this->GetGridBounds(this->Bounds);
     return this->Bounds;
   }
   //@}
 
-  virtual int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
-  virtual int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
-  virtual int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
-  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
+  int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
+  int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
 
 protected:
   vtkGridAxesPlane2DActor(vtkGridAxesHelper* helper = NULL);
-  ~vtkGridAxesPlane2DActor();
+  ~vtkGridAxesPlane2DActor() override;
 
   //@{
   /**
@@ -214,8 +214,8 @@ protected:
   bool HelperManagedExternally;
 
 private:
-  vtkGridAxesPlane2DActor(const vtkGridAxesPlane2DActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGridAxesPlane2DActor&) VTK_DELETE_FUNCTION;
+  vtkGridAxesPlane2DActor(const vtkGridAxesPlane2DActor&) = delete;
+  void operator=(const vtkGridAxesPlane2DActor&) = delete;
   std::deque<double> EmptyVector;
 
   typedef std::pair<vtkVector3d, vtkVector3d> LineSegmentType;

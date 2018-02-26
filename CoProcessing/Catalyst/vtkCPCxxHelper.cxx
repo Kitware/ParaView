@@ -34,10 +34,6 @@
 #include <string>
 #include <vtksys/SystemTools.hxx>
 
-//----------------------------------------------------------------------------
-// Needed when we don't use the vtkStandardNewMacro.
-vtkInstantiatorNewMacro(vtkCPCxxHelper);
-
 vtkWeakPointer<vtkCPCxxHelper> vtkCPCxxHelper::Instance;
 
 //----------------------------------------------------------------------------
@@ -68,6 +64,8 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
     if (!instance)
     {
       instance = new vtkCPCxxHelper;
+      // for compliance with vtkDebugLeaks, initialize the object base
+      instance->InitializeObjectBase();
     }
 
     vtkCPCxxHelper::Instance = instance;

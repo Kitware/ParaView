@@ -52,8 +52,8 @@ protected:
   ~vtkCPConstantScalarFieldFunction();
 
 private:
-  vtkCPConstantScalarFieldFunction(const vtkCPConstantScalarFieldFunction&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPConstantScalarFieldFunction&) VTK_DELETE_FUNCTION;
+  vtkCPConstantScalarFieldFunction(const vtkCPConstantScalarFieldFunction&) = delete;
+  void operator=(const vtkCPConstantScalarFieldFunction&) = delete;
 
   //@{
   /**

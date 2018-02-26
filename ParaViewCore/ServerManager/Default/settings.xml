@@ -48,6 +48,21 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ForceSingleColumnMenus"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          Force the sources/filters menus to be presented as a single
+          scrollable column to ensure that all the filters are selectable
+          on low resolution screens.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <SaveInQSettings />
+        </Hints>
+      </IntVectorProperty>
+
       <IntVectorProperty name="GUIOverrideFont"
         label="Override Font"
         command="SetGUIOverrideFont"
@@ -212,9 +227,12 @@
         default_values="0"
         command="SetTransferFunctionResetMode">
         <Documentation>
-          Color transfer functions (or color maps) are used map data values to colors
-          for pseudo coloring. Set when and how should ParaView update the data
-          range used for this mapping.
+          Color transfer functions (or color maps) are used to map data values to colors
+          for pseudo coloring. Set the default way ParaView decides to update the data
+          range used for this mapping. Newly created transfer functions will update
+          the range according to this setting, but it can later be changed per
+          transfer function via the transfer function's 'Automatic Rescale Range Mode'
+          setting.
         </Documentation>
         <EnumerationDomain name="enum">
           <Entry text="Grow and update on 'Apply'" value="0" />
@@ -234,21 +252,6 @@
           <Entry text="Automatically show and/or hide color bars" value="0" />
           <Entry text="Automatically hide unused color bars" value="1" />
           <Entry text="Manual (not recommended)" value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="DefaultTimeStep"
-        number_of_elements="1"
-        default_values="1">
-        <Documentation>
-          Any time a new dataset with timesteps is opened,
-          set the timestep the application should go to
-          by default.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Leave current time unchanged, if possible" value="0" />
-          <Entry text="Go to first timestep" value="1" />
-          <Entry text="Go to last timestep" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -328,6 +331,18 @@
         <IntRangeDomain min="1" max="17" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ShowAnimationShortcuts"
+        number_of_elements="1"
+        default_values="0"
+        command="SetShowAnimationShortcuts"
+        panel_visibility="advanced">
+        <Documentation>
+          Set whether to show or not an animation shortcut button
+          on ranged scalar property.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="InheritRepresentationProperties"
         command="SetInheritRepresentationProperties"
         number_of_elements="1"
@@ -340,6 +355,21 @@
            a source, then any filter that you connect to it and show in the same view
            should be transformed using the same transformation as well.
         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DefaultTimeStep"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Any time a new dataset with timesteps is opened,
+          set the timestep the application should go to
+          by default.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Leave current time unchanged, if possible" value="0" />
+          <Entry text="Go to first timestep" value="1" />
+          <Entry text="Go to last timestep" value="2" />
+        </EnumerationDomain>
       </IntVectorProperty>
 
       <IntVectorProperty name="MaximumNumberOfDataRepresentationLabels"
@@ -359,7 +389,7 @@
         <Property name="ShowWelcomeDialog" />
         <Property name="ShowSaveStateOnExit" />
         <Property name="CrashRecovery" />
-        <Property name="GUIFontSize" />
+        <Property name="ForceSingleColumnMenus" />
       </PropertyGroup>
 
       <PropertyGroup label="GUI Font">
@@ -402,10 +432,13 @@
         <Property name="CacheGeometryForAnimation" />
         <Property name="AnimationGeometryCacheLimit" />
         <Property name="AnimationTimePrecision" />
+        <Property name="ShowAnimationShortcuts" />
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">
         <Property name="InheritRepresentationProperties" />
+        <Property name="DefaultTimeStep" />
+        <Property name="MaximumNumberOfDataRepresentationLabels" />
       </PropertyGroup>
       <Hints>
         <UseDocumentationForLabels />
@@ -419,20 +452,6 @@
       <Documentation>
         Application settings for render views.
       </Documentation>
-
-      <IntVectorProperty name="UseDisplayLists"
-        command="SetUseDisplayLists"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Enable use of display lists when rendering surface meshes
-          (only applicable for builds with legacy rendering backend).
-        </Documentation>
-        <Hints>
-          <RestartRequired />
-        </Hints>
-      </IntVectorProperty>
 
       <IntVectorProperty name="ResolveCoincidentTopology"
         command="SetResolveCoincidentTopology"
@@ -493,6 +512,22 @@
           Enable depth-peeling to correctly render translucent polygons. May slow down
           rendering performance.
         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DepthPeelingForVolumes"
+        default_values="1"
+        number_of_elements="1"
+        panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Include volumes in the depth-peeling pass to correctly render intermixed
+          volumes with translucent polygons. May slow down rendering performance.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="DepthPeeling" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="MaximumNumberOfPeels"
@@ -735,17 +770,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="UseOffscreenRenderingForScreenshots"
-        default_values="0"
-        number_of_elements="1"
-        panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Set whether offscreen rendering should be used
-          when saving screenshots or animations.
-        </Documentation>
-      </IntVectorProperty>
-
       <IntVectorProperty name="ShowAnnotation"
                          default_values="0"
                          number_of_elements="1"
@@ -786,7 +810,6 @@
       </IntVectorProperty>
 
       <PropertyGroup label="Geometry Mapper Options">
-        <Property name="UseDisplayLists" />
         <Property name="ResolveCoincidentTopology" />
         <Property name="PolygonOffsetParameters" />
         <Property name="ZShift" />
@@ -826,8 +849,8 @@
 
       <PropertyGroup label="Miscellaneous">
         <Property name="OutlineThreshold" />
-        <Property name="UseOffscreenRenderingForScreenshots" />
         <Property name="ShowAnnotation" />
+        <Property name="PointPickingRadius" />
         <Property name="DisableIceT" />
       </PropertyGroup>
       <Hints>

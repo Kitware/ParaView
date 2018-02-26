@@ -69,7 +69,7 @@ public:
 
   pqProxy(const QString& group, const QString& name, vtkSMProxy* proxy, pqServer* server,
     QObject* parent = NULL);
-  virtual ~pqProxy();
+  ~pqProxy() override;
 
   /**
   * Get the server on which this proxy exists.
@@ -137,10 +137,13 @@ public:
   */
   QList<QString> getHelperKeys() const;
 
+  //@{
   /**
   * convert proxy documentation from RST to HTML (so that it can be used in Qt)
   */
   static std::string rstToHtml(const char* rstStr);
+  static QString rstToHtml(const QString& rstStr);
+  //@}
 
   /**
   * Concept of helper proxies:

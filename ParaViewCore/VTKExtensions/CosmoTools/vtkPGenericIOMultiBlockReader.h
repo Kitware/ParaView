@@ -263,8 +263,8 @@ protected:
   virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
 private:
-  vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPGenericIOMultiBlockReader&) VTK_DELETE_FUNCTION;
+  vtkPGenericIOMultiBlockReader(const vtkPGenericIOMultiBlockReader&) = delete;
+  void operator=(const vtkPGenericIOMultiBlockReader&) = delete;
   // Internal helper class
   class vtkGenericIOMultiBlockMetaData;
   vtkGenericIOMultiBlockMetaData* MetaData;

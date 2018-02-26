@@ -46,11 +46,11 @@ public:
    * This causes the actor to be rendered. It, in turn, will render the actor's
    * property and then mapper.
    */
-  virtual void Render(vtkRenderer*, vtkMapper*) VTK_OVERRIDE;
+  void Render(vtkRenderer*, vtkMapper*) VTK_OVERRIDE;
 
   /**
    * This method is used internally by the rendering process.
-   * We overide the superclass method to properly set the estimated render time.
+   * We override the superclass method to properly set the estimated render time.
    */
   int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
 
@@ -71,7 +71,7 @@ public:
 
   /**
    * This is a bit of a hack.  This returns the last mapper used to render.
-   * It does this so that compositing can descide if anything was actually renderered.
+   * It does this so that compositing can decide if anything was actually renderered.
    */
   vtkMapper* GetMapper() VTK_OVERRIDE { return this->SelectMapper(); }
 
@@ -110,7 +110,7 @@ public:
 
 protected:
   vtkPVLODActor();
-  ~vtkPVLODActor();
+  ~vtkPVLODActor() override;
   vtkActor* Device;
   vtkMapper* LODMapper;
 
@@ -119,8 +119,8 @@ protected:
   int EnableLOD;
 
 private:
-  vtkPVLODActor(const vtkPVLODActor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVLODActor&) VTK_DELETE_FUNCTION;
+  vtkPVLODActor(const vtkPVLODActor&) = delete;
+  void operator=(const vtkPVLODActor&) = delete;
 };
 
 #endif

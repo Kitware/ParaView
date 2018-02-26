@@ -48,13 +48,13 @@ class PQCOMPONENTS_EXPORT pqCommandPropertyWidget : public pqPropertyWidget
 
 public:
   pqCommandPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
-  virtual ~pqCommandPropertyWidget();
+  ~pqCommandPropertyWidget() override;
 
 protected slots:
   /**
   * called when the button is clicked by the user.
   */
-  void buttonClicked();
+  virtual void buttonClicked();
 
 private:
   Q_DISABLE_COPY(pqCommandPropertyWidget)

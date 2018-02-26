@@ -118,4 +118,4 @@ if not equal(value, expected):
 Disconnect()
 
 if errors > 0:
-  raise RuntimeError ("An error occured during the execution")
+  raise RuntimeError ("An error occurred during the execution")

@@ -13,10 +13,17 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVSILInformation
+ * @class vtkPVSILInformation
+ * @brief vtkPVInformation subclass to fetch SIL.
  *
- * Information object used to retreived the SIL graph from a file reader or
- * any compatible source.
+ * Information object used to retrieve the SIL from an algorithm. It supports
+ * both legacy representation of SIL (using a vtkGraph) or the newer form (using
+ * vtkSubsetInclusionLattice or subclass).
+ *
+ * If `CopyFromObject` is called with vtkAlgorithmOutput as the argument, it
+ * looks for presence of `vtkSubsetInclusionLattice::SUBSET_INCLUSION_LATTICE()`
+ * or `vtkDataObject::SIL()` (for legacy SIL) key in the output information for
+ * the corresponding `vtkAlgorithm`.
 */
 
 #ifndef vtkPVSILInformation_h
@@ -24,8 +31,10 @@
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkGraph;
+class vtkSubsetInclusionLattice;
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSILInformation : public vtkPVInformation
 {
@@ -37,33 +46,41 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
-   * Returns the SIL.
+   * Returns the SIL. This returns the legacy SIL representation, if any.
    */
   vtkGetObjectMacro(SIL, vtkGraph);
   //@}
 
+  //@{
+  /**
+   * Returns the SIL represented using vtkSubsetInclusionLattice.
+   */
+  vtkSubsetInclusionLattice* GetSubsetInclusionLattice() const;
+  //@}
+
 protected:
   vtkPVSILInformation();
-  ~vtkPVSILInformation();
+  ~vtkPVSILInformation() override;
 
   void SetSIL(vtkGraph*);
   vtkGraph* SIL;
+  vtkSmartPointer<vtkSubsetInclusionLattice> SubsetInclusionLattice;
 
 private:
-  vtkPVSILInformation(const vtkPVSILInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVSILInformation&) VTK_DELETE_FUNCTION;
+  vtkPVSILInformation(const vtkPVSILInformation&) = delete;
+  void operator=(const vtkPVSILInformation&) = delete;
 };
 
 #endif

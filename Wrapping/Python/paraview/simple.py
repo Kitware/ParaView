@@ -35,9 +35,7 @@ A simple example::
 #
 #==============================================================================
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 import paraview
 from paraview import servermanager
@@ -169,9 +167,17 @@ def CreateRenderView(detachedFromLayout=False, **params):
 def CreateXYPlotView(detachedFromLayout=False, **params):
     """Create XY plot Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("XYChartView", detachedFromLayout=False, **params)
+    return CreateView("XYChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
+
+def CreateXYPointPlotView(detachedFromLayout=False, **params):
+    """Create XY plot point Chart view.
+    See CreateView for arguments documentation"""
+    return CreateView("XYPointChartView", detachedFromLayout, **params)
+
+# -----------------------------------------------------------------------------
+
 
 def CreateBarChartView(detachedFromLayout=False, **params):
     """"Create Bar Chart view.
@@ -204,14 +210,14 @@ def CreateComparativeBarChartView(detachedFromLayout=False, **params):
 def CreateParallelCoordinatesChartView(detachedFromLayout=False, **params):
     """"Create Parallele coordinate Chart view.
     See CreateView for arguments documentation"""
-    return CreateView("ParallelCoordinatesChartView", **params)
+    return CreateView("ParallelCoordinatesChartView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
 def Create2DRenderView(detachedFromLayout=False, **params):
     """"Create the standard 3D render view with the 2D interaction mode turned ON.
     See CreateView for arguments documentation"""
-    return CreateView("2DRenderView", **params)
+    return CreateView("2DRenderView", detachedFromLayout, **params)
 
 # -----------------------------------------------------------------------------
 
@@ -501,16 +507,18 @@ def SetDisplayProperties(proxy=None, view=None, **params):
     SetProperties(rep, **params)
 
 # -----------------------------------------------------------------------------
-def ColorBy(rep=None, value=None):
+def ColorBy(rep=None, value=None, separate=False):
     """Set scalar color. This will automatically setup the color maps and others
     necessary state for the representations. 'rep' must be the display
     properties proxy i.e. the value returned by GetDisplayProperties() function.
     If none is provided the display properties for the active source will be
-    used, if possible."""
+    used, if possible. Set separate to True in order to use a separate color
+    map for this representation"""
     rep = rep if rep else GetDisplayProperties()
     if not rep:
         raise ValueError ("No display properties can be determined.")
 
+    rep.UseSeparateColorMap = separate
     association = rep.ColorArrayName.GetAssociation()
     arrayname = rep.ColorArrayName.GetArrayName()
     component = None
@@ -582,22 +590,25 @@ def SetProperties(proxy=None, **params):
 
 def GetProperty(*arguments, **keywords):
     """Get one property of the given pipeline object. If keywords are used,
-       you can set the proxy and the name of the property that you want to get
-       like in the following example::
+    you can set the proxy and the name of the property that you want to get
+    as shown in the following example::
 
-            GetProperty({proxy=sphere, name="Radius"})
+        GetProperty({proxy=sphere, name="Radius"})
 
-       If it's arguments that are used, then you have two case:
-         - if only one argument is used that argument will be
-           the property name.
-         - if two arguments are used then the first one will be
-           the proxy and the second one the property name.
-       Several example are given below::
+    If arguments are used, then you have two cases:
 
-           GetProperty({name="Radius"})
-           GetProperty({proxy=sphereProxy, name="Radius"})
-           GetProperty( sphereProxy, "Radius" )
-           GetProperty( "Radius" )
+    - if only one argument is used that argument will be
+      the property name.
+
+    - if two arguments are used then the first one will be
+      the proxy and the second one the property name.
+
+    Several example are given below::
+
+        GetProperty({name="Radius"})
+        GetProperty({proxy=sphereProxy, name="Radius"})
+        GetProperty( sphereProxy, "Radius" )
+        GetProperty( "Radius" )
     """
     name = None
     proxy = None
@@ -805,29 +816,25 @@ def Delete(proxy=None):
 #==============================================================================
 
 def GetActiveView():
-    """.. _GetActiveView:
-        Returns the active view."""
+    """Returns the active view."""
     return active_objects.view
 
 # -----------------------------------------------------------------------------
 
 def SetActiveView(view):
-    """.. _SetActiveView:
-        Sets the active view."""
+    """Sets the active view."""
     active_objects.view = view
 
 # -----------------------------------------------------------------------------
 
 def GetActiveSource():
-    """.. _GetActiveSource:
-        Returns the active source."""
+    """Returns the active source."""
     return active_objects.source
 
 # -----------------------------------------------------------------------------
 
 def SetActiveSource(source):
-    """.. _SetActiveSource:
-        Sets the active source."""
+    """Sets the active source."""
     active_objects.source = source
 
 # -----------------------------------------------------------------------------
@@ -894,7 +901,7 @@ def ImportCinema(filename, view=None):
     are shown in that view as indicated in the database.
     """
     try:
-        from paraview.vtk.vtkPVCinemaReader import vtkSMCinemaDatabaseImporter
+        from vtkmodules.vtkPVCinemaReader import vtkSMCinemaDatabaseImporter
     except ImportError:
         # cinema not supported in current configuration
         return False
@@ -1001,58 +1008,94 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
 
     `SaveScreenshot` is used to save the rendering results to an image.
 
-    Parameters:
-    -----------
-        filename (str): name of the image file to save to. The filename extension
-            is used to determine the type of image file generated. Supported
-            extensions are `png`, `jpg`, `tif`, `bmp`, and `ppm`.
-        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
-            from, defaults to None. If None, then the active view is used, if
-            available. To save image from a single view, this must be set to a
-            view, to save an image from all views in a layout, pass the layout.
+    **Parameters**
 
-    Keyword Parameters (optional):
-    ------------------------------
-        ImageResolution (tuple(int, int)): a 2-tuple to specify the
-            output image resolution in pixels as `(width, height)`. If not
-            specified, the view (or layout) size is used.
-        FontScaling (str): specify whether to scale fonts
-            proportionally (`"Scale fonts proportionally"`) or
-            not (`"Do not scale fonts"`). Defaults to `"Scale fonts
-            proportionally"`.
-        SeparatorWidth (int): when saving multiple views in a
-            layout, specify the width (in approximate pixels) for a spearator
-            between views in the generated image.
-        SeparatorColor (tuple(float, float, float)): specify the
-            color for separator between views, if applicable.
-        OverrideColorPalette (:obj:str, optional): name of the color palette to
-            use, if any. If none specified, current color palette remains
-            unchanged.
-        StereoMode (str): stereo mode to use, if any. Available
-            values are `"No stereo"`,`"Red-Blue"`, `"Interlaced"`,
-            `"Left Eye Only"`, `"Right Eye Only"`, `"Dresden"`,
-            `"Anaglyph"`, `"Checkerboard"`, `"Side-by-Side Horizontal"`, and the
-            default `"No change"`.
-        TransparentBackground (int): set to 1 (or True) to save
-            an image with background set to alpha=0, if supported by the output
-            image format.
-        ImageQuality (int): set a number in the range [0, 100] to
-            specify the output image quality/compression. 0 is least
-            quality/most compressed, while 100 means best quality/least
-            compressed.
+        filename (str)
+          Name of the image file to save to. The filename extension is used to
+          determine the type of image file generated. Supported extensions are
+          `png`, `jpg`, `tif`, `bmp`, and `ppm`.
 
-    Legacy Parameters:
-    ------------------
+        viewOrLayout (``proxy``, optional):
+          The view or layout to save image from, defaults to None. If None, then
+          the active view is used, if available. To save image from a single
+          view, this must be set to a view, to save an image from all views in a
+          layout, pass the layout.
+
+    **Keyword Parameters (optional)**
+
+        ImageResolution (tuple(int, int))
+          A 2-tuple to specify the output image resolution in pixels as
+          `(width, height)`. If not specified, the view (or layout) size is
+          used.
+
+        FontScaling (str)
+          Specify whether to scale fonts proportionally (`"Scale fonts
+          proportionally"`) or not (`"Do not scale fonts"`). Defaults to
+          `"Scale fonts proportionally"`.
+
+        SeparatorWidth (int)
+          When saving multiple views in a layout, specify the width (in
+          approximate pixels) for a separator between views in the generated
+          image.
+
+        SeparatorColor (tuple(float, float, float))
+          Specify the color for separator between views, if applicable.
+
+        OverrideColorPalette (:obj:str, optional)
+          Name of the color palette to use, if any. If none specified, current
+          color palette remains unchanged.
+
+        StereoMode (str)
+          Stereo mode to use, if any. Available values are `"No stereo"`,
+          `"Red-Blue"`, `"Interlaced"`, `"Left Eye Only"`, `"Right Eye Only"`,
+          `"Dresden"`, `"Anaglyph"`, `"Checkerboard"`,
+          `"Side-by-Side Horizontal"`, and the default `"No change"`.
+
+        TransparentBackground (int)
+          Set to 1 (or True) to save an image with background set to alpha=0, if
+          supported by the output image format.
+
+    In addition, several format-specific keyword parameters can be specified.
+    The format is chosen based on the file extension.
+
+    For JPEG (`*.jpg`), the following parameters are available (optional)
+
+        Quality (int) [0, 100]
+          Specify the JPEG compression quality. `O` is low quality (maximum compression)
+          and `100` is high quality (least compression).
+
+        Progressive (int):
+          Set to 1 (or True) to save progressive JPEG.
+
+    For PNG (`*.png`), the following parameters are available (optional)
+
+        CompressionLevel (int) [0, 9]
+          Specify the *zlib* compression level. `0` is no compression, while `9` is
+          maximum compression.
+
+    **Legacy Parameters**
+
         Prior to ParaView version 5.4, the following parameters were available
-        and are still supported. However, cannot be used together with other
-        keyword parameters documented earlier.
+        and are still supported. However, they cannot be used together with
+        other keyword parameters documented earlier.
 
-        view (proxy): single view to save image from.
-        layout (proxy): layout to save image from.
-        magnification (int): magnification factor to use to save the output
-            image. The current view (or layout) size is scaled by the
-            magnification factor provided.
-        quality (int): output image quality, a number in the range [0, 100].
+        view (proxy)
+          Single view to save image from.
+
+        layout (proxy)
+          Layout to save image from.
+
+        magnification (int)
+          Magnification factor to use to save the output image. The current view
+          (or layout) size is scaled by the magnification factor provided.
+
+        quality (int)
+          Output image quality, a number in the range [0, 100].
+
+        ImageQuality (int)
+            For ParaView 5.4, the following parameters were available, however
+            it is ignored starting with ParaView 5.5. Instead, it is recommended
+            to use format-specific quality parameters based on the file format being used.
     """
     # Let's handle backwards compatibility.
     # Previous API for this method took the following arguments:
@@ -1084,8 +1127,25 @@ def SaveScreenshot(filename, viewOrLayout=None, **params):
     options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
     options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
 
-    SetProperties(options, **params)
+    # this will choose the correct format.
+    options.UpdateDefaultsAndVisibilities(filename)
+
     controller.PostInitializeProxy(options)
+
+    # explicitly process format properties.
+    formatProxy = options.Format
+    formatProperties = formatProxy.ListProperties()
+    for prop in formatProperties:
+        if prop in params:
+            formatProxy.SetPropertyWithName(prop, params[prop])
+            del params[prop]
+
+    if "ImageQuality" in params:
+        import warnings
+        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
+        del params["ImageQuality"]
+
+    SetProperties(options, **params)
     return options.WriteImage(filename)
 
 # -----------------------------------------------------------------------------
@@ -1095,36 +1155,83 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     `SaveAnimation` is used to save an animation as a movie file (avi or ogv) or
     a series of images.
 
-    Parameters:
-    -----------
-        filename (str): name of the output file. The extension is used to
-            determine the type of the output. Supported extensions are `png`,
-            `jpg`, `tif`, `bmp`, and `ppm`. Based on platform (and build)
-            configuration, `avi` and `ogv` may be supported as well.
-        viewOrLayout (:obj:`proxy`, optional): The view or layout to save image
-            from, defaults to None. If None, then the active view is used, if
-            available. To save image from a single view, this must be set to a
-            view, to save an image from all views in a layout, pass the layout.
-        scene (:obj:`proxy`, optional): animation scene to save. If None, then
-            the active scene returned by `GetAnimationScene` is used.
+    **Parameters**
 
-    Keyword Parameters (optional):
-    ------------------------------
-        `SaveAnimation` supports all keyword parameters suppored by
+        filename (str)
+          Name of the output file. The extension is used to determine the type
+          of the output. Supported extensions are `png`, `jpg`, `tif`, `bmp`,
+          and `ppm`. Based on platform (and build) configuration, `avi` and
+          `ogv` may be supported as well.
+
+        viewOrLayout (``proxy``, optional)
+          The view or layout to save image from, defaults to None. If None, then
+          the active view is used, if available. To save image from a single
+          view, this must be set to a view, to save an image from all views in a
+          layout, pass the layout.
+
+        scene (``proxy``, optional)
+          Animation scene to save. If None, then the active scene returned by
+          `GetAnimationScene` is used.
+
+    **Keyword Parameters (optional)**
+
+        `SaveAnimation` supports all keyword parameters supported by
         `SaveScreenshot`. In addition, the following parameters are supported:
 
-        DisconnectAndSave (int): in client-server mode (with rendering-capable
-            server), set this to 1 to disconnect from the server and let the
-            server save the animation out before terminating. In that case, the
-            filename specifies a path on the server. Defaults to 0, in which
-            case the animation is saved on the client.
+        FrameRate (int):
+          Frame rate in frames per second for the output. This only affects the
+          output when generated movies (`avi` or `ogv`), and not when saving the
+          animation out as a series of images.
 
-        FrameRate (int): frame rate in frames per second for the output. This
-            only affects the output when generated movies (`avi` or `ogv`), and
-            not when saving the animation out as a series of images.
+        FrameWindow (tuple(int,int))
+          To save a part of the animation, provide the range in frames or
+          timesteps index.
 
-        FrameWindow (tuple(int,int)):  to save a part of the animation,
-            provide the range in frames or timesteps index.
+    In addition, several format-specific keyword parameters can be specified.
+    The format is chosen based on the file extension.
+
+    For Image-based file-formats that save series of images e.g. PNG, JPEG,
+    following parameters are available.
+
+        SuffixFormat (string):
+          Format string used to convert the frame number to file name suffix.
+
+    FFMPEG avi file format supports following parameters.
+
+        Compression (int)
+          Set to 1 or True to enable compression.
+
+        Quality:
+          When compression is 1 (or True), this specifies the compression
+          quality. `0` is worst quality (smallest file size) and `2` is best
+          quality (largest file size).
+
+    VideoForWindows (VFW) avi file format supports following parameters.
+
+        Quality:
+          This specifies the compression quality. `0` is worst quality
+          (smallest file size) and `2` is best quality (largest file size).
+
+    OGG/Theora file format supports following parameters.
+
+        Quality:
+          This specifies the compression quality. `0` is worst quality
+          (smallest file size) and `2` is best quality (largest file size).
+
+        UseSubsampling:
+          When set to 1 (or True), the video will be encoded uisng 4:2:0
+          subsampling for the color channels.
+
+    **Obsolete Parameters**
+
+        DisconnectAndSave (int):
+          This mode is no longer supported as of ParaView 5.5, and will be
+          ignored.
+
+        ImageQuality (int)
+            For ParaView 5.4, the following parameters were available, however
+            it is ignored starting with ParaView 5.5. Instead, it is recommended
+            to use format-specific quality parameters based on the file format being used.
     """
     # use active view if no view or layout is specified.
     viewOrLayout = viewOrLayout if viewOrLayout else GetActiveView()
@@ -1136,6 +1243,11 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     if not scene:
         raise RuntimeError("Missing animation scene.")
 
+    if "DisconnectAndSave" in params:
+        import warnings
+        warnings.warn("'DisconnectAndSave' is deprecated and will be ignored.", DeprecationWarning)
+        del params["DisconnectAndSave"]
+
     controller = servermanager.ParaViewPipelineController()
     options = servermanager.misc.SaveAnimation()
     controller.PreInitializeProxy(options)
@@ -1145,9 +1257,25 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     options.View = viewOrLayout if viewOrLayout.IsA("vtkSMViewProxy") else None
     options.SaveAllViews = True if viewOrLayout.IsA("vtkSMViewLayoutProxy") else False
 
-    SetProperties(options, **params)
+    # this will choose the correct format.
+    options.UpdateDefaultsAndVisibilities(filename)
+
     controller.PostInitializeProxy(options)
 
+    # explicitly process format properties.
+    formatProxy = options.Format
+    formatProperties = formatProxy.ListProperties()
+    for prop in formatProperties:
+        if prop in params:
+            formatProxy.SetPropertyWithName(prop, params[prop])
+            del params[prop]
+
+    if "ImageQuality" in params:
+        import warnings
+        warnings.warn("'ImageQuality' is deprecated and will be ignored.", DeprecationWarning)
+        del params["ImageQuality"]
+
+    SetProperties(options, **params)
     return options.WriteAnimation(filename)
 
 def WriteAnimation(filename, **params):
@@ -1156,22 +1284,26 @@ def WriteAnimation(filename, **params):
     Use :func:`SaveAnimation` instead.
 
     This function can still be used to save an animation, but using
-    `SaveAnimation` is strongly recommended as it provides more flexibility.
+    :func: `SaveAnimation` is strongly recommended as it provides more
+    flexibility.
 
     The following parameters are currently supported.
 
-    Parameters
-    ----------
-        filename (str): name of the output file.
+    **Parameters**
 
-    Keyword Parameters (optional):
-    ------------------------------
+        filename (str)
+          Name of the output file.
 
-        Magnification (int): magnification factor for the saved animation.
+    **Keyword Parameters (optional)**
 
-        Quality (int): int in range [0,2].
+        Magnification (int):
+          Magnification factor for the saved animation.
 
-        FrameRate (int): frame rate.
+        Quality (int)
+          int in range [0,2].
+
+        FrameRate (int)
+          Frame rate.
 
     The following parameters are no longer supported and are ignored:
     Subsampling, BackgroundColor, FrameRate, StartFileCount, PlaybackTimeWindow
@@ -1282,10 +1414,15 @@ def GetScalarBar(ctf, view=None):
     return sb
 
 # -----------------------------------------------------------------------------
-def GetColorTransferFunction(arrayname, **params):
+def GetColorTransferFunction(arrayname, representation=None, separate=False, **params):
     """Get the color transfer function used to mapping a data array with the
-    given name to colors. This may create a new color transfer function
-    if none exists, or return an existing one"""
+    given name to colors. Representation is used to modify the array name
+    when using a separate color transfer function. separate can be used to recover
+    the separate color transfer function even if it is not used currently by the representation.
+    This may create a new color transfer function if none exists, or return an existing one"""
+    if representation:
+      if separate or representation.UseSeparateColorMap:
+        arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
     if not servermanager.ActiveConnection:
         raise RuntimeError ("Missing active session")
     session = servermanager.ActiveConnection.Session
@@ -1295,10 +1432,15 @@ def GetColorTransferFunction(arrayname, **params):
     SetProperties(lut, **params)
     return lut
 
-def GetOpacityTransferFunction(arrayname, **params):
+def GetOpacityTransferFunction(arrayname, representation=None, separate=False, **params):
     """Get the opacity transfer function used to mapping a data array with the
-    given name to opacity. This may create a new opacity transfer function
-    if none exists, or return an existing one"""
+    given name to opacity. Representation is used to modify the array name
+    when using a separate opacity transfer function. separate can be used to recover
+    the separate opacity transfer function even if it is not used currently by the representation.
+    This may create a new opacity transfer function if none exists, or return an existing one"""
+    if representation:
+      if separate or representation.UseSeparateColorMap:
+        arrayname = ("%s%s_%s" % ("Separate_", representation.SMProxy.GetGlobalIDAsString(), arrayname))
     if not servermanager.ActiveConnection:
         raise RuntimeError ("Missing active session")
     session = servermanager.ActiveConnection.Session
@@ -1568,7 +1710,7 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
 
 def GetCameraTrack(view=None):
     """Returns the camera animation track for the given view. If no view is
-    specified, active view will be used. If no exisiting camera animation track
+    specified, active view will be used. If no existing camera animation track
     is found, a new one will be created."""
     if not view:
         view = GetActiveView()
@@ -1603,9 +1745,11 @@ def GetTimeTrack():
 
 def LoadXML(xmlstring, ns=None):
     """Given a server manager XML as a string, parse and process it.
-    If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as the second arguments:
-    LoadXML(xmlstring, globals())
+    If you loaded the simple module with ``from paraview.simple import *``,
+    make sure to pass ``globals()`` as the second arguments::
+
+        LoadXML(xmlstring, globals())
+
     Otherwise, the new functions will not appear in the global namespace."""
     if not ns:
         ns = globals()
@@ -1616,10 +1760,11 @@ def LoadXML(xmlstring, ns=None):
 
 def LoadPlugin(filename, remote=True, ns=None):
     """Loads a ParaView plugin and updates this module with new constructors
-    if any. The remote argument (default to True) is to specify whether
-    the plugin will be loaded on client (remote=False) or on server (remote=True).
-    If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as an argument::
+    if any. The remote argument (default to ``True``) is to specify whether
+    the plugin will be loaded on client (``remote=False``) or on server
+    (``remote=True``).
+    If you loaded the simple module with ``from paraview.simple import *``,
+    make sure to pass ``globals()`` as an argument::
 
         LoadPlugin("myplugin", False, globals()) # to load on client
         LoadPlugin("myplugin", True, globals())  # to load on server
@@ -1657,9 +1802,10 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
 #==============================================================================
 def LoadCustomFilters(filename, ns=None):
     """Loads a custom filter XML file and updates this module with new
-    constructors if any.
-    If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as an argument."""
+    constructors if any. If you loaded the simple module with
+    ``from paraview.simple import *``, make sure to pass ``globals()`` as an
+    argument.
+    """
     servermanager.ProxyManager().SMProxyManager.LoadCustomProxyDefinitions(filename)
     if not ns:
         ns = globals()
@@ -1708,6 +1854,84 @@ def ClearSelection(proxy=None):
     if not proxy:
         raise RuntimeError ("No active source was found.")
     proxy.SMProxy.SetSelectionInput(proxy.Port, None, 0)
+
+
+#==============================================================================
+# Dynamic lights.
+#==============================================================================
+
+def CreateLight():
+    """Makes a new vtkLight, unattached to a view."""
+    pxm = servermanager.ProxyManager()
+    lightproxy = pxm.NewProxy("additional_lights", "Light")
+
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.RegisterLightProxy(lightproxy, None)
+
+    return servermanager._getPyProxy(lightproxy)
+
+
+def AddLight(view=None):
+    """Makes a new vtkLight and adds it to the designated or active view."""
+    view = view if view else GetActiveView()
+    if not view:
+        raise ValueError ("No 'view' was provided and no active view was found.")
+    if view.IsA("vtkSMRenderViewProxy") is False:
+        return
+
+    lightproxy = CreateLight()
+
+    nowlights = [l for l in view.AdditionalLights]
+    nowlights.append(lightproxy)
+    view.AdditionalLights = nowlights
+    # This is not the same as returning lightProxy
+    return GetLight(len(view.AdditionalLights) - 1, view)
+
+def RemoveLight(light):
+    """Removes an existing vtkLight from its view."""
+    if not light:
+        raise ValueError ("No 'light' was provided.")
+    view = GetViewForLight(light)
+    if view:
+        if (not view.IsA("vtkSMRenderViewProxy")) or (len(view.AdditionalLights) < 1):
+            raise RuntimeError ("View retrieved inconsistent with owning a 'light'.")
+
+        nowlights = [l for l in view.AdditionalLights if l != light]
+        view.AdditionalLights = nowlights
+
+    controller = servermanager.ParaViewPipelineController()
+    controller.SMController.UnRegisterProxy(light.SMProxy)
+
+def GetLight(number, view=None):
+    """Get a handle on a previously added light"""
+    if not view:
+        view = active_objects.view
+    numlights = len(view.AdditionalLights)
+    if numlights < 1 or number < 0 or number >= numlights:
+        return
+    return view.AdditionalLights[number]
+
+def GetViewForLight(proxy):
+    """Given a light proxy, find which view it belongs to"""
+    # search current views for this light.
+    for cc in range(proxy.GetNumberOfConsumers()):
+        consumer = proxy.GetConsumerProxy(cc)
+        consumer = consumer.GetTrueParentProxy()
+        if consumer.IsA("vtkSMRenderViewProxy") and proxy in consumer.AdditionalLights:
+            return consumer
+    return None
+
+#==============================================================================
+# Materials.
+#==============================================================================
+
+def GetMaterialLibrary():
+    """Returns the material library for the active session. """
+    if not servermanager.ActiveConnection:
+        raise RuntimeError ("Missing active session")
+    session = servermanager.ActiveConnection.Session
+    controller = servermanager.ParaViewPipelineController()
+    return controller.FindMaterialLibrary(session)
 
 #==============================================================================
 # Miscellaneous functions.

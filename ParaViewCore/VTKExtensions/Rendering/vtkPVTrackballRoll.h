@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkPVTrackballRoll
- * @brief   Rolls camera arround a point.
+ * @brief   Rolls camera around a point.
  *
  * vtkPVTrackballRoll allows the user to interactively
  * manipulate the camera, the viewpoint of the scene.
@@ -39,20 +39,17 @@ public:
    * Event bindings controlling the effects of pressing mouse buttons
    * or moving the mouse.
    */
-  virtual void OnMouseMove(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
-  virtual void OnButtonDown(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
-  virtual void OnButtonUp(
-    int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnMouseMove(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnButtonDown(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
+  void OnButtonUp(int x, int y, vtkRenderer* ren, vtkRenderWindowInteractor* rwi) VTK_OVERRIDE;
   //@}
 
 protected:
   vtkPVTrackballRoll();
-  ~vtkPVTrackballRoll();
+  ~vtkPVTrackballRoll() override;
 
-  vtkPVTrackballRoll(const vtkPVTrackballRoll&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVTrackballRoll&) VTK_DELETE_FUNCTION;
+  vtkPVTrackballRoll(const vtkPVTrackballRoll&) = delete;
+  void operator=(const vtkPVTrackballRoll&) = delete;
 };
 
 #endif

@@ -52,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqItemViewSearchWidget : public QDialog
 
 public:
   pqItemViewSearchWidget(QWidget* parent = 0);
-  virtual ~pqItemViewSearchWidget();
+  ~pqItemViewSearchWidget() override;
   enum ItemSearchType
   {
     Current,
@@ -81,8 +81,8 @@ protected:
   /**
   * Overridden to capture key presses.
   */
-  virtual bool eventFilter(QObject* obj, QEvent* event);
-  virtual void keyPressEvent(QKeyEvent* e);
+  bool eventFilter(QObject* obj, QEvent* event) override;
+  void keyPressEvent(QKeyEvent* e) override;
   /**
   * Recursive to search all QModelIndices in the model.
   */
@@ -91,7 +91,7 @@ protected:
   /**
   * Overwrite to focus the lineEdit box
   */
-  void showEvent(QShowEvent*);
+  void showEvent(QShowEvent*) override;
   /**
   * match the input string with the index's text
   */

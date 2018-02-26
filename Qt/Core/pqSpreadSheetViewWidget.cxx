@@ -70,8 +70,8 @@ public:
   }
   void endPaint() {}
 
-  virtual void paint(
-    QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+  void paint(
+    QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
   {
     const_cast<pqDelegate*>(this)->Top =
       (this->Top.isValid() && this->Top < index) ? this->Top : index;
@@ -194,12 +194,10 @@ pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
   QObject::connect(this->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this,
     SLOT(onSortIndicatorChanged(int, Qt::SortOrder)));
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
   // limit to using 10 columns when resizing. This addresses performance issues with
   // large data. Note visible columns only (0) is not adequate since the widget may
   // not be visible at all when being resized and we e
   this->horizontalHeader()->setResizeContentsPrecision(10);
-#endif
 }
 
 //-----------------------------------------------------------------------------

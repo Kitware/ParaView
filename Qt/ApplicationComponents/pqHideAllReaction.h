@@ -52,7 +52,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqHideAllReaction::HideAll(); }
+  void onTriggered() override { pqHideAllReaction::HideAll(); }
 private:
   Q_DISABLE_COPY(pqHideAllReaction)
 };

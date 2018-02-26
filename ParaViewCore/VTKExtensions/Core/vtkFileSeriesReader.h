@@ -38,12 +38,42 @@
  * file with the correct time.  Overlaps are handled by requesting data from the
  * file with the upper range the farthest in the future.
  *
- * There are two ways to specify a series of files.  The first way is by adding
- * the filenames one at a time with the AddFileName method.  The second way is
- * by providing a single "meta" file.  This meta file is a simple text file that
- * lists a file per line.  The files can be relative to the meta file.  This
+ * There are three ways to specify a series of files.  The first way is by adding
+ * the filenames one at a time with the AddFileName method.
+
+ * The second way is
+ * by providing (with the AddFileName method) a meta file that specifies a list of
+ * files. This format allows the user to specify a time value in addition to a
+ * filename for each step. The format is as follows:
+ * \verbatim
+ * {
+ * "file-series-version" : "version",
+ * "files" : [
+ * { "name" : "filename1", "time" : timeValue1 },
+ * { "name" : "filename2", "time" : timeValue2 },
+ * ...
+ * ]
+ * }
+ * \endverbatim
+ * Here is an example:
+ * \verbatim
+ * {
+ * "file-series-version" : "1.0",
+ * "files" : [
+ * { "name" : "foo1.vtk", "time" : 0 },
+ * { "name" : "foo2.vtk", "time" : 5.5 },
+ * { "name" : "foo3.vtk", "time" : 11.2 }]
+ * }
+ * \endverbatim
+ *
+ * The current version is 1.0.
+ *
+ * The third way is by providing a single meta file which is a simple text file
+ * that lists a file per line.  The files can be relative to the meta file. This
  * method is useful when the actual reader points to a set of files itself.  The
- * UseMetaFile toggles between these two methods of specifying files.
+ * UseMetaFile enables this method of specifying the files. The filename is set
+ * with SetMetaFileName in this case. Do not use the AddFileName() method when
+ * using SetMetaFileName() as names set with AddFileName() will be ignored.
  *
 */
 
@@ -52,6 +82,8 @@
 
 #include "vtkMetaReader.h"
 #include "vtkPVVTKExtensionsCoreModule.h" //needed for exports
+
+#include <vector> // Needed for protected API
 
 class vtkStringArray;
 
@@ -70,8 +102,7 @@ public:
    * updated the file name of the internal in RequestUpdateExtent based
    * on the time step request.
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   /**
    * CanReadFile is forwarded to the internal reader if it supports it.
@@ -115,18 +146,18 @@ public:
    * If true, then treat file series like it does not contain any time step
    * values. False by default.
    */
-  vtkGetMacro(IgnoreReaderTime, int);
-  vtkSetMacro(IgnoreReaderTime, int);
-  vtkBooleanMacro(IgnoreReaderTime, int);
+  vtkGetMacro(IgnoreReaderTime, bool);
+  vtkSetMacro(IgnoreReaderTime, bool);
+  vtkBooleanMacro(IgnoreReaderTime, bool);
   //@}
 
 protected:
   vtkFileSeriesReader();
-  ~vtkFileSeriesReader();
+  ~vtkFileSeriesReader() override;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int RequestUpdateExtent(
+  int RequestUpdateExtent(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   virtual int RequestUpdateTime(vtkInformation*, vtkInformationVector**, vtkInformationVector*)
@@ -138,10 +169,10 @@ protected:
   {
     return 1;
   };
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
   /**
    * Make sure the reader's output is set to the given index and, if it changed,
@@ -154,13 +185,18 @@ protected:
    * Reads a metadata file and returns a list of filenames (in filesToRead).  If
    * the file could not be read correctly, 0 is returned.
    */
-  virtual int ReadMetaDataFile(
-    const char* metafilename, vtkStringArray* filesToRead, int maxFilesToRead = VTK_INT_MAX);
+  virtual int ReadMetaDataFile(const char* metafilename, vtkStringArray* filesToRead,
+    std::vector<double>& timeValues, int maxFilesToRead = VTK_INT_MAX);
 
   /**
    * True if use a meta-file, false otherwise
    */
   int UseMetaFile;
+
+  /**
+   * True if meta-file is of Json format, false otherwise
+   */
+  bool UseJsonMetaFile;
 
   /**
    * Re-reads information from the metadata file, if necessary.
@@ -176,13 +212,13 @@ protected:
   void RemoveAllFileNamesInternal();
   void AddFileNameInternal(const char*);
 
-  int IgnoreReaderTime;
+  bool IgnoreReaderTime;
 
   int ChooseInput(vtkInformation*);
 
 private:
-  vtkFileSeriesReader(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkFileSeriesReader(const vtkFileSeriesReader&) = delete;
+  void operator=(const vtkFileSeriesReader&) = delete;
 
   vtkFileSeriesReaderInternals* Internal;
 };

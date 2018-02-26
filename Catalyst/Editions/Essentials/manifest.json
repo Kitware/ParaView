@@ -16,6 +16,7 @@
       "path":"ParaViewCore/VTKExtensions/Default",
       "include":[
         { "class":"vtkAMRDualClip" },
+        { "path":"vtkAMRDualClipTables.cxx" },
         { "class":"vtkAMRDualContour" },
         { "class":"vtkAMRDualGridHelper" },
         { "class":"vtkPVArrayCalculator" },
@@ -32,8 +33,6 @@
       ],
       "replace":[
         { "path":"ParaViewCore/VTKExtensions/Default/CMakeLists.txt" },
-        { "path":"ParaViewCore/VTKExtensions/Default/Essentials.props.catalyst.cmake" },
-        { "path":"ParaViewCore/VTKExtensions/Default/hints" },
         { "path":"ParaViewCore/VTKExtensions/Default/module.cmake" }
       ],
       "cswrap":true,
@@ -55,9 +54,6 @@
         { "class":"vtkSynchronizedTemplates2D" },
         { "class":"vtkSynchronizedTemplates3D" },
         { "class":"vtkSynchronizedTemplatesCutter3D" }
-      ],
-      "replace":[
-        { "path":"VTK/Filters/Core/Essentials.props.catalyst.cmake" }
       ],
       "cswrap":true,
       "pythonwrap":true
@@ -99,9 +95,13 @@
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
       "proxies":[
         "Calculator",
+        "CellCenters",
         "Contour",
         "Clip",
         "Cut",
+        "ExtractGeometry",
+        "Glyph",
+        "LegacyGlyph",
         "PassArrays"
       ]
     },

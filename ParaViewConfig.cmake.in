@@ -32,6 +32,21 @@ set (ParaView_USE_FILE "${ParaView_CMAKE_DIR}/UseParaView.cmake")
 set (PARAVIEW_USE_FILE ${ParaView_USE_FILE})
 set (PARAVIEW_CMAKE_DIR ${ParaView_CMAKE_DIR})
 
+# Setup VTK-m if it was enabled
+set(VTK_HAS_VTKM @VTK_HAS_VTKM@)
+if(VTK_HAS_VTKM)
+  set(VTKM_CMAKE_DIR "${ParaView_CMAKE_DIR}")
+  if(NOT __vtk_install_tree)
+    set(VTKM_CMAKE_DIR "@VTKm_BINARY_DIR@/@VTK_INSTALL_PACKAGE_DIR@/vtkm")
+  endif()
+  get_filename_component(VTKM_CMAKE_DIR "${VTKM_CMAKE_DIR}" PATH)
+  find_package(VTKm
+               PATHS "${CMAKE_CURRENT_LIST_DIR}"
+                     "${VTKM_CMAKE_DIR}"
+               NO_DEFAULT_PATH
+               )
+endif()
+
 # Import ParaView targets.
 if(NOT TARGET vtkPVCommon)
   include("${PARAVIEW_CONFIG_TARGETS_FILE}")
@@ -56,12 +71,12 @@ if (__pv_install_tree)
   else ()
     set (PARAVIEW_RUNTIME_DIRS "${VTK_INSTALL_PREFIX}/@VTK_INSTALL_LIBRARY_DIR@")
   endif ()
-  set (PARAVIEW_WWW_DIR "${VTK_INSTALL_PREFIX}/lib/paraview-@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@/www")
+  set (PARAVIEW_WWW_DIR "${VTK_INSTALL_PREFIX}/www")
 else()
   if (WIN32)
     set (PARAVIEW_RUNTIME_DIRS "@ParaView_BINARY_DIR@/bin")
   else ()
-    set (PARAVIEW_RUNTIME_DIRS "@ParaView_BINARY_DIR@/lib/paraview-@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@")
+    set (PARAVIEW_RUNTIME_DIRS "@ParaView_BINARY_DIR@/lib")
   endif ()
   list(APPEND VTK_INCLUDE_DIRS "@ParaView_BINARY_DIR@")
   set (PARAVIEW_WWW_DIR "@ParaView_BINARY_DIR@/www")
@@ -85,13 +100,13 @@ set (PARAVIEW_USE_VISITBRIDGE "@PARAVIEW_USE_VISITBRIDGE@")
 set (PARAVIEW_ENABLE_COPROCESSING "@PARAVIEW_ENABLE_COPROCESSING@")
 set (PARAVIEW_ENABLE_WEB "@PARAVIEW_ENABLE_WEB@")
 
-if (PARAVIEW_ENABLE_PYTHON)
-  if (__pv_install_tree)
-    set(PARAVIEW_PYTHONPATH "${VTK_INSTALL_PREFIX}/@VTK_INSTALL_LIBRARY_DIR@/site-packages")
-  else ()
-    set(PARAVIEW_PYTHONPATH
-      "@ParaView_BINARY_DIR@/lib/site-packages"
-      "@ParaView_BINARY_DIR@/lib")
+if (NOT @VTK_LEGACY_REMOVE@)
+  if (PARAVIEW_ENABLE_PYTHON)
+    if (__pv_install_tree)
+      set(PARAVIEW_PYTHONPATH "${VTK_INSTALL_PREFIX}/@VTK_INSTALL_PYTHON_MODULES_DIR@")
+    else ()
+      set(PARAVIEW_PYTHONPATH "@VTK_BUILD_PYTHON_MODULES_DIR@")
+    endif ()
   endif ()
 endif ()
 

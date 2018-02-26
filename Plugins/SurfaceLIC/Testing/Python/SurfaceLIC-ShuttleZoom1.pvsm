@@ -2476,8 +2476,8 @@
         <Domain name="bool" id="5024.UseTexturedBackground.bool"/>
       </Property>
       <Property name="ViewSize" id="4816.ViewSize" number_of_elements="2">
-        <Element index="0" value="537"/>
-        <Element index="1" value="514"/>
+        <Element index="0" value="300"/>
+        <Element index="1" value="300"/>
       </Property>
       <Property name="ViewTime" id="5024.ViewTime" number_of_elements="1">
         <Element index="0" value="0"/>

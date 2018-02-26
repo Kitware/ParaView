@@ -16,7 +16,7 @@
  * @class   vtkPVPythonInformation
  * @brief   Gets python features.
  *
- * Get details of python availabilty on the root server.
+ * Get details of python availability on the root server.
 */
 
 #ifndef vtkPVPythonInformation_h
@@ -41,19 +41,19 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Same as DeepCopy for this object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -178,7 +178,7 @@ public:
 
 protected:
   vtkPVPythonInformation();
-  ~vtkPVPythonInformation();
+  ~vtkPVPythonInformation() override;
 
   bool PythonSupport;
   std::string PythonPath;
@@ -191,8 +191,8 @@ protected:
   std::string MatplotlibPath;
 
 private:
-  vtkPVPythonInformation(const vtkPVPythonInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVPythonInformation&) VTK_DELETE_FUNCTION;
+  vtkPVPythonInformation(const vtkPVPythonInformation&) = delete;
+  void operator=(const vtkPVPythonInformation&) = delete;
 };
 
 #endif

@@ -16,7 +16,3 @@ set(font_files
 list(APPEND Module_SRCS
   ${font_files}
   )
-set_source_files_properties(
-  ${font_files}
-  WRAP_EXCLUDE
-  )

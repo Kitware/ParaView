@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkEventQtSlotConnect;
 class vtkSMProxySelectionModel;
 class vtkSMSessionProxyManager;
+class vtkSMViewLayoutProxy;
 
 /**
 * pqActiveObjects is a singleton that keeps track of "active objects"
@@ -108,6 +109,11 @@ public:
   * Equivalent to calling this->activeServer()->proxyManager();
   */
   vtkSMSessionProxyManager* proxyManager() const;
+
+  /**
+   * Convenience method to get the layout for the active view.
+   */
+  vtkSMViewLayoutProxy* activeLayout() const;
 
 public slots:
   void setActiveView(pqView* view);
@@ -172,7 +178,7 @@ private slots:
 
 protected:
   pqActiveObjects();
-  ~pqActiveObjects();
+  ~pqActiveObjects() override;
 
   /**
   * single method that fires appropriate signals based on state changes. This

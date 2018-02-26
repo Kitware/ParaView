@@ -68,7 +68,7 @@ public:
   /**
    * Overridden to handle server-notification messages.
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Push updated states from the client to the server in aggregate (originally,
@@ -79,11 +79,11 @@ public:
 
 protected:
   vtkSMLiveInsituLinkProxy();
-  ~vtkSMLiveInsituLinkProxy();
+  ~vtkSMLiveInsituLinkProxy() override;
 
   // overridden to ensure that we communicate the globalid for this proxy so
   // that the server-side can send messages to this proxy.
-  virtual void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() VTK_OVERRIDE;
 
   void MarkStateDirty();
 
@@ -102,8 +102,8 @@ protected:
   vtkIdType TimeStep;
 
 private:
-  vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMLiveInsituLinkProxy&) VTK_DELETE_FUNCTION;
+  vtkSMLiveInsituLinkProxy(const vtkSMLiveInsituLinkProxy&) = delete;
+  void operator=(const vtkSMLiveInsituLinkProxy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

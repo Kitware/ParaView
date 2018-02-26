@@ -59,18 +59,18 @@ protected:
   /**
    * Destructor.
    */
-  virtual ~vtkCommandOptionsXMLParser();
+  ~vtkCommandOptionsXMLParser() override;
 
   // Called when a new element is opened in the XML source.  Should be
   // replaced by subclasses to handle each element.
   //  name = Name of new element.
   //  atts = Null-terminated array of attribute name/value pairs.
   //         Even indices are attribute names, and odd indices are values.
-  virtual void StartElement(const char* name, const char** atts) VTK_OVERRIDE;
+  void StartElement(const char* name, const char** atts) VTK_OVERRIDE;
 
   // Called at the end of an element in the XML source opened when
   // StartElement was called.
-  virtual void EndElement(const char* name) VTK_OVERRIDE;
+  void EndElement(const char* name) VTK_OVERRIDE;
   // Call to process the .. of  <Option>...</>
   void HandleOption(const char** atts);
   // Call to process the .. of  <Option>...</>
@@ -80,8 +80,8 @@ protected:
   void SetProcessTypeInt(int ptype);
 
 private:
-  vtkCommandOptionsXMLParser(const vtkCommandOptionsXMLParser&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCommandOptionsXMLParser&) VTK_DELETE_FUNCTION;
+  vtkCommandOptionsXMLParser(const vtkCommandOptionsXMLParser&) = delete;
+  void operator=(const vtkCommandOptionsXMLParser&) = delete;
   int InPVXTag;
   vtkCommandOptions* PVOptions;
   vtkCommandOptionsXMLParserInternal* Internals;

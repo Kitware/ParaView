@@ -506,24 +506,33 @@
     <!-- end of keyframes -->
   </ProxyGroup>
   <!-- ==================================================================== -->
-  <ProxyGroup name="remote_player">
-    <!-- .................................................................. -->
-    <!-- Proxy used to save animation remotely when the client disconnect -->
-    <Proxy class="vtkPVServerSideAnimationPlayer" name="AnimationPlayer">
-      <StringVectorProperty command="SetSessionProxyManagerState"
-                            default_values=""
-                            name="SessionProxyManagerState"
-                            number_of_elements="1">
-        <Documentation>Set the XML content of the vtkSMSessionProxyManager
-        state.</Documentation>
+  <ProxyGroup name="animation_writers">
+    <Proxy name="JPEG" class="vtkJPEGWriter" process="client"
+      base_proxygroup="screenshot_writers"
+      base_proxyname="JPEG">
+      <StringVectorProperty name="SuffixFormat"
+        number_of_elements="1"
+        default_values=".%04d">
+        <Documentation>
+          Specify the suffix format string to use to add a suffix to the output
+          filenames based on the current timestep number.
+        </Documentation>
       </StringVectorProperty>
-      <StringVectorProperty command="SetFileName"
-                            default_values=""
-                            name="FileName"
-                            number_of_elements="1" />
-      <Property name="Activate" command="Activate" />
+    </Proxy>
+    <Proxy name="PNG" class="vtkPNGWriter" process="client"
+      base_proxygroup="screenshot_writers"
+      base_proxyname="PNG">
+      <StringVectorProperty name="SuffixFormat"
+        number_of_elements="1"
+        default_values=".%04d">
+        <Documentation>
+          Specify the suffix format string to use to add a suffix to the output
+          filenames based on the current timestep number.
+        </Documentation>
+      </StringVectorProperty>
     </Proxy>
   </ProxyGroup>
+
   <!-- ==================================================================== -->
   <ProxyGroup name="misc">
     <!-- .................................................................. -->
@@ -558,18 +567,18 @@
   <ProxyGroup name="misc">
     <!-- .................................................................. -->
     <SaveAnimationProxy name="SaveAnimation" processes="client"
+      label="Save Animation"
       base_proxygroup="misc"
-      base_proxyname="SaveScreenshot">
-      <IntVectorProperty name="DisconnectAndSave"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="advanced">
-        <Documentation>
-          Disconnect from the remote server and save animation on server before
-          terminating.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
+      base_proxyname="SaveScreenshotBase">
+
+      <ProxyProperty name="Format">
+        <ProxyListDomain name="proxy_list">
+          <Group name="animation_writers" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
+      </ProxyProperty>
 
       <ProxyProperty name="AnimationScene" panel_visibility="never" />
 
@@ -615,12 +624,17 @@
         <Property name="TransparentBackground" />
       </PropertyGroup>
 
+      <PropertyGroup label="File Options">
+        <Property name="Format" />
+      </PropertyGroup>
+      <!--
+           FIXME:
       <PropertyGroup label="Compression Options">
         <Property name="ImageQuality" />
       </PropertyGroup>
+      -->
 
       <PropertyGroup label="Animation Options">
-        <Property name="DisconnectAndSave" />
         <Property name="FrameRate" />
         <Property name="FrameWindow" />
       </PropertyGroup>

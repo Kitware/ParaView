@@ -56,7 +56,7 @@ class PQCOMPONENTS_EXPORT pqFindDataCreateSelectionFrame : public QWidget
 
 public:
   pqFindDataCreateSelectionFrame(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  virtual ~pqFindDataCreateSelectionFrame();
+  ~pqFindDataCreateSelectionFrame() override;
 
   /**
   * Helper method used to fill up a combo-box showing allowed selection types
@@ -70,12 +70,6 @@ public slots:
   * the current one, it clears any existing query.
   */
   void setPort(pqOutputPort*);
-
-signals:
-  /**
-  * Fired when the user clicks on the help button for the query clause widget.
-  */
-  void helpRequested();
 
 private slots:
   /**

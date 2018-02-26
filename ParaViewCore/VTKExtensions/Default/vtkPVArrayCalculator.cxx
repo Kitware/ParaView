@@ -24,6 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPointData.h"
+#include "vtkTable.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -162,38 +163,31 @@ int vtkPVArrayCalculator::RequestData(
   vtkDataObject* input = inputVector[0]->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT());
 
   vtkIdType numTuples = 0;
-  vtkGraph* graphInput = vtkGraph::SafeDownCast(input);
-  vtkDataSet* dsInput = vtkDataSet::SafeDownCast(input);
   vtkDataSetAttributes* dataAttrs = NULL;
 
-  if (dsInput)
+  int attributeType = this->AttributeType;
+
+  if (attributeType == vtkArrayCalculator::DEFAULT_ATTRIBUTE_TYPE)
   {
-    if (this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
-      this->AttributeMode == VTK_ATTRIBUTE_MODE_USE_POINT_DATA)
+    vtkGraph* graphInput = vtkGraph::SafeDownCast(input);
+    vtkDataSet* dsInput = vtkDataSet::SafeDownCast(input);
+    vtkTable* tableInput = vtkTable::SafeDownCast(input);
+    if (graphInput)
     {
-      dataAttrs = dsInput->GetPointData();
-      numTuples = dsInput->GetNumberOfPoints();
+      attributeType = vtkDataObject::VERTEX;
     }
-    else
+    if (dsInput)
     {
-      dataAttrs = dsInput->GetCellData();
-      numTuples = dsInput->GetNumberOfCells();
+      attributeType = vtkDataObject::POINT;
+    }
+    if (tableInput)
+    {
+      attributeType = vtkDataObject::ROW;
     }
   }
-  else if (graphInput)
-  {
-    if (this->AttributeMode == VTK_ATTRIBUTE_MODE_DEFAULT ||
-      this->AttributeMode == VTK_ATTRIBUTE_MODE_USE_VERTEX_DATA)
-    {
-      dataAttrs = graphInput->GetVertexData();
-      numTuples = graphInput->GetNumberOfVertices();
-    }
-    else
-    {
-      dataAttrs = graphInput->GetEdgeData();
-      numTuples = graphInput->GetNumberOfEdges();
-    }
-  }
+
+  dataAttrs = input->GetAttributes(attributeType);
+  numTuples = input->GetNumberOfElements(attributeType);
 
   if (numTuples > 0)
   {
@@ -204,11 +198,6 @@ int vtkPVArrayCalculator::RequestData(
     // the input of a downstream calculator.
     this->UpdateArrayAndVariableNames(input, dataAttrs);
   }
-
-  input = NULL;
-  dsInput = NULL;
-  dataAttrs = NULL;
-  graphInput = NULL;
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }

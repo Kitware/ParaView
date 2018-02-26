@@ -52,7 +52,7 @@ public:
   * Constructor. Parent cannot be NULL.
   */
   pqApplicationSettingsReaction(QAction* parent);
-  virtual ~pqApplicationSettingsReaction();
+  ~pqApplicationSettingsReaction() override;
 
   /**
   * Show the application settings dialog.
@@ -63,7 +63,7 @@ protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqApplicationSettingsReaction::showApplicationSettingsDialog(); }
+  void onTriggered() override { pqApplicationSettingsReaction::showApplicationSettingsDialog(); }
 
 private:
   Q_DISABLE_COPY(pqApplicationSettingsReaction)

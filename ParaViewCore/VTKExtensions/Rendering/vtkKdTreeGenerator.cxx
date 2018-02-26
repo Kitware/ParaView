@@ -122,7 +122,7 @@ bool vtkKdTreeGenerator::BuildTree(vtkExtentTranslator* translator, const int ex
     return 0;
   }
 
-  // Now to determine assigments (not much different from inorder traversal printing
+  // Now to determine assignments (not much different from inorder traversal printing
   // the leaf nodes alone).
   int* assignments = new int[this->NumberOfPieces];
   int* ptr = assignments;

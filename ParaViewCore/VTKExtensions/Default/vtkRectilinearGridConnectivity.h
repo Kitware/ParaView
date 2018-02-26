@@ -148,7 +148,7 @@ public:
 
 protected:
   vtkRectilinearGridConnectivity();
-  ~vtkRectilinearGridConnectivity();
+  ~vtkRectilinearGridConnectivity() override;
 
   int DualGridsReady;
   int NumberOfBlocks;
@@ -162,9 +162,9 @@ protected:
   vtkRectilinearGridConnectivityFaceHash* FaceHash;
   vtkRectilinearGridConnectivityInternal* Internal;
 
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   // ---------------------------------------------------------------------- //
@@ -383,7 +383,7 @@ protected:
    * ('polyData') while attaching the index of the material (partIndx, i.e. the
    * volume fraction array used to extract fragments) to each polygon as a cell
    * data attribute. In a word, this function exports a combined version of the
-   * fragements extracted from multiple blocks assigned to a single process.
+   * fragments extracted from multiple blocks assigned to a single process.
    */
   void GenerateOutputFromSingleProcess(
     vtkPolyData** surfaces, int numSurfs, unsigned char partIndx, vtkPolyData* polyData);
@@ -412,7 +412,7 @@ protected:
    * (initial) fragments extracted from multiple processes and an array of
    * values (maxFsize) storing the maximum number of faces that an initial
    * fragment may contain on each process (used to allocate appropriate memory
-   * for buffering the polygons of an intial fragment), this function pushes
+   * for buffering the polygons of an initial fragment), this function pushes
    * these polygons to the face hash on a per fragment basis (the fragment Ids
    * are used to group polygons into initial fragments), detects internal faces
    * / polygons, and registers polygons to the inter-process equivalence set by
@@ -436,15 +436,15 @@ protected:
    * vtkPolyData (polyData) while attaching the index of the material (partIndx,
    * corresponding to the volume fraction array used to extract the fragments)
    * to each polygon as a cell data attribute. In a word, this function exports
-   * a combined version of the fragements extracted from multiple processes (of
+   * a combined version of the fragments extracted from multiple processes (of
    * which each is assigned with either one block or multiple blocks).
    */
   void GenerateOutputFromMultiProcesses(
     vtkPolyData** procPlys, int numProcs, unsigned char partIndx, vtkPolyData* polyData);
 
 private:
-  vtkRectilinearGridConnectivity(const vtkRectilinearGridConnectivity&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkRectilinearGridConnectivity&) VTK_DELETE_FUNCTION;
+  vtkRectilinearGridConnectivity(const vtkRectilinearGridConnectivity&) = delete;
+  void operator=(const vtkRectilinearGridConnectivity&) = delete;
 };
 
 #endif

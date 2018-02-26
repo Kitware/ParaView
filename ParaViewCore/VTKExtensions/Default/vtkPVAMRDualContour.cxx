@@ -67,6 +67,12 @@ int vtkPVAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
   vtkNonOverlappingAMR* hbdsInput =
     vtkNonOverlappingAMR::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
+  if (!hbdsInput)
+  {
+    vtkWarningMacro("Expected a vtkNonOverlappingAMR but did not get one.");
+    return 1;
+  }
+
   vtkInformation* outInfo;
   outInfo = outputVector->GetInformationObject(0);
   vtkMultiBlockDataSet* mbdsOutput0 =

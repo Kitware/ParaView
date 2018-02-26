@@ -96,8 +96,8 @@ protected:
   virtual void CreatePlane(const double bounds[6], vtkPolyData* output);
 
 private:
-  vtkSamplePlaneSource(const vtkSamplePlaneSource&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSamplePlaneSource&) VTK_DELETE_FUNCTION;
+  vtkSamplePlaneSource(const vtkSamplePlaneSource&) = delete;
+  void operator=(const vtkSamplePlaneSource&) = delete;
 };
 
 #endif // vtkSamplePlaneSource_h

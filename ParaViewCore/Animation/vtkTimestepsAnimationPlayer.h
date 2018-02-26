@@ -77,23 +77,23 @@ public:
 
 protected:
   vtkTimestepsAnimationPlayer();
-  ~vtkTimestepsAnimationPlayer();
+  ~vtkTimestepsAnimationPlayer() override;
   //@}
 
-  virtual void StartLoop(double, double, double*) VTK_OVERRIDE;
-  virtual void EndLoop() VTK_OVERRIDE{};
+  void StartLoop(double, double, double*) VTK_OVERRIDE;
+  void EndLoop() VTK_OVERRIDE{};
 
   /**
    * Return the next time given the current time.
    */
-  virtual double GetNextTime(double currentime) VTK_OVERRIDE;
+  double GetNextTime(double currentime) VTK_OVERRIDE;
 
-  virtual double GoToNext(double, double, double currenttime) VTK_OVERRIDE
+  double GoToNext(double, double, double currenttime) VTK_OVERRIDE
   {
     return this->GetNextTimeStep(currenttime);
   }
 
-  virtual double GoToPrevious(double, double, double currenttime) VTK_OVERRIDE
+  double GoToPrevious(double, double, double currenttime) VTK_OVERRIDE
   {
     return this->GetPreviousTimeStep(currenttime);
   }
@@ -103,8 +103,8 @@ protected:
   unsigned long Count;
 
 private:
-  vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkTimestepsAnimationPlayer&) VTK_DELETE_FUNCTION;
+  vtkTimestepsAnimationPlayer(const vtkTimestepsAnimationPlayer&) = delete;
+  void operator=(const vtkTimestepsAnimationPlayer&) = delete;
 
   vtkTimestepsAnimationPlayerSetOfDouble* TimeSteps;
 };

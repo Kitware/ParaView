@@ -20,6 +20,9 @@
  * Information object that can be used to obtain OpenGL extension
  * information. The object from which the information is obtained
  * should be a render window.
+ *
+ * @deprecated in ParaView 5.5. The information is now indirectly available via
+ * vtkPVOpenGLInformation. See `vtkPVOpenGLInformation::GetCapabilities`.
 */
 
 #ifndef vtkPVOpenGLExtensionsInformation_h
@@ -28,8 +31,9 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-class vtkPVOpenGLExtensionsInformationInternal;
+#if !defined(VTK_LEGACY_REMOVE)
 
+class vtkPVOpenGLExtensionsInformationInternal;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLExtensionsInformation
   : public vtkPVInformation
 {
@@ -41,7 +45,7 @@ public:
   /**
    * Transfer information about a single object into this object.
    */
-  virtual void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
 
   /**
    * Returns if the given extension is supported.
@@ -52,26 +56,27 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  virtual void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  virtual void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
    * Merge another information object.
    */
-  virtual void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
 
 protected:
   vtkPVOpenGLExtensionsInformation();
-  ~vtkPVOpenGLExtensionsInformation();
+  ~vtkPVOpenGLExtensionsInformation() override;
   //@}
 
 private:
-  vtkPVOpenGLExtensionsInformation(const vtkPVOpenGLExtensionsInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOpenGLExtensionsInformation&) VTK_DELETE_FUNCTION;
+  vtkPVOpenGLExtensionsInformation(const vtkPVOpenGLExtensionsInformation&) = delete;
+  void operator=(const vtkPVOpenGLExtensionsInformation&) = delete;
 
   vtkPVOpenGLExtensionsInformationInternal* Internal;
 };
 
+#endif // !defined(VTK_LEGACY_REMOVE)
 #endif

@@ -68,7 +68,7 @@ vtkSMTestDriver::vtkSMTestDriver()
 {
   this->AllowErrorInOutput = 0;
   this->ScriptIgnoreOutputErrors = 0;
-  this->TimeOut = 300;
+  this->TimeOut = -1; // no timeout
   this->ServerExitTimeOut = 60;
   this->ScriptExitTimeOut = 0;
   this->TestRenderServer = 0;
@@ -118,12 +118,7 @@ void vtkSMTestDriver::SeparateArguments(const char* str, std::vector<std::string
 
 void vtkSMTestDriver::CollectConfiguredOptions()
 {
-  // try to make sure that this timesout before dart so it can kill all the processes
-  this->TimeOut = 0;
-  if (this->TimeOut < 0)
-  {
-    this->TimeOut = 1500;
-  }
+// try to make sure that this timesout before dart so it can kill all the processes
 
 // now find all the mpi information if mpi run is set
 #ifdef PARAVIEW_USE_MPI
@@ -294,11 +289,6 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->ReverseConnection = 1;
       fprintf(stderr, "Test reverse connection.\n");
     }
-    if (strcmp(argv[i], "--timeout") == 0)
-    {
-      this->TimeOut = atoi(argv[i + 1]);
-      fprintf(stderr, "The timeout was set to %f.\n", this->TimeOut);
-    }
     if (strncmp(argv[i], "--server-exit-timeout", strlen("--server-exit-timeout")) == 0)
     {
       this->ServerExitTimeOut = atoi(argv[i + 1]);
@@ -382,7 +372,7 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
       {
         commandLine.push_back(this->PVSSHFlags[i].c_str());
       }
-      // then the paraview intialization:
+      // then the paraview initialization:
       if (this->PVSetupScript.size())
       {
         commandLine.push_back(this->PVSetupScript.c_str());
@@ -515,7 +505,7 @@ int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name
   }
   if (foundWaiting)
   {
-    cerr << "vtkSMTestDriver: " << name << " sucessfully started.\n";
+    cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
     return 1;
   }
   else
@@ -537,7 +527,7 @@ int vtkSMTestDriver::StartProcess(vtksysProcess* client, const char* name)
   vtksysProcess_Execute(client);
   if (vtksysProcess_GetState(client) == vtksysProcess_State_Executing)
   {
-    cerr << "vtkSMTestDriver: " << name << " sucessfully started.\n";
+    cerr << "vtkSMTestDriver: " << name << " successfully started.\n";
     return 1;
   }
   else
@@ -937,7 +927,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     {
       mpiError = 1;
     }
-    // If client has died, we wait for output from the server processess
+    // If client has died, we wait for output from the server processes
     // for this->ServerExitTimeOut, then we'll kill the servers, if needed.
     double timeout = (clientPipe) ? 0.1 : this->ServerExitTimeOut;
 
@@ -1068,7 +1058,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   }
   if (mpiError)
   {
-    cerr << "vtkSMTestDriver: Error string found in ouput, vtkSMTestDriver returning " << mpiError
+    cerr << "vtkSMTestDriver: Error string found in output, vtkSMTestDriver returning " << mpiError
          << "\n";
     return mpiError;
   }

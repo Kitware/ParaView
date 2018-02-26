@@ -62,7 +62,7 @@ public:
 
 public:
   pqDisplayColorWidget(QWidget* parent = 0);
-  ~pqDisplayColorWidget();
+  ~pqDisplayColorWidget() override;
 
   /**
   * Get/Set the array name as pair (association-number, arrayname).

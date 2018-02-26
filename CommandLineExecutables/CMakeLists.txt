@@ -211,6 +211,7 @@ if (PARAVIEW_ENABLE_PYTHON)
       target_link_libraries(${name} ${ATP_LIBRARIES})
       set_target_properties(${name} PROPERTIES LINK_FLAGS "${ATP_LINK_FLAGS}")
     endif()
+    add_dependencies(${name} paraview_python_package)
   endforeach()
 
   # add python module dependencies to the server-executables for static builds.

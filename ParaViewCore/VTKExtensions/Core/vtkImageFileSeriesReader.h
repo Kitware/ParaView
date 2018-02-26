@@ -18,7 +18,7 @@
  * stacks.
  *
  * vtkImageFileSeriesReader is designed for vtkImageReader2 and subclasses. This
- * adds API to optionally treat the file series as an image stack rather than an
+ * adds API to optionally treat the file series as an image stack rather than a
  * temporal dataset.
  * When ReadAsImageStack is true, we simply by-pass the superclass and instead
  * pass all filenames to the internal reader and then let it handle the pipeline
@@ -41,24 +41,34 @@ public:
   vtkGetMacro(ReadAsImageStack, bool);
   vtkBooleanMacro(ReadAsImageStack, bool);
 
+  //@{
   /**
    * Overridden to directly call the internal reader after passing it the
    * correct filenames when ReadAsImageStack is true.
    */
-  virtual int ProcessRequest(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  //@}
 
 protected:
   vtkImageFileSeriesReader();
-  ~vtkImageFileSeriesReader();
+  ~vtkImageFileSeriesReader() override;
+
+  //@{
+  /**
+   * Update the reader extent if the image file format does not know
+   * what it is (e.g. the raw format). Otherwise set it to all 0s
+   * and have Reader set it automatically.
+   */
+  virtual void UpdateReaderDataExtent();
+  //@}
 
   void UpdateFileNames();
 
   bool ReadAsImageStack;
 
 private:
-  vtkImageFileSeriesReader(const vtkImageFileSeriesReader&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkImageFileSeriesReader&) VTK_DELETE_FUNCTION;
+  vtkImageFileSeriesReader(const vtkImageFileSeriesReader&) = delete;
+  void operator=(const vtkImageFileSeriesReader&) = delete;
 };
 
 #endif

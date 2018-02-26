@@ -101,7 +101,7 @@ public:
     l->addWidget(this->Child);
     this->Child->show();
   }
-  ~pqKeyFrameEditorWidget()
+  ~pqKeyFrameEditorWidget() override
   {
     this->Child->setParent(NULL);
     this->Child->hide();
@@ -132,13 +132,13 @@ public:
   {
   }
   // get data from combo box on key frame editor
-  QVariant data(int role) const
+  QVariant data(int role) const override
   {
     int idx = this->Widget.typeComboBox()->currentIndex();
     QAbstractItemModel* comboModel = this->Widget.typeComboBox()->model();
     return comboModel->data(comboModel->index(idx, 0), role);
   }
-  QWidget* editorDialog() { return &Widget; }
+  QWidget* editorDialog() override { return &Widget; }
   pqKeyFrameTypeWidget Widget;
 };
 
@@ -157,7 +157,7 @@ public:
   }
 
   // get data from widget
-  QVariant data(int role) const
+  QVariant data(int role) const override
   {
     if (role == Qt::DisplayRole)
     {
@@ -175,7 +175,7 @@ public:
     }
     return QVariant();
   }
-  QWidget* editorDialog() { return &Widget; }
+  QWidget* editorDialog() override { return &Widget; }
   QWidget Widget;
   pqCameraKeyFrameWidget CamWidget;
 };
@@ -190,7 +190,8 @@ public:
     , CameraMode(false)
   {
   }
-  QWidget* createEditor(QWidget* p, const QStyleOptionViewItem&, const QModelIndex& index) const
+  QWidget* createEditor(
+    QWidget* p, const QStyleOptionViewItem&, const QModelIndex& index) const override
   {
     const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(index.model());
 
@@ -216,7 +217,7 @@ public:
     return NULL;
   }
   void updateEditorGeometry(
-    QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const
+    QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const override
   {
     if (qobject_cast<pqKeyFrameEditorDialog*>(editor))
     {

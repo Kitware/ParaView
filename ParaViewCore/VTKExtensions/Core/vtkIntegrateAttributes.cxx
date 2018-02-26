@@ -959,7 +959,7 @@ void vtkIntegrateAttributes::IntegratePolygon(
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned rectangular cells
+// For axis aligned rectangular cells
 void vtkIntegrateAttributes::IntegratePixel(
   vtkDataSet* input, vtkUnstructuredGrid* output, vtkIdType cellId, vtkIdList* cellPtIds)
 {
@@ -1096,7 +1096,7 @@ void vtkIntegrateAttributes::IntegrateTetrahedron(vtkDataSet* input, vtkUnstruct
     mid[i] = (pts[0][i] + pts[1][i] + pts[2][i] + pts[3][i]) * 0.25;
   }
 
-  // Calulate the volume of the tet which is 1/6 * the box product
+  // Calculate the volume of the tet which is 1/6 * the box product
   vtkMath::Cross(a, b, n);
   v = vtkMath::Dot(c, n) / 6.0;
   this->Sum += v;
@@ -1116,7 +1116,7 @@ void vtkIntegrateAttributes::IntegrateTetrahedron(vtkDataSet* input, vtkUnstruct
 }
 
 //-----------------------------------------------------------------------------
-// For axis alligned hexahedral cells
+// For axis aligned hexahedral cells
 void vtkIntegrateAttributes::IntegrateVoxel(
   vtkDataSet* input, vtkUnstructuredGrid* output, vtkIdType cellId, vtkIdList* cellPtIds)
 {
@@ -1135,7 +1135,7 @@ void vtkIntegrateAttributes::IntegrateVoxel(
 
   double l, w, h, v, mid[3];
 
-  // Calulate the volume of the voxel
+  // Calculate the volume of the voxel
   l = pts[1][0] - pts[0][0];
   w = pts[2][1] - pts[0][1];
   h = pts[4][2] - pts[0][2];

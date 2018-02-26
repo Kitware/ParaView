@@ -1,13 +1,15 @@
-from vtk.web import camera
+from vtkmodules.web import camera
 from paraview.web import data_writer
 from paraview.web import data_converter
 
-from vtk.web.query_data_model import *
+from vtkmodules.web.query_data_model import *
 from paraview.web.camera import *
-from vtk.web import iteritems, buffer
+from vtkmodules.web import iteritems, buffer
 from paraview import simple
 from paraview import servermanager
-from vtk import *
+
+from vtkmodules.vtkCommonCore import vtkFloatArray, vtkIdList, vtkUnsignedCharArray, vtkTypeUInt32Array
+from vtkmodules.vtkCommonDataModel import vtkDataSetAttributes
 
 import json, os, math, gzip, shutil, hashlib
 
@@ -132,7 +134,7 @@ class DataProberDataSetBuilder(DataSetBuilder):
         imageData = self.resamplerFilter.GetClientSideObject().GetOutput()
         self.DataProber['spacing'] = imageData.GetSpacing()
         arrays = imageData.GetPointData()
-        maskArray = arrays.GetArray(vtk.vtkDataSetAttributes.GhostArrayName())
+        maskArray = arrays.GetArray(vtkDataSetAttributes.GhostArrayName())
         for field in self.fieldsToWrite:
             array = arrays.GetArray(field)
             if array:
@@ -524,7 +526,7 @@ class CompositeDataSetBuilder(DataSetBuilder):
             # Update destination directory
             dest_path = os.path.dirname(self.dataHandler.getDataAbsoluteFilePath('directory'))
 
-            # Write camera informations
+            # Write camera information
             if self.dataHandler.can_write:
                 with open(os.path.join(dest_path, "camera.json"), 'w') as f:
                     f.write(json.dumps(camPos))

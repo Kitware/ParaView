@@ -45,14 +45,6 @@ public:
       int* interactive = reinterpret_cast<int*>(callData);
       camLink->UpdateViews(vtkSMProxy::SafeDownCast(caller), (*interactive == 1));
     }
-    else if (eid == vtkCommand::StartInteractionEvent && clientData && caller)
-    {
-      camLink->StartInteraction(caller);
-    }
-    else if (eid == vtkCommand::EndInteractionEvent && clientData && caller)
-    {
-      camLink->EndInteraction(caller);
-    }
     else if (eid == vtkCommand::ResetCameraEvent && clientData && caller)
     {
       camLink->ResetCamera(caller);
@@ -72,11 +64,6 @@ public:
       vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(proxy);
       if (rmp)
       {
-        if (vtkRenderWindowInteractor* iren = rmp->GetInteractor())
-        {
-          iren->AddObserver(vtkCommand::StartInteractionEvent, this->Observer);
-          iren->AddObserver(vtkCommand::EndInteractionEvent, this->Observer);
-        }
         rmp->AddObserver(vtkCommand::ResetCameraEvent, this->Observer);
       }
     };
@@ -86,11 +73,6 @@ public:
       vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(this->Proxy);
       if (rmp)
       {
-        vtkRenderWindowInteractor* iren = rmp->GetInteractor();
-        if (iren)
-        {
-          iren->RemoveObserver(this->Observer);
-        }
         rmp->RemoveObserver(this->Observer);
       }
     }
@@ -252,50 +234,6 @@ void vtkSMCameraLink::UpdateViews(vtkSMProxy* caller, bool interactive)
           rmp->StillRender();
         }
       }
-    }
-  }
-  this->Internals->Updating = false;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMCameraLink::StartInteraction(vtkObject* caller)
-{
-  if (this->Internals->Updating)
-  {
-    return;
-  }
-
-  this->Internals->Updating = true;
-  int numObjects = this->GetNumberOfLinkedObjects();
-  for (int i = 0; i < numObjects; i++)
-  {
-    vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(this->GetLinkedProxy(i));
-    if (rmp && this->GetLinkedObjectDirection(i) == vtkSMLink::OUTPUT &&
-      rmp->GetInteractor() != caller)
-    {
-      rmp->GetInteractor()->InvokeEvent(vtkCommand::StartInteractionEvent);
-    }
-  }
-  this->Internals->Updating = false;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMCameraLink::EndInteraction(vtkObject* caller)
-{
-  if (this->Internals->Updating)
-  {
-    return;
-  }
-
-  this->Internals->Updating = true;
-  int numObjects = this->GetNumberOfLinkedObjects();
-  for (int i = 0; i < numObjects; i++)
-  {
-    vtkSMRenderViewProxy* rmp = vtkSMRenderViewProxy::SafeDownCast(this->GetLinkedProxy(i));
-    if (rmp && this->GetLinkedObjectDirection(i) == vtkSMLink::OUTPUT &&
-      rmp->GetInteractor() != caller)
-    {
-      rmp->GetInteractor()->InvokeEvent(vtkCommand::EndInteractionEvent);
     }
   }
   this->Internals->Updating = false;

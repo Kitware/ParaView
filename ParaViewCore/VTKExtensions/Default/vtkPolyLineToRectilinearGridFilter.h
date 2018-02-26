@@ -40,19 +40,19 @@ public:
 
 protected:
   vtkPolyLineToRectilinearGridFilter();
-  ~vtkPolyLineToRectilinearGridFilter();
+  ~vtkPolyLineToRectilinearGridFilter() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
 
-  virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkPolyLineToRectilinearGridFilter(const vtkPolyLineToRectilinearGridFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPolyLineToRectilinearGridFilter&) VTK_DELETE_FUNCTION;
+  vtkPolyLineToRectilinearGridFilter(const vtkPolyLineToRectilinearGridFilter&) = delete;
+  void operator=(const vtkPolyLineToRectilinearGridFilter&) = delete;
 };
 
 #endif

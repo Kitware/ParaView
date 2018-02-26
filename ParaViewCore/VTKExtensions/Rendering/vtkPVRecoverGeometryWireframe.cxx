@@ -33,8 +33,8 @@
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <algorithm>
+#include <unordered_map>
 #include <vector>
-#include <vtksys/hash_map.hxx>
 
 static const unsigned char NO_EDGE_FLAG = static_cast<unsigned char>(-1);
 
@@ -93,7 +93,7 @@ public:
 
 // Description:
 // A map from edge endpoints to the information about that edge.
-typedef vtksys::hash_map<EdgeEndpoints, EdgeInformation, EdgeEndpointsHash> EdgeMapType;
+typedef std::unordered_map<EdgeEndpoints, EdgeInformation, EdgeEndpointsHash> EdgeMapType;
 
 void RecordEdgeFlag(vtkPolyData* output, const EdgeInformation& edgeInfo,
   vtkUnsignedCharArray* edgeFlagArray, unsigned char flag, vtkIdType* duplicatePointMap)
@@ -262,7 +262,7 @@ int vtkPVRecoverGeometryWireframe::RequestData(vtkInformation* vtkNotUsed(reques
         return 0;
     }
     // Record the original points of the polygon.  As we iterate over edges,
-    // we may change the indices, but we allways compare edges by the original
+    // we may change the indices, but we always compare edges by the original
     // indices.
     originalPts.resize(npts);
     std::copy(pts, pts + npts, originalPts.begin());

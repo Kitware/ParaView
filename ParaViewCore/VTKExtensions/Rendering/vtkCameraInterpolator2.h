@@ -110,7 +110,7 @@ public:
 
 protected:
   vtkCameraInterpolator2();
-  ~vtkCameraInterpolator2();
+  ~vtkCameraInterpolator2() override;
 
   void Evaluate(double u, vtkParametricSpline* spline, double tuple[3]);
 
@@ -128,8 +128,8 @@ protected:
   vtkParametricSpline* PositionSpline;
 
 private:
-  vtkCameraInterpolator2(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCameraInterpolator2&) VTK_DELETE_FUNCTION;
+  vtkCameraInterpolator2(const vtkCameraInterpolator2&) = delete;
+  void operator=(const vtkCameraInterpolator2&) = delete;
 };
 
 #endif

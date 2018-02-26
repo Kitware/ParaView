@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 
+#ifndef VTK_LEGACY_REMOVE
 namespace
 {
 class pqSettingsCleaner : public QObject
@@ -53,14 +54,8 @@ public:
   {
   }
 
-  virtual ~pqSettingsCleaner() { QFile::remove(this->Filename); }
+  ~pqSettingsCleaner() override { QFile::remove(this->Filename); }
 };
-}
-
-//-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& organization, const QString& application, QObject* p)
-  : QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application, p)
-{
 }
 
 //-----------------------------------------------------------------------------
@@ -72,11 +67,50 @@ pqSettings::pqSettings(const QString& filename, bool temporary, QObject* parentO
     new pqSettingsCleaner(filename, this);
   }
 }
+#endif // VTK_LEGACY_REMOVE
 
 //-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& fname, Format fmt, QObject* parentObject)
-  : Superclass(fname, fmt, parentObject)
+pqSettings::pqSettings(const QString& org, const QString& app, QObject* prnt)
+  : Superclass(org, app, prnt)
 {
+}
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(Scope spe, const QString& org, const QString& app, QObject* prnt)
+  : Superclass(spe, org, app, prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(Format fmt, Scope spe, const QString& org, const QString& app, QObject* prnt)
+  : Superclass(fmt, spe, org, app, prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(const QString& fn, Format fmt, QObject* prnt)
+  : Superclass(fn, fmt, prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(QObject* prnt)
+  : Superclass(prnt)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::~pqSettings()
+{
+}
+
+//-----------------------------------------------------------------------------
+QString pqSettings::backup(const QString& argName)
+{
+  this->sync();
+
+  QString fname = argName.isEmpty() ? (this->fileName() + ".bak") : argName;
+  QFile::remove(fname);
+  return QFile::copy(this->fileName(), fname) ? fname : QString();
 }
 
 //-----------------------------------------------------------------------------
@@ -92,6 +126,8 @@ void pqSettings::saveState(const QMainWindow& window, const QString& key)
   this->setValue("Position", window.pos());
   this->setValue("Size", window.size());
   this->setValue("Layout", window.saveState());
+  QDesktopWidget desktop;
+  this->setValue("Screen", desktop.screenNumber(&window));
   this->endGroup();
 }
 
@@ -120,7 +156,15 @@ void pqSettings::restoreState(const QString& key, QMainWindow& window)
     QRect mwRect(windowTopLeft, window.size());
 
     QDesktopWidget desktop;
+
+    // Default to primary screen, but restore to any saved screen we may have.
     QRect desktopRect = desktop.availableGeometry(desktop.primaryScreen());
+    if (this->contains("Screen"))
+    {
+      int screen = this->value("Screen").toInt();
+      desktopRect = desktop.availableGeometry(screen);
+    }
+
     // try moving it to keep size
     if (!desktopRect.contains(mwRect))
     {

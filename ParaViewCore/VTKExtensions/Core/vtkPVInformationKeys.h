@@ -29,7 +29,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVInformationKeys
 {
 public:
   /**
-   * Key to store the label that should be used for labelling the time in the UI
+   * Key to store the label that should be used for labeling the time in the UI
    */
   static vtkInformationStringKey* TIME_LABEL_ANNOTATION();
 

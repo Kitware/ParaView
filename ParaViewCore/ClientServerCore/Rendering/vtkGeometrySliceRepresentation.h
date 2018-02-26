@@ -35,7 +35,7 @@ public:
   vtkTypeMacro(vtkGeometrySliceRepresentation, vtkGeometryRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) VTK_OVERRIDE;
 
   enum
@@ -58,18 +58,18 @@ public:
 
 protected:
   vtkGeometrySliceRepresentation();
-  ~vtkGeometrySliceRepresentation();
+  ~vtkGeometrySliceRepresentation() override;
 
-  virtual void SetupDefaults() VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  void SetupDefaults() VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
 private:
-  vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkGeometrySliceRepresentation&) VTK_DELETE_FUNCTION;
+  vtkGeometrySliceRepresentation(const vtkGeometrySliceRepresentation&) = delete;
+  void operator=(const vtkGeometrySliceRepresentation&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

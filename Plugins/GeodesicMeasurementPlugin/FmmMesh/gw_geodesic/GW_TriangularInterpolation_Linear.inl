@@ -2,7 +2,7 @@
 /**
  *  \file   GW_TriangularInterpolation_Linear.inl
  *  \brief  Inlined methods for \c GW_TriangularInterpolation_Linear
- *  \author Gabriel Peyré
+ *  \author Gabriel PeyrÃ©
  *  \date   5-5-2003
  */
 /*------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@ namespace GW {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) Gabriel Peyré
+//  Copyright (c) Gabriel PeyrÃ©
 ///////////////////////////////////////////////////////////////////////////////
 //                               END OF FILE                                 //
 ///////////////////////////////////////////////////////////////////////////////

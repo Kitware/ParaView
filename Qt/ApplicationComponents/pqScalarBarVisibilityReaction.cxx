@@ -36,11 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "pqTimer.h"
 #include "pqUndoStack.h"
+#include "vtkAbstractArray.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
 #include <QDebug>
+#include <QMessageBox>
 
 //-----------------------------------------------------------------------------
 pqScalarBarVisibilityReaction::pqScalarBarVisibilityReaction(
@@ -161,6 +163,25 @@ void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
     return;
   }
 
+  if (visible &&
+    vtkSMPVRepresentationProxy::GetEstimatedNumberOfAnnotationsOnScalarBar(
+      repr->getProxy(), repr->getView()->getProxy()) > vtkAbstractArray::MAX_DISCRETE_VALUES)
+  {
+    QMessageBox* box = new QMessageBox(QMessageBox::Warning, tr("Number of annotations warning"),
+      tr("The color map have been configured to show lots of annotations."
+         " Showing the scalar bar in this situation may slow down the rendering"
+         " and it may not be readable anyway. Do you really want to show the color map ?"),
+      QMessageBox::Yes | QMessageBox::No);
+    box->move(QCursor::pos());
+    if (box->exec() == QMessageBox::No)
+    {
+      visible = false;
+      int blocked = this->parentAction()->blockSignals(true);
+      this->parentAction()->setChecked(false);
+      this->parentAction()->blockSignals(blocked);
+    }
+    delete box;
+  }
   BEGIN_UNDO_SET("Toggle Color Legend Visibility");
   vtkSMPVRepresentationProxy::SetScalarBarVisibility(
     repr->getProxy(), repr->getView()->getProxy(), visible);

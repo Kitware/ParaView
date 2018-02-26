@@ -161,6 +161,8 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
     vtkErrorMacro("No view specified.");
     return NULL;
   }
+  // threading can be tricky to debug -
+  bool doThread = true;
 
   vtkInternals::ImageCacheValueType& value = this->Internals->ImageCache[view];
   value.SetListener(view);
@@ -168,8 +170,15 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
   if (value.NeedsRender == false && value.Data != NULL && view->GetNeedsUpdate() == false)
   {
     // cout <<  "Reusing cache" << endl;
-    bool latest = this->Internals->Encoder->GetLatestOutput(view->GetGlobalID(), value.Data);
-    value.HasImagesBeingProcessed = !latest;
+    if (doThread)
+    {
+      bool latest = this->Internals->Encoder->GetLatestOutput(view->GetGlobalID(), value.Data);
+      value.HasImagesBeingProcessed = !latest;
+    }
+    else
+    {
+      value.HasImagesBeingProcessed = false;
+    }
     return value.Data;
   }
 
@@ -188,19 +197,33 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
   // vtkTimerLog::MarkEndEvent("StillRenderToString");
   // vtkTimerLog::DumpLogWithIndents(&cout, 0.0);
 
-  this->Internals->Encoder->PushAndTakeReference(view->GetGlobalID(), image, quality);
-  assert(image == NULL);
-
-  if (value.Data == NULL)
+  if (doThread || this->ImageEncoding)
   {
-    // we need to wait till output is processed.
-    // cout << "Flushing" << endl;
-    this->Internals->Encoder->Flush(view->GetGlobalID());
-    // cout << "Done Flushing" << endl;
-  }
+    this->Internals->Encoder->PushAndTakeReference(
+      view->GetGlobalID(), image, quality, this->ImageEncoding);
+    assert(image == NULL);
 
-  bool latest = this->Internals->Encoder->GetLatestOutput(view->GetGlobalID(), value.Data);
-  value.HasImagesBeingProcessed = !latest;
+    if (value.Data == NULL)
+    {
+      // we need to wait till output is processed.
+      // cout << "Flushing" << endl;
+      this->Internals->Encoder->Flush(view->GetGlobalID());
+      // cout << "Done Flushing" << endl;
+    }
+
+    bool latest = this->Internals->Encoder->GetLatestOutput(view->GetGlobalID(), value.Data);
+    value.HasImagesBeingProcessed = !latest;
+  }
+  else
+  {
+    vtkNew<vtkJPEGWriter> writer;
+    writer->WriteToMemoryOn();
+    writer->SetInputData(image);
+    writer->SetQuality(quality);
+    writer->Write();
+    // smart pointer does the right thing, even if Data was null
+    value.Data = writer->GetResult();
+  }
   value.NeedsRender = false;
   return value.Data;
 }
@@ -212,9 +235,22 @@ const char* vtkPVWebApplication::StillRenderToString(
   vtkUnsignedCharArray* array = this->StillRender(view, quality);
   if (array && array->GetMTime() != time)
   {
-    this->LastStillRenderToStringMTime = array->GetMTime();
+    this->LastStillRenderToMTime = array->GetMTime();
     // cout << "Image size: " << array->GetNumberOfTuples() << endl;
     return reinterpret_cast<char*>(array->GetPointer(0));
+  }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkUnsignedCharArray* vtkPVWebApplication::StillRenderToBuffer(
+  vtkSMViewProxy* view, unsigned long time, int quality)
+{
+  vtkUnsignedCharArray* array = this->StillRender(view, quality);
+  if (array && array->GetMTime() != time)
+  {
+    this->LastStillRenderToMTime = array->GetMTime();
+    return array;
   }
   return NULL;
 }

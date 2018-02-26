@@ -48,7 +48,7 @@ public:
    * status, we override this method to copy the values the info property as the
    * default array selection.
    */
-  virtual int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
 
   /**
    * Global flag to toggle between (a) the default behavior of setting default
@@ -62,13 +62,13 @@ public:
 
 protected:
   vtkSMArraySelectionDomain();
-  ~vtkSMArraySelectionDomain();
+  ~vtkSMArraySelectionDomain() override;
 
   static bool LoadAllVariables;
 
 private:
-  vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMArraySelectionDomain&) VTK_DELETE_FUNCTION;
+  vtkSMArraySelectionDomain(const vtkSMArraySelectionDomain&) = delete;
+  void operator=(const vtkSMArraySelectionDomain&) = delete;
 };
 
 #endif

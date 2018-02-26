@@ -50,15 +50,15 @@ public:
 
 protected:
   vtkSMCameraConfigurationWriter();
-  ~vtkSMCameraConfigurationWriter();
+  ~vtkSMCameraConfigurationWriter() override;
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
   void SetProxy(vtkSMProxy*) VTK_OVERRIDE { vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
-  vtkSMCameraConfigurationWriter(const vtkSMCameraConfigurationWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMCameraConfigurationWriter&) VTK_DELETE_FUNCTION;
+  vtkSMCameraConfigurationWriter(const vtkSMCameraConfigurationWriter&) = delete;
+  void operator=(const vtkSMCameraConfigurationWriter&) = delete;
 };
 
 #endif

@@ -34,8 +34,6 @@
 #include "vtkGeometryFilter.h"
 #include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkHierarchicalBoxDataSet.h"
-#include "vtkHyperOctree.h"
-#include "vtkHyperOctreeSurfaceFilter.h"
 #include "vtkHyperTreeGrid.h"
 #include "vtkHyperTreeGridGeometry.h"
 #include "vtkImageData.h"
@@ -96,7 +94,7 @@ public:
   // a placeholder for whatever operation is actually performed) and store the
   // result in B.  The operation is assumed to be associative.  Commutativity
   // is specified by the Commutative method.
-  virtual void Function(const void* A, void* B, vtkIdType length, int datatype)
+  void Function(const void* A, void* B, vtkIdType length, int datatype) override
   {
     assert((datatype == VTK_DOUBLE) && (length == 6));
     (void)datatype;
@@ -132,7 +130,7 @@ public:
   // Description:
   // Subclasses override this method to specify whether their operation
   // is commutative.  It should return 1 if commutative or 0 if not.
-  virtual int Commutative() { return 1; }
+  int Commutative() override { return 1; }
 };
 
 //----------------------------------------------------------------------------
@@ -142,15 +140,11 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->UseOutline = 1;
   this->BlockColorsDistinctValues = 7;
   this->UseStrips = 0;
-#ifdef VTKGL2
   // generating cell normals by default really slows down paraview
-  // it is especially noticable with the OpenGL2 backend.  Leaving
+  // it is especially noticeable with the OpenGL2 backend.  Leaving
   // it on for the old backend as some tests rely on the cell normals
   // to be there as they use them for other purposes/etc.
   this->GenerateCellNormals = 0;
-#else
-  this->GenerateCellNormals = 1;
-#endif
   this->Triangulate = false;
   this->NonlinearSubdivisionLevel = 1;
 
@@ -503,11 +497,6 @@ void vtkPVGeometryFilter::ExecuteBlock(vtkDataObject* input, vtkPolyData* output
     this->PolyDataExecute(static_cast<vtkPolyData*>(input), output, doCommunicate);
     return;
   }
-  if (input->IsA("vtkHyperOctree"))
-  {
-    this->OctreeExecute(static_cast<vtkHyperOctree*>(input), output, doCommunicate);
-    return;
-  }
   if (input->IsA("vtkHyperTreeGrid"))
   {
     this->HyperTreeGridExecute(static_cast<vtkHyperTreeGrid*>(input), output, doCommunicate);
@@ -797,7 +786,7 @@ int vtkPVGeometryFilter::RequestAMRData(
 
       if (overlappingAMR != NULL && !this->UseNonOverlappingAMRMetaDataForOutlines && ug == NULL)
       {
-        // for non-overlapping AMR, if we were told to not use meta-data, dont.
+        // for non-overlapping AMR, if we were told to not use meta-data, don't.
         continue;
       }
 
@@ -1002,7 +991,7 @@ int vtkPVGeometryFilter::RequestCompositeData(
   }
 
   // Now, when running in parallel, processes may have NULL-leaf nodes at
-  // different locations. To make our life easier in subsquent filtering such as
+  // different locations. To make our life easier in subsequent filtering such as
   // vtkAllToNRedistributeCompositePolyData or vtkKdTreeManager we ensure that
   // all NULL-leafs match up across processes i.e. if any leaf is non-null on
   // any process, then all other processes add empty polydatas for that leaf.
@@ -1621,30 +1610,6 @@ void vtkPVGeometryFilter::PolyDataExecute(
 
   this->OutlineFlag = 1;
   this->DataSetExecute(input, output, doCommunicate);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::OctreeExecute(vtkHyperOctree* input, vtkPolyData* out, int doCommunicate)
-{
-  if (!this->UseOutline)
-  {
-    this->OutlineFlag = 0;
-
-    vtkHyperOctreeSurfaceFilter* internalFilter = vtkHyperOctreeSurfaceFilter::New();
-    internalFilter->SetPassThroughCellIds(this->PassThroughCellIds);
-    // internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
-    vtkHyperOctree* octreeCopy = vtkHyperOctree::New();
-    octreeCopy->ShallowCopy(input);
-    internalFilter->SetInputData(octreeCopy);
-    internalFilter->Update();
-    out->ShallowCopy(internalFilter->GetOutput());
-    octreeCopy->Delete();
-    internalFilter->Delete();
-    return;
-  }
-
-  this->OutlineFlag = 1;
-  this->DataSetExecute(input, out, doCommunicate);
 }
 
 //----------------------------------------------------------------------------

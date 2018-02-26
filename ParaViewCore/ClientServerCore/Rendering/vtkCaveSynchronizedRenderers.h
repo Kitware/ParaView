@@ -43,13 +43,13 @@ public:
 
 protected:
   vtkCaveSynchronizedRenderers();
-  ~vtkCaveSynchronizedRenderers();
+  ~vtkCaveSynchronizedRenderers() override;
 
   /**
    * Called at the start of each render. Overridden to ensure that the camera is
    * updated based on the configuration.
    */
-  virtual void HandleStartRender() VTK_OVERRIDE;
+  void HandleStartRender() VTK_OVERRIDE;
 
   /**
    * During constructor, processes the configuration file to setup the display
@@ -84,8 +84,8 @@ protected:
   int once;
 
 private:
-  vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCaveSynchronizedRenderers&) VTK_DELETE_FUNCTION;
+  vtkCaveSynchronizedRenderers(const vtkCaveSynchronizedRenderers&) = delete;
+  void operator=(const vtkCaveSynchronizedRenderers&) = delete;
 };
 
 #endif

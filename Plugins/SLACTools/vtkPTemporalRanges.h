@@ -55,8 +55,8 @@ protected:
   virtual void Reduce(vtkTable* table);
 
 private:
-  vtkPTemporalRanges(const vtkPTemporalRanges&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPTemporalRanges&) VTK_DELETE_FUNCTION;
+  vtkPTemporalRanges(const vtkPTemporalRanges&) = delete;
+  void operator=(const vtkPTemporalRanges&) = delete;
 
   class vtkRangeTableReduction;
   friend class vtkRangeTableReduction;

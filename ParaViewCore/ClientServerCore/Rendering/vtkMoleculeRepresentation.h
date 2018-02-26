@@ -35,10 +35,10 @@ public:
   vtkTypeMacro(vtkMoleculeRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  virtual int ProcessViewRequest(vtkInformationRequestKey* requestType, vtkInformation* inputInfo,
+  int ProcessViewRequest(vtkInformationRequestKey* requestType, vtkInformation* inputInfo,
     vtkInformation* outputInfo) VTK_OVERRIDE;
 
-  virtual void SetVisibility(bool value) VTK_OVERRIDE;
+  void SetVisibility(bool value) VTK_OVERRIDE;
 
   vtkGetMacro(MoleculeRenderMode, int) void SetMoleculeRenderMode(int mode);
 
@@ -53,19 +53,18 @@ public:
 
   // Description:
   // Returns the data object that is rendered from the given input port.
-  virtual vtkDataObject* GetRenderedDataObject(int port) VTK_OVERRIDE;
+  vtkDataObject* GetRenderedDataObject(int port) VTK_OVERRIDE;
 
   void MarkModified() VTK_OVERRIDE;
 
 protected:
   vtkMoleculeRepresentation();
-  ~vtkMoleculeRepresentation();
+  ~vtkMoleculeRepresentation() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual bool AddToView(vtkView* view) VTK_OVERRIDE;
-  virtual bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
 
   bool IsCached(double cache_key) VTK_OVERRIDE;
 
@@ -84,8 +83,8 @@ protected:
   double DataBounds[6];
 
 private:
-  vtkMoleculeRepresentation(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkMoleculeRepresentation&) VTK_DELETE_FUNCTION;
+  vtkMoleculeRepresentation(const vtkMoleculeRepresentation&) = delete;
+  void operator=(const vtkMoleculeRepresentation&) = delete;
 };
 
 #endif // vtkMoleculeRepresentation_h

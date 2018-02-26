@@ -74,7 +74,7 @@ public:
   void SetLoading(vtkIdType loading) { this->Data[LOADING] = loading; }
   //@{
   /**
-   * Adds to laoding and returns the updated loading.
+   * Adds to loading and returns the updated loading.
    */
   vtkIdType UpdateLoading(vtkIdType update)
   {
@@ -84,7 +84,7 @@ public:
   //@}
   //@{
   /**
-   * Comparision are made by id.
+   * Comparison are made by id.
    */
   bool operator<(const vtkMaterialInterfacePieceLoading& other) const
   {

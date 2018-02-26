@@ -36,18 +36,18 @@ public:
 
 protected:
   vtkSequenceAnimationPlayer();
-  ~vtkSequenceAnimationPlayer();
+  ~vtkSequenceAnimationPlayer() override;
 
-  virtual void StartLoop(double, double, double*) VTK_OVERRIDE;
-  virtual void EndLoop() VTK_OVERRIDE{};
+  void StartLoop(double, double, double*) VTK_OVERRIDE;
+  void EndLoop() VTK_OVERRIDE{};
 
   /**
    * Return the next time given the current time.
    */
-  virtual double GetNextTime(double currentime) VTK_OVERRIDE;
+  double GetNextTime(double currentime) VTK_OVERRIDE;
 
-  virtual double GoToNext(double start, double end, double currenttime) VTK_OVERRIDE;
-  virtual double GoToPrevious(double start, double end, double currenttime) VTK_OVERRIDE;
+  double GoToNext(double start, double end, double currenttime) VTK_OVERRIDE;
+  double GoToPrevious(double start, double end, double currenttime) VTK_OVERRIDE;
 
   int NumberOfFrames;
   int MaxFrameWindow;
@@ -56,8 +56,8 @@ protected:
   int FrameNo;
 
 private:
-  vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSequenceAnimationPlayer&) VTK_DELETE_FUNCTION;
+  vtkSequenceAnimationPlayer(const vtkSequenceAnimationPlayer&) = delete;
+  void operator=(const vtkSequenceAnimationPlayer&) = delete;
 };
 
 #endif

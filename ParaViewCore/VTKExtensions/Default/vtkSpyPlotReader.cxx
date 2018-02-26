@@ -221,7 +221,7 @@ int vtkSpyPlotReader::RequestDataObject(
 
 //-----------------------------------------------------------------------------
 // Read the case file and the first binary file do get meta
-// informations (number of files, number of fields, number of timestep).
+// information (number of files, number of fields, number of timestep).
 int vtkSpyPlotReader::RequestInformation(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
@@ -1629,7 +1629,7 @@ bool vtkSpyPlotReader::GetLocalBoxSize(vtkSpyPlotBlockIterator* biter, int local
 }
 
 // Determines if the box size is a constant over the entire data set
-// if so sets this->GlobalBoxSize to that size, otehrwise sets
+// if so sets this->GlobalBoxSize to that size, otherwise sets
 // it to -1,-1,-1
 void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator* biter)
 {
@@ -1683,12 +1683,12 @@ void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator* biter)
       isConstantGlobally = false;
     }
   }
-  // 3) send a flag indicating change/no change occured
+  // 3) send a flag indicating change/no change occurred
   int lFlag = !isConstantLocally || !isConstantGlobally ? -1 : 1;
   int gFlag = 0;
   this->GlobalController->AllReduce(&lFlag, &gFlag, 1, vtkCommunicator::MIN_OP);
 
-  // set the global box size acordingly
+  // set the global box size accordingly
   switch (gFlag)
   {
     // box size varies

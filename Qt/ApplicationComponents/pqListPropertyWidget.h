@@ -54,7 +54,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqListPropertyWidget : public pqPropertyWid
 public:
   explicit pqListPropertyWidget(
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parent = 0);
-  virtual ~pqListPropertyWidget();
+  ~pqListPropertyWidget() override;
 
   /**
   * Methods used to set/get the value for the widget.

@@ -1,6 +1,5 @@
 include(ParaViewQt)
 pv_find_package_qt(qt_targets REQUIRED QUIET
-                QT4_COMPONENTS QtCore QtGui
                 QT5_COMPONENTS Core Widgets)
 pv_qt_wrap_cpp(MOC_SRCS FilteredPipelineBrowserApp.h)
 vtk_module_test_executable(pqPipelineApp FilteredPipelineBrowserApp.cxx FilteredPipelineBrowserApp.h ${MOC_SRCS})

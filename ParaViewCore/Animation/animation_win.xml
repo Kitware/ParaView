@@ -1,0 +1,53 @@
+<!-- Proxy definitions for FFMPEG writer -->
+<ServerManagerConfiguration>
+  <ProxyGroup name="animation_writers">
+    <Proxy name="VideoForWindows" class="vtkAVIWriter" label="Video For Windows" processes="client">
+      <Documentation>
+        AVI writer that uses Video-for-Windows API.
+      </Documentation>
+
+      <IntVectorProperty name="Quality"
+        command="SetQuality"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Specify the compression quality. **0** is worst quality (smallest file size),
+          and **2** is best quality (largest file size).
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="0" value="0" info="worst quality, smaller file" />
+          <Entry text="1" value="1" />
+          <Entry text="2" value="2" info="best quality, larger file" />
+        </EnumerationDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="Compression" value="1" />
+        </Hints>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FrameRate"
+        command="SetRate"
+        number_of_elements="1"
+        default_values="15"
+        panel_visibility="never">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Specify the frame rate in frames-per-second.
+        </Documentation>
+        <!-- ideally, this property is not hidden and we remove the "FrameRate"
+             property on "SaveAnimation" proxy. However, the way the frame-window stuff is managed currently
+             makes this hard. We need to rework frame-windowing logic too.
+             -->
+      </IntVectorProperty>
+
+      <StringVectorProperty name="CompressorFourCC"
+        command="SetCompressorFourCC"
+        number_of_elements="1"
+        default_values="MSVC"
+        panel_visibility="never" />
+
+      <Hints>
+        <FormatOptions extensions="avi" file_description="VFW AVI files" />
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

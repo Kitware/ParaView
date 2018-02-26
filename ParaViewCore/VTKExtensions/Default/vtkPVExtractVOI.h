@@ -93,13 +93,12 @@ public:
 
 protected:
   vtkPVExtractVOI();
-  ~vtkPVExtractVOI();
+  ~vtkPVExtractVOI() override;
 
-  virtual int RequestData(
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  virtual int RequestUpdateExtent(
+  int RequestUpdateExtent(
     vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int VOI[6];
@@ -110,11 +109,11 @@ protected:
   vtkExtractGrid* ExtractGrid;
   vtkExtractRectilinearGrid* ExtractRG;
 
-  virtual void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
 
 private:
-  vtkPVExtractVOI(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExtractVOI&) VTK_DELETE_FUNCTION;
+  vtkPVExtractVOI(const vtkPVExtractVOI&) = delete;
+  void operator=(const vtkPVExtractVOI&) = delete;
 };
 
 #endif

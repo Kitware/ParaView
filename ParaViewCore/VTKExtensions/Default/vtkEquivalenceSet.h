@@ -72,7 +72,7 @@ public:
 
 protected:
   vtkEquivalenceSet();
-  ~vtkEquivalenceSet();
+  ~vtkEquivalenceSet() override;
 
   int NumberOfResolvedSets;
 
@@ -84,8 +84,8 @@ protected:
   void EquateInternal(int id1, int id2);
 
 private:
-  vtkEquivalenceSet(const vtkEquivalenceSet&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkEquivalenceSet&) VTK_DELETE_FUNCTION;
+  vtkEquivalenceSet(const vtkEquivalenceSet&) = delete;
+  void operator=(const vtkEquivalenceSet&) = delete;
 };
 
 #endif

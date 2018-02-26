@@ -53,7 +53,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqPointPickingHelper : public QObject
 
 public:
   pqPointPickingHelper(const QKeySequence& keySequence, bool pick_on_mesh, QObject* parent = 0);
-  virtual ~pqPointPickingHelper();
+  ~pqPointPickingHelper() override;
 
   /**
   * Returns whether the helper will pick a point in the mesh or simply a point

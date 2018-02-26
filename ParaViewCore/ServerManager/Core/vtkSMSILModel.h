@@ -16,7 +16,6 @@
  * @class   vtkSMSILModel
  * @brief   is a helper for to work with SILs.
  *
- *
  * vtkSMSILModel makes it easier to make checks/unchecks for the SIL while
  * respecting the links/dependencies defined by the SIL.
  *
@@ -31,7 +30,16 @@
  * @par Events:
  * \li vtkCommand::UpdateDataEvent -- fired when the check state of any element
  * changes. calldata = vertexid for the element whose check state changed.
-*/
+ *
+ * @section vtkSMSILModelLegacyWarning Legacy Warning
+ *
+ * While not deprecated, this class exists to support readers that use legacy
+ * representation for SIL which used a `vtkGraph` to represent the SIL. It is
+ * recommended that newer code uses vtkSubsetInclusionLattice (or subclass) to
+ * represent the SIL. In that case, there is no need for such a helper class as
+ * similar API is exposed on vtkSubsetInclusionLattice and subclasses.
+ *
+ */
 
 #ifndef vtkSMSILModel_h
 #define vtkSMSILModel_h
@@ -171,7 +179,7 @@ public:
 
 protected:
   vtkSMSILModel();
-  virtual ~vtkSMSILModel();
+  ~vtkSMSILModel() override;
 
   void UpdateProperty();
   void OnPropertyModified();
@@ -196,8 +204,8 @@ protected:
   vtkCommand* DomainObserver;
 
 private:
-  vtkSMSILModel(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSILModel&) VTK_DELETE_FUNCTION;
+  vtkSMSILModel(const vtkSMSILModel&) = delete;
+  void operator=(const vtkSMSILModel&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

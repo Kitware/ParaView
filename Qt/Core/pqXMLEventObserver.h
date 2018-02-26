@@ -54,16 +54,16 @@ class PQCORE_EXPORT pqXMLEventObserver : public pqEventObserver
 
 public:
   pqXMLEventObserver(QObject* p);
-  ~pqXMLEventObserver();
+  ~pqXMLEventObserver() override;
 
-  virtual void setStream(QTextStream* stream);
+  void setStream(QTextStream* stream) override;
 
 public slots:
   /**
   * Record on event in xml file
   */
-  virtual void onRecordEvent(
-    const QString& Widget, const QString& Command, const QString& Arguments, const int& eventType);
+  void onRecordEvent(const QString& Widget, const QString& Command, const QString& Arguments,
+    const int& eventType) override;
 
 private:
 };

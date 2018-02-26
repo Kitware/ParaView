@@ -153,7 +153,7 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLSubhaloFinder : public vtkPassI
 
     //@{
     /**
-     * Gets/Sets beta factor.  This controlls how saddle points between
+     * Gets/Sets beta factor.  This controls how saddle points between
      * subhalos are treated.  Larger values allow identification of smaller
      * scale structures such as tails.
      * Default: 0.0
@@ -213,8 +213,8 @@ class VTKPVVTKEXTENSIONSCOSMOTOOLS_EXPORT vtkPANLSubhaloFinder : public vtkPassI
   vtkInternals* Internal;
 
 private:
-  vtkPANLSubhaloFinder(const vtkPANLSubhaloFinder&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPANLSubhaloFinder&) VTK_DELETE_FUNCTION;
+  vtkPANLSubhaloFinder(const vtkPANLSubhaloFinder&) = delete;
+  void operator=(const vtkPANLSubhaloFinder&) = delete;
 
   void ExecuteSubHaloFinder(vtkUnstructuredGrid* input, vtkUnstructuredGrid* allParticles,
     vtkUnstructuredGrid* subFofProperties);

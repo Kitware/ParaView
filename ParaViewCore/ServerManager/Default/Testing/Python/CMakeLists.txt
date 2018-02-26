@@ -16,7 +16,8 @@ paraview_test_load_data(""
   TestRepresentationTypePlugin.xml
   )
 paraview_test_load_data_dirs(""
-  dualSphereAnimation)
+  dualSphereAnimation
+  FileSeries)
 
 ###############################################################################
 # For python scripts for testing.
@@ -27,11 +28,14 @@ set(PY_TESTS
   Animation.py
   AxesGridTestGridLines.py
   CellIntegrator.py,NO_VALID
+  ChangeTimeSteps.py
   ColorAttributeTypeBackwardsCompatibility.py,NO_VALID
   CSVWriterReader.py,NO_VALID
   GhostCellsInMergeBlocks.py
   IntegrateAttributes.py,NO_VALID
   MultiServer.py,NO_VALID
+  PointGaussianProperties.py
+  CompositeDataFieldArraysInformation.py,NO_VALID
   ProgrammableFilterProperties.py,NO_VALID
   ProgrammableFilter.py,NO_VALID
   ProxyBackwardsCompatibilityTest.py,NO_VALID
@@ -50,6 +54,7 @@ set(PY_TESTS
   SaveAnimation.py
   SaveScreenshot.py,NO_VALID
   ScalarBarActorBackwardsCompatibility.py,NO_VALID
+  TestVTKSeriesWithMeta.py
   ValidateSources.py,NO_VALID
   VRMLSource.py,NO_VALID
   )
@@ -66,11 +71,6 @@ if (BUILD_SHARED_LIBS
   list(APPEND PY_TESTS
     Plugins.py,NO_VALID)
 endif ()
-
-# This test makes use of "Point Gaussian" representation, only available with OpenGL2
-if("${VTK_RENDERING_BACKEND}" STREQUAL "OpenGL2")
-    list(APPEND PY_TESTS PointGaussianProperties.py)
-endif()
 
 set(SMSTATE_FILE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(${vtk-module}_ARGS
@@ -89,10 +89,16 @@ set(PVBATCH_TESTS
   MultiView.py
   ParallelImageWriter.py,NO_VALID
   ParallelSerialWriter.py
+  PotentialMismatchedDataDelivery.py,NO_VALID
   SaveScreenshot.py,NO_VALID
   Simple.py
   UserTransformOnRepresentation.py
   )
+
+if (numpy_found AND PARAVIEW_USE_MPI)
+  list(APPEND PVBATCH_TESTS
+    D3CellsWithNegativeVolumes.py,NO_VALID)
+endif()
 
 # Saving animation currently doesn't work in symmetric mode.
 # paraview/paraview#17329

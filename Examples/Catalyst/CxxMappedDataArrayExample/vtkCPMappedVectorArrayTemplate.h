@@ -26,7 +26,6 @@
 #include "vtkMappedDataArray.h"
 
 #include "vtkObjectFactory.h" // for vtkStandardNewMacro
-#include "vtkTypeTemplate.h"  // For templated vtkObject API
 
 template <class Scalar>
 class vtkCPMappedVectorArrayTemplate : public vtkMappedDataArray<Scalar>
@@ -104,8 +103,8 @@ protected:
   Scalar* Array;
 
 private:
-  vtkCPMappedVectorArrayTemplate(const vtkCPMappedVectorArrayTemplate&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPMappedVectorArrayTemplate&) VTK_DELETE_FUNCTION;
+  vtkCPMappedVectorArrayTemplate(const vtkCPMappedVectorArrayTemplate&) = delete;
+  void operator=(const vtkCPMappedVectorArrayTemplate&) = delete;
 
   vtkIdType Lookup(const Scalar& val, vtkIdType startIndex);
   double TempDoubleArray[3];

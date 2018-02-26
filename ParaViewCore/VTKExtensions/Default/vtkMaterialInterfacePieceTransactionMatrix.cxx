@@ -224,7 +224,7 @@ void vtkMaterialInterfacePieceTransactionMatrix::Broadcast(vtkCommunicator* comm
   if (myProcId!=0)
     {
     int parent=(myProc-1)/2;
-    // TODO recieve from parent
+    // TODO receive from parent
     // TODO unpack
     }
 

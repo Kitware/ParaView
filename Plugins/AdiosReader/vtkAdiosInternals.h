@@ -118,8 +118,8 @@ public:
 
       if (0 != adios_read_init_method(method, *comm, parameters))
       {
-        // Error occured
-        cerr << "Adios triggerd an error while trying to initialize the method: " << method << endl
+        // Error occurred
+        cerr << "Adios triggered an error while trying to initialize the method: " << method << endl
              << adios_errmsg() << endl
              << "--------------------------------" << endl;
       }
@@ -312,7 +312,7 @@ public:
   }
 
 private:
-  // Internal full contructor
+  // Internal full constructor
   void Initialize(const char* name, ADIOS_DATATYPES type, void* data);
 
   std::string Name;
@@ -474,7 +474,7 @@ bool AdiosStream::Open()
   this->File = adios_read_open_stream(this->FileName.c_str(), this->Method,
     *AdiosGlobal::GetMethodMPIController(this->Method), ADIOS_LOCKMODE_CURRENT, timeout_msec);
 
-  // Allow to try again for 1 minute if an error occured
+  // Allow to try again for 1 minute if an error occurred
   timeout_msec = 5.0; // Set timeout to 5 seconds
   for (int i = 0; (i < 12) && (adios_errno == err_file_not_found); ++i)
   {
@@ -490,7 +490,7 @@ bool AdiosStream::Open()
       *AdiosGlobal::GetMethodMPIController(this->Method), ADIOS_LOCKMODE_CURRENT, timeout_msec);
   }
 
-  // Make sure the stream is still arround
+  // Make sure the stream is still around
   if (adios_errno == err_end_of_stream)
   {
     // stream has been gone before we tried to open
@@ -796,7 +796,7 @@ public:
     ADIOS_SELECTION* selectionCells = NULL;
     ADIOS_SELECTION* selectionPoints = NULL;
 
-    // Retreive grid dimension
+    // Retrieve grid dimension
     std::string nodeVarName = "/nodes/Z"; // Use Z to overcome a bug
     varIter = adiosStreamFile->MetaData.find(nodeVarName);
     if (varIter != adiosStreamFile->MetaData.end())
@@ -949,7 +949,7 @@ public:
     ADIOS_SELECTION* selectionCells = NULL;
     ADIOS_SELECTION* selectionPoints = NULL;
 
-    // Retreive grid dimension
+    // Retrieve grid dimension
     std::string nodeVarName = "/cells/Z"; // Use Z to overcome a bug
     varIter = adiosStreamFile->MetaData.find(nodeVarName);
     if (varIter != adiosStreamFile->MetaData.end())

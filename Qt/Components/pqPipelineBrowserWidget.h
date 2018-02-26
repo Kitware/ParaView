@@ -35,11 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include "pqFlatTreeView.h"
 
+#include <QPointer>
+
 class pqPipelineModel;
 class pqPipelineAnnotationFilterModel;
 class pqPipelineSource;
 class pqOutputPort;
 class pqView;
+class QMenu;
 class vtkSession;
 
 /**
@@ -53,13 +56,13 @@ class PQCOMPONENTS_EXPORT pqPipelineBrowserWidget : public pqFlatTreeView
 
 public:
   pqPipelineBrowserWidget(QWidget* parent = 0);
-  virtual ~pqPipelineBrowserWidget();
+  ~pqPipelineBrowserWidget() override;
 
   /**
   * Used to monitor the key press events in the tree view.
   * Returns True if the event should not be sent to the object.
   */
-  virtual bool eventFilter(QObject* object, QEvent* e);
+  bool eventFilter(QObject* object, QEvent* e) override;
 
   /**
   * Set the visibility of selected items.
@@ -103,6 +106,11 @@ public:
   */
   static void setVisibility(bool visible, pqOutputPort* port);
 
+  /**
+  * Provides access to the context menu.
+  */
+  QMenu* contextMenu() const;
+
 signals:
   /**
   * Fired when the delete key is pressed.
@@ -127,8 +135,11 @@ protected:
   */
   void setVisibility(bool visible, const QModelIndexList& indices);
 
+  void contextMenuEvent(QContextMenuEvent* e) override;
+
   pqPipelineModel* PipelineModel;
   pqPipelineAnnotationFilterModel* FilteredPipelineModel;
+  QPointer<QMenu> ContextMenu;
 
 private:
   /**

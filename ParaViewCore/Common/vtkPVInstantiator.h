@@ -45,11 +45,11 @@ public:
 
 protected:
   vtkPVInstantiator();
-  ~vtkPVInstantiator();
+  ~vtkPVInstantiator() override;
 
 private:
-  vtkPVInstantiator(const vtkPVInstantiator&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVInstantiator&) VTK_DELETE_FUNCTION;
+  vtkPVInstantiator(const vtkPVInstantiator&) = delete;
+  void operator=(const vtkPVInstantiator&) = delete;
 };
 
 #endif

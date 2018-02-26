@@ -111,7 +111,7 @@ public:
 
 protected:
   Private();
-  ~Private();
+  ~Private() override;
 
   void InitParticle(int);
   bool PrepareGLBuffers(vtkRenderer*, vtkActor*);
@@ -159,8 +159,8 @@ protected:
   bool CreateWideLines;
 
 private:
-  Private(const Private&) VTK_DELETE_FUNCTION;
-  void operator=(const Private&) VTK_DELETE_FUNCTION;
+  Private(const Private&) = delete;
+  void operator=(const Private&) = delete;
 };
 
 vtkStandardNewMacro(vtkStreamLinesMapper::Private)

@@ -34,9 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqReaction.h"
 
+class vtkSMSaveScreenshotProxy;
+
 /**
 * @ingroup Reactions
-* Reaction to save a screen shot.
+* @class pqSaveScreenshotReaction
+* @brief Reaction to save a screenshot.
+*
+* pqSaveScreenshotReaction can be connected to a QAction to prompt user and save
+* screenshots or captures from views using the `("misc", "SaveScreenshot")` proxy.
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveScreenshotReaction : public pqReaction
 {
@@ -58,26 +64,31 @@ public:
 
   /**
    * Save a screenshot given the filename and image properties.
+   * This method is provided only for convenience. This doesn't expose any of the
+   * advanced options available to users when saving screenshots.
    */
   static bool saveScreenshot(
     const QString& filename, const QSize& size, int quality, bool all_views = false);
+
+  /**
+   * Prompt user for filename using the various format proxies listed for the
+   * given proxy.
+   */
+  static QString promptFileName(
+    vtkSMSaveScreenshotProxy* saveProxy, const QString& defaultExtension);
 
 public slots:
   /**
   * Updates the enabled state. Applications need not explicitly call
   * this.
   */
-  void updateEnableState();
+  void updateEnableState() override;
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  virtual void onTriggered() { pqSaveScreenshotReaction::saveScreenshot(); }
-
-  /// Prompt for a filename. Will return empty string if user cancelled the
-  /// operation.
-  static QString promptFileName();
+  void onTriggered() override { pqSaveScreenshotReaction::saveScreenshot(); }
 
 private:
   Q_DISABLE_COPY(pqSaveScreenshotReaction)

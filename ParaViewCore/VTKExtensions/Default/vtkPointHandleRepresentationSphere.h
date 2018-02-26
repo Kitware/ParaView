@@ -70,7 +70,7 @@ public:
    * the superclasses SetDisplayPosition in order to set the focal point
    * of the cursor.
    */
-  virtual void SetDisplayPosition(double xyz[3]) VTK_OVERRIDE;
+  void SetDisplayPosition(double xyz[3]) VTK_OVERRIDE;
 
   //@{
   /**
@@ -88,21 +88,21 @@ public:
    * methods. These are the methods that the widget and its representation
    * use to communicate with each other.
    */
-  virtual double* GetBounds() VTK_OVERRIDE;
-  virtual void BuildRepresentation() VTK_OVERRIDE;
-  virtual void StartWidgetInteraction(double eventPos[2]) VTK_OVERRIDE;
-  virtual void WidgetInteraction(double eventPos[2]) VTK_OVERRIDE;
-  virtual int ComputeInteractionState(int X, int Y, int modify = 0) VTK_OVERRIDE;
+  double* GetBounds() VTK_OVERRIDE;
+  void BuildRepresentation() VTK_OVERRIDE;
+  void StartWidgetInteraction(double eventPos[2]) VTK_OVERRIDE;
+  void WidgetInteraction(double eventPos[2]) VTK_OVERRIDE;
+  int ComputeInteractionState(int X, int Y, int modify = 0) VTK_OVERRIDE;
   //@}
 
   //@{
   /**
    * Methods to make this class behave as a vtkProp.
    */
-  virtual void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
-  virtual void GetActors(vtkPropCollection*) VTK_OVERRIDE;
-  virtual void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
-  virtual int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void GetActors(vtkPropCollection*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
   //@}
 
   //@{
@@ -129,7 +129,7 @@ public:
 
 protected:
   vtkPointHandleRepresentationSphere();
-  ~vtkPointHandleRepresentationSphere();
+  ~vtkPointHandleRepresentationSphere() override;
 
   // Render the cursor
   vtkActor* Actor;
@@ -169,8 +169,8 @@ protected:
   double Scalar;
 
 private:
-  vtkPointHandleRepresentationSphere(const vtkPointHandleRepresentationSphere&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPointHandleRepresentationSphere&) VTK_DELETE_FUNCTION;
+  vtkPointHandleRepresentationSphere(const vtkPointHandleRepresentationSphere&) = delete;
+  void operator=(const vtkPointHandleRepresentationSphere&) = delete;
 };
 
 #endif

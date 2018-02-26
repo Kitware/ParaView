@@ -4,29 +4,26 @@
 #include <string>
 #include <vtkCPPipeline.h>
 
-class vtkCPDataDescription;
-class vtkCPPythonHelper;
-
 class vtkCPPVSMPipeline : public vtkCPPipeline
 {
 public:
   static vtkCPPVSMPipeline* New();
   vtkTypeMacro(vtkCPPVSMPipeline, vtkCPPipeline);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   virtual void Initialize(int outputFrequency, std::string& fileName);
 
-  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription);
+  int RequestDataDescription(vtkCPDataDescription* dataDescription) override;
 
-  virtual int CoProcess(vtkCPDataDescription* dataDescription);
+  int CoProcess(vtkCPDataDescription* dataDescription) override;
 
 protected:
   vtkCPPVSMPipeline();
   virtual ~vtkCPPVSMPipeline();
 
 private:
-  vtkCPPVSMPipeline(const vtkCPPVSMPipeline&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkCPPVSMPipeline&) VTK_DELETE_FUNCTION;
+  vtkCPPVSMPipeline(const vtkCPPVSMPipeline&) = delete;
+  void operator=(const vtkCPPVSMPipeline&) = delete;
 
   int OutputFrequency;
   std::string FileName;

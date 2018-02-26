@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream &s, const Fortran_Array3D<T> &A)
 /**
     Read an array from a character stream.  Input format
     is three integers, denoting the dimensions (m x n x k), followed
-    by m*n*k whitespace-separated elments in "row-major" order
+    by m*n*k whitespace-separated elements in "row-major" order
     (i.e. right-most dimension varying fastest.)  Newlines
     are ignored.
 
@@ -54,7 +54,7 @@ std::ostream& operator<<(std::ostream &s, const Fortran_Array3D<T> &A)
     array, use <code> cin >> B;  A.inject(B) ); </code>
     instead or read the elements in one-a-time by hand.
 
-    @param s the charater to read from (typically <code>std::in</code>)
+    @param s the character to read from (typically <code>std::in</code>)
     @param A the array to read into.
 */
 template <class T>

@@ -38,13 +38,13 @@ public:
 
 protected:
   vtkPVOptionsXMLParser() {}
-  ~vtkPVOptionsXMLParser() {}
+  ~vtkPVOptionsXMLParser() override {}
 
-  virtual void SetProcessType(const char* ptype) VTK_OVERRIDE;
+  void SetProcessType(const char* ptype) VTK_OVERRIDE;
 
 private:
-  vtkPVOptionsXMLParser(const vtkPVOptionsXMLParser&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVOptionsXMLParser&) VTK_DELETE_FUNCTION;
+  vtkPVOptionsXMLParser(const vtkPVOptionsXMLParser&) = delete;
+  void operator=(const vtkPVOptionsXMLParser&) = delete;
 };
 
 #endif // #ifndef vtkPVOptionsXMLParser_h

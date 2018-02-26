@@ -72,13 +72,13 @@ public:
 
 protected:
   vtkPVInformation();
-  ~vtkPVInformation();
+  ~vtkPVInformation() override;
 
   int RootOnly;
   vtkSetMacro(RootOnly, int);
 
-  vtkPVInformation(const vtkPVInformation&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVInformation&) VTK_DELETE_FUNCTION;
+  vtkPVInformation(const vtkPVInformation&) = delete;
+  void operator=(const vtkPVInformation&) = delete;
 };
 
 #endif

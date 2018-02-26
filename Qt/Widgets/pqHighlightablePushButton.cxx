@@ -45,6 +45,7 @@ pqHighlightablePushButton::pqHighlightablePushButton(QWidget* parentA)
   : Superclass(parentA)
   , Internals(new pqHighlightablePushButton::pqInternals())
 {
+  this->Internals->ResetPalette = this->palette();
 }
 
 //-----------------------------------------------------------------------------
@@ -61,6 +62,7 @@ pqHighlightablePushButton::pqHighlightablePushButton(
   : Superclass(iconA, textA, parentA)
   , Internals(new pqHighlightablePushButton::pqInternals())
 {
+  this->Internals->ResetPalette = this->palette();
 }
 
 //-----------------------------------------------------------------------------

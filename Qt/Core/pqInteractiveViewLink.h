@@ -51,7 +51,7 @@ class PQCORE_EXPORT pqInteractiveViewLink : public QObject
 public:
   pqInteractiveViewLink(pqRenderView* displayView, pqRenderView* linkedView, double xPos = 0.375,
     double yPos = 0.375, double xSize = 0.25, double ySize = 0.25);
-  virtual ~pqInteractiveViewLink();
+  ~pqInteractiveViewLink() override;
 
   // Save this interactive view link in xml node
   virtual void saveXMLState(vtkPVXMLElement* xml);

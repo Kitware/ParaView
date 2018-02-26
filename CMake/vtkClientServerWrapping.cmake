@@ -76,17 +76,12 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
   vtk_module_headers_load(${module})
 
   foreach(class ${${module}_HEADERS})
-    if(NOT ${module}_HEADER_${class}_WRAP_EXCLUDE)
-      pv_find_vtk_header(${class}.h "${${module}_INCLUDE_DIRS}" pathfound)
+    pv_find_vtk_header(${class}.h "${${module}_INCLUDE_DIRS}" pathfound)
 
-      if(pathfound)
-        if(${module}_HEADER_${class}_ABSTRACT)
-          set_source_files_properties(${pathfound} PROPERTIES ABSTRACT 1)
-        endif()
-        list(APPEND ${module}CS_HEADERS ${pathfound})
-      else()
-        message(WARNING "Unable to find: ${class}")
-      endif()
+    if(pathfound)
+      list(APPEND ${module}CS_HEADERS ${pathfound})
+    else()
+      message(WARNING "Unable to find: ${class}")
     endif()
   endforeach()
 
@@ -112,7 +107,7 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
   endforeach()
 
   if(hints_added AND COMBINED_HINTS)
-    # combined hints are generated only we we have more than the default hints
+    # combined hints are generated only when we have more than the default hints
     # specified by VTK_WRAP_HINTS that need to be used.
     string(STRIP "${COMBINED_HINTS}" CMAKE_CONFIGURABLE_FILE_CONTENT)
     configure_file(
@@ -161,12 +156,7 @@ MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
       # handle full paths
       SET(full_name "${class}.h")
     ENDIF()
-    IF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
-      IF(VTK_CLASS_ABSTRACT_${class})
-        SET_SOURCE_FILES_PROPERTIES(${full_name} PROPERTIES ABSTRACT 1)
-      ENDIF()
-      SET(vtk${kit}CS_HEADERS ${vtk${kit}CS_HEADERS} ${full_name})
-    ENDIF()
+    SET(vtk${kit}CS_HEADERS ${vtk${kit}CS_HEADERS} ${full_name})
   ENDFOREACH()
   VTK_WRAP_ClientServer("${libname}" "vtk${kit}CS_SRCS" "${vtk${kit}CS_HEADERS}")
 ENDMACRO()

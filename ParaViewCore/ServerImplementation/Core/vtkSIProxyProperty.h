@@ -61,17 +61,17 @@ public:
 
 protected:
   vtkSIProxyProperty();
-  ~vtkSIProxyProperty();
+  ~vtkSIProxyProperty() override;
 
   /**
    * Push a new state to the underneath implementation
    */
-  virtual bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
 
   /**
    * Parse the xml for the property.
    */
-  virtual bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
 
   //@{
   /**
@@ -120,8 +120,8 @@ protected:
   bool IsValidNull(vtkTypeUInt32 globalId);
 
 private:
-  vtkSIProxyProperty(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSIProxyProperty&) VTK_DELETE_FUNCTION;
+  vtkSIProxyProperty(const vtkSIProxyProperty&) = delete;
+  void operator=(const vtkSIProxyProperty&) = delete;
   class InternalCache;
   InternalCache* Cache;
 

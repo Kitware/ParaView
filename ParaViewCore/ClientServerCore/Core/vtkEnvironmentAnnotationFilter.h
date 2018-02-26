@@ -62,18 +62,18 @@ public:
 
 protected:
   vtkEnvironmentAnnotationFilter();
-  ~vtkEnvironmentAnnotationFilter();
+  ~vtkEnvironmentAnnotationFilter() override;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   std::string AnnotationValue;
   std::string FileName;
 
 private:
-  vtkEnvironmentAnnotationFilter(const vtkEnvironmentAnnotationFilter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkEnvironmentAnnotationFilter&) VTK_DELETE_FUNCTION;
+  vtkEnvironmentAnnotationFilter(const vtkEnvironmentAnnotationFilter&) = delete;
+  void operator=(const vtkEnvironmentAnnotationFilter&) = delete;
 
   void UpdateAnnotationValue();
 

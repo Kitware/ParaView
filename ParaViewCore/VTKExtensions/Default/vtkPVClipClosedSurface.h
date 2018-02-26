@@ -51,17 +51,17 @@ public:
 
 protected:
   vtkPVClipClosedSurface();
-  ~vtkPVClipClosedSurface();
+  ~vtkPVClipClosedSurface() override;
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
   int InsideOut;
   vtkPlane* ClippingPlane;
 
 private:
-  vtkPVClipClosedSurface(const vtkPVClipClosedSurface&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVClipClosedSurface&) VTK_DELETE_FUNCTION;
+  vtkPVClipClosedSurface(const vtkPVClipClosedSurface&) = delete;
+  void operator=(const vtkPVClipClosedSurface&) = delete;
 };
 
 #endif

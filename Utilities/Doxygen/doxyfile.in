@@ -39,18 +39,37 @@ IMAGE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@/images"
 OUTPUT_DIRECTORY     = "@CMAKE_CURRENT_BINARY_DIR@/doc"
 
 INPUT                = \
-          "@CMAKE_CURRENT_SOURCE_DIR@/pages" \
-          "@CMAKE_CURRENT_SOURCE_DIR@/../../CoProcessing/Adaptors/CamAdaptor" \
-          "@CMAKE_CURRENT_BINARY_DIR@/pages" \
           "@CMAKE_CURRENT_BINARY_DIR@/dox" \
           "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events2.dox" \
           "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events.dox" \
-          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_index.dox" \
-          @PV_MODULE_DIRS_DOXYGEN_ESCAPED@
+          "@CMAKE_CURRENT_BINARY_DIR@/pages" \
+          "@ParaView_SOURCE_DIR@/" \
+
 
 EXCLUDE              = \
+    "@ParaView_SOURCE_DIR@/Catalyst/Editions" \
+    "@ParaView_SOURCE_DIR@/Examples" \
+    "@ParaView_SOURCE_DIR@/ParaViewCore/VTKExtensions/H5PartReader/H5Part/src" \
+    "@ParaView_SOURCE_DIR@/Plugins" \
+    "@ParaView_SOURCE_DIR@/ThirdParty" \
+    "@ParaView_SOURCE_DIR@/Utilities/ColorSeriesToXML" \
+    "@ParaView_SOURCE_DIR@/Utilities/Git" \
+    "@ParaView_SOURCE_DIR@/Utilities/GitSetup" \
+    "@ParaView_SOURCE_DIR@/Utilities/LegacyColorMapXMLToJSON" \
+    "@ParaView_SOURCE_DIR@/Utilities/Maintenance" \
+    "@ParaView_SOURCE_DIR@/Utilities/MinimalBuildTools" \
+    "@ParaView_SOURCE_DIR@/Utilities/ProcessXML" \
+    "@ParaView_SOURCE_DIR@/Utilities/PythonInitializer" \
+    "@ParaView_SOURCE_DIR@/Utilities/Scripts" \
+    "@ParaView_SOURCE_DIR@/Utilities/Sphinx" \
+    "@ParaView_SOURCE_DIR@/Utilities/TestDriver" \
+    "@ParaView_SOURCE_DIR@/Utilities/VisItBridge" \
+    "@ParaView_SOURCE_DIR@/VTK" \
     "@ParaView_SOURCE_DIR@/Web/Documentation" \
 
+
+# Exclude module testing directories.
+EXCLUDE_PATTERNS     = */Testing/Cxx/* */Testing/Python/*
 
 # TAGFILES           = "@VTK_BINARY_DIR@/Utilities/Doxygen/vtk@VTK_MAJOR_VERSION@-nightly.tag"=http://www.vtk.org/doc/nightly/html
 TAGFILES             = @TAGFILES@
@@ -79,7 +98,7 @@ RECURSIVE            = YES
 ALPHABETICAL_INDEX   = YES
 COLS_IN_ALPHA_INDEX  = 3
 IGNORE_PREFIX        = vtkPV vtkSM vtk pq vtkCP
-
+DOT_GRAPH_MAX_NODES  = 100
 ENABLE_PREPROCESSING = YES
 MACRO_EXPANSION      = YES
 SEARCH_INCLUDES      = YES

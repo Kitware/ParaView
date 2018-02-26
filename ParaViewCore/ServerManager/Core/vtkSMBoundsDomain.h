@@ -75,7 +75,7 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) VTK_OVERRIDE;
 
   //@{
   vtkSetClampMacro(Mode, int, 0, 3);
@@ -102,19 +102,19 @@ public:
   /**
    * Overridden to handle APPROXIMATE_CELL_LENGTH.
    */
-  virtual int SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values) VTK_OVERRIDE;
 
 protected:
   vtkSMBoundsDomain();
-  ~vtkSMBoundsDomain();
+  ~vtkSMBoundsDomain() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
 
-  // Obtain the data information from the requried property with
+  // Obtain the data information from the required property with
   // function "Input", if any.
   vtkPVDataInformation* GetInputInformation();
 
@@ -125,8 +125,8 @@ protected:
   int Mode;
   double ScaleFactor; // Used only in SCALED_EXTENT and APPROXIMATE_CELL_LENGTH mode.
 private:
-  vtkSMBoundsDomain(const vtkSMBoundsDomain&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMBoundsDomain&) VTK_DELETE_FUNCTION;
+  vtkSMBoundsDomain(const vtkSMBoundsDomain&) = delete;
+  void operator=(const vtkSMBoundsDomain&) = delete;
 
   vtkSMArrayRangeDomain* ArrayRangeDomain;
 };

@@ -34,6 +34,7 @@ class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInformationVector;
 class vtkPVSynchronizedRenderWindows;
+class vtkRenderWindow;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVView : public vtkView
 {
@@ -186,7 +187,7 @@ public:
    * Overridden to not call Update() directly on the input representations,
    * instead use ProcessViewRequest() for all vtkPVDataRepresentations.
    */
-  virtual void Update() VTK_OVERRIDE;
+  void Update() VTK_OVERRIDE;
 
   /**
    * Returns true if the application is currently in tile display mode.
@@ -213,11 +214,24 @@ public:
    */
   bool GetLocalProcessSupportsInteraction();
 
+  /**
+   * Returns the unique identifier used for this view. This gets set in
+   * `Initialize()`.
+   */
   vtkGetMacro(Identifier, unsigned int);
+
+  /**
+   * If this view needs a render window (not all views may use one),
+   * this method can be used to get the render window associated with this view
+   * on the current process. Note that this window may be shared with other
+   * views depending on the process on which this is called and the
+   * configuration ParaView is running under.
+   */
+  virtual vtkRenderWindow* GetRenderWindow();
 
 protected:
   vtkPVView();
-  ~vtkPVView();
+  ~vtkPVView() override;
 
   /**
    * Overridden to check that the representation has View setup properly. Older
@@ -225,7 +239,7 @@ protected:
    * call the superclass implementations. We check that that's not the case and
    * warn.
    */
-  virtual void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
 
   // vtkPVSynchronizedRenderWindows is used to ensure that this view participates
   // in tile-display configurations. Even if your view subclass a simple
@@ -272,8 +286,8 @@ protected:
   int PPI;
 
 private:
-  vtkPVView(const vtkPVView&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVView&) VTK_DELETE_FUNCTION;
+  vtkPVView(const vtkPVView&) = delete;
+  void operator=(const vtkPVView&) = delete;
 
   class vtkInternals;
 

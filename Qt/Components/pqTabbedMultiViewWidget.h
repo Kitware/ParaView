@@ -60,7 +60,7 @@ class PQCOMPONENTS_EXPORT pqTabbedMultiViewWidget : public QWidget
   Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
 public:
   pqTabbedMultiViewWidget(QWidget* parent = 0);
-  virtual ~pqTabbedMultiViewWidget();
+  ~pqTabbedMultiViewWidget() override;
 
   /**
   * Returns the size for the tabs in the widget.
@@ -81,17 +81,10 @@ public:
   void setTabVisibility(bool visible);
   bool tabVisibility() const;
 
-  //@{
   /**
-   * @deprecated in ParaView 5.4. `vtkSMSaveScreenshotProxy` now encapsulates
-   * all logic to capture images. See `pqSaveScreenshotReaction` for details on
-   * using it.
-   */
-  VTK_LEGACY(vtkImageData* captureImage(int width, int height));
-  VTK_LEGACY(int prepareForCapture(int width, int height));
-  VTK_LEGACY(void cleanupAfterCapture());
-  VTK_LEGACY(bool writeImage(const QString& filename, int width, int height, int quality = -1));
-  //@}
+  * Return the layout proxy.
+  */
+  vtkSMViewLayoutProxy* layoutProxy() const;
 
 signals:
   /**
@@ -125,6 +118,26 @@ public slots:
   * cleans up the layout.
   */
   virtual void reset();
+
+  /**
+   * Enter (or exit) preview mode.
+   *
+   * Preview mode is a mode were various widget's decorations
+   * are hidden and the widget is locked to the specified size. If the widget's
+   * current size is less than the size specified, then the widget is locked to
+   * a size with similar aspect ratio as requested. Pass in invalid (or empty)
+   * size to exit preview mode.
+   *
+   * Preview mode is preferred over `toggleWidgetDecoration` and `lockViewSize`
+   * and is mutually exclusive with either. Mixing them can have unintended
+   * consequences.
+   *
+   * @returns the size to which the widget was locked. When unlocked, this will
+   * be QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX). When entering preview mode this
+   * will same as requested `previewSize` or a smaller size preserving aspect
+   * ratio as much as possible.
+   */
+  QSize preview(const QSize& previewSize = QSize());
 
 protected slots:
   /**
@@ -168,7 +181,7 @@ protected slots:
   void onLayoutNameChanged(pqServerManagerModelItem*);
 
 protected:
-  virtual bool eventFilter(QObject* obj, QEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event) override;
 
   /**
   * assigns a frame to the view.
@@ -184,7 +197,7 @@ protected:
 
   public:
     pqTabWidget(QWidget* parentWdg = NULL);
-    virtual ~pqTabWidget();
+    ~pqTabWidget() override;
 
     /**
     * Set a button to use on the tab bar.
@@ -223,9 +236,24 @@ protected:
     void setReadOnly(bool val);
     bool readOnly() const { return this->ReadOnly; }
 
+    /**
+     * Enter/exit preview mode
+     */
+    QSize preview(const QSize&);
+
+    //@{
+    /**
+     * Get/Set tab bar visibility. Use this instead of directly calling
+     * `this->tabBar()->setVisible()` as that avoid interactions with preview
+     * mode.
+     */
+    void setTabBarVisibility(bool);
+    bool tabBarVisibility() const { return this->TabBarVisibility; }
+    //@}
   private:
     Q_DISABLE_COPY(pqTabWidget)
     bool ReadOnly;
+    bool TabBarVisibility;
     friend class pqTabbedMultiViewWidget;
   };
 

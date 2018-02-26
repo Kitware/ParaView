@@ -1,5 +1,5 @@
 # Wrap all modules marked for client server wrapping
-# PARAVIEW_CURRENT_CS_MODULES is an interal cache entry created
+# PARAVIEW_CURRENT_CS_MODULES is an internal cache entry created
 # in SMApplicaton/CMakeLists.txt
 if (TARGET vtkWrapClientServer)
   include (vtkClientServerWrapping)

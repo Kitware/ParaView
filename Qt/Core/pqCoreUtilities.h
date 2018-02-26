@@ -58,7 +58,7 @@ class PQCORE_EXPORT pqCoreUtilitiesEventHelper : public QObject
 
 public:
   pqCoreUtilitiesEventHelper(QObject* parent);
-  ~pqCoreUtilitiesEventHelper();
+  ~pqCoreUtilitiesEventHelper() override;
 
 signals:
   void eventInvoked(vtkObject*, unsigned long, void*);

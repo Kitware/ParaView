@@ -45,7 +45,6 @@ set (Module_SRCS
   vtkPVKeyFrame.cxx
   vtkPVRampKeyFrame.cxx
   vtkPVRepresentationAnimationHelper.cxx
-  vtkPVServerSideAnimationPlayer.cxx
   vtkPVSinusoidKeyFrame.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkSequenceAnimationPlayer.cxx
@@ -53,7 +52,6 @@ set (Module_SRCS
   vtkSMAnimationFrameWindowDomain.cxx
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
-  vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMSaveAnimationProxy.cxx
@@ -67,16 +65,4 @@ if (PARAVIEW_ENABLE_PYTHON)
     )
 endif()
 
-#set_source_files_properties(
-#  WRAP_EXCLUDE
-#)
-
-set_source_files_properties(
-  vtkAnimationPlayer
-  vtkPVAnimationCue
-  vtkPVCueManipulator
-  vtkPVKeyFrameAnimationCue
-  vtkSMAnimationSceneWriter.cxx
-  ABSTRACT
-)
 vtk_module_library(${vtk-module} ${Module_SRCS})

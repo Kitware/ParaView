@@ -71,25 +71,8 @@ public:
       iter->GetPointer()->Update();
     }
 
-    // To ensure that LUTs are reset using proper ranges, we need to update all
-    // views first, then reset/grow the LUTs and subsequently render all the views.
-    switch (vtkPVGeneralSettings::GetInstance()->GetTransferFunctionResetMode())
-    {
-      case vtkPVGeneralSettings::GROW_ON_APPLY_AND_TIMESTEP:
-        this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(pxm, true);
-        break;
-
-      case vtkPVGeneralSettings::RESET_ON_APPLY_AND_TIMESTEP:
-        this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(pxm, false);
-        // FIXME: Maybe we should warn the user if animation caching is ON and
-        // RESET_ON_APPLY_AND_TIMESTEP is enabled since the ranges will definitely
-        // be wrong if caching gets used.
-        break;
-
-      default:
-        // nothing to do.
-        break;
-    }
+    this->TransferFunctionManager->ResetAllTransferFunctionRangesUsingCurrentData(
+      pxm, true /*animating*/);
   }
 
   void StillRenderAllViews()
@@ -180,7 +163,7 @@ public:
 class vtkTickOnCameraCue : public vtkTickOnGenericCue
 {
 protected:
-  virtual bool IsAcceptable(vtkAnimationCue* cue) const
+  bool IsAcceptable(vtkAnimationCue* cue) const override
   {
     return (vtkPVCameraAnimationCue::SafeDownCast(cue) != NULL);
   }
@@ -195,7 +178,7 @@ public:
   {
   }
 
-  virtual void operator()(vtkAnimationCue* cue) const
+  void operator()(vtkAnimationCue* cue) const override
   {
     vtkPVCameraAnimationCue* cameraCue = vtkPVCameraAnimationCue::SafeDownCast(cue);
     if (cameraCue)
@@ -213,7 +196,7 @@ public:
 class vtkTickOnPythonCue : public vtkTickOnGenericCue
 {
 protected:
-  virtual bool IsAcceptable(vtkAnimationCue* cue) const
+  bool IsAcceptable(vtkAnimationCue* cue) const override
   {
     (void)cue;
     return (false

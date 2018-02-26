@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVExponentialKeyFrame
  *
- * Interplates lineraly between consequtive key frames.
+ * Interplates lineraly between consecutive key frames.
 */
 
 #ifndef vtkPVExponentialKeyFrame_h
@@ -35,8 +35,7 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  virtual void UpdateValue(
-    double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
 
   //@{
   /**
@@ -54,15 +53,15 @@ public:
 
 protected:
   vtkPVExponentialKeyFrame();
-  ~vtkPVExponentialKeyFrame();
+  ~vtkPVExponentialKeyFrame() override;
 
   double Base;
   double StartPower;
   double EndPower;
 
 private:
-  vtkPVExponentialKeyFrame(const vtkPVExponentialKeyFrame&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkPVExponentialKeyFrame&) VTK_DELETE_FUNCTION;
+  vtkPVExponentialKeyFrame(const vtkPVExponentialKeyFrame&) = delete;
+  void operator=(const vtkPVExponentialKeyFrame&) = delete;
 };
 
 #endif

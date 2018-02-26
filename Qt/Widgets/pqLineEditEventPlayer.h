@@ -47,10 +47,11 @@ class PQWIDGETS_EXPORT pqLineEditEventPlayer : public pqAbstractStringEventPlaye
 
 public:
   pqLineEditEventPlayer(QObject* parent = 0);
-  virtual ~pqLineEditEventPlayer();
+  ~pqLineEditEventPlayer() override;
 
   using Superclass::playEvent;
-  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
+  bool playEvent(
+    QObject* Object, const QString& Command, const QString& Arguments, bool& Error) override;
 
 private:
   Q_DISABLE_COPY(pqLineEditEventPlayer)

@@ -240,6 +240,8 @@ int main(int argc, char* argv[])
             << "#define __" << output_file_name << "_h" << endl
             << endl
             << "#include <string.h>" << endl
+            << "#include <cassert>" << endl
+            << "#include <algorithm>" << endl
             << endl;
 
   int cc;
@@ -264,19 +266,27 @@ int main(int argc, char* argv[])
     int kk;
     std::ostringstream createstring;
     std::ostringstream lenstr;
+    std::ostringstream prelenstr;
     for (kk = 0; kk < num; kk++)
     {
-      lenstr << endl << "    + strlen(" << ot.Prefix << moduleName << ot.Suffix << kk << ")";
-      createstring << "  strncat(res, " << ot.Prefix << moduleName << ot.Suffix << kk
-                   << ", len + 1 - strlen(res));" << endl;
+      prelenstr << endl
+                << "  const size_t len" << kk << " = strlen(" << ot.Prefix << moduleName
+                << ot.Suffix << kk << ");";
+      lenstr << endl << "    + len" << kk;
+      createstring << "  std::copy(" << ot.Prefix << moduleName << ot.Suffix << kk << ", "
+                   << ot.Prefix << moduleName << ot.Suffix << kk << " + len" << kk
+                   << ", res + offset); offset += len" << kk << ";" << endl;
     }
     ot.Stream << "// Get single string" << endl
               << "char* " << ot.Prefix << moduleName << argv[argv_offset + 4] << "()" << endl
               << "{" << endl
+              << prelenstr.str() << endl
               << "  size_t len = ( 0" << lenstr.str() << " );" << endl
               << "  char* res = new char[ len + 1];" << endl
-              << "  res[0] = 0;" << endl
-              << createstring.str() << "  return res;" << endl
+              << "  size_t offset = 0;" << endl
+              << createstring.str() << "  assert(offset == len);" << endl
+              << "  res[offset] = 0;" << endl
+              << "  return res;" << endl
               << "}" << endl
               << endl;
   }

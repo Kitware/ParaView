@@ -50,7 +50,7 @@ public:
   /**
    * Return the MTime also considering the internal writer.
    */
-  virtual vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() VTK_OVERRIDE;
 
   //@{
   /**
@@ -136,7 +136,7 @@ public:
 
 protected:
   vtkParallelSerialWriter();
-  ~vtkParallelSerialWriter();
+  ~vtkParallelSerialWriter() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector) VTK_OVERRIDE;
@@ -146,8 +146,8 @@ protected:
     vtkInformationVector* outputVector) VTK_OVERRIDE;
 
 private:
-  vtkParallelSerialWriter(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkParallelSerialWriter&) VTK_DELETE_FUNCTION;
+  vtkParallelSerialWriter(const vtkParallelSerialWriter&) = delete;
+  void operator=(const vtkParallelSerialWriter&) = delete;
 
   void WriteATimestep(vtkDataObject* input);
   void WriteAFile(const char* fname, vtkDataObject* input);

@@ -56,7 +56,7 @@ public:
   * configuration files which contains lists the items shown by this menu.
   */
   pqProxyGroupMenuManager(QMenu* menu, const QString& resourceTagName);
-  ~pqProxyGroupMenuManager();
+  ~pqProxyGroupMenuManager() override;
 
   /**
   * Access the menu.
@@ -176,6 +176,7 @@ protected slots:
   void triggered();
   void quickLaunch();
   void switchActiveServer();
+  void updateMenuStyle();
 
 protected:
   QString ResourceTagName;

@@ -79,6 +79,11 @@ public:
   virtual int Decompress() = 0;
 
   /**
+   * Communicates the next expected image resolution.
+   */
+  virtual void SetImageResolution(int width, int height);
+
+  /**
    * Serialize compressor configuration (but not the data) into the stream.
    */
   virtual void SaveConfiguration(vtkMultiProcessStream* stream);
@@ -109,7 +114,7 @@ protected:
    * Construct with NULL input array and empty but allocated output array.
    */
   vtkImageCompressor();
-  virtual ~vtkImageCompressor();
+  ~vtkImageCompressor() override;
   //@}
 
   // This is the array which contains the compressed data.
@@ -122,8 +127,8 @@ protected:
   char* Configuration;
 
 private:
-  vtkImageCompressor(const vtkImageCompressor&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkImageCompressor&) VTK_DELETE_FUNCTION;
+  vtkImageCompressor(const vtkImageCompressor&) = delete;
+  void operator=(const vtkImageCompressor&) = delete;
 };
 
 #endif

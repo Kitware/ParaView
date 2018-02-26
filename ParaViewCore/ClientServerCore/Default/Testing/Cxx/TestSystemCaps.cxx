@@ -2,11 +2,7 @@
 #include "vtkMPI.h"
 #endif
 
-#ifdef VTKGL2
 #include "vtk_glew.h"
-#else
-#include "vtkgl.h"
-#endif
 
 #include "vtkNew.h"
 #include "vtkRenderWindow.h"

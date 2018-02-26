@@ -213,7 +213,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
 
   std::map<std::string, int> namesUsed;
 
-  // Setup proxies for for explict file change dialog
+  // Setup proxies for for explicit file change dialog
   for (auto idIter = this->Internals->PropertiesMap.begin();
        idIter != this->Internals->PropertiesMap.end(); idIter++)
   {

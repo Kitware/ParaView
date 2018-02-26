@@ -70,12 +70,12 @@ public:
   /**
    * Remove all links.
    */
-  virtual void RemoveAllLinks() VTK_OVERRIDE;
+  void RemoveAllLinks() VTK_OVERRIDE;
 
   /**
    * This method is used to initialize the object to the given protobuf state
    */
-  virtual void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Set/Get the convert to indices flag. When on, the input selection
@@ -87,7 +87,7 @@ public:
 
 protected:
   vtkSMSelectionLink();
-  ~vtkSMSelectionLink();
+  ~vtkSMSelectionLink() override;
 
   friend class vtkSMSelectionLinkInternals;
   friend class vtkSMSelectionLinkObserver;
@@ -95,29 +95,28 @@ protected:
   /**
    * Load the link state.
    */
-  virtual int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  int LoadXMLState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator) VTK_OVERRIDE;
 
   /**
    * Save the state of the link.
    */
-  virtual void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
+  void SaveXMLState(const char* linkname, vtkPVXMLElement* parent) VTK_OVERRIDE;
 
   /**
    * Not implemented
    */
-  virtual void UpdateVTKObjects(vtkSMProxy* vtkNotUsed(caller)) VTK_OVERRIDE{};
+  void UpdateVTKObjects(vtkSMProxy* vtkNotUsed(caller)) VTK_OVERRIDE{};
 
   /**
    * Not implemented
    */
-  virtual void PropertyModified(
+  void PropertyModified(
     vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE{};
 
   /**
    * Not implemented
    */
-  virtual void UpdateProperty(
-    vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE{};
+  void UpdateProperty(vtkSMProxy* vtkNotUsed(caller), const char* vtkNotUsed(pname)) VTK_OVERRIDE{};
 
   /**
    * This method find the caller in the link and update selection output accordingly
@@ -127,7 +126,7 @@ protected:
   /**
    * Update the internal protobuf state
    */
-  virtual void UpdateState() VTK_OVERRIDE;
+  void UpdateState() VTK_OVERRIDE;
 
 private:
   vtkSMSelectionLinkInternals* Internals;
@@ -136,7 +135,7 @@ private:
   bool ModifyingSelection;
   bool ConvertToIndices;
 
-  vtkSMSelectionLink(const vtkSMSelectionLink&) VTK_DELETE_FUNCTION;
-  void operator=(const vtkSMSelectionLink&) VTK_DELETE_FUNCTION;
+  vtkSMSelectionLink(const vtkSMSelectionLink&) = delete;
+  void operator=(const vtkSMSelectionLink&) = delete;
 };
 #endif

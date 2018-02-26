@@ -31,79 +31,108 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #ifndef pqCustomViewDialog_h
 #define pqCustomViewDialog_h
-// .NAME pqCustomViewDialog - Dialog for configuring custom view buttons.
-//
-// .SECTION Description
-// Provides the machinery for associating the current camera configuration
-// to a custom view button, and importing or exporting all of the custom view
-// button configurations.
-//
-// .SECTION See Also
-// pqCameraDialog
-//
-// .SECTION Thanks
-// This class was contributed by SciberQuest Inc.
 
 #include <QDialog>
 #include <QLineEdit>
 #include <QList>
+#include <QPointer>
+#include <QPushButton>
 #include <QString>
 #include <QStringList>
 
 class pqCustomViewButtonDialogUI;
 class vtkSMCameraConfigurationReader;
 
+/*
+ * @class pqCustomViewDialog
+ * @brief Dialog for configuring custom view buttons.
+ *
+ * Provides the machinery for associating the current camera configuration
+ * to a custom view button, and importing or exporting all of the custom view
+ * button configurations.
+ *
+ * @section thanks Thanks
+ * This class was contributed by SciberQuest Inc.
+ *
+ * @sa pqCameraDialog
+ */
 class pqCustomViewButtonDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  // Description:
-  // Create and initialize the dialog.
+  /**
+   * Create and initialize the dialog.
+   */
   pqCustomViewButtonDialog(QWidget* parent, Qt::WindowFlags f, QStringList& toolTips,
     QStringList& configurations, QString& currentConfig);
 
-  ~pqCustomViewButtonDialog();
+  ~pqCustomViewButtonDialog() override;
 
-  // Description:
-  // Constant variable that contains the default name for the tool tips.
+  /**
+   * Constant variable that contains the default name for the tool tips.
+   */
   const static QString DEFAULT_TOOLTIP;
 
-  // Description:
-  // Set/get a list of tool tips, one for each button.
-  void setToolTips(QStringList& toolTips);
+  /**
+   * Constant variable that defines the minimum number of items.
+   */
+  const static int MINIMUM_NUMBER_OF_ITEMS;
+
+  /**
+   * Constant variable that defines the maximum number of items.
+   */
+  const static int MAXIMUM_NUMBER_OF_ITEMS;
+
+  /**
+   * Set the list of tool tips and configurations. This is the preferred way of
+   * settings these as it supports changing the number of items.
+   */
+  void setToolTipsAndConfigurations(const QStringList& toolTips, const QStringList& configs);
+
+  //@{
+  /**
+   * Set/get a list of tool tips, one for each button. The number of items in
+   * the `toolTips` list must match the current number of tooltips being shown.
+   * Use `setToolTipsAndConfigurations` to change the number of items.
+   */
+  void setToolTips(const QStringList& toolTips);
   QStringList getToolTips();
+  //@}
 
-  // Description:
-  // Set/get a list of camera configurations, one for each buttton.
-  void setConfigurations(QStringList& configs);
+  //@{
+  /**
+   * Set/get a list of camera configurations, one for each button. The number of
+   * items in `configs` must match the current number of configs.
+   * Use `setToolTipsAndConfigurations` to change the number of items.
+   */
+  void setConfigurations(const QStringList& configs);
   QStringList getConfigurations();
+  //@}
 
-  // Descrition:
-  // Set/get the current camera configuration.
-  void setCurrentConfiguration(QString& config);
+  //@{
+  /**
+   * Set/get the current camera configuration.
+   */
+  void setCurrentConfiguration(const QString& config);
   QString getCurrentConfiguration();
+  //@}
 
 private slots:
+  void appendRow();
   void importConfigurations();
   void exportConfigurations();
   void clearAll();
 
-  void assignCurrentView(int id);
-  void assignCurrentView0() { this->assignCurrentView(0); }
-  void assignCurrentView1() { this->assignCurrentView(1); }
-  void assignCurrentView2() { this->assignCurrentView(2); }
-  void assignCurrentView3() { this->assignCurrentView(3); }
+  void assignCurrentView();
+  void deleteRow();
 
 private:
   pqCustomViewButtonDialog() {}
-
-  int NButtons;
-
-  QList<QLineEdit*> ToolTips;
   QStringList Configurations;
   QString CurrentConfiguration;
-
   pqCustomViewButtonDialogUI* ui;
+
+  friend class pqCustomViewButtonDialogUI;
 };
 #endif

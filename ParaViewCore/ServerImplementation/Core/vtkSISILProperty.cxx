@@ -99,7 +99,7 @@ bool vtkSISILProperty::Pull(vtkSMMessage* msgToFill)
     return false;
   }
 
-  // Check if we should use the executive or a method to retreive the SIL
+  // Check if we should use the executive or a method to retrieve the SIL
   vtkSmartPointer<vtkGraph> graphSIL;
   if (this->GetCommand())
   {

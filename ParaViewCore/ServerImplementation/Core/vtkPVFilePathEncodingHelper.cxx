@@ -72,6 +72,13 @@ bool vtkPVFilePathEncodingHelper::GetActiveFileIsReadable()
 }
 
 //-----------------------------------------------------------------------------
+bool vtkPVFilePathEncodingHelper::IsDirectory()
+{
+  // note: called on vtkDirectory instance.
+  return this->CallObjectMethod("FileIsDirectory", false);
+}
+
+//-----------------------------------------------------------------------------
 bool vtkPVFilePathEncodingHelper::CallObjectMethod(const char* method, bool ignoreErrors)
 {
   vtkPVSessionBase* session =
