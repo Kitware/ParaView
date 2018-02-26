@@ -210,9 +210,9 @@ set (PV_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 # build machine without any issues. If this not desired, simply specify
 # CMAKE_INSTALL_RPATH_USE_LINK_PATH when configuring Paraview and
 # "make install" will strip all rpaths, which is default behavior.
-if(NOT CMAKE_INSTALL_RPATH_USE_LINK_PATH )
-  set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
+if (NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif ()
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
