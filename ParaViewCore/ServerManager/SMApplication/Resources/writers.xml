@@ -1522,5 +1522,34 @@
       </Hints>
       <!-- End of CSVWriter -->
     </PSWriterProxy>
+    <!-- ================================================================= -->
+    <WriterProxy class="vtkXMLHyperTreeGridWriter"
+                 name="HyperTreeGridWriter">
+      <Documentation short_help="Write HyperTree data as a HyperTreeGrid file.">Writer to write hypertree data as a HyperTreeGrid file.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to be
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="htg"
+                       file_description="HyperTreeGrid Files" />
+      </Hints>
+      <!-- End of HyperTreeGridWriter -->
+    </WriterProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
