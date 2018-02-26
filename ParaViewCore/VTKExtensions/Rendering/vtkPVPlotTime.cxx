@@ -19,6 +19,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
 
+#include <cmath> // for log10
+
 vtkStandardNewMacro(vtkPVPlotTime);
 //----------------------------------------------------------------------------
 vtkPVPlotTime::vtkPVPlotTime()
@@ -43,22 +45,27 @@ bool vtkPVPlotTime::Paint(vtkContext2D* painter)
   }
 
   painter->ApplyPen(this->GetPen());
-  if (this->TimeAxisMode == X_AXIS)
+  auto xaxis = this->GetXAxis();
+  auto yaxis = this->GetYAxis();
+  if (xaxis && yaxis)
   {
-    if (vtkAxis* axis = this->GetYAxis())
+    if (this->TimeAxisMode == X_AXIS)
     {
       double range[2];
-      axis->GetRange(range);
-      painter->DrawLine(this->Time, range[0], this->Time, range[1]);
+      yaxis->GetRange(range);
+
+      const bool use_log = xaxis && xaxis->GetLogScaleActive();
+      const double x = use_log ? log10(fabs(this->Time)) : this->Time;
+      painter->DrawLine(x, range[0], x, range[1]);
     }
-  }
-  else
-  {
-    if (vtkAxis* axis = this->GetXAxis())
+    else
     {
       double range[2];
-      axis->GetRange(range);
-      painter->DrawLine(range[0], this->Time, range[1], this->Time);
+      xaxis->GetRange(range);
+
+      const bool use_log = yaxis && yaxis->GetLogScaleActive();
+      const double y = use_log ? log10(fabs(this->Time)) : this->Time;
+      painter->DrawLine(range[0], y, range[1], y);
     }
   }
   return true;
