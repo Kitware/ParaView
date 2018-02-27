@@ -52,6 +52,10 @@
     <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
   </Category>
 
+  <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
+    <Proxy group="filters" name="HyperTreeGridAxisClip" />
+  </Category>
+
   <Category name="Statistics" menu_label="&amp;Statistics">
     <Proxy group="filters" name="ContingencyStatistics"/>
     <Proxy group="filters" name="DescriptiveStatistics"/>

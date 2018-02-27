@@ -16448,6 +16448,88 @@ source.</Documentation>
       <!-- End vtkInSituPParticlePathFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy name="ExtractEnclosedPoints"
+      class="vtkExtractEnclosedPoints"
+      label="Extract Enclosed Points">
+      <Documentation long_help="Extract points inside a closed polygonal surface"
+                     short_help="Extract points inside a closed points surface">
+        Evaluates all points in the input dataset to determine whether they are contained within
+        an enclosing surface, defined by the **Surface**. The filter assumes that the surface
+        is closed and manifold. To force a check to ensure these preconditions are met
+        set the **CheckSurface** property.
+      </Documentation>
+
+      <OutputPort index="0" name="EnclosedPoints" />
+      <OutputPort index="1" name="Outliers" />
+
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+         <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to extract points from.</Documentation>
+      </InputProperty>
+
+      <InputProperty command="SetSurfaceConnection" name="Surface">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the closed and manifold surface.</Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty name="Tolerance"
+        command="SetTolerance"
+        number_of_elements="1"
+        default_values="0.0001">
+        <DoubleRangeDomain name="range" min="0.0" />
+        <Documentation>
+          Specify the tolerance on the intersection. The tolerance is expressed as
+          a fraction of the diagonal of the bounding box of the enclosing surface.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="CheckSurface"
+        number_of_elements="1"
+        default_values="0"
+        command="SetCheckSurface">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to check the surface for closure. If on, then the
+          algorithm first checks to see if the surface is closed and manifold.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateOutliers"
+        command="SetGenerateOutliers"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          If checked, then a second output will be created
+          that contains the outlier points.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateVertices"
+        command="SetGenerateVertices"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          If checked, then the outputs will contain a poly-vertex cell. This takes a
+          lot more memory, however certain filters many requires cells to be present
+          to function properly.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridToUnstructuredGrid"
                  label="HyperTreeGrid To UnstructuredGrid"
                  name="HyperTreeGridToUnstructuredGrid">
@@ -16594,89 +16676,121 @@ source.</Documentation>
       </DoubleVectorProperty>
       <!-- End vtkHyperTreeGridThreshold -->
     </SourceProxy>
-
     <!-- ==================================================================== -->
-    <SourceProxy name="ExtractEnclosedPoints"
-      class="vtkExtractEnclosedPoints"
-      label="Extract Enclosed Points">
-      <Documentation long_help="Extract points inside a closed polygonal surface"
-                     short_help="Extract points inside a closed points surface">
-        Evaluates all points in the input dataset to determine whether they are contained within
-        an enclosing surface, defined by the **Surface**. The filter assumes that the surface
-        is closed and manifold. To force a check to ensure these preconditions are met
-        set the **CheckSurface** property.
+    <SourceProxy class="vtkHyperTreeGridAxisClip"
+                 name="HyperTreeGridAxisClip"
+                 label="Hyper Tree Grid - Axis Clip">
+      <Documentation short_help="Clip a HTG along an axis-aligned plane or box.">
+        Clip an hyper tree grid along an axis aligned plane or box and output
+        a hyper tree grid with same dimensionality.
       </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
 
-      <OutputPort index="0" name="EnclosedPoints" />
-      <OutputPort index="1" name="Outliers" />
-
-      <InputProperty command="SetInputConnection" name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData" />
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input to extract points from.</Documentation>
       </InputProperty>
-
-      <InputProperty command="SetSurfaceConnection" name="Surface">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
-          <DataType value="vtkPolyData" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the closed and manifold surface.</Documentation>
-      </InputProperty>
-
-      <DoubleVectorProperty name="Tolerance"
-        command="SetTolerance"
-        number_of_elements="1"
-        default_values="0.0001">
-        <DoubleRangeDomain name="range" min="0.0" />
-        <Documentation>
-          Specify the tolerance on the intersection. The tolerance is expressed as
-          a fraction of the diagonal of the bounding box of the enclosing surface.
-        </Documentation>
+      <IntVectorProperty command="SetClipType"
+                         default_values="0"
+                         name="ClipType"
+                         number_of_elements="1">
+          <EnumerationDomain name="enum">
+            <Entry text="Plane"   value="0" />
+            <Entry text="Box"     value="1" />
+            <Entry text="Quadric" value="2" />
+          </EnumerationDomain>
+        <Documentation>Type of clip operation to use.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="PlaneNormal"
+                         command="SetPlaneNormalAxis"
+                         number_of_elements="1"
+                         default_values="0">
+          <EnumerationDomain name="enum">
+            <Entry text="X Axis" value="0" />
+            <Entry text="Y Axis" value="1" />
+            <Entry text="Z Axis" value="2" />
+          </EnumerationDomain>
+        <Documentation>Axis to use as the normal to the clip plane.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="0" />
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="PlanePosition"
+                            command="SetPlanePosition"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <Documentation>Position of the clip plane along the normal axis.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="0" />
+        </Hints>
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="CheckSurface"
-        number_of_elements="1"
-        default_values="0"
-        command="SetCheckSurface">
-        <BooleanDomain name="bool" />
+      <IntVectorProperty name="ClipBelowPlane"
+                         command="SetInsideOut"
+                         default_values="0"
+                         number_of_elements="1">
         <Documentation>
-          Specify whether to check the surface for closure. If on, then the
-          algorithm first checks to see if the surface is closed and manifold.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="GenerateOutliers"
-        command="SetGenerateOutliers"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          If checked, then a second output will be created
-          that contains the outlier points.
+          By default, the portion of the dataset above the clip plane is kept.
+          Enabling this option will keep the portion below the plane.
         </Documentation>
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="0" />
+        </Hints>
       </IntVectorProperty>
-
-      <IntVectorProperty name="GenerateVertices"
-        command="SetGenerateVertices"
-        number_of_elements="1"
-        default_values="0">
+      <DoubleVectorProperty name="MinimumBoxCorner"
+                            command="SetMinimumBounds"
+                            number_of_elements="3"
+                            default_values="-0.5 -0.5 -0.5">
+        <Documentation>Defines the most negative point of the clip box.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumBoxCorner"
+                            command="SetMaximumBounds"
+                            number_of_elements="3"
+                            default_values="0.5 0.5 0.5">
+        <Documentation>Defines the most positive point of the clip box.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="QuadricCoefficients"
+                            command="SetQuadricCoefficients"
+                            number_of_elements="10"
+                            default_values="1. 1. 1. 0. 0. 0. 0. 0. 0. -1.">
         <Documentation>
-          If checked, then the outputs will contain a poly-vertex cell. This takes a
-          lot more memory, however certain filters many requires cells to be present
-          to function properly.
+          Coefficients of the quadric function, defined as the 'a' values in:
+          F(x,y,z) = a0*x^2 + a1*y^2 + a2*z^2 + a3*x*y + a4*y*z + a5*x*z + a6*x + a7*y + a8*z + a9
         </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="2" />
+        </Hints>
+      </DoubleVectorProperty>
+    <!-- End vtkHyperTreeGridAxisClip -->
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
