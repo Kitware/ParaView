@@ -472,7 +472,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             return
 
         nextAnimateTime = time.time() + 1.0 /  self.targetFrameRate
-        for vId in self.viewsInAnimations:
+        for vId in set(self.viewsInAnimations):
             self.pushRender(vId, True)
 
         nextAnimateTime -= time.time()
@@ -505,10 +505,9 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         sView = self.getView(viewId)
         realViewId = sView.GetGlobalIDAsString()
 
-        if realViewId not in self.viewsInAnimations:
-            self.viewsInAnimations.append(realViewId)
-            if len(self.viewsInAnimations) == 1:
-                self.animate()
+        self.viewsInAnimations.append(realViewId)
+        if len(self.viewsInAnimations) == 1:
+            self.animate()
 
 
     @exportRpc("viewport.image.animation.stop")
@@ -1003,10 +1002,12 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
         if not self.playing:
             self.playTime = deltaT
             self.playing = True
+            self.getApplication().InvokeEvent('StartInteractionEvent')
             self.nextPlay()
 
     @exportRpc("pv.time.stop")
     def stop(self):
+        self.getApplication().InvokeEvent('EndInteractionEvent')
         self.playing = False
 
 # =============================================================================
