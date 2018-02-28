@@ -18,7 +18,7 @@ underline="$(echo "$title" | sed 's/./=/g')"
 echo "$title
 $underline
 
-Changes made since ParaView $2 include the following:
+Major changes made since ParaView $2 include the following:
 " > $output_file
 ls $files | xargs -I% bash -c "cat %; echo" >> $output_file
 # Replace section markers with sub-section markers
