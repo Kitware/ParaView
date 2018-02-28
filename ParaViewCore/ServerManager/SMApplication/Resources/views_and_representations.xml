@@ -5689,9 +5689,9 @@
                          name="UseGlyphTable"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When true, the glyph data is expected to be a multiblock
-        dataset, where each top-level node contains a separate glyph which may
-        be selected by a point data array on the input dataset.</Documentation>
+        <Documentation>When enabled, the source index array would be used to select the
+        glyph source. If not, only the first source input will be used to generate
+        the glyph. It's a prerequisite to enable UseCompositeGlyphTable.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetSourceIndexArray"
                             default_values=""
@@ -5712,9 +5712,22 @@
                          name="UseCompositeGlyphTable"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <RequiredProperties>
+          <Property function="input"
+                    name="UseGlyphTable"/>
+          </Property>
+        </RequiredProperties>
         <Documentation>When true, the glyph data is expected to be a multiblock
         dataset, where each top-level node contains a separate glyph which may
-        be selected by a point data array on the input dataset.</Documentation>
+        be selected by a point data array on the input dataset. UseGlyphTable
+        must be enabled as a prerequisite.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseGlyphTable"
+                                   value="1" />
+          <!-- enable this widget when UseGlyphTable==1 -->
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseCullingAndLOD"
                          default_values="0"
