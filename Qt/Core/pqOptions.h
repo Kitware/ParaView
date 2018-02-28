@@ -54,6 +54,14 @@ public:
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(DataDirectory);
 
+  //@{
+  /**
+   * State file to load on startup.
+   */
+  // See Bug #5711
+  vtkGetStringMacro(StateFileName);
+  //@}
+
   vtkGetMacro(ExitAppWhenTestsDone, int);
 
   // Returns the test scripts as a list.
@@ -110,6 +118,7 @@ protected:
   char* TestDirectory;
   char* DataDirectory;
   char* ServerResourceName;
+  char* StateFileName; // loading state file(Bug #5711)
   char* TileImagePath;
 
   int ExitAppWhenTestsDone;
@@ -121,6 +130,7 @@ protected:
 
   vtkSetStringMacro(PythonScript);
   vtkSetStringMacro(ServerResourceName);
+  vtkSetStringMacro(StateFileName);
 
   struct TestInfo
   {
