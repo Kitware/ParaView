@@ -131,6 +131,7 @@ public:
     bool GatherBeforeDeliveringToClient;
     bool Redistributable;
     bool Streamable;
+    int RedistributionMode;
 
     vtkItem()
       : Producer(vtkSmartPointer<vtkPVTrivialProducer>::New())
@@ -141,6 +142,7 @@ public:
       , GatherBeforeDeliveringToClient(false)
       , Redistributable(false)
       , Streamable(false)
+      , RedistributionMode(vtkOrderedCompositeDistributor::SPLIT_BOUNDARY_CELLS)
     {
     }
 
@@ -386,6 +388,38 @@ void vtkPVDataDeliveryManager::MarkAsRedistributable(
   {
     vtkErrorMacro("Invalid argument.");
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::SetRedistributionMode(
+  vtkPVDataRepresentation* repr, int mode, int port)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false, port, true);
+  vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true, port, true);
+  if (item)
+  {
+    item->RedistributionMode = mode;
+    low_item->RedistributionMode = mode;
+  }
+  else
+  {
+    vtkErrorMacro("Invalid argument.");
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::SetRedistributionModeToSplitBoundaryCells(
+  vtkPVDataRepresentation* repr, int port)
+{
+  this->SetRedistributionMode(repr, vtkOrderedCompositeDistributor::SPLIT_BOUNDARY_CELLS, port);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::SetRedistributionModeToDuplicateBoundaryCells(
+  vtkPVDataRepresentation* repr, int port)
+{
+  this->SetRedistributionMode(
+    repr, vtkOrderedCompositeDistributor::ASSIGN_TO_ALL_INTERSECTING_REGIONS, port);
 }
 
 //----------------------------------------------------------------------------
@@ -680,6 +714,7 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
     redistributor->SetInputData(item.GetDeliveredDataObject());
     redistributor->SetPKdTree(this->KdTree);
     redistributor->SetPassThrough(0);
+    redistributor->SetBoundaryMode(item.RedistributionMode);
     redistributor->Update();
     item.SetRedistributedDataObject(redistributor->GetOutputDataObject(0));
   }
