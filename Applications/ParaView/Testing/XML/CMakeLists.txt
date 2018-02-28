@@ -81,6 +81,7 @@ paraview_test_load_data(""
   tube.exo
   vehicle_data.csv
   viscoplastic-ring.h5
+  waveletElevation.vti
   waveletMaterial.vti
   )
 
@@ -450,6 +451,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo8.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UnstructuredOutline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VolumeRenderingWithContour.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/VolumeReprTwoIndepComp.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ViewSettingsDialog.xml
@@ -723,6 +725,7 @@ set (LoadSaveStateVolume_FORCE_SERIAL TRUE)
 # We don't support volume rendering of image data in data server & render server mode
 set(LoadSaveStateVolume_DISABLE_CRS TRUE)
 set(SeparatedColorMapOpacity_DISABLE_CRS TRUE)
+set(VolumeReprTwoIndepComp_DISABLE_CRS TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRContour_DISABLE_CS TRUE)

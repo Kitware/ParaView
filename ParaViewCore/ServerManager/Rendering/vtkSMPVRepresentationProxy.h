@@ -327,6 +327,12 @@ public:
    */
   bool SetRepresentationType(const char* type) VTK_OVERRIDE;
 
+  /**
+   * True if ranges have to be computed independently on component 0 for the color
+   * and 1 for the opacity on the Volume representation.
+   */
+  bool GetVolumeIndependentRanges();
+
 protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy() override;

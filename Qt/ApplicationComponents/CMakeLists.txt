@@ -206,6 +206,8 @@ set (Module_SRCS
   pqMasterOnlyReaction.h
   pqModelTransformSupportBehavior.cxx
   pqModelTransformSupportBehavior.h
+  pqMultiComponentsDecorator.cxx
+  pqMultiComponentsDecorator.h
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqOpacityTableModel.cxx
@@ -423,6 +425,7 @@ set (Module_MOC_HDRS
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
   pqModelTransformSupportBehavior.h
+  pqMultiComponentsDecorator.h
   pqObjectPickingBehavior.h
   pqOpacityTableModel.h
   pqOSPRayHidingDecorator.h

@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIntMaskPropertyWidget.h"
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
+#include "pqMultiComponentsDecorator.h"
 #include "pqOSPRayHidingDecorator.h"
 #include "pqPropertyGroupButton.h"
 #include "pqProxyEditorPropertyWidget.h"
@@ -317,6 +318,10 @@ pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecora
   if (type == "OSPRayHidingDecorator")
   {
     return new pqOSPRayHidingDecorator(config, widget);
+  }
+  if (type == "MultiComponentsDecorator")
+  {
+    return new pqMultiComponentsDecorator(config, widget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

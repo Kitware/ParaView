@@ -466,6 +466,12 @@ void vtkImageVolumeRepresentation::SetIndependentComponents(bool val)
 }
 
 //----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetMultiComponentsMapping(bool val)
+{
+  this->Property->SetIndependentComponents(!val);
+}
+
+//----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
 {
   this->VolumeMapper->SetRequestedRenderMode(mode);

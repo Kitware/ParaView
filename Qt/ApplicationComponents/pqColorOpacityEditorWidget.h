@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QVariant>
 
+class vtkPiecewiseFunction;
 class vtkSMPropertyGroup;
 class pqColorMapModel;
 
@@ -235,6 +236,11 @@ protected slots:
   void updateIndexedLookupState();
 
   /**
+   * called when "MultiComponentsMappingChanged" checkbox is modified.
+  */
+  void multiComponentsMappingChanged(vtkObject*, unsigned long, void*, void*);
+
+  /**
   * called when the use-log-scale checkbox is clicked by the user. We then add
   * extra logic to valid ranges convert the color map to log/linear space.
   */
@@ -248,16 +254,22 @@ protected slots:
 
   /**
   * called when the active representation or view changes.  We then change the
-  * enabled/disabled state of the buttons.  Some actions require a valid
+  * enabled/disabled state of the buttons. Some actions require a valid
   * representation or view, so disable them if there isn't one.
+  * We also update the opacity editor.
   */
-  void updateButtonEnableState();
+  void representationOrViewChanged();
 
 protected:
   /**
    * Validate and adjust the current range before converting to a log range.
    */
   void prepareRangeForLogScaling();
+
+  /**
+   * Initialize the opacity editor.
+   */
+  void initializeOpacityEditor(vtkPiecewiseFunction* pwf);
 
 private:
   Q_DISABLE_COPY(pqColorOpacityEditorWidget)
