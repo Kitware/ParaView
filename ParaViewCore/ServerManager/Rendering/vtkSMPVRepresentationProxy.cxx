@@ -351,31 +351,42 @@ bool vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(
     }
     else
     {
-      double range[2];
-      info->GetComponentFiniteRange(component, range);
-      if (range[1] >= range[0])
-      {
-        // the range must be large enough, compared to values order of magnitude
-        // If data range is too small then we tweak it a bit so scalar mapping
-        // produces valid/reproducible results.
-        vtkSMCoreUtilities::AdjustRange(range);
-        if (lut)
-        {
-          vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, range, extend);
-          vtkSMProxy* sof_lut =
-            vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
-          if (sof_lut && sof != sof_lut)
-          {
-            vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, range, extend);
-          }
-        }
-        if (sof)
-        {
-          vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, range, extend);
-        }
+      double rangeColor[2];
+      double rangeOpacity[2];
 
-        return (lut || sof);
+      if (this->GetVolumeIndependentRanges())
+      {
+        info->GetComponentFiniteRange(0, rangeColor);
+        info->GetComponentFiniteRange(1, rangeOpacity);
       }
+      else
+      {
+        info->GetComponentFiniteRange(component, rangeColor);
+        rangeOpacity[0] = rangeColor[0];
+        rangeOpacity[1] = rangeColor[1];
+      }
+
+      // the range must be large enough, compared to values order of magnitude
+      // If data range is too small then we tweak it a bit so scalar mapping
+      // produces valid/reproducible results.
+      vtkSMCoreUtilities::AdjustRange(rangeColor);
+      vtkSMCoreUtilities::AdjustRange(rangeOpacity);
+
+      if (lut && rangeColor[1] >= rangeColor[0])
+      {
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(lut, rangeColor, extend);
+        vtkSMProxy* sof_lut = vtkSMPropertyHelper(lut, "ScalarOpacityFunction", true).GetAsProxy();
+        if (sof_lut && sof != sof_lut && rangeOpacity[1] >= rangeOpacity[0])
+        {
+          vtkSMTransferFunctionProxy::RescaleTransferFunction(sof_lut, rangeOpacity, extend);
+        }
+      }
+
+      if (sof && rangeOpacity[1] >= rangeOpacity[0])
+      {
+        vtkSMTransferFunctionProxy::RescaleTransferFunction(sof, rangeOpacity, extend);
+      }
+      return (lut || sof);
     }
   }
   return false;
@@ -899,4 +910,21 @@ int vtkSMPVRepresentationProxy::GetEstimatedNumberOfAnnotationsOnScalarBar(vtkSM
 
   sbProxy->UpdatePropertyInformation();
   return vtkSMPropertyHelper(sbProxy, "EstimatedNumberOfAnnotations").GetAsInt();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::GetVolumeIndependentRanges()
+{
+  // the representation is Volume
+  vtkSMProperty* repProperty = this->GetProperty("Representation");
+  if (strcmp(vtkSMPropertyHelper(repProperty).GetAsString(), "Volume") != 0)
+  {
+    return false;
+  }
+
+  // MapScalars and MultiComponentsMapping are checked
+  vtkSMProperty* msProperty = this->GetProperty("MapScalars");
+  vtkSMProperty* mcmProperty = this->GetProperty("MultiComponentsMapping");
+  return (vtkSMPropertyHelper(msProperty).GetAsInt() != 0 &&
+    vtkSMPropertyHelper(mcmProperty).GetAsInt() != 0);
 }

@@ -95,6 +95,7 @@ public:
   void SetSpecularPower(double);
   void SetShade(bool);
   void SetIndependentComponents(bool);
+  void SetMultiComponentsMapping(bool);
 
   //@{
   /**

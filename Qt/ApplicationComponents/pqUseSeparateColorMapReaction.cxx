@@ -107,6 +107,19 @@ void pqUseSeparateColorMapReaction::setRepresentation(pqDataRepresentation* repr
 //-----------------------------------------------------------------------------
 void pqUseSeparateColorMapReaction::onTriggered()
 {
+  // Disable Multi Components Mapping
+  pqDataRepresentation* repr = this->CachedRepresentation.data();
+  vtkSMPVRepresentationProxy* proxy = static_cast<vtkSMPVRepresentationProxy*>(repr->getProxy());
+  vtkSMProperty* mcmProperty = proxy->GetProperty("MultiComponentsMapping");
+  if (vtkSMPropertyHelper(mcmProperty).GetAsInt() == 1)
+  {
+    vtkSMProperty* sepProperty = proxy->GetProperty("UseSeparateColorMap");
+    if (vtkSMPropertyHelper(sepProperty).GetAsInt() == 0)
+    {
+      vtkSMPropertyHelper(mcmProperty).Set(0);
+    }
+  }
+
   // Force color widget to update representation and color map
   emit this->ColorWidget->arraySelectionChanged();
 }

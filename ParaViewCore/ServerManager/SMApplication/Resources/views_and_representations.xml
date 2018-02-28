@@ -3693,6 +3693,8 @@
           <PropertyGroup label="Scalar Coloring">
             <Property name="MapScalars"
                       panel_visibility="advanced" />
+            <Property name="MultiComponentsMapping"
+                      panel_visibility="advanced" />
             <Property name="InterpolateScalarsBeforeMapping"
                       panel_visibility="advanced" />
           </PropertyGroup>
@@ -4490,13 +4492,15 @@
         <BooleanDomain name="bool" />
         <Documentation>Enable/Disable shading.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetIndependentComponents"
-                         default_values="1"
-                         name="MapScalars"
+      <IntVectorProperty command="SetMultiComponentsMapping"
+                         default_values="0"
+                         name="MultiComponentsMapping"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Enable/Disable independent component usage such a
-        unsigned char RGBA data array.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="MultiComponentsDecorator"
+                                   components="2 4" />
+        </Hints>
       </IntVectorProperty>
       <ProxyProperty command="SetScalarOpacity"
                      name="ScalarOpacityFunction" >
@@ -4664,6 +4668,7 @@
         floating point type) and then directly used as
         color.</Documentation>
       </IntVectorProperty>
+
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable"
                      skip_dependency="1">
@@ -5308,13 +5313,14 @@
                          name="MapScalars"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When set to true, LookupTable will always be
+        <Documentation>When set to True, LookupTable will always be
         used for scalar mapping. Otherwise, when up to 4 component
         scalars are present, the components are clamped to a valid
         color interval (0-255 for an integral type and 0.0-1.0 for a
         floating point type) and then directly used as
         color.</Documentation>
       </IntVectorProperty>
+
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable" >
         <Documentation>Set the lookup table to use for scalar
@@ -11117,12 +11123,35 @@
                          name="MapScalars"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When set to True, LookupTable will always be
+        <Documentation>When enabled, LookupTable will always be
         used for scalar mapping. Otherwise, when up to 4 component
         scalars are present, the components are clamped to a valid
         color interval (0-255 for an integral type and 0.0-1.0 for a
         floating point type) and then directly used as
         color.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty default_values="0"
+                         name="MultiComponentsMapping"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable multi components mapping. For a two-components array,
+        the first component is mapped to the color, the second component is mapped to the
+        opacity. For a four-components array, the first, second and third components are used as
+        RGB values and the fourth component is mapped to the opacity. Only available
+        when MapScalars is ON. This feature forces "Separate Color Map" and scales the color and
+        the opacity range with the correct component.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="Representation"
+                                   value="Volume" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MapScalars"
+                                   value="1" />
+          <PropertyWidgetDecorator type="MultiComponentsDecorator"
+                                   components="2 4" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetInterpolateScalarsBeforeMapping"
                          default_values="1"
