@@ -181,6 +181,10 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
 class ParaViewWebMouseHandler(ParaViewWebProtocol):
 
+    def __init__(self):
+        super(ParaViewWebMouseHandler, self).__init__()
+        self.lastAction = 'up'
+
     # RpcName: mouseInteraction => viewport.mouse.interaction
     @exportRpc("viewport.mouse.interaction")
     def mouseInteraction(self, event):
@@ -223,14 +227,16 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
         retVal = self.getApplication().HandleInteractionEvent(view.SMProxy, pvevent)
         del pvevent
 
-        if event["action"] == 'down':
+        if event["action"] == 'down' and self.lastAction != event["action"]:
             self.getApplication().InvokeEvent('StartInteractionEvent')
 
-        if event["action"] == 'up':
+        if event["action"] == 'up' and self.lastAction != event["action"]:
             self.getApplication().InvokeEvent('EndInteractionEvent')
 
         if retVal:
             self.getApplication().InvokeEvent('UpdateEvent')
+
+        self.lastAction = event["action"]
 
         return retVal
 
@@ -481,6 +487,8 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             self.targetFrameRate = self.maxFrameRate
 
         if nextAnimateTime < 0:
+            if nextAnimateTime < -1.0:
+                self.targetFrameRate = 1
             if self.targetFrameRate > self.minFrameRate:
                 self.targetFrameRate -= 1.0
             reactor.callLater(0.001, lambda: self.animate())
