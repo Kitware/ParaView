@@ -1,4 +1,4 @@
-![ParaView](Documentation/img/paraview100.png)
+![ParaView](Documentation/img/paraview.png)
 
 Introduction
 ============
