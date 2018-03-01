@@ -95,6 +95,7 @@ pqProxy::pqProxy(const QString& group, const QString& name, vtkSMProxy* proxy, p
   this->Internal = new pqProxyInternal;
   this->Internal->Proxy = proxy;
   this->Modified = pqProxy::UNMODIFIED;
+  this->UserModifiedSMName = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -254,6 +255,7 @@ void pqProxy::rename(const QString& newname)
     pxm->UnRegisterProxy(this->getSMGroup().toLocal8Bit().data(),
       this->getSMName().toLocal8Bit().data(), this->getProxy());
     this->SMName = newname;
+    this->UserModifiedSMName = true;
   }
 }
 

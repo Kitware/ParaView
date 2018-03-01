@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkDataObject.h"
 #include "vtkNew.h"
+#include "vtkPVCatalystChannelInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGeneralSettings.h"
 #include "vtkSMAnimationSceneProxy.h"
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
@@ -141,6 +143,25 @@ void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
     undoElement->Delete();
   }
   pqsource->setModifiedState(pqProxy::UNMODIFIED);
+
+  // if we have a dataset that has a Catalyst channel name we now rename
+  // the proxy to be the channel name if the user didn't modify the name already
+  if (pqsource->userModifiedSMName() == false)
+  {
+    vtkSMSourceProxy* proxy = pqsource->getSourceProxy();
+
+    vtkNew<vtkPVCatalystChannelInformation> information;
+    information->Initialize();
+
+    // Ask the server to fill out the rest of the information:
+    proxy->GatherInformation(information);
+
+    std::string name = information->GetChannelName();
+    if (!name.empty())
+    {
+      pqsource->rename(name.c_str());
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
