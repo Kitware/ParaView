@@ -49,6 +49,7 @@
     <Proxy group="filters" name="ExtractBagPlots"
             icon=":/pqWidgets/Icons/pqFunctionalBagChart16.png" omit_from_toolbar="1"/>
     <Proxy group="filters" name="ExtractLocation" omit_from_toolbar="1" />
+    <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
   </Category>
 
   <Category name="Statistics" menu_label="&amp;Statistics">
