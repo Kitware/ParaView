@@ -15,6 +15,7 @@
 #include "vtkPVRepresentationAnimationHelper.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRepresentationProxy.h"
 
@@ -53,10 +54,14 @@ void vtkPVRepresentationAnimationHelper::SetVisibility(int visible)
   {
     vtkSMRepresentationProxy* repr =
       vtkSMRepresentationProxy::SafeDownCast(this->SourceProxy->GetConsumerProxy(cc));
-    if (repr && (repr->GetIsSubProxy() == false) && repr->GetProperty("Visibility"))
+    if (repr && (repr->GetIsSubProxy() == false))
     {
-      vtkSMPropertyHelper(repr, "Visibility").Set(visible);
-      repr->UpdateProperty("Visibility");
+      auto visibilityProp = repr->GetProperty("Visibility");
+      if (visibilityProp && visibilityProp->GetAnimateable())
+      {
+        vtkSMPropertyHelper(visibilityProp).Set(visible);
+        repr->UpdateProperty("Visibility");
+      }
     }
   }
 }
@@ -73,10 +78,14 @@ void vtkPVRepresentationAnimationHelper::SetOpacity(double opacity)
   {
     vtkSMRepresentationProxy* repr =
       vtkSMRepresentationProxy::SafeDownCast(this->SourceProxy->GetConsumerProxy(cc));
-    if (repr && (repr->GetIsSubProxy() == false) && repr->GetProperty("Opacity"))
+    if (repr && (repr->GetIsSubProxy() == false))
     {
-      vtkSMPropertyHelper(repr, "Opacity").Set(opacity);
-      repr->UpdateProperty("Opacity");
+      auto opacityProp = repr->GetProperty("Opacity");
+      if (opacityProp && opacityProp->GetAnimateable())
+      {
+        vtkSMPropertyHelper(opacityProp).Set(opacity);
+        repr->UpdateProperty("Opacity");
+      }
     }
   }
 }
