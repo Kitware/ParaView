@@ -76,6 +76,7 @@ pqOptions::pqOptions()
   this->DataDirectory = 0;
   this->ExitAppWhenTestsDone = 0;
   this->ServerResourceName = 0;
+  this->StateFileName = 0;
   this->CurrentImageThreshold = 12;
   this->PythonScript = 0;
   this->TestMaster = 0;
@@ -90,6 +91,7 @@ pqOptions::~pqOptions()
   this->SetTestDirectory(0);
   this->SetDataDirectory(0);
   this->SetServerResourceName(0);
+  this->SetStateFileName(0);
   this->SetPythonScript(0);
   this->SetTileImagePath(0);
 }
@@ -116,6 +118,10 @@ void pqOptions::Initialize()
 
   this->AddArgument("--server", "-s", &this->ServerResourceName,
     "Set the name of the server resource to connect to when the client starts.");
+
+  // add new Command Option for loading StateFile (Bug #5711)
+  this->AddArgument(
+    "--state", NULL, &this->StateFileName, "Load the specified statefile (.pvsm or .py).");
 
   this->AddCallback("--test-script", NULL, &::AddTestScript, this,
     "Add test script. Can be used multiple times to "
@@ -203,6 +209,9 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent
      << "ServerResourceName: " << (this->ServerResourceName ? this->ServerResourceName : "(none)")
+     << endl;
+
+  os << indent << "StateFileName: " << (this->StateFileName ? this->StateFileName : "(none)")
      << endl;
 
   os << indent << "PythonScript: " << (this->PythonScript ? this->PythonScript : "(none)") << endl;

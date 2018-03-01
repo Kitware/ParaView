@@ -42,7 +42,6 @@ vtkPVOptions::vtkPVOptions()
   this->UseRenderingGroup = 0;
   this->ParaViewDataName = 0;
   this->ServersFileName = 0;
-  this->StateFileName = 0;
   this->TestPlugin = 0;
   this->TestPluginPath = 0;
   this->SetTestPlugin("");
@@ -95,7 +94,6 @@ vtkPVOptions::~vtkPVOptions()
 {
   this->SetHostName(0);
   this->SetServersFileName(0);
-  this->SetStateFileName(0);
   this->SetLogFileName(0);
   this->SetStereoType(0);
   this->SetParaViewDataName(0);
@@ -229,10 +227,6 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--servers-file", 0, &this->ServersFileName,
     "Load the specified configuration servers file (.pvsc). This option replaces "
     "the default user's configuration servers file.",
-    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
-
-  // add new Command Option for loading StateFile (Bug #5711)
-  this->AddArgument("--state", 0, &this->StateFileName, "Load the specified statefile (.pvsm).",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
   this->AddBooleanArgument("--symmetric", "-sym", &this->SymmetricMPIMode,
@@ -518,8 +512,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   }
 
   os << indent << "ServersFileName: " << (this->ServersFileName ? this->ServersFileName : "(none)")
-     << endl;
-  os << indent << "StateFileName: " << (this->StateFileName ? this->StateFileName : "(none)")
      << endl;
   os << indent << "LogFileName: " << (this->LogFileName ? this->LogFileName : "(none)") << endl;
   os << indent << "SymmetricMPIMode: " << this->SymmetricMPIMode << endl;

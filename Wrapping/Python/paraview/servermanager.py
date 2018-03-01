@@ -263,11 +263,11 @@ class Proxy(object):
         self.add_attribute('_Proxy__Properties', {})
         self.add_attribute('_Proxy__LastAttrName', None)
         self.add_attribute('SMProxy', None)
-        self.add_attribute('Port', 0)
-
         if 'port' in args:
-            self.Port = args['port']
+            self.add_attribute('Port', args['port'])
             del args['port']
+        else:
+            self.add_attribute('Port', 0)
 
         update = True
         if 'no_update' in args:

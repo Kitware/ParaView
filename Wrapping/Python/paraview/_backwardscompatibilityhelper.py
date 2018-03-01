@@ -153,8 +153,13 @@ def setattr(proxy, pname, value):
         if paraview.compatibility.GetVersion() <= 5.4:
             # The Attribute type uses enumeration values from vtkDataObject::AttributeTypes
             # rather than custom constants for the calculator.  For the values supported by
-            # ParaView before this change, the conversion works out to subtracting 1.
-            proxy.GetProperty("AttributeType").SetData(value - 1)
+            # ParaView before this change, the conversion works out to subtracting 1 if value
+            # is an integer. If value is an enumerated string we use that as is since it matches
+            # the previous enumerated string options.
+            if isinstance(value, int):
+                proxy.GetProperty("AttributeType").SetData(value - 1)
+            else:
+                proxy.GetProperty("AttributeType").SetData(value)
             raise Continue()
         else:
             raise NotSupportedException(\
@@ -349,9 +354,13 @@ def getattr(proxy, pname):
         if paraview.compatibility.GetVersion() <= 5.4:
             # The Attribute type uses enumeration values from vtkDataObject::AttributeTypes
             # rather than custom constants for the calculator.  For the values supported by
-            # ParaView before this change, the conversion works out to adding 1.
+            # ParaView before this change, the conversion works out to adding 1 if it is an
+            # integer. If the value is an enumerated string we use that as is since it matches
+            # the previous enumerated string options.
             value = proxy.GetProperty("AttributeType").GetData()
-            return value + 1
+            if isinstance(value, int):
+                return value + 1
+            return value
         else:
             raise NotSupportedException(
                     'The Calculator.AttributeMode property has been removed in ParaView 5.5. '\

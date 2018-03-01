@@ -1116,6 +1116,22 @@ if (TARGET paraview)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LoadExodusStateFile.xml)
 
+  if (PARAVIEW_ENABLE_PYTHON)
+    # Test whether or not we can load a Python state file with the --state
+    # command line option as well as loading a Python state file that was
+    # generated with PV 5.4.1. Loading the 5.4.1 Python state file checks
+    # on backwards compatibility.
+    set (Calculator54State_THRESHOLD 100)
+    add_pv_test("pv" "_DISABLE_C"
+      COMMAND --client $<TARGET_FILE:paraview>
+              --enable-bt
+              -dr
+              --state=${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.py
+              --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.xml)
+  endif()
+
   #----------------------------------------------------------------------
   # Add test to test stereo rendering modes.
   add_client_tests("pv"
