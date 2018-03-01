@@ -758,7 +758,7 @@
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="QuartileChartView" />
         <WarnOnCreate title="Potentially slow operation">
-          **Plot Selection Over Time** filter needs to process all timesteps
+          **Plot Data Over Time** filter needs to process all timesteps
           available in your dataset and can potentially take a long time to complete.
           Do you want to continue?
         </WarnOnCreate>
