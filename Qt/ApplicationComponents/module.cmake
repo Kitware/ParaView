@@ -12,6 +12,7 @@ vtk_module(pqApplicationComponents
   PRIVATE_DEPENDS
     vtkjsoncpp
     vtkPVAnimation
+    vtkPVClientServerCoreDefault
     vtkPVServerManagerApplication
     vtkPVServerManagerDefault
     vtkPVServerManagerRendering

@@ -37,7 +37,6 @@
 #include "pqPipelineFilter.h"
 #include "pqRenderViewBase.h"
 #include "pqServerManagerModel.h"
-#include "vtkPVCatalystChannelInformation.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMSourceProxy.h"
@@ -64,22 +63,6 @@
 namespace
 {
 static QPointer<pqSGExportStateWizard> ActiveWizard;
-
-//----------------------------------------------------------------------------
-// copied from vtkSMRepresentationProxy::GetProminentValuesInformation()
-// std::string GetCatalystChannelInformation(vtkSMRepresentationProxy* proxy)
-std::string GetCatalystChannelInformation(vtkSMSourceProxy* proxy)
-{
-  vtkNew<vtkPVCatalystChannelInformation> information;
-  // proxy->CreateVTKObjects();
-  proxy->UpdatePipeline();
-  // Initialize parameters with specified values:
-  information->Initialize();
-
-  // Ask the server to fill out the rest of the information:
-  proxy->GatherInformation(information);
-  return information->GetChannelName();
-}
 } // end anonymous namespace
 
 pqSGExportStateWizardPage2::pqSGExportStateWizardPage2(QWidget* _parent)
@@ -140,34 +123,7 @@ void pqSGExportStateWizardPage3::initializePage()
     QListWidgetItem* item = this->Internals->simulationInputs->item(cc);
     QString text = item->text();
     this->Internals->nameWidget->setItem(cc, 0, new QTableWidgetItem(text));
-    std::string channelName;
-    // first see if the source dataset has the channel information which
-    // provides the name of the channel. if it does then use that, otherwise
-    // use a decent default
-    auto source = this->Internals->usedSources.find(text);
-    if (source != this->Internals->usedSources.end())
-    {
-      vtkSMSourceProxy* proxy = source->second->getSourceProxy();
-      channelName = GetCatalystChannelInformation(proxy);
-    }
-    if (!channelName.empty())
-    {
-      this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(channelName.c_str()));
-    }
-    else
-    {
-      // we don't have a valid channel name from the input.
-      // if there is only 1 input then call it input, otherwise
-      // use the same name as the filter
-      if (this->Internals->simulationInputs->count() == 1)
-      {
-        this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem("input"));
-      }
-      else
-      {
-        this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
-      }
-    }
+    this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
     QTableWidgetItem* tableItem = this->Internals->nameWidget->item(cc, 1);
     tableItem->setFlags(tableItem->flags() | Qt::ItemIsEditable);
 
