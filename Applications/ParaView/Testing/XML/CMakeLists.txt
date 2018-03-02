@@ -284,6 +284,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChangeGlyphRepVisibility.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChangingTimestepsInStateFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartAxisRangeAndLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CheckableHeader.xml
