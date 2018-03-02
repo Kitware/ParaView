@@ -326,6 +326,10 @@ static bool actionTextSort(QAction* a, QAction* b)
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::populateRecentlyUsedMenu()
 {
+  // doing this here, ensure that even if multiple pqProxyGroupMenuManager
+  // instances exists for same `resourceTagName`, the recent list remains synced
+  // between all.
+  this->loadRecentlyUsedItems();
   if (QMenu* recentMenu = this->Internal->RecentMenu)
   {
     recentMenu->clear();
@@ -418,7 +422,6 @@ void pqProxyGroupMenuManager::populateMenu()
     auto* rmenu = _menu->addMenu("&Recent") << pqSetName("Recent");
     this->Internal->RecentMenu = rmenu;
     this->connect(rmenu, SIGNAL(aboutToShow()), SLOT(populateRecentlyUsedMenu()));
-    this->loadRecentlyUsedItems();
   }
 
   // Add categories.
@@ -565,6 +568,10 @@ void pqProxyGroupMenuManager::triggered()
       this->Internal->RecentlyUsed.pop_back();
     }
     this->saveRecentlyUsedItems();
+
+    // while this is not necessary, this overcomes a limitation of our testing
+    // framework where it doesn't trigger "aboutToShow" signal.
+    this->populateRecentlyUsedMenu();
   }
 }
 
