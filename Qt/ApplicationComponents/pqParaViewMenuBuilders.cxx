@@ -182,7 +182,6 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWind
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewSources");
   mgr->addProxyDefinitionUpdateListener("sources");
   new pqSourcesMenuReaction(mgr);
-  pqPVApplicationCore::instance()->registerForQuicklaunch(mgr->widgetActionsHolder());
   if (mainWindow)
   {
     // create toolbars for categories as needed.
@@ -192,21 +191,24 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWind
 
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildFiltersMenu(
-  QMenu& menu, QMainWindow* mainWindow, bool hideDisabled)
+  QMenu& menu, QMainWindow* mainWindow, bool hideDisabled, bool quickLaunchable)
 {
-  pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewFilters");
+  pqProxyGroupMenuManager* mgr =
+    new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
   pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
-  pqPVApplicationCore* appCore = pqPVApplicationCore::instance();
-  appCore->registerForQuicklaunch(mgr->widgetActionsHolder());
 
   // Connect the filters menu about to show and the quick-launch dialog about to show
   // to update the enabled/disabled state of the menu items via the
   // pqFiltersMenuReaction
-  QObject::connect(&menu, SIGNAL(aboutToShow()), menuReaction, SLOT(updateEnableState()));
-  QObject::connect(
-    appCore, SIGNAL(aboutToShowQuickLaunch()), menuReaction, SLOT(updateEnableState()));
+  menuReaction->connect(&menu, SIGNAL(aboutToShow()), SLOT(updateEnableState()));
+
+  auto* pvappcore = pqPVApplicationCore::instance();
+  if (quickLaunchable && pvappcore)
+  {
+    menuReaction->connect(pvappcore, SIGNAL(aboutToShowQuickLaunch()), SLOT(updateEnableState()));
+  }
 
   if (mainWindow)
   {
@@ -407,7 +409,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   menu.addAction(actionPBPaste);
   menu.addAction(actionPBChangeInput);
   QMenu* addFilterMenu = menu.addMenu("Add Filter");
-  pqParaViewMenuBuilders::buildFiltersMenu(*addFilterMenu, nullptr, true /*hide disabled*/);
+  pqParaViewMenuBuilders::buildFiltersMenu(
+    *addFilterMenu, nullptr, true /*hide disabled*/, false /*quickLaunchable*/);
   menu.addAction(actionPBReloadFiles);
   menu.addAction(actionPBIgnoreTime);
   menu.addAction(actionPBDelete);
