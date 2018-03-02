@@ -68,8 +68,12 @@ public:
   * Builds "Filters" menu.
   * If you want to automatically add toolbars for filters as requested in the
   * configuration pass in a non-null main window.
+  * If you do not want to add the actions from the filters menu to quick launch
+  * maintained by pqApplicationCore (see pqPVApplicationCore::registerForQuicklaunch),
+  * then pass quickLaunchable == false.
   */
-  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0, bool hideDisabled = false);
+  static void buildFiltersMenu(QMenu& menu, QMainWindow* mainWindow = 0, bool hideDisabled = false,
+    bool quickLaunchable = true);
 
   /**
   * Builds the "Tools" menu.

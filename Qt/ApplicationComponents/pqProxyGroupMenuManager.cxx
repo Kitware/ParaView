@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QSet>
 #include <QStringList>
+#include <QtDebug>
 
 class pqProxyGroupMenuManager::pqInternal
 {
@@ -123,11 +124,15 @@ public:
   QPointer<QAction> SearchAction;
   unsigned long ProxyManagerCallBackId;
   void* LocalActiveSession;
+
+  QPointer<QMenu> RecentMenu;
 };
 
 //-----------------------------------------------------------------------------
-pqProxyGroupMenuManager::pqProxyGroupMenuManager(QMenu* _menu, const QString& resourceTagName)
+pqProxyGroupMenuManager::pqProxyGroupMenuManager(
+  QMenu* _menu, const QString& resourceTagName, bool quickLaunchable)
   : Superclass(_menu)
+  , SupportsQuickLaunch(quickLaunchable)
 {
   this->ResourceTagName = resourceTagName;
   this->Internal = new pqInternal();
@@ -151,6 +156,13 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(QMenu* _menu, const QString& re
       vtkSMProxyManager::ActiveSessionChanged, this, SLOT(switchActiveServer()));
 
   QObject::connect(this->menu(), SIGNAL(aboutToShow()), this, SLOT(updateMenuStyle()));
+
+  // register with pqPVApplicationCore for quicklaunch, if enabled.
+  auto* pvappcore = pqPVApplicationCore::instance();
+  if (quickLaunchable && pvappcore)
+  {
+    pvappcore->registerForQuicklaunch(this->widgetActionsHolder());
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -312,17 +324,14 @@ static bool actionTextSort(QAction* a, QAction* b)
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyGroupMenuManager::populateRecentlyUsedMenu(QMenu* rmenu)
+void pqProxyGroupMenuManager::populateRecentlyUsedMenu()
 {
-  QMenu* recentMenu = rmenu ? rmenu : this->menu()->findChild<QMenu*>("Recent");
-  if (recentMenu)
+  if (QMenu* recentMenu = this->Internal->RecentMenu)
   {
     recentMenu->clear();
-    for (int cc = 0; cc < this->Internal->RecentlyUsed.size(); cc++)
+    for (const QPair<QString, QString>& key : this->Internal->RecentlyUsed)
     {
-      QPair<QString, QString> key = this->Internal->RecentlyUsed[cc];
-      QAction* action = this->getAction(key.first, key.second);
-      if (action)
+      if (auto action = this->getAction(key.first, key.second))
       {
         recentMenu->addAction(action);
       }
@@ -393,19 +402,23 @@ void pqProxyGroupMenuManager::populateMenu()
   }
   _menu->clear();
 
+  if (this->supportsQuickLaunch())
+  {
 #if defined(Q_WS_MAC) || defined(Q_OS_MAC)
-  this->Internal->SearchAction =
-    _menu->addAction("Search...\tAlt+Space", this, SLOT(quickLaunch()));
+    this->Internal->SearchAction =
+      _menu->addAction("Search...\tAlt+Space", this, SLOT(quickLaunch()));
 #else
-  this->Internal->SearchAction =
-    _menu->addAction("Search...\tCtrl+Space", this, SLOT(quickLaunch()));
+    this->Internal->SearchAction =
+      _menu->addAction("Search...\tCtrl+Space", this, SLOT(quickLaunch()));
 #endif
+  }
 
   if (this->RecentlyUsedMenuSize > 0)
   {
-    QMenu* recentMenu = _menu->addMenu("&Recent") << pqSetName("Recent");
+    auto* rmenu = _menu->addMenu("&Recent") << pqSetName("Recent");
+    this->Internal->RecentMenu = rmenu;
+    this->connect(rmenu, SIGNAL(aboutToShow()), SLOT(populateRecentlyUsedMenu()));
     this->loadRecentlyUsedItems();
-    this->populateRecentlyUsedMenu(recentMenu);
   }
 
   // Add categories.
@@ -522,8 +535,7 @@ QAction* pqProxyGroupMenuManager::getAction(const QString& pgroup, const QString
     }
 
     // this avoids creating duplicate connections.
-    QObject::disconnect(action, 0, this, 0);
-    QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(triggered()));
+    this->connect(action, SIGNAL(triggered()), SLOT(triggered()), Qt::UniqueConnection);
     return action;
   }
   return 0;
@@ -552,7 +564,6 @@ void pqProxyGroupMenuManager::triggered()
     {
       this->Internal->RecentlyUsed.pop_back();
     }
-    this->populateRecentlyUsedMenu(0);
     this->saveRecentlyUsedItems();
   }
 }
@@ -560,7 +571,7 @@ void pqProxyGroupMenuManager::triggered()
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::quickLaunch()
 {
-  if (pqPVApplicationCore::instance())
+  if (this->supportsQuickLaunch() && pqPVApplicationCore::instance())
   {
     pqPVApplicationCore::instance()->quickLaunch();
   }

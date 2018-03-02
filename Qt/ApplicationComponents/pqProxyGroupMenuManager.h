@@ -53,9 +53,12 @@ public:
   * Constructor.
   * \c menu is the Menu to be populated.
   * \c resourceTagName is the tag name eg. "ParaViewSources" in the client
-  * configuration files which contains lists the items shown by this menu.
+  *    configuration files which contains lists the items shown by this menu.
+  * \c supportsQuickLaunch, set to false if quick-launch is not to be supported
+  *    for this menu.
   */
-  pqProxyGroupMenuManager(QMenu* menu, const QString& resourceTagName);
+  pqProxyGroupMenuManager(
+    QMenu* menu, const QString& resourceTagName, bool supportsQuickLaunch = true);
   ~pqProxyGroupMenuManager() override;
 
   /**
@@ -128,6 +131,12 @@ public:
   void addProxyDefinitionUpdateListener(const QString& proxyGroupName);
   void removeProxyDefinitionUpdateListener(const QString& proxyGroupName);
 
+  /**
+   * Returns true if the pqProxyGroupMenuManager has been registered with
+   * quick-launch mechanism maintained by pqApplicationCore.
+   */
+  bool supportsQuickLaunch() const { return this->SupportsQuickLaunch; }
+
 public slots:
   /**
   * Load a configuration XML. It will find the elements with resourceTagName
@@ -178,6 +187,12 @@ protected slots:
   void switchActiveServer();
   void updateMenuStyle();
 
+  /**
+   * called when "recent" menu is being shown.
+   * updates the menu with actions for the filters in the recent list.
+   */
+  void populateRecentlyUsedMenu();
+
 protected:
   QString ResourceTagName;
   vtkPVXMLElement* MenuRoot;
@@ -186,7 +201,6 @@ protected:
 
   void loadRecentlyUsedItems();
   void saveRecentlyUsedItems();
-  void populateRecentlyUsedMenu(QMenu*);
 
   /**
   * Returns the action for a given proxy.
@@ -198,6 +212,7 @@ private:
 
   class pqInternal;
   pqInternal* Internal;
+  bool SupportsQuickLaunch;
 };
 
 #endif
