@@ -465,9 +465,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
     /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/doc";
 #endif
 
-  QString paraViewGuideFile = documentationPath + "/Guide.pdf";
   QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
-  QString paraViewTutorialFile = documentationPath + "/Tutorial.pdf";
 
   // Getting Started with ParaView
   new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewGettingStartedFile),
@@ -478,7 +476,10 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   QAction* guide = menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide");
   guide->setObjectName("actionGuide");
   guide->setShortcut(QKeySequence::HelpContents);
-  new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewGuideFile), guide);
+  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/paraview-downloads/"
+                                     "download.php?submit=Download&version=v5.5&type=binary&os="
+                                     "Sources&downloadFile=ParaViewGuide-5.5.0.pdf"),
+    guide);
 
 #ifdef PARAVIEW_USE_QTHELP
   // Help
@@ -490,7 +491,9 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   menu.addSeparator();
 
   // ParaView Tutorial notes
-  new pqDesktopServicesReaction(QUrl::fromLocalFile(paraViewTutorialFile),
+  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/paraview-downloads/"
+                                     "download.php?submit=Download&version=v5.5&type=binary&os="
+                                     "Sources&downloadFile=ParaViewTutorial.pdf"),
     (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Tutorial")
                                   << pqSetName("actionTutorialNotes")));
 
