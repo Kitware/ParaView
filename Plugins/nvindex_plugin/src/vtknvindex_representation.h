@@ -233,4 +233,16 @@ private:
   vtknvindex_isoraycast_params m_isoraycast_params;
 };
 
+// Schwartz counter to manage initialization.
+class VTK_EXPORT vtknvindex_representation_initializer
+{
+public:
+  vtknvindex_representation_initializer();
+  ~vtknvindex_representation_initializer();
+
+private:
+  vtknvindex_representation_initializer(const vtknvindex_representation_initializer&) = delete;
+  void operator=(const vtknvindex_representation_initializer&) = delete;
+};
+static vtknvindex_representation_initializer vtknvindex_representation_initializer_instance;
 #endif // vtknvindex_representation_h

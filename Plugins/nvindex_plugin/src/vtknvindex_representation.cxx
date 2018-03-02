@@ -44,6 +44,7 @@
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkProcessModule.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include "vtknvindex_cluster_properties.h"
@@ -52,6 +53,20 @@
 #include "vtknvindex_representation.h"
 #include "vtknvindex_utilities.h"
 #include "vtknvindex_volumemapper.h"
+
+vtknvindex_representation_initializer::vtknvindex_representation_initializer()
+{
+  static unsigned int counter = 0;
+  if (counter == 0)
+  {
+    vtkProcessModule::SetDefaultMinimumGhostLevelsToRequestForStructuredPipelines(3);
+    ++counter;
+  }
+}
+
+vtknvindex_representation_initializer::~vtknvindex_representation_initializer()
+{
+}
 
 namespace
 {
