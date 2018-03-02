@@ -7,7 +7,7 @@ Show()
 
 clip = Clip()
 clip.ClipType = "Cylinder"
-clip.InsideOut = True
+clip.Invert = True
 
 cylinder = clip.ClipType
 cylinder.Axis = [-1, 1, -1]

@@ -14,7 +14,7 @@ clip1 = Clip(Input=wavelet1)
 clip1.ClipType = 'Plane'
 clip1.Scalars = ['POINTS', 'RTData']
 clip1.Value = 157.0909652709961
-clip1.InsideOut = 1
+clip1.Invert = 1
 
 # init the 'Plane' selected for 'ClipType'
 clip1.ClipType.Origin = [1.0, 0.0, 0.0]
