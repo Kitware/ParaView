@@ -236,6 +236,16 @@ def setattr(proxy, pname, value):
                 raise NotSupportedException(\
                     "'ArrayName' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
 
+    # In 5.5, we changed the Clip to be inverted from what it was before and changed the InsideOut
+    # property to be called Invert to be clearer.
+    if pname == "InsideOut" and proxy.SMProxy.GetXMLName() == "Clip":
+        if paraview.compatibility.GetVersion() <= 5.4:
+            proxy.GetProperty("Invert").SetData(1-value)
+            raise Continue()
+        else:
+            raise NotSupportedException(\
+                "'InsideOut' is obsolete.  Use 'Invert' property of Clip filter instead.")
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -436,6 +446,17 @@ def getattr(proxy, pname):
             else:
                 raise NotSupportedException(\
                     "'ArrayName' is obsolete as of ParaView 5.5.  Use 'SelectInputArray' instead.")
+
+    # In 5.5, we changed the Clip to be inverted from what it was before and changed the InsideOut
+    # property to be called Invert to be clearer.
+    if pname == "InsideOut" and proxy.SMProxy.GetName() == "Clip":
+        if paraview.compatibility.GetVersion() <= 5.4:
+            return proxy.GetProperty("Invert").GetData()
+        else:
+            raise NotSupportedException(
+                    'The Clip.InsideOut property has been changed in ParaView 5.5. '\
+                    'Please set the Invert property instead.')
+
     raise Continue()
 
 def GetProxy(module, key):
@@ -451,7 +472,8 @@ def GetProxy(module, key):
     if version < 5.5:
         if key == "Clip":
             # in PV 5.5 we changed the default for Clip's InsideOut property to 1 instead of 0
+            # also InsideOut was changed to Invert in 5.5
             clip = module.__dict__[key]()
-            clip.InsideOut = 0
+            clip.Invert = 0
             return clip
     return module.__dict__[key]()

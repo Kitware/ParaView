@@ -100,7 +100,7 @@ if not clip:
     print("After replaying trace, could not find Clip filter.")
     sys.exit(1)
 
-clip[0].InsideOut = 0
+clip[0].Invert = 0
 
 # Do a screenshot regression test
 if not smtesting.DoRegressionTesting(ren.SMProxy):

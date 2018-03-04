@@ -6861,13 +6861,13 @@ array.
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVMetaClipDataSet"
                  name="Clip">
-      <Documentation long_help="Clip with an implicit plane. Clipping does not reduce the dimensionality of the data set. The output data type of this filter is always an unstructured grid."
-                     short_help="Clip with an implicit plane.">The Clip filter
+      <Documentation long_help="Clip with an implicit function (an implicit description). Clipping does not reduce the dimensionality of the data set. The output data type of this filter is always an unstructured grid."
+                     short_help="Clip with an implicit function.">The Clip filter
                      cuts away a portion of the input data set using an
-                     implicit function. This filter operates on all types of data
+                     implicit function (an implicit description).
+                     This filter operates on all types of data
                      sets, and it returns unstructured grid data on
-                     output. The **InsideOut** parameter is with respect to the clip
-                     function's normal and not relative to the Clip Type geometry.</Documentation>
+                     output.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -6969,15 +6969,10 @@ array.
       </DoubleVectorProperty>
       <IntVectorProperty command="SetInsideOut"
                          default_values="1"
-                         name="InsideOut"
+                         name="Invert"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>If this property is set to 0, the clip filter will
-        return that portion of the dataset that lies within the clip function.
-        If set to 1, the portions of the dataset that lie outside the clip
-        function will be returned instead. The normal of the clip function
-        points to the portion of the domain within the clip function. For
-        the **Box**, **Cylinder**, and **Sphere** the normals point outwards.</Documentation>
+        <Documentation>Invert which part of the geometry is clipped.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseValueAsOffset"
                          default_values="0"
@@ -6996,8 +6991,8 @@ array.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to extract entire cells
-        in the given region or clip those cells so all of the output one stay
-        only inside that region.</Documentation>
+        in the given region or clip those cells so all of the output will stay
+        only on that side of region.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
@@ -7012,9 +7007,9 @@ array.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1 it will clip to the exact specifications
-        for the **Box** option, otherwise the clip will only approximate the box geometry. The
+        for the **Box** option only, otherwise the clip will only approximate the box geometry. The
         exact clip is very expensive as it requires generating 6 plane clips. Additionally,
-        **Inside Out** must be checked and **Crinkle clip** must be unchecked.</Documentation>
+        **Invert** must be checked and **Crinkle clip** must be unchecked.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
@@ -7023,7 +7018,7 @@ array.
                                    inverse="0" />
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="enabled_state"
-                                   property="InsideOut"
+                                   property="Invert"
                                    value="1" />
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="enabled_state"
