@@ -613,7 +613,8 @@ struct Process_5_4_to_5_5
   {
     return LockScalarRange(document) && CalculatorAttributeMode(document) &&
       CGNSReaderUpdates(document) && HeadlightToAdditionalLight(document) &&
-      DataBoundsInflateScaleFactor(document) && AnnotateAttributesInput(document);
+      DataBoundsInflateScaleFactor(document) && AnnotateAttributesInput(document) &&
+      ClipInvert(document);
   }
 
   bool LockScalarRange(xml_document& document)
@@ -969,6 +970,31 @@ struct Process_5_4_to_5_5
 
       prop.attribute("name").set_value("DataBoundsScaleFactor");
       valueElt.attribute("value").set_value(inflateFactor + 1);
+      prop.remove_child("Domain");
+    }
+    return true;
+  }
+
+  bool ClipInvert(xml_document& document)
+  {
+    pugi::xpath_node_set proxy_nodes =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and "
+                            "@type='Clip']");
+    for (auto xnode : proxy_nodes)
+    {
+      auto proxyNode = xnode.node();
+      if (proxyNode.select_nodes("//Property[@name='InsideOut']").empty())
+      {
+        // state is already newer.
+        continue;
+      }
+
+      auto prop = proxyNode.select_single_node("//Property[@name='InsideOut']").node();
+      auto valueElt = prop.child("Element");
+      bool invert = valueElt.attribute("value").as_bool();
+
+      prop.attribute("name").set_value("Invert");
+      valueElt.attribute("value").set_value(invert);
       prop.remove_child("Domain");
     }
     return true;
