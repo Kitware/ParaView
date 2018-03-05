@@ -332,10 +332,7 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.CreateFolder->setEnabled(true);
 
   impl.Ui.Favorites->setModel(impl.FavoriteModel);
-  impl.Ui.Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
-
   impl.Ui.Recent->setModel(impl.RecentModel);
-  impl.Ui.Recent->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   this->setFileMode(ExistingFile);
 
@@ -536,7 +533,6 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
     this->setToolTip("open multiple files with <ctrl> key.");
   }
   impl.Ui.Files->setSelectionMode(selectionMode);
-  impl.Ui.Favorites->setSelectionMode(selectionMode);
 }
 
 //-----------------------------------------------------------------------------
