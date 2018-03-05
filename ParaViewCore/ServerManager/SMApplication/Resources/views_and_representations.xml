@@ -9036,7 +9036,8 @@
       <IntVectorProperty command="SetVisibility"
                          default_values="0"
                          name="Visibility"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         animateable="0">
         <BooleanDomain name="bool" />
         <Documentation>Set the visibility of the representation.</Documentation>
       </IntVectorProperty>
