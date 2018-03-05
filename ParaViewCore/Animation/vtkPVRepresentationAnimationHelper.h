@@ -39,7 +39,7 @@ public:
 
   //@{
   /**
-   * Don't use directly. Use the corresponding properties intstead.
+   * Don't use directly. Use the corresponding properties instead.
    */
   void SetVisibility(int);
   void SetOpacity(double);
