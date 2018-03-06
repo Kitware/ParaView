@@ -145,8 +145,10 @@ public:
   /**
    * Returns true if this class would like to get ghost-cells if available for
    * the connection whose information object is passed as the argument.
+   * @deprecated in ParaView 5.5. See
+   * `vtkProcessModule::GetNumberOfGhostLevelsToRequest` instead.
    */
-  static bool DoRequestGhostCells(vtkInformation* information);
+  VTK_LEGACY(static bool DoRequestGhostCells(vtkInformation* information));
 
   //@{
   /**

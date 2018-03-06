@@ -39,6 +39,7 @@
 #include "vtkPVTrivialProducer.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
@@ -407,29 +408,12 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 bool vtkGeometryRepresentation::DoRequestGhostCells(vtkInformation* info)
 {
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  if (controller == NULL || controller->GetNumberOfProcesses() <= 1)
-  {
-    return false;
-  }
-
-  if (vtkUnstructuredGrid::GetData(info) != NULL || vtkCompositeDataSet::GetData(info) != NULL ||
-    vtkPolyData::GetData(info) != NULL)
-  {
-    // ensure that there's no WholeExtent to ensure
-    // that this UG was never born out of a structured dataset.
-    bool has_whole_extent = (info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
-    if (!has_whole_extent)
-    {
-      // cout << "Need ghosts" << endl;
-      return true;
-    }
-  }
-
-  return false;
+  return (vtkProcessModule::GetNumberOfGhostLevelsToRequest(info) > 0);
 }
+#endif
 
 //----------------------------------------------------------------------------
 int vtkGeometryRepresentation::RequestUpdateExtent(
@@ -444,12 +428,11 @@ int vtkGeometryRepresentation::RequestUpdateExtent(
     for (int kk = 0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
     {
       vtkInformation* inInfo = inputVector[cc]->GetInformationObject(kk);
-
       int ghostLevels =
         inInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
-      if (this->RequestGhostCellsIfNeeded && vtkGeometryRepresentation::DoRequestGhostCells(inInfo))
+      if (this->RequestGhostCellsIfNeeded)
       {
-        ghostLevels++;
+        ghostLevels += vtkProcessModule::GetNumberOfGhostLevelsToRequest(inInfo);
       }
       inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), ghostLevels);
     }
