@@ -82,7 +82,7 @@ void vtkSMNumberOfComponentsDomain::Update(vtkSMProperty*)
   const char* arrayName = svp->GetUncheckedElement(index);
   if (!arrayName || arrayName[0] == 0)
   {
-    // No array choosen.
+    // No array chosen.
     this->RemoveAllEntries();
     return;
   }

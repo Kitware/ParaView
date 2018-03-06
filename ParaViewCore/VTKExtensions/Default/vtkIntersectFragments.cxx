@@ -871,7 +871,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
 
 //----------------------------------------------------------------------------
 // Receive all geomteric attribute arrays from all other
-// processes. Conatiners filled with the expected number
+// processes. Containers filled with the expected number
 // of empty data arrays/pointers are expected.
 //
 // The following structure is expected:

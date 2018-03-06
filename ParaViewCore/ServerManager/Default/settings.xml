@@ -582,7 +582,7 @@
         </Hints>
       </DoubleVectorProperty>
       <!-- The hard contrast threshold is reduced to 0.045 by default. This
-           ensures that the the red arrow of the orientation axes is
+           ensures that the red arrow of the orientation axes is
            antialiased. -->
       <DoubleVectorProperty name="FXAAHardContrastThreshold"
                             default_values="0.045"

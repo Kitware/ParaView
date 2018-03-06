@@ -392,7 +392,7 @@ void GW_TriangularInterpolation_Cubic::ComputeLocalGradient(  GW_GeodesicVertex&
 
         /* directional gradient estimation */
         GW_Float delta = (pVert->GetDistance() - Vert.GetDistance())/a;
-        /* coordonate of the edge on (u,v) [flatened coords] */
+        /* coordinate of the edge on (u,v) [flattened coords] */
         GW_Float eu = a*cos( rCurAngle/rTotalAngle );
         GW_Float ev = a*sin( rCurAngle/rTotalAngle );
         /* update the matrix */

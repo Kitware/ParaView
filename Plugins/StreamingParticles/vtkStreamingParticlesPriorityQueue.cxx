@@ -304,7 +304,7 @@ void vtkStreamingParticlesPriorityQueue::UpdatePriorities(const double view_plan
       // level or higher then delete the resolution we have and request the resolution
       // below the current one we don't need.  We have to check the request list too since
       // we are adding to the request list without knowing for sure that we need the resolution
-      // we are reqeusting.  Ideally if we are seeing a higher res block in this list, we have
+      // we are requesting.  Ideally if we are seeing a higher res block in this list, we have
       // already seen the lower resolution, but that is not guaranteed by the priority of the
       // blocks.
       if (hasOneLikeXButGreater(item.Identifier, num_block_per_level, blocksRequested) ||

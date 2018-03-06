@@ -335,7 +335,7 @@ bool vtkSIProxy::InitializeAndCreateVTKObjects(vtkSMMessage* message)
   }
 
   // Process the XML and update properties etc.
-  // This needs be called after the VTK ojects have been created since the default values
+  // This needs be called after the VTK objects have been created since the default values
   // for all properties are read (and pushed) from when reading the XML attributes
   // themselves.
   if (!this->ReadXMLAttributes(element))

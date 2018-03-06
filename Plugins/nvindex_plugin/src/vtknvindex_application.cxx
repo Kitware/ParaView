@@ -197,7 +197,7 @@ bool vtknvindex_application::authenticate_nvindex_library()
   // Retrieve Flex license path.
   std::string flexnet_lic_path;
 
-  // Try reading Flex license path from enviroment.
+  // Try reading Flex license path from environment.
   const char* env_flexnet_lic_path = vtksys::SystemTools::GetEnv("NVINDEX_FLEXNET_PATH");
   if (env_flexnet_lic_path != NULL)
   {

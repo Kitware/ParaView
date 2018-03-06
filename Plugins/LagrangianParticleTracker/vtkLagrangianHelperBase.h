@@ -14,7 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkLagrangianHelperBase
- * @brief   Abstract classe for lagrangian helper
+ * @brief   Abstract class for lagrangian helper
  *
  *
  * This is an abstract class for Lagrangian helper

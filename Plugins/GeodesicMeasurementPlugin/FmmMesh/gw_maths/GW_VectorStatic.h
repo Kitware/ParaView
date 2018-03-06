@@ -343,7 +343,7 @@ public:
     *  \param  xy value of the 2 coordinates.
     *  \author Gabriel Peyré 2001-09-10
     *
-    *    Assign the same value to each coordonate.
+    *    Assign the same value to each coordinate.
     */
     /*------------------------------------------------------------------------------*/
     void SetCoord(v_type a)

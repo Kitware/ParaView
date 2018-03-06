@@ -22,7 +22,7 @@
  * of keyframes with same key time is arbritary. This class ensures that the
  * keyframes are always maintained in the correct order.
  * How the values for the animated property are interpolated between successive
- * keyframes depends on the the type of the preceding keyframe. Thus this class
+ * keyframes depends on the type of the preceding keyframe. Thus this class
  * doesn't perform the interpolation instead delegates it to the keyframe object
  * affecting the property at the current time value.
  * \li \c vtkPVCueManipulator::StateModifiedEvent -
@@ -136,7 +136,7 @@ protected:
    * This method is called when the AnimationCue's StartAnimationCueEvent is
    * triggered, to let the animation manipulator know that the cue has
    * been restarted. This is here for one major reason: after the last key
-   * frame, the state of the scene must be as it was left a the the last key
+   * frame, the state of the scene must be as it was left at the last key
    * frame. This does not happen automatically, since if while animating the
    * currentime never coincides with the last key frame's key time, then it
    * never gets a chance to update the properties value.

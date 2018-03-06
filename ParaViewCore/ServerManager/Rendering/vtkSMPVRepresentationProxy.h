@@ -243,11 +243,11 @@ public:
    * Set the scalar bar visibility. This will create a new scalar bar as needed.
    * Scalar bar is only shown if scalar coloring is indeed being used.
    */
-  virtual bool SetScalarBarVisibility(vtkSMProxy* view, bool visibile);
-  static bool SetScalarBarVisibility(vtkSMProxy* proxy, vtkSMProxy* view, bool visibile)
+  virtual bool SetScalarBarVisibility(vtkSMProxy* view, bool visible);
+  static bool SetScalarBarVisibility(vtkSMProxy* proxy, vtkSMProxy* view, bool visible)
   {
     vtkSMPVRepresentationProxy* self = vtkSMPVRepresentationProxy::SafeDownCast(proxy);
-    return self ? self->SetScalarBarVisibility(view, visibile) : false;
+    return self ? self->SetScalarBarVisibility(view, visible) : false;
   }
   //@}
 

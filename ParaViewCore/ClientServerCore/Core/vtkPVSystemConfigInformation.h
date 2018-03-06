@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVSystemConfigInformation
  *
- * A vtkClientServerStream serializable conatiner of information describing
+ * A vtkClientServerStream serializable container of information describing
  * memory configuration of the host of a single process.
 */
 

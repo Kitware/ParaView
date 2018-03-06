@@ -129,7 +129,7 @@ GW_I32 GW_GeodesicPath::AddNewPoint()
         if( GW_ABS(dx)>GW_EPSILON )
         {
             l = l1*x/dx;        // position along the line
-            a = y-l*dy/l2;        // coordonate with respect to v2
+            a = y-l*dy/l2;        // coordinate with respect to v2
             if( l>0 && l<=rStepSize_ && 0<=a && a<=1 )
             {
                 /* the crossing occurs on [v2,v3] */
@@ -161,7 +161,7 @@ GW_I32 GW_GeodesicPath::AddNewPoint()
         if( (GW_ABS(dy)>GW_EPSILON) != 0 )
         {
             l = l2*y/dy;      // position along the line
-            a = x-l*dx/l1;      // coordonate with respect to v1
+            a = x-l*dx/l1;      // coordinate with respect to v1
             if( l>0 && l<=rStepSize_ && 0<=a && a<=1 )
             {
                 /* the crossing occurs on [v1,v3] */
@@ -194,7 +194,7 @@ GW_I32 GW_GeodesicPath::AddNewPoint()
         if( GW_ABS(dx/l1+dy/l2)>GW_EPSILON )
         {
             l = -z/(dx/l1+dy/l2);      // position along the line
-            a = x-l*dx/l1;      // coordonate with respect to v1
+            a = x-l*dx/l1;      // coordinate with respect to v1
             if( l>0 && l<=rStepSize_ && 0<=a && a<=1 )
             {
                 /* the crossing occurs on [v1,v2] */

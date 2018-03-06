@@ -149,7 +149,7 @@
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="BoxWidgetRepresentation">
-      <Documentation>Representation proxy for the the box widget. This includes
+      <Documentation>Representation proxy for the box widget. This includes
       the widget/representation proxies for the box 3D widget.</Documentation>
       <IntVectorProperty command="SetEnabled"
                          default_values="0"
@@ -190,7 +190,7 @@
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="SphereWidgetRepresentation">
-      <Documentation>Representation proxy for the the sphere widget. This
+      <Documentation>Representation proxy for the sphere widget. This
       includes the widget/representation proxies for the sphere 3D
       widget.</Documentation>
       <IntVectorProperty command="SetEnabled"
@@ -228,7 +228,7 @@
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="ImplicitCylinderWidgetRepresentation">
-      <Documentation>Representation proxy for the the sphere widget. This
+      <Documentation>Representation proxy for the sphere widget. This
       includes the widget/representation proxies for the sphere 3D
       widget.</Documentation>
       <IntVectorProperty command="SetEnabled"
@@ -296,12 +296,12 @@
                proxygroup="3d_widgets"
                proxyname="SliderWidget"></Proxy>
       </SubProxy>
-      <!--- End of SliderWidgetRepresentaion -->
+      <!--- End of SliderWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="PolyLineWidgetRepresentation">
-      <Documentation>Representation proxy for the the poly line widget. This
+      <Documentation>Representation proxy for the poly line widget. This
       includes the widget/representation proxies for the sphere 3D
       widget.</Documentation>
       <IntVectorProperty command="SetEnabled"
@@ -334,7 +334,7 @@
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="SplineWidgetRepresentation">
-      <Documentation>Representation proxy for the the spline widget. This
+      <Documentation>Representation proxy for the spline widget. This
       includes the widget/representation proxies for the sphere 3D
       widget.</Documentation>
       <IntVectorProperty command="SetEnabled"
@@ -367,7 +367,7 @@
     <!-- ================================================================== -->
     <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
                                   name="ContourWidgetRepresentation">
-      <Documentation>Representation proxy for the the Contour widget. This
+      <Documentation>Representation proxy for the Contour widget. This
       includes the widget/representation proxies for the sphere 3D
       widget.</Documentation>
       <IntVectorProperty command="SetEnabled"

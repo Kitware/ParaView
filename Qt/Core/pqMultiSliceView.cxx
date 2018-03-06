@@ -37,7 +37,7 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkView.h"
 
-#define MULTI_SLICE_AXIS_THIKNESS 80
+#define MULTI_SLICE_AXIS_THICKNESS 80
 #define MULTI_SLICE_AXIS_ACTIVE_SIZE 20
 #define MULTI_SLICE_AXIS_EDGE_MARGIN 10
 
@@ -94,7 +94,7 @@ QWidget* pqMultiSliceView::createWidget()
   this->AxisX->setTitle("X");
   this->AxisX->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
   this->AxisX->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
-  this->AxisX->setFixedWidth(MULTI_SLICE_AXIS_THIKNESS);
+  this->AxisX->setFixedWidth(MULTI_SLICE_AXIS_THICKNESS);
   this->AxisX->renderView();
 
   this->AxisY = new pqMultiSliceAxisWidget(container);
@@ -103,7 +103,7 @@ QWidget* pqMultiSliceView::createWidget()
   this->AxisY->setTitle("Y");
   this->AxisY->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
   this->AxisY->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
-  this->AxisY->setFixedHeight(MULTI_SLICE_AXIS_THIKNESS - 4);
+  this->AxisY->setFixedHeight(MULTI_SLICE_AXIS_THICKNESS - 4);
   this->AxisY->renderView();
 
   this->AxisZ = new pqMultiSliceAxisWidget(container);
@@ -112,7 +112,7 @@ QWidget* pqMultiSliceView::createWidget()
   this->AxisZ->setTitle("Z");
   this->AxisZ->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
   this->AxisZ->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
-  this->AxisZ->setFixedWidth(MULTI_SLICE_AXIS_THIKNESS);
+  this->AxisZ->setFixedWidth(MULTI_SLICE_AXIS_THICKNESS);
   this->AxisZ->renderView();
 
   this->AxisXYZ[0] = this->AxisX;

@@ -38,7 +38,7 @@ vtkSMIntRangeDomain::~vtkSMIntRangeDomain()
 //  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
 //  if (!ivp || this->GetNumberOfRequiredProperties() == 0)
 //    {
-//    // If number of required properties is 0, this this domain
+//    // If number of required properties is 0, this domain
 //    // does not change based on values for some other property
 //    // in that case, the property default does not depend on the domain.
 //    return this->Superclass::SetDefaultValues(prop);

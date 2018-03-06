@@ -66,7 +66,7 @@ public:
   //@}
 
   /**
-   * Set the data soruce proxy. This is used when in the FOLLOW_DATA mode. The
+   * Set the data source proxy. This is used when in the FOLLOW_DATA mode. The
    * camera will track the data referred to by the data source proxy.
    */
   void SetDataSourceProxy(vtkSMProxy* dataSourceProxy);

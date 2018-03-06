@@ -363,7 +363,7 @@ bool vtkAMRStreamingVolumeRepresentation::StreamingUpdate(
       }
       // if the bounds changed from last time, we reset the priority queue as
       // well. If the bounds didn't change, then the resampler mtime won't
-      // change and it wouldn't think it needs initialization and then we dont'
+      // change and it wouldn't think it needs initialization and then we don't
       // need to reinitialize the priority queue.
       if (this->Resampler->NeedsInitialization())
       {
