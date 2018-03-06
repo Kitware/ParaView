@@ -38,9 +38,9 @@ If making a release from the `release` branch:
 
   - Update release branch
     - [ ] Update `version.txt`
-    - [ ] Create a merge request targeting `release`
+    - [ ] Create a merge request targeting `master`
     - [ ] Build binaries (`Do: test --superbuild`)
-    - [ ] Build binaries
+    - [ ] `Do: merge`
     - [ ] `git push origin update-to-VERSION:release vVERSION`
 -->
 
