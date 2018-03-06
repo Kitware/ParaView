@@ -30,14 +30,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqPluginManager.h"
+#include "ui_pqPluginEULADialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqDebug.h"
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerConfiguration.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
+#include "vtkPVPlugin.h"
+#include "vtkPVPluginLoader.h"
 #include "vtkPVPluginsInformation.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPluginManager.h"
@@ -49,7 +53,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QCoreApplication>
 #include <QPointer>
+#include <QPushButton>
 #include <QSet>
+#include <QTextStream>
 
 #include <sstream>
 class pqPluginManager::pqInternals
@@ -105,6 +111,10 @@ static QString pqPluginManagerSettingsKeyForLocal()
 pqPluginManager::pqPluginManager(QObject* parentObject)
   : Superclass(parentObject)
 {
+  // setup EULA confirmation callback. Note that is still too late for auto-load
+  // plugins. For auto-load plugins, the EULA is always auto-accepted.
+  vtkPVPlugin::SetEULAConfirmationCallback(pqPluginManager::confirmEULA);
+
   this->Internals = new pqInternals();
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -294,4 +304,40 @@ bool pqPluginManager::verifyPlugins(pqServer* activeServer)
   vtkPVPluginsInformation* local_info = this->loadedExtensions(activeServer, false);
   vtkPVPluginsInformation* remote_info = this->loadedExtensions(activeServer, true);
   return vtkPVPluginsInformation::PluginRequirementsSatisfied(local_info, remote_info);
+}
+
+//-----------------------------------------------------------------------------
+bool pqPluginManager::confirmEULA(vtkPVPlugin* plugin)
+{
+  Q_ASSERT(plugin->GetEULA() != nullptr);
+
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+
+  QString pluginKey;
+  QTextStream(&pluginKey) << "EULAConfirmation-" << plugin->GetPluginName() << "-"
+                          << plugin->GetPluginVersionString() << "-Confirmed";
+  if (settings->value(pluginKey, false).toBool() == true)
+  {
+    // previously accepted.
+    return true;
+  }
+
+  QDialog dialog(pqCoreUtilities::mainWidget());
+  Ui::PluginEULADialog ui;
+  ui.setupUi(&dialog);
+  ui.buttonBox->button(QDialogButtonBox::Yes)->setText("Accept");
+  ui.buttonBox->button(QDialogButtonBox::No)->setText("Decline");
+  ui.buttonBox->button(QDialogButtonBox::No)->setDefault(true);
+
+  dialog.setWindowTitle(
+    QString("End User License Agreement for '%1'").arg(plugin->GetPluginName()));
+  ui.textEdit->setText(plugin->GetEULA());
+
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    settings->setValue(pluginKey, true);
+    return true;
+  }
+
+  return false;
 }

@@ -15,15 +15,27 @@
 #include "vtkPVPlugin.h"
 
 #include "vtkPVPluginTracker.h"
+#include "vtkProcessModule.h"
 #include <vtksys/SystemTools.hxx>
+
+#include <cassert>
+#include <sstream>
+
+vtkPVPlugin::EULAConfirmationCallback vtkPVPlugin::EULAConfirmationCallbackPtr = nullptr;
 
 //-----------------------------------------------------------------------------
 void vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
 {
-  // Register the plugin with the plugin manager on the current process. That
-  // will kick in the code to process the plugin e.g. initialize CSInterpreter,
-  // load XML etc.
-  vtkPVPluginTracker::GetInstance()->RegisterPlugin(plugin);
+  assert(plugin != nullptr);
+
+  // If plugin has an EULA, confirm it before proceeding.
+  if (plugin->GetEULA() == nullptr || vtkPVPlugin::ConfirmEULA(plugin))
+  {
+    // Register the plugin with the plugin manager on the current process. That
+    // will kick in the code to process the plugin e.g. initialize CSInterpreter,
+    // load XML etc.
+    vtkPVPluginTracker::GetInstance()->RegisterPlugin(plugin);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -50,4 +62,33 @@ void vtkPVPlugin::SetFileName(const char* filename)
 //-----------------------------------------------------------------------------
 void vtkPVPlugin::GetBinaryResources(std::vector<std::string>&)
 {
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPlugin::SetEULAConfirmationCallback(vtkPVPlugin::EULAConfirmationCallback ptr)
+{
+  vtkPVPlugin::EULAConfirmationCallbackPtr = ptr;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPlugin::ConfirmEULA(vtkPVPlugin* plugin)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetPartitionId() == 0 && plugin->GetEULA() != nullptr)
+  {
+    if (vtkPVPlugin::EULAConfirmationCallbackPtr != nullptr)
+    {
+      return vtkPVPlugin::EULAConfirmationCallbackPtr(plugin);
+    }
+
+    std::ostringstream str;
+    str << "-----------------------------------------------------" << endl
+        << "  By loading the '" << plugin->GetPluginName()
+        << "' plugin you have accepted the EULA shipped with it." << endl
+        << "  If that is not acceptable, please restart the application without loading " << endl
+        << "  the '" << plugin->GetPluginName() << "' plugin." << endl;
+    str << "-----------------------------------------------------" << endl;
+    vtkOutputWindowDisplayText(str.str().c_str());
+  }
+  return true;
 }

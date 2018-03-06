@@ -132,6 +132,8 @@ public:
   {
     return NULL;
   }
+
+  const char* GetEULA() override { return nullptr; }
 };
 
 // Cleans successfully opened libs when the application quits.

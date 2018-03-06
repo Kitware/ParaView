@@ -49,10 +49,6 @@
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPlugin
 {
-  char* FileName;
-  void SetFileName(const char* filename);
-  friend class vtkPVPluginLoader;
-
 public:
   vtkPVPlugin();
   virtual ~vtkPVPlugin();
@@ -85,6 +81,11 @@ public:
   virtual const char* GetRequiredPlugins() = 0;
 
   /**
+   * Returns EULA for the plugin, if any. If none, this will return nullptr.
+   */
+  virtual const char* GetEULA() = 0;
+
+  /**
    * Provides access to binary resources compiled into the plugin.
    * This is primarily used to compile in icons and compressed help project
    * (qch) files into plugins.
@@ -97,8 +98,45 @@ public:
    * This must only be called after the application has initialized, more
    * specifically, all plugin managers have been created and they have
    * registered their callbacks.
+   *
+   * Note, if the plugin has EULA and the user declines the EULA, the import
+   * request will be ignored, and the plugin won't be imported. This does not
+   * mean, however, that the plugin won't have any side effects as the plugin
+   * library can have singletons that get initialized on library load.
    */
   static void ImportPlugin(vtkPVPlugin* plugin);
+
+  /**
+   * Type for EULAConfirmationCallback
+   */
+  typedef bool (*EULAConfirmationCallback)(vtkPVPlugin*);
+
+  //@{
+  /**
+   * Get/Set the static callback to call to confirm EULA
+   */
+  static void SetEULAConfirmationCallback(EULAConfirmationCallback callback);
+  static EULAConfirmationCallback GetEULAConfirmationCallback();
+  //@}
+
+private:
+  /**
+   * Called to confirm EULA in `ImportPlugin` if the plugin has a non-empty EULA.
+   * Based on whether EULAConfirmationCallback is specified, this will
+   * accept the EULA and print a message on the terminal or prompt the user via
+   * the callback to accept the EULA.
+   */
+  static bool ConfirmEULA(vtkPVPlugin* plugin);
+
+  char* FileName;
+  void SetFileName(const char* filename);
+
+  static EULAConfirmationCallback EULAConfirmationCallbackPtr;
+  friend class vtkPVPluginLoader;
+
+private:
+  vtkPVPlugin(const vtkPVPlugin&) = delete;
+  void operator=(const vtkPVPlugin&) = delete;
 };
 //@}
 

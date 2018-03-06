@@ -304,8 +304,9 @@ if(NOT VTK_LEGACY_REMOVE)
 endif()
 
 set (Module_UI_FILES
-  Resources/UI/pqOutputWidget.ui
   Resources/UI/pqFileDialog.ui
+  Resources/UI/pqOutputWidget.ui
+  Resources/UI/pqPluginEULADialog.ui
 )
 
 set (Module_RESOURCE_FILES
