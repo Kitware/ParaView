@@ -19,19 +19,22 @@
 #include "vtkAlgorithm.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDummyController.h"
 #include "vtkFloatingPointExceptions.h"
+#include "vtkInformation.h"
 #include "vtkMultiThreader.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkPSystemTools.h"
 #include "vtkPVConfig.h"
-#include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
+#include "vtkPolyData.h"
 #include "vtkSessionIterator.h"
 #include "vtkStdString.h"
 #include "vtkTCPNetworkAccessManager.h"
+#include "vtkUnstructuredGrid.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -100,6 +103,9 @@ bool vtkProcessModule::FinalizePython = false;
 
 vtkSmartPointer<vtkProcessModule> vtkProcessModule::Singleton;
 vtkSmartPointer<vtkMultiProcessController> vtkProcessModule::GlobalController;
+
+int vtkProcessModule::DefaultMinimumGhostLevelsToRequestForUnstructuredPipelines = 1;
+int vtkProcessModule::DefaultMinimumGhostLevelsToRequestForStructuredPipelines = 0;
 
 //----------------------------------------------------------------------------
 bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
@@ -595,4 +601,58 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Options: "
        << "(null)" << endl;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SetDefaultMinimumGhostLevelsToRequestForStructuredPipelines(int val)
+{
+  vtkProcessModule::DefaultMinimumGhostLevelsToRequestForStructuredPipelines = val;
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::GetDefaultMinimumGhostLevelsToRequestForStructuredPipelines()
+{
+  return vtkProcessModule::DefaultMinimumGhostLevelsToRequestForStructuredPipelines;
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SetDefaultMinimumGhostLevelsToRequestForUnstructuredPipelines(int val)
+{
+  vtkProcessModule::DefaultMinimumGhostLevelsToRequestForUnstructuredPipelines = val;
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::GetDefaultMinimumGhostLevelsToRequestForUnstructuredPipelines()
+{
+  return vtkProcessModule::DefaultMinimumGhostLevelsToRequestForUnstructuredPipelines;
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::GetNumberOfGhostLevelsToRequest(vtkInformation* info)
+{
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  if (controller == nullptr || controller->GetNumberOfProcesses() <= 1)
+  {
+    return 0;
+  }
+
+  if (vtkDataSet::GetData(info) != nullptr || vtkCompositeDataSet::GetData(info) != nullptr)
+  {
+    // Check if this is structured-pipeline, this includes unstructured pipelines
+    // downstream from structured source e.g. Wavelet - > Clip.
+    // To do that, we use a trick. If WHOLE_EXTENT() key us present, it must have
+    // started as a structured dataset.
+    const bool is_structured = (info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
+    return is_structured
+      ? vtkProcessModule::GetDefaultMinimumGhostLevelsToRequestForStructuredPipelines()
+      : vtkProcessModule::GetDefaultMinimumGhostLevelsToRequestForUnstructuredPipelines();
+  }
+  else
+  {
+    // the pipeline is for a non-dataset/composite-dataset filter. don't bother
+    // asking for ghost levels.
+    return 0;
+  }
+
+  return false;
 }

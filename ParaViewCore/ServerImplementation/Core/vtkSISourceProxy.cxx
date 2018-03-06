@@ -20,7 +20,6 @@
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
-//#include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -195,35 +194,6 @@ bool vtkSISourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-// FIXME: avoid code-duplication with vtkGeometryRepresentation. However I
-// cannot add dependency on vtkGeometryRepresentation here. Fix it!!!
-namespace
-{
-bool vtkGeometryRepresentationDoRequestGhostCells(vtkInformation* info)
-{
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  if (controller == NULL || controller->GetNumberOfProcesses() <= 1)
-  {
-    return false;
-  }
-
-  if (vtkUnstructuredGrid::GetData(info) != NULL || vtkCompositeDataSet::GetData(info) != NULL ||
-    vtkPolyData::GetData(info) != NULL)
-  {
-    // ensure that there's no WholeExtent to ensure
-    // that this UG was never born out of a structured dataset.
-    bool has_whole_extent = (info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
-    if (!has_whole_extent)
-    {
-      // cout << "Need ghosts" << endl;
-      return true;
-    }
-  }
-  return false;
-}
-}
-
-//----------------------------------------------------------------------------
 void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
 {
   if (this->DisablePipelineExecution)
@@ -255,11 +225,11 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   // representation results in multiple executes (12546). Hence, we request
   // ghost-cells in UpdatePipeline().
   vtkInformation* outInfo = sddp->GetOutputInformation(real_port);
-  bool req_ghost_cells = vtkGeometryRepresentationDoRequestGhostCells(outInfo);
+  const int ghost_levels = vtkProcessModule::GetNumberOfGhostLevelsToRequest(outInfo);
 
   outInfo->Set(sddp->UPDATE_PIECE_NUMBER(), processid);
   outInfo->Set(sddp->UPDATE_NUMBER_OF_PIECES(), numprocs);
-  outInfo->Set(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS(), req_ghost_cells ? 1 : 0);
+  outInfo->Set(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS(), ghost_levels);
   if (doTime)
   {
     outInfo->Set(sddp->UPDATE_TIME_STEP(), time);

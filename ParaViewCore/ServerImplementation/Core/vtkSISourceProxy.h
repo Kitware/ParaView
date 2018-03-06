@@ -30,6 +30,7 @@
 
 class vtkAlgorithm;
 class vtkAlgorithmOutput;
+class vtkInformation;
 
 class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSISourceProxy : public vtkSIProxy
 {
