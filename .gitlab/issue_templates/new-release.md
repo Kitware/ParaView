@@ -97,6 +97,6 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
 -->
 
 /cc @ben.boeckel
-/cc @cory.quammen
+/cc @cory-quammen
 /cc @utkarsh.ayachit
 /label ~"priority:required"
