@@ -227,6 +227,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
 
   pqProxyGroupMenuManager* mgr = static_cast<pqProxyGroupMenuManager*>(this->parent());
   mgr->setEnabled(enabled);
+
   bool some_enabled = false;
   const QList<QAction*>& actionsList =
     updateOnlyToolbars ? mgr->actionsInToolbars() : mgr->actions();
@@ -317,6 +318,37 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
   {
     mgr->setEnabled(false);
   }
+
+  // Hide unused submenus
+  if (this->HideDisabledActions)
+  {
+    QMenu* menu = mgr->menu();
+    bool anyMenuShown = false;
+    QList<QAction*> menuActions = menu->actions();
+    foreach (QAction* menuAction, menuActions)
+    {
+      if (menuAction->isSeparator() || !menuAction->menu())
+      {
+        continue;
+      }
+      bool anySubMenuShown = false;
+      QList<QAction*> subMenuActions = menuAction->menu()->actions();
+
+      foreach (QAction* subMenuAction, subMenuActions)
+      {
+        if (subMenuAction->isVisible())
+        {
+          anySubMenuShown = true;
+          anyMenuShown = true;
+          break;
+        }
+      }
+
+      menuAction->setVisible(anySubMenuShown);
+    }
+    menu->setEnabled(anyMenuShown);
+  }
+
   // If we updated only the toolbars, then the state of other actions may still
   // be dirty
   this->IsDirty = updateOnlyToolbars;
