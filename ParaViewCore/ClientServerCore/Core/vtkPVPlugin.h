@@ -103,8 +103,10 @@ public:
    * request will be ignored, and the plugin won't be imported. This does not
    * mean, however, that the plugin won't have any side effects as the plugin
    * library can have singletons that get initialized on library load.
+   *
+   * @returns true if the plugin was successfully imported.
    */
-  static void ImportPlugin(vtkPVPlugin* plugin);
+  static bool ImportPlugin(vtkPVPlugin* plugin);
 
   /**
    * Type for EULAConfirmationCallback

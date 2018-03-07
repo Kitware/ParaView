@@ -24,18 +24,18 @@
 vtkPVPlugin::EULAConfirmationCallback vtkPVPlugin::EULAConfirmationCallbackPtr = nullptr;
 
 //-----------------------------------------------------------------------------
-void vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
+bool vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
 {
-  assert(plugin != nullptr);
-
   // If plugin has an EULA, confirm it before proceeding.
-  if (plugin->GetEULA() == nullptr || vtkPVPlugin::ConfirmEULA(plugin))
+  if (plugin && (plugin->GetEULA() == nullptr || vtkPVPlugin::ConfirmEULA(plugin)))
   {
     // Register the plugin with the plugin manager on the current process. That
     // will kick in the code to process the plugin e.g. initialize CSInterpreter,
     // load XML etc.
     vtkPVPluginTracker::GetInstance()->RegisterPlugin(plugin);
+    return true;
   }
+  return false;
 }
 
 //-----------------------------------------------------------------------------
