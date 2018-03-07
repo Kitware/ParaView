@@ -653,6 +653,4 @@ int vtkProcessModule::GetNumberOfGhostLevelsToRequest(vtkInformation* info)
     // asking for ghost levels.
     return 0;
   }
-
-  return false;
 }
