@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVPLYWriter : public vtkWriter
 public:
   static vtkPVPLYWriter* New();
   vtkTypeMacro(vtkPVPLYWriter, vtkWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -44,6 +44,14 @@ public:
    */
   vtkSetMacro(EnableColoring, bool);
   vtkGetMacro(EnableColoring, bool);
+  //@}
+
+  //@{
+  /**
+   * Enable alpha channel if coloring is enabled.
+   */
+  vtkSetMacro(EnableAlpha, bool);
+  vtkGetMacro(EnableAlpha, bool);
   //@}
 
   /**
@@ -72,10 +80,11 @@ protected:
   vtkPVPLYWriter();
   ~vtkPVPLYWriter() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  void WriteData() VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  void WriteData() override;
 
   bool EnableColoring;
+  bool EnableAlpha;
   vtkNew<vtkPLYWriter> Writer;
   vtkSmartPointer<vtkScalarsToColors> LookupTable;
 

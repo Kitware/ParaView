@@ -881,6 +881,7 @@
         <ExposedProperties>
           <Property name="FileType" />
           <Property name="EnableColoring" />
+          <Property name="EnableAlpha" />
           <Property name="ColorArrayName" />
           <Property name="LookupTable" />
         </ExposedProperties>
@@ -890,6 +891,7 @@
       </SubProxy>
       <PropertyGroup label="Color Properties">
         <Property name="EnableColoring" />
+        <Property name="EnableAlpha" />
         <Property name="ColorArrayName" />
         <Property name="LookupTable" />
       </PropertyGroup>
