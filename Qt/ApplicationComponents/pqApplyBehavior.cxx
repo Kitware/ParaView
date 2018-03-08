@@ -211,25 +211,28 @@ void pqApplyBehavior::applied(pqPropertiesPanel*)
   }
 
   vtkPVGeneralSettings* gsettings = vtkPVGeneralSettings::GetInstance();
-  foreach (const pqInternals::PairType& pair, this->Internals->NewlyCreatedRepresentations)
+  if (gsettings->GetColorByBlockColorsOnApply())
   {
-    vtkSMRepresentationProxy* reprProxy = pair.first;
-    vtkSMViewProxy* viewProxy = pair.second;
-
-    // If not scalar coloring, we make an attempt to color using
-    // 'vtkBlockColors' array, if present.
-    if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
-      vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false &&
-      reprProxy->GetRepresentedDataInformation()->GetArrayInformation(
-        "vtkBlockColors", vtkDataObject::FIELD) != NULL &&
-      reprProxy->GetRepresentedDataInformation()->GetNumberOfBlockLeafs(false) > 1)
+    foreach (const pqInternals::PairType& pair, this->Internals->NewlyCreatedRepresentations)
     {
-      vtkSMPVRepresentationProxy::SetScalarColoring(
-        reprProxy, "vtkBlockColors", vtkDataObject::FIELD);
-      if (gsettings->GetScalarBarMode() ==
-        vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+      vtkSMRepresentationProxy* reprProxy = pair.first;
+      vtkSMViewProxy* viewProxy = pair.second;
+
+      // If not scalar coloring, we make an attempt to color using
+      // 'vtkBlockColors' array, if present.
+      if (vtkSMPVRepresentationProxy::SafeDownCast(reprProxy) &&
+        vtkSMPVRepresentationProxy::GetUsingScalarColoring(reprProxy) == false &&
+        reprProxy->GetRepresentedDataInformation()->GetArrayInformation(
+          "vtkBlockColors", vtkDataObject::FIELD) != NULL &&
+        reprProxy->GetRepresentedDataInformation()->GetNumberOfBlockLeafs(false) > 1)
       {
-        vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
+        vtkSMPVRepresentationProxy::SetScalarColoring(
+          reprProxy, "vtkBlockColors", vtkDataObject::FIELD);
+        if (gsettings->GetScalarBarMode() ==
+          vtkPVGeneralSettings::AUTOMATICALLY_SHOW_AND_HIDE_SCALAR_BARS)
+        {
+          vtkSMPVRepresentationProxy::SetScalarBarVisibility(reprProxy, viewProxy, true);
+        }
       }
     }
   }

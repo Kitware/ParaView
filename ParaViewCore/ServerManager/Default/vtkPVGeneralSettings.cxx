@@ -56,6 +56,7 @@ vtkPVGeneralSettings::vtkPVGeneralSettings()
   , LockPanels(false)
   , GUIFontSize(0)
   , GUIOverrideFont(false)
+  , ColorByBlockColorsOnApply(true)
 {
   this->SetDefaultViewType("RenderView");
 }
