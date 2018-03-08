@@ -33,52 +33,27 @@ void PARAVIEW_CSSTREAMS_INITIALIZE(vtkClientServerInterpreter* interp)
 class vtkPVInitializerPlugin : public vtkPVPlugin,
   public vtkPVServerManagerPluginInterface
 {
-  // Description:
-  // Returns the name for this plugin.
-  virtual const char* GetPluginName()
-    {return "vtkPVInitializerPlugin"; }
+  const char* GetPluginName() override { return "vtkPVInitializerPlugin"; }
+  const char* GetPluginVersionString() override { return "0.0"; }
+  bool GetRequiredOnServer() override { return false; }
+  bool GetRequiredOnClient() override { return false; }
+  const char* GetRequiredPlugins() override { return ""; }
+  void GetBinaryResources(std::vector<std::string>&) override { }
+  const char* GetEULA() override { return nullptr; }
 
-  // Description:
-  // Returns the version for this plugin.
-  virtual const char* GetPluginVersionString() { return "0.0"; }
-
-  // Description:
-  // Returns true if this plugin is required on the server.
-  virtual bool GetRequiredOnServer() { return false; }
-
-  // Description:
-  // Returns true if this plugin is required on the client.
-  virtual bool GetRequiredOnClient() {return false;}
-
-  // Description:
-  // Returns a ';' separated list of plugin names required by this plugin.
-  virtual const char* GetRequiredPlugins() { return ""; }
-
-  // Description:
-  // Provides access to binary resources compiled into the plugin.
-  // This is primarily used to compile in icons and compressed help project
-  // (qch) files into plugins.
-  virtual void GetBinaryResources(std::vector<std::string>&) {}
-
-  // Description:
-  // Obtain the server-manager configuration xmls, if any.
-  virtual void GetXMLs(std::vector<std::string> &xmls)
-    {
+  void GetXMLs(std::vector<std::string> &xmls) override
+  {
     (void) xmls;
     char* init_string = NULL;
     @xml_init_code@
     (void) init_string;
-    }
+  }
 
-  // Description:
-  // Returns the callback function to call to initialize the interpretor for the
-  // new vtk/server-manager classes added by this plugin. Returning NULL is
-  // perfectly valid.
-  virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
-    GetInitializeInterpreterCallback()
-      {
-      return PARAVIEW_CSSTREAMS_INITIALIZE;
-      }
+  vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
+    GetInitializeInterpreterCallback() override
+  {
+    return PARAVIEW_CSSTREAMS_INITIALIZE;
+  }
 };
 
 void PARAVIEW_INITIALIZE()

@@ -38,8 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 
 class pqServer;
-class vtkSMPluginManager;
+class vtkPVPlugin;
 class vtkPVPluginsInformation;
+class vtkSMPluginManager;
 
 /**
 * pqPluginManager works with vtkSMPluginManager to keep track for plugins
@@ -147,6 +148,12 @@ protected slots:
 private:
   class pqInternals;
   pqInternals* Internals;
+
+  /**
+   * Callback passed on to `vtkPVPluginLoader::SetEULAConfirmationCallback` to
+   * confirm EULA for locally loaded plugins.
+   */
+  static bool confirmEULA(vtkPVPlugin* plugin);
 };
 
 #endif

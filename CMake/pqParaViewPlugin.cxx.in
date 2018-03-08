@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 @EXTRA_INCLUDES@
 
+#if @PLUGIN_HAS_EULA@ // PLUGIN_HAS_EULA
+#include "@PLUGIN_EULA_HEADER@"
+#endif
+
 namespace
 {
   // This ensures that when the shared library for this plugin is
@@ -180,6 +184,16 @@ void @PLUGIN_NAME@_Plugin::GetPythonSourceList(std::vector<std::string>& modules
   // Qt 5
   Q_IMPORT_PLUGIN(@PLUGIN_NAME@_Plugin)
 
+#endif
+}
+
+//-----------------------------------------------------------------------------
+const char* @PLUGIN_NAME@_Plugin::GetEULA()
+{
+#if @PLUGIN_HAS_EULA@ // PLUGIN_HAS_EULA
+  return @PLUGIN_NAME@_EULA;
+#else
+  return nullptr;
 #endif
 }
 
