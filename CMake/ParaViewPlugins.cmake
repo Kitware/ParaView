@@ -719,6 +719,10 @@ ENDMACRO()
 #  html/css/png/jpg files that comprise of the documentation for the plugin. In
 #  addition, CMake will automatically generate documentation for any proxies
 #  defined in XMLs for this plugin.
+#  EULA (optional) :- a text file with the text for the EULA for the plugin.
+#                     the user is required to accept the EULA before the plugin
+#                     can be loaded.
+#
 # ADD_PARAVIEW_PLUGIN(Name Version
 #     [DOCUMENTATION_DIR dir]
 #     [SERVER_MANAGER_SOURCES source files]
@@ -734,6 +738,7 @@ ENDMACRO()
 #     [REQUIRED_ON_CLIENT]
 #     [REQUIRED_PLUGINS pluginname1 pluginname2]
 #     [CS_KITS kit1 kit2...]
+#     [EULA eulafile]
 #     [EXCLUDE_FROM_DEFAULT_TARGET]
 #  )
 FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
@@ -754,6 +759,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   SET(ARG_AUTOLOAD)
   SET(ARG_CS_KITS)
   SET(ARG_DOCUMENTATION_DIR)
+  SET(ARG_EULA)
 
   SET(PLUGIN_NAME "${NAME}")
   SET(PLUGIN_VERSION "${VERSION}")
@@ -778,7 +784,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
   PV_PLUGIN_PARSE_ARGUMENTS(ARG
-    "DOCUMENTATION_DIR;SERVER_MANAGER_SOURCES;SERVER_MANAGER_XML;SERVER_SOURCES;PYTHON_MODULES;GUI_INTERFACES;GUI_RESOURCES;GUI_RESOURCE_FILES;GUI_SOURCES;SOURCES;REQUIRED_PLUGINS;REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT;EXCLUDE_FROM_DEFAULT_TARGET;AUTOLOAD;CS_KITS"
+    "DOCUMENTATION_DIR;SERVER_MANAGER_SOURCES;SERVER_MANAGER_XML;SERVER_SOURCES;PYTHON_MODULES;GUI_INTERFACES;GUI_RESOURCES;GUI_RESOURCE_FILES;GUI_SOURCES;SOURCES;REQUIRED_PLUGINS;REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT;EXCLUDE_FROM_DEFAULT_TARGET;AUTOLOAD;CS_KITS;EULA"
     "" ${ARGN} )
 
   PV_PLUGIN_LIST_CONTAINS(reqired_server_arg "REQUIRED_ON_SERVER" ${ARGN})
@@ -926,6 +932,23 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   endif()
 
   IF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
+    set (plugin_sources
+      ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
+
+    # handle EULA
+    if (ARG_EULA)
+      set(PLUGIN_HAS_EULA 1)
+      vtk_encode_string(
+        INPUT ${ARG_EULA}
+        NAME ${PLUGIN_NAME}_EULA
+        HEADER_OUTPUT PLUGIN_EULA_HEADER
+        SOURCE_OUTPUT PLUGIN_EULA_SOURCE)
+      list(APPEND plugin_sources ${PLUGIN_EULA_SOURCE} ${PLUGIN_EULA_HEADER})
+    else()
+      set(PLUGIN_HAS_EULA 0)
+    endif()
+
     CONFIGURE_FILE(
       ${ParaView_CMAKE_DIR}/pqParaViewPlugin.h.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h @ONLY)
@@ -933,17 +956,13 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
       ${ParaView_CMAKE_DIR}/pqParaViewPlugin.cxx.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx @ONLY)
 
-    SET (plugin_sources
-      ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h
-    )
     IF (plugin_type_gui)
       set (__plugin_sources_tmp)
       QT5_WRAP_CPP(__plugin_sources_tmp ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
       SET (plugin_sources ${plugin_sources} ${__plugin_sources_tmp})
     ENDIF ()
 
-   if (MSVC)
+    if (MSVC)
       # Do not generate manifests for the plugins - caused issues loading plugins
       set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
     endif()
