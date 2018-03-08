@@ -229,6 +229,14 @@ public:
   vtkGetMacro(GUIOverrideFont, bool);
   //@}
 
+  //@{
+  /**
+   *  Automatically color by **vtkBlockColors** if array is present on `Apply`.
+   */
+  vtkSetMacro(ColorByBlockColorsOnApply, bool);
+  vtkGetMacro(ColorByBlockColorsOnApply, bool);
+  //@}
+
 protected:
   vtkPVGeneralSettings();
   ~vtkPVGeneralSettings() override;
@@ -247,6 +255,7 @@ protected:
   bool LockPanels;
   int GUIFontSize;
   bool GUIOverrideFont;
+  bool ColorByBlockColorsOnApply;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
