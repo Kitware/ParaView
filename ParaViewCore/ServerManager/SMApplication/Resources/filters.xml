@@ -15640,7 +15640,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkPolyData" />
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
@@ -16280,13 +16280,11 @@ source.</Documentation>
                  name="GhostCellsGenerator">
       <Documentation long_help="Generate ghost cells for unstructured grids."
                      short_help="Generate ghost cells for unstructured grids.">
-                     The GhostCellGenerator filter is available when ParaView is
-                     run in parallel (ie. with MPI). It operates on unstructured
-                     grids only.
+                     The GhostCellGenerator operates on unstructured grids only.
                      This filter does not redistribute the input data, it only
-                     generates ghost cells at processor boundary by fetching
+                     generates ghost cells at processor boundaries by fetching
                      topological and geometrical information of those cells on
-                     neighbor ranks. The filter can take benefit of global point
+                     neighbor ranks. The filter can take advantage of global point
                      ids if they are available - if so it will perform faster,
                      otherwise point coordinates will be exchanged and processed.
       </Documentation>
@@ -16296,7 +16294,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="1">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the ghost cells
