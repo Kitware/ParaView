@@ -1,0 +1,1222 @@
+<!--
+* Copyright 2018 NVIDIA Corporation. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*  * Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
+*  * Neither the name of NVIDIA CORPORATION nor the names of its
+*    contributors may be used to endorse or promote products derived
+*    from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<ServerManagerConfiguration>
+    <ProxyGroup name="representations">
+        <RepresentationProxy
+            name="NvidiaIndexRegularVolumeRepresentation"
+            class="vtknvindex_representation"
+            processes="client|renderserver|dataserver"
+            base_proxygroup="representations"
+            base_proxyname="UniformGridVolumeRepresentation">
+            <Documentation>
+                This is identical to the UniformGridVolumeRepresentation except
+                that we are overriding the mapper with
+                NVIDIA IndeX mapper.
+            </Documentation>
+
+          <DoubleVectorProperty
+                command="Getm_roi_range_I"
+                information_only="1"
+                name="range_roiI">
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Min I [%]"
+                name="Min I"
+                command="set_roi_minI"
+                number_of_elements="1"
+                default_values="-100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="min">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiI" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Max I [%]"
+                name="Max I"
+                command="set_roi_maxI"
+                number_of_elements="1"
+                default_values="100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="max">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiI" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+                <Documentation>
+                    Set region of interest
+                </Documentation>
+            </DoubleVectorProperty>
+
+             <DoubleVectorProperty
+                command="Getm_roi_range_J"
+                information_only="1"
+                name="range_roiJ">
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Min J [%]"
+                name="Min J"
+                command="set_roi_minJ"
+                number_of_elements="1"
+                default_values="-100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="min">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiJ" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Max J [%]"
+                name="Max J"
+                command="set_roi_maxJ"
+                number_of_elements="1"
+                default_values="100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="max">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiJ" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+                <Documentation>
+                    Set region of interest
+                </Documentation>
+            </DoubleVectorProperty>
+
+             <DoubleVectorProperty
+                command="Getm_roi_range_K"
+                information_only="1"
+                name="range_roiK">
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Min K [%]"
+                name="Min K"
+                command="set_roi_minK"
+                number_of_elements="1"
+                default_values="-100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="min">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiK" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Max K [%]"
+                name="Max K"
+                command="set_roi_maxK"
+                number_of_elements="1"
+                default_values="100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="max">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiK" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+                <Documentation>
+                    Set region of interest
+                </Documentation>
+            </DoubleVectorProperty>
+
+            <IntVectorProperty
+                name="Subcube Size"
+                command="set_subcube_size"
+                number_of_elements="3"
+                default_values="512 512 512">
+                <Documentation>Set subcube size. This can only be set once before the first rendering</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="Subcube Border"
+                command="set_subcube_border"
+                number_of_elements="1"
+                default_values="3">
+                <Documentation>Set subcube border size,
+                    multiplied by 2 internally</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="Filtering"
+                command="set_filter_mode"
+                number_of_elements="1"
+                default_values="1">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="Nearest"/>
+                    <Entry value="1" text="Trilinear"/>
+                    <Entry value="5" text="Tricubic Catmull"/>
+                    <Entry value="7" text="Tricubic Bspline"/>
+                </EnumerationDomain>
+                <Documentation> Values correspond to that of in IndeX
+                    Trilinear post-HW in IndeX
+                    Tricubic catmull is post-HW in IndeX
+                    Tricubic B-spline is post-HW in IndeX </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="Pre-integration"
+                command="set_preintegration"
+                number_of_elements="1"
+                default_values="1">
+                <BooleanDomain name="bool" />
+                <Documentation>Set Pre-integration.</Documentation>
+            </IntVectorProperty>
+
+          <DoubleVectorProperty
+              label="Step size"
+              name="volume_step_size"
+              panel_visibility="advanced"
+              command="set_volume_step_size"
+              number_of_elements="1"
+              default_values="1.0">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.05"
+                max ="3.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set the distance between two sample points during volume raycasting.
+              Use with care!!, extreme values can lead to performance or quality degradation.
+              Default = 1.0 is best for most situations.
+            </Documentation>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+                name="Volume Opacity"
+                panel_visibility="advanced"
+                command="set_opacity_reference"
+                number_of_elements="1"
+                default_values="1.0">
+                <Documentation>
+                    Set opacity reference
+                </Documentation>
+            </DoubleVectorProperty>
+
+            <IntVectorProperty
+                name="Opacity Mode"
+                panel_visibility="advanced"
+                command="set_opacity_reference_mode"
+                number_of_elements="1"
+                default_values="0">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="Voxel"/>
+                    <Entry value="1" text="Volume"/>
+                    <Entry value="2" text="Custom"/>
+                </EnumerationDomain>
+                <Documentation> Opacity Modes
+                    Voxel   : Reference distance is one voxel.
+                    Volume  : Reference distance is volume dimensions.
+                    Custom  : Reference distance is user defined.
+                </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                label="Log Performance"
+                name="log_performance"
+                panel_visibility="advanced"
+                command="set_log_performance"
+                number_of_elements="1"
+                default_values="0">
+                <BooleanDomain name="bool" />
+                <Documentation>Print performance values in the terminal</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                label="Export Session"
+                name="dump_internal_state"
+                panel_visibility="advanced"
+                command="set_dump_internal_state"
+                number_of_elements="1"
+                default_values="0">
+                <BooleanDomain name="bool" />
+                <Documentation>Dump internal state of NVIDIA IndeX library and write
+                    it into a file nvindex_pvplugin.prj in the plugin source directory.</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="Show Volume"
+                command="show_volume"
+                number_of_elements="1"
+                default_values="1">
+              <BooleanDomain name="bool" />
+              <Documentation>Show/Hide Volume Rendering.</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty command="set_selected_slice"
+                             label="Slice ID"
+                             name="Selected slice"
+                             number_of_elements="1"
+                             default_values="0">
+                <EnumerationDomain name="enum">
+                  <Entry text="Slice 1"
+                         value="0" />
+                  <Entry text="Slice 2"
+                         value="1" />
+                  <Entry text="Slice 3"
+                         value="2" />
+                </EnumerationDomain>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                label="Enabled"
+                name="Enable Slice 1"
+                command="enable_slice1"
+                number_of_elements="1"
+                default_values="0">
+              <BooleanDomain name="bool" />
+              <Documentation>Enable slice rendering.</Documentation>
+                <Hints>
+                  <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="0">
+                  </PropertyWidgetDecorator>
+                </Hints>
+            </IntVectorProperty>
+
+          <IntVectorProperty
+              label="Alignment"
+              name="Slice Mode 1"
+              command="set_slice_mode1"
+              number_of_elements="1"
+              default_values="0">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="X Normal"/>
+              <Entry value="1" text="Y Normal"/>
+              <Entry value="2" text="Z Normal"/>
+            </EnumerationDomain>
+            <Documentation>
+              Slice Modes
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="0">
+              </PropertyWidgetDecorator>
+            </Hints>
+
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+                label="Position [%]"
+                name="Slice Position 1"
+                command="set_slice_pos1"
+                number_of_elements="1"
+                default_values="0">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="-100"
+                  max ="100">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set slice position.
+              </Documentation>
+                <Hints>
+                  <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="0">
+                  </PropertyWidgetDecorator>
+                </Hints>
+            </DoubleVectorProperty>
+
+            <IntVectorProperty
+                label="Enabled"
+                name="Enable Slice 2"
+                command="enable_slice2"
+                number_of_elements="1"
+                default_values="0">
+              <BooleanDomain name="bool" />
+              <Documentation>Enable slice rendering.</Documentation>
+                <Hints>
+                  <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="1">
+                  </PropertyWidgetDecorator>
+                </Hints>
+            </IntVectorProperty>
+
+          <IntVectorProperty
+              label="Alignment"
+              name="Slice Mode 2"
+              command="set_slice_mode2"
+              number_of_elements="1"
+              default_values="0">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="X Normal"/>
+              <Entry value="1" text="Y Normal"/>
+              <Entry value="2" text="Z Normal"/>
+            </EnumerationDomain>
+            <Documentation>
+              Slice Modes
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+                label="Position [%]"
+                name="Slice Position 2"
+                command="set_slice_pos2"
+                number_of_elements="1"
+                default_values="0">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="-100"
+                  max ="100">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set slice position.
+              </Documentation>
+                <Hints>
+                  <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="1">
+                  </PropertyWidgetDecorator>
+                </Hints>
+            </DoubleVectorProperty>
+
+            <IntVectorProperty
+                label="Enabled"
+                name="Enable Slice 3"
+                command="enable_slice3"
+                number_of_elements="1"
+                default_values="0">
+              <BooleanDomain name="bool" />
+              <Documentation>Enable slice rendering.</Documentation>
+                <Hints>
+                  <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="2">
+                  </PropertyWidgetDecorator>
+                </Hints>
+            </IntVectorProperty>
+
+          <IntVectorProperty
+              label="Alignment"
+              name="Slice Mode 3"
+              command="set_slice_mode3"
+              number_of_elements="1"
+              default_values="0">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="X Normal"/>
+              <Entry value="1" text="Y Normal"/>
+              <Entry value="2" text="Z Normal"/>
+            </EnumerationDomain>
+            <Documentation>
+              Slice Modes
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="2">
+              </PropertyWidgetDecorator>
+            </Hints>
+
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+                label="Position [%]"
+                name="Slice Position 3"
+                command="set_slice_pos3"
+                number_of_elements="1"
+                default_values="0">
+            <DoubleRangeDomain
+                name="range"
+                min ="-100"
+                max ="100">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set slice position.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Selected slice" value="2">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <IntVectorProperty
+              label=""
+              name="Filter"
+              command="set_volume_filter"
+              number_of_elements="1"
+              default_values="0">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="None"/>
+              <Entry value="1" text="Isosurface"/>
+              <Entry value="2" text="Depth enhancement"/>
+              <Entry value="3" text="Edge enhancement"/>
+            </EnumerationDomain>
+            <Documentation>
+              It selects the element to be visualized.
+            </Documentation>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+            label="Light type"
+            name="light_type"
+            command="set_light_type"
+            number_of_elements="1"
+            default_values="0">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="Headlight"/>
+              <Entry value="1" text="Orbital"/>
+            </EnumerationDomain>
+            <Documentation>
+              Set light type.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+              label="Azimuth"
+              name="light_angle"
+              command="set_light_angle"
+              number_of_elements="1"
+              default_values="0.0">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.0"
+                max ="360.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set light angle
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="light_type" value="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Elevation"
+              name="light_elevation"
+              command="set_light_elevation"
+              number_of_elements="1"
+              default_values="45.0">
+            <DoubleRangeDomain
+                name="range"
+                min ="-90.0"
+                max ="90.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set light elevation
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="light_type" value="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Ambient"
+              name="surf_ambient"
+              command="set_surf_ambient"
+              number_of_elements="1"
+              default_values="0.15">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.0"
+                max ="1.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set surface ambient level
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Specular"
+              name="surf_specular"
+              command="set_surf_specular"
+              number_of_elements="1"
+              default_values="0.5">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.0"
+                max ="1.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set surface specular level
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Specular power"
+              name="surf_specular_power"
+              command="set_surf_specular_power"
+              number_of_elements="1"
+              default_values="50.0">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.0"
+                max ="100.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set surface specular power
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+
+          <DoubleVectorProperty
+              label="Iso min [%]"
+              name="iso_min"
+              command="set_iso_min"
+              number_of_elements="1"
+              default_values="0">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="100">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set isosurface min value
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Iso max [%]"
+              name="iso_max"
+              command="set_iso_max"
+              number_of_elements="1"
+              default_values="100">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="100">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set isosurface max value
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <IntVectorProperty
+              label="Fill mode"
+              name="iso_fill_mode"
+              command="set_iso_fill_mode"
+              number_of_elements="1"
+              default_values="2">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="No fill"/>
+              <Entry value="1" text="Single color"/>
+              <Entry value="2" text="Colormap"/>
+            </EnumerationDomain>
+            <Documentation>
+              Set isosurface fill mode.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="Use shading"
+              name="iso_use_shading"
+              command="set_iso_use_shading"
+              number_of_elements="1"
+              default_values="1">
+            <BooleanDomain name="bool" />
+            <Documentation>
+              Use shading for isosurface
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="Samples"
+              name="depth_samples"
+              command="set_depth_samples"
+              number_of_elements="1"
+              default_values="8">
+            <IntRangeDomain
+                name="range"
+                min ="1"
+                max ="32">
+            </IntRangeDomain>
+            <Documentation>
+              Set number of samples along the ray
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="2">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+              label="Gamma"
+              name="depth_gamma"
+              command="set_depth_gamma"
+              number_of_elements="1"
+              default_values="0.9">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.01"
+                max ="1.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set gamma correction
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="2">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Edge range"
+              name="edge_range"
+              command="set_edge_range"
+              number_of_elements="1"
+              default_values="1">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="100">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set edge range
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="3">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <IntVectorProperty
+              label="Samples"
+              name="edge_samples"
+              command="set_edge_samples"
+              number_of_elements="1"
+              default_values="6">
+            <IntRangeDomain
+                name="range"
+                min ="1"
+                max ="32">
+            </IntRangeDomain>
+            <Documentation>
+              Set number of samples along the ray
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="3">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <IntVectorProperty
+              label="Shadow samples"
+              name="single_scatt_samples"
+              command="set_single_scatt_samples"
+              number_of_elements="1"
+              default_values="50">
+            <IntRangeDomain
+                name="range"
+                min ="1"
+                max ="200">
+            </IntRangeDomain>
+            <Documentation>
+              Set number of shadow ray samples
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="4">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+              label="Light distance"
+              name="single_scatt_light_distance"
+              command="set_single_scatt_light_distance"
+              number_of_elements="1"
+              default_values="100">
+            <DoubleRangeDomain
+                name="range"
+                min ="0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set the light distance.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="4">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Min alpha"
+              name="single_scatt_min_alpha"
+              command="set_single_scatt_min_alpha"
+              number_of_elements="1"
+              default_values="0.1">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="1">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set the min alpha threshold for scattering.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="4">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Shadow darkness"
+              name="single_scatt_max_shadow"
+              command="set_single_scatt_max_shadow"
+              number_of_elements="1"
+              default_values="0.2">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="1">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set the shadow darkness factor.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="4">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Shadow dampening"
+              name="single_scatt_shadow_exp"
+              command="set_single_scatt_shadow_exp"
+              number_of_elements="1"
+              default_values="1.5">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="20">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set the shadow dampening.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="4">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Gradient threshold"
+              name="isoraycast_threshold"
+              command="set_isoraycast_threshold"
+              number_of_elements="1"
+              default_values="0">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="2">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set gradient threshold
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="5">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+
+          <!-- End of NvidiaIndexRegularVolumeRepresentation -->
+        </RepresentationProxy>
+
+    <!-- ================================================================== -->
+
+        <RepresentationProxy
+            name="NvidiaIndexIrregularVolumeRepresentation"
+            class="vtknvindex_irregular_volume_representation"
+            processes="client|renderserver|dataserver"
+            base_proxygroup="representations"
+            base_proxyname="UnstructuredGridVolumeRepresentation">
+            <Documentation>
+                This is identical to the UniformGridVolumeRepresentation except
+                that we are overriding the mapper with
+                NVIDIA IndeX mapper.
+            </Documentation>
+
+            <DoubleVectorProperty
+                command="Getm_roi_range_I"
+                information_only="1"
+                name="range_roiI">
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Min I [%]"
+                name="Min I"
+                command="set_roi_minI"
+                number_of_elements="1"
+                default_values="-100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="min">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiI" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Max I [%]"
+                name="Max I"
+                command="set_roi_maxI"
+                number_of_elements="1"
+                default_values="100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="max">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiI" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+                <Documentation>
+                    Set region of interest
+                </Documentation>
+            </DoubleVectorProperty>
+
+             <DoubleVectorProperty
+                command="Getm_roi_range_J"
+                information_only="1"
+                name="range_roiJ">
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Min J [%]"
+                name="Min J"
+                command="set_roi_minJ"
+                number_of_elements="1"
+                default_values="-100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="min">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiJ" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Max J [%]"
+                name="Max J"
+                command="set_roi_maxJ"
+                number_of_elements="1"
+                default_values="100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="max">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiJ" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+                <Documentation>
+                    Set region of interest
+                </Documentation>
+            </DoubleVectorProperty>
+
+             <DoubleVectorProperty
+                command="Getm_roi_range_K"
+                information_only="1"
+                name="range_roiK">
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Min K [%]"
+                name="Min K"
+                command="set_roi_minK"
+                number_of_elements="1"
+                default_values="-100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="min">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiK" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Max K [%]"
+                name="Max K"
+                command="set_roi_maxK"
+                number_of_elements="1"
+                default_values="100">
+                <DoubleRangeDomain
+                    name="range"
+                    default_mode="max">
+                    <RequiredProperties>
+                    <Property
+                        function="Range"
+                        name="range_roiK" />
+                    </RequiredProperties>
+                </DoubleRangeDomain>
+                <Documentation>
+                    Set region of interest
+                </Documentation>
+            </DoubleVectorProperty>
+
+            <IntVectorProperty
+                name="Subcube Size"
+                command="set_subcube_size"
+                number_of_elements="3"
+                default_values="512 512 512">
+                <Documentation>Set subcube size. This can only be set once before the first rendering</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="Subcube Border"
+                command="set_subcube_border"
+                number_of_elements="1"
+                default_values="0">
+                <Documentation>Set subcube border size,
+                    multiplied by 2 internally</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="Filtering"
+                command="set_filter_mode"
+                number_of_elements="1"
+                default_values="1">
+                <EnumerationDomain name="enum">
+                    <Entry value="0" text="Nearest"/>
+                    <Entry value="1" text="Trilinear"/>
+                    <Entry value="5" text="Tricubic Catmull"/>
+                    <Entry value="7" text="Tricubic Bspline"/>
+                </EnumerationDomain>
+                <Documentation> Values correspond to that of in IndeX
+                    Trilinear post-HW in IndeX
+                    Tricubic catmull is post-HW in IndeX
+                    Tricubic B-spline is post-HW in IndeX </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                name="Pre-integration"
+                command="set_preintegration"
+                number_of_elements="1"
+                default_values="1">
+                <BooleanDomain name="bool" />
+                <Documentation>Set Pre-integration.</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                label="Log Performance"
+                name="log_performance"
+                panel_visibility="advanced"
+                command="set_log_performance"
+                number_of_elements="1"
+                default_values="0">
+                <BooleanDomain name="bool" />
+                <Documentation>Print performance values in the terminal</Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                label="Export Session"
+                name="dump_internal_state"
+                panel_visibility="advanced"
+                command="set_dump_internal_state"
+                number_of_elements="1"
+                default_values="0">
+                <BooleanDomain name="bool" />
+                <Documentation>Dump internal state of NVIDIA IndeX library and write
+                    it into a file nvindex_pvplugin.prj in the plugin source directory.</Documentation>
+            </IntVectorProperty>
+
+        <!-- End of NvidiaIndexRegularVolumeRepresentation -->
+        </RepresentationProxy>
+
+    <Extension name="UniformGridRepresentation">
+        <Documentation>
+            Extends standard UniformGridRepresentation by adding
+            NvidiaIndexRegularVolumeRepresentation as a new type of representation.
+        </Documentation>
+        <!-- this adds to what is already defined in PVRepresentationBase -->
+        <RepresentationType subproxy="NvidiaIndexRegularVolumeRepresentation"
+        text="NVIDIA IndeX" />
+        <SubProxy>
+        <Proxy name="NvidiaIndexRegularVolumeRepresentation"
+        proxygroup="representations" proxyname="NvidiaIndexRegularVolumeRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="VolumeRepresentation">
+            <Exception name="Input" />
+            <Exception name="Visibility" />
+            <Exception name="Representation" />
+        </ShareProperties>
+
+        <ExposedProperties>
+            <PropertyGroup label="NVIDIA IndeX Region of Interest">
+                  <Property name="Min I"/>
+                  <Property name="Max I"/>
+                  <Property name="Min J"/>
+                  <Property name="Max J"/>
+                  <Property name="Min K"/>
+                  <Property name="Max K"/>
+            </PropertyGroup>
+            <PropertyGroup label="NVIDIA IndeX Volume">
+                  <Property name="Subcube Size"/>
+                  <Property name="Pre-integration"/>
+                  <Property name="Filtering"/>
+                  <Property name="volume_step_size"/>
+                  <Property name="dump_internal_state"/>
+                  <Property name="log_performance"/>
+            </PropertyGroup>
+            <PropertyGroup label="NVIDIA IndeX Slices">
+                <Property name="Show Volume"/>
+                <Property name="Selected slice"/>
+                <Property name="Enable Slice 1"/>
+                <Property name="Slice Mode 1"/>
+                <Property name="Slice Position 1"/>
+                <Property name="Enable Slice 2"/>
+                <Property name="Slice Mode 2"/>
+                <Property name="Slice Position 2"/>
+                <Property name="Enable Slice 3"/>
+                <Property name="Slice Mode 3"/>
+                <Property name="Slice Position 3"/>
+            </PropertyGroup>
+            <PropertyGroup label="NVIDIA IndeX Visual Elements">
+              <Property name="Filter"/>
+              <Property name="light_type"/>
+              <Property name="light_angle"/>
+              <Property name="light_elevation"/>
+              <Property name="surf_ambient"/>
+              <Property name="surf_specular"/>
+              <Property name="surf_specular_power"/>
+              <Property name="iso_min"/>
+              <Property name="iso_max"/>
+              <Property name="iso_fill_mode"/>
+              <Property name="iso_use_shading"/>
+              <Property name="depth_samples"/>
+              <Property name="depth_gamma"/>
+              <Property name="edge_range"/>
+              <Property name="edge_samples"/>
+              <Property name="single_scatt_samples"/>
+              <Property name="single_scatt_light_distance"/>
+              <Property name="single_scatt_min_alpha"/>
+              <Property name="single_scatt_max_shadow"/>
+              <Property name="single_scatt_shadow_exp"/>
+              <Property name="isoraycast_threshold"/>
+            </PropertyGroup>
+        </ExposedProperties>
+
+        </SubProxy>
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+        <Documentation>
+            Extends standard UnstructuredGridRepresentation by adding
+            NvidiaIndexIrregularVolumeRepresentation as a new type of representation.
+        </Documentation>
+        <!-- this adds to what is already defined in PVRepresentationBase -->
+        <RepresentationType subproxy="NvidiaIndexIrregularVolumeRepresentation"
+        text="NVIDIA IndeX" />
+        <SubProxy>
+        <Proxy name="NvidiaIndexIrregularVolumeRepresentation"
+        proxygroup="representations" proxyname="NvidiaIndexIrregularVolumeRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="VolumeRepresentation">
+            <Exception name="Input" />
+            <Exception name="Visibility" />
+            <Exception name="Representation" />
+        </ShareProperties>
+
+        <ExposedProperties>
+            <PropertyGroup label="NVIDIA IndeX Region of Interest">
+                    <Property name="Min I"/>
+                    <Property name="Max I"/>
+                    <Property name="Min J"/>
+                    <Property name="Max J"/>
+                    <Property name="Min K"/>
+                    <Property name="Max K"/>
+            </PropertyGroup>
+            <PropertyGroup label="NVIDIA IndeX Volume">
+                    <Property name="Subcube Size"/>
+                    <!-- <Property name="Pre-integration"/> -->
+                    <!-- <Property name="Filtering"/>  -->
+                    <Property name="dump_internal_state"/>
+                    <Property name="log_performance"/>
+            </PropertyGroup>
+        </ExposedProperties>
+
+        </SubProxy>
+    </Extension>
+    </ProxyGroup>
+
+    <!--<ProxyGroup name="internal_representations">
+    </ProxyGroup>-->
+
+</ServerManagerConfiguration>
