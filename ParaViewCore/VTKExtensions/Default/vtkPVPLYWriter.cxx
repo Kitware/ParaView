@@ -15,6 +15,7 @@
 #include "vtkPVPLYWriter.h"
 
 #include "vtkDataSetAttributes.h"
+#include "vtkDiscretizableColorTransferFunction.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPLYWriter.h"
@@ -28,6 +29,7 @@ vtkStandardNewMacro(vtkPVPLYWriter);
 //----------------------------------------------------------------------------
 vtkPVPLYWriter::vtkPVPLYWriter()
   : EnableColoring(false)
+  , EnableAlpha(false)
 {
   this->SetInputArrayToProcess(
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, static_cast<const char*>(NULL));
@@ -87,6 +89,10 @@ void vtkPVPLYWriter::WriteData()
   {
     this->Writer->SetColorModeToDefault();
     this->Writer->SetArrayName("vtkPVPLYWriterColors");
+    vtkDiscretizableColorTransferFunction* dctf =
+      vtkDiscretizableColorTransferFunction::SafeDownCast(this->LookupTable);
+    bool enableOpacityMapping = dctf->GetEnableOpacityMapping();
+    dctf->SetEnableOpacityMapping(this->EnableAlpha);
     vtkUnsignedCharArray* rgba =
       this->LookupTable->MapScalars(scalars, VTK_COLOR_MODE_MAP_SCALARS, -1);
     rgba->SetName("vtkPVPLYWriterColors");
@@ -97,8 +103,9 @@ void vtkPVPLYWriter::WriteData()
     clone->GetAttributes(fieldAssociation)->AddArray(rgba);
     rgba->FastDelete();
 
-    this->Writer->EnableAlphaOn();
+    this->Writer->SetEnableAlpha(this->EnableAlpha);
     this->Writer->SetInputDataObject(0, clone.GetPointer());
+    dctf->SetEnableOpacityMapping(enableOpacityMapping);
   }
   else
   {
