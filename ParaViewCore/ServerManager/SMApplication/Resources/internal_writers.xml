@@ -262,9 +262,29 @@
         <BooleanDomain name="bool" />
         <Documentation>
           Specify whether color information should be saved in the PLY file.
-          If enable, the data source's coloring state i.e. the array to color with and the transfer function
-          from the active view will be used.
+          If enabled, the data source's array to color with from the active view will be used.
         </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="EnableAlpha"
+                         command="SetEnableAlpha"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether alpha channel information should be saved in the PLY file.
+          If enabled, the data source's transfer function from the active view will be used.
+          This property is disabled if EnableColoring isn't enabled.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="EnableColoring"
+                                   value="1" />
+          <!-- I am keeping this widget always hidden since I don't want the
+               user to be able to change the array in the Writer's dialog.
+               User should change the data's coloring properties in the active view
+               instead -->
+        </Hints>
       </IntVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
