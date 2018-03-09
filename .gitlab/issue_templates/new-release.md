@@ -33,6 +33,18 @@ If the `release` branch is being updated (`vMAJOR.MINOR.0-RC1`):
     - [ ] `Do: merge`
     - [ ] `git push origin update-to-VERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
+  - Create `release` branch for paraview/paraview-superbuild
+    - [ ] Pull latest master
+    - Update `versions.cmake` and `CMakeLists.txt`
+      - [ ] ParaView source selections
+      - [ ] Guide selections
+      - [ ] Assumed version in `CMakeLists.txt`
+    - [ ] Create a merge request targeting `master`
+    - [ ] Build binaries (`Do: test`)
+    - [ ] `Do: merge`
+    - [ ] `git push origin update-to-VERSION:release vVERSION`
+    - [ ] Update kwrobot with the new `release` branch rules
+
 
 If making a release from the `release` branch:
 
@@ -40,6 +52,15 @@ If making a release from the `release` branch:
     - [ ] Update `version.txt`
     - [ ] Create a merge request targeting `master`
     - [ ] Build binaries (`Do: test --superbuild`)
+    - [ ] `Do: merge`
+    - [ ] `git push origin update-to-VERSION:release vVERSION`
+  - Update `release` branch for paraview/paraview-superbuild
+    - Update `versions.cmake` and `CMakeLists.txt`
+      - [ ] ParaView source selections
+      - [ ] Guide selections
+      - [ ] Assumed version in `CMakeLists.txt`
+    - [ ] Create a merge request targeting `master`
+    - [ ] Build binaries (`Do: test`)
     - [ ] `Do: merge`
     - [ ] `git push origin update-to-VERSION:release vVERSION`
 -->
