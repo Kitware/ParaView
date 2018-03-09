@@ -367,6 +367,14 @@ set(_vtk_modules
   # needed for H5PartReader support
   )
 
+if ((NOT WIN32) OR (NOT MSVC) OR (MSVC_VERSION GREATER 1899))
+  # MSVC 2015 (1900) or newer is needed if using MVSC for vtkIOMotionFX
+  list(APPEND _vtk_modules
+    vtkIOMotionFX # needed for vtkMotionFXCFGReader
+    )
+endif()
+
+
 list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
 list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
 list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)

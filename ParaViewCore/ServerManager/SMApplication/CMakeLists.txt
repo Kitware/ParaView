@@ -148,6 +148,12 @@ if (vtkioadios_index GREATER 0)
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_adios.xml)
 endif()
 
+list(FIND VTK_MODULES_ENABLED "vtkIOMotionFX" vtkiomotionfx_index)
+if (vtkiomotionfx_index GREATER 0)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_motionfx.xml)
+endif()
+
 if (PARAVIEW_USE_OPENTURNS)
   list(APPEND requestedResourceFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_openturns.xml)
