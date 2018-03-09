@@ -459,6 +459,24 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/RandomAttributes.xml
 )
 
+if (TARGET pvNVIDIAIndeX)
+  list(APPEND TESTS_WITH_BASELINES
+    ${CMAKE_CURRENT_SOURCE_DIR}/IndeXRepresentation.xml)
+  set(IndeXRepresentation_DISABLE_CS TRUE)
+  set(IndeXRepresentation_DISABLE_CRS TRUE)
+
+  # The embedded free IndeX license doesn't support parallel processing.
+  # Disable the test on MPI builds.
+  if (NOT PARAVIEW_USE_MPI)
+    list(APPEND TESTS_WITH_BASELINES
+      ${CMAKE_CURRENT_SOURCE_DIR}/IndeXRepresentationServer.xml)
+    set(IndeXRepresentationServer_DISABLE_C TRUE)
+    # This won't work until image delivery for the render server is
+    # implemented.
+    set(IndeXRepresentationServer_DISABLE_CRS TRUE)
+  endif ()
+endif ()
+
 if(VTK_USE_LARGE_DATA)
   paraview_test_load_data_dirs(""
     bake
