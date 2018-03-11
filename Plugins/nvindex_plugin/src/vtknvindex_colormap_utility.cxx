@@ -43,8 +43,8 @@
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_colormap::vtknvindex_colormap()
-  : m_color_mtime(0)
-  , m_changed(false)
+  : m_changed(false)
+  , m_color_mtime(0)
   , m_opacity_mtime(0)
 {
   // empty

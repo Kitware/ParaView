@@ -43,8 +43,8 @@
 vtknvindex_volume_importer::vtknvindex_volume_importer(
   const mi::math::Vector_struct<mi::Uint32, 3>& volume_size, const mi::Sint32& border_size,
   const std::string& scalar_type) //,
-  : m_volume_size(volume_size),
-    m_border_size(border_size),
+  : m_border_size(border_size),
+    m_volume_size(volume_size),
     m_scalar_type(scalar_type)
 {
   // empty
