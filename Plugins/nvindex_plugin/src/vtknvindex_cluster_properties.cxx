@@ -137,7 +137,7 @@ mi::Sint32 vtknvindex_cluster_properties::get_cur_local_rank_id() const
   if (it == m_hostmane_to_rankids.end())
     return -1;
 
-  for (mi::Sint32 j = 0; j < it->second.size(); ++j)
+  for (mi::Size j = 0; j < it->second.size(); ++j)
   {
     if (it->second[j] == cur_rank_id)
       return j;
