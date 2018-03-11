@@ -1,3 +1,2 @@
 pv_plugin(pvNVIDIAIndeX
- DESCRIPTION "Plugin for NVIDIA IndeX"
- DEFAULT_ENABLED)
+ DESCRIPTION "Plugin for NVIDIA IndeX")
