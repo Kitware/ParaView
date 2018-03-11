@@ -947,6 +947,9 @@ void vtknvindex_representation::set_light_type(int light_type)
     case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
   }
 }
 
@@ -966,6 +969,9 @@ void vtknvindex_representation::set_light_angle(double light_angle)
     case RTC_KERNELS_SINGLE_SCATTERING:
     case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
       break;
   }
 }
@@ -989,6 +995,9 @@ void vtknvindex_representation::set_light_elevation(double light_elevation)
     case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
   }
 }
 
@@ -1007,6 +1016,9 @@ void vtknvindex_representation::set_surf_ambient(double ambient)
     case RTC_KERNELS_SINGLE_SCATTERING:
     case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
       break;
   }
 }
@@ -1027,6 +1039,9 @@ void vtknvindex_representation::set_surf_specular(double specular)
     case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
   }
 }
 
@@ -1045,6 +1060,9 @@ void vtknvindex_representation::set_surf_specular_power(double specular_power)
     case RTC_KERNELS_SINGLE_SCATTERING:
     case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
       break;
   }
 }
