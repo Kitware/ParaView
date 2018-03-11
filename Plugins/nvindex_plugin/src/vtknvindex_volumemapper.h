@@ -68,6 +68,7 @@ public:
 
   // Get dataset bounding box.
   double* GetBounds() override;
+  using Superclass::GetBounds;
 
   // Shutdown forward loggers, NVIDIA IndeX library and unload libraries.
   void shutdown();

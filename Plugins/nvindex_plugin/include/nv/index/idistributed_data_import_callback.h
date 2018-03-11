@@ -278,6 +278,7 @@ public:
     bbox.max.z = static_cast<mi::Sint32>(mi::math::ceil(bounding_box.max.z));
     return create(bbox, time_step, factory, dice_transaction);
   }
+  using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused.
@@ -325,6 +326,7 @@ public:
   {
     return 0;
   }
+  using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused

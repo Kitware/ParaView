@@ -49,6 +49,8 @@ public:
   // Estimates the volume data size inside the bounding box (in bytes).
   mi::Size estimate(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
     mi::neuraylib::IDice_transaction* dice_transaction) const override;
+  using nv::index::Distributed_discrete_data_import_callback<0xecac5c8d, 0x46d6, 0x43a5, 0xab, 0xa3,
+    0x4, 0xa0, 0xa4, 0xd2, 0x48, 0xa1>::estimate;
 
   // The cluster properties triggered by ParaView.
   void set_cluster_properties(vtknvindex_cluster_properties* host_properties);
@@ -63,6 +65,8 @@ public:
     const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
     nv::index::IData_subset_factory* factory,
     mi::neuraylib::IDice_transaction* dice_transaction) const override;
+  using nv::index::Distributed_discrete_data_import_callback<0xecac5c8d, 0x46d6, 0x43a5, 0xab, 0xa3,
+    0x4, 0xa0, 0xa4, 0xd2, 0x48, 0xa1>::create;
 
   // DiCE methods.
   void serialize(mi::neuraylib::ISerializer* serializer) const override;

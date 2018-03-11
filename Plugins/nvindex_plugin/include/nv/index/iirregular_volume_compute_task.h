@@ -105,6 +105,7 @@ public:
   {
     return 0;
   }
+  using mi::base::Interface_implement<IIrregular_volume_compute_task>::edit;
 
   /// Apply an editing to the scala values only.
   ///
