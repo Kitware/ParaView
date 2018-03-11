@@ -171,8 +171,8 @@ public:
   ///                                     for the dataset subset, which is contained in the given 3D
   ///                                     area.
   ///
-  virtual mi::Size estimate(const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
-    mi::neuraylib::IDice_transaction* dice_transaction) const /*override final*/
+  mi::Size estimate(const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
+    mi::neuraylib::IDice_transaction* dice_transaction) const override /*final*/
   {
     mi::math::Bbox_struct<mi::Sint32, 3> bbox;
     bbox.min.x = static_cast<mi::Sint32>(mi::math::floor(bounding_box.min.x));
@@ -214,9 +214,9 @@ public:
   /// \return                             Returns the portion of the dataset contained in the
   ///                                     3D area.
   ///
-  virtual IDistributed_data_subset* create(
-    const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box, IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const /*override final*/
+  IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
+    IData_subset_factory* factory,
+    mi::neuraylib::IDice_transaction* dice_transaction) const override /*final*/
   {
     mi::math::Bbox_struct<mi::Sint32, 3> bbox;
     bbox.min.x = static_cast<mi::Sint32>(mi::math::floor(bounding_box.min.x));
@@ -265,10 +265,9 @@ public:
   /// \return                             Returns the portion of the dataset contained in the
   ///                                     3D area.
   ///
-  virtual IDistributed_data_subset* create(
-    const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box, mi::Uint32 time_step,
-    IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const /*override final*/
+  IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
+    mi::Uint32 time_step, IData_subset_factory* factory,
+    mi::neuraylib::IDice_transaction* dice_transaction) const override /*final*/
   {
     mi::math::Bbox_struct<mi::Sint32, 3> bbox;
     bbox.min.x = static_cast<mi::Sint32>(mi::math::floor(bounding_box.min.x));
@@ -282,7 +281,7 @@ public:
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused.
-  virtual void serialize(mi::neuraylib::ISerializer* serializer) const
+  void serialize(mi::neuraylib::ISerializer* serializer) const override
   {
     // avoid warnings
     (void)serializer;
@@ -290,14 +289,14 @@ public:
 
   /// Empty body, i.e., no member data is deserialized.
   /// \param[in] deserializer unused
-  virtual void deserialize(mi::neuraylib::IDeserializer* deserializer)
+  void deserialize(mi::neuraylib::IDeserializer* deserializer) override
   {
     // avoid warnings
     (void)deserializer;
   }
 
   /// Empty body, i.e., no configuration for the session exporter given.
-  virtual const char* get_configuration() const { return 0; }
+  const char* get_configuration() const override { return 0; }
 };
 
 /// This mixin class can be used to implement the IDistributed_data_import_callback interface.
@@ -320,16 +319,16 @@ public:
   /// \param[in] factory                  unused.
   /// \param[in] dice_transaction         unused.
   /// \return                             0.
-  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
+  IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
     mi::Uint32 /*time_step*/, IData_subset_factory* /*factory*/,
-    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
+    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const override
   {
     return 0;
   }
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused
-  virtual void serialize(mi::neuraylib::ISerializer* serializer) const
+  void serialize(mi::neuraylib::ISerializer* serializer) const override
   {
     // avoid warnings
     (void)serializer;
@@ -337,14 +336,14 @@ public:
 
   /// Empty body, i.e., no member data is deserialized.
   /// \param[in] deserializer unused
-  virtual void deserialize(mi::neuraylib::IDeserializer* deserializer)
+  void deserialize(mi::neuraylib::IDeserializer* deserializer) override
   {
     // avoid warnings
     (void)deserializer;
   }
 
   /// Empty body, i.e., no configuration for the session exporter given.
-  virtual const char* get_configuration() const { return 0; }
+  const char* get_configuration() const override { return 0; }
 };
 
 } // namespace index

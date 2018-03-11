@@ -65,7 +65,7 @@ class VTK_EXPORT vtknvindex_irregular_volume_representation : public vtkPVDataRe
 public:
   static vtknvindex_irregular_volume_representation* New();
   vtkTypeMacro(vtknvindex_irregular_volume_representation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Register a volume mapper with the representation.
   void AddVolumeMapper(const char* name, vtkUnstructuredGridVolumeMapper*);
@@ -78,19 +78,19 @@ public:
   // The method is typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) override;
 
   // This needs to be called on all instances of vtkGeometryRepresentation when
   // the input is modified. This is essential since the geometry filter does not
   // have any real-input on the client side which messes with the Update
   // requests.
-  virtual void MarkModified();
+  void MarkModified() override;
 
   // Get/Set the visibility for this representation. When the visibility of
   // representation of false, all view passes are ignored.
   // Overridden to propagate to the active representation.
-  virtual void SetVisibility(bool val);
+  void SetVisibility(bool val) override;
 
   //***************************************************************************
   // Forwarded to vtkVolumeRepresentationPreprocessor
@@ -177,22 +177,22 @@ protected:
   ~vtknvindex_irregular_volume_representation();
 
   // Fill input port information.
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   // Adds the representation to the view. This is called from
   // vtkView::AddRepresentation(). The sub classes should override this method.
   // Returns true if the addition succeeds.
-  virtual bool AddToView(vtkView* view);
+  bool AddToView(vtkView* view) override;
 
   // Removes the representation to the view.  This is called from
   // vtkView::RemoveRepresentation().  Subclasses should override this method.
   // Returns true if the removal succeeds.
-  virtual bool RemoveFromView(vtkView* view);
+  bool RemoveFromView(vtkView* view) override;
 
   // Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
-  virtual bool IsCached(double cache_key);
+  bool IsCached(double cache_key) override;
 
   // Passes on parameters to the active volume mapper.
   virtual void UpdateMapperParameters();

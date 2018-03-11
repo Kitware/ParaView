@@ -233,7 +233,7 @@ public:
   /// For video plugins, typically the name of the video codec is used, for example, \c "x264".
   ///
   /// \note This method from #mi::base::Plugin is repeated here only for documentation purposes.
-  virtual const char* get_name() const = 0;
+  const char* get_name() const override = 0;
 
   /// Initializes the plugin.
   ///

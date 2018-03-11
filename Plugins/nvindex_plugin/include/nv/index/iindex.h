@@ -416,7 +416,7 @@ public:
 class Index_canvas : public mi::base::Interface_implement<IIndex_canvas>
 {
 public:
-  virtual void render_tile(const mi::math::Bbox_struct<mi::Uint32, 2>& area, mi::Uint8* buffer)
+  void render_tile(const mi::math::Bbox_struct<mi::Uint32, 2>& area, mi::Uint8* buffer) override
   {
     const mi::Uint32 x_range = area.max.x - area.min.x;
     const mi::Uint32 y_range = area.max.y - area.min.y;
@@ -425,7 +425,7 @@ public:
     this->receive_tile_blend(buffer, buffer_size * 4, area);
   }
 
-  virtual mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const
+  mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const override
   {
     const mi::math::Vector_struct<mi::Sint32, 2> res = get_buffer_resolution();
     mi::math::Vector_struct<mi::Uint32, 2> resolution;

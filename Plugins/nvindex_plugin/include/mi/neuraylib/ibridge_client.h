@@ -372,7 +372,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  virtual const base::IInterface* get_interface(const base::Uuid& interface_id) const
+  const base::IInterface* get_interface(const base::Uuid& interface_id) const override
   {
     if (interface_id == IID())
     {
@@ -393,7 +393,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  virtual base::IInterface* get_interface(const base::Uuid& interface_id)
+  base::IInterface* get_interface(const base::Uuid& interface_id) override
   {
     if (interface_id == IID())
     {
@@ -407,31 +407,31 @@ public:
   using base::Interface_implement<I>::get_interface;
 
   /// Returns the class ID corresponding to the template parameters of this mixin class.
-  virtual base::Uuid get_class_id() const { return IID(); }
+  base::Uuid get_class_id() const override { return IID(); }
 
   /// Empty body. This method from the base class is not needed for client jobs.
-  virtual void deserialize(neuraylib::IDeserializer* deserializer)
+  void deserialize(neuraylib::IDeserializer* deserializer) override
   {
     // avoid warnings
     (void)deserializer;
   }
 
   /// Empty body. The default job references no elements.
-  virtual void get_references(neuraylib::ITag_set* result) const
+  void get_references(neuraylib::ITag_set* result) const override
   {
     // avoid warnings
     (void)result;
   }
 
   /// Empty body. The default job references no elements.
-  virtual void get_references(IElement_set* result) const
+  void get_references(IElement_set* result) const override
   {
     // avoid warnings
     (void)result;
   }
 
   /// Returns \c false in the default implementation.
-  virtual bool upload_only() const { return false; }
+  bool upload_only() const override { return false; }
 };
 
 /// Base class for Bridge jobs that only update elements without executing anything.
@@ -442,13 +442,13 @@ public:
 class Update_job : public mi::bridge::Client_job<0xf9b3c8e2, 0x7688, 0x4bf8, 0x91, 0x36, 0xcd, 0x3a,
                      0x3f, 0x51, 0x30, 0x7a>
 {
-  void serialize(neuraylib::ISerializer* serializer) const
+  void serialize(neuraylib::ISerializer* serializer) const override
   {
     // avoid warnings
     (void)serializer;
   }
 
-  void receive_remote_result(neuraylib::IDeserializer* deserializer, bool last_result)
+  void receive_remote_result(neuraylib::IDeserializer* deserializer, bool last_result) override
   {
     // avoid warnings
     (void)deserializer;

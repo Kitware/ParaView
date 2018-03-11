@@ -1249,7 +1249,7 @@ public:
   /// the objects get transferred to the requesting remote host.
   ///
   /// \param serializer   The serializer to which to write the job content to.
-  virtual void serialize(ISerializer* serializer) const = 0;
+  void serialize(ISerializer* serializer) const override = 0;
 
   /// Deserializes the fragmented job to enable remote job execution of fragments.
   ///
@@ -1259,7 +1259,7 @@ public:
   /// class may additionally generate data required by all fragments, like caches, etc.
   ///
   /// \param deserializer   The deserializer from which to read the job content.
-  virtual void deserialize(IDeserializer* deserializer) = 0;
+  void deserialize(IDeserializer* deserializer) override = 0;
 
   /// Static assignment of fragments to hosts in the cluster.
   ///
@@ -1413,7 +1413,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  virtual const base::IInterface* get_interface(const base::Uuid& interface_id) const
+  const base::IInterface* get_interface(const base::Uuid& interface_id) const override
   {
     if (interface_id == IID())
     {
@@ -1434,7 +1434,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  virtual base::IInterface* get_interface(const base::Uuid& interface_id)
+  base::IInterface* get_interface(const base::Uuid& interface_id) override
   {
     if (interface_id == IID())
     {
@@ -1448,7 +1448,7 @@ public:
   using base::Interface_implement<I>::get_interface;
 
   /// Returns the class ID corresponding to the template parameters of this mixin class.
-  virtual base::Uuid get_class_id() const { return IID(); }
+  base::Uuid get_class_id() const override { return IID(); }
 };
 
 /// This mixin class can be used to implement the #mi::neuraylib::IElement interface.
@@ -1486,7 +1486,7 @@ public:
   //  Overrides the standard release() implementation.
   //
   //  If the release count drops to 1, and the embedded pointer is set, release it.
-  virtual Uint32 release() const
+  Uint32 release() const override
   {
     base::Lock::Block block(&m_pointer_lock);
     base::Interface_implement<I>::retain();
@@ -1507,7 +1507,7 @@ public:
   //  Sets the embedded pointer.
   //
   //  The embedded pointer is used for internal purposes. Users must not use this method.
-  virtual bool set_pointer(const base::IInterface* pointer)
+  bool set_pointer(const base::IInterface* pointer) override
   {
     base::Lock::Block block(&m_pointer_lock);
     if (m_pointer)
@@ -1521,7 +1521,7 @@ public:
   //  Returns the embedded pointer.
   //
   //  The embedded pointer is used for internal purposes. Users must not use this method.
-  virtual const base::IInterface* get_pointer() const
+  const base::IInterface* get_pointer() const override
   {
     base::Lock::Block block(&m_pointer_lock);
     if (m_pointer)
@@ -1530,20 +1530,20 @@ public:
   }
 
   /// Empty body, i.e., leaves \p result unaltered.
-  virtual void get_references(ITag_set* result) const
+  void get_references(ITag_set* result) const override
   {
     // avoid warnings
     (void)result;
   }
 
   /// Assumes that the size of the database element is given by \c sizeof.
-  virtual Size get_size() const { return sizeof(*this); }
+  Size get_size() const override { return sizeof(*this); }
 
   /// By default, multicast distribution for database elements is enabled.
-  virtual bool get_send_to_all_nodes() const { return true; }
+  bool get_send_to_all_nodes() const override { return true; }
 
   /// By default, offloading to disk is disabled.
-  virtual bool get_offload_to_disk() const { return false; }
+  bool get_offload_to_disk() const override { return false; }
 
 private:
   //  The embedded pointer.

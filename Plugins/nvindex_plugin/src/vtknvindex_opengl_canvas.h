@@ -47,30 +47,30 @@ public:
   void initialize_gl();
 
   // Prepare the rendering (called before receive tile).
-  virtual void prepare();
+  void prepare() override;
 
   // Receive tile.
   // \deprecated
-  virtual void receive_tile(mi::Uint8* span_buffer, mi::Uint32 buffer_size,
-    const mi::math::Bbox_struct<mi::Uint32, 2>& covered_area);
+  void receive_tile(mi::Uint8* span_buffer, mi::Uint32 buffer_size,
+    const mi::math::Bbox_struct<mi::Uint32, 2>& covered_area) override;
 
   // Receive tile and blend it.
   // \deprecated
-  virtual void receive_tile_blend(mi::Uint8* span_buffer, mi::Uint32 buffer_size,
-    const mi::math::Bbox_struct<mi::Uint32, 2>& covered_area);
+  void receive_tile_blend(mi::Uint8* span_buffer, mi::Uint32 buffer_size,
+    const mi::math::Bbox_struct<mi::Uint32, 2>& covered_area) override;
 
   // Finish the operations applied to the canvas (called once all tiles have been received).
-  virtual void finish();
+  void finish() override;
 
   // The present tile rendering using OpenGL is not capable of
   // using multiple threads, because OpenGL requires a context
   // bound to each thread.
-  virtual bool is_multi_thread_capable() const;
+  bool is_multi_thread_capable() const override;
 
   // Set/get OpenGL viewport resolution.
-  virtual void set_buffer_resolution(
-    const mi::math::Vector_struct<mi::Sint32, 2>& main_window_resolution);
-  virtual mi::math::Vector_struct<mi::Sint32, 2> get_buffer_resolution() const;
+  void set_buffer_resolution(
+    const mi::math::Vector_struct<mi::Sint32, 2>& main_window_resolution) override;
+  mi::math::Vector_struct<mi::Sint32, 2> get_buffer_resolution() const override;
 
   // Stores the VTK Renderer pointer.
   void set_vtk_renderer(vtkRenderer* vtk_renderer);
