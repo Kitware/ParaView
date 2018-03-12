@@ -16792,5 +16792,41 @@ source.</Documentation>
       </DoubleVectorProperty>
     <!-- End vtkHyperTreeGridAxisClip -->
     </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridAxisCut"
+                 name="HyperTreeGridAxisCut"
+                 label="Hyper Tree Grid - Axis Cut">
+      <Documentation short_help="Cut a 3D HTG along an axis-aligned plane.">
+        Cut a hyper tree grid along an axis-aligned plane and output a new hyper
+        tree grid. Only works for 3D grids.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="PlaneNormal"
+                         command="SetPlaneNormalAxis"
+                         number_of_elements="1"
+                         default_values="0">
+          <EnumerationDomain name="enum">
+            <Entry text="X Axis" value="0" />
+            <Entry text="Y Axis" value="1" />
+            <Entry text="Z Axis" value="2" />
+          </EnumerationDomain>
+        <Documentation>Axis to use as the normal to the cut plane.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="PlanePosition"
+                            command="SetPlanePosition"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <Documentation>Position of the cut plane along the normal axis.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End vtkHyperTreeGridAxisClut -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
