@@ -52,7 +52,8 @@ public:
   std::ostringstream& get_message(mi::Uint32 level);
 
   // Set message and severity values.
-  virtual void message(mi::base::Message_severity level, const char* category, const char* message);
+  void message(
+    mi::base::Message_severity level, const char* category, const char* message) override;
 
 private:
   // Output stream.

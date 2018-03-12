@@ -137,7 +137,7 @@ mi::Sint32 vtknvindex_cluster_properties::get_cur_local_rank_id() const
   if (it == m_hostmane_to_rankids.end())
     return -1;
 
-  for (mi::Sint32 j = 0; j < it->second.size(); ++j)
+  for (mi::Size j = 0; j < it->second.size(); ++j)
   {
     if (it->second[j] == cur_rank_id)
       return j;
@@ -336,18 +336,17 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
     }
     else // vtknvindex_scene::VOLUME_TYPE_IRREGULAR
     {
-      mi::Uint64 scalars_size = 0;
       vtknvindex_irregular_volume_data* volume_data =
         static_cast<vtknvindex_irregular_volume_data*>(dataset_parameters.volume_data);
 
       if (scalar_type == "unsigned char")
-        scalars_size = volume_data->num_points * sizeof(mi::Uint8);
+        ;
       else if (scalar_type == "unsigned short")
-        scalars_size = volume_data->num_points * sizeof(mi::Uint16);
+        ;
       else if (scalar_type == "float")
-        scalars_size = volume_data->num_points * sizeof(mi::Float32);
+        ;
       else if (scalar_type == "double")
-        scalars_size = volume_data->num_points * sizeof(mi::Float64);
+        ;
       else
       {
         ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";

@@ -438,7 +438,7 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
 
   // Starting the NVIDIA IndeX library.
   mi::Uint32 start_result = 0;
-  if (start_result = m_nvindex_interface->start(true) != 0)
+  if ((start_result = m_nvindex_interface->start(true)) != 0)
   {
     ERROR_LOG << "Start of the NVIDIA IndeX library failed.";
   }

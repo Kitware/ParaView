@@ -124,11 +124,11 @@ public:
   void print_info() const;
 
   // DiCE database element methods
-  mi::neuraylib::IElement* copy() const;
-  virtual void serialize(mi::neuraylib::ISerializer* serializer) const;
-  virtual void deserialize(mi::neuraylib::IDeserializer* deserializer);
-  virtual const char* get_class_name() const;
-  virtual mi::base::Uuid get_class_id() const;
+  mi::neuraylib::IElement* copy() const override;
+  void serialize(mi::neuraylib::ISerializer* serializer) const override;
+  void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
+  const char* get_class_name() const override;
+  mi::base::Uuid get_class_id() const override;
 
   // Build the host list with its rank list assignments.
   void build_hosts_rank_distribution();

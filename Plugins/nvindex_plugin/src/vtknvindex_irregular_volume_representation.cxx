@@ -204,14 +204,11 @@ int vtknvindex_irregular_volume_representation::RequestData(
 
     // Check for time series data info.
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-    mi::Sint32 nb_time_steps = 0;
     mi::Float32 cur_time_step = 0;
     int has_time_steps = inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
     if (has_time_steps)
     {
-      nb_time_steps = inInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-
       cur_time_step = inInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     }
 

@@ -61,7 +61,7 @@ class VTK_EXPORT vtknvindex_irregular_volume_mapper : public vtkUnstructuredGrid
 public:
   static vtknvindex_irregular_volume_mapper* New();
   vtkTypeMacro(vtknvindex_irregular_volume_mapper, vtkUnstructuredGridVolumeMapper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtknvindex_irregular_volume_mapper();
   ~vtknvindex_irregular_volume_mapper();
@@ -70,7 +70,7 @@ public:
   void shutdown();
 
   // Overriding from vtkUnstructuredGridVolumeMapper.
-  virtual void Render(vtkRenderer* ren, vtkVolume* vol);
+  void Render(vtkRenderer* ren, vtkVolume* vol) override;
 
   // Load and setup NVIDIA IndeX library.
   bool initialize_nvindex();

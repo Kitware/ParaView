@@ -174,7 +174,7 @@ public:
 protected:
   // Sends the contents of the string buffer to the logger, clears the string buffer, and resets
   // the log level to the default log level.
-  int sync()
+  int sync() override
   {
     std::stringbuf::sync();
     const std::string& s = str();
