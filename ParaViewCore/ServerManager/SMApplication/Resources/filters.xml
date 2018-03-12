@@ -16828,5 +16828,41 @@ source.</Documentation>
       </DoubleVectorProperty>
       <!-- End vtkHyperTreeGridAxisClut -->
     </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridAxisReflection"
+                 name="HyperTreeGridAxisReflection"
+                 label="Hyper Tree Grid - Axis Reflection">
+      <Documentation short_help="Reflect an HTG across an axis-aligned plane.">
+        This filter reflect the cells of a hyper tree grid with respect to
+        one of the planes parallel to the bounding box of the data set.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="PlaneNormal"
+                         command="SetPlane"
+                         number_of_elements="1"
+                         default_values="0">
+          <EnumerationDomain name="enum">
+            <Entry text="X Axis" value="6" />
+            <Entry text="Y Axis" value="7" />
+            <Entry text="Z Axis" value="8" />
+          </EnumerationDomain>
+        <Documentation>Axis to use as the normal to the reflection plane.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="PlanePosition"
+                            command="SetCenter"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <Documentation>Position of the reflection plane along the normal axis.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End vtkHyperTreeGridAxisReflection -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
