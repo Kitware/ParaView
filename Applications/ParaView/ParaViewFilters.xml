@@ -54,6 +54,9 @@
 
   <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
     <Proxy group="filters" name="HyperTreeGridAxisClip" />
+    <Proxy group="filters" name="HyperTreeGridContour" />
+    <Proxy group="filters" name="HyperTreeGridThreshold" />
+    <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
   </Category>
 
   <Category name="Statistics" menu_label="&amp;Statistics">
@@ -199,9 +202,6 @@
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" />
-  <Proxy group="filters" name="HyperTreeGridContour" />
-  <Proxy group="filters" name="HyperTreeGridThreshold" />
-  <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="IntegrateAttributes" />

@@ -16552,7 +16552,7 @@ source.</Documentation>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridContour"
-                 label="HyperTreeGrid Contour"
+                 label="Hyper Tree Grid - Contour"
                  name="HyperTreeGridContour">
       <Documentation long_help="Specialized Contour filter for HyperTreeGrid."
                      short_help="Contour filter for HyperTreeGrid.">
@@ -16617,7 +16617,7 @@ source.</Documentation>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridThreshold"
-                 label="HyperTreeGrid Threshold"
+                 label="Hyper Tree Grid - Threshold"
                  name="HyperTreeGridThreshold">
       <Documentation long_help="Specialized Threshold filter for HyperTreeGrid."
                      short_help="Threshold filter for HyperTreeGrid.">
