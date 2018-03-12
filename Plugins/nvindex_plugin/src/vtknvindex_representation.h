@@ -67,25 +67,25 @@ class VTK_EXPORT vtknvindex_representation : public vtkImageVolumeRepresentation
 public:
   static vtknvindex_representation* New();
   vtkTypeMacro(vtknvindex_representation, vtkImageVolumeRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Overrides from vtkImageVolumeRepresentation.
-  virtual int ProcessViewRequest(
-    vtkInformationRequestKey* request_type, vtkInformation* inInfo, vtkInformation* outInfo);
+  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+    vtkInformation* outInfo) override;
 
-  virtual bool AddToView(vtkView* view);
-  virtual bool RemoveFromView(vtkView* view);
+  bool AddToView(vtkView* view) override;
+  bool RemoveFromView(vtkView* view) override;
 
   // Overrides for correct ghost cell.
   int RequestDataBase(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+  int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
   // Overrides from vtkPVDataRepresentation.
-  virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
+  int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
   //
   // Configuration options set by ParaView GUI.

@@ -148,8 +148,8 @@ bool vtknvindex_irregular_volume_mapper::initialize_nvindex()
   }
 
   mi::Uint32 setup_result = 0;
-  if (setup_result =
-        m_application_context.setup_nvindex_library(m_cluster_properties->get_host_names()) != 0)
+  if ((setup_result =
+          m_application_context.setup_nvindex_library(m_cluster_properties->get_host_names())) != 0)
   {
     ERROR_LOG << "Failed to start the NVIDIA IndeX library: " << setup_result << ".";
     return false;

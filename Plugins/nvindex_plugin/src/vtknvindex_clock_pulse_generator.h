@@ -52,9 +52,9 @@ public:
   void set_tick(mi::Float64 tick);
 
   // Implementation of Ivtknvindex_clock_pulse_generator.
-  virtual mi::Float64 get_tick() { return m_t; }
-  virtual mi::Float64 get_start() const { return m_t_start; }
-  virtual mi::Float64 get_end() const { return m_t_end; }
+  mi::Float64 get_tick() override { return m_t; }
+  mi::Float64 get_start() const override { return m_t_start; }
+  mi::Float64 get_end() const override { return m_t_end; }
 
 private:
   mi::Float64 m_t;

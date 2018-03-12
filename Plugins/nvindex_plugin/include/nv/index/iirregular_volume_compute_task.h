@@ -99,19 +99,19 @@ class Irregular_volume_compute_task
 {
 public:
   /// Empty implementations
-  virtual nv::index::IIrregular_volume_subset* edit(
-    const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
+  nv::index::IIrregular_volume_subset* edit(const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
     const IIrregular_volume_subset* /*subset_data*/, nv::index::IData_subset_factory* /*factory*/,
-    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
+    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const override
   {
     return 0;
   }
+  using mi::base::Interface_implement<IIrregular_volume_compute_task>::edit;
 
   /// Apply an editing to the scala values only.
   ///
   /// \return compute mode for the task.
   ///
-  virtual Operation_mode get_operation_mode() const { return OPERATION_MODE_SCALA_VALUE_EDITING; }
+  Operation_mode get_operation_mode() const override { return OPERATION_MODE_SCALA_VALUE_EDITING; }
 };
 }
 } // namespace index / nv

@@ -173,9 +173,9 @@ std::string vtknvindex_forwarding_logger::level_to_string(mi::base::Message_seve
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_forwarding_logger_factory::vtknvindex_forwarding_logger_factory()
-  : m_iindex_if()
+  : m_header_str("")
+  , m_iindex_if()
   , m_fallback_severity_level(mi::base::MESSAGE_SEVERITY_INFO)
-  , m_header_str("")
 {
   // empty
 }

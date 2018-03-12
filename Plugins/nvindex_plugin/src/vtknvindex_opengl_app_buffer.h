@@ -43,18 +43,18 @@ public:
 
   // Returns the resolution (width,height) in pixels.
   // Returns (-1, -1) if not initialized.
-  virtual mi::math::Vector_struct<mi::Sint32, 2> get_resolution() const;
+  mi::math::Vector_struct<mi::Sint32, 2> get_resolution() const override;
 
   // Get the pointer to the Z-buffer, same structure as OpenGL Z-buffer.
   // Returns NULL if not initialized.
   // This returns writable raw pointer. Use with care.
   // Depth value is in the range [0, maxuint].
   // Returns pointer to the top address of mi::Uint32[pixel_count].
-  virtual mi::Uint32* get_z_buffer_ptr();
+  mi::Uint32* get_z_buffer_ptr() override;
 
   // Set/Get Z-buffer precision (bits).
   void set_z_buffer_precision(mi::Uint32 precision);
-  mi::Uint32 get_z_buffer_precision() const;
+  mi::Uint32 get_z_buffer_precision() const override;
 
   // Resizes the buffer, results in memory reallocation.
   void resize_buffer(mi::math::Vector_struct<mi::Sint32, 2> const& new_resolution);

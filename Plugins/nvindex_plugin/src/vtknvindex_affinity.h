@@ -93,21 +93,21 @@ public:
     const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 host_id = ~0u, mi::Uint32 gpu_id = ~0u);
 
   // Get the set affinity information for a given bbox.
-  virtual bool get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion,
-    mi::Uint32& host_id, mi::Uint32& gpu_id) const;
+  bool get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion, mi::Uint32& host_id,
+    mi::Uint32& gpu_id) const override;
 
   // Get the number of subregions produced by NVIDIA IndeX.
-  virtual mi::Uint32 get_nb_subregions() const;
+  mi::Uint32 get_nb_subregions() const override;
   // Get the bounding box associated to a subregion.
-  virtual mi::math::Bbox_struct<mi::Float32, 3> get_subregion(mi::Uint32 index) const;
+  mi::math::Bbox_struct<mi::Float32, 3> get_subregion(mi::Uint32 index) const override;
 
   // Print the affinity information as part of the scene dump.
   void scene_dump_affinity_info(std::ostringstream& s);
 
   // DiCE methods
-  virtual mi::base::Uuid get_class_id() const;
-  virtual void serialize(mi::neuraylib::ISerializer* serializer) const;
-  virtual void deserialize(mi::neuraylib::IDeserializer* deserializer);
+  mi::base::Uuid get_class_id() const override;
+  void serialize(mi::neuraylib::ISerializer* serializer) const override;
+  void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
 
 private:
   // Get a gpu id for the given host using robin-round scheme.

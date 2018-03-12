@@ -50,7 +50,7 @@ public:
       \param size   The requested size of memory in bytes. It may be zero.
       \return       The allocated memory block.
   */
-  virtual void* malloc(Size size)
+  void* malloc(Size size) override
   {
     // Use non-throwing new call, which may return NULL instead
     return ::new (std::nothrow) char[size];
@@ -64,7 +64,7 @@ public:
       \param  memory   A memory block previously allocated by a call to #malloc().
                        If \c memory is \c NULL, no operation is performed.
   */
-  virtual void free(void* memory) { ::delete[] reinterpret_cast<char*>(memory); }
+  void free(void* memory) override { ::delete[] reinterpret_cast<char*>(memory); }
 
   /// Returns the single instance of the default allocator.
   static IAllocator* get_instance()

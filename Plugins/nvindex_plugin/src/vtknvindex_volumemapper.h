@@ -61,19 +61,20 @@ class VTK_EXPORT vtknvindex_volumemapper : public vtkSmartVolumeMapper
 public:
   static vtknvindex_volumemapper* New();
   vtkTypeMacro(vtknvindex_volumemapper, vtkSmartVolumeMapper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtknvindex_volumemapper();
   ~vtknvindex_volumemapper();
 
   // Get dataset bounding box.
-  virtual double* GetBounds();
+  double* GetBounds() override;
+  using Superclass::GetBounds;
 
   // Shutdown forward loggers, NVIDIA IndeX library and unload libraries.
   void shutdown();
 
   // Overriding from vtkSmartVolumeMapper.
-  virtual void Render(vtkRenderer* ren, vtkVolume* vol);
+  void Render(vtkRenderer* ren, vtkVolume* vol) override;
 
   // Load and setup NVIDIA IndeX library
   bool initialize_nvindex();

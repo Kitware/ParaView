@@ -47,29 +47,32 @@ public:
     const mi::Sint32& border_size, const std::string& scalar_type);
 
   // Estimates the volume data size inside the bounding box (in bytes).
-  virtual mi::Size estimate(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
-    mi::neuraylib::IDice_transaction* dice_transaction) const;
+  mi::Size estimate(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
+    mi::neuraylib::IDice_transaction* dice_transaction) const override;
+  using nv::index::Distributed_discrete_data_import_callback<0xecac5c8d, 0x46d6, 0x43a5, 0xab, 0xa3,
+    0x4, 0xa0, 0xa4, 0xd2, 0x48, 0xa1>::estimate;
 
   // The cluster properties triggered by ParaView.
   void set_cluster_properties(vtknvindex_cluster_properties* host_properties);
 
   // NVIDIA IndeX triggers this callback if time varying data shall be imported.
-  virtual nv::index::IDistributed_data_subset* create(
-    const mi::math::Bbox_struct<mi::Sint32, 3>& bbox, mi::Uint32 time_step,
-    nv::index::IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const;
+  nv::index::IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Sint32, 3>& bbox,
+    mi::Uint32 time_step, nv::index::IData_subset_factory* factory,
+    mi::neuraylib::IDice_transaction* dice_transaction) const override;
 
   // Create internal storage of ParaView's subset inside bounding box.
-  virtual nv::index::IDistributed_data_subset* create(
+  nv::index::IDistributed_data_subset* create(
     const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
     nv::index::IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const;
+    mi::neuraylib::IDice_transaction* dice_transaction) const override;
+  using nv::index::Distributed_discrete_data_import_callback<0xecac5c8d, 0x46d6, 0x43a5, 0xab, 0xa3,
+    0x4, 0xa0, 0xa4, 0xd2, 0x48, 0xa1>::create;
 
   // DiCE methods.
-  virtual void serialize(mi::neuraylib::ISerializer* serializer) const;
-  virtual void deserialize(mi::neuraylib::IDeserializer* deserializer);
+  void serialize(mi::neuraylib::ISerializer* serializer) const override;
+  void deserialize(mi::neuraylib::IDeserializer* deserializer) override;
   virtual void get_references(mi::neuraylib::ITag_set* result) const;
-  virtual mi::base::Uuid subset_id() const;
+  mi::base::Uuid subset_id() const override;
 
 private:
   // Use appropriate voxel storage.
