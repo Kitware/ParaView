@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout" columnstretch="1,0,0,0,0,0,0">
-   <item row="1" column="2">
+   <item row="1" column="3">
     <widget class="QPushButton" name="RescaleCustom">
      <property name="toolTip">
       <string>Rescale to custom range</string>
