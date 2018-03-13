@@ -2430,13 +2430,15 @@ def SetProgressPrintingEnabled(value):
     if value and not GetProgressPrintingIsEnabled():
         if paraview.fromGUI:
             raise RuntimeError("Printing progress in the GUI is not supported.")
-        progressObserverTag = vtkProcessModule.GetProcessModule().AddObserver(\
-            "ProgressEvent", _printProgress)
+        if ActiveConnection and ActiveConnection.Session:
+            progressObserverTag = ActiveConnection.Session.GetProgressHandler().AddObserver(
+                "ProgressEvent", _printProgress)
 
     # If value is false and progress printing is currently on...
     elif GetProgressPrintingIsEnabled():
-        vtkProcessModule.GetProcessModule().RemoveObserver(progressObserverTag)
-        progressObserverTag = None
+        if ActiveConnection and ActiveConnection.Session:
+            ActiveConnection.Session.GetProgressHandler().RemoveObserver(progressObserverTag)
+            progressObserverTag = None
 
 def ToggleProgressPrinting():
     """Turn on/off printing of progress.  See SetProgressPrintingEnabled."""
@@ -2572,14 +2574,8 @@ def _printProgress(caller, event):
     global currentAlgorithm, currentProgress
 
     pm = vtkProcessModule.GetProcessModule()
-    progress = pm.GetLastProgress() / 10
-    # If we got a 100% as the first thing, ignore
-    # This is to get around the fact that some vtk
-    # algorithms report 100% more than once (which is
-    # a bug)
-    if not currentAlgorithm and progress == 10:
-        return
-    alg = pm.GetLastProgressName()
+    progress = caller.GetLastProgress()
+    alg = caller.GetLastProgressText()
     if alg != currentAlgorithm and alg:
         if currentAlgorithm:
             while currentProgress <= 10:
