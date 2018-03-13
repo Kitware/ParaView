@@ -141,8 +141,7 @@ protected:
    * Build the VBO/IBO, called by UpdateBufferObjects
    */
   void AppendOneBufferObject(vtkRenderer* ren, vtkActor* act, vtkCompositeMapperHelperData* hdata,
-    unsigned int& flat_index, std::vector<unsigned char>& colors,
-    std::vector<float>& norms) override;
+    vtkIdType& flat_index, std::vector<unsigned char>& colors, std::vector<float>& norms) override;
 
   /**
    * Update uniforms of shaders
@@ -263,7 +262,7 @@ void vtkExtrusionMapperHelper::PrintSelf(ostream& os, vtkIndent indent)
 
 //-------------------------------------------------------------------------
 void vtkExtrusionMapperHelper::AppendOneBufferObject(vtkRenderer* ren, vtkActor* act,
-  vtkCompositeMapperHelperData* hdata, unsigned int& voffset, std::vector<unsigned char>& newColors,
+  vtkCompositeMapperHelperData* hdata, vtkIdType& voffset, std::vector<unsigned char>& newColors,
   std::vector<float>& newNorms)
 {
   vtkExtrusionMapper* parent = static_cast<vtkExtrusionMapper*>(this->Parent);

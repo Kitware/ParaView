@@ -941,9 +941,6 @@
     { "name": "vtkMetaIO",
       "path": "VTK/Utilities/MetaIO"
     },
-    { "name": "vtkParseOGLExt",
-      "path": "VTK/Utilities/ParseOGLExt"
-    },
     { "name": "vtkglew",
       "path": "VTK/ThirdParty/glew"
     },
