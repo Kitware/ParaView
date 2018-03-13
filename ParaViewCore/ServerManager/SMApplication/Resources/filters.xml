@@ -15990,6 +15990,27 @@ source.</Documentation>
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <!-- cell locator begin -->
+      <ProxyProperty command="SetCellLocatorPrototype"
+                     label="Cell Locator"
+                     name="CellLocator"
+                     panel_visibility="advanced">
+        <ProxyGroupDomain name="groups">
+          <Group name="cell_locators" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="cell_locators"
+                 name="StaticCellLocator" />
+          <Proxy group="cell_locators"
+                 name="CellTreeLocator" />
+          <Proxy group="cell_locators"
+                 name="CellLocator" />
+        </ProxyListDomain>
+        <Documentation>The cell locator to use for finding cells for probing.
+        </Documentation>
+      </ProxyProperty>
+      <!-- cell locator end -->
+
       <!-- End vtkResampleToImage -->
     </SourceProxy>
     <!-- ==================================================================== -->
