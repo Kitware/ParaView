@@ -986,16 +986,11 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     if (property_group_tag != -1)
     {
       // Create decorators, if any.
-      pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-      for (pqPropertyWidgetInterface* interface :
-        interfaceTracker->interfaces<pqPropertyWidgetInterface*>())
+      const auto decoratorXMLs = getDecorators(groupHints[property_group_tag]);
+      for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
       {
-        const auto decoratorXMLs = getDecorators(groupHints[property_group_tag]);
-        for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
-        {
-          Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
-          pqPropertyWidgetDecorator::create(decoratorXML, propertyWidget);
-        }
+        Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
+        pqPropertyWidgetDecorator::create(decoratorXML, propertyWidget);
       }
     }
 

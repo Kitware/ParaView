@@ -82,6 +82,7 @@ paraview_test_load_data(""
   vehicle_data.csv
   viscoplastic-ring.h5
   waveletMaterial.vti
+  TestCompositePropertyWidgetDecoratorPlugin.xml
   )
 
 SET (TESTS_WITHOUT_BASELINES
@@ -99,6 +100,7 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StringInLineChartView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TableHistogram.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestCompositePropertyWidgetDecorator.xml
 )
 
 if (PARAVIEW_ENABLE_PYTHON)

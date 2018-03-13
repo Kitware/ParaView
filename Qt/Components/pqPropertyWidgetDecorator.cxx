@@ -44,7 +44,7 @@ pqPropertyWidgetDecorator::pqPropertyWidgetDecorator(
   : Superclass(parentObject)
   , XML(xmlConfig)
 {
-  Q_ASSERT(parentObject != NULL);
+  Q_ASSERT(parentObject);
   parentObject->addDecorator(this);
 }
 

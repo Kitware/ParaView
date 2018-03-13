@@ -7011,19 +7011,13 @@ array.
         exact clip is very expensive as it requires generating 6 plane clips. Additionally,
         **Invert** must be checked and **Crinkle clip** must be unchecked.</Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipFunction"
-                                   value="Box"
-                                   inverse="0" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="enabled_state"
-                                   property="Invert"
-                                   value="1" />
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="enabled_state"
-                                   property="PreserveInputCells"
-                                   value="0" />
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="ClipFunction" value="Box" inverse="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="Invert" value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="enabled_state" property="PreserveInputCells" value="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <Hints>
