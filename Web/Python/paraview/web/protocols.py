@@ -30,6 +30,7 @@ from vtkmodules.vtkWebCore                  import vtkDataEncoder, vtkWebInterac
 from vtkmodules.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
 from vtkmodules.vtkPVServerManagerCore      import vtkSMProxyManager
 from vtkmodules.vtkCommonDataModel          import vtkDataObject
+from vtkmodules.vtkPVClientServerCoreCore   import vtkProcessModule
 
 if sys.version_info >= (3,):
     xrange = range
@@ -717,6 +718,30 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         self.getApplication().InvokeEvent('UpdateEvent')
         return { 'result': 'success' }
 
+# =============================================================================
+#
+# Provide Progress support
+#
+# =============================================================================
+
+class ParaViewWebProgressUpdate(ParaViewWebProtocol):
+    progressObserverTag = None
+
+    def __init__(self):
+        super(ParaViewWebProgressUpdate, self).__init__()
+        self.listenToProgress()
+
+    def listenToProgress(self):
+        progressHandler = simple.servermanager.ActiveConnection.Session.GetProgressHandler()
+        if not ParaViewWebProgressUpdate.progressObserverTag:
+            ParaViewWebProgressUpdate.progressObserverTag = progressHandler.AddObserver(
+                'ProgressEvent',
+                lambda handler, event: self.updateProgress(handler))
+
+    def updateProgress(self, caller):
+        txt = caller.GetLastProgressText()
+        progress = caller.GetLastProgress()
+        self.publish('paraview.progress', { 'text': txt, 'progress': progress })
 
 # =============================================================================
 #
