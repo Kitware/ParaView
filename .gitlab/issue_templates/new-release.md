@@ -9,9 +9,8 @@ following strings with the associated values:
 Please remove this comment.
 -->
 
-# Prepatory steps
+# Preparatory steps
 
-  - [ ] Announce to `paraview-developers@paraview.org`
   - Update ParaView guides
     - [ ] User manual
       - [ ] Uploaded
@@ -23,44 +22,25 @@ Please remove this comment.
 <!--
 Keep the relevant items for the kind of release this is.
 
-If the `release` branch is being updated (`vMAJOR.MINOR.0-RC1`):
+If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
 
-  - Create release branch
-    - [ ] Pull latest master
+  - Update `release` branch for **paraview**
+    - [ ] Pull latest `master`
     - [ ] Update `version.txt`
     - [ ] Create a merge request targeting `master`
-    - [ ] Build binaries (`Do: test --superbuild`)
-    - [ ] `Do: merge`
-    - [ ] `git push origin update-to-VERSION:release vVERSION`
-    - [ ] Update kwrobot with the new `release` branch rules
-  - Create `release` branch for paraview/paraview-superbuild
-    - [ ] Pull latest master
-    - Update `versions.cmake` and `CMakeLists.txt`
-      - [ ] ParaView source selections
-      - [ ] Guide selections
-      - [ ] Assumed version in `CMakeLists.txt`
-    - [ ] Create a merge request targeting `master`
-    - [ ] Build binaries (`Do: test`)
+    - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] `git push origin update-to-VERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
-
-If making a release from the `release` branch:
+If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
 
   - Update release branch
+    - [ ] Pull latest `release`
     - [ ] Update `version.txt`
     - [ ] Create a merge request targeting `master`
     - [ ] Build binaries (`Do: test --superbuild`)
-    - [ ] `Do: merge`
-    - [ ] `git push origin update-to-VERSION:release vVERSION`
-  - Update `release` branch for paraview/paraview-superbuild
-    - Update `versions.cmake` and `CMakeLists.txt`
-      - [ ] ParaView source selections
-      - [ ] Guide selections
-      - [ ] Assumed version in `CMakeLists.txt`
-    - [ ] Create a merge request targeting `master`
-    - [ ] Build binaries (`Do: test`)
+    - [ ] Get positive review
     - [ ] `Do: merge`
     - [ ] `git push origin update-to-VERSION:release vVERSION`
 -->
@@ -72,24 +52,65 @@ If making a release from the `release` branch:
     - [ ] `rsync -rptv $tarballs paraview.release:ParaView_Release/vMAJOR.MINOR/`
   - [ ] Update the superbuild
 
+<!--
+Keep the relevant items for the kind of release this is.
+
+If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
+
+  - Update `release` branch for **paraview/paraview-superbuild**
+    - [ ] Pull latest `master`
+    - Update `versions.cmake` and `CMakeLists.txt`
+      - [ ] ParaView source selections
+      - [ ] Guide selections
+      - [ ] Assumed version in `CMakeLists.txt`
+    - [ ] Create a merge request targeting `master`
+    - [ ] Build binaries (`Do: test`)
+    - [ ] Get positive review
+    - [ ] `Do: merge`
+    - [ ] `git push origin update-to-VERSION:release vVERSION`
+    - [ ] Update kwrobot with the new `release` branch rules
+
+If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
+
+  - Update `release` branch for paraview/paraview-superbuild
+    - [ ] Pull latest `release`
+    - Update `versions.cmake` and `CMakeLists.txt`
+      - [ ] ParaView source selections
+      - [ ] Guide selections
+      - [ ] Assumed version in `CMakeLists.txt`
+    - [ ] Create a merge request targeting `master`
+    - [ ] Build binaries (`Do: test`)
+    - [ ] Get positive review
+    - [ ] `Do: merge`
+    - [ ] `git push origin update-to-VERSION:release vVERSION`
+-->
+
 # Validating binaries
 
-  - [ ] Python
-  - [ ] `import compiler`
-  - [ ] `import numpy`
-  - [ ] Plugins are present and load properly
-  - [ ] Text source LaTeX `$A^2$`
-  - [ ] OSPRay
-  - [ ] AutoMPI
+  - For each binary, check
+    - [ ] Python
+    - [ ] `import compiler`
+    - [ ] `import numpy`
+    - [ ] Plugins are present and load properly
+    - [ ] Text source LaTeX `$A^2$`
+    - [ ] OSPRay
+    - [ ] AutoMPI
+
+  - Binary checklist
+    - [ ] macOS
+    - [ ] Linux
+    - [ ] Windows MPI (.exe)
+    - [ ] Windows MPI (.zip)
+    - [ ] Windows no-MPI (.exe)
+    - [ ] Windows no-MPI (.zip)
 
 # Upload binaries
 
-  - [ ] Sign macOS binary
+  - [ ] Ask @chuck.atkins to sign macOS binary
   - Upload binaries to `paraview.org`
     - [ ] `rsync -rptv $binaries paraview.release:ParaView_Release/vMAJOR.MINOR/`
   - [ ] Update `md5sum.txt`
-  - [ ] Update JavaScript for `paraview.org/downloads`
-    - [ ] `rsync -rptv paraview-downloads.js paraview.release:ParaView_Release/`
+  - [ ] Ask @utkarsh.ayachit to regenerate `https://www.paraview.org/files/listing.txt`
   - [ ] Test download links
 
 # Post-release
