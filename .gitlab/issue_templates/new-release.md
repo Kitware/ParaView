@@ -24,24 +24,42 @@ Keep the relevant items for the kind of release this is.
 
 If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
 
-  - Update `release` branch for **paraview**
-    - [ ] Pull latest `master`
-    - [ ] Update `version.txt`
-    - [ ] Create a merge request targeting `master`
+  - Update `master` branch for **paraview**
+    - [ ] `git fetch origin`
+    - [ ] `git checkout master`
+    - [ ] `git merge --ff-only origin/master`
+  - Update `version.txt` and tag the commit
+    - [ ] `git checkout -b update-to-VERSION`
+    - [ ] `echo VERSION > version.txt`
+    - [ ] `git commit -m 'Update version number to VERSION'`
+    - [ ] `git -m 'Update version number to VERSION'`
+    - [ ] `git tag -a -m 'ParaView VERSION' vVERSION HEAD`
+  - Integrate changes to `master` branch
+    - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
     - [ ] Get positive review
     - [ ] `Do: merge`
+  - Integrate changes to `release` branch
     - [ ] `git push origin update-to-VERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
 If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
 
-  - Update release branch
-    - [ ] Pull latest `release`
-    - [ ] Update `version.txt`
-    - [ ] Create a merge request targeting `master`
+  - Update `release` branch for **paraview**
+    - [ ] `git fetch origin`
+    - [ ] `git checkout release`
+    - [ ] `git merge --ff-only origin/release`
+  - Update `version.txt` and tag the commit
+    - [ ] `git checkout -b update-to-VERSION`
+    - [ ] `echo VERSION > version.txt`
+    - [ ] `git commit -m 'Update version number to VERSION'`
+    - [ ] `git -m 'Update version number to VERSION'`
+    - [ ] `git tag -a -m 'ParaView VERSION' vVERSION HEAD`
+  - Integrate changes to `master` branch
+    - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
     - [ ] Build binaries (`Do: test --superbuild`)
     - [ ] Get positive review
     - [ ] `Do: merge`
+  - Integrate changes to `release` branch
     - [ ] `git push origin update-to-VERSION:release vVERSION`
 -->
 
@@ -57,31 +75,41 @@ Keep the relevant items for the kind of release this is.
 
 If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
 
-  - Update `release` branch for **paraview/paraview-superbuild**
-    - [ ] Pull latest `master`
-    - Update `versions.cmake` and `CMakeLists.txt`
-      - [ ] ParaView source selections
-      - [ ] Guide selections
-      - [ ] Assumed version in `CMakeLists.txt`
+  - Update `master` branch for **paraview/paraview-superbuild**
+    - [ ] `git fetch origin`
+    - [ ] `git checkout master`
+    - [ ] `git merge --ff-only origin/master`
+  - Update `versions.cmake` and `CMakeLists.txt`
+    - [ ] ParaView source selections
+    - [ ] Guide selections
+    - [ ] Assumed version in `CMakeLists.txt`
+  - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`
     - [ ] Build binaries (`Do: test`)
+    - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
     - [ ] Get positive review
     - [ ] `Do: merge`
+  - Integrate changes to `release` branch
     - [ ] `git push origin update-to-VERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
 If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
 
-  - Update `release` branch for paraview/paraview-superbuild
-    - [ ] Pull latest `release`
-    - Update `versions.cmake` and `CMakeLists.txt`
-      - [ ] ParaView source selections
-      - [ ] Guide selections
-      - [ ] Assumed version in `CMakeLists.txt`
+  - Update `release` branch for **paraview/paraview-superbuild**
+    - [ ] `git fetch origin`
+    - [ ] `git checkout release`
+    - [ ] `git merge --ff-only origin/release`
+  - Update `versions.cmake` and `CMakeLists.txt`
+    - [ ] ParaView source selections
+    - [ ] Guide selections
+    - [ ] Assumed version in `CMakeLists.txt`
+  - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master`
     - [ ] Build binaries (`Do: test`)
+    - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
     - [ ] Get positive review
     - [ ] `Do: merge`
+  - Integrate changes to `release` branch
     - [ ] `git push origin update-to-VERSION:release vVERSION`
 -->
 
