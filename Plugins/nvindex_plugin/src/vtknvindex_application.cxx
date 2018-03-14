@@ -166,7 +166,6 @@ bool vtknvindex_application::authenticate_nvindex_library()
 {
 
   std::string index_vendor_key, index_secret_key;
-  std::string flexnet_lic_path("/path/to/flexnet/");
 
   bool found_license = false;
 
@@ -193,6 +192,24 @@ bool vtknvindex_application::authenticate_nvindex_library()
     index_vendor_key = "NVIDIA IndeX License for ParaView - IndeX:PV:Free:v1 - 20180307 "
                        "(oem:retail_cloud.20190331)";
     index_secret_key = "776532b335999674f8492574fbccd8defeac1b30e9804d5d42b383c57dcfab8f";
+  }
+
+  // Retrieve Flex license path.
+  std::string flexnet_lic_path;
+
+  // Try reading Flex license path from enviroment.
+  const char* env_flexnet_lic_path = vtksys::SystemTools::GetEnv("NVINDEX_FLEXNET_PATH");
+  if (env_flexnet_lic_path != NULL)
+  {
+    flexnet_lic_path = env_flexnet_lic_path;
+  }
+  else // Try reading Flex license path from config file.
+  {
+    vtknvindex_xml_config_parser xml_parser;
+    if (xml_parser.open_config_file("nvindex_config.xml"))
+    {
+      found_license = xml_parser.get_flex_license_path(flexnet_lic_path);
+    }
   }
 
   return (m_nvindex_interface->authenticate(index_vendor_key.c_str(),
