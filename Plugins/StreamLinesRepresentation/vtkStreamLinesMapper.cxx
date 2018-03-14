@@ -619,7 +619,6 @@ bool vtkStreamLinesMapper::Private::PrepareGLBuffers(vtkRenderer* ren, vtkActor*
 
   bool prevCreateWideLines = this->CreateWideLines;
   this->CreateWideLines = actor->GetProperty()->GetLineWidth() > 1.0 &&
-    vtkOpenGLRenderWindow::GetContextSupportsOpenGL32() &&
     actor->GetProperty()->GetLineWidth() > renWin->GetMaximumHardwareLineWidth();
 
   if (!this->Program || (prevCreateWideLines != this->CreateWideLines))
