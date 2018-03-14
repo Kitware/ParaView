@@ -100,6 +100,7 @@ vtknvindex_xml_config_parser::~vtknvindex_xml_config_parser()
   // empty
 }
 
+//-------------------------------------------------------------------------------------------------
 bool vtknvindex_xml_config_parser::get_license_strings(
   std::string& vendor_key, std::string& secret_key)
 {
@@ -123,6 +124,27 @@ bool vtknvindex_xml_config_parser::get_license_strings(
 
   vendor_key = std::string(vendor_key_elm->GetCharacterData());
   secret_key = std::string(secret_key_elm->GetCharacterData());
+
+  return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+bool vtknvindex_xml_config_parser::get_flex_license_path(std::string& path)
+{
+  vtkXMLDataElement* license_elm = m_root_elm->LookupElementWithName("license");
+  if (!license_elm)
+  {
+    return false;
+  }
+
+  vtkXMLDataElement* flex_license_path_elm =
+    license_elm->FindNestedElementWithName("flex_license_path");
+  if (!flex_license_path_elm)
+  {
+    return false;
+  }
+
+  path = std::string(flex_license_path_elm->GetCharacterData());
 
   return true;
 }
