@@ -458,11 +458,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
 #else
   QString appdir = QCoreApplication::applicationDirPath();
-  QString documentationPath = QFileInfo(appdir).fileName() == "bin"
-    ?
-    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc"
-    :
-    /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/doc";
+  QString documentationPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc";
 #endif
 
   QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
