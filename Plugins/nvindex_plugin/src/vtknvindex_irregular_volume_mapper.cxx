@@ -241,9 +241,19 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     this->ArrayId, this->ArrayName,
     use_cell_colors); // CellFlag
 
+  // Check for scalar per cell values
   if (use_cell_colors)
   {
     ERROR_LOG << "Scalars per cell are not supported by NVIDIA IndeX";
+    return false;
+  }
+
+  // check for valid data types
+  const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
+  if (scalar_type != "unsigned char" && scalar_type != "unsigned short" && scalar_type != "float" &&
+    scalar_type != "double")
+  {
+    ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
     return false;
   }
 
@@ -399,7 +409,7 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
     // fill dataset parameters struct.
     vtknvindex_dataset_parameters dataset_parameters;
     dataset_parameters.volume_type = vtknvindex_scene::VOLUME_TYPE_IRREGULAR;
-    dataset_parameters.scalar_type = m_scalar_array->GetDataTypeAsString();
+    dataset_parameters.scalar_type = scalar_type;
     dataset_parameters.voxel_range[0] = static_cast<mi::Float32>(m_scalar_array->GetRange(0)[0]);
     dataset_parameters.voxel_range[1] = static_cast<mi::Float32>(m_scalar_array->GetRange(0)[1]);
     dataset_parameters.scalar_range[0] = static_cast<mi::Float32>(m_scalar_array->GetRange()[0]);
@@ -521,6 +531,8 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   {
     ERROR_LOG << "Failed to initialize the mapper in "
               << "vtknvindex_irregular_volume_mapper::Render.";
+    ERROR_LOG << "NVIDIA IndeX rendering was aborted.";
+    return;
   }
 
   // Prepare data to be rendered.
@@ -528,6 +540,8 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   {
     ERROR_LOG << "Failed to prepare data in "
               << "vtknvindex_irregular_volume_mapper::Render.";
+    ERROR_LOG << "NVIDIA IndeX rendering was aborted.";
+    return;
   }
 
   if (m_is_viewer)
