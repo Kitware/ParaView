@@ -991,7 +991,7 @@ struct Process_5_4_to_5_5
 
       auto prop = proxyNode.select_single_node("//Property[@name='InsideOut']").node();
       auto valueElt = prop.child("Element");
-      bool invert = valueElt.attribute("value").as_bool();
+      int invert = valueElt.attribute("value").as_int();
 
       prop.attribute("name").set_value("Invert");
       valueElt.attribute("value").set_value(invert);
