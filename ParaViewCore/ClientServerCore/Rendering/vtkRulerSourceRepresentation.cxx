@@ -46,6 +46,7 @@ vtkRulerSourceRepresentation::vtkRulerSourceRepresentation()
   this->DistanceRepresentation = vtkDistanceRepresentation2D::New();
   this->DistanceRepresentation->SetHandleRepresentation(handle);
   this->DistanceRepresentation->InstantiateHandleRepresentation();
+  this->DistanceRepresentation->GetAxis()->UseFontSizeFromPropertyOn();
 
   this->CacheKeeper->SetInputData(this->Clone.Get());
 }
