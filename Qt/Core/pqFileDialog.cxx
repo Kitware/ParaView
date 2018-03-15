@@ -299,6 +299,10 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   // install the autocompleter
   impl.Ui.FileName->setCompleter(impl.Completer);
 
+  // this is the Navigate button, which is only shown when needed
+  // and that too in ExistingFilesAndDirectories and Directory mode alone.
+  impl.Ui.Navigate->hide();
+
   QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
   impl.Ui.NavigateBack->setIcon(back);
   impl.Ui.NavigateBack->setEnabled(false);
@@ -406,6 +410,12 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   impl.Ui.ShowDetail->setChecked(showDetail);
   impl.Ui.Files->setColumnHidden(2, !showDetail);
   impl.Ui.Files->setColumnHidden(3, !showDetail);
+
+  // let's manage the default button.
+  impl.Ui.OK->setDefault(true);
+  impl.Ui.Navigate->setDefault(false);
+
+  this->connect(impl.Ui.Navigate, SIGNAL(clicked()), SLOT(onNavigate()));
 }
 
 //-----------------------------------------------------------------------------
@@ -524,6 +534,16 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
     this->setToolTip("open multiple files with <ctrl> key.");
   }
   impl.Ui.Files->setSelectionMode(selectionMode);
+
+  if (mode == Directory || mode == ExistingFilesAndDirectories)
+  {
+    impl.Ui.Navigate->show();
+    impl.Ui.Navigate->setEnabled(false);
+  }
+  else
+  {
+    impl.Ui.Navigate->hide();
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -765,12 +785,19 @@ void pqFileDialog::onModelReset()
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onNavigate(const QString& Path)
+void pqFileDialog::onNavigate(const QString& newpath)
 {
   auto& impl = *this->Implementation;
 
+  QString path_to_navigate(newpath);
+  if (newpath.isEmpty() && impl.FileNames.size() > 0)
+  {
+    path_to_navigate = impl.FileNames.front();
+    path_to_navigate = impl.Model->absoluteFilePath(path_to_navigate);
+  }
+
   impl.addHistory(impl.Model->getCurrentPath());
-  impl.setCurrentPath(Path);
+  impl.setCurrentPath(path_to_navigate);
 }
 
 //-----------------------------------------------------------------------------
@@ -927,6 +954,7 @@ void pqFileDialog::onTextEdited(const QString& str)
     impl.FileNames.clear();
   }
   impl.Ui.Files->blockSignals(false);
+  this->updateButtonStates();
 }
 
 //-----------------------------------------------------------------------------
@@ -1132,23 +1160,6 @@ void pqFileDialog::fileSelectionChanged()
       fileNames.append(name);
     }
   }
-  // if we are in directory mode we have to enable / disable the OK button
-  // based on if the user has selected a file.
-  if (impl.Mode == pqFileDialog::Directory && indices[0].model() == &impl.FileFilter)
-  {
-    QModelIndex idx = impl.FileFilter.mapToSource(indices[0]);
-    bool enabled = impl.Model->isDir(idx);
-    impl.Ui.OK->setEnabled(enabled);
-    if (enabled)
-    {
-      impl.Ui.FileName->setText(fileString);
-    }
-    else
-    {
-      impl.Ui.FileName->clear();
-    }
-    return;
-  }
 
   // user is currently editing a name, don't change the text
   impl.Ui.FileName->blockSignals(true);
@@ -1156,6 +1167,7 @@ void pqFileDialog::fileSelectionChanged()
   impl.Ui.FileName->blockSignals(false);
 
   impl.FileNames = fileNames;
+  this->updateButtonStates();
 }
 
 //-----------------------------------------------------------------------------
@@ -1262,5 +1274,57 @@ void pqFileDialog::restoreState()
       impl.Ui.splitter->restoreState(settings->value("Splitter").toByteArray());
     }
     settings->endGroup();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::updateButtonStates()
+{
+  auto& impl = *this->Implementation;
+
+  bool is_dir = false;
+  if (impl.FileNames.size() == 1)
+  {
+    QString tmp;
+    is_dir = impl.Model->dirExists(impl.FileNames.front(), tmp);
+  }
+
+  // if mode is Directory, update OK button state.
+  if (impl.Mode == Directory)
+  {
+    impl.Ui.OK->setEnabled(is_dir);
+  }
+  else
+  {
+    impl.Ui.OK->setEnabled(true);
+  }
+
+  if (impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories)
+  {
+    // show the Navigate button.
+    impl.Ui.Navigate->setVisible(true);
+
+    // let's see if the Navigate button should be enabled. If the Navigate
+    // button is enabled, it is also made the "default" button i.e. the button
+    // that's triggered when user this the "Enter" key. If Navigate is not
+    // enabled, then the OK button is the "default" button.
+    if (is_dir)
+    {
+      impl.Ui.OK->setDefault(false);
+      impl.Ui.Navigate->setEnabled(true);
+      impl.Ui.Navigate->setDefault(true);
+    }
+    else
+    {
+      impl.Ui.Navigate->setEnabled(false);
+      impl.Ui.Navigate->setDefault(false);
+      impl.Ui.OK->setDefault(true);
+    }
+  }
+  else
+  {
+    impl.Ui.Navigate->setVisible(false);
+    impl.Ui.Navigate->setDefault(false);
+    impl.Ui.OK->setDefault(true);
   }
 }

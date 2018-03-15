@@ -204,7 +204,7 @@ protected:
 
 private slots:
   void onModelReset();
-  void onNavigate(const QString&);
+  void onNavigate(const QString& = QString());
   void onNavigateUp();
   void onNavigateBack();
   void onNavigateForward();
@@ -243,6 +243,13 @@ private slots:
   * Emits the filesSelected() signal and closes the dialog,
   */
   void emitFilesSelectionDone();
+
+  /**
+   * This is called every time the set of chosen files may have changed. Here,
+   * we update the visibility and enabled state of the `OK` and `Navigate`
+   * buttons.
+   */
+  void updateButtonStates();
 
 private:
   pqFileDialog(const pqFileDialog&);
