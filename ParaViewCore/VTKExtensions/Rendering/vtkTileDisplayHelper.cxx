@@ -34,7 +34,6 @@ class vtkTileDisplayHelper::vtkInternals
 {
 public:
   std::string DumpImagePath;
-  static vtkSmartPointer<vtkTileDisplayHelper> Instance;
   vtkNew<vtkPNGWriter> PNGWriter;
 
   class vtkTile
@@ -155,7 +154,27 @@ public:
   }
 };
 
-vtkSmartPointer<vtkTileDisplayHelper> vtkTileDisplayHelper::vtkInternals::Instance;
+//=============================================================================
+namespace
+{
+static vtkSmartPointer<vtkTileDisplayHelper> TileDisplayHelperSingleton;
+static int TileDisplayHelperSingletonCleanerNiftyCounter = 0;
+}
+
+vtkTileDisplayHelperSingletonCleaner::vtkTileDisplayHelperSingletonCleaner()
+{
+  TileDisplayHelperSingletonCleanerNiftyCounter++;
+}
+
+vtkTileDisplayHelperSingletonCleaner::~vtkTileDisplayHelperSingletonCleaner()
+{
+  TileDisplayHelperSingletonCleanerNiftyCounter--;
+  if (TileDisplayHelperSingletonCleanerNiftyCounter == 0)
+  {
+    TileDisplayHelperSingleton = nullptr;
+  }
+}
+//=============================================================================
 
 vtkStandardNewMacro(vtkTileDisplayHelper);
 //----------------------------------------------------------------------------
@@ -173,11 +192,11 @@ vtkTileDisplayHelper::~vtkTileDisplayHelper()
 //----------------------------------------------------------------------------
 vtkTileDisplayHelper* vtkTileDisplayHelper::GetInstance()
 {
-  if (!vtkInternals::Instance)
+  if (!TileDisplayHelperSingleton)
   {
-    vtkInternals::Instance.TakeReference(vtkTileDisplayHelper::New());
+    TileDisplayHelperSingleton = vtkSmartPointer<vtkTileDisplayHelper>::New();
   }
-  return vtkInternals::Instance;
+  return TileDisplayHelperSingleton;
 }
 
 //----------------------------------------------------------------------------

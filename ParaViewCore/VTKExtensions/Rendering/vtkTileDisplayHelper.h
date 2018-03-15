@@ -105,4 +105,16 @@ private:
   vtkInternals* Internals;
 };
 
+//  Implementation of Schwartz counter idiom to ensure that the
+//  vtkTileDisplayHelper singleton is cleaned up correctly during finalization.
+static class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkTileDisplayHelperSingletonCleaner
+{
+public:
+  vtkTileDisplayHelperSingletonCleaner();
+  ~vtkTileDisplayHelperSingletonCleaner();
+
+private:
+  vtkTileDisplayHelperSingletonCleaner(const vtkTileDisplayHelperSingletonCleaner&) = delete;
+  void operator=(const vtkTileDisplayHelperSingletonCleaner&) = delete;
+} TileDisplayHelperSingletonCleanerInstance;
 #endif
