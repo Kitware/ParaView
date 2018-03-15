@@ -80,24 +80,15 @@ namespace
 
 QStringList MakeFilterList(const QString& filter)
 {
-  QString f(filter);
-
-  if (f.isEmpty())
+  if (filter.contains(";;"))
   {
-    return QStringList();
+    return filter.split(";;", QString::SkipEmptyParts);
   }
 
-  QString sep(";;");
-  int i = f.indexOf(sep, 0);
-  if (i == -1)
-  {
-    if (f.indexOf("\n", 0) != -1)
-    {
-      sep = "\n";
-      i = f.indexOf(sep, 0);
-    }
-  }
-  return f.split(sep, QString::SkipEmptyParts);
+  // check if '\n' is being used as separator.
+  // (not sure why, but the old code was doing it, and if some applications
+  // are relying on it, I don't want to break them right now).
+  return filter.split('\n', QString::SkipEmptyParts);
 }
 
 QStringList GetWildCardsFromFilter(const QString& filter)
