@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <layout class="QHBoxLayout">
+    <layout class="QHBoxLayout" stretch="0,1,0,0,0,0,0">
      <property name="spacing">
       <number>6</number>
      </property>
@@ -33,29 +33,8 @@
      </property>
      <item>
       <widget class="QLabel" name="label_3">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>100</width>
-         <height>16777215</height>
-        </size>
-       </property>
        <property name="text">
         <string>Look in:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
