@@ -485,12 +485,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     std::string dataPath = pm->GetSelfDir() + "/../data";
 #else
     std::string appdir = pm->GetSelfDir();
-    ;
-    std::string dataPath = vtksys::SystemTools::GetFilenameName(appdir) == "bin"
-      ?
-      /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/data"
-      :
-      /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/data";
+    std::string dataPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/data";
 #endif
     dataPath = vtksys::SystemTools::CollapseFullPath(dataPath);
     if (vtksys::SystemTools::FileIsDirectory(dataPath))
