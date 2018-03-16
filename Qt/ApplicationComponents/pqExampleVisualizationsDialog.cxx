@@ -40,11 +40,7 @@ void pqExampleVisualizationsDialog::onButtonPressed()
   QString dataPath = QCoreApplication::applicationDirPath() + "/../data";
 #else
   QString appdir = QCoreApplication::applicationDirPath();
-  QString dataPath = QFileInfo(appdir).fileName() == "bin"
-    ?
-    /* w/o shared forwarding */ appdir + "/../share/paraview-" PARAVIEW_VERSION "/data"
-    :
-    /* w/ shared forwarding  */ appdir + "/../../share/paraview-" PARAVIEW_VERSION "/data";
+  QString dataPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/data";
 #endif
   QPushButton* button = qobject_cast<QPushButton*>(sender());
   if (button)
