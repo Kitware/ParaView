@@ -94,9 +94,6 @@
     { "path":"ParaViewCore/README.txt" },
     { "path":"VTK/vtkLogo.ico" },
     { "path":"VTK/README.md" },
-    { "path":"VTK/ThirdParty/utf8" },
-    { "name": "vtkParseOGLExt",
-      "path": "VTK/Utilities/ParseOGLExt"
-    }
+    { "path":"VTK/ThirdParty/utf8" }
   ]
 }

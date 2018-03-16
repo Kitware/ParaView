@@ -47,8 +47,7 @@ protected:
    * Build the VBO/IBO, called by UpdateBufferObjects
    */
   void AppendOneBufferObject(vtkRenderer* ren, vtkActor* act, vtkCompositeMapperHelperData* hdata,
-    unsigned int& flat_index, std::vector<unsigned char>& colors,
-    std::vector<float>& norms) override;
+    vtkIdType& flat_index, std::vector<unsigned char>& colors, std::vector<float>& norms) override;
 
   /**
    * Update uniforms of shaders
@@ -66,7 +65,7 @@ vtkStandardNewMacro(vtkBumpMapMapperHelper);
 
 //-------------------------------------------------------------------------
 void vtkBumpMapMapperHelper::AppendOneBufferObject(vtkRenderer* ren, vtkActor* act,
-  vtkCompositeMapperHelperData* hdata, unsigned int& voffset, std::vector<unsigned char>& newColors,
+  vtkCompositeMapperHelperData* hdata, vtkIdType& voffset, std::vector<unsigned char>& newColors,
   std::vector<float>& newNorms)
 {
   vtkInformation* info = this->GetInputArrayInformation(0);

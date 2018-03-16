@@ -975,8 +975,8 @@ int vtkClientServerInterpreter::LoadInternal(const char* moduleName, const char*
   // Get the init function.
   std::string initFuncName = moduleName;
   initFuncName += "_Initialize";
-  void* pfunc = vtkDynamicLoader::GetSymbolAddress(lib, initFuncName.c_str());
-  InitFunction func = *reinterpret_cast<InitFunction*>(&pfunc);
+  auto func =
+    reinterpret_cast<InitFunction>(vtkDynamicLoader::GetSymbolAddress(lib, initFuncName.c_str()));
   if (!func)
   {
     vtkErrorMacro(

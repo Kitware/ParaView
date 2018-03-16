@@ -587,6 +587,9 @@
      <Proxy class="vtkOBBTree"
             name="OBBTree"
             label="OBB Tree Cell Locator"/>
+     <Proxy class="vtkStaticCellLocator"
+            name="StaticCellLocator"
+            label="Static Cell Locator"/>
   </ProxyGroup>
 
   <ProxyGroup name="implicit_functions">
