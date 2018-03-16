@@ -31,7 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqPropertyWidgetDecorator.h"
 
+#include "pqApplicationCore.h"
+#include "pqInterfaceTracker.h"
 #include "pqPropertyWidget.h"
+#include "pqPropertyWidgetDecorator.h"
+#include "pqPropertyWidgetInterface.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
@@ -47,8 +51,41 @@ pqPropertyWidgetDecorator::pqPropertyWidgetDecorator(
 //-----------------------------------------------------------------------------
 pqPropertyWidgetDecorator::~pqPropertyWidgetDecorator()
 {
+  if (auto* pwdg = this->parentWidget())
+  {
+    pwdg->removeDecorator(this);
+  }
 }
 
+//-----------------------------------------------------------------------------
+pqPropertyWidgetDecorator* pqPropertyWidgetDecorator::create(
+  vtkPVXMLElement* xmlconfig, pqPropertyWidget* prnt)
+{
+  if (xmlconfig == nullptr || strcmp(xmlconfig->GetName(), "PropertyWidgetDecorator") != 0 ||
+    xmlconfig->GetAttribute("type") == nullptr)
+  {
+    PV_DEBUG_PANELS() << "Invalid xml config specified. Cannot create a decorator.";
+    return nullptr;
+  }
+
+  auto tracker = pqApplicationCore::instance()->interfaceTracker();
+  auto interfaces = tracker->interfaces<pqPropertyWidgetInterface*>();
+
+  const QString type = xmlconfig->GetAttribute("type");
+  for (auto* anInterface : interfaces)
+  {
+    if (pqPropertyWidgetDecorator* decorator =
+          anInterface->createWidgetDecorator(type, xmlconfig, prnt))
+    {
+      return decorator;
+    }
+  }
+
+  PV_DEBUG_PANELS() << "Cannot create decorator of type " << type;
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
 vtkPVXMLElement* pqPropertyWidgetDecorator::xml() const
 {
   return this->XML.GetPointer();

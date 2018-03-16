@@ -90,6 +90,12 @@ public:
   */
   virtual bool enableWidget() const { return true; }
 
+  /**
+   * Creates a new decorator, given the xml config and the parent
+   * pqPropertyWidget for the decorator.
+   */
+  static pqPropertyWidgetDecorator* create(vtkPVXMLElement* xml, pqPropertyWidget* parent);
+
 signals:
   /**
   * This signal is fired whenever the decorator has determined that the panel

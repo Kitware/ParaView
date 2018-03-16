@@ -826,14 +826,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
         for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
         {
           Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
-          const QString type = decoratorXML->GetAttribute("type");
-          for (pqPropertyWidgetInterface* decoratorInterface : interfaces)
-          {
-            if (decoratorInterface->createWidgetDecorator(type, decoratorXML, propertyWidget))
-            {
-              break;
-            }
-          }
+          pqPropertyWidgetDecorator::create(decoratorXML, propertyWidget);
         }
 
         propertyWidget->setParent(this);
@@ -1001,11 +994,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
         for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
         {
           Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
-          const QString type = decoratorXML->GetAttribute("type");
-          if (interface->createWidgetDecorator(type, decoratorXML, propertyWidget))
-          {
-            break;
-          }
+          pqPropertyWidgetDecorator::create(decoratorXML, propertyWidget);
         }
       }
     }
@@ -1095,15 +1084,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
   {
     Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
-    const QString type = decoratorXML->GetAttribute("type");
-    for (int cc = 0; cc < interfaces.size(); cc++)
-    {
-      pqPropertyWidgetInterface* interface = interfaces[cc];
-      if (interface->createWidgetDecorator(type, decoratorXML, widget))
-      {
-        break;
-      }
-    }
+    pqPropertyWidgetDecorator::create(decoratorXML, widget);
   }
 
   // Create all default decorators
