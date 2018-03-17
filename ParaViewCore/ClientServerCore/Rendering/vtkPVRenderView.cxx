@@ -2996,6 +2996,16 @@ vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetViewTime(double value)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetViewTime(value, ren);
+#endif
+  this->Superclass::SetViewTime(value);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetEnableOSPRay(bool v)
 {
 #ifdef PARAVIEW_USE_OSPRAY
@@ -3219,6 +3229,28 @@ void vtkPVRenderView::SetBackgroundEast(double x, double y, double z)
   (void)x;
   (void)y;
   (void)z;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetTimeCacheSize(int v)
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetTimeCacheSize(v, ren);
+#else
+  (void)v;
+#endif
+}
+
+//----------------------------------------------------------------------------
+int vtkPVRenderView::GetTimeCacheSize()
+{
+#ifdef PARAVIEW_USE_OSPRAY
+  vtkRenderer* ren = this->GetRenderer();
+  return vtkOSPRayRendererNode::GetTimeCacheSize(ren);
+#else
+  return 0;
 #endif
 }
 
