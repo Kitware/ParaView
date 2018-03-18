@@ -80,24 +80,15 @@ namespace
 
 QStringList MakeFilterList(const QString& filter)
 {
-  QString f(filter);
-
-  if (f.isEmpty())
+  if (filter.contains(";;"))
   {
-    return QStringList();
+    return filter.split(";;", QString::SkipEmptyParts);
   }
 
-  QString sep(";;");
-  int i = f.indexOf(sep, 0);
-  if (i == -1)
-  {
-    if (f.indexOf("\n", 0) != -1)
-    {
-      sep = "\n";
-      i = f.indexOf(sep, 0);
-    }
-  }
-  return f.split(sep, QString::SkipEmptyParts);
+  // check if '\n' is being used as separator.
+  // (not sure why, but the old code was doing it, and if some applications
+  // are relying on it, I don't want to break them right now).
+  return filter.split('\n', QString::SkipEmptyParts);
 }
 
 QStringList GetWildCardsFromFilter(const QString& filter)
@@ -291,120 +282,116 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   : Superclass(p)
   , Implementation(new pqImplementation(this, server))
 {
-  this->Implementation->Ui.setupUi(this);
+  auto& impl = *this->Implementation;
+
+  impl.Ui.setupUi(this);
   // ensures that the favorites and the browser component are sized
   // proportionately.
-  this->Implementation->Ui.mainSplitter->setStretchFactor(0, 1);
-  this->Implementation->Ui.mainSplitter->setStretchFactor(1, 4);
+  impl.Ui.mainSplitter->setStretchFactor(0, 1);
+  impl.Ui.mainSplitter->setStretchFactor(1, 4);
   this->setWindowTitle(title);
 
-  this->Implementation->Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
+  impl.Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
 
   // install the event filter
-  this->Implementation->Ui.Files->installEventFilter(this->Implementation);
+  impl.Ui.Files->installEventFilter(this->Implementation);
 
   // install the autocompleter
-  this->Implementation->Ui.FileName->setCompleter(this->Implementation->Completer);
+  impl.Ui.FileName->setCompleter(impl.Completer);
+
+  // this is the Navigate button, which is only shown when needed
+  // and that too in ExistingFilesAndDirectories and Directory mode alone.
+  impl.Ui.Navigate->hide();
 
   QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
-  this->Implementation->Ui.NavigateBack->setIcon(back);
-  this->Implementation->Ui.NavigateBack->setEnabled(false);
-  QObject::connect(
-    this->Implementation->Ui.NavigateBack, SIGNAL(clicked(bool)), this, SLOT(onNavigateBack()));
+  impl.Ui.NavigateBack->setIcon(back);
+  impl.Ui.NavigateBack->setEnabled(false);
+  QObject::connect(impl.Ui.NavigateBack, SIGNAL(clicked(bool)), this, SLOT(onNavigateBack()));
   // just flip the back image to make a forward image
   QPixmap forward = QPixmap::fromImage(back.toImage().mirrored(true, false));
-  this->Implementation->Ui.NavigateForward->setIcon(forward);
-  this->Implementation->Ui.NavigateForward->setDisabled(true);
-  QObject::connect(this->Implementation->Ui.NavigateForward, SIGNAL(clicked(bool)), this,
-    SLOT(onNavigateForward()));
-  this->Implementation->Ui.NavigateUp->setIcon(
-    style()->standardPixmap(QStyle::SP_FileDialogToParent));
-  this->Implementation->Ui.CreateFolder->setIcon(
-    style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
-  this->Implementation->Ui.CreateFolder->setDisabled(true);
+  impl.Ui.NavigateForward->setIcon(forward);
+  impl.Ui.NavigateForward->setDisabled(true);
+  QObject::connect(impl.Ui.NavigateForward, SIGNAL(clicked(bool)), this, SLOT(onNavigateForward()));
+  impl.Ui.NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
+  impl.Ui.CreateFolder->setIcon(style()->standardPixmap(QStyle::SP_FileDialogNewFolder));
+  impl.Ui.CreateFolder->setDisabled(true);
 
-  this->Implementation->Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
+  impl.Ui.ShowDetail->setIcon(QIcon(":/pqWidgets/Icons/pqAdvanced26.png"));
 
-  this->Implementation->Ui.Files->setModel(&this->Implementation->FileFilter);
-  this->Implementation->Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
+  impl.Ui.Files->setModel(&impl.FileFilter);
+  impl.Ui.Files->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  this->Implementation->Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
-  QObject::connect(this->Implementation->Ui.Files,
-    SIGNAL(customContextMenuRequested(const QPoint&)), this,
+  impl.Ui.Files->setContextMenuPolicy(Qt::CustomContextMenu);
+  QObject::connect(impl.Ui.Files, SIGNAL(customContextMenuRequested(const QPoint&)), this,
     SLOT(onContextMenuRequested(const QPoint&)));
-  this->Implementation->Ui.CreateFolder->setEnabled(true);
+  impl.Ui.CreateFolder->setEnabled(true);
 
-  this->Implementation->Ui.Favorites->setModel(this->Implementation->FavoriteModel);
-  this->Implementation->Ui.Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-  this->Implementation->Ui.Recent->setModel(this->Implementation->RecentModel);
-  this->Implementation->Ui.Recent->setSelectionBehavior(QAbstractItemView::SelectRows);
+  impl.Ui.Favorites->setModel(impl.FavoriteModel);
+  impl.Ui.Recent->setModel(impl.RecentModel);
 
   this->setFileMode(ExistingFile);
 
-  QObject::connect(this->Implementation->Model, SIGNAL(modelReset()), this, SLOT(onModelReset()));
+  QObject::connect(impl.Model, SIGNAL(modelReset()), this, SLOT(onModelReset()));
+
+  QObject::connect(impl.Ui.NavigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
+
+  QObject::connect(impl.Ui.CreateFolder, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
 
   QObject::connect(
-    this->Implementation->Ui.NavigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
+    impl.Ui.Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
 
-  QObject::connect(
-    this->Implementation->Ui.CreateFolder, SIGNAL(clicked()), this, SLOT(onCreateNewFolder()));
+  QObject::connect(impl.Ui.FileType, SIGNAL(currentIndexChanged(const QString&)), this,
+    SLOT(onFilterChange(const QString&)));
 
-  QObject::connect(this->Implementation->Ui.Parents, SIGNAL(activated(const QString&)), this,
-    SLOT(onNavigate(const QString&)));
-
-  QObject::connect(this->Implementation->Ui.FileType, SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(onFilterChange(const QString&)));
-
-  QObject::connect(this->Implementation->Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
+  QObject::connect(impl.Ui.Favorites, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedFavorite(const QModelIndex&)));
 
-  QObject::connect(this->Implementation->Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
+  QObject::connect(impl.Ui.Recent, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedRecent(const QModelIndex&)));
 
-  QObject::connect(this->Implementation->Ui.Files, SIGNAL(clicked(const QModelIndex&)), this,
+  QObject::connect(impl.Ui.Files, SIGNAL(clicked(const QModelIndex&)), this,
     SLOT(onClickedFile(const QModelIndex&)));
 
-  QObject::connect(this->Implementation->Ui.Files->selectionModel(),
+  QObject::connect(impl.Ui.Files->selectionModel(),
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
     SLOT(fileSelectionChanged()));
 
-  QObject::connect(this->Implementation->Ui.Favorites, SIGNAL(activated(const QModelIndex&)), this,
+  QObject::connect(impl.Ui.Favorites, SIGNAL(activated(const QModelIndex&)), this,
     SLOT(onActivateFavorite(const QModelIndex&)));
 
-  QObject::connect(this->Implementation->Ui.Recent, SIGNAL(activated(const QModelIndex&)), this,
+  QObject::connect(impl.Ui.Recent, SIGNAL(activated(const QModelIndex&)), this,
     SLOT(onActivateRecent(const QModelIndex&)));
 
-  QObject::connect(this->Implementation->Ui.Files, SIGNAL(doubleClicked(const QModelIndex&)), this,
+  QObject::connect(impl.Ui.Files, SIGNAL(doubleClicked(const QModelIndex&)), this,
     SLOT(onDoubleClickFile(const QModelIndex&)));
 
-  QObject::connect(this->Implementation->Ui.FileName, SIGNAL(textChanged(const QString&)), this,
+  QObject::connect(impl.Ui.FileName, SIGNAL(textChanged(const QString&)), this,
     SLOT(onTextEdited(const QString&)));
 
   QStringList filterList = MakeFilterList(nameFilter);
   if (filterList.empty())
   {
-    this->Implementation->Ui.FileType->addItem("All Files (*)");
-    this->Implementation->Filters << "All Files (*)";
+    impl.Ui.FileType->addItem("All Files (*)");
+    impl.Filters << "All Files (*)";
   }
   else
   {
-    this->Implementation->Ui.FileType->addItems(filterList);
-    this->Implementation->Filters = filterList;
+    impl.Ui.FileType->addItems(filterList);
+    impl.Filters = filterList;
   }
-  this->onFilterChange(this->Implementation->Ui.FileType->currentText());
+  this->onFilterChange(impl.Ui.FileType->currentText());
 
   QString startPath = startDirectory;
   if (startPath.isEmpty())
   {
-    startPath = this->Implementation->getStartPath();
+    startPath = impl.getStartPath();
   }
-  this->Implementation->addHistory(startPath);
-  this->Implementation->setCurrentPath(startPath);
+  impl.addHistory(startPath);
+  impl.setCurrentPath(startPath);
 
-  this->Implementation->Ui.Files->resizeColumnToContents(0);
-  this->Implementation->Ui.Files->setTextElideMode(Qt::ElideMiddle);
-  QHeaderView* header = this->Implementation->Ui.Files->header();
+  impl.Ui.Files->resizeColumnToContents(0);
+  impl.Ui.Files->setTextElideMode(Qt::ElideMiddle);
+  QHeaderView* header = impl.Ui.Files->header();
 
   // This code is similar to QFileDialog code
   // It positions different columns and orders in a standard way
@@ -413,16 +400,22 @@ pqFileDialog::pqFileDialog(pqServer* server, QWidget* p, const QString& title,
   header->resizeSection(1, fm.width(QLatin1String("mp3Folder")));
   header->resizeSection(2, fm.width(QLatin1String("128.88 GB")));
   header->resizeSection(3, fm.width(QLatin1String("10/29/81 02:02PM")));
-  this->Implementation->Ui.Files->setSortingEnabled(true);
-  this->Implementation->Ui.Files->header()->setSortIndicator(0, Qt::AscendingOrder);
+  impl.Ui.Files->setSortingEnabled(true);
+  impl.Ui.Files->header()->setSortIndicator(0, Qt::AscendingOrder);
 
   // Use saved state if any
   this->restoreState();
 
-  bool showDetail = this->Implementation->Model->isShowingDetailedInfo();
-  this->Implementation->Ui.ShowDetail->setChecked(showDetail);
-  this->Implementation->Ui.Files->setColumnHidden(2, !showDetail);
-  this->Implementation->Ui.Files->setColumnHidden(3, !showDetail);
+  bool showDetail = impl.Model->isShowingDetailedInfo();
+  impl.Ui.ShowDetail->setChecked(showDetail);
+  impl.Ui.Files->setColumnHidden(2, !showDetail);
+  impl.Ui.Files->setColumnHidden(3, !showDetail);
+
+  // let's manage the default button.
+  impl.Ui.OK->setDefault(true);
+  impl.Ui.Navigate->setDefault(false);
+
+  this->connect(impl.Ui.Navigate, SIGNAL(clicked()), SLOT(onNavigate()));
 }
 
 //-----------------------------------------------------------------------------
@@ -434,6 +427,8 @@ pqFileDialog::~pqFileDialog()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onCreateNewFolder()
 {
+  auto& impl = *this->Implementation;
+
   // Add a directory entry with a default name to the model
   // This actually creates a directory with the given name,
   //   but this temporary directory will be deleted and a new one created
@@ -443,12 +438,12 @@ void pqFileDialog::onCreateNewFolder()
   QString dirName = QString("New Folder");
   int i = 0;
   QString fullDir;
-  while (this->Implementation->Model->dirExists(dirName, fullDir))
+  while (impl.Model->dirExists(dirName, fullDir))
   {
     dirName = QString("New Folder%1").arg(i++);
   }
 
-  if (!this->Implementation->Model->mkdir(dirName))
+  if (!impl.Model->mkdir(dirName))
   {
     QMessageBox message(QMessageBox::Warning, this->windowTitle(),
       QString(tr("Unable to create directory %1.")).arg(dirName), QMessageBox::Ok);
@@ -457,7 +452,7 @@ void pqFileDialog::onCreateNewFolder()
   }
 
   // Get the index of the new directory in the model
-  QAbstractProxyModel* m = &this->Implementation->FileFilter;
+  QAbstractProxyModel* m = &impl.FileFilter;
   int numrows = m->rowCount(QModelIndex());
   bool found = false;
   QModelIndex idx;
@@ -475,21 +470,23 @@ void pqFileDialog::onCreateNewFolder()
     return;
   }
 
-  this->Implementation->Ui.Files->scrollTo(idx);
-  this->Implementation->Ui.Files->selectionModel()->select(
+  impl.Ui.Files->scrollTo(idx);
+  impl.Ui.Files->selectionModel()->select(
     idx, QItemSelectionModel::Select | QItemSelectionModel::Current);
-  this->Implementation->Ui.Files->edit(idx);
-  this->Implementation->Ui.FileName->clear();
+  impl.Ui.Files->edit(idx);
+  impl.Ui.FileName->clear();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
 {
+  auto& impl = *this->Implementation;
+
   QMenu menu;
   menu.setObjectName("FileDialogContextMenu");
 
   // Only display new dir option if we're saving, not opening
-  if (this->Implementation->Mode == pqFileDialog::AnyFile)
+  if (impl.Mode == pqFileDialog::AnyFile)
   {
     QAction* actionNewDir = new QAction("Create New Folder", this);
     QObject::connect(actionNewDir, SIGNAL(triggered()), this, SLOT(onCreateNewFolder()));
@@ -498,22 +495,24 @@ void pqFileDialog::onContextMenuRequested(const QPoint& menuPos)
 
   QAction* actionHiddenFiles = new QAction("Show Hidden Files", this);
   actionHiddenFiles->setCheckable(true);
-  actionHiddenFiles->setChecked(this->Implementation->FileFilter.getShowHidden());
+  actionHiddenFiles->setChecked(impl.FileFilter.getShowHidden());
   QObject::connect(actionHiddenFiles, SIGNAL(triggered(bool)), this, SLOT(onShowHiddenFiles(bool)));
   menu.addAction(actionHiddenFiles);
 
-  menu.exec(this->Implementation->Ui.Files->mapToGlobal(menuPos));
+  menu.exec(impl.Ui.Files->mapToGlobal(menuPos));
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 {
+  auto& impl = *this->Implementation;
+
   // this code is only needed for the 3.10 release as
   // after that the user should know that the dialog support multiple file open
   bool setupMutlipleFileHelp = false;
-  this->Implementation->Mode = mode;
+  impl.Mode = mode;
   QAbstractItemView::SelectionMode selectionMode;
-  switch (this->Implementation->Mode)
+  switch (impl.Mode)
   {
     case AnyFile:
     case ExistingFile:
@@ -523,57 +522,70 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       break;
     case ExistingFiles:
     case ExistingFilesAndDirectories:
-      setupMutlipleFileHelp = (this->Implementation->ShowMultipleFileHelp != true);
+      setupMutlipleFileHelp = (impl.ShowMultipleFileHelp != true);
       selectionMode = QAbstractItemView::ExtendedSelection;
       break;
   }
   if (setupMutlipleFileHelp)
   {
     // only set the tooltip and window title the first time through
-    this->Implementation->ShowMultipleFileHelp = true;
+    impl.ShowMultipleFileHelp = true;
     this->setWindowTitle(this->windowTitle() + "  (open multiple files with <ctrl> key.)");
     this->setToolTip("open multiple files with <ctrl> key.");
   }
-  this->Implementation->Ui.Files->setSelectionMode(selectionMode);
-  this->Implementation->Ui.Favorites->setSelectionMode(selectionMode);
+  impl.Ui.Files->setSelectionMode(selectionMode);
+
+  if (mode == Directory || mode == ExistingFilesAndDirectories)
+  {
+    impl.Ui.Navigate->show();
+    impl.Ui.Navigate->setEnabled(false);
+  }
+  else
+  {
+    impl.Ui.Navigate->hide();
+  }
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension)
 {
+  auto& impl = *this->Implementation;
+
   if (fileExtension == QString())
   {
     // upon the initial use of any kind (e.g., data or screenshot) of dialog
     // 'fileExtension' is equal /set to an empty string.
     // In this case, no any user preferences are considered
-    this->Implementation->Ui.FileType->setCurrentIndex(0);
+    impl.Ui.FileType->setCurrentIndex(0);
   }
   else
   {
-    int index = this->Implementation->Ui.FileType->findText(fileExtension, Qt::MatchContains);
+    int index = impl.Ui.FileType->findText(fileExtension, Qt::MatchContains);
     // just in case the provided extension is not in the combobox list
     index = (index == -1) ? 0 : index;
-    this->Implementation->Ui.FileType->setCurrentIndex(index);
+    impl.Ui.FileType->setCurrentIndex(index);
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::addToFilesSelected(const QStringList& files)
 {
+  auto& impl = *this->Implementation;
+
   // Ensure that we are hidden before broadcasting the selection,
   // so we don't get caught by screen-captures
   this->setVisible(false);
-  this->Implementation->SelectedFiles.append(files);
+  impl.SelectedFiles.append(files);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::emitFilesSelectionDone()
 {
-  emit filesSelected(this->Implementation->SelectedFiles);
-  if (this->Implementation->Mode != this->ExistingFiles &&
-    this->Implementation->SelectedFiles.size() > 0)
+  auto& impl = *this->Implementation;
+  emit filesSelected(impl.SelectedFiles);
+  if (impl.Mode != this->ExistingFiles && impl.SelectedFiles.size() > 0)
   {
-    emit filesSelected(this->Implementation->SelectedFiles[0]);
+    emit filesSelected(impl.SelectedFiles[0]);
   }
   this->done(QDialog::Accepted);
 }
@@ -581,24 +593,28 @@ void pqFileDialog::emitFilesSelectionDone()
 //-----------------------------------------------------------------------------
 QList<QStringList> pqFileDialog::getAllSelectedFiles()
 {
-  return this->Implementation->SelectedFiles;
+  auto& impl = *this->Implementation;
+  return impl.SelectedFiles;
 }
 
 //-----------------------------------------------------------------------------
 QStringList pqFileDialog::getSelectedFiles(int index)
 {
-  if (index < 0 || index >= this->Implementation->SelectedFiles.size())
+  auto& impl = *this->Implementation;
+  if (index < 0 || index >= impl.SelectedFiles.size())
   {
     return QStringList();
   }
-  return this->Implementation->SelectedFiles[index];
+  return impl.SelectedFiles[index];
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::accept()
 {
+  auto& impl = *this->Implementation;
+
   bool loadedFile = false;
-  switch (this->Implementation->Mode)
+  switch (impl.Mode)
   {
     case AnyFile:
     case Directory:
@@ -619,19 +635,21 @@ void pqFileDialog::accept()
 //-----------------------------------------------------------------------------
 bool pqFileDialog::acceptExistingFiles()
 {
+  auto& impl = *this->Implementation;
+
   bool loadedFiles = false;
   QString filename;
-  if (this->Implementation->FileNames.size() == 0)
+  if (impl.FileNames.size() == 0)
   {
     // when we have nothing selected in the current selection model, we will
     // attempt to use the default way
     return this->acceptDefault(true);
   }
-  foreach (filename, this->Implementation->FileNames)
+  foreach (filename, impl.FileNames)
   {
     filename = filename.trimmed();
 
-    QString fullFilePath = this->Implementation->Model->absoluteFilePath(filename);
+    QString fullFilePath = impl.Model->absoluteFilePath(filename);
     emit this->fileAccepted(fullFilePath);
     loadedFiles = (this->acceptInternal(this->buildFileGroup(filename)) || loadedFiles);
   }
@@ -641,10 +659,12 @@ bool pqFileDialog::acceptExistingFiles()
 //-----------------------------------------------------------------------------
 bool pqFileDialog::acceptDefault(const bool& checkForGrouping)
 {
-  QString filename = this->Implementation->Ui.FileName->text();
+  auto& impl = *this->Implementation;
+
+  QString filename = impl.Ui.FileName->text();
   filename = filename.trimmed();
 
-  QString fullFilePath = this->Implementation->Model->absoluteFilePath(filename);
+  QString fullFilePath = impl.Model->absoluteFilePath(filename);
   emit this->fileAccepted(fullFilePath);
 
   QStringList files;
@@ -662,11 +682,13 @@ bool pqFileDialog::acceptDefault(const bool& checkForGrouping)
 //-----------------------------------------------------------------------------
 QStringList pqFileDialog::buildFileGroup(const QString& filename)
 {
+  auto& impl = *this->Implementation;
+
   QStringList files;
 
   // if we find the file passed in is the parent of a group,
   // add the entire group to the return QList
-  QAbstractProxyModel* model = &this->Implementation->FileFilter;
+  QAbstractProxyModel* model = &impl.FileFilter;
 
   for (int row = 0; row < model->rowCount(); row++)
   {
@@ -691,7 +713,7 @@ QStringList pqFileDialog::buildFileGroup(const QString& filename)
         if (column == 0)
         {
           QModelIndex sourceIndex = model->mapToSource(index);
-          files += this->Implementation->Model->getFilePaths(sourceIndex);
+          files += impl.Model->getFilePaths(sourceIndex);
         }
         else
         {
@@ -704,7 +726,7 @@ QStringList pqFileDialog::buildFileGroup(const QString& filename)
 
   if (files.empty())
   {
-    files.append(this->Implementation->Model->absoluteFilePath(filename));
+    files.append(impl.Model->absoluteFilePath(filename));
   }
 
   return files;
@@ -713,9 +735,11 @@ QStringList pqFileDialog::buildFileGroup(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqFileDialog::onModelReset()
 {
-  this->Implementation->Ui.Parents->clear();
+  auto& impl = *this->Implementation;
 
-  QString currentPath = this->Implementation->Model->getCurrentPath();
+  impl.Ui.Parents->clear();
+
+  QString currentPath = impl.Model->getCurrentPath();
   // clean the path to always look like a unix path
   currentPath = QDir::cleanPath(currentPath);
 
@@ -749,128 +773,152 @@ void pqFileDialog::onModelReset()
         str += separator;
       }
     }
-    this->Implementation->Ui.Parents->addItem(str);
+    impl.Ui.Parents->addItem(str);
   }
-  this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
-  disconnect(this->Implementation->Ui.ShowDetail, SIGNAL(clicked(bool)), NULL, NULL);
-  connect(this->Implementation->Ui.ShowDetail, SIGNAL(clicked(bool)), this,
-    SLOT(onShowDetailToggled(bool)));
-  bool showDetail = this->Implementation->Model->isShowingDetailedInfo();
-  this->Implementation->Ui.ShowDetail->setChecked(showDetail);
-  this->Implementation->Ui.Files->setColumnHidden(2, !showDetail);
-  this->Implementation->Ui.Files->setColumnHidden(3, !showDetail);
+  impl.Ui.Parents->setCurrentIndex(parents.size() - 1);
+  disconnect(impl.Ui.ShowDetail, SIGNAL(clicked(bool)), NULL, NULL);
+  connect(impl.Ui.ShowDetail, SIGNAL(clicked(bool)), this, SLOT(onShowDetailToggled(bool)));
+  bool showDetail = impl.Model->isShowingDetailedInfo();
+  impl.Ui.ShowDetail->setChecked(showDetail);
+  impl.Ui.Files->setColumnHidden(2, !showDetail);
+  impl.Ui.Files->setColumnHidden(3, !showDetail);
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onNavigate(const QString& Path)
+void pqFileDialog::onNavigate(const QString& newpath)
 {
-  this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
-  this->Implementation->setCurrentPath(Path);
+  auto& impl = *this->Implementation;
+
+  QString path_to_navigate(newpath);
+  if (newpath.isEmpty() && impl.FileNames.size() > 0)
+  {
+    path_to_navigate = impl.FileNames.front();
+    path_to_navigate = impl.Model->absoluteFilePath(path_to_navigate);
+  }
+
+  impl.addHistory(impl.Model->getCurrentPath());
+  impl.setCurrentPath(path_to_navigate);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateUp()
 {
-  this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
-  QFileInfo info(this->Implementation->Model->getCurrentPath());
-  this->Implementation->setCurrentPath(info.path());
+  auto& impl = *this->Implementation;
+
+  impl.addHistory(impl.Model->getCurrentPath());
+  QFileInfo info(impl.Model->getCurrentPath());
+  impl.setCurrentPath(info.path());
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateDown(const QModelIndex& idx)
 {
-  if (!this->Implementation->Model->isDir(idx))
+  auto& impl = *this->Implementation;
+
+  if (!impl.Model->isDir(idx))
     return;
 
-  const QStringList paths = this->Implementation->Model->getFilePaths(idx);
+  const QStringList paths = impl.Model->getFilePaths(idx);
 
   if (1 != paths.size())
     return;
 
-  this->Implementation->addHistory(this->Implementation->Model->getCurrentPath());
-  this->Implementation->setCurrentPath(paths[0]);
+  impl.addHistory(impl.Model->getCurrentPath());
+  impl.setCurrentPath(paths[0]);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateBack()
 {
-  QString path = this->Implementation->backHistory();
-  this->Implementation->setCurrentPath(path);
+  auto& impl = *this->Implementation;
+  QString path = impl.backHistory();
+  impl.setCurrentPath(path);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onNavigateForward()
 {
-  QString path = this->Implementation->forwardHistory();
-  this->Implementation->setCurrentPath(path);
+  auto& impl = *this->Implementation;
+  QString path = impl.forwardHistory();
+  impl.setCurrentPath(path);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onFilterChange(const QString& filter)
 {
+  auto& impl = *this->Implementation;
+
   // set filter on proxy
-  this->Implementation->FileFilter.setFilter(filter);
+  impl.FileFilter.setFilter(filter);
 
   // update view
-  this->Implementation->FileFilter.clear();
+  impl.FileFilter.clear();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onClickedFavorite(const QModelIndex&)
 {
-  this->Implementation->Ui.Files->clearSelection();
+  auto& impl = *this->Implementation;
+  impl.Ui.Files->clearSelection();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onClickedRecent(const QModelIndex&)
 {
-  this->Implementation->Ui.Files->clearSelection();
+  auto& impl = *this->Implementation;
+  impl.Ui.Files->clearSelection();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onClickedFile(const QModelIndex& vtkNotUsed(index))
 {
-  this->Implementation->Ui.Favorites->clearSelection();
+  auto& impl = *this->Implementation;
+  impl.Ui.Favorites->clearSelection();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onActivateFavorite(const QModelIndex& index)
 {
-  if (this->Implementation->FavoriteModel->isDir(index))
+  auto& impl = *this->Implementation;
+  if (impl.FavoriteModel->isDir(index))
   {
-    QString file = this->Implementation->FavoriteModel->filePath(index);
+    QString file = impl.FavoriteModel->filePath(index);
     this->onNavigate(file);
-    this->Implementation->Ui.FileName->selectAll();
+    impl.Ui.FileName->selectAll();
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onActivateRecent(const QModelIndex& index)
 {
-  QString file = this->Implementation->RecentModel->filePath(index);
+  auto& impl = *this->Implementation;
+  QString file = impl.RecentModel->filePath(index);
   this->onNavigate(file);
-  this->Implementation->Ui.FileName->selectAll();
+  impl.Ui.FileName->selectAll();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onDoubleClickFile(const QModelIndex&)
 {
-  QScopedValueRollback<bool> setter(this->Implementation->InDoubleClickHandler, true);
+  auto& impl = *this->Implementation;
+  QScopedValueRollback<bool> setter(impl.InDoubleClickHandler, true);
   this->accept();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onShowHiddenFiles(const bool& hidden)
 {
-  this->Implementation->FileFilter.setShowHidden(hidden);
+  auto& impl = *this->Implementation;
+  impl.FileFilter.setShowHidden(hidden);
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onShowDetailToggled(bool show)
 {
-  this->Implementation->Model->setShowDetailedInfo(show);
-  this->Implementation->Ui.Files->setColumnHidden(2, !show);
-  this->Implementation->Ui.Files->setColumnHidden(3, !show);
+  auto& impl = *this->Implementation;
+  impl.Model->setShowDetailedInfo(show);
+  impl.Ui.Files->setColumnHidden(2, !show);
+  impl.Ui.Files->setColumnHidden(3, !show);
 }
 
 //-----------------------------------------------------------------------------
@@ -882,34 +930,37 @@ void pqFileDialog::setShowHidden(const bool& hidden)
 //-----------------------------------------------------------------------------
 bool pqFileDialog::getShowHidden()
 {
-  return this->Implementation->FileFilter.getShowHidden();
+  auto& impl = *this->Implementation;
+  return impl.FileFilter.getShowHidden();
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onTextEdited(const QString& str)
 {
-  this->Implementation->Ui.Favorites->clearSelection();
+  auto& impl = *this->Implementation;
+  impl.Ui.Favorites->clearSelection();
 
   // really important to block signals so that the clearSelection
   // doesn't cause a signal to be fired that calls fileSelectionChanged
-  this->Implementation->Ui.Files->blockSignals(true);
-  this->Implementation->Ui.Files->clearSelection();
+  impl.Ui.Files->blockSignals(true);
+  impl.Ui.Files->clearSelection();
   if (str.size() > 0)
   {
-    // convert the typed information to be this->Implementation->FileNames
-    this->Implementation->FileNames =
-      str.split(this->Implementation->FileNamesSeperator, QString::SkipEmptyParts);
+    // convert the typed information to be impl.FileNames
+    impl.FileNames = str.split(impl.FileNamesSeperator, QString::SkipEmptyParts);
   }
   else
   {
-    this->Implementation->FileNames.clear();
+    impl.FileNames.clear();
   }
-  this->Implementation->Ui.Files->blockSignals(false);
+  impl.Ui.Files->blockSignals(false);
+  this->updateButtonStates();
 }
 
 //-----------------------------------------------------------------------------
 QString pqFileDialog::fixFileExtension(const QString& filename, const QString& filter)
 {
+  auto& impl = *this->Implementation;
   // Add missing extension if necessary
   QFileInfo fileInfo(filename);
   QString ext = fileInfo.completeSuffix();
@@ -921,7 +972,7 @@ QString pqFileDialog::fixFileExtension(const QString& filename, const QString& f
     // Ensure that the extension the user added is indeed of one the supported
     // types. (BUG #7634).
     QStringList wildCards;
-    foreach (QString curfilter, this->Implementation->Filters)
+    foreach (QString curfilter, impl.Filters)
     {
       wildCards += ::GetWildCardsFromFilter(curfilter);
     }
@@ -974,21 +1025,22 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
     return false;
   }
 
+  auto& impl = *this->Implementation;
   QString file = selected_files[0];
   // User chose an existing directory
-  if (this->Implementation->Model->dirExists(file, file))
+  if (impl.Model->dirExists(file, file))
   {
-    switch (this->Implementation->Mode)
+    switch (impl.Mode)
     {
       case ExistingFilesAndDirectories:
-        if (!this->Implementation->InDoubleClickHandler)
+        if (!impl.InDoubleClickHandler)
         {
           this->addToFilesSelected(selected_files);
           return true;
         }
         VTK_FALLTHROUGH;
       case Directory:
-        if (!this->Implementation->InDoubleClickHandler)
+        if (!impl.InDoubleClickHandler)
         {
           this->addToFilesSelected(QStringList(file));
           this->onNavigate(file);
@@ -999,37 +1051,37 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
       case ExistingFiles:
       case AnyFile:
         this->onNavigate(file);
-        this->Implementation->Ui.FileName->clear();
+        impl.Ui.FileName->clear();
         break;
     }
     return false;
   }
 
   // User chose an existing file or a brand new filename.
-  if (this->Implementation->Mode == pqFileDialog::AnyFile)
+  if (impl.Mode == pqFileDialog::AnyFile)
   {
     // If mode is a "save" dialog, we fix the extension first.
-    file = this->fixFileExtension(file, this->Implementation->Ui.FileType->currentText());
+    file = this->fixFileExtension(file, impl.Ui.FileType->currentText());
 
     // It is very possible that after fixing the extension,
     // the new filename is an already present directory,
     // hence we handle that case:
-    if (this->Implementation->Model->dirExists(file, file))
+    if (impl.Model->dirExists(file, file))
     {
       this->onNavigate(file);
-      this->Implementation->Ui.FileName->clear();
+      impl.Ui.FileName->clear();
       return false;
     }
   }
 
   // User chose an existing file-or-files
-  if (this->Implementation->Model->fileExists(file, file))
+  if (impl.Model->fileExists(file, file))
   {
-    switch (this->Implementation->Mode)
+    switch (impl.Mode)
     {
       case Directory:
         // User chose a file in directory mode, do nothing
-        this->Implementation->Ui.FileName->clear();
+        impl.Ui.FileName->clear();
         break;
       case ExistingFile:
       case ExistingFiles:
@@ -1038,7 +1090,7 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
         break;
       case AnyFile:
         // User chose an existing file, prompt before overwrite
-        if (!this->Implementation->SuppressOverwriteWarning)
+        if (!impl.SuppressOverwriteWarning)
         {
           if (QMessageBox::No ==
             QMessageBox::warning(this, this->windowTitle(),
@@ -1055,13 +1107,13 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
   }
   else // User choose non-existent file.
   {
-    switch (this->Implementation->Mode)
+    switch (impl.Mode)
     {
       case Directory:
       case ExistingFile:
       case ExistingFiles:
       case ExistingFilesAndDirectories:
-        this->Implementation->Ui.FileName->selectAll();
+        impl.Ui.FileName->selectAll();
         return false;
 
       case AnyFile:
@@ -1075,12 +1127,12 @@ bool pqFileDialog::acceptInternal(const QStringList& selected_files)
 //-----------------------------------------------------------------------------
 void pqFileDialog::fileSelectionChanged()
 {
+  auto& impl = *this->Implementation;
   // Selection changed, update the FileName entry box
   // to reflect the current selection.
   QString fileString;
-  const QModelIndexList indices =
-    this->Implementation->Ui.Files->selectionModel()->selectedIndexes();
-  const QModelIndexList rows = this->Implementation->Ui.Files->selectionModel()->selectedRows();
+  const QModelIndexList indices = impl.Ui.Files->selectionModel()->selectedIndexes();
+  const QModelIndexList rows = impl.Ui.Files->selectionModel()->selectedRows();
 
   if (indices.isEmpty())
   {
@@ -1097,47 +1149,31 @@ void pqFileDialog::fileSelectionChanged()
     {
       continue;
     }
-    if (index.model() == &this->Implementation->FileFilter)
+    if (index.model() == &impl.FileFilter)
     {
-      name = this->Implementation->FileFilter.data(index).toString();
+      name = impl.FileFilter.data(index).toString();
       fileString += name;
       if (i != rows.size() - 1)
       {
-        fileString += this->Implementation->FileNamesSeperator;
+        fileString += impl.FileNamesSeperator;
       }
       fileNames.append(name);
     }
   }
-  // if we are in directory mode we have to enable / disable the OK button
-  // based on if the user has selected a file.
-  if (this->Implementation->Mode == pqFileDialog::Directory &&
-    indices[0].model() == &this->Implementation->FileFilter)
-  {
-    QModelIndex idx = this->Implementation->FileFilter.mapToSource(indices[0]);
-    bool enabled = this->Implementation->Model->isDir(idx);
-    this->Implementation->Ui.OK->setEnabled(enabled);
-    if (enabled)
-    {
-      this->Implementation->Ui.FileName->setText(fileString);
-    }
-    else
-    {
-      this->Implementation->Ui.FileName->clear();
-    }
-    return;
-  }
 
   // user is currently editing a name, don't change the text
-  this->Implementation->Ui.FileName->blockSignals(true);
-  this->Implementation->Ui.FileName->setText(fileString);
-  this->Implementation->Ui.FileName->blockSignals(false);
+  impl.Ui.FileName->blockSignals(true);
+  impl.Ui.FileName->setText(fileString);
+  impl.Ui.FileName->blockSignals(false);
 
-  this->Implementation->FileNames = fileNames;
+  impl.FileNames = fileNames;
+  this->updateButtonStates();
 }
 
 //-----------------------------------------------------------------------------
 bool pqFileDialog::selectFile(const QString& f)
 {
+  auto& impl = *this->Implementation;
   // We don't use QFileInfo here since it messes the paths up if the client and
   // the server are heterogeneous systems.
   std::string unix_path = f.toUtf8().data();
@@ -1157,9 +1193,9 @@ bool pqFileDialog::selectFile(const QString& f)
   }
 
   QPointer<QDialog> diag = this;
-  this->Implementation->Model->setCurrentPath(dirname.c_str());
-  this->Implementation->Ui.FileName->setText(filename.c_str());
-  this->Implementation->SuppressOverwriteWarning = true;
+  impl.Model->setCurrentPath(dirname.c_str());
+  impl.Ui.FileName->setText(filename.c_str());
+  impl.SuppressOverwriteWarning = true;
   this->accept();
   if (diag && diag->result() != QDialog::Accepted)
   {
@@ -1171,12 +1207,13 @@ bool pqFileDialog::selectFile(const QString& f)
 //-----------------------------------------------------------------------------
 void pqFileDialog::showEvent(QShowEvent* _showEvent)
 {
+  auto& impl = *this->Implementation;
   QDialog::showEvent(_showEvent);
   // Qt sets the default keyboard focus to the last item in the tab order
   // which is determined by the creation order. This means that we have
   // to explicitly state that the line edit has the focus on showing no
   // matter the tab order
-  this->Implementation->Ui.FileName->setFocus(Qt::OtherFocusReason);
+  impl.Ui.FileName->setFocus(Qt::OtherFocusReason);
 }
 
 //-----------------------------------------------------------------------------
@@ -1196,6 +1233,7 @@ QString pqFileDialog::getSaveFileName(pqServer* server, QWidget* parentWdg, cons
 //-----------------------------------------------------------------------------
 void pqFileDialog::saveState()
 {
+  auto& impl = *this->Implementation;
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core)
   {
@@ -1203,10 +1241,10 @@ void pqFileDialog::saveState()
     settings->saveState(*this, "FileDialog");
     settings->beginGroup("FileDialog");
 
-    QHeaderView* header = this->Implementation->Ui.Files->header();
+    QHeaderView* header = impl.Ui.Files->header();
     settings->setValue("Header", header->saveState());
-    settings->setValue("MainSplitter", this->Implementation->Ui.mainSplitter->saveState());
-    settings->setValue("Splitter", this->Implementation->Ui.splitter->saveState());
+    settings->setValue("MainSplitter", impl.Ui.mainSplitter->saveState());
+    settings->setValue("Splitter", impl.Ui.splitter->saveState());
     settings->endGroup();
   }
 }
@@ -1214,7 +1252,7 @@ void pqFileDialog::saveState()
 //-----------------------------------------------------------------------------
 void pqFileDialog::restoreState()
 {
-
+  auto& impl = *this->Implementation;
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core)
   {
@@ -1224,19 +1262,69 @@ void pqFileDialog::restoreState()
 
     if (settings->contains("Header"))
     {
-      this->Implementation->Ui.Files->header()->restoreState(
-        settings->value("Header").toByteArray());
+      impl.Ui.Files->header()->restoreState(settings->value("Header").toByteArray());
     }
 
     if (settings->contains("MainSplitter"))
     {
-      this->Implementation->Ui.mainSplitter->restoreState(
-        settings->value("MainSplitter").toByteArray());
+      impl.Ui.mainSplitter->restoreState(settings->value("MainSplitter").toByteArray());
     }
     if (settings->contains("Splitter"))
     {
-      this->Implementation->Ui.splitter->restoreState(settings->value("Splitter").toByteArray());
+      impl.Ui.splitter->restoreState(settings->value("Splitter").toByteArray());
     }
     settings->endGroup();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::updateButtonStates()
+{
+  auto& impl = *this->Implementation;
+
+  bool is_dir = false;
+  if (impl.FileNames.size() == 1)
+  {
+    QString tmp;
+    is_dir = impl.Model->dirExists(impl.FileNames.front(), tmp);
+  }
+
+  // if mode is Directory, update OK button state.
+  if (impl.Mode == Directory)
+  {
+    impl.Ui.OK->setEnabled(is_dir);
+  }
+  else
+  {
+    impl.Ui.OK->setEnabled(true);
+  }
+
+  if (impl.Mode == Directory || impl.Mode == ExistingFilesAndDirectories)
+  {
+    // show the Navigate button.
+    impl.Ui.Navigate->setVisible(true);
+
+    // let's see if the Navigate button should be enabled. If the Navigate
+    // button is enabled, it is also made the "default" button i.e. the button
+    // that's triggered when user this the "Enter" key. If Navigate is not
+    // enabled, then the OK button is the "default" button.
+    if (is_dir)
+    {
+      impl.Ui.OK->setDefault(false);
+      impl.Ui.Navigate->setEnabled(true);
+      impl.Ui.Navigate->setDefault(true);
+    }
+    else
+    {
+      impl.Ui.Navigate->setEnabled(false);
+      impl.Ui.Navigate->setDefault(false);
+      impl.Ui.OK->setDefault(true);
+    }
+  }
+  else
+  {
+    impl.Ui.Navigate->setVisible(false);
+    impl.Ui.Navigate->setDefault(false);
+    impl.Ui.OK->setDefault(true);
   }
 }
