@@ -73,6 +73,8 @@ set (Module_SRCS
   pqComponentsTestUtility.h
   pqCompositeDataInformationTreeModel.cxx
   pqCompositeDataInformationTreeModel.h
+  pqCompositePropertyWidgetDecorator.cxx
+  pqCompositePropertyWidgetDecorator.h
   pqCompositeTreePropertyWidget.cxx
   pqCompositeTreePropertyWidget.h
   pqCustomFilterDefinitionModel.cxx
@@ -337,6 +339,7 @@ set (Module_MOC_HDRS
   pqComparativeVisPanel.h
   pqComponentsTestUtility.h
   pqCompositeDataInformationTreeModel.h
+  pqCompositePropertyWidgetDecorator.h
   pqCompositeTreePropertyWidget.h
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h

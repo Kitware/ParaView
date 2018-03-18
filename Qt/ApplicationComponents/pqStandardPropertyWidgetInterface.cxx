@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorPaletteSelectorWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
+#include "pqCompositePropertyWidgetDecorator.h"
 #include "pqCylinderPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
@@ -322,6 +323,10 @@ pqPropertyWidgetDecorator* pqStandardPropertyWidgetInterface::createWidgetDecora
   if (type == "MultiComponentsDecorator")
   {
     return new pqMultiComponentsDecorator(config, widget);
+  }
+  if (type == "CompositeDecorator")
+  {
+    return new pqCompositePropertyWidgetDecorator(config, widget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***
