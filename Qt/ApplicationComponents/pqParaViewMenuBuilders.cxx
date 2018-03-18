@@ -173,7 +173,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
-  new pqRestoreUserPreferencesReaction(ui.actionRestoreUserPreferences);
+  new pqRestoreUserPreferencesReaction(ui.actionResetDefaultSettings);
 }
 
 //-----------------------------------------------------------------------------
