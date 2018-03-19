@@ -80,7 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRecentFilesMenu.h"
 #include "pqReloadFilesReaction.h"
 #include "pqRepresentationToolbar.h"
-#include "pqRestoreUserPreferencesReaction.h"
+#include "pqResetDefaultSettingsReaction.h"
 #include "pqSaveAnimationGeometryReaction.h"
 #include "pqSaveAnimationReaction.h"
 #include "pqSaveDataReaction.h"
@@ -173,7 +173,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
-  new pqRestoreUserPreferencesReaction(ui.actionRestoreUserPreferences);
+  new pqResetDefaultSettingsReaction(ui.actionResetDefaultSettings);
 }
 
 //-----------------------------------------------------------------------------

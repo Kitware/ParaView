@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqRestoreUserPreferencesReaction.h
+   Module:  pqResetDefaultSettingsReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,48 +29,48 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqRestoreUserPreferencesReaction_h
-#define pqRestoreUserPreferencesReaction_h
+#ifndef pqResetDefaultSettingsReaction_h
+#define pqResetDefaultSettingsReaction_h
 
 #include "pqReaction.h"
 
 #include <QStringList>
 
 /**
- * @class pqRestoreUserPreferencesReaction
- * @brief reaction to restore user preferences to default.
+ * @class pqResetDefaultSettingsReaction
+ * @brief reaction to restore user settings to default.
  * @ingroup Reactions
  *
- * pqRestoreUserPreferencesReaction can restore user settings to default. It
+ * pqResetDefaultSettingsReaction can restore user settings to default. It
  * pops up a prompt indicating whether the user wants to generate backups for
  * settings being restored. If so, backups are generated.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqRestoreUserPreferencesReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqResetDefaultSettingsReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 
 public:
-  pqRestoreUserPreferencesReaction(QAction* parent);
-  ~pqRestoreUserPreferencesReaction() override;
+  pqResetDefaultSettingsReaction(QAction* parent);
+  ~pqResetDefaultSettingsReaction() override;
 
   /**
-   * Restore user preferences. Application must be restarted for the changes to
+   * Reset to default settings. Application must be restarted for the changes to
    * take effect.
    */
-  virtual void restoreUserPreferences();
+  virtual void resetSettingsToDefault();
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  void onTriggered() override { this->restoreUserPreferences(); }
+  void onTriggered() override { this->resetSettingsToDefault(); }
 
   virtual void clearSettings();
   virtual QStringList backupSettings();
 
 private:
-  Q_DISABLE_COPY(pqRestoreUserPreferencesReaction)
+  Q_DISABLE_COPY(pqResetDefaultSettingsReaction)
 };
 
 #endif

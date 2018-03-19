@@ -176,15 +176,15 @@
     <string>V</string>
    </property>
  </action>
-  <action name="actionRestoreUserPreferences">
+  <action name="actionResetDefaultSettings">
    <property name="text">
-    <string>Restore User Preferences</string>
+    <string>Reset to Default Settings</string>
    </property>
    <property name="iconText">
-    <string>Restore User Preferences</string>
+    <string>Reset to Default Settings</string>
    </property>
    <property name="toolTip">
-    <string>Restore user preferences to default.</string>
+    <string>Reset user settings to default.</string>
    </property>
   </action>
   <addaction name="actionEditUndo"/>
@@ -206,7 +206,7 @@
   <addaction name="actionQuery"/>
   <addaction name="separator"/>
   <addaction name="actionEditSettings"/>
-  <addaction name="actionRestoreUserPreferences"/>
+  <addaction name="actionResetDefaultSettings"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
