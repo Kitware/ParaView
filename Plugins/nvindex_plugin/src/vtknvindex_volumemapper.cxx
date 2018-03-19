@@ -270,7 +270,6 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
                 << " in vtknvindex_representation::RequestData().";
       return false;
     }
-    vtknvindex::util::sleep(0.2);
     m_is_nvindex_rank = true;
   }
 
