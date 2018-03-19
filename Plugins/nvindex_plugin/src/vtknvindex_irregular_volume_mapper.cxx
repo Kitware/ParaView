@@ -226,7 +226,6 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
                 << " in vtknvindex_representation::RequestData().";
       return false;
     }
-    vtknvindex::util::sleep(0.2);
     m_is_nvindex_rank = true;
   }
 
