@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqRestoreUserPreferencesReaction.cxx
+   Module:  pqResetDefaultSettingsReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqRestoreUserPreferencesReaction.h"
+#include "pqResetDefaultSettingsReaction.h"
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
@@ -44,18 +44,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqRestoreUserPreferencesReaction::pqRestoreUserPreferencesReaction(QAction* parentObject)
+pqResetDefaultSettingsReaction::pqResetDefaultSettingsReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqRestoreUserPreferencesReaction::~pqRestoreUserPreferencesReaction()
+pqResetDefaultSettingsReaction::~pqResetDefaultSettingsReaction()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqRestoreUserPreferencesReaction::restoreUserPreferences()
+void pqResetDefaultSettingsReaction::restoreUserPreferences()
 {
   QMessageBox mbox(pqCoreUtilities::mainWidget());
   mbox.setWindowTitle("Reset to Default Settings");
@@ -116,7 +116,7 @@ void pqRestoreUserPreferencesReaction::restoreUserPreferences()
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqRestoreUserPreferencesReaction::backupSettings()
+QStringList pqResetDefaultSettingsReaction::backupSettings()
 {
   auto core = pqApplicationCore::instance();
   if (core->getOptions()->GetDisableRegistry())
@@ -152,7 +152,7 @@ QStringList pqRestoreUserPreferencesReaction::backupSettings()
 }
 
 //-----------------------------------------------------------------------------
-void pqRestoreUserPreferencesReaction::clearSettings()
+void pqResetDefaultSettingsReaction::clearSettings()
 {
   auto core = pqApplicationCore::instance();
   if (core->getOptions()->GetDisableRegistry())
