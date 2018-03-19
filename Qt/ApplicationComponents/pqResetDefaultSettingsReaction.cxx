@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqRestoreUserPreferencesReaction.cxx
+   Module:  pqResetDefaultSettingsReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqRestoreUserPreferencesReaction.h"
+#include "pqResetDefaultSettingsReaction.h"
 
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
@@ -44,28 +44,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqRestoreUserPreferencesReaction::pqRestoreUserPreferencesReaction(QAction* parentObject)
+pqResetDefaultSettingsReaction::pqResetDefaultSettingsReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqRestoreUserPreferencesReaction::~pqRestoreUserPreferencesReaction()
+pqResetDefaultSettingsReaction::~pqResetDefaultSettingsReaction()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqRestoreUserPreferencesReaction::restoreUserPreferences()
+void pqResetDefaultSettingsReaction::resetSettingsToDefault()
 {
   QMessageBox mbox(pqCoreUtilities::mainWidget());
-  mbox.setWindowTitle("Restore User Preferences");
+  mbox.setWindowTitle("Reset to Default Settings");
   mbox.setIcon(QMessageBox::Question);
-  mbox.setText("<b>Restore user preferences to default</b>");
-  mbox.setInformativeText("All user preferences will be discarded. Do you want to continue?");
+  mbox.setText("<b>Reset custom settings to default.</b>");
+  mbox.setInformativeText(
+    "All custom setting will be reset to their default values. Do you want to continue?");
   mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::Save | QMessageBox::Cancel);
 
   mbox.button(QMessageBox::Yes)->setText("Yes");
-  mbox.button(QMessageBox::Save)->setText("Yes, and backup current preferences");
+  mbox.button(QMessageBox::Save)->setText("Yes, and backup current settings");
   mbox.setDefaultButton(QMessageBox::Cancel);
 
   QString informativeText;
@@ -105,9 +106,9 @@ void pqRestoreUserPreferencesReaction::restoreUserPreferences()
     << tr("Please restart %1 for the changes to take effect.").arg(QApplication::applicationName());
 
   QMessageBox mbox2(pqCoreUtilities::mainWidget());
-  mbox2.setWindowTitle(tr("Restore User Preferences"));
+  mbox2.setWindowTitle(tr("Reset to Default Settings"));
   mbox2.setIcon(QMessageBox::Information);
-  mbox2.setText(tr("<b>User preferences restored to default</b>"));
+  mbox2.setText(tr("<b>Settings reset to default</b>"));
   mbox2.setInformativeText(informativeText);
   mbox2.setStandardButtons(QMessageBox::Ok);
   mbox2.setDefaultButton(QMessageBox::Ok);
@@ -115,7 +116,7 @@ void pqRestoreUserPreferencesReaction::restoreUserPreferences()
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqRestoreUserPreferencesReaction::backupSettings()
+QStringList pqResetDefaultSettingsReaction::backupSettings()
 {
   auto core = pqApplicationCore::instance();
   if (core->getOptions()->GetDisableRegistry())
@@ -151,7 +152,7 @@ QStringList pqRestoreUserPreferencesReaction::backupSettings()
 }
 
 //-----------------------------------------------------------------------------
-void pqRestoreUserPreferencesReaction::clearSettings()
+void pqResetDefaultSettingsReaction::clearSettings()
 {
   auto core = pqApplicationCore::instance();
   if (core->getOptions()->GetDisableRegistry())
