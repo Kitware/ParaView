@@ -7,6 +7,7 @@
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION
+#include "vtkPVFileInformation.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSessionProxyManager.h"
 
@@ -39,12 +40,7 @@ pqWelcomeDialog::~pqWelcomeDialog()
 //-----------------------------------------------------------------------------
 void pqWelcomeDialog::onGettingStartedGuideClicked()
 {
-#if defined(_WIN32) || defined(__APPLE__)
-  QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
-#else
-  QString appdir = QCoreApplication::applicationDirPath();
-  QString documentationPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc";
-#endif
+  QString documentationPath(vtkPVFileInformation::GetParaViewDocDirectory().c_str());
   QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
   QUrl gettingStartedURL = QUrl::fromLocalFile(paraViewGettingStartedFile);
   if (pqDesktopServicesReaction::openUrl(gettingStartedURL))
