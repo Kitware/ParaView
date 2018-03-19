@@ -214,3 +214,9 @@ void pqPropertyWidget::addDecorator(pqPropertyWidgetDecorator* decorator)
     this->Decorators.push_back(decorator);
   }
 }
+
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::removeDecorator(pqPropertyWidgetDecorator* decorator)
+{
+  this->Decorators.removeAll(decorator);
+}

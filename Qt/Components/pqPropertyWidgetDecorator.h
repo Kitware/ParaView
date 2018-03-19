@@ -56,7 +56,7 @@ public:
   * @param xml The XML element from the `<Hints/>` section for the proxy/property that
   * resulted in the creation of the decorator. Decorators can be provided
   * configuration parameters from the XML.
-  * @param parent Parent widget, cannot be NULL.
+  * @param parent Parent widget
   */
   pqPropertyWidgetDecorator(vtkPVXMLElement* xml, pqPropertyWidget* parent);
   ~pqPropertyWidgetDecorator() override;
@@ -89,6 +89,12 @@ public:
   * disabled given the current state.
   */
   virtual bool enableWidget() const { return true; }
+
+  /**
+   * Creates a new decorator, given the xml config and the parent
+   * pqPropertyWidget for the decorator.
+   */
+  static pqPropertyWidgetDecorator* create(vtkPVXMLElement* xml, pqPropertyWidget* parent);
 
 signals:
   /**

@@ -195,6 +195,11 @@ protected:
   void addDecorator(pqPropertyWidgetDecorator*);
 
   /**
+   * Unregisters a decorator.
+   */
+  void removeDecorator(pqPropertyWidgetDecorator*);
+
+  /**
   * Provides access to the pqPropertyLinks instance.
   */
   pqPropertyLinks& links() { return this->Links; }
@@ -203,6 +208,7 @@ public:
   void setProperty(vtkSMProperty* property);
 
 private:
+  friend class pqCompositePropertyWidgetDecorator;
   friend class pqPropertyWidgetDecorator;
   friend class pqProxyWidget;
 

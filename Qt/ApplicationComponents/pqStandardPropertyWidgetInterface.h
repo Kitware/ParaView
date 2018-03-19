@@ -117,6 +117,7 @@ public:
    * \li \c GenericDecorator: pqGenericPropertyWidgetDecorator
    * \li \c OSPRayHidingDecorator: pqOSPRayHidingDecorator
    * \li \c MultiComponentsDecorator: pqMultiComponentsDecorator
+   * \li \c CompositeDecorator: pqCompositePropertyWidgetDecorator
    */
   pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget) override;
