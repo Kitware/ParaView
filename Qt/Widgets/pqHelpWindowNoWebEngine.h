@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
 *============================================================================
 * This is an internal header used by pqHelpWindow.
-* This header gets included when PARAVIEW_USE_QTWEBKIT is OFF.
+* This header gets included when PARAVIEW_USE_QTWEBENGINE is OFF.
 *============================================================================
 */
 
