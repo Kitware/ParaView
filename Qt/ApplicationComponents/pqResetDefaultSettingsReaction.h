@@ -55,16 +55,16 @@ public:
   ~pqResetDefaultSettingsReaction() override;
 
   /**
-   * Restore user preferences. Application must be restarted for the changes to
+   * Reset to default settings. Application must be restarted for the changes to
    * take effect.
    */
-  virtual void restoreUserPreferences();
+  virtual void resetSettingsToDefault();
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  void onTriggered() override { this->restoreUserPreferences(); }
+  void onTriggered() override { this->resetSettingsToDefault(); }
 
   virtual void clearSettings();
   virtual QStringList backupSettings();

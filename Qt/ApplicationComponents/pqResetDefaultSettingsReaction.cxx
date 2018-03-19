@@ -55,7 +55,7 @@ pqResetDefaultSettingsReaction::~pqResetDefaultSettingsReaction()
 }
 
 //-----------------------------------------------------------------------------
-void pqResetDefaultSettingsReaction::restoreUserPreferences()
+void pqResetDefaultSettingsReaction::resetSettingsToDefault()
 {
   QMessageBox mbox(pqCoreUtilities::mainWidget());
   mbox.setWindowTitle("Reset to Default Settings");
