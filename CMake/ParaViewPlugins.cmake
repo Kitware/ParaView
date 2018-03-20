@@ -321,14 +321,21 @@ ENDMACRO()
 #     XML_GROUP <xml group used to identify the vtkSMProxy>
 #     XML_NAME <xml name used to identify the vtkSMProxy>
 #     ...)
-# The TYPE, XML_GROUP, and XML_NAME can be repeated to register multiple types
-# of pqProxy subclasses or reuse the same pqProxy for multiple proxy types.
+# or
+#   add_pqproxy(OUTIFACES OUTSRCS
+#     TYPE <pqProxy subclass name>
+#     XML_GROUP <xml group used to identify the vtkSMProxy>
+#     XML_NAME_REGEX <xml name regex used to identify the vtkSMProxy>
+#     ...)
+# The TYPE, XML_GROUP, XML_NAME and XML_NAME_REGEX can be repeated to register
+# multiple types of pqProxy subclasses or reuse the same pqProxy for multiple
+# proxy types.
 macro(add_pqproxy OUTIFACES OUTSRCS)
   set (arg_types)
   set (_doing)
   set (_active_index)
   foreach (arg ${ARGN})
-    if ((NOT _doing) AND ("${arg}" MATCHES "^(TYPE|XML_GROUP|XML_NAME)$"))
+    if ((NOT _doing) AND ("${arg}" MATCHES "^(TYPE|XML_GROUP|XML_NAME|XML_NAME_REGEX)$"))
       set (_doing "${arg}")
     elseif (_doing STREQUAL "TYPE")
       list(APPEND arg_types "${arg}")
@@ -343,6 +350,9 @@ macro(add_pqproxy OUTIFACES OUTSRCS)
     elseif (_doing STREQUAL "XML_NAME")
       set (_type_${_active_index}_xmlname "${arg}")
       set (_doing)
+    elseif (_doing STREQUAL "XML_NAME_REGEX")
+      set (_type_${_active_index}_xmlname_root "${arg}")
+      set (_doing)
     else()
       set (_doing)
     endif()
@@ -356,13 +366,23 @@ macro(add_pqproxy OUTIFACES OUTSRCS)
     list(GET arg_types ${index} arg_type)
     set (arg_xml_group "${_type_${index}_xmlgroup}")
     set (arg_xml_name "${_type_${index}_xmlname}")
-    set (ARG_INCLUDES "${ARG_INCLUDES}#include\"${arg_type}.h\"\n")
+    set (arg_xml_name_regex "${_type_${index}_xmlname_regex}")
+    set (ARG_INCLUDES "${ARG_INCLUDES}#include \"${arg_type}.h\"\n")
+    if (arg_xml_name_regex)
+    set (ARG_BODY "${ARG_BODY}
+    if (QString(\"${arg_xml_group}\") == proxy->GetXMLGroup() &&
+        QString(proxy->GetXMLName()).contains(QRegularExpression(\"${arg_xml_name_regex}\")))
+        {
+        return new ${arg_type}(regGroup, regName, proxy, server, NULL);
+        }")
+    else ()
     set (ARG_BODY "${ARG_BODY}
     if (QString(\"${arg_xml_group}\") == proxy->GetXMLGroup() &&
         QString(\"${arg_xml_name}\") == proxy->GetXMLName())
         {
         return new ${arg_type}(regGroup, regName, proxy, server, NULL);
         }")
+    endif()
   endforeach()
 
   if (ARG_INCLUDES AND ARG_BODY)
