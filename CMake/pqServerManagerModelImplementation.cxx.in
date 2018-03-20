@@ -1,5 +1,6 @@
 #include "@ARG_TYPE@ServerManagerModelImplementation.h"
 #include "vtkSMProxy.h"
+#include <QRegularExpression>
 
 // begin includes
 @ARG_INCLUDES@
