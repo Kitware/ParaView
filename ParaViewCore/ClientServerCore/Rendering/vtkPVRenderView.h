@@ -898,6 +898,14 @@ public:
    * For OSPRay, set the library of materials.
    */
   virtual void SetMaterialLibrary(vtkPVMaterialLibrary*);
+  void SetViewTime(double value) VTK_OVERRIDE;
+  //@{
+  /**
+   * Set the size of OSPRay's temporal cache.
+   */
+  void SetTimeCacheSize(int);
+  int GetTimeCacheSize();
+  //@}
 
   //@{
   /**
