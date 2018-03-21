@@ -2688,6 +2688,25 @@
                                    values="1" />
         </Hints>
       </DoubleVectorProperty>
+      <IntVectorProperty
+          name="OSPRayTemporalCacheSize"
+          label="Temporal Cache Size"
+          command="SetTimeCacheSize"
+          default_values="0"
+          animateable="0"
+          number_of_elements="1">
+        <IntRangeDomain
+            min="0"
+            name="range"/>
+        <Documentation>Set the size of the timestep cache that speeds up flip book animation of volumes in OSPRay.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
       <DoubleVectorProperty
           name="BackgroundNorth"
           command="SetBackgroundNorth"
@@ -2804,6 +2823,7 @@
         <Property name="SamplesPerPixel"/>
         <Property name="MaxFrames"/>
         <Property name="LightScale"/>
+	<Property name="OSPRayTemporalCacheSize"/>
       </PropertyGroup>
     </RenderViewProxy>
 
