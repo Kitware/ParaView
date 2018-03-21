@@ -161,21 +161,6 @@ void CoProcess(
     BuildVTKDataStructures(grid, attributes);
     dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
 
-    // figure out the whole extent of the grid
-    unsigned int* extent = grid.GetExtents();
-    int wholeExtent[6], tmp[6];
-    for (int i = 0; i < 3; i++)
-    {
-      wholeExtent[i * 2] = -static_cast<int>(extent[i * 2]); // negate for parallel communication
-      wholeExtent[i * 2 + 1] = static_cast<int>(extent[i * 2 + 1]);
-    }
-    vtkMultiProcessController::GetGlobalController()->AllReduce(
-      wholeExtent, tmp, 6, vtkCommunicator::MAX_OP);
-    for (int i = 0; i < 3; i++)
-    {
-      tmp[i * 2] = -tmp[i * 2];
-    }
-    dataDescription->GetInputDescriptionByName("input")->SetWholeExtent(tmp);
     Processor->CoProcess(dataDescription.GetPointer());
   }
 }
