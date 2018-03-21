@@ -139,9 +139,10 @@ void CoProcess(
     BuildVTKDataStructures(grid, attributes);
     dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
     int wholeExtent[6];
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 3; i++)
     {
-      wholeExtent[i] = grid.GetNumPoints()[i];
+      wholeExtent[2 * i] = 0;
+      wholeExtent[2 * i + 1] = grid.GetNumPoints()[i];
     }
 
     dataDescription->GetInputDescriptionByName("input")->SetWholeExtent(wholeExtent);

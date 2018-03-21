@@ -39,7 +39,7 @@ def CreateCoProcessor():
         writer = servermanager.writers.XMLMultiBlockDataWriter(Input=adaptorinput)
         filename = 'input_%t.vtm'
       else:
-        print "Don't know how to create a writer for a ", grid.GetClassName()
+        print("Don't know how to create a writer for a ", grid.GetClassName())
 
       if filename:
         coprocessor.RegisterWriter(writer, filename, freq=outputfrequency)
