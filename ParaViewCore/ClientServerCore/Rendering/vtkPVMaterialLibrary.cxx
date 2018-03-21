@@ -22,6 +22,7 @@
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
 #include "vtkResourceFileLocator.h"
+#include "vtkVersion.h"
 #include <vtksys/SystemTools.hxx>
 
 #include <cassert>
@@ -59,7 +60,7 @@ vtkPVMaterialLibrary::vtkPVMaterialLibrary()
 
   // and we look in some default locations relative to the exe
   auto vtklibs = vtkGetLibraryPathForSymbol(GetVTKVersion);
-  assert(!vtklibs.empty);
+  assert(!vtklibs.empty());
 
   // where materials might be in relation to that
   std::vector<std::string> prefixes = {
