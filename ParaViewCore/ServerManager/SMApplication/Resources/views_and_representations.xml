@@ -6662,11 +6662,6 @@
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
-      <SubProxy>
-        <Proxy name="SelectionRepresentation"
-               proxygroup="representations"
-               proxyname="SelectionRepresentation" />
-      </SubProxy>
     </PVRepresentationProxy>
 
     <!-- =================================================================== -->

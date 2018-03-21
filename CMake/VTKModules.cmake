@@ -407,6 +407,7 @@ if (PARAVIEW_ENABLE_PDAL)
 endif()
 
 if (PARAVIEW_USE_MPI)
+  list (APPEND _vtk_mpi_modules vtkDomainsParallelChemistry)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
 endif()
 

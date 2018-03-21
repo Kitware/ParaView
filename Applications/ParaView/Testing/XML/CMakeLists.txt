@@ -51,6 +51,7 @@ paraview_test_load_data(""
   dualSphereAnimation.clone.pvd
   dualSphereAnimation.pvd
   iron_protein.vtk
+  linesPolydata.vtk
   LoadState.pvsm
   LoadStateDialog.pvsm
   minimal.nii
@@ -63,6 +64,7 @@ paraview_test_load_data(""
   NE2_ps_bath.png
   non_convex_polygon.vtu
   office.binary.vtk
+  pointSet.vtk
   porphyrin.cml
   PropertyLink.pvsm
   quadraticTetra01.vtu
@@ -304,6 +306,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AccentuatedFilename.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AMReXParticlesReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Annotations.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConvertToMolecule.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CopyPasteProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRClip.xml
@@ -381,6 +384,8 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateChooseFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateUseExisting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MoleculeBonds.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MoleculeToLines.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockAttributes1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockInspector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockSingleBlock.xml
@@ -544,6 +549,16 @@ if (PARAVIEW_USE_MPI)
 
     # Test Use Data Partitions for volume rendering
     #${CMAKE_CURRENT_SOURCE_DIR}/UseDataPartitions.xml
+  )
+
+  # DistributePoints is only tested in non-built-in mode.
+  add_client_server_tests("pvcs"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DistributePoints.xml
+  )
+  add_client_render_server_tests("pvcrs"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DistributePoints.xml
   )
 
   # Volume rendering seems to work better in serial
