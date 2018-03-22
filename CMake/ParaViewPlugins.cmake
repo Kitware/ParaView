@@ -123,7 +123,7 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
   IF(HDRS)
     include(vtkWrapClientServer)
 
-    vtk_wrap_hierarchy(${Name} ${VTK_MODULES_DIR}
+    vtk_wrap_hierarchy(${Name} ${CMAKE_CURRENT_BINARY_DIR}
       "${ARGN}")
 
     # Plugins should not use unified bindings. The problem arises because the
