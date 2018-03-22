@@ -16594,5 +16594,89 @@ source.</Documentation>
       </DoubleVectorProperty>
       <!-- End vtkHyperTreeGridThreshold -->
     </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="ExtractEnclosedPoints"
+      class="vtkExtractEnclosedPoints"
+      label="Extract Enclosed Points">
+      <Documentation long_help="Extract points inside a closed polygonal surface"
+                     short_help="Extract points inside a closed points surface">
+        Evaluates all points in the input dataset to determine whether they are contained within
+        an enclosing surface, defined by the **Surface**. The filter assumes that the surface
+        is closed and manifold. To force a check to ensure these preconditions are met
+        set the **CheckSurface** property.
+      </Documentation>
+
+      <OutputPort index="0" name="EnclosedPoints" />
+      <OutputPort index="1" name="Outliers" />
+
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to extract points from.</Documentation>
+      </InputProperty>
+
+      <InputProperty command="SetSurfaceConnection" name="Surface">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the closed and manifold surface.</Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty name="Tolerance"
+        command="SetTolerance"
+        number_of_elements="1"
+        default_values="0.0001">
+        <DoubleRangeDomain name="range" min="0.0" />
+        <Documentation>
+          Specify the tolerance on the intersection. The tolerance is expressed as
+          a fraction of the diagonal of the bounding box of the enclosing surface.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="CheckSurface"
+        number_of_elements="1"
+        default_values="0"
+        command="SetCheckSurface">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to check the surface for closure. If on, then the
+          algorithm first checks to see if the surface is closed and manifold.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateOutliers"
+        command="SetGenerateOutliers"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          If checked, then a second output will be created
+          that contains the outlier points.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateVertices"
+        command="SetGenerateVertices"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          If checked, then the outputs will contain a poly-vertex cell. This takes a
+          lot more memory, however certain filters many requires cells to be present
+          to function properly.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
