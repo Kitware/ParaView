@@ -68,15 +68,6 @@ ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.1"
         ${kernel_string_sources}
 )
 
-ExternalData_Expand_Arguments(pvNVIDIAIndeX_UserGuide user_guide "DATA{nvidia_index_paraview_plugin.pdf}")
-ExternalData_Add_Target(pvNVIDIAIndeX_UserGuide)
-add_dependencies(pvNVIDIAIndeX pvNVIDIAIndeX_UserGuide)
-
-install(
-  FILES         ${user_guide}
-  DESTINATION   "${VTK_INSTALL_DOC_DIR}/pvNVIDIAIndeX"
-  COMPONENT     Documentation)
-
 include(vtkOpenGL)
 vtk_opengl_link(pvNVIDIAIndeX)
 
