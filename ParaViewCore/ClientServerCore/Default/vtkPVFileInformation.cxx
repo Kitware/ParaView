@@ -23,7 +23,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVFileInformationHelper.h"
 #include "vtkProcessModule.h"
+#include "vtkResourceFileLocator.h"
 #include "vtkSmartPointer.h"
+#include "vtkVersion.h"
 
 #if defined(_WIN32)
 #define _WIN32_IE 0x0400    // special folder support
@@ -1199,6 +1201,44 @@ void vtkPVFileInformation::Initialize()
 #else
   this->ModificationTime = time(NULL);
 #endif
+}
+
+//-----------------------------------------------------------------------------
+std::string vtkPVFileInformation::GetParaViewSharedResourcesDirectory()
+{
+  // Look for where the function "GetVTKVersion." lives.
+  auto vtk_libs = vtkGetLibraryPathForSymbol(GetVTKVersion);
+
+  // Where docs might be in relation to the executable
+  std::vector<std::string> prefixes = {
+#if defined(_WIN32) || defined(__APPLE__)
+    ".."
+#else
+    "share/paraview-" PARAVIEW_VERSION
+#endif
+  };
+
+  // Search for the docs directory
+  vtkNew<vtkResourceFileLocator> locator;
+  auto resource_dir = locator->Locate(vtk_libs, prefixes, "doc");
+  if (!resource_dir.empty())
+  {
+    resource_dir = vtksys::SystemTools::CollapseFullPath(resource_dir);
+  }
+
+  return resource_dir;
+}
+
+//-----------------------------------------------------------------------------
+std::string vtkPVFileInformation::GetParaViewExampleFilesDirectory()
+{
+  return vtkPVFileInformation::GetParaViewSharedResourcesDirectory() + "/data";
+}
+
+//-----------------------------------------------------------------------------
+std::string vtkPVFileInformation::GetParaViewDocDirectory()
+{
+  return vtkPVFileInformation::GetParaViewSharedResourcesDirectory() + "/doc";
 }
 
 //-----------------------------------------------------------------------------

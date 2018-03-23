@@ -111,6 +111,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QMenu>
 
+#include "vtkPVFileInformation.h"
+
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 {
@@ -454,13 +456,7 @@ void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 {
-#if defined(_WIN32) || defined(__APPLE__)
-  QString documentationPath = QCoreApplication::applicationDirPath() + "/../doc";
-#else
-  QString appdir = QCoreApplication::applicationDirPath();
-  QString documentationPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/doc";
-#endif
-
+  QString documentationPath(vtkPVFileInformation::GetParaViewDocDirectory().c_str());
   QString paraViewGettingStartedFile = documentationPath + "/GettingStarted.pdf";
 
   // Getting Started with ParaView

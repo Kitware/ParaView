@@ -129,6 +129,22 @@ public:
   vtkGetMacro(ModificationTime, time_t);
   //@}
 
+  /**
+  * Returns the path to the base data directory path holding various files
+  * packaged with ParaView.
+  */
+  static std::string GetParaViewSharedResourcesDirectory();
+
+  /**
+  * Return the path of the example data packaged with ParaView.
+  */
+  static std::string GetParaViewExampleFilesDirectory();
+
+  /**
+  * Return the path of the documents packaged with ParaView.
+  */
+  static std::string GetParaViewDocDirectory();
+
 protected:
   vtkPVFileInformation();
   ~vtkPVFileInformation() override;
