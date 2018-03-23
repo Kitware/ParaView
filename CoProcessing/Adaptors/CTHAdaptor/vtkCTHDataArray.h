@@ -213,6 +213,7 @@ public:
     this->BuildFallback();
     return this->Fallback->SetVoidArray(p, id, i);
   }
+  void SetArrayFreeFunction(void (*)(void*)) override {}
 
   // Description:
   // Since we don't allocate, this does nothing
