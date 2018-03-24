@@ -22,6 +22,7 @@
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMProperty.h"
 #include "vtkStdString.h"
+#include "vtkWeakPointer.h"
 
 #include "vtkPVConfig.h"
 
@@ -80,9 +81,9 @@ public:
     }
 #endif
   }
-  vtkSMMaterialDomain* Owner;
+  vtkWeakPointer<vtkSMMaterialDomain> Owner;
 #ifdef PARAVIEW_USE_OSPRAY
-  vtkOSPRayMaterialLibrary* Watchee;
+  vtkWeakPointer<vtkOSPRayMaterialLibrary> Watchee;
 #endif
 };
 
