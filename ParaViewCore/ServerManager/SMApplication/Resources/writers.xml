@@ -79,7 +79,7 @@
         smallest compressed filesize.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCompressionLevel"
-                         default_values="5"
+                         default_values="6"
                          name="CompressionLevel"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -107,6 +107,13 @@
         </EnumerationDomain>
         <Documentation>A compression performance parameter from 1 (faster/larger
          compressed filesize) to 9 (slower/smaller compressed filesize).</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="CompressorType"
+                                   value="0"
+                                   inverse="1" />
+        </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetWriteAllTimeSteps"
                          default_values="0"
