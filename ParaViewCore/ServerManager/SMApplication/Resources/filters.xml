@@ -16896,5 +16896,39 @@ source.</Documentation>
       </IntVectorProperty>
       <!-- End vtkHyperTreeGridCellCenters -->
     </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridDepthLimiter"
+                 name="HyperTreeGridDepthLimiter"
+                 label="Hyper Tree Grid - Depth Limiter">
+      <Documentation short_help="Limit HTG nodes to a maximum depth">
+        Extract all levels down to a specified depth from a hyper tree grid.
+        If the required depth is greater or equal to the maximum level of the
+        input grid, then the output is identical.
+        Note that when a material mask is present, the geometry extent of the
+        output grid is guaranteed to contain that of the input tree, but the
+        former might be strictly larger than the latter. This is not a bug
+        but an expected behavior of which the user should be aware.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="SetDepth"
+                         command="SetDepth"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          Maximum depth to which the output grid should be limited.
+        </Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <!-- End vtkHyperTreeGridDepthLimiter -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
