@@ -274,12 +274,17 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
   "Build ParaView with Qt support (without GUI)" OFF
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
-# Add an option to enable using Qt Webkit for widgets, as needed.
-# Default is OFF. We don't want to depend on WebKit unless absolutely needed.
-cmake_dependent_option(PARAVIEW_USE_QTWEBKIT
+# Warn about old option
+if (PARAVIEW_USE_QTWEBKIT)
+  message(WARNING
+    "PARAVIEW_USE_QTWEBKIT was removed in version 5.6 since Qt WebKit was also removed.  Use PARAVIEW_USE_QTWEBENGINE instead to use Qt's WebEngine widgets")
+endif()
+# Add an option to enable using Qt WebEngine for widgets, as needed.
+# Default is OFF. We don't want to depend on WebEngine unless absolutely needed.
+cmake_dependent_option(PARAVIEW_USE_QTWEBENGINE
   "Use Qt WebKit components as needed." OFF
   "PARAVIEW_ENABLE_QT_SUPPORT" OFF)
-mark_as_advanced(PARAVIEW_USE_QTWEBKIT)
+mark_as_advanced(PARAVIEW_USE_QTWEBENGINE)
 
 # Add an option to enable using Qt Help, as needed.
 # Default is ON to enable integrated help/documentation.

@@ -70,11 +70,11 @@ public:
   void setUrl(const QUrl& url) override { this->Widget->setUrl(url); }
 };
 
-#ifdef PARAVIEW_USE_QTWEBKIT
-#include "pqHelpWindowWebKit.h"
+#ifdef PARAVIEW_USE_QTWEBENGINE
+#include "pqHelpWindowWebEngine.h"
 typedef pqBrowserTemplate<pqWebView> PQBROWSER_TYPE;
 #else
-#include "pqHelpWindowNoWebKit.h"
+#include "pqHelpWindowNoWebEngine.h"
 typedef pqBrowserTemplate<pqTextBrowser> PQBROWSER_TYPE;
 #endif
 

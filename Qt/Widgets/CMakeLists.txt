@@ -200,6 +200,10 @@ if (PARAVIEW_USE_QTHELP)
   list(APPEND qt5_private_comps Help)
 endif()
 
+if(PARAVIEW_USE_QTWEBENGINE)
+  list(APPEND qt5_public_comps WebEngineWidgets)
+endif()
+
 pv_find_package_qt(qt_public_targets REQUIRED
   QT5_COMPONENTS ${qt5_public_comps})
 pv_find_package_qt(qt_private_targets REQUIRED
@@ -248,12 +252,12 @@ SET(QT_WIDGETS_ALL_SRCS ${Module_SRCS} ${QtWidgets_MOC_SOURCES}
 ##########################################################################
 # import Qt build settings
 set(${vtk-module}_NO_HeaderTest 1)
-if(PARAVIEW_USE_QTWEBKIT)
-  add_definitions(-DPARAVIEW_USE_QTWEBKIT)
-endif()
 
 vtk_module_export_code_find_package(Qt5 COMPONENTS ${qt5_public_comps})
 vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
 target_link_libraries(${vtk-module}
   LINK_PRIVATE ${qt_private_targets}
   LINK_PUBLIC ${qt_public_targets})
+if(PARAVIEW_USE_QTWEBENGINE)
+  target_compile_definitions(${vtk-module} PRIVATE PARAVIEW_USE_QTWEBENGINE)
+endif()
