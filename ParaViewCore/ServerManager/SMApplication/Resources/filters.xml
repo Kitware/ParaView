@@ -16930,5 +16930,23 @@ source.</Documentation>
       </IntVectorProperty>
       <!-- End vtkHyperTreeGridDepthLimiter -->
     </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridGeometry"
+                 name="HyperTreeGridGeometry"
+                 label="Hyper Tree Grid - Geometry Filter">
+      <Documentation short_help="Generate external surface of a HTG.">
+        Generate PolyData representing the external surface of a HTG.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridGeometry -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
