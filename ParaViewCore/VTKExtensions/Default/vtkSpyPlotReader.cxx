@@ -509,7 +509,7 @@ int vtkSpyPlotReader::UpdateTimeStep(
     }
   }
   this->CurrentTimeStep = closestStep;
-  if ((outputData != NULL) && (static_cast<int>(this->TimeSteps->size()) < this->CurrentTimeStep))
+  if ((outputData != NULL) && (static_cast<int>(this->TimeSteps->size()) > this->CurrentTimeStep))
   {
     outputData->GetInformation()->Set(
       vtkDataObject::DATA_TIME_STEP(), (*this->TimeSteps)[this->CurrentTimeStep]);
