@@ -126,6 +126,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridAxisClip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridAxisCut.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridAxisReflection.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridCellCenters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridContour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridThreshold.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LightAddRemove.xml

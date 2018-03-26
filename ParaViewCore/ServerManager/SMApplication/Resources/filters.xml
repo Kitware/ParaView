@@ -16864,5 +16864,37 @@ source.</Documentation>
       </DoubleVectorProperty>
       <!-- End vtkHyperTreeGridAxisReflection -->
     </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridCellCenters"
+                 name="HyperTreeGridCellCenters"
+                 label="Hyper Tree Grid - Cell Centers">
+      <Documentation short_help="Generate points at leaf node centers.">
+        This filter generates output points at the center of the leaf
+        cells in the hyper tree grid.
+        These points can be used for placing glyphs or labeling.
+        The cell attributes will be associated with the points in the output.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="CreateVertexCells"
+                         command="SetVertexCells"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          If enabled, vertex cells will be added to the output dataset. This
+          is useful for visualizing the output points, which are not rendered
+          otherwise.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End vtkHyperTreeGridCellCenters -->
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
