@@ -130,6 +130,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridContour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridDepthLimiter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridGeometry.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridPlaneCutter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridThreshold.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LightAddRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
