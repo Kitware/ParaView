@@ -4530,9 +4530,9 @@
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Smart" value="0" />
-          <Entry text="Ray Cast Only" value="2" />
-          <Entry text="GPU Based" value="4" />
-          <Entry text="OSPRay Based" value="5" />
+          <Entry text="Ray Cast Only" value="1" />
+          <Entry text="GPU Based" value="2" />
+          <Entry text="OSPRay Based" value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetScalarOpacityUnitDistance"
