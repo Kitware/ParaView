@@ -2,7 +2,7 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/combxyz.bin" />
-  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="PLOT3D Files" />
+  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="PLOT3D Reader" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/QFileName/FileChooser/FileButton" command="activate" arguments="" />

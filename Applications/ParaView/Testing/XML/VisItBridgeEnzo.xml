@@ -2,7 +2,7 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/VisItBridge/data0000.boundary" />
-  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="Enzo Files (VisIt)" />
+  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="VisItEnzoReader" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/MeshStatus/ArraySelectionWidget" command="setCurrent" arguments="0.0" />

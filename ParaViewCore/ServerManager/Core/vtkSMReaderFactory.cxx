@@ -59,6 +59,7 @@ public:
     vtkWeakPointer<vtkSMSession> Session;
     std::string Group;
     std::string Name;
+    std::string Label;
     std::vector<std::string> Extensions;
     std::vector<vtksys::RegularExpression> FilenameRegExs;
     std::vector<std::string> FilenamePatterns;
@@ -118,6 +119,7 @@ public:
           this->FilenameRegExs.push_back(vtksys::RegularExpression(regex.c_str()));
         }
       }
+      this->Label = prototype->GetXMLLabel();
       this->Description = rfHint->GetAttribute("file_description");
 
       int is_directory = 0;
@@ -428,7 +430,7 @@ vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename, vtkSMSession
       iter->second.FillInformation(session);
       this->Readers->AddString(iter->second.Group.c_str());
       this->Readers->AddString(iter->second.Name.c_str());
-      this->Readers->AddString(iter->second.Description.c_str());
+      this->Readers->AddString(iter->second.Label.c_str());
     }
   }
 
@@ -459,7 +461,7 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename, vtkS
       iter->second.FillInformation(session);
       this->Readers->AddString(iter->second.Group.c_str());
       this->Readers->AddString(iter->second.Name.c_str());
-      this->Readers->AddString(iter->second.Description.c_str());
+      this->Readers->AddString(iter->second.Label.c_str());
     }
   }
 
