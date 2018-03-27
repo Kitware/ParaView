@@ -431,13 +431,13 @@ bool vtkSMLoadStateOptionsProxy::Load()
           else if (info.FilePaths.size() > 1)
           {
             // Assume the filename will be unchanged so just add the new path the file
-            std::vector<std::string> newPathCompenents;
-            SystemTools::SplitPath(SystemTools::GetFilenamePath(propertyValue), newPathCompenents);
+            std::vector<std::string> newPathComponents;
+            SystemTools::SplitPath(SystemTools::GetFilenamePath(propertyValue), newPathComponents);
             for (auto fIter = info.FilePaths.begin(); fIter != info.FilePaths.end(); fIter++)
             {
-              newPathCompenents.push_back(SystemTools::GetFilenameName(*fIter));
-              *fIter = SystemTools::JoinPath(newPathCompenents);
-              newPathCompenents.pop_back();
+              newPathComponents.push_back(SystemTools::GetFilenameName(*fIter));
+              *fIter = SystemTools::JoinPath(newPathComponents);
+              newPathComponents.pop_back();
             }
             info.Modified = true;
           }
