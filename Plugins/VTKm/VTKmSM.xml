@@ -364,6 +364,20 @@
         <Documentation>This property specifies the input to the Cell Data to
         Point Data filter.</Documentation>
       </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectArray"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies the name of the array
+        to averages to cells.</Documentation>
+      </StringVectorProperty>
 
       <Hints>
         <ShowInMenu category="VTKm" />
@@ -417,17 +431,11 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          number_of_components="1"/>
         <Documentation>This property specifies the input to the VTKm Clip
         filter.</Documentation>
       </InputProperty>
-      <DoubleVectorProperty command="SetClipValue"
-                            default_values="0.0"
-                            name="ClipValue"
-                            number_of_elements="1">
-        <Documentation>The scalar value to use when clipping the dataset.
-        Values greater than ClipValue are preserved in the output dataset.
-        </Documentation>
-      </DoubleVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -435,13 +443,36 @@
                             name="SelectInputScalars"
                             number_of_elements="5">
         <ArrayListDomain attribute_type="Scalars"
+                         input_domain_name="input_array"
                          name="array_list">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
       </StringVectorProperty>
+      <DoubleVectorProperty command="SetClipValue"
+                            default_values="0.0"
+                            name="ClipValue"
+                            number_of_elements="1">
+        <ArrayRangeDomain name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>The scalar value to use when clipping the dataset.
+        Values greater than ClipValue are preserved in the output dataset.
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetComputeScalars"
                          name="ComputeScalars"
                          default_values="1"
@@ -508,11 +539,25 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="cell"
+        <InputArrayDomain attribute_type="point"
                           name="input_array" />
         <Documentation>This property specifies the input to the filter.
         </Documentation>
       </InputProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            name="SelectArray"
+                            number_of_elements="5">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies the name of the array
+        to averages to cells.</Documentation>
+      </StringVectorProperty>
 
       <Hints>
         <ShowInMenu category="VTKm" />
