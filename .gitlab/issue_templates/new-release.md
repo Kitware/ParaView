@@ -19,21 +19,26 @@ Please remove this comment.
     - [ ] Getting Started
       - [ ] Uploaded
 
+# Update ParaView
+
 <!--
 Keep the relevant items for the kind of release this is.
 
 If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
 
-  - Update `master` branch for **paraview**
-    - [ ] `git fetch origin`
-    - [ ] `git checkout master`
-    - [ ] `git merge --ff-only origin/master`
-  - Update `version.txt` and tag the commit
-    - [ ] `git checkout -b update-to-VERSION`
-    - [ ] `echo VERSION > version.txt`
-    - [ ] `git commit -m 'Update version number to VERSION'`
-    - [ ] `git -m 'Update version number to VERSION'`
-    - [ ] `git tag -a -m 'ParaView VERSION' vVERSION HEAD`
+  - [ ] Update `master` branch for **paraview**
+```
+git fetch origin
+git checkout master
+git merge --ff-only origin/master
+```
+  - [ ] Update `version.txt` and tag the commit
+```
+git checkout -b update-to-VERSION
+echo VERSION > version.txt
+git commit -m 'Update version number to VERSION' version.txt
+git tag -a -m 'ParaView VERSION' vVERSION HEAD
+```
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
     - [ ] Get positive review
@@ -44,19 +49,21 @@ If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
 
 If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
 
-  - Update `release` branch for **paraview**
-    - [ ] `git fetch origin`
-    - [ ] `git checkout release`
-    - [ ] `git merge --ff-only origin/release`
-  - Update `version.txt` and tag the commit
-    - [ ] `git checkout -b update-to-VERSION`
-    - [ ] `echo VERSION > version.txt`
-    - [ ] `git commit -m 'Update version number to VERSION'`
-    - [ ] `git -m 'Update version number to VERSION'`
-    - [ ] `git tag -a -m 'ParaView VERSION' vVERSION HEAD`
+  - [ ] Update `release` branch for **paraview**
+```
+git fetch origin
+git checkout release
+git merge --ff-only origin/release
+```
+  - [ ] Update `version.txt` and tag the commit
+```
+git checkout -b update-to-VERSION
+echo VERSION > version.txt
+git commit -m 'Update version number to VERSION' version.txt
+git tag -a -m 'ParaView VERSION' vVERSION HEAD
+```
   - Integrate changes to `master` branch
     - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
-    - [ ] Build binaries (`Do: test --superbuild`)
     - [ ] Get positive review
     - [ ] `Do: merge`
   - Integrate changes to `release` branch
@@ -68,7 +75,8 @@ If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or abov
     - [ ] Catalyst (`Catalyst/generate-tarballs.sh vVERSION`)
   - Upload tarballs to `paraview.org`
     - [ ] `rsync -rptv $tarballs paraview.release:ParaView_Release/vMAJOR.MINOR/`
-  - [ ] Update the superbuild
+
+# Update ParaView-Superbuild
 
 <!--
 Keep the relevant items for the kind of release this is.
@@ -80,13 +88,28 @@ If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
     - [ ] `git checkout master`
     - [ ] `git merge --ff-only origin/master`
   - Update `versions.cmake` and `CMakeLists.txt`
-    - [ ] ParaView source selections
-    - [ ] Guide selections
-    - [ ] Assumed version in `CMakeLists.txt`
+    - [ ] `git checkout -b update-to-VERSION`
+    - [ ] Set ParaView source selections in `CMakeLists.txt`
+    - [ ] Force explicit version in `CMakeLists.txt`
+```
+# Force source selection setting here.
+set(paraview_SOURCE_SELECTION "VERSION" CACHE STRING "Force version to VERSION" FORCE)
+set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
+```
+    - [ ] Guide selections in `versions.cmake`
+    - [ ] `git add versions.cmake CMakeLists.txt`
+    - [ ] `git commit -m "Update the default version to VERSION"`
   - Integrate changes to `master` branch
-    - [ ] Create a merge request targeting `master`
+    - [ ] Create a merge request targeting `master`, title beginning with WIP
     - [ ] Build binaries (`Do: test`)
     - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
+    - [ ] Remove explicit version forcing added in CMakeLists.txt and force push
+```
+git add CMakeLists.txt
+git commit --amend
+git gitlab-push -f
+```
+    - [ ] Remove WIP from merge request title
     - [ ] Get positive review
     - [ ] `Do: merge`
   - Integrate changes to `release` branch
@@ -100,13 +123,27 @@ If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or abov
     - [ ] `git checkout release`
     - [ ] `git merge --ff-only origin/release`
   - Update `versions.cmake` and `CMakeLists.txt`
-    - [ ] ParaView source selections
-    - [ ] Guide selections
-    - [ ] Assumed version in `CMakeLists.txt`
+    - [ ] Set ParaView source selections in `CMakeLists.txt`
+    - [ ] Force explicit version in `CMakeLists.txt`
+```
+# Force source selection setting here.
+set(paraview_SOURCE_SELECTION "VERSION" CACHE STRING "Force version to VERSION" FORCE)
+set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
+```
+    - [ ] Guide selections in `versions.cmake`
+    - [ ] `git add versions.cmake CMakeLists.txt`
+    - [ ] `git commit -m "Update the default version to VERSION"`
   - Integrate changes to `master` branch
-    - [ ] Create a merge request targeting `master`
+    - [ ] Create a merge request targeting `master`, title beginning with WIP
     - [ ] Build binaries (`Do: test`)
     - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
+    - [ ] Remove explicit version forcing added in CMakeLists.txt and force push
+```
+git add CMakeLists.txt
+git commit --amend
+git gitlab-push -f
+```
+    - [ ] Remove WIP from merge request title
     - [ ] Get positive review
     - [ ] `Do: merge`
   - Integrate changes to `release` branch
@@ -151,19 +188,6 @@ These items only apply to non-RC releases.
 
   - [ ] Update release notes
     (https://www.paraview.org/Wiki/ParaView_Release_Notes)
--->
-
-<!--
-# Code snippets:
-
-## Updating `version.txt`:
-
-```sh
-git checkout -b update-to-VERSION
-echo VERSION > version.txt
-git commit -m 'Update version number to VERSION'
-git tag -a -m 'ParaView VERSION' vVERSION HEAD
-```
 -->
 
 /cc @ben.boeckel
