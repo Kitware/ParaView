@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSaveScreenshotProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTrace.h"
 #include "vtkSMUtilities.h"
@@ -777,9 +778,14 @@ void pqMultiViewWidget::standardButtonPressed(int button)
       vtkSMViewProxy* viewProxy = this->layoutManager()->GetView(index.toInt());
       if (viewProxy)
       {
+        auto session = viewProxy->GetSession();
+        // trigger progress request here delays render requests that happen as
+        // the UI is being updated to remove the view. That fixes #18077.
+        session->PrepareProgress();
         this->layoutManager()->RemoveView(viewProxy);
         pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
         builder->destroy(getPQView(viewProxy));
+        session->CleanupPendingProgress();
       }
       if (index.toInt() != 0)
       {
