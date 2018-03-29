@@ -153,12 +153,14 @@ git gitlab-push -f
 # Validating binaries
 
   - For each binary, check
+    - [ ] Getting started guide opens
+    - [ ] Examples load and match thumbnails in dialog
     - [ ] Python
-    - [ ] `import compiler`
-    - [ ] `import numpy`
+    - [ ] `import compiler`, `import numpy`
     - [ ] Plugins are present and load properly
     - [ ] Text source LaTeX `$A^2$`
     - [ ] OSPRay
+    - [ ] IndeX runs
     - [ ] AutoMPI
 
   - Binary checklist
