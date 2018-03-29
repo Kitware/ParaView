@@ -112,6 +112,7 @@ git gitlab-push -f
     - [ ] Remove WIP from merge request title
     - [ ] Get positive review
     - [ ] `Do: merge`
+    - [ ] `git tag -a -m 'ParaView superbuild VERSION' vVERSION HEAD`
   - Integrate changes to `release` branch
     - [ ] `git push origin update-to-VERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
@@ -146,6 +147,7 @@ git gitlab-push -f
     - [ ] Remove WIP from merge request title
     - [ ] Get positive review
     - [ ] `Do: merge`
+    - [ ] `git tag -a -m 'ParaView superbuild VERSION' vVERSION HEAD`
   - Integrate changes to `release` branch
     - [ ] `git push origin update-to-VERSION:release vVERSION`
 -->
@@ -153,12 +155,14 @@ git gitlab-push -f
 # Validating binaries
 
   - For each binary, check
+    - [ ] Getting started guide opens
+    - [ ] Examples load and match thumbnails in dialog
     - [ ] Python
-    - [ ] `import compiler`
-    - [ ] `import numpy`
+    - [ ] `import compiler`, `import numpy`
     - [ ] Plugins are present and load properly
     - [ ] Text source LaTeX `$A^2$`
     - [ ] OSPRay
+    - [ ] IndeX runs
     - [ ] AutoMPI
 
   - Binary checklist
