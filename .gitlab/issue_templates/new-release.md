@@ -178,8 +178,11 @@ git gitlab-push -f
   - [ ] Ask @chuck.atkins to sign macOS binary
   - Upload binaries to `paraview.org`
     - [ ] `rsync -rptv $binaries paraview.release:ParaView_Release/vMAJOR.MINOR/`
-  - [ ] Update `md5sum.txt`
-  - [ ] Ask @utkarsh.ayachit to regenerate `https://www.paraview.org/files/listing.txt`
+  - [ ] Ask @utkarsh.ayachit to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt`
+```
+buildListing.sh
+updateMD5sum.sh vMAJOR.MINOR
+```
   - [ ] Test download links
 
 # Post-release
