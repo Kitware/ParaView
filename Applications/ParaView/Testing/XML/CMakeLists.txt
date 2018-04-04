@@ -451,6 +451,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo7.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo8.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UnstructuredOutline.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/VectorComponentHistogram.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VolumeRenderingWithContour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector1.xml
