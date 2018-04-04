@@ -144,22 +144,26 @@ void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
   }
   pqsource->setModifiedState(pqProxy::UNMODIFIED);
 
-  // if we have a dataset that has a Catalyst channel name we now rename
-  // the proxy to be the channel name if the user didn't modify the name already
-  if (pqsource->userModifiedSMName() == false)
+  pqPipelineFilter* pqfilter = qobject_cast<pqPipelineFilter*>(pqproxy);
+  if (!pqfilter)
   {
-    vtkSMSourceProxy* proxy = pqsource->getSourceProxy();
-
-    vtkNew<vtkPVCatalystChannelInformation> information;
-    information->Initialize();
-
-    // Ask the server to fill out the rest of the information:
-    proxy->GatherInformation(information);
-
-    std::string name = information->GetChannelName();
-    if (!name.empty())
+    // if we have a dataset from a source that has a Catalyst channel name we now rename
+    // the proxy to be the channel name if the user didn't modify the name already
+    if (pqsource->userModifiedSMName() == false)
     {
-      pqsource->rename(name.c_str());
+      vtkSMSourceProxy* proxy = pqsource->getSourceProxy();
+
+      vtkNew<vtkPVCatalystChannelInformation> information;
+      information->Initialize();
+
+      // Ask the server to fill out the rest of the information:
+      proxy->GatherInformation(information);
+
+      std::string name = information->GetChannelName();
+      if (!name.empty())
+      {
+        pqsource->rename(name.c_str());
+      }
     }
   }
 }
