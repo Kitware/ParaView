@@ -6902,6 +6902,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataObject" />
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="any" name="input_array" />
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
