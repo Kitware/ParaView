@@ -63,6 +63,7 @@ public:
   pqInternals(pqLightsInspector* inSelf)
     : self(inSelf)
     , observerTag(0)
+    , rview(nullptr)
   {
     this->Ui.setupUi(inSelf);
 
