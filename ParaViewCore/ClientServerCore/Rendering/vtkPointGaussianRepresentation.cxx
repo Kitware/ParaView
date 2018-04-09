@@ -125,6 +125,7 @@ bool vtkPointGaussianRepresentation::AddToView(vtkView* view)
   if (rview)
   {
     rview->GetRenderer()->AddActor(this->Actor);
+    rview->RegisterPropForHardwareSelection(this, this->Actor);
     return this->Superclass::AddToView(view);
   }
   return false;
