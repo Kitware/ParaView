@@ -83,21 +83,29 @@ public:
 
     if (vtkSMProxyProperty::SafeDownCast(this->Property))
     {
-      vtkSMProxyListDomain* pld =
-        vtkSMProxyListDomain::SafeDownCast(this->Property->FindDomain("vtkSMProxyListDomain"));
-      if (!pld)
+      if (vtkSMProxyListDomain::SafeDownCast(this->Property->FindDomain("vtkSMProxyListDomain")))
       {
-        qCritical() << "ProxyProperty without vtkSMProxyListDomain is not supported. "
-                    << "pqGenericPropertyWidgetDecorator may not work as expected.";
-        return false;
+        bool status = false;
+        for (auto it = this->Values.begin(); helper.GetAsProxy(0) && it != this->Values.end(); ++it)
+        {
+          status |= (helper.GetAsProxy(0)->GetXMLName() == *it);
+        }
+        return this->Inverse ? !status : status;
       }
-
-      bool status = false;
-      for (auto it = this->Values.begin(); helper.GetAsProxy(0) && it != this->Values.end(); ++it)
+      if (this->Values.size() == 1 && this->Values[0] == "null")
       {
-        status |= (helper.GetAsProxy(0)->GetXMLName() == *it);
+        if (helper.GetNumberOfElements() == 1)
+        {
+          return (helper.GetAsProxy(0) != nullptr ? this->Inverse : !this->Inverse);
+        }
+        else if (helper.GetNumberOfElements() == 0)
+        {
+          return this->Inverse;
+        }
       }
-      return this->Inverse ? !status : status;
+      qCritical() << "ProxyProperty not properly specified in XML. "
+                  << "pqGenericPropertyWidgetDecorator may not work as expected.";
+      return false;
     }
 
     vtkVariant val = helper.GetAsVariant(0);
@@ -118,10 +126,10 @@ pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
   , Internals(new pqGenericPropertyWidgetDecorator::pqInternals())
 {
   vtkSMProxy* proxy = this->parentWidget()->proxy();
-  Q_ASSERT(proxy != NULL);
+  Q_ASSERT(proxy != nullptr);
 
   const char* propertyName = config->GetAttribute("property");
-  if (propertyName == NULL || proxy->GetProperty(propertyName) == NULL)
+  if (propertyName == nullptr || proxy->GetProperty(propertyName) == nullptr)
   {
     // this can happen with compound proxies. In which case, silently ignore.
     // qCritical() << "Invalid property='" << (propertyName? propertyName : "(null)")
@@ -138,11 +146,11 @@ pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
   }
 
   const char* value = config->GetAttribute("value");
-  if (value == NULL)
+  if (value == nullptr)
   {
     // see if there are multiple values instead.
     value = config->GetAttribute("values");
-    if (value == NULL)
+    if (value == nullptr)
     {
       qCritical() << "Missing 'value' in the specified configuration.";
       return;
@@ -194,7 +202,7 @@ pqGenericPropertyWidgetDecorator::~pqGenericPropertyWidgetDecorator()
 //-----------------------------------------------------------------------------
 void pqGenericPropertyWidgetDecorator::updateState()
 {
-  if (this->Internals->Property == NULL || this->parentWidget() == NULL)
+  if (this->Internals->Property == nullptr || this->parentWidget() == nullptr)
   {
     return;
   }
