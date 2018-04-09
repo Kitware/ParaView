@@ -4,6 +4,13 @@
 # that loads the state file and then compares the resulting image to the
 # baseline.
 
+# On windows, execute_process runs PARAVIEW_EXECUTABLE in background.
+# We prepend "cmd /c" to force paraview's window to be shown to ensure proper
+# mouse interactions with the GUI.
+if(WIN32)
+  set(PARAVIEW_EXECUTABLE cmd /c ${PARAVIEW_EXECUTABLE})
+endif()
+
 # run paraview to setup and save the python state file
 execute_process(
   COMMAND ${PARAVIEW_EXECUTABLE} -dr
