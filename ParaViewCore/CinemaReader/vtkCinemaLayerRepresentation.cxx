@@ -301,24 +301,12 @@ void vtkCinemaLayerRepresentation::UpdateMapper()
       center[1] = (bounds[3] + bounds[2]) / 2.0;
       center[2] = (bounds[5] + bounds[4]) / 2.0;
 
-      // Get angle between the active camera and the layer one.
-      double activeUp[3];
-      activeCamera->GetViewUp(activeUp);
-      double layerUp[3];
-      layerCamera->GetViewUp(layerUp);
-      double angle = vtkMath::AngleBetweenVectors(layerUp, activeUp);
-      double direction[3];
-      activeCamera->GetDirectionOfProjection(direction);
-      double cross[3];
-      vtkMath::Cross(layerUp, activeUp, cross);
-      if (vtkMath::Dot(cross, direction) > 0)
-      {
-        angle = -angle;
-      }
-      // Rotate around the center
       vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+      // manipulate relative to center of image
       transform->Translate(center[0], center[1], center[2]);
-      transform->RotateWXYZ(180 + vtkMath::DegreesFromRadians(angle), 0, 0, 1);
+      // flip Y
+      transform->Scale(1.0, -1.0, 1.0);
+      // used to rotate about Z, here but that is problematic
       transform->Translate(-center[0], -center[1], -center[2]);
 
       // scale the image to fit the view
