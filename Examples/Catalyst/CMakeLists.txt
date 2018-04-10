@@ -35,6 +35,7 @@ add_subdirectory(MPISubCommunicatorExample)
 add_subdirectory(PythonDolfinExample)
 add_subdirectory(CxxParticlePathExample)
 add_subdirectory(CxxMultiChannelInputExample)
+add_subdirectory(CxxHyperTreeGridExample)
 if(USE_CATALYST)
   # this example requires Catalyst
   add_subdirectory(CxxGhostCellsExample)

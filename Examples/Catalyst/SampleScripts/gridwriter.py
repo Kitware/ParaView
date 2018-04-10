@@ -38,6 +38,9 @@ def CreateCoProcessor():
       elif  grid.IsA('vtkMultiBlockDataSet'):
         writer = servermanager.writers.XMLMultiBlockDataWriter(Input=adaptorinput)
         filename = 'input_%t.vtm'
+      elif  grid.IsA('vtkHyperTreeGrid'):
+        writer = servermanager.writers.HyperTreeGridWriter(Input=adaptorinput)
+        filename = 'input_%t.htg'
       else:
         print("Don't know how to create a writer for a ", grid.GetClassName())
 
