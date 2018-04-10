@@ -134,7 +134,7 @@
         <Documentation>Set the chart title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTitleFontSize"
-                            default_values="14"
+                            default_values="18"
                             name="ChartTitleFontSize"
                             number_of_elements="1">
         <Documentation>Set the chart title font size.</Documentation>
@@ -386,7 +386,7 @@
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetLeftAxisTitleFontSize"
-                            default_values="12"
+                            default_values="18"
                             name="LeftAxisTitleFontSize"
                             number_of_elements="1">
         <Documentation>Set the axis title font size.</Documentation>
@@ -667,7 +667,7 @@
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetBottomAxisTitleFontSize"
-                            default_values="12"
+                            default_values="18"
                             name="BottomAxisTitleFontSize"
                             number_of_elements="1">
         <Documentation>Set the axis title font size.</Documentation>
@@ -961,7 +961,7 @@
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetRightAxisTitleFontSize"
-                            default_values="12"
+                            default_values="18"
                             name="RightAxisTitleFontSize"
                             number_of_elements="1">
         <Documentation>Set the axis title font size.</Documentation>
@@ -1247,7 +1247,7 @@
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTopAxisTitleFontSize"
-                            default_values="12"
+                            default_values="18"
                             name="TopAxisTitleFontSize"
                             number_of_elements="1">
         <Documentation>Set the axis title font size.</Documentation>
