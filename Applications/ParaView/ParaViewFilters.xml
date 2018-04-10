@@ -52,6 +52,19 @@
     <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
   </Category>
 
+  <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
+    <Proxy group="filters" name="HyperTreeGridAxisClip" />
+    <Proxy group="filters" name="HyperTreeGridAxisCut" />
+    <Proxy group="filters" name="HyperTreeGridAxisReflection" />
+    <Proxy group="filters" name="HyperTreeGridCellCenters" />
+    <Proxy group="filters" name="HyperTreeGridContour" />
+    <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
+    <Proxy group="filters" name="HyperTreeGridGeometry" />
+    <Proxy group="filters" name="HyperTreeGridPlaneCutter" />
+    <Proxy group="filters" name="HyperTreeGridThreshold" />
+    <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
+  </Category>
+
   <Category name="Statistics" menu_label="&amp;Statistics">
     <Proxy group="filters" name="ContingencyStatistics"/>
     <Proxy group="filters" name="DescriptiveStatistics"/>
@@ -195,9 +208,6 @@
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" />
-  <Proxy group="filters" name="HyperTreeGridContour" />
-  <Proxy group="filters" name="HyperTreeGridThreshold" />
-  <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="IntegrateAttributes" />

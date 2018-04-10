@@ -16448,6 +16448,88 @@ source.</Documentation>
       <!-- End vtkInSituPParticlePathFilter -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy name="ExtractEnclosedPoints"
+      class="vtkExtractEnclosedPoints"
+      label="Extract Enclosed Points">
+      <Documentation long_help="Extract points inside a closed polygonal surface"
+                     short_help="Extract points inside a closed points surface">
+        Evaluates all points in the input dataset to determine whether they are contained within
+        an enclosing surface, defined by the **Surface**. The filter assumes that the surface
+        is closed and manifold. To force a check to ensure these preconditions are met
+        set the **CheckSurface** property.
+      </Documentation>
+
+      <OutputPort index="0" name="EnclosedPoints" />
+      <OutputPort index="1" name="Outliers" />
+
+      <InputProperty command="SetInputConnection" name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+         <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to extract points from.</Documentation>
+      </InputProperty>
+
+      <InputProperty command="SetSurfaceConnection" name="Surface">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the closed and manifold surface.</Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty name="Tolerance"
+        command="SetTolerance"
+        number_of_elements="1"
+        default_values="0.0001">
+        <DoubleRangeDomain name="range" min="0.0" />
+        <Documentation>
+          Specify the tolerance on the intersection. The tolerance is expressed as
+          a fraction of the diagonal of the bounding box of the enclosing surface.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="CheckSurface"
+        number_of_elements="1"
+        default_values="0"
+        command="SetCheckSurface">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to check the surface for closure. If on, then the
+          algorithm first checks to see if the surface is closed and manifold.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateOutliers"
+        command="SetGenerateOutliers"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          If checked, then a second output will be created
+          that contains the outlier points.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GenerateVertices"
+        command="SetGenerateVertices"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          If checked, then the outputs will contain a poly-vertex cell. This takes a
+          lot more memory, however certain filters many requires cells to be present
+          to function properly.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridToUnstructuredGrid"
                  label="HyperTreeGrid To UnstructuredGrid"
                  name="HyperTreeGridToUnstructuredGrid">
@@ -16470,7 +16552,7 @@ source.</Documentation>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridContour"
-                 label="HyperTreeGrid Contour"
+                 label="Hyper Tree Grid - Contour"
                  name="HyperTreeGridContour">
       <Documentation long_help="Specialized Contour filter for HyperTreeGrid."
                      short_help="Contour filter for HyperTreeGrid.">
@@ -16535,7 +16617,7 @@ source.</Documentation>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkHyperTreeGridThreshold"
-                 label="HyperTreeGrid Threshold"
+                 label="Hyper Tree Grid - Threshold"
                  name="HyperTreeGridThreshold">
       <Documentation long_help="Specialized Threshold filter for HyperTreeGrid."
                      short_help="Threshold filter for HyperTreeGrid.">
@@ -16594,89 +16676,317 @@ source.</Documentation>
       </DoubleVectorProperty>
       <!-- End vtkHyperTreeGridThreshold -->
     </SourceProxy>
-
     <!-- ==================================================================== -->
-    <SourceProxy name="ExtractEnclosedPoints"
-      class="vtkExtractEnclosedPoints"
-      label="Extract Enclosed Points">
-      <Documentation long_help="Extract points inside a closed polygonal surface"
-                     short_help="Extract points inside a closed points surface">
-        Evaluates all points in the input dataset to determine whether they are contained within
-        an enclosing surface, defined by the **Surface**. The filter assumes that the surface
-        is closed and manifold. To force a check to ensure these preconditions are met
-        set the **CheckSurface** property.
+    <SourceProxy class="vtkHyperTreeGridAxisClip"
+                 name="HyperTreeGridAxisClip"
+                 label="Hyper Tree Grid - Axis Clip">
+      <Documentation short_help="Clip a HTG along an axis-aligned plane or box.">
+        Clip an hyper tree grid along an axis aligned plane or box and output
+        a hyper tree grid with same dimensionality.
       </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
 
-      <OutputPort index="0" name="EnclosedPoints" />
-      <OutputPort index="1" name="Outliers" />
-
-      <InputProperty command="SetInputConnection" name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetClipType"
+                         default_values="0"
+                         name="ClipType"
+                         number_of_elements="1">
+          <EnumerationDomain name="enum">
+            <Entry text="Plane"   value="0" />
+            <Entry text="Box"     value="1" />
+            <Entry text="Quadric" value="2" />
+          </EnumerationDomain>
+        <Documentation>Type of clip operation to use.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="PlaneNormal"
+                         command="SetPlaneNormalAxis"
+                         number_of_elements="1"
+                         default_values="0">
+          <EnumerationDomain name="enum">
+            <Entry text="X Axis" value="0" />
+            <Entry text="Y Axis" value="1" />
+            <Entry text="Z Axis" value="2" />
+          </EnumerationDomain>
+        <Documentation>Axis to use as the normal to the clip plane.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="0" />
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="PlanePosition"
+                            command="SetPlanePosition"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <Documentation>Position of the clip plane along the normal axis.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="0" />
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty name="ClipBelowPlane"
+                         command="SetInsideOut"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          By default, the portion of the dataset above the clip plane is kept.
+          Enabling this option will keep the portion below the plane.
+        </Documentation>
+        <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="0" />
+        </Hints>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="MinimumBoxCorner"
+                            command="SetMinimumBounds"
+                            number_of_elements="3"
+                            default_values="-0.5 -0.5 -0.5">
+        <Documentation>Defines the most negative point of the clip box.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="MaximumBoxCorner"
+                            command="SetMaximumBounds"
+                            number_of_elements="3"
+                            default_values="0.5 0.5 0.5">
+        <Documentation>Defines the most positive point of the clip box.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="1" />
+        </Hints>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="QuadricCoefficients"
+                            command="SetQuadricCoefficients"
+                            number_of_elements="10"
+                            default_values="1. 1. 1. 0. 0. 0. 0. 0. 0. -1.">
+        <Documentation>
+          Coefficients of the quadric function, defined as the 'a' values in:
+          F(x,y,z) = a0*x^2 + a1*y^2 + a2*z^2 + a3*x*y + a4*y*z + a5*x*z + a6*x + a7*y + a8*z + a9
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ClipType"
+                                   value="2" />
+        </Hints>
+      </DoubleVectorProperty>
+    <!-- End vtkHyperTreeGridAxisClip -->
+    </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridAxisCut"
+                 name="HyperTreeGridAxisCut"
+                 label="Hyper Tree Grid - Axis Cut">
+      <Documentation short_help="Cut a 3D HTG along an axis-aligned plane.">
+        Cut a hyper tree grid along an axis-aligned plane and output a new hyper
+        tree grid. Only works for 3D grids.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input to extract points from.</Documentation>
       </InputProperty>
-
-      <InputProperty command="SetSurfaceConnection" name="Surface">
+      <IntVectorProperty name="PlaneNormal"
+                         command="SetPlaneNormalAxis"
+                         number_of_elements="1"
+                         default_values="0">
+          <EnumerationDomain name="enum">
+            <Entry text="X Axis" value="0" />
+            <Entry text="Y Axis" value="1" />
+            <Entry text="Z Axis" value="2" />
+          </EnumerationDomain>
+        <Documentation>Axis to use as the normal to the cut plane.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="PlanePosition"
+                            command="SetPlanePosition"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <Documentation>Position of the cut plane along the normal axis.</Documentation>
+      </DoubleVectorProperty>
+      <!-- End vtkHyperTreeGridAxisClut -->
+    </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridAxisReflection"
+                 name="HyperTreeGridAxisReflection"
+                 label="Hyper Tree Grid - Axis Reflection">
+      <Documentation short_help="Reflect an HTG across an axis-aligned plane.">
+        This filter reflect the cells of a hyper tree grid with respect to
+        one of the planes parallel to the bounding box of the data set.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
-          <DataType value="vtkPolyData" />
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
-        <Documentation>This property specifies the closed and manifold surface.</Documentation>
       </InputProperty>
-
-      <DoubleVectorProperty name="Tolerance"
-        command="SetTolerance"
-        number_of_elements="1"
-        default_values="0.0001">
-        <DoubleRangeDomain name="range" min="0.0" />
-        <Documentation>
-          Specify the tolerance on the intersection. The tolerance is expressed as
-          a fraction of the diagonal of the bounding box of the enclosing surface.
-        </Documentation>
+      <IntVectorProperty name="PlaneNormal"
+                         command="SetPlane"
+                         number_of_elements="1"
+                         default_values="0">
+          <EnumerationDomain name="enum">
+            <Entry text="X Axis" value="6" />
+            <Entry text="Y Axis" value="7" />
+            <Entry text="Z Axis" value="8" />
+          </EnumerationDomain>
+        <Documentation>Axis to use as the normal to the reflection plane.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="PlanePosition"
+                            command="SetCenter"
+                            number_of_elements="1"
+                            default_values="0.0">
+        <Documentation>Position of the reflection plane along the normal axis.</Documentation>
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="CheckSurface"
-        number_of_elements="1"
-        default_values="0"
-        command="SetCheckSurface">
-        <BooleanDomain name="bool" />
+      <!-- End vtkHyperTreeGridAxisReflection -->
+    </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridCellCenters"
+                 name="HyperTreeGridCellCenters"
+                 label="Hyper Tree Grid - Cell Centers">
+      <Documentation short_help="Generate points at leaf node centers.">
+        This filter generates output points at the center of the leaf
+        cells in the hyper tree grid.
+        These points can be used for placing glyphs or labeling.
+        The cell attributes will be associated with the points in the output.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="CreateVertexCells"
+                         command="SetVertexCells"
+                         default_values="0"
+                         number_of_elements="1">
         <Documentation>
-          Specify whether to check the surface for closure. If on, then the
-          algorithm first checks to see if the surface is closed and manifold.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="GenerateOutliers"
-        command="SetGenerateOutliers"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          If checked, then a second output will be created
-          that contains the outlier points.
-        </Documentation>
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="GenerateVertices"
-        command="SetGenerateVertices"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          If checked, then the outputs will contain a poly-vertex cell. This takes a
-          lot more memory, however certain filters many requires cells to be present
-          to function properly.
+          If enabled, vertex cells will be added to the output dataset. This
+          is useful for visualizing the output points, which are not rendered
+          otherwise.
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
+      <!-- End vtkHyperTreeGridCellCenters -->
+    </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridDepthLimiter"
+                 name="HyperTreeGridDepthLimiter"
+                 label="Hyper Tree Grid - Depth Limiter">
+      <Documentation short_help="Limit HTG nodes to a maximum depth">
+        Extract all levels down to a specified depth from a hyper tree grid.
+        If the required depth is greater or equal to the maximum level of the
+        input grid, then the output is identical.
+        Note that when a material mask is present, the geometry extent of the
+        output grid is guaranteed to contain that of the input tree, but the
+        former might be strictly larger than the latter. This is not a bug
+        but an expected behavior of which the user should be aware.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="SetDepth"
+                         command="SetDepth"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          Maximum depth to which the output grid should be limited.
+        </Documentation>
+        <IntRangeDomain min="0"
+                        name="range" />
+      </IntVectorProperty>
+      <!-- End vtkHyperTreeGridDepthLimiter -->
+    </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridGeometry"
+                 name="HyperTreeGridGeometry"
+                 label="Hyper Tree Grid - Geometry Filter">
+      <Documentation short_help="Generate external surface of a HTG.">
+        Generate PolyData representing the external surface of a HTG.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- End vtkHyperTreeGridGeometry -->
+    </SourceProxy>
+    <SourceProxy class="vtkHyperTreeGridPlaneCutter"
+                 name="HyperTreeGridPlaneCutter"
+                 label="Hyper Tree Grid - Plane Cutter">
+      <Documentation short_help="Produce polydata describing a plane in the HTG.">
+        Takes as input an hyper tree grid and a single plane and generates the
+        polygonal data intersection surface.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkHyperTreeGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+      <ProxyProperty command="SetPlane"
+                     name="Plane">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+        </ProxyListDomain>
+        <Documentation>This property sets the parameters of the plane
+        function.</Documentation>
+      </ProxyProperty>
+      <IntVectorProperty name="UseDualGrid"
+                         command="SetDual"
+                         default_values="0"
+                         number_of_elements="1">
+        <Documentation>
+          If enabled, the output plane is computed using the dual grid, providing
+          perfect connectivity at the cost of speed. If disabled, the AMR mesh
+          is used directly, and the output is obtained faster and is more useful
+          for rendering.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End vtkHyperTreeGridPlaneCutter-->
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

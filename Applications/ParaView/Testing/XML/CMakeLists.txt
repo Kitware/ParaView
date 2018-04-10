@@ -123,6 +123,15 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Ensemble.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridAxisClip.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridAxisCut.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridAxisReflection.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridCellCenters.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridContour.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridDepthLimiter.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridGeometry.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridPlaneCutter.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridThreshold.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LightAddRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
