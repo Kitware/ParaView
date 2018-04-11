@@ -38,6 +38,8 @@ generate_edition () {
     --no-configure --no-build --no-test --remove-dirs $cmd
   tar zcf Catalyst-$suffix$editionsuffix.tar.gz Catalyst-$suffix$editionsuffix
   mv Catalyst-$suffix$editionsuffix.tar.gz ../
+  tar Jcf Catalyst-$suffix$editionsuffix.tar.xz Catalyst-$suffix$editionsuffix
+  mv Catalyst-$suffix$editionsuffix.tar.xz ../
 }
 
 rm -rf $src_output/__tmp__
