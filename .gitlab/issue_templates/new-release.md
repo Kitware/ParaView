@@ -71,7 +71,7 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
 -->
 
   - Create tarballs
-    - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --tgz --zip -v vVERSION`)
+    - [ ] ParaView (`Utilities/Maintenance/create_tarballs.bash --txz --zip -v vVERSION`)
     - [ ] Catalyst (`Catalyst/generate-tarballs.sh vVERSION`)
   - Upload tarballs to `paraview.org`
     - [ ] `rsync -rptv $tarballs paraview.release:ParaView_Release/vMAJOR.MINOR/`
