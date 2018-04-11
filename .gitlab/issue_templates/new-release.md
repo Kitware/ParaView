@@ -175,9 +175,9 @@ git gitlab-push -f
 
 # Upload binaries
 
-  - [ ] Ask @chuck.atkins to sign macOS binary
   - Upload binaries to `paraview.org`
     - [ ] `rsync -rptv $binaries paraview.release:ParaView_Release/vMAJOR.MINOR/`
+  - [ ] Ask @chuck.atkins to sign macOS binary
   - [ ] Ask @utkarsh.ayachit to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt`
 ```
 buildListing.sh
