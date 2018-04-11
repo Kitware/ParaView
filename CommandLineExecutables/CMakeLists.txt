@@ -76,10 +76,14 @@ foreach (vtk_module IN LISTS VTK_MODULES_ENABLED extra_modules)
         set(type)
         get_property(type TARGET "${vtk_module_library}" PROPERTY TYPE)
         if (type STREQUAL "INTERFACE_LIBRARY")
+          # note, this may set vtk_module_library to empty for interface
+          # libraries that have no INTERFACE_LINK_LIBRARIES.
           get_property(vtk_module_library TARGET "${vtk_module_library}" PROPERTY INTERFACE_LINK_LIBRARIES)
         endif ()
         set(vtk_module_library_name)
-        get_property(vtk_module_library_name TARGET "${vtk_module_library}" PROPERTY OUTPUT_NAME)
+        if (vtk_module_library)
+          get_property(vtk_module_library_name TARGET "${vtk_module_library}" PROPERTY OUTPUT_NAME)
+        endif ()
         if (NOT vtk_module_library_name)
           set(vtk_module_library_name "${vtk_module_library}")
         endif ()
@@ -97,14 +101,20 @@ foreach (vtk_module IN LISTS VTK_MODULES_ENABLED extra_modules)
       get_property(target_type TARGET "${vtk_module}" PROPERTY TYPE)
       if (target_type MATCHES "_LIBRARY$")
         if (target_type STREQUAL "INTERFACE_LIBRARY")
+          # note, this may set vtk_module_library to empty for interface
+          # libraries that have no INTERFACE_LINK_LIBRARIES.
           get_property(vtk_module_library TARGET "${vtk_module}" PROPERTY INTERFACE_LINK_LIBRARIES)
         else ()
           set(vtk_module_library "${vtk_module}")
         endif ()
         set(vtk_module_library_name)
-        get_property(vtk_module_library_name TARGET "${vtk_module_library}" PROPERTY OUTPUT_NAME)
-        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
+        if (vtk_module_library)
+          get_property(vtk_module_library_name TARGET "${vtk_module_library}" PROPERTY OUTPUT_NAME)
+        endif ()
+        if (vtk_module_library_name)
+          file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/vtkModuleDependencies.h"
 "\"${vtk_module_library_name}\", ")
+        endif ()
       endif ()
     endif ()
 
