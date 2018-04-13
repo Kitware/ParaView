@@ -236,7 +236,7 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
   // composite name
   if (compositeFound)
   {
-    tooltipTextStream << std::endl << "Block: " << compositeName;
+    tooltipTextStream << "\nBlock: " << compositeName;
   }
 
   vtkFieldData* fieldData = nullptr;
@@ -250,13 +250,12 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
     originalIds = pointData->GetArray("vtkOriginalPointIds");
     if (originalIds)
     {
-      tooltipTextStream << std::endl << "Id: " << originalIds->GetTuple1(0);
+      tooltipTextStream << "\nId: " << originalIds->GetTuple1(0);
     }
 
     // point coords
     ds->GetPoint(0, point);
-    tooltipTextStream << std::endl
-                      << "Coords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
+    tooltipTextStream << "\nCoords: (" << point[0] << ", " << point[1] << ", " << point[2] << ")";
   }
   else if (association == vtkDataObject::FIELD_ASSOCIATION_CELLS)
   {
@@ -266,15 +265,25 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
     originalIds = cellData->GetArray("vtkOriginalCellIds");
     if (originalIds)
     {
-      tooltipTextStream << std::endl << "Id: " << originalIds->GetTuple1(0);
+      tooltipTextStream << "\nId: " << originalIds->GetTuple1(0);
     }
     // cell type? cell points?
-    vtkCell* cell = ds->GetCell(0);
-    tooltipTextStream << std::endl
-                      << "Type: " << vtkSMCoreUtilities::GetStringForCellType(cell->GetCellType());
+    if (ds->GetNumberOfCells() > 0)
+    {
+      vtkCell* cell = ds->GetCell(0);
+      tooltipTextStream << "\nType: "
+                        << vtkSMCoreUtilities::GetStringForCellType(cell->GetCellType());
+    }
 
     // needed to position the tooltip
-    ds->GetPoint(0, point);
+    if (ds->GetNumberOfPoints() > 0)
+    {
+      ds->GetPoint(0, point);
+    }
+    else
+    {
+      point[0] = point[1] = point[2] = 0.0;
+    }
   }
 
   if (fieldData)
@@ -288,7 +297,7 @@ bool vtkSMTooltipSelectionPipeline::GetTooltipInfo(
       {
         continue;
       }
-      tooltipTextStream << std::endl << array->GetName() << ": ";
+      tooltipTextStream << "\n" << array->GetName() << ": ";
       if (array->GetNumberOfComponents() > 1)
       {
         tooltipTextStream << "(";
