@@ -189,7 +189,7 @@ def setattr(proxy, pname, value):
                 raise Continue()
             else:
                 raise NotSupportedException("'%s' is obsolete. Use the `Blocks` "\
-                        "property to select blocks using SIL instead.")
+                        "property to select blocks using SIL instead." % pname)
 
     if pname == "DataBoundsInflateFactor" and proxy.SMProxy.GetProperty("DataBoundsScaleFactor"):
         if paraview.compatibility.GetVersion() <= 5.4:
