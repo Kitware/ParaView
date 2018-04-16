@@ -59,7 +59,6 @@
     <Proxy group="filters" name="HyperTreeGridCellCenters" />
     <Proxy group="filters" name="HyperTreeGridContour" />
     <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
-    <Proxy group="filters" name="HyperTreeGridGeometry" />
     <Proxy group="filters" name="HyperTreeGridPlaneCutter" />
     <Proxy group="filters" name="HyperTreeGridThreshold" />
     <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
