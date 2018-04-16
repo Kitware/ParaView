@@ -16949,8 +16949,8 @@ source.</Documentation>
       <!-- End vtkHyperTreeGridGeometry -->
     </SourceProxy>
     <SourceProxy class="vtkHyperTreeGridPlaneCutter"
-                 name="HyperTreeGridPlaneCutter"
-                 label="Hyper Tree Grid - Plane Cutter">
+                 name="HyperTreeGridSliceWithPlane"
+                 label="Hyper Tree Grid - Slice With Plane">
       <Documentation short_help="Produce polydata describing a plane in the HTG.">
         Takes as input an hyper tree grid and a single plane and generates the
         polygonal data intersection surface.
