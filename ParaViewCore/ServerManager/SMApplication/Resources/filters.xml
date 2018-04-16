@@ -16543,7 +16543,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the converter.</Documentation>
@@ -16564,7 +16564,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the converter.</Documentation>
@@ -16629,7 +16629,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the converter.</Documentation>
