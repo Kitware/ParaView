@@ -4015,6 +4015,7 @@
                         name="input_type">
           <DataType value="vtkDataSet" />
           <DataType value="vtkGenericDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="cell"
                           name="input_array_cell"
@@ -5454,6 +5455,7 @@
                      name="Input">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <InputArrayDomain attribute_type="any"
                           name="input_array_any" />
