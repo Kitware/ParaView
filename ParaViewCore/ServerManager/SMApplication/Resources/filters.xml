@@ -16543,7 +16543,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the converter.</Documentation>
@@ -16564,7 +16564,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the converter.</Documentation>
@@ -16629,7 +16629,7 @@ source.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the converter.</Documentation>
@@ -16949,8 +16949,8 @@ source.</Documentation>
       <!-- End vtkHyperTreeGridGeometry -->
     </SourceProxy>
     <SourceProxy class="vtkHyperTreeGridPlaneCutter"
-                 name="HyperTreeGridPlaneCutter"
-                 label="Hyper Tree Grid - Plane Cutter">
+                 name="HyperTreeGridSliceWithPlane"
+                 label="Hyper Tree Grid - Slice With Plane">
       <Documentation short_help="Produce polydata describing a plane in the HTG.">
         Takes as input an hyper tree grid and a single plane and generates the
         polygonal data intersection surface.
