@@ -1,0 +1,23 @@
+<!-- Copyright (c) 2017 Battelle Energy Alliance, LLC  -->
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="MooseXfemClip" class="vtkMooseXfemClip" label="MooseXfemClip">
+      <Documentation
+        long_help="Clip partial elements cut by the XFEM cut plane in codes based on the MOOSE framework."
+        short_help="Clip partial elements cut by XFEM in MOOSE models.">
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
