@@ -2,13 +2,11 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/SPCTH/Dave_Karelitz_Small/sample.spcth-timeseries" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />  
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrayStatus/ArraySelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CellArrayStatus/ArraySelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="CTHPart" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/VolumeArrays/ArraySelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/VolumeArrays/ArraySelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/VolumeArrays/ArraySelectionWidget" command="setCheckState" arguments="4.0,2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/VolumeArrays/ArraySelectionWidget" command="setCheckState" arguments="5.0,2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/VolumeArrays/ArraySelectionWidget" command="setCheckState" arguments="6.0,2" />
