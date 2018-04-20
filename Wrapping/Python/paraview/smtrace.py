@@ -892,13 +892,6 @@ class PropertiesModified(NestableTraceItem):
         self.MTime.Modified()
         self.Comment = "#%s" % comment if not comment is None else \
             "# Properties modified on %s" % str(self.ProxyAccessor)
-        try:
-            # Hack to track ScalarOpacityFunction property changes since that proxy
-            # is shown on the same pqProxyWidget as the ColorTransferFunction proxy --
-            # which is non-standard.
-            if proxy.ScalarOpacityFunction:
-                self.ScalarOpacityFunctionHack = PropertiesModified(self.proxy.ScalarOpacityFunction)
-        except: pass
 
     def finalize(self):
         props = self.ProxyAccessor.get_properties()
@@ -908,24 +901,35 @@ class PropertiesModified(NestableTraceItem):
                 self.Comment,
                 self.ProxyAccessor.trace_properties(props_to_trace, in_ctor=False)])
 
-        # also handle properties on values for properties with ProxyListDomain.
-        for prop in [k for k in props if k.has_proxy_list_domain()]:
+        # Remember, we are monitoring a proxy to trace any properties on it that
+        # are modified. When that's the case, properties on a proxy-property on
+        # that proxy may have been modified too and it would make sense to trace
+        # those as well (e.g. ScalarOpacityFunction on a PVLookupTable proxy).
+        # This loop handles that. We explicitly skip "InputProperty"s, however
+        # since tracing properties modified on the input should not be a
+        # responsibility of this method.
+        for prop in props:
+            if not isinstance(prop.get_object(), sm.ProxyProperty) or \
+                    isinstance(prop.get_object(), sm.InputProperty) or \
+                    prop.DisableSubTrace:
+                continue
             val = prop.get_property_value()
-            if val:
+            try:
+                # val can be None or list of proxies. We are not tracing list of
+                # proxies since we don't want to trace properties like
+                # `view.Representations`.
+                if not val or not isinstance(val, sm.Proxy): continue
                 valaccessor = Trace.get_accessor(val)
-                if not prop.DisableSubTrace:
-                  props = valaccessor.get_properties()
-                  props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
-                  if props_to_trace:
+            except Untraceable:
+                continue
+            else:
+                props = valaccessor.get_properties()
+                props_to_trace = [k for k in props if self.MTime.GetMTime() < k.get_object().GetMTime()]
+                if props_to_trace:
                     Trace.Output.append_separated([
                         "# Properties modified on %s" % valaccessor,
                         valaccessor.trace_properties(props_to_trace, in_ctor=False)])
         TraceItem.finalize(self)
-
-        try:
-            self.ScalarOpacityFunctionHack.finalize()
-            del self.ScalarOpacityFunctionHack
-        except AttributeError: pass
 
 class ScalarBarInteraction(NestableTraceItem):
     """Traces scalar bar interactions"""
