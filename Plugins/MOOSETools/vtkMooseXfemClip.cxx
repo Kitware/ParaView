@@ -23,7 +23,7 @@
 #include "vtkIncrementalPointLocator.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMergePoints.h"
+#include "vtkNonMergingPointLocator.h"
 #include "vtkObjectFactory.h"
 #include "vtkPlane.h"
 #include "vtkPointData.h"
@@ -37,7 +37,7 @@ vtkStandardNewMacro(vtkMooseXfemClip);
 vtkMooseXfemClip::vtkMooseXfemClip()
 {
   this->OutputPointsPrecision = DEFAULT_PRECISION;
-  this->Locator = NULL;
+  this->Locator = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ vtkMooseXfemClip::~vtkMooseXfemClip()
   if (this->Locator)
   {
     this->Locator->UnRegister(this);
-    this->Locator = NULL;
+    this->Locator = nullptr;
   }
 }
 
@@ -59,9 +59,12 @@ void vtkMooseXfemClip::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkMooseXfemClip::CreateDefaultLocator()
 {
-  if (this->Locator == NULL)
+  if (this->Locator == nullptr)
   {
-    this->Locator = vtkMergePoints::New();
+    // The vtkNonMergingPointLocator does not merge coincident points on
+    // opposing sides of the cutting plane, which is esential for proper
+    // visualization of fields that are discontinuous across that interface.
+    this->Locator = vtkNonMergingPointLocator::New();
     this->Locator->Register(this);
     this->Locator->Delete();
   }
@@ -102,7 +105,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPoints* newPoints;
   vtkFloatArray* cellScalars;
   vtkImplicitFunction* ClipFunction = NULL;
-  vtkPlane* ClipPlane = NULL;
+  vtkPlane* ClipPlane = nullptr;
 
   vtkDataArray* XFEMCutOriginArray = input->GetCellData()->GetArray("xfem_cut_origin_");
   vtkDataArray* XFEMCutNormalArray = input->GetCellData()->GetArray("xfem_cut_normal_");
@@ -119,7 +122,6 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   vtkPoints* cellPts;
-  vtkIdList* cellIds;
   double s;
   vtkIdType npts;
   vtkIdType* pts;
@@ -127,11 +129,8 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   vtkIdType i;
   int j;
   vtkIdType estimatedSize;
-  int numOutputs = 1;
 
   vtkDebugMacro(<< "Clipping dataset");
-
-  int inputObjectType = input->GetDataObjectType();
 
   // Initialize self; create output objects
   //
@@ -180,7 +179,7 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
   newPoints->Allocate(numPts, numPts / 2);
 
   // locator used to merge potentially duplicate points
-  if (this->Locator == NULL)
+  if (this->Locator == nullptr)
   {
     this->CreateDefaultLocator();
   }
@@ -210,7 +209,6 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
 
     input->GetCell(cellId, cell);
     cellPts = cell->GetPoints();
-    cellIds = cell->GetPointIds();
     npts = cellPts->GetNumberOfPoints();
 
     double* Origin;
@@ -236,12 +234,6 @@ int vtkMooseXfemClip::RequestData(vtkInformation* vtkNotUsed(request),
       {
         cellPts = cell->GetPoints();
         s = ClipFunction->FunctionValue(cellPts->GetPoint(i));
-        if (s < 0)
-        {
-          // Hack to leave a slight gap between the opposing cut
-          // planes so that the nodes don't get merged together.
-          s *= 1.0001;
-        }
         cellScalars->InsertTuple(i, &s);
       }
     }
