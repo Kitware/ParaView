@@ -35,24 +35,33 @@ function(determine_version source_dir git_command var_prefix)
     # information. Just return here to avoid the warning message at the end of
     # this function.
     return ()
-  elseif (NOT PARAVIEW_GIT_DESCRIBE)
-    if(EXISTS ${git_command} AND EXISTS ${source_dir}/.git)
-      execute_process(
-        COMMAND ${git_command} describe
-        WORKING_DIRECTORY ${source_dir}
-        RESULT_VARIABLE result
-        OUTPUT_VARIABLE output
-        ERROR_QUIET
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_STRIP_TRAILING_WHITESPACE)
+  elseif (NOT PARAVIEW_GIT_DESCRIBE AND
+          EXISTS ${git_command} AND
+          EXISTS ${source_dir}/.git)
+    execute_process(
+      COMMAND ${git_command} describe
+      WORKING_DIRECTORY ${source_dir}
+      RESULT_VARIABLE result
+      OUTPUT_VARIABLE output
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_STRIP_TRAILING_WHITESPACE)
+    if (NOT result EQUAL 0)
+      # git describe failed (bad return code).
+      set(output "")
     endif()
-  else()
-    set(result 0)
-    set(output ${PARAVIEW_GIT_DESCRIBE})
+  else ()
+    # note, output may be set to empty if PARAVIEW_GIT_DESCRIBE is not defined.
+    set(output "${PARAVIEW_GIT_DESCRIBE}")
   endif()
+
+  unset(tmp_VERSION)
   extract_version_components("${output}" tmp)
   if(DEFINED tmp_VERSION)
-    message(STATUS "Determined Source Version : ${tmp_VERSION_FULL}")
+    if (NOT "${tmp_VERSION}" STREQUAL "${${var_prefix}_VERSION}")
+      message(WARNING
+        "Version from git (${tmp_VERSION}) disagrees with hard coded version (${${var_prefix}_VERSION}). Either update the git tags or version.txt.")
+    endif()
     foreach(suffix VERSION VERSION_MAJOR VERSION_MINOR VERSION_PATCH
                    VERSION_PATCH_EXTRA VERSION_FULL VERSION_IS_RELEASE)
       set(${var_prefix}_${suffix} ${tmp_${suffix}} PARENT_SCOPE)
@@ -65,14 +74,16 @@ endfunction()
 
 # Extracts components from a version string. See determine_version() for usage.
 function(extract_version_components version_string var_prefix)
-  string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)[-]*(.*)"
+  string(REGEX MATCH "^v?(([0-9]+)\\.([0-9]+)\\.([0-9]+)-?(.*))$"
     version_matches "${version_string}")
   if(CMAKE_MATCH_0)
-    set(full ${CMAKE_MATCH_0})
-    set(major ${CMAKE_MATCH_1})
-    set(minor ${CMAKE_MATCH_2})
-    set(patch ${CMAKE_MATCH_3})
-    set(patch_extra ${CMAKE_MATCH_4})
+    # note, we don't use CMAKE_MATCH_0 for `full` since it may or may not have
+    # the `v` prefix.
+    set(full ${CMAKE_MATCH_1})
+    set(major ${CMAKE_MATCH_2})
+    set(minor ${CMAKE_MATCH_3})
+    set(patch ${CMAKE_MATCH_4})
+    set(patch_extra ${CMAKE_MATCH_5})
 
     set(${var_prefix}_VERSION "${major}.${minor}" PARENT_SCOPE)
     set(${var_prefix}_VERSION_MAJOR ${major} PARENT_SCOPE)
