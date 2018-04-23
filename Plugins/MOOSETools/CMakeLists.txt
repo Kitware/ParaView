@@ -6,6 +6,7 @@ include_directories(
 # this plugin can be loaded on the server side
 
 ADD_PARAVIEW_PLUGIN(MooseXfemClip "1.0"
+  DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
   REQUIRED_ON_SERVER
   SERVER_MANAGER_XML MooseXfemClip.xml
   SERVER_MANAGER_SOURCES vtkMooseXfemClip.cxx)

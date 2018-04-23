@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>MooseXfemClip</title>
+  </head>
+  <body>
+    <h1>MooseXfemClip</h1>
+
+    <div>
+    MooseXfemClip is a filter for use visualizing results produced by
+    the extended finite element method (XFEM) using the xfem module in the
+    <a href=http://www.mooseframework.org>MOOSE framework</a>.
+
+    <p>
+    The MOOSE XFEM implementation uses the phantom node technique, in which elements
+    traversed by a discontinuity are split into two partial elements, each containing
+    physical and non-physical material.
+
+    <p>
+    This code generates two sets of elemental variables: `xfem_cut_origin_[0-2]` and
+    `xfem_cut_normal_[0-2]`, which define the origin and normal of a cutting plane to be
+    applied to each partial element. If these both contain nonzero values, this filter will
+    cut off the non-physical portions of those elements.
+
+    <p>
+    It is necessary to define the cut planes in this way rather than using a global signed
+    distance function because a global signed distance function has ambiguities at crack tips,
+    where two partial elements share a common edge or face.
+
+    <p>
+    The following two images show the mesh before and after the clipping process, with the
+    physical portions of the domain shown in orange and the non-physical portions shown
+    in grey before clipping:
+    <p>
+    <img src="before.png" /> <img src="after.png"  />
+
+    <div>
+    <h1>Usage Instructions</h1>
+
+    To use the plugin, load in all variables coming from an XFEM results file.  The ones
+    the plugin needs are called: <tt>xfem_cut_origin_[xyz]</tt> and <tt>xfem_cut_normal_[xyz]</tt>.
+    These are generated automatically by MOOSE models using XFEM.  Once you've done that,
+    you can apply the MooseXfemClip filter, and you should see the nonphysical parts of
+    partial elements clipped.
+
+    <p>
+    To correctly visualize the results on a mesh with magnified deformation, apply
+    the "Warp" filter after applying this filter.
+  </body>
+</html>
