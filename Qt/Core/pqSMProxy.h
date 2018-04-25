@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSMProxy_h
-#define _pqSMProxy_h
+#ifndef pqSMProxy_h
+#define pqSMProxy_h
 
 #include "pqCoreModule.h"
 #include "vtkSMProxy.h"
@@ -48,6 +48,14 @@ typedef vtkSmartPointer<vtkSMProxy> pqSMProxy;
 */
 Q_DECLARE_METATYPE(pqSMProxy)
 
-extern PQCORE_EXPORT const int pqSMProxyMetaTypeId;
+// use Schwartz counter idiom to correctly
+// call qRegisterMetaType<> even on static builds when pqSMProxy
+// header is included in any translation unit.
+static class PQCORE_EXPORT pqSMProxySchwartzCounter
+{
+public:
+  pqSMProxySchwartzCounter();
+  ~pqSMProxySchwartzCounter() = default;
+} pqSMProxySchwartzCounter;
 
 #endif

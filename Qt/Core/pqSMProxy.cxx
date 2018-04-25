@@ -29,8 +29,19 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqSMProxy.h"
 
-// register meta type for pqSMProxy
-const int pqSMProxyMetaTypeId = qRegisterMetaType<pqSMProxy>("pqSMProxy");
+namespace
+{
+static unsigned int counter = 0;
+}
+
+pqSMProxySchwartzCounter::pqSMProxySchwartzCounter()
+{
+  if (counter == 0)
+  {
+    // register meta type for pqSMProxy
+    qRegisterMetaType<pqSMProxy>("pqSMProxy");
+  }
+  counter++;
+}
