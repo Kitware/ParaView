@@ -1001,7 +1001,7 @@ void pqAnimationViewWidget::createTrack()
 
     if (mode == "orbit")
     {
-      // update key frame paramters based on the orbit points.
+      // update key frame parameters based on the orbit points.
       vtkSMProxy* kf = cue->getKeyFrame(0);
       pqSMAdaptor::setMultipleElementProperty(
         kf->GetProperty("PositionPathPoints"), creator.orbitPoints(7));

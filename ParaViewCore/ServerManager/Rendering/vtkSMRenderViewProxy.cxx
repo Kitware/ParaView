@@ -876,7 +876,7 @@ static void vtkShrinkSelection(vtkSelection* sel)
 {
   std::map<void*, int> pixelCounts;
   unsigned int numNodes = sel->GetNumberOfNodes();
-  void* choosen = NULL;
+  void* chosen = NULL;
   int maxPixels = -1;
   for (unsigned int cc = 0; cc < numNodes; cc++)
   {
@@ -891,29 +891,29 @@ static void vtkShrinkSelection(vtkSelection* sel)
       if (pixelCounts[source] > maxPixels)
       {
         maxPixels = numPixels;
-        choosen = source;
+        chosen = source;
       }
     }
   }
 
-  std::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
-  if (choosen != NULL)
+  std::vector<vtkSmartPointer<vtkSelectionNode> > chosenNodes;
+  if (chosen != NULL)
   {
     for (unsigned int cc = 0; cc < numNodes; cc++)
     {
       vtkSelectionNode* node = sel->GetNode(cc);
       vtkInformation* properties = node->GetProperties();
       if (properties->Has(vtkSelectionNode::SOURCE()) &&
-        properties->Get(vtkSelectionNode::SOURCE()) == choosen)
+        properties->Get(vtkSelectionNode::SOURCE()) == chosen)
       {
-        choosenNodes.push_back(node);
+        chosenNodes.push_back(node);
       }
     }
   }
   sel->RemoveAllNodes();
-  for (unsigned int cc = 0; cc < choosenNodes.size(); cc++)
+  for (unsigned int cc = 0; cc < chosenNodes.size(); cc++)
   {
-    sel->AddNode(choosenNodes[cc]);
+    sel->AddNode(chosenNodes[cc]);
   }
 }
 }

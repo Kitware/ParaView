@@ -412,7 +412,7 @@ class CoProcessor(object):
         """
         controller = servermanager.ParaViewPipelineController()
         # assume that a client only proxy with the same name as a writer
-        # is available in "insitu_writer_paramters"
+        # is available in "insitu_writer_parameters"
 
         # Since coprocessor sometimes pass writer as a custom object and not
         # a proxy, we need to handle that. Just creating any arbitrary writer

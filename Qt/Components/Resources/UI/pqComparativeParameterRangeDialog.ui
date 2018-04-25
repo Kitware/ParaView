@@ -55,13 +55,13 @@ However number of values in both entires must match.</string>
    <item>
     <widget class="QComboBox" name="mode">
      <property name="toolTip">
-      <string>Controls the direction in which the paramter is varied.</string>
+      <string>Controls the direction in which the parameter is varied.</string>
      </property>
      <property name="statusTip">
-      <string>Controls the direction in which the paramter is varied.</string>
+      <string>Controls the direction in which the parameter is varied.</string>
      </property>
      <property name="whatsThis">
-      <string>Controls the direction in which the paramter is varied.</string>
+      <string>Controls the direction in which the parameter is varied.</string>
      </property>
      <item>
       <property name="text">

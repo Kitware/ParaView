@@ -84,7 +84,7 @@
        This filter requires an initial analysis of the input data with the
        MaterialClusterAnalysis filter. If input is not the output of this filter
        (ie. it does not contain the metadata produced by this filter, the cluster centers
-       in particular), then the filter will be called internaly first.
+       in particular), then the filter will be called internally first.
      </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">

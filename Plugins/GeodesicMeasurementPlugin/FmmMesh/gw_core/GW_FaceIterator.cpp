@@ -5,7 +5,7 @@
 using namespace GW;
 
 
-/* progression : \todo take in acount NULL pointer */
+/* progression : \todo take in account NULL pointer */
 void GW_FaceIterator::operator++()
 {
     /*!!

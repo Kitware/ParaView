@@ -19,7 +19,7 @@
  * indexed by fragment and proc, intended to facilitate
  * moving fragment pieces around.
  *
- * Internaly we have a 2D matrix. On one axis is fragment id
+ * Internally we have a 2D matrix. On one axis is fragment id
  * on the other is proc id.
  *
  * Transaction are intended to execute in fragment order
@@ -68,7 +68,7 @@ public:
   vtkIdType GetNumberOfTransactions(int procId);
   /**
    * Given a proc and a fragment, return a ref to
-   * the associated list of tranactions.
+   * the associated list of transactions.
    */
   std::vector<vtkMaterialInterfacePieceTransaction>& GetTransactions(int fragmentId, int procId);
   /**

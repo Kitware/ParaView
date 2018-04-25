@@ -118,7 +118,7 @@ void pqSignalAdaptorKeyFrameType::onTypeChanged()
   int type = vtkPVCompositeKeyFrame::GetTypeFromString(text.toLocal8Bit().data());
   if (type == vtkPVCompositeKeyFrame::NONE)
   {
-    qDebug() << "Unknown type choosen in the combox: " << text;
+    qDebug() << "Unknown type chosen in the combox: " << text;
     return;
   }
 

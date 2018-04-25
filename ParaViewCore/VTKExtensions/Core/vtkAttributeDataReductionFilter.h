@@ -54,7 +54,7 @@ public:
   };
 
   // Set the attributes to reduce. Only the chosen type of attributes will be
-  // reduced by this filter. The not-choosen attributes are passed through
+  // reduced by this filter. The not-chosen attributes are passed through
   // from the first input unchanged. Default is (POINT_DATA|CELL_DATA)
   // i.e. point data and cell data will be reduced.
   // FIXME: Field data not supported yet.

@@ -46,7 +46,7 @@ public:
     /* indirection */
     GW_Face* operator*(  );
 
-    /* progression : \todo take in acount NULL pointer */
+    /* progression : \todo take in account NULL pointer */
     void operator++();
 
     GW_Vertex* GetLeftVertex();

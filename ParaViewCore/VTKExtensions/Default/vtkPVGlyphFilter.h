@@ -120,7 +120,7 @@ protected:
   int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
 
   /**
-   * Returns 1 if point is to be glyped, otherwise returns 0.
+   * Returns 1 if point is to be glyphed, otherwise returns 0.
    */
   int IsPointVisible(vtkDataSet* ds, vtkIdType ptId) VTK_OVERRIDE;
 

@@ -73,7 +73,7 @@ public:
    * Return an array of ids. The ids are stored in the following order
    * and the size of the array is provided as argument.
    * [key, value, key, value, ...]
-   * The array is kept internaly using a std::vector
+   * The array is kept internally using a std::vector
    */
   vtkTypeUInt32* GetMappingArray(int& size);
 

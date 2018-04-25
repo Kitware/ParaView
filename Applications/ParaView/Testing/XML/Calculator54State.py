@@ -7,7 +7,7 @@
 #### import the simple module from the paraview
 from paraview.simple import *
 
-# the compatibility information has to be manully set
+# the compatibility information has to be manually set
 paraview.compatibility.major = 5
 paraview.compatibility.minor = 4
 #### disable automatic camera reset on 'Show'

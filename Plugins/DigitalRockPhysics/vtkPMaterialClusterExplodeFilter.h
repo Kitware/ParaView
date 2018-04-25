@@ -28,7 +28,7 @@
  * This filter requires an initial analysis of the input data with the
  * vtkPMaterialClusterAnalysisFilter. If input is not the output of this filter
  * (ie. it does not contain the metadata produced by this filter, the cluster
- * centers in particular), then the filter will be called internaly first.
+ * centers in particular), then the filter will be called internally first.
  *
  * Note that this filter has two levels of parallelization: it takes benefit of
  * data parallelism if it is enabled (eg. MPI), but it takes also benefit from

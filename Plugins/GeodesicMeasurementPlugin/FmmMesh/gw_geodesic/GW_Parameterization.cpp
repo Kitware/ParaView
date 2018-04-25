@@ -1139,7 +1139,7 @@ void GW_Parameterization::ResolutionBoundaryFixed( GW_Mesh& Mesh, GW_SparseMatri
                 break;
             num++;
         };
-        /* normally we should have extracted as many piece as they were setted position */
+        /* normally we should have extracted as many piece as they were set position */
         GW_U32 nNbrPieces = (GW_U32) boundary_pieces.size();
         GW_ASSERT( nNbrPieces==pTrissectorInfoMap->size() );
         /* set up the position for each base point */

@@ -430,7 +430,7 @@ public:
   /**
    * Saves the state of the server manager as XML, and returns the
    * vtkPVXMLElement for the root of the state.
-   * Note this this method allocates a new vtkPVXMLElement object,
+   * Note this method allocates a new vtkPVXMLElement object,
    * it's the caller's responsibility to free it by calling Delete().
    */
   vtkPVXMLElement* SaveXMLState();

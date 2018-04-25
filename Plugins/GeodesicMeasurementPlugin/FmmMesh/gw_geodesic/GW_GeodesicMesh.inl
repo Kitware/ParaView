@@ -322,7 +322,7 @@ GW_Float GW_GeodesicMesh::ComputeVertexDistance( GW_GeodesicFace& CurrentFace, G
         GW_Float d1 = Vert1.GetDistance();
         GW_Float d2 = Vert2.GetDistance();
 
-        /*    Set it if you want only to take in acount dead vertex
+        /*    Set it if you want only to take in account dead vertex
             during the update step. */
         #define USING_ONLY_DEAD
 

@@ -1,7 +1,7 @@
 # Improve support of dependent components for volume representation
 
 When volume representation is selected and **Map Scalars** and selected data
-array has 2 or 4 components, a new property called **Mutliple Components Mapping**
+array has 2 or 4 components, a new property called **Multiple Components Mapping**
 is available.
 
 When this new feature is enabled:

@@ -28,7 +28,7 @@ GW_VertexIterator::GW_VertexIterator(  GW_Face* pFace, GW_Vertex* pOrigin, GW_Ve
 
 
 
-/* progression : \todo take in acount NULL pointer */
+/* progression : \todo take in account NULL pointer */
 void GW_VertexIterator::operator++()
 {
     /*
