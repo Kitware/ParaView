@@ -10,3 +10,7 @@ ADD_PARAVIEW_PLUGIN(MooseXfemClip "1.0"
   REQUIRED_ON_SERVER
   SERVER_MANAGER_XML MooseXfemClip.xml
   SERVER_MANAGER_SOURCES vtkMooseXfemClip.cxx)
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()
