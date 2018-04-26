@@ -126,12 +126,18 @@ void vtkPVGridAxes3DActor::UpdateGridBoundsUsingDataBounds()
       this->SetScale(1, 1, 1);
     }
 
-    double scaleArray[3] = { this->DataBoundsScaleFactor, this->DataBoundsScaleFactor,
-      this->DataBoundsScaleFactor };
-    bbox.Scale(scaleArray);
-
+    double center[3];
     double bds[6];
     bbox.GetBounds(bds);
+
+    // correct the bounds for the data bounds scale factor
+    for (int i = 0; i < 3; i++)
+    {
+      center[i] = (bds[2 * i] + bds[2 * i + 1]) / 2;
+      bds[2 * i] = center[i] - ((center[i] - bds[2 * i]) * this->DataBoundsScaleFactor);
+      bds[2 * i + 1] = center[i] + ((bds[2 * i + 1] - center[i]) * this->DataBoundsScaleFactor);
+    }
+
     this->SetGridBounds(bds);
   }
   else
