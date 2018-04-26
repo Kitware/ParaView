@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFindDataCreateSelectionFrame.h"
 #include "ui_pqFindDataCreateSelectionFrame.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -168,6 +169,18 @@ pqFindDataCreateSelectionFrame::pqFindDataCreateSelectionFrame(
 {
   // fill the source combo with existing sources, if any.
   this->Internals->Ui.source->fillExistingPorts();
+
+  // BUG #18135. If we have something selected, show that, others, show the
+  // current source.
+  auto selectionManager = this->Internals->SelectionManager;
+  if (selectionManager && selectionManager->hasActiveSelection())
+  {
+    this->setPort(selectionManager->getSelectedPort());
+  }
+  else if (auto* aport = pqActiveObjects::instance().activePort())
+  {
+    this->setPort(aport);
+  }
 }
 
 //-----------------------------------------------------------------------------
