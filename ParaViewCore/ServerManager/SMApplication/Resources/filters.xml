@@ -16467,7 +16467,7 @@ source.</Documentation>
           <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-         <DataType value="vtkPolyData" />
+         <DataType value="vtkPointSet" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to extract points from.</Documentation>
       </InputProperty>
