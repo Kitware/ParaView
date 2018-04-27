@@ -1,8 +1,8 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="internal_sources">
+  <ProxyGroup name="sources">
     <SourceProxy class="vtkGDALVectorReader"
                  label="GDAL Vector Reader"
-                 name="GDALVectorReaderCore">
+                 name="GDALVectorReader">
       <Documentation short_help="Reads a vector file using the GDAL
       library.">GDAL Vector Reader is a source object that reads
       vector files and uses GDAL as the underlying library for the
@@ -22,6 +22,60 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="GetNumberOfLayers"
+                         information_only="1"
+                         name="NumberOfLayers">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetActiveLayer"
+                         information_only="1"
+                         name="ActiveLayerInfo">
+      </IntVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetActiveLayer"
+                         default_values="0"
+                         information_property="ActiveLayerInfo"
+                         name="ActiveLayer"
+                         number_of_elements="1">
+        <Documentation>Set the active layer.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetAppendFeatures"
+                         information_only="1"
+                         name="AppendFeaturesInfo">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAppendFeatures"
+                         default_values="0"
+                         information_property="AppendFeaturesInfo"
+                         name="AppendFeatures"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set whether features are appended to a single
+    vtkPolyData. Turning the option on is useful when a shapefile has
+    a number of features which could otherwise lead to a huge
+    multiblock structure.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="GetAddFeatureIds"
+                         information_only="1"
+                         name="AddFeatureIdsInfo">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetAddFeatureIds"
+                         default_values="0"
+                         information_property="AddFeatureIdsInfo"
+                         name="AddFeatureIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether feature IDs should be generated.
+          Some GDAL primitives (e.g., a polygon with a hole
+          in its interior) are represented by multiple VTK
+          cells. If you wish to identify the primitive
+          responsible for a VTK cell, turn this on. It is
+          off by default for backwards compatibility.
+          The array of feature IDs will be the active
+          cell-data pedigree IDs.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <ReaderFactory extensions="shp"
                        file_description="GDAL Vector Files"/>
@@ -30,7 +84,7 @@
     </SourceProxy>
     <SourceProxy class="vtkGDALRasterReader"
                  label="GDAL Raster Reader"
-                 name="GDALRasterReaderCore">
+                 name="GDALRasterReader">
       <Documentation short_help="Reads a raster file using the GDAL
       library.">GDAL Raster Reader is a source object that reads
       raster files and uses GDAL as the underlying library for the
@@ -51,110 +105,25 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="GetTargetDimensions"
+                         information_only="1"
+                         name="TargetDimensionsInfo">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTargetDimensions"
+                         default_values="-1 -1"
+                         information_property="TargetDimensionsInfo"
+                         name="TargetDimensions"
+                         number_of_elements="2">
+        <Documentation>
+          Set the desired width and height of the image.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <ReaderFactory extensions="tif"
                        file_description="GDAL Raster Files" />
       </Hints>
       <!-- End GDALRasterReader -->
     </SourceProxy>
-    <!-- End of "internal_sources" -->
-  </ProxyGroup>
-
-
-  <ProxyGroup name="sources">
-    <SourceProxy class="vtkFileSeriesReader"
-                 file_name_method="SetFileName"
-                 label="GDAL Vector Reader"
-                 name="GDALVectorReader"
-                 si_class="vtkSIMetaReaderProxy">
-      <Documentation short_help="Reads a vector file using the GDAL
-      library.">GDAL Vector Reader is a source object that reads
-      vector files and uses GDAL as the underlying library for the
-      task. GDAL is required for this reader. The output of the reader
-      is a vtkMultiBlockDataSet</Documentation>
-      <SubProxy>
-        <Proxy name="Reader"
-               proxygroup="internal_sources"
-               proxyname="GDALVectorReaderCore"></Proxy>
-      </SubProxy>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="RemoveAllFileNames"
-                            command="AddFileName"
-                            information_property="FileNameInfo"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never"
-                            repeat_command="1">
-        <FileListDomain name="files" />
-        <Documentation>The list of files to be read by the reader. Each file is
-        expected to be in the GDAL Vector data format. The standard
-        extension is .shp. If more than one file is specified, the reader will
-        switch to file series mode in which it will pretend that it can support
-        time and provide one file per time step.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-        <Documentation>Available timestep values.</Documentation>
-      </DoubleVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="shp"
-                       file_description="GDAL Vector Files" />
-      </Hints>
-      <!-- GDALVectorReader -->
-    </SourceProxy>
-    <SourceProxy class="vtkFileSeriesReader"
-                 file_name_method="SetFileName"
-                 label="GDAL Raster Reader"
-                 name="GDALRasterReader"
-                 si_class="vtkSIMetaReaderProxy">
-      <Documentation short_help="Reads a vector file using the GDAL
-      library.">GDAL Raster Reader is a source object that reads
-      vector files and uses GDAL as the underlying library for the
-      task. GDAL is required for this reader. The output of the reader
-      is a vtkMultiBlockDataSet</Documentation>
-      <SubProxy>
-        <Proxy name="Reader"
-               proxygroup="internal_sources"
-               proxyname="GDALRasterReaderCore"></Proxy>
-      </SubProxy>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            clean_command="RemoveAllFileNames"
-                            command="AddFileName"
-                            information_property="FileNameInfo"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never"
-                            repeat_command="1">
-        <FileListDomain name="files" />
-        <Documentation>The list of files to be read by the reader. Each file is
-        expected to be in the GDAL Raster data format. The standard
-        extension is .tif. If more than one file is specified, the reader will
-        switch to file series mode in which it will pretend that it can support
-        time and provide one file per time step.</Documentation>
-      </StringVectorProperty>
-      <DoubleVectorProperty information_only="1"
-                            name="TimestepValues"
-                            repeatable="1">
-        <TimeStepsInformationHelper />
-        <Documentation>Available timestep values.</Documentation>
-      </DoubleVectorProperty>
-      <Hints>
-        <ReaderFactory extensions="tif"
-                       file_description="GDAL Raster Files" />
-      </Hints>
-      <!-- GDALVectorReader -->
-    </SourceProxy>
+    <!-- End of "sources" -->
   </ProxyGroup>
 </ServerManagerConfiguration>
