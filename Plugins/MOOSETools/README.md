@@ -30,9 +30,6 @@ partial elements clipped.
 This filter is based on the vtkClipDataSet filter, copyright Ken Martin, Will Schroeder,
 and Bill Lorensen.
 
-### Resources
-[XFEM Paraview Plugin Source Code Repository](https://github.com/idaholab/XFEMParaviewPlugin)
-
 ### Other Software
 Idaho National Laboratory is a cutting edge research facility which is a constantly producing high quality research and software. Feel free to take a look at our other software and scientific offerings at:
 
