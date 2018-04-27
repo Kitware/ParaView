@@ -128,9 +128,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridAxisReflection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridCellCenters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridContour.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridDepthLimiter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridPlaneCutter.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridThreshold.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LightAddRemove.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
@@ -153,6 +151,18 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/UpdateTransferFunctionRanges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
+)
+
+# These tests do not work in parallel due to issues with
+# partitioned vtkHyperTreeGrids. When those issues are fixed
+# these tests should be enabled in parallel again by adding
+# them back to TESTS_WITH_INLINE_COMPARES
+SET (HTG_TESTS_WITH_INLINE_COMPARES
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridDepthLimiter.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/HyperTreeGridThreshold.xml
+)
+add_client_tests("pv"
+  TEST_SCRIPTS ${HTG_TESTS_WITH_INLINE_COMPARES}
 )
 
 if(NOT APPLE)
