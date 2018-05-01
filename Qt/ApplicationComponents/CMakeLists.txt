@@ -276,6 +276,8 @@ set (Module_SRCS
   pqServerConnectReaction.h
   pqServerDisconnectReaction.cxx
   pqServerDisconnectReaction.h
+  pqSetMainWindowTitleReaction.cxx
+  pqSetMainWindowTitleReaction.h
   pqShowWidgetDecorator.cxx
   pqShowWidgetDecorator.h
   pqSourcesMenuReaction.cxx
@@ -459,6 +461,7 @@ set (Module_MOC_HDRS
   pqSeriesEditorPropertyWidget.h
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h
+  pqSetMainWindowTitleReaction.h
   pqShowWidgetDecorator.h
   pqSourcesMenuReaction.h
   pqSpherePropertyWidget.h
