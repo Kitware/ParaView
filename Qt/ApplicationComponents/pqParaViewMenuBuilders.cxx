@@ -88,6 +88,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveStateReaction.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
+#include "pqSetMainWindowTitleReaction.h"
 #include "pqSetName.h"
 #include "pqSourcesMenuReaction.h"
 #include "pqTestingReaction.h"
@@ -176,6 +177,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqDataQueryReaction(ui.actionQuery);
   new pqResetDefaultSettingsReaction(ui.actionResetDefaultSettings);
+  new pqSetMainWindowTitleReaction(ui.actionSetMainWindowTitle);
 }
 
 //-----------------------------------------------------------------------------

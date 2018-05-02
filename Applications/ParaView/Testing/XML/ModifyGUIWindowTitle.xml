@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionSetMainWindowTitle" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0/1QLineEdit0" command="set_string" arguments="A" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0/1QLineEdit0" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0/1QLineEdit0" command="key" arguments="16777248" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0/1QLineEdit0" command="set_string" arguments="B" />
+  <pqevent object="pqClientMainWindow/1QInputDialog0" command="key" arguments="16777220" />
+</pqevents>

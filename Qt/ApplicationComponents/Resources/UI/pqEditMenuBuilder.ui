@@ -187,6 +187,17 @@
     <string>Reset user settings to default.</string>
    </property>
   </action>
+  <action name="actionSetMainWindowTitle">
+   <property name="text">
+    <string>Set Main Window Title</string>
+   </property>
+   <property name="toolTip">
+    <string>Set the main window title</string>
+   </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
+  </action>
   <addaction name="actionEditUndo"/>
   <addaction name="actionEditRedo"/>
   <addaction name="separator"/>
@@ -207,6 +218,8 @@
   <addaction name="separator"/>
   <addaction name="actionEditSettings"/>
   <addaction name="actionResetDefaultSettings"/>
+  <addaction name="separator"/>
+  <addaction name="actionSetMainWindowTitle"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

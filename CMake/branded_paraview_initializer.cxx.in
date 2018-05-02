@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVConfig.h"
 
+#include "vtksys/SystemTools.hxx"
+
 #cmakedefine BPC_SPLASH_RESOURCE "@BPC_SPLASH_RESOURCE@"
 
 //-----------------------------------------------------------------------------
@@ -160,6 +162,13 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
 #if @BPC_HAS_TITLE@
   this->MainWindow->setWindowTitle("@BPC_TITLE@");
 #endif
+  // the user can specify a different window title by setting the PARAVIEW_WINDOW_TITLE
+  // environment variable. This helps when using multiple PV GUIs simultaneously
+  // and context switching quickly between them.
+  if (const char* newWindowTitle = vtksys::SystemTools::GetEnv("PARAVIEW_WINDOW_TITLE"))
+  {
+    this->MainWindow->setWindowTitle(newWindowTitle);
+  }
 
   // We used to call processEvents() here. We removed it, since that results in
   // timers (esp. pqCommandLineOptionsBehavior::playTests(), or
