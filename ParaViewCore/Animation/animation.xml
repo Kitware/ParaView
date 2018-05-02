@@ -531,6 +531,18 @@
         </Documentation>
       </StringVectorProperty>
     </Proxy>
+    <Proxy name="TIFF" class="vtkTIFFWriter" process="client"
+      base_proxygroup="screenshot_writers"
+      base_proxyname="TIFF">
+      <StringVectorProperty name="SuffixFormat"
+        number_of_elements="1"
+        default_values=".%04d">
+        <Documentation>
+          Specify the suffix format string to use to add a suffix to the output
+          filenames based on the current timestep number.
+        </Documentation>
+      </StringVectorProperty>
+    </Proxy>
   </ProxyGroup>
 
   <!-- ==================================================================== -->
