@@ -348,6 +348,9 @@ QVariant pqSpreadSheetViewModel::data(const QModelIndex& idx, int role /*=Qt::Di
   }
   else if (value.IsArray())
   {
+    const char* component_separator = ", ";
+    str = QString();
+    QTextStream stream(&str, QIODevice::WriteOnly);
     // it's possible that it's a char array, then too we need to do the
     // number magic.
     vtkDataArray* array = vtkDataArray::SafeDownCast(value.ToArray());
@@ -359,45 +362,37 @@ QVariant pqSpreadSheetViewModel::data(const QModelIndex& idx, int role /*=Qt::Di
         case VTK_UNSIGNED_CHAR:
         case VTK_SIGNED_CHAR:
         {
-          str = QString();
           for (vtkIdType cc = 0; cc < array->GetNumberOfTuples(); cc++)
           {
             double* tuple = array->GetTuple(cc);
             for (vtkIdType kk = 0; kk < array->GetNumberOfComponents(); kk++)
             {
-              str += QString::number(static_cast<int>(tuple[kk])) + " ";
+              stream << (kk > 0 ? component_separator : "")
+                     << QString::number(static_cast<int>(tuple[kk]));
             }
-            str = str.trimmed();
           }
           break;
         }
         case VTK_DOUBLE:
         case VTK_FLOAT:
         {
-          str = QString();
           for (vtkIdType cc = 0; cc < array->GetNumberOfTuples(); cc++)
           {
             double* tuple = array->GetTuple(cc);
             for (vtkIdType kk = 0; kk < array->GetNumberOfComponents(); kk++)
             {
-              str += QString::number(static_cast<double>(tuple[kk]),
-                       this->Internal->FixedRepresentation ? 'f' : 'g',
-                       this->Internal->DecimalPrecision) +
-                " ";
+              stream << (kk > 0 ? component_separator : "")
+                     << QString::number(static_cast<double>(tuple[kk]),
+                          this->Internal->FixedRepresentation ? 'f' : 'g',
+                          this->Internal->DecimalPrecision);
             }
-            str = str.trimmed();
           }
-          break;
           break;
         }
         default:
           break;
       }
     }
-  }
-  if (!value.IsString() && !value.IsUnicodeString())
-  {
-    str.replace(" ", "\t");
   }
   return str;
 }
