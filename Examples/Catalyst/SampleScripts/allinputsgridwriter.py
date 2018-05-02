@@ -41,6 +41,7 @@ def CreateCoProcessor():
           print("Don't know how to create a writer for a ", grid.GetClassName())
 
         if extension:
+          name = name.translate(None, '/') # Get rid of any slashes in the channel name
           coprocessor.RegisterWriter(writer, filename=name+'_%t'+extension, freq=outputfrequency)
 
     return Pipeline()

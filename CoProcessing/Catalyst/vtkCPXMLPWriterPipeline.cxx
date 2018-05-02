@@ -31,6 +31,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 
+#include <algorithm>
 #include <sstream>
 #include <string>
 
@@ -174,7 +175,7 @@ int vtkCPXMLPWriterPipeline::CoProcess(vtkCPDataDescription* dataDescription)
 
   for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
   {
-    const char* inputName = dataDescription->GetInputDescriptionName(i);
+    std::string inputName = dataDescription->GetInputDescriptionName(i);
     vtkCPInputDataDescription* idd = dataDescription->GetInputDescription(i);
     vtkDataObject* grid = idd->GetGrid();
     if (grid == nullptr)
@@ -206,6 +207,8 @@ int vtkCPXMLPWriterPipeline::CoProcess(vtkCPDataDescription* dataDescription)
         vtkSMStringVectorProperty* fileName =
           vtkSMStringVectorProperty::SafeDownCast(writer->GetProperty("FileName"));
 
+        // If we have a / in the channel name we take it out of the filename we're going to write to
+        inputName.erase(std::remove(inputName.begin(), inputName.end(), '/'), inputName.end());
         std::ostringstream o;
         if (this->Path.empty() == false)
         {
