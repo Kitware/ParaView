@@ -38,6 +38,7 @@
 #include "vtkStringArray.h"
 
 #include <list>
+#include <vtksys/SystemTools.hxx>
 
 struct vtkCPProcessorInternals
 {
@@ -47,12 +48,13 @@ struct vtkCPProcessorInternals
 };
 
 vtkStandardNewMacro(vtkCPProcessor);
-vtkMultiProcessController* vtkCPProcessor::Controller = NULL;
+vtkMultiProcessController* vtkCPProcessor::Controller = nullptr;
 //----------------------------------------------------------------------------
 vtkCPProcessor::vtkCPProcessor()
 {
   this->Internal = new vtkCPProcessorInternals;
-  this->InitializationHelper = NULL;
+  this->InitializationHelper = nullptr;
+  this->WorkingDirectory = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -61,14 +63,15 @@ vtkCPProcessor::~vtkCPProcessor()
   if (this->Internal)
   {
     delete this->Internal;
-    this->Internal = NULL;
+    this->Internal = nullptr;
   }
 
   if (this->InitializationHelper)
   {
     this->InitializationHelper->Delete();
-    this->InitializationHelper = NULL;
+    this->InitializationHelper = nullptr;
   }
+  this->SetWorkingDirectory(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -95,7 +98,7 @@ vtkCPPipeline* vtkCPProcessor::GetPipeline(int which)
 {
   if (which < 0 || which >= this->GetNumberOfPipelines())
   {
-    return NULL;
+    return nullptr;
   }
   int counter = 0;
   vtkCPProcessorInternals::PipelineListIterator iter = this->Internal->Pipelines.begin();
@@ -108,7 +111,7 @@ vtkCPPipeline* vtkCPProcessor::GetPipeline(int which)
     counter++;
     iter++;
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -130,17 +133,41 @@ vtkObject* vtkCPProcessor::NewInitializationHelper()
 }
 
 //----------------------------------------------------------------------------
-int vtkCPProcessor::Initialize()
+int vtkCPProcessor::Initialize(const char* workingDirectory)
 {
-  if (this->InitializationHelper == NULL)
+  if (this->InitializationHelper == nullptr)
   {
     this->InitializationHelper = this->NewInitializationHelper();
+  }
+  // make sure the directory exists here so that we only do it once
+  if (workingDirectory)
+  {
+    vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+    int success = 1;
+    if (controller == nullptr || controller->GetLocalProcessId() == 0)
+    {
+      success = vtksys::SystemTools::MakeDirectory(workingDirectory) == true ? 1 : 0;
+      if (success == 0)
+      {
+        vtkWarningMacro("Could not make "
+          << workingDirectory << " directory. "
+          << "Results will be generated in current working directory instead.");
+      }
+    }
+    if (controller)
+    {
+      controller->Broadcast(&success, 1, 0);
+    }
+    if (success)
+    {
+      this->SetWorkingDirectory(workingDirectory);
+    }
   }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkCPProcessor::Initialize(vtkMPICommunicatorOpaqueComm& comm)
+int vtkCPProcessor::Initialize(vtkMPICommunicatorOpaqueComm& comm, const char* workingDirectory)
 {
 #ifdef PARAVIEW_USE_MPI
   if (vtkCPProcessor::Controller)
@@ -148,7 +175,7 @@ int vtkCPProcessor::Initialize(vtkMPICommunicatorOpaqueComm& comm)
     vtkErrorMacro("Can only initialize with a communicator once per process.");
     return 0;
   }
-  if (this->InitializationHelper == NULL)
+  if (this->InitializationHelper == nullptr)
   {
     vtkMPICommunicator* communicator = vtkMPICommunicator::New();
     communicator->InitializeExternal(&comm);
@@ -157,12 +184,12 @@ int vtkCPProcessor::Initialize(vtkMPICommunicatorOpaqueComm& comm)
     this->Controller = controller;
     this->Controller->SetGlobalController(controller);
     communicator->Delete();
-    return this->Initialize();
+    return this->Initialize(workingDirectory);
   }
   return 1;
 #else
   static_cast<void>(&comm); // get rid of variable not used warning
-  return this->Initialize();
+  return this->Initialize(workingDirectory);
 #endif
 }
 
@@ -225,6 +252,13 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
       input->GetFieldData()->AddArray(catalystChannel);
     }
   }
+
+  std::string originalWorkingDirectory;
+  if (this->WorkingDirectory)
+  {
+    originalWorkingDirectory = vtksys::SystemTools::GetCurrentWorkingDirectory();
+    vtksys::SystemTools::ChangeDirectory(this->WorkingDirectory);
+  }
   for (vtkCPProcessorInternals::PipelineListIterator iter = this->Internal->Pipelines.begin();
        iter != this->Internal->Pipelines.end(); iter++)
   {
@@ -248,6 +282,10 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
       }
     }
   }
+  if (originalWorkingDirectory.empty() == false)
+  {
+    vtksys::SystemTools::ChangeDirectory(originalWorkingDirectory);
+  }
   // we want to reset everything here to make sure that new information
   // is properly passed in the next time.
   dataDescription->ResetAll();
@@ -259,7 +297,7 @@ int vtkCPProcessor::Finalize()
 {
   if (this->Controller)
   {
-    this->Controller->SetGlobalController(NULL);
+    this->Controller->SetGlobalController(nullptr);
     this->Controller->Finalize(1);
     this->Controller->Delete();
   }
