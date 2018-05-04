@@ -325,7 +325,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
     QMenu* menu = mgr->menu();
     bool anyMenuShown = false;
     QList<QAction*> menuActions = menu->actions();
-    foreach (QAction* menuAction, menuActions)
+    for (QAction* menuAction : menuActions)
     {
       if (menuAction->isSeparator() || !menuAction->menu())
       {
@@ -334,7 +334,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
       bool anySubMenuShown = false;
       QList<QAction*> subMenuActions = menuAction->menu()->actions();
 
-      foreach (QAction* subMenuAction, subMenuActions)
+      for (QAction* subMenuAction : subMenuActions)
       {
         if (subMenuAction->isVisible())
         {
