@@ -7890,6 +7890,24 @@
           Set whether to render the line for the median value, if available.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="ShowMinimum"
+                         command="SetMinVisibility"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to render the line for the minimum value, if available.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="ShowMaximum"
+                         command="SetMaxVisibility"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to render the line for the maximum value, if available.
+        </Documentation>
+      </IntVectorProperty>
     </ChartRepresentationProxy>
 
     <!-- =================================================================== -->

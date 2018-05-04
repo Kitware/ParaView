@@ -232,10 +232,10 @@ public:
    * array in the input dataset. This is useful when multiple plots are to be
    * created for a single series.
    */
-  virtual std::string GetSeriesRole(
+  virtual std::vector<std::string> GetSeriesRoles(
     const std::string& vtkNotUsed(tableName), const std::string& vtkNotUsed(columnName))
   {
-    return std::string();
+    return { std::string() };
   }
 
   virtual vtkPlot* NewPlot(vtkXYChartRepresentation* self, const std::string& tableName,
@@ -277,18 +277,21 @@ public:
       for (vtkIdType cc = 0; cc < numCols; ++cc)
       {
         std::string columnName = table->GetColumnName(cc);
-        std::string role = this->GetSeriesRole(tableName, columnName);
+        auto roles = this->GetSeriesRoles(tableName, columnName);
 
-        // recover the order of the current table column
-        const int order =
-          this->GetSeriesParameter(self, tableName, columnName, role, this->SeriesOrder, -1);
+        for (const auto& role : roles)
+        {
+          // recover the order of the current table column
+          const int order =
+            this->GetSeriesParameter(self, tableName, columnName, role, this->SeriesOrder, -1);
 
-        // store all info in a (sorted) map
-        std::array<std::string, 3> mapValue;
-        mapValue[0] = tableName;
-        mapValue[1] = columnName;
-        mapValue[2] = role;
-        orderMap.insert(std::make_pair(order, std::make_pair(table, mapValue)));
+          // store all info in a (sorted) map
+          std::array<std::string, 3> mapValue;
+          mapValue[0] = tableName;
+          mapValue[1] = columnName;
+          mapValue[2] = role;
+          orderMap.insert(std::make_pair(order, std::make_pair(table, mapValue)));
+        }
       }
     }
 

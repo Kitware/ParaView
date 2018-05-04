@@ -73,16 +73,33 @@ public:
   vtkGetMacro(MedianVisibility, bool);
   //@}
 
+  //@{
+  /**
+   * When set to true, the min curve is rendered.
+   */
+  vtkSetMacro(MinVisibility, bool);
+  vtkGetMacro(MinVisibility, bool);
+  //@}
+
+  //@{
+  /**
+   * When set to true, the max curve is rendered.
+   */
+  vtkSetMacro(MaxVisibility, bool);
+  vtkGetMacro(MaxVisibility, bool);
+  //@}
+
 protected:
   vtkQuartileChartRepresentation();
   ~vtkQuartileChartRepresentation() override;
 
+  bool AverageVisibility;
+  bool HasOnlyOnePoint;
+  bool MaxVisibility;
+  bool MedianVisibility;
+  bool MinVisibility;
   bool QuartileVisibility;
   bool RangeVisibility;
-  bool AverageVisibility;
-  bool MedianVisibility;
-
-  bool HasOnlyOnePoint;
 
   void PrepareForRendering() VTK_OVERRIDE;
 
