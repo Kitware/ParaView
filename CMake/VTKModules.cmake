@@ -405,6 +405,10 @@ if (PARAVIEW_ENABLE_PDAL)
   list (APPEND _vtk_modules vtkIOPDAL)
 endif()
 
+if (PARAVIEW_ENABLE_SEGY)
+  list (APPEND _vtk_modules vtkIOSegY)
+endif()
+
 
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
