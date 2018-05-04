@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMAdaptor.h"
 #include "pqTimer.h"
-#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 
 namespace
@@ -118,15 +117,7 @@ public:
     pqTreeWidgetItemObject* item = new pqTreeWidgetItemObject(widget, argument);
     item->setData(0, Qt::ToolTipRole, text);
     item->setData(0, Qt::UserRole, key);
-    // BUG #0013739. If we leave the item User-Checkable, it interferes with the
-    // selection of item and we experience odd behaviors when user clicks on the
-    // check-box or clicks on the name of the item. Hence we make the item
-    // non-user checkable. However, pqTreeWidgetCheckHelper ends up handling the
-    // click as click on the name of the item and hence we still get the item's
-    // checkstate being updated when the user clicks on it. At the same time,
-    // the item gets selected as well and hence the group-check-state-changing
-    // works as well.
-    item->setFlags(item->flags() & (~Qt::ItemIsUserCheckable));
+    item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     if (this->Pixmaps.contains(key))
     {
       item->setData(0, Qt::DecorationRole, this->Pixmaps[key]);
@@ -198,10 +189,6 @@ pqExodusIIVariableSelectionWidget::pqExodusIIVariableSelectionWidget(QWidget* pa
 
   this->installEventFilter(this);
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(updateProperty()));
-
-  // Make a click anywhere on a variable's row change its checked/unchecked state.
-  new pqTreeWidgetCheckHelper(this, 0, this);
-
   this->setSelectionMode(QAbstractItemView::ContiguousSelection);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
