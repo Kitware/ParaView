@@ -11,6 +11,11 @@ from paraview import simple, servermanager
 from paraview.vtk.vtkPVVTKExtensionsCore import *
 import math
 
+# If the user created a filename in a location that doesn't exist by default we'll
+# make the directory for them. This can be changed though by setting createDirectoriesIfNeeded
+# to False.
+createDirectoriesIfNeeded = True
+
 # -----------------------------------------------------------------------------
 def IsInModulo(timestep, frequencyArray):
     """
@@ -203,6 +208,23 @@ class CoProcessor(object):
                 else:
                     ts = str(timestep).rjust(paddingamount, '0')
                     writer.FileName = fileName.replace("%t", ts)
+                if '/' in writer.FileName and createDirectoriesIfNeeded:
+                    oktowrite = [1.]
+                    import vtk
+                    comm = vtk.vtkMultiProcessController.GetGlobalController()
+                    if comm.GetLocalProcessId() == 0:
+                        import os
+                        newDir = writer.FileName[0:writer.FileName.rfind('/')]
+                        try:
+                            os.makedirs(newDir)
+                        except OSError:
+                            if not os.path.isdir(newDir):
+                                print ("ERROR: Cannot make directory for", writer.FileName, ". No data will be written.")
+                                oktowrite[0] = 0.
+                    comm.Broadcast(oktowrite, 1, 0)
+                    if oktowrite[0] == 0:
+                        # we can't make the directory so no reason to update the pipeline
+                        return
                 writer.UpdatePipeline(datadescription.GetTime())
 
     def WriteImages(self, datadescription, rescale_lookuptable=False,
@@ -267,6 +289,24 @@ class CoProcessor(object):
                     if dirname:
                         cinema_dirs.append(dirname)
                 else:
+                    if '/' in fname and createDirectoriesIfNeeded:
+                        oktowrite = [1.]
+                        import vtk
+                        comm = vtk.vtkMultiProcessController.GetGlobalController()
+                        if comm.GetLocalProcessId() == 0:
+                            import os
+                            newDir = fname[0:fname.rfind('/')]
+                            try:
+                                os.makedirs(newDir)
+                            except OSError:
+                                if not os.path.isdir(newDir):
+                                    print ("ERROR: Cannot make directory for", fname, ". No image will be output.")
+                                    oktowrite[0] = 0.
+                        comm.Broadcast(oktowrite, 1, 0)
+                        if oktowrite[0] == 0:
+                            # we can't make the directory so no reason to update the pipeline
+                            return
+
                     if image_quality is None and fname.endswith('png'):
                         # for png quality = 0 means no compression. compression can be a potentially
                         # very costly serial operation on process 0
