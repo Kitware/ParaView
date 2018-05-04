@@ -16519,7 +16519,7 @@ source.</Documentation>
       <IntVectorProperty name="GenerateVertices"
         command="SetGenerateVertices"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <Documentation>
           If checked, then the outputs will contain a poly-vertex cell. This takes a
           lot more memory, however certain filters many requires cells to be present
