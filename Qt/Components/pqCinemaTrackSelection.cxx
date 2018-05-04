@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqTreeWidget.h"
-#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItem.h"
 #include "ui_pqCinemaTrackSelection.h"
 
