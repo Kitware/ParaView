@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidget.h"
 
+class vtkPVXMLElement;
 class vtkSMPropertyGroup;
 
 class PQCOMPONENTS_EXPORT pqArrayStatusPropertyWidget : public pqPropertyWidget

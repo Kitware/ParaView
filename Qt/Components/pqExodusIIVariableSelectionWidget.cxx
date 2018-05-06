@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqExodusIIVariableSelectionWidget.h"
 
+#if !defined(VTK_LEGACY_REMOVE)
+
 #include <QDynamicPropertyChangeEvent>
 #include <QList>
 #include <QMap>
@@ -185,6 +187,9 @@ pqExodusIIVariableSelectionWidget::pqExodusIIVariableSelectionWidget(QWidget* pa
   : Superclass(parentObject)
   , Internals(new pqInternals())
 {
+  VTK_LEGACY_REPLACED_BODY(
+    pqExodusIIVariableSelectionWidget, "ParaView 5.5", pqArraySelectionWidget);
+
   this->Internals->Timer.setSingleShot(true);
 
   this->installEventFilter(this);
@@ -307,3 +312,5 @@ void pqExodusIIVariableSelectionWidget::updateProperty()
   this->Internals->KeysToUpdate.clear();
   emit this->widgetModified();
 }
+
+#endif // !defined(VTK_LEGACY_REMOVE)

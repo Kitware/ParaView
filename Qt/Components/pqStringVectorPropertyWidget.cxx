@@ -50,9 +50,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqArrayListDomain.h"
+#include "pqArraySelectionWidget.h"
 #include "pqComboBoxDomain.h"
 #include "pqDialog.h"
-#include "pqExodusIIVariableSelectionWidget.h"
 #include "pqFieldSelectionAdaptor.h"
 #include "pqFileChooserWidget.h"
 #include "pqLineEdit.h"
@@ -236,21 +236,20 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   {
     if (smProperty->GetRepeatable())
     {
-      // repeatable array list domains get a tree widget
-      // listing each array name with a check box
-      pqExodusIIVariableSelectionWidget* selectorWidget =
-        new pqExodusIIVariableSelectionWidget(this);
+      // repeatable array list domains get a the pqArraySelectionWidget
+      // that lists each array name with a check box
+      auto selectorWidget = new pqArraySelectionWidget(this);
       selectorWidget->setObjectName("ArraySelectionWidget");
-      selectorWidget->setRootIsDecorated(false);
       selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
-      selectorWidget->setMaximumRowCountBeforeScrolling(smProperty);
+      selectorWidget->setMaximumRowCountBeforeScrolling(
+        pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
       // hide widget label
       this->setShowLabel(false);
 
       vbox->addWidget(selectorWidget);
 
-      PV_DEBUG_PANELS() << "pqExodusIIVariableSelectionWidget for a "
+      PV_DEBUG_PANELS() << "pqArrayStatusPropertyWidget for a "
                         << "StringVectorProperty with a repeatable "
                         << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
 
@@ -341,11 +340,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   }
   else if (arraySelectionDomain)
   {
-    pqExodusIIVariableSelectionWidget* selectorWidget = new pqExodusIIVariableSelectionWidget(this);
+    auto selectorWidget = new pqArraySelectionWidget(this);
     selectorWidget->setObjectName("ArraySelectionWidget");
-    selectorWidget->setRootIsDecorated(false);
     selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
-    selectorWidget->setMaximumRowCountBeforeScrolling(smProperty);
+    selectorWidget->setMaximumRowCountBeforeScrolling(
+      pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
     this->addPropertyLink(
       selectorWidget, smProxy->GetPropertyName(smProperty), SIGNAL(widgetModified()), smProperty);
@@ -361,7 +360,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     PV_DEBUG_PANELS() << " Also creating pqArrayListDomain to keep the list updated.";
 
-    PV_DEBUG_PANELS() << "pqExodusIIVariableSelectionWidget for a StringVectorProperty "
+    PV_DEBUG_PANELS() << "pqArraySelectionWidget for a StringVectorProperty "
                       << "with a ArraySelectionDomain (" << arraySelectionDomain->GetXMLName()
                       << ")";
   }

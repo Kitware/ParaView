@@ -220,3 +220,17 @@ void pqPropertyWidget::removeDecorator(pqPropertyWidgetDecorator* decorator)
 {
   this->Decorators.removeAll(decorator);
 }
+
+//-----------------------------------------------------------------------------
+int pqPropertyWidget::hintsWidgetHeightNumberOfRows(vtkPVXMLElement* hints, int defaultValue)
+{
+  if (vtkPVXMLElement* element = hints ? hints->FindNestedElementByName("WidgetHeight") : nullptr)
+  {
+    int rowCount = 0;
+    if (element->GetScalarAttribute("number_of_rows", &rowCount))
+    {
+      return rowCount;
+    }
+  }
+  return defaultValue;
+}

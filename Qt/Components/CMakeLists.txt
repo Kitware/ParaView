@@ -45,6 +45,8 @@ set (Module_SRCS
   pqAnimationViewWidget.h
   pqArrayListDomain.cxx
   pqArrayListDomain.h
+  pqArraySelectionWidget.cxx
+  pqArraySelectionWidget.h
   pqArrayStatusPropertyWidget.cxx
   pqArrayStatusPropertyWidget.h
   pqCalculatorWidget.cxx
@@ -107,8 +109,6 @@ set (Module_SRCS
   pqDockWindowInterface.h
   pqDoubleVectorPropertyWidget.cxx
   pqDoubleVectorPropertyWidget.h
-  pqExodusIIVariableSelectionWidget.cxx
-  pqExodusIIVariableSelectionWidget.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
   pqFileChooserWidget.cxx
@@ -326,6 +326,7 @@ set (Module_MOC_HDRS
   pqAnimationManager.h
   pqAnimationViewWidget.h
   pqArrayListDomain.h
+  pqArraySelectionWidget.h
   pqArrayStatusPropertyWidget.h
   pqCalculatorWidget.h
   pqCameraDialog.h
@@ -353,7 +354,6 @@ set (Module_MOC_HDRS
   pqDisplayPanelPropertyWidget.h
   pqDisplayRepresentationWidget.h
   pqDoubleVectorPropertyWidget.h
-  pqExodusIIVariableSelectionWidget.h
   pqFieldSelectionAdaptor.h
   pqFileChooserWidget.h
   pqFindDataCreateSelectionFrame.h
@@ -561,6 +561,16 @@ endif()
 set (Module_RESOURCE_FILES
   Resources/pqComponents.qrc
 )
+
+if(NOT VTK_LEGACY_REMOVE)
+  # deprecated in 5.6
+  list(APPEND Module_SRCS
+    pqExodusIIVariableSelectionWidget.cxx
+    pqExodusIIVariableSelectionWidget.h)
+  list(APPEND Module_MOC_HDRS
+    pqExodusIIVariableSelectionWidget.h)
+endif()
+
 
 include(ParaViewQt)
 pv_find_package_qt(qt_private_targets REQUIRED QUIET

@@ -32,21 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqExodusIIVariableSelectionWidget_h
 #define pqExodusIIVariableSelectionWidget_h
 
+#include "vtkSetGet.h"
+#if !defined(VTK_LEGACY_REMOVE)
 #include "pqComponentsModule.h"
 #include "pqTreeWidget.h"
 
 /**
-* pqExodusIIVariableSelectionWidget is used by pqExodusIIPanel to show the
-* a variable selection widget. Unlike typical variable selection widgets used
-* for array statuses, ExodusReader has separate properties for specifying
-* different selection e.g. NodeSetResultArrayStatus, EdgeSetResultArrayStatus,
-* etc., but all are still shown in the same tree-widget to the user. This
-* widget makes that possible. It provides different signals and properties for
-* changing/accessing the different values independently and thus can be
-* directly used with a pqPropertyManager or pqPropertyLinks object.
-*
-* pqExodusIIVariableSelectionWidget relies on dynamic properties to avoid
-* having to hard code all the types of properties that ExodusII proxy has.
+ * @class pqExodusIIVariableSelectionWidget
+ * @deprecated ParaView 5.6
+ *
+ * pqExodusIIVariableSelectionWidget has been deprecated in ParaView 5.6 and has
+ * been replaced by pqArraySelectionWidget. pqArraySelectionWidget a QTreeView
+ * subclass, rather than a QTreeWidget subclass and is better suited for
+ * consolidating user interactions when dealing with large lists.
 */
 class PQCOMPONENTS_EXPORT pqExodusIIVariableSelectionWidget : public pqTreeWidget
 {
@@ -54,7 +52,7 @@ class PQCOMPONENTS_EXPORT pqExodusIIVariableSelectionWidget : public pqTreeWidge
   typedef pqTreeWidget Superclass;
 
 public:
-  pqExodusIIVariableSelectionWidget(QWidget* parent = 0);
+  VTK_LEGACY(pqExodusIIVariableSelectionWidget(QWidget* parent = 0));
   ~pqExodusIIVariableSelectionWidget() override;
 
 signals:
@@ -85,4 +83,6 @@ private:
   pqInternals* Internals;
 };
 
-#endif
+#endif // !defined(VTK_LEGACY_REMOVE)
+
+#endif // pqExodusIIVariableSelectionWidget_h
