@@ -77,11 +77,7 @@ pqTreeView::pqTreeView(QWidget* widgetParent)
   checkable->setStretchLastSection(this->header()->stretchLastSection());
   this->setHeader(checkable);
   this->installEventFilter(checkable);
-#if QT_VERSION >= 0x050000
   checkable->setSectionsClickable(true);
-#else
-  checkable->setClickable(true);
-#endif
 
   // Listen for the show/hide events of the horizontal scroll bar.
   this->horizontalScrollBar()->installEventFilter(this);
