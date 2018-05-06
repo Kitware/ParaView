@@ -32,10 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSubsetInclusionLatticeWidget.h"
 
 #include "pqTreeView.h"
-
 #include "pqTreeViewSelectionHelper.h"
 
-#include <QAbstractItemModel>
 #include <QHeaderView>
 #include <QIdentityProxyModel>
 #include <QTabWidget>
@@ -46,8 +44,10 @@ namespace
 class ProxyModel : public QIdentityProxyModel
 {
 public:
-  ProxyModel(const QString& headerLabel, QObject* parentObject = nullptr)
+  ProxyModel(
+    const QString& headerLabel, const QModelIndex& srcRootIndex, QObject* parentObject = nullptr)
     : QIdentityProxyModel(parentObject)
+    , SourceRootIndex(srcRootIndex)
     , HeaderLabel(headerLabel)
   {
   }
@@ -57,16 +57,64 @@ public:
   QVariant headerData(
     int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
   {
-    if (orientation == Qt::Horizontal && section == 0 && role == Qt::DisplayRole)
+    if (orientation == Qt::Horizontal && section == 0)
     {
-      return this->HeaderLabel;
+      switch (role)
+      {
+        case Qt::DisplayRole:
+          return this->HeaderLabel;
+
+        case Qt::TextAlignmentRole:
+          return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+
+        case Qt::CheckStateRole:
+          return this->headerCheckState();
+
+        default:
+          break;
+      }
     }
     return this->QIdentityProxyModel::headerData(section, orientation, role);
   }
 
+  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value,
+    int role = Qt::EditRole) override
+  {
+    if (orientation == Qt::Horizontal && section == 0)
+    {
+      switch (role)
+      {
+        case Qt::CheckStateRole:
+          this->setHeaderCheckState(value);
+          emit this->headerDataChanged(orientation, section, section);
+          return true;
+
+        default:
+          break;
+      }
+    }
+    return this->QIdentityProxyModel::setHeaderData(section, orientation, value, role);
+  }
+
 private:
   Q_DISABLE_COPY(ProxyModel);
+  QPersistentModelIndex SourceRootIndex;
   QString HeaderLabel;
+
+  inline QVariant headerCheckState() const
+  {
+    return this->SourceRootIndex.isValid()
+      ? this->sourceModel()->data(this->SourceRootIndex, Qt::CheckStateRole)
+      : QVariant();
+  }
+
+  inline void setHeaderCheckState(const QVariant& state)
+  {
+    if (this->SourceRootIndex.isValid())
+    {
+      this->sourceModel()->setData(this->SourceRootIndex, state, Qt::CheckStateRole);
+    }
+  }
 };
 }
 
@@ -145,9 +193,9 @@ void pqSubsetInclusionLatticeWidget::modelReset()
     const QModelIndex idx = amodel->index(cc, 0, QModelIndex());
     const QString label = amodel->data(idx, Qt::DisplayRole).toString();
 
-    pqTreeView* atree = new pqTreeView(this);
+    pqTreeView* atree = new pqTreeView(this, /*use_pqHeaderView=*/true);
 
-    ProxyModel* pmodel = new ProxyModel(label, atree);
+    ProxyModel* pmodel = new ProxyModel(label, idx, atree);
     pmodel->setSourceModel(amodel);
 
     atree->setObjectName(QString("Tree%1").arg(cc));

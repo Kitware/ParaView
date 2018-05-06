@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqArraySelectionWidget.h"
 
+#include "pqHeaderView.h"
+
 #include <QEvent>
 #include <QHeaderView>
 #include <QMap>
@@ -40,8 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScopedValueRollback>
 #include <QStandardItem>
 #include <QStandardItemModel>
-#include <QStyle>
-#include <QStyleOptionButton>
 
 #include <map>
 
@@ -89,38 +89,6 @@ public:
     this->insert("SetStatus", QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"));
   }
 };
-
-// this keeps tracks for pixmaps to use to render checkboxes
-// in the header.
-class CheckboxPixMaps
-{
-  QVector<QPixmap> Pixmaps;
-
-public:
-  CheckboxPixMaps(QWidget* parent)
-  {
-    QStyle::State styleOptions[3] = { QStyle::State_Off, QStyle::State_NoChange, QStyle::State_On };
-
-    QStyleOptionButton option;
-    QRect rect = parent->style()->subElementRect(QStyle::SE_CheckBoxIndicator, &option);
-    option.rect = QRect(QPoint(0, 0), rect.size());
-    for (int i = 0; i < 3; i++)
-    {
-      QPixmap apixmap(rect.size());
-      apixmap.fill(QColor(0, 0, 0, 0));
-      QPainter painter(&apixmap);
-      option.state = styleOptions[i] | QStyle::State_Enabled;
-      parent->style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, &painter);
-      this->Pixmaps.push_back(apixmap);
-    }
-  }
-
-  QPixmap pixmap(Qt::CheckState state) const
-  {
-    int istate = static_cast<int>(state);
-    return (istate >= 0 && istate < 3) ? this->Pixmaps[istate] : QPixmap();
-  }
-};
 }
 
 class pqArraySelectionWidget::Model : public QStandardItemModel
@@ -128,24 +96,28 @@ class pqArraySelectionWidget::Model : public QStandardItemModel
   using Superclass = QStandardItemModel;
   QPointer<pqArraySelectionWidget> Widget;
   PixmapMap Pixmaps;
-  CheckboxPixMaps Checkboxes;
 
 public:
   Model(int rs, int cs, pqArraySelectionWidget* parentObject)
     : Superclass(rs, cs, parentObject)
     , Widget(parentObject)
-    , Checkboxes(parentObject)
   {
   }
 
   ~Model() override {}
 
+  // Here, `key` is the dynamic property name,
+  //       `label` is the array name (or label e.g. Object Ids)
+  //       `value` is the array's selection status.
   void setStatus(const QString& key, const QString& label, bool value)
   {
     using map_type = std::map<QString, bool>;
     this->setStatus(key, map_type{ { label, value } });
   }
 
+  // Here, `key` is the dynamic property name,
+  //       `label` is the array name (or label e.g. Object Ids)
+  //       `value` is the array's selection status.
   void setStatus(const QString& key, const std::map<QString, bool>& value_map)
   {
     auto& items_map = this->GroupedItemsMap[key];
@@ -174,8 +146,6 @@ public:
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
           Qt::ItemNeverHasChildren);
         item->setData(pixmap, Qt::DecorationRole);
-
-        // fixme: icon
         this->appendRow(item);
 
         // add to map.
@@ -186,7 +156,7 @@ public:
       iter->second->setCheckState(pair.second ? Qt::Checked : Qt::Unchecked);
     }
     // potentially changed, so just indicate that.
-    emit this->headerDataChanged(Qt::Horizontal, 0, 0);
+    this->emitHeaderDataChanged();
   }
 
   void remove(const QString& key)
@@ -211,10 +181,59 @@ public:
       if (!key.isEmpty())
       {
         this->Widget->updateProperty(key, this->status(key));
-        emit this->headerDataChanged(Qt::Horizontal, 0, 0);
+        this->emitHeaderDataChanged();
       }
     }
     return retval;
+  }
+
+  QVariant headerData(
+    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
+  {
+    if (section == 0 && orientation == Qt::Horizontal)
+    {
+      switch (role)
+      {
+        case Qt::CheckStateRole:
+          return this->headerCheckState();
+        case Qt::TextAlignmentRole:
+          return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+      }
+    }
+
+    return this->Superclass::headerData(section, orientation, role);
+  }
+
+  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value,
+    int role = Qt::EditRole) override
+  {
+    if (section == 0 && orientation == Qt::Horizontal && role == Qt::CheckStateRole)
+    {
+      QSet<QString> changedKeys;
+      auto checkState = value.value<Qt::CheckState>();
+      for (const auto& pair1 : this->GroupedItemsMap)
+      {
+        for (const auto& pair2 : pair1.second)
+        {
+          auto item = pair2.second;
+          if (item && item->isCheckable() && item->checkState() != checkState)
+          {
+            item->setCheckState(checkState);
+
+            // save the property name to update.
+            changedKeys.insert(pair1.first);
+          }
+        }
+      }
+
+      for (const QString& key : changedKeys)
+      {
+        this->Widget->updateProperty(key, this->status(key));
+      }
+      this->emitHeaderDataChanged();
+      return true;
+    }
+    return this->Superclass::setHeaderData(section, orientation, value, role);
   }
 
 private:
@@ -249,7 +268,7 @@ private:
     return QString();
   }
 
-  QVariant status(const QString& key)
+  QVariant status(const QString& key) const
   {
     auto iter = this->GroupedItemsMap.find(key);
     if (iter == this->GroupedItemsMap.end() || iter->second.size() == 0)
@@ -273,18 +292,77 @@ private:
     return QVariant::fromValue(values);
   }
 
+  // returns header check state.
+  // we cache the computed header check state to avoid recomputing.
+  QVariant headerCheckState() const
+  {
+    if (this->HeaderCheckState.isValid())
+    {
+      return this->HeaderCheckState;
+    }
+
+    int state = -1;
+    for (const auto& pair1 : this->GroupedItemsMap)
+    {
+      for (const auto& pair2 : pair1.second)
+      {
+        auto item = pair2.second;
+        if (item && item->isCheckable())
+        {
+          if (state == -1)
+          {
+            state = item->checkState();
+          }
+          else if (state != item->checkState())
+          {
+            state = Qt::PartiallyChecked;
+            break;
+          }
+        }
+      }
+      if (state == Qt::PartiallyChecked)
+      {
+        break;
+      }
+    }
+
+    switch (state)
+    {
+      case 1:
+        this->HeaderCheckState = Qt::PartiallyChecked;
+        break;
+      case 2:
+        this->HeaderCheckState = Qt::Checked;
+        break;
+      case 0:
+      default:
+        this->HeaderCheckState = Qt::Unchecked;
+    }
+    return this->HeaderCheckState;
+  }
+
+  void emitHeaderDataChanged()
+  {
+    this->HeaderCheckState.clear();
+    emit this->headerDataChanged(Qt::Horizontal, 0, 0);
+  }
+
   std::map<QString, std::map<QString, QStandardItem*> > GroupedItemsMap;
+  mutable QVariant HeaderCheckState;
 };
 
 //-----------------------------------------------------------------------------
 pqArraySelectionWidget::pqArraySelectionWidget(QWidget* parentObject)
-  : Superclass(parentObject)
+  : Superclass(parentObject, /*use_pqHeaderView=*/true)
   , UpdatingProperty(false)
 {
   this->setObjectName("ArraySelectionWidget");
   this->setRootIsDecorated(false);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+  // name it changed just to avoid having to change a whole lot of tests.
+  this->header()->setObjectName("1QHeaderView0");
 
   auto mymodel = new pqArraySelectionWidget::Model(0, 1, this);
   this->setModel(mymodel);

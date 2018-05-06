@@ -148,50 +148,52 @@ void pqProxySILModel::onCheckStatusChanged()
 
 //-----------------------------------------------------------------------------
 QVariant pqProxySILModel::headerData(
-  int section, Qt::Orientation, int role /*= Qt::DisplayRole*/) const
+  int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
   if (section == (this->columnCount() - 1))
   {
+    // the last column is the column showing index, we don't have to give it any
+    // header.
     return QVariant();
   }
-  if (this->noCheckBoxes && (role == Qt::DecorationRole || role == Qt::CheckStateRole))
+
+  // we want align all text to the left-vcenter.
+  if (role == Qt::TextAlignmentRole && orientation == Qt::Horizontal)
   {
-    return QVariant();
+    return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
   }
-  else if (role == Qt::DisplayRole && this->HeaderTitle != "")
-  {
-    return this->HeaderTitle;
-  }
-  //
-  //
-  //
+
   if (role == Qt::DisplayRole)
   {
-    return this->HierarchyName;
+    return this->HeaderTitle.isEmpty() == false ? this->HeaderTitle : this->HierarchyName;
   }
-  else if (role == Qt::DecorationRole)
+  else if (this->noCheckBoxes == false && role == Qt::CheckStateRole)
   {
     QModelIndex srcIndex = this->mapToSource(QModelIndex());
     Qt::ItemFlags iflags = this->sourceModel()->flags(srcIndex);
     if ((iflags & Qt::ItemIsUserCheckable) || (iflags & Qt::ItemIsTristate))
     {
-      int checkState = this->sourceModel()->data(srcIndex, Qt::CheckStateRole).toInt();
-      switch (checkState)
-      {
-        case Qt::Checked:
-          return QVariant(this->CheckboxPixmaps[0]);
-
-        case Qt::PartiallyChecked:
-          return QVariant(this->CheckboxPixmaps[1]);
-
-        default:
-          return QVariant(this->CheckboxPixmaps[2]);
-      }
+      return this->sourceModel()->data(srcIndex, Qt::CheckStateRole);
     }
   }
 
   return QVariant();
 }
+
+//-----------------------------------------------------------------------------
+bool pqProxySILModel::setHeaderData(
+  int section, Qt::Orientation orientation, const QVariant& value, int role)
+{
+  if (role == Qt::CheckStateRole && orientation == Qt::Horizontal)
+  {
+    Q_UNUSED(section);
+    const QModelIndex srcIndex = this->mapToSource(QModelIndex());
+    auto srcModel = this->sourceModel();
+    return srcModel->setData(srcIndex, value, Qt::CheckStateRole);
+  }
+  return false;
+}
+
 //-----------------------------------------------------------------------------
 QVariant pqProxySILModel::data(const QModelIndex& proxyIndex, int role) const
 {
@@ -212,22 +214,6 @@ QVariant pqProxySILModel::data(const QModelIndex& proxyIndex, int role) const
     return QVariant();
   }
   return QAbstractProxyModel::data(proxyIndex, role);
-}
-
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-void pqProxySILModel::toggleRootCheckState()
-{
-  int checkState = this->data(QModelIndex(), Qt::CheckStateRole).toInt();
-  if (checkState == Qt::PartiallyChecked || checkState == Qt::Unchecked)
-  {
-    this->setData(QModelIndex(), Qt::Checked, Qt::CheckStateRole);
-  }
-  else
-  {
-    this->setData(QModelIndex(), Qt::Unchecked, Qt::CheckStateRole);
-  }
 }
 
 //-----------------------------------------------------------------------------
