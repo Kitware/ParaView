@@ -15,6 +15,7 @@
 #include "vtkIceTCompositePass.h"
 
 #include "vtkBoundingBox.h"
+#include "vtkCameraPass.h"
 #include "vtkFloatArray.h"
 #include "vtkFrameBufferObjectBase.h"
 #include "vtkIceTContext.h"
@@ -407,15 +408,15 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   GLbitfield clear_mask = 0;
   if (!render_state->GetRenderer()->Transparent())
   {
-    ostate->glClearColor((GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0));
+    ostate->vtkglClearColor((GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0));
     clear_mask |= GL_COLOR_BUFFER_BIT;
   }
   if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
   {
-    ostate->glClearDepth(static_cast<GLclampf>(1.0));
+    ostate->vtkglClearDepth(static_cast<GLclampf>(1.0));
     clear_mask |= GL_DEPTH_BUFFER_BIT;
   }
-  ostate->glClear(clear_mask);
+  ostate->vtkglClear(clear_mask);
   // icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
 
   // when a painter needs to use MPI global collective
@@ -457,6 +458,10 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   this->IceTContext->MakeCurrent();
   this->SetupContext(render_state);
 
+  GLint physical_viewport[4];
+  ostate->vtkglGetIntegerv(GL_VIEWPORT, physical_viewport);
+  icetPhysicalRenderSize(physical_viewport[2], physical_viewport[3]);
+
   icetDrawCallback(IceTDrawCallback);
   IceTDrawCallbackHandle = this;
   IceTDrawCallbackState = render_state;
@@ -468,11 +473,6 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   vtkMatrix4x4* unused;
   cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
   float background[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-  GLint physical_viewport[4];
-  ostate->glGetIntegerv(GL_VIEWPORT, physical_viewport);
-
-  icetPhysicalRenderSize(physical_viewport[2], physical_viewport[3]);
 
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: icetDrawFrame Start");
   IceTImage renderedImage = icetDrawFrame(vcdc->Element[0], wcvc->Element[0], background);
@@ -602,50 +602,6 @@ void vtkIceTCompositePass::ReadyProgram(vtkOpenGLRenderWindow* context)
 }
 
 //----------------------------------------------------------------------------
-// for the old OpenGL
-void vtkIceTCompositePass::GLDraw(const vtkRenderState* render_state)
-{
-  vtkOpenGLClearErrorMacro();
-
-  vtkOpenGLRenderWindow* context =
-    static_cast<vtkOpenGLRenderWindow*>(render_state->GetRenderer()->GetRenderWindow());
-  vtkOpenGLState* ostate = context->GetState();
-
-  GLbitfield clear_mask = 0;
-  if (!this->DepthOnly)
-  {
-    if (!render_state->GetRenderer()->Transparent())
-    {
-      clear_mask |= GL_COLOR_BUFFER_BIT;
-    }
-    if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
-    {
-      clear_mask |= GL_DEPTH_BUFFER_BIT;
-    }
-  }
-  else
-  {
-    if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
-    {
-      clear_mask |= GL_DEPTH_BUFFER_BIT;
-    }
-    ostate->glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-  }
-  ostate->glClear(clear_mask);
-  if (this->RenderPass)
-  {
-    this->RenderPass->Render(render_state);
-  }
-  if (this->DepthOnly)
-  {
-    ostate->glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-  }
-
-  vtkOpenGLCheckErrorMacro("failed after Draw");
-}
-
-//----------------------------------------------------------------------------
-// for OpenGL 2+
 void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDouble* proj_matrix,
   const IceTDouble* mv_matrix, const IceTFloat* vtkNotUsed(background_color),
   const IceTInt* vtkNotUsed(readback_viewport), IceTImage result)
@@ -657,7 +613,7 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
   vtkOpenGLState* ostate = context->GetState();
 
   GLbitfield clear_mask = 0;
-  ostate->glClearColor((GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0));
+  ostate->vtkglClearColor((GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0), (GLclampf)(0.0));
   if (!this->DepthOnly)
   {
     if (!render_state->GetRenderer()->Transparent())
@@ -675,10 +631,10 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
     {
       clear_mask |= GL_DEPTH_BUFFER_BIT;
     }
-    ostate->glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    ostate->vtkglColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
   }
 
-  ostate->glClear(clear_mask);
+  ostate->vtkglClear(clear_mask);
   if (this->RenderPass)
   {
     vtkOpenGLCamera* cam =
@@ -732,7 +688,7 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
 
       if (this->DepthOnly)
       {
-        ostate->glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        ostate->vtkglColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
       }
     }
     else
@@ -1000,19 +956,18 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
 
   // TO to FB: apply TO on quad with special zcomposite fragment shader.
   GLboolean prevColorMask[4];
-  ostate->glGetBooleanv(GL_COLOR_WRITEMASK, prevColorMask);
-  ostate->glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+  ostate->vtkglGetBooleanv(GL_COLOR_WRITEMASK, prevColorMask);
+  ostate->vtkglColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
-  GLboolean prevDepthTest = ostate->GetEnumValue(GL_DEPTH_TEST);
-  ostate->glGetBooleanv(GL_DEPTH_TEST, &prevDepthTest);
+  GLboolean prevDepthTest = ostate->GetEnumState(GL_DEPTH_TEST);
 
   GLboolean prevDepthMask;
-  ostate->glGetBooleanv(GL_DEPTH_WRITEMASK, &prevDepthMask);
-  ostate->glDepthMask(GL_TRUE);
+  ostate->vtkglGetBooleanv(GL_DEPTH_WRITEMASK, &prevDepthMask);
+  ostate->vtkglDepthMask(GL_TRUE);
 
   GLint prevDepthFunc;
-  ostate->glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
-  ostate->glDepthFunc(GL_ALWAYS);
+  ostate->vtkglGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
+  ostate->vtkglDepthFunc(GL_ALWAYS);
 
   this->ReadyProgram(context);
 
@@ -1024,16 +979,16 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
 
   if (prevDepthTest)
   {
-    ostate->glEnable(GL_DEPTH_TEST);
+    ostate->vtkglEnable(GL_DEPTH_TEST);
   }
   else
   {
-    ostate->glDisable(GL_DEPTH_TEST);
+    ostate->vtkglDisable(GL_DEPTH_TEST);
   }
 
-  ostate->glDepthMask(prevDepthMask);
-  ostate->glDepthFunc(prevDepthFunc);
-  ostate->glColorMask(prevColorMask[0], prevColorMask[1], prevColorMask[2], prevColorMask[3]);
+  ostate->vtkglDepthMask(prevDepthMask);
+  ostate->vtkglDepthFunc(prevDepthFunc);
+  ostate->vtkglColorMask(prevColorMask[0], prevColorMask[1], prevColorMask[2], prevColorMask[3]);
 
   vtkOpenGLCheckErrorMacro("failed after PushIceTDepthBufferToScreen");
   vtkOpenGLRenderUtilities::MarkDebugEvent("End vtkIceTCompositePass::PushIceTDepthBufferToScreen");
@@ -1088,14 +1043,14 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(const vtkRenderState* ren
   vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
   vtkOpenGLState::ScopedglColorMask colormasksaver(ostate);
 
-  ostate->glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+  ostate->vtkglColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
   // per-fragment operations
-  ostate->glDisable(GL_STENCIL_TEST);
-  ostate->glDisable(GL_DEPTH_TEST);
-  ostate->glDisable(GL_BLEND);
-  ostate->glDisable(GL_INDEX_LOGIC_OP);
-  ostate->glDisable(GL_COLOR_LOGIC_OP);
+  ostate->vtkglDisable(GL_STENCIL_TEST);
+  ostate->vtkglDisable(GL_DEPTH_TEST);
+  ostate->vtkglDisable(GL_BLEND);
+  ostate->vtkglDisable(GL_INDEX_LOGIC_OP);
+  ostate->vtkglDisable(GL_COLOR_LOGIC_OP);
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // client to server
 
@@ -1103,12 +1058,12 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(const vtkRenderState* ren
   GLint blendDstA = GL_ONE_MINUS_SRC_ALPHA;
   GLint blendSrcC = GL_SRC_ALPHA;
   GLint blendDstC = GL_ONE_MINUS_SRC_ALPHA;
-  ostate->glGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcA);
-  ostate->glGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstA);
-  ostate->glGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcC);
-  ostate->glGetIntegerv(GL_BLEND_DST_RGB, &blendDstC);
+  ostate->vtkglGetIntegerv(GL_BLEND_SRC_ALPHA, &blendSrcA);
+  ostate->vtkglGetIntegerv(GL_BLEND_DST_ALPHA, &blendDstA);
+  ostate->vtkglGetIntegerv(GL_BLEND_SRC_RGB, &blendSrcC);
+  ostate->vtkglGetIntegerv(GL_BLEND_DST_RGB, &blendDstC);
   // framebuffers have their color premultiplied by alpha.
-  ostate->glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  ostate->vtkglBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   this->BackgroundTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1, 0, 0, w, h, NULL, NULL);
 
   // Apply (with blending) IceT color buffer on top of background
@@ -1140,11 +1095,11 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(const vtkRenderState* ren
   // PBO to TO
   this->IceTTexture->Create2D(dims[0], dims[1], 4, this->PBO, false);
 
-  ostate->glEnable(GL_BLEND);
+  ostate->vtkglEnable(GL_BLEND);
 
   this->IceTTexture->CopyToFrameBuffer(0, 0, w - 1, h - 1, 0, 0, w, h, NULL, NULL);
   // restore the blend state
-  ostate->glBlendFuncSeparate(blendSrcC, blendDstC, blendSrcA, blendDstA);
+  ostate->vtkglBlendFuncSeparate(blendSrcC, blendDstC, blendSrcA, blendDstA);
 
   vtkOpenGLCheckErrorMacro("failed after PushIceTColorBufferToScreen");
   vtkOpenGLRenderUtilities::MarkDebugEvent("End vtkIceTCompositePass::PushIceTColorBufferToScreen");

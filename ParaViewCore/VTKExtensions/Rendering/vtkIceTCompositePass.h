@@ -244,7 +244,6 @@ public:
   /**
    * Internal callback. Don't use.
    */
-  virtual void GLDraw(const vtkRenderState*);
   virtual void Draw(const vtkRenderState*, const IceTDouble* proj_matrix,
     const IceTDouble* mv_matrix, const IceTFloat* background_color, const IceTInt* viewport,
     IceTImage result);

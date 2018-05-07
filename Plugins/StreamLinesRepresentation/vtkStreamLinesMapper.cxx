@@ -440,7 +440,7 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   if (this->CreateWideLines && this->Program->IsUniformUsed("lineWidthNVC"))
   {
     int vp[4];
-    ostate->glGetIntegerv(GL_VIEWPORT, vp);
+    ostate->vtkglGetIntegerv(GL_VIEWPORT, vp);
     float lineWidth[2];
     lineWidth[0] = 2.0 * actor->GetProperty()->GetLineWidth() / vp[2];
     lineWidth[1] = 2.0 * actor->GetProperty()->GetLineWidth() / vp[3];
@@ -480,9 +480,9 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   this->VBOs->AddAllAttributesToVAO(this->Program, vao.Get());
 
   // Perform rendering
-  ostate->glClearColor(0.0, 0.0, 0.0, 0.0);
-  ostate->glClear(GL_COLOR_BUFFER_BIT);
-  ostate->glDisable(GL_DEPTH_TEST);
+  ostate->vtkglClearColor(0.0, 0.0, 0.0, 0.0);
+  ostate->vtkglClear(GL_COLOR_BUFFER_BIT);
+  ostate->vtkglDisable(GL_DEPTH_TEST);
   if (!this->CreateWideLines)
   {
     glLineWidth(actor->GetProperty()->GetLineWidth());
@@ -514,7 +514,7 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
     if (this->ClearFlag)
     {
       // Clear frame buffer if camera changed
-      ostate->glClear(GL_COLOR_BUFFER_BIT);
+      ostate->vtkglClear(GL_COLOR_BUFFER_BIT);
       this->CameraMTime = cam->GetMTime();
       this->ClearFlag = false;
     }
@@ -549,12 +549,12 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
     this->TextureProgram->SetUniformi("source", this->FrameTexture->GetTextureUnit());
     // Setup blending equation
     int prevBlendParams[4];
-    ostate->glGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendParams[0]);
-    ostate->glGetIntegerv(GL_BLEND_DST_RGB, &prevBlendParams[1]);
-    ostate->glGetIntegerv(GL_BLEND_SRC_ALPHA, &prevBlendParams[2]);
-    ostate->glGetIntegerv(GL_BLEND_DST_ALPHA, &prevBlendParams[3]);
-    ostate->glEnable(GL_BLEND);
-    ostate->glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    ostate->vtkglGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendParams[0]);
+    ostate->vtkglGetIntegerv(GL_BLEND_DST_RGB, &prevBlendParams[1]);
+    ostate->vtkglGetIntegerv(GL_BLEND_SRC_ALPHA, &prevBlendParams[2]);
+    ostate->vtkglGetIntegerv(GL_BLEND_DST_ALPHA, &prevBlendParams[3]);
+    ostate->vtkglEnable(GL_BLEND);
+    ostate->vtkglBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     vtkOpenGLRenderUtilities::RenderQuad(
       s_quadVerts, s_quadTCoords, this->TextureProgram, vaot.Get());
@@ -566,7 +566,7 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
     this->FrameTexture->Deactivate();
     vaot->Release();
   }
-  ostate->glEnable(GL_DEPTH_TEST);
+  ostate->vtkglEnable(GL_DEPTH_TEST);
 }
 
 //----------------------------------------------------------------------------

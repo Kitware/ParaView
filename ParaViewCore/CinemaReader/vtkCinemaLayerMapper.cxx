@@ -373,9 +373,9 @@ public:
     }
 
     this->VAO->Bind();
-    ostate->glEnable(GL_DEPTH_TEST);
-    ostate->glDepthMask(GL_TRUE);
-    ostate->glDepthFunc(GL_LEQUAL);
+    ostate->vtkglEnable(GL_DEPTH_TEST);
+    ostate->vtkglDepthMask(GL_TRUE);
+    ostate->vtkglDepthFunc(GL_LEQUAL);
 
     vtkOpenGLCamera* camera = vtkOpenGLCamera::SafeDownCast(ren->GetActiveCamera());
 
