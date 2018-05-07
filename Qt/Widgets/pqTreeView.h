@@ -74,7 +74,7 @@ class PQWIDGETS_EXPORT pqTreeView : public QTreeView
   typedef QTreeView Superclass;
 
 public:
-  pqTreeView(QWidget* parent = 0);
+  pqTreeView(QWidget* parent = nullptr, bool use_pqHeaderView = false);
   ~pqTreeView() override {}
 
   bool eventFilter(QObject* object, QEvent* e) override;

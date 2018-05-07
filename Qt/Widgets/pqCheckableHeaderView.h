@@ -49,6 +49,12 @@ class pqCheckableHeaderViewInternal;
 * user checkable.  The checkbox is painted per section with one of the
 * three states (checked, partially checked, unchecked) depending on
 * the check state of individual items. Currently used in pqTreeView.
+*
+* pqCheckableHeaderView is flagged to be investigated for deprecation.
+* pqHeaderView provides a much simpler and more model-view friendly
+* implementation that relies on the QAbstractItemModel simply respecting
+* Qt::CheckStateRole for the header. It is recommended that you update your code
+* to use pqHeaderView instead.
 */
 class PQWIDGETS_EXPORT pqCheckableHeaderView : public QHeaderView
 {

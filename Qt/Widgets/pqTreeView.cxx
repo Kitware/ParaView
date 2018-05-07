@@ -32,15 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeView.h"
 
 #include "pqCheckableHeaderView.h"
+#include "pqHeaderView.h"
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QEvent>
 #include <QLayout>
 #include <QMimeData>
+#include <QPointer>
 #include <QScrollBar>
-
-#include <iostream>
 
 namespace
 {
@@ -65,7 +65,7 @@ int pqCountItems(QAbstractItemModel* model, const QModelIndex& idx, int max)
 }
 
 //-----------------------------------------------------------------------------
-pqTreeView::pqTreeView(QWidget* widgetParent)
+pqTreeView::pqTreeView(QWidget* widgetParent, bool use_pqHeaderView)
   : QTreeView(widgetParent)
   , ScrollPadding(0)
   , MaximumRowCountBeforeScrolling(10)
@@ -73,11 +73,25 @@ pqTreeView::pqTreeView(QWidget* widgetParent)
   this->ScrollPadding = 0;
 
   // Change the default header view to a checkable one.
-  pqCheckableHeaderView* checkable = new pqCheckableHeaderView(Qt::Horizontal, this);
-  checkable->setStretchLastSection(this->header()->stretchLastSection());
-  this->setHeader(checkable);
-  this->installEventFilter(checkable);
-  checkable->setSectionsClickable(true);
+  QPointer<QHeaderView> oldheader = this->header();
+  if (use_pqHeaderView)
+  {
+    pqHeaderView* myheader = new pqHeaderView(Qt::Horizontal, this);
+    myheader->setToggleCheckStateOnSectionClick(true);
+    myheader->setStretchLastSection(oldheader->stretchLastSection());
+    this->setHeader(myheader);
+  }
+  else
+  {
+    // in the long run, I'd like to get rid of the pqCheckableHeaderView
+    // entirely.
+    pqCheckableHeaderView* checkable = new pqCheckableHeaderView(Qt::Horizontal, this);
+    checkable->setStretchLastSection(oldheader->stretchLastSection());
+    this->setHeader(checkable);
+    this->installEventFilter(checkable);
+    checkable->setSectionsClickable(true);
+  }
+  delete oldheader;
 
   // Listen for the show/hide events of the horizontal scroll bar.
   this->horizontalScrollBar()->installEventFilter(this);
