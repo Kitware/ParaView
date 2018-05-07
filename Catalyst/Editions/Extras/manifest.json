@@ -250,6 +250,7 @@
   "proxies":[
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
       "proxies":[
+        "AggregateDataSet",
         "AppendReductionFilter",
         "CellDataToPointData",
         "DataSetSurfaceFilter",
