@@ -241,6 +241,10 @@ set(_vtk_modules
   # Needed for:
   #  vtkImageMandelbrotSource
 
+  vtkIOAsynchronous
+  # Needed for:
+  #  Cinema Writer
+
   vtkIOExodus
   # Needed for:
   #  vtkExodusIIReader
