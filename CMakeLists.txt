@@ -247,9 +247,6 @@ option(PARAVIEW_ENABLE_LAS "Enable LAS support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_LAS)
 option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_PDAL)
-option(PARAVIEW_ENABLE_SEGY "Enable SegY support." OFF)
-mark_as_advanced(PARAVIEW_ENABLE_SEGY)
-
 
 if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
