@@ -23,6 +23,11 @@ from paraview import coprocessing
 # %s
 
 #--------------------------------------------------------------
+# Global timestep output options
+timeStepToStartOutputAt=%s
+forceOutputAtFirstCall=%s
+
+#--------------------------------------------------------------
 # Global screenshot output options
 imageFileNamePadding=%s
 rescale_lookuptable=%s
@@ -106,10 +111,13 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
     from paraview.servermanager import vtkSMProxyManager
     version_str = vtkSMProxyManager.GetParaViewSourceVersion()
 
+    timeStepToStartOutputAt=0
+    forceOutputAtFirstCall=False
+
     pipeline_script = cpstate.DumpPipeline(\
         export_rendering, simulation_input_map, screenshot_info, cinema_tracks, array_selection)
-    script = __output_contents % (version_str, padding_amount, rescale_data_range,
-                                  pipeline_script,
+    script = __output_contents % (version_str, timeStepToStartOutputAt, forceOutputAtFirstCall,
+                                  padding_amount, rescale_data_range, pipeline_script,
                                   enable_live_viz, live_viz_frequency)
     if filename:
         outFile = open(filename, "w")

@@ -413,6 +413,7 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     pipelineClassDef += "  # these are the frequencies at which the coprocessor updates.\n"
     pipelineClassDef += "  freqs = " + str(cpstate_globals.write_frequencies) + "\n"
     pipelineClassDef += "  coprocessor.SetUpdateFrequencies(freqs)\n"
+    pipelineClassDef += "  coprocessor.SetInitialOutputOptions(timeStepToStartOutputAt,forceOutputAtFirstCall)\n"
     pipelineClassDef += "  return coprocessor\n"
     return pipelineClassDef
 
