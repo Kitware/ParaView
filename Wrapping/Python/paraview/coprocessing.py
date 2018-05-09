@@ -17,21 +17,6 @@ import math
 createDirectoriesIfNeeded = True
 
 # -----------------------------------------------------------------------------
-def IsInModulo(timestep, frequencyArray):
-    """
-    Return True if the given timestep is in one of the provided frequency.
-    This can be interpreted as follow::
-
-        isFM = IsInModulo(timestep, [2,3,7])
-
-    is similar to::
-
-        isFM = (timestep % 2 == 0) or (timestep % 3 == 0) or (timestep % 7 == 0)
-    """
-    for frequency in frequencyArray:
-        if frequency > 0 and (timestep % frequency == 0):
-            return True
-    return False
 
 class CoProcessor(object):
     """Base class for co-processing Pipelines.
@@ -73,6 +58,9 @@ class CoProcessor(object):
         self.__CinemaTracks = {}
         self.__InitialFrequencies = {}
         self.__PrintEnsightFormatString = False
+        self.__TimeStepToStartOutputAt=0
+        self.__ForceOutputAtFirstCall=False
+        self.__FirstTimeStepIndex = None
 
     def SetPrintEnsightFormatString(self, enable):
         """If outputting ExodusII files with the purpose of reading them into
@@ -91,6 +79,17 @@ class CoProcessor(object):
            raise RuntimeError (
                  "Incorrect argument type: %s, must be a dict" % type(frequencies))
         self.__InitialFrequencies = frequencies
+
+    def SetInitialOutputOptions(self, timeStepToStartOutputAt, forceOutputAtFirstCall):
+        """Set the frequencies at which the pipeline needs to be updated.
+           Typically, this is called by the subclass once it has determined what
+           timesteps co-processing will be needed to be done.
+           frequencies is a map, with key->string name of for the simulation
+           input, and value is a list of frequencies.
+           """
+
+        self.__TimeStepToStartOutputAt=timeStepToStartOutputAt
+        self.__ForceOutputAtFirstCall=forceOutputAtFirstCall
 
     def EnableLiveVisualization(self, enable, frequency = 1):
         """Call this method to enable live-visualization. When enabled,
@@ -120,7 +119,7 @@ class CoProcessor(object):
         # if this is a time step to do live then all of the inputs
         # must be made available. note that we want the pipeline built
         # before we do the actual first live connection.
-        if self.__EnableLiveVisualization and timestep % self.__LiveVisualizationFrequency == 0 \
+        if self.__EnableLiveVisualization and self.NeedToOutput(timestep, self.__LiveVisualizationFrequency) \
            and self.__LiveVisualizationLink:
             if self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
                 num_inputs = datadescription.GetNumberOfInputDescriptions()
@@ -137,13 +136,13 @@ class CoProcessor(object):
         # hasn't been set up yet). If we don't have live enabled
         # we know that the output frequencies aren't changed and can
         # just use the initial frequencies.
-        if self.__InitialFrequencies or not self.__EnableLiveVisualization:
+        if self.__ForceOutputAtFirstCall or self.__InitialFrequencies or not self.__EnableLiveVisualization:
             num_inputs = datadescription.GetNumberOfInputDescriptions()
             for cc in range(num_inputs):
                 input_name = datadescription.GetInputDescriptionName(cc)
 
                 freqs = self.__InitialFrequencies.get(input_name, [])
-                if self.__EnableLiveVisualization or ( self and IsInModulo(timestep, freqs) ):
+                if self.__EnableLiveVisualization or ( self and self.IsInModulo(timestep, freqs) ):
                         datadescription.GetInputDescription(cc).AllFieldsOn()
                         datadescription.GetInputDescription(cc).GenerateMeshOn()
         else:
@@ -154,15 +153,14 @@ class CoProcessor(object):
             for writer in self.__WritersList:
                 frequency = writer.parameters.GetProperty(
                     "WriteFrequency").GetElement(0)
-                if (timestep % frequency) == 0 or \
-                   datadescription.GetForceOutput() == True:
+                if self.NeedToOutput(timestep, frequency) or datadescription.GetForceOutput() == True:
                     writerinputs = cpstate.locate_simulation_inputs(writer)
                     for writerinput in writerinputs:
                         datadescription.GetInputDescriptionByName(writerinput).AllFieldsOn()
                         datadescription.GetInputDescriptionByName(writerinput).GenerateMeshOn()
 
             for view in self.__ViewsList:
-                if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
+                if (view.cpFrequency and self.NeedToOutput(timestep, view.cpFrequency)) or \
                    datadescription.GetForceOutput() == True:
                     viewinputs = cpstate.locate_simulation_inputs_for_view(view)
                     for viewinput in viewinputs:
@@ -197,8 +195,7 @@ class CoProcessor(object):
         for writer in self.__WritersList:
             frequency = writer.parameters.GetProperty(
                 "WriteFrequency").GetElement(0)
-            if (timestep % frequency) == 0 or \
-                    datadescription.GetForceOutput() == True:
+            if self.NeedToOutput(timestep, frequency) or datadescription.GetForceOutput() == True:
                 fileName = writer.parameters.GetProperty("FileName").GetElement(0)
                 paddingamount = writer.parameters.GetProperty("PaddingAmount").GetElement(0)
                 helperName = writer.GetXMLName()
@@ -262,7 +259,7 @@ class CoProcessor(object):
 
         cinema_dirs = []
         for view in self.__ViewsList:
-            if (view.cpFrequency and timestep % view.cpFrequency == 0) or \
+            if (view.cpFrequency and self.NeedToOutput(timestep, view.cpFrequency)) or \
                datadescription.GetForceOutput() == True:
                 fname = view.cpFileName
                 ts = str(timestep).rjust(padding_amount, '0')
@@ -347,7 +344,7 @@ class CoProcessor(object):
 
 
         timeStep = datadescription.GetTimeStep()
-        if self.__EnableLiveVisualization and timeStep % self.__LiveVisualizationFrequency == 0:
+        if self.__EnableLiveVisualization and self.NeedToOutput(timeStep, self.__LiveVisualizationFrequency):
             if not self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
                 return
 
@@ -706,3 +703,42 @@ class CoProcessor(object):
         #restore what we showed
         pv_introspect.restore_visibility(pxystate)
         return os.path.basename(vfname)
+
+    def IsInModulo(self, timestep, frequencies):
+        """
+        Return True if the given timestep is in one of the provided frequency.
+        This can be interpreted as follow::
+
+        isFM = IsInModulo(timestep-timeStepToStartOutputAt, [2,3,7])
+
+        is similar to::
+
+        isFM = (timestep-timeStepToStartOutputAt % 2 == 0) or (timestep-timeStepToStartOutputAt % 3 == 0) or (timestep-timeStepToStartOutputAt % 7 == 0)
+
+        The timeStepToStartOutputAt is the first timestep that will potentially be output.
+        """
+        if timestep < self.__TimeStepToStartOutputAt and not self.__ForceOutputAtFirstCall:
+            return False
+        for frequency in frequencies:
+            if frequency > 0 and self.NeedToOutput(timestep, frequency):
+                return True
+
+        return False
+
+
+    def NeedToOutput(self, timestep, frequency):
+        """
+        Return True if we need to output based on the input timestep and frequency. Checks based
+        __FirstTimeStepIndex, __FirstTimeStepIndex, __ForceOutputAtFirstCall and __TimeStepToStartOutputAt
+        member variables.
+        """
+        if self.__FirstTimeStepIndex == None:
+            self.__FirstTimeStepIndex = timestep
+
+        if self.__ForceOutputAtFirstCall and self.__FirstTimeStepIndex == timestep:
+            return True
+
+        if self.__TimeStepToStartOutputAt <= timestep and (timestep-self.__TimeStepToStartOutputAt) % frequency == 0:
+            return True
+
+        return False
