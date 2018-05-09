@@ -63,6 +63,6 @@ def RequestDataDescription(datadescription):
   if timestep % 20 == 0:
     # add in some fields
     #print('added Pressure and wanting to do coprocessing')
-    datadescription.GetInputDescriptionByName("input").AddPointField("Pressure")
+    datadescription.GetInputDescriptionByName("input").AddField("Pressure", 0) # 0 for point field
     datadescription.GetInputDescriptionByName('input').GenerateMeshOn()
   return

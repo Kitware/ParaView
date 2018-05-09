@@ -22,6 +22,7 @@
 #include "vtkPointData.h"
 
 #include <algorithm>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -29,8 +30,7 @@ class vtkCPInputDataDescription::vtkInternals
 {
 public:
   typedef std::vector<std::string> FieldType;
-  FieldType PointFields;
-  FieldType CellFields;
+  std::map<int, FieldType> Fields;
 };
 
 vtkStandardNewMacro(vtkCPInputDataDescription);
@@ -60,29 +60,44 @@ vtkCPInputDataDescription::~vtkCPInputDataDescription()
 //----------------------------------------------------------------------------
 void vtkCPInputDataDescription::Reset()
 {
-  this->Internals->PointFields.clear();
-  this->Internals->CellFields.clear();
+  this->Internals->Fields.clear();
   this->AllFields = false;
   this->GenerateMesh = false;
 }
 
 //----------------------------------------------------------------------------
-void vtkCPInputDataDescription::AddPointField(const char* fieldName)
+void vtkCPInputDataDescription::AddField(const char* fieldName, int type)
 {
-  this->Internals->PointFields.push_back(fieldName);
+  this->Internals->Fields[type].push_back(fieldName);
 }
 
+#ifndef VTK_LEGACY_REMOVE
+//----------------------------------------------------------------------------
+void vtkCPInputDataDescription::AddPointField(const char* fieldName)
+{
+  VTK_LEGACY_BODY(vtkCPInputDataDescription::AddPointField, "ParaView 5.6");
+  this->AddField(fieldName, vtkDataObject::POINT);
+}
+#endif
+
+#ifndef VTK_LEGACY_REMOVE
 //----------------------------------------------------------------------------
 void vtkCPInputDataDescription::AddCellField(const char* fieldName)
 {
-  this->Internals->CellFields.push_back(fieldName);
+  VTK_LEGACY_BODY(vtkCPInputDataDescription::AddCellField, "ParaView 5.6");
+  this->AddField(fieldName, vtkDataObject::CELL);
 }
+#endif
 
 //----------------------------------------------------------------------------
 unsigned int vtkCPInputDataDescription::GetNumberOfFields()
 {
-  return static_cast<unsigned int>(
-    this->Internals->PointFields.size() + this->Internals->CellFields.size());
+  unsigned int count = 0;
+  for (auto iter : this->Internals->Fields)
+  {
+    count += static_cast<unsigned int>(iter.second.size());
+  }
+  return count;
 }
 
 //----------------------------------------------------------------------------
@@ -91,19 +106,54 @@ const char* vtkCPInputDataDescription::GetFieldName(unsigned int fieldIndex)
   if (fieldIndex >= this->GetNumberOfFields())
   {
     vtkWarningMacro("Bad FieldIndex " << fieldIndex);
-    return 0;
+    return nullptr;
   }
-
-  if (fieldIndex >= static_cast<unsigned int>(this->Internals->PointFields.size()))
+  size_t count = 0;
+  for (auto iter : this->Internals->Fields)
   {
-    fieldIndex -= static_cast<unsigned int>(this->Internals->PointFields.size());
-    return this->Internals->CellFields[fieldIndex].c_str();
+    size_t size = iter.second.size();
+    if (size + count <= static_cast<size_t>(fieldIndex))
+    {
+      return iter.second[fieldIndex - size].c_str();
+    }
   }
-  return this->Internals->PointFields[fieldIndex].c_str();
+  vtkWarningMacro("Bad FieldIndex " << fieldIndex);
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
+int vtkCPInputDataDescription::GetFieldType(unsigned int fieldIndex)
+{
+  if (fieldIndex >= this->GetNumberOfFields())
+  {
+    vtkWarningMacro("Bad FieldIndex " << fieldIndex);
+    return -1;
+  }
+  size_t count = 0;
+  for (auto iter : this->Internals->Fields)
+  {
+    size_t size = iter.second.size();
+    if (size + count <= static_cast<size_t>(fieldIndex))
+    {
+      return iter.first;
+    }
+  }
+  vtkWarningMacro("Bad FieldIndex " << fieldIndex);
+  return -1;
+}
+
+#ifndef VTK_LEGACY_REMOVE
+//----------------------------------------------------------------------------
 bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName)
+{
+  VTK_LEGACY_BODY(vtkCPInputDataDescription::IsFieldNeeded, "ParaView 5.6");
+
+  return this->IsFieldNeeded(fieldName, 0) || this - IsFieldNeeded(fieldName, 1);
+}
+#endif
+
+//----------------------------------------------------------------------------
+bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName, int type)
 {
   if (!fieldName)
   {
@@ -115,96 +165,19 @@ bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName)
     return true;
   }
 
-  if (std::find(this->Internals->PointFields.begin(), this->Internals->PointFields.end(),
-        fieldName) != this->Internals->PointFields.end())
-  {
-    return true;
-  }
-
-  if (std::find(this->Internals->CellFields.begin(), this->Internals->CellFields.end(),
-        fieldName) != this->Internals->CellFields.end())
-  {
-    return true;
-  }
-
-  return false;
+  return std::find(this->Internals->Fields[type].begin(), this->Internals->Fields[type].end(),
+           fieldName) != this->Internals->Fields[type].end();
 }
 
+#ifndef VTK_LEGACY_REMOVE
 //----------------------------------------------------------------------------
 bool vtkCPInputDataDescription::IsFieldPointData(const char* fieldName)
 {
-  if (std::find(this->Internals->PointFields.begin(), this->Internals->PointFields.end(),
-        fieldName) != this->Internals->PointFields.end())
-  {
-    return true;
-  }
-
-  return false;
+  VTK_LEGACY_BODY(vtkCPInputDataDescription::IsFieldPointData, "ParaView 5.6");
+  return std::find(this->Internals->Fields[0].begin(), this->Internals->Fields[0].end(),
+           fieldName) != this->Internals->Fields[0].end();
 }
-
-//----------------------------------------------------------------------------
-bool vtkCPInputDataDescription::IsInputSufficient()
-{
-  if (this->Grid == 0)
-  {
-    return false;
-  }
-
-  vtkDataSet* dataSet = vtkDataSet::SafeDownCast(this->Grid);
-  if (dataSet)
-  {
-    return this->DoesGridContainNeededFields(dataSet);
-  }
-  vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(this->Grid);
-  if (composite)
-  {
-    vtkCompositeDataIterator* iter = composite->NewIterator();
-    iter->SkipEmptyNodesOn();
-    for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      dataSet = vtkDataSet::SafeDownCast(iter->GetDataSet());
-      if (dataSet)
-      {
-        if (!this->DoesGridContainNeededFields(dataSet))
-        {
-          iter->Delete();
-          return false;
-        }
-      }
-    }
-    iter->Delete();
-    return true;
-  }
-
-  return false; // false because of unknown grid type
-}
-
-//----------------------------------------------------------------------------
-bool vtkCPInputDataDescription::DoesGridContainNeededFields(vtkDataSet* dataSet)
-{
-  vtkInternals::FieldType::iterator iter;
-  for (iter = this->Internals->PointFields.begin(); iter != this->Internals->PointFields.end();
-       ++iter)
-  {
-    std::string fieldName = *iter;
-    if (dataSet->GetPointData()->GetArray(fieldName.c_str()) == 0)
-    {
-      return false;
-    }
-  }
-
-  for (iter = this->Internals->CellFields.begin(); iter != this->Internals->CellFields.end();
-       ++iter)
-  {
-    std::string fieldName = *iter;
-    if (dataSet->GetCellData()->GetArray(fieldName.c_str()) == 0)
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
+#endif
 
 //----------------------------------------------------------------------------
 bool vtkCPInputDataDescription::GetIfGridIsNecessary()
