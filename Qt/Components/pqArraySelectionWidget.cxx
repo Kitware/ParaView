@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqArraySelectionWidget.h"
 
 #include "pqHeaderView.h"
+#include "pqSMAdaptor.h"
 
 #include <QEvent>
 #include <QHeaderView>

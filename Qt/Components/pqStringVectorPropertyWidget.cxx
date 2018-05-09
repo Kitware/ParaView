@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxySILModel.h"
 #include "pqSILModel.h"
 #include "pqSILWidget.h"
+#include "pqSMAdaptor.h"
 #include "pqScalarValueListPropertyWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
