@@ -211,6 +211,9 @@
     { "name":"vtkThirdPartylz4",
       "path":"VTK/ThirdParty/lz4"
     },
+    { "name":"vtkThirdPartydoubleconversion",
+      "path":"VTK/ThirdParty/doubleconversion"
+    },
     { "name":"vtkThirdPartyexpat",
       "path":"VTK/ThirdParty/expat"
     },
