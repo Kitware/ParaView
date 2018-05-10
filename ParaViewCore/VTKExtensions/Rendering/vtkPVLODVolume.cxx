@@ -427,7 +427,14 @@ void vtkPVLODVolume::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkAbstractVolumeMapper* vtkPVLODVolume::GetMapper()
 {
-  return vtkAbstractVolumeMapper::SafeDownCast(this->LODProp->GetLODMapper(this->HighLODId));
+  if (this->LODProp && this->HighLODId >= 0)
+  {
+    return vtkAbstractVolumeMapper::SafeDownCast(this->LODProp->GetLODMapper(this->HighLODId));
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 void vtkPVLODVolume::SetPropertyKeys(vtkInformation* keys)
