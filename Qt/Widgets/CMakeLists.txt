@@ -80,6 +80,8 @@ set(Module_SRCS
   pqExpanderButton.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
+  pqHeaderView.cxx
+  pqHeaderView.h
   pqHighlightablePushButton.cxx
   pqHighlightablePushButton.h
   pqHighlightableToolButton.cxx
@@ -161,6 +163,7 @@ set (QtWidgets_SRCS
   pqExpandableTableView.h
   pqExpanderButton.h
   pqFlatTreeView.h
+  pqHeaderView.h
   pqHighlightablePushButton.h
   pqHighlightableToolButton.h
   pqLineEditEventPlayer.h

@@ -32,12 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeView.h"
 
 #include "pqCheckableHeaderView.h"
+#include "pqHeaderView.h"
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QEvent>
 #include <QLayout>
 #include <QMimeData>
+#include <QPointer>
 #include <QScrollBar>
 
 namespace
@@ -62,7 +64,8 @@ int pqCountItems(QAbstractItemModel* model, const QModelIndex& idx, int max)
 }
 }
 
-pqTreeView::pqTreeView(QWidget* widgetParent)
+//-----------------------------------------------------------------------------
+pqTreeView::pqTreeView(QWidget* widgetParent, bool use_pqHeaderView)
   : QTreeView(widgetParent)
   , ScrollPadding(0)
   , MaximumRowCountBeforeScrolling(10)
@@ -70,15 +73,25 @@ pqTreeView::pqTreeView(QWidget* widgetParent)
   this->ScrollPadding = 0;
 
   // Change the default header view to a checkable one.
-  pqCheckableHeaderView* checkable = new pqCheckableHeaderView(Qt::Horizontal, this);
-  checkable->setStretchLastSection(this->header()->stretchLastSection());
-  this->setHeader(checkable);
-  this->installEventFilter(checkable);
-#if QT_VERSION >= 0x050000
-  checkable->setSectionsClickable(true);
-#else
-  checkable->setClickable(true);
-#endif
+  QPointer<QHeaderView> oldheader = this->header();
+  if (use_pqHeaderView)
+  {
+    pqHeaderView* myheader = new pqHeaderView(Qt::Horizontal, this);
+    myheader->setToggleCheckStateOnSectionClick(true);
+    myheader->setStretchLastSection(oldheader->stretchLastSection());
+    this->setHeader(myheader);
+  }
+  else
+  {
+    // in the long run, I'd like to get rid of the pqCheckableHeaderView
+    // entirely.
+    pqCheckableHeaderView* checkable = new pqCheckableHeaderView(Qt::Horizontal, this);
+    checkable->setStretchLastSection(oldheader->stretchLastSection());
+    this->setHeader(checkable);
+    this->installEventFilter(checkable);
+    checkable->setSectionsClickable(true);
+  }
+  delete oldheader;
 
   // Listen for the show/hide events of the horizontal scroll bar.
   this->horizontalScrollBar()->installEventFilter(this);
@@ -87,6 +100,7 @@ pqTreeView::pqTreeView(QWidget* widgetParent)
   this->setFocusPolicy(Qt::StrongFocus);
 }
 
+//-----------------------------------------------------------------------------
 bool pqTreeView::eventFilter(QObject* object, QEvent* e)
 {
   if (object == this->horizontalScrollBar())
@@ -106,6 +120,7 @@ bool pqTreeView::eventFilter(QObject* object, QEvent* e)
   return QTreeView::eventFilter(object, e);
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeView::wheelEvent(QWheelEvent* evt)
 {
   // don't handle wheel events unless widget had focus.
@@ -117,6 +132,7 @@ void pqTreeView::wheelEvent(QWheelEvent* evt)
   }
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeView::setModel(QAbstractItemModel* newModel)
 {
   QAbstractItemModel* current = this->model();
@@ -138,12 +154,14 @@ void pqTreeView::setModel(QAbstractItemModel* newModel)
   this->invalidateLayout();
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeView::setRootIndex(const QModelIndex& index)
 {
   QTreeView::setRootIndex(index);
   this->invalidateLayout();
 }
 
+//-----------------------------------------------------------------------------
 QSize pqTreeView::sizeHint() const
 {
   // lets show X items before we get a scrollbar
@@ -176,11 +194,13 @@ QSize pqTreeView::sizeHint() const
   return QSize(this->Superclass::sizeHint().width(), h + extra);
 }
 
+//-----------------------------------------------------------------------------
 QSize pqTreeView::minimumSizeHint() const
 {
   return this->sizeHint();
 }
 
+//-----------------------------------------------------------------------------
 void pqTreeView::invalidateLayout()
 {
   // sizeHint is dynamic, so we need to invalidate parent layouts
@@ -192,4 +212,46 @@ void pqTreeView::invalidateLayout()
   // invalidate() is not enough, we need to reset the cache of the
   // QWidgetItemV2, so sizeHint() could be recomputed.
   this->updateGeometry();
+}
+
+//-----------------------------------------------------------------------------
+QItemSelectionModel::SelectionFlags pqTreeView::selectionCommand(
+  const QModelIndex& idx, const QEvent* evt) const
+{
+  if (evt != nullptr && evt->type() == QEvent::MouseButtonRelease && idx.isValid())
+  {
+    return QItemSelectionModel::NoUpdate;
+  }
+  return this->Superclass::selectionCommand(idx, evt);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTreeView::edit(const QModelIndex& idx, EditTrigger trigger, QEvent* evt)
+{
+  const bool edited = this->Superclass::edit(idx, trigger, evt);
+
+  if (trigger == SelectedClicked && edited)
+  {
+    auto amodel = this->model();
+    auto itemFlags = amodel->flags(idx);
+    if ((itemFlags & Qt::ItemIsUserCheckable) && (itemFlags & Qt::ItemIsEnabled))
+    {
+      const auto itemCheckState = amodel->data(idx, Qt::CheckStateRole);
+
+      // user clicked on a selected item, update all other selected items check
+      // state, if possible, to match the clicked item's check state.
+      for (const QModelIndex& otherIdx : this->selectedIndexes())
+      {
+        if (otherIdx != idx)
+        {
+          auto otherItemFlags = amodel->flags(otherIdx);
+          if ((otherItemFlags & Qt::ItemIsUserCheckable) && (otherItemFlags & Qt::ItemIsEnabled))
+          {
+            amodel->setData(otherIdx, itemCheckState, Qt::CheckStateRole);
+          }
+        }
+      }
+    }
+  }
+  return edited;
 }

@@ -1,6 +1,8 @@
 SET(MyTests
-  FlatTreeView
   Animation
+  FlatTreeView
+  TreeViewSelectionAndCheckState
+  HeaderViewCheckState
   )
 
 SET(MocSources

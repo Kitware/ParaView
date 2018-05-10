@@ -150,12 +150,17 @@ public:
 
   /**
   * Overridden to return the same name as the hierarchy.
-  * Also returns a DecorationRole icon which can show the check state of the
-  * root node. Connect the header's sectionClicked() signal to
-  * toggleRootCheckState() to support affecting the check state using the
-  * header.
+  *
+  * Also overridden to handle Qt::CheckStateRole for pqHeaderView to support
+  * toggling column checkstate from the header.
   */
   QVariant headerData(int, Qt::Orientation, int role = Qt::DisplayRole) const override;
+
+  /**
+   * overridden to handle toggling of check state.
+   */
+  bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value,
+    int role = Qt::EditRole) override;
 
   /**
   * Overridden to provide a means of turning off checkboxes
@@ -188,12 +193,6 @@ public slots:
   * Set the status values for the hierarchy.
   */
   void setValues(const QList<QVariant>&);
-
-  /**
-  * Convenience slot to toggle the check state of the entire subtree shown by
-  * this model.
-  */
-  void toggleRootCheckState();
 
 signals:
   void valuesChanged();
