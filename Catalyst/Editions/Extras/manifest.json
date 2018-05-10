@@ -69,7 +69,11 @@
         { "class":"vtkExtractSelectedThresholds" },
         { "class":"vtkExtractSelectedRows" },
         { "class":"vtkExtractSelection" },
-        { "class":"vtkProbeSelectedLocations" }
+        { "class":"vtkFrustumSelector" },
+        { "class":"vtkLocationSelector" },
+        { "class":"vtkValueSelector" },
+        { "class":"vtkProbeSelectedLocations" },
+        { "class":"vtkSelectionOperator" }
       ],
       "cswrap":true,
       "pythonwrap":true
