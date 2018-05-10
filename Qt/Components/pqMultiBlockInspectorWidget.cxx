@@ -1142,11 +1142,7 @@ void pqMultiBlockInspectorWidget::itemDoubleClicked(const QModelIndex& idx)
       QColorDialog::getColor(color, this, "Select Color", QColorDialog::DontUseNativeDialog);
     if (newColor.isValid())
     {
-      BEGIN_UNDO_SET("Change Block Colors");
-      internals.ProxyModel->setColor(idx, newColor);
-      emit this->blockColorsChanged();
-      emit this->requestRender();
-      END_UNDO_SET();
+      this->setColor(idx, newColor);
     }
   }
   else if (idx.column() == 2)
@@ -1157,11 +1153,7 @@ void pqMultiBlockInspectorWidget::itemDoubleClicked(const QModelIndex& idx)
     dialog.setValue(opacity);
     if (dialog.exec() == QDialog::Accepted)
     {
-      BEGIN_UNDO_SET("Change Block Opacities");
-      internals.ProxyModel->setOpacity(idx, dialog.value());
-      emit this->blockOpacitiesChanged();
-      emit this->requestRender();
-      END_UNDO_SET();
+      this->setOpacity(idx, qBound(0.0, dialog.value(), 1.0));
     }
   }
 }
@@ -1227,32 +1219,12 @@ void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
         QColorDialog::getColor(QColor(), this, "Select Color", QColorDialog::DontUseNativeDialog);
       if (newColor.isValid())
       {
-        const QVariant val(newColor);
-        BEGIN_UNDO_SET("Set Block Colors");
-        const QModelIndexList sRows =
-          internals.SelectionModel->selectedRows(internals.ProxyModel->colorColumn());
-        for (auto iter = sRows.begin(); iter != sRows.end(); ++iter)
-        {
-          internals.ProxyModel->setColor(*iter, val);
-        }
-        END_UNDO_SET();
-        emit this->blockColorsChanged();
-        emit this->requestRender();
+        this->setColor(internals.SelectionModel->currentIndex(), newColor);
       }
     }
     else if (selAction == resetColors)
     {
-      const QVariant val;
-      BEGIN_UNDO_SET("Reset Block Colors");
-      const QModelIndexList sRows =
-        internals.SelectionModel->selectedRows(internals.ProxyModel->colorColumn());
-      for (auto iter = sRows.begin(); iter != sRows.end(); ++iter)
-      {
-        internals.ProxyModel->setColor(*iter, val);
-      }
-      END_UNDO_SET();
-      emit this->blockColorsChanged();
-      emit this->requestRender();
+      this->setColor(internals.SelectionModel->currentIndex(), QColor());
     }
     else if (selAction == setOpacities)
     {
@@ -1261,36 +1233,75 @@ void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
       dialog.setValue(1.0);
       if (dialog.exec() == QDialog::Accepted)
       {
-        const QVariant val(dialog.value());
-        BEGIN_UNDO_SET("Set Block Opacities");
-        const QModelIndexList sRows =
-          internals.SelectionModel->selectedRows(internals.ProxyModel->opacityColumn());
-        for (auto iter = sRows.begin(); iter != sRows.end(); ++iter)
-        {
-          internals.ProxyModel->setOpacity(*iter, val);
-        }
-        END_UNDO_SET();
-        emit this->blockOpacitiesChanged();
-        emit this->requestRender();
+        this->setOpacity(
+          internals.SelectionModel->currentIndex(), qBound(0.0, dialog.value(), 1.0));
       }
     }
     else if (selAction == resetOpacities)
     {
-      const QVariant val;
-      BEGIN_UNDO_SET("Reset Block Opacities");
-      const QModelIndexList sRows =
-        internals.SelectionModel->selectedRows(internals.ProxyModel->opacityColumn());
-      for (auto iter = sRows.begin(); iter != sRows.end(); ++iter)
-      {
-        internals.ProxyModel->setOpacity(*iter, val);
-      }
-      END_UNDO_SET();
-      emit this->blockOpacitiesChanged();
-      emit this->requestRender();
+      // -ve opacity causes the value be cleared.
+      this->setOpacity(internals.SelectionModel->currentIndex(), -1.0);
     }
     else if (selAction == expandAll)
     {
       internals.Ui.treeView->expandAll();
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorWidget::setColor(const QModelIndex& idx, const QColor& newcolor)
+{
+  pqInternals& internals = (*this->Internals);
+
+  QModelIndexList sRows =
+    internals.SelectionModel->selectedRows(internals.ProxyModel->colorColumn());
+  if (idx.isValid() && !sRows.contains(idx))
+  {
+    // if idx not part of active selection, we don't update the all selected
+    // nodes, only the current item.
+    sRows.clear();
+    sRows.push_back(idx);
+  }
+
+  const QVariant val = QVariant::fromValue(newcolor);
+  BEGIN_UNDO_SET(newcolor.isValid() ? "Set Block Colors" : "Reset Block Colors");
+  for (const QModelIndex& itemIdx : sRows)
+  {
+    internals.ProxyModel->setColor(itemIdx, val);
+  }
+  END_UNDO_SET();
+  emit this->blockColorsChanged();
+  emit this->requestRender();
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorWidget::setOpacity(const QModelIndex& idx, double opacity)
+{
+  pqInternals& internals = (*this->Internals);
+
+  QVariant val;
+  if (opacity >= 0 && opacity <= 1.0)
+  {
+    val = QVariant(opacity);
+  }
+
+  QModelIndexList sRows =
+    internals.SelectionModel->selectedRows(internals.ProxyModel->opacityColumn());
+  if (idx.isValid() && !sRows.contains(idx))
+  {
+    // if idx not part of active selection, we don't update the all selected
+    // nodes, only the current item.
+    sRows.clear();
+    sRows.push_back(idx);
+  }
+
+  BEGIN_UNDO_SET(val.isValid() ? "Set Block Opacities" : "Reset Block Opacities");
+  for (const QModelIndex& itemIdx : sRows)
+  {
+    internals.ProxyModel->setOpacity(itemIdx, val);
+  }
+  END_UNDO_SET();
+  emit this->blockOpacitiesChanged();
+  emit this->requestRender();
 }
