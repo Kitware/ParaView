@@ -9,8 +9,8 @@ Adapted from the [Paraview wiki](http://www.paraview.org/Wiki/ParaView:Build_And
 
 Prerequisites
 =============
-* The ParaView build process requires [CMake](http://www.cmake.org/) version 2.8.8 or higher and a working compiler. On Unix-like operating systems, it also requires Make, while on Windows it requires Visual Studio and Ninja build.
-* Building ParaView's user interface requires [Qt](http://www.qt.io/download-open-source/), version 5.6+ (5.9.\* is recommended, 5.7.\* and 5.8\* also work). To compile ParaView, either the LGPL or commercial versions of Qt may be used. Also note that on Windows you need to choose a Visual Studio version to match binaries available for your Qt version.
+* The ParaView build process requires [CMake](http://www.cmake.org/) version 3.3 or higher and a working compiler. On Unix-like operating systems, it also requires Make, while on Windows it requires Visual Studio and Ninja build.
+* Building ParaView's user interface requires [Qt](http://www.qt.io/download-open-source/), version 5.6+ (5.9.\* is recommended, 5.7.\* and 5.8\* also work, 5.10 is not yet recommended). To compile ParaView, either the LGPL or commercial versions of Qt may be used. Also note that on Windows you need to choose a Visual Studio version to match binaries available for your Qt version.
 * For Windows builds, unix-like environments such as Cygwin, or MinGW are not supported.
 
 Download And Install CMake
