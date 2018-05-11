@@ -189,10 +189,10 @@
   </action>
   <action name="actionSetMainWindowTitle">
    <property name="text">
-    <string>Set Main Window Title</string>
+    <string>Rename Window</string>
    </property>
    <property name="toolTip">
-    <string>Set the main window title</string>
+    <string>Change the main window title</string>
    </property>
    <property name="shortcut">
     <string>F2</string>
