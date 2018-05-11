@@ -176,6 +176,23 @@ signals:
   void requestRender();
 
 private:
+  //@{
+  /**
+   * Methods to change block colors or opacity ensemble.
+   *
+   * If the index is valid and identifies an item that is part of the current selection,
+   * then all selected items get updated similarly. If not, only the chosen item is
+   * updated. If the index is invalid, then all items part of the current
+   * selection are updated.
+   *
+   * For setColor, if `newcolor` is invalid, then it acts as "reset color".
+   * For setOpacity, if `opacity` is < 0, then it acts as "reset opacity".
+   */
+  void setColor(const QModelIndex& idx, const QColor& newcolor);
+  void setOpacity(const QModelIndex& idx, double opacity);
+  //@}
+
+private:
   Q_DISABLE_COPY(pqMultiBlockInspectorWidget);
 
   class pqInternals;
