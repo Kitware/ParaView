@@ -84,6 +84,14 @@ protected:
   vtkSelectionNode* LocateSelection(unsigned int level, unsigned int index, vtkSelection* sel);
   vtkSelectionNode* LocateSelection(unsigned int composite_index, vtkSelection* sel);
 
+  /**
+   * Creates a new vtkSelectionOperator for the given content type.
+   * May return null if not supported. Overridden to handle
+   * vtkSelectionNode::QUERY.
+   */
+  vtkSmartPointer<vtkSelectionOperator> NewSelectionOperator(
+    vtkSelectionNode::SelectionContent type) override;
+
 private:
   vtkPVExtractSelection(const vtkPVExtractSelection&) = delete;
   void operator=(const vtkPVExtractSelection&) = delete;

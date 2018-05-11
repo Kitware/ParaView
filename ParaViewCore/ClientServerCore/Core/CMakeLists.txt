@@ -108,6 +108,7 @@ if (PARAVIEW_ENABLE_PYTHON)
     vtkPythonExtractSelection.cxx
     vtkPythonProgrammableFilter.cxx
     vtkPythonAnnotationFilter.cxx
+    vtkPythonSelector.cxx
     )
 endif()
 

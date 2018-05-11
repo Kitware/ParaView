@@ -30,14 +30,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
 #include "vtkPointData.h"
+#include "vtkPythonSelector.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
+#include "vtkSelectionOperator.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include "vtkPythonExtractSelection.h"
-#endif
 
 #include <vector>
 
@@ -127,38 +125,10 @@ int vtkPVExtractSelection::RequestData(
     output2->ShallowCopy(sel);
   }
 
-  if (sel->GetNumberOfNodes() >= 1 && sel->GetNode(0)->GetContentType() == vtkSelectionNode::QUERY)
+  // Call the superclass's RequestData()
+  if (!this->Superclass::RequestData(request, inputVector, outputVector))
   {
-#ifdef PARAVIEW_ENABLE_PYTHON
-    vtkPythonExtractSelection* pythonExtractSelection = vtkPythonExtractSelection::New();
-
-    vtkDataObject* localInputDO = inputDO->NewInstance();
-    localInputDO->ShallowCopy(inputDO);
-
-    vtkSelection* localSel = sel->NewInstance();
-    localSel->ShallowCopy(sel);
-
-    pythonExtractSelection->SetInputData(0, localInputDO);
-    pythonExtractSelection->SetInputData(1, localSel);
-    pythonExtractSelection->SetPreserveTopology(this->PreserveTopology);
-
-    pythonExtractSelection->Update();
-
-    outputDO->ShallowCopy(pythonExtractSelection->GetOutputDataObject(0));
-
-    pythonExtractSelection->Delete();
-    localSel->Delete();
-    localInputDO->Delete();
-#endif // PARAVIEW_ENABLE_PYTHON
-  }
-  else
-  {
-    // only call superclass's request data for non-query type
-    // selections (which use the python extract selection filter)
-    if (!this->Superclass::RequestData(request, inputVector, outputVector))
-    {
-      return 0;
-    }
+    return 0;
   }
 
   if (this->GetNumberOfOutputPorts() < 2)
@@ -312,6 +282,21 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(
     }
   }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkSmartPointer<vtkSelectionOperator> vtkPVExtractSelection::NewSelectionOperator(
+  vtkSelectionNode::SelectionContent type)
+{
+  if (type == vtkSelectionNode::QUERY)
+  {
+    // Return a query operator
+    return vtkSmartPointer<vtkPythonSelector>::New();
+  }
+  else
+  {
+    return this->Superclass::NewSelectionOperator(type);
+  }
 }
 
 //----------------------------------------------------------------------------
