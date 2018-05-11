@@ -38,7 +38,7 @@ public:
   /**
    * Set a frustum to choose within.
    */
-  void SetFrustum(double vertices[32]);
+  void AddFrustum(double vertices[32]);
 
   //@{
   /**
