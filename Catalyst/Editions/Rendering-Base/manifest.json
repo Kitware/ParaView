@@ -306,11 +306,9 @@
         { "class": "vtkAnnotationLink" },
         { "class": "vtkAxes" },
         { "class": "vtkBoxClipDataSet" },
-        { "class": "vtkCellCenters" },
         { "class": "vtkDataSetTriangleFilter" },
         { "class": "vtkMergeCells" },
         { "class": "vtkMultiBlockDataGroupFilter" },
-        { "class": "vtkPassArrays" },
         { "class": "vtkPassThrough" },
         { "class": "vtkSplitColumnComponents" },
         { "class": "vtkTransformPolyDataFilter" }

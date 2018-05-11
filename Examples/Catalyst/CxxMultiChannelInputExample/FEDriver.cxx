@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
   // The first argument is the program name
   FEAdaptor feaAdaptor(argc - 1, argv + 1);
 #endif
-  unsigned int numberOfTimeSteps = 100;
+  unsigned int numberOfTimeSteps = 10;
   for (unsigned int timeStep = 0; timeStep < numberOfTimeSteps; timeStep++)
   {
     // use a time step length of 0.1

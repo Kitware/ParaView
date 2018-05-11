@@ -114,6 +114,10 @@ public:
   vtkSetVector6Macro(WholeExtent, int);
   vtkGetVector6Macro(WholeExtent, int);
 
+  // Description:
+  // Shallow copy.
+  void ShallowCopy(vtkCPInputDataDescription*);
+
 protected:
   vtkCPInputDataDescription();
   ~vtkCPInputDataDescription() override;

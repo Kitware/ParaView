@@ -40,7 +40,7 @@ class CoProcessor(object):
 
     __CinemaTracks is populated when defining the co-processing pipline through
     paraview.cpstate. paraview.cpstate uses accessor instances to set values and
-    array names through the RegisterCinemaTrack and AddArraysToCinemaTrack
+    array names through the RegisterCinemaTrack and AddArrayssToCinemaTrack
     methods of this class.
     """
 
@@ -61,6 +61,8 @@ class CoProcessor(object):
         self.__TimeStepToStartOutputAt=0
         self.__ForceOutputAtFirstCall=False
         self.__FirstTimeStepIndex = None
+        # a list of arrays requested for each channel, e.g. {'input': ["a point data array name", 0], ["a cell data array name", 1]}
+        self.__RequestedArrays = None
 
     def SetPrintEnsightFormatString(self, enable):
         """If outputting ExodusII files with the purpose of reading them into
@@ -79,6 +81,13 @@ class CoProcessor(object):
            raise RuntimeError (
                  "Incorrect argument type: %s, must be a dict" % type(frequencies))
         self.__InitialFrequencies = frequencies
+
+    def SetRequestedArrays(self, channelname, requestedarrays):
+        """Set which arrays this script will request from the adaptor for the given channel name.
+        """
+        if not self.__RequestedArrays:
+            self.__RequestedArrays = {}
+        self.__RequestedArrays[channelname] = requestedarrays
 
     def SetInitialOutputOptions(self, timeStepToStartOutputAt, forceOutputAtFirstCall):
         """Set the frequencies at which the pipeline needs to be updated.
@@ -122,11 +131,16 @@ class CoProcessor(object):
         if self.__EnableLiveVisualization and self.NeedToOutput(timestep, self.__LiveVisualizationFrequency) \
            and self.__LiveVisualizationLink:
             if self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
-                num_inputs = datadescription.GetNumberOfInputDescriptions()
-                for cc in range(num_inputs):
-                    input_name = datadescription.GetInputDescriptionName(cc)
-                    datadescription.GetInputDescription(cc).AllFieldsOn()
-                    datadescription.GetInputDescription(cc).GenerateMeshOn()
+                if self.__RequestedArrays:
+                    for key in self.__RequestedArrays:
+                        for v in self.__RequestedArrays[key]:
+                            datadescription.GetInputDescriptionByName(key).AddField(v[0], v[1])
+                else:
+                    num_inputs = datadescription.GetNumberOfInputDescriptions()
+                    for cc in range(num_inputs):
+                        input_name = datadescription.GetInputDescriptionName(cc)
+                        datadescription.GetInputDescription(cc).AllFieldsOn()
+                        datadescription.GetInputDescription(cc).GenerateMeshOn()
                 return
 
         # if we haven't processed the pipeline yet in DoCoProcessing() we
@@ -137,12 +151,16 @@ class CoProcessor(object):
         # we know that the output frequencies aren't changed and can
         # just use the initial frequencies.
         if self.__ForceOutputAtFirstCall or self.__InitialFrequencies or not self.__EnableLiveVisualization:
-            num_inputs = datadescription.GetNumberOfInputDescriptions()
-            for cc in range(num_inputs):
-                input_name = datadescription.GetInputDescriptionName(cc)
-
-                freqs = self.__InitialFrequencies.get(input_name, [])
-                if self.__EnableLiveVisualization or ( self and self.IsInModulo(timestep, freqs) ):
+            if self.__RequestedArrays:
+                for key in self.__RequestedArrays:
+                    for v in self.__RequestedArrays[key]:
+                        datadescription.GetInputDescriptionByName(key).AddField(v[0], v[1])
+            else:
+                num_inputs = datadescription.GetNumberOfInputDescriptions()
+                for cc in range(num_inputs):
+                    input_name = datadescription.GetInputDescriptionName(cc)
+                    freqs = self.__InitialFrequencies.get(input_name, [])
+                    if self.__EnableLiveVisualization or ( self and self.IsInModulo(timestep, freqs) ):
                         datadescription.GetInputDescription(cc).AllFieldsOn()
                         datadescription.GetInputDescription(cc).GenerateMeshOn()
         else:
@@ -151,21 +169,30 @@ class CoProcessor(object):
             from paraview import cpstate
             frequencies = {}
             for writer in self.__WritersList:
-                frequency = writer.parameters.GetProperty(
-                    "WriteFrequency").GetElement(0)
+                frequency = writer.parameters.GetProperty("WriteFrequency").GetElement(0)
                 if self.NeedToOutput(timestep, frequency) or datadescription.GetForceOutput() == True:
                     writerinputs = cpstate.locate_simulation_inputs(writer)
                     for writerinput in writerinputs:
-                        datadescription.GetInputDescriptionByName(writerinput).AllFieldsOn()
-                        datadescription.GetInputDescriptionByName(writerinput).GenerateMeshOn()
+                        if self.__RequestedArrays:
+                            for key in self.__RequestedArrays:
+                                for v in self.__RequestedArrays[key]:
+                                    datadescription.GetInputDescriptionByName(writerinput).AddField(v[0], v[1])
+                        else:
+                            datadescription.GetInputDescriptionByName(writerinputinput).AllFieldsOn()
+                            datadescription.GetInputDescriptionByName(writerinputinput).GenerateMeshOn()
 
             for view in self.__ViewsList:
                 if (view.cpFrequency and self.NeedToOutput(timestep, view.cpFrequency)) or \
                    datadescription.GetForceOutput() == True:
                     viewinputs = cpstate.locate_simulation_inputs_for_view(view)
                     for viewinput in viewinputs:
-                        datadescription.GetInputDescriptionByName(viewinput).AllFieldsOn()
-                        datadescription.GetInputDescriptionByName(viewinput).GenerateMeshOn()
+                        if self.__RequestedArrays:
+                            for key in self.__RequestedArrays:
+                                for v in self.__RequestedArrays[key]:
+                                    datadescription.GetInputDescriptionByName(viewinput).AddField(v[0], v[1])
+                        else:
+                            datadescription.GetInputDescriptionByName(viewinput).AllFieldsOn()
+                            datadescription.GetInputDescriptionByName(viewinput).GenerateMeshOn()
 
 
     def UpdateProducers(self, datadescription):
@@ -384,6 +411,9 @@ class CoProcessor(object):
             raise RuntimeError ("Simulation input name '%s' does not exist" % inputname)
 
         grid = datadescription.GetInputDescriptionByName(inputname).GetGrid()
+        if not grid:
+            # we have a description of this channel but we don't need the grid so return
+            return
 
         producer = simple.PVTrivialProducer(guiName=inputname)
         producer.add_attribute("cpSimulationInput", inputname)

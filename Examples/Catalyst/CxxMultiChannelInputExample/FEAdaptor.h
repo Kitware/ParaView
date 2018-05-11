@@ -22,10 +22,10 @@ public:
 
 private:
   void BuildVTKVolumetricGrid(Grid& grid, vtkUnstructuredGrid* volumetricGrid);
-  void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkUnstructuredGrid* volumetricGrid,
-    vtkCPInputDataDescription* volumetricGridChannel);
+  void UpdateVTKAttributes(Grid& grid, Attributes& attributes,
+    vtkCPInputDataDescription* volumetricGridChannel, vtkUnstructuredGrid* volumetricGrid);
   void BuildVTKVolumetricGridDataStructures(Grid& grid, Attributes& attributes,
-    vtkUnstructuredGrid* volumetricGrid, vtkCPInputDataDescription* volumetricGridChannel);
+    vtkCPInputDataDescription* volumetricGridChannel, vtkUnstructuredGrid* volumetricGrid);
   void BuildVTKParticlesDataStructures(Particles& particles, vtkPolyData* vtkparticles);
 
   vtkCPProcessor* Processor;

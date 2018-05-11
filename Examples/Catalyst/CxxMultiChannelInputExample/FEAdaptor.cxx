@@ -66,7 +66,7 @@ void FEAdaptor::CoProcess(Grid& grid, Attributes& attributes, Particles& particl
     { // only build the VTK volumetric grid if it's needed this time step
       vtkNew<vtkUnstructuredGrid> volumetricGrid;
       this->BuildVTKVolumetricGridDataStructures(
-        grid, attributes, volumetricGrid, volumetricGridChannel);
+        grid, attributes, volumetricGridChannel, volumetricGrid);
       volumetricGridChannel->SetGrid(volumetricGrid);
     }
     vtkCPInputDataDescription* particlesChannel =
@@ -74,6 +74,7 @@ void FEAdaptor::CoProcess(Grid& grid, Attributes& attributes, Particles& particl
     if (particlesChannel->GetIfGridIsNecessary())
     { // only build the VTK particles if it's needed this time step
       vtkNew<vtkPolyData> vtkparticles;
+      // the particles have no field data
       this->BuildVTKParticlesDataStructures(particles, vtkparticles);
       particlesChannel->SetGrid(vtkparticles);
     }
@@ -105,9 +106,9 @@ void FEAdaptor::BuildVTKVolumetricGrid(Grid& grid, vtkUnstructuredGrid* volumetr
 }
 
 void FEAdaptor::UpdateVTKAttributes(Grid& grid, Attributes& attributes,
-  vtkUnstructuredGrid* volumetricGrid, vtkCPInputDataDescription* volumetricGridChannel)
+  vtkCPInputDataDescription* volumetricGridChannel, vtkUnstructuredGrid* volumetricGrid)
 {
-  if (volumetricGridChannel->IsFieldNeeded("velocity", vtkDataObject::POINT))
+  if (volumetricGridChannel->IsFieldNeeded("velocity", 0))
   {
     if (volumetricGrid->GetPointData()->GetNumberOfArrays() == 0)
     {
@@ -132,7 +133,7 @@ void FEAdaptor::UpdateVTKAttributes(Grid& grid, Attributes& attributes,
       velocity->SetTypedTuple(i, values);
     }
   }
-  if (volumetricGridChannel->IsFieldNeeded("pressure", vtkDataObject::CELL))
+  if (volumetricGridChannel->IsFieldNeeded("pressure", 1))
   {
     if (volumetricGrid->GetCellData()->GetNumberOfArrays() == 0)
     {
@@ -152,10 +153,10 @@ void FEAdaptor::UpdateVTKAttributes(Grid& grid, Attributes& attributes,
 }
 
 void FEAdaptor::BuildVTKVolumetricGridDataStructures(Grid& grid, Attributes& attributes,
-  vtkUnstructuredGrid* volumetricGrid, vtkCPInputDataDescription* volumetricGridChannel)
+  vtkCPInputDataDescription* volumetricGridChannel, vtkUnstructuredGrid* volumetricGrid)
 {
   this->BuildVTKVolumetricGrid(grid, volumetricGrid);
-  this->UpdateVTKAttributes(grid, attributes, volumetricGrid, volumetricGridChannel);
+  this->UpdateVTKAttributes(grid, attributes, volumetricGridChannel, volumetricGrid);
 }
 
 void FEAdaptor::BuildVTKParticlesDataStructures(Particles& particles, vtkPolyData* vtkparticles)

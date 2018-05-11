@@ -49,7 +49,7 @@ vtkCPInputDataDescription::vtkCPInputDataDescription()
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::~vtkCPInputDataDescription()
 {
-  this->SetGrid(0);
+  this->SetGrid(nullptr);
   if (this->Internals)
   {
     delete this->Internals;
@@ -68,7 +68,11 @@ void vtkCPInputDataDescription::Reset()
 //----------------------------------------------------------------------------
 void vtkCPInputDataDescription::AddField(const char* fieldName, int type)
 {
-  this->Internals->Fields[type].push_back(fieldName);
+  if (std::find(this->Internals->Fields[type].begin(), this->Internals->Fields[type].end(),
+        fieldName) == this->Internals->Fields[type].end())
+  {
+    this->Internals->Fields[type].push_back(fieldName);
+  }
 }
 
 #ifndef VTK_LEGACY_REMOVE
@@ -97,6 +101,14 @@ unsigned int vtkCPInputDataDescription::GetNumberOfFields()
   {
     count += static_cast<unsigned int>(iter.second.size());
   }
+  if (count > 2)
+  {
+    count = 0;
+    for (auto iter : this->Internals->Fields)
+    {
+      count += static_cast<unsigned int>(iter.second.size());
+    }
+  }
   return count;
 }
 
@@ -112,10 +124,11 @@ const char* vtkCPInputDataDescription::GetFieldName(unsigned int fieldIndex)
   for (auto iter : this->Internals->Fields)
   {
     size_t size = iter.second.size();
-    if (size + count <= static_cast<size_t>(fieldIndex))
+    if (size + count > static_cast<size_t>(fieldIndex))
     {
-      return iter.second[fieldIndex - size].c_str();
+      return iter.second[fieldIndex - count].c_str();
     }
+    count += size;
   }
   vtkWarningMacro("Bad FieldIndex " << fieldIndex);
   return nullptr;
@@ -133,10 +146,11 @@ int vtkCPInputDataDescription::GetFieldType(unsigned int fieldIndex)
   for (auto iter : this->Internals->Fields)
   {
     size_t size = iter.second.size();
-    if (size + count <= static_cast<size_t>(fieldIndex))
+    if (size + count > static_cast<size_t>(fieldIndex))
     {
       return iter.first;
     }
+    count += size;
   }
   vtkWarningMacro("Bad FieldIndex " << fieldIndex);
   return -1;
@@ -183,6 +197,20 @@ bool vtkCPInputDataDescription::IsFieldPointData(const char* fieldName)
 bool vtkCPInputDataDescription::GetIfGridIsNecessary()
 {
   return (this->AllFields || this->GetNumberOfFields() > 0 || this->GenerateMesh);
+}
+
+//----------------------------------------------------------------------------
+void vtkCPInputDataDescription::ShallowCopy(vtkCPInputDataDescription* idd)
+{
+  if (idd == nullptr || this == idd)
+  {
+    return;
+  }
+  this->AllFields = idd->AllFields;
+  this->GenerateMesh = idd->GenerateMesh;
+  this->SetGrid(idd->Grid);
+  memcpy(this->WholeExtent, idd->WholeExtent, 6 * sizeof(int));
+  this->Internals->Fields = idd->Internals->Fields;
 }
 
 //----------------------------------------------------------------------------

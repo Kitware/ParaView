@@ -32,6 +32,10 @@ forceOutputAtFirstCall=%s
 imageFileNamePadding=%s
 rescale_lookuptable=%s
 
+#--------------------------------------------------------------
+# whether or not to request specific arrays from the adaptor
+requestSpecificArrays=%s
+
 %s
 
 #--------------------------------------------------------------
@@ -50,13 +54,6 @@ coprocessor.EnableLiveVisualization(%s, %s)
 def RequestDataDescription(datadescription):
     "Callback to populate the request for current timestep"
     global coprocessor
-    if datadescription.GetForceOutput() == True:
-        # We are just going to request all fields and meshes from the simulation
-        # code/adaptor.
-        for i in range(datadescription.GetNumberOfInputDescriptions()):
-            datadescription.GetInputDescription(i).AllFieldsOn()
-            datadescription.GetInputDescription(i).GenerateMeshOn()
-        return
 
     # setup requests for all inputs based on the requirements of the
     # pipeline.
@@ -111,13 +108,17 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
     from paraview.servermanager import vtkSMProxyManager
     version_str = vtkSMProxyManager.GetParaViewSourceVersion()
 
+    # TODO: Once we're starting work on the PV export dialog we will need to
+    # fill in timeStepToStartOutputAt, forceOutputAtFirstCall and requestSpecificNames
+    # from the export options
     timeStepToStartOutputAt=0
     forceOutputAtFirstCall=False
+    requestSpecificNames=False
 
     pipeline_script = cpstate.DumpPipeline(\
-        export_rendering, simulation_input_map, screenshot_info, cinema_tracks, array_selection)
+       export_rendering, simulation_input_map, screenshot_info, cinema_tracks, array_selection)
     script = __output_contents % (version_str, timeStepToStartOutputAt, forceOutputAtFirstCall,
-                                  padding_amount, rescale_data_range, pipeline_script,
+                                  padding_amount, rescale_data_range, requestSpecificNames, pipeline_script,
                                   enable_live_viz, live_viz_frequency)
     if filename:
         outFile = open(filename, "w")

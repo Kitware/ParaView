@@ -30,6 +30,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPassArrays.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -201,15 +202,6 @@ int vtkCPProcessor::RequestDataDescription(vtkCPDataDescription* dataDescription
     vtkWarningMacro("DataDescription is NULL.");
     return 0;
   }
-  if (dataDescription->GetForceOutput() == true)
-  {
-    for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
-    {
-      dataDescription->GetInputDescription(i)->GenerateMeshOn();
-      dataDescription->GetInputDescription(i)->AllFieldsOn();
-    }
-    return 1;
-  }
 
   // first set all inputs to be off and set to on as needed.
   // we don't use vtkCPInputDataDescription::Reset() because
@@ -262,21 +254,46 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
   for (vtkCPProcessorInternals::PipelineListIterator iter = this->Internal->Pipelines.begin();
        iter != this->Internal->Pipelines.end(); iter++)
   {
-    if (dataDescription->GetForceOutput() == false)
+    // Reset dataDescription so that we can check each pipeline again
+    // before calling CoProcess to make sure which pipelines should
+    // be executing.
+    for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
     {
-      // Reset dataDescription so that we can check each pipeline again
-      // before calling CoProcess to make sure which pipelines should
-      // be executing.
-      for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
-      {
-        dataDescription->GetInputDescription(i)->GenerateMeshOff();
-        dataDescription->GetInputDescription(i)->AllFieldsOff();
-      }
+      dataDescription->GetInputDescription(i)->Reset();
     }
-    if (dataDescription->GetForceOutput() == true ||
-      iter->GetPointer()->RequestDataDescription(dataDescription))
+    if (iter->GetPointer()->RequestDataDescription(dataDescription))
     {
-      if (!iter->GetPointer()->CoProcess(dataDescription))
+      // now we need to filter out arrays that are not needed by this pipeline
+      // but were requested by other pipelines at this time step
+      vtkSmartPointer<vtkCPDataDescription> dataDescriptionCopy = dataDescription;
+      if (this->Internal->Pipelines.size() > 1)
+      {
+        // if there's only one pipeline we don't have to worry about getting
+        // more arrays than we requesting arrays
+        dataDescriptionCopy = vtkSmartPointer<vtkCPDataDescription>::New();
+        dataDescriptionCopy->Copy(dataDescription);
+        for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
+        {
+          vtkCPInputDataDescription* idd = dataDescriptionCopy->GetInputDescription(i);
+          if (idd->GetIfGridIsNecessary() == true && idd->GetAllFields() == false)
+          {
+            vtkNew<vtkPassArrays> passArrays;
+            passArrays->UseFieldTypesOn();
+            passArrays->AddFieldType(vtkDataObject::FIELD);
+            passArrays->AddFieldType(vtkDataObject::POINT);
+            passArrays->AddFieldType(vtkDataObject::CELL);
+            passArrays->SetInputData(idd->GetGrid());
+            for (unsigned int j = 0; j < idd->GetNumberOfFields(); j++)
+            {
+              int type = idd->GetFieldType(j);
+              passArrays->AddArray(type, idd->GetFieldName(j));
+            }
+            passArrays->Update();
+            idd->SetGrid(passArrays->GetOutput());
+          }
+        }
+      }
+      if (!iter->GetPointer()->CoProcess(dataDescriptionCopy))
       {
         success = 0;
       }

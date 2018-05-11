@@ -96,6 +96,10 @@ public:
   /// adaptor to the coprocessing pipelines.
   vtkGetObjectMacro(UserData, vtkFieldData);
 
+  /// Copy of dataDescription. Does a deep copy of the data members
+  /// but a shallow copy of the vtkDataObjects.
+  void Copy(vtkCPDataDescription*);
+
 protected:
   vtkCPDataDescription();
   virtual ~vtkCPDataDescription();

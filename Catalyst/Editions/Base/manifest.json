@@ -175,6 +175,18 @@
       "cswrap":true,
       "pythonwrap":true
     },
+    { "name":"vtkFiltersGeneral",
+      "path":"VTK/Filters/General",
+      "include":[
+        { "class":"vtkPassArrays" }
+      ],
+      "replace":[
+        { "path":"VTK/Filters/General/module.cmake" },
+        { "path":"VTK/Filters/General/CMakeLists.txt" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
     { "name":"vtkPVCommon",
       "path":"ParaViewCore/Common",
       "exclude":[
