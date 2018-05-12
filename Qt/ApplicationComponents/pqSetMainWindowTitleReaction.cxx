@@ -32,10 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSetMainWindowTitleReaction.h"
 
 #include "pqCoreUtilities.h"
-#ifdef PARAVIEW_USE_QTHELP
-#include "pqHelpReaction.h"
-#endif
-
 #include <QInputDialog>
 
 //-----------------------------------------------------------------------------
@@ -54,7 +50,7 @@ void pqSetMainWindowTitleReaction::showSetMainWindowTitleDialog()
 {
   bool ok = false;
   QWidget* mainWindow = pqCoreUtilities::mainWidget();
-  QString text = QInputDialog::getText(mainWindow, tr("ParaView"), tr("Set Main Window Title:"),
+  QString text = QInputDialog::getText(mainWindow, tr("Rename Window"), tr("New title:"),
     QLineEdit::Normal, mainWindow->windowTitle(), &ok);
   if (ok && !text.isEmpty())
   {
