@@ -490,7 +490,7 @@ int vtkSpyPlotReader::UpdateTimeStep(
   if (outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) &&
     (this->TimeSteps->size() > 0))
   {
-    // Get the requested time step. We only supprt requests of a single time
+    // Get the requested time step. We only support requests of a single time
     // step in this reader right now
     double requestedTimeStep =
       outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
@@ -1473,7 +1473,7 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
     this->GlobalController->PrintSelf(os, indent.GetNextIndent());
   }
 }
-// Get the minimum level that actuall has data and
+// Get the minimum level that actually has data and
 // its grid spacing. If this process has no blocks
 // then we return spacing and min level close to infinity.
 void vtkSpyPlotReader::GetLocalMinLevelAndSpacing(
@@ -1658,7 +1658,7 @@ void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator* biter)
     return;
   }
 
-  // To decide weather or not box size is constant...
+  // To decide whether or not box size is constant...
   // 1) get the smallest box size across procs
   int globalBoxSize[3] = { -1, -1, -1 };
   this->GlobalController->AllReduce(localBoxSize, globalBoxSize, 3, vtkCommunicator::MIN_OP);

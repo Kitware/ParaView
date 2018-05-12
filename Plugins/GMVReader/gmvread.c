@@ -3716,7 +3716,7 @@ void readunits(FILE* gmvin, int ftype)
          ioerrtst(gmvin);
         }
 
-      /*  Allocate two character stings.  */
+      /*  Allocate two character strings.  */
       fldstr = (char *)malloc(numunits*MAXCUSTOMNAMELENGTH*sizeof(char));
       unitstr = (char *)malloc(numunits*MAXCUSTOMNAMELENGTH*sizeof(char));
       if (fldstr == NULL || unitstr == NULL)

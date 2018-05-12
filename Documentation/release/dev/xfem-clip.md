@@ -9,5 +9,5 @@ The MOOSE XFEM implementation uses a phantom node approach
 to represent discontinuities in finite element solutions,
 which results in overlapping finite elements. The MooseXfemClip
 filter clips off the non-physical portions of the overlapping
-elements, allowing correct visualization of the discontinous
+elements, allowing correct visualization of the discontinuous
 fields produced by this method.

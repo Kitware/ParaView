@@ -78,7 +78,7 @@ protected:
   int IdentifyLocalFragments();
   // Copy structure from multi block of polydata.
   int CopyInputStructureStats(vtkMultiBlockDataSet* dest, vtkMultiBlockDataSet* src);
-  // Copy structure from mutli block of multi piece
+  // Copy structure from multi block of multi piece
   int CopyInputStructureGeom(vtkMultiBlockDataSet* dest, vtkMultiBlockDataSet* src);
   //
   int PrepareToProcessRequest();

@@ -85,7 +85,7 @@
  *    tag.
  *
  * \li 2) It is possible for a subproxy to use proxy definition defined elsewhere
- *     by identifying the interface with attribues "proxygroup" and "proxyname".
+ *     by identifying the interface with attributes "proxygroup" and "proxyname".
  *     eg.
  *     \code
  *     <SubProxy>

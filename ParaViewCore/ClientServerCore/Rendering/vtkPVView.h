@@ -208,7 +208,7 @@ public:
    * other nodes. In reality batch processes should not support interaction. Due
    * to a bug in vtkPVAxesWidget, if there's no interactor, the batch mode ends
    * up missing the orientation widget and hence rendering differently than
-   * pvpython. To avoid that, this method curretly returns true on the root
+   * pvpython. To avoid that, this method currently returns true on the root
    * node in batch mode. This will however change in the future once
    * vtkPVAxesWidget has been cleaned up.
    */

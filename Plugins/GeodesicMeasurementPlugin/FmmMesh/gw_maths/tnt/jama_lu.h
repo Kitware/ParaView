@@ -16,7 +16,7 @@ namespace JAMA
    and a permutation vector piv of length m so that A(piv,:) = L*U.
    If m < n, then L is m-by-m and U is m-by-n.
    <P>
-   The LU decompostion with pivoting always exists, even if the matrix is
+   The LU decomposition with pivoting always exists, even if the matrix is
    singular, so the constructor will never fail.  The primary use of the
    LU decomposition is in the solution of square systems of simultaneous
    linear equations.  This will fail if isNonsingular() returns false.

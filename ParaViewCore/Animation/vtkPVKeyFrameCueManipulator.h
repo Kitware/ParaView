@@ -19,7 +19,7 @@
  *
  * This is a Manipulator that support key framing.
  * Key frames are stored in a vector ordered by their keyframe time. Ordering
- * of keyframes with same key time is arbritary. This class ensures that the
+ * of keyframes with same key time is arbitrary. This class ensures that the
  * keyframes are always maintained in the correct order.
  * How the values for the animated property are interpolated between successive
  * keyframes depends on the type of the preceding keyframe. Thus this class

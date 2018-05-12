@@ -569,7 +569,7 @@ void vtkPGenericIOReader::LoadRawData()
     else
     {
 #ifdef DEBUG
-      std::cout << "DISBLED\n";
+      std::cout << "DISABLED\n";
       std::cout.flush();
 #endif
     }

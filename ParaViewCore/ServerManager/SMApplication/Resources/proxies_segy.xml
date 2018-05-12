@@ -7,7 +7,7 @@
         SEG-Y Reader reads SEG-Y data files. We create a Structured
         Grid for 2.5D SEG-Y and 3D data. If we set the StructuredGrid
         option to false we create a Image Data for 3D data. This saves
-        memory and may speed-up certain algorithms, but the postion
+        memory and may speed-up certain algorithms, but the position
         and the shape of the data may not be correct. The axes for the
         data are: crossline, inline, depth.
       </Documentation>

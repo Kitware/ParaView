@@ -11835,7 +11835,7 @@ source.</Documentation>
                          name="PruneOutput"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>When set, the output mutliblock dataset will be pruned
+        <Documentation>When set, the output multiblock dataset will be pruned
         to remove empty nodes. On by default.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetMaintainStructure"

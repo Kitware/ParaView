@@ -292,7 +292,7 @@ protected:
   // fraction array and the iso-value to produce greater-than-isovalue sub-
   // volumes (or polyhedra) by employing an extended 256-entry lookup table.
   // These resulting polyhedra are stored in the output vtkPolyData (plyHedra).
-  // All point data attribues except for non-selected volume fraction arrays
+  // All point data attributes except for non-selected volume fraction arrays
   // are integrated when marching cubes. The integrated attribute arrays are
   // attached to the polyhedra's faces as the cell data.
   void ExtractFragmentPolyhedra(

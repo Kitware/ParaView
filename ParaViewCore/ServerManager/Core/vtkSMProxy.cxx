@@ -1228,7 +1228,7 @@ void vtkSMProxy::MarkModified(vtkSMProxy* modifiedProxy)
    * UpdatePipelineInformation(). The calling on UpdatePropertyInformation()
    * was not really buying us much as far as keeping dependent domains updated
    * was concerned, for unless UpdatePipelineInformation was called on the
-   * reader/filter, updating infor properties was not going to yield any
+   * reader/filter, updating info properties was not going to yield any
    * changed values. Removing this also allows for linking for info properties
    * and properties using property links.
    * A side effect of this may be that the 3DWidgets information properties wont get
@@ -2126,7 +2126,7 @@ void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locat
 
     if (subProxy == NULL)
     {
-      vtkWarningMacro("State provide a sub-proxy information althoug the proxy"
+      vtkWarningMacro("State provide a sub-proxy information although the proxy"
         << "does not find that sub-proxy."
         << " - Proxy: " << this->XMLGroup << " - " << this->XMLName << endl
         << " - Sub-Proxy: " << subProxyMsg->name().c_str() << " " << subProxyMsg->global_id());

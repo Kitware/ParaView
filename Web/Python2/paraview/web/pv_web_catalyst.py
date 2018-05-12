@@ -248,7 +248,7 @@ if __name__ == "__main__":
     server.add_arguments(parser)
     _PVCatalystManager.add_arguments(parser)
 
-    # Exctract arguments
+    # Extract arguments
     args = parser.parse_args()
 
     # Configure our current application

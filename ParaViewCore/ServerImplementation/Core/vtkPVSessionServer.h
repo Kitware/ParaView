@@ -106,7 +106,7 @@ public:
 
   //@{
   /**
-   * Enable or Disable further connections in muliple connection mode.
+   * Enable or Disable further connections in multiple connection mode.
    * By default, further connections are enabled. (this->DisableFurtherConnections = false)
    */
   vtkBooleanMacro(DisableFurtherConnections, bool);

@@ -296,7 +296,7 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
       // Returns the directory path specified in the xml file without the geom file name
       std::string fpath = vtksys::SystemTools::GetFilenamePath(str_field_name);
 
-      // Check if str_field_name is an abolute path or a relative path
+      // Check if str_field_name is an absolute path or a relative path
       if (fpath.empty() || !vtksys::SystemTools::FileIsFullPath(fpath.c_str()))
       {
         // Returns the path of the xml file
@@ -371,7 +371,7 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
   opt_mesh_ignore_periodicity(0, GMSH_SET, 1); // Critical for distrubuted  meshes with periodic
                                                // boundaries. Must be called after GmshInitialize()
   opt_mesh_partition_create_topology(0, GMSH_SET, 0.); // For safety
-  GModel* testGModel = GModel::current();              // Retrive the static GModel object
+  GModel* testGModel = GModel::current();              // Retrieve the static GModel object
   // Gmsh automatically resets the name of the model from CTX::instance()->files[0] (see
   // Common/CommandLine.cpp:1157 in the Gmsh source directory), which is the first model ever read.
   // Therefore, update the name of the model based on mshfiles[1].
@@ -627,7 +627,7 @@ int vtkGmshReader::ReadGeomAndFieldFile(int& firstVertexNo, vtkUnstructuredGrid*
     //   Map: DGInterpolationScheme_level_1 - Number of PViews: 2
     //     PView: Pressure_p_3
     //     PView: Velocity_p_3
-    // Note that the views are sorted by alphabetical order and thier name must be unique (within
+    // Note that the views are sorted by alphabetical order and their name must be unique (within
     // their interpolation scheme)
     int mapSize = schemeAndPviewMapSet.size();
 

@@ -259,7 +259,7 @@ bool vtkSMNewWidgetRepresentationProxy::LinkProperties(
 {
   if (this->Internal->ControlledProxy != NULL)
   {
-    vtkErrorMacro("Cannot `LinkProperties` with muliple proxies.");
+    vtkErrorMacro("Cannot `LinkProperties` with multiple proxies.");
     return false;
   }
 

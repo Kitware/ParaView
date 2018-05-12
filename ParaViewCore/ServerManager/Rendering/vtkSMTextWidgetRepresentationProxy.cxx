@@ -88,7 +88,7 @@ void vtkSMTextWidgetRepresentationProxy::CreateVTKObjects()
   tapp->AddProxy(this->TextActorProxy);
 
   // Mark TextActor properties modified so the default value will be pushed at
-  // the UpdateVTKObject call. This prevent them from behing overridden by some
+  // the UpdateVTKObject call. This prevents them from being overridden by some
   // vtk initialization code when the TextActor get linked to the representation
   this->TextActorProxy->MarkAllPropertiesAsModified();
 }

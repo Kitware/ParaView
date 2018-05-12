@@ -757,7 +757,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(int blockId, vtkImageData* imag
 {
   if (this->VolumeFractionArray)
   {
-    vtkGenericWarningMacro("Block alread initialized !!!");
+    vtkGenericWarningMacro("Block already initialized !!!");
     return;
   }
   if (image == 0)
@@ -974,7 +974,7 @@ void vtkMaterialInterfaceFilterBlock::InitializeGhostLayer(unsigned char* volFra
 {
   if (this->VolumeFractionArray)
   {
-    vtkGenericWarningMacro("Block alread initialized !!!");
+    vtkGenericWarningMacro("Block already initialized !!!");
     return;
   }
 

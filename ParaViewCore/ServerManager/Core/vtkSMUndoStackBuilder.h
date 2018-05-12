@@ -95,9 +95,9 @@ public:
   virtual void Clear();
 
   /**
-   * One can add arbritary elements to the active undo set.
+   * One can add arbitrary elements to the active undo set.
    * It is essential that the StateLoader on the UndoStack can handle the
-   * arbritary undo elements.
+   * arbitrary undo elements.
    * If that element has been escaped for any reason, the method will return false;
    */
   virtual bool Add(vtkUndoElement* element);

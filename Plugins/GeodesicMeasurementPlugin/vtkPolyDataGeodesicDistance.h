@@ -39,7 +39,7 @@ class VTK_EXPORT vtkPolyDataGeodesicDistance : public vtkPolyDataAlgorithm
 {
 public:
   // Description:
-  // Standard methids for printing and determining type information.
+  // Standard methods for printing and determining type information.
   vtkTypeMacro(vtkPolyDataGeodesicDistance, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 

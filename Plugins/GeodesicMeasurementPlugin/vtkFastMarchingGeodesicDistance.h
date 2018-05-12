@@ -85,7 +85,7 @@ public:
   static vtkFastMarchingGeodesicDistance* New();
 
   // Description:
-  // Standard methids for printing and determining type information.
+  // Standard methods for printing and determining type information.
   vtkTypeMacro(vtkFastMarchingGeodesicDistance, vtkPolyDataGeodesicDistance);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 

@@ -49,7 +49,7 @@
           </PropertyWidgetDecorator>
         </Hints>
         <Documentation>
-          When interpretting values as categories, enabling this
+          When interpreting values as categories, enabling this
           option results in the display of only the 'active'
           categorical colors for values in the data range, i.e.,
           values that exist in the source. You may need to click the

@@ -2051,7 +2051,7 @@ void GenericIO::readData(
         crc64_omp(Data, ReadSize);
 #else // Commenting because NewCRC cannot == -1 (uint64) and this is debugging code.
 //        uint64_t NewCRC = crc64_omp(Data, ReadSize);
-//        std::cerr << "Recalulated CRC: " << NewCRC << ((NewCRC == -1) ? "ok" : "bad") << "\n";
+//        std::cerr << "Recalculated CRC: " << NewCRC << ((NewCRC == -1) ? "ok" : "bad") << "\n";
 #endif
         break;
       }

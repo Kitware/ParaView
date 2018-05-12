@@ -1282,7 +1282,7 @@ vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(in
   // since in vtk points array stores XYZ contiguously
   // and they are stored separately in cgns file
   // the memory layout is set so that one cgns file array
-  // will be filling every 3 chuncks in memory
+  // will be filling every 3 chunks in memory
   memEnd[0] *= 3;
 
   // Set up points

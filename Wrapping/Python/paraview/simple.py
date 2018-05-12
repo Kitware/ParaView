@@ -13,7 +13,7 @@ A simple example::
   # Apply a shrink filter
   shrink = Shrink(sphere)
 
-  # Turn the visiblity of the shrink object on.
+  # Turn the visibility of the shrink object on.
   Show(shrink)
 
   # Render the scene
@@ -1219,7 +1219,7 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
           (smallest file size) and `2` is best quality (largest file size).
 
         UseSubsampling:
-          When set to 1 (or True), the video will be encoded uisng 4:2:0
+          When set to 1 (or True), the video will be encoded using 4:2:0
           subsampling for the color channels.
 
     **Obsolete Parameters**

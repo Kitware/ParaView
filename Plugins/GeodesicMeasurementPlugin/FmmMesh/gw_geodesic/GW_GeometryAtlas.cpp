@@ -65,7 +65,7 @@ GW_GeometryAtlas::~GW_GeometryAtlas()
 /*------------------------------------------------------------------------------*/
 void GW_GeometryAtlas::InitSampling( std::vector<T_TrissectorInfoVector>& CyclicPositionCollection, GW_U32 n )
 {
-    /* delete preivous data */
+    /* delete previous data */
     for( IT_GeometryCellVector it = CellVector_.begin(); it!=CellVector_.end(); ++it )
         GW_DELETE(*it);
     CellVector_.clear();

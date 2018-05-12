@@ -34,7 +34,7 @@ public:
   static vtkGeodesicsBetweenPoints* New();
 
   // Description:
-  // Standard methids for printing and determining type information.
+  // Standard methods for printing and determining type information.
   vtkTypeMacro(vtkGeodesicsBetweenPoints, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 

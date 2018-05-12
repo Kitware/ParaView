@@ -352,7 +352,7 @@ void vtkPhastaReader::readheader(int* fileDescriptor, const char keyphrase[], vo
   {
     fprintf(stderr, "No file associated with Descriptor %d\n", *fileDescriptor);
     fprintf(stderr, "openfile function has to be called before \n");
-    fprintf(stderr, "acessing the file\n ");
+    fprintf(stderr, "accessing the file\n ");
     fprintf(stderr, "fatal error: cannot continue, returning out of call\n");
     return;
   }
@@ -393,7 +393,7 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
   {
     fprintf(stderr, "No file associated with Descriptor %d\n", *fileDescriptor);
     fprintf(stderr, "openfile function has to be called before \n");
-    fprintf(stderr, "acessing the file\n ");
+    fprintf(stderr, "accessing the file\n ");
     fprintf(stderr, "fatal error: cannot continue, returning out of call\n");
     return;
   }

@@ -269,7 +269,7 @@ public:
    * during memory intensive portions of the algorithm.
    * acceptable values are [1 INF), however the default
    * is 1,000,000 polys. Increasing increases parallelism
-   * while decresing reduces parallelism. Setting too low
+   * while decreasing reduces parallelism. Setting too low
    * can cause problems. For instance if it's set so low
    * that all processes are excluded.
    */
@@ -346,7 +346,7 @@ protected:
     std::vector<std::string>& volumeWtdAvgArrayNames,
     std::vector<std::string>& massWtdAvgArrayNames, std::vector<std::string>& summedArrayNames,
     std::vector<std::string>& integratedArrayNames);
-  // Craete a new fragment/piece.
+  // Create a new fragment/piece.
   vtkPolyData* NewFragmentMesh();
   // Process each cell, looking for fragments.
   int ProcessBlock(int blockId);

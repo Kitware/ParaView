@@ -41,7 +41,7 @@ public:
   vtkTypeMacro(vtkPVProxyDefinitionIterator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
-  // ********* Iterator Commom methods **********
+  // ********* Iterator Common methods **********
 
   /**
    * Move the iterator to the beginning.
