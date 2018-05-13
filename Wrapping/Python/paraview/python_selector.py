@@ -82,11 +82,6 @@ def execute(inputDO, selectionNode, elementInside):
             "expression. Verify that the expression is valid." % \
             (query, type(maskArray)))
 
-    # If inverse selection is requested, just logical_not the mask array.
-    if selectionNode.GetProperties().Has(selectionNode.INVERSE()) and \
-        selectionNode.GetProperties().Get(selectionNode.INVERSE()) == 1:
-          maskArray = algos.logical_not(maskArray)
-
     # Preserve topology. Just add the mask array as vtkSignedCharArray to the
     # output.
     # Note: we must force the data type to VTK_SIGNED_CHAR or the array will
