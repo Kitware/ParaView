@@ -21,10 +21,9 @@
 #define vtkPythonSelector_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-
-#include "vtkSelectionNode.h"
 #include "vtkSelectionOperator.h"
-#include "vtkWeakPointer.h"
+
+#include "vtkWeakPointer.h" // for vtkWeakPointer
 
 class vtkSelectionNode;
 
