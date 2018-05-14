@@ -341,8 +341,6 @@ endif()
 # setup external data. this will automatically download the test
 # data and baseline files to the build tree and set PARAVIEW_DATA_ROOT.
 include(ParaViewExternalData)
-set(ExternalData_LINK_CONTENT MD5)
-set(ExternalData_BINARY_ROOT          "${CMAKE_BINARY_DIR}/ExternalData")
 set(PARAVIEW_TEST_DATA_DIR            "${CMAKE_CURRENT_SOURCE_DIR}/Testing/Data")
 set(PARAVIEW_TEST_BASELINE_DIR        "${PARAVIEW_TEST_DATA_DIR}/Baseline")
 set(PARAVIEW_TEST_OUTPUT_DATA_DIR     "${ExternalData_BINARY_ROOT}/Testing/Data")
