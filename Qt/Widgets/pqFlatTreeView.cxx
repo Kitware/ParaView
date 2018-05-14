@@ -3711,11 +3711,11 @@ void pqFlatTreeView::drawData(QPainter& painter, int px, int py, const QModelInd
       // Adjust the vertical alignment according to the style.
       if (options.displayAlignment & Qt::AlignVCenter)
       {
-        py += (itemHeight - pixmap.height()) / 2;
+        py += (itemHeight - this->IndentWidth) / 2;
       }
       else if (options.displayAlignment & Qt::AlignBottom)
       {
-        py += itemHeight - pixmap.height();
+        py += itemHeight - this->IndentWidth;
       }
 
       painter.drawPixmap(px, py, pixmap);
