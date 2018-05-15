@@ -4,13 +4,15 @@
 #include <vtkDataSet.h>
 #include <vtkSmartPointer.h>
 
+class vtkCPInputDataDescription;
+
 class Grid
 {
 public:
   Grid(const unsigned int numberOfPoints[3], const bool outputImageData,
     const int numberOfGhostLevels);
 
-  void UpdateField(double time);
+  void UpdateField(double time, vtkCPInputDataDescription* inputDataDescription);
   vtkDataSet* GetVTKGrid();
 
 private:

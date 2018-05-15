@@ -4,6 +4,7 @@
 class Attributes;
 class Grid;
 class Particles;
+class vtkCPInputDataDescription;
 class vtkCPProcessor;
 class vtkPolyData;
 class vtkUnstructuredGrid;
@@ -21,9 +22,10 @@ public:
 
 private:
   void BuildVTKVolumetricGrid(Grid& grid, vtkUnstructuredGrid* volumetricGrid);
-  void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkUnstructuredGrid* volumetricGrid);
-  void BuildVTKVolumetricGridDataStructures(
-    Grid& grid, Attributes& attributes, vtkUnstructuredGrid* volumetricGrid);
+  void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkUnstructuredGrid* volumetricGrid,
+    vtkCPInputDataDescription* volumetricGridChannel);
+  void BuildVTKVolumetricGridDataStructures(Grid& grid, Attributes& attributes,
+    vtkUnstructuredGrid* volumetricGrid, vtkCPInputDataDescription* volumetricGridChannel);
   void BuildVTKParticlesDataStructures(Particles& particles, vtkPolyData* vtkparticles);
 
   vtkCPProcessor* Processor;

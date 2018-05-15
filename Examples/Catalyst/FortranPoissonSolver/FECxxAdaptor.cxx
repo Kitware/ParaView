@@ -56,7 +56,7 @@ extern "C" void addfield_(double* scalars, char* name)
   }
 
   // field name must match that in the fortran code.
-  if (idd->IsFieldNeeded(name))
+  if (idd->IsFieldNeeded(name, vtkDataObject::POINT))
   {
     vtkSmartPointer<vtkDoubleArray> field = vtkSmartPointer<vtkDoubleArray>::New();
     field->SetName(name);

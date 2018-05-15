@@ -47,39 +47,44 @@ void BuildVTKGrid(Grid& grid)
   }
 }
 
-void UpdateVTKAttributes(Grid& grid, Attributes& attributes)
+void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkCPInputDataDescription* idd)
 {
-  if (VTKGrid->GetPointData()->GetNumberOfArrays() == 0)
+  if (idd->IsFieldNeeded("velocity", vtkDataObject::POINT))
   {
-    // velocity array
+    if (VTKGrid->GetPointData()->GetNumberOfArrays() == 0)
+    {
+      // velocity array
+      vtkCPMappedVectorArrayTemplate<double>* velocity =
+        vtkCPMappedVectorArrayTemplate<double>::New();
+      velocity->SetName("velocity");
+      VTKGrid->GetPointData()->AddArray(velocity);
+      velocity->Delete();
+    }
     vtkCPMappedVectorArrayTemplate<double>* velocity =
-      vtkCPMappedVectorArrayTemplate<double>::New();
-    velocity->SetName("velocity");
-    VTKGrid->GetPointData()->AddArray(velocity);
-    velocity->Delete();
+      vtkCPMappedVectorArrayTemplate<double>::SafeDownCast(
+        VTKGrid->GetPointData()->GetArray("velocity"));
+    velocity->SetVectorArray(attributes.GetVelocityArray(), VTKGrid->GetNumberOfPoints());
   }
-  vtkCPMappedVectorArrayTemplate<double>* velocity =
-    vtkCPMappedVectorArrayTemplate<double>::SafeDownCast(
-      VTKGrid->GetPointData()->GetArray("velocity"));
-  velocity->SetVectorArray(attributes.GetVelocityArray(), VTKGrid->GetNumberOfPoints());
-
-  if (VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
+  if (idd->IsFieldNeeded("pressure", vtkDataObject::CELL))
   {
-    // pressure array
-    vtkNew<vtkFloatArray> pressure;
-    pressure->SetName("pressure");
-    pressure->SetNumberOfComponents(1);
-    VTKGrid->GetCellData()->AddArray(pressure.GetPointer());
+    if (VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
+    {
+      // pressure array
+      vtkNew<vtkFloatArray> pressure;
+      pressure->SetName("pressure");
+      pressure->SetNumberOfComponents(1);
+      VTKGrid->GetCellData()->AddArray(pressure.GetPointer());
+    }
+    vtkFloatArray* pressure =
+      vtkFloatArray::SafeDownCast(VTKGrid->GetCellData()->GetArray("pressure"));
+    // The pressure array is a scalar array so we can reuse
+    // memory as long as we ordered the points properly.
+    float* pressureData = attributes.GetPressureArray();
+    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfCells()), 1);
   }
-  vtkFloatArray* pressure =
-    vtkFloatArray::SafeDownCast(VTKGrid->GetCellData()->GetArray("pressure"));
-  // The pressure array is a scalar array so we can reuse
-  // memory as long as we ordered the points properly.
-  float* pressureData = attributes.GetPressureArray();
-  pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfCells()), 1);
 }
 
-void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
+void BuildVTKDataStructures(Grid& grid, Attributes& attributes, vtkCPInputDataDescription* idd)
 {
   if (VTKGrid == NULL)
   {
@@ -89,7 +94,7 @@ void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
     VTKGrid = vtkUnstructuredGrid::New();
     BuildVTKGrid(grid);
   }
-  UpdateVTKAttributes(grid, attributes);
+  UpdateVTKAttributes(grid, attributes, idd);
 }
 }
 
@@ -143,8 +148,9 @@ void CoProcess(
   }
   if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
   {
-    BuildVTKDataStructures(grid, attributes);
-    dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
+    vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("input");
+    BuildVTKDataStructures(grid, attributes, idd);
+    idd->SetGrid(VTKGrid);
     Processor->CoProcess(dataDescription.GetPointer());
   }
 }

@@ -141,8 +141,12 @@ void Finalize()
   }
 }
 
-void BuildFields(vtkOverlappingAMR* grid)
+void BuildFields(vtkOverlappingAMR* grid, vtkCPInputDataDescription* idd)
 {
+  if (idd->IsFieldNeeded("data", vtkDataObject::POINT) == false)
+  {
+    return;
+  }
   vtkCompositeDataIterator* iter = grid->NewIterator();
   iter->InitTraversal();
   iter->SkipEmptyNodesOn();
@@ -182,8 +186,9 @@ void CoProcess(double time, unsigned int timeStep, bool lastTimeStep)
   {
     vtkNew<vtkOverlappingAMR> grid;
     BuildVTKGrid(grid.GetPointer());
-    BuildFields(grid.GetPointer());
-    dataDescription->GetInputDescriptionByName("input")->SetGrid(grid.GetPointer());
+    vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("input");
+    BuildFields(grid.GetPointer(), idd);
+    idd->SetGrid(grid.GetPointer());
     Processor->CoProcess(dataDescription.GetPointer());
   }
 }
