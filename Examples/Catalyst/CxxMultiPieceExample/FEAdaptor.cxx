@@ -49,52 +49,58 @@ void BuildVTKGrid(Grid& grid)
   VTKGrid->SetBlock(0, multiPiece.GetPointer());
 }
 
-void UpdateVTKAttributes(Grid& grid, Attributes& attributes)
+void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkCPInputDataDescription* idd)
 {
   int mpiRank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
   vtkMultiPieceDataSet* multiPiece = vtkMultiPieceDataSet::SafeDownCast(VTKGrid->GetBlock(0));
-  vtkDataSet* dataSet = vtkDataSet::SafeDownCast(multiPiece->GetPiece(mpiRank));
-  if (dataSet->GetPointData()->GetNumberOfArrays() == 0)
+  if (idd->IsFieldNeeded("velocity", vtkDataObject::POINT))
   {
-    // velocity array
-    vtkNew<vtkDoubleArray> velocity;
-    velocity->SetName("velocity");
-    velocity->SetNumberOfComponents(3);
-    velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfLocalPoints()));
-    dataSet->GetPointData()->AddArray(velocity.GetPointer());
+    vtkDataSet* dataSet = vtkDataSet::SafeDownCast(multiPiece->GetPiece(mpiRank));
+    if (dataSet->GetPointData()->GetNumberOfArrays() == 0)
+    {
+      // velocity array
+      vtkNew<vtkDoubleArray> velocity;
+      velocity->SetName("velocity");
+      velocity->SetNumberOfComponents(3);
+      velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfLocalPoints()));
+      dataSet->GetPointData()->AddArray(velocity.GetPointer());
+    }
+    vtkDoubleArray* velocity =
+      vtkDoubleArray::SafeDownCast(dataSet->GetPointData()->GetArray("velocity"));
+    // The velocity array is ordered as vx0,vx1,vx2,..,vy0,vy1,vy2,..,vz0,vz1,vz2,..
+    // so we need to create a full copy of it with VTK's ordering of
+    // vx0,vy0,vz0,vx1,vy1,vz1,..
+    double* velocityData = attributes.GetVelocityArray();
+    vtkIdType numTuples = velocity->GetNumberOfTuples();
+    for (vtkIdType i = 0; i < numTuples; i++)
+    {
+      double values[3] = { velocityData[i], velocityData[i + numTuples],
+        velocityData[i + 2 * numTuples] };
+      velocity->SetTypedTuple(i, values);
+    }
   }
-  if (dataSet->GetCellData()->GetNumberOfArrays() == 0)
+  if (idd->IsFieldNeeded("pressure", vtkDataObject::CELL))
   {
-    // pressure array
-    vtkNew<vtkFloatArray> pressure;
-    pressure->SetName("pressure");
-    pressure->SetNumberOfComponents(1);
-    dataSet->GetCellData()->AddArray(pressure.GetPointer());
+    vtkDataSet* dataSet = vtkDataSet::SafeDownCast(multiPiece->GetPiece(mpiRank));
+    if (dataSet->GetCellData()->GetNumberOfArrays() == 0)
+    {
+      // pressure array
+      vtkNew<vtkFloatArray> pressure;
+      pressure->SetName("pressure");
+      pressure->SetNumberOfComponents(1);
+      dataSet->GetCellData()->AddArray(pressure.GetPointer());
+    }
+    vtkFloatArray* pressure =
+      vtkFloatArray::SafeDownCast(dataSet->GetCellData()->GetArray("pressure"));
+    // The pressure array is a scalar array so we can reuse
+    // memory as long as we ordered the points properly.
+    float* pressureData = attributes.GetPressureArray();
+    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfLocalCells()), 1);
   }
-  vtkDoubleArray* velocity =
-    vtkDoubleArray::SafeDownCast(dataSet->GetPointData()->GetArray("velocity"));
-  // The velocity array is ordered as vx0,vx1,vx2,..,vy0,vy1,vy2,..,vz0,vz1,vz2,..
-  // so we need to create a full copy of it with VTK's ordering of
-  // vx0,vy0,vz0,vx1,vy1,vz1,..
-  double* velocityData = attributes.GetVelocityArray();
-  vtkIdType numTuples = velocity->GetNumberOfTuples();
-  for (vtkIdType i = 0; i < numTuples; i++)
-  {
-    double values[3] = { velocityData[i], velocityData[i + numTuples],
-      velocityData[i + 2 * numTuples] };
-    velocity->SetTypedTuple(i, values);
-  }
-
-  vtkFloatArray* pressure =
-    vtkFloatArray::SafeDownCast(dataSet->GetCellData()->GetArray("pressure"));
-  // The pressure array is a scalar array so we can reuse
-  // memory as long as we ordered the points properly.
-  float* pressureData = attributes.GetPressureArray();
-  pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfLocalCells()), 1);
 }
 
-void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
+void BuildVTKDataStructures(Grid& grid, Attributes& attributes, vtkCPInputDataDescription* idd)
 {
   if (VTKGrid == NULL)
   {
@@ -104,7 +110,7 @@ void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
     VTKGrid = vtkMultiBlockDataSet::New();
     BuildVTKGrid(grid);
   }
-  UpdateVTKAttributes(grid, attributes);
+  UpdateVTKAttributes(grid, attributes, idd);
 }
 }
 
@@ -158,8 +164,9 @@ void CoProcess(
   }
   if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
   {
-    BuildVTKDataStructures(grid, attributes);
-    dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
+    vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("input");
+    BuildVTKDataStructures(grid, attributes, idd);
+    idd->SetGrid(VTKGrid);
 
     Processor->CoProcess(dataDescription.GetPointer());
   }

@@ -4,6 +4,7 @@
 #include <mpi.h>
 #include <stdlib.h>
 
+#include <vtkCPInputDataDescription.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
 #include <vtkDoubleArray.h>
@@ -139,24 +140,27 @@ void Grid::CreateUnstructuredGrid(int extent[6])
   this->VTKGrid = unstructuredGrid;
 }
 
-void Grid::UpdateField(double time)
+void Grid::UpdateField(double time, vtkCPInputDataDescription* inputDataDescription)
 {
-  vtkDoubleArray* scalar =
-    vtkDoubleArray::FastDownCast(this->VTKGrid->GetPointData()->GetArray("Scalar"));
-  if (scalar == nullptr)
+  if (inputDataDescription->IsFieldNeeded("Scalar", vtkDataObject::POINT))
   {
-    scalar = vtkDoubleArray::New();
-    scalar->SetNumberOfTuples(this->VTKGrid->GetNumberOfPoints());
-    scalar->SetName("Scalar");
-    this->VTKGrid->GetPointData()->AddArray(scalar);
-    scalar->Delete(); // ok since VTKGrid is keeping a reference to this array
-  }
-  vtkIdType numPoints = this->VTKGrid->GetNumberOfPoints();
-  for (vtkIdType pt = 0; pt < numPoints; pt++)
-  {
-    double coord[3];
-    this->VTKGrid->GetPoint(pt, coord);
-    double value = coord[1] * time;
-    scalar->SetTypedTuple(pt, &value);
+    vtkDoubleArray* scalar =
+      vtkDoubleArray::FastDownCast(this->VTKGrid->GetPointData()->GetArray("Scalar"));
+    if (scalar == nullptr)
+    {
+      scalar = vtkDoubleArray::New();
+      scalar->SetNumberOfTuples(this->VTKGrid->GetNumberOfPoints());
+      scalar->SetName("Scalar");
+      this->VTKGrid->GetPointData()->AddArray(scalar);
+      scalar->Delete(); // ok since VTKGrid is keeping a reference to this array
+    }
+    vtkIdType numPoints = this->VTKGrid->GetNumberOfPoints();
+    for (vtkIdType pt = 0; pt < numPoints; pt++)
+    {
+      double coord[3];
+      this->VTKGrid->GetPoint(pt, coord);
+      double value = coord[1] * time;
+      scalar->SetTypedTuple(pt, &value);
+    }
   }
 }

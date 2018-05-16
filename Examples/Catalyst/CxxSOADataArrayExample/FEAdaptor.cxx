@@ -51,43 +51,48 @@ void BuildVTKGrid(Grid& grid)
   }
 }
 
-void UpdateVTKAttributes(Grid& grid, Attributes& attributes)
+void UpdateVTKAttributes(Grid& grid, Attributes& attributes, vtkCPInputDataDescription* idd)
 {
-  if (VTKGrid->GetPointData()->GetNumberOfArrays() == 0)
+  if (idd->IsFieldNeeded("velocity", vtkDataObject::POINT))
   {
-    // velocity array
-    vtkSOADataArrayTemplate<double>* velocity = vtkSOADataArrayTemplate<double>::New();
-    velocity->SetNumberOfComponents(3);
-    velocity->SetNumberOfTuples(grid.GetNumberOfPoints());
-    velocity->SetName("velocity");
-    VTKGrid->GetPointData()->AddArray(velocity);
-    velocity->Delete();
+    if (VTKGrid->GetPointData()->GetNumberOfArrays() == 0)
+    {
+      // velocity array
+      vtkSOADataArrayTemplate<double>* velocity = vtkSOADataArrayTemplate<double>::New();
+      velocity->SetNumberOfComponents(3);
+      velocity->SetNumberOfTuples(grid.GetNumberOfPoints());
+      velocity->SetName("velocity");
+      VTKGrid->GetPointData()->AddArray(velocity);
+      velocity->Delete();
+    }
+    vtkSOADataArrayTemplate<double>* velocity =
+      vtkSOADataArrayTemplate<double>::SafeDownCast(VTKGrid->GetPointData()->GetArray("velocity"));
+    velocity->SetArray(0, attributes.GetVelocityArray(), grid.GetNumberOfPoints(), false, true);
+    velocity->SetArray(1, attributes.GetVelocityArray() + grid.GetNumberOfPoints(),
+      grid.GetNumberOfPoints(), false, true);
+    velocity->SetArray(2, attributes.GetVelocityArray() + 2 * grid.GetNumberOfPoints(),
+      grid.GetNumberOfPoints(), false, true);
   }
-  vtkSOADataArrayTemplate<double>* velocity =
-    vtkSOADataArrayTemplate<double>::SafeDownCast(VTKGrid->GetPointData()->GetArray("velocity"));
-  velocity->SetArray(0, attributes.GetVelocityArray(), grid.GetNumberOfPoints(), false, true);
-  velocity->SetArray(1, attributes.GetVelocityArray() + grid.GetNumberOfPoints(),
-    grid.GetNumberOfPoints(), false, true);
-  velocity->SetArray(2, attributes.GetVelocityArray() + 2 * grid.GetNumberOfPoints(),
-    grid.GetNumberOfPoints(), false, true);
-
-  if (VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
+  if (idd->IsFieldNeeded("pressure", vtkDataObject::CELL))
   {
-    // pressure array
-    vtkNew<vtkFloatArray> pressure;
-    pressure->SetName("pressure");
-    pressure->SetNumberOfComponents(1);
-    VTKGrid->GetCellData()->AddArray(pressure.GetPointer());
+    if (VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
+    {
+      // pressure array
+      vtkNew<vtkFloatArray> pressure;
+      pressure->SetName("pressure");
+      pressure->SetNumberOfComponents(1);
+      VTKGrid->GetCellData()->AddArray(pressure.GetPointer());
+    }
+    vtkFloatArray* pressure =
+      vtkFloatArray::SafeDownCast(VTKGrid->GetCellData()->GetArray("pressure"));
+    // The pressure array is a scalar array so we can reuse
+    // memory as long as we ordered the points properly.
+    float* pressureData = attributes.GetPressureArray();
+    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfCells()), 1);
   }
-  vtkFloatArray* pressure =
-    vtkFloatArray::SafeDownCast(VTKGrid->GetCellData()->GetArray("pressure"));
-  // The pressure array is a scalar array so we can reuse
-  // memory as long as we ordered the points properly.
-  float* pressureData = attributes.GetPressureArray();
-  pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfCells()), 1);
 }
 
-void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
+void BuildVTKDataStructures(Grid& grid, Attributes& attributes, vtkCPInputDataDescription* idd)
 {
   if (VTKGrid == NULL)
   {
@@ -97,7 +102,7 @@ void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
     VTKGrid = vtkUnstructuredGrid::New();
     BuildVTKGrid(grid);
   }
-  UpdateVTKAttributes(grid, attributes);
+  UpdateVTKAttributes(grid, attributes, idd);
 }
 }
 
@@ -151,8 +156,9 @@ void CoProcess(
   }
   if (Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
   {
-    BuildVTKDataStructures(grid, attributes);
-    dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
+    vtkCPInputDataDescription* idd = dataDescription->GetInputDescriptionByName("input");
+    BuildVTKDataStructures(grid, attributes, idd);
+    idd->SetGrid(VTKGrid);
     Processor->CoProcess(dataDescription.GetPointer());
   }
 }

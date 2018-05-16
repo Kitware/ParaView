@@ -113,9 +113,9 @@ int main(int argc, char* argv[])
     dataDescription->SetForceOutput(timeStep == numberOfTimeSteps - 1);
     if (processor->RequestDataDescription(dataDescription))
     {
-      grid.UpdateField(time);
       vtkCPInputDataDescription* inputDataDescription =
         dataDescription->GetInputDescriptionByName("input");
+      grid.UpdateField(time, inputDataDescription);
       inputDataDescription->SetGrid(grid.GetVTKGrid());
       if (!generateUnstructuredGrid)
       {

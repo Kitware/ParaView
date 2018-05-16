@@ -46,21 +46,21 @@ extern "C" void addfield_(double* scalars, char* name)
   vtkCPInputDataDescription* idd =
     vtkCPPythonAdaptorAPI::GetCoProcessorData()->GetInputDescriptionByName("input");
 
-  vtkImageData* Image = vtkImageData::SafeDownCast(idd->GetGrid());
+  vtkImageData* image = vtkImageData::SafeDownCast(idd->GetGrid());
 
-  if (!Image)
+  if (!image)
   {
     vtkGenericWarningMacro("No adaptor grid to attach field data to.");
     return;
   }
 
   // field name must match that in the fortran code.
-  if (idd->IsFieldNeeded(name))
+  if (idd->IsFieldNeeded(name, vtkDataObject::POINT))
   {
     vtkSmartPointer<vtkDoubleArray> field = vtkSmartPointer<vtkDoubleArray>::New();
     field->SetNumberOfComponents(2);
     field->SetName(name);
-    field->SetArray(scalars, 2 * Image->GetNumberOfPoints(), 1);
-    Image->GetPointData()->AddArray(field);
+    field->SetArray(scalars, 2 * image->GetNumberOfPoints(), 1);
+    image->GetPointData()->AddArray(field);
   }
 }
