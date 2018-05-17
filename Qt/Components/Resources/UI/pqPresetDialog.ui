@@ -34,7 +34,7 @@
     <widget class="QTableView" name="gradients">
      <property name="minimumSize">
       <size>
-       <width>300</width>
+       <width>800</width>
        <height>0</height>
       </size>
      </property>

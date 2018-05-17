@@ -232,16 +232,96 @@ private:
   Q_DISABLE_COPY(pqPresetDialogProxyModel)
 };
 
+class pqPresetDialogReflowModel : public QAbstractProxyModel
+{
+  typedef QAbstractProxyModel Superclass;
+  int NumColumns;
+
+public:
+  pqPresetDialogReflowModel(int cols, QObject* parentObject = nullptr)
+    : Superclass(parentObject)
+    , NumColumns(cols)
+  {
+  }
+  ~pqPresetDialogReflowModel() override {}
+
+  QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override
+  {
+    return this->index(sourceIndex.row() / this->NumColumns, sourceIndex.row() % this->NumColumns);
+  }
+
+  QModelIndex mapToSource(const QModelIndex& proxyIndex) const override
+  {
+    auto resultRow = proxyIndex.row() * this->NumColumns + proxyIndex.column();
+    if (resultRow < sourceModel()->rowCount())
+    {
+      return sourceModel()->index(resultRow, 0);
+    }
+    // We add dummy items to make sure there are numColumns items in the last row even
+    // if the source's number of rows isn't a multiple of the number of columns.
+    return QModelIndex();
+  }
+
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override
+  {
+    auto parentRowCount = sourceModel()->rowCount(parent);
+    return parentRowCount / this->NumColumns + (parentRowCount % this->NumColumns == 0 ? 0 : 1);
+  }
+
+  int columnCount(const QModelIndex& parent = QModelIndex()) const override
+  {
+    return this->NumColumns;
+  }
+
+  QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const override
+  {
+    auto resultRow = proxyIndex.row() * this->NumColumns + proxyIndex.column();
+    if (resultRow < sourceModel()->rowCount())
+    {
+      return Superclass::data(proxyIndex, role);
+    }
+    else
+    {
+      return QVariant();
+    }
+  }
+
+  Qt::ItemFlags flags(const QModelIndex& proxyIndex) const override
+  {
+    auto resultRow = proxyIndex.row() * this->NumColumns + proxyIndex.column();
+    if (resultRow < sourceModel()->rowCount())
+    {
+      return Superclass::flags(proxyIndex);
+    }
+    else
+    {
+      return Superclass::flags(proxyIndex) & ~Qt::ItemIsSelectable;
+    }
+  }
+
+  QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const
+  {
+    return createIndex(row, column);
+  }
+
+  QModelIndex parent(const QModelIndex& child) const { return QModelIndex(); }
+
+private:
+  Q_DISABLE_COPY(pqPresetDialogReflowModel);
+};
+
 class pqPresetDialog::pqInternals
 {
 public:
   Ui::pqPresetDialog Ui;
   QPointer<pqPresetDialogTableModel> Model;
   QPointer<QSortFilterProxyModel> ProxyModel;
+  QPointer<pqPresetDialogReflowModel> ReflowModel;
 
   pqInternals(pqPresetDialog::Modes mode, pqPresetDialog* self)
     : Model(new pqPresetDialogTableModel(self))
     , ProxyModel(new pqPresetDialogProxyModel(mode, self))
+    , ReflowModel(new pqPresetDialogReflowModel(2, self))
   {
     this->Ui.setupUi(self);
     this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
@@ -253,7 +333,11 @@ public:
     this->ProxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     this->ProxyModel->connect(this->Ui.searchBox, SIGNAL(textChanged(const QString&)),
       SLOT(setFilterWildcard(const QString&)));
-    this->Ui.gradients->setModel(this->ProxyModel);
+    this->ReflowModel->setSourceModel(this->ProxyModel);
+    this->Ui.gradients->setModel(this->ReflowModel);
+    this->Ui.gradients->setSelectionBehavior(QAbstractItemView::SelectItems);
+    // This makes the two columns share the width of the table as the dialog is resized
+    this->Ui.gradients->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   }
 };
 
@@ -319,6 +403,7 @@ void pqPresetDialog::setCurrentPreset(const char* presetName)
   pqInternals& internals = (*this->Internals);
   QModelIndex idx = internals.Model->indexFromName(presetName);
   idx = internals.ProxyModel->mapFromSource(idx);
+  idx = internals.ReflowModel->mapFromSource(idx);
   if (idx.isValid())
   {
     internals.Ui.gradients->selectionModel()->setCurrentIndex(
@@ -330,7 +415,7 @@ void pqPresetDialog::setCurrentPreset(const char* presetName)
 void pqPresetDialog::updateEnabledStateForSelection()
 {
   const Ui::pqPresetDialog& ui = this->Internals->Ui;
-  QModelIndexList selectedRows = ui.gradients->selectionModel()->selectedRows();
+  QModelIndexList selectedRows = ui.gradients->selectionModel()->selectedIndexes();
   if (selectedRows.size() == 1)
   {
     this->updateForSelectedIndex(selectedRows[0]);
@@ -358,7 +443,8 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
 {
   // update "options" based on what's available.
   const pqInternals& internals = *this->Internals;
-  QModelIndex idx = internals.ProxyModel->mapToSource(proxyIndex);
+  QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
+  idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
   Q_ASSERT(preset.empty() == false);
 
@@ -381,7 +467,8 @@ void pqPresetDialog::triggerApply(const QModelIndex& _proxyIndex)
 
   const QModelIndex proxyIndex =
     _proxyIndex.isValid() ? _proxyIndex : ui.gradients->selectionModel()->currentIndex();
-  QModelIndex idx = internals.ProxyModel->mapToSource(proxyIndex);
+  QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
+  idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
   Q_ASSERT(preset.empty() == false);
   emit this->applyPreset(preset);
@@ -400,12 +487,13 @@ void pqPresetDialog::removePreset(const QModelIndex& _proxyIndex)
   }
   else
   {
-    selectedRows = ui.gradients->selectionModel()->selectedRows();
+    selectedRows = ui.gradients->selectionModel()->selectedIndexes();
   }
   for (int cc = (selectedRows.size() - 1); cc >= 0; cc--)
   {
     const QModelIndex& proxyIndex = selectedRows[cc];
-    QModelIndex idx = internals.ProxyModel->mapToSource(proxyIndex);
+    QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
+    idx = internals.ProxyModel->mapToSource(idx);
     internals.Model->removePreset(idx.row());
   }
 }
@@ -418,7 +506,8 @@ const Json::Value& pqPresetDialog::currentPreset()
   QModelIndex proxyIndex = ui.gradients->selectionModel()->currentIndex();
   if (proxyIndex.isValid())
   {
-    QModelIndex idx = internals.ProxyModel->mapToSource(proxyIndex);
+    QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
+    idx = internals.ProxyModel->mapToSource(idx);
     const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
     Q_ASSERT(preset.empty() == false);
     return preset;
@@ -476,8 +565,10 @@ void pqPresetDialog::importPresets()
     {
       QModelIndex startProxyIdx =
         internals.ProxyModel->mapFromSource(internals.Model->index(oldCount, 0, QModelIndex()));
+      startProxyIdx = internals.ReflowModel->mapFromSource(startProxyIdx);
       QModelIndex endProxyIdx =
         internals.ProxyModel->mapFromSource(internals.Model->index(newCount - 1, 0, QModelIndex()));
+      endProxyIdx = internals.ReflowModel->mapFromSource(endProxyIdx);
 
       QItemSelection selection(startProxyIdx, endProxyIdx);
       internals.Ui.gradients->selectionModel()->select(
@@ -506,10 +597,11 @@ void pqPresetDialog::exportPresets()
   const Ui::pqPresetDialog& ui = this->Internals->Ui;
 
   Json::Value presetCollection(Json::arrayValue);
-  QModelIndexList selectedRows = ui.gradients->selectionModel()->selectedRows();
+  QModelIndexList selectedRows = ui.gradients->selectionModel()->selectedIndexes();
   foreach (const QModelIndex& proxyIndex, selectedRows)
   {
-    QModelIndex idx = internals.ProxyModel->mapToSource(proxyIndex);
+    QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
+    idx = internals.ProxyModel->mapToSource(idx);
     const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
     presetCollection.append(preset);
   }
