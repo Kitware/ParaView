@@ -80,7 +80,6 @@
         { "class":"vtkCellCenters" },
         { "class":"vtkClipDataSet" },
         { "class":"vtkClipVolume" },
-        { "class":"vtkPassArrays" },
         { "class":"vtkTableBasedClipDataSet" }
       ],
       "replace":[

@@ -15,14 +15,14 @@ public:
 
   virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) VTK_OVERRIDE
   {
-    return this->ShouldOutput(dataDescription, false);
+    return this->ShouldOutput(dataDescription);
   }
 
   /// Execute the pipeline. Returns 1 for success and 0 for failure.
   virtual int CoProcess(vtkCPDataDescription* dataDescription) VTK_OVERRIDE
   {
     this->OutputCounter++;
-    if (this->ShouldOutput(dataDescription, true) == 0)
+    if (this->ShouldOutput(dataDescription) == 0)
     {
       vtkErrorMacro("Calling CoProcess but shouldn't be.");
       return 0;
@@ -64,19 +64,12 @@ protected:
   int ExpectedOutputCounter;
   int OutputCounter;
 
-  // This method determines if we should output or not. For
-  // RequestDataDescription() we don't check whether the output is
-  // forced or not because that should have been checked already.
-  // For CoProcess we do also use that for the check.
-  int ShouldOutput(vtkCPDataDescription* dataDescription, bool checkForceOutput)
+  // This method determines if we should output or not.
+  int ShouldOutput(vtkCPDataDescription* dataDescription)
   {
-    if (checkForceOutput && dataDescription->GetForceOutput())
-    {
-      return 1;
-    }
     vtkIdType timeStep = dataDescription->GetTimeStep();
     int retVal = 0;
-    if (timeStep % this->FirstInputFrequency == 0)
+    if (timeStep % this->FirstInputFrequency == 0 || dataDescription->GetForceOutput() == true)
     {
       vtkCPInputDataDescription* inputDescription =
         dataDescription->GetInputDescriptionByName("firstinput");
@@ -84,7 +77,7 @@ protected:
       inputDescription->GenerateMeshOn();
       retVal = 1;
     }
-    if (timeStep % this->SecondInputFrequency == 0)
+    if (timeStep % this->SecondInputFrequency == 0 || dataDescription->GetForceOutput() == true)
     {
       vtkCPInputDataDescription* inputDescription =
         dataDescription->GetInputDescriptionByName("secondinput");

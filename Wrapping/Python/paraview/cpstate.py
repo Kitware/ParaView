@@ -22,6 +22,7 @@ def reset_cpstate_globals():
     cpstate_globals.export_rendering = False
     cpstate_globals.cinema_tracks = {}
     cpstate_globals.cinema_arrays = {}
+    cpstate_globals.channels_needed = []
 
 reset_cpstate_globals()
 
@@ -241,6 +242,9 @@ class WriterAccessor(smtrace.RealProxyAccessor):
                 cpstate_globals.write_frequencies[sim_input_name].append(write_frequency)
                 cpstate_globals.write_frequencies[sim_input_name].sort()
 
+            if not sim_input_name in cpstate_globals.channels_needed:
+                cpstate_globals.channels_needed.append(sim_input_name)
+
     def get_proxy_label(self, xmlgroup, xmlname):
         pxm = servermanager.ProxyManager()
         prototype = pxm.GetPrototypeProxy(xmlgroup, xmlname)
@@ -317,7 +321,7 @@ class cpstate_filter_proxies_to_serialize(object):
 
 # -----------------------------------------------------------------------------
 def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
-    cinema_tracks, cinema_arrays):
+                 cinema_tracks, cinema_arrays):
     """Method that will dump the current pipeline and return it as a string trace.
 
     export_rendering
@@ -384,6 +388,22 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
                     cpstate_globals.write_frequencies[sim_input_name].append(image_write_frequency)
                     cpstate_globals.write_frequencies[sim_input_name].sort()
 
+                if not sim_input_name in cpstate_globals.channels_needed:
+                    cpstate_globals.channels_needed.append(sim_input_name)
+
+    pxm = servermanager.ProxyManager()
+    arrays = {}
+    for channel_name in cpstate_globals.channels_needed:
+        arrays[channel_name] = []
+        p = pxm.GetProxy("sources", channel_name)
+        if p:
+            for i in range(p.GetPointDataInformation().GetNumberOfArrays()):
+                arrays[channel_name].append([p.GetPointDataInformation().GetArray(i).GetName(), 0])
+            for i in range(p.GetCellDataInformation().GetNumberOfArrays()):
+                arrays[channel_name].append([p.GetCellDataInformation().GetArray(i).GetName(), 1])
+
+
+    print("stuff is ", arrays)
     # Create global fields values
     pipelineClassDef = "\n"
     pipelineClassDef += "# ----------------------- CoProcessor definition -----------------------\n\n"
@@ -413,6 +433,10 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     pipelineClassDef += "  # these are the frequencies at which the coprocessor updates.\n"
     pipelineClassDef += "  freqs = " + str(cpstate_globals.write_frequencies) + "\n"
     pipelineClassDef += "  coprocessor.SetUpdateFrequencies(freqs)\n"
+    pipelineClassDef += "  if requestSpecificArrays:\n"
+    for channel_name in arrays:
+        pipelineClassDef += "    arrays = " +str(arrays[channel_name]) + "\n"
+        pipelineClassDef += "    coprocessor.SetRequestedArrays('" + channel_name + "', arrays)\n"
     pipelineClassDef += "  coprocessor.SetInitialOutputOptions(timeStepToStartOutputAt,forceOutputAtFirstCall)\n"
     pipelineClassDef += "  return coprocessor\n"
     return pipelineClassDef

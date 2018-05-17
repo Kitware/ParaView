@@ -5,6 +5,7 @@ vtk_module(vtkPVCatalyst
     vtkPVServerManagerApplication
     vtkCommonCore
   PRIVATE_DEPENDS
+    vtkFiltersGeneral
     vtksys
 
   TEST_DEPENDS
