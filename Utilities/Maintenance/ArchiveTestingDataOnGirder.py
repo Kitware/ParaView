@@ -170,9 +170,9 @@ def main():
                         default=os.path.join(os.path.dirname(__file__), '..',
                             '..'),
                         help='path to local target folder')
-    # Default is ITK/ITKTestingData/Nightly
+    # Default is ParaView/ExernalData/Development
     parser.add_argument('--parent-id', required=False,
-                        default='57b673388d777f10f269651c',
+                        default='5afda5a58d777f15ebe1d38c',
                         help='id of Girder parent target')
     parser.add_argument('--object-store', required=True,
                         help='Path to the CMake ExternalData object store')
