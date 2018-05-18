@@ -19,7 +19,7 @@ paraview_test_load_data_dirs(""
   GMV/invalid
   GMV/partial-pyramid
   GMV/quadratic_cells
-  "Iron Xdmf"
+  Iron_Xdmf
   RodPlate
   singleSphereAnimation
   SLAC/pic-example
@@ -32,7 +32,7 @@ paraview_test_load_data_dirs(""
 paraview_test_load_data(""
   ,REGEX:tensors_.*\\.vti
   artifact.dta
-  "blow data.myvtk"
+  blow_data.myvtk
   blow.vtk
   bluntfin.vts
   can.ex2
@@ -50,7 +50,7 @@ paraview_test_load_data(""
   dualSphereAnimation4.pvd
   dualSphereAnimation.clone.pvd
   dualSphereAnimation.pvd
-  "iron protein.vtk"
+  iron_protein.vtk
   LoadState.pvsm
   LoadStateDialog.pvsm
   minimal.nii
