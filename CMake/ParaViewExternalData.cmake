@@ -56,6 +56,9 @@ set(ExternalData_URL_TEMPLATES "" CACHE STRING
 file:///var/bigharddrive/%(algo)/%(hash)")
 mark_as_advanced(ExternalData_URL_TEMPLATES)
 list(APPEND ExternalData_URL_TEMPLATES
+  # Data published by Girder
+  "https://data.kitware.com/api/v1/file/hashsum/%(algo)/%(hash)/download"
+
   # Data published by MIDAS
   # Provided by VTK
   "http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=%(hash)&algorithm=%(algo)"
