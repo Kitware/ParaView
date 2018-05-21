@@ -43,27 +43,27 @@ def stringListDomainDecorator(props, xmlProps, uiProps, domain):
 #--------------------------------------------------------------------------
 # Handle TreeDomain
 #--------------------------------------------------------------------------
+def numpad(numelts):
+    return len(str(int(numelts)))
+
 def treeDomainDecorator(props, xmlProps, uiProps, domain):
     uiProps['type'] = 'int'
     uiProps['widget'] = 'list-n'
 
-    valMap = {}
+    values = []
 
     index = 0
     stack = []
-    stack.append([ domain.GetInformation(), [] ])
+    stack.append([ domain.GetInformation(), ['Multi-block Dataset'], -1 ])
 
     while len(stack) > 0:
         me = stack.pop()
 
         dataInformation = me[0]
         accumulatedName = me[1]
+        parentIndex = me[2]
 
-        if len(accumulatedName) > 1 and accumulatedName[0] == 'Element Blocks':
-            print (index,' -> ',' + '.join(accumulatedName))
-            valMap[accumulatedName[-1]] = index
-
-        index += 1
+        values.append([accumulatedName, index, parentIndex])
 
         infoName = None
 
@@ -78,11 +78,27 @@ def treeDomainDecorator(props, xmlProps, uiProps, domain):
                 for i in range(numChildren - 1, -1, -1):
                     child = info.GetDataInformation(i)
                     childName = info.GetName(i)
-                    stack.append([ child, accumulatedName + [childName] ])
+                    stack.append([ child, accumulatedName + [childName], index ])
+
+        index += 1
 
     #valMap = { 'Block 1': 2, 'Block 2': 3 }
 
+    valMap = {}
+    blockList = [None] * len(values)
+    pads = numpad(len(values))
+    for value in values:
+        names = value[0]
+        blockIdx = value[1]
+        parentIdx = value[2]
+        padding = '-' * (len(names) - 1)
+        valuesEntryName = "%s %s %s" % (str(blockIdx).zfill(pads), padding, names[-1])
+        valMap[valuesEntryName] = blockIdx
+        blockList[blockIdx] = { 'label': names[-1], 'parent': parentIdx, 'id': blockIdx }
+
     uiProps['values'] = valMap
+    uiProps['blocks'] = blockList
+    uiProps['sort'] = True
 
     return True
 
