@@ -1629,7 +1629,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         if type(filepathOrConfig) == dict:
             configurationData = filepathOrConfig
         else:
-            with open(filepath, 'r') as fd:
+            with open(filepathOrConfig, 'r') as fd:
                 configurationData = json.load(fd)
         self.configureFiltersOrSources('sources', configurationData['sources'])
         self.configureFiltersOrSources('filters', configurationData['filters'])
