@@ -1,12 +1,12 @@
 paraview_test_load_data(""
-  "blow data.myvtk"
+  blow_data.myvtk
   blow.vtk
   bot2.wrl
   can.ex2
   disk_out_ref.ex2
   dualSphereAnimation4.pvd
   elements.vtu
-  "iron protein.vtk"
+  iron_protein.vtk
   multicomb_0.vts
   poisson_3dall_2.xmf
   PythonProgrammableFilterParameters.xml

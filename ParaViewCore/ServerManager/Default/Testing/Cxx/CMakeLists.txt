@@ -42,7 +42,7 @@ paraview_test_load_data_dirs(""
   )
 paraview_test_load_data(""
   ,REGEX:poisson_3d.*\\.h5
-  "iron protein.vtk"
+  "iron_protein.vtk"
   SPCTH/ball_and_box.spcth
   sonic.pht
   sonicgeom.dat.1
