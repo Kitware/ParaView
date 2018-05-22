@@ -403,7 +403,6 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
                 arrays[channel_name].append([p.GetCellDataInformation().GetArray(i).GetName(), 1])
 
 
-    print("stuff is ", arrays)
     # Create global fields values
     pipelineClassDef = "\n"
     pipelineClassDef += "# ----------------------- CoProcessor definition -----------------------\n\n"
