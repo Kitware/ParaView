@@ -31,10 +31,10 @@ def save_render_buffer(fname):
     w2i.ShouldRerenderOff()
     w2i.SetInput(w)
     w2i.Modified()
-    tiff = TIFFWriter()
-    tiff.Input = w2i.GetOutput()
-    tiff.FileName = fname
-    tiff.UpdatePipeline()
+    png = PNGWriter()
+    png.Input = w2i.GetOutput()
+    png.FileName = fname
+    png.UpdatePipeline()
 
 
 def flush_render_buffer():
@@ -193,7 +193,7 @@ self.GetOutput().ShallowCopy(ap.GetOutput())
 
     print('Saving frame 0 screenshot')
     fdigits = int(math.ceil(math.log(num_frames, 10)))
-    frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.tiff'
+    frame_fname_fmt = output_basename + '.scene.f%(f)0' + str(fdigits) + 'd.png'
     SaveScreenshot(frame_fname_fmt % {'f': 0})
 
     print('Gathering geometry counts')
