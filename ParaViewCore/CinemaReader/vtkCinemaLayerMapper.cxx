@@ -25,6 +25,7 @@
 #include "vtkOpenGLRenderUtilities.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLShaderCache.h"
+#include "vtkOpenGLState.h"
 #include "vtkOpenGLVertexArrayObject.h"
 #include "vtkPixelBufferObject.h"
 #include "vtkPointData.h"
@@ -199,7 +200,6 @@ class vtkCinemaLayerMapper::vtkInternals
   vtkVector3d PrevCameraViewUp; // used to avoid recomputing ViewUpRoll unless needed.
 
   vtkSmartPointer<vtkShaderProgram> ShaderProgram;
-  vtkSmartPointer<vtkOpenGLBufferObject> Verts;
   vtkSmartPointer<vtkOpenGLVertexArrayObject> VAO;
   vtkVector2i LayerDimensions; // size of each layer in pixels.
 public:
@@ -211,7 +211,6 @@ public:
   void ReleaseGraphicsResources(vtkWindow*)
   {
     this->ShaderProgram = NULL;
-    this->Verts = NULL;
     this->VAO = NULL;
     this->LayerTextures.clear();
   }
@@ -309,6 +308,8 @@ public:
       return;
     }
 
+    vtkOpenGLState* ostate = renWin->GetState();
+
     typedef vtkOpenGLRenderUtilities GLUtil;
     if (!this->ShaderProgram)
     {
@@ -363,9 +364,8 @@ public:
       // this->ShaderProgram->SetFileNameForDebugging("/tmp/cinema_layer_mapper");
 
       // Initialize new VAO/vertex buffer. This is only done once:
-      this->Verts = vtkSmartPointer<vtkOpenGLBufferObject>::New();
       this->VAO = vtkSmartPointer<vtkOpenGLVertexArrayObject>::New();
-      GLUtil::PrepFullScreenVAO(this->Verts, this->VAO, this->ShaderProgram);
+      GLUtil::PrepFullScreenVAO(renWin, this->VAO, this->ShaderProgram);
     }
     else
     {
@@ -373,9 +373,9 @@ public:
     }
 
     this->VAO->Bind();
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
+    ostate->vtkglEnable(GL_DEPTH_TEST);
+    ostate->vtkglDepthMask(GL_TRUE);
+    ostate->vtkglDepthFunc(GL_LEQUAL);
 
     vtkOpenGLCamera* camera = vtkOpenGLCamera::SafeDownCast(ren->GetActiveCamera());
 
