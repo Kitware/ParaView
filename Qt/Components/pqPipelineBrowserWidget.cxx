@@ -61,7 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   : Superclass(parentObject)
-  , PipelineModel(new pqPipelineModel(this))
+  , PipelineModel(
+      new pqPipelineModel(*pqApplicationCore::instance()->getServerManagerModel(), this))
   , FilteredPipelineModel(new pqPipelineAnnotationFilterModel(this))
   , ContextMenu(new QMenu(this))
 {
