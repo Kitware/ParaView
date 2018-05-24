@@ -55,7 +55,7 @@ static void InitSeriesVisibilityDefaults()
   {
     const char* defaults[] = { "^arc_length", "^bin_extents", "^FileId", "^GlobalElementId",
       "^GlobalNodeId", "^ObjectId", "^Pedigree.*", "^Points_.*", "^Time", "^vtkOriginal.*",
-      "^vtkValidPointMask", "^N .*", nullptr };
+      "^vtkValidPointMask", "^N .*", "^X$", "^X .*", "^Y$", "^Y .*", "^Z$", "^Z .*", nullptr };
     for (int cc = 0; defaults[cc] != nullptr; cc++)
     {
       SeriesVisibilityDefaults.push_back(
