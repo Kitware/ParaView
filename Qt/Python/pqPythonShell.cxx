@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringOutputWindow.h"
 #include "vtkWeakPointer.h"
 
+#include <QAbstractItemView>
 #include <QApplication>
 #include <QCursor>
 #include <QFile>

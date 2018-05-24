@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include <QDebug>
+#include <QHeaderView>
 
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"

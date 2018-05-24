@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPiecewiseFunction.h"
 #include <QString>
 
+#include <QDoubleValidator>
+
 class pqTransferFunctionWidgetPropertyDialog::pqInternals
 {
 public:

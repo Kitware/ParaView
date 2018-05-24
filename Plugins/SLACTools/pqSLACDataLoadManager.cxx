@@ -34,6 +34,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QAction>
 #include <QPushButton>
 #include <QtDebug>
 

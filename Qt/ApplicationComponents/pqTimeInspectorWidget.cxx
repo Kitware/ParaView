@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QHeaderView>
 #include <QLineF>
 #include <QPainter>
 #include <QVariant>

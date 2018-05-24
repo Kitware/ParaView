@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMUncheckedPropertyHelper.h"
 
 #include <QGridLayout>
+#include <QStyle>
 
 class pqDoubleRangeSliderPropertyWidget::pqInternals
 {

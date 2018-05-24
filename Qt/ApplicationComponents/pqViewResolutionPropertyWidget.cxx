@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 #include <QIntValidator>
+#include <QStyle>
 
 class pqViewResolutionPropertyWidget::pqInternals
 {
