@@ -51,7 +51,7 @@ public:
 
     #undef DEFINE_OPERATOR
 
-    /** special treatement for strings */
+    /** special treatment for strings */
     GW_Ofstream& operator << (string& v)
     {
         GW_U32 nSize = (GW_U32) v.size();
@@ -88,7 +88,7 @@ public:
 
     #undef DEFINE_OPERATOR
 
-    /** special treatement for strings */
+    /** special treatment for strings */
     GW_Ifstream& operator >> (string& v)
     {
         GW_U32 nSize;

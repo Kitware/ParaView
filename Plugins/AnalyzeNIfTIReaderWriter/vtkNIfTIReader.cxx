@@ -651,7 +651,7 @@ void vtkNIfTIReaderUpdate2(
   /* Returns proper name for cases 1,2,3 */
   std::string ImageFileName = GetImageFileName(self->GetFileName());
   // NOTE: gzFile operations act just like FILE * operations when the files
-  // are not in gzip fromat.
+  // are not in gzip format.
   // This greatly simplifies the following code, and gzFile types are used
   // everywhere.
   // In addition, it has the added benefit of reading gzip compressed image

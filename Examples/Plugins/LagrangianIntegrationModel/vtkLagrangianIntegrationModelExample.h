@@ -88,7 +88,7 @@ public:
    * Methods used by ParaView surface helper to get default
    * values for each leaf of each dataset of surface
    * nComponents could be retrieved with arrayName but is
-   * given for simplication purposes.
+   * given for simplification purposes.
    * it is your responsibility to initialize all components of
    * defaultValues[nComponent]
    */

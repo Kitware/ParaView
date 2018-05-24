@@ -226,7 +226,7 @@ int vtkMaterialInterfaceCommBuffer::UnPack(
 }
 
 //----------------------------------------------------------------------------
-// Extract data from the buffer. Copy flag indicates weather to
+// Extract data from the buffer. Copy flag indicates whether to
 // copy or set pointer to buffer.
 int vtkMaterialInterfaceCommBuffer::UnPack(
   float*& rData, const int nComps, const vtkIdType nTups, const bool copyFlag)
@@ -261,7 +261,7 @@ int vtkMaterialInterfaceCommBuffer::UnPack(
 }
 
 //----------------------------------------------------------------------------
-// Extract data from the buffer. Copy flag indicates weather to
+// Extract data from the buffer. Copy flag indicates whether to
 // copy or set pointer to buffer.
 int vtkMaterialInterfaceCommBuffer::UnPack(
   double*& rData, const int nComps, const vtkIdType nTups, const bool copyFlag)
@@ -295,7 +295,7 @@ int vtkMaterialInterfaceCommBuffer::UnPack(
   return 1;
 }
 //----------------------------------------------------------------------------
-// Extract data from the buffer. Copy flag indicates weather to
+// Extract data from the buffer. Copy flag indicates whether to
 // copy or set poi9nter to buffer.
 int vtkMaterialInterfaceCommBuffer::UnPack(
   int*& rData, const int nComps, const vtkIdType nTups, const bool copyFlag)

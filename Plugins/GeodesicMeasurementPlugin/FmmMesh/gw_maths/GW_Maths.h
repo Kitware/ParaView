@@ -151,7 +151,7 @@ public:
     *  \author Gabriel Peyré
     *  \date   10-28-2002
     *
-    *  Comute the normal of a triangle, assuming CW orientation.
+    *  Compute the normal of a triangle, assuming CW orientation.
     */
     /*------------------------------------------------------------------------------*/
     static void FlatTriangleNormal(GW_Vector3D& Normal, const GW_Vector3D& v1, const GW_Vector3D& v2, const GW_Vector3D& v3)

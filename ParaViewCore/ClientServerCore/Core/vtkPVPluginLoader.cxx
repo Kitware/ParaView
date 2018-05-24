@@ -441,7 +441,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     return false;
   }
 
-  // If we succeeded so far, then obtain the instace of vtkPVPlugin for this
+  // If we succeeded so far, then obtain the instance of vtkPVPlugin for this
   // plugin and load it.
 
   pv_plugin_query_instance_fptr pv_plugin_query_instance =

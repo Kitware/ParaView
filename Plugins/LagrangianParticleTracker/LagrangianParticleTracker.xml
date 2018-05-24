@@ -182,7 +182,7 @@
                  name="ModifiedBSPTree"/>
         </ProxyListDomain>
         <Documentation>Specify the locator used to
-        locate cells in the flow intput</Documentation>
+        locate cells in the flow input</Documentation>
       </ProxyProperty>
       <IntVectorProperty command="SetNonPlanarQuadSupport"
                          default_values="1"

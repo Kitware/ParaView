@@ -382,11 +382,11 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, v
 
         // Check ghost points.
         // If we are processing a piece, we do not want to duplicate
-        // glyphs on the borders.  The corrct check here is:
+        // glyphs on the borders.  The correct check here is:
         // ghostLevel > 0.  I am leaving this over glyphing here because
         // it make a nice example (sphereGhost.tcl) to show the
         // point ghost levels with the glyph filter.  I am not certain
-        // of the usefullness of point ghost levels over 1, but I will have
+        // of the usefulness of point ghost levels over 1, but I will have
         // to think about it.
         if (inGhostLevels && inGhostLevels[inPtId] > requestedGhostLevel) {
           continue;

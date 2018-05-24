@@ -656,7 +656,7 @@ void vtkPGenericIOMultiBlockReader::LoadRawDataForBlock(int blockId)
     else
     {
 #ifdef DEBUG
-      std::cout << "DISBLED\n";
+      std::cout << "DISABLED\n";
       std::cout.flush();
 #endif
     }

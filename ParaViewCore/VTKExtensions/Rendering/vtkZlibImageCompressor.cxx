@@ -39,14 +39,14 @@ public:
   void SetLossLessMode(int mode) { this->LossLessMode = mode; }
   int GetLossLessMode() { return this->LossLessMode; }
   // Description:
-  // This is used to control weather or not alpha chanel
+  // This is used to control whether or not alpha channel
   // is stripped during the pre-processing (i.e. RGBA -> RGB).
   void SetStripAlpha(int status) { this->StripAlpha = status; }
   int GetStripAlpha() { return this->StripAlpha; }
   // Description:
   // Pre-process the provided image, pre-processed data is return
   // via the "out" parameter. A flag is returned through the "freeOut"
-  // parameter indicating weather or not the caller needs to call free
+  // parameter indicating whether or not the caller needs to call free
   // on the returned array.
   void PreProcess(vtkUnsignedCharArray* in, unsigned char*& out, int& nCompsOut, vtkIdType& outSize,
     int& freeOut);

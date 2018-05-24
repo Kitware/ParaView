@@ -55,7 +55,7 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
     vtkPVServerOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
   if (!options)
   {
-    vtkErrorMacro("Are you sure vtkCaveSynchronizedRenderers is crated on "
+    vtkErrorMacro("Are you sure vtkCaveSynchronizedRenderers is created on "
                   "an appropriate processes?");
   }
   else

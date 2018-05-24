@@ -4123,7 +4123,7 @@ int vtkPEnSightGoldBinaryReader::ReadLine(char result[80])
   if (!(this->IFile->read(result, 80).good()))
   {
     // The read fails when reading the last part/array when there are no points.
-    // I took out the error macro as a tempory fix.
+    // I took out the error macro as a temporary fix.
     // We need to determine what EnSight does when the part with zero point
     // is not the last, and change the read array method.
     // int fixme; // I do not a file to test with yet.

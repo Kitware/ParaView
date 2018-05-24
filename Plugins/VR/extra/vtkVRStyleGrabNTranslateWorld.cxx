@@ -61,7 +61,7 @@ vtkVRStyleGrabNTranslateWorld::vtkVRStyleGrabNTranslateWorld(QObject* parentObje
 //------------------------------------------------------------------------destr
 vtkVRStyleGrabNTranslateWorld::~vtkVRStyleGrabNTranslateWorld()
 {
-  // Delete the assigned matix
+  // Delete the assigned matrix
   Neo->Delete();
   Tx->Delete();
   Old->Delete();

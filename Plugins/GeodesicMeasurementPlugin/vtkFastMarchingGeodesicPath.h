@@ -70,7 +70,7 @@ public:
   static vtkFastMarchingGeodesicPath* New();
 
   // Description:
-  // Standard methids for printing and determining type information.
+  // Standard methods for printing and determining type information.
   vtkTypeMacro(vtkFastMarchingGeodesicPath, vtkGeodesicPath);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 

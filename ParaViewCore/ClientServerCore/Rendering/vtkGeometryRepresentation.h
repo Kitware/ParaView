@@ -364,7 +364,7 @@ protected:
   void UpdateBlockAttributes(vtkMapper* mapper);
 
   /**
-   * Computes the bounds of the visible data based on the block visiblities in the
+   * Computes the bounds of the visible data based on the block visibilities in the
    * composite data attributes of the mapper.
    */
   void ComputeVisibleDataBounds();

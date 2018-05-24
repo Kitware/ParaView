@@ -130,7 +130,7 @@ int vtkGmshMetaReader::RequestData(
   // Check if a particular time was requested.
   if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
   {
-    // Get the requested time step. We only supprt requests of a single time
+    // Get the requested time step. We only support requests of a single time
     // step in this reader right now
     double requestedTimeSteps = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     double timeValue = requestedTimeSteps;

@@ -519,7 +519,7 @@ void vtkPLANLHaloFinder::VectorizeData(vtkUnstructuredGrid* particles)
   assert("pre: uid should not be NULL!" && (uid != NULL));
 
   vtkIntArray* owner = vtkIntArray::SafeDownCast(particles->GetPointData()->GetArray("ghost"));
-  assert("pre: ownder should not be NULL" && (owner != NULL));
+  assert("pre: owner should not be NULL" && (owner != NULL));
 
   vtkIntArray* haloTag = vtkIntArray::New();
   haloTag->SetName("HaloID");

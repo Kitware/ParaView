@@ -62,7 +62,7 @@ void vtkMooseXfemClip::CreateDefaultLocator()
   if (this->Locator == nullptr)
   {
     // The vtkNonMergingPointLocator does not merge coincident points on
-    // opposing sides of the cutting plane, which is esential for proper
+    // opposing sides of the cutting plane, which is essential for proper
     // visualization of fields that are discontinuous across that interface.
     this->Locator = vtkNonMergingPointLocator::New();
     this->Locator->Register(this);

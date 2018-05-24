@@ -98,7 +98,7 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="LICIntensity"
-        label="LIC Intesity"
+        label="LIC Intensity"
         command="SetLICIntensity"
         number_of_elements="1"
         default_values="0.8"
