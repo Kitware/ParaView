@@ -31,10 +31,9 @@ def _get_argument_parser():
                         help='the source repo, defaults to repo in which the script is contained')
 
   parser.add_argument('-i', dest='input_dirs', action='append',
-                        help='(repeatable) the directory contain manifest.json'\
-                        'and other resources; muliple input decks can be'\
-                        'specified by repeating -i in the order of processing'\
-                        'The directory contain manifest.json and other resources')
+                        help='(repeatable) the directory contains manifest.json '\
+                        'and other resources; multiple input decks can be '\
+                        'specified by repeating -i in the order of processing')
   parser.add_argument('-o', dest='output_dir', action='store',
                         help='the directory where the modified sources will be written')
   parser.add_argument('-t', dest='copy_tests', action='store_true',
