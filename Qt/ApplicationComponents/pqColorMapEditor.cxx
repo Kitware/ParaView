@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QKeyEvent>
 #include <QPointer>
+#include <QStyle>
 #include <QVBoxLayout>
 
 class pqColorMapEditor::pqInternals

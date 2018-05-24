@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 
+#include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QLineEdit>
 #include <QRadioButton>

@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QSet>
 #include <QShortcut>
+#include <QStyle>
 
 //-----------------------------------------------------------------------------
 pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementation(
