@@ -16149,8 +16149,18 @@ source.</Documentation>
                  value="1" />
           <Entry text="Z Axis"
                  value="2" />
+          <Entry text="Oriented Bounding Box Major Axis"
+                 value="3" />
+          <Entry text="Oriented Bounding Box Medium Axis"
+                 value="4" />
+          <Entry text="Oriented Bounding Box Minor Axis"
+                 value="5" />
         </EnumerationDomain>
-        <Documentation>Select which axis to put the ruler along</Documentation>
+        <Documentation>Select along which axis the ruler should be aligned. Note:
+        this filter requires that all points in the dataset to which it is applied
+        be copied to a single rank when this option is set to any of the
+        Oriented Bound Box options, so make sure the dataset can fit on one rank
+        before applying this filter.</Documentation>
       </IntVectorProperty>
       <Hints>
         <Representation view="RenderView" type="RulerSourceRepresentation" />

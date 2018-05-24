@@ -23,6 +23,7 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
+#include "vtkOBBTree.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkRulerLineForInput);
@@ -60,12 +61,14 @@ int vtkRulerLineForInput::RequestInformation(vtkInformation* vtkNotUsed(request)
 
   return 1;
 }
+
 int vtkRulerLineForInput::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inVectors, vtkInformationVector* outVector)
 {
   vtkDataObject* inputData = vtkDataObject::GetData(inVectors[0], 0);
   vtkBoundingBox bbox;
   vtkDataSet* dataset;
+
   if ((dataset = vtkDataSet::SafeDownCast(inputData)))
   {
     double bounds[6];
@@ -111,6 +114,66 @@ int vtkRulerLineForInput::RequestData(vtkInformation* vtkNotUsed(request),
     bbox.GetBounds(globalBounds);
   }
 
+  double corner[3], max[3], mid[3], min[3], size[3];
+  vtkSmartPointer<vtkPoints> points;
+  if (this->Axis >= 3 && this->Axis <= 5)
+  {
+    auto pointSet = vtkPointSet::SafeDownCast(inputData);
+    if (pointSet)
+    {
+      points = pointSet->GetPoints();
+    }
+    else if (auto mbds = vtkMultiBlockDataSet::SafeDownCast(inputData))
+    {
+      // Merge points from blocks into a new vtkPointsObject.
+      points = vtkSmartPointer<vtkPoints>::New();
+      vtkSmartPointer<vtkCompositeDataIterator> itr;
+      itr.TakeReference(mbds->NewIterator());
+      for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
+      {
+        auto pointSetBlock = vtkPointSet::SafeDownCast(mbds->GetDataSet(itr));
+        if (!pointSetBlock)
+        {
+          // No points, skip.
+          continue;
+        }
+        auto srcPoints = pointSetBlock->GetPoints();
+        if (srcPoints)
+        {
+          points->InsertPoints(
+            points->GetNumberOfPoints(), srcPoints->GetNumberOfPoints(), 0, srcPoints);
+        }
+      }
+    }
+    else
+    {
+      vtkErrorMacro(<< "Input data set of type " << inputData->GetClassName()
+                    << " is not currently supported.");
+      return 0;
+    }
+
+    // Fetch all points across ranks.
+    // WARNING: this will be very slow and may crash your system if the data
+    // does not all fit on one rank.
+    bool communicate = this->Controller && this->Controller->GetNumberOfProcesses() > 1;
+    int myRank = this->Controller->GetLocalProcessId();
+    if (communicate)
+    {
+      vtkSmartPointer<vtkDataArray> globalPointsArray;
+      globalPointsArray.TakeReference(points->GetData()->NewInstance());
+      this->Controller->GatherV(points->GetData(), globalPointsArray, 0);
+      if (myRank == 0)
+      {
+        points->SetData(globalPointsArray);
+      }
+    }
+
+    if (!this->Controller || myRank == 0)
+    {
+      vtkOBBTree::ComputeOBB(points, corner, max, mid, min, size);
+    }
+  }
+
   vtkInformation* outInfo = outVector->GetInformationObject(0);
   if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) > 0)
   {
@@ -119,15 +182,30 @@ int vtkRulerLineForInput::RequestData(vtkInformation* vtkNotUsed(request),
 
   vtkNew<vtkLineSource> line;
   line->SetPoint1(globalBounds[0], globalBounds[2], globalBounds[4]);
-  switch (this->Axis)
+  switch (static_cast<AxisType>(this->Axis))
   {
-    case 1:
+    case AxisType::Y:
       line->SetPoint2(globalBounds[0], globalBounds[3], globalBounds[4]);
       break;
-    case 2:
+    case AxisType::Z:
       line->SetPoint2(globalBounds[0], globalBounds[2], globalBounds[5]);
       break;
-    case 0:
+    case AxisType::OrientedBoundingBoxMajorAxis:
+      line->SetPoint1(corner);
+      vtkMath::Add(corner, max, corner);
+      line->SetPoint2(corner);
+      break;
+    case AxisType::OrientedBoundingBoxMediumAxis:
+      line->SetPoint1(corner);
+      vtkMath::Add(corner, mid, corner);
+      line->SetPoint2(corner);
+      break;
+    case AxisType::OrientedBoundingBoxMinorAxis:
+      line->SetPoint1(corner);
+      vtkMath::Add(corner, min, corner);
+      line->SetPoint2(corner);
+      break;
+    case AxisType::X:
     default:
       line->SetPoint2(globalBounds[1], globalBounds[2], globalBounds[4]);
       break;
