@@ -28,6 +28,7 @@
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkPointData.h"
 
 #include "vtkMultiBlockDataSet.h"
@@ -39,7 +40,6 @@
 namespace
 {
 int numberOfMarkers;
-int myProc;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,38 +112,28 @@ extern "C" void setcoprocessorfield_(char* fname, int* len, int* mx, int* my, in
   unsigned int blockId = *my_id;
 
   vtkUniformGrid* img = vtkUniformGrid::SafeDownCast(grid->GetDataSet(level, blockId));
+  vtkIdType numCells = (*mx + 1) * (*my + 1) * (*mz + 1);
 
-  int numCells = (*mx + 1) * (*my + 1) * (*mz + 1);
-  bool DownConvert = *down_convert;
-
-  float* data2 = new float[numCells];
-  for (unsigned int id = 0; id < numCells; id++)
-    data2[id] = data[id];
-
-  if (DownConvert)
+  if (*down_convert)
   {
-    vtkUnsignedCharArray* att = vtkUnsignedCharArray::New();
-    vtkStdString* name = new vtkStdString(fname, *len);
-    att->SetName(*name);
+    vtkNew<vtkUnsignedCharArray> att;
+    vtkStdString name(fname, *len);
+    att->SetName(name);
     att->SetNumberOfComponents(1);
     att->SetNumberOfTuples(numCells);
     for (vtkIdType idx = 0; idx < numCells; ++idx)
     {
-      att->SetValue(idx, static_cast<unsigned char>(data2[idx] * 255.0));
+      att->SetValue(idx, static_cast<unsigned char>(data[idx] * 255.0));
     }
     img->GetCellData()->AddArray(att);
   }
   else
   {
-    vtkFloatArray* att = vtkFloatArray::New();
-    vtkStdString* name = new vtkStdString(fname, *len);
-    att->SetName(*name);
+    vtkNew<vtkFloatArray> att;
+    vtkStdString name(fname, *len);
+    att->SetName(name);
     att->SetNumberOfComponents(1);
-    att->SetNumberOfTuples(numCells);
-    for (vtkIdType idx = 0; idx < numCells; ++idx)
-    {
-      att->SetValue(idx, data2[idx]);
-    }
+    att->SetArray(data, numCells, 1);
     img->GetCellData()->AddArray(att);
   }
 
@@ -163,7 +153,6 @@ extern "C" void setmarkergeometry_(int* nvp, int* my_id)
     vtkCPAdaptorAPI::GetCoProcessorData()->GetInputDescriptionByName("input2")->GetGrid());
   vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(mgrid->GetBlock(0));
 
-  myProc = *my_id;
   numberOfMarkers = *nvp;
 
   // Initialize any arrays in the current ugrid
@@ -204,7 +193,7 @@ extern "C" void addmarkergeometry_(int* numberOfParticles, // Particles in added
   vtkUnstructuredGrid* ugrid = vtkUnstructuredGrid::SafeDownCast(mgrid->GetBlock(0));
 
   // Get pointers to points and cells which were allocated but not inserted
-  vtkPoints* points = ugrid->GetPoints();
+  vtkPoints* points = ugrid->GetPoints(); // ACB is the points here appended for multiple calls?
 
   for (int i = 0; i < *numberOfParticles; i++)
   {
@@ -237,7 +226,7 @@ extern "C" void addmarkerscalarfield_(char* fname, // Name of data
   vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
 
   // If it doesn't exist, create and size, and refetch
-  if (dataArray == 0)
+  if (dataArray == nullptr)
   {
     vtkFloatArray* arr = vtkFloatArray::New();
     arr->SetName(varName);
@@ -277,7 +266,7 @@ extern "C" void addmarkervectorfield_(char* fname, // Name of data
   vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
 
   // If it doesn't exist, create and size, and refetch
-  if (dataArray == 0)
+  if (dataArray == nullptr)
   {
     vtkFloatArray* arr = vtkFloatArray::New();
     arr->SetName(varName);
@@ -324,7 +313,7 @@ extern "C" void addmarkertensorfield_(char* fname, // Name of data
   vtkFloatArray* dataArray = vtkFloatArray::SafeDownCast(ugrid->GetPointData()->GetArray(varName));
 
   // If it doesn't exist, create and size, and refetch
-  if (dataArray == 0)
+  if (dataArray == nullptr)
   {
     vtkFloatArray* arr = vtkFloatArray::New();
     arr->SetName(varName);
