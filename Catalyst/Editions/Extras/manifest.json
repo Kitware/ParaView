@@ -47,7 +47,8 @@
     { "name":"vtkPVClientServerCoreCore",
       "path":"ParaViewCore/ClientServerCore/Core",
       "include":[
-        { "class":"vtkPVExtractSelection" }
+        { "class":"vtkPVExtractSelection" },
+        { "class":"vtkPythonSelector" }
       ],
       "patches":[
         { "path": "ClientServerCore-restore-extraction.patch",
@@ -60,6 +61,7 @@
     { "name":"vtkFiltersExtraction",
       "path":"VTK/Filters/Extraction",
       "include":[
+        { "class":"vtkBlockSelector" },
         { "class":"vtkConvertSelection" },
         { "class":"vtkExtractBlock" },
         { "class":"vtkExtractCells" },
@@ -71,9 +73,9 @@
         { "class":"vtkExtractSelection" },
         { "class":"vtkFrustumSelector" },
         { "class":"vtkLocationSelector" },
-        { "class":"vtkValueSelector" },
         { "class":"vtkProbeSelectedLocations" },
-        { "class":"vtkSelectionOperator" }
+        { "class":"vtkSelector" },
+        { "class":"vtkValueSelector" }
       ],
       "cswrap":true,
       "pythonwrap":true

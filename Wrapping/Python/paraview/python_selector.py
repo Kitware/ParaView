@@ -18,6 +18,13 @@ from vtkmodules.vtkCommonDataModel import vtkDataObject
 from vtkmodules.util import vtkConstants
 from paraview import calculator
 
+import sys
+if sys.hexversion < 0x03000000:
+    import itertools
+    izip = itertools.izip
+else:
+    izip = zip
+
 def _create_id_array(dataobject, attributeType):
     """Returns a VTKArray or VTKCompositeDataArray for the ids"""
     if not dataobject:
@@ -38,7 +45,7 @@ def maskarray_is_valid(maskArray):
         isinstance(maskArray, dsa.VTKArray) or \
         isinstance(maskArray, dsa.VTKCompositeDataArray)
 
-def execute(inputDO, selectionNode, elementInside):
+def execute(inputDO, selectionNode, insidednessArrayName, outputDO):
     field_type = selectionNode.GetFieldType()
     if field_type == selectionNode.CELL:
         attributeType = vtkDataObject.CELL
@@ -86,8 +93,16 @@ def execute(inputDO, selectionNode, elementInside):
     # output.
     # Note: we must force the data type to VTK_SIGNED_CHAR or the array will
     # be ignored by the freeze selection operation
-    from vtkmodules.util.numpy_support import numpy_to_vtk
+    from paraview.vtk.util import numpy_support
+    output = dsa.WrapDataObject(outputDO)
     if type(maskArray) is not dsa.VTKNoneArray:
-        insidedness = numpy_to_vtk(maskArray, deep=1, array_type=vtkConstants.VTK_SIGNED_CHAR)
-        insidedness.SetName("vtkInsidedness")
-        elementInside.DeepCopy(insidedness)
+        if isinstance(maskArray, dsa.VTKCompositeDataArray):
+            for ds, array in izip(output, maskArray.Arrays):
+                if array is not None:
+                    insidedness = numpy_support.numpy_to_vtk(array, deep=1, array_type=vtkConstants.VTK_SIGNED_CHAR)
+                    insidedness.SetName(insidednessArrayName)
+                    ds.GetAttributes(attributeType).VTKObject.AddArray(insidedness)
+        else:
+            insidedness = numpy_support.numpy_to_vtk(maskArray, deep=1, array_type=vtkConstants.VTK_SIGNED_CHAR)
+            insidedness.SetName(insidednessArrayName)
+            output.GetAttributes(attributeType).VTKObject.AddArray(insidedness)

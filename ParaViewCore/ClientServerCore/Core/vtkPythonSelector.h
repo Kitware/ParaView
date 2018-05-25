@@ -21,28 +21,35 @@
 #define vtkPythonSelector_h
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkSelectionOperator.h"
-
-#include "vtkWeakPointer.h" // for vtkWeakPointer
+#include "vtkSelector.h"
 
 class vtkSelectionNode;
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonSelector : public vtkSelectionOperator
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonSelector : public vtkSelector
 {
 public:
   static vtkPythonSelector* New();
-  vtkTypeMacro(vtkPythonSelector, vtkSelectionOperator);
+  vtkTypeMacro(vtkPythonSelector, vtkSelector);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void Initialize(vtkSelectionNode* node) override;
-
-  bool ComputeSelectedElements(vtkDataObject* input, vtkSignedCharArray* elementInside) override;
+  /**
+   * Overridden to delegate the selection to the Python expression.
+   */
+  bool ComputeSelectedElements(vtkDataObject* input, vtkDataObject* output) override;
 
 protected:
   vtkPythonSelector();
   ~vtkPythonSelector() override;
 
-  vtkWeakPointer<vtkSelectionNode> Node;
+  /**
+   * Implementing this is required by the superclass.
+   */
+  virtual bool ComputeSelectedElementsForBlock(vtkDataObject* vtkNotUsed(input),
+    vtkSignedCharArray* vtkNotUsed(insidednessArray), unsigned int vtkNotUsed(compositeIndex),
+    unsigned int vtkNotUsed(amrLevel), unsigned int vtkNotUsed(amrIndex)) override
+  {
+    return false;
+  }
 
 private:
   vtkPythonSelector(const vtkPythonSelector&) = delete;

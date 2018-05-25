@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPythonSelector.h"
 
+#include "vtkCompositeDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSelectionNode.h"
@@ -34,41 +35,37 @@ vtkPythonSelector::~vtkPythonSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonSelector::Initialize(vtkSelectionNode* node)
+bool vtkPythonSelector::ComputeSelectedElements(vtkDataObject* input, vtkDataObject* output)
 {
-  this->Node = node;
-}
-
-//----------------------------------------------------------------------------
-bool vtkPythonSelector::ComputeSelectedElements(
-  vtkDataObject* input, vtkSignedCharArray* elementInside)
-{
-  assert(input != nullptr && elementInside != nullptr);
-  assert(this->Node);
+  assert(input != nullptr);
+  assert(output != nullptr);
+  assert(this->Node != nullptr);
 
   // ensure Python is initialized.
   vtkPythonInterpreter::Initialize();
 
-  char addrOfInputDO[1024], addrOfNode[1024], addrOfElementInside[1024];
+  char addrOfInputDO[1024], addrOfNode[1024], addrOfOutputDO[1024];
   sprintf(addrOfInputDO, "%p", input);
-  sprintf(addrOfNode, "%p", this->Node.GetPointer());
-  sprintf(addrOfElementInside, "%p", elementInside);
+  sprintf(addrOfNode, "%p", this->Node);
+  sprintf(addrOfOutputDO, "%p", output);
 
   std::ostringstream stream;
   stream << "def vtkPythonSelector_ComputeSelectedElements():" << endl
          << "    from paraview import python_selector as ps" << endl
          << "    from paraview import vtk" << endl
          << "    inputDO = vtk.vtkDataObject('" << addrOfInputDO << "')" << endl
+         << "    outputDO = vtk.vtkDataObject('" << addrOfOutputDO << "')" << endl
          << "    node = vtk.vtkSelectionNode('" << addrOfNode << "')" << endl
-         << "    elementInside = vtk.vtkSignedCharArray('" << addrOfElementInside << "')" << endl
-         << "    ps.execute(inputDO, node, elementInside)" << endl
-         << "    del elementInside" << endl
+         << "    ps.execute(inputDO, node, '" << this->InsidednessArrayName << "', outputDO)"
+         << endl
+         << "    del outputDO" << endl
          << "    del node" << endl
          << "    del inputDO" << endl
          << "    del ps" << endl
          << "vtkPythonSelector_ComputeSelectedElements()" << endl
          << "del vtkPythonSelector_ComputeSelectedElements" << endl;
   vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+
   return true;
 }
 

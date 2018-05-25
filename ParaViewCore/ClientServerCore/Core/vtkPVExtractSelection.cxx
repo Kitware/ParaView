@@ -33,7 +33,7 @@
 #include "vtkPythonSelector.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
-#include "vtkSelectionOperator.h"
+#include "vtkSelector.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 
@@ -285,7 +285,7 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(
 }
 
 //----------------------------------------------------------------------------
-vtkSmartPointer<vtkSelectionOperator> vtkPVExtractSelection::NewSelectionOperator(
+vtkSmartPointer<vtkSelector> vtkPVExtractSelection::NewSelectionOperator(
   vtkSelectionNode::SelectionContent type)
 {
   if (type == vtkSelectionNode::QUERY)
