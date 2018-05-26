@@ -228,3 +228,21 @@ Views support the following annotations:
 layout from grabbing the view, enabling custom application developers to assign or
 position the view themselves. Use `pqObjectBuilder::createView(viewType, server, true)`
 to create a new view with this annotation added.
+
+Live Source
+------------
+Certain algorithms can generate new data autonomously, e.g. a source that reads
+data from the network. The **LiveSource** hint allows ParaView to periodically
+check with the algorithm if it has new data and update the application, if so.
+
+For that, one simply adds a hint to the proxy as follows:
+
+    <SourceProxy ...>
+      ...
+      <Hints>
+        <LiveSource />
+      </Hints>
+    </SourceProxy>
+
+The algorithm subclass must have `bool GetNeedsUpdate()` method that returns
+true if the algorithm needs update.

@@ -109,6 +109,14 @@ public:
 
   //@{
   /**
+   * Controls whether `pqLiveSourceBehavior` is created.
+   * @sa pqLiveSourceBehavior
+   */
+  PQ_BEHAVIOR_DEFINE_METHODS(LiveSourceBehavior);
+  //@}
+
+  //@{
+  /**
    * By default, widgets like QComboBox, QSlider handle wheel event even when
    * the widget doesn't have the focus. While that's handy, in many use-cases,
    * in several where these are embedded in scrollable panels, they can
@@ -151,6 +159,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(LockPanelsBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(PythonShellResetBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(WheelNeedsFocusBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(LiveSourceBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG
