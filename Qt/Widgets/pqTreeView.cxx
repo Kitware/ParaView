@@ -247,7 +247,13 @@ bool pqTreeView::edit(const QModelIndex& idx, EditTrigger trigger, QEvent* evt)
           auto otherItemFlags = amodel->flags(otherIdx);
           if ((otherItemFlags & Qt::ItemIsUserCheckable) && (otherItemFlags & Qt::ItemIsEnabled))
           {
-            amodel->setData(otherIdx, itemCheckState, Qt::CheckStateRole);
+            // several models may report flags incorrectly. Hence check for valid
+            // checkstate data as well,  before setting check state.
+            const QVariant idata = amodel->data(otherIdx, Qt::CheckStateRole);
+            if (idata.isValid() && idata != itemCheckState)
+            {
+              amodel->setData(otherIdx, itemCheckState, Qt::CheckStateRole);
+            }
           }
         }
       }
