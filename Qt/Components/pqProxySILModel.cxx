@@ -96,7 +96,13 @@ QModelIndex pqProxySILModel::mapToSource(const QModelIndex& proxyIndex) const
   }
   else if (proxyIndex.isValid())
   {
-    return silModel->makeIndex(static_cast<vtkIdType>(proxyIndex.internalId()));
+    if (proxyIndex.column() < silModel->columnCount())
+    {
+      return silModel->makeIndex(static_cast<vtkIdType>(proxyIndex.internalId()));
+    }
+    qCritical("Calling mapToSource on a column not supported by source. "
+              "This may indicate an error in the logic.");
+    return QModelIndex();
   }
 
   return silModel->hierarchyIndex(this->HierarchyName);
@@ -229,14 +235,17 @@ void pqProxySILModel::setHeaderTitle(QString& title)
 //-----------------------------------------------------------------------------
 Qt::ItemFlags pqProxySILModel::flags(const QModelIndex& idx) const
 {
-  QModelIndex srcIndex = this->mapToSource(idx);
-  Qt::ItemFlags iflags = this->sourceModel()->flags(srcIndex);
-
-  if (this->noCheckBoxes)
+  Qt::ItemFlags iflags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  if (idx.isValid() && (idx.column() < this->sourceModel()->columnCount()))
   {
-    Qt::ItemFlags mask = Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
-    mask = ~mask;
-    iflags = iflags & mask;
+    QModelIndex srcIndex = this->mapToSource(idx);
+    iflags = this->sourceModel()->flags(srcIndex);
+    if (this->noCheckBoxes)
+    {
+      Qt::ItemFlags mask = Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+      mask = ~mask;
+      iflags = iflags & mask;
+    }
   }
   return iflags;
 }
