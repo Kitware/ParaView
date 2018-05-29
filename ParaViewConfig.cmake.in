@@ -33,9 +33,9 @@ set (PARAVIEW_USE_FILE ${ParaView_USE_FILE})
 set (PARAVIEW_CMAKE_DIR ${ParaView_CMAKE_DIR})
 
 # Setup VTK-m if it was enabled
-set(VTK_HAS_VTKM @VTK_HAS_VTKM@)
-if(VTK_HAS_VTKM)
-  set(VTKM_CMAKE_DIR "${ParaView_CMAKE_DIR}")
+set(PARAVIEW_USE_VTKM @PARAVIEW_USE_VTKM@)
+if(PARAVIEW_USE_VTKM)
+   set(VTKM_CMAKE_DIR "${VTK_CMAKE_DIR}")
   if(NOT __vtk_install_tree)
     set(VTKM_CMAKE_DIR "@VTKm_BINARY_DIR@/@VTK_INSTALL_PACKAGE_DIR@/vtkm")
   endif()
@@ -43,6 +43,7 @@ if(VTK_HAS_VTKM)
   find_package(VTKm
                PATHS "${CMAKE_CURRENT_LIST_DIR}"
                      "${VTKM_CMAKE_DIR}"
+                     "${VTK_RUNTIME_DIRS}"
                NO_DEFAULT_PATH
                )
 endif()
