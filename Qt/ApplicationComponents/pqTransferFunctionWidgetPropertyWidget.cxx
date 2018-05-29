@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqTransferFunctionWidgetPropertyWidget.h"
 
+#include "pqCoreUtilities.h"
 #include "pqPVApplicationCore.h"
 #include "pqTransferFunctionWidget.h"
 #include "pqTransferFunctionWidgetPropertyDialog.h"
@@ -185,8 +186,9 @@ void pqTransferFunctionWidgetPropertyWidget::buttonClicked()
   vtkObjectBase* object = this->TFProxy->GetClientSideObject();
   vtkPiecewiseFunction* transferFunction = vtkPiecewiseFunction::SafeDownCast(object);
 
-  this->Dialog = new pqTransferFunctionWidgetPropertyDialog(
-    this->property()->GetXMLLabel(), &this->Range[0], transferFunction, this);
+  this->Dialog = new pqTransferFunctionWidgetPropertyDialog(this->property()->GetXMLLabel(),
+    &this->Range[0], transferFunction, this, pqCoreUtilities::mainWidget());
+  this->Dialog->setObjectName(this->property()->GetXMLName());
   this->Dialog->show();
   this->UpdateProperty();
 }

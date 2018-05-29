@@ -35,6 +35,13 @@ if (NOT EXISTS "${PARAVIEW_EXECUTABLE}")
   message(FATAL_ERROR "Could not file ParaView '${PARAVIEW_EXECUTABLE}'")
 endif()
 
+# On windows, execute_process runs PARAVIEW_EXECUTABLE in background.
+# We prepend "cmd /c" to force paraview's window to be shown to ensure proper
+# mouse interactions with the GUI.
+if(WIN32)
+  set(PARAVIEW_EXECUTABLE cmd /c ${PARAVIEW_EXECUTABLE})
+endif()
+
 execute_process_with_echo(COMMAND
     ${PARAVIEW_EXECUTABLE} -dr
     --test-directory=${COPROCESSING_TEST_DIR}

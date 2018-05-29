@@ -79,6 +79,14 @@ void MainWindow::processTest()
 {
   if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
   {
+    // make sure the widget had enough time to become valid
+    pqQVTKWidgetBase* qwdg = qobject_cast<pqQVTKWidgetBase*>(this->RenderView->widget());
+    if (qwdg != nullptr && !qwdg->isValid())
+    {
+      QTimer::singleShot(100, this, SLOT(processTest()));
+      return;
+    }
+
     bool comparison_succeeded = true;
     if ((options->GetNumberOfTestScripts() > 0) && (options->GetTestBaseline(0) != NULL))
     {

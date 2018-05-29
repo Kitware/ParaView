@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImageUtil.h"
 #include "pqLineEditEventPlayer.h"
 #include "pqOptions.h"
+#include "pqQVTKWidget.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
 #include "pqServerManagerModel.h"
@@ -296,19 +297,35 @@ class WidgetSizer
 {
   QSize OldSize;
   QWidget* Widget;
+  bool EnableHiDPI;
 
 public:
   WidgetSizer(QWidget* widget, const QSize& size)
     : Widget(widget)
+    , EnableHiDPI(true)
   {
+    pqQVTKWidget* w = dynamic_cast<pqQVTKWidget*>(widget);
+    if (w)
+    {
+      // We need to disable the HiDPI during capture to ensure target size
+      // is exactly respected (otherwise, as we convert size from float to int
+      // and back and forth, we loose precision).
+      this->EnableHiDPI = w->enableHiDPI();
+      w->setEnableHiDPI(false);
+    }
     if (widget != nullptr && size.isValid())
     {
       this->OldSize = widget->size();
-      widget->resize(size / widget->devicePixelRatio());
+      widget->resize(size);
     }
   }
   ~WidgetSizer()
   {
+    pqQVTKWidget* w = dynamic_cast<pqQVTKWidget*>(this->Widget);
+    if (w)
+    {
+      w->setEnableHiDPI(this->EnableHiDPI);
+    }
     if (this->Widget && this->OldSize.isValid())
     {
       this->Widget->resize(this->OldSize);

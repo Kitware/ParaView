@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProgressManager.h"
+#include "pqQVTKWidgetBase.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
@@ -224,6 +225,15 @@ void pqView::tryRender()
 //-----------------------------------------------------------------------------
 void pqView::forceRender()
 {
+  // avoid calling render if the widget isn't valid, i.e. if the context isn't
+  // ready yet. This is due to asynchronous initialization of the context by
+  // the pqQVTKWidgetBase class.
+  pqQVTKWidgetBase* qwdg = qobject_cast<pqQVTKWidgetBase*>(this->widget());
+  if (qwdg != nullptr && !qwdg->isValid())
+  {
+    return;
+  }
+
   // cancel any pending renders, if this method is called directly.
   this->cancelPendingRenders();
   vtkSMViewProxy* view = this->getViewProxy();

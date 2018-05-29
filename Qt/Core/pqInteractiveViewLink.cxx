@@ -331,7 +331,7 @@ void pqInteractiveViewLink::drawViewLink(int setFront)
     this->Internal->DisplayPVView->GetUseDistributedRenderingForStillRender();
 
   // getFront is true when remoteRendering a non-visible linked view, false otherwise
-  bool getFront = !remoteRendering || visible;
+  bool getFront = remoteRendering && !visible;
 
   // Render the linked view offscreen is necessary
   // only when non-remote-rendering a non-visible linked view

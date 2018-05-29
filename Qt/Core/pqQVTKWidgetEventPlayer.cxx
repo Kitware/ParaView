@@ -39,8 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
+#include "QVTKOpenGLSimpleWidget.h"
 #include "pqEventDispatcher.h"
 #include "pqQVTKWidgetBase.h"
+
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
 {
@@ -49,14 +51,16 @@ pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
 bool pqQVTKWidgetEventPlayer::playEvent(
   QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
-  pqQVTKWidgetBase* widget = qobject_cast<pqQVTKWidgetBase*>(Object);
-  if (widget)
+  pqQVTKWidgetBase* baseWidget = qobject_cast<pqQVTKWidgetBase*>(Object);
+  QVTKOpenGLSimpleWidget* qvtkWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
+  if (baseWidget || qvtkWidget)
   {
     if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove")
     {
       QRegExp mouseRegExp("\\(([^,]*),([^,]*),([^,]),([^,]),([^,]*)\\)");
       if (mouseRegExp.indexIn(Arguments) != -1)
       {
+        QWidget* widget = qobject_cast<QWidget*>(Object);
         QVariant v = mouseRegExp.cap(1);
         int x = static_cast<int>(v.toDouble() * widget->size().width());
         v = mouseRegExp.cap(2);
@@ -71,7 +75,20 @@ bool pqQVTKWidgetEventPlayer::playEvent(
           ? QEvent::MouseButtonPress
           : ((Command == "mouseMove") ? QEvent::MouseMove : QEvent::MouseButtonRelease);
         QMouseEvent e(type, QPoint(x, y), button, buttons, keym);
-        qApp->notify(widget, &e);
+
+        if (baseWidget != nullptr)
+        {
+          // Due to QTBUG-61836 (see QVTKOpenGLWidget::testingEvent()), events should
+          // be propagated back to the internal QVTKOpenGLWindow when being fired
+          // explicitely on the widget instance. We have to use a custom event
+          // callback in this case to ensure that events are passed to the window.
+          baseWidget->testingEvent(&e);
+        }
+
+        if (qvtkWidget != nullptr)
+        {
+          qApp->notify(qvtkWidget, &e);
+        }
       }
       return true;
     }
