@@ -107,7 +107,7 @@
    <item row="2" column="0" colspan="3">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Drag control points to change point locations.&lt;br/&gt;Use Ctrl + Left Click to insert new points.&lt;br/&gt;Use Shift + Left Click to remove a point.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Drag control points to change point locations.&lt;br/&gt;Use Ctrl + Left Click to insert a new point on the line at mouse position.&lt;br/&gt;Use Shift + Left Click to remove the point at mouse position.&lt;br/&gt;Use Alt + Left Click to add a new point anywhere at mouse position&lt;br/&gt;at the end of the polyline or at the beginning if the first point is selected.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
