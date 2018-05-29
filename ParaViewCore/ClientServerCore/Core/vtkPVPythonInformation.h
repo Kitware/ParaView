@@ -34,42 +34,42 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonInformation : public vtkPVInfo
 public:
   static vtkPVPythonInformation* New();
   vtkTypeMacro(vtkPVPythonInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void DeepCopy(vtkPVPythonInformation* info);
 
   /**
    * Transfer information about a single object into this object.
    */
-  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) override;
 
   /**
    * Same as DeepCopy for this object.
    */
-  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) override;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) override;
+  void CopyFromStream(const vtkClientServerStream*) override;
   //@}
 
   //@{
   /**
    * Whether the server was compiled with python support.
    */
-  vtkSetMacro(PythonSupport, bool) vtkGetMacro(PythonSupport, bool)
-    vtkBooleanMacro(PythonSupport, bool)
-    //@}
+  vtkSetMacro(PythonSupport, bool) vtkGetMacro(PythonSupport, bool);
+  vtkBooleanMacro(PythonSupport, bool);
+  //@}
 
-    //@{
-    /**
-     * If GetPythonSupport() is true, returns the version of python detected on
-     * the server.
-     */
-    void SetPythonVersion(const std::string& arg)
+  //@{
+  /**
+   * If GetPythonSupport() is true, returns the version of python detected on
+   * the server.
+   */
+  void SetPythonVersion(const std::string& arg)
   {
     if (arg != this->PythonVersion)
     {
@@ -100,16 +100,16 @@ public:
   /**
    * Whether the numpy module is available on the server.
    */
-  vtkSetMacro(NumpySupport, bool) vtkGetMacro(NumpySupport, bool)
-    vtkBooleanMacro(NumpySupport, bool)
-    //@}
+  vtkSetMacro(NumpySupport, bool) vtkGetMacro(NumpySupport, bool);
+  vtkBooleanMacro(NumpySupport, bool);
+  //@}
 
-    //@{
-    /**
-     * If GetNumpySupport() is true, returns the version of numpy detected on the
-     * server.
-     */
-    void SetNumpyVersion(const std::string& arg)
+  //@{
+  /**
+   * If GetNumpySupport() is true, returns the version of numpy detected on the
+   * server.
+   */
+  void SetNumpyVersion(const std::string& arg)
   {
     if (arg != this->NumpyVersion)
     {
@@ -140,16 +140,17 @@ public:
   /**
    * Whether the matplotlib module is available on the server.
    */
-  vtkSetMacro(MatplotlibSupport, bool) vtkGetMacro(MatplotlibSupport, bool)
-    vtkBooleanMacro(MatplotlibSupport, bool)
-    //@}
+  vtkSetMacro(MatplotlibSupport, bool);
+  vtkGetMacro(MatplotlibSupport, bool);
+  vtkBooleanMacro(MatplotlibSupport, bool);
+  //@}
 
-    //@{
-    /**
-     * If GetMatplotlibSupport() is true, returns the version of matplotlib
-     * detected on the server.
-     */
-    void SetMatplotlibVersion(const std::string& arg)
+  //@{
+  /**
+   * If GetMatplotlibSupport() is true, returns the version of matplotlib
+   * detected on the server.
+   */
+  void SetMatplotlibVersion(const std::string& arg)
   {
     if (arg != this->MatplotlibVersion)
     {
