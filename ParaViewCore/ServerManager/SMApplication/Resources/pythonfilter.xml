@@ -531,6 +531,32 @@ annotation text.
       </DoubleVectorProperty>
       <!-- End ProgrammableSource -->
     </SourceProxy>
+
+    <SourceProxy class="vtkPythonProgrammableFilter"
+                 label="Live Programmable Source"
+                 name="LiveProgrammableSource"
+                 base_proxygroup="sources"
+                 base_proxyname="ProgrammableSource">
+      <Documentation>
+        A programmable source that can produce new data autonomously.
+      </Documentation>
+      <StringVectorProperty command="SetCheckNeedsUpdateScript"
+                            label="Script (CheckNeedsUpdate)"
+                            name="CheckNeedsUpdateScript"
+                            number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line" syntax="python" />
+        </Hints>
+        <Documentation>
+          Specify the script to use to check if the filter/source has new data.
+          This is only needed for "live" sources, that can cause data to be available
+          outside of ParaView.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <LiveSource />
+      </Hints>
+   </SourceProxy>
   </ProxyGroup>
   <!-- =================================================================== -->
   <ProxyGroup name="animation">

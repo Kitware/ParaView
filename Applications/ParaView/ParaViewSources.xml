@@ -18,6 +18,7 @@
   <Proxy group="sources" name="PointSource" />
   <Proxy group="sources" name="PolyLineSource" />
   <Proxy group="sources" name="ProgrammableSource" />
+  <Proxy group="sources" name="LiveProgrammableSource" />
   <Proxy group="sources" name="Ruler" />
   <Proxy group="sources" name="SphereSource" />
   <Proxy group="sources" name="SplineSource" />

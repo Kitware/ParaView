@@ -57,29 +57,41 @@ public:
   /**
    * Set the text of the python script to execute.
    */
-  vtkSetStringMacro(Script) vtkGetStringMacro(Script)
-    //@}
+  vtkSetStringMacro(Script);
+  vtkGetStringMacro(Script);
+  //@}
 
-    //@{
-    /**
-     * Set the text of the python script to execute in RequestInformation().
-     */
-    vtkSetStringMacro(InformationScript) vtkGetStringMacro(InformationScript)
-    //@}
+  //@{
+  /**
+   * Set the text of the python script to execute in RequestInformation().
+   */
+  vtkSetStringMacro(InformationScript);
+  vtkGetStringMacro(InformationScript);
+  //@}
 
-    //@{
-    /**
-     * Set the text of the python script to execute in RequestUpdateExtent().
-     */
-    vtkSetStringMacro(UpdateExtentScript) vtkGetStringMacro(UpdateExtentScript)
-    //@}
+  //@{
+  /**
+   * Set the text of the python script to execute in RequestUpdateExtent().
+   */
+  vtkSetStringMacro(UpdateExtentScript);
+  vtkGetStringMacro(UpdateExtentScript);
+  //@}
 
-    //@{
-    /**
-     * Set a name-value parameter that will be available to the script
-     * when it is run
-     */
-    void SetParameterInternal(const char* name, const char* value);
+  //@{
+  /**
+   * For "live" sources, this script, if provided, if used to determine
+   * if the source needs an update.
+   */
+  vtkSetStringMacro(CheckNeedsUpdateScript);
+  vtkGetStringMacro(CheckNeedsUpdateScript);
+  //@}
+
+  //@{
+  /**
+   * Set a name-value parameter that will be available to the script
+   * when it is run
+   */
+  void SetParameterInternal(const char* name, const char* value);
   void SetParameter(const char* name, const char* value);
   void SetParameter(const char* name, int value);
   void SetParameter(const char* name, double value);
@@ -132,6 +144,18 @@ public:
     this->Superclass::SetNumberOfInputPorts(numberOfInputPorts);
   }
 
+  /**
+   * Application code can call `GetNeedsUpdate` to check if the algorithm can use
+   * an update to show updated information.
+   */
+  bool GetNeedsUpdate();
+
+  /**
+   * CheckNeedsUpdateScript should call `SetNeedsUpdate(true)` to indicate that
+   * the algorithm has new data and hence may be updated.
+   */
+  vtkSetMacro(NeedsUpdate, bool);
+
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter() override;
@@ -169,8 +193,10 @@ protected:
   char* Script;
   char* InformationScript;
   char* UpdateExtentScript;
+  char* CheckNeedsUpdateScript;
   char* PythonPath;
   int OutputDataSetType;
+  bool NeedsUpdate;
 
 private:
   vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&) = delete;
