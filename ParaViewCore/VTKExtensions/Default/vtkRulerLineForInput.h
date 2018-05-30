@@ -16,8 +16,9 @@
  * @class   vtkRulerLineForInput
  *
  *
- * This filter produces a line along a side of the bounding box of its input.
- * Which coordinate axis this line is parallel to is configurable via SetAxis.
+ * This filter produces a line along a side of the bounding box of its input
+ * for either an axis-aligned bounding box or an object-oriented bounding box.
+ * Use SetAxis to choose to which coordinate axis this line is parallel.
  * This class is designed to work with the vtkRulerLineRepresentation to show
  * a ruler along the input data.
  *
@@ -39,10 +40,20 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
   static vtkRulerLineForInput* New();
 
+  enum class AxisType
+  {
+    X = 0,
+    Y,
+    Z,
+    OrientedBoundingBoxMajorAxis,
+    OrientedBoundingBoxMediumAxis,
+    OrientedBoundingBoxMinorAxis
+  };
+
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
-  vtkSetClampMacro(Axis, int, 0, 2);
+  vtkSetClampMacro(Axis, int, 0, 5);
   vtkGetMacro(Axis, int);
 
 protected:
