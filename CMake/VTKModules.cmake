@@ -377,6 +377,7 @@ endif()
 
 list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
 list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
+list (APPEND _vtk_modules vtkIOSegY)
 list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
 if(PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules vtkPVCinemaReader)
@@ -404,11 +405,6 @@ endif()
 if (PARAVIEW_ENABLE_PDAL)
   list (APPEND _vtk_modules vtkIOPDAL)
 endif()
-
-if (PARAVIEW_ENABLE_SEGY)
-  list (APPEND _vtk_modules vtkIOSegY)
-endif()
-
 
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
