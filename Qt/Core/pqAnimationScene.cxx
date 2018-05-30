@@ -201,6 +201,12 @@ pqAnimationCue* pqAnimationScene::getCue(
   {
     vtkSMProxy* cue = pqCue->getProxy();
     vtkSMProxy* animatedProxy = pqSMAdaptor::getProxyProperty(cue->GetProperty("AnimatedProxy"));
+    auto propertyNameProperty = cue->GetProperty("AnimatedPropertyName");
+    if (!propertyNameProperty)
+    {
+      continue;
+    }
+
     QString aname =
       pqSMAdaptor::getElementProperty(cue->GetProperty("AnimatedPropertyName")).toString();
     int aindex = pqSMAdaptor::getElementProperty(cue->GetProperty("AnimatedElement")).toInt();
