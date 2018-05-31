@@ -31,8 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSpreadSheetViewModel.h"
 
-// Server Manager Includes.
+#include "vtkArrayDispatch.h"
 #include "vtkCellType.h"
+#include "vtkDataArrayAccessor.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
@@ -284,7 +285,55 @@ void pqSpreadSheetViewModel::onDataFetched(vtkObject*, unsigned long, void*, voi
   // we always invalidate header data, just to be on a safe side.
   this->headerDataChanged(Qt::Horizontal, 0, this->columnCount() - 1);
 }
+namespace
+{
+struct ArrayTupleToStringConvertor
+{
+private:
+  QTextStream Stream;
+  const char* Separator;
+  bool Fixed;
+  int Precision;
 
+public:
+  ArrayTupleToStringConvertor(QString& string, const char* sep, bool fixed, int precision)
+    : Stream(&string, QIODevice::WriteOnly)
+    , Separator(sep)
+    , Fixed(fixed)
+    , Precision(precision)
+  {
+  }
+
+  template <typename ArrayType>
+  void operator()(ArrayType* darray)
+  {
+    vtkDataArrayAccessor<ArrayType> accessor(darray);
+    if (darray->GetNumberOfTuples() == 1)
+    {
+      for (int cc = 0; cc < darray->GetNumberOfComponents(); ++cc)
+      {
+        this->Stream << (cc > 0 ? this->Separator : "") << this->number(accessor.Get(0, cc));
+      }
+    }
+  }
+
+  template <typename ValueType>
+  QString number(const ValueType& val) const
+  {
+    return QString::number(val);
+  }
+
+  QString number(const double& val) const
+  {
+    return QString::number(val, this->Fixed ? 'f' : 'g', this->Precision);
+  }
+
+  QString number(const float& val) const
+  {
+    return QString::number(val, this->Fixed ? 'f' : 'g', this->Precision);
+  }
+};
+};
 //-----------------------------------------------------------------------------
 QVariant pqSpreadSheetViewModel::data(const QModelIndex& idx, int role /*=Qt::DisplayRole*/) const
 {
@@ -348,51 +397,11 @@ QVariant pqSpreadSheetViewModel::data(const QModelIndex& idx, int role /*=Qt::Di
   }
   else if (value.IsArray())
   {
-    const char* component_separator = ", ";
     str = QString();
-    QTextStream stream(&str, QIODevice::WriteOnly);
-    // it's possible that it's a char array, then too we need to do the
-    // number magic.
-    vtkDataArray* array = vtkDataArray::SafeDownCast(value.ToArray());
-    if (array)
-    {
-      switch (array->GetDataType())
-      {
-        case VTK_CHAR:
-        case VTK_UNSIGNED_CHAR:
-        case VTK_SIGNED_CHAR:
-        {
-          for (vtkIdType cc = 0; cc < array->GetNumberOfTuples(); cc++)
-          {
-            double* tuple = array->GetTuple(cc);
-            for (vtkIdType kk = 0; kk < array->GetNumberOfComponents(); kk++)
-            {
-              stream << (kk > 0 ? component_separator : "")
-                     << QString::number(static_cast<int>(tuple[kk]));
-            }
-          }
-          break;
-        }
-        case VTK_DOUBLE:
-        case VTK_FLOAT:
-        {
-          for (vtkIdType cc = 0; cc < array->GetNumberOfTuples(); cc++)
-          {
-            double* tuple = array->GetTuple(cc);
-            for (vtkIdType kk = 0; kk < array->GetNumberOfComponents(); kk++)
-            {
-              stream << (kk > 0 ? component_separator : "")
-                     << QString::number(static_cast<double>(tuple[kk]),
-                          this->Internal->FixedRepresentation ? 'f' : 'g',
-                          this->Internal->DecimalPrecision);
-            }
-          }
-          break;
-        }
-        default:
-          break;
-      }
-    }
+    ArrayTupleToStringConvertor convertor(
+      str, ", ", this->Internal->FixedRepresentation, this->Internal->DecimalPrecision);
+    vtkArrayDispatch::DispatchByValueType<vtkArrayDispatch::AllTypes>::Execute(
+      vtkDataArray::SafeDownCast(value.ToArray()), convertor);
   }
   return str;
 }
