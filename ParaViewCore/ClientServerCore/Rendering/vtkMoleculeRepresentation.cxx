@@ -24,6 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkView.h"
 
@@ -250,3 +251,12 @@ void vtkMoleculeRepresentation::UpdateColoringParameters()
   mInfo->CopyEntry(info, vtkDataObject::FIELD_ASSOCIATION());
   mInfo->CopyEntry(info, vtkDataObject::FIELD_NAME());
 }
+
+//----------------------------------------------------------------------------
+#define vtkForwardPropertyCallMacro(propertyMethod, arg, arg_type)                                 \
+  void vtkMoleculeRepresentation::propertyMethod(arg_type arg)                                     \
+  {                                                                                                \
+    this->Actor->GetProperty()->propertyMethod(arg);                                               \
+  }
+
+vtkForwardPropertyCallMacro(SetOpacity, value, double);

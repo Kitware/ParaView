@@ -46,6 +46,10 @@ public:
 
   void SetLookupTable(vtkScalarsToColors* lut);
 
+  //***************************************************************************
+  // Forwarded to Actor->GetProperty()
+  virtual void SetOpacity(double val);
+
   // Description:
   // No-op. For compatibility with vtkPVCompositeRepresentation, which calls
   // SetRepresentation on it's subproxies.
