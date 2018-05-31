@@ -226,6 +226,7 @@ public:
   }
   ~pqPresetDialogProxyModel() override {}
 
+  bool isShowingAdvanced() { return ShowAdvanced; }
   void setShowAdvanced(bool show)
   {
     this->ShowAdvanced = show;
@@ -470,8 +471,25 @@ void pqPresetDialog::setCurrentPreset(const char* presetName)
 {
   pqInternals& internals = (*this->Internals);
   QModelIndex idx = internals.Model->indexFromName(presetName);
-  idx = internals.ProxyModel->mapFromSource(idx);
-  idx = internals.ReflowModel->mapFromSource(idx);
+  if (!idx.isValid())
+  {
+    return;
+  }
+  auto newIdx = internals.ProxyModel->mapFromSource(idx);
+  newIdx = internals.ReflowModel->mapFromSource(newIdx);
+  if (!newIdx.isValid() && !internals.ProxyModel->isShowingAdvanced())
+  {
+    // If the requested preset is not in the default list, trigger the show advanced button and try
+    // to get the index again.  Since the return above was not triggered we know the index should be
+    // valid with the advanced maps showing.
+    internals.Ui.advancedButton->click();
+    idx = internals.ProxyModel->mapFromSource(idx);
+    idx = internals.ReflowModel->mapFromSource(idx);
+  }
+  else
+  {
+    idx = newIdx;
+  }
   if (idx.isValid())
   {
     internals.Ui.gradients->selectionModel()->setCurrentIndex(
