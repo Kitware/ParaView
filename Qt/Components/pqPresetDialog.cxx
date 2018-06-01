@@ -405,6 +405,9 @@ public:
     this->Ui.gradients->setSelectionBehavior(QAbstractItemView::SelectItems);
     // This makes the two columns share the width of the table as the dialog is resized
     this->Ui.gradients->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // Make the vertical spacing bigger
+    this->Ui.gradients->verticalHeader()->setDefaultSectionSize(
+      (int)(this->Ui.gradients->verticalHeader()->defaultSectionSize() * 1.5));
   }
 };
 
