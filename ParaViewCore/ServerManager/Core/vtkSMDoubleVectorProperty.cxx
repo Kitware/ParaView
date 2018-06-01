@@ -320,3 +320,17 @@ bool vtkSMDoubleVectorProperty::IsValueDefault()
 {
   return this->Internals->IsValueDefault();
 }
+
+//---------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+void vtkSMDoubleVectorProperty::SetPrecision(int)
+{
+  VTK_LEGACY_BODY(vtkSMDoubleVectorProperty::SetPrecision, "ParaView 5.6");
+}
+
+int vtkSMDoubleVectorProperty::GetPrecision()
+{
+  VTK_LEGACY_BODY(vtkSMDoubleVectorProperty::GetPrecision, "ParaView 5.6");
+  return 0;
+}
+#endif
