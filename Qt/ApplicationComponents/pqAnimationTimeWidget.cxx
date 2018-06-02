@@ -99,12 +99,12 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
   this->setEnabled(false);
 
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
-  this->connect(ui.timeValue, SIGNAL(textChangedAndEditingFinished()), SIGNAL(timeValueChanged()));
+  this->connect(ui.timeValue, SIGNAL(textChangedAndEditingFinished()), SLOT(timeLineEditChanged()));
   this->connect(ui.radioButtonValue, SIGNAL(toggled(bool)), SIGNAL(playModeChanged()));
   this->connect(
     ui.radioButtonValue, SIGNAL(toggled(bool)), SLOT(updateTimestepCountLabelVisibility()));
   this->connect(
-    ui.timestepValue, SIGNAL(valueChangedAndEditingFinished()), SLOT(timestepValueChanged()));
+    ui.timestepValue, SIGNAL(valueChangedAndEditingFinished()), SLOT(timeSpinBoxChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -166,6 +166,7 @@ vtkSMProxy* pqAnimationTimeWidget::timeKeeper() const
 void pqAnimationTimeWidget::setTimeValue(double time)
 {
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
+  ui.timeValue->setProperty("PQ_DOUBLE_VALUE", QVariant(time));
   ui.timeValue->setTextAndResetCursor(QString::number(time, 'g', this->Internals->Precision));
   bool prev = ui.timestepValue->blockSignals(true);
   int index = vtkSMTimeKeeperProxy::GetLowerBoundTimeStepIndex(this->timeKeeper(), time);
@@ -177,7 +178,17 @@ void pqAnimationTimeWidget::setTimeValue(double time)
 double pqAnimationTimeWidget::timeValue() const
 {
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
-  return ui.timeValue->text().toDouble();
+  auto doubleValue = ui.timeValue->property("PQ_DOUBLE_VALUE");
+  return doubleValue.isValid() ? doubleValue.toDouble() : ui.timeValue->text().toDouble();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationTimeWidget::timeLineEditChanged()
+{
+  auto& ui = this->Internals->Ui;
+  const auto currentValue = ui.timeValue->text().toDouble();
+  ui.timeValue->setProperty("PQ_DOUBLE_VALUE", QVariant(currentValue));
+  emit this->timeValueChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -249,7 +260,7 @@ void pqAnimationTimeWidget::updateTimestepCountLabelVisibility()
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeWidget::timestepValueChanged()
+void pqAnimationTimeWidget::timeSpinBoxChanged()
 {
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
   int index = ui.timestepValue->value();

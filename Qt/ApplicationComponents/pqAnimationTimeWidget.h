@@ -130,7 +130,14 @@ private slots:
   * to change the current timestep. We will update the current time and
   * result in triggering  timeValueChanged() if time indeed changed.
   */
-  void timestepValueChanged();
+  void timeSpinBoxChanged();
+
+  /**
+   * called when user changes the time value in the line edit.
+   * we update the internal "full precision" time value and fire
+   * `timeValueChanged`.
+   */
+  void timeLineEditChanged();
 
 private:
   Q_DISABLE_COPY(pqAnimationTimeWidget)
