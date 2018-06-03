@@ -2435,7 +2435,6 @@
                             default_values="0"
                             name="Time"
                             number_of_elements="1"
-                            precision="17"
                             state_ignored="1">
         <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
         <DoubleRangeDomain name="range" />
@@ -2451,7 +2450,6 @@
                             information_only="1"
                             name="TimeRange"
                             number_of_elements="2"
-                            precision="17"
                             state_ignored="1">
         <!-- state-ignored simply makes this property not be saved in the UndoRedo state -->
         <Documentation>This is the time range. It's possible that there are no
