@@ -41,21 +41,21 @@ bool vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
 //-----------------------------------------------------------------------------
 vtkPVPlugin::vtkPVPlugin()
 {
-  this->FileName = NULL;
+  this->FileName = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVPlugin::~vtkPVPlugin()
 {
   delete[] this->FileName;
-  this->FileName = NULL;
+  this->FileName = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVPlugin::SetFileName(const char* filename)
 {
   delete[] this->FileName;
-  this->FileName = NULL;
+  this->FileName = nullptr;
   this->FileName = vtksys::SystemTools::DuplicateString(filename);
 }
 
