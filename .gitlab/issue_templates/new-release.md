@@ -18,6 +18,8 @@ Please remove this comment.
       - [ ] Uploaded
     - [ ] Getting Started
       - [ ] Uploaded
+    - [ ] Assemble release notes into Documentation/release/ParaView-VERSION.
+      - [ ] Get positive review and merge.
 
 # Update ParaView
 
@@ -83,14 +85,16 @@ Keep the relevant items for the kind of release this is.
 
 If making a first release candidate from master, i.e., `vMAJOR.MINOR.0-RC1`:
 
-  - Update `master` branch for **paraview/paraview-superbuild**
-    - [ ] `git fetch origin`
-    - [ ] `git checkout master`
-    - [ ] `git merge --ff-only origin/master`
+  - [ ] Update `master` branch for **paraview/paraview-superbuild**
+```
+git fetch origin
+git checkout master
+git merge --ff-only origin/master
+```
   - Update `versions.cmake` and `CMakeLists.txt`
     - [ ] `git checkout -b update-to-VERSION`
-    - [ ] Set ParaView source selections in `CMakeLists.txt`
-    - [ ] Force explicit version in `CMakeLists.txt`
+    - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
+      version in `CMakeLists.txt`:
 ```
 # Force source selection setting here.
 set(paraview_SOURCE_SELECTION "VERSION" CACHE STRING "Force version to VERSION" FORCE)
@@ -120,12 +124,14 @@ git gitlab-push -f
 If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
 
   - Update `release` branch for **paraview/paraview-superbuild**
-    - [ ] `git fetch origin`
-    - [ ] `git checkout release`
-    - [ ] `git merge --ff-only origin/release`
+```
+git fetch origin
+git checkout release
+git merge --ff-only origin/release
+```
   - Update `versions.cmake` and `CMakeLists.txt`
-    - [ ] Set ParaView source selections in `CMakeLists.txt`
-    - [ ] Force explicit version in `CMakeLists.txt`
+    - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
+      version in `CMakeLists.txt`:
 ```
 # Force source selection setting here.
 set(paraview_SOURCE_SELECTION "VERSION" CACHE STRING "Force version to VERSION" FORCE)
@@ -189,7 +195,9 @@ updateMD5sum.sh vMAJOR.MINOR
 
   - [ ] Notify `paraview@paraview.org` and `paraview-developers@paraview.org`
         that the release is available.
-
+  - [ ] Post an announcement in the Announcements category on
+        [discourse.paraview.org](https://discourse.paraview.org/).
+  - [ ]  Write and publish blog post with release notes.
 <!--
 These items only apply to non-RC releases.
 
@@ -198,6 +206,6 @@ These items only apply to non-RC releases.
 -->
 
 /cc @ben.boeckel
-/cc @cory-quammen
+/cc @cory.quammen
 /cc @utkarsh.ayachit
 /label ~"priority:required"
