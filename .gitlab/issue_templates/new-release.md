@@ -13,11 +13,14 @@ Please remove this comment.
 
   - Update ParaView guides
     - [ ] User manual
-      - [ ] Uploaded
-    - [ ] Catalyst guide
-      - [ ] Uploaded
-    - [ ] Getting Started
-      - [ ] Uploaded
+      - [ ] Rename to ParaViewGuide-VERSION.pdf
+      - [ ] Upload to www.paraview.org/files/vMAJOR.MINOR
+    - [ ] Catalyst Guide
+      - [ ] Rename to ParaViewCatalystGuide-VERSION.pdf
+      - [ ] Upload to www.paraview.org/files/vMAJOR.MINOR
+    - [ ] Getting Started Guide
+      - [ ] Rename to ParaViewGettingStarted-VERSION.pdf
+      - [ ] Upload to www.paraview.org/files/vMAJOR.MINOR
     - [ ] Assemble release notes into Documentation/release/ParaView-VERSION.
       - [ ] Get positive review and merge.
 
