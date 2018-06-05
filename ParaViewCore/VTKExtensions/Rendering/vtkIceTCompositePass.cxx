@@ -18,6 +18,7 @@
 #include "vtkCameraPass.h"
 #include "vtkFloatArray.h"
 #include "vtkFrameBufferObjectBase.h"
+#include "vtkHardwareSelector.h"
 #include "vtkIceTContext.h"
 #include "vtkIntArray.h"
 #include "vtkMatrix3x3.h"
@@ -474,6 +475,7 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   cam->GetKeyMatrices(render_state->GetRenderer(), wcvc, norms, vcdc, unused);
   float background[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
+  // here is where the actual drawing occurs
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: icetDrawFrame Start");
   IceTImage renderedImage = icetDrawFrame(vcdc->Element[0], wcvc->Element[0], background);
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: icetDrawFrame End");
@@ -484,7 +486,8 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   // isolate vtk from IceT OpenGL errors
   vtkOpenGLClearErrorMacro();
 
-  if (render_state->GetRenderer()->GetRenderWindow()->GetStereoRender() == 1)
+  vtkRenderer* ren = render_state->GetRenderer();
+  if (ren->GetRenderWindow()->GetStereoRender() == 1)
   {
     // if we are doing a stereo render we need to know
     // which stereo eye we are currently rendering. If we don't do this
@@ -551,7 +554,9 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   else if (this->FixBackground)
   {
     if (format == ICET_IMAGE_COLOR_RGBA_UBYTE)
+    {
       this->PushIceTColorBufferToScreen(render_state);
+    }
   }
 
   this->CleanupContext(render_state);
@@ -608,8 +613,8 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
 {
   vtkOpenGLClearErrorMacro();
 
-  vtkOpenGLRenderWindow* context =
-    static_cast<vtkOpenGLRenderWindow*>(render_state->GetRenderer()->GetRenderWindow());
+  vtkRenderer* ren = static_cast<vtkRenderer*>(render_state->GetRenderer());
+  vtkOpenGLRenderWindow* context = static_cast<vtkOpenGLRenderWindow*>(ren->GetRenderWindow());
   vtkOpenGLState* ostate = context->GetState();
 
   GLbitfield clear_mask = 0;
@@ -676,8 +681,32 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
       // Copy image from default buffer.
       if (icetImageGetColorFormat(result) != ICET_IMAGE_COLOR_NONE)
       {
+        // read in the pixels
+        unsigned char* destdata = icetImageGetColorub(result);
         glReadPixels(0, 0, icetImageGetWidth(result), icetImageGetHeight(result), GL_RGBA,
-          GL_UNSIGNED_BYTE, icetImageGetColorub(result));
+          GL_UNSIGNED_BYTE, destdata);
+
+        // for selections we need the adjusted buffer
+        // so we overwrite the RGB with the selection buffer
+        vtkHardwareSelector* sel = ren->GetSelector();
+        if (sel)
+        {
+          // copy the processed selection buffers into icet
+          unsigned char* passdata = sel->GetPixelBuffer(sel->GetCurrentPass());
+          unsigned int* area = sel->GetArea();
+          unsigned int passwidth = area[2] - area[0] + 1;
+          for (int y = 0; y < icetImageGetHeight(result); ++y)
+          {
+            for (int x = 0; x < icetImageGetWidth(result); ++x)
+            {
+              unsigned char* pdptr = passdata + (y * passwidth + x) * 3;
+              destdata[0] = pdptr[0];
+              destdata[1] = pdptr[1];
+              destdata[2] = pdptr[2];
+              destdata += 4;
+            }
+          }
+        }
       }
 
       if (icetImageGetDepthFormat(result) != ICET_IMAGE_DEPTH_NONE)

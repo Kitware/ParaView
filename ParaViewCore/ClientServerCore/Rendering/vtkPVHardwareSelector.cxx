@@ -73,16 +73,20 @@ void vtkPVHardwareSelector::SetSynchronizedWindows(vtkPVSynchronizedRenderWindow
 //----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::PassRequired(int pass)
 {
-  if (pass == MIN_KNOWN_PASS + 1)
+  if (pass == PROCESS_PASS && this->Iteration == 0)
   {
-    // synchronize the MaxAttributeId among all active processes (BUG #141112).
-    if (this->SynchronizedWindows && this->SynchronizedWindows->GetEnabled())
-    {
-      this->SynchronizedWindows->Reduce(
-        this->MaxAttributeId, vtkPVSynchronizedRenderWindows::MAX_OP);
-    }
+    return true;
   }
-  return (pass == PROCESS_PASS ? true : this->Superclass::PassRequired(pass));
+
+  vtkIdType passRequiredValue = this->Superclass::PassRequired(pass) ? 1 : 0;
+
+  // synchronize the value among all active processes (BUG #141112).
+  if (this->SynchronizedWindows && this->SynchronizedWindows->GetEnabled())
+  {
+    this->SynchronizedWindows->Reduce(passRequiredValue, vtkPVSynchronizedRenderWindows::MAX_OP);
+  }
+
+  return passRequiredValue > 0;
 }
 
 //----------------------------------------------------------------------------

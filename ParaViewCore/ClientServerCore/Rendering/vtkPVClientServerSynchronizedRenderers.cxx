@@ -15,6 +15,7 @@
 =========================================================================*/
 #include "vtkPVClientServerSynchronizedRenderers.h"
 
+#include "vtkHardwareSelector.h"
 #include "vtkLZ4Compressor.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -249,6 +250,12 @@ void vtkPVClientServerSynchronizedRenderers::PushImageToScreen()
   }
   this->Superclass::PushImageToScreen();
   this->Renderer->SetPreserveColorBuffer(prev);
+
+  vtkHardwareSelector* sel = this->Renderer->GetSelector();
+  if (sel)
+  {
+    sel->SavePixelBuffer(sel->GetCurrentPass());
+  }
 }
 
 //----------------------------------------------------------------------------
