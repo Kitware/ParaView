@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
+#include "pqSettings.h"
 #include "vtkNew.h"
 #include "vtkSMTransferFunctionPresets.h"
 #include "vtkSMTransferFunctionProxy.h"
@@ -42,11 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtk_jsoncpp.h>
 
 #include <QList>
+#include <QMenu>
 #include <QPixmap>
 #include <QPointer>
+#include <QRegExp>
 #include <QSize>
 #include <QSortFilterProxyModel>
 #include <QtDebug>
+
+#define NUMBER_OF_DEFAULT_PRESETS 16
 
 class pqPresetDialogTableModel : public QAbstractTableModel
 {
@@ -151,10 +156,58 @@ public:
       switch (role)
       {
         case Qt::DisplayRole:
-          return this->Presets->GetPresetDefaultPosition(idx.row());
+          auto position = this->Presets->GetPresetDefaultPosition(idx.row());
+          if (position == -1)
+          {
+            pqSettings settings;
+            auto userChosenPresets =
+              settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
+            QString name = this->Presets->GetPresetName(idx.row()).c_str();
+            auto presetIdx = userChosenPresets.indexOf(QRegExp(QRegExp::escape(name)));
+            return presetIdx == -1 ? -1 : NUMBER_OF_DEFAULT_PRESETS + presetIdx;
+          }
+          return position;
       }
     }
     return QVariant();
+  }
+
+  void addPresetToDefaults(const QModelIndex& idx)
+  {
+    if (!idx.isValid() || idx.model() != this || idx.column() != 0)
+    {
+      return;
+    }
+    QString presetName = this->Presets->GetPresetName(idx.row()).c_str();
+    pqSettings settings;
+    auto userChosenPresets =
+      settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
+    if (!userChosenPresets.contains(presetName))
+    {
+      userChosenPresets.push_back(presetName);
+      settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
+      auto changedIndex = this->index(idx.row(), 1);
+      emit this->dataChanged(changedIndex, changedIndex);
+    }
+  }
+
+  void removePresetFromDefaults(const QModelIndex& idx)
+  {
+    if (!idx.isValid() || idx.model() != this || idx.column() != 0)
+    {
+      return;
+    }
+    QString presetName = this->Presets->GetPresetName(idx.row()).c_str();
+    pqSettings settings;
+    auto userChosenPresets =
+      settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
+    if (userChosenPresets.contains(presetName))
+    {
+      userChosenPresets.removeOne(presetName);
+      settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
+      auto changedIndex = this->index(idx.row(), 1);
+      emit this->dataChanged(changedIndex, changedIndex);
+    }
   }
 
   bool setData(const QModelIndex& idx, const QVariant& value, int role) override
@@ -430,6 +483,7 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
   this->connect(ui.exportPresets, SIGNAL(clicked()), SLOT(exportPresets()));
   this->connect(ui.advancedButton, &QAbstractButton::toggled, this,
     [&](bool showAdvanced) { this->Internals->ProxyModel->setShowAdvanced(showAdvanced); });
+  this->connect(ui.showDefault, SIGNAL(stateChanged(int)), SLOT(setPresetIsAdvanced(int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -517,6 +571,7 @@ void pqPresetDialog::updateEnabledStateForSelection()
     ui.annotations->setEnabled(false);
     ui.apply->setEnabled(false);
     ui.exportPresets->setEnabled(selectedRows.size() > 0);
+    ui.showDefault->setEnabled(false);
 
     bool isEditable = true;
     foreach (const QModelIndex& idx, selectedRows)
@@ -536,9 +591,13 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
   idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
   Q_ASSERT(preset.empty() == false);
+  const int defaultPosition =
+    internals.Model->data(internals.Model->index(idx.row(), 1), Qt::DisplayRole).toInt();
 
   const Ui::pqPresetDialog& ui = internals.Ui;
 
+  ui.showDefault->setChecked(defaultPosition != -1);
+  ui.showDefault->setEnabled(defaultPosition == -1 || defaultPosition >= NUMBER_OF_DEFAULT_PRESETS);
   ui.colors->setEnabled(true);
   ui.usePresetRange->setEnabled(!internals.Model->Presets->GetPresetHasIndexedColors(preset));
   ui.opacities->setEnabled(internals.Model->Presets->GetPresetHasOpacities(preset));
@@ -705,4 +764,35 @@ void pqPresetDialog::exportPresets()
   }
   outfs << presetCollection.toStyledString().c_str() << endl;
   outfs.close();
+}
+
+//-----------------------------------------------------------------------------
+void pqPresetDialog::setPresetIsAdvanced(int newState)
+{
+  bool showByDefault = newState == Qt::Checked;
+  const pqInternals& internals = *this->Internals;
+  QModelIndexList selectedRows = internals.Ui.gradients->selectionModel()->selectedIndexes();
+  if (selectedRows.size() > 1 || selectedRows.size() == 0)
+  {
+    // This doesn't support toggling multiple at once for now.
+    // This is more of a sanity check since the checkbox should be disabled anyway.
+    return;
+  }
+  QModelIndex idx = selectedRows[0];
+
+  idx = internals.ReflowModel->mapToSource(idx);
+  idx = internals.ProxyModel->mapToSource(idx);
+
+  QModelIndex col1Idx = internals.Model->index(idx.row(), 1);
+
+  int defaultPosition = internals.Model->data(col1Idx, Qt::DisplayRole).toInt();
+
+  if (showByDefault && defaultPosition == -1)
+  {
+    internals.Model->addPresetToDefaults(idx);
+  }
+  else if (!showByDefault && defaultPosition != -1)
+  {
+    internals.Model->removePresetFromDefaults(idx);
+  }
 }

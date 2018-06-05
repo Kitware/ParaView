@@ -136,6 +136,8 @@ protected slots:
   void importPresets();
   void exportPresets();
 
+  void setPresetIsAdvanced(int newState);
+
 private:
   Q_DISABLE_COPY(pqPresetDialog)
   class pqInternals;

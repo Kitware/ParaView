@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>547</width>
+    <width>952</width>
     <height>551</height>
    </rect>
   </property>
@@ -123,6 +123,14 @@
        </property>
        <property name="text">
         <string>Use preset range</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="showDefault">
+       <property name="text">
+        <string>Show without
+advanced view</string>
        </property>
       </widget>
      </item>
