@@ -693,17 +693,20 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
         {
           // copy the processed selection buffers into icet
           unsigned char* passdata = sel->GetPixelBuffer(sel->GetCurrentPass());
-          unsigned int* area = sel->GetArea();
-          unsigned int passwidth = area[2] - area[0] + 1;
-          for (int y = 0; y < icetImageGetHeight(result); ++y)
+          if (passdata)
           {
-            for (int x = 0; x < icetImageGetWidth(result); ++x)
+            unsigned int* area = sel->GetArea();
+            unsigned int passwidth = area[2] - area[0] + 1;
+            for (int y = 0; y < icetImageGetHeight(result); ++y)
             {
-              unsigned char* pdptr = passdata + (y * passwidth + x) * 3;
-              destdata[0] = pdptr[0];
-              destdata[1] = pdptr[1];
-              destdata[2] = pdptr[2];
-              destdata += 4;
+              for (int x = 0; x < icetImageGetWidth(result); ++x)
+              {
+                unsigned char* pdptr = passdata + (y * passwidth + x) * 3;
+                destdata[0] = pdptr[0];
+                destdata[1] = pdptr[1];
+                destdata[2] = pdptr[2];
+                destdata += 4;
+              }
             }
           }
         }
