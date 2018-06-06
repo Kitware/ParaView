@@ -100,7 +100,7 @@ public slots:
   void addSource(pqPipelineSource* source);
 
   /**
-  * Called when a new source/filter is unregistred.
+  * Called when a new source/filter is unregistered.
   */
   void removeSource(pqPipelineSource* source);
 

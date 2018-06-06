@@ -80,7 +80,7 @@ public:
   void restoreState(const QString& key, QDialog& dialog);
 
   /**
-  * Calling this method will cause the modified signal to be emited.
+  * Calling this method will cause the modified signal to be emitted.
   */
   void alertSettingsModified();
 

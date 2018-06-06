@@ -60,7 +60,7 @@ public:
   void RegisterPrototype(const char* xmlgroup, const char* xmlname);
 
   /**
-   * Retruns true if the data from the output port can be written at all.
+   * Returns true if the data from the output port can be written at all.
    */
   bool CanWrite(vtkSMSourceProxy*, unsigned int outputport);
 

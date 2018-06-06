@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * @ingroup Behaviors
-* pqPluginSettingsBehavior adds support for adding applicatin settings from plugins
+* pqPluginSettingsBehavior adds support for adding application settings from plugins
 */
 class PQAPPLICATIONCOMPONENTS_EXPORT pqPluginSettingsBehavior : public QObject
 {

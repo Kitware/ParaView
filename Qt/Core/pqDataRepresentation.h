@@ -118,7 +118,7 @@ public:
   unsigned long getFullResMemorySize();
 
   /**
-  * This is convienience method to return first representation for the
+  * This is convenience method to return first representation for the
   * upstream stream filter/source in the same view as this representation.
   * This is only applicable, if this representation is connected to a
   * data-filter which has a valid input.

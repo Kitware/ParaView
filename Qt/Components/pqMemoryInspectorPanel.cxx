@@ -510,7 +510,7 @@ private:
   long long HostMemoryAvailable;      // memory available to us.
   QProgressBar* TotalMemoryUseWidget; // for displaying all process's use
   QProgressBar* GroupMemoryUseWidget; // for displaying only pv process's use
-  QFrame* WidgetContainer;            // widget containing both all and proccess group
+  QFrame* WidgetContainer;            // widget containing both all and process group
   QTreeWidgetItem* TreeItem;          // gui element
   vector<RankData*> Ranks;            // references to ranks local to this host
 };
@@ -910,7 +910,7 @@ void pqMemoryInspectorPanel::RenderCompleted()
   /*
   // This code is for updating on endRender regardless of whether
   // or not data was updated.it works better than updating only
-  // after data is udpated. however is disabled because it's slight
+  // after data is updated. however is disabled because it's slight
   // over kill
   if (!this->AutoUpdate || !this->isVisible())
     {
@@ -1063,7 +1063,7 @@ int pqMemoryInspectorPanel::Initialize()
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
   {
-    // this is not necessarilly an error as the panel may be created
+    // this is not necessarily an error as the panel may be created
     // before the server is connected.
     return 0;
   }
@@ -1414,7 +1414,7 @@ void pqMemoryInspectorPanel::UpdateHosts()
 //-----------------------------------------------------------------------------
 void pqMemoryInspectorPanel::UpdateHosts(map<string, HostData*>& hosts)
 {
-  // update host laod to reflect all of its ranks.
+  // update host load to reflect all of its ranks.
   map<string, HostData*>::iterator it = hosts.begin();
   map<string, HostData*>::iterator end = hosts.end();
   while (it != end)

@@ -168,7 +168,7 @@
      <item>
       <widget class="QLabel" name="label_9">
        <property name="toolTip">
-        <string>Configure the compressor using default settings taylored to a selected connection type.</string>
+        <string>Configure the compressor using default settings tailored to a selected connection type.</string>
        </property>
        <property name="text">
         <string>Apply presets for</string>
@@ -229,7 +229,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QLabel" name="label_10">
        <property name="toolTip">
-        <string>Configure the compressor using default settings taylored to a selected connection type.</string>
+        <string>Configure the compressor using default settings tailored to a selected connection type.</string>
        </property>
        <property name="text">
         <string>connection.</string>

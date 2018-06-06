@@ -728,7 +728,7 @@ int vtkSpyPlotReader::RequestData(vtkInformation* request,
     info->Set(vtkStreamingDemandDrivenPipeline::BOUNDS(), b, 6);
 
     // Gather blocks per level information.
-    // Note that this is a quick fix. Taking this extra pass shouldbe avoided. -Leo
+    // Note that this is a quick fix. Taking this extra pass should be avoided. -Leo
     if (this->IsAMR)
     {
       std::vector<int> blocksPerLevel;

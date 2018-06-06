@@ -149,7 +149,7 @@ public slots:
   void endNonUndoableChanges();
 
   /**
-  * One can add arbritary elements to the
+  * One can add arbitrary elements to the
   * undo set currently being built.
   */
   void addToActiveUndoSet(vtkUndoElement* element);

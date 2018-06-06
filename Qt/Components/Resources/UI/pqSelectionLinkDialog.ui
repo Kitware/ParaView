@@ -33,7 +33,7 @@
    <item row="1" column="1">
     <widget class="QLabel" name="selectionSharingLabel">
      <property name="text">
-      <string>&lt;b&gt;Link Selection:&lt;/b&gt; link selection by sharing the actual selection&lt;br/&gt;between the data sources. The selection is then evaluated for&lt;br/&gt;each linked sources separatly.</string>
+      <string>&lt;b&gt;Link Selection:&lt;/b&gt; link selection by sharing the actual selection&lt;br/&gt;between the data sources. The selection is then evaluated for&lt;br/&gt;each linked sources separately.</string>
      </property>
      <property name="textFormat">
       <enum>Qt::RichText</enum>

@@ -73,7 +73,7 @@ public:
   void setSession(vtkSMSession*);
 
   /**
-  * Retrun the Proxy ID if any, otherwise return 0
+  * Return the Proxy ID if any, otherwise return 0
   */
   vtkTypeUInt32 getProxyId();
 

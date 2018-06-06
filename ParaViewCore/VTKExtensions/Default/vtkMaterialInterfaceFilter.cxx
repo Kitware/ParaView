@@ -1041,7 +1041,7 @@ void vtkMaterialInterfaceFilterBlock::InitializeGhostLayer(unsigned char* volFra
 }
 
 //----------------------------------------------------------------------------
-// Flipped a coin.  This method only addes the neighbor relation one way.
+// Flipped a coin.  This method only adds the neighbor relation one way.
 // User needs to call it twice to get the backward connection.
 void vtkMaterialInterfaceFilterBlock::AddNeighbor(
   vtkMaterialInterfaceFilterBlock* neighbor, int axis, int maxFlag)
@@ -3670,7 +3670,7 @@ int vtkMaterialInterfaceFilter::RequestData(vtkInformation* vtkNotUsed(request),
 #ifdef vtkMaterialInterfaceFilterDEBUG
   std::clock_t endTime = std::clock();
   cerr << "[" << __LINE__ << "] " << this->Controller->GetLocalProcessId()
-       << " clock time ellapsed during request data "
+       << " clock time elapsed during request data "
        << (double)(endTime - startTime) / (double)CLOCKS_PER_SEC << " sec." << endl;
   cerr << "[" << __LINE__ << "] " << this->Controller->GetLocalProcessId()
        << " exited request data."

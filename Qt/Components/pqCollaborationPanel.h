@@ -64,7 +64,7 @@ signals:
   void triggerChatMessage(pqServer* server, int userId, QString& msgContent);
 
   /**
-  * Emmitting this signal when user has allowed its mouse position to be
+  * Emitting this signal when user has allowed its mouse position to be
   * shared and send to the other clients
   */
   void shareLocalMousePointer(bool);

@@ -499,7 +499,7 @@ void pqKeyFrameEditor::readKeyFrameData()
         pqKeyFrameInterpolationItem* item = new pqKeyFrameInterpolationItem();
         this->Internal->Model.setItem(i, 1, item);
 
-        // intialize gui with adaptor
+        // initialize gui with adaptor
         pqPropertyLinks links;
         pqSignalAdaptorKeyFrameType adaptor(&item->Widget, &links);
         adaptor.setKeyFrameProxy(keyFrame);

@@ -154,7 +154,7 @@ void ConnectFrameToView(pqViewFrame* frame, pqView* pqview)
   Q_ASSERT(frame);
   // if pqview == NULL, then the frame is either being assigned to a empty
   // view, or pqview for a view-proxy just isn't present yet.
-  // it's possible that pqview is NULL, if the view proxy hasnt been registered
+  // it's possible that pqview is NULL, if the view proxy hasn't been registered
   // yet. This happens often when initialization state is being loaded in
   // collaborative sessions.
   if (pqview != NULL)
@@ -467,7 +467,7 @@ pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   pqView* pqview = smmodel->findItem<pqView*>(view);
-  // it's possible that pqview is NULL, if the view proxy hasnt been registered
+  // it's possible that pqview is NULL, if the view proxy hasn't been registered
   // yet. This happens often when initialization state is being loaded in
   // collaborative sessions.
   ConnectFrameToView(frame, pqview);
@@ -716,7 +716,7 @@ void pqMultiViewWidget::reload()
     {
       // since we are in the process of destroying the view, cancel any pending
       // render requests. This addresses a Windows issue where the view would
-      // occassionally popout and render when undoing the creation of the view
+      // occasionally popout and render when undoing the creation of the view
       // or closing it.
       pqView* view = getPQView(iter.key());
       if (view)

@@ -72,7 +72,7 @@ public:
 
 signals:
   /**
-  * This will be triggered by the remote clients to update any interessting
+  * This will be triggered by the remote clients to update any interesting
   * components. This should be triggered by local client to broadcast to
   * the other clients
   */
@@ -87,7 +87,7 @@ signals:
   /**
   * Signal triggered when user information get updated
   * regardless the active one
-  * A nice thing TODO could be to just forwared from the pqServer but ONLY IF
+  * A nice thing TODO could be to just forward from the pqServer but ONLY IF
   * (activeServer == sender)
   */
   void triggeredMasterUser(int);
@@ -104,7 +104,7 @@ signals:
 public slots:
   /**
   * Slot used to keep track of all possible vtkSMCollaborationManagers
-  * They are unsed in pqCollaborationBehavior to listen the
+  * They are used in pqCollaborationBehavior to listen to the
   * ServerManagerModel... (preServerAdded/aboutToRemoveServer)
   */
   void onServerAdded(pqServer*);

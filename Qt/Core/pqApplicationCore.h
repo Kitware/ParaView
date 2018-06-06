@@ -82,7 +82,7 @@ class PQCORE_EXPORT pqApplicationCore : public QObject
   typedef QObject Superclass;
 
 public:
-  // Get the global instace for the pqApplicationCore.
+  // Get the global instance for the pqApplicationCore.
   static pqApplicationCore* instance();
 
   /**

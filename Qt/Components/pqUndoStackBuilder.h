@@ -59,7 +59,7 @@ class vtkCommand;
 *     hits Ok, such as Application Settings dialog, change input dialogs,
 *     we must use Begin() and End().
 * \li Any GUI wiget that is a single widget but changes multiple server
-*     manager properties or can lead to mutiple undo steps should use
+*     manager properties or can lead to multiple undo steps should use
 *     Begin and End block eg. Accept button, widget to select scalar to color
 *     by etc.
 * \li GUI Widgets that are directly linked to a Server Manager property and
@@ -79,7 +79,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-  * Get/Set if all modifications triggerred when not within a Begin/End
+  * Get/Set if all modifications triggered when not within a Begin/End
   * block should be added to the undo stack or not. On by default.
   * Must be set before performing changes to Server Manager which the
   * GUI is certain shouldn't be added to the Undo stack.

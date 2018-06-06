@@ -85,7 +85,7 @@ public:
   void addTracking(std::string id, std::string name);
 
   /// Adding a transformation matrix
-  void setTransformation(vtkMatrix4x4* matix);
+  void setTransformation(vtkMatrix4x4* matrix);
 
   /// Initialize the device with the name.
   bool init();

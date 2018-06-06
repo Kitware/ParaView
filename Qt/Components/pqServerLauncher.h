@@ -132,7 +132,7 @@ protected:
 
   /**
   * Provides access to the pqServerConfiguration passed to the constructor.
-  * Note this is clone of the pqServerConfiguration passed to the constuctor and
+  * Note this is clone of the pqServerConfiguration passed to the constructor and
   * not the same instance.
   */
   pqServerConfiguration& configuration() const;

@@ -88,7 +88,7 @@ You will be permitted to designate in writing to NVIDIA Designated Users for pur
 3	EXCLUSIONS.  You shall not request, and NVIDIA shall not provide Services for Supported Software under the EULA related to: 
 (a)	errors in Your own or Your licensors’ products that are not due to Errors in the Supported Software;
 (b)	service necessary due to accident, catastrophe, or negligence of Your users, or due to operator error, improper use of the Supported Software or attempted support by unauthorized persons;
-(c)	causes external to the Supported Software, including weather conditions, air conditioning and humidity control, faulty electrical power, hardware failure, misuse, neglect, damage or use of the Supported Software with hardware or software not supplied or recommended by NVIDIA
+(c)	causes external to the Supported Software, including whether conditions, air conditioning and humidity control, faulty electrical power, hardware failure, misuse, neglect, damage or use of the Supported Software with hardware or software not supplied or recommended by NVIDIA
 (d)	Your failure to implement Maintenance, Updates or Upgrades supplied by NVIDIA which would correct the Error and were previously made available by NVIDIA;
 (e)	modifications to the Supported Software made by You or on Your behalf, or any modifications made by any third party without NVIDIA’s authorization;
 (f)	use of the Supported Software that deviates from the operating procedures, indicated supported operating systems and any other specifications indicated in the Documentation;

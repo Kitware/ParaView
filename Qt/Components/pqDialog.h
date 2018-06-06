@@ -60,7 +60,7 @@ public:
   ~pqDialog() override;
 
   /**
-  * Set the lable used for undo command.
+  * Set the label used for undo command.
   */
   void setUndoLabel(const QString& label) { this->UndoLabel = label; }
 signals:

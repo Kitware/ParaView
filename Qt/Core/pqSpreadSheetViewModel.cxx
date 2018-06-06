@@ -379,7 +379,7 @@ QVariant pqSpreadSheetViewModel::data(const QModelIndex& idx, int role /*=Qt::Di
   QString str = value.ToString().c_str();
   if (value.IsChar() || value.IsUnsignedChar() || value.IsSignedChar())
   {
-    // Don't show ASCII characted for char arrays.
+    // Don't show ASCII character for char arrays.
     const char* column_name = view->GetColumnName(column);
     if (column_name && strcmp(column_name, "Cell Type") == 0)
     {

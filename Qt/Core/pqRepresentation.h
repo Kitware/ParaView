@@ -88,7 +88,7 @@ public slots:
 
   /**
   * Renders the view to which this representation has been added if any.
-  * If \c force is true, then the render is triggerred immediately, otherwise,
+  * If \c force is true, then the render is triggered immediately, otherwise,
   * it will be called on idle.
   */
   void renderView(bool force);

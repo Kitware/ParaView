@@ -61,7 +61,7 @@ public:
   * Real, Sequence or Custom mode
   * Real mode shows no tick marks for timesteps
   * Sequence mode shows evenly spaced ticks for teach timestep
-  *  where the number of ticks can be controled by the ticks property
+  *  where the number of ticks can be controlled by the ticks property
   * Custom shows tick marks at the location indicated by the setTickMarks().
   */
   enum ModeType

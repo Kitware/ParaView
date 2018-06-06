@@ -62,7 +62,7 @@ void pqFileDialogFilter::setFilter(const QString& filter)
   // if we have (...) in our filter, strip everything out but the contents of ()
   int start, end;
   end = filter.lastIndexOf(')');
-  // we need to from the backwards incase the name of the filter is:
+  // we need to from the backwards in case the name of the filter is:
   // File Type (polydata) (*.ft)
   start = filter.lastIndexOf('(', end);
   if (start != -1 && end != -1)
@@ -196,6 +196,6 @@ bool pqFileDialogFilter::lessThan(const QModelIndex& left, const QModelIndex& ri
     QDateTime rightData = this->sourceModel()->data(right, Qt::UserRole).toDateTime();
     return leftData < rightData;
   }
-  // Other column (strings) are handeld by the superclass
+  // Other column (strings) are handled by the superclass
   return QSortFilterProxyModel::lessThan(left, right);
 }
