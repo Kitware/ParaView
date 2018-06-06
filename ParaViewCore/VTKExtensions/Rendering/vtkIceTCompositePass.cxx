@@ -638,6 +638,13 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
     }
     ostate->vtkglColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
   }
+  double bg[3];
+  render_state->GetRenderer()->GetBackground(bg);
+  if (clear_mask & GL_COLOR_BUFFER_BIT)
+  {
+    // let OSPRay know that we need black background too
+    render_state->GetRenderer()->SetBackground(0, 0, 0);
+  }
 
   ostate->vtkglClear(clear_mask);
   if (this->RenderPass)
@@ -741,6 +748,7 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state, const IceTDo
       }
     }
   }
+  render_state->GetRenderer()->SetBackground(bg[0], bg[1], bg[2]);
   vtkOpenGLCheckErrorMacro("failed after Draw");
 }
 
