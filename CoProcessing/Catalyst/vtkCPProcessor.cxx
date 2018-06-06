@@ -21,6 +21,7 @@
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPPipeline.h"
 #include "vtkDataObject.h"
+#include "vtkDoubleArray.h"
 #include "vtkFieldData.h"
 #ifdef PARAVIEW_USE_MPI
 #include "vtkMPI.h"
@@ -234,6 +235,13 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
     return 0;
   }
   int success = 1;
+  // We need to add in information like channel name and time value here to the
+  // field data. The channel name is used to automatically keep track of which
+  // channel things are happening with so we can hide that complexity from the user.
+  // The time value needs to be added here since the XML writers will add that
+  // information in and if the user tries to create a Catalyst Python script
+  // pipeline that uses that field data (e.g. Annotate Field Data filter) from those
+  // files they'll get failures.
   for (unsigned int i = 0; i < dataDescription->GetNumberOfInputDescriptions(); i++)
   {
     if (vtkDataObject* input = dataDescription->GetInputDescription(i)->GetGrid())
@@ -242,6 +250,12 @@ int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
       catalystChannel->SetName(this->GetInputArrayName());
       catalystChannel->InsertNextValue(dataDescription->GetInputDescriptionName(i));
       input->GetFieldData()->AddArray(catalystChannel);
+
+      vtkNew<vtkDoubleArray> time;
+      time->SetNumberOfTuples(1);
+      time->SetTypedComponent(0, 0, dataDescription->GetTime());
+      time->SetName("TimeValue");
+      input->GetFieldData()->AddArray(time);
     }
   }
 
