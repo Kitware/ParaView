@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    $RCSfile FortranAdaptorAPI.cxx,v $
+  Module:    PagosaAdaptor.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -37,6 +37,11 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
+/*
+ * Pagosa is a simulation code. It is a closed source code. A copy of the Physics
+ * Manual is at http://permalink.lanl.gov/object/tr?what=info:lanl-repo/lareport/LA-14425-M
+ */
+
 namespace
 {
 int numberOfMarkers;
@@ -45,7 +50,7 @@ int numberOfMarkers;
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Define the data structures to hold the in situ output VTK data
-// vtkNonOverlappyingAMR is required for using the MaterialInterface filter
+// vtkNonOverlappingAMR is required for using the MaterialInterface filter
 // vtkUnstructuredGrid will hold the data currently written to .cosmo files
 //
 ///////////////////////////////////////////////////////////////////////////////

@@ -25,7 +25,8 @@ foreach (flag CMAKE_C_FLAGS_DEBUG
               CMAKE_CXX_FLAGS_DEBUG
               CMAKE_CXX_FLAGS_RELEASE
               CMAKE_CXX_FLAGS_MINSIZEREL
-              CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+              CMAKE_CXX_FLAGS_RELWITHDEBINFO
+              CMAKE_INSTALL_PREFIX)
   if (${${flag}})
     set (extra_params ${extra_params}
         -D${flag}:STRING=${${flag}})
@@ -144,16 +145,15 @@ if (PARAVIEW_ENABLE_PYTHON AND NOT WIN32)
 
   #------------------------------------------------------------------------------
   # Adaptors that need Python and Fortran
+  # The Pagosa adaptor is done as part of the normal ParaView CMake configuration
+  # so that the library can be installed.
   #------------------------------------------------------------------------------
   cmake_dependent_option(BUILD_PAGOSA_ADAPTOR
     "Build the Pagosa Catalyst Adaptor" OFF
     "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
   mark_as_advanced(BUILD_PAGOSA_ADAPTOR)
   if(BUILD_PAGOSA_ADAPTOR)
-    build_adaptor(PagosaAdaptor
-      "Fortran"
-      COMMENT "Building Pagosa Adaptor"
-      DEPENDS vtkPVPythonCatalyst)
+    add_subdirectory(CoProcessing/Adaptors/PagosaAdaptor)
   endif()
 
 endif()
