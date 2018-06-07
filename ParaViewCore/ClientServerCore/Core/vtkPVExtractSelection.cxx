@@ -30,12 +30,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
 #include "vtkPointData.h"
-#include "vtkPythonSelector.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSelector.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "vtkPythonSelector.h"
+#endif
 
 #include <vector>
 
@@ -290,8 +293,13 @@ vtkSmartPointer<vtkSelector> vtkPVExtractSelection::NewSelectionOperator(
 {
   if (type == vtkSelectionNode::QUERY)
   {
-    // Return a query operator
+// Return a query operator
+#ifdef PARAVIEW_ENABLE_PYTHON
     return vtkSmartPointer<vtkPythonSelector>::New();
+#else
+    vtkErrorMacro(<< "vtkSelectionNode::QUERY is supported only when Python is enabled.");
+    return nullptr;
+#endif
   }
   else
   {
