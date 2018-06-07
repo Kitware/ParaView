@@ -6502,6 +6502,15 @@
         <Documentation>Set the visibility for this
         representation.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1" min="0" name="range" />
+        <Documentation>
+          The opacity to use when rendering the model.
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty command="SetMoleculeRenderMode"
                          default_values="0"
                          label="Render Mode"
@@ -6640,6 +6649,8 @@
                proxyname="MoleculeRepresentation" />
         <ExposedProperties>
           <PropertyGroup label="Molecule">
+            <Property name="Opacity"
+                      panel_visibility="default" />
             <Property name="MoleculeRenderMode"
                       panel_visibility="default" />
             <Property name="UseCustomRadii"
