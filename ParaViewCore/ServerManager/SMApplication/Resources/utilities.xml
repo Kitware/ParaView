@@ -4207,10 +4207,50 @@
         </Documentation>
       </IntVectorProperty>
       <Hints>
-        <FormatOptions extensions="jpg"
+        <FormatOptions extensions="jpeg jpg"
           file_description="JPEG images" />
       </Hints>
     </Proxy>
+
+    <Proxy name="TIFF" class="vtkTIFFWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as TIFF files.
+      </Documentation>
+      <IntVectorProperty name="Compression"
+        command="SetCompression"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Specify compression type.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="PackBits" value="1" />
+          <Entry text="Deflate" value="3" />
+          <!--
+               JPEG is disabled since it raised errors about color space when
+               using it.
+
+               LZW is disabled since its not available (as per docs in vtkTIFFWriter
+          -->
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="tiff tif"
+          file_description="TIFF images" />
+      </Hints>
+    </Proxy>
+
+    <Proxy name="BMP" class="vtkBMPWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as BMP files.
+      </Documentation>
+      <Hints>
+        <FormatOptions extensions="bmp"
+          file_description="Bitmap images" />
+      </Hints>
+    </Proxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="misc">
