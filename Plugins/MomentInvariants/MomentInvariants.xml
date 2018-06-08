@@ -1,0 +1,148 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+   <SourceProxy name="MI ComputeMoments" class="vtkComputeMoments" label="MI vtkComputeMoments">
+     <Documentation
+        long_help="MomentInvariants vtkComputeMoments"
+        short_help="MomentInvariants vtkComputeMoments">
+     </Documentation>
+     <InputProperty
+        name="Input Dataset"
+        port_index="0"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             The dataset of which the moments are computed
+           </Documentation>
+      </InputProperty>
+     <InputProperty
+        name="Input Grid"
+        port_index="1"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             Optional. The grid locations where the moments are computed. If not set, use the original grid.
+           </Documentation>
+      </InputProperty>
+<!--       <StringVectorProperty name="NameOfPointData"
+                        command="SetNameOfPointData"
+                        number_of_elements="1"
+                        default_values="points">
+      </StringVectorProperty> -->
+      <IntVectorProperty name="Order"
+                     command="SetOrder"
+                     number_of_elements="1"
+                     default_values="2">
+      </IntVectorProperty>
+      <IntVectorProperty name="NumberOfIntegrationSteps"
+                     command="SetNumberOfIntegrationSteps"
+                     number_of_elements="1"
+                     default_values="5">
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Radii"
+                     command="SetRadiiArray"
+                     argument_is_array="1"
+                     number_of_elements="10"
+                     default_values="1 0 0 0 0 0 0 0 0 0">
+      </DoubleVectorProperty>
+
+   </SourceProxy>
+   <SourceProxy name="MI MomentInvariants" class="vtkMomentInvariants" label="MI vtkMomentInvariants">
+     <Documentation
+        long_help="MomentInvariants vtkMomentInvariants"
+        short_help="MomentInvariants vtkMomentInvariants">
+     </Documentation>
+     <InputProperty
+        name="Input Pattern"
+        port_index="0"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             The pattern, of scalar, vector, or matrix type
+           </Documentation>
+      </InputProperty>
+     <InputProperty
+        name="Input Computed Moments"
+        port_index="1"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             The output of computeMoments, which is vtkImageData.
+           </Documentation>
+      </InputProperty>
+<!--       <StringVectorProperty name="NameOfPointData"
+                        command="SetNameOfPointData"
+                        number_of_elements="1"
+                        default_values="">
+      </StringVectorProperty> -->
+      <IntVectorProperty name="Order"
+                     command="SetOrder"
+                     number_of_elements="1"
+                     default_values="2">
+      </IntVectorProperty>
+      <IntVectorProperty name="NumberOfIntegrationSteps"
+                     command="SetNumberOfIntegrationSteps"
+                     number_of_elements="1"
+                     default_values="5">
+      </IntVectorProperty>
+      <IntVectorProperty name="AngleResolution"
+                     command="SetAngleResolution"
+                     number_of_elements="1"
+                     default_values="100">
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Eps"
+                     command="SetEps"
+                     number_of_elements="1"
+                     default_values="1e-2">
+      </DoubleVectorProperty>
+      <IntVectorProperty name="IsTranslation"
+                     command="SetIsTranslation"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty name="IsScaling"
+                     command="SetIsScaling"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty name="IsRotation"
+                     command="SetIsRotation"
+                     number_of_elements="1"
+                     default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty name="IsReflection"
+                     command="SetIsReflection"
+                     number_of_elements="1"
+                     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
