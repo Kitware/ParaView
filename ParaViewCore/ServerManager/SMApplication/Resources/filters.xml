@@ -16290,7 +16290,7 @@ source.</Documentation>
       <!-- End D3 -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPUnstructuredGridGhostCellsGenerator"
+    <SourceProxy class="vtkUnstructuredGridGhostCellsGenerator"
                  label="Ghost Cells Generator"
                  name="GhostCellsGenerator">
       <Documentation long_help="Generate ghost cells for unstructured grids."
