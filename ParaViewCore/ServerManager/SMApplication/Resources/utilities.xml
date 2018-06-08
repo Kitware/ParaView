@@ -4207,7 +4207,7 @@
         </Documentation>
       </IntVectorProperty>
       <Hints>
-        <FormatOptions extensions="jpg"
+        <FormatOptions extensions="jpeg jpg"
           file_description="JPEG images" />
       </Hints>
     </Proxy>
@@ -4236,8 +4236,18 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <Hints>
-        <FormatOptions extensions="tiff"
+        <FormatOptions extensions="tiff tif"
           file_description="TIFF images" />
+      </Hints>
+    </Proxy>
+
+    <Proxy name="BMP" class="vtkBMPWriter" processes="client">
+      <Documentation>
+        Writer for saving screenshots as BMP files.
+      </Documentation>
+      <Hints>
+        <FormatOptions extensions="bmp"
+          file_description="Bitmap images" />
       </Hints>
     </Proxy>
 
