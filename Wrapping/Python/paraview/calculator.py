@@ -79,30 +79,24 @@ def pointIsNear(locations, distance, inputs):
     node.GetProperties().Set(vtkSelectionNode.EPSILON(), distance)
     node.SetSelectionList(array)
 
-    selection = vtkSelection()
-    selection.AddNode(node)
-    from vtkmodules.vtkFiltersExtraction import vtkExtractSelectedLocations
-    pointsNear = vtkExtractSelectedLocations()
-    pointsNear.SetInputData(0, inputs[0].VTKObject)
-    pointsNear.SetInputData(1, selection)
-    pointsNear.Update()
+    from paraview.vtk.vtkFiltersExtraction import vtkLocationSelector
+    selector = vtkLocationSelector()
+    selector.Initialize(node, "vtkInsidedness")
 
-    extractedPoints = pointsNear.GetOutput()
-    numPoints = inputs[0].GetNumberOfPoints()
-    result = np.zeros((numPoints,), dtype = np.int8)
+    inputDO = inputs[0].VTKObject
+    outputDO = inputDO.NewInstance()
+    outputDO.CopyStructure(inputDO)
 
-    extracted = dsa.WrapDataObject(extractedPoints)
-    pointIds = extracted.PointData.GetArray('vtkOriginalPointIds')
+    output = dsa.WrapDataObject(outputDO)
+    if outputDO.IsA('vtkCompositeDataSet'):
+        it = inputDO.NewIterator()
+        it.InitTraversal()
+        while not it.IsDoneWithTraversal():
+            outputDO.SetDataSet(it, inputDO.GetDataSet(it).NewInstance())
+            it.GoToNextItem()
+    selector.ComputeSelectedElements(inputDO, outputDO)
 
-    if isinstance(pointIds, dsa.VTKCompositeDataArray):
-        for a in pointIds.GetArrays():
-            result[a] = 1
-    else:
-         result[pointIds] = 1
-
-    import vtkmodules.util.numpy_support as np_s
-    vtkarray = np_s.numpy_to_vtk(result, deep=True)
-    return dsa.vtkDataArrayToVTKArray(vtkarray)
+    return output.PointData.GetArray('vtkInsidedness')
 
 def cellContainsPoint(inputs, locations):
     array = vtkDoubleArray()
