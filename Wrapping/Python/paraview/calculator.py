@@ -109,30 +109,24 @@ def cellContainsPoint(inputs, locations):
     node.SetContentType(vtkSelectionNode.LOCATIONS)
     node.SetSelectionList(array)
 
-    selection = vtkSelection()
-    selection.AddNode(node)
-    from vtkmodules.vtkFiltersExtraction import vtkExtractSelectedLocations
-    cellsNear = vtkExtractSelectedLocations()
-    cellsNear.SetInputData(0, inputs[0].VTKObject)
-    cellsNear.SetInputData(1, selection)
-    cellsNear.Update()
+    from paraview.vtk.vtkFiltersExtraction import vtkLocationSelector
+    selector = vtkLocationSelector()
+    selector.Initialize(node, "vtkInsidedness")
 
-    extractedCells = cellsNear.GetOutput()
-    numCells = inputs[0].GetNumberOfCells()
-    result = np.zeros((numCells,), dtype = np.int8)
+    inputDO = inputs[0].VTKObject
+    outputDO = inputDO.NewInstance()
+    outputDO.CopyStructure(inputDO)
 
-    extracted = dsa.WrapDataObject(extractedCells)
-    cellIds = extracted.CellData.GetArray('vtkOriginalCellIds')
+    output = dsa.WrapDataObject(outputDO)
+    if outputDO.IsA('vtkCompositeDataSet'):
+        it = inputDO.NewIterator()
+        it.InitTraversal()
+        while not it.IsDoneWithTraversal():
+            outputDO.SetDataSet(it, inputDO.GetDataSet(it).NewInstance())
+            it.GoToNextItem()
+    selector.ComputeSelectedElements(inputDO, outputDO)
 
-    if isinstance(cellIds, dsa.VTKCompositeDataArray):
-        for a in cellIds.GetArrays():
-            result[a] = 1
-    else:
-         result[cellIds] = 1
-
-    import vtkmodules.util.numpy_support as np_s
-    vtkarray = np_s.numpy_to_vtk(result, deep=True)
-    return dsa.vtkDataArrayToVTKArray(vtkarray)
+    return output.CellData.GetArray('vtkInsidedness')
 
 def compute(inputs, expression, ns=None):
     #  build the locals environment used to eval the expression.
