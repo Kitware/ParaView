@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-   <SourceProxy name="MI ComputeMoments" class="vtkComputeMoments" label="MI vtkComputeMoments">
+   <SourceProxy name="MI ComputeMoments" class="vtkComputeMoments" label="Compute Moments">
      <Documentation
         long_help="MomentInvariants vtkComputeMoments"
         short_help="MomentInvariants vtkComputeMoments">
@@ -57,8 +57,72 @@
                      default_values="1 0 0 0 0 0 0 0 0 0">
       </DoubleVectorProperty>
 
+      <Hints>
+        <ShowInMenu category="Moment Invariants" />
+      </Hints>
    </SourceProxy>
-   <SourceProxy name="MI MomentInvariants" class="vtkMomentInvariants" label="MI vtkMomentInvariants">
+   <SourceProxy name="MI PComputeMoments" class="vtkPComputeMoments" label="Parallel Compute Moments">
+     <Documentation
+        long_help="MomentInvariants vtkPComputeMoments"
+        short_help="MomentInvariants vtkPComputeMoments">
+     </Documentation>
+     <InputProperty
+        name="Input Dataset"
+        port_index="0"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             The dataset of which the moments are computed
+           </Documentation>
+      </InputProperty>
+     <InputProperty
+        name="Input Grid"
+        port_index="1"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             Optional. The grid locations where the moments are computed. If not set, use the original grid.
+           </Documentation>
+      </InputProperty>
+<!--       <StringVectorProperty name="NameOfPointData"
+                        command="SetNameOfPointData"
+                        number_of_elements="1"
+                        default_values="points">
+      </StringVectorProperty> -->
+      <IntVectorProperty name="Order"
+                     command="SetOrder"
+                     number_of_elements="1"
+                     default_values="2">
+      </IntVectorProperty>
+      <IntVectorProperty name="NumberOfIntegrationSteps"
+                     command="SetNumberOfIntegrationSteps"
+                     number_of_elements="1"
+                     default_values="5">
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Radii"
+                     command="SetRadiiArray"
+                     argument_is_array="1"
+                     number_of_elements="10"
+                     default_values="1 0 0 0 0 0 0 0 0 0">
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ShowInMenu category="Moment Invariants" />
+      </Hints>
+   </SourceProxy>
+   <SourceProxy name="MI vtkMomentInvariants" class="vtkMomentInvariants" label="Moment Invariants">
      <Documentation
         long_help="MomentInvariants vtkMomentInvariants"
         short_help="MomentInvariants vtkMomentInvariants">
@@ -143,6 +207,9 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <Hints>
+        <ShowInMenu category="Moment Invariants" />
+      </Hints>
    </SourceProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>
