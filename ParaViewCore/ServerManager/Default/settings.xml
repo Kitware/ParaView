@@ -319,6 +319,22 @@
         </Hints>
       </IntVectorProperty>
 
+      <IntVectorProperty name="AnimationTimeNotation"
+        number_of_elements="1"
+        default_values="0"
+        command="SetAnimationTimeNotation"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the display notation for the time in the animation toolbar. 'Mixed' will automatically
+          choose the shortest display.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Mixed" value="0" />
+          <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="AnimationTimePrecision"
         number_of_elements="1"
         default_values="6"
@@ -326,7 +342,7 @@
         panel_visibility="advanced">
         <Documentation>
           Set the number of significant digits displayed for the time in the animation
-          toolbar.
+          toolbar. Should be in the range [1,17].
         </Documentation>
         <IntRangeDomain min="1" max="17" />
       </IntVectorProperty>
@@ -443,6 +459,7 @@
         <Property name="CacheGeometryForAnimation" />
         <Property name="AnimationGeometryCacheLimit" />
         <Property name="AnimationTimePrecision" />
+        <Property name="AnimationTimeNotation" />
         <Property name="ShowAnimationShortcuts" />
       </PropertyGroup>
 

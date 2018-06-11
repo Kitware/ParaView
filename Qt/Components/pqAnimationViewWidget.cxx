@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationWidget.h"
 #include "pqApplicationCore.h"
 #include "pqComboBoxDomain.h"
+#include "pqCoreUtilities.h"
 #include "pqKeyFrameEditor.h"
 #include "pqOrbitCreatorDialog.h"
 #include "pqPipelineTimeKeyFrameEditor.h"
@@ -74,6 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkPVConfig.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -341,6 +343,14 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
 
   this->Internal->AnimationWidget = new pqAnimationWidget(this) << pqSetName("pqAnimationWidget");
   this->Internal->AnimationWidget->animationModel()->setInteractive(true);
+  this->Internal->AnimationWidget->animationModel()->setTimePrecision(
+    vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
+  this->Internal->AnimationWidget->animationModel()->setTimeNotation(
+    vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation());
+
+  pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
+    SLOT(generalSettingsChanged()));
+
   QWidget* w = this->Internal->AnimationWidget->createDeleteWidget();
 
   this->Internal->CreateSource = new pqAnimatableProxyComboBox(w) << pqSetName("ProxyCombo");
@@ -1071,4 +1081,13 @@ void pqAnimationViewWidget::changeDataProxyDialogAccepted()
       .Set(this->Internal->SelectedDataProxy);
     this->Internal->SelectedCueProxy->UpdateVTKObjects();
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::generalSettingsChanged()
+{
+  this->Internal->AnimationWidget->animationModel()->setTimePrecision(
+    vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
+  this->Internal->AnimationWidget->animationModel()->setTimeNotation(
+    vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation());
 }

@@ -49,7 +49,7 @@ void pqAnimationTimeToolbar::constructor()
   this->connect(pqPVApplicationCore::instance()->animationManager(),
     SIGNAL(activeSceneChanged(pqAnimationScene*)), SLOT(setAnimationScene(pqAnimationScene*)));
   pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
-    SLOT(updateTimePrecision()));
+    SLOT(updateTimeDisplay()));
 }
 
 //-----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ void pqAnimationTimeToolbar::setAnimationScene(pqAnimationScene* scene)
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationTimeToolbar::updateTimePrecision()
+void pqAnimationTimeToolbar::updateTimeDisplay()
 {
   if (this->AnimationTimeWidget->timePrecision() !=
     vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision())
@@ -67,6 +67,9 @@ void pqAnimationTimeToolbar::updateTimePrecision()
     this->AnimationTimeWidget->setTimePrecision(
       vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision());
   }
+
+  this->AnimationTimeWidget->setTimeNotation(
+    vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation());
 }
 
 //-----------------------------------------------------------------------------

@@ -87,6 +87,12 @@ public:
   int timePrecision() const;
 
   /**
+   * Get/set the precision with which time is reported.
+   */
+  void setTimeNotation(const QChar& val);
+  QChar timeNotation() const;
+
+  /**
   * Get/set the number of timesteps.
   */
   void setTimeStepCount(int count);
@@ -122,6 +128,11 @@ public slots:
   */
   void setAnimationScene(vtkSMProxy* animationScene);
 
+  /**
+   * Clear the combobox and fill it with current time values.
+   */
+  void repopulateTimeComboBox();
+
 private slots:
   void updateTimestepCountLabelVisibility();
 
@@ -138,6 +149,19 @@ private slots:
    * `timeValueChanged`.
    */
   void timeLineEditChanged();
+
+  /**
+   * called when user changes the time value in the combobox.
+   * we update the internal "full precision" time value and fire
+   * `timeValueChanged`.
+   */
+  void timeComboBoxChanged();
+
+  /**
+   * called when user toggles the radio button.
+   * we switch playmode and fire `playModeChanged`
+   */
+  void timeRadioButtonToggled();
 
 private:
   Q_DISABLE_COPY(pqAnimationTimeWidget)

@@ -168,6 +168,17 @@ public slots:
   * This also results in a call to setTicks().
   */
   void setTickMarks(int num, double* tick_marks);
+  /**
+   * Set the precision for time printing.
+   * Default is 6.
+   */
+  void setTimePrecision(int precision);
+
+  /**
+   * Set the notation to use for time printing.
+   * Should be one of the following: e,E,f,g or G. Default is g.
+   */
+  void setTimeNotation(const QChar& notation);
 
 signals:
   // emitted when a track is double clicked on
@@ -241,6 +252,9 @@ private:
   pqCheckBoxPixMaps* CheckBoxPixMaps;
 
   QString EnabledHeaderToolTip;
+
+  int TimePrecision;
+  QChar TimeNotation;
 };
 
 #endif // pqAnimationModel_h

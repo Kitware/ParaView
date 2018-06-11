@@ -164,6 +164,8 @@ private slots:
   */
   void toggleTrackSuppression(pqAnimationTrack*);
 
+  void generalSettingsChanged();
+
 signals:
   void dummySignal();
   void sceneCurrentTimeChanged();

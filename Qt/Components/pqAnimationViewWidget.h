@@ -132,6 +132,8 @@ protected slots:
   // when configuring the follow-data animation
   void changeDataProxyDialogAccepted();
 
+  void generalSettingsChanged();
+
 private:
   Q_DISABLE_COPY(pqAnimationViewWidget)
 

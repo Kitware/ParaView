@@ -156,8 +156,24 @@ public:
   /**
    * Set the precision of the animation time toolbar.
    */
-  vtkSetMacro(AnimationTimePrecision, int);
+  vtkSetClampMacro(AnimationTimePrecision, int, 1, 17);
   vtkGetMacro(AnimationTimePrecision, int);
+  //@}
+
+  enum
+  {
+    MIXED = 0,
+    SCIENTIFIC,
+    FIXED
+  };
+
+  //@{
+  /**
+   * Set the notation for the animation time toolbar.
+   */
+  void SetAnimationTimeNotation(int notation);
+  vtkSetMacro(AnimationTimeNotation, char);
+  vtkGetMacro(AnimationTimeNotation, char);
   //@}
 
   //@{
@@ -265,6 +281,7 @@ protected:
   bool GUIOverrideFont;
   int ConsoleFontSize;
   bool ColorByBlockColorsOnApply;
+  char AnimationTimeNotation;
 
 private:
   vtkPVGeneralSettings(const vtkPVGeneralSettings&) = delete;
