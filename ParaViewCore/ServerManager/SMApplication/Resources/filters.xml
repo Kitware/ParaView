@@ -1754,7 +1754,8 @@ found and the point will be rejected.</Documentation>
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain composite_data_supported="0"
+                        name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Connectivity
