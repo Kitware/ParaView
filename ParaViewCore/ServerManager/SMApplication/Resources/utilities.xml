@@ -192,6 +192,16 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty command="SetNanOpacity"
+                         default_values="1"
+                         name="NanOpacity"
+                         number_of_elements="1" >
+        <DoubleRangeDomain min="0" max="1" name="range" />
+        <Documentation>
+          Set the opacity to use when NaN (not-a-number) is encountered.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty command="SetDiscretize"
                          default_values="1"
                          name="Discretize"
@@ -318,6 +328,7 @@
       <PropertyGroup label="Color Mapping Parameters">
         <Property name="ColorSpace" />
         <Property name="NanColor" />
+        <Property name="NanOpacity" />
       </PropertyGroup>
 
       <PropertyGroup label="Color Discretization">
