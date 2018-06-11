@@ -245,6 +245,12 @@ option(PARAVIEW_ENABLE_PDAL "Enable PDAL support." OFF)
 mark_as_advanced(PARAVIEW_ENABLE_PDAL)
 
 
+#================================================================================
+# This is a workaround for a bug in VTKmDetermineVersion.cmake that has been fixed
+# since ParaView 5.5 release. This simply overcomes the bug.
+set(VTKm_GIT_DESCRIBE "v1.1.0")
+#================================================================================
+
 if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 endif()
