@@ -582,23 +582,11 @@ bool pqSpreadSheetViewModel::isDataValid(const QModelIndex& idx) const
     return false;
   }
 
-  vtkPVDataInformation* info = repr->getInputDataInformation();
-  int field_type = this->getFieldType();
-
-  // Get the appropriate attribute information object
-  vtkPVDataSetAttributesInformation* attrInfo =
-    info ? info->GetAttributeInformation(field_type) : 0;
-
-  if (attrInfo)
+  // Ensure that the row of this index is less than the length of the
+  // data array associated with its column
+  if (idx.row() < this->Internal->VTKView->GetNumberOfRows())
   {
-    // Ensure that the row of this index is less than the length of the
-    // data array associated with its column
-    vtkPVArrayInformation* arrayInfo =
-      attrInfo->GetArrayInformation(this->GetView()->GetColumnName(idx.column()));
-    if (arrayInfo && idx.row() < arrayInfo->GetNumberOfTuples())
-    {
-      return true;
-    }
+    return true;
   }
 
   return false;
