@@ -129,8 +129,7 @@
      <item>
       <widget class="QCheckBox" name="showDefault">
        <property name="text">
-        <string>Show without
-advanced view</string>
+        <string>Show in default mode</string>
        </property>
       </widget>
      </item>
@@ -196,6 +195,21 @@ advanced view</string>
    <item row="0" column="0">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="pqSearchBox" name="searchBox" native="true">
         <property name="sizePolicy">
