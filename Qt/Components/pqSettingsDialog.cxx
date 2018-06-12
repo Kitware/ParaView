@@ -75,7 +75,7 @@ bool pqSettingsDialog::ShowRestartRequired = false;
 
 //-----------------------------------------------------------------------------
 pqSettingsDialog::pqSettingsDialog(QWidget* parentObject, Qt::WindowFlags f)
-  : Superclass(parentObject, f)
+  : Superclass(parentObject, f | Qt::WindowStaysOnTopHint)
   , Internals(new pqSettingsDialog::pqInternals())
 {
   Ui::SettingsDialog& ui = this->Internals->Ui;
