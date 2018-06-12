@@ -44,7 +44,7 @@ int TestImageScaleFactors(int, char* [])
   try
   {
     // totally crazy sizes.
-    Test(vtkVector2i(2188, 1236), vtkVector2i(538, 638));
+    Test(vtkVector2i(2188, 1236), vtkVector2i(538, 638), true);
 
     // preserves aspect ratio
     Test(vtkVector2i(1280, 800), vtkVector2i(800, 800));

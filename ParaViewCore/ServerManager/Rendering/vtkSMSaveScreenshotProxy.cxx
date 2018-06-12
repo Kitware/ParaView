@@ -559,10 +559,12 @@ vtkVector2i vtkSMSaveScreenshotProxy::GetScaleFactorsAndSize(
       // now for a more accurate magnification; it may not be possible to find one,
       // and hence we first do an approximate calculation.
       const auto factors = computeFactors(targetSize[cc]);
+      // Do not resize the image to less than half of the original size
+      int minSize = std::max(1, size[cc] / 2);
       for (auto fiter = factors.begin(); fiter != factors.end(); ++fiter)
       {
         const int potentialSize = targetSize[cc] / *fiter;
-        if (potentialSize > 1 && potentialSize <= size[cc])
+        if (potentialSize > minSize && potentialSize <= size[cc])
         {
           // kaching!
           magnification[cc] = *fiter;
