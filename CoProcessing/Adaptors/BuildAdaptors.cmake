@@ -25,7 +25,8 @@ foreach (flag CMAKE_C_FLAGS_DEBUG
               CMAKE_CXX_FLAGS_DEBUG
               CMAKE_CXX_FLAGS_RELEASE
               CMAKE_CXX_FLAGS_MINSIZEREL
-              CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+              CMAKE_CXX_FLAGS_RELWITHDEBINFO
+              CMAKE_INSTALL_PREFIX)
   if (${${flag}})
     set (extra_params ${extra_params}
         -D${flag}:STRING=${${flag}})
@@ -84,16 +85,28 @@ endfunction()
 #------------------------------------------------------------------------------
 # Adaptors
 #------------------------------------------------------------------------------
-build_adaptor(NPICAdaptor
-  "C"
-  COMMENT "Building NPIC Adaptor"
-  DEPENDS vtkPVCatalyst)
+cmake_dependent_option(BUILD_NPIC_ADAPTOR
+  "Build the NPIC Catalyst Adaptor" OFF
+  "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
+mark_as_advanced(BUILD_NPIC_ADAPTOR)
+if(BUILD_NPIC_ADAPTOR)
+  build_adaptor(NPICAdaptor
+    "C"
+    COMMENT "Building NPIC Adaptor"
+    DEPENDS vtkPVCatalyst)
+endif()
 
 if (PARAVIEW_USE_MPI)
-  build_adaptor(ParticleAdaptor
-    "C"
-    COMMENT "Building Particle Adaptor"
-    DEPENDS vtkPVCatalyst)
+  cmake_dependent_option(BUILD_PARTICLE_ADAPTOR
+    "Build the Particle Catalyst Adaptor" OFF
+    "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
+  mark_as_advanced(BUILD_PARTICLE_ADAPTOR)
+  if(BUILD_PARTICLE_ADAPTOR)
+    build_adaptor(ParticleAdaptor
+      "C"
+      COMMENT "Building Particle Adaptor"
+      DEPENDS vtkPVCatalyst)
+  endif()
 endif()
 
 #------------------------------------------------------------------------------
@@ -129,4 +142,18 @@ if (PARAVIEW_ENABLE_PYTHON AND NOT WIN32)
                     COMMENT "Building Cam Adaptor"
                     DEPENDS vtkPVCatalyst)
   endif()
+
+  #------------------------------------------------------------------------------
+  # Adaptors that need Python and Fortran
+  # The Pagosa adaptor is done as part of the normal ParaView CMake configuration
+  # so that the library can be installed.
+  #------------------------------------------------------------------------------
+  cmake_dependent_option(BUILD_PAGOSA_ADAPTOR
+    "Build the Pagosa Catalyst Adaptor" OFF
+    "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
+  mark_as_advanced(BUILD_PAGOSA_ADAPTOR)
+  if(BUILD_PAGOSA_ADAPTOR)
+    add_subdirectory(CoProcessing/Adaptors/PagosaAdaptor)
+  endif()
+
 endif()
