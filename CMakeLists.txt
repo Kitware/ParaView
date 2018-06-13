@@ -857,6 +857,14 @@ if (NOT VTK_INSTALL_NO_DEVELOPMENT)
 endif()
 
 #-----------------------------------------------------------------------------
+if (PARAVIEW_BUILD_CATALYST_ADAPTORS AND NOT WIN32)
+  # BuildAdaptors.cmake builds the adaptors as a separate project. We mark is
+  # OPTIONAL for Catalyst packages that don't have the adaptors included.
+  include(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/Adaptors/BuildAdaptors.cmake
+          OPTIONAL)
+endif()
+
+#-----------------------------------------------------------------------------
 # Export all targets at once from the build tree in their final configuration.
 # We export these again so that we add ParaView's targets to the list.
 get_property(_vtk_targets GLOBAL PROPERTY VTK_TARGETS)
@@ -896,15 +904,6 @@ if (BUILD_EXAMPLES)
       TEST_INCLUDE_FILE "${CMAKE_CURRENT_BINARY_DIR}/CatalystExamples.cmake")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CatalystExamples.cmake" "subdirs(${CMAKE_CURRENT_BINARY_DIR}/Examples/All/Catalyst/)")
   ENDIF ()
-endif()
-
-
-#-----------------------------------------------------------------------------
-if (PARAVIEW_BUILD_CATALYST_ADAPTORS AND NOT WIN32)
-  # BuildAdaptors.cmake builds the adaptors as a separate project. We mark is
-  # OPTIONAL for Catalyst packages that don't have the adaptors included.
-  include(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/Adaptors/BuildAdaptors.cmake
-          OPTIONAL)
 endif()
 
 #-----------------------------------------------------------------------------
