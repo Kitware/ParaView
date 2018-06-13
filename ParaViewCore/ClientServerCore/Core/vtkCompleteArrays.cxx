@@ -219,6 +219,7 @@ int vtkCompleteArrays::RequestData(
   vtkDebugMacro(<< "Completing array");
 
   outputDS->CopyStructure(inputDS);
+  outputDS->GetFieldData()->PassData(inputDS->GetFieldData());
   outputDS->GetPointData()->PassData(inputDS->GetPointData());
   outputDS->GetCellData()->PassData(inputDS->GetCellData());
 
