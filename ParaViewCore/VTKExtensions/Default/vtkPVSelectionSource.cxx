@@ -183,7 +183,7 @@ vtkPVSelectionSource::~vtkPVSelectionSource()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionSource::SetFrustum(double vertices[32])
+void vtkPVSelectionSource::AddFrustum(double vertices[32])
 {
   memcpy(this->Frustum, vertices, sizeof(double) * 32);
   this->Mode = FRUSTUM;

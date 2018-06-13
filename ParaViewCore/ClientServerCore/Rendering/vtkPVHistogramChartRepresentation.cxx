@@ -325,9 +325,10 @@ bool vtkPVHistogramChartRepresentation::MapSelectionToView(vtkSelection* sel)
   {
     vtkSelectionNode* node = nodes[cc];
     vtkDoubleArray* selectionList = vtkDoubleArray::SafeDownCast(node->GetSelectionList());
-    for (vtkIdType j = 0; (j + 1) < selectionList->GetNumberOfTuples(); j += 2)
+    for (vtkIdType j = 0; j < selectionList->GetNumberOfTuples(); ++j)
     {
-      double range[2] = { selectionList->GetValue(j), selectionList->GetValue(j + 1) };
+      double range[2] = { selectionList->GetTypedComponent(j, 0),
+        selectionList->GetTypedComponent(j, 1) };
       // since range is bin-range, convert that to bin-mid-points based range.
       range[0] += halfDelta;
       range[1] -= halfDelta;

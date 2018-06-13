@@ -67,7 +67,9 @@ paraview_add_test_python(
 paraview_add_test_python(
   NO_DATA NO_VALID NO_OUTPUT NO_RT
   TestResetProperty.py
-  PointPicking.py
+
+  # Temporarily disabled
+  # PointPicking.py
 )
 
 paraview_add_test_python(

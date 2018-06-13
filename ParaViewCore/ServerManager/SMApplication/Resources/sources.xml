@@ -1757,7 +1757,7 @@
       <Documentation>FrustumSelectionSource is a source producing a frustum
       selection.</Documentation>
       <DoubleVectorProperty argument_is_array="1"
-                            command="SetFrustum"
+                            command="AddFrustum"
                             default_values="0.0 0.0 1.0 0.0
          0.0 0.0 0.0 0.0
          0.0 1.0 1.0 0.0
