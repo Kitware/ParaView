@@ -12,12 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // must be the first thing that's included
+
 #include "vtkPythonSelector.h"
+#include "vtkPythonUtil.h"
 
 #include "vtkCompositeDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSelectionNode.h"
+#include "vtkSmartPyObject.h"
 
 #include <cassert>
 #include <sstream>
@@ -43,28 +47,40 @@ bool vtkPythonSelector::ComputeSelectedElements(vtkDataObject* input, vtkDataObj
 
   // ensure Python is initialized.
   vtkPythonInterpreter::Initialize();
+  vtkPythonScopeGilEnsurer gilEnsurer;
 
-  char addrOfInputDO[1024], addrOfNode[1024], addrOfOutputDO[1024];
-  sprintf(addrOfInputDO, "%p", input);
-  sprintf(addrOfNode, "%p", this->Node);
-  sprintf(addrOfOutputDO, "%p", output);
+  vtkSmartPyObject psModule;
+  psModule.TakeReference(PyImport_ImportModule("paraview.python_selector"));
+  if (!psModule)
+  {
+    vtkWarningMacro("Failed to import 'paraview.python_selector'");
+    if (PyErr_Occurred())
+    {
+      PyErr_Print();
+      PyErr_Clear();
+      return false;
+    }
+  }
 
-  std::ostringstream stream;
-  stream << "def vtkPythonSelector_ComputeSelectedElements():" << endl
-         << "    from paraview import python_selector as ps" << endl
-         << "    from paraview import vtk" << endl
-         << "    inputDO = vtk.vtkDataObject('" << addrOfInputDO << "')" << endl
-         << "    outputDO = vtk.vtkDataObject('" << addrOfOutputDO << "')" << endl
-         << "    node = vtk.vtkSelectionNode('" << addrOfNode << "')" << endl
-         << "    ps.execute(inputDO, node, '" << this->InsidednessArrayName << "', outputDO)"
-         << endl
-         << "    del outputDO" << endl
-         << "    del node" << endl
-         << "    del inputDO" << endl
-         << "    del ps" << endl
-         << "vtkPythonSelector_ComputeSelectedElements()" << endl
-         << "del vtkPythonSelector_ComputeSelectedElements" << endl;
-  vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+  vtkSmartPyObject functionName(PyString_FromString("execute"));
+  vtkSmartPyObject inputObj(vtkPythonUtil::GetObjectFromPointer(input));
+  vtkSmartPyObject nodeObj(vtkPythonUtil::GetObjectFromPointer(this->Node));
+  vtkSmartPyObject arrayNameObj(PyString_FromString(this->InsidednessArrayName.c_str()));
+  vtkSmartPyObject outputObj(vtkPythonUtil::GetObjectFromPointer(output));
+
+  vtkSmartPyObject retVal(
+    PyObject_CallMethodObjArgs(psModule, functionName.GetPointer(), inputObj.GetPointer(),
+      nodeObj.GetPointer(), arrayNameObj.GetPointer(), outputObj.GetPointer(), nullptr));
+  if (!retVal)
+  {
+    vtkWarningMacro("Could not invoke 'python_selector.execute()'");
+    if (PyErr_Occurred())
+    {
+      PyErr_Print();
+      PyErr_Clear();
+      return false;
+    }
+  }
 
   return true;
 }
