@@ -32,7 +32,7 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/EditScalarBar" command="activate" arguments="" />
   <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/WindowLocation/ComboBox" command="activated" arguments="AnyLocation" />
-  <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Position/LineEdit0" command="set_string" arguments="0.1" />
+  <pqevent object="ColorLegendEditor/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/Position/DoubleLineEdit0" command="set_full_precision_text" arguments="0.1" />
   <pqevent object="ColorLegendEditor/widget/ApplyButton" command="activate" arguments="" />
   <pqevent object="ColorLegendEditor/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/qt_dockwidget_closebutton" command="activate" arguments="" />

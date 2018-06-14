@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleRangeWidget.h"
 
-#include "pqLineEdit.h"
 #include "vtkPVConfig.h"
 
 // Qt includes

@@ -195,6 +195,30 @@ public:
   vtkBooleanMacro(ResetDisplayEmptyViews, bool);
   //@}
 
+  //@{
+  /**
+   * This enum specifies which notations to use for displaying real number values.
+   */
+  enum
+  {
+    DISPLAY_REALNUMBERS_USING_STANDARD_NOTATION = 0,
+    DISPLAY_REALNUMBERS_USING_SCIENTIFIC_NOTATION
+  };
+  /**
+   * Get/Set the notation of real number displayed in widgets or views.
+   */
+  vtkSetMacro(RealNumberDisplayedNotation, int);
+  vtkGetMacro(RealNumberDisplayedNotation, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the precision of real number displayed in widgets or views.
+   */
+  vtkSetMacro(RealNumberDisplayedPrecision, int);
+  vtkGetMacro(RealNumberDisplayedPrecision, int);
+  //@}
+
   /**
    * Forwarded for vtkSMParaViewPipelineControllerWithRendering.
    */
@@ -291,6 +315,8 @@ protected:
   unsigned long AnimationGeometryCacheLimit;
   int AnimationTimePrecision;
   bool ShowAnimationShortcuts;
+  int RealNumberDisplayedNotation;
+  int RealNumberDisplayedPrecision;
   bool ResetDisplayEmptyViews;
   int PropertiesPanelMode;
   bool LockPanels;

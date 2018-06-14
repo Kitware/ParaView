@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "pqDiscreteDoubleWidget.h"
+#include "pqDoubleLineEdit.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqHighlightableToolButton.h"
 #include "pqLabel.h"
-#include "pqLineEdit.h"
 #include "pqPropertiesPanel.h"
 #include "pqScalarValueListPropertyWidget.h"
 #include "pqScaleByButton.h"
@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetRangeDomain.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
@@ -175,6 +176,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     {
       // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget* widget = new pqDoubleRangeWidget(this);
+      this->addGeneralSettingsObserver(widget);
       widget->setObjectName("DoubleRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
@@ -207,10 +209,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 
         for (int i = 0; i < 3; i++)
         {
-          pqLineEdit* lineEdit = new pqLineEdit(this);
-          lineEdit->setValidator(new QDoubleValidator(lineEdit));
-          lineEdit->setObjectName(QString("LineEdit%1").arg(2 * i));
-          lineEdit->setTextAndResetCursor(
+          pqDoubleLineEdit* lineEdit = new pqDoubleLineEdit(this);
+          this->addGeneralSettingsObserver(lineEdit);
+          lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i));
+          lineEdit->setFullPrecisionText(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2 * i)).toString());
           if (showLabels)
           {
@@ -223,14 +225,15 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           {
             gridLayout->addWidget(lineEdit, i, 0);
           }
-          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, 2 * i);
-          this->connect(
-            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
+          this->addPropertyLink(
+            lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, 2 * i);
+          this->connect(lineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
+            SIGNAL(changeFinished()));
 
-          lineEdit = new pqLineEdit(this);
-          lineEdit->setValidator(new QDoubleValidator(lineEdit));
-          lineEdit->setObjectName(QString("LineEdit%1").arg(2 * i + 1));
-          lineEdit->setTextAndResetCursor(
+          lineEdit = new pqDoubleLineEdit(this);
+          this->addGeneralSettingsObserver(lineEdit);
+          lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i + 1));
+          lineEdit->setFullPrecisionText(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2 * i + 1)).toString());
           if (showLabels)
           {
@@ -244,9 +247,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
             gridLayout->addWidget(lineEdit, i, 1);
           }
           this->addPropertyLink(
-            lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, 2 * i + 1);
-          this->connect(
-            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
+            lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, 2 * i + 1);
+          this->connect(lineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
+            SIGNAL(changeFinished()));
         }
 
         layoutLocal->addLayout(gridLayout);
@@ -266,15 +269,16 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
             label->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
             layoutLocal->addWidget(label);
           }
-          pqLineEdit* lineEdit = new pqLineEdit(this);
-          lineEdit->setValidator(new QDoubleValidator(lineEdit));
-          lineEdit->setObjectName(QString("LineEdit%1").arg(i));
-          lineEdit->setTextAndResetCursor(
+          pqDoubleLineEdit* lineEdit = new pqDoubleLineEdit(this);
+          this->addGeneralSettingsObserver(lineEdit);
+          lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(i));
+          lineEdit->setFullPrecisionText(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
           layoutLocal->addWidget(lineEdit);
-          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, i);
-          this->connect(
-            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
+          this->addPropertyLink(
+            lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, i);
+          this->connect(lineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
+            SIGNAL(changeFinished()));
         }
 
         PV_DEBUG_PANELS() << "List of QLineEdit's for an DoubleVectorProperty "
@@ -289,6 +293,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     if (discrete->GetValuesExists())
     {
       pqDiscreteDoubleWidget* widget = new pqDiscreteDoubleWidget(this);
+      this->addGeneralSettingsObserver(widget);
       widget->setObjectName("DiscreteDoubleWidget");
       widget->setValues(discrete->GetValues());
 
@@ -342,6 +347,11 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   if (defaultDomain)
   {
     defaultDomain->Delete();
+  }
+  if (hasGeneralSettingsObservers())
+  {
+    pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
+      SLOT(onPVGeneralSettingsModified()));
   }
 }
 
@@ -400,5 +410,57 @@ void pqDoubleVectorPropertyWidget::scale(double factor)
     }
     emit this->changeAvailable();
     emit this->changeFinished();
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool pqDoubleVectorPropertyWidget::hasGeneralSettingsObservers() const
+{
+  return !this->DoubleLineEditGeneralSettingsObservers.isEmpty() ||
+    !this->DoubleSliderWidgetGeneralSettingsObservers.isEmpty();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::addGeneralSettingsObserver(pqDoubleLineEdit* widget)
+{
+  this->DoubleLineEditGeneralSettingsObservers << widget;
+  this->updateObserverFromGeneralSettings(widget);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::updateObserverFromGeneralSettings(pqDoubleLineEdit* widget)
+{
+  Q_ASSERT(widget);
+  widget->setNotation(static_cast<pqDoubleLineEdit::RealNumberNotation>(
+    vtkPVGeneralSettings::GetInstance()->GetRealNumberDisplayedNotation()));
+  widget->setPrecision(vtkPVGeneralSettings::GetInstance()->GetRealNumberDisplayedPrecision());
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::addGeneralSettingsObserver(pqDoubleSliderWidget* widget)
+{
+  this->DoubleSliderWidgetGeneralSettingsObservers << widget;
+  this->updateObserverFromGeneralSettings(widget);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::updateObserverFromGeneralSettings(pqDoubleSliderWidget* widget)
+{
+  Q_ASSERT(widget);
+  widget->setNotation(static_cast<pqDoubleLineEdit::RealNumberNotation>(
+    vtkPVGeneralSettings::GetInstance()->GetRealNumberDisplayedNotation()));
+  widget->setPrecision(vtkPVGeneralSettings::GetInstance()->GetRealNumberDisplayedPrecision());
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleVectorPropertyWidget::onPVGeneralSettingsModified()
+{
+  foreach (pqDoubleLineEdit* widget, this->DoubleLineEditGeneralSettingsObservers)
+  {
+    this->updateObserverFromGeneralSettings(widget);
+  }
+  foreach (pqDoubleSliderWidget* widget, this->DoubleSliderWidgetGeneralSettingsObservers)
+  {
+    this->updateObserverFromGeneralSettings(widget);
   }
 }

@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqDoubleVectorPropertyWidget_h
 #define _pqDoubleVectorPropertyWidget_h
 
+class pqDoubleLineEdit;
+class pqDoubleSliderWidget;
 #include "pqPropertyWidget.h"
 
 class PQCOMPONENTS_EXPORT pqDoubleVectorPropertyWidget : public pqPropertyWidget
@@ -66,8 +68,20 @@ protected slots:
   void scaleTwice();
   void scale(double);
 
+  void onPVGeneralSettingsModified();
+
 private:
   Q_DISABLE_COPY(pqDoubleVectorPropertyWidget)
+
+  bool hasGeneralSettingsObservers() const;
+
+  void addGeneralSettingsObserver(pqDoubleLineEdit* widget);
+  void updateObserverFromGeneralSettings(pqDoubleLineEdit* widget);
+  QList<pqDoubleLineEdit*> DoubleLineEditGeneralSettingsObservers;
+
+  void addGeneralSettingsObserver(pqDoubleSliderWidget* widget);
+  void updateObserverFromGeneralSettings(pqDoubleSliderWidget* widget);
+  QList<pqDoubleSliderWidget*> DoubleSliderWidgetGeneralSettingsObservers;
 };
 
 #endif // _pqDoubleVectorPropertyWidget_h

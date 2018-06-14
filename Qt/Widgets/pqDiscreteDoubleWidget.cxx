@@ -14,8 +14,6 @@
 =========================================================================*/
 #include "pqDiscreteDoubleWidget.h"
 
-#include "pqLineEdit.h"
-
 // Qt includes
 #include <QDoubleValidator>
 #include <QHBoxLayout>

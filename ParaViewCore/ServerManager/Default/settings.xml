@@ -371,6 +371,32 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="RealNumberDisplayedNotation"
+        number_of_elements="1"
+        default_values="0"
+        command="SetRealNumberDisplayedNotation"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the notation used to display real numbers.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Standard notation" value="0" />
+          <Entry text="Scientific notation" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RealNumberDisplayedPrecision"
+        number_of_elements="1"
+        default_values="6"
+        command="SetRealNumberDisplayedPrecision"
+        panel_visibility="advanced">
+        <Documentation>
+          Set the number of significant digits to display in real numbers.
+          This does NOT affect the values used in computation.
+        </Documentation>
+        <IntRangeDomain min="1" max="17" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="InheritRepresentationProperties"
         command="SetInheritRepresentationProperties"
         number_of_elements="1"
@@ -489,6 +515,8 @@
 
       <PropertyGroup label="Miscellaneous">
         <Property name="ResetDisplayEmptyViews" />
+        <Property name="RealNumberDisplayedNotation" />
+        <Property name="RealNumberDisplayedPrecision" />
         <Property name="InheritRepresentationProperties" />
         <Property name="DefaultTimeStep" />
         <Property name="MaximumNumberOfDataRepresentationLabels" />
