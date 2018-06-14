@@ -116,11 +116,8 @@ public:
    * Returns the preset's JSON-defined default position (if any)
    * or -1 if none.
    */
-  int GetPresetDefaultPosition(const Json::Value& preset);
-  int GetPresetDefaultPosition(unsigned int index)
-  {
-    return this->GetPresetDefaultPosition(this->GetPreset(index));
-  }
+  bool IsPresetDefault(const Json::Value& preset);
+  bool IsPresetDefault(unsigned int index) { return this->IsPresetDefault(this->GetPreset(index)); }
 
   /**
    * Add a preset give the Json::Value object.

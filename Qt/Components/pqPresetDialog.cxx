@@ -51,8 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSortFilterProxyModel>
 #include <QtDebug>
 
-#define NUMBER_OF_DEFAULT_PRESETS 16
-
 class pqPresetDialogTableModel : public QAbstractTableModel
 {
   typedef QAbstractTableModel Superclass;
@@ -156,17 +154,24 @@ public:
       switch (role)
       {
         case Qt::DisplayRole:
-          auto position = this->Presets->GetPresetDefaultPosition(idx.row());
-          if (position == -1)
+          // -1 means "not default"
+          // 0 means "application default" - user can't remove these
+          // 1 means "user default"
+          auto isDefault = this->Presets->IsPresetDefault(idx.row());
+          if (!isDefault)
           {
             pqSettings settings;
             auto userChosenPresets =
               settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
             QString name = this->Presets->GetPresetName(idx.row()).c_str();
             auto presetIdx = userChosenPresets.indexOf(QRegExp(QRegExp::escape(name)));
-            return presetIdx == -1 ? -1 : NUMBER_OF_DEFAULT_PRESETS + presetIdx;
+            if (presetIdx >= 0)
+            {
+              isDefault = true;
+            }
+            return isDefault ? 1 : -1;
           }
-          return position;
+          return 0;
       }
     }
     return QVariant();
@@ -272,10 +277,6 @@ public:
     {
       ShowAdvanced = true;
     }
-    else
-    {
-      this->sort(1);
-    }
   }
   ~pqPresetDialogProxyModel() override {}
 
@@ -283,14 +284,6 @@ public:
   void setShowAdvanced(bool show)
   {
     this->ShowAdvanced = show;
-    if (show)
-    {
-      this->sort(-1);
-    }
-    else
-    {
-      this->sort(1);
-    }
     this->invalidateFilter();
   }
 
@@ -599,7 +592,7 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
   const Ui::pqPresetDialog& ui = internals.Ui;
 
   ui.showDefault->setChecked(defaultPosition != -1);
-  ui.showDefault->setEnabled(defaultPosition == -1 || defaultPosition >= NUMBER_OF_DEFAULT_PRESETS);
+  ui.showDefault->setEnabled(defaultPosition == -1 || defaultPosition == 1);
   ui.colors->setEnabled(true);
   ui.usePresetRange->setEnabled(!internals.Model->Presets->GetPresetHasIndexedColors(preset));
   ui.opacities->setEnabled(internals.Model->Presets->GetPresetHasOpacities(preset));

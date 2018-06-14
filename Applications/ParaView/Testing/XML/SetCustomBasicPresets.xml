@@ -13,13 +13,13 @@
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="29.1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="33.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="30.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="34.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="30.1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="33.1" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="29.1" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="33.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/widget/advancedButton" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="8.0" />
