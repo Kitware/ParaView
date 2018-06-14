@@ -32,15 +32,7 @@
 
 #include <memory> //for std::unique_ptr.
 
-// Schwartz counter idiom to register loader for Python plugins (based on Python
-// algorithm).
-static class VTKPVPYTHONALGORITHM_EXPORT vtkPVPythonAlgorithmPluginLoaderInitializer
-{
-public:
-  vtkPVPythonAlgorithmPluginLoaderInitializer();
-  ~vtkPVPythonAlgorithmPluginLoaderInitializer();
-
-} PythonAlgorithmPluginInitializerInstance;
+class vtkPVPluginLoaderCleanerInitializer;
 
 class VTKPVPYTHONALGORITHM_EXPORT vtkPVPythonAlgorithmPlugin
   : public vtkPVPlugin,
@@ -84,6 +76,16 @@ private:
    */
   static bool LoadPlugin(const char* pname);
 };
+
+// Schwartz counter idiom to register loader for Python plugins (based on Python
+// algorithm).
+static class VTKPVPYTHONALGORITHM_EXPORT vtkPVPythonAlgorithmPluginLoaderInitializer
+{
+public:
+  vtkPVPythonAlgorithmPluginLoaderInitializer();
+  ~vtkPVPythonAlgorithmPluginLoaderInitializer();
+
+} PythonAlgorithmPluginInitializerInstance;
 
 #endif
 // VTK-HeaderTest-Exclude: vtkPVPythonAlgorithmPlugin.h

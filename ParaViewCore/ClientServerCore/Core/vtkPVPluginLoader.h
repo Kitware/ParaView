@@ -31,7 +31,6 @@
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
 #include <functional> // for std::function
-#include <vector>     // for std::vector
 
 class vtkPVPlugin;
 
@@ -187,8 +186,6 @@ protected:
 private:
   vtkPVPluginLoader(const vtkPVPluginLoader&) = delete;
   void operator=(const vtkPVPluginLoader&) = delete;
-  static std::vector<PluginLoaderCallback> OrderedPluginLoaderCallbacks;
-
   static bool CallPluginLoaderCallbacks(const char* nameOrFile);
 };
 

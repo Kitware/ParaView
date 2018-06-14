@@ -7,6 +7,7 @@ vtk_module(vtkPVPythonAlgorithm
     vtkPVServerImplementationCore
   PRIVATE_DEPENDS
     vtkFiltersPython
+    vtkPVClientServerCoreCore
     vtkPythonInterpreter
     vtksys
     vtkWrappingPythonCore

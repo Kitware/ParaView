@@ -28,25 +28,17 @@
 
 //============================================================================
 static int nifty_counter = 0;
-static int callback_id = -1;
 vtkPVPythonAlgorithmPluginLoaderInitializer::vtkPVPythonAlgorithmPluginLoaderInitializer()
 {
   if (nifty_counter == 0)
   {
-    callback_id =
-      vtkPVPluginLoader::RegisterLoadPluginCallback(vtkPVPythonAlgorithmPlugin::LoadPlugin);
+    vtkPVPluginLoader::RegisterLoadPluginCallback(vtkPVPythonAlgorithmPlugin::LoadPlugin);
   }
   nifty_counter++;
 }
 
 vtkPVPythonAlgorithmPluginLoaderInitializer::~vtkPVPythonAlgorithmPluginLoaderInitializer()
 {
-  nifty_counter--;
-  if (nifty_counter == 0 && callback_id != -1)
-  {
-    vtkPVPluginLoader::UnregisterLoadPluginCallback(callback_id);
-    callback_id = -1;
-  }
 }
 
 //============================================================================

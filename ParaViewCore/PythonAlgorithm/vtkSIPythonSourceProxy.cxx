@@ -22,6 +22,7 @@
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVPythonAlgorithmPlugin.h" // needed to ensure init in static builds.
 #include "vtkPythonAlgorithm.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonUtil.h"

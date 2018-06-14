@@ -30,8 +30,10 @@
 
 #include <cstdlib>
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #define vtkPVPluginLoaderDebugMacro(x)                                                             \
   {                                                                                                \
@@ -193,22 +195,28 @@ vtkPVPluginLoaderCleaner* vtkPVPluginLoaderCleaner::LibCleaner = NULL;
 };
 
 //=============================================================================
+using VectorOfCallbacks = std::vector<vtkPVPluginLoader::PluginLoaderCallback>;
+static VectorOfCallbacks* RegisteredPluginLoaderCallbacks = nullptr;
 static int nifty_counter = 0;
 vtkPVPluginLoaderCleanerInitializer::vtkPVPluginLoaderCleanerInitializer()
 {
+  if (nifty_counter == 0)
+  {
+    ::RegisteredPluginLoaderCallbacks = new VectorOfCallbacks();
+  }
   nifty_counter++;
 }
+
 vtkPVPluginLoaderCleanerInitializer::~vtkPVPluginLoaderCleanerInitializer()
 {
   nifty_counter--;
   if (nifty_counter == 0)
   {
     vtkPVPluginLoaderCleaner::FinalizeInstance();
+    delete ::RegisteredPluginLoaderCallbacks;
+    ::RegisteredPluginLoaderCallbacks = nullptr;
   }
 }
-//=============================================================================
-std::vector<vtkPVPluginLoader::PluginLoaderCallback>
-  vtkPVPluginLoader::OrderedPluginLoaderCallbacks;
 
 vtkStandardNewMacro(vtkPVPluginLoader);
 //-----------------------------------------------------------------------------
@@ -580,33 +588,39 @@ void vtkPVPluginLoader::PluginLibraryUnloaded(const char* pluginname)
 //-----------------------------------------------------------------------------
 int vtkPVPluginLoader::RegisterLoadPluginCallback(PluginLoaderCallback callback)
 {
-  auto& callbackVector = vtkPVPluginLoader::OrderedPluginLoaderCallbacks;
-  size_t index = callbackVector.size();
-  callbackVector.push_back(callback);
-  return static_cast<int>(index);
+  if (::RegisteredPluginLoaderCallbacks)
+  {
+    size_t index = ::RegisteredPluginLoaderCallbacks->size();
+    ::RegisteredPluginLoaderCallbacks->push_back(callback);
+    return static_cast<int>(index);
+  }
+  return -1;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::UnregisterLoadPluginCallback(int index)
 {
-  auto& callbackVector = vtkPVPluginLoader::OrderedPluginLoaderCallbacks;
-  if (index >= 0 && index < static_cast<int>(callbackVector.size()))
+  if (::RegisteredPluginLoaderCallbacks != nullptr && index >= 0 &&
+    index < static_cast<int>(::RegisteredPluginLoaderCallbacks->size()))
   {
-    auto iter = callbackVector.begin();
+    auto iter = ::RegisteredPluginLoaderCallbacks->begin();
     std::advance(iter, index);
-    callbackVector.erase(iter);
+    ::RegisteredPluginLoaderCallbacks->erase(iter);
   }
 }
 
 //-----------------------------------------------------------------------------
 bool vtkPVPluginLoader::CallPluginLoaderCallbacks(const char* nameOrFile)
 {
-  auto& callbackVector = vtkPVPluginLoader::OrderedPluginLoaderCallbacks;
-  for (auto iter = callbackVector.rbegin(); iter != callbackVector.rend(); ++iter)
+  if (::RegisteredPluginLoaderCallbacks)
   {
-    if ((*iter)(nameOrFile))
+    for (auto iter = ::RegisteredPluginLoaderCallbacks->rbegin();
+         iter != ::RegisteredPluginLoaderCallbacks->rend(); ++iter)
     {
-      return true;
+      if ((*iter)(nameOrFile))
+      {
+        return true;
+      }
     }
   }
   return false;
