@@ -147,6 +147,13 @@
     <Proxy group="filters" name="SPHDatasetInterpolator" />
   </Category>
 
+  <Category name="Chemistry" menu_label="Chemistry">
+    <Proxy group="filters" name="AppendMolecule"/>
+    <Proxy group="filters" name="ComputeMoleculeBonds"/>
+    <Proxy group="filters" name="MoleculeToLines"/>
+    <Proxy group="filters" name="PointSetToMolecule"/>
+  </Category>
+
   <Proxy group="filters" name="AggregateDataSet" />
   <Proxy group="filters" name="AppendArcLength" />
   <Proxy group="filters" name="AddFieldArrays" />
@@ -185,6 +192,7 @@
   <Proxy group="filters" name="DecimatePolyline" />
   <Proxy group="filters" name="Delaunay2D" />
   <Proxy group="filters" name="Delaunay3D" />
+  <Proxy group="filters" name="DistributePointSet"/>
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
   <Proxy group="filters" name="ExtractBlock" />

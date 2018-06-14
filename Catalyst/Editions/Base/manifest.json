@@ -164,6 +164,7 @@
         { "class":"vtkCellDataToPointData" },
         { "class":"vtkFeatureEdges" },
         { "class":"vtkImageAppend" },
+        { "class":"vtkMoleculeAppend" },
         { "class":"vtkPointDataToCellData" },
         { "class":"vtkProbeFilter" },
         { "class":"vtkQuadricClustering" },
@@ -346,6 +347,7 @@
     { "path":"ParaViewCore/ServerManager/SMApplication/Resources/filters.xml",
       "proxies":[
         "Append",
+        "AppendMolecule",
         "AppendPolyData",
         "FeatureEdges",
         "PointDataToCellData",

@@ -121,6 +121,14 @@ int vtkBlockDeliveryPreprocessor::RequestData(
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
 
+  // For some reasons, upstream pipeline can produce vtkDataObject
+  // instead of a derived type (such case use to appear with vtkMolecule)
+  // In this case, data is 'empty' and there is nothing to process.
+  if (!strcmp(inputDO->GetClassName(), "vtkDataObject"))
+  {
+    return 1;
+  }
+
   vtkSmartPointer<vtkAttributeDataToTableFilter> adtf =
     vtkSmartPointer<vtkAttributeDataToTableFilter>::New();
   adtf->SetInputData(inputDO);

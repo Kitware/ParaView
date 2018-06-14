@@ -127,7 +127,7 @@ int vtkMoleculeRepresentation::ProcessViewRequest(
   {
     vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds, this->Actor->GetMatrix());
     vtkPVRenderView::SetPiece(inInfo, this, this->CacheKeeper->GetOutput());
-    vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this, true, false);
+    vtkPVRenderView::SetDeliverToClientAndRenderingProcesses(inInfo, this, true, true);
   }
   else if (request_type == vtkPVView::REQUEST_RENDER())
   {

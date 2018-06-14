@@ -21,6 +21,8 @@
 #include "vtkGraph.h"
 #include "vtkImageAppend.h"
 #include "vtkImageData.h"
+#include "vtkMolecule.h"
+#include "vtkMoleculeAppend.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNew.h"
@@ -154,6 +156,10 @@ bool vtkMultiProcessControllerHelper::MergePieces(
     appender = vtkStructuredGridAppend::New();
     ;
   }
+  else if (vtkMolecule::SafeDownCast(result))
+  {
+    appender = vtkMoleculeAppend::New();
+  }
   else if (vtkGraph::SafeDownCast(result))
   {
     vtkGenericWarningMacro("Support for vtkGraph has been depreciated.") return false;
@@ -176,12 +182,17 @@ bool vtkMultiProcessControllerHelper::MergePieces(
   for (iter = pieces.begin(); iter != pieces.end(); ++iter)
   {
     vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
-
     if (ds && ds->GetNumberOfPoints() == 0)
     {
       // skip empty pieces.
       continue;
     }
+    vtkMolecule* mol = vtkMolecule::SafeDownCast(iter->GetPointer());
+    if (mol && mol->GetNumberOfAtoms() == 0)
+    {
+      continue;
+    }
+
     vtkNew<vtkTrivialProducer> tp;
     tp->SetOutput(iter->GetPointer());
     appender->AddInputConnection(0, tp->GetOutputPort());
