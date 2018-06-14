@@ -155,6 +155,7 @@ protected slots:
 
 protected:
   void focusInEvent(QFocusEvent* event);
+  void updateFullPrecisionText();
   void updateLimitedPrecisionText();
 
 private:

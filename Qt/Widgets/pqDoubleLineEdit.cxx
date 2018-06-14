@@ -86,6 +86,7 @@ void pqDoubleLineEdit::setFullPrecisionText(const QString& _text)
     return;
   }
   this->FullPrecisionText = _text;
+  this->updateFullPrecisionText();
   this->updateLimitedPrecisionText();
   emit fullPrecisionTextChanged(this->FullPrecisionText);
 }
@@ -122,6 +123,7 @@ void pqDoubleLineEdit::setPrecision(int _precision)
     return;
   }
   this->Precision = _precision;
+  this->updateFullPrecisionText();
   this->updateLimitedPrecisionText();
 }
 
@@ -153,6 +155,24 @@ void pqDoubleLineEdit::focusInEvent(QFocusEvent* event)
     this->onEditingStarted();
   }
   return this->Superclass::focusInEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleLineEdit::updateFullPrecisionText()
+{
+  int dotIndex = this->FullPrecisionText.indexOf(".");
+  if (dotIndex >= 0)
+  {
+    int digits = this->FullPrecisionText.length() - 1 - dotIndex;
+    if (digits <= this->Precision)
+    {
+      this->FullPrecisionText += QString("0").repeated(this->Precision - digits);
+    }
+  }
+  else
+  {
+    this->FullPrecisionText += QString(".") + QString("0").repeated(this->Precision);
+  }
 }
 
 //-----------------------------------------------------------------------------
