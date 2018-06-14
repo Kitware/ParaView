@@ -481,8 +481,10 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
   this->connect(ui.apply, SIGNAL(clicked()), SLOT(triggerApply()));
   this->connect(ui.importPresets, SIGNAL(clicked()), SLOT(importPresets()));
   this->connect(ui.exportPresets, SIGNAL(clicked()), SLOT(exportPresets()));
-  this->connect(ui.advancedButton, &QAbstractButton::toggled, this,
-    [&](bool showAdvanced) { this->Internals->ProxyModel->setShowAdvanced(showAdvanced); });
+  this->connect(ui.advancedButton, &QAbstractButton::toggled, this, [&](bool showAdvanced) {
+    this->Internals->ProxyModel->setShowAdvanced(showAdvanced);
+    this->updateEnabledStateForSelection();
+  });
   this->connect(ui.showDefault, SIGNAL(stateChanged(int)), SLOT(setPresetIsAdvanced(int)));
 }
 
