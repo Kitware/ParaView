@@ -20,6 +20,7 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSet.h"
+#include "vtkFileSeriesWriter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
@@ -56,35 +57,37 @@ vtkParallelSerialWriter::vtkParallelSerialWriter()
 {
   this->SetNumberOfOutputPorts(0);
 
-  this->Writer = 0;
+  this->Writer = nullptr;
 
-  this->FileNameMethod = 0;
-  this->FileName = 0;
+  this->FileNameMethod = nullptr;
+  this->FileName = nullptr;
+  this->FileNameSuffix = nullptr;
 
   this->Piece = 0;
   this->NumberOfPieces = 1;
   this->GhostLevel = 0;
 
-  this->PreGatherHelper = 0;
-  this->PostGatherHelper = 0;
+  this->PreGatherHelper = nullptr;
+  this->PostGatherHelper = nullptr;
 
   this->WriteAllTimeSteps = 0;
   this->NumberOfTimeSteps = 0;
   this->CurrentTimeIndex = 0;
 
-  this->Interpreter = 0;
+  this->Interpreter = nullptr;
   this->SetInterpreter(vtkClientServerInterpreterInitializer::GetGlobalInterpreter());
 }
 
 //-----------------------------------------------------------------------------
 vtkParallelSerialWriter::~vtkParallelSerialWriter()
 {
-  this->SetWriter(0);
-  this->SetFileNameMethod(0);
-  this->SetFileName(0);
-  this->SetPreGatherHelper(0);
-  this->SetPostGatherHelper(0);
-  this->SetInterpreter(0);
+  this->SetWriter(nullptr);
+  this->SetFileNameMethod(nullptr);
+  this->SetFileName(nullptr);
+  this->SetFileNameSuffix(nullptr);
+  this->SetPreGatherHelper(nullptr);
+  this->SetPostGatherHelper(nullptr);
+  this->SetInterpreter(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -243,7 +246,17 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
         std::string path = vtksys::SystemTools::GetFilenamePath(filename);
         std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
         std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
-        fname << path << "/" << fnamenoext << "." << this->CurrentTimeIndex << ext;
+        if (this->FileNameSuffix && vtkFileSeriesWriter::SuffixValidation(this->FileNameSuffix))
+        {
+          // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
+          char suffix[100];
+          snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
+          fname << path << "/" << fnamenoext << suffix << ext;
+        }
+        else
+        {
+          fname << path << "/" << fnamenoext << "." << this->CurrentTimeIndex << ext;
+        }
       }
       else
       {

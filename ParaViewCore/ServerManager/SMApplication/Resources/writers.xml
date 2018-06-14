@@ -923,6 +923,24 @@
         <Documentation>When WriteTimeSteps is turned ON, the writer is
         executed once for each time step available from its input.</Documentation>
       </IntVectorProperty>
+      <StringVectorProperty command="SetFileNameSuffix"
+			    default_values="_%d"
+		            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+	  The suffix to append to the file name when writing files at different timesteps.
+	  (File extensions such as .vtk should be excluded.)
+          The % format specifiers are used. For example, _%d will write files as FileName_0,
+	  FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+	    <Property name="WriteTimeSteps" function="boolean" />
+	  </PropertyWidgetDecorator>
+	</Hints>
+      </StringVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
                proxygroup="filters"

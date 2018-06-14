@@ -129,6 +129,11 @@ public:
    */
   void SetInterpreter(vtkClientServerInterpreter* interp) { this->Interpreter = interp; }
 
+  /**
+   * Utility function for validating the file name suffix.
+   */
+  static bool SuffixValidation(char* fileNameSuffix);
+
 protected:
   vtkFileSeriesWriter();
   ~vtkFileSeriesWriter() override;
