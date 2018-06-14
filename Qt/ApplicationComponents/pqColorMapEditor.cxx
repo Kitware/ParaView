@@ -262,7 +262,7 @@ void pqColorMapEditor::setColorTransferFunction(vtkSMProxy* ctf)
   this->Internals->ProxyWidget = widget;
   this->updatePanel();
 
-  QObject::connect(widget, SIGNAL(changeAvailable()), this, SLOT(updateIfNeeded()));
+  QObject::connect(widget, SIGNAL(changeFinished()), this, SLOT(updateIfNeeded()));
 }
 
 //-----------------------------------------------------------------------------
