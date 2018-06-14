@@ -98,7 +98,6 @@ private:
   Q_DISABLE_COPY(pqQVTKWidget)
   vtkSmartPointer<vtkSMProxy> ViewProxy;
   vtkWeakPointer<vtkSMSession> Session;
-  QImage MousePointerToDraw;
   QString SizePropertyName;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
 };
