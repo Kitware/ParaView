@@ -166,7 +166,18 @@ void pqDoubleLineEdit::updateFullPrecisionText()
     int digits = this->FullPrecisionText.length() - 1 - dotIndex;
     if (digits <= this->Precision)
     {
+      // If it applies, appends "0"
       this->FullPrecisionText += QString("0").repeated(this->Precision - digits);
+    }
+    else
+    {
+      // If it applies, removes extra "0"
+      while (digits > this->Precision &&
+        this->FullPrecisionText[this->FullPrecisionText.length() - 1] == "0")
+      {
+        this->FullPrecisionText.chop(1);
+        digits = this->FullPrecisionText.length() - 1 - dotIndex;
+      }
     }
   }
   else
