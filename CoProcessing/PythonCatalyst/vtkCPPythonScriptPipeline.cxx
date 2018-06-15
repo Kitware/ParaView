@@ -61,6 +61,9 @@ void InitializePython()
                     << "  pass\n"
                     << "paraview.print_error = print_dummy\n"
                     << "paraview.print_debug_info = print_dummy\n"
+                    // we now import stuff that have warnings or errors that we know are bad
+                    // when we're in a Catalyst edition. This fixes #18248.
+                    << "import paraview.servermanager\n"
                     << "paraview.print_error = f1\n"
                     << "paraview.print_debug_info = f2\n"
                     << "from paraview.vtk import vtkPVCatalyst\n";
