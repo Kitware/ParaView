@@ -3820,7 +3820,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vtm vtmb"
+        <ReaderFactory extensions="vtm vtm.series vtmb vtmb.series"
                        file_description="VTK MultiBlock Data Files" />
       </Hints>
       <!-- end of XMLMultiBlockDataReader -->
@@ -3875,7 +3875,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vthb vth"
+        <ReaderFactory extensions="vthb vthb.series vth vth.series"
                        file_description="VTK Hierarchical Box Data Files" />
       </Hints>
       <!-- end of XMLUniformGridAMRReader -->
@@ -3984,7 +3984,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vtp"
+        <ReaderFactory extensions="vtp vtp.series"
                        file_description="VTK PolyData Files" />
       </Hints>
     </SourceProxy>
@@ -4041,7 +4041,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vtt"
+        <ReaderFactory extensions="vtt vtt.series"
                        file_description="VTK Table Files" />
       </Hints>
     </SourceProxy>
@@ -4101,7 +4101,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vtu"
+        <ReaderFactory extensions="vtu vtu.series"
                        file_description="VTK UnstructuredGrid Files" />
       </Hints>
     </SourceProxy>
@@ -4159,7 +4159,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vti"
+        <ReaderFactory extensions="vti vti.series"
                        file_description="VTK ImageData Files" />
       </Hints>
     </SourceProxy>
@@ -4217,7 +4217,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vts"
+        <ReaderFactory extensions="vts vts.series"
                        file_description="VTK StructuredGrid Files" />
       </Hints>
     </SourceProxy>
@@ -4275,7 +4275,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="vtr"
+        <ReaderFactory extensions="vtr vtr.series"
                        file_description="VTK RectilinearGrid Files" />
       </Hints>
     </SourceProxy>
@@ -4335,7 +4335,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="pvtp"
+        <ReaderFactory extensions="pvtp pvtp.series"
                        file_description="VTK PolyData Files (partitioned)" />
       </Hints>
     </SourceProxy>
@@ -4397,7 +4397,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="pvtu"
+        <ReaderFactory extensions="pvtu pvtu.series"
                        file_description="VTK UnstructuredGrid Files (partitioned)" />
       </Hints>
     </SourceProxy>
@@ -4457,7 +4457,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="pvtt"
+        <ReaderFactory extensions="pvtt pvtt.series"
                        file_description="VTK Table (partitioned)" />
       </Hints>
     </SourceProxy>
@@ -4518,7 +4518,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="pvti"
+        <ReaderFactory extensions="pvti pvti.series"
                        file_description="VTK ImageData Files (partitioned)" />
       </Hints>
     </SourceProxy>
@@ -4580,7 +4580,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="pvts"
+        <ReaderFactory extensions="pvts pvts.series"
                        file_description="VTK StructuredGrid Files (partitioned)" />
       </Hints>
     </SourceProxy>
@@ -4642,7 +4642,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="pvtr"
+        <ReaderFactory extensions="pvtr pvtr.series"
                        file_description="VTK RectilinearGrid Files (partitioned)" />
       </Hints>
     </SourceProxy>
@@ -4753,7 +4753,7 @@
         Partitioned Legacy VTK reader.</Documentation>
       </StringVectorProperty>
       <Hints>
-        <ReaderFactory extensions="pvtk"
+        <ReaderFactory extensions="pvtk pvtk.series"
                        file_description="Legacy VTK Files (partitioned)" />
       </Hints>
       <!-- End pvtkfile -->
@@ -5153,7 +5153,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="ply"
+        <ReaderFactory extensions="ply ply.series"
                        file_description="PLY Polygonal File Format" />
       </Hints>
     </SourceProxy>
@@ -5281,7 +5281,7 @@
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="stl"
+        <ReaderFactory extensions="stl stl.series"
                        file_description="Stereo Lithography" />
       </Hints>
       <!-- End stlreader-->
