@@ -1,7 +1,5 @@
 #### import the simple module from the paraview
 import paraview
-paraview.compatibility.major = 5
-paraview.compatibility.minor = 2
 
 from paraview.simple import *
 from paraview import smtesting
@@ -48,6 +46,18 @@ SaveData(plyfilename,
 #        LookupTable=rTDataLUT
 )
 
+# save data as a time series with time step padding
+plyfilenamewithpadding = os.path.join(smtesting.TempDir, "PLYWriterDataWithPadding.ply")
+SaveData(plyfilenamewithpadding,
+        proxy=contour1, EnableColoring=1,
+# These properties need not be specified if being set to the coloring state of
+# the input in the active view.
+#        ColorArrayName=['POINTS', 'RTData'],
+#        LookupTable=rTDataLUT
+    WriteTimeSteps=1,
+    Filenamesuffix='_%.3d'
+)
+
 # destroy contour1
 Delete(contour1)
 del contour1
@@ -57,7 +67,23 @@ Delete(wavelet1)
 del wavelet1
 
 # create a new 'PLY Reader'
-fooply = PLYReader(FileName=plyfilename)
+fooply = PLYReader(FileNames=[plyfilename])
+
+# show data in view
+fooplyDisplay = Show(fooply, renderView1)
+fooplyDisplay.MapScalars = 0
+
+# reset view to fit data
+Render()
+ResetCamera()
+
+if not smtesting.DoRegressionTesting(renderView1.SMProxy):
+    raise smtesting.TestError ('Test failed.')
+
+splitname = plyfilenamewithpadding.split('.')
+newfilename = splitname[0]+'_000.'+splitname[1]
+fooply.FileNames=[newfilename]
+fooply.UpdatePipeline()
 
 # show data in view
 fooplyDisplay = Show(fooply, renderView1)

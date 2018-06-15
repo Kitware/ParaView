@@ -33,41 +33,6 @@
 vtkStandardNewMacro(vtkFileSeriesWriter);
 vtkCxxSetObjectMacro(vtkFileSeriesWriter, Writer, vtkAlgorithm);
 
-namespace
-{
-// Utility function for validating the file name suffix
-bool suffixValidation(char* fileNameSuffix)
-{
-  std::string suffix(fileNameSuffix);
-  // Only allow this format: ABC%.Xd
-  // ABC is an arbitrary string which may or may not exist
-  // % and d must exist and d must be the last char
-  // . and X may or may not exist, X must be an integer if it exists
-  if (suffix.empty() || suffix[suffix.size() - 1] != 'd')
-  {
-    return false;
-  }
-  std::string::size_type lastPercentage = suffix.find_last_of('%');
-  if (lastPercentage == std::string::npos)
-  {
-    return false;
-  }
-  if (suffix.size() - lastPercentage > 2 && !isdigit(suffix[lastPercentage + 1]) &&
-    suffix[lastPercentage + 1] != '.')
-  {
-    return false;
-  }
-  for (std::string::size_type i = lastPercentage + 2; i < suffix.size() - 1; ++i)
-  {
-    if (!isdigit(suffix[i]))
-    {
-      return false;
-    }
-  }
-  return true;
-}
-}
-
 //-----------------------------------------------------------------------------
 vtkFileSeriesWriter::vtkFileSeriesWriter()
 {
@@ -238,7 +203,7 @@ bool vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* i
     std::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
     std::string fnamenoext = vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
     std::string ext = vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-    if (this->FileNameSuffix && suffixValidation(this->FileNameSuffix))
+    if (this->FileNameSuffix && vtkFileSeriesWriter::SuffixValidation(this->FileNameSuffix))
     {
       // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
       char suffix[100];
@@ -324,6 +289,38 @@ void vtkFileSeriesWriter::SetWriterFileName(const char* fname)
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
   }
+}
+
+//-----------------------------------------------------------------------------
+bool vtkFileSeriesWriter::SuffixValidation(char* fileNameSuffix)
+{
+  std::string suffix(fileNameSuffix);
+  // Only allow this format: ABC%.Xd
+  // ABC is an arbitrary string which may or may not exist
+  // % and d must exist and d must be the last char
+  // . and X may or may not exist, X must be an integer if it exists
+  if (suffix.empty() || suffix[suffix.size() - 1] != 'd')
+  {
+    return false;
+  }
+  std::string::size_type lastPercentage = suffix.find_last_of('%');
+  if (lastPercentage == std::string::npos)
+  {
+    return false;
+  }
+  if (suffix.size() - lastPercentage > 2 && !isdigit(suffix[lastPercentage + 1]) &&
+    suffix[lastPercentage + 1] != '.')
+  {
+    return false;
+  }
+  for (std::string::size_type i = lastPercentage + 2; i < suffix.size() - 1; ++i)
+  {
+    if (!isdigit(suffix[i]))
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
