@@ -16,7 +16,6 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h" // needed for DEFAULT_DOUBLE_PRECISION_VALUE
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
@@ -39,7 +38,6 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 {
   this->Internals = new vtkInternals(this);
   this->ArgumentIsArray = 0;
-  this->Precision = DEFAULT_DOUBLE_PRECISION_VALUE;
 }
 
 //---------------------------------------------------------------------------
@@ -211,11 +209,14 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElem
     this->SetArgumentIsArray(arg_is_array);
   }
 
-  int precision = 0;
-  if (element->GetScalarAttribute("precision", &precision))
+#if !defined(VTK_LEGACY_REMOVE) && !defined(VTK_LEGACY_SILENT)
+  if (element->GetAttribute("precision"))
   {
-    this->SetPrecision(precision);
+    vtkWarningMacro(
+      "DoubleVectorProperty no longer supports `precision` attribute as it is no longer needed. "
+      "Simply remove it from your XML configuration.");
   }
+#endif
 
   int numElems = this->GetNumberOfElements();
   if (numElems > 0)
@@ -284,8 +285,6 @@ void vtkSMDoubleVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
-  os << indent << "Precision: " << this->Precision << endl;
-
   os << indent << "Values: ";
   for (unsigned int i = 0; i < this->GetNumberOfElements(); i++)
   {
@@ -321,3 +320,17 @@ bool vtkSMDoubleVectorProperty::IsValueDefault()
 {
   return this->Internals->IsValueDefault();
 }
+
+//---------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+void vtkSMDoubleVectorProperty::SetPrecision(int)
+{
+  VTK_LEGACY_BODY(vtkSMDoubleVectorProperty::SetPrecision, "ParaView 5.6");
+}
+
+int vtkSMDoubleVectorProperty::GetPrecision()
+{
+  VTK_LEGACY_BODY(vtkSMDoubleVectorProperty::GetPrecision, "ParaView 5.6");
+  return 0;
+}
+#endif

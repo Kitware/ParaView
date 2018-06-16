@@ -30,12 +30,15 @@
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
-class vtkIntArray;
-class vtkPVPlugin;
-class vtkStringArray;
+#include <functional> // for std::function
+
 class vtkPVPlugin;
 
+#if !defined(VTK_LEGACY_REMOVE)
+/// deprecated in ParaView 5.6. Use `vtkPVPluginLoader::PluginLoaderCallback`
+/// instead.
 typedef bool (*vtkPluginLoadFunction)(const char*);
+#endif
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginLoader : public vtkObject
 {
@@ -132,10 +135,20 @@ public:
   vtkGetMacro(Loaded, bool);
   //@}
 
+  //@{
+  /**
+   */
+  using PluginLoaderCallback = std::function<bool(const char*)>;
+  static int RegisterLoadPluginCallback(PluginLoaderCallback callback);
+  static void UnregisterLoadPluginCallback(int id);
+  //@}
+
   /**
    * Sets the function used to load static plugins.
+   * @deprecated ParaView 5.6. Please use `RegisterLoadPluginCallback` instead
+   * which supports adding multiple callbacks.
    */
-  static void SetStaticPluginLoadFunction(vtkPluginLoadFunction function);
+  VTK_LEGACY(static void SetStaticPluginLoadFunction(vtkPluginLoadFunction function));
 
   /**
    * Internal method used in pqParaViewPlugin.cxx.in to tell the
@@ -154,7 +167,7 @@ protected:
    * Called by LoadPluginInternal() to do the final steps in loading of a
    * plugin.
    */
-  bool LoadPlugin(const char* file, vtkPVPlugin* plugin);
+  bool LoadPluginInternal(vtkPVPlugin* plugin);
 
   vtkSetStringMacro(ErrorString);
   vtkSetStringMacro(PluginName);
@@ -173,8 +186,7 @@ protected:
 private:
   vtkPVPluginLoader(const vtkPVPluginLoader&) = delete;
   void operator=(const vtkPVPluginLoader&) = delete;
-
-  static vtkPluginLoadFunction StaticPluginLoadFunction;
+  static bool CallPluginLoaderCallbacks(const char* nameOrFile);
 };
 
 // Implementation of Schwartz counter idiom to ensure that the plugin library

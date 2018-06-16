@@ -121,6 +121,14 @@ public:
   static EULAConfirmationCallback GetEULAConfirmationCallback();
   //@}
 
+protected:
+  /**
+   * Set the filename the plugin is loaded from, if any. If it's nullptr, then
+   * its assumed that the plugin is "linked-in" i.e. not loaded from an external
+   * file.
+   */
+  void SetFileName(const char* filename);
+
 private:
   /**
    * Called to confirm EULA in `ImportPlugin` if the plugin has a non-empty EULA.
@@ -131,7 +139,6 @@ private:
   static bool ConfirmEULA(vtkPVPlugin* plugin);
 
   char* FileName;
-  void SetFileName(const char* filename);
 
   static EULAConfirmationCallback EULAConfirmationCallbackPtr;
   friend class vtkPVPluginLoader;

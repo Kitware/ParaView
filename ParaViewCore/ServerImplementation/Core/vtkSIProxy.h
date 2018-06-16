@@ -135,6 +135,12 @@ protected:
   ~vtkSIProxy() override;
 
   /**
+   * Create an instance of the class specified. Default implementation uses
+   * `this->Interpreter->NewInstance()`.
+   */
+  virtual vtkObjectBase* NewVTKObject(const char* className);
+
+  /**
    * Returns the subproxy helper for the subproxy with the given name, if any.
    */
   vtkSIProxy* GetSubSIProxy(const char* name);
@@ -164,7 +170,7 @@ protected:
   /**
    * Called to delete VTK objects.
    */
-  void DeleteVTKObjects();
+  virtual void DeleteVTKObjects();
 
   /**
    * Called after CreateVTKObjects(). The main difference for subclasses when

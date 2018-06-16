@@ -154,13 +154,11 @@ public:
 
   //@{
   /**
-   * Get/Set the precision to use while saving the state for this property. If
-   * 0 (or negative), then default ostream precision will be used. Precision can
-   * be defined in ServerManager configuration XML using the attribute
-   * "precision".
+   * @deprecated ParView 5.6: No longer needed as double values are always
+   * serialized in full lossless precision when saving to XML state files.
    */
-  vtkSetMacro(Precision, int);
-  vtkGetMacro(Precision, int);
+  VTK_LEGACY(void SetPrecision(int));
+  VTK_LEGACY(int GetPrecision());
   //@}
 
   /**
@@ -197,7 +195,6 @@ protected:
 
   int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
 
-  int Precision;
   int ArgumentIsArray;
 
   /**

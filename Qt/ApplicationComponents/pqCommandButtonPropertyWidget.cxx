@@ -32,14 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCommandButtonPropertyWidget.h"
 
+#include "pqPVApplicationCore.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-
-#include "pqPVApplicationCore.h"
+#include "vtkSMTrace.h"
 
 #include <QPushButton>
 #include <QVBoxLayout>
 
+//-----------------------------------------------------------------------------
 pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(
   vtkSMProxy* smProxy, vtkSMProperty* proxyProperty, QWidget* pWidget)
   : pqPropertyWidget(smProxy, pWidget)
@@ -60,14 +61,27 @@ pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(
                     << "the panel_widget=\"command_button\" attribute";
 }
 
+//-----------------------------------------------------------------------------
 pqCommandButtonPropertyWidget::~pqCommandButtonPropertyWidget()
 {
 }
 
+//-----------------------------------------------------------------------------
 void pqCommandButtonPropertyWidget::buttonClicked()
 {
-  this->Property->Modified();
-  this->proxy()->UpdateProperty(this->proxy()->GetPropertyName(this->Property));
+  auto aproxy = this->proxy();
+  if (this->Property->GetCommand() != nullptr)
+  {
+    const char* pname = aproxy->GetPropertyName(this->Property);
+    SM_SCOPED_TRACE(CallMethod).arg("proxy", aproxy).arg("InvokeCommand").arg(pname);
+    this->proxy()->InvokeCommand(pname);
+  }
+  else
+  {
+    // if property has no command, then we simply recreate the proxies.
+    SM_SCOPED_TRACE(CallMethod).arg("proxy", aproxy).arg("RecreateVTKObjects");
+    this->proxy()->RecreateVTKObjects();
+  }
 
   // Trigger a rendering
   pqPVApplicationCore::instance()->render();

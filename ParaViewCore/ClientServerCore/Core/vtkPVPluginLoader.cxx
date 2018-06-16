@@ -26,12 +26,14 @@
 #include "vtkPVServerManagerPluginInterface.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
-
-#include <sstream>
-#include <string>
-#include <vtksys/SystemTools.hxx>
+#include "vtksys/SystemTools.hxx"
 
 #include <cstdlib>
+#include <iterator>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #define vtkPVPluginLoaderDebugMacro(x)                                                             \
   {                                                                                                \
@@ -193,22 +195,28 @@ vtkPVPluginLoaderCleaner* vtkPVPluginLoaderCleaner::LibCleaner = NULL;
 };
 
 //=============================================================================
+using VectorOfCallbacks = std::vector<vtkPVPluginLoader::PluginLoaderCallback>;
+static VectorOfCallbacks* RegisteredPluginLoaderCallbacks = nullptr;
 static int nifty_counter = 0;
 vtkPVPluginLoaderCleanerInitializer::vtkPVPluginLoaderCleanerInitializer()
 {
+  if (nifty_counter == 0)
+  {
+    ::RegisteredPluginLoaderCallbacks = new VectorOfCallbacks();
+  }
   nifty_counter++;
 }
+
 vtkPVPluginLoaderCleanerInitializer::~vtkPVPluginLoaderCleanerInitializer()
 {
   nifty_counter--;
   if (nifty_counter == 0)
   {
     vtkPVPluginLoaderCleaner::FinalizeInstance();
+    delete ::RegisteredPluginLoaderCallbacks;
+    ::RegisteredPluginLoaderCallbacks = nullptr;
   }
 }
-//=============================================================================
-
-vtkPluginLoadFunction vtkPVPluginLoader::StaticPluginLoadFunction = 0;
 
 vtkStandardNewMacro(vtkPVPluginLoader);
 //-----------------------------------------------------------------------------
@@ -362,6 +370,13 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   std::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
   this->SetPluginName(defaultname.c_str());
 
+  // first, try the callbacks.
+  if (vtkPVPluginLoader::CallPluginLoaderCallbacks(file))
+  {
+    this->Loaded = true;
+    return true;
+  }
+
   if (vtksys::SystemTools::GetFilenameLastExtension(file) == ".xml")
   {
     vtkPVPluginLoaderDebugMacro("Loading XML plugin" << endl);
@@ -369,18 +384,15 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     if (plugin)
     {
       vtkPVPluginLoaderCleaner::GetInstance()->Register(plugin);
-      return this->LoadPlugin(file, plugin);
+      plugin->SetFileName(file);
+      return this->LoadPluginInternal(plugin);
     }
     vtkPVPluginLoaderErrorMacro(
       "Failed to load XML plugin. Not a valid XML or file could not be read.");
     return false;
   }
+
 #ifndef BUILD_SHARED_LIBS
-  if (StaticPluginLoadFunction && StaticPluginLoadFunction(file))
-  {
-    this->Loaded = true;
-    return true;
-  }
   vtkPVPluginLoaderErrorMacro("Could not find the plugin statically linked in, and "
                               "cannot load dynamic plugins  in static builds.");
   return false;
@@ -511,84 +523,31 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     vtkPVPluginLoaderDebugMacro("Updating Shared Library Paths: " << ldLibPath << endl);
   }
 
-  vtkPVPlugin* plugin = pv_plugin_query_instance();
-  //  if (plugin->UnloadOnExit())
+  if (vtkPVPlugin* plugin = pv_plugin_query_instance())
   {
-    // So that the lib is closed when the application quits.
-    // BUGS #10293, #15608.
-    vtkPVPluginLoaderCleaner::GetInstance()->Register(plugin->GetPluginName(), lib);
+    plugin->SetFileName(file);
+    //  if (plugin->UnloadOnExit())
+    {
+      // So that the lib is closed when the application quits.
+      // BUGS #10293, #15608.
+      vtkPVPluginLoaderCleaner::GetInstance()->Register(plugin->GetPluginName(), lib);
+    }
+    return this->LoadPluginInternal(plugin);
   }
-
-  return this->LoadPlugin(file, plugin);
 #endif // ifndef BUILD_SHARED_LIBS else
+  return false;
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVPluginLoader::LoadPlugin(const char* file, vtkPVPlugin* plugin)
+bool vtkPVPluginLoader::LoadPluginInternal(vtkPVPlugin* plugin)
 {
-#ifndef BUILD_SHARED_LIBS
-  if (StaticPluginLoadFunction && StaticPluginLoadFunction(plugin->GetPluginName()))
-  {
-    this->Loaded = true;
-    return true;
-  }
-  else
-  {
-    this->SetErrorString("Failed to load static plugin.");
-  }
-#endif
-
   this->SetPluginName(plugin->GetPluginName());
   this->SetPluginVersion(plugin->GetPluginVersionString());
-
-  // Print some debug information about the plugin, if needed.
-  vtkPVPluginLoaderDebugMacro(
-    "Plugin instance located successfully. "
-    "Now loading components from the plugin instance based on the interfaces it "
-    "implements."
-    << endl);
-  vtkPVPluginLoaderDebugMacro("----------------------------------------------------------------\n"
-                              "Plugin Information: \n"
-                              "  Name        : "
-    << plugin->GetPluginName() << "\n"
-                                  "  Version     : "
-    << plugin->GetPluginVersionString() << "\n"
-                                           "  ReqOnServer : "
-    << plugin->GetRequiredOnServer() << "\n"
-                                        "  ReqOnClient : "
-    << plugin->GetRequiredOnClient() << "\n"
-                                        "  ReqPlugins  : "
-    << plugin->GetRequiredPlugins() << endl);
-  vtkPVServerManagerPluginInterface* smplugin =
-    dynamic_cast<vtkPVServerManagerPluginInterface*>(plugin);
-  if (smplugin)
-  {
-    vtkPVPluginLoaderDebugMacro("  ServerManager Plugin : Yes" << endl);
-  }
-  else
-  {
-    vtkPVPluginLoaderDebugMacro("  ServerManager Plugin : No" << endl);
-  }
-
-  vtkPVPythonPluginInterface* pyplugin = dynamic_cast<vtkPVPythonPluginInterface*>(plugin);
-  if (pyplugin)
-  {
-    vtkPVPluginLoaderDebugMacro("  Python Plugin : Yes" << endl);
-  }
-  else
-  {
-    vtkPVPluginLoaderDebugMacro("  Python Plugin : No" << endl);
-  }
-
-  // Set the filename so the vtkPVPluginTracker knows what file this plugin was
-  // loaded from.
-  plugin->SetFileName(file);
 
   // From this point onwards the vtkPVPlugin travels the same path as a
   // statically imported plugin.
   vtkPVPlugin::ImportPlugin(plugin);
   this->Loaded = true;
-
   return true;
 }
 
@@ -611,16 +570,58 @@ void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void vtkPVPluginLoader::SetStaticPluginLoadFunction(vtkPluginLoadFunction function)
 {
-  if (!StaticPluginLoadFunction)
-  {
-    StaticPluginLoadFunction = function;
-  }
+  VTK_LEGACY_REPLACED_BODY(vtkPVPluginLoader::SetStaticPluginLoadFunction, "ParaView 5.6",
+    vtkPVPluginLoader::RegisterLoadPluginCallback);
+  vtkPVPluginLoader::RegisterLoadPluginCallback(function);
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::PluginLibraryUnloaded(const char* pluginname)
 {
   vtkPVPluginLoaderCleaner::PluginLibraryUnloaded(pluginname);
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVPluginLoader::RegisterLoadPluginCallback(PluginLoaderCallback callback)
+{
+  if (::RegisteredPluginLoaderCallbacks)
+  {
+    size_t index = ::RegisteredPluginLoaderCallbacks->size();
+    ::RegisteredPluginLoaderCallbacks->push_back(callback);
+    return static_cast<int>(index);
+  }
+  return -1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPluginLoader::UnregisterLoadPluginCallback(int index)
+{
+  if (::RegisteredPluginLoaderCallbacks != nullptr && index >= 0 &&
+    index < static_cast<int>(::RegisteredPluginLoaderCallbacks->size()))
+  {
+    auto iter = ::RegisteredPluginLoaderCallbacks->begin();
+    std::advance(iter, index);
+    ::RegisteredPluginLoaderCallbacks->erase(iter);
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVPluginLoader::CallPluginLoaderCallbacks(const char* nameOrFile)
+{
+  if (::RegisteredPluginLoaderCallbacks)
+  {
+    for (auto iter = ::RegisteredPluginLoaderCallbacks->rbegin();
+         iter != ::RegisteredPluginLoaderCallbacks->rend(); ++iter)
+    {
+      if ((*iter)(nameOrFile))
+      {
+        return true;
+      }
+    }
+  }
+  return false;
 }
