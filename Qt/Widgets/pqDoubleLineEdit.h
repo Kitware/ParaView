@@ -154,7 +154,7 @@ protected slots:
   void triggerFullPrecisionTextChangedAndEditingFinished();
 
 protected:
-  void focusInEvent(QFocusEvent* event);
+  void focusInEvent(QFocusEvent* event) override;
   void updateFullPrecisionText();
   void updateLimitedPrecisionText();
 
