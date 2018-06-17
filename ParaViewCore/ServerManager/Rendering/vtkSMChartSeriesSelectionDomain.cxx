@@ -55,8 +55,8 @@ static void InitSeriesVisibilityDefaults()
   {
     const char* defaults[] = { "^arc_length", "^bin_extents", "^FileId", "^GlobalElementId",
       "^GlobalNodeId", "^ObjectId", "^Pedigree.*", "^Points_.*", "^Time", "^vtkOriginal.*",
-      "^vtkValidPointMask", "^N .*", NULL };
-    for (int cc = 0; defaults[cc] != NULL; cc++)
+      "^vtkValidPointMask", "^N .*", "^X$", "^X .*", "^Y$", "^Y .*", "^Z$", "^Z .*", nullptr };
+    for (int cc = 0; defaults[cc] != nullptr; cc++)
     {
       SeriesVisibilityDefaults.push_back(
         SeriesVisibilityPair(vtksys::RegularExpression(defaults[cc]), false));
@@ -124,9 +124,9 @@ vtkSMChartSeriesSelectionDomain::vtkSMChartSeriesSelectionDomain()
 //----------------------------------------------------------------------------
 vtkSMChartSeriesSelectionDomain::~vtkSMChartSeriesSelectionDomain()
 {
-  this->SetDefaultValue(NULL);
+  this->SetDefaultValue(nullptr);
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -144,7 +144,7 @@ vtkPVDataInformation* vtkSMChartSeriesSelectionDomain::GetInputInformation()
       return sp->GetDataInformation(helper.GetOutputPort());
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -218,7 +218,8 @@ void vtkSMChartSeriesSelectionDomain::Update(vtkSMProperty*)
   // clear old component names.
   this->Internals->VisibilityOverrides.clear();
 
-  if (compositeIndex == NULL || dataInfo->GetCompositeDataInformation()->GetDataIsComposite() == 0)
+  if (compositeIndex == nullptr ||
+    dataInfo->GetCompositeDataInformation()->GetDataIsComposite() == 0)
   {
     // since there's no way to choose which dataset from a composite one to use,
     // just look at the top-level array information (skipping partial arrays).
@@ -291,7 +292,7 @@ void vtkSMChartSeriesSelectionDomain::PopulateAvailableArrays(const std::string&
   std::set<vtkStdString> uniquestrings;
 
   vtkPVDataSetAttributesInformation* dsa = dataInfo->GetAttributeInformation(fieldAssociation);
-  for (int cc = 0; dsa != NULL && cc < dsa->GetNumberOfArrays(); cc++)
+  for (int cc = 0; dsa != nullptr && cc < dsa->GetNumberOfArrays(); cc++)
   {
     vtkPVArrayInformation* arrayInfo = dsa->GetArrayInformation(cc);
     this->PopulateArrayComponents(
@@ -420,7 +421,7 @@ void vtkSMChartSeriesSelectionDomain::UpdateDefaultValues(
   vtkSMProperty* property, bool preserve_previous_values)
 {
   vtkSMStringVectorProperty* vp = vtkSMStringVectorProperty::SafeDownCast(property);
-  assert(vp != NULL);
+  assert(vp != nullptr);
 
   vtkNew<vtkStringList> values;
   std::set<std::string> seriesNames;
