@@ -148,11 +148,11 @@ if (PARAVIEW_ENABLE_PYTHON AND NOT WIN32)
   # The Pagosa adaptor is done as part of the normal ParaView CMake configuration
   # so that the library can be installed.
   #------------------------------------------------------------------------------
-  cmake_dependent_option(BUILD_PAGOSA_ADAPTOR
+  cmake_dependent_option(PARAVIEW_BUILD_PAGOSA_ADAPTOR
     "Build the Pagosa Catalyst Adaptor" OFF
     "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
-  mark_as_advanced(BUILD_PAGOSA_ADAPTOR)
-  if(BUILD_PAGOSA_ADAPTOR)
+  mark_as_advanced(PARAVIEW_BUILD_PAGOSA_ADAPTOR)
+  if(PARAVIEW_BUILD_PAGOSA_ADAPTOR)
     add_subdirectory(CoProcessing/Adaptors/PagosaAdaptor)
   endif()
 

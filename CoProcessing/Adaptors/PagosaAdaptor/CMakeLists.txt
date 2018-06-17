@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.3)
 project(PagosaAdaptor)
 
 set(STANDALONE_BUILD 0)
@@ -28,11 +28,22 @@ target_link_libraries(
   PagosaAdaptor vtkPVCatalyst vtkPVPythonCatalyst
 )
 
-if(PARAVIEW_INSTALL_DEVELOPMENT_FILES OR STANDALONE_BUILD)
-  install(TARGETS PagosaAdaptor DESTINATION ${CMAKE_INSTALL_PREFIX}/lib COMPONENT Development)
-  if(STANDALONE_BUILD)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PagosaAdaptorAPIMangling.h DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-  else()
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PagosaAdaptorAPIMangling.h DESTINATION ${VTK_INSTALL_INCLUDE_DIR})
-  endif()
+set_property(GLOBAL APPEND PROPERTY VTK_TARGETS PagosaAdaptor)
+
+if(STANDALONE_BUILD)
+  install(TARGETS PagosaAdaptor EXPORT PagosaAdaptorTargets
+    DESTINATION lib
+    COMPONENT Development)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PagosaAdaptorAPIMangling.h
+    DESTINATION include)
+  export(TARGETS PagosaAdaptor FILE
+    PagosaAdaptor.cmake)
+#  export(EXPORT PagosaAdaptorTargets
+#    FILE ${PagosaAdaptor_BINARY_DIR}/PagosaAdaptorTargets.cmake)
+elseif(PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  install(TARGETS PagosaAdaptor EXPORT ${PV_INSTALL_EXPORT_NAME}
+    DESTINATION lib
+    COMPONENT Development)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/PagosaAdaptorAPIMangling.h
+    DESTINATION ${VTK_INSTALL_INCLUDE_DIR})
 endif()
