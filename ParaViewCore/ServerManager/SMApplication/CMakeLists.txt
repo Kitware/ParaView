@@ -165,6 +165,13 @@ if (PARAVIEW_USE_OPENTURNS)
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_openturns.xml)
 endif()
 
+list(FIND VTK_MODULES_ENABLED "vtkFiltersMomentInvariants" vtkFiltersMomentInvariants_index)
+if (vtkFiltersMomentInvariants_index GREATER 0)
+  list(APPEND requestedResourceFiles
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/MomentInvariants.xml)
+endif()
+
+
 #------------------------------------------------------------------------------
 
 if (PARAVIEW_ENABLE_PYTHON)

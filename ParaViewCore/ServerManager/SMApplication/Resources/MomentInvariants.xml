@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-   <SourceProxy name="MI ComputeMoments" class="vtkComputeMoments" label="Compute Moments">
+   <SourceProxy name="ComputeMoments" class="vtkComputeMoments" label="Compute Moments">
      <Documentation
         long_help="MomentInvariants vtkComputeMoments"
         short_help="MomentInvariants vtkComputeMoments">
@@ -61,7 +61,7 @@
         <ShowInMenu category="Moment Invariants" />
       </Hints>
    </SourceProxy>
-   <SourceProxy name="MI PComputeMoments" class="vtkPComputeMoments" label="Parallel Compute Moments">
+   <SourceProxy name="ParallelComputeMoments" class="vtkPComputeMoments" label="Parallel Compute Moments">
      <Documentation
         long_help="MomentInvariants vtkPComputeMoments"
         short_help="MomentInvariants vtkPComputeMoments">
@@ -122,7 +122,7 @@
         <ShowInMenu category="Moment Invariants" />
       </Hints>
    </SourceProxy>
-   <SourceProxy name="MI vtkMomentInvariants" class="vtkMomentInvariants" label="Moment Invariants">
+   <SourceProxy name="MomentInvariants" class="vtkMomentInvariants" label="Moment Invariants">
      <Documentation
         long_help="MomentInvariants vtkMomentInvariants"
         short_help="MomentInvariants vtkMomentInvariants">
