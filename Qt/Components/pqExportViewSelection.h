@@ -91,7 +91,7 @@ public:
   *            'ViewName2' : [...],
   *            ... (for N views)
   */
-  QString getSelectionAsString(QString const& scriptFromat);
+  QString getSelectionAsString(QString const& scriptFormat);
 
 signals:
   void arraySelectionEnabledChanged(bool enabled);

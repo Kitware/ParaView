@@ -243,7 +243,7 @@ public slots:
   void setOrientationAxesOutlineColor(const QColor&);
 
   // Set the center of rotation. For this to work,
-  // one should have approriate interaction style (vtkPVInteractorStyle subclass)
+  // one should have appropriate interaction style (vtkPVInteractorStyle subclass)
   // and camera manipulators that use the center of rotation.
   // They are setup correctly by default.
   void setCenterOfRotation(double x, double y, double z);
@@ -326,7 +326,7 @@ protected:
   void fakeUndoRedo(bool redo, bool self);
 
   /**
-  * Updates undo stack of all linked views to record a programatic change
+  * Updates undo stack of all linked views to record a programmatic change
   * in camera as a interaction. Must be called with start=true before the
   * change and with start=false after the change.
   */

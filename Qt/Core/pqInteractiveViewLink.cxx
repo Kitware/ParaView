@@ -257,7 +257,7 @@ void pqInteractiveViewLink::renderLinkedView()
     // We need to render the hidden view here
     // The good practice would be to call LinkedView->forceRender()
     // in order to make sure there is no tag mismatch between server and client
-    // in remote rendering. But this using a LinkedView->Render cann trigger
+    // in remote rendering. But this using a LinkedView->Render can trigger
     // a render loop if multiple interactive view link are used, because of the camera
     // link transmitting render from on view to the next, and then back, causing the render
     // loop.
@@ -281,7 +281,7 @@ void pqInteractiveViewLink::drawViewLink()
   // Without this counter, which count StillRender (update rate < 1)
   // when creating a CameraLink loop between views with at least one interactive view link,
   // an infinite render loop would occur because the last display view render
-  // would trigger the timer wich would trigger a display view render, which would trigger,
+  // would trigger the timer which would trigger a display view render, which would trigger,
   // via the CameraLink loop, a linked view render, on so on.
   if (this->Internal->DisplayWindow->GetDesiredUpdateRate() < 1)
   {
@@ -307,7 +307,7 @@ void pqInteractiveViewLink::drawViewLink()
 void pqInteractiveViewLink::finalRenderDisplayView()
 {
   // We need a unique still render to have an up-to-date view link
-  // Any other consecutive still render is uneeded and most likely
+  // Any other consecutive still render is unneeded and most likely
   // due to CameraLink loop.
   if (this->Internal->StillRenderCounter <= 1)
   {

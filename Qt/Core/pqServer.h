@@ -192,7 +192,7 @@ signals:
   void finalTimeoutWarning();
 
   /**
-  * Fired if any server side crash or disconnection occured.
+  * Fired if any server side crash or disconnection occurred.
   */
   void serverSideDisconnected();
 
@@ -263,7 +263,7 @@ protected slots:
   void onCollaborationCommunication(vtkObject*, unsigned long, void*, void*);
 
   /**
-  * Called by vtkSMSessionClient is any communication error occured with the
+  * Called by vtkSMSessionClient is any communication error occurred with the
   * server. This usually mean that the server side is dead.
   */
   void onConnectionLost(vtkObject*, unsigned long, void*, void*);

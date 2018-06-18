@@ -478,7 +478,7 @@ vtkSMProxy* pqObjectBuilder::createProxy(
   }
   else if (reg_group.contains("prototypes"))
   {
-    // Mark as prototype to prevent them from behing saved in undo stack and
+    // Mark as prototype to prevent them from being saved in undo stack and
     // managed through the state
     proxy->SetPrototype(true);
   }

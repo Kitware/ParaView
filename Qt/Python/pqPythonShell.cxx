@@ -195,7 +195,7 @@ public:
           }
           else
           {
-            value = PyObject_GetAttr(object, key); // Return value: New refernce.
+            value = PyObject_GetAttr(object, key); // Return value: New reference.
           }
           if (!value)
           {

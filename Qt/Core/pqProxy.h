@@ -206,7 +206,7 @@ protected:
   * Make this pqProxy take on a new identity. This is following case:
   * Proxy A registered as (gA, nA), then is again registered as (gA, nA2).
   * pqServerManagerModel does not create a new pqProxy for (gA, nA2).
-  * However, if (gA, nA) is now unregistered, the same old instace of pqProxy
+  * However, if (gA, nA) is now unregistered, the same old instance of pqProxy
   * which represented (gA, nA) will now "take on a new identity" and
   * represent proxy (gA, nA2). This method will trigger the
   * nameChanged() signal.
@@ -218,7 +218,7 @@ protected:
   // after the object has been created.
   virtual void initialize();
 
-  // Method used to update the internal structure whithout affecting
+  // Method used to update the internal structure without affecting
   // the ProxyManager proxy registration
   virtual void addInternalHelperProxy(const QString& key, vtkSMProxy*) const;
   virtual void removeInternalHelperProxy(const QString& key, vtkSMProxy*) const;

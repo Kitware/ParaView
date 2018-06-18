@@ -183,7 +183,7 @@ private slots:
 
   /**
   * \brief
-  *   Clears the custom filter overwite flag.
+  *   Clears the custom filter overwrite flag.
   * \param text The changed name text.
   */
   void clearNameOverwrite(const QString& text);

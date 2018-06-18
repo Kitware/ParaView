@@ -123,7 +123,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
     if (vtkSMVectorProperty::SafeDownCast(smproperty)->GetRepeatCommand())
     {
       // Some enumeration properties, we add
-      // ability to select mutliple elements. This is the case if the
+      // ability to select multiple elements. This is the case if the
       // SM property has repeat command flag set.
       pqTreeWidget* treeWidget = new pqTreeWidget(this);
       treeWidget->setObjectName("TreeWidget");

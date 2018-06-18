@@ -58,7 +58,7 @@ public:
   //@}
   //@{
   /**
-   * Wakes up Insitu side if simulation is paused. Handles corectly
+   * Wakes up Insitu side if simulation is paused. Handles correctly
    * several calls on the LIVE side.
    */
   void LiveChanged();

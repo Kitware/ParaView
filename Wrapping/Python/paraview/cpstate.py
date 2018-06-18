@@ -50,7 +50,7 @@ def locate_simulation_inputs(proxy):
 
 # -----------------------------------------------------------------------------
 def locate_simulation_inputs_for_view(view_proxy):
-    """Given a view proxy, retruns a list of source proxies that have been
+    """Given a view proxy, returns a list of source proxies that have been
         flagged as the 'simulation input' in the state exporting wizard."""
     reprProp = servermanager.ProxyProperty(view_proxy, view_proxy.GetProperty("Representations"))
     reprs = reprProp[:]

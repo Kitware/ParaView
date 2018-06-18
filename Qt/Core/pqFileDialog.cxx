@@ -509,7 +509,7 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 
   // this code is only needed for the 3.10 release as
   // after that the user should know that the dialog support multiple file open
-  bool setupMutlipleFileHelp = false;
+  bool setupMultipleFileHelp = false;
   impl.Mode = mode;
   QAbstractItemView::SelectionMode selectionMode;
   switch (impl.Mode)
@@ -522,11 +522,11 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       break;
     case ExistingFiles:
     case ExistingFilesAndDirectories:
-      setupMutlipleFileHelp = (impl.ShowMultipleFileHelp != true);
+      setupMultipleFileHelp = (impl.ShowMultipleFileHelp != true);
       selectionMode = QAbstractItemView::ExtendedSelection;
       break;
   }
-  if (setupMutlipleFileHelp)
+  if (setupMultipleFileHelp)
   {
     // only set the tooltip and window title the first time through
     impl.ShowMultipleFileHelp = true;

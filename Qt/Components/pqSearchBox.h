@@ -133,7 +133,7 @@ public:
   QString settingKey() const;
 
   /**
-  * Convinience method to access the settings. It should not be used to
+  * Convenience method to access the settings. It should not be used to
   * modify the advanced button state. Use setAdvancedSearchActive() instead.
   */
   QSettings* settings() const;

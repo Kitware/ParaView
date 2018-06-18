@@ -134,7 +134,7 @@ public:
   }
 
   /**
-  * Given the gloabal id for a proxy,
+  * Given the global id for a proxy,
   * locates a pqServerManagerModelItem subclass for the proxy.
   */
   template <class T>

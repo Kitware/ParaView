@@ -220,7 +220,7 @@ unsigned long pqCoreUtilities::connect(vtkObject* vtk_object, int vtk_event_id, 
   // helper. Since pqCoreUtilitiesEventHelper::Interal keeps a weak-pointer to
   // the vtk_object, that gets cleared. So eventually when qobject is destroyed,
   // the pqCoreUtilitiesEventHelper is deleted, but since the vtk_object is
-  // already deleted, it doesnt' do anything special.
+  // already deleted, it doesn't do anything special.
   return eventid;
 }
 

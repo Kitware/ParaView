@@ -67,7 +67,7 @@
      <item>
       <widget class="QPushButton" name="RescaleButton">
        <property name="toolTip">
-        <string>Rescale and leave automatical rescaling mode unchanged.</string>
+        <string>Rescale and leave automatic rescaling mode unchanged.</string>
        </property>
        <property name="text">
         <string>Rescale</string>

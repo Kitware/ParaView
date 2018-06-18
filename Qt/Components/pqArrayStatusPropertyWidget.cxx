@@ -64,7 +64,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
     }
   }
 
-  // dont show label
+  // don't show label
   this->setShowLabel(false);
 }
 
@@ -87,7 +87,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   const char* property_name = smproxy->GetPropertyName(smproperty);
   this->addPropertyLink(selectorWidget, property_name, SIGNAL(widgetModified()), smproperty);
 
-  // dont show label
+  // don't show label
   this->setShowLabel(false);
 }
 

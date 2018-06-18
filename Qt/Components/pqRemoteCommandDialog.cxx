@@ -44,7 +44,7 @@ enum
 const char* tokens[] = { "$TERM_EXEC$", "$TERM_OPTS$", "$SSH_EXEC$", "$FE_URL$", "$PV_HOST$",
   "$PV_PID$" };
 
-// a command set is slected based on host system types.
+// a command set is selected based on host system types.
 // client | server | descr
 //--------+--------+----------
 //   0    |  -1    | unix cli

@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * plugin that is notified by ParaView when ParaView starts and exits.
 * In practice, no plugin can be loaded until ParaView is up and running, hence
 * the \c startup() is called immediately after the plugin is loaded. When the
-* applicaiton is about to exit or if the plugin is about to be unloaded,
+* application is about to exit or if the plugin is about to be unloaded,
 * \c shutdown() is called on all the registered /// interfaces.
 */
 class PQCORE_EXPORT pqAutoStartInterface

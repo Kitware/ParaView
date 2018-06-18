@@ -2158,7 +2158,7 @@ void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locat
     }
   }
   // Load deferred sub-proxy state
-  // Deferring sub-proxy loading IS VERY IMPORTANT, specialy for compound proxy
+  // Deferring sub-proxy loading IS VERY IMPORTANT, especially for compound proxy
   // that define pipeline connectivity.
   // If not done while loading the pipeline connection, this will failed because
   // the sub-proxy involved might not have a GlobalID yet !

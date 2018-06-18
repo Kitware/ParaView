@@ -152,7 +152,7 @@ public:
 
   /**
   * Returns the current size of the rendering context.
-  * Default implementation returns the client size ofthe widget. Subclasses
+  * Default implementation returns the client size of the widget. Subclasses
   * may override to change this behavior.
   */
   virtual QSize getSize();
@@ -183,7 +183,7 @@ public:
   QList<pqRepresentation*> getRepresentations() const;
 
   /**
-  * This method returns is any pqPipelineSource can be dislayed in this
+  * This method returns is any pqPipelineSource can be displayed in this
   * view. NOTE: This is no longer virtual. Simply forwards to
   * vtkSMViewProxy::CanDisplayData().
   */

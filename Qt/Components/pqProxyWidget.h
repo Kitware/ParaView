@@ -48,7 +48,7 @@ class vtkSMProxy;
 * source/filter and the display/representation sections of the panel.
 *
 * pqProxyWidget doesn't show any widgets in the panel by default (after
-* contructor). Use filterWidgets() or updatePanel() to show widgets matching
+* constructor). Use filterWidgets() or updatePanel() to show widgets matching
 * criteria.
 *
 * Note: This class replaces pqProxyPanel (and subclasses). pqProxyPanel is

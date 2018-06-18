@@ -125,7 +125,7 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
           double normalized_x = mouseEvent->x() / static_cast<double>(size.width());
           double normalized_y = mouseEvent->y() / static_cast<double>(size.height());
           // Move to the place where the mouse was released and then release it.
-          // This mimicks drag without actually having to save all the intermediate
+          // This mimics drag without actually having to save all the intermediate
           // mouse move positions.
           emit recordEvent(widget, "mouseMove", QString("(%1,%2,%3,%4,%5)")
                                                   .arg(normalized_x)

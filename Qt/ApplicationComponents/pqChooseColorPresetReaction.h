@@ -60,7 +60,7 @@ class vtkSMProxy;
 * monitor this representation and allow user to load preset of its transfer functions.
 *
 * \li Control a specific color transfer function: To use this mode, pass the \c track_active_objects
-* parameter to the constructor as `false` and then set the transfer function proxy explictly
+* parameter to the constructor as `false` and then set the transfer function proxy explicitly
 * using pqChooseColorPresetReaction::setTransferFunction() method.
 *
 * In all modes, the reaction will fire the presetApplied() signal to indicate a new preset has been

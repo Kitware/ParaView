@@ -995,7 +995,7 @@ namespace
 void MergeAnnotations(QList<QVariant>& mergedAnnotations,
   const QList<QVariant>& existingAnnotations, const QList<QVariant>& candidateValues)
 {
-  // Extract values from exisiting interleaved annotation list.
+  // Extract values from existing interleaved annotation list.
   QList<QVariant> existingValues;
   for (int idx = 0; idx < existingAnnotations.size() / 2; ++idx)
   {

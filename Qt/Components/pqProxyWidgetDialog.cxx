@@ -182,7 +182,7 @@ public:
     /// Reset the scroll area so it can actually be used.
     ui.scrollArea->setMinimumSize(oldMinSize);
 
-    // Finaly set the maximum and current dialog size
+    // Finally set the maximum and current dialog size
     self->setMaximumSize(pqCoreUtilities::mainWidget()->size());
     if (this->GeometryLoaded == false)
     {

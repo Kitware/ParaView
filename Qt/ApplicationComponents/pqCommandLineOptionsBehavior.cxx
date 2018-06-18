@@ -174,7 +174,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   else if (options->GetStateFileName())
   {
     // check for --state option. (Bug #5711)
-    // NOTE: --data and --state cannnot be specifed at the same time.
+    // NOTE: --data and --state cannot be specified at the same time.
 
     // Load state file without fix-filenames dialog.
     pqLoadStateReaction::loadState(options->GetStateFileName(), true);

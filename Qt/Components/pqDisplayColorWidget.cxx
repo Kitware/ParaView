@@ -476,7 +476,7 @@ void pqDisplayColorWidget::refreshColorArrayNames()
       uniquifier.insert(key);
     }
   }
-  // doing this here, instead of in the construtor ensures that the
+  // doing this here, instead of in the constructor ensures that the
   // popup menu shows resonably on OsX.
   this->Variables->setMaxVisibleItems(this->Variables->count() + 1);
 

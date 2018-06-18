@@ -450,7 +450,7 @@ pqLinksEditor::pqLinksEditor(vtkSMLink* link, QWidget* p)
       }
       else
       {
-        qDebug() << "Unknow Link type:" << model->getLinkType(idx) << endl;
+        qDebug() << "Unknown Link type:" << model->getLinkType(idx) << endl;
       }
 
       vtkSMProxy* inputProxy = model->getProxy1(idx);

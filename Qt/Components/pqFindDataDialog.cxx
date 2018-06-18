@@ -124,7 +124,7 @@ void pqFindDataDialog::freezeSelection()
         (fdType == vtkSelectionNode::CELL && selectedInformation->GetNumberOfCells() > 10000))
       {
         if (QMessageBox::warning(this, tr("Convert Selection"),
-              tr("This selection converion can potentially result in fetching a "
+              tr("This selection conversion can potentially result in fetching a "
                  "large amount of data to the client.\n"
                  "Are you sure you want to continue?"),
               QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) != QMessageBox::Ok)
