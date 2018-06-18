@@ -13,10 +13,9 @@ sliceRep = Show(s)
 
 view = GetActiveView()
 view.ResetCamera()
+view.ViewSize = [400, 400]
 
 Render()
-
-plotline = PlotOverLine(Input = s)
 
 pt1 = [0, 0, 0]
 pt2 = [0, 0, 0]
@@ -35,8 +34,6 @@ for i in range(3):
     if abs(pt1[i] - pt1Goal[i]) > 1e-4:
         print("Error, point 1 should be:")
         print(pt1Goal)
-        sys.exit(1)
     if abs(pt2[i] - pt2Goal[i]) > 1e-4:
         print("Error, point 2 should be:")
         print(pt2Goal)
-        sys.exit(1)
