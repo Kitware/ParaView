@@ -113,6 +113,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 
 #include "vtkPVFileInformation.h"
+#include "vtkSMProxyManager.h"
 
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
@@ -470,10 +471,13 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   QAction* guide = menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Guide");
   guide->setObjectName("actionGuide");
   guide->setShortcut(QKeySequence::HelpContents);
-  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/paraview-downloads/"
-                                     "download.php?submit=Download&version=v5.5&type=binary&os="
-                                     "Sources&downloadFile=ParaViewGuide-5.5.0.pdf"),
-    guide);
+  QString guideURL = QString("https://www.paraview.org/paraview-downloads/"
+                             "download.php?submit=Download&version=v%1.%2&type=binary&os="
+                             "Sources&downloadFile=ParaViewGuide-%1.%2.%3.pdf")
+                       .arg(vtkSMProxyManager::GetVersionMajor())
+                       .arg(vtkSMProxyManager::GetVersionMinor())
+                       .arg(vtkSMProxyManager::GetVersionPatch());
+  new pqDesktopServicesReaction(QUrl(guideURL), guide);
 
 #ifdef PARAVIEW_USE_QTHELP
   // Help
@@ -484,12 +488,16 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   // -----------------
   menu.addSeparator();
 
-  // ParaView Tutorial notes
-  new pqDesktopServicesReaction(QUrl("https://www.paraview.org/paraview-downloads/"
-                                     "download.php?submit=Download&version=v5.5&type=binary&os="
-                                     "Sources&downloadFile=ParaViewTutorial.pdf"),
-    (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Tutorial")
-                                  << pqSetName("actionTutorialNotes")));
+  // ParaView Tutorial
+  QString tutorialURL = QString("https://www.paraview.org/paraview-downloads/"
+                                "download.php?submit=Download&version=v%1.%2&type=binary&os="
+                                "Sources&downloadFile=ParaViewTutorial-%1.%2.%3.pdf")
+                          .arg(vtkSMProxyManager::GetVersionMajor())
+                          .arg(vtkSMProxyManager::GetVersionMinor())
+                          .arg(vtkSMProxyManager::GetVersionPatch());
+  new pqDesktopServicesReaction(
+    QUrl(tutorialURL), (menu.addAction(QIcon(":/pqWidgets/Icons/pdf.png"), "ParaView Tutorial")
+                         << pqSetName("actionTutorialNotes")));
 
   // Sandia National Labs Tutorials
   new pqDesktopServicesReaction(QUrl("http://www.paraview.org/Wiki/SNL_ParaView_4_Tutorials"),
