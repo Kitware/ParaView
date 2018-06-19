@@ -147,6 +147,15 @@ public:
 
         case Qt::UserRole:
           return this->Presets->GetPresetHasIndexedColors(idx.row());
+        case Qt::FontRole:
+          QFont font;
+          // if this is a default preset, bold and underline the name
+          if (this->data(this->index(idx.row(), 1), Qt::DisplayRole) != -1)
+          {
+            font.setBold(true);
+            font.setUnderline(true);
+          }
+          return font;
       }
     }
     else if (idx.column() == 1)
@@ -785,9 +794,11 @@ void pqPresetDialog::setPresetIsAdvanced(int newState)
   if (showByDefault && defaultPosition == -1)
   {
     internals.Model->addPresetToDefaults(idx);
+    internals.Ui.gradients->update(selectedRows[0]);
   }
   else if (!showByDefault && defaultPosition != -1)
   {
     internals.Model->removePresetFromDefaults(idx);
+    internals.Ui.gradients->update(selectedRows[0]);
   }
 }
