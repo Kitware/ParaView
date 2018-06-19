@@ -39,7 +39,7 @@ git merge --ff-only origin/master
 ```
   - [ ] Update `version.txt` and tag the commit
 ```
-git checkout -b update-to-VERSION
+git checkout -b update-to-vVERSION
 echo VERSION > version.txt
 git commit -m 'Update version number to VERSION' version.txt
 git tag -a -m 'ParaView VERSION' vVERSION HEAD
@@ -49,7 +49,7 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
     - [ ] Get positive review
     - [ ] `Do: merge`
   - Integrate changes to `release` branch
-    - [ ] `git push origin update-to-VERSION:release vVERSION`
+    - [ ] `git push origin update-to-vVERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
 If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
@@ -62,7 +62,7 @@ git merge --ff-only origin/release
 ```
   - [ ] Update `version.txt` and tag the commit
 ```
-git checkout -b update-to-VERSION
+git checkout -b update-to-vVERSION
 echo VERSION > version.txt
 git commit -m 'Update version number to VERSION' version.txt
 git tag -a -m 'ParaView VERSION' vVERSION HEAD
@@ -72,7 +72,7 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
     - [ ] Get positive review
     - [ ] `Do: merge`
   - Integrate changes to `release` branch
-    - [ ] `git push origin update-to-VERSION:release vVERSION`
+    - [ ] `git push origin update-to-vVERSION:release vVERSION`
 -->
 
   - Create tarballs
@@ -95,7 +95,7 @@ git checkout master
 git merge --ff-only origin/master
 ```
   - Update `versions.cmake` and `CMakeLists.txt`
-    - [ ] `git checkout -b update-to-VERSION`
+    - [ ] `git checkout -b update-to-vVERSION`
     - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
       version in `CMakeLists.txt`:
 ```
@@ -121,7 +121,7 @@ git gitlab-push -f
     - [ ] `Do: merge`
     - [ ] `git tag -a -m 'ParaView superbuild VERSION' vVERSION HEAD`
   - Integrate changes to `release` branch
-    - [ ] `git push origin update-to-VERSION:release vVERSION`
+    - [ ] `git push origin update-to-vVERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
 If making a release from the `release` branch, e.g., `vMAJOR.MINOR.0-RC2 or above`:
@@ -158,7 +158,7 @@ git gitlab-push -f
     - [ ] `Do: merge`
     - [ ] `git tag -a -m 'ParaView superbuild VERSION' vVERSION HEAD`
   - Integrate changes to `release` branch
-    - [ ] `git push origin update-to-VERSION:release vVERSION`
+    - [ ] `git push origin update-to-vVERSION:release vVERSION`
 -->
 
 # Validating binaries
@@ -167,7 +167,7 @@ git gitlab-push -f
     - [ ] Getting started guide opens
     - [ ] Examples load and match thumbnails in dialog
     - [ ] Python
-    - [ ] `import compiler`, `import numpy`
+    - [ ] `import compiler, numpy`
     - [ ] Plugins are present and load properly
     - [ ] Text source LaTeX `$A^2$`
     - [ ] OSPRay
