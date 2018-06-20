@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqKeyFrameEditor.h"
 #include "pqLineEdit.h"
 #include "pqPVApplicationCore.h"
+#include "pqSetName.h"
 #include "pqUndoStack.h"
 
 #include "vtkSMProperty.h"
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGridLayout>
 #include <QIntValidator>
 #include <QLabel>
+#include <QMenu>
 
 //-----------------------------------------------------------------------------
 pqAnimationShortcutWidget::pqAnimationShortcutWidget(
@@ -60,10 +62,16 @@ pqAnimationShortcutWidget::pqAnimationShortcutWidget(
   , Property(property)
   , Scene(nullptr)
 {
+  QMenu* popupMenu = new QMenu(this);
+  popupMenu << pqSetName("AnimationShortcutMenu");
+  this->setMenu(popupMenu);
+  QObject::connect(popupMenu, SIGNAL(aboutToShow()), SLOT(updateMenu()));
+  QObject::connect(popupMenu, SIGNAL(triggered(QAction*)), SLOT(onTriggered(QAction*)));
+
+  this->setPopupMode(QToolButton::InstantPopup);
+
   QObject::connect(
-    this, SIGNAL(triggered(QAction*)), this, SLOT(onTriggered(QAction*)), Qt::QueuedConnection);
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)), this,
-    SLOT(onSceneCuesChanged()));
+    &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)), this, SLOT(updateMenu()));
 
   pqAnimationManager* mgr = pqPVApplicationCore::instance()->animationManager();
   QObject::connect(
@@ -86,46 +94,42 @@ void pqAnimationShortcutWidget::setScene(pqAnimationScene* scene)
   this->Scene = scene;
   if (scene)
   {
-    QObject::connect(scene, SIGNAL(cuesChanged()), this, SLOT(onSceneCuesChanged()));
+    QObject::connect(scene, SIGNAL(cuesChanged()), this, SLOT(updateMenu()));
   }
-  this->onSceneCuesChanged();
+  this->updateMenu();
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationShortcutWidget::onSceneCuesChanged()
+void pqAnimationShortcutWidget::updateMenu()
 {
+  QMenu* popupMenu = this->menu();
+  Q_ASSERT(popupMenu);
+
+  popupMenu->clear();
+
   pqAnimationCue* cue = this->Scene
     ? pqPVApplicationCore::instance()->animationManager()->getCue(
         this->Scene, this->Proxy, this->Property->GetXMLName(), 0)
     : nullptr;
   if (!cue)
   {
-    if (this->actions().size() != 1)
-    {
-      foreach (QAction* action, this->actions())
-      {
-        this->removeAction(action);
-      }
-      QAction* playAction = new QAction(
-        QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"), tr("Create a new animation track"), this);
-      playAction->setData(QVariant(0));
-      this->setDefaultAction(playAction);
-    }
+    QAction* playAction = new QAction(
+      QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"), tr("Create a new animation track"), this);
+    playAction->setData(QVariant(0));
+    popupMenu->addAction(playAction);
+    this->setIcon(QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"));
   }
   else
   {
-    if (this->actions().size() != 2)
-    {
-      this->removeAction(defaultAction());
-      QAction* editAction =
-        new QAction(QIcon(":/pqWidgets/Icons/pqRamp24.png"), tr("Edit the animation track"), this);
-      editAction->setData(QVariant(1));
-      QAction* deleteAction = new QAction(
-        QIcon(":/QtWidgets/Icons/pqDelete16.png"), tr("Remove the animation track"), this);
-      deleteAction->setData(QVariant(2));
-      this->addAction(deleteAction);
-      this->setDefaultAction(editAction);
-    }
+    QAction* editAction =
+      new QAction(QIcon(":/pqWidgets/Icons/pqRamp24.png"), tr("Edit the animation track"), this);
+    editAction->setData(QVariant(1));
+    popupMenu->addAction(editAction);
+    QAction* deleteAction = new QAction(
+      QIcon(":/QtWidgets/Icons/pqDelete16.png"), tr("Remove the animation track"), this);
+    deleteAction->setData(QVariant(2));
+    popupMenu->addAction(deleteAction);
+    this->setIcon(QIcon(":/pqWidgets/Icons/pqRamp24.png"));
   }
 }
 
