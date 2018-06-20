@@ -72,6 +72,11 @@ public:
 
   QPoint getCursorPosition();
 
+  /**
+   * Set the size of the font to use. Size is measured in points.
+   */
+  void setFontSize(int size);
+
 signals:
   /**
   * Signal emitted whenever the user enters a command

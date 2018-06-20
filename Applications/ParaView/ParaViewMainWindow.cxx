@@ -399,6 +399,13 @@ void ParaViewMainWindow::updateFontSize()
     }
     this->Internals->CurrentGUIFontSize = fontSize;
   }
+
+  // Console font size
+  int consoleFontSize = gsSettings->GetConsoleFontSize();
+#if defined(PARAVIEW_ENABLE_PYTHON)
+  pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
+  shell->setFontSize(consoleFontSize);
+#endif
 }
 
 //-----------------------------------------------------------------------------

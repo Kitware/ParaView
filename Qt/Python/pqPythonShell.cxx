@@ -40,14 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqConsoleWidget.h"
 #include "pqFileDialog.h"
 #include "pqUndoStack.h"
+
 #include "vtkCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVOptions.h"
-#include "vtkProcessModule.h"
+
 #include "vtkPythonCompatibility.h"
 #include "vtkPythonInteractiveInterpreter.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
 #include "vtkStringOutputWindow.h"
 #include "vtkWeakPointer.h"
@@ -563,6 +565,13 @@ void* pqPythonShell::consoleLocals()
   // locals.
   this->initialize();
   return this->Internals->interpreter()->GetInteractiveConsoleLocalsPyObject();
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonShell::setFontSize(int fontSize)
+{
+  pqConsoleWidget* consoleWidget = this->Internals->Ui.consoleWidget;
+  consoleWidget->setFontSize(fontSize);
 }
 
 //-----------------------------------------------------------------------------

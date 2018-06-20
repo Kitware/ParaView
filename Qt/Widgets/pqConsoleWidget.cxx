@@ -466,6 +466,15 @@ QPoint pqConsoleWidget::getCursorPosition()
 }
 
 //-----------------------------------------------------------------------------
+void pqConsoleWidget::setFontSize(int size)
+{
+  QTextCursor cursor = this->Implementation->textCursor();
+  this->Implementation->selectAll();
+  this->Implementation->setFontPointSize(size);
+  this->Implementation->setTextCursor(cursor);
+}
+
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::setCompleter(pqConsoleWidgetCompleter* completer)
 {
   this->Implementation->setCompleter(completer);
