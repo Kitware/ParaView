@@ -28,6 +28,7 @@
 class vtkCallbackCommand;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
+class vtkFeatureEdges;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperTreeGrid;
@@ -67,6 +68,15 @@ public:
    */
   vtkSetMacro(UseOutline, int);
   vtkGetMacro(UseOutline, int);
+  //@}
+
+  //@{
+  /**
+   * Set/get whether to produce feature edges (vs. surface).
+   * If both this and UseOutline are true, then an outline will be produced.
+   */
+  vtkSetMacro(GenerateFeatureEdges, bool);
+  vtkGetMacro(GenerateFeatureEdges, bool);
   //@}
 
   //@{
@@ -285,6 +295,7 @@ protected:
   vtkGenericGeometryFilter* GenericGeometryFilter;
   vtkUnstructuredGridGeometryFilter* UnstructuredGridGeometryFilter;
   vtkPVRecoverGeometryWireframe* RecoverWireframeFilter;
+  vtkFeatureEdges* FeatureEdgesFilter;
 
   /**
    * Call CheckAttributes on the \c input which ensures that all attribute
@@ -317,6 +328,7 @@ protected:
   int StripModFirstPass;
   bool HideInternalAMRFaces;
   bool UseNonOverlappingAMRMetaDataForOutlines;
+  bool GenerateFeatureEdges;
 
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&) = delete;
