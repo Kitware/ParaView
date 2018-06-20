@@ -1051,12 +1051,15 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
 
 class ParaViewWebColorManager(ParaViewWebProtocol):
 
-    def __init__(self, pathToColorMaps=None):
+    def __init__(self, pathToColorMaps=None, showBuiltin=True):
         super(ParaViewWebColorManager, self).__init__()
+        if pathToColorMaps:
+            simple.ImportPresets(filename=pathToColorMaps)
         self.presets = servermanager.vtkSMTransferFunctionPresets()
         self.colorMapNames = []
         for i in range(self.presets.GetNumberOfPresets()):
-            self.colorMapNames.append(self.presets.GetPresetName(i))
+            if showBuiltin or not self.presets.IsPresetBuiltin(i):
+                self.colorMapNames.append(self.presets.GetPresetName(i))
 
     # RpcName: getScalarBarVisibilities => pv.color.manager.scalarbar.visibility.get
     @exportRpc("pv.color.manager.scalarbar.visibility.get")
