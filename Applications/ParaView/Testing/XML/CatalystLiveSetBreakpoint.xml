@@ -3,7 +3,6 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
   <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionCatalystConnect" />
   <pqevent object="pqClientMainWindow/1QInputDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
 
   <!-- wait for Catalyst pipeline to show-up -->
   <pqevent object="pqClientMainWindow" command="pqLiveInsituManager"

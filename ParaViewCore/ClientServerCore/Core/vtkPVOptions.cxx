@@ -79,6 +79,7 @@ vtkPVOptions::vtkPVOptions()
   this->DisableXDisplayTests = 0;
   this->ForceOffscreenRendering = 0;
   this->ForceOnscreenRendering = 0;
+  this->CatalystLivePort = -1;
 
   if (this->XMLParser)
   {
@@ -525,4 +526,5 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DisableXDisplayTests: " << this->DisableXDisplayTests << endl;
   os << indent << "ForceNoMPIInitOnClient: " << this->ForceNoMPIInitOnClient << endl;
   os << indent << "ForceMPIInitOnClient: " << this->ForceMPIInitOnClient << endl;
+  os << indent << "CatalystLivePort: " << this->CatalystLivePort << endl;
 }
