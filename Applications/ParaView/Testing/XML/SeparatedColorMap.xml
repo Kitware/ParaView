@@ -50,7 +50,8 @@
   <pqcheck object="pqClientMainWindow/variableToolbar/1QToolButton2" property="checked" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/ChoosePreset" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/widget/advancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="5.0" />
+  <!-- Choose "Black, Orange and White" -->
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="9.1" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/SeparatedColorMapA.png" threshold="5" />
@@ -58,14 +59,16 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,56,10,/0:0/1:0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/ChoosePreset" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/widget/advancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="3.0" />
+  <!-- Choose "Black Body Radiation" -->
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="1.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionUseSeparateColorMap" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/ChoosePreset" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/widget/advancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="2.0" />
+  <!-- Choose "Rainbow Desaturated" -->
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="6.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,69,1,/0:0/0:0" />
