@@ -57,16 +57,14 @@ public:
 
 protected slots:
   /**
+   * Called when the menu is about to be shown.
+   */
+  virtual void updateMenu();
+
+  /**
    * Called when toolbutton it pressed
    */
   virtual void onTriggered(QAction*);
-
-  /**
-   * The cues in the scene have changed, so we make sure
-   * that we are not displaying a removed or added cue, if so
-   * we update the GUI.
-   */
-  virtual void onSceneCuesChanged();
 
   /**
    * Set the scene to view
