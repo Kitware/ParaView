@@ -137,6 +137,8 @@ private:
 
   friend class pqConsoleWidgetEventPlayer;
 
+  int FontSize;
+
   /**
   * Prints and executes the command. Used by pqConsoleWidgetEventPlayer for
   * text playback.

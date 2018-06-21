@@ -406,6 +406,9 @@ void ParaViewMainWindow::updateFontSize()
   pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
   shell->setFontSize(consoleFontSize);
 #endif
+  pqOutputWidget* outputWidget =
+    qobject_cast<pqOutputWidget*>(this->Internals->outputWidgetDock->widget());
+  outputWidget->setFontSize(consoleFontSize);
 }
 
 //-----------------------------------------------------------------------------
