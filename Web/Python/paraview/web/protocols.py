@@ -182,7 +182,7 @@ class ParaViewWebProtocol(vtk_protocols.vtkWebProtocol):
 
 class ParaViewWebMouseHandler(ParaViewWebProtocol):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(ParaViewWebMouseHandler, self).__init__()
         self.lastAction = 'up'
 
@@ -249,7 +249,7 @@ class ParaViewWebMouseHandler(ParaViewWebProtocol):
 
 class ParaViewWebViewPort(ParaViewWebProtocol):
 
-    def __init__(self, scale=1.0, maxWidth=2560, maxHeight=1440):
+    def __init__(self, scale=1.0, maxWidth=2560, maxHeight=1440, **kwargs):
         super(ParaViewWebViewPort, self).__init__()
         self.scale = scale
         self.maxWidth = maxWidth
@@ -404,7 +404,7 @@ class ParaViewWebViewPortImageDelivery(ParaViewWebProtocol):
 # =============================================================================
 
 class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
-    def __init__(self, decode=True):
+    def __init__(self, decode=True, **kwargs):
         ParaViewWebProtocol.__init__(self)
         self.trackingViews = {}
         self.lastStaleTime = 0
@@ -727,7 +727,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
 class ParaViewWebProgressUpdate(ParaViewWebProtocol):
     progressObserverTag = None
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(ParaViewWebProgressUpdate, self).__init__()
         self.listenToProgress()
 
@@ -751,7 +751,7 @@ class ParaViewWebProgressUpdate(ParaViewWebProtocol):
 
 class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(ParaViewWebViewPortGeometryDelivery, self).__init__()
 
         self.dataCache = {}
@@ -848,7 +848,7 @@ class ParaViewWebViewPortGeometryDelivery(ParaViewWebProtocol):
 # =============================================================================
 
 class ParaViewWebLocalRendering(ParaViewWebProtocol):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(ParaViewWebLocalRendering, self).__init__()
         self.context = SynchronizationContext()
         self.trackingViews = {}
@@ -950,7 +950,7 @@ class ParaViewWebLocalRendering(ParaViewWebProtocol):
 
 class ParaViewWebTimeHandler(ParaViewWebProtocol):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(ParaViewWebTimeHandler, self).__init__()
         # setup animation scene
         self.scene = simple.GetAnimationScene()
@@ -1051,7 +1051,7 @@ class ParaViewWebTimeHandler(ParaViewWebProtocol):
 
 class ParaViewWebColorManager(ParaViewWebProtocol):
 
-    def __init__(self, pathToColorMaps=None, showBuiltin=True):
+    def __init__(self, pathToColorMaps=None, showBuiltin=True, **kwargs):
         super(ParaViewWebColorManager, self).__init__()
         if pathToColorMaps:
             simple.ImportPresets(filename=pathToColorMaps)
@@ -1550,7 +1550,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                        'unspecified',     # 14
                        'signed_char' ]    # 15
 
-    def __init__(self, allowedProxiesFile=None, baseDir=None, fileToLoad=None, allowUnconfiguredReaders=True, groupProxyEditorWidgets=True, respectPropertyGroups=True):
+    def __init__(self, allowedProxiesFile=None, baseDir=None, fileToLoad=None, allowUnconfiguredReaders=True, groupProxyEditorWidgets=True, respectPropertyGroups=True, **kwargs):
         """
         basePath: specify the base directory (or directories) that we should start with, if this
         parameter takes the form: "name1=path1|name2=path2|...", then we will treat this as the
@@ -2731,7 +2731,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
 class ParaViewWebKeyValuePairStore(ParaViewWebProtocol):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(ParaViewWebKeyValuePairStore, self).__init__()
         self.keyValStore = {}
 
@@ -2757,7 +2757,7 @@ class ParaViewWebKeyValuePairStore(ParaViewWebProtocol):
 
 class ParaViewWebSaveData(ParaViewWebProtocol):
 
-    def __init__(self, baseSavePath=''):
+    def __init__(self, baseSavePath='', **kwargs):
         super(ParaViewWebSaveData, self).__init__()
 
         savePath = baseSavePath
@@ -2905,7 +2905,7 @@ class ParaViewWebStartupRemoteConnection(ParaViewWebProtocol):
 
     connected = False
 
-    def __init__(self, dsHost = None, dsPort = 11111, rsHost=None, rsPort=22222, rcPort=-1):
+    def __init__(self, dsHost = None, dsPort = 11111, rsHost=None, rsPort=22222, rcPort=-1, **kwargs):
         super(ParaViewWebStartupRemoteConnection, self).__init__()
         if not ParaViewWebStartupRemoteConnection.connected and dsHost:
             ParaViewWebStartupRemoteConnection.connected = True
@@ -2925,7 +2925,7 @@ class ParaViewWebStartupPluginLoader(ParaViewWebProtocol):
 
     loaded = False
 
-    def __init__(self, plugins=None, pathSeparator=':'):
+    def __init__(self, plugins=None, pathSeparator=':', **kwargs):
         super(ParaViewWebStartupPluginLoader, self).__init__()
         if not ParaViewWebStartupPluginLoader.loaded and plugins:
             ParaViewWebStartupPluginLoader.loaded = True
@@ -2940,7 +2940,7 @@ class ParaViewWebStartupPluginLoader(ParaViewWebProtocol):
 
 class ParaViewWebStateLoader(ParaViewWebProtocol):
 
-    def __init__(self, state_path = None):
+    def __init__(self, state_path = None, **kwargs):
         super(ParaViewWebStateLoader, self).__init__()
         if state_path and state_path[-5:] == '.pvsm':
             self.loadState(state_path)
@@ -2968,7 +2968,7 @@ class ParaViewWebStateLoader(ParaViewWebProtocol):
 
 class ParaViewWebFileListing(ParaViewWebProtocol):
 
-    def __init__(self, basePath, name, excludeRegex=r"^\.|~$|^\$", groupRegex=r"[0-9]+\."):
+    def __init__(self, basePath, name, excludeRegex=r"^\.|~$|^\$", groupRegex=r"[0-9]+\.", **kwargs):
         """
         Configure the way the WebFile browser will expose the server content.
          - basePath: specify the base directory (or directories) that we should start with, if this
@@ -3087,7 +3087,7 @@ from vtkmodules.vtkCommonCore import *
 
 class ParaViewWebSelectionHandler(ParaViewWebProtocol):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.active_view = None
         self.previous_interaction = -1
         self.selection_type = -1
@@ -3148,7 +3148,7 @@ class ParaViewWebSelectionHandler(ParaViewWebProtocol):
 
 class ParaViewWebExportData(ParaViewWebProtocol):
 
-    def __init__(self, basePath):
+    def __init__(self, basePath, **kwargs):
         self.base_export_path = basePath
 
     # RpcName: exportData => pv.export.data
