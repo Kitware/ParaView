@@ -401,14 +401,14 @@ void ParaViewMainWindow::updateFontSize()
   }
 
   // Console font size
-  int consoleFontSize = gsSettings->GetConsoleFontSize();
+  int defaultFontSize = 12;
 #if defined(PARAVIEW_ENABLE_PYTHON)
   pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
-  shell->setFontSize(consoleFontSize);
+  shell->setFontSize(fontSize == 0 ? defaultFontSize : fontSize);
 #endif
   pqOutputWidget* outputWidget =
     qobject_cast<pqOutputWidget*>(this->Internals->outputWidgetDock->widget());
-  outputWidget->setFontSize(consoleFontSize);
+  outputWidget->setFontSize(fontSize == 0 ? defaultFontSize : fontSize);
 }
 
 //-----------------------------------------------------------------------------

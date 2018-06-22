@@ -90,17 +90,6 @@
         </Hints>
       </IntVectorProperty>
 
-      <IntVectorProperty name="ConsoleFontSize"
-        label="Console Font Size"
-        command="SetConsoleFontSize"
-        number_of_elements="1"
-        default_values="12">
-        <Documentation>
-          Specify the size of the font used in the Python Shell and Output Window in points.
-        </Documentation>
-        <IntRangeDomain name="range" min="8" max="32" />
-      </IntVectorProperty>
-
       <StringVectorProperty name="DefaultViewType"
         number_of_elements="1"
         default_values="RenderView"
@@ -417,7 +406,6 @@
       <PropertyGroup label="GUI Font">
         <Property name="GUIOverrideFont"/>
         <Property name="GUIFontSize" />
-        <Property name="ConsoleFontSize" />
       </PropertyGroup>
 
       <PropertyGroup label="View Options">
