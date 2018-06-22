@@ -905,6 +905,19 @@ void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetGenerateFeatureEdges(bool val)
+{
+  if (vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter))
+  {
+    vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetGenerateFeatureEdges(val);
+  }
+
+  // since geometry filter needs to execute, we need to mark the representation
+  // modified.
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetBlockVisibility(unsigned int index, bool visible)
 {
   this->BlockVisibilities[index] = visible;

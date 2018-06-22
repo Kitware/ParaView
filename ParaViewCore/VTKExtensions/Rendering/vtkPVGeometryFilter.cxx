@@ -27,6 +27,7 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSetSurfaceFilter.h"
+#include "vtkFeatureEdges.h"
 #include "vtkFloatArray.h"
 #include "vtkGarbageCollector.h"
 #include "vtkGenericDataSet.h"
@@ -138,6 +139,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
 {
   this->OutlineFlag = 0;
   this->UseOutline = 1;
+  this->GenerateFeatureEdges = false;
   this->BlockColorsDistinctValues = 7;
   this->UseStrips = 0;
   // generating cell normals by default really slows down paraview
@@ -152,6 +154,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter()
   this->GenericGeometryFilter = vtkGenericGeometryFilter::New();
   this->UnstructuredGridGeometryFilter = vtkUnstructuredGridGeometryFilter::New();
   this->RecoverWireframeFilter = vtkPVRecoverGeometryWireframe::New();
+  this->FeatureEdgesFilter = vtkFeatureEdges::New();
 
   // Setup a callback for the internal readers to report progress.
   this->DataSetSurfaceFilter->AddObserver(
@@ -206,6 +209,10 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter()
     vtkPVRecoverGeometryWireframe* tmp = this->RecoverWireframeFilter;
     this->RecoverWireframeFilter = NULL;
     tmp->Delete();
+  }
+  if (this->FeatureEdgesFilter)
+  {
+    this->FeatureEdgesFilter->Delete();
   }
   this->OutlineSource->Delete();
   this->SetController(0);
@@ -558,6 +565,12 @@ int vtkPVGeometryFilter::RequestData(
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::CleanupOutputData(vtkPolyData* output, int doCommunicate)
 {
+  if (this->GenerateFeatureEdges)
+  {
+    this->FeatureEdgesFilter->SetInputData(output);
+    this->FeatureEdgesFilter->Update();
+    output->ShallowCopy(this->FeatureEdgesFilter->GetOutput());
+  }
   this->ExecuteCellNormals(output, doCommunicate);
   this->RemoveGhostCells(output);
   if (this->GenerateProcessIds && output && output->GetNumberOfPoints() > 0)

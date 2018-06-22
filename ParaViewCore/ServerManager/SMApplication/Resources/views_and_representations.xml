@@ -3630,6 +3630,8 @@
       </IntVectorProperty>
       <RepresentationType subproxy="OutlineRepresentation"
                           text="Outline" />
+      <RepresentationType subproxy="FeatureEdgesRepresentation"
+                          text="Feature Edges" />
       <RepresentationType subproxy="SurfaceRepresentation"
                           subtype="Points"
                           text="Points" />
@@ -3824,6 +3826,15 @@
         <Proxy name="OutlineRepresentation"
                proxygroup="representations"
                proxyname="OutlineRepresentation"></Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="FeatureEdgesRepresentation"
+               proxygroup="representations"
+               proxyname="FeatureEdgesRepresentation"></Proxy>
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
           <Exception name="Visibility" />
@@ -4599,6 +4610,18 @@
                          base_proxyname="SurfaceRepresentation" >
       <Documentation>
         Representation for showing an outline for any dataset.
+      </Documentation>
+      <!-- end of OutlineRepresentation -->
+    </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkFeatureEdgesRepresentation"
+                         name="FeatureEdgesRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="SurfaceRepresentation" >
+      <Documentation>
+        Representation for showing feature edges for any dataset.
       </Documentation>
       <!-- end of OutlineRepresentation -->
     </RepresentationProxy>

@@ -41,6 +41,7 @@ set (Module_SRCS
   vtkClientServerMoveData.cxx
   vtkCompositeRepresentation.cxx
   vtkDataLabelRepresentation.cxx
+  vtkFeatureEdgesRepresentation.cxx
   vtkGeometryRepresentation.cxx
   vtkGeometryRepresentationWithFaces.cxx
   vtkGeometrySliceRepresentation.cxx
