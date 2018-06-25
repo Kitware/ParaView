@@ -160,8 +160,6 @@ set (Module_SRCS
   pqGlyphScaleFactorPropertyWidget.h
   pqHandlePropertyWidget.cxx
   pqHandlePropertyWidget.h
-  pqHideAllReaction.cxx
-  pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.cxx
@@ -408,7 +406,6 @@ set (Module_MOC_HDRS
   pqGenericPropertyWidgetDecorator.h
   pqGlyphScaleFactorPropertyWidget.h
   pqHandlePropertyWidget.h
-  pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.h
   pqImplicitPlanePropertyWidget.h

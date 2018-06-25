@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqHideAllReaction_h
 
 #include "pqReaction.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 
 /**
 * @ingroup Reactions
@@ -46,7 +47,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqHideAllReaction : public pqReaction
 public:
   pqHideAllReaction(QAction* parent);
 
-  static void HideAll();
+  VTK_LEGACY(static void HideAll());
 
 protected:
   /**
