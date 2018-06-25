@@ -101,9 +101,10 @@ public:
   pqLiveInsituVisualizationManager* managerFromDisplay(pqServer* displaySession);
   static pqLiveInsituVisualizationManager* managerFromInsitu(pqServer* insituSession);
   /**
-  * Creates the manager and accept connections from Catalyst
+  * Creates the manager and accept connections from Catalyst. Can pass in a requested
+  * portNumber.
   */
-  pqLiveInsituVisualizationManager* connect(pqServer* displaySession);
+  pqLiveInsituVisualizationManager* connect(pqServer* displaySession, int portNumber = -1);
 
   double breakpointTime() const { return this->BreakpointTime; }
   double breakpointTimeStep() const { return this->BreakpointTimeStep; }

@@ -225,6 +225,48 @@ if (NOT APPLE)
     ${CMAKE_CURRENT_SOURCE_DIR}/HistogramSelection.xml)
 endif()
 
+macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
+  # These tests are too complex to run in parallel.
+  set (CATALYST_SIMULATION CatalystWaveletDriver.py)
+  set (INSITU_SCRIPT CatalystWaveletCoprocessing)
+
+  set ("${test_name}_FORCE_SERIAL" TRUE)
+  add_pv_test("pv" "_DISABLE_C"
+    COMMAND
+    --script-ignore-output-errors --script $<TARGET_FILE:pvbatch> -sym
+    ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
+    ${INSITU_SCRIPT} "${duration}"
+
+    --client ${CLIENT_EXECUTABLE}
+    --enable-bt
+    ${command_line_connect_command}
+    -dr
+    --test-directory=${PARAVIEW_TEST_DIR}
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.xml
+    EXTRA_LABELS "CATALYST")
+
+  add_pv_test(pvcs "_DISABLE_CS"
+    COMMAND
+    --script-np 5 --script-ignore-output-errors
+    --script $<TARGET_FILE:pvbatch> -sym
+    ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
+    ${INSITU_SCRIPT} "${duration}"
+
+    --server $<TARGET_FILE:pvserver>
+    --enable-bt
+
+    --client ${CLIENT_EXECUTABLE}
+    --enable-bt
+    ${command_line_connect_command}
+    -dr
+    --test-directory=${PARAVIEW_TEST_DIR}
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.xml
+    EXTRA_LABELS "CATALYST")
+
+endmacro(ADD_CATALYST_LIVE_TEST)
+
 # Catalyst tests
 # ----------------------------------------------------------------------
 if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
@@ -236,50 +278,11 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/CatalystCinemaGUI.xml )
   set_tests_properties(pv.CatalystCinemaGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
 
-  set (catalyst_live_tests
-    CatalystLiveSetBreakpoint
-    CatalystLivePause)
-  set (CATALYST_SIMULATION CatalystWaveletDriver.py)
-  set (INSITU_SCRIPT CatalystWaveletCoprocessing)
-  # Test-specific parameters
-  set (CatalystLiveSetBreakpoint_DURATION 222)
-  set (CatalystLivePause_DURATION 80)
+  add_catalyst_live_test(CatalystLiveSetBreakpoint 222 "")
+  # the CatalystLivePause test uses the --live=22222 command line option to automatically
+  # connect to a running simulation on port 22222
+  add_catalyst_live_test(CatalystLivePause 80  "--live=22222")
 
-  foreach (tname ${catalyst_live_tests})
-    # These tests are too complex to run in parallel.
-    set ("${tname}_FORCE_SERIAL" TRUE)
-    add_pv_test("pv" "_DISABLE_C"
-      COMMAND
-      --script-ignore-output-errors --script $<TARGET_FILE:pvbatch> -sym
-      ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
-      ${INSITU_SCRIPT} "${${tname}_DURATION}"
-
-      --client ${CLIENT_EXECUTABLE}
-      --enable-bt
-      -dr
-      --test-directory=${PARAVIEW_TEST_DIR}
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/${tname}.xml
-      EXTRA_LABELS "CATALYST")
-
-    add_pv_test(pvcs "_DISABLE_CS"
-      COMMAND
-      --script-np 5 --script-ignore-output-errors
-      --script $<TARGET_FILE:pvbatch> -sym
-      ${CMAKE_CURRENT_SOURCE_DIR}/${CATALYST_SIMULATION}
-      ${INSITU_SCRIPT} "${${tname}_DURATION}"
-
-      --server $<TARGET_FILE:pvserver>
-      --enable-bt
-
-      --client ${CLIENT_EXECUTABLE}
-      --enable-bt
-      -dr
-      --test-directory=${PARAVIEW_TEST_DIR}
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/${tname}.xml
-      EXTRA_LABELS "CATALYST")
-  endforeach()
 endif()
 
 if (PARAVIEW_ENABLE_XDMF2 AND NOT PARAVIEW_ENABLE_XDMF3)

@@ -43,7 +43,7 @@ class vtkSMLiveInsituLinkProxy;
 
 /**
 * Manages the live-coprocessing link. When
-* pqLiveInsituVisualizationManager in instantiated, it creates a new
+* pqLiveInsituVisualizationManager is instantiated, it creates a new
 * dummy session that represents the catalyst pipeline. The proxy
 * manager in this session reflects the state of the proxies on the
 * coprocessing side.  Next, it creates the (coprocessing,

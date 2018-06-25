@@ -142,6 +142,8 @@ void pqOptions::Initialize()
 
   this->AddBooleanArgument(
     "--test-slave", 0, &this->TestSlave, "(For testing) When present, tests slave configuration.");
+
+  this->AddArgument("--live", 0, &this->CatalystLivePort, "Set the Catalyst Live port");
 }
 
 //-----------------------------------------------------------------------------

@@ -163,6 +163,10 @@ public:
   /// Provides access to server-url if specified on the command line.
   vtkGetStringMacro(ServerURL);
 
+  /// Provides access to the Catalyst Live port if specified on the command line.
+  /// A value of -1 indicates that no value was set.
+  vtkGetMacro(CatalystLivePort, int);
+
   //@{
   /**
    * This is used when user want to open a file at startup
@@ -320,6 +324,8 @@ protected:
   char* TestPlugin; // to load plugins from command line for tests
   char* TestPluginPath;
   int DisableXDisplayTests;
+  int
+    CatalystLivePort; // currently only set through the GUI but may eventually be set in any client
   //@}
 
   // inline setters

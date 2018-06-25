@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDeleteReaction.h"
 #include "pqEventDispatcher.h"
 #include "pqFileDialog.h"
+#include "pqLiveInsituManager.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqObjectBuilder.h"
@@ -196,6 +197,15 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
 #else
     qCritical() << "Python support not enabled. Cannot run python scripts.";
 #endif
+  }
+
+  // check if a Catalyst Live port was passed in that we should automatically attempt
+  // to establish a connection to.
+  if (options->GetCatalystLivePort() != -1)
+  {
+    pqLiveInsituManager* insituManager = pqLiveInsituManager::instance();
+    insituManager->connect(
+      pqActiveObjects::instance().activeServer(), options->GetCatalystLivePort());
   }
 
   if (options->GetDisableRegistry())
