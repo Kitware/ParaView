@@ -56,6 +56,7 @@ paraview_add_test_python(
   ColorBy.py
   OutputImageResolution.py
   PartialArrayIndication.py
+  ResetSession.py
   TestClipCylinder.py
   TestColorHistogram.py
   TestGeometryBoundsClobber.py

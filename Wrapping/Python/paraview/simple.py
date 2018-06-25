@@ -104,6 +104,15 @@ def ReverseConnect(port=11111):
     _add_functions(globals())
     return connection
 
+# -----------------------------------------------------------------------------
+
+def ResetSession():
+    """Reset the session to its initial state."""
+    connection = servermanager.ResetSession()
+    _initializeSession(connection)
+    _add_functions(globals())
+    return connection
+
 #==============================================================================
 # Multi-servers
 #==============================================================================
