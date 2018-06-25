@@ -2835,6 +2835,22 @@ def UnRegister(proxy, **extraArgs):
         raise RuntimeError ("UnRegistration error.")
     return (registrationGroup, registrationName)
 
+def ResetSession():
+    """Reset the session in the active connection to its initial state."""
+    global ActiveConnection
+
+    # Simulate disconnect
+    pxm = ProxyManager()
+    session = ActiveConnection.Session
+
+    pxm.UnRegisterProxies()
+
+    pm = vtkProcessModule.GetProcessModule()
+    pm.UnRegisterSession(session)
+    id = pm.RegisterSession(session)
+    connection = GetConnectionFromId(id)
+    return connection
+
 def demo1():
     """This simple demonstration creates a sphere, renders it and delivers
     it to the client using Fetch. It returns a tuple of (data, render
