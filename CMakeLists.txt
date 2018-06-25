@@ -959,4 +959,9 @@ if (NOT WIN32 AND is_git)
     add_dependencies(paraview-source
       "paraview-source-${format}")
   endforeach ()
+  # This is a hack.  Git version 2.17 does NOT like running these in parallel and
+  # reports that a lockfile is already locked.  In order for the build to succeed,
+  # force these to run in serial.
+  add_dependencies(paraview-source-tgz paraview-source-txz)
+  add_dependencies(paraview-source-txz paraview-source-zip)
 endif ()
