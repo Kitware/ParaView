@@ -279,6 +279,15 @@ public:
     this->Ui.treeView->header()->moveSection(COLUMN_COUNT, COLUMN_DATA);
   }
 
+  void setFontSize(int fontSize)
+  {
+    this->Ui.consoleWidget->setFontSize(fontSize);
+
+    QFont font;
+    font.setPointSize(fontSize);
+    this->Ui.treeView->setFont(font);
+  }
+
   QIcon icon(QtMsgType type)
   {
     switch (type)
@@ -483,4 +492,10 @@ const QString& pqOutputWidget::settingsKey() const
 {
   const pqInternals& internals = (*this->Internals);
   return internals.settingsKey();
+}
+
+//-----------------------------------------------------------------------------
+void pqOutputWidget::setFontSize(int fontSize)
+{
+  this->Internals->setFontSize(fontSize);
 }

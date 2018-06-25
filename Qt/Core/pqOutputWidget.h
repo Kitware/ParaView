@@ -142,6 +142,13 @@ public:
   const QString& settingsKey() const;
   //@}
 
+  //@{
+  /**
+   * Set/get the font size in points for the output console text.
+   */
+  void setFontSize(int fontSize);
+  //@}
+
 public slots:
   /**
    * Display a message in the widget. There's generally no need to use this

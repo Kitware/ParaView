@@ -231,6 +231,14 @@ public:
 
   //@{
   /**
+   * Console font size.
+   */
+  vtkSetClampMacro(ConsoleFontSize, int, 8, VTK_INT_MAX);
+  vtkGetMacro(ConsoleFontSize, int);
+  //@}
+
+  //@{
+  /**
    *  Automatically color by **vtkBlockColors** if array is present on `Apply`.
    */
   vtkSetMacro(ColorByBlockColorsOnApply, bool);
@@ -255,6 +263,7 @@ protected:
   bool LockPanels;
   int GUIFontSize;
   bool GUIOverrideFont;
+  int ConsoleFontSize;
   bool ColorByBlockColorsOnApply;
 
 private:

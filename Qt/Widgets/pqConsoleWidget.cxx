@@ -433,6 +433,7 @@ public:
 pqConsoleWidget::pqConsoleWidget(QWidget* Parent)
   : QWidget(Parent)
   , Implementation(new pqImplementation(*this))
+  , FontSize(12)
 {
   QVBoxLayout* const l = new QVBoxLayout(this);
   l->setMargin(0);
@@ -452,9 +453,12 @@ QTextCharFormat pqConsoleWidget::getFormat()
 }
 
 //-----------------------------------------------------------------------------
-void pqConsoleWidget::setFormat(const QTextCharFormat& Format)
+void pqConsoleWidget::setFormat(const QTextCharFormat& format)
 {
-  this->Implementation->setCurrentCharFormat(Format);
+  // Override font size.
+  QTextCharFormat formatCopy(format);
+  formatCopy.setFontPointSize(this->FontSize);
+  this->Implementation->setCurrentCharFormat(formatCopy);
 }
 
 //-----------------------------------------------------------------------------
@@ -463,6 +467,18 @@ QPoint pqConsoleWidget::getCursorPosition()
   QTextCursor tc = this->Implementation->textCursor();
 
   return this->Implementation->cursorRect(tc).topLeft();
+}
+
+//-----------------------------------------------------------------------------
+void pqConsoleWidget::setFontSize(int size)
+{
+  // Cache for later use.
+  this->FontSize = size;
+
+  QTextCursor cursor = this->Implementation->textCursor();
+  this->Implementation->selectAll();
+  this->Implementation->setFontPointSize(size);
+  this->Implementation->setTextCursor(cursor);
 }
 
 //-----------------------------------------------------------------------------

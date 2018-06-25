@@ -72,6 +72,11 @@ public:
 
   QPoint getCursorPosition();
 
+  /**
+   * Set the size of the font to use. Size is measured in points.
+   */
+  void setFontSize(int size);
+
 signals:
   /**
   * Signal emitted whenever the user enters a command
@@ -131,6 +136,8 @@ private:
   friend class pqImplementation;
 
   friend class pqConsoleWidgetEventPlayer;
+
+  int FontSize;
 
   /**
   * Prints and executes the command. Used by pqConsoleWidgetEventPlayer for
