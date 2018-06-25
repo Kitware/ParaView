@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
 
@@ -157,6 +158,7 @@ bool pqDeleteReaction::canDeleteSelected()
 //-----------------------------------------------------------------------------
 void pqDeleteReaction::deleteAll()
 {
+  SM_SCOPED_TRACE(CallFunction).arg("ResetSession");
   BEGIN_UNDO_EXCLUDE();
   if (pqServer* server = pqActiveObjects::instance().activeServer())
   {
