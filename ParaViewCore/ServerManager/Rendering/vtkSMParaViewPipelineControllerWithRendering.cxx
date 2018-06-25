@@ -418,6 +418,29 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
 }
 
 //----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::ShowAll(vtkSMViewProxy* view)
+{
+  if (view == NULL)
+  {
+    return;
+  }
+
+  SM_SCOPED_TRACE(CallFunction).arg("ShowAll").arg(view);
+
+  vtkSMPropertyHelper helper(view, "Representations");
+  for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
+  {
+    vtkSMProxy* repr = helper.GetAsProxy(i);
+    vtkSMProperty* input = repr->GetProperty("Input");
+    if (input)
+    {
+      vtkSMPropertyHelper(repr, "Visibility").Set(1);
+      repr->UpdateVTKObjects();
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Hide(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view)
 {

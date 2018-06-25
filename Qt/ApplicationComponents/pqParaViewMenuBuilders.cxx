@@ -63,7 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
 #endif
-#include "pqHideAllReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
 #include "pqImportCinemaReaction.h"
 #include "pqLinkSelectionReaction.h"
@@ -90,6 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerDisconnectReaction.h"
 #include "pqSetMainWindowTitleReaction.h"
 #include "pqSetName.h"
+#include "pqShowHideAllReaction.h"
 #include "pqSourcesMenuReaction.h"
 #include "pqTestingReaction.h"
 #include "pqTimerLogReaction.h"
@@ -172,7 +172,8 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   new pqDeleteReaction(ui.actionDelete_All, true);
-  new pqHideAllReaction(ui.actionHide_All);
+  new pqShowHideAllReaction(ui.actionShow_All, pqShowHideAllReaction::ActionType::Show);
+  new pqShowHideAllReaction(ui.actionHide_All, pqShowHideAllReaction::ActionType::Hide);
   new pqCopyReaction(ui.actionCopy);
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
@@ -292,12 +293,25 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
     QApplication::translate("pqPipelineBrowserContextMenu", "Open", Q_NULLPTR));
 #endif // QT_NO_STATUSTIP
 
+  QAction* actionPBShowAll = new QAction(menu.parent());
+  actionPBShowAll->setObjectName(QStringLiteral("actionPBShowAll"));
+  QIcon showAllIcon;
+  showAllIcon.addFile(
+    QStringLiteral(":/pqWidgets/Icons/pqEyeball.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionPBShowAll->setIcon(showAllIcon);
+  actionPBShowAll->setText(
+    QApplication::translate("pqPipelineBrowserContextMenu", "&Show All", Q_NULLPTR));
+#ifndef QT_NO_STATUSTIP
+  actionPBShowAll->setStatusTip(QApplication::translate(
+    "pqPipelineBrowserContextMenu", "Shoo all source outputs in the pipeline", Q_NULLPTR));
+#endif // QT_NO_STATUSTIP
+
   QAction* actionPBHideAll = new QAction(menu.parent());
   actionPBHideAll->setObjectName(QStringLiteral("actionPBHideAll"));
-  QIcon icon1;
-  icon1.addFile(
-    QStringLiteral(":/pqWidgets/Icons/pqEyeball.png"), QSize(), QIcon::Normal, QIcon::Off);
-  actionPBHideAll->setIcon(icon1);
+  QIcon hideAllIcon;
+  hideAllIcon.addFile(
+    QStringLiteral(":/pqWidgets/Icons/pqEyeballClosed.png"), QSize(), QIcon::Normal, QIcon::Off);
+  actionPBHideAll->setIcon(hideAllIcon);
   actionPBHideAll->setText(
     QApplication::translate("pqPipelineBrowserContextMenu", "&Hide All", Q_NULLPTR));
 #ifndef QT_NO_STATUSTIP
@@ -409,6 +423,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
 #endif // QT_NO_TOOLTIP
 
   menu.addAction(actionPBOpen);
+  menu.addAction(actionPBShowAll);
   menu.addAction(actionPBHideAll);
   menu.addAction(actionPBCopy);
   menu.addAction(actionPBPaste);
@@ -425,7 +440,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
   // And here the reactions come in handy! Just reuse the reaction used for
   // File | Open.
   new pqLoadDataReaction(actionPBOpen);
-  new pqHideAllReaction(actionPBHideAll);
+  new pqShowHideAllReaction(actionPBShowAll, pqShowHideAllReaction::ActionType::Show);
+  new pqShowHideAllReaction(actionPBHideAll, pqShowHideAllReaction::ActionType::Hide);
   new pqCopyReaction(actionPBCopy);
   new pqCopyReaction(actionPBPaste, true);
   new pqChangePipelineInputReaction(actionPBChangeInput);
