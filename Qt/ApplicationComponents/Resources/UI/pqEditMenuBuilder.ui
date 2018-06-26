@@ -121,10 +121,22 @@
     <string>Reset Session</string>
    </property>
   </action>
+  <action name="actionShow_All">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqEyeball.png</normaloff>:/pqWidgets/Icons/pqEyeball.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show All</string>
+   </property>
+   <property name="toolTip">
+    <string>Show all sources in selected view</string>
+   </property>
+  </action>
   <action name="actionHide_All">
    <property name="icon">
-    <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
-     <normaloff>:/pqWidgets/Icons/pqEyeball.png</normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</iconset>
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</normaloff>:/pqWidgets/Icons/pqEyeballClosed.png</iconset>
    </property>
    <property name="text">
     <string>Hide All</string>
@@ -175,7 +187,7 @@
    <property name="shortcut">
     <string>V</string>
    </property>
- </action>
+  </action>
   <action name="actionResetDefaultSettings">
    <property name="text">
     <string>Reset to Default Settings</string>
@@ -211,6 +223,7 @@
   <addaction name="actionIgnoreTime"/>
   <addaction name="actionDelete"/>
   <addaction name="separator"/>
+  <addaction name="actionShow_All"/>
   <addaction name="actionHide_All"/>
   <addaction name="actionDelete_All"/>
   <addaction name="separator"/>

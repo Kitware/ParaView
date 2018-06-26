@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program: ParaView
-  Module:    pqHideAllReaction.h
+  Module:    pqShowHideAllReaction.cxx
 
   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
   All rights reserved.
@@ -29,32 +29,41 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqHideAllReaction_h
-#define pqHideAllReaction_h
+#include "pqShowHideAllReaction.h"
 
-#include "pqReaction.h"
-#include "vtkSetGet.h" // for VTK_LEGACY
+#include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
+#include "pqUndoStack.h"
+#include "pqView.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
+#include "vtkSMViewProxy.h"
 
-/**
-* @ingroup Reactions
-* Reaction to hide all sources output ports.
-*/
-class PQAPPLICATIONCOMPONENTS_EXPORT pqHideAllReaction : public pqReaction
+//-----------------------------------------------------------------------------
+pqShowHideAllReaction::pqShowHideAllReaction(QAction* parentObject, ActionType action)
+  : Superclass(parentObject)
+  , Action(action)
 {
-  Q_OBJECT
-  typedef pqReaction Superclass;
+}
 
-public:
-  pqHideAllReaction(QAction* parent);
-
-  VTK_LEGACY(static void HideAll());
-
-protected:
-  /**
-  * Called when the action is triggered.
-  */
-  void onTriggered() override { pqHideAllReaction::HideAll(); }
-private:
-  Q_DISABLE_COPY(pqHideAllReaction)
-};
-#endif
+//-----------------------------------------------------------------------------
+void pqShowHideAllReaction::act(ActionType action)
+{
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : NULL;
+  if (action == ActionType::Show)
+  {
+    BEGIN_UNDO_SET("Show All");
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+    controller->ShowAll(viewProxy);
+    END_UNDO_SET();
+  }
+  else
+  {
+    BEGIN_UNDO_SET("Hide All");
+    vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+    controller->HideAll(viewProxy);
+    END_UNDO_SET();
+  }
+  pqApplicationCore::instance()->render();
+}

@@ -56,6 +56,11 @@ public:
   virtual vtkSMProxy* Show(vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* view);
 
   /**
+   * Show all source output ports in provided view.
+   */
+  void ShowAll(vtkSMViewProxy* view);
+
+  /**
    * Opposite of Show(). Locates the representation for the producer and then
    * hides it, if found. Returns that representation, if found.
    */

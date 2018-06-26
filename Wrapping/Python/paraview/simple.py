@@ -483,6 +483,15 @@ def Show(proxy=None, view=None, **params):
     return rep
 
 # -----------------------------------------------------------------------------
+def ShowAll(view=None):
+    """Show all pipeline sources in the given view.
+    If view is not specified, active view is used."""
+    if not view:
+        view = active_objects.view
+    controller = servermanager.ParaViewPipelineController()
+    controller.ShowAll(view)
+
+# -----------------------------------------------------------------------------
 def Hide(proxy=None, view=None):
     """Turns the visibility of a given pipeline object off in the given view.
     If pipeline object and/or view are not specified, active objects are used."""

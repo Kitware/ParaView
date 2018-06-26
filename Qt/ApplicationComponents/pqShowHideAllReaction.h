@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program: ParaView
-  Module:    pqHideAllReaction.h
+  Module:    pqShowHideAllReaction.h
 
   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
   All rights reserved.
@@ -29,32 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqHideAllReaction_h
-#define pqHideAllReaction_h
+#ifndef pqShowHideAllReaction_h
+#define pqShowHideAllReaction_h
 
 #include "pqReaction.h"
-#include "vtkSetGet.h" // for VTK_LEGACY
 
 /**
 * @ingroup Reactions
-* Reaction to hide all sources output ports.
+* Reaction to show or hide all sources output ports.
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqHideAllReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqShowHideAllReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 
 public:
-  pqHideAllReaction(QAction* parent);
+  enum class ActionType
+  {
+    Show,
+    Hide
+  };
 
-  VTK_LEGACY(static void HideAll());
+  pqShowHideAllReaction(QAction* parent, ActionType action);
+
+  static void act(ActionType action);
 
 protected:
   /**
   * Called when the action is triggered.
   */
-  void onTriggered() override { pqHideAllReaction::HideAll(); }
+  void onTriggered() override { pqShowHideAllReaction::act(this->Action); }
 private:
-  Q_DISABLE_COPY(pqHideAllReaction)
+  Q_DISABLE_COPY(pqShowHideAllReaction)
+
+  /// Show all representations if true, hide if false.
+  ActionType Action;
 };
 #endif

@@ -160,8 +160,6 @@ set (Module_SRCS
   pqGlyphScaleFactorPropertyWidget.h
   pqHandlePropertyWidget.cxx
   pqHandlePropertyWidget.h
-  pqHideAllReaction.cxx
-  pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.cxx
@@ -280,6 +278,8 @@ set (Module_SRCS
   pqServerDisconnectReaction.h
   pqSetMainWindowTitleReaction.cxx
   pqSetMainWindowTitleReaction.h
+  pqShowHideAllReaction.cxx
+  pqShowHideAllReaction.h
   pqShowWidgetDecorator.cxx
   pqShowWidgetDecorator.h
   pqSourcesMenuReaction.cxx
@@ -406,7 +406,6 @@ set (Module_MOC_HDRS
   pqGenericPropertyWidgetDecorator.h
   pqGlyphScaleFactorPropertyWidget.h
   pqHandlePropertyWidget.h
-  pqHideAllReaction.h
   pqIgnoreSourceTimeReaction.h
   pqImageCompressorWidget.h
   pqImplicitPlanePropertyWidget.h
@@ -465,6 +464,7 @@ set (Module_MOC_HDRS
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h
   pqSetMainWindowTitleReaction.h
+  pqShowHideAllReaction.h
   pqShowWidgetDecorator.h
   pqSourcesMenuReaction.h
   pqSpherePropertyWidget.h
@@ -513,9 +513,14 @@ endif()
 if(NOT VTK_LEGACY_REMOVE)
   list(APPEND Module_SRCS
     pqPythonShellReaction.cxx
-    pqPythonShellReaction.h)
+    pqPythonShellReaction.h
+    pqHideAllReaction.cxx
+    pqHideAllReaction.h
+  )
   list(APPEND Module_MOC_HDRS
-    pqPythonShellReaction.h)
+    pqPythonShellReaction.h
+    pqHideAllReaction.h
+  )
 endif()
 
 set (Module_UI_FILES

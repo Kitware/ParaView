@@ -437,6 +437,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionModifiersPoints.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectionModifiersBlocks.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectReader.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ShowAll.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SimpleInteraction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SliceAlongPolyline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SliceAlongSpline.xml
