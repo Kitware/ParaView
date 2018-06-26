@@ -387,6 +387,16 @@ bool vtkSMTransferFunctionPresets::GetPresetHasAnnotations(const Json::Value& pr
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::IsPresetDefault(const Json::Value& preset)
+{
+  if (preset.empty() || !preset.isMember("DefaultMap"))
+  {
+    return false;
+  }
+  return preset["DefaultMap"].asBool();
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMTransferFunctionPresets::IsPresetBuiltin(unsigned int index)
 {
   if (index >= this->GetNumberOfPresets())
