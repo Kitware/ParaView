@@ -1270,7 +1270,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
       {
         int flagNameLen = (int)strlen(GMVRead::gmv_data.name1) + 5;
         char* flagName = new char[flagNameLen + 1];
-        strncpy(&flagName[0], (char*)"flag ", 5);
+        strncpy(&flagName[0], (char*)"flag ", 6);
         strcpy(&flagName[5], GMVRead::gmv_data.name1);
         flagName[flagNameLen] = '\0';
 
@@ -1536,7 +1536,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
               // Find out whether this variable has been selected for reading
               int tracerNameLen = (int)strlen(GMVRead::gmv_data.name1) + 7;
               char* tracerName = new char[tracerNameLen + 1];
-              strncpy(&tracerName[0], (char*)"tracer ", 7);
+              strncpy(&tracerName[0], (char*)"tracer ", 8);
               strcpy(&tracerName[7], GMVRead::gmv_data.name1);
               tracerName[tracerNameLen] = '\0';
 
@@ -2274,7 +2274,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
       {
         int flagNameLen = (int)strlen(GMVRead::gmv_data.name1) + 5;
         char* flagName = new char[flagNameLen + 1];
-        strncpy(&flagName[0], (char*)"flag ", 5);
+        strncpy(&flagName[0], (char*)"flag ", 6);
         strcpy(&flagName[5], GMVRead::gmv_data.name1);
         flagName[flagNameLen] = '\0';
 
@@ -2353,7 +2353,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
             {
               int tracerNameLen = (int)strlen(GMVRead::gmv_data.name1) + 7;
               char* tracerName = new char[tracerNameLen + 1];
-              strncpy(&tracerName[0], (char*)"tracer ", 7);
+              strncpy(&tracerName[0], (char*)"tracer ", 8);
               strcpy(&tracerName[7], GMVRead::gmv_data.name1);
               tracerName[tracerNameLen] = '\0';
               this->PointDataArraySelection->AddArray(tracerName);

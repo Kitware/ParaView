@@ -877,12 +877,12 @@ void vtkAMRConnectivity::ProcessBoundaryAtBlock(vtkNonOverlappingAMR* volume,
                 ijk_off[0]++;
               }
               ijk_off[1] = ijk[1];
-              if ((setting & 2) == 1 && extent[3] != extent[2])
+              if ((setting & 2) == 2 && extent[3] != extent[2])
               {
                 ijk_off[1]++;
               }
               ijk_off[2] = ijk[2];
-              if ((setting & 4) == 1 && extent[5] != extent[4])
+              if ((setting & 4) == 4 && extent[5] != extent[4])
               {
                 ijk_off[2]++;
               }
@@ -1283,12 +1283,12 @@ void vtkAMRConnectivity::ProcessBoundaryAtNeighbor(
               ijk_off[0]++;
             }
             ijk_off[1] = ijk[1];
-            if ((setting & 2) == 1 && extent[3] != extent[2])
+            if ((setting & 2) == 2 && extent[3] != extent[2])
             {
               ijk_off[1]++;
             }
             ijk_off[2] = ijk[2];
-            if ((setting & 4) == 1 && extent[5] != extent[4])
+            if ((setting & 4) == 4 && extent[5] != extent[4])
             {
               ijk_off[2]++;
             }
