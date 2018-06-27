@@ -602,8 +602,8 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
 
         if not realViewId in self.trackingViews:
             observerCallback = lambda *args, **kwargs: self.pushRender(realViewId)
-            startCallback = lambda *args, **kwargs: self.startViewAnimation()
-            stopCallback = lambda *args, **kwargs: self.stopViewAnimation()
+            startCallback = lambda *args, **kwargs: self.startViewAnimation(realViewId)
+            stopCallback = lambda *args, **kwargs: self.stopViewAnimation(realViewId)
             tag = self.getApplication().AddObserver('UpdateEvent', observerCallback)
             tagStart = self.getApplication().AddObserver('StartInteractionEvent', startCallback)
             tagStop = self.getApplication().AddObserver('EndInteractionEvent', stopCallback)
