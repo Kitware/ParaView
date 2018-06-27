@@ -178,8 +178,8 @@ class CoProcessor(object):
                                 for v in self.__RequestedArrays[key]:
                                     datadescription.GetInputDescriptionByName(writerinput).AddField(v[0], v[1])
                         else:
-                            datadescription.GetInputDescriptionByName(writerinputinput).AllFieldsOn()
-                            datadescription.GetInputDescriptionByName(writerinputinput).GenerateMeshOn()
+                            datadescription.GetInputDescriptionByName(writerinput).AllFieldsOn()
+                            datadescription.GetInputDescriptionByName(writerinput).GenerateMeshOn()
 
             for view in self.__ViewsList:
                 if (view.cpFrequency and self.NeedToOutput(timestep, view.cpFrequency)) or \
