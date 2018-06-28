@@ -5423,47 +5423,7 @@
                            min="0"
                            name="range" />
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetAmbient"
-                            default_values="0.0"
-                            name="Ambient"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetDiffuse"
-                            default_values="1.0"
-                            name="Diffuse"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSpecular"
-                            default_values="0.0"
-                            name="Specular"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="1"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSpecularPower"
-                            default_values="100.0"
-                            name="SpecularPower"
-                            number_of_elements="1">
-        <DoubleRangeDomain max="100"
-                           min="0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetSpecularColor"
-                            default_values="1.0 1.0 1.0"
-                            name="SpecularColor"
-                            number_of_elements="3">
-        <DoubleRangeDomain max="1 1 1"
-                           min="0 0 0"
-                           name="range" />
-      </DoubleVectorProperty>
-      <!-- End of ImageSliceRepresentation -->
+    <!-- End of ImageSliceRepresentation -->
     </RepresentationProxy>
 
     <!-- ================================================================== -->
