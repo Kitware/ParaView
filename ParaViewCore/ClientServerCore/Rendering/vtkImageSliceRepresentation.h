@@ -140,17 +140,6 @@ public:
    */
   vtkPVLODActor* GetActor() { return this->Actor; }
 
-  //@{
-  /**
-   * Pass lighting parameters to vtkProperty.
-   */
-  void SetAmbient(double ambient);
-  void SetDiffuse(double diffuse);
-  void SetSpecular(double specular);
-  void SetSpecularPower(double val);
-  void SetSpecularColor(double r, double g, double b);
-  //@}
-
 protected:
   vtkImageSliceRepresentation();
   ~vtkImageSliceRepresentation() override;
