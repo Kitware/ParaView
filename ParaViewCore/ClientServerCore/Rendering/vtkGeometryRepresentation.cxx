@@ -1150,3 +1150,22 @@ void vtkGeometryRepresentation::ComputeVisibleDataBounds()
     this->VisibleDataBoundsTime.Modified();
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetCustomShader(const char* shader)
+{
+  vtkOpenGLPolyDataMapper* glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
+  vtkOpenGLPolyDataMapper* glLODMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->LODMapper);
+
+  if (glMapper && glLODMapper)
+  {
+    glMapper->ClearAllShaderReplacements();
+    glLODMapper->ClearAllShaderReplacements();
+
+    std::string repl = "VTK::Light::Impl\n";
+    repl += shader;
+
+    glMapper->AddShaderReplacement(vtkShader::Fragment, "VTK::Light::Impl", true, repl, true);
+    glLODMapper->AddShaderReplacement(vtkShader::Fragment, "VTK::Light::Impl", true, repl, true);
+  }
+}

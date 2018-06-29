@@ -3793,6 +3793,8 @@
                       panel_visibility="never" />
             <Property name="Triangulate"
                       panel_visibility="advanced" />
+            <Property name="ACustomShader"
+                      panel_visibility="advanced" />
             <Property name="NonlinearSubdivisionLevel"
                       panel_visibility="advanced" />
             <Property name="BlockVisibility"
@@ -11049,6 +11051,19 @@
         issues of non-convex polygons. This feature has a processing and memory
         cost, it should be enabled only when needed.</Documentation>
       </IntVectorProperty>
+      <StringVectorProperty command="SetCustomShader"
+                            default_values=""
+                            label="Custom Shader Code"
+                            name="ACustomShader"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>
+          Sets the custom shader code
+        </Documentation>
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty command="SetNonlinearSubdivisionLevel"
                          default_values="1"
                          name="NonlinearSubdivisionLevel"

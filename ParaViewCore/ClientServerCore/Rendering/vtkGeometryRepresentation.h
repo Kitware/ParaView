@@ -288,6 +288,11 @@ public:
   vtkGetMacro(UseDataPartitions, bool);
   //@}
 
+  /**
+   * Specify custom shader
+   */
+  virtual void SetCustomShader(const char*);
+
 protected:
   vtkGeometryRepresentation();
   ~vtkGeometryRepresentation() override;
