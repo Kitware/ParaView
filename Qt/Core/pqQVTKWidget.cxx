@@ -53,19 +53,6 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , SizePropertyName("ViewSize")
 {
-  // Tmp objects
-  QPixmap mousePixmap(":/pqCore/Icons/pqMousePick15.png");
-  int w = mousePixmap.width();
-  int h = mousePixmap.height();
-  QImage image(w, h, QImage::Format_ARGB32);
-  QPainter painter(&image);
-  painter.drawPixmap(0, 0, mousePixmap);
-  painter.end();
-  image = image.rgbSwapped();
-
-  // Save the loaded image
-  this->MousePointerToDraw = image.mirrored();
-
   this->connect(this, SIGNAL(resized()), SLOT(updateSizeProperties()));
 
   // disable HiDPI if we are running tests

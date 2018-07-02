@@ -55,7 +55,8 @@ bool pqQVTKWidgetEventPlayer::playEvent(
   QVTKOpenGLSimpleWidget* qvtkWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
   if (baseWidget || qvtkWidget)
   {
-    if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove")
+    if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove" ||
+      Command == "mouseDblClick")
     {
       QRegExp mouseRegExp("\\(([^,]*),([^,]*),([^,]),([^,]),([^,]*)\\)");
       if (mouseRegExp.indexIn(Arguments) != -1)
@@ -71,9 +72,24 @@ bool pqQVTKWidgetEventPlayer::playEvent(
         Qt::MouseButtons buttons = static_cast<Qt::MouseButton>(v.toInt());
         v = mouseRegExp.cap(5);
         Qt::KeyboardModifiers keym = static_cast<Qt::KeyboardModifier>(v.toInt());
-        QEvent::Type type = (Command == "mousePress")
-          ? QEvent::MouseButtonPress
-          : ((Command == "mouseMove") ? QEvent::MouseMove : QEvent::MouseButtonRelease);
+
+        QEvent::Type type = QEvent::None;
+        if (Command == "mousePress")
+        {
+          type = QEvent::MouseButtonPress;
+        }
+        else if (Command == "mouseRelease")
+        {
+          type = QEvent::MouseButtonRelease;
+        }
+        else if (Command == "mouseMove")
+        {
+          type = QEvent::MouseMove;
+        }
+        else if (Command == "mouseDblClick")
+        {
+          type = QEvent::MouseButtonDblClick;
+        }
         QMouseEvent e(type, QPoint(x, y), button, buttons, keym);
 
         if (baseWidget != nullptr)

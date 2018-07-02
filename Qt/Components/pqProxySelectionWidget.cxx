@@ -57,6 +57,7 @@ public:
   pqInternal(pqProxySelectionWidget* self)
     : ShowingAdvancedProperties(false)
     , HideProxyWidgetsInDefaultView(false)
+    , HideProxyWidgets(false)
   {
     this->Ui.setupUi(self);
     this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
