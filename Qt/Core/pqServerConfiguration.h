@@ -48,8 +48,13 @@ class PQCORE_EXPORT pqServerConfiguration
 {
 public:
   pqServerConfiguration();
-  pqServerConfiguration(vtkPVXMLElement* xml);
   ~pqServerConfiguration();
+
+  /**
+   * Create a server configuration with the provided xml and timeout.
+   * the timeout is in seconds, 0 means no retry and -1 means infinite retries.
+   */
+  pqServerConfiguration(vtkPVXMLElement* xml, int connectionTimeout = 60);
 
   /**
   * Get/Set whether the configuration is mutable. This variable is not
@@ -77,6 +82,13 @@ public:
   pqServerResource resource() const;
   void setResource(const pqServerResource&);
   void setResource(const QString&);
+
+  /**
+  * Get/Set the timeout in seconds that will be used when connecting
+  * 0 means no retry and -1 means infinite retries.
+  */
+  int connectionTimeout() const;
+  void setConnectionTimeout(int connectionTimeout);
 
   /**
   * Types of start
@@ -135,8 +147,9 @@ protected:
   vtkPVXMLElement* startupXML() const;
 
 private:
-  void constructor(vtkPVXMLElement*);
+  void constructor(vtkPVXMLElement*, int connectionTimeout = 60);
   bool Mutable;
+  int ConnectionTimeout;
   vtkSmartPointer<vtkPVXMLElement> XML;
 };
 

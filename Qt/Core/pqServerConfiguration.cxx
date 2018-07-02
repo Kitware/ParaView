@@ -48,20 +48,21 @@ pqServerConfiguration::pqServerConfiguration()
   vtkNew<vtkPVXMLParser> parser;
   parser->Parse("<Server name='" SERVER_CONFIGURATION_DEFAULT_NAME
                 "' configuration=''><ManualStartup/></Server>");
-  this->constructor(parser->GetRootElement());
+  this->constructor(parser->GetRootElement(), 60);
 }
 
 //-----------------------------------------------------------------------------
-pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml)
+pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml, int connectionTimeout)
 {
-  this->constructor(xml);
+  this->constructor(xml, connectionTimeout);
 }
 
 //-----------------------------------------------------------------------------
-void pqServerConfiguration::constructor(vtkPVXMLElement* xml)
+void pqServerConfiguration::constructor(vtkPVXMLElement* xml, int connectionTimeout)
 {
   Q_ASSERT(xml && xml->GetName() && strcmp(xml->GetName(), "Server") == 0);
   this->XML = xml;
+  this->ConnectionTimeout = connectionTimeout;
   this->Mutable = true;
 }
 
@@ -104,6 +105,18 @@ void pqServerConfiguration::setResource(const pqServerResource& arg_resource)
 void pqServerConfiguration::setResource(const QString& str)
 {
   this->XML->SetAttribute("resource", str.toLocal8Bit().data());
+}
+
+//-----------------------------------------------------------------------------
+int pqServerConfiguration::connectionTimeout() const
+{
+  return this->ConnectionTimeout;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerConfiguration::setConnectionTimeout(int connectionTimeout)
+{
+  this->ConnectionTimeout = connectionTimeout;
 }
 
 //-----------------------------------------------------------------------------
@@ -292,5 +305,5 @@ pqServerConfiguration pqServerConfiguration::clone() const
 {
   vtkNew<vtkPVXMLElement> xml;
   this->XML->CopyTo(xml.GetPointer());
-  return pqServerConfiguration(xml.GetPointer());
+  return pqServerConfiguration(xml.GetPointer(), this->ConnectionTimeout);
 }

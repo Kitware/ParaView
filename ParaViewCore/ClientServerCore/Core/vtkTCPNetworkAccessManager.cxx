@@ -106,10 +106,6 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
     if (parameters.find("timeout") != parameters.end())
     {
       timeout_in_seconds = atoi(parameters["timeout"].c_str());
-      if (timeout_in_seconds < 0)
-      {
-        timeout_in_seconds = 0;
-      }
     }
 
     this->WrongConnectID = false;
@@ -389,13 +385,20 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::ConnectToRemote(
       break;
     }
     timer->StopTimer();
-    if (timeout_in_seconds <= 0 || timer->GetElapsedTime() > timeout_in_seconds)
+    if (timeout_in_seconds >= 0)
     {
-      vtkErrorMacro(<< "Connect timeout.");
-      return NULL;
+      if (timeout_in_seconds == 0 || timer->GetElapsedTime() > timeout_in_seconds)
+      {
+        vtkErrorMacro(<< "Connect timeout.");
+        return NULL;
+      }
+      vtkWarningMacro(<< "Connect failed. Retrying for "
+                      << (timeout_in_seconds - timer->GetElapsedTime()) << " more seconds.");
     }
-    vtkWarningMacro(<< "Connect failed.  Retrying for "
-                    << (timeout_in_seconds - timer->GetElapsedTime()) << " more seconds.");
+    else
+    {
+      vtkWarningMacro("Connect failed.  Retrying.");
+    }
     vtksys::SystemTools::Delay(1000);
   }
 

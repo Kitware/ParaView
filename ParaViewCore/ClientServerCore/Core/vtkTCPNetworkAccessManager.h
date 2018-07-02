@@ -68,8 +68,8 @@ public:
    * It leaves the server socket open for client to connect.
    * timeout   :- When connecting to remote i.e listen==false, specify the time
    * (in seconds) for which this call blocks to retry attempts to
-   * connect to the host/port. If absent, default is 60s. 0 or
-   * negative implies no retry attempts.
+   * connect to the host/port. If absent, default is 60s. 0 implies no retry attempts.
+   * A negative value implies an infinite number of retries.
    */
   vtkMultiProcessController* NewConnection(const char* url) VTK_OVERRIDE;
 

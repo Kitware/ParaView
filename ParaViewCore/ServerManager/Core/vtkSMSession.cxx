@@ -287,7 +287,7 @@ void vtkSMSession::Disconnect(vtkIdType sid)
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToSelf()
+vtkIdType vtkSMSession::ConnectToSelf(int timeout)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkIdType sid = 0;
@@ -297,7 +297,7 @@ vtkIdType vtkSMSession::ConnectToSelf()
     int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
     if (port > 0)
     {
-      sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true);
+      sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true, timeout);
       if (sid > 0)
       {
         return sid;
@@ -326,20 +326,21 @@ vtkIdType vtkSMSession::ConnectToCatalyst()
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
+vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port, int timeout)
 {
-  return vtkSMSession::ConnectToRemoteInternal(hostname, port, false);
+  return vtkSMSession::ConnectToRemoteInternal(hostname, port, false, timeout);
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemoteInternal(const char* hostname, int port, bool is_auto_mpi)
+vtkIdType vtkSMSession::ConnectToRemoteInternal(
+  const char* hostname, int port, bool is_auto_mpi, int timeout)
 {
   std::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   session->IsAutoMPI = is_auto_mpi;
   vtkIdType sid = 0;
-  if (session->Connect(sname.str().c_str()))
+  if (session->Connect(sname.str().c_str(), timeout))
   {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
@@ -350,13 +351,13 @@ vtkIdType vtkSMSession::ConnectToRemoteInternal(const char* hostname, int port, 
 
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(
-  const char* dshost, int dsport, const char* rshost, int rsport)
+  const char* dshost, int dsport, const char* rshost, int rsport, int timeout)
 {
   std::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/" << rshost << ":" << rsport;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
   vtkIdType sid = 0;
-  if (session->Connect(sname.str().c_str()))
+  if (session->Connect(sname.str().c_str(), timeout))
   {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     sid = pm->RegisterSession(session);
