@@ -35,7 +35,7 @@
     <string>&amp;Redo</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+R</string>
+    <string>Ctrl+Y</string>
    </property>
   </action>
   <action name="actionEditCameraUndo">
