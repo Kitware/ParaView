@@ -289,9 +289,9 @@ public:
   //@}
 
   /**
-   * Specify custom shader
+   * Specify shader replacements using a Json string
    */
-  virtual void SetCustomShader(const char*);
+  virtual void SetShaderReplacements(const char*);
 
 protected:
   vtkGeometryRepresentation();

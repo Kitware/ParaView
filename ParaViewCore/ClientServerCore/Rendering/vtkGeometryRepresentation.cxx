@@ -53,7 +53,12 @@
 #include "vtkOSPRayActorNode.h"
 #endif
 
+#include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
+
+#include <memory>
+#include <tuple>
+#include <vector>
 
 //*****************************************************************************
 // This is used to convert a vtkPolyData to a vtkMultiBlockDataSet. If input is
@@ -1152,20 +1157,83 @@ void vtkGeometryRepresentation::ComputeVisibleDataBounds()
 }
 
 //----------------------------------------------------------------------------
-void vtkGeometryRepresentation::SetCustomShader(const char* shader)
+void vtkGeometryRepresentation::SetShaderReplacements(const char* replacementsString)
 {
   vtkOpenGLPolyDataMapper* glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
   vtkOpenGLPolyDataMapper* glLODMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->LODMapper);
 
-  if (glMapper && glLODMapper)
+  if (!glMapper || !glLODMapper || replacementsString == "" || replacementsString[0] == '\0')
   {
-    glMapper->ClearAllShaderReplacements();
-    glLODMapper->ClearAllShaderReplacements();
+    return;
+  }
+  glMapper->ClearAllShaderReplacements();
+  glLODMapper->ClearAllShaderReplacements();
 
-    std::string repl = "VTK::Light::Impl\n";
-    repl += shader;
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = false;
+  Json::Value root;
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+  bool success = reader->parse(
+    replacementsString, replacementsString + strlen(replacementsString), &root, nullptr);
+  if (!success)
+  {
+    vtkGenericWarningMacro("Unable to parse the replacement Json string!");
+    return;
+  }
+  bool isArray = root.isArray();
+  size_t nbReplacements = isArray ? root.size() : 1;
 
-    glMapper->AddShaderReplacement(vtkShader::Fragment, "VTK::Light::Impl", true, repl, true);
-    glLODMapper->AddShaderReplacement(vtkShader::Fragment, "VTK::Light::Impl", true, repl, true);
+  std::vector<std::tuple<vtkShader::Type, std::string, std::string> > replacements;
+  for (size_t index = 0; index < nbReplacements; ++index)
+  {
+    const Json::Value& repl = isArray ? root[(int)index] : root;
+    if (!repl.isMember("type"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: a type is required.");
+      return;
+    }
+    std::string type = repl["type"].asString();
+    vtkShader::Type shaderType = vtkShader::Unknown;
+    if (type == "fragment")
+    {
+      shaderType = vtkShader::Fragment;
+    }
+    else if (type == "vertex")
+    {
+      shaderType = vtkShader::Vertex;
+    }
+    else if (type == "geometry")
+    {
+      shaderType == vtkShader::Geometry;
+    }
+    if (shaderType == vtkShader::Unknown)
+    {
+      vtkErrorMacro("Unknown shader type for replacement:" << type);
+      return;
+    }
+
+    if (!repl.isMember("original"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: an original pattern is required.");
+      return;
+    }
+    std::string original = repl["original"].asString();
+    if (!repl.isMember("replacement"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: a replacement pattern is required.");
+      return;
+    }
+    std::string replacement = repl["replacement"].asString();
+    replacements.push_back(std::make_tuple(shaderType, original, replacement));
+  }
+
+  for (const auto& r : replacements)
+  {
+    cout << "Repl " << std::get<0>(r) << "from" << endl
+         << std::get<1>(r) << endl
+         << "to" << endl
+         << std::get<2>(r) << endl;
+    glMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
+    glLODMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
   }
 }
