@@ -120,6 +120,9 @@
    <property name="text">
     <string>Reset Session</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="actionShow_All">
    <property name="icon">
