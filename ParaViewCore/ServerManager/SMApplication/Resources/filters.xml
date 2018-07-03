@@ -2213,6 +2213,16 @@ found and the point will be rejected.</Documentation>
           are told not to triangulate results if possible.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty name="GenerateSolidGeometry"
+                         command="SetGenerateSolidGeometry"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="advanced" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Generate solid output with 3D cells. When set to false, 2D contours are generated.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End CTHPart -->
     </SourceProxy>
     <!-- ==================================================================== -->
