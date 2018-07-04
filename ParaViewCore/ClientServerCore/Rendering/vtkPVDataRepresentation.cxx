@@ -127,6 +127,8 @@ int vtkPVDataRepresentation::RequestData(
   // the proxy level.
   this->InvokeEvent(vtkCommand::UpdateDataEvent);
   this->NeedUpdate = false;
+
+  // cout << "Updated: " << this->DebugName << endl;
   return 1;
 }
 

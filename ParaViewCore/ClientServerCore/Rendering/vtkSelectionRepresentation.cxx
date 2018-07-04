@@ -29,7 +29,6 @@ vtkSelectionRepresentation::vtkSelectionRepresentation()
 {
   this->GeometryRepresentation = vtkGeometryRepresentation::New();
   this->GeometryRepresentation->SetPickable(0);
-  this->GeometryRepresentation->SetDebugString("vtkSelectionRepresentation");
   this->GeometryRepresentation->RequestGhostCellsIfNeededOff();
 
   this->LabelRepresentation = vtkDataLabelRepresentation::New();
@@ -129,6 +128,11 @@ bool vtkSelectionRepresentation::AddToView(vtkView* view)
 {
   view->AddRepresentation(this->GeometryRepresentation);
   view->AddRepresentation(this->LabelRepresentation);
+
+  // a good spot to update debug names for internal representations.
+  this->SetDebugName(this->GeometryRepresentation, "Selection");
+  this->SetDebugName(this->LabelRepresentation, "Label");
+
   return this->Superclass::AddToView(view);
 }
 

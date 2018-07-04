@@ -226,7 +226,7 @@ int vtkPolarAxesRepresentation::ProcessViewRequest(
 
 //----------------------------------------------------------------------------
 int vtkPolarAxesRepresentation::RequestData(
-  vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*)
+  vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkMath::UninitializeBounds(this->DataBounds);
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
@@ -248,12 +248,7 @@ int vtkPolarAxesRepresentation::RequestData(
     this->OutlineGeometry->Initialize();
   }
 
-  // We fire UpdateDataEvent to notify the representation proxy that the
-  // representation was updated. The representation proxty will then call
-  // PostUpdateData(). We do this since now representations are not updated at
-  // the proxy level.
-  this->InvokeEvent(vtkCommand::UpdateDataEvent);
-  return 1;
+  return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------

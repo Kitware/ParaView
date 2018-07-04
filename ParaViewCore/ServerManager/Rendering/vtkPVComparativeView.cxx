@@ -410,7 +410,7 @@ public:
       helper.Set(0);
       reprToClear->UpdateProperty("ForceUseCache");
       reprToClear->ClearMarkedModified(); // HACK.
-      reprToClear->MarkDirty(NULL);
+      reprToClear->MarkDirtyFromProducer(nullptr, nullptr, nullptr);
       helper.Set(1);
       reprToClear->UpdateProperty("ForceUseCache");
     }

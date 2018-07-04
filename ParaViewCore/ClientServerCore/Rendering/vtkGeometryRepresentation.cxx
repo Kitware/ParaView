@@ -185,8 +185,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->Representation = SURFACE;
 
   this->SuppressLOD = false;
-  this->DebugString = 0;
-  this->SetDebugString(this->GetClassName());
 
   vtkMath::UninitializeBounds(this->VisibleDataBounds);
 
@@ -200,7 +198,6 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 //----------------------------------------------------------------------------
 vtkGeometryRepresentation::~vtkGeometryRepresentation()
 {
-  this->SetDebugString(0);
   this->CacheKeeper->Delete();
   this->GeometryFilter->Delete();
   this->MultiBlockMaker->Delete();
@@ -512,7 +509,6 @@ bool vtkGeometryRepresentation::IsCached(double cache_key)
 //----------------------------------------------------------------------------
 vtkDataObject* vtkGeometryRepresentation::GetRenderedDataObject(int port)
 {
-  // cout << this << ":" << this->DebugString << ":GetRenderedDataObject" << endl;
   (void)port;
   if (this->GeometryFilter->GetNumberOfInputConnections(0) > 0)
   {
@@ -524,7 +520,6 @@ vtkDataObject* vtkGeometryRepresentation::GetRenderedDataObject(int port)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::MarkModified()
 {
-  // cout << this << ":" << this->DebugString << ":MarkModified" << endl;
   if (!this->GetUseCache())
   {
     // Cleanup caches when not using cache.

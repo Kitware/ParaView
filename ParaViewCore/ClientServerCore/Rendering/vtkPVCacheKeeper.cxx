@@ -46,6 +46,7 @@ vtkCxxSetObjectMacro(vtkPVCacheKeeper, CacheSizeKeeper, vtkCacheSizeKeeper);
 int vtkPVCacheKeeper::CacheHit = 0;
 int vtkPVCacheKeeper::CacheMiss = 0;
 int vtkPVCacheKeeper::CacheSkips = 0;
+int vtkPVCacheKeeper::CacheClears = 0;
 //----------------------------------------------------------------------------
 vtkPVCacheKeeper::vtkPVCacheKeeper()
 {
@@ -79,6 +80,8 @@ void vtkPVCacheKeeper::RemoveAllCaches()
     // Tell the cache size keeper about the newly freed memory size.
     this->CacheSizeKeeper->FreeCacheSize(freed_size);
   }
+
+  ++vtkPVCacheKeeper::CacheClears;
 
   // this method should never mark the filter modified !!!
 }
@@ -189,6 +192,7 @@ void vtkPVCacheKeeper::ClearCacheStateFlags()
   vtkPVCacheKeeper::CacheHit = 0;
   vtkPVCacheKeeper::CacheMiss = 0;
   vtkPVCacheKeeper::CacheSkips = 0;
+  vtkPVCacheKeeper::CacheClears = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -207,6 +211,12 @@ int vtkPVCacheKeeper::GetCacheMisses()
 int vtkPVCacheKeeper::GetCacheSkips()
 {
   return vtkPVCacheKeeper::CacheSkips;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVCacheKeeper::GetCacheClears()
+{
+  return vtkPVCacheKeeper::CacheClears;
 }
 
 //----------------------------------------------------------------------------

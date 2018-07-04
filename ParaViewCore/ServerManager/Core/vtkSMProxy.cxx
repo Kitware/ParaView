@@ -1263,15 +1263,20 @@ void vtkSMProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 //----------------------------------------------------------------------------
 void vtkSMProxy::MarkConsumersAsDirty(vtkSMProxy* modifiedProxy)
 {
-  unsigned int numConsumers = this->GetNumberOfConsumers();
-  for (unsigned int i = 0; i < numConsumers; i++)
+  for (const auto& cinfo : this->Internals->Consumers)
   {
-    vtkSMProxy* cons = this->GetConsumerProxy(i);
-    if (cons)
+    if (auto cons = cinfo.Proxy.GetPointer())
     {
-      cons->MarkDirty(modifiedProxy);
+      cons->MarkDirtyFromProducer(modifiedProxy, this, cinfo.Property);
     }
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxy::MarkDirtyFromProducer(vtkSMProxy* modifiedProxy, vtkSMProxy* vtkNotUsed(producer),
+  vtkSMProperty* vtkNotUsed(producerProperty))
+{
+  this->MarkDirty(modifiedProxy);
 }
 
 //----------------------------------------------------------------------------

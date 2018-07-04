@@ -81,6 +81,7 @@ public:
   static int GetCacheHits();
   static int GetCacheMisses();
   static int GetCacheSkips();
+  static int GetCacheClears();
   //@}
 
 protected:
@@ -122,6 +123,7 @@ private:
   static int CacheHit;
   static int CacheMiss;
   static int CacheSkips;
+  static int CacheClears;
 };
 
 #endif

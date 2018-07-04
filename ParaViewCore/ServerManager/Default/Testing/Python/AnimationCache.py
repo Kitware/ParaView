@@ -37,7 +37,10 @@ Render()
 # Initial state, nothing cached, or expected to be cached.
 vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.GoToNext()
-assert vtkPVCacheKeeper.GetCacheSkips() > 0 and vtkPVCacheKeeper.GetCacheMisses() == 0 and vtkPVCacheKeeper.GetCacheHits() == 0
+assert vtkPVCacheKeeper.GetCacheSkips() > 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() == 0 and \
+        vtkPVCacheKeeper.GetCacheHits() == 0 and \
+        vtkPVCacheKeeper.GetCacheClears() > 0
 
 #---------------------------------------------------------
 # nothing cached, or expected to be cached since we didn't enable caching.
@@ -45,7 +48,10 @@ vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.GoToNext()
 AnimationScene1.GoToNext()
 AnimationScene1.GoToPrevious()
-assert vtkPVCacheKeeper.GetCacheSkips() > 0 and vtkPVCacheKeeper.GetCacheMisses() == 0 and vtkPVCacheKeeper.GetCacheHits() == 0
+assert vtkPVCacheKeeper.GetCacheSkips() > 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() == 0 and \
+        vtkPVCacheKeeper.GetCacheHits() == 0 and \
+        vtkPVCacheKeeper.GetCacheClears() > 0
 
 #---------------------------------------------------------
 # Enable caching
@@ -55,39 +61,83 @@ vtkPVGeneralSettings.GetInstance().SetCacheGeometryForAnimation(True)
 # Nothing in cache, but we expect the data to be cached for next time.
 vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.GoToFirst()
-assert vtkPVCacheKeeper.GetCacheSkips() == 0 and vtkPVCacheKeeper.GetCacheMisses() > 0 and vtkPVCacheKeeper.GetCacheHits() == 0
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() > 0 and \
+        vtkPVCacheKeeper.GetCacheHits() == 0 and \
+        vtkPVCacheKeeper.GetCacheClears() == 0
 
 vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.GoToNext()
-assert vtkPVCacheKeeper.GetCacheSkips() == 0 and vtkPVCacheKeeper.GetCacheMisses() > 0 and vtkPVCacheKeeper.GetCacheHits() == 0
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() > 0 and \
+        vtkPVCacheKeeper.GetCacheHits() == 0 and \
+        vtkPVCacheKeeper.GetCacheClears() == 0
 
 #---------------------------------------------------------
 # now we expect the cache to hit and have no misses.
 vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.GoToPrevious()
 AnimationScene1.GoToFirst()
-assert vtkPVCacheKeeper.GetCacheSkips() == 0 and vtkPVCacheKeeper.GetCacheMisses() == 0 and vtkPVCacheKeeper.GetCacheHits() > 0
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() == 0 and \
+        vtkPVCacheKeeper.GetCacheHits() > 0 and \
+        vtkPVCacheKeeper.GetCacheClears() == 0
 
 #---------------------------------------------------------
 # Let's fill up the cache fully. We'll have some hits and misses, but no skips.
 vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.GoToFirst()
 AnimationScene1.Play()
-assert vtkPVCacheKeeper.GetCacheSkips() == 0 and vtkPVCacheKeeper.GetCacheMisses() > 0 and vtkPVCacheKeeper.GetCacheHits() > 0
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() > 0 and \
+        vtkPVCacheKeeper.GetCacheHits() > 0 and \
+        vtkPVCacheKeeper.GetCacheClears() == 0
 
 
 #---------------------------------------------------------
 # Play again, this time cache should be used.
 vtkPVCacheKeeper.ClearCacheStateFlags()
 AnimationScene1.Play()
-assert vtkPVCacheKeeper.GetCacheSkips() == 0 and vtkPVCacheKeeper.GetCacheMisses() == 0 and vtkPVCacheKeeper.GetCacheHits() > 0
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() == 0 and \
+        vtkPVCacheKeeper.GetCacheHits() > 0 and \
+        vtkPVCacheKeeper.GetCacheClears() == 0
 
 #---------------------------------------------------------
 # Modify properties and play. this time it should be a cache miss since
 # the cache should have been cleared.
-can_ex2.PointVariables = ['ACCL', 'DISPL']
 vtkPVCacheKeeper.ClearCacheStateFlags()
+can_ex2.PointVariables = ['ACCL', 'DISPL']
 AnimationScene1.Play()
-assert vtkPVCacheKeeper.GetCacheSkips() == 0 and vtkPVCacheKeeper.GetCacheMisses() > 0 and vtkPVCacheKeeper.GetCacheHits() == 0
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() > 0 and \
+        vtkPVCacheKeeper.GetCacheHits() == 0 and \
+        vtkPVCacheKeeper.GetCacheClears() > 0
+
+#---------------------------------------------------------
+# Modify representation properties and play.
+# This time, it should have any cache misses or clears (except
+# for the `vtkPVGridAxes3DRepresentation` which uses position
+# in request data.
+vtkPVCacheKeeper.ClearCacheStateFlags()
+DataRepresentation1.Position = [1, 0, 0]
+AnimationScene1.Play()
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() == 44 and \
+        vtkPVCacheKeeper.GetCacheHits() > 0 and \
+        vtkPVCacheKeeper.GetCacheClears() == 1 # the axes grid depends on
+                                               # position in request data, so it's okay
+
+#---------------------------------------------------------
+# Let's modified "Representation" and play.
+# This time, since we now have a different representation active, we epxetc
+vtkPVCacheKeeper.ClearCacheStateFlags()
+DataRepresentation1.SetRepresentationType("Outline")
+AnimationScene1.Play()
+assert vtkPVCacheKeeper.GetCacheSkips() == 0 and \
+        vtkPVCacheKeeper.GetCacheMisses() > 0 and \
+        vtkPVCacheKeeper.GetCacheHits() > 0 and \
+        vtkPVCacheKeeper.GetCacheClears() == 0
+
 
 print("All's well that ends well! Looks like the cache is working as expected.")

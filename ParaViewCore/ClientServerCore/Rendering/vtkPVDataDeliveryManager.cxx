@@ -121,6 +121,7 @@ public:
     vtkSmartPointer<vtkDataObject> StreamedPiece;
 
     vtkMTimeType TimeStamp;
+    vtkMTimeType LastDeliveryTimeStamp;
     vtkMTimeType ActualMemorySize;
 
   public:
@@ -136,6 +137,7 @@ public:
     vtkItem()
       : Producer(vtkSmartPointer<vtkPVTrivialProducer>::New())
       , TimeStamp(0)
+      , LastDeliveryTimeStamp(0)
       , ActualMemorySize(0)
       , CloneDataToAllNodes(false)
       , DeliverToClientAndRenderingProcesses(false)
@@ -172,7 +174,20 @@ public:
     void SetActualMemorySize(unsigned long size) { this->ActualMemorySize = size; }
     unsigned long GetActualMemorySize() const { return this->ActualMemorySize; }
 
-    void SetDeliveredDataObject(vtkDataObject* data) { this->DeliveredDataObject = data; }
+    void SetDeliveredDataObject(vtkDataObject* data)
+    {
+      this->DeliveredDataObject = data;
+      if (data)
+      {
+        vtkTimeStamp ts;
+        ts.Modified();
+        this->LastDeliveryTimeStamp = ts;
+      }
+      else
+      {
+        this->LastDeliveryTimeStamp = 0;
+      }
+    }
 
     void SetRedistributedDataObject(vtkDataObject* data) { this->RedistributedDataObject = data; }
 
@@ -198,6 +213,7 @@ public:
 
     vtkDataObject* GetDataObject() const { return this->DataObject.GetPointer(); }
     vtkMTimeType GetTimeStamp() const { return this->TimeStamp; }
+    vtkMTimeType GetLastDeliveryTimeStamp() const { return this->LastDeliveryTimeStamp; }
     void SetNextStreamedPiece(vtkDataObject* data) { this->StreamedPiece = data; }
     vtkDataObject* GetStreamedPiece() { return this->StreamedPiece; }
   };
@@ -538,20 +554,24 @@ vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(unsigned int id, bool 
 bool vtkPVDataDeliveryManager::NeedsDelivery(
   vtkMTimeType timestamp, std::vector<unsigned int>& keys_to_deliver, bool use_low)
 {
+  // cout << endl << endl << "NeedsDelivery " << endl;
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin(); iter != this->Internals->ItemsMap.end(); ++iter)
   {
     if (this->Internals->IsRepresentationVisible(iter->first.first))
     {
       vtkInternals::vtkItem& item = use_low ? iter->second.second : iter->second.first;
-      if (item.GetTimeStamp() > timestamp)
+      if (item.GetTimeStamp() > timestamp || item.GetLastDeliveryTimeStamp() < item.GetTimeStamp())
       {
+        // cout << this->GetRepresentation(iter->first.first)->GetDebugName() << "("
+        // <<iter->first.second<<")" << endl;;
         // FIXME: convert keys_to_deliver to a vector of pairs.
         keys_to_deliver.push_back(iter->first.first);
         keys_to_deliver.push_back(static_cast<unsigned int>(iter->first.second));
       }
     }
   }
+  // cout << endl;
   return keys_to_deliver.size() > 0;
 }
 
@@ -661,6 +681,9 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
       {
         if (item.OrderedCompositingInfo.Translator)
         {
+          // cout << "use structured info: ";
+          // cout << this->GetRepresentation(iter->first.first)->GetDebugName() << "("
+          // <<iter->first.second<<")" << endl;
           // implies that the representation is providing us with means to
           // override how the ordered compositing happens.
           const vtkInternals::vtkOrderedCompositingInfo& info = item.OrderedCompositingInfo;
@@ -669,6 +692,11 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
         }
         else if (item.Redistributable)
         {
+          // cout << "redistribute: ";
+          // cout << this->GetRepresentation(iter->first.first)->GetDebugName() << "("
+          // <<iter->first.second<<") = "
+          //   << item.GetDeliveredDataObject()
+          //   << endl;
           cutsGenerator->AddDataObject(item.GetDeliveredDataObject());
         }
       }
