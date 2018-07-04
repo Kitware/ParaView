@@ -38,11 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * @defgroup Reactions ParaView Reactions
-* ParaView client relies of a collection of reactions that autonomous entities
-* that use pqApplicationCore and other core components to get their work done which
-* keeping track for their own enabled state without any external input. To
-* use, simple create this reaction and assign it to a menu
-* and add it to menus/toolbars whatever.
+* ParaView client relies on a collection of reactions that are autonomous
+* entities that use pqApplicationCore and other core components to get their
+* work done. To use, simply attach an instance of pqReaction subclass to a
+* QAction. The reaction then monitors events from the QAction. Additionally, the
+* reaction can monitor the ParaView application state to update things like
+* enable state, label, etc. for the QAction itself.
 */
 
 /**
