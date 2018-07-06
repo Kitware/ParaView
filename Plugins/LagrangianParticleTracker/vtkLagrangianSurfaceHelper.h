@@ -71,7 +71,7 @@ protected:
 
   /**
    * Convenience method to fill field data of provided dataset
-   * using data for the speicfied leaf number
+   * using data for the specified leaf number
    */
   void FillFieldData(vtkDataSet* dataset, int leaf);
 

@@ -1645,7 +1645,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolyhedra(
   double dataBbox[6];
   double acumVols[8]; // accumulated volume a vertex scatters
   double lastFrcs[8]; // to reuse quad scalars (1, 2, 5, 6 only)
-  double nodeFrcs[8]; // fractions of the ORIGINAL hexas (noe nodes)
+  double nodeFrcs[8]; // fractions of the ORIGINAL hexas (now nodes)
   double lastVols[8]; // to reuse --- similar to lastFrcs
   double nodeVols[8]; // volumes of the ORIGINAL hexas (now nodes)
   double lastCord[3];
@@ -2920,7 +2920,7 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash(
   vtkRectilinearGridConnectivityFace** newFaces = NULL;
 
   // determine the number of integrated components (including the material
-  // volume) to be saved to the global fragment attributs array and allocate a
+  // volume) to be saved to the global fragment attributes array and allocate a
   // buffer for a tuple
   tupleSiz = this->Internal->NumberIntegralComponents + 1;
   tupleBuf = new double[tupleSiz];

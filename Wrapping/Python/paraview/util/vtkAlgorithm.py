@@ -69,7 +69,7 @@ to build the ParaView-specific XML via decorators.
 Decorator Basics
 ================
 
-There are four main classes currently avilable: `smproxy`,
+There are four main classes currently available: `smproxy`,
 `smproperty`, `smdomain`, and `smhint`. Each provides a set of decorators to
 declare a proxy, property, domain or a hint, respectively.
 

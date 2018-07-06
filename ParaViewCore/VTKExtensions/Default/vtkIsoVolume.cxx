@@ -74,7 +74,7 @@ int vtkIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
   vtkDataObject* inObj = inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* outObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
-  // Comman vars.
+  // Common vars.
   vtkStdString arrayName("");
   int fieldAssociation(-1);
   // double*       range (0);

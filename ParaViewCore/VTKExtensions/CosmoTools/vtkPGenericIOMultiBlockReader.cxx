@@ -947,7 +947,7 @@ int vtkPGenericIOMultiBlockReader::RequestData(vtkInformation* vtkNotUsed(reques
 
   output->SetNumberOfBlocks(this->MetaData->NumberOfBlocks);
 
-  // Get the global dimensions and physical orign & scale from
+  // Get the global dimensions and physical origin & scale from
   // the genericio file and add them to the dataset
   uint64_t tmpDims[3];
   double tmpDouble[3];

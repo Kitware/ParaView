@@ -2,8 +2,8 @@ GmshReader Plugin
 ParaView/VTK reader for visualization of high-order polynomial solutions under the Gmsh format.
 Version: 1.0
 
-See Copyright.txt, License.txt and Credits.txt for respectively copyright,
-license and authors informations. You should have received a copy of
+See Copyright.txt, License.txt and Credits.txt for respective copyright,
+license and authors information. You should have received a copy of
 these files along with ParaViewGMSHReaderPlugin.
 
 -For more information on Gmsh see http://geuz.org/gmsh/
@@ -161,7 +161,7 @@ If present, FieldInfo contains at least three elements related to the solution d
 
  * The TimeSteps element contains TimeStep sub-elements. Each TimeStep element specifies an index (index_attribute), an index used in the geometry filename pattern (geometry_index), an index used in the field filename pattern (field_index) and a time value (float).
     1. number_of_steps specifies how many steps of your solution you want to visualize. These steps can then be visualized sequentially with the ParaView play button (green arrow).
-    2. Normally there is one TimeStep element per timestep. However, it is possible to ask the reader to automatically generate timestep entries. This is done by setting the (optional) auto_generate_indices to 1. This is the usual and recommended mode for contant intervals between successive time steps. In this case, the reader will generate number_of_steps entries.
+    2. Normally there is one TimeStep element per timestep. However, it is possible to ask the reader to automatically generate timestep entries. This is done by setting the (optional) auto_generate_indices to 1. This is the usual and recommended mode for constant intervals between successive time steps. In this case, the reader will generate number_of_steps entries.
     3. The geometry_index and field_index of these entries will start at start_index and will be incremented by increment_index_by.
     4. The time value of these entries will start at start_value and will be incremented by increment_value_by.
 
