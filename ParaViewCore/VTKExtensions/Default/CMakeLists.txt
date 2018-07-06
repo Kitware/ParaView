@@ -108,6 +108,7 @@ set(Module_SRCS
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
   vtkPVGlyphFilter.cxx
+  vtkPVNewGlyphFilter.cxx
   vtkPVGridAxes3DActor.cxx
   vtkPVImageReader.cxx
   vtkPVLinearExtrusionFilter.cxx

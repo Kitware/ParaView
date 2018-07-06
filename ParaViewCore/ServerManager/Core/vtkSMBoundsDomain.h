@@ -24,7 +24,7 @@
  * are the min and max for the bounds along each of the coordinate axis.
  * \li \c MAGNITUDE: the domain has a single range set to (-magn/2.0, +magn/2.0)
  * where magn is the magnitude of the diagonal.
- * \li \c ORIENTED_MAGNITUDE:  same as MAGNITUDE, but instead of the dialog, a
+ * \li \c ORIENTED_MAGNITUDE:  same as MAGNITUDE, but instead of the diagonal, a
  * vector determined using two additional required properties with functions
  * Normal, and Origin is used.
  * \li \c SCALED_EXTENT: the range is set to (0, maxbounds * this->ScaleFactor)

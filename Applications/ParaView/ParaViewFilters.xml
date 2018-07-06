@@ -8,6 +8,7 @@
     <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
     <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
     <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
+    <Proxy group="filters" name="NewGlyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
     <Proxy group="filters" name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
     <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
     <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
@@ -211,6 +212,7 @@
   <Proxy group="filters" name="GenerateIdScalars"/>
   <Proxy group="filters" name="GhostCellsGenerator" />
   <Proxy group="filters" name="Glyph" />
+  <Proxy group="filters" name="NewGlyph" />
   <Proxy group="filters" name="GlyphWithCustomSource" />
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GridConnectivity" />
