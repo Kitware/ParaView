@@ -27,18 +27,18 @@
  * \li \c ORIENTED_MAGNITUDE:  same as MAGNITUDE, but instead of the dialog, a
  * vector determined using two additional required properties with functions
  * Normal, and Origin is used.
- * li \c SCALED_EXTENT: the range is set to (0, maxbounds * this->ScaleFactor)
+ * \li \c SCALED_EXTENT: the range is set to (0, maxbounds * this->ScaleFactor)
  * where maxbounds is the length of the longest axis for the bounding box.
- * li \c ARRAY_SCALED_EXTENT: the range is set to (0, (arrayMagnitude / maxbounds) *
+ * \li \c ARRAY_SCALED_EXTENT: the range is set to (0, (arrayMagnitude / maxbounds) *
  * this->ScaleFactor)
  * where maxbounds is the length of the longest axis for the bounding box.
  * and arrayMagnitude the maximum magnitude of the array.
- * li \c APPROXIMATE_CELL_LENGTH: approximation for cell length computed using the
- * li \c DATA_BOUNDS: this mode for a 6 tuple property that takes the data
+ * \li \c APPROXIMATE_CELL_LENGTH: approximation for cell length computed using the
+ * \li \c DATA_BOUNDS: this mode for a 6 tuple property that takes the data
  * bounds. The range will have 6 ranges:
  * (xmin,xmax), (xmin,xmax), (ymin,ymax), (ymin,ymax), (zmin,zmax), and (zmin,zmax).
  * If default_mode is not specified, then "min,max,min,max,min,max" is assumed.
- * li \c EXTENTS: this mode for a property that takes a value between 0 and (max-min) for
+ * \li \c EXTENTS: this mode for a property that takes a value between 0 and (max-min) for
  * each component.
  *
  * To determine the input data bounds, this domain depends on a required
