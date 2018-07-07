@@ -41,31 +41,24 @@ class vtkIntegrateAttributes::vtkFieldList : public vtkDataSetAttributes::FieldL
   typedef vtkDataSetAttributes::FieldList Superclass;
 
 public:
-  vtkFieldList(int numInputs)
-    : vtkDataSetAttributes::FieldList(numInputs)
+  vtkFieldList(int numInputs = 0)
+    : Superclass(numInputs)
   {
   }
-  void SetFieldIndex(int i, int index)
+
+protected:
+  // overridden to only create vtkDoubleArray for numeric arrays.
+  vtkSmartPointer<vtkAbstractArray> CreateArray(int type) const override
   {
-    this->vtkDataSetAttributes::FieldList::SetFieldIndex(i, index);
-  }
-  // This method is same as vtkFieldList::InitializeFieldList followed by logic
-  // to mark non-vtkDataArray fields are invalid. Thus, effectively skipping
-  // them.
-  void InitializeFieldListForDataArrays(vtkDataSetAttributes* dsa)
-  {
-    this->Superclass::InitializeFieldList(dsa);
-    for (int i = vtkDataSetAttributes::NUM_ATTRIBUTES; i < this->GetNumberOfFields(); i++)
+    if (auto array = this->Superclass::CreateArray(type))
     {
-      if (this->GetFieldIndex(i) >= 0)
+      const int is_numeric = (array->IsNumeric());
+      if (is_numeric)
       {
-        vtkAbstractArray* aa = dsa->GetAbstractArray(this->GetFieldName(i));
-        if (vtkDataArray::SafeDownCast(aa) == NULL)
-        {
-          this->SetFieldIndex(i, -1);
-        }
+        return vtkSmartPointer<vtkAbstractArray>::Take(vtkDoubleArray::New());
       }
     }
+    return nullptr;
   }
 };
 
@@ -352,35 +345,11 @@ int vtkIntegrateAttributes::RequestData(
   if (compositeInput)
   {
     vtkCompositeDataIterator* iter = compositeInput->NewIterator();
-    int index = 0;
-    // vtkFieldList needs to know num of inputs, so determine that first.
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      vtkDataObject* dobj = iter->GetCurrentDataObject();
-      vtkDataSet* ds = vtkDataSet::SafeDownCast(dobj);
-      if (ds)
-      {
-        if (ds->GetNumberOfPoints() == 0)
-        {
-          continue; // skip empty datasets.
-        }
-        index++;
-      }
-      else
-      {
-        if (dobj)
-        {
-          vtkWarningMacro("This filter cannot handle sub-datasets of type : "
-            << dobj->GetClassName() << ". Skipping block");
-        }
-      }
-    }
 
     // Create the intersection field list. This is list of arrays common
     // to all blocks in the input.
-    vtkFieldList pdList(index);
-    vtkFieldList cdList(index);
-    index = 0;
+    vtkFieldList pdList;
+    vtkFieldList cdList;
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
       vtkDataObject* dobj = iter->GetCurrentDataObject();
@@ -391,17 +360,8 @@ int vtkIntegrateAttributes::RequestData(
         {
           continue; // skip empty datasets.
         }
-        if (index == 0)
-        {
-          pdList.InitializeFieldListForDataArrays(ds->GetPointData());
-          cdList.InitializeFieldListForDataArrays(ds->GetCellData());
-        }
-        else
-        {
-          pdList.IntersectFieldList(ds->GetPointData());
-          cdList.IntersectFieldList(ds->GetCellData());
-        }
-        index++;
+        pdList.IntersectFieldList(ds->GetPointData());
+        cdList.IntersectFieldList(ds->GetCellData());
       }
       else
       {
@@ -417,7 +377,7 @@ int vtkIntegrateAttributes::RequestData(
     this->AllocateAttributes(pdList, output->GetPointData());
     this->AllocateAttributes(cdList, output->GetCellData());
 
-    index = 0;
+    int index = 0;
     // Now execute for each block.
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
@@ -438,8 +398,8 @@ int vtkIntegrateAttributes::RequestData(
     // Set all values to 0.  All output attributes are type double.
     vtkFieldList pdList(1);
     vtkFieldList cdList(1);
-    pdList.InitializeFieldListForDataArrays(dsInput->GetPointData());
-    cdList.InitializeFieldListForDataArrays(dsInput->GetCellData());
+    pdList.InitializeFieldList(dsInput->GetPointData());
+    cdList.InitializeFieldList(dsInput->GetCellData());
     this->AllocateAttributes(pdList, output->GetPointData());
     this->AllocateAttributes(cdList, output->GetCellData());
     this->ExecuteBlock(dsInput, output, 0, pdList, cdList);
@@ -622,27 +582,24 @@ void vtkIntegrateAttributes::ReceivePiece(vtkUnstructuredGrid* mergeTo, int from
 void vtkIntegrateAttributes::AllocateAttributes(
   vtkIntegrateAttributes::vtkFieldList& fieldList, vtkDataSetAttributes* outda)
 {
-  int numArrays = fieldList.GetNumberOfFields();
-  for (int i = 0; i < numArrays; ++i)
+  outda->CopyAllocate(fieldList);
+  for (int cc = 0, max = outda->GetNumberOfArrays(); cc < max; ++cc)
   {
-    if (fieldList.GetFieldIndex(i) < 0)
-    {
-      continue;
-    }
-    int numComponents = fieldList.GetFieldComponents(i);
-    // All arrays are allocated double with one tuple.
-    vtkDoubleArray* outArray = vtkDoubleArray::New();
-    outArray->SetNumberOfComponents(numComponents);
-    outArray->SetNumberOfTuples(1);
-    outArray->SetName(fieldList.GetFieldName(i));
+    auto array = vtkDoubleArray::SafeDownCast(outda->GetAbstractArray(cc));
+    assert(array != nullptr);
+    array->SetNumberOfTuples(1);
     // It cannot hurt to zero the arrays here.
-    for (int j = 0; j < numComponents; ++j)
-    {
-      outArray->SetComponent(0, j, 0.0);
-    }
-    fieldList.SetFieldIndex(i, outda->AddArray(outArray));
-    outArray->Delete();
-    // Should we set scalars, vectors ...
+    array->FillValue(0.0);
+  }
+
+  for (int cc = 0; cc < vtkDataSetAttributes::NUM_ATTRIBUTES; ++cc)
+  {
+    // this should not be necessary, however, the old version of
+    // vtkIntegrateAttributes didn't mark active attributes for any arrays. We
+    // preserve that behavior here. This is needed since filters like vtkGlyph3D
+    // love to drop active attributes (incorrectly, in my opinion). Until we
+    // resolve that, I am keeping this old behavior.
+    outda->SetActiveAttribute(-1, cc);
   }
 }
 
