@@ -180,6 +180,13 @@ class pqOutputWidget::pqInternals
   static const int COLUMN_COUNT = 1;
   static const int COLUMN_DATA = 0;
 
+  static QStandardItem* newEmptyItem()
+  {
+    auto item = new QStandardItem();
+    item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+    return item;
+  }
+
 public:
   Ui::OutputWidget Ui;
   QPointer<QStandardItemModel> Model;
@@ -263,11 +270,11 @@ public:
     messageItem->setForeground(this->foregroundColor(type));
 
     QList<QStandardItem*> items;
-    items << messageItem << new QStandardItem();
+    items << messageItem << this->newEmptyItem();
     summaryItem->appendRow(items);
     items.clear();
 
-    items << summaryItem << new QStandardItem();
+    items << summaryItem << this->newEmptyItem();
     rootItem->appendRow(items);
   }
 
