@@ -738,7 +738,7 @@ vtkIdType* vtkAMRDualClipLocator::GetCornerPointer(
     // The problem is that the range may become larger than our locator array.
     // The minimum extent can get smaller when we mask bits off.
     // Also, we have to convert back to relative index to remove the global offset.
-    // Different point in the locator may be in different degnerate levels,
+    // Different point in the locator may be in different degenerate levels,
     // so we do need to convert index back to the original level.
     // It looks like we need to know the origin of the block.
     xCell += blockOrigin[0];

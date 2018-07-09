@@ -19,7 +19,7 @@ def _count(values):
         return 1
 
 def _stringify(values):
-    """internal method: used to convert values to a stirng suitable for an xml attribute"""
+    """internal method: used to convert values to a string suitable for an xml attribute"""
     if type(values) == list or type(values) == tuple:
         return " ".join([str(x) for x in values])
     elif type(values) == type(True):
@@ -517,7 +517,7 @@ def load_plugin(filepath, default_modulename=None):
     return module
 
 def reload_plugin_module(module):
-    """helper function to relead aplugin module previously loaded via
+    """helper function to reload a plugin module previously loaded via
     load_plugin"""
     from inspect import getsourcefile, ismodule
     if ismodule(module) and getsourcefile(module):

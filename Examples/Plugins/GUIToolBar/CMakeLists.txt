@@ -23,7 +23,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
                             GROUP_NAME "ToolBar/MyActions")
 
 
-  # another way of adding a toolbar  is to simpy add a new QToolBar subclass.
+  # another way of adding a toolbar is to simply add a new QToolBar subclass.
   ADD_PARAVIEW_TOOLBAR(IFACES_2 IFACE_SRCS_2 CLASS_NAME MyToolBar)
 
   # create a plugin for this panel

@@ -539,7 +539,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
         msg.set_global_id(message->global_id());
         msg.set_location(message->location());
 
-        // Add extra-informations
+        // Add extra-information
         msg.set_share_only(true);
         msg.set_client_id(this->ServerInformation->GetClientId());
 

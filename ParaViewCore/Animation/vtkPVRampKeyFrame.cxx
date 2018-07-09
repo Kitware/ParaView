@@ -55,7 +55,7 @@ void vtkPVRampKeyFrame::UpdateValue(double currenttime, vtkPVAnimationCue* cue, 
     unsigned int end_novalues = next->GetNumberOfKeyValues();
     unsigned int min = (start_novalues < end_novalues) ? start_novalues : end_novalues;
 
-    // interpolate comman indices.
+    // interpolate common indices.
     for (i = 0; i < min; i++)
     {
       double vmax = next->GetKeyValue(i);
