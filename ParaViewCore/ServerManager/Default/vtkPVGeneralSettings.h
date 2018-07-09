@@ -185,6 +185,16 @@ public:
   vtkBooleanMacro(ShowAnimationShortcuts, bool);
   //@}
 
+  //@{
+  /**
+   * Set whether to reset display when showing
+   * a representation in an empty view.
+   */
+  vtkSetMacro(ResetDisplayEmptyViews, bool);
+  vtkGetMacro(ResetDisplayEmptyViews, bool);
+  vtkBooleanMacro(ResetDisplayEmptyViews, bool);
+  //@}
+
   /**
    * Forwarded for vtkSMParaViewPipelineControllerWithRendering.
    */
@@ -275,6 +285,7 @@ protected:
   unsigned long AnimationGeometryCacheLimit;
   int AnimationTimePrecision;
   bool ShowAnimationShortcuts;
+  bool ResetDisplayEmptyViews;
   int PropertiesPanelMode;
   bool LockPanels;
   int GUIFontSize;
