@@ -25,6 +25,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 
+#include <cassert>
 #include <vector>
 
 vtkStandardNewMacro(vtkAttributeDataReductionFilter);
@@ -135,16 +136,14 @@ static void vtkAttributeDataReductionFilterReduce(vtkDataSetAttributes* output,
   std::vector<vtkDataSetAttributes*> inputs, vtkAttributeDataReductionFilter* self)
 {
   int numInputs = static_cast<int>(inputs.size());
-
-  vtkDataSetAttributes::FieldList fieldList(numInputs);
-  fieldList.InitializeFieldList(inputs[0]);
+  assert(numInputs > 0);
 
   vtkDataSetAttributes* input0 = inputs[0];
-  vtkIdType numTuples = inputs[0]->GetNumberOfTuples();
+  vtkIdType numTuples = input0->GetNumberOfTuples();
 
-  for (int cc = 1; cc < numInputs; ++cc)
+  vtkDataSetAttributes::FieldList fieldList;
+  for (vtkDataSetAttributes* dsa : inputs)
   {
-    vtkDataSetAttributes* dsa = inputs[cc];
     // Include only field that have any arrays
     if (dsa->GetNumberOfArrays() > 0 && dsa->GetNumberOfTuples() == numTuples)
     {
@@ -154,10 +153,7 @@ static void vtkAttributeDataReductionFilterReduce(vtkDataSetAttributes* output,
   output->CopyGlobalIdsOn();
   output->CopyAllocate(fieldList, numTuples);
   // Copy 0th data over first.
-  for (vtkIdType idx = 0; idx < numTuples; ++idx)
-  {
-    output->CopyData(fieldList, input0, 0, idx, idx);
-  }
+  fieldList.CopyData(0, input0, 0, numTuples, output, 0);
 
   self->UpdateProgress(0.1);
   double progress_offset = 0.1;
