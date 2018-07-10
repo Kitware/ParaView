@@ -80,6 +80,12 @@ public:
     SucceedScalarBar
   };
 
+  enum OutOfRangeType
+  {
+    BELOW_RANGE = 0,
+    ABOVE_RANGE = 1,
+  };
+
   //@{
   /**
    * Set the scalar bar thickness. When the orientation is
@@ -102,6 +108,16 @@ public:
    */
   vtkSetClampMacro(ScalarBarLength, double, 0, 1);
   vtkGetMacro(ScalarBarLength, double);
+  //@}
+
+  //@{
+  /**
+   * Set whether the scalar bar is reversed ie from high
+   * to low instead of from low to high. Default is false;
+   */
+  vtkSetMacro(ReverseLegend, bool);
+  vtkGetMacro(ReverseLegend, bool);
+  vtkBooleanMacro(ReverseLegend, bool);
   //@}
 
   //@{
@@ -271,6 +287,11 @@ private:
   bool UseCustomLabels;
 
   /**
+   * Flag that controls if the whole color legend should be reversed
+   */
+  bool ReverseLegend;
+
+  /**
    * Custom label values.
    */
   vtkSmartPointer<vtkDoubleArray> CustomLabels;
@@ -327,6 +348,9 @@ private:
    * Get the rect for the below-range color swatch.
    */
   vtkRectf GetBelowRangeColorRect(double size[2]);
+
+  vtkRectf GetOutOfRangeColorRectInternal(
+    vtkContext2DScalarBarActor::OutOfRangeType type, double size[2]);
 
   /**
    * Get the rect for the NaN color swatch.
