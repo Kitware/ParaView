@@ -68,7 +68,10 @@ public:
 private slots:
   void setAnimationScene(pqAnimationScene* scene);
 
-  void updateTimePrecision();
+  /**
+   * Update the notation and precision for time display.
+   */
+  void updateTimeDisplay();
 
 private:
   Q_DISABLE_COPY(pqAnimationTimeToolbar)

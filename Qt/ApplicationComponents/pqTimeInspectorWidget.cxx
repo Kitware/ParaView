@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqPropertyLinks.h"
 #include "pqPropertyLinksConnection.h"
 #include "pqProxy.h"
@@ -45,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkNew.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkSMParaViewPipelineController.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
@@ -273,6 +275,9 @@ pqTimeInspectorWidget::pqTimeInspectorWidget(QWidget* parentObject)
   this->connect(
     &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)), SLOT(setServer(pqServer*)));
   this->setServer(pqActiveObjects::instance().activeServer());
+
+  pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
+    SLOT(generalSettingsChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -449,6 +454,8 @@ void pqTimeInspectorWidget::setSceneTimeSteps(const QList<QVariant>& val)
   {
     animationModel->setTickMarks(0, NULL);
   }
+
+  this->generalSettingsChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -616,4 +623,15 @@ void pqTimeInspectorWidget::handleProxyNameChanged(pqServerManagerModelItem* ite
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqTimeInspectorWidget::generalSettingsChanged()
+{
+  int timePrecision = vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision();
+  this->Internals->Ui.AnimationTimeWidget->setTimePrecision(timePrecision);
+  this->Internals->Ui.AnimationWidget->animationModel()->setTimePrecision(timePrecision);
+  char timeNotation = vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation();
+  this->Internals->Ui.AnimationTimeWidget->setTimeNotation(timeNotation);
+  this->Internals->Ui.AnimationWidget->animationModel()->setTimeNotation(timeNotation);
 }

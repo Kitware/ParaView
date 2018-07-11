@@ -58,11 +58,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 
+#include "vtkPVGeneralSettings.h"
+
 // ParaView widget includes
 
 // ParaView core includes
 #include "pqActiveObjects.h"
 #include "pqCompositeDataInformationTreeModel.h"
+#include "pqCoreUtilities.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
@@ -105,6 +108,9 @@ pqProxyInformationWidget::pqProxyInformationWidget(QWidget* p)
 
   this->connect(&pqActiveObjects::instance(), SIGNAL(portChanged(pqOutputPort*)), this,
     SLOT(setOutputPort(pqOutputPort*)));
+
+  pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
+    SLOT(updateInformation()));
 }
 
 //-----------------------------------------------------------------------------
@@ -242,6 +248,10 @@ void pqProxyInformationWidget::updateInformation()
   pModel->blockSignals(true);
   this->Ui->timeValues->blockSignals(true);
   //
+
+  int precision = vtkPVGeneralSettings::GetInstance()->GetAnimationTimePrecision();
+  char notation = vtkPVGeneralSettings::GetInstance()->GetAnimationTimeNotation();
+
   if (tsv)
   {
     unsigned int numElems = tsv->GetNumberOfElements();
@@ -249,8 +259,8 @@ void pqProxyInformationWidget::updateInformation()
     {
       QTreeWidgetItem* item = new QTreeWidgetItem(this->Ui->timeValues);
       item->setData(0, Qt::DisplayRole, i);
-      item->setData(1, Qt::DisplayRole, QString::number(tsv->GetElement(i), 'g', 17));
-      item->setData(1, Qt::ToolTipRole, QString::number(tsv->GetElement(i), 'g', 17));
+      item->setData(1, Qt::DisplayRole, QString::number(tsv->GetElement(i), notation, precision));
+      item->setData(1, Qt::ToolTipRole, QString::number(tsv->GetElement(i), notation, precision));
       item->setFlags(item->flags() | Qt::ItemIsEditable);
     }
   }
