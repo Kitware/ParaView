@@ -649,7 +649,6 @@ void pqMultiViewWidget::reload()
   {
     if (aWidget && !newWidgets.contains(aWidget))
     {
-      aWidget->setParent(NULL);
       delete aWidget;
     }
   }
