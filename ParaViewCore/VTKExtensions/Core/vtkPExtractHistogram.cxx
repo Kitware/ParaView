@@ -87,7 +87,7 @@ int vtkPExtractHistogram::RequestData(
   }
 
   vtkTable* output = vtkTable::GetData(outputVector, 0);
-  vtkSmartPointer<vtkDataArray> oldExtents = output->GetRowData()->GetArray((int)0);
+  vtkSmartPointer<vtkDataArray> oldExtents = output->GetRowData()->GetArray("bin_extents");
   if (oldExtents == NULL)
   {
     // Nothing to do if there is no data
@@ -122,7 +122,7 @@ int vtkPExtractHistogram::RequestData(
       vtkErrorMacro(<< "Reduced data has 0 arrays");
       return 0;
     }
-    output->GetRowData()->GetArray((int)0)->DeepCopy(oldExtents);
+    output->GetRowData()->GetArray("bin_extents")->DeepCopy(oldExtents);
     if (this->CalculateAverages)
     {
       vtkDataArray* bin_values = output->GetRowData()->GetArray("bin_values");
