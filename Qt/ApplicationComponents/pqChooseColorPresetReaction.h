@@ -106,6 +106,10 @@ signals:
   * fired every time a preset is applied.
   */
   void presetApplied();
+  /**
+   * fired when the preset dialog is closed.
+   */
+  void presetDialogClosed();
 
 private slots:
   void applyCurrentPreset();

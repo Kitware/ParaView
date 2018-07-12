@@ -793,9 +793,9 @@ void pqColorOpacityEditorWidget::choosePreset(const char* presetName)
   pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(tmp, false);
   ccpr->setTransferFunction(this->proxy());
   this->connect(ccpr, SIGNAL(presetApplied()), SLOT(presetApplied()));
+  this->connect(ccpr, SIGNAL(presetDialogClosed()), ccpr, SLOT(deleteLater()));
+  this->connect(ccpr, SIGNAL(presetDialogClosed()), tmp, SLOT(deleteLater()));
   ccpr->choosePreset(presetName);
-  delete ccpr;
-  delete tmp;
 }
 
 //-----------------------------------------------------------------------------

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
+#include "pqQVTKWidget.h"
 #include "pqSettings.h"
 #include "vtkNew.h"
 #include "vtkSMTransferFunctionPresets.h"
@@ -409,6 +410,58 @@ private:
   Q_DISABLE_COPY(pqPresetDialogReflowModel);
 };
 
+namespace
+{
+class pqPresetDialogFakeModality : public QObject
+{
+public:
+  pqPresetDialogFakeModality(pqPresetDialog* p)
+    : QObject(p)
+    , Self(p)
+  {
+  }
+  bool eventFilter(QObject* obj, QEvent* event) override
+  {
+    if (!dynamic_cast<QInputEvent*>(event))
+    {
+      // if the event is not an input event let it through
+      return false;
+    }
+    // The event filter is called multiple times for each event.  The first time
+    // is for the Window the event is within.  We have to let theset through so
+    // that the event filter will be called again on the event with the widget
+    // that will recieve it.
+    //
+    // VTK gets events from the QVTKOpenGLWidow so we don't even need to let the
+    // pqQVTKWidget accept events.  This prevents it from popping up a context
+    // menu too.
+    if (obj->inherits("QWidgetWindow") || obj->inherits("QVTKOpenGLWindow"))
+    {
+      return false;
+    }
+    while (obj != NULL)
+    {
+      if (obj == this->Self)
+      {
+        // if the event is on a child of the preset dialog let it go through
+        return false;
+      }
+      else if (obj->inherits("QMenu"))
+      {
+        // Future proofing: it is really bad if you have a context menu up and
+        // all events to it are blocked.  It locks X completely.
+        return false;
+      }
+      obj = obj->parent();
+    }
+    return true;
+  }
+
+private:
+  pqPresetDialog* Self;
+};
+}
+
 class pqPresetDialog::pqInternals
 {
 public:
@@ -416,11 +469,13 @@ public:
   QPointer<pqPresetDialogTableModel> Model;
   QPointer<pqPresetDialogProxyModel> ProxyModel;
   QPointer<pqPresetDialogReflowModel> ReflowModel;
+  QScopedPointer<QObject> EventFilter;
 
   pqInternals(pqPresetDialog::Modes mode, pqPresetDialog* self)
     : Model(new pqPresetDialogTableModel(self))
     , ProxyModel(new pqPresetDialogProxyModel(mode, self))
     , ReflowModel(new pqPresetDialogReflowModel(2, self))
+    , EventFilter(new pqPresetDialogFakeModality(self))
   {
     this->Ui.setupUi(self);
     this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
@@ -488,11 +543,13 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
     this->updateEnabledStateForSelection();
   });
   this->connect(ui.showDefault, SIGNAL(stateChanged(int)), SLOT(setPresetIsAdvanced(int)));
+  QApplication::instance()->installEventFilter(this->Internals->EventFilter.data());
 }
 
 //-----------------------------------------------------------------------------
 pqPresetDialog::~pqPresetDialog()
 {
+  QApplication::instance()->removeEventFilter(this->Internals->EventFilter.data());
 }
 
 //-----------------------------------------------------------------------------

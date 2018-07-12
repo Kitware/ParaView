@@ -128,16 +128,18 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
 
   bool indexedLookup = vtkSMPropertyHelper(lut, "IndexedLookup", true).GetAsInt() != 0;
 
-  pqPresetDialog dialog(pqCoreUtilities::mainWidget(), indexedLookup
+  pqPresetDialog* dialog = new pqPresetDialog(pqCoreUtilities::mainWidget(), indexedLookup
       ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
       : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
-  dialog.setCurrentPreset(presetName);
-  dialog.setCustomizableLoadColors(!indexedLookup);
-  dialog.setCustomizableLoadOpacities(!indexedLookup);
-  dialog.setCustomizableUsePresetRange(!indexedLookup);
-  dialog.setCustomizableLoadAnnotations(indexedLookup);
-  this->connect(&dialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
-  dialog.exec();
+  dialog->setCurrentPreset(presetName);
+  dialog->setCustomizableLoadColors(!indexedLookup);
+  dialog->setCustomizableLoadOpacities(!indexedLookup);
+  dialog->setCustomizableUsePresetRange(!indexedLookup);
+  dialog->setCustomizableLoadAnnotations(indexedLookup);
+  dialog->setAttribute(Qt::WA_DeleteOnClose, true);
+  this->connect(dialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
+  this->connect(dialog, SIGNAL(finished(int)), SIGNAL(presetDialogClosed()));
+  dialog->show();
   return true;
 }
 
