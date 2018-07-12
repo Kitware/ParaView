@@ -33,6 +33,7 @@ vtkStandardNewMacro(vtkPointGaussianRepresentation)
   this->LastScaleArrayComponent = 0;
   this->OpacityByArray = false;
   this->LastOpacityArray = NULL;
+  this->UseScaleFunction = true;
   this->SelectedPreset = vtkPointGaussianRepresentation::GAUSSIAN_BLUR;
   InitializeShaderPresets();
 }
@@ -357,9 +358,31 @@ void vtkPointGaussianRepresentation::SetScaleByArray(bool newVal)
 }
 
 //----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::SetUseScaleFunction(bool enable)
+{
+  if (this->UseScaleFunction != enable)
+  {
+    this->UseScaleFunction = enable;
+    this->Modified();
+    this->UpdateMapperScaleFunction();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPointGaussianRepresentation::SetScaleTransferFunction(vtkPiecewiseFunction* pwf)
 {
-  this->Mapper->SetScaleFunction(pwf);
+  if (this->ScaleFunction.Get() != pwf)
+  {
+    this->ScaleFunction = pwf;
+    this->Modified();
+    this->UpdateMapperScaleFunction();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPointGaussianRepresentation::UpdateMapperScaleFunction()
+{
+  this->Mapper->SetScaleFunction(this->UseScaleFunction ? this->ScaleFunction : nullptr);
 }
 
 //----------------------------------------------------------------------------

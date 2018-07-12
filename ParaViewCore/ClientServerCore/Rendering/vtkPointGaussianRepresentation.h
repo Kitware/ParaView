@@ -136,6 +136,11 @@ public:
   void SelectScaleArrayComponent(int component);
 
   /**
+   * Use scale transfer function. If false, no mapping is done.
+   */
+  void SetUseScaleFunction(bool enable);
+
+  /**
    * Sets a vtkPiecewiseFunction to use in mapping array values to sprite
    * sizes.  Performance decreases (along with understandability) when
    * large values are used for sprite sizes.  This is only used when
@@ -197,10 +202,12 @@ protected:
   vtkSetStringMacro(LastScaleArray);
   vtkSetStringMacro(LastOpacityArray);
   void InitializeShaderPresets();
+  void UpdateMapperScaleFunction();
 
   vtkSmartPointer<vtkActor> Actor;
   vtkSmartPointer<vtkPointGaussianMapper> Mapper;
   vtkSmartPointer<vtkPolyData> ProcessedData;
+  vtkSmartPointer<vtkPiecewiseFunction> ScaleFunction;
 
   int SelectedPreset;
 
@@ -211,6 +218,8 @@ protected:
   bool OpacityByArray;
   char* LastOpacityArray;
   int LastOpacityArrayComponent;
+
+  bool UseScaleFunction;
 
   std::vector<std::string> PresetShaderStrings;
   std::vector<float> PresetShaderScales;

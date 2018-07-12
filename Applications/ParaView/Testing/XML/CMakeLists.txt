@@ -412,6 +412,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointChartView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PointGaussianNoScaleTransferFunction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointGaussianScaleOpacityArray.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolarAxes.xml
