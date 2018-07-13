@@ -89,7 +89,6 @@ public:
     {
       if (child->widget())
       {
-        child->widget()->setParent(0);
         delete child->widget();
       }
       delete child;
@@ -120,7 +119,6 @@ public:
     if (child->widget() && child->widget()->objectName() == "LightsEditor")
     {
       child = this->Ui.verticalLayout->takeAt(0);
-      child->widget()->setParent(0);
       delete child->widget();
       delete child;
     }
@@ -128,7 +126,6 @@ public:
     {
       if (child->widget())
       {
-        child->widget()->setParent(0);
         delete child->widget();
       }
       delete child;

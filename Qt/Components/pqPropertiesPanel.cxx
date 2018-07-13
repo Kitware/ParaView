@@ -97,7 +97,6 @@ public:
     this->Panel->setObjectName(QString("HiddenProxyPanel%1").arg(this->MyId));
     this->Panel->hide();
     this->Panel->parentWidget()->layout()->removeWidget(this->Panel);
-    this->Panel->setParent(NULL);
   }
 
   void show(QWidget* parentWdg)
