@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyLinks.h"
 #include "pqPropertyLinksConnection.h"
+#include "pqTimer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkWeakPointer.h"
@@ -107,8 +108,15 @@ pqAnimationTimeWidget::pqAnimationTimeWidget(QWidget* parentObject)
     ui.timeValueComboBox, SIGNAL(currentTextChanged(QString)), SLOT(timeComboBoxChanged()));
   ui.timeValueComboBox->setVisible(false);
   this->connect(ui.radioButtonValue, SIGNAL(toggled(bool)), SLOT(timeRadioButtonToggled()));
-  this->connect(
-    ui.timestepValue, SIGNAL(valueChangedAndEditingFinished()), SLOT(timeSpinBoxChanged()));
+
+  // the idiosyncrasies of QSpinBox make it so that we have to delay when we
+  // respond to the "go-to-next" event (see paraview/paraview#18204).
+  auto timer = new pqTimer(this);
+  timer->setInterval(100);
+  timer->setSingleShot(true);
+  this->connect(timer, SIGNAL(timeout()), SLOT(timeSpinBoxChanged()));
+  QObject::connect(
+    ui.timestepValue, SIGNAL(valueChangedAndEditingFinished()), timer, SLOT(start()));
 }
 
 //-----------------------------------------------------------------------------
