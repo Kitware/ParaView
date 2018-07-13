@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 * supports multiple common use-cases from a pqPropertyWidgetDecorator.
 * The use-cases supported are as follows:
 * \li 1. enabling the pqPropertyWidget when the value of another
-* property matches a specific value (disabling otherwise).
+* property element matches a specific value (disabling otherwise).
 * \li 2. similar to 1, except instead of enabling/disabling the widget is made
 * "default" when the values match and "advanced" otherwise.
 * \li 3. as well as "inverse" of all the above i.e. when the value doesn't

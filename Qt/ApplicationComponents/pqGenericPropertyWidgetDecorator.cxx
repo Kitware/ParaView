@@ -46,6 +46,7 @@ class pqGenericPropertyWidgetDecorator::pqInternals
 {
 public:
   vtkWeakPointer<vtkSMProperty> Property;
+  int Index;
   std::vector<std::string> Values;
   bool Inverse;
   bool Enabled;
@@ -58,7 +59,8 @@ public:
   } Mode;
 
   pqInternals()
-    : Inverse(false)
+    : Index(0)
+    , Inverse(false)
     , Enabled(true)
     , Visible(true)
     , Mode(ENABLED_STATE)
@@ -73,12 +75,6 @@ public:
       // if there is no proxy, 'its value' does not match this->Value.
       bool status = false;
       return this->Inverse ? !status : status;
-    }
-    if (helper.GetNumberOfElements() != 1)
-    {
-      qCritical() << "pqGenericPropertyWidgetDecorator may not work as expected.";
-      // currently, we only support 1 element properties.
-      return false;
     }
 
     if (vtkSMProxyProperty::SafeDownCast(this->Property))
@@ -108,7 +104,7 @@ public:
       return false;
     }
 
-    vtkVariant val = helper.GetAsVariant(0);
+    vtkVariant val = helper.GetAsVariant(this->Index);
     bool status = false;
     for (auto it = this->Values.begin(); it != this->Values.end(); ++it)
     {
@@ -138,11 +134,10 @@ pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
   }
 
   this->Internals->Property = proxy->GetProperty(propertyName);
-  if (vtkSMUncheckedPropertyHelper(this->Internals->Property).GetNumberOfElements() > 1)
+
+  if (config->GetAttribute("index") != nullptr)
   {
-    qCritical() << "pqGenericPropertyWidgetDecorator currently only supports "
-                   "single valued properties";
-    return;
+    config->GetScalarAttribute("index", &this->Internals->Index);
   }
 
   const char* value = config->GetAttribute("value");
