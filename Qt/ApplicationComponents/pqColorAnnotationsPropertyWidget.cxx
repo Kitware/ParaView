@@ -1046,13 +1046,17 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
 {
   if (!this->addActiveAnnotations(false))
   {
+    QString warningTitle("Could not determine discrete values");
+    QString warningMessage(
+      "Could not automatically determine annotation values. Usually this means "
+      "too many discrete values are available in the data produced by the "
+      "current source/filter. This can happen if the data array type is floating "
+      "point. Please add annotations manually or force generation. Forcing the "
+      "generation will automatically hide the Scalar Bar.");
+
     QMessageBox* box = new QMessageBox(this);
-    box->setWindowTitle(tr("Couldn't determine discrete values"));
-    box->setText(
-      tr("Problems generating values or too many discrete value,"
-         " using the data produced by the current source/filter. "
-         "Please add annotations manually or force generation. Forcing the generation will"
-         " automatically hide the Scalar Bar."));
+    box->setWindowTitle(warningTitle);
+    box->setText(warningMessage);
     box->addButton(tr("Force"), QMessageBox::AcceptRole);
     box->addButton(QMessageBox::Cancel);
     if (box->exec() != QMessageBox::Cancel)
@@ -1063,9 +1067,10 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
 
       if (!this->addActiveAnnotations(true))
       {
-        QMessageBox::warning(this, tr("Couldn't determine discrete values"),
-          tr("Could not determine discrete values using the data produced by the "
-             "current source/filter. Please add annotations manually."),
+        QMessageBox::warning(this, warningTitle,
+          tr("Could not force generation of discrete values using the data "
+             "produced by the current source/filter. Please add annotations "
+             "manually."),
           QMessageBox::Ok);
       }
     }
@@ -1129,14 +1134,17 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
 {
   if (!this->addActiveAnnotationsFromVisibleSources(false))
   {
+    QString warningTitle("Could not determine discrete values");
+    QString warningMessage(
+      "Could not automatically determine annotation values. Usually this means "
+      "too many discrete values are available in the data produced by the "
+      "current source/filter. This can happen if the data array type is floating "
+      "point. Please add annotations manually or force generation. Forcing the "
+      "generation will automatically hide the Scalar Bar.");
 
     QMessageBox* box = new QMessageBox(this);
-    box->setWindowTitle(tr("Couldn't determine discrete values"));
-    box->setText(
-      tr("Some discrete values are missing or are unavailable because these is too many "
-         "discrete value,"
-         "Please add annotations manually or force generation. Forcing the generation will"
-         " automatically hide the Scalar Bar."));
+    box->setWindowTitle(warningTitle);
+    box->setText(warningMessage);
     box->addButton(tr("Force"), QMessageBox::AcceptRole);
     box->addButton(QMessageBox::Cancel);
     if (box->exec() != QMessageBox::Cancel)
@@ -1147,11 +1155,10 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
 
       if (!this->addActiveAnnotationsFromVisibleSources(true))
       {
-        QMessageBox::warning(this, tr("Missing or unavailable discrete values"),
-          tr("Some discrete values are missing or are unavailable because these is too many "
-             "discrete "
-             "value,"
-             "Please add annotations manually or try to force generation."),
+        QMessageBox::warning(this, warningTitle,
+          tr("Could not force generation of discrete values using the data "
+             "produced by the current source/filter. Please add annotations "
+             "manually."),
           QMessageBox::Ok);
       }
     }
