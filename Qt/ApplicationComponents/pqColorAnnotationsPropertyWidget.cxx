@@ -75,8 +75,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
-#include <QSet>
 #include <algorithm>
+#include <set>
 
 namespace
 {
@@ -401,23 +401,24 @@ public:
   // item, if any.
   QModelIndex removeAnnotations(const QModelIndexList& toRemove = QModelIndexList())
   {
-    QSet<int> rowsToRemove;
+    std::set<int> rowsToRemove;
     foreach (const QModelIndex& idx, toRemove)
     {
       rowsToRemove.insert(idx.row());
     }
-    QList<int> rowsList = rowsToRemove.toList();
-    qSort(rowsList);
-    for (int cc = (rowsList.size() - 1); cc >= 0; --cc)
+
+    for (auto riter = rowsToRemove.rbegin(); riter != rowsToRemove.rend(); ++riter)
     {
-      emit this->beginRemoveRows(QModelIndex(), rowsList[cc], rowsList[cc]);
-      this->Items.remove(rowsList[cc]);
+      emit this->beginRemoveRows(QModelIndex(), *riter, *riter);
+      this->Items.remove(*riter);
       emit this->endRemoveRows();
     }
-    if (rowsList.size() > 0 && rowsList.front() > this->Items.size())
+
+    if (rowsToRemove.size() > 0 && *rowsToRemove.begin() > this->Items.size())
     {
-      return this->index(rowsList.front(), 0);
+      return this->index(*rowsToRemove.begin(), 0);
     }
+
     if (this->Items.size() > 0)
     {
       return this->index(this->Items.size() - 1, 0);
@@ -1196,7 +1197,7 @@ bool pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources(bo
   vtkSMSessionProxyManager* pxm = server->proxyManager();
 
   // Iterate over representations, collecting prominent values from each.
-  QSet<QString> uniqueAnnotations;
+  std::set<QString> uniqueAnnotations;
   vtkSmartPointer<vtkCollection> collection = vtkSmartPointer<vtkCollection>::New();
   pxm->GetProxies("representations", collection);
   bool missingValues = false;
@@ -1250,15 +1251,11 @@ bool pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources(bo
     }
   }
 
-  QList<QString> uniqueList = uniqueAnnotations.values();
-  qSort(uniqueList);
-
   QList<QVariant> existingAnnotations = this->annotations();
-
   QList<QVariant> candidateAnnotationValues;
-  for (int idx = 0; idx < uniqueList.size(); idx++)
+  for (const QString& avalue : uniqueAnnotations)
   {
-    candidateAnnotationValues.push_back(uniqueList[idx]);
+    candidateAnnotationValues.push_back(avalue);
   }
 
   // Combined annotation values (old and new)
