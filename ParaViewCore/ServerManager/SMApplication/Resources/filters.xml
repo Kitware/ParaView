@@ -11254,6 +11254,7 @@ source.</Documentation>
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkDataObject" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property indicates the the inputs to the Group
         Datasets filter.</Documentation>
@@ -11818,6 +11819,7 @@ source.</Documentation>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkMultiBlockDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>This property specifies the input to the Extract Group
         filter.</Documentation>
