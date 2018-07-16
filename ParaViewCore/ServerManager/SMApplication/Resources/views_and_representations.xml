@@ -6336,7 +6336,7 @@
                          panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Show/hide and Axes Grid around the selected data.</Documentation>
+        <Documentation>Show/hide an Axes Grid around the selected data.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
