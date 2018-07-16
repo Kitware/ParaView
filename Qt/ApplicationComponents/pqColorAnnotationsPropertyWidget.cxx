@@ -407,6 +407,7 @@ public:
       rowsToRemove.insert(idx.row());
     }
     QList<int> rowsList = rowsToRemove.toList();
+    qSort(rowsList);
     for (int cc = (rowsList.size() - 1); cc >= 0; --cc)
     {
       emit this->beginRemoveRows(QModelIndex(), rowsList[cc], rowsList[cc]);
