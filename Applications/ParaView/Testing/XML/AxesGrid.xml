@@ -20,10 +20,10 @@
 
   <!-- move the camera a little and let's look at the grid -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/TitleBar/1QToolBar0/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthAngle" command="set_double" arguments="45" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationAngle" command="set_double" arguments="15" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/azimuthAngle" command="set_double" arguments="45" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/azimuthButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationAngle" command="set_double" arguments="15" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/AxesGrid2.png" width="400" height="400" />
 

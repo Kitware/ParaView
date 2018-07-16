@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqCameraDialogInternal;
 class pqView;
+class pqSettings;
+class vtkSMRenderViewProxy;
 
 class PQCOMPONENTS_EXPORT pqCameraDialog : public pqDialog
 {
@@ -45,6 +47,41 @@ public:
   ~pqCameraDialog() override;
 
   void SetCameraGroupsEnabled(bool enabled);
+
+  /**
+   * Open the CustomViewpointDialog to configure customViewpoints
+   */
+  static bool configureCustomViewpoints(QWidget* parentWidget, vtkSMRenderViewProxy* viewProxy);
+
+  /**
+   * Add the current viewpoint to the custom viewpoints
+   */
+  static bool addCurrentViewpointToCustomViewpoints(vtkSMRenderViewProxy* viewProxy);
+
+  /**
+   * Change cemara positing to an indexed custom viewpoints
+   */
+  static bool applyCustomViewpoint(int CustomViewpointIndex, vtkSMRenderViewProxy* viewProxy);
+
+  /**
+   * Delete an indexed custom viewpoint
+   */
+  static bool deleteCustomViewpoint(int CustomViewpointIndex, vtkSMRenderViewProxy* viewProxy);
+
+  /**
+   * Set an indexed custom viewpoint to the current viewpoint
+   */
+  static bool setToCurrentViewpoint(int CustomViewpointIndex, vtkSMRenderViewProxy* viewProxy);
+
+  /**
+   * Return the list of custom viewpoints tooltups
+   */
+  static QStringList CustomViewpointToolTips();
+
+  /**
+   * Return the list of custom viewpoint configurations
+   */
+  static QStringList CustomViewpointConfigurations();
 
 public slots:
   void setRenderModule(pqView*);
@@ -58,8 +95,10 @@ private slots:
   // Description:
   // Assign/restore the current camera properties to
   // a custom view button.
-  void configureCustomViews();
-  void applyCustomView();
+  void configureCustomViewpoints();
+  void applyCustomViewpoint();
+  void addCurrentViewpointToCustomViewpoints();
+  void updateCustomViewpointButtons();
 
   void resetViewDirectionPosX();
   void resetViewDirectionNegX();

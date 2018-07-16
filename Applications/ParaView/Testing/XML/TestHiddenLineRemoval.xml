@@ -8,10 +8,10 @@
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Wireframe" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/actionAdjustCamera" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationAngle" command="set_double" arguments="-30" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthAngle" command="set_double" arguments="60" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationAngle" command="set_double" arguments="-30" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/azimuthAngle" command="set_double" arguments="60" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/azimuthButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />

@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Client includes.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqCustomViewButtonDialog.h"
+#include "pqCustomViewpointButtonDialog.h"
 #include "pqFileDialog.h"
 #include "pqInteractiveViewLink.h"
 #include "pqLinksModel.h"
@@ -140,43 +140,71 @@ QStringList getListOfStrings(pqSettings* settings, const QString& defaultTxt, in
 //=============================================================================
 class pqCameraDialogInternal : public Ui::pqCameraDialog
 {
-  QList<QPointer<QToolButton> > CustomViewButtons;
+  QVector<QPointer<QToolButton> > CustomViewpointButtons;
+  QPointer<QToolButton> PlusButton;
 
 public:
   QPointer<pqRenderView> RenderModule;
   pqPropertyLinks CameraLinks;
 
-  pqCameraDialogInternal() {}
-  ~pqCameraDialogInternal() {}
-
-  void configureCustomViewButtons(const QStringList& tooltips, ::pqCameraDialog* self)
+  pqCameraDialogInternal()
   {
-    // remove extra buttons.
-    for (int cc = this->CustomViewButtons.size() - 1; cc >= tooltips.size(); --cc)
+    // Add + bouton
+    this->PlusButton = new QToolButton();
+    this->PlusButton->setObjectName("AddButton");
+    this->PlusButton->setToolTip(QToolButton::tr("Add Current Viewpoint"));
+    this->PlusButton->setIcon(QIcon(":/QtWidgets/Icons/pqPlus16.png"));
+    this->PlusButton->setMinimumSize(QSize(34, 34));
+  }
+
+  ~pqCameraDialogInternal() { delete this->PlusButton; }
+
+  void updateCustomViewpointButtons(::pqCameraDialog* self)
+  {
+    QStringList toolTips = self->CustomViewpointToolTips();
+
+    // Remove supplemental buttons
+    this->PlusButton->disconnect();
+    this->customViewpointGridLayout->removeWidget(this->PlusButton);
+
+    for (int cc = this->CustomViewpointButtons.size(); cc > toolTips.size(); cc--)
     {
-      this->customViewGridLayout->removeWidget(this->CustomViewButtons[cc]);
-      delete this->CustomViewButtons[cc];
-      this->CustomViewButtons.pop_back();
+      this->customViewpointGridLayout->removeWidget(this->CustomViewpointButtons[cc - 1]);
+      delete this->CustomViewpointButtons[cc - 1];
+    }
+    if (this->CustomViewpointButtons.size() > toolTips.size())
+    {
+      this->CustomViewpointButtons.resize(toolTips.size());
     }
 
-    // update current buttons.
-    for (int cc = 0; cc < this->CustomViewButtons.size(); ++cc)
+    // add / change remaining buttons.
+    for (int cc = 0; cc < toolTips.size(); ++cc)
     {
-      this->CustomViewButtons[cc]->setToolTip(tooltips[cc]);
+      if (this->CustomViewpointButtons.size() > cc)
+      {
+        this->CustomViewpointButtons[cc]->setToolTip(toolTips[cc]);
+      }
+      else
+      {
+        QToolButton* tb = new QToolButton(self);
+        tb->setObjectName(QString("customViewpoint%1").arg(cc));
+        tb->setText(QString::number(cc + 1));
+        tb->setToolTip(toolTips[cc]);
+        tb->setProperty("pqCameraDialog_INDEX", cc);
+        tb->setMinimumSize(QSize(34, 34));
+        self->connect(tb, SIGNAL(clicked()), SLOT(applyCustomViewpoint()));
+        this->CustomViewpointButtons.push_back(tb);
+        this->customViewpointGridLayout->addWidget(tb, cc / 6, cc % 6);
+      }
     }
 
-    // add any new buttons.
-    for (int cc = this->CustomViewButtons.size(); cc < tooltips.size(); ++cc)
+    // Add Plus Button if needed
+    if (toolTips.size() < pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS)
     {
-      QToolButton* tb = new QToolButton(self);
-      tb->setObjectName(QString("customView%1").arg(cc));
-      tb->setText(QString::number(cc + 1));
-      tb->setToolTip(tooltips[cc]);
-      tb->setProperty("pqCameraDialog_INDEX", cc);
-      tb->setMinimumSize(QSize(34, 34));
-      self->connect(tb, SIGNAL(clicked()), SLOT(applyCustomView()));
-      this->CustomViewButtons.push_back(tb);
-      this->customViewGridLayout->addWidget(tb, cc / 6, cc % 6);
+      self->connect(
+        this->PlusButton, SIGNAL(clicked()), SLOT(addCurrentViewpointToCustomViewpoints()));
+      this->customViewpointGridLayout->addWidget(
+        this->PlusButton, toolTips.size() / 6, toolTips.size() % 6);
     }
   }
 };
@@ -218,8 +246,11 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=null*/, Qt::WindowFlags f /*=0*/)
   QObject::connect(this->Internal->loadCameraConfiguration, SIGNAL(clicked()), this,
     SLOT(loadCameraConfiguration()));
 
-  QObject::connect(
-    this->Internal->configureCustomViews, SIGNAL(clicked()), this, SLOT(configureCustomViews()));
+  QObject::connect(this->Internal->configureCustomViewpoints, SIGNAL(clicked()), this,
+    SLOT(configureCustomViewpoints()));
+
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  this->connect(settings, SIGNAL(modified()), SLOT(updateCustomViewpointButtons()));
 
   QObject::connect(this->Internal->interactiveViewLinkComboBox, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateInteractiveViewLinkWidgets()));
@@ -235,16 +266,7 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=null*/, Qt::WindowFlags f /*=0*/)
 
   // load custom view buttons with any tool tips set by the user in a previous
   // session.
-  pqCameraDialogInternal* w = this->Internal;
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->beginGroup("CustomViewButtons");
-  settings->beginGroup("ToolTips");
-  const QStringList toolTips = getListOfStrings(settings, pqCustomViewButtonDialog::DEFAULT_TOOLTIP,
-    pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
-    pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
-  settings->endGroup();
-  settings->endGroup();
-  w->configureCustomViewButtons(toolTips, this);
+  this->updateCustomViewpointButtons();
 }
 
 //-----------------------------------------------------------------------------
@@ -364,6 +386,7 @@ void pqCameraDialog::updateInteractiveViewLinkWidgets()
   if (this->Internal->interactiveViewLinkComboBox->count() == 0)
   {
     this->Internal->interactiveViewLinkGroup->setEnabled(false);
+    this->Internal->interactiveViewLinkGroup->setCollapsed(true);
   }
   else
   {
@@ -516,44 +539,38 @@ void pqCameraDialog::resetRotationCenterWithCamera()
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::configureCustomViews()
+void pqCameraDialog::configureCustomViewpoints()
 {
-  pqCameraDialogInternal* ui = this->Internal;
+  if (pqCameraDialog::configureCustomViewpoints(
+        this, this->Internal->RenderModule->getRenderViewProxy()))
+  {
+    this->updateCustomViewpointButtons();
+  }
+}
 
-  // load the existing button configurations from the app wide settings.
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-
-  settings->beginGroup("CustomViewButtons");
-
-  settings->beginGroup("Configurations");
-  QStringList configs =
-    getListOfStrings(settings, QString(), pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
-      pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
-  settings->endGroup();
-
-  settings->beginGroup("ToolTips");
-  QStringList toolTips = getListOfStrings(settings, pqCustomViewButtonDialog::DEFAULT_TOOLTIP,
-    pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
-    pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
-  settings->endGroup();
-
-  settings->endGroup();
+//-----------------------------------------------------------------------------
+bool pqCameraDialog::configureCustomViewpoints(
+  QWidget* parentWidget, vtkSMRenderViewProxy* viewProxy)
+{
+  QStringList toolTips = pqCameraDialog::CustomViewpointToolTips();
+  QStringList configs = pqCameraDialog::CustomViewpointConfigurations();
 
   // grab the current camera configuration.
   std::ostringstream os;
 
-  vtkSMCameraConfigurationWriter* writer = vtkSMCameraConfigurationWriter::New();
-  writer->SetRenderViewProxy(ui->RenderModule->getRenderViewProxy());
+  vtkNew<vtkSMCameraConfigurationWriter> writer;
+  writer->SetRenderViewProxy(viewProxy);
   writer->WriteConfiguration(os);
 
   QString currentConfig(os.str().c_str());
 
   // user modifies the configuration
-  pqCustomViewButtonDialog dialog(this, 0, toolTips, configs, currentConfig);
+  pqCustomViewpointButtonDialog dialog(parentWidget, 0, toolTips, configs, currentConfig);
   if (dialog.exec() == QDialog::Accepted)
   {
     // save the new configuration into the app wide settings.
     configs = dialog.getConfigurations();
+    pqSettings* settings = pqApplicationCore::instance()->settings();
     settings->beginGroup("CustomViewButtons");
     settings->beginGroup("Configurations");
     settings->remove(""); // remove all items in the group.
@@ -574,13 +591,56 @@ void pqCameraDialog::configureCustomViews()
     }
     settings->endGroup();
     settings->endGroup();
-    ui->configureCustomViewButtons(toolTips, this);
+    settings->alertSettingsModified();
+    return true;
   }
-  writer->Delete();
+  return false;
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::applyCustomView()
+void pqCameraDialog::addCurrentViewpointToCustomViewpoints()
+{
+  if (pqCameraDialog::addCurrentViewpointToCustomViewpoints(
+        this->Internal->RenderModule->getRenderViewProxy()))
+  {
+    this->updateCustomViewpointButtons();
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool pqCameraDialog::addCurrentViewpointToCustomViewpoints(vtkSMRenderViewProxy* viewProxy)
+{
+  if (!viewProxy)
+  {
+    return false;
+  }
+
+  // grab the current camera configuration.
+  std::ostringstream os;
+  vtkNew<vtkSMCameraConfigurationWriter> writer;
+  writer->SetRenderViewProxy(viewProxy);
+  writer->WriteConfiguration(os);
+
+  // load the existing button configurations from the app wide settings.
+  QStringList configs = pqCameraDialog::CustomViewpointConfigurations();
+
+  // Add current viewpoint config to setting
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+  settings->beginGroup("Configurations");
+  settings->setValue(QString::number(configs.size()), os.str().c_str());
+  settings->endGroup();
+  settings->beginGroup("ToolTips");
+  settings->setValue(
+    QString::number(configs.size()), QString("Current Viewpoint %1").arg(configs.size() + 1));
+  settings->endGroup();
+  settings->endGroup();
+  settings->alertSettingsModified();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCustomViewpoint()
 {
   int buttonId = -1;
   if (QObject* asender = this->sender())
@@ -592,43 +652,126 @@ void pqCameraDialog::applyCustomView()
     return;
   }
 
-  pqCameraDialogInternal* ui = this->Internal;
+  if (pqCameraDialog::applyCustomViewpoint(
+        buttonId, this->Internal->RenderModule->getRenderViewProxy()))
+  {
+    // camera configuration has been modified update the scene.
+    this->Internal->RenderModule->render();
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool pqCameraDialog::applyCustomViewpoint(int CustomViewpointIndex, vtkSMRenderViewProxy* viewProxy)
+{
+  if (!viewProxy)
+  {
+    return false;
+  }
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+  settings->beginGroup("Configurations");
+  QString config = settings->value(QString::number(CustomViewpointIndex), "").toString();
+  settings->endGroup();
+  settings->endGroup();
+  if (config.isEmpty())
+  {
+    return false;
+  }
+
+  vtkNew<vtkPVXMLParser> parser;
+  parser->InitializeParser();
+  parser->ParseChunk(config.toLocal8Bit().data(), static_cast<unsigned int>(config.size()));
+  parser->CleanupParser();
+
+  vtkPVXMLElement* xmlStream = parser->GetRootElement();
+  if (!xmlStream)
+  {
+    pqErrorMacro("Invalid XML in custom view button configuration.");
+    return false;
+  }
+
+  vtkNew<vtkSMCameraConfigurationReader> reader;
+  reader->SetRenderViewProxy(viewProxy);
+  if (reader->ReadConfiguration(xmlStream) == 0)
+  {
+    pqErrorMacro(<< "Invalid XML in custom view button " << CustomViewpointIndex
+                 << " configuration.");
+    return false;
+  }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool pqCameraDialog::deleteCustomViewpoint(
+  int CustomViewpointIndex, vtkSMRenderViewProxy* viewProxy)
+{
+  if (!viewProxy)
+  {
+    return false;
+  }
+  QStringList toolTips = pqCameraDialog::CustomViewpointToolTips();
+  if (CustomViewpointIndex >= toolTips.size())
+  {
+    return false;
+  }
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
   settings->beginGroup("Configurations");
-  QString config = settings->value(QString::number(buttonId), "").toString();
-  settings->endGroup();
-  settings->endGroup();
-
-  if (!config.isEmpty() && ui->RenderModule)
+  for (int i = 0; i < toolTips.size() - 1; i++)
   {
-    vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
-    parser->InitializeParser();
-    parser->ParseChunk(config.toLocal8Bit().data(), static_cast<unsigned int>(config.size()));
-    parser->CleanupParser();
-
-    vtkPVXMLElement* xmlStream = parser->GetRootElement();
-    if (!xmlStream)
+    if (i < CustomViewpointIndex)
     {
-      pqErrorMacro("Invalid XML in custom view button configuration.");
-      return;
+      continue;
     }
-
-    vtkSmartPointer<vtkSMCameraConfigurationReader> reader =
-      vtkSmartPointer<vtkSMCameraConfigurationReader>::New();
-
-    reader->SetRenderViewProxy(ui->RenderModule->getRenderViewProxy());
-    int ok = reader->ReadConfiguration(xmlStream);
-    if (!ok)
-    {
-      pqErrorMacro(<< "Invalid XML in custom view button " << buttonId << " configuration.");
-      return;
-    }
-
-    // camera configuration has been modified update the scene.
-    ui->RenderModule->render();
+    settings->setValue(QString::number(i), settings->value(QString::number(i + 1)));
   }
+  settings->remove(QString::number(toolTips.size() - 1));
+  settings->endGroup();
+  settings->beginGroup("ToolTips");
+  for (int i = 0; i < toolTips.size() - 1; i++)
+  {
+    if (i < CustomViewpointIndex)
+    {
+      continue;
+    }
+    settings->setValue(QString::number(i), settings->value(QString::number(i + 1)));
+  }
+  settings->remove(QString::number(toolTips.size() - 1));
+  settings->endGroup();
+  settings->endGroup();
+  settings->alertSettingsModified();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool pqCameraDialog::setToCurrentViewpoint(
+  int CustomViewpointIndex, vtkSMRenderViewProxy* viewProxy)
+{
+  if (!viewProxy)
+  {
+    return false;
+  }
+
+  // grab the current camera configuration.
+  std::ostringstream os;
+  vtkNew<vtkSMCameraConfigurationWriter> writer;
+  writer->SetRenderViewProxy(viewProxy);
+  writer->WriteConfiguration(os);
+
+  // load the existing button configurations from the app wide settings.
+  QStringList configs = pqCameraDialog::CustomViewpointConfigurations();
+
+  // Add current viewpoint config to setting
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+  settings->beginGroup("Configurations");
+  settings->setValue(QString::number(CustomViewpointIndex), os.str().c_str());
+  settings->endGroup();
+  settings->endGroup();
+  settings->alertSettingsModified();
+  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -687,4 +830,42 @@ void pqCameraDialog::loadCameraConfiguration()
   }
 
   reader->Delete();
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqCameraDialog::CustomViewpointConfigurations()
+{
+  // Recover configurations from settings
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+  settings->beginGroup("Configurations");
+  const QStringList configs =
+    getListOfStrings(settings, pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP,
+      pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
+      pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+  settings->endGroup();
+  settings->endGroup();
+  return configs;
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqCameraDialog::CustomViewpointToolTips()
+{
+  // Recover tooltTips from settings
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+  settings->beginGroup("ToolTips");
+  const QStringList toolTips =
+    getListOfStrings(settings, pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP,
+      pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS,
+      pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+  settings->endGroup();
+  settings->endGroup();
+  return toolTips;
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::updateCustomViewpointButtons()
+{
+  this->Internal->updateCustomViewpointButtons(this);
 }

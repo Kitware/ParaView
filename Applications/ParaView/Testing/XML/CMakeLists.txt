@@ -346,6 +346,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CreateDelete.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomSourceProbe.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CustomViewpoints.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DataOutlines.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DisableResetDisplayEmptyViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DualSphereAnimation.xml
