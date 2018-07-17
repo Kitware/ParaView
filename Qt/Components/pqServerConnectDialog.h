@@ -83,6 +83,18 @@ public:
   static bool selectServer(pqServerConfiguration& selected_configuration,
     QWidget* dialogParent = NULL, const pqServerResource& selector = pqServerResource());
 
+signals:
+
+  /**
+   * Emitted when a server is added.
+   */
+  void serverAdded();
+
+  /**
+   * Emitted when a server is deleted.
+   */
+  void serverDeleted();
+
 protected slots:
   /**
   * called to update the shown server configurations.
@@ -92,7 +104,7 @@ protected slots:
   /**
   * called when user selects a server.
   */
-  void onServerSelected(int row);
+  void onServerSelected();
 
   /**
   * called when user clicks "edit-server"
@@ -103,6 +115,11 @@ protected slots:
   * called when user clicks "add-server"
   */
   void addServer();
+
+  /**
+   * Called when a server has been added or deleted.
+   */
+  void updateButtons();
 
   /**
   * called when user changes the server-type.
