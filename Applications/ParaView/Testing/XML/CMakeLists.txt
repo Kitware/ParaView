@@ -320,6 +320,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AngularPeriodicFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/BagPlots.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/BagPlotsSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
@@ -915,6 +916,8 @@ IF (PARAVIEW_USE_MPI)
   # Hence disable them.
   set (BagPlots_DISABLE_CS TRUE)
   set (BagPlots_DISABLE_CRS TRUE)
+  set (BagPlotsSelection_DISABLE_CS TRUE)
+  set (BagPlotsSelection_DISABLE_CRS TRUE)
   set (FunctionalBagPlots_DISABLE_CS TRUE)
   set (FunctionalBagPlots_DISABLE_CRS TRUE)
 
