@@ -5871,6 +5871,10 @@ void regcell(long icell, long nc)
       default: break;
      }
 
+   /* Avoid warning about possible use of uninitialized array element */
+   /* fverts[0] used below. */
+   fverts[0] = 0;
+
    /*  Build face information.  */
    for (i = 0; i < nfaces; i++)
       nverts[i] = nv[i];
