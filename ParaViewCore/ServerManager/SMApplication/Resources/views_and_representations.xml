@@ -3914,6 +3914,7 @@
             <Property name="ScaleByArray" />
             <Property name="SetScaleArray" />
             <Property name="ScaleArrayComponent" />
+            <Property name="UseScaleFunction" />
             <Property name="ScaleTransferFunction" />
             <Property name="OpacityByArray" />
             <Property name="OpacityArray" />
@@ -4746,6 +4747,18 @@
         <Documentation>
           If this property is on, the Scale Array will be used to determine that radii
           of the gaussians.  Otherwise the Default Radius will be used.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseScaleFunction"
+                         default_values="1"
+                         name="UseScaleFunction"
+                         number_of_elements="1"
+                         label="Use Scale Transfer Function"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is enabled, the Scale Transfer Function is used to map
+          the scale values of the Scale Array. Otherwise, the scale values are used as-is.
         </Documentation>
       </IntVectorProperty>
       <ProxyProperty command="SetOpacityTransferFunction"
