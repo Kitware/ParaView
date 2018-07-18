@@ -2,6 +2,7 @@
 
 #include "vtkActor.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkDataSet.h"
@@ -199,13 +200,11 @@ int vtkPointGaussianRepresentation::RequestData(
   }
   else if (compositeInput)
   {
-    vtkNew<vtkCompositeDataToUnstructuredGridFilter> merge;
-    merge->SetInputData(compositeInput);
-    merge->Update();
-    input = merge->GetOutput();
+    // only will draw polydatas
+    this->ProcessedData = compositeInput;
   }
 
-  // The mapper underneath expect only PolyData
+  // The mapper underneath expect only PolyData or CompositePD
   // Apply conversion - We do not need vertex list as we
   // use all the points in that use case
   if (this->ProcessedData == NULL && input != NULL && input->GetNumberOfPoints() > 0)
@@ -246,8 +245,31 @@ int vtkPointGaussianRepresentation::ProcessViewRequest(
     // 1. Provide the data being rendered.
     if (this->ProcessedData)
     {
+      vtkPolyData* pd = vtkPolyData::SafeDownCast(this->ProcessedData);
+      vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(this->ProcessedData);
+      if (pd)
+      {
+        pd->GetBounds(bounds);
+      }
+      if (cd)
+      {
+        vtkBoundingBox bbox;
+        vtkCompositeDataIterator* iter = cd->NewIterator();
+        for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+        {
+          vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+          if (ds)
+          {
+            double tmpBounds[6];
+            ds->GetBounds(tmpBounds);
+            bbox.AddBounds(tmpBounds);
+          }
+        }
+        bbox.GetBounds(bounds);
+        iter->Delete();
+      }
+
       vtkPVRenderView::SetPiece(inInfo, this, this->ProcessedData);
-      this->ProcessedData->GetBounds(bounds);
     }
 
     // 2. Provide the bounds.

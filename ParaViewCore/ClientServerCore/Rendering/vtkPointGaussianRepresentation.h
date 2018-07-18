@@ -29,10 +29,10 @@
 #include <vector>            // for std::vector
 
 class vtkActor;
+class vtkDataObject;
+class vtkPiecewiseFunction;
 class vtkPointGaussianMapper;
 class vtkScalarsToColors;
-class vtkPolyData;
-class vtkPiecewiseFunction;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPointGaussianRepresentation
   : public vtkPVDataRepresentation
@@ -206,7 +206,7 @@ protected:
 
   vtkSmartPointer<vtkActor> Actor;
   vtkSmartPointer<vtkPointGaussianMapper> Mapper;
-  vtkSmartPointer<vtkPolyData> ProcessedData;
+  vtkSmartPointer<vtkDataObject> ProcessedData;
   vtkSmartPointer<vtkPiecewiseFunction> ScaleFunction;
 
   int SelectedPreset;
