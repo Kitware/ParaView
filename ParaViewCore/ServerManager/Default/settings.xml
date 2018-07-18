@@ -359,6 +359,18 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ResetDisplayEmptyViews"
+        number_of_elements="1"
+        default_values="1"
+        command="SetResetDisplayEmptyViews"
+        panel_visibility="advanced">
+        <Documentation>
+          When showing a representation in an empty view, set wether or not to reset
+          the view display.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="InheritRepresentationProperties"
         command="SetInheritRepresentationProperties"
         number_of_elements="1"
@@ -464,6 +476,7 @@
       </PropertyGroup>
 
       <PropertyGroup label="Miscellaneous">
+        <Property name="ResetDisplayEmptyViews" />
         <Property name="InheritRepresentationProperties" />
         <Property name="DefaultTimeStep" />
         <Property name="MaximumNumberOfDataRepresentationLabels" />

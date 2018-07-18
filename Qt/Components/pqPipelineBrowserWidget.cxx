@@ -260,7 +260,8 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, const QModelIndexList&
   }
   if (pqView* view = pqActiveObjects::instance().activeView())
   {
-    if (view->getNumberOfVisibleDataRepresentations() == 1 && visible)
+    if (view->getNumberOfVisibleDataRepresentations() == 1 && visible &&
+      vtkPVGeneralSettings::GetInstance()->GetResetDisplayEmptyViews())
     {
       view->resetDisplay();
     }
