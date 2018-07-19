@@ -262,7 +262,7 @@
         "DataSetSurfaceFilter",
         "ExtractBlock",
         "ExtractHistogram",
-        "Glyph",
+        "GlyphLegacy",
         "ImageDataToPointSet",
         "IntegrateAttributes",
         "PVExtractSelection",

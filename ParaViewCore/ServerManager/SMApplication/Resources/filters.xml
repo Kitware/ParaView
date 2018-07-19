@@ -7909,8 +7909,8 @@ Every Nth Point.
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVGlyphFilter"
-                 name="Glyph">
+    <SourceProxy class="vtkPVGlyphFilterLegacy"
+                 name="GlyphLegacy">
       <Documentation long_help="This filter produces a glyph at each point of in input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
                      short_help="Generate a glyph at each point of the input data set.">
 The Glyph filter generates a glyph (i.e., an arrow, cone, cube,
@@ -8204,9 +8204,9 @@ source.</Documentation>
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVGlyphFilter"
-                 label="Glyph With Custom Source"
-                 name="GlyphWithCustomSource">
+    <SourceProxy class="vtkPVGlyphFilterLegacy"
+                 label="Glyph With Custom Source Legacy"
+                 name="GlyphWithCustomSourceLegacy">
       <Documentation long_help="This filter generates a glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
                      short_help="Generate a glyph symbol at each point of the input data set.">
       The Glyph filter generates a glyph at each point in the input dataset.
@@ -13146,7 +13146,7 @@ source.</Documentation>
              group="filters"
              id="2429"
              servers="1"
-             type="Glyph">
+             type="GlyphLegacy">
         <Property id="2429.Input"
                   name="Input"
                   number_of_elements="1">

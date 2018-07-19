@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVGlyphFilter.h
+  Module:    vtkPVGlyphFilterLegacy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -13,12 +13,12 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVGlyphFilter
+ * @class   vtkPVGlyphFilterLegacy
  * @brief   extended API for vtkGlyph3D for better control
  * over glyph placement.
  *
  *
- * vtkPVGlyphFilter extends vtkGlyph3D for adding control over which points are
+ * vtkPVGlyphFilterLegacy extends vtkGlyph3D for adding control over which points are
  * glyphed using \c GlyphMode. Three modes are now provided:
  * \li ALL_POINTS: all points in the input dataset are glyphed. This same as using
  * vtkGlyph3D directly.
@@ -37,15 +37,15 @@
  * across all ranks for generating identical sample points.
 */
 
-#ifndef vtkPVGlyphFilter_h
-#define vtkPVGlyphFilter_h
+#ifndef vtkPVGlyphFilterLegacy_h
+#define vtkPVGlyphFilterLegacy_h
 
 #include "vtkGlyph3D.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilterLegacy : public vtkGlyph3D
 {
 public:
   enum GlyphModeType
@@ -55,9 +55,9 @@ public:
     SPATIALLY_UNIFORM_DISTRIBUTION
   };
 
-  vtkTypeMacro(vtkPVGlyphFilter, vtkGlyph3D);
+  vtkTypeMacro(vtkPVGlyphFilterLegacy, vtkGlyph3D);
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
-  static vtkPVGlyphFilter* New();
+  static vtkPVGlyphFilterLegacy* New();
 
   //@{
   /**
@@ -109,8 +109,8 @@ public:
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
 protected:
-  vtkPVGlyphFilter();
-  ~vtkPVGlyphFilter() override;
+  vtkPVGlyphFilterLegacy();
+  ~vtkPVGlyphFilterLegacy() override;
   //@}
 
   // Standard Pipeline methods
@@ -159,8 +159,8 @@ protected:
   vtkMultiProcessController* Controller;
 
 private:
-  vtkPVGlyphFilter(const vtkPVGlyphFilter&) = delete;
-  void operator=(const vtkPVGlyphFilter&) = delete;
+  vtkPVGlyphFilterLegacy(const vtkPVGlyphFilterLegacy&) = delete;
+  void operator=(const vtkPVGlyphFilterLegacy&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

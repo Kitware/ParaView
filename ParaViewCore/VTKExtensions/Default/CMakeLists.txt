@@ -107,7 +107,7 @@ set(Module_SRCS
   vtkPVExtractComponent.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
-  vtkPVGlyphFilter.cxx
+  vtkPVGlyphFilterLegacy.cxx
   vtkPVNewGlyphFilter.cxx
   vtkPVGridAxes3DActor.cxx
   vtkPVImageReader.cxx

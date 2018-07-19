@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  static const char* const filters[] = { "PVExtractSelection", "ExtractHistogram", "Glyph",
+  static const char* const filters[] = { "PVExtractSelection", "ExtractHistogram", "GlyphLegacy",
     "WarpScalar", "WarpVector", "IntegrateAttributes", "DataSetSurfaceFilter", NULL };
 
   const char* const* name = &filters[0];
