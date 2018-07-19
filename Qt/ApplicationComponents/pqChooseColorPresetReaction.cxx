@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
+QPointer<pqPresetDialog> pqChooseColorPresetReaction::PresetDialog;
+
 namespace pvInternals
 {
 vtkSMProxy* lutProxy(vtkSMProxy* reprProxy)
@@ -128,18 +130,30 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
 
   bool indexedLookup = vtkSMPropertyHelper(lut, "IndexedLookup", true).GetAsInt() != 0;
 
-  pqPresetDialog* dialog = new pqPresetDialog(pqCoreUtilities::mainWidget(), indexedLookup
-      ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
-      : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
-  dialog->setCurrentPreset(presetName);
-  dialog->setCustomizableLoadColors(!indexedLookup);
-  dialog->setCustomizableLoadOpacities(!indexedLookup);
-  dialog->setCustomizableUsePresetRange(!indexedLookup);
-  dialog->setCustomizableLoadAnnotations(indexedLookup);
-  dialog->setAttribute(Qt::WA_DeleteOnClose, true);
-  this->connect(dialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
-  this->connect(dialog, SIGNAL(finished(int)), SIGNAL(presetDialogClosed()));
-  dialog->show();
+  if (PresetDialog)
+  {
+    PresetDialog->setMode(indexedLookup ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
+                                        : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
+  }
+  else
+  {
+    // This should be deleted when the mainWidget is closed and it should be impossible
+    // to get back here with the preset dialog open due to the event filtering done by
+    // the preset dialog.
+    PresetDialog = new pqPresetDialog(pqCoreUtilities::mainWidget(), indexedLookup
+        ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
+        : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
+    this->connect(PresetDialog, &pqPresetDialog::applyPreset, this,
+      []() { std::cerr << "got signal" << std::endl; });
+  }
+
+  PresetDialog->setCurrentPreset(presetName);
+  PresetDialog->setCustomizableLoadColors(!indexedLookup);
+  PresetDialog->setCustomizableLoadOpacities(!indexedLookup);
+  PresetDialog->setCustomizableUsePresetRange(!indexedLookup);
+  PresetDialog->setCustomizableLoadAnnotations(indexedLookup);
+  this->connect(PresetDialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
+  PresetDialog->show();
   return true;
 }
 
@@ -148,6 +162,7 @@ void pqChooseColorPresetReaction::applyCurrentPreset()
 {
   pqPresetDialog* dialog = qobject_cast<pqPresetDialog*>(this->sender());
   Q_ASSERT(dialog);
+  Q_ASSERT(dialog == PresetDialog);
 
   vtkSMProxy* lut = this->TransferFunctionProxy;
   if (!lut)

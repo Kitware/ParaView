@@ -78,11 +78,12 @@ class pqPresetDialogTableModel : public QAbstractTableModel
   }
 
 public:
-  vtkNew<vtkSMTransferFunctionPresets> Presets;
+  vtkSmartPointer<vtkSMTransferFunctionPresets> Presets;
 
   pqPresetDialogTableModel(QObject* parentObject)
     : Superclass(parentObject)
   {
+    this->Presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
     this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
   }
 
@@ -92,6 +93,15 @@ public:
   {
     this->beginResetModel();
     this->Presets->ImportPresets(filename.toStdString().c_str());
+    this->endResetModel();
+  }
+
+  void reset()
+  {
+    this->beginResetModel();
+    this->Presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
+    this->Pixmaps.clear();
+    this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
     this->endResetModel();
   }
 
@@ -290,6 +300,12 @@ public:
   }
   ~pqPresetDialogProxyModel() override {}
 
+  void setMode(pqPresetDialog::Modes mode)
+  {
+    this->Mode = mode;
+    this->invalidateFilter();
+  }
+
   bool isShowingAdvanced() { return ShowAdvanced; }
   void setShowAdvanced(bool show)
   {
@@ -452,6 +468,13 @@ public:
         // all events to it are blocked.  It locks X completely.
         return false;
       }
+      else if (obj->inherits("QListView") && obj->parent() == nullptr)
+      {
+        // This is the list that pops up in the export/import file dialog to
+        // complete the filename you have started typing.  Similar to the QMenu,
+        // if not handled it locks X completely.
+        return false;
+      }
       obj = obj->parent();
     }
     return true;
@@ -519,6 +542,20 @@ public:
     this->Ui.gradients->verticalHeader()->setDefaultSectionSize(
       (int)(this->Ui.gradients->verticalHeader()->defaultSectionSize() * 1.5));
   }
+
+  void setMode(Modes mode)
+  {
+    this->ProxyModel->setMode(mode);
+    this->Ui.advancedButton->setEnabled(mode != SHOW_INDEXED_COLORS_ONLY);
+    if (mode == SHOW_INDEXED_COLORS_ONLY)
+    {
+      this->Ui.advancedButton->setChecked(true);
+      this->ProxyModel->setShowAdvanced(true);
+    }
+    this->Ui.gradients->selectionModel()->clear();
+  }
+
+  void resetModel() { this->Model->reset(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -543,15 +580,32 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
     this->updateEnabledStateForSelection();
   });
   this->connect(ui.showDefault, SIGNAL(stateChanged(int)), SLOT(setPresetIsAdvanced(int)));
-  QApplication::instance()->installEventFilter(this->Internals->EventFilter.data());
 }
 
 //-----------------------------------------------------------------------------
 pqPresetDialog::~pqPresetDialog()
 {
-  QApplication::instance()->removeEventFilter(this->Internals->EventFilter.data());
 }
 
+//-----------------------------------------------------------------------------
+void pqPresetDialog::showEvent(QShowEvent* e)
+{
+  QApplication::instance()->installEventFilter(this->Internals->EventFilter.data());
+  QDialog::showEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+void pqPresetDialog::closeEvent(QCloseEvent* e)
+{
+  QApplication::instance()->removeEventFilter(this->Internals->EventFilter.data());
+  QDialog::closeEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+void pqPresetDialog::setMode(Modes mode)
+{
+  this->Internals->setMode(mode);
+}
 //-----------------------------------------------------------------------------
 void pqPresetDialog::setCustomizableLoadColors(bool state, bool defaultValue)
 {
@@ -588,9 +642,16 @@ void pqPresetDialog::setCustomizableUsePresetRange(bool state, bool defaultValue
 void pqPresetDialog::setCurrentPreset(const char* presetName)
 {
   pqInternals& internals = (*this->Internals);
+  // since the preset dialog is persistent and a new preset could have been added,
+  // reset the loaded presets.
+  if (presetName)
+  {
+    internals.resetModel();
+  }
   QModelIndex idx = internals.Model->indexFromName(presetName);
   if (!idx.isValid())
   {
+    internals.Ui.gradients->selectionModel()->clear();
     return;
   }
   auto newIdx = internals.ProxyModel->mapFromSource(idx);

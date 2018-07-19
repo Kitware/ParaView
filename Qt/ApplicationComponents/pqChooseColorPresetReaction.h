@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>         // needed for QPointer
 
 class pqDataRepresentation;
+class pqPresetDialog;
 class vtkSMProxy;
 
 /**
@@ -106,10 +107,6 @@ signals:
   * fired every time a preset is applied.
   */
   void presetApplied();
-  /**
-   * fired when the preset dialog is closed.
-   */
-  void presetDialogClosed();
 
 private slots:
   void applyCurrentPreset();
@@ -130,6 +127,7 @@ private:
   Q_DISABLE_COPY(pqChooseColorPresetReaction)
   QPointer<pqDataRepresentation> Representation;
   vtkWeakPointer<vtkSMProxy> TransferFunctionProxy;
+  static QPointer<pqPresetDialog> PresetDialog;
 };
 
 #endif
