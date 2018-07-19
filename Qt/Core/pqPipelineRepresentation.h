@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include <QPair>
 
-class pqPipelineRepresentationInternal;
 class pqPipelineSource;
 class pqRenderViewModule;
 class pqServer;
