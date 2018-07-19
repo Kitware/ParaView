@@ -7911,6 +7911,9 @@ Every Nth Point.
     <!-- ==================================================================== -->
     <SourceProxy class="vtkPVGlyphFilterLegacy"
                  name="GlyphLegacy">
+      <Deprecated deprecated_in="5.6" to_remove_in="5.7">
+        It has been replaced by 'GlyphWithCustomSource'. Please consider using that instead.
+      </Deprecated>
       <Documentation long_help="This filter produces a glyph at each point of in input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
                      short_help="Generate a glyph at each point of the input data set.">
 The Glyph filter generates a glyph (i.e., an arrow, cone, cube,
