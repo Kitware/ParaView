@@ -20,7 +20,6 @@
 #include "vtkMergeArrays.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
-#include "vtkPVLegacyGlyphFilter.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPlane.h"
 #include "vtkPolyData.h"
@@ -54,11 +53,6 @@ int TestPVFilters(int argc, char* argv[])
   gs->SetScale(1);
   gs->FilledOff();
   gs->CrossOff();
-
-  vtkPVLegacyGlyphFilter* glyph = vtkPVLegacyGlyphFilter::New();
-  glyph->SetInputConnection(clean->GetOutputPort());
-  glyph->SetSourceConnection(gs->GetOutputPort());
-  glyph->SetScaleFactor(0.75);
 
   vtkContourFilter* contour = vtkContourFilter::New();
   contour->SetInputConnection(clean->GetOutputPort());
@@ -101,7 +95,6 @@ int TestPVFilters(int argc, char* argv[])
   vtkMergeArrays* merge = vtkMergeArrays::New();
   merge->AddInputConnection(warp->GetOutputPort());
   merge->AddInputConnection(clip->GetOutputPort());
-  merge->AddInputConnection(glyph->GetOutputPort());
   merge->Update(); // discard
 
   vtkDataSetMapper* warpMapper = vtkDataSetMapper::New();
@@ -122,7 +115,6 @@ int TestPVFilters(int argc, char* argv[])
   reader->Delete();
   clean->Delete();
   gs->Delete();
-  glyph->Delete();
   contour->Delete();
   plane->Delete();
   clip->Delete();

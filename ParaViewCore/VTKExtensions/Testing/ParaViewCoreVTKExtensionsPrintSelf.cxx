@@ -108,7 +108,6 @@
 #include "vtkPVJoystickFlyOut.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLODVolume.h"
-#include "vtkPVLegacyGlyphFilter.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVNullSource.h"
@@ -288,7 +287,6 @@ int ParaViewCoreVTKExtensionsPrintSelf(int, char* [])
   PRINT_SELF(vtkPVExtractVOI);
   PRINT_SELF(vtkPVFrustumActor);
   PRINT_SELF(vtkPVGeometryFilter);
-  PRINT_SELF(vtkPVLegacyGlyphFilter);
   PRINT_SELF(vtkPVInteractorStyle);
   PRINT_SELF(vtkPVJoystickFly);
   PRINT_SELF(vtkPVJoystickFlyIn);

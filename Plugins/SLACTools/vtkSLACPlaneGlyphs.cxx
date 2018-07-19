@@ -109,15 +109,6 @@ int vtkSLACPlaneGlyphs::RequestData(vtkInformation* vtkNotUsed(request),
   threshold->SetInputArrayToProcess(
     0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS, "vtkValidPointMask");
 
-  // TODO: Run the output of the threshold filter through the glyph filter.  It
-  // would look something like this.
-  // VTK_CREATE(vtkPVLegacyGlyphFilter, glyph);
-  // glyph->SetInputConnection(threshold->GetOutputPort());
-  // Set up how you want the glyphs to look.
-  // glyph->Update();
-  // output->ShallowCopy(glyph->GetOutput());
-  // Instead, we are now just writing out the sampled points.
-
   threshold->Update();
   output->ShallowCopy(threshold->GetOutput());
   output->GetPointData()->RemoveArray("vtkValidPointMask");

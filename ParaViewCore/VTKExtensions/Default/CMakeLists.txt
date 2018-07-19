@@ -109,7 +109,6 @@ set(Module_SRCS
   vtkPVGlyphFilter.cxx
   vtkPVGridAxes3DActor.cxx
   vtkPVImageReader.cxx
-  vtkPVLegacyGlyphFilter.cxx
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMetaClipDataSet.cxx
   vtkPVMetaSliceDataSet.cxx
