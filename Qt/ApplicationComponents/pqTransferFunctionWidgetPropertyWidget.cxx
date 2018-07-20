@@ -133,7 +133,6 @@ void pqTransferFunctionWidgetPropertyWidget::onDomainChanged()
       this->Range[0] = this->Range[1] = this->Domain->GetRangeMaximum(0);
     }
   }
-  this->updateRange();
   emit this->domainChanged();
 }
 
