@@ -137,6 +137,10 @@ public:
    */
   bool supportsQuickLaunch() const { return this->SupportsQuickLaunch; }
 
+  void setEnableBookmarks(bool enable) { this->EnableBookmarks = enable; }
+
+  QMenu* getBookmarksMenu();
+
 public slots:
   /**
   * Load a configuration XML. It will find the elements with resourceTagName
@@ -193,19 +197,33 @@ protected slots:
    */
   void populateRecentlyUsedMenu();
 
+  /**
+   * called when "bookmarks" menu is being shown.
+   * create the menu (and submenu) with actions for the filters in the bookmarks list.
+   */
+  void populateBookmarksMenu();
+
 protected:
   QString ResourceTagName;
   vtkPVXMLElement* MenuRoot;
   int RecentlyUsedMenuSize;
   bool Enabled;
+  bool EnableBookmarks;
 
   void loadRecentlyUsedItems();
   void saveRecentlyUsedItems();
 
   /**
+   * Load the bookmarks from settings.
+   */
+  void loadBookmarksItems();
+
+  /**
   * Returns the action for a given proxy.
   */
   QAction* getAction(const QString& pgroup, const QString& proxyname);
+
+  QAction* getAddToCategoryAction(const QString& path);
 
 private:
   Q_DISABLE_COPY(pqProxyGroupMenuManager)

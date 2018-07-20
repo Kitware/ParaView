@@ -49,6 +49,10 @@ set (Module_SRCS
   pqArraySelectionWidget.h
   pqArrayStatusPropertyWidget.cxx
   pqArrayStatusPropertyWidget.h
+  pqBookmarksDialog.cxx
+  pqBookmarksDialog.h
+  pqBookmarksTreeWidget.cxx
+  pqBookmarksTreeWidget.h
   pqCalculatorWidget.cxx
   pqCalculatorWidget.h
   pqCameraDialog.cxx
@@ -328,6 +332,8 @@ set (Module_MOC_HDRS
   pqArrayListDomain.h
   pqArraySelectionWidget.h
   pqArrayStatusPropertyWidget.h
+  pqBookmarksDialog.h
+  pqBookmarksTreeWidget.h
   pqCalculatorWidget.h
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
@@ -460,6 +466,7 @@ set (Module_MOC_HDRS
 set (Module_UI_FILES
   Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui
+  Resources/UI/pqBookmarksDialog.ui
   Resources/UI/pqCalculatorWidget.ui
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraKeyFrameWidget.ui

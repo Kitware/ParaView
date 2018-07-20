@@ -91,6 +91,7 @@ paraview_test_load_data(""
 SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ArrayBoundsScaleDomain.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/BookmarksFilters.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomOutputFormat.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DelimitedTextReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportFilteredColumnsSpreadsheet.xml
