@@ -278,11 +278,13 @@ void vtkPVInteractorStyle::DollyToPosition(double fact, int* position, vtkRender
   else
   {
     // Zoom relatively to the cursor position
-    double viewFocus[4], newCameraPos[3];
+    double viewFocus[4], originalViewFocus[3], cameraPos[3], newCameraPos[3];
     double newFocalPoint[4], norm[3];
 
     // Move focal point to cursor position
+    cam->GetPosition(cameraPos);
     cam->GetFocalPoint(viewFocus);
+    cam->GetFocalPoint(originalViewFocus);
     cam->GetViewPlaneNormal(norm);
 
     vtkPVInteractorStyle::ComputeWorldToDisplay(
@@ -298,14 +300,11 @@ void vtkPVInteractorStyle::DollyToPosition(double fact, int* position, vtkRender
 
     // Find new focal point
     cam->GetPosition(newCameraPos);
-    cam->GetFocalPoint(viewFocus);
+
     double newPoint[3];
-    double t = norm[0] * (viewFocus[0] - newCameraPos[0]) +
-      norm[1] * (viewFocus[1] - newCameraPos[1]) + norm[2] * (viewFocus[2] - newCameraPos[2]);
-    t = t / (pow(norm[0], 2) + pow(norm[1], 2) + pow(norm[2], 2));
-    newPoint[0] = newCameraPos[0] + norm[0] * t;
-    newPoint[1] = newCameraPos[1] + norm[1] * t;
-    newPoint[2] = newCameraPos[2] + norm[2] * t;
+    newPoint[0] = originalViewFocus[0] + newCameraPos[0] - cameraPos[0];
+    newPoint[1] = originalViewFocus[1] + newCameraPos[1] - cameraPos[1];
+    newPoint[2] = originalViewFocus[2] + newCameraPos[2] - cameraPos[2];
 
     cam->SetFocalPoint(newPoint);
   }
