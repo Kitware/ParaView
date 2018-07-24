@@ -367,10 +367,7 @@ public:
     return parentRowCount / this->NumColumns + (parentRowCount % this->NumColumns == 0 ? 0 : 1);
   }
 
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override
-  {
-    return this->NumColumns;
-  }
+  int columnCount(const QModelIndex& = QModelIndex()) const override { return this->NumColumns; }
 
   QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const override
   {
@@ -398,12 +395,12 @@ public:
     }
   }
 
-  QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const
+  QModelIndex index(int row, int column, const QModelIndex& = QModelIndex()) const override
   {
     return createIndex(row, column);
   }
 
-  QModelIndex parent(const QModelIndex& child) const { return QModelIndex(); }
+  QModelIndex parent(const QModelIndex&) const override { return QModelIndex(); }
 
 private:
   Q_DISABLE_COPY(pqPresetDialogReflowModel);
