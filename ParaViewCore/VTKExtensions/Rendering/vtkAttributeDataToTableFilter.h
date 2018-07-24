@@ -30,6 +30,7 @@
 #include "vtkTableAlgorithm.h"
 
 class vtkFieldData;
+class vtkIdTypeArray;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAttributeDataToTableFilter : public vtkTableAlgorithm
 {
@@ -126,6 +127,12 @@ protected:
 private:
   vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&) = delete;
   void operator=(const vtkAttributeDataToTableFilter&) = delete;
+
+  /**
+   * If original Ids for points are available (due to selection filtering),
+   * re-map the indices to original Ids.
+   */
+  void ConvertToOriginalIds(vtkDataSet* inputDS, vtkIdTypeArray* indices);
 };
 
 #endif
