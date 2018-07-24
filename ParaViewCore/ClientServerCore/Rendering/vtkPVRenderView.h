@@ -535,6 +535,7 @@ public:
   }
   //@}
 
+  //@{
   /**
    * This is an temporary/experimental option and may be removed without notice.
    * This is intended to be used within some experimental representations that
@@ -548,6 +549,9 @@ public:
    * ordered compositing will also be disabled.
    */
   static void SetForceDataDistributionMode(vtkInformation* info, int flag);
+  bool IsForceDataDistributionModeSet() const { return this->ForceDataDistributionMode != -1; }
+  int GetForceDataDistributionMode() const { return this->ForceDataDistributionMode; }
+  //@}
 
   //@{
   /**

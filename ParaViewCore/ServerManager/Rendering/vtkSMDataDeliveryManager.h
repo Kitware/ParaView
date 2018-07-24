@@ -76,6 +76,7 @@ protected:
     REMOTE_RENDERING_AND_LOW_RES = 3,
   };
   vtkTimeStamp DeliveryTimestamps[4];
+  int PreviousForceDataDistributionMode;
 
 private:
   vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&) = delete;

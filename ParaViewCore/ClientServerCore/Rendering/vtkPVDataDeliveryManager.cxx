@@ -626,7 +626,15 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
     }
     dataMover->SetInputData(data);
     dataMover->Update();
-    if (dataMover->GetOutputGeneratedOnProcess())
+    if (dataMover->GetOutputGeneratedOnProcess() ||
+      /* when ForceDataDistributionMode is set, the node rendering and the
+       * node having valid data don't necessary line up. Hence we take the
+       * safest approach i.e. we'll update the rendered geometry on each
+       * deliver. When `ForceDataDistributionMode` is toggled back, we redo
+       * all the geometry delivery as appropriate. See also
+       * `vtkSMDataDeliveryManager::Deliver`.
+       */
+      this->RenderView->IsForceDataDistributionModeSet())
     {
       item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
     }

@@ -31,6 +31,8 @@
 vtkStandardNewMacro(vtkSMDataDeliveryManager);
 //----------------------------------------------------------------------------
 vtkSMDataDeliveryManager::vtkSMDataDeliveryManager()
+  : PreviousForceDataDistributionMode(-1)
+
 {
 }
 
@@ -59,6 +61,19 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   bool use_distributed_rendering = interactive
     ? view->GetUseDistributedRenderingForInteractiveRender()
     : view->GetUseDistributedRenderingForStillRender();
+
+  if (this->PreviousForceDataDistributionMode != view->GetForceDataDistributionMode())
+  {
+    // if distribution mode is forced and different from previous,
+    // there's no guarantee what it will be and which nodes will have geometry.
+    // So we simply clear delivery timestamps to do deliveries with a clean
+    // slate.
+    this->PreviousForceDataDistributionMode = view->GetForceDataDistributionMode();
+    for (int cc = 0; cc < 4; ++cc)
+    {
+      this->DeliveryTimestamps[cc] = vtkTimeStamp();
+    }
+  }
 
   vtkMTimeType update_ts = view->GetUpdateTimeStamp();
   int delivery_type = LOCAL_RENDERING_AND_FULL_RES;
