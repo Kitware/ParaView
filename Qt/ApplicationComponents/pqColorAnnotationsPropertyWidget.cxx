@@ -634,8 +634,12 @@ public:
   pqAnnotationsModel Model;
   vtkNew<vtkEventQtSlotConnect> VTKConnector;
   QPointer<pqColorAnnotationsPropertyWidgetDecorator> Decorator;
+  QScopedPointer<QAction> TempAction;
+  QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
 
   pqInternals(pqColorAnnotationsPropertyWidget* self)
+    : TempAction(new QAction)
+    , ChoosePresetReaction(new pqChooseColorPresetReaction(this->TempAction.data(), false))
   {
     this->Ui.setupUi(self);
     this->Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
@@ -655,6 +659,9 @@ public:
     this->Ui.AnnotationsTable->horizontalHeader()->setStretchLastSection(true);
 
     this->Decorator = new pqColorAnnotationsPropertyWidgetDecorator(NULL, self);
+
+    QObject::connect(
+      this->ChoosePresetReaction.data(), SIGNAL(presetApplied()), self, SIGNAL(changeFinished()));
   }
 };
 
@@ -1280,14 +1287,9 @@ void pqColorAnnotationsPropertyWidget::removeAllAnnotations()
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::choosePreset(const char* presetName)
 {
-  QAction* tmp = new QAction(NULL);
-  pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(tmp, false);
-  ccpr->setTransferFunction(this->proxy());
-  this->connect(ccpr, SIGNAL(presetApplied()), SIGNAL(changeFinished()));
-  ccpr->choosePreset(presetName);
+  this->Internals->ChoosePresetReaction->setTransferFunction(this->proxy());
+  this->Internals->ChoosePresetReaction->choosePreset(presetName);
   emit this->indexedColorsChanged();
-  delete ccpr;
-  delete tmp;
 }
 
 //-----------------------------------------------------------------------------

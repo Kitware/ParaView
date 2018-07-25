@@ -120,6 +120,8 @@ public:
   QPointer<pqColorOpacityEditorWidgetDecorator> Decorator;
   vtkWeakPointer<vtkSMPropertyGroup> PropertyGroup;
   vtkWeakPointer<vtkSMProxy> ScalarOpacityFunctionProxy;
+  QScopedPointer<QAction> TempAction;
+  QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
 
   // We use this pqPropertyLinks instance to simply monitor smproperty changes.
   pqPropertyLinks LinksForMonitoringChanges;
@@ -130,6 +132,8 @@ public:
     : ColorTableModel(self)
     , OpacityTableModel(self)
     , PropertyGroup(group)
+    , TempAction(new QAction)
+    , ChoosePresetReaction(new pqChooseColorPresetReaction(this->TempAction.data(), false))
   {
     this->Ui.setupUi(self);
     this->Ui.CurrentDataValue->setValidator(new QDoubleValidator(self));
@@ -148,6 +152,9 @@ public:
     this->Ui.OpacityTable->horizontalHeader()->setHighlightSections(false);
     this->Ui.OpacityTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     this->Ui.OpacityTable->horizontalHeader()->setStretchLastSection(true);
+
+    QObject::connect(
+      this->ChoosePresetReaction.data(), SIGNAL(presetApplied()), self, SLOT(presetApplied()));
   }
 
   void render()
@@ -789,13 +796,8 @@ void pqColorOpacityEditorWidget::invertTransferFunctions()
 //-----------------------------------------------------------------------------
 void pqColorOpacityEditorWidget::choosePreset(const char* presetName)
 {
-  QAction* tmp = new QAction(NULL);
-  pqChooseColorPresetReaction* ccpr = new pqChooseColorPresetReaction(tmp, false);
-  ccpr->setTransferFunction(this->proxy());
-  this->connect(ccpr, SIGNAL(presetApplied()), SLOT(presetApplied()));
-  ccpr->choosePreset(presetName);
-  delete ccpr;
-  delete tmp;
+  this->Internals->ChoosePresetReaction->setTransferFunction(this->proxy());
+  this->Internals->ChoosePresetReaction->choosePreset(presetName);
 }
 
 //-----------------------------------------------------------------------------

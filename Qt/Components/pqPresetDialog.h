@@ -71,6 +71,11 @@ public:
   ~pqPresetDialog() override;
 
   /**
+  * Set the current mode (which type of presets are displayed)
+  */
+  void setMode(Modes mode);
+
+  /**
   * Set the current preset using its name.
   */
   void setCurrentPreset(const char* presetName);
@@ -137,6 +142,10 @@ protected slots:
   void exportPresets();
 
   void setPresetIsAdvanced(int newState);
+
+protected:
+  void showEvent(QShowEvent* e) override;
+  void closeEvent(QCloseEvent* e) override;
 
 private:
   Q_DISABLE_COPY(pqPresetDialog)

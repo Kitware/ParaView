@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>         // needed for QPointer
 
 class pqDataRepresentation;
+class pqPresetDialog;
 class vtkSMProxy;
 
 /**
@@ -126,6 +127,7 @@ private:
   Q_DISABLE_COPY(pqChooseColorPresetReaction)
   QPointer<pqDataRepresentation> Representation;
   vtkWeakPointer<vtkSMProxy> TransferFunctionProxy;
+  static QPointer<pqPresetDialog> PresetDialog;
 };
 
 #endif

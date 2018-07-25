@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
+#include "pqQVTKWidget.h"
 #include "pqSettings.h"
 #include "vtkNew.h"
 #include "vtkSMTransferFunctionPresets.h"
@@ -77,11 +78,12 @@ class pqPresetDialogTableModel : public QAbstractTableModel
   }
 
 public:
-  vtkNew<vtkSMTransferFunctionPresets> Presets;
+  vtkSmartPointer<vtkSMTransferFunctionPresets> Presets;
 
   pqPresetDialogTableModel(QObject* parentObject)
     : Superclass(parentObject)
   {
+    this->Presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
     this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
   }
 
@@ -91,6 +93,15 @@ public:
   {
     this->beginResetModel();
     this->Presets->ImportPresets(filename.toStdString().c_str());
+    this->endResetModel();
+  }
+
+  void reset()
+  {
+    this->beginResetModel();
+    this->Presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
+    this->Pixmaps.clear();
+    this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
     this->endResetModel();
   }
 
@@ -289,6 +300,12 @@ public:
   }
   ~pqPresetDialogProxyModel() override {}
 
+  void setMode(pqPresetDialog::Modes mode)
+  {
+    this->Mode = mode;
+    this->invalidateFilter();
+  }
+
   bool isShowingAdvanced() { return ShowAdvanced; }
   void setShowAdvanced(bool show)
   {
@@ -406,6 +423,65 @@ private:
   Q_DISABLE_COPY(pqPresetDialogReflowModel);
 };
 
+namespace
+{
+class pqPresetDialogFakeModality : public QObject
+{
+public:
+  pqPresetDialogFakeModality(pqPresetDialog* p)
+    : QObject(p)
+    , Self(p)
+  {
+  }
+  bool eventFilter(QObject* obj, QEvent* event) override
+  {
+    if (!dynamic_cast<QInputEvent*>(event))
+    {
+      // if the event is not an input event let it through
+      return false;
+    }
+    // The event filter is called multiple times for each event.  The first time
+    // is for the Window the event is within.  We have to let theset through so
+    // that the event filter will be called again on the event with the widget
+    // that will recieve it.
+    //
+    // VTK gets events from the QVTKOpenGLWidow so we don't even need to let the
+    // pqQVTKWidget accept events.  This prevents it from popping up a context
+    // menu too.
+    if (obj->inherits("QWidgetWindow") || obj->inherits("QVTKOpenGLWindow"))
+    {
+      return false;
+    }
+    while (obj != NULL)
+    {
+      if (obj == this->Self)
+      {
+        // if the event is on a child of the preset dialog let it go through
+        return false;
+      }
+      else if (obj->inherits("QMenu"))
+      {
+        // Future proofing: it is really bad if you have a context menu up and
+        // all events to it are blocked.  It locks X completely.
+        return false;
+      }
+      else if (obj->inherits("QListView") && obj->parent() == nullptr)
+      {
+        // This is the list that pops up in the export/import file dialog to
+        // complete the filename you have started typing.  Similar to the QMenu,
+        // if not handled it locks X completely.
+        return false;
+      }
+      obj = obj->parent();
+    }
+    return true;
+  }
+
+private:
+  pqPresetDialog* Self;
+};
+}
+
 class pqPresetDialog::pqInternals
 {
 public:
@@ -413,11 +489,13 @@ public:
   QPointer<pqPresetDialogTableModel> Model;
   QPointer<pqPresetDialogProxyModel> ProxyModel;
   QPointer<pqPresetDialogReflowModel> ReflowModel;
+  QScopedPointer<QObject> EventFilter;
 
   pqInternals(pqPresetDialog::Modes mode, pqPresetDialog* self)
     : Model(new pqPresetDialogTableModel(self))
     , ProxyModel(new pqPresetDialogProxyModel(mode, self))
     , ReflowModel(new pqPresetDialogReflowModel(2, self))
+    , EventFilter(new pqPresetDialogFakeModality(self))
   {
     this->Ui.setupUi(self);
     this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
@@ -461,6 +539,20 @@ public:
     this->Ui.gradients->verticalHeader()->setDefaultSectionSize(
       (int)(this->Ui.gradients->verticalHeader()->defaultSectionSize() * 1.5));
   }
+
+  void setMode(Modes mode)
+  {
+    this->ProxyModel->setMode(mode);
+    this->Ui.advancedButton->setEnabled(mode != SHOW_INDEXED_COLORS_ONLY);
+    if (mode == SHOW_INDEXED_COLORS_ONLY)
+    {
+      this->Ui.advancedButton->setChecked(true);
+      this->ProxyModel->setShowAdvanced(true);
+    }
+    this->Ui.gradients->selectionModel()->clear();
+  }
+
+  void resetModel() { this->Model->reset(); }
 };
 
 //-----------------------------------------------------------------------------
@@ -492,6 +584,25 @@ pqPresetDialog::~pqPresetDialog()
 {
 }
 
+//-----------------------------------------------------------------------------
+void pqPresetDialog::showEvent(QShowEvent* e)
+{
+  QApplication::instance()->installEventFilter(this->Internals->EventFilter.data());
+  QDialog::showEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+void pqPresetDialog::closeEvent(QCloseEvent* e)
+{
+  QApplication::instance()->removeEventFilter(this->Internals->EventFilter.data());
+  QDialog::closeEvent(e);
+}
+
+//-----------------------------------------------------------------------------
+void pqPresetDialog::setMode(Modes mode)
+{
+  this->Internals->setMode(mode);
+}
 //-----------------------------------------------------------------------------
 void pqPresetDialog::setCustomizableLoadColors(bool state, bool defaultValue)
 {
@@ -528,9 +639,16 @@ void pqPresetDialog::setCustomizableUsePresetRange(bool state, bool defaultValue
 void pqPresetDialog::setCurrentPreset(const char* presetName)
 {
   pqInternals& internals = (*this->Internals);
+  // since the preset dialog is persistent and a new preset could have been added,
+  // reset the loaded presets.
+  if (presetName)
+  {
+    internals.resetModel();
+  }
   QModelIndex idx = internals.Model->indexFromName(presetName);
   if (!idx.isValid())
   {
+    internals.Ui.gradients->selectionModel()->clear();
     return;
   }
   auto newIdx = internals.ProxyModel->mapFromSource(idx);
