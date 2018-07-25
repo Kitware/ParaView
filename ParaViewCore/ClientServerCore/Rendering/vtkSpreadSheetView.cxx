@@ -426,6 +426,7 @@ int vtkSpreadSheetView::StreamToClient()
   this->NumberOfRows = num_rows;
   if (this->SomethingUpdated)
   {
+    this->ClearCache();
     this->InvokeEvent(vtkCommand::UpdateDataEvent);
   }
   return 1;

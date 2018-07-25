@@ -138,6 +138,7 @@ int vtkAttributeDataToTableFilter::RequestData(vtkInformation* vtkNotUsed(reques
             }
             for (int i = 0; i < maxpoints; i++)
             {
+              this->ConvertToOriginalIds(ds, indices[i]);
               output->GetRowData()->AddArray(indices[i]);
               indices[i]->Delete();
             }
@@ -313,6 +314,35 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output, vtkDataObject* in
     }
     output->GetRowData()->AddArray(indicesArray);
     indicesArray->FastDelete();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkAttributeDataToTableFilter::ConvertToOriginalIds(
+  vtkDataSet* inputDS, vtkIdTypeArray* indices)
+{
+  vtkPointData* pd = inputDS->GetPointData();
+  if (!pd)
+  {
+    return;
+  }
+
+  vtkDataArray* originalIds = pd->GetArray("vtkOriginalPointIds");
+  if (!originalIds)
+  {
+    originalIds = pd->GetArray("vtkOriginalIndices");
+  }
+  if (originalIds)
+  {
+    for (vtkIdType i = 0; i < indices->GetNumberOfValues(); ++i)
+    {
+      vtkIdType id = indices->GetValue(i);
+      if (id >= 0 && id < originalIds->GetNumberOfTuples())
+      {
+        vtkIdType origId = originalIds->GetComponent(id, 0);
+        indices->SetValue(i, origId);
+      }
+    }
   }
 }
 
