@@ -56,8 +56,10 @@ public:
    * csrc://<pvserver-host>:<pvserver-port>
    * cdsrsrc://<pvdataserver-host>:<pvdataserver-port>/<pvrenderserver-host>:<pvrenderserver-port>
    * In this case, the hostname is irrelevant and is ignored.
+   * Wait for timeout seconds for the connection. Default is 60, 0 means no retry.
+   * -1 means infinite retries.
    */
-  virtual bool Connect(const char* url);
+  virtual bool Connect(const char* url, int timeout = 60);
 
   /**
    * Returns true is this session is active/alive/valid.

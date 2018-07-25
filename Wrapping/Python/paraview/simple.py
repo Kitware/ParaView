@@ -81,16 +81,20 @@ def Disconnect(ns=None, force=True):
 
 # -----------------------------------------------------------------------------
 
-def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
+def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111, timeout = 60):
     """Creates a connection to a server. Example usage::
 
     > Connect("amber") # Connect to a single server at default port
     > Connect("amber", 12345) # Connect to a single server at port 12345
-    > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
+    > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair
+    > Connect("amber", timeout=30) # Connect to a single server at default port with a 30s timeout instead of default 60s
+    > Connect("amber", timeout=-1) # Connect to a single server at default port with no timeout instead of default 60s
+    > Connect("amber", timeout=0)  # Connect to a single server at default port without retrying instead of retrying for the default 60s"""
     Disconnect(globals(), False)
-    connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
-    _initializeSession(connection)
-    _add_functions(globals())
+    connection = servermanager.Connect(ds_host, ds_port, rs_host, rs_port, timeout)
+    if not (connection is None):
+      _initializeSession(connection)
+      _add_functions(globals())
     return connection
 
 # -----------------------------------------------------------------------------

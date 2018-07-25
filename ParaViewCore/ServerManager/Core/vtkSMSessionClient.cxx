@@ -147,7 +147,7 @@ vtkMultiProcessController* vtkSMSessionClient::GetController(ServerFlags process
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMSessionClient::Connect(const char* url)
+bool vtkSMSessionClient::Connect(const char* url, int timeout)
 {
   this->SetURI(url);
   vtksys::RegularExpression pvserver("^cs://([^:]+)(:([0-9]+))?");
@@ -159,6 +159,10 @@ bool vtkSMSessionClient::Connect(const char* url)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions* options = pm->GetOptions();
+
+  // generate timeout string in seconds.
+  std::ostringstream timeoutString;
+  timeoutString << "timeout=" << timeout << "&";
 
   std::ostringstream handshake;
   handshake << "handshake=paraview-" << PARAVIEW_VERSION;
@@ -181,7 +185,7 @@ bool vtkSMSessionClient::Connect(const char* url)
     port = (port <= 0) ? 11111 : port;
 
     std::ostringstream stream;
-    stream << "tcp://" << hostname << ":" << port << "?" << handshake.str();
+    stream << "tcp://" << hostname << ":" << port << "?" << timeoutString.str() << handshake.str();
     data_server_url = stream.str();
   }
   else if (pvserver_reverse.find(url))
@@ -190,7 +194,8 @@ bool vtkSMSessionClient::Connect(const char* url)
     int port = atoi(pvserver_reverse.match(3).c_str());
     port = (port < 0) ? 11111 : port;
     std::ostringstream stream;
-    stream << "tcp://localhost:" << port << "?listen=true&nonblocking=true&" << handshake.str();
+    stream << "tcp://localhost:" << port << "?listen=true&nonblocking=true&" << timeoutString.str()
+           << handshake.str();
     data_server_url = stream.str();
   }
   else if (pvrenderserver.find(url))
@@ -204,11 +209,13 @@ bool vtkSMSessionClient::Connect(const char* url)
     rsport = (rsport <= 0) ? 22221 : rsport;
 
     std::ostringstream stream;
-    stream << "tcp://" << dataserverhost << ":" << dsport << "?" << handshake.str();
+    stream << "tcp://" << dataserverhost << ":" << dsport << "?" << timeoutString.str()
+           << handshake.str();
     data_server_url = stream.str().c_str();
 
     std::ostringstream stream2;
-    stream2 << "tcp://" << renderserverhost << ":" << rsport << "?" << handshake.str();
+    stream2 << "tcp://" << renderserverhost << ":" << rsport << "?" << timeoutString.str()
+            << handshake.str();
     render_server_url = stream2.str();
   }
   else if (pvrenderserver_reverse.find(url))
@@ -220,11 +227,13 @@ bool vtkSMSessionClient::Connect(const char* url)
     rsport = (rsport < 0) ? 22221 : rsport;
 
     std::ostringstream stream;
-    stream << "tcp://localhost:" << dsport << "?listen=true&nonblocking=true&" << handshake.str();
+    stream << "tcp://localhost:" << dsport << "?listen=true&nonblocking=true&"
+           << timeoutString.str() << handshake.str();
     data_server_url = stream.str().c_str();
 
     std::ostringstream stream2;
-    stream2 << "tcp://localhost:" << rsport << "?listen=true&nonblocking=true&" << handshake.str();
+    stream2 << "tcp://localhost:" << rsport << "?listen=true&nonblocking=true&"
+            << timeoutString.str() << handshake.str();
     render_server_url = stream2.str();
   }
 

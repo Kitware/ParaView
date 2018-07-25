@@ -265,6 +265,11 @@ void pqServerResource::setScheme(const QString& rhs)
   this->Implementation->Scheme = rhs;
 }
 
+bool pqServerResource::isReverse() const
+{
+  return (this->Implementation->Scheme == "csrc" || this->Implementation->Scheme == "cdsrsrc");
+}
+
 const QString pqServerResource::host() const
 {
   if (this->Implementation->Scheme == "cdsrs" || this->Implementation->Scheme == "cdsrsrc")

@@ -624,7 +624,8 @@ bool pqServerLauncher::connectToPrelaunchedServer()
   }
 
   const pqServerResource& resource = this->Internals->Configuration.resource();
-  this->Internals->Server = builder->createServer(resource);
+  this->Internals->Server =
+    builder->createServer(resource, this->Internals->Configuration.connectionTimeout());
   return this->Internals->Server != NULL;
 }
 

@@ -111,6 +111,29 @@
           </spacer>
          </item>
          <item>
+          <widget class="QLabel" name="timeoutLabel">
+           <property name="text">
+            <string>Timeout (s) </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="timeoutSpinBox">
+           <property name="toolTip">
+            <string>Specify the timeout in seconds to use when connecting to the server. 0 means no retry. -1 means infinite retries.</string>
+           </property>
+           <property name="value">
+            <number>60</number>
+           </property>
+           <property name="minimum">
+            <number>-1</number>
+           </property>
+           <property name="maximum">
+            <number>9999</number>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="connect">
            <property name="enabled">
             <bool>false</bool>
