@@ -194,6 +194,8 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
 #if PY_MAJOR_VERSION == 2
     vtkSmartPyObject resultingTextBytes(PyUnicode_AsUTF8String(resultingText));
     char* resultingTextAsCString = PyString_AsString(resultingTextBytes);
+#elif PY_VERSION_HEX >= 0x03070000
+    char* resultingTextAsCString = const_cast<char*>(PyUnicode_AsUTF8(resultingText));
 #else
     char* resultingTextAsCString = PyUnicode_AsUTF8(resultingText);
 #endif
