@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 #include "QVTKOpenGLSimpleWidget.h"
-#include "pqQVTKWidgetBase.h"
+#include "QVTKOpenGLWidget.h"
 
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
@@ -69,16 +69,16 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
   // Look for a render window in the possible widget types.
   vtkRenderWindow* rw = nullptr;
 
-  pqQVTKWidgetBase* const baseWidget = qobject_cast<pqQVTKWidgetBase*>(Object);
-  if (baseWidget != nullptr)
-  {
-    rw = baseWidget->GetRenderWindow();
-  }
-
-  QVTKOpenGLSimpleWidget* const qvtkWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
+  QVTKOpenGLWidget* const qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object);
   if (qvtkWidget != nullptr)
   {
     rw = qvtkWidget->GetRenderWindow();
+  }
+
+  QVTKOpenGLSimpleWidget* const qvtksWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
+  if (qvtksWidget != nullptr)
+  {
+    rw = qvtksWidget->GetRenderWindow();
   }
 
   // Could not find a render window, don't translate the event
@@ -175,7 +175,8 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
 
       // Resize widget to 300x300
       int width = 300, height = 300;
-      QSize old_size = widget->maximumSize();
+      QSize oldSize = widget->size();
+      QSize oldMaxSize = widget->maximumSize();
       widget->setMaximumSize(width, height);
       widget->resize(width, height);
 
@@ -200,7 +201,8 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
       {
         error = false;
         testUtil->pauseRecords(false);
-        widget->setMaximumSize(old_size);
+        widget->setMaximumSize(oldMaxSize);
+        widget->resize(oldSize);
         return true;
       }
       QString file = file_dialog.getSelectedFiles()[0];
@@ -218,8 +220,8 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
       testUtil->pauseRecords(false);
 
       // Restore widget size
-      widget->setMaximumSize(old_size);
-      widget->resize(old_size);
+      widget->setMaximumSize(oldMaxSize);
+      widget->resize(oldSize);
 
       // Emit record signal
       emit recordEvent(Object, pqCoreTestUtility::PQ_COMPAREVIEW_PROPERTY_NAME,
