@@ -175,6 +175,7 @@ QVariant pqFileDialogFavoriteModel::data(const QModelIndex& idx, int role) const
         case 0:
           return file.label();
       }
+      break;
     case Qt::DecorationRole:
       switch (idx.column())
       {
