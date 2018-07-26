@@ -120,6 +120,8 @@ set (Module_SRCS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
   pqCreateCustomFilterReaction.h
+  pqCustomShortcutBehavior.cxx
+  pqCustomShortcutBehavior.h
   pqCustomViewpointsToolbar.cxx
   pqCustomViewpointsToolbar.h
   pqCylinderPropertyWidget.cxx
@@ -392,6 +394,7 @@ set (Module_MOC_HDRS
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
+  pqCustomShortcutBehavior.h
   pqCustomViewpointsToolbar.h
   pqCylinderPropertyWidget.h
   pqDataQueryReaction.h
