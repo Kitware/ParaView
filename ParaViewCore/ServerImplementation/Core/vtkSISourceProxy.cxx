@@ -92,6 +92,24 @@ bool vtkSISourceProxy::CreateVTKObjects()
     return true;
   }
 
+  // Register observer to record the execution time for each algorithm in the
+  // local timer-log.
+  algorithm->AddObserver(vtkCommand::StartEvent, this, &vtkSISourceProxy::MarkStartEvent);
+  algorithm->AddObserver(vtkCommand::EndEvent, this, &vtkSISourceProxy::MarkEndEvent);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSISourceProxy::OnCreateVTKObjects()
+{
+  this->Superclass::OnCreateVTKObjects();
+
+  vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+  if (algorithm == NULL)
+  {
+    return;
+  }
+
   // Create the right kind of executive.
   if (this->ExecutiveName && !this->GetVTKObject()->IsA("vtkPVDataRepresentation"))
   {
@@ -106,12 +124,6 @@ bool vtkSISourceProxy::CreateVTKObjects()
       }
     }
   }
-
-  // Register observer to record the execution time for each algorithm in the
-  // local timer-log.
-  algorithm->AddObserver(vtkCommand::StartEvent, this, &vtkSISourceProxy::MarkStartEvent);
-  algorithm->AddObserver(vtkCommand::EndEvent, this, &vtkSISourceProxy::MarkEndEvent);
-  return true;
 }
 
 //----------------------------------------------------------------------------

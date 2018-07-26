@@ -3039,186 +3039,6 @@
       </DoubleVectorProperty>
     </Proxy>
     <!-- netCDFReaderCore -->
-    <Proxy class="vtkMultiBlockPLOT3DReader"
-                 name="P3DReaderCore">
-      <Documentation long_help="Reads ASCII or binary PLOT3D files."
-                     short_help="Read PLOT3D files.">PLOT3D is a plotting
-                     package developed at NASA. The PLOT3D reader can read both
-                     ASCII and binary PLOT3D files. The default file extension
-                     for the geometry files is .xyz, and the default file
-                     extension for the solution files is .q. The output of this
-                     reader is a multiblock dataset containing curvilinear
-                     (structured grid) datasets.</Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the .xyz (geometry) file name
-        for the PLOT3D reader.</Documentation>
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetQFileName"
-                            name="QFileName"
-                            number_of_elements="1"
-                            panel_visibility="default">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the .q (solution) file name for
-          the PLOT3D reader.</Documentation>
-        <Hints>
-          <FileChooser extensions="q" file_description="Solution files" />
-        </Hints>
-      </StringVectorProperty>
-      <StringVectorProperty animateable="0"
-                            command="SetFunctionFileName"
-                            name="FunctionFileName"
-                            number_of_elements="1"
-                            panel_visibility="default">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the .f (function) file name for
-        the PLOT3D reader.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetAutoDetectFormat"
-                         default_values="1"
-                         name="AutoDetectFormat"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When this options is enabled, the reader will try to
-  automatically figure out various settings for a binary file. The other
-  options are ignored. Does not work for text (ASCII) files.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetBinaryFile"
-                         default_values="1"
-                         name="BinaryFile"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether the data files are
-        binary.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetMultiGrid"
-                         default_values="0"
-                         name="MultiGrid"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether these files have
-        multiple-block information.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetHasByteCount"
-                         default_values="0"
-                         name="HasByteCount"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether this file uses Fortran
-        leading-trailing byte counts.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetIBlanking"
-                         default_values="0"
-                         name="IBlanking"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether this dataset has
-        visibility information.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetTwoDimensionalGeometry"
-                         default_values="0"
-                         name="TwoDimensionalGeometry"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether the data is two- or
-        three-dimensional.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetForceRead"
-                         default_values="0"
-                         name="ForceRead"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property indicates whether to attempt to read the
-        file even if it appears corrupt</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetDoublePrecision"
-                         default_values="0"
-                         name="DoublePrecision"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property specifies whether floating points values
-  are in double precision.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetByteOrder"
-                         default_values="0"
-                         name="ByteOrder"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="BigEndian"
-                 value="0" />
-          <Entry text="LittleEndian"
-                 value="1" />
-        </EnumerationDomain>
-        <Documentation>This property specifies the byte order of any binary
-        file(s).</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty clean_command="RemoveAllFunctions"
-                         command="AddFunction"
-                         name="Functions"
-                         number_of_elements_per_command="1"
-                         panel_visibility="default"
-                         repeat_command="1">
-        <EnumerationDomain name="array_list">
-          <!-- <Entry value="100" text="Scalar - Density"/> -->
-          <Entry text="Scalar - Pressure"
-                 value="110" />
-          <Entry text="Scalar - Pressure Coefficient"
-                 value="111" />
-          <Entry text="Scalar - Mach Number"
-                 value="112" />
-          <Entry text="Scalar - Sound Speed"
-                 value="113" />
-          <Entry text="Scalar - Temperature"
-                 value="120" />
-          <Entry text="Scalar - Enthalpy"
-                 value="130" />
-          <Entry text="Scalar - Internal energy"
-                 value="140" />
-          <Entry text="Scalar - Kinetic energy"
-                 value="144" />
-          <Entry text="Scalar - Velocity magnitude"
-                 value="153" />
-          <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
-          <Entry text="Scalar - Entropy"
-                 value="170" />
-          <Entry text="Scalar - Swirl"
-                 value="184" />
-          <Entry text="Vector - Velocity"
-                 value="200" />
-          <Entry text="Vector - Vorticity"
-                 value="201" />
-          <!-- <Entry value="202" text="Vector - Momentum"/> -->
-          <Entry text="Vector - Pressure gradient"
-                 value="210" />
-          <Entry text="Scalar - Vorticity magnitude"
-                 value="211" />
-          <Entry text="Vector - Strain rate"
-                 value="212" />
-        </EnumerationDomain>
-        <Documentation>This property lists which functions (point-centered
-        arrays) to compute.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty name="PreserveIntermediateFunctions"
-        command="SetPreserveIntermediateFunctions"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When checked, the reader will preserve intermediate computed
-          quantities that were not explicitly requested e.g. if **Velocity magnitude** is
-          enabled, but not **Velocity**, the reader still needs to compute **Velocity**.
-          If this is unchecked, then the output will not have
-          **Velocity** array, only the requested **VelocityMagnitude**. This is useful to
-          avoid using up memory for arrays that are not relevant for the analysis.
-        </Documentation>
-      </IntVectorProperty>
-      <!-- End P3DReaderCore -->
-    </Proxy>
     <!-- Beginning of FLUENTReaderCore -->
     <Proxy class="vtkFLUENTReader"
                  name="FLUENTReaderCore">
@@ -7908,11 +7728,10 @@
       </Hints>
     </SourceProxy>
     <!-- End MPASReader -->
-    <SourceProxy class="vtkFileSeriesReader"
-                 file_name_method="SetQFileName"
+    <SourceProxy class="vtkMultiBlockPLOT3DReader"
                  label="PLOT3D Reader"
                  name="P3DReader"
-                 si_class="vtkSIMetaReaderProxy">
+                 executive="vtkReaderExecutive">
       <Documentation long_help="Reads ASCII or binary PLOT3D files."
                      short_help="Read PLOT3D files.">PLOT3D is a plotting
                      package developed at NASA. The PLOT3D reader can read both
@@ -7921,11 +7740,26 @@
                      extension for the solution files is .q. The output of this
                      reader is a multiblock dataset containing curvilinear
                      (structured grid) datasets.</Documentation>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
       <StringVectorProperty animateable="0"
-                            clean_command="RemoveAllFileNames"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the .xyz (geometry) file name
+        for the PLOT3D reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="ClearFileNames"
                             command="AddFileName"
                             name="QFileName"
                             number_of_elements="1"
+                            information_property="FileNameInfo"
                             repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>The list of .q (solution) files for the PLOT3D reader.
@@ -7936,31 +7770,153 @@
           <FileChooser extensions="q" file_description="Solution files" />
         </Hints>
       </StringVectorProperty>
-      <SubProxy>
-        <Proxy name="Reader"
-               proxygroup="internal_sources"
-               proxyname="P3DReaderCore"></Proxy>
-        <ExposedProperties>
-          <Property name="FileName" />
-          <Property name="FunctionFileName"/>
-          <Property name="AutoDetectFormat"/>
-          <Property name="BinaryFile" />
-          <Property name="MultiGrid" />
-          <Property name="HasByteCount" />
-          <Property name="IBlanking" />
-          <Property name="TwoDimensionalGeometry" />
-          <Property name="DoublePrecision" />
-          <Property name="ByteOrder" />
-          <Property name="Functions" />
-          <Property name="PreserveIntermediateFunctions" />
-          <Property name="ForceRead" />
-        </ExposedProperties>
-      </SubProxy>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
+      <StringVectorProperty animateable="0"
+                            command="SetFunctionFileName"
+                            name="FunctionFileName"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the .f (function) file name for
+        the PLOT3D reader.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetAutoDetectFormat"
+                         default_values="1"
+                         name="AutoDetectFormat"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When this options is enabled, the reader will try to
+  automatically figure out various settings for a binary file. The other
+  options are ignored. Does not work for text (ASCII) files.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBinaryFile"
+                         default_values="1"
+                         name="BinaryFile"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether the data files are
+        binary.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMultiGrid"
+                         default_values="0"
+                         name="MultiGrid"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether these files have
+        multiple-block information.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHasByteCount"
+                         default_values="0"
+                         name="HasByteCount"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether this file uses Fortran
+        leading-trailing byte counts.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetIBlanking"
+                         default_values="0"
+                         name="IBlanking"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether this dataset has
+        visibility information.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTwoDimensionalGeometry"
+                         default_values="0"
+                         name="TwoDimensionalGeometry"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether the data is two- or
+        three-dimensional.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceRead"
+                         default_values="0"
+                         name="ForceRead"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property indicates whether to attempt to read the
+        file even if it appears corrupt</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDoublePrecision"
+                         default_values="0"
+                         name="DoublePrecision"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether floating points values
+  are in double precision.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetByteOrder"
+                         default_values="0"
+                         name="ByteOrder"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="BigEndian"
+                 value="0" />
+          <Entry text="LittleEndian"
+                 value="1" />
+        </EnumerationDomain>
+        <Documentation>This property specifies the byte order of any binary
+        file(s).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty clean_command="RemoveAllFunctions"
+                         command="AddFunction"
+                         name="Functions"
+                         number_of_elements_per_command="1"
+                         panel_visibility="default"
+                         repeat_command="1">
+        <EnumerationDomain name="array_list">
+          <!-- <Entry value="100" text="Scalar - Density"/> -->
+          <Entry text="Scalar - Pressure"
+                 value="110" />
+          <Entry text="Scalar - Pressure Coefficient"
+                 value="111" />
+          <Entry text="Scalar - Mach Number"
+                 value="112" />
+          <Entry text="Scalar - Sound Speed"
+                 value="113" />
+          <Entry text="Scalar - Temperature"
+                 value="120" />
+          <Entry text="Scalar - Enthalpy"
+                 value="130" />
+          <Entry text="Scalar - Internal energy"
+                 value="140" />
+          <Entry text="Scalar - Kinetic energy"
+                 value="144" />
+          <Entry text="Scalar - Velocity magnitude"
+                 value="153" />
+          <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
+          <Entry text="Scalar - Entropy"
+                 value="170" />
+          <Entry text="Scalar - Swirl"
+                 value="184" />
+          <Entry text="Vector - Velocity"
+                 value="200" />
+          <Entry text="Vector - Vorticity"
+                 value="201" />
+          <!-- <Entry value="202" text="Vector - Momentum"/> -->
+          <Entry text="Vector - Pressure gradient"
+                 value="210" />
+          <Entry text="Scalar - Vorticity magnitude"
+                 value="211" />
+          <Entry text="Vector - Strain rate"
+                 value="212" />
+        </EnumerationDomain>
+        <Documentation>This property lists which functions (point-centered
+        arrays) to compute.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="PreserveIntermediateFunctions"
+        command="SetPreserveIntermediateFunctions"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When checked, the reader will preserve intermediate computed
+          quantities that were not explicitly requested e.g. if **Velocity magnitude** is
+          enabled, but not **Velocity**, the reader still needs to compute **Velocity**.
+          If this is unchecked, then the output will not have
+          **Velocity** array, only the requested **VelocityMagnitude**. This is useful to
+          avoid using up memory for arrays that are not relevant for the analysis.
+        </Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
                             repeatable="1">
@@ -7974,8 +7930,9 @@
          property -->
         <DefaultFileNameProperty name="FileName" />
       </Hints>
-      <!-- End plot3d reader-->
+      <!-- End P3DReader -->
     </SourceProxy>
+
     <!-- Plot3D Meta Reader -->
     <SourceProxy class="vtkPlot3DMetaReader"
                  label="PLOT3D Meta-File Reader"
