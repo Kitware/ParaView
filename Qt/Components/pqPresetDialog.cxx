@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtk_jsoncpp.h>
 
+#include <QInputEvent>
 #include <QList>
 #include <QMenu>
 #include <QPixmap>

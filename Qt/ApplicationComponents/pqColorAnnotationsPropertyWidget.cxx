@@ -638,7 +638,7 @@ public:
   QScopedPointer<pqChooseColorPresetReaction> ChoosePresetReaction;
 
   pqInternals(pqColorAnnotationsPropertyWidget* self)
-    : TempAction(new QAction)
+    : TempAction(new QAction(self))
     , ChoosePresetReaction(new pqChooseColorPresetReaction(this->TempAction.data(), false))
   {
     this->Ui.setupUi(self);

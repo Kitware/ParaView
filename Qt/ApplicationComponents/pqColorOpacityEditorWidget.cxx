@@ -132,7 +132,7 @@ public:
     : ColorTableModel(self)
     , OpacityTableModel(self)
     , PropertyGroup(group)
-    , TempAction(new QAction)
+    , TempAction(new QAction(self))
     , ChoosePresetReaction(new pqChooseColorPresetReaction(this->TempAction.data(), false))
   {
     this->Ui.setupUi(self);
