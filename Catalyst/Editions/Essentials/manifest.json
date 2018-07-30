@@ -26,7 +26,6 @@
         { "class":"vtkPVCylinder" },
         { "class":"vtkPVDataSetAlgorithmSelectorFilter" },
         { "class":"vtkPVGlyphFilter" },
-        { "class":"vtkPVLegacyGlyphFilter" },
         { "class":"vtkPVMetaClipDataSet" },
         { "class":"vtkPVMetaSliceDataSet" },
         { "class":"vtkPVPlane" }
@@ -100,7 +99,6 @@
         "Cut",
         "ExtractGeometry",
         "Glyph",
-        "LegacyGlyph",
         "PassArrays"
       ]
     },
