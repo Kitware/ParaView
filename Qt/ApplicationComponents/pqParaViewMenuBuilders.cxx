@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCopyReaction.h"
 #include "pqCreateCustomFilterReaction.h"
 #include "pqCustomViewpointsToolbar.h"
+#include "pqCustomizeShortcutsReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqDesktopServicesReaction.h"
@@ -253,6 +254,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   QAction* manageBookmarksAction = menu.addAction("Manage Bookmarks...")
     << pqSetName("actionManage_Bookmarks");
   new pqManageBookmarksReaction(manageBookmarksAction, mgr);
+
+  new pqCustomizeShortcutsReaction(
+    menu.addAction("Customize Shortcuts...") << pqSetName("actionCustomize"));
 
   menu.addSeparator(); // --------------------------------------------------
 

@@ -122,6 +122,10 @@ set (Module_SRCS
   pqCreateCustomFilterReaction.h
   pqCustomShortcutBehavior.cxx
   pqCustomShortcutBehavior.h
+  pqCustomizeShortcutsReaction.cxx
+  pqCustomizeShortcutsReaction.h
+  pqCustomizeShortcutsDialog.cxx
+  pqCustomizeShortcutsDialog.h
   pqCustomViewpointsToolbar.cxx
   pqCustomViewpointsToolbar.h
   pqCylinderPropertyWidget.cxx
@@ -395,6 +399,8 @@ set (Module_MOC_HDRS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
   pqCustomShortcutBehavior.h
+  pqCustomizeShortcutsReaction.h
+  pqCustomizeShortcutsDialog.h
   pqCustomViewpointsToolbar.h
   pqCylinderPropertyWidget.h
   pqDataQueryReaction.h
@@ -549,6 +555,7 @@ set (Module_UI_FILES
   Resources/UI/pqColorToolbar.ui
   Resources/UI/pqCustomResolutionDialog.ui
   Resources/UI/pqCylinderPropertyWidget.ui
+  Resources/UI/pqCustomizeShortcutsDialog.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui
