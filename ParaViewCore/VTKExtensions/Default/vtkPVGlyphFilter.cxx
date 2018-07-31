@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVNewGlyphFilter.cxx
+  Module:    vtkPVGlyphFilter.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVNewGlyphFilter.h"
+#include "vtkPVGlyphFilter.h"
 
 // VTK includes
 #include "vtkBoundingBox.h"
@@ -44,7 +44,7 @@
 #include <set>
 #include <vector>
 
-class vtkPVNewGlyphFilter::vtkInternals
+class vtkPVGlyphFilter::vtkInternals
 {
   vtkBoundingBox Bounds;
   double NearestPointRadius;
@@ -95,10 +95,10 @@ public:
   //---------------------------------------------------------------------------
   // Update internal datastructures for the given dataset. This will collect
   // bounds information for all datasets for SPATIALLY_UNIFORM_DISTRIBUTION.
-  void UpdateWithDataset(vtkDataSet* ds, vtkPVNewGlyphFilter* self)
+  void UpdateWithDataset(vtkDataSet* ds, vtkPVGlyphFilter* self)
   {
     assert(ds != NULL && self != NULL);
-    if (self->GetGlyphMode() != vtkPVNewGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
+    if (self->GetGlyphMode() != vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
     {
       // nothing to do.
       return;
@@ -118,9 +118,9 @@ public:
   // information among all ranks.
   // Subsequently, we also build the list of random sample points using the
   // synchronized bounds.
-  void SynchronizeGlobalInformation(vtkPVNewGlyphFilter* self)
+  void SynchronizeGlobalInformation(vtkPVGlyphFilter* self)
   {
-    if (self->GetGlyphMode() != vtkPVNewGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
+    if (self->GetGlyphMode() != vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
     {
       return; // nothing to do.
     }
@@ -186,18 +186,18 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  inline bool IsPointVisible(vtkDataSet* ds, vtkIdType ptId, vtkPVNewGlyphFilter* self)
+  inline bool IsPointVisible(vtkDataSet* ds, vtkIdType ptId, vtkPVGlyphFilter* self)
   {
     assert(ds != NULL && self != NULL);
     switch (self->GetGlyphMode())
     {
-      case vtkPVNewGlyphFilter::ALL_POINTS:
+      case vtkPVGlyphFilter::ALL_POINTS:
         return true;
 
-      case vtkPVNewGlyphFilter::EVERY_NTH_POINT:
+      case vtkPVGlyphFilter::EVERY_NTH_POINT:
         return self->GetStride() <= 1 || (ptId % self->GetStride()) == 0;
 
-      case vtkPVNewGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION:
+      case vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION:
         // This will initialize the point locator and build the list of PointIds
         // that should be glyphed.
         this->SetupLocator(ds);
@@ -225,11 +225,11 @@ public:
   }
 };
 
-vtkStandardNewMacro(vtkPVNewGlyphFilter);
-vtkCxxSetObjectMacro(vtkPVNewGlyphFilter, Controller, vtkMultiProcessController);
-vtkCxxSetObjectMacro(vtkPVNewGlyphFilter, SourceTransform, vtkTransform);
+vtkStandardNewMacro(vtkPVGlyphFilter);
+vtkCxxSetObjectMacro(vtkPVGlyphFilter, Controller, vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkPVGlyphFilter, SourceTransform, vtkTransform);
 //-----------------------------------------------------------------------------
-vtkPVNewGlyphFilter::vtkPVNewGlyphFilter()
+vtkPVGlyphFilter::vtkPVGlyphFilter()
   : VectorScaleMode(SCALE_BY_MAGNITUDE)
   , SourceTransform(nullptr)
   , RescaleToGlyphSizeRange(true)
@@ -238,14 +238,14 @@ vtkPVNewGlyphFilter::vtkPVNewGlyphFilter()
   , Seed(1)
   , Stride(1)
   , Controller(0)
-  , Internals(new vtkPVNewGlyphFilter::vtkInternals())
+  , Internals(new vtkPVGlyphFilter::vtkInternals())
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->SetNumberOfInputPorts(2);
 }
 
 //-----------------------------------------------------------------------------
-vtkPVNewGlyphFilter::~vtkPVNewGlyphFilter()
+vtkPVGlyphFilter::~vtkPVGlyphFilter()
 {
   this->SetController(nullptr);
   this->SetSourceTransform(nullptr);
@@ -254,7 +254,7 @@ vtkPVNewGlyphFilter::~vtkPVNewGlyphFilter()
 
 //----------------------------------------------------------------------------
 // Specify a source object at a specified table location.
-void vtkPVNewGlyphFilter::SetSourceConnection(int id, vtkAlgorithmOutput* algOutput)
+void vtkPVGlyphFilter::SetSourceConnection(int id, vtkAlgorithmOutput* algOutput)
 {
   if (id < 0)
   {
@@ -281,7 +281,7 @@ void vtkPVNewGlyphFilter::SetSourceConnection(int id, vtkAlgorithmOutput* algOut
 }
 
 //----------------------------------------------------------------------------
-vtkMTimeType vtkPVNewGlyphFilter::GetMTime()
+vtkMTimeType vtkPVGlyphFilter::GetMTime()
 {
   vtkMTimeType mTime = this->Superclass::GetMTime();
   vtkMTimeType time;
@@ -294,7 +294,7 @@ vtkMTimeType vtkPVNewGlyphFilter::GetMTime()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVNewGlyphFilter::FillInputPortInformation(int port, vtkInformation* info)
+int vtkPVGlyphFilter::FillInputPortInformation(int port, vtkInformation* info)
 {
   if (port == 0)
   {
@@ -315,7 +315,7 @@ int vtkPVNewGlyphFilter::FillInputPortInformation(int port, vtkInformation* info
 }
 
 //----------------------------------------------------------------------------
-int vtkPVNewGlyphFilter::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info)
+int vtkPVGlyphFilter::FillOutputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   // now add our info
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
@@ -323,7 +323,7 @@ int vtkPVNewGlyphFilter::FillOutputPortInformation(int vtkNotUsed(port), vtkInfo
 }
 
 //----------------------------------------------------------------------------
-int vtkPVNewGlyphFilter::ProcessRequest(
+int vtkPVGlyphFilter::ProcessRequest(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
@@ -335,7 +335,7 @@ int vtkPVNewGlyphFilter::ProcessRequest(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVNewGlyphFilter::RequestDataObject(
+int vtkPVGlyphFilter::RequestDataObject(
   vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (vtkCompositeDataSet::GetData(inputVector[0], 0))
@@ -362,7 +362,7 @@ int vtkPVNewGlyphFilter::RequestDataObject(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVNewGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
+int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkInformationVector* sourceVector = inputVector[1];
@@ -446,13 +446,13 @@ int vtkPVNewGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVNewGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
+int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 {
   return this->Internals->IsPointVisible(ds, ptId, this);
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVNewGlyphFilter::IsInputArrayToProcessValid(vtkDataSet* input)
+bool vtkPVGlyphFilter::IsInputArrayToProcessValid(vtkDataSet* input)
 {
   vtkDataArray* scaleArray = this->GetInputArrayToProcess(0, input);
   vtkDataArray* orientationArray = this->GetInputArrayToProcess(1, input);
@@ -475,7 +475,7 @@ bool vtkPVNewGlyphFilter::IsInputArrayToProcessValid(vtkDataSet* input)
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData* vtkPVNewGlyphFilter::GetSource(int idx, vtkInformationVector* sourceInfo)
+vtkPolyData* vtkPVGlyphFilter::GetSource(int idx, vtkInformationVector* sourceInfo)
 {
   vtkInformation* info = sourceInfo->GetInformationObject(idx);
   if (!info)
@@ -486,7 +486,7 @@ vtkPolyData* vtkPVNewGlyphFilter::GetSource(int idx, vtkInformationVector* sourc
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVNewGlyphFilter::UseCellCenters(vtkDataSet* input)
+bool vtkPVGlyphFilter::UseCellCenters(vtkDataSet* input)
 {
   int inSScalarsAssociation = this->GetInputArrayAssociation(0, input);
   int inVectorsAssociation = this->GetInputArrayAssociation(1, input);
@@ -495,7 +495,7 @@ bool vtkPVNewGlyphFilter::UseCellCenters(vtkDataSet* input)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPVNewGlyphFilter::ExecuteWithCellCenters(
+bool vtkPVGlyphFilter::ExecuteWithCellCenters(
   vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output)
 {
   vtkNew<vtkCellCenters> cellCenters;
@@ -510,7 +510,7 @@ bool vtkPVNewGlyphFilter::ExecuteWithCellCenters(
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVNewGlyphFilter::Execute(
+bool vtkPVGlyphFilter::Execute(
   vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output)
 {
   vtkDataArray* scaleArray = this->GetInputArrayToProcess(0, input);
@@ -519,7 +519,7 @@ bool vtkPVNewGlyphFilter::Execute(
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVNewGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVector,
+bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVector,
   vtkPolyData* output, vtkDataArray* scaleArray, vtkDataArray* orientArray)
 {
   assert(input && output);
@@ -873,7 +873,7 @@ bool vtkPVNewGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourc
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVNewGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "GlyphMode: ";

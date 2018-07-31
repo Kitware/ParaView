@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVNewGlyphFilter.h
+  Module:    vtkPVGlyphFilter.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -13,12 +13,12 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVNewGlyphFilter
+ * @class   vtkPVGlyphFilter
  * @brief   extended API for vtkGlyph3D for better control
  * over glyph placement.
  *
  *
- * vtkPVNewGlyphFilter extends vtkGlyph3D for adding control over which points are
+ * vtkPVGlyphFilter extends vtkGlyph3D for adding control over which points are
  * glyphed using \c GlyphMode. Three modes are now provided:
  * \li ALL_POINTS: all points in the input dataset are glyphed. This same as using
  * vtkGlyph3D directly.
@@ -37,15 +37,15 @@
  * across all ranks for generating identical sample points.
 */
 
-#ifndef vtkPVNewGlyphFilter_h
-#define vtkPVNewGlyphFilter_h
+#ifndef vtkPVGlyphFilter_h
+#define vtkPVGlyphFilter_h
 
 #include "vtkGlyph3D.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVNewGlyphFilter : public vtkPolyDataAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilter : public vtkPolyDataAlgorithm
 {
 public:
   enum VectorScaleMode
@@ -61,9 +61,9 @@ public:
     SPATIALLY_UNIFORM_DISTRIBUTION
   };
 
-  vtkTypeMacro(vtkPVNewGlyphFilter, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkPVGlyphFilter, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  static vtkPVNewGlyphFilter* New();
+  static vtkPVGlyphFilter* New();
 
   //@{
   /**
@@ -194,8 +194,8 @@ public:
   int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
-  vtkPVNewGlyphFilter();
-  ~vtkPVNewGlyphFilter() override;
+  vtkPVGlyphFilter();
+  ~vtkPVGlyphFilter() override;
   //@}
 
   // Standard Pipeline methods
@@ -266,8 +266,8 @@ protected:
   int OutputPointsPrecision;
 
 private:
-  vtkPVNewGlyphFilter(const vtkPVNewGlyphFilter&) = delete;
-  void operator=(const vtkPVNewGlyphFilter&) = delete;
+  vtkPVGlyphFilter(const vtkPVGlyphFilter&) = delete;
+  void operator=(const vtkPVGlyphFilter&) = delete;
 
   class vtkInternals;
   vtkInternals* Internals;

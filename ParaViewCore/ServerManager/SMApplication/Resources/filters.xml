@@ -7556,8 +7556,8 @@ points in the input. Defaults to ***Single***.
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPVNewGlyphFilter"
-                 name="NewGlyph">
+    <SourceProxy class="vtkPVGlyphFilter"
+                 name="Glyph">
       <Documentation long_help=""
                      short_help="">
       </Documentation>
