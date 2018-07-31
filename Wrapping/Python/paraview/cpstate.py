@@ -432,10 +432,11 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     pipelineClassDef += "  # these are the frequencies at which the coprocessor updates.\n"
     pipelineClassDef += "  freqs = " + str(cpstate_globals.write_frequencies) + "\n"
     pipelineClassDef += "  coprocessor.SetUpdateFrequencies(freqs)\n"
-    pipelineClassDef += "  if requestSpecificArrays:\n"
-    for channel_name in arrays:
-        pipelineClassDef += "    arrays = " +str(arrays[channel_name]) + "\n"
-        pipelineClassDef += "    coprocessor.SetRequestedArrays('" + channel_name + "', arrays)\n"
+    if arrays:
+        pipelineClassDef += "  if requestSpecificArrays:\n"
+        for channel_name in arrays:
+            pipelineClassDef += "    arrays = " + str(arrays[channel_name]) + "\n"
+            pipelineClassDef += "    coprocessor.SetRequestedArrays('" + channel_name + "', arrays)\n"
     pipelineClassDef += "  coprocessor.SetInitialOutputOptions(timeStepToStartOutputAt,forceOutputAtFirstCall)\n"
     pipelineClassDef += "  return coprocessor\n"
     return pipelineClassDef
