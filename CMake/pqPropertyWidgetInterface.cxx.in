@@ -51,36 +51,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* @name@Implementation::createWidgetForProperty(
-  vtkSMProxy *smproxy, vtkSMProperty *smproperty)
+  vtkSMProxy *smproxy, vtkSMProperty *smproperty, QWidget* parentWidget)
 {
 #if @pwi_widget@
   // handle properties that specify custom panel widgets
   if (smproperty && smproperty->GetPanelWidget() &&
-    strcmp(smproperty->GetPanelWidget(), "@type@") == 0)
-    {
-    return new @classname@(smproxy, smproperty);
-    }
+      strcmp(smproperty->GetPanelWidget(), "@type@") == 0)
+  {
+    return new @classname@(smproxy, smproperty, parentWidget);
+  }
 #endif
   Q_UNUSED(smproxy);
   Q_UNUSED(smproperty);
+  Q_UNUSED(parentWidget);
   return NULL;
 }
 
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* @name@Implementation::createWidgetForPropertyGroup(
-  vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup)
+  vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup, QWidget* parentWidget)
 {
 #if @pwi_group@
   // handle properties that specify custom panel widgets
   if (smgroup && smgroup->GetPanelWidget() &&
-    strcmp(smgroup->GetPanelWidget(), "@type@") == 0)
-    {
-    return new @classname@(smproxy, smgroup);
-    }
+      strcmp(smgroup->GetPanelWidget(), "@type@") == 0)
+  {
+    return new @classname@(smproxy, smgroup, parentWidget);
+  }
 #endif
   Q_UNUSED(smproxy);
   Q_UNUSED(smgroup);
+  Q_UNUSED(parentWidget);
   return NULL;
 }
 

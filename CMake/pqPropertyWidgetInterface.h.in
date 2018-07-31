@@ -49,13 +49,13 @@ public:
   /// For unsupported/unknown proxies/properties, implementations should simply
   /// return NULL without raising any errors (or messages).
   pqPropertyWidget* createWidgetForProperty(vtkSMProxy *proxy,
-                                            vtkSMProperty *property) override;
+    vtkSMProperty *property, QWidget* parentWidget) override;
 
   /// Given a proxy and its property group, create a widget for the same, of possible.
   /// For unsupported/unknown proxies/property-groups, implementations should simply
   /// return NULL without raising any errors (or messages).
   pqPropertyWidget* createWidgetForPropertyGroup(vtkSMProxy *proxy,
-                                                 vtkSMPropertyGroup *group) override;
+    vtkSMPropertyGroup *group, QWidget* parentWidget) override;
 
   /// Given the type of the decorator and the pqPropertyWidget that needs to be
   /// decorated, create the pqPropertyWidgetDecorator instance, if possible.

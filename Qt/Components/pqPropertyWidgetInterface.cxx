@@ -38,19 +38,21 @@ pqPropertyWidgetInterface::~pqPropertyWidgetInterface()
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(
-  vtkSMProxy* proxy, vtkSMProperty* property)
+  vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parentWidget)
 {
   Q_UNUSED(proxy);
   Q_UNUSED(property);
+  Q_UNUSED(parentWidget);
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForPropertyGroup(
-  vtkSMProxy* proxy, vtkSMPropertyGroup* group)
+  vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentWidget)
 {
   Q_UNUSED(proxy);
   Q_UNUSED(group);
+  Q_UNUSED(parentWidget);
   return 0;
 }
 
