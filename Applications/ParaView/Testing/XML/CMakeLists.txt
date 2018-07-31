@@ -629,6 +629,7 @@ endif()
 if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/ColorByComponentNames.xml # needs programmable filter
+    ${CMAKE_CURRENT_SOURCE_DIR}/IndexedLookupInitialization.xml # needs Python Calculator
     ${CMAKE_CURRENT_SOURCE_DIR}/LiveProgrammableSource.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/SaveLoadStatePython.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
