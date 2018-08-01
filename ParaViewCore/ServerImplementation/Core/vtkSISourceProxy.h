@@ -86,6 +86,14 @@ protected:
   bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
 
   /**
+   * Called after CreateVTKObjects(). The main difference for subclasses when
+   * overriding CreateVTKObjects() or OnCreateVTKObjects() is that
+   * CreateVTKObjects() is called before ReadXMLAttributes() is called, while
+   * OnCreateVTKObjects() is called after ReadXMLAttributes().
+   */
+  void OnCreateVTKObjects() override;
+
+  /**
    * Create the output ports and add post filters for each output port.
    * CreateOutputPorts is only called when an output-port is requested, i.e.
    * GetOutputPort() is called.
