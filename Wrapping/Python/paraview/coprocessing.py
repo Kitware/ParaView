@@ -46,6 +46,9 @@ class CoProcessor(object):
 
     def __init__(self):
         self.__PipelineCreated = False
+        # __ProducersMap will have a list of the producers/channels that need to be
+        # created by the adaptor for this pipeline. The adaptor may be able to generate
+        # other channels as well though.
         self.__ProducersMap = {}
         self.__WritersList = []
         self.__ViewsList = []
@@ -121,13 +124,16 @@ class CoProcessor(object):
            Default implementation uses the update-frequencies set using
            SetUpdateFrequencies() to determine if the current timestep needs to
            be processed and then requests all fields. Subclasses can override
-           this method to provide additional customizations."""
+           this method to provide additional customizations. If there is a Live
+           connection that can also override the initial frequencies."""
 
         timestep = datadescription.GetTimeStep()
 
-        # if this is a time step to do live then all of the inputs
-        # must be made available. note that we want the pipeline built
-        # before we do the actual first live connection.
+        # if this is a time step to do live then only the channels that were requested when
+        # generating the script will be made available even though the adaptor may be able
+        # to provide other channels. similarly, if only specific arrays were requested when
+        # generating the script then only those arrays will be provided to the Live connection.
+        # note that we want the pipeline built before we do the actual first live connection.
         if self.__EnableLiveVisualization and self.NeedToOutput(timestep, self.__LiveVisualizationFrequency) \
            and self.__LiveVisualizationLink:
             if self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
@@ -135,19 +141,22 @@ class CoProcessor(object):
                     for key in self.__RequestedArrays:
                         for v in self.__RequestedArrays[key]:
                             datadescription.GetInputDescriptionByName(key).AddField(v[0], v[1])
+                elif self.__InitialFrequencies:
+                    # __ProducersMap will not be filled up until after the first call to
+                    # DoCoProcessing so we rely on __InitialFrequencies initially but then
+                    # __ProducersMap after that as __InitialFrequencies will be cleared out.
+                    for key in self.__InitialFrequencies:
+                        datadescription.GetInputDescriptionByName(key).AllFieldsOn()
+                        datadescription.GetInputDescriptionByName(key).GenerateMeshOn()
                 else:
-                    num_inputs = datadescription.GetNumberOfInputDescriptions()
-                    for cc in range(num_inputs):
-                        input_name = datadescription.GetInputDescriptionName(cc)
-                        datadescription.GetInputDescription(cc).AllFieldsOn()
-                        datadescription.GetInputDescription(cc).GenerateMeshOn()
+                    for key in self.__ProducersMap:
+                        datadescription.GetInputDescriptionByName(key).AllFieldsOn()
+                        datadescription.GetInputDescriptionByName(key).GenerateMeshOn()
                 return
 
         # if we haven't processed the pipeline yet in DoCoProcessing() we
         # must use the initial frequencies to figure out if there's
-        # work to do this time/timestep. If Live is enabled we mark
-        # all inputs as needed (this is only done if the Live connection
-        # hasn't been set up yet). If we don't have live enabled
+        # work to do this time/timestep. If we don't have Live enabled
         # we know that the output frequencies aren't changed and can
         # just use the initial frequencies.
         if self.__ForceOutputAtFirstCall or self.__InitialFrequencies or not self.__EnableLiveVisualization:
@@ -155,16 +164,14 @@ class CoProcessor(object):
                 for key in self.__RequestedArrays:
                     for v in self.__RequestedArrays[key]:
                         datadescription.GetInputDescriptionByName(key).AddField(v[0], v[1])
-            else:
-                num_inputs = datadescription.GetNumberOfInputDescriptions()
-                for cc in range(num_inputs):
-                    input_name = datadescription.GetInputDescriptionName(cc)
-                    freqs = self.__InitialFrequencies.get(input_name, [])
-                    if self.__EnableLiveVisualization or ( self and self.IsInModulo(timestep, freqs) ):
-                        datadescription.GetInputDescription(cc).AllFieldsOn()
-                        datadescription.GetInputDescription(cc).GenerateMeshOn()
+            elif self.__InitialFrequencies:
+                for key in self.__InitialFrequencies:
+                    freqs = self.__InitialFrequencies.get(key, [])
+                    if self.__EnableLiveVisualization or self.IsInModulo(timestep, freqs):
+                        datadescription.GetInputDescriptionByName(key).AllFieldsOn()
+                        datadescription.GetInputDescriptionByName(key).GenerateMeshOn()
         else:
-            # the catalyst pipeline may have been changed by a live connection
+            # the catalyst pipeline may have been changed by a Live connection
             # so we need to regenerate the frequencies
             from paraview import cpstate
             frequencies = {}

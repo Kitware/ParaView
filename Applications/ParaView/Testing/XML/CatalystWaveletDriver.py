@@ -35,7 +35,18 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
     datadescription = vtkPVCatalyst.vtkCPDataDescription()
     datadescription.SetTimeData(time, step)
     datadescription.AddInput("input")
+    # add another input/channel that should never be requested by Live. we check later that
+    # this input/channel indeed is NOT requested to verify that Catalyst is only
+    # requesting what it should be.
+    datadescription.AddInput("other_input")
     cpscript.RequestDataDescription(datadescription)
+
+    inputdescription = datadescription.GetInputDescriptionByName("other_input")
+    if inputdescription.GetIfGridIsNecessary() == True:
+        print('ERROR: Should not be requesting Catalyst channel named "other_input" but am')
+        sys.exit(1)
+        return
+
     inputdescription = datadescription.GetInputDescriptionByName("input")
     if inputdescription.GetIfGridIsNecessary() == False:
         return

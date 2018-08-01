@@ -61,7 +61,7 @@ static const char* cp_python_export_code = "from paraview import cpexport\n"
                                            "   enable_live_viz=%6,\n"
                                            "   live_viz_frequency=%7,\n"
                                            "   cinema_tracks={%8},\n"
-                                           "   array_selection = {%10},\n"
+                                           "   cinema_arrays = {%10},\n"
                                            "   filename='%9')\n";
 }
 
