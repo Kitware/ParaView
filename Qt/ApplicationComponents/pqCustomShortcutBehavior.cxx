@@ -66,6 +66,10 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings& settings)
     }
     else if (!actionName.isEmpty())
     {
+      // store the default key sequence before overriding it with the
+      // user specified one in the settings.
+      QKeySequence defaultShortcut = action->shortcut();
+      action->setProperty("ParaViewDefaultKeySequence", defaultShortcut);
       auto variant = settings.value(actionName, QVariant());
       if (variant.canConvert<QKeySequence>())
       {

@@ -45,7 +45,9 @@ public:
 
 private slots:
   void onEditingFinished();
-  void onApply();
+  void onSelectionChanged();
+  void onClearShortcut();
+  void onResetShortcut();
 
 private:
   Q_DISABLE_COPY(pqCustomizeShortcutsDialog);
