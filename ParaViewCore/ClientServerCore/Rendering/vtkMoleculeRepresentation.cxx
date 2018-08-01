@@ -246,10 +246,10 @@ void vtkMoleculeRepresentation::SyncMapper()
 void vtkMoleculeRepresentation::UpdateColoringParameters()
 {
   vtkInformation* info = this->GetInputArrayInformation(0);
-  vtkInformation* mInfo = this->Mapper->GetInputArrayInformation(0);
-
-  mInfo->CopyEntry(info, vtkDataObject::FIELD_ASSOCIATION());
-  mInfo->CopyEntry(info, vtkDataObject::FIELD_NAME());
+  // this ensures that mapper's Mtime is updated when the array selection
+  // changes.
+  this->Mapper->SetInputArrayToProcess(
+    0, 0, 0, info->Get(vtkDataObject::FIELD_ASSOCIATION()), info->Get(vtkDataObject::FIELD_NAME()));
 }
 
 //----------------------------------------------------------------------------
