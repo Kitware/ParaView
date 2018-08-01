@@ -491,6 +491,7 @@ public:
   QPointer<pqPresetDialogProxyModel> ProxyModel;
   QPointer<pqPresetDialogReflowModel> ReflowModel;
   QScopedPointer<QObject> EventFilter;
+  bool ShowingAdvanced;
 
   pqInternals(pqPresetDialog::Modes mode, pqPresetDialog* self)
     : Model(new pqPresetDialogTableModel(self))
@@ -502,6 +503,7 @@ public:
     this->Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
     this->Ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
     this->Ui.verticalLayout->setSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+    this->ShowingAdvanced = false;
 
     this->ProxyModel->setSourceModel(this->Model);
     this->ProxyModel->setFilterKeyColumn(0);
@@ -576,7 +578,23 @@ pqPresetDialog::pqPresetDialog(QWidget* parentObject, pqPresetDialog::Modes mode
   this->connect(ui.advancedButton, &QAbstractButton::toggled, this, [&](bool showAdvanced) {
     this->Internals->ProxyModel->setShowAdvanced(showAdvanced);
     this->updateEnabledStateForSelection();
+    this->Internals->ShowingAdvanced = showAdvanced;
   });
+  this->Internals->ProxyModel->connect(
+    ui.searchBox, &pqSearchBox::textChanged, [this](const QString& text) {
+      if (!text.isEmpty())
+      {
+        this->Internals->ProxyModel->setShowAdvanced(true);
+        this->updateEnabledStateForSelection();
+        this->Internals->Ui.advancedButton->setEnabled(false);
+      }
+      else
+      {
+        this->Internals->ProxyModel->setShowAdvanced(this->Internals->ShowingAdvanced);
+        this->updateEnabledStateForSelection();
+        this->Internals->Ui.advancedButton->setEnabled(true);
+      }
+    });
   this->connect(ui.showDefault, SIGNAL(stateChanged(int)), SLOT(setPresetIsAdvanced(int)));
 }
 
@@ -654,7 +672,7 @@ void pqPresetDialog::setCurrentPreset(const char* presetName)
   }
   auto newIdx = internals.ProxyModel->mapFromSource(idx);
   newIdx = internals.ReflowModel->mapFromSource(newIdx);
-  if (!newIdx.isValid() && !internals.ProxyModel->isShowingAdvanced())
+  if (!newIdx.isValid() && !internals.ShowingAdvanced)
   {
     // If the requested preset is not in the default list, trigger the show advanced button and try
     // to get the index again.  Since the return above was not triggered we know the index should be
