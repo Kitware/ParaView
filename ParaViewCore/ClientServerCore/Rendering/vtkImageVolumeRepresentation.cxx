@@ -130,6 +130,9 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0;
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
+
+  this->MapScalars = true;
+  this->MultiComponentsMapping = false;
 }
 
 //----------------------------------------------------------------------------
@@ -342,6 +345,22 @@ void vtkImageVolumeRepresentation::UpdateMapperParameters()
 
   if (this->Property)
   {
+    if (this->MapScalars)
+    {
+      if (this->MultiComponentsMapping)
+      {
+        this->Property->SetIndependentComponents(false);
+      }
+      else
+      {
+        this->Property->SetIndependentComponents(true);
+      }
+    }
+    else
+    {
+      this->Property->SetIndependentComponents(false);
+    }
+
     // Update the mapper's vector mode
     vtkColorTransferFunction* ctf = this->Property->GetRGBTransferFunction(0);
 
@@ -460,15 +479,21 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 }
 
 //----------------------------------------------------------------------------
-void vtkImageVolumeRepresentation::SetIndependentComponents(bool val)
+void vtkImageVolumeRepresentation::SetMapScalars(bool val)
 {
-  this->Property->SetIndependentComponents(val);
+  this->MapScalars = val;
+  // the value is passed on to the vtkVolumeProperty in UpdateMapperParameters
+  // since SetMapScalars and SetMultiComponentsMapping both control the same
+  // vtkVolumeProperty ivar i.e. IndependentComponents.
 }
 
 //----------------------------------------------------------------------------
 void vtkImageVolumeRepresentation::SetMultiComponentsMapping(bool val)
 {
-  this->Property->SetIndependentComponents(!val);
+  this->MultiComponentsMapping = val;
+  // the value is passed on to the vtkVolumeProperty in UpdateMapperParameters
+  // since SetMapScalars and SetMultiComponentsMapping both control the same
+  // vtkVolumeProperty ivar i.e. IndependentComponents.
 }
 
 //----------------------------------------------------------------------------

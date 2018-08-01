@@ -94,7 +94,7 @@ public:
   void SetSpecular(double);
   void SetSpecularPower(double);
   void SetShade(bool);
-  void SetIndependentComponents(bool);
+  void SetMapScalars(bool);
   void SetMultiComponentsMapping(bool);
 
   //@{
@@ -174,6 +174,9 @@ protected:
   double Origin[3];
   double Spacing[3];
   int WholeExtent[6];
+
+  bool MapScalars;
+  bool MultiComponentsMapping;
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&) = delete;

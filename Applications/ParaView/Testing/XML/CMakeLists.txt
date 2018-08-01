@@ -490,6 +490,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo8.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UnstructuredOutline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VectorComponentHistogram.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/VolumeNoMapScalars.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VolumeRenderingWithContour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VolumeReprTwoIndepComp.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
@@ -885,8 +886,11 @@ set(ExportSceneSpreadSheetView2_DISABLE_CRS TRUE)
 # in this test.
 set (RemoteRendering_DISABLE_CRS TRUE)
 set (RemoteRendering_THRESHOLD 50)
-set (VolumeRenderingWithContour_DISABLE_CRS 50)
+set (VolumeRenderingWithContour_DISABLE_CRS TRUE)
 set (VolumeRenderingWithContour_THRESHOLD 50)
+set (VolumeNoMapScalars_DISABLE_CRS TRUE)
+set (VolumeNoMapScalars_THRESHOLD 50)
+
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.

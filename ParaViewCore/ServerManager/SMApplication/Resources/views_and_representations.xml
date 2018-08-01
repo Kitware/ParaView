@@ -4525,6 +4525,18 @@
         <BooleanDomain name="bool" />
         <Documentation>Enable/Disable shading.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetMapScalars"
+                         default_values="1"
+                         name="MapScalars"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When enabled, LookupTable will always be
+        used for scalar mapping. Otherwise, when up to 4 component
+        scalars are present, the components are clamped to a valid
+        color interval (0-255 for an integral type and 0.0-1.0 for a
+        floating point type) and then directly used as
+        color.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetMultiComponentsMapping"
                          default_values="0"
                          name="MultiComponentsMapping"

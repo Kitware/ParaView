@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit0" command="set_string" arguments="-20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit1" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit2" command="set_string" arguments="-20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit3" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProgrammableFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/1pqPopOutWidget0/Script" command="set_string" arguments="from paraview.vtk.numpy_interface import dataset_adapter as dsa&#xA;import numpy &#xA;def make_tensor(xx,yy,zz,aa):&#xA;  return numpy.vstack([xx,yy,zz,aa]).transpose().view(dsa.VTKArray)&#xA;&#xA;xx = numpy.uint8(inputs[0].PointData[&quot;RTData&quot;])&#xA;output.PointData.append(make_tensor(xx,xx,xx,xx), &quot;rgba&quot;)&#xA;&#xA;" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/SearchLineEdit" command="set_string" arguments="map" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/MapScalars/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Volume" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/SearchLineEdit" command="key" arguments="16777216" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit0" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit1" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit2" command="set_string" arguments="-20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/WholeExtent/LineEdit3" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Recent" command="activate" arguments="ProgrammableFilter" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Script/1pqPopOutWidget0/Script" command="set_string" arguments="from paraview.vtk.numpy_interface import dataset_adapter as dsa&#xA;import numpy &#xA;def make_tensor(xx,yy,zz,aa):&#xA;  return numpy.vstack([xx,yy,zz,aa]).transpose().view(dsa.VTKArray)&#xA;&#xA;xx = numpy.uint8(inputs[0].PointData[&quot;RTData&quot;])&#xA;count = len(xx)&#xA;output.PointData.append(make_tensor(xx,numpy.zeros(count), numpy.zeros(count), xx), &quot;rgba&quot;) &#xA;" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/SearchLineEdit" command="set_string" arguments="map" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/MapScalars/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Volume" />
+
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+</pqevents>
