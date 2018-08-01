@@ -1088,9 +1088,25 @@
         <Documentation>This property lists which point-centered arrays to
         read.</Documentation>
       </StringVectorProperty>
-      <!-- End XMLPUnstructuredGridReaderCore -->
+      <!-- End vtkXMLPUnstructuredGridReader -->
     </Proxy>
-        <Proxy class="vtkXMLPTableReader"
+    <!-- Start XMLHyperTreeReaderCore -->
+    <!-- NEED PARALLEL SUPPORT -->
+    <Proxy class="vtkXMLHyperTreeGridReader"
+                 label="XML HyperTree Grid Reader"
+                 name="XMLHyperTreeGridReaderCore">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        Hyper Tree grid reader.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+    <!-- End XMLHyperTreeReaderCore -->
+    <Proxy class="vtkXMLPTableReader"
                  label="XML Partitioned Table Reader"
                  name="XMLPTableReaderCore">
       <Documentation long_help="Reads the summary file and the associated VTK XML table files."
@@ -8240,27 +8256,54 @@ series.
                        file_description="TRUCHAS dataset" />
       </Hints>
     </SourceProxy>
-    <!-- HyperTreeGrid Reader -->
-    <SourceProxy class="vtkXMLHyperTreeGridReader"
+    <!-- HyperTreeGridReader -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
                  label="HyperTreeGrid Reader"
-                 name="HyperTreeGridReader">
-      <Documentation long_help="Reads HyperTreeGrid .htg files"
-                     short_help="Reads HyperTreeGrid data">Reads HyperTreeGrid data files</Documentation>
-      <StringVectorProperty animateable="0"
-                            command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1"
-                            panel_visibility="never">
-        <FileListDomain name="files" />
-        <Documentation>This property specifies the file name</Documentation>
+                 name="HyperTreeGridReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation
+        long_help="Reads HyperTreeGrid .htg files"
+        short_help="Reads HyperTreeGrid data"
+      >Reads HyperTreeGrid data files
+      </Documentation>
+      <SubProxy>
+        <Proxy
+          name="Reader"
+          proxygroup="internal_sources"
+          proxyname="XMLHyperTreeGridReaderCore"
+        />
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
       </StringVectorProperty>
-
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
       <Hints>
-        <ReaderFactory extensions="htg"
-                       file_description="HyperTreeGrid" />
+        <ReaderFactory
+          extensions="htg"
+          file_description="HyperTreeGrid"
+        />
       </Hints>
     </SourceProxy>
-
+    <!-- AMReXParticlesReader -->
     <SourceProxy name="AMReXParticlesReader"
       class="vtkFileSeriesReader"
       file_name_method="SetPlotFileName"
