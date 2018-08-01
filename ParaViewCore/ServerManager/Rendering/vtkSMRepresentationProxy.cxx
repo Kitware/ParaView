@@ -342,7 +342,7 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   {
     vtkTimerLog::MarkStartEvent("vtkSMRepresentationProxy::GetProminentValues");
     this->CreateVTKObjects();
-    this->UpdatePipeline();
+
     // Initialize parameters with specified values:
     this->ProminentValuesInformation->Initialize();
     this->ProminentValuesInformation->SetFieldAssociation(
@@ -354,7 +354,23 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
     this->ProminentValuesInformation->SetForce(force);
 
     // Ask the server to fill out the rest of the information:
-    this->GatherInformation(this->ProminentValuesInformation);
+
+    // Now, we need to check if the array of interest is on the input or
+    // produced as an artifact by the representation.
+    vtkSMPropertyHelper inputHelper(this, "Input");
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
+    const unsigned int port = inputHelper.GetOutputPort();
+    if (input &&
+      input->GetDataInformation(port)->GetArrayInformation(name.c_str(), fieldAssoc) != nullptr)
+    {
+      this->ProminentValuesInformation->SetPortNumber(port);
+      input->GatherInformation(this->ProminentValuesInformation);
+    }
+    else
+    {
+      this->GatherInformation(this->ProminentValuesInformation);
+    }
+
     vtkTimerLog::MarkEndEvent("vtkSMRepresentationProxy::GetProminentValues");
     this->ProminentValuesFraction = fraction;
     this->ProminentValuesUncertainty = uncertaintyAllowed;

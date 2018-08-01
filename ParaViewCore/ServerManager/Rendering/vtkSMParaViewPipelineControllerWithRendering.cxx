@@ -335,6 +335,7 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
           mgr->GetColorTransferFunction(arrayName, proxy->GetSessionProxyManager());
         vtkSMPropertyHelper(lutProperty).Set(lutProxy);
         vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(proxy, true);
+        proxy->UpdateVTKObjects();
       }
     }
   }
