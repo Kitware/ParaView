@@ -61,7 +61,7 @@ public:
           stream << iter->toStyledString().c_str();
         }
         stream << "]";
-        settings->SetSetting("TransferFuctionPresets.CustomPresets", stream.str());
+        settings->SetSetting("TransferFunctionPresets.CustomPresets", stream.str());
       }
     }
   }
@@ -202,7 +202,7 @@ private:
     }
     this->CustomPresetsLoaded = true;
 
-    const char* const settingsKey = "TransferFuctionPresets.CustomPresets";
+    const char* const settingsKey = "TransferFunctionPresets.CustomPresets";
     vtkSMSettings* settings = vtkSMSettings::GetInstance();
     if (settings == NULL || !settings->HasSetting(settingsKey))
     {
