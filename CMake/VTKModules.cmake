@@ -366,6 +366,9 @@ set(_vtk_modules
 
   vtkPVVTKExtensionsCGNSReader
   # needed for CGNS reader support.
+  
+  vtkPVVTKExtensionsCGNSWriter
+  # needed for CGNS writer support.
 
   vtkPVVTKExtensionsH5PartReader
   # needed for H5PartReader support

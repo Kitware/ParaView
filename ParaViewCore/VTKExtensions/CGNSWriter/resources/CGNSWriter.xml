@@ -1,0 +1,53 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="writers">
+    <!-- CGNSWriter -->
+    <WriterProxy name="CGNSWriter"
+                 class="vtkCGNSWriter"
+                 label="CGNS Writer">
+      <Documentation short_help="Write a dataset in CGNS format."
+                     long_help="Write files stored in CGNS format.">
+        The CGNS writer writes files stored in CGNS format.
+        The file extension is .cgns. The input of this reader is
+        a structured grid, polygon data, unstructured grid or a multi-block
+        dataset containing these data types.
+      </Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input" >
+
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseHDF5"
+                         number_of_elements="1"
+                         name="UseHDF5"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When UseHDF5 is turned ON, the CGNS file will use HDF5 as
+        the underlying file format. When turned OFF, the file will use ADF as the
+        underlying file format. HDF5 is preferred and default.
+        </Documentation>
+      </IntVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="UseHDF5" show="0"/>
+        <WriterFactory extensions="cgns" file_description="CGNS Files"/>
+      </Hints>
+
+      <!-- End of CGNSWriter -->
+    </WriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
