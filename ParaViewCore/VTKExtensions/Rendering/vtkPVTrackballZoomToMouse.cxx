@@ -51,7 +51,7 @@ void vtkPVTrackballZoomToMouse::OnMouseMove(
   // The camera's Dolly function scales by the distance already, so we need
   // to un-scale by it here so the zoom is not too fast or slow.
   double k = dy * this->ZoomScale / ren->GetActiveCamera()->GetDistance();
-  vtkPVInteractorStyle::DollyToPosition((1.0 - k), this->ZoomPosition, ren);
+  vtkPVInteractorStyle::DollyToPosition((1.0 + k), this->ZoomPosition, ren);
   rwi->Render();
 }
 
