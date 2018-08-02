@@ -37,7 +37,6 @@ set(Module_SRCS
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx
   vtkImageFileSeriesReader.cxx
-  vtkIntegrateAttributes.cxx
   vtkMemberFunctionCommand.h
   vtkMetaReader.cxx
   vtkMultiProcessControllerHelper.cxx
