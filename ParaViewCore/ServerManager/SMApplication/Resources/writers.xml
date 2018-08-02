@@ -635,6 +635,7 @@
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkMultiBlockDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
