@@ -63,6 +63,7 @@ correctness of outputs. A description of the examples are:
                           This example is meant to be used as an example of how
                           Catalyst deals with ghost cells for an unstructured grid
                           or an image data. This example requires a Catalyst build.
+* CxxHyperTreeGridExample -- An example where a vtkHyperTreeGrid is produced.
 
 Other objects of interest:
 * LICENSE.md -- The license of this software.

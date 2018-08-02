@@ -635,6 +635,7 @@
         <DataTypeDomain composite_data_supported="1"
                         name="input_type">
           <DataType value="vtkMultiBlockDataSet" />
+          <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
@@ -1568,6 +1569,77 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty command="SetEncodeAppendedData"
+                         default_values="0"
+                         name="EncodeAppendedData"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When EncodeAppendedData is turned ON, the writer uses
+        base64 encoding when writing binary data (only if appended mode is
+        selected).</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompressorType"
+                         default_values="0"
+                         name="CompressorType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="None"
+                 value="0"
+                 info="fastest write"/>
+          <Entry text="LZ4"
+                 value="2"
+                 info="fastest compressed write" />
+          <Entry text="ZLib"
+                 value="1"
+                 info="balanced performance" />
+          <Entry text="LZMA"
+                 value="3"
+                 info="smallest filesize" />
+        </EnumerationDomain>
+        <Documentation>The compression algorithm used to compress binary data
+        (appended mode only). None offers fastest write, LZ4 offers fastest
+        compressed write, ZLib offers balanced performance, LZMA offers
+        smallest compressed filesize.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetCompressionLevel"
+                         default_values="6"
+                         name="CompressionLevel"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="1"
+                 value="1"
+                 info="fastest write"/>
+          <Entry text="2"
+                 value="2" />
+          <Entry text="3"
+                 value="3" />
+          <Entry text="4"
+                 value="4" />
+          <Entry text="5"
+                 value="5"
+                 info="balanced performance" />
+          <Entry text="6"
+                 value="6" />
+          <Entry text="7"
+                 value="7" />
+          <Entry text="8"
+                 value="8" />
+          <Entry text="9"
+                 value="9"
+                 info="smallest filesize"/>
+        </EnumerationDomain>
+        <Documentation>A compression performance parameter from 1 (faster/larger
+         compressed filesize) to 9 (slower/smaller compressed filesize).</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="CompressorType"
+                                   value="0"
+                                   inverse="1" />
+        </Hints>
+      </IntVectorProperty>
+
       <Hints>
         <Property name="Input"
                   show="0" />

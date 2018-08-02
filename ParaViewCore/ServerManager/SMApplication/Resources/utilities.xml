@@ -4058,6 +4058,48 @@
       </Hints>
       <!-- End of ExodusIIWriter -->
     </SourceProxy>
+
+    <SourceProxy name="HyperTreeGridWriter" class="vtkPVNullSource"
+      label="Parallel HyperTreeGrid Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkHyperTreeGrid" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.htg">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="PaddingAmount"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the script state -->
+      <WriterProxy group="writers" name="HyperTreeGridWriter" />
+     </Hints>
+     <!-- End of HyperTreeGridWriter -->
+    </SourceProxy>
   </ProxyGroup>
 
   <ProxyGroup name="pythontracing">
