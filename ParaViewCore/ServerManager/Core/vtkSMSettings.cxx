@@ -65,6 +65,19 @@ bool SortByPriority(const SettingsCollection& r1, const SettingsCollection& r2)
   return (r1.Priority > r2.Priority);
 }
 
+// Potentially transform JSON to handle backwards compatibility issues
+void TransformJSON(std::string& settingsJSON)
+{
+  std::string findString("TransferFuctionPresets");
+  std::string replaceString("TransferFunctionPresets");
+  size_t location = settingsJSON.find(findString);
+  while (location != std::string::npos)
+  {
+    settingsJSON.replace(location, findString.length(), replaceString);
+    location = settingsJSON.find(findString);
+  }
+}
+
 } // end anonymous namespace
 
 class vtkSMSettings::vtkSMSettingsInternal
@@ -963,6 +976,9 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
   {
     processedSettings.append("{}");
   }
+
+  // Take care of any backwards compatibility issues
+  TransformJSON(processedSettings);
 
   Json::CharReaderBuilder builder;
   builder["collectComments"] = true;
