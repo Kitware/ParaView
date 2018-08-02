@@ -123,7 +123,6 @@ void FEAdaptor::AddData(vtkHyperTreeGrid* htg, vtkHyperTreeCursor* cursor)
 
 void FEAdaptor::SubdivideLeaves(vtkHyperTreeGrid* htg, vtkHyperTreeCursor* cursor, long long treeId)
 {
-  unsigned int level = cursor->GetLevel();
   this->AddData(htg, cursor);
   if (cursor->IsLeaf())
   {
