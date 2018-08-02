@@ -143,8 +143,6 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
     PresetDialog = new pqPresetDialog(pqCoreUtilities::mainWidget(), indexedLookup
         ? pqPresetDialog::SHOW_INDEXED_COLORS_ONLY
         : pqPresetDialog::SHOW_NON_INDEXED_COLORS_ONLY);
-    this->connect(PresetDialog, &pqPresetDialog::applyPreset, this,
-      []() { std::cerr << "got signal" << std::endl; });
   }
 
   PresetDialog->setCurrentPreset(presetName);
