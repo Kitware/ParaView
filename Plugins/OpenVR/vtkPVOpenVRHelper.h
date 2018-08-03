@@ -22,12 +22,16 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
-#include <map> // for ivar
-#include <set> // for ivar
+#include <map>    // for ivar
+#include <set>    // for ivar
+#include <vector> // fo rivar
 
+class vtkBoxWidget2;
 class vtkCallbackCommand;
+class vtkDataSet;
 class vtkDistanceWidget;
 class vtkImplicitPlaneWidget2;
+class vtkOpenVRCameraPose;
 class vtkOpenVRInteractorStyle;
 class vtkOpenVRMenuWidget;
 class vtkOpenVRMenuRepresentation;
@@ -37,9 +41,13 @@ class vtkOpenVRRenderWindowInteractor;
 class vtkOpenVRRenderer;
 class vtkOpenVRRenderWindow;
 class vtkPropCollection;
+class vtkPVDataRepresentation;
 class vtkPVRenderView;
+class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMProxyLocator;
 class vtkSMViewProxy;
+class vtkTransform;
 
 class vtkPVOpenVRHelper : public vtkObject
 {
@@ -57,10 +65,6 @@ public:
   // called when a view is removed from PV
   void ViewRemoved(vtkSMViewProxy* view);
 
-  std::string GetNextXML() { return this->NextXML; }
-
-  void SetNextXML(std::string& pos) { this->NextXML = pos; }
-
   // if in VR close out the event loop
   void Quit();
 
@@ -68,31 +72,94 @@ public:
   // on the View
   void UpdateProps();
 
+  // use multisampling
+  vtkSetMacro(MultiSample, bool);
+  vtkGetMacro(MultiSample, bool);
+
+  // set the initial thickness in world coordinates for
+  // thick crop planes. 0 indicates automatic
+  // setting. It defaults to 0
+  vtkSetMacro(DefaultCropThickness, double);
+  vtkGetMacro(DefaultCropThickness, double);
+
+  // Save/Load the state for VR
+  void LoadState(vtkPVXMLElement*, vtkSMProxyLocator*);
+  void SaveState(vtkPVXMLElement*);
+
+  // allow the user to edit a scalar field
+  // in VR
+  vtkSetMacro(EditableField, std::string);
+  vtkGetMacro(EditableField, std::string);
+
+  void SetFieldValues(const char*);
+  vtkGetMacro(FieldValues, std::string);
+
+  void ExportLocationsAsSkyboxes(vtkSMViewProxy* view);
+  void ExportLocationsAsView(vtkSMViewProxy* view);
+
 protected:
   vtkPVOpenVRHelper();
   ~vtkPVOpenVRHelper();
 
-  std::string NextXML;
+  // state settings that the helper loads
+  // These are typically not exposed in the GUI
+  // state exposed inthe GUI is handled by the DockPanel
+  // gui class.
+  int NavigationPanelVisibility;
+  std::vector<std::pair<std::array<double, 3>, std::array<double, 3> > > CropPlaneStates;
+  std::vector<std::array<double, 16> > ThickCropStates;
+  bool CropSnapping;
+
+  std::string EditableField;
+  std::string FieldValues;
+  bool MultiSample;
+
+  void ApplyState();
+  void RecordState();
+
+  double DefaultCropThickness;
+
+  std::map<int, std::string> EditFieldMap;
+  vtkOpenVRMenuWidget* EditFieldMenu;
+  vtkOpenVRMenuRepresentation* EditFieldMenuRepresentation;
+  void EditField(std::string name);
+
+  vtkDataSet* LastPickedDataSet;
+  vtkIdType LastPickedCellId;
+  vtkPVDataRepresentation* LastPickedRepresentation;
+  vtkDataSet* PreviousPickedDataSet;
+  vtkIdType PreviousPickedCellId;
+  vtkPVDataRepresentation* PreviousPickedRepresentation;
+  std::vector<vtkIdType> SelectedCells;
 
   void GetScalars();
   void BuildScalarMenu();
-  void SelectScalar(std::string name);
+  void SelectScalar();
+  std::string SelectedScalar;
 
   vtkNew<vtkOpenVRPanelWidget> NavWidget;
   vtkNew<vtkOpenVRPanelRepresentation> NavRepresentation;
   void ToggleNavigationPanel();
   unsigned long NavigationTag;
 
-  void AddACropPlane();
-  void RemoveAllCropPlanes();
   std::set<vtkImplicitPlaneWidget2*> CropPlanes;
+  std::set<vtkBoxWidget2*> ThickCrops;
+  void AddACropPlane(double* origin, double* normal);
+  void RemoveAllCropPlanes();
+  void AddAThickCrop(vtkTransform* t);
+  void RemoveAllThickCrops();
+  void ToggleCropSnapping();
+  vtkNew<vtkOpenVRMenuRepresentation> CropMenuRepresentation;
+  vtkNew<vtkOpenVRMenuWidget> CropMenu;
+  unsigned long CropTag;
 
   vtkOpenVRInteractorStyle* Style;
   vtkOpenVRRenderWindowInteractor* Interactor;
 
   std::map<std::string, int> ScalarMap;
-  vtkNew<vtkOpenVRMenuWidget> ScalarMenu;
-  vtkNew<vtkOpenVRMenuRepresentation> ScalarMenuRepresentation;
+  vtkOpenVRMenuWidget* ScalarMenu;
+  vtkOpenVRMenuRepresentation* ScalarMenuRepresentation;
+
   vtkCallbackCommand* EventCommand;
   static void EventCallback(
     vtkObject* object, unsigned long event, void* clientdata, void* calldata);
@@ -109,6 +176,20 @@ protected:
   vtkOpenVRRenderWindow* RenderWindow;
   vtkPropCollection* AddedProps;
   vtkTimeStamp PropUpdateTime;
+
+  bool NeedStillRender;
+
+  void SaveLocationState(int slot);
+  void LoadLocationState();
+  class SlotData
+  {
+  public:
+    std::map<vtkSMProxy*, bool> Visibility;
+  };
+  std::map<int, SlotData> SlotValues;
+  int LoadSlotValue;
+
+  std::map<int, vtkOpenVRCameraPose> SavedCameraPoses;
 
 private:
   vtkPVOpenVRHelper(const vtkPVOpenVRHelper&) = delete;
