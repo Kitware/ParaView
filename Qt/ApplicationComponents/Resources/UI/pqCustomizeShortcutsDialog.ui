@@ -66,6 +66,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QPushButton" name="recordButton">
+        <property name="toolTip">
+         <string>To set the shortcut for the selected action, press this then enter the shortcut.</string>
+        </property>
         <property name="text">
          <string>Record</string>
         </property>
@@ -79,6 +82,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Remove the shortcut for the selected action.</string>
+        </property>
         <property name="text">
          <string>Clear</string>
         </property>
@@ -86,6 +92,9 @@
       </item>
       <item row="0" column="3">
        <widget class="QPushButton" name="resetButton">
+        <property name="toolTip">
+         <string>Restore the default shortcut for the selected action.</string>
+        </property>
         <property name="text">
          <string>Reset</string>
         </property>
