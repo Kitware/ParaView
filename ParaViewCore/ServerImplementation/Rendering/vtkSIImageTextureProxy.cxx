@@ -30,12 +30,9 @@ vtkSIImageTextureProxy::~vtkSIImageTextureProxy()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSIImageTextureProxy::CreateVTKObjects()
+void vtkSIImageTextureProxy::OnCreateVTKObjects()
 {
-  if (!this->Superclass::CreateVTKObjects())
-  {
-    return false;
-  }
+  this->Superclass::OnCreateVTKObjects();
 
   // Do the binding between the SubProxy source to the local input
   vtkSIProxy* reader = this->GetSubSIProxy("Source");
@@ -46,9 +43,8 @@ bool vtkSIImageTextureProxy::CreateVTKObjects()
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->GetVTKObject() << "SetInputConnection"
            << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-    return this->Interpreter->ProcessStream(stream) ? true : false;
+    this->Interpreter->ProcessStream(stream);
   }
-  return true;
 }
 
 //----------------------------------------------------------------------------

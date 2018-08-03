@@ -42,7 +42,7 @@ protected:
   /**
    * Overridden to hookup the image source with the Texture, if available.
    */
-  bool CreateVTKObjects() VTK_OVERRIDE;
+  void OnCreateVTKObjects() override;
 
 private:
   vtkSIImageTextureProxy(const vtkSIImageTextureProxy&) = delete;
