@@ -99,6 +99,7 @@
       "path": "VTK/Filters/Parallel",
       "include": [
         { "class": "vtkAggregateDataSetFilter" },
+        { "class": "vtkIntegrateAttributes" },
         { "class": "vtkPCellDataToPointData" }
       ],
       "replace": [
@@ -147,7 +148,6 @@
         { "class":"vtkAttributeDataReductionFilter" },
         { "class":"vtkExtractHistogram" },
         { "class":"vtkFileSeriesWriter" },
-        { "class":"vtkIntegrateAttributes" },
         { "class":"vtkParallelSerialWriter" },
         { "class":"vtkPExtractHistogram" },
         { "class":"vtkPVNullSource" },
