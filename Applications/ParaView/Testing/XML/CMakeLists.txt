@@ -490,7 +490,6 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo8.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UnstructuredOutline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VectorComponentHistogram.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/VolumeNoMapScalars.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VolumeRenderingWithContour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VolumeReprTwoIndepComp.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
@@ -638,6 +637,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSaveGeometry.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceStatisticsFilter.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSupplementalProxiesFully.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/VolumeNoMapScalars.xml # needs programmable filter
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
     ${CMAKE_CURRENT_SOURCE_DIR}/RestoreArrayDefaultTransferFunction.xml
