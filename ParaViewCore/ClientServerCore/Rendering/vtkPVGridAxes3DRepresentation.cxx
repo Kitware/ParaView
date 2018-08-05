@@ -37,10 +37,9 @@
 
 #include <algorithm>
 
-vtkStandardNewMacro(vtkPVGridAxes3DRepresentation)
-
-  //------------------------------------------------------------------------------
-  void vtkPVGridAxes3DRepresentation::PrintSelf(std::ostream& os, vtkIndent indent)
+vtkStandardNewMacro(vtkPVGridAxes3DRepresentation);
+//------------------------------------------------------------------------------
+void vtkPVGridAxes3DRepresentation::PrintSelf(std::ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

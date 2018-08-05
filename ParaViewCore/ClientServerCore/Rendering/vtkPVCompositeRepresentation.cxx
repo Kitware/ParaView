@@ -91,6 +91,10 @@ bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
     view->AddRepresentation(this->PolarAxesRepresentation);
   }
 
+  // a good spot to update debug names for internal representations.
+  this->SetDebugName(this->SelectionRepresentation, "Selection");
+  this->SetDebugName(this->PolarAxesRepresentation, "PolarAxes");
+  this->SetDebugName(this->GridAxesRepresentation, "GridAxes");
   return true;
 }
 
@@ -168,6 +172,10 @@ void vtkPVCompositeRepresentation::SetForcedCacheKey(double val)
 void vtkPVCompositeRepresentation::SetInputConnection(int port, vtkAlgorithmOutput* input)
 {
   this->GridAxesRepresentation->SetInputConnection(port, input);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->SetInputConnection(port, input);
+  }
   this->Superclass::SetInputConnection(port, input);
 }
 
@@ -175,6 +183,10 @@ void vtkPVCompositeRepresentation::SetInputConnection(int port, vtkAlgorithmOutp
 void vtkPVCompositeRepresentation::SetInputConnection(vtkAlgorithmOutput* input)
 {
   this->GridAxesRepresentation->SetInputConnection(input);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->SetInputConnection(input);
+  }
   this->Superclass::SetInputConnection(input);
 }
 
@@ -182,6 +194,10 @@ void vtkPVCompositeRepresentation::SetInputConnection(vtkAlgorithmOutput* input)
 void vtkPVCompositeRepresentation::AddInputConnection(int port, vtkAlgorithmOutput* input)
 {
   this->GridAxesRepresentation->AddInputConnection(port, input);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->AddInputConnection(port, input);
+  }
   this->Superclass::AddInputConnection(port, input);
 }
 
@@ -189,6 +205,10 @@ void vtkPVCompositeRepresentation::AddInputConnection(int port, vtkAlgorithmOutp
 void vtkPVCompositeRepresentation::AddInputConnection(vtkAlgorithmOutput* input)
 {
   this->GridAxesRepresentation->AddInputConnection(input);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->AddInputConnection(input);
+  }
   this->Superclass::AddInputConnection(input);
 }
 
@@ -196,6 +216,10 @@ void vtkPVCompositeRepresentation::AddInputConnection(vtkAlgorithmOutput* input)
 void vtkPVCompositeRepresentation::RemoveInputConnection(int port, vtkAlgorithmOutput* input)
 {
   this->GridAxesRepresentation->RemoveInputConnection(port, input);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->RemoveInputConnection(port, input);
+  }
   this->Superclass::RemoveInputConnection(port, input);
 }
 
@@ -203,6 +227,10 @@ void vtkPVCompositeRepresentation::RemoveInputConnection(int port, vtkAlgorithmO
 void vtkPVCompositeRepresentation::RemoveInputConnection(int port, int idx)
 {
   this->GridAxesRepresentation->RemoveInputConnection(port, idx);
+  if (this->PolarAxesRepresentation)
+  {
+    this->PolarAxesRepresentation->RemoveInputConnection(port, idx);
+  }
   this->Superclass::RemoveInputConnection(port, idx);
 }
 

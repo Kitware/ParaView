@@ -25,8 +25,10 @@
 #define vtkPVDataRepresentation_h
 
 #include "vtkDataRepresentation.h"
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkPVClientServerCoreRenderingModule.h" // needed for exports
 #include "vtkWeakPointer.h"                       // needed for vtkWeakPointer
+#include <string>                                 // needed for string
+
 class vtkInformationRequestKey;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentation : public vtkDataRepresentation
@@ -184,6 +186,16 @@ public:
    */
   vtkMTimeType GetPipelineDataTime();
 
+  //@{
+  /**
+   * See `vtkSMRepresentationProxy::SetDebugName`.
+   * This is solely intended to simplify debugging and use for any other purpose
+   * is vehemently discouraged.
+   */
+  void SetDebugName(const std::string& name) { this->DebugName = name; }
+  const std::string& GetDebugName() const { return this->DebugName; }
+  //@}
+
 protected:
   vtkPVDataRepresentation();
   ~vtkPVDataRepresentation() override;
@@ -218,6 +230,14 @@ protected:
   bool UpdateTimeValid;
   unsigned int UniqueIdentifier;
 
+  void SetDebugName(vtkPVDataRepresentation* repr, const std::string& name)
+  {
+    if (repr && repr->GetDebugName().empty())
+    {
+      repr->SetDebugName(this->DebugName + "/" + name);
+    }
+  }
+
 private:
   vtkPVDataRepresentation(const vtkPVDataRepresentation&) = delete;
   void operator=(const vtkPVDataRepresentation&) = delete;
@@ -230,6 +250,7 @@ private:
   class Internals;
   Internals* Implementation;
   vtkWeakPointer<vtkView> View;
+  std::string DebugName;
 };
 
 #endif

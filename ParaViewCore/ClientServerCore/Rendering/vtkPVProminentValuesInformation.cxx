@@ -203,66 +203,42 @@ int vtkPVProminentValuesInformation::Compare(vtkPVProminentValuesInformation* in
 //----------------------------------------------------------------------------
 void vtkPVProminentValuesInformation::CopyFromObject(vtkObject* obj)
 {
-  vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(obj);
-  // Locate named array in dataset(s).
-  // (This bit adapted from vtkPVDataInformation.)
-  vtkDataObject* dobj = vtkDataObject::SafeDownCast(repr->GetRenderedDataObject(0));
-  vtkInformation* info = NULL;
-  // Handle the case where the a vtkAlgorithmOutput is passed instead of
-  // the data object. vtkSMPart uses vtkAlgorithmOutput.
-  if (!dobj)
-  {
-    vtkAlgorithmOutput* algOutput = vtkAlgorithmOutput::SafeDownCast(obj);
-    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(obj);
-    if (algOutput && algOutput->GetProducer())
-    {
-      if (strcmp(algOutput->GetProducer()->GetClassName(), "vtkPVNullSource") == 0)
-      {
-        // Don't gather any data information from the hypothetical null source.
-        return;
-      }
+  // vtkPVProminentValuesInformation may be collected info from a
+  // `vtkPVDataRepresentation` subclass (in which case we're collecting
+  // representation data information) or a `vtkAlgorithm`.
+  // So we handle the two cases here.
 
-      if (algOutput->GetProducer()->IsA("vtkPVPostFilter"))
-      {
-        algOutput = algOutput->GetProducer()->GetInputConnection(0, 0);
-      }
-      info = algOutput->GetProducer()->GetOutputInformation(this->PortNumber);
-      dobj = algOutput->GetProducer()->GetOutputDataObject(algOutput->GetIndex());
-    }
-    else if (algo)
+  vtkDataObject* dobj = nullptr;
+  if (vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(obj))
+  {
+    dobj = vtkDataObject::SafeDownCast(repr->GetRenderedDataObject(0));
+  }
+  else if (auto algo = vtkAlgorithm::SafeDownCast(obj))
+  {
+    // We don't use vtkAlgorithm::GetOutputDataObject() since that calls a
+    // UpdateDataObject() pass, which may raise errors if the algo is not
+    // fully setup yet.
+    if (strcmp(algo->GetClassName(), "vtkPVNullSource") == 0)
     {
-      // We don't use vtkAlgorithm::GetOutputDataObject() since that calls a
-      // UpdateDataObject() pass, which may raise errors if the algo is not
-      // fully setup yet.
-      if (strcmp(algo->GetClassName(), "vtkPVNullSource") == 0)
-      {
-        // Don't gather any data information from the hypothetical null source.
-        return;
-      }
-      info = algo->GetExecutive()->GetOutputInformation(this->PortNumber);
-      if (!info || vtkDataObject::GetData(info) == NULL)
-      {
-        return;
-      }
-      dobj = algo->GetOutputDataObject(this->PortNumber);
+      // Don't gather any data information from the hypothetical null source.
+      return;
     }
+    auto info = algo->GetExecutive()->GetOutputInformation(this->PortNumber);
+    if (!info || vtkDataObject::GetData(info) == NULL)
+    {
+      return;
+    }
+    dobj = algo->GetOutputDataObject(this->PortNumber);
   }
 
-  if (!dobj)
-  {
-    vtkErrorMacro(
-      "Could not cast object to a known data set: " << (obj ? obj->GetClassName() : "(null)"));
-    return;
-  }
-
-  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
-  if (cds)
+  if (vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj))
   {
     this->CopyFromCompositeDataSet(cds);
-    return;
   }
-
-  this->CopyFromLeafDataObject(dobj);
+  else if (dobj)
+  {
+    this->CopyFromLeafDataObject(dobj);
+  }
 }
 
 //----------------------------------------------------------------------------

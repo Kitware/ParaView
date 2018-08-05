@@ -622,9 +622,20 @@ protected:
   virtual void AddProperty(const char* name, vtkSMProperty* prop);
 
   /**
-   * Calls MarkDirty() on all consumers.
+   * Calls `MarkDirtyFromProducer` on all consumers.
    */
   virtual void MarkConsumersAsDirty(vtkSMProxy* modifiedProxy);
+
+  /**
+   * `MarkConsumersAsDirty` calls this method on each consumer, instead of
+   * directly calling `MarkDirty` on the consumer. This provides the consumer
+   * with potentially useful insight about which producer the modification is
+   * coming from which can be useful e.g. vtkSMRepresentationProxy.
+   *
+   * Default implementation simply calls `this->MarkDirty(modifiedProxy)`.
+   */
+  virtual void MarkDirtyFromProducer(
+    vtkSMProxy* modifiedProxy, vtkSMProxy* producer, vtkSMProperty* property);
 
   //@{
   /**

@@ -405,10 +405,6 @@ protected:
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&) = delete;
   void operator=(const vtkGeometryRepresentation&) = delete;
-
-  friend class vtkSelectionRepresentation;
-  char* DebugString;
-  vtkSetStringMacro(DebugString);
 };
 
 #endif

@@ -49,16 +49,13 @@
  * empty i.e. it contains no proxies, the command is called on the VTK object
  * with NULL argument useful when there's no clean_command that can be called on
  * the VTK object to unset the property e.g. SetLookupTable(NULL).
- * li skip_dependency : if set to 1, this property does not result in adding a
- * dependency between the proxies set as values of this property and the proxy
- * to which the property belongs (which is the default behaviour). Use this with
- * care as it would mean that ParaView would no realize any updates are needed
- * to the pipeline if any proxy set on the property changes. This is necessary
- * in some cases, e.g. if LUT proxy on a representation changes, we don't want
- * to representation to treat it same as if the input pipeline changed!
+ * \li skip_dependency: obsolete and no longer supported. This was intended for
+ * vtkSMRepresentationProxy to distinguish between proxy connections that
+ * invalidate representation pipeline (e.g. input) and those that don't (e.g.
+ * LookupTable). vtkSMRepresentationProxy now handles this automatically.
  * @sa
  * vtkSMProperty
-*/
+ */
 
 #ifndef vtkSMProxyProperty_h
 #define vtkSMProxyProperty_h
@@ -171,9 +168,9 @@ public:
 
   //@{
   /**
-   * Returns whether the "skip_dependency" attribute is set.
+   * @deprecated ParaView 5.6. No longer supported or needed.
    */
-  vtkGetMacro(SkipDependency, bool);
+  VTK_LEGACY(bool GetSkipDependency());
   //@}
 
   /**
@@ -239,8 +236,6 @@ protected:
   // Static flag used to know if the locator should be used to create proxy
   // or if the session should be used to find only the existing ones
   static bool CreateProxyAllowed;
-
-  bool SkipDependency;
 
   class vtkPPInternals;
   friend class vtkPPInternals;

@@ -1767,12 +1767,7 @@
 
       <ProxyProperty name="AxesGrid"
                      command="SetGridAxes3DActor"
-                     panel_widget="proxy_editor"
-                     skip_dependency="1">
-        <!-- We mark skip_dependency=1 since we don't want the view to
-             call Update() when the GridAxes3DActor changes. The GridAxes3DActor
-             is indeed going to change when the view updates when Change-Of-Basis matrix
-             is being used, for example. -->
+                     panel_widget="proxy_editor">
         <ProxyListDomain name="proxy_list">
           <Proxy group="annotations" name="GridAxes3DActor" />
         </ProxyListDomain>
@@ -3931,7 +3926,7 @@
       </SubProxy>
       <ProxyProperty name="DataAxesGrid"
                      command="SetGridAxesRepresentation"
-                     panel_widget="proxy_editor">
+                     panel_widget="proxy_editor" >
         <ProxyListDomain name="proxy_list">
           <Proxy group="representations" name="GridAxesRepresentation" />
         </ProxyListDomain>
@@ -4548,7 +4543,7 @@
         </Hints>
       </IntVectorProperty>
       <ProxyProperty command="SetScalarOpacity"
-                     name="ScalarOpacityFunction" >
+                     name="ScalarOpacityFunction">
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -4727,8 +4722,7 @@
       </IntVectorProperty>
 
       <ProxyProperty command="SetLookupTable"
-                     name="LookupTable"
-                     skip_dependency="1">
+                     name="LookupTable" >
         <Documentation>Set the lookup-table to use to map data array to colors.
         Lookuptable is only used with MapScalars to ON.</Documentation>
         <ProxyGroupDomain name="groups">
@@ -4738,7 +4732,7 @@
       <ProxyProperty command="SetScaleTransferFunction"
                      name="ScaleTransferFunction"
                      panel_visibility="advanced"
-                     panel_widget="transfer_function_editor">
+                     panel_widget="transfer_function_editor" >
         <Documentation>Set the piecewise function used to map data array to sprite size.
         ScaleTransferFunction is only used if ScaleByArray is set.</Documentation>
         <RangedTransferFunctionDomain name="proxy_list">
@@ -6563,7 +6557,7 @@
         </FieldDataDomain>
       </StringVectorProperty>
       <ProxyProperty command="SetLookupTable"
-                     name="LookupTable">
+                     name="LookupTable" >
         <Documentation>Set the lookup-table to use to map data array to colors.
         Lookuptable is only used with MapScalars to ON.</Documentation>
         <ProxyGroupDomain name="groups">
@@ -7003,7 +6997,7 @@
       </DoubleVectorProperty>
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable"
-                     panel_visibility="never">
+                     panel_visibility="never" >
         <Documentation>Sets the lookup table to use for scalar
         mapping.</Documentation>
         <ProxyGroupDomain name="groups">
@@ -10752,7 +10746,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <ProxyProperty command="SetColor"
-                     name="LookupTable">
+                     name="LookupTable" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
@@ -10807,7 +10801,7 @@
         <IntRangeDomain name="range" />
       </IntVectorProperty>
       <ProxyProperty command="SetScalarOpacity"
-                     name="ScalarOpacityFunction">
+                     name="ScalarOpacityFunction" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -11163,13 +11157,13 @@
       <ProxyProperty command="SetTexture"
                      name="Texture"
                      panel_widget="texture_selector"
-                     null_on_empty="1">
+                     null_on_empty="1" >
         <ProxyGroupDomain name="groups">
           <Group name="textures" />
         </ProxyGroupDomain>
       </ProxyProperty>
       <ProxyProperty command="SetLookupTable"
-                     name="LookupTable">
+                     name="LookupTable" >
         <Documentation>Set the lookup-table to use to map data array to colors.
         Lookuptable is only used with MapScalars to ON.</Documentation>
         <ProxyGroupDomain name="groups">
@@ -11327,7 +11321,7 @@
                      name="OSPRayScaleFunction"
                      label="OSPRay Scale Function"
                      panel_visibility="advanced"
-                     panel_widget="transfer_function_editor">
+                     panel_widget="transfer_function_editor" >
         <Documentation>Set the piecewise function used to map data array to sprite size.
         ScaleTransferFunction is only used if ScaleByArray is set.</Documentation>
         <ProxyGroupDomain name="groups">

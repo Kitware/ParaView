@@ -85,8 +85,7 @@
         </FieldDataDomain>
       </StringVectorProperty>
       <ProxyProperty command="SetLookupTable"
-                     name="LookupTable"
-                     skip_dependency="1">
+                     name="LookupTable" >
         <Documentation>Set the lookup-table to use to map data array to colors.
         Lookuptable is only used with MapScalars to ON.</Documentation>
         <ProxyGroupDomain name="groups">

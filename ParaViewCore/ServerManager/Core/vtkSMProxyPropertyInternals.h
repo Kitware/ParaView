@@ -58,8 +58,8 @@ private:
 private:
   void UpdateProducerConsumerLinks()
   {
-    if (this->Self == NULL || this->Self->GetSkipDependency() == true ||
-      this->Self->GetParent() == NULL || this->PreviousProxies == this->Proxies)
+    if (this->Self == nullptr || this->Self->GetParent() == nullptr ||
+      this->PreviousProxies == this->Proxies)
     {
       return;
     }
@@ -243,7 +243,7 @@ public:
   }
 
   //------------------------------------------------------------------------------------
-  bool Set(unsigned int count, vtkSMProxy** proxies, const unsigned int* ports = NULL)
+  bool Set(unsigned int count, vtkSMProxy** proxies, const unsigned int* ports = nullptr)
   {
     SmartVectorOfProxies newValues(proxies, proxies + count);
     VectorOfUInts newPorts;
@@ -308,7 +308,7 @@ public:
   {
     return (index < static_cast<unsigned int>(this->Proxies.size())
         ? this->Proxies[index].GetPointer()
-        : NULL);
+        : nullptr);
   }
   //------------------------------------------------------------------------------------
   vtkSMProxy* GetUnchecked(unsigned int index) const
@@ -317,7 +317,7 @@ public:
     {
       return (index < static_cast<unsigned int>(this->UncheckedProxies.size())
           ? this->UncheckedProxies[index].GetPointer()
-          : NULL);
+          : nullptr);
     }
     return this->Get(index);
   }
@@ -375,7 +375,7 @@ public:
       unsigned int port = variant.port_number(cc);
 
       // either ask the locator for the proxy, or find an existing one.
-      vtkSMProxy* proxy = NULL;
+      vtkSMProxy* proxy = nullptr;
       if (locator && vtkSMProxyProperty::CanCreateProxy())
       {
         proxy = locator->LocateProxy(gid);
@@ -385,7 +385,7 @@ public:
         proxy =
           vtkSMProxy::SafeDownCast(this->Self->GetParent()->GetSession()->GetRemoteObject(gid));
       }
-      if (proxy != NULL || gid == 0)
+      if (proxy != nullptr || gid == 0)
       {
         proxies.push_back(proxy);
         ports.push_back(port);
