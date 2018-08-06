@@ -3,9 +3,6 @@ import os
 import paraview
 import paraview.simple as pvsimple
 
-# trying to import the library where I can specify the global and subcontrollers
-import vtkParallelCorePython
-
 paraview.options.batch = True # this may not be necessary
 paraview.simple._DisableFirstRenderCameraReset()
 
