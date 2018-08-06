@@ -133,6 +133,10 @@ void vtkPVLODActor::Render(vtkRenderer* ren, vtkMapper* vtkNotUsed(m))
   vtkInformation* info = this->GetPropertyKeys();
   this->Device->SetPropertyKeys(info);
   this->Device->Render(ren, mapper);
+  if (this->Texture)
+  {
+    this->Texture->PostRender(ren);
+  }
   this->Property->PostRender(this, ren);
   this->EstimatedRenderTime = mapper->GetTimeToDraw();
 }
@@ -158,27 +162,7 @@ int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport* vp)
   // Do this check only when not in selection mode
   if (this->GetIsOpaque() || (ren->GetSelector() && this->Property->GetOpacity() > 0.0))
   {
-    this->Property->Render(this, ren);
-
-    // render the backface property
-    if (this->BackfaceProperty)
-    {
-      this->BackfaceProperty->BackfaceRender(this, ren);
-    }
-
-    // render the texture
-    if (this->Texture)
-    {
-      this->Texture->Render(ren);
-    }
     this->Render(ren, this->Mapper);
-    this->Property->PostRender(this, ren);
-
-    if (this->Texture)
-    {
-      this->Texture->PostRender(ren);
-    }
-
     renderedSomething = 1;
   }
 
