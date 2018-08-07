@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLoadRestoreWindowLayoutReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainControlsToolbar.h"
+#include "pqManageBookmarksReaction.h"
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
@@ -203,6 +204,7 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
     new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
+  mgr->setEnableBookmarks(true);
   pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
 
   // Connect the filters menu about to show and the quick-launch dialog about to show
@@ -241,6 +243,14 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   // Add support for importing plugins only if ParaView was built shared.
   new pqManagePluginsReaction(
     menu.addAction("Manage Plugins...") << pqSetName("actionManage_Plugins"));
+
+  QMenu* dummyMenu = new QMenu();
+  pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(dummyMenu, "ParaViewFilters", false);
+  mgr->addProxyDefinitionUpdateListener("filters");
+
+  QAction* manageBookmarksAction = menu.addAction("Manage Bookmarks...")
+    << pqSetName("actionManage_Bookmarks");
+  new pqManageBookmarksReaction(manageBookmarksAction, mgr);
 
   menu.addSeparator(); // --------------------------------------------------
 
