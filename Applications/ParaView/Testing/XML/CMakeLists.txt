@@ -637,7 +637,6 @@ if(PARAVIEW_ENABLE_PYTHON)
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSaveGeometry.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceStatisticsFilter.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceSupplementalProxiesFully.xml
-    ${CMAKE_CURRENT_SOURCE_DIR}/VolumeNoMapScalars.xml # needs programmable filter
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
     ${CMAKE_CURRENT_SOURCE_DIR}/RestoreArrayDefaultTransferFunction.xml
@@ -664,7 +663,9 @@ if(PARAVIEW_ENABLE_PYTHON)
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       ${CMAKE_CURRENT_SOURCE_DIR}/ForceTimeDiamond.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridCellBlanking.xml
-      ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml)
+      ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml
+      ${CMAKE_CURRENT_SOURCE_DIR}/VolumeNoMapScalars.xml # needs programmable filter + numpy
+      )
     list(APPEND TESTS_WITH_INLINE_COMPARES
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
 
