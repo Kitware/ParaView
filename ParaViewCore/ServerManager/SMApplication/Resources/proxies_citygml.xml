@@ -1,0 +1,58 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy class="vtkCityGMLReader"
+                 label="CityGML Reader"
+                 name="CityGML Reader">
+      <Documentation short_help="Reads CityGML data files.">
+vtkCityGMLReader is a reader for CityGML .gml files. The output is a
+multiblock dataset. We read objects at level of detail (LOD) specified
+(default is 3). The leaves of the multiblock dataset (which are
+polygonal datasets) have a field array with one element called
+"gml_id" which corresponds to the gml:id for gml:TriangulatedSurface,
+gml:MultiSurface or gml:CompositeSurface in the CityGML file. If the
+polygonal dataset has a texture, we specify this with a point array called
+"tcoords" and a field array with one element called "texture_uri"
+containing the path to the texture file.  Top level children of the
+multiblock dataset have a field array with one element called
+"element" which contains the CityGML element name for example:
+dem:ReliefFeature, wtr:WaterBody, grp::CityObjectGroup (forest),
+veg:SolitaryVegetationObject, brid:Bridge, run:Tunel, tran:Railway,
+tran:Road, bldg:Building, gen:GenericCityObject, luse:LandUse
+      </Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>Specify file name of the CityGML data file to read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetLOD"
+                         default_values="3"
+                         name="LOD"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain min="0" max="4"
+                        name="range" />
+        <Documentation>Specify the level of detail (LOD) to
+        read. Valid values are from 0 (least detailed) through 4 (most
+        detailed), default value is 3.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseTransparencyAsOpacity"
+                         default_values="0"
+                         name="UseTransparencyAsOpacity"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>Certain input files use app:transparency as
+        opacity. Set this field true to show that correctly. The
+        default is false.</Documentation>
+        </IntVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="gml xml"
+                       file_description="CityGML files" />
+      </Hints>
+    </SourceProxy>
+    <!-- End CityGMLReader -->
+  </ProxyGroup>
+</ServerManagerConfiguration>

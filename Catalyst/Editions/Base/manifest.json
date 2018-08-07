@@ -300,7 +300,7 @@
     },
     {
       "name":"vtkpugixml",
-      "path":"ThirdParty/pugixml"
+      "path":"VTK/ThirdParty/pugixml"
     },
     { "path":"Wrapping" },
     { "path":"VTK/Copyright.txt" },
