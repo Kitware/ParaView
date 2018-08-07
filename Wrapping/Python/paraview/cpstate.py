@@ -23,6 +23,8 @@ def reset_cpstate_globals():
     cpstate_globals.cinema_tracks = {}
     cpstate_globals.cinema_arrays = {}
     cpstate_globals.channels_needed = []
+    cpstate_globals.enable_live_viz = False
+    cpstate_globals.live_viz_frequency = 0
 
 reset_cpstate_globals()
 
@@ -321,7 +323,7 @@ class cpstate_filter_proxies_to_serialize(object):
 
 # -----------------------------------------------------------------------------
 def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
-                 cinema_tracks, cinema_arrays):
+                 cinema_tracks, cinema_arrays, enable_live_viz, live_viz_frequency):
     """Method that will dump the current pipeline and return it as a string trace.
 
     export_rendering
@@ -352,6 +354,13 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
       * key -> proxy name
 
       * value -> list of array names
+
+    enable_live_viz
+      boolean telling if we want to enable Catalyst Live connection
+
+    live_viz_frequency
+      integer telling how often to update Live connection. only used if
+      enable_live_viz is True
     """
 
     # reset the global variables.
@@ -362,6 +371,8 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     cpstate_globals.screenshot_info = screenshot_info
     cpstate_globals.cinema_tracks = cinema_tracks
     cpstate_globals.cinema_arrays = cinema_arrays
+    cpstate_globals.enable_live_viz = enable_live_viz
+    cpstate_globals.live_viz_frequency = live_viz_frequency
 
     # Initialize the write frequency map
     for key in cpstate_globals.simulation_input_map.values():
@@ -391,6 +402,16 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
                 if not sim_input_name in cpstate_globals.channels_needed:
                     cpstate_globals.channels_needed.append(sim_input_name)
 
+    if enable_live_viz:
+        for key in simulation_input_map:
+            sim_input_name = simulation_input_map[key]
+            if not live_viz_frequency in cpstate_globals.write_frequencies:
+                cpstate_globals.write_frequencies[sim_input_name].append(live_viz_frequency)
+                cpstate_globals.write_frequencies[sim_input_name].sort()
+
+            if not sim_input_name in cpstate_globals.channels_needed:
+                cpstate_globals.channels_needed.append(sim_input_name)
+
     pxm = servermanager.ProxyManager()
     arrays = {}
     for channel_name in cpstate_globals.channels_needed:
@@ -401,7 +422,6 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
                 arrays[channel_name].append([p.GetPointDataInformation().GetArray(i).GetName(), 0])
             for i in range(p.GetCellDataInformation().GetNumberOfArrays()):
                 arrays[channel_name].append([p.GetCellDataInformation().GetArray(i).GetName(), 1])
-
 
     # Create global fields values
     pipelineClassDef = "\n"
@@ -432,10 +452,11 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     pipelineClassDef += "  # these are the frequencies at which the coprocessor updates.\n"
     pipelineClassDef += "  freqs = " + str(cpstate_globals.write_frequencies) + "\n"
     pipelineClassDef += "  coprocessor.SetUpdateFrequencies(freqs)\n"
-    pipelineClassDef += "  if requestSpecificArrays:\n"
-    for channel_name in arrays:
-        pipelineClassDef += "    arrays = " +str(arrays[channel_name]) + "\n"
-        pipelineClassDef += "    coprocessor.SetRequestedArrays('" + channel_name + "', arrays)\n"
+    if arrays:
+        pipelineClassDef += "  if requestSpecificArrays:\n"
+        for channel_name in arrays:
+            pipelineClassDef += "    arrays = " + str(arrays[channel_name]) + "\n"
+            pipelineClassDef += "    coprocessor.SetRequestedArrays('" + channel_name + "', arrays)\n"
     pipelineClassDef += "  coprocessor.SetInitialOutputOptions(timeStepToStartOutputAt,forceOutputAtFirstCall)\n"
     pipelineClassDef += "  return coprocessor\n"
     return pipelineClassDef

@@ -84,7 +84,7 @@ from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
     padding_amount, rescale_data_range, enable_live_viz, live_viz_frequency,
-    cinema_tracks, array_selection, filename=None):
+    cinema_tracks, cinema_arrays, filename=None):
     """Returns a string with the generated CoProcessing script based on the
     options specified.
 
@@ -101,7 +101,7 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
 
     :param cinema_tracks: cinema offline visualizer parameters
 
-    :param array_selection: selected value arrays for cinema
+    :param cinema_arrays: selected value arrays for cinema
 
     :param filename: if specified, the script is written to the file.
     """
@@ -116,7 +116,8 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
     requestSpecificNames=False
 
     pipeline_script = cpstate.DumpPipeline(\
-       export_rendering, simulation_input_map, screenshot_info, cinema_tracks, array_selection)
+      export_rendering, simulation_input_map, screenshot_info, cinema_tracks,\
+      cinema_arrays, enable_live_viz, live_viz_frequency)
     script = __output_contents % (version_str, timeStepToStartOutputAt, forceOutputAtFirstCall,
                                   padding_amount, rescale_data_range, requestSpecificNames, pipeline_script,
                                   enable_live_viz, live_viz_frequency)
@@ -141,7 +142,7 @@ def run(filename=None):
         enable_live_viz=True,
         live_viz_frequency=1,
         cinema_tracks={},
-        array_selection = {},
+        cinema_arrays = {},
         filename=filename)
     if not filename:
         print ("# *** Generated Script Begin ***")
