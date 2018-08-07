@@ -1312,11 +1312,11 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
           int stereoType = this->Session->GetServerInformation()->GetStereoType(idx);
           if (stereoType != -1)
           {
-            this->Internals->SharedRenderWindow->SetStereoRender(stereoType != 0);
             if (stereoType > 0)
             {
               this->Internals->SharedRenderWindow->SetStereoType(stereoType);
             }
+            this->Internals->SharedRenderWindow->SetStereoRender(stereoType != 0);
           }
         }
         this->Internals->SharedRenderWindow->SetBorders(showborders ? 1 : 0);
