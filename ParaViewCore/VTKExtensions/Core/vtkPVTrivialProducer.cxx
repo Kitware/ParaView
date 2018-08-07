@@ -32,7 +32,6 @@
 struct vtkPVTrivialProducerInternal
 {
   std::vector<double> TimeSteps;
-  std::vector<int> AllProcessExtents;
 };
 
 vtkStandardNewMacro(vtkPVTrivialProducer);
@@ -48,7 +47,7 @@ vtkPVTrivialProducer::~vtkPVTrivialProducer()
   if (this->Internals)
   {
     delete this->Internals;
-    this->Internals = NULL;
+    this->Internals = nullptr;
   }
 }
 
@@ -69,29 +68,6 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output, double time)
 
   this->Modified();
   this->SetOutput(output);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVTrivialProducerPieceToExtentThreadSafe(int* resultExtent, vtkDataObject* dataSet)
-{
-  // this is really only meant for topologically structured grids
-  if (vtkImageData* id = vtkImageData::SafeDownCast(dataSet))
-  {
-    id->GetExtent(resultExtent);
-  }
-  else if (vtkStructuredGrid* sd = vtkStructuredGrid::SafeDownCast(dataSet))
-  {
-    sd->GetExtent(resultExtent);
-  }
-  else if (vtkRectilinearGrid* rd = vtkRectilinearGrid::SafeDownCast(dataSet))
-  {
-    rd->GetExtent(resultExtent);
-  }
-  else
-  {
-    return 0;
-  }
-  return 1;
 }
 
 //----------------------------------------------------------------------------
