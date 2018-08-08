@@ -34,13 +34,13 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVTrivialProducer : public vtkTrivialProd
 public:
   static vtkPVTrivialProducer* New();
   vtkTypeMacro(vtkPVTrivialProducer, vtkTrivialProducer);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set the data object that is "produced" by this producer.  It is
    * never really modified.
    */
-  void SetOutput(vtkDataObject* output) VTK_OVERRIDE;
+  void SetOutput(vtkDataObject* output) override;
 
   /**
    * Set the output data object as well as time information
@@ -53,7 +53,7 @@ public:
    * output data object is never modified, but it is queried to
    * fulfill requests.
    */
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 protected:
   vtkPVTrivialProducer();
