@@ -874,5 +874,13 @@ void pqRenderView::onInteractionModeChange()
 //-----------------------------------------------------------------------------
 void pqRenderView::setCursor(const QCursor& c)
 {
-  this->widget()->setCursor(c);
+  QWidget* widget = this->widget();
+  if (pqQVTKWidgetBase* qvtkwidget = qobject_cast<pqQVTKWidgetBase*>(widget))
+  {
+    qvtkwidget->setQVTKCursor(c);
+  }
+  else
+  {
+    widget->setCursor(c);
+  }
 }

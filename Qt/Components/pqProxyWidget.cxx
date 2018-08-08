@@ -815,7 +815,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     for (pqPropertyWidgetInterface* groupWidgetInterface : interfaces)
     {
       pqPropertyWidget* propertyWidget =
-        groupWidgetInterface->createWidgetForPropertyGroup(smproxy, group);
+        groupWidgetInterface->createWidgetForPropertyGroup(smproxy, group, this);
       if (propertyWidget)
       {
         PV_DEBUG_PANELS() << "Group " << group->GetXMLLabel() << " is controlled by widget "
@@ -1023,7 +1023,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
     interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
   foreach (pqPropertyWidgetInterface* interface, interfaces)
   {
-    widget = interface->createWidgetForProperty(smproxy, smproperty);
+    widget = interface->createWidgetForProperty(smproxy, smproperty, parentObj);
     if (widget)
     {
       break;

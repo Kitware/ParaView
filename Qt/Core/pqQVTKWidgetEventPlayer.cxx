@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "QVTKOpenGLSimpleWidget.h"
+#include "QVTKOpenGLWidget.h"
 #include "pqEventDispatcher.h"
-#include "pqQVTKWidgetBase.h"
 
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
@@ -51,9 +51,9 @@ pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
 bool pqQVTKWidgetEventPlayer::playEvent(
   QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
-  pqQVTKWidgetBase* baseWidget = qobject_cast<pqQVTKWidgetBase*>(Object);
-  QVTKOpenGLSimpleWidget* qvtkWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
-  if (baseWidget || qvtkWidget)
+  QVTKOpenGLWidget* qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object);
+  QVTKOpenGLSimpleWidget* qvtksWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
+  if (qvtkWidget || qvtksWidget)
   {
     if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove" ||
       Command == "mouseDblClick")
@@ -92,18 +92,18 @@ bool pqQVTKWidgetEventPlayer::playEvent(
         }
         QMouseEvent e(type, QPoint(x, y), button, buttons, keym);
 
-        if (baseWidget != nullptr)
+        if (qvtkWidget != nullptr)
         {
           // Due to QTBUG-61836 (see QVTKOpenGLWidget::testingEvent()), events should
           // be propagated back to the internal QVTKOpenGLWindow when being fired
           // explicitly on the widget instance. We have to use a custom event
           // callback in this case to ensure that events are passed to the window.
-          baseWidget->testingEvent(&e);
+          qvtkWidget->testingEvent(&e);
         }
 
-        if (qvtkWidget != nullptr)
+        if (qvtksWidget != nullptr)
         {
-          qApp->notify(qvtkWidget, &e);
+          qApp->notify(qvtksWidget, &e);
         }
       }
       return true;
