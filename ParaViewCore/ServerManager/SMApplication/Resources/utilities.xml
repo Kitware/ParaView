@@ -36,6 +36,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty default_values="0"
+                         name="AnnotationsInitialized"
+                         number_of_elements="1"
+                         panel_visibility="never" >
+        <Documentation>
+         Set to 1 to indicate that the annotations have been initialized.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <IntVectorProperty name="ShowIndexedColorActiveValues"
                          command="SetUseActiveValues"
                          default_values="0"

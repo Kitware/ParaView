@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqChooseColorPresetReaction.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqDoubleRangeDialog.h"
 #include "pqDoubleRangeWidget.h"
@@ -783,6 +784,31 @@ void pqColorAnnotationsPropertyWidget::updateIndexedLookupState()
     this->Internals->Ui.ChoosePreset->setVisible(val);
     this->Internals->Ui.SaveAsPreset->setVisible(val);
     this->Internals->Decorator->setIsAdvanced(!val);
+
+    if (val)
+    {
+      vtkSMPropertyHelper annotationsInitialized(this->proxy(), "AnnotationsInitialized");
+      if (!annotationsInitialized.GetAsInt())
+      {
+        // Attempt to add active annotations.
+        bool success = this->addActiveAnnotations(false /* do not force generation */);
+        if (!success)
+        {
+          pqCoreUtilities::promptUser("pqColorAnnotationsPropertyWidget::updatedIndexedLookupState",
+            QMessageBox::Information, "Could not determine discrete values to use for annotations",
+            "Could not initialize annotations for categorical coloring. There may be too many "
+            "discrete "
+            "values in your data, or you may be coloring by a floating point data array. Please "
+            "add annotations "
+            "manually.",
+            QMessageBox::Ok | QMessageBox::Save);
+        }
+        else
+        {
+          annotationsInitialized.Set(1);
+        }
+      }
+    }
   }
 }
 
