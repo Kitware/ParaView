@@ -630,7 +630,6 @@ endif()
 if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITH_BASELINES
     ${CMAKE_CURRENT_SOURCE_DIR}/ColorByComponentNames.xml # needs programmable filter
-    ${CMAKE_CURRENT_SOURCE_DIR}/IndexedLookupInitialization.xml # needs Python Calculator
     ${CMAKE_CURRENT_SOURCE_DIR}/LiveProgrammableSource.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/SaveLoadStatePython.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
@@ -664,6 +663,7 @@ if(PARAVIEW_ENABLE_PYTHON)
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataSelectLocation.xml # find data needs python/numpy
       ${CMAKE_CURRENT_SOURCE_DIR}/FindDataSelectLocationMultiblock.xml # find data needs python/numpy
       ${CMAKE_CURRENT_SOURCE_DIR}/ForceTimeDiamond.xml
+      ${CMAKE_CURRENT_SOURCE_DIR}/IndexedLookupInitialization.xml # needs Python Calculator/numpy
       ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridCellBlanking.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/TestFindDataMax.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/VolumeNoMapScalars.xml # needs programmable filter + numpy
