@@ -1030,7 +1030,7 @@ void vtkContext2DScalarBarActor::PaintTitle(vtkContext2D* painter, double size[2
     // Move title to the top if the title is forced horizontal
     if (this->ForceHorizontalTitle && this->GetOrientation() != VTK_ORIENT_HORIZONTAL)
     {
-      titleY = axisRect.GetY() + axisRect.GetHeight() + 0.25 * titleHeight;
+      titleY = barAndAxisRect.GetY() + barAndAxisRect.GetHeight() + 0.25 * titleHeight;
     }
   }
   else // Vertical orientation
