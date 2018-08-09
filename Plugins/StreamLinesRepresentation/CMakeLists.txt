@@ -41,7 +41,6 @@ encode_files_as_strings(ENCODED_STRING_FILES
 
 add_paraview_plugin(
   StreamLinesRepresentation "0.1"
-  DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
   SERVER_MANAGER_XML StreamLinesRepresentation.xml
   SERVER_MANAGER_SOURCES
     vtkStreamLinesRepresentation.cxx
