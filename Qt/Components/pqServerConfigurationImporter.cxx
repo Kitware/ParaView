@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqServerConfigurationImporter.h"
 
+#include "pqEventDispatcher.h" // For blocking test events during configuration download
+
 #include "vtkNew.h"
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
@@ -169,6 +171,9 @@ void pqServerConfigurationImporter::fetchConfigurations()
   this->Internals->Configurations.clear();
   this->Internals->AbortFetch = false;
 
+  // Block test events until all configurations are downloaded.
+  pqEventDispatcher::deferEventsIfBlocked(true);
+
   for (QMapIterator<QString, QUrl> iter(this->Internals->SourceURLs); iter.hasNext();)
   {
     // this is funny, but evidently, that's how QMapIterator it to be used.
@@ -191,6 +196,9 @@ void pqServerConfigurationImporter::fetchConfigurations()
       break;
     }
   }
+
+  // Unblock test events
+  pqEventDispatcher::deferEventsIfBlocked(false);
 
   emit this->configurationsUpdated();
 }
