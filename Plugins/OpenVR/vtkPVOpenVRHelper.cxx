@@ -1052,25 +1052,28 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
       std::string poses = e->GetAttributeOrEmpty("CameraPoses");
       std::istringstream iss(poses);
       vtkXMLDataElement* topel = vtkXMLUtilities::ReadElementFromStream(iss);
-
-      int numnest = topel->GetNumberOfNestedElements();
-      for (int i = 0; i < numnest; ++i)
+      if (topel)
       {
-        vtkXMLDataElement* el = topel->GetNestedElement(static_cast<int>(i));
-        int poseNum = 0;
-        el->GetScalarAttribute("PoseNumber", poseNum);
-        poseNum--; // zero indexed
-        el->GetVectorAttribute("Position", 3, this->SavedCameraPoses[poseNum].Position);
-        el->GetVectorAttribute("InitialViewUp", 3, this->SavedCameraPoses[poseNum].PhysicalViewUp);
-        el->GetVectorAttribute(
-          "InitialViewDirection", 3, this->SavedCameraPoses[poseNum].PhysicalViewDirection);
-        el->GetVectorAttribute("ViewDirection", 3, this->SavedCameraPoses[poseNum].ViewDirection);
-        el->GetVectorAttribute("Translation", 3, this->SavedCameraPoses[poseNum].Translation);
-        el->GetScalarAttribute("Distance", this->SavedCameraPoses[poseNum].Distance);
-        el->GetScalarAttribute("MotionFactor", this->SavedCameraPoses[poseNum].MotionFactor);
-        this->SavedCameraPoses[poseNum].Loaded = true;
+        int numnest = topel->GetNumberOfNestedElements();
+        for (int i = 0; i < numnest; ++i)
+        {
+          vtkXMLDataElement* el = topel->GetNestedElement(static_cast<int>(i));
+          int poseNum = 0;
+          el->GetScalarAttribute("PoseNumber", poseNum);
+          poseNum--; // zero indexed
+          el->GetVectorAttribute("Position", 3, this->SavedCameraPoses[poseNum].Position);
+          el->GetVectorAttribute(
+            "InitialViewUp", 3, this->SavedCameraPoses[poseNum].PhysicalViewUp);
+          el->GetVectorAttribute(
+            "InitialViewDirection", 3, this->SavedCameraPoses[poseNum].PhysicalViewDirection);
+          el->GetVectorAttribute("ViewDirection", 3, this->SavedCameraPoses[poseNum].ViewDirection);
+          el->GetVectorAttribute("Translation", 3, this->SavedCameraPoses[poseNum].Translation);
+          el->GetScalarAttribute("Distance", this->SavedCameraPoses[poseNum].Distance);
+          el->GetScalarAttribute("MotionFactor", this->SavedCameraPoses[poseNum].MotionFactor);
+          this->SavedCameraPoses[poseNum].Loaded = true;
+        }
+        topel->Delete();
       }
-      topel->Delete();
     }
   }
 

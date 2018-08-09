@@ -22,9 +22,10 @@
 
 #include "vtkNew.h" // for ivars
 #include "vtkObject.h"
+#include <array>  // for method sig
 #include <map>    // for ivar
 #include <set>    // for ivar
-#include <vector> // fo rivar
+#include <vector> // for ivar
 
 class vtkBoxWidget2;
 class vtkCallbackCommand;
