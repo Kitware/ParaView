@@ -16551,16 +16551,16 @@ source.</Documentation>
       <!-- End vtkHyperTreeGridPlaneCutter-->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy name="PointSetToMolecule" class="vtkPointSetToMoleculeFilter" label="Convert Into Molecule">
-      <Documentation
-         long_help="Convert a point set into a molecule."
-         short_help="Convert a point set into a molecule.">
-           Convert a point set into a molecule. Every point of the input becomes an atom
-           of the output molecule. It needs a point array containing the atomic numbers.
+    <SourceProxy class="vtkPointSetToMoleculeFilter"
+                 name="PointSetToMolecule"
+                 label="Convert Into Molecule">
+      <Documentation long_help="Convert a point set into a molecule."
+                     short_help="Convert a point set into a molecule.">
+        Convert a point set into a molecule. Every point of the input becomes an atom
+        of the output molecule. It needs a point array containing the atomic numbers.
       </Documentation>
-      <InputProperty
-         name="Input"
-         command="SetInputConnection">
+      <InputProperty name="Input"
+                     command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -16593,24 +16593,23 @@ source.</Documentation>
                          name="ConvertLinesIntoBonds"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation
-          short_help="Specify if line cells are converted into bonds."
-          long_help="Specify if line cells are converted into bonds.">
-            This property determines if the lines (cell of type VTK_LINE) are converted into bonds.
+        <Documentation short_help="Specify if line cells are converted into bonds."
+                       long_help="Specify if line cells are converted into bonds.">
+          This property determines if the lines (cell of type VTK_LINE) are converted into bonds.
         </Documentation>
       </IntVectorProperty>
     <!-- End PointSetToMolecule -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy name="MoleculeToLines" class="vtkMoleculeToLinesFilter" label="Molecule To Lines">
-      <Documentation
-         long_help="Convert a molecule into lines."
-         short_help="Convert a molecule into lines.">
-           Convert a molecule into lines. Each atom of the input becomes a point of the output polydata, each bond a line.
+    <SourceProxy class="vtkMoleculeToLinesFilter"
+                 name="MoleculeToLines"
+                label="Molecule To Lines">
+      <Documentation long_help="Convert a molecule into lines."
+                     short_help="Convert a molecule into lines.">
+        Convert a molecule into lines. Each atom of the input becomes a point of the output polydata, each bond a line.
       </Documentation>
-      <InputProperty
-         name="Input"
-         command="SetInputConnection">
+      <InputProperty name="Input"
+                     command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -16622,12 +16621,13 @@ source.</Documentation>
     <!-- End MoleculeToLines -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy name="AppendMolecule" class="vtkMoleculeAppend" label="Append Molecule">
-      <Documentation
-         long_help="Appends one or more molecules into a single molecule."
-         short_help="Append molecules into a single molecule.">
-           Appends one or more molecules into a single molecule. It also appends  the associated atom data and edge data.
-           Note that input data arrays should match (same number of arrays with same names in each input)
+    <SourceProxy class="vtkMoleculeAppend"
+                 name="AppendMolecule"
+                 label="Append Molecule">
+      <Documentation long_help="Appends one or more molecules into a single molecule."
+                     short_help="Append molecules into a single molecule.">
+        Appends one or more molecules into a single molecule. It also appends  the associated atom data and edge data.
+        Note that input data arrays should match (same number of arrays with same names in each input)
       </Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
@@ -16644,27 +16644,27 @@ source.</Documentation>
     <!-- End AppendMolecule -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy name="ComputeMoleculeBonds" class="vtkSimpleBondPerceiver" label="Compute Molecule Bonds">
-      <Documentation
-         long_help="Compute the bonds of a molecule based on interatomic distance only."
-         short_help="Compute the bonds of a molecule.">
-            Compute the bonds of a molecule. If the
-            interatomic distance is less than the sum of the two atom's covalent radii
-            (and a tolerance), a single bond is added.
-            This algorithm does not consider valences, hybridization, aromaticity, or
-            anything other than atomic separations. It will not produce anything other
-            than single bonds.
+    <SourceProxy class="vtkSimpleBondPerceiver"
+                 name="ComputeMoleculeBonds"
+                 label="Compute Molecule Bonds">
+      <Documentation long_help="Compute the bonds of a molecule based on interatomic distance only."
+                     short_help="Compute the bonds of a molecule.">
+        Compute the bonds of a molecule. If the
+        interatomic distance is less than the sum of the two atom's covalent radii
+        (and a tolerance), a single bond is added.
+        This algorithm does not consider valences, hybridization, aromaticity, or
+        anything other than atomic separations. It will not produce anything other
+        than single bonds.
       </Documentation>
-      <InputProperty
-         name="Input"
-         command="SetInputConnection">
-            <ProxyGroupDomain name="groups">
-              <Group name="sources"/>
-              <Group name="filters"/>
-            </ProxyGroupDomain>
-            <DataTypeDomain name="input_type">
-              <DataType value="vtkMolecule"/>
-            </DataTypeDomain>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMolecule"/>
+        </DataTypeDomain>
       </InputProperty>
       <DoubleVectorProperty command="SetTolerance"
                             default_values="0.45"
@@ -16672,9 +16672,8 @@ source.</Documentation>
                             number_of_elements="1"
                             panel_visibility="advanced">
         <DoubleRangeDomain name="scalar_range" />
-        <Documentation
-          short_help="Tolerance on covalent radius size">
-            This property determines the tolerance to apply on covalent radius.
+        <Documentation short_help="Tolerance on covalent radius size">
+          This property determines the tolerance to apply on covalent radius.
         </Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetIsToleranceAbsolute"
@@ -16682,37 +16681,33 @@ source.</Documentation>
                          name="IsToleranceAbsolute"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation
-          short_help="Specify if Tolerance is absolute or relative to radius."
-          long_help="Specify if Tolerance is absolute (addition) or relative (multiplication) to radius.">
-            This property determines if the tolerance is absolute (value is added to radius and should be positive)
-            or not (value multiplied with radius and should be greater than 1).
+        <Documentation short_help="Specify if Tolerance is absolute or relative to radius."
+                       long_help="Specify if Tolerance is absolute (addition) or relative (multiplication) to radius.">
+          This property determines if the tolerance is absolute (value is added to radius and should be positive)
+          or not (value multiplied with radius and should be greater than 1).
         </Documentation>
       </IntVectorProperty>
     <!-- End ComputeMoleculeBonds -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy name="DistributePointSet"
-                 class="vtkDistributedPointCloudFilter"
-                 multiprocess_support="multiple_processes"
+    <SourceProxy class="vtkDistributedPointCloudFilter"
+                 name="DistributePoints"
                  label="Distribute Points">
-      <Documentation
-         long_help="Fairly distribute point set into spatially contiguous regions."
-         short_help="Distribute points.">
-           This filter fairly distributes points over processes into contiguous spatial regions.
-           The output is the same type as input, but it does not contain any cell.
+      <Documentation long_help="Fairly distribute points over processors into spatially contiguous regions."
+                     short_help="Distribute points over processors.">
+           This filter fairly distributes points over processors into contiguous spatial regions.
+           The output is a PolyData which does not contain any cell.
            Distribution is done using a Kd-tree.
       </Documentation>
-      <InputProperty
-         name="Input"
-         command="SetInputConnection">
-            <ProxyGroupDomain name="groups">
-              <Group name="sources"/>
-              <Group name="filters"/>
-            </ProxyGroupDomain>
-            <DataTypeDomain name="input_type">
-              <DataType value="vtkPointSet"/>
-            </DataTypeDomain>
+      <InputProperty name="Input"
+                     command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
       </InputProperty>
     </SourceProxy>
     <!-- End DistributePointCloud -->
