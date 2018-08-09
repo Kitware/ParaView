@@ -91,8 +91,8 @@ set (Module_SRCS
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.cxx
   pqCustomFilterManagerModel.h
-  pqCustomViewButtonDialog.cxx
-  pqCustomViewButtonDialog.h
+  pqCustomViewpointButtonDialog.cxx
+  pqCustomViewpointButtonDialog.h
   pqDataInformationModel.cxx
   pqDataInformationModel.h
   pqDataInformationWidget.cxx
@@ -351,7 +351,7 @@ set (Module_MOC_HDRS
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
-  pqCustomViewButtonDialog.h
+  pqCustomViewpointButtonDialog.h
   pqDataInformationModel.h
   pqDataInformationWidget.h
   pqDialog.h
@@ -478,7 +478,7 @@ set (Module_UI_FILES
   Resources/UI/pqContourControls.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
-  Resources/UI/pqCustomViewButtonDialog.ui
+  Resources/UI/pqCustomViewpointButtonDialog.ui
   Resources/UI/pqDisplayRepresentationWidget.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqFindDataCreateSelectionFrame.ui

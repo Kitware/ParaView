@@ -1,5 +1,5 @@
-#include "pqCustomViewButtonDialog.h"
-#include "ui_pqCustomViewButtonDialog.h"
+#include "pqCustomViewpointButtonDialog.h"
+#include "ui_pqCustomViewpointButtonDialog.h"
 
 #include <QDebug>
 #include <QToolButton>
@@ -17,7 +17,7 @@
 
 // User interface
 //=============================================================================
-class pqCustomViewButtonDialogUI : public Ui::pqCustomViewButtonDialog
+class pqCustomViewpointButtonDialogUI : public Ui::pqCustomViewpointButtonDialog
 {
   struct RowData
   {
@@ -27,15 +27,15 @@ class pqCustomViewButtonDialogUI : public Ui::pqCustomViewButtonDialog
     QPointer<QToolButton> DeleteButton;
   };
 
-  QPointer< ::pqCustomViewButtonDialog> Parent;
+  QPointer< ::pqCustomViewpointButtonDialog> Parent;
   QList<RowData> Rows;
 
 public:
-  pqCustomViewButtonDialogUI(::pqCustomViewButtonDialog* parent)
+  pqCustomViewpointButtonDialogUI(::pqCustomViewpointButtonDialog* parent)
     : Parent(parent)
   {
   }
-  ~pqCustomViewButtonDialogUI() { this->setNumberOfRows(0); }
+  ~pqCustomViewpointButtonDialogUI() { this->setNumberOfRows(0); }
 
   void setNumberOfRows(int rows)
   {
@@ -45,7 +45,7 @@ public:
     }
 
     // enable/disable add button.
-    this->add->setEnabled(rows < ::pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+    this->add->setEnabled(rows < ::pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
 
     // remove extra rows.
     for (int cc = this->Rows.size() - 1; cc >= rows; --cc)
@@ -73,21 +73,21 @@ public:
       arow.IndexLabel->setAlignment(Qt::AlignCenter);
       arow.ToolTipEdit = new QLineEdit(this->Parent);
       arow.ToolTipEdit->setToolTip("This text will be set to the buttons tool tip.");
-      arow.ToolTipEdit->setText(::pqCustomViewButtonDialog::DEFAULT_TOOLTIP);
+      arow.ToolTipEdit->setText(::pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP);
       arow.ToolTipEdit->setObjectName(QString("toolTip%1").arg(cc));
-      arow.AssignButton = new QPushButton("current view", this->Parent);
-      arow.AssignButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
-      arow.AssignButton->setObjectName(QString("currentView%1").arg(cc));
-      this->Parent->connect(arow.AssignButton, SIGNAL(clicked()), SLOT(assignCurrentView()));
+      arow.AssignButton = new QPushButton("Current Viewpoint", this->Parent);
+      arow.AssignButton->setProperty("pqCustomViewpointButtonDialog_INDEX", cc);
+      arow.AssignButton->setObjectName(QString("currentViewpoint%1").arg(cc));
+      this->Parent->connect(arow.AssignButton, SIGNAL(clicked()), SLOT(assignCurrentViewpoint()));
       this->gridLayout->addWidget(arow.IndexLabel, cc + 1, 0);
       this->gridLayout->addWidget(arow.ToolTipEdit, cc + 1, 1);
       this->gridLayout->addWidget(arow.AssignButton, cc + 1, 2);
-      if (cc >= ::pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS)
+      if (cc >= ::pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS)
       {
         arow.DeleteButton = new QToolButton(this->Parent);
         arow.DeleteButton->setObjectName(QString("delete%1").arg(cc));
         arow.DeleteButton->setIcon(QIcon(":/QtWidgets/Icons/pqDelete24.png"));
-        arow.DeleteButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
+        arow.DeleteButton->setProperty("pqCustomViewpointButtonDialog_INDEX", cc);
         this->gridLayout->addWidget(arow.DeleteButton, cc + 1, 3);
         this->Parent->connect(arow.DeleteButton, SIGNAL(clicked()), SLOT(deleteRow()));
       }
@@ -152,30 +152,31 @@ public:
     {
       auto& currentRow = this->Rows[cc];
       currentRow.IndexLabel->setText(QString::number(cc + 1));
-      currentRow.AssignButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
+      currentRow.AssignButton->setProperty("pqCustomViewpointButtonDialog_INDEX", cc);
       this->gridLayout->addWidget(currentRow.IndexLabel, cc + 1, 0);
       this->gridLayout->addWidget(currentRow.ToolTipEdit, cc + 1, 1);
       this->gridLayout->addWidget(currentRow.AssignButton, cc + 1, 2);
       if (currentRow.DeleteButton)
       {
-        currentRow.DeleteButton->setProperty("pqCustomViewButtonDialog_INDEX", cc);
+        currentRow.DeleteButton->setProperty("pqCustomViewpointButtonDialog_INDEX", cc);
         this->gridLayout->addWidget(currentRow.DeleteButton, cc + 1, 3);
       }
     }
 
     // enable/disable add button.
-    this->add->setEnabled(this->Rows.size() < ::pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
+    this->add->setEnabled(
+      this->Rows.size() < ::pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS);
   }
 };
 
 // Organizes button config file info in a single location.
 //=============================================================================
-class pqCustomViewButtonFileInfo
+class pqCustomViewpointButtonFileInfo
 {
 public:
-  pqCustomViewButtonFileInfo()
-    : FileIdentifier("CustomViewButtonConfiguration")
-    , FileDescription("Custom View Button Configuration")
+  pqCustomViewpointButtonFileInfo()
+    : FileIdentifier("CustomViewpointsConfiguration")
+    , FileDescription("Custom Viewpoints Configuration")
     , FileExtension(".pvcvbc")
     , WriterVersion("1.0")
   {
@@ -187,17 +188,17 @@ public:
 };
 
 //------------------------------------------------------------------------------
-const QString pqCustomViewButtonDialog::DEFAULT_TOOLTIP = QString("not configured.");
-const int pqCustomViewButtonDialog::MINIMUM_NUMBER_OF_ITEMS = 4;
-const int pqCustomViewButtonDialog::MAXIMUM_NUMBER_OF_ITEMS = 30;
+const QString pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP = QString("not configured.");
+const int pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS = 0;
+const int pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS = 30;
 
 //------------------------------------------------------------------------------
-pqCustomViewButtonDialog::pqCustomViewButtonDialog(QWidget* Parent, Qt::WindowFlags flags,
+pqCustomViewpointButtonDialog::pqCustomViewpointButtonDialog(QWidget* Parent, Qt::WindowFlags flags,
   QStringList& toolTips, QStringList& configs, QString& curConfig)
   : QDialog(Parent, flags)
   , ui(nullptr)
 {
-  this->ui = new pqCustomViewButtonDialogUI(this);
+  this->ui = new pqCustomViewpointButtonDialogUI(this);
   this->ui->setupUi(this);
   this->setToolTipsAndConfigurations(toolTips, configs);
   this->setCurrentConfiguration(curConfig);
@@ -208,14 +209,14 @@ pqCustomViewButtonDialog::pqCustomViewButtonDialog(QWidget* Parent, Qt::WindowFl
 }
 
 //------------------------------------------------------------------------------
-pqCustomViewButtonDialog::~pqCustomViewButtonDialog()
+pqCustomViewpointButtonDialog::~pqCustomViewpointButtonDialog()
 {
   delete this->ui;
   this->ui = NULL;
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::setToolTipsAndConfigurations(
+void pqCustomViewpointButtonDialog::setToolTipsAndConfigurations(
   const QStringList& toolTips, const QStringList& configs)
 {
   if (toolTips.size() != configs.size())
@@ -246,7 +247,7 @@ void pqCustomViewButtonDialog::setToolTipsAndConfigurations(
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::setToolTips(const QStringList& toolTips)
+void pqCustomViewpointButtonDialog::setToolTips(const QStringList& toolTips)
 {
   if (toolTips.length() != this->ui->rowCount())
   {
@@ -257,13 +258,13 @@ void pqCustomViewButtonDialog::setToolTips(const QStringList& toolTips)
 }
 
 //------------------------------------------------------------------------------
-QStringList pqCustomViewButtonDialog::getToolTips()
+QStringList pqCustomViewpointButtonDialog::getToolTips()
 {
   return this->ui->toolTips();
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::setConfigurations(const QStringList& configs)
+void pqCustomViewpointButtonDialog::setConfigurations(const QStringList& configs)
 {
   if (configs.length() != this->ui->rowCount())
   {
@@ -274,36 +275,36 @@ void pqCustomViewButtonDialog::setConfigurations(const QStringList& configs)
 }
 
 //------------------------------------------------------------------------------
-QStringList pqCustomViewButtonDialog::getConfigurations()
+QStringList pqCustomViewpointButtonDialog::getConfigurations()
 {
   return this->Configurations;
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::setCurrentConfiguration(const QString& config)
+void pqCustomViewpointButtonDialog::setCurrentConfiguration(const QString& config)
 {
   this->CurrentConfiguration = config;
 }
 
 //------------------------------------------------------------------------------
-QString pqCustomViewButtonDialog::getCurrentConfiguration()
+QString pqCustomViewpointButtonDialog::getCurrentConfiguration()
 {
   return this->CurrentConfiguration;
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::importConfigurations()
+void pqCustomViewpointButtonDialog::importConfigurations()
 {
   // What follows is a reader for an xml format that contains
   // a group of nested Camera Configuration XML hierarchies
   // each written by the vtkSMCameraConfigurationWriter.
   // The nested configuration hierarchies might be empty.
-  pqCustomViewButtonFileInfo fileInfo;
+  pqCustomViewpointButtonFileInfo fileInfo;
 
   QString filters =
     QString("%1 (*%2);;All Files (*.*)").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension);
 
-  pqFileDialog dialog(0, this, "Load Custom View Button Configuration", "", filters);
+  pqFileDialog dialog(0, this, "Load Custom Viewpoints Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::ExistingFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -347,7 +348,7 @@ void pqCustomViewButtonDialog::importConfigurations()
 
     for (auto button : root.children())
     {
-      if (strncmp(button.name(), "CustomViewButton", strlen("CustomViewButton")) != 0)
+      if (strncmp(button.name(), "CustomViewpointButton", strlen("CustomViewpointButton")) != 0)
       {
         qWarning() << "Unexpected element found '" << button.name() << "'. Skipping.";
         continue;
@@ -410,14 +411,14 @@ void pqCustomViewButtonDialog::importConfigurations()
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::exportConfigurations()
+void pqCustomViewpointButtonDialog::exportConfigurations()
 {
-  pqCustomViewButtonFileInfo fileInfo;
+  pqCustomViewpointButtonFileInfo fileInfo;
 
   QString filters =
     QString("%1 (*%2);;All Files (*.*)").arg(fileInfo.FileDescription).arg(fileInfo.FileExtension);
 
-  pqFileDialog dialog(0, this, "Save Custom View Button Configuration", "", filters);
+  pqFileDialog dialog(0, this, "Save Custom Viewpoints Configuration", "", filters);
   dialog.setFileMode(pqFileDialog::AnyFile);
 
   if (dialog.exec() == QDialog::Accepted)
@@ -433,7 +434,8 @@ void pqCustomViewButtonDialog::exportConfigurations()
     Q_ASSERT(toolTipTexts.size() == this->Configurations.size());
     for (int i = 0, max = this->ui->rowCount(); i < max; ++i)
     {
-      auto button = root.append_child(QString("CustomViewButton%1").arg(i).toStdString().c_str());
+      auto button =
+        root.append_child(QString("CustomViewpointButton%1").arg(i).toStdString().c_str());
 
       // tool tip
       auto tip = button.append_child("ToolTip");
@@ -458,7 +460,7 @@ void pqCustomViewButtonDialog::exportConfigurations()
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::appendRow()
+void pqCustomViewpointButtonDialog::appendRow()
 {
   const int numRows = this->ui->rowCount();
   Q_ASSERT(numRows < MAXIMUM_NUMBER_OF_ITEMS);
@@ -467,37 +469,37 @@ void pqCustomViewButtonDialog::appendRow()
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::clearAll()
+void pqCustomViewpointButtonDialog::clearAll()
 {
   this->setToolTipsAndConfigurations(QStringList(), QStringList());
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::assignCurrentView()
+void pqCustomViewpointButtonDialog::assignCurrentViewpoint()
 {
   int row = -1;
   if (QObject* asender = this->sender())
   {
-    row = asender->property("pqCustomViewButtonDialog_INDEX").toInt();
+    row = asender->property("pqCustomViewpointButtonDialog_INDEX").toInt();
   }
 
   if (row >= 0 && row < this->ui->rowCount())
   {
     this->Configurations[row] = this->CurrentConfiguration;
-    if (this->ui->toolTip(row) == pqCustomViewButtonDialog::DEFAULT_TOOLTIP)
+    if (this->ui->toolTip(row) == pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP)
     {
-      this->ui->setToolTip(row, "Current View " + QString::number(row + 1));
+      this->ui->setToolTip(row, "Current Viewpoint " + QString::number(row + 1));
     }
   }
 }
 
 //------------------------------------------------------------------------------
-void pqCustomViewButtonDialog::deleteRow()
+void pqCustomViewpointButtonDialog::deleteRow()
 {
   int row = -1;
   if (QObject* asender = this->sender())
   {
-    row = asender->property("pqCustomViewButtonDialog_INDEX").toInt();
+    row = asender->property("pqCustomViewpointButtonDialog_INDEX").toInt();
   }
 
   if (row >= 0 && row < this->ui->rowCount())

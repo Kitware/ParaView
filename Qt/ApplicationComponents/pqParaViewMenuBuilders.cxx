@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorToolbar.h"
 #include "pqCopyReaction.h"
 #include "pqCreateCustomFilterReaction.h"
+#include "pqCustomViewpointsToolbar.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqDesktopServicesReaction.h"
@@ -607,10 +608,16 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   timeToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, timeToolbar);
 
+  QToolBar* customViewpointsToolbar = new pqCustomViewpointsToolbar(&mainWindow)
+    << pqSetName("customViewpointsToolbar");
+  customViewpointsToolbar->layout()->setSpacing(0);
+  mainWindow.addToolBar(Qt::TopToolBarArea, customViewpointsToolbar);
+
+  mainWindow.addToolBarBreak();
+
   QToolBar* colorToolbar = new pqColorToolbar(&mainWindow) << pqSetName("variableToolbar");
   colorToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, colorToolbar);
-  mainWindow.insertToolBarBreak(colorToolbar);
 
   QToolBar* reprToolbar = new pqRepresentationToolbar(&mainWindow)
     << pqSetName("representationToolbar");

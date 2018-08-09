@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCustomViewButtonDialog.h
+   Module:    pqCustomViewpointButtonDialog.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef pqCustomViewDialog_h
-#define pqCustomViewDialog_h
+#ifndef pqCustomViewpointDialog_h
+#define pqCustomViewpointDialog_h
+
+#include "pqComponentsModule.h"
 
 #include <QDialog>
 #include <QLineEdit>
@@ -40,11 +42,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 
-class pqCustomViewButtonDialogUI;
+class pqCustomViewpointButtonDialogUI;
 class vtkSMCameraConfigurationReader;
 
 /*
- * @class pqCustomViewDialog
+ * @class pqCustomViewpointDialog
  * @brief Dialog for configuring custom view buttons.
  *
  * Provides the machinery for associating the current camera configuration
@@ -56,7 +58,7 @@ class vtkSMCameraConfigurationReader;
  *
  * @sa pqCameraDialog
  */
-class pqCustomViewButtonDialog : public QDialog
+class PQCOMPONENTS_EXPORT pqCustomViewpointButtonDialog : public QDialog
 {
   Q_OBJECT
 
@@ -64,10 +66,10 @@ public:
   /**
    * Create and initialize the dialog.
    */
-  pqCustomViewButtonDialog(QWidget* parent, Qt::WindowFlags f, QStringList& toolTips,
+  pqCustomViewpointButtonDialog(QWidget* parent, Qt::WindowFlags f, QStringList& toolTips,
     QStringList& configurations, QString& currentConfig);
 
-  ~pqCustomViewButtonDialog() override;
+  ~pqCustomViewpointButtonDialog() override;
 
   /**
    * Constant variable that contains the default name for the tool tips.
@@ -124,15 +126,15 @@ private slots:
   void exportConfigurations();
   void clearAll();
 
-  void assignCurrentView();
+  void assignCurrentViewpoint();
   void deleteRow();
 
 private:
-  pqCustomViewButtonDialog() {}
+  pqCustomViewpointButtonDialog() {}
   QStringList Configurations;
   QString CurrentConfiguration;
-  pqCustomViewButtonDialogUI* ui;
+  pqCustomViewpointButtonDialogUI* ui;
 
-  friend class pqCustomViewButtonDialogUI;
+  friend class pqCustomViewpointButtonDialogUI;
 };
 #endif
