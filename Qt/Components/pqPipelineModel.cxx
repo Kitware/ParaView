@@ -91,6 +91,7 @@ public:
   enum IconType
   {
     SERVER,
+    SECURE_SERVER,
     LINK,
     GEOMETRY,
     BAGCHART,
@@ -214,6 +215,11 @@ public:
       case pqPipelineModel::Server:
       {
         pqServer* server = qobject_cast<pqServer*>(this->Object);
+        if (server->getResource().configuration().isPortForwarding())
+        {
+          return SECURE_SERVER;
+        }
+
         vtkSMLiveInsituLinkProxy* proxy = pqLiveInsituManager::linkProxy(server);
         return proxy ? ((vtkSMPropertyHelper(proxy, "SimulationPaused").GetAs<int>() == 1)
                            ? INSITU_SERVER_PAUSED
@@ -466,6 +472,8 @@ void pqPipelineModel::constructor()
   this->PixmapList = new QPixmap[pqPipelineModelDataItem::LAST + 1];
 
   this->PixmapList[pqPipelineModelDataItem::SERVER].load(":/pqWidgets/Icons/pqServer16.png");
+  this->PixmapList[pqPipelineModelDataItem::SECURE_SERVER].load(
+    ":/pqWidgets/Icons/pqSecureServer16.png");
   this->PixmapList[pqPipelineModelDataItem::LINK].load(":/pqWidgets/Icons/pqLinkBack16.png");
   this->PixmapList[pqPipelineModelDataItem::GEOMETRY].load(":/pqWidgets/Icons/pq3DView16.png");
   this->PixmapList[pqPipelineModelDataItem::BAGCHART].load(":/pqWidgets/Icons/pqBagChart16.png");
@@ -799,7 +807,7 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
             int time = server->getRemainingLifeTime();
             QString timeLeft =
               time > -1 ? QString(" (%1min left)").arg(QString::number(time)) : QString();
-            return QString("%1 (%2)%3").arg(name).arg(resource.toURI()).arg(timeLeft);
+            return QString("%1 (%2)%3").arg(name).arg(resource.configuration().URI()).arg(timeLeft);
           }
           else
           {

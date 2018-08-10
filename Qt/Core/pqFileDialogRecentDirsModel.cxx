@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqFileDialogModel.h"
 #include "pqServer.h"
+#include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
 
@@ -59,7 +60,7 @@ pqFileDialogRecentDirsModel::pqFileDialogRecentDirsModel(
   // from the pqSettings. If server==NULL, we use the "builtin:" resource.
   pqServerResource resource = server ? server->getResource() : pqServerResource("builtin:");
 
-  QString uri = resource.toURI();
+  QString uri = resource.configuration().URI();
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
 

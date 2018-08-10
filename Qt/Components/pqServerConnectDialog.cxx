@@ -401,6 +401,9 @@ void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& confi
   {
     type = CLIENT_SERVER_REVERSE_CONNECT;
     this->Internals->port->setValue(configuration.resource().port(11111));
+
+    // set the host the the remote server name is correct, even if it not used for connecting.
+    this->Internals->host->setText(configuration.resource().host());
   }
   else if (scheme == "cdsrs")
   {
@@ -415,6 +418,10 @@ void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& confi
     type = CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT;
     this->Internals->dataServerPort->setValue(configuration.resource().dataServerPort(11111));
     this->Internals->renderServerPort->setValue(configuration.resource().renderServerPort(22222));
+
+    // set the host the the remote server name is correct, even if it not used for connecting.
+    this->Internals->dataServerHost->setText(configuration.resource().dataServerHost());
+    this->Internals->renderServerHost->setText(configuration.resource().renderServerHost());
   }
   this->Internals->type->setCurrentIndex(type);
   this->updateServerType();
@@ -511,7 +518,7 @@ void pqServerConnectDialog::acceptConfigurationPage1()
 
     case CLIENT_SERVER_REVERSE_CONNECT:
       resource.setScheme("csrc");
-      resource.setHost("localhost");
+      resource.setHost(this->Internals->host->text());
       resource.setPort(this->Internals->port->value());
       break;
 
@@ -525,9 +532,9 @@ void pqServerConnectDialog::acceptConfigurationPage1()
 
     case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
       resource.setScheme("cdsrsrc");
-      resource.setDataServerHost("localhost");
+      resource.setDataServerHost(this->Internals->dataServerHost->text());
       resource.setDataServerPort(this->Internals->dataServerPort->value());
-      resource.setRenderServerHost("localhost");
+      resource.setRenderServerHost(this->Internals->renderServerHost->text());
       resource.setRenderServerPort(this->Internals->renderServerPort->value());
       break;
 
@@ -556,7 +563,7 @@ void pqServerConnectDialog::editServerStartup()
     {
       double delay, timeout;
       this->Internals->startup_type->setCurrentIndex(1);
-      this->Internals->commandLine->setText(config.command(timeout, delay));
+      this->Internals->commandLine->setText(config.execCommand(timeout, delay));
       this->Internals->delay->setValue(delay);
     }
     break;
