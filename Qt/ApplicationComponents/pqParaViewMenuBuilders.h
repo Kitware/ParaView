@@ -38,6 +38,8 @@ class QMenu;
 class QWidget;
 class QMainWindow;
 
+class pqPropertiesPanel;
+
 /**
 * pqParaViewMenuBuilders provides helper methods to build menus that are
 * exactly as used by ParaView client. Simply call the appropriate method with
@@ -55,7 +57,7 @@ public:
   /**
   * Builds the standard Edit menu.
   */
-  static void buildEditMenu(QMenu& menu);
+  static void buildEditMenu(QMenu& menu, pqPropertiesPanel* propertiesPanel = nullptr);
 
   /**
   * Builds "Sources" menu.

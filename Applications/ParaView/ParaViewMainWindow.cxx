@@ -248,7 +248,8 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   // Populate application menus with actions.
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);
-  pqParaViewMenuBuilders::buildEditMenu(*this->Internals->menu_Edit);
+  pqParaViewMenuBuilders::buildEditMenu(
+    *this->Internals->menu_Edit, this->Internals->propertiesPanel);
 
   // Populate sources menu.
   pqParaViewMenuBuilders::buildSourcesMenu(*this->Internals->menuSources, this);

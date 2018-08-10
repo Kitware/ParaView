@@ -49,6 +49,8 @@ set (Module_SRCS
   pqApplicationSettingsReaction.h
   pqApplyBehavior.cxx
   pqApplyBehavior.h
+  pqApplyPropertiesReaction.cxx
+  pqApplyPropertiesReaction.h
   pqAutoApplyReaction.cxx
   pqAutoApplyReaction.h
   pqAutoLoadPluginXMLBehavior.cxx
