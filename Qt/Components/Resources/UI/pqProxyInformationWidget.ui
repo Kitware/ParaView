@@ -70,7 +70,7 @@
          <bool>false</bool>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+         <string notr="true">/* Explicitly apply to QLineEdit, so that tooltip isn't affected */ QLineEdit{background-color: rgba(0, 0, 0, 0);border: none;}</string>
         </property>
         <property name="readOnly">
          <bool>true</bool>
@@ -93,7 +93,10 @@
          <bool>false</bool>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+         <string notr="true">/* Explicitly apply to QLineEdit, so that tooltip isn't affected */ QLineEdit{background-color: rgba(0, 0, 0, 0);border: none;}</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
         <property name="readOnly">
          <bool>true</bool>
