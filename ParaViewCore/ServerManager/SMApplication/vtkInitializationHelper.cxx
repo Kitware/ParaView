@@ -196,7 +196,8 @@ void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVO
   {
     if (options->GetUnknownArgument())
     {
-      sscerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
+      sscerr << "Got unknown argument: " << options->GetUnknownArgument()
+             << ". Could you have misspelled your Python file path or name?" << endl;
     }
     if (options->GetErrorMessage())
     {
