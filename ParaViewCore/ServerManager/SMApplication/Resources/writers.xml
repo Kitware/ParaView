@@ -1569,7 +1569,21 @@
                             number_of_elements="1">
         <Documentation>The name of the file to be written.</Documentation>
       </StringVectorProperty>
-
+      <IntVectorProperty command="SetDataMode"
+                         default_values="2"
+                         name="DataMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Ascii"
+                 value="0" />
+          <Entry text="Binary"
+                 value="1" />
+          <Entry text="Appended"
+                 value="2" />
+        </EnumerationDomain>
+        <Documentation>The mode uses for writing the file's data i.e. ascii,
+        binary, appended binary.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetEncodeAppendedData"
                          default_values="0"
                          name="EncodeAppendedData"
