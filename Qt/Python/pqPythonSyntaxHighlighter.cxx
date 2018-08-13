@@ -197,7 +197,7 @@ void pqPythonSyntaxHighlighter::rehighlightSyntax()
 #elif PY_VERSION_HEX >= 0x03070000
     char* resultingTextAsCString = const_cast<char*>(PyUnicode_AsUTF8(resultingText));
 #else
-    char* resultingTextAsCString = PyUnicode_AsUTF8(resultingText);
+    const char* resultingTextAsCString = PyUnicode_AsUTF8(resultingText);
 #endif
 
     QString pygmentsOutput = QString::fromUtf8(resultingTextAsCString);
