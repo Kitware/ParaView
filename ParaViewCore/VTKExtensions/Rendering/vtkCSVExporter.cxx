@@ -32,6 +32,11 @@ public:
   std::map<double, std::pair<std::string, int> > Lines;
   int ColumnCount;
 
+  //@{
+  // Used in STREAM_ROWS mode.
+  std::map<std::string, std::string> ColumnLabels;
+  //@}
+
   vtkInternals()
     : ColumnCount(0)
   {
@@ -73,7 +78,6 @@ vtkCSVExporter::vtkCSVExporter()
 {
   this->FileStream = 0;
   this->FileName = 0;
-  this->FilterColumnsByVisibility = false;
   this->FieldDelimiter = 0;
   this->SetFieldDelimiter(",");
   this->Internals = new vtkInternals();
@@ -93,6 +97,38 @@ vtkCSVExporter::~vtkCSVExporter()
   this->FileStream = 0;
   this->SetFieldDelimiter(0);
   this->SetFileName(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkCSVExporter::SetColumnLabel(const char* name, const char* label)
+{
+  if (name != nullptr)
+  {
+    auto& internals = *this->Internals;
+    internals.ColumnLabels[name] = label ? label : "";
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkCSVExporter::ClearColumnLabels()
+{
+  auto& internals = *this->Internals;
+  internals.ColumnLabels.clear();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkCSVExporter::GetColumnLabel(const char* name)
+{
+  if (name != nullptr)
+  {
+    const auto& internals = *this->Internals;
+    auto iter = internals.ColumnLabels.find(name);
+    if (iter != internals.ColumnLabels.end())
+    {
+      return !iter->second.empty() ? iter->second.c_str() : nullptr;
+    }
+  }
+  return name;
 }
 
 //----------------------------------------------------------------------------
@@ -156,10 +192,17 @@ void vtkCSVExporter::WriteHeader(vtkFieldData* data)
     return;
   }
   bool first = true;
-  int numArrays = data->GetNumberOfArrays();
+  const int numArrays = data->GetNumberOfArrays();
   for (int cc = 0; cc < numArrays; cc++)
   {
     vtkAbstractArray* array = data->GetAbstractArray(cc);
+    auto name = array->GetName();
+    auto label = this->GetColumnLabel(name);
+    if (label == nullptr)
+    {
+      // skip columns with no names.
+      continue;
+    }
     int numComps = array->GetNumberOfComponents();
     for (int comp = 0; comp < numComps; comp++)
     {
@@ -167,7 +210,7 @@ void vtkCSVExporter::WriteHeader(vtkFieldData* data)
       {
         (*this->FileStream) << this->FieldDelimiter;
       }
-      (*this->FileStream) << array->GetName();
+      (*this->FileStream) << label;
       if (numComps > 1)
       {
         (*this->FileStream) << ":" << comp;
@@ -201,6 +244,14 @@ void vtkCSVExporter::WriteData(vtkFieldData* data)
     for (int cc = 0; cc < numArrays; cc++)
     {
       vtkAbstractArray* array = data->GetAbstractArray(cc);
+      auto name = array->GetName();
+      auto label = this->GetColumnLabel(name);
+      if (label == nullptr)
+      {
+        // skip columns with no names.
+        continue;
+      }
+
       int numComps = array->GetNumberOfComponents();
       for (int comp = 0; comp < numComps; comp++)
       {

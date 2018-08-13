@@ -3058,12 +3058,6 @@
                             number_of_elements="1">
         <Documentation>Name of the file to be written.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="SetFilterColumnsByVisibility"
-                         default_values="0"
-                         name="FilterColumnsByVisibility"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <Hints>
         <ExporterFactory extensions="csv tsv txt" />
       </Hints>

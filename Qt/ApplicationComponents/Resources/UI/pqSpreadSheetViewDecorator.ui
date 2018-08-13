@@ -17,7 +17,16 @@
    <property name="spacing">
     <number>1</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -46,36 +55,6 @@
      <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
      </property>
-     <item>
-      <property name="text">
-       <string>Points</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Cells</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Field Data</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Vertices</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Edges</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Rows</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>
@@ -117,7 +96,7 @@
      </property>
      <property name="icon">
       <iconset>
-      <normaloff>:/pqWidgets/Icons/pqFixedRepr32.png</normaloff>:/pqWidgets/Icons/pqFixedRepr32.png</iconset>
+       <normaloff>:/pqWidgets/Icons/pqFixedRepr32.png</normaloff>:/pqWidgets/Icons/pqFixedRepr32.png</iconset>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -139,7 +118,7 @@
       <string>Selected</string>
      </property>
      <property name="icon">
-      <iconset resource="../pqComponents.qrc">
+      <iconset>
        <normaloff>:/pqWidgets/Icons/pqSelect16.png</normaloff>:/pqWidgets/Icons/pqSelect16.png</iconset>
      </property>
      <property name="checkable">
@@ -165,8 +144,11 @@
       <string>Toggle column visibility</string>
      </property>
      <property name="icon">
-      <iconset resource="../pqComponents.qrc">
+      <iconset>
        <normaloff>:/pqWidgets/Icons/pqRectilinearGrid16.png</normaloff>:/pqWidgets/Icons/pqRectilinearGrid16.png</iconset>
+     </property>
+     <property name="popupMode">
+      <enum>QToolButton::InstantPopup</enum>
      </property>
     </widget>
    </item>
@@ -179,7 +161,7 @@
       <string>...</string>
      </property>
      <property name="icon">
-      <iconset resource="../pqComponents.qrc">
+      <iconset>
        <normaloff>:/pqWidgets/Icons/pqProgrammableFilter24.png</normaloff>:/pqWidgets/Icons/pqProgrammableFilter24.png</iconset>
      </property>
      <property name="checkable">
@@ -205,12 +187,12 @@
    </item>
   </layout>
   <action name="actionExport">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/pqWidgets/Icons/pqSaveTable32.png</normaloff>:/pqWidgets/Icons/pqSaveTable32.png</iconset>
+   </property>
    <property name="toolTip">
     <string>Export Spreadsheet</string>
-   </property>
-   <property name="icon">
-    <iconset resource="../pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqSaveTable32.png</normaloff>:/pqWidgets/Icons/pqSaveTable32.png</iconset>
    </property>
   </action>
  </widget>

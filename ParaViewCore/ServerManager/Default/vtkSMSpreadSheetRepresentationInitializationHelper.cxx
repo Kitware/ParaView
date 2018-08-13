@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSpreadSheetRepresentationInitializationHelper.h"
 
+#include "vtkDataObject.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
@@ -60,31 +61,22 @@ void vtkSMSpreadSheetRepresentationInitializationHelper::PostInitializeProxy(
     return;
   }
 
-  vtkSMSourceProxy* inputProxy =
-    vtkSMSourceProxy::SafeDownCast(vtkSMPropertyHelper(proxy, "Input").GetAsProxy());
+  vtkSMPropertyHelper inputHelper(proxy, "Input");
+  auto inputProxy = vtkSMSourceProxy::SafeDownCast(inputHelper.GetAsProxy());
   if (inputProxy == nullptr)
   {
     return;
   }
 
-  // reset FieldAssociation to a good default first. This is needed since this
-  // method gets called before the properties have been reset to their domain
-  // defaults.
-  vtkSMProperty* fieldAssociationProperty = proxy->GetProperty("FieldAssociation");
-  if (fieldAssociationProperty && fieldAssociationProperty->GetMTime() < ts)
-  {
-    fieldAssociationProperty->ResetToDomainDefaults();
-  }
-
-  unsigned int port = vtkSMPropertyHelper(proxy, "Input").GetOutputPort();
-  int fieldAssociation = vtkSMPropertyHelper(fieldAssociationProperty).GetAsInt();
-
+  // this is a hack to deal with statistic filters that produce a multiblock of
+  // tables.
+  unsigned int port = inputHelper.GetOutputPort();
   if (vtkPVDataInformation* dataInfo = inputProxy->GetDataInformation(port))
   {
     vtkPVCompositeDataInformation* cdInfo = dataInfo->GetCompositeDataInformation();
-    if (!cdInfo->GetDataIsComposite())
+    if (!cdInfo->GetDataIsComposite() && dataInfo->GetDataSetType() != VTK_TABLE)
     {
-      // data is not a composite dataset, all's good.
+      // data is not a composite dataset of tables , all's good.
       return;
     }
 
@@ -100,8 +92,7 @@ void vtkSMSpreadSheetRepresentationInitializationHelper::PostInitializeProxy(
         continue;
       }
 
-      vtkPVDataSetAttributesInformation* attrInfo =
-        currentDataInfo->GetAttributeInformation(fieldAssociation);
+      auto attrInfo = currentDataInfo->GetAttributeInformation(vtkDataObject::ROW);
       for (int cc = 0, max = attrInfo->GetNumberOfArrays(); cc < max; ++cc)
       {
         if (attrInfo->GetArrayInformation(cc) && !attrInfo->GetArrayInformation(cc)->GetIsPartial())
