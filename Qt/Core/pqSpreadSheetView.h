@@ -61,6 +61,12 @@ public:
   */
   pqSpreadSheetViewModel* getViewModel();
 
+  /**
+   * Returns the currently visible representation, if any.
+   * Note that this view supports showing only one representation at a time.
+   */
+  pqDataRepresentation* activeRepresentation() const;
+
 signals:
   /**
   * Fired when the currently shown representation changes. \c repr may be

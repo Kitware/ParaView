@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqProxyWidget.h"
+#include "pqUndoStack.h"
 #include "vtkNew.h"
-#include "vtkSMExporterProxy.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMViewExportHelper.h"
@@ -113,6 +113,8 @@ void pqExportReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 QString pqExportReaction::exportActiveView()
 {
+  SCOPED_UNDO_EXCLUDE();
+
   pqView* view = pqActiveObjects::instance().activeView();
   if (!view)
   {

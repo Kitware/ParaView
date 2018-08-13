@@ -139,6 +139,12 @@ public:
   //@}
 
   /**
+   * Returns the number of elements of the given type where type can
+   * vtkDataObject::POINT, vtkDataObject::CELL, ... etc.
+   */
+  vtkTypeInt64 GetNumberOfElements(int type);
+
+  /**
    * Returns a string describing the datatype that can be directly
    * shown in a user interface.
    */

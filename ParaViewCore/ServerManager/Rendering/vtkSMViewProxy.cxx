@@ -711,6 +711,11 @@ bool vtkSMViewProxy::HideOtherRepresentationsIfNeeded(vtkSMProxy* repr)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMViewProxy::RepresentationVisibilityChanged(vtkSMProxy*, bool)
+{
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMViewProxy::GetLocalProcessSupportsInteraction()
 {
   this->CreateVTKObjects();
