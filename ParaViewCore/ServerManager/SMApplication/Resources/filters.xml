@@ -4156,7 +4156,7 @@ array.
                      short_help="Evaluate geometric mesh quality.">This filter
                      creates a new cell array containing a geometric measure of
                      each cell's fitness. Different quality measures can be
-                     chosen for different cell shapes. Supported shapes include
+                     chosen for different cell shapes. Supported shapes include linear
                      triangles, quadrilaterals, tetrahedra, and hexahedra. For
                      other shapes, a value of 0 is assigned.</Documentation>
       <InputProperty command="SetInputConnection"
