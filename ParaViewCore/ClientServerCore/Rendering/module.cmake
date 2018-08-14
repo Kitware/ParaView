@@ -29,6 +29,7 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkRenderingVolumeOpenGL2
     vtkViewsContext2D
     vtkViewsCore
+    vtkjsoncpp
     ${__dependencies}
   PRIVATE_DEPENDS
     vtksys

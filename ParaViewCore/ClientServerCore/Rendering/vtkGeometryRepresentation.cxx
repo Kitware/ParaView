@@ -53,7 +53,12 @@
 #include "vtkOSPRayActorNode.h"
 #endif
 
+#include <vtk_jsoncpp.h>
 #include <vtksys/SystemTools.hxx>
+
+#include <memory>
+#include <tuple>
+#include <vector>
 
 //*****************************************************************************
 // This is used to convert a vtkPolyData to a vtkMultiBlockDataSet. If input is
@@ -193,6 +198,9 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->PWF = NULL;
 
   this->UseDataPartitions = false;
+
+  this->UseShaderReplacements = false;
+  this->ShaderReplacementsString = "";
 }
 
 //----------------------------------------------------------------------------
@@ -1148,5 +1156,112 @@ void vtkGeometryRepresentation::ComputeVisibleDataBounds()
     }
     this->GetBounds(dataObject, this->VisibleDataBounds, cdAttributes);
     this->VisibleDataBoundsTime.Modified();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetUseShaderReplacements(bool useShaderRepl)
+{
+  if (this->UseShaderReplacements != useShaderRepl)
+  {
+    this->UseShaderReplacements = useShaderRepl;
+    this->Modified();
+    this->UpdateShaderReplacements();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetShaderReplacements(const char* replacementsString)
+{
+  if (strcmp(replacementsString, this->ShaderReplacementsString.c_str()))
+  {
+    this->ShaderReplacementsString = std::string(replacementsString);
+    this->Modified();
+    this->UpdateShaderReplacements();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::UpdateShaderReplacements()
+{
+  vtkOpenGLPolyDataMapper* glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
+  vtkOpenGLPolyDataMapper* glLODMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->LODMapper);
+
+  if (!glMapper || !glLODMapper)
+  {
+    return;
+  }
+
+  glMapper->ClearAllShaderReplacements();
+  glLODMapper->ClearAllShaderReplacements();
+
+  if (!this->UseShaderReplacements || this->ShaderReplacementsString == "")
+  {
+    return;
+  }
+
+  Json::CharReaderBuilder builder;
+  builder["collectComments"] = false;
+  Json::Value root;
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+  bool success = reader->parse(this->ShaderReplacementsString.c_str(),
+    this->ShaderReplacementsString.c_str() + this->ShaderReplacementsString.length(), &root,
+    nullptr);
+  if (!success)
+  {
+    vtkGenericWarningMacro("Unable to parse the replacement Json string!");
+    return;
+  }
+  bool isArray = root.isArray();
+  size_t nbReplacements = isArray ? root.size() : 1;
+
+  std::vector<std::tuple<vtkShader::Type, std::string, std::string> > replacements;
+  for (size_t index = 0; index < nbReplacements; ++index)
+  {
+    const Json::Value& repl = isArray ? root[(int)index] : root;
+    if (!repl.isMember("type"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: a type is required.");
+      return;
+    }
+    std::string type = repl["type"].asString();
+    vtkShader::Type shaderType = vtkShader::Unknown;
+    if (type == "fragment")
+    {
+      shaderType = vtkShader::Fragment;
+    }
+    else if (type == "vertex")
+    {
+      shaderType = vtkShader::Vertex;
+    }
+    else if (type == "geometry")
+    {
+      shaderType = vtkShader::Geometry;
+    }
+    if (shaderType == vtkShader::Unknown)
+    {
+      vtkErrorMacro("Unknown shader type for replacement:" << type);
+      return;
+    }
+
+    if (!repl.isMember("original"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: an original pattern is required.");
+      return;
+    }
+    std::string original = repl["original"].asString();
+    if (!repl.isMember("replacement"))
+    {
+      vtkErrorMacro("Syntax error in shader replacements: a replacement pattern is required.");
+      return;
+    }
+    std::string replacement = repl["replacement"].asString();
+    replacements.push_back(std::make_tuple(shaderType, original, replacement));
+  }
+
+  for (const auto& r : replacements)
+  {
+    glMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
+    glLODMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
   }
 }

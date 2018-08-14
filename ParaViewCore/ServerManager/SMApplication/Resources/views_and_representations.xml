@@ -3793,6 +3793,10 @@
                       panel_visibility="never" />
             <Property name="Triangulate"
                       panel_visibility="advanced" />
+            <Property name="UseShaderReplacements"
+                      panel_visibility="advanced" />
+            <Property name="ShaderReplacements"
+                      panel_visibility="advanced" />
             <Property name="NonlinearSubdivisionLevel"
                       panel_visibility="advanced" />
             <Property name="BlockVisibility"
@@ -11049,6 +11053,47 @@
         issues of non-convex polygons. This feature has a processing and memory
         cost, it should be enabled only when needed.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseShaderReplacements"
+                         default_values="0"
+                         name="UseShaderReplacements"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable the use of shader replacements.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetShaderReplacements"
+                            default_values=""
+                            name="ShaderReplacements"
+                            number_of_elements="1"
+                            panel_widget="shader_replacements_selector"
+                            panel_visibility="advanced">
+        <Documentation>
+          Specify shader replacements using a Json string.
+          The Json string can be a single node or an array of nodes with the
+          following properties:&#xa;
+            "type": specifies the type of shader the replacement is about.
+              It can be either "vertex", "fragment" or "geometry".&#xa;
+            "original": specifies the original string to be replaced in the shader code.
+              This string is generally a pattern defined by the mapper
+              vtkOpenGLPolyDataMapper at specific locations of the shader
+              GLSL source code.&#xa;
+            "replacement": specifies the replacement string in GLSL source code.
+              Note that the Json parser supports multiple lines entries.&#xa;
+          Example of a simple shader replacement (draw all the fragments in full red
+          color without any shading consideration):&#xa;
+            {&#xa;
+             "type": "fragment",&#xa;
+             "original": "//VTK::Light::Impl",&#xa;
+             "replacement": "gl_FragData[0]=vec4(1.0,0.0,0.0,1.0);"&#xa;
+           }&#xa;
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseShaderReplacements"
+                                   value="1" />
+          <!-- show this widget when UseShaderReplacements is enabled -->
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty command="SetNonlinearSubdivisionLevel"
                          default_values="1"
                          name="NonlinearSubdivisionLevel"
