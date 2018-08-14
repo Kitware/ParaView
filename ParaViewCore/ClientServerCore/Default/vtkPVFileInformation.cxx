@@ -479,25 +479,14 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::GetSpecialDirectories()
 {
-  // FIXME: Use vtkPVLibraryInfo (see paraview/paraview!798) once it's available
-  // to get such paths. Hardcoding it for now.
-  if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+  std::string examplesPath = vtkPVFileInformation::GetParaViewExampleFilesDirectory();
+  if (vtksys::SystemTools::FileIsDirectory(examplesPath))
   {
-#if defined(_WIN32) || defined(__APPLE__)
-    std::string examplesPath = pm->GetSelfDir() + "/../examples";
-#else
-    std::string appdir = pm->GetSelfDir();
-    std::string examplesPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/examples";
-#endif
-    examplesPath = vtksys::SystemTools::CollapseFullPath(examplesPath);
-    if (vtksys::SystemTools::FileIsDirectory(examplesPath))
-    {
-      vtkNew<vtkPVFileInformation> info;
-      info->SetFullPath(examplesPath.c_str());
-      info->SetName("Examples");
-      info->Type = DIRECTORY;
-      this->Contents->AddItem(info.Get());
-    }
+    vtkNew<vtkPVFileInformation> info;
+    info->SetFullPath(examplesPath.c_str());
+    info->SetName("Examples");
+    info->Type = DIRECTORY;
+    this->Contents->AddItem(info.Get());
   }
 
 #if defined(_WIN32)
