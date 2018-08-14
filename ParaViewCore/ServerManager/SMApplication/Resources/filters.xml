@@ -650,52 +650,38 @@
         <Documentation>This property specifies the input for this
         filter.</Documentation>
       </InputProperty>
-      <IntVectorProperty command="GetLevelRange"
-                        default_values="0 0"
-                        information_only="1"
-                        name="LevelRange"
-                        number_of_elements="2"></IntVectorProperty>
-      <IntVectorProperty command="SetForwardUpstream"
-                         default_values="0"
-                         name="ForwardUpstream"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property specifies whether or not requests will be
-        propagated upstream.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetEnablePrefetching"
-                         default_values="0"
-                         name="EnablePrefetching"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This property specifies whether or not requests
-        pre-fetching of blocks of the next level will be
-        enabled.</Documentation>
-      </IntVectorProperty>
       <IntVectorProperty command="SetMaxResolution"
                          default_values="0"
                          name="Level"
                          number_of_elements="1">
-        <IntRangeDomain max="100"
-                        min="0"
-                        name="range" />
-        <!--         <RequiredProperties>
-         <Property name="LevelRange" function="LevelRange"/>
-        </RequiredProperties>
--->
+        <AMRLevelsDomain default_mode="max"
+                         name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </AMRLevelsDomain>
         <Documentation>Set maximum slice resolution.</Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty command="SetOffSetFromOrigin"
-                            default_values="1.0"
+      <DoubleVectorProperty command="SetOffsetFromOrigin"
+                            default_values="0.0"
                             name="OffSet"
                             number_of_elements="1">
-        <DoubleRangeDomain min="0"
-                           name="range" />
+        <BoundsDomain default_mode="mid"
+                      mode="extents"
+                      name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="AxisFlags"
+                      name="Normal" />
+          </RequiredProperties>
+        </BoundsDomain>
         <Documentation>Set's the offset from the origin of the
         data-set</Documentation>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetNormal"
-                         default_values="0"
+                         default_values="1"
                          name="Normal"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
@@ -704,7 +690,7 @@
           <Entry text="Y-Normal"
                  value="2" />
           <Entry text="Z-Normal"
-                 value="3" />
+                 value="4" />
         </EnumerationDomain>
         <Documentation>This property sets the normal of the
         slice.</Documentation>

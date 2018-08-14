@@ -30,6 +30,7 @@
 #==========================================================================
 set (Module_SRCS
   vtkLiveInsituLink.cxx
+  vtkSMAMRLevelsDomain.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
   vtkSMArraySelectionDomain.cxx

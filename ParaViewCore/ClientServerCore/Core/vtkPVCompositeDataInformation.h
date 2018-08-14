@@ -100,6 +100,14 @@ public:
   vtkGetMacro(DataIsComposite, int);
   //@}
 
+  //@{
+  /**
+   * Returns the number of levels in the AMR dataset. Only valid for
+   * vtkUniformGridAMR datasets.
+   */
+  vtkGetMacro(NumberOfAMRLevels, unsigned int);
+  //@}
+
   // TODO:
   // Add API to obtain meta data information for each of the children.
 
@@ -118,6 +126,8 @@ protected:
 
   unsigned int NumberOfPieces;
   vtkSetMacro(NumberOfPieces, unsigned int);
+
+  unsigned int NumberOfAMRLevels;
 
   friend class vtkPVDataInformation;
   vtkPVDataInformation* GetDataInformationForCompositeIndex(int* index);
