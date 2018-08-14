@@ -31,6 +31,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTrace.h"
 #include "vtkSMTransferFunctionManager.h"
+#include "vtkSMTransferFunctionProxy.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
@@ -331,10 +332,14 @@ bool vtkSMParaViewPipelineControllerWithRendering::RegisterRepresentationProxy(v
       }
       if (vtkSMProperty* lutProperty = proxy->GetProperty("LookupTable"))
       {
-        vtkSMProxy* lutProxy =
-          mgr->GetColorTransferFunction(arrayName, proxy->GetSessionProxyManager());
+        vtkSMTransferFunctionProxy* lutProxy = vtkSMTransferFunctionProxy::SafeDownCast(
+          mgr->GetColorTransferFunction(arrayName, proxy->GetSessionProxyManager()));
+        int rescaleMode =
+          vtkSMPropertyHelper(lutProxy, "AutomaticRescaleRangeMode", true).GetAsInt();
         vtkSMPropertyHelper(lutProperty).Set(lutProxy);
-        vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(proxy, true);
+        bool extend = rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY;
+        bool force = false;
+        vtkSMPVRepresentationProxy::RescaleTransferFunctionToDataRange(proxy, extend, force);
         proxy->UpdateVTKObjects();
       }
     }
