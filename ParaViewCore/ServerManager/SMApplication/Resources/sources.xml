@@ -1061,6 +1061,35 @@
       <!-- End Mandelbrot -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkImageSimpleSource"
+                 label="Simple Image"
+                 name="ImageSimpleSource">
+      <Documentation long_help="Representation simple image in 3 dimensions"
+                     short_help="Create a Simple Image representation">The
+                     Simple source can be used to create a uniform rectilinear
+                     grid with scalar values derived from relatively light
+                     computations. The active scalar array is named "X", and
+                     is set to the X coordinate for each pixel. There are two
+                     additional point data sets. The data array named
+                     "Distance2" is computed as the squared distance from
+                     each pixel to the origin. The data array named "Swirl"
+                     is a vector field computed as (Y,Z,X) at each pixel.
+                     </Documentation>
+      <IntVectorProperty command="SetWholeExtent"
+                         default_values="-10 10 -10 10 -10 10"
+                         name="WholeExtent"
+                         number_of_elements="6"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" />
+        <Documentation>The six values in the property indicate the X, Y, and Z
+        extent of the output data. The first two numbers are the minimum and
+        maximum X extent; the next two are the minimum and maximum Y extent;
+        and the final two are the minimum and maximum Z extent. The numbers are
+        inclusive, so values of -10, 10, -10, 10, =10, 10 indicate that the
+        dimensions of the output will be 21 x 21 x 21.</Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+      <!-- ==================================================================== -->
     <SourceProxy class="vtkPlaneSource"
                  label="Plane"
                  name="PlaneSource">
