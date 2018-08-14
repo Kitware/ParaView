@@ -288,8 +288,18 @@ public:
   vtkGetMacro(UseDataPartitions, bool);
   //@}
 
+  //@{
   /**
-   * Specify shader replacements using a Json string
+   * Specify whether or not to shader replacements string must be used.
+   */
+  virtual void SetUseShaderReplacements(bool);
+  vtkGetMacro(UseShaderReplacements, bool);
+  //@}
+
+  /**
+   * Specify shader replacements using a Json string.
+   * Please refer to the XML definition of the property for details about
+   * the expected Json string format.
    */
   virtual void SetShaderReplacements(const char*);
 
@@ -375,6 +385,11 @@ protected:
    */
   void ComputeVisibleDataBounds();
 
+  /**
+   * Update the mapper with the shader replacement strings if feature is enabled.
+   */
+  void UpdateShaderReplacements();
+
   vtkAlgorithm* GeometryFilter;
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;
@@ -399,6 +414,9 @@ protected:
   vtkPiecewiseFunction* PWF;
 
   bool UseDataPartitions;
+
+  bool UseShaderReplacements;
+  std::string ShaderReplacementsString;
 
   bool BlockAttrChanged = false;
   vtkTimeStamp BlockAttributeTime;

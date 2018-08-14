@@ -268,6 +268,10 @@ set (Module_SRCS
   pqSetBreakpointDialog.h
   pqSettingsDialog.cxx
   pqSettingsDialog.h
+  pqShaderReplacementsComboBox.cxx
+  pqShaderReplacementsComboBox.h
+  pqShaderReplacementsSelectorPropertyWidget.cxx
+  pqShaderReplacementsSelectorPropertyWidget.h
   pqSignalAdaptorKeyFrameType.cxx
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.cxx
@@ -437,6 +441,8 @@ set (Module_MOC_HDRS
   pqServerLauncher.h
   pqSetBreakpointDialog.h
   pqSettingsDialog.h
+  pqShaderReplacementsComboBox.h
+  pqShaderReplacementsSelectorPropertyWidget.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.h

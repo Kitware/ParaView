@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyGroupButton.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
+#include "pqShaderReplacementsSelectorPropertyWidget.h"
 #include "pqShowWidgetDecorator.h"
 #include "pqSpherePropertyWidget.h"
 #include "pqSplinePropertyWidget.h"
@@ -133,6 +134,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "texture_selector")
   {
     return new pqTextureSelectorPropertyWidget(smProxy);
+  }
+  else if (name == "shader_replacements_selector")
+  {
+    return new pqShaderReplacementsSelectorPropertyWidget(smProxy, smProperty);
   }
   else if (name == "calculator")
   {

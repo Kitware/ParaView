@@ -198,6 +198,9 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->PWF = NULL;
 
   this->UseDataPartitions = false;
+
+  this->UseShaderReplacements = false;
+  this->ShaderReplacementsString = "";
 }
 
 //----------------------------------------------------------------------------
@@ -1157,24 +1160,53 @@ void vtkGeometryRepresentation::ComputeVisibleDataBounds()
 }
 
 //----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetUseShaderReplacements(bool useShaderRepl)
+{
+  if (this->UseShaderReplacements != useShaderRepl)
+  {
+    this->UseShaderReplacements = useShaderRepl;
+    this->Modified();
+    this->UpdateShaderReplacements();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetShaderReplacements(const char* replacementsString)
+{
+  if (strcmp(replacementsString, this->ShaderReplacementsString.c_str()))
+  {
+    this->ShaderReplacementsString = std::string(replacementsString);
+    this->Modified();
+    this->UpdateShaderReplacements();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::UpdateShaderReplacements()
 {
   vtkOpenGLPolyDataMapper* glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
   vtkOpenGLPolyDataMapper* glLODMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->LODMapper);
 
-  if (!glMapper || !glLODMapper || replacementsString == "" || replacementsString[0] == '\0')
+  if (!glMapper || !glLODMapper)
   {
     return;
   }
+
   glMapper->ClearAllShaderReplacements();
   glLODMapper->ClearAllShaderReplacements();
+
+  if (!this->UseShaderReplacements || this->ShaderReplacementsString == "")
+  {
+    return;
+  }
 
   Json::CharReaderBuilder builder;
   builder["collectComments"] = false;
   Json::Value root;
   std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-  bool success = reader->parse(
-    replacementsString, replacementsString + strlen(replacementsString), &root, nullptr);
+  bool success = reader->parse(this->ShaderReplacementsString.c_str(),
+    this->ShaderReplacementsString.c_str() + this->ShaderReplacementsString.length(), &root,
+    nullptr);
   if (!success)
   {
     vtkGenericWarningMacro("Unable to parse the replacement Json string!");
@@ -1204,7 +1236,7 @@ void vtkGeometryRepresentation::SetShaderReplacements(const char* replacementsSt
     }
     else if (type == "geometry")
     {
-      shaderType == vtkShader::Geometry;
+      shaderType = vtkShader::Geometry;
     }
     if (shaderType == vtkShader::Unknown)
     {
@@ -1229,10 +1261,6 @@ void vtkGeometryRepresentation::SetShaderReplacements(const char* replacementsSt
 
   for (const auto& r : replacements)
   {
-    cout << "Repl " << std::get<0>(r) << "from" << endl
-         << std::get<1>(r) << endl
-         << "to" << endl
-         << std::get<2>(r) << endl;
     glMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
     glLODMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
   }

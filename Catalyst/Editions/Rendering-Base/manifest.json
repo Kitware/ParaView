@@ -945,6 +945,9 @@
     { "name": "vtkjpeg",
       "path": "VTK/ThirdParty/jpeg"
     },
+    { "name": "vtkjsoncpp",
+      "path": "VTK/ThirdParty/jsoncpp"
+    },
     { "name": "vtkpng",
       "path": "VTK/ThirdParty/png"
     },
