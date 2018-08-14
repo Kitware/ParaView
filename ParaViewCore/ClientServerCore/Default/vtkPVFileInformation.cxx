@@ -484,16 +484,16 @@ void vtkPVFileInformation::GetSpecialDirectories()
   if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
   {
 #if defined(_WIN32) || defined(__APPLE__)
-    std::string dataPath = pm->GetSelfDir() + "/../data";
+    std::string examplesPath = pm->GetSelfDir() + "/../examples";
 #else
     std::string appdir = pm->GetSelfDir();
-    std::string dataPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/data";
+    std::string examplesPath = appdir + "/../share/paraview-" PARAVIEW_VERSION "/examples";
 #endif
-    dataPath = vtksys::SystemTools::CollapseFullPath(dataPath);
-    if (vtksys::SystemTools::FileIsDirectory(dataPath))
+    examplesPath = vtksys::SystemTools::CollapseFullPath(examplesPath);
+    if (vtksys::SystemTools::FileIsDirectory(examplesPath))
     {
       vtkNew<vtkPVFileInformation> info;
-      info->SetFullPath(dataPath.c_str());
+      info->SetFullPath(examplesPath.c_str());
       info->SetName("Examples");
       info->Type = DIRECTORY;
       this->Contents->AddItem(info.Get());
@@ -1232,7 +1232,7 @@ std::string vtkPVFileInformation::GetParaViewSharedResourcesDirectory()
 //-----------------------------------------------------------------------------
 std::string vtkPVFileInformation::GetParaViewExampleFilesDirectory()
 {
-  return vtkPVFileInformation::GetParaViewSharedResourcesDirectory() + "/data";
+  return vtkPVFileInformation::GetParaViewSharedResourcesDirectory() + "/examples";
 }
 
 //-----------------------------------------------------------------------------
