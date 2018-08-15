@@ -176,6 +176,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqChangePipelineInputReaction(ui.actionChangeInput);
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
+  ui.actionDelete->setShortcut(QKeySequence(Qt::ALT + Qt::Key_D));
   new pqDeleteReaction(ui.actionDelete_All, true);
   new pqShowHideAllReaction(ui.actionShow_All, pqShowHideAllReaction::ActionType::Show);
   new pqShowHideAllReaction(ui.actionHide_All, pqShowHideAllReaction::ActionType::Hide);
@@ -189,7 +190,9 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   if (propertiesPanel)
   {
     QAction* applyAction = new QAction(QIcon(":/pqWidgets/Icons/pqUpdate16.png"), "Apply", &menu);
+    applyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
     QAction* resetAction = new QAction(QIcon(":/pqWidgets/Icons/pqCancel16.png"), "Reset", &menu);
+    resetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_R));
     menu.insertAction(ui.actionDelete, applyAction);
     menu.insertAction(ui.actionDelete, resetAction);
     new pqApplyPropertiesReaction(propertiesPanel, applyAction, true);

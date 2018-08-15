@@ -22,14 +22,11 @@
      <item>
       <widget class="QPushButton" name="Accept">
        <property name="text">
-        <string>&amp;Apply</string>
+        <string>Apply</string>
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
          <normaloff>:/pqWidgets/Icons/pqUpdate16.png</normaloff>:/pqWidgets/Icons/pqUpdate16.png</iconset>
-       </property>
-       <property name="shortcut">
-        <string>Alt+A</string>
        </property>
        <property name="default">
         <bool>true</bool>
@@ -42,7 +39,7 @@
         <string>Resets any changed properties to their values from the last time 'Apply' was clicked.</string>
        </property>
        <property name="text">
-        <string>&amp;Reset</string>
+        <string>Reset</string>
        </property>
        <property name="icon">
         <iconset resource="../pqComponents.qrc">
@@ -53,7 +50,7 @@
      <item>
       <widget class="QPushButton" name="Delete">
        <property name="text">
-        <string>&amp;Delete</string>
+        <string>Delete</string>
        </property>
        <property name="icon">
         <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
