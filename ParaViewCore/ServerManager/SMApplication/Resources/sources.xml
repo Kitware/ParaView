@@ -546,6 +546,55 @@
       <!-- End Hyper Tree Grid -->
     </SourceProxy>
     <!-- ==================================================================== -->
+    <SourceProxy class="vtkRandomHyperTreeGridSource"
+                 label="Hyper Tree Grid (Random)"
+                 name="RandomHyperTreeGridSource">
+      <Documentation long_help="Construct a HyperTreeGrid from a random seed."
+                     short_help="Create a random hyper tree grid">This source uses input parameters,
+                     most notably a seed value, to generate a vtkHyperTreeGrid instance for testing.
+      </Documentation>
+      <IntVectorProperty command="SetSeed"
+                         default_values="0"
+                         name="Seed"
+                         number_of_elements="1">
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGridSize"
+                         default_values="5 5 2"
+                         name="GridSize"
+                         number_of_elements="3">
+        <IntRangeDomain min="0"
+                        name="range" />
+        <Documentation>The three values in this property specify the number
+        of root cells in each dimension of the hyper tree grid.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetOutputBounds"
+                         default_values="-10 10 -10 10 -10 10"
+                         name="OutputBounds"
+                         number_of_elements="6">
+        <Documentation>The bounds of the resulting dataset.</Documentation>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetSplitFraction"
+                            default_values="0.5"
+                            name="SplitFraction"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           max="1"
+                           name="range" />
+        <Documentation>The chance that a given node will be split during
+        construction. Higher values mean more splits.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetMaxDepth"
+                         default_values="5"
+                         name="MaxDepth"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the maximum
+        number of levels in the hyper tree grid.</Documentation>
+      </IntVectorProperty>
+      <!-- End Random Hyper Tree Grid -->
+    </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkHierarchicalFractal"
                  label="Hierarchical Fractal"
                  name="HierarchicalFractal">
