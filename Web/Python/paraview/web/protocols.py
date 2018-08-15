@@ -529,6 +529,18 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
 
 
     @exportRpc("viewport.image.push")
+    def imagePush(self, options):
+        view = self.getView(options["view"])
+        viewId = view.GetGlobalIDAsString()
+
+        # Make sure an image is pushed
+        self.getApplication().InvalidateCache(view.SMProxy)
+
+        self.pushRender(viewId)
+
+
+    # Internal function since the reply[image] is not
+    # JSON(serializable) it can not be an RPC one
     def stillRender(self, options):
         """
         RPC Callback to render a view and obtain the rendered image.
@@ -613,7 +625,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             # There is an observer on this view already
             self.trackingViews[realViewId]['observerCount'] += 1
 
-        self.publish('viewport.image.push.subscription', self.pushRender(realViewId))
+        self.pushRender(realViewId)
         return { 'success': True, 'viewId': realViewId }
 
 
