@@ -329,6 +329,21 @@
       <!-- End of PLYWriter -->
     </Proxy>
     <!-- ================================================================= -->
+    <Proxy class="vtkOBJWriter"
+           name="OBJWriter">
+      <Documentation short_help="Write polygonal data in Wavefront OBJ format.">
+      </Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <InputProperty name="DummyInput" panel_visibility="never">
+        <InputArrayDomain attribute_type="any" name="input_array" />
+      </InputProperty>
+      <!-- End of OBJWriter -->
+    </Proxy>
+    <!-- ================================================================= -->
     <Proxy base_proxygroup="internal_writers"
            base_proxyname="DataWriterBase"
            class="vtkGenericDataObjectWriter"
