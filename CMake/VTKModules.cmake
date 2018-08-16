@@ -369,6 +369,9 @@ set(_vtk_modules
 
   vtkPVVTKExtensionsH5PartReader
   # needed for H5PartReader support
+
+  vtkIOVeraOut
+  # needed for vtkVeraOutReader
   )
 
 if ((NOT WIN32) OR (NOT MSVC) OR (MSVC_VERSION GREATER 1899))
