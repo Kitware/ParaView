@@ -459,6 +459,19 @@ public:
   //@}
 
   /**
+   * When plotting data with nonpositive values, ignore the standard warning
+  * and draw only the data with positive values.
+  */
+  static void SetIgnoreNegativeLogAxisWarning(bool val)
+  {
+    vtkPVXYChartView::IgnoreNegativeLogAxisWarning = val;
+  }
+  static bool GetIgnoreNegativeLogAxisWarning()
+  {
+    return vtkPVXYChartView::IgnoreNegativeLogAxisWarning;
+  }
+
+  /**
    * Provides access to the chart view.
    */
   virtual vtkChart* GetChart();
@@ -519,6 +532,8 @@ protected:
 
   bool HideTimeMarker;
   bool SortByXAxis;
+
+  static bool IgnoreNegativeLogAxisWarning;
 
 private:
   vtkPVXYChartView(const vtkPVXYChartView&) = delete;
