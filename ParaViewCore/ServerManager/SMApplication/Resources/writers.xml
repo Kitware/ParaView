@@ -925,22 +925,22 @@
         executed once for each time step available from its input.</Documentation>
       </IntVectorProperty>
       <StringVectorProperty command="SetFileNameSuffix"
-			    default_values="_%d"
-		            label = "File name suffix"
+                            default_values="_%d"
+                            label = "File name suffix"
                             name="FileNameSuffix"
                             number_of_elements="1">
         <Documentation>
-	  The suffix to append to the file name when writing files at different timesteps.
-	  (File extensions such as .vtk should be excluded.)
-          The % format specifiers are used. For example, _%d will write files as FileName_0,
-	  FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
-          FileName_001, FileName_002 etc.
+        The suffix to append to the file name when writing files at different timesteps.
+        (File extensions such as .vtk should be excluded.)
+        The % format specifiers are used. For example, _%d will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        FileName_001, FileName_002 etc.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="EnableWidgetDecorator">
-	    <Property name="WriteTimeSteps" function="boolean" />
-	  </PropertyWidgetDecorator>
-	</Hints>
+          <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </StringVectorProperty>
       <SubProxy>
         <Proxy name="PostGatherHelper"
@@ -957,6 +957,78 @@
         <UseDocumentationForLabels />
       </Hints>
       <!-- End of PLYWriter -->
+    </PSWriterProxy>
+    <!-- ================================================================= -->
+    <PSWriterProxy class="vtkParallelSerialWriter"
+                   file_name_method="SetFileName"
+                   name="POBJWriter">
+      <Documentation short_help="Write polygonal data in Wavefront OBJ format.">
+      Writer to write polygonal data in Wavefront OBJ format.
+      Written files contain the geometry including lines, triangles and polygons.
+      Normals and texture coordinates on points are also written if they exist.
+      This version is used when running in parallel. It gathers data to first node
+      and saves one file.</Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="OBJWriter"></Proxy>
+        <LinkProperties>
+          <Property name="DummyInput" with_property="Input" />
+        </LinkProperties>
+      </SubProxy>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each time step available from its input.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFileNameSuffix"
+                            default_values="_%d"
+                            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+        The suffix to append to the file name when writing files at different timesteps.
+        (File extensions such as .vtk should be excluded.)
+        The % format specifiers are used. For example, _%d will write files as FileName_0,
+        FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+        FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+          <Property name="WriteTimeSteps" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PostGatherHelper"
+               proxygroup="filters"
+               proxyname="AppendPolyData" />
+      </SubProxy>
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <WriterFactory extensions="obj" file_description="Wavefront OBJ File Format" />
+        <UseDocumentationForLabels />
+      </Hints>
+      <!-- End of OBJWriter -->
     </PSWriterProxy>
     <!-- ================================================================= -->
     <PSWriterProxy class="vtkParallelSerialWriter"
