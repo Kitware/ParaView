@@ -27,9 +27,12 @@
 #include <cmath>
 #include <string>
 
+namespace
+{
 const std::string SIMPLE_FIELD_X = "X";
-const std::string SIMPLE_FIELD_DIST2 = "DISTANCE_SQUARED";
-const std::string SIMPLE_FIELD_SWIRL = "SWIRL";
+const std::string SIMPLE_FIELD_DISTANCESQUARED = "DistanceSquared";
+const std::string SIMPLE_FIELD_SWIRL = "Swirl";
+}
 
 vtkStandardNewMacro(vtkImageSimpleSource);
 
@@ -142,7 +145,7 @@ int vtkImageSimpleSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   // Build point data by traversing the image coordinates
   vtkDataArray* xArray = pointData->GetArray(SIMPLE_FIELD_X.c_str());
-  vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DIST2.c_str());
+  vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
   vtkDataArray* swirlArray = pointData->GetArray(SIMPLE_FIELD_SWIRL.c_str());
 
   // Get starting pointer to each array
@@ -217,7 +220,7 @@ int vtkImageSimpleSource::RequestInformation(vtkInformation* vtkNotUsed(request)
   // Point data "DistanceSquared"
   vtkInformation* dsInfo = vtkInformation::New();
   dsInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
-  dsInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_DIST2);
+  dsInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_DISTANCESQUARED);
   dsInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
   dsInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 1);
   pointDataInfo->Append(dsInfo);
