@@ -188,7 +188,7 @@ public:
 };
 
 //------------------------------------------------------------------------------
-const QString pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP = QString("not configured.");
+const QString pqCustomViewpointButtonDialog::DEFAULT_TOOLTIP = QString("Unnamed Viewpoint");
 const int pqCustomViewpointButtonDialog::MINIMUM_NUMBER_OF_ITEMS = 0;
 const int pqCustomViewpointButtonDialog::MAXIMUM_NUMBER_OF_ITEMS = 30;
 
