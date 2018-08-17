@@ -86,15 +86,19 @@ void pqCustomViewpointsToolbar::updateCustomViewpointActions()
   // Recover tooltips from settings
   QStringList tooltips = pqCameraDialog::CustomViewpointToolTips();
 
-  // Remove end actions
-  if (this->PlusAction)
+  if (!this->ConfigAction)
   {
-    this->removeAction(this->PlusAction);
+    this->ConfigAction = this->addAction(QIcon(this->ConfigPixmap),
+      tr("Configure custom viewpoints"), this, SLOT(configureCustomViewpoints()));
+    this->ConfigAction->setObjectName("ConfigAction");
   }
 
-  if (this->ConfigAction)
+  if (!this->PlusAction)
   {
-    this->removeAction(this->ConfigAction);
+    this->PlusAction =
+      this->addAction(QIcon(this->PlusPixmap), tr("Add current viewpoint as custom viewpoint"),
+        this, SLOT(addCurrentViewpointToCustomViewpoints()));
+    this->PlusAction->setObjectName("PlusAction");
   }
 
   // Remove unused actions
@@ -131,13 +135,6 @@ void pqCustomViewpointsToolbar::updateCustomViewpointActions()
     }
   }
 
-  this->PlusAction =
-    this->addAction(QIcon(this->PlusPixmap), tr("Add current viewpoint as custom viewpoint"), this,
-      SLOT(addCurrentViewpointToCustomViewpoints()));
-  this->PlusAction->setObjectName("PlusAction");
-  this->ConfigAction = this->addAction(
-    QIcon(this->ConfigPixmap), tr("Configure"), this, SLOT(configureCustomViewpoints()));
-  this->ConfigAction->setObjectName("ConfigAction");
   this->updateEnabledState();
 }
 
