@@ -2439,25 +2439,26 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Before we're done we need to check for groups of properties where every
         # property in the group has a panel_visibilty of 'advanced', in which
         # case, the group should be marked the same.
-        for groupName in groupMap:
-            if groupName is not 'root' and 'ui' in groupMap[groupName]:
-                groupUiList = groupMap[groupName]['ui']
-                firstUiElt = groupUiList[0]
-                groupDependency = False
-                if 'depends' in firstUiElt and firstUiElt['depends']:
-                    groupDependency = True
-                advancedGroup = True
-                for uiProp in groupUiList:
-                    if uiProp['advanced'] == 0:
-                        advancedGroup = False
-                    if groupDependency and ('depends' not in uiProp or uiProp['depends'] != firstUiElt['depends']):
-                        groupDependency = False
+        if uiList:
+            for groupName in groupMap:
+                if groupName is not 'root' and 'ui' in groupMap[groupName]:
+                    groupUiList = groupMap[groupName]['ui']
+                    firstUiElt = groupUiList[0]
+                    groupDependency = False
+                    if 'depends' in firstUiElt and firstUiElt['depends']:
+                        groupDependency = True
+                    advancedGroup = True
+                    for uiProp in groupUiList:
+                        if uiProp['advanced'] == 0:
+                            advancedGroup = False
+                        if groupDependency and ('depends' not in uiProp or uiProp['depends'] != firstUiElt['depends']):
+                            groupDependency = False
 
-                if advancedGroup:
-                    groupMap[groupName]['groupItem']['advanced'] = 1
+                    if advancedGroup:
+                        groupMap[groupName]['groupItem']['advanced'] = 1
 
-                if groupDependency:
-                    groupMap[groupName]['groupItem']['depends'] = firstUiElt['depends']
+                    if groupDependency:
+                        groupMap[groupName]['groupItem']['depends'] = firstUiElt['depends']
 
         return { 'proxy': props, 'ui': uis }
 
@@ -2472,7 +2473,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             return functionName.strip()
 
     @exportRpc("pv.proxy.manager.create")
-    def create(self, functionName, parentId):
+    def create(self, functionName, parentId, initialValues = {}, skipDomain = False):
         """
         Creates a new filter/source proxy as a child of the specified
         parent proxy.  Returns the proxy state for the newly created
@@ -2493,7 +2494,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
 
         # Create new source/filter
         allowed = self.allowedProxies[name]
-        newProxy = paraview.simple.__dict__[allowed]()
+        newProxy = paraview.simple.__dict__[allowed](**initialValues)
 
         # To make WebGL export work
         simple.Show()
@@ -2501,7 +2502,8 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         self.getApplication().InvokeEvent('UpdateEvent')
 
         try:
-            self.applyDomains(parentProxy, newProxy.GetGlobalIDAsString())
+            if not skipDomain:
+                self.applyDomains(parentProxy, newProxy.GetGlobalIDAsString())
         except Exception as inst:
             print ('Caught exception applying domains:')
             print (inst)
