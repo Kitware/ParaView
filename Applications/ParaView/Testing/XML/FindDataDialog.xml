@@ -124,7 +124,7 @@
 
   <!-- Test field name sanitization -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
-  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
