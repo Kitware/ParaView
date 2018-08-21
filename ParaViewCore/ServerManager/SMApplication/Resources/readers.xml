@@ -1720,7 +1720,7 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetEdgeBlockArrayStatus"
                             element_types="2 0"
-                            information_property="EdgeBlockArrayInfo"
+                            information_property="EdgeBlocksInfo"
                             name="EdgeBlocks"
                             number_of_elements_per_command="2"
                             repeat_command="1">
@@ -1741,7 +1741,7 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetFaceBlockArrayStatus"
                             element_types="2 0"
-                            information_property="FaceBlockArrayInfo"
+                            information_property="FaceBlocksInfo"
                             name="FaceBlocks"
                             number_of_elements_per_command="2"
                             repeat_command="1">
