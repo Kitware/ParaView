@@ -40,7 +40,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <spacer name="verticalSpacer_2">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -52,6 +52,23 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_6">
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Please note - this wizard is deprecated in favor of the Catalyst Export Inspector as of ParaView 5.6 and will be removed in a future version.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -185,8 +202,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>622</width>
-         <height>758</height>
+         <width>364</width>
+         <height>602</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">

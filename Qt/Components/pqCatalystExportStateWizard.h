@@ -35,6 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include "pqSGExportStateWizard.h"
 
+/**
+ * @class pqCatalystExportStateWizard
+ * @deprecated ParaView 5.6
+ *
+ * pqCatalystExportStateWizard has been deprecated in ParaView 5.6 and has
+ * been replaced by pqCatalystExportInspector
+*/
 class PQCOMPONENTS_EXPORT pqCatalystExportStateWizard : public pqSGExportStateWizard
 {
   Q_OBJECT

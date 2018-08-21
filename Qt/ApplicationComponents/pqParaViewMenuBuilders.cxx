@@ -681,7 +681,7 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
 #define SHOWOLDCATALYSTGUI 1
 #if SHOWOLDCATALYSTGUI
   menu.addSeparator(); // --------------------------------------------------
-  QAction* csg = menu.addAction("Generate Script") << pqSetName("Export State");
+  QAction* csg = menu.addAction("Generate Script -deprecated") << pqSetName("Export State");
   new pqCatalystScriptGeneratorReaction(csg);
 
   menu.addSeparator(); // --------------------------------------------------
