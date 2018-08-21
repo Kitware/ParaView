@@ -63,6 +63,7 @@
 class vtkPVDataInformation;
 class vtkSMProxyProperty;
 class vtkSMArrayRangeDomain;
+class vtkSMIntVectorProperty;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMBoundsDomain : public vtkSMDoubleRangeDomain
 {
@@ -99,6 +100,19 @@ public:
 
   vtkGetMacro(ScaleFactor, double);
 
+  enum Axes
+  {
+    X_AXIS = 1,
+    Y_AXIS = 2,
+    Z_AXIS = 4,
+    X_AND_Y_AXES = X_AXIS | Y_AXIS,
+    Y_AND_Z_AXES = Y_AXIS | Z_AXIS,
+    X_AND_Z_AXES = X_AXIS | Z_AXIS,
+    X_Y_AND_Z_AXES = X_AXIS | Y_AXIS | Z_AXIS
+  };
+
+  vtkGetMacro(AxisFlags, int);
+
   /**
    * Overridden to handle APPROXIMATE_CELL_LENGTH.
    */
@@ -118,12 +132,19 @@ protected:
   // function "Input", if any.
   vtkPVDataInformation* GetInputInformation();
 
+  // Obtain the information for the "AxisFlags" required property.
+  vtkSMIntVectorProperty* GetAxisFlagsInformation();
+
+  bool IsAxisEnabled(int axis);
+
   void SetDomainValues(double bounds[6]);
 
   void UpdateOriented();
 
   int Mode;
   double ScaleFactor; // Used only in SCALED_EXTENT and APPROXIMATE_CELL_LENGTH mode.
+  int AxisFlags;
+
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&) = delete;
   void operator=(const vtkSMBoundsDomain&) = delete;
