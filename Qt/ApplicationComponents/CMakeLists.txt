@@ -78,8 +78,6 @@ set (Module_SRCS
   pqCatalystContinueReaction.h
   pqCatalystExportReaction.cxx
   pqCatalystExportReaction.h
-  pqCatalystExportNowReaction.cxx
-  pqCatalystExportNowReaction.h
   pqCatalystPauseSimulationReaction.cxx
   pqCatalystPauseSimulationReaction.h
   pqCatalystRemoveBreakpointReaction.cxx
@@ -375,7 +373,6 @@ set (Module_MOC_HDRS
   pqCatalystConnectReaction.h
   pqCatalystContinueReaction.h
   pqCatalystExportReaction.h
-  pqCatalystExportNowReaction.h
   pqCatalystPauseSimulationReaction.h
   pqCatalystRemoveBreakpointReaction.h
   pqCatalystScriptGeneratorReaction.h

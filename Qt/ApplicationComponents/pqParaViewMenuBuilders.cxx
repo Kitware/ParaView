@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraUndoRedoReaction.h"
 #include "pqCatalystConnectReaction.h"
 #include "pqCatalystContinueReaction.h"
-#include "pqCatalystExportNowReaction.h"
 #include "pqCatalystExportReaction.h"
 #include "pqCatalystPauseSimulationReaction.h"
 #include "pqCatalystRemoveBreakpointReaction.h"
@@ -677,8 +676,6 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
   QAction* gcatalyst = menu.addAction("Export Catalyst Script")
     << pqSetName("actionExportCatalyst");
   new pqCatalystExportReaction(gcatalyst);
-  QAction* gdata = menu.addAction("Export Data Products") << pqSetName("actionExportCatalystData");
-  new pqCatalystExportNowReaction(gdata);
 #endif
 
 #define SHOWOLDCATALYSTGUI 1
