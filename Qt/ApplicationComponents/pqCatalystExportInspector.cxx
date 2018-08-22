@@ -165,7 +165,7 @@ void pqCatalystExportInspector::Update()
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
   // filters and writers
-  // turn off handling temporaily while we set up the menu
+  // turn off handling temporarily while we set up the menu
   QObject::disconnect(
     this->Internals->Ui.filterChoice, SIGNAL(currentIndexChanged(int)), this, SLOT(Update()));
   // the filters we might configure for export
@@ -180,6 +180,8 @@ void pqCatalystExportInspector::Update()
     {
       filterChoice->setCurrentText(current);
     }
+    // reflect name changes, as happens when we open a Catalyst produced dataset with channel info
+    QObject::connect(i, SIGNAL(nameChanged(pqServerManagerModelItem*)), this, SLOT(Update()));
   }
   // turn handling back on
   QObject::connect(
@@ -187,7 +189,7 @@ void pqCatalystExportInspector::Update()
   this->PopulateWriterFormats();
 
   // views and writers
-  // turn off handling temporaily while we set up the menu
+  // turn off handling temporarily while we set up the menu
   QObject::disconnect(
     this->Internals->Ui.viewChoice, SIGNAL(currentIndexChanged(int)), this, SLOT(Update()));
   // the views we might configure for export
@@ -202,6 +204,8 @@ void pqCatalystExportInspector::Update()
     {
       viewChoice->setCurrentText(current);
     }
+    // reflect name changes
+    QObject::connect(i, SIGNAL(nameChanged(pqServerManagerModelItem*)), this, SLOT(Update()));
   }
   // turn handling back on
   QObject::connect(
