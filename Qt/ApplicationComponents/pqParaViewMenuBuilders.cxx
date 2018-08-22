@@ -676,6 +676,8 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
   QAction* gcatalyst = menu.addAction("Export Catalyst Script")
     << pqSetName("actionExportCatalyst");
   new pqCatalystExportReaction(gcatalyst);
+#else
+  (void)exportConfiguration; // avoid unreferenced parameter comp warning
 #endif
 
 #define SHOWOLDCATALYSTGUI 1

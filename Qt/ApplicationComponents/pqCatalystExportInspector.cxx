@@ -274,8 +274,7 @@ void pqCatalystExportInspector::PopulateWriterFormats()
   {
     return;
   }
-  std::string availproxies;
-  wf->GetSupportedWriterProxies(filter, portnum, availproxies, "CatalystApproved");
+  std::string availproxies = wf->GetSupportedWriterProxies(filter, portnum, "CatalystApproved");
   std::stringstream ss(availproxies);
   std::string item;
   while (std::getline(ss, item, ';'))
@@ -462,8 +461,8 @@ void pqCatalystExportInspector::ExportView(bool enableSS)
     // create the corresponding writer subproxy
     // Note: I would do this in ExportProxyDepot except no rendering dependency there
     std::string formatS = ssName.toStdString();
-    int dotP = formatS.find_first_of(".") + 1;
-    int rparenP = formatS.find_last_of(")");
+    size_t dotP = formatS.find_first_of(".") + 1;
+    size_t rparenP = formatS.find_last_of(")");
     std::string extension = "dontcare." + formatS.substr(dotP, rparenP - dotP);
     ssProxy->UpdateDefaultsAndVisibilities(extension.c_str());
     ssProxy->SetAnnotation("enabled", "1");

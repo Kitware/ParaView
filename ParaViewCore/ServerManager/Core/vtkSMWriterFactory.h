@@ -97,8 +97,8 @@ public:
   /**
    * A variation on GetSupportedFileTypes that obtains a list of prototype proxy names.
   */
-  void GetSupportedWriterProxies(vtkSMSourceProxy* source, unsigned int outputport,
-    std::string& output, const char* RequiredHint = nullptr);
+  const char* GetSupportedWriterProxies(
+    vtkSMSourceProxy* source, unsigned int outputport, const char* RequiredHint = nullptr);
 
   // Returns the number of registered prototypes.
   unsigned int GetNumberOfRegisteredPrototypes();

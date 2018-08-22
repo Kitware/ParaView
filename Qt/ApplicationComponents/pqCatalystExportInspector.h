@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqCatalystExportInspector_h
 #define pqCatalystExportInspector_h
 
-#include "pqComponentsModule.h" // for exports
+#include "pqApplicationComponentsModule.h" // for exports
 #include <QWidget>
 
 /**
@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * will produce when a Catalyzed simulation runs it.
  */
 
-class PQCOMPONENTS_EXPORT pqCatalystExportInspector : public QWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystExportInspector : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;

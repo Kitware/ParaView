@@ -220,8 +220,8 @@ vtkSMProxy* vtkSMExportProxyDepot::GetScreenshotProxy(
     }
 
     std::string formatS = format;
-    int dotP = formatS.find_first_of(".") + 1;
-    int rparenP = formatS.find_last_of(")");
+    size_t dotP = formatS.find_first_of(".") + 1;
+    size_t rparenP = formatS.find_last_of(")");
     std::string extension = formatS.substr(dotP, rparenP - dotP);
 
     vtkNew<vtkSMParaViewPipelineController> controller;

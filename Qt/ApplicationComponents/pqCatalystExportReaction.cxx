@@ -169,7 +169,7 @@ void pqCatalystExportReaction::onTriggered()
     // done here except cinema image specific parameters
     const char* hashname = pxm->GetProxyName("export_writers", nextWriter);
     std::string formatS = hashname;
-    int underP = formatS.find_first_of("_");
+    size_t underP = formatS.find_first_of("_");
     std::string filterName = formatS.substr(0, underP);
     filterName[0] = tolower(filterName[0]);
 

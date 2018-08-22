@@ -174,6 +174,8 @@ public:
   typedef std::map<std::string, vtkValue> PrototypesType;
   PrototypesType Prototypes;
   std::string SupportedFileTypes;
+  std::string SupportedWriterProxies;
+
   // The set of groups that are searched for writers. By default "writers" is
   // included.
   std::set<std::string> Groups;
@@ -409,8 +411,8 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMWriterFactory::GetSupportedWriterProxies(
-  vtkSMSourceProxy* source, unsigned int outputport, std::string& output, const char* RequiredHint)
+const char* vtkSMWriterFactory::GetSupportedWriterProxies(
+  vtkSMSourceProxy* source, unsigned int outputport, const char* RequiredHint)
 {
   std::set<std::string> sorted_types;
 
@@ -441,8 +443,10 @@ void vtkSMWriterFactory::GetSupportedWriterProxies(
     }
     all_types << (*iter2);
   }
-  output = all_types.str();
+  this->Internals->SupportedWriterProxies = all_types.str();
+  return this->Internals->SupportedWriterProxies.c_str();
 }
+
 //----------------------------------------------------------------------------
 bool vtkSMWriterFactory::CanWrite(vtkSMSourceProxy* source, unsigned int outputport)
 {
