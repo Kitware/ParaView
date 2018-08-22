@@ -21,6 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSMPTools.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <array>
@@ -92,6 +93,88 @@ void vtkImageSimpleSource::SetWholeExtent(
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
+class ValueFunctor
+{
+public:
+  ValueFunctor()
+    : Image(nullptr)
+  {
+  }
+
+  void operator()(vtkIdType begin, vtkIdType end)
+  {
+    if (!this->Image)
+    {
+      return;
+    }
+
+    int extent[6];
+    this->Image->GetExtent(extent);
+    vtkIdType outIncX = 1;
+    vtkIdType outIncY = extent[1] - extent[0] + 1;
+    vtkIdType outIncZ = outIncY * (extent[3] - extent[2] + 1);
+
+    // Get first index
+    vtkIdType firstIndex[3];
+    firstIndex[2] = begin / outIncZ + extent[4];
+    firstIndex[1] = begin / outIncZ % outIncY + extent[2];
+    firstIndex[0] = begin % outIncY + extent[0];
+    // std::cout << "firstIndex: " << firstIndex[0] << ", " << firstIndex[1] << ", " <<
+    // firstIndex[2] << std::endl;
+
+    // Get second index
+    vtkIdType secondIndex[3];
+    secondIndex[2] = end / outIncZ + extent[4];
+    secondIndex[1] = end / outIncZ % outIncY + extent[2];
+    secondIndex[0] = end % outIncY + extent[0];
+    // std::cout << "secondIndex: " << secondIndex[0] << ", " << secondIndex[1] << ", " <<
+    // secondIndex[2] << std::endl;
+
+    // Build point data by traversing the image coordinates
+    vtkPointData* pointData = this->Image->GetPointData();
+    vtkDataArray* xArray = pointData->GetArray(SIMPLE_FIELD_X.c_str());
+    vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
+    vtkDataArray* swirlArray = pointData->GetArray(SIMPLE_FIELD_SWIRL.c_str());
+
+    // Get starting pointer to each array
+    double* xPtr = static_cast<double*>(xArray->GetVoidPointer(begin));
+    double* distPtr = static_cast<double*>(distArray->GetVoidPointer(begin));
+    double* swirlPtr = static_cast<double*>(swirlArray->GetVoidPointer(begin));
+
+    // Loop over voxels
+    // unsigned long target = static_cast<unsigned long>((dims[2])*(dims[1])/50.0) + 1;
+    unsigned long count = 0;
+    for (int idxZ = firstIndex[2]; idxZ <= secondIndex[2]; idxZ++)
+    {
+      for (int idxY = firstIndex[1]; idxY <= secondIndex[1]; idxY++)
+      {
+        for (int idxX = firstIndex[0]; idxX <= secondIndex[0]; idxX++)
+        {
+          // std::cout << "ijk: " << idxX << ", " << idxY << ", " << idxZ << std::endl;
+          *xPtr = static_cast<double>(idxX);
+          xPtr++;
+
+          *distPtr = static_cast<double>(idxX * idxX + idxY * idxY + idxZ * idxZ);
+          distPtr++;
+
+          *swirlPtr = idxY;
+          swirlPtr++;
+          *swirlPtr = idxZ;
+          swirlPtr++;
+          *swirlPtr = idxX;
+          swirlPtr++;
+        } // for (idxX)
+      }   // for (idxY)
+    }     // for (idxZ)
+  }
+
+  vtkImageData* Image;
+};
+} // end anonymous namespace
+
+//----------------------------------------------------------------------------
 int vtkImageSimpleSource::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
@@ -143,53 +226,10 @@ int vtkImageSimpleSource::RequestData(vtkInformation* vtkNotUsed(request),
   pointData->SetActiveScalars(SIMPLE_FIELD_X.c_str());
   pointData->SetActiveVectors(SIMPLE_FIELD_SWIRL.c_str());
 
-  // Build point data by traversing the image coordinates
-  vtkDataArray* xArray = pointData->GetArray(SIMPLE_FIELD_X.c_str());
-  vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
-  vtkDataArray* swirlArray = pointData->GetArray(SIMPLE_FIELD_SWIRL.c_str());
-
-  // Get starting pointer to each array
-  double* xPtr = static_cast<double*>(xArray->GetVoidPointer(0));
-  double* distPtr = static_cast<double*>(distArray->GetVoidPointer(0));
-  double* swirlPtr = static_cast<double*>(swirlArray->GetVoidPointer(0));
-
-  vtkIdType outIncX, outIncY, outIncZ;
-  output->GetContinuousIncrements(extent, outIncX, outIncY, outIncZ);
-
-  // Loop through output pixels
-  for (int idxZ = extent[4]; idxZ <= extent[5]; idxZ++)
-  {
-    for (int idxY = extent[2]; !this->AbortExecute && idxY <= extent[3]; idxY++)
-    {
-      // if (!(count%target))
-      // {
-      //   this->UpdateProgress(count/(50.0*target));
-      // }
-      // count++;
-      for (int idxX = extent[0]; idxX <= extent[1]; idxX++)
-      {
-        *xPtr = static_cast<double>(idxX);
-        xPtr++;
-
-        *distPtr = static_cast<double>(idxX * idxX + idxY * idxY + idxZ * idxZ);
-        distPtr++;
-
-        *swirlPtr = idxY;
-        swirlPtr++;
-        *swirlPtr = idxZ;
-        swirlPtr++;
-        *swirlPtr = idxX;
-        swirlPtr++;
-      }
-      xPtr += outIncY;
-      distPtr += outIncY;
-      swirlPtr += 3 * outIncY;
-    }
-    xPtr += outIncZ;
-    distPtr += outIncZ;
-    swirlPtr += 3 * outIncZ;
-  }
-
+  // Test the functor conversion from linear index to extents here
+  ValueFunctor functor;
+  functor.Image = output;
+  vtkSMPTools::For(0, imageSize - 1, functor);
   return 1;
 }
 
@@ -236,6 +276,7 @@ int vtkImageSimpleSource::RequestInformation(vtkInformation* vtkNotUsed(request)
   swInfo->FastDelete();
 
   outInfo->Set(vtkDataObject::POINT_DATA_VECTOR(), pointDataInfo);
+  pointDataInfo->FastDelete();
 
   // Also support sub-extents
   outInfo->Set(CAN_PRODUCE_SUB_EXTENT(), 1);
