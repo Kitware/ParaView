@@ -79,7 +79,9 @@ static const char* cp_python_export_code = "from paraview import cpexport\n"
                                            "   cinema_tracks={%8},\n"
                                            "   filename='%9',\n"
                                            "   cinema_arrays={%10},\n"
-                                           "   write_start=%11)\n";
+                                           "   write_start=%11,\n"
+                                           "   make_cinema_table=%12,\n"
+                                           "   root_directory='%13')\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -110,6 +112,8 @@ void pqCatalystExportReaction::onTriggered()
     sim_inputs_map; // a map from the simulation inputs in the gui to the adaptor's named inputs
   QString rendering_info; // a map from the render view name to render output params
   QString rescale_data_range = "False";
+  QString make_cinema_table = "False";
+  QString root_directory = "";
 
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
@@ -144,6 +148,11 @@ void pqCatalystExportReaction::onTriggered()
 
   rescale_data_range =
     vtkSMPropertyHelper(globaloptions, "RescaleToDataRange").GetAsInt(0) == 0 ? "False" : "True";
+
+  make_cinema_table =
+    vtkSMPropertyHelper(globaloptions, "SaveDTable").GetAsInt(0) == 0 ? "False" : "True";
+
+  root_directory = vtkSMPropertyHelper(globaloptions, "RootDirectory").GetAsString(0);
 
   // writers
   bool exported_any_writers = false;
@@ -467,7 +476,9 @@ void pqCatalystExportReaction::onTriggered()
                 .arg(cinema_tracks)
                 .arg(filename)
                 .arg(cinema_arrays)
-                .arg(write_start);
+                .arg(write_start)
+                .arg(make_cinema_table)
+                .arg(root_directory);
     // cerr << command.toStdString() << endl;
 
     // ensure Python in initialized.

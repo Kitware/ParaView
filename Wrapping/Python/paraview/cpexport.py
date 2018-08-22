@@ -84,7 +84,8 @@ from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
     padding_amount, rescale_data_range, enable_live_viz, live_viz_frequency,
-                           cinema_tracks, cinema_arrays, filename=None, write_start=0):
+                           cinema_tracks, cinema_arrays, filename=None, write_start=0,
+                           make_cinema_table=False, root_directory=""):
     """Returns a string with the generated CoProcessing script based on the
     options specified.
 
@@ -105,7 +106,12 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
 
     :param cinema_arrays: selected value arrays for cinema
 
+    :param make_cinema_table: if specified, writes a cinema D index file.
+
     :param filename: if specified, the script is written to the file.
+
+    :param root_directory: if specified, the script will export underneath this directory.
+
     """
     from paraview.servermanager import vtkSMProxyManager
     version_str = vtkSMProxyManager.GetParaViewSourceVersion()
@@ -119,9 +125,10 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
 
     pipeline_script = cpstate.DumpPipeline(\
       export_rendering, simulation_input_map, screenshot_info, cinema_tracks,\
-      cinema_arrays, enable_live_viz, live_viz_frequency)
+      cinema_arrays, enable_live_viz, live_viz_frequency, make_cinema_table, root_directory)
     script = __output_contents % (version_str, timeStepToStartOutputAt, forceOutputAtFirstCall,
-                                  padding_amount, rescale_data_range, requestSpecificNames, pipeline_script,
+                                  padding_amount, rescale_data_range, requestSpecificNames,
+                                  pipeline_script,
                                   enable_live_viz, live_viz_frequency)
     if filename:
         outFile = open(filename, "w")

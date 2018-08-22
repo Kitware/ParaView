@@ -3671,14 +3671,6 @@
         Proxy used to maintain global Catalyst state.
       </Documentation>
 
-      <StringVectorProperty name="RootDirectory"
-        number_of_elements="1"
-        default_values="./">
-        <Documentation>
-          Defines a top level directory where Catalyst output files are placed under.
-        </Documentation>
-      </StringVectorProperty>
-
       <IntVectorProperty name="EnableLive"
                          label="Enable Live Connections"
                          default_values="0"
@@ -3700,6 +3692,24 @@
         </Documentation>
       </IntVectorProperty>
 
+      <StringVectorProperty name="RootDirectory"
+                         number_of_elements="1"
+                         default_values="">
+        <Documentation>
+          Defines a top level directory where Catalyst output files are placed under.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="FileNamePadding"
+                         label="Zero Padding"
+                         default_values="0"
+                         number_of_elements="1">
+        <IntRangeDomain name="range" min="0" max="16"/>
+        <Documentation>
+          Pads numerical filenames with leading zeros to be at least this width.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="WriteStart"
                          label="Write Start"
                          default_values="0"
@@ -3708,16 +3718,6 @@
         <IntRangeDomain name="range" min="0" />
         <Documentation>
           Catalyst will skip this many startup cycles before starting to write files.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="FileNamePadding"
-                         label="Zero Padding"
-                         default_values="0"
-                         number_of_elements="1">
-        <IntRangeDomain name="range" min="0" max="32"/>
-        <Documentation>
-          Pads numerical filenames with leading zeros to be at least this width.
         </Documentation>
       </IntVectorProperty>
 
@@ -3734,7 +3734,7 @@
 
       <IntVectorProperty name="SaveDTable"
                          label="Save Cinema D Table"
-                         default_values="1"
+                         default_values="0"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
