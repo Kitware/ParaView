@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
 //-----------------------------------------------------------------------------
@@ -128,6 +129,9 @@ void pqLoadPaletteReaction::actionTriggered(QAction* actn)
     Q_ASSERT(palettePrototype);
 
     BEGIN_UNDO_SET("Load color palette");
+    SM_SCOPED_TRACE(CallFunction)
+      .arg("LoadPalette")
+      .arg("paletteName", actn->property("PV_XML_NAME").toString().toLocal8Bit().data());
     paletteProxy->Copy(palettePrototype);
     paletteProxy->UpdateVTKObjects();
     END_UNDO_SET();
