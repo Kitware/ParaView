@@ -118,9 +118,7 @@ private:
   // helpers to maintain the content
   void PopulateWriterFormats();
   void PopulateViewFormats();
-
-  // manufacture proxies for settings to export with
-  void MakeGlobalProxy();
+  void UpdateGlobalOptions();
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

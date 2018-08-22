@@ -126,7 +126,6 @@ pqCatalystExportInspector::~pqCatalystExportInspector()
 void pqCatalystExportInspector::showEvent(QShowEvent* e)
 {
   (void)e;
-  this->MakeGlobalProxy();
   this->Update();
 }
 
@@ -210,25 +209,25 @@ void pqCatalystExportInspector::Update()
   this->PopulateViewFormats();
 
   // the global options
-  if (this->Internals->GlobalOptionsUI)
-  {
-    this->Internals->GlobalOptionsUI->updatePanel();
-    this->Internals->GlobalOptionsUI->show();
-  }
+  this->UpdateGlobalOptions();
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::MakeGlobalProxy()
+void pqCatalystExportInspector::UpdateGlobalOptions()
 {
   vtkSMExportProxyDepot* ed =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetExportDepot();
   vtkSMProxy* globalProxy = ed->GetGlobalOptions();
 
+  if (this->Internals->GlobalOptionsUI)
+  {
+    delete this->Internals->GlobalOptionsUI;
+  }
+
   this->Internals->GlobalOptionsUI = new pqProxyWidget(globalProxy, this->Internals->Ui.container);
-  // this->Internals->GlobalOptionsUI->filterWidgets(this->Internals->Ui.advanced->isChecked());
-  // //why won't update UI correctly?
-  this->Internals->GlobalOptionsUI->filterWidgets(true);
+  this->Internals->GlobalOptionsUI->filterWidgets(this->Internals->Ui.advanced->isChecked());
   this->Internals->GlobalOptionsUI->setApplyChangesImmediately(true);
+  this->Internals->GlobalOptionsUI->show();
 }
 
 //-----------------------------------------------------------------------------
@@ -588,11 +587,7 @@ void pqCatalystExportInspector::Advanced(bool setting)
     this->Internals->Ui.viewConfigure->hide();
   }
 
-  if (this->Internals->GlobalOptionsUI)
-  {
-    delete this->Internals->GlobalOptionsUI;
-    this->MakeGlobalProxy();
-  }
+  this->UpdateGlobalOptions();
 }
 
 //-----------------------------------------------------------------------------
