@@ -127,14 +127,12 @@ class CoProcessor(object):
            this method to provide additional customizations. If there is a Live
            connection that can also override the initial frequencies."""
 
-        timestep = datadescription.GetTimeStep()
-
         # if this is a time step to do live then only the channels that were requested when
         # generating the script will be made available even though the adaptor may be able
         # to provide other channels. similarly, if only specific arrays were requested when
         # generating the script then only those arrays will be provided to the Live connection.
         # note that we want the pipeline built before we do the actual first live connection.
-        if self.__EnableLiveVisualization and self.NeedToOutput(timestep, self.__LiveVisualizationFrequency) \
+        if self.__EnableLiveVisualization and self.NeedToOutput(datadescription, self.__LiveVisualizationFrequency) \
            and self.__LiveVisualizationLink:
             if self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
                 if self.__RequestedArrays:
@@ -167,7 +165,7 @@ class CoProcessor(object):
             elif self.__InitialFrequencies:
                 for key in self.__InitialFrequencies:
                     freqs = self.__InitialFrequencies.get(key, [])
-                    if self.__EnableLiveVisualization or self.IsInModulo(timestep, freqs):
+                    if self.__EnableLiveVisualization or self.IsInModulo(datadescription, freqs):
                         datadescription.GetInputDescriptionByName(key).AllFieldsOn()
                         datadescription.GetInputDescriptionByName(key).GenerateMeshOn()
         else:
@@ -177,7 +175,7 @@ class CoProcessor(object):
             frequencies = {}
             for writer in self.__WritersList:
                 frequency = writer.parameters.GetProperty("WriteFrequency").GetElement(0)
-                if self.NeedToOutput(timestep, frequency) or datadescription.GetForceOutput() == True:
+                if self.NeedToOutput(datadescription, frequency) or datadescription.GetForceOutput() == True:
                     writerinputs = cpstate.locate_simulation_inputs(writer)
                     for writerinput in writerinputs:
                         if self.__RequestedArrays:
@@ -189,7 +187,7 @@ class CoProcessor(object):
                             datadescription.GetInputDescriptionByName(writerinput).GenerateMeshOn()
 
             for view in self.__ViewsList:
-                if (view.cpFrequency and self.NeedToOutput(timestep, view.cpFrequency)) or \
+                if (view.cpFrequency and self.NeedToOutput(datadescription, view.cpFrequency)) or \
                    datadescription.GetForceOutput() == True:
                     viewinputs = cpstate.locate_simulation_inputs_for_view(view)
                     for viewinput in viewinputs:
@@ -229,7 +227,7 @@ class CoProcessor(object):
         for writer in self.__WritersList:
             frequency = writer.parameters.GetProperty(
                 "WriteFrequency").GetElement(0)
-            if self.NeedToOutput(timestep, frequency) or datadescription.GetForceOutput() == True:
+            if self.NeedToOutput(datadescription, frequency) or datadescription.GetForceOutput() == True:
                 fileName = writer.parameters.GetProperty("FileName").GetElement(0)
                 paddingamount = writer.parameters.GetProperty("PaddingAmount").GetElement(0)
                 helperName = writer.GetXMLName()
@@ -293,7 +291,7 @@ class CoProcessor(object):
 
         cinema_dirs = []
         for view in self.__ViewsList:
-            if (view.cpFrequency and self.NeedToOutput(timestep, view.cpFrequency)) or \
+            if (view.cpFrequency and self.NeedToOutput(datadescription, view.cpFrequency)) or \
                datadescription.GetForceOutput() == True:
                 fname = view.cpFileName
                 ts = str(timestep).rjust(padding_amount, '0')
@@ -377,12 +375,12 @@ class CoProcessor(object):
             self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
 
 
-        timeStep = datadescription.GetTimeStep()
-        if self.__EnableLiveVisualization and self.NeedToOutput(timeStep, self.__LiveVisualizationFrequency):
+        if self.__EnableLiveVisualization and self.NeedToOutput(datadescription, self.__LiveVisualizationFrequency):
             if not self.__LiveVisualizationLink.Initialize(servermanager.ActiveConnection.Session.GetSessionProxyManager()):
                 return
 
         time = datadescription.GetTime()
+        timeStep = datadescription.GetTimeStep()
 
         # stay in the loop while the simulation is paused
         while True:
@@ -675,7 +673,6 @@ class CoProcessor(object):
                 return x
 
         #what time?
-        timestep = datadescription.GetTimeStep()
         time = datadescription.GetTime()
         view.ViewTime = time
         formatted_time = float_limiter(time)
@@ -741,10 +738,10 @@ class CoProcessor(object):
         pv_introspect.restore_visibility(pxystate)
         return os.path.basename(vfname)
 
-    def IsInModulo(self, timestep, frequencies):
+    def IsInModulo(self, datadescription, frequencies):
         """
-        Return True if the given timestep is in one of the provided frequency.
-        This can be interpreted as follow::
+        Return True if the given timestep in datadescription is in one of the provided frequencies
+        or output is forced. This can be interpreted as follow::
 
         isFM = IsInModulo(timestep-timeStepToStartOutputAt, [2,3,7])
 
@@ -754,21 +751,26 @@ class CoProcessor(object):
 
         The timeStepToStartOutputAt is the first timestep that will potentially be output.
         """
+        timestep = datadescription.GetTimeStep()
         if timestep < self.__TimeStepToStartOutputAt and not self.__ForceOutputAtFirstCall:
             return False
         for frequency in frequencies:
-            if frequency > 0 and self.NeedToOutput(timestep, frequency):
+            if frequency > 0 and self.NeedToOutput(datadescription, frequency):
                 return True
 
         return False
 
 
-    def NeedToOutput(self, timestep, frequency):
+    def NeedToOutput(self, datadescription, frequency):
         """
-        Return True if we need to output based on the input timestep and frequency. Checks based
+        Return True if we need to output based on the input timestep, frequency and forceOutput. Checks based
         __FirstTimeStepIndex, __FirstTimeStepIndex, __ForceOutputAtFirstCall and __TimeStepToStartOutputAt
         member variables.
         """
+        if datadescription.GetForceOutput() == True:
+            return True
+
+        timestep = datadescription.GetTimeStep()
         if self.__FirstTimeStepIndex == None:
             self.__FirstTimeStepIndex = timestep
 
