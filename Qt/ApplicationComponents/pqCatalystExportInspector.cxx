@@ -311,7 +311,16 @@ void pqCatalystExportInspector::ExportFilter(bool enableWriter)
     vtkSMSourceProxy* writerProxy = ed->GetWriterProxy(
       filter, filterName.toStdString().c_str(), writerName.toStdString().c_str());
 
+    // signify that this is now on
     writerProxy->SetAnnotation("enabled", "1");
+
+    // use a decent default for the eventually exported filename
+    std::string filename = vtkSMPropertyHelper(writerProxy, "CatalystFilePattern").GetAsString();
+    if (filename.find("filename") != std::string::npos)
+    {
+      filename.replace(0, 8, filterName.toStdString());
+      vtkSMPropertyHelper(writerProxy, "CatalystFilePattern").Set(filename.c_str());
+    }
 
     // other than the cinema writer, we only allow one at a time
     if (writerName != "Cinema image options")
@@ -468,7 +477,17 @@ void pqCatalystExportInspector::ExportView(bool enableSS)
     size_t rparenP = formatS.find_last_of(")");
     std::string extension = "dontcare." + formatS.substr(dotP, rparenP - dotP);
     ssProxy->UpdateDefaultsAndVisibilities(extension.c_str());
+
+    // signify that this is now on
     ssProxy->SetAnnotation("enabled", "1");
+
+    // use a decent default for the eventually exported filename
+    std::string filename = vtkSMPropertyHelper(ssProxy, "CatalystFilePattern").GetAsString();
+    if (filename.find("filename") == 0)
+    {
+      filename.replace(0, 8, viewName.toStdString());
+      vtkSMPropertyHelper(ssProxy, "CatalystFilePattern").Set(filename.c_str());
+    }
 
     // including the cinema writer, we only allow one at a time
     for (int i = 0; i < this->Internals->Ui.viewFormat->count(); i++)
