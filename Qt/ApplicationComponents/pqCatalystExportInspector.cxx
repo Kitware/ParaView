@@ -82,6 +82,10 @@ pqCatalystExportInspector::pqCatalystExportInspector(
   : Superclass(parentObject, f)
   , Internals(new pqCatalystExportInspector::pqInternals(this))
 {
+  this->Internals->Ui.advanced->setChecked(false);
+  this->Internals->Ui.filterConfigure->hide();
+  this->Internals->Ui.viewConfigure->hide();
+
   pqActiveObjects& ao = pqActiveObjects::instance();
   QObject::connect(&ao, SIGNAL(sourceChanged(pqPipelineSource*)), this, SLOT(SourceUpdated()));
   QObject::connect(&ao, SIGNAL(viewChanged(pqView*)), this, SLOT(ViewUpdated()));
@@ -92,6 +96,8 @@ pqCatalystExportInspector::pqCatalystExportInspector(
     SLOT(UpdateWriterCheckbox()));
   QObject::connect(this->Internals->Ui.filterFormat, SIGNAL(currentIndexChanged(int)), this,
     SLOT(UpdateWriterCheckbox()));
+  QObject::connect(this->Internals->Ui.filterFormat, SIGNAL(highlighted(int)), this,
+    SLOT(UpdateWriterCheckbox(int)));
   QObject::connect(
     this->Internals->Ui.filterExtract, SIGNAL(toggled(bool)), this, SLOT(ExportFilter(bool)));
   QObject::connect(
@@ -105,6 +111,8 @@ pqCatalystExportInspector::pqCatalystExportInspector(
     SLOT(UpdateScreenshotCheckbox()));
   QObject::connect(this->Internals->Ui.viewFormat, SIGNAL(currentIndexChanged(int)), this,
     SLOT(UpdateScreenshotCheckbox()));
+  QObject::connect(this->Internals->Ui.viewFormat, SIGNAL(highlighted(int)), this,
+    SLOT(UpdateScreenshotCheckbox(int)));
   QObject::connect(
     this->Internals->Ui.viewExtract, SIGNAL(toggled(bool)), this, SLOT(ExportView(bool)));
   QObject::connect(
@@ -400,10 +408,31 @@ void pqCatalystExportInspector::ConfigureWriterProxy()
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::UpdateWriterCheckbox()
+void pqCatalystExportInspector::UpdateWriterCheckbox(int i)
+{
+  if (i != -1)
+  {
+    // dynamically highlighting, don't affect any state, just change the widget
+    QObject::disconnect(
+      this->Internals->Ui.filterExtract, SIGNAL(toggled(bool)), this, SLOT(ExportFilter(bool)));
+  }
+  this->InternalWriterCheckbox(i);
+  if (i != -1)
+  {
+    QObject::connect(
+      this->Internals->Ui.filterExtract, SIGNAL(toggled(bool)), this, SLOT(ExportFilter(bool)));
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCatalystExportInspector::InternalWriterCheckbox(int i)
 {
   QString filterName = this->Internals->Ui.filterChoice->currentText();
   QString writerName = this->Internals->Ui.filterFormat->currentText();
+  if (i != -1)
+  {
+    writerName = this->Internals->Ui.filterFormat->itemText(i);
+  }
   if (filterName == "" || writerName == "")
   {
     this->Internals->Ui.filterExtract->setChecked(false);
@@ -567,10 +596,31 @@ void pqCatalystExportInspector::ConfigureScreenshotProxy()
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::UpdateScreenshotCheckbox()
+void pqCatalystExportInspector::UpdateScreenshotCheckbox(int i)
+{
+  if (i != -1)
+  {
+    // dynamically highlighting, don't affect any state, just change the widget
+    QObject::disconnect(
+      this->Internals->Ui.viewExtract, SIGNAL(toggled(bool)), this, SLOT(ExportView(bool)));
+  }
+  this->InternalScreenshotCheckbox(i);
+  if (i != -1)
+  {
+    QObject::connect(
+      this->Internals->Ui.viewExtract, SIGNAL(toggled(bool)), this, SLOT(ExportView(bool)));
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqCatalystExportInspector::InternalScreenshotCheckbox(int i)
 {
   QString viewName = this->Internals->Ui.viewChoice->currentText();
   QString writerName = this->Internals->Ui.viewFormat->currentText();
+  if (i != -1)
+  {
+    writerName = this->Internals->Ui.viewFormat->itemText(i);
+  }
   if (viewName == "" || writerName == "")
   {
     this->Internals->Ui.viewExtract->setChecked(false);

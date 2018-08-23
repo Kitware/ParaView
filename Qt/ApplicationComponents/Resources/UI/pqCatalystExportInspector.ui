@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>351</width>
-    <height>450</height>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,26 +17,26 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-       <widget class="pqSearchBox" name="searchBox" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>10</height>
-         </size>
-        </property>
-        <property name="settingKey" stdset="0">
-         <string notr="true"/>
-        </property>
-        <property name="advancedSearchEnabled" stdset="0">
-         <bool>false</bool>
-        </property>
-       </widget>
+      <widget class="pqSearchBox" name="searchBox" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="settingKey" stdset="0">
+        <string notr="true"/>
+       </property>
+       <property name="advancedSearchEnabled" stdset="0">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="advanced">
@@ -382,7 +382,7 @@
     </spacer>
    </item>
   </layout>
-</widget>
+ </widget>
  <customwidgets>
   <customwidget>
    <class>pqSearchBox</class>

@@ -79,7 +79,7 @@ private slots:
   /**
   * Maintains state of writer proxy's enable property
   */
-  void UpdateWriterCheckbox();
+  void UpdateWriterCheckbox(int i = -1);
   /**
   * User pressed on checkbox to turn on export of a filter
   */
@@ -92,7 +92,7 @@ private slots:
   /**
   * Maintains state of screenshot proxy's enable property
   */
-  void UpdateScreenshotCheckbox();
+  void UpdateScreenshotCheckbox(int i = -1);
   /**
   * User pressed on checkbox to turn on export of a view
   */
@@ -125,6 +125,8 @@ private:
   void PopulateViewFormats();
   void UpdateGlobalOptions();
   void UpdateGlobalOptions(const QString& searchString);
+  void InternalScreenshotCheckbox(int i);
+  void InternalWriterCheckbox(int i);
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
