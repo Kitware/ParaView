@@ -81,7 +81,9 @@ static const char* cp_python_export_code = "from paraview import cpexport\n"
                                            "   cinema_arrays={%10},\n"
                                            "   write_start=%11,\n"
                                            "   make_cinema_table=%12,\n"
-                                           "   root_directory='%13')\n";
+                                           "   root_directory='%13',\n"
+                                           "   request_specific_arrays=%14,\n"
+                                           "   force_first_output=%15)\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -114,6 +116,8 @@ void pqCatalystExportReaction::onTriggered()
   QString rescale_data_range = "False";
   QString make_cinema_table = "False";
   QString root_directory = "";
+  QString request_specific_arrays = "False";
+  QString force_first_output = "False";
 
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
@@ -138,21 +142,19 @@ void pqCatalystExportReaction::onTriggered()
   vtkSMProxy* globaloptions = ed->GetGlobalOptions();
   live_visualization =
     vtkSMPropertyHelper(globaloptions, "EnableLive").GetAsInt(0) == 0 ? "False" : "True";
-
   live_visualization_frequency = vtkSMPropertyHelper(globaloptions, "LiveFrequency").GetAsInt(0);
-
   write_start = vtkSMPropertyHelper(globaloptions, "WriteStart").GetAsInt(0);
-
   paddingAmount = QString::fromStdString(
     std::to_string(vtkSMPropertyHelper(globaloptions, "FileNamePadding").GetAsInt(0)));
-
   rescale_data_range =
     vtkSMPropertyHelper(globaloptions, "RescaleToDataRange").GetAsInt(0) == 0 ? "False" : "True";
-
   make_cinema_table =
     vtkSMPropertyHelper(globaloptions, "SaveDTable").GetAsInt(0) == 0 ? "False" : "True";
-
   root_directory = vtkSMPropertyHelper(globaloptions, "RootDirectory").GetAsString(0);
+  request_specific_arrays =
+    vtkSMPropertyHelper(globaloptions, "RequestSpecificArrays").GetAsInt(0) == 0 ? "False" : "True";
+  force_first_output =
+    vtkSMPropertyHelper(globaloptions, "ForceFirstOutput").GetAsInt(0) == 0 ? "False" : "True";
 
   // writers
   bool exported_any_writers = false;
@@ -478,8 +480,9 @@ void pqCatalystExportReaction::onTriggered()
                 .arg(cinema_arrays)
                 .arg(write_start)
                 .arg(make_cinema_table)
-                .arg(root_directory);
-    // cerr << command.toStdString() << endl;
+                .arg(root_directory)
+                .arg(request_specific_arrays)
+                .arg(force_first_output);
 
     // ensure Python in initialized.
     vtkPythonInterpreter::Initialize();

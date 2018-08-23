@@ -401,8 +401,7 @@ class NewStyleWriters(object):
 
 # -----------------------------------------------------------------------------
 def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
-                 cinema_tracks, cinema_arrays, enable_live_viz, live_viz_frequency,
-                 make_cinema_table, root_directory):
+                 cinema_tracks, cinema_arrays, enable_live_viz, live_viz_frequency):
     """Method that will dump the current pipeline and return it as a string trace.
 
     export_rendering
@@ -440,12 +439,6 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
     live_viz_frequency
       integer telling how often to update Live connection. only used if
       enable_live_viz is True
-
-    make_cinema_table
-      boolean telling if we want to create a cinema D table that indexes everything we write
-
-    root_directory
-      string telling where catalyst output files should be written under
     """
 
     # reset the global variables.
@@ -547,14 +540,12 @@ def DumpPipeline(export_rendering, simulation_input_map, screenshot_info,
             pipelineClassDef += "    coprocessor.SetRequestedArrays('" + channel_name + "', arrays)\n"
     pipelineClassDef += "  coprocessor.SetInitialOutputOptions(timeStepToStartOutputAt,forceOutputAtFirstCall)\n"
     pipelineClassDef += "\n"
-    if make_cinema_table:
-        pipelineClassDef += "  coprocessor.EnableCinemaDTable()\n"
-        pipelineClassDef += "\n"
-
-    if root_directory:
-        pipelineClassDef += "  coprocessor.SetRootDirectory(\"" + root_directory + "\")\n"
-        pipelineClassDef += "\n"
-
+    pipelineClassDef += "  if rootDirectory:\n"
+    pipelineClassDef += "      coprocessor.SetRootDirectory(rootDirectory)\n"
+    pipelineClassDef += "\n"
+    pipelineClassDef += "  if make_cinema_table:\n"
+    pipelineClassDef += "      coprocessor.EnableCinemaDTable()\n"
+    pipelineClassDef += "\n"
     pipelineClassDef += "  return coprocessor\n"
     return pipelineClassDef
 

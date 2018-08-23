@@ -3710,6 +3710,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="RequestSpecificArrays"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Tells Catalyst to ask for only those arrays that are currently enabled on the source rather than all of them.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="WriteStart"
                          label="Write Start"
                          default_values="0"
@@ -3717,7 +3727,17 @@
                          panel_visibility="advanced">
         <IntRangeDomain name="range" min="0" />
         <Documentation>
-          Catalyst will skip this many startup cycles before starting to write files.
+          Catalyst will skip this many startup cycles (possibly excepting ForceFirstOutput) before starting to write files.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceFirstOutput"
+                         default_values="0"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Tells Catalyst to always dump the first timestep it gets because it may take a long time to wait for WriteStart iterations.
         </Documentation>
       </IntVectorProperty>
 
