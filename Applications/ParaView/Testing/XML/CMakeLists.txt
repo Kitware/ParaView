@@ -283,6 +283,11 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   # connect to a running simulation on port 22222
   add_catalyst_live_test(CatalystLivePause 80  "--live=22222")
 
+  # tests for the new export inspector panel
+  add_client_tests("pv"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/CatalystExporterGUI.xml )
+  set_tests_properties(pv.CatalystExporterGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+
 endif()
 
 if (PARAVIEW_ENABLE_XDMF2 AND NOT PARAVIEW_ENABLE_XDMF3)
