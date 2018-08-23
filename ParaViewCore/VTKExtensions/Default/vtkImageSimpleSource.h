@@ -23,10 +23,10 @@
 #ifndef vtkImageSimpleSource_h
 #define vtkImageSimpleSource_h
 
-#include "vtkImageAlgorithm.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkThreadedImageAlgorithm.h"
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkImageSimpleSource : public vtkImageAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkImageSimpleSource : public vtkThreadedImageAlgorithm
 {
 public:
   static vtkImageSimpleSource* New();
@@ -44,8 +44,15 @@ protected:
 
   int WholeExtent[6];
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  void PrepareImageData(vtkInformationVector** inputVector, vtkInformationVector* outputVector,
+    vtkImageData*** inDataObjects = nullptr, vtkImageData** outDataObjects = nullptr) override;
+
+  int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
+
+  void ThreadedRequestData(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector, vtkImageData*** inData, vtkImageData** outData,
+    int extent[6], int threadId) override;
 
 private:
   vtkImageSimpleSource(const vtkImageSimpleSource&) = delete;
