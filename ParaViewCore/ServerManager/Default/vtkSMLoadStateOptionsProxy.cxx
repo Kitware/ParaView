@@ -296,7 +296,7 @@ bool vtkSMLoadStateOptionsProxy::HasDataFiles()
 
 //----------------------------------------------------------------------------
 bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
-  std::vector<std::string>& filepaths, bool clearFilenameIfNotFound)
+  std::vector<std::string>& filepaths, int path, bool clearFilenameIfNotFound)
 {
   std::string lastLocatedPath = "";
   int numOfPathMatches = 0;
@@ -308,7 +308,7 @@ bool vtkSMLoadStateOptionsProxy::LocateFilesInDirectory(
     {
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "LocateFileInDirectory"
-             << *fIter << vtkClientServerStream::End;
+             << *fIter << path << vtkClientServerStream::End;
       this->ExecuteStream(stream, false, vtkPVSession::DATA_SERVER_ROOT);
       vtkClientServerStream result = this->GetLastResult();
       std::string locatedPath = "";
@@ -379,7 +379,9 @@ bool vtkSMLoadStateOptionsProxy::Load()
 
           if (pIter->first.find("FilePattern") == std::string::npos)
           {
-            if (this->LocateFilesInDirectory(info.FilePaths, this->OnlyUseFilesInDataDirectory))
+            bool path = pIter->first.compare("FilePrefix") == 0;
+            if (this->LocateFilesInDirectory(
+                  info.FilePaths, path, this->OnlyUseFilesInDataDirectory))
             {
               info.Modified = true;
             }

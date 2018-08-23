@@ -71,13 +71,16 @@ protected:
 
   /**
    * Locates the files in the user specified directory and updates the paths
-   * in the state file XML.  If the clearFilenameIfNotFound option is set to true
-   * it will set the filenames that are not in the directory to empty string
-   * rather than leave them as the filenames from the state file XML.
+   * in the state file XML. Set the isPath parameter to 1 for file
+   * paths that are prefixes, 0 otherwise. If the clearFilenameIfNotFound
+   * option is set to true it will set the filenames that are not in the
+   * directory to empty string rather than leave them as the filenames from
+   * the state file XML.
    *
    * @returns false if any of the files were not found
    */
-  bool LocateFilesInDirectory(std::vector<std::string>& filepaths, bool clearFilenameIfNotFound);
+  bool LocateFilesInDirectory(
+    std::vector<std::string>& filepaths, int path, bool clearFilenameIfNotFound);
 
   vtkSetStringMacro(StateFileName);
   char* StateFileName;

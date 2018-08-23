@@ -38,7 +38,7 @@ void vtkLoadStateOptions::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepath)
+std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepath, int isPath)
 {
   std::string result = "";
   std::string modifiedDataDirectory = this->DataDirectory;
@@ -77,9 +77,27 @@ std::string vtkLoadStateOptions::LocateFileInDirectory(const std::string& filepa
   while (pathComponents.size() >= 1)
   {
     std::string searchPath = SystemTools::JoinPath(directoryPathComponents);
-    if (SystemTools::LocateFileInDir(filepath.c_str(), searchPath.c_str(), result))
+
+    // If we care only about whether the path exists for a file , check that here.
+    if (isPath)
     {
-      return result;
+      // File path has old path. Replace old path with new path and
+      // check that it exists.
+      std::string filePrefix = SystemTools::GetFilenameName(filepath);
+      std::string newPath = SystemTools::JoinPath(directoryPathComponents);
+      if (SystemTools::FileExists(newPath.c_str(), false /*isFile*/))
+      {
+        std::vector<std::string> newPrefixComponents(directoryPathComponents);
+        newPrefixComponents.push_back(filePrefix);
+        return SystemTools::JoinPath(newPrefixComponents);
+      }
+    }
+    else
+    {
+      if (SystemTools::LocateFileInDir(filepath.c_str(), searchPath.c_str(), result))
+      {
+        return result;
+      }
     }
     directoryPathComponents.insert(
       directoryPathComponents.begin() + insertIndex, pathComponents.back());
