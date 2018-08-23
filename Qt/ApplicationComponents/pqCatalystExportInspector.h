@@ -67,16 +67,6 @@ private slots:
   void Update();
 
   /**
-  * Maintains currently selected sourceproxy in dropdown menu of sourceproxies.
-  */
-  void SourceUpdated();
-
-  /**
-  * Maintains currently selected View in dropdown menu of views.
-  */
-  void ViewUpdated();
-
-  /**
   * Maintains state of writer proxy's enable property
   */
   void UpdateWriterCheckbox(int i = -1);

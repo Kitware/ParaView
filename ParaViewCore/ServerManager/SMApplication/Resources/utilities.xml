@@ -3668,7 +3668,7 @@
 
     <Proxy name="CatalystGlobalOptions">
       <Documentation>
-        Proxy used to maintain global Catalyst state.
+        A proxy used to maintain global Catalyst state. This, combined with the pipeline shape and a choice of writers and screenshots define what Catalyst will do with and produce from the data that the simulation gives to it.
       </Documentation>
 
       <IntVectorProperty name="EnableLive"
@@ -3701,12 +3701,12 @@
       </StringVectorProperty>
 
       <IntVectorProperty name="FileNamePadding"
-                         label="Zero Padding"
+                         label="File Padding"
                          default_values="0"
                          number_of_elements="1">
         <IntRangeDomain name="range" min="0" max="16"/>
         <Documentation>
-          Pads numerical filenames with leading zeros to be at least this width.
+          Pads numerical filenames with leading zeros to be a consistent width.
         </Documentation>
       </IntVectorProperty>
 
@@ -3735,7 +3735,8 @@
       <IntVectorProperty name="SaveDTable"
                          label="Save Cinema D Table"
                          default_values="0"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>
           Creates a Cinema table that indexes all output files.

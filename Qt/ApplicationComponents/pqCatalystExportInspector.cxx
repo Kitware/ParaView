@@ -82,13 +82,14 @@ pqCatalystExportInspector::pqCatalystExportInspector(
   : Superclass(parentObject, f)
   , Internals(new pqCatalystExportInspector::pqInternals(this))
 {
+  // default to non-advanced
   this->Internals->Ui.advanced->setChecked(false);
   this->Internals->Ui.filterConfigure->hide();
   this->Internals->Ui.viewConfigure->hide();
 
   pqActiveObjects& ao = pqActiveObjects::instance();
-  QObject::connect(&ao, SIGNAL(sourceChanged(pqPipelineSource*)), this, SLOT(SourceUpdated()));
-  QObject::connect(&ao, SIGNAL(viewChanged(pqView*)), this, SLOT(ViewUpdated()));
+  QObject::connect(&ao, SIGNAL(sourceChanged(pqPipelineSource*)), this, SLOT(Update()));
+  QObject::connect(&ao, SIGNAL(viewChanged(pqView*)), this, SLOT(Update()));
 
   QObject::connect(
     this->Internals->Ui.filterChoice, SIGNAL(currentIndexChanged(int)), this, SLOT(Update()));
@@ -137,36 +138,6 @@ pqCatalystExportInspector::~pqCatalystExportInspector()
 void pqCatalystExportInspector::showEvent(QShowEvent* e)
 {
   (void)e;
-  this->Update();
-}
-
-//-----------------------------------------------------------------------------
-void pqCatalystExportInspector::SourceUpdated()
-{
-  this->Update();
-  pqActiveObjects& ao = pqActiveObjects::instance();
-  auto activeSource = ao.activeSource();
-  if (!activeSource)
-  {
-    return;
-  }
-  QString newname = activeSource->getSMName();
-  this->Internals->Ui.filterChoice->setCurrentText(newname);
-  this->Update();
-}
-
-//-----------------------------------------------------------------------------
-void pqCatalystExportInspector::ViewUpdated()
-{
-  this->Update();
-  pqActiveObjects& ao = pqActiveObjects::instance();
-  auto activeView = ao.activeView();
-  if (!activeView)
-  {
-    return;
-  }
-  QString newname = activeView->getSMName();
-  this->Internals->Ui.viewChoice->setCurrentText(newname);
   this->Update();
 }
 
