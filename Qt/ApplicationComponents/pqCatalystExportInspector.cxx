@@ -115,6 +115,9 @@ pqCatalystExportInspector::pqCatalystExportInspector(
   QObject::connect(this->Internals->Ui.advanced, SIGNAL(toggled(bool)), this, SLOT(Advanced(bool)));
 
   QObject::connect(this->Internals->Ui.Help, SIGNAL(pressed()), this, SLOT(Help()));
+
+  QObject::connect(this->Internals->Ui.searchBox, SIGNAL(textChanged(const QString&)), this,
+    SLOT(Search(const QString&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -219,6 +222,12 @@ void pqCatalystExportInspector::Update()
 //-----------------------------------------------------------------------------
 void pqCatalystExportInspector::UpdateGlobalOptions()
 {
+  this->UpdateGlobalOptions(QString(""));
+}
+
+//-----------------------------------------------------------------------------
+void pqCatalystExportInspector::UpdateGlobalOptions(const QString& searchString)
+{
   vtkSMExportProxyDepot* ed =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetExportDepot();
   vtkSMProxy* globalProxy = ed->GetGlobalOptions();
@@ -229,7 +238,8 @@ void pqCatalystExportInspector::UpdateGlobalOptions()
   }
 
   this->Internals->GlobalOptionsUI = new pqProxyWidget(globalProxy, this->Internals->Ui.container);
-  this->Internals->GlobalOptionsUI->filterWidgets(this->Internals->Ui.advanced->isChecked());
+  this->Internals->GlobalOptionsUI->filterWidgets(
+    this->Internals->Ui.advanced->isChecked(), searchString);
   this->Internals->GlobalOptionsUI->setApplyChangesImmediately(true);
   this->Internals->GlobalOptionsUI->show();
 }
@@ -620,4 +630,10 @@ void pqCatalystExportInspector::Help()
   // this is better than nothing, but we want a custom page
   pqHelpReaction::showProxyHelp("coprocessing", "CatalystGlobalOptions");
 #endif
+}
+
+//-----------------------------------------------------------------------------
+void pqCatalystExportInspector::Search(const QString& searchString)
+{
+  this->UpdateGlobalOptions(searchString);
 }

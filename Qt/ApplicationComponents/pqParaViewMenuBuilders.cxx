@@ -672,7 +672,6 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
     << pqSetName("actionCatalystConfigure"); // but this is OK?
   QObject::connect(cexport, SIGNAL(triggered()), exportConfiguration, SLOT(show()));
 
-  menu.addSeparator(); // --------------------------------------------------
   QAction* gcatalyst = menu.addAction("Export Catalyst Script")
     << pqSetName("actionExportCatalyst");
   new pqCatalystExportReaction(gcatalyst);
@@ -686,7 +685,6 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
   QAction* csg = menu.addAction("Generate Script -deprecated") << pqSetName("Export State");
   new pqCatalystScriptGeneratorReaction(csg);
 
-  menu.addSeparator(); // --------------------------------------------------
   pqSGWritersMenuManager* menuMgr =
     new pqSGWritersMenuManager(&menu, "&Writers", "CatalystWritersMenu", nullptr);
   menuMgr->createMenu();

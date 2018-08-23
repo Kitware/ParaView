@@ -112,6 +112,11 @@ private slots:
   */
   void Help();
 
+  /**
+  * Search text changed.
+  */
+  void Search(const QString&);
+
 private:
   Q_DISABLE_COPY(pqCatalystExportInspector);
 
@@ -119,6 +124,7 @@ private:
   void PopulateWriterFormats();
   void PopulateViewFormats();
   void UpdateGlobalOptions();
+  void UpdateGlobalOptions(const QString& searchString);
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;
