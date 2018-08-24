@@ -370,7 +370,7 @@ class NewStyleWriters(object):
 
             xmlgroup = pxy.GetXMLGroup()
 
-            padding_amount = globalepxy.ZeroPadding
+            padding_amount = globalepxy.GetProperty("FileNamePadding").GetElement(0)
             write_frequency = pxy.GetProperty("WriteFrequency").GetElement(0)
             filename = pxy.GetProperty("CatalystFilePattern").GetElement(0)
 
