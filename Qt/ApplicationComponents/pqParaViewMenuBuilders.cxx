@@ -689,5 +689,7 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
     new pqSGWritersMenuManager(&menu, "&Writers", "CatalystWritersMenu", nullptr);
   menuMgr->createMenu();
 #endif
+#else
+  (void)exportConfiguration; // avoid unreferenced parameter comp warning
 #endif
 }
