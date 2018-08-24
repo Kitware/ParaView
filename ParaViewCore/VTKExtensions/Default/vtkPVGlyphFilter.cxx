@@ -724,8 +724,8 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
     }
     else
     {
-      // If not scaling by array, set the glyph to the maximum of the glyph size range
-      scalex = scaley = scalez = this->GlyphSizeRange[1];
+      // If not scaling by array, set the glyph to the maximum glyph size
+      scalex = scaley = scalez = this->MaximumGlyphSize;
     }
 
     // Clamp and scale glyph if a scale array is set
@@ -737,10 +737,10 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
       scalex = (scalex - dataRange[0]) / den;
       scaley = (scaley - dataRange[0]) / den;
       scalez = (scalez - dataRange[0]) / den;
-      double multiplier = this->GlyphSizeRange[1] - this->GlyphSizeRange[0];
-      scalex = scalex * multiplier + this->GlyphSizeRange[0];
-      scaley = scaley * multiplier + this->GlyphSizeRange[0];
-      scalez = scalez * multiplier + this->GlyphSizeRange[0];
+      double multiplier = this->MaximumGlyphSize;
+      scalex = scalex * multiplier;
+      scaley = scaley * multiplier;
+      scalez = scalez * multiplier;
     }
 
     // Check ghost points.

@@ -7732,18 +7732,16 @@ selected.
         </Hints>
         <Documentation>
 The range of the data. The first element defines the value that maps
-to the minimum glyph size specified by the GlyphSizeRange, and the
-second element defines the value that maps to the maximum glyph size.
-Data values inside the range are mapped linearly to the GlyphSizeRange,
-while data values outside this range will be clamped to this range
-prior to mapping to the glyph size.
+to a glyph size of zero, and the second element defines the value that maps to the
+maximum glyph size. Data values inside the range are mapped linearly between 0 and
+the Maximum Glyph Size, while data values outside this range will be clamped to this
+range prior to mapping to the glyph size.
         </Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetGlyphSizeRange"
-                            name="GlyphSizeRange"
-                            default_values="0 1.0"
-                            number_of_elements="2"
-                            panel_widget="double_range">
+      <DoubleVectorProperty command="SetMaximumGlyphSize"
+                            name="MaximumGlyphSize"
+                            default_values="1.0"
+                            number_of_elements="1">
         <BoundsDomain mode="scaled_extent"
                       name="bounds"
                       scale_factor="0.1">
@@ -7753,11 +7751,8 @@ prior to mapping to the glyph size.
           </RequiredProperties>
         </BoundsDomain>
         <Documentation>
-Specifies the minimum and maximum size of glyphs. When ScaleArray is
-not "None", the first element specifies the minimum glyph size used
-for data values at or below the minimum data range. The second element
-is the maximum glyph size used to represent data values at or above
-the maximum data range.
+Sets the maximum glyph size. The upper data value specified in the GlyphDataRange
+will map to this glyph size while the lower data value will map to zero glyph size.
         </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
@@ -7885,7 +7880,7 @@ Every Nth Point.
         <Property name="GlyphDataRange" />
       </PropertyGroup>
       <PropertyGroup label="Glyph Size Range">
-        <Property name="GlyphSizeRange" />
+        <Property name="MaximumGlyphSize" />
       </PropertyGroup>
       <PropertyGroup label="Orientation">
         <Property name="OrientationArray" />

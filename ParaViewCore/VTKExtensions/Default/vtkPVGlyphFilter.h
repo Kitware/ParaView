@@ -89,11 +89,10 @@ public:
 
   //@{
   /**
-   * Get/set the range of the data. The first element defines the value that maps to the
-   * minimum glyph size specified by the GlyphSizeRange, and the second element defines the
-   * value that maps to the maximum glyph size. Data values inside the range are mapped
-   * linearly to the GlyphSizeRange, while data values outside this range will be
-   * clamped to this range prior to mapping to the glyph size.
+   * Get/set the range of the data. The first element defines the value that maps to glyph size
+   * zero, and the second element defines the value that maps to the maximum glyph size. Data values
+   * inside the range are mapped linearly to the range [0, MaximumGlyphSize], while data values
+   * outside this range will be clamped to this range prior to mapping to the glyph size.
    */
   vtkSetVector2Macro(GlyphDataRange, double);
   vtkGetVector2Macro(GlyphDataRange, double);
@@ -101,18 +100,16 @@ public:
 
   //@{
   /**
-   * Get/set the range of the glyph sizes. The first element is the minimum glyph size
-   * used for data values at or below the minimum data range. The second element is the
-   * maximum glyph size used to represent data values at or above the maximum data range.
+   * Get/set the maximum glyph size. The upper data value specified in the GlyphDataRange
+   * will map to this glyph size.
    */
-  vtkSetVector2Macro(GlyphSizeRange, double);
-  vtkGetVector2Macro(GlyphSizeRange, double);
+  vtkSetMacro(MaximumGlyphSize, double);
   //@}
 
   //@{
   /**
-   * Get/set whether to map scale array values to the GlyphSizeRange. If off, raw
-   * values from the scale array will be used if the scale array is set.
+   * Get/set whether to map scale array values to the glyph size range [0, MaximumGlyphSize].
+   * If off, raw values from the scale array will be used if the scale array is set.
    */
   vtkSetMacro(RescaleToGlyphSizeRange, bool);
   vtkGetMacro(RescaleToGlyphSizeRange, bool);
@@ -256,7 +253,7 @@ protected:
   int VectorScaleMode;
   vtkTransform* SourceTransform;
   double GlyphDataRange[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
-  double GlyphSizeRange[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
+  double MaximumGlyphSize = 1.0;
   bool RescaleToGlyphSizeRange;
   int GlyphMode;
   int MaximumNumberOfSamplePoints;
