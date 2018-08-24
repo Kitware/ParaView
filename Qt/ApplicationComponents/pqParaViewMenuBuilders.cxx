@@ -189,6 +189,7 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu& menu, QMainWindow* mainWind
 {
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewSources");
   mgr->addProxyDefinitionUpdateListener("sources");
+  mgr->setRecentlyUsedMenuSize(10);
   new pqSourcesMenuReaction(mgr);
   if (mainWindow)
   {
