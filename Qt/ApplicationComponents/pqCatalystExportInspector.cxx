@@ -84,8 +84,6 @@ pqCatalystExportInspector::pqCatalystExportInspector(
 {
   // default to non-advanced
   this->Internals->Ui.advanced->setChecked(false);
-  this->Internals->Ui.filterConfigure->hide();
-  this->Internals->Ui.viewConfigure->hide();
 
   pqActiveObjects& ao = pqActiveObjects::instance();
   QObject::connect(&ao, SIGNAL(sourceChanged(pqPipelineSource*)), this, SLOT(Update()));
@@ -628,19 +626,8 @@ void pqCatalystExportInspector::InternalScreenshotCheckbox(int i)
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::Advanced(bool setting)
+void pqCatalystExportInspector::Advanced(bool vtkNotUsed(setting))
 {
-  if (setting)
-  {
-    this->Internals->Ui.filterConfigure->show();
-    this->Internals->Ui.viewConfigure->show();
-  }
-  else
-  {
-    this->Internals->Ui.filterConfigure->hide();
-    this->Internals->Ui.viewConfigure->hide();
-  }
-
   this->UpdateGlobalOptions();
 }
 
