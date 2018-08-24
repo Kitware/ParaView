@@ -45,7 +45,8 @@ public:
   //@{
   /**
    * Controls which input data component should be binned, for input arrays
-   * with more-than-one component
+   * with more-than-one component.  Setting this to the number of components
+   * will compute the histogram of the magnitude (L2 norm) of the tuple.
    */
   vtkSetClampMacro(Component, int, 0, VTK_INT_MAX);
   vtkGetMacro(Component, int);
