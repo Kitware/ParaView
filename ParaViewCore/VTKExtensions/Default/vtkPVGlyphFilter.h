@@ -40,10 +40,11 @@
 #ifndef vtkPVGlyphFilter_h
 #define vtkPVGlyphFilter_h
 
-#include "vtkGlyph3D.h"
 #include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPolyDataAlgorithm.h"
 
 class vtkMultiProcessController;
+class vtkTransform;
 
 class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilter : public vtkPolyDataAlgorithm
 {
