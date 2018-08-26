@@ -232,7 +232,7 @@ vtkCxxSetObjectMacro(vtkPVGlyphFilter, SourceTransform, vtkTransform);
 vtkPVGlyphFilter::vtkPVGlyphFilter()
   : VectorScaleMode(SCALE_BY_MAGNITUDE)
   , SourceTransform(nullptr)
-  , RescaleToGlyphSizeRange(true)
+  , RescaleGlyphs(true)
   , GlyphMode(ALL_POINTS)
   , MaximumNumberOfSamplePoints(5000)
   , Seed(1)
@@ -729,7 +729,7 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
     }
 
     // Clamp and scale glyph if a scale array is set
-    if (scaleArray && this->RescaleToGlyphSizeRange && this->VectorScaleMode != SCALE_BY_COMPONENTS)
+    if (scaleArray && this->RescaleGlyphs && this->VectorScaleMode != SCALE_BY_COMPONENTS)
     {
       vtkMath::ClampValue(&scalex, dataRange);
       vtkMath::ClampValue(&scaley, dataRange);

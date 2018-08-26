@@ -7677,8 +7677,8 @@ ArrayRangeDomain is set to the vector magnitude for up to 3-component
 arrays.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetRescaleToGlyphSizeRange"
-                         name="RescaleToGlyphSizeRange"
+      <IntVectorProperty command="SetRescaleGlyphs"
+                         name="RescaleGlyphs"
                          default_values="1"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
@@ -7720,7 +7720,7 @@ selected.
                                          value="None"
                                          inverse="1" />
                 <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                  <Property name="RescaleToGlyphSizeRange" function="boolean" />
+                  <Property name="RescaleGlyphs" function="boolean" />
                 </PropertyWidgetDecorator>
               </Expression>
               <PropertyWidgetDecorator type="GenericDecorator"
@@ -7762,7 +7762,7 @@ will map to this glyph size while the lower data value will map to zero glyph si
                                        property="VectorScaleMode"
                                        value="0" />
               <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                <Property name="RescaleToGlyphSizeRange" function="boolean" />
+                <Property name="RescaleGlyphs" function="boolean" />
               </PropertyWidgetDecorator>
             </Expression>
           </PropertyWidgetDecorator>

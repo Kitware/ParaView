@@ -112,9 +112,9 @@ public:
    * Get/set whether to map scale array values to the glyph size range [0, MaximumGlyphSize].
    * If off, raw values from the scale array will be used if the scale array is set.
    */
-  vtkSetMacro(RescaleToGlyphSizeRange, bool);
-  vtkGetMacro(RescaleToGlyphSizeRange, bool);
-  vtkBooleanMacro(RescaleToGlyphSizeRange, bool);
+  vtkSetMacro(RescaleGlyphs, bool);
+  vtkGetMacro(RescaleGlyphs, bool);
+  vtkBooleanMacro(RescaleGlyphs, bool);
   //@}
 
   //@{
@@ -255,7 +255,7 @@ protected:
   vtkTransform* SourceTransform;
   double GlyphDataRange[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
   double MaximumGlyphSize = 1.0;
-  bool RescaleToGlyphSizeRange;
+  bool RescaleGlyphs;
   int GlyphMode;
   int MaximumNumberOfSamplePoints;
   int Seed;
