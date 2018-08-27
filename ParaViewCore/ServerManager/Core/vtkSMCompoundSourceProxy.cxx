@@ -188,9 +188,9 @@ void vtkSMCompoundSourceProxy::UpdateVTKObjects()
   {
     vtkSMProxy* subProxy = this->GetSubProxy(i);
     vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(subProxy);
-    // For vtkSMCompoundSourceProxy,GetNumberOfAlgorithmRequiredInputPorts
-    // always returns 0.
-    if (!source || source->GetNumberOfAlgorithmRequiredInputPorts() == 0)
+    // If subProxy is a vtkSMCompoundSourceProxy, make sure that UpdateVTKObjects is called.
+    vtkSMCompoundSourceProxy* subCompound = vtkSMCompoundSourceProxy::SafeDownCast(subProxy);
+    if (!source || subCompound != nullptr || source->GetNumberOfAlgorithmRequiredInputPorts() == 0)
     {
       subProxy->UpdateVTKObjects();
     }
