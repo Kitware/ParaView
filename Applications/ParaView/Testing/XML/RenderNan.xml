@@ -40,7 +40,7 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/NanColor/ColorButton" command="setChosenColor" arguments="255,0,255" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/Update" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/NanOpacity/DoubleRangeWidget/LineEdit" command="set_string" arguments="0.15" />
+  <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/NanOpacity/DoubleRangeWidget/DoubleLineEdit" command="set_full_precision_text" arguments="0.15" />
   <!--
   Image compare for color selected via GUI.
   -->
