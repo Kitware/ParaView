@@ -27,12 +27,9 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 
-#include <map> // For Column Visibilities
-
 class vtkCSVExporter;
 class vtkClientServerMoveData;
 class vtkMarkSelectedRows;
-class vtkPassArrays;
 class vtkReductionFilter;
 class vtkSortedTableStreamer;
 class vtkTable;
@@ -43,25 +40,25 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetView : public vtkPVVie
 public:
   static vtkSpreadSheetView* New();
   vtkTypeMacro(vtkSpreadSheetView, vtkPVView);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Triggers a high-resolution render.
    * \note CallOnAllProcesses
    */
-  void StillRender() VTK_OVERRIDE { this->StreamToClient(); }
+  void StillRender() override { this->StreamToClient(); }
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
    * \note CallOnAllProcesses
    */
-  void InteractiveRender() VTK_OVERRIDE { this->StreamToClient(); }
+  void InteractiveRender() override { this->StreamToClient(); }
 
   /**
    * Overridden to identify and locate the active-representation.
    */
-  void Update() VTK_OVERRIDE;
+  void Update() override;
 
   //@{
   /**
@@ -76,7 +73,7 @@ public:
 
   //@{
   /**
-   * Allow user to enable/disable cell connectivity generation in the datamodel
+   * Allow user to enable/disable cell connectivity generation.
    */
   vtkSetMacro(GenerateCellConnectivity, bool);
   vtkGetMacro(GenerateCellConnectivity, bool);
@@ -85,10 +82,25 @@ public:
 
   //@{
   /**
-   * Manage column visibilities, used only for export
+   * Specify the field association for the data to be shown in the view.
+   * This is passed on to the vtkSpreadSheetRepresentation in `Update` pass.
    */
-  void SetColumnVisibility(int fieldAssociation, const char* column, int visibility);
-  void ClearColumnVisibilities();
+  vtkSetMacro(FieldAssociation, int);
+  vtkGetMacro(FieldAssociation, int);
+  //@}
+
+  //@{
+  /**
+   * This API enables the users to hide columns that should be shown.
+   * Columns can be hidden using their names or labels.
+   */
+  void HideColumnByName(const char* columnName);
+  bool IsColumnHiddenByName(const char* columnName);
+  void ClearHiddenColumnsByName();
+
+  void HideColumnByLabel(const char* columnLabel);
+  bool IsColumnHiddenByLabel(const char* columnLabel);
+  void ClearHiddenColumnsByLabel();
   //@}
 
   /**
@@ -108,6 +120,33 @@ public:
    * \note CallOnClient
    */
   const char* GetColumnName(vtkIdType index);
+
+  //@{
+  /**
+   * Returns true if the column is internal.
+   */
+  bool IsColumnInternal(vtkIdType index);
+  bool IsColumnInternal(const char* columnName);
+  //@}
+
+  //@{
+  /**
+   * Returns the user-friendly label to use for the column
+   * in the spreadsheet view.
+   *
+   * If `this->IsColumnInternal(..)` is true for the chosen column. Then this
+   * method will return `nullptr`.
+   *
+   * \note CallOnClient
+   */
+  const char* GetColumnLabel(vtkIdType index);
+  const char* GetColumnLabel(const char* columnName);
+  //@}
+
+  /**
+   * Returns the visibility for the column at the given index.
+   */
+  bool GetColumnVisibility(vtkIdType index);
 
   //@{
   /**
@@ -168,7 +207,7 @@ public:
   void ClearCache();
 
   // INTERNAL METHOD. Don't call directly.
-  vtkTable* FetchBlockCallback(vtkIdType blockindex, bool filterColumnForExport = false);
+  vtkTable* FetchBlockCallback(vtkIdType blockindex);
 
 protected:
   vtkSpreadSheetView();
@@ -184,7 +223,7 @@ protected:
 
   void OnRepresentationUpdated();
 
-  vtkTable* FetchBlock(vtkIdType blockindex, bool filterColumnForExport = false);
+  vtkTable* FetchBlock(vtkIdType blockindex, bool skipCache = false);
 
   bool ShowExtractedSelection;
   bool GenerateCellConnectivity;
@@ -192,8 +231,6 @@ protected:
   vtkMarkSelectedRows* TableSelectionMarker;
   vtkReductionFilter* ReductionFilter;
   vtkClientServerMoveData* DeliveryFilter;
-  vtkPassArrays* PassFilter;
-
   vtkIdType NumberOfRows;
 
   enum
@@ -208,11 +245,10 @@ private:
   class vtkInternals;
   friend class vtkInternals;
   vtkInternals* Internals;
-
-  std::map<std::pair<int, std::string>, int> ColumnVisibilities;
   bool SomethingUpdated;
-
   unsigned long RMICallbackTag;
+
+  int FieldAssociation;
 };
 
 #endif
