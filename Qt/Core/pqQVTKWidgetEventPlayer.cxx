@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
-#include "QVTKOpenGLSimpleWidget.h"
+#include "QVTKOpenGLNativeWidget.h"
 #include "QVTKOpenGLWidget.h"
 #include "pqEventDispatcher.h"
 
@@ -52,8 +52,8 @@ bool pqQVTKWidgetEventPlayer::playEvent(
   QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
 {
   QVTKOpenGLWidget* qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object);
-  QVTKOpenGLSimpleWidget* qvtksWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
-  if (qvtkWidget || qvtksWidget)
+  QVTKOpenGLNativeWidget* qvtkNativeWidget = qobject_cast<QVTKOpenGLNativeWidget*>(Object);
+  if (qvtkWidget || qvtkNativeWidget)
   {
     if (Command == "mousePress" || Command == "mouseRelease" || Command == "mouseMove" ||
       Command == "mouseDblClick")
@@ -101,9 +101,9 @@ bool pqQVTKWidgetEventPlayer::playEvent(
           qvtkWidget->testingEvent(&e);
         }
 
-        if (qvtksWidget != nullptr)
+        if (qvtkNativeWidget != nullptr)
         {
-          qApp->notify(qvtksWidget, &e);
+          qApp->notify(qvtkNativeWidget, &e);
         }
       }
       return true;

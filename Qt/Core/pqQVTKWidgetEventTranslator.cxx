@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEvent>
 #include <QMouseEvent>
 
-#include "QVTKOpenGLSimpleWidget.h"
+#include "QVTKOpenGLNativeWidget.h"
 #include "QVTKOpenGLWidget.h"
 
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
@@ -75,10 +75,10 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
     rw = qvtkWidget->GetRenderWindow();
   }
 
-  QVTKOpenGLSimpleWidget* const qvtksWidget = qobject_cast<QVTKOpenGLSimpleWidget*>(Object);
-  if (qvtksWidget != nullptr)
+  QVTKOpenGLNativeWidget* const qvtkNativeWidget = qobject_cast<QVTKOpenGLNativeWidget*>(Object);
+  if (qvtkNativeWidget != nullptr)
   {
-    rw = qvtksWidget->GetRenderWindow();
+    rw = qvtkNativeWidget->GetRenderWindow();
   }
 
   // Could not find a render window, don't translate the event

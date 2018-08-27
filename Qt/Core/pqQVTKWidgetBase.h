@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqQVTKWidgetBase_h
 #define pqQVTKWidgetBase_h
 
-// It might possible to replace QVTKOpenGLWidget by QVTKOpenGLSimpleWidget here,
+// It might possible to replace QVTKOpenGLWidget by QVTKOpenGLNativeWidget here,
 // eg, if you need to work with native widgets only. However this is not tested nor recommended.
 
 #include "QVTKOpenGLWidget.h"
