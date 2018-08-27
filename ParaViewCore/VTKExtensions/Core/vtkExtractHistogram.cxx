@@ -160,11 +160,19 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
       vtkDataObject* dObj = cdit->GetCurrentDataObject();
       vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
       if (data_array && this->Component >= 0 &&
-        this->Component < data_array->GetNumberOfComponents())
+        this->Component <= data_array->GetNumberOfComponents())
       {
         foundone = true;
         double tRange[2];
-        data_array->GetRange(tRange, this->Component);
+        if (this->Component == data_array->GetNumberOfComponents())
+        {
+          // magnitude
+          data_array->GetRange(tRange, -1);
+        }
+        else
+        {
+          data_array->GetRange(tRange, this->Component);
+        }
         range[0] = (tRange[0] < range[0]) ? tRange[0] : range[0];
         range[1] = (tRange[1] > range[1]) ? tRange[1] : range[1];
       }
@@ -186,12 +194,20 @@ bool vtkExtractHistogram::GetInputArrayRange(vtkInformationVector** inputVector,
     }
     // If the requested component is out-of-range for the input, we return an
     // empty dataset
-    if (this->Component < 0 && this->Component >= data_array->GetNumberOfComponents())
+    if (this->Component < 0 && this->Component > data_array->GetNumberOfComponents())
     {
       vtkWarningMacro("Requested component " << this->Component << " is not available.");
       return false;
     }
-    data_array->GetRange(range, this->Component);
+    if (this->Component == data_array->GetNumberOfComponents())
+    {
+      // magnitude
+      data_array->GetRange(range, -1);
+    }
+    else
+    {
+      data_array->GetRange(range, this->Component);
+    }
   }
 
   return true;
@@ -274,7 +290,7 @@ void vtkExtractHistogram::BinAnArray(
   // If the requested component is out-of-range for the input,
   // the bin_values will be 0, so no need to do any actual counting.
   if (data_array == NULL || this->Component < 0 ||
-    this->Component >= data_array->GetNumberOfComponents())
+    this->Component > data_array->GetNumberOfComponents())
   {
     return;
   }
@@ -290,7 +306,23 @@ void vtkExtractHistogram::BinAnArray(
     {
       this->UpdateProgress(0.10 + 0.90 * i / num_of_tuples);
     }
-    const double value = data_array->GetComponent(i, this->Component);
+    double value;
+    // if component is equal to the number of components, then the magnitude was requested.
+    if (this->Component == data_array->GetNumberOfComponents())
+    {
+      value = 0;
+      double comp;
+      for (int j = 0; j < data_array->GetNumberOfComponents(); ++j)
+      {
+        comp = data_array->GetComponent(i, j);
+        value += comp * comp;
+      }
+      value = sqrt(value);
+    }
+    else
+    {
+      value = data_array->GetComponent(i, this->Component);
+    }
     int index = static_cast<int>(
       (value - min + (this->CenterBinsAroundMinAndMax ? half_delta : 0.)) / bin_delta);
 

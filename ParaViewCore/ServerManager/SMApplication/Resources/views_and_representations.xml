@@ -7055,7 +7055,7 @@
                          default_values="0"
                          name="Component"
                          number_of_elements="1">
-        <NumberOfComponentsDomain name="comps">
+        <NumberOfComponentsDomain name="comps" enable_magnitude="1">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
