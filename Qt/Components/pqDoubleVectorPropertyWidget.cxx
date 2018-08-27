@@ -212,8 +212,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           pqDoubleLineEdit* lineEdit = new pqDoubleLineEdit(this);
           this->addGeneralSettingsObserver(lineEdit);
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i));
-          lineEdit->setFullPrecisionText(
-            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2 * i)).toString());
           if (showLabels)
           {
             pqLabel* label = new pqLabel(componentLabels[2 * i], this);
@@ -233,8 +231,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           lineEdit = new pqDoubleLineEdit(this);
           this->addGeneralSettingsObserver(lineEdit);
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i + 1));
-          lineEdit->setFullPrecisionText(
-            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(2 * i + 1)).toString());
           if (showLabels)
           {
             pqLabel* label = new pqLabel(componentLabels[2 * i + 1], this);
@@ -272,8 +268,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           pqDoubleLineEdit* lineEdit = new pqDoubleLineEdit(this);
           this->addGeneralSettingsObserver(lineEdit);
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(i));
-          lineEdit->setFullPrecisionText(
-            QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
           layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(
             lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, i);
