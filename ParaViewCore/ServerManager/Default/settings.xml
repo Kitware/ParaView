@@ -380,8 +380,8 @@
           Set the notation used to display real numbers.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Standard notation" value="0" />
-          <Entry text="Scientific notation" value="1" />
+          <Entry text="Fixed" value="0" />
+          <Entry text="Scientific" value="1" />
         </EnumerationDomain>
       </IntVectorProperty>
 
