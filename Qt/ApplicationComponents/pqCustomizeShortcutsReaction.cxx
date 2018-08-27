@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCustomizeShortcutsReaction.h"
 
+#include "pqCoreUtilities.h"
 #include "pqCustomizeShortcutsDialog.h"
 
 pqCustomizeShortcutsReaction::pqCustomizeShortcutsReaction(QAction* parentObject)
@@ -40,6 +41,6 @@ pqCustomizeShortcutsReaction::pqCustomizeShortcutsReaction(QAction* parentObject
 
 void pqCustomizeShortcutsReaction::showCustomizeShortcutsDialog()
 {
-  pqCustomizeShortcutsDialog dialog;
+  pqCustomizeShortcutsDialog dialog(pqCoreUtilities::mainWidget());
   dialog.exec();
 }
