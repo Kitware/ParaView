@@ -198,6 +198,7 @@ protected:
 
   // Standard Pipeline methods
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   virtual int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   int FillInputPortInformation(int, vtkInformation*) override;
   int FillOutputPortInformation(int, vtkInformation*) override;
