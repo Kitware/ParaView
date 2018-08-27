@@ -253,8 +253,8 @@ protected:
 
   int VectorScaleMode;
   vtkTransform* SourceTransform;
-  double GlyphDataRange[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
-  double MaximumGlyphSize = 1.0;
+  double GlyphDataRange[2];
+  double MaximumGlyphSize;
   bool RescaleGlyphs;
   int GlyphMode;
   int MaximumNumberOfSamplePoints;

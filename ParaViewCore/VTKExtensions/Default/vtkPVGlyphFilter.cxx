@@ -232,6 +232,7 @@ vtkCxxSetObjectMacro(vtkPVGlyphFilter, SourceTransform, vtkTransform);
 vtkPVGlyphFilter::vtkPVGlyphFilter()
   : VectorScaleMode(SCALE_BY_MAGNITUDE)
   , SourceTransform(nullptr)
+  , MaximumGlyphSize(1.0)
   , RescaleGlyphs(true)
   , GlyphMode(ALL_POINTS)
   , MaximumNumberOfSamplePoints(5000)
@@ -242,6 +243,8 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->SetNumberOfInputPorts(2);
+  this->GlyphDataRange[0] = VTK_DOUBLE_MAX;
+  this->GlyphDataRange[1] = -VTK_DOUBLE_MAX;
 }
 
 //-----------------------------------------------------------------------------
