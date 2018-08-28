@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCatalystExportStateWizard.h
+   Module:    pqCatalystExportReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqCatalystExportStateWizard_h
-#define pqCatalystExportStateWizard_h
+#ifndef pqCatalystExportReaction_h
+#define pqCatalystExportReaction_h
 
-#include "pqComponentsModule.h"
-#include "pqSGExportStateWizard.h"
+#include "pqApplicationComponentsModule.h"
+#include "pqReaction.h"
 
 /**
- * @class pqCatalystExportStateWizard
- * @deprecated ParaView 5.6
- *
- * pqCatalystExportStateWizard has been deprecated in ParaView 5.6 and has
- * been replaced by pqCatalystExportInspector
+* @ingroup Reactions
+* Reaction to export a Catalyst script that will produce configured catalyst data products.
 */
-class PQCOMPONENTS_EXPORT pqCatalystExportStateWizard : public pqSGExportStateWizard
+
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystExportReaction : public pqReaction
 {
   Q_OBJECT
-  typedef pqSGExportStateWizard Superclass;
+  typedef pqReaction Superclass;
 
 public:
-  pqCatalystExportStateWizard(QWidget* parentObject = 0, Qt::WindowFlags parentFlags = 0);
-  virtual ~pqCatalystExportStateWizard();
+  pqCatalystExportReaction(QAction* parent);
+  ~pqCatalystExportReaction();
 
-  virtual void customize();
-
-protected:
-  virtual bool getCommandString(QString& command);
+protected slots:
+  /**
+  * Called when the action is triggered.
+  */
+  virtual void onTriggered();
 
 private:
-  Q_DISABLE_COPY(pqCatalystExportStateWizard)
+  Q_DISABLE_COPY(pqCatalystExportReaction)
 };
 
 #endif

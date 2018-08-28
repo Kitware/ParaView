@@ -59,6 +59,7 @@ set (Module_SRCS
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
   vtkSMExtentDomain.cxx
+  vtkSMExportProxyDepot.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
   vtkSMInputFileNameDomain.cxx

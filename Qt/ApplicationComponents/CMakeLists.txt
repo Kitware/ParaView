@@ -76,6 +76,8 @@ set (Module_SRCS
   pqCatalystConnectReaction.cxx
   pqCatalystConnectReaction.h
   pqCatalystContinueReaction.h
+  pqCatalystExportReaction.cxx
+  pqCatalystExportReaction.h
   pqCatalystPauseSimulationReaction.cxx
   pqCatalystPauseSimulationReaction.h
   pqCatalystRemoveBreakpointReaction.cxx
@@ -370,6 +372,7 @@ set (Module_MOC_HDRS
   pqCameraUndoRedoReaction.h
   pqCatalystConnectReaction.h
   pqCatalystContinueReaction.h
+  pqCatalystExportReaction.h
   pqCatalystPauseSimulationReaction.h
   pqCatalystRemoveBreakpointReaction.h
   pqCatalystScriptGeneratorReaction.h
@@ -507,11 +510,14 @@ set (Module_MOC_HDRS
 
 if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND Module_MOC_HDRS
+    pqCatalystExportInspector.h
     pqMacroReaction.h
     pqTraceReaction.h
   )
 
   list (APPEND Module_SRCS
+    pqCatalystExportInspector.cxx
+    pqCatalystExportInspector.h
     pqMacroReaction.cxx
     pqMacroReaction.h
     pqTraceReaction.cxx
@@ -539,6 +545,7 @@ set (Module_UI_FILES
   Resources/UI/pqBoxPropertyWidget.ui
   Resources/UI/pqCameraManipulatorWidget.ui
   Resources/UI/pqCameraToolbar.ui
+  Resources/UI/pqCatalystExportInspector.ui
   Resources/UI/pqColorAnnotationsPropertyWidget.ui
   Resources/UI/pqColorEditorPropertyWidget.ui
   Resources/UI/pqColorMapEditor.ui

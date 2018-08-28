@@ -30,6 +30,7 @@
 #include "vtkSMCoreUtilities.h"
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMDocumentation.h"
+#include "vtkSMExportProxyDepot.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMPipelineState.h"
 #include "vtkSMPropertyIterator.h"
@@ -158,6 +159,9 @@ vtkSMSessionProxyManager::vtkSMSessionProxyManager(vtkSMSession* session)
   this->PipelineState = vtkSMPipelineState::New();
   this->PipelineState->SetSession(this->Session);
 
+  this->ExportDepot = vtkSMExportProxyDepot::New();
+  this->ExportDepot->Session = this;
+
   // setup event forwarder so that it forwards all events fired by this class via
   // the global proxy manager.
   vtkNew<vtkSMProxyManagerForwarder> forwarder;
@@ -181,6 +185,9 @@ vtkSMSessionProxyManager::~vtkSMSessionProxyManager()
 
   this->PipelineState->Delete();
   this->PipelineState = NULL;
+
+  this->ExportDepot->Delete();
+  this->ExportDepot = nullptr;
 }
 
 //----------------------------------------------------------------------------

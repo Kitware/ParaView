@@ -266,6 +266,17 @@
    </attribute>
    <widget class="pqLightsInspector" name="lightInspectorPanel"/>
   </widget>
+  <widget class="QDockWidget" name="catalystInspectorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Catalyst Export Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+  </widget>
   <widget class="QDockWidget" name="colorMapEditorDock">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -492,6 +503,12 @@
    <class>pqLightsInspector</class>
    <extends>QWidget</extends>
    <header>pqLightsInspector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqCatalystExportInspector</class>
+   <extends>QWidget</extends>
+   <header>pqCatalystExportInspector.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

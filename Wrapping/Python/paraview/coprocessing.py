@@ -66,6 +66,9 @@ class CoProcessor(object):
         self.__FirstTimeStepIndex = None
         # a list of arrays requested for each channel, e.g. {'input': ["a point data array name", 0], ["a cell data array name", 1]}
         self.__RequestedArrays = None
+        self.__EnableCinemaDTable = False
+        self.__WroteCinemaDHeader = False
+        self.__RootDirectory = ""
 
     def SetPrintEnsightFormatString(self, enable):
         """If outputting ExodusII files with the purpose of reading them into
@@ -211,6 +214,8 @@ class CoProcessor(object):
            if self.__EnableLiveVisualization:
                # we don't want to use __InitialFrequencies any more with live viz
                self.__InitialFrequencies = None
+           self.__FixupWriters()
+
         else:
             simtime = datadescription.GetTime()
             for name, producer in self.__ProducersMap.items():
@@ -255,6 +260,8 @@ class CoProcessor(object):
                         # we can't make the directory so no reason to update the pipeline
                         return
                 writer.UpdatePipeline(datadescription.GetTime())
+                self.__AppendToCinemaDTable(timestep, "writer_%s" % self.__WritersList.index(writer), writer.FileName)
+
 
     def WriteImages(self, datadescription, rescale_lookuptable=False,
                     image_quality=None, padding_amount=0):
@@ -316,6 +323,7 @@ class CoProcessor(object):
                         dirname = self.UpdateCinema(view, datadescription,
                                                     specLevel="A")
                     if dirname:
+                        self.__AppendToCinemaDTable(timestep, "view_%s" % self.__ViewsList.index(view), "cinema/"+dirname)
                         cinema_dirs.append(dirname)
                 else:
                     if '/' in fname and createDirectoriesIfNeeded:
@@ -348,6 +356,7 @@ class CoProcessor(object):
 
                     simple.SaveScreenshot(fname, view,
                             magnification=view.cpMagnification, quality=quality)
+                    self.__AppendToCinemaDTable(timestep, "view_%s" % self.__ViewsList.index(view), fname)
 
         if len(cinema_dirs) > 1:
             import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
@@ -781,3 +790,52 @@ class CoProcessor(object):
             return True
 
         return False
+
+
+    def EnableCinemaDTable(self):
+        """ Enable the normally disabled cinema D table export feature """
+        self.__EnableCinemaDTable = True
+
+
+    def __AppendToCinemaDTable(self, time, producer, filename):
+        """
+        This is called every time catalyst writes any data product to update the
+        Cinema D index of outputs table.
+        """
+        if not self.__EnableCinemaDTable:
+            return
+        import vtk
+        comm = vtk.vtkMultiProcessController.GetGlobalController()
+        if comm.GetLocalProcessId() == 0:
+            # strip possible leading root directory from filename
+            datafilename = filename
+            indexfilename = "data.csv"
+            if self.__RootDirectory is not "":
+              rdprefix = self.__RootDirectory + "/"
+              datafilename = filename[filename.startswith(rdprefix) and len(rdprefix):] #strip rdprefix
+              indexfilename = rdprefix + "/data.csv"
+            if not self.__WroteCinemaDHeader:
+                self.__WroteCinemaDHeader = True
+                f = open(indexfilename, "w")
+                f.write("timestep,producer,FILE\n")
+                f.close()
+            f = open(indexfilename, "a+")
+            f.write("%s,%s,%s\n" % (time, producer, datafilename))
+            f.close()
+
+
+    def SetRootDirectory(self, root_directory):
+        """ Makes Catalyst put all output under this directory. """
+        self.__RootDirectory = root_directory
+
+
+    def __FixupWriters(self):
+        """ Called once to ensure that all writers obey the root directory directive """
+        if self.__RootDirectory is "":
+            return
+        for view in self.__ViewsList:
+            view.cpFileName = self.__RootDirectory + "/" + view.cpFileName
+        for writer in self.__WritersList:
+            fileName = self.__RootDirectory + "/" + writer.parameters.GetProperty("FileName").GetElement(0)
+            writer.parameters.GetProperty("FileName").SetElement(0, fileName)
+            writer.parameters.FileName = fileName

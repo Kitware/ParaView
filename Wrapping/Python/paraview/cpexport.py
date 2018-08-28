@@ -14,28 +14,32 @@ CoProcessing."""
 #  3) The boolean to know if we need to rescale the data range
 # -----------------------------------------------------------------------------
 __output_contents = """
-from paraview.simple import *
-from paraview import coprocessing
-
-
 #--------------------------------------------------------------
-# Code generated from cpstate.py to create the CoProcessor.
-# %s
 
-#--------------------------------------------------------------
 # Global timestep output options
 timeStepToStartOutputAt=%s
 forceOutputAtFirstCall=%s
 
-#--------------------------------------------------------------
 # Global screenshot output options
 imageFileNamePadding=%s
 rescale_lookuptable=%s
 
-#--------------------------------------------------------------
-# whether or not to request specific arrays from the adaptor
+# Whether or not to request specific arrays from the adaptor.
 requestSpecificArrays=%s
 
+# a root directory under which all Catalyst output goes
+rootDirectory='%s'
+
+# makes a cinema D index table
+make_cinema_table=%s
+
+#--------------------------------------------------------------
+# Code generated from cpstate.py to create the CoProcessor.
+# %s
+#--------------------------------------------------------------
+
+from paraview.simple import *
+from paraview import coprocessing
 %s
 
 #--------------------------------------------------------------
@@ -84,12 +88,16 @@ from paraview import cpstate
 
 def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
     padding_amount, rescale_data_range, enable_live_viz, live_viz_frequency,
-    cinema_tracks, cinema_arrays, filename=None):
+                           cinema_tracks, cinema_arrays, filename=None, write_start=0,
+                           make_cinema_table=False, root_directory="",
+                           request_specific_arrays=False, force_first_output=False):
     """Returns a string with the generated CoProcessing script based on the
     options specified.
 
     First three arguments are same as those expected by
     cpstate.DumpPipeline() function.
+
+    :param write_start: integer (0-) how many cycles catalyst should wait before executing
 
     :param padding_amount: integer (0-10) to set image output filename padding
 
@@ -103,24 +111,34 @@ def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_in
 
     :param cinema_arrays: selected value arrays for cinema
 
+    :param make_cinema_table: boolean set to true to request a cinema D index file.
+
     :param filename: if specified, the script is written to the file.
+
+    :param root_directory: if specified, the script will export underneath this directory.
+
+    :param request_specific_arrays: boolean set to true to ask for individual arrays
+
+    :param force_first_output: boolean set to true to write the first timestep regardless of write_start.
+
     """
     from paraview.servermanager import vtkSMProxyManager
     version_str = vtkSMProxyManager.GetParaViewSourceVersion()
 
-    # TODO: Once we're starting work on the PV export dialog we will need to
-    # fill in timeStepToStartOutputAt, forceOutputAtFirstCall and requestSpecificNames
-    # from the export options
-    timeStepToStartOutputAt=0
-    forceOutputAtFirstCall=False
-    requestSpecificNames=False
-
     pipeline_script = cpstate.DumpPipeline(\
       export_rendering, simulation_input_map, screenshot_info, cinema_tracks,\
       cinema_arrays, enable_live_viz, live_viz_frequency)
-    script = __output_contents % (version_str, timeStepToStartOutputAt, forceOutputAtFirstCall,
-                                  padding_amount, rescale_data_range, requestSpecificNames, pipeline_script,
-                                  enable_live_viz, live_viz_frequency)
+    script = __output_contents % (write_start,
+                                  force_first_output,
+                                  padding_amount,
+                                  rescale_data_range,
+                                  request_specific_arrays,
+                                  root_directory,
+                                  make_cinema_table,
+                                  version_str,
+                                  pipeline_script,
+                                  enable_live_viz,
+                                  live_viz_frequency)
     if filename:
         outFile = open(filename, "w")
         outFile.write(script)

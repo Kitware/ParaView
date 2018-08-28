@@ -85,6 +85,17 @@
         <Property name="TransportMethod" />
         <Property name="TransportMethodArguments" />
       </PropertyGroup>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="CatalystWriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
       <Hints>
         <Property name="Input"               show="0" />
         <Property name="TransportMethod"     show="1" />
@@ -92,6 +103,7 @@
         <Property name="CompressionMethod"   show="1" />
         <WriterFactory extensions="vta"
                        file_description="VTK ADIOS File" />
+        <CatalystApproved/>
       </Hints>
       <!-- End of ADIOSWriter -->
     </WriterProxy>

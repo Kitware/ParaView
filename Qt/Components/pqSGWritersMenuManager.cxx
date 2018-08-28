@@ -173,7 +173,7 @@ void pqSGWritersMenuManager::createMenu()
   {
     submenu = action->menu();
     // remove potential ampersand (&) that can be added to the title by Qt
-    if (submenu && (submenu->title().replace('&', "") == tr("Data Extract Writers")))
+    if (submenu && (submenu->title().replace('&', "") == tr("Data Extract Writers -deprecated")))
     {
       break;
     }
@@ -186,7 +186,7 @@ void pqSGWritersMenuManager::createMenu()
     if (!this->AlreadyConnected)
     {
       // make the submenu
-      submenu = new QMenu(tr("Data Extract Writers"), this->Menu);
+      submenu = new QMenu(tr("Data Extract Writers -deprecated"), this->Menu);
       submenu->setObjectName("Writers");
       this->Menu->addMenu(submenu);
       // connect its actions up

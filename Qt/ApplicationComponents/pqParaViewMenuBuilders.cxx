@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCameraUndoRedoReaction.h"
 #include "pqCatalystConnectReaction.h"
 #include "pqCatalystContinueReaction.h"
+#include "pqCatalystExportReaction.h"
 #include "pqCatalystPauseSimulationReaction.h"
 #include "pqCatalystRemoveBreakpointReaction.h"
 #include "pqCatalystScriptGeneratorReaction.h"
@@ -648,7 +649,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
+void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfiguration)
 {
   new pqCatalystConnectReaction(menu.addAction("Connect...") << pqSetName("actionCatalystConnect"));
   new pqCatalystPauseSimulationReaction(
@@ -663,13 +664,33 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu)
     menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
 
 #ifdef PARAVIEW_ENABLE_PYTHON
+#define SHOWNEWCATALYSTGUI 1
+#if SHOWNEWCATALYSTGUI
   menu.addSeparator(); // --------------------------------------------------
-  QAction* csg = menu.addAction("Generate Script") << pqSetName("Export State");
+  // QAction* cexport = menu.addAction("Configure Exports"); //WTH won't this show up on mac?
+  // QAction* cexport = menu.addAction("Setup Exports"); //or this on mac?
+  QAction* cexport = menu.addAction("Define Exports")
+    << pqSetName("actionCatalystConfigure"); // but this is OK?
+  QObject::connect(cexport, SIGNAL(triggered()), exportConfiguration, SLOT(show()));
+
+  QAction* gcatalyst = menu.addAction("Export Catalyst Script")
+    << pqSetName("actionExportCatalyst");
+  new pqCatalystExportReaction(gcatalyst);
+#else
+  (void)exportConfiguration; // avoid unreferenced parameter comp warning
+#endif
+
+#define SHOWOLDCATALYSTGUI 1
+#if SHOWOLDCATALYSTGUI
+  menu.addSeparator(); // --------------------------------------------------
+  QAction* csg = menu.addAction("Generate Script -deprecated") << pqSetName("Export State");
   new pqCatalystScriptGeneratorReaction(csg);
 
-  menu.addSeparator(); // --------------------------------------------------
   pqSGWritersMenuManager* menuMgr =
     new pqSGWritersMenuManager(&menu, "&Writers", "CatalystWritersMenu", nullptr);
   menuMgr->createMenu();
+#endif
+#else
+  (void)exportConfiguration; // avoid unreferenced parameter comp warning
 #endif
 }

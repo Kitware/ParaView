@@ -71,8 +71,12 @@ public:
    * in order to prevent a double pipeline execution when you want to write a
    * given timestep, you should call updatePipeline( time ) before the
    * CreateWriter call.
+   * The proxybyname flag tells the factory to use the proxy name rather than
+   * a filename.extension to lookup the right proxy.
+   * The requiredHint restricts to proxies with the XML hint, for example "CatalystApproved".
    */
-  vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy*, unsigned int outputport);
+  vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy*, unsigned int outputport,
+    bool proxyname = false, const char* requiredHint = nullptr);
   vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy* pxy)
   {
     return this->CreateWriter(filename, pxy, 0);
@@ -90,6 +94,11 @@ public:
   {
     return this->GetSupportedFileTypes(source, 0);
   }
+  /**
+   * A variation on GetSupportedFileTypes that obtains a list of prototype proxy names.
+  */
+  const char* GetSupportedWriterProxies(
+    vtkSMSourceProxy* source, unsigned int outputport, const char* requiredHint = nullptr);
 
   // Returns the number of registered prototypes.
   unsigned int GetNumberOfRegisteredPrototypes();
