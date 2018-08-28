@@ -30,7 +30,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkImageSimpleSource : public vtkThreaded
 {
 public:
   static vtkImageSimpleSource* New();
-  vtkTypeMacro(vtkImageSimpleSource, vtkImageAlgorithm);
+  vtkTypeMacro(vtkImageSimpleSource, vtkThreadedImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -43,6 +43,7 @@ protected:
   ~vtkImageSimpleSource() override {}
 
   int WholeExtent[6];
+  int FirstIndex[3];
 
   void PrepareImageData(vtkInformationVector** inputVector, vtkInformationVector* outputVector,
     vtkImageData*** inDataObjects = nullptr, vtkImageData** outDataObjects = nullptr) override;

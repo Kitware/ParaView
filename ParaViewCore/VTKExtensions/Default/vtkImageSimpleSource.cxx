@@ -46,6 +46,10 @@ vtkImageSimpleSource::vtkImageSimpleSource()
   this->WholeExtent[4] = -10;
   this->WholeExtent[5] = 10;
 
+  this->FirstIndex[0] = this->WholeExtent[0];
+  this->FirstIndex[1] = this->WholeExtent[2];
+  this->FirstIndex[2] = this->WholeExtent[4];
+
   this->SetNumberOfInputPorts(0);
 }
 
@@ -54,9 +58,11 @@ void vtkImageSimpleSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "Whole Extent: (" << this->WholeExtent[0] << "," << this->WholeExtent[1] << ", "
+  os << indent << "WholeExtent: (" << this->WholeExtent[0] << ", " << this->WholeExtent[1] << ", "
      << this->WholeExtent[2] << ", " << this->WholeExtent[3] << ", " << this->WholeExtent[4] << ", "
-     << this->WholeExtent[5] << ")\n";
+     << this->WholeExtent[5] << ")\n"
+     << "FirstIndex: (" << this->FirstIndex[0] << "," << this->FirstIndex[1] << ","
+     << this->FirstIndex[2] << ")\n";
 }
 
 //----------------------------------------------------------------------------
@@ -95,6 +101,11 @@ void vtkImageSimpleSource::SetWholeExtent(
     modified = 1;
     this->WholeExtent[5] = zMax;
   }
+
+  this->FirstIndex[0] = this->WholeExtent[0];
+  this->FirstIndex[1] = this->WholeExtent[2];
+  this->FirstIndex[2] = this->WholeExtent[4];
+
   if (modified)
   {
     this->Modified();
@@ -106,7 +117,6 @@ void vtkImageSimpleSource::PrepareImageData(vtkInformationVector** vtkNotUsed(in
   vtkInformationVector* outputVector, vtkImageData*** vtkNotUsed(inDataObjects),
   vtkImageData** outDataObjects)
 {
-  std::cout << "PrepareImageData()" << std::endl;
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkImageData* outData = vtkImageData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
@@ -114,6 +124,12 @@ void vtkImageSimpleSource::PrepareImageData(vtkInformationVector** vtkNotUsed(in
   int extent[6];
   outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), extent);
   outData->SetExtent(extent);
+
+  // Save first index for subsequent data requests
+  this->FirstIndex[0] = extent[0];
+  this->FirstIndex[1] = extent[2];
+  this->FirstIndex[2] = extent[4];
+
   if (outDataObjects)
   {
     outDataObjects[0] = outData;
@@ -153,7 +169,7 @@ void vtkImageSimpleSource::PrepareImageData(vtkInformationVector** vtkNotUsed(in
 
     pointData->AddArray(array);
     array->Delete();
-  } // for(i)
+  } // for (i)
 
   // Make X the active scalars, Swirl the active vectors
   pointData->SetActiveScalars(SIMPLE_FIELD_X.c_str());
@@ -212,10 +228,9 @@ int vtkImageSimpleSource::RequestInformation(vtkInformation* vtkNotUsed(request)
 
 //----------------------------------------------------------------------------
 void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector,
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* vtkNotUsed(outputVector),
   vtkImageData*** vtkNotUsed(inData), vtkImageData** outData, int extent[6], int threadId)
 {
-  // std::cout << threadId << "-ThreadedReqData" << std::endl;
   vtkImageData* imageData = outData[0];
 
   // Get data arrays
@@ -237,28 +252,34 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
 
   // Compute first index for this extent
   int structuredBegin[3];
-  structuredBegin[0] = extent[0] - this->WholeExtent[0];
-  structuredBegin[1] = extent[2] - this->WholeExtent[2];
-  structuredBegin[2] = extent[4] - this->WholeExtent[4];
+  structuredBegin[0] = extent[0] - this->FirstIndex[0];
+  structuredBegin[1] = extent[2] - this->FirstIndex[1];
+  structuredBegin[2] = extent[4] - this->FirstIndex[2];
   vtkIdType begin = structuredBegin[0] + inc[1] * structuredBegin[1] + inc[2] * structuredBegin[2];
 
   // Get starting pointer for each array
   double* xPtr = static_cast<double*>(xArray->GetVoidPointer(0)) + begin;
   double* distPtr = static_cast<double*>(distArray->GetVoidPointer(0)) + begin;
   double* swirlPtr = static_cast<double*>(swirlArray->GetVoidPointer(0)) + 3 * begin;
-  // double* swirlPtrStart = static_cast<double*>(swirlArray->GetVoidPointer(0));
 
   // Loop over voxels
-  // unsigned long target = static_cast<unsigned long>((dims[2])*(dims[1])/50.0) + 1;
-  unsigned long count = 0;
+  int dZ = extent[5] - extent[4] + 1;
+  int dY = extent[3] - extent[2] + 1;
+  unsigned long progressGoal = dY * dZ;
+  unsigned long progressStep = progressGoal <= 20 ? 1 : progressGoal / 20;
+  unsigned long progressCount = 0;
   for (int idxZ = extent[4]; idxZ <= extent[5]; idxZ++)
   {
     for (int idxY = extent[2]; !this->AbortExecute && idxY <= extent[3]; idxY++)
     {
+      progressCount++;
+      if ((threadId == 0) && (progressCount % progressStep) == 0)
+      {
+        this->UpdateProgress(static_cast<double>(progressCount) / progressGoal);
+      }
+
       for (int idxX = extent[0]; idxX <= extent[1]; idxX++)
       {
-        // std::cout << "ijk: " << idxX << ", " << idxY << ", " << idxZ
-        //           << " -- dswirl " << (swirlPtr - swirlPtrStart) << std::endl;
         *xPtr = static_cast<double>(idxX);
         xPtr++;
 
