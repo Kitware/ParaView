@@ -68,8 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSubsetInclusionLatticeWidget.h"
 #include "pqTextEdit.h"
 #include "pqTreeView.h"
+#include "pqTreeViewSelectionHelper.h"
 #include "pqTreeWidget.h"
-#include "pqTreeWidgetSelectionHelper.h"
 #include "vtkPVConfig.h"
 
 #include <QComboBox>
@@ -245,6 +245,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       selectorWidget->setMaximumRowCountBeforeScrolling(
         pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
+      // add context menu and custom indicator for sorting and filtering.
+      new pqTreeViewSelectionHelper(selectorWidget);
+
       // hide widget label
       this->setShowLabel(false);
 
@@ -346,6 +349,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
     selectorWidget->setMaximumRowCountBeforeScrolling(
       pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
+
+    // add context menu and custom indicator for sorting and filtering.
+    new pqTreeViewSelectionHelper(selectorWidget);
 
     this->addPropertyLink(
       selectorWidget, smProxy->GetPropertyName(smProperty), SIGNAL(widgetModified()), smProperty);

@@ -31,33 +31,72 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTreeViewSelectionHelper.h"
 
-// Server Manager Includes.
+#include "pqHeaderView.h"
 
-// Qt Includes.
 #include <QItemSelection>
+#include <QLineEdit>
 #include <QMenu>
 #include <QSortFilterProxyModel>
+#include <QVBoxLayout>
+#include <QWidgetAction>
 #include <QtDebug>
 
-// ParaView Includes.
+namespace
+{
+void updateFilter(QTreeView* tree, int section, const QString& txt)
+{
+  auto model = tree->model();
+  auto header = tree->header();
+  auto pqheader = qobject_cast<pqHeaderView*>(header);
+  auto sfmodel = qobject_cast<QSortFilterProxyModel*>(model);
+
+  if (sfmodel)
+  {
+    sfmodel->setFilterRegExp(QRegExp(txt, Qt::CaseInsensitive, QRegExp::Wildcard));
+    sfmodel->setFilterKeyColumn(section);
+  }
+  if (pqheader && sfmodel)
+  {
+    if (txt.isEmpty())
+    {
+      pqheader->removeCustomIndicatorIcon("remove-filter");
+    }
+    else
+    {
+      pqheader->addCustomIndicatorIcon(QIcon(":/QtWidgets/Icons/pqDelete24.png"), "remove-filter");
+    }
+  }
+}
+}
 
 //-----------------------------------------------------------------------------
 pqTreeViewSelectionHelper::pqTreeViewSelectionHelper(QTreeView* tree)
   : Superclass(tree)
+  , TreeView(tree)
+  , Filterable(true)
 {
-  this->TreeView = tree;
   tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
   tree->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  QObject::connect(tree, SIGNAL(clicked(QModelIndex)), this, SLOT(onClicked(QModelIndex)));
-  QObject::connect(tree, SIGNAL(pressed(QModelIndex)), this, SLOT(onPressed(QModelIndex)));
-
-  QObject::connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)), this,
-    SLOT(showContextMenu(const QPoint&)));
-
-  QObject::connect(tree->selectionModel(),
-    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this,
-    SLOT(saveSelection()));
+  if (auto pqheader = qobject_cast<pqHeaderView*>(tree->header()))
+  {
+    pqheader->setCustomIndicatorShown(true);
+    pqheader->addCustomIndicatorIcon(
+      QIcon(":/QtWidgets/Icons/outline_arrow_drop_down_circle_black_24dp.png"), "menu");
+    QObject::connect(pqheader, &pqHeaderView::customIndicatorClicked,
+      [this, tree](int section, const QPoint& pt, const QString& role) {
+        if (role == "menu")
+        {
+          this->showContextMenu(section, pt);
+        }
+        else if (role == "remove-filter")
+        {
+          updateFilter(tree, section, QString());
+        }
+      });
+  }
+  QObject::connect(tree, &QTreeView::customContextMenuRequested,
+    [this, tree](const QPoint& pt) { this->showContextMenu(tree->columnAt(pt.x()), pt); });
 }
 
 //-----------------------------------------------------------------------------
@@ -66,102 +105,122 @@ pqTreeViewSelectionHelper::~pqTreeViewSelectionHelper()
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeViewSelectionHelper::saveSelection()
-{
-  this->PrevSelection = this->CurrentSelection;
-  this->CurrentSelection = this->TreeView->selectionModel()->selection();
-}
-
-//-----------------------------------------------------------------------------
-void pqTreeViewSelectionHelper::onPressed(QModelIndex idx)
-{
-  //  qDebug() << "onItemPressed"
-  //  << this->TreeWidget->selectionModel()->selectedIndexes().size();
-
-  this->PressState = -1;
-
-  Qt::ItemFlags flags = this->TreeView->model()->flags(idx);
-
-  if ((flags & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
-  {
-    this->PressState = this->TreeView->model()->data(idx, Qt::CheckStateRole).toInt();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqTreeViewSelectionHelper::onClicked(QModelIndex idx)
-{
-  //  qDebug() << "onItemClicked"
-  //  << this->TreeWidget->selectionModel()->selectedIndexes().size();
-  if (this->PrevSelection.contains(idx) && this->PressState != -1)
-  {
-    Qt::CheckState state =
-      static_cast<Qt::CheckState>(this->TreeView->model()->data(idx, Qt::CheckStateRole).toInt());
-    if (state != this->PressState)
-    {
-      // Change all checkable items in the this->Selection to match the new
-      // check state.
-      this->setSelectedItemsCheckState(state);
-    }
-  }
-  this->saveSelection();
-}
-
-//-----------------------------------------------------------------------------
 void pqTreeViewSelectionHelper::setSelectedItemsCheckState(Qt::CheckState state)
 {
   // Change all checkable items in the this->Selection to match the new
   // check state.
-  foreach (QModelIndex idx, this->PrevSelection.indexes())
+  auto model = this->TreeView->model();
+  for (const QModelIndex& idx : this->TreeView->selectionModel()->selectedIndexes())
   {
-    Qt::ItemFlags flags = this->TreeView->model()->flags(idx);
-
+    const Qt::ItemFlags flags = model->flags(idx);
     if ((flags & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
     {
-      this->TreeView->model()->setData(idx, state, Qt::CheckStateRole);
+      model->setData(idx, state, Qt::CheckStateRole);
     }
   }
-
-  this->TreeView->selectionModel()->select(
-    this->PrevSelection, QItemSelectionModel::ClearAndSelect);
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeViewSelectionHelper::showContextMenu(const QPoint& pos)
+void pqTreeViewSelectionHelper::showContextMenu(int section, const QPoint& pos)
 {
-  if (this->TreeView->selectionModel()->selectedIndexes().size() > 0)
+  auto tree = this->TreeView;
+  auto model = tree->model();
+  auto header = tree->header();
+  auto sfmodel = qobject_cast<QSortFilterProxyModel*>(model);
+
+  QList<QModelIndex> selectedIndexes;
+  for (const QModelIndex& idx : this->TreeView->selectionModel()->selectedIndexes())
   {
-    QMenu menu;
-    menu.setObjectName("TreeViewCheckMenu");
-    QAction* check = new QAction("Check", &menu);
-    QAction* uncheck = new QAction("Uncheck", &menu);
-    QAction* sort = new QAction("Sort", &menu);
-    QAction* unsort = new QAction("Clear Sorting", &menu);
-    menu.addAction(check);
-    menu.addAction(uncheck);
-    QSortFilterProxyModel* sortModel =
-      qobject_cast<QSortFilterProxyModel*>(this->TreeView->model());
-    if (sortModel)
+    if (idx.column() == section)
     {
-      menu.addAction(sort);
-      menu.addAction(unsort);
-    }
-    QAction* result = menu.exec(this->TreeView->mapToGlobal(pos));
-    if (result == check)
-    {
-      this->setSelectedItemsCheckState(Qt::Checked);
-    }
-    else if (result == uncheck)
-    {
-      this->setSelectedItemsCheckState(Qt::Unchecked);
-    }
-    else if (result == sort)
-    {
-      sortModel->sort(this->TreeView->columnAt(pos.x()), Qt::AscendingOrder);
-    }
-    else if (result == unsort)
-    {
-      sortModel->sort(-1);
+      selectedIndexes.push_back(idx);
     }
   }
+
+  const bool user_checkable =
+    model->headerData(section, header->orientation(), Qt::CheckStateRole).isValid();
+  const int selectionCount = selectedIndexes.size();
+  const int rowCount = model->rowCount();
+
+  QMenu menu;
+  menu.setObjectName("TreeViewCheckMenu");
+  if (this->Filterable && sfmodel != nullptr)
+  {
+    if (auto filterActn = new QWidgetAction(&menu))
+    {
+      auto ledit = new QLineEdit(&menu);
+      ledit->setPlaceholderText("Filter items");
+      ledit->setClearButtonEnabled(true);
+      ledit->setText(sfmodel->filterRegExp().pattern());
+
+      auto container = new QWidget(&menu);
+      auto l = new QVBoxLayout(container);
+      // ideally, I'd like to place the QLineEdit inline with rest of the menu
+      // actions, but not sure how to do it.
+      // const auto xpos = 28; //menu.style()->pixelMetric(QStyle::PM_MenuHMargin);
+      l->setContentsMargins(2, 2, 2, 2);
+      l->addWidget(ledit);
+      QObject::connect(ledit, &QLineEdit::textChanged,
+        [tree, section](const QString& txt) { updateFilter(tree, section, txt); });
+
+      filterActn->setDefaultWidget(container);
+      menu.addAction(filterActn);
+    }
+    menu.addSeparator();
+  }
+
+  if (user_checkable)
+  {
+    if (auto actn = menu.addAction("Check highlighted items"))
+    {
+      actn->setEnabled(selectionCount > 0);
+      QObject::connect(
+        actn, &QAction::triggered, [this](bool) { this->setSelectedItemsCheckState(Qt::Checked); });
+    }
+
+    if (auto actn = menu.addAction("Uncheck highlighted items"))
+    {
+      actn->setEnabled(selectionCount > 0);
+      QObject::connect(actn, &QAction::triggered,
+        [this](bool) { this->setSelectedItemsCheckState(Qt::Unchecked); });
+    }
+  }
+
+  if (sfmodel != nullptr)
+  {
+    if (user_checkable)
+    {
+      menu.addSeparator();
+    }
+
+    auto order = Qt::AscendingOrder;
+    if (sfmodel->sortColumn() != -1 && sfmodel->sortOrder() != Qt::DescendingOrder)
+    {
+      order = Qt::DescendingOrder;
+    }
+
+    if (auto actn =
+          menu.addAction(order == Qt::AscendingOrder ? "Sort (ascending)" : "Sort (descending)"))
+    {
+      actn->setEnabled(rowCount > 0);
+      QObject::connect(actn, &QAction::triggered, [order, section, sfmodel, header](bool) {
+        sfmodel->sort(section, order);
+        header->setSortIndicatorShown(true);
+        // this needs to be inverted to match the icons we use in other places
+        // like SpreadSheetView.
+        header->setSortIndicator(
+          section, order == Qt::AscendingOrder ? Qt::DescendingOrder : Qt::AscendingOrder);
+      });
+    }
+
+    if (auto actn = menu.addAction("Clear sorting"))
+    {
+      actn->setEnabled(sfmodel->sortColumn() != -1);
+      QObject::connect(actn, &QAction::triggered, [sfmodel, header](bool) {
+        sfmodel->sort(-1);
+        header->setSortIndicatorShown(false);
+      });
+    }
+  }
+  menu.exec(this->TreeView->mapToGlobal(pos));
 }

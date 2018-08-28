@@ -8,5 +8,7 @@
         <file>Icons/pqMultiply@2x.png</file>
         <file>Icons/pqMultiply.png</file>
         <file>Icons/pqPlus16.png</file>
+        <file>Icons/outline_arrow_drop_down_circle_black_24dp.png</file>
+        <file>Icons/outline_arrow_drop_down_circle_black_24dp@2x.png</file>
     </qresource>
 </RCC>

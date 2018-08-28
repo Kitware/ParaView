@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractItemModel>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QStyle>
 #include <QtDebug>
 
@@ -40,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqHeaderView::pqHeaderView(Qt::Orientation orientation, QWidget* parentObject)
   : Superclass(orientation, parentObject)
   , ToggleCheckStateOnSectionClick(false)
+  , CustomIndicatorShown(false)
 {
   if (orientation == Qt::Vertical)
   {
@@ -114,10 +116,39 @@ void pqHeaderView::paintSection(QPainter* painter, const QRect& rect, int logica
 
   QRect newrect = rect;
   newrect.setLeft(newrect.x() + r2.x());
+  if (this->CustomIndicatorShown)
+  {
+    // adjust width so that sort indicator doesn't overlap with the custom
+    // indicators.
+    newrect.setRight(
+      newrect.right() - (checkRect.width() * static_cast<int>(this->CustomIndicatorIcons.size())));
+  }
+
+  painter->save();
   this->Superclass::paintSection(painter, newrect, logicalIndex);
+  painter->restore();
 
   // let's save the checkbox rect to handle clicks.
   this->CheckRect = checkRect;
+
+  this->CustomIndicatorRects.clear();
+  if (this->CustomIndicatorShown)
+  {
+    int leftpos = newrect.right();
+    for (auto iter = this->CustomIndicatorIcons.rbegin(); iter != this->CustomIndicatorIcons.rend();
+         ++iter)
+    {
+      const auto& icon = iter->first;
+      const auto& role = iter->second;
+
+      QRect ciRect = checkRect;
+      ciRect.moveTo(leftpos, ciRect.y());
+      this->style()->drawItemPixmap(painter, ciRect, Qt::AlignCenter, icon.pixmap(ciRect.size()));
+      this->CustomIndicatorRects.push_back(std::make_pair(ciRect, role));
+
+      leftpos += checkRect.width();
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -139,9 +170,28 @@ void pqHeaderView::mouseReleaseEvent(QMouseEvent* evt)
 //-----------------------------------------------------------------------------
 void pqHeaderView::mouseClickEvent(QMouseEvent* evt)
 {
+  if (evt->button() != Qt::LeftButton)
+  {
+    return;
+  }
+
   if (auto amodel = this->model())
   {
     int logicalIndex = this->logicalIndexAt(evt->pos());
+    if (this->CustomIndicatorShown)
+    {
+      for (const auto& pair : this->CustomIndicatorRects)
+      {
+        const auto& rect = pair.first;
+        const auto& role = pair.second;
+        if (rect.contains(this->PressPosition))
+        {
+          emit this->customIndicatorClicked(logicalIndex, rect.bottomLeft(), role);
+          return;
+        }
+      }
+    }
+
     const QVariant hdata =
       amodel->headerData(logicalIndex, this->orientation(), Qt::CheckStateRole);
     if (hdata.isValid())
@@ -164,4 +214,59 @@ void pqHeaderView::mouseClickEvent(QMouseEvent* evt)
       }
     }
   }
+}
+
+//-----------------------------------------------------------------------------
+void pqHeaderView::setCustomIndicatorShown(bool val)
+{
+  if (this->CustomIndicatorShown != val)
+  {
+    this->CustomIndicatorShown = val;
+    this->update();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqHeaderView::addCustomIndicatorIcon(const QIcon& icon, const QString& role)
+{
+  for (auto& pair : this->CustomIndicatorIcons)
+  {
+    if (pair.second == role)
+    {
+      pair.first = icon;
+      return;
+    }
+  }
+
+  this->CustomIndicatorIcons.push_back(std::make_pair(icon, role));
+  this->update();
+}
+
+//-----------------------------------------------------------------------------
+void pqHeaderView::removeCustomIndicatorIcon(const QString& role)
+{
+  for (auto iter = this->CustomIndicatorIcons.begin(); iter != this->CustomIndicatorIcons.end();)
+  {
+    if (iter->second == role)
+    {
+      iter = this->CustomIndicatorIcons.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+QIcon pqHeaderView::customIndicatorIcon(const QString& role) const
+{
+  for (auto& pair : this->CustomIndicatorIcons)
+  {
+    if (pair.second == role)
+    {
+      return pair.first;
+    }
+  }
+  return QIcon();
 }
