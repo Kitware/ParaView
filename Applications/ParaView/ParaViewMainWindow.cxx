@@ -78,10 +78,10 @@ void vtkPVInitializePythonModules();
 #endif
 
 #ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqCatalystExportInspector.h"
 #include "pqPythonDebugLeaksView.h"
 #include "pqPythonShell.h"
 typedef pqPythonDebugLeaksView DebugLeaksViewType;
-#include "pqCatalystExportInspector.h"
 #else
 #include "vtkQtDebugLeaksView.h"
 typedef vtkQtDebugLeaksView DebugLeaksViewType;

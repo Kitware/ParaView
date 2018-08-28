@@ -2849,7 +2849,7 @@
                        label="Write Frequency"
                        default_values="1"
                        number_of_elements="1">
-        <Documentation>Set how often Catalyst runs will export this data product.
+        <Documentation>Set how often Catalyst runs will export this data product. Zero is OK and means only when output is forced by the simulation.
         </Documentation>
         <IntRangeDomain min="0"
                         name="range" />

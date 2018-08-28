@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   ParaView
-Module:    vtkSMCatalystOptionsProxy.h
+Module:    vtkSMExportProxyDepot.h
 
 Copyright (c) Kitware, Inc.
 All rights reserved.

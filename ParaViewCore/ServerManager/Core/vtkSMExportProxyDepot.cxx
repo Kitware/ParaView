@@ -77,7 +77,7 @@ vtkSMProxy* vtkSMExportProxyDepot::GetGlobalOptions()
     controller->PreInitializeProxy(globalProxy);
     controller->PostInitializeProxy(globalProxy);
     this->Session->RegisterProxy("export_global", "catalyst", globalProxy);
-    globalProxy->Delete();
+    globalProxy->FastDelete();
   }
   return globalProxy;
 }
@@ -156,7 +156,7 @@ vtkSMSourceProxy* vtkSMExportProxyDepot::GetWriterProxy(
     }
 
     this->Session->RegisterProxy("export_writers", filterhash.c_str(), writerProxy);
-    writerProxy->Delete();
+    writerProxy->FastDelete();
   }
   return writerProxy;
 }
@@ -236,7 +236,7 @@ vtkSMProxy* vtkSMExportProxyDepot::GetScreenshotProxy(
     controller->PostInitializeProxy(ssProxy);
 
     this->Session->RegisterProxy("export_screenshots", viewhash.c_str(), ssProxy);
-    ssProxy->Delete();
+    ssProxy->FastDelete();
   }
   return ssProxy;
 }
