@@ -25,6 +25,7 @@
         { "class":"vtkPVContourFilter" },
         { "class":"vtkPVCylinder" },
         { "class":"vtkPVDataSetAlgorithmSelectorFilter" },
+        { "class":"vtkPVGlyphFilter" },
         { "class":"vtkPVGlyphFilterLegacy" },
         { "class":"vtkPVMetaClipDataSet" },
         { "class":"vtkPVMetaSliceDataSet" },
