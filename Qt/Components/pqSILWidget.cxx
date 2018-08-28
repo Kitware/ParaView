@@ -135,8 +135,6 @@ void pqSILWidget::onModelReset()
   activeTree->setRootIsDecorated(false);
   activeTree->setModel(this->SortModel);
   activeTree->expandAll();
-  activeTree->header()->swapSections(0, 1);
-  activeTree->resizeColumnToContents(1);
   this->TabWidget->addTab(activeTree, this->ActiveCategory);
   new pqTreeViewSelectionHelper(activeTree);
 
@@ -161,8 +159,6 @@ void pqSILWidget::onModelReset()
     tree->setModel(sortModel);
     tree->expandAll();
     new pqTreeViewSelectionHelper(tree);
-    tree->header()->swapSections(0, 1);
-    tree->resizeColumnToContents(1);
 
     this->TabWidget->addTab(tree, category);
   }

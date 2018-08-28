@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt Includes.
 #include <QApplication>
+#include <QDebug>
 #include <QPainter>
 #include <QPixmap>
 #include <QStyle>
@@ -100,8 +101,6 @@ QModelIndex pqProxySILModel::mapToSource(const QModelIndex& proxyIndex) const
     {
       return silModel->makeIndex(static_cast<vtkIdType>(proxyIndex.internalId()));
     }
-    qCritical("Calling mapToSource on a column not supported by source. "
-              "This may indicate an error in the logic.");
     return QModelIndex();
   }
 
@@ -156,12 +155,7 @@ void pqProxySILModel::onCheckStatusChanged()
 QVariant pqProxySILModel::headerData(
   int section, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
-  if (section == (this->columnCount() - 1))
-  {
-    // the last column is the column showing index, we don't have to give it any
-    // header.
-    return QVariant();
-  }
+  Q_UNUSED(section);
 
   // we want align all text to the left-vcenter.
   if (role == Qt::TextAlignmentRole && orientation == Qt::Horizontal)
@@ -203,18 +197,6 @@ bool pqProxySILModel::setHeaderData(
 //-----------------------------------------------------------------------------
 QVariant pqProxySILModel::data(const QModelIndex& proxyIndex, int role) const
 {
-  if (proxyIndex.column() == (this->columnCount() - 1))
-  {
-    if (role == Qt::DisplayRole)
-    {
-      // One based indexing works well with Exodus block ids
-      return QVariant(proxyIndex.row() + 1);
-    }
-    else
-    {
-      return QVariant();
-    }
-  }
   if (this->noCheckBoxes && (role == Qt::DecorationRole || role == Qt::CheckStateRole))
   {
     return QVariant();
