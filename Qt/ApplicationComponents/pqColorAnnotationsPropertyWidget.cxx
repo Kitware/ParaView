@@ -76,6 +76,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QPainter>
 #include <QPointer>
+#include <QString>
+#include <QTextStream>
 #include <algorithm>
 #include <set>
 
@@ -794,14 +796,16 @@ void pqColorAnnotationsPropertyWidget::updateIndexedLookupState()
         bool success = this->addActiveAnnotations(false /* do not force generation */);
         if (!success)
         {
+          QString promptMessage;
+          QTextStream qs(&promptMessage);
+          qs << "Could not initialize annotations for categorical coloring. There may be too many "
+             << "discrete values in your data, (more than " << vtkAbstractArray::MAX_DISCRETE_VALUES
+             << ") "
+             << "or you may be coloring by a floating point data array. Please "
+             << "add annotations manually.";
           pqCoreUtilities::promptUser("pqColorAnnotationsPropertyWidget::updatedIndexedLookupState",
             QMessageBox::Information, "Could not determine discrete values to use for annotations",
-            "Could not initialize annotations for categorical coloring. There may be too many "
-            "discrete "
-            "values in your data, or you may be coloring by a floating point data array. Please "
-            "add annotations "
-            "manually.",
-            QMessageBox::Ok | QMessageBox::Save);
+            promptMessage, QMessageBox::Ok | QMessageBox::Save);
         }
         else
         {
@@ -1082,13 +1086,14 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotations()
   if (!this->addActiveAnnotations(false))
   {
     QString warningTitle("Could not determine discrete values");
-    QString warningMessage(
-      "Could not automatically determine annotation values. Usually this means "
-      "too many discrete values are available in the data produced by the "
-      "current source/filter. This can happen if the data array type is floating "
-      "point. Please add annotations manually or force generation. Forcing the "
-      "generation will automatically hide the Scalar Bar.");
-
+    QString warningMessage;
+    QTextStream qs(&warningMessage);
+    qs << "Could not automatically determine annotation values. Usually this means "
+       << "too many discrete values (more than " << vtkAbstractArray::MAX_DISCRETE_VALUES << ") "
+       << "are available in the data produced by the "
+       << "current source/filter. This can happen if the data array type is floating "
+       << "point. Please add annotations manually or force generation. Forcing the "
+       << "generation will automatically hide the Scalar Bar.";
     QMessageBox* box = new QMessageBox(this);
     box->setWindowTitle(warningTitle);
     box->setText(warningMessage);
@@ -1170,12 +1175,14 @@ void pqColorAnnotationsPropertyWidget::addActiveAnnotationsFromVisibleSources()
   if (!this->addActiveAnnotationsFromVisibleSources(false))
   {
     QString warningTitle("Could not determine discrete values");
-    QString warningMessage(
-      "Could not automatically determine annotation values. Usually this means "
-      "too many discrete values are available in the data produced by the "
-      "current source/filter. This can happen if the data array type is floating "
-      "point. Please add annotations manually or force generation. Forcing the "
-      "generation will automatically hide the Scalar Bar.");
+    QString warningMessage;
+    QTextStream qs(&warningMessage);
+    qs << "Could not automatically determine annotation values. Usually this means "
+       << "too many discrete values (more than " << vtkAbstractArray::MAX_DISCRETE_VALUES << ") "
+       << "are available in the data produced by the "
+       << "current source/filter. This can happen if the data array type is floating "
+       << "point. Please add annotations manually or force generation. Forcing the "
+       << "generation will automatically hide the Scalar Bar.";
 
     QMessageBox* box = new QMessageBox(this);
     box->setWindowTitle(warningTitle);
