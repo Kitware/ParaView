@@ -246,17 +246,6 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(\
                 "'InsideOut' is obsolete.  Use 'Invert' property of Clip filter instead.")
 
-    # In 5.6, we changed the "SpreadSheetRepresentation" proxy to no longer have
-    # the "FieldAssociation" and "GenerateCellConnectivity" properties. They are
-    # now moved to the view.
-    if pname in ["FieldAssociation", "GenerateCellConnectivity"] and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() <= 5.5:
-            raise Continue()
-        else:
-            raise NotSupportedException(
-                  "'%s' is obsolete on SpreadSheetRepresentation as of ParaView 5.6 and has been migrated to the view." % pname)
-
-
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -468,15 +457,6 @@ def getattr(proxy, pname):
                     'The Clip.InsideOut property has been changed in ParaView 5.5. '\
                     'Please set the Invert property instead.')
 
-    # In 5.6, we changed the "SpreadSheetRepresentation" proxy to no longer have
-    # the "FieldAssociation" and "GenerateCellConnectivity" properties. They are
-    # now moved to the view.
-    if pname in ["FieldAssociation", "GenerateCellConnectivity"] and proxy.SMProxy.GetXMLName() == "SpreadSheetRepresentation":
-        if paraview.compatibility.GetVersion() <= 5.5:
-            return 0
-        else:
-            raise NotSupportedException(
-                  "'%s' is obsolete on SpreadSheetRepresentation as of ParaView 5.6 and has been migrated to the view." % pname)
     raise Continue()
 
 def GetProxy(module, key):

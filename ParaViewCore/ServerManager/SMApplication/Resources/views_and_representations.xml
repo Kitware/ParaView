@@ -3486,7 +3486,7 @@
       <!-- end of PlotMatrixViewProxy -->
     </PlotMatrixViewProxy>
     <!-- ================================================================== -->
-    <SpreadSheetViewProxy base_proxygroup="internal_views"
+    <ViewProxy base_proxygroup="internal_views"
                base_proxyname="ViewBase"
                class="vtkSpreadSheetView"
                name="SpreadSheetView"
@@ -3510,8 +3510,7 @@
       <IntVectorProperty command="SetShowExtractedSelection"
                          default_values="0"
                          name="SelectionOnly"
-                         number_of_elements="1"
-                         panel_visibility="never">
+                         number_of_elements="1">
         <Documentation>When set to 1, this representations shows only the
         selected cells (or points). The change will effect only after calling
         Update(). Note that changing this will clean all cache.</Documentation>
@@ -3553,29 +3552,15 @@
         The output of this filter will have at most BlockSize
         rows.</Documentation>
       </IdTypeVectorProperty>
-      <StringVectorProperty command="HideColumnByLabel"
-                            clean_command="ClearHiddenColumnsByLabel"
-                            name="HiddenColumnLabels"
-                            number_of_elements_per_command="1"
+      <StringVectorProperty command="SetColumnVisibility"
+                            clean_command="ClearColumnVisibilities"
+                            element_types="0 2 0"
+                            name="ColumnVisibility"
+                            number_of_elements_per_command="3"
                             panel_visibility="never"
-                            repeat_command="1">
-        <Documentation>This is list of labels for columns that will be hidden
-          in the view i.e. these columns won't be show in the GUI or exported
-          when exporting the view.
-        </Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetFieldAssociation"
-                         default_values="0"
-                         name="FieldAssociation"
-                         number_of_elements="1"
-                         panel_visibility="never">
-        <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
-                         name="enum">
-        </FieldDataDomain>
-      </IntVectorProperty>
-
+                            repeat_command="1"/>
+        <Documentation>Set the current column visibility in the spreadsheet view
+        to be used for export.</Documentation>
       <Hints>
         <ShowOneRepresentationAtATime />
         <!-- When present, vtkSMParaViewPipelineController::Show() will
@@ -3584,7 +3569,7 @@
       </Hints>
 
       <!-- End of SpreadSheetView -->
-    </SpreadSheetViewProxy>
+    </ViewProxy>
   </ProxyGroup>
 
   <!-- ==================================================================== -->
@@ -8523,6 +8508,14 @@
         <BooleanDomain name="bool" />
         <Documentation>Visibility of the representation.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateCellConnectivity"
+                         default_values="0"
+                         name="GenerateCellConnectivity"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Generation of the cell connectivity.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetForceUseCache"
                          default_values="0"
                          is_internal="1"
@@ -8549,6 +8542,21 @@
         set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
         Instead, ForcedCacheKey is used.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="FieldAssociation"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to pass.</Documentation>
+        <FieldDataDomain enable_field_data="1"
+                         force_point_cell_data="1"
+                         name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty clean_command="RemoveAllCompositeDataSetIndices"
                          command="AddCompositeDataSetIndex"
                          name="CompositeDataSetIndex"

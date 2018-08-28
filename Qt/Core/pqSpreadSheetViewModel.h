@@ -104,18 +104,9 @@ public:
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   /**
-   * Returns the data for the given role and section in the header with the
-   * specified orientation.
-   *
-   * When orientation is Qt::Horizontal, pqSpreadSheetViewModel adds support for
-   * two new roles: `pqSpreadSheetViewModel::SectionVisible`, and
-   * `pqSpreadSheetViewModel::SectionInternal`. `SectionVisible` can be used to
-   * determine if the column (or horizontal section) is visible or hidden.
-   * `SectionInternal` is used to determine if the section is internal. An
-   * internal section is also hidden.
-   * When data associated with these two roles changes, the model will fire
-   * `headerDataChanged` signal.
-   */
+  * Returns the data for the given role and section in the header with the
+  * specified orientation.
+  */
   QVariant headerData(
     int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -128,6 +119,21 @@ public:
   * Return true only if the given column is sortable.
   */
   bool isSortable(int section);
+
+  /**
+  * Return true only if the given column is visible
+  */
+  bool isVisible(int section);
+
+  /**
+  * Set the visibility of a given column
+  */
+  void setVisible(int section, bool visible);
+
+  /**
+  * Clear visibility list, all column considered visible
+  */
+  void clearVisible();
 
   /**
   * Returns the field type for the data currently shown by this model.
@@ -175,13 +181,6 @@ public:
   */
   Qt::ItemFlags flags(const QModelIndex& index) const override;
   bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
-
-  enum
-  {
-    SectionInternal = Qt::UserRole + 1,
-    SectionVisible,
-  };
-
 public slots:
   /**
   * resets the model.
@@ -216,15 +215,10 @@ private slots:
   void triggerSelectionChanged();
 
   /**
-   * Called when the vtkSpreadSheetView fetches a new block, we fire
-   * dataChanged signal.
-   */
+  * Caleld when the vtkSpreadSheetView fetches a new block, we fire
+  * dataChanged signal.
+  */
   void onDataFetched(vtkObject*, unsigned long, void*, void* call_data);
-
-  /**
-   * Called when "HiddenColumnLabels" property is modified.
-   */
-  void hiddenColumnsChanged();
 
 protected:
   /**

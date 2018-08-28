@@ -375,7 +375,7 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
 
     vtkSMPropertyHelper(repr, "Visibility").Set(1);
     repr->UpdateVTKObjects();
-    vtkSMViewProxy::RepresentationVisibilityChanged(view, repr, true);
+
     vtkSMViewProxy::HideOtherRepresentationsIfNeeded(view, repr);
     return repr;
   }
@@ -425,7 +425,6 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
     view->UpdateVTKObjects();
     repr->FastDelete();
 
-    vtkSMViewProxy::RepresentationVisibilityChanged(view, repr, true);
     vtkSMViewProxy::HideOtherRepresentationsIfNeeded(view, repr);
     return repr;
   }
@@ -453,7 +452,6 @@ void vtkSMParaViewPipelineControllerWithRendering::ShowAll(vtkSMViewProxy* view)
     {
       vtkSMPropertyHelper(repr, "Visibility").Set(1);
       repr->UpdateVTKObjects();
-      vtkSMViewProxy::RepresentationVisibilityChanged(view, repr, true);
     }
   }
 }
@@ -492,7 +490,6 @@ void vtkSMParaViewPipelineControllerWithRendering::Hide(vtkSMProxy* repr, vtkSMV
   {
     vtkSMPropertyHelper(repr, "Visibility").Set(0);
     repr->UpdateVTKObjects();
-    vtkSMViewProxy::RepresentationVisibilityChanged(view, repr, false);
 
     if (vtkSMParaViewPipelineControllerWithRendering::HideScalarBarOnHide)
     {

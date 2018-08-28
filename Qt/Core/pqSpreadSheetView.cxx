@@ -265,18 +265,3 @@ pqSpreadSheetViewModel* pqSpreadSheetView::getViewModel()
 {
   return this->Internal->Model;
 }
-
-//-----------------------------------------------------------------------------
-pqDataRepresentation* pqSpreadSheetView::activeRepresentation() const
-{
-  const auto reprs = this->getRepresentations();
-  for (auto repr : reprs)
-  {
-    pqDataRepresentation* drepr = qobject_cast<pqDataRepresentation*>(repr);
-    if (drepr && drepr->isVisible())
-    {
-      return drepr;
-    }
-  }
-  return nullptr;
-}

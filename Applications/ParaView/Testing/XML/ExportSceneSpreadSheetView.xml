@@ -25,4 +25,5 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionExport" />
   <pqevent object="pqClientMainWindow/FileExportDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/ExportSceneSpreadSheetView.csv" />
   <pqevent object="pqClientMainWindow/FileExportDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/ExportSceneSpreadSheetView.csv" />
+  <pqevent object="pqClientMainWindow/1QDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
 </pqevents>

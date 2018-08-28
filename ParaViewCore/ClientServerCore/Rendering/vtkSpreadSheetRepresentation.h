@@ -44,13 +44,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
 
   /**
-   * Overridden to update state of `GenerateCellConnectivity` and `FieldAssociation`
-   * which is specified on the view.
-   */
-  int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) override;
-
-  /**
    * Since this has no delivery, just mark ourselves modified.
    */
   void MarkModified() VTK_OVERRIDE { this->Superclass::MarkModified(); }
@@ -58,6 +51,19 @@ public:
   vtkAlgorithmOutput* GetDataProducer();
   vtkAlgorithmOutput* GetExtractedDataProducer();
   vtkAlgorithmOutput* GetSelectionProducer();
+
+  //@{
+  /**
+   * Allow user to enable/disable cell connectivity generation in the datamodel
+   */
+  void SetGenerateCellConnectivity(bool);
+  bool GetGenerateCellConnectivity();
+  //@}
+
+  //***************************************************************************
+  // Forwarded to vtkBlockDeliveryPreprocessor.
+  void SetFieldAssociation(int val);
+  int GetFieldAssociation();
 
   //@{
   /**
@@ -75,15 +81,6 @@ public:
 protected:
   vtkSpreadSheetRepresentation();
   ~vtkSpreadSheetRepresentation() override;
-
-  //@{
-  /**
-   * This is called in `ProcessViewRequest` during the
-   * `vtkPVView::REQUEST_UPDATE` pass.
-   */
-  void SetGenerateCellConnectivity(bool);
-  void SetFieldAssociation(int val);
-  //@}
 
   /**
    * Fill input port information.

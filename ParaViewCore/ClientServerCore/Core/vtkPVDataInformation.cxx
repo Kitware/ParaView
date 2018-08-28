@@ -241,30 +241,6 @@ vtkPVDataSetAttributesInformation* vtkPVDataInformation::GetAttributeInformation
 }
 
 //----------------------------------------------------------------------------
-vtkTypeInt64 vtkPVDataInformation::GetNumberOfElements(int type)
-{
-  switch (type)
-  {
-    case vtkDataObject::POINT:
-      return this->GetNumberOfPoints();
-    case vtkDataObject::CELL:
-      return this->GetNumberOfCells();
-    case vtkDataObject::FIELD:
-      return this->FieldDataInformation->GetMaximumNumberOfTuples();
-    case vtkDataObject::VERTEX:
-      return this->GetNumberOfVertices();
-    case vtkDataObject::EDGE:
-      // this is odd, but we're currently accumulating edge counts in
-      // NumberOfCells. That should be fixed.
-      return this->GetNumberOfCells();
-    case vtkDataObject::ROW:
-      return this->GetNumberOfRows();
-    default:
-      return 0;
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVDataInformation::Initialize()
 {
   this->DataSetType = -1;
@@ -707,7 +683,7 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
 
   this->MemorySize = data->GetActualMemorySize();
-  this->NumberOfCells = 0;
+  this->NumberOfCells = data->GetNumberOfRows() * data->GetNumberOfColumns();
   this->NumberOfPoints = 0;
   this->NumberOfRows = data->GetNumberOfRows();
 
@@ -887,7 +863,6 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
   }
 
   if (this->NumberOfPoints == 0 && this->NumberOfCells == 0 && this->NumberOfDataSets == 0 &&
-    this->NumberOfRows == 0 && this->NumberOfVertices == 0 &&
     this->FieldDataInformation->GetNumberOfArrays() == 0)
   {
     // Just copy the other array information.
@@ -930,8 +905,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
   }
 
   // Empty data set? Ignore bounds, extent and array info.
-  if (info->GetNumberOfCells() == 0 && info->GetNumberOfPoints() == 0 &&
-    info->GetNumberOfRows() == 0 && info->GetNumberOfVertices() == 0)
+  if (info->GetNumberOfCells() == 0 && info->GetNumberOfPoints() == 0)
   {
     return;
   }
