@@ -20,7 +20,6 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSpreadSheetView.h"
 
 vtkStandardNewMacro(vtkSpreadSheetRepresentation);
 //----------------------------------------------------------------------------
@@ -42,12 +41,15 @@ vtkSpreadSheetRepresentation::~vtkSpreadSheetRepresentation()
 //----------------------------------------------------------------------------
 void vtkSpreadSheetRepresentation::SetFieldAssociation(int val)
 {
-  if (val != this->DataConditioner->GetFieldAssociation())
-  {
-    this->DataConditioner->SetFieldAssociation(val);
-    this->ExtractedDataConditioner->SetFieldAssociation(val);
-    this->MarkModified();
-  }
+  this->DataConditioner->SetFieldAssociation(val);
+  this->ExtractedDataConditioner->SetFieldAssociation(val);
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
+int vtkSpreadSheetRepresentation::GetFieldAssociation()
+{
+  return this->DataConditioner->GetFieldAssociation();
 }
 
 //----------------------------------------------------------------------------
@@ -86,27 +88,6 @@ int vtkSpreadSheetRepresentation::FillInputPortInformation(int port, vtkInformat
 
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkSpreadSheetRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request, vtkInformation* inInfo, vtkInformation* outInfo)
-{
-  if (this->GetVisibility() == false)
-  {
-    return 0;
-  }
-
-  if (request == vtkPVView::REQUEST_UPDATE())
-  {
-    if (vtkSpreadSheetView* view = vtkSpreadSheetView::SafeDownCast(inInfo->Get(vtkPVView::VIEW())))
-    {
-      this->SetGenerateCellConnectivity(view->GetGenerateCellConnectivity());
-      this->SetFieldAssociation(view->GetFieldAssociation());
-    }
-  }
-
-  return this->Superclass::ProcessViewRequest(request, inInfo, outInfo);
 }
 
 //----------------------------------------------------------------------------
@@ -168,10 +149,12 @@ void vtkSpreadSheetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSpreadSheetRepresentation::SetGenerateCellConnectivity(bool v)
 {
-  if (this->DataConditioner->GetGenerateCellConnectivity() != v)
-  {
-    this->DataConditioner->SetGenerateCellConnectivity(v);
-    this->ExtractedDataConditioner->SetGenerateCellConnectivity(v);
-    this->MarkModified();
-  }
+  this->DataConditioner->SetGenerateCellConnectivity(v);
+  this->ExtractedDataConditioner->SetGenerateCellConnectivity(v);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSpreadSheetRepresentation::GetGenerateCellConnectivity()
+{
+  return this->ExtractedDataConditioner->GetGenerateCellConnectivity();
 }

@@ -28,6 +28,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPassArrays.h"
 #include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
@@ -38,7 +39,6 @@
 
 #include <algorithm>
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 namespace
@@ -167,9 +167,6 @@ public:
   vtkIdType MostRecentlyAccessedBlock;
   vtkWeakPointer<vtkSpreadSheetRepresentation> ActiveRepresentation;
   vtkCommand* Observer;
-
-  std::set<std::string> HiddenColumnsByName;
-  std::set<std::string> HiddenColumnsByLabel;
 };
 
 namespace
@@ -265,6 +262,11 @@ vtkSpreadSheetView::vtkSpreadSheetView()
   this->DeliveryFilter = vtkClientServerMoveData::New();
   this->DeliveryFilter->SetOutputDataType(VTK_TABLE);
 
+  this->PassFilter = vtkPassArrays::New();
+  this->PassFilter->UseFieldTypesOff();
+  this->PassFilter->RemoveArraysOn();
+  this->PassFilter->SetInputConnection(this->DeliveryFilter->GetOutputPort());
+
   this->ReductionFilter->SetInputConnection(this->TableStreamer->GetOutputPort());
 
   this->Internals = new vtkInternals();
@@ -284,7 +286,6 @@ vtkSpreadSheetView::vtkSpreadSheetView()
     this->RMICallbackTag =
       this->SynchronizedWindows->AddRMICallback(::FetchRMIBogus, this, FETCH_BLOCK_TAG);
   }
-  this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 }
 
 //----------------------------------------------------------------------------
@@ -297,6 +298,7 @@ vtkSpreadSheetView::~vtkSpreadSheetView()
   this->TableSelectionMarker->Delete();
   this->ReductionFilter->Delete();
   this->DeliveryFilter->Delete();
+  this->PassFilter->Delete();
 
   this->Internals->Observer->Delete();
   delete this->Internals;
@@ -309,87 +311,28 @@ void vtkSpreadSheetView::SetShowExtractedSelection(bool val)
   if (val != this->ShowExtractedSelection)
   {
     this->ShowExtractedSelection = val;
+    this->ClearCache();
     this->Modified();
   }
 }
 
 //----------------------------------------------------------------------------
-void vtkSpreadSheetView::HideColumnByName(const char* columnName)
+void vtkSpreadSheetView::SetColumnVisibility(
+  int fieldAssociation, const char* column, int visibility)
 {
-  if (columnName)
-  {
-    auto& internals = *this->Internals;
-    internals.HiddenColumnsByName.insert(columnName);
-  }
+  this->ColumnVisibilities[std::make_pair(fieldAssociation, column)] = visibility;
 }
 
 //----------------------------------------------------------------------------
-void vtkSpreadSheetView::ClearHiddenColumnsByName()
+void vtkSpreadSheetView::ClearColumnVisibilities()
 {
-  auto& internals = *this->Internals;
-  internals.HiddenColumnsByName.clear();
-}
-
-//----------------------------------------------------------------------------
-bool vtkSpreadSheetView::IsColumnHiddenByName(const char* columnName)
-{
-  const auto& internals = *this->Internals;
-  return columnName
-    ? internals.HiddenColumnsByName.find(columnName) != internals.HiddenColumnsByName.end()
-    : true;
-}
-
-//----------------------------------------------------------------------------
-void vtkSpreadSheetView::HideColumnByLabel(const char* columnLabel)
-{
-  if (columnLabel)
-  {
-    auto& internals = *this->Internals;
-    internals.HiddenColumnsByLabel.insert(columnLabel);
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkSpreadSheetView::ClearHiddenColumnsByLabel()
-{
-  auto& internals = *this->Internals;
-  internals.HiddenColumnsByLabel.clear();
-}
-
-//----------------------------------------------------------------------------
-bool vtkSpreadSheetView::IsColumnHiddenByLabel(const char* columnLabel)
-{
-  const auto& internals = *this->Internals;
-  return columnLabel
-    ? internals.HiddenColumnsByLabel.find(columnLabel) != internals.HiddenColumnsByLabel.end()
-    : true;
+  this->ColumnVisibilities.clear();
 }
 
 //----------------------------------------------------------------------------
 void vtkSpreadSheetView::ClearCache()
 {
   this->Internals->CachedBlocks.clear();
-}
-
-//----------------------------------------------------------------------------
-bool vtkSpreadSheetView::GetColumnVisibility(vtkIdType index)
-{
-  auto name = this->GetColumnName(index);
-  auto label = this->GetColumnLabel(name);
-  return !(this->IsColumnInternal(name) || this->IsColumnHiddenByName(name) ||
-    this->IsColumnHiddenByLabel(label));
-}
-
-//----------------------------------------------------------------------------
-bool vtkSpreadSheetView::IsColumnInternal(vtkIdType index)
-{
-  return this->IsColumnInternal(this->GetColumnName(index));
-}
-
-//----------------------------------------------------------------------------
-bool vtkSpreadSheetView::IsColumnInternal(const char* columnName)
-{
-  return (columnName == nullptr || strcmp(columnName, "__vtkIsSelected__") == 0) ? true : false;
 }
 
 //----------------------------------------------------------------------------
@@ -497,13 +440,13 @@ void vtkSpreadSheetView::OnRepresentationUpdated()
 }
 
 //----------------------------------------------------------------------------
-vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex, bool skipCache)
+vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex, bool filterColumnForExport)
 {
   vtkTable* block;
-  // Do not use cache when the blocks are fetched for exporting.
-  if (skipCache)
+  // Do not use cache with filtered columns
+  if (filterColumnForExport)
   {
-    block = this->FetchBlockCallback(blockindex);
+    block = this->FetchBlockCallback(blockindex, filterColumnForExport);
   }
   else
   {
@@ -519,7 +462,7 @@ vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex, bool skipCache)
 }
 
 //----------------------------------------------------------------------------
-vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
+vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex, bool filterColumn)
 {
   // Sanity Check
   if (!this->Internals->ActiveRepresentation)
@@ -534,11 +477,30 @@ vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
 
   this->TableStreamer->SetBlock(blockindex);
   this->TableStreamer->Modified();
-  this->TableSelectionMarker->SetFieldAssociation(this->FieldAssociation);
+  this->TableSelectionMarker->SetFieldAssociation(
+    this->Internals->ActiveRepresentation->GetFieldAssociation());
   this->ReductionFilter->Modified();
   this->DeliveryFilter->Modified();
   this->DeliveryFilter->Update();
-  return vtkTable::SafeDownCast(this->DeliveryFilter->GetOutput());
+
+  vtkTable* ret = vtkTable::SafeDownCast(this->DeliveryFilter->GetOutput());
+  if (filterColumn)
+  {
+    this->PassFilter->ClearArrays();
+    std::map<std::pair<int, std::string>, int>::iterator mapItem;
+    for (int i = 0; i < ret->GetNumberOfColumns(); i++)
+    {
+      mapItem = this->ColumnVisibilities.find(std::make_pair(
+        this->Internals->ActiveRepresentation->GetFieldAssociation(), ret->GetColumnName(i)));
+      if (mapItem != this->ColumnVisibilities.end() && mapItem->second == 0)
+      {
+        this->PassFilter->AddArray(vtkDataObject::ROW, ret->GetColumnName(i));
+      }
+    }
+    this->PassFilter->Update();
+    ret = vtkTable::SafeDownCast(this->PassFilter->GetOutput());
+  }
+  return ret;
 }
 
 //----------------------------------------------------------------------------
@@ -573,61 +535,6 @@ const char* vtkSpreadSheetView::GetColumnName(vtkIdType index)
     }
   }
   return NULL;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkSpreadSheetView::GetColumnLabel(vtkIdType index)
-{
-  return this->GetColumnLabel(this->GetColumnName(index));
-}
-
-//----------------------------------------------------------------------------
-const char* vtkSpreadSheetView::GetColumnLabel(const char* name)
-{
-  if (name == nullptr || this->IsColumnInternal(name))
-  {
-    return nullptr;
-  }
-  else if (strcmp("vtkOriginalProcessIds", name) == 0)
-  {
-    return "Process ID";
-  }
-  else if (strcmp("vtkOriginalIndices", name) == 0 && this->Internals->ActiveRepresentation)
-  {
-    switch (this->FieldAssociation)
-    {
-      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-        return "Point ID";
-      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-        return "Cell ID";
-      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-        return "Vertex ID";
-      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-        return "Edge ID";
-      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-        return "Row ID";
-      default:
-        // LOG_S(INFO) << "Unknown field association encountered.";
-        return name;
-    }
-  }
-  else if (strcmp("vtkOriginalCellIds", name) == 0 && this->GetShowExtractedSelection())
-  {
-    return "Cell ID";
-  }
-  else if (strcmp("vtkOriginalPointIds", name) == 0 && this->GetShowExtractedSelection())
-  {
-    return "Point ID";
-  }
-  else if (strcmp("vtkOriginalRowIds", name) == 0 && this->GetShowExtractedSelection())
-  {
-    return "Row ID";
-  }
-  else if (strcmp("vtkCompositeIndexArray", name) == 0)
-  {
-    return "Block Number";
-  }
-  return name;
 }
 
 //----------------------------------------------------------------------------
@@ -683,42 +590,18 @@ bool vtkSpreadSheetView::Export(vtkCSVExporter* exporter)
   }
   this->ClearCache();
 
-  if (auto activeRepr = this->Internals->ActiveRepresentation)
+  vtkIdType blockSize = this->TableStreamer->GetBlockSize();
+  vtkIdType numBlocks = (this->GetNumberOfRows() / blockSize) + 1;
+  for (vtkIdType cc = 0; cc < numBlocks; cc++)
   {
-    vtkIdType blockSize = this->TableStreamer->GetBlockSize();
-    vtkIdType numBlocks = (this->GetNumberOfRows() / blockSize) + 1;
-    for (vtkIdType cc = 0; cc < numBlocks; cc++)
+    vtkTable* block = this->FetchBlock(cc, exporter->GetFilterColumnsByVisibility());
+    if (block)
     {
-      if (vtkTable* block = this->FetchBlock(cc))
+      if (cc == 0)
       {
-        auto* rowData = block->GetRowData();
-        if (cc == 0)
-        {
-          // update column labels; this ensures that all the columns have same
-          // names as the spreadsheet view.
-          for (vtkIdType idx = 0; idx < rowData->GetNumberOfArrays(); ++idx)
-          {
-            if (auto array = rowData->GetAbstractArray(idx))
-            {
-              // note: internal columns get nullptr label which the exporter
-              // skips.
-              auto name = array->GetName();
-              auto label = this->GetColumnLabel(name);
-              if (this->IsColumnInternal(name) || this->IsColumnHiddenByName(name) ||
-                this->IsColumnHiddenByLabel(label))
-              {
-                exporter->SetColumnLabel(array->GetName(), nullptr);
-              }
-              else
-              {
-                exporter->SetColumnLabel(array->GetName(), label);
-              }
-            }
-          }
-          exporter->WriteHeader(rowData);
-        }
-        exporter->WriteData(rowData);
+        exporter->WriteHeader(block->GetRowData());
       }
+      exporter->WriteData(block->GetRowData());
     }
   }
   exporter->Close();

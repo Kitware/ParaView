@@ -45,6 +45,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextOption>
 #include <QVBoxLayout>
 
+namespace
+{
+inline bool pqIsColumnInternal(const QString& str)
+{
+  return (str == "__vtkIsSelected__");
+}
+}
+
 //-----------------------------------------------------------------------------
 class pqSpreadSheetViewWidget::pqDelegate : public pqNonEditableStyledItemDelegate
 {
@@ -217,16 +225,18 @@ void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* modelToUse)
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewWidget::onHeaderDataChanged()
 {
-  if (auto amodel = this->model())
+  pqSpreadSheetViewModel* shModel = qobject_cast<pqSpreadSheetViewModel*>(this->model());
+  if (!shModel)
   {
-    for (int cc = 0, max = amodel->columnCount(); cc < max; cc++)
-    {
-      bool visible =
-        amodel->headerData(cc, Qt::Horizontal, pqSpreadSheetViewModel::SectionVisible).toBool();
-      this->setColumnHidden(cc, !visible);
-    }
-    this->resizeColumnsToContents();
+    return;
   }
+
+  for (int cc = 0; cc < shModel->columnCount(); cc++)
+  {
+    QString headerTitle = this->model()->headerData(cc, Qt::Horizontal).toString();
+    this->setColumnHidden(cc, !shModel->isVisible(cc) || pqIsColumnInternal(headerTitle));
+  }
+  this->resizeColumnsToContents();
 }
 
 //-----------------------------------------------------------------------------
@@ -271,7 +281,14 @@ void pqSpreadSheetViewWidget::onSectionDoubleClicked(int logicalindex)
   for (int cc = 0; cc < numcols; cc++)
   {
     QString headerTitle = this->model()->headerData(cc, Qt::Horizontal).toString();
-    this->setColumnHidden(cc, (this->SingleColumnMode && cc != logicalindex));
+    if (pqIsColumnInternal(headerTitle))
+    {
+      this->setColumnHidden(cc, true);
+    }
+    else
+    {
+      this->setColumnHidden(cc, (this->SingleColumnMode && cc != logicalindex));
+    }
     if (this->SingleColumnMode && cc == logicalindex)
     {
 #if QT_VERSION >= 0x050000

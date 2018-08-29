@@ -201,12 +201,12 @@ public:
   // combobox.
   void updateFieldType()
   {
-    if (this->ViewProxy)
+    if (this->RepresentationProxy)
     {
       int fieldType =
         this->Ui.showTypeComboBox->itemData(this->Ui.showTypeComboBox->currentIndex()).toInt();
-      vtkSMPropertyHelper(this->ViewProxy, "FieldAssociation").Set(fieldType);
-      this->ViewProxy->UpdateVTKObjects();
+      vtkSMPropertyHelper(this->RepresentationProxy, "FieldAssociation").Set(fieldType);
+      this->RepresentationProxy->UpdateVTKObjects();
       this->ViewProxy->StillRender();
     }
   }

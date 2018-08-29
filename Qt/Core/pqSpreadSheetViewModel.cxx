@@ -108,6 +108,7 @@ public:
   QPointer<pqDataRepresentation> ActiveRepresentation;
   vtkWeakPointer<vtkSMProxy> ActiveRepresentationProxy;
   vtkSpreadSheetView* VTKView;
+  QList<bool> ColumnVisibility;
   bool Dirty;
 };
 
@@ -138,12 +139,6 @@ pqSpreadSheetViewModel::pqSpreadSheetViewModel(vtkSMProxy* view, QObject* parent
   QObject::connect(&this->Internal->SelectionModel,
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
     &this->Internal->SelectionTimer, SLOT(start()));
-
-  // QueuedConnection is needed to avoid updating the UI before property has
-  // been "pushed".
-  this->Internal->VTKConnect->Connect(view->GetProperty("HiddenColumnLabels"),
-    vtkCommand::ModifiedEvent, this, SLOT(hiddenColumnsChanged()), nullptr, 0.0,
-    Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -199,7 +194,11 @@ int pqSpreadSheetViewModel::columnCount(const QModelIndex&) const
 //-----------------------------------------------------------------------------
 int pqSpreadSheetViewModel::getFieldType() const
 {
-  return this->GetView()->GetFieldAssociation();
+  if (this->activeRepresentationProxy())
+  {
+    return vtkSMPropertyHelper(this->activeRepresentationProxy(), "FieldAssociation").GetAsInt();
+  }
+  return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -447,23 +446,63 @@ bool pqSpreadSheetViewModel::isSortable(int section)
 QVariant pqSpreadSheetViewModel::headerData(
   int section, Qt::Orientation orientation, int role /*=Qt::DisplayRole*/) const
 {
-  if (orientation == Qt::Horizontal)
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
   {
     // No need to get updated data, simply get the current data.
     vtkSpreadSheetView* view = this->Internal->VTKView;
     if (view->GetNumberOfColumns() > section)
     {
-      switch (role)
+      QString title = view->GetColumnName(section);
+      // Convert names of some standard arrays to user-friendly ones.
+      if (title == "vtkOriginalProcessIds")
       {
-        case Qt::DisplayRole:
-          return view->GetColumnLabel(section);
-        case SectionInternal:
-          return view->IsColumnInternal(section);
-        case SectionVisible:
-          return view->GetColumnVisibility(section);
+        title = "Process ID";
       }
+      else if (title == "vtkOriginalIndices")
+      {
+        switch (this->getFieldType())
+        {
+          case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+            title = "Point ID";
+            break;
+
+          case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+            title = "Cell ID";
+            break;
+
+          case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+            title = "Vertex ID";
+            break;
+
+          case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+            title = "Edge ID";
+            break;
+
+          case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+            title = "Row ID";
+            break;
+        }
+      }
+      else if (title == "vtkOriginalCellIds" && view->GetShowExtractedSelection())
+      {
+        title = "Cell ID";
+      }
+      else if (title == "vtkOriginalPointIds" && view->GetShowExtractedSelection())
+      {
+        title = "Point ID";
+      }
+      else if (title == "vtkOriginalRowIds" && view->GetShowExtractedSelection())
+      {
+        title = "Row ID";
+      }
+      else if (title == "vtkCompositeIndexArray")
+      {
+        title = "Block Number";
+      }
+
+      return QVariant(title);
     }
-    return QVariant();
+    return "__BUG__";
   }
   else if (orientation == Qt::Vertical && role == Qt::DisplayRole)
   {
@@ -471,6 +510,7 @@ QVariant pqSpreadSheetViewModel::headerData(
     QVariant rowNo = this->Superclass::headerData(section, orientation, role);
     return QVariant(rowNo.toUInt() - 1);
   }
+
   return this->Superclass::headerData(section, orientation, role);
 }
 
@@ -646,15 +686,33 @@ Qt::ItemFlags pqSpreadSheetViewModel::flags(const QModelIndex& idx) const
 bool pqSpreadSheetViewModel::setData(const QModelIndex&, const QVariant&, int)
 {
   // Do nothing, we are not supposed to change our data...
-  return false;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-void pqSpreadSheetViewModel::hiddenColumnsChanged()
+void pqSpreadSheetViewModel::clearVisible()
 {
-  const int numCols = this->columnCount();
-  if (numCols > 0)
+  this->Internal->ColumnVisibility.clear();
+  emit this->headerDataChanged(Qt::Horizontal, 0, this->columnCount());
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::setVisible(int section, bool visibility)
+{
+  while (this->Internal->ColumnVisibility.size() <= section)
   {
-    emit this->headerDataChanged(Qt::Horizontal, 0, this->columnCount() - 1);
+    this->Internal->ColumnVisibility.append(true);
   }
+  this->Internal->ColumnVisibility[section] = visibility;
+  emit this->headerDataChanged(Qt::Horizontal, section - 1, section);
+}
+
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewModel::isVisible(int section)
+{
+  if (this->Internal->ColumnVisibility.size() > section)
+  {
+    return this->Internal->ColumnVisibility.at(section);
+  }
+  return true;
 }

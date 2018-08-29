@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationComponentsModule.h"
 #include <QObject>
-#include <QScopedPointer> // for QScopedPointer
 
 class pqSpreadSheetView;
 class pqOutputPort;
@@ -50,37 +49,10 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqSpreadSheetViewDecorator : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
-  Q_PROPERTY(bool allowChangeOfSource READ allowChangeOfSource WRITE setAllowChangeOfSource);
-
-  //@{
-  /**
-   * There properties are connected to the corresponding ServerManager
-   * properties on the SpreadsheetView proxy.
-   */
-  Q_PROPERTY(
-    bool generateCellConnectivity READ generateCellConnectivity WRITE setGenerateCellConnectivity);
-  Q_PROPERTY(
-    bool showSelectedElementsOnly READ showSelectedElementsOnly WRITE setShowSelectedElementsOnly);
-  Q_PROPERTY(int fieldAssociation READ fieldAssociation WRITE setFieldAssociation);
-  //@}
-
+  Q_PROPERTY(bool allowChangeOfSource READ allowChangeOfSource WRITE setAllowChangeOfSource)
 public:
   pqSpreadSheetViewDecorator(pqSpreadSheetView* view);
   ~pqSpreadSheetViewDecorator() override;
-
-  //@{
-  /**
-   * These are linked to the corresponding properties on the SpreadsheetView
-   * proxy using a pqPropertyLinks instance.
-   */
-  bool generateCellConnectivity() const;
-  void setGenerateCellConnectivity(bool);
-  bool showSelectedElementsOnly() const;
-  void setShowSelectedElementsOnly(bool);
-  int fieldAssociation() const;
-  void setFieldAssociation(int);
-  //@}
-
   void setPrecision(int);
   void setFixedRepresentation(bool);
 
@@ -95,13 +67,14 @@ public:
   */
   void setAllowChangeOfSource(bool val);
 
-signals:
-  void uiModified();
-
 protected slots:
   void currentIndexChanged(pqOutputPort*);
   void showing(pqDataRepresentation*);
   void displayPrecisionChanged(int);
+  void showToggleColumnPopupMenu();
+  void resetColumnVisibility();
+  void updateColumnVisibility();
+  void toggleCellConnectivity();
   void toggleFixedRepresentation(bool);
 
 protected:
@@ -111,7 +84,7 @@ private:
   Q_DISABLE_COPY(pqSpreadSheetViewDecorator)
 
   class pqInternal;
-  QScopedPointer<pqInternal> Internal;
+  pqInternal* Internal;
 };
 
 #endif

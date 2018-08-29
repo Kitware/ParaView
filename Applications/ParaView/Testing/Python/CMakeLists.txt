@@ -72,8 +72,7 @@ paraview_add_test_python(
 )
 
 paraview_add_test_python(
-  NO_VALID NO_RT
-  ExportCSV.py
+  NO_VALID NO_OUTPUT NO_RT
   Plot3DReader.py
 )
 

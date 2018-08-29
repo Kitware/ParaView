@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkView.h"
 
 // Qt includes.
 #include <QList>
@@ -156,8 +155,7 @@ vtkSMViewProxy* pqView::getViewProxy() const
 //-----------------------------------------------------------------------------
 vtkView* pqView::getClientSideView() const
 {
-  auto vproxy = this->getViewProxy();
-  return vproxy ? vtkView::SafeDownCast(vproxy->GetClientSideObject()) : nullptr;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
