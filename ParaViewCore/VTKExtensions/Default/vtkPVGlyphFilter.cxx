@@ -373,8 +373,6 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
   this->Internals->Reset();
 
   vtkDataSet* ds = vtkDataSet::GetData(inputVector[0], 0);
-  std::cout << this->Controller->GetLocalProcessId() << ": " << ds->GetNumberOfPoints()
-            << std::endl;
   vtkCompositeDataSet* cds = vtkCompositeDataSet::GetData(inputVector[0], 0);
   if (ds)
   {
