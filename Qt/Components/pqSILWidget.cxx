@@ -31,9 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSILWidget.h"
 
-#include <QDebug>
-
 #include <QAction>
+#include <QDebug>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
@@ -88,6 +87,9 @@ pqSILWidget::pqSILWidget(const QString& activeCategory, QWidget* parentObject)
   // setup model
   this->ActiveModel = new pqProxySILModel(activeCategory, this);
   this->SortModel = new QSortFilterProxyModel(this);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+  this->SortModel->setRecursiveFilteringEnabled(true);
+#endif
   this->SortModel->setSourceModel(this->ActiveModel);
 }
 
@@ -137,6 +139,9 @@ void pqSILWidget::onModelReset()
   activeTree->expandAll();
   this->TabWidget->addTab(activeTree, this->ActiveCategory);
   new pqTreeViewSelectionHelper(activeTree);
+  // even for QT_VERSION < 5.10, we let filtering be enabled on the first widget
+  // since in most cases this will be a flat tree where filtering works fine
+  // even for older Qt versions without support for recursive filtering.
 
   int num_tabs = this->Model->rowCount();
   for (int cc = 0; cc < num_tabs; cc++)
@@ -155,10 +160,19 @@ void pqSILWidget::onModelReset()
     proxyModel->setSourceModel(this->Model);
 
     QSortFilterProxyModel* sortModel = new QSortFilterProxyModel(tree);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+    sortModel->setRecursiveFilteringEnabled(true);
+#endif
     sortModel->setSourceModel(proxyModel);
     tree->setModel(sortModel);
     tree->expandAll();
-    new pqTreeViewSelectionHelper(tree);
+
+    auto helper = new pqTreeViewSelectionHelper(tree);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 10, 0))
+    // disable filtering for older Qt version where recursive filtering
+    // on a tree is not supported.
+    helper->setFilterable(false);
+#endif
 
     this->TabWidget->addTab(tree, category);
   }

@@ -57,8 +57,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * pqArraySelectionWidget is based on a class known as pqExodusIIVariableSelectionWidget.
  * pqExodusIIVariableSelectionWidget, however was a pqTreeWidget subclass. This, however,
- * uses pqTreeView which is the recommended approach since it can better support improve
- * UX with dealing with large lists.
+ * uses pqTreeView which is the recommended approach since it provides a better user experience
+ * when dealing with large lists.
+ *
+ * @section ImprovingUserExperience Improving user experience
+ *
+ * To help the user with checking multiple items, filtering, and sorting, you
+ * may want to connect pqArraySelectionWidget with a pqTreeViewSelectionHelper.
+ *
  */
 class PQCOMPONENTS_EXPORT pqArraySelectionWidget : public pqTreeView
 {
@@ -101,6 +107,8 @@ private:
 
   class Model;
   friend class Model;
+
+  Model* realModel() const;
 };
 
 #endif

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqArrayStatusPropertyWidget.h"
 
 #include "pqArraySelectionWidget.h"
+#include "pqTreeViewSelectionHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProxy.h"
@@ -48,6 +49,9 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   selectorWidget->setHeaderLabel(smgroup->GetXMLLabel());
   selectorWidget->setMaximumRowCountBeforeScrolling(
     pqPropertyWidget::hintsWidgetHeightNumberOfRows(smgroup->GetHints()));
+
+  // add context menu and custom indicator for sorting and filtering.
+  new pqTreeViewSelectionHelper(selectorWidget);
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);

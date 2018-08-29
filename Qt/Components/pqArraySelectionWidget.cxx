@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QPointer>
 #include <QScopedValueRollback>
+#include <QSortFilterProxyModel>
 #include <QStandardItem>
 #include <QStandardItemModel>
 
@@ -366,12 +367,24 @@ pqArraySelectionWidget::pqArraySelectionWidget(QWidget* parentObject)
   this->header()->setObjectName("1QHeaderView0");
 
   auto mymodel = new pqArraySelectionWidget::Model(0, 1, this);
-  this->setModel(mymodel);
+  auto sortmodel = new QSortFilterProxyModel(this);
+  sortmodel->setSourceModel(mymodel);
+  this->setModel(sortmodel);
 }
 
 //-----------------------------------------------------------------------------
 pqArraySelectionWidget::~pqArraySelectionWidget()
 {
+}
+
+//-----------------------------------------------------------------------------
+pqArraySelectionWidget::Model* pqArraySelectionWidget::realModel() const
+{
+  if (auto sortmodel = qobject_cast<QSortFilterProxyModel*>(this->model()))
+  {
+    return dynamic_cast<pqArraySelectionWidget::Model*>(sortmodel->sourceModel());
+  }
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -392,7 +405,7 @@ void pqArraySelectionWidget::propertyChanged(const QString& pname)
 {
   Q_ASSERT(this->UpdatingProperty == false);
 
-  auto amodel = dynamic_cast<pqArraySelectionWidget::Model*>(this->model());
+  auto amodel = this->realModel();
   Q_ASSERT(amodel);
 
   QVariant value = this->property(pname.toLocal8Bit().data());
@@ -444,7 +457,7 @@ void pqArraySelectionWidget::updateProperty(const QString& pname, const QVariant
 //-----------------------------------------------------------------------------
 void pqArraySelectionWidget::setHeaderLabel(const QString& label)
 {
-  auto amodel = dynamic_cast<pqArraySelectionWidget::Model*>(this->model());
+  auto amodel = this->realModel();
   Q_ASSERT(amodel);
   amodel->setHeaderData(0, Qt::Horizontal, label, Qt::DisplayRole);
 }
@@ -452,7 +465,7 @@ void pqArraySelectionWidget::setHeaderLabel(const QString& label)
 //-----------------------------------------------------------------------------
 QString pqArraySelectionWidget::headerLabel() const
 {
-  auto amodel = dynamic_cast<const pqArraySelectionWidget::Model*>(this->model());
+  auto amodel = this->realModel();
   Q_ASSERT(amodel);
   return amodel->headerData(0, Qt::Horizontal, Qt::DisplayRole).toString();
 }

@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPoint> // for QPoint
 #include <QRect>  // for QRect
 
+#include <utility> // for std::pair
+#include <vector>  // for std::vector
+
 /**
  * @class pqHeaderView
  * @brief pqHeaderView extends QHeaderView to add support for
@@ -59,6 +62,7 @@ class PQWIDGETS_EXPORT pqHeaderView : public QHeaderView
 {
   Q_OBJECT
   typedef QHeaderView Superclass;
+  Q_PROPERTY(bool showCustomIndicator READ isCustomIndicatorShown WRITE setCustomIndicatorShown);
 
 public:
   pqHeaderView(Qt::Orientation orientation, QWidget* parent = nullptr);
@@ -74,8 +78,37 @@ public:
    */
   void setToggleCheckStateOnSectionClick(bool val) { this->ToggleCheckStateOnSectionClick = val; }
   bool toggleCheckStateOnSectionClick() const { return this->ToggleCheckStateOnSectionClick; }
-
   //@}
+
+  //@{
+  /**
+   * This property holds if a custom indicator is shown for sections. The custom
+   * indicator can be used to popup a custom menu or filtering options, for
+   * example. If enabled, all visible sections with non-empty header data get a
+   * custom indicator rendered.
+   *
+   * By default, this property is `false`.
+   */
+  bool isCustomIndicatorShown() const { return this->CustomIndicatorShown; }
+  void setCustomIndicatorShown(bool val);
+  //@}
+
+  //@{
+  /**
+   * When `showCustomIndicator` property is true, these are the icons
+   * rendered. Icons are rendered in order from right to left i.e. first added
+   * icon on the rightmost side and so on. The `role` is useful in
+   * distinguishing user clicks when the `customIndicatorClicked` signal is
+   * fired.
+   */
+  void addCustomIndicatorIcon(const QIcon& icon, const QString& role);
+  void removeCustomIndicatorIcon(const QString& role);
+  QIcon customIndicatorIcon(const QString& role) const;
+  //@}
+
+signals:
+  void customIndicatorClicked(int section, const QPoint& pt, const QString& role);
+
 protected:
   void paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const override;
   void mousePressEvent(QMouseEvent* event) override;
@@ -89,6 +122,12 @@ private:
   bool ToggleCheckStateOnSectionClick;
   QPoint PressPosition;
   mutable QRect CheckRect;
+
+  bool CustomIndicatorShown;
+
+  // we keep as a vector since order of addition of icons is important.
+  std::vector<std::pair<QIcon, QString> > CustomIndicatorIcons;
+  mutable std::vector<std::pair<QRect, QString> > CustomIndicatorRects;
 };
 
 #endif
