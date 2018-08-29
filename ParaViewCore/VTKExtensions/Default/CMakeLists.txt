@@ -56,6 +56,7 @@ set(Module_SRCS
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
   vtkHybridProbeFilter.cxx
+  vtkImageSimpleSource.cxx
   vtkIntegrateFlowThroughSurface.cxx
   vtkIntersectFragments.cxx
   vtkIsoVolume.cxx
