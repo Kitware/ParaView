@@ -496,4 +496,13 @@ def GetProxy(module, key):
             clip = module.__dict__[key]()
             clip.Invert = 0
             return clip
+    if version < 5.6:
+        if key == "Glyph":
+            # In PV 5.6, we replaced the Glyph filter with a new implementation that has a
+            # different set of properties. The previous implementation was renamed to
+            # GlyphLegacy.
+            print("Creating GlyphLegacy")
+            glyph = module.__dict__["GlyphLegacy"]()
+            print(glyph)
+            return glyph
     return module.__dict__[key]()
