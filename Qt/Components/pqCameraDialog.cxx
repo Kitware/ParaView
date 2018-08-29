@@ -239,6 +239,10 @@ pqCameraDialog::pqCameraDialog(QWidget* _p /*=null*/, Qt::WindowFlags f /*=0*/)
     this->Internal->elevationButton, SIGNAL(clicked()), this, SLOT(applyCameraElevation()));
   QObject::connect(
     this->Internal->azimuthButton, SIGNAL(clicked()), this, SLOT(applyCameraAzimuth()));
+  QObject::connect(
+    this->Internal->zoomInButton, SIGNAL(clicked()), this, SLOT(applyCameraZoomIn()));
+  QObject::connect(
+    this->Internal->zoomOutButton, SIGNAL(clicked()), this, SLOT(applyCameraZoomOut()));
 
   QObject::connect(this->Internal->saveCameraConfiguration, SIGNAL(clicked()), this,
     SLOT(saveCameraConfiguration()));
@@ -482,7 +486,7 @@ void pqCameraDialog::resetViewDirectionNegZ()
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double angle)
+void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double value)
 {
   if (this->Internal->RenderModule)
   {
@@ -495,16 +499,27 @@ void pqCameraDialog::adjustCamera(CameraAdjustmentType enType, double angle)
     }
     if (enType == pqCameraDialog::Roll)
     {
-      camera->Roll(angle);
+      camera->Roll(value);
     }
     else if (enType == pqCameraDialog::Elevation)
     {
-      RotateElevation(camera, angle);
+      RotateElevation(camera, value);
     }
     else if (enType == pqCameraDialog::Azimuth)
     {
-      camera->Azimuth(angle);
+      camera->Azimuth(value);
     }
+    else if (enType == pqCameraDialog::Zoom)
+    {
+      if (camera->GetParallelProjection())
+      {
+        camera->SetParallelScale(camera->GetParallelScale() / value);
+      }
+      else
+      {
+        camera->Dolly(value);
+      }
+    } // if (pqCameraDialog::Zoom)
     proxy->SynchronizeCameraProperties();
     this->Internal->RenderModule->render();
   }
@@ -526,6 +541,18 @@ void pqCameraDialog::applyCameraElevation()
 void pqCameraDialog::applyCameraAzimuth()
 {
   this->adjustCamera(pqCameraDialog::Azimuth, this->Internal->azimuthAngle->value());
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraZoomIn()
+{
+  this->adjustCamera(pqCameraDialog::Zoom, this->Internal->zoomFactor->value());
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCameraZoomOut()
+{
+  this->adjustCamera(pqCameraDialog::Zoom, 1.0 / this->Internal->zoomFactor->value());
 }
 
 //-----------------------------------------------------------------------------

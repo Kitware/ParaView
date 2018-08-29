@@ -113,6 +113,8 @@ private slots:
   void applyCameraRoll();
   void applyCameraElevation();
   void applyCameraAzimuth();
+  void applyCameraZoomIn();
+  void applyCameraZoomOut();
 
   void resetRotationCenterWithCamera();
 
@@ -130,9 +132,10 @@ private:
   {
     Roll = 0,
     Elevation,
-    Azimuth
+    Azimuth,
+    Zoom
   };
-  void adjustCamera(CameraAdjustmentType enType, double angle);
+  void adjustCamera(CameraAdjustmentType enType, double value);
 };
 
 #endif
