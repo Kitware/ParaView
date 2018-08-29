@@ -1,0 +1,442 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqCustomizeShortcutsDialog.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#include "pqCustomizeShortcutsDialog.h"
+
+#include "ui_pqCustomizeShortcutsDialog.h"
+
+#include "pqCoreUtilities.h"
+#include "pqSettings.h"
+
+#include <QAbstractItemModel>
+#include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
+
+namespace
+{
+
+class TreeItem
+{
+public:
+  explicit TreeItem(const QString& name, const QString& fullKey, bool isLeaf, QAction* action,
+    TreeItem* parentItem = nullptr)
+    : Name(name)
+    , FullKey(fullKey)
+    , Action(action)
+    , IsLeaf(isLeaf)
+    , ParentItem(parentItem)
+  {
+    if (action)
+    {
+      this->KeySequence = action->shortcut().toString();
+    }
+  }
+
+  ~TreeItem() { qDeleteAll(this->ChildItems); }
+
+  void appendChild(TreeItem* child) { this->ChildItems.append(child); }
+
+  TreeItem* child(int row) { return this->ChildItems[row]; }
+
+  int childCount() const { return this->ChildItems.size(); }
+
+  const QString& name() const { return this->Name; }
+
+  const QString& settingsKey() const { return this->FullKey; }
+
+  const QKeySequence keySequence() const { return this->KeySequence; }
+
+  void setKeySequence(const QKeySequence& shortcut)
+  {
+    this->KeySequence = shortcut.toString();
+    this->Action->setShortcut(shortcut);
+    pqSettings settings;
+    settings.setValue(settingsKey(), shortcut);
+  }
+
+  bool isLeaf() const { return this->IsLeaf; }
+
+  int row() const
+  {
+    if (this->ParentItem)
+    {
+      return this->ParentItem->ChildItems.indexOf(const_cast<TreeItem*>(this));
+    }
+    return 0;
+  }
+
+  TreeItem* parentItem() { return this->ParentItem; }
+
+  QKeySequence defaultKeySequence()
+  {
+    if (!this->Action)
+    {
+      return QKeySequence();
+    }
+    QVariant shortcut = this->Action->property("ParaViewDefaultKeySequence");
+    if (shortcut.isValid())
+    {
+      return shortcut.value<QKeySequence>();
+    }
+    return QKeySequence();
+  }
+
+private:
+  QList<TreeItem*> ChildItems;
+  QString Name;
+  QString FullKey;
+  QKeySequence KeySequence;
+  QPointer<QAction> Action;
+  bool IsLeaf;
+  TreeItem* ParentItem;
+};
+
+class pqCustomizeShortcutsModel : public QAbstractItemModel
+{
+  static void buildTree(TreeItem* root, const QList<QAction*>& actions, pqSettings& settings)
+  {
+    for (QAction* action : actions)
+    {
+      QString actionName = action->text();
+      if (actionName.isEmpty())
+      {
+        continue;
+      }
+      actionName = actionName.replace("&", "");
+      QString localSettingName = actionName.replace(" ", "");
+      QString settingsKey = QString("%1/%2").arg(settings.group()).arg(localSettingName);
+      if (action->menu())
+      {
+        if (actionName != "RecentFiles")
+        {
+          TreeItem* myItem = new TreeItem(actionName, settingsKey, false, action, root);
+          root->appendChild(myItem);
+          settings.beginGroup(localSettingName);
+          buildTree(myItem, action->menu()->actions(), settings);
+          settings.endGroup();
+        }
+      }
+      else
+      {
+        QString shortcut;
+        if (settings.contains(localSettingName))
+        {
+          shortcut = settings.value(localSettingName).toString();
+        }
+        TreeItem* myItem = new TreeItem(actionName, settingsKey, true, action, root);
+        root->appendChild(myItem);
+      }
+    }
+  }
+
+public:
+  pqCustomizeShortcutsModel(QObject* p)
+    : QAbstractItemModel(p)
+  {
+    pqSettings settings;
+    auto mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+    auto menuBar = mainWindow->menuBar();
+    TreeItem* treeItem = new TreeItem("", "", false, nullptr, nullptr);
+    settings.beginGroup("pqCustomShortcuts");
+    buildTree(treeItem, menuBar->actions(), settings);
+    settings.endGroup();
+    this->RootItem = treeItem;
+  }
+
+  ~pqCustomizeShortcutsModel() { delete this->RootItem; }
+
+  QModelIndex index(int row, int column, const QModelIndex& parentIndex) const override
+  {
+    if (!hasIndex(row, column, parentIndex))
+      return QModelIndex();
+
+    TreeItem* parentItem;
+
+    if (!parentIndex.isValid())
+    {
+      parentItem = this->RootItem;
+    }
+    else
+    {
+      parentItem = static_cast<TreeItem*>(parentIndex.internalPointer());
+    }
+
+    TreeItem* childItem = parentItem->child(row);
+    if (childItem)
+    {
+      return createIndex(row, column, childItem);
+    }
+    else
+    {
+      return QModelIndex();
+    }
+  }
+
+  QModelIndex parent(const QModelIndex& idx) const override
+  {
+    if (!idx.isValid())
+    {
+      return QModelIndex();
+    }
+
+    TreeItem* childItem = static_cast<TreeItem*>(idx.internalPointer());
+    TreeItem* parentItem = childItem->parentItem();
+
+    if (parentItem == this->RootItem)
+    {
+      return QModelIndex();
+    }
+    return createIndex(parentItem->row(), 0, parentItem);
+  }
+
+  int rowCount(const QModelIndex& parentIndex) const override
+  {
+    TreeItem* parentItem;
+    if (parentIndex.column() > 0)
+    {
+      return 0;
+    }
+
+    if (!parentIndex.isValid())
+    {
+      parentItem = this->RootItem;
+    }
+    else
+    {
+      parentItem = static_cast<TreeItem*>(parentIndex.internalPointer());
+    }
+    return parentItem->childCount();
+  }
+
+  int columnCount(const QModelIndex&) const override { return 2; }
+
+  QVariant headerData(
+    int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
+  {
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+    {
+      switch (section)
+      {
+        case 0:
+          return "Action";
+        case 1:
+          return "Shortcut";
+      }
+    }
+    return QVariant();
+  }
+
+  QVariant data(const QModelIndex& idx, int role) const override
+  {
+    if (!idx.isValid())
+    {
+      return QVariant();
+    }
+    if (role != Qt::DisplayRole)
+    {
+      return QVariant();
+    }
+    TreeItem* item = static_cast<TreeItem*>(idx.internalPointer());
+
+    switch (idx.column())
+    {
+      case 0:
+        return item->name();
+      case 1:
+        return item->keySequence();
+    }
+    return QVariant();
+  }
+
+  void setKeySequence(const QModelIndex& idx, const QKeySequence& shortcut)
+  {
+    if (!idx.isValid() || idx.column() != 1)
+    {
+      return;
+    }
+    TreeItem* item = static_cast<TreeItem*>(idx.internalPointer());
+    if (!item || !item->isLeaf())
+    {
+      return;
+    }
+    if (shortcut != item->keySequence())
+    {
+      item->setKeySequence(shortcut);
+      QVector<int> roles;
+      roles << Qt::DisplayRole;
+      emit dataChanged(idx, idx, roles);
+    }
+  }
+
+private:
+  TreeItem* RootItem;
+};
+}
+
+class pqCustomizeShortcutsDialog::pqInternals
+{
+public:
+  Ui::pqCustomizeShortcutsDialog Ui;
+  QPointer<pqCustomizeShortcutsModel> Model;
+
+  pqInternals(pqCustomizeShortcutsDialog* self)
+    : Model(new pqCustomizeShortcutsModel(self))
+  {
+    Ui.setupUi(self);
+    Ui.treeView->setModel(this->Model);
+    Ui.treeView->expandAll();
+    Ui.treeView->resizeColumnToContents(0);
+  }
+};
+
+pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
+  : Superclass(parentObject)
+  , Internals(new pqInternals(this))
+{
+  connect(this->Internals->Ui.keySequenceEdit, &QKeySequenceEdit::editingFinished, this,
+    &pqCustomizeShortcutsDialog::onEditingFinished);
+  connect(this->Internals->Ui.treeView->selectionModel(), &QItemSelectionModel::selectionChanged,
+    this, &pqCustomizeShortcutsDialog::onSelectionChanged);
+  connect(this->Internals->Ui.clearButton, &QAbstractButton::clicked, this,
+    &pqCustomizeShortcutsDialog::onClearShortcut);
+  connect(this->Internals->Ui.resetButton, &QAbstractButton::clicked, this,
+    &pqCustomizeShortcutsDialog::onResetShortcut);
+  connect(this->Internals->Ui.recordButton, &QAbstractButton::clicked, this,
+    [this]() { this->Internals->Ui.keySequenceEdit->setFocus(); });
+  this->setWindowTitle("Customize Shortcuts");
+  this->onSelectionChanged();
+}
+
+pqCustomizeShortcutsDialog::~pqCustomizeShortcutsDialog()
+{
+}
+
+void pqCustomizeShortcutsDialog::onEditingFinished()
+{
+  auto selectionModel = this->Internals->Ui.treeView->selectionModel();
+  auto selectedList = selectionModel->selectedRows(1);
+  if (selectedList.size() == 0)
+  {
+    return;
+  }
+  auto selected = selectedList[0];
+  if (!selected.isValid())
+  {
+    return;
+  }
+  this->Internals->Model->setKeySequence(
+    selected, this->Internals->Ui.keySequenceEdit->keySequence());
+  // Update Reset/Clear buttons' enabled state
+  this->onSelectionChanged();
+}
+
+void pqCustomizeShortcutsDialog::onSelectionChanged()
+{
+  auto setEnabled = [this](bool enable) {
+    this->Internals->Ui.recordButton->setEnabled(enable);
+    this->Internals->Ui.clearButton->setEnabled(enable);
+    this->Internals->Ui.resetButton->setEnabled(enable);
+    this->Internals->Ui.keySequenceEdit->setEnabled(enable);
+  };
+  auto selectionModel = this->Internals->Ui.treeView->selectionModel();
+  auto selectedList = selectionModel->selectedRows(1);
+  if (selectedList.size() == 0)
+  {
+    setEnabled(false);
+    return;
+  }
+  auto selected = selectedList[0];
+  if (!selected.isValid())
+  {
+    setEnabled(true);
+    return;
+  }
+  QString keySequence = this->Internals->Model->data(selected, Qt::DisplayRole).toString();
+  this->Internals->Ui.keySequenceEdit->setKeySequence(keySequence);
+  TreeItem* item = static_cast<TreeItem*>(selected.internalPointer());
+  setEnabled(item->isLeaf());
+  // If the item does not have a default keysequence, Reset and Clear do
+  // the same thing.  Disable Reset to avoid user confusion.
+  // Also, disable Reset if the KeySequence is already the default.
+  if (item->isLeaf())
+  {
+    if (item->defaultKeySequence() == QKeySequence() ||
+      item->defaultKeySequence() == item->keySequence())
+    {
+      this->Internals->Ui.resetButton->setEnabled(false);
+    }
+    if (item->keySequence() == QKeySequence())
+    {
+      this->Internals->Ui.clearButton->setEnabled(false);
+    }
+  }
+}
+
+void pqCustomizeShortcutsDialog::onClearShortcut()
+{
+  auto selectionModel = this->Internals->Ui.treeView->selectionModel();
+  auto selectedList = selectionModel->selectedRows(1);
+  if (selectedList.size() == 0)
+  {
+    return;
+  }
+  auto selected = selectedList[0];
+  if (!selected.isValid())
+  {
+    return;
+  }
+  this->Internals->Model->setKeySequence(selected, QKeySequence());
+  this->Internals->Ui.keySequenceEdit->setKeySequence(QKeySequence());
+  // Update Reset/Clear buttons' enabled state
+  this->onSelectionChanged();
+}
+
+void pqCustomizeShortcutsDialog::onResetShortcut()
+{
+  auto selectionModel = this->Internals->Ui.treeView->selectionModel();
+  auto selectedList = selectionModel->selectedRows(1);
+  if (selectedList.size() == 0)
+  {
+    return;
+  }
+  auto selected = selectedList[0];
+  if (!selected.isValid())
+  {
+    return;
+  }
+  TreeItem* item = static_cast<TreeItem*>(selected.internalPointer());
+  QKeySequence shortcut = item->defaultKeySequence();
+  this->Internals->Model->setKeySequence(selected, shortcut);
+  this->Internals->Ui.keySequenceEdit->setKeySequence(shortcut);
+  // Update Reset/Clear buttons' enabled state
+  this->onSelectionChanged();
+}

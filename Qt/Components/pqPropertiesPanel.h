@@ -118,6 +118,16 @@ public:
   */
   void updatePanel(pqOutputPort* port);
 
+  /**
+   * Returns true if there are changes to be applied.
+   */
+  bool canApply();
+
+  /**
+   * Returns true if there are changes to be reset.
+   */
+  bool canReset();
+
 public slots:
   /**
   * Apply the changes properties to the proxies.
@@ -236,6 +246,13 @@ signals:
   * This signal is emitted when the user clicks the delete button.
   */
   void deleteRequested(pqPipelineSource* source);
+
+  /**
+   * This signal is emitted when the apply button's enable state changes.
+   * This is intended for other controls that call apply on the panel so
+   * that they can be enabled/disabled correctly (i.e. menu items).
+   */
+  void applyEnableStateChanged();
 
 private slots:
   /**

@@ -49,6 +49,8 @@ set (Module_SRCS
   pqApplicationSettingsReaction.h
   pqApplyBehavior.cxx
   pqApplyBehavior.h
+  pqApplyPropertiesReaction.cxx
+  pqApplyPropertiesReaction.h
   pqAutoApplyReaction.cxx
   pqAutoApplyReaction.h
   pqAutoLoadPluginXMLBehavior.cxx
@@ -122,6 +124,12 @@ set (Module_SRCS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
   pqCreateCustomFilterReaction.h
+  pqCustomShortcutBehavior.cxx
+  pqCustomShortcutBehavior.h
+  pqCustomizeShortcutsReaction.cxx
+  pqCustomizeShortcutsReaction.h
+  pqCustomizeShortcutsDialog.cxx
+  pqCustomizeShortcutsDialog.h
   pqCustomViewpointsToolbar.cxx
   pqCustomViewpointsToolbar.h
   pqCylinderPropertyWidget.cxx
@@ -395,6 +403,9 @@ set (Module_MOC_HDRS
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
+  pqCustomShortcutBehavior.h
+  pqCustomizeShortcutsReaction.h
+  pqCustomizeShortcutsDialog.h
   pqCustomViewpointsToolbar.h
   pqCylinderPropertyWidget.h
   pqDataQueryReaction.h
@@ -553,6 +564,7 @@ set (Module_UI_FILES
   Resources/UI/pqColorToolbar.ui
   Resources/UI/pqCustomResolutionDialog.ui
   Resources/UI/pqCylinderPropertyWidget.ui
+  Resources/UI/pqCustomizeShortcutsDialog.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui

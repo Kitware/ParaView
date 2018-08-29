@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTimeToolbar.h"
 #include "pqApplicationCore.h"
 #include "pqApplicationSettingsReaction.h"
+#include "pqApplyPropertiesReaction.h"
 #include "pqAxesToolbar.h"
 #include "pqCameraLinkReaction.h"
 #include "pqCameraToolbar.h"
@@ -56,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCopyReaction.h"
 #include "pqCreateCustomFilterReaction.h"
 #include "pqCustomViewpointsToolbar.h"
+#include "pqCustomizeShortcutsReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqDesktopServicesReaction.h"
@@ -78,6 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
 #include "pqPVApplicationCore.h"
+#include "pqPropertiesPanel.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqRecentFilesMenu.h"
 #include "pqReloadFilesReaction.h"
@@ -159,7 +162,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
+void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* propertiesPanel)
 {
   QString objectName = menu.objectName();
   Ui::pqEditMenuBuilder ui;
@@ -174,6 +177,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqChangePipelineInputReaction(ui.actionChangeInput);
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
+  ui.actionDelete->setShortcut(QKeySequence(Qt::ALT + Qt::Key_D));
   new pqDeleteReaction(ui.actionDelete_All, true);
   new pqShowHideAllReaction(ui.actionShow_All, pqShowHideAllReaction::ActionType::Show);
   new pqShowHideAllReaction(ui.actionHide_All, pqShowHideAllReaction::ActionType::Hide);
@@ -183,6 +187,18 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqDataQueryReaction(ui.actionQuery);
   new pqResetDefaultSettingsReaction(ui.actionResetDefaultSettings);
   new pqSetMainWindowTitleReaction(ui.actionSetMainWindowTitle);
+
+  if (propertiesPanel)
+  {
+    QAction* applyAction = new QAction(QIcon(":/pqWidgets/Icons/pqUpdate16.png"), "Apply", &menu);
+    applyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_A));
+    QAction* resetAction = new QAction(QIcon(":/pqWidgets/Icons/pqCancel16.png"), "Reset", &menu);
+    resetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_R));
+    menu.insertAction(ui.actionDelete, applyAction);
+    menu.insertAction(ui.actionDelete, resetAction);
+    new pqApplyPropertiesReaction(propertiesPanel, applyAction, true);
+    new pqApplyPropertiesReaction(propertiesPanel, resetAction, false);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -254,6 +270,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   QAction* manageBookmarksAction = menu.addAction("Manage Bookmarks...")
     << pqSetName("actionManage_Bookmarks");
   new pqManageBookmarksReaction(manageBookmarksAction, mgr);
+
+  new pqCustomizeShortcutsReaction(
+    menu.addAction("Customize Shortcuts...") << pqSetName("actionCustomize"));
 
   menu.addSeparator(); // --------------------------------------------------
 

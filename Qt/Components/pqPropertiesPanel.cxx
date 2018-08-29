@@ -342,6 +342,20 @@ pqPropertiesPanel::~pqPropertiesPanel()
 }
 
 //-----------------------------------------------------------------------------
+bool pqPropertiesPanel::canApply()
+{
+  Ui::propertiesPanel& ui = this->Internals->Ui;
+  return ui.Accept->isEnabled();
+}
+
+//-----------------------------------------------------------------------------
+bool pqPropertiesPanel::canReset()
+{
+  Ui::propertiesPanel& ui = this->Internals->Ui;
+  return ui.Reset->isEnabled();
+}
+
+//-----------------------------------------------------------------------------
 void pqPropertiesPanel::setPanelMode(int val)
 {
   if (this->PanelMode == val)
@@ -732,6 +746,7 @@ void pqPropertiesPanel::updateButtonState()
     this->Internals->ReceivedChangeAvailable = false;
   }
 
+  emit this->applyEnableStateChanged();
   this->updateButtonEnableState();
 }
 
