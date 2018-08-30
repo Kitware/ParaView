@@ -7658,7 +7658,7 @@ source.</Documentation>
         <ArrayListDomain attribute_type="Scalars"
                          input_domain_name="scale_array"
                          name="array_list"
-                         none_string="None">
+                         none_string="No scale array">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -7752,7 +7752,7 @@ selected.
                                          mode="visibility"
                                          property="ScaleArray"
                                          index="4"
-                                         value="None"
+                                         value="No scale array"
                                          inverse="1" />
                 <PropertyWidgetDecorator type="ShowWidgetDecorator">
                   <Property name="RescaleGlyphs" function="boolean" />
@@ -7813,7 +7813,7 @@ will map to this glyph size while the lower data value will map to zero glyph si
         <ArrayListDomain attribute_type="Vectors"
                          input_domain_name="vector_array"
                          name="array_list"
-                         none_string="None">
+                         none_string="No orientation array">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -8333,7 +8333,7 @@ source.</Documentation>
         <ArrayListDomain attribute_type="Scalars"
                          input_domain_name="scale_array"
                          name="array_list"
-                         none_string="None">
+                         none_string="No scale array">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
@@ -8427,7 +8427,7 @@ selected.
                                          mode="visibility"
                                          property="ScaleArray"
                                          index="4"
-                                         value="None"
+                                         value="No scale array"
                                          inverse="1" />
                 <PropertyWidgetDecorator type="ShowWidgetDecorator">
                   <Property name="RescaleGlyphs" function="boolean" />
@@ -8488,7 +8488,7 @@ will map to this glyph size while the lower data value will map to zero glyph si
         <ArrayListDomain attribute_type="Vectors"
                          input_domain_name="vector_array"
                          name="array_list"
-                         none_string="None">
+                         none_string="No orientation array">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
