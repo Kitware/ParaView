@@ -7723,10 +7723,20 @@ If off, the glyph scale factor will be taken directly from the Scale Array, if o
 selected.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="VectorScaleMode"
+                                       value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="VectorScaleMode"
-                                   value="0" />
+                                   property="ScaleArray"
+                                   number_of_components="3"
+                                   index="4"
+                                   inverse="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetGlyphDataRange"
@@ -7758,10 +7768,18 @@ selected.
                   <Property name="RescaleGlyphs" function="boolean" />
                 </PropertyWidgetDecorator>
               </Expression>
-              <PropertyWidgetDecorator type="GenericDecorator"
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                     mode="visibility"
+                                     property="VectorScaleMode"
+                                     value="0" />
+                <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="VectorScaleMode"
-                                   value="0" />
+                                   property="ScaleArray"
+                                   number_of_components="3"
+                                   index="4"
+                                   inverse="1" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -7792,10 +7810,18 @@ will map to this glyph size while the lower data value will map to zero glyph si
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="VectorScaleMode"
-                                       value="0" />
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                     mode="visibility"
+                                     property="VectorScaleMode"
+                                     value="0" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ScaleArray"
+                                   number_of_components="3"
+                                   index="4"
+                                   inverse="1" />
+              </Expression>
               <PropertyWidgetDecorator type="ShowWidgetDecorator">
                 <Property name="RescaleGlyphs" function="boolean" />
               </PropertyWidgetDecorator>
@@ -7911,7 +7937,7 @@ Every Nth Point.
       <PropertyGroup label="Glyph Data Range">
         <Property name="GlyphDataRange" />
       </PropertyGroup>
-      <PropertyGroup label="Glyph Size Range">
+      <PropertyGroup label="Glyph Size">
         <Property name="MaximumGlyphSize" />
       </PropertyGroup>
       <PropertyGroup label="Orientation">
@@ -8398,10 +8424,20 @@ If off, the glyph scale factor will be taken directly from the Scale Array, if o
 selected.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="VectorScaleMode"
+                                       value="0" />
+              <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="VectorScaleMode"
-                                   value="0" />
+                                   property="ScaleArray"
+                                   number_of_components="3"
+                                   index="4"
+                                   inverse="1" />
+            </Expression>
+          </PropertyWidgetDecorator>
         </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetGlyphDataRange"
@@ -8433,10 +8469,18 @@ selected.
                   <Property name="RescaleGlyphs" function="boolean" />
                 </PropertyWidgetDecorator>
               </Expression>
-              <PropertyWidgetDecorator type="GenericDecorator"
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                     mode="visibility"
+                                     property="VectorScaleMode"
+                                     value="0" />
+                <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
-                                   property="VectorScaleMode"
-                                   value="0" />
+                                   property="ScaleArray"
+                                   number_of_components="3"
+                                   index="4"
+                                   inverse="1" />
+              </Expression>
             </Expression>
           </PropertyWidgetDecorator>
         </Hints>
@@ -8467,10 +8511,18 @@ will map to this glyph size while the lower data value will map to zero glyph si
         <Hints>
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="VectorScaleMode"
-                                       value="0" />
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                     mode="visibility"
+                                     property="VectorScaleMode"
+                                     value="0" />
+                <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ScaleArray"
+                                   number_of_components="3"
+                                   index="4"
+                                   inverse="1" />
+              </Expression>
               <PropertyWidgetDecorator type="ShowWidgetDecorator">
                 <Property name="RescaleGlyphs" function="boolean" />
               </PropertyWidgetDecorator>
@@ -8586,7 +8638,7 @@ Every Nth Point.
       <PropertyGroup label="Glyph Data Range">
         <Property name="GlyphDataRange" />
       </PropertyGroup>
-      <PropertyGroup label="Glyph Size Range">
+      <PropertyGroup label="Glyph Size">
         <Property name="MaximumGlyphSize" />
       </PropertyGroup>
       <PropertyGroup label="Orientation">
