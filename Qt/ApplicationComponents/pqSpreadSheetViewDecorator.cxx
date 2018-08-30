@@ -250,11 +250,9 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view)
     }
   }
 
-  auto callback = [this](int) { emit this->uiModified(); };
-  QObject::connect(
-    internal.Attribute, QOverload<int>::of(&QComboBox::currentIndexChanged), callback);
-  QObject::connect(internal.ToggleCellConnectivity, &QToolButton::toggled, callback);
-  QObject::connect(internal.SelectionOnly, &QToolButton::toggled, callback);
+  this->connect(internal.Attribute, SIGNAL(currentIndexChanged(int)), SIGNAL(uiModified()));
+  this->connect(internal.ToggleCellConnectivity, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
+  this->connect(internal.SelectionOnly, SIGNAL(toggled(bool)), SIGNAL(uiModified()));
 
   internal.Links.setUseUncheckedProperties(true);
   QObject::connect(&internal.Links, &pqPropertyLinks::qtWidgetChanged, [proxy, &internal]() {
