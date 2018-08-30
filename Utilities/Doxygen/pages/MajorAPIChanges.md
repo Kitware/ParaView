@@ -4,6 +4,16 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.6
+--------------
+
+###vtkPVDataInformation and vtkTable###
+
+Previously, `vtkPVDataInformation` would accumulate row and column counts when
+gathering information from a vtkTable in the `vtkPVDataInformation::NumberOfCells`
+variable. This was incorrect and PraView 5.6 fixes this. For `vtkTable`,
+`vtkPVDataInformation::GetNumberOfCells` will now return 0.
+
 Changes in 5.5
 --------------
 
