@@ -595,9 +595,8 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
 
   vtkTimerLog::MarkStartEvent(use_lod ? "LowRes Data Migration" : "FullRes Data Migration");
 
-  bool using_remote_rendering = use_lod
-    ? this->RenderView->GetUseDistributedRenderingForInteractiveRender()
-    : this->RenderView->GetUseDistributedRenderingForStillRender();
+  bool using_remote_rendering = use_lod ? this->RenderView->GetUseDistributedRenderingForLODRender()
+                                        : this->RenderView->GetUseDistributedRenderingForRender();
   int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
 
   for (unsigned int cc = 0; cc < size; cc += 2)
@@ -864,7 +863,7 @@ void vtkPVDataDeliveryManager::DeliverStreamedPieces(unsigned int size, unsigned
   // with only delivering pieces for streaming.
   assert(size % 2 == 0);
 
-  bool using_remote_rendering = this->RenderView->GetUseDistributedRenderingForStillRender();
+  bool using_remote_rendering = this->RenderView->GetUseDistributedRenderingForRender();
   int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
 
   for (unsigned int cc = 0; cc < size; cc += 2)

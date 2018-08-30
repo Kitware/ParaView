@@ -186,8 +186,8 @@ int vtkPVGridAxes3DRepresentation::ProcessViewRequest(
     vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(this->GetView());
     if (rview)
     {
-      forceOpaque = (rview->GetUseDistributedRenderingForInteractiveRender() ||
-                      rview->GetUseDistributedRenderingForStillRender()) &&
+      forceOpaque = (rview->GetUseDistributedRenderingForLODRender() ||
+                      rview->GetUseDistributedRenderingForRender()) &&
         !rview->GetUseOrderedCompositing();
     }
     this->GridAxes->SetForceOpaque(forceOpaque);

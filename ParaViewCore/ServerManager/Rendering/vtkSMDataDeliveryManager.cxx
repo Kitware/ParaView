@@ -58,9 +58,8 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
 
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->ViewProxy->GetClientSideObject());
   bool use_lod = interactive && view->GetUseLODForInteractiveRender();
-  bool use_distributed_rendering = interactive
-    ? view->GetUseDistributedRenderingForInteractiveRender()
-    : view->GetUseDistributedRenderingForStillRender();
+  bool use_distributed_rendering = use_lod ? view->GetUseDistributedRenderingForRender()
+                                           : view->GetUseDistributedRenderingForLODRender();
 
   if (this->PreviousForceDataDistributionMode != view->GetForceDataDistributionMode())
   {
