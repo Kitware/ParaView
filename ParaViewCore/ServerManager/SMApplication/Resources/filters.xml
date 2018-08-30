@@ -7692,7 +7692,6 @@ the vector magnitude. **Scale by Components** scales glyphs by each vector compo
 that component represents, e.g., the x-direction is scaled by component 0, the y-direction is
 scaled by component 1, and so on.
         </Documentation>
-        <!-- TODO - add hint to hide when not scaling by vector. -->
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
@@ -8368,12 +8367,12 @@ the vector magnitude. **Scale by Components** scales glyphs by each vector compo
 that component represents, e.g., the x-direction is scaled by component 0, the y-direction is
 scaled by component 1, and so on.
         </Documentation>
-        <!-- TODO - add hint to hide when not scaling by vector. -->
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="ScaleArray"
-                                   association_type="vector" />
+                                   number_of_components="3"
+                                   index="4" />
         </Hints>
       </IntVectorProperty>
 
