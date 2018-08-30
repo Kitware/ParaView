@@ -146,13 +146,14 @@ public:
         return false;
       }
 
+      // Array components could be 0 if arrayName is the NoneString
+      int arrayComponents = 0;
       vtkPVArrayInformation* arrayInfo = dataInfo->GetArrayInformation(arrayName, arrayAssociation);
-      if (!arrayInfo)
+      if (arrayInfo)
       {
-        return false;
+        arrayComponents = arrayInfo->GetNumberOfComponents();
       }
 
-      int arrayComponents = arrayInfo->GetNumberOfComponents();
       bool status = arrayComponents == this->NumberOfComponents;
       return this->Inverse ? !status : status;
     }
