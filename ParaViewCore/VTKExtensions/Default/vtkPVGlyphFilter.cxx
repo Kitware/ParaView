@@ -757,8 +757,12 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
       scalex = scaley = scalez = this->MaximumGlyphSize;
     }
 
-    // Clamp and scale glyph if a scale array is set
-    if (scaleArray && this->RescaleGlyphs && this->VectorScaleMode != SCALE_BY_COMPONENTS)
+    // Clamp and scale glyph if a scale array is set and the RescaleGlyphs option is on.
+    // If the scaleArray is a vector and the vector scale mode is not set to SCALE_BY_COMPONENTS,
+    // also rescale (by magnitude). However, if SCALE_BY_COMPONENTS is on and the scaleArray is
+    // a scalar, go ahead and rescale the array.
+    if (scaleArray && this->RescaleGlyphs &&
+      (this->VectorScaleMode != SCALE_BY_COMPONENTS || scaleArray->GetNumberOfComponents() == 1))
     {
       vtkMath::ClampValue(&scalex, dataRange);
       vtkMath::ClampValue(&scaley, dataRange);
