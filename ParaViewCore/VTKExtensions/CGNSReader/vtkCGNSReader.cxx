@@ -14,10 +14,12 @@
 =========================================================================*/
 //  Copyright 2013-2014 Mickael Philit.
 
+#ifdef _WINDOWS
 // the 4211 warning is emitted when building this file with Visual Studio 2013
 // for an SDK-specific file (sys/stat.inl:57) => disable warning
 #pragma warning(push)
 #pragma warning(disable : 4211)
+#endif
 
 #include "vtkCGNSReader.h"
 #include "vtkCGNSReaderInternal.h" // For parsing information request
@@ -3416,4 +3418,6 @@ void vtkCGNSReader::LoadMeshOff()
 
 #endif // !defined(VTK_LEGACY_REMOVE)
 //==============================================================================
+#ifdef _WINDOWS
 #pragma warning(pop)
+#endif

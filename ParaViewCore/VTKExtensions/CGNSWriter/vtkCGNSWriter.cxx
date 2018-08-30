@@ -552,7 +552,7 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
     {
       Flatten(nested, o2d, o3d, zoneOffset + 1);
     }
-    else
+    else if (block)
     {
       o3d.push_back(entry(block, zonename));
     }
@@ -592,8 +592,15 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiBlock(
         continue;
       }
 
-      vtkErrorWithObjectMacro(
-        nullptr, << "Writing of block type " << e.obj->GetDataObjectType() << " not supported.");
+      if (e.obj)
+      {
+        vtkErrorWithObjectMacro(
+          nullptr, << "Writing of block type '" << e.obj->GetClassName() << "' not supported.");
+      }
+      else
+      {
+        vtkWarningWithObjectMacro(nullptr, << "Writing of unsupported block type skipped.");
+      }
     }
   }
 
