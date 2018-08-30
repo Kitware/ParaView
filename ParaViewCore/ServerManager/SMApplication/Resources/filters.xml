@@ -7693,6 +7693,13 @@ that component represents, e.g., the x-direction is scaled by component 0, the y
 scaled by component 1, and so on.
         </Documentation>
         <!-- TODO - add hint to hide when not scaling by vector. -->
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ScaleArray"
+                                   number_of_components="3"
+                                   index="4" />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty information_only="1"
@@ -8362,6 +8369,12 @@ that component represents, e.g., the x-direction is scaled by component 0, the y
 scaled by component 1, and so on.
         </Documentation>
         <!-- TODO - add hint to hide when not scaling by vector. -->
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ScaleArray"
+                                   association_type="vector" />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty information_only="1"
