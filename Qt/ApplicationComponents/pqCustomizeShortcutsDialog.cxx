@@ -137,7 +137,8 @@ class pqCustomizeShortcutsModel : public QAbstractItemModel
       QString settingsKey = QString("%1/%2").arg(settings.group()).arg(localSettingName);
       if (action->menu())
       {
-        if (actionName != "RecentFiles")
+        if (actionName != "RecentFiles" && actionName != "Filters" && actionName != "Sources" &&
+          (!(root->name() == "Macros" && (actionName == "Edit..." || actionName == "Delete..."))))
         {
           TreeItem* myItem = new TreeItem(actionName, settingsKey, false, action, root);
           root->appendChild(myItem);
