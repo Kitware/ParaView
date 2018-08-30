@@ -43,6 +43,8 @@ public:
   pqCustomizeShortcutsDialog(QWidget* p = nullptr);
   ~pqCustomizeShortcutsDialog();
 
+  static QString getActionName(QAction* action);
+
 private slots:
   void onEditingFinished();
   void onSelectionChanged();

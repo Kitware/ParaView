@@ -127,7 +127,7 @@ class pqCustomizeShortcutsModel : public QAbstractItemModel
   {
     for (QAction* action : actions)
     {
-      QString actionName = action->text();
+      QString actionName = pqCustomizeShortcutsDialog::getActionName(action);
       if (actionName.isEmpty())
       {
         continue;
@@ -489,4 +489,25 @@ void pqCustomizeShortcutsDialog::onResetShortcut()
   this->Internals->Ui.keySequenceEdit->setKeySequence(shortcut);
   // Update Reset/Clear buttons' enabled state
   this->onSelectionChanged();
+}
+
+QString pqCustomizeShortcutsDialog::getActionName(QAction* action)
+{
+  QString objectName = action->objectName();
+  if (objectName == "actionEditUndo")
+  {
+    return "Undo";
+  }
+  else if (objectName == "actionEditRedo")
+  {
+    return "Redo";
+  }
+  else if (objectName == "actionToolsStartStopTrace")
+  {
+    return "StartStopTrace";
+  }
+  else
+  {
+    return action->text();
+  }
 }
