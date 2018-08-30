@@ -108,6 +108,12 @@ public:
    */
   vtkSMProperty* GetProperty();
 
+  /**
+     * Helper method to get vtkPVDataInformation from input proxy connected to the
+     * required property with the given function.
+     */
+  virtual vtkPVDataInformation* GetInputDataInformation(const char* function, int index = 0);
+
 protected:
   vtkSMDomain();
   ~vtkSMDomain() override;
@@ -171,12 +177,6 @@ protected:
    * required property.
    */
   void AddRequiredProperty(vtkSMProperty* prop, const char* function);
-
-  /**
-   * Helper method to get vtkPVDataInformation from input proxy connected to the
-   * required property with the given function.
-   */
-  virtual vtkPVDataInformation* GetInputDataInformation(const char* function, int index = 0);
 
   //@{
   /**
