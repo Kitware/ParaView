@@ -314,6 +314,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     {
       pqDiscreteDoubleWidget* widget = new pqDiscreteDoubleWidget(this);
       widget->setObjectName("DiscreteDoubleWidget");
+      updatePrecisionNotationWidgetFromSettings<pqDiscreteDoubleWidget>(widget);
       widget->setValues(discrete->GetValues());
 
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
