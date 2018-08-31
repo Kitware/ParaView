@@ -1243,7 +1243,7 @@ if (TARGET paraview)
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.xml)
     
     # Test backwards compatibility for Glyph filter change in ParaView 5.6
-    add_pv_test("pv", "_DISABLE_C"
+    add_pv_test("pv" "_DISABLE_C"
       COMMAND --client $<TARGET_FILE:paraview>
               --enable-bt
               -dr
