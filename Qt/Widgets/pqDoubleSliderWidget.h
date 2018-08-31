@@ -31,6 +31,8 @@ class PQWIDGETS_EXPORT pqDoubleSliderWidget : public QWidget
   Q_PROPERTY(double value READ value WRITE setValue USER true)
   Q_PROPERTY(pqDoubleLineEdit::RealNumberNotation notation READ notation WRITE setNotation)
   Q_PROPERTY(int precision READ precision WRITE setPrecision)
+  Q_PROPERTY(bool widgetSettingsApplicationManaged READ widgetSettingsApplicationManaged WRITE
+      setWidgetSettingsApplicationManaged)
 
 public:
   pqDoubleSliderWidget(QWidget* parent = NULL);
@@ -52,6 +54,13 @@ public:
    * \sa setPrecision()
    */
   int precision() const;
+
+  /**
+   * Return if the widget settings are expected to be managed by the application.
+   * True by default.
+   * \sa setWidgetSettingsApplicationManaged()
+   */
+  bool widgetSettingsApplicationManaged() const;
 
 signals:
   /**
@@ -84,6 +93,12 @@ public slots:
    * \sa precision()
    */
   void setPrecision(int precision);
+
+  /**
+   * Set if widget settings are expected to be managed by the application.
+   * \sa widgetSettingsApplicationManaged()
+   */
+  void setWidgetSettingsApplicationManaged(bool value);
 
 protected:
   virtual int valueToSliderPos(double val);

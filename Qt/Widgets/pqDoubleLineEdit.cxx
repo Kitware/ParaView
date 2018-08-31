@@ -61,6 +61,7 @@ QDoubleValidator::Notation toValidatorNotation(pqDoubleLineEdit::RealNumberNotat
 pqDoubleLineEdit::pqDoubleLineEdit(QWidget* _parent)
   : Superclass(_parent)
   , Precision(2)
+  , WidgetSettingsApplicationManaged(true)
 {
   this->DoubleValidator = new QDoubleValidator(this);
   this->setValidator(this->DoubleValidator);
@@ -222,4 +223,16 @@ void pqDoubleLineEdit::onEditingFinished()
 void pqDoubleLineEdit::triggerFullPrecisionTextChangedAndEditingFinished()
 {
   emit fullPrecisionTextChangedAndEditingFinished();
+}
+
+//-----------------------------------------------------------------------------
+bool pqDoubleLineEdit::widgetSettingsApplicationManaged() const
+{
+  return this->WidgetSettingsApplicationManaged;
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleLineEdit::setWidgetSettingsApplicationManaged(bool value)
+{
+  this->WidgetSettingsApplicationManaged = value;
 }

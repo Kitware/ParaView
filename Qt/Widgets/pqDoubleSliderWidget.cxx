@@ -221,3 +221,15 @@ void pqDoubleSliderWidget::setPrecision(int _precision)
 {
   this->DoubleLineEdit->setPrecision(_precision);
 }
+
+//-----------------------------------------------------------------------------
+bool pqDoubleSliderWidget::widgetSettingsApplicationManaged() const
+{
+  return this->DoubleLineEdit->widgetSettingsApplicationManaged();
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleSliderWidget::setWidgetSettingsApplicationManaged(bool value)
+{
+  this->DoubleLineEdit->setWidgetSettingsApplicationManaged(value);
+}

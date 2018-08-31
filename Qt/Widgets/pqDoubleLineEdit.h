@@ -54,6 +54,8 @@ class PQWIDGETS_EXPORT pqDoubleLineEdit : public QLineEdit
   Q_PROPERTY(QString fullPrecisionText READ fullPrecisionText WRITE setFullPrecisionText)
   Q_PROPERTY(RealNumberNotation notation READ notation WRITE setNotation)
   Q_PROPERTY(int precision READ precision WRITE setPrecision)
+  Q_PROPERTY(bool widgetSettingsApplicationManaged READ widgetSettingsApplicationManaged WRITE
+      setWidgetSettingsApplicationManaged)
 
   typedef pqDoubleLineEdit Self;
   typedef QLineEdit Superclass;
@@ -102,6 +104,13 @@ public:
    */
   const QDoubleValidator* doubleValidator() const;
 
+  /**
+   * Return if the widget settings are expected to be managed by the application.
+   * True by default.
+   * \sa setWidgetSettingsApplicationManaged()
+   */
+  bool widgetSettingsApplicationManaged() const;
+
 public slots:
   /**
    * Set the real number in standard notation.
@@ -123,6 +132,12 @@ public slots:
    * \sa precision()
    */
   void setPrecision(int precision);
+
+  /**
+   * Set if widget settings are expected to be managed by the application.
+   * \sa widgetSettingsApplicationManaged()
+   */
+  void setWidgetSettingsApplicationManaged(bool value);
 
 signals:
   /**
@@ -165,6 +180,7 @@ private:
   RealNumberNotation Notation;
   QDoubleValidator* DoubleValidator;
   int Precision;
+  bool WidgetSettingsApplicationManaged;
 };
 
 #endif
