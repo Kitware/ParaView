@@ -696,6 +696,21 @@ def GetViewProperties(view=None):
     GetDisplayProperties()."""
     return GetActiveView()
 
+# -----------------------------------------------------------------------------
+def LoadPalette(paletteName):
+    """Load a color palette to override the default foreground and background
+    colors used by ParaView views.  The current global palette's colors are set
+    to the colors in the loaded palette."""
+    pxm = servermanager.ProxyManager()
+    palette = pxm.GetProxy("global_properties", "ColorPalette")
+    prototype = pxm.GetPrototypeProxy("palettes", paletteName)
+
+    if palette is None or prototype is None:
+        return
+
+    palette.Copy(prototype)
+    palette.UpdateVTKObjects()
+
 #==============================================================================
 # ServerManager methods
 #==============================================================================
