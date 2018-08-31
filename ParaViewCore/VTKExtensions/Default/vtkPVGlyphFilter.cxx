@@ -15,12 +15,12 @@
 #include "vtkPVGlyphFilter.h"
 
 // VTK includes
-#include "vtkAppendPolyData.h"
 #include "vtkBoundingBox.h"
 #include "vtkCellCenters.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataSet.h"
+#include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMinimalStandardRandomSequence.h"
@@ -33,6 +33,7 @@
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTransform.h"
 #include "vtkTuple.h"
 #include "vtkUniformGrid.h"
 
@@ -226,9 +227,14 @@ public:
 
 vtkStandardNewMacro(vtkPVGlyphFilter);
 vtkCxxSetObjectMacro(vtkPVGlyphFilter, Controller, vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkPVGlyphFilter, SourceTransform, vtkTransform);
 //-----------------------------------------------------------------------------
 vtkPVGlyphFilter::vtkPVGlyphFilter()
-  : GlyphMode(vtkPVGlyphFilter::ALL_POINTS)
+  : VectorScaleMode(SCALE_BY_MAGNITUDE)
+  , SourceTransform(nullptr)
+  , MaximumGlyphSize(1.0)
+  , RescaleGlyphs(true)
+  , GlyphMode(ALL_POINTS)
   , MaximumNumberOfSamplePoints(5000)
   , Seed(1)
   , Stride(1)
@@ -236,29 +242,79 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
   , Internals(new vtkPVGlyphFilter::vtkInternals())
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());
+  this->SetNumberOfInputPorts(2);
+  this->GlyphDataRange[0] = VTK_DOUBLE_MAX;
+  this->GlyphDataRange[1] = -VTK_DOUBLE_MAX;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVGlyphFilter::~vtkPVGlyphFilter()
 {
-  this->SetController(NULL);
+  this->SetController(nullptr);
+  this->SetSourceTransform(nullptr);
   delete this->Internals;
+}
+
+//----------------------------------------------------------------------------
+// Specify a source object at a specified table location.
+void vtkPVGlyphFilter::SetSourceConnection(int id, vtkAlgorithmOutput* algOutput)
+{
+  if (id < 0)
+  {
+    vtkErrorMacro("Bad index " << id << " for source.");
+    return;
+  }
+
+  int numConnections = this->GetNumberOfInputConnections(1);
+  if (id < numConnections)
+  {
+    this->SetNthInputConnection(1, id, algOutput);
+  }
+  else if (id == numConnections && algOutput)
+  {
+    this->AddInputConnection(1, algOutput);
+  }
+  else if (algOutput)
+  {
+    vtkWarningMacro("The source id provided is larger than the maximum "
+                    "source id, using "
+      << numConnections << " instead.");
+    this->AddInputConnection(1, algOutput);
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkMTimeType vtkPVGlyphFilter::GetMTime()
+{
+  vtkMTimeType mTime = this->Superclass::GetMTime();
+  vtkMTimeType time;
+  if (this->SourceTransform != nullptr)
+  {
+    time = this->SourceTransform->GetMTime();
+    mTime = (time > mTime ? time : mTime);
+  }
+  return mTime;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVGlyphFilter::FillInputPortInformation(int port, vtkInformation* info)
 {
-  if (!this->Superclass::FillInputPortInformation(port, info))
-  {
-    return 0;
-  }
-
   if (port == 0)
   {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
     // we can handle composite datasets.
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+    return 1;
   }
-  return 1;
+  else if (port == 1)
+  {
+    info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
+    info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+    return 1;
+  }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -393,79 +449,69 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 }
 
 //-----------------------------------------------------------------------------
+int vtkPVGlyphFilter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+{
+  // get the info objects
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation* sourceInfo = inputVector[1]->GetInformationObject(0);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  if (sourceInfo)
+  {
+    sourceInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), 0);
+    sourceInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), 1);
+    sourceInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 0);
+  }
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
 int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
 {
-  return (this->Superclass::IsPointVisible(ds, ptId) != 0) &&
-    (this->Internals->IsPointVisible(ds, ptId, this));
+  return this->Internals->IsPointVisible(ds, ptId, this);
 }
 
 //-----------------------------------------------------------------------------
 bool vtkPVGlyphFilter::IsInputArrayToProcessValid(vtkDataSet* input)
 {
-  // confirm that both scalars and vectors are being used by the Glyph filter,
-  // otherwise, the mismatch in array association for the two is not an issue.
-  if (!this->NeedsScalars() || !this->NeedsVectors())
+  vtkDataArray* scaleArray = this->GetInputArrayToProcess(0, input);
+  vtkDataArray* orientationArray = this->GetInputArrayToProcess(1, input);
+  int scaleArrayAssociation = this->GetInputArrayAssociation(0, input);
+  int orientationArrayAssociation = this->GetInputArrayAssociation(1, input);
+  if (scaleArrayAssociation != orientationArrayAssociation && scaleArray && orientationArray)
   {
-    return true;
-  }
-
-  vtkDataArray* inSScalars = this->GetInputArrayToProcess(0, input);
-  vtkDataArray* inVectors = this->GetInputArrayToProcess(1, input);
-  int inSScalarsAssociation = this->GetInputArrayAssociation(0, input);
-  int inVectorsAssociation = this->GetInputArrayAssociation(1, input);
-  if (inSScalarsAssociation != inVectorsAssociation && inSScalars && inVectors)
-  {
-    std::string inSScalarsType =
-      (inSScalarsAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS ? "point" : "cell");
-    std::string inVectorsType =
-      (inVectorsAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS ? "point" : "cell");
+    std::string scaleArrayType =
+      (scaleArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS ? "point" : "cell");
+    std::string orientationArrayType =
+      (orientationArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS ? "point" : "cell");
     vtkWarningMacro(<< "Mismatched attributes:\n"
-                    << inSScalars->GetName() << " is a " << inSScalarsType << " attribute whereas "
-                    << inVectors->GetName() << " is a " << inVectorsType << " attribute.");
+                    << scaleArray->GetName() << " is a " << scaleArrayType << " attribute whereas "
+                    << orientationArray->GetName() << " is a " << orientationArrayType
+                    << " attribute.");
     return false;
   }
 
   return true;
 }
 
-//-----------------------------------------------------------------------------
-bool vtkPVGlyphFilter::NeedsScalars()
+//----------------------------------------------------------------------------
+vtkPolyData* vtkPVGlyphFilter::GetSource(int idx, vtkInformationVector* sourceInfo)
 {
-  if (this->ScaleMode == VTK_SCALE_BY_SCALAR)
+  vtkInformation* info = sourceInfo->GetInformationObject(idx);
+  if (!info)
   {
-    return true;
+    return nullptr;
   }
-  if (this->ColorMode == VTK_COLOR_BY_SCALAR)
-  {
-    return true;
-  }
-  if (this->IndexMode == VTK_INDEXING_BY_SCALAR)
-  {
-    return true;
-  }
-  return false;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkPVGlyphFilter::NeedsVectors()
-{
-  if (this->ScaleMode == VTK_SCALE_BY_VECTOR || this->ScaleMode == VTK_SCALE_BY_VECTORCOMPONENTS)
-  {
-    return true;
-  }
-  if (this->ColorMode == VTK_COLOR_BY_VECTOR)
-  {
-    return true;
-  }
-  if (this->VectorMode == VTK_USE_VECTOR)
-  {
-    return true;
-  }
-  if (this->IndexMode == VTK_INDEXING_BY_VECTOR)
-  {
-    return true;
-  }
-  return false;
+  return vtkPolyData::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT()));
 }
 
 //-----------------------------------------------------------------------------
@@ -490,6 +536,373 @@ bool vtkPVGlyphFilter::ExecuteWithCellCenters(
   vtkDataArray* inVectors = input->GetPointData()->GetArray(
     this->GetInputArrayInformation(1)->Get(vtkDataObject::FIELD_NAME()));
   return this->Execute(input, sourceVector, output, inSScalars, inVectors);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGlyphFilter::Execute(
+  vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output)
+{
+  vtkDataArray* scaleArray = this->GetInputArrayToProcess(0, input);
+  vtkDataArray* orientArray = this->GetInputArrayToProcess(1, input);
+  return this->Execute(input, sourceVector, output, scaleArray, orientArray);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVector,
+  vtkPolyData* output, vtkDataArray* scaleArray, vtkDataArray* orientArray)
+{
+  assert(input && output);
+  if (input == nullptr || output == nullptr)
+  {
+    // nothing to do.
+    return true;
+  }
+
+  if (this->GlyphDataRange[0] > this->GlyphDataRange[1])
+  {
+    vtkErrorMacro(
+      "First element in GlyphDataRange must be less than or equal to the second element.");
+    return false;
+  }
+
+  if (orientArray && orientArray->GetNumberOfComponents() > 3)
+  {
+    vtkErrorMacro(<< "vtkDataArray " << orientArray->GetName() << " has more than 3 components.\n");
+    return false;
+  }
+
+  vtkDebugMacro(<< "Generating glyphs");
+
+  auto pts = vtkSmartPointer<vtkIdList>::New();
+  pts->Allocate(VTK_CELL_SIZE);
+
+  unsigned char* inGhostLevels = nullptr;
+  vtkDataArray* temp = nullptr;
+  auto pd = input->GetPointData();
+  if (pd)
+  {
+    temp = pd->GetArray(vtkDataSetAttributes::GhostArrayName());
+  }
+  if ((!temp) || (temp->GetDataType() != VTK_UNSIGNED_CHAR) || (temp->GetNumberOfComponents() != 1))
+  {
+    vtkDebugMacro("No appropriate ghost levels field available.");
+  }
+  else
+  {
+    inGhostLevels = static_cast<vtkUnsignedCharArray*>(temp)->GetPointer(0);
+  }
+
+  vtkIdType numPts = input->GetNumberOfPoints();
+  if (numPts < 1)
+  {
+    vtkDebugMacro(<< "No points to glyph!");
+    return 1;
+  }
+
+  double dataRange[2] = { 0.0, 1.0 };
+  if (scaleArray && this->GlyphDataRange[0] != this->GlyphDataRange[1])
+  {
+    dataRange[0] = this->GlyphDataRange[0];
+    dataRange[1] = this->GlyphDataRange[1];
+  }
+  else
+  {
+    dataRange[0] = this->GlyphDataRange[1] - DBL_EPSILON;
+    dataRange[1] = this->GlyphDataRange[1];
+  }
+
+  double den = dataRange[1] - dataRange[0];
+  if (den == 0.0)
+  {
+    den = 1.0;
+  }
+
+  // Allocate storage for output PolyData
+  vtkPointData* outputPD = output->GetPointData();
+  outputPD->CopyVectorsOff();
+  outputPD->CopyNormalsOff();
+  outputPD->CopyTCoordsOff();
+
+  vtkSmartPointer<vtkPolyData> source = this->GetSource(0, sourceVector);
+  if (source == nullptr)
+  {
+    vtkNew<vtkPolyData> defaultSource;
+    defaultSource->Allocate();
+    vtkNew<vtkPoints> defaultPoints;
+    defaultPoints->Allocate(6);
+    defaultPoints->InsertNextPoint(0, 0, 0);
+    defaultPoints->InsertNextPoint(1, 0, 0);
+    vtkIdType defaultPointIds[2];
+    defaultPointIds[0] = 0;
+    defaultPointIds[1] = 1;
+    defaultSource->SetPoints(defaultPoints);
+    defaultSource->InsertNextCell(VTK_LINE, 2, defaultPointIds);
+    source = defaultSource;
+  }
+
+  auto sourcePts = source->GetPoints();
+  vtkIdType numSourcePts = sourcePts->GetNumberOfPoints();
+  vtkIdType numSourceCells = source->GetNumberOfCells();
+
+  vtkDataArray* sourceNormals = source->GetPointData()->GetNormals();
+
+  // Prepare to copy output.
+  pd = input->GetPointData();
+  outputPD->CopyAllocate(pd, numPts * numSourcePts);
+
+  vtkNew<vtkIdList> srcPointIdList;
+  srcPointIdList->SetNumberOfIds(numSourcePts);
+  vtkNew<vtkIdList> dstPointIdList;
+  dstPointIdList->SetNumberOfIds(numSourcePts);
+  vtkNew<vtkIdList> srcCellIdList;
+  srcCellIdList->SetNumberOfIds(numSourceCells);
+  vtkNew<vtkIdList> dstCellIdList;
+  dstCellIdList->SetNumberOfIds(numSourceCells);
+
+  auto newPts = vtkSmartPointer<vtkPoints>::New();
+
+  // Set the desired precision for the points in the output.
+  if (this->OutputPointsPrecision == vtkAlgorithm::DEFAULT_PRECISION)
+  {
+    newPts->SetDataType(VTK_FLOAT);
+  }
+  else if (this->OutputPointsPrecision == vtkAlgorithm::SINGLE_PRECISION)
+  {
+    newPts->SetDataType(VTK_FLOAT);
+  }
+  else if (this->OutputPointsPrecision == vtkAlgorithm::DOUBLE_PRECISION)
+  {
+    newPts->SetDataType(VTK_DOUBLE);
+  }
+
+  newPts->Allocate(numPts * numSourcePts);
+
+  vtkSmartPointer<vtkFloatArray> newNormals;
+  if (sourceNormals)
+  {
+    newNormals.TakeReference(vtkFloatArray::New());
+    newNormals->SetNumberOfComponents(3);
+    newNormals->Allocate(3 * numPts * numSourcePts);
+    newNormals->SetName("Normals");
+  }
+
+  // Setting up for calls to PolyData::InsertNextCell()
+  output->Allocate(source, 3 * numPts * numSourceCells, numPts * numSourceCells);
+
+  vtkSmartPointer<vtkPoints> transformedSourcePts = vtkSmartPointer<vtkPoints>::New();
+  transformedSourcePts->SetDataTypeToDouble();
+  transformedSourcePts->Allocate(numSourcePts);
+
+  // Traverse all Input points, transforming Source points and copying
+  // point attributes.
+  auto trans = vtkSmartPointer<vtkTransform>::New();
+  vtkNew<vtkIdList> pointIdList;
+  vtkIdType ptIncr = 0;
+  vtkIdType cellIncr = 0;
+  for (vtkIdType inPtId = 0; inPtId < numPts; inPtId++)
+  {
+    double scalex(1.0), scaley(1.0), scalez(1.0);
+    if (!(inPtId % 10000))
+    {
+      this->UpdateProgress(static_cast<double>(inPtId) / numPts);
+      if (this->GetAbortExecute())
+      {
+        break;
+      }
+    }
+
+    // Get the scalar and vector data
+    if (scaleArray)
+    {
+      if (scaleArray->GetNumberOfComponents() == 1)
+      {
+        scalex = scaley = scalez = scaleArray->GetComponent(inPtId, 0);
+      }
+      else
+      {
+        // Consider the vector scaling mode
+        if (scaleArray->GetNumberOfComponents() == 2)
+        {
+          double* vec2 = scaleArray->GetTuple(inPtId);
+          if (this->VectorScaleMode == SCALE_BY_MAGNITUDE)
+          {
+            scalex = scaley = scalez = vtkMath::Norm2D(vec2);
+          }
+          else if (this->VectorScaleMode == SCALE_BY_COMPONENTS)
+          {
+            scalex = vec2[0];
+            scaley = vec2[1];
+            // leave scalez alone for 2D
+          }
+        }
+        else if (scaleArray->GetNumberOfComponents() == 3)
+        {
+          double* vec3 = scaleArray->GetTuple(inPtId);
+          if (this->VectorScaleMode == SCALE_BY_MAGNITUDE)
+          {
+            scalex = scaley = scalez = vtkMath::Norm(vec3);
+          }
+          else
+          {
+            scalex = vec3[0];
+            scaley = vec3[1];
+            scalez = vec3[2];
+          }
+        }
+      }
+    }
+    else
+    {
+      // If not scaling by array, set the glyph to the maximum glyph size
+      scalex = scaley = scalez = this->MaximumGlyphSize;
+    }
+
+    // Clamp and scale glyph if a scale array is set and the RescaleGlyphs option is on.
+    // If the scaleArray is a vector and the vector scale mode is not set to SCALE_BY_COMPONENTS,
+    // also rescale (by magnitude). However, if SCALE_BY_COMPONENTS is on and the scaleArray is
+    // a scalar, go ahead and rescale the array.
+    if (scaleArray && this->RescaleGlyphs &&
+      (this->VectorScaleMode != SCALE_BY_COMPONENTS || scaleArray->GetNumberOfComponents() == 1))
+    {
+      vtkMath::ClampValue(&scalex, dataRange);
+      vtkMath::ClampValue(&scaley, dataRange);
+      vtkMath::ClampValue(&scalez, dataRange);
+      scalex = (scalex - dataRange[0]) / den;
+      scaley = (scaley - dataRange[0]) / den;
+      scalez = (scalez - dataRange[0]) / den;
+      double multiplier = this->MaximumGlyphSize;
+      scalex = scalex * multiplier;
+      scaley = scaley * multiplier;
+      scalez = scalez * multiplier;
+    }
+
+    // Check ghost points.
+    // If we are processing a piece, we do not want to duplicate
+    // glyphs on the borders.
+    if (inGhostLevels && inGhostLevels[inPtId] & vtkDataSetAttributes::DUPLICATEPOINT)
+    {
+      continue;
+    }
+
+    // this is used to respect blanking specified on uniform grids.
+    vtkUniformGrid* inputUG = vtkUniformGrid::SafeDownCast(input);
+    if (inputUG && !inputUG->IsPointVisible(inPtId))
+    {
+      // input is a vtkUniformGrid and the current point is blanked. Don't glyph
+      // it.
+      continue;
+    }
+
+    if (!this->IsPointVisible(input, inPtId))
+    {
+      continue;
+    }
+
+    // Now begin copying/transforming glyph
+    trans->Identity();
+
+    // Copy all topology (transformation independent)
+    for (vtkIdType cellId = 0; cellId < numSourceCells; cellId++)
+    {
+      source->GetCellPoints(cellId, pointIdList);
+      int npts = pointIdList->GetNumberOfIds();
+      pts->Reset();
+      for (vtkIdType i = 0; i < npts; i++)
+      {
+        pts->InsertId(i, pointIdList->GetId(i) + ptIncr);
+      }
+      output->InsertNextCell(source->GetCellType(cellId), pts);
+    }
+
+    // translate Source to Input point
+    double x[3];
+    input->GetPoint(inPtId, x);
+    trans->Translate(x[0], x[1], x[2]);
+
+    if (orientArray)
+    {
+      double v[3] = { 0.0 };
+      orientArray->GetTuple(inPtId, v);
+      double vMag = vtkMath::Norm(v);
+      if (vMag > 0.0)
+      {
+        // if there is no y or z component
+        if (v[1] == 0.0 && v[2] == 0.0)
+        {
+          if (v[0] < 0) // just flip x if we need to
+          {
+            trans->RotateWXYZ(180.0, 0, 1, 0);
+          }
+        }
+        else
+        {
+          double vNew[3];
+          vNew[0] = (v[0] + vMag) / 2.0;
+          vNew[1] = v[1] / 2.0;
+          vNew[2] = v[2] / 2.0;
+          trans->RotateWXYZ(180.0, vNew[0], vNew[1], vNew[2]);
+        }
+      }
+    }
+
+    // scale data if appropriate
+    if (scalex == 0.0)
+    {
+      scalex = 1.0e-10;
+    }
+    if (scaley == 0.0)
+    {
+      scaley = 1.0e-10;
+    }
+    if (scalez == 0.0)
+    {
+      scalez = 1.0e-10;
+    }
+    trans->Scale(scalex, scaley, scalez);
+
+    // multiply points and normals by resulting matrix
+    if (this->SourceTransform)
+    {
+      transformedSourcePts->Reset();
+      this->SourceTransform->TransformPoints(sourcePts, transformedSourcePts);
+      trans->TransformPoints(transformedSourcePts, newPts);
+    }
+    else
+    {
+      trans->TransformPoints(sourcePts, newPts);
+    }
+
+    if (newNormals.GetPointer())
+    {
+      trans->TransformNormals(sourceNormals, newNormals);
+    }
+
+    // Copy point data from source (if possible)
+    if (pd)
+    {
+      for (vtkIdType i = 0; i < numSourcePts; ++i)
+      {
+        srcPointIdList->SetId(i, inPtId);
+        dstPointIdList->SetId(i, ptIncr + i);
+      }
+      outputPD->CopyData(pd, srcPointIdList, dstPointIdList);
+    }
+
+    ptIncr += numSourcePts;
+    cellIncr += numSourceCells;
+  }
+
+  if (newNormals.GetPointer())
+  {
+    outputPD->SetNormals(newNormals);
+  }
+
+  // Update ourselves and release memory
+  //
+  output->SetPoints(newPts);
+  output->Squeeze();
+
+  return true;
 }
 
 //-----------------------------------------------------------------------------

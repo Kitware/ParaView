@@ -1241,6 +1241,17 @@ if (TARGET paraview)
               --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.xml)
+    
+    # Test backwards compatibility for Glyph filter change in ParaView 5.6
+    add_pv_test("pv" "_DISABLE_C"
+      COMMAND --client $<TARGET_FILE:paraview>
+              --enable-bt
+              -dr
+              --state=${CMAKE_CURRENT_SOURCE_DIR}/Glyph56State.py
+              --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Glyph56State.xml
+    )
   endif()
 
   #----------------------------------------------------------------------

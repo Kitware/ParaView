@@ -199,6 +199,7 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
   QPixmap globalPixmap(":/pqWidgets/Icons/pqGlobalData16.png");
   QPixmap rowPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png");
   QPixmap edgePixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png");
+  QPixmap nonePixmap(":/pqWidgets/Icons/pqCancel32.png");
 
   vtkSMArrayListDomain* ald =
     vtkSMArrayListDomain::SafeDownCast(this->Property->GetDomain("array_list"));
@@ -253,6 +254,12 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
     if (array.second)
     {
       arrayName += " (partial)";
+    }
+
+    // Do not show an icon for the none string
+    if (arrayName == ald->GetNoneString())
+    {
+      pix = &nonePixmap;
     }
 
     if (pix)

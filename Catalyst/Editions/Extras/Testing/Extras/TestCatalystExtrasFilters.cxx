@@ -41,7 +41,8 @@ int main(int argc, char* argv[])
   }
 
   static const char* const filters[] = { "PVExtractSelection", "ExtractHistogram", "Glyph",
-    "WarpScalar", "WarpVector", "IntegrateAttributes", "DataSetSurfaceFilter", NULL };
+    "GlyphLegacy", "WarpScalar", "WarpVector", "IntegrateAttributes", "DataSetSurfaceFilter",
+    NULL };
 
   const char* const* name = &filters[0];
 
