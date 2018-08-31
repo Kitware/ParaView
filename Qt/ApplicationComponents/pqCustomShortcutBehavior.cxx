@@ -57,7 +57,7 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings& settings)
   {
     QString actionName = pqCustomizeShortcutsDialog::getActionName(action);
     actionName = actionName.replace("&", "");
-    actionName = actionName.replace(" ", "");
+    actionName = actionName.replace(" ", "_");
     if (action->menu())
     {
       auto menu = action->menu();

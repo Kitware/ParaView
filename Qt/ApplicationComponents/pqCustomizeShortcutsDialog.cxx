@@ -133,7 +133,7 @@ class pqCustomizeShortcutsModel : public QAbstractItemModel
         continue;
       }
       actionName = actionName.replace("&", "");
-      QString localSettingName = actionName.replace(" ", "");
+      QString localSettingName = actionName.replace(" ", "_");
       QString settingsKey = QString("%1/%2").arg(settings.group()).arg(localSettingName);
       if (action->menu())
       {
@@ -272,7 +272,11 @@ public:
     switch (idx.column())
     {
       case 0:
-        return item->name();
+      {
+        QString result = item->name();
+        result.replace("_", " ");
+        return result;
+      }
       case 1:
         return item->keySequence();
     }
