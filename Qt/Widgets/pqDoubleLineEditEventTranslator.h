@@ -54,7 +54,7 @@ public:
    * Overridden to handle events on QColorDialog.
    */
   using Superclass::translateEvent;
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
 
 private:
   Q_DISABLE_COPY(pqDoubleLineEditEventTranslator);
