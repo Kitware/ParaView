@@ -514,7 +514,6 @@ public:
     vtkExtentTranslator* translator, const int whole_extents[6], const double origin[3],
     const double spacing[3]);
   static void SetOrderedCompositingInformation(vtkInformation* info, const double bounds[6]);
-  void ClearOrderedCompositingInformation();
   //@}
 
   //@{

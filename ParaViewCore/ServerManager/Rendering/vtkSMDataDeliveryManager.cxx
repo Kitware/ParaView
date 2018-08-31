@@ -31,7 +31,6 @@
 vtkStandardNewMacro(vtkSMDataDeliveryManager);
 //----------------------------------------------------------------------------
 vtkSMDataDeliveryManager::vtkSMDataDeliveryManager()
-  : PreviousForceDataDistributionMode(-1)
 
 {
 }
@@ -57,54 +56,35 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   assert(this->ViewProxy != NULL);
 
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->ViewProxy->GetClientSideObject());
-  bool use_lod = interactive && view->GetUseLODForInteractiveRender();
-  bool use_distributed_rendering = use_lod ? view->GetUseDistributedRenderingForRender()
-                                           : view->GetUseDistributedRenderingForLODRender();
+  const bool use_lod = interactive && view->GetUseLODForInteractiveRender();
+  const bool use_distributed_rendering = use_lod ? view->GetUseDistributedRenderingForLODRender()
+                                                 : view->GetUseDistributedRenderingForRender();
 
-  if (this->PreviousForceDataDistributionMode != view->GetForceDataDistributionMode())
+  const int data_distribution_mode = view->GetDataDistributionMode(use_distributed_rendering);
+  vtkMTimeType update_ts = view->GetUpdateTimeStamp();
+
+  // note: this will create new vtkTimeStamp, if needed.
+  vtkTimeStamp& timeStamp = this->DeliveryTimestamps[data_distribution_mode];
+  if (timeStamp > update_ts)
   {
-    // if distribution mode is forced and different from previous,
-    // there's no guarantee what it will be and which nodes will have geometry.
-    // So we simply clear delivery timestamps to do deliveries with a clean
-    // slate.
-    this->PreviousForceDataDistributionMode = view->GetForceDataDistributionMode();
-    for (int cc = 0; cc < 4; ++cc)
+    // we have delivered the data since the last update on this view for the
+    // chosen data delivery mode. No delivery needs to be done at this time.
+    return;
+  }
+
+  // Get a list of representations for which we need to delivery data.
+  std::vector<unsigned int> keys_to_deliver;
+  {
+    vtkTimerLogScope logscope(
+      use_lod ? "check for data delivery (use_lod: 1)" : "check for delivery (use_lod: 0)");
+    if (!view->GetDeliveryManager()->NeedsDelivery(timeStamp, keys_to_deliver, interactive))
     {
-      this->DeliveryTimestamps[cc] = vtkTimeStamp();
+      timeStamp.Modified();
+      return;
     }
   }
 
-  vtkMTimeType update_ts = view->GetUpdateTimeStamp();
-  int delivery_type = LOCAL_RENDERING_AND_FULL_RES;
-  if (!use_lod && use_distributed_rendering)
-  {
-    delivery_type = REMOTE_RENDERING_AND_FULL_RES;
-  }
-  else if (use_lod && !use_distributed_rendering)
-  {
-    delivery_type = LOCAL_RENDERING_AND_LOW_RES;
-  }
-  else if (use_lod && use_distributed_rendering)
-  {
-    delivery_type = REMOTE_RENDERING_AND_LOW_RES;
-  }
-
-  vtkTimeStamp& timeStamp = this->DeliveryTimestamps[delivery_type];
-  if (timeStamp > update_ts)
-  {
-    // we delivered the data since the update. Nothing delivery to be done.
-    return;
-  }
-
-  std::vector<unsigned int> keys_to_deliver;
-  if (!view->GetDeliveryManager()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))
-  {
-    timeStamp.Modified();
-    return;
-  }
-
-  // cout << "Request Delivery: " <<  keys_to_deliver.size() << endl;
-  vtkTimerLog::MarkStartEvent("vtkSMDataDeliveryManager: Deliver Geometry");
+  vtkTimerLogScope logscope("do data delivery");
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this->ViewProxy) << "Deliver"
          << static_cast<int>(use_lod) << static_cast<unsigned int>(keys_to_deliver.size())
@@ -113,7 +93,6 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
          << vtkClientServerStream::End;
   this->ViewProxy->GetSession()->ExecuteStream(this->ViewProxy->GetLocation(), stream, false);
   timeStamp.Modified();
-  vtkTimerLog::MarkEndEvent("vtkSMDataDeliveryManager: Deliver Geometry");
 }
 
 //----------------------------------------------------------------------------

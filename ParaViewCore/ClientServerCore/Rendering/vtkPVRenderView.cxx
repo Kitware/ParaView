@@ -1433,23 +1433,45 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     ? this->GetUseDistributedRenderingForLODRender()
     : this->GetUseDistributedRenderingForRender();
 
-  if (this->GetUseOrderedCompositing())
+  const bool use_ordered_compositing = this->GetUseOrderedCompositing();
+
+  vtkTimerLog::FormatAndMarkEvent(
+    "Render (use_lod: %d), (use_distributed_rendering: %d), (use_ordered_compositing: %d)",
+    use_lod_rendering, use_distributed_rendering, use_ordered_compositing);
+
+  // If ordered compositing is needed, we have two options: either we're
+  // supposed to (i) build a KdTree and redistribute data or we are expected to (ii) use
+  // a custom partition provided via `vtkPartitionOrder` built using local data
+  // bounds and not bother redistributing data at all. Let's determine which
+  // path we're expected to take and do work accordingly.
+  if (use_ordered_compositing)
   {
-    if (this->PartitionOrdering->GetImplementation() == NULL ||
-      this->PartitionOrdering->GetImplementation()->IsA("vtkPKdTree"))
+    auto poImpl = this->PartitionOrdering->GetImplementation();
+    if (poImpl == nullptr || vtkPKdTree::SafeDownCast(poImpl) != nullptr)
     {
+      vtkTimerLog::FormatAndMarkEvent(
+        "Using ordered compositing w/ data redistribution, if needed");
+      // not using a custom (bounds-based ordering) i.e. we use in path (i). Let
+      // the delivery manager redistrbute data as it deems necessary.
       this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(use_lod_rendering);
       this->PartitionOrdering->SetImplementation(this->Internals->DeliveryManager->GetKdTree());
     }
     else
     {
+      vtkTimerLog::FormatAndMarkEvent("Using ordered compositing with w/o data redistribution");
+      // using custom rendering ordering without any data redistribution i.e.
+      // path (ii).
+
+      // clear off redistributed data.
       this->Internals->DeliveryManager->ClearRedistributedData(use_lod_rendering);
     }
+    // tell `this->SynchronizedRenderers` who to order the ranks when doing
+    // parallel rendering.
     this->SynchronizedRenderers->SetPartitionOrdering(this->PartitionOrdering.GetPointer());
   }
   else
   {
-    this->SynchronizedRenderers->SetPartitionOrdering(NULL);
+    this->SynchronizedRenderers->SetPartitionOrdering(nullptr);
   }
 
   // enable render empty images if it was requested
@@ -1757,12 +1779,6 @@ void vtkPVRenderView::SetOrderedCompositingInformation(vtkInformation* info, con
   vtkNew<vtkPartitionOrdering> partitionOrdering;
   partitionOrdering->Construct(bounds);
   view->PartitionOrdering->SetImplementation(partitionOrdering.GetPointer());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::ClearOrderedCompositingInformation()
-{
-  this->PartitionOrdering->SetImplementation(NULL);
 }
 
 //----------------------------------------------------------------------------
