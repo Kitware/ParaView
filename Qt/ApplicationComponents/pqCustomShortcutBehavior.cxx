@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCustomShortcutBehavior.h"
 
+#include "pqCustomizeShortcutsDialog.h"
 #include "pqSettings.h"
 
 #include <QAction>
@@ -54,9 +55,9 @@ void loadShortcuts(const QList<QAction*>& actions, pqSettings& settings)
 {
   for (QAction* action : actions)
   {
-    QString actionName = action->text();
+    QString actionName = pqCustomizeShortcutsDialog::getActionName(action);
     actionName = actionName.replace("&", "");
-    actionName = actionName.replace(" ", "");
+    actionName = actionName.replace(" ", "_");
     if (action->menu())
     {
       auto menu = action->menu();

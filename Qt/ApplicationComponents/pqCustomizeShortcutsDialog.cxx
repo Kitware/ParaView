@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QMenu>
 #include <QMenuBar>
+#include <QSortFilterProxyModel>
 
 namespace
 {
@@ -126,17 +127,18 @@ class pqCustomizeShortcutsModel : public QAbstractItemModel
   {
     for (QAction* action : actions)
     {
-      QString actionName = action->text();
+      QString actionName = pqCustomizeShortcutsDialog::getActionName(action);
       if (actionName.isEmpty())
       {
         continue;
       }
       actionName = actionName.replace("&", "");
-      QString localSettingName = actionName.replace(" ", "");
+      QString localSettingName = actionName.replace(" ", "_");
       QString settingsKey = QString("%1/%2").arg(settings.group()).arg(localSettingName);
       if (action->menu())
       {
-        if (actionName != "RecentFiles")
+        if (actionName != "RecentFiles" && actionName != "Filters" && actionName != "Sources" &&
+          (!(root->name() == "Macros" && (actionName == "Edit..." || actionName == "Delete..."))))
         {
           TreeItem* myItem = new TreeItem(actionName, settingsKey, false, action, root);
           root->appendChild(myItem);
@@ -270,7 +272,11 @@ public:
     switch (idx.column())
     {
       case 0:
-        return item->name();
+      {
+        QString result = item->name();
+        result.replace("_", " ");
+        return result;
+      }
       case 1:
         return item->keySequence();
     }
@@ -300,6 +306,41 @@ public:
 private:
   TreeItem* RootItem;
 };
+
+class FilterLeavesProxyModel : public QSortFilterProxyModel
+{
+  typedef QSortFilterProxyModel Superclass;
+
+public:
+  FilterLeavesProxyModel(QObject* p = nullptr)
+    : Superclass(p)
+  {
+  }
+
+  ~FilterLeavesProxyModel() = default;
+
+  bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
+  {
+    auto source = this->sourceModel();
+    auto indexInQuestion = source->index(source_row, 0, source_parent);
+    if (source->hasChildren(indexInQuestion))
+    {
+      const int numRows = source->rowCount(indexInQuestion);
+      for (int i = 0; i < numRows; ++i)
+      {
+        if (filterAcceptsRow(i, indexInQuestion))
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+    else
+    {
+      return Superclass::filterAcceptsRow(source_row, source_parent);
+    }
+  }
+};
 }
 
 class pqCustomizeShortcutsDialog::pqInternals
@@ -307,14 +348,18 @@ class pqCustomizeShortcutsDialog::pqInternals
 public:
   Ui::pqCustomizeShortcutsDialog Ui;
   QPointer<pqCustomizeShortcutsModel> Model;
+  QPointer<QSortFilterProxyModel> FilterModel;
 
   pqInternals(pqCustomizeShortcutsDialog* self)
     : Model(new pqCustomizeShortcutsModel(self))
+    , FilterModel(new FilterLeavesProxyModel(self))
   {
     Ui.setupUi(self);
-    Ui.treeView->setModel(this->Model);
+    this->FilterModel->setSourceModel(this->Model);
+    Ui.treeView->setModel(this->FilterModel);
     Ui.treeView->expandAll();
     Ui.treeView->resizeColumnToContents(0);
+    Ui.searchBox->setAdvancedSearchEnabled(false);
   }
 };
 
@@ -332,6 +377,12 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
     &pqCustomizeShortcutsDialog::onResetShortcut);
   connect(this->Internals->Ui.recordButton, &QAbstractButton::clicked, this,
     [this]() { this->Internals->Ui.keySequenceEdit->setFocus(); });
+  connect(this->Internals->Ui.searchBox, &pqSearchBox::textChanged, this, [this]() {
+    QRegExp regex(this->Internals->Ui.searchBox->text(), Qt::CaseInsensitive);
+
+    this->Internals->FilterModel->setFilterRegExp(regex);
+    this->Internals->Ui.treeView->expandAll();
+  });
   this->setWindowTitle("Customize Shortcuts");
   this->onSelectionChanged();
 }
@@ -353,6 +404,7 @@ void pqCustomizeShortcutsDialog::onEditingFinished()
   {
     return;
   }
+  selected = this->Internals->FilterModel->mapToSource(selected);
   this->Internals->Model->setKeySequence(
     selected, this->Internals->Ui.keySequenceEdit->keySequence());
   // Update Reset/Clear buttons' enabled state
@@ -380,6 +432,7 @@ void pqCustomizeShortcutsDialog::onSelectionChanged()
     setEnabled(true);
     return;
   }
+  selected = this->Internals->FilterModel->mapToSource(selected);
   QString keySequence = this->Internals->Model->data(selected, Qt::DisplayRole).toString();
   this->Internals->Ui.keySequenceEdit->setKeySequence(keySequence);
   TreeItem* item = static_cast<TreeItem*>(selected.internalPointer());
@@ -414,6 +467,7 @@ void pqCustomizeShortcutsDialog::onClearShortcut()
   {
     return;
   }
+  selected = this->Internals->FilterModel->mapToSource(selected);
   this->Internals->Model->setKeySequence(selected, QKeySequence());
   this->Internals->Ui.keySequenceEdit->setKeySequence(QKeySequence());
   // Update Reset/Clear buttons' enabled state
@@ -433,10 +487,32 @@ void pqCustomizeShortcutsDialog::onResetShortcut()
   {
     return;
   }
+  selected = this->Internals->FilterModel->mapToSource(selected);
   TreeItem* item = static_cast<TreeItem*>(selected.internalPointer());
   QKeySequence shortcut = item->defaultKeySequence();
   this->Internals->Model->setKeySequence(selected, shortcut);
   this->Internals->Ui.keySequenceEdit->setKeySequence(shortcut);
   // Update Reset/Clear buttons' enabled state
   this->onSelectionChanged();
+}
+
+QString pqCustomizeShortcutsDialog::getActionName(QAction* action)
+{
+  QString objectName = action->objectName();
+  if (objectName == "actionEditUndo")
+  {
+    return "Undo";
+  }
+  else if (objectName == "actionEditRedo")
+  {
+    return "Redo";
+  }
+  else if (objectName == "actionToolsStartStopTrace")
+  {
+    return "StartStopTrace";
+  }
+  else
+  {
+    return action->text();
+  }
 }
