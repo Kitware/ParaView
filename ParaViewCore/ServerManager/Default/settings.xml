@@ -237,6 +237,7 @@
         <EnumerationDomain name="enum">
           <Entry text="Grow and update on 'Apply'" value="0" />
           <Entry text="Grow and update every timestep" value="1" />
+          <Entry text="Update on 'Apply'" value="2" />
           <Entry text="Clamp and update every timestep" value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
