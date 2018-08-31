@@ -69,7 +69,21 @@ vtkSMProxy* vtkSMExportProxyDepot::GetGlobalOptions()
   {
     return nullptr;
   }
-  vtkSMProxy* globalProxy = this->Session->GetProxy("export_global", "catalyst");
+  // todo: need to refactor to make this hacky search for the last
+  // proxy uneccessary.
+  // do that by making that the session delete old export proxies
+  // to ensure that 'There can only be one.'
+  vtkCollection* coll = vtkCollection::New();
+  this->Session->GetProxies("export_global", "catalyst", coll);
+  coll->InitTraversal();
+  vtkObject* obj = coll->GetNextItemAsObject();
+  vtkSMProxy* globalProxy = nullptr;
+  while (obj != nullptr)
+  {
+    globalProxy = vtkSMProxy::SafeDownCast(obj);
+    obj = coll->GetNextItemAsObject();
+  }
+  coll->Delete();
   if (!globalProxy)
   {
     globalProxy = this->Session->NewProxy("coprocessing", "CatalystGlobalOptions");
