@@ -87,7 +87,8 @@ void pqCategoryToolbarsBehavior::updateToolbars()
       toolbar = new QToolBar(this->MainWindow);
       toolbar->setObjectName(category);
       toolbar->setOrientation(Qt::Horizontal);
-      toolbar->setWindowTitle(category); // TODO: Get label from MenuManager.
+      QString categoryLabel = this->MenuManager->categoryLabel(category);
+      toolbar->setWindowTitle(categoryLabel.size() > 0 ? categoryLabel : category);
       this->MainWindow->addToolBar(toolbar);
       if (this->MenuManager->hideForTests(category))
       {

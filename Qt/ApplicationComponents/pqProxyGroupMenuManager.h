@@ -141,6 +141,11 @@ public:
 
   QMenu* getBookmarksMenu();
 
+  /**
+   * Given a category name, return the category label.
+   */
+  QString categoryLabel(const QString& category);
+
 public slots:
   /**
   * Load a configuration XML. It will find the elements with resourceTagName
