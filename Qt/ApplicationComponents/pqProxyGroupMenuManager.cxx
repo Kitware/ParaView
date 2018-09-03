@@ -512,6 +512,17 @@ QMenu* pqProxyGroupMenuManager::getBookmarksMenu()
 }
 
 //-----------------------------------------------------------------------------
+QString pqProxyGroupMenuManager::categoryLabel(const QString& category)
+{
+  if (this->Internal->Categories.contains(category))
+  {
+    return this->Internal->Categories[category].Label;
+  }
+
+  return QString();
+}
+
+//-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::populateMenu()
 {
   // We reuse QAction instances, yet we don't want to have callbacks set up for
