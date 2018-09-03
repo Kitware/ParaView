@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqDoubleVectorPropertyWidget.h
+   Module:  pqDoubleLineEditEventTranslator.h
 
-   Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2018 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,48 +28,42 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
 
-#ifndef _pqDoubleVectorPropertyWidget_h
-#define _pqDoubleVectorPropertyWidget_h
+#ifndef pqDoubleLineEditEventTranslator_h
+#define pqDoubleLineEditEventTranslator_h
 
-#include "pqPropertyWidget.h"
+// ParaView Includes.
+#include "pqWidgetEventTranslator.h"
+#include "pqWidgetsModule.h"
 
-class PQCOMPONENTS_EXPORT pqDoubleVectorPropertyWidget : public pqPropertyWidget
+/**
+ * pqDoubleLineEditEventTranslator translates events on pqDoubleLineEdit
+ * or subclass so that they can be recorded in tests.
+ */
+class PQWIDGETS_EXPORT pqDoubleLineEditEventTranslator : public pqWidgetEventTranslator
 {
   Q_OBJECT
-  typedef pqPropertyWidget Superclass;
+  typedef pqWidgetEventTranslator Superclass;
 
 public:
-  pqDoubleVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqDoubleLineEditEventTranslator(QObject* parent = 0);
+  ~pqDoubleLineEditEventTranslator() override;
 
-  ~pqDoubleVectorPropertyWidget() override;
-
-  // Overridden to clear highlights from the pqHighlightablePushButton.
-  void apply() override;
-  void reset() override;
-
-signals:
   /**
-  * internal signal used to clear highlights from pqHighlightablePushButton.
-  */
-  void clearHighlight();
-  void highlightResetButton();
-
-protected slots:
-  /**
-  * called when the user clicks the "reset" button for a specific property.
-  */
-  virtual void resetButtonClicked();
-
-  void scaleHalf();
-  void scaleTwice();
-  void scale(double);
-
-  void onPVGeneralSettingsModified();
+   * Overridden to handle events on QColorDialog.
+   */
+  using Superclass::translateEvent;
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error) override;
 
 private:
-  Q_DISABLE_COPY(pqDoubleVectorPropertyWidget)
+  Q_DISABLE_COPY(pqDoubleLineEditEventTranslator);
+
+  QObject* CurrentObject;
+
+private slots:
+  void onDestroyed();
+  void onFullPrecisionTextChangedAndEditingFinished(const QString& text);
 };
 
-#endif // _pqDoubleVectorPropertyWidget_h
+#endif

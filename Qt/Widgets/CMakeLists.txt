@@ -66,6 +66,12 @@ set(Module_SRCS
   pqDelimitedTextParser.h
   pqDiscreteDoubleWidget.cxx
   pqDiscreteDoubleWidget.h
+  pqDoubleLineEdit.cxx
+  pqDoubleLineEdit.h
+  pqDoubleLineEditEventPlayer.cxx
+  pqDoubleLineEditEventPlayer.h
+  pqDoubleLineEditEventTranslator.cxx
+  pqDoubleLineEditEventTranslator.h
   pqDoubleRangeDialog.cxx
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.cxx
@@ -156,6 +162,9 @@ set (QtWidgets_SRCS
   pqConsoleWidget.h
   pqDelimitedTextParser.h
   pqDiscreteDoubleWidget.h
+  pqDoubleLineEdit.h
+  pqDoubleLineEditEventPlayer.h
+  pqDoubleLineEditEventTranslator.h
   pqDoubleRangeDialog.h
   pqDoubleRangeWidget.h
   pqDoubleSliderWidget.h

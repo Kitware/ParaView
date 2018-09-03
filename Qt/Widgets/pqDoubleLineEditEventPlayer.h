@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqDoubleVectorPropertyWidget.h
+   Module:  pqDoubleLineEditEventPlayer.h
 
-   Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,48 +28,35 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef pqDoubleLineEditEventPlayer_h
+#define pqDoubleLineEditEventPlayer_h
 
-#ifndef _pqDoubleVectorPropertyWidget_h
-#define _pqDoubleVectorPropertyWidget_h
+#include "pqAbstractStringEventPlayer.h"
+#include "pqWidgetsModule.h"
 
-#include "pqPropertyWidget.h"
-
-class PQCOMPONENTS_EXPORT pqDoubleVectorPropertyWidget : public pqPropertyWidget
+/**
+* pqDoubleLineEditEventPlayer extends pqAbstractStringEventPlayer to ensure that
+* pqDoubleLine is updated in playback when "set_full_precision_text" is handled.
+*/
+class PQWIDGETS_EXPORT pqDoubleLineEditEventPlayer : public pqAbstractStringEventPlayer
 {
   Q_OBJECT
-  typedef pqPropertyWidget Superclass;
+  typedef pqAbstractStringEventPlayer Superclass;
+  typedef pqDoubleLineEditEventPlayer Self;
 
 public:
-  pqDoubleVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqDoubleLineEditEventPlayer(QObject* parent = 0);
+  ~pqDoubleLineEditEventPlayer() override;
 
-  ~pqDoubleVectorPropertyWidget() override;
+  using Superclass::playEvent;
+  bool playEvent(
+    QObject* object, const QString& command, const QString& arguments, bool& error) override;
 
-  // Overridden to clear highlights from the pqHighlightablePushButton.
-  void apply() override;
-  void reset() override;
-
-signals:
-  /**
-  * internal signal used to clear highlights from pqHighlightablePushButton.
-  */
-  void clearHighlight();
-  void highlightResetButton();
-
-protected slots:
-  /**
-  * called when the user clicks the "reset" button for a specific property.
-  */
-  virtual void resetButtonClicked();
-
-  void scaleHalf();
-  void scaleTwice();
-  void scale(double);
-
-  void onPVGeneralSettingsModified();
+  static const QString& EVENT_NAME();
 
 private:
-  Q_DISABLE_COPY(pqDoubleVectorPropertyWidget)
+  Q_DISABLE_COPY(pqDoubleLineEditEventPlayer)
 };
 
-#endif // _pqDoubleVectorPropertyWidget_h
+#endif

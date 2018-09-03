@@ -17,9 +17,8 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,35,307" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/UseBlockDetailInformation/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ProcessesCanLoadAnyBlock/CheckBox" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/LineEdit0" command="set_string" arguments="3" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/LineEdit0" command="key" arguments="16777219" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/LineEdit0" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/DoubleLineEdit0" command="set_full_precision_text" arguments="3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/DoubleLineEdit0" command="set_full_precision_text" arguments="2" />
   <!-- Stop automatic streaming -->
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="stop_streaming" />
   <!-- Start the representation -->
@@ -92,8 +91,7 @@
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming4.png" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/LineEdit0" command="set_string" arguments="4" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/LineEdit0" command="key" arguments="16777221" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/DoubleLineEdit0" command="set_full_precision_text" arguments="4" />
   <!-- step down the streaming updates a few times -->
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />

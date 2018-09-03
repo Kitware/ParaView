@@ -17,6 +17,19 @@ variable. This was incorrect and PraView 5.6 fixes this. For `vtkTable`,
 Changes in 5.5
 --------------
 
+
+###Replace pqLineEdit with pqDoubleLineEdit for viewing and editing double properties###
+
+Tests recorded prior to this version need to be updated to:
+
+* reference `DoubleLineEdit` instead of `LineEdit`
+* use `set_full_precision_text` command instead of `set_string`
+
+Note that the changes must only be applied to properties of type double. This means
+that systematic search and replace can not be directly used.
+
+See #17966
+
 ###Changes to Python shell###
 
 `pqPythonShell` now is a fairly self contained class. One no longer has to go
