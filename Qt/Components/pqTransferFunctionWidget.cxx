@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTransferFunctionWidget.h"
 
-#include "QVTKOpenGLSimpleWidget.h"
+#include "QVTKOpenGLNativeWidget.h"
 #include "pqCoreUtilities.h"
 #include "pqTimer.h"
 #include "vtkAxis.h"
@@ -171,7 +171,7 @@ class pqTransferFunctionWidget::pqInternals
   vtkNew<vtkGenericOpenGLRenderWindow> Window;
 
 public:
-  QPointer<QVTKOpenGLSimpleWidget> Widget;
+  QPointer<QVTKOpenGLNativeWidget> Widget;
   vtkNew<vtkTransferFunctionChartXY> ChartXY;
   vtkNew<vtkContextView> ContextView;
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
@@ -183,7 +183,7 @@ public:
   unsigned long CurrentPointEditEventId;
 
   pqInternals(pqTransferFunctionWidget* editor)
-    : Widget(new QVTKOpenGLSimpleWidget(editor))
+    : Widget(new QVTKOpenGLNativeWidget(editor))
     , CurrentPointEditEventId(0)
   {
     this->Timer.setSingleShot(true);
