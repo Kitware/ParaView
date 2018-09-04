@@ -84,7 +84,7 @@ def CreateReader(ctor, fileInfo, **kwargs):
     import glob
     files = glob.glob(fileInfo)
     files.sort() # assume there is a logical ordering of the filenames that corresponds to time ordering
-    reader = ctor(FileName=files)
+    reader = paraview.simple.OpenDataFile(files)
     CheckReader(reader)
     if kwargs:
         pvsimple.SetProperties(reader, **kwargs)
@@ -103,7 +103,7 @@ def CreateView(proxy_ctor, filename, magnification, width, height, tp_views):
     view = proxy_ctor()
     return RegisterView(view, filename, magnification, width, height, tp_views)
 
-def RegisterView(view, filename, magnification, width, height, tp_views):
+def RegisterView(view, filename='filename_%t.vti', magnification=1.0, width=1024, height=1024, tp_views=[]):
     view.add_attribute("tpFileName", filename)
     view.add_attribute("tpMagnification", magnification)
     tp_views.append(view)

@@ -318,6 +318,8 @@ set (Module_SRCS
   pqStatusBar.h
   pqStreamingTestingEventPlayer.cxx
   pqStreamingTestingEventPlayer.h
+  pqTemporalExportReaction.cxx
+  pqTemporalExportReaction.h
   pqTestingReaction.cxx
   pqTestingReaction.h
   pqTextLocationWidget.cxx
@@ -499,6 +501,7 @@ set (Module_MOC_HDRS
   pqStandardViewFrameActionsImplementation.h
   pqStatusBar.h
   pqStreamingTestingEventPlayer.h
+  pqTemporalExportReaction.h
   pqTestingReaction.h
   pqTextLocationWidget.h
   pqTimeInspectorWidget.h
