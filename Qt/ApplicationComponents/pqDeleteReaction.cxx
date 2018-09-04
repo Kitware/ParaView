@@ -174,7 +174,6 @@ void pqDeleteReaction::deleteSelected()
 {
   if (!pqDeleteReaction::canDeleteSelected())
   {
-    qCritical() << "Cannot delete selected ";
     return;
   }
 
