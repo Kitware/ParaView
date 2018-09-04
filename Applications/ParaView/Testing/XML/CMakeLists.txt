@@ -422,6 +422,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointChartView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PointGaussianMultiBlockDataSet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointGaussianNoScaleTransferFunction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointGaussianScaleOpacityArray.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PointInterpolator.xml
@@ -1031,6 +1032,10 @@ set (ResetToVisibleRange_DISABLE_CRS TRUE)
 # Molecules are not supported in client-serve modes, currently.
 set (Molecule_DISABLE_CS TRUE)
 set (Molecule_DISABLE_CRS TRUE)
+
+# Because of #18421, we need to disable this test in client/server
+set (PointGaussianMultiBlockDataSet_DISABLE_CS TRUE)
+set (PointGaussianMultiBlockDataSet_DISABLE_CRS TRUE)
 
 ##########################################################
 # List of known incompatible tests for Collaboration
