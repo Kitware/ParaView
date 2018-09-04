@@ -85,7 +85,7 @@ public:
     }
 
     // Returns true if the data from the given output port can be written.
-    bool CanWrite(vtkSMSourceProxy* source, unsigned int port, const char* requiredHint = nullptr)
+    bool CanWrite(vtkSMSourceProxy* source, unsigned int port)
     {
       vtkSMSessionProxyManager* pxm = source->GetSession()->GetSessionProxyManager();
       vtkSMProxy* prototype = pxm->GetPrototypeProxy(this->Group.c_str(), this->Name.c_str());
@@ -121,27 +121,11 @@ public:
         {
           if (writer->GetParallelOnly())
           {
-            if (!requiredHint ||
-              strcmp("CatalystApproved", requiredHint) !=
-                0) // Catalyst export can access parallel defs in serial
-            {
-              return false;
-            }
+            return false;
           }
         }
       }
 
-      if (requiredHint && writer)
-      {
-        if (!writer->GetHints())
-        {
-          return false;
-        }
-        if (!writer->GetHints()->FindNestedElementByName(requiredHint))
-        {
-          return false;
-        }
-      }
       vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(prototype->GetProperty("Input"));
       if (!pp)
       {
@@ -292,8 +276,8 @@ void vtkSMWriterFactory::UpdateAvailableWriters()
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMWriterFactory::CreateWriter(const char* filename, vtkSMSourceProxy* source,
-  unsigned int outputport, bool proxybyname, const char* requiredHint)
+vtkSMProxy* vtkSMWriterFactory::CreateWriter(
+  const char* filename, vtkSMSourceProxy* source, unsigned int outputport, bool proxybyname)
 {
   if (!filename || filename[0] == 0)
   {
@@ -338,7 +322,7 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(const char* filename, vtkSMSourcePr
     iter->second.FillInformation(source->GetSession());
     if (iter->second.CanCreatePrototype(source) &&
       (proxybyname || iter->second.ExtensionTest(extension.c_str())) &&
-      iter->second.CanWrite(source, outputport, requiredHint))
+      iter->second.CanWrite(source, outputport))
     {
       if (proxybyname)
       {
@@ -412,7 +396,7 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
 
 //----------------------------------------------------------------------------
 const char* vtkSMWriterFactory::GetSupportedWriterProxies(
-  vtkSMSourceProxy* source, unsigned int outputport, const char* requiredHint)
+  vtkSMSourceProxy* source, unsigned int outputport)
 {
   std::set<std::string> sorted_types;
 
@@ -420,8 +404,7 @@ const char* vtkSMWriterFactory::GetSupportedWriterProxies(
   for (iter = this->Internals->Prototypes.begin(); iter != this->Internals->Prototypes.end();
        ++iter)
   {
-    if (iter->second.CanCreatePrototype(source) &&
-      iter->second.CanWrite(source, outputport, requiredHint))
+    if (iter->second.CanCreatePrototype(source) && iter->second.CanWrite(source, outputport))
     {
       iter->second.FillInformation(source->GetSession());
       if (iter->second.Extensions.size() > 0)

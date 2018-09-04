@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSMWriterFactory.h"
+#include "vtkStringList.h"
 
 #include <sstream>
 
@@ -256,7 +257,17 @@ void pqCatalystExportInspector::PopulateWriterFormats()
 
   // discover the list of all possible writers for the current filter
   vtkSmartPointer<vtkSMWriterFactory> wf = vtkSmartPointer<vtkSMWriterFactory>::New();
+  auto sl = vtkSmartPointer<vtkStringList>::New();
+  wf->GetGroups(sl);
+  // we want our particular approved writers
+  for (int i = 0; i < sl->GetNumberOfStrings(); i++)
+  {
+    wf->RemoveGroup(sl->GetString(i));
+  }
+  wf->AddGroup("insitu2_writer_parameters");
+
   wf->UpdateAvailableWriters();
+
   vtkSMSourceProxy* filter;
   int portnum;
   ::getFilterProxyAndPort(filterName, filter, portnum);
@@ -264,7 +275,7 @@ void pqCatalystExportInspector::PopulateWriterFormats()
   {
     return;
   }
-  std::string availproxies = wf->GetSupportedWriterProxies(filter, portnum, "CatalystApproved");
+  std::string availproxies = wf->GetSupportedWriterProxies(filter, portnum);
   std::stringstream ss(availproxies);
   std::string item;
   while (std::getline(ss, item, ';'))
