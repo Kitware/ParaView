@@ -2473,7 +2473,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             return functionName.strip()
 
     @exportRpc("pv.proxy.manager.create")
-    def create(self, functionName, parentId, initialValues = {}, skipDomain = False):
+    def create(self, functionName, parentId, initialValues = {}, skipDomain = False, subProxyValues = {}):
         """
         Creates a new filter/source proxy as a child of the specified
         parent proxy.  Returns the proxy state for the newly created
@@ -2495,6 +2495,16 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         # Create new source/filter
         allowed = self.allowedProxies[name]
         newProxy = paraview.simple.__dict__[allowed](**initialValues)
+
+        # Update subproxy values
+        if newProxy:
+            for subProxyName in subProxyValues:
+                subProxy = newProxy.GetProperty(subProxyName).GetData()
+                if subProxy:
+                    for propName in subProxyValues[subProxyName]:
+                        prop = subProxy.SMProxy.GetProperty(propName)
+                        prop.SetElements(subProxyValues[subProxyName][propName])
+                    subProxy.UpdateVTKObjects()
 
         # To make WebGL export work
         simple.Show()
