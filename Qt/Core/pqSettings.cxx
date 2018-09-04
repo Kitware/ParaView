@@ -29,8 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include <pqSettings.h>
+#include "pqSettings.h"
 
+#include <QCoreApplication>
 #include <QDesktopWidget>
 #include <QDialog>
 #include <QDockWidget>
@@ -120,6 +121,37 @@ void pqSettings::alertSettingsModified()
 }
 
 //-----------------------------------------------------------------------------
+void pqSettings::saveState(const QDialog& dialog, const QString& key)
+{
+  this->beginGroup(key);
+  this->setValue("Position", dialog.pos());
+  this->setValue("Size", dialog.size());
+  // let's add a PID to avoid restoring dialog position across different
+  // sessions. This avoids issues reported in #18163.
+  this->setValue("PID", QCoreApplication::applicationPid());
+  this->endGroup();
+}
+
+//-----------------------------------------------------------------------------
+void pqSettings::restoreState(const QString& key, QDialog& dialog)
+{
+  this->beginGroup(key);
+
+  if (this->contains("Size"))
+  {
+    dialog.resize(this->value("Size").toSize());
+  }
+
+  // restore position only if it is the same process.
+  if (this->value("PID").value<qint64>() == QCoreApplication::applicationPid() &&
+    this->contains("Position"))
+  {
+    dialog.move(this->value("Position").toPoint());
+  }
+  this->endGroup();
+}
+
+//-----------------------------------------------------------------------------
 void pqSettings::saveState(const QMainWindow& window, const QString& key)
 {
   this->beginGroup(key);
@@ -128,15 +160,6 @@ void pqSettings::saveState(const QMainWindow& window, const QString& key)
   this->setValue("Layout", window.saveState());
   QDesktopWidget desktop;
   this->setValue("Screen", desktop.screenNumber(&window));
-  this->endGroup();
-}
-
-//-----------------------------------------------------------------------------
-void pqSettings::saveState(const QDialog& dialog, const QString& key)
-{
-  this->beginGroup(key);
-  this->setValue("Position", dialog.pos());
-  this->setValue("Size", dialog.size());
   this->endGroup();
 }
 
@@ -213,24 +236,6 @@ void pqSettings::saveInQSettings(const char* key, vtkSMProperty* smproperty)
   {
     this->setValue(key, vtkSMPropertyHelper(smproperty).GetAsString());
   }
-}
-
-//-----------------------------------------------------------------------------
-void pqSettings::restoreState(const QString& key, QDialog& dialog)
-{
-  this->beginGroup(key);
-
-  if (this->contains("Size"))
-  {
-    dialog.resize(this->value("Size").toSize());
-  }
-
-  if (this->contains("Position"))
-  {
-    dialog.move(this->value("Position").toPoint());
-  }
-
-  this->endGroup();
 }
 
 //-----------------------------------------------------------------------------
