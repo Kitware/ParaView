@@ -373,15 +373,16 @@
 
       <IntVectorProperty name="RealNumberDisplayedNotation"
         number_of_elements="1"
-        default_values="0"
+        default_values="2"
         command="SetRealNumberDisplayedNotation"
         panel_visibility="advanced">
         <Documentation>
           Set the notation used to display real numbers.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Fixed" value="0" />
+          <!-- Reserved for a possible future "Mixed" mode (value="0") -->
           <Entry text="Scientific" value="1" />
+          <Entry text="Fixed" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
 
