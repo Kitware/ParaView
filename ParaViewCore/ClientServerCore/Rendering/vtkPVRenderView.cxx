@@ -350,8 +350,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractiveRenderProcesses = vtkPVSession::NONE;
   this->UsedLODForLastRender = false;
   this->UseLODForInteractiveRender = false;
-  this->UseDistributedRenderingForStillRender = false;
-  this->UseDistributedRenderingForInteractiveRender = false;
+  this->UseDistributedRenderingForRender = false;
+  this->UseDistributedRenderingForLODRender = false;
   this->MakingSelection = false;
   this->PreviousSwapBuffers = 0;
   this->StillRenderImageReductionFactor = 1;
@@ -1176,9 +1176,9 @@ void vtkPVRenderView::SynchronizeForCollaboration()
   {
     vtkMultiProcessStream stream;
     stream << (this->UseLODForInteractiveRender ? 1 : 0)
-           << (this->UseDistributedRenderingForStillRender ? 1 : 0)
-           << (this->UseDistributedRenderingForInteractiveRender ? 1 : 0)
-           << this->StillRenderProcesses << this->InteractiveRenderProcesses;
+           << (this->UseDistributedRenderingForRender ? 1 : 0)
+           << (this->UseDistributedRenderingForLODRender ? 1 : 0) << this->StillRenderProcesses
+           << this->InteractiveRenderProcesses;
     r_controller->Send(stream, 1, 42000);
   }
   else
@@ -1196,8 +1196,8 @@ void vtkPVRenderView::SynchronizeForCollaboration()
     stream >> arg1 >> arg2 >> arg3 >> this->StillRenderProcesses >>
       this->InteractiveRenderProcesses;
     this->UseLODForInteractiveRender = (arg1 == 1);
-    this->UseDistributedRenderingForStillRender = (arg2 == 1);
-    this->UseDistributedRenderingForInteractiveRender = (arg3 == 1);
+    this->UseDistributedRenderingForRender = (arg2 == 1);
+    this->UseDistributedRenderingForLODRender = (arg3 == 1);
   }
 }
 
@@ -1258,21 +1258,21 @@ void vtkPVRenderView::Update()
 
   // Update decisions about lod-rendering and remote-rendering.
   this->UseLODForInteractiveRender = this->ShouldUseLODRendering(local_size);
-  this->UseDistributedRenderingForStillRender =
+  this->UseDistributedRenderingForRender =
     this->ShouldUseDistributedRendering(local_size, /*using_lod=*/false);
   if (!this->UseLODForInteractiveRender)
   {
-    this->UseDistributedRenderingForInteractiveRender = this->UseDistributedRenderingForStillRender;
+    this->UseDistributedRenderingForLODRender = this->UseDistributedRenderingForRender;
   }
 
   this->StillRenderProcesses = this->InteractiveRenderProcesses = vtkPVSession::CLIENT;
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->InCaveDisplayMode();
-  if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForStillRender)
+  if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForRender)
   {
     this->StillRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
   }
-  if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForInteractiveRender)
+  if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForLODRender)
   {
     this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
   }
@@ -1291,11 +1291,10 @@ void vtkPVRenderView::CopyViewUpdateOptions(vtkPVRenderView* otherView)
   this->NeedsOrderedCompositing = otherView->NeedsOrderedCompositing;
   this->RenderEmptyImages = otherView->RenderEmptyImages;
   this->UseLODForInteractiveRender = otherView->UseLODForInteractiveRender;
-  this->UseDistributedRenderingForStillRender = otherView->UseDistributedRenderingForStillRender;
+  this->UseDistributedRenderingForRender = otherView->UseDistributedRenderingForRender;
   this->StillRenderProcesses = otherView->StillRenderProcesses;
   this->InteractiveRenderProcesses = otherView->InteractiveRenderProcesses;
-  this->UseDistributedRenderingForInteractiveRender =
-    otherView->UseDistributedRenderingForInteractiveRender;
+  this->UseDistributedRenderingForLODRender = otherView->UseDistributedRenderingForLODRender;
 }
 
 //----------------------------------------------------------------------------
@@ -1322,13 +1321,13 @@ void vtkPVRenderView::UpdateLOD()
   this->SynchronizedWindows->SynchronizeSize(local_size);
   // cout << "LOD Geometry size: " << local_size << endl;
 
-  this->UseDistributedRenderingForInteractiveRender =
+  this->UseDistributedRenderingForLODRender =
     this->ShouldUseDistributedRendering(local_size, /*using_lod=*/true);
 
   this->InteractiveRenderProcesses = vtkPVSession::CLIENT;
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->InCaveDisplayMode();
-  if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForInteractiveRender)
+  if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForLODRender)
   {
     this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
   }
@@ -1369,8 +1368,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   this->UpdateStereoProperties();
 
   if (this->SynchronizedWindows->GetMode() != vtkPVSynchronizedRenderWindows::CLIENT ||
-    (!interactive && this->UseDistributedRenderingForStillRender) ||
-    (interactive && this->UseDistributedRenderingForInteractiveRender))
+    (!interactive && this->UseDistributedRenderingForRender) ||
+    (interactive && this->UseDistributedRenderingForLODRender))
   {
     // in multi-client modes, Render() will be called on client always. Now the
     // client need to coordinate with server only when we are remote rendering.
@@ -1430,27 +1429,49 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // cout << "Using remote rendering: " << use_distributed_rendering << endl;
 
   // Decide if we are doing remote rendering or local rendering.
-  bool use_distributed_rendering = interactive
-    ? this->GetUseDistributedRenderingForInteractiveRender()
-    : this->GetUseDistributedRenderingForStillRender();
+  bool use_distributed_rendering = use_lod_rendering
+    ? this->GetUseDistributedRenderingForLODRender()
+    : this->GetUseDistributedRenderingForRender();
 
-  if (this->GetUseOrderedCompositing())
+  const bool use_ordered_compositing = this->GetUseOrderedCompositing();
+
+  vtkTimerLog::FormatAndMarkEvent(
+    "Render (use_lod: %d), (use_distributed_rendering: %d), (use_ordered_compositing: %d)",
+    use_lod_rendering, use_distributed_rendering, use_ordered_compositing);
+
+  // If ordered compositing is needed, we have two options: either we're
+  // supposed to (i) build a KdTree and redistribute data or we are expected to (ii) use
+  // a custom partition provided via `vtkPartitionOrder` built using local data
+  // bounds and not bother redistributing data at all. Let's determine which
+  // path we're expected to take and do work accordingly.
+  if (use_ordered_compositing)
   {
-    if (this->PartitionOrdering->GetImplementation() == NULL ||
-      this->PartitionOrdering->GetImplementation()->IsA("vtkPKdTree"))
+    auto poImpl = this->PartitionOrdering->GetImplementation();
+    if (poImpl == nullptr || vtkPKdTree::SafeDownCast(poImpl) != nullptr)
     {
+      vtkTimerLog::FormatAndMarkEvent(
+        "Using ordered compositing w/ data redistribution, if needed");
+      // not using a custom (bounds-based ordering) i.e. we use in path (i). Let
+      // the delivery manager redistrbute data as it deems necessary.
       this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(use_lod_rendering);
       this->PartitionOrdering->SetImplementation(this->Internals->DeliveryManager->GetKdTree());
     }
     else
     {
+      vtkTimerLog::FormatAndMarkEvent("Using ordered compositing with w/o data redistribution");
+      // using custom rendering ordering without any data redistribution i.e.
+      // path (ii).
+
+      // clear off redistributed data.
       this->Internals->DeliveryManager->ClearRedistributedData(use_lod_rendering);
     }
+    // tell `this->SynchronizedRenderers` who to order the ranks when doing
+    // parallel rendering.
     this->SynchronizedRenderers->SetPartitionOrdering(this->PartitionOrdering.GetPointer());
   }
   else
   {
-    this->SynchronizedRenderers->SetPartitionOrdering(NULL);
+    this->SynchronizedRenderers->SetPartitionOrdering(nullptr);
   }
 
   // enable render empty images if it was requested
@@ -1758,12 +1779,6 @@ void vtkPVRenderView::SetOrderedCompositingInformation(vtkInformation* info, con
   vtkNew<vtkPartitionOrdering> partitionOrdering;
   partitionOrdering->Construct(bounds);
   view->PartitionOrdering->SetImplementation(partitionOrdering.GetPointer());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::ClearOrderedCompositingInformation()
-{
-  this->PartitionOrdering->SetImplementation(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -2190,7 +2205,7 @@ void vtkPVRenderView::DeliverStreamedPieces(unsigned int size, unsigned int* rep
   vtkTimerLog::MarkStartEvent("vtkPVRenderView::DeliverStreamedPieces");
   this->Internals->DeliveryManager->DeliverStreamedPieces(size, representation_ids);
 
-  if (this->GetLocalProcessDoesRendering(this->GetUseDistributedRenderingForStillRender()))
+  if (this->GetLocalProcessDoesRendering(this->GetUseDistributedRenderingForRender()))
   {
     // tell representations to "deal with" the newly streamed piece on the
     // rendering nodes.
@@ -2763,7 +2778,7 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
   // Fixes issue with the background (black) when coming back from FLOATING_POINT
   // mode. FLOATING_POINT mode is only supported in BATCH mode and single process
   // CLIENT.
-  if (this->GetUseDistributedRenderingForStillRender() &&
+  if (this->GetUseDistributedRenderingForRender() &&
     vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
   {
     vtkWarningMacro("vtkValuePass::FLOATING_POINT mode is only supported in BATCH"
@@ -2966,7 +2981,7 @@ void vtkPVRenderView::CaptureValuesFloat()
   else
 #endif
   {
-    if (this->GetUseDistributedRenderingForStillRender() &&
+    if (this->GetUseDistributedRenderingForRender() &&
       vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_CLIENT)
     {
       vtkWarningMacro("vtkValuePass::FLOATING_POINT result is only available in the root"
@@ -3281,3 +3296,23 @@ void vtkPVRenderView::SetDiscreteCameras(
 
   self->DiscreteCameras = style;
 }
+
+//----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+bool vtkPVRenderView::GetUseDistributedRenderingForStillRender()
+{
+  VTK_LEGACY_REPLACED_BODY(vtkPVRenderView::GetUseDistributedRenderingForStillRender,
+    "ParaView 5.6", vtkPVRenderView::GetUseDistributedRenderingForRender);
+  return this->GetUseDistributedRenderingForRender();
+}
+#endif
+
+//----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+bool vtkPVRenderView::GetUseDistributedRenderingForInteractiveRender()
+{
+  VTK_LEGACY_REPLACED_BODY(vtkPVRenderView::GetUseDistributedRenderingForInteractiveRender,
+    "ParaView 5.6", vtkPVRenderView::GetUseDistributedRenderingForLODRender);
+  return this->GetUseDistributedRenderingForLODRender();
+}
+#endif

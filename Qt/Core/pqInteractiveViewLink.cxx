@@ -245,8 +245,8 @@ void pqInteractiveViewLink::renderLinkedView()
   if (!this->Internal->Rendering && this->Internal->LinkedView != NULL &&
     this->Internal->LinkedPVView != NULL && this->Internal->DisplayPVView != NULL)
   {
-    if (this->Internal->LinkedPVView->GetUseDistributedRenderingForStillRender() ||
-      this->Internal->DisplayPVView->GetUseDistributedRenderingForStillRender())
+    if (this->Internal->LinkedPVView->GetUseDistributedRenderingForRender() ||
+      this->Internal->DisplayPVView->GetUseDistributedRenderingForRender())
     {
       qCritical() << "Something went wrong, remote rendering should not use "
                      "pqInteractiveViewLink::renderLinkedView method";
@@ -327,8 +327,8 @@ void pqInteractiveViewLink::drawViewLink(int setFront)
   }
 
   bool visible = this->Internal->LinkedWidget->isVisible();
-  bool remoteRendering = this->Internal->LinkedPVView->GetUseDistributedRenderingForStillRender() ||
-    this->Internal->DisplayPVView->GetUseDistributedRenderingForStillRender();
+  bool remoteRendering = this->Internal->LinkedPVView->GetUseDistributedRenderingForRender() ||
+    this->Internal->DisplayPVView->GetUseDistributedRenderingForRender();
 
   // getFront is true when remoteRendering a non-visible linked view, false otherwise
   bool getFront = remoteRendering && !visible;
