@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTrack.h"
 
 pqAnimationWidget::pqAnimationWidget(QWidget* p)
-  : QAbstractScrollArea(p)
+  : Superclass(p)
 {
   this->View = new QGraphicsView(this->viewport());
   this->viewport()->setBackgroundRole(QPalette::Window);
@@ -217,7 +217,7 @@ void pqAnimationWidget::scrollContentsBy(int dx, int dy)
     this->EnabledHeader->setOffset(this->verticalScrollBar()->value());
   }
   this->updateWidgetPosition();
-  QAbstractScrollArea::scrollContentsBy(dx, dy);
+  this->Superclass::scrollContentsBy(dx, dy);
 }
 
 void pqAnimationWidget::updateScrollBars()
@@ -275,17 +275,13 @@ bool pqAnimationWidget::event(QEvent* e)
   {
     this->Model->setRowHeight(this->Header->defaultSectionSize());
   }
-  if (e->type() == QEvent::Show)
-  {
-    this->updateGeometries();
-  }
-  return QAbstractScrollArea::event(e);
+  return this->Superclass::event(e);
 }
 
 void pqAnimationWidget::resizeEvent(QResizeEvent* e)
 {
-  this->updateScrollBars();
-  QAbstractScrollArea::resizeEvent(e);
+  this->Superclass::resizeEvent(e);
+  this->updateGeometries();
 }
 
 void pqAnimationWidget::headerDeleteClicked(int which)
