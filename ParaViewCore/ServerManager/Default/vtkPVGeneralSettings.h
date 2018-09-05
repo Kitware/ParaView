@@ -201,8 +201,8 @@ public:
    */
   enum
   {
-    DISPLAY_REALNUMBERS_USING_FIXED_NOTATION = 0,
-    DISPLAY_REALNUMBERS_USING_SCIENTIFIC_NOTATION
+    DISPLAY_REALNUMBERS_USING_SCIENTIFIC_NOTATION = 1,
+    DISPLAY_REALNUMBERS_USING_FIXED_NOTATION,
   };
   /**
    * Get/Set the notation of real number displayed in widgets or views.

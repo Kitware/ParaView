@@ -40,7 +40,7 @@ namespace
 //-----------------------------------------------------------------------------
 QTextStream::RealNumberNotation toTextStreamNotation(pqDoubleLineEdit::RealNumberNotation notation)
 {
-  if (notation == pqDoubleLineEdit::StandardNotation)
+  if (notation == pqDoubleLineEdit::FixedNotation)
   {
     return QTextStream::FixedNotation;
   }
@@ -53,7 +53,14 @@ QTextStream::RealNumberNotation toTextStreamNotation(pqDoubleLineEdit::RealNumbe
 //-----------------------------------------------------------------------------
 QDoubleValidator::Notation toValidatorNotation(pqDoubleLineEdit::RealNumberNotation notation)
 {
-  return static_cast<QDoubleValidator::Notation>(notation);
+  if (notation == pqDoubleLineEdit::RealNumberNotation::ScientificNotation)
+  {
+    return QDoubleValidator::ScientificNotation;
+  }
+  else
+  {
+    return QDoubleValidator::StandardNotation;
+  }
 }
 }
 
@@ -65,7 +72,7 @@ pqDoubleLineEdit::pqDoubleLineEdit(QWidget* _parent)
 {
   this->DoubleValidator = new QDoubleValidator(this);
   this->setValidator(this->DoubleValidator);
-  this->setNotation(pqDoubleLineEdit::StandardNotation);
+  this->setNotation(pqDoubleLineEdit::FixedNotation);
 }
 
 //-----------------------------------------------------------------------------
