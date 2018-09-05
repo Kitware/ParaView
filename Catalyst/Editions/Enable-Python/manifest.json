@@ -8,10 +8,6 @@
       { "name":"PARAVIEW_ENABLE_PYTHON",
         "type":"BOOL",
         "value":"ON"
-      },
-      { "name":"PARAVIEW_USE_UNIFIED_BINDINGS",
-        "type":"BOOL",
-        "value":"ON"
       }
     ]
   },

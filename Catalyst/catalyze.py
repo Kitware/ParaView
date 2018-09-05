@@ -60,6 +60,8 @@ def filter_proxies(fin, fout, proxies, all_proxies):
            proxy.attrib['name'] in proxies
   for group in root.iter('ProxyGroup'):
     new_proxies = filter(is_wanted, list(group))
+    if new_proxies:
+      new_group = ET.Element(group.tag, group.attrib)
     for proxy in new_proxies:
       removed_subproxies = []
       for subproxy in proxy.iter('SubProxy'):
@@ -73,10 +75,8 @@ def filter_proxies(fin, fout, proxies, all_proxies):
       for reptype in proxy.iter('RepresentationType'):
         if reptype.attrib['subproxy'] in removed_subproxies:
           proxy.remove(reptype)
-    if new_proxies:
-      new_group = ET.Element(group.tag, group.attrib)
-      map(new_group.append, new_proxies)
-      new_tree.append(new_group)
+      new_group.append(proxy)
+    new_tree.append(new_group)
 
   write_value = ET.tostring(new_tree)
   if hasattr(write_value, 'decode'):

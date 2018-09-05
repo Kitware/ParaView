@@ -193,7 +193,7 @@ static void ReturnResult(PyObject* result, vtkClientServerStream& resultStream)
   }
   else if (PyString_Check(result))
   {
-    char* str = PyString_AsString(result);
+    const char* str = PyString_AsString(result);
     resultStream << vtkClientServerStream::Reply << str << vtkClientServerStream::End;
   }
   else if (PyBool_Check(result))
