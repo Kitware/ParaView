@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define vtksys_SHARED_FORWARD_OPTION_PRINT "--print"
 #define vtksys_SHARED_FORWARD_OPTION_LDD "--ldd"
 
+#include <libgen.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,8 +40,7 @@ int get_driver_cache_user_path(char *driver_cache_path)
     {
     return 0;
     }
-  strncpy(driver_cache_path, home, strlen(home) + 1);
-  strcat(driver_cache_path, "/.config/ParaView/ParaViewMesaConfig.ini");
+  snprintf(driver_cache_path, KWSYS_SHARED_FORWARD_MAXPATH, "%s/.config/ParaView/ParaViewMesaConfig.ini", home);
   //fprintf(stdout, "User cache = %s\n", driver_cache_path);
   return 1;
 }
@@ -56,18 +56,11 @@ int get_driver_cache_site_path(const char *this_exe_path,
   kwsys_shared_forward_self_path(this_exe_path, self_path);
   kwsys_shared_forward_get_settings(self_path, throwaway_ldpath, exe);
 
-  char driver_install_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
-  char *last_slash = strrchr(exe, '/');
-  if (last_slash)
-    {
-    strncpy(driver_install_path, exe, last_slash - exe + 1);
+  char *dirname_exe = dirname(exe);
+  snprintf(driver_cache_path, KWSYS_SHARED_FORWARD_MAXPATH, "%s/ParaViewMesaConfig.ini", dirname_exe);
 
-    strcat(driver_cache_path, driver_install_path);
-    strcat(driver_cache_path, "ParaViewMesaConfig.ini");
-    //fprintf(stdout, "Site cache = %s\n", driver_cache_path);
-    return 1;
-    }
-  return 0;
+  //fprintf(stdout, "Site cache = %s\n", driver_cache_path);
+  return 1;
 }
 
 int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
@@ -85,23 +78,13 @@ int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
   kwsys_shared_forward_self_path(this_exe_path, self_path);
   kwsys_shared_forward_get_settings(self_path, throwaway_ldpath, exe);
 
-  char driver_install_path[KWSYS_SHARED_FORWARD_MAXPATH] = { 0 };
-  char *last_slash = strrchr(exe, '/');
-  if (last_slash)
-    {
-    strncpy(driver_install_path, exe, last_slash - exe + 1);
+  char *dirname_exe = dirname(exe);
+  snprintf(kwsys_shared_forward_ldpath, KWSYS_SHARED_FORWARD_MAXPATH, "%s/%s%s", dirname_exe, driver, kwsys_shared_forward_path_sep);
 
-    strcat(kwsys_shared_forward_ldpath, driver_install_path);
-    strcat(kwsys_shared_forward_ldpath, driver);
-    strcat(kwsys_shared_forward_ldpath, kwsys_shared_forward_path_sep);
-
-    // Checks
-    //fprintf(stdout, "driver_install_path = %s\n", driver_install_path);
-    //fprintf(stdout, "kwsys_shared_forward_ldpath = %s\n",
-    //    kwsys_shared_forward_ldpath);
-    return 1;
-    }
-  return 0;
+  // Checks
+  //fprintf(stdout, "kwsys_shared_forward_ldpath = %s\n",
+  //    kwsys_shared_forward_ldpath);
+  return 1;
 }
 
 int choose_driver(const char *this_exe_path, const char *driver, int print)
@@ -198,7 +181,7 @@ int main(int argc, char** argv)
              strcmp(argv[i], "--mesa-swr") == 0       ||
              strcmp(argv[i], "--mesa") == 0)
       {
-      strncpy(driver_choice, argv[i] + 2, MAX_DRIVER_CHOICE);
+      snprintf(driver_choice, MAX_DRIVER_CHOICE, argv[i] + 2);
       }
     else
       {
