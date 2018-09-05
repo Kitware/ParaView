@@ -514,6 +514,10 @@ bool vtkSMPVRepresentationProxy::SetScalarColoringInternal(
 
   if (arrayname == NULL || arrayname[0] == '\0')
   {
+    SM_SCOPED_TRACE(SetScalarColoring)
+      .arg("display", this)
+      .arg("arrayname", arrayname)
+      .arg("attribute_type", attribute_type);
     vtkSMPropertyHelper(this, "LookupTable", true).RemoveAllValues();
     vtkSMPropertyHelper(this, "ScalarOpacityFunction", true).RemoveAllValues();
     this->UpdateVTKObjects();
