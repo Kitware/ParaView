@@ -45,7 +45,9 @@ class pqAnimationTrack;
 
 class PQWIDGETS_EXPORT pqAnimationWidget : public QAbstractScrollArea
 {
-  Q_OBJECT
+  Q_OBJECT;
+  using Superclass = QAbstractScrollArea;
+
 public:
   pqAnimationWidget(QWidget* p = 0);
   ~pqAnimationWidget() override;
