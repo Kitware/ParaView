@@ -62,6 +62,8 @@ def filter_proxies(fin, fout, proxies, all_proxies):
     new_proxies = filter(is_wanted, list(group))
     if new_proxies:
       new_group = ET.Element(group.tag, group.attrib)
+    else:
+      continue
     for proxy in new_proxies:
       removed_subproxies = []
       for subproxy in proxy.iter('SubProxy'):
