@@ -263,22 +263,34 @@ public:
     {
       return QVariant();
     }
-    if (role != Qt::DisplayRole)
-    {
-      return QVariant();
-    }
     TreeItem* item = static_cast<TreeItem*>(idx.internalPointer());
-
-    switch (idx.column())
+    if (role == Qt::DisplayRole)
     {
-      case 0:
+
+      switch (idx.column())
       {
-        QString result = item->name();
-        result.replace("_", " ");
-        return result;
+        case 0:
+        {
+          QString result = item->name();
+          result.replace("_", " ");
+          return result;
+        }
+        case 1:
+          return item->keySequence();
       }
-      case 1:
-        return item->keySequence();
+    }
+    else if (role == Qt::FontRole)
+    {
+      switch (idx.column())
+      {
+        case 1:
+          QFont font;
+          if (item->keySequence() != item->defaultKeySequence())
+          {
+            font.setBold(true);
+          }
+          return font;
+      }
     }
     return QVariant();
   }
