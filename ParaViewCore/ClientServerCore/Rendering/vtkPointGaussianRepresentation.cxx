@@ -200,15 +200,40 @@ int vtkPointGaussianRepresentation::RequestData(
   }
   else if (compositeInput)
   {
-    // only will draw polydatas
-    this->ProcessedData = compositeInput;
+    // make sure all block of the composite dataset are polydata
+    vtkCompositeDataSet* compositeData = compositeInput->NewInstance();
+    this->ProcessedData.TakeReference(compositeData);
+    compositeData->CopyStructure(compositeInput);
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(compositeInput->NewIterator());
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      vtkPolyData* pd = vtkPolyData::SafeDownCast(ds);
+      if (pd)
+      {
+        compositeData->SetDataSet(iter, pd);
+      }
+      else if (ds && ds->GetNumberOfPoints() > 0)
+      {
+        // The mapper underneath expect only PolyData or CompositePD
+        // Apply conversion - We do not need vertex list as we
+        // use all the points in that use case
+        vtkNew<vtkMaskPoints> unstructuredToPolyData;
+        unstructuredToPolyData->SetInputData(ds);
+        unstructuredToPolyData->SetMaximumNumberOfPoints(ds->GetNumberOfPoints());
+        unstructuredToPolyData->GenerateVerticesOff();
+        unstructuredToPolyData->SetOnRatio(1);
+        unstructuredToPolyData->Update();
+        compositeData->SetDataSet(iter, unstructuredToPolyData->GetOutput());
+      }
+    }
   }
-
-  // The mapper underneath expect only PolyData or CompositePD
-  // Apply conversion - We do not need vertex list as we
-  // use all the points in that use case
-  if (this->ProcessedData == NULL && input != NULL && input->GetNumberOfPoints() > 0)
+  else if (input != NULL && input->GetNumberOfPoints() > 0)
   {
+    // The mapper underneath expect only PolyData or CompositePD
+    // Apply conversion - We do not need vertex list as we
+    // use all the points in that use case
     vtkNew<vtkMaskPoints> unstructuredToPolyData;
     unstructuredToPolyData->SetInputData(input);
     unstructuredToPolyData->SetMaximumNumberOfPoints(input->GetNumberOfPoints());
