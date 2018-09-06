@@ -28,26 +28,23 @@ usage () {
         "[--verbose] [-v <version>] [<tag>|<commit>]"
 }
 
-# Check for a tool to get MD5 sums from.
-if type -p md5sum >/dev/null; then
-    readonly md5tool="md5sum"
-    readonly md5regex="s/ .*//"
-elif type -p md5 >/dev/null; then
-    readonly md5tool="md5"
-    readonly md5regex="s/.*= //"
+# Check for a tool to get SHA512 sums from.
+if type -p sha512sum >/dev/null; then
+    readonly sha512tool="sha512sum"
+    readonly sha512regex="s/ .*//"
 elif type -p cmake >/dev/null; then
-    readonly md5tool="cmake -E md5sum"
-    readonly md5regex="s/ .*//"
+    readonly sha512tool="cmake -E sha512sum"
+    readonly sha512regex="s/ .*//"
 else
-    die "No 'md5sum' or 'md5' tool found."
+    die "No 'sha512sum' tool found."
 fi
 
-compute_MD5 () {
+compute_SHA512 () {
     local file="$1"
     readonly file
     shift
 
-    $md5tool "$file" | sed -e "$md5regex"
+    $sha512tool "$file" | sed -e "$sha512regex"
 }
 
 validate () {
@@ -108,14 +105,14 @@ find_data_objects () {
     readonly revision
     shift
 
-    # Find all .md5 files in the tree.
+    # Find all .sha512 files in the tree.
     git ls-tree --full-tree -r "$revision" | \
-        grep '\.md5$' | \
+        grep '\.sha512$' | \
         while read mode type obj path; do
             case "$path" in
-                *.md5)
+                *.sha512)
                     # Build the path to the object.
-                    echo "MD5,$( git cat-file blob $obj ),$path"
+                    echo "SHA512,$( git cat-file blob $obj ),$path"
                     ;;
                 *)
                     die "unknown ExternalData content link: $path"
