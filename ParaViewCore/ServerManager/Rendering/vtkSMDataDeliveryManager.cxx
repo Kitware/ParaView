@@ -64,7 +64,9 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   vtkMTimeType update_ts = view->GetUpdateTimeStamp();
 
   // note: this will create new vtkTimeStamp, if needed.
-  vtkTimeStamp& timeStamp = this->DeliveryTimestamps[data_distribution_mode];
+  vtkTimeStamp& timeStamp = use_lod ? this->DeliveryTimestampsLOD[data_distribution_mode]
+                                    : this->DeliveryTimestamps[data_distribution_mode];
+
   if (timeStamp > update_ts)
   {
     // we have delivered the data since the last update on this view for the
