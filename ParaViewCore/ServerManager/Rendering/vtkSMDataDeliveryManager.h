@@ -70,6 +70,7 @@ protected:
 
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
   std::map<int, vtkTimeStamp> DeliveryTimestamps;
+  std::map<int, vtkTimeStamp> DeliveryTimestampsLOD;
 
 private:
   vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&) = delete;
