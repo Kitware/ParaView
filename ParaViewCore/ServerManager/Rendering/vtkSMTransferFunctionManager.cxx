@@ -240,6 +240,10 @@ void vtkSMTransferFunctionManager::ResetAllTransferFunctionRangesUsingCurrentDat
     {
       extend = true;
     }
+    else if (rescaleMode == vtkSMTransferFunctionManager::RESET_ON_APPLY && !animating)
+    {
+      extend = false;
+    }
     else if (rescaleMode == vtkSMTransferFunctionManager::GROW_ON_APPLY_AND_TIMESTEP && animating)
     {
       extend = true;
