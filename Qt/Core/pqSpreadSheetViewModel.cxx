@@ -456,7 +456,7 @@ QVariant pqSpreadSheetViewModel::headerData(
       switch (role)
       {
         case Qt::DisplayRole:
-          return view->GetColumnLabel(section);
+          return QString(view->GetColumnLabel(section).c_str());
         case SectionInternal:
           return view->IsColumnInternal(section);
         case SectionVisible:

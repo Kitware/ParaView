@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqSpreadSheetViewModel.h"
 
+#include "pqMultiColumnHeaderView.h"
+
 #include <QApplication>
 #include <QHeaderView>
 #include <QItemDelegate>
@@ -81,29 +83,30 @@ public:
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
   : Superclass(parentObject)
+  , SingleColumnMode(false)
+  , OldColumnCount(0)
 {
   // setup some defaults.
   this->setAlternatingRowColors(true);
   this->setCornerButtonEnabled(false);
   this->setSelectionBehavior(QAbstractItemView::SelectRows);
-#if QT_VERSION >= 0x050000
-  this->horizontalHeader()->setSectionsMovable(true);
-#else
-  this->horizontalHeader()->setMovable(true);
-#endif
-  this->horizontalHeader()->setHighlightSections(false);
-  this->SingleColumnMode = false;
+
+  auto hheader = new pqMultiColumnHeaderView(Qt::Horizontal, this);
+  hheader->setObjectName("Header");
+  hheader->setSectionsClickable(true);
+  hheader->setSectionsMovable(false);
+  hheader->setHighlightSections(false);
+  // limit to using 100 columns when resizing. This addresses performance issues with
+  // large data. Note visible columns only (0) is not adequate since the widget may
+  // not be visible at all when being resized and we e
+  hheader->setResizeContentsPrecision(100);
+  this->setHorizontalHeader(hheader);
 
   // setup the delegate.
   this->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
 
   QObject::connect(this->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this,
     SLOT(onSortIndicatorChanged(int, Qt::SortOrder)));
-
-  // limit to using 10 columns when resizing. This addresses performance issues with
-  // large data. Note visible columns only (0) is not adequate since the widget may
-  // not be visible at all when being resized and we e
-  this->horizontalHeader()->setResizeContentsPrecision(10);
 }
 
 //-----------------------------------------------------------------------------
@@ -133,13 +136,21 @@ void pqSpreadSheetViewWidget::onHeaderDataChanged()
 {
   if (auto amodel = this->model())
   {
-    for (int cc = 0, max = amodel->columnCount(); cc < max; cc++)
+    const int colcount = amodel->columnCount();
+    for (int cc = 0; cc < colcount; cc++)
     {
       bool visible =
         amodel->headerData(cc, Qt::Horizontal, pqSpreadSheetViewModel::SectionVisible).toBool();
       this->setColumnHidden(cc, !visible);
     }
-    this->resizeColumnsToContents();
+
+    if (this->OldColumnCount != colcount)
+    {
+      // don't resize column unless the column count really changed.
+      // this overcomes #18430.
+      this->resizeColumnsToContents();
+      this->OldColumnCount = colcount;
+    }
   }
 }
 

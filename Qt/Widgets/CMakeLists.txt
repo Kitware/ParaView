@@ -100,6 +100,8 @@ set(Module_SRCS
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
   pqListWidgetItemObject.h
+  pqMultiColumnHeaderView.cxx
+  pqMultiColumnHeaderView.h
   pqProgressWidget.cxx
   pqProgressWidget.h
   pqQuickLaunchDialog.cxx
@@ -179,6 +181,7 @@ set (QtWidgets_SRCS
   pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h
+  pqMultiColumnHeaderView.h
   pqProgressWidget.h
   pqQuickLaunchDialog.h
   pqScaleByButton.h

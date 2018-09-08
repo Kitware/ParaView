@@ -72,12 +72,6 @@ public:
     this->Table->setCornerButtonEnabled(false);
     this->Table->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->Table->setSelectionModel(&this->SelectionModel);
-#if QT_VERSION >= 0x050000
-    this->Table->horizontalHeader()->setSectionsMovable(true);
-#else
-    this->Table->horizontalHeader()->setMovable(true);
-#endif
-    this->SingleColumnMode = false;
 
     // Do not show the sorting arrow as default
     this->Table->setSortingEnabled(false);
@@ -93,8 +87,6 @@ public:
   // We use EmptySelectionModel as the selection model for the view when in
   // SelectionOnly mode i.e. when we showing only the selected elements.
   QItemSelectionModel EmptySelectionModel;
-
-  bool SingleColumnMode;
 };
 
 //-----------------------------------------------------------------------------

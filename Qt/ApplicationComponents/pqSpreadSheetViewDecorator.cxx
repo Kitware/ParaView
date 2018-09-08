@@ -147,8 +147,10 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
         model->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString().toLatin1().data();
       bool checked =
         model->headerData(col, Qt::Horizontal, pqSpreadSheetViewModel::SectionVisible).toBool();
-      columnLabels.push_back(std::make_pair(label, checked));
-      columnLabelsSet.insert(label);
+      if (columnLabelsSet.insert(label).second == true)
+      {
+        columnLabels.push_back(std::make_pair(label, checked));
+      }
     }
   }
   columnLabels.push_back(std::make_pair(std::string(), false));
@@ -160,10 +162,9 @@ static void populateMenu(pqSpreadSheetView* view, QMenu* menu)
   for (unsigned int cc = 0, max = svp->GetNumberOfElements(); cc < max; ++cc)
   {
     auto txt = svp->GetElement(cc);
-    if (columnLabelsSet.find(txt) == columnLabelsSet.end())
+    if (columnLabelsSet.insert(txt).second == true)
     {
       columnLabels.push_back(std::make_pair(txt, false));
-      columnLabelsSet.insert(txt);
     }
   }
 

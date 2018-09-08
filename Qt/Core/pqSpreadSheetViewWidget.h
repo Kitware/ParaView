@@ -86,12 +86,13 @@ protected:
   */
   void paintEvent(QPaintEvent* event) override;
 
-  bool SingleColumnMode;
-
 private:
   Q_DISABLE_COPY(pqSpreadSheetViewWidget)
 
   class pqDelegate;
+
+  bool SingleColumnMode;
+  int OldColumnCount;
 };
 
 #endif
