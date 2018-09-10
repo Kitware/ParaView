@@ -328,7 +328,7 @@ void pqDeleteReaction::onTriggered()
           "Delete All?", tr("The current visualization will be reset \n"
                             "and the state will be discarded.\n\n"
                             "Are you sure you want to continue?"),
-          QMessageBox::Yes | QMessageBox::No | QMessageBox::Save))
+          QMessageBox::Yes | QMessageBox::No))
     {
       pqDeleteReaction::deleteAll();
     }
