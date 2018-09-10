@@ -27,6 +27,7 @@
 #include "vtkUnsignedCharArray.h"
 
 #include "assert.h"
+#include <cmath>
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkCaveSynchronizedRenderers);
@@ -214,4 +215,35 @@ void vtkCaveSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "Y: " << this->DisplayY[0] << " " << this->DisplayY[1] << " " << this->DisplayY[2]
      << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkCaveSynchronizedRenderers::SetRenderer(vtkRenderer* renderer)
+{
+  this->Superclass::SetRenderer(renderer);
+  if (this->NumberOfDisplays != 1)
+  {
+    return;
+  }
+
+  vtkPVServerOptions* options =
+    vtkPVServerOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+  if (!options)
+  {
+    vtkErrorMacro("Can not load the server options.");
+    return;
+  }
+
+  int* geometry = options->GetGeometry(0);
+  if (!options->GetCaveBoundsSet(0) && geometry && geometry[2] != 0)
+  {
+    vtkCamera* camera = this->GetRenderer() ? this->GetRenderer()->GetActiveCamera() : nullptr;
+    double angle = camera ? camera->GetViewAngle() / 2. : 15.;
+    double ratio = static_cast<double>(geometry[3]) / geometry[2];
+    double z = ratio / tan(vtkMath::RadiansFromDegrees(angle));
+    double lowerLeft[3] = { 1., ratio, z };
+    double lowerRight[3] = { -1., ratio, z };
+    double upperRight[3] = { -1., -ratio, z };
+    this->DefineDisplay(0, lowerLeft, lowerRight, upperRight);
+  }
 }

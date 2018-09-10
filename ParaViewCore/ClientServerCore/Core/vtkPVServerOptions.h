@@ -74,6 +74,7 @@ public:
   double* GetLowerLeft(unsigned int idx);
   double* GetLowerRight(unsigned int idx);
   double* GetUpperRight(unsigned int idx);
+  bool GetCaveBoundsSet(unsigned int idx);
   //@}
 
   // Returns -1 to indicate not stereo type was specified. 0 indicate no stereo
