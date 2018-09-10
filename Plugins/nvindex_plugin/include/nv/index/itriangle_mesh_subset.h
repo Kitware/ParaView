@@ -42,11 +42,12 @@ public:
   /// Initializes the triangle mesh subset by assigning vertices and
   /// per-vertex attributes.
   ///
-  /// When the array (normal, texture coordinate, color) is provided, but its
-  /// index array is 0, then the vertex index array will be used. In this way,
-  /// you can share the attribute index map.
+  /// When an array is provided (e.g. \c normals or \c texture_coordinates), but its
+  /// index array (\c normal_indices, \c tex_coord_indices) is 0, then the vertex
+  /// index array (\c vertex_indices) will be used instead. This way, you can share the
+  /// attribute index map.
   ///
-  /// The array that map a triangle index to an attribute index are all
+  /// The arrays that map a triangle index to an attribute index are all
   /// separate.
   ///
   /// \param[in] bounding_box           bounding box of the sub-mesh (required)
@@ -124,8 +125,9 @@ public:
   /// \return Vertex normal array
   virtual mi::math::Vector_struct<mi::Float32, 3>* get_normals() const = 0;
 
-  /// Returns the tri-vertex to normal index array. The array length is # of triangles * 3.
-  /// \return the reference to tri-vertex to normal index array
+  /// Returns the tri-vertex to normal index array.
+  /// The array length is number of triangles * 3.
+  /// \return Tri-vertex to normal index array
   virtual mi::Uint32* get_normal_indices() const = 0;
 
   /// Returns the number of texture coordinates.
@@ -155,7 +157,8 @@ public:
   virtual mi::Uint32* get_color_indices() const = 0;
 
   /// Returns the tri-vertex to colormap index array.
-  /// \return Tri-vertex to colormap index array
+  /// The array length is number of triangles * 3.
+  /// \return Tri-vertex to colormap index array, or 0
   virtual mi::Uint32* get_colormap_indices() const = 0;
 
   /// Returns the number of materials
@@ -175,6 +178,7 @@ public:
   virtual ITriangle_mesh_subset::Triflags* get_triangle_flags() const = 0;
 
   /// Returns the IDs of the triangles in the sub-mesh.
+  /// The array length is number of triangles.
   /// \return Triangle ID array
   virtual mi::Uint64* get_global_triangle_ids() const = 0;
 

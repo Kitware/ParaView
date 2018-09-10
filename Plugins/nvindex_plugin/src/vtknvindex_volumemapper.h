@@ -134,6 +134,7 @@ private:
   bool m_rtc_kernel_changed; // True when switching between CUDA code.
   bool m_rtc_param_changed;  // True when a kernel parameter changed.
 
+  vtkMTimeType m_last_MTime;   // last MTime when volume was modified
   std::string m_prev_property; // Volume property that was rendered.
 
   std::map<mi::Sint32, bool>

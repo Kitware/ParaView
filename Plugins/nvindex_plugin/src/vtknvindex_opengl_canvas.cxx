@@ -33,7 +33,11 @@
 #include "vtkOpenGLRenderer.h"
 #include "vtkRenderWindow.h"
 
+#if defined(__APPLE__)
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
 
 //-------------------------------------------------------------------------------------------------
 vtknvindex_opengl_canvas::vtknvindex_opengl_canvas()
@@ -42,6 +46,7 @@ vtknvindex_opengl_canvas::vtknvindex_opengl_canvas()
   m_main_window_size.y = 0;
 }
 
+//-------------------------------------------------------------------------------------------------
 vtknvindex_opengl_canvas::~vtknvindex_opengl_canvas()
 {
   // empty
@@ -53,16 +58,19 @@ bool vtknvindex_opengl_canvas::is_multi_thread_capable() const
   return false;
 }
 
+//-------------------------------------------------------------------------------------------------
 mi::math::Vector_struct<mi::Sint32, 2> vtknvindex_opengl_canvas::get_buffer_resolution() const
 {
   return m_main_window_size;
 }
 
+//-------------------------------------------------------------------------------------------------
 std::string vtknvindex_opengl_canvas::get_class_name() const
 {
   return std::string("vtknvindex_opengl_canvas");
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtknvindex_opengl_canvas::initialize_gl()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -80,6 +88,18 @@ void vtknvindex_opengl_canvas::prepare()
   // considering depth information.
   glDepthMask(GL_FALSE);
   glDisable(GL_DEPTH_TEST);
+}
+
+//-------------------------------------------------------------------------------------------------
+mi::math::Vector_struct<mi::Uint32, 2> vtknvindex_opengl_canvas::get_resolution() const
+{
+  // const mi::math::Vector_struct<mi::Sint32, 2> res = get_buffer_resolution();
+  // mi::math::Vector_struct<mi::Uint32, 2> resolution;
+  // resolution.x = static_cast<mi::Uint32>(res.x);
+  // resolution.y = static_cast<mi::Uint32>(res.y);
+  // return resolution;
+
+  return mi::math::Vector<mi::Uint32, 2>(m_main_window_size.x, m_main_window_size.y);
 }
 
 //-------------------------------------------------------------------------------------------------

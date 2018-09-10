@@ -76,14 +76,14 @@ public:
   ///
   /// Increments the reference count of the object referenced through this interface
   /// and returns the new reference count. The operation is thread-safe.
-  Uint32 retain() const override { return ++m_refcnt; }
+  virtual Uint32 retain() const { return ++m_refcnt; }
 
   /// Decrements the reference count.
   ///
   /// Decrements the reference count of the object referenced through this interface
   /// and returns the new reference count. If the reference count dropped to
   /// zero, the object will be deleted. The operation is thread-safe.
-  Uint32 release() const override
+  virtual Uint32 release() const
   {
     Uint32 cnt = --m_refcnt;
     if (!cnt)
@@ -101,7 +101,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the
   /// new interface pointer, whose reference count has been retained once. The caller
   /// must release the returned interface pointer at the end to prevent a memory leak.
-  const IInterface* get_interface(const Uuid& interface_id) const override
+  virtual const IInterface* get_interface(const Uuid& interface_id) const
   {
     return I::get_interface_static(this, interface_id);
   }
@@ -116,7 +116,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the
   /// new interface pointer, whose reference count has been retained once. The caller
   /// must release the returned interface pointer at the end to prevent a memory leak.
-  IInterface* get_interface(const Uuid& interface_id) override
+  virtual IInterface* get_interface(const Uuid& interface_id)
   {
     return I::get_interface_static(this, interface_id);
   }
@@ -124,7 +124,7 @@ public:
   using I::get_interface;
 
   /// Returns the interface ID of the most derived interface.
-  Uuid get_iid() const override { return typename I::IID(); }
+  Uuid get_iid() const { return typename I::IID(); }
 
 protected:
   virtual ~Interface_implement() {}
@@ -274,13 +274,13 @@ public:
   ///
   /// Implements #mi::base::IInterface::retain() with a constant reference
   /// count of one.
-  Uint32 retain() const override { return 1; }
+  virtual Uint32 retain() const { return 1; }
 
   /// Returns the fixed reference count of one.
   ///
   /// Implements #mi::base::IInterface::release() with a constant reference
   /// count of one. The object will never be deleted through a release call.
-  Uint32 release() const override { return 1; }
+  virtual Uint32 release() const { return 1; }
 
   /// Acquires a const interface.
   ///
@@ -292,7 +292,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the
   /// new interface pointer, whose reference count has been retained once. The caller
   /// must release the returned interface pointer at the end to prevent a memory leak.
-  const IInterface* get_interface(const Uuid& interface_id) const override
+  virtual const IInterface* get_interface(const Uuid& interface_id) const
   {
     return I::get_interface_static(this, interface_id);
   }
@@ -307,7 +307,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the
   /// new interface pointer, whose reference count has been retained once. The caller
   /// must release the returned interface pointer at the end to prevent a memory leak.
-  IInterface* get_interface(const Uuid& interface_id) override
+  virtual IInterface* get_interface(const Uuid& interface_id)
   {
     return I::get_interface_static(this, interface_id);
   }
@@ -315,7 +315,7 @@ public:
   using I::get_interface;
 
   /// Returns the interface ID of the most derived interface.
-  Uuid get_iid() const override { return typename I::IID(); }
+  Uuid get_iid() const { return typename I::IID(); }
 
 protected:
   virtual ~Interface_implement_singleton() {}

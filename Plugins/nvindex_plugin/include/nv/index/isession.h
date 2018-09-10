@@ -64,11 +64,11 @@ public:
   ///@}
 
   ///////////////////////////////////////////////////////////////////////////////////
-  /// \name Creating a viewport.
+  /// \name Multi-view support.
   ///@{
   /// Creates a new viewport.
   ///
-  /// \return     Returns the new \c IViewport object.  The caller
+  /// \return     Returns the new \c IViewport object. The caller
   ///             takes ownership of the viewport object and is
   ///             responsible for freeing it when it is not needed
   ///             anymore, i.e. by storing it in a \c mi::base::Handle.
@@ -77,12 +77,22 @@ public:
 
   /// Creates a new viewport list.
   ///
-  /// \return     Returns the new \c IViewport_list object.  The caller
+  /// \return     Returns the new \c IViewport_list object. The caller
   ///             takes ownership of the viewport object and is
   ///             responsible for freeing it when it is not needed
   ///             anymore, i.e. by storing it in a \c mi::base::Handle.
   ///
   virtual IViewport_list* create_viewport_list() const = 0;
+
+  /// Creates a new list of canvas/viewport-list pairs.
+  ///
+  /// \return     Returns the new \c ICanvas_viewport_list object. The caller
+  ///             takes ownership of the returned object and is
+  ///             responsible for freeing it when it is not needed
+  ///             anymore, i.e. by storing it in a \c mi::base::Handle.
+  ///
+  virtual ICanvas_viewport_list* create_canvas_viewport_list() const = 0;
+
   ///@}
 
   ///////////////////////////////////////////////////////////////////////////////////

@@ -74,7 +74,7 @@ public:
   /// Returns the total number of elements.
   ///
   /// This value is the product of #get_number_of_rows() and #get_number_of_columns().
-  Size get_length() const override = 0;
+  virtual Size get_length() const = 0;
 
   /// Returns the type name of elements of the compound.
   virtual const char* get_element_type_name() const = 0;

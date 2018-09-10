@@ -57,7 +57,7 @@ public:
   ///
   /// \param size     The requested size of memory in bytes. It may be zero.
   /// \return         The allocated memory block.
-  void* malloc(Size size) override = 0;
+  virtual void* malloc(Size size) = 0;
 
   /// Releases the given memory block.
   ///
@@ -66,7 +66,7 @@ public:
   ///
   /// \param memory   A memory block previously allocated by a call to #malloc().
   ///                 If \c memory is \c NULL, no operation is performed.
-  void free(void* memory) override = 0;
+  virtual void free(void* memory) = 0;
 
   /// This function is used by \neurayProductName to inquire the amount of extra memory currently
   /// in use in the application.

@@ -1,29 +1,29 @@
 /* Copyright 2018 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #ifndef vtknvindex_rtc_kernel_params_h
 #define vtknvindex_rtc_kernel_params_h
@@ -37,6 +37,7 @@ enum vtknvindex_rtc_kernels
   RTC_KERNELS_EDGE_ENHANCEMENT,
   RTC_KERNELS_SINGLE_SCATTERING,
   RTC_KERNELS_ISORAYCAST,
+  RTC_KERNELS_SUPERNOVA_GRADIENT
 };
 
 // kernel parameter buffer
@@ -246,10 +247,40 @@ struct vtknvindex_isoraycast_params
   }
 };
 
+// Supernova gradient parameters
+struct vtknvindex_supernova_gradient_params
+{
+  float gradient_scale; // gradient value (0.5) [0,1]
+  float screen_gamma;   // (0.55)
+  int color_method;     // Gradient Color method (3):
+                        // 0: use z gradient only
+                        // 1: use x,y gradient only
+                        // 2: use gradient magnitude
+                        // 3: darken sample color by magnitude
+
+  vtknvindex_supernova_gradient_params()
+    : gradient_scale(0.5f)
+    , screen_gamma(0.55f)
+    , color_method(3)
+  {
+  }
+};
+
+// rtc sparse volume programs
 extern const char* KERNEL_ISOSURFACE_STRING;
 extern const char* KERNEL_DEPTH_ENHANCEMENT_STRING;
 extern const char* KERNEL_EDGE_ENHANCEMENT_STRING;
+
 extern const char* KERNEL_SINGLE_SCATTERING_STRING;
 extern const char* KERNEL_ISORAYCAST_STRING;
+extern const char* KERNEL_SUPERNOVA_GRADIENT_STRING;
+
+// rtc irregular volume programs
+extern const char* KERNEL_IRREGULAR_ISOSURFACE_STRING;
+extern const char* KERNEL_IRREGULAR_DEPTH_ENHANCEMENT_STRING;
+extern const char* KERNEL_IRREGULAR_EDGE_ENHANCEMENT_STRING;
+
+// rtc surface programs
+extern const char* KERNEL_PLANE_SURFACE_MAPPING_STRING;
 
 #endif // vtknvindex_rtc_kernel_params_h

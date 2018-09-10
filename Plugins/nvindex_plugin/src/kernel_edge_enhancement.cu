@@ -41,8 +41,10 @@ struct Edge_enhancement_params
   float min_alpha;    // 0.2f minimum alpha for sampling (improves performance)
 };
 
-NV_IDX_VOLUME_SAMPLE_PROGRAM_PREFIX
-class NV_IDX_volume_sample_program
+using namespace nv::index::xac;
+using namespace nv::index::xaclib;
+
+class Volume_sample_program
 {
   NV_IDX_VOLUME_SAMPLE_PROGRAM
 
@@ -52,28 +54,34 @@ public:
 
 public:
   NV_IDX_DEVICE_INLINE_MEMBER
-  void init_instance()
+  void initialize()
   {
     // Bind the contents of the buffer slot 0 to the variable
-    m_edge_enhancement_params = NV_IDX_bind_parameter_buffer<Edge_enhancement_params>(0);
+    m_edge_enhancement_params = state.bind_parameter_buffer<Edge_enhancement_params>(0);
   }
 
   NV_IDX_DEVICE_INLINE_MEMBER
-  int execute(const NV_IDX_sample_info_self& sample_info, float4& output_color)
+  int execute(const Sample_info_self&   sample_info,
+                    Sample_output&      sample_output)
   {
-    const NV_IDX_volume& volume = state.self;
-    const float3& ps = sample_info.sample_position;
-    const NV_IDX_colormap& colormap = volume.get_colormap();
+    const auto& volume = state.self;
+    const float3& ps = sample_info.sample_position_object_space;
+    const Colormap& colormap = volume.get_colormap();
+
+    const auto  svol_sampler =
+      volume.generate_sampler<float>(0u, sample_info.sample_context);
+
 
     // sample volume
-    const float3 p0 = ps - (state.m_ray_direction * (m_edge_enhancement_params->rh *
-                                                      m_edge_enhancement_params->sample_range));
-    const float3 p2 = ps + (state.m_ray_direction * (m_edge_enhancement_params->rh *
-                                                      m_edge_enhancement_params->sample_range));
+    const float3 ray_dir = sample_info.ray_direction;
+    const float3 p0 = ps - (ray_dir * (m_edge_enhancement_params->rh *
+                                       m_edge_enhancement_params->sample_range));
+    const float3 p2 = ps + (ray_dir * (m_edge_enhancement_params->rh *
+                                       m_edge_enhancement_params->sample_range));
 
-    const float vs_p0 = volume.sample<float>(p0);
-    const float vs_ps = volume.sample<float>(ps);
-    const float vs_p2 = volume.sample<float>(p2);
+    const float vs_p0 = svol_sampler.fetch_sample(p0);
+    const float vs_ps = svol_sampler.fetch_sample(ps);
+    const float vs_p2 = svol_sampler.fetch_sample(p2);
 
     const float4 ps_color = colormap.lookup(vs_ps);
     const float ps_alpha = ps_color.w;
@@ -102,8 +110,8 @@ public:
         const float3 pi_b = (1.0f - rt) * p0 + rt * ps;
         const float3 pi_a = (1.0f - rt) * ps + rt * p2;
 
-        const float vs_pi_b = volume.sample<float>(pi_b);
-        const float vs_pi_a = volume.sample<float>(pi_a);
+        const float vs_pi_b = svol_sampler.fetch_sample(pi_b);
+        const float vs_pi_a = svol_sampler.fetch_sample(pi_a);
 
         const float4 pia_color = colormap.lookup(vs_pi_b);
         const float4 pib_color = colormap.lookup(vs_pi_a);
@@ -121,29 +129,29 @@ public:
 
       // check if all are larger
       // if (sum_over > 1 && sum_under == 0)
-      //    output_color = make_float4(ps_color.x, ps_color.y, ps_color.z, ps_color.w);
+      //    sample_output.color = make_float4(ps_color.x, ps_color.y, ps_color.z, ps_color.w);
 
       // check numer of samples below / above reference
       if (((sum_under_b > min_hits) && (sum_under_a > min_hits)) ||
         ((sum_over_b > min_hits) && (sum_over_a > min_hits)))
       {
-        output_color = ps_color / float(sum_under_b + sum_under_a - 2 * min_hits + 1);
-        output_color.w = ps_color.w;
+        sample_output.color = ps_color / float(sum_under_b + sum_under_a - 2 * min_hits + 1);
+        sample_output.color.w = ps_color.w;
 
         return NV_IDX_PROG_OK;
       }
       else
       {
-        output_color = ps_color;
+        sample_output.color = ps_color;
 
         // return NV_IDX_PROG_DISCARD_SAMPLE;
       }
     }
     else
     {
-      output_color = ps_color;
+      sample_output.color = ps_color;
     }
 
     return NV_IDX_PROG_OK;
   }
-}; // class NV_IDX_volume_sample_program
+}; // class Volume_sample_program

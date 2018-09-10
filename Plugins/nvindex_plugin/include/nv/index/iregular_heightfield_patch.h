@@ -91,7 +91,7 @@ public:
   ///
   virtual const mi::Float32* get_elevation_values() const = 0;
 
-  /// Returns the number of grid points. This is the same as the number of elements in the
+  /// Returns the number of grid points. This is the same as the number of elements in the the
   /// elevation value array size and the normal value array.
   ///
   /// \return Size of the elevation value array.

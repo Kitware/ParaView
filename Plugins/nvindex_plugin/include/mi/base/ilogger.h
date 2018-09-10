@@ -174,7 +174,7 @@ public:
 protected:
   // Sends the contents of the string buffer to the logger, clears the string buffer, and resets
   // the log level to the default log level.
-  int sync() override
+  int sync()
   {
     std::stringbuf::sync();
     const std::string& s = str();
@@ -246,6 +246,9 @@ public:
     , m_buffer(*this, logger, module_category, default_level)
   {
     rdbuf(&m_buffer);
+#if (__cplusplus >= 201402L)
+    this->pword(get_index()) = this;
+#endif
   }
 
   /// Destructor.
@@ -261,7 +264,7 @@ public:
   //  Returns the unique index into the private storage of std::ios_base.
   static int get_index()
   {
-    // Static initialization is guaranteed to be thread-safe with C++11 and later. The method
+    // Static initiliazation is guaranteed to be thread-safe with C++11 and later. The method
     // std::ios_base::xalloc() is guaranteed to be thread-safe with C++14 and later.
     static int s_index = std::ios_base::xalloc();
     return s_index;

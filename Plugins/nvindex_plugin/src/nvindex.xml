@@ -181,7 +181,7 @@
                 name="Subcube Border"
                 command="set_subcube_border"
                 number_of_elements="1"
-                default_values="3">
+                default_values="2">
                 <Documentation>Set subcube border size,
                     multiplied by 2 internally</Documentation>
             </IntVectorProperty>
@@ -483,6 +483,7 @@
               <Entry value="1" text="Isosurface"/>
               <Entry value="2" text="Depth enhancement"/>
               <Entry value="3" text="Edge enhancement"/>
+              <Entry value="6" text="Gradient"/>
             </EnumerationDomain>
             <Documentation>
               It selects the element to be visualized.
@@ -884,6 +885,66 @@
             </Hints>
           </DoubleVectorProperty>
 
+          <DoubleVectorProperty
+              label="Gradient scale"
+              name="gradient_scale"
+              command="set_gradient_scale"
+              number_of_elements="1"
+              default_values="40.0">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.001"
+                max ="100.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set gradient scale
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="6">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Gamma"
+              name="gradient_gamma"
+              command="set_gradient_gamma"
+              number_of_elements="1"
+              default_values="0.55">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.001"
+                max ="1.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set gradient gamma
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="6">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <IntVectorProperty
+              label="Color method"
+              name="gradient_color_method"
+              command="set_gradient_color_method"
+              number_of_elements="1"
+              default_values="2">
+            <EnumerationDomain name="enum">
+              <Entry value="0" text="Z gradient"/>
+              <Entry value="1" text="X,Y gradient"/>
+              <Entry value="2" text="Gradient magnitude"/>
+              <Entry value="3" text="Darken"/>
+            </EnumerationDomain>
+            <Documentation>
+              Set Gradient color method.
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="6">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
 
           <!-- End of NvidiaIndexRegularVolumeRepresentation -->
         </RepresentationProxy>
@@ -1097,7 +1158,301 @@
                     it into a file nvindex_pvplugin.prj in the plugin source directory.</Documentation>
             </IntVectorProperty>
 
-        <!-- End of NvidiaIndexRegularVolumeRepresentation -->
+            <IntVectorProperty
+                label=""
+                name="Filter"
+                command="set_volume_filter"
+                number_of_elements="1"
+                default_values="0">
+              <EnumerationDomain name="enum">
+                <Entry value="0" text="None"/>
+                <Entry value="1" text="Isosurface"/>
+                <Entry value="2" text="Depth enhancement"/>
+                <Entry value="3" text="Edge enhancement"/>
+                <Entry value="6" text="Gradient"/>
+              </EnumerationDomain>
+              <Documentation>
+                It selects the element to be visualized.
+              </Documentation>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+              label="Light type"
+              name="light_type"
+              command="set_light_type"
+              number_of_elements="1"
+              default_values="0">
+              <EnumerationDomain name="enum">
+                <Entry value="0" text="Headlight"/>
+                <Entry value="1" text="Orbital"/>
+              </EnumerationDomain>
+              <Documentation>
+                Set light type.
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </IntVectorProperty>
+
+            <DoubleVectorProperty
+                label="Azimuth"
+                name="light_angle"
+                command="set_light_angle"
+                number_of_elements="1"
+                default_values="0.0">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="0.0"
+                  max ="360.0">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set light angle
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="light_type" value="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Elevation"
+                name="light_elevation"
+                command="set_light_elevation"
+                number_of_elements="1"
+                default_values="45.0">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="-90.0"
+                  max ="90.0">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set light elevation
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="light_type" value="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Ambient"
+                name="surf_ambient"
+                command="set_surf_ambient"
+                number_of_elements="1"
+                default_values="0.15">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="0.0"
+                  max ="1.0">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set surface ambient level
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Specular"
+                name="surf_specular"
+                command="set_surf_specular"
+                number_of_elements="1"
+                default_values="0.5">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="0.0"
+                  max ="1.0">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set surface specular level
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Specular power"
+                name="surf_specular_power"
+                command="set_surf_specular_power"
+                number_of_elements="1"
+                default_values="50.0">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="0.0"
+                  max ="100.0">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set surface specular power
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="0" inverse="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </DoubleVectorProperty>
+
+
+            <DoubleVectorProperty
+                label="Iso min [%]"
+                name="iso_min"
+                command="set_iso_min"
+                number_of_elements="1"
+                default_values="0">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="0"
+                  max ="100">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set isosurface min value
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </DoubleVectorProperty>
+
+            <DoubleVectorProperty
+                label="Iso max [%]"
+                name="iso_max"
+                command="set_iso_max"
+                number_of_elements="1"
+                default_values="100">
+              <DoubleRangeDomain
+                  name="range"
+                  min ="0"
+                  max ="100">
+              </DoubleRangeDomain>
+              <Documentation>
+                Set isosurface max value
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </DoubleVectorProperty>
+
+            <IntVectorProperty
+                label="Fill mode"
+                name="iso_fill_mode"
+                command="set_iso_fill_mode"
+                number_of_elements="1"
+                default_values="2">
+              <EnumerationDomain name="enum">
+                <Entry value="0" text="No fill"/>
+                <Entry value="1" text="Single color"/>
+                <Entry value="2" text="Colormap"/>
+              </EnumerationDomain>
+              <Documentation>
+                Set isosurface fill mode.
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </IntVectorProperty>
+
+            <IntVectorProperty
+                label="Use shading"
+                name="iso_use_shading"
+                command="set_iso_use_shading"
+                number_of_elements="1"
+                default_values="1">
+              <BooleanDomain name="bool" />
+              <Documentation>
+                Use shading for isosurface
+              </Documentation>
+              <Hints>
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="1">
+                </PropertyWidgetDecorator>
+              </Hints>
+            </IntVectorProperty>
+
+          <IntVectorProperty
+              label="Samples"
+              name="depth_samples"
+              command="set_depth_samples"
+              number_of_elements="1"
+              default_values="1">
+            <IntRangeDomain
+                name="range"
+                min ="1"
+                max ="8">
+            </IntRangeDomain>
+            <Documentation>
+              Set number of samples along the ray
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="2">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <DoubleVectorProperty
+              label="Gamma"
+              name="depth_gamma"
+              command="set_depth_gamma"
+              number_of_elements="1"
+              default_values="0.9">
+            <DoubleRangeDomain
+                name="range"
+                min ="0.01"
+                max ="1.0">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set gamma correction
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="2">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <DoubleVectorProperty
+              label="Edge range"
+              name="edge_range"
+              command="set_edge_range"
+              number_of_elements="1"
+              default_values="1">
+            <DoubleRangeDomain
+                name="range"
+                min ="0"
+                max ="100">
+            </DoubleRangeDomain>
+            <Documentation>
+              Set edge range
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="3">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </DoubleVectorProperty>
+
+          <IntVectorProperty
+              label="Samples"
+              name="edge_samples"
+              command="set_edge_samples"
+              number_of_elements="1"
+              default_values="6">
+            <IntRangeDomain
+                name="range"
+                min ="1"
+                max ="32">
+            </IntRangeDomain>
+            <Documentation>
+              Set number of samples along the ray
+            </Documentation>
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Filter" value="3">
+              </PropertyWidgetDecorator>
+            </Hints>
+          </IntVectorProperty>
+
+          <!-- End of NvidiaIndexRegularVolumeRepresentation -->
         </RepresentationProxy>
 
     <Extension name="UniformGridRepresentation">
@@ -1170,6 +1525,9 @@
               <Property name="single_scatt_max_shadow"/>
               <Property name="single_scatt_shadow_exp"/>
               <Property name="isoraycast_threshold"/>
+              <Property name="gradient_scale"/>
+              <Property name="gradient_gamma"/>
+              <Property name="gradient_color_method"/>
             </PropertyGroup>
         </ExposedProperties>
 
@@ -1209,6 +1567,23 @@
                     <!-- <Property name="Filtering"/>  -->
                     <Property name="dump_internal_state"/>
                     <Property name="log_performance"/>
+            </PropertyGroup>
+            <PropertyGroup label="NVIDIA IndeX Visual Elements">
+              <Property name="Filter"/>
+              <Property name="light_type"/>
+              <Property name="light_angle"/>
+              <Property name="light_elevation"/>
+              <Property name="surf_ambient"/>
+              <Property name="surf_specular"/>
+              <Property name="surf_specular_power"/>
+              <Property name="iso_min"/>
+              <Property name="iso_max"/>
+              <Property name="iso_fill_mode"/>
+              <Property name="iso_use_shading"/>
+              <Property name="depth_samples"/>
+              <Property name="depth_gamma"/>
+              <Property name="edge_range"/>
+              <Property name="edge_samples"/>
             </PropertyGroup>
         </ExposedProperties>
 

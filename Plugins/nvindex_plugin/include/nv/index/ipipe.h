@@ -35,7 +35,7 @@ public:
   /// \return the point array
   virtual const mi::math::Vector_struct<mi::Float32, 3>* get_points() const = 0;
 
-  /// Get the number of radii
+  /// Get the number of raddi
   ///
   /// radius per segment, overrides global radius. if nb_radii is 0, global
   /// radius is taken. if nb_radii is 1, the radius is constant for this pipe.

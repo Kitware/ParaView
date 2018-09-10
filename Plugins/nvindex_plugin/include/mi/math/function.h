@@ -1022,15 +1022,11 @@ inline bool sign_bit(Float64 s)
 /// The methods relies on the IEEE 754 floating-point standard.
 inline bool isnan MI_PREVENT_MACRO_EXPAND(const Float32 x)
 {
-  const Uint32 exponent_mask = 0x7F800000; // 8 bit exponent
-  const Uint32 fraction_mask = 0x7FFFFF;   // 23 bit fraction
-
   // interpret as Uint32 value
   const Uint32 f = base::binary_cast<Uint32>(x);
 
   // check bit pattern
-  return ((f & exponent_mask) == exponent_mask) && // exp == 2^8 - 1
-    ((f & fraction_mask) != 0);                    // fraction != 0
+  return (f << 1) > 0xFF000000U; // shift sign bit, 8bit exp == 2^8-1, fraction != 0
 }
 
 /// Checks a double-precision floating point number for "not a number".
@@ -1038,15 +1034,10 @@ inline bool isnan MI_PREVENT_MACRO_EXPAND(const Float32 x)
 /// The methods relies on the IEEE 754 floating-point standard.
 inline bool isnan MI_PREVENT_MACRO_EXPAND(const Float64 x)
 {
-  const Uint64 exponent_mask = 0x7FF0000000000000ULL; // 11 bit exponent
-  const Uint64 fraction_mask = 0xFFFFFFFFFFFFFULL;    // 52 bit fraction
-
   // interpret as Uint64 value
   const Uint64 f = base::binary_cast<Uint64>(x);
 
-  // check bit pattern
-  return ((f & exponent_mask) == exponent_mask) && // exp == 2^11 - 1
-    ((f & fraction_mask) != 0);                    // fraction != 0
+  return (f << 1) > 0xFFE0000000000000ULL; // shift sign bit, 11bit exp == 2^11-1, fraction != 0
 }
 #else
 using std::isnan;

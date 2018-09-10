@@ -141,9 +141,27 @@ public:
   ///
   enum Attribute_type
   {
-    ATTRIB_TYPE_UINT8 = 0x00,  ///< 8bit unsigned integer attribute type.
-    ATTRIB_TYPE_UINT16 = 0x01, ///< 16bit unsigned integer attribute type.
-    ATTRIB_TYPE_FLOAT32 = 0x02 ///< 32bit floating point attribute type.
+    ATTRIB_TYPE_UINT8 = 0x00, ///<  8bit unsigned integer scalar attribute type.
+    ATTRIB_TYPE_UINT8_2 =
+      0x01, ///<  8bit unsigned integer vector attribute type with two components.
+    ATTRIB_TYPE_UINT8_3 =
+      0x02, ///<  8bit unsigned integer vector attribute type with three components.
+    ATTRIB_TYPE_UINT8_4 =
+      0x03, ///<  8bit unsigned integer vector attribute type with four components.
+    ATTRIB_TYPE_UINT16 = 0x04, ///< 16bit unsigned integer scalar attribute type.
+    ATTRIB_TYPE_UINT16_2 =
+      0x05, ///< 16bit unsigned integer vector attribute type with two components.
+    ATTRIB_TYPE_UINT16_3 =
+      0x06, ///< 16bit unsigned integer vector attribute type with three components.
+    ATTRIB_TYPE_UINT16_4 =
+      0x07, ///< 16bit unsigned integer vector attribute type with four components.
+    ATTRIB_TYPE_FLOAT32 = 0x08, ///< 32bit floating point scalar attribute type.
+    ATTRIB_TYPE_FLOAT32_2 =
+      0x09, ///< 32bit floating point vector attribute type with two components.
+    ATTRIB_TYPE_FLOAT32_3 =
+      0x10, ///< 32bit floating point vector attribute type with three components.
+    ATTRIB_TYPE_FLOAT32_4 =
+      0x11 ///< 32bit floating point vector attribute type with four components.
   };
 
   /// Irregular volume attribute parameters.

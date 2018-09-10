@@ -40,7 +40,7 @@ public:
   /// Returns the size of the array.
   ///
   /// The size of an array is the number of elements in the array.
-  Size get_length() const override = 0;
+  virtual Size get_length() const = 0;
 
   /// Returns the \p index -th element of the array.
   ///

@@ -54,7 +54,7 @@ public:
 
   /// A circle is defined by its center and a radius. The radius is always defined in
   /// screen space and given in pixels while the center of a circle is defined by a 3D
-  /// coordinate. The following method gets the center of the circle as well as its
+  /// coordinate. The following method gets the center of the cricle as well as its
   /// screen space radius by reference.
   ///
   /// \param[out] center          The center of the circle defined in the circles
@@ -86,7 +86,7 @@ public:
     mi::math::Color_struct& line_color, mi::Float32& line_width) const = 0;
 
   /// The inner part of a circle is defined to be empty or can be filled. The fill style
-  /// defines the appearance of the circle's interior.
+  /// defines the appareance of the circle's interior.
   //
   enum Fill_style
   {
