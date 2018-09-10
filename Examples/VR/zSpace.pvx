@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<pvx>
+  <Process Type="server|dataserver|renderserver">
+    <EyeSeparation Value="0.065"/>
+    <Machine Name="localhost"
+             Environment="DISPLAY=:0"
+             Geometry="1920x1080+1920+0"/>
+  </Process>
+</pvx>

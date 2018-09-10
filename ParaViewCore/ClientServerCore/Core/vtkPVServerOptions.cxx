@@ -362,6 +362,16 @@ double* vtkPVServerOptions::GetUpperRight(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVServerOptions::GetCaveBoundsSet(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+  {
+    return 0;
+  }
+  return this->Internals->MachineInformationVector[idx].CaveBoundsSet == 1;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVServerOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
