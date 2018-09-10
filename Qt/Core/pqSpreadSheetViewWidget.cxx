@@ -46,6 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 //-----------------------------------------------------------------------------
+/*
+ * This delegate helps us keep track of rows that are being painted,
+ * that way we can control which blocks of data to request from the server side
+ */
 class pqSpreadSheetViewWidget::pqDelegate : public pqNonEditableStyledItemDelegate
 {
   typedef pqNonEditableStyledItemDelegate Superclass;
@@ -65,100 +69,13 @@ public:
   void paint(
     QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override
   {
-    const_cast<pqDelegate*>(this)->Top =
-      (this->Top.isValid() && this->Top < index) ? this->Top : index;
-    const_cast<pqDelegate*>(this)->Bottom =
-      (this->Bottom.isValid() && index < this->Bottom) ? this->Bottom : index;
-    QString text = index.data().toString();
-    if (text.isEmpty())
-      return;
-
-    // Make sure the text color is appropriate when selection
-    QPalette::ColorGroup cg =
-      (option.state & QStyle::State_Enabled) ? QPalette::Normal : QPalette::Disabled;
-    if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
-    {
-      cg = QPalette::Inactive;
-    }
-    if (option.state & QStyle::State_Selected)
-    {
-      painter->fillRect(option.rect, option.palette.brush(QPalette::Highlight));
-      painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
-    }
-    else
-    {
-      painter->setPen(option.palette.color(cg, QPalette::Text));
-    }
-
-    const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-    QRect textRect = option.rect.adjusted(textMargin, 0, -textMargin, 0);
-    this->TextOption.setWrapMode(QTextOption::ManualWrap);
-    this->TextOption.setTextDirection(option.direction);
-    this->TextOption.setAlignment(
-      QStyle::visualAlignment(option.direction, option.displayAlignment));
-
-    int split = text.split("\t").length();
-    this->TextOption.setTabStop(option.rect.width() / split);
-    this->TextLayout.setTextOption(this->TextOption);
-    this->TextLayout.setFont(option.font);
-    this->TextLayout.setText(text);
-
-    QSizeF textLayoutSize = this->doTextLayout(textRect.width());
-
-    if (textRect.width() < textLayoutSize.width() || textRect.height() < textLayoutSize.height())
-    {
-      QString elided;
-      int start = 0;
-      int end = text.indexOf(QChar::LineSeparator, start);
-      if (end == -1)
-      {
-        elided += option.fontMetrics.elidedText(text, option.textElideMode, textRect.width());
-      }
-      else
-        while (end != -1)
-        {
-          elided += option.fontMetrics.elidedText(
-            text.mid(start, end - start), option.textElideMode, textRect.width());
-          start = end + 1;
-          end = text.indexOf(QChar::LineSeparator, start);
-        }
-      this->TextLayout.setText(elided);
-      textLayoutSize = this->doTextLayout(textRect.width());
-    }
-
-    const QSize layoutSize(textRect.width(), int(textLayoutSize.height()));
-    const QRect layoutRect =
-      QStyle::alignedRect(option.direction, option.displayAlignment, layoutSize, textRect);
-    this->TextLayout.draw(
-      painter, layoutRect.topLeft(), QVector<QTextLayout::FormatRange>(), layoutRect);
+    this->Top = (this->Top.isValid() && this->Top < index) ? this->Top : index;
+    this->Bottom = (this->Bottom.isValid() && index < this->Bottom) ? this->Bottom : index;
+    this->Superclass::paint(painter, option, index);
   }
 
-  QSizeF doTextLayout(int lineWidth) const
-  {
-    QFontMetrics fontMetrics(this->TextLayout.font());
-    int leading = fontMetrics.leading();
-    qreal height = 0;
-    qreal widthUsed = 0;
-    this->TextLayout.beginLayout();
-    for (;;)
-    {
-      QTextLine line = this->TextLayout.createLine();
-      if (!line.isValid())
-        break;
-      line.setLineWidth(lineWidth);
-      height += leading;
-      line.setPosition(QPointF(0, height));
-      height += line.height();
-      widthUsed = qMax(widthUsed, line.naturalTextWidth());
-    }
-    this->TextLayout.endLayout();
-    return QSizeF(widthUsed, height);
-  }
-
-  QModelIndex Top;
-  QModelIndex Bottom;
-  mutable QTextLayout TextLayout;
-  mutable QTextOption TextOption;
+  mutable QModelIndex Top;
+  mutable QModelIndex Bottom;
 };
 
 //-----------------------------------------------------------------------------
@@ -178,10 +95,7 @@ pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
   this->SingleColumnMode = false;
 
   // setup the delegate.
-  this->setItemDelegate(new pqDelegate(this));
-
-  QObject::connect(this->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this,
-    SLOT(onSectionDoubleClicked(int)), Qt::QueuedConnection);
+  this->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
 
   QObject::connect(this->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this,
     SLOT(onSortIndicatorChanged(int, Qt::SortOrder)));
@@ -256,37 +170,6 @@ void pqSpreadSheetViewWidget::paintEvent(QPaintEvent* pevent)
   }
 }
 
-//-----------------------------------------------------------------------------
-/// Called when user double clicks on a column header.
-void pqSpreadSheetViewWidget::onSectionDoubleClicked(int logicalindex)
-{
-  int numcols = this->model()->columnCount();
-  if (logicalindex < 0 || logicalindex >= numcols)
-  {
-    return;
-  }
-
-  QHeaderView* header = this->horizontalHeader();
-  this->SingleColumnMode = !this->SingleColumnMode;
-  for (int cc = 0; cc < numcols; cc++)
-  {
-    this->setColumnHidden(cc, (this->SingleColumnMode && cc != logicalindex));
-    if (this->SingleColumnMode && cc == logicalindex)
-    {
-      header->setSectionResizeMode(cc, QHeaderView::Stretch);
-    }
-    else if (!this->SingleColumnMode)
-    {
-      header->setSectionResizeMode(cc, QHeaderView::Interactive);
-    }
-  }
-
-  if (!this->SingleColumnMode)
-  {
-    // re-load column visibility from the data model.
-    this->onHeaderDataChanged();
-  }
-}
 //-----------------------------------------------------------------------------
 /// Called when user clicks on a column header for sorting purpose.
 void pqSpreadSheetViewWidget::onSortIndicatorChanged(int section, Qt::SortOrder order)
