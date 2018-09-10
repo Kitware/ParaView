@@ -291,7 +291,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   mesh_params.global_max_edge_length = mi::math::sqrt(max_edge_length_sqr);
 
   mi::base::Handle<nv::index::IIrregular_volume_subset> irregular_volume_subset(
-    factory->create<nv::index::IIrregular_volume_subset>());
+    factory->create_data_subset<nv::index::IIrregular_volume_subset>());
 
   if (!irregular_volume_subset.is_valid_interface())
   {

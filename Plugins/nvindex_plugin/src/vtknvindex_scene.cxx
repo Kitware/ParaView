@@ -1,29 +1,29 @@
 /* Copyright 2018 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <cassert>
 
@@ -31,6 +31,7 @@
 
 #include "vtknvindex_scene.h"
 
+#include <nv/index/idistributed_compute_algorithm.h>
 #include <nv/index/idistributed_data_import_callback.h>
 #include <nv/index/ilight.h>
 #include <nv/index/imaterial.h>
@@ -39,6 +40,11 @@
 #include <nv/index/iregular_volume_texture.h>
 #include <nv/index/irendering_kernel_programs.h>
 #include <nv/index/iscene.h>
+
+#ifdef USE_SPARSE_VOLUME
+#include <nv/index/isparse_volume_rendering_properties.h>
+#endif
+
 #include <nv/index/ivolume_filter_mode.h>
 
 #include "vtkCamera.h"
@@ -54,6 +60,8 @@
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_irregular_volume_importer.h"
 #include "vtknvindex_rtc_kernel_params.h"
+#include "vtknvindex_sparse_volume_importer.h"
+#include "vtknvindex_volume_compute.h"
 #include "vtknvindex_volume_importer.h"
 
 //-------------------------------------------------------------------------------------------------
@@ -131,15 +139,28 @@ void update_slice_planes(nv::index::IPlane* plane, const vtknvindex_slice_params
 vtknvindex_scene::vtknvindex_scene()
   : m_scene_created(false)
   , m_only_init(true)
+  , m_is_parallel(false)
   , m_vol_properties_tag(mi::neuraylib::NULL_TAG)
-  , m_camera_tag(mi::neuraylib::NULL_TAG)
+  , m_perspective_camera_tag(mi::neuraylib::NULL_TAG)
+  , m_parallel_camera_tag(mi::neuraylib::NULL_TAG)
   , m_timeseries_tag(mi::neuraylib::NULL_TAG)
   , m_static_group_tag(mi::neuraylib::NULL_TAG)
   , m_volume_tag(mi::neuraylib::NULL_TAG)
   , m_volume_colormap_tag(mi::neuraylib::NULL_TAG)
+
+#ifdef USE_SPARSE_VOLUME
+  , m_prog_se_mapping_tag(mi::neuraylib::NULL_TAG)
+#else
   , m_volume_texture_attrib_tag(mi::neuraylib::NULL_TAG)
+#endif // USE_SPARSE_VOLUME
+
   , m_rtc_program_params_tag(mi::neuraylib::NULL_TAG)
   , m_rtc_program_tag(mi::neuraylib::NULL_TAG)
+  , m_volume_compute_attrib_tag(mi::neuraylib::NULL_TAG)
+
+#ifdef USE_SPARSE_VOLUME
+  , m_sparse_volume_render_properties_tag(mi::neuraylib::NULL_TAG)
+#endif
 {
   m_cluster_properties = NULL;
 }
@@ -147,13 +168,26 @@ vtknvindex_scene::vtknvindex_scene()
 vtknvindex_scene::~vtknvindex_scene()
 {
   m_vol_properties_tag = mi::neuraylib::NULL_TAG;
-  m_camera_tag = mi::neuraylib::NULL_TAG;
+  m_perspective_camera_tag = mi::neuraylib::NULL_TAG;
+  m_parallel_camera_tag = mi::neuraylib::NULL_TAG;
   m_timeseries_tag = mi::neuraylib::NULL_TAG;
   m_volume_tag = mi::neuraylib::NULL_TAG;
   m_volume_colormap_tag = mi::neuraylib::NULL_TAG;
+
+#ifdef USE_SPARSE_VOLUME
+  m_prog_se_mapping_tag = mi::neuraylib::NULL_TAG;
+#else
   m_volume_texture_attrib_tag = mi::neuraylib::NULL_TAG;
+#endif // USE_SPARSE_VOLUME
+
   m_rtc_program_params_tag = mi::neuraylib::NULL_TAG;
   m_rtc_program_tag = mi::neuraylib::NULL_TAG;
+  m_volume_compute_attrib_tag = mi::neuraylib::NULL_TAG;
+
+#ifdef USE_SPARSE_VOLUME
+  m_sparse_volume_render_properties_tag = mi::neuraylib::NULL_TAG;
+#endif
+
   m_static_group_tag = mi::neuraylib::NULL_TAG;
 
   for (mi::Uint32 i = 0; i < m_plane_tags.size(); i++)
@@ -165,7 +199,9 @@ vtknvindex_scene::~vtknvindex_scene()
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
-  const vtknvindex_application& application_context, Volume_type volume_type)
+  const vtknvindex_application& application_context,
+  const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction,
+  Volume_type volume_type)
 
 {
   if (m_scene_created)
@@ -182,10 +218,10 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
   affinity->retain();
   application_context.m_iindex_session->set_affinity_information(affinity.get());
 
-  // DiCE database access.
-  mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
-    application_context.m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
-  assert(dice_transaction.is_valid_interface());
+  // // DiCE database access.
+  // mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
+  //  application_context.m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
+  // assert(dice_transaction.is_valid_interface());
 
   // GUI settings.
   vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
@@ -220,9 +256,15 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       mi::math::Vector_struct<mi::Uint32, 3> volume_size;
       regular_volume_properties->get_volume_size(volume_size);
 
-      // Create shared memory regular volume data importer.
+// Create shared memory regular volume data importer.
+
+#ifdef USE_SPARSE_VOLUME
+      vtknvindex_sparse_volume_importer* volume_importer =
+        new vtknvindex_sparse_volume_importer(volume_size, subcube_border, scalar_type);
+#else
       vtknvindex_volume_importer* volume_importer =
         new vtknvindex_volume_importer(volume_size, subcube_border, scalar_type);
+#endif
 
       assert(volume_importer);
 
@@ -233,19 +275,34 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       const mi::Float32 volume_rotate = 0.f;
       const mi::math::Vector<mi::Float32, 3> volume_translate(0.f, 0.f, 0.f);
 
+// Create the sparse volume scene element
+#ifdef USE_SPARSE_VOLUME
+      mi::math::Bbox<mi::Float32, 3> svol_bbox = mi::math::Bbox<mi::Float32, 3>(
+        mi::math::Vector<mi::Float32, 3>(0.f), mi::math::Vector<mi::Float32, 3>(volume_size));
+      mi::math::Matrix<mi::Float32, 4, 4> transform_mat(1.0f); // Identity matrix
+
+      mi::base::Handle<nv::index::ISparse_volume_scene_element> volume_scene_element(
+        scene->create_sparse_volume(
+          svol_bbox, transform_mat, volume_importer, dice_transaction.get()));
+#else
       mi::base::Handle<nv::index::IRegular_volume> volume_scene_element(
         scene->create_volume(volume_scale, volume_rotate, volume_translate, volume_size,
           volume_importer, dice_transaction.get()));
+#endif
+
       assert(volume_scene_element.is_valid_interface());
 
       if (volume_scene_element)
       {
         m_colormap_plane_tags.resize(MAX_SLICE_MAPS);
 
+#ifndef USE_SPARSE_VOLUME
         // Load and assign the colormap.
         m_nvindex_colormap.create_scene_colormaps(vol, m_volume_colormap_tag, m_colormap_plane_tags,
           scene.get(), regular_volume_properties, dice_transaction);
         volume_scene_element->assign_colormap(m_volume_colormap_tag);
+#endif
+
         volume_scene_element->set_enabled(pv_config_settings->get_enable_volume());
 
         // Store the volume scene element in the distributed database.
@@ -256,6 +313,14 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       {
         ERROR_LOG << "Unable to create a regular volume scene element.";
       }
+
+#ifdef USE_SPARSE_VOLUME
+      // Load and create colormap from ParaView
+      m_nvindex_colormap.create_scene_colormaps(vol, m_volume_colormap_tag, m_colormap_plane_tags,
+        scene.get(), regular_volume_properties, dice_transaction);
+
+      scene->prepend(m_volume_colormap_tag, dice_transaction.get());
+#endif
     }
     else // scene contains an irregular volume (unstructured volume grid)
     {
@@ -359,57 +424,106 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         scene->create_attribute<nv::index::IVolume_sample_program>());
       assert(rtc_program.is_valid_interface());
 
-      switch (m_volume_rtc_kernel.rtc_kernel)
+      if (volume_type == VOLUME_TYPE_REGULAR)
       {
-        case RTC_KERNELS_ISOSURFACE:
+        switch (m_volume_rtc_kernel.rtc_kernel)
         {
-          vtknvindex_isosurface_params iso_params;
-          rtc_program->set_program_source(KERNEL_ISOSURFACE_STRING);
-          rtc_program_parameters->set_buffer_data(
-            0, reinterpret_cast<void*>(&iso_params), sizeof(iso_params));
-          break;
-        }
+          case RTC_KERNELS_ISOSURFACE:
+          {
+            vtknvindex_isosurface_params iso_params;
+            rtc_program->set_program_source(KERNEL_ISOSURFACE_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&iso_params), sizeof(iso_params));
+            break;
+          }
 
-        case RTC_KERNELS_DEPTH_ENHANCEMENT:
+          case RTC_KERNELS_DEPTH_ENHANCEMENT:
+          {
+            vtknvindex_depth_enhancement_params depth_params;
+            rtc_program->set_program_source(KERNEL_DEPTH_ENHANCEMENT_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&depth_params), sizeof(depth_params));
+            break;
+          }
+
+          case RTC_KERNELS_EDGE_ENHANCEMENT:
+          {
+            vtknvindex_edge_enhancement_params edge_params;
+            rtc_program->set_program_source(KERNEL_EDGE_ENHANCEMENT_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&edge_params), sizeof(edge_params));
+            break;
+          }
+
+          case RTC_KERNELS_SINGLE_SCATTERING:
+          {
+            vtknvindex_single_scattering_params single_params;
+            rtc_program->set_program_source(KERNEL_SINGLE_SCATTERING_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&single_params), sizeof(single_params));
+            break;
+          }
+
+          case RTC_KERNELS_ISORAYCAST:
+          {
+            vtknvindex_isoraycast_params isoraycast_params;
+            rtc_program->set_program_source(KERNEL_ISORAYCAST_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&isoraycast_params), sizeof(isoraycast_params));
+            break;
+          }
+
+          case RTC_KERNELS_SUPERNOVA_GRADIENT:
+          {
+            vtknvindex_supernova_gradient_params supernova_params;
+            rtc_program->set_program_source(KERNEL_SUPERNOVA_GRADIENT_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&supernova_params), sizeof(supernova_params));
+            break;
+          }
+
+          default:
+            rtc_program->set_enabled(false);
+            rtc_program_parameters->set_enabled(false);
+            break;
+        }
+      }
+      else // kernels for irregular volumes
+      {
+        switch (m_volume_rtc_kernel.rtc_kernel)
         {
-          vtknvindex_depth_enhancement_params depth_params;
-          rtc_program->set_program_source(KERNEL_DEPTH_ENHANCEMENT_STRING);
-          rtc_program_parameters->set_buffer_data(
-            0, reinterpret_cast<void*>(&depth_params), sizeof(depth_params));
-          break;
-        }
+          case RTC_KERNELS_ISOSURFACE:
+          {
+            vtknvindex_isosurface_params iso_params;
+            rtc_program->set_program_source(KERNEL_IRREGULAR_ISOSURFACE_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&iso_params), sizeof(iso_params));
+            break;
+          }
 
-        case RTC_KERNELS_EDGE_ENHANCEMENT:
-        {
-          vtknvindex_edge_enhancement_params edge_params;
-          rtc_program->set_program_source(KERNEL_EDGE_ENHANCEMENT_STRING);
-          rtc_program_parameters->set_buffer_data(
-            0, reinterpret_cast<void*>(&edge_params), sizeof(edge_params));
-          break;
-        }
+          case RTC_KERNELS_DEPTH_ENHANCEMENT:
+          {
+            vtknvindex_depth_enhancement_params depth_params;
+            rtc_program->set_program_source(KERNEL_IRREGULAR_DEPTH_ENHANCEMENT_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&depth_params), sizeof(depth_params));
+            break;
+          }
 
-        case RTC_KERNELS_SINGLE_SCATTERING:
-        {
-          vtknvindex_single_scattering_params single_params;
-          rtc_program->set_program_source(KERNEL_SINGLE_SCATTERING_STRING);
-          rtc_program_parameters->set_buffer_data(
-            0, reinterpret_cast<void*>(&single_params), sizeof(single_params));
-          break;
-        }
+          case RTC_KERNELS_EDGE_ENHANCEMENT:
+          {
+            vtknvindex_edge_enhancement_params edge_params;
+            rtc_program->set_program_source(KERNEL_IRREGULAR_EDGE_ENHANCEMENT_STRING);
+            rtc_program_parameters->set_buffer_data(
+              0, reinterpret_cast<void*>(&edge_params), sizeof(edge_params));
+            break;
+          }
 
-        case RTC_KERNELS_ISORAYCAST:
-        {
-          vtknvindex_isoraycast_params isoraycast_params;
-          rtc_program->set_program_source(KERNEL_ISORAYCAST_STRING);
-          rtc_program_parameters->set_buffer_data(
-            0, reinterpret_cast<void*>(&isoraycast_params), sizeof(isoraycast_params));
-          break;
+          default:
+            rtc_program->set_enabled(false);
+            rtc_program_parameters->set_enabled(false);
+            break;
         }
-
-        default:
-          rtc_program->set_enabled(false);
-          rtc_program_parameters->set_enabled(false);
-          break;
       }
 
       m_rtc_program_params_tag =
@@ -431,7 +545,58 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         dice_transaction->store_for_reference_counting(vol_render_properties.get());
       assert(m_vol_properties_tag.is_valid());
 
+      // Volume compute attribute
+      mi::math::Vector_struct<mi::Uint32, 3> volume_size;
+      regular_volume_properties->get_volume_size(volume_size);
+
+      mi::base::Handle<vtknvindex_volume_compute> vol_compute(new vtknvindex_volume_compute(
+        volume_size, subcube_border, scalar_type, m_cluster_properties));
+      assert(vol_compute.is_valid_interface());
+
+      vol_compute->set_enabled(false);
+
+      m_volume_compute_attrib_tag =
+        dice_transaction->store_for_reference_counting(vol_compute.get());
+      assert(m_volume_compute_attrib_tag.is_valid());
+
+#ifdef USE_SPARSE_VOLUME
+      // Filter mode attribute
+      mi::base::Handle<nv::index::ISparse_volume_rendering_properties>
+        sparse_volume_render_properties(
+          scene->create_attribute<nv::index::ISparse_volume_rendering_properties>());
+
+      assert(sparse_volume_render_properties.is_valid_interface());
+
+      // filter mode
+      const nv::index::Sparse_volume_filter_mode filter_mode =
+        static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
+
+      sparse_volume_render_properties->set_filter_mode(filter_mode);
+
+      // use pre-integration
+      const vtknvindex_rtc_kernels rtc_kernel = pv_config_settings->get_rtc_kernel();
+      bool use_preintegration =
+        rtc_kernel == RTC_KERNELS_NONE && pv_config_settings->is_preintegration();
+      sparse_volume_render_properties->set_preintegrated_volume_rendering(use_preintegration);
+
+      // sampling distance
+      sparse_volume_render_properties->set_sampling_distance(pv_config_settings->get_step_size());
+
+      // set reference sampling distance
+      sparse_volume_render_properties->set_reference_sampling_distance(
+        calculate_volume_reference_step_size(vol, pv_config_settings->get_opacity_mode(),
+          pv_config_settings->get_opacity_reference()));
+
+      // sparse volume render properties tag
+      m_sparse_volume_render_properties_tag =
+        dice_transaction->store_for_reference_counting(sparse_volume_render_properties.get());
+      assert(m_sparse_volume_render_properties_tag.is_valid());
+
+      static_group->append(m_sparse_volume_render_properties_tag, dice_transaction.get());
+
+#endif
       // Volume properties.
+      static_group->append(m_volume_compute_attrib_tag, dice_transaction.get());
       static_group->append(m_rtc_program_params_tag, dice_transaction.get());
       static_group->append(m_rtc_program_tag, dice_transaction.get());
       static_group->append(m_vol_properties_tag, dice_transaction.get());
@@ -440,6 +605,34 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       // Slice properties, only for regular volumes.
       if (volume_type == VOLUME_TYPE_REGULAR)
       {
+#ifdef USE_SPARSE_VOLUME
+        // Plane surface shader
+        mi::base::Handle<nv::index::IRendering_kernel_program> rtc_surface_program(
+          scene->create_attribute<nv::index::ISurface_sample_program>());
+        assert(rtc_surface_program.is_valid_interface());
+
+        rtc_surface_program->set_program_source(KERNEL_PLANE_SURFACE_MAPPING_STRING);
+
+        const mi::neuraylib::Tag rtc_surface_program_tag =
+          dice_transaction->store_for_reference_counting(rtc_surface_program.get());
+        assert(rtc_surface_program_tag.is_valid());
+
+        // RTC program scene element mapping
+        mi::base::Handle<nv::index::IRendering_kernel_program_scene_element_mapping>
+          prog_se_mapping(
+            scene->create_attribute<nv::index::IRendering_kernel_program_scene_element_mapping>());
+        assert(prog_se_mapping.is_valid_interface());
+
+        // set volume mapping
+        prog_se_mapping->set_mapping(1, m_volume_tag);
+        // set colormap mapping
+        prog_se_mapping->set_mapping(2, m_colormap_plane_tags[0]);
+
+        m_prog_se_mapping_tag =
+          dice_transaction->store_for_reference_counting(prog_se_mapping.get());
+        assert(m_prog_se_mapping_tag.is_valid());
+
+#else
         // Volume texture attribute.
         mi::base::Handle<nv::index::IRegular_volume_texture> vol_tex_attrib(
           scene->create_attribute<nv::index::IRegular_volume_texture>());
@@ -463,6 +656,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         const mi::neuraylib::Tag vol_filter_mode_tag =
           dice_transaction->store_for_reference_counting(vol_filter_mode.get());
         assert(vol_filter_mode_tag.is_valid());
+#endif
 
         // Pure white ambient material.
         mi::base::Handle<nv::index::IPhong_gl> material(
@@ -495,9 +689,14 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         }
 
         // Append slice and properties to transformed group.
+        transform_group->append(m_colormap_plane_tags[0], dice_transaction.get());
+#ifdef USE_SPARSE_VOLUME
+        transform_group->append(rtc_surface_program_tag, dice_transaction.get());
+        transform_group->append(m_prog_se_mapping_tag, dice_transaction.get());
+#else
         transform_group->append(m_volume_texture_attrib_tag, dice_transaction.get());
         transform_group->append(vol_filter_mode_tag, dice_transaction.get());
-        transform_group->append(m_colormap_plane_tags[0], dice_transaction.get());
+#endif
         transform_group->append(material_tag, dice_transaction.get());
 
         for (mi::Uint32 i = 0; i < MAX_SLICES; i++)
@@ -519,16 +718,25 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     scene->append(m_static_group_tag, dice_transaction.get());
     scene->append(transform_group_tag, dice_transaction.get());
 
-    // Create a camera and adjust the camera parameter.
-    const mi::neuraylib::Tag camera_tag = session->create_camera(dice_transaction.get());
-    assert(camera_tag.is_valid());
-    m_camera_tag = camera_tag;
+    // Create perspective and parallel cameras to be exchangables and adjust the camera parameter.
+    const mi::neuraylib::Tag perspective_camera_tag =
+      session->create_camera(dice_transaction.get(), nv::index::IPerspective_camera::IID());
+    assert(perspective_camera_tag.is_valid());
+    m_perspective_camera_tag = perspective_camera_tag;
+
+    const mi::neuraylib::Tag parallel_camera_tag =
+      session->create_camera(dice_transaction.get(), nv::index::IOrthographic_camera::IID());
+    assert(parallel_camera_tag.is_valid());
+    m_parallel_camera_tag = parallel_camera_tag;
 
     // Setup camera parameters.
-    update_camera(ren, dice_transaction);
+    update_camera(ren, dice_transaction, application_context);
 
     // Add the camera to the scene.
-    scene->set_camera(camera_tag);
+    if (m_is_parallel)
+      scene->set_camera(parallel_camera_tag);
+    else
+      scene->set_camera(perspective_camera_tag);
 
     // Set global scene transform (only required for regular volumes).
     if (volume_type == VOLUME_TYPE_REGULAR)
@@ -559,7 +767,6 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
   }
 
   // Commit transaction.
-  dice_transaction->commit();
   m_scene_created = true;
 }
 
@@ -570,9 +777,35 @@ bool vtknvindex_scene::scene_created() const
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_scene::update_volume(
-  const vtknvindex_application& application_context, Volume_type volume_type)
+void vtknvindex_scene::update_volume(vtknvindex_application& application_context,
+  const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction,
+  Volume_type volume_type)
 {
+  // Use volume compute interface when it's a regular volume and its size wasn't changed.
+  if (volume_type == VOLUME_TYPE_REGULAR)
+  {
+    mi::base::Handle<const nv::index::ISparse_volume_scene_element> volume_scene_element(
+      dice_transaction->access<const nv::index::ISparse_volume_scene_element>(m_volume_tag));
+    assert(volume_scene_element.is_valid_interface());
+
+    mi::math::Bbox<mi::Float32, 3> svol_prev_bbox = volume_scene_element->get_bounding_box();
+
+    vtknvindex_regular_volume_properties* regular_volume_properties =
+      m_cluster_properties->get_regular_volume_properties();
+
+    mi::math::Vector_struct<mi::Uint32, 3> volume_size;
+    regular_volume_properties->get_volume_size(volume_size);
+    mi::math::Bbox<mi::Float32, 3> svol_cur_bbox = mi::math::Bbox<mi::Float32, 3>(
+      mi::math::Vector<mi::Float32, 3>(0.f), mi::math::Vector<mi::Float32, 3>(volume_size));
+
+    // In the case the volume size changed the compute interface cannot be used
+    // and a new volume needs to be re-created in the scene graph
+    if (svol_cur_bbox == svol_prev_bbox)
+    {
+      update_compute(dice_transaction);
+      return;
+    }
+  }
 
   // Set the affinity information.
   mi::base::Handle<vtknvindex_affinity> affinity = m_cluster_properties->get_affinity();
@@ -584,11 +817,6 @@ void vtknvindex_scene::update_volume(
   // NVIDIA IndeX session takes ownership of the affinity.
   affinity->retain();
   application_context.m_iindex_session->set_affinity_information(affinity.get());
-
-  // DiCE database access.
-  mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
-    application_context.m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
-  assert(dice_transaction.is_valid_interface());
 
   // Create and setup the scene.
   {
@@ -629,14 +857,28 @@ void vtknvindex_scene::update_volume(
       mi::math::Vector_struct<mi::Uint32, 3> volume_size;
       regular_volume_properties->get_volume_size(volume_size);
 
-      // Create shared memory regular volume data importer.
+// Create shared memory regular volume data importer.
+#ifdef USE_SPARSE_VOLUME
+      vtknvindex_sparse_volume_importer* volume_importer =
+        new vtknvindex_sparse_volume_importer(volume_size, subcube_border, scalar_type);
+#else
       vtknvindex_volume_importer* volume_importer =
         new vtknvindex_volume_importer(volume_size, subcube_border, scalar_type);
-
+#endif
       assert(volume_importer);
 
       volume_importer->set_cluster_properties(m_cluster_properties);
 
+#ifdef USE_SPARSE_VOLUME
+      // Create the sparse volume scene element
+      mi::math::Bbox<mi::Float32, 3> svol_bbox = mi::math::Bbox<mi::Float32, 3>(
+        mi::math::Vector<mi::Float32, 3>(0.f), mi::math::Vector<mi::Float32, 3>(volume_size));
+      mi::math::Matrix<mi::Float32, 4, 4> transform_mat(1.0f); // Identity matrix
+
+      mi::base::Handle<nv::index::ISparse_volume_scene_element> volume_scene_element(
+        scene->create_sparse_volume(
+          svol_bbox, transform_mat, volume_importer, dice_transaction.get()));
+#else
       // Create a scene element that represents a regular volume.
       const mi::math::Vector<mi::Float32, 3> volume_scale(1.f, 1.f, 1.f);
       const mi::Float32 volume_rotate = 0.f;
@@ -645,6 +887,7 @@ void vtknvindex_scene::update_volume(
       mi::base::Handle<nv::index::IRegular_volume> volume_scene_element(
         scene->create_volume(volume_scale, volume_rotate, volume_translate, volume_size,
           volume_importer, dice_transaction.get()));
+#endif
       assert(volume_scene_element.is_valid_interface());
 
       if (volume_scene_element)
@@ -652,20 +895,34 @@ void vtknvindex_scene::update_volume(
         vtknvindex_config_settings* pv_config_settings =
           m_cluster_properties->get_config_settings();
 
-        // Update colormap assignment.
+// Update colormap assignment.
+#ifndef USE_SPARSE_VOLUME
         volume_scene_element->assign_colormap(m_volume_colormap_tag);
+#endif
         volume_scene_element->set_enabled(pv_config_settings->get_enable_volume());
 
         // Store the volume scene element in the distributed database.
         m_volume_tag = dice_transaction->store_for_reference_counting(volume_scene_element.get());
         assert(m_volume_tag.is_valid());
 
+#ifdef USE_SPARSE_VOLUME
+        // Update RTC program scene element mapping
+        mi::base::Handle<nv::index::IRendering_kernel_program_scene_element_mapping>
+          prog_se_mapping(
+            dice_transaction->edit<nv::index::IRendering_kernel_program_scene_element_mapping>(
+              m_prog_se_mapping_tag));
+        assert(prog_se_mapping.is_valid_interface());
+
+        // set volume mapping
+        prog_se_mapping->set_mapping(1, m_volume_tag);
+#else
         // Update volume texture attribute.
         mi::base::Handle<nv::index::IRegular_volume_texture> vol_tex_attrib(
           dice_transaction->edit<nv::index::IRegular_volume_texture>(m_volume_texture_attrib_tag));
         assert(vol_tex_attrib.is_valid_interface());
 
         vol_tex_attrib->set_volume_element(m_volume_tag);
+#endif // USE_SPARSE_VOLUME
       }
       else
       {
@@ -713,10 +970,10 @@ void vtknvindex_scene::update_volume(
 
     // Append new volume to the static scene group.
     static_group_edit->append(m_volume_tag, dice_transaction.get());
-  }
 
-  // Commit transaction.
-  dice_transaction->commit();
+    if (volume_type == VOLUME_TYPE_REGULAR)
+      update_config_settings(dice_transaction, application_context);
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -745,7 +1002,7 @@ void vtknvindex_scene::update_scene(vtkRenderer* ren, vtkVolume* vol,
     update_slices(dice_transaction);
 
   // Update camera.
-  update_camera(ren, dice_transaction);
+  update_camera(ren, dice_transaction, application_context);
 
   // update time series animation settings.
   if (is_timeseries)
@@ -755,15 +1012,19 @@ void vtknvindex_scene::update_scene(vtkRenderer* ren, vtkVolume* vol,
         application_context.m_iindex_session->get_clock());
 
     if (app_clock_pulse)
-      app_clock_pulse->set_tick(
-        m_cluster_properties->get_regular_volume_properties()->get_current_time_step());
+    {
+      mi::Sint32 cur_time_step =
+        m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
+      app_clock_pulse->set_tick(cur_time_step);
+    }
   }
 }
 
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_scene::update_rtc_kernel(
   const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction,
-  const vtknvindex_rtc_params_buffer& rtc_param_buffer, bool kernel_changed)
+  const vtknvindex_rtc_params_buffer& rtc_param_buffer, Volume_type volume_type,
+  bool kernel_changed)
 {
 
   if (kernel_changed)
@@ -774,37 +1035,70 @@ void vtknvindex_scene::update_rtc_kernel(
       dice_transaction->edit<nv::index::IRendering_kernel_program>(m_rtc_program_tag));
     assert(rtc_program.is_valid_interface());
 
-    switch (rtc_param_buffer.rtc_kernel)
+    if (volume_type == VOLUME_TYPE_REGULAR)
     {
-      case RTC_KERNELS_ISOSURFACE:
-        rtc_program->set_program_source(KERNEL_ISOSURFACE_STRING);
-        rtc_program->set_enabled(true);
-        break;
+      switch (rtc_param_buffer.rtc_kernel)
+      {
+        case RTC_KERNELS_ISOSURFACE:
+          rtc_program->set_program_source(KERNEL_ISOSURFACE_STRING);
+          rtc_program->set_enabled(true);
+          break;
 
-      case RTC_KERNELS_DEPTH_ENHANCEMENT:
-        rtc_program->set_program_source(KERNEL_DEPTH_ENHANCEMENT_STRING);
-        rtc_program->set_enabled(true);
-        break;
+        case RTC_KERNELS_DEPTH_ENHANCEMENT:
+          rtc_program->set_program_source(KERNEL_DEPTH_ENHANCEMENT_STRING);
+          rtc_program->set_enabled(true);
+          break;
 
-      case RTC_KERNELS_EDGE_ENHANCEMENT:
-        rtc_program->set_program_source(KERNEL_EDGE_ENHANCEMENT_STRING);
-        rtc_program->set_enabled(true);
-        break;
+        case RTC_KERNELS_EDGE_ENHANCEMENT:
+          rtc_program->set_program_source(KERNEL_EDGE_ENHANCEMENT_STRING);
+          rtc_program->set_enabled(true);
+          break;
 
-      case RTC_KERNELS_SINGLE_SCATTERING:
-        rtc_program->set_program_source(KERNEL_SINGLE_SCATTERING_STRING);
-        rtc_program->set_enabled(true);
-        break;
+        case RTC_KERNELS_SINGLE_SCATTERING:
+          rtc_program->set_program_source(KERNEL_SINGLE_SCATTERING_STRING);
+          rtc_program->set_enabled(true);
+          break;
 
-      case RTC_KERNELS_ISORAYCAST:
-        rtc_program->set_program_source(KERNEL_ISORAYCAST_STRING);
-        rtc_program->set_enabled(true);
-        break;
+        case RTC_KERNELS_ISORAYCAST:
+          rtc_program->set_program_source(KERNEL_ISORAYCAST_STRING);
+          rtc_program->set_enabled(true);
+          break;
 
-      case RTC_KERNELS_NONE:
-      default:
-        rtc_program->set_enabled(false);
-        break;
+        case RTC_KERNELS_SUPERNOVA_GRADIENT:
+          rtc_program->set_program_source(KERNEL_SUPERNOVA_GRADIENT_STRING);
+          rtc_program->set_enabled(true);
+          break;
+
+        case RTC_KERNELS_NONE:
+        default:
+          rtc_program->set_enabled(false);
+          break;
+      }
+    }
+    else // irregular volume kernels
+    {
+      switch (rtc_param_buffer.rtc_kernel)
+      {
+        case RTC_KERNELS_ISOSURFACE:
+          rtc_program->set_program_source(KERNEL_IRREGULAR_ISOSURFACE_STRING);
+          rtc_program->set_enabled(true);
+          break;
+
+        case RTC_KERNELS_DEPTH_ENHANCEMENT:
+          rtc_program->set_program_source(KERNEL_IRREGULAR_DEPTH_ENHANCEMENT_STRING);
+          rtc_program->set_enabled(true);
+          break;
+
+        case RTC_KERNELS_EDGE_ENHANCEMENT:
+          rtc_program->set_program_source(KERNEL_IRREGULAR_EDGE_ENHANCEMENT_STRING);
+          rtc_program->set_enabled(true);
+          break;
+
+        case RTC_KERNELS_NONE:
+        default:
+          rtc_program->set_enabled(false);
+          break;
+      }
     }
   }
 
@@ -828,16 +1122,12 @@ void vtknvindex_scene::update_rtc_kernel(
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_scene::update_camera(
-  vtkRenderer* ren, const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction)
+void vtknvindex_scene::update_camera(vtkRenderer* ren,
+  const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction,
+  const vtknvindex_application& application_context)
 {
-  assert(m_camera_tag.is_valid());
-
-  mi::base::Handle<nv::index::IPerspective_camera> nvindex_camera(
-    dice_transaction->edit<nv::index::IPerspective_camera>(m_camera_tag));
-  assert(nvindex_camera.is_valid_interface());
-
   vtkSmartPointer<vtkCamera> app_camera = ren->GetActiveCamera();
+  vtkTypeBool is_parallel = app_camera->GetParallelProjection();
 
   mi::Float64 x, y, z;
   app_camera->GetPosition(x, y, z);
@@ -852,22 +1142,68 @@ void vtknvindex_scene::update_camera(
   mi::math::Vector<mi::Float32, 3> view_direction(center - eye);
   view_direction.normalize();
 
-  nvindex_camera->set(eye, view_direction, up);
-
   const mi::Sint32* window_size = ren->GetVTKWindow()->GetActualSize();
   mi::Float32 aspect_ratio = static_cast<mi::Float32>(window_size[0]) / window_size[1];
-  nvindex_camera->set_aspect(aspect_ratio);
-
-  mi::Float32 aperture = 0.033f;
-  nvindex_camera->set_aperture(aperture);
-
-  // Focal distance is set to match ParaView's fixed vertical FOV of 30 deg.
-  mi::Float64 focal_distance = (aperture / (aspect_ratio * 0.53589838529));
-  nvindex_camera->set_focal(focal_distance);
 
   mi::Float64* clipping_range = app_camera->GetClippingRange();
-  nvindex_camera->set_clip_min(clipping_range[0]);
-  nvindex_camera->set_clip_max(clipping_range[1]);
+
+  if (is_parallel)
+  {
+    assert(m_parallel_camera_tag.is_valid());
+
+    mi::base::Handle<nv::index::IOrthographic_camera> nvindex_camera(
+      dice_transaction->edit<nv::index::IOrthographic_camera>(m_parallel_camera_tag));
+    assert(nvindex_camera.is_valid_interface());
+
+    nvindex_camera->set(eye, view_direction, up);
+    nvindex_camera->set_aspect(aspect_ratio);
+    nvindex_camera->set_clip_min(clipping_range[0]);
+    nvindex_camera->set_clip_max(clipping_range[1]);
+
+    mi::Float32 aperture = app_camera->GetParallelScale() * 2.0 * aspect_ratio;
+    nvindex_camera->set_aperture(aperture);
+  }
+  else
+  {
+    assert(m_perspective_camera_tag.is_valid());
+
+    mi::base::Handle<nv::index::IPerspective_camera> nvindex_camera(
+      dice_transaction->edit<nv::index::IPerspective_camera>(m_perspective_camera_tag));
+    assert(nvindex_camera.is_valid_interface());
+
+    nvindex_camera->set(eye, view_direction, up);
+    nvindex_camera->set_aspect(aspect_ratio);
+    nvindex_camera->set_clip_min(clipping_range[0]);
+    nvindex_camera->set_clip_max(clipping_range[1]);
+
+    mi::Float32 aperture = 0.033f;
+    nvindex_camera->set_aperture(aperture);
+
+    // Focal distance is set to match ParaView's fixed vertical FOV of 30 deg.
+    mi::Float64 focal_distance = (aperture / (aspect_ratio * 0.53589838529));
+    nvindex_camera->set_focal(focal_distance);
+  }
+
+  // camera projection changed
+  if (m_is_parallel != is_parallel)
+  {
+    // Access the session instance from the database.
+    mi::base::Handle<const nv::index::ISession> session(
+      dice_transaction->access<const nv::index::ISession>(application_context.m_session_tag));
+    assert(session.is_valid_interface());
+
+    // Access (edit mode) the scene instance from the database.
+    mi::base::Handle<nv::index::IScene> scene(
+      dice_transaction->edit<nv::index::IScene>(session->get_scene()));
+    assert(scene.is_valid_interface());
+
+    if (is_parallel)
+      scene->set_camera(m_parallel_camera_tag);
+    else
+      scene->set_camera(m_perspective_camera_tag);
+
+    m_is_parallel = is_parallel;
+  }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -915,6 +1251,8 @@ void vtknvindex_scene::update_config_settings(
   // CUDA shader mode.
   const vtknvindex_rtc_kernels rtc_kernel = pv_config_settings->get_rtc_kernel();
 
+#ifndef USE_SPARSE_VOLUME
+
   // Set filter mode.
   const nv::index::IConfig_settings::Volume_filtering_modes filter_mode =
     pv_config_settings->get_filter_mode();
@@ -929,6 +1267,43 @@ void vtknvindex_scene::update_config_settings(
 
   // volume step size
   config_settings->set_step_size_min(pv_config_settings->get_step_size());
+
+#else
+
+  assert(m_sparse_volume_render_properties_tag.is_valid());
+
+  mi::base::Handle<nv::index::ISparse_volume_rendering_properties> sparse_volume_render_properties(
+    dice_transaction->edit<nv::index::ISparse_volume_rendering_properties>(
+      m_sparse_volume_render_properties_tag));
+
+  assert(sparse_volume_render_properties.is_valid_interface());
+
+  // filter mode
+  const nv::index::Sparse_volume_filter_mode filter_mode =
+    static_cast<nv::index::Sparse_volume_filter_mode>(pv_config_settings->get_filter_mode());
+
+  sparse_volume_render_properties->set_filter_mode(filter_mode);
+
+  // use pre-integration
+  bool use_preintegration = rtc_kernel == RTC_KERNELS_NONE && !m_nvindex_colormap.changed() &&
+    pv_config_settings->is_preintegration();
+  sparse_volume_render_properties->set_preintegrated_volume_rendering(use_preintegration);
+
+  // sampling distance
+  sparse_volume_render_properties->set_sampling_distance(pv_config_settings->get_step_size());
+
+  // set voxel offset
+  sparse_volume_render_properties->set_voxel_offsets(mi::math::Vector<mi::Float32, 3>(0.5f));
+
+  // Set sparse volume brick size and border size.
+  // For performance reasons is best to have (BD + 2*BS) to be power of 2.
+  nv::index::IConfig_settings::Sparse_volume_config sparse_volume_config;
+  sparse_volume_config.brick_dimensions = mi::math::Vector<mi::Uint32, 3>(60u);
+  sparse_volume_config.brick_shared_border_size = 2u;
+
+  config_settings->set_sparse_volume_configuration(sparse_volume_config);
+
+#endif
 
   if (m_only_init)
   {
@@ -1003,13 +1378,13 @@ void vtknvindex_scene::update_config_settings(
     data_transfer_config.tile_image_encoding = true;
 
     config_settings->set_data_transfer_config(data_transfer_config);
-
-    // Logging performance values.
-    if (m_cluster_properties->get_config_settings()->is_log_performance())
-      config_settings->set_monitor_performance_values(true);
-    else
-      config_settings->set_monitor_performance_values(false);
   }
+
+  // Logging performance values.
+  if (m_cluster_properties->get_config_settings()->is_log_performance())
+    config_settings->set_monitor_performance_values(true);
+  else
+    config_settings->set_monitor_performance_values(false);
 
   // Dump internal state.
   if (pv_config_settings->is_dump_internal_state())
@@ -1042,8 +1417,14 @@ void vtknvindex_scene::update_slices(
   // Update volume visibility.
   const bool enable_volume = pv_config_settings->get_enable_volume();
 
+#ifdef USE_SPARSE_VOLUME
+  mi::base::Handle<nv::index::ISparse_volume_scene_element> volume(
+    dice_transaction->edit<nv::index::ISparse_volume_scene_element>(m_volume_tag));
+#else
   mi::base::Handle<nv::index::IRegular_volume> volume(
     dice_transaction->edit<nv::index::IRegular_volume>(m_volume_tag));
+#endif
+
   assert(volume.is_valid_interface());
 
   if (volume->get_enabled() != enable_volume)
@@ -1066,6 +1447,17 @@ void vtknvindex_scene::update_slices(
 
     update_slice_planes(plane.get(), slice_params, volume_size);
   }
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_scene::update_compute(
+  const mi::base::Handle<mi::neuraylib::IDice_transaction>& dice_transaction)
+{
+  mi::base::Handle<vtknvindex_volume_compute> vol_compute(
+    dice_transaction->edit<vtknvindex_volume_compute>(m_volume_compute_attrib_tag));
+  assert(vol_compute.is_valid_interface());
+
+  vol_compute->set_enabled(true);
 }
 
 //-------------------------------------------------------------------------------------------------

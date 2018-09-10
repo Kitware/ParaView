@@ -78,9 +78,9 @@ public:
   /// Available color sources.
   enum Color_source
   {
-    COLOR_SOURCE_NONE = 0,          // disable colormap and RGBA array sources.
-    COLOR_SOURCE_COLORMAP_ONLY = 1, // It uses colormap only. RGBA array is disabled.
-    COLOR_SOURCE_RGBA_ONLY = 2,     // It uses RGBA array only. Colormap is disabled.
+    COLOR_SOURCE_NONE = 0,          // disable colormap and rgba array sources.
+    COLOR_SOURCE_COLORMAP_ONLY = 1, // It uses colormap only. rgba array is disabled.
+    COLOR_SOURCE_RGBA_ONLY = 2,     // It uses rgba array only. Colormap is disabled.
     COLOR_SOURCE_BOTH = 3,          // It uses both color sources or any defined (default).
                                     // When both defined it mixes the colors from both sources.
   };

@@ -43,7 +43,7 @@ public:
 
   // Returns the resolution (width,height) in pixels.
   // Returns (-1, -1) if not initialized.
-  mi::math::Vector_struct<mi::Sint32, 2> get_resolution() const override;
+  mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const override;
 
   // Get the pointer to the Z-buffer, same structure as OpenGL Z-buffer.
   // Returns NULL if not initialized.

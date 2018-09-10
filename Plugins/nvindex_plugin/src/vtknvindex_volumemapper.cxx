@@ -36,7 +36,11 @@
 #include <windows.h>
 #endif // _WIN32
 
+#if defined(__APPLE__)
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
 
 #include "vtkCellData.h"
 #include "vtkCommand.h"
@@ -101,6 +105,7 @@ vtknvindex_volumemapper::vtknvindex_volumemapper()
     m_cached_bounds[i] = 0.0;
 
   m_prev_property = "";
+  m_last_MTime = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -172,7 +177,6 @@ bool vtknvindex_volumemapper::initialize_nvindex()
 {
   if (!m_application_context.load_nvindex_library())
   {
-    ERROR_LOG << "Failed to load NVIDIA IndeX library.";
     return false;
   }
 
@@ -264,11 +268,18 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
   // Initialize the mapper. Start IndeX service at each node at local rank 0.
   if (cur_local_rank == 0)
   {
-    if (!m_is_index_initialized && !initialize_nvindex())
+    if (!m_is_index_initialized)
     {
-      ERROR_LOG << "Failed to initialize the volume mapper for NVIDIA IndeX"
-                << " in vtknvindex_representation::RequestData().";
-      return false;
+      if (!initialize_nvindex())
+      {
+        ERROR_LOG << "Failed to initialize the volume mapper for NVIDIA IndeX"
+                  << " in vtknvindex_representation::RequestData().";
+        return false;
+      }
+
+      // Let IndeX remote instances to start before IndeX viewer.
+      if (cur_global_rank == 0 && m_cluster_properties->get_nb_hosts() > 1)
+        vtknvindex::util::sleep(0.2);
     }
     m_is_nvindex_rank = true;
   }
@@ -298,8 +309,11 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
 
   // check for valid data types
   const std::string scalar_type = m_scalar_array->GetDataTypeAsString();
-  if (scalar_type != "unsigned char" && scalar_type != "unsigned short" && scalar_type != "float" &&
-    scalar_type != "double")
+  if (scalar_type != "unsigned char" && scalar_type != "unsigned short"
+#ifdef USE_SPARSE_VOLUME
+    && scalar_type != "char" && scalar_type != "short"
+#endif
+    && scalar_type != "float" && scalar_type != "double")
   {
     ERROR_LOG << "The scalar type: " << scalar_type << " is not supported by NVIDIA IndeX.";
     return false;
@@ -330,6 +344,9 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
   dataset_parameters.bounds[5] = extent[5];
 
   dataset_parameters.volume_data = static_cast<void*>(&volume_data);
+
+  // clean shared memory
+  m_cluster_properties->unlink_shared_memory(true);
 
   // Collect dataset type, ranges, bounding boxes, scalar values and affinity to be passed to NVIDIA
   // IndeX.
@@ -448,6 +465,26 @@ void vtknvindex_volumemapper::rtc_kernel_changed(
 //-------------------------------------------------------------------------------------------------
 void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
 {
+  // check if volume data was modified
+  if (!m_cluster_properties->get_regular_volume_properties()->is_timeseries_data())
+  {
+    mi::Sint32 use_cell_colors;
+    vtkDataArray* scalar_array = this->GetScalars(this->GetInput(), this->ScalarMode,
+      this->ArrayAccessMode, this->ArrayId, this->ArrayName, use_cell_colors);
+
+    vtkMTimeType cur_MTime = scalar_array->GetMTime();
+
+    if (m_last_MTime == 0)
+    {
+      m_last_MTime = cur_MTime;
+    }
+    else if (m_last_MTime < cur_MTime)
+    {
+      m_last_MTime = cur_MTime;
+      m_volume_changed = true;
+    }
+  }
+
   // check for volume property changed
   std::string cur_property(this->GetArrayName());
   if (cur_property != m_prev_property)
@@ -466,6 +503,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   }
 
   // Prepare data to be rendered
+
   mi::Sint32 cur_time_step =
     m_cluster_properties->get_regular_volume_properties()->get_current_time_step();
 
@@ -481,16 +519,18 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
 
-    // Setup scene information
-    if (!m_scene.scene_created())
-      m_scene.create_scene(ren, vol, m_application_context, vtknvindex_scene::VOLUME_TYPE_REGULAR);
-    else if (m_volume_changed)
-      m_scene.update_volume(m_application_context, vtknvindex_scene::VOLUME_TYPE_REGULAR);
-
     // DiCE database access
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
       m_application_context.m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
     assert(dice_transaction.is_valid_interface());
+
+    // Setup scene information
+    if (!m_scene.scene_created())
+      m_scene.create_scene(
+        ren, vol, m_application_context, dice_transaction, vtknvindex_scene::VOLUME_TYPE_REGULAR);
+    else if (m_volume_changed)
+      m_scene.update_volume(
+        m_application_context, dice_transaction, vtknvindex_scene::VOLUME_TYPE_REGULAR);
 
     // Update scene parameters
     m_scene.update_scene(ren, vol, m_application_context, dice_transaction,
@@ -502,7 +542,8 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     // Update CUDA code.
     if (m_rtc_kernel_changed || m_rtc_param_changed)
     {
-      m_scene.update_rtc_kernel(dice_transaction, m_volume_rtc_kernel, m_rtc_kernel_changed);
+      m_scene.update_rtc_kernel(dice_transaction, m_volume_rtc_kernel,
+        vtknvindex_scene::VOLUME_TYPE_REGULAR, m_rtc_kernel_changed);
       m_rtc_kernel_changed = false;
       m_rtc_param_changed = false;
     }
@@ -569,7 +610,7 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
 
   // clean shared memory
   m_controller->Barrier();
-  m_cluster_properties->unlink_shared_memory();
+  m_cluster_properties->unlink_shared_memory(false);
 }
 
 //-------------------------------------------------------------------------------------------------

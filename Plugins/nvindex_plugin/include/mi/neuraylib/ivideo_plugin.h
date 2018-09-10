@@ -20,6 +20,7 @@ namespace neuraylib
 
 class IBuffer;
 class ICanvas;
+class ICanvas_cuda;
 class IPlugin_api;
 
 /** \addtogroup mi_neuray_plugins
@@ -27,7 +28,7 @@ class IPlugin_api;
 */
 
 /// Type of video encoder plugins
-#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v13"
+#define MI_NEURAY_VIDEO_PLUGIN_TYPE "video v16"
 
 /// A buffer for video data representing a frame.
 class IVideo_data : public mi::base::Interface_declare<0xbdd686fa, 0x3e37, 0x43aa, 0xbd, 0xe6, 0x7b,
@@ -112,6 +113,22 @@ public:
   ///                     -  -4: Failed to encode frame.
   ///                     - <-4: For unspecified error.
   virtual Sint32 encode_canvas(const ICanvas* canvas, IVideo_data** out) = 0;
+
+  /// Encodes the pixel data contained in a cuda canvas.
+  ///
+  /// \param canvas       Encode this cuda canvas.
+  /// \param[out] out     The encoded data. The ownership of \c *out is passed to the caller as
+  ///                     for a return value. In particular, the caller must call release() when
+  ///                     \c *out is no longer needed.
+  /// \return
+  ///                     -   0: Canvas successfully encoded.
+  ///                     -  -1: Invalid parameters.
+  ///                     -  -2: Not initialized or closed.
+  ///                     -  -3: Memory/buffer allocation problem.
+  ///                     -  -4: Failed to encode frame.
+  ///                     -  -5: unsupported canvas type
+  ///                     - <-5: For unspecified error.
+  virtual Sint32 encode_canvas(const ICanvas_cuda* canvas, IVideo_data** out) = 0;
 
   /// Closes the video stream.
   ///
@@ -233,7 +250,7 @@ public:
   /// For video plugins, typically the name of the video codec is used, for example, \c "x264".
   ///
   /// \note This method from #mi::base::Plugin is repeated here only for documentation purposes.
-  const char* get_name() const override = 0;
+  virtual const char* get_name() const = 0;
 
   /// Initializes the plugin.
   ///

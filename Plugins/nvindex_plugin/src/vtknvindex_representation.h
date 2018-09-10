@@ -171,6 +171,11 @@ public:
   // Set Iso-raycast parameter.
   void set_isoraycast_threshold(double threshold);
 
+  // Supernova gradient parameteres
+  void set_gradient_scale(double scale);
+  void set_gradient_gamma(double gamma);
+  void set_gradient_color_method(int method);
+
   // Set region of interest.
   void set_roi_minI(double val);
   void set_roi_maxI(double val);
@@ -198,9 +203,9 @@ private:
   vtknvindex_cached_bounds* get_cached_bounds(mi::Sint32 time);
   void set_cached_bounds(mi::Sint32 time);
 
-  // Utility function for binary-searching a specific time stamp inside the sorted time steps list.
+  // Utility function for searching the lower bound time stamp inside a sorted time steps list.
   mi::Sint32 find_time_step(
-    const mi::Float64* time_steps, mi::Float64 time, mi::Sint32 left, mi::Sint32 right) const;
+    mi::Float64 time, const mi::Float64* time_steps, mi::Sint32 nb_tsteps) const;
 
   // Update current kernel
   void update_current_kernel();
@@ -231,6 +236,7 @@ private:
   vtknvindex_edge_enhancement_params m_edge_enhancement_params;
   vtknvindex_single_scattering_params m_single_scattering_params;
   vtknvindex_isoraycast_params m_isoraycast_params;
+  vtknvindex_supernova_gradient_params m_supernova_params;
 };
 
 // Schwartz counter to manage initialization.

@@ -269,7 +269,7 @@
 #if defined(_MSC_VER) /* Microsoft Visual C++ */
 #define MI_FORCE_INLINE __forceinline
 #elif defined(__GNUC__) /* GNU C/C++ Compiler */
-#if !defined(NDEBUG)
+#if defined(DEBUG)
 /* Known bug in some g++ compiler versions: forced inlining produces
  * buggy code when compiling without optimization.
  */
@@ -280,6 +280,14 @@
 #else
 #define MI_FORCE_INLINE inline
 #endif
+#endif
+
+#ifdef MI_PLATFORM_WINDOWS
+/// The operating system specific default filename extension for shared libraries (DLLs)
+#define MI_BASE_DLL_FILE_EXT ".dll"
+#else
+/// The operating system specific default filename extension for shared libraries (DLLs)
+#define MI_BASE_DLL_FILE_EXT ".so"
 #endif
 
 /*@}*/ // end group mi_base_config

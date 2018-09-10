@@ -60,13 +60,13 @@ vtknvindex_host_properties::~vtknvindex_host_properties()
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_host_properties::shm_cleanup()
+void vtknvindex_host_properties::shm_cleanup(bool reset)
 {
   std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.begin();
-  std::vector<shm_info> shmlist = shmit->second;
-
   for (; shmit != m_shmlist.end(); ++shmit)
   {
+    std::vector<shm_info> shmlist = shmit->second;
+
     for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
     {
       shm_info current_shm = shmlist[i];
@@ -77,6 +77,9 @@ void vtknvindex_host_properties::shm_cleanup()
 #endif // _WIN32
     }
   }
+
+  if (reset)
+    m_shmlist.clear();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -105,6 +108,25 @@ void vtknvindex_host_properties::set_shminfo(mi::Uint32 time_step, std::string s
     ceil((shmvolume.y / subcube_size)) * ceil((shmvolume.z / subcube_size));
 
   m_shmref[shmname] = static_cast<mi::Uint32>(shm_reference_count);
+}
+
+void vtknvindex_host_properties::free_shm_pointer(mi::Uint32 time_step)
+{
+  std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
+  if (shmit != m_shmlist.end())
+  {
+    std::vector<shm_info>& shmlist = shmit->second;
+    for (mi::Uint32 i = 0; i < shmlist.size(); i++)
+    {
+      mi::base::Lock::Block block(&s_ptr_lock);
+
+      if (shmlist[i].m_raw_mem_pointer != NULL)
+      {
+        free(shmlist[i].m_raw_mem_pointer);
+        shmlist[i].m_raw_mem_pointer = NULL;
+      }
+    }
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -147,7 +169,7 @@ bool contains(const mi::math::Bbox<mi::Float32, 3>& bb, const mi::math::Vector<m
 // ------------------------------------------------------------------------------------------------
 bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox,
   std::string& shmname, mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize,
-  void** raw_mem_pointer, mi::Uint32& time_step)
+  void** raw_mem_pointer, mi::Uint32 time_step)
 {
   std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
   if (shmit == m_shmlist.end())
@@ -182,8 +204,45 @@ bool vtknvindex_host_properties::get_shminfo(const mi::math::Bbox<mi::Float32, 3
 }
 
 // ------------------------------------------------------------------------------------------------
+bool vtknvindex_host_properties::get_shminfo_isect(const mi::math::Bbox<mi::Float32, 3>& bbox,
+  std::string& shmname, mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize,
+  void** raw_mem_pointer, mi::Uint32 time_step)
+{
+  std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
+  if (shmit == m_shmlist.end())
+  {
+    ERROR_LOG << "The shared memory information in vtknvindex_host_properties::get_shminfo is not "
+                 "available for the time step: "
+              << time_step << ".";
+    return false;
+  }
+
+  std::vector<shm_info>& shmlist = shmit->second;
+  if (shmlist.empty())
+  {
+    ERROR_LOG << "The shared memory list in vtknvindex_host_properties::get_shminfo is empty.";
+    return false;
+  }
+
+  for (mi::Uint32 i = 0; i < shmlist.size(); ++i)
+  {
+    shm_info current_shm = shmlist[i];
+
+    if (current_shm.m_shm_bbox.intersects(bbox))
+    {
+      shmname = current_shm.m_shm_name;
+      shmbbox = current_shm.m_shm_bbox;
+      shmsize = current_shm.m_size;
+      *raw_mem_pointer = current_shm.m_raw_mem_pointer;
+      return true;
+    }
+  }
+  return false;
+}
+
+// ------------------------------------------------------------------------------------------------
 vtknvindex_host_properties::shm_info* vtknvindex_host_properties::get_shminfo(
-  const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32& time_step)
+  const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step)
 {
   std::map<mi::Uint32, std::vector<shm_info> >::iterator shmit = m_shmlist.find(time_step);
   if (shmit == m_shmlist.end())

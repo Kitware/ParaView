@@ -48,6 +48,19 @@ namespace vtknvindex
 namespace util
 {
 
+// some typedefs
+typedef mi::math::Vector<mi::Sint32, 3> Vec3i;
+typedef mi::math::Vector<mi::Uint32, 3> Vec3u;
+
+typedef mi::math::Vector_struct<mi::Sint32, 3> Vec3i_struct;
+typedef mi::math::Vector_struct<mi::Uint32, 3> Vec3u_struct;
+
+typedef mi::math::Bbox<mi::Sint32, 3> Bbox3i;
+typedef mi::math::Bbox<mi::Uint32, 3> Bbox3u;
+
+typedef mi::math::Bbox_struct<mi::Sint32, 3> Bbox3i_struct;
+typedef mi::math::Bbox_struct<mi::Uint32, 3> Bbox3u_struct;
+
 //-------------------------------------------------------------------------------------------------
 // Helper macro. Checks whether the expression is true and if not prints a message and exits.
 #define check_success(expr)                                                                        \

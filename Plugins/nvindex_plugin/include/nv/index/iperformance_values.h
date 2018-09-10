@@ -65,7 +65,7 @@ public:
   static const mi::Uint64 TIME_RESOLUTION = 1000000;
 
   /// Value returned by \c get() when an invalid type was specified.
-  static const mi::Uint64 INVALID_VALUE = ~0ULL;
+  static const mi::Uint64 INVALID_VALUE = ~0;
 
   /// Value returned by \c get_time() when an invalid type was specified.
   /// \return invalid time value

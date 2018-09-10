@@ -103,6 +103,7 @@ public:
   mi::Sint32 get_cur_local_rank_id() const;
 
   // Get the list of host names in the cluster.
+  mi::Uint32 get_nb_hosts() const;
   const std::vector<std::string>& get_host_names() const;
 
   // Return host_properties of the host this rank belongs to.
@@ -118,7 +119,7 @@ public:
     const vtknvindex_dataset_parameters& dataset_parameters, mi::Sint32 current_hostid);
 
   // Free resources associated to shared memory
-  void unlink_shared_memory();
+  void unlink_shared_memory(bool reset);
 
   // Print all the cluster details.
   void print_info() const;

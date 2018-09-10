@@ -74,8 +74,7 @@ public:
   /// \param argc          The size of the \p argv array (must be 0).
   /// \param argv          An array of optional arguments (ignored).
   /// \return              An instance of the class, or \c NULL on failure.
-  base::IInterface* create(
-    ITransaction* transaction, Uint32 argc, const base::IInterface* argv[]) override
+  base::IInterface* create(ITransaction* transaction, Uint32 argc, const base::IInterface* argv[])
   {
     // avoid warnings
     (void)transaction;

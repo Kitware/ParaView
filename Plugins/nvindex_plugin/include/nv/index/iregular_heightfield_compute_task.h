@@ -42,7 +42,7 @@ public:
     mi::math::Bbox_struct<mi::Sint32, 2>& roi) const = 0;
 
   /// Apply user-defined operations on the heightfield dataset's elevation values.
-  /// A re-computation of the normal values is not triggered automatically.
+  /// A re-compution of the normal values is not triggered automatically.
   ///
   /// \deprecated This will be replaced with compute_with_bounding_box in the future.
   ///
@@ -103,9 +103,9 @@ public:
   /// patch's
   ///                                 elevation values have taken place and \c false otherwise.
   ///
-  virtual bool compute(const mi::math::Bbox_struct<mi::Sint32, 2>& /*ij_patch_range*/,
-    mi::Float32* /*elevation_values*/, mi::math::Vector_struct<mi::Float32, 3>* /*normal_values*/,
-    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
+  virtual bool compute(const mi::math::Bbox_struct<mi::Sint32, 2>& ij_patch_range,
+    mi::Float32* elevation_values, mi::math::Vector_struct<mi::Float32, 3>* normal_values,
+    mi::neuraylib::IDice_transaction* dice_transaction) const
   {
     return false;
   }

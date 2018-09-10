@@ -74,7 +74,7 @@ void vtknvindex_affinity::scene_dump_affinity_info(std::ostringstream& s)
   s << "\n"
     << "## User-defined data affinity."
     << "\n";
-  s << "## Set the number of user-defined affinity information in the project file."
+  s << "## Set the number of user-defined affinity informations in the project file."
     << "\n";
 
   s << "index::domain_subdivision::nb_spatial_regions = " << m_final_spatial_subdivision.size()
@@ -118,6 +118,7 @@ void vtknvindex_affinity::scene_dump_affinity_info(std::ostringstream& s)
 void vtknvindex_affinity::reset_affinity()
 {
   m_spatial_subdivision.clear();
+  m_final_spatial_subdivision.clear();
 }
 
 // ------------------------------------------------------------------------------------------------

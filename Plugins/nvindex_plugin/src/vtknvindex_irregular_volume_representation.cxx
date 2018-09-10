@@ -594,3 +594,271 @@ void vtknvindex_irregular_volume_representation::set_dump_internal_state(bool is
   m_app_config_settings->set_dump_internal_state(is_dump);
   DefaultMapper->config_settings_changed();
 }
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::update_current_kernel()
+{
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_ISOSURFACE, reinterpret_cast<void*>(&m_isosurface_params),
+          sizeof(m_isosurface_params));
+      break;
+
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_DEPTH_ENHANCEMENT,
+          reinterpret_cast<void*>(&m_depth_enhancement_params), sizeof(m_depth_enhancement_params));
+      break;
+
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_EDGE_ENHANCEMENT,
+          reinterpret_cast<void*>(&m_edge_enhancement_params), sizeof(m_edge_enhancement_params));
+      break;
+
+    case RTC_KERNELS_SINGLE_SCATTERING:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_SINGLE_SCATTERING,
+          reinterpret_cast<void*>(&m_single_scattering_params), sizeof(m_single_scattering_params));
+      break;
+
+    case RTC_KERNELS_ISORAYCAST:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_ISORAYCAST, reinterpret_cast<void*>(&m_isoraycast_params),
+          sizeof(m_isoraycast_params));
+      break;
+
+    case RTC_KERNELS_SUPERNOVA_GRADIENT:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_SUPERNOVA_GRADIENT,
+          reinterpret_cast<void*>(&m_supernova_params), sizeof(m_supernova_params));
+      break;
+
+    case RTC_KERNELS_NONE:
+    default:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_NONE, 0, 0);
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_volume_filter(int filter)
+{
+  vtknvindex_rtc_kernels kernel = static_cast<vtknvindex_rtc_kernels>(filter);
+
+  m_app_config_settings->set_rtc_kernel(kernel);
+  static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)->config_settings_changed();
+
+  update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_light_type(int light_type)
+{
+  m_isosurface_params.light_mode = light_type;
+  m_depth_enhancement_params.light_mode = light_type;
+  m_single_scattering_params.light_mode = light_type;
+  m_isoraycast_params.light_mode = light_type;
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+    case RTC_KERNELS_SINGLE_SCATTERING:
+    case RTC_KERNELS_ISORAYCAST:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_light_angle(double light_angle)
+{
+  mi::Float32 angle = static_cast<float>(2.0 * vtkMath::Pi() * (light_angle / 360.0));
+  m_isosurface_params.angle = angle;
+  m_depth_enhancement_params.angle = angle;
+  m_single_scattering_params.angle = angle;
+  m_isoraycast_params.angle = angle;
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+    case RTC_KERNELS_SINGLE_SCATTERING:
+    case RTC_KERNELS_ISORAYCAST:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_light_elevation(double light_elevation)
+{
+  mi::Float32 elevation =
+    static_cast<float>(2.0 * vtkMath::Pi() * ((light_elevation + 90.0) / 360.0));
+
+  m_isosurface_params.elevation = elevation;
+  m_depth_enhancement_params.elevation = elevation;
+  m_single_scattering_params.elevation = elevation;
+  m_isoraycast_params.elevation = elevation;
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+    case RTC_KERNELS_SINGLE_SCATTERING:
+    case RTC_KERNELS_ISORAYCAST:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_surf_ambient(double ambient)
+{
+  m_isosurface_params.amb_fac = static_cast<float>(ambient);
+  m_depth_enhancement_params.amb_fac = static_cast<float>(ambient);
+  m_single_scattering_params.amb_fac = static_cast<float>(ambient);
+  m_isoraycast_params.amb_fac = static_cast<float>(ambient);
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+    case RTC_KERNELS_SINGLE_SCATTERING:
+    case RTC_KERNELS_ISORAYCAST:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_surf_specular(double specular)
+{
+  m_isosurface_params.spec_fac = static_cast<float>(specular);
+  m_depth_enhancement_params.spec_fac = static_cast<float>(specular);
+  m_single_scattering_params.spec_fac = static_cast<float>(specular);
+  m_isoraycast_params.spec_fac = static_cast<float>(specular);
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+    case RTC_KERNELS_SINGLE_SCATTERING:
+    case RTC_KERNELS_ISORAYCAST:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_surf_specular_power(double specular_power)
+{
+  m_isosurface_params.shininess = static_cast<float>(specular_power);
+  m_depth_enhancement_params.shininess = static_cast<float>(specular_power);
+  m_single_scattering_params.shininess = static_cast<float>(specular_power);
+  m_isoraycast_params.shininess = static_cast<float>(specular_power);
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+    case RTC_KERNELS_SINGLE_SCATTERING:
+    case RTC_KERNELS_ISORAYCAST:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_min(double iso_min)
+{
+  m_isosurface_params.iso_min = static_cast<float>(iso_min / 100.0);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_max(double iso_max)
+{
+  m_isosurface_params.iso_max = static_cast<float>(iso_max / 100.0);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_fill_mode(int mode)
+{
+  m_isosurface_params.fill_up = mode;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_use_shading(bool use_shading)
+{
+  m_isosurface_params.use_shading = use_shading ? 1 : 0;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_depth_samples(int depth_samples)
+{
+  m_depth_enhancement_params.max_dsteps = depth_samples;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_DEPTH_ENHANCEMENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_depth_gamma(double gamma)
+{
+  m_depth_enhancement_params.screen_gamma = gamma;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_DEPTH_ENHANCEMENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_edge_range(double edge_range)
+{
+  m_edge_enhancement_params.sample_range = static_cast<float>(edge_range);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_EDGE_ENHANCEMENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_edge_samples(int edge_samples)
+{
+  m_edge_enhancement_params.stp_num = edge_samples;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_EDGE_ENHANCEMENT)
+    update_current_kernel();
+}
