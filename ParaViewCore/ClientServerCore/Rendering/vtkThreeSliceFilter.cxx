@@ -29,7 +29,9 @@
 #include "vtkPProbeFilter.h"
 #include "vtkPlane.h"
 #include "vtkPointData.h"
+#include "vtkPointLocator.h"
 #include "vtkPointSource.h"
+#include "vtkPolyData.h"
 #include "vtkSMPTools.h"
 #include "vtkUnsignedIntArray.h"
 
@@ -316,8 +318,49 @@ void vtkThreeSliceFilter::Process(
   // Update the internal pipeline
   this->CombinedFilteredInput->Update();
 
+  // Add array with original point ids (for selection)
+  const char* vtkSliceOriginalPointIds = "vtkSliceOriginalPointIds";
+  vtkPolyData* combinedData = this->CombinedFilteredInput->GetOutput();
+  vtkIdType nbPoints = combinedData->GetNumberOfPoints();
+  vtkIdTypeArray* originalPointIds = nullptr;
+  if (combinedData->GetPointData()->HasArray(vtkSliceOriginalPointIds) == 1)
+  {
+    originalPointIds = vtkIdTypeArray::FastDownCast(
+      combinedData->GetPointData()->GetArray(vtkSliceOriginalPointIds));
+    vtkIdType oldNbPoints = originalPointIds->GetNumberOfTuples();
+    if (oldNbPoints != nbPoints)
+    {
+      originalPointIds->SetNumberOfTuples(nbPoints);
+    }
+  }
+  else
+  {
+    vtkNew<vtkIdTypeArray> newPointIds;
+    newPointIds->SetName(vtkSliceOriginalPointIds);
+    newPointIds->SetNumberOfComponents(1);
+    newPointIds->SetNumberOfTuples(nbPoints);
+    combinedData->GetPointData()->AddArray(newPointIds.GetPointer());
+    originalPointIds = vtkIdTypeArray::FastDownCast(
+      combinedData->GetPointData()->GetArray(vtkSliceOriginalPointIds));
+  }
+
+  // It is possible that this instance's data partition is empty, so check
+  // before building a point locator.
+  if (nbPoints > 0)
+  {
+    vtkNew<vtkPointLocator> locator;
+    locator->SetDataSet(input);
+    locator->BuildLocator();
+    for (vtkIdType i = 0; i < nbPoints; i++)
+    {
+      double* xyz = combinedData->GetPoint(i);
+      vtkIdType originalId = locator->FindClosestPoint(xyz[0], xyz[1], xyz[2]);
+      originalPointIds->SetValue(i, originalId);
+    } // for
+  }   // if
+
   // Copy generated output to filter output
-  outputs[0]->ShallowCopy(this->CombinedFilteredInput->GetOutput());
+  outputs[0]->ShallowCopy(combinedData);
   outputs[1]->ShallowCopy(this->Slices[0]->GetOutput());
   outputs[2]->ShallowCopy(this->Slices[1]->GetOutput());
   outputs[3]->ShallowCopy(this->Slices[2]->GetOutput());
