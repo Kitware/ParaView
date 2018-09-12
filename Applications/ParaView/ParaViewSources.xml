@@ -35,7 +35,7 @@
   </Category>
   <Category name="MeasurementTools" menu_label="&amp;Measurement Tools" preserve_order="1"
     show_in_toolbar="1">
-    <Proxy group="sources" name="Axes" icon=":/pqWidgets/Icons/pqAxes.png"/>
+    <Proxy group="sources" name="Axes" omit_from_toolbar="1" icon=":/pqWidgets/Icons/pqAxes.png"/>
     <Proxy group="sources" name="Ruler" icon=":/pqWidgets/Icons/pqRuler16.png"/>
   </Category>
   <Proxy group="sources" name="GlyphSource2D" />
