@@ -10111,8 +10111,7 @@
             <Property name="OrientationAxesOutlineColor"
                       panel_visibility="advanced"/>
           </PropertyGroup>
-          <PropertyGroup label="Lights" panel_widget="LightsEditor"
-                         panel_visibility="advanced">
+          <PropertyGroup label="Lights" panel_visibility="never">
             <!-- Light Kit -->
             <Property name="UseLight"/>
             <!-- Key Light -->
