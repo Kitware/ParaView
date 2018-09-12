@@ -48,7 +48,12 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
     - [ ] Create a merge request targeting `master` (do *not* add `Backport: release`)
     - [ ] Get positive review
     - [ ] `Do: merge`
+  - Update VTK's `paraview/release` branch
+    - [ ] `git push origin paraview-vtk-submodule-hash:paraview/release`
+    - [ ] Update kwrobot with the new `paraview/release` branch rules
   - Integrate changes to `release` branch
+    - [ ] `git config -f .gitmodules submodule.VTK.branch paraview/release`
+    - [ ] `git commit -m 'release: follow VTK's paraview/release branch' .gitmodules`
     - [ ] `git push origin update-to-vVERSION:release vVERSION`
     - [ ] Update kwrobot with the new `release` branch rules
 
