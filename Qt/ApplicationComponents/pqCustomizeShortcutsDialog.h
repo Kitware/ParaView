@@ -50,6 +50,7 @@ private slots:
   void onSelectionChanged();
   void onClearShortcut();
   void onResetShortcut();
+  void onResetAll();
 
 private:
   Q_DISABLE_COPY(pqCustomizeShortcutsDialog);
