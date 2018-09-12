@@ -735,13 +735,6 @@ void vtkSpreadSheetView::SetColumnNameToSort(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkSpreadSheetView::SetComponentToSort(int val)
-{
-  this->TableStreamer->SetSelectedComponent(val);
-  this->ClearCache();
-}
-
-//----------------------------------------------------------------------------
 void vtkSpreadSheetView::SetInvertSortOrder(bool val)
 {
   this->TableStreamer->SetInvertOrder(val ? 1 : 0);

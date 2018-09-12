@@ -3530,13 +3530,6 @@
                             number_of_elements="1"
                             panel_visibility="never">
       </StringVectorProperty>
-      <IntVectorProperty command="SetComponentToSort"
-                         default_values="-1"
-                         name="SelectedComponent"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <IntRangeDomain name="range" />
-      </IntVectorProperty>
       <IntVectorProperty command="SetInvertSortOrder"
                          default_values="0"
                          name="InvertOrder"

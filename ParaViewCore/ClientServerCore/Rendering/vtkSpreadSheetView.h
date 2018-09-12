@@ -179,12 +179,6 @@ public:
   void SetColumnNameToSort() { this->SetColumnNameToSort(NULL); }
 
   /**
-   * Get/Set the component to sort with. Use -1 (default) for magnitude.
-   * \note CallOnAllProcesses
-   */
-  void SetComponentToSort(int val);
-
-  /**
    * Get/Set whether the sort order must be Max to Min rather than Min to Max.
    * \note CallOnAllProcesses
    */
