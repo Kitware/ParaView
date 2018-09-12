@@ -21,6 +21,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="pqSearchBox" name="searchBox" native="true"/>
+   </item>
+   <item>
     <widget class="QTreeView" name="treeView">
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -110,8 +113,15 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="3">
-       <widget class="pqSearchBox" name="searchBox" native="true"/>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="resetAllButton">
+        <property name="toolTip">
+         <string>Resets the shortcuts for all actions to the default or clears the shortcut if there is no default.</string>
+        </property>
+        <property name="text">
+         <string>Reset All</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -263,22 +263,34 @@ public:
     {
       return QVariant();
     }
-    if (role != Qt::DisplayRole)
-    {
-      return QVariant();
-    }
     TreeItem* item = static_cast<TreeItem*>(idx.internalPointer());
-
-    switch (idx.column())
+    if (role == Qt::DisplayRole)
     {
-      case 0:
+
+      switch (idx.column())
       {
-        QString result = item->name();
-        result.replace("_", " ");
-        return result;
+        case 0:
+        {
+          QString result = item->name();
+          result.replace("_", " ");
+          return result;
+        }
+        case 1:
+          return item->keySequence();
       }
-      case 1:
-        return item->keySequence();
+    }
+    else if (role == Qt::FontRole)
+    {
+      switch (idx.column())
+      {
+        case 1:
+          QFont font;
+          if (item->keySequence() != item->defaultKeySequence())
+          {
+            font.setBold(true);
+          }
+          return font;
+      }
     }
     return QVariant();
   }
@@ -303,7 +315,40 @@ public:
     }
   }
 
+  void resetAll()
+  {
+    callOnAllLeaves(
+      [this](const QModelIndex& leafIndex, TreeItem* item) {
+        QKeySequence shortcut = item->defaultKeySequence();
+        QModelIndex indexToChange = this->index(leafIndex.row(), 1, this->parent(leafIndex));
+        this->setKeySequence(indexToChange, shortcut);
+      },
+      QModelIndex());
+  }
+
 private:
+  template <typename T>
+  void callOnAllLeaves(T func, const QModelIndex& index)
+  {
+    const int numRows = this->rowCount(index);
+    for (int i = 0; i < numRows; ++i)
+    {
+      QModelIndex childIndex = this->index(i, 0, index);
+      TreeItem* item = static_cast<TreeItem*>(childIndex.internalPointer());
+      if (!item)
+      {
+        return;
+      }
+      if (item->isLeaf())
+      {
+        func(childIndex, item);
+      }
+      else
+      {
+        this->callOnAllLeaves(func, childIndex);
+      }
+    }
+  }
   TreeItem* RootItem;
 };
 
@@ -375,6 +420,8 @@ pqCustomizeShortcutsDialog::pqCustomizeShortcutsDialog(QWidget* parentObject)
     &pqCustomizeShortcutsDialog::onClearShortcut);
   connect(this->Internals->Ui.resetButton, &QAbstractButton::clicked, this,
     &pqCustomizeShortcutsDialog::onResetShortcut);
+  connect(this->Internals->Ui.resetAllButton, &QAbstractButton::clicked, this,
+    &pqCustomizeShortcutsDialog::onResetAll);
   connect(this->Internals->Ui.recordButton, &QAbstractButton::clicked, this,
     [this]() { this->Internals->Ui.keySequenceEdit->setFocus(); });
   connect(this->Internals->Ui.searchBox, &pqSearchBox::textChanged, this, [this]() {
@@ -493,6 +540,12 @@ void pqCustomizeShortcutsDialog::onResetShortcut()
   this->Internals->Model->setKeySequence(selected, shortcut);
   this->Internals->Ui.keySequenceEdit->setKeySequence(shortcut);
   // Update Reset/Clear buttons' enabled state
+  this->onSelectionChanged();
+}
+
+void pqCustomizeShortcutsDialog::onResetAll()
+{
+  this->Internals->Model->resetAll();
   this->onSelectionChanged();
 }
 
