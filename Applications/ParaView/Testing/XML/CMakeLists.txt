@@ -313,6 +313,7 @@ endif()
 list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/4AxesContextView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AccentuatedFilename.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/AMRCutPlane.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AMReXParticlesReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Annotations.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ConvertToMolecule.xml
@@ -1246,7 +1247,7 @@ if (TARGET paraview)
               --test-directory=${PARAVIEW_TEST_DIR}
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.xml)
-    
+
     # Test backwards compatibility for Glyph filter change in ParaView 5.6
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client $<TARGET_FILE:paraview>

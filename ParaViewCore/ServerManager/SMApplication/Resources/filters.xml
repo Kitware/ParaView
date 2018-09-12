@@ -485,6 +485,7 @@
         filter.</Documentation>
       </InputProperty>
     </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkAMRCutPlane"
                  label="AMR CutPlane"
                  name="AMRCutPlane">
@@ -527,7 +528,13 @@
                             label="Center"
                             name="Center"
                             number_of_elements="3"
-                            panel_visibility="never"></DoubleVectorProperty>
+                            panel_visibility="never">
+        <BoundsDomain default_mode="mid" mode="normal" name="range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetNormal"
                             default_values="0 0 1"
@@ -535,16 +542,13 @@
                             name="Normal"
                             number_of_elements="3"
                             panel_visibility="never"></DoubleVectorProperty>
-      <Hints>
-        <PropertyGroup label="Slice Widget"
-                       type="Plane">
-          <Property function="Origin"
-                    name="Center" />
-          <Property function="Normal"
-                    name="Normal" />
-        </PropertyGroup>
-      </Hints>
+      <PropertyGroup label="Plane Parameters" panel_widget="InteractivePlane">
+        <Property function="Origin" name="Center" />
+        <Property function="Normal" name="Normal" />
+        <Property function="Input" name="Input" />
+      </PropertyGroup>
     </SourceProxy>
+    <!-- ==================================================================== -->
     <SourceProxy class="vtkAMRResampleFilter"
                  label="Resample AMR"
                  name="AMRResampleFilter">
