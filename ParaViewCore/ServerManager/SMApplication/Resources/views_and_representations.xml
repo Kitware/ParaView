@@ -2778,7 +2778,7 @@
         <Property name="HeadLightK:H Ratio"/>
         <Property name="MaintainLuminance"/>
       </PropertyGroup>
-      <PropertyGroup label="Background" panel_widget="BackgroundEditor">
+      <PropertyGroup label="Background" panel_widget="BackgroundEditor" panel_visibility="advanced">
         <Property name="Background"/>
         <Property name="Background2"/>
         <Property name="UseGradientBackground"/>
@@ -10150,7 +10150,7 @@
                     panel_visibility="advanced"/>
           <Property name="EyeAngle" panel_visibility="never"/>
 
-          <PropertyGroup label="Background" panel_widget="BackgroundEditor">
+          <PropertyGroup label="Background" panel_widget="BackgroundEditor" panel_visibility="advanced">
             <Property name="Background"/>
             <Property name="Background2"/>
             <Property name="UseGradientBackground"/>
