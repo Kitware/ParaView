@@ -262,15 +262,32 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
   double* distPtr = static_cast<double*>(distArray->GetVoidPointer(0)) + begin;
   double* swirlPtr = static_cast<double*>(swirlArray->GetVoidPointer(0)) + 3 * begin;
 
-  // Loop over voxels
   int dZ = extent[5] - extent[4] + 1;
   int dY = extent[3] - extent[2] + 1;
+  int dX = extent[1] - extent[0] + 1;
+
+  // Convert and save x and y indices to double values
+  double* yValues = new double[dY];
+  for (int idxY = extent[2], i = 0; !this->AbortExecute && idxY <= extent[3]; idxY++, i++)
+  {
+    yValues[i] = static_cast<double>(idxY);
+  }
+
+  double* xValues = new double[dX];
+  for (int idxX = extent[0], i = 0; idxX <= extent[1]; idxX++, i++)
+  {
+    xValues[i] = static_cast<double>(idxX);
+  }
+
+  // Loop over voxels
   unsigned long progressGoal = dY * dZ;
   unsigned long progressStep = progressGoal <= 20 ? 1 : progressGoal / 20;
   unsigned long progressCount = 0;
   for (int idxZ = extent[4]; idxZ <= extent[5]; idxZ++)
   {
-    for (int idxY = extent[2]; !this->AbortExecute && idxY <= extent[3]; idxY++)
+    double z = static_cast<double>(idxZ);
+    double zSquared = z * z;
+    for (int idxY = extent[2], j = 0; !this->AbortExecute && idxY <= extent[3]; idxY++, j++)
     {
       progressCount++;
       if ((threadId == 0) && (progressCount % progressStep) == 0)
@@ -278,19 +295,23 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
         this->UpdateProgress(static_cast<double>(progressCount) / progressGoal);
       }
 
-      for (int idxX = extent[0]; idxX <= extent[1]; idxX++)
+      double y = yValues[j];
+      double yzSquared = y * y + zSquared;
+      for (int idxX = extent[0], i = 0; idxX <= extent[1]; idxX++, i++)
       {
-        *xPtr = static_cast<double>(idxX);
+        double x = xValues[i];
+
+        *xPtr = x;
         xPtr++;
 
-        *distPtr = static_cast<double>(idxX * idxX + idxY * idxY + idxZ * idxZ);
+        *distPtr = x * x + yzSquared;
         distPtr++;
 
-        *swirlPtr = idxY;
+        *swirlPtr = y;
         swirlPtr++;
-        *swirlPtr = idxZ;
+        *swirlPtr = z;
         swirlPtr++;
-        *swirlPtr = idxX;
+        *swirlPtr = x;
         swirlPtr++;
       } // for (idxX)
       xPtr += outIncY;
@@ -301,4 +322,7 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
     distPtr += outIncZ;
     swirlPtr += 3 * outIncZ;
   } // for (idxZ)
+
+  delete[] yValues;
+  delete[] xValues;
 }
