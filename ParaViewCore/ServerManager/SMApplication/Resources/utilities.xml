@@ -4445,72 +4445,6 @@
           file_description="Bitmap images" />
       </Hints>
     </Proxy>
-
-    <Proxy name="CDB" processes="client">
-      <Documentation>
-        Global setup for Cinema Image Database output.
-      </Documentation>
-      <IntVectorProperty name="Deferred Rendering"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          Deferred rendering cabability level of this database. None means that static images are created at each viewpoint (aka 'SpecA'). Composeable (aka 'SpecC') adds ability to hide/show individual objects. Recolorable adds colormap editability.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="None" value="0" />
-          <Entry text="Composable" value="1" />
-          <Entry text="Composable+Recolorable" value="2" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <IntVectorProperty name="Camera Model"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          Specify camera capability level for this database. Static means the camera is fixed, phi-theta is an inward facing rectilinear sampling of the sphere, the pose cameras sparsely sample and maintain an orientation matrix.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Static" value="0" />
-          <Entry text="Phi-Theta" value="1" />
-          <Entry text="Inward Pose" value="2" />
-          <Entry text="Outward Pose" value="3" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty name="Track Object"
-        number_of_elements="1"
-        default_values="None">
-        <Documentation>
-          Name of a pipeline object to orient the camera with. Only meaningful for Inward and Outward Pose Cameras.
-        </Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty name="Camera Phi Divisions"
-        number_of_elements="1"
-        default_values="12">
-        <Documentation>
-          Specify number of longitudinal divisions. Only meaningful for Phi-Theta and Pose Cameras.
-        </Documentation>
-        <IntRangeDomain name="range" min="1" max="64" />
-      </IntVectorProperty>
-      <IntVectorProperty name="Camera Theta Divisions"
-        number_of_elements="1"
-        default_values="7">
-        <Documentation>
-          Specify number of latitudinal divisions. Only meaningful for Phi-Theta and Pose Cameras.
-        </Documentation>
-        <IntRangeDomain name="range" min="1" max="32" />
-      </IntVectorProperty>
-      <IntVectorProperty name="Camera Roll Divisions"
-        number_of_elements="1"
-        default_values="1">
-        <Documentation>
-          Specify number of roll divisions. Only meaningful for Inward and Outward Pose Cameras.
-        </Documentation>
-        <IntRangeDomain name="range" min="1" max="64" />
-      </IntVectorProperty>
-      <Hints>
-        <FormatOptions extensions="cdb"
-          file_description="Cinema Image Exports" />
-      </Hints>
-    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="misc">
@@ -4685,20 +4619,6 @@
       <PropertyGroup label="Image Options">
         <Property name="Format" />
       </PropertyGroup>
-
-      <SubProxy>
-        <Proxy name="CatalystOptions"
-               proxygroup="misc"
-               proxyname="CatalystOptions"></Proxy>
-        <ExposedProperties>
-           <PropertyGroup label="Catalyst Options">
-             <Property name="WriteFrequency" />
-             <Property name="CatalystFilePattern" />
-             <Property name="CatalystFitToScreen" />
-           </PropertyGroup>
-        </ExposedProperties>
-      </SubProxy>
-
     </SaveScreenshotProxy>
   </ProxyGroup>
 
@@ -4749,4 +4669,131 @@
       </IntVectorProperty>
     </LoadStateOptionsProxy>
   </ProxyGroup>
+
+
+  <!-- ================================================================= -->
+  <ProxyGroup name="insitu2_misc">
+    <Proxy name="CDB" processes="client">
+      <Documentation>
+        Global setup for Cinema Image Database output.
+      </Documentation>
+      <IntVectorProperty name="Deferred Rendering"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Deferred rendering cabability level of this database. None means that static images are created at each viewpoint (aka 'SpecA'). Composeable (aka 'SpecC') adds ability to hide/show individual objects. Recolorable adds colormap editability.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Composable" value="1" />
+          <Entry text="Composable+Recolorable" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty name="Camera Model"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Specify camera capability level for this database. Static means the camera is fixed, phi-theta is an inward facing rectilinear sampling of the sphere, the pose cameras sparsely sample and maintain an orientation matrix.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Static" value="0" />
+          <Entry text="Phi-Theta" value="1" />
+          <Entry text="Inward Pose" value="2" />
+          <Entry text="Outward Pose" value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <StringVectorProperty name="Track Object"
+        number_of_elements="1"
+        default_values="None">
+        <Documentation>
+          Name of a pipeline object to orient the camera with. Only meaningful for Inward and Outward Pose Cameras.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty name="Camera Phi Divisions"
+        number_of_elements="1"
+        default_values="12">
+        <Documentation>
+          Specify number of longitudinal divisions. Only meaningful for Phi-Theta and Pose Cameras.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="64" />
+      </IntVectorProperty>
+      <IntVectorProperty name="Camera Theta Divisions"
+        number_of_elements="1"
+        default_values="7">
+        <Documentation>
+          Specify number of latitudinal divisions. Only meaningful for Phi-Theta and Pose Cameras.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="32" />
+      </IntVectorProperty>
+      <IntVectorProperty name="Camera Roll Divisions"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Specify number of roll divisions. Only meaningful for Inward and Outward Pose Cameras.
+        </Documentation>
+        <IntRangeDomain name="range" min="1" max="64" />
+      </IntVectorProperty>
+      <Hints>
+        <FormatOptions extensions="cdb"
+          file_description="Cinema Image Exports" />
+      </Hints>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="insitu2_writer_parameters">
+    <SaveScreenshotProxy
+        base_proxygroup="misc"
+        base_proxyname="SaveScreenshotBase"
+        name="SaveScreenshot"
+        processes="client">
+      <Documentation>
+        Variation with catalyst specific extensions.
+      </Documentation>
+
+      <ProxyProperty name="Format">
+        <ProxyListDomain name="proxy_list">
+          <Group name="screenshot_writers" />
+          <Group name="insitu2_misc" />
+        </ProxyListDomain>
+        <Hints>
+          <ProxySelectionWidget enabled="0" />
+        </Hints>
+      </ProxyProperty>
+
+      <PropertyGroup label="Size and Scaling">
+        <Property name="SaveAllViews" />
+        <Property name="ImageResolution" />
+        <Property name="FontScaling" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Separator Options" >
+        <Property name="SeparatorWidth" />
+        <Property name="SeparatorColor" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Coloring">
+        <Property name="OverrideColorPalette" />
+        <Property name="StereoMode" />
+        <Property name="TransparentBackground" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Image Options">
+        <Property name="Format" />
+      </PropertyGroup>
+
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+             <Property name="CatalystFitToScreen" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+    </SaveScreenshotProxy>
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

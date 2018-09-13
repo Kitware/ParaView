@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMWriterFactory.h"
 #include "vtkSMWriterProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringList.h"
 
 class vtkSMExportProxyDepot::Internal
 {
@@ -134,14 +135,21 @@ vtkSMSourceProxy* vtkSMExportProxyDepot::GetWriterProxy(
   {
     // first time accessed, make it
     vtkSmartPointer<vtkSMWriterFactory> wf = vtkSmartPointer<vtkSMWriterFactory>::New();
+    auto sl = vtkSmartPointer<vtkStringList>::New();
+    wf->GetGroups(sl);
+    // we want our particular approved writers
+    for (int i = 0; i < sl->GetNumberOfStrings(); i++)
+    {
+      wf->RemoveGroup(sl->GetString(i));
+    }
+    wf->AddGroup("insitu2_writer_parameters");
     wf->UpdateAvailableWriters();
 
-    writerProxy =
-      vtkSMWriterProxy::SafeDownCast(wf->CreateWriter(format, filter, 0, true, "CatalystApproved"));
+    writerProxy = vtkSMWriterProxy::SafeDownCast(wf->CreateWriter(format, filter, 0, true));
 
     vtkPVXMLElement* hint = writerProxy->GetHints();
     std::string extension = "";
-    // use first entry in the hint to choose a default fileextension
+    // use first entry in the hint to choose a default file extension
     if (hint != nullptr)
     {
       vtkPVXMLElement* factory = hint->FindNestedElementByName("WriterFactory");
@@ -227,7 +235,7 @@ vtkSMProxy* vtkSMExportProxyDepot::GetScreenshotProxy(
   if (!ssProxy)
   {
     // first time accessed, make it
-    ssProxy = this->Session->NewProxy("misc", "SaveScreenshot");
+    ssProxy = this->Session->NewProxy("insitu2_writer_parameters", "SaveScreenshot");
     if (!ssProxy)
     {
       return nullptr;
