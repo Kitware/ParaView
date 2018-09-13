@@ -377,11 +377,13 @@ set(_vtk_modules
   # needed for vtkVeraOutReader
   )
 
-if ((NOT WIN32) OR (NOT MSVC) OR (MSVC_VERSION GREATER 1899))
-  # MSVC 2015 (1900) or newer is needed if using MVSC for vtkIOMotionFX
-  list(APPEND _vtk_modules
-    vtkIOMotionFX # needed for vtkMotionFXCFGReader
-    )
+if (PARAVIEW_ENABLE_MOTIONFX)
+  if ((NOT WIN32) OR (NOT MSVC) OR (MSVC_VERSION GREATER 1899))
+    # MSVC 2015 (1900) or newer is needed if using MVSC for vtkIOMotionFX
+    list(APPEND _vtk_modules
+      vtkIOMotionFX # needed for vtkMotionFXCFGReader
+      )
+  endif()
 endif()
 
 
