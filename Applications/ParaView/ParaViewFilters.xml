@@ -296,5 +296,5 @@
   <Proxy group="filters" name="GenericGeometryFilter" />
   <Proxy group="filters" name="SliceAlongPolyLine" />
   <Proxy group="filters" name="SliceWithPlane" />
-  <Proxy group="filters" name="RulerFilter" />
+  <Proxy group="filters" name="RulerFilter" icon=":/pqWidgets/Icons/pqRuler.png"/>
 </ParaViewFilters>
