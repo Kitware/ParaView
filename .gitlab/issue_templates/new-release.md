@@ -172,7 +172,7 @@ git gitlab-push -f
     - [ ] Getting started guide opens
     - [ ] Examples load and match thumbnails in dialog
     - [ ] Python
-    - [ ] `import compiler, numpy`
+    - [ ] `import numpy`
     - [ ] Plugins are present and load properly
     - [ ] Text source LaTeX `$A^2$`
     - [ ] OSPRay
@@ -201,11 +201,9 @@ updateMD5sum.sh vMAJOR.MINOR
 
 # Post-release
 
-  - [ ] Notify `paraview@paraview.org` and `paraview-developers@paraview.org`
-        that the release is available.
+  - [ ]  Write and publish blog post with release notes.
   - [ ] Post an announcement in the Announcements category on
         [discourse.paraview.org](https://discourse.paraview.org/).
-  - [ ]  Write and publish blog post with release notes.
 <!--
 These items only apply to non-RC releases.
 
