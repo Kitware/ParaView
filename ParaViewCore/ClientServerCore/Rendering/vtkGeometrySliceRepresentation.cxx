@@ -220,7 +220,7 @@ void vtkGeometrySliceRepresentation::SetupDefaults()
   vtkMath::UninitializeBounds(this->Internals->OriginalDataBounds);
   this->Superclass::SetupDefaults();
   vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
-  mapper->SetPointIdArrayName("-");
+  mapper->SetPointIdArrayName("vtkSliceOriginalPointIds");
   mapper->SetCellIdArrayName("vtkSliceOriginalCellIds");
   mapper->SetCompositeIdArrayName("vtkSliceCompositeIndex");
 
