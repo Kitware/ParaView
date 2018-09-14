@@ -18,13 +18,11 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <array>
-#include <cmath>
+#include <cstring> // memcpy()
 #include <string>
 
 namespace
@@ -39,6 +37,9 @@ vtkStandardNewMacro(vtkImageSimpleSource);
 //----------------------------------------------------------------------------
 vtkImageSimpleSource::vtkImageSimpleSource()
 {
+  this->EnableDistanceSquaredData = true;
+  this->EnableSwirlData = true;
+
   this->WholeExtent[0] = -10;
   this->WholeExtent[1] = 10;
   this->WholeExtent[2] = -10;
@@ -61,7 +62,9 @@ void vtkImageSimpleSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "WholeExtent: (" << this->WholeExtent[0] << ", " << this->WholeExtent[1] << ", "
      << this->WholeExtent[2] << ", " << this->WholeExtent[3] << ", " << this->WholeExtent[4] << ", "
      << this->WholeExtent[5] << ")\n"
-     << "FirstIndex: (" << this->FirstIndex[0] << "," << this->FirstIndex[1] << ","
+     << indent << "EnableDistanceSquaredData: " << this->EnableDistanceSquaredData << "\n"
+     << indent << "EnabledSwirlData: " << this->EnableSwirlData << "\n"
+     << indent << "FirstIndex: (" << this->FirstIndex[0] << "," << this->FirstIndex[1] << ","
      << this->FirstIndex[2] << ")\n";
 }
 
@@ -171,9 +174,24 @@ void vtkImageSimpleSource::PrepareImageData(vtkInformationVector** vtkNotUsed(in
     array->Delete();
   } // for (i)
 
-  // Make X the active scalars, Swirl the active vectors
+  // Make X the active scalars
   pointData->SetActiveScalars(SIMPLE_FIELD_X.c_str());
-  pointData->SetActiveVectors(SIMPLE_FIELD_SWIRL.c_str());
+
+  // If DistanceSquared not enabled, remove it
+  if (!this->EnableDistanceSquaredData)
+  {
+    pointData->RemoveArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
+  }
+
+  // If Swirl enabled, make it the active vectors array, else remove it
+  if (this->EnableSwirlData)
+  {
+    pointData->SetActiveVectors(SIMPLE_FIELD_SWIRL.c_str());
+  }
+  else
+  {
+    pointData->RemoveArray(SIMPLE_FIELD_SWIRL.c_str());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -200,25 +218,30 @@ int vtkImageSimpleSource::RequestInformation(vtkInformation* vtkNotUsed(request)
   pointDataInfo->Append(xInfo);
   xInfo->FastDelete();
 
-  // Point data "DistanceSquared"
-  vtkInformation* dsInfo = vtkInformation::New();
-  dsInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
-  dsInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_DISTANCESQUARED);
-  dsInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
-  dsInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 1);
-  pointDataInfo->Append(dsInfo);
-  dsInfo->FastDelete();
+  // Optional point data "DistanceSquared"
+  if (this->EnableDistanceSquaredData)
+  {
+    vtkInformation* dsInfo = vtkInformation::New();
+    dsInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
+    dsInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_DISTANCESQUARED);
+    dsInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
+    dsInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 1);
+    pointDataInfo->Append(dsInfo);
+    dsInfo->FastDelete();
+  }
 
-  // Point data "Swirl" (vector)
-  vtkInformation* swInfo = vtkInformation::New();
-  swInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
-  swInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_SWIRL);
-  swInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
-  swInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 3);
-  pointDataInfo->Append(swInfo);
-  swInfo->FastDelete();
-
-  outInfo->Set(vtkDataObject::POINT_DATA_VECTOR(), pointDataInfo);
+  // Optional point data "Swirl" (vector)
+  if (this->EnableSwirlData)
+  {
+    vtkInformation* swInfo = vtkInformation::New();
+    swInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
+    swInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_SWIRL);
+    swInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
+    swInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 3);
+    pointDataInfo->Append(swInfo);
+    swInfo->FastDelete();
+    outInfo->Set(vtkDataObject::POINT_DATA_VECTOR(), pointDataInfo);
+  }
   pointDataInfo->FastDelete();
 
   // Also support sub-extents
@@ -232,12 +255,6 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
   vtkImageData*** vtkNotUsed(inData), vtkImageData** outData, int extent[6], int threadId)
 {
   vtkImageData* imageData = outData[0];
-
-  // Get data arrays
-  vtkPointData* pointData = imageData->GetPointData();
-  vtkDataArray* xArray = pointData->GetArray(SIMPLE_FIELD_X.c_str());
-  vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
-  vtkDataArray* swirlArray = pointData->GetArray(SIMPLE_FIELD_SWIRL.c_str());
 
   // Compute continuous increments for this extent
   int dims[3];
@@ -257,10 +274,24 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
   structuredBegin[2] = extent[4] - this->FirstIndex[2];
   vtkIdType begin = structuredBegin[0] + inc[1] * structuredBegin[1] + inc[2] * structuredBegin[2];
 
-  // Get starting pointer for each array
+  // Get data arrays and starting pointers
+  vtkPointData* pointData = imageData->GetPointData();
+  vtkDataArray* xArray = pointData->GetArray(SIMPLE_FIELD_X.c_str());
   double* xPtr = static_cast<double*>(xArray->GetVoidPointer(0)) + begin;
-  double* distPtr = static_cast<double*>(distArray->GetVoidPointer(0)) + begin;
-  double* swirlPtr = static_cast<double*>(swirlArray->GetVoidPointer(0)) + 3 * begin;
+
+  double* distPtr = nullptr;
+  if (this->EnableDistanceSquaredData)
+  {
+    vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
+    distPtr = static_cast<double*>(distArray->GetVoidPointer(0)) + begin;
+  }
+
+  double* swirlPtr = nullptr;
+  if (this->EnableSwirlData)
+  {
+    vtkDataArray* swirlArray = pointData->GetArray(SIMPLE_FIELD_SWIRL.c_str());
+    swirlPtr = static_cast<double*>(swirlArray->GetVoidPointer(0)) + 3 * begin;
+  }
 
   int dZ = extent[5] - extent[4] + 1;
   int dY = extent[3] - extent[2] + 1;
@@ -295,32 +326,56 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
         this->UpdateProgress(static_cast<double>(progressCount) / progressGoal);
       }
 
-      double y = yValues[j];
-      double yzSquared = y * y + zSquared;
-      for (int idxX = extent[0], i = 0; idxX <= extent[1]; idxX++, i++)
+      if (this->EnableDistanceSquaredData || this->EnableSwirlData)
       {
-        double x = xValues[i];
+        double y = yValues[j];
+        double yzSquared = y * y + zSquared;
+        for (int idxX = extent[0], i = 0; idxX <= extent[1]; idxX++, i++)
+        {
+          double x = xValues[i];
 
-        *xPtr = x;
-        xPtr++;
+          *xPtr = x;
+          xPtr++;
 
-        *distPtr = x * x + yzSquared;
-        distPtr++;
+          if (this->EnableDistanceSquaredData)
+          {
+            *distPtr = x * x + yzSquared;
+            distPtr++;
+          }
 
-        *swirlPtr = y;
-        swirlPtr++;
-        *swirlPtr = z;
-        swirlPtr++;
-        *swirlPtr = x;
-        swirlPtr++;
-      } // for (idxX)
-      xPtr += outIncY;
-      distPtr += outIncY;
-      swirlPtr += 3 * outIncY;
+          if (this->EnableSwirlData)
+          {
+            *swirlPtr = y;
+            swirlPtr++;
+            *swirlPtr = z;
+            swirlPtr++;
+            *swirlPtr = x;
+            swirlPtr++;
+          }
+        } // for (idxX)
+
+        xPtr += outIncY;
+        distPtr += outIncY;
+        swirlPtr += 3 * outIncY;
+      } // if
+      else
+      {
+        // Optimize X when DistanceSquared and Swirl are both disabled
+        memcpy(xPtr, xValues, dX * sizeof(double));
+        xPtr += dX + outIncY;
+      } // else
+
     } // for (idxY)
+
     xPtr += outIncZ;
-    distPtr += outIncZ;
-    swirlPtr += 3 * outIncZ;
+    if (this->EnableDistanceSquaredData)
+    {
+      distPtr += outIncZ;
+    }
+    if (this->EnableSwirlData)
+    {
+      swirlPtr += 3 * outIncZ;
+    }
   } // for (idxZ)
 
   delete[] yValues;

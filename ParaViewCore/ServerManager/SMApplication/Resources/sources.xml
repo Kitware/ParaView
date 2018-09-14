@@ -1087,6 +1087,27 @@
         inclusive, so values of -10, 10, -10, 10, =10, 10 indicate that the
         dimensions of the output will be 21 x 21 x 21.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetEnableDistanceSquaredData"
+                         default_values="1"
+                         name="Generate DistanceSquared Scalars"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable DistanceSquared point data scalar array.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableSwirlData"
+                         default_values="1"
+                         name="Generate Swirl Vectors"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable Swirl point data vector array.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetEnableSMP"
                          default_values="0"
                          name="EnableSMP"
