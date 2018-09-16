@@ -588,9 +588,14 @@ void pqRenderViewSelectionReaction::UpdateTooltip()
       pipeline->GetTooltipInfo(association, tooltipPos, tooltipText))
     {
       QWidget* widget = this->View->widget();
+
+      // Take DPI scaling into account for the transformation
+      qreal dpr = widget->devicePixelRatioF();
+
       // Convert renderer based position to a global position
-      QPoint pos =
-        widget->mapToGlobal(QPoint(tooltipPos[0], widget->size().height() - tooltipPos[1]));
+      QPoint pos = widget->mapToGlobal(
+        QPoint(tooltipPos[0] / dpr, widget->size().height() - (tooltipPos[1] / dpr)));
+
       QToolTip::showText(pos, tooltipText.c_str());
     }
     else
