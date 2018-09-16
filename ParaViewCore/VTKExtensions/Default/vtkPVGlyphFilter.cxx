@@ -167,17 +167,18 @@ public:
         this->Bounds.GetMinPoint()[2], this->Bounds.GetMaxPoint()[2]);
     }
 
-    // we use diagonal, instead of actual length for each side to avoid the
-    // issue with one of the lengths being 0.
-    double side = std::sqrt(this->Bounds.GetDiagonalLength());
-    double volume = side * side * side;
+    double l[3];
+    this->Bounds.GetLengths(l);
+
+    int dim = (l[0] > 0.0 && l[1] > 0.0 && l[2] > 0.0) ? 3 : 2;
+
+    double volume = std::pow(this->Bounds.GetDiagonalLength(), dim);
     if (volume > 0.0)
     {
-      assert(volume > 0.0);
       assert(self->GetMaximumNumberOfSamplePoints() > 0);
       double volumePerGlyph = volume / self->GetMaximumNumberOfSamplePoints();
-      double delta = std::pow(volumePerGlyph, 1.0 / 3.0);
-      this->NearestPointRadius = std::pow(2 * delta, 1.0 / 2.0) / 2.0;
+      double delta = std::pow(volumePerGlyph, 1.0 / dim);
+      this->NearestPointRadius = delta / 2.0;
     }
     else
     {
