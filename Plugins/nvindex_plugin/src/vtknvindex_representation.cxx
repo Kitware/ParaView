@@ -580,10 +580,9 @@ int vtknvindex_representation::RequestData(
     }
 
     // volume size
-    mi::math::Vector_struct<mi::Uint32, 3> volume_size;
-    volume_size.x = static_cast<mi::Uint32>(volume_extents.max.x - volume_extents.min.x + 1);
-    volume_size.y = static_cast<mi::Uint32>(volume_extents.max.y - volume_extents.min.y + 1);
-    volume_size.z = static_cast<mi::Uint32>(volume_extents.max.z - volume_extents.min.z + 1);
+    m_volume_size.x = static_cast<mi::Uint32>(volume_extents.max.x - volume_extents.min.x + 1);
+    m_volume_size.y = static_cast<mi::Uint32>(volume_extents.max.y - volume_extents.min.y + 1);
+    m_volume_size.z = static_cast<mi::Uint32>(volume_extents.max.z - volume_extents.min.z + 1);
 
     if (!using_cache)
     {
@@ -633,26 +632,16 @@ int vtknvindex_representation::RequestData(
       m_cluster_properties->get_regular_volume_properties()->set_volume_scaling(scaling_flt);
 
       // volume size
-      m_cluster_properties->get_regular_volume_properties()->set_volume_size(volume_size);
+      m_cluster_properties->get_regular_volume_properties()->set_volume_size(m_volume_size);
 
       delete[] all_rank_bounds;
 
       // Cache bounds only for time varying datasets.
       if (has_time_steps)
         set_cached_bounds(cur_time_step);
+
+      update_index_roi();
     }
-
-    // Set region of interest.
-    mi::math::Bbox_struct<mi::Float32, 3> roi;
-
-    roi.min.x = (volume_size.x - 1) * m_roi_gui.min.x;
-    roi.max.x = (volume_size.x - 1) * m_roi_gui.max.x;
-    roi.min.y = (volume_size.y - 1) * m_roi_gui.min.y;
-    roi.max.y = (volume_size.y - 1) * m_roi_gui.max.y;
-    roi.min.z = (volume_size.z - 1) * m_roi_gui.min.z;
-    roi.max.z = (volume_size.z - 1) * m_roi_gui.max.z;
-
-    m_app_config_settings->set_region_of_interest(roi);
   }
   else
   {
@@ -772,45 +761,62 @@ void vtknvindex_representation::set_opacity_reference(double opacity_reference)
 }
 
 //----------------------------------------------------------------------------
+void vtknvindex_representation::update_index_roi()
+{
+  // Set region of interest.
+  mi::math::Bbox<mi::Float32, 3> roi;
+
+  roi.min.x = (m_volume_size.x - 1) * m_roi_gui.min.x;
+  roi.max.x = (m_volume_size.x - 1) * m_roi_gui.max.x;
+  roi.min.y = (m_volume_size.y - 1) * m_roi_gui.min.y;
+  roi.max.y = (m_volume_size.y - 1) * m_roi_gui.max.y;
+  roi.min.z = (m_volume_size.z - 1) * m_roi_gui.min.z;
+  roi.max.z = (m_volume_size.z - 1) * m_roi_gui.max.z;
+
+  m_app_config_settings->set_region_of_interest(roi);
+  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->config_settings_changed();
+}
+
+//----------------------------------------------------------------------------
 void vtknvindex_representation::set_roi_minI(double val)
 {
   m_roi_gui.min.x = (val + 100.0) / 200.0;
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_roi_maxI(double val)
 {
   m_roi_gui.max.x = (val + 100.0) / 200.0;
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_roi_minJ(double val)
 {
   m_roi_gui.min.y = (val + 100.0) / 200.0;
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_roi_maxJ(double val)
 {
   m_roi_gui.max.y = (val + 100.0) / 200.0;
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_roi_minK(double val)
 {
   m_roi_gui.min.z = (val + 100.0) / 200.0;
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_representation::set_roi_maxK(double val)
 {
   m_roi_gui.max.z = (val + 100.0) / 200.0;
-  static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
@@ -925,24 +931,6 @@ void vtknvindex_representation::update_current_kernel()
           reinterpret_cast<void*>(&m_edge_enhancement_params), sizeof(m_edge_enhancement_params));
       break;
 
-    case RTC_KERNELS_SINGLE_SCATTERING:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_SINGLE_SCATTERING,
-          reinterpret_cast<void*>(&m_single_scattering_params), sizeof(m_single_scattering_params));
-      break;
-
-    case RTC_KERNELS_ISORAYCAST:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_ISORAYCAST, reinterpret_cast<void*>(&m_isoraycast_params),
-          sizeof(m_isoraycast_params));
-      break;
-
-    case RTC_KERNELS_SUPERNOVA_GRADIENT:
-      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
-        ->rtc_kernel_changed(RTC_KERNELS_SUPERNOVA_GRADIENT,
-          reinterpret_cast<void*>(&m_supernova_params), sizeof(m_supernova_params));
-      break;
-
     case RTC_KERNELS_NONE:
     default:
       static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)
@@ -967,15 +955,11 @@ void vtknvindex_representation::set_light_type(int light_type)
 {
   m_isosurface_params.light_mode = light_type;
   m_depth_enhancement_params.light_mode = light_type;
-  m_single_scattering_params.light_mode = light_type;
-  m_isoraycast_params.light_mode = light_type;
 
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
-    case RTC_KERNELS_SINGLE_SCATTERING:
-    case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
     case RTC_KERNELS_EDGE_ENHANCEMENT:
@@ -990,15 +974,11 @@ void vtknvindex_representation::set_light_angle(double light_angle)
   mi::Float32 angle = static_cast<float>(2.0 * vtkMath::Pi() * (light_angle / 360.0));
   m_isosurface_params.angle = angle;
   m_depth_enhancement_params.angle = angle;
-  m_single_scattering_params.angle = angle;
-  m_isoraycast_params.angle = angle;
 
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
-    case RTC_KERNELS_SINGLE_SCATTERING:
-    case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
     case RTC_KERNELS_EDGE_ENHANCEMENT:
@@ -1015,15 +995,11 @@ void vtknvindex_representation::set_light_elevation(double light_elevation)
 
   m_isosurface_params.elevation = elevation;
   m_depth_enhancement_params.elevation = elevation;
-  m_single_scattering_params.elevation = elevation;
-  m_isoraycast_params.elevation = elevation;
 
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
-    case RTC_KERNELS_SINGLE_SCATTERING:
-    case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
     case RTC_KERNELS_EDGE_ENHANCEMENT:
@@ -1037,15 +1013,11 @@ void vtknvindex_representation::set_surf_ambient(double ambient)
 {
   m_isosurface_params.amb_fac = static_cast<float>(ambient);
   m_depth_enhancement_params.amb_fac = static_cast<float>(ambient);
-  m_single_scattering_params.amb_fac = static_cast<float>(ambient);
-  m_isoraycast_params.amb_fac = static_cast<float>(ambient);
 
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
-    case RTC_KERNELS_SINGLE_SCATTERING:
-    case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
     case RTC_KERNELS_EDGE_ENHANCEMENT:
@@ -1059,15 +1031,11 @@ void vtknvindex_representation::set_surf_specular(double specular)
 {
   m_isosurface_params.spec_fac = static_cast<float>(specular);
   m_depth_enhancement_params.spec_fac = static_cast<float>(specular);
-  m_single_scattering_params.spec_fac = static_cast<float>(specular);
-  m_isoraycast_params.spec_fac = static_cast<float>(specular);
 
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
-    case RTC_KERNELS_SINGLE_SCATTERING:
-    case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
     case RTC_KERNELS_EDGE_ENHANCEMENT:
@@ -1081,15 +1049,11 @@ void vtknvindex_representation::set_surf_specular_power(double specular_power)
 {
   m_isosurface_params.shininess = static_cast<float>(specular_power);
   m_depth_enhancement_params.shininess = static_cast<float>(specular_power);
-  m_single_scattering_params.shininess = static_cast<float>(specular_power);
-  m_isoraycast_params.shininess = static_cast<float>(specular_power);
 
   switch (m_app_config_settings->get_rtc_kernel())
   {
     case RTC_KERNELS_ISOSURFACE:
     case RTC_KERNELS_DEPTH_ENHANCEMENT:
-    case RTC_KERNELS_SINGLE_SCATTERING:
-    case RTC_KERNELS_ISORAYCAST:
       update_current_kernel();
       break;
     case RTC_KERNELS_EDGE_ENHANCEMENT:
@@ -1167,84 +1131,5 @@ void vtknvindex_representation::set_edge_samples(int edge_samples)
   m_edge_enhancement_params.stp_num = edge_samples;
 
   if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_EDGE_ENHANCEMENT)
-    update_current_kernel();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_single_scatt_samples(int samples)
-{
-  m_single_scattering_params.steps = samples;
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SINGLE_SCATTERING)
-    update_current_kernel();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_single_scatt_light_distance(double light_distance)
-{
-  m_single_scattering_params.light_distance = static_cast<mi::Float32>(light_distance);
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SINGLE_SCATTERING)
-    update_current_kernel();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_single_scatt_min_alpha(double min_alpha)
-{
-  m_single_scattering_params.min_alpha = static_cast<mi::Float32>(min_alpha);
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SINGLE_SCATTERING)
-    update_current_kernel();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_single_scatt_max_shadow(double max_shadow)
-{
-  m_single_scattering_params.max_shadow = static_cast<mi::Float32>(max_shadow);
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SINGLE_SCATTERING)
-    update_current_kernel();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_single_scatt_shadow_exp(double shadow_exp)
-{
-  m_single_scattering_params.shadow_exp = static_cast<mi::Float32>(shadow_exp);
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SINGLE_SCATTERING)
-    update_current_kernel();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_isoraycast_threshold(double threshold)
-{
-  m_isoraycast_params.diff_h = static_cast<float>(threshold / 10.0);
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISORAYCAST)
-    update_current_kernel();
-}
-
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_gradient_scale(double scale)
-{
-  m_supernova_params.gradient_scale = static_cast<mi::Float32>(scale);
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SUPERNOVA_GRADIENT)
-    update_current_kernel();
-}
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_gradient_gamma(double gamma)
-{
-  m_supernova_params.screen_gamma = static_cast<mi::Float32>(gamma);
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SUPERNOVA_GRADIENT)
-    update_current_kernel();
-}
-//----------------------------------------------------------------------------
-void vtknvindex_representation::set_gradient_color_method(int method)
-{
-  m_supernova_params.color_method = method;
-
-  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_SUPERNOVA_GRADIENT)
     update_current_kernel();
 }

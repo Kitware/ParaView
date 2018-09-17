@@ -455,33 +455,6 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
             break;
           }
 
-          case RTC_KERNELS_SINGLE_SCATTERING:
-          {
-            vtknvindex_single_scattering_params single_params;
-            rtc_program->set_program_source(KERNEL_SINGLE_SCATTERING_STRING);
-            rtc_program_parameters->set_buffer_data(
-              0, reinterpret_cast<void*>(&single_params), sizeof(single_params));
-            break;
-          }
-
-          case RTC_KERNELS_ISORAYCAST:
-          {
-            vtknvindex_isoraycast_params isoraycast_params;
-            rtc_program->set_program_source(KERNEL_ISORAYCAST_STRING);
-            rtc_program_parameters->set_buffer_data(
-              0, reinterpret_cast<void*>(&isoraycast_params), sizeof(isoraycast_params));
-            break;
-          }
-
-          case RTC_KERNELS_SUPERNOVA_GRADIENT:
-          {
-            vtknvindex_supernova_gradient_params supernova_params;
-            rtc_program->set_program_source(KERNEL_SUPERNOVA_GRADIENT_STRING);
-            rtc_program_parameters->set_buffer_data(
-              0, reinterpret_cast<void*>(&supernova_params), sizeof(supernova_params));
-            break;
-          }
-
           default:
             rtc_program->set_enabled(false);
             rtc_program_parameters->set_enabled(false);
@@ -1054,21 +1027,6 @@ void vtknvindex_scene::update_rtc_kernel(
           rtc_program->set_enabled(true);
           break;
 
-        case RTC_KERNELS_SINGLE_SCATTERING:
-          rtc_program->set_program_source(KERNEL_SINGLE_SCATTERING_STRING);
-          rtc_program->set_enabled(true);
-          break;
-
-        case RTC_KERNELS_ISORAYCAST:
-          rtc_program->set_program_source(KERNEL_ISORAYCAST_STRING);
-          rtc_program->set_enabled(true);
-          break;
-
-        case RTC_KERNELS_SUPERNOVA_GRADIENT:
-          rtc_program->set_program_source(KERNEL_SUPERNOVA_GRADIENT_STRING);
-          rtc_program->set_enabled(true);
-          break;
-
         case RTC_KERNELS_NONE:
         default:
           rtc_program->set_enabled(false);
@@ -1127,7 +1085,7 @@ void vtknvindex_scene::update_camera(vtkRenderer* ren,
   const vtknvindex_application& application_context)
 {
   vtkSmartPointer<vtkCamera> app_camera = ren->GetActiveCamera();
-  vtkTypeBool is_parallel = app_camera->GetParallelProjection();
+  bool is_parallel = app_camera->GetParallelProjection() != 0;
 
   mi::Float64 x, y, z;
   app_camera->GetPosition(x, y, z);

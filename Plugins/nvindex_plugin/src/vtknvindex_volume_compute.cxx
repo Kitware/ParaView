@@ -148,7 +148,7 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   // request_bbox.max.y - m_border_size,
   // request_bbox.max.z - m_border_size);
 
-  mi::math::Bbox<mi::Float32, 3> request_bbox = svol_subset_desc->get_subregion_object_space();
+  mi::math::Bbox<mi::Float32, 3> request_bbox = svol_subset_desc->get_subregion_scene_space();
 
   // Fetch shared memory details from host properties
   std::string shm_memory_name;
@@ -556,6 +556,6 @@ void vtknvindex_volume_compute::deserialize(mi::neuraylib::IDeserializer* deseri
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_volume_compute::get_references(mi::neuraylib::ITag_set* result) const
+void vtknvindex_volume_compute::get_references(mi::neuraylib::ITag_set* /*result*/) const
 {
 }

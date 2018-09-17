@@ -101,8 +101,9 @@ vtknvindex_import_bricks::vtknvindex_import_bricks(
 }
 
 //-------------------------------------------------------------------------------------------------
-void vtknvindex_import_bricks::execute_fragment(mi::neuraylib::IDice_transaction* dice_transaction,
-  mi::Size index, mi::Size count, const mi::neuraylib::IJob_execution_context* context)
+void vtknvindex_import_bricks::execute_fragment(
+  mi::neuraylib::IDice_transaction* /*dice_transaction*/, mi::Size index, mi::Size /*count*/,
+  const mi::neuraylib::IJob_execution_context* /*context*/)
 {
   using namespace nv::index;
   using namespace vtknvindex::util;
@@ -283,7 +284,7 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   Handle<const ISparse_volume_subset_data_descriptor> svol_subset_desc(
     svol_data_subset->get_subset_data_descriptor());
 
-  mi::math::Bbox<mi::Float32, 3> request_bbox = svol_subset_desc->get_subregion_object_space();
+  mi::math::Bbox<mi::Float32, 3> request_bbox = svol_subset_desc->get_subregion_scene_space();
 
   // ERROR_LOG << "DBBOX: " << request_bbox << ", QBBOX: " << bounding_box;
 

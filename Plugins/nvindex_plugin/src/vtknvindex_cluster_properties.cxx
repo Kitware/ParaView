@@ -149,7 +149,7 @@ mi::Sint32 vtknvindex_cluster_properties::get_cur_local_rank_id() const
 // ------------------------------------------------------------------------------------------------
 mi::Uint32 vtknvindex_cluster_properties::get_nb_hosts() const
 {
-  return m_host_names.size();
+  return static_cast<mi::Uint32>(m_host_names.size());
 }
 
 // ------------------------------------------------------------------------------------------------

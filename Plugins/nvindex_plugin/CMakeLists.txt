@@ -30,11 +30,8 @@ set(kernel_sources
   src/kernel_irregular_isosurface.cu
   src/kernel_depth_enhancement.cu
   src/kernel_edge_enhancement.cu
-  src/kernel_isoraycast.cu
   src/kernel_isosurface.cu
-  src/kernel_plane_surface_mapping.cu
-  src/kernel_single_scattering.cu
-  src/kernel_supernova_gradient.cu)
+  src/kernel_plane_surface_mapping.cu)
 set(kernel_string_sources)
 foreach (kernel_source IN LISTS kernel_sources)
   get_filename_component(kernel_name "${kernel_source}" NAME_WE)

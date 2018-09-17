@@ -25,8 +25,8 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __vtknvindex_volume_compute_h
-#define __vtknvindex_volume_compute_h
+#ifndef vtknvindex_volume_compute_h
+#define vtknvindex_volume_compute_h
 
 #include <string>
 #include <vector>

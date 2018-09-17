@@ -738,7 +738,7 @@ public:
   /// Sets the session handler that will be called when clients connect.
   ///
   /// The session handler will be called as part of the handshake between client and server to
-  /// decide weather to accept or to reject the client, e.g., based on a security token supplied
+  /// decide whether to accept or to reject the client, e.g., based on a security token supplied
   /// by the client. The server will always accept clients if no session handler is set (default
   /// behavior). The session handler can also be used to keep track of which sessions are
   /// connected to the application and their state by adding an

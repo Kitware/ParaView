@@ -269,7 +269,7 @@
 #if defined(_MSC_VER) /* Microsoft Visual C++ */
 #define MI_FORCE_INLINE __forceinline
 #elif defined(__GNUC__) /* GNU C/C++ Compiler */
-#if defined(DEBUG)
+#if defined(NDEBUG)
 /* Known bug in some g++ compiler versions: forced inlining produces
  * buggy code when compiling without optimization.
  */

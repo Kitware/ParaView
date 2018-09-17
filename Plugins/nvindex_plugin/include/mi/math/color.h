@@ -121,7 +121,7 @@ public:
   /// The default constructor leaves the color elements uninitialized.
   inline Color()
   {
-#if defined(DEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
+#if defined(NDEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
     // In debug mode, default-constructed colors are initialized with signaling NaNs or, if not
     // applicable, with a maximum value to increase the chances of diagnosing incorrect use of
     // an uninitialized color.
