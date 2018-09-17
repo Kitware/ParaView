@@ -155,6 +155,13 @@ public:
   static bool promptUser(const QString& settingsKey, QMessageBox::Icon icon, const QString& title,
     const QString& message, QMessageBox::StandardButtons buttons, QWidget* parentWdg = NULL);
 
+  /**
+   * Converts a double value to a full precision QString.
+   * Internally uses `vtkNumberToString` for lossless conversion from double to
+   * string.
+   */
+  static QString number(double value);
+
 private:
   static QWidget* findMainWindow();
   static QPointer<QWidget> MainWidget;
