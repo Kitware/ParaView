@@ -44,10 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
+#include "vtkNumberToString.h"
 #include "vtkObject.h"
 #include "vtkWeakPointer.h"
 
 #include <cstdlib>
+#include <sstream>
 
 QPointer<QWidget> pqCoreUtilities::MainWidget = 0;
 
@@ -273,4 +275,12 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey, QMessageBox::Icon i
     default:
       return false;
   }
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::number(double value)
+{
+  std::ostringstream str;
+  str << vtkNumberToString()(value);
+  return QString::fromLocal8Bit(str.str().c_str());
 }
