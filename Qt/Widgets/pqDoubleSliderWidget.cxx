@@ -223,13 +223,13 @@ void pqDoubleSliderWidget::setPrecision(int _precision)
 }
 
 //-----------------------------------------------------------------------------
-bool pqDoubleSliderWidget::widgetSettingsApplicationManaged() const
+bool pqDoubleSliderWidget::useGlobalPrecisionAndNotation() const
 {
-  return this->DoubleLineEdit->widgetSettingsApplicationManaged();
+  return this->DoubleLineEdit->useGlobalPrecisionAndNotation();
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleSliderWidget::setWidgetSettingsApplicationManaged(bool value)
+void pqDoubleSliderWidget::setUseGlobalPrecisionAndNotation(bool val)
 {
-  this->DoubleLineEdit->setWidgetSettingsApplicationManaged(value);
+  this->DoubleLineEdit->setUseGlobalPrecisionAndNotation(val);
 }

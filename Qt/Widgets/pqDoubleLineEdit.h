@@ -54,11 +54,10 @@ class PQWIDGETS_EXPORT pqDoubleLineEdit : public QLineEdit
   Q_PROPERTY(QString fullPrecisionText READ fullPrecisionText WRITE setFullPrecisionText)
   Q_PROPERTY(RealNumberNotation notation READ notation WRITE setNotation)
   Q_PROPERTY(int precision READ precision WRITE setPrecision)
-  Q_PROPERTY(bool widgetSettingsApplicationManaged READ widgetSettingsApplicationManaged WRITE
-      setWidgetSettingsApplicationManaged)
+  Q_PROPERTY(bool useGlobalPrecisionAndNotation READ useGlobalPrecisionAndNotation WRITE
+      setUseGlobalPrecisionAndNotation)
 
-  typedef pqDoubleLineEdit Self;
-  typedef QLineEdit Superclass;
+  using Superclass = QLineEdit;
 
 public:
   pqDoubleLineEdit(QWidget* parent = 0);
@@ -105,12 +104,22 @@ public:
   const QDoubleValidator* doubleValidator() const;
 
   /**
-   * Return if the widget settings are expected to be managed by the application.
-   * True by default.
-   * \sa setWidgetSettingsApplicationManaged()
+   * `useGlobalPrecisionAndNotation` indicates if the pqDoubleLineEdit should
+   * use global precision and notation values instead of the parameters
+   * specified on this instance. Default is true.
    */
-  bool widgetSettingsApplicationManaged() const;
+  bool useGlobalPrecisionAndNotation() const;
 
+  //@{
+  /**
+   * Get/set the global precision and notation. All pqDoubleLineEdit instances
+   * that have `useGlobalPrecisionAndNotation` property set to true will
+   * automatically respect the state set on the global variables.
+   */
+  static void setGlobalPrecisionAndNotation(int precision, RealNumberNotation notation);
+  static int globalPrecision();
+  static RealNumberNotation globalNotation();
+  //@}
 public slots:
   /**
    * Set the real number in standard notation.
@@ -134,10 +143,10 @@ public slots:
   void setPrecision(int precision);
 
   /**
-   * Set if widget settings are expected to be managed by the application.
-   * \sa widgetSettingsApplicationManaged()
+   * Set whether to use global precision and notation values. Default is true.
+   * @sa useGlobalPrecisionAndNotation()
    */
-  void setWidgetSettingsApplicationManaged(bool value);
+  void setUseGlobalPrecisionAndNotation(bool value);
 
 signals:
   /**
@@ -180,7 +189,10 @@ private:
   RealNumberNotation Notation;
   QDoubleValidator* DoubleValidator;
   int Precision;
-  bool WidgetSettingsApplicationManaged;
+  bool UseGlobalPrecisionAndNotation;
+
+  static int GlobalPrecision;
+  static RealNumberNotation GlobalNotation;
 };
 
 #endif

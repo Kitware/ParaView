@@ -374,6 +374,14 @@ protected slots:
   void onStateSaved(vtkPVXMLElement* root);
   void onHelpEngineWarning(const QString&);
 
+private slots:
+  /**
+   * called when vtkPVGeneralSettings::GetInstance() fired
+   * `vtkCommand::ModifiedEvent`. We update pqDoubleLineEdit's global precision
+   * settings.
+   */
+  void generalSettingsChanged();
+
 protected:
   bool LoadingState;
 

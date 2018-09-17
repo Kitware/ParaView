@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt Includes.
 #include <QFocusEvent>
+#include <QPointer>
 #include <QTextStream>
 
 namespace
@@ -62,22 +63,84 @@ QDoubleValidator::Notation toValidatorNotation(pqDoubleLineEdit::RealNumberNotat
     return QDoubleValidator::StandardNotation;
   }
 }
+
+using InstanceTrackerType = QList<QPointer<pqDoubleLineEdit> >;
+static InstanceTrackerType* InstanceTracker = nullptr;
+}
+
+int pqDoubleLineEdit::GlobalPrecision = 2;
+pqDoubleLineEdit::RealNumberNotation pqDoubleLineEdit::GlobalNotation =
+  pqDoubleLineEdit::FixedNotation;
+
+//-----------------------------------------------------------------------------
+void pqDoubleLineEdit::setGlobalPrecisionAndNotation(int precision, RealNumberNotation notation)
+{
+  bool modified = false;
+  if (precision != pqDoubleLineEdit::GlobalPrecision)
+  {
+    pqDoubleLineEdit::GlobalPrecision = precision;
+    modified = true;
+  }
+
+  if (pqDoubleLineEdit::GlobalNotation != notation)
+  {
+    pqDoubleLineEdit::GlobalNotation = notation;
+    modified = true;
+  }
+
+  if (modified && InstanceTracker != nullptr)
+  {
+    for (const auto& instance : *InstanceTracker)
+    {
+      if (instance && instance->useGlobalPrecisionAndNotation())
+      {
+        instance->updateFullPrecisionText();
+        instance->updateLimitedPrecisionText();
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+pqDoubleLineEdit::RealNumberNotation pqDoubleLineEdit::globalNotation()
+{
+  return pqDoubleLineEdit::GlobalNotation;
+}
+
+//-----------------------------------------------------------------------------
+int pqDoubleLineEdit::globalPrecision()
+{
+  return pqDoubleLineEdit::GlobalPrecision;
 }
 
 //-----------------------------------------------------------------------------
 pqDoubleLineEdit::pqDoubleLineEdit(QWidget* _parent)
   : Superclass(_parent)
   , Precision(2)
-  , WidgetSettingsApplicationManaged(true)
+  , UseGlobalPrecisionAndNotation(true)
 {
   this->DoubleValidator = new QDoubleValidator(this);
   this->setValidator(this->DoubleValidator);
   this->setNotation(pqDoubleLineEdit::FixedNotation);
+  if (InstanceTracker == nullptr)
+  {
+    InstanceTracker = new InstanceTrackerType();
+  }
+  InstanceTracker->push_back(this);
 }
 
 //-----------------------------------------------------------------------------
 pqDoubleLineEdit::~pqDoubleLineEdit()
 {
+  if (InstanceTracker)
+  {
+    InstanceTracker->removeAll(this);
+    if (InstanceTracker->size() == 0)
+    {
+      delete InstanceTracker;
+      InstanceTracker = nullptr;
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -168,20 +231,23 @@ void pqDoubleLineEdit::focusInEvent(QFocusEvent* event)
 //-----------------------------------------------------------------------------
 void pqDoubleLineEdit::updateFullPrecisionText()
 {
+  const int real_precision =
+    this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::GlobalPrecision : this->Precision;
+
   int dotIndex = this->FullPrecisionText.indexOf(".");
   if (dotIndex >= 0)
   {
     int digits = this->FullPrecisionText.length() - 1 - dotIndex;
-    if (digits <= this->Precision)
+    if (digits <= real_precision)
     {
       // If it applies, appends "0"
-      this->FullPrecisionText += QString("0").repeated(this->Precision - digits);
+      this->FullPrecisionText += QString("0").repeated(real_precision - digits);
     }
     else
     {
       // If it applies, removes extra "0"
-      while (digits > this->Precision &&
-        this->FullPrecisionText[this->FullPrecisionText.length() - 1] == "0")
+      while (digits > real_precision &&
+        this->FullPrecisionText[this->FullPrecisionText.length() - 1] == '0')
       {
         this->FullPrecisionText.chop(1);
         digits = this->FullPrecisionText.length() - 1 - dotIndex;
@@ -190,17 +256,22 @@ void pqDoubleLineEdit::updateFullPrecisionText()
   }
   else
   {
-    this->FullPrecisionText += QString(".") + QString("0").repeated(this->Precision);
+    this->FullPrecisionText += QString(".") + QString("0").repeated(real_precision);
   }
 }
 
 //-----------------------------------------------------------------------------
 void pqDoubleLineEdit::updateLimitedPrecisionText()
 {
+  const auto real_precision =
+    this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::GlobalPrecision : this->Precision;
+  const auto real_notation =
+    this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::GlobalNotation : this->Notation;
+
   QString limited;
   QTextStream converter(&limited);
-  converter.setRealNumberNotation(toTextStreamNotation(this->Notation));
-  converter.setRealNumberPrecision(this->Precision);
+  converter.setRealNumberNotation(toTextStreamNotation(real_notation));
+  converter.setRealNumberPrecision(real_precision);
   converter << this->FullPrecisionText.toDouble();
   this->setText(limited);
 }
@@ -233,13 +304,14 @@ void pqDoubleLineEdit::triggerFullPrecisionTextChangedAndEditingFinished()
 }
 
 //-----------------------------------------------------------------------------
-bool pqDoubleLineEdit::widgetSettingsApplicationManaged() const
+bool pqDoubleLineEdit::useGlobalPrecisionAndNotation() const
 {
-  return this->WidgetSettingsApplicationManaged;
+  return this->UseGlobalPrecisionAndNotation;
 }
 
 //-----------------------------------------------------------------------------
-void pqDoubleLineEdit::setWidgetSettingsApplicationManaged(bool value)
+void pqDoubleLineEdit::setUseGlobalPrecisionAndNotation(bool value)
 {
-  this->WidgetSettingsApplicationManaged = value;
+  this->UseGlobalPrecisionAndNotation = value;
+  this->updateLimitedPrecisionText();
 }

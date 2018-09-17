@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetRangeDomain.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
-#include "vtkPVGeneralSettings.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
@@ -63,28 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QStyle>
 #include <QToolButton>
-
-//-----------------------------------------------------------------------------
-namespace
-{
-
-// Since the instance of "pqDoubleVectorPropertyWidget" created by
-// "pqProxyWidget::createWidgetForProperty"
-// is added to the panel layout (in "pqProxyWidgetItem::appendToLayout") only after it has been
-// instanciated,
-// we need this function to explicitly update the widget based on the Paraview settings.
-//
-// For that reason, calling "onPVGeneralSettingsModified" after creating all property widgets does
-// not have the intended effect. Indeed, the descendants of "pqCoreUtilities::mainWidget()"
-// do not include the property widget just created.
-template <typename WidgetType>
-void updatePrecisionNotationWidgetFromSettings(WidgetType* widget)
-{
-  int displayedNotation = vtkPVGeneralSettings::GetInstance()->GetRealNumberDisplayedNotation();
-  widget->setNotation(static_cast<pqDoubleLineEdit::RealNumberNotation>(displayedNotation));
-  widget->setPrecision(vtkPVGeneralSettings::GetInstance()->GetRealNumberDisplayedPrecision());
-}
-}
 
 //-----------------------------------------------------------------------------
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
@@ -201,13 +178,13 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
       // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget* widget = new pqDoubleRangeWidget(this);
       widget->setObjectName("DoubleRangeWidget");
+      widget->setUseGlobalPrecisionAndNotation(true);
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
       if (range->GetResolutionExists())
       {
         widget->setResolution(range->GetResolution());
       }
-      updatePrecisionNotationWidgetFromSettings<pqDoubleRangeWidget>(widget);
 
       // ensures that the widget's range is updated whenever the domain changes.
       new pqWidgetRangeDomain(widget, "minimum", "maximum", dvp, 0);
@@ -234,8 +211,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
         for (int i = 0; i < 3; i++)
         {
           pqDoubleLineEdit* lineEdit = new pqDoubleLineEdit(this);
+          lineEdit->setUseGlobalPrecisionAndNotation(true);
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i));
-          updatePrecisionNotationWidgetFromSettings<pqDoubleLineEdit>(lineEdit);
           if (showLabels)
           {
             pqLabel* label = new pqLabel(componentLabels[2 * i], this);
@@ -254,7 +231,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 
           lineEdit = new pqDoubleLineEdit(this);
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i + 1));
-          updatePrecisionNotationWidgetFromSettings<pqDoubleLineEdit>(lineEdit);
+          lineEdit->setUseGlobalPrecisionAndNotation(true);
           if (showLabels)
           {
             pqLabel* label = new pqLabel(componentLabels[2 * i + 1], this);
@@ -292,7 +269,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           }
           pqDoubleLineEdit* lineEdit = new pqDoubleLineEdit(this);
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(i));
-          updatePrecisionNotationWidgetFromSettings<pqDoubleLineEdit>(lineEdit);
+          lineEdit->setUseGlobalPrecisionAndNotation(true);
           layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(
             lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, i);
@@ -314,7 +291,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     {
       pqDiscreteDoubleWidget* widget = new pqDiscreteDoubleWidget(this);
       widget->setObjectName("DiscreteDoubleWidget");
-      updatePrecisionNotationWidgetFromSettings<pqDiscreteDoubleWidget>(widget);
+      widget->setUseGlobalPrecisionAndNotation(true);
       widget->setValues(discrete->GetValues());
 
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
@@ -368,8 +345,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   {
     defaultDomain->Delete();
   }
-  pqCoreUtilities::connect(vtkPVGeneralSettings::GetInstance(), vtkCommand::ModifiedEvent, this,
-    SLOT(onPVGeneralSettingsModified()));
 }
 
 //-----------------------------------------------------------------------------
@@ -427,22 +402,5 @@ void pqDoubleVectorPropertyWidget::scale(double factor)
     }
     emit this->changeAvailable();
     emit this->changeFinished();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleVectorPropertyWidget::onPVGeneralSettingsModified()
-{
-  QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
-  if (mainWindow)
-  {
-    foreach (pqDoubleLineEdit* widget, mainWindow->findChildren<pqDoubleLineEdit*>())
-    {
-      if (!widget->widgetSettingsApplicationManaged())
-      {
-        continue;
-      }
-      updatePrecisionNotationWidgetFromSettings<pqDoubleLineEdit>(widget);
-    }
   }
 }
