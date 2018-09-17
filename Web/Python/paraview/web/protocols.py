@@ -304,14 +304,17 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
 
     # RpcName: updateCamera => viewport.camera.update
     @exportRpc("viewport.camera.update")
-    def updateCamera(self, view_id, focal_point, view_up, position):
+    def updateCamera(self, view_id, focal_point, view_up, position, forceUpdate = True):
         view = self.getView(view_id)
 
         view.CameraFocalPoint = focal_point
         view.CameraViewUp = view_up
         view.CameraPosition = position
-        self.getApplication().InvalidateCache(view.SMProxy)
-        self.getApplication().InvokeEvent('UpdateEvent')
+
+        if forceUpdate:
+            self.getApplication().InvalidateCache(view.SMProxy)
+            self.getApplication().InvokeEvent('UpdateEvent')
+
 
     @exportRpc("viewport.camera.get")
     def getCamera(self, view_id):
