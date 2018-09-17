@@ -211,7 +211,7 @@
       </widget>
      </item>
      <item>
-      <widget class="pqLineEdit" name="CurrentDataValue">
+      <widget class="pqDoubleLineEdit" name="CurrentDataValue">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -316,9 +316,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqLineEdit</class>
+   <class>pqDoubleLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
+   <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources>
