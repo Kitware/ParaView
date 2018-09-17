@@ -168,7 +168,7 @@ public:
   /// call #mi::neuraylib::ILibrary_authenticator::authenticate().
   ///
   /// \return    \c true if a valid FlexNet license is available, \c false if no valid FlexNet
-  ///            license is availble, no response has been submitted yet, or the license has
+  ///            license is available, no response has been submitted yet, or the license has
   ///            already been checked out.
   virtual bool is_flexnet_license_available() const = 0;
 };

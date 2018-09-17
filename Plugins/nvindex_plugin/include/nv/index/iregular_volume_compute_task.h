@@ -121,8 +121,8 @@ public:
   ///
   /// \return                         false, as no data is modified.
   ///
-  virtual bool compute_gpu(const mi::math::Bbox_struct<mi::Uint32, 3>& brick_bbox,
-    cudaArray* voxel_values, mi::neuraylib::IDice_transaction* dice_transaction) const
+  virtual bool compute_gpu(const mi::math::Bbox_struct<mi::Uint32, 3>& /*brick_bbox*/,
+    cudaArray* /*voxel_values*/, mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
   {
     return false;
   }

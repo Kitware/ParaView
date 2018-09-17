@@ -158,11 +158,11 @@ public:
 
   /// Sets the maximum bitrate used by the video stream.
   ///
-  /// Bridge video will attempt to automatically adjust the bitrate to adapt to the available
-  /// bandwidth. The bitrate won't go below the set minimum bitrate. If the available bandwidth
+  /// To adapt to the available bandwidth, the bridge video will automatically adjust the bitrate.
+  /// However, the bitrate will not be set below the minimum bitrate. If the available bandwidth
   /// is smaller then frame rate will go down to compensate. Likewise, the bitrate won't go
   /// above the set maximum bitrate. Set min and max bitrate to the same value to override the
-  /// automatic adaption. The max bitrate setting takes precedence if max bitrate
+  /// automatic adjustment. The max bitrate setting takes precedence if max bitrate
   /// is set lower than min bitrate.
   ///
   /// The \c "h264" format will use the frame rate and the current bit rate when calculating the
@@ -189,11 +189,11 @@ public:
 
   /// Sets the minimum bitrate used by the video stream.
   ///
-  /// Bridge video will attempt to automatically adjust the bitrate to adapt to the available
-  /// bandwidth. The bitrate won't go below the set minimum bitrate. If the available bandwidth
+  /// To adapt to the available bandwidth, the bridge video will automatically adjust the bitrate.
+  //  However, the bitrate will not be set below the minimum bitrate. If the available bandwidth
   /// is smaller then frame rate will go down to compensate. Likewise, the bitrate won't go
   /// above the set maximum bitrate. Set min and max bitrate to the same value to override the
-  /// automatic adaption. The max bitrate setting takes precedence if max bitrate
+  /// automatic adjustment. The max bitrate setting takes precedence if max bitrate
   /// is set lower than min bitrate.
   ///
   /// The \c "h264" format will use the frame rate and the current bit rate when calculating the

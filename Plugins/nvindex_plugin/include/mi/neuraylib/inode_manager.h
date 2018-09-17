@@ -904,10 +904,10 @@ public:
   /// \param program_name         The name of the program to be executed as child process.
   /// \param program_arguments    The arguments supposed to be passed to the program.
   /// \return                     If \p program_name (in combination with \p program_arguments) is
-  ///                             eligible to be run then \p program_name or an adaption of
-  ///                             \p program_name to the local file system of the worker node is
-  ///                             returned (possibly including a full path name). Otherwise,
-  ///                             \c NULL is returned.
+  ///                             eligible to be run then \p program_name is returned.
+  ///                             (The returned value may include the full pathname and may be
+  ///                             modified based on the requirements of the local file system
+  ///                             of the worker node) Otherwise, \c NULL is returned.
   virtual const IString* resolve_process(
     const char* program_name, const char* program_arguments) = 0;
 };

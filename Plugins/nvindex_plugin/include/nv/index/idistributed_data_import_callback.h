@@ -243,9 +243,9 @@ public:
   /// \return                             Returns the portion of the dataset contained in the
   ///                                     3D area.
   ///
-  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Sint32, 3>& bounding_box,
-    mi::Uint32 time_step, IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const
+  virtual IDistributed_data_subset* create(
+    const mi::math::Bbox_struct<mi::Sint32, 3>& /*bounding_box*/, mi::Uint32 /*time_step*/,
+    IData_subset_factory* /*factory*/, mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
   {
     return 0;
   }
@@ -279,6 +279,8 @@ public:
     bbox.max.z = static_cast<mi::Sint32>(mi::math::ceil(bounding_box.max.z));
     return create(bbox, time_step, factory, dice_transaction);
   }
+
+  using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused.
@@ -320,12 +322,14 @@ public:
   /// \param[in] factory                  unused.
   /// \param[in] dice_transaction         unused.
   /// \return                             0.
-  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& bbox,
-    mi::Uint32 time_step, IData_subset_factory* factory,
-    mi::neuraylib::IDice_transaction* dice_transaction) const
+  virtual IDistributed_data_subset* create(const mi::math::Bbox_struct<mi::Float32, 3>& /*bbox*/,
+    mi::Uint32 /*time_step*/, IData_subset_factory* /*factory*/,
+    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
   {
     return 0;
   }
+
+  using mi::neuraylib::Base<id1, id2, id3, id4, id5, id6, id7, id8, id9, id10, id11, I>::create;
 
   /// Empty body, i.e., no member data is serialized.
   /// \param[in] serializer unused

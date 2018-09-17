@@ -199,12 +199,12 @@ public:
   ///
   /// \return The number of layers.
   ///
-  virtual Frame_buffer_layer_type get_layer_type(mi::Uint32 layer_id) const
+  virtual Frame_buffer_layer_type get_layer_type(mi::Uint32 /*layer_id*/) const
   {
     return IIndex_canvas::FB_LAYER_UNDEFINED;
   }
 
-  virtual void render_tile(mi::Uint32 layer_id, Frame_buffer_layer_type layer_type,
+  virtual void render_tile(mi::Uint32 /*layer_id*/, Frame_buffer_layer_type layer_type,
     const mi::math::Bbox_struct<mi::Uint32, 2>& area, mi::Uint8* buffer)
   {
     // Ignore the layer id but consider the layer type.
