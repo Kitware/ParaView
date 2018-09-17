@@ -66,7 +66,7 @@
       <number>2</number>
      </property>
      <item row="0" column="2">
-      <widget class="pqLineEdit" name="centerY"/>
+      <widget class="pqDoubleLineEdit" name="centerY"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="radiusLabel">
@@ -76,7 +76,7 @@
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="pqLineEdit" name="axisY"/>
+      <widget class="pqDoubleLineEdit" name="axisY"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="axisLabel">
@@ -86,13 +86,13 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="pqLineEdit" name="axisX"/>
+      <widget class="pqDoubleLineEdit" name="axisX"/>
      </item>
      <item row="2" column="1">
-      <widget class="pqLineEdit" name="radius"/>
+      <widget class="pqDoubleLineEdit" name="radius"/>
      </item>
      <item row="1" column="3">
-      <widget class="pqLineEdit" name="axisZ">
+      <widget class="pqDoubleLineEdit" name="axisZ">
        <property name="text">
         <string/>
        </property>
@@ -106,10 +106,10 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="pqLineEdit" name="centerX"/>
+      <widget class="pqDoubleLineEdit" name="centerX"/>
      </item>
      <item row="0" column="3">
-      <widget class="pqLineEdit" name="centerZ"/>
+      <widget class="pqDoubleLineEdit" name="centerZ"/>
      </item>
     </layout>
    </item>
@@ -181,9 +181,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqLineEdit</class>
+   <class>pqDoubleLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
+   <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
