@@ -383,15 +383,14 @@ void pqCameraDialog::setupGUI()
 //-----------------------------------------------------------------------------
 void pqCameraDialog::updateInteractiveViewLinkWidgets()
 {
-  if (this->Internal->interactiveViewLinkComboBox->count() == 0)
-  {
-    this->Internal->interactiveViewLinkGroup->setEnabled(false);
-    this->Internal->interactiveViewLinkGroup->setCollapsed(true);
-  }
-  else
-  {
-    this->Internal->interactiveViewLinkGroup->setEnabled(true);
+  const bool enabled = (this->Internal->interactiveViewLinkComboBox->count() > 0);
 
+  this->Internal->interactiveViewLinkComboBox->setEnabled(enabled);
+  this->Internal->interactiveViewLinkBackground->setEnabled(enabled);
+  this->Internal->interactiveViewLinkOpacity->setEnabled(enabled);
+
+  if (enabled)
+  {
     pqInteractiveViewLink* ivLink = static_cast<pqInteractiveViewLink*>(
       this->Internal->interactiveViewLinkComboBox
         ->itemData(this->Internal->interactiveViewLinkComboBox->currentIndex())
@@ -431,9 +430,46 @@ void pqCameraDialog::setInteractiveViewLinkBackground(bool hideBackground)
 //-----------------------------------------------------------------------------
 void pqCameraDialog::SetCameraGroupsEnabled(bool enabled)
 {
-  this->Internal->viewsGroup->setEnabled(enabled);
-  this->Internal->positionsGroup->setEnabled(enabled);
-  this->Internal->orientationsGroup->setEnabled(enabled);
+  auto& internal = (*this->Internal);
+  internal.viewXMinus->setEnabled(enabled);
+  internal.viewXPlus->setEnabled(enabled);
+  internal.viewYMinus->setEnabled(enabled);
+  internal.viewYPlus->setEnabled(enabled);
+  internal.viewZMinus->setEnabled(enabled);
+  internal.viewZPlus->setEnabled(enabled);
+
+  internal.customViewpointGridLayout->setEnabled(enabled);
+  internal.configureCustomViewpoints->setEnabled(enabled);
+
+  internal.CenterX->setEnabled(enabled);
+  internal.CenterY->setEnabled(enabled);
+  internal.CenterZ->setEnabled(enabled);
+  internal.AutoResetCenterOfRotation->setEnabled(enabled);
+
+  internal.rotationFactor->setEnabled(enabled);
+
+  internal.position0->setEnabled(enabled);
+  internal.position1->setEnabled(enabled);
+  internal.position2->setEnabled(enabled);
+  internal.focalPoint0->setEnabled(enabled);
+  internal.focalPoint1->setEnabled(enabled);
+  internal.focalPoint2->setEnabled(enabled);
+  internal.viewUp0->setEnabled(enabled);
+  internal.viewUp1->setEnabled(enabled);
+  internal.viewUp2->setEnabled(enabled);
+  internal.viewAngle->setEnabled(enabled);
+  internal.loadCameraConfiguration->setEnabled(enabled);
+  internal.saveCameraConfiguration->setEnabled(enabled);
+
+  internal.rollButton->setEnabled(enabled);
+  internal.rollAngle->setEnabled(enabled);
+  internal.elevationButton->setEnabled(enabled);
+  internal.elevationAngle->setEnabled(enabled);
+  internal.azimuthButton->setEnabled(enabled);
+  internal.azimuthAngle->setEnabled(enabled);
+  internal.zoomInButton->setEnabled(enabled);
+  internal.zoomFactor->setEnabled(enabled);
+  internal.zoomOutButton->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
