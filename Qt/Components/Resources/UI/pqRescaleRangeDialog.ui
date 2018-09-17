@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0">
    <item row="1" column="0">
-    <widget class="QLineEdit" name="MinimumScalar">
+    <widget class="pqDoubleLineEdit" name="MinimumScalar">
      <property name="whatsThis">
       <string>Enter the new range minimum here.</string>
      </property>
@@ -32,7 +32,7 @@
     </widget>
    </item>
    <item row="1" column="2">
-    <widget class="QLineEdit" name="MaximumScalar">
+    <widget class="pqDoubleLineEdit" name="MaximumScalar">
      <property name="whatsThis">
       <string>Enter the new range maximum here.</string>
      </property>
@@ -46,7 +46,16 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <property name="margin">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -128,6 +137,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>MinimumScalar</tabstop>
   <tabstop>MaximumScalar</tabstop>
