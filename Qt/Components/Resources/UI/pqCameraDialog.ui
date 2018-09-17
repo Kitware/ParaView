@@ -276,13 +276,13 @@
             </property>
             <layout class="QGridLayout">
              <item row="0" column="0">
-              <widget class="QLineEdit" name="CenterX"/>
+              <widget class="pqDoubleLineEdit" name="CenterX"/>
              </item>
              <item row="0" column="1">
-              <widget class="QLineEdit" name="CenterY"/>
+              <widget class="pqDoubleLineEdit" name="CenterY"/>
              </item>
              <item row="0" column="2">
-              <widget class="QLineEdit" name="CenterZ"/>
+              <widget class="pqDoubleLineEdit" name="CenterZ"/>
              </item>
              <item row="1" column="0" colspan="3">
               <widget class="QCheckBox" name="AutoResetCenterOfRotation">
@@ -382,31 +382,31 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QLineEdit" name="position0"/>
+              <widget class="pqDoubleLineEdit" name="position0"/>
              </item>
              <item row="0" column="2">
-              <widget class="QLineEdit" name="position1"/>
+              <widget class="pqDoubleLineEdit" name="position1"/>
              </item>
              <item row="0" column="3">
-              <widget class="QLineEdit" name="position2"/>
+              <widget class="pqDoubleLineEdit" name="position2"/>
              </item>
              <item row="1" column="1">
-              <widget class="QLineEdit" name="focalPoint0"/>
+              <widget class="pqDoubleLineEdit" name="focalPoint0"/>
              </item>
              <item row="1" column="2">
-              <widget class="QLineEdit" name="focalPoint1"/>
+              <widget class="pqDoubleLineEdit" name="focalPoint1"/>
              </item>
              <item row="1" column="3">
-              <widget class="QLineEdit" name="focalPoint2"/>
+              <widget class="pqDoubleLineEdit" name="focalPoint2"/>
              </item>
              <item row="2" column="1">
-              <widget class="QLineEdit" name="viewUp0"/>
+              <widget class="pqDoubleLineEdit" name="viewUp0"/>
              </item>
              <item row="2" column="2">
-              <widget class="QLineEdit" name="viewUp1"/>
+              <widget class="pqDoubleLineEdit" name="viewUp1"/>
              </item>
              <item row="2" column="3">
-              <widget class="QLineEdit" name="viewUp2"/>
+              <widget class="pqDoubleLineEdit" name="viewUp2"/>
              </item>
             </layout>
            </widget>
@@ -800,6 +800,11 @@
    <extends>QWidget</extends>
    <header>pqDoubleRangeWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDoubleLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
