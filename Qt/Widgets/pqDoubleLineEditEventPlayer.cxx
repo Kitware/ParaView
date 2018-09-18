@@ -57,7 +57,7 @@ bool pqDoubleLineEditEventPlayer::playEvent(
   {
     return false;
   }
-  if (command == Self::EVENT_NAME())
+  if (command == Self::EVENT_NAME() || command == "set_string")
   {
     doubleLineEdit->setFullPrecisionText(arguments);
     doubleLineEdit->triggerFullPrecisionTextChangedAndEditingFinished();
