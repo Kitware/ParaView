@@ -14,7 +14,7 @@
   <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments="5" />
   <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="40" />
   <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="8" />
-  <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/TimeStepIndices/ScalarValueList/Table" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 

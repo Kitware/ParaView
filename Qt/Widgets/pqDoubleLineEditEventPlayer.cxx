@@ -61,13 +61,9 @@ bool pqDoubleLineEditEventPlayer::playEvent(
   {
     doubleLineEdit->setFullPrecisionText(arguments);
     doubleLineEdit->triggerFullPrecisionTextChangedAndEditingFinished();
+    return true;
   }
-  else
-  {
-    error = true;
-    qCritical() << "unknown command" << command << "associated with object" << object;
-  }
-  return true;
+  return this->Superclass::playEvent(object, command, arguments, error);
 }
 
 //-----------------------------------------------------------------------------
