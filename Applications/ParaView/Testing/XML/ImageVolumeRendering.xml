@@ -21,11 +21,11 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <!-- set camera to look down side ways-->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/actionAdjustCamera" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/rollAngle" command="set_double" arguments="45" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/rollButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationAngle" command="set_double" arguments="45" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollAngle" command="set_double" arguments="45" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationAngle" command="set_double" arguments="45" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <!-- make Wavelet source active in pipeline browser -->
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,61,10,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,61,10,/0:0/0:0" />

@@ -11,7 +11,7 @@
   <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments=".2" />
   <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments=".6" />
   <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="10" />
-  <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/DisplayColorWidget/Variables" command="set_string" arguments="Momentum" />
 </pqevents>

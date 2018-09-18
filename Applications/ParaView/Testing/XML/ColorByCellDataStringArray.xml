@@ -8,11 +8,11 @@
   <pqevent object="pqClientMainWindow/variableToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/AddActive" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/TitleBar/1QToolBar0/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/rollAngle" command="set_double" arguments="35" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/rollButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/rollButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationAngle" command="set_double" arguments="45" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/orientationsGroup/elevationButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollAngle" command="set_double" arguments="35" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/rollButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationAngle" command="set_double" arguments="45" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/elevationButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/AnnotationsEditor/ChoosePreset" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="3.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/apply" command="activate" arguments="" />
@@ -20,18 +20,17 @@
   <pqevent object="pqClientMainWindow/pqPresetDialog/close" command="activate" arguments="" />
 
   <!-- let's try to test pqCameraDialog custom views -->
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/configureCustomViewpoints" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/configureCustomViewpoints" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/add" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/currentViewpoint0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/toolTip0" command="set_string" arguments="custom" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
 
   <!-- change camera to something arbitrary -->
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
 
   <!-- restore using pqCameraDialog -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/actionAdjustCamera" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/customViewpoint0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/customViewpoint0" command="activate" arguments="" />
 </pqevents>

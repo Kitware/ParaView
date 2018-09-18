@@ -209,20 +209,4 @@
 
   <!-- Change view orientation for screen capture -->
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeZ" command="activate" arguments="" />
-  <!--
-    <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CameraButton" command="activate" arguments="" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/position0" command="set_string" arguments="120" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/position0" command="key" arguments="16777217" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/position1" command="set_string" arguments="115" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/position1" command="key" arguments="16777217" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/position2" command="set_string" arguments="800" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/position2" command="key" arguments="16777217" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/focalPoint0" command="set_string" arguments="120" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/focalPoint0" command="key" arguments="16777217" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/focalPoint1" command="set_string" arguments="115" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/focalPoint1" command="key" arguments="16777217" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/focalPoint2" command="set_string" arguments="-27" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox/positionsGroup/focalPoint2" command="key" arguments="16777217" />
-    <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
-  -->
 </pqevents>
