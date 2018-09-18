@@ -105,7 +105,7 @@ bool vtkSMExportProxyDepot::HasWriterProxy(const char* filtername, const char* f
     return false;
   }
   std::string filterhash = filtername;
-  filterhash += "_";
+  filterhash += "|";
   filterhash += format;
 
   vtkSMSourceProxy* writerProxy =
@@ -126,7 +126,7 @@ vtkSMSourceProxy* vtkSMExportProxyDepot::GetWriterProxy(
     return nullptr;
   }
   std::string filterhash = filtername;
-  filterhash += "_";
+  filterhash += "|";
   filterhash += format;
 
   vtkSMSourceProxy* writerProxy =
@@ -208,7 +208,7 @@ bool vtkSMExportProxyDepot::HasScreenshotProxy(const char* viewname, const char*
   }
 
   std::string viewhash = viewname;
-  viewhash += "_";
+  viewhash += "|";
   viewhash += format;
 
   vtkSMProxy* ssProxy = this->Session->GetProxy("export_screenshots", viewhash.c_str());
@@ -228,7 +228,7 @@ vtkSMProxy* vtkSMExportProxyDepot::GetScreenshotProxy(
     return nullptr;
   }
   std::string viewhash = viewname;
-  viewhash += "_";
+  viewhash += "|";
   viewhash += format;
 
   vtkSMProxy* ssProxy = this->Session->GetProxy("export_screenshots", viewhash.c_str());
