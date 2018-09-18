@@ -37,7 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * @ingroup Reactions
-* Reaction to export a Temporal script that will produce configured catalyst data products.
+* Reaction to export a script that will produce configured temporal data
+* products simultaneously. Each group of nodes in the MPI job will process a
+* different subset of the temporal domain. Within a group the nodes split
+* the data spatially as usual.
 */
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqTemporalExportReaction : public pqReaction

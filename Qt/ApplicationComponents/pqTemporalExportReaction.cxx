@@ -83,8 +83,11 @@ screenshot_info = {%3}
 # the number of processes working together on a single time step
 timeCompartmentSize = %4
 
+# makes a cinema D index table
+make_cinema_table=%5
+
 # the name of the Python script to be output
-scriptFileName = "%5"
+scriptFileName = "%6"
 
 # -----------------------------------------------------------------------------
 from paraview import smtrace, servermanager, smstate, cpstate
@@ -250,10 +253,13 @@ tp_views = []
 timeCompartmentSize = %s
 globalController, temporalController, timeCompartmentSize = STP.CreateControllers(timeCompartmentSize)
 
+makeCinemaTable = %s
+
 %s
+
 # Lastly, run though the local timecompartment on each set of nodes
-STP.IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, tp_writers, tp_views)
-""" % (timeCompartmentSize, pipelineClassDef)
+STP.IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, tp_writers, tp_views, make_cinema_table=makeCinemaTable)
+""" % (timeCompartmentSize, make_cinema_table, pipelineClassDef)
 
 
 outFile = open(scriptFileName, 'w')
@@ -287,6 +293,7 @@ void pqTemporalExportReaction::onTriggered()
   QString
     sim_inputs_map; // a map from the simulation inputs in the gui to the adaptor's named inputs
   QString rendering_info; // a map from the render view name to render output params
+  QString make_cinema_table = "False";
   QString timeInputFilePattern = "";
   int timeCompartmentSize = 1;
 
@@ -295,6 +302,8 @@ void pqTemporalExportReaction::onTriggered()
   vtkSMProxy* globaloptions = ed->GetGlobalOptions();
   timeInputFilePattern = vtkSMPropertyHelper(globaloptions, "TimeInputFilePattern").GetAsString(0);
   timeCompartmentSize = vtkSMPropertyHelper(globaloptions, "TimeCompartmentSize").GetAsInt(0);
+  make_cinema_table =
+    vtkSMPropertyHelper(globaloptions, "SaveDTable").GetAsInt(0) == 0 ? "False" : "True";
 
   // populate the reader list
   QList<pqPipelineSource*> sources =
@@ -395,6 +404,7 @@ void pqTemporalExportReaction::onTriggered()
                 .arg(sim_inputs_map)
                 .arg(rendering_info)
                 .arg(timeCompartmentSize)
+                .arg(make_cinema_table)
                 .arg(filename);
 
     // ensure Python in initialized.
