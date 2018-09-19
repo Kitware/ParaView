@@ -853,6 +853,21 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="DefaultInteractionMode"
+        command="SetDefaultInteractionMode"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="advanced">
+        <Documentation>
+          When opening a dataset, set the initial interaction mode.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Automatic, based on the first time step" value="0" />
+          <Entry text="Always 2D" value="1" />
+          <Entry text="Always 3D" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="ShowAnnotation"
                          default_values="0"
                          number_of_elements="1"
@@ -932,6 +947,7 @@
 
       <PropertyGroup label="Miscellaneous">
         <Property name="OutlineThreshold" />
+        <Property name="DefaultInteractionMode" />
         <Property name="ShowAnnotation" />
         <Property name="PointPickingRadius" />
         <Property name="DisableIceT" />
