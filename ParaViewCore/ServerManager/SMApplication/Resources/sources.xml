@@ -1062,11 +1062,11 @@
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkImageSimpleSource"
-                 label="Simple Image"
-                 name="SimpleImage">
-      <Documentation long_help="Create an image in 3 dimensions with scalar and vector data arrays, consuming minimal computational resources."
-                     short_help="Create an image with scalar and vector arrays.">The
-                     Simple Image source can be used to create a uniform rectilinear
+                 label="Fast Uniform Grid"
+                 name="FastUniformGrid">
+      <Documentation long_help="Create a uniform grid in 3 dimensions with scalar and vector data arrays, consuming minimal computational resources."
+                     short_help="Create a 3D uniform grid with scalar and vector arrays.">The
+                     Fast Uniform Grid source can be used to create a uniform
                      grid with scalar values derived from relatively light
                      computations. The active scalar array is named "X", and
                      is set to the X coordinate for each pixel. There are two
@@ -1078,8 +1078,7 @@
       <IntVectorProperty command="SetWholeExtent"
                          default_values="-10 10 -10 10 -10 10"
                          name="WholeExtent"
-                         number_of_elements="6"
-                         panel_visibility="advanced">
+                         number_of_elements="6">
         <IntRangeDomain name="range" />
         <Documentation>The six values in the property indicate the X, Y, and Z
         extent of the output data. The first two numbers are the minimum and
@@ -1087,6 +1086,49 @@
         and the final two are the minimum and maximum Z extent. The numbers are
         inclusive, so values of -10, 10, -10, 10, =10, 10 indicate that the
         dimensions of the output will be 21 x 21 x 21.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableDistanceSquaredData"
+                         default_values="1"
+                         name="Generate DistanceSquared Scalars"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable DistanceSquared point data scalar array.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetEnableSwirlData"
+                         default_values="1"
+                         name="Generate Swirl Vectors"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable Swirl point data vector array.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty command="SetEnableSMP"
+                         default_values="0"
+                         name="EnableSMP"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        Enable/disable SMP for threading.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDesiredBytesPerPiece"
+                         default_values="65536"
+                         name="DesiredBytesPerPiece"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+        The desired bytes per piece when the volume is split for SMP execution.
+        When SMP is enabled, this is used to subdivide the volume into pieces.
+        Smaller pieces allow for better dynamic load balancing, but increase
+        the total overhead.
+        </Documentation>
       </IntVectorProperty>
     </SourceProxy>
       <!-- ==================================================================== -->

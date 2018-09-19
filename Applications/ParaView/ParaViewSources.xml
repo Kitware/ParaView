@@ -10,9 +10,9 @@
     show_in_toolbar="0">
     <Proxy group="sources" name="AMRGaussianPulseSource" />
     <Proxy group="sources" name="DataObjectGenerator" />
+    <Proxy group="sources" name="FastUniformGrid" />
     <Proxy group="sources" name="HierarchicalFractal" />
     <Proxy group="sources" name="HyperTreeGridSource" />
-    <Proxy group="sources" name="SimpleImage" />
     <Proxy group="sources" name="ImageMandelbrotSource" />
     <Proxy group="sources" name="LiveProgrammableSource" />
     <Proxy group="sources" name="RandomHyperTreeGridSource" />
