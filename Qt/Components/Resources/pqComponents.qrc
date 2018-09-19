@@ -360,5 +360,6 @@
         <file>Icons/inherited_opacity.png</file>
         <file>Icons/no_color.png</file>
         <file>Icons/no_opacity.png</file>
+        <file>pqPresetGroups.json</file>
     </qresource>
 </RCC>

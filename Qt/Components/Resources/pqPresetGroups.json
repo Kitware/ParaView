@@ -1,0 +1,23 @@
+[
+  {
+    "groupName": "default",
+    "presets": [
+      "Cool to Warm",
+      "Cool to Warm (Extended)",
+      "Black-Body Radiation",
+      "X Ray",
+      "Inferno (matplotlib)",
+      "Black, Blue and White",
+      "Blue Orange (divergent)",
+      "Viridis (matplotlib)",
+      "Gray and Red",
+      "Linear Green (Gr4L)",
+      "Cold and Hot",
+      "Blue - Green - Orange",
+      "Rainbow Desaturated",
+      "Yellow - Gray - Blue",
+      "Rainbow Uniform",
+      "jet"
+    ]
+  }
+]

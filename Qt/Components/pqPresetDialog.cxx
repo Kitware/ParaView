@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPresetDialog.h"
 #include "ui_pqPresetDialog.h"
 
+#include "pqApplicationCore.h"
 #include "pqFileDialog.h"
+#include "pqPresetGroupsManager.h"
 #include "pqPresetToPixmap.h"
 #include "pqPropertiesPanel.h"
 #include "pqQVTKWidget.h"
@@ -80,12 +82,19 @@ class pqPresetDialogTableModel : public QAbstractTableModel
 
 public:
   vtkSmartPointer<vtkSMTransferFunctionPresets> Presets;
+  pqPresetGroupsManager* GroupManager;
 
   pqPresetDialogTableModel(QObject* parentObject)
     : Superclass(parentObject)
   {
     this->Presets = vtkSmartPointer<vtkSMTransferFunctionPresets>::New();
     this->Pixmaps.reserve(this->Presets->GetNumberOfPresets());
+    this->GroupManager = qobject_cast<pqPresetGroupsManager*>(
+      pqApplicationCore::instance()->manager("PRESET_GROUP_MANAGER"));
+    this->connect(this->GroupManager, &pqPresetGroupsManager::groupsUpdated, this, [this]() {
+      this->beginResetModel();
+      this->endResetModel();
+    });
   }
 
   ~pqPresetDialogTableModel() override {}
@@ -135,7 +144,10 @@ public:
     return idx.isValid() ? 0 : static_cast<int>(this->Presets->GetNumberOfPresets());
   }
 
-  int columnCount(const QModelIndex& /*parent*/) const override { return 2; }
+  int columnCount(const QModelIndex& /*parent*/) const override
+  {
+    return 1 + this->GroupManager->numberOfGroups();
+  }
 
   QVariant data(const QModelIndex& idx, int role) const override
   {
@@ -161,8 +173,10 @@ public:
           return this->Presets->GetPresetHasIndexedColors(idx.row());
         case Qt::FontRole:
           QFont font;
+          // Find the column in this model for the default group.
+          auto column = this->GroupManager->groupNames().indexOf("default") + 1;
           // if this is a default preset, bold and underline the name
-          if (this->data(this->index(idx.row(), 1), Qt::DisplayRole) != -1)
+          if (column != 0 && this->data(this->index(idx.row(), column), Qt::DisplayRole) != -1)
           {
             font.setBold(true);
             font.setUnderline(true);
@@ -170,29 +184,29 @@ public:
           return font;
       }
     }
-    else if (idx.column() == 1)
+    else // column > 0
     {
       switch (role)
       {
         case Qt::DisplayRole:
-          // -1 means "not default"
-          // 0 means "application default" - user can't remove these
-          // 1 means "user default"
-          auto isDefault = this->Presets->IsPresetDefault(idx.row());
-          if (!isDefault)
+          auto groupName = this->GroupManager->groupName(idx.column() - 1);
+          auto name = this->Presets->GetPresetName(idx.row());
+          auto applicationGroupIndex =
+            this->GroupManager->presetRankInGroup(name.c_str(), groupName);
+          if (groupName != "default")
+          {
+            return applicationGroupIndex;
+          }
+          else
           {
             pqSettings settings;
             auto userChosenPresets =
               settings.value("pqSettingdDialog/userChosenPresets", QStringList()).toStringList();
-            QString name = this->Presets->GetPresetName(idx.row()).c_str();
-            auto presetIdx = userChosenPresets.indexOf(QRegExp(QRegExp::escape(name)));
-            if (presetIdx >= 0)
-            {
-              isDefault = true;
-            }
-            return isDefault ? 1 : -1;
+            auto presetIdx = userChosenPresets.indexOf(QRegExp(QRegExp::escape(name.c_str())));
+            return (presetIdx != -1)
+              ? presetIdx + this->GroupManager->numberOfPresetsInGroup(groupName)
+              : applicationGroupIndex;
           }
-          return 0;
       }
     }
     return QVariant();
@@ -212,8 +226,9 @@ public:
     {
       userChosenPresets.push_back(presetName);
       settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
-      auto changedIndex = this->index(idx.row(), 1);
-      emit this->dataChanged(changedIndex, changedIndex);
+      auto changedIndexStart = this->index(idx.row(), 0);
+      auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
+      emit this->dataChanged(changedIndexStart, changedIndexEnd);
     }
   }
 
@@ -231,8 +246,9 @@ public:
     {
       userChosenPresets.removeOne(presetName);
       settings.setValue("pqSettingdDialog/userChosenPresets", userChosenPresets);
-      auto changedIndex = this->index(idx.row(), 1);
-      emit this->dataChanged(changedIndex, changedIndex);
+      auto changedIndexStart = this->index(idx.row(), 0);
+      auto changedIndexEnd = this->index(idx.row(), this->columnCount(idx) - 1);
+      emit this->dataChanged(changedIndexStart, changedIndexEnd);
     }
   }
 
@@ -321,9 +337,11 @@ protected:
     {
       return false;
     }
+    pqPresetDialogTableModel* source = static_cast<pqPresetDialogTableModel*>(this->sourceModel());
+    auto defaultColumn = 1 + source->GroupManager->groupNames().indexOf("default");
     if (!this->ShowAdvanced)
     {
-      QModelIndex positionIdx = this->sourceModel()->index(sourceRow, 1, sourceParent);
+      QModelIndex positionIdx = source->index(sourceRow, defaultColumn, sourceParent);
       if (this->sourceModel()->data(positionIdx, Qt::DisplayRole).toInt() < 0)
       {
         return false;
@@ -729,13 +747,16 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
   idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
   Q_ASSERT(preset.empty() == false);
-  const int defaultPosition =
-    internals.Model->data(internals.Model->index(idx.row(), 1), Qt::DisplayRole).toInt();
+  auto column = internals.Model->GroupManager->groupNames().indexOf("default") + 1;
+  QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), column);
+
+  int defaultPosition = internals.Model->data(defaultColumnIndex, Qt::DisplayRole).toInt();
+  int numDefaultPresets = internals.Model->GroupManager->numberOfPresetsInGroup("default");
 
   const Ui::pqPresetDialog& ui = internals.Ui;
 
   ui.showDefault->setChecked(defaultPosition != -1);
-  ui.showDefault->setEnabled(defaultPosition == -1 || defaultPosition == 1);
+  ui.showDefault->setEnabled(defaultPosition == -1 || defaultPosition >= numDefaultPresets);
   ui.colors->setEnabled(true);
   ui.usePresetRange->setEnabled(!internals.Model->Presets->GetPresetHasIndexedColors(preset));
   ui.opacities->setEnabled(internals.Model->Presets->GetPresetHasOpacities(preset));
@@ -921,9 +942,10 @@ void pqPresetDialog::setPresetIsAdvanced(int newState)
   idx = internals.ReflowModel->mapToSource(idx);
   idx = internals.ProxyModel->mapToSource(idx);
 
-  QModelIndex col1Idx = internals.Model->index(idx.row(), 1);
+  auto column = internals.Model->GroupManager->groupNames().indexOf("default") + 1;
+  QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), column);
 
-  int defaultPosition = internals.Model->data(col1Idx, Qt::DisplayRole).toInt();
+  int defaultPosition = internals.Model->data(defaultColumnIndex, Qt::DisplayRole).toInt();
 
   if (showByDefault && defaultPosition == -1)
   {
