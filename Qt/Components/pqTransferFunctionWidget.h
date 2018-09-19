@@ -110,14 +110,20 @@ signals:
   */
   void controlPointsModified();
 
+  //@{
+  /**
+   * internal signals, do not use.
+   */
+  void pwfModified();
+  void ctfModified();
+  //@}
+
 protected slots:
   /**
   * slot called when the internal vtkControlPointsItem fires
   * vtkControlPointsItem::CurrentPointChangedEvent
   */
   void onCurrentChangedEvent();
-
-  void renderInternal();
 
 protected:
   /**

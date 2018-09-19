@@ -55,22 +55,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPiecewiseFunctionItem.h"
 #include "vtkSMCoreUtilities.h"
 #include "vtkSmartPointer.h"
+#include "vtkVector.h"
 
 #include <QColorDialog>
 #include <QPointer>
+#include <QSurfaceFormat>
 #include <QVBoxLayout>
+
 #include <algorithm>
 
-#if QT_VERSION >= 0x050000
-#include <QSurfaceFormat>
-#endif
+namespace
+{
 
 //-----------------------------------------------------------------------------
-// We extend vtkChartXY to add logic to reset view bounds automatically. This
-// ensures that when LUT changes, we are always showing the complete LUT.
+// vtkTransferFunctionChartXY extends vtkChartXY to support following
+// customizations:
+// 1. The axes should always show the bounds for the transfer function's XY
+//    range. Thus, we need to change the axes range whenever the transfer
+//    function range changes.
+//
+// 2. If the transfer function range is too small, disable interaction and
+//    potentially rendering of the transfer function since it won't be correct.
+//
 class vtkTransferFunctionChartXY : public vtkChartXY
 {
-  double XRange[2];
+  vtkVector2d XRange;
+  vtkVector2d XRangePrevious;
   bool DataValid;
 
   bool IsDataRangeValid(const double r[2]) const
@@ -84,32 +94,20 @@ class vtkTransferFunctionChartXY : public vtkChartXY
 public:
   static vtkTransferFunctionChartXY* New();
   vtkTypeMacro(vtkTransferFunctionChartXY, vtkChartXY);
-  vtkWeakPointer<vtkControlPointsItem> ControlPointsItem;
 
-  // Description:
-  // Perform any updates to the item that may be necessary before rendering.
-  // The scene should take care of calling this on all items before their
-  // Paint function is invoked.
-  void Update() VTK_OVERRIDE
+  void SetTFRange(const vtkVector2d& range) { this->XRange = range; }
+
+  void Update() override
   {
-    if (this->ControlPointsItem)
-    {
-      // Reset bounds if the control points' bounds have changed.
-      double bounds[4];
-      this->ControlPointsItem->GetBounds(bounds);
-      this->SetVisible(true);
-      if (bounds[0] <= bounds[1] && (bounds[0] != this->XRange[0] || bounds[1] != this->XRange[1]))
-      {
-        this->XRange[0] = bounds[0];
-        this->XRange[1] = bounds[1];
-        this->DataValid = this->IsDataRangeValid(this->XRange);
-        this->RecalculateBounds();
-      }
-    }
     this->Superclass::Update();
+    if (this->XRange != this->XRangePrevious)
+    {
+      this->XRangePrevious = this->XRange;
+      this->DataValid = this->IsDataRangeValid(this->XRange.GetData());
+      this->AdjustAxes();
+    }
   }
-
-  bool PaintChildren(vtkContext2D* painter) VTK_OVERRIDE
+  bool PaintChildren(vtkContext2D* painter) override
   {
     if (this->DataValid)
     {
@@ -119,31 +117,31 @@ public:
     return true;
   }
 
-  bool MouseEnterEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseEnterEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseEnterEvent(mouse) : false);
   }
-  bool MouseMoveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseMoveEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseMoveEvent(mouse) : false);
   }
-  bool MouseLeaveEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseLeaveEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseLeaveEvent(mouse) : false);
   }
-  bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseButtonPressEvent(mouse) : false);
   }
-  bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) VTK_OVERRIDE
+  bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse) override
   {
     return (this->DataValid ? this->Superclass::MouseButtonReleaseEvent(mouse) : false);
   }
-  bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta) VTK_OVERRIDE
+  bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta) override
   {
     return (this->DataValid ? this->Superclass::MouseWheelEvent(mouse, delta) : false);
   }
-  bool KeyPressEvent(const vtkContextKeyEvent& key) VTK_OVERRIDE
+  bool KeyPressEvent(const vtkContextKeyEvent& key) override
   {
     return (this->DataValid ? this->Superclass::KeyPressEvent(key) : false);
   }
@@ -151,18 +149,27 @@ public:
 protected:
   vtkTransferFunctionChartXY()
   {
-    this->XRange[0] = this->XRange[1] = 0.0;
+    this->XRange = this->XRangePrevious = vtkVector2d(0, 0);
     this->DataValid = false;
-    this->ZoomWithMouseWheelOff();
   }
   ~vtkTransferFunctionChartXY() override {}
+
+  void AdjustAxes()
+  {
+    this->GetAxis(vtkAxis::BOTTOM)->SetRange(this->XRange[0], this->XRange[1]);
+    this->GetAxis(vtkAxis::LEFT)->SetRange(0, 1);
+
+    // for recalculation of transforms using current axes ranges.
+    this->RecalculatePlotTransforms();
+  }
 
 private:
   vtkTransferFunctionChartXY(const vtkTransferFunctionChartXY&);
   void operator=(const vtkTransferFunctionChartXY&);
 };
-
 vtkStandardNewMacro(vtkTransferFunctionChartXY);
+
+} // end of namespace
 
 //-----------------------------------------------------------------------------
 
@@ -189,12 +196,10 @@ public:
     this->Timer.setSingleShot(true);
     this->Timer.setInterval(0);
 
-#if QT_VERSION >= 0x050000
     QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
     fmt.setSamples(8);
     this->Widget->setFormat(fmt);
     this->Widget->setEnableHiDPI(true);
-#endif
 
     this->Widget->setObjectName("1QVTKWidget0");
     this->Widget->SetRenderWindow(this->Window.Get());
@@ -203,6 +208,7 @@ public:
     this->ChartXY->SetAutoSize(true);
     this->ChartXY->SetShowLegend(false);
     this->ChartXY->SetForceAxesToBounds(true);
+    this->ChartXY->SetZoomWithMouseWheel(false);
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
     this->ContextView->SetInteractor(this->Widget->GetInteractor());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
@@ -222,7 +228,7 @@ public:
     for (int cc = 0; cc < 4; cc++)
     {
       this->ChartXY->GetAxis(cc)->SetVisible(false);
-      this->ChartXY->GetAxis(cc)->SetBehavior(vtkAxis::AUTO);
+      this->ChartXY->GetAxis(cc)->SetBehavior(vtkAxis::FIXED);
     }
   }
   ~pqInternals() { this->cleanup(); }
@@ -246,7 +252,14 @@ pqTransferFunctionWidget::pqTransferFunctionWidget(QWidget* parentObject)
   : Superclass(parentObject)
   , Internals(new pqInternals(this))
 {
-  QObject::connect(&this->Internals->Timer, SIGNAL(timeout()), this, SLOT(renderInternal()));
+  // whenever the rendering timer times out, we render the widget.
+  QObject::connect(&this->Internals->Timer, &QTimer::timeout, [this]() {
+    auto renWin = this->Internals->ContextView->GetRenderWindow();
+    if (this->isVisible() && renWin->IsDrawable())
+    {
+      renWin->Render();
+    }
+  });
 }
 
 //-----------------------------------------------------------------------------
@@ -347,7 +360,6 @@ void pqTransferFunctionWidget::initialize(
 
   if (this->Internals->ControlPointsItem)
   {
-    this->Internals->ChartXY->ControlPointsItem = this->Internals->ControlPointsItem;
     this->Internals->ControlPointsItem->SetEndPointsRemovable(false);
     this->Internals->ControlPointsItem->SetShowLabels(true);
     this->Internals->ChartXY->AddPlot(this->Internals->ControlPointsItem);
@@ -362,11 +374,27 @@ void pqTransferFunctionWidget::initialize(
   // ensures that.
   if (ctf)
   {
-    this->Internals->VTKConnect->Connect(ctf, vtkCommand::ModifiedEvent, this, SLOT(render()));
+    this->Internals->VTKConnect->Connect(
+      ctf, vtkCommand::ModifiedEvent, this, SIGNAL(ctfModified()));
+    QObject::connect(this, &pqTransferFunctionWidget::ctfModified, [ctf, this]() {
+      auto chartXY = this->Internals->ChartXY.GetPointer();
+      chartXY->SetTFRange(vtkVector2d(ctf->GetRange()));
+      this->render();
+    });
+    auto chartXY = this->Internals->ChartXY.GetPointer();
+    chartXY->SetTFRange(vtkVector2d(ctf->GetRange()));
   }
   if (pwf)
   {
-    this->Internals->VTKConnect->Connect(pwf, vtkCommand::ModifiedEvent, this, SLOT(render()));
+    this->Internals->VTKConnect->Connect(
+      pwf, vtkCommand::ModifiedEvent, this, SIGNAL(pwfModified()));
+    QObject::connect(this, &pqTransferFunctionWidget::pwfModified, [pwf, this]() {
+      auto chartXY = this->Internals->ChartXY.GetPointer();
+      chartXY->SetTFRange(vtkVector2d(pwf->GetRange()));
+      this->render();
+    });
+    auto chartXY = this->Internals->ChartXY.GetPointer();
+    chartXY->SetTFRange(vtkVector2d(pwf->GetRange()));
   }
 }
 
@@ -461,15 +489,6 @@ bool pqTransferFunctionWidget::GetLogScaleXAxis() const
 void pqTransferFunctionWidget::render()
 {
   this->Internals->Timer.start();
-}
-
-//-----------------------------------------------------------------------------
-void pqTransferFunctionWidget::renderInternal()
-{
-  if (this->isVisible() && this->Internals->ContextView->GetRenderWindow()->IsDrawable())
-  {
-    this->Internals->ContextView->GetRenderWindow()->Render();
-  }
 }
 
 //-----------------------------------------------------------------------------
