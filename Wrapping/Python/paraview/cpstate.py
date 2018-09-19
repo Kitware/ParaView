@@ -365,8 +365,8 @@ class NewStyleWriters(object):
                 # skip the array and property export information we stuff in this proxy
                 continue
 
-            inputname = xs.split('_')[0].lower()
-            writername = xs.split('_')[1]
+            inputname = xs.split('|')[0].lower().replace("*","")
+            writername = xs.split('|')[1]
 
             xmlgroup = pxy.GetXMLGroup()
 

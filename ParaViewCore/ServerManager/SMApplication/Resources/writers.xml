@@ -1824,7 +1824,7 @@
     <WriterProxy base_proxygroup="writers"
                base_proxyname="XMLPImageDataWriter"
                class="vtkFileSeriesWriter"
-               name="XMPImageDataWriter">
+               name="XMLPImageDataWriter">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
