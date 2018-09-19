@@ -122,6 +122,10 @@ int vtkRulerLineForInput::RequestData(vtkInformation* vtkNotUsed(request),
     if (pointSet)
     {
       points = pointSet->GetPoints();
+      if (!points)
+      {
+        points = vtkSmartPointer<vtkPoints>::New();
+      }
     }
     else if (auto mbds = vtkMultiBlockDataSet::SafeDownCast(inputData))
     {
