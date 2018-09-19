@@ -102,7 +102,7 @@ namespace mi
     <tr><td>\c "Float64"           </td><td>yes</td><td>#mi::IFloat64 </td><td>mi::Float64 </td>
                                         <td>64-bit IEEE-754 double-precision floating-point number
                                         </td></tr>
-    <tr><td>\c "Difference"        </td><td>no</td><td>#mi::IDifference</td><td>mi::Difference</td>
+    <tr><td>\c "Difference         </td><td>no</td><td>#mi::IDifference</td><td>mi::Difference</td>
                                         <td>Signed 32-bit or 64-bit integer, depending on the
                                         architecture</td></tr>
     <tr><td>\c "Size"              </td><td>no</td><td>#mi::ISize</td><td>mi::Size</td>

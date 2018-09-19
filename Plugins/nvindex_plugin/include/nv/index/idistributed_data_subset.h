@@ -16,6 +16,34 @@ namespace nv
 namespace index
 {
 
+// * optional for attribute-bound datasets?
+//   - volumes
+//   - height-fields do not store attributes for example...
+class IDistributed_data_attribute_set_descriptor
+  : public mi::base::Interface_declare<0x88b4168a, 0xde56, 0x4f18, 0x96, 0xca, 0xd6, 0x4d, 0xef,
+      0x0, 0x4b, 0x94>
+{
+public:
+  virtual bool is_valid() const = 0;
+};
+
+class IDistributed_data_subset_data_descriptor
+  : public mi::base::Interface_declare<0x10f2ae8b, 0xd1ac, 0x446b, 0xa2, 0xef, 0x15, 0xb, 0xd, 0x82,
+      0xaa, 0xc8>
+{
+public:
+  /// Returns wheather the data-subset data descriptor is valid or not.
+  ///
+  virtual bool is_valid() const = 0;
+
+  /// Returns the subdivision subregion bounding box of the subset in global scene space.
+  ///
+  virtual mi::math::Bbox_struct<mi::Float32, 3> get_subregion_scene_space() const = 0;
+  /// Returns the subdivision subregion bounding box of the subset in the dataset's object space.
+  ///
+  virtual mi::math::Bbox_struct<mi::Float32, 3> get_subregion_object_space() const = 0;
+};
+
 /// @ingroup nv_index_data_storage
 ///
 /// The base class for each subset of a large-scale distributed dataset.
@@ -89,21 +117,56 @@ public:
   /// \return Created instance of an implementation of the interface class
   ///         that represents the subset of the large-scale dataset.
   ///
-  virtual IDistributed_data_subset* create(
-    const mi::base::Uuid& dataset_type, char* parameter) const = 0;
+  virtual IDistributed_data_subset* create_data_subset(
+    const mi::base::Uuid& dataset_type, const char* parameter) const = 0;
 
+  virtual IDistributed_data_subset* create_data_subset(const mi::base::Uuid& dataset_type,
+    const IDistributed_data_attribute_set_descriptor* dataset_attrib_set_desc,
+    const char* parameter) const = 0;
+
+  // Convenience functions for creating typed data subsets.
   template <class T>
-  const T* create(char* parameter = 0) const
+  const T* create_data_subset(const char* parameter = 0) const
   {
-    const T* t = static_cast<const T*>(create(typename T::IID(), parameter));
+    const T* t = static_cast<const T*>(create_data_subset(typename T::IID(), parameter));
     return t;
   }
 
   template <class T>
-  T* create(char* parameter = 0)
+  T* create_data_subset(const char* parameter = 0)
   {
-    T* t = static_cast<T*>(create(typename T::IID(), parameter));
+    T* t = static_cast<T*>(create_data_subset(typename T::IID(), parameter));
     return t;
+  }
+
+  template <class T>
+  const T* create_data_subset(
+    const IDistributed_data_attribute_set_descriptor* dataset_attrib_set_desc,
+    const char* parameter = 0) const
+  {
+    const T* t = static_cast<const T*>(
+      create_data_subset(typename T::IID(), dataset_attrib_set_desc, parameter));
+    return t;
+  }
+
+  template <class T>
+  T* create_data_subset(const IDistributed_data_attribute_set_descriptor* dataset_attrib_set_desc,
+    const char* parameter = 0)
+  {
+    T* t =
+      static_cast<T*>(create_data_subset(typename T::IID(), dataset_attrib_set_desc, parameter));
+    return t;
+  }
+
+  // Creates a new attribute-set descriptor
+  virtual IDistributed_data_attribute_set_descriptor* create_attribute_set_descriptor(
+    const mi::base::Uuid& class_id) const = 0;
+
+  // Convenience functions for creating typed attribute-set descriptors.
+  template <class T>
+  T* create_attribute_set_descriptor()
+  {
+    return static_cast<T*>(create_attribute_set_descriptor(typename T::IID()));
   }
 };
 

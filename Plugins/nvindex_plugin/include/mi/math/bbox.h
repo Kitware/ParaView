@@ -752,7 +752,7 @@ template <typename T, Size DIM>
 void Bbox<T, DIM>::robust_grow(T eps)
 {
   // Just enlarging the bounding box by epsilon * (largest box extent) is not sufficient, since
-  // there may be cancellation errors if the box is far away from the origin. Hence we take into
+  // there may be cancelation errors if the box is far away from the origin. Hence we take into
   // account the distance of the box from the origin: the further the box is away, the larger we
   // have to make it. We just add the two contributions. If we are very far away, then distance
   // will dominate. For very large boxes, the extent will dominate. We neglect exact weight

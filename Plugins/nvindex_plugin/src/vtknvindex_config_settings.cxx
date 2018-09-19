@@ -346,6 +346,15 @@ void vtknvindex_config_settings::set_filter_mode(mi::Sint32 filter_mode)
 nv::index::IConfig_settings::Volume_filtering_modes vtknvindex_config_settings::get_filter_mode()
   const
 {
+#ifdef USE_SPARSE_VOLUME
+  mi::Uint32 filter_mode = m_filter_mode;
+  if (filter_mode == 5)
+    filter_mode = 3;
+  else if (filter_mode == 7)
+    filter_mode = 5;
+
+  return static_cast<nv::index::IConfig_settings::Volume_filtering_modes>(filter_mode);
+#else
   switch (m_filter_mode)
   {
     case 0:
@@ -359,6 +368,7 @@ nv::index::IConfig_settings::Volume_filtering_modes vtknvindex_config_settings::
     default:
       return nv::index::IConfig_settings::VOLUME_FILTER_NEAREST;
   }
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------

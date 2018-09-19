@@ -27,7 +27,7 @@ namespace index
 /// and the spatial subdivision from NVIDIA IndeX have to result in the same
 /// spatial regions (bounding boxes). At least the domain-specific spatial regions
 /// for which an explicit affinity is given have to match or include (cover) one or a
-/// subset of bounding boxes that are created by NVIDIA IndeX. The subcube
+/// subset of bounding boxes that are created by NVIDIA IndeX. The sub cube
 /// configuration defines the size of the bounding boxes created by NVIDIA IndeX
 /// and allows to optimize the alignment of the internal spatial decomposition to
 /// a given domain-specific spatial decomposition.
@@ -40,14 +40,14 @@ class IAffinity_information
 {
 public:
   /// Flags for setting specific affinity modes.
-  enum Affinity_flags : mi::Uint32
+  enum Affinity_flags
   {
     ANY_GPU = 0xffffffff ///< The GPU should be assigned automatically.
   };
 
   /// Defines the affinity for a subregion with the given bounding box. The
-  /// affinity includes the cluster machine as well as the GPU id on that
-  /// machine. If neither the id of the cluster machine nor the id of the GPU
+  /// affinity includes the cluster machine as well as the CUDA device id on that
+  /// machine. If neither the id of the cluster machine nor the id of the CUDA device
   /// is valid (e.g., the host is not listed in cluster) then the affinity
   /// definition is ignored.
   ///
@@ -57,7 +57,8 @@ public:
   /// \param[out] host_id         The cluster machine (host) where the subregion is supposed to be
   ///                             stored, processed and rendered.
   ///
-  /// \param[out] gpu_id          The GPU id on the given cluster machine where the subregion is
+  /// \param[out] device_id       The CUDA device id on the given cluster machine where the
+  /// subregion is
   ///                             supposed to be stored, processed and rendered. If set to \c
   ///                             ANY_GPU
   ///                             then the GPU will be chosen automatically.
@@ -66,7 +67,7 @@ public:
   ///         and \c gpu_id should be ignored.
   ///
   virtual bool get_affinity(const mi::math::Bbox_struct<mi::Float32, 3>& subregion,
-    mi::Uint32& host_id, mi::Uint32& gpu_id) const = 0;
+    mi::Uint32& host_id, mi::Uint32& device_id) const = 0;
 };
 
 /// Domain specific subdivision and data distribution.
@@ -112,7 +113,7 @@ public:
   /// aligns its internal spatial subdivision scheme to the application-supplied
   /// bounding box to cover the entire space.
   ///
-  /// \param[in]  index       An index that allowa accessing the application-supplied
+  /// \param[in]  index       An index that allows accessing the application-supplied
   ///                         spatial areas. The index must be in the range
   ///                         [0,\c get_nb_subregions()].
   ///

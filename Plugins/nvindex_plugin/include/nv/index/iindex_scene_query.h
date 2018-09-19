@@ -100,4 +100,4 @@ public:
 } // namespace index
 } // namespace nv
 
-#endif // #ifndef NVIDIA_INDEX_IINDEX_SCENE_QUERY_H
+#endif // NVIDIA_INDEX_IINDEX_SCENE_QUERY_H

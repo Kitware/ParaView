@@ -33,6 +33,13 @@
 
 class vtknvindex_cluster_properties;
 
+// Use appropriate voxel storage.
+// Based on the data type of the dataset.
+template <typename T>
+bool resolve_voxel_type(T* shmem_volume, T* voxel_data_storage,
+  const mi::math::Bbox<mi::Sint32, 3>& bounds, const mi::math::Bbox<mi::Sint32, 3>& shmbbox,
+  mi::neuraylib::IDice_transaction* dice_transaction, bool zyx_to_xyz);
+
 // The class vtknvindex_volume_importer represents a distributed data importer for NVIDIA IndeX
 // to load subsets of a regular volume dataset based shared memory.
 class vtknvindex_volume_importer
@@ -75,12 +82,12 @@ public:
   mi::base::Uuid subset_id() const override;
 
 private:
-  // Use appropriate voxel storage.
-  // Based on the data type of the dataset.
-  template <typename T>
-  bool resolve_voxel_type(T* shmem_volume, T* voxel_data_storage,
-    const mi::math::Bbox<mi::Sint32, 3>& bounds, const mi::math::Bbox<mi::Sint32, 3>& shmbbox,
-    mi::neuraylib::IDice_transaction* dice_transaction, bool zyx_to_xyz) const;
+  //// Use appropriate voxel storage.
+  //// Based on the data type of the dataset.
+  // template <typename T>
+  // bool resolve_voxel_type(T* shmem_volume, T* voxel_data_storage,
+  //  const mi::math::Bbox<mi::Sint32, 3>& bounds, const mi::math::Bbox<mi::Sint32, 3>& shmbbox,
+  //  mi::neuraylib::IDice_transaction* dice_transaction, bool zyx_to_xyz) const;
 
   mi::Sint32 m_border_size;                            // subcube border size.
   mi::math::Vector<mi::Uint32, 3> m_volume_size;       // Volume size.

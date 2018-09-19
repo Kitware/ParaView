@@ -47,7 +47,7 @@ public:
   /// Returns the size of the map.
   ///
   /// The size of a map is the number of keys in the map.
-  Size get_length() const override = 0;
+  virtual Size get_length() const = 0;
 
   /// Checks whether the map is empty.
   ///

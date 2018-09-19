@@ -90,6 +90,10 @@ public:
   // Set ParaView domain subdivision KD-Tree.
   void set_domain_kdtree(vtkPKdTree* kd_tree);
 
+  // The CUDA code need to be updated on changes applied in the GUI.
+  void rtc_kernel_changed(
+    vtknvindex_rtc_kernels kernel, const void* params_buffer, mi::Uint32 buffer_size);
+
   // Returns true if NVIDIA IndeX is initialized by this mapper.
   bool is_mapper_initialized() { return m_is_mapper_initialized; }
 
@@ -114,7 +118,12 @@ private:
   bool m_config_settings_changed; // When some parameter changed on the GUI.
   bool m_volume_changed;          // When switching to a different time step.
                                   // or switching between properties.
-  std::string m_prev_property;    // volume property that was rendered.
+
+  bool m_rtc_kernel_changed; // True when switching between CUDA code.
+  bool m_rtc_param_changed;  // True when a kernel parameter changed.
+
+  vtkMTimeType m_last_MTime;   // last MTime when volume was modified
+  std::string m_prev_property; // volume property that was rendered.
 
   vtknvindex_application m_application_context;        // NVIDIA IndeX application context.
   vtknvindex_scene m_scene;                            // NVIDIA IndeX scene.
@@ -125,6 +134,8 @@ private:
   vtknvindex_irregular_volume_data m_volume_data;      // Tetrahedral volume data.
 
   vtkPKdTree* m_kd_tree; // ParaView domain subdivision.
+
+  vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The CUDA code applied to the current volume.
 };
 
 #endif

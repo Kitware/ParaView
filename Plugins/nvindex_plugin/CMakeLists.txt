@@ -20,14 +20,18 @@ ELSE()
     INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF()
 
+add_definitions(-DUSE_SPARSE_VOLUME)
+
 pv_process_modules()
 
 set(kernel_sources
+  src/kernel_irregular_depth_enhancement.cu
+  src/kernel_irregular_edge_enhancement.cu
+  src/kernel_irregular_isosurface.cu
   src/kernel_depth_enhancement.cu
   src/kernel_edge_enhancement.cu
-  src/kernel_isoraycast.cu
   src/kernel_isosurface.cu
-  src/kernel_single_scattering.cu)
+  src/kernel_plane_surface_mapping.cu)
 set(kernel_string_sources)
 foreach (kernel_source IN LISTS kernel_sources)
   get_filename_component(kernel_name "${kernel_source}" NAME_WE)
@@ -40,7 +44,7 @@ foreach (kernel_source IN LISTS kernel_sources)
     "${source}")
 endforeach ()
 
-ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.1"
+ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.2-dev"
     EULA "EULA.txt"
     SERVER_MANAGER_XML src/nvindex.xml
     SERVER_MANAGER_SOURCES
@@ -64,7 +68,9 @@ ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.1"
         src/vtknvindex_receiving_logger.cxx
         src/vtknvindex_regular_volume_properties.cxx
         src/vtknvindex_scene.cxx
+        src/vtknvindex_sparse_volume_importer.cxx
         src/vtknvindex_volume_importer.cxx
+        src/vtknvindex_volume_compute.cxx
         ${kernel_string_sources}
 )
 

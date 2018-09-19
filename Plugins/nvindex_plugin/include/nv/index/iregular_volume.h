@@ -58,7 +58,7 @@ public:
   /// Returns the transformation matrix of the scene element.
   ///
   /// \return Transformation matrix from IJK (local) to XYZ (global) space.
-  mi::math::Matrix_struct<mi::Float32, 4, 4> get_transform() const override = 0;
+  virtual mi::math::Matrix_struct<mi::Float32, 4, 4> get_transform() const = 0;
 
   /// Returns the size of the entire (unclipped) volume.
   ///

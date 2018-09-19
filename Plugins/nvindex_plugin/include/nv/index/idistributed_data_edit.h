@@ -12,6 +12,7 @@
 #include <nv/index/iirregular_volume_compute_task.h>
 #include <nv/index/iregular_heightfield_compute_task.h>
 #include <nv/index/iregular_volume_compute_task.h>
+#include <nv/index/isparse_volume_compute_task.h>
 
 namespace nv
 {
@@ -22,7 +23,7 @@ namespace index
 /// This interface class represents an entry point for user-defined editing tasks that operate on
 /// the regular volume distributed in the cluster. The editing operation modifies the amplitude
 /// values
-/// if the volume datasets.
+/// of the volume datasets.
 ///
 /// An instance of this class can be retrieved from \c
 /// IRegular_volume_data_locality::create_data_edit()
@@ -60,6 +61,39 @@ public:
   /// device.
   ///
   virtual mi::Sint32 get_assigned_device(
+    mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
+};
+
+/// @ingroup nv_index_data_edit
+/// This interface class represents an entry point for user-defined editing tasks that operate on
+/// sparse-volume data distributed in the cluster. The editing operation modifies the voxel values
+/// of the volume datasets.
+///
+/// An instance of this class can be retrieved from \c
+/// IRegular_volume_data_locality::retrieve_sparse_volume_data_locality()
+/// for a given subset of the sparse volume. The computing task that actually performs the
+/// user-defined volume editing operation needs to be implemented by a class derived from the
+/// interface \c ISparse_volume_compute_task and passed to #execute_compute_task().
+///
+/// In order to be able to process the given the volume data, the calling distributed rendering
+/// algorithm
+/// (e.g., \c IDistributed_compute_algorithm) has to make sure to query the interface only for those
+/// volume subsets that are available on the current cluster host where the compute unit
+/// (fragment of the fragmented job) runs on, i.e., the volume's subset data needs to be
+/// available locally on that machine.
+///
+class ISparse_volume_data_edit : public mi::base::Interface_declare<0xe976cf3, 0xedcd, 0x4318, 0x8e,
+                                   0xa7, 0xb0, 0x84, 0x1, 0xab, 0x43, 0xf6>
+{
+public:
+  /// Applies the given compute task on the current sparse-volume subset.
+  ///
+  /// \param[in] compute_task     The compute task performs the editing
+  ///                             operation and can be any user-defined
+  ///                             technique or algorithm.
+  /// \param[in] dice_transaction The DiCE transaction used for the operation.
+  ///
+  virtual void execute_compute_task(const ISparse_volume_compute_task* compute_task,
     mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
 };
 

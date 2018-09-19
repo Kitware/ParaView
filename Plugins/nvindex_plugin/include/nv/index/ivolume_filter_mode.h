@@ -24,7 +24,7 @@ namespace index
 /// rendering a volume primitive directly (using \c IRegular_volume) or indirectly (e.g. mapped on
 /// an \c IPlane).
 ///
-/// \note This attribute takes precedence over the global setting from \c
+/// \note This attribute takes precendence over the global setting from \c
 /// IConfig_settings::set_volume_filter().
 ///
 /// \todo Currently this attribute only affects volume data mapped onto an \c IPlane.
@@ -39,7 +39,7 @@ public:
   /// In GPU rendering mode, all the filters below including those tagged as 'software' are
   /// implemented using CUDA. Those filters that are are tagged 'hardware' leverage the
   /// texture hardware, e.g., linear filters, exposed through CUDA to further optimize the
-  /// filtering performance.
+  /// the filtering performance.
   enum Filter_mode
   {
     /// Access a single voxel with nearest filtering (a.k.a. point filtering).

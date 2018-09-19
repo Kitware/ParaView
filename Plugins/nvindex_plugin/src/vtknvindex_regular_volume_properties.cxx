@@ -268,32 +268,50 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_info->m_shm_name, shm_info->m_size);
 
+#ifndef USE_SPARSE_VOLUME
       transform_zyx_to_xyz<mi::Uint8>(reinterpret_cast<mi::Uint8*>(scalar_array->GetVoidPointer(0)),
         reinterpret_cast<mi::Uint8*>(shm_ptr), bounds);
+#endif
     }
     else if (m_scalar_type == "unsigned short")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Uint16>(shm_info->m_shm_name, shm_info->m_size);
 
+#ifndef USE_SPARSE_VOLUME
       transform_zyx_to_xyz<mi::Uint16>(
         reinterpret_cast<mi::Uint16*>(scalar_array->GetVoidPointer(0)),
         reinterpret_cast<mi::Uint16*>(shm_ptr), bounds);
+#endif
     }
+#ifdef USE_SPARSE_VOLUME
+    else if (m_scalar_type == "char")
+    {
+      shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint8>(shm_info->m_shm_name, shm_info->m_size);
+    }
+    else if (m_scalar_type == "short")
+    {
+      shm_ptr = vtknvindex::util::get_vol_shm<mi::Sint16>(shm_info->m_shm_name, shm_info->m_size);
+    }
+#endif
     else if (m_scalar_type == "float")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Float32>(shm_info->m_shm_name, shm_info->m_size);
 
+#ifndef USE_SPARSE_VOLUME
       transform_zyx_to_xyz<mi::Float32>(
         reinterpret_cast<mi::Float32*>(scalar_array->GetVoidPointer(0)),
         reinterpret_cast<mi::Float32*>(shm_ptr), bounds);
+#endif
     }
     else if (m_scalar_type == "double")
     {
       shm_ptr = vtknvindex::util::get_vol_shm<mi::Float64>(shm_info->m_shm_name, shm_info->m_size);
 
+#ifndef USE_SPARSE_VOLUME
       transform_zyx_to_xyz<mi::Float64>(
         reinterpret_cast<mi::Float64*>(scalar_array->GetVoidPointer(0)),
         reinterpret_cast<mi::Float64*>(shm_ptr), bounds);
+#endif
     }
     else
     {
@@ -308,17 +326,24 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(vtkDataArray* sca
       return false;
     }
 
+#ifdef USE_SPARSE_VOLUME
+    memcpy(shm_ptr, scalar_array->GetVoidPointer(0), shm_info->m_size);
+#endif // USE_SPARSE_VOLUME
+
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(shm_ptr, shm_info->m_size);
   }
   else
   {
-    shm_info->m_raw_mem_pointer = scalar_array->GetVoidPointer(0);
+    shm_info->m_raw_mem_pointer = malloc(shm_info->m_size); // scalar_array->GetVoidPointer(0);
+    memcpy(shm_info->m_raw_mem_pointer, scalar_array->GetVoidPointer(0), shm_info->m_size);
+
+    // shm_info->m_raw_mem_pointer = scalar_array->GetVoidPointer(0);
   }
 
   m_time_steps_written++;
 
-  INFO_LOG << "Done writing bounding boy: " << current_bbox
+  INFO_LOG << "Done writing bounding box: " << current_bbox
            << " into shared memory: " << shm_info->m_shm_name << ".";
 
   return true;
@@ -359,11 +384,11 @@ bool vtknvindex_regular_volume_properties::write_shared_memory(
   // check scalar type
   size_t scalar_size = 0;
 
-  if (m_scalar_type == "unsigned char")
+  if (m_scalar_type == "char" || m_scalar_type == "unsigned char")
   {
     scalar_size = sizeof(mi::Uint8);
   }
-  else if (m_scalar_type == "unsigned short")
+  else if (m_scalar_type == "short" || m_scalar_type == "unsigned short")
   {
     scalar_size = sizeof(mi::Uint16);
   }

@@ -525,8 +525,10 @@ public:
   /// \param root_element   The root of the subgraph to traverse.
   /// \param name_pattern   A regular expression that acts as filter on the names of returned
   ///                       scene elements. The regular expression must be compliant to extended
-  ///                       regular expressions as defined in POSIX 1003.2. The value \c NULL is
-  ///                       handled as \c ".*".
+  ///                       regular expressions as defined in POSIX 1003.2. The regular expression
+  ///                       is matched to \em any \em part of the scene element name, not just to
+  ///                       the \em entire scene element name. The value \c NULL is handled as
+  ///                       \c ".*".
   /// \param type_names     A list of type names that acts as filter on the names of returned
   ///                       scene elements. Only scene elements with a matching type name pass
   ///                       the filter. The value \c NULL lets all scene elements pass the filter

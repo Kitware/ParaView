@@ -1,29 +1,29 @@
 /* Copyright 2018 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <cassert>
 #include <cstdio>
@@ -36,7 +36,11 @@
 #include <windows.h>
 #endif // _WIN32
 
+#if defined(__APPLE__)
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
 
 #include "vtkCellData.h"
 #include "vtkCellIterator.h"
@@ -90,10 +94,14 @@ vtknvindex_irregular_volume_mapper::vtknvindex_irregular_volume_mapper()
   , m_is_data_prepared(false)
   , m_config_settings_changed(false)
   , m_volume_changed(false)
+  , m_rtc_kernel_changed(false)
+  , m_rtc_param_changed(false)
+
 {
   m_controller = vtkMultiProcessController::GetGlobalController();
   m_kd_tree = NULL;
   m_prev_property = "";
+  m_last_MTime = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -143,7 +151,6 @@ bool vtknvindex_irregular_volume_mapper::initialize_nvindex()
 {
   if (!m_application_context.load_nvindex_library())
   {
-    ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
     return false;
   }
 
@@ -220,11 +227,18 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
   // Initialize NVIDIA IndeX at the local rank 0 on each node.
   if (cur_local_rank == 0)
   {
-    if (!m_is_index_initialized && !initialize_nvindex())
+    if (!m_is_index_initialized)
     {
-      ERROR_LOG << "Failed to initialize the volume mapper for NVIDIA IndeX"
-                << " in vtknvindex_representation::RequestData().";
-      return false;
+      if (!initialize_nvindex())
+      {
+        ERROR_LOG << "Failed to initialize the volume mapper for NVIDIA IndeX"
+                  << " in vtknvindex_representation::RequestData().";
+        return false;
+      }
+
+      // Let IndeX remote instances to start before IndeX viewer.
+      if (cur_global_rank == 0 && m_cluster_properties->get_nb_hosts() > 1)
+        vtknvindex::util::sleep(0.2);
     }
     m_is_nvindex_rank = true;
   }
@@ -423,6 +437,9 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
 
     dataset_parameters.volume_data = static_cast<void*>(&m_volume_data);
 
+    // clean shared memory
+    m_cluster_properties->unlink_shared_memory(true);
+
     if (is_MPI)
     {
       mi::Sint32 current_hostid = 0;
@@ -515,8 +532,40 @@ void vtknvindex_irregular_volume_mapper::config_settings_changed()
 }
 
 //-------------------------------------------------------------------------------------------------
+void vtknvindex_irregular_volume_mapper::rtc_kernel_changed(
+  vtknvindex_rtc_kernels kernel, const void* params_buffer, mi::Uint32 buffer_size)
+{
+  if (kernel != m_volume_rtc_kernel.rtc_kernel)
+  {
+    m_volume_rtc_kernel.rtc_kernel = kernel;
+    m_rtc_kernel_changed = true;
+  }
+
+  m_volume_rtc_kernel.params_buffer = params_buffer;
+  m_volume_rtc_kernel.buffer_size = buffer_size;
+  m_rtc_param_changed = true;
+}
+
+//-------------------------------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol)
 {
+  // check if volume data was modified
+  mi::Sint32 use_cell_colors;
+  vtkDataArray* scalar_array = this->GetScalars(this->GetInput(), this->ScalarMode,
+    this->ArrayAccessMode, this->ArrayId, this->ArrayName, use_cell_colors);
+
+  vtkMTimeType cur_MTime = scalar_array->GetMTime();
+
+  if (m_last_MTime == 0)
+  {
+    m_last_MTime = cur_MTime;
+  }
+  else if (m_last_MTime < cur_MTime)
+  {
+    m_last_MTime = cur_MTime;
+    m_volume_changed = true;
+  }
+
   // Check for volume property changed.
   std::string cur_property(this->GetArrayName());
   if (cur_property != m_prev_property)
@@ -547,22 +596,32 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
   {
     vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Rendering");
 
-    // Setup scene information.
-    if (!m_scene.scene_created())
-      m_scene.create_scene(
-        ren, vol, m_application_context, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
-    else if (m_volume_changed)
-      m_scene.update_volume(m_application_context, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
-
     // DiCE database access.
     mi::base::Handle<mi::neuraylib::IDice_transaction> dice_transaction(
       m_application_context.m_global_scope->create_transaction<mi::neuraylib::IDice_transaction>());
     assert(dice_transaction.is_valid_interface());
 
+    // Setup scene information.
+    if (!m_scene.scene_created())
+      m_scene.create_scene(
+        ren, vol, m_application_context, dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+    else if (m_volume_changed)
+      m_scene.update_volume(
+        m_application_context, dice_transaction, vtknvindex_scene::VOLUME_TYPE_IRREGULAR);
+
     // Update scene parameters.
     m_scene.update_scene(
       ren, vol, m_application_context, dice_transaction, m_config_settings_changed, false, false);
     m_config_settings_changed = false;
+
+    // Update CUDA code.
+    if (m_rtc_kernel_changed || m_rtc_param_changed)
+    {
+      m_scene.update_rtc_kernel(dice_transaction, m_volume_rtc_kernel,
+        vtknvindex_scene::VOLUME_TYPE_IRREGULAR, m_rtc_kernel_changed);
+      m_rtc_kernel_changed = false;
+      m_rtc_param_changed = false;
+    }
 
     // Update render canvas.
     update_canvas(ren);
@@ -624,5 +683,5 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
 
   // clean shared memory
   m_controller->Barrier();
-  m_cluster_properties->unlink_shared_memory();
+  m_cluster_properties->unlink_shared_memory(false);
 }
