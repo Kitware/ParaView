@@ -31,13 +31,13 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="pqLineEdit" name="point1X"/>
+    <widget class="pqDoubleLineEdit" name="point1X"/>
    </item>
    <item row="3" column="2">
-    <widget class="pqLineEdit" name="point1Y"/>
+    <widget class="pqDoubleLineEdit" name="point1Y"/>
    </item>
    <item row="3" column="3">
-    <widget class="pqLineEdit" name="point1Z"/>
+    <widget class="pqDoubleLineEdit" name="point1Z"/>
    </item>
    <item row="4" column="0">
     <widget class="QLabel" name="labelPoint2">
@@ -50,13 +50,13 @@
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="pqLineEdit" name="point2X"/>
+    <widget class="pqDoubleLineEdit" name="point2X"/>
    </item>
    <item row="4" column="2">
-    <widget class="pqLineEdit" name="point2Y"/>
+    <widget class="pqDoubleLineEdit" name="point2Y"/>
    </item>
    <item row="4" column="3">
-    <widget class="pqLineEdit" name="point2Z"/>
+    <widget class="pqDoubleLineEdit" name="point2Z"/>
    </item>
    <item row="5" column="0" colspan="4">
     <widget class="QLabel" name="pickLabel">
@@ -133,9 +133,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqLineEdit</class>
+   <class>pqDoubleLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
+   <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -66,8 +66,6 @@ protected slots:
   void scaleTwice();
   void scale(double);
 
-  void onPVGeneralSettingsModified();
-
 private:
   Q_DISABLE_COPY(pqDoubleVectorPropertyWidget)
 };

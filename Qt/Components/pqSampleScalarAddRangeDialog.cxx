@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSampleScalarAddRangeDialog.h"
 #include "ui_pqSampleScalarAddRangeDialog.h"
 
-#include <QDoubleValidator>
+#include "pqCoreUtilities.h"
+
 #include <algorithm>
 #include <cmath>
 
@@ -58,10 +59,7 @@ pqSampleScalarAddRangeDialog::pqSampleScalarAddRangeDialog(double default_from, 
   this->Implementation->StrictLog = false;
   this->Implementation->Ui.setupUi(this);
 
-  this->Implementation->Ui.from->setValidator(new QDoubleValidator(this->Implementation->Ui.from));
   this->setFrom(default_from);
-
-  this->Implementation->Ui.to->setValidator(new QDoubleValidator(this->Implementation->Ui.to));
   this->setTo(default_to);
 
   this->Implementation->Ui.steps->setValidator(
@@ -86,22 +84,22 @@ pqSampleScalarAddRangeDialog::~pqSampleScalarAddRangeDialog()
 
 double pqSampleScalarAddRangeDialog::from() const
 {
-  return this->Implementation->Ui.from->text().toDouble();
+  return this->Implementation->Ui.from->fullPrecisionText().toDouble();
 }
 
 void pqSampleScalarAddRangeDialog::setFrom(double value)
 {
-  this->Implementation->Ui.from->setText(QString::number(value));
+  this->Implementation->Ui.from->setFullPrecisionText(pqCoreUtilities::number(value));
 }
 
 double pqSampleScalarAddRangeDialog::to() const
 {
-  return this->Implementation->Ui.to->text().toDouble();
+  return this->Implementation->Ui.to->fullPrecisionText().toDouble();
 }
 
 void pqSampleScalarAddRangeDialog::setTo(double value)
 {
-  this->Implementation->Ui.to->setText(QString::number(value));
+  this->Implementation->Ui.to->setFullPrecisionText(pqCoreUtilities::number(value));
 }
 
 unsigned long pqSampleScalarAddRangeDialog::steps() const

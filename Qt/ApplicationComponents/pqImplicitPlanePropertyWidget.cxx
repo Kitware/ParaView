@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 
-#include <QDoubleValidator>
-
 namespace
 {
 // Implicit plane widget does not like it when any of the dimensions is 0. So
@@ -79,18 +77,14 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
 {
   Ui::ImplicitPlanePropertyWidget ui;
   ui.setupUi(this);
-  new QDoubleValidator(ui.originX);
-  new QDoubleValidator(ui.originY);
-  new QDoubleValidator(ui.originZ);
-  new QDoubleValidator(ui.normalX);
-  new QDoubleValidator(ui.normalY);
-  new QDoubleValidator(ui.normalZ);
-
   if (vtkSMProperty* origin = smgroup->GetProperty("Origin"))
   {
-    this->addPropertyLink(ui.originX, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 0);
-    this->addPropertyLink(ui.originY, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 1);
-    this->addPropertyLink(ui.originZ, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 2);
+    this->addPropertyLink(ui.originX, "fullPrecisionText",
+      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), origin, 0);
+    this->addPropertyLink(ui.originY, "fullPrecisionText",
+      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), origin, 1);
+    this->addPropertyLink(ui.originZ, "fullPrecisionText",
+      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), origin, 2);
     ui.labelOrigin->setText(origin->GetXMLLabel());
     ui.pickLabel->setText(
       ui.pickLabel->text().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
@@ -107,9 +101,12 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
 
   if (vtkSMProperty* normal = smgroup->GetProperty("Normal"))
   {
-    this->addPropertyLink(ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
-    this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
-    this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
+    this->addPropertyLink(ui.normalX, "fullPrecisionText",
+      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 0);
+    this->addPropertyLink(ui.normalY, "fullPrecisionText",
+      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 1);
+    this->addPropertyLink(ui.normalZ, "fullPrecisionText",
+      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 2);
     ui.labelNormal->setText(normal->GetXMLLabel());
     QString tooltip = this->getTooltip(normal);
     ui.normalX->setToolTip(tooltip);

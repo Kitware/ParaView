@@ -41,13 +41,13 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="pqLineEdit" name="centerX"/>
+    <widget class="pqDoubleLineEdit" name="centerX"/>
    </item>
    <item row="1" column="2">
-    <widget class="pqLineEdit" name="centerY"/>
+    <widget class="pqDoubleLineEdit" name="centerY"/>
    </item>
    <item row="1" column="3">
-    <widget class="pqLineEdit" name="centerZ"/>
+    <widget class="pqDoubleLineEdit" name="centerZ"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="normalLabel">
@@ -57,13 +57,13 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="pqLineEdit" name="normalX"/>
+    <widget class="pqDoubleLineEdit" name="normalX"/>
    </item>
    <item row="2" column="2">
-    <widget class="pqLineEdit" name="normalY"/>
+    <widget class="pqDoubleLineEdit" name="normalY"/>
    </item>
    <item row="2" column="3">
-    <widget class="pqLineEdit" name="normalZ"/>
+    <widget class="pqDoubleLineEdit" name="normalZ"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="radiusLabel">
@@ -73,7 +73,7 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="pqLineEdit" name="radius"/>
+    <widget class="pqDoubleLineEdit" name="radius"/>
    </item>
    <item row="4" column="0" colspan="4">
     <widget class="QLabel" name="pickLabel">
@@ -105,9 +105,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqLineEdit</class>
+   <class>pqDoubleLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
+   <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

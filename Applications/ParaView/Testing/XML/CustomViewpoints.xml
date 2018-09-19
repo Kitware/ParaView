@@ -7,37 +7,37 @@
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/actionAdjustCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog" command="key" arguments="16777250" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/AddButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/AddButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/customViewpoint0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/customViewpoint0" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/CustomViewpoints_A.png" threshold="5" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/AddButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/AddButton" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/customViewpoint2" property="checked" arguments="false" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/AddButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/AddButton" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/customViewpoint2" property="checked" arguments="false" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeZ" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveZ" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/AddButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/customViewpoint0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/customViewpoint3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/AddButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/customViewpoint0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/customViewpoint3" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/CustomViewpoints_B.png" threshold="5" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/configureCustomViewpoints" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/configureCustomViewpoints" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/delete3" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/delete2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/configureCustomViewpoints" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/configureCustomViewpoints" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/add" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog" command="key" arguments="16777248" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/toolTip2" command="set_string" arguments="Test" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/currentViewpoint2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/customViewpoint2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/customViewpoint2" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/CustomViewpoints_A.png" threshold="5" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/groupBox_2/customViewpointsGroup/configureCustomViewpoints" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents_2/configureCustomViewpoints" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/clearAll" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/pqCustomViewpointButtonDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/customViewpointsToolbar/PlusAction" command="activate" arguments="" />
