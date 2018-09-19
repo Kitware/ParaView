@@ -34,7 +34,7 @@
   <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="300" />
   <pqevent object="pqSampleScalarAddRangeDialog/steps" command="key" arguments="16777217" />
   <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="3" />
-  <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
 
 
 

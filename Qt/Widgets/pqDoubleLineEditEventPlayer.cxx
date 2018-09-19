@@ -57,17 +57,13 @@ bool pqDoubleLineEditEventPlayer::playEvent(
   {
     return false;
   }
-  if (command == Self::EVENT_NAME())
+  if (command == Self::EVENT_NAME() || command == "set_string")
   {
     doubleLineEdit->setFullPrecisionText(arguments);
     doubleLineEdit->triggerFullPrecisionTextChangedAndEditingFinished();
+    return true;
   }
-  else
-  {
-    error = true;
-    qCritical() << "unknown command" << command << "associated with object" << object;
-  }
-  return true;
+  return this->Superclass::playEvent(object, command, arguments, error);
 }
 
 //-----------------------------------------------------------------------------

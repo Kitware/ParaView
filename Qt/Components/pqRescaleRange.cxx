@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRescaleRange.h"
 #include "ui_pqRescaleRangeDialog.h"
 
-#include <QDoubleValidator>
+#include "pqCoreUtilities.h"
 
 class pqRescaleRangeForm : public Ui::pqRescaleRangeDialog
 {
@@ -51,16 +51,11 @@ pqRescaleRange::pqRescaleRange(QWidget* widgetParent)
   // Set up the ui.
   this->Form->setupUi(this);
 
-  // Make sure the line edits only allow number inputs.
-  QDoubleValidator* validator = new QDoubleValidator(this);
-  this->Form->MinimumScalar->setValidator(validator);
-  this->Form->MaximumScalar->setValidator(validator);
-
   // Connect the gui elements.
-  this->connect(
-    this->Form->MinimumScalar, SIGNAL(textChanged(const QString&)), this, SLOT(validate()));
-  this->connect(
-    this->Form->MaximumScalar, SIGNAL(textChanged(const QString&)), this, SLOT(validate()));
+  this->connect(this->Form->MinimumScalar, SIGNAL(fullPrecisionTextChanged(const QString&)), this,
+    SLOT(validate()));
+  this->connect(this->Form->MaximumScalar, SIGNAL(fullPrecisionTextChanged(const QString&)), this,
+    SLOT(validate()));
 
   this->connect(this->Form->RescaleOnlyButton, SIGNAL(clicked()), SLOT(accept()));
   this->connect(this->Form->RescaleButton, SIGNAL(clicked()), SLOT(rescaleAndLock()));
@@ -82,29 +77,25 @@ void pqRescaleRange::setRange(double min, double max)
   }
 
   // Update the displayed range.
-  this->Form->MinimumScalar->setText(QString::number(min, 'g', 6));
-  this->Form->MaximumScalar->setText(QString::number(max, 'g', 6));
+  this->Form->MinimumScalar->setFullPrecisionText(pqCoreUtilities::number(min));
+  this->Form->MaximumScalar->setFullPrecisionText(pqCoreUtilities::number(max));
 }
 
 double pqRescaleRange::minimum() const
 {
-  return this->Form->MinimumScalar->text().toDouble();
+  return this->Form->MinimumScalar->fullPrecisionText().toDouble();
 }
 
 double pqRescaleRange::maximum() const
 {
-  return this->Form->MaximumScalar->text().toDouble();
+  return this->Form->MaximumScalar->fullPrecisionText().toDouble();
 }
 
 void pqRescaleRange::validate()
 {
-  int dummy;
-  QString tmp1 = this->Form->MinimumScalar->text();
-  QString tmp2 = this->Form->MaximumScalar->text();
-
-  if (this->Form->MinimumScalar->validator()->validate(tmp1, dummy) == QValidator::Acceptable &&
-    this->Form->MaximumScalar->validator()->validate(tmp2, dummy) == QValidator::Acceptable &&
-    tmp1.toDouble() <= tmp2.toDouble())
+  QString tmp1 = this->Form->MinimumScalar->fullPrecisionText();
+  QString tmp2 = this->Form->MaximumScalar->fullPrecisionText();
+  if (tmp1.toDouble() <= tmp2.toDouble())
   {
     this->Form->RescaleButton->setEnabled(true);
     this->Form->RescaleOnlyButton->setEnabled(true);

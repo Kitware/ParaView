@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqChooseColorPresetReaction.h"
 #include "pqColorTableModel.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqOpacityTableModel.h"
 #include "pqPipelineRepresentation.h"
@@ -64,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 #include "vtk_jsoncpp.h"
 
-#include <QDoubleValidator>
 #include <QMessageBox>
 #include <QPointer>
 #include <QTimer>
@@ -136,7 +136,6 @@ public:
     , ChoosePresetReaction(new pqChooseColorPresetReaction(this->TempAction.data(), false))
   {
     this->Ui.setupUi(self);
-    this->Ui.CurrentDataValue->setValidator(new QDoubleValidator(self));
     this->Ui.mainLayout->setMargin(pqPropertiesPanel::suggestedMargin());
     // this->Ui.mainLayout->setSpacing(
     //  pqPropertiesPanel::suggestedVerticalSpacing());
@@ -234,8 +233,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   this->connect(
     ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
   // if the user edits the "DataValue", we need to update the transfer function.
-  QObject::connect(
-    ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
+  QObject::connect(ui.CurrentDataValue, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
+    SLOT(currentDataEdited()));
 
   vtkSMProperty* smproperty = smgroup->GetProperty("XRGBPoints");
   if (smproperty)
@@ -488,7 +487,7 @@ void pqColorOpacityEditorWidget::updateCurrentData()
   {
     double xrgbms[6];
     stc->GetNodeValue(ui.ColorEditor->currentPoint(), xrgbms);
-    ui.CurrentDataValue->setText(QString::number(xrgbms[0]));
+    ui.CurrentDataValue->setFullPrecisionText(pqCoreUtilities::number(xrgbms[0]));
 
     // Don't enable widget for first/last control point. For those, users must
     // rescale the transfer function manually
@@ -499,7 +498,7 @@ void pqColorOpacityEditorWidget::updateCurrentData()
   {
     double xvms[4];
     pwf->GetNodeValue(ui.OpacityEditor->currentPoint(), xvms);
-    ui.CurrentDataValue->setText(QString::number(xvms[0]));
+    ui.CurrentDataValue->setFullPrecisionText(pqCoreUtilities::number(xvms[0]));
 
     // Don't enable widget for first/last control point. For those, users must
     // rescale the transfer function manually
@@ -650,11 +649,11 @@ void pqColorOpacityEditorWidget::currentDataEdited()
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   if (ui.ColorEditor->currentPoint() >= 0 && stc)
   {
-    ui.ColorEditor->setCurrentPointPosition(ui.CurrentDataValue->text().toDouble());
+    ui.ColorEditor->setCurrentPointPosition(ui.CurrentDataValue->fullPrecisionText().toDouble());
   }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
   {
-    ui.OpacityEditor->setCurrentPointPosition(ui.CurrentDataValue->text().toDouble());
+    ui.OpacityEditor->setCurrentPointPosition(ui.CurrentDataValue->fullPrecisionText().toDouble());
   }
 
   this->updateCurrentData();

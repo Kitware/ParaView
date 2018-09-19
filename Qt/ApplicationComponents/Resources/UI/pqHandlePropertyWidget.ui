@@ -38,13 +38,13 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="pqLineEdit" name="worldPositionX"/>
+    <widget class="pqDoubleLineEdit" name="worldPositionX"/>
    </item>
    <item row="1" column="2">
-    <widget class="pqLineEdit" name="worldPositionY"/>
+    <widget class="pqDoubleLineEdit" name="worldPositionY"/>
    </item>
    <item row="1" column="3">
-    <widget class="pqLineEdit" name="worldPositionZ"/>
+    <widget class="pqDoubleLineEdit" name="worldPositionZ"/>
    </item>
    <item row="2" column="0" colspan="4">
     <widget class="QLabel" name="pickLabel">
@@ -76,9 +76,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqLineEdit</class>
+   <class>pqDoubleLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>pqLineEdit.h</header>
+   <header>pqDoubleLineEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

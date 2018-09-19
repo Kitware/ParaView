@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreInit.h"
 #include "pqCoreTestUtility.h"
 #include "pqCoreUtilities.h"
+#include "pqDoubleLineEdit.h"
 #include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
 #include "pqLinksModel.h"
@@ -71,7 +72,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardServerManagerModelInterface.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
+#include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVXMLElement.h"
@@ -211,6 +214,14 @@ void pqApplicationCore::constructor()
   // tracker.
   this->InterfaceTracker->initialize();
   this->PluginManager->loadPluginsFromSettings();
+
+  if (auto pvsettings = vtkPVGeneralSettings::GetInstance())
+  {
+    // pqDoubleLineEdit's global precision is linked to parameters in
+    // vtkPVGeneralSettings. Let's set that up here.
+    pqCoreUtilities::connect(
+      pvsettings, vtkCommand::ModifiedEvent, this, SLOT(generalSettingsChanged()));
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -741,4 +752,16 @@ void pqApplicationCore::registerDocumentation(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadDistributedPlugins(const char* vtkNotUsed(filename))
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::generalSettingsChanged()
+{
+  if (auto pvsettings = vtkPVGeneralSettings::GetInstance())
+  {
+    pqDoubleLineEdit::setGlobalPrecisionAndNotation(
+      pvsettings->GetRealNumberDisplayedPrecision(),
+      static_cast<pqDoubleLineEdit::RealNumberNotation>(
+        pvsettings->GetRealNumberDisplayedNotation()));
+  }
 }
