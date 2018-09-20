@@ -18,6 +18,9 @@ GENERATE_MAN         = NO
 GENERATE_RTF         = NO
 GENERATE_TAGFILE     = "@CMAKE_CURRENT_BINARY_DIR@/ParaView.tag"
 
+HTML_HEADER          = "@CMAKE_CURRENT_SOURCE_DIR@/templates/header.html"
+HTML_FOOTER          = "@CMAKE_CURRENT_SOURCE_DIR@/templates/footer.html"
+
 PDF_HYPERLINKS       = YES
 
 HAVE_DOT             = @HAVE_DOT_YESNO@
