@@ -2778,7 +2778,7 @@
         <Property name="HeadLightK:H Ratio"/>
         <Property name="MaintainLuminance"/>
       </PropertyGroup>
-      <PropertyGroup label="Background" panel_widget="BackgroundEditor">
+      <PropertyGroup label="Background" panel_widget="BackgroundEditor" panel_visibility="advanced">
         <Property name="Background"/>
         <Property name="Background2"/>
         <Property name="UseGradientBackground"/>
@@ -10111,8 +10111,7 @@
             <Property name="OrientationAxesOutlineColor"
                       panel_visibility="advanced"/>
           </PropertyGroup>
-          <PropertyGroup label="Lights" panel_widget="LightsEditor"
-                         panel_visibility="advanced">
+          <PropertyGroup label="Lights" panel_visibility="never">
             <!-- Light Kit -->
             <Property name="UseLight"/>
             <!-- Key Light -->
@@ -10150,7 +10149,7 @@
                     panel_visibility="advanced"/>
           <Property name="EyeAngle" panel_visibility="never"/>
 
-          <PropertyGroup label="Background" panel_widget="BackgroundEditor">
+          <PropertyGroup label="Background" panel_widget="BackgroundEditor" panel_visibility="advanced">
             <Property name="Background"/>
             <Property name="Background2"/>
             <Property name="UseGradientBackground"/>
