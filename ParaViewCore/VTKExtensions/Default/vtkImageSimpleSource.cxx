@@ -210,9 +210,9 @@ int vtkImageSimpleSource::RequestInformation(vtkInformation* vtkNotUsed(request)
 
   // Point data "X" (active)
   vtkInformation* xInfo = vtkInformation::New();
-  xInfo->Set(vtkDataObject::FIELD_ACTIVE_ATTRIBUTE(), VTK_DOUBLE);
+  xInfo->Set(vtkDataObject::FIELD_ACTIVE_ATTRIBUTE(), VTK_FLOAT);
   xInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_X);
-  xInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
+  xInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_FLOAT);
   xInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 1);
   xInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
   pointDataInfo->Append(xInfo);
@@ -224,7 +224,7 @@ int vtkImageSimpleSource::RequestInformation(vtkInformation* vtkNotUsed(request)
     vtkInformation* dsInfo = vtkInformation::New();
     dsInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
     dsInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_DISTANCESQUARED);
-    dsInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
+    dsInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_FLOAT);
     dsInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 1);
     pointDataInfo->Append(dsInfo);
     dsInfo->FastDelete();
@@ -236,7 +236,7 @@ int vtkImageSimpleSource::RequestInformation(vtkInformation* vtkNotUsed(request)
     vtkInformation* swInfo = vtkInformation::New();
     swInfo->Set(vtkDataObject::FIELD_ASSOCIATION(), vtkDataObject::FIELD_ASSOCIATION_POINTS);
     swInfo->Set(vtkDataObject::FIELD_NAME(), SIMPLE_FIELD_SWIRL);
-    swInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_DOUBLE);
+    swInfo->Set(vtkDataObject::FIELD_ATTRIBUTE_TYPE(), VTK_FLOAT);
     swInfo->Set(vtkDataObject::FIELD_NUMBER_OF_COMPONENTS(), 3);
     pointDataInfo->Append(swInfo);
     swInfo->FastDelete();
@@ -277,37 +277,37 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
   // Get data arrays and starting pointers
   vtkPointData* pointData = imageData->GetPointData();
   vtkDataArray* xArray = pointData->GetArray(SIMPLE_FIELD_X.c_str());
-  double* xPtr = static_cast<double*>(xArray->GetVoidPointer(0)) + begin;
+  float* xPtr = static_cast<float*>(xArray->GetVoidPointer(0)) + begin;
 
-  double* distPtr = nullptr;
+  float* distPtr = nullptr;
   if (this->EnableDistanceSquaredData)
   {
     vtkDataArray* distArray = pointData->GetArray(SIMPLE_FIELD_DISTANCESQUARED.c_str());
-    distPtr = static_cast<double*>(distArray->GetVoidPointer(0)) + begin;
+    distPtr = static_cast<float*>(distArray->GetVoidPointer(0)) + begin;
   }
 
-  double* swirlPtr = nullptr;
+  float* swirlPtr = nullptr;
   if (this->EnableSwirlData)
   {
     vtkDataArray* swirlArray = pointData->GetArray(SIMPLE_FIELD_SWIRL.c_str());
-    swirlPtr = static_cast<double*>(swirlArray->GetVoidPointer(0)) + 3 * begin;
+    swirlPtr = static_cast<float*>(swirlArray->GetVoidPointer(0)) + 3 * begin;
   }
 
   int dZ = extent[5] - extent[4] + 1;
   int dY = extent[3] - extent[2] + 1;
   int dX = extent[1] - extent[0] + 1;
 
-  // Convert and save x and y indices to double values
-  double* yValues = new double[dY];
+  // Convert and save x and y indices to float values
+  float* yValues = new float[dY];
   for (int idxY = extent[2], i = 0; !this->AbortExecute && idxY <= extent[3]; idxY++, i++)
   {
-    yValues[i] = static_cast<double>(idxY);
+    yValues[i] = static_cast<float>(idxY);
   }
 
-  double* xValues = new double[dX];
+  float* xValues = new float[dX];
   for (int idxX = extent[0], i = 0; idxX <= extent[1]; idxX++, i++)
   {
-    xValues[i] = static_cast<double>(idxX);
+    xValues[i] = static_cast<float>(idxX);
   }
 
   // Loop over voxels
@@ -316,23 +316,23 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
   unsigned long progressCount = 0;
   for (int idxZ = extent[4]; idxZ <= extent[5]; idxZ++)
   {
-    double z = static_cast<double>(idxZ);
-    double zSquared = z * z;
+    float z = static_cast<float>(idxZ);
+    float zSquared = z * z;
     for (int idxY = extent[2], j = 0; !this->AbortExecute && idxY <= extent[3]; idxY++, j++)
     {
       progressCount++;
       if ((threadId == 0) && (progressCount % progressStep) == 0)
       {
-        this->UpdateProgress(static_cast<double>(progressCount) / progressGoal);
+        this->UpdateProgress(static_cast<float>(progressCount) / progressGoal);
       }
 
       if (this->EnableDistanceSquaredData || this->EnableSwirlData)
       {
-        double y = yValues[j];
-        double yzSquared = y * y + zSquared;
+        float y = yValues[j];
+        float yzSquared = y * y + zSquared;
         for (int idxX = extent[0], i = 0; idxX <= extent[1]; idxX++, i++)
         {
-          double x = xValues[i];
+          float x = xValues[i];
 
           *xPtr = x;
           xPtr++;
@@ -361,7 +361,7 @@ void vtkImageSimpleSource::ThreadedRequestData(vtkInformation* vtkNotUsed(reques
       else
       {
         // Optimize X when DistanceSquared and Swirl are both disabled
-        memcpy(xPtr, xValues, dX * sizeof(double));
+        memcpy(xPtr, xValues, dX * sizeof(float));
         xPtr += dX + outIncY;
       } // else
 
