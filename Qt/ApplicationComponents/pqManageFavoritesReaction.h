@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPluginTreeWidget.h
+   Module: pqManageFavoritesReaction.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,45 +28,43 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef pqManageFavoritesReaction_h
+#define pqManageFavoritesReaction_h
 
-#ifndef _pqBookmarksTreeWidget_h
-#define _pqBookmarksTreeWidget_h
+#include "pqMasterOnlyReaction.h"
 
-#include <QTreeWidget>
-
-#include <QSet>
-
-#include "pqComponentsModule.h"
-
-class QTreeWidgetItem;
+class QAction;
+class pqProxyGroupMenuManager;
 
 /**
- * pqBookmarksTreeWidget is a custom widget used to display Bookmarks.
- * It extands a QTreeWidget.
+ * @ingroup Reactions
+ * pqManageFavoritesReaction is the reaction to pop-up the favorites manager dialog.
  */
-class PQCOMPONENTS_EXPORT pqBookmarksTreeWidget : public QTreeWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqManageFavoritesReaction : public pqMasterOnlyReaction
 {
-  typedef QTreeWidget Superclass;
   Q_OBJECT
+  typedef pqMasterOnlyReaction Superclass;
 
 public:
-  pqBookmarksTreeWidget(QWidget* p = NULL);
+  pqManageFavoritesReaction(QAction* action, pqProxyGroupMenuManager* mgr)
+    : Superclass(action)
+    , manager(mgr)
+  {
+  }
 
-  bool isDropOnItem() { return this->dropIndicatorPosition() == QAbstractItemView::OnItem; }
+  /**
+   * Pops-up the pqFavoriteDialog dialog.
+   */
+  static void manageFavorites(pqProxyGroupMenuManager* manager);
 
 protected:
-  /**
-   * Reimplemented to store unfolded dragged items.
-   */
-  void dragEnterEvent(QDragEnterEvent* event) override;
+  void onTriggered() override { pqManageFavoritesReaction::manageFavorites(this->manager); }
 
-  /**
-   * Reimplemented to keep unfolded items that were unfolded.
-   */
-  void dropEvent(QDropEvent* event) override;
+private:
+  Q_DISABLE_COPY(pqManageFavoritesReaction)
 
-  QSet<QTreeWidgetItem*> UnfoldedDraggedCategories;
+  pqProxyGroupMenuManager* manager;
 };
 
-#endif // !_pqBookmarksTreeWidget_h
+#endif
