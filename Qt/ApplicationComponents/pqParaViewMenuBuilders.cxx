@@ -75,8 +75,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLoadRestoreWindowLayoutReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainControlsToolbar.h"
-#include "pqManageBookmarksReaction.h"
 #include "pqManageCustomFiltersReaction.h"
+#include "pqManageFavoritesReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
 #include "pqPVApplicationCore.h"
@@ -223,7 +223,7 @@ void pqParaViewMenuBuilders::buildFiltersMenu(
     new pqProxyGroupMenuManager(&menu, "ParaViewFilters", quickLaunchable);
   mgr->addProxyDefinitionUpdateListener("filters");
   mgr->setRecentlyUsedMenuSize(10);
-  mgr->setEnableBookmarks(true);
+  mgr->setEnableFavorites(true);
   pqFiltersMenuReaction* menuReaction = new pqFiltersMenuReaction(mgr, hideDisabled);
 
   // Connect the filters menu about to show and the quick-launch dialog about to show
@@ -267,9 +267,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(dummyMenu, "ParaViewFilters", false);
   mgr->addProxyDefinitionUpdateListener("filters");
 
-  QAction* manageBookmarksAction = menu.addAction("Manage Bookmarks...")
-    << pqSetName("actionManage_Bookmarks");
-  new pqManageBookmarksReaction(manageBookmarksAction, mgr);
+  QAction* manageFavoritesAction = menu.addAction("Manage Favorites...")
+    << pqSetName("actionManage_Favorites");
+  new pqManageFavoritesReaction(manageFavoritesAction, mgr);
 
   new pqCustomizeShortcutsReaction(
     menu.addAction("Customize Shortcuts...") << pqSetName("actionCustomize"));

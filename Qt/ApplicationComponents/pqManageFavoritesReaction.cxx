@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqManageBookmarksReaction.h
+   Module: pqManageFavoritesReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,29 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqManageBookmarksReaction_h
-#define pqManageBookmarksReaction_h
+#include "pqManageFavoritesReaction.h"
 
-#include "pqMasterOnlyReaction.h"
+#include "pqCoreUtilities.h"
+#include "pqFavoritesDialog.h"
+#include "pqProxyGroupMenuManager.h"
 
-class QAction;
-class pqProxyGroupMenuManager;
+#include <QAction>
+#include <QVariant>
 
-/**
- * @ingroup Reactions
- * pqManageBookmarksReaction is the reaction to pop-up the bookmarks manager dialog.
- */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqManageBookmarksReaction : public pqMasterOnlyReaction
+//-----------------------------------------------------------------------------
+void pqManageFavoritesReaction::manageFavorites(pqProxyGroupMenuManager* manager)
 {
-  Q_OBJECT
-  typedef pqMasterOnlyReaction Superclass;
 
-public:
-  pqManageBookmarksReaction(QAction* action, pqProxyGroupMenuManager* mgr)
-    : Superclass(action)
-    , manager(mgr)
+  QVariantList data;
+  for (QAction* action : manager->actions())
   {
+    QStringList proxyStrings = action->data().toStringList();
+    proxyStrings[0] = action->text();
+    // data contains 'label , proxyName'
+    data << proxyStrings;
   }
 
-  /**
-   * Pops-up the pqBookmarkDialog dialog.
-   */
-  static void manageBookmarks(pqProxyGroupMenuManager* manager);
-
-protected:
-  void onTriggered() override { pqManageBookmarksReaction::manageBookmarks(this->manager); }
-
-private:
-  Q_DISABLE_COPY(pqManageBookmarksReaction)
-
-  pqProxyGroupMenuManager* manager;
-};
-
-#endif
+  pqFavoritesDialog dialog(data, pqCoreUtilities::mainWidget());
+  dialog.setObjectName("FavoritesManagerDialog");
+  dialog.exec();
+}

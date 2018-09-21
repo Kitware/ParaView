@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBookmarksTreeWidget.cxx
+   Module:    pqFavoritesTreeWidget.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,18 +30,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqBookmarksTreeWidget.h"
+#include "pqFavoritesTreeWidget.h"
 
 #include <QTreeWidgetItem>
 
 //----------------------------------------------------------------------------
-pqBookmarksTreeWidget::pqBookmarksTreeWidget(QWidget* p)
+pqFavoritesTreeWidget::pqFavoritesTreeWidget(QWidget* p)
   : Superclass(p)
 {
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksTreeWidget::dragEnterEvent(QDragEnterEvent* event)
+void pqFavoritesTreeWidget::dragEnterEvent(QDragEnterEvent* event)
 {
   this->UnfoldedDraggedCategories.clear();
   for (auto* item : this->selectedItems())
@@ -56,7 +56,7 @@ void pqBookmarksTreeWidget::dragEnterEvent(QDragEnterEvent* event)
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksTreeWidget::dropEvent(QDropEvent* event)
+void pqFavoritesTreeWidget::dropEvent(QDropEvent* event)
 {
   Superclass::dropEvent(event);
   // Superclass automatically fold dropped item, so manually

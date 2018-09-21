@@ -31,8 +31,8 @@
 set (Module_SRCS
   pqAboutDialogReaction.cxx
   pqAboutDialogReaction.h
-  pqAddToBookmarksReaction.cxx
-  pqAddToBookmarksReaction.h
+  pqAddToFavoritesReaction.cxx
+  pqAddToFavoritesReaction.h
   pqAlwaysConnectedBehavior.cxx
   pqAlwaysConnectedBehavior.h
   pqAnimationShortcutWidget.cxx
@@ -214,8 +214,8 @@ set (Module_SRCS
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.cxx
   pqManageLinksReaction.h
-  pqManageBookmarksReaction.cxx
-  pqManageBookmarksReaction.h
+  pqManageFavoritesReaction.cxx
+  pqManageFavoritesReaction.h
   pqManagePluginsReaction.cxx
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.cxx
@@ -358,7 +358,7 @@ set (Module_SRCS
 
 set (Module_MOC_HDRS
   pqAboutDialogReaction.h
-  pqAddToBookmarksReaction.h
+  pqAddToFavoritesReaction.h
   pqAlwaysConnectedBehavior.h
   pqAnimationShortcutDecorator.h
   pqAnimationShortcutWidget.h
@@ -448,7 +448,7 @@ set (Module_MOC_HDRS
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.h
-  pqManageBookmarksReaction.h
+  pqManageFavoritesReaction.h
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
   pqModelTransformSupportBehavior.h

@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqAddToBookmarksReaction.h
+   Module:    pqPluginTreeWidget.h
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,46 +28,45 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-========================================================================*/
-#ifndef pqAddToBookmarksReaction_h
-#define pqAddToBookmarksReaction_h
+=========================================================================*/
 
-#include "pqReaction.h"
+#ifndef _pqFavoritesTreeWidget_h
+#define _pqFavoritesTreeWidget_h
+
+#include <QTreeWidget>
+
+#include <QSet>
+
+#include "pqComponentsModule.h"
+
+class QTreeWidgetItem;
 
 /**
-* @ingroup Reactions
-* Reaction to add selected filter in bookmarks
-*/
-class PQAPPLICATIONCOMPONENTS_EXPORT pqAddToBookmarksReaction : public pqReaction
+ * pqFavoritesTreeWidget is a custom widget used to display Favorites.
+ * It extands a QTreeWidget.
+ */
+class PQCOMPONENTS_EXPORT pqFavoritesTreeWidget : public QTreeWidget
 {
+  typedef QTreeWidget Superclass;
   Q_OBJECT
-  typedef pqReaction Superclass;
 
 public:
-  pqAddToBookmarksReaction(QAction* parent, QVector<QString>& filters);
+  pqFavoritesTreeWidget(QWidget* p = NULL);
 
-  /**
-   * Add filter in bookmarks.
-   */
-  static void addToBookmarks(QAction* parent);
-
-public slots:
-  /**
-  * Updates the enabled state. Applications need not explicitly call
-  * this.
-  */
-  void updateEnableState() override;
+  bool isDropOnItem() { return this->dropIndicatorPosition() == QAbstractItemView::OnItem; }
 
 protected:
   /**
-   * Called when the action is triggered.
+   * Reimplemented to store unfolded dragged items.
    */
-  void onTriggered() override { pqAddToBookmarksReaction::addToBookmarks(this->parentAction()); }
+  void dragEnterEvent(QDragEnterEvent* event) override;
 
-private:
-  Q_DISABLE_COPY(pqAddToBookmarksReaction)
+  /**
+   * Reimplemented to keep unfolded items that were unfolded.
+   */
+  void dropEvent(QDropEvent* event) override;
 
-  QVector<QString> Filters;
+  QSet<QTreeWidgetItem*> UnfoldedDraggedCategories;
 };
 
-#endif
+#endif // !_pqFavoritesTreeWidget_h

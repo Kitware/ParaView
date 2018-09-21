@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqManageBookmarksReaction.cxx
+   Module:    pqAddToFavoritesReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,45 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqManageBookmarksReaction.h"
+#ifndef pqAddToFavoritesReaction_h
+#define pqAddToFavoritesReaction_h
 
-#include "pqBookmarksDialog.h"
-#include "pqCoreUtilities.h"
-#include "pqProxyGroupMenuManager.h"
+#include "pqReaction.h"
 
-#include <QAction>
-#include <QVariant>
-
-//-----------------------------------------------------------------------------
-void pqManageBookmarksReaction::manageBookmarks(pqProxyGroupMenuManager* manager)
+/**
+* @ingroup Reactions
+* Reaction to add selected filter in favorites
+*/
+class PQAPPLICATIONCOMPONENTS_EXPORT pqAddToFavoritesReaction : public pqReaction
 {
+  Q_OBJECT
+  typedef pqReaction Superclass;
 
-  QVariantList data;
-  for (QAction* action : manager->actions())
-  {
-    QStringList proxyStrings = action->data().toStringList();
-    proxyStrings[0] = action->text();
-    // data contains 'label , proxyName'
-    data << proxyStrings;
-  }
+public:
+  pqAddToFavoritesReaction(QAction* parent, QVector<QString>& filters);
 
-  pqBookmarksDialog dialog(data, pqCoreUtilities::mainWidget());
-  dialog.setObjectName("BookmarksManagerDialog");
-  dialog.exec();
-}
+  /**
+   * Add filter in favorites.
+   */
+  static void addToFavorites(QAction* parent);
+
+public slots:
+  /**
+  * Updates the enabled state. Applications need not explicitly call
+  * this.
+  */
+  void updateEnableState() override;
+
+protected:
+  /**
+   * Called when the action is triggered.
+   */
+  void onTriggered() override { pqAddToFavoritesReaction::addToFavorites(this->parentAction()); }
+
+private:
+  Q_DISABLE_COPY(pqAddToFavoritesReaction)
+
+  QVector<QString> Filters;
+};
+
+#endif

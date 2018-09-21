@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqAddToBookmarksReaction.cxx
+   Module:    pqAddToFavoritesReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqAddToBookmarksReaction.h"
+#include "pqAddToFavoritesReaction.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 //-----------------------------------------------------------------------------
-pqAddToBookmarksReaction::pqAddToBookmarksReaction(QAction* parentObject, QVector<QString>& filters)
+pqAddToFavoritesReaction::pqAddToFavoritesReaction(QAction* parentObject, QVector<QString>& filters)
   : Superclass(parentObject)
 {
   this->Filters.swap(filters);
@@ -52,7 +52,7 @@ pqAddToBookmarksReaction::pqAddToBookmarksReaction(QAction* parentObject, QVecto
 }
 
 //-----------------------------------------------------------------------------
-void pqAddToBookmarksReaction::updateEnableState()
+void pqAddToFavoritesReaction::updateEnableState()
 {
   pqPipelineFilter* filter =
     qobject_cast<pqPipelineFilter*>(pqActiveObjects::instance().activeSource());
@@ -66,7 +66,7 @@ void pqAddToBookmarksReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqAddToBookmarksReaction::addToBookmarks(QAction* parent)
+void pqAddToFavoritesReaction::addToFavorites(QAction* parent)
 {
   pqPipelineFilter* filter =
     qobject_cast<pqPipelineFilter*>(pqActiveObjects::instance().activeSource());
@@ -78,7 +78,7 @@ void pqAddToBookmarksReaction::addToBookmarks(QAction* parent)
   }
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString key = QString("bookmarks.%1/").arg("ParaViewFilters");
+  QString key = QString("favorites.%1/").arg("ParaViewFilters");
 
   vtkSMProxy* proxy = filter->getProxy();
   QString filterId = QString("%1;%2;%3;%4")

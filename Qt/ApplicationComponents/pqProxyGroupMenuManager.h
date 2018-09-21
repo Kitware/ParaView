@@ -137,9 +137,9 @@ public:
    */
   bool supportsQuickLaunch() const { return this->SupportsQuickLaunch; }
 
-  void setEnableBookmarks(bool enable) { this->EnableBookmarks = enable; }
+  void setEnableFavorites(bool enable) { this->EnableFavorites = enable; }
 
-  QMenu* getBookmarksMenu();
+  QMenu* getFavoritesMenu();
 
   /**
    * Given a category name, return the category label.
@@ -203,25 +203,25 @@ protected slots:
   void populateRecentlyUsedMenu();
 
   /**
-   * called when "bookmarks" menu is being shown.
-   * create the menu (and submenu) with actions for the filters in the bookmarks list.
+   * called when "favorites" menu is being shown.
+   * create the menu (and submenu) with actions for the filters in the favorites list.
    */
-  void populateBookmarksMenu();
+  void populateFavoritesMenu();
 
 protected:
   QString ResourceTagName;
   vtkPVXMLElement* MenuRoot;
   int RecentlyUsedMenuSize;
   bool Enabled;
-  bool EnableBookmarks;
+  bool EnableFavorites;
 
   void loadRecentlyUsedItems();
   void saveRecentlyUsedItems();
 
   /**
-   * Load the bookmarks from settings.
+   * Load the favorites from settings.
    */
-  void loadBookmarksItems();
+  void loadFavoritesItems();
 
   /**
   * Returns the action for a given proxy.

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBookmarksDialog.cxx
+   Module:    pqFavoritesDialog.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 // self
-#include "pqBookmarksDialog.h"
-#include "ui_pqBookmarksDialog.h"
+#include "pqFavoritesDialog.h"
+#include "ui_pqFavoritesDialog.h"
 
 // Qt
 #include <QDropEvent>
@@ -159,9 +159,9 @@ void fetchTreeViewItemRec(QTreeWidget* widget, QTreeWidgetItem* item,
 }
 
 //----------------------------------------------------------------------------
-pqBookmarksDialog::pqBookmarksDialog(const QVariant& filtersList, QWidget* p)
+pqFavoritesDialog::pqFavoritesDialog(const QVariant& filtersList, QWidget* p)
   : Superclass(p)
-  , Ui(new Ui::pqBookmarksDialog())
+  , Ui(new Ui::pqFavoritesDialog())
 {
   this->Ui->setupUi(this);
 
@@ -171,14 +171,14 @@ pqBookmarksDialog::pqBookmarksDialog(const QVariant& filtersList, QWidget* p)
 
   QObject::connect(this->Ui->addCategory, SIGNAL(released()), this, SLOT(createCategory()));
   QObject::connect(
-    this->Ui->removeBookmark, SIGNAL(released()), this, SLOT(onRemoveBookmarkPressed()));
-  QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->Ui->bookmarks);
-  QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(onRemoveBookmarkPressed()));
+    this->Ui->removeFavorite, SIGNAL(released()), this, SLOT(onRemoveFavoritePressed()));
+  QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this->Ui->favorites);
+  QObject::connect(shortcut, SIGNAL(activated()), this, SLOT(onRemoveFavoritePressed()));
 
-  this->Ui->bookmarks->setHeaderLabels(QStringList() << QString("Name"));
-  this->Ui->bookmarks->viewport()->installEventFilter(this);
-  QObject::connect(this->Ui->addBookmark, SIGNAL(released()), this, SLOT(onAddBookmarkPressed()));
-  QObject::connect(this->Ui->bookmarks, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this,
+  this->Ui->favorites->setHeaderLabels(QStringList() << QString("Name"));
+  this->Ui->favorites->viewport()->installEventFilter(this);
+  QObject::connect(this->Ui->addFavorite, SIGNAL(released()), this, SLOT(onAddFavoritePressed()));
+  QObject::connect(this->Ui->favorites, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this,
     SLOT(onItemChanged(QTreeWidgetItem*, int)));
   QObject::connect(
     this->Ui->searchBox, SIGNAL(textChanged(QString)), this, SLOT(onSearchTextChanged(QString)));
@@ -186,16 +186,16 @@ pqBookmarksDialog::pqBookmarksDialog(const QVariant& filtersList, QWidget* p)
   this->connect(this, SIGNAL(accepted()), SLOT(onAccepted()));
 
   this->populateFiltersTree(filtersList);
-  this->populateBookmarksTree();
+  this->populateFavoritesTree();
 }
 
 //----------------------------------------------------------------------------
-pqBookmarksDialog::~pqBookmarksDialog()
+pqFavoritesDialog::~pqFavoritesDialog()
 {
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::onSearchTextChanged(QString pattern)
+void pqFavoritesDialog::onSearchTextChanged(QString pattern)
 {
   auto* root = this->Ui->availableFilters->invisibleRootItem();
   for (int i = 0; i < root->childCount(); i++)
@@ -213,22 +213,22 @@ void pqBookmarksDialog::onSearchTextChanged(QString pattern)
 }
 
 //----------------------------------------------------------------------------
-bool pqBookmarksDialog::eventFilter(QObject* object, QEvent* event)
+bool pqFavoritesDialog::eventFilter(QObject* object, QEvent* event)
 {
   if (event->type() == QEvent::Drop)
   {
     auto* dropEvent = static_cast<QDropEvent*>(event);
     auto* sourceTreeView = dynamic_cast<QTreeWidget*>(dropEvent->source());
-    auto* destItem = this->Ui->bookmarks->itemAt(dropEvent->pos());
+    auto* destItem = this->Ui->favorites->itemAt(dropEvent->pos());
     QTreeWidgetItem* categoryItem = nullptr;
     if (destItem)
     {
-      bool onItem = this->Ui->bookmarks->isDropOnItem();
+      bool onItem = this->Ui->favorites->isDropOnItem();
       categoryItem = onItem ? destItem : destItem->parent();
     }
     if (categoryItem == nullptr)
     {
-      categoryItem = this->Ui->bookmarks->invisibleRootItem();
+      categoryItem = this->Ui->favorites->invisibleRootItem();
     }
     else
     {
@@ -263,11 +263,11 @@ bool pqBookmarksDialog::eventFilter(QObject* object, QEvent* event)
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::populateBookmarksTree()
+void pqFavoritesDialog::populateFavoritesTree()
 {
-  this->Ui->bookmarks->clear();
+  this->Ui->favorites->clear();
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString key = QStringLiteral("bookmarks.ParaViewFilters/");
+  QString key = QStringLiteral("favorites.ParaViewFilters/");
   if (settings->contains(key))
   {
     QString settingValue = settings->value(key).toString();
@@ -282,7 +282,7 @@ void pqBookmarksDialog::populateBookmarksTree()
         QString proxyName = isCategory ? "" : bmPath.takeLast();
         QString displayName = bmPath.takeLast();
 
-        QTreeWidgetItem* root = this->Ui->bookmarks->invisibleRootItem();
+        QTreeWidgetItem* root = this->Ui->favorites->invisibleRootItem();
         for (const QString& category : bmPath)
         {
           root = ::createItem(root, category, true);
@@ -291,11 +291,11 @@ void pqBookmarksDialog::populateBookmarksTree()
       }
     }
   }
-  this->Ui->bookmarks->resizeColumnToContents(0);
+  this->Ui->favorites->resizeColumnToContents(0);
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::populateFiltersTree(const QVariant& filtersList)
+void pqFavoritesDialog::populateFiltersTree(const QVariant& filtersList)
 {
   this->Ui->availableFilters->clear();
   QSequentialIterable iterableList = filtersList.value<QSequentialIterable>();
@@ -313,12 +313,12 @@ void pqBookmarksDialog::populateFiltersTree(const QVariant& filtersList)
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::onItemChanged(QTreeWidgetItem* item, int)
+void pqFavoritesDialog::onItemChanged(QTreeWidgetItem* item, int)
 {
   if (::isItemCategory(item))
   {
     // Ensure unicity of categories
-    ::ensureUniqueCategoryName(this->Ui->bookmarks, item);
+    ::ensureUniqueCategoryName(this->Ui->favorites, item);
   }
   else
   {
@@ -328,17 +328,17 @@ void pqBookmarksDialog::onItemChanged(QTreeWidgetItem* item, int)
       item->setFlags(item->flags() & ~(Qt::ItemIsDropEnabled));
     }
   }
-  this->Ui->bookmarks->scrollToItem(item);
-  this->Ui->bookmarks->setCurrentItem(item);
+  this->Ui->favorites->scrollToItem(item);
+  this->Ui->favorites->setCurrentItem(item);
 }
 
 //----------------------------------------------------------------------------
-QTreeWidgetItem* pqBookmarksDialog::getSelectedCategory()
+QTreeWidgetItem* pqFavoritesDialog::getSelectedCategory()
 {
-  QTreeWidgetItem* item = this->Ui->bookmarks->invisibleRootItem();
-  if (!this->Ui->bookmarks->selectedItems().isEmpty())
+  QTreeWidgetItem* item = this->Ui->favorites->invisibleRootItem();
+  if (!this->Ui->favorites->selectedItems().isEmpty())
   {
-    item = this->Ui->bookmarks->selectedItems().first();
+    item = this->Ui->favorites->selectedItems().first();
     if (!::isItemCategory(item))
     {
       item = item->parent();
@@ -349,30 +349,30 @@ QTreeWidgetItem* pqBookmarksDialog::getSelectedCategory()
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::createCategory()
+void pqFavoritesDialog::createCategory()
 {
   QTreeWidgetItem* root = this->getSelectedCategory() ? this->getSelectedCategory()
-                                                      : this->Ui->bookmarks->invisibleRootItem();
+                                                      : this->Ui->favorites->invisibleRootItem();
   QTreeWidgetItem* precedingItem = nullptr;
-  if (!this->Ui->bookmarks->selectedItems().isEmpty() &&
-    !::isItemCategory(this->Ui->bookmarks->selectedItems().first()))
+  if (!this->Ui->favorites->selectedItems().isEmpty() &&
+    !::isItemCategory(this->Ui->favorites->selectedItems().first()))
   {
-    precedingItem = this->Ui->bookmarks->selectedItems().first();
+    precedingItem = this->Ui->favorites->selectedItems().first();
   }
 
   QTreeWidgetItem* newItem =
     ::createItem(root, QStringLiteral("New Category"), true, "", precedingItem, true);
-  this->Ui->bookmarks->scrollToItem(newItem);
-  this->Ui->bookmarks->setCurrentItem(newItem);
-  this->Ui->bookmarks->editItem(newItem, 0);
-  this->Ui->bookmarks->resizeColumnToContents(0);
+  this->Ui->favorites->scrollToItem(newItem);
+  this->Ui->favorites->setCurrentItem(newItem);
+  this->Ui->favorites->editItem(newItem, 0);
+  this->Ui->favorites->resizeColumnToContents(0);
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::onRemoveBookmarkPressed()
+void pqFavoritesDialog::onRemoveFavoritePressed()
 {
   QSet<QTreeWidgetItem *> deletedItems, aboveItems, belowItems;
-  QList<QTreeWidgetItem*> selected = this->Ui->bookmarks->selectedItems();
+  QList<QTreeWidgetItem*> selected = this->Ui->favorites->selectedItems();
   if (selected.size() == 0)
   {
     return;
@@ -381,7 +381,7 @@ void pqBookmarksDialog::onRemoveBookmarkPressed()
   // Fetch all items that are above and below the selected items
   for (auto* item : selected)
   {
-    ::fetchTreeViewItemRec(this->Ui->bookmarks, item, aboveItems, belowItems);
+    ::fetchTreeViewItemRec(this->Ui->favorites, item, aboveItems, belowItems);
   }
   // Remove the selected items recursively
 
@@ -405,23 +405,23 @@ void pqBookmarksDialog::onRemoveBookmarkPressed()
   if (belowItems.count() != 0)
   {
     auto* item = *belowItems.begin();
-    this->Ui->bookmarks->scrollToItem(item);
-    this->Ui->bookmarks->setCurrentItem(item);
+    this->Ui->favorites->scrollToItem(item);
+    this->Ui->favorites->setCurrentItem(item);
   }
 
-  this->Ui->bookmarks->resizeColumnToContents(0);
+  this->Ui->favorites->resizeColumnToContents(0);
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::onAddBookmarkPressed()
+void pqFavoritesDialog::onAddFavoritePressed()
 {
   QTreeWidgetItem* root = this->getSelectedCategory() ? this->getSelectedCategory()
-                                                      : this->Ui->bookmarks->invisibleRootItem();
+                                                      : this->Ui->favorites->invisibleRootItem();
   QTreeWidgetItem* precedingItem = nullptr;
-  if (!this->Ui->bookmarks->selectedItems().isEmpty() &&
-    !::isItemCategory(this->Ui->bookmarks->selectedItems().first()))
+  if (!this->Ui->favorites->selectedItems().isEmpty() &&
+    !::isItemCategory(this->Ui->favorites->selectedItems().first()))
   {
-    precedingItem = this->Ui->bookmarks->selectedItems().first();
+    precedingItem = this->Ui->favorites->selectedItems().first();
   }
 
   for (auto item : this->Ui->availableFilters->selectedItems())
@@ -429,26 +429,26 @@ void pqBookmarksDialog::onAddBookmarkPressed()
     auto* qitem = ::createItem(
       root, item->text(0), false, item->data(0, Qt::UserRole + 1).toString(), precedingItem);
 
-    this->Ui->bookmarks->scrollToItem(qitem);
+    this->Ui->favorites->scrollToItem(qitem);
   }
 
   root->setExpanded(true);
-  this->Ui->bookmarks->resizeColumnToContents(0);
+  this->Ui->favorites->resizeColumnToContents(0);
 }
 
 //----------------------------------------------------------------------------
-void pqBookmarksDialog::onAccepted()
+void pqFavoritesDialog::onAccepted()
 {
-  QTreeWidgetItem* item = this->Ui->bookmarks->invisibleRootItem();
+  QTreeWidgetItem* item = this->Ui->favorites->invisibleRootItem();
   QString value;
   value = this->populateSettingsValue(value, item);
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  QString key = QStringLiteral("bookmarks.ParaViewFilters/");
+  QString key = QStringLiteral("favorites.ParaViewFilters/");
   settings->setValue(key, value);
 }
 
 //----------------------------------------------------------------------------
-QString pqBookmarksDialog::populateSettingsValue(const QString& value, QTreeWidgetItem* item)
+QString pqFavoritesDialog::populateSettingsValue(const QString& value, QTreeWidgetItem* item)
 {
   QString newValue;
   for (auto child : item->takeChildren())
