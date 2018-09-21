@@ -79,7 +79,10 @@ int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
   kwsys_shared_forward_get_settings(self_path, throwaway_ldpath, exe);
 
   char *dirname_exe = dirname(exe);
-  snprintf(kwsys_shared_forward_ldpath, KWSYS_SHARED_FORWARD_MAXPATH, "%s/%s%s", dirname_exe, driver, kwsys_shared_forward_path_sep);
+  strncat(kwsys_shared_forward_ldpath, dirname_exe, KWSYS_SHARED_FORWARD_MAXPATH - strlen(kwsys_shared_forward_ldpath) - strlen(dirname_exe) - 1);
+  strncat(kwsys_shared_forward_ldpath, "/", KWSYS_SHARED_FORWARD_MAXPATH - strlen(kwsys_shared_forward_ldpath) - 1 - 1);
+  strncat(kwsys_shared_forward_ldpath, driver, KWSYS_SHARED_FORWARD_MAXPATH - strlen(kwsys_shared_forward_ldpath) - strlen(driver) - 1);
+  strncat(kwsys_shared_forward_ldpath, kwsys_shared_forward_path_sep, KWSYS_SHARED_FORWARD_MAXPATH - strlen(kwsys_shared_forward_ldpath) - strlen(kwsys_shared_forward_path_sep) - 1);
 
   // Checks
   //fprintf(stdout, "kwsys_shared_forward_ldpath = %s\n",
