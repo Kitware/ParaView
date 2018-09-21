@@ -99,7 +99,7 @@ git fetch origin
 git checkout master
 git merge --ff-only origin/master
 ```
-  - Update `versions.cmake` and `CMakeLists.txt`
+  - Update `CMakeLists.txt`
     - [ ] `git checkout -b update-to-vVERSION`
     - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
       version in `CMakeLists.txt`:
@@ -108,6 +108,7 @@ git merge --ff-only origin/master
 set(paraview_SOURCE_SELECTION "VERSION" CACHE STRING "Force version to VERSION" FORCE)
 set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
+  - Update `versions.cmake`
     - [ ] Guide selections in `versions.cmake`
     - [ ] `git add versions.cmake CMakeLists.txt`
     - [ ] `git commit -m "Update the default version to VERSION"`
@@ -121,6 +122,7 @@ git add CMakeLists.txt
 git commit --amend
 git gitlab-push -f
 ```
+  - Finalize merge request
     - [ ] Remove WIP from merge request title
     - [ ] Get positive review
     - [ ] `Do: merge`
@@ -137,7 +139,7 @@ git fetch origin
 git checkout release
 git merge --ff-only origin/release
 ```
-  - Update `versions.cmake` and `CMakeLists.txt`
+  - Update `CMakeLists.txt`
     - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
       version in `CMakeLists.txt`:
 ```
@@ -145,6 +147,7 @@ git merge --ff-only origin/release
 set(paraview_SOURCE_SELECTION "VERSION" CACHE STRING "Force version to VERSION" FORCE)
 set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
 ```
+  - Update `versions.cmake`
     - [ ] Guide selections in `versions.cmake`
     - [ ] `git add versions.cmake CMakeLists.txt`
     - [ ] `git commit -m "Update the default version to VERSION"`
@@ -158,6 +161,7 @@ git add CMakeLists.txt
 git commit --amend
 git gitlab-push -f
 ```
+  - Finalize merge request
     - [ ] Remove WIP from merge request title
     - [ ] Get positive review
     - [ ] `Do: merge`
