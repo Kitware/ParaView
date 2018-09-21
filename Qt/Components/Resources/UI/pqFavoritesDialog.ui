@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>pqBookmarksDialog</class>
- <widget class="QDialog" name="pqBookmarksDialog">
+ <class>pqFavoritesDialog</class>
+ <widget class="QDialog" name="pqFavoritesDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,11 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Bookmarks Manager</string>
+   <string>Favorites Manager</string>
   </property>
   <layout class="QGridLayout">
    <item row="2" column="1">
-    <widget class="QPushButton" name="removeBookmark">
+    <widget class="QPushButton" name="removeFavorite">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -108,16 +108,16 @@
     </widget>
    </item>
    <item row="0" column="2" rowspan="4">
-    <widget class="QGroupBox" name="bookmarksGroup">
+    <widget class="QGroupBox" name="favoritesGroup">
      <property name="title">
-      <string>Bookmarks</string>
+      <string>Favorites</string>
      </property>
      <layout class="QGridLayout">
       <property name="rightMargin">
        <number>0</number>
       </property>
       <item row="0" column="0" rowspan="2" colspan="5">
-       <widget class="pqBookmarksTreeWidget" name="bookmarks">
+       <widget class="pqFavoritesTreeWidget" name="favorites">
         <property name="contextMenuPolicy">
          <enum>Qt::NoContextMenu</enum>
         </property>
@@ -189,7 +189,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QPushButton" name="addBookmark">
+    <widget class="QPushButton" name="addFavorite">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -208,13 +208,13 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqBookmarksTreeWidget</class>
+   <class>pqFavoritesTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>pqBookmarksTreeWidget.h</header>
+   <header>pqFavoritesTreeWidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>bookmarks</tabstop>
+  <tabstop>favorites</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
@@ -224,7 +224,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>pqBookmarksDialog</receiver>
+   <receiver>pqFavoritesDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -240,7 +240,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>pqBookmarksDialog</receiver>
+   <receiver>pqFavoritesDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

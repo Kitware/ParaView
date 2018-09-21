@@ -344,7 +344,7 @@ void pqFiltersMenuReaction::updateEnableState(bool updateOnlyToolbars)
     for (QAction* menuAction : menuActions)
     {
       if (menuAction->isSeparator() || !menuAction->menu() ||
-        menuAction->menu() == mgr->getBookmarksMenu())
+        menuAction->menu() == mgr->getFavoritesMenu())
       {
         continue;
       }

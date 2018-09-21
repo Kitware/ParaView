@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqManageBookmarksReaction.cxx
+   Module: pqManageFavoritesReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,17 +29,17 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqManageBookmarksReaction.h"
+#include "pqManageFavoritesReaction.h"
 
-#include "pqBookmarksDialog.h"
 #include "pqCoreUtilities.h"
+#include "pqFavoritesDialog.h"
 #include "pqProxyGroupMenuManager.h"
 
 #include <QAction>
 #include <QVariant>
 
 //-----------------------------------------------------------------------------
-void pqManageBookmarksReaction::manageBookmarks(pqProxyGroupMenuManager* manager)
+void pqManageFavoritesReaction::manageFavorites(pqProxyGroupMenuManager* manager)
 {
 
   QVariantList data;
@@ -51,7 +51,7 @@ void pqManageBookmarksReaction::manageBookmarks(pqProxyGroupMenuManager* manager
     data << proxyStrings;
   }
 
-  pqBookmarksDialog dialog(data, pqCoreUtilities::mainWidget());
-  dialog.setObjectName("BookmarksManagerDialog");
+  pqFavoritesDialog dialog(data, pqCoreUtilities::mainWidget());
+  dialog.setObjectName("FavoritesManagerDialog");
   dialog.exec();
 }

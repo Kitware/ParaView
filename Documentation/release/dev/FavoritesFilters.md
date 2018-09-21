@@ -1,7 +1,7 @@
-# Bookmarks for filters
+# Favorites for filters
 
-* Introduce the concept of bookmarks for filters.
-  The 'manage bookmarks' dialog allows to create and arrange bookmarks under
+* Introduce the concept of favorites for filters.
+  The 'manage favorites' dialog allows to create and arrange favorites under
   recursive custom categories.
-  Bookmarks are accessible from 'Filters' menu.
-  The pipeline context menu contains an 'Add bookmark' action.
+  Favorites are accessible from 'Filters' menu.
+  The pipeline context menu contains an 'Add favorite' action.

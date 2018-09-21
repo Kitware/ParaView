@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqBookmarksTreeWidget_h
-#define _pqBookmarksTreeWidget_h
+#ifndef _pqFavoritesTreeWidget_h
+#define _pqFavoritesTreeWidget_h
 
 #include <QTreeWidget>
 
@@ -42,16 +42,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QTreeWidgetItem;
 
 /**
- * pqBookmarksTreeWidget is a custom widget used to display Bookmarks.
+ * pqFavoritesTreeWidget is a custom widget used to display Favorites.
  * It extands a QTreeWidget.
  */
-class PQCOMPONENTS_EXPORT pqBookmarksTreeWidget : public QTreeWidget
+class PQCOMPONENTS_EXPORT pqFavoritesTreeWidget : public QTreeWidget
 {
   typedef QTreeWidget Superclass;
   Q_OBJECT
 
 public:
-  pqBookmarksTreeWidget(QWidget* p = NULL);
+  pqFavoritesTreeWidget(QWidget* p = NULL);
 
   bool isDropOnItem() { return this->dropIndicatorPosition() == QAbstractItemView::OnItem; }
 
@@ -69,4 +69,4 @@ protected:
   QSet<QTreeWidgetItem*> UnfoldedDraggedCategories;
 };
 
-#endif // !_pqBookmarksTreeWidget_h
+#endif // !_pqFavoritesTreeWidget_h

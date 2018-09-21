@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqAddToBookmarksReaction.h
+   Module:    pqAddToFavoritesReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,27 +29,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqAddToBookmarksReaction_h
-#define pqAddToBookmarksReaction_h
+#ifndef pqAddToFavoritesReaction_h
+#define pqAddToFavoritesReaction_h
 
 #include "pqReaction.h"
 
 /**
 * @ingroup Reactions
-* Reaction to add selected filter in bookmarks
+* Reaction to add selected filter in favorites
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqAddToBookmarksReaction : public pqReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqAddToFavoritesReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 
 public:
-  pqAddToBookmarksReaction(QAction* parent, QVector<QString>& filters);
+  pqAddToFavoritesReaction(QAction* parent, QVector<QString>& filters);
 
   /**
-   * Add filter in bookmarks.
+   * Add filter in favorites.
    */
-  static void addToBookmarks(QAction* parent);
+  static void addToFavorites(QAction* parent);
 
 public slots:
   /**
@@ -62,10 +62,10 @@ protected:
   /**
    * Called when the action is triggered.
    */
-  void onTriggered() override { pqAddToBookmarksReaction::addToBookmarks(this->parentAction()); }
+  void onTriggered() override { pqAddToFavoritesReaction::addToFavorites(this->parentAction()); }
 
 private:
-  Q_DISABLE_COPY(pqAddToBookmarksReaction)
+  Q_DISABLE_COPY(pqAddToFavoritesReaction)
 
   QVector<QString> Filters;
 };

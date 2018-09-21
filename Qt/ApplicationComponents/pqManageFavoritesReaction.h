@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqManageBookmarksReaction.h
+   Module: pqManageFavoritesReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqManageBookmarksReaction_h
-#define pqManageBookmarksReaction_h
+#ifndef pqManageFavoritesReaction_h
+#define pqManageFavoritesReaction_h
 
 #include "pqMasterOnlyReaction.h"
 
@@ -39,30 +39,30 @@ class pqProxyGroupMenuManager;
 
 /**
  * @ingroup Reactions
- * pqManageBookmarksReaction is the reaction to pop-up the bookmarks manager dialog.
+ * pqManageFavoritesReaction is the reaction to pop-up the favorites manager dialog.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqManageBookmarksReaction : public pqMasterOnlyReaction
+class PQAPPLICATIONCOMPONENTS_EXPORT pqManageFavoritesReaction : public pqMasterOnlyReaction
 {
   Q_OBJECT
   typedef pqMasterOnlyReaction Superclass;
 
 public:
-  pqManageBookmarksReaction(QAction* action, pqProxyGroupMenuManager* mgr)
+  pqManageFavoritesReaction(QAction* action, pqProxyGroupMenuManager* mgr)
     : Superclass(action)
     , manager(mgr)
   {
   }
 
   /**
-   * Pops-up the pqBookmarkDialog dialog.
+   * Pops-up the pqFavoriteDialog dialog.
    */
-  static void manageBookmarks(pqProxyGroupMenuManager* manager);
+  static void manageFavorites(pqProxyGroupMenuManager* manager);
 
 protected:
-  void onTriggered() override { pqManageBookmarksReaction::manageBookmarks(this->manager); }
+  void onTriggered() override { pqManageFavoritesReaction::manageFavorites(this->manager); }
 
 private:
-  Q_DISABLE_COPY(pqManageBookmarksReaction)
+  Q_DISABLE_COPY(pqManageFavoritesReaction)
 
   pqProxyGroupMenuManager* manager;
 };
