@@ -162,7 +162,11 @@ vtkSMTrace* vtkSMTrace::StartTrace(const char* preamble)
     {
       vtkPythonScopeGilEnsurer gilEnsurer;
       std::ostringstream str;
-      str << "# trace generated using " << vtkSMProxyManager::GetParaViewSourceVersion() << "\n";
+      str << "# trace generated using " << vtkSMProxyManager::GetParaViewSourceVersion() << "\n"
+          << "#"
+          << "\n"
+          << "# To ensure correct image size when batch processing, please search \n"
+          << "# for and uncomment the line `# renderView*.ViewSize = [*,*]`\n";
       vtkSmartPyObject _start_trace_internal(PyObject_CallMethod(
         vtkSMTrace::ActiveTracer->GetTraceModule(), const_cast<char*>("_start_trace_internal"),
         const_cast<char*>("(s)"), const_cast<char*>(preamble ? preamble : str.str().c_str())));
