@@ -68,6 +68,20 @@ public:
   vtkGetMacro(OutlineThreshold, vtkIdType);
   //@}
 
+  enum
+  {
+    AUTOMATIC = 0,
+    ALWAYS_2D = 1,
+    ALWAYS_3D = 2
+  };
+  //@{
+  /**
+   * Set the default interaction mode.
+   */
+  vtkSetMacro(DefaultInteractionMode, int);
+  vtkGetMacro(DefaultInteractionMode, int);
+  //@}
+
   //@{
   /**
    * Set the radius in pixels to include for finding the closet point when
@@ -90,6 +104,7 @@ protected:
   vtkPVRenderViewSettings();
   ~vtkPVRenderViewSettings() override;
 
+  int DefaultInteractionMode;
   vtkIdType OutlineThreshold;
   int PointPickingRadius;
   bool DisableIceT;
