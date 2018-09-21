@@ -1196,7 +1196,7 @@ int main(int argc, char* argv[])
   size_t nspos;
   FILE* fp;
   NewClassInfo* classData;
-  int i;
+  int i, j;
 
   /* pre-define a macro to identify the language */
   vtkParse_DefineMacro("__VTK_WRAP_CLIENTSERVER__", 0);
@@ -1292,8 +1292,19 @@ int main(int argc, char* argv[])
 
   for (i = 0; i < data->NumberOfSuperClasses; ++i)
   {
-    if (strchr(data->SuperClasses[i], '<'))
+    if (strncmp(data->SuperClasses[i], "vtk", 3) == 0 && strchr(data->SuperClasses[i], '<'))
     {
+      fprintf(fp, "// This automatically generated file contains only a stub,\n");
+      fprintf(fp, "// bacause the class %s is based on a templated VTK class.\n", data->Name);
+      fprintf(fp, "// Wrapping such classes is not currently supported.\n");
+      fprintf(fp, "// Here follows the list of detected superclasses "
+                  "(first offending one marked by !):\n");
+
+      for (j = 0; j < data->NumberOfSuperClasses; ++j)
+      {
+        fprintf(fp, "// %c %s\n", i == j ? '!' : ' ', data->SuperClasses[j]);
+      }
+
       output_DummyInitFunction(fp, fileInfo->FileName);
       fclose(fp);
       exit(0);
