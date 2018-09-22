@@ -270,29 +270,21 @@ void pqSpreadSheetViewWidget::onSectionDoubleClicked(int logicalindex)
   this->SingleColumnMode = !this->SingleColumnMode;
   for (int cc = 0; cc < numcols; cc++)
   {
-    QString headerTitle = this->model()->headerData(cc, Qt::Horizontal).toString();
     this->setColumnHidden(cc, (this->SingleColumnMode && cc != logicalindex));
     if (this->SingleColumnMode && cc == logicalindex)
     {
-#if QT_VERSION >= 0x050000
       header->setSectionResizeMode(cc, QHeaderView::Stretch);
-#else
-      header->setResizeMode(cc, QHeaderView::Stretch);
-#endif
     }
     else if (!this->SingleColumnMode)
     {
-#if QT_VERSION >= 0x050000
       header->setSectionResizeMode(cc, QHeaderView::Interactive);
-#else
-      header->setResizeMode(cc, QHeaderView::Interactive);
-#endif
     }
   }
 
   if (!this->SingleColumnMode)
   {
-    this->resizeColumnsToContents();
+    // re-load column visibility from the data model.
+    this->onHeaderDataChanged();
   }
 }
 //-----------------------------------------------------------------------------
