@@ -143,7 +143,7 @@ set(RESULTING_HTML_HELP_FILE "${DOXTEMP}/vtk@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_V
 #   CREATE_HTML_TARZ_ARCHIVE @DOCUMENTATION_HTML_TARZ@
 #   RESULTING_HTML_TARZ_ARCHIVE_FILE $DOXTEMP/vtk@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@-html.tar.gz
 #
-set(CREATE_HTML_TARZ_ARCHIVE ON)
+set(CREATE_HTML_TARZ_ARCHIVE OFF)
 set(RESULTING_HTML_TARZ_ARCHIVE_FILE "${DOXTEMP}/ParaView-html.tar.gz")
 
 # DOWNLOAD_VTK_TAGFILE VTK_TAGFILE VTK_TAGFILE_REMOTE_DIR VTK_TAGFILE_DEST_DIR:
@@ -460,8 +460,8 @@ endif()
 # ----------------------------------------------------------------------------
 # Create the *.tar.gz file
 
-step(12 "build *.tar.gz file")
 if(CREATE_HTML_TARZ_ARCHIVE)
+  step(12 "build *.tar.gz file")
   if(NOT RESULTING_HTML_TARZ_ARCHIVE_FILE STREQUAL "")
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar cfz ${RESULTING_HTML_TARZ_ARCHIVE_FILE} html
       WORKING_DIRECTORY ${OUTPUT_DIRECTORY}
@@ -472,6 +472,8 @@ if(CREATE_HTML_TARZ_ARCHIVE)
       message(FATAL_ERROR "Command failed: ${rv}")
     endif()
   endif()
+else()
+  step(12 "build *.tar.gz file -- skipping")
 endif()
 
 # ----------------------------------------------------------------------------
