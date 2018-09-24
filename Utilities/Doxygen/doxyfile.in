@@ -12,7 +12,6 @@ GENERATE_TREEVIEW    = NO
 GENERATE_TODOLIST    = YES
 GENERATE_BUGLIST     = YES
 GENERATE_HTML        = YES
-GENERATE_HTMLHELP    = YES
 GENERATE_LATEX       = NO
 GENERATE_MAN         = NO
 GENERATE_RTF         = NO
@@ -39,7 +38,14 @@ ALLEXTERNALS         = NO
 
 IMAGE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@/images"
 
-OUTPUT_DIRECTORY     = "@CMAKE_CURRENT_BINARY_DIR@/doc"
+# The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
+# into which the generated documentation will be written.
+OUTPUT_DIRECTORY     = "@DOCUMENTATION_OUTPUT_DIRECTORY@"
+
+# The HTML_OUTPUT tag is used to specify where the HTML docs
+# will be put. If a relative path is entered the value of
+# OUTPUT_DIRECTORY will be put in front of it.
+HTML_OUTPUT          = "cxx"
 
 INPUT                = \
           "@CMAKE_CURRENT_BINARY_DIR@/dox" \

@@ -38,7 +38,7 @@ add_custom_target(ParaViewPythonDoc
           "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview"
   COMMAND ${sphinx-build}
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
-          "${PARAVIEW_WWW_DIR}/py-doc"
+          "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/python"
   SOURCES sphinx_apidoc.py
           config/index.rst
           config/quick-start.rst

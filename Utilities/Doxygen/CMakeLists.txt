@@ -49,6 +49,12 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/pages/index.md.in
   ${CMAKE_CURRENT_BINARY_DIR}/pages/index.md)
 
+# this var tells doxyfile where to generate the html pages.
+# in doxyfile we place all html pages relative to this dir under "cxx"
+# (see `HTML_OUTPUT`) var in doxyfile.in
+set(DOCUMENTATION_OUTPUT_DIRECTORY
+  "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}")
+
 configure_file(
   ${ParaView_SOURCE_DIR}/Utilities/Doxygen/doxyfile.in
   ${ParaView_BINARY_DIR}/Utilities/Doxygen/doxyfile)
@@ -63,9 +69,4 @@ add_custom_target(ParaViewDoxygenDoc
   -P ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake
   DEPENDS ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake)
 
-add_custom_target(ParaViewDoxygenDoc-copy
-  DEPENDS ParaViewDoxygenDoc
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc/html "${PARAVIEW_WWW_DIR}/cxx-doc"
-)
-
-add_dependencies(ParaViewDoc ParaViewDoxygenDoc-copy)
+add_dependencies(ParaViewDoc ParaViewDoxygenDoc)
