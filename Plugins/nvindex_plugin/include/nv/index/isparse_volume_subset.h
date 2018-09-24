@@ -165,7 +165,7 @@ public:
     mi::Uint32 lod_level) const = 0;
 
   /// Returns the level-of-detail range used by the subset. The components of the returned vector
-  /// indicate the lowest (x-component) and hightest (y-component) level-of-detail used by the
+  /// indicate the lowest (x-component) and highest (y-component) level-of-detail used by the
   /// subset.
   ///
   virtual mi::math::Vector_struct<mi::Uint32, 2> get_subset_lod_level_range() const = 0;
@@ -291,8 +291,7 @@ public:
   /// sub-blocks
   ///                                     in the linear source buffer. These offsets need to be
   ///                                     defined
-  ///                                     as numbers of typed elements according the the voxel type
-  ///                                     of
+  ///                                     as numbers of typed elements according the voxel type of
   ///                                     the volume brick. If this parameter is 0, the offsets will
   ///                                     be derived from the \c dst_ranges parameter assuming a
   ///                                     tight

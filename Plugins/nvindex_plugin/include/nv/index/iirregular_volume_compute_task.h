@@ -34,9 +34,9 @@ public:
   /// volume subset data.
   enum Operation_mode
   {
-    /// Updating the scala values attached at cell vertices.
-    OPERATION_MODE_SCALA_VALUE_EDITING = 1,
-    /// Updating the poitions and possibly scala values at the
+    /// Updating the scalar values attached at cell vertices.
+    OPERATION_MODE_SCALAR_VALUE_EDITING = 1,
+    /// Updating the positions and possibly scalar values at the
     /// cell vertices but not changing the volumes topology.
     OPERATION_MODE_VERTEX_EDITING = 2,
     /// Reset the irregular volume subset that is contained in the given
@@ -109,11 +109,11 @@ public:
 
   using mi::base::Interface_implement<IIrregular_volume_compute_task>::edit;
 
-  /// Apply an editing to the scala values only.
+  /// Apply an editing to the scalar values only.
   ///
   /// \return compute mode for the task.
   ///
-  virtual Operation_mode get_operation_mode() const { return OPERATION_MODE_SCALA_VALUE_EDITING; }
+  virtual Operation_mode get_operation_mode() const { return OPERATION_MODE_SCALAR_VALUE_EDITING; }
 };
 }
 } // namespace index / nv

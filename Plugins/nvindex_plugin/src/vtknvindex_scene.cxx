@@ -33,6 +33,7 @@
 
 #include <nv/index/idistributed_compute_algorithm.h>
 #include <nv/index/idistributed_data_import_callback.h>
+#include <nv/index/iirregular_volume_rendering_properties.h>
 #include <nv/index/ilight.h>
 #include <nv/index/imaterial.h>
 #include <nv/index/iplane.h>
@@ -507,15 +508,35 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       assert(m_rtc_program_tag.is_valid());
 
       // Create scene volume properties attribute.
-      mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_render_properties(
-        scene->create_attribute<nv::index::IRegular_volume_rendering_properties>());
-      assert(vol_render_properties.is_valid_interface());
+      if (volume_type == VOLUME_TYPE_REGULAR)
+      {
+        mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_render_properties(
+          scene->create_attribute<nv::index::IRegular_volume_rendering_properties>());
+        assert(vol_render_properties.is_valid_interface());
 
-      vol_render_properties->set_reference_step_size(calculate_volume_reference_step_size(
-        vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
+        vol_render_properties->set_reference_step_size(calculate_volume_reference_step_size(vol,
+          pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
 
-      m_vol_properties_tag =
-        dice_transaction->store_for_reference_counting(vol_render_properties.get());
+        m_vol_properties_tag =
+          dice_transaction->store_for_reference_counting(vol_render_properties.get());
+      }
+      else
+      {
+        mi::base::Handle<nv::index::IIrregular_volume_rendering_properties> vol_render_properties(
+          scene->create_attribute<nv::index::IIrregular_volume_rendering_properties>());
+        assert(vol_render_properties.is_valid_interface());
+
+        nv::index::IIrregular_volume_rendering_properties::Rendering render_properties;
+        vol_render_properties->get_rendering(render_properties);
+
+        render_properties.sampling_reference_segment_length = calculate_volume_reference_step_size(
+          vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference());
+
+        vol_render_properties->set_rendering(render_properties);
+
+        m_vol_properties_tag =
+          dice_transaction->store_for_reference_counting(vol_render_properties.get());
+      }
       assert(m_vol_properties_tag.is_valid());
 
       // Volume compute attribute

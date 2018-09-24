@@ -65,7 +65,7 @@ public:
   /// \param[in]  s   Sampling distance (default value is 1.0f).
   ///
   virtual void set_reference_sampling_distance(mi::Float32 s) = 0;
-  /// Returns the referemce sampling distance used for a sparse volume scene element (\c
+  /// Returns the reference sampling distance used for a sparse volume scene element (\c
   /// ISparse_volume_scene_element).
   virtual mi::Float32 get_reference_sampling_distance() const = 0;
 
@@ -107,27 +107,27 @@ public:
   /// allows for
   /// a more coarse LOD selection displaying lower resolution data closer to the view point.
   ///
-  /// \param[in]  pixel_threshold     Scalar pixel thresould.
+  /// \param[in]  pixel_threshold     Scalar pixel threshold.
   ///
   virtual void set_lod_pixel_threshold(mi::Float32 pixel_threshold) = 0;
-  /// Returns the currently set scalar pixel threshould.
+  /// Returns the currently set scalar pixel threshold.
   virtual mi::Float32 get_lod_pixel_threshold() const = 0;
 
 #if 0 // EXTENSION LOD active level range control
     /// Set the active LOD-level range to be used by NVIDIA IndeX.
-    /// 
+    ///
     /// The active LOD-level range limits the data NVIDIA IndeX is requesting to be written
     /// to this LOD-texture instance and accesses during rendering.
-    /// 
+    ///
     /// \param[in]  lod_level_range     The LOD-range to be used by NVIDIA IndeX.
-    ///             
+    ///
     virtual void                            set_active_LOD_level_range(
                                                 const mi::math::Vector_struct<mi::Uint32, 2>& lod_level_range) = 0;
 
     /// Returns the currently active LOD-level range to be used by NVIDIA IndeX.
-    /// 
+    ///
     /// \returns    The currently active LOD-level range.
-    /// 
+    ///
     virtual mi::math::Vector_struct<mi::Uint32, 2>  get_active_LOD_level_range() const = 0;
 #endif
 
@@ -135,7 +135,7 @@ public:
   /// ISparse_volume_scene_element).
   /// Per default this is disabled.
   ///
-  /// \param[in] enable           Enables the pre-integrated volume renderingn technique
+  /// \param[in] enable           Enables the pre-integrated volume rendering technique
   ///                             if (\c true) otherwise the technique will be disabled (\c false).
   ///
   virtual void set_preintegrated_volume_rendering(bool enable) = 0;
