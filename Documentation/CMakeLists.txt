@@ -1,8 +1,21 @@
-add_custom_target(ParaViewWelcomeDoc
-  DEPENDS index-doc.html
-  COMMAND ${CMAKE_COMMAND} -E copy_directory "${ParaView_SOURCE_DIR}/Documentation/img" "${PARAVIEW_WWW_DIR}/img"
-  COMMAND ${CMAKE_COMMAND} -E copy "${ParaView_SOURCE_DIR}/Documentation/index-doc.html" ${PARAVIEW_WWW_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy "${ParaView_SOURCE_DIR}/Documentation/kitware.css" ${PARAVIEW_WWW_DIR}
-)
+file(MAKE_DIRECTORY ${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY})
 
-add_dependencies(ParaViewDoc ParaViewWelcomeDoc)
+#---------------------------------------------------------------------------------
+# add a txt file to indicate which source version the documentation was
+# generated for.
+set(CMAKE_CONFIGURABLE_FILE_CONTENT "${PARAVIEW_VERSION_FULL}")
+configure_file("${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in"
+               "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/version.txt")
+unset(CMAKE_CONFIGURABLE_FILE_CONTENT)
+
+#---------------------------------------------------------------------------------
+# add a custom command to package the documentations into a tar ball thats
+# easy  to move around.
+add_custom_target(ParaViewDoc-TGZ
+  COMMAND
+    ${CMAKE_COMMAND} -E tar cfz
+    ${CMAKE_CURRENT_BINARY_DIR}/ParaViewGeneratedDocs.tar.gz
+    ${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}
+  WORKING_DIRECTORY ${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/..
+  COMMENT "Generate ParaViewGeneratedDocs.tar.gz")
+add_dependencies(ParaViewDoc-TGZ ParaViewDoc)

@@ -165,9 +165,7 @@ if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
 # Leaving  VTK_PYTHON_SITE_PACKAGES_SUFFIX unchanged. VTK picks a good one.
-if(NOT PARAVIEW_WWW_DIR)
-  set(PARAVIEW_WWW_DIR "${ParaView_BINARY_DIR}/www")
-endif()
+
 set(PARAVIEW_MODULES_DIR ${VTK_MODULES_DIR})
 
 if (NOT DEFINED VTK_CUSTOM_LIBRARY_SUFFIX)
@@ -190,6 +188,12 @@ if(NOT PARAVIEW_BUILD_PLUGINS_DIR)
   else()
     set(PARAVIEW_BUILD_PLUGINS_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/paraview-${PARAVIEW_VERSION}/plugins)
   endif()
+endif()
+
+# This is the directory under which all generated docs, such as Doxygen and
+# Sphinx generated docs, are placed.
+if(NOT PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY)
+  set(PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY "${ParaView_BINARY_DIR}/doc")
 endif()
 
 # Disable installing of the Qt Designer plugin. There's no need for it in
