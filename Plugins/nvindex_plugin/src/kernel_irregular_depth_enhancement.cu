@@ -208,7 +208,7 @@ public:
         return NV_IDX_PROG_OK;
     }
 
-    // compute gradient for irrgular volume
+    // compute gradient for irregular volume
     NV_IDX_DEVICE_INLINE_MEMBER
     float3 get_gradient_3n(const Sample_info_self&  sample_info, float vs_c)
     {

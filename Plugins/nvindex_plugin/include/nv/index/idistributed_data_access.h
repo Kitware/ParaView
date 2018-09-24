@@ -183,7 +183,7 @@ public:
   /// extent of the stored values is defined by the computed 2D
   /// bounding box.  The method returns the pointer to the elevation
   /// value array.  The interface class 'owns' the elevation values,
-  /// i.e., the destructer of the implemented interface class
+  /// i.e., the destructor of the implemented interface class
   /// deletes the local data.
   ///
   /// \return         The pointer to the first element of the accessed

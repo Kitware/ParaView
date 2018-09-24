@@ -27,7 +27,7 @@ class IIrregular_volume_scene_element
 public:
   /// Returns the length of the longest edge in the irregular volume mesh.
   ///
-  /// \note       This information is required for correct visual results. It sets an improtant
+  /// \note       This information is required for correct visual results. It sets an important
   ///             bound for the renderer to consider for setting up internal resources.
   ///
   /// \returns    The length of the longest edge in the irregular volume mesh.

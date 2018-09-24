@@ -244,7 +244,7 @@ public:
 /// position cast through the scene.
 ///
 /// Each query result gives information about the scene element hit by the ray. This
-/// information includes, for instance, the scene lement's \c tag to clearly identify it
+/// information includes, for instance, the scene element's \c tag to clearly identify it
 /// and the intersection point in the scene element's IJK space.
 ///
 class IScene_lookup_result : public mi::base::Interface_declare<0x8832eb30, 0x1c5e, 0x4ab8, 0x90,

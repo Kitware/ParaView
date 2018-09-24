@@ -34,7 +34,7 @@ namespace index
 class IScene_visitor
 {
 public:
-  /// The scene representation can be travered depth-first order only today.
+  /// The scene representation can be traversed depth-first order only today.
   /// When traversing in depth-first order, each node is visited twice
   /// i.e., in forward or backward directions.
   ///
@@ -56,12 +56,12 @@ public:
   /// \param uuid             The unique identifier that represents the
   ///                         type of the visited class.
   ///
-  /// \param evaluation_mode  The scene representation can be travered
+  /// \param evaluation_mode  The scene representation can be traversed
   ///                         depth-first order and a node is evaluated
   ///                         twice in, i.e., in forward or backward
-  ///                         directions. The method can handle the
+  ///                         directions. The method can handle
   ///                         the evaluation based on either one
-  ///                         appropriatey.
+  ///                         appropriately.
   ///
   /// \param transaction      The transaction used when traversing the
   ///                         scene.

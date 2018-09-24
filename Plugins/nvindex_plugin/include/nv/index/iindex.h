@@ -95,7 +95,7 @@
 /// @defgroup xac_obj XAC elements
 /// @ingroup xac
 /// Scene elements for XAC programs.
-/// Predefinied elements that are part of the XAC interface can provide information
+/// Predefined elements that are part of the XAC interface can provide information
 /// about the current IndeX state as well as a set of geometric scene elements used.
 /// for the final visualization output.
 
