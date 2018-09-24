@@ -647,8 +647,11 @@ class PropertyTraceHelper(object):
                   return data[0]
             except IndexError:
                 return "None"
+        elif myobject.SMProperty.IsA("vtkSMStringVectorProperty"):
+            # handle multiline properties (see #18480)
+            return self.create_multiline_string(repr(myobject))
         else:
-            return str(myobject)
+            return repr(myobject)
 
     def has_proxy_list_domain(self):
         """Returns True if this property has a ProxyListDomain, else False."""
@@ -661,6 +664,24 @@ class PropertyTraceHelper(object):
         """Return the Property value as would be returned by
         servermanager.Proxy.GetPropertyValue()."""
         return self.ProxyAccessor.get_object().GetPropertyValue(self.get_property_name())
+
+    def create_multiline_string(self, astr):
+        """helper to convert a string representation into a multiline string"""
+        if '\\n' in astr:
+            # this happens for multiline string-vector properties.
+            # for those, we ensure that the `astr` has raw \n's rather than
+            # the escaped version. we also fix the string indicators.
+
+            # replace '\\n' with real '\n'
+            astr = astr.replace('\\n','\n')
+
+            # escape any `"""` in the script
+            astr = astr.replace('"""', '\\"\\"\\"')
+
+            # replace first and last characters with `"""`
+            astr = '"""' + astr[1:-1] + '"""'
+        return astr
+
 
 # ===================================================================================================
 # === Filters used to filter properties traced ===
