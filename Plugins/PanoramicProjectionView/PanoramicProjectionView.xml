@@ -1,0 +1,50 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+    <RenderViewProxy name="PanoramicProjectionView" class="vtkPVPanoramicProjectionView"
+        label="Panoramic Projection View"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views" base_proxyname="RenderView">
+    <Documentation>
+      This view allows visualization of large view angles mapping a panorama to a single image.
+      The image can be used as input for several devices (VR headsets, panaramic screens, domes...)
+    </Documentation>
+      <IntVectorProperty command="SetProjectionType"
+                         default_values="0"
+                         name="ProjectionType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Equirectangular" value="1" />
+          <Entry text="Azimuthal (fish eye)" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Set the projection type used to map the scene to the 2D image.
+          Equirectangular projection maps meridians to vertical straight lines
+          and circles of latitude to horizontal straight lines.
+          Azimuthal equidistant projection maps all points of the scene
+          based on their distance to the view direction. This projection produces a fisheye effect.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetAngle"
+                         default_values="180"
+                         name="ProjectionAngle"
+                         number_of_elements="1">
+        <DoubleRangeDomain name="range" min="90" max="360" />
+        <Documentation>
+          Set the angle used by the projection shader. 180 degrees is a half sphere, 360 degrees
+          is a full sphere, but any values in the range (90;360) can be set.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetCubeResolution"
+                         default_values="500"
+                         name="CubeResolution"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="100" max="10000" />
+        <Documentation>
+          Set the internal cubemap resolution.
+          Increasing it improves the result but the rendering will be slower.
+        </Documentation>
+      </IntVectorProperty>
+    </RenderViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
