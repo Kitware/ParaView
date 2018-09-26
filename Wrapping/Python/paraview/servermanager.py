@@ -675,13 +675,14 @@ class Property(object):
             else:
                 repr = "None"
         else:
+            # this happens for command properties i.e. ones that do not store
+            # any state. For those, we use this alternate representation.
             repr = "Property name= "
             name = self.Proxy.GetPropertyName(self.SMProperty)
             if name:
                 repr += name
             else:
                 repr += "Unknown"
-
         return repr
 
     def __call__(self):
