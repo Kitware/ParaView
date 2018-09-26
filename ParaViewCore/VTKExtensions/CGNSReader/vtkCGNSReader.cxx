@@ -235,7 +235,7 @@ public:
 
     // We'll use vtkExtractGrid, which needs VOI in point extents.
     vtkNew<vtkExtractGrid> extractVOI;
-    int voi[6];
+    int voi[6] = { 0, 0, 0, 0, 0, 0 };
     this->GetVOI(voi, cellDim);
     extractVOI->SetInputDataObject(zoneGrid);
     extractVOI->SetVOI(voi);
