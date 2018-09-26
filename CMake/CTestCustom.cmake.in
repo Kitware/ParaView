@@ -97,10 +97,6 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # Ignore Mac link error about read_only_relocs
   "ld.*warning.*read_only_relocs cannot be used with x86_64"
 
-  # exclude warning from MantaView  plugin
-  "MantaView.VTK"
-  "manta"
-
   # exclude warning from GeodesicMeasurement plugin
   "GeodesicMeasurementPlugin"
   "FmmMesh"
