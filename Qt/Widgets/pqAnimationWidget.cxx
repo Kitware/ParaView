@@ -284,6 +284,12 @@ void pqAnimationWidget::resizeEvent(QResizeEvent* e)
   this->updateGeometries();
 }
 
+void pqAnimationWidget::showEvent(QShowEvent* e)
+{
+  this->Superclass::showEvent(e);
+  this->updateGeometries();
+}
+
 void pqAnimationWidget::headerDeleteClicked(int which)
 {
   if (which > 0)

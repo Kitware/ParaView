@@ -86,6 +86,7 @@ protected:
   void scrollContentsBy(int dx, int dy) override;
   bool event(QEvent* e) override;
   void resizeEvent(QResizeEvent* e) override;
+  void showEvent(QShowEvent* e) override;
 
 private:
   QGraphicsView* View;
