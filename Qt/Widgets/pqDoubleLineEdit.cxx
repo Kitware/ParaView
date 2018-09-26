@@ -45,16 +45,20 @@ QTextStream::RealNumberNotation toTextStreamNotation(pqDoubleLineEdit::RealNumbe
   {
     return QTextStream::FixedNotation;
   }
-  else
+  else if (notation == pqDoubleLineEdit::ScientificNotation)
   {
     return QTextStream::ScientificNotation;
+  }
+  else
+  {
+    return QTextStream::SmartNotation;
   }
 }
 
 //-----------------------------------------------------------------------------
 QDoubleValidator::Notation toValidatorNotation(pqDoubleLineEdit::RealNumberNotation notation)
 {
-  if (notation == pqDoubleLineEdit::RealNumberNotation::ScientificNotation)
+  if (notation != pqDoubleLineEdit::RealNumberNotation::FixedNotation)
   {
     return QDoubleValidator::ScientificNotation;
   }

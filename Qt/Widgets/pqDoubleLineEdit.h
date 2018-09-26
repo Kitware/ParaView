@@ -74,7 +74,8 @@ public:
    */
   enum RealNumberNotation
   {
-    ScientificNotation = 1,
+    MixedNotation = 0,
+    ScientificNotation,
     FixedNotation
   };
 

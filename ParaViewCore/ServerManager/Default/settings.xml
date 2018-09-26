@@ -381,7 +381,7 @@
           Set the notation used to display real numbers.
         </Documentation>
         <EnumerationDomain name="enum">
-          <!-- Reserved for a possible future "Mixed" mode (value="0") -->
+          <Entry text="Mixed" value="0" />
           <Entry text="Scientific" value="1" />
           <Entry text="Fixed" value="2" />
         </EnumerationDomain>
