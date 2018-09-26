@@ -261,25 +261,9 @@ in default mode</string>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="advancedButton">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../pqComponents.qrc">
-          <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
-        </property>
-       </widget>
+       <widget class="QComboBox" name="groupChooser"/>
       </item>
      </layout>
-     <zorder>advancedButton</zorder>
-     <zorder>searchBox</zorder>
     </widget>
    </item>
   </layout>
