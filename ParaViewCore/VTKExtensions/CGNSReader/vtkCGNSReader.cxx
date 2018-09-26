@@ -22,6 +22,7 @@
 #endif
 
 #include "vtkCGNSReader.h"
+#include "vtkCGNSCache.h"          //for caching mesh points
 #include "vtkCGNSReaderInternal.h" // For parsing information request
 
 #include "vtkCallbackCommand.h"
@@ -364,6 +365,7 @@ vtkCGNSReader::vtkCGNSReader()
   : PointDataArraySelection()
   , CellDataArraySelection()
   , Internal(new CGNSRead::vtkCGNSMetaData())
+  , MeshPointsCache()
 {
   this->FileName = NULL;
 
@@ -379,6 +381,7 @@ vtkCGNSReader::vtkCGNSReader()
   this->IgnoreFlowSolutionPointers = false;
   this->DistributeBlocks = true;
   this->IgnoreSILChangeEvents = false;
+  this->CacheMesh = false;
 
   // Setup the selection callback to modify this object when an array
   // selection is changed.
@@ -404,6 +407,7 @@ vtkCGNSReader::vtkCGNSReader()
 vtkCGNSReader::~vtkCGNSReader()
 {
   this->SetFileName(0);
+  this->MeshPointsCache.ClearCache();
 
   this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
   this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
@@ -1207,9 +1211,8 @@ int vtkCGNSReader::vtkPrivate::AttachReferenceValue(
 }
 
 //------------------------------------------------------------------------------
-vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(int base,
-  int vtkNotUsed(zone), int cellDim, int physicalDim, const cgsize_t* zsize, const int* voi,
-  vtkCGNSReader* self)
+vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(int base, int zone,
+  int cellDim, int physicalDim, const cgsize_t* zsize, const int* voi, vtkCGNSReader* self)
 {
   int rind[6];
   int n;
@@ -1226,98 +1229,139 @@ vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(in
   cgsize_t memEnd[3] = { 1, 1, 1 };
   cgsize_t memDims[3] = { 1, 1, 1 };
 
+  int extent[6] = { 0, 0, 0, 0, 0, 0 };
+
   // Get Coordinates and FlowSolution node names
   std::string gridCoordName;
   std::vector<std::string> solutionNames;
+  std::string keyMesh;
 
   std::vector<double> gridChildId;
   std::size_t nCoordsArray = 0;
+  vtkSmartPointer<vtkPoints> points;
 
   vtkPrivate::getGridAndSolutionNames(base, gridCoordName, solutionNames, self);
 
-  vtkPrivate::getCoordsIdAndFillRind(
-    gridCoordName, physicalDim, nCoordsArray, gridChildId, rind, self);
-
-  // Rind was parsed (or not) then populate dimensions :
-  // Compute structured grid coordinate range
-  for (n = 0; n < cellDim; n++)
+  // If it is not a deforming mesh, gridCoordName keep the standard name
+  // Only Volume mesh points, not subset are cached
+  bool caching = (gridCoordName == "GridCoordinates" && voi == nullptr && self->CacheMesh);
+  if (caching)
   {
-    srcStart[n] = rind[2 * n] + 1;
-    srcEnd[n] = rind[2 * n] + zsize[n];
-    memEnd[n] = zsize[n];
-    memDims[n] = zsize[n];
-  }
+    // Try to get from cache
+    const char* basename = self->Internal->GetBase(base).name;
+    const char* zonename = self->Internal->GetBase(base).zones[zone].name;
+    // build a key /basename/zonename
+    std::ostringstream query;
+    query << "/" << basename << "/" << zonename;
+    keyMesh = query.str();
 
-  if (voi != nullptr)
-  {
-    // we are provided a sub-extent to read.
-    // First let's assert that the subextent is valid.
-    bool valid = true;
-    for (n = 0; n < cellDim; ++n)
+    points = self->MeshPointsCache.Find(keyMesh);
+    if (points.Get() != nullptr)
     {
-      valid &= (voi[2 * n] >= 0 && voi[2 * n] <= memEnd[n] && voi[2 * n + 1] >= 0 &&
-        voi[2 * n + 1] <= memEnd[n] && voi[2 * n] <= voi[2 * n + 1]);
-    }
-    if (!valid)
-    {
-      vtkGenericWarningMacro("Invalid sub-extent specified. Ignoring.");
-    }
-    else
-    {
-      // update src and mem pointers.
-      for (n = 0; n < cellDim; ++n)
+      // check storage data type
+      if ((self->GetDoublePrecisionMesh() != 0) != (points->GetDataType() == VTK_DOUBLE))
       {
-        srcStart[n] += voi[2 * n];
-        srcEnd[n] = srcStart[n] + (voi[2 * n + 1] - voi[2 * n]);
-        memEnd[n] = (voi[2 * n + 1] - voi[2 * n]) + 1;
-        memDims[n] = memEnd[n];
+        points = nullptr;
+      }
+      for (n = 0; n < cellDim; n++)
+      {
+        extent[1 + 2 * n] = zsize[n] - 1;
       }
     }
   }
 
-  // Compute number of points
-  const vtkIdType nPts = static_cast<vtkIdType>(memEnd[0] * memEnd[1] * memEnd[2]);
-
-  // Populate the extent array
-  int extent[6] = { 0, 0, 0, 0, 0, 0 };
-  extent[1] = memEnd[0] - 1;
-  extent[3] = memEnd[1] - 1;
-  extent[5] = memEnd[2] - 1;
-
-  // wacky hack ...
-  // memory aliasing is done
-  // since in vtk points array stores XYZ contiguously
-  // and they are stored separately in cgns file
-  // the memory layout is set so that one cgns file array
-  // will be filling every 3 chunks in memory
-  memEnd[0] *= 3;
-
-  // Set up points
-  vtkNew<vtkPoints> points;
-  //
-  // vtkPoints assumes float data type
-  //
-  if (self->GetDoublePrecisionMesh() != 0)
+  // Reading points in file since cache was not hit
+  if (points.Get() == nullptr)
   {
-    points->SetDataTypeToDouble();
-  }
-  //
-  // Resize vtkPoints to fit data
-  //
-  points->SetNumberOfPoints(nPts);
+    vtkPrivate::getCoordsIdAndFillRind(
+      gridCoordName, physicalDim, nCoordsArray, gridChildId, rind, self);
 
-  //
-  // Populate the coordinates.  Put in 3D points with z=0 if the mesh is 2D.
-  //
-  if (self->GetDoublePrecisionMesh() != 0) // DOUBLE PRECISION MESHPOINTS
-  {
-    CGNSRead::get_XYZ_mesh<double, float>(self->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
-      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points.Get());
-  }
-  else // SINGLE PRECISION MESHPOINTS
-  {
-    CGNSRead::get_XYZ_mesh<float, double>(self->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
-      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points.Get());
+    // Rind was parsed (or not) then populate dimensions :
+    // Compute structured grid coordinate range
+    for (n = 0; n < cellDim; n++)
+    {
+      srcStart[n] = rind[2 * n] + 1;
+      srcEnd[n] = rind[2 * n] + zsize[n];
+      memEnd[n] = zsize[n];
+      memDims[n] = zsize[n];
+    }
+
+    if (voi != nullptr)
+    {
+      // we are provided a sub-extent to read.
+      // First let's assert that the subextent is valid.
+      bool valid = true;
+      for (n = 0; n < cellDim; ++n)
+      {
+        valid &= (voi[2 * n] >= 0 && voi[2 * n] <= memEnd[n] && voi[2 * n + 1] >= 0 &&
+          voi[2 * n + 1] <= memEnd[n] && voi[2 * n] <= voi[2 * n + 1]);
+      }
+      if (!valid)
+      {
+        vtkGenericWarningMacro("Invalid sub-extent specified. Ignoring.");
+      }
+      else
+      {
+        // update src and mem pointers.
+        for (n = 0; n < cellDim; ++n)
+        {
+          srcStart[n] += voi[2 * n];
+          srcEnd[n] = srcStart[n] + (voi[2 * n + 1] - voi[2 * n]);
+          memEnd[n] = (voi[2 * n + 1] - voi[2 * n]) + 1;
+          memDims[n] = memEnd[n];
+        }
+      }
+    }
+
+    // Compute number of points
+    const vtkIdType nPts = static_cast<vtkIdType>(memEnd[0] * memEnd[1] * memEnd[2]);
+
+    // Populate the extent array
+    // int extent[6] = { 0, 0, 0, 0, 0, 0 };
+    extent[1] = memEnd[0] - 1;
+    extent[3] = memEnd[1] - 1;
+    extent[5] = memEnd[2] - 1;
+
+    // wacky hack ...
+    // memory aliasing is done
+    // since in vtk points array stores XYZ contiguously
+    // and they are stored separately in cgns file
+    // the memory layout is set so that one cgns file array
+    // will be filling every 3 chunks in memory
+    memEnd[0] *= 3;
+
+    // Set up points
+    points = vtkPoints::New();
+    //
+    // vtkPoints assumes float data type
+    //
+    if (self->GetDoublePrecisionMesh() != 0)
+    {
+      points->SetDataTypeToDouble();
+    }
+    //
+    // Resize vtkPoints to fit data
+    //
+    points->SetNumberOfPoints(nPts);
+
+    //
+    // Populate the coordinates.  Put in 3D points with z=0 if the mesh is 2D.
+    //
+    if (self->GetDoublePrecisionMesh() != 0) // DOUBLE PRECISION MESHPOINTS
+    {
+      CGNSRead::get_XYZ_mesh<double, float>(self->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
+        srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points.Get());
+    }
+    else // SINGLE PRECISION MESHPOINTS
+    {
+      CGNSRead::get_XYZ_mesh<float, double>(self->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
+        srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points.Get());
+    }
+    // Add points to cache
+    if (caching)
+    {
+      self->MeshPointsCache.Insert(keyMesh, points);
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -1503,6 +1547,7 @@ int vtkCGNSReader::GetUnstructuredZone(
   // Get Coordinates and FlowSolution node names
   std::string gridCoordName;
   std::vector<std::string> solutionNames;
+  std::string keyMesh;
 
   std::vector<double> gridChildId;
   std::size_t nCoordsArray = 0;
@@ -1530,36 +1575,71 @@ int vtkCGNSReader::GetUnstructuredZone(
   nPts = static_cast<vtkIdType>(zsize[0]);
   assert(nPts == zsize[0]);
 
-  // Set up points
-  vtkPoints* points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points;
 
-  //
-  // wacky hack ...
-  memEnd[0] *= 3; // for memory aliasing
-  //
-  // vtkPoints assumes float data type
-  //
-  if (this->DoublePrecisionMesh != 0)
+  // If it is not a deforming mesh, gridCoordName keep the standard name
+  // Only Volume mesh points, not subset are cached
+  bool caching = (gridCoordName == "GridCoordinates" && this->CacheMesh);
+  if (caching)
   {
-    points->SetDataTypeToDouble();
-  }
-  //
-  // Resize vtkPoints to fit data
-  //
-  points->SetNumberOfPoints(nPts);
+    // Try to get from cache
+    const char* basename = this->Internal->GetBase(base).name;
+    const char* zonename = this->Internal->GetBase(base).zones[zone].name;
+    // build a key /basename/zonename
+    std::ostringstream query;
+    query << "/" << basename << "/" << zonename;
+    keyMesh = query.str();
 
-  //
-  // Populate the coordinates. Put in 3D points with z=0 if the mesh is 2D.
-  //
-  if (this->DoublePrecisionMesh != 0) // DOUBLE PRECISION MESHPOINTS
-  {
-    CGNSRead::get_XYZ_mesh<double, float>(this->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
-      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points);
+    points = this->MeshPointsCache.Find(keyMesh);
+    if (points.Get() != nullptr)
+    {
+      // check storage data type
+      if ((this->GetDoublePrecisionMesh() != 0) != (points->GetDataType() == VTK_DOUBLE))
+      {
+        points = nullptr;
+      }
+    }
   }
-  else // SINGLE PRECISION MESHPOINTS
+
+  // Reading points from file instead of cache
+  if (points.Get() == nullptr)
   {
-    CGNSRead::get_XYZ_mesh<float, double>(this->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
-      srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points);
+    // Set up points
+    points = vtkPoints::New();
+
+    //
+    // wacky hack ...
+    memEnd[0] *= 3; // for memory aliasing
+    //
+    // vtkPoints assumes float data type
+    //
+    if (this->DoublePrecisionMesh != 0)
+    {
+      points->SetDataTypeToDouble();
+    }
+    //
+    // Resize vtkPoints to fit data
+    //
+    points->SetNumberOfPoints(nPts);
+
+    //
+    // Populate the coordinates. Put in 3D points with z=0 if the mesh is 2D.
+    //
+    if (this->DoublePrecisionMesh != 0) // DOUBLE PRECISION MESHPOINTS
+    {
+      CGNSRead::get_XYZ_mesh<double, float>(this->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
+        srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points);
+    }
+    else // SINGLE PRECISION MESHPOINTS
+    {
+      CGNSRead::get_XYZ_mesh<float, double>(this->cgioNum, gridChildId, nCoordsArray, cellDim, nPts,
+        srcStart, srcEnd, srcStride, memStart, memEnd, memStride, memDims, points);
+    }
+    // Add points to cache
+    if (caching)
+    {
+      this->MeshPointsCache.Insert(keyMesh, points);
+    }
   }
 
   this->UpdateProgress(0.2);
@@ -3375,6 +3455,16 @@ void vtkCGNSReader::EnableAllFamilies()
 void vtkCGNSReader::DisableAllFamilies()
 {
   this->GetSIL()->DeselectAllFamilies();
+}
+
+//----------------------------------------------------------------------------
+void vtkCGNSReader::SetCacheMesh(bool enable)
+{
+  this->CacheMesh = enable;
+  if (!enable)
+  {
+    this->MeshPointsCache.ClearCache();
+  }
 }
 
 //==============================================================================

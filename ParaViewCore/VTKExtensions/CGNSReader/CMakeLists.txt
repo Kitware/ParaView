@@ -18,12 +18,14 @@ set(Module_SRCS
   vtkCGNSReaderInternal.cxx
   vtkCGNSSubsetInclusionLattice.cxx
   vtkFileSeriesHelper.cxx
+  vtkCGNSCache.cxx
   )
 
 set_source_files_properties(
   cgio_helpers
   vtkCGNSReaderInternal
   vtkFileSeriesHelper
+  vtkCGNSCache
   PROPERTIES
     SKIP_HEADER_INSTALL 1
 )

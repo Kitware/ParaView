@@ -35,9 +35,11 @@
 #ifndef vtkCGNSReader_h
 #define vtkCGNSReader_h
 
+#include "vtkCGNSCache.h"
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkNew.h"                             // for vtkNew.
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
+#include "vtkPoints.h"
 
 class vtkDataSet;
 class vtkDataArraySelection;
@@ -211,6 +213,16 @@ public:
 
   //@{
   /**
+   * This reader can cache the mesh points if they are time invariant.
+   * They will be stored with a unique reference to their /base/zonename
+   * and not be read in the file when doing unsteady analysis.
+   */
+  void SetCacheMesh(bool enable);
+  vtkGetMacro(CacheMesh, bool);
+  vtkBooleanMacro(CacheMesh, bool);
+
+  //@{
+  /**
    * Set/get the communication object used to relay a list of files
    * from the rank 0 process to all others. This is the only interprocess
    * communication required by vtkPExodusIIReader.
@@ -269,7 +281,8 @@ private:
   void OnSILStateChanged();
   bool IgnoreSILChangeEvents;
 
-  CGNSRead::vtkCGNSMetaData* Internal; // Metadata
+  CGNSRead::vtkCGNSMetaData* Internal;               // Metadata
+  CGNSRead::vtkCGNSCache<vtkPoints> MeshPointsCache; // Cache for the mesh points
 
   char* FileName; // cgns file name
 #if !defined(VTK_LEGACY_REMOVE)
@@ -280,6 +293,7 @@ private:
   int CreateEachSolutionAsBlock; // debug option to create
   bool IgnoreFlowSolutionPointers;
   bool DistributeBlocks;
+  bool CacheMesh;
 
   // For internal cgio calls (low level IO)
   int cgioNum;      // cgio file reference
