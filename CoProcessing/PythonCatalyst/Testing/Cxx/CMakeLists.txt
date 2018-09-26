@@ -256,5 +256,17 @@ if (PARAVIEW_BUILD_QT_GUI)
 
     endif()
 
+    add_test(NAME TemporalScriptFullWorkflow
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/TemporalExporterGUI.xml
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvbatch>
+      -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${PARAVIEW_TEST_DIR}/temporalexport.py
+      -DTEST_NAME:STRING=TemporalScriptFullWorkflow
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+    set_tests_properties(TemporalScriptFullWorkflow PROPERTIES RUN_SERIAL ON)
+    set_tests_properties(TemporalScriptFullWorkflow PROPERTIES LABELS "${CP_LABELS}")
+
   ENDIF ()
 endif()
