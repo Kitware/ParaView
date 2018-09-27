@@ -90,35 +90,6 @@ public:
 
   //@{
   /**
-   * Get/set the range of the data. The first element defines the value that maps to glyph size
-   * zero, and the second element defines the value that maps to the maximum glyph size. Data values
-   * inside the range are mapped linearly to the range [0, MaximumGlyphSize], while data values
-   * outside this range will be clamped to this range prior to mapping to the glyph size.
-   */
-  vtkSetVector2Macro(GlyphDataRange, double);
-  vtkGetVector2Macro(GlyphDataRange, double);
-  //@}
-
-  //@{
-  /**
-   * Get/set the maximum glyph size. The upper data value specified in the GlyphDataRange
-   * will map to this glyph size.
-   */
-  vtkSetMacro(MaximumGlyphSize, double);
-  //@}
-
-  //@{
-  /**
-   * Get/set whether to map scale array values to the glyph size range [0, MaximumGlyphSize].
-   * If off, raw values from the scale array will be used if the scale array is set.
-   */
-  vtkSetMacro(RescaleGlyphs, bool);
-  vtkGetMacro(RescaleGlyphs, bool);
-  vtkBooleanMacro(RescaleGlyphs, bool);
-  //@}
-
-  //@{
-  /**
    * Get/set the vector scaling mode. This mode determines how glyphs are scaled when the
    * scale array has more than one component.
    */
@@ -150,6 +121,15 @@ public:
   vtkSetMacro(OutputPointsPrecision, int);
   vtkGetMacro(OutputPointsPrecision, int);
   //@}
+
+  //@{
+  /**
+   * Set/get scale factor used to change the size of glyphs. This factor is
+   * applied uniformly in each dimension.
+   */
+  //@}
+  vtkSetMacro(ScaleFactor, double);
+  vtkGetMacro(ScaleFactor, double);
 
   //@{
   /**
@@ -254,9 +234,7 @@ protected:
 
   int VectorScaleMode;
   vtkTransform* SourceTransform;
-  double GlyphDataRange[2];
-  double MaximumGlyphSize;
-  bool RescaleGlyphs;
+  double ScaleFactor;
   int GlyphMode;
   int MaximumNumberOfSamplePoints;
   int Seed;

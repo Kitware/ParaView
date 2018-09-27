@@ -7570,27 +7570,24 @@ oriented and scaled by the input scalar and vector arrays. If the arrays are
 point-centered, glyphs are placed at points in the input dataset. If the arrays
 are cell-centered, glyphs are placed at the center of cells in the input dataset.
 A transform that applies to the glyph source can be modified to change the shape
-of the glyph. This filter operates on any type of data set. Its output is polygonal.
+of the glyph. This filter operates on any type of data set. Its output is a polygonal
+dataset.
 
-To use this filter, select the **Scale Array** to control glyph scaling
-and **Orientation Array** to orient the glyphs if desired - each array
-can be set to 'None' if scaling or orientation is not desired. When scaling
+To use this filter, select the **Orientation Array** to orient the glyphs and the
+**Scale Array** to control glyph scaling if desired - each array
+can be set to 'No array' if orientation or scaling is not desired. When scaling
 by a 3-element vector array, the **Vector Scale Mode** can be set to either
 'Scale by Magnitude', which scales glyphs according to the vector magnitude,
-or 'Scale by Components', which treats a each component as a separate scaling
+or 'Scale by Components', which treats each component as a separate scaling
 factor in the corresponding dimension, i.e., the first component is the
 scaling factor in the x-dimension, the second component scales the y-dimension,
-and the third component scales the z-dimension.
-
-When the **Rescale Glyphs** option is on, data in the **Scale Array** will be
-mapped linearly from the **Glyph Data Range** to the range [0, **Maximum Glyph Size**].
-If, however, the **Vector Scale Mode** property is set to 'Scale by Components',
-the glyphs will be scaled according to each vector component without this remapping.
+and the third component scales the z-dimension. An overall constant **Scale Factor**
+is applied following the scaling controlled by other properties of this filter.
 
 The **Glyph Mode** property controls which points in the input dataset
-are selected for glyphing (since in most cases, glyphing all points in
+are selected for glyphing since in most cases, glyphing all points in
 the input dataset can be both performance impeding as well as visually
-cluttered).
+cluttered.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -7640,20 +7637,31 @@ This property determines which type of glyph will be placed at the
 points in the input dataset.
         </Documentation>
       </InputProperty>
-
-      <ProxyProperty command="SetSourceTransform"
-                     name="GlyphTransform"
-                     panel_visibility="advanced">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources"
-                 name="Transform2" />
-        </ProxyListDomain>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values="1"
+                            element_types="0 0 0 0 2"
+                            name="OrientationArray"
+                            number_of_elements="5">
+        <!-- default value=1 so normals go to the right place -->
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="vector_array"
+                         name="array_list"
+                         none_string="No orientation array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
         <Documentation>
-The values in this property allow you to specify the transform
-(translation, rotation, and scaling) to apply to the glyph
-source.</Documentation>
-      </ProxyProperty>
-
+Select the input array to use for orienting the glyphs.
+        </Documentation>
+      </StringVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             default_values="0"
                             element_types="0 0 0 0 2"
@@ -7716,149 +7724,43 @@ ArrayRangeDomain is set to the vector magnitude for up to 3-component
 arrays.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetRescaleGlyphs"
-                         name="RescaleGlyphs"
-                         default_values="1"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-Enable rescaling the glyph scale factor to the value specified by **Glyph Size Range**.
-If off, the glyph scale factor will be taken directly from the Scale Array, if one is
-selected.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="VectorScaleMode"
-                                       value="0" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ScaleArray"
-                                   number_of_components="3"
-                                   index="4"
-                                   inverse="1" />
-            </Expression>
-          </PropertyWidgetDecorator>
-        </Hints>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetGlyphDataRange"
-                            name="GlyphDataRange"
-                            default_values="0 1.0"
-                            number_of_elements="2"
-                            panel_widget="double_range">
-        <ArrayRangeDomain name="range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-            <Property function="ArraySelection"
-                      name="ScaleArray" />
-            <Property function="ComponentSelection"
-                      name="ComponentSelection"/>
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <Expression type="and">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         mode="visibility"
-                                         property="ScaleArray"
-                                         index="4"
-                                         value="No scale array"
-                                         inverse="1" />
-                <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                  <Property name="RescaleGlyphs" function="boolean" />
-                </PropertyWidgetDecorator>
-              </Expression>
-              <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                     mode="visibility"
-                                     property="VectorScaleMode"
-                                     value="0" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ScaleArray"
-                                   number_of_components="3"
-                                   index="4"
-                                   inverse="1" />
-              </Expression>
-            </Expression>
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>
-The range of the data. The first element defines the value that maps
-to a glyph size of zero, and the second element defines the value that maps to the
-maximum glyph size. Data values inside the range are mapped linearly between 0 and
-the **Maximum Glyph Size**, while data values outside this range will be clamped to this
-range prior to mapping to the glyph size.
-        </Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMaximumGlyphSize"
-                            name="MaximumGlyphSize"
+      <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
-                            number_of_elements="1">
-        <BoundsDomain mode="scaled_extent"
-                      name="bounds"
-                      scale_factor="0.1">
+                            name="ScaleFactor"
+                            number_of_elements="1"
+                            panel_widget="glyph_scale_factor">
+        <BoundsDomain mode="scaled_extent" name="bounds" scale_factor="0.1">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
-        <Documentation>
-Sets the maximum glyph size. The upper data value specified in the **Glyph Data Range**
-will map to this glyph size while the lower data value will map to zero glyph size.
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="ScaleArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <ArrayRangeDomain name="vector_range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="OrientationArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>Specify the constant multiplier to use to scale the glyphs.
         </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                     mode="visibility"
-                                     property="VectorScaleMode"
-                                     value="0" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ScaleArray"
-                                   number_of_components="3"
-                                   index="4"
-                                   inverse="1" />
-              </Expression>
-              <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                <Property name="RescaleGlyphs" function="boolean" />
-              </PropertyWidgetDecorator>
-            </Expression>
-          </PropertyWidgetDecorator>
-        </Hints>
       </DoubleVectorProperty>
-
-      <StringVectorProperty command="SetInputArrayToProcess"
-                            default_values="1"
-                            element_types="0 0 0 0 2"
-                            name="OrientationArray"
-                            number_of_elements="5">
-        <!-- default value=1 so normals go to the right place -->
-        <ArrayListDomain attribute_type="Vectors"
-                         input_domain_name="vector_array"
-                         name="array_list"
-                         none_string="No orientation array">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
+      <ProxyProperty command="SetSourceTransform"
+                     name="GlyphTransform"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources"
+                 name="Transform2" />
+        </ProxyListDomain>
         <Documentation>
-Select the input array to use for orienting the glyphs.
-        </Documentation>
-      </StringVectorProperty>
+The values in this property allow you to specify the transform
+(translation, rotation, and scaling) to apply to the glyph
+source.</Documentation>
+      </ProxyProperty>
 
       <IntVectorProperty command="SetGlyphMode"
                          default_values="2"
@@ -7931,21 +7833,16 @@ Every Nth Point.
       <PropertyGroup label="Glyph Source">
         <Property name="Source" />
       </PropertyGroup>
-      <PropertyGroup label="Glyph Transform">
-        <Property name="GlyphTransform" />
+      <PropertyGroup label="Orientation">
+        <Property name="OrientationArray" />
       </PropertyGroup>
       <PropertyGroup label="Scale">
         <Property name="ScaleArray" />
         <Property name="VectorScaleMode" />
+        <Property name="ScaleFactor" />
       </PropertyGroup>
-      <PropertyGroup label="Glyph Data Range">
-        <Property name="GlyphDataRange" />
-      </PropertyGroup>
-      <PropertyGroup label="Glyph Size">
-        <Property name="MaximumGlyphSize" />
-      </PropertyGroup>
-      <PropertyGroup label="Orientation">
-        <Property name="OrientationArray" />
+      <PropertyGroup label="Glyph Transform">
+        <Property name="GlyphTransform" />
       </PropertyGroup>
       <PropertyGroup label="Masking">
         <Property name="GlyphMode" />
@@ -8270,33 +8167,30 @@ source.</Documentation>
                  The glyph is provided as the **Source** input to this filter.
       <Documentation long_help="This filter produces a glyph at points or cell centers in an input data set. The glyphs can be oriented and scaled by point or cell attributes of the input dataset."
                      short_help="Generate glyphs that represent attributes in the input data set.">
-The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line,
-sphere, or 2D glyph) at each point or cell in the input dataset. The glyphs can be
+The **Glyph With Custom Source** filter generates a glyph specified as the **Source**
+input to this filter at each point in the input dataset. The glyphs can be
 oriented and scaled by the input scalar and vector arrays. If the arrays are
 point-centered, glyphs are placed at points in the input dataset. If the arrays
 are cell-centered, glyphs are placed at the center of cells in the input dataset.
 A transform that applies to the glyph source can be modified to change the shape
-of the glyph. This filter operates on any type of data set. Its output is polygonal.
+of the glyph. This filter operates on any type of data set. Its output is a polygonal
+dataset.
 
-To use this filter, select the **Scale Array** to control glyph scaling
-and **Orientation Array** to orient the glyphs if desired - each array
-can be set to 'None' if scaling or orientation is not desired. When scaling
+To use this filter, select the **Orientation Array** to orient the glyphs and the
+**Scale Array** to control glyph scaling if desired - each array
+can be set to 'No array' if orientation or scaling is not desired. When scaling
 by a 3-element vector array, the **Vector Scale Mode** can be set to either
 'Scale by Magnitude', which scales glyphs according to the vector magnitude,
-or 'Scale by Components', which treats a each component as a separate scaling
+or 'Scale by Components', which treats each component as a separate scaling
 factor in the corresponding dimension, i.e., the first component is the
 scaling factor in the x-dimension, the second component scales the y-dimension,
-and the third component scales the z-dimension.
-
-When the **Rescale Glyphs** option is on, data in the **Scale Array** will be
-mapped linearly from the **Glyph Data Range** to the range [0, **Maximum Glyph Size**].
-If, however, the **Vector Scale Mode** property is set to 'Scale by Components',
-the glyphs will be scaled according to each vector component without this remapping.
+and the third component scales the z-dimension. An overall constant **Scale Factor**
+is applied following the scaling controlled by other properties of this filter.
 
 The **Glyph Mode** property controls which points in the input dataset
-are selected for glyphing (since in most cases, glyphing all points in
+are selected for glyphing since in most cases, glyphing all points in
 the input dataset can be both performance impeding as well as visually
-cluttered).
+cluttered.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -8314,8 +8208,8 @@ cluttered).
                           number_of_components="3"
                           optional="1" />
         <Documentation>
-This property specifies the input to this filter.  This is the
-dataset from which the points are selected to be glyphed.
+This property specifies the input to this filter. This is the
+dataset from which the locations are selected to be glyphed.
         </Documentation>
       </InputProperty>
       <InputProperty command="SetSourceConnection"
@@ -8337,24 +8231,35 @@ placed at the points in the input dataset.
           <!-- show the selected proxy's panel, only in advanced mode. -->
         </Hints>
         <Documentation>
-This property determines which type of glyph will be
-placed at the points in the input dataset.
+This property determines which glyph will be placed at the
+points in the input dataset.
         </Documentation>
       </InputProperty>
-
-      <ProxyProperty command="SetSourceTransform"
-                     name="GlyphTransform"
-                     panel_visibility="advanced">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources"
-                 name="Transform2" />
-        </ProxyListDomain>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values="1"
+                            element_types="0 0 0 0 2"
+                            name="OrientationArray"
+                            number_of_elements="5">
+        <!-- default value=1 so normals go to the right place -->
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="vector_array"
+                         name="array_list"
+                         none_string="No orientation array">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
         <Documentation>
-The values in this property allow you to specify the transform
-(translation, rotation, and scaling) to apply to the glyph
-source.</Documentation>
-      </ProxyProperty>
-
+Select the input array to use for orienting the glyphs.
+        </Documentation>
+      </StringVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             default_values="0"
                             element_types="0 0 0 0 2"
@@ -8417,149 +8322,43 @@ ArrayRangeDomain is set to the vector magnitude for up to 3-component
 arrays.
         </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetRescaleGlyphs"
-                         name="RescaleGlyphs"
-                         default_values="1"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-Enable rescaling the glyph scale factor to the value specified by **Glyph Size Range**.
-If off, the glyph scale factor will be taken directly from the Scale Array, if one is
-selected.
-        </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="or">
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                       mode="visibility"
-                                       property="VectorScaleMode"
-                                       value="0" />
-              <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ScaleArray"
-                                   number_of_components="3"
-                                   index="4"
-                                   inverse="1" />
-            </Expression>
-          </PropertyWidgetDecorator>
-        </Hints>
-      </IntVectorProperty>
-      <DoubleVectorProperty command="SetGlyphDataRange"
-                            name="GlyphDataRange"
-                            default_values="0 1.0"
-                            number_of_elements="2"
-                            panel_widget="double_range">
-        <ArrayRangeDomain name="range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-            <Property function="ArraySelection"
-                      name="ScaleArray" />
-            <Property function="ComponentSelection"
-                      name="ComponentSelection"/>
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <Expression type="and">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                         mode="visibility"
-                                         property="ScaleArray"
-                                         index="4"
-                                         value="No scale array"
-                                         inverse="1" />
-                <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                  <Property name="RescaleGlyphs" function="boolean" />
-                </PropertyWidgetDecorator>
-              </Expression>
-              <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                     mode="visibility"
-                                     property="VectorScaleMode"
-                                     value="0" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ScaleArray"
-                                   number_of_components="3"
-                                   index="4"
-                                   inverse="1" />
-              </Expression>
-            </Expression>
-          </PropertyWidgetDecorator>
-        </Hints>
-        <Documentation>
-The range of the data. The first element defines the value that maps
-to a glyph size of zero, and the second element defines the value that maps to the
-maximum glyph size. Data values inside the range are mapped linearly between 0 and
-the **Maximum Glyph Size**, while data values outside this range will be clamped to this
-range prior to mapping to the glyph size.
-        </Documentation>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty command="SetMaximumGlyphSize"
-                            name="MaximumGlyphSize"
+      <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
-                            number_of_elements="1">
-        <BoundsDomain mode="scaled_extent"
-                      name="bounds"
-                      scale_factor="0.1">
+                            name="ScaleFactor"
+                            number_of_elements="1"
+                            panel_widget="glyph_scale_factor">
+        <BoundsDomain mode="scaled_extent" name="bounds" scale_factor="0.1">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </BoundsDomain>
-        <Documentation>
-Sets the maximum glyph size. The upper data value specified in the **Glyph Data Range**
-will map to this glyph size while the lower data value will map to zero glyph size.
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="ScaleArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <ArrayRangeDomain name="vector_range">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="ArraySelection" name="OrientationArray" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>Specify the constant multiplier to use to scale the glyphs.
         </Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="CompositeDecorator">
-            <Expression type="and">
-              <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                     mode="visibility"
-                                     property="VectorScaleMode"
-                                     value="0" />
-                <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ScaleArray"
-                                   number_of_components="3"
-                                   index="4"
-                                   inverse="1" />
-              </Expression>
-              <PropertyWidgetDecorator type="ShowWidgetDecorator">
-                <Property name="RescaleGlyphs" function="boolean" />
-              </PropertyWidgetDecorator>
-            </Expression>
-          </PropertyWidgetDecorator>
-        </Hints>
       </DoubleVectorProperty>
-
-      <StringVectorProperty command="SetInputArrayToProcess"
-                            default_values="1"
-                            element_types="0 0 0 0 2"
-                            name="OrientationArray"
-                            number_of_elements="5">
-        <!-- default value=1 so normals go to the right place -->
-        <ArrayListDomain attribute_type="Vectors"
-                         input_domain_name="vector_array"
-                         name="array_list"
-                         none_string="No orientation array">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
+      <ProxyProperty command="SetSourceTransform"
+                     name="GlyphTransform"
+                     panel_visibility="advanced">
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources"
+                 name="Transform2" />
+        </ProxyListDomain>
         <Documentation>
-Select the input array to use for orienting the glyphs.
-        </Documentation>
-      </StringVectorProperty>
+The values in this property allow you to specify the transform
+(translation, rotation, and scaling) to apply to the glyph
+source.</Documentation>
+      </ProxyProperty>
 
       <IntVectorProperty command="SetGlyphMode"
                          default_values="2"
@@ -8572,8 +8371,8 @@ Select the input array to use for orienting the glyphs.
           <Entry text="Uniform Spatial Distribution" value="2"/>
         </EnumerationDomain>
         <Documentation>
-          This property indicates the mode that will be used to generate
-          glyphs from the dataset.
+This property indicates the mode that will be used to generate
+glyphs from the dataset.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfSamplePoints"
@@ -8632,21 +8431,16 @@ Every Nth Point.
       <PropertyGroup label="Glyph Source">
         <Property name="Source" />
       </PropertyGroup>
-      <PropertyGroup label="Glyph Transform">
-        <Property name="GlyphTransform" />
+      <PropertyGroup label="Orientation">
+        <Property name="OrientationArray" />
       </PropertyGroup>
       <PropertyGroup label="Scale">
         <Property name="ScaleArray" />
         <Property name="VectorScaleMode" />
+        <Property name="ScaleFactor" />
       </PropertyGroup>
-      <PropertyGroup label="Glyph Data Range">
-        <Property name="GlyphDataRange" />
-      </PropertyGroup>
-      <PropertyGroup label="Glyph Size">
-        <Property name="MaximumGlyphSize" />
-      </PropertyGroup>
-      <PropertyGroup label="Orientation">
-        <Property name="OrientationArray" />
+      <PropertyGroup label="Glyph Transform">
+        <Property name="GlyphTransform" />
       </PropertyGroup>
       <PropertyGroup label="Masking">
         <Property name="GlyphMode" />
