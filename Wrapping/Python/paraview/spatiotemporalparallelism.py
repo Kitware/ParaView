@@ -94,6 +94,8 @@ def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, write
         myStartTimeStep = myStartTimeStep+remainder
         myEndTimeStep = myStartTimeStep+tpp
 
+    myStartTimeStep = int(myStartTimeStep)
+    myEndTimeStep = int(myEndTimeStep)
     cinemaLines = []
     for currentTimeStep in range(myStartTimeStep,myEndTimeStep):
         #print (globalController.GetLocalProcessId(), " is working on ", currentTimeStep)
