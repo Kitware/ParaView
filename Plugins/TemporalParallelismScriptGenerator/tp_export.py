@@ -72,7 +72,7 @@ class ViewAccessor(smtrace.RealProxyAccessor):
         assert len(params) == 4
         trace.append([
             "STP.RegisterView(%s," % self,
-            "    filename='%s', magnification=%s, width=%s, height=%s, tp_views)" %\
+            "    filename='%s', magnification=%s, width=%s, height=%s, tp_views=tp_views)" %\
                 (params[0], params[1], params[2], params[3])])
         trace.append_separator()
         return trace.raw_data()
@@ -141,7 +141,8 @@ def tp_hook(varname, proxy):
         return ReaderAccessor(varname, proxy, reader_input_map[pname])
     if pname and proxy.GetHints() and proxy.GetHints().FindNestedElementByName("WriterProxy"):
         return WriterAccessor(varname, proxy)
-    if smtrace.Trace.get_registered_name(proxy, "views"):
+    pname = smtrace.Trace.get_registered_name(proxy, "views")
+    if pname:
         # since view is being accessed, ensure that we were indeed saving
         # rendering components.
         assert export_rendering

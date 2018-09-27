@@ -328,8 +328,9 @@ class NewStyleWriters(object):
     """Helper to dump configured writer proxies, which are not in the pipeline,
     into the script."""
 
-    def __init__(self):
+    def __init__(self, make_temporal_script=False):
         self.__cnt = 1
+        self.__make_temporal_script = make_temporal_script
 
     def __make_name(self, name):
         """
@@ -391,8 +392,12 @@ class NewStyleWriters(object):
                 varname = self.__make_name(prototype.GetXMLLabel())
             f = "%s = servermanager.writers.%s(Input=%s)" % (varname, writername, inputname)
             res.append(f)
-            f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s)" % (
-                varname, filename, write_frequency, padding_amount)
+            if self.__make_temporal_script:
+                f = "STP.RegisterWriter(%s, '%s', tp_writers)" % (
+                    varname, filename)
+            else:
+                f = "coprocessor.RegisterWriter(%s, filename='%s', freq=%s, paddingamount=%s)" % (
+                    varname, filename, write_frequency, padding_amount)
             res.append(f)
             res.append("")
         if len(res) == 2:

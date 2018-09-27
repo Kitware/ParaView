@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#// Give an example of creating an unstructured grid with point data
+// Give an example of creating an unstructured grid with point data
 // and cell data to demonstrate how other people can pass their
 // simulation data to the coprocessors.
 

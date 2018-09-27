@@ -3758,6 +3758,29 @@
         </Documentation>
       </IntVectorProperty>
 
+      <StringVectorProperty name="TimeInputFilePattern"
+                         label="Input File Pattern"
+                         number_of_elements="1"
+                         default_values="infile_*.vti"
+                         panel_visibility="advanced">
+        <Documentation>
+          A regular expression to that tells spatio-temporal scripts where to search for input files.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="TimeCompartmentSize"
+                         default_values="1"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <IntRangeDomain name="range" min="1" max="1000" />
+        <Documentation>
+          The number of processes working together on a specific time step in a spatio-temporal style batch script.
+        </Documentation>
+      </IntVectorProperty>
+      <PropertyGroup label="Spatio-Temporal Controls">
+        <Property name="TimeInputFilePattern" />
+        <Property name="TimeCompartmentSize" />
+      </PropertyGroup>
     </Proxy>
   </ProxyGroup>
 

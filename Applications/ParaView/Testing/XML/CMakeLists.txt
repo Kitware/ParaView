@@ -288,6 +288,9 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   add_client_tests("pv"
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/CatalystExporterGUI.xml )
   set_tests_properties(pv.CatalystExporterGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW;CATALYST")
+  add_client_tests("pv"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TemporalExporterGUI.xml )
+  set_tests_properties(pv.TemporalExporterGUI PROPERTIES RUN_SERIAL ON LABELS "PARAVIEW")
 
 endif()
 

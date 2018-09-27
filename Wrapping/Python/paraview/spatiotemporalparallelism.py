@@ -2,6 +2,12 @@ import sys
 import os
 import paraview
 import paraview.simple as pvsimple
+can_savecinema = True
+try:
+    from vtkmodules.numpy_interface.algorithms import *
+    from mpi4py import MPI
+except:
+    can_savecinema = False
 
 paraview.options.batch = True # this may not be necessary
 paraview.simple._DisableFirstRenderCameraReset()
@@ -46,20 +52,34 @@ def CreateControllers(timeCompartmentSize):
     return globalController, temporalController, timeCompartmentSize
 
 def WriteImages(currentTimeStep, currentTime, views):
+    cinemaLines = []
+    cnt = 0
     for view in views:
         filename = view.tpFileName.replace("%t", str(currentTimeStep))
         view.ViewTime = currentTime
+        cinemaLines.append(str(currentTime) + "," + view.GetXMLName()+"_"+str(cnt) + "," + filename + "\n")
         pvsimple.WriteImage(filename, view, Magnification=view.tpMagnification)
+        cnt = cnt + 1
+    return cinemaLines
 
 def WriteFiles(currentTimeStep, currentTime, writers):
+    cinemaLines = []
+    cnt = 0
     for writer in writers:
         originalfilename = writer.FileName
         fname = originalfilename.replace("%t", str(currentTimeStep))
         writer.FileName = fname
+        cinemaLines.append(str(currentTime) + "," + writer.GetXMLName()+"_"+str(cnt) + "," + fname + "\n")
         writer.UpdatePipeline(currentTime)
         writer.FileName = originalfilename
+        cnt = cnt + 1
+    return cinemaLines
 
-def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, writers, views):
+def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, writers, views, make_cinema_table=False):
+    if make_cinema_table and not can_savecinema:
+        print ("WARNING: Can not save cinema table because MPI4PY is not available.")
+        make_cinema_table = False
+
     numProcs = globalController.GetNumberOfProcesses()
     numTimeCompartments = numProcs//timeCompartmentSize
     tpp = len(timeSteps)/numTimeCompartments
@@ -74,17 +94,45 @@ def IterateOverTimeSteps(globalController, timeCompartmentSize, timeSteps, write
         myStartTimeStep = myStartTimeStep+remainder
         myEndTimeStep = myStartTimeStep+tpp
 
+    myStartTimeStep = int(myStartTimeStep)
+    myEndTimeStep = int(myEndTimeStep)
+    cinemaLines = []
     for currentTimeStep in range(myStartTimeStep,myEndTimeStep):
         #print (globalController.GetLocalProcessId(), " is working on ", currentTimeStep)
-        WriteImages(currentTimeStep, timeSteps[currentTimeStep], views)
-        WriteFiles(currentTimeStep, timeSteps[currentTimeStep], writers)
+        ret = WriteImages(currentTimeStep, timeSteps[currentTimeStep], views)
+        if ret:
+            cinemaLines.extend(ret)
+        ret = WriteFiles(currentTimeStep, timeSteps[currentTimeStep], writers)
+        if ret:
+            cinemaLines.extend(ret)
+
+    if make_cinema_table:
+        # gather the file list from each time compartment to the root and save it
+        myGID = globalController.GetLocalProcessId()
+        myLID = int(myGID) % int(timeCompartmentSize)
+        mystring = ''
+        # only one node per time compartment should participate
+        if myLID == 0:
+            mystring = ''.join(x for x in cinemaLines)
+        mylen = len(mystring)
+        result = ''
+        comm = vtkMPI4PyCommunicator.ConvertToPython(globalController.GetCommunicator())
+        gathered_lines = comm.gather(mystring, root=0)
+        if myGID == 0:
+            # root writes the file, prepending header
+            f = open("data.csv", "w")
+            f.write("timestep,producer,FILE\n")
+            for x in gathered_lines:
+                if x:
+                    f.write(x)
+            f.close()
 
 def CreateReader(ctor, fileInfo, **kwargs):
     "Creates a reader, checks if it can be used, and sets the filenames"
     import glob
     files = glob.glob(fileInfo)
     files.sort() # assume there is a logical ordering of the filenames that corresponds to time ordering
-    reader = ctor(FileName=files)
+    reader = paraview.simple.OpenDataFile(files)
     CheckReader(reader)
     if kwargs:
         pvsimple.SetProperties(reader, **kwargs)
@@ -103,7 +151,7 @@ def CreateView(proxy_ctor, filename, magnification, width, height, tp_views):
     view = proxy_ctor()
     return RegisterView(view, filename, magnification, width, height, tp_views)
 
-def RegisterView(view, filename, magnification, width, height, tp_views):
+def RegisterView(view, filename='filename_%t.vti', magnification=1.0, width=1024, height=1024, tp_views=[]):
     view.add_attribute("tpFileName", filename)
     view.add_attribute("tpMagnification", magnification)
     tp_views.append(view)

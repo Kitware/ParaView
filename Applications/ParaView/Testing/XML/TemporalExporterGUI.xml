@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/FileSeries/wavelet_..vti" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/CutFunction/ProxySelectionWidget/frame/ChosenProxyWidget/InteractivePlane/useCameraNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/CatalystExportInspector/filterChoice" command="activated" arguments="Slice1" />i
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/CatalystExportInspector/filterFormat" command="activated" arguments="XMLPPolyDataWriter" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/CatalystExportInspector/filterExtract" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/CatalystExportInspector/viewExtract" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/CatalystExportInspector/advanced" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/CatalystExportInspector/container/0pqProxyWidget0/TimeCompartmentSize/IntRangeWidget/LineEdit" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/catalystInspectorDock/CatalystExportInspector/container/0pqProxyWidget0/TimeInputFilePattern/TimeInputFilePattern" command="set_string" arguments="$PARAVIEW_DATA_ROOT/FileSeries/wavelet_*.vti" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Catalyst" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst" command="activate" arguments="actionExportTemporal" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Catalyst/ExportTemporalStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/temporalexport.py" />
+</pqevents>

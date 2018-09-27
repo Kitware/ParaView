@@ -97,6 +97,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSetName.h"
 #include "pqShowHideAllReaction.h"
 #include "pqSourcesMenuReaction.h"
+#include "pqTemporalExportReaction.h"
 #include "pqTestingReaction.h"
 #include "pqTimerLogReaction.h"
 #include "pqUndoRedoReaction.h"
@@ -695,6 +696,10 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
   QAction* gcatalyst = menu.addAction("Export Catalyst Script")
     << pqSetName("actionExportCatalyst");
   new pqCatalystExportReaction(gcatalyst);
+  QAction* gtemporal = menu.addAction("Export Temporal Script")
+    << pqSetName("actionExportTemporal");
+  new pqTemporalExportReaction(gtemporal);
+
 #else
   (void)exportConfiguration; // avoid unreferenced parameter comp warning
 #endif

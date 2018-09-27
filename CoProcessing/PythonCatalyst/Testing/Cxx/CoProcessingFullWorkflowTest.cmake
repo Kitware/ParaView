@@ -29,7 +29,11 @@ file(REMOVE
   "${COPROCESSING_TEST_DIR}/filename_0_0.vtp"
   "${COPROCESSING_TEST_DIR}/file_00.pvtp"
   "${COPROCESSING_TEST_DIR}/file_00_0.vtp"
-  "${COPROCESSING_TEST_DIR}/cinema")
+  "${COPROCESSING_TEST_DIR}/cinema"
+  "${COPROCESSING_TEST_DIR}/Slice1_4.pvtp"
+  "${COPROCESSING_TEST_DIR}/Slice1_4"
+  "${COPROCESSING_TEST_DIR}/RenderView1_4.png"
+  )
 
 if (NOT EXISTS "${PARAVIEW_EXECUTABLE}")
   message(FATAL_ERROR "Could not file ParaView '${PARAVIEW_EXECUTABLE}'")
@@ -57,15 +61,26 @@ if(NOT EXISTS "${PVBATCH_EXECUTABLE}")
 endif()
 
 message("Running pvbatch")
-execute_process_with_echo(COMMAND
-  ${PVBATCH_EXECUTABLE} -sym -dr
-  ${COPROCESSING_DRIVER_SCRIPT}
-  ${COPROCESSING_TEST_DIR}/cptest.py 1
-  WORKING_DIRECTORY ${COPROCESSING_TEST_DIR}
-  RESULT_VARIABLE rv)
+
+if(NOT "${TEST_NAME}" STREQUAL "TemporalScriptFullWorkflow")
+  execute_process_with_echo(COMMAND
+    ${PVBATCH_EXECUTABLE} -sym -dr
+    ${COPROCESSING_DRIVER_SCRIPT}
+    ${COPROCESSING_TEST_DIR}/cptest.py 1
+    WORKING_DIRECTORY ${COPROCESSING_TEST_DIR}
+    RESULT_VARIABLE rv)
+else()
+  execute_process_with_echo(COMMAND
+    ${PVBATCH_EXECUTABLE} -sym -dr
+    ${COPROCESSING_DRIVER_SCRIPT}
+    WORKING_DIRECTORY ${COPROCESSING_TEST_DIR}
+    RESULT_VARIABLE rv)
+endif()
+
 if(rv)
   message(FATAL_ERROR "pvbatch return value was = '${rv}' ")
 endif()
+
 
 if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinema")
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/image/info.json" OR
@@ -94,6 +109,17 @@ if("${TEST_NAME}" STREQUAL "CoProcessingFullWorkflowCinemaCompositeFloat")
      NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=1.png" OR
      NOT EXISTS "${COPROCESSING_TEST_DIR}/cinema/composite_fl_image/phi=0/theta=0/time=0/vis=0/Slice1=0/colorSlice1=2.Z")
     message(FATAL_ERROR "Catalyst did not generate a composite cinema store (float value images)!")
+  endif()
+  return()
+endif()
+
+if("${TEST_NAME}" STREQUAL "TemporalScriptFullWorkflow")
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/Slice1_4.pvtp" OR
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/Slice1_4/Slice1_4_0.vtp")
+    message(FATAL_ERROR "TemporalScript did not generate a data extract!")
+  endif()
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/RenderView1_4.png")
+    message(FATAL_ERROR "TemporalScript did not generate a screen capture!")
   endif()
   return()
 endif()
