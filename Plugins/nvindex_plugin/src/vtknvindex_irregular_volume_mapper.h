@@ -103,6 +103,9 @@ public:
   // The configuration settings needs to be updated on changes applied to the GUI.
   void config_settings_changed();
 
+  // The volume opacity needs to be updated on changes applied in the GUI.
+  void opacity_changed();
+
   // Initialize the mapper.
   bool initialize_mapper(vtkRenderer* ren, vtkVolume* vol);
 
@@ -116,6 +119,7 @@ private:
   bool m_is_nvindex_rank;         // True if this rank is running NVIDIA IndeX.
   bool m_is_data_prepared;        // True if all the data is ready for the importer.
   bool m_config_settings_changed; // When some parameter changed on the GUI.
+  bool m_opacity_changed;         // True if volume opacity changed.
   bool m_volume_changed;          // When switching to a different time step.
                                   // or switching between properties.
 
