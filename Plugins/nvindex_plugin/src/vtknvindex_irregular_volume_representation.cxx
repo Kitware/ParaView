@@ -643,6 +643,13 @@ void vtknvindex_irregular_volume_representation::set_volume_filter(int filter)
 }
 
 //----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_step_size_factor(double step_size_factor)
+{
+  m_app_config_settings->set_step_size(static_cast<mi::Float32>(step_size_factor));
+  static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)->opacity_changed();
+}
+
+//----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_light_type(int light_type)
 {
   m_isosurface_params.light_mode = light_type;

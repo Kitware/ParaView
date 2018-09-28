@@ -126,7 +126,25 @@ void vtknvindex_colormap::get_paraview_colormap(vtkVolume* vol,
 
   // Read color values from ParaView.
   color_array.resize(3 * array_size);
-  app_color_transfer_function->GetTable(voxel_range.x, voxel_range.y, array_size, &color_array[0]);
+  // using Logarithmic scale?
+  if (app_color_transfer_function->GetScale())
+  {
+    double color[3];
+    for (mi::Uint32 i = 0; i < array_size; i++)
+    {
+      mi::Float32 value = static_cast<mi::Float32>(i) / array_size;
+      value = voxel_range.x + (voxel_range.y - voxel_range.x) * value;
+      app_color_transfer_function->GetColor(value, color);
+      color_array[i * 3] = color[0];
+      color_array[i * 3 + 1] = color[1];
+      color_array[i * 3 + 2] = color[2];
+    }
+  }
+  else // Linear scale
+  {
+    app_color_transfer_function->GetTable(
+      voxel_range.x, voxel_range.y, array_size, &color_array[0]);
+  }
 
   // Read opacity values from ParaView.
   opacity_array.resize(array_size);
@@ -195,7 +213,26 @@ void vtknvindex_colormap::get_paraview_colormaps(vtkVolume* vol,
 
   // Read color values from ParaView.
   color_array.resize(3 * array_size);
-  app_color_transfer_function->GetTable(voxel_range.x, voxel_range.y, array_size, &color_array[0]);
+
+  // using Logarithmic scale?
+  if (app_color_transfer_function->GetScale())
+  {
+    double color[3];
+    for (mi::Uint32 i = 0; i < array_size; i++)
+    {
+      mi::Float32 value = static_cast<mi::Float32>(i) / array_size;
+      value = voxel_range.x + (voxel_range.y - voxel_range.x) * value;
+      app_color_transfer_function->GetColor(value, color);
+      color_array[i * 3] = color[0];
+      color_array[i * 3 + 1] = color[1];
+      color_array[i * 3 + 2] = color[2];
+    }
+  }
+  else // Linear scale
+  {
+    app_color_transfer_function->GetTable(
+      voxel_range.x, voxel_range.y, array_size, &color_array[0]);
+  }
 
   // Read opacity values from ParaView.
   opacity_array.resize(array_size);

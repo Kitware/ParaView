@@ -33,6 +33,7 @@
 
 #include <nv/index/idistributed_compute_algorithm.h>
 #include <nv/index/idistributed_data_import_callback.h>
+#include <nv/index/iirregular_volume_rendering_properties.h>
 #include <nv/index/ilight.h>
 #include <nv/index/imaterial.h>
 #include <nv/index/iplane.h>
@@ -467,7 +468,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         {
           case RTC_KERNELS_ISOSURFACE:
           {
-            vtknvindex_isosurface_params iso_params;
+            vtknvindex_ivol_isosurface_params iso_params;
+            iso_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_ISOSURFACE_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&iso_params), sizeof(iso_params));
@@ -476,7 +478,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
           case RTC_KERNELS_DEPTH_ENHANCEMENT:
           {
-            vtknvindex_depth_enhancement_params depth_params;
+            vtknvindex_ivol_depth_enhancement_params depth_params;
+            depth_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_DEPTH_ENHANCEMENT_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&depth_params), sizeof(depth_params));
@@ -485,7 +488,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
           case RTC_KERNELS_EDGE_ENHANCEMENT:
           {
-            vtknvindex_edge_enhancement_params edge_params;
+            vtknvindex_ivol_edge_enhancement_params edge_params;
+            edge_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
             rtc_program->set_program_source(KERNEL_IRREGULAR_EDGE_ENHANCEMENT_STRING);
             rtc_program_parameters->set_buffer_data(
               0, reinterpret_cast<void*>(&edge_params), sizeof(edge_params));
@@ -507,15 +511,42 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       assert(m_rtc_program_tag.is_valid());
 
       // Create scene volume properties attribute.
-      mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_render_properties(
-        scene->create_attribute<nv::index::IRegular_volume_rendering_properties>());
-      assert(vol_render_properties.is_valid_interface());
+      if (volume_type == VOLUME_TYPE_REGULAR)
+      {
+        mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_render_properties(
+          scene->create_attribute<nv::index::IRegular_volume_rendering_properties>());
+        assert(vol_render_properties.is_valid_interface());
 
-      vol_render_properties->set_reference_step_size(calculate_volume_reference_step_size(
-        vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
+        vol_render_properties->set_reference_step_size(calculate_volume_reference_step_size(vol,
+          pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
 
-      m_vol_properties_tag =
-        dice_transaction->store_for_reference_counting(vol_render_properties.get());
+        m_vol_properties_tag =
+          dice_transaction->store_for_reference_counting(vol_render_properties.get());
+      }
+      else // irregular volume properties
+      {
+        mi::base::Handle<nv::index::IIrregular_volume_rendering_properties> vol_render_properties(
+          scene->create_attribute<nv::index::IIrregular_volume_rendering_properties>());
+        assert(vol_render_properties.is_valid_interface());
+
+        nv::index::IIrregular_volume_rendering_properties::Rendering render_properties;
+        vol_render_properties->get_rendering(render_properties);
+
+        render_properties.sampling_mode =
+          (m_volume_rtc_kernel.rtc_kernel == RTC_KERNELS_NONE) ? 0 : 1;
+
+        render_properties.sampling_segment_length =
+          m_cluster_properties->get_config_settings()->get_ivol_step_size() *
+          m_cluster_properties->get_config_settings()->get_step_size();
+
+        render_properties.sampling_reference_segment_length = calculate_volume_reference_step_size(
+          vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference());
+
+        vol_render_properties->set_rendering(render_properties);
+
+        m_vol_properties_tag =
+          dice_transaction->store_for_reference_counting(vol_render_properties.get());
+      }
       assert(m_vol_properties_tag.is_valid());
 
       // Volume compute attribute
@@ -999,7 +1030,7 @@ void vtknvindex_scene::update_rtc_kernel(
   const vtknvindex_rtc_params_buffer& rtc_param_buffer, Volume_type volume_type,
   bool kernel_changed)
 {
-
+  // Does it need to update kernel programs?
   if (kernel_changed)
   {
     assert(m_rtc_program_tag.is_valid());
@@ -1060,6 +1091,7 @@ void vtknvindex_scene::update_rtc_kernel(
     }
   }
 
+  // Does it need to update kernel's parameter buffer?
   assert(m_rtc_program_params_tag.is_valid());
 
   mi::base::Handle<nv::index::IRendering_kernel_program_parameters> rtc_program_parameters(
@@ -1069,13 +1101,80 @@ void vtknvindex_scene::update_rtc_kernel(
 
   if (rtc_param_buffer.rtc_kernel != RTC_KERNELS_NONE)
   {
-    rtc_program_parameters->set_buffer_data(
-      0, rtc_param_buffer.params_buffer, rtc_param_buffer.buffer_size);
-    rtc_program_parameters->set_enabled(true);
+    if (volume_type == VOLUME_TYPE_REGULAR)
+    {
+      rtc_program_parameters->set_buffer_data(
+        0, rtc_param_buffer.params_buffer, rtc_param_buffer.buffer_size);
+      rtc_program_parameters->set_enabled(true);
+    }
+    else // irregular volume kernels
+    {
+      switch (rtc_param_buffer.rtc_kernel)
+      {
+        case RTC_KERNELS_ISOSURFACE:
+        {
+          vtknvindex_ivol_isosurface_params iso_params =
+            *(reinterpret_cast<const vtknvindex_ivol_isosurface_params*>(
+              rtc_param_buffer.params_buffer));
+
+          iso_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+          rtc_program_parameters->set_buffer_data(0, &iso_params, rtc_param_buffer.buffer_size);
+          rtc_program_parameters->set_enabled(true);
+        }
+        break;
+
+        case RTC_KERNELS_DEPTH_ENHANCEMENT:
+        {
+          vtknvindex_ivol_depth_enhancement_params depth_params =
+            *(reinterpret_cast<const vtknvindex_ivol_depth_enhancement_params*>(
+              rtc_param_buffer.params_buffer));
+
+          depth_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+          rtc_program_parameters->set_buffer_data(0, &depth_params, rtc_param_buffer.buffer_size);
+          rtc_program_parameters->set_enabled(true);
+        }
+        break;
+
+        case RTC_KERNELS_EDGE_ENHANCEMENT:
+        {
+          vtknvindex_ivol_edge_enhancement_params edge_params =
+            *(reinterpret_cast<const vtknvindex_ivol_edge_enhancement_params*>(
+              rtc_param_buffer.params_buffer));
+
+          edge_params.rh = m_cluster_properties->get_config_settings()->get_ivol_step_size();
+          rtc_program_parameters->set_buffer_data(0, &edge_params, rtc_param_buffer.buffer_size);
+          rtc_program_parameters->set_enabled(true);
+        }
+        break;
+
+        case RTC_KERNELS_NONE:
+        default:
+          rtc_program_parameters->set_buffer_data(
+            0, rtc_param_buffer.params_buffer, rtc_param_buffer.buffer_size);
+          rtc_program_parameters->set_enabled(true);
+          break;
+      }
+    }
   }
   else
   {
     rtc_program_parameters->set_enabled(false);
+  }
+
+  // Update irregular volume properties
+  if (kernel_changed && (volume_type == VOLUME_TYPE_IRREGULAR))
+  {
+    mi::base::Handle<nv::index::IIrregular_volume_rendering_properties> vol_render_properties(
+      dice_transaction->edit<nv::index::IIrregular_volume_rendering_properties>(
+        m_vol_properties_tag));
+    assert(vol_render_properties.is_valid_interface());
+
+    nv::index::IIrregular_volume_rendering_properties::Rendering render_properties;
+    vol_render_properties->get_rendering(render_properties);
+
+    render_properties.sampling_mode = (rtc_param_buffer.rtc_kernel == RTC_KERNELS_NONE) ? 0 : 1;
+
+    vol_render_properties->set_rendering(render_properties);
   }
 }
 
@@ -1355,14 +1454,41 @@ void vtknvindex_scene::update_volume_opacity(
 {
   assert(m_vol_properties_tag.is_valid());
 
-  mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_properties(
-    dice_transaction->edit<nv::index::IRegular_volume_rendering_properties>(m_vol_properties_tag));
-  assert(vol_properties.is_valid_interface());
+  mi::base::Handle<const mi::neuraylib::IElement> vol_elem(
+    dice_transaction->access<mi::neuraylib::IElement>(m_volume_tag));
 
-  vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
+  mi::base::Handle<const nv::index::ISparse_volume_scene_element> sparse_vol_elem(
+    vol_elem->get_interface<nv::index::ISparse_volume_scene_element>());
 
-  vol_properties->set_reference_step_size(calculate_volume_reference_step_size(
-    vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
+  // Is regular volume?
+  if (sparse_vol_elem.is_valid_interface())
+  {
+    mi::base::Handle<nv::index::IRegular_volume_rendering_properties> vol_properties(
+      dice_transaction->edit<nv::index::IRegular_volume_rendering_properties>(
+        m_vol_properties_tag));
+    assert(vol_properties.is_valid_interface());
+
+    vtknvindex_config_settings* pv_config_settings = m_cluster_properties->get_config_settings();
+
+    vol_properties->set_reference_step_size(calculate_volume_reference_step_size(
+      vol, pv_config_settings->get_opacity_mode(), pv_config_settings->get_opacity_reference()));
+  }
+  else // It's irregular volume
+  {
+    mi::base::Handle<nv::index::IIrregular_volume_rendering_properties> vol_render_properties(
+      dice_transaction->edit<nv::index::IIrregular_volume_rendering_properties>(
+        m_vol_properties_tag));
+    assert(vol_render_properties.is_valid_interface());
+
+    nv::index::IIrregular_volume_rendering_properties::Rendering render_properties;
+    vol_render_properties->get_rendering(render_properties);
+
+    render_properties.sampling_segment_length =
+      m_cluster_properties->get_config_settings()->get_ivol_step_size() *
+      m_cluster_properties->get_config_settings()->get_step_size();
+
+    vol_render_properties->set_rendering(render_properties);
+  }
 }
 
 //-------------------------------------------------------------------------------------------------

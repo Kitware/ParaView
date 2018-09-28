@@ -29,7 +29,7 @@ namespace index
 ///
 /// A texture may be assigned to a plane. The texture can be defined by
 /// volume data or an arbitrary bitmap. The plane's texture is
-/// implemented by assigning one of follwing attributes to the plane:
+/// implemented by assigning one of following attributes to the plane:
 /// \c IRegular_volume_texture (for volumes) or \c IDistributed_compute_technique (for bitmaps).
 ///
 ///

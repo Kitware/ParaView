@@ -136,6 +136,10 @@ public:
   void set_step_size(mi::Float32 step_size);
   mi::Float32 get_step_size() const;
 
+  // Set/get irregular volume step size.
+  void set_ivol_step_size(mi::Float32 step_size);
+  mi::Float32 get_ivol_step_size() const;
+
   // Set/get flag for performance logging.
   void set_log_performance(bool is_dump);
   bool is_log_performance() const;
@@ -185,6 +189,7 @@ private:
   mi::Uint32 m_filter_mode;                                   // Volume filtering mode.
   mi::Uint32 m_subcube_border;                                // NVIDIA IndeX subcube border size.
   mi::Float32 m_step_size;                                    // Volume raycast step size.
+  mi::Float32 m_ivol_step_size;                               // IRR-Volume raycast step size.
   mi::Uint32 m_opacity_mode;                                  // Volume opacity mode.
   mi::Float32 m_opacity_reference;                            // Volume reference opacity.
   vtknvindex_rtc_kernels m_rtc_kernel;                        // Current rtc kernel.

@@ -64,14 +64,14 @@ public:
 /// Defines headers that can be included by rendering kernel programs. The attribute is applied to a
 /// scene element and then affects any \c IRendering_kernel_program that is also applied.
 ///
-/// Multiple headers can be defined, each identfied by the name by which it can be included in the
+/// Multiple headers can be defined, each identified by the name by which it can be included in the
 /// program. While the name may look like a file path such as <tt>/includes/common/utils.h</tt> and
 /// the
 /// header can be included as <tt>\#include "/includes/common/utils.h"</tt>, it is really just an
 /// identifier. This attribute does not perform any file access.
 ///
 /// When multiple instances of this attribute are active for a rendered scene element, only the
-/// instance that is defined closest to the scene element in the scene description hierachy will be
+/// instance that is defined closest to the scene element in the scene description hierarchy will be
 /// used.
 ///
 class IRendering_kernel_program_headers

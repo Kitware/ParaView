@@ -541,10 +541,10 @@ public:
   ///
   /// Video contexts must first be created by the client and can then be retrieved on the server
   /// via this method. The video context ID is assigned when the video context is created on the
-  /// client side and must be transfered to the server before calling this method. The recommended
-  /// way to do this is to execute a Bridge job containing the video context ID and optionally
-  /// other data that is required for the server-side application to set up the video source and
-  /// to start producing frames.
+  /// client side and must be transferred to the server before calling this method.
+  /// The recommended way to do this is to execute a Bridge job containing the video context ID
+  /// and optionally other data that is required for the server-side application to set up
+  /// the video source and to start producing frames.
   ///
   /// \param context_id   The video context ID.
   /// \return             The video context or \c NULL if no video context with the provided ID
@@ -887,17 +887,18 @@ public:
 
   /// Returns the hash and serialized size for the provided element.
   ///
-  /// \param transaction The transaction to use when looking up the element.
-  /// \param element The name of the element.
-  /// \param o_hash The hash will be written to this IString on success.
-  /// \param o_size The serialized size in bytes will be assigend to this variable on success.
+  /// \param transaction   The transaction to use when looking up the element.
+  /// \param element       The name of the element.
+  /// \param o_hash        The hash will be written to this IString on success.
+  /// \param o_size        The serialized size in bytes will be assigned to this variable on
+  ///                      success.
   /// \return
-  ///              -     0: Success.
-  ///              -    -1: Invalid arguments.
-  ///              -    -2: Failed to look up element with the provided name.
-  ///              - <= -2: Unspecified error.
-  virtual Sint32 calculate_hash(mi::neuraylib::ITransaction* transaction, const char* element,
-    mi::IString* o_hash, mi::Size* o_size) = 0;
+  ///                      -     0: Success.
+  ///                      -    -1: Invalid arguments.
+  ///                      -    -2: Failed to look up element with the provided name.
+  ///                      - <= -2: Unspecified error.
+  virtual Sint32 calculate_hash(
+    neuraylib::ITransaction* transaction, const char* element, IString* o_hash, Size* o_size) = 0;
 };
 
 /*@}*/ // end group mi_neuray_bridge_server

@@ -208,9 +208,9 @@ bool vtknvindex_application::authenticate_nvindex_library()
   // No explicit license found, use default free license.
   if (!found_license)
   {
-    index_vendor_key = "NVIDIA IndeX License for ParaView - IndeX:PV:Free:v1 - 20180307 "
-                       "(oem:retail_cloud.20190331)";
-    index_secret_key = "776532b335999674f8492574fbccd8defeac1b30e9804d5d42b383c57dcfab8f";
+    index_vendor_key = "NVIDIA IndeX License for ParaView - IndeX:PV:Free:v1 - 20180927 "
+                       "(oem:retail_cloud.20210904)";
+    index_secret_key = "10aed4fb95a7fb230875decf11dd29c666612b4df39775df6256bc291bd0d346";
   }
 
   // Retrieve Flex license path.
@@ -445,15 +445,12 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
   // TODO: Demo Hack, Remove later
   // Retain subregion resources
   {
+#ifdef USE_SPARSE_VOLUME
     // Debug configuration.
     mi::base::Handle<nv::index::IIndex_debug_configuration> idebug_configuration(
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>());
     assert(idebug_configuration.is_valid_interface());
 
-    std::string retain_subregion_resources = std::string("retain_subregion_resources=1");
-    idebug_configuration->set_option(retain_subregion_resources.c_str());
-
-#ifdef USE_SPARSE_VOLUME
     std::string disable_timeseries_data_prefetch =
       std::string("timeseries_data_prefetch_disable=1");
     idebug_configuration->set_option(disable_timeseries_data_prefetch.c_str());
@@ -464,7 +461,6 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
       std::string use_strict_domain_subdivision = std::string("use_strict_domain_subdivision=1");
       idebug_configuration->set_option(use_strict_domain_subdivision.c_str());
     }
-
 #endif
   }
 

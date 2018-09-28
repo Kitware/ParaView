@@ -164,6 +164,9 @@ public:
   // Set CUDA code parameter.
   void set_volume_filter(int filter);
 
+  // Set raycast step size factor
+  void set_step_size_factor(double step_size_factor);
+
   // Set common lighting parameter.
   void set_light_type(int light_type);
   void set_light_angle(double light_angle);
@@ -270,9 +273,9 @@ private:
   mi::Float32 m_prev_time_step;
 
   // rtc kernel params
-  vtknvindex_isosurface_params m_isosurface_params;
-  vtknvindex_depth_enhancement_params m_depth_enhancement_params;
-  vtknvindex_edge_enhancement_params m_edge_enhancement_params;
+  vtknvindex_ivol_isosurface_params m_isosurface_params;
+  vtknvindex_ivol_depth_enhancement_params m_depth_enhancement_params;
+  vtknvindex_ivol_edge_enhancement_params m_edge_enhancement_params;
 };
 
 #endif // vtknvindex_irregular_volume_representation_h

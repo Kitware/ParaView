@@ -16,7 +16,7 @@ namespace index
 
 /// Enables rendering to a user-defined canvas.
 /// Technically, the canvas wraps a frame buffer that contains one or more rendering targets
-/// or frame buffer layer. The the NVIDIA IndeX library renders its rendering/visualization
+/// or frame buffer layer. The NVIDIA IndeX library renders its rendering/visualization
 /// results into the associated frame buffer layers.
 /// Typical use cases include the rendering (blending) of all image tiles (a.k.a. horizontal
 /// spans) into an OpenGL framebuffer, into main memory or CUDA buffer for
@@ -65,7 +65,7 @@ public:
   virtual void prepare() = 0;
 
   /// This interface method receives multiple tiles for each layer.
-  /// The method is called for each tile and each layer between \c prepare() and
+  /// The method is called for each tile and each layer between \c prepare()
   /// and \c finish().
   ///
   /// \note This method must be thread safe since the library may
@@ -80,7 +80,7 @@ public:
     const mi::math::Bbox_struct<mi::Uint32, 2>& area, mi::Uint8* buffer) = 0;
 
   /// This interface method receives multiple tiles.
-  /// The method is called for each tile and between \c prepare() and
+  /// The method is called for each tile and between \c prepare()
   /// and \c finish().
   ///
   /// \note This method must be thread safe since the library may
@@ -96,7 +96,7 @@ public:
     const mi::math::Bbox_struct<mi::Uint32, 2>& area) = 0;
 
   /// This interface method receives multiple tiles.
-  /// The method is called for each tile and between \c prepare() and
+  /// The method is called for each tile and between \c prepare()
   /// and \c finish().
   ///
   /// This method blends the received image over existing image data.
@@ -134,7 +134,7 @@ public:
   ///
   virtual mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const = 0;
 
-  /// Returns the a canvas that hosts the rendered pixels.
+  /// Returns the canvas that hosts the rendered pixels.
   ///
   /// \return     The main memory canvas that contains the rendered image.
   ///
@@ -143,19 +143,19 @@ public:
 
 /// CUDA-memory based canvas.
 /// Using a CUDA-memory based enables NVIDIA IndeX to run rendering and image
-/// compositing on the GPU only without ever transfering data from GPUs to main
+/// compositing on the GPU only without ever transferring data from GPUs to main
 /// memory.
 /// NVIDIA IndeX support the creation of a built-in CUDA canvas that derives
-/// from the the following interface class.
+/// from the following interface class.
 ///
 class IIndex_cuda_canvas : public mi::base::Interface_declare<0x631ca66c, 0x5ed7, 0x4275, 0xb7,
                              0xb8, 0x10, 0x23, 0x85, 0xf8, 0x36, 0x55, nv::index::IIndex_canvas>
 {
 public:
-  /// Returns the a CUDA memory based canvas for external use, e.g., by a
+  /// Returns the CUDA memory based canvas for external use, e.g., by a
   /// video encoder as input.
   ///
-  /// \return     The low-level CUDA memory canvas..
+  /// \return     The low-level CUDA memory canvas.
   ///
   virtual mi::neuraylib::ICanvas_cuda* get_cuda_canvas() const = 0;
 

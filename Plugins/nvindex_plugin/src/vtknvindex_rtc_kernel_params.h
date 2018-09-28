@@ -160,6 +160,97 @@ struct vtknvindex_edge_enhancement_params
   }
 };
 
+// IVOL isosurface CUDA code parameters.
+struct vtknvindex_ivol_isosurface_params
+{
+  float rh; // raycast step size
+  // Common lighting parameter.
+  int light_mode;  // 0=headlight, 1=orbital
+  float angle;     // 0.0 angle
+  float elevation; // 0.0 elevation
+
+  float iso_min;   // 0.5, iso value in %
+  float iso_max;   // 0.5, iso value in %
+  int fill_up;     // 1
+  int use_shading; // 1, use local phong-blinn model
+
+  float spec_fac;  // 1.0f, specular level (phong)
+  float shininess; // 50.0f, shininess parameter (phong)
+  float amb_fac;   // 0.2f, ambient factor
+
+  float spec_color[3]; // make_float3(1.0f), specular color
+
+  float dummy[2]; // for memory 16 bytes alignment
+
+  vtknvindex_ivol_isosurface_params()
+    : rh(1.0f)
+    , light_mode(0)
+    , angle(0.0f)
+    , elevation(0.0f)
+    , iso_min(0.5f)
+    , iso_max(0.5f)
+    , fill_up(1)
+    , use_shading(1)
+    , spec_fac(1.0f)
+    , shininess(50.0f)
+    , amb_fac(0.2f)
+  {
+    spec_color[0] = spec_color[1] = spec_color[2] = 1.0f;
+  }
+};
+
+// IVOL depth enhancement CUDA code parameters.
+struct vtknvindex_ivol_depth_enhancement_params
+{
+  float rh; // raycast step size
+  // Common lighting parameter.
+  int light_mode;  // 0=headlight, 1=orbital
+  float angle;     // 0.0 angle
+  float elevation; // 0.0 elevation
+
+  // additional depth samples
+  int max_dsteps; // = 8 [GUI] number of additional samples
+
+  // screen effects
+  float screen_gamma; // 0.9f [GUI] gamma correction parameter
+
+  // shading parameters [GUI / scene]
+  float spec_color[3]; // make_float3(1.0f) specular color
+  float spec_fac;      // 0.2f specular factor (phong)
+  float shininess;     // 50.0f shininess parameter (phong)
+  float amb_fac;       // 0.4f ambient factor
+
+  vtknvindex_ivol_depth_enhancement_params()
+    : rh(0.0f)
+    , light_mode(0)
+    , angle(0.0f)
+    , elevation(0.0f)
+    , max_dsteps(8)
+    , screen_gamma(0.9f)
+    , spec_fac(0.2f)
+    , shininess(50.0f)
+    , amb_fac(0.4f)
+  {
+    spec_color[0] = spec_color[1] = spec_color[2] = 1.0f;
+  }
+};
+
+// IVOL edge enhancement CUDA code parameters.
+struct vtknvindex_ivol_edge_enhancement_params
+{
+  float rh;           // 1.0f ray sampling difference
+  float sample_range; // [10, 10] 1.0 sample range
+  int stp_num;        // 6 [GUI] additional samples along ray
+  float dummy;
+
+  vtknvindex_ivol_edge_enhancement_params()
+    : rh(1.0f)
+    , sample_range(1.0f)
+    , stp_num(6)
+  {
+  }
+};
+
 // rtc sparse volume programs
 extern const char* KERNEL_ISOSURFACE_STRING;
 extern const char* KERNEL_DEPTH_ENHANCEMENT_STRING;
