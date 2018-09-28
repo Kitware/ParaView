@@ -407,6 +407,21 @@ const char* vtkSMCoreUtilities::GetStringForCellType(int cellType)
       return "Higher-Order-Pyramid";
     case VTK_HIGHER_ORDER_HEXAHEDRON:
       return "Higher-Order-Hexahedron";
+
+    case VTK_LAGRANGE_CURVE:
+      return "Lagrange Curve";
+    case VTK_LAGRANGE_TRIANGLE:
+      return "Lagrange Triangle";
+    case VTK_LAGRANGE_QUADRILATERAL:
+      return "Lagrange Quadrilateral";
+    case VTK_LAGRANGE_TETRAHEDRON:
+      return "Lagrange Tetrahedron";
+    case VTK_LAGRANGE_HEXAHEDRON:
+      return "Lagrange Hexahedron";
+    case VTK_LAGRANGE_WEDGE:
+      return "Lagrange Wedge";
+    case VTK_LAGRANGE_PYRAMID:
+      return "Lagrange Pyramid";
   }
   return "Unknown";
 }
