@@ -1223,6 +1223,32 @@
         <Documentation>This property specifies the input to the Cell Data to
         Point Data filter.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetProcessAllArrays"
+                         default_values="1"
+                         name="ProcessAllArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property controls whether all input
+        cell arrays will be processed and converted into point arrays.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty clean_command="ClearCellDataArrays"
+                            command="AddCellDataArray"
+                            name="CellDataArrays"
+                            label="Cell Data Array to process"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a cell array by name to be converted to point array.</Documentation>
+        <ArrayListDomain input_domain_name="input_array" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ProcessAllArrays" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty command="SetPassCellData"
                          default_values="0"
                          name="PassCellData"
@@ -4744,6 +4770,32 @@ array.
         <Documentation>This property specifies the input to the Point Data to
         Cell Data filter.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetProcessAllArrays"
+                         default_values="1"
+                         name="ProcessAllArrays"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>The value of this property controls whether all input
+        point arrays will be processed and converted into cell arrays.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty clean_command="ClearPointDataArrays"
+                            command="AddPointDataArray"
+                            name="PointDataArrays"
+                            label="Point Data Array to process"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <Documentation>Add a point array by name to be converted to cell array.</Documentation>
+        <ArrayListDomain input_domain_name="input_array" name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="ProcessAllArrays" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
       <IntVectorProperty command="SetPassPointData"
                          default_values="0"
                          name="PassPointData"
