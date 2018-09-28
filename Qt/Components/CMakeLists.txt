@@ -200,6 +200,8 @@ set (Module_SRCS
   pqPopOutWidget.h
   pqPresetDialog.cxx
   pqPresetDialog.h
+  pqPresetGroupsManager.cxx
+  pqPresetGroupsManager.h
   pqPresetToPixmap.cxx
   pqPresetToPixmap.h
   pqPropertiesPanel.cxx
@@ -408,6 +410,7 @@ set (Module_MOC_HDRS
   pqPluginTreeWidget.h
   pqPopOutWidget.h
   pqPresetDialog.h
+  pqPresetGroupsManager.h
   pqPresetToPixmap.h
   pqPropertiesPanel.h
   pqPropertyGroupWidget.h

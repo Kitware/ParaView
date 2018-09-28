@@ -4,7 +4,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="ImageMandelbrotSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/colorMapEditorDock/colorMapEditorPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Properties/ColorOpacityEditor/ChoosePreset" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/advancedButton" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="All" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
@@ -14,14 +14,14 @@
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseWheel" arguments="-120,0,0,600,261" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="33.0" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="34.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="33.1" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="34.0" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="33.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/advancedButton" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/pqPresetDialog/widget/groupChooser" command="activated" arguments="default" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="8.0" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/showDefault" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/pqPresetDialog/gradients" command="setCurrent" arguments="8.0" />

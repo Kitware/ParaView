@@ -147,6 +147,9 @@ protected:
   void showEvent(QShowEvent* e) override;
   void closeEvent(QCloseEvent* e) override;
 
+private slots:
+  void updateGroups();
+
 private:
   Q_DISABLE_COPY(pqPresetDialog)
   class pqInternals;

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqItemViewSearchWidget.h"
 #include "pqLoadDataReaction.h"
 #include "pqOptions.h"
+#include "pqPresetGroupsManager.h"
 #include "pqPropertiesPanel.h"
 #include "pqQuickLaunchDialog.h"
 #include "pqSelectionManager.h"
@@ -71,6 +72,23 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* opti
   this->SelectionManager = new pqSelectionManager(this);
 
   pqApplicationCore::instance()->registerManager("SELECTION_MANAGER", this->SelectionManager);
+
+  pqPresetGroupsManager* presetGroupManager = new pqPresetGroupsManager(this);
+  QString groupString;
+  QFile groupsFile(":pqWidgets/pqPresetGroups.json");
+
+  if (!groupsFile.open(QIODevice::ReadOnly))
+  {
+    qWarning() << "Could not load preset group list.";
+  }
+  else
+  {
+    groupString = groupsFile.readAll();
+  }
+  groupsFile.close();
+
+  presetGroupManager->loadGroups(groupString);
+  pqApplicationCore::instance()->registerManager("PRESET_GROUP_MANAGER", presetGroupManager);
 
   this->PythonManager = 0;
 #ifdef PARAVIEW_ENABLE_PYTHON
