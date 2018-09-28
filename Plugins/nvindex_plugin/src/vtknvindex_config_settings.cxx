@@ -283,6 +283,7 @@ vtknvindex_config_settings::vtknvindex_config_settings()
   , m_filter_mode(0)
   , m_subcube_border(2)
   , m_step_size(1.0f)
+  , m_ivol_step_size(1.0f)
   , m_opacity_mode(0)
   , m_opacity_reference(1.0f)
   , m_rtc_kernel(RTC_KERNELS_NONE)
@@ -393,6 +394,17 @@ void vtknvindex_config_settings::set_step_size(mi::Float32 step_size)
 mi::Float32 vtknvindex_config_settings::get_step_size() const
 {
   return m_step_size;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_config_settings::set_ivol_step_size(mi::Float32 step_size)
+{
+  m_ivol_step_size = step_size;
+}
+//-------------------------------------------------------------------------------------------------
+mi::Float32 vtknvindex_config_settings::get_ivol_step_size() const
+{
+  return m_ivol_step_size;
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -35,12 +35,12 @@ NV_IDX_XAC_VERSION_1_0
 
 struct Depth_enhancement_params
 {
+    float rh;
     // common lighting params
     int light_mode;   // 0=headlight, 1=orbital
     float angle;    // 0 angle
     float elevation;  // pi/2 angle
     int max_dsteps;   // = 8 [GUI] number of additional samples
-    float ash;     // 0.01f adaptive sampling threshold
     float screen_gamma; // 0.9f [GUI] gamma correction parameter
 
     // shading parameters [GUI / scene]
@@ -48,11 +48,6 @@ struct Depth_enhancement_params
     float spec_fac;  // 0.2f specular factor (phong)
     float shininess;  // 50.0f shininess parameter (phong)
     float amb_fac;   // 0.4f ambient factor
-
-    float shade_h;  // 0.5f [GUI] min alpha value for shading
-    float min_alpha; // 0.001f min alpha for sampling (improves performance)
-
-    float dummy[2];
 };
 
 using namespace nv::index;
@@ -62,15 +57,10 @@ class Volume_sample_program
 {
     NV_IDX_VOLUME_SAMPLE_PROGRAM
 
-    const uint field_index     = 0u;
-    const float dh             = 0.1f;
-    const float dh_inv         = 10.0f;
-    const float rh             = 1.0f;
-    const float min_grad_length= 0.001f;
-    const float shade_h        = 0.5f;
-    const float min_alpha      = 0.001f;
-    const float3 spec_color    = make_float3(1.f); // make_float3(1.0f) specular color
-
+    const uint field_index      = 0u;
+    const float min_grad_length = 0.001f;
+    const float shade_h         = 0.5f; // min alpha value for shading
+    const float min_alpha       = 0.001f; // min alpha for sampling
 
 public:
     const Depth_enhancement_params*
@@ -111,6 +101,7 @@ public:
         }
 
         // sample volume along the ray
+        const float rh = m_depth_enhancement_params->rh;
         const float3 p0 = scene_position;
         const float3 p1 = p0 + (ray_dir * rh);
         const float3 v01 = (ray_dir * rh);
@@ -128,7 +119,7 @@ public:
         }
 
         // check the number of steps to take along the ray
-        if (m_depth_enhancement_params->max_dsteps > 2)
+        if (m_depth_enhancement_params->max_dsteps >= 2)
         {
             // init result color
             float4 acc_color = make_float4(
@@ -167,7 +158,7 @@ public:
         if (sample_color.w > shade_h)
         {
             // get the volume gradient
-            const float3 vs_grad = get_gradient_3n(sample_info, vs_p0);
+            const float3 vs_grad = get_gradient_3n(sample_info, vs_p0, rh);
 
             // check gradient length
             if (length(vs_grad) < min_grad_length)
@@ -194,7 +185,7 @@ public:
             }
 
             // compute final shaded color (RGB)
-            float4 color_linear = make_float4(diffuse_color * (m_depth_enhancement_params->amb_fac + lambertian) + spec_color * (spec_fac * m_depth_enhancement_params->spec_fac));
+            float4 color_linear = make_float4(diffuse_color * (m_depth_enhancement_params->amb_fac + lambertian) + m_depth_enhancement_params->spec_color * (spec_fac * m_depth_enhancement_params->spec_fac));
 
             // apply gamma correction
             color_linear = xaclib::gamma_correct(color_linear, m_depth_enhancement_params->screen_gamma);
@@ -210,8 +201,10 @@ public:
 
     // compute gradient for irregular volume
     NV_IDX_DEVICE_INLINE_MEMBER
-    float3 get_gradient_3n(const Sample_info_self&  sample_info, float vs_c)
+    float3 get_gradient_3n(const Sample_info_self&  sample_info, float vs_c, float rh)
     {
+        const float dh = 0.5f*rh;
+        const float dh_inv = 1.0f/rh;
         const auto& cell_info = sample_info.sample_cell_info;
         const auto& ivol = state.self;
 

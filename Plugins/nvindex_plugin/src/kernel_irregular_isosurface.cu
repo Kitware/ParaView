@@ -35,7 +35,8 @@
 // Define the user-defined data structure
 struct Isosurface_params
 {
-  // common lighting params
+  float rh;        // raycast step size
+  // Common lighting parameter.
   int light_mode;  // 0=headlight, 1=orbital
   float angle;     // 0.0 angle
   float elevation; // 0.0 elevation
@@ -44,20 +45,14 @@ struct Isosurface_params
   float iso_max;   // 0.5, iso value in %
   int fill_up;     // 1
   int use_shading; // 1, use local phong-blinn model
-  float min_alpha; // 0.05, finite difference
 
   float spec_fac;  // 1.0f, specular level (phong)
   float shininess; // 50.0f, shininess parameter (phong)
   float amb_fac;   // 0.2f, ambient factor
-  float diff_exp;  // 2.0f, diffuse falloff (like edge enhance)
-
-  int show_grid;  // 0, show normal grid
-  int ng_num;     // 16
-  float ng_width; // 0.01f
 
   float3 spec_color; // make_float3(1.0f), specular color
 
-  float2 dummy; // for memory 16 bytes alignment
+  float dummy[2]; // for memory 16 bytes alignment
 };
 
 using namespace nv::index;
@@ -67,9 +62,9 @@ class Volume_sample_program
 {
   NV_IDX_VOLUME_SAMPLE_PROGRAM
 
-  const uint field_index     = 0u;
-  const float dh             = 0.1f;
-
+  const uint field_index  = 0u;
+  const float min_alpha   = 0.05f; // finite difference
+  const float diff_exp    = 2.0f; // diffuse falloff (like edge enhance)
 
 public:
   const Isosurface_params* m_isosurface_params; // define variables to bind user-defined buffer to
@@ -88,7 +83,6 @@ public:
   {
     const auto& cell_info = sample_info.sample_cell_info;
     const auto& volume = state.self;
-    const float3& sample_position = sample_info.scene_position;
     const float3 ray_dir = sample_info.ray_direction;
     const Colormap& colormap = volume.get_colormap();
 
@@ -109,7 +103,8 @@ public:
     const float volume_sample = volume.fetch_attribute<float>(field_index, cell_info);
 
     // get spatial sample points for each dimensions
-    const float rh = 1.0f;//state.self.get_stepsize_min(); // ray sampling difference
+    const float rh = m_isosurface_params->rh;
+    const float dh = 0.1f*rh;
     const float vs_dr_p = volume.fetch_attribute_offset<float>(field_index, cell_info, ray_dir * rh);
     const float vs_dr_n = volume.fetch_attribute_offset<float>(field_index, cell_info, - ray_dir * rh);
 
@@ -126,40 +121,12 @@ public:
         -normalize(xaclib::volume_gradient(volume, cell_info, dh)); // get isosurface normal
 
       // check if to skip sample
-      if (sample_color.w < m_isosurface_params->min_alpha)
+      if (sample_color.w < min_alpha)
       {
         return NV_IDX_PROG_DISCARD_SAMPLE;
       }
       else
       {
-        // show normal grid lines
-        if (m_isosurface_params->show_grid)
-        {
-          // compute angles
-          const float ang_ng = M_PI / (float)(m_isosurface_params->ng_num + 1);
-
-          // compute modulo difference
-          const float ang_mx = fmodf(acos(iso_normal.x), ang_ng);
-          const float ang_my = fmodf(acos(iso_normal.y), ang_ng);
-          const float ang_mz = fmodf(acos(iso_normal.z), ang_ng);
-
-          if (fabsf(ang_mx) < m_isosurface_params->ng_width)
-          {
-            sample_output.color = make_float4(0.5f, 0.f, 0.f, 1.f);
-            return NV_IDX_PROG_OK;
-          }
-          else if (fabsf(ang_my) < m_isosurface_params->ng_width)
-          {
-            sample_output.color = make_float4(0.f, 0.5f, 0.f, 1.f);
-            return NV_IDX_PROG_OK;
-          }
-          else if (fabsf(ang_mz) < m_isosurface_params->ng_width)
-          {
-            sample_output.color = make_float4(0.f, 0.f, 0.5f, 1.f);
-            return NV_IDX_PROG_OK;
-          }
-        }
-
         // valid intersection found
         if (m_isosurface_params->use_shading)
         {
@@ -211,36 +178,8 @@ public:
         -normalize(xaclib::volume_gradient(volume, cell_info, dh)); // get isosurface normal
 
       // check if to skip sample
-      if (sample_color.w < m_isosurface_params->min_alpha)
+      if (sample_color.w < min_alpha)
         return NV_IDX_PROG_DISCARD_SAMPLE;
-
-      // show normal grid lines
-      if (m_isosurface_params->show_grid)
-      {
-        // compute angles
-        const float ang_ng = M_PI / (float)(m_isosurface_params->ng_num + 1);
-
-        // compute modulo difference
-        const float ang_mx = fmodf(acos(iso_normal.x), ang_ng);
-        const float ang_my = fmodf(acos(iso_normal.y), ang_ng);
-        const float ang_mz = fmodf(acos(iso_normal.z), ang_ng);
-
-        if (fabsf(ang_mx) < m_isosurface_params->ng_width)
-        {
-          sample_output.color = make_float4(0.5f, 0.f, 0.f, 1.f);
-          return NV_IDX_PROG_OK;
-        }
-        else if (fabsf(ang_my) < m_isosurface_params->ng_width)
-        {
-          sample_output.color = make_float4(0.f, 0.5f, 0.f, 1.f);
-          return NV_IDX_PROG_OK;
-        }
-        else if (fabsf(ang_mz) < m_isosurface_params->ng_width)
-        {
-          sample_output.color = make_float4(0.f, 0.f, 0.5f, 1.f);
-          return NV_IDX_PROG_OK;
-        }
-      }
 
       // valid intersection found
       if (m_isosurface_params->use_shading)
@@ -301,7 +240,7 @@ public:
       NH = fabsf(dot(H, normal));
     }
 
-    const float diff_amnt = powf(NL, m_isosurface_params->diff_exp);
+    const float diff_amnt = powf(NL, diff_exp);
     const float spec_amnt = powf(NH, m_isosurface_params->shininess);
 
     // compute final color (RGB)

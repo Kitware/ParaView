@@ -228,6 +228,7 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
   m_num_ranks = 1;
   m_rank_id = 0;
+  m_all_rank_ids.clear();
   m_all_rank_ids.push_back(0);
 
   mi::math::Bbox<mi::Sint32, 3> volume_extents;
