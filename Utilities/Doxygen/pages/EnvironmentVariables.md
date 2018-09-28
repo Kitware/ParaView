@@ -20,3 +20,4 @@ PV_PLUGIN_DEBUG | Prints debugging information when loading plugins into ParaVie
 PV_PLUGIN_PATH | Directories containing plugins to be loaded on startup.
 PV_SETTINGS_DEBUG | When set, debugging text will be printed out to assist developers debug settings.
 QT_MAC_NO_NATIVE_MENUBAR | Qt flag to force the Qt menu bar rather than the native mac menu bar.
+PV_USE_OFFSCREEN_BUFFERS_FOR_IMAGE_CAPTURE | A temporary environment variable which defined causes ParaView to use offscreen frame buffer when capturing images (see #18446). This may be removed in future without notice.

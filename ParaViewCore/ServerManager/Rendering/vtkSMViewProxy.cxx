@@ -41,7 +41,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
 
 namespace vtkSMViewProxyNS
 {
@@ -121,6 +122,15 @@ private:
 };
 vtkStandardNewMacro(WindowToImageFilter);
 };
+
+namespace
+{
+static bool GetUseOffScreenBuffersEnvironmentFlag()
+{
+  static bool flag = (getenv("PV_USE_OFFSCREEN_BUFFERS_FOR_IMAGE_CAPTURE") != nullptr);
+  return flag;
+}
+}
 
 bool vtkSMViewProxy::TransparentBackground = false;
 
@@ -596,6 +606,14 @@ vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magX, int magY)
   int swapBuffers = renWin->GetSwapBuffers();
   renWin->SwapBuffersOff();
 
+  const bool prevOB = renWin->GetUseOffScreenBuffers();
+  static bool use_offscreen_buffers_flag = ::GetUseOffScreenBuffersEnvironmentFlag();
+  if (use_offscreen_buffers_flag)
+  {
+    // see #18446 for why we need UseOffScreenBuffers.
+    renWin->SetUseOffScreenBuffers(true);
+  }
+
   // this is needed to ensure that view gets setup correctly before go ahead to
   // capture the image.
   this->RenderForImageCapture();
@@ -614,6 +632,10 @@ vtkImageData* vtkSMViewProxy::CaptureWindowInternal(int magX, int magY)
   w2i->Update();
 
   renWin->SetSwapBuffers(swapBuffers);
+  if (use_offscreen_buffers_flag)
+  {
+    renWin->SetUseOffScreenBuffers(prevOB);
+  }
 
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());
