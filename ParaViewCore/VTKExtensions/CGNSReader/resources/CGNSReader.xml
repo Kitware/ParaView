@@ -87,13 +87,29 @@
         <BooleanDomain name="bool" />
         <Documentation>
           Toggle whether to cache mesh points.
-          If unchecked, tmesh coordinates are read at every time step.
+          If unchecked, mesh coordinates are read at every time step.
           If checked, mesh coordinates are store in the cache. When loading a new iteration,
           the mesh coordinates will be retrieved from the cache.
           Changing this property may impact the loading performance.
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="CacheConnectivity"
+                         command="SetCacheConnectivity"
+                         number_of_elements="1"
+                         animateable="0"
+                         default_values="0"
+                         label="Caching Unstructured Mesh Connectivity"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether to cache mesh connectivity for unstructured meshes.
+          If unchecked, mesh connectivity are read at every time step.
+          If checked, mesh connectivity are store in the cache. When loading a new iteration,
+          the mesh connectivity will be retrieved from the cache.
+          Changing this property may impact the loading performance.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty name="CreateEachSolutionAsBlock"
                          command="SetCreateEachSolutionAsBlock"
@@ -209,6 +225,7 @@
           <Property name="PointArrayStatus" />
           <Property name="DoublePrecisionMesh" />
           <Property name="CacheMesh" />
+          <Property name="CacheConnectivity" />
           <Property name="CreateEachSolutionAsBlock" />
           <Property name="IgnoreFlowSolutionPointers" />
         </ExposedProperties>

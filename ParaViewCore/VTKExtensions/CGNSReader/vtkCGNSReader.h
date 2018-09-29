@@ -40,6 +40,7 @@
 #include "vtkNew.h"                             // for vtkNew.
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
 #include "vtkPoints.h"
+#include "vtkUnstructuredGrid.h"
 
 class vtkDataSet;
 class vtkDataArraySelection;
@@ -223,6 +224,16 @@ public:
 
   //@{
   /**
+   * This reader can cache the meshconnectivities if they are time invariant.
+   * They will be stored with a unique reference to their /base/zonename
+   * and not be read in the file when doing unsteady analysis.
+   */
+  void SetCacheConnectivity(bool enable);
+  vtkGetMacro(CacheConnectivity, bool);
+  vtkBooleanMacro(CacheConnectivity, bool);
+
+  //@{
+  /**
    * Set/get the communication object used to relay a list of files
    * from the rank 0 process to all others. This is the only interprocess
    * communication required by vtkPExodusIIReader.
@@ -283,6 +294,8 @@ private:
 
   CGNSRead::vtkCGNSMetaData* Internal;               // Metadata
   CGNSRead::vtkCGNSCache<vtkPoints> MeshPointsCache; // Cache for the mesh points
+  CGNSRead::vtkCGNSCache<vtkUnstructuredGrid>
+    ConnectivitiesCache; // Cache for the mesh connectivities
 
   char* FileName; // cgns file name
 #if !defined(VTK_LEGACY_REMOVE)
@@ -294,6 +307,7 @@ private:
   bool IgnoreFlowSolutionPointers;
   bool DistributeBlocks;
   bool CacheMesh;
+  bool CacheConnectivity;
 
   // For internal cgio calls (low level IO)
   int cgioNum;      // cgio file reference
