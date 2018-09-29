@@ -39,13 +39,13 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkNew.h"                             // for vtkNew.
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
-#include "vtkPoints.h"
-#include "vtkUnstructuredGrid.h"
 
 class vtkDataSet;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
 class vtkCGNSSubsetInclusionLattice;
+class vtkPoints;
+class vtkUnstructuredGrid;
 
 namespace CGNSRead
 {
