@@ -93,7 +93,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
 
     print('Generating wavelet')
     wavelet = Wavelet()
-    d2 = dimension/2
+    d2 = dimension//2
     wavelet.WholeExtent = [-d2, d2, -d2, d2, -d2, d2]
     wavelet.Maximum = 100.0
     waveletDisplay = Show()

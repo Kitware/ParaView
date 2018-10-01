@@ -143,6 +143,8 @@ start=0
 for r in range(0,p):
     start += int(ns(r))
 end=start+ns(p)
+start = int(start)
+end = int(end)
 
 ss = vtkSphereSource()
 ss.SetPhiResolution(res)

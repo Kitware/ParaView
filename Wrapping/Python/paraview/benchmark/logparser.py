@@ -127,8 +127,8 @@ def _parse_a_log(log, merge_before_nframes=0):
     # Combine the initial entries into a single 'Frame 0' entry
     if merge_before_nframes > 0:
         f0 = all_frames[0]
-        map(lambda f: f0.Logs.extend(f.Logs),
-            all_frames[1:-merge_before_nframes])
+        list(map(lambda f: f0.Logs.extend(f.Logs),
+            all_frames[1:-merge_before_nframes]))
         return [f0] + all_frames[-merge_before_nframes:]
     return all_frames
 
@@ -198,7 +198,7 @@ class BasicStats:
         self.Max = None
         self._Mean = None
         self._StdDev = None
-        map(self.add_sample, samples)
+        list(map(self.add_sample, samples))
 
     def add_sample(self, x):
         if self.N == 0:
