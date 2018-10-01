@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -62,7 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSettings.h"
@@ -78,7 +78,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShowEvent>
 #include <QVBoxLayout>
 
+#include <cassert>
 #include <cmath>
+#include <list>
+#include <map>
+#include <sstream>
 #include <utility>
 #include <vector>
 
@@ -105,7 +109,7 @@ QWidget* newGroupSeparator(QWidget* parent)
   return widget;
 }
 
-std::vector<vtkWeakPointer<vtkPVXMLElement> > getDecorators(vtkPVXMLElement* hints)
+std::vector<vtkWeakPointer<vtkPVXMLElement> > get_decorators(vtkPVXMLElement* hints)
 {
   std::vector<vtkWeakPointer<vtkPVXMLElement> > decoratorTypes;
   vtkNew<vtkCollection> collection;
@@ -122,6 +126,36 @@ std::vector<vtkWeakPointer<vtkPVXMLElement> > getDecorators(vtkPVXMLElement* hin
     }
   }
   return decoratorTypes;
+}
+
+void add_decorators(pqPropertyWidget* widget, vtkPVXMLElement* hints)
+{
+  if (widget && hints)
+  {
+    auto xmls = get_decorators(hints);
+    for (auto xml : xmls)
+    {
+      Q_ASSERT(xml && xml->GetAttribute("type"));
+      pqPropertyWidgetDecorator::create(xml, widget);
+    }
+  }
+}
+
+std::string get_group_label(vtkSMPropertyGroup* smgroup)
+{
+  assert(smgroup != nullptr);
+  auto label = smgroup->GetXMLLabel();
+  if (label && label[0] != '\0')
+  {
+    return std::string(label);
+  }
+  else
+  {
+    // generate a unique string.
+    std::ostringstream str;
+    str << "__smgroup:" << smgroup;
+    return str.str();
+  }
 }
 
 void DetermineLegacyHiddenProperties(QSet<QString>& properties, vtkSMProxy* proxy)
@@ -153,12 +187,12 @@ class pqProxyWidgetItem : public QObject
   QPointer<pqPropertyWidget> PropertyWidget;
   QStringList DefaultVisibilityForRepresentations;
   bool Group;
-  int GroupTag;
+  QString GroupTag;
 
   pqProxyWidgetItem(QObject* parentObj)
     : Superclass(parentObj)
     , Group(false)
-    , GroupTag(-1)
+    , GroupTag()
     , Advanced(false)
   {
   }
@@ -209,12 +243,13 @@ public:
 
   /// Creates a new item for a property group with several widgets (for
   /// individual properties in the group).
-  static pqProxyWidgetItem* newMultiItemGroupItem(int group_id, const QString& group_label,
+  static pqProxyWidgetItem* newMultiItemGroupItem(const QString& group_label,
     pqPropertyWidget* widget, const QString& widget_label, QObject* parentObj)
   {
     pqProxyWidgetItem* item = newItem(widget, widget_label, parentObj);
     item->Group = true;
-    item->GroupTag = group_id;
+    // ensure GroupTag is not null for multi-property groups.
+    item->GroupTag = group_label.isNull() ? QString("") : group_label;
     if (!group_label.isEmpty())
     {
       item->GroupHeader = pqProxyWidget::newGroupLabelWidget(group_label, widget->parentWidget());
@@ -328,7 +363,7 @@ public:
     // prevVisibleItem then we need to show `this`'s header.
     if (this->GroupHeader)
     {
-      this->GroupHeader->setVisible(this->GroupTag == -1 || prevVisibleItem == NULL ||
+      this->GroupHeader->setVisible(this->GroupTag.isNull() || prevVisibleItem == nullptr ||
         this->GroupTag != prevVisibleItem->GroupTag);
     }
 
@@ -403,7 +438,87 @@ public:
 private:
   Q_DISABLE_COPY(pqProxyWidgetItem)
 };
+
+//--------------------------------------------------------------------------------------------------
+// Returns true if the property should be skipped from the panel.
+bool skip_property(vtkSMProperty* smproperty, const std::string& key,
+  const QStringList& chosenProperties, const QSet<QString>& legacyHiddenProperties)
+{
+  const QString skey = QString(key.c_str());
+  const QString simplifiedKey = QString(key.c_str()).remove(' ');
+  auto xmllabel = smproperty->GetXMLLabel();
+
+  if (!chosenProperties.isEmpty() &&
+    !(chosenProperties.contains(simplifiedKey) || chosenProperties.contains(skey)))
+  {
+    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
+                      << " gets skipped because it is not listed in the properties argument";
+    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    return true;
+  }
+
+  if (smproperty->GetInformationOnly())
+  {
+    // skip information only properties
+    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
+                      << " gets skipped because it is an information only property";
+    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    return true;
+  }
+
+  if (smproperty->GetIsInternal())
+  {
+    // skip internal properties
+    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
+                      << " gets skipped because it is an internal property";
+    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    return true;
+  }
+
+  if (smproperty->GetPanelVisibility() && strcmp(smproperty->GetPanelVisibility(), "never") == 0 &&
+    chosenProperties.size() == 0)
+  {
+    // skip properties marked as never show (unless it was explicitly 'chosen').
+    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
+                      << " gets skipped because it has panel_visibility of \"never\"";
+    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    return true;
+  }
+
+  if (chosenProperties.size() == 0 &&
+    (legacyHiddenProperties.contains(skey) || legacyHiddenProperties.contains(simplifiedKey)))
+  {
+    // skipping properties marked with "show=0" in the hints section.
+    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
+                      << " gets skipped because is has show='0' specified in the Hints.";
+    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    return true;
+  }
+  return false;
 }
+
+//--------------------------------------------------------------------------------------------------
+// Returns true if the group should be skipped from the panel.
+bool skip_group(vtkSMPropertyGroup* smgroup, const QStringList& chosenProperties)
+{
+  if (!chosenProperties.empty() && !chosenProperties.contains(smgroup->GetXMLLabel()))
+  {
+    return true;
+  }
+
+  if (smgroup->GetPanelVisibility() && strcmp(smgroup->GetPanelVisibility(), "never") == 0 &&
+    chosenProperties.size() == 0)
+  {
+    // skip property groups marked as never show
+    PV_DEBUG_PANELS() << "  - Group "
+                      << (smgroup->GetXMLLabel() ? smgroup->GetXMLLabel() : "(null)")
+                      << " gets skipped because it has panel_visibility of \"never\"";
+    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    return true;
+  }
+  return false;
+}
+} // end of namespace {}
 
 //-----------------------------------------------------------------------------------
 QWidget* pqProxyWidget::newGroupLabelWidget(const QString& labelText, QWidget* parent)
@@ -756,96 +871,55 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 {
   vtkSMProxy* smproxy = this->proxy();
 
-  // build collection of all properties that are contained in a group
-
-  // map where key is a property and value is the group_tag for the group
-  // the property belongs to. Several properties can belong to the same group.
-  QMap<vtkSMProperty*, int> groupProperties;
-
-  // map of a group-tag and the pqProxyWidgetItem for the group, if any.
-  QMap<int, QPointer<pqProxyWidgetItem> > groupItems;
-  QMap<int, QString> groupLabels;
-  QMap<int, vtkPVXMLElement*> groupHints;
-
-  for (size_t index = 0; index < smproxy->GetNumberOfPropertyGroups(); index++)
+  // step 1: iterate over all groups to populate `property_2_group_map`.
+  //         this will make it easier to determine if a property belong to a
+  //         group.
+  std::map<vtkSMProperty*, vtkSMPropertyGroup*> property_2_group_map;
+  for (size_t index = 0, num_groups = smproxy->GetNumberOfPropertyGroups(); index < num_groups;
+       ++index)
   {
-    int group_tag = static_cast<int>(index);
-    vtkSMPropertyGroup* group = smproxy->GetPropertyGroup(index);
-    for (size_t j = 0; j < group->GetNumberOfProperties(); j++)
+    auto smgroup = smproxy->GetPropertyGroup(index);
+    for (unsigned int cc = 0, num_properties = smgroup->GetNumberOfProperties();
+         cc < num_properties; ++cc)
     {
-      groupProperties[group->GetProperty(static_cast<unsigned int>(j))] = group_tag;
+      if (auto smproperty = smgroup->GetProperty(cc))
+      {
+        property_2_group_map[smproperty] = smgroup;
+      }
     }
-    groupLabels[group_tag] = group->GetXMLLabel();
-    groupHints[group_tag] = group->GetHints();
+  }
 
-    if (group->GetNumberOfProperties() == 0)
+  // step 2: iterate over all properties and build an ordered list of properties
+  //         that corresponds to the order in which the widgets will be rendered.
+  //         this is generally same as the order in the XML with one exception,
+  //         properties in groups with same label are placed next to each other.
+  std::list<std::pair<vtkSMProperty*, std::string> > ordered_properties;
+  std::map<std::string, decltype(ordered_properties)::iterator> group_end_iterators;
+
+  vtkNew<vtkSMOrderedPropertyIterator> opiter;
+  opiter->SetProxy(smproxy);
+  for (opiter->Begin(); !opiter->IsAtEnd(); opiter->Next())
+  {
+    auto smproperty = opiter->GetProperty();
+    vtkSMPropertyGroup* smgroup = nullptr;
+    try
     {
-      // skip empty groups.
+      smgroup = property_2_group_map.at(smproperty);
+    }
+    catch (std::out_of_range&)
+    {
+      ordered_properties.push_back(std::make_pair(smproperty, std::string(opiter->GetKey())));
       continue;
     }
 
-    bool ignorePanelVisibility = false;
-    if (!properties.isEmpty())
-    {
-      if (!properties.contains(group->GetXMLLabel()))
-      {
-        continue;
-      }
-      else
-      {
-        ignorePanelVisibility = true;
-      }
-    }
+    assert(smgroup != nullptr);
+    const std::string xmllabel = ::get_group_label(smgroup);
+    auto geiter = group_end_iterators.find(xmllabel);
+    auto insert_pos =
+      (geiter != group_end_iterators.end()) ? std::next(geiter->second) : ordered_properties.end();
 
-    if (QString(group->GetPanelVisibility()) == "never" && !ignorePanelVisibility)
-    {
-      // skip property groups marked as never show
-      PV_DEBUG_PANELS() << "  - Group " << group->GetXMLLabel()
-                        << " gets skipped because it has panel_visibility of \"never\"";
-
-      // set an empty pqProxyWidgetItem so we don't create a "container"
-      // group for this property group.
-      groupItems[group_tag] = NULL;
-      continue;
-    }
-
-    pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-    QList<pqPropertyWidgetInterface*> interfaces =
-      interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
-    for (pqPropertyWidgetInterface* groupWidgetInterface : interfaces)
-    {
-      pqPropertyWidget* propertyWidget =
-        groupWidgetInterface->createWidgetForPropertyGroup(smproxy, group, this);
-      if (propertyWidget)
-      {
-        PV_DEBUG_PANELS() << "Group " << group->GetXMLLabel() << " is controlled by widget "
-                          << propertyWidget->metaObject()->className();
-
-        // Create decorators, if any.
-        const auto decoratorXMLs = getDecorators(group->GetHints());
-        for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
-        {
-          Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
-          pqPropertyWidgetDecorator::create(decoratorXML, propertyWidget);
-        }
-
-        propertyWidget->setParent(this);
-        QString groupTypeName = group->GetPanelWidget();
-        groupTypeName.replace(" ", "");
-        propertyWidget->setObjectName(groupTypeName);
-
-        // save record of the property widget
-        pqProxyWidgetItem* item =
-          pqProxyWidgetItem::newGroupItem(propertyWidget, group->GetXMLLabel(), this);
-        item->Advanced = QString(group->GetPanelVisibility()) == "advanced";
-        item->SearchTags << group->GetPanelWidget() << group->GetXMLLabel();
-        // FIXME: Maybe SearchTags should have the labels for all the properties
-        // in this group.
-
-        groupItems[group_tag] = item;
-        break;
-      }
-    }
+    group_end_iterators[xmllabel] = ordered_properties.insert(
+      insert_pos, std::make_pair(smproperty, std::string(opiter->GetKey())));
   }
 
   // Handle legacy-hidden properties: previously, developers hid properties from
@@ -855,143 +929,162 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
   QSet<QString> legacyHiddenProperties;
   DetermineLegacyHiddenProperties(legacyHiddenProperties, smproxy);
 
-  // iterate over each property, and create corresponding widgets
-  vtkNew<vtkSMOrderedPropertyIterator> propertyIter;
-  propertyIter->SetProxy(smproxy);
-
-  bool isCompoundProxy = smproxy->IsA("vtkSMCompoundSourceProxy");
-
-  for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
+  enum class EnumState
   {
-    vtkSMProperty* smProperty = propertyIter->GetProperty();
+    None = 0,  //< undefined
+    Custom,    //< group is using a custom widget
+    Collection //< group is simply grouping multiple property widgets together
+  };
+  std::map<vtkSMPropertyGroup*, EnumState> group_widget_status;
 
-    QString propertyKeyName = propertyIter->GetKey();
-    propertyKeyName.replace(" ", "");
-    const char* xmlLabel = (smProperty->GetXMLLabel() && !isCompoundProxy)
-      ? smProperty->GetXMLLabel()
-      : propertyIter->GetKey();
+  // step 3: now iterate over the `ordered_properties` list and create widgets
+  // as needed.
+  pqInterfaceTracker* interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
+  const QList<pqPropertyWidgetInterface*> interfaces =
+    interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
 
-    QString xmlDocumentation = pqProxyWidget::documentationText(smProperty);
-
-    bool ignorePanelVisibility = false;
-    if (!properties.isEmpty())
+  for (auto& apair : ordered_properties)
+  {
+    auto smproperty = apair.first;
+    const std::string& smkey = apair.second;
+    if (smproperty == nullptr ||
+      ::skip_property(smproperty, smkey, properties, legacyHiddenProperties))
     {
-      if (!properties.contains(propertyKeyName))
+      continue;
+    }
+    vtkSMPropertyGroup* smgroup = nullptr;
+    try
+    {
+      smgroup = property_2_group_map.at(smproperty);
+    }
+    catch (std::out_of_range&)
+    {
+    }
+    if (smgroup != nullptr && ::skip_group(smgroup, properties))
+    {
+      if (properties.size() > 0)
       {
-        PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << " ("
-                          << smProperty->GetXMLLabel() << ")"
-                          << " gets skipped because it is not listed in the properties argument";
-        PV_DEBUG_PANELS() << ""; // this adds a newline.
-        continue;
+        // We're encountering a weird case. The user explicitly listed the
+        // properties to create widgets for, however, only one (or some) properties from
+        // the group were requested to be shown, not the entire group.
+        // There's no right way to handle this. We handle it the "legacy" way
+        // i.e. just create the widget for this property as if it was not part
+        // of the group at all.
+        smgroup = nullptr;
+        PV_DEBUG_PANELS() << "Ignoring property group for explicitly selected property: " << smkey;
       }
       else
       {
-        ignorePanelVisibility = true;
+        continue;
       }
     }
 
-    if (smProperty->GetInformationOnly())
+    if (smgroup != nullptr)
     {
-      // skip information only properties
-      PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << " ("
-                        << smProperty->GetXMLLabel() << ")"
-                        << " gets skipped because it is an information only property";
-      PV_DEBUG_PANELS() << ""; // this adds a newline.
-      continue;
-    }
-
-    if (smProperty->GetIsInternal())
-    {
-      // skip internal properties
-      PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << " ("
-                        << smProperty->GetXMLLabel() << ")"
-                        << " gets skipped because it is an internal property";
-      PV_DEBUG_PANELS() << ""; // this adds a newline.
-      continue;
-    }
-
-    if (QString(smProperty->GetPanelVisibility()) == "never" && !ignorePanelVisibility)
-    {
-      // skip properties marked as never show
-      PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << "(" << smProperty->GetXMLLabel()
-                        << ")"
-                        << " gets skipped because it has panel_visibility of \"never\"";
-      PV_DEBUG_PANELS() << ""; // this adds a newline.
-      continue;
-    }
-
-    if (legacyHiddenProperties.contains(propertyIter->GetKey()))
-    {
-      // skipping properties marked with "show=0" in the hints section.
-      PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << "(" << smProperty->GetXMLLabel()
-                        << ")"
-                        << " gets skipped because is has show='0' specified in the Hints.";
-      continue;
-    }
-
-    int property_group_tag = -1;
-    if (groupProperties.contains(smProperty))
-    {
-      property_group_tag = groupProperties[smProperty];
-      if (groupItems.contains(property_group_tag))
+      auto gwsiter = group_widget_status.find(smgroup);
+      if (gwsiter != group_widget_status.end() && gwsiter->second == EnumState::Custom)
       {
-        if (groupItems[property_group_tag] != NULL)
-        {
-          // insert the group-item.
-          this->Internals->appendToItems(groupItems[property_group_tag], this);
-
-          // clear the widget so we don't add it multiple times.
-          groupItems[property_group_tag] = NULL;
-        }
-        // group widget has been added for this property. skip the rest.
+        // already created a custom widget for this group, skip
+        // the property.
         continue;
       }
 
-      // this property belongs to a non-hidden group which doesn't have any
-      // custom widget. That simply means we will add framing around this
-      // property.
+      if (gwsiter == group_widget_status.end())
+      {
+        // first time we're encountering a property from this group.
+        // let's see if we're creating a custom group widget or just a
+        // multi-property group.
+        auto& ref_state = group_widget_status[smgroup];
+        ref_state = EnumState::None;
+        for (auto iface : interfaces)
+        {
+          if (auto gwidget = iface->createWidgetForPropertyGroup(smproxy, smgroup, this))
+          {
+            PV_DEBUG_PANELS() << "Group `"
+                              << (smgroup->GetXMLLabel() ? smgroup->GetXMLLabel() : "(null)")
+                              << "` is controlled by widget " << gwidget->metaObject()->className();
+
+            // handle group decorators for custom widget, if any.
+            ::add_decorators(gwidget, smgroup->GetHints());
+
+            gwidget->setParent(this);
+            gwidget->setObjectName(QString(smgroup->GetPanelWidget()).remove(' '));
+
+            auto item =
+              pqProxyWidgetItem::newGroupItem(gwidget, QString(smgroup->GetXMLLabel()), this);
+            item->Advanced = (smgroup->GetPanelVisibility() &&
+              strcmp(smgroup->GetPanelVisibility(), "advanced") == 0);
+            item->SearchTags << smgroup->GetPanelWidget();
+            if (smgroup->GetXMLLabel())
+            {
+              item->SearchTags << smgroup->GetXMLLabel();
+            }
+            // FIXME: Maybe SearchTags should have the labels for all the properties
+            // in this group.
+
+            this->Internals->appendToItems(item, this);
+            group_widget_status[smgroup] = EnumState::Custom;
+            PV_DEBUG_PANELS() << ""; // this adds a newline.
+            break;
+          }
+        } // for ()
+
+        if (ref_state == EnumState::Custom)
+        {
+          // we just add a custom widget for this property's group,
+          // continue on to the next property.
+          continue;
+        }
+
+        // no custom widget created for the group, must be simply a
+        // multi-property group. just update the state and fall-through
+        // to create a widget for the property.
+        ref_state = EnumState::Collection;
+      }
     }
 
+    Q_ASSERT(smgroup == nullptr || group_widget_status[smgroup] == EnumState::Collection);
+
+    const bool isCompoundProxy = vtkSMCompoundSourceProxy::SafeDownCast(smproxy) != nullptr;
+    const char* xmllabel =
+      (smproperty->GetXMLLabel() && !isCompoundProxy) ? smproperty->GetXMLLabel() : smkey.c_str();
+
+    const QString xmlDocumentation = pqProxyWidget::documentationText(smproperty);
+
     // create property widget
-    PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << "(" << xmlLabel << ")";
-    pqPropertyWidget* propertyWidget = this->createWidgetForProperty(smProperty, smproxy, this);
-    if (!propertyWidget)
+    PV_DEBUG_PANELS() << "Property:" << smkey << "(" << xmllabel << ")";
+    pqPropertyWidget* pwidget = this->createWidgetForProperty(smproperty, smproxy, this);
+    if (!pwidget)
     {
-      PV_DEBUG_PANELS() << "Property:" << propertyIter->GetKey() << "(" << smProperty->GetXMLLabel()
-                        << ")"
+      PV_DEBUG_PANELS() << "Property:" << smkey << "(" << xmllabel << ")"
                         << " gets skipped as we could not determine the widget type to create.";
       continue;
     }
-    propertyWidget->setObjectName(propertyKeyName);
+    pwidget->setObjectName(QString(smkey.c_str()).remove(' '));
 
-    QString itemLabel = this->UseDocumentationForLabels
-      ? QString("<p><b>%1</b>: %2</p>").arg(xmlLabel).arg(xmlDocumentation)
-      : QString(xmlLabel);
+    const QString itemLabel = this->UseDocumentationForLabels
+      ? QString("<p><b>%1</b>: %2</p>").arg(xmllabel).arg(xmlDocumentation)
+      : QString(xmllabel);
 
-    pqProxyWidgetItem* item = property_group_tag == -1
-      ? pqProxyWidgetItem::newItem(propertyWidget, QString(itemLabel), this)
-      : pqProxyWidgetItem::newMultiItemGroupItem(property_group_tag,
-          groupLabels[property_group_tag], propertyWidget, QString(itemLabel), this);
+    auto item = (smgroup == nullptr) ? pqProxyWidgetItem::newItem(pwidget, QString(itemLabel), this)
+                                     : pqProxyWidgetItem::newMultiItemGroupItem(
+                                         smgroup->GetXMLLabel(), pwidget, QString(itemLabel), this);
 
     // save record of the property widget and containing widget
-    item->SearchTags << xmlLabel << xmlDocumentation << propertyIter->GetKey();
-    item->Advanced = QString(smProperty->GetPanelVisibility()) == "advanced";
-
-    if (smProperty->GetPanelVisibilityDefaultForRepresentation())
+    item->SearchTags << xmllabel << xmlDocumentation << smkey.c_str();
+    item->Advanced =
+      smproperty->GetPanelVisibility() && strcmp(smproperty->GetPanelVisibility(), "advanced") == 0;
+    if (smproperty->GetPanelVisibilityDefaultForRepresentation())
     {
       item->appendToDefaultVisibilityForRepresentations(
-        smProperty->GetPanelVisibilityDefaultForRepresentation());
+        smproperty->GetPanelVisibilityDefaultForRepresentation());
     }
 
-    if (property_group_tag != -1)
+    // handle group decorator, if any.
+    if (smgroup)
     {
       // Create decorators, if any.
-      const auto decoratorXMLs = getDecorators(groupHints[property_group_tag]);
-      for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
-      {
-        Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
-        pqPropertyWidgetDecorator::create(decoratorXML, propertyWidget);
-      }
+      ::add_decorators(pwidget, smgroup->GetHints());
     }
 
     this->Internals->appendToItems(item, this);
@@ -1075,12 +1168,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   }
 
   // Create decorators, if any.
-  const auto decoratorXMLs = getDecorators(smproperty->GetHints());
-  for (vtkPVXMLElement* decoratorXML : decoratorXMLs)
-  {
-    Q_ASSERT(decoratorXML && decoratorXML->GetAttribute("type"));
-    pqPropertyWidgetDecorator::create(decoratorXML, widget);
-  }
+  ::add_decorators(widget, smproperty->GetHints());
 
   // Create all default decorators
   for (int cc = 0; cc < interfaces.size(); cc++)
