@@ -21,7 +21,7 @@ Please remove this comment.
     - [ ] Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-VERSION.pdf
       - [ ] Upload to www.paraview.org/files/vMAJOR.MINOR
-    - [ ] Assemble release notes into Documentation/release/ParaView-VERSION.
+    - [ ] Assemble release notes into `Documentation/release/ParaView-VERSION`.
       - [ ] Get positive review and merge.
 
 # Update ParaView
@@ -78,6 +78,11 @@ git tag -a -m 'ParaView VERSION' vVERSION HEAD
     - [ ] `Do: merge`
   - Integrate changes to `release` branch
     - [ ] `git push origin update-to-vVERSION:release vVERSION`
+
+If making a non-RC release, additionally:
+
+  - Update documentation page
+    - [ ] See `https://github.com/Kitware/paraview-docs/blob/gh-pages/versions.json`
 -->
 
   - Create tarballs
@@ -202,6 +207,14 @@ buildListing.sh
 updateMD5sum.sh vMAJOR.MINOR
 ```
   - [ ] Test download links
+
+<!--
+If making a non-RC release:
+
+# Upload documentation
+
+  - [ ] Upload versioned documentation to `https://github.com/kitware/paraview-docs`
+-->
 
 # Post-release
 
