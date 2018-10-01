@@ -233,8 +233,6 @@ vtkCxxSetObjectMacro(vtkPVGlyphFilter, SourceTransform, vtkTransform);
 vtkPVGlyphFilter::vtkPVGlyphFilter()
   : VectorScaleMode(SCALE_BY_MAGNITUDE)
   , SourceTransform(nullptr)
-  , MaximumGlyphSize(1.0)
-  , RescaleGlyphs(true)
   , GlyphMode(ALL_POINTS)
   , MaximumNumberOfSamplePoints(5000)
   , Seed(1)
@@ -244,8 +242,6 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
 {
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->SetNumberOfInputPorts(2);
-  this->GlyphDataRange[0] = VTK_DOUBLE_MAX;
-  this->GlyphDataRange[1] = -VTK_DOUBLE_MAX;
 }
 
 //-----------------------------------------------------------------------------
@@ -559,12 +555,14 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
     return true;
   }
 
+#if 0
   if (this->GlyphDataRange[0] > this->GlyphDataRange[1])
   {
     vtkErrorMacro(
       "First element in GlyphDataRange must be less than or equal to the second element.");
     return false;
   }
+#endif
 
   if (orientArray && orientArray->GetNumberOfComponents() > 3)
   {
@@ -598,24 +596,6 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
   {
     vtkDebugMacro(<< "No points to glyph!");
     return 1;
-  }
-
-  double dataRange[2] = { 0.0, 1.0 };
-  if (scaleArray && this->GlyphDataRange[0] != this->GlyphDataRange[1])
-  {
-    dataRange[0] = this->GlyphDataRange[0];
-    dataRange[1] = this->GlyphDataRange[1];
-  }
-  else
-  {
-    dataRange[0] = this->GlyphDataRange[1] - DBL_EPSILON;
-    dataRange[1] = this->GlyphDataRange[1];
-  }
-
-  double den = dataRange[1] - dataRange[0];
-  if (den == 0.0)
-  {
-    den = 1.0;
   }
 
   // Allocate storage for output PolyData
@@ -752,30 +732,11 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
         }
       }
     }
-    else
-    {
-      // If not scaling by array, set the glyph to the maximum glyph size
-      scalex = scaley = scalez = this->MaximumGlyphSize;
-    }
 
-    // Clamp and scale glyph if a scale array is set and the RescaleGlyphs option is on.
-    // If the scaleArray is a vector and the vector scale mode is not set to SCALE_BY_COMPONENTS,
-    // also rescale (by magnitude). However, if SCALE_BY_COMPONENTS is on and the scaleArray is
-    // a scalar, go ahead and rescale the array.
-    if (scaleArray && this->RescaleGlyphs &&
-      (this->VectorScaleMode != SCALE_BY_COMPONENTS || scaleArray->GetNumberOfComponents() == 1))
-    {
-      vtkMath::ClampValue(&scalex, dataRange);
-      vtkMath::ClampValue(&scaley, dataRange);
-      vtkMath::ClampValue(&scalez, dataRange);
-      scalex = (scalex - dataRange[0]) / den;
-      scaley = (scaley - dataRange[0]) / den;
-      scalez = (scalez - dataRange[0]) / den;
-      double multiplier = this->MaximumGlyphSize;
-      scalex = scalex * multiplier;
-      scaley = scaley * multiplier;
-      scalez = scalez * multiplier;
-    }
+    // Apply scale factor
+    scalex *= this->ScaleFactor;
+    scaley *= this->ScaleFactor;
+    scalez *= this->ScaleFactor;
 
     // Check ghost points.
     // If we are processing a piece, we do not want to duplicate
