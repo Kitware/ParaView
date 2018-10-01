@@ -1085,6 +1085,12 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     {
       // Create decorators, if any.
       ::add_decorators(pwidget, smgroup->GetHints());
+
+      if (smgroup->GetXMLLabel())
+      {
+        // see #18498
+        item->SearchTags << smgroup->GetXMLLabel();
+      }
     }
 
     this->Internals->appendToItems(item, this);
