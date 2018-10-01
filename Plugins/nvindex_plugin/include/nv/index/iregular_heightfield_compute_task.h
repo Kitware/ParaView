@@ -42,7 +42,7 @@ public:
     mi::math::Bbox_struct<mi::Sint32, 2>& roi) const = 0;
 
   /// Apply user-defined operations on the heightfield dataset's elevation values.
-  /// A re-computation of the normal values is not triggered automatically.
+  /// A re-compution of the normal values is not triggered automatically.
   ///
   /// \deprecated This will be replaced with compute_with_bounding_box in the future.
   ///

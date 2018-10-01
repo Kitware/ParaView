@@ -17,6 +17,7 @@
 #include <nv/index/idistributed_data_locality.h>
 #include <nv/index/ierror.h>
 #include <nv/index/iheightfield_interaction.h>
+#include <nv/index/iindex_canvas.h>
 #include <nv/index/iindex_scene_query.h>
 #include <nv/index/iopengl_application_buffer.h>
 #include <nv/index/iperformance_values.h>
@@ -77,6 +78,33 @@
 
 /// @defgroup scene_queries Scene queries
 /// @ingroup nv_index
+
+/// @defgroup xac XAC programs
+/// @ingroup nv_index
+/// IndeX Accelerated Compute interface programs.
+/// The IndeX Accelerated Compute (XAC) Interface enables programmers to add
+/// real-time compiled sampling programs into the IndeX volume rendering pipeline.
+/// XAC programs are written in the CUDA programming language.
+
+/// @defgroup xac_scene XAC scene
+/// @ingroup xac
+/// Scene definition for XAC programs.
+/// For each rendered frame, IndeX performs a back-to-front ray
+/// casting procedure in a scene defined by an XAC class.
+
+/// @defgroup xac_obj XAC elements
+/// @ingroup xac
+/// Scene elements for XAC programs.
+/// Predefined elements that are part of the XAC interface can provide information
+/// about the current IndeX state as well as a set of geometric scene elements used.
+/// for the final visualization output.
+
+/// @defgroup xac_lib XAC functions
+/// @ingroup xac
+/// Functions and macros for XAC programs.
+/// The XAC interface also provides a set of convenience macros and functions for
+/// printing debugging information, transformation handling, basic shading
+/// operations and generic gradient operators.
 
 /// @defgroup nv_index_scene_description_shape Scene shapes
 /// @ingroup nv_index_scene_description
@@ -297,144 +325,6 @@ public:
   virtual IClock_pulse_generator* get_clock() const = 0;
 };
 
-/// Enables rendering of data to a user-defined canvas.
-/// Technically, the canvas wraps a frame buffer that contains one or more rendering targets
-/// or frame buffer layer. The NVIDIA IndeX library renders its rendering/visualization
-/// results into the associated frame buffer layers.
-/// Typical use cases include the rendering (blending) of all image tiles (a.k.a horizontal
-/// spans) into an OpenGL framebuffer, into main memory or CUDA buffer for
-/// video-streaming, and into an image buffer or file.
-///
-/// The NVIDIA IndeX library ships the implementation of a main memory buffer and an OpenGL buffer
-/// based canvas classes as source code to ease the integration into a given application.
-/// @ingroup nv_index_rendering
-///
-class IIndex_canvas : public mi::base::Interface_declare<0x46c5a5f7, 0x31de, 0x468d, 0x9b, 0x6c,
-                        0xb0, 0x35, 0x77, 0xed, 0xfe, 0x61>
-{
-public:
-  /// Before rendering, a buffer typically needs to be flushed or front- and back buffers
-  /// need to be swapped.
-  /// This method is called right before any image tile is rendered into the canvas,
-  /// i.e, before any call to \c receive_tile().
-  ///
-  virtual void prepare() = 0;
-
-  /// This interface method receives multiple tiles for each layer.
-  /// The method is called for each tile and each layer between \c prepare() and
-  /// \c finish().
-  ///
-  /// \note This method must be thread safe since the library may
-  ///       call this method from different threads simultaneously.
-  ///
-  /// \param[in] layer_id         The id of the layer.
-  /// \param[in] layer_type       The type of the layer.
-  /// \param[in] area             The 2D bounding box of the tile covered in the screen space.
-  /// \param[in] buffer           The image buffer that contains the rendering inside the tile area.
-  ///
-  virtual void render_tile(const mi::math::Bbox_struct<mi::Uint32, 2>& area, mi::Uint8* buffer) = 0;
-
-  /// This interface method receives multiple tiles.
-  /// The method is called for each tile and between \c prepare() and
-  /// \c finish().
-  ///
-  /// \note This method must be thread safe since the library may
-  ///       call this method from different threads simultaneously.
-  ///
-  /// \deprecated
-  ///
-  /// \param[in] buffer           The image buffer that contains the rendering inside the tile area.
-  /// \param[in] buffer_size      The size of the tile's image buffer.
-  /// \param[in] area             The 2D bounding box of the tile covered in the screen space.
-  ///
-  virtual void receive_tile(mi::Uint8* buffer, mi::Uint32 buffer_size,
-    const mi::math::Bbox_struct<mi::Uint32, 2>& area) = 0;
-
-  /// This interface method receives multiple tiles.
-  /// The method is called for each tile and between \c prepare() and
-  /// \c finish().
-  ///
-  /// This method blends the received image over existing image data.
-  ///
-  /// \note This method must be thread safe since the library may
-  ///       call this method from different threads simultaneously.
-  ///
-  /// \deprecated
-  ///
-  /// \param[in] buffer           The image buffer that contains the rendering inside the tile area.
-  /// \param[in] buffer_size      The size of the tile's image buffer.
-  /// \param[in] area             The 2D bounding box of the tile covered in the screen space.
-  ///
-  virtual void receive_tile_blend(mi::Uint8* buffer, mi::Uint32 buffer_size,
-    const mi::math::Bbox_struct<mi::Uint32, 2>& area) = 0;
-
-  /// This method is called after all tiles are rendered, i.e, after all
-  /// call to \c receive_tile().
-  ///
-  virtual void finish() = 0;
-
-  /// The tiles can either be rendered in separate threads or in the main
-  /// application thread. In a multi-thread scenario the tile rendering
-  /// machinery needs to be capable to be processed using multiple threads.
-  /// For instance, OpenGL is single threaded and cannot run (easily) in
-  /// multiple threads but a rendering into an image or a frame of a video
-  /// stream can benefit from multi-threaded tile rendering.
-  ///
-  /// \return true when tile rendering is in parallel
-  virtual bool is_multi_thread_capable() const = 0;
-
-  /// Sets the resolution of the canvas buffer in pixels.
-  ///
-  /// \deprecated
-  ///
-  /// \param[in] buffer_resolution buffer size in pixels.
-  ///
-  virtual void set_buffer_resolution(
-    const mi::math::Vector_struct<mi::Sint32, 2>& buffer_resolution) = 0;
-
-  /// Returns the resolution of the canvas buffer in
-  /// pixels.
-  ///
-  /// \deprecated
-  ///
-  /// \return buffer size in pixels
-  ///
-  virtual mi::math::Vector_struct<mi::Sint32, 2> get_buffer_resolution() const = 0;
-
-  /// Returns the resolution of the canvas in pixels.
-  ///
-  /// \return The resolution of the canvas in pixels.
-  ///
-  virtual mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const = 0;
-};
-
-/// Mixin class for implementing the IIndex_canvas interface.
-///
-/// This mixin class provides a default implementation of some of the pure
-/// virtual methods of the IDistributed_compute_technique interface.
-///
-class Index_canvas : public mi::base::Interface_implement<IIndex_canvas>
-{
-public:
-  void render_tile(const mi::math::Bbox_struct<mi::Uint32, 2>& area, mi::Uint8* buffer) override
-  {
-    const mi::Uint32 x_range = area.max.x - area.min.x;
-    const mi::Uint32 y_range = area.max.y - area.min.y;
-    const mi::Uint32 buffer_size = (x_range * y_range);
-
-    this->receive_tile_blend(buffer, buffer_size * 4, area);
-  }
-
-  mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const override
-  {
-    const mi::math::Vector_struct<mi::Sint32, 2> res = get_buffer_resolution();
-    mi::math::Vector_struct<mi::Uint32, 2> resolution;
-    resolution.x = static_cast<mi::Uint32>(res.x);
-    resolution.y = static_cast<mi::Uint32>(res.y);
-    return resolution;
-  }
-};
-
 typedef mi::Uint32 IFrame_identifier; ///< A frame's unique identifier.
 
 /// The frame results store information gathered during the rendering process. Such information
@@ -450,7 +340,7 @@ public:
   /// \note Use the \c mi::base::Handle template to store the returned interface pointer in order
   ///       to guarantee the correct destruction of the returned interface.
   ///
-  /// \return         The detailed performance values information
+  /// \return         The the detailed performance values information
   ///                 gathered during the rendering process.
   ///
   virtual IPerformance_values* get_performance_values() const = 0;
@@ -555,15 +445,105 @@ public:
   virtual void report_workload_balancing_operations(IBalancing_operations* balancing_ops) = 0;
 };
 
+/// Interface class for creating NVIDIA IndeX built-in canvases such as a CUDA memory canvas.
+class IIndex_canvas_creation_properties : public mi::base::Interface_declare<0x788ee4b1, 0xa0eb,
+                                            0x47e5, 0x91, 0xf0, 0x92, 0x0a, 0x30, 0xfa, 0xad, 0x11>
+{
+public:
+  /// Get the resolution that a built-in canvas shall be initialized with.
+  ///
+  /// \return     The resolution for creating a built-in canvas.
+  ///
+  virtual const mi::math::Vector_struct<mi::Uint32, 2>& get_resolution() const = 0;
+};
+
+/// Interface class for creating NVIDIA IndeX built-in a CUDA memory canvas.
+class IIndex_cuda_canvas_creation_properties
+  : public mi::base::Interface_declare<0xae97ca4b, 0xe8c5, 0x4c5b, 0xa7, 0xe6, 0xd6, 0x10, 0xfd,
+      0xad, 0xcf, 0xe1, nv::index::IIndex_canvas_creation_properties>
+{
+public:
+  /// The CUDA device by which the CUDA memory canvas shall be managed.
+  ///
+  /// \return     The CUDA device ID.
+  ///
+  virtual mi::Sint32 get_cuda_device_id() const = 0;
+};
+
+/// Implements the properties required by NVIDIA IndeX for creating a CUDA canvas.
+/// This implementation is to be moved to the application layer.
+class Index_cuda_canvas_creation_properties
+  : public mi::base::Interface_implement<nv::index::IIndex_cuda_canvas_creation_properties>
+{
+public:
+  /// Create an instance that delivers all properties required for creating
+  /// a CUDA canvas.
+  ///
+  /// \param[in]  cuda_device_id          Defines the cuda device on which a
+  ///                                     memory for a cuda canvas shall be
+  ///                                     allocated.
+  ///                                     If set to '-1' or an invalid/undefined
+  ///                                     cuda device, then NVIDIA IndeX selects
+  ///                                     a device.
+  ///
+  /// \param[in]  resolution              The resolution of the requested
+  ///                                     built-in canvas.
+  ///
+  Index_cuda_canvas_creation_properties(
+    mi::Sint32 cuda_device_id, const mi::math::Vector_struct<mi::Uint32, 2>& resolution)
+    : m_cuda_device_id(cuda_device_id)
+    , m_resolution(resolution)
+  {
+  }
+
+  virtual mi::Sint32 get_cuda_device_id() const { return m_cuda_device_id; }
+  virtual const mi::math::Vector_struct<mi::Uint32, 2>& get_resolution() const
+  {
+    return m_resolution;
+  }
+
+private:
+  mi::Sint32 m_cuda_device_id;
+  mi::math::Vector_struct<mi::Uint32, 2> m_resolution;
+};
+
 /// Enables the rendering of a user-defined session/scene.
 ///
 class IIndex_rendering : public mi::base::Interface_declare<0x435617a4, 0x589b, 0x47d9, 0x99, 0x17,
                            0x05, 0x82, 0x7d, 0x1d, 0xfc, 0x3e>
 {
 public:
+  enum Index_builtin_canvas_type
+  {
+    IDX_CANVAS_CUDA_MEMORY = 0u, ///< A canvas that allocates the framebuffer in CUDA memory.
+    IDX_CANVAS_MAIN_MEMORY = 1u  ///< A canvas that allocates the framebuffer in main memory.
+  };
+
+  /// Creates a built-in \c IIndex_canvas instance.
+  /// While NVIDIA IndeX features the ability to implement user-defined canvases
+  /// that the application can pass to the rendering process, NVIDIA IndeX can
+  /// also create built-in canvases for use by an application.
+  /// On the one hand, using a built-in canvas frees an integrator from
+  /// implementing default canvases such as a simple main memory canvas.
+  /// It should be noted, that built-in canvases can comprise specific capabilities
+  /// such as a CUDA memory canvas to which NVIDIA IndeX composites its
+  /// rendering results without ever transferring rendering results back to
+  /// main memory.
+  ///
+  /// \param[in]  properties              Defines the specific canvas and
+  ///                                     additional properties for creating
+  ///                                     a canvas.
+  ///
+  /// \return                             Returns a built-in canvas.
+  ///                                     The application takes ownership
+  ///                                     of the returned canvas.
+  ///
+  virtual IIndex_canvas* create_canvas(IIndex_canvas_creation_properties* properties) const = 0;
+
   /// Renders a frame of the scene and writes the resulting image
-  /// tiles into the user-defined \c IIndex_canvas. This method
-  /// assume a single viewport that covers the entire canvas.
+  /// tiles into the user-defined or a built-in \c IIndex_canvas.
+  /// This method assumes a single viewport that covers the entire
+  /// canvas.
   ///
   /// \note \c IIndex_session::update() needs to be called before
   /// this method, using the same DiCE transaction.
@@ -595,8 +575,8 @@ public:
     IFrame_info_callbacks* frame_info = 0, bool composite_immediately = true,
     IOpengl_application_buffer* opengl_app_buffer = 0) = 0;
 
-  /// Renders a frame of scene and writes the resulting image
-  /// tiles into the user-defined \c IIndex_canvas. Each element
+  /// Renders a frame of the scene and writes the resulting image
+  /// tiles into the user-defined or a built-in \c IIndex_canvas. Each element
   /// of the given viewport list specifies a target area on the
   /// canvas as well as an \c IScope, which enables variations in
   /// the scene between viewport.
@@ -624,6 +604,36 @@ public:
   ///                                         each of the viewports.
   virtual IFrame_results_list* render(mi::neuraylib::Tag_struct session_tag, IIndex_canvas* canvas,
     IViewport_list* viewport_list) = 0;
+
+  /// Renders a frame of the scene and writes the resulting image
+  /// tiles into multiple user-defined \c IIndex_canvas instances.
+  /// Each element of the given canvas/viewport-list pairs specifies a canvas
+  /// as well as the associated viewports in that canvas. Each viewport's
+  /// \c IScope enables variations in the scene between viewports.
+  ///
+  /// \note This method must always receive the list of all used canvases, even if some of them
+  /// should not be rendered, to ensure proper cache handling. However, the viewports in the
+  /// canvases that should be skipped for rendering can be disabled by calling \c
+  /// IViewport::set_enable().
+  ///
+  /// \note This method internally creates and commits a \c
+  /// mi::neuraylib::IDice_transaction for each viewport and
+  /// therefore all transactions editing the scene should be
+  /// committed. Also, in contrast to the non-viewport version of
+  /// this method, this one does not require \c
+  /// IIndex_session::update() to be called.
+  ///
+  /// \param[in] session_tag                  The \c ISession tag.
+  /// \param[in] canvas_viewport_list         List of user-defined canvases with associated
+  ///                                         viewports.
+  ///
+  /// \return                                 Returns a list of frame results
+  ///                                         containing information gathered
+  ///                                         during the rendering process (e.g. error
+  ///                                         information and performance values) for
+  ///                                         each of the viewports.
+  virtual IFrame_results_list* render(
+    mi::neuraylib::Tag_struct session_tag, ICanvas_viewport_list* canvas_viewport_list) = 0;
 
   /// Cancel the rendering of a frame.
   ///
@@ -877,4 +887,4 @@ nv::index::IIndex* nv_index_factory();
 
 } // extern "C"
 
-#endif // #ifndef NVIDIA_INDEX_IINDEX_H
+#endif // NVIDIA_INDEX_IINDEX_H

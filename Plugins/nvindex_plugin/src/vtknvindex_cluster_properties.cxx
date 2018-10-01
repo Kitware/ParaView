@@ -42,11 +42,11 @@ size_t vtknvindex_irregular_volume_data::get_memory_size(const std::string& scal
 {
   size_t scalar_size;
 
-  if (scalar_type == "unsigned char")
+  if (scalar_type == "char" || scalar_type == "unsigned char")
   {
     scalar_size = sizeof(mi::Uint8);
   }
-  else if (scalar_type == "unsigned short")
+  else if (scalar_type == "short" || scalar_type == "unsigned short")
   {
     scalar_size = sizeof(mi::Uint16);
   }
@@ -88,7 +88,7 @@ vtknvindex_cluster_properties::~vtknvindex_cluster_properties()
   {
     if (shmit->second)
     {
-      shmit->second->shm_cleanup();
+      shmit->second->shm_cleanup(false);
       delete shmit->second;
       shmit->second = NULL;
     }
@@ -144,6 +144,12 @@ mi::Sint32 vtknvindex_cluster_properties::get_cur_local_rank_id() const
   }
 
   return -1;
+}
+
+// ------------------------------------------------------------------------------------------------
+mi::Uint32 vtknvindex_cluster_properties::get_nb_hosts() const
+{
+  return static_cast<mi::Uint32>(m_host_names.size());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -222,6 +228,7 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
   m_num_ranks = 1;
   m_rank_id = 0;
+  m_all_rank_ids.clear();
   m_all_rank_ids.push_back(0);
 
   mi::math::Bbox<mi::Sint32, 3> volume_extents;
@@ -321,6 +328,12 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
         shm_size = volume_size * sizeof(mi::Uint8);
       else if (scalar_type == "unsigned short")
         shm_size = volume_size * sizeof(mi::Uint16);
+#ifdef USE_SPARSE_VOLUME
+      else if (scalar_type == "char")
+        shm_size = volume_size * sizeof(mi::Sint8);
+      else if (scalar_type == "short")
+        shm_size = volume_size * sizeof(mi::Sint16);
+#endif
       else if (scalar_type == "float")
         shm_size = volume_size * sizeof(mi::Float32);
       else if (scalar_type == "double")
@@ -486,7 +499,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 
       // Trying to reconstruct cur_bbox without ghost cells = affinity.
       mi::math::Bbox<mi::Float32, 3> vol_ext_flt(volume_extents);
-      mi::Float32 border_size = 3.0f;
+      mi::Float32 border_size = m_config_settings->get_subcube_border();
 
       if (current_affinity.min.x > vol_ext_flt.min.x)
         current_affinity.min.x += border_size;
@@ -596,6 +609,12 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
           shm_size = volume_size * sizeof(mi::Uint8);
         else if (scalar_type == "unsigned short")
           shm_size = volume_size * sizeof(mi::Uint16);
+#ifdef USE_SPARSE_VOLUME
+        else if (scalar_type == "char")
+          shm_size = volume_size * sizeof(mi::Sint8);
+        else if (scalar_type == "short")
+          shm_size = volume_size * sizeof(mi::Sint16);
+#endif
         else if (scalar_type == "float")
           shm_size = volume_size * sizeof(mi::Float32);
         else if (scalar_type == "double")
@@ -622,7 +641,7 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
 }
 
 // ------------------------------------------------------------------------------------------------
-void vtknvindex_cluster_properties::unlink_shared_memory()
+void vtknvindex_cluster_properties::unlink_shared_memory(bool reset)
 {
   // Unlink shared memory and delete host properties.
   std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.begin();
@@ -630,7 +649,7 @@ void vtknvindex_cluster_properties::unlink_shared_memory()
   {
     if (shmit->second)
     {
-      shmit->second->shm_cleanup();
+      shmit->second->shm_cleanup(reset);
     }
   }
 }

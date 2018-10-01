@@ -28,7 +28,7 @@
 ///
 /// A change in this version number indicates that the binary compatibility
 /// of the interfaces offered through the shared library have changed.
-#define MI_NEURAYLIB_API_VERSION 27
+#define MI_NEURAYLIB_API_VERSION 30
 
 // The following three to four macros define the API version.
 // The macros thereafter are defined in terms of the first four.
@@ -76,7 +76,7 @@
 
 /// Type of plugins for the \NeurayApiName.
 /// \see #mi::base::Plugin::get_type().
-#define MI_NEURAYLIB_PLUGIN_TYPE "neuray API v18"
+#define MI_NEURAYLIB_PLUGIN_TYPE "neuray API v21"
 
 // Enables features that were deprecated with version 8.1.
 // #define MI_NEURAYLIB_DEPRECATED_8_1

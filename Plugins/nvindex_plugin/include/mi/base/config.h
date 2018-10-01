@@ -282,6 +282,14 @@
 #endif
 #endif
 
+#ifdef MI_PLATFORM_WINDOWS
+/// The operating system specific default filename extension for shared libraries (DLLs)
+#define MI_BASE_DLL_FILE_EXT ".dll"
+#else
+/// The operating system specific default filename extension for shared libraries (DLLs)
+#define MI_BASE_DLL_FILE_EXT ".so"
+#endif
+
 /*@}*/ // end group mi_base_config
 
 #endif // MI_BASE_CONFIG_H

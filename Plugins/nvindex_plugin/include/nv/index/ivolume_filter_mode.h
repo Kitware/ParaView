@@ -38,8 +38,8 @@ public:
   /// applied before filtering.
   /// In GPU rendering mode, all the filters below including those tagged as 'software' are
   /// implemented using CUDA. Those filters that are are tagged 'hardware' leverage the
-  /// texture hardware, e.g., linear filters, exposed through CUDA to further optimize the
-  /// filtering performance.
+  /// texture hardware, e.g., linear filters, exposed through CUDA to further optimize
+  /// the filtering performance.
   enum Filter_mode
   {
     /// Access a single voxel with nearest filtering (a.k.a. point filtering).

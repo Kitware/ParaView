@@ -24,196 +24,328 @@ namespace index
 enum Sparse_volume_voxel_format
 {
   SPARSE_VOLUME_VOXEL_FORMAT_UINT8 = 0x00, ///< Scalar voxel format with uint8 precision
-  SPARSE_VOLUME_VOXEL_FORMAT_VEC2_UINT8,   ///< Vector voxel format with 2 components and uint8
-                                           /// precision per component
-  SPARSE_VOLUME_VOXEL_FORMAT_VEC3_UINT8,   ///< Vector voxel format with 3 components and uint8
-                                           /// precision per component
-  SPARSE_VOLUME_VOXEL_FORMAT_VEC4_UINT8,   ///< Vector voxel format with 4 components and uint8
-                                           /// precision per component
-  SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32,      ///< Scalar voxel format with float32 precision
-  SPARSE_VOLUME_VOXEL_FORMAT_VEC2_FLOAT32, ///< Vector voxel format with 2 components and float32
-                                           /// precision per component
-  SPARSE_VOLUME_VOXEL_FORMAT_VEC3_FLOAT32, ///< Vector voxel format with 3 components and float32
-                                           /// precision per component
-  SPARSE_VOLUME_VOXEL_FORMAT_VEC4_FLOAT32, ///< Vector voxel format with 4 components and float32
-                                           /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_UINT8_2, ///< Vector voxel format with 2 components and uint8 precision
+                                      /// per component
+  SPARSE_VOLUME_VOXEL_FORMAT_UINT8_4, ///< Vector voxel format with 4 components and uint8 precision
+                                      /// per component
+  SPARSE_VOLUME_VOXEL_FORMAT_SINT8,   ///< Scalar voxel format with sint8 precision
+  SPARSE_VOLUME_VOXEL_FORMAT_SINT8_2, ///< Vector voxel format with 2 components and sint8 precision
+                                      /// per component
+  SPARSE_VOLUME_VOXEL_FORMAT_SINT8_4, ///< Vector voxel format with 4 components and sint8 precision
+                                      /// per component
+  SPARSE_VOLUME_VOXEL_FORMAT_UINT16,  ///< Scalar voxel format with uint16 precision
+  SPARSE_VOLUME_VOXEL_FORMAT_UINT16_2,  ///< Vector voxel format with 2 components and uint16
+                                        /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_UINT16_4,  ///< Vector voxel format with 4 components and uint16
+                                        /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_SINT16,    ///< Scalar voxel format with sint16 precision
+  SPARSE_VOLUME_VOXEL_FORMAT_SINT16_2,  ///< Vector voxel format with 2 components and sint16
+                                        /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_SINT16_4,  ///< Vector voxel format with 4 components and sint16
+                                        /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32,   ///< Scalar voxel format with float32 precision
+  SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32_2, ///< Vector voxel format with 2 components and float32
+                                        /// precision per component
+  SPARSE_VOLUME_VOXEL_FORMAT_FLOAT32_4, ///< Vector voxel format with 4 components and float32
+                                        /// precision per component
 
   SPARSE_VOLUME_VOXEL_FORMAT_COUNT
 };
 
 /// @ingroup nv_index_data_storage
-/// This class allows external input of a set of individual volume bricks associated with a sparse
-/// volume dataset into NVIDIA IndeX. An instance of this class is created through an instance of
-/// \c ISparse_volume_subset and is associated with an individual attribute of a potentially larger
-/// dataset.
+/// Attribute-set descriptor for sparse volume subsets. This interface is used to configure a set of
+/// attributes for a sparse volume subset to input into the NVIDIA IndeX library.
 ///
-/// This class represents a pool storage for a set of volume bricks of a certain voxel type with
-/// specific brick dimensions and brick ghost voxel-border size. The capacity of the brick pool is
-/// fixed and specified at creation time.
-///
-class ISparse_volume_subset_brick_pool : public mi::base::Interface_declare<0x3a727d84, 0xeea4,
-                                           0x41fc, 0x8d, 0x9f, 0x8d, 0xe2, 0x36, 0x84, 0xc2, 0xaa>
+class ISparse_volume_attribute_set_descriptor
+  : public mi::base::Interface_declare<0x728bb4d5, 0x1d77, 0x42da, 0x81, 0x1c, 0x39, 0xa3, 0x34,
+      0x56, 0x26, 0xa4, IDistributed_data_attribute_set_descriptor>
 {
 public:
-  /// Returns the capacity of the pool. The capacity denotes the maximum number of bricks that can
-  /// be inserted into the brick pool.
+  /// Sparse volume attribute parameters.
   ///
-  virtual mi::Size get_capacity() const = 0;
+  /// This structure defines the basic parameters of a single attribute associated with the volume
+  /// dataset.
+  ///
+  struct Attribute_parameters
+  {
+    Sparse_volume_voxel_format format; ///< Attribute format. See \c Sparse_volume_voxel_format.
+  };
 
-  /// Returns the current size of the pool. The size denotes the actual number of bricks that are
-  /// currently inserted in the brick pool.
+  /// Configure the parameters for an attribute for a sparse volume subset.
   ///
-  virtual mi::Size get_size() const = 0;
+  /// \param[in]  attrib_index    The storage index of the attribute.
+  /// \param[in]   attrib_params  The attribute parameters for the given index.
+  ///
+  /// \return                     True when the attribute according to the passed index could be set
+  /// up, false otherwise.
+  ///
+  virtual bool setup_attribute(
+    mi::Uint32 attrib_index, const Attribute_parameters& attrib_params) = 0;
 
-  /// Returns the voxel format of the brick pool.
+  /// Get the attribute parameters of a currently valid attribute for a given index.
   ///
-  virtual Sparse_volume_voxel_format get_voxel_format() const = 0;
+  /// \param[in]  attrib_index    The storage index of the attribute.
+  /// \param[out] attrib_params   The attribute parameters for the given index.
+  ///
+  /// \return                     True when the attribute according to the passed index could be
+  /// found, false otherwise.
+  ///
+  virtual bool get_attribute_parameters(
+    mi::Uint32 attrib_index, Attribute_parameters& attrib_params) const = 0;
+};
 
-  /// Returns the dimensions of the bricks in the brick pool. The brick dimensions are including a
-  /// potential border
-  /// of ghost voxels around the actual brick data. The effective brick dimensions then is
-  /// calculated by:
-  /// * brick_dimensions - 2 * brick_overlap.
-  ///
-  virtual mi::math::Vector_struct<mi::Uint32, 3> get_brick_dimensions() const = 0;
+/// @ingroup nv_index_data_storage
+/// Subset-data descriptor for sparse volume subsets. This interface class is used by the NVIDIA
+/// IndeX library
+/// to communicate information about sparse volume sub-data to an application. NVIDIA IndeX is
+/// storing sparse
+/// volume data in a bricked format internally. This interface class gives detailed information
+/// about volume-brick
+/// data contained in the subset. The application is free to fill volume-data bricks or leave them
+/// empty, hence
+/// creating a sparse volume layout.
+///
+/// For level-of-detail volumes this interface requests volume-data bricks for potentially multiple
+/// levels-of-detail.
+/// The application is responsible to fill in all requested volume-data bricks in order to enable
+/// correct level-of-detail
+/// volume representation and rendering.
+///
+class ISparse_volume_subset_data_descriptor
+  : public mi::base::Interface_declare<0xad2ab72c, 0xab33, 0x4357, 0xb6, 0xd5, 0x5a, 0xcd, 0xb9,
+      0xf9, 0x62, 0xca, IDistributed_data_subset_data_descriptor>
+{
+public:
+  struct Data_brick_info
+  {
+    mi::math::Vector_struct<mi::Sint32, 3>
+      brick_position;           ///< Position in volume local space of the
+                                ///< the particular brick (on it's level-of-detail).
+    mi::Uint32 brick_lod_level; ///< Level-of-detail of the particular brick.
+  };
 
-  /// Returns the size of the optional brick border of ghost voxels around individual bricks.
+public:
+  /// Returns the number of levels-of-detail in the volume dataset.
   ///
-  virtual mi::Uint32 get_brick_overlap() const = 0;
+  /// \returns    The number of levels-of-detail in the volume dataset
+  ///
+  virtual mi::Uint32 get_dataset_number_of_lod_levels() const = 0;
 
-  /// Insert an attribute-volume brick into the brick pool.
+  /// Returns the bounding box of the requested level-of-detail in local voxel coordinates.
   ///
-  /// \param[in]      brick_position          Denotes the min-corner (lower-left-back) of the volume
-  /// brick in global
-  ///                                         voxel coordinates relative to the entire sparse volume
-  ///                                         dataset.
-  /// \param[in]      brick_data              Raw data pointer to the volume brick data. The caller
-  /// retains the
-  ///                                         ownership of this data pointer.
+  /// \param[in]  lod_level       Level-of-detail for which to return the data bounding box.
   ///
-  /// \returns        Returns a valid brick index at which the volume brick is inserted into the
-  /// brick pool. Valid
-  ///                 indices fall in the range of 0 to the pool capacity - 1. An error during the
-  ///                 insertion of a
-  ///                 volume brick is indicated with the return value -1.
+  /// \returns    The bounding box of the requested level-of-detail in local voxel coordinates.
   ///
-  virtual mi::Sint32 insert_brick(
-    const mi::math::Vector_struct<mi::Sint32, 3>& brick_position, const void* brick_data) = 0;
+  virtual mi::math::Bbox_struct<mi::Sint32, 3> get_dataset_lod_level_box(
+    mi::Uint32 lod_level) const = 0;
 
-  /// Returns a raw pointer to the internal volume brick pool storage array. This data pointer can
-  /// be utilized to
-  /// access the pool data for binary dumps of the entire pool contents.
+  /// Returns the data resolution of the requested level-of-detail in local voxel coordinates.
   ///
-  /// The memory size of the returned data array is equal to to pools capacity multiplied by the
-  /// memory size of a single
-  /// volume brick, which is calculated by the brick dimensions times the size of the current voxel
-  /// format.
+  /// \param[in]  lod_level       Level-of-detail for which to return the data resolution.
   ///
-  /// \returns        Returns a raw pointer to the internal volume brick pool storage array.
+  /// \returns    The data resolution of the requested level-of-detail in local voxel coordinates.
   ///
-  virtual const void* get_brick_pool_data() const = 0;
+  virtual mi::math::Vector_struct<mi::Uint32, 3> get_dataset_lod_level_resolution(
+    mi::Uint32 lod_level) const = 0;
+
+  /// Returns the dimensions of the volume-data bricks.
+  ///
+  virtual mi::math::Vector_struct<mi::Uint32, 3> get_subset_data_brick_dimensions() const = 0;
+
+  /// Returns the data bounds covering all volume-data bricks required for the subset on a
+  /// particular level-of-detail.
+  ///
+  /// \param[in]  lod_level       Level-of-detail for which to return the subset-data bounding box.
+  ///
+  /// \returns    The data bounds covering all volume-data bricks required for this subset the
+  ///             requested level-of-detail.
+  ///
+  virtual mi::math::Bbox_struct<mi::Sint32, 3> get_subset_lod_data_bounds(
+    mi::Uint32 lod_level) const = 0;
+
+  /// Returns the level-of-detail range used by the subset. The components of the returned vector
+  /// indicate the lowest (x-component) and highest (y-component) level-of-detail used by the
+  /// subset.
+  ///
+  virtual mi::math::Vector_struct<mi::Uint32, 2> get_subset_lod_level_range() const = 0;
+
+  /// Returns the number of volume-data bricks available in the volume-data subset.
+  ///
+  virtual mi::Uint32 get_subset_number_of_data_bricks() const = 0;
+
+  /// Returns the volume-data brick information for a selected data brick.
+  ///
+  /// \param[in]  brick_index     Volume-data brick index for which to return the information.
+  ///
+  /// \returns    The volume-data brick information (\c Data_brick_info) for the requested data
+  /// brick.
+  ///
+  virtual const Data_brick_info get_subset_data_brick_info(mi::Uint32 brick_index) const = 0;
 };
 
 /// @ingroup nv_index_data_storage
 /// Distributed data storage class for sparse volume subsets.
 ///
 /// The data import for sparse volume data associated with \c ISparse_volume_scene_element instances
-/// with
-/// NVIDIA IndeX is performed through instances of this sub-set class. A sub-set of a sparse volume
-/// is defined
+/// using
+/// NVIDIA IndeX is performed through instances of this subset class. A subset of a sparse volume is
+/// defined
 /// by all the volume-data bricks associated with a rectangular subregion of the entire
 /// scene/dataset. This
 /// interface class provides methods to input volume data for one or multiple attributes of a
-/// dataset. The
-/// individual attributes are defined by separate brick pools, storing only the volume bricks
-/// specific to their
-/// associated attributes.
+/// dataset.
 ///
-/// This interface class provides methods for generating attribute brick-pools and querying all
-/// brick pools. A
-/// brick pool represents storage for a specified number of bricks with specific brick dimensions,
-/// brick ghost voxel-border size and brick format. The actual volume-brick data is input through
-/// the
-/// \c ISparse_volume_subset_brick_pool interface obtained through an instance of this interface
-/// class.
-///
-class ISparse_volume_subset : public mi::base::Interface_declare<0x9b8a8982, 0x5215, 0x4933, 0x93,
-                                0xc6, 0x31, 0x35, 0x2a, 0x37, 0xff, 0x7a, IDistributed_data_subset>
+class ISparse_volume_subset : public mi::base::Interface_declare<0x1dfa0274, 0xcf8, 0x4f4c, 0xa8,
+                                0x65, 0x24, 0xd0, 0xae, 0xf5, 0x89, 0x31, IDistributed_data_subset>
 {
 public:
-  /// Generates an attribute brick-pool instance of type \c ISparse_volume_subset_brick_pool. The
-  /// associated
-  /// brick-pool instance can be queried through the \c get_attribute_brick_pool() method.
+  /// Definition of internal buffer information.
   ///
-  /// \param[in]      brick_dimensions        Dimensions of the individual bricks in the requested
-  /// brick pool.
-  ///                                         The specification of the dimension is including an
-  ///                                         optional border
-  ///                                         of ghost voxels around the actual brick data. The
-  ///                                         effective brick
-  ///                                         dimensions then are calculated as brick_dimensions -
-  ///                                         2 * brick_overlap.
-  /// \param[in]      brick_overlap           Size of an optional brick border of ghost voxels used
-  /// for
-  ///                                         interpolation purposes.
-  /// \param[in]      brick_voxel_format      Voxel format of the bricks in the requested brick
-  /// pool.
-  /// \param[in]      pool_capacity           Requested capacity in number of volume bricks of the
-  /// requested brick pool.
-  /// \param[in]      initial_pool_data       An optional raw pointer to a data array containing the
-  /// brick data
-  ///                                         for initializing the brick pool. The ownership of the
-  ///                                         data remains
-  ///                                         with the caller.
-  /// \param[in]      initial_pool_data_size  The memory size of the optional initialization data
-  /// array. This size
-  ///                                         should be a multiple of the size of an individual
-  ///                                         volume brick and
-  ///                                         smaller than the requested volume pool capacity.
+  /// The internal buffer information can be queried using the \c get_internal_buffer_info() method
+  /// to gain access to the internal buffer data for direct write operations. This enables zero-copy
+  /// optimizations for implementations of, e.g., \c IDistributed_compute_technique where large
+  /// parts
+  /// of the data-subset buffer can be written directly without going through the \c write()
+  /// methods.
   ///
-  /// \returns        Returns valid attribute index (0-based) at which the newly generated
-  /// attribute
-  ///                 brick pool is generated at. Failure at generating an appropriate brick pool is
-  ///                 indicated by the return value -1. A valid attribute index can be used to
-  ///                 acquire
-  ///                 a pointer to the associated \c ISparse_volume_subset_brick_pool instance
-  ///                 through
-  ///                 the \c get_attribute_brick_pool() method.
+  /// \note The internal layout of the buffer of a volume-data brick is in a linear IJK/XYZ layout
+  /// with
+  ///       the I/X-component running fastest.
   ///
-  virtual mi::Sint32 generate_attribute_brick_pool(
-    const mi::math::Vector_struct<mi::Uint32, 3>& brick_dimensions, mi::Uint32 brick_overlap,
-    Sparse_volume_voxel_format brick_voxel_format, mi::Size pool_capacity,
-    void* initial_pool_data = 0, mi::Size initial_pool_data_size = 0ull) = 0;
+  struct Data_brick_buffer_info
+  {
+    void* data;               ///< Raw memory pointer to internal buffer data.
+    mi::Size size;            ///< The size of the buffer in Bytes.
+    mi::Sint32 gpu_device_id; ///< GPU device id if the buffer is located on a GPU device,
+                              ///< -1 to indicate a host buffer.
+    bool is_pinned_memory;    ///< Flag indicating if a host buffer is a pinned (page-locked)
+                              ///< memory area.
+  };
 
-  /// Returns the current number active brick pools.
+  /// Transformation that should be applied on the written data.
   ///
-  /// \returns        The current number active brick pools.
+  /// \note Experimental, subject to change!
   ///
-  virtual mi::Sint32 get_nb_attribute_brick_pools() const = 0;
+  enum Data_transformation
+  {
+    DATA_TRANSFORMATION_NONE = 0,           ///< Pass through unchanged
+    DATA_TRANSFORMATION_FLIP_AXIS_ORDER = 1 ///< Change voxel storage order (x/y/z to z/y/x)
+  };
 
-  /// This method allows to query an interface pointer to an \c ISparse_volume_subset_brick_pool
-  /// instance
-  /// for a valid attribute index. A valid attribute index is either directly obtained through the
-  /// \c generate_attribute_brick_pool() method or lies in the range (0..N) where N is the current
-  /// number
-  /// of attribute brick pools returned by \c get_nb_attribute_brick_pools().
+public:
+  /// Returns the attribute-set descriptor of the subset.
   ///
-  /// \param[in]      attribute_index         Valid attribute index of the queried brick-pool
-  /// instance.
+  virtual const ISparse_volume_attribute_set_descriptor* get_attribute_set_descriptor() const = 0;
+  virtual const ISparse_volume_subset_data_descriptor* get_subset_data_descriptor() const = 0;
+
+  /// Write a volume-data brick to the subset from a memory block in main memory.
   ///
-  /// \returns        Valid interface pointer to an \c ISparse_volume_subset_input_brick_pool
-  /// instance.
-  ///                 The ownership of the returned interface pointer remains with the sparse volume
-  ///                 sub-set instance and will only remain valid for its life time. In case of
-  ///                 errors or
-  ///                 a query for an invalid attribute index a null-pointer is returned.
+  /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to write voxel data.
+  /// \param[in]  brick_attrib_idx    The attribute index of the volume-data brick for which to
+  /// write voxel data.
+  /// \param[in]  src_values          Source array of voxel values that will be written to
+  ///                                 this data-subset buffer.
+  /// \param[in]  gpu_device_id       GPU device id if the passed buffer is located on a GPU device,
+  ///                                 otherwise this needs to be -1 to for a host memory buffer.
+  /// \param[in]  brick_data_transform Transformation to apply to the data that is written
   ///
-  virtual ISparse_volume_subset_brick_pool* get_attribute_brick_pool(
-    mi::Sint32 attribute_index) = 0;
+  /// \returns                        True if the write operation was successful, false otherwise.
+  ///
+  virtual bool write_brick_data(mi::Uint32 brick_subset_idx, mi::Uint32 brick_attrib_idx,
+    const void* src_values, mi::Sint32 gpu_device_id,
+    Data_transformation brick_data_transform = DATA_TRANSFORMATION_NONE) = 0;
+
+  /// Write a volume-data brick to the subset from a \c IRDMA_buffer.
+  ///
+  /// \note The \c IRDMA_buffer can be located either in CPU or GPU memory. If a GPU-memory
+  ///       buffer is passed additional memory copy operations may occur.
+  ///
+  /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to write voxel data.
+  /// \param[in]  brick_attrib_idx    The attribute index of the volume-data brick for which to
+  /// write voxel data.
+  /// \param[in]  src_rdma_buffer     Source RDMA buffer of voxel values that will be written to
+  ///                                 this data-subset buffer.
+  /// \param[in]  brick_data_transform Transformation to apply to the data that is written
+  ///
+  /// \returns                        True if the write operation was successful, false otherwise.
+  ///
+  virtual bool write_brick_data(mi::Uint32 brick_subset_idx, mi::Uint32 brick_attrib_idx,
+    const mi::neuraylib::IRDMA_buffer* src_rdma_buffer,
+    Data_transformation brick_data_transform = DATA_TRANSFORMATION_NONE) = 0;
+
+  /// Write multiple volume-data bricks to the subset from a single \c IRDMA_buffer.
+  /// The packing of the volume-data bricks to be written from the \c IRDMA_buffer is defined
+  /// in the passed \c src_rdma_buffer_offsets parameter. It this parameter is 0, the volume
+  /// sub-blocks need to be tightly packed after each other in the source buffer.
+  ///
+  /// \note The \c IRDMA_buffer can be located either in CPU or GPU memory. If a GPU-memory
+  ///       buffer is passed additional memory copy operations may occur.
+  ///
+  /// \param[in]  brick_subset_indices    Subset volume-data brick indices for which to write voxel
+  /// data.
+  /// \param[in]  brick_attrib_indices    The attribute indices of the volume-data bricks for which
+  /// to write voxel data.
+  /// \param[in]  nb_input_bricks         The number of dst_range bounding boxes.
+  /// \param[in]  src_rdma_buffer_offsets Array defining the offsets of the individual volume
+  /// sub-blocks
+  ///                                     in the linear source buffer. These offsets need to be
+  ///                                     defined
+  ///                                     as numbers of typed elements according the voxel type of
+  ///                                     the volume brick. If this parameter is 0, the offsets will
+  ///                                     be derived from the \c dst_ranges parameter assuming a
+  ///                                     tight
+  ///                                     packing of the volume sub-blocks in the source buffer.
+  /// \param[in]  src_rdma_buffer         Source RDMA buffer of voxel values that will be written to
+  ///                                     this subset buffer.
+  /// \param[in]  brick_data_transform Transformation to apply to the data that is written
+  ///
+  /// \returns                            True if the write operation was successful, false
+  /// otherwise.
+  ///
+  virtual bool write_brick_data_multiple(const mi::Uint32* brick_subset_indices,
+    const mi::Uint32* brick_attrib_indices, mi::Uint32 nb_input_bricks,
+    const mi::Size* src_rdma_buffer_offsets, const mi::neuraylib::IRDMA_buffer* src_rdma_buffer,
+    Data_transformation brick_data_transform = DATA_TRANSFORMATION_NONE) = 0;
+
+  /// Query the internal buffer information of the data-subset instance for a volume-data brick
+  /// in otder to gain access to the internal buffer-data for direct write operations.
+  ///
+  /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to query internal
+  /// buffer.
+  /// \param[in]  brick_attrib_idx    The attribute index of the volume-data brick for which to
+  /// query the
+  ///                                 internal buffer information
+  ///
+  /// \returns                        An instance of \c Internal_buffer_info describing the internal
+  ///                                 buffer data for direct use.
+  ///
+  virtual const Data_brick_buffer_info access_brick_data_buffer(
+    mi::Uint32 brick_subset_idx, mi::Uint32 brick_attrib_idx) = 0;
+
+  /// Creates an RDMA buffer that is a wrapper for of the internal buffer.
+  ///
+  /// \param[in]  rdma_ctx            The RDMA context used for wrapping the internal buffer.
+  /// \param[in]  brick_subset_idx    Volume-data brick subset index for which to query internal
+  /// buffer.
+  /// \param[in]  brick_attrib_idx    The attribute index of the volume-data brick for which to
+  /// query the
+  ///                                 internal buffer information
+  ///
+  ///
+  /// \returns                    RDMA buffer wrapping the internal buffer data,
+  ///                             or 0 in case of failure.
+  ///
+  virtual mi::neuraylib::IRDMA_buffer* access_brick_data_buffer_rdma(
+    mi::neuraylib::IRDMA_context* rdma_ctx, mi::Uint32 brick_subset_idx,
+    mi::Uint32 brick_attrib_idx) = 0;
 
   /// This method allows to write a compact cache file of successfully loaded subset data to the
   /// file system
   /// for more efficient future loading operations.
+  ///
+  /// \note: This API is currently not supported and will change in future releases.
+  ///
   virtual bool store_internal_data_representation(const char* output_filename) const = 0;
   virtual bool load_internal_data_representation(const char* input_filename) = 0;
 };

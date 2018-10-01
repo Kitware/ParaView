@@ -61,6 +61,62 @@ public:
 };
 
 /// @ingroup nv_index_scene_description_attribute
+/// Defines headers that can be included by rendering kernel programs. The attribute is applied to a
+/// scene element and then affects any \c IRendering_kernel_program that is also applied.
+///
+/// Multiple headers can be defined, each identified by the name by which it can be included in the
+/// program. While the name may look like a file path such as <tt>/includes/common/utils.h</tt> and
+/// the
+/// header can be included as <tt>\#include "/includes/common/utils.h"</tt>, it is really just an
+/// identifier. This attribute does not perform any file access.
+///
+/// When multiple instances of this attribute are active for a rendered scene element, only the
+/// instance that is defined closest to the scene element in the scene description hierarchy will be
+/// used.
+///
+class IRendering_kernel_program_headers
+  : public mi::base::Interface_declare<0xa5edda1a, 0x9a97, 0x40c1, 0xa2, 0xe7, 0xf2, 0x44, 0x2d,
+      0x2d, 0x55, 0xc7, nv::index::IAttribute>
+{
+public:
+  /// Stores a header in the attribute. Any existing header with the same name will be
+  /// overwritten.
+  ///
+  /// \param[in] include_name   Name by which the header can be included. Must not be null or an
+  ///                           empty string.
+  /// \param[in] header_src     Header source code. If null, any existing entry will be removed.
+  ///
+  virtual void set_header(const char* include_name, const char* header_src) = 0;
+
+  /// Returns the header source code for a given name.
+  ///
+  /// \param[in] include_name   Name by which the header can be included.
+  /// \return Header source code, or null if no header is defined for the name.
+  ///
+  virtual const char* get_header(const char* include_name) const = 0;
+
+  /// Returns the total number of headers stored in the attribute.
+  ///
+  /// \return Number of entries.
+  ///
+  virtual mi::Uint32 get_nb_headers() const = 0;
+
+  /// Returns the name and header source code for the header with the given index.
+  ///
+  /// \param[in]  index             Index of the header, must be less than \c get_nb_headers().
+  /// \param[out] include_name_out  Will be filled with a pointer to the name of the entry, or
+  ///                               null if the index is invalid.
+  /// \param[out] header_src_out    Will be filled with a pointer to the header source code.
+  ///
+  virtual void get_header(
+    mi::Uint32 index, const char** include_name_out, const char** header_src_out) const = 0;
+
+  /// Removes all headers from the attributes.
+  ///
+  virtual void clear() = 0;
+};
+
+/// @ingroup nv_index_scene_description_attribute
 /// The interface class representing user-defined parameter buffers for user-programmable rendering
 /// kernel components.
 ///
@@ -126,7 +182,7 @@ public:
 ///    float4 plane_equation;
 /// };
 ///
-/// class NV_IDX_volume_sample_program
+/// class Volume_sample_program
 /// {
 ///     NV_IDX_VOLUME_SAMPLE_PROGRAM
 ///
@@ -139,37 +195,37 @@ public:
 ///
 /// public:
 ///     NV_IDX_DEVICE_INLINE_MEMBER
-///     void init_instance()
+///     void initialize()
 ///     {
 ///         // Bind the contents of the buffer slot 0 to the variable
-///         m_plane_array_buffer = NV_IDX_bind_parameter_buffer<Plane_data_buffer>(0);
+///         m_plane_array_buffer = state.bind_parameter_buffer<Plane_data_buffer>(0);
 ///
 ///         // Bind the contents of the buffer slot 0 to the variable pointing to the first entry
-///         m_plane_buffer_0 = NV_IDX_bind_parameter_buffer<Plane_data_buffer>(0, 0 /*array
+///         m_plane_buffer_0 = state.bind_parameter_buffer<Plane_data_buffer>(0, 0 /*array
 ///         offset*/);
 ///         // Bind the contents of the buffer slot 0 to the variable pointing to the second entry
-///         m_plane_buffer_1 = NV_IDX_bind_parameter_buffer<Plane_data_buffer>(0, 1 /*array
+///         m_plane_buffer_1 = state.bind_parameter_buffer<Plane_data_buffer>(0, 1 /*array
 ///         offset*/);
 ///     }
 /// ...
 ///     NV_IDX_DEVICE_INLINE_MEMBER
 ///     int execute(
-///         const float3&   sample_position,
-///               float4&   output_color)
+///        const Sample_info_self&     sample_info,
+///              Sample_output&        sample_output)
 ///     {
 ///         const float dist_p_00 = dot(m_plane_array_buffer[0].plane_equation,
-///         make_float4(sample_position, 1.0f));
+///         make_float4(sample_info.sample_position, 1.0f));
 ///         const float dist_p_01 = dot(m_plane_array_buffer[1].plane_equation,
-///         make_float4(sample_position, 1.0f));
+///         make_float4(sample_info.sample_position, 1.0f));
 /// \endcode
 ///
 /// or to access the same data through the separate entries:
 ///
 /// \code
 ///         const float dist_p_00 = dot(m_plane_buffer_0->plane_equation,
-///         make_float4(sample_position, 1.0f));
+///         make_float4(sample_info.sample_position, 1.0f));
 ///         const float dist_p_01 = dot(m_plane_buffer_1->plane_equation,
-///         make_float4(sample_position, 1.0f));
+///         make_float4(sample_info.sample_position, 1.0f));
 /// ...
 /// };
 /// \endcode
@@ -183,12 +239,12 @@ public:
 /// to access such arrays in a straightforward way through the array index operator or by binding
 /// the contents of the
 /// array to individual variables. The function to perform the binding (\c
-/// NV_IDX_bind_parameter_buffer()) allows both use
+/// state.bind_parameter_buffer()) allows both use
 /// cases:
 ///
 /// \code
 /// NV_IDX_DEVICE_INLINE_MEMBER
-/// const T* NV_IDX_bind_parameter_buffer(
+/// const T* bind_parameter_buffer(
 ///             unsigned buffer_slot,
 ///             unsigned buffer_slot_offset = 0u);
 /// \endcode
@@ -293,29 +349,31 @@ public:
 /// The attribute is similar to \c IRendering_kernel_program_parameters, but instead of providing a
 /// user-defined buffer, it provides a fixed number of \e slots, where scene elements can be mapped
 /// to. These scene elements (e.g., \c IRegular_volume can then be accessed inside a
-/// user-defined program using \c NV_IDX_bind_scene_element() together with the \e state.
+/// user-defined program using \c state.scene.access().
 ///
 /// For example, consider the mapping attribute is applied to \c IPlane, mapping an existing \c
 /// IRegular_volume to slot 1 by calling <tt>mapping_attribute.set_mapping(1, volume_tag)</tt>. A \c
 /// IVolume_sample_program also applied to the plane may then access the volume data as follows:
 ///
 /// \code
-/// class NV_IDX_volume_sample_program
+/// NV_IDX_XAC_VERSION_1_0
+///
+/// class Volume_sample_program
 /// {
 ///     NV_IDX_VOLUME_SAMPLE_PROGRAM
 /// public:
 ///     NV_IDX_DEVICE_INLINE_MEMBER
-///     void init_instance() {}
+///     void initialize() {}
 ///
 ///     NV_IDX_DEVICE_INLINE_MEMBER
 ///     int execute(
-///         const float3&   sample_position,
-///               float4&   output_color)
+///        const Sample_info_self&     sample_info,
+///              Sample_output&        sample_output)
 ///     {
 ///         const int SLOT_ID = 1;
-///         const uint volume_id = NV_IDX_bind_scene_element(SLOT_ID);
-///         const float v = state.get_volume(volume_id).sample(sample_position);
-///         output_color = make_float4(v, v, v, 1.f);
+///         const auto volume = state.scene.access<xac::Regular_volume>(SLOT_ID);
+///         const float v = volume.sample(sample_info.sample_position);
+///         sample_output.color = make_float4(v, v, v, 1.f);
 ///         return NV_IDX_PROG_OK;
 ///     }
 /// };
@@ -345,11 +403,36 @@ public:
   ///
   virtual bool set_mapping(mi::Uint32 slot_idx, mi::neuraylib::Tag_struct data_tag) = 0;
 
+  ///
+  enum Query_reference
+  {
+    RELATIVE_QUERY_BOUNDING_BOX = 0, ///<
+    ABSOLUTE_QUERY_BOUNDING_BOX = 1  ///<
+  };
+
+  /// Maps a scene element to a slot.
+  ///
+  /// \param[in]  slot_idx    Slot index, must be less than \c get_nb_slots().
+  /// \param[in]  data_tag    Tag of a scene element. If \c NULL_TAG, an existing mapping is
+  /// removed.
+  /// \param[in]  query_bbox  Bounding box ensuring that all data inside becomes available for
+  ///                         use by the kernel program through the given slot id.
+  /// \param[in]  reference   The query reference indicates whether the query bounding box shall be
+  ///                         applied relative to each data point or whether the bounding box
+  ///                         represents a
+  ///                         absolute spatial area for distributed data accessing.
+  ///
+  /// \return     True is \c slot_idx is valid.
+  ///
+  virtual bool set_mapping(mi::Uint32 slot_idx, mi::neuraylib::Tag_struct data_tag,
+    const mi::math::Bbox_struct<mi::Float32, 3>& query_bbox,
+    Query_reference reference = RELATIVE_QUERY_BOUNDING_BOX) = 0;
+
   /// Returns the mapping of a given slot.
   ///
   /// \param[in]  slot_idx   Slot index, must be less than \c get_nb_slots().
   ///
-  /// \return     Tag of the scene element that is mapped to the slot, or \c NULL_TAG is non is
+  /// \return     Tag of the scene element that is mapped to the slot, or \c NULL_TAG if it is not
   ///             mapped or the slot index is invalid.
   ///
   virtual mi::neuraylib::Tag_struct get_mapping(mi::Uint32 slot_idx) const = 0;
@@ -364,21 +447,23 @@ public:
 /// volume sample program is:
 ///
 /// \code
-/// class NV_IDX_volume_sample_program
+/// NV_IDX_XAC_VERSION_1_0
+///
+/// class Volume_sample_program
 /// {
 ///     NV_IDX_VOLUME_SAMPLE_PROGRAM
 ///
 /// public:
 ///     NV_IDX_DEVICE_INLINE_MEMBER
-///     void init_instance() {}
+///     void initialize() {}
 ///
 ///     NV_IDX_DEVICE_INLINE_MEMBER
 ///     int execute(
-///         const float3&   sample_position, // read-only
-///               float4&   output_color)    // write-only
+///        const Sample_info_self&     sample_info,
+///              Sample_output&        sample_output)
 ///     {
 ///         // Scalar volume sample
-///         const float  volume_sample = state.volume.sample(sample_position);
+///         const float  volume_sample = state.volume.sample(sample_info.sample_position);
 ///         // Look up color and opacity values from colormap
 ///         const float4 sample_color  = state.colormap.lookup(volume_sample);
 ///
@@ -388,7 +473,8 @@ public:
 ///         }
 ///
 ///         // Output swizzled color
-///         output_color = make_float4(sample_color.y,
+///         sample_output.color = make_float4(
+///                                    sample_color.y,
 ///                                    sample_color.z,
 ///                                    sample_color.x,
 ///                                    sample_color.w);
@@ -400,10 +486,8 @@ public:
 ///
 /// Currently the class representing a volume sample program needs to follow the template set in the
 /// example above. It
-/// has to be called \c NV_IDX_volume_sample_program and is required to expose two public methods
-/// called
-/// \c init_instance(), which is executed once per rendering instance of a subregion, and \c
-/// execute(),
+/// has to be called \c Volume_sample_program and is required to expose two public methods called
+/// \c initialize(), which is executed once per rendering instance of a subregion, and \c execute(),
 /// which is then executed for each sample taken along a viewing ray.
 ///
 /// Each volume sample program is also required to have the \c NV_IDX_VOLUME_SAMPLE_PROGRAM macro as
@@ -413,7 +497,7 @@ public:
 /// Later revisions of the rendering kernel programs feature will make the definition more
 /// straightforward.
 ///
-/// The \c init_instance() method can be used to initialize variables used in the per-sample
+/// The \c initialize() method can be used to initialize variables used in the per-sample
 /// computation of the
 /// \c execute() method. The initializations can encompass the calculation of static data such as
 /// lighting or material
@@ -460,7 +544,9 @@ class IVolume_sample_program
 /// rendering process. An example of a surface sample program is:
 ///
 /// \code
-/// class NV_IDX_surface_sample_program
+/// NV_IDX_XAC_VERSION_1_0
+///
+/// class Surface_sample_program
 /// {
 ///     NV_IDX_SURFACE_SAMPLE_PROGRAM
 ///
@@ -469,7 +555,7 @@ class IVolume_sample_program
 ///
 /// public:
 ///     NV_IDX_DEVICE_INLINE_MEMBER
-///     void init_instance()
+///     void initialize()
 ///     {
 ///         light_direction = normalize(make_float3(1.0f, 1.0f, 1.0f));
 ///         material_ka     = make_float3(0.1f, 0.1f, 0.1f);
@@ -477,13 +563,10 @@ class IVolume_sample_program
 ///
 ///     NV_IDX_DEVICE_INLINE_MEMBER
 ///     int execute(
-///         const float3&   sample_position, // read-only
-///         const float3&   sample_normal,   // read-only
-///         const float4&   sample_color,    // read-only
-///               float&    sample_distance, // read/write
-///               float4&   output_color)    // write-only
+///        const   Sample_info_self&  sample_info,         // read-only
+///                Sample_output&     sample_output)       // write-only
 ///     {
-///         if (sample_color.w < 0.1f)
+///         if (sample_info.sample_color.w < 0.1f)
 ///         {
 ///             return NV_IDX_PROG_DISCARD_SAMPLE;
 ///         }
@@ -495,10 +578,10 @@ class IVolume_sample_program
 ///                                    ? n_l * 0.5f + 0.5f
 ///                                    : max(0.0f, n_l);
 ///
-///         const float3 kd      = make_float3(sample_color);
+///         const float3 kd      = make_float3(sample_info.sample_color);
 ///         const float3 s_lit   = material_ka + kd * diffuse;
 ///
-///         output_color = make_float4(s_lit, sample_color.w);
+///         sample_output.color = make_float4(s_lit, sample_info.sample_color.w);
 ///
 ///         return NV_IDX_PROG_OK;
 ///     }
@@ -508,9 +591,8 @@ class IVolume_sample_program
 ///
 /// Currently the class representing a surface sample program needs to follow the template set in
 /// the example above. It
-/// has to be called \c NV_IDX_surface_sample_program and is required to expose two public methods
-/// called
-/// \c init_instance(), which is executed once per rendering instance of a subregion, and execute(),
+/// has to be called \c Surface_sample_program and is required to expose two public methods called
+/// \c initialize(), which is executed once per rendering instance of a subregion, and execute(),
 /// which is then
 /// executed for each surface intersection encountered along a viewing ray.
 ///
@@ -521,7 +603,7 @@ class IVolume_sample_program
 /// Later revisions of the rendering kernel programs feature will make the definition more
 /// straightforward.
 ///
-/// The \c init_instance() method can be used to initialize variables used in the per-intersection
+/// The \c initialize() method can be used to initialize variables used in the per-intersection
 /// computation of the
 /// \c execute() method. The initializations can encompass the calculation of static data such as
 /// lighting or material

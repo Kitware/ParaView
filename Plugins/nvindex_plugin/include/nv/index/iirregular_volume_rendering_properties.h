@@ -25,9 +25,9 @@ class IIrregular_volume_rendering_properties
 public:
   struct Rendering
   {
-    mi::Float32
-      sampling_segment_length; ///< If not 0, segment length for sampling; if 0, use preintegration
-    mi::Uint32 sampling_mode;  ///< Mode for sampling.
+    mi::Uint32 sampling_mode;                      ///< Mode for sampling.
+    mi::Float32 sampling_segment_length;           ///< Segment length for sampling.
+    mi::Float32 sampling_reference_segment_length; ///< Segment length for sampling.
   };
 
   struct Diagnostics

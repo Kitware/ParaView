@@ -762,18 +762,26 @@ public:
 
   /// Time step animation settings
   ///
+  /// \deprecated Replaced by \c ITime_step_assignment.
+  ///
   /// \return total number of timesteps
   virtual mi::Uint32 get_nb_timesteps() const = 0;
 
   /// Set total number of timesteps (default: 0)
   ///
+  /// \deprecated Replaced by \c ITime_step_assignment.
+  ///
   /// \param[in] nb_timesteps total number of timesteps
   virtual void set_nb_timesteps(mi::Uint32 nb_timesteps) = 0;
 
+  /// \deprecated Replaced by \c ITime_step_assignment.
+  ///
   /// \return current timestep
   virtual mi::Uint32 get_current_timestep() const = 0;
 
   /// Set current timestep (default: 0)
+  ///
+  /// \deprecated Replaced by \c ITime_step_assignment.
   ///
   /// \param[in] current_timestep current timestep to be set
   virtual void set_current_timestep(mi::Uint32 current_timestep) = 0;

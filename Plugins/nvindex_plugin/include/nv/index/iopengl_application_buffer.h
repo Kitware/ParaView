@@ -33,7 +33,7 @@ public:
   /// Get the buffer resolution.
   ///
   /// \return resolution (width,height) in pixels
-  virtual mi::math::Vector_struct<mi::Sint32, 2> get_resolution() const = 0;
+  virtual mi::math::Vector_struct<mi::Uint32, 2> get_resolution() const = 0;
 
   /// Get the pointer of the z-buffer. It has the same structure as the OpenGL
   /// z-buffer. May be 0 if not initialized.

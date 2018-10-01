@@ -59,8 +59,8 @@ public:
   /// \param evaluation_mode  The scene representation can be traversed
   ///                         depth-first order and a node is evaluated
   ///                         twice in, i.e., in forward or backward
-  ///                         directions. The method can handle the
-  ///                         evaluation based on either one
+  ///                         directions. The method can handle
+  ///                         the evaluation based on either one
   ///                         appropriately.
   ///
   /// \param transaction      The transaction used when traversing the

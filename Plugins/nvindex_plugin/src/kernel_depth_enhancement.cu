@@ -55,8 +55,10 @@ struct Depth_enhancement_params
   float2 dummy;
 };
 
-NV_IDX_VOLUME_SAMPLE_PROGRAM_PREFIX
-class NV_IDX_volume_sample_program
+using namespace nv::index::xac;
+using namespace nv::index::xaclib;
+
+class Volume_sample_program
 {
   NV_IDX_VOLUME_SAMPLE_PROGRAM
 
@@ -66,22 +68,25 @@ public:
 
 public:
   NV_IDX_DEVICE_INLINE_MEMBER
-  void init_instance()
+  void initialize()
   {
     // Bind the contents of the buffer slot 0 to the variable
-    m_depth_enhancement_params = NV_IDX_bind_parameter_buffer<Depth_enhancement_params>(0);
+    m_depth_enhancement_params = state.bind_parameter_buffer<Depth_enhancement_params>(0);
   }
 
   NV_IDX_DEVICE_INLINE_MEMBER
-  int execute(const NV_IDX_sample_info_self& sample_info, float4& output_color)
+  int execute(  const   Sample_info_self&   sample_info,
+                        Sample_output&      sample_output)
   {
-    const NV_IDX_volume& volume = state.self;
-    const float3& sample_position = sample_info.sample_position;
-    const NV_IDX_colormap& colormap = volume.get_colormap();
+    const auto& volume = state.self;
+    const float3& sample_position = sample_info.sample_position_object_space;
+    const Colormap& colormap = volume.get_colormap();
+
+    const auto  svol_sampler =
+      volume.generate_sampler<float>(0u, sample_info.sample_context);
 
     // retrieve parameter buffer contents (fixed values in code definition)
-    const float3 wp = sample_info.scene_position;
-    const float3 ray_dir = state.m_ray_direction;
+    const float3 ray_dir = sample_info.ray_direction;
 
     float3 light_dir;
     if (m_depth_enhancement_params->light_mode == 0)
@@ -96,12 +101,12 @@ public:
     }
 
     // sample volume
-    const float rh = state.m_ray_stepsize_min * 2.0f; // ray sampling difference
+    const float rh = state.self.get_sample_distance() * 2.0f; // ray sampling difference
     const float3 p0 = sample_position;
     const float3 p1 = sample_position + (ray_dir * rh);
 
-    const float vs_p0 = volume.sample<float>(p0);
-    const float vs_p1 = volume.sample<float>(p1);
+    const float vs_p0 = svol_sampler.fetch_sample(p0);
+    const float vs_p1 = svol_sampler.fetch_sample(p1);
 
     const float vs_min = min(vs_p0, vs_p1);
     const float vs_max = max(vs_p0, vs_p1);
@@ -116,20 +121,11 @@ public:
       d_steps = min(d_steps, m_depth_enhancement_params->max_dsteps);
     }
 
-    // compositing front-to-back
-    /*const float4&    result;    // C_dst
-    const float4&   color;  // C_src
-    const float omda = 1.0f - result.w;
-    result.x += omda * color.x;
-    result.y += omda * color.y;
-    result.z += omda * color.z;
-    result.w += omda * color.w;*/
-
     // sample once
     const float4 sample_color = colormap.lookup(vs_p0);
-    output_color = make_float4(sample_color.x, sample_color.y, sample_color.z, sample_color.w);
+    sample_output.color = make_float4(sample_color.x, sample_color.y, sample_color.z, sample_color.w);
 
-    if (output_color.w < m_depth_enhancement_params->min_alpha)
+    if (sample_output.color.w < m_depth_enhancement_params->min_alpha)
       return NV_IDX_PROG_DISCARD_SAMPLE;
 
     if (d_steps > 1)
@@ -143,7 +139,7 @@ public:
         // get step size
         const float rt = float(ahc) / float(d_steps);
         const float3 pi = (1.0f - rt) * p0 + rt * p1;
-        const float vs_pi = volume.sample<float>(pi);
+        const float vs_pi = svol_sampler.fetch_sample(pi);
         const float4 cur_col = colormap.lookup(vs_pi);
 
         // front-to-back blending
@@ -156,22 +152,19 @@ public:
       }
 
       // assign result color
-      output_color = result;
+      sample_output.color = result;
     }
     // local shading
-    if (output_color.w > m_depth_enhancement_params->shade_h)
+    if (sample_output.color.w > m_depth_enhancement_params->shade_h)
     {
       // get gradient normal
-      const float3 vs_grad = volume.get_gradient(sample_position); // compute R3 gradient
+      const float3 vs_grad = volume_gradient<Volume_filter_mode::TRILINEAR>(volume, sample_position);
       const float3 iso_normal = -normalize(vs_grad);               // get isosurface normal
-      // const float vs_grad_mag = length(vs_grad);                            // get gradient
-      // magnitude
 
       // set up lighting parameters
-      // const float3 light_dir = normalize(light_pos - wp);
-      const float3 view_dir = state.m_ray_direction;
+      const float3 view_dir = sample_info.ray_direction;
 
-      const float3 diffuse_color = make_float3(output_color);
+      const float3 diffuse_color = make_float3(sample_output.color);
 
       const float diff_amnt = fabsf(dot(light_dir, iso_normal)); // two sided shading
       float spec_amnt = 0.0f;
@@ -191,17 +184,17 @@ public:
 
       // apply gamma correction (assume ambient_color, diffuse_color and spec_color
       // have been linearized, i.e. have no gamma correction in them)
-      output_color.x = powf(color_linear.x, float(1.0f / m_depth_enhancement_params->screen_gamma));
-      output_color.y = powf(color_linear.y, float(1.0f / m_depth_enhancement_params->screen_gamma));
-      output_color.z = powf(color_linear.z, float(1.0f / m_depth_enhancement_params->screen_gamma));
+      sample_output.color.x = powf(color_linear.x, float(1.0f / m_depth_enhancement_params->screen_gamma));
+      sample_output.color.y = powf(color_linear.y, float(1.0f / m_depth_enhancement_params->screen_gamma));
+      sample_output.color.z = powf(color_linear.z, float(1.0f / m_depth_enhancement_params->screen_gamma));
 
       // apply build in gamma function
-      // output_color = gamma_correct(output_color, m_depth_enhancement_params->screen_gamma);
+      // sample_output.color = gamma_correct(sample_output.color, m_depth_enhancement_params->screen_gamma);
 
       // clamp result color
-      output_color = clamp(output_color, 0.0f, 1.0f);
+      sample_output.color = clamp(sample_output.color, 0.0f, 1.0f);
     }
 
     return NV_IDX_PROG_OK;
   }
-}; // class NV_IDX_volume_sample_program
+}; // class Volume_sample_program

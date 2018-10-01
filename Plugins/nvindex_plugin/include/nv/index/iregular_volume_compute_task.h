@@ -121,9 +121,8 @@ public:
   ///
   /// \return                         false, as no data is modified.
   ///
-  bool compute_gpu(const mi::math::Bbox_struct<mi::Uint32, 3>& /*brick_bbox*/,
-    cudaArray* /*voxel_values*/,
-    mi::neuraylib::IDice_transaction* /*dice_transaction*/) const override
+  virtual bool compute_gpu(const mi::math::Bbox_struct<mi::Uint32, 3>& /*brick_bbox*/,
+    cudaArray* /*voxel_values*/, mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
   {
     return false;
   }
@@ -132,7 +131,7 @@ public:
   ///
   /// \return compute mode for the task.
   ///
-  Compute_mode get_compute_mode() const override { return COMPUTE_MODE_CPU; }
+  virtual Compute_mode get_compute_mode() const { return COMPUTE_MODE_CPU; }
 };
 }
 } // namespace index / nv

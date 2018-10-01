@@ -16,10 +16,6 @@ namespace nv
 namespace index
 {
 
-// TODO chris: Work in progress
-// * add lod controls
-//   - min/max lod level
-
 /// @ingroup nv_index_scene_description_attribute
 
 /// The interface class representing rendering properties for regular height-field data.

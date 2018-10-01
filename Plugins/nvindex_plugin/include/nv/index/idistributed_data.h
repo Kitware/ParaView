@@ -50,11 +50,11 @@ public:
 
   /// A distributed dataset's extent in 3D space that shall be considered for
   /// rendering or computing can be restricted by a clip region.
-  /// The NVIDIA IndeX library only takes into account those parts of the
+  /// The NVIDIA IndeX library only takes into account thoses parts of the
   /// distributed dataset that lie inside of this. All parts outside of the
   /// region will be ignored.
   /// Changing the clip region, e.g., increasing its size, might result
-  /// into a repartitioning of the spatial subdivision or might trigger
+  /// in a repartitioning of the spatial subdivision or might trigger
   /// importer calls.
   ///
   /// \return     The clip region of the dataset defined in its local

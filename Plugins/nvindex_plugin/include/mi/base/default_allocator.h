@@ -40,7 +40,6 @@ class Default_allocator : public Interface_implement_singleton<IAllocator>
 {
   Default_allocator() {}
   Default_allocator(const Default_allocator&) {}
-
 public:
   /** Allocates a memory block of the given size.
 
@@ -50,7 +49,7 @@ public:
       \param size   The requested size of memory in bytes. It may be zero.
       \return       The allocated memory block.
   */
-  void* malloc(Size size) override
+  virtual void* malloc(Size size)
   {
     // Use non-throwing new call, which may return NULL instead
     return ::new (std::nothrow) char[size];
@@ -64,7 +63,7 @@ public:
       \param  memory   A memory block previously allocated by a call to #malloc().
                        If \c memory is \c NULL, no operation is performed.
   */
-  void free(void* memory) override { ::delete[] reinterpret_cast<char*>(memory); }
+  virtual void free(void* memory) { ::delete[] reinterpret_cast<char*>(memory); }
 
   /// Returns the single instance of the default allocator.
   static IAllocator* get_instance()

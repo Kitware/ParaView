@@ -50,7 +50,7 @@
 #define MI_NEURAYLIB_DICE_VERSION_QUALIFIER_EMPTY
 
 /// DiCE product version number in a string representation, such as \c "2016".
-#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING "trunk"
+#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING "2018"
 
 /*@}*/ // end group mi_neuray_dice
 
@@ -1076,7 +1076,7 @@ public:
   /// remote host.
   ///
   /// Note that all fragments of a fragmented job which are executed on the same host will use the
-  /// same replica of the the original fragmented job instance. That means the replica can contain
+  /// same replica of the original fragmented job instance. That means the replica can contain
   /// data shared between different fragments, like caches, etc.
   ///
   /// As in the case of local execution other fragments executed on that host might be executed in
@@ -1172,7 +1172,7 @@ public:
   /// remote host.
   ///
   /// Note that all fragments of a fragmented job which are executed on the same host will use the
-  /// same replica of the original fragmented job instance. That means the replica can contain
+  /// same replica of the the original fragmented job instance. That means the replica can contain
   /// data shared between different fragments, like caches, etc.
   ///
   /// As in the case of local execution other fragments executed on that host might be executed in
@@ -1249,7 +1249,7 @@ public:
   /// the objects get transferred to the requesting remote host.
   ///
   /// \param serializer   The serializer to which to write the job content to.
-  void serialize(ISerializer* serializer) const override = 0;
+  virtual void serialize(ISerializer* serializer) const = 0;
 
   /// Deserializes the fragmented job to enable remote job execution of fragments.
   ///
@@ -1259,7 +1259,7 @@ public:
   /// class may additionally generate data required by all fragments, like caches, etc.
   ///
   /// \param deserializer   The deserializer from which to read the job content.
-  void deserialize(IDeserializer* deserializer) override = 0;
+  virtual void deserialize(IDeserializer* deserializer) = 0;
 
   /// Static assignment of fragments to hosts in the cluster.
   ///
@@ -1413,7 +1413,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  const base::IInterface* get_interface(const base::Uuid& interface_id) const override
+  virtual const base::IInterface* get_interface(const base::Uuid& interface_id) const
   {
     if (interface_id == IID())
     {
@@ -1434,7 +1434,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  base::IInterface* get_interface(const base::Uuid& interface_id) override
+  virtual base::IInterface* get_interface(const base::Uuid& interface_id)
   {
     if (interface_id == IID())
     {
@@ -1448,7 +1448,7 @@ public:
   using base::Interface_implement<I>::get_interface;
 
   /// Returns the class ID corresponding to the template parameters of this mixin class.
-  base::Uuid get_class_id() const override { return IID(); }
+  virtual base::Uuid get_class_id() const { return IID(); }
 };
 
 /// This mixin class can be used to implement the #mi::neuraylib::IElement interface.
@@ -1486,7 +1486,7 @@ public:
   //  Overrides the standard release() implementation.
   //
   //  If the release count drops to 1, and the embedded pointer is set, release it.
-  Uint32 release() const override
+  virtual Uint32 release() const
   {
     base::Lock::Block block(&m_pointer_lock);
     base::Interface_implement<I>::retain();
@@ -1507,7 +1507,7 @@ public:
   //  Sets the embedded pointer.
   //
   //  The embedded pointer is used for internal purposes. Users must not use this method.
-  bool set_pointer(const base::IInterface* pointer) override
+  virtual bool set_pointer(const base::IInterface* pointer)
   {
     base::Lock::Block block(&m_pointer_lock);
     if (m_pointer)
@@ -1521,7 +1521,7 @@ public:
   //  Returns the embedded pointer.
   //
   //  The embedded pointer is used for internal purposes. Users must not use this method.
-  const base::IInterface* get_pointer() const override
+  virtual const base::IInterface* get_pointer() const
   {
     base::Lock::Block block(&m_pointer_lock);
     if (m_pointer)
@@ -1530,20 +1530,20 @@ public:
   }
 
   /// Empty body, i.e., leaves \p result unaltered.
-  void get_references(ITag_set* result) const override
+  virtual void get_references(ITag_set* result) const
   {
     // avoid warnings
     (void)result;
   }
 
   /// Assumes that the size of the database element is given by \c sizeof.
-  Size get_size() const override { return sizeof(*this); }
+  virtual Size get_size() const { return sizeof(*this); }
 
   /// By default, multicast distribution for database elements is enabled.
-  bool get_send_to_all_nodes() const override { return true; }
+  virtual bool get_send_to_all_nodes() const { return true; }
 
   /// By default, offloading to disk is disabled.
-  bool get_offload_to_disk() const override { return false; }
+  virtual bool get_offload_to_disk() const { return false; }
 
 private:
   //  The embedded pointer.

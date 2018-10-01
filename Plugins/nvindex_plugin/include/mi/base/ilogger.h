@@ -174,7 +174,7 @@ public:
 protected:
   // Sends the contents of the string buffer to the logger, clears the string buffer, and resets
   // the log level to the default log level.
-  int sync() override
+  int sync()
   {
     std::stringbuf::sync();
     const std::string& s = str();
@@ -246,6 +246,9 @@ public:
     , m_buffer(*this, logger, module_category, default_level)
   {
     rdbuf(&m_buffer);
+#if (__cplusplus >= 201402L)
+    this->pword(get_index()) = this;
+#endif
   }
 
   /// Destructor.

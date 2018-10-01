@@ -46,7 +46,7 @@ namespace index
 /// Each job invocation usually requires information about
 /// the number of operations (a.k.a. fragments) that shall be launched and the
 /// target cluster nodes to which the launched fragments shall be sent to
-/// process or analyze the distributed data.
+/// process or analyse the distributed data.
 ///
 ///
 /// \deprecated This interface class is subject to change!
@@ -178,6 +178,39 @@ public:
 };
 
 /// @ingroup nv_index_data_access
+/// The interface class exposes the locality information of a distributed sparse-volume dataset.
+///
+/// The interface method \c IData_distribution::retrieve_data_locality()
+/// returns the volume data locality.
+///
+/// \deprecated This interface class is subject to change!
+///
+class ISparse_volume_data_locality
+  : public mi::base::Interface_declare<0x860724fe, 0x5c07, 0x43b3, 0xaa, 0xc8, 0xbc, 0x3, 0x72,
+      0xc8, 0x44, 0xf8, IDistributed_data_locality>
+{
+public:
+  /// Creates means to edit the sparse-volume subset stored locally on a cluster node.
+  /// The method may only be called on the cluster machine that stores the data.
+  ///
+  /// \param[in] dice_transaction     The DiCE transaction used that the tasks operates in.
+  ///
+  /// \param[in] cluster_node_id      The index of the cluster machine that stores
+  ///                                 a certain subset data.
+  ///
+  /// \param[in] index                The index of the bounding box that references
+  ///                                 the actual sparse-volume subset
+  ///
+  /// \return                         Returns an NVIDIA IndeX instance of
+  ///                                 the interface class \c ISparse_volume_data_edit
+  ///                                 to edit the sparse-volume subset data contents.
+  ///
+  virtual ISparse_volume_data_edit* create_data_edit(
+    mi::neuraylib::IDice_transaction* dice_transaction, mi::Uint32 cluster_node_id,
+    mi::Uint32 index) const = 0;
+};
+
+/// @ingroup nv_index_data_access
 /// The interface class exposes the locality information of a distributed regular heightfield
 /// dataset.
 ///
@@ -292,6 +325,27 @@ public:
   virtual IRegular_volume_data_locality* retrieve_data_locality(
     mi::neuraylib::Tag_struct scene_element_tag,
     const mi::math::Bbox_struct<mi::Uint32, 3>& query_bbox,
+    mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
+
+  /// Query the distribution of sparse-volume data in the cluster. The returned
+  /// instance of the class that implements interface \c ISparse_volume_data_locality
+  /// provides the cluster nodes where parts of the queried data including their
+  /// respective bounding boxes (subset bounding box) are stored.
+  ///
+  /// \param[in] scene_element_tag    The sparse-volume scene element tag that refers to
+  ///                                 data representation whose distribution shall
+  ///                                 be returned.
+  /// \param[in] query_bbox           The bounding box in scene element's local space.
+  ///                                 The data distribution will be exposed for the
+  ///                                 user-defined bounding box passed to the query.
+  /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
+  ///
+  /// \return                         Returns the data distribution scheme that
+  ///                                 corresponds to the query parameters.
+  ///
+  virtual ISparse_volume_data_locality* retrieve_sparse_volume_data_locality(
+    mi::neuraylib::Tag_struct scene_element_tag,
+    const mi::math::Bbox_struct<mi::Sint32, 3>& query_bbox,
     mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
 
   /// Query the distribution of heightfield data in the cluster. The returned

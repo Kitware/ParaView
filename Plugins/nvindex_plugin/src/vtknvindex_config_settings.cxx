@@ -283,6 +283,7 @@ vtknvindex_config_settings::vtknvindex_config_settings()
   , m_filter_mode(0)
   , m_subcube_border(2)
   , m_step_size(1.0f)
+  , m_ivol_step_size(1.0f)
   , m_opacity_mode(0)
   , m_opacity_reference(1.0f)
   , m_rtc_kernel(RTC_KERNELS_NONE)
@@ -346,6 +347,15 @@ void vtknvindex_config_settings::set_filter_mode(mi::Sint32 filter_mode)
 nv::index::IConfig_settings::Volume_filtering_modes vtknvindex_config_settings::get_filter_mode()
   const
 {
+#ifdef USE_SPARSE_VOLUME
+  mi::Uint32 filter_mode = m_filter_mode;
+  if (filter_mode == 5)
+    filter_mode = 3;
+  else if (filter_mode == 7)
+    filter_mode = 5;
+
+  return static_cast<nv::index::IConfig_settings::Volume_filtering_modes>(filter_mode);
+#else
   switch (m_filter_mode)
   {
     case 0:
@@ -359,6 +369,7 @@ nv::index::IConfig_settings::Volume_filtering_modes vtknvindex_config_settings::
     default:
       return nv::index::IConfig_settings::VOLUME_FILTER_NEAREST;
   }
+#endif
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -383,6 +394,17 @@ void vtknvindex_config_settings::set_step_size(mi::Float32 step_size)
 mi::Float32 vtknvindex_config_settings::get_step_size() const
 {
   return m_step_size;
+}
+
+//-------------------------------------------------------------------------------------------------
+void vtknvindex_config_settings::set_ivol_step_size(mi::Float32 step_size)
+{
+  m_ivol_step_size = step_size;
+}
+//-------------------------------------------------------------------------------------------------
+mi::Float32 vtknvindex_config_settings::get_ivol_step_size() const
+{
+  return m_ivol_step_size;
 }
 
 //-------------------------------------------------------------------------------------------------

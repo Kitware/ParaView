@@ -76,19 +76,27 @@ public:
 
   ~vtknvindex_host_properties();
 
-  void shm_cleanup();
+  void shm_cleanup(bool reset);
 
   // Set the shared memory data for the current bounding box and the time step.
   void set_shminfo(mi::Uint32 time_step, std::string shmname,
     mi::math::Bbox<mi::Float32, 3> shmbbox, mi::Uint64 shmsize, void* raw_mem_pointer = NULL);
 
+  // free temporary raw pointer
+  void free_shm_pointer(mi::Uint32 time_step);
+
   // Get the shared memory data for the current bounding box and the time step.
   bool get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, std::string& shmname,
     mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize, void** raw_mem_pointer,
-    mi::Uint32& time_step);
+    mi::Uint32 time_step);
+
+  // Get the shared memory data that intersects the current bounding box and the time step.
+  bool get_shminfo_isect(const mi::math::Bbox<mi::Float32, 3>& bbox, std::string& shmname,
+    mi::math::Bbox<mi::Float32, 3>& shmbbox, mi::Uint64& shmsize, void** raw_mem_pointer,
+    mi::Uint32 time_step);
 
   // Get the shared memory info for the current bounding box and the time step.
-  shm_info* get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32& time_step);
+  shm_info* get_shminfo(const mi::math::Bbox<mi::Float32, 3>& bbox, mi::Uint32 time_step);
 
   bool mark_shm_used(const std::string& shmname, void* shmpointer, const mi::Uint64& shmsize);
 
@@ -122,6 +130,8 @@ private:
     m_shmref; // The reference count on a particular shared memory piece.
   std::map<mi::Uint32, std::vector<shm_info> >
     m_shmlist; // List of shared memory pieces on the present host.
+
+  mi::base::Lock s_ptr_lock;
 };
 
 #endif // vtknvindex_host_properties_h

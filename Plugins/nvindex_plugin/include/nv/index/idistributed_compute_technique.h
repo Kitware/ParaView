@@ -78,6 +78,33 @@ public:
 
 /// @ingroup nv_index_data_computing
 ///
+/// Interface class for user-defined techniques for computing 2D LOD-texture data on demand.
+///
+/// An implementation of this class can be assigned as a scene description attribute to an
+/// compute-enabled \c IPlane
+/// scene element.
+///
+/// When rendering a certain area of the scene primitive (defined by the renderer), the compute
+/// technique is called and
+/// an instance of an \c IDistributed_compute_destination_buffer_2d_texture_LOD is passed the \c
+/// launch_compute() method.
+/// The compute technique fills this buffer for the required subregions and mipmap-layers of the
+/// distributed dataset.
+/// The renderer then uses the generated data as a texture mapped onto the defined 2D area (\c
+/// IPlane).
+///
+/// Typical use cases for the compute technique are to visualize data that result from complex,
+/// possibly distributed,
+/// computing processes process as 2D textures.
+///
+class IDistributed_compute_technique_LOD
+  : public mi::base::Interface_declare<0x7c8909d5, 0x3cc2, 0x415b, 0x80, 0xef, 0x65, 0x74, 0x99,
+      0x38, 0xd6, 0xff, nv::index::IDistributed_compute_technique>
+{
+};
+
+/// @ingroup nv_index_data_computing
+///
 /// Mixin class for implementing the IDistributed_compute_technique interface.
 ///
 /// This mixin class provides a default implementation of some of the pure
@@ -126,7 +153,7 @@ public:
   /// \param[in] tag  The tag that refers to the user-defined meta
   ///                 data associated with the scene element.
   ///
-  virtual void set_meta_data(mi::neuraylib::Tag_struct tag) {}
+  virtual void set_meta_data(mi::neuraylib::Tag_struct /*tag*/) {}
 
   /// Retrieve the scene element's reference to the user-defined meta data.
   ///
@@ -134,6 +161,19 @@ public:
   ///          data associated with the scene element.
   ///
   virtual mi::neuraylib::Tag_struct get_meta_data() const { return mi::neuraylib::NULL_TAG; }
+};
+
+/// @ingroup nv_index_data_computing
+///
+/// Mixin class for implementing the IDistributed_compute_technique_LOD interface.
+///
+template <mi::Uint32 i_id1, mi::Uint16 i_id2, mi::Uint16 i_id3, mi::Uint8 i_id4, mi::Uint8 i_id5,
+  mi::Uint8 i_id6, mi::Uint8 i_id7, mi::Uint8 i_id8, mi::Uint8 i_id9, mi::Uint8 i_id10,
+  mi::Uint8 i_id11, class I = nv::index::IDistributed_compute_technique_LOD>
+class Distributed_compute_technique_LOD
+  : public nv::index::Distributed_compute_technique<i_id1, i_id2, i_id3, i_id4, i_id5, i_id6, i_id7,
+      i_id8, i_id9, i_id10, i_id11, I>
+{
 };
 
 } // namespace index

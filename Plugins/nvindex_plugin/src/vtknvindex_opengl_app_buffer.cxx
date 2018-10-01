@@ -45,12 +45,13 @@ vtknvindex_opengl_app_buffer::~vtknvindex_opengl_app_buffer()
 }
 
 //-----------------------------------------------------------------------------
-mi::math::Vector_struct<mi::Sint32, 2> vtknvindex_opengl_app_buffer::get_resolution() const
+mi::math::Vector_struct<mi::Uint32, 2> vtknvindex_opengl_app_buffer::get_resolution() const
 {
-  mi::math::Vector_struct<mi::Sint32, 2> sint32_2_st;
-  sint32_2_st.x = m_resolution.x;
-  sint32_2_st.y = m_resolution.y;
-  return sint32_2_st;
+  // mi::math::Vector_struct<mi::Sint32, 2> sint32_2_st;
+  // sint32_2_st.x = m_resolution.x;
+  // sint32_2_st.y = m_resolution.y;
+  // return sint32_2_st;
+  return mi::math::Vector<mi::Uint32, 2>(m_resolution.x, m_resolution.y);
 }
 
 //-----------------------------------------------------------------------------

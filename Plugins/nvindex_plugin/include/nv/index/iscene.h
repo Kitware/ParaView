@@ -198,6 +198,8 @@ public:
   /// add it to the scene description.
   ///
   /// \param[in] ijk_bbox                     The local space bounding box.
+  /// \param[in] transform_matrix             Transformation matrix from IJK (local) to XYZ (global)
+  /// space.
   /// \param[in] importer_callback            Distributed data import callback function.
   /// \param[in] dice_transaction             The DiCE transaction.
   ///
@@ -205,6 +207,7 @@ public:
   ///
   virtual ISparse_volume_scene_element* create_sparse_volume(
     const mi::math::Bbox_struct<mi::Float32, 3>& ijk_bbox,
+    const mi::math::Matrix_struct<mi::Float32, 4, 4>& transform_matrix,
     nv::index::IDistributed_data_import_callback* importer_callback,
     mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
 

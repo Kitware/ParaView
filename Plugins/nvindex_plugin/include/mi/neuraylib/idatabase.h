@@ -80,8 +80,8 @@ public:
   /// Removes a scope with the specified ID.
   ///
   /// Note that scopes are reference counted. The actual removal will not happen before all
-  /// elements referencing the scope have been released (e.g., child scopes, transactions,
-  /// database elements).
+  /// elements referencing the scope have been released, e.g., child scopes, transactions,
+  /// database elements, including handles to the scope itself.
   ///
   /// It is not possible to remove the global scope.
   ///

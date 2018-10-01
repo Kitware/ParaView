@@ -62,8 +62,10 @@ struct Single_scattering_params
   float3 dummy;
 };
 
-NV_IDX_VOLUME_SAMPLE_PROGRAM_PREFIX
-class NV_IDX_volume_sample_program
+using namespace nv::index::xac;
+using namespace nv::index::xaclib;
+
+class Volume_sample_program
 {
   NV_IDX_VOLUME_SAMPLE_PROGRAM
 
@@ -73,19 +75,20 @@ public:
 
 public:
   NV_IDX_DEVICE_INLINE_MEMBER
-  void init_instance()
+  void initialize()
   {
     // Bind the contents of the buffer slot 0 to the variable
-    m_single_scattering_params = NV_IDX_bind_parameter_buffer<Single_scattering_params>(0);
+    m_single_scattering_params = state.bind_parameter_buffer<Single_scattering_params>(0);
   }
 
   NV_IDX_DEVICE_INLINE_MEMBER
-  int execute(const NV_IDX_sample_info_self& sample_info, float4& output_color)
+  int execute(const Sample_info_self&   sample_info,
+                    Sample_output&      sample_output)
   {
     // retrieve parameter buffer contents (fixed values in code definition)
-    const NV_IDX_volume volume = state.scene.get_volume(m_single_scattering_params->volume_id);
+    const auto& volume = state.scene.access_by_id<Regular_volume>(m_single_scattering_params->volume_id);
     const float3& sample_position = sample_info.sample_position;
-    const NV_IDX_colormap& colormap = state.self.get_colormap();
+    const Colormap& colormap = state.self.get_colormap();
 
     // sample volume and colormap
     const float volume_sample = volume.sample<float>(sample_position);
@@ -93,7 +96,7 @@ public:
 
     if (sample_color.w < m_single_scattering_params->min_samp_alpha)
     {
-      output_color = sample_color;
+      sample_output.color = sample_color;
       return NV_IDX_PROG_DISCARD_SAMPLE;
     }
 
@@ -119,13 +122,13 @@ public:
     // init output color
     if (m_single_scattering_params->use_shading)
     {
-      output_color = blinn_shading(
-        sample_position, sample_color, -normalize(light_dir), m_single_scattering_params->dh);
-      output_color.w = sample_color.w;
+      sample_output.color = blinn_shading(
+        sample_position, sample_color, -normalize(light_dir), sample_info.ray_direction, m_single_scattering_params->dh);
+      sample_output.color.w = sample_color.w;
     }
     else
     {
-      output_color = sample_color;
+      sample_output.color = sample_color;
     }
 
     // check for iso intersections
@@ -144,7 +147,7 @@ public:
         const float st = (float)(sc) / (float)(m_single_scattering_params->steps - 1.0f);
 
         const float3 sray_pos = world_pos + st * light_dir + light_off;
-        const float3 sub_pos = state.self.transform_scene_to_sample(sray_pos);
+        const float3 sub_pos = transform_point(state.self.get_scene_to_sample_transform(), sray_pos);
 
         sample_value = volume.sample<float>(sub_pos);
 
@@ -168,8 +171,8 @@ public:
       }
 
       // apply shadow correction
-      output_color *= fmaxf(fminf(acc_shadow, 1.0f), 0.0f);
-      output_color.w = sample_color.w;
+      sample_output.color *= fmaxf(fminf(acc_shadow, 1.0f), 0.0f);
+      sample_output.color.w = sample_color.w;
     }
 
     return NV_IDX_PROG_OK;
@@ -179,6 +182,7 @@ public:
   float4 blinn_shading(const float3& sample_position,
     const float4& sample_color,
     const float3& light_dir,
+    const float3& view_dir,
     const float dh)
   {
     // define parameters
@@ -189,9 +193,6 @@ public:
     // get R3 gradient vector
     const float3 vs_grad = state.self.get_gradient(sample_position, dh); // compute R3 gradient
     const float3 iso_normal = -normalize(vs_grad);                       // get isosurface normal
-
-    // set up lighting parameters
-    const float3 view_dir = state.m_ray_direction;
 
     const float diff_amnt = fabsf(dot(light_dir, iso_normal)); // two sided shading
     float spec_amnt = 0.0f;
@@ -226,4 +227,4 @@ public:
       max(min(color.z, 1.0f), 0.0f),
       max(min(color.w, 1.0f), 0.0f));
   }
-}; // class NV_IDX_volume_sample_program
+}; // class Volume_sample_program

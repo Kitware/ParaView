@@ -541,10 +541,10 @@ public:
   ///
   /// Video contexts must first be created by the client and can then be retrieved on the server
   /// via this method. The video context ID is assigned when the video context is created on the
-  /// client side and must be transferred to the server before calling this method. The recommended
-  /// way to do this is to execute a Bridge job containing the video context ID and optionally
-  /// other data that is required for the server-side application to set up the video source and
-  /// to start producing frames.
+  /// client side and must be transferred to the server before calling this method.
+  /// The recommended way to do this is to execute a Bridge job containing the video context ID
+  /// and optionally other data that is required for the server-side application to set up
+  /// the video source and to start producing frames.
   ///
   /// \param context_id   The video context ID.
   /// \return             The video context or \c NULL if no video context with the provided ID
@@ -828,18 +828,19 @@ public:
   /// - \c "recurse" of type #mi::IBoolean: If \c true, any elements referenced by the elements
   ///   in the \p elements array are exported as well. Default: true.
   ///
-  /// \param transaction        The transaction to use for the export.
-  /// \param elements           The elements to export. Only supports element names as IString.
-  /// \param exporter_options   The exporter options.
-  /// \param[out] snapshot_id   The ID of the snapshot will be stored here if the operation is
-  ///                           successful.
-  /// \return                   Result of the export operation with the following error codes:
-  ///                           -       0: Success.
-  ///                           -    6001: Invalid parameters.
-  ///                           -    6002: Disk cache IO error.
-  ///                           -    6003: Failed to serialize a database element.
-  ///                           -    6004: Failed to export snapshot.
-  ///                           - >= 6005: Unspecified error.
+  /// \param transaction         The transaction to use for the export.
+  /// \param elements            The elements to export. Only supports element names as IString.
+  /// \param exporter_options    The exporter options.
+  /// \param[in,out] snapshot_id The ID of the snapshot to use. If an empty string is passed an
+  ///                            automatically generated unique identifier will be assigned to
+  ///                            this string.
+  /// \return                    Result of the export operation with the following error codes:
+  ///                            -       0: Success.
+  ///                            -    6001: Invalid parameters.
+  ///                            -    6002: Disk cache IO error.
+  ///                            -    6003: Failed to serialize a database element.
+  ///                            -    6004: Failed to export snapshot.
+  ///                            - >= 6005: Unspecified error.
   virtual neuraylib::IExport_result* export_snapshot(neuraylib::ITransaction* transaction,
     const IArray* elements, const IMap* exporter_options, IString* snapshot_id) = 0;
 };
@@ -883,6 +884,21 @@ public:
 
   /// Returns the Bridge protocol version string.
   virtual const char* get_bridge_protocol_version() const = 0;
+
+  /// Returns the hash and serialized size for the provided element.
+  ///
+  /// \param transaction   The transaction to use when looking up the element.
+  /// \param element       The name of the element.
+  /// \param o_hash        The hash will be written to this IString on success.
+  /// \param o_size        The serialized size in bytes will be assigned to this variable on
+  ///                      success.
+  /// \return
+  ///                      -     0: Success.
+  ///                      -    -1: Invalid arguments.
+  ///                      -    -2: Failed to look up element with the provided name.
+  ///                      - <= -2: Unspecified error.
+  virtual Sint32 calculate_hash(
+    neuraylib::ITransaction* transaction, const char* element, IString* o_hash, Size* o_size) = 0;
 };
 
 /*@}*/ // end group mi_neuray_bridge_server

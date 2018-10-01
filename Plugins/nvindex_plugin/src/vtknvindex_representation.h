@@ -161,17 +161,9 @@ public:
   void set_edge_range(double edge_range);
   void set_edge_samples(int edge_samples);
 
-  // Set single scattering parameter.
-  void set_single_scatt_samples(int samples);
-  void set_single_scatt_light_distance(double light_distance);
-  void set_single_scatt_min_alpha(double min_alpha);
-  void set_single_scatt_max_shadow(double max_shadow);
-  void set_single_scatt_shadow_exp(double shadow_exp);
-
-  // Set Iso-raycast parameter.
-  void set_isoraycast_threshold(double threshold);
-
   // Set region of interest.
+  void update_index_roi();
+
   void set_roi_minI(double val);
   void set_roi_maxI(double val);
   vtkGetVector2Macro(m_roi_range_I, double);
@@ -198,9 +190,9 @@ private:
   vtknvindex_cached_bounds* get_cached_bounds(mi::Sint32 time);
   void set_cached_bounds(mi::Sint32 time);
 
-  // Utility function for binary-searching a specific time stamp inside the sorted time steps list.
+  // Utility function for searching the lower bound time stamp inside a sorted time steps list.
   mi::Sint32 find_time_step(
-    const mi::Float64* time_steps, mi::Float64 time, mi::Sint32 left, mi::Sint32 right) const;
+    mi::Float64 time, const mi::Float64* time_steps, mi::Sint32 nb_tsteps) const;
 
   // Update current kernel
   void update_current_kernel();
@@ -215,6 +207,7 @@ private:
   vtknvindex_cluster_properties*
     m_cluster_properties; // Cluster wide properties, refer class documentation.
   mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
+  mi::math::Vector<mi::Uint32, 3> m_volume_size;   // Cached volume size.
 
   // backup of original Image Reduction Factors
   mi::Sint32 m_still_image_reduction_factor;
@@ -229,8 +222,6 @@ private:
   vtknvindex_isosurface_params m_isosurface_params;
   vtknvindex_depth_enhancement_params m_depth_enhancement_params;
   vtknvindex_edge_enhancement_params m_edge_enhancement_params;
-  vtknvindex_single_scattering_params m_single_scattering_params;
-  vtknvindex_isoraycast_params m_isoraycast_params;
 };
 
 // Schwartz counter to manage initialization.

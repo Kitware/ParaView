@@ -240,8 +240,7 @@ int vtknvindex_irregular_volume_representation::RequestData(
       m_controller->AllGather(this->DataBounds, all_rank_extents, 6);
     }
 
-    mi::math::Bbox<mi::Sint32, 3> volume_dimensions;
-    volume_dimensions.clear();
+    m_volume_dimensions.clear();
 
     // volume dimensions
     for (mi::Sint32 i = 0, idx = 0; i < num_processes; i++, idx += 6)
@@ -255,38 +254,21 @@ int vtknvindex_irregular_volume_representation::RequestData(
       cur_volume_dimensions.max.y = static_cast<mi::Sint32>(std::ceil(cur_extent[3]));
       cur_volume_dimensions.max.z = static_cast<mi::Sint32>(std::ceil(cur_extent[5]));
 
-      volume_dimensions.insert(cur_volume_dimensions);
+      m_volume_dimensions.insert(cur_volume_dimensions);
     }
 
     delete[] all_rank_extents;
 
-    m_cluster_properties->get_regular_volume_properties()->set_volume_extents(volume_dimensions);
+    m_cluster_properties->get_regular_volume_properties()->set_volume_extents(m_volume_dimensions);
 
     // volume size
-    mi::math::Vector_struct<mi::Uint32, 3> volume_size;
-    volume_size.x = volume_dimensions.max.x - volume_dimensions.min.x + 1;
-    volume_size.y = volume_dimensions.max.y - volume_dimensions.min.y + 1;
-    volume_size.z = volume_dimensions.max.z - volume_dimensions.min.z + 1;
+    m_volume_size.x = m_volume_dimensions.max.x - m_volume_dimensions.min.x + 1;
+    m_volume_size.y = m_volume_dimensions.max.y - m_volume_dimensions.min.y + 1;
+    m_volume_size.z = m_volume_dimensions.max.z - m_volume_dimensions.min.z + 1;
 
-    m_cluster_properties->get_regular_volume_properties()->set_volume_size(volume_size);
+    m_cluster_properties->get_regular_volume_properties()->set_volume_size(m_volume_size);
 
-    // region of interest
-    mi::math::Bbox_struct<mi::Float32, 3> roi;
-
-    roi.min.x = volume_dimensions.min.x +
-      (volume_dimensions.max.x - volume_dimensions.min.x) * m_roi_gui.min.x;
-    roi.max.x = volume_dimensions.min.x +
-      (volume_dimensions.max.x - volume_dimensions.min.x) * m_roi_gui.max.x;
-    roi.min.y = volume_dimensions.min.y +
-      (volume_dimensions.max.y - volume_dimensions.min.y) * m_roi_gui.min.y;
-    roi.max.y = volume_dimensions.min.y +
-      (volume_dimensions.max.y - volume_dimensions.min.y) * m_roi_gui.max.y;
-    roi.min.z = volume_dimensions.min.z +
-      (volume_dimensions.max.z - volume_dimensions.min.z) * m_roi_gui.min.z;
-    roi.max.z = volume_dimensions.min.z +
-      (volume_dimensions.max.z - volume_dimensions.min.z) * m_roi_gui.max.z;
-
-    m_app_config_settings->set_region_of_interest(roi);
+    update_index_roi();
   }
   else
   {
@@ -540,45 +522,68 @@ void vtknvindex_irregular_volume_representation::set_preintegration(bool enable_
 }
 
 //----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::update_index_roi()
+{
+  // Set region of interest.
+  mi::math::Bbox<mi::Float32, 3> roi;
+
+  roi.min.x = m_volume_dimensions.min.x +
+    (m_volume_dimensions.max.x - m_volume_dimensions.min.x) * m_roi_gui.min.x;
+  roi.max.x = m_volume_dimensions.min.x +
+    (m_volume_dimensions.max.x - m_volume_dimensions.min.x) * m_roi_gui.max.x;
+  roi.min.y = m_volume_dimensions.min.y +
+    (m_volume_dimensions.max.y - m_volume_dimensions.min.y) * m_roi_gui.min.y;
+  roi.max.y = m_volume_dimensions.min.y +
+    (m_volume_dimensions.max.y - m_volume_dimensions.min.y) * m_roi_gui.max.y;
+  roi.min.z = m_volume_dimensions.min.z +
+    (m_volume_dimensions.max.z - m_volume_dimensions.min.z) * m_roi_gui.min.z;
+  roi.max.z = m_volume_dimensions.min.z +
+    (m_volume_dimensions.max.z - m_volume_dimensions.min.z) * m_roi_gui.max.z;
+
+  m_app_config_settings->set_region_of_interest(roi);
+  DefaultMapper->config_settings_changed();
+}
+
+//----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_roi_minI(double val)
 {
   m_roi_gui.min.x = (val + 100.0) / 200.0;
-  DefaultMapper->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_roi_maxI(double val)
 {
   m_roi_gui.max.x = (val + 100.0) / 200.0;
-  DefaultMapper->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_roi_minJ(double val)
 {
   m_roi_gui.min.y = (val + 100.0) / 200.0;
-  DefaultMapper->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_roi_maxJ(double val)
 {
   m_roi_gui.max.y = (val + 100.0) / 200.0;
-  DefaultMapper->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_roi_minK(double val)
 {
   m_roi_gui.min.z = (val + 100.0) / 200.0;
-  DefaultMapper->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_representation::set_roi_maxK(double val)
 {
   m_roi_gui.max.z = (val + 100.0) / 200.0;
-  DefaultMapper->config_settings_changed();
+  update_index_roi();
 }
 
 //----------------------------------------------------------------------------
@@ -593,4 +598,237 @@ void vtknvindex_irregular_volume_representation::set_dump_internal_state(bool is
 {
   m_app_config_settings->set_dump_internal_state(is_dump);
   DefaultMapper->config_settings_changed();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::update_current_kernel()
+{
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_ISOSURFACE, reinterpret_cast<void*>(&m_isosurface_params),
+          sizeof(m_isosurface_params));
+      break;
+
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_DEPTH_ENHANCEMENT,
+          reinterpret_cast<void*>(&m_depth_enhancement_params), sizeof(m_depth_enhancement_params));
+      break;
+
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_EDGE_ENHANCEMENT,
+          reinterpret_cast<void*>(&m_edge_enhancement_params), sizeof(m_edge_enhancement_params));
+      break;
+
+    case RTC_KERNELS_NONE:
+    default:
+      static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)
+        ->rtc_kernel_changed(RTC_KERNELS_NONE, 0, 0);
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_volume_filter(int filter)
+{
+  vtknvindex_rtc_kernels kernel = static_cast<vtknvindex_rtc_kernels>(filter);
+
+  m_app_config_settings->set_rtc_kernel(kernel);
+  static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)->config_settings_changed();
+
+  update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_step_size_factor(double step_size_factor)
+{
+  m_app_config_settings->set_step_size(static_cast<mi::Float32>(step_size_factor));
+  static_cast<vtknvindex_irregular_volume_mapper*>(this->DefaultMapper)->opacity_changed();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_light_type(int light_type)
+{
+  m_isosurface_params.light_mode = light_type;
+  m_depth_enhancement_params.light_mode = light_type;
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_light_angle(double light_angle)
+{
+  mi::Float32 angle = static_cast<float>(2.0 * vtkMath::Pi() * (light_angle / 360.0));
+  m_isosurface_params.angle = angle;
+  m_depth_enhancement_params.angle = angle;
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_light_elevation(double light_elevation)
+{
+  mi::Float32 elevation =
+    static_cast<float>(2.0 * vtkMath::Pi() * ((light_elevation + 90.0) / 360.0));
+
+  m_isosurface_params.elevation = elevation;
+  m_depth_enhancement_params.elevation = elevation;
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_surf_ambient(double ambient)
+{
+  m_isosurface_params.amb_fac = static_cast<float>(ambient);
+  m_depth_enhancement_params.amb_fac = static_cast<float>(ambient);
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_surf_specular(double specular)
+{
+  m_isosurface_params.spec_fac = static_cast<float>(specular);
+  m_depth_enhancement_params.spec_fac = static_cast<float>(specular);
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_surf_specular_power(double specular_power)
+{
+  m_isosurface_params.shininess = static_cast<float>(specular_power);
+  m_depth_enhancement_params.shininess = static_cast<float>(specular_power);
+
+  switch (m_app_config_settings->get_rtc_kernel())
+  {
+    case RTC_KERNELS_ISOSURFACE:
+    case RTC_KERNELS_DEPTH_ENHANCEMENT:
+      update_current_kernel();
+      break;
+    case RTC_KERNELS_EDGE_ENHANCEMENT:
+    case RTC_KERNELS_NONE:
+      break;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_min(double iso_min)
+{
+  m_isosurface_params.iso_min = static_cast<float>(iso_min / 100.0);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_max(double iso_max)
+{
+  m_isosurface_params.iso_max = static_cast<float>(iso_max / 100.0);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_fill_mode(int mode)
+{
+  m_isosurface_params.fill_up = mode;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_iso_use_shading(bool use_shading)
+{
+  m_isosurface_params.use_shading = use_shading ? 1 : 0;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_ISOSURFACE)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_depth_samples(int depth_samples)
+{
+  m_depth_enhancement_params.max_dsteps = depth_samples;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_DEPTH_ENHANCEMENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_depth_gamma(double gamma)
+{
+  m_depth_enhancement_params.screen_gamma = gamma;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_DEPTH_ENHANCEMENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_edge_range(double edge_range)
+{
+  m_edge_enhancement_params.sample_range = static_cast<float>(edge_range);
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_EDGE_ENHANCEMENT)
+    update_current_kernel();
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_representation::set_edge_samples(int edge_samples)
+{
+  m_edge_enhancement_params.stp_num = edge_samples;
+
+  if (m_app_config_settings->get_rtc_kernel() == RTC_KERNELS_EDGE_ENHANCEMENT)
+    update_current_kernel();
 }

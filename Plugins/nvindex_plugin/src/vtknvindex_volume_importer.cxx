@@ -94,9 +94,9 @@ void vtknvindex_volume_importer::set_cluster_properties(
 
 //-------------------------------------------------------------------------------------------------
 template <typename T>
-bool vtknvindex_volume_importer::resolve_voxel_type(T* shmem_volume, T* voxel_data_storage,
+bool resolve_voxel_type(T* shmem_volume, T* voxel_data_storage,
   const mi::math::Bbox<mi::Sint32, 3>& bounds, const mi::math::Bbox<mi::Sint32, 3>& shmbbox,
-  mi::neuraylib::IDice_transaction* /*dice_transaction*/, bool zyx_to_xyz) const
+  mi::neuraylib::IDice_transaction* /*dice_transaction*/, bool zyx_to_xyz)
 {
   if (voxel_data_storage == NULL)
   {
@@ -334,6 +334,8 @@ nv::index::IDistributed_data_subset* vtknvindex_volume_importer::create(
   mi::Uint64 shmsize = 0;
   void* raw_mem_pointer = NULL;
 
+  m_cluster_properties->get_host_properties(rankid)->free_shm_pointer(time_step - 1);
+
   if (!m_cluster_properties->get_host_properties(rankid)->get_shminfo(
         bounds_no_border, shm_memory_name, shmbbox_flt, shmsize, &raw_mem_pointer, time_step))
   {
@@ -373,7 +375,7 @@ nv::index::IDistributed_data_subset* vtknvindex_volume_importer::create(
     // Create brick (must be derived from IRegular_volume_brick_data)
     // and return the database element to the caller. The caller keeps ownership.
     mi::base::Handle<nv::index::IRegular_volume_brick_uint8> volume_brick(
-      factory->create<nv::index::IRegular_volume_brick_uint8>());
+      factory->create_data_subset<nv::index::IRegular_volume_brick_uint8>());
 
     if (!volume_brick.is_valid_interface())
     {
@@ -407,7 +409,7 @@ nv::index::IDistributed_data_subset* vtknvindex_volume_importer::create(
     // Create brick (must be derived from IRegular_volume_brick_data)
     // and return the database element to the caller. The caller keeps ownership.
     mi::base::Handle<nv::index::IRegular_volume_brick_uint16> volume_brick(
-      factory->create<nv::index::IRegular_volume_brick_uint16>());
+      factory->create_data_subset<nv::index::IRegular_volume_brick_uint16>());
 
     if (!volume_brick.is_valid_interface())
     {
@@ -440,7 +442,7 @@ nv::index::IDistributed_data_subset* vtknvindex_volume_importer::create(
     // Create brick (must be derived from IRegular_volume_brick_data)
     // and return the database element to the caller. The caller keeps ownership.
     mi::base::Handle<nv::index::IRegular_volume_brick_float32> volume_brick(
-      factory->create<nv::index::IRegular_volume_brick_float32>());
+      factory->create_data_subset<nv::index::IRegular_volume_brick_float32>());
 
     if (!volume_brick.is_valid_interface())
     {
@@ -471,21 +473,22 @@ nv::index::IDistributed_data_subset* vtknvindex_volume_importer::create(
       ? reinterpret_cast<mi::Float64*>(raw_mem_pointer)
       : vtknvindex::util::get_vol_shm<mi::Float64>(shm_memory_name, shmsize);
 
-    mi::Float32* shmem_volume_flt = new mi::Float32[shmsize];
+    mi::Uint64 nb_scalars = shmsize / sizeof(mi::Float64);
+
+    mi::Float32* shmem_volume_flt = new mi::Float32[nb_scalars];
     if (!shmem_volume_flt)
     {
       ERROR_LOG << "Unable to create conversion buffer.";
       return 0;
     }
 
-    mi::Uint64 block_size = shmsize / sizeof(mi::Float64);
-    for (mi::Uint64 i = 0; i < block_size; ++i)
+    for (mi::Uint64 i = 0; i < nb_scalars; ++i)
       shmem_volume_flt[i] = static_cast<mi::Float32>(shmem_volume[i]);
 
     // Create brick (must be derived from IRegular_volume_brick_data)
     // and return the database element to the caller. The caller keeps ownership.
     mi::base::Handle<nv::index::IRegular_volume_brick_float32> volume_brick(
-      factory->create<nv::index::IRegular_volume_brick_float32>());
+      factory->create_data_subset<nv::index::IRegular_volume_brick_float32>());
 
     if (!volume_brick.is_valid_interface())
     {

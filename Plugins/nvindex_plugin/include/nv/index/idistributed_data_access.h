@@ -11,6 +11,8 @@
 #include <mi/dice.h>
 
 #include <nv/index/iregular_volume_data.h>
+#include <nv/index/isparse_volume_scene_element.h>
+#include <nv/index/isparse_volume_subset.h>
 
 namespace nv
 {
@@ -23,7 +25,7 @@ namespace index
 ///
 /// The access functionality, for instance, allows implementing
 /// user-defined computing algorithms operating on the distributed
-/// volume data to facilitate today's and future workflow
+/// volume data to facilitate todays and future workflow
 /// functionalities.
 ///
 /// The amount of amplitude data queried from the
@@ -111,7 +113,7 @@ public:
 ///
 /// The access functionality, for instance, allows implementing
 /// user-defined computing algorithms operating on the distributed
-/// elevation data to facilitate today's and future workflow
+/// elevation data to facilitate todays and future workflow
 /// functionalities.
 ///
 /// The amount of elevation values queried from the
@@ -207,6 +209,87 @@ public:
 };
 
 /// @ingroup nv_index_data_access
+/// Interface class for accessing the distributed sparse volume
+/// data.
+///
+/// The access functionality, for instance, allows implementing
+/// user-defined computing algorithms operating on the distributed
+/// volume data to facilitate todays and future workflow
+/// functionalities.
+///
+/// The amount of amplitude data queried from the
+/// cluster environment relies on the bounding box given by
+/// the user. The NVIDIA IndeX library then manages the cluster-wide
+/// data access and returns a local copy of the data.
+///
+/// TODO: Finish doc
+///
+/// The interface class \c IDistributed_data_access_factory returns an
+/// interface specific to a volume scene element referred to by the
+/// element's tag.
+///
+class ISparse_volume_data_access : public mi::base::Interface_declare<0xfe288301, 0x16dc, 0x42a1,
+                                     0x9b, 0xa9, 0xd6, 0x82, 0xa1, 0x20, 0x53, 0x33>
+{
+public:
+  /// Querying the amplitude values of a sparse volume
+  /// dataset. The query relies on the user-defined bounding box
+  /// and creates a local copy of the volume data. The
+  /// bounding box may be larger than the regular volume uploaded
+  /// to the cluster. In such a case, the access returns the
+  /// volume data contained in the both the user-defined
+  /// bounding box and extent that bounds the uploaded
+  /// volume data.
+  ///
+  /// \param[in] query_bbox           Defines the bounding box to perform
+  ///                                 the volume data access query. The
+  ///                                 bounding box is defined in the volume
+  ///                                 scene element's IJK space.
+  /// \param[in] dice_transaction     The DiCE transaction that the
+  ///                                 data access runs in.
+  ///
+  /// \return access status. Succeeded, when return values >=
+  /// 0. Failed when negative.
+  virtual mi::Sint32 access(const mi::math::Bbox_struct<mi::Sint32, 3>& query_bbox,
+    mi::neuraylib::IDice_transaction* dice_transaction) = 0;
+
+  /// Getting the computed bounding volume in which the accessed
+  /// volume data is defined. The computed bounding box may be different
+  /// from the bounding box used to query the volume data if,
+  /// for instance, all or part of the uploaded data lies outside the
+  /// user-defined bounding box.
+  ///
+  /// \returns        The bounding box of the accessed regular volume
+  ///                 data. The bounding box is defined in the volume
+  ///                 scene element's local 3D space.
+  ///
+  virtual const mi::math::Bbox_struct<mi::Sint32, 3>& get_bounding_box() const = 0;
+
+  /// The volume scene element that corresponds to the accessed data.
+  ///
+  /// \returns        The unique tag that references the volume
+  ///                 scene element.
+  ///
+  virtual mi::neuraylib::Tag_struct get_scene_element() const = 0;
+
+  /// The accessed volume data is stored locally. The extent of the
+  /// stored data is defined by the computed bounding volume.
+  /// The method returns a pointer to an \c IRegular_volume_data
+  /// interface, giving access to the typed regular volume data.
+  /// The \c IRegular_volume_data_access interface class 'owns' the
+  /// volume data while the \c IRegular_volume_data only grants access
+  /// to the data, i.e. the destructor of the implemented interface
+  /// class deletes the local data. All further existing \c IRegular_volume_data
+  /// instances will then hold invalid data.
+  ///
+  /// \returns        Interface pointer to an \c ISparse_volume_subset instance
+  ///                 giving access to the typed regular volume data. The volume
+  ///                 data is defined in Z-first and X-last order.
+  ///
+  virtual const ISparse_volume_subset* get_volume_data() const = 0;
+};
+
+/// @ingroup nv_index_data_access
 /// Interface class that exposes distributed data access interfaces
 /// for specific scene element.
 ///
@@ -239,6 +322,18 @@ public:
   ///                                         cluster environment.
   ///
   virtual IRegular_heightfield_data_access* create_regular_heightfield_data_access(
+    mi::neuraylib::Tag_struct scene_element_tag) const = 0;
+
+  /// Exposes an interface class that allows accessing distributed volume data.
+  ///
+  /// \param[in] scene_element_tag            The unique tag that references the
+  ///                                         volume scene element for which the
+  ///                                         access interface shall be exposed.
+  /// \return                                 The interface that enables accessing
+  ///                                         volume data distributed in the
+  ///                                         cluster environment.
+  ///
+  virtual ISparse_volume_data_access* create_sparse_volume_data_access(
     mi::neuraylib::Tag_struct scene_element_tag) const = 0;
 };
 }

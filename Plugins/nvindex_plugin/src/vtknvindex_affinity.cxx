@@ -118,6 +118,7 @@ void vtknvindex_affinity::scene_dump_affinity_info(std::ostringstream& s)
 void vtknvindex_affinity::reset_affinity()
 {
   m_spatial_subdivision.clear();
+  m_final_spatial_subdivision.clear();
 }
 
 // ------------------------------------------------------------------------------------------------

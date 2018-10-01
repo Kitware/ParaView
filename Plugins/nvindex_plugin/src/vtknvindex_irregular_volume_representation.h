@@ -33,6 +33,8 @@
 #include "vtkPVConfig.h"
 #include "vtkPVDataRepresentation.h"
 
+#include "vtknvindex_rtc_kernel_params.h"
+
 //#if PARAVIEW_VERSION_MAJOR == 5 && PARAVIEW_VERSION_MINOR >= 2
 #define PARAVIEW_UGRID_USE_PARTITIONS
 //#endif
@@ -159,7 +161,39 @@ public:
   // Set flag to log performance values.
   void set_log_performance(bool is_log);
 
+  // Set CUDA code parameter.
+  void set_volume_filter(int filter);
+
+  // Set raycast step size factor
+  void set_step_size_factor(double step_size_factor);
+
+  // Set common lighting parameter.
+  void set_light_type(int light_type);
+  void set_light_angle(double light_angle);
+  void set_light_elevation(double light_elevation);
+
+  // Set common specular parameters.
+  void set_surf_ambient(double ambient);
+  void set_surf_specular(double specular);
+  void set_surf_specular_power(double specular_power);
+
+  // Set iso-surface parameters.
+  void set_iso_min(double iso_min);
+  void set_iso_max(double iso_max);
+  void set_iso_fill_mode(int mode);
+  void set_iso_use_shading(bool use_shading);
+
+  // Set depth enhancement parameters.
+  void set_depth_samples(int depth_samples);
+  void set_depth_gamma(double gamma);
+
+  // Set edge enhancement parameters.
+  void set_edge_range(double edge_range);
+  void set_edge_samples(int edge_samples);
+
   // Set region of interest.
+  void update_index_roi();
+
   void set_roi_minI(double val);
   void set_roi_maxI(double val);
   vtkGetVector2Macro(m_roi_range_I, double);
@@ -216,6 +250,9 @@ private:
     const vtknvindex_irregular_volume_representation&) = delete;
   void operator=(const vtknvindex_irregular_volume_representation&) = delete;
 
+  // Update current kernel
+  void update_current_kernel();
+
   class vtkInternals;
   vtkInternals* Internals;
 
@@ -229,9 +266,16 @@ private:
   vtknvindex_config_settings* m_app_config_settings; // Application side config settings.
   vtknvindex_cluster_properties*
     m_cluster_properties; // Cluster wide properties, refer class documentation.
-  mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui; // Region of interest set in the GUI.
+  mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui;   // Region of interest set in the GUI.
+  mi::math::Vector<mi::Uint32, 3> m_volume_size;     // Cached volume size
+  mi::math::Bbox<mi::Sint32, 3> m_volume_dimensions; // Cached volume dimensions
 
   mi::Float32 m_prev_time_step;
+
+  // rtc kernel params
+  vtknvindex_ivol_isosurface_params m_isosurface_params;
+  vtknvindex_ivol_depth_enhancement_params m_depth_enhancement_params;
+  vtknvindex_ivol_edge_enhancement_params m_edge_enhancement_params;
 };
 
 #endif // vtknvindex_irregular_volume_representation_h

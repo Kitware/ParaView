@@ -60,31 +60,32 @@ struct Isosurface_params
   float2 dummy; // for memory 16 bytes alignment
 };
 
-NV_IDX_VOLUME_SAMPLE_PROGRAM_PREFIX
-class NV_IDX_volume_sample_program
+using namespace nv::index::xac;
+using namespace nv::index::xaclib;
+
+class Volume_sample_program
 {
   NV_IDX_VOLUME_SAMPLE_PROGRAM
-
-private:
-  const float3 ray_dir = state.m_ray_direction;
 
 public:
   const Isosurface_params* m_isosurface_params; // define variables to bind user-defined buffer to
 
 public:
   NV_IDX_DEVICE_INLINE_MEMBER
-  void init_instance()
+  void initialize()
   {
     // Bind the contents of the buffer slot 0 to the variable
-    m_isosurface_params = NV_IDX_bind_parameter_buffer<Isosurface_params>(0);
+    m_isosurface_params = state.bind_parameter_buffer<Isosurface_params>(0);
   }
 
   NV_IDX_DEVICE_INLINE_MEMBER
-  int execute(const NV_IDX_sample_info_self& sample_info, float4& output_color)
+  int execute(const Sample_info_self&   sample_info,
+                    Sample_output&      sample_output)
   {
-    const NV_IDX_volume& volume = state.self;
-    const float3& sample_position = sample_info.sample_position;
-    const NV_IDX_colormap& colormap = volume.get_colormap();
+    const auto& volume = state.self;
+    const float3& sample_position = sample_info.sample_position_object_space;
+    const float3 ray_dir = sample_info.ray_direction;
+    const Colormap& colormap = volume.get_colormap();
 
     // retrieve parameter buffer contents (fixed values in code definition)
     float iso_min = (1.0f - m_isosurface_params->iso_min) * colormap.get_domain_min() +
@@ -100,12 +101,16 @@ public:
     }
 
     // sample volume and colormap
-    const float volume_sample = volume.sample<float>(sample_position);
+    const auto  svol_sampler = volume.generate_sampler<float>(
+                                                        0u,
+                                                        sample_info.sample_context);
+
+    const float volume_sample = svol_sampler.fetch_sample(sample_position);
 
     // get spatial sample points for each dimensions
-    const float rh = state.m_ray_stepsize_min; // ray sampling difference
-    const float vs_dr_p = volume.sample<float>(sample_position + ray_dir * rh);
-    const float vs_dr_n = volume.sample<float>(sample_position - ray_dir * rh);
+    const float rh = volume.get_sample_distance(); // ray sampling difference
+    const float vs_dr_p = svol_sampler.fetch_sample(sample_position + ray_dir * rh);
+    const float vs_dr_n = svol_sampler.fetch_sample(sample_position - ray_dir * rh);
 
     // sum up threshold exceeds in both directions for iso_min
     float sum_over = float((vs_dr_p > iso_min) + (vs_dr_n > iso_min) + (volume_sample > iso_min));
@@ -117,7 +122,7 @@ public:
       // sample color
       const float4 sample_color = colormap.lookup(iso_min); // use isovalue color
       const float3 iso_normal =
-        -normalize(volume.get_gradient(sample_position)); // get isosurface normal
+        -normalize(volume_gradient<Volume_filter_mode::TRILINEAR>(volume, sample_position)); // get isosurface normal
 
       // check if to skip sample
       if (sample_color.w < m_isosurface_params->min_alpha)
@@ -139,17 +144,17 @@ public:
 
           if (fabsf(ang_mx) < m_isosurface_params->ng_width)
           {
-            output_color = make_float4(0.5f, 0.f, 0.f, 1.f);
+            sample_output.color = make_float4(0.5f, 0.f, 0.f, 1.f);
             return NV_IDX_PROG_OK;
           }
           else if (fabsf(ang_my) < m_isosurface_params->ng_width)
           {
-            output_color = make_float4(0.f, 0.5f, 0.f, 1.f);
+            sample_output.color = make_float4(0.f, 0.5f, 0.f, 1.f);
             return NV_IDX_PROG_OK;
           }
           else if (fabsf(ang_mz) < m_isosurface_params->ng_width)
           {
-            output_color = make_float4(0.f, 0.f, 0.5f, 1.f);
+            sample_output.color = make_float4(0.f, 0.f, 0.5f, 1.f);
             return NV_IDX_PROG_OK;
           }
         }
@@ -157,13 +162,13 @@ public:
         // valid intersection found
         if (m_isosurface_params->use_shading)
         {
-          output_color = blinn_shader(iso_normal, sample_color);
+          sample_output.color = blinn_shader(iso_normal, sample_color, ray_dir);
         }
         else
         {
           // use sample color
-          output_color = sample_color;
-          output_color.w = 1.0f;
+          sample_output.color = sample_color;
+          sample_output.color.w = 1.0f;
         }
 
         return NV_IDX_PROG_OK;
@@ -173,8 +178,8 @@ public:
       (m_isosurface_params->fill_up == -1 && sum_under >= 3))
     {
       // use iso_min color
-      output_color = colormap.lookup(iso_min);
-      output_color.w = 1.0f;
+      sample_output.color = colormap.lookup(iso_min);
+      sample_output.color.w = 1.0f;
 
       return NV_IDX_PROG_OK;
     }
@@ -182,7 +187,7 @@ public:
       (m_isosurface_params->fill_up == -2 && sum_under >= 3))
     {
       // use sample color
-      output_color = colormap.lookup(volume_sample);
+      sample_output.color = colormap.lookup(volume_sample);
 
       return NV_IDX_PROG_OK;
     }
@@ -202,7 +207,7 @@ public:
       // sample color
       const float4 sample_color = colormap.lookup(iso_max); // use isovalue color
       const float3 iso_normal =
-        -normalize(volume.get_gradient(sample_position)); // get isosurface normal
+        -normalize(volume_gradient<Volume_filter_mode::TRILINEAR>(volume, sample_position)); // get isosurface normal
 
       // check if to skip sample
       if (sample_color.w < m_isosurface_params->min_alpha)
@@ -221,17 +226,17 @@ public:
 
         if (fabsf(ang_mx) < m_isosurface_params->ng_width)
         {
-          output_color = make_float4(0.5f, 0.f, 0.f, 1.f);
+          sample_output.color = make_float4(0.5f, 0.f, 0.f, 1.f);
           return NV_IDX_PROG_OK;
         }
         else if (fabsf(ang_my) < m_isosurface_params->ng_width)
         {
-          output_color = make_float4(0.f, 0.5f, 0.f, 1.f);
+          sample_output.color = make_float4(0.f, 0.5f, 0.f, 1.f);
           return NV_IDX_PROG_OK;
         }
         else if (fabsf(ang_mz) < m_isosurface_params->ng_width)
         {
-          output_color = make_float4(0.f, 0.f, 0.5f, 1.f);
+          sample_output.color = make_float4(0.f, 0.f, 0.5f, 1.f);
           return NV_IDX_PROG_OK;
         }
       }
@@ -239,13 +244,13 @@ public:
       // valid intersection found
       if (m_isosurface_params->use_shading)
       {
-        output_color = blinn_shader(iso_normal, sample_color);
+        sample_output.color = blinn_shader(iso_normal, sample_color, ray_dir);
       }
       else
       {
         // use sample color
-        output_color = sample_color;
-        output_color.w = 1.0f;
+        sample_output.color = sample_color;
+        sample_output.color.w = 1.0f;
       }
 
       return NV_IDX_PROG_OK;
@@ -254,8 +259,8 @@ public:
       (m_isosurface_params->fill_up == -1 && sum_under >= 3))
     {
       // use iso_max color
-      output_color = colormap.lookup(iso_max);
-      output_color.w = 1.0f;
+      sample_output.color = colormap.lookup(iso_max);
+      sample_output.color.w = 1.0f;
 
       return NV_IDX_PROG_OK;
     }
@@ -263,7 +268,7 @@ public:
       (m_isosurface_params->fill_up == -2 && sum_under >= 3))
     {
       // use sample color
-      output_color = colormap.lookup(volume_sample);
+      sample_output.color = colormap.lookup(volume_sample);
 
       return NV_IDX_PROG_OK;
     }
@@ -272,10 +277,13 @@ public:
       // no isosurface intersection
       return NV_IDX_PROG_DISCARD_SAMPLE;
     }
+
+    // sample_output.color = make_float4(0.f, 0.5f, 1.f, 1.f);
+    // return NV_IDX_PROG_OK;
   }
 
   NV_IDX_DEVICE_INLINE_MEMBER
-  float4 blinn_shader(const float3& normal, const float4& sample_color)
+  float4 blinn_shader(const float3& normal, const float4& sample_color, const float3& ray_dir)
   {
     const float3 diffuse_color = make_float3(sample_color);
 
@@ -305,4 +313,24 @@ public:
     return clamp(
       make_float4(shade_color.x, shade_color.y, shade_color.z, sample_color.w), 0.0f, 1.0f);
   }
-}; // class NV_IDX_volume_sample_program
+
+  // float3 get_gradient(const Sparse_volume_sampler<float>& sampler, const float3 sample_position, const float dh)
+  // {
+      // // get spatial sample points for each dimensions
+      // const float vs_dx_p = sampler.fetch_sample(sample_position + make_float3( dh, 0, 0));
+      // const float vs_dx_n = sampler.fetch_sample(sample_position + make_float3(-dh, 0, 0));
+      // const float vs_dy_p = sampler.fetch_sample(sample_position + make_float3(  0, dh, 0));
+      // const float vs_dy_n = sampler.fetch_sample(sample_position + make_float3(  0,-dh, 0));
+      // const float vs_dz_p = sampler.fetch_sample(sample_position + make_float3(  0, 0, dh));
+      // const float vs_dz_n = sampler.fetch_sample(sample_position + make_float3(  0, 0,-dh));
+
+      // // get finite differences for each dimension
+      // const float vs_grad_x = (vs_dx_p - vs_dx_n) / dh;
+      // const float vs_grad_y = (vs_dy_p - vs_dy_n) / dh;
+      // const float vs_grad_z = (vs_dz_p - vs_dz_n) / dh;
+
+      // // get R3 gradient vector
+      // return make_float3(vs_grad_x, vs_grad_y, vs_grad_z);
+  // }
+
+}; // class Volume_sample_program

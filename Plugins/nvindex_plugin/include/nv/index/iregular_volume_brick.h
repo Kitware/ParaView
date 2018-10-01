@@ -73,7 +73,7 @@ public:
   /// Allocate the volume brick's memory. The brick's memory layout represents a 3D grid structure
   /// and is aligned in
   /// x-first and z-last order, were x refers to the brick's width in its local coordinate system
-  /// and z to
+  /// and z to the
   /// the brick's depth.
   /// The size of the continuous memory block relies on the brick's width, height, and depth, the
   /// number of

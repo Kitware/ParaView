@@ -372,7 +372,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  const base::IInterface* get_interface(const base::Uuid& interface_id) const override
+  virtual const base::IInterface* get_interface(const base::Uuid& interface_id) const
   {
     if (interface_id == IID())
     {
@@ -393,7 +393,7 @@ public:
   /// In the case of a non-\c NULL return value, the caller receives ownership of the new
   /// interface pointer, whose reference count has been retained once. The caller must
   /// release the returned interface pointer at the end to prevent a memory leak.
-  base::IInterface* get_interface(const base::Uuid& interface_id) override
+  virtual base::IInterface* get_interface(const base::Uuid& interface_id)
   {
     if (interface_id == IID())
     {
@@ -407,31 +407,31 @@ public:
   using base::Interface_implement<I>::get_interface;
 
   /// Returns the class ID corresponding to the template parameters of this mixin class.
-  base::Uuid get_class_id() const override { return IID(); }
+  virtual base::Uuid get_class_id() const { return IID(); }
 
   /// Empty body. This method from the base class is not needed for client jobs.
-  void deserialize(neuraylib::IDeserializer* deserializer) override
+  virtual void deserialize(neuraylib::IDeserializer* deserializer)
   {
     // avoid warnings
     (void)deserializer;
   }
 
   /// Empty body. The default job references no elements.
-  void get_references(neuraylib::ITag_set* result) const override
+  virtual void get_references(neuraylib::ITag_set* result) const
   {
     // avoid warnings
     (void)result;
   }
 
   /// Empty body. The default job references no elements.
-  void get_references(IElement_set* result) const override
+  virtual void get_references(IElement_set* result) const
   {
     // avoid warnings
     (void)result;
   }
 
   /// Returns \c false in the default implementation.
-  bool upload_only() const override { return false; }
+  virtual bool upload_only() const { return false; }
 };
 
 /// Base class for Bridge jobs that only update elements without executing anything.
@@ -442,13 +442,13 @@ public:
 class Update_job : public mi::bridge::Client_job<0xf9b3c8e2, 0x7688, 0x4bf8, 0x91, 0x36, 0xcd, 0x3a,
                      0x3f, 0x51, 0x30, 0x7a>
 {
-  void serialize(neuraylib::ISerializer* serializer) const override
+  void serialize(neuraylib::ISerializer* serializer) const
   {
     // avoid warnings
     (void)serializer;
   }
 
-  void receive_remote_result(neuraylib::IDeserializer* deserializer, bool last_result) override
+  void receive_remote_result(neuraylib::IDeserializer* deserializer, bool last_result)
   {
     // avoid warnings
     (void)deserializer;
@@ -682,6 +682,38 @@ public:
   ///
   /// \see #get_bytes_written()
   virtual Size get_bytes_read() const = 0;
+
+  /// Allows the data for specific elements to be overridden by specifying the hash of the
+  /// data to use regardless of the actual data stored in the db. The replacements will only be
+  /// done when executing a bridge job that returns the provided top_level_element in its
+  /// get_references() method and only when executed in the same scope as the scope of the
+  /// provided transaction. When an edited element is detected for the job the overrides
+  /// map will be consulted to see if an override for the element with that name exists. If
+  /// it does the element won't be serialized and the override hash from the map will
+  /// be used instead. The server then use the hash when loading the data from the cache, meaning
+  /// that it can be different than the actual data on the client. For this to work, the data
+  /// for the hash must be guaranteed to already be in the server side cache. This can be
+  /// achieved by storing snapshots in the server side cache with all required data before
+  /// rendering the scene containing hash overrides.
+  ///
+  /// \param overrides An IMap with the name of the element to override as key and the hash
+  ///                  as string value. The map must be of type Map\<String\>. Call this
+  ///                  method with a \c NULL override map to release it or replace it with a
+  ///                  new one. The map instance is retained by bridge to avoid expensive copying
+  ///                  and must not be modified after this call.
+  /// \param transaction The hash overrides will be applied only for jobs executing in the same
+  ///                    scope as this transaction. The top level element must be visible in
+  ///                    this transaction.
+  /// \param top_level_element The top level element. The overrides applies to this element
+  ///                          and all elements it reference when executing a job that returns
+  ///                          the specified top level element in its get_references() method.
+  /// \return
+  ///              -     0: Success.
+  ///              -    -1: Invalid arguments (\p job or transaction is \c NULL).
+  ///              -    -2: Invalid transaction state (already committed or aborted).
+  ///              - <= -2: Unspecified error.
+  virtual Sint32 set_hash_overrides(
+    const IMap* overrides, const char* top_level_element, neuraylib::ITransaction* transaction) = 0;
 };
 
 /// API component that serves as entry point for the client-side Bridge API.
