@@ -294,6 +294,9 @@
            </item>
            <item row="1" column="2">
             <widget class="QSpinBox" name="rollResolution">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="toolTip">
               <string>The number of camera positions in the roll direction.</string>
              </property>
@@ -411,6 +414,12 @@
           <property name="toolTip">
            <string>Mode for the cinema store of this view: none=don't export, static=fixed camera, phi-theta=Phi*Theta camera positions around focal point, AER=camera rotates arbitrarily around focal point, YPR=camera rotates arbitrarily from vantage point.</string>
           </property>
+          <property name="currentText">
+           <string>static</string>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
           <item>
            <property name="text">
             <string>none</string>
@@ -426,20 +435,13 @@
             <string>phi-theta</string>
            </property>
           </item>
-          <item>
-           <property name="text">
-            <string>azimuth-elevation-roll</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>yaw-pitch-roll</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="6" column="2">
          <widget class="QLineEdit" name="trackObjectName">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter name from Pipeline Browser for camera to track over time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -464,6 +466,9 @@
         </item>
         <item row="0" column="2">
          <widget class="QCheckBox" name="composite">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="toolTip">
            <string>Whether to export specA (simple RGB) or newer (compositible deferred rendering images) format stores</string>
           </property>
@@ -471,7 +476,7 @@
            <string/>
           </property>
           <property name="checked">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -484,6 +489,9 @@
         </item>
         <item row="2" column="2">
          <widget class="QCheckBox" name="cbUseFloatValues">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="toolTip">
            <string>Render recolorable float value pixels via GL_ARB_texture_float buffers if available.</string>
           </property>
@@ -504,6 +512,9 @@
         </item>
         <item row="1" column="2">
          <widget class="QCheckBox" name="cbNoValues">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="toolTip">
            <string>Use prebaked lookup table as RGB pixels instead of recolorable float value pixels. </string>
           </property>
