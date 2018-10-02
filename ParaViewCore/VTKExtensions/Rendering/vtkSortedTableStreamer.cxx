@@ -105,6 +105,10 @@ public:
         dstArray->SetNumberOfComponents(otherArray->GetNumberOfComponents());
         dstArray->SetName(otherArray->GetName());
         dstArray->Allocate(minSize * otherArray->GetNumberOfComponents());
+        if (auto oinfo = otherArray->GetInformation())
+        {
+          dstArray->CopyInformation(oinfo);
+        }
       }
 
       for (vtkIdType idx = 0; idx < otherArray->GetNumberOfTuples(); ++idx)
@@ -1067,6 +1071,11 @@ public:
       subArray->SetNumberOfComponents(srcArray->GetNumberOfComponents());
       subArray->SetName(srcArray->GetName());
       subArray->Allocate(size * srcArray->GetNumberOfComponents());
+      if (auto sinfo = srcArray->GetInformation())
+      {
+        subArray->CopyInformation(sinfo);
+      }
+
       vtkIdType max = size + offset;
       if (sorter != NULL && sorter->Array != NULL)
       {
