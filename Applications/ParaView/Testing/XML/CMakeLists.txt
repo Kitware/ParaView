@@ -139,6 +139,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/LineChartSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMap.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LogColorMapToggle.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Molecule.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.xml
@@ -818,6 +819,7 @@ set (PolygonPointSelection_FORCE_SERIAL TRUE)
 set (Contour_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (Calculator_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (LogColorMap_FORCE_SERIAL TRUE) # since this uses popup-menu
+set (LogColorMapToggle_FORCE_SERIAL TRUE) # since this pops up output window
 set (ColorOpacityTableEditing_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (SimpleInteraction_FORCE_SERIAL TRUE) # since this uses popup-menu
 set (ExportFilteredColumnsSpreadsheet_FORCE_SERIAL TRUE) # since this uses popup-menu

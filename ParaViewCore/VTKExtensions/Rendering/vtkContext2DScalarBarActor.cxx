@@ -904,6 +904,8 @@ void vtkContext2DScalarBarActor::PaintAxis(vtkContext2D* painter, double size[2]
   // NOTE: the order of calls to this->Axis is important and should be
   // changed only with extreme care.
   this->Axis->SetTickLabelAlgorithm(vtkAxis::TICK_SIMPLE);
+  this->Axis->SetUnscaledMinimumLimit(std::numeric_limits<double>::max() * -1.0);
+  this->Axis->SetUnscaledMaximumLimit(std::numeric_limits<double>::max());
   this->Axis->SetUnscaledRange(range);
   this->Axis->SetAxisVisible(false);
   this->Axis->SetLabelsVisible(!indexedMode && this->DrawTickLabels == 1);
