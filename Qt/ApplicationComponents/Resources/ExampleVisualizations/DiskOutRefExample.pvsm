@@ -8147,11 +8147,6 @@
       <Property name="ComponentSelection" id="29834.ComponentSelection" number_of_elements="1">
         <Element index="0" value="4"/>
       </Property>
-      <Property name="GlyphDataRange" id="29834.GlyphDataRange" number_of_elements="2">
-        <Element index="0" value="0.36351895068327494"/>
-        <Element index="1" value="12.745763979148677"/>
-        <Domain name="range" id="29834.GlyphDataRange.range"/>
-      </Property>
       <Property name="GlyphMode" id="29834.GlyphMode" number_of_elements="1">
         <Element index="0" value="2"/>
         <Domain name="enum" id="29834.GlyphMode.enum">
@@ -8172,10 +8167,6 @@
         <Domain name="input_type" id="29834.Input.input_type"/>
         <Domain name="scale_array" id="29834.Input.scale_array"/>
         <Domain name="vector_array" id="29834.Input.vector_array"/>
-      </Property>
-      <Property name="MaximumGlyphSize" id="29834.MaximumGlyphSize" number_of_elements="1">
-        <Element index="0" value="0.7661338657140733"/>
-        <Domain name="bounds" id="29834.MaximumGlyphSize.bounds"/>
       </Property>
       <Property name="MaximumNumberOfSamplePoints" id="29834.MaximumNumberOfSamplePoints" number_of_elements="1">
         <Element index="0" value="5000"/>
@@ -8198,10 +8189,6 @@
           <Entry value="0" text="Point Data"/>
           <Entry value="1" text="Cell Data"/>
         </Domain>
-      </Property>
-      <Property name="RescaleGlyphs" id="29834.RescaleGlyphs" number_of_elements="1">
-        <Element index="0" value="1"/>
-        <Domain name="bool" id="29834.RescaleGlyphs.bool"/>
       </Property>
       <Property name="ScaleArray" id="29834.ScaleArray" number_of_elements="5">
         <Element index="0" value="0"/>
@@ -8231,6 +8218,12 @@
           <Entry value="0" text="Point Data"/>
           <Entry value="1" text="Cell Data"/>
         </Domain>
+      </Property>
+      <Property name="ScaleFactor" id="13792.ScaleFactor" number_of_elements="1">
+        <Element index="0" value="0.05"/>
+        <Domain name="bounds" id="13792.ScaleFactor.bounds"/>
+        <Domain name="scalar_range" id="13792.ScaleFactor.scalar_range"/>
+        <Domain name="vector_range" id="13792.ScaleFactor.vector_range"/>
       </Property>
       <Property name="Seed" id="29834.Seed" number_of_elements="1">
         <Element index="0" value="10339"/>
