@@ -24,13 +24,14 @@ from vtkmodules.web import iteritems
 from vtkmodules.web.render_window_serializer import SynchronizationContext, initializeSerializers, serializeInstance, getReferenceId
 from paraview.web.decorators import *
 
-from vtkmodules.vtkCommonDataModel          import vtkImageData
-from vtkmodules.vtkCommonCore               import vtkUnsignedCharArray, vtkCollection
-from vtkmodules.vtkWebCore                  import vtkDataEncoder, vtkWebInteractionEvent
-from vtkmodules.vtkPVServerManagerRendering import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
-from vtkmodules.vtkPVServerManagerCore      import vtkSMProxyManager
-from vtkmodules.vtkCommonDataModel          import vtkDataObject
-from vtkmodules.vtkPVClientServerCoreCore   import vtkProcessModule
+from vtkmodules.vtkCommonDataModel             import vtkImageData
+from vtkmodules.vtkCommonCore                  import vtkUnsignedCharArray, vtkCollection
+from vtkmodules.vtkWebCore                     import vtkDataEncoder, vtkWebInteractionEvent
+from vtkmodules.vtkPVServerManagerRendering    import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
+from vtkmodules.vtkPVServerManagerCore         import vtkSMProxyManager
+from vtkmodules.vtkCommonDataModel             import vtkDataObject
+from vtkmodules.vtkPVClientServerCoreCore      import vtkProcessModule
+from vtkmodules.vtkPVClientServerCoreRendering import vtkPVRenderView
 
 if sys.version_info >= (3,):
     xrange = range
@@ -304,19 +305,30 @@ class ParaViewWebViewPort(ParaViewWebProtocol):
 
     # RpcName: updateCamera => viewport.camera.update
     @exportRpc("viewport.camera.update")
-    def updateCamera(self, view_id, focal_point, view_up, position):
+    def updateCamera(self, view_id, focal_point, view_up, position, forceUpdate = True):
         view = self.getView(view_id)
 
         view.CameraFocalPoint = focal_point
         view.CameraViewUp = view_up
         view.CameraPosition = position
-        self.getApplication().InvalidateCache(view.SMProxy)
-        self.getApplication().InvokeEvent('UpdateEvent')
+
+        if forceUpdate:
+            self.getApplication().InvalidateCache(view.SMProxy)
+            self.getApplication().InvokeEvent('UpdateEvent')
+
 
     @exportRpc("viewport.camera.get")
     def getCamera(self, view_id):
         view = self.getView(view_id)
+        bounds = [-1, 1, -1, 1, -1, 1]
+
+        if view and view.GetClientSideView().GetClassName() == 'vtkPVRenderView':
+            rr = view.GetClientSideView().GetRenderer()
+            bounds = rr.ComputeVisiblePropBounds()
+
         return {
+            'bounds': bounds,
+            'center': list(view.CenterOfRotation),
             'focal': list(view.CameraFocalPoint),
             'up': list(view.CameraViewUp),
             'position': list(view.CameraPosition)
