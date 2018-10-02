@@ -787,7 +787,8 @@ void pqColorAnnotationsPropertyWidget::updateIndexedLookupState()
     this->Internals->Ui.SaveAsPreset->setVisible(val);
     this->Internals->Decorator->setIsAdvanced(!val);
 
-    if (val)
+    pqDataRepresentation* repr = pqActiveObjects::instance().activeRepresentation();
+    if (val && repr && repr->isVisible())
     {
       vtkSMPropertyHelper annotationsInitialized(this->proxy(), "AnnotationsInitialized");
       if (!annotationsInitialized.GetAsInt())
