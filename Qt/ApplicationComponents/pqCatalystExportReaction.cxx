@@ -327,9 +327,29 @@ void pqCatalystExportReaction::onTriggered()
             break;
         }
         int cameraLevel = vtkSMPropertyHelper(writerProxy, "Camera Model").GetAsInt();
+        if (renderingLevel == 0 && cameraLevel > 1)
+        {
+          cameraLevel = 1;
+          qWarning(
+            "Camera Type choice is not compatible with Cinema Spec A, falling back to phi-theta.");
+        }
+
         int numPhis = vtkSMPropertyHelper(writerProxy, "Camera Phi Divisions").GetAsInt();
         int numThetas = vtkSMPropertyHelper(writerProxy, "Camera Theta Divisions").GetAsInt();
         int numRolls = vtkSMPropertyHelper(writerProxy, "Camera Roll Divisions").GetAsInt();
+        if (numRolls > 1)
+        {
+          if (renderingLevel == 0)
+          {
+            numRolls = 1;
+            qWarning("Roll is not compatible with Cinema Spec A, falling back to roll = 1.");
+          }
+          else if (cameraLevel < 2)
+          {
+            numRolls = 1;
+            qWarning("Roll requires pose based camera, falling back to roll = 1.");
+          }
+        }
         QString camState;
         QString phis = "";
         QString thetas = "";
@@ -401,6 +421,21 @@ void pqCatalystExportReaction::onTriggered()
         }
 
         QString trackedObject = vtkSMPropertyHelper(writerProxy, "Track Object").GetAsString();
+        if (trackedObject != "None")
+        {
+          if (renderingLevel == 0)
+          {
+            trackedObject = "None";
+            qWarning(
+              "Object tracking is not compatible with Cinema Spec A, falling back to no tracking.");
+          }
+          else if (cameraLevel < 2)
+          {
+            trackedObject = "None";
+            qWarning("Object tracking requires pose based camera, falling back to no tracking.");
+          }
+        }
+
         cinema_options += ", 'tracking':{ 'object':'" + trackedObject + "'}";
 
         vtkSMRenderViewProxy* rvp = vtkSMRenderViewProxy::SafeDownCast(viewProxy);
