@@ -43,6 +43,7 @@ class QSpinBox;
 class QToolButton;
 class QWidget;
 class pqColorChooserButton;
+class pqDoubleSliderWidget;
 class vtkSMProxy;
 class vtkSMPropertyGroup;
 
@@ -71,6 +72,7 @@ public:
   void addPropertyLink(QDoubleSpinBox* spinBox, const char* propertyName, int smindex = -1);
   void addPropertyLink(QSpinBox* spinBox, const char* propertyName, int smindex = -1);
   void addPropertyLink(pqColorChooserButton* color, const char* propertyName, int smindex = -1);
+  void addPropertyLink(pqDoubleSliderWidget* slider, const char* propertyName, int smindex = -1);
   // make this signal public
   using Superclass::changeFinished;
 
