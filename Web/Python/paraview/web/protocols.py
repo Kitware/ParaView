@@ -2207,7 +2207,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                                        'min': ithrange[0],
                                        'max': ithrange[1] })
             else:
-                rangeList.append({ 'name': '', 'min': magRange[1], 'max': magRange[1] })
+                rangeList.append({ 'name': '', 'min': magRange[0], 'max': magRange[1] })
 
             data['range'] = rangeList
             arrayData.append(data)
