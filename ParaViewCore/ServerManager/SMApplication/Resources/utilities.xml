@@ -4731,6 +4731,20 @@
         <Documentation>
           Name of a pipeline object to orient the camera with. Only meaningful for Inward and Outward Pose Cameras.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="1" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="2" />
+              </Expression>
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="3" />
+              </Expression>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
       </StringVectorProperty>
       <IntVectorProperty name="Camera Phi Divisions"
         number_of_elements="1"
@@ -4755,6 +4769,20 @@
           Specify number of roll divisions. Only meaningful for Inward and Outward Pose Cameras.
         </Documentation>
         <IntRangeDomain name="range" min="1" max="64" />
+        <Hints>
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="and">
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="1" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="2" />
+              </Expression>
+              <Expression type="or">
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="3" />
+              </Expression>
+            </Expression>
+          </PropertyWidgetDecorator>
+        </Hints>
       </IntVectorProperty>
       <Hints>
         <FormatOptions extensions="cdb"
