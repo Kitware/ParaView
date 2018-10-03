@@ -26,9 +26,8 @@ Download And Install Qt
 ParaView uses Qt as its GUI library. Qt is required whenever the ParaView client is built with a GUI.
 
 * [Download a release](http://download.qt.io/official_releases/qt/).
-    - For binaries, use the latest stable version of qt-PLATFORM-opensource-VERSION.[tar.gz or zip or dmg or exe]. If this gives you trouble, version 4.8.2 is known to work. When downloading binaries, ensure that your compiler version matches the Qt compiler indicated. Version 5.6+ supports Visual Studio 2015.
-    - For source code, use the latest stable version of qt-everywhere-opensource-src-VERSION.[tar.gz or zip or dmg]. If this gives you trouble, version 4.8.2 is known to work.
-* Developers have reported some issues with QT 5 on Mac and linux.
+    - For binaries, use the latest stable version of qt-PLATFORM-opensource-VERSION.[tar.gz or zip or dmg or exe]. When downloading binaries, ensure that your compiler version matches the Qt compiler indicated. Version 5.6+ supports Visual Studio 2015.
+    - For source code, use the latest stable version of qt-everywhere-opensource-src-VERSION.[tar.gz or zip or dmg].
 
 Compiler and Build Tool
 -----------------------
