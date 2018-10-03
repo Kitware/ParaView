@@ -686,6 +686,9 @@ class CoProcessor(object):
         view.ViewTime = time
         formatted_time = float_limiter(time)
 
+        #ensure that cinema operates on the specified view
+        simple.SetActiveView(view)
+
         # Include camera information in the user defined parameters.
         # pv_introspect uses __CinemaTracks to customize the exploration.
         co = view.cpCinemaOptions
