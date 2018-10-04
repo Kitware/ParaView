@@ -276,10 +276,6 @@ bool vtknvindex_volumemapper::initialize_mapper(vtkRenderer* /*ren*/, vtkVolume*
                   << " in vtknvindex_representation::RequestData().";
         return false;
       }
-
-      // Let IndeX remote instances to start before IndeX viewer.
-      if (cur_global_rank == 0 && m_cluster_properties->get_nb_hosts() > 1)
-        vtknvindex::util::sleep(0.2);
     }
     m_is_nvindex_rank = true;
   }

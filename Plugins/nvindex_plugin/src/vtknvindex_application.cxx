@@ -442,14 +442,17 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
     }
   }
 
-  // TODO: Demo Hack, Remove later
-  // Retain subregion resources
   {
 #ifdef USE_SPARSE_VOLUME
     // Debug configuration.
     mi::base::Handle<nv::index::IIndex_debug_configuration> idebug_configuration(
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>());
     assert(idebug_configuration.is_valid_interface());
+
+    std::string use_greater_than_comparison_for_sparse_volume_octree_builds =
+      std::string("use_greater_than_comparison_for_sparse_volume_octree_builds=1");
+    idebug_configuration->set_option(
+      use_greater_than_comparison_for_sparse_volume_octree_builds.c_str());
 
     std::string disable_timeseries_data_prefetch =
       std::string("timeseries_data_prefetch_disable=1");
@@ -506,6 +509,51 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
   if ((start_result = m_nvindex_interface->start(true)) != 0)
   {
     ERROR_LOG << "Start of the NVIDIA IndeX library failed.";
+  }
+
+  // Syncronize IndeX viewer with remote instances.
+  if (inetwork_configuration->get_mode() != mi::neuraylib::INetwork_configuration::MODE_OFF)
+  {
+    // IndeX viewer must wait until the remote nodes are connected
+    if (vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() == 0)
+    {
+      mi::base::Handle<nv::index::ICluster_configuration> icluster_configuration(
+        m_nvindex_interface->get_api_component<nv::index::ICluster_configuration>());
+
+      std::vector<std::string> host_list;
+      for (mi::Uint32 i = 0; i < host_names.size(); ++i)
+      {
+        if (find(host_list.begin(), host_list.end(), host_names[i]) == host_list.end())
+          host_list.push_back(host_names[i]);
+      }
+
+      const mi::Uint32 cluster_size = host_list.size();
+      if (cluster_size > 0)
+      {
+        mi::Uint32 old_nb_hosts = 0;
+        mi::Uint32 nb_hosts = 0;
+        INFO_LOG << "Waiting until cluster size reaches " << cluster_size << " hosts";
+        while (nb_hosts < cluster_size)
+        {
+          nb_hosts = icluster_configuration->get_number_of_hosts();
+          if (nb_hosts > old_nb_hosts)
+          {
+            INFO_LOG << "Cluster now has " << nb_hosts << " host" << (nb_hosts == 1 ? "" : "s")
+                     << ", need " << (cluster_size - std::min(nb_hosts, cluster_size))
+                     << " more to continue";
+            old_nb_hosts = nb_hosts;
+          }
+          else if (nb_hosts < old_nb_hosts)
+          {
+            INFO_LOG << "Aborting because at least one host has left - had " << old_nb_hosts
+                     << " hosts, only " << nb_hosts << " left";
+            return false;
+          }
+          vtknvindex::util::sleep(0.5f);
+        }
+        INFO_LOG << "Cluster size " << cluster_size << " reached, continuing...";
+      }
+    }
   }
 
   return start_result;
