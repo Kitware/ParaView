@@ -44,7 +44,6 @@ PURPOSE.  See the above copyright notice for more information.
 #endif
 
 #include "vtk_netcdf.h"
-#include "vtk_netcdfcpp.h"
 #include "vtksys/SystemTools.hxx"
 
 #include <algorithm>

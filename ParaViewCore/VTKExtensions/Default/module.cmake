@@ -24,7 +24,6 @@ vtk_module(vtkPVVTKExtensionsDefault
     ${_dependencies}
   PRIVATE_DEPENDS
     vtkIOInfovis
-    vtknetcdfcpp
     vtksys
     vtkChartsCore
     vtkIOPLY
