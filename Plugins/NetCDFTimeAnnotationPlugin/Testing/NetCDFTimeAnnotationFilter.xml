@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/tos_O1_2001-2002.nc" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCurrent" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCheckState" arguments="1.0,0" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog" command="mousePress" arguments="1,1,0,289,415" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog" command="mouseRelease" arguments="1,0,0,289,415" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Annotation" command="activate" arguments="NetCDFTimeAnnotation" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/FontEditor/Bold" command="set_boolean" arguments="true" />
+</pqevents>
