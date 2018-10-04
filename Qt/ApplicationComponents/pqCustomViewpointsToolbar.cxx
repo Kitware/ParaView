@@ -45,11 +45,7 @@ void pqCustomViewpointsToolbar::constructor()
 {
   // Create base pixmap
   this->BasePixmap.fill(QColor(0, 0, 0, 0));
-  QFont font = QApplication::font();
-  font.setPixelSize(15);
   QPainter pixPaint(&this->BasePixmap);
-  pixPaint.setFont(font);
-  pixPaint.setPen(Qt::black);
   pixPaint.drawPixmap(0, 0, QPixmap(":/pqWidgets/Icons/pqEditCamera16.png"));
 
   // Create plus pixmap
@@ -124,6 +120,7 @@ void pqCustomViewpointsToolbar::updateCustomViewpointActions()
       // action does not exist yet, create it
       pixmap = this->BasePixmap.copy();
       QPainter pixWithNumberPaint(&pixmap);
+      pixWithNumberPaint.setPen(QApplication::palette().windowText().color());
       pixWithNumberPaint.drawText(
         pixmap.rect(), Qt::AlignRight | Qt::AlignBottom, QString::number(cc + 1));
 

@@ -465,11 +465,11 @@ void pqPythonShell::printString(const QString& text, pqPythonShell::PrintMode mo
 
       case STATUS:
       default:
-        format.setForeground(QColor(0, 0, 150));
+        format.setForeground(QApplication::palette().highlight().color());
     }
     consoleWidget->setFormat(format);
     consoleWidget->printString(string);
-    format.setForeground(QColor(0, 0, 0));
+    format.setForeground(QApplication::palette().windowText().color());
     consoleWidget->setFormat(format);
 
     this->Prompted = false;
@@ -498,7 +498,7 @@ bool pqPythonShell::prompt(const QString& indent)
 
     Ui::PythonShell& ui = this->Internals->Ui;
     QTextCharFormat format = ui.consoleWidget->getFormat();
-    format.setForeground(QColor(0, 0, 0));
+    format.setForeground(QApplication::palette().windowText().color());
     ui.consoleWidget->setFormat(format);
     ui.consoleWidget->prompt(this->Prompt);
     ui.consoleWidget->printCommand(indent);
