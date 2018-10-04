@@ -1,0 +1,79 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <CompoundSourceProxy name="NetCDFTimeAnnotation" label="NetCDF Time Annotation">
+      <Proxy group="filters" type="ProgrammableFilter" id="6868" servers="1" compound_name="ProgrammableFilter1">
+        <Property name="CopyArrays" id="6868.CopyArrays" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="6868.CopyArrays.bool"/>
+        </Property>
+        <Property name="InformationScript" id="6868.InformationScript" number_of_elements="1">
+          <Element index="0" value=""/>
+        </Property>
+        <Property name="Input" id="6868.Input" number_of_elements="1">
+          <Domain name="groups" id="6868.Input.groups"/>
+          <Domain name="input_type" id="6868.Input.input_type"/>
+        </Property>
+        <Property name="OutputDataSetType" id="6868.OutputDataSetType" number_of_elements="1">
+          <Element index="0" value="8"/>
+          <Domain name="enum" id="6868.OutputDataSetType.enum">
+            <Entry value="8" text="Same as Input"/>
+            <Entry value="0" text="vtkPolyData"/>
+            <Entry value="2" text="vtkStructuredGrid"/>
+            <Entry value="3" text="vtkRectilinearGrid"/>
+            <Entry value="4" text="vtkUnstructuredGrid"/>
+            <Entry value="6" text="vtkImageData"/>
+            <Entry value="10" text="vtkUniformGrid"/>
+            <Entry value="13" text="vtkMultiblockDataSet"/>
+            <Entry value="15" text="vtkHierarchicalBoxDataSet"/>
+            <Entry value="19" text="vtkTable"/>
+            <Entry value="33" text="vtkMolecule"/>
+          </Domain>
+        </Property>
+        <Property name="PythonPath" id="6868.PythonPath" number_of_elements="1">
+          <Element index="0" value=""/>
+        </Property>
+        <Property name="Script" id="6868.Script" number_of_elements="1">
+          <Element index="0" value="from netcdftime import utime&#xa;from netcdftime import datetime&#xa;&#xa;inp = self.GetInputDataObject(0,0)&#xa;outp = self.GetOutputDataObject(0)&#xa;&#xa;currentTime = inp.GetInformation().Get(vtk.vtkDataObject.DATA_TIME_STEP())&#xa;timeUnitsArray = inp.GetFieldData().GetAbstractArray(&#x22;time_units&#x22;)&#xa;if timeUnitsArray:&#xa;  timeUnits = timeUnitsArray.GetValue(0)&#xa;&#xa;  cdftime = utime(timeUnits)&#xa;  t = cdftime.num2date(currentTime)&#xa;&#xa;  fdate = vtk.vtkStringArray()&#xa;  fdate.SetName(&#x22;FullDate&#x22;)&#xa;  fdate.SetNumberOfValues(1)&#xa;  fdate.SetValue(0, str(t))&#xa;  outp.GetFieldData().AddArray(fdate)&#xa;&#xa;  date = vtk.vtkIntArray()&#xa;  date.SetName(&#x22;Date&#x22;)&#xa;  date.SetNumberOfValues(6)&#xa;  date.SetValue(0, t.year)&#xa;  date.SetValue(1, t.month)&#xa;  date.SetValue(2, t.day)&#xa;  date.SetValue(3, t.hour)&#xa;  date.SetValue(4, t.minute)&#xa;  date.SetValue(5, t.second)&#xa;  outp.GetFieldData().AddArray(date)&#xa;"/>
+        </Property>
+        <Property name="UpdateExtentScript" id="6868.UpdateExtentScript" number_of_elements="1">
+          <Element index="0" value=""/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="PythonAnnotation" id="7137" servers="1" compound_name="PythonAnnotation1">
+        <Property name="AnnotationValue" id="7137.AnnotationValue" number_of_elements="1">
+          <Element index="0" value="On 2001.01.00 at 00:00"/>
+        </Property>
+        <Property name="ArrayAssociation" id="7137.ArrayAssociation" number_of_elements="1">
+          <Element index="0" value="2"/>
+          <Domain name="enum" id="7137.ArrayAssociation.enum">
+            <Entry value="0" text="Point Data"/>
+            <Entry value="1" text="Cell Data"/>
+            <Entry value="2" text="Field Data"/>
+            <Entry value="6" text="Row Data"/>
+          </Domain>
+        </Property>
+        <Property name="Expression" id="7137.Expression" number_of_elements="1">
+          <Element index="0" value="&#x22;On %02i.%02i.%02i at %02i:%02i&#x22; % (Date[0], Date[1], Date[2], Date[3], Date[4])"/>
+        </Property>
+        <Property name="Input" id="7137.Input" number_of_elements="1">
+          <Proxy value="6868" output_port="0"/>
+          <Domain name="groups" id="7137.Input.groups"/>
+          <Domain name="input_type" id="7137.Input.input_type"/>
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property name="Input" proxy_name="ProgrammableFilter1" exposed_name="Input"/>
+        <!--Property name="Script" proxy_name="ProgrammableFilter1" exposed_name="Script"/-->
+        <Property name="Expression" proxy_name="PythonAnnotation1" exposed_name="Expression"/>
+      </ExposedProperties>
+      <OutputPort name="Output" proxy="PythonAnnotation1" port_index="0"/>
+      <Hints>
+        <ShowInMenu category="Annotation" />
+        <Visibility replace_input="0" />
+        <OutputPort index="0"
+                    name="Output-0"
+                    type="text" />
+      </Hints>
+    </CompoundSourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
