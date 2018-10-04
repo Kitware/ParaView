@@ -57,7 +57,7 @@
 #include "vtkTableExtentTranslator.h"
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtk_netcdfcpp.h"
+#include "vtk_netcdf.h"
 
 #include "cdi.h"
 #include "stdlib.h"
@@ -132,34 +132,6 @@ void cdi_get(cdiVar_t* cdiVar, double* buffer, int nlevels)
     vtkErrorMacro(<< "malloc failed!" << endl);                                                    \
     return (0);                                                                                    \
   }
-
-//----------------------------------------------------------------------------
-//  Macro to check if the named NetCDF dimension exists
-//----------------------------------------------------------------------------
-#define CHECK_DIM(ncFile, name)                                                                    \
-  if (!isNcDim(ncFile, name))                                                                      \
-  {                                                                                                \
-    vtkErrorMacro(<< "Cannot find dimension: " << name << endl);                                   \
-    return 0;                                                                                      \
-  }
-
-//----------------------------------------------------------------------------
-// Check if there is a NetCDF dimension by that name
-//----------------------------------------------------------------------------
-static bool isNcDim(NcFile* ncFile, NcToken name)
-{
-  int num_dims = ncFile->num_dims();
-  // cerr << "looking for: " << name << endl;
-  for (int i = 0; i < num_dims; i++)
-  {
-    NcDim* ncDim = ncFile->get_dim(i);
-    // cerr << "checking " << ncDim->name() << endl;
-    if ((strcmp(ncDim->name(), name)) == 0)
-      // we have a match, so return
-      return true;
-  }
-  return false;
-}
 
 //-----------------------------------------------------------------------------
 //  Function to convert cartesian coordinates to spherical, for use in
@@ -924,10 +896,36 @@ int vtkCDIReader::GetVars()
     vtkDebugMacro(<< "Found Domain Data and loading it." << endl);
     this->buildDomainArrays = true;
 
-    NcFile* pnf = new NcFile(this->FileName);
-    CHECK_DIM(pnf, this->domain_dimension.c_str());
-    NcDim* nDomains = pnf->get_dim(this->domain_dimension.c_str());
-    this->NumberOfDomains = nDomains->size();
+    {
+      int ncid;
+      int nc_err;
+      if ((nc_err = nc_open(this->FileName,
+             NC_NOWRITE | NC_64BIT_OFFSET | NC_NETCDF4 | NC_CLASSIC_MODEL, &ncid)) != NC_NOERR)
+      {
+        vtkErrorMacro(<< "NetCDF error: " << nc_strerror(nc_err));
+        return 0;
+      }
+      int dimid;
+      if ((nc_err = nc_inq_dimid(ncid, this->domain_dimension.c_str(), &dimid)) != NC_NOERR)
+      {
+        vtkErrorMacro(<< "Cannot find dimension: " << this->domain_dimension);
+        nc_close(ncid);
+        return 0;
+      }
+      size_t ndomains;
+      if ((nc_err = nc_inq_dimlen(ncid, dimid, &ndomains)) != NC_NOERR)
+      {
+        vtkErrorMacro(<< "NetCDF error: " << nc_strerror(nc_err));
+        nc_close(ncid);
+        return 0;
+      }
+      if ((nc_err = nc_close(ncid)) != NC_NOERR)
+      {
+        vtkErrorMacro(<< "NetCDF error: " << nc_strerror(nc_err));
+        return 0;
+      }
+      this->NumberOfDomains = ndomains;
+    }
     vtkDebugMacro(<< "We have a total of " << this->NumberOfDomains << " Domains." << endl);
 
     string str, word;
