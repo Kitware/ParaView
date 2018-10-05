@@ -352,6 +352,8 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   num = num == 0 ? 1 : num;
   double w = labelRect.width() / num;
 
+  painter->save();
+  painter->setPen(QColor(0, 0, 0));
   painter->drawText(QRectF(labelRect.left(), labelRect.top(), w / 2.0, rh),
     Qt::AlignLeft | Qt::AlignVCenter,
     QString::number(this->StartTime, this->TimeNotation.toLatin1(), this->TimePrecision));
@@ -367,6 +369,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF&)
   painter->drawText(QRectF(labelRect.right() - w / 2.0, labelRect.top(), w / 2.0, rh),
     Qt::AlignRight | Qt::AlignVCenter,
     QString::number(this->EndTime, this->TimeNotation.toLatin1(), this->TimePrecision));
+  painter->restore();
 
   // if sequence, draw a tick mark for each frame
   if ((this->mode() == Sequence || this->mode() == Custom) && this->currentTicks() > 2)

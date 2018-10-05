@@ -67,7 +67,7 @@ public:
 
     QTextCharFormat format;
     format.setFont(f);
-    format.setForeground(QColor(0, 0, 0));
+    format.setForeground(QApplication::palette().windowText().color());
     this->setCurrentCharFormat(format);
 
     this->CommandHistory.append("");
