@@ -72,6 +72,10 @@ public:
   void set_volume_extents(mi::math::Bbox<mi::Sint32, 3> volume_extents);
   void get_volume_extents(mi::math::Bbox<mi::Sint32, 3>& volume_extents) const;
 
+  // Extents of the volumetric dataset.
+  void set_ivol_volume_extents(mi::math::Bbox<mi::Float32, 3> volume_extents);
+  void get_ivol_volume_extents(mi::math::Bbox<mi::Float32, 3>& volume_extents) const;
+
   // Translation, Scaling.
   void set_volume_translation(mi::math::Vector<mi::Float32, 3> translation);
   void get_volume_translation(mi::math::Vector<mi::Float32, 3>& translation) const;
@@ -127,6 +131,7 @@ private:
 
   std::string m_scalar_type;                             // Volume's scalar type as string.
   mi::math::Bbox<mi::Sint32, 3> m_volume_extents;        // ParaView volume extents.
+  mi::math::Bbox<mi::Float32, 3> m_ivol_volume_extents;  // ParaView irregular volume extents.
   mi::math::Vector<mi::Float32, 2> m_voxel_range;        // Voxel range of the Volume data.
   mi::math::Vector<mi::Float32, 2> m_scalar_range;       // Scalar range of the Volume data.
   mi::math::Vector_struct<mi::Uint32, 3> m_volume_size;  // Entire volume size.

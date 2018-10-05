@@ -266,9 +266,8 @@ private:
   vtknvindex_config_settings* m_app_config_settings; // Application side config settings.
   vtknvindex_cluster_properties*
     m_cluster_properties; // Cluster wide properties, refer class documentation.
-  mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui;   // Region of interest set in the GUI.
-  mi::math::Vector<mi::Uint32, 3> m_volume_size;     // Cached volume size
-  mi::math::Bbox<mi::Sint32, 3> m_volume_dimensions; // Cached volume dimensions
+  mi::math::Bbox_struct<mi::Float32, 3> m_roi_gui;    // Region of interest set in the GUI.
+  mi::math::Bbox<mi::Float32, 3> m_volume_dimensions; // Cached volume dimensions
 
   mi::Float32 m_prev_time_step;
 

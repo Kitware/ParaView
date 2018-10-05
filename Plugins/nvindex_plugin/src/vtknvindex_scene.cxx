@@ -325,16 +325,8 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
     }
     else // scene contains an irregular volume (unstructured volume grid)
     {
-      mi::math::Bbox<mi::Sint32, 3> volume_extents;
-      regular_volume_properties->get_volume_extents(volume_extents);
-
       mi::math::Bbox<mi::Float32, 3> ivol_bbox;
-      ivol_bbox.min.x = volume_extents.min.x;
-      ivol_bbox.min.y = volume_extents.min.y;
-      ivol_bbox.min.z = volume_extents.min.z;
-      ivol_bbox.max.x = volume_extents.max.x;
-      ivol_bbox.max.y = volume_extents.max.y;
-      ivol_bbox.max.z = volume_extents.max.z;
+      regular_volume_properties->get_ivol_volume_extents(ivol_bbox);
 
       // Create shared memory irregular volume data importer.
       vtknvindex_irregular_volume_importer* volume_importer =
@@ -549,19 +541,22 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
       }
       assert(m_vol_properties_tag.is_valid());
 
-      // Volume compute attribute
-      mi::math::Vector_struct<mi::Uint32, 3> volume_size;
-      regular_volume_properties->get_volume_size(volume_size);
+      if (volume_type == VOLUME_TYPE_REGULAR)
+      {
+        // Volume compute attribute
+        mi::math::Vector_struct<mi::Uint32, 3> volume_size;
+        regular_volume_properties->get_volume_size(volume_size);
 
-      mi::base::Handle<vtknvindex_volume_compute> vol_compute(new vtknvindex_volume_compute(
-        volume_size, subcube_border, scalar_type, m_cluster_properties));
-      assert(vol_compute.is_valid_interface());
+        mi::base::Handle<vtknvindex_volume_compute> vol_compute(new vtknvindex_volume_compute(
+          volume_size, subcube_border, scalar_type, m_cluster_properties));
+        assert(vol_compute.is_valid_interface());
 
-      vol_compute->set_enabled(false);
+        vol_compute->set_enabled(false);
 
-      m_volume_compute_attrib_tag =
-        dice_transaction->store_for_reference_counting(vol_compute.get());
-      assert(m_volume_compute_attrib_tag.is_valid());
+        m_volume_compute_attrib_tag =
+          dice_transaction->store_for_reference_counting(vol_compute.get());
+        assert(m_volume_compute_attrib_tag.is_valid());
+      }
 
 #ifdef USE_SPARSE_VOLUME
       // Filter mode attribute
@@ -600,7 +595,9 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
 #endif
       // Volume properties.
-      static_group->append(m_volume_compute_attrib_tag, dice_transaction.get());
+      if (volume_type == VOLUME_TYPE_REGULAR)
+        static_group->append(m_volume_compute_attrib_tag, dice_transaction.get());
+
       static_group->append(m_rtc_program_params_tag, dice_transaction.get());
       static_group->append(m_rtc_program_tag, dice_transaction.get());
       static_group->append(m_vol_properties_tag, dice_transaction.get());
@@ -935,16 +932,8 @@ void vtknvindex_scene::update_volume(vtknvindex_application& application_context
     }
     else // Scene contains an irregular volume (unstructured volume grid).
     {
-      mi::math::Bbox<mi::Sint32, 3> volume_extents;
-      regular_volume_properties->get_volume_extents(volume_extents);
-
       mi::math::Bbox<mi::Float32, 3> ivol_bbox;
-      ivol_bbox.min.x = volume_extents.min.x;
-      ivol_bbox.min.y = volume_extents.min.y;
-      ivol_bbox.min.z = volume_extents.min.z;
-      ivol_bbox.max.x = volume_extents.max.x;
-      ivol_bbox.max.y = volume_extents.max.y;
-      ivol_bbox.max.z = volume_extents.max.z;
+      regular_volume_properties->get_ivol_volume_extents(ivol_bbox);
 
       // Create shared memory irregular volume data importer.
       vtknvindex_irregular_volume_importer* volume_importer =
@@ -1541,7 +1530,8 @@ void vtknvindex_scene::update_compute(
     dice_transaction->edit<vtknvindex_volume_compute>(m_volume_compute_attrib_tag));
   assert(vol_compute.is_valid_interface());
 
-  vol_compute->set_enabled(true);
+  if (vol_compute.is_valid_interface())
+    vol_compute->set_enabled(true);
 }
 
 //-------------------------------------------------------------------------------------------------
