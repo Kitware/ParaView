@@ -5,6 +5,7 @@ Instead of relying to complex .pvsc file, it is now possible to use the followin
 * `<SSHCommand exec=...>` instead of `<Command exec=...> ` so the command will be executed through SSH
 * `<SSHConfig user="user">`, child of `<SSHCommand>` with an optional argument to set the SSH user
 * `<Terminal exec=/path/to/term/>`, child of `<SSHConfig>` with an optional terminal executable argument. When this tag is set, the SSH command will be executed through on a new terminal
+* `<SSH exec=/path/to/ssh/>`, child of `<SSHConfig>` with an ssh executable argument. When this tag is set and the executable is specified, a specific ssh executable will be used
 * `<Askpass/>`, child of `<SSHConfig>`, so an askpass program is used. Make sure to set SSH_ASKPASS and DISPLAY before using this. Incompatible with `<Terminal>` tag, only on Linux.
 * `<PortForwarding local="port">`, child of `<SSHConfig>` with an optional local port argument, this is the biggest change. This allow to set up port fowarding through SSH tunneling. If no local port is defined, the server port will be used.
 

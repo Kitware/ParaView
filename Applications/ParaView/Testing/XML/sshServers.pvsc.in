@@ -28,6 +28,7 @@
       <SSHCommand exec="@ParaView_BINARY_DIR@/Applications/ParaView/Testing/XML/server.sh" timeout="0" delay="5">
         <SSHConfig>
           <Terminal exec="/usr/bin/xterm"/>
+          <SSH exec="/usr/bin/ssh"/>
         </SSHConfig>
         <Arguments>
           <Argument value="$PV_SERVER_PORT$"/>
