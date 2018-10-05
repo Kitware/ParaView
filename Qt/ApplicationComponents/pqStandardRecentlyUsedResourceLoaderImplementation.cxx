@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLoadStateReaction.h"
 #include "pqRecentlyUsedResourcesList.h"
 #include "pqServer.h"
+#include "pqServerConfiguration.h"
 #include "pqServerResource.h"
 
 #include <QFileInfo>
@@ -178,7 +179,13 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::addDataFilesToRecentRes
 {
   if (server)
   {
+    // Needed to get the display resource in case of port forwarding
     pqServerResource resource = server->getResource();
+    pqServerConfiguration config = resource.configuration();
+    if (!config.isNameDefault())
+    {
+      resource = config.resource();
+    }
 
     resource.setPath(files[0]);
     resource.addData("PARAVIEW_DATA", "1");
@@ -203,11 +210,19 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentRes
 {
   if (server)
   {
+    // Needed to get the display resource in case of port forwarding
+    pqServerResource tmpResource = server->getResource();
+    pqServerConfiguration config = tmpResource.configuration();
+    if (!config.isNameDefault())
+    {
+      tmpResource = config.resource();
+    }
+
     // Add this to the list of recent server resources ...
     pqServerResource resource;
     resource.setScheme("session");
     resource.setPath(filename);
-    resource.setSessionServer(server->getResource());
+    resource.setSessionServer(tmpResource);
     resource.addData("PARAVIEW_STATE", "1");
     pqApplicationCore* core = pqApplicationCore::instance();
     core->recentlyUsedResources().add(resource);
@@ -224,8 +239,15 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::addCinemaDatabaseToRece
 {
   if (server)
   {
-    // Add this to the list of recent server resources ...
+    // Needed to get the display resource in case of port forwarding
     pqServerResource resource = server->getResource();
+    pqServerConfiguration config = resource.configuration();
+    if (!config.isNameDefault())
+    {
+      resource = config.resource();
+    }
+
+    // Add this to the list of recent server resources ...
     resource.setPath(filename);
     resource.addData("PARAVIEW_CINEMA_DATABASE", "1");
 

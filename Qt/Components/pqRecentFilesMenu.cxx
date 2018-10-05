@@ -144,10 +144,18 @@ void pqRecentFilesMenu::buildMenu()
     QString key;
     if (this->SortByServers)
     {
-      pqServerResource hostResource = (resource.scheme() == "session")
-        ? resource.sessionServer().schemeHostsPorts()
-        : resource.schemeHostsPorts();
-      key = hostResource.toURI();
+      pqServerConfiguration config = resource.configuration();
+      if (config.isNameDefault())
+      {
+        pqServerResource hostResource = (resource.scheme() == "session")
+          ? resource.sessionServer().schemeHostsPorts()
+          : resource.schemeHostsPorts();
+        key = hostResource.toURI();
+      }
+      else
+      {
+        key = resource.configuration().URI();
+      }
     }
     clusteredResources[key].push_back(resource);
   }

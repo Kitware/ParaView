@@ -117,6 +117,8 @@ public:
 
   /**
   * Returns a compact string representation of the resource in URI format
+  * Prefer using configuration->URI() if a configuration is available
+  * and not default.
   */
   const QString toURI() const;
 

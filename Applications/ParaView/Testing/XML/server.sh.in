@@ -1,0 +1,1 @@
+DISPLAY=:0 @ParaView_BINARY_DIR@/bin/pvserver -sp=$1 2>&1 | tee sshServer.log
