@@ -389,7 +389,28 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
       return QString();
     }
 
-    QString sshCommand = pqServerConfiguration::sshCommand();
+    vtkPVXMLElement* sshConfigXML = commandXML->FindNestedElementByName("SSHConfig");
+    if (sshConfigXML == nullptr)
+    {
+      // SSHCommand should always have a SSHConfig xml
+      qCritical("Missing SSHConfig in server configuration");
+      return QString();
+    }
+
+    // Recover a sssh command
+    // It can be specified in the XML.
+    // If not we look for default ssh names.
+    vtkPVXMLElement* sshCommandExecXML = sshConfigXML->FindNestedElementByName("SSH");
+    QString sshCommand;
+    if (sshCommandExecXML)
+    {
+      sshCommand = sshCommandExecXML->GetAttributeOrDefault("exec", "");
+    }
+    if (sshCommand.isEmpty())
+    {
+      sshCommand = pqServerConfiguration::sshCommand();
+    }
+
     if (sshCommand.isEmpty())
     {
       qCritical("No ssh command or capabilities found, cannot use SSHCommand.");
@@ -398,7 +419,6 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
     else
     {
       // Recover full ssh command
-      vtkPVXMLElement* sshConfigXML = commandXML->FindNestedElementByName("SSHConfig");
       QString sshFullCommand = this->sshFullCommand(sshCommand, sshConfigXML);
 
 #if defined(__linux)
@@ -411,7 +431,7 @@ QString pqServerConfiguration::command(double& timeout, double& delay) const
 #endif
 
       // Recover a terminal command
-      // It can either be specified in the XML, in $TERMINAL.
+      // It can be specified in the XML.
       // If not we look for default terminal names
       vtkPVXMLElement* sshTermXML = sshConfigXML->FindNestedElementByName("Terminal");
       QString termCommand;
