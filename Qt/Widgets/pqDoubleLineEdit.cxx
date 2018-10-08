@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleLineEdit.h"
 
 // Qt Includes.
+#include <QDoubleValidator>
 #include <QFocusEvent>
 #include <QPointer>
 #include <QTextStream>
@@ -56,25 +57,13 @@ QTextStream::RealNumberNotation toTextStreamNotation(pqDoubleLineEdit::RealNumbe
 }
 
 //-----------------------------------------------------------------------------
-QDoubleValidator::Notation toValidatorNotation(pqDoubleLineEdit::RealNumberNotation notation)
-{
-  if (notation != pqDoubleLineEdit::RealNumberNotation::FixedNotation)
-  {
-    return QDoubleValidator::ScientificNotation;
-  }
-  else
-  {
-    return QDoubleValidator::StandardNotation;
-  }
-}
-
 using InstanceTrackerType = QList<QPointer<pqDoubleLineEdit> >;
 static InstanceTrackerType* InstanceTracker = nullptr;
 }
 
-int pqDoubleLineEdit::GlobalPrecision = 2;
+int pqDoubleLineEdit::GlobalPrecision = 6;
 pqDoubleLineEdit::RealNumberNotation pqDoubleLineEdit::GlobalNotation =
-  pqDoubleLineEdit::FixedNotation;
+  pqDoubleLineEdit::MixedNotation;
 
 //-----------------------------------------------------------------------------
 void pqDoubleLineEdit::setGlobalPrecisionAndNotation(int precision, RealNumberNotation notation)
@@ -98,7 +87,6 @@ void pqDoubleLineEdit::setGlobalPrecisionAndNotation(int precision, RealNumberNo
     {
       if (instance && instance->useGlobalPrecisionAndNotation())
       {
-        instance->updateFullPrecisionText();
         instance->updateLimitedPrecisionText();
       }
     }
@@ -123,8 +111,7 @@ pqDoubleLineEdit::pqDoubleLineEdit(QWidget* _parent)
   , Precision(2)
   , UseGlobalPrecisionAndNotation(true)
 {
-  this->DoubleValidator = new QDoubleValidator(this);
-  this->setValidator(this->DoubleValidator);
+  this->setValidator(new QDoubleValidator(this));
   this->setNotation(pqDoubleLineEdit::FixedNotation);
   if (InstanceTracker == nullptr)
   {
@@ -161,7 +148,6 @@ void pqDoubleLineEdit::setFullPrecisionText(const QString& _text)
     return;
   }
   this->FullPrecisionText = _text;
-  this->updateFullPrecisionText();
   this->updateLimitedPrecisionText();
   emit fullPrecisionTextChanged(this->FullPrecisionText);
 }
@@ -180,7 +166,6 @@ void pqDoubleLineEdit::setNotation(pqDoubleLineEdit::RealNumberNotation _notatio
     return;
   }
   this->Notation = _notation;
-  this->DoubleValidator->setNotation(toValidatorNotation(_notation));
   this->updateLimitedPrecisionText();
 }
 
@@ -198,28 +183,7 @@ void pqDoubleLineEdit::setPrecision(int _precision)
     return;
   }
   this->Precision = _precision;
-  this->updateFullPrecisionText();
   this->updateLimitedPrecisionText();
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleLineEdit::setDoubleValidator(QDoubleValidator* validator)
-{
-  if (validator == nullptr)
-  {
-    return;
-  }
-  validator->setParent(this);
-  this->setValidator(validator);
-  delete this->DoubleValidator;
-  this->DoubleValidator = validator;
-  this->DoubleValidator->setNotation(toValidatorNotation(this->notation()));
-}
-
-//-----------------------------------------------------------------------------
-const QDoubleValidator* pqDoubleLineEdit::doubleValidator() const
-{
-  return this->DoubleValidator;
 }
 
 //-----------------------------------------------------------------------------
@@ -230,38 +194,6 @@ void pqDoubleLineEdit::focusInEvent(QFocusEvent* event)
     this->onEditingStarted();
   }
   return this->Superclass::focusInEvent(event);
-}
-
-//-----------------------------------------------------------------------------
-void pqDoubleLineEdit::updateFullPrecisionText()
-{
-  const int real_precision =
-    this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::GlobalPrecision : this->Precision;
-
-  int dotIndex = this->FullPrecisionText.indexOf(".");
-  if (dotIndex >= 0)
-  {
-    int digits = this->FullPrecisionText.length() - 1 - dotIndex;
-    if (digits <= real_precision)
-    {
-      // If it applies, appends "0"
-      this->FullPrecisionText += QString("0").repeated(real_precision - digits);
-    }
-    else
-    {
-      // If it applies, removes extra "0"
-      while (digits > this->Precision &&
-        this->FullPrecisionText[this->FullPrecisionText.length() - 1] == '0')
-      {
-        this->FullPrecisionText.chop(1);
-        digits = this->FullPrecisionText.length() - 1 - dotIndex;
-      }
-    }
-  }
-  else
-  {
-    this->FullPrecisionText += QString(".") + QString("0").repeated(real_precision);
-  }
 }
 
 //-----------------------------------------------------------------------------

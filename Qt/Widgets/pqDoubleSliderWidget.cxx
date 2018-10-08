@@ -137,13 +137,13 @@ void pqDoubleSliderWidget::editingFinished()
 //-----------------------------------------------------------------------------
 void pqDoubleSliderWidget::setValidator(QDoubleValidator* validator)
 {
-  this->DoubleLineEdit->setDoubleValidator(validator);
+  this->DoubleLineEdit->setValidator(validator);
 }
 
 //-----------------------------------------------------------------------------
 const QDoubleValidator* pqDoubleSliderWidget::validator() const
 {
-  return this->DoubleLineEdit->doubleValidator();
+  return qobject_cast<const QDoubleValidator*>(this->DoubleLineEdit->validator());
 }
 
 //-----------------------------------------------------------------------------
