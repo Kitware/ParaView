@@ -373,7 +373,7 @@
 
       <IntVectorProperty name="RealNumberDisplayedNotation"
         number_of_elements="1"
-        default_values="2"
+        default_values="0"
         command="SetRealNumberDisplayedNotation"
         panel_visibility="advanced">
         <Documentation>

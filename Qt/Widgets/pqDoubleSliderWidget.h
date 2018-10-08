@@ -19,8 +19,8 @@
 #include "pqWidgetsModule.h"
 #include <QWidget>
 
-class QSlider;
 class QDoubleValidator;
+class QSlider;
 
 /**
  * A widget with a tied slider and line edit for editing a double property
