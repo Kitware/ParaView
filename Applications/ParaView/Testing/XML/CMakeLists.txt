@@ -649,6 +649,7 @@ list(APPEND TESTS_WITH_BASELINES
   3DWidgetInCustomFilter.xml
   CalcParens.xml
   Calculator.xml
+  CalculatorInput.xml
   ChangeGlyphRepVisibility.xml
   ChangingTimestepsInStateFiles.xml
   ChartAxisRangeAndLabels.xml
