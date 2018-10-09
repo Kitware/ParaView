@@ -33,8 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqDoubleLineEdit_h
 
 // Qt Includes.
-#include <QDoubleValidator>
-class QFocusEvent;
 #include <QLineEdit>
 
 // ParaView Includes.
@@ -46,6 +44,9 @@ class QFocusEvent;
  *
  * The precision and notation associated with the displayed number can be
  * configured using the corresponding properties.
+ *
+ * In its constructor, pqDoubleLineEdit sets up a QDoubleValidator as the
+ * validator for the line edit.
  */
 class PQWIDGETS_EXPORT pqDoubleLineEdit : public QLineEdit
 {
@@ -90,19 +91,6 @@ public:
    * \sa setPrecision()
    */
   int precision() const;
-
-  /**
-   * Set a new instance of input validator. Note that setting a null pointer has no effect
-   * and that the ownership of the validator is transfer to this pqDoubleLineEdit instance.
-   * \sa doubleValidator()
-   */
-  void setDoubleValidator(QDoubleValidator* validator);
-
-  /**
-   * Return a pointer to the current input validator.
-   * \sa setDoubleValidator()
-   */
-  const QDoubleValidator* doubleValidator() const;
 
   /**
    * `useGlobalPrecisionAndNotation` indicates if the pqDoubleLineEdit should
@@ -180,7 +168,6 @@ protected slots:
 
 protected:
   void focusInEvent(QFocusEvent* event) override;
-  void updateFullPrecisionText();
   void updateLimitedPrecisionText();
 
 private:
@@ -188,7 +175,7 @@ private:
 
   QString FullPrecisionText;
   RealNumberNotation Notation;
-  QDoubleValidator* DoubleValidator;
+
   int Precision;
   bool UseGlobalPrecisionAndNotation;
 

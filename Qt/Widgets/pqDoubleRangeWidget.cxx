@@ -128,7 +128,7 @@ void pqDoubleRangeWidget::updateValidator()
 //-----------------------------------------------------------------------------
 bool pqDoubleRangeWidget::strictRange() const
 {
-  const QDoubleValidator* dv = validator();
+  const QDoubleValidator* dv = this->validator();
   return dv->bottom() == this->minimum() && dv->top() == this->maximum();
 }
 
