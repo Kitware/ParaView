@@ -52,6 +52,7 @@ void vtkPVCompositeDataPipeline::CopyDefaultInformation(vtkInformation* request,
     // object.
     vtkInformationVector* inArrayVec = algorithmInfo->Get(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS());
     int num_arrays = inArrayVec ? inArrayVec->GetNumberOfInformationObjects() : 0;
+    int informationIndex = 0;
     for (int array_index = 0; array_index < num_arrays; array_index++)
     {
       vtkInformation* arrayInfo = this->Algorithm->GetInputArrayInformation(array_index);
@@ -73,7 +74,8 @@ void vtkPVCompositeDataPipeline::CopyDefaultInformation(vtkInformation* request,
         if (pvpfe)
         {
           assert(this->Algorithm->GetInputConnection(port, connection)->GetIndex() == 0);
-          pvpfe->SetPostArrayToProcessInformation(0, arrayInfo);
+          pvpfe->SetPostArrayToProcessInformation(informationIndex, arrayInfo);
+          informationIndex++;
         }
       }
     }

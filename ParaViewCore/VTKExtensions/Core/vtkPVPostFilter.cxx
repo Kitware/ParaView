@@ -252,14 +252,6 @@ int vtkPVPostFilter::RequestData(
 //----------------------------------------------------------------------------
 int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
 {
-  // get the array to convert info
-  vtkInformationVector* postVector =
-    this->Information->Get(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS());
-  vtkInformation* postArrayInfo = postVector->GetInformationObject(0);
-
-  const char* name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-  int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
-
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(output);
   if (cd)
   {
@@ -269,29 +261,42 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
       vtkDataSet* dataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (dataset)
       {
-        std::string demangled_name, demagled_component_name;
-        DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
-
-        this->DoAnyNeededConversions(
-          dataset, name, fieldAssociation, demangled_name.c_str(), demagled_component_name.c_str());
+        this->DoAnyNeededConversions(dataset);
       }
     }
     iter->Delete();
-    return 1;
   }
   else
   {
     vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
     if (dataset)
     {
-      std::string demangled_name, demagled_component_name;
-      DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
-
-      return this->DoAnyNeededConversions(
-        dataset, name, fieldAssociation, demangled_name.c_str(), demagled_component_name.c_str());
+      this->DoAnyNeededConversions(dataset);
     }
   }
-  return 0;
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPostFilter::DoAnyNeededConversions(vtkDataSet* dataset)
+{
+  // get the array to convert info
+  vtkInformationVector* postVector =
+    this->Information->Get(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS());
+  for (int i = 0; i < postVector->GetNumberOfInformationObjects(); i++)
+  {
+    vtkInformation* postArrayInfo = postVector->GetInformationObject(i);
+
+    const char* name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
+    int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
+
+    std::string demangled_name, demagled_component_name;
+    DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
+
+    this->DoAnyNeededConversions(
+      dataset, name, fieldAssociation, demangled_name.c_str(), demagled_component_name.c_str());
+  }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -334,16 +339,26 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataSet* output, const char* requ
 
   if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
   {
-    if (cellData->GetAbstractArray(requested_name) || cellData->GetAbstractArray(demangled_name))
+    vtkAbstractArray* array = cellData->GetAbstractArray(requested_name);
+    if (!array)
     {
-      this->CellDataToPointData(output);
+      array = cellData->GetAbstractArray(demangled_name);
+    }
+    if (array)
+    {
+      this->CellDataToPointData(output, array->GetName());
     }
   }
   else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
   {
-    if (pointData->GetAbstractArray(requested_name) || pointData->GetAbstractArray(demangled_name))
+    vtkAbstractArray* array = pointData->GetAbstractArray(requested_name);
+    if (!array)
     {
-      this->PointDataToCellData(output);
+      array = pointData->GetAbstractArray(demangled_name);
+    }
+    if (array)
+    {
+      this->PointDataToCellData(output, array->GetName());
     }
   }
 
@@ -364,7 +379,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataSet* output, const char* requ
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPostFilter::CellDataToPointData(vtkDataSet* output)
+void vtkPVPostFilter::CellDataToPointData(vtkDataSet* output, const char* name)
 {
   vtkDataObject* clone = output->NewInstance();
   clone->ShallowCopy(output);
@@ -372,6 +387,8 @@ void vtkPVPostFilter::CellDataToPointData(vtkDataSet* output)
   vtkCellDataToPointData* converter = vtkCellDataToPointData::New();
   converter->SetInputData(clone);
   converter->PassCellDataOn();
+  converter->ProcessAllArraysOff();
+  converter->AddCellDataArray(name);
   converter->Update();
   output->ShallowCopy(converter->GetOutputDataObject(0));
   converter->Delete();
@@ -379,7 +396,7 @@ void vtkPVPostFilter::CellDataToPointData(vtkDataSet* output)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output)
+void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output, const char* name)
 {
   vtkDataObject* clone = output->NewInstance();
   clone->ShallowCopy(output);
@@ -387,6 +404,8 @@ void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output)
   vtkPointDataToCellData* converter = vtkPointDataToCellData::New();
   converter->SetInputData(clone);
   converter->PassPointDataOn();
+  converter->ProcessAllArraysOff();
+  converter->AddPointDataArray(name);
   converter->Update();
   output->ShallowCopy(converter->GetOutputDataObject(0));
   converter->Delete();

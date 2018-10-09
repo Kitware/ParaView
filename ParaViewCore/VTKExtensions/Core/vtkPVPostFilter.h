@@ -58,10 +58,11 @@ protected:
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
 
   int DoAnyNeededConversions(vtkDataObject* output);
+  int DoAnyNeededConversions(vtkDataSet* dataset);
   int DoAnyNeededConversions(vtkDataSet* output, const char* requested_name, int fieldAssociation,
     const char* demangled_name, const char* demagled_component_name);
-  void CellDataToPointData(vtkDataSet* output);
-  void PointDataToCellData(vtkDataSet* output);
+  void CellDataToPointData(vtkDataSet* output, const char* name);
+  void PointDataToCellData(vtkDataSet* output, const char* name);
   int ExtractComponent(vtkDataSetAttributes* dsa, const char* requested_name,
     const char* demangled_name, const char* demagled_component_name);
 
