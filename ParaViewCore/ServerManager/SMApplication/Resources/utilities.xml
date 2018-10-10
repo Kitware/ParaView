@@ -130,6 +130,7 @@
           <Entry text="Lab" value="2" />
           <Entry text="Diverging" value="3" />
           <Entry text="Lab/CIEDE2000" value="4" />
+          <Entry text="Step" value="5" />
         </EnumerationDomain>
         <Documentation>
           The color space used for interpolation: RGB, HSV, Lab (CIELAB), or
@@ -141,6 +142,8 @@
           interpolating between two saturated colors.
           In Lab/CIEDE2000 mode, it will take the shortest path in the Lab color
           space with respect to the CIE Delta E 2000 color distance measure.
+          In Step mode, the color of an interval is the color of the second point
+          of the interval.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetUseBelowRangeColor"
@@ -984,6 +987,8 @@
                  value="3" />
           <Entry text="Lab/CIEDE2000"
                  value="4" />
+          <Entry text="Step"
+                 value="5" />
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
