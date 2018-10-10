@@ -69,6 +69,11 @@ public:
    */
   void SetGenerateTriangles(int status);
 
+  /**
+   * Expose method from vtkCutter
+   */
+  void SetMergePoints(bool status);
+
 protected:
   vtkPVMetaSliceDataSet();
   ~vtkPVMetaSliceDataSet() override;

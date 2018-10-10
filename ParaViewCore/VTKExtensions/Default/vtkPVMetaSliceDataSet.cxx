@@ -20,7 +20,9 @@
 #include "vtkExtractGeometry.h"
 #include "vtkImplicitFunction.h"
 #include "vtkInformation.h"
+#include "vtkMergePoints.h"
 #include "vtkNew.h"
+#include "vtkNonMergingPointLocator.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
@@ -29,6 +31,8 @@ class vtkPVMetaSliceDataSet::vtkInternals
 public:
   vtkNew<vtkCutter> Cutter;
   vtkNew<vtkExtractGeometry> ExtractCells;
+  vtkNew<vtkMergePoints> MergeLocator;
+  vtkNew<vtkNonMergingPointLocator> NonMergeLocator;
 
   vtkInternals()
   {
@@ -101,5 +105,14 @@ void vtkPVMetaSliceDataSet::PreserveInputCells(int keepCellAsIs)
 void vtkPVMetaSliceDataSet::SetGenerateTriangles(int status)
 {
   this->Internal->Cutter->SetGenerateTriangles(status);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMetaSliceDataSet::SetMergePoints(bool status)
+{
+  this->Internal->Cutter->SetLocator(status
+      ? static_cast<vtkPointLocator*>(this->Internal->MergeLocator.Get())
+      : this->Internal->NonMergeLocator.Get());
   this->Modified();
 }
