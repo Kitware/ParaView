@@ -271,10 +271,7 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
 
       volume_importer->set_cluster_properties(m_cluster_properties);
 
-      // Create a scene element that represents a regular volume.
-      const mi::math::Vector<mi::Float32, 3> volume_scale(1.f, 1.f, 1.f);
-      const mi::Float32 volume_rotate = 0.f;
-      const mi::math::Vector<mi::Float32, 3> volume_translate(0.f, 0.f, 0.f);
+// Create a scene element that represents a regular volume.
 
 // Create the sparse volume scene element
 #ifdef USE_SPARSE_VOLUME
@@ -286,6 +283,10 @@ void vtknvindex_scene::create_scene(vtkRenderer* ren, vtkVolume* vol,
         scene->create_sparse_volume(
           svol_bbox, transform_mat, volume_importer, dice_transaction.get()));
 #else
+      const mi::math::Vector<mi::Float32, 3> volume_scale(1.f, 1.f, 1.f);
+      const mi::Float32 volume_rotate = 0.f;
+      const mi::math::Vector<mi::Float32, 3> volume_translate(0.f, 0.f, 0.f);
+
       mi::base::Handle<nv::index::IRegular_volume> volume_scene_element(
         scene->create_volume(volume_scale, volume_rotate, volume_translate, volume_size,
           volume_importer, dice_transaction.get()));

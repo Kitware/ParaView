@@ -527,7 +527,7 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
           host_list.push_back(host_names[i]);
       }
 
-      const mi::Uint32 cluster_size = host_list.size();
+      const mi::Uint32 cluster_size = static_cast<mi::Uint32>(host_list.size());
       if (cluster_size > 0)
       {
         mi::Uint32 old_nb_hosts = 0;

@@ -303,8 +303,6 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   using namespace vtknvindex::util;
   using mi::base::Handle;
 
-  vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Importing");
-
   // Setup the attribute-set descriptor
   Handle<ISparse_volume_attribute_set_descriptor> svol_attrib_set_desc(
     factory->create_attribute_set_descriptor<ISparse_volume_attribute_set_descriptor>());
@@ -438,8 +436,6 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(subdivision_ptr, shmsize);
   }
-
-  vtkTimerLog::MarkEndEvent("NVIDIA-IndeX: Importing");
 
   return svol_data_subset.get();
 }
