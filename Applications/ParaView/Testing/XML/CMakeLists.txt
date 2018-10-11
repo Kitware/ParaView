@@ -834,6 +834,8 @@ if(PARAVIEW_SSH_SERVERS_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR}/${tname}.xml)
     set(${tname}_DISABLE_CS TRUE)
     set(${tname}_DISABLE_CRS TRUE)
+# The SSH tests should not be run in parallel to avoid port collision
+    set(${tname}_FORCE_SERIAL TRUE) 
   endforeach()
 endif(PARAVIEW_SSH_SERVERS_TESTING)
 
