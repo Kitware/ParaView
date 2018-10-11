@@ -46,11 +46,21 @@ def tryint(s):
     except:
         return s
 
+
 def alphanum_key(s):
     """ Turn a string into a list of string and number chunks.
         "z23a" -> ["z", 23, "a"]
     """
     return [ tryint(c) for c in re.split('([0-9]+)', s) ]
+
+
+def sanitizeKeys(mapObj):
+    output = {}
+    for key in mapObj:
+        sanitizeKey = servermanager._make_name_valid(key)
+        output[sanitizeKey] = mapObj[key]
+
+    return output
 
 
 # =============================================================================
@@ -2505,8 +2515,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             pid = '0'
 
         # Create new source/filter
+        sanitizedInitialValues = sanitizeKeys(initialValues)
         allowed = self.allowedProxies[name]
-        newProxy = paraview.simple.__dict__[allowed](**initialValues)
+        newProxy = paraview.simple.__dict__[allowed](**sanitizedInitialValues)
 
         # Update subproxy values
         if newProxy:
