@@ -2515,7 +2515,11 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                 if subProxy:
                     for propName in subProxyValues[subProxyName]:
                         prop = subProxy.SMProxy.GetProperty(propName)
-                        prop.SetElements(subProxyValues[subProxyName][propName])
+                        value = subProxyValues[subProxyName][propName]
+                        if isinstance(value, list):
+                            prop.SetElements(value)
+                        else:
+                            prop.SetElements([value])
                     subProxy.UpdateVTKObjects()
 
         # To make WebGL export work
