@@ -35,7 +35,7 @@
 #ifndef vtkCGNSReader_h
 #define vtkCGNSReader_h
 
-#include "vtkCGNSCache.h"
+#include "vtkCGNSCache.h" // for vtkCGNSCache, caching of mesh and connectivity
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkNew.h"                             // for vtkNew.
 #include "vtkPVVTKExtensionsCGNSReaderModule.h" // for export macro
