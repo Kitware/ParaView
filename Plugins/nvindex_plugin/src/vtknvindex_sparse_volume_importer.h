@@ -61,6 +61,7 @@ private:
   mi::Size m_vol_fmt_size;
   mi::Sint32 m_border_size;
   mi::Size m_nb_fragments;
+  mi::Size m_nb_bricks;
   vtknvindex::util::Bbox3i m_read_bounds;
 };
 

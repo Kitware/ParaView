@@ -43,7 +43,7 @@ vtknvindex_regular_volume_properties::vtknvindex_regular_volume_properties()
 {
   m_volume_translation = mi::math::Vector<mi::Float32, 3>(0.f);
   m_volume_scaling = mi::math::Vector<mi::Float32, 3>(1.f);
-  // empty
+  m_volume_extents.min = m_volume_extents.max = mi::math::Vector<mi::Sint32, 3>(0);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -166,6 +166,20 @@ void vtknvindex_regular_volume_properties::get_volume_extents(
   mi::math::Bbox<mi::Sint32, 3>& volume_extents) const
 {
   volume_extents = m_volume_extents;
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_regular_volume_properties::set_ivol_volume_extents(
+  mi::math::Bbox<mi::Float32, 3> volume_extents)
+{
+  m_ivol_volume_extents = volume_extents;
+}
+
+// ------------------------------------------------------------------------------------------------
+void vtknvindex_regular_volume_properties::get_ivol_volume_extents(
+  mi::math::Bbox<mi::Float32, 3>& volume_extents) const
+{
+  volume_extents = m_ivol_volume_extents;
 }
 
 // ------------------------------------------------------------------------------------------------

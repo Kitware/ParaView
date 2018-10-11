@@ -246,28 +246,23 @@ int vtknvindex_irregular_volume_representation::RequestData(
     for (mi::Sint32 i = 0, idx = 0; i < num_processes; i++, idx += 6)
     {
       mi::Float64* cur_extent = all_rank_extents + idx;
-      mi::math::Bbox<mi::Sint32, 3> cur_volume_dimensions;
-      cur_volume_dimensions.min.x = static_cast<mi::Sint32>(std::floor(cur_extent[0]));
-      cur_volume_dimensions.min.y = static_cast<mi::Sint32>(std::floor(cur_extent[2]));
-      cur_volume_dimensions.min.z = static_cast<mi::Sint32>(std::floor(cur_extent[4]));
-      cur_volume_dimensions.max.x = static_cast<mi::Sint32>(std::ceil(cur_extent[1]));
-      cur_volume_dimensions.max.y = static_cast<mi::Sint32>(std::ceil(cur_extent[3]));
-      cur_volume_dimensions.max.z = static_cast<mi::Sint32>(std::ceil(cur_extent[5]));
+      mi::math::Bbox<mi::Float32, 3> cur_volume_dimensions;
+      cur_volume_dimensions.min.x = static_cast<mi::Float32>(cur_extent[0]);
+      cur_volume_dimensions.min.y = static_cast<mi::Float32>(cur_extent[2]);
+      cur_volume_dimensions.min.z = static_cast<mi::Float32>(cur_extent[4]);
+      cur_volume_dimensions.max.x = static_cast<mi::Float32>(cur_extent[1]);
+      cur_volume_dimensions.max.y = static_cast<mi::Float32>(cur_extent[3]);
+      cur_volume_dimensions.max.z = static_cast<mi::Float32>(cur_extent[5]);
 
       m_volume_dimensions.insert(cur_volume_dimensions);
     }
 
     delete[] all_rank_extents;
 
-    m_cluster_properties->get_regular_volume_properties()->set_volume_extents(m_volume_dimensions);
+    m_cluster_properties->get_regular_volume_properties()->set_ivol_volume_extents(
+      m_volume_dimensions);
 
     // volume size
-    m_volume_size.x = m_volume_dimensions.max.x - m_volume_dimensions.min.x + 1;
-    m_volume_size.y = m_volume_dimensions.max.y - m_volume_dimensions.min.y + 1;
-    m_volume_size.z = m_volume_dimensions.max.z - m_volume_dimensions.min.z + 1;
-
-    m_cluster_properties->get_regular_volume_properties()->set_volume_size(m_volume_size);
-
     update_index_roi();
   }
   else
