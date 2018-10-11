@@ -96,7 +96,19 @@ vtknvindex_import_bricks::vtknvindex_import_bricks(
   , m_vol_fmt_size(vol_fmt_size)
   , m_border_size(border_size)
 {
-  m_nb_fragments = subset_data_descriptor->get_subset_number_of_data_bricks();
+  m_nb_bricks = subset_data_descriptor->get_subset_number_of_data_bricks();
+  m_nb_fragments = vtknvindex_sysinfo_instance.get_number_logical_cpu();
+
+  // if number of cpus could not be determinated, used default fragments.
+  if (m_nb_fragments == 0)
+  {
+    const mi::Size DEFAULT_NB_FRAGMENTS = 8;
+    m_nb_fragments = DEFAULT_NB_FRAGMENTS;
+  }
+
+  if (m_nb_fragments > m_nb_bricks)
+    m_nb_fragments = m_nb_bricks;
+
   m_read_bounds = read_bounds;
 }
 
@@ -109,68 +121,116 @@ void vtknvindex_import_bricks::execute_fragment(
   using namespace vtknvindex::util;
 
   const mi::Uint32 svol_attrib_index_0 = 0u;
-  const mi::Uint32 brick_idx = static_cast<mi::Uint32>(index);
+  mi::Size nb_bricks_per_index = m_nb_bricks / m_nb_fragments;
+  if (m_nb_bricks % m_nb_fragments > 0)
+    nb_bricks_per_index++;
 
-  const ISparse_volume_subset_data_descriptor::Data_brick_info brick_info =
-    m_subset_data_descriptor->get_subset_data_brick_info(brick_idx);
-  const ISparse_volume_subset::Data_brick_buffer_info brick_data_info =
-    m_volume_subset->access_brick_data_buffer(brick_idx, svol_attrib_index_0);
+  mi::Uint32 min_brick_idx = static_cast<mi::Uint32>(index * nb_bricks_per_index);
+  mi::Uint32 max_brick_idx = static_cast<mi::Uint32>((index + 1) * nb_bricks_per_index);
+  if (max_brick_idx > m_nb_bricks)
+    max_brick_idx = m_nb_bricks;
 
-  mi::Uint8* svol_brick_data_raw = reinterpret_cast<mi::Uint8*>(brick_data_info.data);
-  if (svol_brick_data_raw == NULL)
+  for (mi::Uint32 brick_idx = min_brick_idx; brick_idx < max_brick_idx; brick_idx++)
   {
-    ERROR_LOG << LOG_svol_rvol_prefix
-              << "Error accessing brick data pointer, brick id: " << brick_idx;
-    return;
-  }
+    const ISparse_volume_subset_data_descriptor::Data_brick_info brick_info =
+      m_subset_data_descriptor->get_subset_data_brick_info(brick_idx);
+    const ISparse_volume_subset::Data_brick_buffer_info brick_data_info =
+      m_volume_subset->access_brick_data_buffer(brick_idx, svol_attrib_index_0);
 
-  Bbox3i pv_volume_bounds = m_subset_data_descriptor->get_dataset_lod_level_box(0);
-  // pv_volume_bounds.min += Vec3i(m_border_size);
-  // pv_volume_bounds.max -= Vec3i(m_border_size);
-
-  const Vec3i read_dims = m_read_bounds.extent();
-
-  const Vec3i brick_pos = brick_info.brick_position;
-  const Vec3u brick_dim = m_subset_data_descriptor->get_subset_data_brick_dimensions();
-  Bbox3i brick_bounds(brick_pos, brick_pos + static_cast<Vec3i>(brick_dim));
-
-  Bbox3i subdivision_bounds(m_read_bounds);
-  for (mi::Uint32 i = 0; i < 3; ++i)
-  {
-    if (subdivision_bounds.min[i] == pv_volume_bounds.min[i])
-      subdivision_bounds.min[i] -= m_border_size;
-
-    if (subdivision_bounds.max[i] == pv_volume_bounds.max[i])
-      subdivision_bounds.max[i] += m_border_size;
-  }
-
-  for (mi::Uint32 z = 0u; z < brick_dim.z; ++z)
-  {
-    for (mi::Uint32 y = 0u; y < brick_dim.y; ++y)
+    mi::Uint8* svol_brick_data_raw = reinterpret_cast<mi::Uint8*>(brick_data_info.data);
+    if (svol_brick_data_raw == NULL)
     {
-      for (mi::Uint32 x = 0u; x < brick_dim.x; ++x)
+      ERROR_LOG << LOG_svol_rvol_prefix
+                << "Error accessing brick data pointer, brick id: " << brick_idx;
+      return;
+    }
+
+    Bbox3i pv_volume_bounds = m_subset_data_descriptor->get_dataset_lod_level_box(0);
+    const Vec3i read_dims = m_read_bounds.extent();
+
+    const Vec3i brick_pos = brick_info.brick_position;
+    const Vec3u brick_dim = m_subset_data_descriptor->get_subset_data_brick_dimensions();
+    Bbox3i brick_bounds(brick_pos, brick_pos + static_cast<Vec3i>(brick_dim));
+
+    Bbox3i subdivision_bounds(m_read_bounds);
+    for (mi::Uint32 i = 0; i < 3; ++i)
+    {
+      if (subdivision_bounds.min[i] == pv_volume_bounds.min[i])
+        subdivision_bounds.min[i] -= m_border_size;
+
+      if (subdivision_bounds.max[i] == pv_volume_bounds.max[i])
+        subdivision_bounds.max[i] += m_border_size;
+    }
+
+    subdivision_bounds.max += Vec3i(1);
+
+    brick_bounds.min =
+      mi::math::clamp(brick_bounds.min, subdivision_bounds.min, subdivision_bounds.max);
+
+    brick_bounds.max =
+      mi::math::clamp(brick_bounds.max, subdivision_bounds.min, subdivision_bounds.max);
+
+    brick_bounds.min -= m_read_bounds.min;
+    brick_bounds.max -= m_read_bounds.min;
+
+    const Vec3i dest_delta(brick_pos - m_read_bounds.min);
+
+    for (mi::Sint32 z = brick_bounds.min.z; z < brick_bounds.max.z; ++z)
+    {
+      const mi::Sint32 zz = mi::math::clamp(z, 0, read_dims.z - 1);
+      const mi::Size dst_off_z =
+        static_cast<mi::Size>(z - dest_delta.z) * brick_dim.x * brick_dim.y;
+      const mi::Size src_off_z = static_cast<mi::Size>(zz) * read_dims.x * read_dims.y;
+
+      for (mi::Sint32 y = brick_bounds.min.y; y < brick_bounds.max.y; ++y)
       {
-        const Vec3i voxel_pos_brick = Vec3i(x, y, z);
-        const Vec3i voxel_pos_vol = voxel_pos_brick + brick_pos;
+        const mi::Sint32 yy = mi::math::clamp(y, 0, read_dims.y - 1);
+        const mi::Size dst_off_yz =
+          static_cast<mi::Size>(y - dest_delta.y) * brick_dim.x + dst_off_z;
+        const mi::Size src_off_yz = static_cast<mi::Size>(yy) * read_dims.x + src_off_z;
 
-        if (!subdivision_bounds.contains(voxel_pos_vol))
-          continue;
+        mi::Sint32 xmin = mi::math::clamp(brick_bounds.min.x, 0, read_dims.x);
+        mi::Sint32 xmax = mi::math::clamp(brick_bounds.max.x, 0, read_dims.x);
 
-        const Vec3i voxel_pos_vol_subdata = voxel_pos_vol - m_read_bounds.min;
-        Vec3i voxel_pos_vol_subdata_clamped =
-          mi::math::clamp(voxel_pos_vol_subdata, Vec3i(0u), read_dims - Vec3i(1));
+        // Read interior voxels
+        if (xmax > xmin)
+        {
+          // destination offset
+          const mi::Size dst_off = static_cast<mi::Size>(xmin - dest_delta.x) + dst_off_yz;
 
-        // destination offset
-        const mi::Size dst_off = static_cast<mi::Size>(x) + static_cast<mi::Size>(y) * brick_dim.x +
-          static_cast<mi::Size>(z) * brick_dim.x * brick_dim.y;
+          // source offset
+          const mi::Size src_off = static_cast<mi::Size>(xmin) + src_off_yz;
 
-        // source offset
-        const mi::Size src_off = static_cast<mi::Size>(voxel_pos_vol_subdata_clamped.x) +
-          static_cast<mi::Size>(voxel_pos_vol_subdata_clamped.y) * read_dims.x +
-          static_cast<mi::Size>(voxel_pos_vol_subdata_clamped.z) * read_dims.x * read_dims.y;
+          memcpy(svol_brick_data_raw + dst_off * m_vol_fmt_size,
+            m_app_subdivision + src_off * m_vol_fmt_size,
+            m_vol_fmt_size * static_cast<mi::Size>(xmax - xmin));
+        }
 
-        memcpy(svol_brick_data_raw + dst_off * m_vol_fmt_size,
-          m_app_subdivision + src_off * m_vol_fmt_size, m_vol_fmt_size);
+        // Read lower bound when x < 0
+        for (mi::Sint32 x = brick_bounds.min.x; x < 0; ++x)
+        {
+          // destination offset
+          const mi::Size dst_off = static_cast<mi::Size>(x - dest_delta.x) + dst_off_yz;
+
+          // source offset
+          const mi::Size src_off = src_off_yz;
+
+          memcpy(svol_brick_data_raw + dst_off * m_vol_fmt_size,
+            m_app_subdivision + src_off * m_vol_fmt_size, m_vol_fmt_size);
+        }
+
+        // Read upper bound when x >= read_dims.x
+        for (mi::Sint32 x = read_dims.x; x < brick_bounds.max.x; ++x)
+        {
+          // destination offset
+          const mi::Size dst_off = static_cast<mi::Size>(x - dest_delta.x) + dst_off_yz;
+
+          // source offset
+          const mi::Size src_off = static_cast<mi::Size>(read_dims.x - 1) + src_off_yz;
+
+          memcpy(svol_brick_data_raw + dst_off * m_vol_fmt_size,
+            m_app_subdivision + src_off * m_vol_fmt_size, m_vol_fmt_size);
+        }
       }
     }
   }
@@ -242,8 +302,6 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
   using namespace nv::index;
   using namespace vtknvindex::util;
   using mi::base::Handle;
-
-  vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Importing");
 
   // Setup the attribute-set descriptor
   Handle<ISparse_volume_attribute_set_descriptor> svol_attrib_set_desc(
@@ -378,8 +436,6 @@ nv::index::IDistributed_data_subset* vtknvindex_sparse_volume_importer::create(
     // free memory space linked to shared memory
     vtknvindex::util::unmap_shm(subdivision_ptr, shmsize);
   }
-
-  vtkTimerLog::MarkEndEvent("NVIDIA-IndeX: Importing");
 
   return svol_data_subset.get();
 }

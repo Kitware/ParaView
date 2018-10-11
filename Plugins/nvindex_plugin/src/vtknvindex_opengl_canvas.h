@@ -30,6 +30,7 @@
 
 #include <string>
 
+#include "vtkOpenGLRenderWindow.h"
 #include "vtkRenderer.h"
 
 #include <mi/base/interface_implement.h>
@@ -86,6 +87,7 @@ private:
   // Set main window size.
   mi::math::Vector_struct<mi::Sint32, 2> m_main_window_size;
   vtkRenderer* m_vtk_renderer;
+  vtkOpenGLRenderWindow* m_vtk_ogl_render_window;
 };
 
 #endif // vtknvindex_opengl_canvas_h

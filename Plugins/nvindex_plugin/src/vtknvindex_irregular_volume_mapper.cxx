@@ -240,10 +240,6 @@ bool vtknvindex_irregular_volume_mapper::initialize_mapper(vtkRenderer* /*ren*/,
                   << " in vtknvindex_representation::RequestData().";
         return false;
       }
-
-      // Let IndeX remote instances to start before IndeX viewer.
-      if (m_is_viewer && m_cluster_properties->get_nb_hosts() > 1)
-        vtknvindex::util::sleep(0.2);
     }
   }
 

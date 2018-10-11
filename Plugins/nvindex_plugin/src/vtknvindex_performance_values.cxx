@@ -29,13 +29,13 @@
 #include <iomanip>
 #include <iostream>
 
-#include "vtksys/SystemInformation.hxx"
 #include "vtksys/SystemTools.hxx"
 
 #include "vtknvindex_application.h"
 #include "vtknvindex_forwarding_logger.h"
 #include "vtknvindex_performance_values.h"
 
+//-------------------------------------------------------------------------------------------------
 vtknvindex_performance_values::vtknvindex_performance_values()
   : m_print_header(true)
   , m_performance_log_file("nvindex_perf_log.txt")
@@ -43,11 +43,13 @@ vtknvindex_performance_values::vtknvindex_performance_values()
   // empty
 }
 
+//-------------------------------------------------------------------------------------------------
 vtknvindex_performance_values::~vtknvindex_performance_values()
 {
   // empty
 }
 
+//-------------------------------------------------------------------------------------------------
 void vtknvindex_performance_values::print_perf_values(
   vtknvindex_application& application, mi::base::Handle<nv::index::IFrame_results> frame_results)
 {
@@ -168,6 +170,7 @@ void vtknvindex_performance_values::print_perf_values(
   file_handler.close();
 }
 
+//-------------------------------------------------------------------------------------------------
 std::string vtknvindex_performance_values::to_string(mi::Uint64 memory) const
 {
   std::ostringstream number_str;
@@ -185,4 +188,29 @@ std::string vtknvindex_performance_values::to_string(mi::Uint64 memory) const
     number_str << memory / (K * K * K * K) << " Tb";
 
   return number_str.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+vtknvindex_sysinfo::vtknvindex_sysinfo()
+{
+  m_sys_info.RunOSCheck();
+  m_sys_info.RunCPUCheck();
+  m_nb_logical_cpu = m_sys_info.GetNumberOfLogicalCPU();
+}
+
+//-------------------------------------------------------------------------------------------------
+vtknvindex_sysinfo::~vtknvindex_sysinfo()
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+vtksys::SystemInformation& vtknvindex_sysinfo::get_sysinfo()
+{
+  return m_sys_info;
+}
+
+//-------------------------------------------------------------------------------------------------
+mi::Uint32 vtknvindex_sysinfo::get_number_logical_cpu() const
+{
+  return m_nb_logical_cpu;
 }
