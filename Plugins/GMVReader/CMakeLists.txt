@@ -44,6 +44,7 @@ if(PARAVIEW_USE_MPI)
 endif()
 
 ADD_PARAVIEW_PLUGIN(GMVReader "1.0"
+  DESCRIPTION "Reader for binary or ASCII files stored in General Mesh Viewer file format"
   REQUIRED_ON_SERVER
   SERVER_MANAGER_XML GMVReaderSM.xml
   SERVER_MANAGER_SOURCES vtkGMVReader.cxx)

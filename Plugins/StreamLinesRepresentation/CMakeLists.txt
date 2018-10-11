@@ -41,6 +41,7 @@ encode_files_as_strings(ENCODED_STRING_FILES
 
 add_paraview_plugin(
   StreamLinesRepresentation "0.1"
+  DESCRIPTION "Add animated Stream Lines representation for any type of dataset"
   SERVER_MANAGER_XML StreamLinesRepresentation.xml
   SERVER_MANAGER_SOURCES
     vtkStreamLinesRepresentation.cxx

@@ -21,6 +21,7 @@ if (PARAVIEW_ENABLE_PYTHON)
     message(STATUS "netcdftime Python module not found! NetCDFTimeAnnotationPlugin not be available until it is installed.")
   else()
     add_paraview_plugin(NetCDFTimeAnnotationPlugin "1.0"
+      DESCRIPTION "Provides NetCDF Time Annotation filter"
       SERVER_MANAGER_XML NetCDFTimeAnnotation.xml
       REQUIRED_ON_SERVER)
 

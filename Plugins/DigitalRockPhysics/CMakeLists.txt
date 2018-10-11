@@ -10,6 +10,7 @@ include(ParaViewPlugins)
 include_directories(${VTK_INCLUDE_DIRS})
 
 add_paraview_plugin(DigitalRockPhysics "1.0"
+  DESCRIPTION "Digital Rock Physics analysis filters"
   SERVER_MANAGER_XML DigitalRockPhysics.xml
   SERVER_MANAGER_SOURCES vtkPMaterialClusterAnalysisFilter.cxx
                          vtkPMaterialClusterExplodeFilter.cxx)

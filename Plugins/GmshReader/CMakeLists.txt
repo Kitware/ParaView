@@ -14,6 +14,7 @@ include_directories(
 
 add_paraview_plugin(
   GmshReader "1.0"
+  DESCRIPTION "Reader for visualization of high-order polynomial solutions under the Gmsh format"
   SERVER_MANAGER_XML
     GmshReaderServerManager.xml
   SERVER_MANAGER_SOURCES

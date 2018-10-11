@@ -48,6 +48,7 @@ if(PARAVIEW_USE_MPI)
          ${MPI_INCLUDE_PATH})
 
       ADD_PARAVIEW_PLUGIN( Adios "1.4"
+         DESCRIPTION "Reader for *.bp files based on Adios"
          SERVER_MANAGER_XML
             Adios.xml
          SERVER_MANAGER_SOURCES

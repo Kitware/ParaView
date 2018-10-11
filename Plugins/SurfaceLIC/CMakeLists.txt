@@ -6,6 +6,7 @@ include_directories(
 
 add_paraview_plugin(
   SurfaceLIC "2.0"
+  DESCRIPTION "Add Surface-LIC vector visualization representation"
   DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
   SERVER_MANAGER_XML vtkSurfaceLICRepresentation.xml
   SERVER_MANAGER_SOURCES vtkSurfaceLICRepresentation.cxx

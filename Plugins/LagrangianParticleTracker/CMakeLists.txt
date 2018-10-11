@@ -22,6 +22,7 @@ if (PARAVIEW_BUILD_QT_GUI)
     CLASS_NAME pqIntegrationModelSurfaceHelperWidget)
 
   add_paraview_plugin(LagrangianParticleTracker "1.0"
+    DESCRIPTION "Highly customizable filter for particle tracking"
     REQUIRED_ON_SERVER
     REQUIRED_ON_CLIENT
     SERVER_MANAGER_XML

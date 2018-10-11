@@ -39,6 +39,7 @@ INCLUDE_DIRECTORIES(${VAPOR_NETCDF_INCLUDE_DIRS})
 
 #TODO: GUI XML should not be necessary. Why are hints in server xml not working for the plugin?
 ADD_PARAVIEW_PLUGIN(VDFReaderPlugin "1.0"
+  DESCRIPTION "Plugin to read NCAR VDR files"
   SERVER_MANAGER_XML VDFReader.xml
   SERVER_MANAGER_SOURCES vtkVDFReader.cxx
   REQUIRED_ON_SERVER
