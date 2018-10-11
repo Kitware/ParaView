@@ -347,6 +347,17 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   QTreeWidgetItem* infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags);
 
+  // Description
+  if (strlen(plInfo->GetDescription(index)) > 0)
+  {
+    infoText.clear();
+    infoText << tr("Description");
+    infoText << tr(plInfo->GetDescription(index));
+    infoNode = new QTreeWidgetItem(pluginNode, infoText);
+    infoNode->setFlags(infoFlags);
+    infoNode->setToolTip(ValueCol, tr(plInfo->GetDescription(index)));
+  }
+
   // Location
   infoText.clear();
   infoText << tr("Location") << tr(plInfo->GetPluginFileName(index));

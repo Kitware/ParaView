@@ -109,6 +109,17 @@ public:
     return "@PLUGIN_REQUIRED_PLUGINS@";
     }
 
+  /**
+   * Returns a description of this plugin.
+   */
+  const char* GetDescription() override
+    {
+    return "@PLUGIN_DESCRIPTION@";
+    }
+
+  /**
+   * Returns EULA for the plugin, if any. If none, this will return nullptr.
+   */
   const char* GetEULA() override;
 
   // Description:

@@ -33,6 +33,7 @@ public:
   std::string Name;
   std::string FileName;
   std::string RequiredPlugins;
+  std::string Description;
   std::string Version;
   std::string StatusMessage;
   bool AutoLoadForce;
@@ -85,6 +86,12 @@ public:
     {
       return false;
     }
+    this->Description = temp_ptr;
+
+    if (!stream.GetArgument(0, offset++, &temp_ptr))
+    {
+      return false;
+    }
     this->Version = temp_ptr;
 
     if (!stream.GetArgument(0, offset++, &this->AutoLoad))
@@ -113,8 +120,8 @@ public:
 void operator<<(vtkClientServerStream& stream, const vtkItem& item)
 {
   stream << item.Name.c_str() << item.FileName.c_str() << item.RequiredPlugins.c_str()
-         << item.Version.c_str() << item.AutoLoad << item.Loaded << item.RequiredOnClient
-         << item.RequiredOnServer;
+         << item.Description.c_str() << item.Version.c_str() << item.AutoLoad << item.Loaded
+         << item.RequiredOnClient << item.RequiredOnServer;
 }
 }
 
@@ -224,6 +231,7 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
       item.RequiredPlugins = plugin->GetRequiredPlugins();
       item.RequiredOnClient = plugin->GetRequiredOnClient();
       item.RequiredOnServer = plugin->GetRequiredOnServer();
+      item.Description = plugin->GetDescription();
       item.Version = plugin->GetPluginVersionString();
     }
     else
@@ -334,6 +342,16 @@ const char* vtkPVPluginsInformation::GetRequiredPlugins(unsigned int cc)
   if (cc < this->GetNumberOfPlugins())
   {
     return (*this->Internals)[cc].RequiredPlugins.c_str();
+  }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVPluginsInformation::GetDescription(unsigned int cc)
+{
+  if (cc < this->GetNumberOfPlugins())
+  {
+    return (*this->Internals)[cc].Description.c_str();
   }
   return NULL;
 }

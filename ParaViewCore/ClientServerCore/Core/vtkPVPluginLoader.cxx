@@ -121,6 +121,11 @@ public:
   // Returns a ';' separated list of plugin names required by this plugin.
   const char* GetRequiredPlugins() override { return ""; }
 
+  /**
+   * Returns a description of this plugin.
+   */
+  const char* GetDescription() override { return ""; }
+
   // Description:
   // Obtain the server-manager configuration xmls, if any.
   void GetXMLs(std::vector<std::string>& xmls) override { xmls.push_back(this->XML); }
