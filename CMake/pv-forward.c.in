@@ -184,7 +184,7 @@ int main(int argc, char** argv)
              strcmp(argv[i], "--mesa-swr") == 0       ||
              strcmp(argv[i], "--mesa") == 0)
       {
-      snprintf(driver_choice, MAX_DRIVER_CHOICE, argv[i] + 2);
+      snprintf(driver_choice, MAX_DRIVER_CHOICE, "%s", argv[i] + 2);
       }
     else
       {
