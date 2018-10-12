@@ -18,6 +18,7 @@
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #endif
 
 // Gmsh headers

@@ -5,7 +5,7 @@ if (NOT ParaView_BINARY_DIR)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(Gmsh 3.0.7 REQUIRED)
+find_package(Gmsh 4.0.0 REQUIRED)
 
 include_directories(
   ${VTK_INCLUDE_DIRS}
