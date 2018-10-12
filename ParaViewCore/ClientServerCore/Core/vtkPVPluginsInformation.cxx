@@ -134,7 +134,7 @@ vtkStandardNewMacro(vtkPVPluginsInformation);
 vtkPVPluginsInformation::vtkPVPluginsInformation()
 {
   this->RootOnly = 1;
-  this->SearchPaths = NULL;
+  this->SearchPaths = nullptr;
   this->Internals = new vtkInternals();
 }
 
@@ -142,7 +142,7 @@ vtkPVPluginsInformation::vtkPVPluginsInformation()
 vtkPVPluginsInformation::~vtkPVPluginsInformation()
 {
   delete this->Internals;
-  this->Internals = NULL;
+  this->Internals = nullptr;
   this->SetSearchPaths(0);
 }
 
@@ -185,7 +185,7 @@ void vtkPVPluginsInformation::CopyToStream(vtkClientServerStream* stream)
 void vtkPVPluginsInformation::CopyFromStream(const vtkClientServerStream* stream)
 {
   int offset = 0;
-  const char* search_paths = NULL;
+  const char* search_paths = nullptr;
   if (!stream->GetArgument(0, offset++, &search_paths))
   {
     vtkErrorMacro("Error parsing SearchPaths.");
@@ -225,7 +225,7 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
     item.AutoLoadForce = false;
 
     vtkPVPlugin* plugin = tracker->GetPlugin(cc);
-    item.Loaded = plugin != NULL;
+    item.Loaded = plugin != nullptr;
     if (plugin)
     {
       item.RequiredPlugins = plugin->GetRequiredPlugins();
@@ -291,7 +291,7 @@ const char* vtkPVPluginsInformation::GetPluginName(unsigned int cc)
   {
     return (*this->Internals)[cc].Name.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -300,10 +300,10 @@ const char* vtkPVPluginsInformation::GetPluginStatusMessage(unsigned int cc)
   if (cc < this->GetNumberOfPlugins())
   {
     const char* reply = (*this->Internals)[cc].StatusMessage.c_str();
-    return (strlen(reply) == 0 ? NULL : reply);
+    return (strlen(reply) == 0 ? nullptr : reply);
   }
 
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -313,7 +313,7 @@ const char* vtkPVPluginsInformation::GetPluginFileName(unsigned int cc)
   {
     return (*this->Internals)[cc].FileName.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -323,7 +323,7 @@ const char* vtkPVPluginsInformation::GetPluginVersion(unsigned int cc)
   {
     return (*this->Internals)[cc].Version.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -343,7 +343,7 @@ const char* vtkPVPluginsInformation::GetRequiredPlugins(unsigned int cc)
   {
     return (*this->Internals)[cc].RequiredPlugins.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -353,7 +353,7 @@ const char* vtkPVPluginsInformation::GetDescription(unsigned int cc)
   {
     return (*this->Internals)[cc].Description.c_str();
   }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

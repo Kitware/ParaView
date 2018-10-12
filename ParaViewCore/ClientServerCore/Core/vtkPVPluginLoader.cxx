@@ -101,24 +101,29 @@ public:
     return instance;
   }
 
-  // Description:
-  // Returns the name for this plugin.
+  /**
+   * Returns the name for this plugin.
+   */
   const char* GetPluginName() override { return this->PluginName.c_str(); }
 
-  // Description:
-  // Returns the version for this plugin.
+  /**
+   * Returns the version for this plugin.
+   */
   const char* GetPluginVersionString() override { return "1.0"; }
 
-  // Description:
-  // Returns true if this plugin is required on the server.
+  /**
+   * Returns true if this plugin is required on the server.
+   */
   bool GetRequiredOnServer() override { return true; }
 
-  // Description:
-  // Returns true if this plugin is required on the client.
+  /**
+   * Returns true if this plugin is required on the client.
+   */
   bool GetRequiredOnClient() override { return false; }
 
-  // Description:
-  // Returns a ';' separated list of plugin names required by this plugin.
+  /**
+   * Returns a ';' separated list of plugin names required by this plugin.
+   */
   const char* GetRequiredPlugins() override { return ""; }
 
   /**
@@ -126,20 +131,25 @@ public:
    */
   const char* GetDescription() override { return ""; }
 
-  // Description:
-  // Obtain the server-manager configuration xmls, if any.
+  /**
+   * Obtain the server-manager configuration xmls, if any.
+   */
   void GetXMLs(std::vector<std::string>& xmls) override { xmls.push_back(this->XML); }
 
-  // Description:
-  // Returns the callback function to call to initialize the interpretor for the
-  // new vtk/server-manager classes added by this plugin. Returning NULL is
-  // perfectly valid.
+  /**
+   * Returns the callback function to call to initialize the interpretor for the
+   * new vtk/server-manager classes added by this plugin. Returning NULL is
+   * perfectly valid.
+   */
   vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
   GetInitializeInterpreterCallback() override
   {
     return NULL;
   }
 
+  /**
+   * Returns EULA for the plugin, if any. If none, this will return nullptr.
+   */
   const char* GetEULA() override { return nullptr; }
 };
 
