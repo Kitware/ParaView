@@ -22,7 +22,6 @@
 #endif
 
 #include "vtkCGNSReader.h"
-#include "vtkCGNSCache.h"          //for caching mesh points
 #include "vtkCGNSReaderInternal.h" // For parsing information request
 
 #include "vtkCallbackCommand.h"
