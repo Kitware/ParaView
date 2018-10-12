@@ -100,7 +100,8 @@ void vtkCGNSCache<CacheDataType>::Insert(
   const std::string& key, const vtkSmartPointer<CacheDataType>& data)
 {
 
-  if (this->cacheSizeLimit > 0 && this->CacheData.size() >= this->cacheSizeLimit)
+  if (this->cacheSizeLimit > 0 &&
+    this->CacheData.size() >= static_cast<size_t>(this->cacheSizeLimit))
   {
     // Make some room by removing last accessed/inserted item
     this->CacheData.erase(this->LastCacheAccess);
