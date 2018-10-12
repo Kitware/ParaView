@@ -6694,7 +6694,8 @@ array.
       </IntVectorProperty>
       <IntVectorProperty command="SetMergePoints"
                          default_values="1"
-                         name="Merge duplicated points in the slice"
+                         name="MergePoints"
+                         label="Merge duplicated points in the slice"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>This parameter controls whether to merge duplicated points in the slice.</Documentation>
