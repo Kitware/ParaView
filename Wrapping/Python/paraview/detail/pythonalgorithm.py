@@ -387,6 +387,7 @@ class smproxy(object):
                 nested_xmls.append(val)
 
         prop_xmls_dict = {}
+        prop_ordering = {}
         for pname, val in classobj.__dict__.items():
             val = _undecorate(val)
             if callable(val) and hasattr(val, "_pvsm_property_xmls"):
@@ -395,11 +396,10 @@ class smproxy(object):
                     raise RuntimeError("Multiple property definitions on the same" \
                                        "method are not supported.")
                 prop_xmls_dict[pname] = pxmls[0]
+                prop_ordering[pname] = val.__code__.co_firstlineno
 
-        # since the order of the properties keeps on changing between invocations,
-        # let's sort them by the name for consistency. In future, we may put in
-        # extra logic to preserve order they were defined in the class
-        nested_xmls += [prop_xmls_dict[key] for key in sorted(prop_xmls_dict.keys())]
+        # sort properties by the line numbers of their functions
+        nested_xmls += [prop_xmls_dict[key] for key in sorted(prop_xmls_dict.keys(), key=prop_ordering.get)]
 
         if attrs.get("support_reload", True):
             nested_xmls.insert(0, """
