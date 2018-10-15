@@ -309,9 +309,7 @@ vtkPVPluginsInformation* pqPluginDialog::getPluginInfo(
   vtkPVPluginsInformation* info = pm->loadedExtensions(
     this->Server, (pluginNode->treeWidget() == this->Ui->remotePlugins) ? true : false);
 
-  index = (pluginNode && pluginNode->type() == QTreeWidgetItem::UserType)
-    ? pluginNode->data(NameCol, Qt::UserRole).toUInt()
-    : 0;
+  index = pluginNode ? pluginNode->data(NameCol, Qt::UserRole).toUInt() : 0;
 
   if (info && info->GetNumberOfPlugins() > index)
   {
@@ -325,7 +323,7 @@ vtkPVPluginsInformation* pqPluginDialog::getPluginInfo(
 void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInformation* plInfo,
   unsigned int index, bool vtkNotUsed(remote))
 {
-  Qt::ItemFlags infoFlags(Qt::ItemIsEnabled);
+  Qt::ItemFlags infoFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
   // set icon hint
   if (plInfo->GetPluginLoaded(index))
@@ -341,11 +339,15 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
     pluginNode->setText(ValueCol, "Not Loaded");
   }
 
+  QVariant vdata;
+  vdata.setValue(index);
+
   QStringList infoText;
   // Version
   infoText << tr("Version") << tr(plInfo->GetPluginVersion(index));
   QTreeWidgetItem* infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags);
+  infoNode->setData(NameCol, Qt::UserRole, vdata);
 
   // Description
   if (strlen(plInfo->GetDescription(index)) > 0)
@@ -356,6 +358,7 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
     infoNode = new QTreeWidgetItem(pluginNode, infoText);
     infoNode->setFlags(infoFlags);
     infoNode->setToolTip(ValueCol, tr(plInfo->GetDescription(index)));
+    infoNode->setData(NameCol, Qt::UserRole, vdata);
   }
 
   // Location
@@ -364,6 +367,7 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags);
   infoNode->setToolTip(ValueCol, tr(plInfo->GetPluginFileName(index)));
+  infoNode->setData(NameCol, Qt::UserRole, vdata);
 
   // Depended Plugins
   if (plInfo->GetRequiredPlugins(index))
@@ -374,6 +378,7 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
     infoNode = new QTreeWidgetItem(pluginNode, infoText);
     infoNode->setFlags(infoFlags);
     infoNode->setToolTip(ValueCol, tr(plInfo->GetRequiredPlugins(index)));
+    infoNode->setData(NameCol, Qt::UserRole, vdata);
   }
 
   // Load status
@@ -386,6 +391,7 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   {
     infoNode->setToolTip(ValueCol, tr(plInfo->GetPluginStatusMessage(index)));
   }
+  infoNode->setData(NameCol, Qt::UserRole, vdata);
 
   // AutoLoad setting
   infoText.clear();
@@ -393,6 +399,7 @@ void pqPluginDialog::addInfoNodes(QTreeWidgetItem* pluginNode, vtkPVPluginsInfor
   infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags | Qt::ItemIsUserCheckable);
   infoNode->setCheckState(ValueCol, plInfo->GetAutoLoad(index) ? Qt::Checked : Qt::Unchecked);
+  infoNode->setData(NameCol, Qt::UserRole, vdata);
 }
 
 //----------------------------------------------------------------------------
