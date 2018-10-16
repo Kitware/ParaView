@@ -24,6 +24,7 @@ ELSE ()
 ENDIF ()
 
 ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
+  DESCRIPTION "Reader/Writer for Analyze and NifTI files"
   SERVER_MANAGER_SOURCES vtkAnalyzeReader.cxx
                          vtkAnalyzeWriter.cxx
                          vtkNIfTIReader.cxx

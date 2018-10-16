@@ -49,6 +49,7 @@ public:
   bool GetRequiredOnServer() override { return true; }
   bool GetRequiredOnClient() override { return false; }
   const char* GetRequiredPlugins() override { return ""; }
+  const char* GetDescription() override { return ""; }
   const char* GetEULA() override { return nullptr; }
   //@}
 

@@ -6,6 +6,7 @@ include_directories(
 
 add_paraview_plugin(
   EyeDomeLightingView "1.0"
+  DESCRIPTION "Add 3D View with eye-dome Lighting support"
   REQUIRED_ON_SERVER
   REQUIRED_ON_CLIENT
   SERVER_MANAGER_SOURCES

@@ -8,6 +8,7 @@ else()
 endif()
 
 add_paraview_plugin(VTKmFilters "0.1"
+  DESCRIPTION "VTKm many-core filters"
   REQUIRED_ON_SERVER
   SERVER_MANAGER_XML VTKmSM.xml
   )

@@ -106,6 +106,7 @@ ADD_PARAVIEW_DOCK_WINDOW(
 # create a plugin for this starter
 ADD_PARAVIEW_PLUGIN(
   VRPlugin "1.0"
+  DESCRIPTION "Virtual Reality Devices and Interactor styles"
   GUI_INTERFACES ${IFACES} ${IFACES_WINDOW}
   GUI_SOURCES
           pqVRAddConnectionDialog.cxx

@@ -29,14 +29,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-/// This is an auto-generated file. Please do not edit.
+// This is an auto-generated file. Please do not edit.
 
-/// This file is used to wrap a ParaView plugin.
+// This file is used to wrap a ParaView plugin.
 #cmakedefine plugin_type_python
 #cmakedefine plugin_type_servermanager
 #cmakedefine plugin_type_gui
 
-/// this is set when the plugin has source headers that are wrapped.
+// this is set when the plugin has source headers that are wrapped.
 #cmakedefine INITIALIZE_WRAPPING
 #cmakedefine INITIALIZE_EXTRA_CS_MODULES
 
@@ -44,17 +44,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPlugin.h"
 
 #ifdef plugin_type_gui
-# include "vtkPVGUIPluginInterface.h"
-# include <QObject>
-# include <QtPlugin>
+#include "vtkPVGUIPluginInterface.h"
+#include <QObject>
+#include <QtPlugin>
 #endif
 
 #ifdef plugin_type_servermanager
-# include "vtkPVServerManagerPluginInterface.h"
+#include "vtkPVServerManagerPluginInterface.h"
 #endif
 
 #ifdef plugin_type_python
-# include "vtkPVPythonPluginInterface.h"
+#include "vtkPVPythonPluginInterface.h"
 #endif
 
 class @PLUGIN_NAME@_Plugin :
@@ -77,67 +77,77 @@ class @PLUGIN_NAME@_Plugin :
   Q_OBJECT
   Q_INTERFACES(vtkPVGUIPluginInterface)
   Q_PLUGIN_METADATA(IID "com.kitware/paraview/@PLUGIN_NAME@_Plugin")
-//#endif
 #endif
 public:
   @PLUGIN_NAME@_Plugin();
 
-   // Description:
-  // Returns the name for this plugin.
-  const char* GetPluginName() override
-    {return "@PLUGIN_NAME@"; }
+  /**
+   * Returns the name for this plugin.
+   */
+  const char* GetPluginName() override {return "@PLUGIN_NAME@"; }
 
-  // Description:
-  // Returns the version for this plugin.
-  const char* GetPluginVersionString() override
-    { return "@PLUGIN_VERSION@"; }
+  /**
+   * Returns the version for this plugin.
+   */
+  const char* GetPluginVersionString() override { return "@PLUGIN_VERSION@"; }
 
-  // Description:
-  // Returns true if this plugin is required on the server.
-  bool GetRequiredOnServer() override
-    { return @PLUGIN_REQUIRED_ON_SERVER@; }
+  /**
+   * Returns true if this plugin is required on the server.
+   */
+  bool GetRequiredOnServer() override { return @PLUGIN_REQUIRED_ON_SERVER@; }
 
-  // Description:
-  // Returns true if this plugin is required on the client.
-  bool GetRequiredOnClient() override
-    { return @PLUGIN_REQUIRED_ON_CLIENT@; }
+  /**
+   * Returns true if this plugin is required on the client.
+   */
+  bool GetRequiredOnClient() override { return @PLUGIN_REQUIRED_ON_CLIENT@; }
 
-  // Description:
-  // Returns a ';' separated list of plugin names required by this plugin.
-  const char* GetRequiredPlugins() override
-    {
-    return "@PLUGIN_REQUIRED_PLUGINS@";
-    }
+  /**
+   * Returns a ';' separated list of plugin names required by this plugin.
+   */
+  const char* GetRequiredPlugins() override { return "@PLUGIN_REQUIRED_PLUGINS@"; }
 
+  /**
+   * Returns a description of this plugin.
+   */
+  const char* GetDescription() override { return "@PLUGIN_DESCRIPTION@"; }
+
+  /**
+   * Returns EULA for the plugin, if any. If none, this will return nullptr.
+   */
   const char* GetEULA() override;
 
-  // Description:
-  // Provides access to binary resources compiled into the plugin.
-  // This is primarily used to compile in icons and compressed help project
-  // (qch) files into plugins.
+  /**
+   * Provides access to binary resources compiled into the plugin.
+   * This is primarily used to compile in icons and compressed help project
+   * (qch) files into plugins.
+   */
   void GetBinaryResources(std::vector<std::string>& resources) override;
 
 #ifdef plugin_type_servermanager
-  // Description:
-  // Obtain the server-manager configuration xmls, if any.
-  void GetXMLs(std::vector<std::string> &xmls) override;
+  /**
+   * Obtain the server-manager configuration xmls, if any.
+   */
+  void GetXMLs(std::vector<std::string>& xmls) override;
 
-  // Description:
-  // Returns the callback function to call to initialize the interpretor for the
-  // new vtk/server-manager classes added by this plugin. Returning NULL is
-  // perfectly valid.
+  /**
+   * Returns the callback function to call to initialize the interpretor for the
+   * new vtk/server-manager classes added by this plugin. Returning NULL is
+   * perfectly valid.
+   */
   vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
     GetInitializeInterpreterCallback() override;
 #endif
 
 #ifdef plugin_type_gui
-  /// Returns the list of ParaView-Interfaces provided by this plugin.
+  /**
+   * Returns the list of ParaView-Interfaces provided by this plugin.
+   */
   QObjectList interfaces() override;
 #endif
 
 #ifdef plugin_type_python
   void GetPythonSourceList(std::vector<std::string>& modules,
     std::vector<std::string>& sources,
-    std::vector<int> &package_flags) override;
+    std::vector<int>& package_flags) override;
 #endif
 };

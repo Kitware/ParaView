@@ -38,6 +38,7 @@ class vtkPVInitializerPlugin : public vtkPVPlugin,
   bool GetRequiredOnServer() override { return false; }
   bool GetRequiredOnClient() override { return false; }
   const char* GetRequiredPlugins() override { return ""; }
+  const char* GetDescription() override { return ""; }
   void GetBinaryResources(std::vector<std::string>&) override { }
   const char* GetEULA() override { return nullptr; }
 

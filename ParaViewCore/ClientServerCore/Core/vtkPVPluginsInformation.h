@@ -46,6 +46,7 @@ public:
   const char* GetRequiredPlugins(unsigned int);
   bool GetRequiredOnServer(unsigned int);
   bool GetRequiredOnClient(unsigned int);
+  const char* GetDescription(unsigned int);
   bool GetAutoLoad(unsigned int);
   //@}
 

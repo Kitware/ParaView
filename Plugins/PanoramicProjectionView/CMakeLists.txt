@@ -18,6 +18,7 @@ include_directories(
 
 add_paraview_plugin(
   PanoramicProjectionView "1.0"
+  DESCRIPTION "Add a panoramic projection 3D view"
   REQUIRED_ON_SERVER
   REQUIRED_ON_CLIENT
   SERVER_MANAGER_SOURCES

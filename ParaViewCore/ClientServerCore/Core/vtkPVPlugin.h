@@ -81,6 +81,11 @@ public:
   virtual const char* GetRequiredPlugins() = 0;
 
   /**
+   * Returns a description of this plugin.
+   */
+  virtual const char* GetDescription() = 0;
+
+  /**
    * Returns EULA for the plugin, if any. If none, this will return nullptr.
    */
   virtual const char* GetEULA() = 0;

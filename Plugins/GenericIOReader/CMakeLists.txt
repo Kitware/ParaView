@@ -29,6 +29,7 @@ mark_as_advanced(GIO_DEBUG_LOG)
 
 # Create the plugin
 add_paraview_plugin(GenericIOReader "1.0"
+  DESCRIPTION "GenericIO Reader for HACC data"
   SERVER_MANAGER_XML vtkGenIOReader.xml
   SERVER_MANAGER_SOURCES vtkGenIOReader.cxx
   SERVER_SOURCES ${SRC_LIST}
