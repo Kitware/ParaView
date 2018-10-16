@@ -4700,7 +4700,7 @@
       <Documentation>
         Global setup for Cinema Image Database output.
       </Documentation>
-      <IntVectorProperty name="Deferred Rendering"
+      <IntVectorProperty name="DeferredRendering"
         number_of_elements="1"
         default_values="0">
         <Documentation>
@@ -4712,7 +4712,7 @@
           <Entry text="Composable+Recolorable" value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <IntVectorProperty name="Camera Model"
+      <IntVectorProperty name="CameraModel"
         number_of_elements="1"
         default_values="0">
         <Documentation>
@@ -4725,7 +4725,7 @@
           <Entry text="Outward Pose" value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <StringVectorProperty name="Track Object"
+      <StringVectorProperty name="TrackObject"
         number_of_elements="1"
         default_values="None">
         <Documentation>
