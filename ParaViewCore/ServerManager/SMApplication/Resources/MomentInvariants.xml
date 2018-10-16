@@ -6,7 +6,7 @@
         short_help="MomentInvariants vtkComputeMoments">
      </Documentation>
      <InputProperty
-        name="Input Dataset"
+        name="Input"
         port_index="0"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
@@ -21,7 +21,7 @@
            </Documentation>
       </InputProperty>
      <InputProperty
-        name="Input Grid"
+        name="InputGrid"
         port_index="1"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
@@ -67,7 +67,7 @@
         short_help="MomentInvariants vtkPComputeMoments">
      </Documentation>
      <InputProperty
-        name="Input Dataset"
+        name="Input"
         port_index="0"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
@@ -82,7 +82,7 @@
            </Documentation>
       </InputProperty>
      <InputProperty
-        name="Input Grid"
+        name="InputGrid"
         port_index="1"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
@@ -128,7 +128,7 @@
         short_help="MomentInvariants vtkMomentInvariants">
      </Documentation>
      <InputProperty
-        name="Input Pattern"
+        name="Input"
         port_index="0"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
@@ -143,7 +143,7 @@
            </Documentation>
       </InputProperty>
      <InputProperty
-        name="Input Computed Moments"
+        name="InputComputedMoments"
         port_index="1"
         command="SetInputConnection">
            <ProxyGroupDomain name="groups">
