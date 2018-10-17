@@ -144,7 +144,7 @@ class pqCustomizeShortcutsModel : public QAbstractItemModel
           // category menus. Ignore all but the alphabetical category to avoid duplicates.
           continue;
         }
-        if (actionName != "Recent Files" &&
+        if (actionName != "Recent_Files" &&
           (!(root->name() == "Macros" && (actionName == "Edit..." || actionName == "Delete..."))))
         {
           TreeItem* myItem = new TreeItem(actionName, settingsKey, false, action, root);
