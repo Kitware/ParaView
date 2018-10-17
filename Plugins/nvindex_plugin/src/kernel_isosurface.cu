@@ -93,12 +93,8 @@ public:
     float iso_max = (1.0f - m_isosurface_params->iso_max) * colormap.get_domain_min() +
       m_isosurface_params->iso_max * colormap.get_domain_max();
 
-    if (iso_max > iso_min)
-    {
-      const float iso_tmp = iso_min;
-      iso_min = iso_max;
-      iso_max = iso_tmp;
-    }
+    if (iso_max < iso_min)
+      return NV_IDX_PROG_DISCARD_SAMPLE;
 
     // sample volume and colormap
     const auto  svol_sampler = volume.generate_sampler<float>(
@@ -113,16 +109,14 @@ public:
     const float vs_dr_n = svol_sampler.fetch_sample(sample_position - ray_dir * rh);
 
     // sum up threshold exceeds in both directions for iso_min
-    float sum_over = float((vs_dr_p > iso_min) + (vs_dr_n > iso_min) + (volume_sample > iso_min));
-    float sum_under = float((vs_dr_p < iso_min) + (vs_dr_n < iso_min) + (volume_sample < iso_min));
+    float sum_over_min = float((vs_dr_p > iso_min) + (vs_dr_n > iso_min) + (volume_sample > iso_min));
+    float sum_under_min = float((vs_dr_p < iso_min) + (vs_dr_n < iso_min) + (volume_sample < iso_min));
 
     // check for iso_min intersections
-    if (sum_over > 0 && sum_under > 0)
+    if (sum_over_min > 0 && sum_under_min > 0)
     {
       // sample color
       const float4 sample_color = colormap.lookup(iso_min); // use isovalue color
-      const float3 iso_normal =
-        -normalize(volume_gradient<Volume_filter_mode::TRILINEAR>(volume, sample_position)); // get isosurface normal
 
       // check if to skip sample
       if (sample_color.w < m_isosurface_params->min_alpha)
@@ -131,37 +125,12 @@ public:
       }
       else
       {
-        // show normal grid lines
-        if (m_isosurface_params->show_grid)
-        {
-          // compute angles
-          const float ang_ng = M_PI / (float)(m_isosurface_params->ng_num + 1);
-
-          // compute modulo difference
-          const float ang_mx = fmodf(acos(iso_normal.x), ang_ng);
-          const float ang_my = fmodf(acos(iso_normal.y), ang_ng);
-          const float ang_mz = fmodf(acos(iso_normal.z), ang_ng);
-
-          if (fabsf(ang_mx) < m_isosurface_params->ng_width)
-          {
-            sample_output.color = make_float4(0.5f, 0.f, 0.f, 1.f);
-            return NV_IDX_PROG_OK;
-          }
-          else if (fabsf(ang_my) < m_isosurface_params->ng_width)
-          {
-            sample_output.color = make_float4(0.f, 0.5f, 0.f, 1.f);
-            return NV_IDX_PROG_OK;
-          }
-          else if (fabsf(ang_mz) < m_isosurface_params->ng_width)
-          {
-            sample_output.color = make_float4(0.f, 0.f, 0.5f, 1.f);
-            return NV_IDX_PROG_OK;
-          }
-        }
-
         // valid intersection found
         if (m_isosurface_params->use_shading)
         {
+          // get isosurface normal
+          const float3 iso_normal =
+            -normalize(volume_gradient<Volume_filter_mode::TRILINEAR>(volume, sample_position));
           sample_output.color = blinn_shader(iso_normal, sample_color, ray_dir);
         }
         else
@@ -174,112 +143,66 @@ public:
         return NV_IDX_PROG_OK;
       }
     }
-    else if ((m_isosurface_params->fill_up == 1 && sum_over >= 3) ||
-      (m_isosurface_params->fill_up == -1 && sum_under >= 3))
+    else if(sum_over_min >= 3)
     {
-      // use iso_min color
-      sample_output.color = colormap.lookup(iso_min);
-      sample_output.color.w = 1.0f;
+      // sum up threshold exceeds in both directions for iso_max
+      float sum_over_max = float((vs_dr_p > iso_max) + (vs_dr_n > iso_max) + (volume_sample > iso_max));
+      float sum_under_max = float((vs_dr_p < iso_max) + (vs_dr_n < iso_max) + (volume_sample < iso_max));
 
-      return NV_IDX_PROG_OK;
-    }
-    else if ((m_isosurface_params->fill_up == 2 && sum_over >= 3) ||
-      (m_isosurface_params->fill_up == -2 && sum_under >= 3))
-    {
-      // use sample color
-      sample_output.color = colormap.lookup(volume_sample);
-
-      return NV_IDX_PROG_OK;
-    }
-    else
-    {
-      // no isosurface intersection
-      // return NV_IDX_PROG_DISCARD_SAMPLE;
-    }
-
-    // sum up threshold exceeds in both directions for iso_max
-    sum_over = float((vs_dr_p > iso_max) + (vs_dr_n > iso_max) + (volume_sample > iso_max));
-    sum_under = float((vs_dr_p < iso_max) + (vs_dr_n < iso_max) + (volume_sample < iso_max));
-
-    // check for iso_max intersections
-    if (sum_over > 0 && sum_under > 0)
-    {
-      // sample color
-      const float4 sample_color = colormap.lookup(iso_max); // use isovalue color
-      const float3 iso_normal =
-        -normalize(volume_gradient<Volume_filter_mode::TRILINEAR>(volume, sample_position)); // get isosurface normal
-
-      // check if to skip sample
-      if (sample_color.w < m_isosurface_params->min_alpha)
-        return NV_IDX_PROG_DISCARD_SAMPLE;
-
-      // show normal grid lines
-      if (m_isosurface_params->show_grid)
+      // check for iso_max intersections
+      if (sum_over_max > 0 && sum_under_max > 0)
       {
-        // compute angles
-        const float ang_ng = M_PI / (float)(m_isosurface_params->ng_num + 1);
+        // sample color
+        const float4 sample_color = colormap.lookup(iso_max); // use isovalue color
 
-        // compute modulo difference
-        const float ang_mx = fmodf(acos(iso_normal.x), ang_ng);
-        const float ang_my = fmodf(acos(iso_normal.y), ang_ng);
-        const float ang_mz = fmodf(acos(iso_normal.z), ang_ng);
+        // check if to skip sample
+        if (sample_color.w < m_isosurface_params->min_alpha)
+          return NV_IDX_PROG_DISCARD_SAMPLE;
 
-        if (fabsf(ang_mx) < m_isosurface_params->ng_width)
+        // valid intersection found
+        if (m_isosurface_params->use_shading)
         {
-          sample_output.color = make_float4(0.5f, 0.f, 0.f, 1.f);
-          return NV_IDX_PROG_OK;
+          // get isosurface normal
+          const float3 iso_normal =
+            -normalize(volume_gradient<Volume_filter_mode::TRILINEAR>(volume, sample_position));
+          sample_output.color = blinn_shader(iso_normal, sample_color, ray_dir);
         }
-        else if (fabsf(ang_my) < m_isosurface_params->ng_width)
+        else
         {
-          sample_output.color = make_float4(0.f, 0.5f, 0.f, 1.f);
-          return NV_IDX_PROG_OK;
+          // use sample color
+          sample_output.color = sample_color;
+          sample_output.color.w = 1.0f;
         }
-        else if (fabsf(ang_mz) < m_isosurface_params->ng_width)
-        {
-          sample_output.color = make_float4(0.f, 0.f, 0.5f, 1.f);
-          return NV_IDX_PROG_OK;
-        }
+
+        return NV_IDX_PROG_OK;
       }
-
-      // valid intersection found
-      if (m_isosurface_params->use_shading)
+      else if(sum_under_max >=3 && m_isosurface_params->fill_up > 0)
       {
-        sample_output.color = blinn_shader(iso_normal, sample_color, ray_dir);
+        if(m_isosurface_params->fill_up == 1)
+        {
+          // use iso_min color
+          sample_output.color = colormap.lookup(iso_min);
+          sample_output.color.w = 1.0f;
+          return NV_IDX_PROG_OK;
+        }
+        else
+        {
+          // use sample color
+          sample_output.color = colormap.lookup(volume_sample);
+          return NV_IDX_PROG_OK;
+        }
       }
       else
       {
-        // use sample color
-        sample_output.color = sample_color;
-        sample_output.color.w = 1.0f;
+        // no isosurface intersection
+        return NV_IDX_PROG_DISCARD_SAMPLE;
       }
-
-      return NV_IDX_PROG_OK;
-    }
-    else if ((m_isosurface_params->fill_up == 1 && sum_over >= 3) ||
-      (m_isosurface_params->fill_up == -1 && sum_under >= 3))
-    {
-      // use iso_max color
-      sample_output.color = colormap.lookup(iso_max);
-      sample_output.color.w = 1.0f;
-
-      return NV_IDX_PROG_OK;
-    }
-    else if ((m_isosurface_params->fill_up == 2 && sum_over >= 3) ||
-      (m_isosurface_params->fill_up == -2 && sum_under >= 3))
-    {
-      // use sample color
-      sample_output.color = colormap.lookup(volume_sample);
-
-      return NV_IDX_PROG_OK;
     }
     else
     {
       // no isosurface intersection
       return NV_IDX_PROG_DISCARD_SAMPLE;
     }
-
-    // sample_output.color = make_float4(0.f, 0.5f, 1.f, 1.f);
-    // return NV_IDX_PROG_OK;
   }
 
   NV_IDX_DEVICE_INLINE_MEMBER
