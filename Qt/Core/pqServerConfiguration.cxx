@@ -124,6 +124,9 @@ void pqServerConfiguration::setResource(const pqServerResource& arg_resource)
 void pqServerConfiguration::setResource(const QString& str)
 {
   this->XML->SetAttribute("resource", str.toLocal8Bit().data());
+
+  // Make sure this->ActualURI is correctly updated if needed
+  this->parseSshPortForwardingXML();
 }
 
 //-----------------------------------------------------------------------------
