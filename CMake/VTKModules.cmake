@@ -390,6 +390,7 @@ endif()
 list(APPEND _vtk_modules vtkRenderingLICOpenGL2)
 list(APPEND _vtk_modules vtkDomainsChemistryOpenGL2)
 list (APPEND _vtk_modules vtkIOSegY)
+list (APPEND _vtk_modules vtkIOCityGML)
 list(APPEND _vtk_mpi_modules vtkRenderingParallelLIC)
 if(PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules
