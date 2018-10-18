@@ -28,9 +28,15 @@ vtkSpreadSheetRepresentation::vtkSpreadSheetRepresentation()
 {
   this->SetNumberOfInputPorts(3);
   this->DataConditioner->SetGenerateOriginalIds(1);
+  this->DataConditioner->SetFlattenTable(true);
+  this->DataConditioner->SetSplitComponentsNamingMode(
+    vtkSplitColumnComponents::NUMBERS_WITH_UNDERSCORES);
   this->CleanArrays->SetInputConnection(this->DataConditioner->GetOutputPort());
 
   this->ExtractedDataConditioner->SetGenerateOriginalIds(0);
+  this->ExtractedDataConditioner->SetFlattenTable(true);
+  this->ExtractedDataConditioner->SetSplitComponentsNamingMode(
+    vtkSplitColumnComponents::NUMBERS_WITH_UNDERSCORES);
   this->ExtractedCleanArrays->SetInputConnection(this->ExtractedDataConditioner->GetOutputPort());
 }
 

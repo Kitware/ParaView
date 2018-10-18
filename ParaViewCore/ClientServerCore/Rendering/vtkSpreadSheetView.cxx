@@ -21,6 +21,8 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkFieldData.h"
+#include "vtkInformation.h"
 #include "vtkMarkSelectedRows.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
@@ -32,6 +34,7 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSortedTableStreamer.h"
+#include "vtkSplitColumnComponents.h"
 #include "vtkSpreadSheetRepresentation.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
@@ -78,11 +81,119 @@ struct OrderByNames : std::binary_function<vtkAbstractArray*, vtkAbstractArray*,
     return (a1Name < a2Name);
   }
 };
+
+/// internal function to convert any array's name to a user friendly name.
+const char* get_userfriendly_name(
+  const char* name, vtkSpreadSheetView* self, bool* converted = nullptr)
+{
+  if (converted)
+  {
+    *converted = true;
+  }
+  if (name == nullptr || name[0] == '\0')
+  {
+    if (converted)
+    {
+      *converted = false;
+    }
+    return name;
+  }
+  else if (strcmp("vtkOriginalProcessIds", name) == 0)
+  {
+    return "Process ID";
+  }
+  else if (strcmp("vtkOriginalIndices", name) == 0)
+  {
+    switch (self->GetFieldAssociation())
+    {
+      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+        return "Point ID";
+      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+        return "Cell ID";
+      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+        return "Vertex ID";
+      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+        return "Edge ID";
+      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+        return "Row ID";
+      default:
+        // LOG_S(INFO) << "Unknown field association encountered.";
+        return name;
+    }
+  }
+  else if (strcmp("vtkOriginalCellIds", name) == 0 && self->GetShowExtractedSelection())
+  {
+    return "Cell ID";
+  }
+  else if (strcmp("vtkOriginalPointIds", name) == 0 && self->GetShowExtractedSelection())
+  {
+    return "Point ID";
+  }
+  else if (strcmp("vtkOriginalRowIds", name) == 0 && self->GetShowExtractedSelection())
+  {
+    return "Row ID";
+  }
+  else if (strcmp("vtkCompositeIndexArray", name) == 0)
+  {
+    return "Block Number";
+  }
+
+  if (converted)
+  {
+    *converted = false;
+  }
+  return name;
+}
 }
 
 class vtkSpreadSheetView::vtkInternals
 {
-public:
+  std::vector<std::tuple<std::string, std::string, int> > ColumnMetaData;
+  std::map<std::string, size_t> ColumnIndexMap;
+
+  void UpdateColumnMetaData(vtkTable* table)
+  {
+    this->ColumnMetaData.clear();
+    this->ColumnIndexMap.clear();
+
+    std::map<std::string, vtkIdType> index_map; // this is just to make the lookup faster.
+    for (vtkIdType cc = 0, max = table->GetNumberOfColumns(); cc < max; ++cc)
+    {
+      // this build a tuple that indicates it's not an extracted component
+      auto col = table->GetColumn(cc);
+      auto colInfo = col->GetInformation();
+
+      const std::string original_name =
+        colInfo->Has(vtkSplitColumnComponents::ORIGINAL_ARRAY_NAME())
+        ? std::string(colInfo->Get(vtkSplitColumnComponents::ORIGINAL_ARRAY_NAME()))
+        : std::string();
+
+      const int original_component =
+        colInfo->Has(vtkSplitColumnComponents::ORIGINAL_COMPONENT_NUMBER())
+        ? colInfo->Get(vtkSplitColumnComponents::ORIGINAL_COMPONENT_NUMBER())
+        : -1;
+
+      auto tuple = std::make_tuple(std::string(col->GetName()),
+        original_component >= 0 ? original_name : std::string(), original_component);
+      this->ColumnIndexMap[std::get<0>(tuple)] = this->ColumnMetaData.size();
+      this->ColumnMetaData.push_back(std::move(tuple));
+    }
+
+    assert(this->ColumnMetaData.size() == this->ColumnIndexMap.size() &&
+      this->ColumnIndexMap.size() == static_cast<size_t>(table->GetNumberOfColumns()));
+  }
+
+  vtkIdType GetMostRecentlyAccessedBlock(vtkSpreadSheetView* self)
+  {
+    vtkIdType maxBlockId = self->GetNumberOfRows() / self->TableStreamer->GetBlockSize();
+    if (this->MostRecentlyAccessedBlock >= 0 && this->MostRecentlyAccessedBlock <= maxBlockId)
+    {
+      return this->MostRecentlyAccessedBlock;
+    }
+    this->MostRecentlyAccessedBlock = 0;
+    return 0;
+  }
+
   class CacheInfo
   {
   public:
@@ -92,6 +203,43 @@ public:
 
   typedef std::map<vtkIdType, CacheInfo> CacheType;
   CacheType CachedBlocks;
+
+public:
+  void ClearCache()
+  {
+    this->CachedBlocks.clear();
+    this->ColumnMetaData.clear();
+    this->ColumnIndexMap.clear();
+  }
+
+  vtkIdType GetNumberOfColumns(vtkSpreadSheetView* self)
+  {
+    if (this->ActiveRepresentation != nullptr && this->ColumnMetaData.size() == 0)
+    {
+      this->GetSomeBlock(self);
+    }
+    return static_cast<vtkIdType>(this->ColumnMetaData.size());
+  }
+
+  const char* GetColumnName(vtkIdType index, vtkSpreadSheetView* self)
+  {
+    if (this->GetNumberOfColumns(self) > index)
+    {
+      return std::get<0>(this->ColumnMetaData[index]).c_str();
+    }
+    return nullptr;
+  }
+
+  std::string GetOriginalArrayName(const std::string& aname) const
+  {
+    auto iter = this->ColumnIndexMap.find(aname);
+    if (iter != this->ColumnIndexMap.end())
+    {
+      const auto& tuple = this->ColumnMetaData[iter->second];
+      return !std::get<1>(tuple).empty() ? std::get<1>(tuple) : aname;
+    }
+    return aname;
+  }
 
   vtkTable* GetDataObject(vtkIdType blockId)
   {
@@ -151,17 +299,34 @@ public:
     info.RecentUseTime.Modified();
     this->CachedBlocks[blockId] = info;
     this->MostRecentlyAccessedBlock = blockId;
+
+    if (this->CachedBlocks.size() == 1)
+    {
+      this->UpdateColumnMetaData(clone);
+    }
   }
 
-  vtkIdType GetMostRecentlyAccessedBlock(vtkSpreadSheetView* self)
+  /**
+   * A convenient method to get some block. It returns either a cached block
+   * or the most recently accessed block, if possible. This method will avoid a
+   * fetch unless needed.
+   */
+  vtkTable* GetSomeBlock(vtkSpreadSheetView* self)
   {
-    vtkIdType maxBlockId = self->GetNumberOfRows() / self->TableStreamer->GetBlockSize();
-    if (this->MostRecentlyAccessedBlock >= 0 && this->MostRecentlyAccessedBlock <= maxBlockId)
+    const auto mrbId = this->GetMostRecentlyAccessedBlock(self);
+    if (auto table = this->GetDataObject(mrbId))
     {
-      return this->MostRecentlyAccessedBlock;
+      return table;
     }
-    this->MostRecentlyAccessedBlock = 0;
-    return 0;
+
+    for (const auto& cinfo : this->CachedBlocks)
+    {
+      if (cinfo.second.Dataobject != nullptr)
+      {
+        return cinfo.second.Dataobject;
+      }
+    }
+    return self->FetchBlock(mrbId);
   }
 
   vtkIdType MostRecentlyAccessedBlock;
@@ -357,18 +522,17 @@ void vtkSpreadSheetView::ClearHiddenColumnsByLabel()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSpreadSheetView::IsColumnHiddenByLabel(const char* columnLabel)
+bool vtkSpreadSheetView::IsColumnHiddenByLabel(const std::string& columnLabel)
 {
   const auto& internals = *this->Internals;
-  return columnLabel
-    ? internals.HiddenColumnsByLabel.find(columnLabel) != internals.HiddenColumnsByLabel.end()
-    : true;
+  return columnLabel.empty() ? true : internals.HiddenColumnsByLabel.find(columnLabel) !=
+      internals.HiddenColumnsByLabel.end();
 }
 
 //----------------------------------------------------------------------------
 void vtkSpreadSheetView::ClearCache()
 {
-  this->Internals->CachedBlocks.clear();
+  this->Internals->ClearCache();
 }
 
 //----------------------------------------------------------------------------
@@ -497,23 +661,14 @@ void vtkSpreadSheetView::OnRepresentationUpdated()
 }
 
 //----------------------------------------------------------------------------
-vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex, bool skipCache)
+vtkTable* vtkSpreadSheetView::FetchBlock(vtkIdType blockindex)
 {
-  vtkTable* block;
-  // Do not use cache when the blocks are fetched for exporting.
-  if (skipCache)
+  vtkTable* block = this->Internals->GetDataObject(blockindex);
+  if (!block)
   {
     block = this->FetchBlockCallback(blockindex);
-  }
-  else
-  {
-    block = this->Internals->GetDataObject(blockindex);
-    if (!block)
-    {
-      block = this->FetchBlockCallback(blockindex);
-      this->Internals->AddToCache(blockindex, block, 10);
-      this->InvokeEvent(vtkCommand::UpdateEvent, &blockindex);
-    }
+    this->Internals->AddToCache(blockindex, block, 10);
+    this->InvokeEvent(vtkCommand::UpdateEvent, &blockindex);
   }
   return block;
 }
@@ -544,15 +699,7 @@ vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
 //----------------------------------------------------------------------------
 vtkIdType vtkSpreadSheetView::GetNumberOfColumns()
 {
-  if (this->Internals->ActiveRepresentation)
-  {
-    vtkTable* block0 = this->FetchBlock(this->Internals->GetMostRecentlyAccessedBlock(this));
-    if (block0)
-    {
-      return block0->GetNumberOfColumns();
-    }
-  }
-  return 0;
+  return this->Internals->GetNumberOfColumns(this);
 }
 
 //----------------------------------------------------------------------------
@@ -564,70 +711,26 @@ vtkIdType vtkSpreadSheetView::GetNumberOfRows()
 //----------------------------------------------------------------------------
 const char* vtkSpreadSheetView::GetColumnName(vtkIdType index)
 {
-  if (this->Internals->ActiveRepresentation)
-  {
-    vtkTable* block0 = this->FetchBlock(this->Internals->GetMostRecentlyAccessedBlock(this));
-    if (block0)
-    {
-      return block0->GetColumnName(index);
-    }
-  }
-  return NULL;
+  return this->Internals->GetColumnName(index, this);
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSpreadSheetView::GetColumnLabel(vtkIdType index)
+std::string vtkSpreadSheetView::GetColumnLabel(vtkIdType index)
 {
   return this->GetColumnLabel(this->GetColumnName(index));
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSpreadSheetView::GetColumnLabel(const char* name)
+std::string vtkSpreadSheetView::GetColumnLabel(const char* name)
 {
   if (name == nullptr || this->IsColumnInternal(name))
   {
-    return nullptr;
+    return std::string();
   }
-  else if (strcmp("vtkOriginalProcessIds", name) == 0)
-  {
-    return "Process ID";
-  }
-  else if (strcmp("vtkOriginalIndices", name) == 0 && this->Internals->ActiveRepresentation)
-  {
-    switch (this->FieldAssociation)
-    {
-      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-        return "Point ID";
-      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-        return "Cell ID";
-      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-        return "Vertex ID";
-      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-        return "Edge ID";
-      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-        return "Row ID";
-      default:
-        // LOG_S(INFO) << "Unknown field association encountered.";
-        return name;
-    }
-  }
-  else if (strcmp("vtkOriginalCellIds", name) == 0 && this->GetShowExtractedSelection())
-  {
-    return "Cell ID";
-  }
-  else if (strcmp("vtkOriginalPointIds", name) == 0 && this->GetShowExtractedSelection())
-  {
-    return "Point ID";
-  }
-  else if (strcmp("vtkOriginalRowIds", name) == 0 && this->GetShowExtractedSelection())
-  {
-    return "Row ID";
-  }
-  else if (strcmp("vtkCompositeIndexArray", name) == 0)
-  {
-    return "Block Number";
-  }
-  return name;
+
+  bool cleaned = false;
+  auto cleanedname = ::get_userfriendly_name(name, this, &cleaned);
+  return cleaned ? cleanedname : this->Internals->GetOriginalArrayName(name);
 }
 
 //----------------------------------------------------------------------------
@@ -711,7 +814,10 @@ bool vtkSpreadSheetView::Export(vtkCSVExporter* exporter)
               }
               else
               {
-                exporter->SetColumnLabel(array->GetName(), label);
+                // we don't use the label since it is same for all components in
+                // the array, instead we only use user friendly version of the
+                // array name.
+                exporter->SetColumnLabel(array->GetName(), ::get_userfriendly_name(name, this));
               }
             }
           }
@@ -731,13 +837,6 @@ bool vtkSpreadSheetView::Export(vtkCSVExporter* exporter)
 void vtkSpreadSheetView::SetColumnNameToSort(const char* name)
 {
   this->TableStreamer->SetColumnNameToSort(name);
-  this->ClearCache();
-}
-
-//----------------------------------------------------------------------------
-void vtkSpreadSheetView::SetComponentToSort(int val)
-{
-  this->TableStreamer->SetSelectedComponent(val);
   this->ClearCache();
 }
 

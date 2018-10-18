@@ -13165,10 +13165,6 @@
       <Property name="Representations" id="43681.Representations" number_of_elements="1">
         <Proxy value="43670"/>
       </Property>
-      <Property name="SelectedComponent" id="43681.SelectedComponent" number_of_elements="1">
-        <Element index="0" value="-1"/>
-        <Domain name="range" id="43681.SelectedComponent.range"/>
-      </Property>
       <Property name="SelectionOnly" id="43681.SelectionOnly" number_of_elements="1">
         <Element index="0" value="0"/>
         <Domain name="bool" id="43681.SelectionOnly.bool"/>

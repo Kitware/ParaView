@@ -27,6 +27,8 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 
+#include <string> // for std::string
+
 class vtkCSVExporter;
 class vtkClientServerMoveData;
 class vtkMarkSelectedRows;
@@ -99,7 +101,7 @@ public:
   void ClearHiddenColumnsByName();
 
   void HideColumnByLabel(const char* columnLabel);
-  bool IsColumnHiddenByLabel(const char* columnLabel);
+  bool IsColumnHiddenByLabel(const std::string& columnLabel);
   void ClearHiddenColumnsByLabel();
   //@}
 
@@ -139,8 +141,8 @@ public:
    *
    * \note CallOnClient
    */
-  const char* GetColumnLabel(vtkIdType index);
-  const char* GetColumnLabel(const char* columnName);
+  std::string GetColumnLabel(vtkIdType index);
+  std::string GetColumnLabel(const char* columnName);
   //@}
 
   /**
@@ -177,12 +179,6 @@ public:
    */
   void SetColumnNameToSort(const char*);
   void SetColumnNameToSort() { this->SetColumnNameToSort(NULL); }
-
-  /**
-   * Get/Set the component to sort with. Use -1 (default) for magnitude.
-   * \note CallOnAllProcesses
-   */
-  void SetComponentToSort(int val);
 
   /**
    * Get/Set whether the sort order must be Max to Min rather than Min to Max.
@@ -223,7 +219,7 @@ protected:
 
   void OnRepresentationUpdated();
 
-  vtkTable* FetchBlock(vtkIdType blockindex, bool skipCache = false);
+  vtkTable* FetchBlock(vtkIdType blockindex);
 
   bool ShowExtractedSelection;
   bool GenerateCellConnectivity;

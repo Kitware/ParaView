@@ -69,12 +69,6 @@ public:
 
 protected slots:
   /**
-  * called when a header section is double-clicked. It results in that column
-  * being stretched over the full view for better viewing.
-  */
-  void onSectionDoubleClicked(int);
-
-  /**
   * called when a header section is clicked in order to be sorted.
   * It results in that column being sorted if possible.
   */
@@ -92,12 +86,13 @@ protected:
   */
   void paintEvent(QPaintEvent* event) override;
 
-  bool SingleColumnMode;
-
 private:
   Q_DISABLE_COPY(pqSpreadSheetViewWidget)
 
   class pqDelegate;
+
+  bool SingleColumnMode;
+  int OldColumnCount;
 };
 
 #endif

@@ -28,13 +28,16 @@
 #include "vtkPointData.h"
 #include "vtkPointSet.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSmartPointer.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
 //----------------------------------------------------------------------------
@@ -73,11 +76,9 @@ int vtkAttributeDataToTableFilter::RequestData(vtkInformation* vtkNotUsed(reques
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
-  vtkFieldData* fieldData = this->GetSelectedField(input);
-
-  if (fieldData)
+  vtkTable* output = vtkTable::GetData(outputVector);
+  if (vtkFieldData* fieldData = input->GetAttributesAsFieldData(this->FieldAssociation))
   {
-    vtkTable* output = vtkTable::GetData(outputVector);
     if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_NONE)
     {
       // Field data can have different length arrays, so we need to create
@@ -87,65 +88,10 @@ int vtkAttributeDataToTableFilter::RequestData(vtkInformation* vtkNotUsed(reques
     else
     {
       output->GetRowData()->ShallowCopy(fieldData);
-      if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(input);
+      if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS && ds != nullptr)
       {
-        // BUG #6830. Add cell-type array.
-        vtkDataSet* ds = vtkDataSet::SafeDownCast(input);
-        if (ds)
-        {
-          vtkCharArray* celltypes = vtkCharArray::New();
-          celltypes->SetName("Cell Type");
-          vtkIdType numcells = ds->GetNumberOfCells();
-          celltypes->SetNumberOfTuples(numcells);
-          char* ptr = celltypes->GetPointer(0);
-          vtkIdList* points = vtkIdList::New();
-          vtkIdType maxpoints = 0;
-          for (vtkIdType cc = 0; cc < numcells; cc++)
-          {
-            ptr[cc] = static_cast<char>(ds->GetCellType(cc));
-            ds->GetCellPoints(cc, points);
-            maxpoints = maxpoints > points->GetNumberOfIds() ? maxpoints : points->GetNumberOfIds();
-          }
-          output->GetRowData()->AddArray(celltypes);
-          celltypes->Delete();
-
-          if (this->GenerateCellConnectivity)
-          {
-            vtkIdTypeArray** indices = new vtkIdTypeArray*[maxpoints];
-            int w = 1 + log10(maxpoints);
-            for (vtkIdType i = 0; i < maxpoints; i++)
-            {
-              std::stringstream arrayname;
-              arrayname << "Point Index " << std::setw(w) << std::setfill('0') << i;
-              indices[i] = vtkIdTypeArray::New();
-              indices[i]->SetName(arrayname.str().c_str());
-              indices[i]->SetNumberOfTuples(numcells);
-            }
-            for (vtkIdType cc = 0; cc < numcells; cc++)
-            {
-              ds->GetCellPoints(cc, points);
-              for (vtkIdType pt = 0; pt < maxpoints; pt++)
-              {
-                if (pt < points->GetNumberOfIds())
-                {
-                  indices[pt]->SetValue(cc, points->GetId(pt));
-                }
-                else
-                {
-                  indices[pt]->SetValue(cc, -1);
-                }
-              }
-            }
-            for (int i = 0; i < maxpoints; i++)
-            {
-              this->ConvertToOriginalIds(ds, indices[i]);
-              output->GetRowData()->AddArray(indices[i]);
-              indices[i]->Delete();
-            }
-            delete[] indices;
-          }
-          points->Delete();
-        }
+        this->AddCellTypeAndConnectivity(output, ds);
       }
     }
 
@@ -165,88 +111,100 @@ int vtkAttributeDataToTableFilter::RequestData(vtkInformation* vtkNotUsed(reques
 }
 
 //----------------------------------------------------------------------------
+void vtkAttributeDataToTableFilter::AddCellTypeAndConnectivity(vtkTable* output, vtkDataSet* ds)
+{
+  vtkNew<vtkCharArray> celltypes;
+  celltypes->SetName("Cell Type");
+  const vtkIdType numcells = ds->GetNumberOfCells();
+  celltypes->SetNumberOfTuples(numcells);
+  char* ptr = celltypes->GetPointer(0);
+  vtkNew<vtkIdList> points;
+  vtkIdType maxpoints = 0;
+  for (vtkIdType cc = 0; cc < numcells; cc++)
+  {
+    ptr[cc] = static_cast<char>(ds->GetCellType(cc));
+    ds->GetCellPoints(cc, points);
+    maxpoints = maxpoints > points->GetNumberOfIds() ? maxpoints : points->GetNumberOfIds();
+  }
+  output->GetRowData()->AddArray(celltypes);
+
+  if (this->GenerateCellConnectivity)
+  {
+    std::vector<vtkSmartPointer<vtkIdTypeArray> > indices;
+    int w = 1 + log10(maxpoints);
+    for (vtkIdType i = 0; i < maxpoints; i++)
+    {
+      std::stringstream arrayname;
+      arrayname << "Point Index " << std::setw(w) << std::setfill('0') << i;
+      vtkNew<vtkIdTypeArray> idarray;
+      idarray->SetName(arrayname.str().c_str());
+      idarray->SetNumberOfTuples(numcells);
+      indices[i] = idarray;
+    }
+
+    for (vtkIdType cc = 0; cc < numcells; cc++)
+    {
+      ds->GetCellPoints(cc, points);
+      for (vtkIdType pt = 0; pt < maxpoints; pt++)
+      {
+        if (pt < points->GetNumberOfIds())
+        {
+          indices[pt]->SetValue(cc, points->GetId(pt));
+        }
+        else
+        {
+          indices[pt]->SetValue(cc, -1);
+        }
+      }
+    }
+    for (int i = 0; i < maxpoints; i++)
+    {
+      this->ConvertToOriginalIds(ds, indices[i]);
+      output->GetRowData()->AddArray(indices[i]);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkAttributeDataToTableFilter::PassFieldData(vtkFieldData* output, vtkFieldData* input)
 {
   output->DeepCopy(input);
+
   // Now resize arrays to match the longest one.
-  vtkIdType max_Tuples = 0;
-  int cc;
-  for (cc = 0; cc < output->GetNumberOfArrays(); cc++)
+  vtkIdType max_count = 0;
+  for (int cc = 0, max = output->GetNumberOfArrays(); cc < max; ++cc)
   {
-    vtkAbstractArray* arr = output->GetAbstractArray(cc);
-    if (arr && arr->GetNumberOfTuples() > max_Tuples)
+    if (vtkAbstractArray* arr = output->GetAbstractArray(cc))
     {
-      max_Tuples = arr->GetNumberOfTuples();
+      max_count = std::max(max_count, arr->GetNumberOfTuples());
     }
   }
-  for (cc = 0; cc < output->GetNumberOfArrays(); cc++)
+  for (int cc = 0, max = output->GetNumberOfArrays(); cc < max; ++cc)
   {
     vtkAbstractArray* arr = output->GetAbstractArray(cc);
-    vtkIdType numTuples = arr->GetNumberOfTuples();
-    if (numTuples != max_Tuples)
+    if (!arr)
     {
-      arr->Resize(max_Tuples);
-      arr->SetNumberOfTuples(max_Tuples);
-      int num_comps = arr->GetNumberOfComponents();
+      continue;
+    }
 
+    const vtkIdType current_count = arr->GetNumberOfTuples();
+    if (current_count != max_count)
+    {
+      arr->SetNumberOfTuples(max_count);
+      const int num_comps = arr->GetNumberOfComponents();
       vtkDataArray* da = vtkDataArray::SafeDownCast(arr);
-      if (da)
+      if (da != nullptr && num_comps > 0)
       {
-        double* tuple = new double[num_comps + 1];
-        for (int kk = 0; kk < num_comps + 1; kk++)
+        std::vector<double> tuple(num_comps, 0.0);
+        for (vtkIdType jj = current_count; jj < max_count; ++jj)
         {
-          tuple[kk] = 0;
-        }
-        for (vtkIdType jj = numTuples; jj < max_Tuples; jj++)
-        {
-          da->SetTuple(jj, tuple);
+          da->SetTuple(jj, &tuple[0]);
         }
       }
     }
   }
 }
 
-//----------------------------------------------------------------------------
-#define vtkAttributeDataToTableFilterValidate(type, method)                                        \
-  {                                                                                                \
-    type* __temp = type::SafeDownCast(input);                                                      \
-    if (__temp)                                                                                    \
-    {                                                                                              \
-      return __temp->method();                                                                     \
-    }                                                                                              \
-    return 0;                                                                                      \
-  }
-
-//----------------------------------------------------------------------------
-vtkFieldData* vtkAttributeDataToTableFilter::GetSelectedField(vtkDataObject* input)
-{
-  if (input)
-  {
-    switch (this->FieldAssociation)
-    {
-      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-        vtkAttributeDataToTableFilterValidate(vtkDataSet, GetPointData);
-
-      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-        vtkAttributeDataToTableFilterValidate(vtkDataSet, GetCellData);
-
-      case vtkDataObject::FIELD_ASSOCIATION_NONE:
-        return input->GetFieldData();
-
-      case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-        vtkAttributeDataToTableFilterValidate(vtkGraph, GetVertexData);
-
-      case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-        vtkAttributeDataToTableFilterValidate(vtkGraph, GetEdgeData);
-
-      case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-        vtkAttributeDataToTableFilterValidate(vtkTable, GetRowData);
-    }
-  }
-  return 0;
-}
-
-#define VTK_MAX(x, y) ((x) > (y)) ? (x) : (y)
 //----------------------------------------------------------------------------
 void vtkAttributeDataToTableFilter::Decorate(vtkTable* output, vtkDataObject* input)
 {
@@ -271,9 +229,9 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output, vtkDataObject* in
   int cellDims[3];
   if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS && dimensions)
   {
-    cellDims[0] = VTK_MAX(1, (dimensions[0] - 1));
-    cellDims[1] = VTK_MAX(1, (dimensions[1] - 1));
-    cellDims[2] = VTK_MAX(1, (dimensions[2] - 1));
+    cellDims[0] = std::max(1, (dimensions[0] - 1));
+    cellDims[1] = std::max(1, (dimensions[1] - 1));
+    cellDims[2] = std::max(1, (dimensions[2] - 1));
     dimensions = cellDims;
   }
 

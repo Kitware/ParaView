@@ -29,6 +29,7 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkTableAlgorithm.h"
 
+class vtkDataSet;
 class vtkFieldData;
 class vtkIdTypeArray;
 
@@ -106,18 +107,12 @@ protected:
   vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
 
   /**
-   * Internal method to return the chosen field from the input. May return 0 is
-   * the chosen field is not applicable for the current data object or not
-   * present.
-   */
-  vtkFieldData* GetSelectedField(vtkDataObject* input);
-
-  /**
    * Called when AddMetaData is true. Adds meta-data to the output.
    */
   void Decorate(vtkTable* output, vtkDataObject* input);
 
   void PassFieldData(vtkFieldData* output, vtkFieldData* input);
+  void AddCellTypeAndConnectivity(vtkTable* output, vtkDataSet* ds);
 
   int FieldAssociation;
   bool AddMetaData;

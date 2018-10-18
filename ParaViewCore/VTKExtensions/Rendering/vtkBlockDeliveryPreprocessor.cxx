@@ -15,7 +15,6 @@
 #include "vtkBlockDeliveryPreprocessor.h"
 
 #include "vtkAttributeDataToTableFilter.h"
-#include "vtkCompositeDataPipeline.h"
 #include "vtkExtractBlock.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -25,7 +24,6 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#include "vtkSplitColumnComponents.h"
 #include "vtkTable.h"
 #include "vtkUniformGridAMRDataIterator.h"
 
@@ -38,18 +36,20 @@ class vtkBlockDeliveryPreprocessor::CompositeDataSetIndicesType : public std::se
 vtkStandardNewMacro(vtkBlockDeliveryPreprocessor);
 //----------------------------------------------------------------------------
 vtkBlockDeliveryPreprocessor::vtkBlockDeliveryPreprocessor()
+  : FieldAssociation(vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  , FlattenTable(0)
+  , GenerateOriginalIds(true)
+  , GenerateCellConnectivity(false)
+  , SplitComponentsNamingMode(vtkSplitColumnComponents::NAMES_WITH_UNDERSCORES)
+  , CompositeDataSetIndices(new vtkBlockDeliveryPreprocessor::CompositeDataSetIndicesType())
 {
-  this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
-  this->FlattenTable = 0;
-  this->GenerateOriginalIds = true;
-  this->GenerateCellConnectivity = false;
-  this->CompositeDataSetIndices = new CompositeDataSetIndicesType();
 }
 
 //----------------------------------------------------------------------------
 vtkBlockDeliveryPreprocessor::~vtkBlockDeliveryPreprocessor()
 {
   delete this->CompositeDataSetIndices;
+  this->CompositeDataSetIndices = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -129,8 +129,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(
     return 1;
   }
 
-  vtkSmartPointer<vtkAttributeDataToTableFilter> adtf =
-    vtkSmartPointer<vtkAttributeDataToTableFilter>::New();
+  vtkNew<vtkAttributeDataToTableFilter> adtf;
   adtf->SetInputData(inputDO);
   adtf->SetAddMetaData(true);
   adtf->SetGenerateCellConnectivity(this->GenerateCellConnectivity);
@@ -140,19 +139,16 @@ int vtkBlockDeliveryPreprocessor::RequestData(
 
   // Create a pointer of the base class type, so that later stages need not be
   // concerned with whether the data was flattened or not.
-  vtkAlgorithm* filter = adtf;
+  vtkSmartPointer<vtkAlgorithm> filter;
+  filter = adtf;
 
-  vtkSmartPointer<vtkSplitColumnComponents> split;
   if (this->FlattenTable)
   {
-    split = vtkSmartPointer<vtkSplitColumnComponents>::New();
-    vtkCompositeDataPipeline* pipeline = vtkCompositeDataPipeline::New();
-    split->SetExecutive(pipeline);
-    pipeline->Delete();
-    filter = split;
+    vtkNew<vtkSplitColumnComponents> split;
     split->SetInputConnection(adtf->GetOutputPort());
-    split->SetNamingModeToNamesWithUnderscores();
+    split->SetNamingMode(this->SplitComponentsNamingMode);
     split->Update();
+    filter = split;
   }
 
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::SafeDownCast(outputDO);
@@ -200,12 +196,6 @@ int vtkBlockDeliveryPreprocessor::RequestData(
   }
   iter->Delete();
   return 1;
-}
-
-//----------------------------------------------------------------------------
-vtkExecutive* vtkBlockDeliveryPreprocessor::CreateDefaultExecutive()
-{
-  return vtkCompositeDataPipeline::New();
 }
 
 //----------------------------------------------------------------------------
