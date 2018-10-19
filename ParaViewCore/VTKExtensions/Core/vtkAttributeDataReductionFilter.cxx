@@ -167,31 +167,28 @@ static void vtkAttributeDataReductionFilterReduce(vtkDataSetAttributes* output,
     if (dsa->GetNumberOfArrays() > 0 && dsa->GetNumberOfTuples() == numTuples)
     {
       // Now combine this inPD with the outPD using the reduction indicated.
-      for (int i = 0; i < fieldList.GetNumberOfFields(); ++i)
-      {
-        if (fieldList.GetFieldIndex(i) >= 0)
+      auto f = [list_index, progress_offset, progress_factor, self](
+        vtkAbstractArray* fromA, vtkAbstractArray* toA) {
+        vtkDataArray* toDA = vtkDataArray::SafeDownCast(toA);
+        vtkDataArray* fromDA = vtkDataArray::SafeDownCast(fromA);
+        if (!toDA || !fromDA)
         {
-          vtkDataArray* toDA = output->GetArray(fieldList.GetFieldIndex(i));
-          vtkDataArray* fromDA = dsa->GetArray(fieldList.GetDSAIndex(list_index, i));
-          if (!toDA || !fromDA)
-          {
-            continue;
-          }
-          vtkSmartPointer<vtkArrayIterator> toIter;
-          toIter.TakeReference(toDA->NewIterator());
-          vtkSmartPointer<vtkArrayIterator> fromIter;
-          fromIter.TakeReference(fromDA->NewIterator());
-          switch (toDA->GetDataType())
-          {
-            vtkArrayIteratorTemplateMacro(
-              vtkAttributeDataReductionFilterReduce(self, static_cast<VTK_TT*>(toIter.GetPointer()),
-                static_cast<VTK_TT*>(fromIter.GetPointer()), progress_offset, progress_factor));
-            default:
-              vtkGenericWarningMacro(
-                "Cannot reduce arrays of type: " << toDA->GetDataTypeAsString());
-          }
+          return;
         }
-      }
+        vtkSmartPointer<vtkArrayIterator> toIter;
+        toIter.TakeReference(toDA->NewIterator());
+        vtkSmartPointer<vtkArrayIterator> fromIter;
+        fromIter.TakeReference(fromDA->NewIterator());
+        switch (toDA->GetDataType())
+        {
+          vtkArrayIteratorTemplateMacro(
+            vtkAttributeDataReductionFilterReduce(self, static_cast<VTK_TT*>(toIter.GetPointer()),
+              static_cast<VTK_TT*>(fromIter.GetPointer()), progress_offset, progress_factor));
+          default:
+            vtkGenericWarningMacro("Cannot reduce arrays of type: " << toDA->GetDataTypeAsString());
+        }
+      };
+      fieldList.TransformData(list_index, dsa, output, f);
       list_index++;
     }
 
