@@ -50,6 +50,7 @@ set (Module_SRCS
   vtkSMLightProxy.cxx
   vtkSMMaterialDomain.cxx
   vtkSMMaterialLibraryProxy.cxx
+  vtkSMPVMoleculeRepresentationProxy.cxx
   vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOrthographicSliceViewProxy.cxx

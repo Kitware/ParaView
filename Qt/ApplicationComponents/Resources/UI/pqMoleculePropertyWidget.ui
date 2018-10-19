@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MoleculePropertyWidget</class>
+ <widget class="QWidget" name="MoleculePropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>301</width>
+    <height>251</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="wdgLayout" columnstretch="0,0">
+   <item row="1" column="0">
+    <widget class="QLabel" name="presetLabel">
+     <property name="text">
+      <string>Preset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="3">
+    <widget class="QComboBox" name="preset"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="ShowAomsLabel">
+     <property name="text">
+      <string>Show Atoms </string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="showAtoms">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="atomicRadiusTypeLabel">
+     <property name="text">
+      <string>Atom Radius type</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="3">
+    <widget class="QComboBox" name="atomicRadiusType"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="atomicRadiusFactorLabel">
+     <property name="text">
+      <string>Atom Radius Factor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="pqDoubleRangeWidget" name="atomicRadiusFactor" native="true"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="pqScaleByButton" name="scaleAtomicRadiusFactor" native="true"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="QToolButton" name="resetAtomicRadiusFactor" native="true"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="atomicRadiusArrayNameLabel">
+     <property name="text">
+      <string>Atomic Radius Array</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" colspan="3">
+    <widget class="QComboBox" name="atomicRadiusArrayName"/>
+   </item>
+   <item row="6" column="0" colspan="3">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="ShowBondsLabel">
+     <property name="text">
+      <string>Show Bonds</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="showBonds">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="bondRadiusLabel">
+     <property name="text">
+      <string>Bonds Radius</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="pqDoubleRangeWidget" name="bondRadius" native="true"/>
+   </item>
+   <item row="8" column="2">
+    <widget class="pqScaleByButton" name="scaleBondRadius" native="true"/>
+   </item>
+   <item row="8" column="3">
+    <widget class="QToolButton" name="resetBondRadius" native="true"/>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="multiCylindersLabel">
+     <property name="text">
+      <string>Use Multi Cylinders</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QCheckBox" name="useMultiCylinders">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="bondColorModeLabel">
+     <property name="text">
+      <string>Use Atom Color </string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QCheckBox" name="bondColorMode">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="bondColorLabel">
+     <property name="text">
+      <string>Bonds color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="pqColorChooserButton" name="bondColor"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QToolButton</extends>
+   <header>pqColorChooserButton.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqScaleByButton</class>
+   <extends>QToolButton</extends>
+   <header>pqScaleByButton.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

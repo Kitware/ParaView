@@ -6520,6 +6520,9 @@
         </DataTypeDomain>
         <Documentation>Set the input molecule for the
         representation.</Documentation>
+        <InputArrayDomain attribute_type="vertex"
+                          name="input_array"
+                          optional="1" />
       </InputProperty>
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
@@ -6539,21 +6542,89 @@
           The opacity to use when rendering the model.
         </Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetMoleculeRenderMode"
-                         default_values="0"
-                         label="Render Mode"
-                         name="MoleculeRenderMode"
-                         number_of_elements="1"
-                         panel_visibility="default">
-        <EnumerationDomain name="enum">
-          <Entry text="Ball and Stick"
-                 value="0" />
-          <Entry text="Space Filling"
-                 value="1" />
-          <Entry text="Liquorice"
-                 value="2" />
-        </EnumerationDomain>
+      <IntVectorProperty command="SetRenderAtoms"
+                         default_values="1"
+                         name="RenderAtoms"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility for the atoms.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetAtomicRadiusScaleFactor"
+                            default_values="0.3"
+                            name="AtomicRadiusFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="3" min="0" name="range" />
+        <Documentation>The scale factor to apply on atom radius. Radius is expected to be in Angstrom. </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetAtomicRadiusType"
+                         default_values="1"
+                         label="Atomic Radius Type"
+                         name="AtomicRadiusType"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Covalent"
+                 value="0" />
+          <Entry text="Van Der Waals"
+                 value="1" />
+          <Entry text="Unit"
+                 value="2" />
+          <Entry text="Input Array"
+                 value="3" />
+        </EnumerationDomain>
+        <Documentation>The radius type to use.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="AtomicRadiusArrayName"
+                            command="SetAtomicRadiusArray"
+                            number_of_elements="1"
+                            label="Atomic Radii Array"
+                            panel_visibility="advanced">
+        <ArrayListDomain  input_domain_name="input_array"
+                          attribute_type="Scalars"
+                          name="array_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property specifies the name of the input array to use for atom radii. Values are expected to be in Angstrom.
+        </Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetRenderBonds"
+                         default_values="1"
+                         name="RenderBonds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Set the visibility for the bonds.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBondRadius"
+                            default_values="0.075"
+                            name="BondRadius"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="0.5" min="0" name="range" />
+        <Documentation>The bond radius, in Angstrom. </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseMultiCylindersForBonds"
+                         default_values="1"
+                         name="MultiCylindersForBonds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Display multiple cylinders for high bond order.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetBondColorMode"
+                         default_values="1"
+                         name="BondColorMode"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Use atom color for bonds. If disabled, use the custom bond color.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetBondColor"
+                            default_values="1 1 1"
+                            name="BondColor"
+                            number_of_elements="3"
+                            panel_widget="color_selector"
+                            panel_visibility="default">
+        <Documentation>Sets the color for the bonds.</Documentation>
+      </DoubleVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
                             name="ColorArrayName"
@@ -6581,18 +6652,9 @@
           <Group name="lookup_tables" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <IntVectorProperty command="SetUseCustomRadii"
-                         default_values="0"
-                         name="UseCustomRadii"
-                         label="Use 'radii' Array For Atomic Radii"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>If true, the 'radii' array in the input VertexData will
-        be used to determine the atomic radii.</Documentation>
-      </IntVectorProperty>
       <!-- End of MoleculeRepresentation -->
     </RepresentationProxy>
-    <PVRepresentationProxy class="vtkPVCompositeRepresentation"
+    <PVMoleculeRepresentationProxy class="vtkPVCompositeRepresentation"
                            name="PVMoleculeRepresentation"
                            processes="client|renderserver|dataserver">
       <Documentation>PVRepresentationProxy for vtkMolecule.</Documentation>
@@ -6670,21 +6732,38 @@
                proxygroup="representations"
                proxyname="MoleculeRepresentation" />
         <ExposedProperties>
-          <PropertyGroup label="Molecule">
+          <PropertyGroup label="Coloring">
             <Property name="Opacity"
                       panel_visibility="default" />
-            <Property name="MoleculeRenderMode"
-                      panel_visibility="default" />
-            <Property name="UseCustomRadii"
-                      panel_visibility="default" />
             <Property name="ColorArrayName"
-                      panel_visibility="never" />
+                      panel_visibility="default" />
             <Property name="LookupTable"
                       panel_visibility="never" />
           </PropertyGroup>
+          <PropertyGroup label="Styling"
+                          panel_widget="MoleculeParameters">
+            <Property name="RenderAtoms"
+                      function="RenderAtoms" />
+            <Property name="AtomicRadiusFactor"
+                      function="AtomicRadiusFactor" />
+            <Property name="AtomicRadiusType"
+                      function="AtomicRadiusType"/>
+            <Proprety name="AtomicRadiusArrayName"
+                      function="AtomicRadiusArrayName"/>
+            <Property name="RenderBonds"
+                      function="RenderBonds" />
+            <Property name="BondRadius"
+                      function="BondRadius" />
+            <Property name="MultiCylindersForBonds"
+                      function="UseMultiCylindersForBonds"/>
+            <Property name="BondColorMode"
+                      function="BondColorMode"/>
+            <Property name="BondColor"
+                      function="BondColor"/>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
-    </PVRepresentationProxy>
+    </PVMoleculeRepresentationProxy>
 
     <!-- =================================================================== -->
     <ChartRepresentationProxy base_proxygroup="representations"

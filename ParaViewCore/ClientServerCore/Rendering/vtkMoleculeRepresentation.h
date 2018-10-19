@@ -61,6 +61,22 @@ public:
 
   void MarkModified() VTK_OVERRIDE;
 
+  //@{
+  /**
+   * Forward custom atom/bonds rendering parameters to the mapper.
+   */
+  void SetAtomicRadiusType(int type);
+  void SetAtomicRadiusScaleFactor(double factor);
+  void SetBondRadius(double factor);
+  void SetBondColorMode(int mode);
+  void SetBondColor(double color[3]);
+  void SetBondColor(double r, double g, double b);
+  void SetUseMultiCylindersForBonds(bool use);
+  void SetRenderAtoms(bool render);
+  void SetRenderBonds(bool render);
+  void SetAtomicRadiusArray(const char* name);
+  //@}
+
 protected:
   vtkMoleculeRepresentation();
   ~vtkMoleculeRepresentation() override;
