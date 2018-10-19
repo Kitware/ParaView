@@ -56,6 +56,7 @@ set (Module_SRCS
   vtkSMPlotMatrixViewProxy.cxx
   vtkSMPVRepresentationProxy.cxx
   vtkSMRenderViewProxy.cxx
+  vtkSMRangedTransferFunctionDomain.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationTypeDomain.cxx
   vtkSMRepresentedArrayListDomain.cxx

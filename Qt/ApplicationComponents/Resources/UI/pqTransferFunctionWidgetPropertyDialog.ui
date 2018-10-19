@@ -56,6 +56,9 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="4">
+       <widget class="pqHighlightableToolButton" name="resetButton"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -72,6 +75,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>pqHighlightableToolButton</class>
+   <extends>QToolButton</extends>
+   <header>pqHighlightableToolButton.h</header>
+  </customwidget>
   <customwidget>
    <class>pqTransferFunctionWidget</class>
    <extends>QWidget</extends>

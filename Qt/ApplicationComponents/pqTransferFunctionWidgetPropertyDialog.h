@@ -44,13 +44,13 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqTransferFunctionWidgetPropertyDialog : pu
   Q_OBJECT
 
 public:
-  pqTransferFunctionWidgetPropertyDialog(const QString& label, double* xrange,
+  pqTransferFunctionWidgetPropertyDialog(const QString& label,
     vtkPiecewiseFunction* transferFunction, QWidget* propertyWdg, QWidget* parentWdg = NULL);
   ~pqTransferFunctionWidgetPropertyDialog();
 
 protected slots:
-  void onRangeChanged();
-  void onDomainChanged();
+  void onRangeEdited();
+  void updateRange();
 
 private:
   vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;

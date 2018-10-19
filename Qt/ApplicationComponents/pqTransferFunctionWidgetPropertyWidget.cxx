@@ -79,8 +79,6 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
     return;
   }
   this->TFProxy = vtkSMTransferFunctionProxy::SafeDownCast(pxy);
-  this->Range[0] = 0.0;
-  this->Range[1] = 1.0;
 
   this->Connection = vtkEventQtSlotConnect::New();
   this->Domain =
@@ -88,9 +86,8 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
   if (this->Domain)
   {
     this->Connection->Connect(
-      this->Domain, vtkCommand::DomainModifiedEvent, this, SLOT(onDomainChanged()));
+      this->Domain, vtkCommand::DomainModifiedEvent, this, SIGNAL(domainChanged()));
   }
-  this->onDomainChanged();
 
   QVBoxLayout* l = new QVBoxLayout;
   l->setMargin(0);
@@ -111,36 +108,26 @@ pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget(
   {
     this->Connection->Delete();
   }
+  delete this->Dialog;
 }
 
-void pqTransferFunctionWidgetPropertyWidget::onDomainChanged()
+void pqTransferFunctionWidgetPropertyWidget::resetRangeToDomainDefault()
 {
-  this->Range[0] = 0.0;
-  this->Range[1] = 1.0;
-  if (this->Domain)
-  {
-    if (this->Domain->GetRangeMinimumExists(0) && this->Domain->GetRangeMaximumExists(0))
-    {
-      this->Range[0] = this->Domain->GetRangeMinimum(0);
-      this->Range[1] = this->Domain->GetRangeMaximum(0);
-    }
-    else if (this->Domain->GetRangeMinimumExists(0))
-    {
-      this->Range[0] = this->Range[1] = this->Domain->GetRangeMinimum(0);
-    }
-    else if (this->Domain->GetRangeMaximumExists(0))
-    {
-      this->Range[0] = this->Range[1] = this->Domain->GetRangeMaximum(0);
-    }
-  }
-  emit this->domainChanged();
+  this->property()->ResetToDomainDefaults();
+  emit this->changeAvailable();
+  emit this->changeFinished();
+}
+
+void pqTransferFunctionWidgetPropertyWidget::getRange(double range[2])
+{
+  this->TFProxy->GetRange(range);
 }
 
 void pqTransferFunctionWidgetPropertyWidget::setRange(const double& min, const double& max)
 {
-  this->Range[0] = min;
-  this->Range[1] = max;
-  this->updateRange();
+  this->TFProxy->RescaleTransferFunction(min, max, false);
+  emit this->changeAvailable();
+  emit this->changeFinished();
 }
 
 void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty()
@@ -165,19 +152,6 @@ void pqTransferFunctionWidgetPropertyWidget::propagateProxyPointsProperty()
   emit this->changeFinished();
 }
 
-void pqTransferFunctionWidgetPropertyWidget::updateRange()
-{
-  this->TFProxy->RescaleTransferFunction(this->Range[0], this->Range[1], false);
-  emit this->changeAvailable();
-  emit this->changeFinished();
-}
-
-void pqTransferFunctionWidgetPropertyWidget::UpdateProperty()
-{
-  this->propagateProxyPointsProperty();
-  this->updateRange();
-}
-
 void pqTransferFunctionWidgetPropertyWidget::buttonClicked()
 {
   delete this->Dialog;
@@ -185,9 +159,8 @@ void pqTransferFunctionWidgetPropertyWidget::buttonClicked()
   vtkObjectBase* object = this->TFProxy->GetClientSideObject();
   vtkPiecewiseFunction* transferFunction = vtkPiecewiseFunction::SafeDownCast(object);
 
-  this->Dialog = new pqTransferFunctionWidgetPropertyDialog(this->property()->GetXMLLabel(),
-    &this->Range[0], transferFunction, this, pqCoreUtilities::mainWidget());
+  this->Dialog = new pqTransferFunctionWidgetPropertyDialog(
+    this->property()->GetXMLLabel(), transferFunction, this, pqCoreUtilities::mainWidget());
   this->Dialog->setObjectName(this->property()->GetXMLName());
   this->Dialog->show();
-  this->UpdateProperty();
 }
