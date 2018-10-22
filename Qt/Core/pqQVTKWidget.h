@@ -88,7 +88,6 @@ public slots:
   void paintMousePointer(int x, int y);
 
 protected:
-  bool renderVTK();
   bool canRender();
 
 private slots:
