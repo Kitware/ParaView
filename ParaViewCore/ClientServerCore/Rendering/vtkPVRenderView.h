@@ -204,6 +204,20 @@ public:
 
   //@{
   /**
+   * SuppressRendering can be used to suppress the render within a StillRender
+   * or InteractiveRender. This is useful in cases where you want the
+   * representations mappers to be setup for rendering and have their data ready
+   * but not actually do the render. For example if you want to export the scene
+   * but not render it you must turn on SuppressRendering and then call
+   * StillRender
+   */
+  vtkSetMacro(SuppressRendering, bool);
+  vtkGetMacro(SuppressRendering, bool);
+  vtkBooleanMacro(SuppressRendering, bool);
+  //@}
+
+  //@{
+  /**
    * Get/Set the reduction-factor to use when for StillRender(). This is
    * typically set to 1, but in some cases with terrible connectivity or really
    * large displays, one may want to use a sub-sampled image even for
@@ -1093,6 +1107,15 @@ protected:
   int InteractionMode;
   bool ShowAnnotation;
   bool UpdateAnnotation;
+
+  // this ivar can be used to suppress the render within
+  // a StillRender or InteractiveRender. This is useful
+  // in cases where you want the representations mappers
+  // to be setup for rendering and have their data ready
+  // but not actually do the render. For example if you
+  // want to export the scene but not render it you must
+  // turn on SuppressRendering and then call StillRender
+  bool SuppressRendering;
 
   // 2D and 3D interactor style
   vtkPVInteractorStyle* TwoDInteractorStyle;
