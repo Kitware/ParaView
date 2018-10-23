@@ -389,6 +389,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Culler = vtkSmartPointer<vtkPVRendererCuller>::New();
   this->ForceDataDistributionMode = -1;
   this->PreviousDiscreteCameraIndex = -1;
+  this->SuppressRendering = false;
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -1343,7 +1344,7 @@ void vtkPVRenderView::StillRender()
 
   this->Internals->PreRender(this->RenderView);
 
-  this->Render(false, false);
+  this->Render(false, this->SuppressRendering);
 
   vtkTimerLog::MarkEndEvent("Still Render");
 }
@@ -1357,7 +1358,7 @@ void vtkPVRenderView::InteractiveRender()
   this->Internals->OSPRayCount = 0;
   this->Internals->PreRender(this->RenderView);
 
-  this->Render(true, false);
+  this->Render(true, this->SuppressRendering);
 
   vtkTimerLog::MarkEndEvent("Interactive Render");
 }
@@ -2224,6 +2225,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UseLightKit: " << this->UseLightKit << endl;
+  os << indent << "SuppressRendering: " << this->SuppressRendering << endl;
 }
 
 //----------------------------------------------------------------------------
