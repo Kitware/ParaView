@@ -35,6 +35,7 @@
 #include "vtkJPEGWriter.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
+#include "vtkNumberToString.h"
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLTexture.h"
 #include "vtkOpenVRCamera.h"
@@ -868,13 +869,14 @@ template <typename T>
 void addVectorAttribute(vtkPVXMLElement* el, const char* name, T* data, int count)
 {
   std::ostringstream o;
+  vtkNumberToString convert;
   for (int i = 0; i < count; ++i)
   {
     if (i)
     {
       o << " ";
     }
-    o << data[i];
+    o << convert(data[i]);
   }
   el->AddAttribute(name, o.str().c_str());
 }
@@ -904,8 +906,8 @@ void vtkPVOpenVRHelper::SaveState(vtkPVXMLElement* root)
         el->SetName("CameraPose");
         el->AddAttribute("PoseNumber", p.first);
         addVectorAttribute(el, "Position", pose.Position, 3);
-        el->AddAttribute("Distance", pose.Distance);
-        el->AddAttribute("MotionFactor", pose.MotionFactor);
+        el->AddAttribute("Distance", pose.Distance, 20);
+        el->AddAttribute("MotionFactor", pose.MotionFactor, 20);
         addVectorAttribute(el, "Translation", pose.Translation, 3);
         addVectorAttribute(el, "InitialViewUp", pose.PhysicalViewUp, 3);
         addVectorAttribute(el, "InitialViewDirection", pose.PhysicalViewDirection, 3);
@@ -928,12 +930,12 @@ void vtkPVOpenVRHelper::SaveState(vtkPVXMLElement* root)
     {
       vtkPVXMLElement* child = vtkPVXMLElement::New();
       child->SetName("Crop");
-      child->AddAttribute("origin0", i.first[0]);
-      child->AddAttribute("origin1", i.first[1]);
-      child->AddAttribute("origin2", i.first[2]);
-      child->AddAttribute("normal0", i.second[0]);
-      child->AddAttribute("normal1", i.second[1]);
-      child->AddAttribute("normal2", i.second[2]);
+      child->AddAttribute("origin0", i.first[0], 20);
+      child->AddAttribute("origin1", i.first[1], 20);
+      child->AddAttribute("origin2", i.first[2], 20);
+      child->AddAttribute("normal0", i.second[0], 20);
+      child->AddAttribute("normal1", i.second[1], 20);
+      child->AddAttribute("normal2", i.second[2], 20);
       e->AddNestedElement(child);
       child->FastDelete();
     }
@@ -1075,6 +1077,14 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
         topel->Delete();
       }
     }
+  }
+
+  // for everything else also watch for old style XML
+  // where the data was under OpenVRHelper
+  vtkPVXMLElement* olde = e->FindNestedElementByName("OpenVRHelper");
+  if (olde)
+  {
+    e = olde;
   }
 
   // load the visibility information
@@ -1710,6 +1720,25 @@ vtkPolyData* findPolyData(vtkDataObject* input)
 }
 }
 
+namespace
+{
+template <typename T>
+void setVectorAttribute(vtkXMLDataElement* el, const char* name, int count, T* data)
+{
+  std::ostringstream o;
+  vtkNumberToString convert;
+  for (int i = 0; i < count; ++i)
+  {
+    if (i)
+    {
+      o << " ";
+    }
+    o << convert(data[i]);
+  }
+  el->SetAttribute(name, o.str().c_str());
+}
+}
+
 void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
 {
   // record the state if we are currently in vr
@@ -1733,12 +1762,8 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
   std::string dir = "pv-view/";
   vtksys::SystemTools::MakeDirectory(dir);
 
-  vtkNew<vtkXMLUtilities> xml;
   vtkNew<vtkXMLDataElement> topel;
   topel->SetName("View");
-  topel->SetAttribute("ViewImage", "set this");
-  topel->SetAttribute("Longitude", "0.0");
-  topel->SetAttribute("Latitude", "0.0");
 
   std::vector<vtkActor*> actors;
   std::vector<vtkPolyData*> datas;
@@ -1768,13 +1793,13 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
     vtkNew<vtkXMLDataElement> poseel;
     poseel->SetName("CameraPose");
     poseel->SetIntAttribute("PoseNumber", static_cast<int>(count + 1));
-    poseel->SetVectorAttribute("Position", 3, pose.Position);
+    setVectorAttribute(poseel, "Position", 3, pose.Position);
     poseel->SetDoubleAttribute("Distance", pose.Distance);
     poseel->SetDoubleAttribute("MotionFactor", pose.MotionFactor);
-    poseel->SetVectorAttribute("Translation", 3, pose.Translation);
-    poseel->SetVectorAttribute("InitialViewUp", 3, pose.PhysicalViewUp);
-    poseel->SetVectorAttribute("InitialViewDirection", 3, pose.PhysicalViewDirection);
-    poseel->SetVectorAttribute("ViewDirection", 3, pose.ViewDirection);
+    setVectorAttribute(poseel, "Translation", 3, pose.Translation);
+    setVectorAttribute(poseel, "InitialViewUp", 3, pose.PhysicalViewUp);
+    setVectorAttribute(poseel, "InitialViewDirection", 3, pose.PhysicalViewDirection);
+    setVectorAttribute(poseel, "ViewDirection", 3, pose.ViewDirection);
 
     vtkCollectionSimpleIterator pit;
     vtkActorCollection* acol = pvRenderer->GetActors();
@@ -1878,9 +1903,9 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
         adatael->SetDoubleAttribute("LineWidth", actor->GetProperty()->GetLineWidth());
 
         adatael->SetVectorAttribute("Scale", 3, actor->GetScale());
-        adatael->SetVectorAttribute("Position", 3, actor->GetPosition());
-        adatael->SetVectorAttribute("Origin", 3, actor->GetOrigin());
-        adatael->SetVectorAttribute("Orientation", 3, actor->GetOrientation());
+        setVectorAttribute(adatael, "Position", 3, actor->GetPosition());
+        setVectorAttribute(adatael, "Origin", 3, actor->GetOrigin());
+        setVectorAttribute(adatael, "Orientation", 3, actor->GetOrientation());
 
         // scalar visibility
         adatael->SetIntAttribute("ScalarVisibility", actor->GetMapper()->GetScalarVisibility());
@@ -1893,7 +1918,7 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
         }
         else
         {
-          adatael->SetVectorAttribute("ScalarRange", 2, actor->GetMapper()->GetScalarRange());
+          setVectorAttribute(adatael, "ScalarRange", 2, actor->GetMapper()->GetScalarRange());
         }
         adatael->SetIntAttribute("ScalarArrayId", actor->GetMapper()->GetArrayId());
         adatael->SetIntAttribute("ScalarArrayAccessMode", actor->GetMapper()->GetArrayAccessMode());
@@ -1948,6 +1973,21 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
 
   vtkIndent indent;
   vtkXMLUtilities::WriteElementToFile(topel, "pv-view/index.mvx", &indent);
+
+  // create empty extra.xml file
+  vtkNew<vtkXMLDataElement> topel2;
+  topel2->SetName("View");
+  topel2->SetAttribute("ViewImage", "Filename.jpg");
+  topel2->SetAttribute("Longitude", "0.0");
+  topel2->SetAttribute("Latitude", "0.0");
+
+  vtkNew<vtkXMLDataElement> psel;
+  psel->SetName("PhotoSpheres");
+  vtkNew<vtkXMLDataElement> cpel;
+  cpel->SetName("CameraPoses");
+  topel2->AddNestedElement(psel);
+  topel2->AddNestedElement(cpel);
+  vtkXMLUtilities::WriteElementToFile(topel2, "pv-view/extra.xml", &indent);
 }
 
 void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
@@ -2162,6 +2202,15 @@ void vtkPVOpenVRHelper::UpdateProps()
     for (acol->InitTraversal(pit); (actor = acol->GetNextActor(pit));)
     {
       this->AddedProps->AddItem(actor);
+      // force opaque is opacity is 1.0
+      if (actor->GetProperty()->GetOpacity() >= 1.0)
+      {
+        actor->ForceOpaqueOn();
+      }
+      else
+      {
+        actor->ForceOpaqueOff();
+      }
       this->Renderer->AddActor(actor);
       if (actor->GetTexture())
       {
