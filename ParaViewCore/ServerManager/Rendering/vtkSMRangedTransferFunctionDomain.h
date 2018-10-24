@@ -36,13 +36,14 @@
 #ifndef vtkSMRangedTransferFunctionDomain_h
 #define vtkSMRangedTransferFunctionDomain_h
 
-#include "vtkClientServerID.h"            // needed for saving animation in batch script
-#include "vtkPVServerManagerCoreModule.h" //needed for exports
+#include "vtkClientServerID.h"                 // needed for saving animation in batch script
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxyListDomain.h"
 
 class vtkSMRangedTransferFunctionDomainInternals;
 
-class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRangedTransferFunctionDomain : public vtkSMProxyListDomain
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRangedTransferFunctionDomain
+  : public vtkSMProxyListDomain
 {
 public:
   static vtkSMRangedTransferFunctionDomain* New();
@@ -71,6 +72,7 @@ public:
   bool GetRangeMaximumExists(unsigned int idx);
   //@}
 
+  //@{
   /**
    * Returns the range minimum/maximum value, is exists, otherwise
    * 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
@@ -86,6 +88,13 @@ public:
     int not_used;
     return this->GetRangeMaximum(idx, not_used);
   }
+  //@}
+
+  /**
+   * If prop is a vtkSMProxyProperty containing a vtkSMTransferFunctionProxy
+   * this set its range based on this domain min and max values.
+   */
+  int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) override;
 
 protected:
   vtkSMRangedTransferFunctionDomain();

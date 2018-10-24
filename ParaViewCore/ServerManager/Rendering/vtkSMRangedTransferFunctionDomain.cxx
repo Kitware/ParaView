@@ -18,6 +18,8 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMArrayRangeDomain.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMTransferFunctionProxy.h"
 
 class vtkSMRangedTransferFunctionDomainInternals
 {
@@ -131,4 +133,51 @@ void vtkSMRangedTransferFunctionDomain::InvokeDomainModifiedEvent()
 void vtkSMRangedTransferFunctionDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMRangedTransferFunctionDomain::SetDefaultValues(
+  vtkSMProperty* prop, bool use_unchecked_values)
+{
+  vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(prop);
+  vtkSMTransferFunctionProxy* transferFunctionProxy = nullptr;
+  if (proxyProp)
+  {
+    if (use_unchecked_values)
+    {
+      if (proxyProp->GetNumberOfUncheckedProxies() > 0)
+      {
+        transferFunctionProxy =
+          vtkSMTransferFunctionProxy::SafeDownCast(proxyProp->GetUncheckedProxy(0));
+      }
+    }
+    else
+    {
+      if (proxyProp->GetNumberOfProxies() > 0)
+      {
+        transferFunctionProxy = vtkSMTransferFunctionProxy::SafeDownCast(proxyProp->GetProxy(0));
+      }
+    }
+  }
+
+  if (transferFunctionProxy)
+  {
+    double rangeMin = 0.0;
+    double rangeMax = 1.0;
+    if (this->GetRangeMinimumExists(0) && this->GetRangeMaximumExists(0))
+    {
+      rangeMin = this->GetRangeMinimum(0);
+      rangeMax = this->GetRangeMaximum(0);
+    }
+    else if (this->GetRangeMinimumExists(0))
+    {
+      rangeMin = rangeMax = this->GetRangeMinimum(0);
+    }
+    else if (this->GetRangeMaximumExists(0))
+    {
+      rangeMin = rangeMax = this->GetRangeMaximum(0);
+    }
+    transferFunctionProxy->RescaleTransferFunction(rangeMin, rangeMax, false);
+  }
+  return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }

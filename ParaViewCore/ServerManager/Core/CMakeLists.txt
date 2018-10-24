@@ -104,7 +104,6 @@ set (Module_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
   vtkSMRangeDomainTemplate.txx
-  vtkSMRangedTransferFunctionDomain.cxx
   vtkSMReaderFactory.cxx
   vtkSMRemoteObject.cxx
   vtkSMRemoteObjectUpdateUndoElement.cxx
