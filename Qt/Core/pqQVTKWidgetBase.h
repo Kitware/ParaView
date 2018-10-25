@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // It might possible to replace QVTKOpenGLWidget by QVTKOpenGLNativeWidget here,
 // eg, if you need to work with native widgets only. However this is not tested nor recommended.
 
-#include "QVTKOpenGLWidget.h"
+#include "QVTKOpenGLNativeWidget.h"
 class vtkGenericOpenGLRenderWindow;
-typedef QVTKOpenGLWidget pqQVTKWidgetBase;
+typedef QVTKOpenGLNativeWidget pqQVTKWidgetBase;
 typedef vtkGenericOpenGLRenderWindow pqQVTKWidgetBaseRenderWindowType;
 
 #endif

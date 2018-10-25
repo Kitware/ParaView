@@ -93,12 +93,6 @@ void pqQVTKWidget::setSession(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
-bool pqQVTKWidget::renderVTK()
-{
-  return false;
-}
-
-//----------------------------------------------------------------------------
 bool pqQVTKWidget::canRender()
 {
   // despite our best efforts, it's possible that the paint event happens while
