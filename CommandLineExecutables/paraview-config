@@ -1,0 +1,230 @@
+#!/usr/bin/env python3
+
+import difflib
+import os
+import shlex
+import subprocess
+import tempfile
+
+
+CMAKELISTS = """
+cmake_minimum_required(VERSION 3.3)
+project(find_paraview CXX)
+
+find_package(ParaView REQUIRED COMPONENTS %(components)s)
+set(vtk_components %(vtk_components)s)
+if (vtk_components)
+  find_package(VTK REQUIRED COMPONENTS ${vtk_components})
+endif ()
+
+set(src "${CMAKE_CURRENT_BINARY_DIR}/src.cxx")
+file(WRITE "${src}" "
+int main(int argc, char* argv[]) {
+  (void)argc;
+  (void)argv;
+  return 0;
+}
+")
+
+add_executable(with_paraview "${src}")
+target_compile_definitions(with_paraview
+  PRIVATE
+    WITH_PARAVIEW)
+target_link_libraries(with_paraview
+  PRIVATE
+    ${PARAVIEW_LIBRARIES}
+    ${VTK_LIBRARIES}
+    -LWITH_PARAVIEW)
+# Explicitly not doing autoinit since the generated header gets deleted.
+#vtk_module_autoinit(
+#  TARGETS with_paraview
+#  MODULES ${PARAVIEW_LIBRARIES})
+
+add_executable(without_paraview "${src}")
+target_compile_definitions(without_paraview
+  PRIVATE
+    WITHOUT_PARAVIEW)
+target_link_libraries(without_paraview
+  PRIVATE
+    -LWITHOUT_PARAVIEW)
+"""
+
+
+def diff_commands(a, b):
+    a_args = shlex.split(a)
+    b_args = shlex.split(b)
+
+    a_flags = []
+    b_flags = []
+    differ = difflib.SequenceMatcher(a=a_args, b=b_args, autojunk=False)
+    for tag, i1, i2, j1, j2 in differ.get_opcodes():
+        if tag in ('delete', 'replace'):
+            a_flags.extend(a_args[i1:i2])
+        if tag in ('insert', 'replace'):
+            b_flags.extend(b_args[j1:j2])
+    return (a_flags, b_flags)
+
+
+def test_diff_commands():
+    cmd_a = 'prog -lcommon a_different common'
+    cmd_b = 'prog -lcommon b_different common'
+    (a_flags, b_flags) = diff_commands(cmd_a, cmd_b)
+    assert a_flags == ['a_different']
+    assert b_flags == ['b_different']
+
+
+def extract_flags(compile_with, compile_without, link_with, link_without):
+    (_, compile_flags) = diff_commands(compile_without, compile_with)
+    (_, link_flags) = diff_commands(link_without, link_with)
+
+    # Remove our marker flags.
+    compile_flags.remove('-DWITH_PARAVIEW')
+    link_flags.remove('-LWITH_PARAVIEW')
+
+    # Remove target-specific flags.
+    def is_target_specific(arg):
+        return arg.find('with_paraview') > -1
+    compile_flags = [
+        flag for flag in compile_flags if not is_target_specific(flag)]
+    link_flags = [flag for flag in link_flags if not is_target_specific(flag)]
+
+    return (compile_flags, link_flags)
+
+
+def test_extract_flags():
+    cmd_without_compile = \
+        'compiler -DWITHOUT_PARAVIEW -o without_paraview.dir/src.cxx.o src.cxx'
+    cmd_without_link = \
+        'compiler -LWITHOUT_PARAVIEW with_paraview.dir/src.cxx.o'
+    cmd_with_compile = \
+        'compiler -DWITH_PARAVIEW -I/path/to/paraview/includes -o with_paraview.dir/src.cxx.o src.cxx'
+    cmd_with_link = \
+        'compiler -LWITH_PARAVIEW /path/to/pv.so with_paraview.dir/src.cxx.o'
+    (compile_flags, link_flags) = \
+        extract_flags(cmd_with_compile, cmd_without_compile, cmd_with_link,
+                      cmd_without_link)
+    assert compile_flags == ['-I/path/to/paraview/includes']
+    assert link_flags == ['/path/to/pv.so']
+
+
+def extract_paraview_flags(components, cmake='cmake',
+                           generator='Unix Makefiles',
+                           paraview_dir=None, vtk_components=[]):
+    cmake_format = {}
+    cmake_format['components'] = ' '.join(components)
+    cmake_format['vtk_components'] = ' '.join(vtk_components)
+
+    with tempfile.TemporaryDirectory() as workdir:
+        srcdir = os.path.join(workdir, 'src')
+        builddir = os.path.join(workdir, 'build')
+
+        os.mkdir(srcdir)
+        os.mkdir(builddir)
+
+        # Write the CMake file.
+        with open(os.path.join(srcdir, 'CMakeLists.txt'), 'w+') as fout:
+            fout.write(CMAKELISTS % cmake_format)
+
+        # Configure the build tree.
+        configure_cmd = [
+            cmake,
+            '-G' + generator,
+            srcdir,
+        ]
+
+        if paraview_dir is not None:
+            configure_cmd.append('-DParaView_DIR:PATH=' + paraview_dir)
+        subprocess.check_call(configure_cmd, cwd=builddir,
+                              stdout=subprocess.DEVNULL)
+
+        # Run the build tool.
+        build_cmd = [
+            cmake,
+            '--build', '.',
+            '--',
+        ]
+        build_env = os.environ.copy()
+        if generator == 'Ninja':
+            build_cmd.append('-n')
+            build_cmd.append('-v')
+            build_env['NINJA_STATUS'] = ''
+        elif generator == 'Unix Makefiles':
+            # This doesn't work because the link line is actually behind
+            # another rule.
+            # build_cmd.append('-n')
+            build_cmd.append('VERBOSE=1')
+        else:
+            raise RuntimeError('Unsupported generator %s' % generator)
+        build_output = subprocess.Popen(build_cmd,
+                                        cwd=builddir,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT,
+                                        env=build_env)
+
+        lines = {}
+        lines['compile_with'] = None
+        lines['link_with'] = None
+        lines['compile_without'] = None
+        lines['link_without'] = None
+
+        def check_line(lines, line, flag, key):
+            if lines[key] is None and line.find(flag) > -1:
+                lines[key] = line
+
+        for line in build_output.stdout:
+            line = line.strip().decode('utf-8')
+            check_line(lines, line, '-DWITH_PARAVIEW', 'compile_with')
+            check_line(lines, line, '-LWITH_PARAVIEW', 'link_with')
+            check_line(lines, line, '-DWITHOUT_PARAVIEW', 'compile_without')
+            check_line(lines, line, '-LWITHOUT_PARAVIEW', 'link_without')
+
+        if not all(lines.values()):
+            raise RuntimeError('missing some compile line outputs')
+
+        return extract_flags(**lines)
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='Extract required flags for linking to ParaView')
+    parser.add_argument(
+        '-c', '--component', metavar='COMPONENT', action='append',
+        default=[], dest='components',
+        help='Component to search for')
+    parser.add_argument(
+        '-v', '--vtk-component', metavar='COMPONENT', action='append',
+        default=[], dest='vtk_components',
+        help='VTK component to search for')
+    parser.add_argument(
+        '-C', '--cmake', metavar='CMAKE', default='cmake',
+        dest='cmake',
+        help='Path to CMake to use')
+    parser.add_argument(
+        '-G', '--generator', metavar='GENERATOR', default='Unix Makefiles',
+        choices=('Unix Makefiles', 'Ninja'), dest='generator',
+        help='The CMake generator to use')
+    parser.add_argument(
+        '-p', '--paraview', metavar='PARAVIEW DIR', default=None,
+        dest='paraview_dir',
+        help='Where to find paraview-config.cmake')
+    parser.add_argument(
+        '-f', '--cppflags', action='store_true', default=False,
+        dest='cppflags',
+        help='Print CPP flags for using the components')
+    parser.add_argument(
+        '-l', '--ldflags', action='store_true', default=False,
+        dest='ldflags',
+        help='Print linker flags for using the components')
+
+    opts = parser.parse_args()
+    (compile_flags, link_flags) = \
+        extract_paraview_flags(opts.components, cmake=opts.cmake,
+                               generator=opts.generator,
+                               paraview_dir=opts.paraview_dir,
+                               vtk_components=opts.vtk_components)
+    if opts.cppflags:
+        print(' '.join(compile_flags))
+    if opts.ldflags:
+        print(' '.join(link_flags))
