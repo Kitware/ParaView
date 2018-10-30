@@ -399,6 +399,56 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="Graph">
+         <layout class="QGridLayout" name="graphLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="graphVertexLabel">
+            <property name="text">
+             <string>Number of Vertices</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="graphEdgeLabel">
+            <property name="text">
+             <string>Number of Edges</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="numberOfGraphEdges">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="numberOfGraphVertices">
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgba(0, 0, 0, 0);border: none;</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

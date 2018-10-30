@@ -131,6 +131,7 @@ public:
   vtkGetMacro(NumberOfRows, vtkTypeInt64);
   vtkGetMacro(NumberOfTrees, vtkTypeInt64);
   vtkGetMacro(NumberOfVertices, vtkTypeInt64);
+  vtkGetMacro(NumberOfEdges, vtkTypeInt64);
   vtkGetMacro(NumberOfLeaves, vtkTypeInt64);
   vtkGetMacro(MemorySize, int);
   vtkGetMacro(PolygonCount, int);
@@ -324,6 +325,7 @@ protected:
   vtkTypeInt64 NumberOfRows = 0;  // tables
   vtkTypeInt64 NumberOfTrees = 0; // hypertreegrids
   vtkTypeInt64 NumberOfVertices = 0;
+  vtkTypeInt64 NumberOfEdges = 0; // graphs
   vtkTypeInt64 NumberOfLeaves = 0;
   int MemorySize = 0;
   vtkIdType PolygonCount = 0;

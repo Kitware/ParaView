@@ -282,6 +282,8 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
   this->Ui->numberOfTrees->setText(tr("NA"));
   this->Ui->numberOfVertices->setText(tr("NA"));
   this->Ui->numberOfLeaves->setText(tr("NA"));
+  this->Ui->numberOfGraphVertices->setText(tr("NA"));
+  this->Ui->numberOfGraphEdges->setText(tr("NA"));
   this->Ui->memory->setText(tr("NA"));
 
   this->Ui->dataArrays->clear();
@@ -324,6 +326,11 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
   QString numLeaves = QString("%1").arg(dataInformation->GetNumberOfLeaves());
   this->Ui->numberOfLeaves->setText(numLeaves);
 
+  this->Ui->numberOfGraphVertices->setText(numVertices);
+
+  QString numBonds = QString("%1").arg(dataInformation->GetNumberOfEdges());
+  this->Ui->numberOfGraphEdges->setText(numBonds);
+
   switch (dataInformation->GetDataSetType())
   {
     case VTK_TABLE:
@@ -334,6 +341,19 @@ void pqProxyInformationWidget::fillDataInformation(vtkPVDataInformation* dataInf
       this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->HyperTreeGrid);
       break;
 
+    case VTK_DIRECTED_GRAPH:
+    case VTK_UNDIRECTED_GRAPH:
+    case VTK_GRAPH:
+      this->Ui->graphVertexLabel->setText("Number of Vertices");
+      this->Ui->graphEdgeLabel->setText("Number of Edges");
+      this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->Graph);
+      break;
+
+    case VTK_MOLECULE:
+      this->Ui->graphVertexLabel->setText("Number of Atoms");
+      this->Ui->graphEdgeLabel->setText("Number of Bonds");
+      this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->Graph);
+      break;
     default:
       this->Ui->dataTypeProperties->setCurrentWidget(this->Ui->DataSet);
       break;
