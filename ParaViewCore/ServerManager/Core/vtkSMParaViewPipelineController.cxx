@@ -586,6 +586,9 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
 
   SM_SCOPED_TRACE(RegisterPipelineProxy).arg("proxy", proxy);
 
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
+
   // Create animation helpers for this proxy.
   this->CreateAnimationHelpers(proxy);
 
@@ -658,6 +661,9 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy, const
   }
 
   SM_SCOPED_TRACE(RegisterViewProxy).arg("proxy", proxy);
+
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
 
   // Now register the proxy itself.
   proxy->GetSessionProxyManager()->RegisterProxy("views", proxyname, proxy);
@@ -776,9 +782,11 @@ bool vtkSMParaViewPipelineController::RegisterRepresentationProxy(vtkSMProxy* pr
     return false;
   }
 
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
+
   // Register the proxy itself.
   proxy->GetSessionProxyManager()->RegisterProxy("representations", proxy);
-
   return true;
 }
 
@@ -844,6 +852,9 @@ bool vtkSMParaViewPipelineController::RegisterColorTransferFunctionProxy(
     return false;
   }
 
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
+
   proxy->GetSessionProxyManager()->RegisterProxy("lookup_tables", proxyname, proxy);
   return true;
 }
@@ -857,6 +868,9 @@ bool vtkSMParaViewPipelineController::RegisterOpacityTransferFunction(
     return false;
   }
 
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
+
   proxy->GetSessionProxyManager()->RegisterProxy("piecewise_functions", proxyname, proxy);
   return true;
 }
@@ -868,6 +882,9 @@ bool vtkSMParaViewPipelineController::RegisterAnimationProxy(vtkSMProxy* proxy)
   {
     return false;
   }
+
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
 
   proxy->GetSessionProxyManager()->RegisterProxy("animation", proxy);
   return true;
@@ -956,6 +973,9 @@ bool vtkSMParaViewPipelineController::RegisterLightProxy(
   }
 
   SM_SCOPED_TRACE(RegisterLightProxy).arg("proxy", proxy).arg("view", view);
+
+  // Register proxies created for proxy list domains.
+  this->RegisterProxiesForProxyListDomains(proxy);
 
   // we would like the light to be a child of the view, but lights need to be created
   // and registered independently, before the view is created in python state files.
@@ -1120,10 +1140,6 @@ bool vtkSMParaViewPipelineController::PostInitializeProxy(vtkSMProxy* proxy)
     }
     proxy->UpdateVTKObjects();
   }
-
-  // Register proxies created for proxy list domains.
-  this->RegisterProxiesForProxyListDomains(proxy);
-
   return true;
 }
 
