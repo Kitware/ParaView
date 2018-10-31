@@ -72,6 +72,7 @@ void vtkPVInitializePythonModules();
 #include <QMimeData>
 #include <QTextCodec>
 #include <QUrl>
+#include <QtDebug>
 
 #ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
 #include "ParaViewDocumentationInitializer.h"
@@ -92,6 +93,7 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 public:
   bool FirstShow;
   int CurrentGUIFontSize;
+  QFont DefaultApplicationFont; // will be initialized to default app font in constructor.
   pqTimer UpdateFontSizeTimer;
   pqInternals()
     : FirstShow(true)
@@ -396,31 +398,33 @@ void ParaViewMainWindow::showWelcomeDialog()
 //-----------------------------------------------------------------------------
 void ParaViewMainWindow::updateFontSize()
 {
+  auto& internals = *this->Internals;
   vtkPVGeneralSettings* gsSettings = vtkPVGeneralSettings::GetInstance();
-  bool overrideFontSize = gsSettings->GetGUIOverrideFont();
-  int fontSize = overrideFontSize ? gsSettings->GetGUIFontSize() : 0;
-  if (this->Internals->CurrentGUIFontSize != fontSize)
+  int fontSize = internals.DefaultApplicationFont.pointSize();
+  if (gsSettings->GetGUIOverrideFont() && gsSettings->GetGUIFontSize() > 0)
   {
-    if (fontSize > 0) // note vtkPVGeneralSettings clamps it to [8, INT_MAX)
-    {
-      this->setStyleSheet(QString("* { font-size: %1pt }").arg(fontSize));
-    }
-    else
-    {
-      this->setStyleSheet(QString());
-    }
+    fontSize = gsSettings->GetGUIFontSize();
+  }
+  if (fontSize <= 0)
+  {
+    qDebug() << "Ignoring invalid font size: " << fontSize;
+    return;
+  }
+
+  if (internals.CurrentGUIFontSize != fontSize)
+  {
+    this->setStyleSheet(QString("* { font-size: %1pt }").arg(fontSize));
     this->Internals->CurrentGUIFontSize = fontSize;
   }
 
-  // Console font size
-  int defaultFontSize = 12;
+// Console font size
 #if defined(PARAVIEW_ENABLE_PYTHON)
   pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
-  shell->setFontSize(fontSize == 0 ? defaultFontSize : fontSize);
+  shell->setFontSize(fontSize);
 #endif
   pqOutputWidget* outputWidget =
     qobject_cast<pqOutputWidget*>(this->Internals->outputWidgetDock->widget());
-  outputWidget->setFontSize(fontSize == 0 ? defaultFontSize : fontSize);
+  outputWidget->setFontSize(fontSize);
 }
 
 //-----------------------------------------------------------------------------
