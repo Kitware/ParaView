@@ -137,6 +137,11 @@ protected:
 
   void contextMenuEvent(QContextMenuEvent* e) override;
 
+  /**
+   * Overridden to pass changed font to pqPipelineModel.
+   */
+  bool viewportEvent(QEvent* e) override;
+
   pqPipelineModel* PipelineModel;
   pqPipelineAnnotationFilterModel* FilteredPipelineModel;
   QPointer<QMenu> ContextMenu;

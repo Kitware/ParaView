@@ -151,6 +151,20 @@ bool pqPipelineBrowserWidget::eventFilter(QObject* object, QEvent* eventArg)
 }
 
 //----------------------------------------------------------------------------
+bool pqPipelineBrowserWidget::viewportEvent(QEvent* evt)
+{
+  if (evt->type() == QEvent::FontChange)
+  {
+    // Pass the changed font to the model otherwise it doesn't use
+    // correct font for modified items.
+    QFont modifiedFont = this->font();
+    modifiedFont.setBold(true);
+    this->PipelineModel->setModifiedFont(modifiedFont);
+  }
+  return this->Superclass::viewportEvent(evt);
+}
+
+//----------------------------------------------------------------------------
 void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex& index_)
 {
   // we make sure we are only clicking on an eye
