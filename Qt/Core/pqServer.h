@@ -170,6 +170,11 @@ public:
    */
   int getRemainingLifeTime() const;
 
+  /**
+   * Set the time (in minutes) remaining.
+   */
+  void setRemainingLifeTime(int value);
+
 signals:
   /**
   * Fired when the name of the proxy is changed.
