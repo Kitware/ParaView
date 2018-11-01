@@ -1687,13 +1687,19 @@
       <PropertyGroup label="Frequency">
         <Property name="XFreq" />
         <Property name="YFreq" />
-        <Property name="ZFreq" />
       </PropertyGroup>
 
       <PropertyGroup label="Amplitude">
         <Property name="XMag" />
         <Property name="YMag" />
         <Property name="ZMag" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Frequency">
+        <!-- this is added separately just to demonstrate that
+             this group will automatically get merged with the previous
+             one with the same name! -->
+        <Property name="ZFreq" />
       </PropertyGroup>
 
       <!-- End Wavelet -->
