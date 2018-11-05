@@ -118,6 +118,37 @@
           Set the desired width and height of the image.
         </Documentation>
       </IntVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            name="CellArrayStatus"
+                            number_of_elements="2"
+                            number_of_elements_per_command="2"
+                            repeat_command="1"
+                            panel_visibility="advanced">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which GDAL band to load.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetCollateBands"
+                         default_values="1"
+                         name="CollateBands"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> Get/Set if bands are collated in one scalar
+        array. Currently we collate RGB, RGBA, gray alpha and
+        pallete. The default is true.
+</Documentation>
+      </IntVectorProperty>
+
       <Hints>
         <ReaderFactory extensions="tif"
                        file_description="GDAL Raster Files" />
