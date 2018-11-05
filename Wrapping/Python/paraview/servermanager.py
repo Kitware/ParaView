@@ -1183,7 +1183,6 @@ class ProxyProperty(Property):
                     name = listdomain.GetProxyName(i)
                     iproxy = CreateProxy(igroup, name)
                     listdomain.AddProxy(iproxy)
-                    pm.RegisterProxy(group, proxy.GetPropertyName(smproperty), iproxy)
                 smproperty.ResetToDomainDefaults(False)
 
     def GetAvailable(self):
