@@ -801,18 +801,13 @@ QVariant pqPipelineModel::data(const QModelIndex& idx, int role) const
         if (server)
         {
           const pqServerResource& resource = server->getResource();
-          if (!resource.configuration().isNameDefault())
-          {
-            QString name = resource.configuration().name();
-            int time = server->getRemainingLifeTime();
-            QString timeLeft =
-              time > -1 ? QString(" (%1min left)").arg(QString::number(time)) : QString();
-            return QString("%1 (%2)%3").arg(name).arg(resource.configuration().URI()).arg(timeLeft);
-          }
-          else
-          {
-            return QVariant(resource.toURI());
-          }
+          const auto name = resource.configuration().isNameDefault()
+            ? resource.toURI()
+            : resource.configuration().name();
+          int time = server->getRemainingLifeTime();
+          QString timeLeft =
+            time > -1 ? QString(" (%1min left)").arg(QString::number(time)) : QString();
+          return QString("%1 (%2)%3").arg(name).arg(resource.configuration().URI()).arg(timeLeft);
         }
         else if (source)
         {

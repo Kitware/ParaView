@@ -78,6 +78,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #endif
 
+#include <chrono>
+
 namespace pqObjectBuilderNS
 {
 static bool ContinueWaiting = true;
@@ -734,6 +736,11 @@ pqServer* pqObjectBuilder::resetServer(pqServer* server)
 {
   Q_ASSERT(server);
 
+  // save the current remaining lifetime to restore it
+  // when we recreate the server following reset.
+  const int remainingLifetime = server->getRemainingLifeTime();
+  auto startTime = std::chrono::system_clock::now();
+
   pqServerResource resource = server->getResource();
   vtkSmartPointer<vtkSMSession> session = server->session();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -763,6 +770,11 @@ pqServer* pqObjectBuilder::resetServer(pqServer* server)
   if (id != 0)
   {
     newServer = smModel->findServer(id);
+
+    auto endTime = std::chrono::system_clock::now();
+    auto deltaMinutes = std::chrono::duration_cast<std::chrono::minutes>(endTime - startTime);
+    newServer->setRemainingLifeTime(
+      remainingLifetime > 0 ? (remainingLifetime - deltaMinutes.count()) : remainingLifetime);
     emit this->finishedAddingServer(newServer);
   }
   return newServer;

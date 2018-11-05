@@ -78,10 +78,9 @@ public:
   QTimer HeartbeatTimer;
 
   QTimer ServerLifeTimeTimer;
-  // remaining time in minutes
-  int RemainingLifeTime;
 
-  int IdleServerMessageCounter;
+  // remaining time in minutes
+  int RemainingLifeTime{ -1 };
 
   vtkNew<vtkEventQtSlotConnect> VTKConnect;
   vtkWeakPointer<vtkSMCollaborationManager> CollaborationCommunicator;
@@ -100,18 +99,14 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
   this->Session =
     vtkSMSession::SafeDownCast(vtkProcessModule::GetProcessModule()->GetSession(connectionID));
 
+  QObject::connect(&this->Internals->ServerLifeTimeTimer, &QTimer::timeout, this,
+    &pqServer::updateRemainingLifeTime);
+
   vtkPVServerInformation* serverInfo = this->getServerInformation();
-  if (this->isRemote() && serverInfo && serverInfo->GetTimeout() > 0)
-  {
-    this->Internals->RemainingLifeTime = serverInfo->GetTimeout();
-    QObject::connect(&this->Internals->ServerLifeTimeTimer, SIGNAL(timeout()), this,
-      SLOT(updateRemainingLifeTime()));
-    this->Internals->ServerLifeTimeTimer.start(60000); // trigger signal every minute
-  }
-  else
-  {
-    this->Internals->RemainingLifeTime = -1;
-  }
+  const int timeout = (this->isRemote() && serverInfo && serverInfo->GetTimeout() > 0)
+    ? serverInfo->GetTimeout()
+    : -1;
+  this->setRemainingLifeTime(timeout);
 
   QObject::connect(&this->Internals->HeartbeatTimer, SIGNAL(timeout()), this, SLOT(heartBeat()));
 
@@ -175,6 +170,27 @@ void pqServer::setMonitorServerNotifications(bool val)
   else
   {
     this->IdleCollaborationTimer.stop();
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setRemainingLifeTime(int value)
+{
+  auto& internals = (*this->Internals);
+  if (internals.RemainingLifeTime != value)
+  {
+    internals.RemainingLifeTime = value;
+    if (value > 0 && internals.ServerLifeTimeTimer.isActive() == false)
+    {
+      internals.ServerLifeTimeTimer.start(60000); // trigger signal every minute
+    }
+    else if (value <= 0)
+    {
+      internals.ServerLifeTimeTimer.stop();
+    }
+    // since RemainingLifeTime is used it labelling the server, fire nameChanged
+    // so pipeline browser can accurately indicate it.
+    emit this->nameChanged(this);
   }
 }
 
