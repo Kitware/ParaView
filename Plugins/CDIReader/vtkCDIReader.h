@@ -4,7 +4,7 @@
  *  Program:   Visualization Toolkit
  *  Module:    vtkCDIReader.h
  *
- *  Copyright (c) 2015 Niklas Roeber, DKRZ Hamburg
+ *  Copyright (c) 2018 Niklas Roeber, DKRZ Hamburg
  *  All rights reserved.
  *  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
  *
@@ -37,26 +37,57 @@
 #ifndef __vtkCDIReader_h
 #define __vtkCDIReader_h
 
+#define DEBUG 0
 #define MAX_VARS 100
-#define MAX_VAR_NAME 100
 
-#ifdef __linux__
-// linux code goes here
-#elif _WIN32
+#ifdef _WIN32
 #define VTKIONETCDF_EXPORT __declspec(dllexport)
+#else
+#define VTKIONETCDF_EXPORT
 #endif
 
-#include "vtkIONetCDFModule.h"
-#include "vtkIntArray.h"
-#include "vtkUnstructuredGridAlgorithm.h"
-#include <string>
+#include <vtkCallbackCommand.h>
+#include <vtkCellArray.h>
+#include <vtkCellData.h>
+#include <vtkCellType.h>
+#include <vtkCommunicator.h>
+#include <vtkDataArraySelection.h>
+#include <vtkDataObject.h>
+#include <vtkDoubleArray.h>
+#include <vtkDummyController.h>
+#include <vtkErrorCode.h>
 #include <vtkExtractSelection.h>
+#include <vtkFloatArray.h>
+#include <vtkIONetCDFModule.h>
+#include <vtkInformation.h>
+#include <vtkInformationDoubleVectorKey.h>
+#include <vtkInformationVector.h>
+#include <vtkIntArray.h>
+#include <vtkMath.h>
+#ifdef PARAVIEW_USE_MPI
+#include <vtkMPI.h>
+#include <vtkMPIController.h>
+#endif
+#include <vtkObjectFactory.h>
+#include <vtkPVConfig.h>
+#include <vtkPointData.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkSmartPointer.h>
-#include <vtkSmartPointer.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkStringArray.h>
+#include <vtkTableExtentTranslator.h>
+#include <vtkToolkits.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkUnstructuredGridAlgorithm.h>
+#include <vtk_netcdf.h>
 
+#include <algorithm>
 #include <cctype>
+#include <cfloat>
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
@@ -69,55 +100,29 @@
 class vtkCallbackCommand;
 class vtkDataArraySelection;
 class vtkDoubleArray;
-class vtkStdString;
+class vtkFloatArray;
+#ifdef PARAVIEW_USE_MPI
+class vtkMultiProcessController;
+#endif
 class vtkStringArray;
-
-typedef struct
-{
-  int streamID;
-  int varID;
-  int gridID;
-  int zaxisID;
-  int gridsize;
-  int nlevel;
-  int type;
-  int const_time;
-
-  int timestep;
-  int levelID;
-
-  char name[CDI_MAX_NAME];
-} cdiVar_t;
-
-struct point
-{
-  double lon;
-  double lat;
-};
-
-struct point_with_index
-{
-  point p;
-  int i;
-};
 
 class VTKIONETCDF_EXPORT vtkCDIReader : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkCDIReader* New();
   vtkTypeMacro(vtkCDIReader, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  vtkSetStringMacro(FileName);
+  void SetFileName(const char* val);
   vtkGetStringMacro(FileName);
+
   vtkGetMacro(MaximumCells, int);
   vtkGetMacro(MaximumPoints, int);
   vtkGetMacro(NumberOfCellVars, int);
   vtkGetMacro(NumberOfPointVars, int);
 
-  vtkUnstructuredGrid* GetOutput();
-  vtkUnstructuredGrid* GetOutput(int index);
-
+  void SetFileSeriesNumbers(int val1, int val2);
+  void SetFileSeriesFirstName(const char* val);
   vtkStringArray* VariableDimensions;
   vtkStringArray* AllDimensions;
   vtkSmartPointer<vtkIntArray> LoadingDimensions;
@@ -127,51 +132,61 @@ public:
   vtkGetObjectMacro(AllDimensions, vtkStringArray);
   vtkGetObjectMacro(VariableDimensions, vtkStringArray);
 
-  int GetNumberOfVariableArrays() { return GetNumberOfCellArrays(); };
-  const char* GetVariableArrayName(int idx) { return GetCellArrayName(idx); };
-  int GetVariableArrayStatus(const char* name) { return GetCellArrayStatus(name); };
-  void SetVariableArrayStatus(const char* name, int status) { SetCellArrayStatus(name, status); };
+  int GetNumberOfVariableArrays() { return this->GetNumberOfCellArrays(); }
+  const char* GetVariableArrayName(int idx) { return this->GetCellArrayName(idx); }
+  int GetVariableArrayStatus(const char* name) { return this->GetCellArrayStatus(name); }
+  void SetVariableArrayStatus(const char* name, int status)
+  {
+    this->SetCellArrayStatus(name, status);
+  }
 
-  int GetNumberOfPointArrays();
+  int GetNumberOfPointArrays() { return this->PointDataArraySelection->GetNumberOfArrays(); }
   const char* GetPointArrayName(int index);
-  int GetPointArrayStatus(const char* name);
+  int GetPointArrayStatus(const char* name)
+  {
+    return this->PointDataArraySelection->ArrayIsEnabled(name);
+  }
   void SetPointArrayStatus(const char* name, int status);
-  void DisableAllPointArrays();
-  void EnableAllPointArrays();
+  void DisableAllPointArrays() { this->PointDataArraySelection->DisableAllArrays(); }
+  void EnableAllPointArrays() { this->PointDataArraySelection->EnableAllArrays(); }
 
-  int GetNumberOfCellArrays();
+  int GetNumberOfCellArrays() { return this->CellDataArraySelection->GetNumberOfArrays(); }
   const char* GetCellArrayName(int index);
-  int GetCellArrayStatus(const char* name);
+  int GetCellArrayStatus(const char* name)
+  {
+    return this->CellDataArraySelection->ArrayIsEnabled(name);
+  }
   void SetCellArrayStatus(const char* name, int status);
-  void DisableAllCellArrays();
-  void EnableAllCellArrays();
+  void DisableAllCellArrays() { this->CellDataArraySelection->DisableAllArrays(); }
+  void EnableAllCellArrays() { this->CellDataArraySelection->EnableAllArrays(); }
 
-  int GetNumberOfDomainArrays();
+  int GetNumberOfDomainArrays() { return this->DomainDataArraySelection->GetNumberOfArrays(); }
   const char* GetDomainArrayName(int index);
-  int GetDomainArrayStatus(const char* name);
+  int GetDomainArrayStatus(const char* name)
+  {
+    return this->DomainDataArraySelection->ArrayIsEnabled(name);
+  }
   void SetDomainArrayStatus(const char* name, int status);
-  void DisableAllDomainArrays();
-  void EnableAllDomainArrays();
+  void DisableAllDomainArrays() { this->DomainDataArraySelection->DisableAllArrays(); }
+  void EnableAllDomainArrays() { this->DomainDataArraySelection->EnableAllArrays(); }
 
-  int getNumberOfDomains() { return NumberOfDomains; };
-  int getNumberOfDomainsVars() { return NumberOfDomainVars; };
-  bool SupportDomainData() { return (haveDomainData && haveDomainVariable); };
+  int GetNumberOfDomains() { return this->NumberOfDomains; }
+  int GetNumberOfDomainsVars() { return this->NumberOfDomainVars; }
+  bool SupportDomainData() { return (this->HaveDomainData && this->HaveDomainVariable); }
 
   void SetVerticalLevel(int level);
   vtkGetVector2Macro(VerticalLevelRange, int);
+  vtkGetMacro(VerticalLevelSelected, int);
 
   void SetLayerThickness(int val);
   vtkGetVector2Macro(LayerThicknessRange, int);
+  vtkGetMacro(LayerThickness, int);
 
-  void SetProjectLatLon(bool val);
-  vtkGetMacro(ProjectLatLon, bool);
+  void SetProjection(int val);
+  vtkGetMacro(ProjectionMode, int);
 
-  void SetProjectCassini(bool val);
-  vtkGetMacro(ProjectCassini, bool);
-
-  void SetMissingValue(double val);
-  void EnableMissingValue(bool val);
-  vtkGetMacro(MissingValue, double);
+  void SetDoublePrecision(bool val);
+  vtkGetMacro(DoublePrecision, bool);
 
   void SetInvertZAxis(bool val);
   vtkGetMacro(InvertZAxis, bool);
@@ -180,23 +195,27 @@ public:
   vtkGetMacro(IncludeTopography, bool);
 
   void InvertTopography(bool val);
-  vtkGetMacro(invertedTopography, bool);
+  vtkGetMacro(InvertedTopography, bool);
 
   void SetShowMultilayerView(bool val);
   vtkGetMacro(ShowMultilayerView, bool);
 
+#ifdef PARAVIEW_USE_MPI
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  virtual void SetController(vtkMultiProcessController*);
+#endif
+
 protected:
   vtkCDIReader();
   ~vtkCDIReader() override;
+  int OpenFile();
   void DestroyData();
   void SetDefaults();
-  bool invertedTopography;
   int CheckForMaskData();
-  float masking_value;
-  int GetDims();
   int GetVars();
   int ReadAndOutputGrid(bool init);
   int ReadAndOutputVariableData();
+  int ReadTimeUnits(const char* Name);
   int BuildVarArrays();
   int AllocSphereGeometry();
   int AllocLatLonGeometry();
@@ -211,36 +230,68 @@ protected:
   int LoadDomainVarData(int variable);
   int RegenerateGeometry();
   int ConstructGridGeometry();
+  int LoadClonClatVars();
   int MirrorMesh();
   bool BuildDomainCellVars();
-  void Remove_Duplicates(
-    double* PointLon, double* PointLat, int temp_nbr_vertices, int* vertexID, int* nbr_cells);
-  void cellMask(const char* arg1);
+  void RemoveDuplicates(
+    double* PointLon, double* PointLat, int temp_nbr_vertices, int* triangle_list, int* nbr_cells);
 
-  char* FileName;
-  vtkStdString* VariableName;
+  long GetPartitioning(int piece, int numPieces, int numCellsPerLevel, int numPointsPerCell,
+    int& beginPoint, int& endPoint, int& beginCell, int& endCell);
+  void SetupPointConnectivity();
+
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+
+  static void SelectionCallback(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eid),
+    void* clientdata, void* vtkNotUsed(calldata))
+  {
+    static_cast<vtkCDIReader*>(clientdata)->Modified();
+  }
+
+  int GetDims();
+  int ReadHorizontalGridData();
+  int ReadVerticalGridData();
+  int FillVariableDimensions();
+  int RegenerateVariables();
+
+#ifdef PARAVIEW_USE_MPI
+  vtkMultiProcessController* Controller;
+#endif
+
+  int NumberOfProcesses;
+  bool InvertedTopography;
+  bool FilenameSet;
+  float MaskingValue;
+  int BeginPoint, EndPoint, BeginCell, EndCell;
+  int Piece, NumPieces;
+  int NumberLocalCells;
+  int NumberAllCells;
+  int NumberLocalPoints;
+  int NumberAllPoints;
+  bool Decomposition;
+
+  char *FileName, *FileNameGrid, *FileSeriesFirstName;
   int* VariableType;
   int NumberOfTimeSteps;
-  double* TimeSteps;
   double DTime;
+  int FileSeriesNumber;
+  int NumberOfFiles;
+  double TStepDistance;
 
   vtkCallbackCommand* SelectionObserver;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  static void SelectionCallback(
-    vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
-
   bool InfoRequested;
   bool DataRequested;
+  bool Grib;
 
-  vtkDataArraySelection* PointDataArraySelection;
   vtkDataArraySelection* CellDataArraySelection;
+  vtkDataArraySelection* PointDataArraySelection;
   vtkDataArraySelection* DomainDataArraySelection;
 
-  vtkDoubleArray** CellVarDataArray;   // Actual data arrays
-  vtkDoubleArray** PointVarDataArray;  // Actual data arrays
-  vtkDoubleArray** DomainVarDataArray; // Actual data arrays
+  vtkDataArray** CellVarDataArray;
+  vtkDataArray** PointVarDataArray;
+  vtkDoubleArray** DomainVarDataArray;
 
   int VerticalLevelSelected;
   int VerticalLevelRange[2];
@@ -250,22 +301,20 @@ protected:
   int LayerThickness;
   int LayerThicknessRange[2];
 
-  int FillVariableDimensions();
-  int dimensionSelection;
-  int RegenerateVariables();
-  double MissingValue;
-  bool RemoveMissingValues;
+  int DimensionSelection;
   bool InvertZAxis;
-  bool gotMask;
-  bool ProjectLatLon, ProjectCassini;
+  bool GotMask, AddCoordinateVars;
+  int ProjectionMode;
+  bool DoublePrecision;
   bool ShowMultilayerView;
   bool IncludeTopography;
-  bool haveDomainData, haveDomainVariable, buildDomainArrays;
-  std::string domain_var_name;
-  std::string domain_dimension;
-  std::string performance_data_file;
+  bool HaveDomainData;
+  bool HaveDomainVariable;
+  bool BuildDomainArrays;
+  std::string DomainVarName;
+  std::string DomainDimension;
+  std::string PerformanceDataFile;
 
-  // geometry
   int MaximumNVertLevels;
   int NumberOfCells;
   int NumberOfVertices;
@@ -273,48 +322,56 @@ protected:
   int NumberOfTriangles;
   int NumberOfDomains;
   int PointsPerCell;
-  int CurrentExtraPoint; // current extra point
-  int CurrentExtraCell;  // current extra  cell
-  bool reconstruct_new;
+  bool ReconstructNew;
+  bool NeedHorizontalGridFile;
+  bool NeedVerticalGridFile;
 
-  double* clon_vertices;
-  double* clat_vertices;
-  double* depth_var;
-  double* PointX; // x coord of point
-  double* PointY; // y coord of point
-  double* PointZ; // z coord of point
+  double* CLonVertices;
+  double* CLatVertices;
+  double* CLon;
+  double* CLat;
+  double* DepthVar;
+  double* PointX;
+  double* PointY;
+  double* PointZ;
   int ModNumPoints;
   int ModNumCells;
-  int* OrigConnections; // original connections
-  int* ModConnections;  // modified connections
-  int* CellMap;         // maps from added cell to original cell #
+  int* OrigConnections;
+  int* ModConnections;
   int* CellMask;
-  int* DomainMask;        // in which line is which domain variable
-  double* DomainCellVar;  // in which line is which domain variable
-  int* PointMap;          // maps from added point to original point #
-  int* MaximumLevelPoint; //
-  int MaximumCells;       // max cells
-  int MaximumPoints;      // max points
+  int* DomainMask;
+  double* DomainCellVar;
+  int MaximumCells;
+  int MaximumPoints;
+  int* VertexIds;
 
-  // vars
   int NumberOfCellVars;
   int NumberOfPointVars;
   int NumberOfDomainVars;
   double* PointVarData;
-  bool grid_reconstructed;
+  bool GridReconstructed;
 
-  // cdi vars
-  int streamID;
-  int vlistID;
-  int gridID;
-  int zaxisID;
-  int surfID;
+  int StreamID;
+  int VListID;
+  int GridID;
+  int ZAxisID;
+  int SurfID;
+
+  char* TimeUnits;
+  char* Calendar;
+  vtkSmartPointer<vtkUnstructuredGrid> Output;
 
 private:
-  vtkCDIReader(const vtkCDIReader&);
-  void operator=(const vtkCDIReader&);
+  vtkCDIReader(const vtkCDIReader&) = delete;
+  void operator=(const vtkCDIReader&) = delete;
+
   class Internal;
   Internal* Internals;
+
+  template <typename ValueType>
+  int LoadCellVarDataTemplate(int variable, double dTime, vtkDataArray* dataArray);
+  template <typename ValueType>
+  int LoadPointVarDataTemplate(int variable, double dTime, vtkDataArray* dataArray);
 };
 
 #endif
