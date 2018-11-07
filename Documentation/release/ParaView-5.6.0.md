@@ -158,7 +158,7 @@ JSON description files for time series can now be written for these additional f
 vtm, vtmb, vthb, vth, vtp, vtt, vtu, vti, vtk, vts, vtr, pvtp, pvtu, pvtt, pvti,
 pvts, pvtr, pvtk, ply, stl
 
-The name of the series file must follow the format <filename>.<format>.series,
+The name of the series file must follow the format \<filename\>.\<format\>.series,
 e.g., `images.vti.series`. More information about the content of the file can be
 found [here](https://gitlab.kitware.com/paraview/paraview/blob/v5.5.0/Documentation/release/ParaView-5.5.0.md).
 
@@ -324,7 +324,7 @@ are available in the **Alphabetical** category.
 
 ## Selection in the Point Gaussian representation
 
-* Points selection now works with the **Point Gaussian** representation.
+Points selection now works with the **Point Gaussian** representation.
 
 ## Optional rescaling of log plots with negative data values
 
@@ -366,8 +366,8 @@ volume rendering, and new path tracer materials like the principled material
 as exemplified with the "scratched" sample material.
 
 |![OSPRay-rendered surfaces with new materials](img/5.6.0/ospray.png)|
-| |
-| |
+|:--:|
+| *OSPRay-rendered surfaces with new materials.* |
 
 ## Improve support of dependent components for volume representation
 
@@ -451,7 +451,7 @@ A MPI4PY issue with SGI's MPT MPI library has been resolved.
 
 ## Pass Arrays filter
 
-The Pass Arrays filter now properly deals with ghost information.
+The **Pass Arrays** filter now properly deals with ghost information.
 
 ## Point selection and hovering fixed in Slice view
 
