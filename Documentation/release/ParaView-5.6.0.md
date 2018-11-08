@@ -369,6 +369,28 @@ as exemplified with the "scratched" sample material.
 |:--:|
 | *OSPRay-rendered surfaces with new materials.* |
 
+## NVIDIA IndeX plugin 2.2
+
+**Structured Volume Grids:**
+
+* New render engine provides optimized memory usage and faster initialization times.
+* Added Catalyst support for In-Situ visualizations.
+* Added support for all ParaView's playback modes when using time series datasets.
+* Added support for interactive changes of scalar values/properties.
+* Added support to render volume combined geometry in cluster mode.
+* Added support for datasets with signed types sint8 and sint16.
+
+**Unstructured Volume Grids:**
+
+*   New Visual Elements presets: Iso-Surface, Depth Enhancement and Edge Enhancement.
+*   Added support for interactive changes of scalar values/properties.
+
+**Common:**
+
+*   Added support for orthographic projection camera.
+*   Added support for logarithmic scale in colormaps when mapping data to colors.
+*   Improved profiling log: HW/SW information and detailed performance values.
+
 ## Improve support of dependent components for volume representation
 
 When volume representation is selected and **Map Scalars** and selected data
