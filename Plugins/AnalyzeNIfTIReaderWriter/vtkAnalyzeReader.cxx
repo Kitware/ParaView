@@ -56,7 +56,7 @@ vtkAnalyzeReader::~vtkAnalyzeReader()
   }
   if (this->analyzeHeaderUnsignedCharArray)
   {
-    delete this->analyzeHeaderUnsignedCharArray;
+    delete[] this->analyzeHeaderUnsignedCharArray;
     this->analyzeHeaderUnsignedCharArray = 0;
   }
 }
