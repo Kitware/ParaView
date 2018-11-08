@@ -357,6 +357,8 @@ public:
       readCurvilinearZone(base, zone, cellDim, physicalDim, zsize, voi, self);
     return vtkDataSet::SafeDownCast(zoneDO);
   }
+
+  static std::string GenerateMeshKey(const char* basename, const char* zonename);
 };
 
 //----------------------------------------------------------------------------
@@ -409,6 +411,7 @@ vtkCGNSReader::~vtkCGNSReader()
 {
   this->SetFileName(0);
   this->MeshPointsCache.ClearCache();
+  this->ConnectivitiesCache.ClearCache();
 
   this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
   this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
@@ -449,6 +452,15 @@ void vtkCGNSReader::SetController(vtkMultiProcessController* c)
     this->ProcRank = 0;
     this->ProcSize = 1;
   }
+}
+
+//------------------------------------------------------------------------------
+
+std::string vtkCGNSReader::vtkPrivate::GenerateMeshKey(const char* basename, const char* zonename)
+{
+  std::ostringstream query;
+  query << "/" << basename << "/" << zonename;
+  return query.str();
 }
 
 //------------------------------------------------------------------------------
@@ -1252,9 +1264,7 @@ vtkSmartPointer<vtkDataObject> vtkCGNSReader::vtkPrivate::readCurvilinearZone(in
     const char* basename = self->Internal->GetBase(base).name;
     const char* zonename = self->Internal->GetBase(base).zones[zone].name;
     // build a key /basename/zonename
-    std::ostringstream query;
-    query << "/" << basename << "/" << zonename;
-    keyMesh = query.str();
+    keyMesh = vtkPrivate::GenerateMeshKey(basename, zonename);
 
     points = self->MeshPointsCache.Find(keyMesh);
     if (points.Get() != nullptr)
@@ -1587,9 +1597,7 @@ int vtkCGNSReader::GetUnstructuredZone(
     const char* basename = this->Internal->GetBase(base).name;
     const char* zonename = this->Internal->GetBase(base).zones[zone].name;
     // build a key /basename/zonename
-    std::ostringstream query;
-    query << "/" << basename << "/" << zonename;
-    keyMesh = query.str();
+    keyMesh = vtkPrivate::GenerateMeshKey(basename, zonename);
 
     points = this->MeshPointsCache.Find(keyMesh);
     if (points.Get() != nullptr)
@@ -1872,8 +1880,8 @@ int vtkCGNSReader::GetUnstructuredZone(
     ugrid = this->ConnectivitiesCache.Find(keyConnect);
     if (ugrid.Get() != nullptr)
     {
-      // Do not check NGon because CGNS convention for counting cells is buggy in this case
-      if (ugrid->GetNumberOfCells() != numCoreCells && !hasNGon)
+      if (ugrid->GetNumberOfCells() != numCoreCells && !hasNGon ||
+        ugrid->GetNumberOfCells() != zsize[1] && hasNGon)
       {
         vtkWarningMacro(<< "Connectivities from the cache have"
                            " a different number of cells from"

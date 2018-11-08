@@ -18,7 +18,7 @@ set(Module_SRCS
   vtkCGNSReaderInternal.cxx
   vtkCGNSSubsetInclusionLattice.cxx
   vtkFileSeriesHelper.cxx
-  vtkCGNSCache.cxx
+  vtkCGNSCache.h
   )
 
 set_source_files_properties(
