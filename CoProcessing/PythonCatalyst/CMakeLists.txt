@@ -31,7 +31,9 @@
 set (Module_SRCS
   CPythonAdaptorAPI.cxx
   vtkCPPythonAdaptorAPI.cxx
+  vtkCPPythonPipeline.cxx
   vtkCPPythonScriptPipeline.cxx
+  vtkCPPythonStringPipeline.cxx
 )
 
 set (${vtk-module}_HDRS CPythonAdaptorAPI.h)

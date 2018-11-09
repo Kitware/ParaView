@@ -52,6 +52,7 @@ else()
 endif()
 
 set_tests_properties(CoProcessingImport PROPERTIES LABELS "${CP_LABELS}")
+set_tests_properties(CoProcessingImport PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 
 # test if we can use a Python programmable filter in a Catalyst Python script
 if (NOT PARAVIEW_USE_MPI)
@@ -77,6 +78,7 @@ else()
 endif()
 
 set_tests_properties(CoProcessingProgrammableFilter PROPERTIES LABELS "${CP_LABELS}")
+set_tests_properties(CoProcessingProgrammableFilter PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 #-  add_test(NAME CoProcessingProgrammableFilter
 #-    COMMAND CoProcessingProgrammableFilter
 #-    ${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py)
@@ -109,6 +111,7 @@ else()
 endif()
 
 set_tests_properties(CoProcessingTestPythonScript PROPERTIES LABELS "${CP_LABELS}")
+set_tests_properties(CoProcessingTestPythonScript PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 
 if (PARAVIEW_USE_MPI)
   add_test(NAME PCoProcessingTestPythonScript
@@ -129,6 +132,7 @@ if (PARAVIEW_USE_MPI)
   # so we run this one serially so that they don't interfere.
   set_tests_properties(PCoProcessingTestPythonScript PROPERTIES RUN_SERIAL ON)
   set_tests_properties(PCoProcessingTestPythonScript PROPERTIES LABELS "${CP_LABELS}")
+  set_tests_properties(PCoProcessingTestPythonScript PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 endif()
 
 if (PARAVIEW_BUILD_QT_GUI)

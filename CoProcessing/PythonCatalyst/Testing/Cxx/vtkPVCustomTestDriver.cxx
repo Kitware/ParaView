@@ -20,11 +20,13 @@
 #include "vtkCPNodalFieldBuilder.h"
 #include "vtkCPProcessor.h"
 #include "vtkCPPythonScriptPipeline.h"
+#include "vtkCPPythonStringPipeline.h"
 #include "vtkCPUniformGridBuilder.h"
 #include "vtkCommunicator.h"
 #include "vtkDataObject.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
@@ -174,6 +176,26 @@ int vtkPVCustomTestDriver::Initialize(const char* fileName)
     vtkErrorMacro("Bad ordering of the processor's pipeline.");
     success = 0;
   }
+
+  // add in a string pipeline to verify that it works
+  vtkNew<vtkCPPythonStringPipeline> stringPipeline;
+  this->Processor->AddPipeline(stringPipeline);
+  // clang-format off
+  std::string operations = R"(
+from __future__ import print_function
+
+def RequestDataDescription(datadescription):
+  if datadescription.GetForceOutput() == True or datadescription.GetTimeStep() % 5 == 0:
+    for i in range(datadescription.GetNumberOfInputDescriptions()):
+      datadescription.GetInputDescription(i).AllFieldsOn()
+      datadescription.GetInputDescription(i).GenerateMeshOn()
+  return
+
+def DoCoProcessing(datadescription):
+  print('in DoCoProcessing')
+)";
+    // clang-format on
+    stringPipeline->Initialize(operations.c_str());
 
   return success;
 }
