@@ -210,6 +210,8 @@ set (Module_SRCS
   pqLockPanelsReaction.h
   pqMainControlsToolbar.cxx
   pqMainControlsToolbar.h
+  pqMainWindowEventBehavior.cxx
+  pqMainWindowEventBehavior.h
   pqManageCustomFiltersReaction.cxx
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.cxx
@@ -448,6 +450,7 @@ set (Module_MOC_HDRS
   pqLockPanelsBehavior.h
   pqLockPanelsReaction.h
   pqMainControlsToolbar.h
+  pqMainWindowEventBehavior.h
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.h
   pqManageFavoritesReaction.h

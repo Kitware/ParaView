@@ -107,6 +107,7 @@ public:
   PQ_BEHAVIOR_DEFINE_METHODS(LockPanelsBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(PythonShellResetBehavior);
   PQ_BEHAVIOR_DEFINE_METHODS(CustomShortcutBehavior);
+  PQ_BEHAVIOR_DEFINE_METHODS(MainWindowEventBehavior);
 
   //@{
   /**
@@ -162,6 +163,7 @@ private:
   PQ_BEHAVIOR_DECLARE_FLAG(WheelNeedsFocusBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(LiveSourceBehavior);
   PQ_BEHAVIOR_DECLARE_FLAG(CustomShortcutBehavior);
+  PQ_BEHAVIOR_DECLARE_FLAG(MainWindowEventBehavior);
 };
 
 #undef PQ_BEHAVIOR_DECLARE_FLAG

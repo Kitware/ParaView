@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqInterfaceTracker;
 class pqLinksModel;
+class pqMainWindowEventManager;
 class pqObjectBuilder;
 class pqOptions;
 class pqPipelineSource;
@@ -182,6 +183,14 @@ public:
   * vtkSMProxyManager.
   */
   pqLinksModel* getLinksModel() const { return this->LinksModel; }
+
+  /**
+  * pqMainWindowManager manages signals called for main window events.
+  */
+  pqMainWindowEventManager* getMainWindowEventManager() const
+  {
+    return this->MainWindowEventManager;
+  }
 
   /**
   * pqPluginManager manages all functionality associated with loading plugins.
@@ -393,6 +402,7 @@ protected:
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;
+  pqMainWindowEventManager* MainWindowEventManager;
   pqPluginManager* PluginManager;
   pqProgressManager* ProgressManager;
   pqServerManagerModel* ServerManagerModel;

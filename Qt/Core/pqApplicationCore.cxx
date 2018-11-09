@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventDispatcher.h"
 #include "pqInterfaceTracker.h"
 #include "pqLinksModel.h"
+#include "pqMainWindowEventManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
 #include "pqPipelineFilter.h"
@@ -222,6 +223,9 @@ void pqApplicationCore::constructor()
     pqCoreUtilities::connect(
       pvsettings, vtkCommand::ModifiedEvent, this, SLOT(generalSettingsChanged()));
   }
+
+  // * Set up the manager for converting main window events to signals.
+  this->MainWindowEventManager = new pqMainWindowEventManager(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -240,6 +244,9 @@ pqApplicationCore::~pqApplicationCore()
 
   delete this->LinksModel;
   this->LinksModel = 0;
+
+  delete this->MainWindowEventManager;
+  this->MainWindowEventManager = 0;
 
   delete this->ObjectBuilder;
   this->ObjectBuilder = 0;

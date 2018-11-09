@@ -95,6 +95,8 @@ set(Module_SRCS
   pqLinksModel.h
   pqLinkViewWidget.cxx
   pqLinkViewWidget.h
+  pqMainWindowEventManager.cxx
+  pqMainWindowEventManager.h
   pqMultiSliceAxisWidget.cxx
   pqMultiSliceAxisWidget.h
   pqMultiSliceView.cxx
@@ -245,6 +247,7 @@ set (Module_MOC_HDRS
   pqInterfaceTracker.h
   pqLinksModel.h
   pqLinkViewWidget.h
+  pqMainWindowEventManager.h
   pqMultiSliceAxisWidget.h
   pqMultiSliceView.h
   pqNonEditableStyledItemDelegate.h
@@ -397,4 +400,3 @@ target_link_libraries(${vtk-module}
 #IF(BUILD_TESTING)
 #  ADD_SUBDIRECTORY(Testing)
 #ENDIF()
-
