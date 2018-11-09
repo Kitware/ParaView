@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqTPExportStateWizard.h"
+#include "pqSGExportStateWizardInternals.h"
 
 #include <vtkPVXMLElement.h>
 #include <vtkSMProxyManager.h>

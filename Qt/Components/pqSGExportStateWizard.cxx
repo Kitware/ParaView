@@ -30,6 +30,7 @@
 
   ========================================================================*/
 #include "pqSGExportStateWizard.h"
+#include "pqSGExportStateWizardInternals.h"
 
 #include "pqApplicationCore.h"
 #include "pqContextView.h"
