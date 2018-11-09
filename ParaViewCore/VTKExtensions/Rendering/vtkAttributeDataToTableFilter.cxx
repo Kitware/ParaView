@@ -130,7 +130,7 @@ void vtkAttributeDataToTableFilter::AddCellTypeAndConnectivity(vtkTable* output,
 
   if (this->GenerateCellConnectivity)
   {
-    std::vector<vtkSmartPointer<vtkIdTypeArray> > indices;
+    std::vector<vtkSmartPointer<vtkIdTypeArray> > indices(maxpoints);
     int w = 1 + log10(maxpoints);
     for (vtkIdType i = 0; i < maxpoints; i++)
     {

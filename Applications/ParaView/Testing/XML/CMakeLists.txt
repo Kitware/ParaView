@@ -104,6 +104,7 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Preview.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SearchBox.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheetSelectedCellConnectivity.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StringInLineChartView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TableHistogram.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TestCompositePropertyWidgetDecorator.xml
@@ -836,7 +837,7 @@ if(PARAVIEW_SSH_SERVERS_TESTING)
     set(${tname}_DISABLE_CS TRUE)
     set(${tname}_DISABLE_CRS TRUE)
 # The SSH tests should not be run in parallel to avoid port collision
-    set(${tname}_FORCE_SERIAL TRUE) 
+    set(${tname}_FORCE_SERIAL TRUE)
   endforeach()
 endif(PARAVIEW_SSH_SERVERS_TESTING)
 
