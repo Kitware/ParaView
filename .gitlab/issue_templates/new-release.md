@@ -12,16 +12,16 @@ Please remove this comment.
 # Preparatory steps
 
   - Update ParaView guides
-    - [ ] User manual
+    - User manual
       - [ ] Rename to ParaViewGuide-VERSION.pdf
       - [ ] Upload to www.paraview.org/files/vMAJOR.MINOR
-    - [ ] Catalyst Guide
+    - Catalyst Guide
       - [ ] Rename to ParaViewCatalystGuide-VERSION.pdf
       - [ ] Upload to www.paraview.org/files/vMAJOR.MINOR
-    - [ ] Getting Started Guide
+    - Getting Started Guide
       - [ ] Rename to ParaViewGettingStarted-VERSION.pdf
       - [ ] Upload to www.paraview.org/files/vMAJOR.MINOR
-    - [ ] Assemble release notes into `Documentation/release/ParaView-VERSION`.
+    - Assemble release notes into `Documentation/release/ParaView-VERSION`.
       - [ ] Get positive review and merge.
 
 # Update ParaView
@@ -106,6 +106,7 @@ git merge --ff-only origin/master
 ```
   - Update `CMakeLists.txt`
     - [ ] `git checkout -b update-to-vVERSION`
+    - [ ] Update PARAVIEW_VERSION_DEFAULT to the release version (without RC*)
     - [ ] Set ParaView source selections in `CMakeLists.txt` and force explicit
       version in `CMakeLists.txt`:
 ```
@@ -118,7 +119,7 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
     - [ ] `git add versions.cmake CMakeLists.txt`
     - [ ] `git commit -m "Update the default version to VERSION"`
   - Integrate changes to `master` branch
-    - [ ] Create a merge request targeting `master`, title beginning with WIP
+    - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
     - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
     - [ ] Remove explicit version forcing added in CMakeLists.txt and force push
@@ -157,10 +158,10 @@ set(paraview_FROM_SOURCE_DIR OFF CACHE BOOL "Force source dir off" FORCE)
     - [ ] `git add versions.cmake CMakeLists.txt`
     - [ ] `git commit -m "Update the default version to VERSION"`
   - Integrate changes to `master` branch
-    - [ ] Create a merge request targeting `master`, title beginning with WIP
+    - [ ] Create a merge request targeting `master`, title beginning with WIP (do *not* add `Backport: release` to description)
     - [ ] Build binaries (`Do: test`)
     - [ ] Download the binaries that have been generated in the dashboard results. They will be deleted within 24 hours.
-    - [ ] Remove explicit version forcing added in CMakeLists.txt and force push
+    - [ ] Remove explicit version forcing added in CMakeLists.txt, amend the commit, and force push
 ```
 git add CMakeLists.txt
 git commit --amend
@@ -198,15 +199,16 @@ git gitlab-push -f
 
 # Upload binaries
 
-  - Upload binaries to `paraview.org`
-    - [ ] `rsync -rptv $binaries paraview.release:ParaView_Release/vMAJOR.MINOR/`
+  - Upload binaries to `paraview.org` (`rsync -rptv $binaries paraview.release:ParaView_Release/vMAJOR.MINOR/`)
   - [ ] Ask @chuck.atkins to sign macOS binary
-  - [ ] Ask @utkarsh.ayachit to regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt`
+  - [ ] Regenerate `https://www.paraview.org/files/listing.txt` and `md5sum.txt`
+
 ```
 buildListing.sh
 updateMD5sum.sh vMAJOR.MINOR
 ```
-  - [ ] Test download links
+
+  - [ ] Test download links on https://www.paraview.org/download
 
 <!--
 If making a non-RC release:
@@ -218,14 +220,15 @@ If making a non-RC release:
 
 # Post-release
 
-  - [ ]  Write and publish blog post with release notes.
+  - [ ] Write and publish blog post with release notes.
   - [ ] Post an announcement in the Announcements category on
         [discourse.paraview.org](https://discourse.paraview.org/).
 <!--
-These items only apply to non-RC releases.
+If making a non-RC release:
 
   - [ ] Update release notes
     (https://www.paraview.org/Wiki/ParaView_Release_Notes)
+  - [ ] Move unclosed issues to next release milestone in GitLab
 -->
 
 /cc @ben.boeckel
