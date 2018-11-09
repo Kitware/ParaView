@@ -229,16 +229,22 @@ void vtkNIfTIReader::ExecuteInformation()
   {
     case 7:
       numElts *= m_NiftiImage->nw;
+      VTK_FALLTHROUGH;
     case 6:
       numElts *= m_NiftiImage->nv;
+      VTK_FALLTHROUGH;
     case 5:
       numElts *= m_NiftiImage->nu;
+      VTK_FALLTHROUGH;
     case 4:
       numElts *= m_NiftiImage->nt;
+      VTK_FALLTHROUGH;
     case 3:
       numElts *= m_NiftiImage->nz;
+      VTK_FALLTHROUGH;
     case 2:
       numElts *= m_NiftiImage->ny;
+      VTK_FALLTHROUGH;
     case 1:
       numElts *= m_NiftiImage->nx;
       break;

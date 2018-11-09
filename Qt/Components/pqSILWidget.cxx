@@ -167,10 +167,12 @@ void pqSILWidget::onModelReset()
     tree->setModel(sortModel);
     tree->expandAll();
 
-    auto helper = new pqTreeViewSelectionHelper(tree);
-#if (QT_VERSION < QT_VERSION_CHECK(5, 10, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+    new pqTreeViewSelectionHelper(tree);
+#else
     // disable filtering for older Qt version where recursive filtering
     // on a tree is not supported.
+    auto helper = new pqTreeViewSelectionHelper(tree);
     helper->setFilterable(false);
 #endif
 
