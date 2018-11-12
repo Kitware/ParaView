@@ -1880,8 +1880,8 @@ int vtkCGNSReader::GetUnstructuredZone(
     ugrid = this->ConnectivitiesCache.Find(keyConnect);
     if (ugrid.Get() != nullptr)
     {
-      if (ugrid->GetNumberOfCells() != numCoreCells && !hasNGon ||
-        ugrid->GetNumberOfCells() != zsize[1] && hasNGon)
+      if ((ugrid->GetNumberOfCells() != numCoreCells && !hasNGon) ||
+        (ugrid->GetNumberOfCells() != zsize[1] && hasNGon))
       {
         vtkWarningMacro(<< "Connectivities from the cache have"
                            " a different number of cells from"
