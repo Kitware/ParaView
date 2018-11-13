@@ -11,6 +11,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/3GQP.pdb}"
   "DATA{${paraview_test_data_directory_input}/Data/can-restarts/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree.vtm}"
@@ -721,6 +722,7 @@ list(APPEND TESTS_WITH_BASELINES
   LoadSaveStateVolume.xml
   ManyTypesXMLWriterReader.xml
   MoleculeBonds.xml
+  MoleculeColoring.xml
   MoleculeToLines.xml
   MultiBlockAttributes1.xml
   MultiBlockInspector.xml
@@ -1401,6 +1403,8 @@ set (ResetToVisibleRange_DISABLE_CRS TRUE)
 # Molecules are not supported in client-serve modes, currently.
 set (Molecule_DISABLE_CS TRUE)
 set (Molecule_DISABLE_CRS TRUE)
+set (MoleculeColoring_DISABLE_CS TRUE)
+set (MoleculeColoring_DISABLE_CRS TRUE)
 
 ##########################################################
 # List of known incompatible tests for Collaboration

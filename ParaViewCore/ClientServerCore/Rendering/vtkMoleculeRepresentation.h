@@ -50,6 +50,8 @@ public:
   // Forwarded to Actor->GetProperty()
   virtual void SetOpacity(double val);
 
+  void SetMapScalars(bool map);
+
   // Description:
   // No-op. For compatibility with vtkPVCompositeRepresentation, which calls
   // SetRepresentation on it's subproxies.
