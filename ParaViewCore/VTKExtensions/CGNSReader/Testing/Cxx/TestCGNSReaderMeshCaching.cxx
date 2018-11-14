@@ -78,6 +78,7 @@ int TestCGNSReaderMeshCaching(int argc, char* argv[])
   vtk_assert(da == db);
   // Check that caching mesh implies lower loading time
   // vtk_assert(hot_timing < cold_timing);
+  cout << "Expected timings: " << hot_timing << " < " << cold_timing << endl;
 
   return EXIT_SUCCESS;
 }
