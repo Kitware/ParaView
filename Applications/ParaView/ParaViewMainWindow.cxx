@@ -43,8 +43,7 @@ void vtkPVInitializePythonModules();
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqDeleteReaction.h"
-#include "pqLoadDataReaction.h"
-#include "pqLoadStateReaction.h"
+#include "pqMainWindowEventManager.h"
 #include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
@@ -69,9 +68,7 @@ void vtkPVInitializePythonModules();
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMessageBox>
-#include <QMimeData>
 #include <QTextCodec>
-#include <QUrl>
 #include <QtDebug>
 
 #ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
@@ -314,48 +311,20 @@ void ParaViewMainWindow::showHelpForProxy(const QString& groupname, const QStrin
 //-----------------------------------------------------------------------------
 void ParaViewMainWindow::dragEnterEvent(QDragEnterEvent* evt)
 {
-  evt->acceptProposedAction();
+  pqApplicationCore::instance()->getMainWindowEventManager()->dragEnterEvent(evt);
 }
 
 //-----------------------------------------------------------------------------
 void ParaViewMainWindow::dropEvent(QDropEvent* evt)
 {
-  QList<QUrl> urls = evt->mimeData()->urls();
-  if (urls.isEmpty())
-  {
-    return;
-  }
-
-  QList<QString> files;
-
-  foreach (QUrl url, urls)
-  {
-    if (!url.toLocalFile().isEmpty())
-    {
-      QString path = url.toLocalFile();
-      if (path.endsWith(".pvsm", Qt::CaseInsensitive))
-      {
-        pqLoadStateReaction::loadState(path);
-      }
-      else
-      {
-        files.append(url.toLocalFile());
-      }
-    }
-  }
-
-  // If we have no file we return
-  if (files.empty() || files.first().isEmpty())
-  {
-    return;
-  }
-  pqLoadDataReaction::loadData(files);
+  pqApplicationCore::instance()->getMainWindowEventManager()->dropEvent(evt);
 }
 
 //-----------------------------------------------------------------------------
 void ParaViewMainWindow::showEvent(QShowEvent* evt)
 {
   this->Superclass::showEvent(evt);
+
   if (this->Internals->FirstShow)
   {
     this->Internals->FirstShow = false;
@@ -370,22 +339,14 @@ void ParaViewMainWindow::showEvent(QShowEvent* evt)
       this->updateFontSize();
     }
   }
+
+  pqApplicationCore::instance()->getMainWindowEventManager()->showEvent(evt);
 }
 
 //-----------------------------------------------------------------------------
 void ParaViewMainWindow::closeEvent(QCloseEvent* evt)
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  if (core->settings()->value("GeneralSettings.ShowSaveStateOnExit", false).toBool())
-  {
-    if (QMessageBox::question(this, "Exit ParaView?",
-          "Do you want to save the state before exiting ParaView?",
-          QMessageBox::Save | QMessageBox::Discard) == QMessageBox::Save)
-    {
-      pqSaveStateReaction::saveState();
-    }
-  }
-  evt->accept();
+  pqApplicationCore::instance()->getMainWindowEventManager()->closeEvent(evt);
 }
 
 //-----------------------------------------------------------------------------
