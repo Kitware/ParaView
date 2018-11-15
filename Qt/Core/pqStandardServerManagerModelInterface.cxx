@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSpreadSheetViewProxy.h"
 
 #if defined(PARAVIEW_ENABLE_PYTHON)
 #include "pqPythonView.h"
@@ -76,7 +77,7 @@ inline pqProxy* CreatePQView(
 {
   QObject* parent = NULL;
   QString xmlname = proxy->GetXMLName();
-  if (xmlname == pqSpreadSheetView::spreadsheetViewType())
+  if (vtkSMSpreadSheetViewProxy::SafeDownCast(proxy))
   {
     return new pqSpreadSheetView(group, name, proxy, server, parent);
   }
