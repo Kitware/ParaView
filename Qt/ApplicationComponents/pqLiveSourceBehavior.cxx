@@ -46,25 +46,65 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 
 #include <QPointer>
+#include <algorithm>
+#include <limits>
+#include <utility>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 class pqLiveSourceBehavior::pqInternals
 {
+  void updateSources()
+  {
+    const auto old_size = this->LiveSources.size();
+    auto iter = this->LiveSources.begin();
+    while (iter != this->LiveSources.end())
+    {
+      if (iter->first == nullptr)
+      {
+        iter = this->LiveSources.erase(iter);
+      }
+      else
+      {
+        ++iter;
+      }
+    }
+
+    if (old_size != this->LiveSources.size())
+    {
+      // update interval
+      int interval = std::numeric_limits<int>::max();
+      for (const auto& pair : this->LiveSources)
+      {
+        interval = std::min(interval, pair.second);
+      }
+      this->Timer.setInterval(interval);
+    }
+  }
+
+  static const int DEFAULT_INTERVAL = 100;
+
 public:
   pqTimer Timer;
-  QList<QPointer<pqPipelineSource> > LiveSources;
+  std::vector<std::pair<QPointer<pqPipelineSource>, int> > LiveSources;
 
   pqInternals()
   {
-    this->Timer.setInterval(100);
+    this->Timer.setInterval(DEFAULT_INTERVAL);
     this->Timer.setSingleShot(true);
   }
 
   void addSource(pqPipelineSource* src, vtkPVXMLElement* liveHints)
   {
     Q_ASSERT(liveHints != nullptr);
-    Q_UNUSED(liveHints);
-    this->LiveSources.push_back(src);
+    int interval = 0;
+    if (!liveHints->GetScalarAttribute("interval", &interval) || interval <= 0)
+    {
+      interval = DEFAULT_INTERVAL;
+    }
+
+    this->LiveSources.push_back(std::make_pair(QPointer<pqPipelineSource>(src), interval));
+    this->Timer.setInterval(std::min(this->Timer.interval(), interval));
     this->Timer.start();
   }
 
@@ -72,7 +112,7 @@ public:
 
   void resume()
   {
-    this->LiveSources.removeAll(nullptr);
+    this->updateSources();
     if (this->LiveSources.size() > 0)
     {
       this->Timer.start();
@@ -82,7 +122,7 @@ public:
   void update()
   {
     this->Timer.stop();
-    this->LiveSources.removeAll(nullptr);
+    this->updateSources();
     if (this->LiveSources.size() == 0)
     {
       return;
@@ -95,8 +135,9 @@ public:
     }
 
     // iterate over all sources and update those that need updating.
-    for (pqPipelineSource* src : this->LiveSources)
+    for (const auto& pair : this->LiveSources)
     {
+      pqPipelineSource* src = pair.first;
       auto proxy = vtkSMSourceProxy::SafeDownCast(src->getProxy());
       auto session = proxy->GetSession();
 

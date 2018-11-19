@@ -240,9 +240,12 @@ For that, one simply adds a hint to the proxy as follows:
     <SourceProxy ...>
       ...
       <Hints>
-        <LiveSource />
+        <LiveSource interval="100" />
       </Hints>
     </SourceProxy>
 
 The algorithm subclass must have `bool GetNeedsUpdate()` method that returns
 true if the algorithm needs update.
+
+The `interval` attribute is optional (defaults to 100) and can be used to
+provide a refresh rate in milliseconds.
