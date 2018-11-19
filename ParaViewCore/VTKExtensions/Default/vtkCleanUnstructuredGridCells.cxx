@@ -75,13 +75,19 @@ int vtkCleanUnstructuredGridCells::RequestData(vtkInformation* vtkNotUsed(reques
   // Copy over the original points. Assume there are no degenerate points.
   output->SetPoints(input->GetPoints());
 
+  output->GetPointData()->ShallowCopy(input->GetPointData());
+
+  vtkCellData* outCD = output->GetCellData();
+  outCD->CopyGlobalIdsOn();
+  outCD->CopyAllocate(input->GetCellData());
+
   // remove duplicate cells
   std::set<std::set<int> > cellSet;
   std::set<std::set<int> >::iterator cellIter;
 
   // Now copy the cells.
   vtkIdList* cellPoints = vtkIdList::New();
-  const int numberOfCells = input->GetNumberOfCells();
+  const vtkIdType numberOfCells = input->GetNumberOfCells();
   vtkIdType progressStep = numberOfCells / 100;
   if (progressStep == 0)
   {
@@ -92,7 +98,7 @@ int vtkCleanUnstructuredGridCells::RequestData(vtkInformation* vtkNotUsed(reques
   int ndeg = 0;
   int ndup = 0;
 
-  for (int id = 0; id < numberOfCells; id++)
+  for (vtkIdType id = 0; id < numberOfCells; id++)
   {
     if (id % progressStep == 0)
     {
@@ -105,7 +111,8 @@ int vtkCleanUnstructuredGridCells::RequestData(vtkInformation* vtkNotUsed(reques
     if (cellType == VTK_POLY_VERTEX || cellType == VTK_TRIANGLE_STRIP)
     {
       input->GetCellPoints(id, cellPoints);
-      output->InsertNextCell(cellType, cellPoints);
+      vtkIdType newCellId = output->InsertNextCell(cellType, cellPoints);
+      outCD->CopyData(input->GetCellData(), id, newCellId);
       continue;
     }
 
@@ -124,7 +131,8 @@ int vtkCleanUnstructuredGridCells::RequestData(vtkInformation* vtkNotUsed(reques
     if (nn.size() == static_cast<unsigned int>(cellPoints->GetNumberOfIds()) &&
       cellIter == cellSet.end())
     {
-      output->InsertNextCell(input->GetCellType(id), cellPoints);
+      vtkIdType newCellId = output->InsertNextCell(input->GetCellType(id), cellPoints);
+      outCD->CopyData(input->GetCellData(), id, newCellId);
       cellSet.insert(nn);
     }
     else if (nn.size() != static_cast<unsigned int>(cellPoints->GetNumberOfIds()))
