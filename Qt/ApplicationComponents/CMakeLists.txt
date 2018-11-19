@@ -240,6 +240,8 @@ set (Module_SRCS
   pqParaViewBehaviors.h
   pqParaViewMenuBuilders.cxx
   pqParaViewMenuBuilders.h
+  pqPauseLiveSourcePropertyWidget.cxx
+  pqPauseLiveSourcePropertyWidget.h
   pqPersistentMainWindowStateBehavior.cxx
   pqPersistentMainWindowStateBehavior.h
   pqPipelineContextMenuBehavior.cxx
@@ -464,6 +466,7 @@ set (Module_MOC_HDRS
   pqPVAnimationWidget.h
   pqPVApplicationCore.h
   pqParaViewBehaviors.h
+  pqPauseLiveSourcePropertyWidget.h
   pqPersistentMainWindowStateBehavior.h
   pqPipelineContextMenuBehavior.h
   pqPluginActionGroupBehavior.h

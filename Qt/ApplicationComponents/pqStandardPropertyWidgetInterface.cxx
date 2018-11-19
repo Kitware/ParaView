@@ -66,6 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqListPropertyWidget.h"
 #include "pqMultiComponentsDecorator.h"
 #include "pqOSPRayHidingDecorator.h"
+#include "pqPauseLiveSourcePropertyWidget.h"
 #include "pqPropertyGroupButton.h"
 #include "pqProxyEditorPropertyWidget.h"
 #include "pqSeriesEditorPropertyWidget.h"
@@ -198,6 +199,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForProperty(
   else if (name == "view_resolution")
   {
     return new pqViewResolutionPropertyWidget(smProxy, smProperty, parentWidget);
+  }
+  else if (name == "pause_livesource")
+  {
+    return new pqPauseLiveSourcePropertyWidget(smProxy, smProperty, parentWidget);
   }
 
   // *** NOTE: When adding new types, please update the header documentation ***

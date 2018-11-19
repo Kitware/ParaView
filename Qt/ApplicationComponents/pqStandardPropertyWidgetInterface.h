@@ -75,6 +75,7 @@ public:
    * \li \c transfer_function_editor : pqTransferFunctionWidgetPropertyWidget
    * \li \c viewtype_selector: pqViewTypePropertyWidget
    * \li \c view_resolution: pqViewResolutionPropertyWidget
+   * \li \c pause_livesource: pqPauseLiveSourcePropertyWidget
    */
   pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parentWidget) override;

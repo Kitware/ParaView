@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <utility>
 #include <vector>
 
+bool pqLiveSourceBehavior::PauseLiveUpdates = false;
+
 //-----------------------------------------------------------------------------
 class pqLiveSourceBehavior::pqInternals
 {
@@ -135,24 +137,27 @@ public:
     }
 
     // iterate over all sources and update those that need updating.
-    for (const auto& pair : this->LiveSources)
+    if (!pqLiveSourceBehavior::isPaused())
     {
-      pqPipelineSource* src = pair.first;
-      auto proxy = vtkSMSourceProxy::SafeDownCast(src->getProxy());
-      auto session = proxy->GetSession();
-
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke << VTKOBJECT(proxy) << "GetNeedsUpdate"
-             << vtkClientServerStream::End;
-      session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, /*ignore errors*/ true);
-
-      vtkClientServerStream result = session->GetLastResult(vtkPVSession::DATA_SERVER_ROOT);
-      bool needs_update = false;
-      if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1 &&
-        result.GetArgument(0, 0, &needs_update) && needs_update)
+      for (const auto& pair : this->LiveSources)
       {
-        proxy->MarkModified(proxy);
-        src->renderAllViews();
+        pqPipelineSource* src = pair.first;
+        auto proxy = vtkSMSourceProxy::SafeDownCast(src->getProxy());
+        auto session = proxy->GetSession();
+
+        vtkClientServerStream stream;
+        stream << vtkClientServerStream::Invoke << VTKOBJECT(proxy) << "GetNeedsUpdate"
+               << vtkClientServerStream::End;
+        session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, /*ignore errors*/ true);
+
+        vtkClientServerStream result = session->GetLastResult(vtkPVSession::DATA_SERVER_ROOT);
+        bool needs_update = false;
+        if (result.GetNumberOfMessages() == 1 && result.GetNumberOfArguments(0) == 1 &&
+          result.GetArgument(0, 0, &needs_update) && needs_update)
+        {
+          proxy->MarkModified(proxy);
+          src->renderAllViews();
+        }
       }
     }
 
@@ -201,6 +206,18 @@ pqLiveSourceBehavior::pqLiveSourceBehavior(QObject* parentObject)
 //-----------------------------------------------------------------------------
 pqLiveSourceBehavior::~pqLiveSourceBehavior()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveSourceBehavior::pause()
+{
+  pqLiveSourceBehavior::PauseLiveUpdates = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqLiveSourceBehavior::resume()
+{
+  pqLiveSourceBehavior::PauseLiveUpdates = false;
 }
 
 //-----------------------------------------------------------------------------

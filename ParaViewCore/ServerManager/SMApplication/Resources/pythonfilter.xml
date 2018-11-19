@@ -553,6 +553,12 @@ annotation text.
           outside of ParaView.
         </Documentation>
       </StringVectorProperty>
+
+      <Property name="PauseLiveSource" panel_widget="pause_livesource">
+        <Documentation>
+          Pause live source.
+        </Documentation>
+      </Property>
       <Hints>
         <LiveSource />
       </Hints>
