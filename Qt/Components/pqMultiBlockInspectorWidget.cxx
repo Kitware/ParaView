@@ -262,6 +262,8 @@ public:
 
   QColor color(const QModelIndex& idx) const
   {
+    Q_ASSERT(idx.column() == this->ColorColumn);
+
     const QModelIndex srcIdx = this->mapToSource(idx);
     QColor dcolor = this->sourceModel()->data(srcIdx, Qt::DisplayRole).value<QColor>();
     if (!dcolor.isValid() && this->LUT)
@@ -1202,6 +1204,7 @@ void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
 
   if (QAction* selAction = menu.exec(internals.Ui.treeView->mapToGlobal(pos)))
   {
+    QModelIndex idx = internals.SelectionModel->currentIndex();
     if (selAction == showBlocks || selAction == hideBlocks)
     {
       const QModelIndexList sRows = internals.SelectionModel->selectedRows(0);
@@ -1215,32 +1218,35 @@ void pqMultiBlockInspectorWidget::contextMenu(const QPoint& pos)
     }
     else if (selAction == setColors)
     {
+      QColor color =
+        internals.ProxyModel->color(idx.sibling(idx.row(), internals.ProxyModel->colorColumn()));
       QColor newColor =
-        QColorDialog::getColor(QColor(), this, "Select Color", QColorDialog::DontUseNativeDialog);
+        QColorDialog::getColor(color, this, "Select Color", QColorDialog::DontUseNativeDialog);
       if (newColor.isValid())
       {
-        this->setColor(internals.SelectionModel->currentIndex(), newColor);
+        this->setColor(idx, newColor);
       }
     }
     else if (selAction == resetColors)
     {
-      this->setColor(internals.SelectionModel->currentIndex(), QColor());
+      this->setColor(idx, QColor());
     }
     else if (selAction == setOpacities)
     {
+      double opacity = internals.ProxyModel->opacity(
+        idx.sibling(idx.row(), internals.ProxyModel->opacityColumn()));
       pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, this);
       dialog.setWindowTitle("Select Opacity");
-      dialog.setValue(1.0);
+      dialog.setValue(opacity);
       if (dialog.exec() == QDialog::Accepted)
       {
-        this->setOpacity(
-          internals.SelectionModel->currentIndex(), qBound(0.0, dialog.value(), 1.0));
+        this->setOpacity(idx, qBound(0.0, dialog.value(), 1.0));
       }
     }
     else if (selAction == resetOpacities)
     {
       // -ve opacity causes the value be cleared.
-      this->setOpacity(internals.SelectionModel->currentIndex(), -1.0);
+      this->setOpacity(idx, -1.0);
     }
     else if (selAction == expandAll)
     {
@@ -1261,7 +1267,7 @@ void pqMultiBlockInspectorWidget::setColor(const QModelIndex& idx, const QColor&
     // if idx not part of active selection, we don't update the all selected
     // nodes, only the current item.
     sRows.clear();
-    sRows.push_back(idx);
+    sRows.push_back(idx.sibling(idx.row(), internals.ProxyModel->colorColumn()));
   }
 
   const QVariant val = QVariant::fromValue(newcolor);
@@ -1293,7 +1299,7 @@ void pqMultiBlockInspectorWidget::setOpacity(const QModelIndex& idx, double opac
     // if idx not part of active selection, we don't update the all selected
     // nodes, only the current item.
     sRows.clear();
-    sRows.push_back(idx);
+    sRows.push_back(idx.sibling(idx.row(), internals.ProxyModel->opacityColumn()));
   }
 
   BEGIN_UNDO_SET(val.isValid() ? "Set Block Opacities" : "Reset Block Opacities");
