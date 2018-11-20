@@ -15,89 +15,25 @@
 #include "vtkCPPythonScriptPipeline.h"
 
 #include "vtkCPDataDescription.h"
-#include "vtkDataObject.h"
 #include "vtkMultiProcessController.h"
-#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h"
-#include "vtkPVPythonOptions.h"
-#include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
-#include "vtkSMObject.h"
-#include "vtkSMProxyManager.h"
 
 #include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
 
-extern "C" {
-void vtkPVInitializePythonModules();
-}
-
-namespace
-{
-//----------------------------------------------------------------------------
-void InitializePython()
-{
-  static bool initialized = false;
-  if (initialized)
-  {
-    return;
-  }
-  initialized = true;
-
-  // register callback to initialize modules statically. The callback is
-  // empty when BUILD_SHARED_LIBS is ON.
-  vtkPVInitializePythonModules();
-
-  vtkPythonInterpreter::Initialize();
-
-  std::ostringstream loadPythonModules;
-  loadPythonModules << "import sys\n"
-                    << "import paraview\n"
-                    << "f1 = paraview.print_error\n"
-                    << "f2 = paraview.print_debug_info\n"
-                    << "def print_dummy(text):\n"
-                    << "  pass\n"
-                    << "paraview.print_error = print_dummy\n"
-                    << "paraview.print_debug_info = print_dummy\n"
-                    // we now import stuff that have warnings or errors that we know are bad
-                    // when we're in a Catalyst edition. This fixes #18248.
-                    << "import paraview.servermanager\n"
-                    << "paraview.print_error = f1\n"
-                    << "paraview.print_debug_info = f2\n"
-                    << "from paraview.vtk import vtkPVCatalyst\n";
-  vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
-}
-
-//----------------------------------------------------------------------------
-// for things like programmable filters that have a '\n' in their strings,
-// we need to fix them to have \\n so that everything works smoothly
-void fixEOL(std::string& str)
-{
-  const std::string from = "\\n";
-  const std::string to = "\\\\n";
-  size_t start_pos = 0;
-  while ((start_pos = str.find(from, start_pos)) != std::string::npos)
-  {
-    str.replace(start_pos, from.length(), to);
-    start_pos += to.length();
-  }
-  return;
-}
-}
-
 vtkStandardNewMacro(vtkCPPythonScriptPipeline);
 //----------------------------------------------------------------------------
 vtkCPPythonScriptPipeline::vtkCPPythonScriptPipeline()
 {
-  this->PythonScriptName = 0;
+  this->PythonScriptName = nullptr;
 }
 
 //----------------------------------------------------------------------------
 vtkCPPythonScriptPipeline::~vtkCPPythonScriptPipeline()
 {
-  this->SetPythonScriptName(0);
+  this->SetPythonScriptName(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -118,8 +54,6 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
     return 0;
   }
 
-  InitializePython();
-
   // for now do not check on filename extension:
   // vtksys::SystemTools::GetFilenameLastExtension(FileName) == ".py" == 0)
 
@@ -130,9 +64,9 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   this->SetPythonScriptName(fileNameName.c_str());
 
   // only process 0 reads the actual script and then broadcasts it out
-  char* scriptText = NULL;
+  char* scriptText = nullptr;
   // we need to add the script path to PYTHONPATH
-  char* scriptPath = NULL;
+  char* scriptPath = nullptr;
 
   int rank = controller->GetLocalProcessId();
   int scriptSizes[2] = { 0, 0 };
@@ -145,7 +79,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
     {
       while (getline(myfile, line))
       {
-        fixEOL(line);
+        this->FixEOL(line);
         desiredString.append(line).append("\n");
       }
       myfile.close();
@@ -228,8 +162,6 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(vtkCPDataDescription* data
     return 0;
   }
 
-  InitializePython();
-
   // check the script to see if it should be run...
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
@@ -252,8 +184,6 @@ int vtkCPPythonScriptPipeline::CoProcess(vtkCPDataDescription* dataDescription)
     return 0;
   }
 
-  InitializePython();
-
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   std::ostringstream pythonInput;
@@ -269,8 +199,6 @@ int vtkCPPythonScriptPipeline::CoProcess(vtkCPDataDescription* dataDescription)
 //----------------------------------------------------------------------------
 int vtkCPPythonScriptPipeline::Finalize()
 {
-  InitializePython();
-
   std::ostringstream pythonInput;
   pythonInput << "if hasattr(" << this->PythonScriptName << ", 'Finalize'):\n"
               << "  " << this->PythonScriptName << ".Finalize()\n";
@@ -278,25 +206,6 @@ int vtkCPPythonScriptPipeline::Finalize()
   vtkPythonInterpreter::RunSimpleString(pythonInput.str().c_str());
 
   return 1;
-}
-
-//----------------------------------------------------------------------------
-vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
-{
-  char addressOfPointer[1024];
-#ifdef COPROCESSOR_WIN32_BUILD
-  sprintf_s(addressOfPointer, "%p", pointer);
-#else
-  sprintf(addressOfPointer, "%p", pointer);
-#endif
-  char* aplus = addressOfPointer;
-  if ((addressOfPointer[0] == '0') && ((addressOfPointer[1] == 'x') || addressOfPointer[1] == 'X'))
-  {
-    aplus += 2; // skip over "0x"
-  }
-
-  vtkStdString value = aplus;
-  return value;
 }
 
 //----------------------------------------------------------------------------

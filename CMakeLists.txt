@@ -776,7 +776,7 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
     ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst/)
 
   list(APPEND VTK_PYTHON_MODULES ${vtk-module})
-  set(vtkPVPythonCatalyst_HEADERS vtkCPPythonScriptPipeline)
+  set(vtkPVPythonCatalyst_HEADERS vtkCPPythonScriptPipeline vtkCPPythonStringPipeline vtkCPPythonPipeline)
   vtk_add_python_wrapping(${vtk-module} pv_wrapping_sources)
   vtk_add_python_wrapping_library(${vtk-module} pv_wrapping_sources ${vtk-module})
 

@@ -15,7 +15,7 @@
 #ifndef vtkCPPythonScriptPipeline_h
 #define vtkCPPythonScriptPipeline_h
 
-#include "vtkCPPipeline.h"
+#include "vtkCPPythonPipeline.h"
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries
 #include "vtkStdString.h"              // for the string
 
@@ -26,12 +26,12 @@ class vtkCPDataDescription;
 /// script.  This class only does operations with respect to the script
 /// and uses the name of the script as the module to hide its definitions
 /// from other python modules.
-class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
+class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonScriptPipeline : public vtkCPPythonPipeline
 {
 public:
   static vtkCPPythonScriptPipeline* New();
-  vtkTypeMacro(vtkCPPythonScriptPipeline, vtkCPPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  vtkTypeMacro(vtkCPPythonScriptPipeline, vtkCPPythonPipeline);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// Initialize this pipeline from given the file name of a
   /// python script. Returns 1 for success and 0 for failure.
@@ -44,21 +44,18 @@ public:
   /// it fills in the FieldNames array that the coprocessor requires
   /// in order to fulfill all the coprocessing requests for this
   /// TimeStep/Time combination.
-  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) VTK_OVERRIDE;
+  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription) override;
 
   /// Execute the pipeline. Returns 1 for success and 0 for failure.
-  virtual int CoProcess(vtkCPDataDescription* dataDescription) VTK_OVERRIDE;
+  virtual int CoProcess(vtkCPDataDescription* dataDescription) override;
 
   /// Finalize the pipeline before deleting it. A default no-op implementation
   /// is given. Returns 1 for success and 0 for failure.
-  virtual int Finalize() VTK_OVERRIDE;
+  virtual int Finalize() override;
 
 protected:
   vtkCPPythonScriptPipeline();
   virtual ~vtkCPPythonScriptPipeline();
-
-  /// Return the address of Pointer for the python script.
-  vtkStdString GetPythonAddress(void* pointer);
 
   /// Set/get macro functinos for setting PythonScriptName.
   vtkSetStringMacro(PythonScriptName);
