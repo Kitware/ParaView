@@ -82,7 +82,7 @@
         { "class": "vtkVolumeInputHelper" },
         { "class": "vtkOpenGLVolumeGradientOpacityTable" },
         { "class": "vtkMultiBlockVolumeMapper" },
-        { "class": "vtkOpenGLUniforms.cxx" },
+        { "class": "vtkOpenGLUniforms" },
         { "class": "vtkOpenGLVolumeOpacityTable" },
         { "class": "vtkOpenGLVolumeRGBTable" },
         { "class": "vtkSmartVolumeMapper" },
