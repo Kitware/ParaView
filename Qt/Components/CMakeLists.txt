@@ -47,6 +47,8 @@ set (Module_SRCS
   pqArrayListDomain.h
   pqArraySelectionWidget.cxx
   pqArraySelectionWidget.h
+  pqArraySelectorPropertyWidget.cxx
+  pqArraySelectorPropertyWidget.h
   pqArrayStatusPropertyWidget.cxx
   pqArrayStatusPropertyWidget.h
   pqFavoritesDialog.cxx
@@ -113,8 +115,6 @@ set (Module_SRCS
   pqDockWindowInterface.h
   pqDoubleVectorPropertyWidget.cxx
   pqDoubleVectorPropertyWidget.h
-  pqFieldSelectionAdaptor.cxx
-  pqFieldSelectionAdaptor.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
   pqFindDataCreateSelectionFrame.cxx
@@ -337,6 +337,7 @@ set (Module_MOC_HDRS
   pqAnimationViewWidget.h
   pqArrayListDomain.h
   pqArraySelectionWidget.h
+  pqArraySelectorPropertyWidget.h
   pqArrayStatusPropertyWidget.h
   pqFavoritesDialog.h
   pqFavoritesTreeWidget.h
@@ -366,7 +367,6 @@ set (Module_MOC_HDRS
   pqDisplayPanelPropertyWidget.h
   pqDisplayRepresentationWidget.h
   pqDoubleVectorPropertyWidget.h
-  pqFieldSelectionAdaptor.h
   pqFileChooserWidget.h
   pqFindDataCreateSelectionFrame.h
   pqFindDataCurrentSelectionFrame.h
