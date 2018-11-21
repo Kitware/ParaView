@@ -578,16 +578,6 @@ set (Module_RESOURCE_FILES
   Resources/pqComponents.qrc
 )
 
-if(NOT VTK_LEGACY_REMOVE)
-  # deprecated in 5.6
-  list(APPEND Module_SRCS
-    pqExodusIIVariableSelectionWidget.cxx
-    pqExodusIIVariableSelectionWidget.h)
-  list(APPEND Module_MOC_HDRS
-    pqExodusIIVariableSelectionWidget.h)
-endif()
-
-
 include(ParaViewQt)
 pv_find_package_qt(qt_private_targets REQUIRED QUIET
   QT5_COMPONENTS Widgets Network)

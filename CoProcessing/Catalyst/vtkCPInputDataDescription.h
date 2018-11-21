@@ -42,16 +42,6 @@ public:
   void AddField(const char* fieldName, int type);
 
   // Description:
-  // Add in a name of a point field .
-  // @deprecated in ParaView 5.6. Use *AddField()* instead.
-  VTK_LEGACY(void AddPointField(const char* fieldName));
-
-  // Description:
-  // Add in a name of a cell field.
-  // @deprecated in ParaView 5.6. Use *AddField()* instead.
-  VTK_LEGACY(void AddCellField(const char* fieldName));
-
-  // Description:
   // Get the number of fields currently specified in this object.
   unsigned int GetNumberOfFields();
 
@@ -67,18 +57,7 @@ public:
 
   // Description:
   // Return true if a field with fieldName is needed.
-  // @deprecated in ParaView 5.6. Use *bool IsFieldNeeded(const char* fieldName, int type)* instead.
-  VTK_LEGACY(bool IsFieldNeeded(const char* fieldName));
-
-  // Description:
-  // Return true if a field with fieldName is needed.
   bool IsFieldNeeded(const char* fieldName, int type);
-
-  // Description:
-  // Return true if the field associated with fieldName is point data
-  // and false if it is cell data.
-  // @deprecated in ParaView 5.6. Use *GetFieldType* instead.
-  VTK_LEGACY(bool IsFieldPointData(const char* fieldName));
 
   // Description:
   // When set to true, all fields are requested. Off by default.

@@ -34,12 +34,6 @@
 
 class vtkPVPlugin;
 
-#if !defined(VTK_LEGACY_REMOVE)
-/// deprecated in ParaView 5.6. Use `vtkPVPluginLoader::PluginLoaderCallback`
-/// instead.
-typedef bool (*vtkPluginLoadFunction)(const char*);
-#endif
-
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginLoader : public vtkObject
 {
 public:
@@ -142,13 +136,6 @@ public:
   static int RegisterLoadPluginCallback(PluginLoaderCallback callback);
   static void UnregisterLoadPluginCallback(int id);
   //@}
-
-  /**
-   * Sets the function used to load static plugins.
-   * @deprecated ParaView 5.6. Please use `RegisterLoadPluginCallback` instead
-   * which supports adding multiple callbacks.
-   */
-  VTK_LEGACY(static void SetStaticPluginLoadFunction(vtkPluginLoadFunction function));
 
   /**
    * Internal method used in pqParaViewPlugin.cxx.in to tell the

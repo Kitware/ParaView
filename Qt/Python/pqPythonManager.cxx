@@ -51,12 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPythonInterpreter.h"
 #include "vtkSmartPointer.h"
 
-#if !defined(VTK_LEGACY_REMOVE)
-#include "pqPythonDialog.h"
-#include "pqPythonShell.h"
-#include "vtkSMTrace.h"
-#endif
-
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
@@ -78,17 +72,7 @@ public:
     : Editor(NULL)
   {
   }
-  ~pqInternal()
-  {
-#if !defined(VTK_LEGACY_REMOVE)
-    delete this->PythonDialog;
-#endif
-    delete this->Editor;
-  }
-
-#if !defined(VTK_LEGACY_REMOVE)
-  QPointer<pqPythonDialog> PythonDialog;
-#endif
+  ~pqInternal() { delete this->Editor; }
 
   QPointer<pqPythonScriptEditor> Editor;
   QPointer<pqPythonMacroSupervisor> MacroSupervisor;
@@ -152,12 +136,6 @@ pqPythonManager::pqPythonManager(QObject* _parent /*=null*/)
   // Listen the signal when a macro wants to be edited
   QObject::connect(this->Internal->MacroSupervisor, SIGNAL(onEditMacro(const QString&)), this,
     SLOT(editMacro(const QString&)));
-
-#if !defined(VTK_LEGACY_REMOVE)
-  // Listen for signal when server is about to be removed
-  this->connect(core->getServerManagerModel(), SIGNAL(aboutToRemoveServer(pqServer*)), this,
-    SLOT(onRemovingServer(pqServer*)));
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -172,23 +150,6 @@ bool pqPythonManager::interpreterIsInitialized()
 {
   return vtkPythonInterpreter::IsInitialized();
 }
-
-//-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-pqPythonDialog* pqPythonManager::pythonShellDialog()
-{
-  VTK_LEGACY_BODY(pqPythonManager::pythonShellDialog, "ParaView 5.5");
-
-  // Create the dialog and initialize the interpreter the first time this
-  // method is called.
-  if (!this->Internal->PythonDialog)
-  {
-    vtkPythonInterpreter::Initialize();
-    this->Internal->PythonDialog = new pqPythonDialog(pqCoreUtilities::mainWidget());
-  }
-  return this->Internal->PythonDialog;
-}
-#endif
 
 //-----------------------------------------------------------------------------
 void pqPythonManager::addWidgetForRunMacros(QWidget* widget)
@@ -256,55 +217,6 @@ void pqPythonManager::executeScriptAndRender(const QString& filename)
   this->executeScript(filename);
   pqApplicationCore::instance()->render();
 }
-
-//-----------------------------------------------------------------------------
-void pqPythonManager::onRemovingServer(pqServer* /*server*/)
-{
-#if !defined(VTK_LEGACY_REMOVE)
-  if (this->Internal->PythonDialog)
-  {
-    this->Internal->PythonDialog->shell()->reset();
-  }
-#endif
-}
-
-//----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-QString pqPythonManager::getTraceString()
-{
-  VTK_LEGACY_BODY(pqPythonManager::getTraceString, "ParaView 5.5");
-  return vtkSMTrace::GetActiveTracer() ? vtkSMTrace::GetActiveTracer()->GetCurrentTrace().c_str()
-                                       : "";
-}
-#endif
-
-//-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void pqPythonManager::editTrace(const QString& txt, bool update)
-{
-  VTK_LEGACY_BODY(pqPythonManager::editTrace, "ParaView 5.5");
-
-  // Create the editor if needed and only the first time
-  bool new_editor = this->Internal->Editor == NULL;
-  if (!this->Internal->Editor)
-  {
-    this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
-    this->Internal->Editor->setPythonManager(this);
-  }
-
-  QString traceString = txt.isEmpty() ? this->getTraceString() : txt;
-  this->Internal->Editor->show();
-  if (new_editor || !update) // don't raise the window if we are just updating the trace.
-  {
-    this->Internal->Editor->raise();
-    this->Internal->Editor->activateWindow();
-  }
-  if (update || this->Internal->Editor->newFile())
-  {
-    this->Internal->Editor->setText(traceString);
-  }
-}
-#endif
 
 //----------------------------------------------------------------------------
 void pqPythonManager::updateMacroList()

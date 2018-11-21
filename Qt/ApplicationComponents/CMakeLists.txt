@@ -545,19 +545,6 @@ if (PARAVIEW_ENABLE_PYTHON)
   )
 endif()
 
-if(NOT VTK_LEGACY_REMOVE)
-  list(APPEND Module_SRCS
-    pqPythonShellReaction.cxx
-    pqPythonShellReaction.h
-    pqHideAllReaction.cxx
-    pqHideAllReaction.h
-  )
-  list(APPEND Module_MOC_HDRS
-    pqPythonShellReaction.h
-    pqHideAllReaction.h
-  )
-endif()
-
 set (Module_UI_FILES
   Resources/UI/pqAnimationTimeWidget.ui
   Resources/UI/pqAxesToolbar.ui

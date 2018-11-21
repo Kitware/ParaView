@@ -63,14 +63,6 @@ public:
   const std::vector<std::string>& GetFileExtensions() const { return this->FileExtensions; };
   //@}
 
-  //@{
-  /**
-   * Returns the suggested file extension for this exporter.
-   * @deprecated in ParaView 5.5. Use `GetFileExtensions` instead.
-   */
-  VTK_LEGACY(const char* GetFileExtension());
-  //@}
-
 protected:
   vtkSMExporterProxy();
   ~vtkSMExporterProxy() override;

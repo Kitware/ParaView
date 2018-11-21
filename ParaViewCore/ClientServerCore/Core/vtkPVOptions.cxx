@@ -428,16 +428,6 @@ int vtkPVOptions::DeprecatedArgument(const char* argument)
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-int vtkPVOptions::GetUseOffscreenRendering()
-{
-  VTK_LEGACY_REPLACED_BODY(vtkPVOptions::GetUseOffscreenRendering, "ParaView 5.5",
-    vtkPVOptions::GetForceOffscreenRendering);
-  return this->GetForceOffscreenRendering();
-}
-#endif
-
-//----------------------------------------------------------------------------
 void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

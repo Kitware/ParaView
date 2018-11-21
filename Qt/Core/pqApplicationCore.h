@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
-#include "vtkSetGet.h" // for VTK_LEGACY
 #include <QObject>
 #include <QPointer>
 
@@ -62,10 +61,6 @@ class QStringList;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkSMStateLoader;
-
-#if !defined(VTK_LEGACY_REMOVE)
-class pqDisplayPolicy;
-#endif
 
 /**
 * This class is the crux of the ParaView application. It creates
@@ -201,16 +196,6 @@ public:
   * ProgressManager is the manager that streamlines progress.
   */
   pqProgressManager* getProgressManager() const { return this->ProgressManager; }
-
-  /**
-  * @deprecated ParaView 5.5.  See vtkSMParaViewPipelineControllerWithRendering.
-  */
-  VTK_LEGACY(pqDisplayPolicy* getDisplayPolicy() const);
-
-  /**
-  * @deprecated ParaView 5.5. See vtkSMParaViewPipelineControllerWithRendering.
-  */
-  VTK_LEGACY(void setDisplayPolicy(pqDisplayPolicy* dp));
 
   /**
   * Provides access to the test utility.
@@ -395,10 +380,6 @@ protected:
   bool LoadingState;
 
   pqOptions* Options;
-
-#if !defined(VTK_LEGACY_REMOVE)
-  pqDisplayPolicy* DisplayPolicy;
-#endif
   pqLinksModel* LinksModel;
   pqObjectBuilder* ObjectBuilder;
   pqInterfaceTracker* InterfaceTracker;

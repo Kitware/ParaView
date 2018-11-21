@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h" // for exports
 #include <QScopedPointer> // for QScopedPointer.
 
-#include "vtkSetGet.h" // for LEGACY_REMOVE
-
 class pqOutputWidget;
 
 namespace OutputWidgetInternals
@@ -113,19 +111,6 @@ class PQCORE_EXPORT pqOutputWidget : public QWidget
 public:
   pqOutputWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   ~pqOutputWidget() override;
-
-#if !defined(VTK_LEGACY_REMOVE)
-  /*
-   * @deprecated in ParaView 5.5. Simply use QtMsgType.
-   */
-  enum MessageTypes
-  {
-    MESSAGE = QtInfoMsg,
-    ERROR = QtCriticalMsg,
-    WARNING = QtWarningMsg,
-    DEBUG = QtDebugMsg
-  };
-#endif
 
   /**
    * Add substrings to match with message to determine whether they should be

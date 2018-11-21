@@ -56,12 +56,6 @@ set (Module_UI_FILES
   pqPythonShell.ui
 )
 
-if(NOT VTK_LEGACY_REMOVE)
-  list(APPEND Module_SRCS pqPythonDialog.cxx pqPythonDialog.h)
-  list(APPEND Module_MOC_HDRS pqPythonDialog.h)
-  list(APPEND Module_UI_FILES pqPythonDialog.ui)
-endif()
-
 find_package(PythonLibs REQUIRED)
 
 include_directories(

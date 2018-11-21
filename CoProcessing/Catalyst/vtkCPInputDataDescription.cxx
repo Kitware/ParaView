@@ -75,24 +75,6 @@ void vtkCPInputDataDescription::AddField(const char* fieldName, int type)
   }
 }
 
-#ifndef VTK_LEGACY_REMOVE
-//----------------------------------------------------------------------------
-void vtkCPInputDataDescription::AddPointField(const char* fieldName)
-{
-  VTK_LEGACY_BODY(vtkCPInputDataDescription::AddPointField, "ParaView 5.6");
-  this->AddField(fieldName, vtkDataObject::POINT);
-}
-#endif
-
-#ifndef VTK_LEGACY_REMOVE
-//----------------------------------------------------------------------------
-void vtkCPInputDataDescription::AddCellField(const char* fieldName)
-{
-  VTK_LEGACY_BODY(vtkCPInputDataDescription::AddCellField, "ParaView 5.6");
-  this->AddField(fieldName, vtkDataObject::CELL);
-}
-#endif
-
 //----------------------------------------------------------------------------
 unsigned int vtkCPInputDataDescription::GetNumberOfFields()
 {
@@ -156,16 +138,6 @@ int vtkCPInputDataDescription::GetFieldType(unsigned int fieldIndex)
   return -1;
 }
 
-#ifndef VTK_LEGACY_REMOVE
-//----------------------------------------------------------------------------
-bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName)
-{
-  VTK_LEGACY_BODY(vtkCPInputDataDescription::IsFieldNeeded, "ParaView 5.6");
-
-  return this->IsFieldNeeded(fieldName, 0) || this - IsFieldNeeded(fieldName, 1);
-}
-#endif
-
 //----------------------------------------------------------------------------
 bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName, int type)
 {
@@ -182,16 +154,6 @@ bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName, int type)
   return std::find(this->Internals->Fields[type].begin(), this->Internals->Fields[type].end(),
            fieldName) != this->Internals->Fields[type].end();
 }
-
-#ifndef VTK_LEGACY_REMOVE
-//----------------------------------------------------------------------------
-bool vtkCPInputDataDescription::IsFieldPointData(const char* fieldName)
-{
-  VTK_LEGACY_BODY(vtkCPInputDataDescription::IsFieldPointData, "ParaView 5.6");
-  return std::find(this->Internals->Fields[0].begin(), this->Internals->Fields[0].end(),
-           fieldName) != this->Internals->Fields[0].end();
-}
-#endif
 
 //----------------------------------------------------------------------------
 bool vtkCPInputDataDescription::GetIfGridIsNecessary()

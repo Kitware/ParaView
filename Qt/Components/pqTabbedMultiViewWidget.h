@@ -33,11 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqTabbedMultiViewWidget_h
 
 #include "pqComponentsModule.h"
-#include "vtkSetGet.h" // needed for VTK_LEGACY
-#include "vtkType.h"   // needed for vtkIdType
-#include <QStyle>      // needed for QStyle:StandardPixmap
-#include <QTabBar>     // needed for QTabBar::ButtonPosition
-#include <QTabWidget>  // needed for QTabWidget.
+#include "vtkType.h"  // needed for vtkIdType
+#include <QStyle>     // needed for QStyle:StandardPixmap
+#include <QTabBar>    // needed for QTabBar::ButtonPosition
+#include <QTabWidget> // needed for QTabWidget.
 
 class pqMultiViewWidget;
 class pqProxy;

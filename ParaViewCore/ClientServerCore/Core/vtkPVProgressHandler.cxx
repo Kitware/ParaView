@@ -533,8 +533,4 @@ void vtkPVProgressHandler::RefreshMessage(const char* message, int etype, bool i
         break;
     }
   }
-
-#if !defined(VTK_LEGACY_REMOVE)
-  this->InvokeEvent(vtkCommand::MessageEvent, const_cast<char*>(message));
-#endif
 }

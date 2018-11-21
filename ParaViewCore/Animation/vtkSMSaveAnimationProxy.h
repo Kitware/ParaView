@@ -49,24 +49,6 @@ public:
   virtual bool WriteAnimation(const char* filename);
 
   /**
-   * Returns true if the session can support disconnecting and saving
-   * animations.
-   */
-  VTK_LEGACY(static bool SupportsDisconnectAndSave(vtkSMSession* session));
-
-  /**
-   * Returns true if the session supports AVI file writing.
-   * @deprecated in ParaView 5.5
-   */
-  VTK_LEGACY(static bool SupportsAVI(vtkSMSession* session, bool remote = false));
-
-  /**
-   * Returns true if the session supports OGV file writing.
-   * @deprecated in ParaView 5.5
-   */
-  VTK_LEGACY(static bool SupportsOGV(vtkSMSession* session, bool remote = false));
-
-  /**
    * Overridden to update visibility state of "FrameRate" property.
    */
   void UpdateDefaultsAndVisibilities(const char* filename) override;

@@ -209,15 +209,6 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElem
     this->SetArgumentIsArray(arg_is_array);
   }
 
-#if !defined(VTK_LEGACY_REMOVE) && !defined(VTK_LEGACY_SILENT)
-  if (element->GetAttribute("precision"))
-  {
-    vtkWarningMacro(
-      "DoubleVectorProperty no longer supports `precision` attribute as it is no longer needed. "
-      "Simply remove it from your XML configuration.");
-  }
-#endif
-
   int numElems = this->GetNumberOfElements();
   if (numElems > 0)
   {
@@ -320,17 +311,3 @@ bool vtkSMDoubleVectorProperty::IsValueDefault()
 {
   return this->Internals->IsValueDefault();
 }
-
-//---------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void vtkSMDoubleVectorProperty::SetPrecision(int)
-{
-  VTK_LEGACY_BODY(vtkSMDoubleVectorProperty::SetPrecision, "ParaView 5.6");
-}
-
-int vtkSMDoubleVectorProperty::GetPrecision()
-{
-  VTK_LEGACY_BODY(vtkSMDoubleVectorProperty::GetPrecision, "ParaView 5.6");
-  return 0;
-}
-#endif
