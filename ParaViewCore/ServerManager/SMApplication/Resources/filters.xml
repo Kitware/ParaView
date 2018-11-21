@@ -7797,7 +7797,9 @@ source.</Documentation>
         <EnumerationDomain name="enum">
           <Entry text="All Points" value="0"/>
           <Entry text="Every Nth Point" value="1"/>
-          <Entry text="Uniform Spatial Distribution" value="2"/>
+          <Entry text="Uniform Spatial Distribution (Bounds Based)" value="2"/>
+          <Entry text="Uniform Spatial Distribution (Surface Sampling)" value="3"/>
+          <Entry text="Uniform Spatial Distribution (Volume Sampling)" value="4"/>
         </EnumerationDomain>
         <Documentation>
 This property indicates the mode that will be used to generate
@@ -7814,11 +7816,14 @@ This property specifies the maximum number of sample points to use
 when sampling the space when Uniform Spatial Distribution is used.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="2" />
-          <!-- show this widget when GlyphMode==2 -->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="GlyphMode" value="2" inverse="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="GlyphMode" value="3" inverse="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="GlyphMode" value="4" inverse="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+          <!-- show this widget when GlyphMode==2||3||4 -->
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetSeed"
@@ -7832,11 +7837,14 @@ uniform distribution of glyph points when a Uniform Spatial
 Distribution is used.
         </Documentation>
         <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="GlyphMode"
-                                   value="2" />
-          <!-- show this widget when GlyphMode==2 -->
+          <PropertyWidgetDecorator type="CompositeDecorator">
+            <Expression type="or">
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="GlyphMode" value="2" inverse="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="GlyphMode" value="3" inverse="0" />
+              <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="GlyphMode" value="4" inverse="0" />
+            </Expression>
+          </PropertyWidgetDecorator>
+          <!-- show this widget when GlyphMode==2||3||4 -->
         </Hints>
       </IntVectorProperty>
       <IntVectorProperty command="SetStride"

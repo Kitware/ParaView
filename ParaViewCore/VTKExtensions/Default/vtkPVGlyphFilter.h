@@ -32,9 +32,28 @@
  * distribution of points are glyphed. \c Seed controls the seed point for the random
  * number generator (vtkMinimalStandardRandomSequence). \c MaximumNumberOfSamplePoints
  * can be used to limit the number of sample points used for random sampling. This
- * doesn't not equal the number of points actually glyphed, since that depends on
+ * does not equal the number of points actually glyphed, since that depends on
  * several factors. In parallel, this filter ensures that spatial bounds are collected
  * across all ranks for generating identical sample points.
+ *
+ * \li SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE: points randomly sampled
+ * via an inverse transform on surface area of each cell. When used with a volume dataset,
+ * the surface mesh is extracted and used for the sampling.
+ * \c Seed controls the seed point for the random number generator.
+ * \c MaximumNumberOfSamplePoints limits the number of sample points used for random sampling.
+ * The number of glyphs produced can be smaller since the sampling depends on several factors.
+ * In parallel and with composite dataset, this filter ensures that each piece
+ * samples only a representative number of points.
+ * Note that the mesh will be triangulated first.
+ *
+ * \li SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME: points randomly sampled
+ * via an inverse transform on the volume of each cell. Only 3D cells will be considered.
+ * \c Seed controls the seed point for the random number generator.
+ * \c MaximumNumberOfSamplePoints limits the number of sample points used for random sampling.
+ * The number of glyphs produced can be smaller since the sampling depends on several factors.
+ * In parallel and with composite dataset, this filter ensures that each piece
+ * samples only a representative number of points.
+ * Note that the grid will be tetrahedralized first.
 */
 
 #ifndef vtkPVGlyphFilter_h
@@ -59,7 +78,9 @@ public:
   {
     ALL_POINTS,
     EVERY_NTH_POINT,
-    SPATIALLY_UNIFORM_DISTRIBUTION
+    SPATIALLY_UNIFORM_DISTRIBUTION,
+    SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE,
+    SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME
   };
 
   vtkTypeMacro(vtkPVGlyphFilter, vtkPolyDataAlgorithm);
@@ -135,7 +156,7 @@ public:
   /**
    * Set/Get the mode at which glyphs will be generated.
    */
-  vtkSetClampMacro(GlyphMode, int, ALL_POINTS, SPATIALLY_UNIFORM_DISTRIBUTION);
+  vtkSetClampMacro(GlyphMode, int, ALL_POINTS, SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME);
   vtkGetMacro(GlyphMode, int);
   //@}
 
@@ -159,13 +180,12 @@ public:
   //@{
   /**
    * Set/Get maximum number of sample points to use to sample the space when
-   * GlyphMode is set to SPATIALLY_UNIFORM_DISTRIBUTION.
+   * GlyphMode is set to SPATIALLY_UNIFORM_*.
    */
   vtkSetClampMacro(MaximumNumberOfSamplePoints, int, 1, VTK_INT_MAX);
   vtkGetMacro(MaximumNumberOfSamplePoints, int);
   //@}
 
-  //@{
   /**
    * Overridden to create output data of appropriate type.
    */
@@ -174,7 +194,6 @@ public:
 protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter() override;
-  //@}
 
   // Standard Pipeline methods
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
@@ -185,8 +204,10 @@ protected:
 
   /**
    * Returns 1 if point is to be glyphed, otherwise returns 0.
+   * \c index is the flat index of the dataset when using composite dataset.
+   * \c cellCenters is a flag to know if cellCenters are currently used
    */
-  virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
+  virtual int IsPointVisible(unsigned int index, vtkDataSet* ds, vtkIdType ptId, bool cellCenters);
 
   /**
    * Returns true if input Scalars and Vectors are compatible, otherwise returns 0.
@@ -213,23 +234,18 @@ protected:
    */
   bool NeedsVectors();
 
-  /**
-   * Method called in RequestData() to do the actual data processing. This will
-   * apply a Cell Centers before the Glyph. The \c input, filling up the \c output
-   * based on the filter parameters.
-   */
-  virtual bool ExecuteWithCellCenters(
-    vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output);
-
   //@{
   /**
    * Method called in RequestData() to do the actual data processing. This will
    * glyph the \c input, filling up the \c output based on the filter
-   * parameters.
+   * parameters. \c index is the flat index of the dataset when using composite dataset.
+   * This will use vtkCellCenters if UseCellCenters returns true.
    */
-  virtual bool Execute(vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output);
-  virtual bool Execute(vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output,
-    vtkDataArray* inSScalars, vtkDataArray* inVectors);
+  virtual bool Execute(
+    unsigned int index, vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output);
+  virtual bool Execute(unsigned int index, vtkDataSet* input, vtkInformationVector* sourceVector,
+    vtkPolyData* output, vtkDataArray* inSScalars, vtkDataArray* inVectors,
+    bool cellCenters = false);
   //@}
 
   int VectorScaleMode;
