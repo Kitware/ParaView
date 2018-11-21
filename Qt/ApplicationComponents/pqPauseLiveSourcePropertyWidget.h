@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqLiveSourceBehavior.h
+   Module:  pqPauseLiveSourcePropertyWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,65 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqLiveSourceBehavior_h
-#define pqLiveSourceBehavior_h
+#ifndef pqPauseLiveSourcePropertyWidget_h
+#define pqPauseLiveSourcePropertyWidget_h
 
-#include "pqApplicationComponentsModule.h"
-#include <QObject>
-#include <QScopedPointer>
-
-class pqPipelineSource;
-class pqView;
+#include "pqApplicationComponentsModule.h" // needed for exports
+#include "pqPropertyWidget.h"
 
 /**
- * @class pqLiveSourceBehavior
- * @ingroup Behaviors
+ * @class pqPauseLiveSourcePropertyWidget
+ * @brief widget to pause all live sources
  *
- * pqLiveSourceBehavior adds support for "live" algorithms. These are
- * vtkAlgorithm subclasses that have a method `GetNeedsUpdate` which returns
- * true (bool) when source may have new data and should be refreshed.
- *
- * To indicate a source is a "live source", one needs to simply add
- * `<LiveSource>` XML hint for the source proxy.
+ * pqPauseLiveSourcePropertyWidget can be added to a property on any source that
+ * is a "live source" i.e. has the `<LiveSource>` XML hint. This will add a
+ * button to the UI that allows the user to pause all live sources.
  */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqLiveSourceBehavior : public QObject
+class PQAPPLICATIONCOMPONENTS_EXPORT pqPauseLiveSourcePropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef pqPropertyWidget Superclass;
 
 public:
-  pqLiveSourceBehavior(QObject* parent = 0);
-  ~pqLiveSourceBehavior() override;
-
-  /**
-   * Pause live updates.
-   */
-  static void pause();
-
-  /**
-   * Resume live updates.
-   */
-  static void resume();
-
-  /**
-   * Returns true if live updates are paused.
-   */
-  static bool isPaused() { return pqLiveSourceBehavior::PauseLiveUpdates; }
-
-protected slots:
-  void viewAdded(pqView*);
-  void sourceAdded(pqPipelineSource*);
-  void timeout();
+  pqPauseLiveSourcePropertyWidget(
+    vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parent = 0);
+  ~pqPauseLiveSourcePropertyWidget() override;
 
 private:
-  Q_DISABLE_COPY(pqLiveSourceBehavior);
-  void startInteractionEvent();
-  void endInteractionEvent();
-
-  class pqInternals;
-  QScopedPointer<pqInternals> Internals;
-
-  static bool PauseLiveUpdates;
+  Q_DISABLE_COPY(pqPauseLiveSourcePropertyWidget)
 };
 
 #endif
