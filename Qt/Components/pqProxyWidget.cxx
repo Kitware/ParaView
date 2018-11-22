@@ -1142,7 +1142,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   }
   else if (vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(smproperty))
   {
-    widget = new pqStringVectorPropertyWidget(svp, smproxy, parentObj);
+    widget = pqStringVectorPropertyWidget::createWidget(svp, smproxy, parentObj);
   }
   else if (vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(smproperty))
   {

@@ -51,9 +51,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqArrayListDomain.h"
 #include "pqArraySelectionWidget.h"
+#include "pqArraySelectorPropertyWidget.h"
 #include "pqComboBoxDomain.h"
 #include "pqDialog.h"
-#include "pqFieldSelectionAdaptor.h"
 #include "pqFileChooserWidget.h"
 #include "pqLineEdit.h"
 #include "pqPopOutWidget.h"
@@ -235,76 +235,40 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   }
   else if (arrayListDomain)
   {
-    if (smProperty->GetRepeatable())
-    {
-      // repeatable array list domains get a the pqArraySelectionWidget
-      // that lists each array name with a check box
-      auto selectorWidget = new pqArraySelectionWidget(this);
-      selectorWidget->setObjectName("ArraySelectionWidget");
-      selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
-      selectorWidget->setMaximumRowCountBeforeScrolling(
-        pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
+    Q_ASSERT(smProperty->GetRepeatable());
+    // repeatable array list domains get a the pqArraySelectionWidget
+    // that lists each array name with a check box
+    auto selectorWidget = new pqArraySelectionWidget(this);
+    selectorWidget->setObjectName("ArraySelectionWidget");
+    selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+    selectorWidget->setMaximumRowCountBeforeScrolling(
+      pqPropertyWidget::hintsWidgetHeightNumberOfRows(smProperty->GetHints()));
 
-      // add context menu and custom indicator for sorting and filtering.
-      new pqTreeViewSelectionHelper(selectorWidget);
+    // add context menu and custom indicator for sorting and filtering.
+    new pqTreeViewSelectionHelper(selectorWidget);
 
-      // hide widget label
-      this->setShowLabel(false);
+    // hide widget label
+    this->setShowLabel(false);
 
-      vbox->addWidget(selectorWidget);
+    vbox->addWidget(selectorWidget);
 
-      PV_DEBUG_PANELS() << "pqArrayStatusPropertyWidget for a "
-                        << "StringVectorProperty with a repeatable "
-                        << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
+    PV_DEBUG_PANELS() << "pqArrayStatusPropertyWidget for a "
+                      << "StringVectorProperty with a repeatable "
+                      << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
 
-      // unlike vtkSMArraySelectionDomain which is doesn't tend to change based
-      // on values of other properties, typically, vtkSMArrayListDomain changes
-      // on other property values e.g. when one switches from point-data to
-      // cell-data, the available arrays change. Hence we "reset" the widget
-      // every time the domain changes.
-      new pqArrayListDomain(
-        selectorWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
+    // unlike vtkSMArraySelectionDomain which is doesn't tend to change based
+    // on values of other properties, typically, vtkSMArrayListDomain changes
+    // on other property values e.g. when one switches from point-data to
+    // cell-data, the available arrays change. Hence we "reset" the widget
+    // every time the domain changes.
+    new pqArrayListDomain(
+      selectorWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
 
-      PV_DEBUG_PANELS() << " Also creating pqArrayListDomain to keep the list updated.";
+    PV_DEBUG_PANELS() << " Also creating pqArrayListDomain to keep the list updated.";
 
-      this->addPropertyLink(
-        selectorWidget, smProxy->GetPropertyName(smProperty), SIGNAL(widgetModified()), smProperty);
-      this->setChangeAvailableAsChangeFinished(true);
-    }
-    else if (fieldDataDomain)
-    {
-      QComboBox* comboBox = new QComboBox(this);
-      comboBox->setObjectName("ComboBox");
-
-      pqFieldSelectionAdaptor* adaptor = new pqFieldSelectionAdaptor(comboBox, smProperty);
-
-      this->addPropertyLink(adaptor, "selection", SIGNAL(selectionChanged()), svp);
-      this->setChangeAvailableAsChangeFinished(true);
-
-      vbox->addWidget(comboBox);
-
-      PV_DEBUG_PANELS() << "QComboBox for a StringVectorProperty with a "
-                        << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")"
-                        << "and a FieldDataDomain (" << fieldDataDomain->GetXMLName() << ")";
-    }
-    else
-    {
-      // non-repeatable array list domains get a combo box
-      // listing each array name
-      QComboBox* comboBox = new QComboBox(this);
-      comboBox->setObjectName("ComboBox");
-
-      pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
-      new pqComboBoxDomain(comboBox, smProperty, "array_list");
-
-      this->addPropertyLink(adaptor, "currentText", SIGNAL(currentTextChanged(QString)), svp);
-      this->setChangeAvailableAsChangeFinished(true);
-
-      vbox->addWidget(comboBox);
-
-      PV_DEBUG_PANELS() << "QComboBox for a StringVectorProperty with a "
-                        << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
-    }
+    this->addPropertyLink(
+      selectorWidget, smProxy->GetPropertyName(smProperty), SIGNAL(widgetModified()), smProperty);
+    this->setChangeAvailableAsChangeFinished(true);
   }
   else if (silDomain)
   {
@@ -497,3 +461,12 @@ pqStringVectorPropertyWidget::~pqStringVectorPropertyWidget()
 }
 
 //-----------------------------------------------------------------------------
+pqPropertyWidget* pqStringVectorPropertyWidget::createWidget(
+  vtkSMStringVectorProperty* svp, vtkSMProxy* smproxy, QWidget* parent)
+{
+  if (svp && svp->FindDomain<vtkSMArrayListDomain>() && !svp->GetRepeatable())
+  {
+    return new pqArraySelectorPropertyWidget(svp, smproxy, parent);
+  }
+  return new pqStringVectorPropertyWidget(svp, smproxy, parent);
+}

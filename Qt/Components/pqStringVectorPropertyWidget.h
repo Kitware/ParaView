@@ -37,12 +37,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyLinks.h"
 
+class vtkSMStringVectorProperty;
 class PQCOMPONENTS_EXPORT pqStringVectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 public:
-  pqStringVectorPropertyWidget(vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = 0);
+  pqStringVectorPropertyWidget(
+    vtkSMProperty* property, vtkSMProxy* proxy, QWidget* parent = nullptr);
   virtual ~pqStringVectorPropertyWidget();
+
+  /**
+   * Factory method to instantiate a hard-coded type of pqPropertyWidget
+   * subclass for t he vtkSMStringVectorProperty.
+   */
+  static pqPropertyWidget* createWidget(
+    vtkSMStringVectorProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent = nullptr);
 
 private:
   Q_DISABLE_COPY(pqStringVectorPropertyWidget);
