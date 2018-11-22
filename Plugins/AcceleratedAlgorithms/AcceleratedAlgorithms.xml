@@ -35,12 +35,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property specifies the name of the scalar array
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
@@ -161,12 +155,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property specifies the name of the scalar array
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>

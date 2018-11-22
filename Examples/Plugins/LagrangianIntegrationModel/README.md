@@ -28,7 +28,7 @@ This is a line by line explanation for LagrangianIntegrationModelExample.xml
                               // index : a user index in order to identify the array, define it in default values, start at 1, index 0 is reserved.
                               // port : the port number , define it in default values
                               // connection : the connection in the port, define it in default values but should not be needed in tracker context
-                              // fieldAssociaction : point data or cell data, defined in FieldDataDomain
+                              // fieldAssociaction : point data or cell data, defined in InputArrayDomain
                               // arrayName : actual array name, passed be paraview.
                             default_values_delimiter=";" // Only when using default values for multiples args, ie more than just the index
                             default_values="2;1;0;0:ParticleDiameter" // Default values, here it is port 1 with index 2, connection 0, type is PointData
@@ -51,12 +51,6 @@ This is a line by line explanation for LagrangianIntegrationModelExample.xml
                      // the surfaces are called DummySurface
           </RequiredProperties>
          </ArrayListDomain>
-         <FieldDataDomain name="field_list"> // Needed if one want to be able to recover the field association, recommended.
-          <RequiredProperties> // Should be the same as above RequiredProperties
-           <Property function="Input"
-                     name="DummyInput" />
-          </RequiredProperties>
-         </FieldDataDomain>
          <Documentation>This property contains the name of  // Documentation for the property
           the array to use as flow velocity.</Documentation>
         </StringVectorProperty>

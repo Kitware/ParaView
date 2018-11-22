@@ -211,12 +211,6 @@
                       name="DummySource" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummySource" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property contains the name of the vector array from
         the seeds to use as initial particle velocity.</Documentation>
       </StringVectorProperty>
@@ -248,12 +242,6 @@
                       name="DummySource" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummySource" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Hints>
           <PropertyWidgetDecorator type="ShowWidgetDecorator">
             <Property name="UseInitialIntegrationTime" function="boolean" />
@@ -345,12 +333,6 @@
                       name="DummyInput" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummyInput" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property contains the name of
         the array to use as flow velocity.</Documentation>
       </StringVectorProperty>
@@ -370,12 +352,6 @@
                       name="DummyInput" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummyInput" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property contains the name of
         the array to use as flow density.</Documentation>
       </StringVectorProperty>
@@ -394,12 +370,6 @@
                       name="DummyInput" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummyInput" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property contains the name of
         the array to use as flow dynamic viscosity.</Documentation>
       </StringVectorProperty>
@@ -418,12 +388,6 @@
                       name="DummySource" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummySource" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property contains the name of
         the array to use from seeds as particle diameter.</Documentation>
       </StringVectorProperty>
@@ -442,12 +406,6 @@
                       name="DummySource" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="DummySource" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property contains the name of
         the array to use from seedsas particle density.</Documentation>
       </StringVectorProperty>

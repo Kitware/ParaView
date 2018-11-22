@@ -41,11 +41,6 @@
             <Property name="Input" function="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property name="Input" function="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>
           The name of the scalar array that represents flux through a 2D
           element or circulation along a 1D element.  This array will be
@@ -106,11 +101,6 @@
             <Property name="Input" function="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property name="Input" function="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>
           The name of the scalar or vector array that represents flux
           through a 2D element or circulation along a 1D element.  If

@@ -41,12 +41,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property specifies the name of the scalar array
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
@@ -134,12 +128,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>The value of this property contains the name of the
         scalar array from which to perform thresholding.</Documentation>
       </StringVectorProperty>
@@ -203,12 +191,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property lists the name of the scalar array from
         which to compute the gradient.</Documentation>
       </StringVectorProperty>
@@ -450,12 +432,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetClipValue"
                             default_values="0.0"

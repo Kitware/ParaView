@@ -4433,13 +4433,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1"
-                         force_point_cell_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
@@ -4679,13 +4672,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1"
-                         force_point_cell_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <IntVectorProperty command="SetMapScalars"
                          default_values="1"
@@ -5149,13 +5135,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1"
-                         force_point_cell_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <IntVectorProperty command="SetExtractedBlockIndex"
                          default_values="0"
@@ -5382,13 +5361,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1"
-                         force_point_cell_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <IntVectorProperty command="SetSlice"
                          default_values="0"
@@ -6601,12 +6573,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable" >
@@ -6981,12 +6947,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property indicates the name of the array from which
         to compute the histogram.</Documentation>
       </StringVectorProperty>
@@ -10722,13 +10682,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1"
-                         force_point_cell_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetPosition"
                             default_values="0 0 0"
@@ -10942,12 +10895,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <StringVectorProperty command="SetRepresentation"
                             default_values="Surface"

@@ -28,14 +28,6 @@
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </FieldDataDomain>
-
         <Documentation>
           This property specifies the name of the input vector array to process.
         </Documentation>
