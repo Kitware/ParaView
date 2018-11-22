@@ -511,8 +511,8 @@ bool vtkSMSelectionHelper::MergeSelection(
     return false;
   }
 
-  if (vtkSMPropertyHelper(output, "ContainingCells").GetAsInt() !=
-    vtkSMPropertyHelper(input, "ContainingCells").GetAsInt())
+  if (vtkSMPropertyHelper(output, "ContainingCells", true).GetAsInt() !=
+    vtkSMPropertyHelper(input, "ContainingCells", true).GetAsInt())
   {
     return false;
   }
@@ -619,8 +619,8 @@ bool vtkSMSelectionHelper::SubtractSelection(
     return false;
   }
 
-  if (vtkSMPropertyHelper(output, "ContainingCells").GetAsInt() !=
-    vtkSMPropertyHelper(input, "ContainingCells").GetAsInt())
+  if (vtkSMPropertyHelper(output, "ContainingCells", true).GetAsInt() !=
+    vtkSMPropertyHelper(input, "ContainingCells", true).GetAsInt())
   {
     return false;
   }
@@ -766,8 +766,8 @@ bool vtkSMSelectionHelper::ToggleSelection(
     return false;
   }
 
-  if (vtkSMPropertyHelper(output, "ContainingCells").GetAsInt() !=
-    vtkSMPropertyHelper(input, "ContainingCells").GetAsInt())
+  if (vtkSMPropertyHelper(output, "ContainingCells", true).GetAsInt() !=
+    vtkSMPropertyHelper(input, "ContainingCells", true).GetAsInt())
   {
     return false;
   }

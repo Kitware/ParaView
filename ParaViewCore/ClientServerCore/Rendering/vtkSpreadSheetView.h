@@ -109,26 +109,26 @@ public:
    * Get the number of columns.
    * \note CallOnClient
    */
-  vtkIdType GetNumberOfColumns();
+  virtual vtkIdType GetNumberOfColumns();
 
   /**
    * Get the number of rows.
    * \note CallOnClient
    */
-  vtkIdType GetNumberOfRows();
+  virtual vtkIdType GetNumberOfRows();
 
   /**
    * Returns the name for the column.
    * \note CallOnClient
    */
-  const char* GetColumnName(vtkIdType index);
+  virtual const char* GetColumnName(vtkIdType index);
 
   //@{
   /**
    * Returns true if the column is internal.
    */
-  bool IsColumnInternal(vtkIdType index);
-  bool IsColumnInternal(const char* columnName);
+  virtual bool IsColumnInternal(vtkIdType index);
+  virtual bool IsColumnInternal(const char* columnName);
   //@}
 
   //@{
@@ -141,14 +141,14 @@ public:
    *
    * \note CallOnClient
    */
-  std::string GetColumnLabel(vtkIdType index);
-  std::string GetColumnLabel(const char* columnName);
+  virtual std::string GetColumnLabel(vtkIdType index);
+  virtual std::string GetColumnLabel(const char* columnName);
   //@}
 
   /**
    * Returns the visibility for the column at the given index.
    */
-  bool GetColumnVisibility(vtkIdType index);
+  virtual bool GetColumnVisibility(vtkIdType index);
 
   //@{
   /**
@@ -157,19 +157,19 @@ public:
    * on the CLIENT process for now.
    * \note CallOnClient
    */
-  vtkVariant GetValue(vtkIdType row, vtkIdType col);
-  vtkVariant GetValueByName(vtkIdType row, const char* columnName);
+  virtual vtkVariant GetValue(vtkIdType row, vtkIdType col);
+  virtual vtkVariant GetValueByName(vtkIdType row, const char* columnName);
   //@}
 
   /**
    * Returns true if the row is selected.
    */
-  bool IsRowSelected(vtkIdType row);
+  virtual bool IsRowSelected(vtkIdType row);
 
   /**
    * Returns true is the data for the particular row is locally available.
    */
-  bool IsAvailable(vtkIdType row);
+  virtual bool IsAvailable(vtkIdType row);
 
   //***************************************************************************
   // Forwarded to vtkSortedTableStreamer.
@@ -195,7 +195,7 @@ public:
   /**
    * Export the contents of this view using the exporter.
    */
-  bool Export(vtkCSVExporter* exporter);
+  virtual bool Export(vtkCSVExporter* exporter);
 
   /**
    * Allow user to clear the cache if he needs to.

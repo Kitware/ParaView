@@ -1,7 +1,7 @@
 """This is the paraview.vtk module."""
 import sys
 
-if sys.version_info < (3,4):
+if sys.version_info <= (3,4):
     # imp is deprecated in 3.4
     import imp, importlib
 
