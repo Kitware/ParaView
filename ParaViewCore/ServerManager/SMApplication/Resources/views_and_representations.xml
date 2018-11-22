@@ -3563,8 +3563,7 @@
                          number_of_elements="1"
                          panel_visibility="never">
         <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
+        <FieldDataDomain enable_field_data="1"
                          name="enum">
         </FieldDataDomain>
       </IntVectorProperty>
@@ -6756,8 +6755,7 @@
                          name="AttributeType"
                          number_of_elements="1">
         <Documentation>Select the attribute data to render.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
+        <FieldDataDomain enable_field_data="1"
                          name="enum">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -7196,8 +7194,7 @@
                          name="FieldAssociation"
                          number_of_elements="1">
         <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
+        <FieldDataDomain enable_field_data="1"
                          name="enum">
           <RequiredProperties>
             <Property function="Input"
@@ -7365,8 +7362,7 @@
                          name="FieldAssociation"
                          number_of_elements="1">
         <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
+        <FieldDataDomain enable_field_data="1"
                          name="enum">
           <RequiredProperties>
             <Property function="Input"
@@ -7555,8 +7551,7 @@
                          name="FieldAssociation"
                          number_of_elements="1">
         <Documentation>Select the attribute data to pass.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
+        <FieldDataDomain enable_field_data="1"
                          name="enum">
           <RequiredProperties>
             <Property function="Input"
@@ -8029,8 +8024,7 @@
                          name="AttributeType"
                          number_of_elements="1">
         <Documentation>Select the attribute data to render.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
+        <FieldDataDomain enable_field_data="1"
                          name="enum">
           <RequiredProperties>
             <Property function="Input" name="Input" />
@@ -8327,8 +8321,7 @@
                          name="AttributeType"
                          number_of_elements="1">
         <Documentation>Select the attribute data to render.</Documentation>
-        <FieldDataDomain disable_update_domain_entries="1"
-                         enable_field_data="1"
+        <FieldDataDomain enable_field_data="1"
                          name="enum">
           <RequiredProperties>
             <Property function="Input" name="Input" />
