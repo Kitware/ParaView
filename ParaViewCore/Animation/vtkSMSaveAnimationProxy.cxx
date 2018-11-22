@@ -246,57 +246,6 @@ vtkSMSaveAnimationProxy::~vtkSMSaveAnimationProxy()
 }
 
 //----------------------------------------------------------------------------
-#ifndef VTK_LEGACY_REMOVE
-bool vtkSMSaveAnimationProxy::SupportsDisconnectAndSave(vtkSMSession* session)
-{
-  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsDisconnectAndSave, "ParaView 5.5");
-  return false;
-}
-#endif
-
-//----------------------------------------------------------------------------
-#ifndef VTK_LEGACY_REMOVE
-bool vtkSMSaveAnimationProxy::SupportsAVI(vtkSMSession* session, bool remote)
-{
-  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsAVI, "ParaView 5.5");
-  vtkSmartPointer<vtkPVServerInformation> info;
-  if (remote)
-  {
-    info = session->GetServerInformation();
-  }
-  else
-  {
-    // vtkPVServerInformation initialize AVI/OGG support in constructor for the
-    // local process.
-    info = vtkSmartPointer<vtkPVServerInformation>::New();
-  }
-
-  return info->GetAVISupport() != 0;
-}
-#endif
-
-//----------------------------------------------------------------------------
-#ifndef VTK_LEGACY_REMOVE
-bool vtkSMSaveAnimationProxy::SupportsOGV(vtkSMSession* session, bool remote)
-{
-  VTK_LEGACY_BODY(vtkSMSaveAnimationProxy::SupportsOGV, "ParaView 5.5");
-  vtkSmartPointer<vtkPVServerInformation> info;
-  if (remote)
-  {
-    info = session->GetServerInformation();
-  }
-  else
-  {
-    // vtkPVServerInformation initialize AVI/OGG support in constructor for the
-    // local process.
-    info = vtkSmartPointer<vtkPVServerInformation>::New();
-  }
-
-  return info->GetOGVSupport() != 0;
-}
-#endif
-
-//----------------------------------------------------------------------------
 bool vtkSMSaveAnimationProxy::EnforceSizeRestrictions(const char* filename)
 {
   std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename ? filename : "");

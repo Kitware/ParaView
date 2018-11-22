@@ -33,8 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqView_h
 
 #include "pqProxy.h"
-#include "vtkSetGet.h" // needed for VTK_LEGACY.
-#include <QSize>       // needed for QSize.
+#include <QSize> // needed for QSize.
 
 class pqOutputPort;
 class pqPipelineSource;

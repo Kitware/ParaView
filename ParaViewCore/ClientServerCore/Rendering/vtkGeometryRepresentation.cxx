@@ -413,14 +413,6 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 }
 
 //----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-bool vtkGeometryRepresentation::DoRequestGhostCells(vtkInformation* info)
-{
-  return (vtkProcessModule::GetNumberOfGhostLevelsToRequest(info) > 0);
-}
-#endif
-
-//----------------------------------------------------------------------------
 int vtkGeometryRepresentation::RequestUpdateExtent(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {

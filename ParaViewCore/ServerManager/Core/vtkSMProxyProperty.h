@@ -166,13 +166,6 @@ public:
    */
   void Copy(vtkSMProperty* src) VTK_OVERRIDE;
 
-  //@{
-  /**
-   * @deprecated ParaView 5.6. No longer supported or needed.
-   */
-  VTK_LEGACY(bool GetSkipDependency());
-  //@}
-
   /**
    * Update all proxies referred by this property (if any).
    */

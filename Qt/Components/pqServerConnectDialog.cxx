@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConfigurationImporter.h"
 #include "pqServerResource.h"
 #include "pqSettings.h"
+#include "vtkSetGet.h"
 
 #include <QAuthenticator>
 #include <QFormLayout>

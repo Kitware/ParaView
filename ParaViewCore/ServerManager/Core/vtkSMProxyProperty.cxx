@@ -304,14 +304,6 @@ void vtkSMProxyProperty::ReadFrom(
 //---------------------------------------------------------------------------
 int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element)
 {
-#if !defined(VTK_LEGACY_REMOVE) && !defined(VTK_LEGACY_SILENT)
-  int skip_dependency;
-  if (element->GetScalarAttribute("skip_dependency", &skip_dependency))
-  {
-    vtkWarningMacro("'skip_dependency' no longer supported or needed. "
-                    "Please remove it from the XML to avoid this warning.");
-  }
-#endif
   return this->Superclass::ReadXMLAttributes(parent, element);
 }
 
@@ -514,12 +506,3 @@ void vtkSMProxyProperty::ResetToXMLDefaults()
 {
   this->RemoveAllProxies();
 }
-
-//---------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-bool vtkSMProxyProperty::GetSkipDependency()
-{
-  VTK_LEGACY_BODY(vtkSMProxyProperty::GetSkipDependency, "ParaView 5.6");
-  return false;
-}
-#endif

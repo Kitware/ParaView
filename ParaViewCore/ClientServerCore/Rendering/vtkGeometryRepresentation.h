@@ -142,14 +142,6 @@ public:
    */
   vtkDataObject* GetRenderedDataObject(int port) VTK_OVERRIDE;
 
-  /**
-   * Returns true if this class would like to get ghost-cells if available for
-   * the connection whose information object is passed as the argument.
-   * @deprecated in ParaView 5.5. See
-   * `vtkProcessModule::GetNumberOfGhostLevelsToRequest` instead.
-   */
-  VTK_LEGACY(static bool DoRequestGhostCells(vtkInformation* information));
-
   //@{
   /**
    * Representations that use geometry representation as the internal

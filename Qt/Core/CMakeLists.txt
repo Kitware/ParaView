@@ -298,14 +298,6 @@ set (Module_MOC_HDRS
   pqXYChartView.h
 )
 
-if(NOT VTK_LEGACY_REMOVE)
-  list(APPEND Module_SRCS
-    pqDisplayPolicy.cxx
-    pqDisplayPolicy.h)
-  list(APPEND Module_MOC_HDRS
-    pqDisplayPolicy.h)
-endif()
-
 set (Module_UI_FILES
   Resources/UI/pqFileDialog.ui
   Resources/UI/pqOutputWidget.ui

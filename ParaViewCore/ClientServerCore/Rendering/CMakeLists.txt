@@ -122,12 +122,6 @@ if (PARAVIEW_USE_ICE_T)
     vtkIceTSynchronizedRenderers.cxx)
 endif()
 
-if(NOT VTK_LEGACY_REMOVE)
-  list(APPEND Module_SRCS
-    vtkPVDisplayInformation.cxx
-    vtkPVOpenGLExtensionsInformation.cxx)
-endif()
-
 set (${vtk-module}_HDRS
   vtkStreamingPriorityQueue.h
   vtkGeometryRepresentationInternal.h

@@ -3298,23 +3298,3 @@ void vtkPVRenderView::SetDiscreteCameras(
 
   self->DiscreteCameras = style;
 }
-
-//----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-bool vtkPVRenderView::GetUseDistributedRenderingForStillRender()
-{
-  VTK_LEGACY_REPLACED_BODY(vtkPVRenderView::GetUseDistributedRenderingForStillRender,
-    "ParaView 5.6", vtkPVRenderView::GetUseDistributedRenderingForRender);
-  return this->GetUseDistributedRenderingForRender();
-}
-#endif
-
-//----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-bool vtkPVRenderView::GetUseDistributedRenderingForInteractiveRender()
-{
-  VTK_LEGACY_REPLACED_BODY(vtkPVRenderView::GetUseDistributedRenderingForInteractiveRender,
-    "ParaView 5.6", vtkPVRenderView::GetUseDistributedRenderingForLODRender);
-  return this->GetUseDistributedRenderingForLODRender();
-}
-#endif

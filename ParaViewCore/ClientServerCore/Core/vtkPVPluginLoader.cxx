@@ -585,16 +585,6 @@ void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-#if !defined(VTK_LEGACY_REMOVE)
-void vtkPVPluginLoader::SetStaticPluginLoadFunction(vtkPluginLoadFunction function)
-{
-  VTK_LEGACY_REPLACED_BODY(vtkPVPluginLoader::SetStaticPluginLoadFunction, "ParaView 5.6",
-    vtkPVPluginLoader::RegisterLoadPluginCallback);
-  vtkPVPluginLoader::RegisterLoadPluginCallback(function);
-}
-#endif
-
-//-----------------------------------------------------------------------------
 void vtkPVPluginLoader::PluginLibraryUnloaded(const char* pluginname)
 {
   vtkPVPluginLoaderCleaner::PluginLibraryUnloaded(pluginname);

@@ -152,15 +152,6 @@ public:
   vtkSetMacro(ArgumentIsArray, int);
   //@}
 
-  //@{
-  /**
-   * @deprecated ParView 5.6: No longer needed as double values are always
-   * serialized in full lossless precision when saving to XML state files.
-   */
-  VTK_LEGACY(void SetPrecision(int));
-  VTK_LEGACY(int GetPrecision());
-  //@}
-
   /**
    * Copy all property values.
    */

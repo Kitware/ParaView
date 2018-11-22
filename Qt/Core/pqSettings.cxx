@@ -41,35 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 
-#ifndef VTK_LEGACY_REMOVE
-namespace
-{
-class pqSettingsCleaner : public QObject
-{
-  QString Filename;
-
-public:
-  pqSettingsCleaner(const QString& filename, QObject* parentObject)
-    : QObject(parentObject)
-    , Filename(filename)
-  {
-  }
-
-  ~pqSettingsCleaner() override { QFile::remove(this->Filename); }
-};
-}
-
-//-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& filename, bool temporary, QObject* parentObject)
-  : QSettings(filename, QSettings::IniFormat, parentObject)
-{
-  if (temporary)
-  {
-    new pqSettingsCleaner(filename, this);
-  }
-}
-#endif // VTK_LEGACY_REMOVE
-
 //-----------------------------------------------------------------------------
 pqSettings::pqSettings(const QString& org, const QString& app, QObject* prnt)
   : Superclass(org, app, prnt)

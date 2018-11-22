@@ -61,11 +61,6 @@ public:
    */
   vtkGetMacro(EGLDeviceIndex, int);
 
-  /**
-   * @deprecated in ParaView 5.5. Use `GetForceOnscreenRendering()` instead.
-   */
-  VTK_LEGACY(int GetUseOffscreenRendering());
-
   //@{
   /**
    * This is the argument specified by --data on the command line. Additionally,

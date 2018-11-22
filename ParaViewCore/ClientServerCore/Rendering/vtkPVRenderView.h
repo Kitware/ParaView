@@ -700,14 +700,6 @@ public:
   vtkGetMacro(UseDistributedRenderingForRender, bool);
   //@}
 
-  /**
-   * @deprecated ParaView 5.6.
-   *
-   * Please use `GetUseDistributedRenderingForRender` instead.
-   * The change was done to make the name better reflect the implementation.
-   */
-  VTK_LEGACY(bool GetUseDistributedRenderingForStillRender());
-
   //@{
   /**
    * Returns whether the view will use distributed rendering for the next
@@ -716,14 +708,6 @@ public:
    */
   vtkGetMacro(UseDistributedRenderingForLODRender, bool);
   //@}
-
-  /**
-   * @deprecated ParaView 5.6.
-   *
-   * Please use `GetUseDistributedRenderingForLODRender` instead. The change was
-   * done to make the name better reflect the implementation.
-   */
-  VTK_LEGACY(bool GetUseDistributedRenderingForInteractiveRender());
 
   //@{
   /**

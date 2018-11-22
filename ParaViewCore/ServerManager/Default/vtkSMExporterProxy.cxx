@@ -36,19 +36,6 @@ vtkSMExporterProxy::~vtkSMExporterProxy()
   this->SetView(0);
 }
 
-#ifndef VTK_LEGACY_REMOVE
-//----------------------------------------------------------------------------
-const char* vtkSMExporterProxy::GetFileExtension()
-{
-  VTK_LEGACY_BODY(vtkSMExporterProxy::GetFileExtension, "ParaView 5.5")
-  if (this->FileExtensions.empty())
-  {
-    return nullptr;
-  }
-  return this->FileExtensions[0].c_str();
-}
-#endif
-
 //----------------------------------------------------------------------------
 int vtkSMExporterProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pxm, vtkPVXMLElement* element)
 {

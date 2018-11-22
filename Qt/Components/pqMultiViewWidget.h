@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QWidget>
 
-#include "vtkSetGet.h" // for VTK_LEGACY
-
 class pqProxy;
 class pqView;
 class pqViewFrame;
