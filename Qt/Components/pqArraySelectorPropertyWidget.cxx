@@ -62,7 +62,7 @@ QIcon get_icon(int assoc)
     case vtkDataObject::EDGE:
       return QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
     case vtkDataObject::ROW:
-      return QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
+      return QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
     default:
       return QIcon();
   }
