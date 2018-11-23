@@ -50,6 +50,12 @@ pqStreamLinesAnimationManager::pqStreamLinesAnimationManager(QObject* p /*=0*/)
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(preViewAdded(pqView*)), this, SLOT(onViewAdded(pqView*)));
   QObject::connect(smmodel, SIGNAL(preViewRemoved(pqView*)), this, SLOT(onViewRemoved(pqView*)));
+
+  // Add currently existing views
+  foreach (pqView* view, smmodel->findItems<pqView*>())
+  {
+    this->onViewAdded(view);
+  }
 }
 
 //-----------------------------------------------------------------------------
