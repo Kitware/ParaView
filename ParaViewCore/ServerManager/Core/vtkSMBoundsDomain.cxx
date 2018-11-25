@@ -26,6 +26,8 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
+#include <cmath>
+
 vtkStandardNewMacro(vtkSMBoundsDomain);
 //---------------------------------------------------------------------------
 vtkSMBoundsDomain::vtkSMBoundsDomain()
@@ -334,12 +336,12 @@ int vtkSMBoundsDomain::SetDefaultValues(vtkSMProperty* property, bool use_unchec
       double unitDistance = 1.0;
       if (vtkMath::AreBoundsInitialized(bounds))
       {
-        double diameter = sqrt((bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
+        const double diameter = sqrt((bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
           (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) +
           (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]));
 
-        int numCells = dataInfo->GetNumberOfCells();
-        double linearNumCells = pow((double)numCells, (1.0 / 3.0));
+        const auto numCells = dataInfo->GetNumberOfCells();
+        const double linearNumCells = std::cbrt(numCells);
         unitDistance = diameter;
         if (linearNumCells != 0.0 && !vtkMath::IsNan(linearNumCells) &&
           !vtkMath::IsInf(linearNumCells))
