@@ -253,13 +253,15 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
 
   if (PARAVIEW_QT_VERSION STREQUAL "4")
     set(qt_binary_dir_hints "${QT_BINARY_DIR}")
+    set(qt_xmlpatterns_name "xmlpatterns-qt4")
   else() # Qt5
     # Qt5's CMake config doesn't support QT_BINARY_DIR
     set(qt_binary_dir_hints "${Qt5_DIR}/../../../bin")
+    set(qt_xmlpatterns_name "xmlpatterns-qt5")
   endif()
 
   find_program(QT_XMLPATTERNS_EXECUTABLE
-    xmlpatterns
+    "${qt_xmlpatterns_name}" xmlpatterns
     HINTS "${qt_binary_dir_hints}"
     DOC "xmlpatterns used to generate html from Proxy documentation.")
   mark_as_advanced(QT_XMLPATTERNS_EXECUTABLE)
