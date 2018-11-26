@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMEnumerationDomain.h"
-#include "vtkSMFieldDataDomain.h"
 #include "vtkSMFileListDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -127,7 +126,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   vtkSMEnumerationDomain* enumerationDomain = 0;
   vtkSMFileListDomain* fileListDomain = 0;
   vtkSMArrayListDomain* arrayListDomain = 0;
-  vtkSMFieldDataDomain* fieldDataDomain = 0;
   vtkSMStringListDomain* stringListDomain = 0;
   vtkSMSILDomain* silDomain = 0;
   vtkSMArraySelectionDomain* arraySelectionDomain = 0;
@@ -148,8 +146,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       arraySelectionDomain ? arraySelectionDomain : vtkSMArraySelectionDomain::SafeDownCast(domain);
     stringListDomain =
       stringListDomain ? stringListDomain : vtkSMStringListDomain::SafeDownCast(domain);
-    fieldDataDomain =
-      fieldDataDomain ? fieldDataDomain : vtkSMFieldDataDomain::SafeDownCast(domain);
   }
   domainIter->Delete();
 

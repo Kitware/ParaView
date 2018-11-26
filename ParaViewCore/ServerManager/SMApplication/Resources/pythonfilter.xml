@@ -184,12 +184,6 @@ annotation text.
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>This property indicates the name of the array from which
         to compute the histogram.</Documentation>
       </StringVectorProperty>

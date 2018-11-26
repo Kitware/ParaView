@@ -4,6 +4,26 @@ Major API Changes             {#MajorAPIChanges}
 This page documents major API/design changes between different versions since we
 started tracking these (starting after version 4.2).
 
+Changes in 5.7
+--------------
+
+###vtkSMFieldDataDomain in array selection properties###
+
+Previously, `vtkSMFieldDataDomain` was added to `vtkSMStringVectorProperty`
+instances that allowed user to choose the array to process. This is no longer needed
+or supported. Simply remove the `vtkSMFieldDataDomain` from the XML for such properties.
+Typically such properties have `vtkSMArrayListDomain` and that domain alone is
+sufficient to enable selection of array name and its association.
+
+###Changes to vtkSMFieldDataDomain###
+
+vtkSMFieldDataDomain no longer updates the domain based on the type of the
+input. The domain will always list the attribute types known to VTK/ParaView. As
+a result, XML attributes `force_point_cell_data` and
+`disable_update_domain_entries` for the XML definition of vtkSMFieldDataDomain
+have been deprecated and should simply be removed from the XML as they are no
+longer relevant.
+
 Changes in 5.6
 --------------
 

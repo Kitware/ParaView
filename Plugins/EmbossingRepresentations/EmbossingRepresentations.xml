@@ -22,11 +22,6 @@
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>
           Select the data used to compute bump mapping.
           Only scalar point data arrays are accepted.
@@ -67,11 +62,6 @@
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>
           Select a cell data array in order to extrude cells.
           Select a point data array in order to generate a height field.

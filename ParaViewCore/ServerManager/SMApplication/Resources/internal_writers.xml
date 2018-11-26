@@ -303,11 +303,6 @@
             <Property function="Input" name="DummyInput" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input" name="DummyInput" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"

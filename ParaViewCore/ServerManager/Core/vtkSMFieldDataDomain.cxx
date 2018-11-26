@@ -25,21 +25,16 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSmartPointer.h"
 
 #include <set>
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
 //---------------------------------------------------------------------------
-static const char* const vtkSMFieldDataDomainAttributeTypes[] = { "Point Data", "Cell Data",
-  "Field Data", "(invalid)", "Vertex Data", "Edge Data", "Row Data", NULL };
-//---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
 {
   this->EnableFieldDataSelection = false;
-  this->DisableUpdateDomainEntries = false;
-  this->ForcePointAndCellDataSelection = false;
-  this->DefaultValue = -1;
 }
 
 //---------------------------------------------------------------------------
@@ -48,112 +43,70 @@ vtkSMFieldDataDomain::~vtkSMFieldDataDomain()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMFieldDataDomain::Update(vtkSMProperty*)
+const char* vtkSMFieldDataDomain::GetAttributeTypeAsString(int attrType)
 {
-  // We don't return here, since even if updating the domain values may be
-  // disabled, we still would want to pick a good default for this domain.
-  // if (this->DisableUpdateDomainEntries)
-  //  {
-  //  return;
-  //  }
+  static const char* const vtkSMFieldDataDomainAttributeTypes[] = { "Point Data", "Cell Data",
+    "Field Data", nullptr, "Vertex Data", "Edge Data", "Row Data", nullptr };
 
-  vtkPVDataInformation* dataInfo = this->GetInputDataInformation("Input");
-  vtkSMProperty* pp = this->GetRequiredProperty("Input");
-  vtkSMInputArrayDomain* iad =
-    pp ? vtkSMInputArrayDomain::SafeDownCast(pp->FindDomain("vtkSMInputArrayDomain")) : NULL;
-
-  this->UpdateDomainEntries(iad ? iad->GetAttributeType() : vtkSMInputArrayDomain::ANY, dataInfo);
+  if (attrType >= 0 && attrType < vtkDataObject::NUMBER_OF_ATTRIBUTE_TYPES)
+  {
+    return vtkSMFieldDataDomainAttributeTypes[attrType];
+  }
+  return nullptr;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMFieldDataDomain::UpdateDomainEntries(
-  int acceptable_association, vtkPVDataInformation* dataInfo)
+int vtkSMFieldDataDomain::ComputeDefaultValue()
 {
-  std::set<int> accepted_associations;
-
-  // iterate over all attribute types and add the "acceptable" attribute types
-  // to this domain.
-  for (int idx = vtkSMInputArrayDomain::POINT;
-       idx < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES; idx++)
+  auto dataInfo = this->GetInputDataInformation("Input");
+  if (!dataInfo)
   {
-    if (idx == vtkSMInputArrayDomain::ANY ||
-      !vtkSMInputArrayDomain::IsAttributeTypeAcceptable(acceptable_association, idx, NULL))
-    {
-      continue;
-    }
-
-    // Add field-data if ...
-    if (
-      // ... domain updates are disabled
-      this->DisableUpdateDomainEntries ||
-      // ... point/cell if forced.
-      (this->ForcePointAndCellDataSelection &&
-        (idx == vtkSMInputArrayDomain::POINT || idx == vtkSMInputArrayDomain::CELL)))
-    {
-      accepted_associations.insert(idx);
-      continue;
-    }
-
-    // add the idx is it has some arrays.
-    if (dataInfo == NULL || dataInfo->GetAttributeInformation(idx) == NULL ||
-      dataInfo->GetAttributeInformation(idx)->GetMaximumNumberOfTuples() == 0)
-    {
-      continue;
-    }
-    accepted_associations.insert(idx);
+    return -1;
   }
 
-  // field data is added only if this->EnableFieldDataSelection is true.
-  if (this->EnableFieldDataSelection)
+  // first, find an attribute with non-empty arrays and tuples
+  for (unsigned int cc = 0, max = this->GetNumberOfEntries(); cc < max; ++cc)
   {
-    accepted_associations.insert(vtkSMInputArrayDomain::FIELD);
-  }
-
-  if (accepted_associations.size() > 0)
-  {
-    // to pick a good default, find the first non-empty acceptable attribute.
-    this->DefaultValue = (*accepted_associations.begin());
-    for (std::set<int>::const_iterator iter = accepted_associations.begin();
-         iter != accepted_associations.end(); ++iter)
+    const int attrType = this->GetEntryValue(cc);
+    auto attrInfo = dataInfo->GetAttributeInformation(attrType);
+    if (attrInfo && attrInfo->GetNumberOfArrays() > 0 && attrInfo->GetMaximumNumberOfTuples() > 0)
     {
-      vtkPVDataSetAttributesInformation* attrInfo =
-        dataInfo ? dataInfo->GetAttributeInformation(*iter) : NULL;
-      if (attrInfo && attrInfo->GetNumberOfArrays() > 0)
-      {
-        this->DefaultValue = *iter;
-        break;
-      }
+      return attrType;
     }
   }
-  else
+
+  // if that fails, find an attribute with non-empty arrays
+  for (unsigned int cc = 0, max = this->GetNumberOfEntries(); cc < max; ++cc)
   {
-    this->DefaultValue = -1;
+    const int attrType = this->GetEntryValue(cc);
+    auto attrInfo = dataInfo->GetAttributeInformation(attrType);
+    if (attrInfo && attrInfo->GetNumberOfArrays() > 0)
+    {
+      return attrType;
+    }
   }
 
-  // FIXME: Add ability to not modify the domain unless changed for real.
-  this->RemoveAllEntries();
-  for (std::set<int>::const_iterator iter = accepted_associations.begin();
-       iter != accepted_associations.end(); iter++)
-  {
-    this->AddEntry(vtkSMFieldDataDomainAttributeTypes[*iter], *iter);
-  }
+  return -1;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMFieldDataDomain::SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values)
 {
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
-  if (ivp && this->DefaultValue != -1)
+  if (vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop))
   {
-    if (use_unchecked_values)
+    const int defaultValue = this->ComputeDefaultValue();
+    if (defaultValue != -1)
     {
-      ivp->SetUncheckedElement(0, this->DefaultValue);
+      if (use_unchecked_values)
+      {
+        ivp->SetUncheckedElement(0, defaultValue);
+      }
+      else
+      {
+        ivp->SetElement(0, defaultValue);
+      }
+      return 1;
     }
-    else
-    {
-      ivp->SetElement(0, this->DefaultValue);
-    }
-    return 1;
   }
   return this->Superclass::SetDefaultValues(prop, use_unchecked_values);
 }
@@ -166,24 +119,64 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
     return 0;
   }
 
+  if (vtkSMStringVectorProperty::SafeDownCast(prop))
+  {
+#if !defined(VTK_LEGACY_SILENT)
+    vtkErrorMacro(
+      "`vtkSMFieldDataDomain` is being used on a `vtkSMStringVectorProperty`. "
+      "This is no longer needed or supported. Simply remove it from your XML configuration "
+      "for property "
+      << prop->GetXMLName());
+#endif
+
+#if defined(VTK_LEGACY_REMOVE)
+    return 0;
+#else
+    return 1;
+#endif
+  }
+
+#if !defined(VTK_LEGACY_SILENT)
+  if (element->GetAttribute("disable_update_domain_entries"))
+  {
+    vtkErrorMacro("`vtkSMFieldDataDomain` no longer supports or needs "
+                  "`disable_update_domain_entries` attribute."
+                  "Simply remove it from the XML for property "
+      << prop->GetXMLName());
+  }
+
+  if (element->GetAttribute("force_point_cell_data"))
+  {
+    vtkErrorMacro(
+      "`vtkSMFieldDataDomain` no longer supports or needs `force_point_cell_data` attribute."
+      "Simply remove it from the XML for property "
+      << prop->GetXMLName());
+  }
+#endif
+
   int enable_field_data = 0;
   if (element->GetScalarAttribute("enable_field_data", &enable_field_data))
   {
     this->EnableFieldDataSelection = (enable_field_data != 0) ? true : false;
   }
-  int disable_update_domain_entries = 0;
-  if (element->GetScalarAttribute("disable_update_domain_entries", &disable_update_domain_entries))
+
+  // iterate over all attribute types and add the "acceptable" attribute types
+  // to this domain.
+  this->RemoveAllEntries();
+  for (int idx = 0; idx < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES; idx++)
   {
-    this->DisableUpdateDomainEntries = (disable_update_domain_entries != 0) ? true : false;
+    auto label = vtkSMFieldDataDomain::GetAttributeTypeAsString(idx);
+    if (!label)
+    {
+      continue;
+    }
+    if (idx == vtkDataObject::FIELD && !this->EnableFieldDataSelection)
+    {
+      continue;
+    }
+    this->AddEntry(label, idx);
   }
 
-  int force_point_cell_data = 0;
-  if (element->GetScalarAttribute("force_point_cell_data", &force_point_cell_data))
-  {
-    this->ForcePointAndCellDataSelection = (force_point_cell_data != 0) ? true : false;
-  }
-
-  this->UpdateDomainEntries(vtkSMInputArrayDomain::ANY, NULL);
   return 1;
 }
 

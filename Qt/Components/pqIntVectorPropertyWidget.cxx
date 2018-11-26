@@ -32,11 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqIntVectorPropertyWidget.h"
 
+#include "vtkDataObject.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMFieldDataDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNumberOfComponentsDomain.h"
@@ -61,6 +63,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QIntValidator>
+
+namespace
+{
+QIcon get_icon(int assoc)
+{
+  switch (assoc)
+  {
+    case vtkDataObject::POINT:
+      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
+    case vtkDataObject::CELL:
+      return QIcon(":/pqWidgets/Icons/pqCellData16.png");
+    case vtkDataObject::FIELD:
+      return QIcon(":/pqWidgets/Icons/pqGlobalData16.png");
+    case vtkDataObject::VERTEX:
+      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
+    case vtkDataObject::EDGE:
+      return QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
+    case vtkDataObject::ROW:
+      return QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
+    default:
+      return QIcon();
+  }
+}
+}
 
 //-----------------------------------------------------------------------------
 pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
@@ -157,18 +183,21 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
     {
       QComboBox* comboBox = new QComboBox(this);
       comboBox->setObjectName("ComboBox");
+      auto is_fielddatadomain = (vtkSMFieldDataDomain::SafeDownCast(domain) != nullptr);
       for (unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
       {
         const char* entryText = ed->GetEntryText(i);
+        QIcon icon = is_fielddatadomain ? ::get_icon(ed->GetEntryValue(i)) : QIcon();
         if (const char* info = ed->GetInfoText(i))
         {
-          comboBox->addItem(QString("%1 (%2)").arg(entryText).arg(info), entryText);
+          comboBox->addItem(icon, QString("%1 (%2)").arg(entryText).arg(info), entryText);
         }
         else
         {
-          comboBox->addItem(entryText, entryText);
+          comboBox->addItem(icon, entryText, entryText);
         }
       }
+
       // vtkSMNumberOfComponentsDomain is a dynamic domain
       // hence we need to connect it to a pqComboBoxDomain
       // so the combobox will stay updated.

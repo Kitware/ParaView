@@ -76,13 +76,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </RepresentedArrayListDomain>
-        <FieldDataDomain name="field_list"
-                         disable_update_domain_entries="1"
-                         force_point_cell_data="1">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
       </StringVectorProperty>
       <ProxyProperty command="SetLookupTable"
                      name="LookupTable" >

@@ -103,12 +103,6 @@
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>
         Select the input array to be treated as defining seeds.
         A point having a non-zero value will be considered as being a seed.
@@ -127,11 +121,6 @@
             <Property function="Input" name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property function="Input" name="Input" />
-          </RequiredProperties>
-        </FieldDataDomain>
         <Documentation>Select the input array to be treated as the Metric
         Tensor.It can only be an isometric tensor, and the selected field should
         contain the length of the metric tensor at each polydata point.
