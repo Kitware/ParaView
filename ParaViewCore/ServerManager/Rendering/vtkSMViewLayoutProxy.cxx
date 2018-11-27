@@ -38,7 +38,8 @@
 #include "vtkWeakPointer.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
+#include <queue>
 
 class vtkSMViewLayoutProxy::vtkInternals
 {
@@ -96,11 +97,37 @@ public:
       return;
     }
 
-    Cell source_cell = this->KDTree[source];
-    this->KDTree[source] = Cell();
-    this->MoveSubtree(2 * destination + 1, 2 * source + 1);
-    this->MoveSubtree(2 * destination + 2, 2 * source + 2);
-    this->KDTree[destination] = source_cell;
+    // Do a breadth-first traversal of source and destination. This is to ensure that
+    // we swap elements in the KDTree in the proper order (moving from lower elements
+    // in the tree up) when moving the subtree up the tree.
+    std::queue<int> sourceQueue;
+    std::queue<int> destQueue;
+
+    sourceQueue.push(source);
+    destQueue.push(destination);
+
+    int kdtreeSize = static_cast<int>(this->KDTree.size());
+
+    while (!sourceQueue.empty())
+    {
+      int currentSource = sourceQueue.front();
+      sourceQueue.pop();
+      int currentDest = destQueue.front();
+      destQueue.pop();
+
+      // Copy source to destination.
+      if (currentSource < kdtreeSize && currentDest < kdtreeSize)
+      {
+        this->KDTree[currentDest] = this->KDTree[currentSource];
+        this->KDTree[currentSource] = Cell();
+
+        // Push children onto queue
+        sourceQueue.push(GetFirstChild(currentSource));
+        sourceQueue.push(GetSecondChild(currentSource));
+        destQueue.push(GetFirstChild(currentDest));
+        destQueue.push(GetSecondChild(currentDest));
+      }
+    }
   }
 
   void Shrink()

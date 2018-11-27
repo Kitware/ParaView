@@ -703,7 +703,7 @@ void pqMultiViewWidget::reload()
   this->markActive(pqActiveObjects::instance().activeView());
 
   // Cleanup deleted objects. "cleaner" helps us avoid any dangling widgets and
-  // deletes them whwn delete cleaner is called. Now we prune internal
+  // deletes them when delete cleaner is called. Now we prune internal
   // datastructures to get rid of these NULL ptrs.
 
   // remove any deleted view frames.
@@ -774,7 +774,7 @@ void pqMultiViewWidget::standardButtonPressed(int button)
     case pqViewFrame::Close:
     {
       BEGIN_UNDO_SET("Close View");
-      vtkSMViewProxy* viewProxy = this->layoutManager()->GetView(index.toInt());
+      vtkSmartPointer<vtkSMViewProxy> viewProxy = this->layoutManager()->GetView(index.toInt());
       if (viewProxy)
       {
         auto session = viewProxy->GetSession();
