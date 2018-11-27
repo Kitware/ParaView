@@ -1165,10 +1165,9 @@ void pqMultiBlockInspectorWidget::modelDataChanged(const QModelIndex& start, con
 {
   if (start.column() <= 0 && end.column() >= 0)
   {
-    BEGIN_UNDO_SET("Change Block Visibilities");
+    SCOPED_UNDO_SET("Change Block Visibilities");
     emit this->blockVisibilitiesChanged();
     emit this->requestRender();
-    END_UNDO_SET();
   }
 }
 
@@ -1271,12 +1270,11 @@ void pqMultiBlockInspectorWidget::setColor(const QModelIndex& idx, const QColor&
   }
 
   const QVariant val = newcolor.isValid() ? QVariant::fromValue(newcolor) : QVariant();
-  BEGIN_UNDO_SET(newcolor.isValid() ? "Set Block Colors" : "Reset Block Colors");
+  SCOPED_UNDO_SET(newcolor.isValid() ? "Set Block Colors" : "Reset Block Colors");
   for (const QModelIndex& itemIdx : sRows)
   {
     internals.ProxyModel->setColor(itemIdx, val);
   }
-  END_UNDO_SET();
   emit this->blockColorsChanged();
   emit this->requestRender();
 }
@@ -1296,12 +1294,11 @@ void pqMultiBlockInspectorWidget::setOpacity(const QModelIndex& idx, double opac
     sRows.push_back(idx.sibling(idx.row(), internals.ProxyModel->opacityColumn()));
   }
 
-  BEGIN_UNDO_SET(val.isValid() ? "Set Block Opacities" : "Reset Block Opacities");
+  SCOPED_UNDO_SET(val.isValid() ? "Set Block Opacities" : "Reset Block Opacities");
   for (const QModelIndex& itemIdx : sRows)
   {
     internals.ProxyModel->setOpacity(itemIdx, val);
   }
-  END_UNDO_SET();
   emit this->blockOpacitiesChanged();
   emit this->requestRender();
 }
