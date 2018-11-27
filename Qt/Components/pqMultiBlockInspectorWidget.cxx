@@ -1270,7 +1270,7 @@ void pqMultiBlockInspectorWidget::setColor(const QModelIndex& idx, const QColor&
     sRows.push_back(idx.sibling(idx.row(), internals.ProxyModel->colorColumn()));
   }
 
-  const QVariant val = QVariant::fromValue(newcolor);
+  const QVariant val = newcolor.isValid() ? QVariant::fromValue(newcolor) : QVariant();
   BEGIN_UNDO_SET(newcolor.isValid() ? "Set Block Colors" : "Reset Block Colors");
   for (const QModelIndex& itemIdx : sRows)
   {
@@ -1285,13 +1285,7 @@ void pqMultiBlockInspectorWidget::setColor(const QModelIndex& idx, const QColor&
 void pqMultiBlockInspectorWidget::setOpacity(const QModelIndex& idx, double opacity)
 {
   pqInternals& internals = (*this->Internals);
-
-  QVariant val;
-  if (opacity >= 0 && opacity <= 1.0)
-  {
-    val = QVariant(opacity);
-  }
-
+  const QVariant val = (opacity >= 0 && opacity <= 1.0) ? QVariant(opacity) : QVariant();
   QModelIndexList sRows =
     internals.SelectionModel->selectedRows(internals.ProxyModel->opacityColumn());
   if (idx.isValid() && !sRows.contains(idx))
