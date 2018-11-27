@@ -278,7 +278,6 @@
         { "class": "vtkDecimatePro" },
         { "class": "vtkStripper" },
         { "class": "vtkStructuredGridOutlineFilter" },
-        { "class": "vtkTriangleFilter" },
         { "class": "vtkTriangleMeshPointNormals"},
         { "class": "vtkTubeFilter" }
       ],
@@ -306,7 +305,6 @@
         { "class": "vtkAnnotationLink" },
         { "class": "vtkAxes" },
         { "class": "vtkBoxClipDataSet" },
-        { "class": "vtkDataSetTriangleFilter" },
         { "class": "vtkMergeCells" },
         { "class": "vtkMultiBlockDataGroupFilter" },
         { "class": "vtkPassThrough" },
