@@ -322,7 +322,7 @@
                             repeat_command="1"
                             set_number_command="SetNumberOfIndexedOpacitiesInFullSet"
                             use_index="1"
-                            panel_visibility="advanced">
+                            panel_visibility="never">
         <Documentation>
           Opacities used when using IndexedLookup is true.
         </Documentation>
