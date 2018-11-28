@@ -366,7 +366,7 @@
         command="SetResetDisplayEmptyViews"
         panel_visibility="advanced">
         <Documentation>
-          When showing a representation in an empty view, set wether or not to reset
+          When showing a representation in an empty view, set whether or not to reset
           the view display.
         </Documentation>
         <BooleanDomain name="bool" />

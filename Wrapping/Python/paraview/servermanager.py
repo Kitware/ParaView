@@ -135,7 +135,7 @@ def _wrap_property(proxy, smproperty):
 
 class ParaViewPipelineController(object):
     """ParaViewPipelineController wraps vtkSMParaViewPipelineController class
-    to manage conversion of arguments passed around from Pyhton Proxy objects to
+    to manage conversion of arguments passed around from Python Proxy objects to
     vtkSMProxy instances are vice-versa."""
     def __init__(self):
         """Constructor. Creates a new instance of

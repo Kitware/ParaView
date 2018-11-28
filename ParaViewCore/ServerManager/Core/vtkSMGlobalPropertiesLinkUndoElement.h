@@ -19,7 +19,7 @@
  * to a property of an arbitrary Proxy.
  * This class is automatically build inside the vtkSMProxyManager when
  * GlobalPropertyLinks are changed.
- * FIXME: This class is currrently non-functional. I need to re-energize this
+ * FIXME: This class is currently non-functional. I need to re-energize this
  * class. It's falling down the priority chain for now.
 */
 

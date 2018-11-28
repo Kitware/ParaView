@@ -606,7 +606,7 @@ int vtkCDIReader::RequestInformation(
 //----------------------------------------------------------------------------
 int vtkCDIReader::ReadTimeUnits(const char* Name)
 {
-  // Code from vtkNetCDFReader to read in time and calender data for annotation
+  // Code from vtkNetCDFReader to read in time and calendar data for annotation
   // For now we use the netCDF reader directly, as there is yet no CDI call for this
   delete[] this->TimeUnits;
   this->TimeUnits = nullptr;

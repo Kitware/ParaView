@@ -2397,7 +2397,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
                             hmapKey = 'default'
 
                         if hmapKey:
-                            # We're intereseted in decorating based on this hint
+                            # We're interested in decorating based on this hint
                             hintFunction = hmap[hmapKey]
                             hintFunction(prop, uiElt, hint)
 

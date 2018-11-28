@@ -539,7 +539,7 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
   // data.
   int numProcs = this->Controller->GetNumberOfProcesses();
 
-  // Make sure we have enoght processes to read all the pieces.
+  // Make sure we have enough processes to read all the pieces.
   if (numProcs < numServers)
   {
     vtkErrorMacro("Not enough processes (" << numProcs << ") to read all Ensight server files ("

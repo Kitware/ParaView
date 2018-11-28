@@ -344,7 +344,7 @@ void pqVRUIConnection::setQueue(vtkVRQueue* queue)
 // ----------------------------------------------------------------------------
 bool pqVRUIConnection::init()
 {
-  // Initialize the socket connetion;
+  // Initialize the socket connection;
   this->Internals->initSocket(this->Address, this->Port);
   this->Internals->initPipe();
   if (!this->Internals->connect())

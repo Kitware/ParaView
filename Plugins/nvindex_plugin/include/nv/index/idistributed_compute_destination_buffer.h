@@ -668,7 +668,7 @@ public:
   ///         use \c mi::base::Handle to manage the lifetime of the returned interface
   ///         pointer.
   ///
-  /// \param [in] global_texture_resolution   The global texture resulution for which to
+  /// \param [in] global_texture_resolution   The global texture resolution for which to
   ///                                         generate the compute-texture tile LOD-
   ///                                         configuration.
   /// \param [in] texture_tile_surface_area   The tile-surface area for which to generate

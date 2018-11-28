@@ -7,9 +7,9 @@ Instead of relying to complex .pvsc file, it is now possible to use the followin
 * `<Terminal exec=/path/to/term/>`, child of `<SSHConfig>` with an optional terminal executable argument. When this tag is set, the SSH command will be executed through on a new terminal
 * `<SSH exec=/path/to/ssh/>`, child of `<SSHConfig>` with an ssh executable argument. When this tag is set and the executable is specified, a specific ssh executable will be used
 * `<Askpass/>`, child of `<SSHConfig>`, so an askpass program is used. Make sure to set SSH_ASKPASS and DISPLAY before using this. Incompatible with `<Terminal>` tag, only on Linux.
-* `<PortForwarding local="port">`, child of `<SSHConfig>` with an optional local port argument, this is the biggest change. This allow to set up port fowarding through SSH tunneling. If no local port is defined, the server port will be used.
+* `<PortForwarding local="port">`, child of `<SSHConfig>` with an optional local port argument, this is the biggest change. This allow to set up port forwarding through SSH tunneling. If no local port is defined, the server port will be used.
 
-When `PortForwarding` is used, it is completely invisible to the user, remote host and port are correct and not related to the SSH tunelling. In order to inform the user that the communication between client and server are secured, the server icon in the pipeline browser is slightly different.
+When `PortForwarding` is used, it is completely invisible to the user, remote host and port are correct and not related to the SSH tunneling. In order to inform the user that the communication between client and server are secured, the server icon in the pipeline browser is slightly different.
 
 Example of a simple configuration file:
 ```XML

@@ -173,7 +173,7 @@ vtkCxxSetObjectMacro(vtkMaterialInterfaceFilter, ClipFunction, vtkImplicitFuncti
 //      We can do connectivity through the ghost cells (might as well) but
 //      the do not contribute to the integrated values.  We will not create faces
 //      from a ghost layer, but we will use them to place points.
-//      We will use the fragment ids in the ghost layers to create an equivalency realtion
+//      We will use the fragment ids in the ghost layers to create an equivalency relation
 //      and to combine fragments in a post processing step.
 
 // We need to strip off ghost cells that we do not need.
@@ -6680,7 +6680,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       // that are split? We can weed out processes that are
       // highly loaded and cycle through the group that
       // remains assigning to each until all work has
-      // been alloted.
+      // been allotted.
       vtkMaterialInterfaceProcessRing procRing;
       procRing.Initialize(heap, this->UpperLoadingBound);
 #ifdef vtkMaterialInterfaceFilterDEBUG
@@ -6763,7 +6763,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       ++thisMsgId;
     }
 
-    // Brodcast the transaction matrix
+    // Broadcast the transaction matrix
     TM.Broadcast(comm, controllingProcId);
 
     // Prepare for a bunch of inverse searches through
@@ -7558,7 +7558,7 @@ int vtkMaterialInterfaceFilter::ReceiveIntegratedAttributes(const int sourceProc
   this->Controller->Receive(buffer.GetBuffer(), buffer.GetBufferSize(), sourceProcId, thisMsgId);
   ++thisMsgId;
 
-  // unpack attribue data, with an explicit copy
+  // unpack attribute data, with an explicit copy
   // into a local array
   const unsigned int nToUnPack = buffer.GetNumberOfTuples(0);
   // volume

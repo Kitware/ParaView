@@ -607,7 +607,7 @@ void GW_Parameterization::SplitMesh( GW_GeodesicMesh& Mesh )
                 }
             }
             T_FaceList& FaceList = FaceListPool[num];
-            /* set to NULL neighboor faces */
+            /* set to NULL neighbor faces */
             GW_I32 nNumNeigh = pFace1->GetEdgeNumber( *pVert1, *pVert2 );
             GW_ASSERT( nNumNeigh>=0 );
             GW_Face* pNeighFace = pFace1->GetFaceNeighbor( nNumNeigh );

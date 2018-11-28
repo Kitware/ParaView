@@ -373,7 +373,7 @@ class smproxy(object):
             if callable(val) and hasattr(val, "_pvsm_property_xmls"):
                 pxmls = getattr(val, "_pvsm_property_xmls")
                 if len(pxmls) > 1:
-                    raise RuntimeError("Multiple property defintions on the same"\
+                    raise RuntimeError("Multiple property definitions on the same"\
                             "method are not supported.")
                 prop_xmls_dict[pname] = pxmls[0]
 

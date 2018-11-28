@@ -69,7 +69,7 @@ private:
   // Apply selected mask to RGBA data, do not pass alpha.
   void MaskRGBStripA(const unsigned char* in, const unsigned char* inEnd, unsigned char* out);
   // Description:
-  // Do not apply the selcted mask, copy RGBA, into RGB.
+  // Do not apply the selected mask, copy RGBA, into RGB.
   void CopyRGBStripA(const unsigned char* in, const unsigned char* inEnd, unsigned char* out);
   // Description:
   // Copy RGB and add alpha 0xff

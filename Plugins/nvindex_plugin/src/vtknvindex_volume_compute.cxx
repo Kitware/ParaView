@@ -106,7 +106,7 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
 
   if (!svol_data_subset.is_valid_interface())
   {
-    ERROR_LOG << LOG_prefix << "Unable to retrive sparse-volume data-subset.";
+    ERROR_LOG << LOG_prefix << "Unable to retrieve sparse-volume data-subset.";
     return;
   }
 

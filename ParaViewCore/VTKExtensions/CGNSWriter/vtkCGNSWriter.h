@@ -26,7 +26,7 @@ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
  *   - vtkUnstructuredGrid
  *   - vtkPolydata
  *   - vtkMultiBlockDataSet
- *   - vtkMultiPieceDataSet (currenly not implemented)
+ *   - vtkMultiPieceDataSet (currently not implemented)
 */
 
 #ifndef vtkCGNSWriter_h

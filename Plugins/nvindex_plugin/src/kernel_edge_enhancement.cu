@@ -131,7 +131,7 @@ public:
       // if (sum_over > 1 && sum_under == 0)
       //    sample_output.color = make_float4(ps_color.x, ps_color.y, ps_color.z, ps_color.w);
 
-      // check numer of samples below / above reference
+      // check number of samples below / above reference
       if (((sum_under_b > min_hits) && (sum_under_a > min_hits)) ||
         ((sum_over_b > min_hits) && (sum_over_a > min_hits)))
       {

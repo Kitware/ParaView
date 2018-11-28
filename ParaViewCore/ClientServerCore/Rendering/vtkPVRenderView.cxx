@@ -870,7 +870,7 @@ bool vtkPVRenderView::PrepareSelect(int fieldAssociation)
   this->GetRenderWindow()->SwapBuffersOff();
 
   // Make sure that the representations are up-to-date. This is required since
-  // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
+  // due to delayed-switch-back-from-lod, the most recent render maybe a LOD
   // render (or a nonremote render) in which case we need to update the
   // representation pipelines correctly.
   this->Render(/*interactive*/ false, /*skip-rendering*/ false);
