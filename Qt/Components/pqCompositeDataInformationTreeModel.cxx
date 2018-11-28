@@ -318,13 +318,21 @@ public:
     // acts as value being cleared.
     value_pair.second = value.isValid() ? true : false;
 
+    // if value is invalid i.e. the value is being cleared then we
+    // fetch the value from the parent. This makes sense since in such a case,
+    // the value would indeed be inherited from the parent.
+    if (!value.isValid() && this->Parent != nullptr)
+    {
+      value_pair.first = this->Parent->CustomColumnState[col].first;
+    }
+
     // now, propagate over all children and pass this value.
     for (auto citer = this->Children.begin(); citer != this->Children.end(); ++citer)
     {
       CNode& child = (*citer);
       if (force == true || child.CustomColumnState[col].second == false)
       {
-        child.setCustomColumnState(col, value, force, dmodel);
+        child.setCustomColumnState(col, value_pair.first, force, dmodel);
         child.CustomColumnState[col].second = false; // since the value is inherited.
       }
     }
