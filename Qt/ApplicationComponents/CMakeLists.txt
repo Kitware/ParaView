@@ -564,6 +564,7 @@ set (Module_UI_FILES
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui
+  Resources/UI/pqEmptyView.ui
   Resources/UI/pqExampleVisualizationsDialog.ui
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqFontPropertyWidget.ui

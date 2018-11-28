@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqCatalystExportStateWizard.h"
+#include "pqSGExportStateWizardInternals.h"
 
 #include <vtkCamera.h>
 #include <vtkPVXMLElement.h>
