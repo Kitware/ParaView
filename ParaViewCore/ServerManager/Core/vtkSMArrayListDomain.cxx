@@ -419,10 +419,16 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
   if (values != this->ALDInternals->DomainValues)
   {
     this->ALDInternals->DomainValues = values;
+
+    // ensures that we fire DomainModifiedEvent only once.
+    DeferDomainModifiedEvents defer(this);
+
     this->SetStrings(this->ALDInternals->GetDomainValueStrings());
-    // FIXME: there is still a possibility that the above may not trigger
-    // DomainModified(). How do we handle that without unnecessarily
-    // firing the signal twice?
+
+    // since `this->SetStrings()` may not necessarily have changed even though
+    // the arrays changed (e.g. BUG #18628), we explicitly fire domain modified.
+    // Note DeferDomainModifiedEvents ensures that the event gets fired only once.
+    this->DomainModified();
   }
 }
 

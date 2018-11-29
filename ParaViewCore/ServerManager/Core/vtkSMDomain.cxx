@@ -40,11 +40,36 @@ struct vtkSMDomainInternals
 };
 
 //---------------------------------------------------------------------------
+vtkSMDomain::DeferDomainModifiedEvents::DeferDomainModifiedEvents(vtkSMDomain* domain)
+  : Self(domain)
+{
+  assert(this->Self != nullptr);
+  ++this->Self->DeferDomainModifiedEventsCount;
+}
+
+//---------------------------------------------------------------------------
+vtkSMDomain::DeferDomainModifiedEvents::~DeferDomainModifiedEvents()
+{
+  assert(this->Self->DeferDomainModifiedEventsCount > 0);
+  if ((--this->Self->DeferDomainModifiedEventsCount) == 0)
+  {
+    if (this->Self->PendingDomainModifiedEvents)
+    {
+      this->Self->PendingDomainModifiedEvents = false;
+      this->Self->DomainModified();
+    }
+  }
+}
+
+//---------------------------------------------------------------------------
 vtkSMDomain::vtkSMDomain()
 {
   this->XMLName = 0;
   this->Internals = new vtkSMDomainInternals;
   this->IsOptional = false;
+
+  this->DeferDomainModifiedEventsCount = 0;
+  this->PendingDomainModifiedEvents = false;
 }
 
 //---------------------------------------------------------------------------
@@ -186,7 +211,15 @@ unsigned int vtkSMDomain::GetNumberOfRequiredProperties()
 //---------------------------------------------------------------------------
 void vtkSMDomain::DomainModified()
 {
-  this->InvokeEvent(vtkCommand::DomainModifiedEvent, 0);
+  if (this->DeferDomainModifiedEventsCount == 0)
+  {
+    this->PendingDomainModifiedEvents = false;
+    this->InvokeEvent(vtkCommand::DomainModifiedEvent);
+  }
+  else
+  {
+    this->PendingDomainModifiedEvents = true;
+  }
 }
 
 //---------------------------------------------------------------------------
