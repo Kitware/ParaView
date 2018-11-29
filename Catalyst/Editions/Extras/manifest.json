@@ -58,6 +58,15 @@
       "cswrap":true,
       "pythonwrap":true
     },
+    { "name":"vtkFiltersCore",
+      "path":"VTK/Filters/Core",
+      "include":[
+        { "class":"vtkIdFilter" },
+        { "class":"vtkTriangleFilter" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
     { "name":"vtkFiltersExtraction",
       "path":"VTK/Filters/Extraction",
       "include":[
@@ -130,6 +139,7 @@
     { "name":"vtkFiltersGeneral",
       "path":"VTK/Filters/General",
       "include":[
+        { "class":"vtkDataSetTriangleFilter" },
         { "class":"vtkExtractSelectedFrustum" },
         { "class":"vtkExtractSelectionBase" },
         { "class":"vtkGradientFilter" },
@@ -138,6 +148,18 @@
         { "class":"vtkTransformFilter" },
         { "class":"vtkWarpScalar" },
         { "class":"vtkWarpVector" }
+      ],
+      "cswrap":true,
+      "pythonwrap":true
+    },
+    { "name":"vtkPVVTKExtensionsDefault",
+      "path":"ParaViewCore/VTKExtensions/Default",
+      "include":[
+        { "class":"vtkPVGlyphFilter" },
+        { "class":"vtkPVGlyphFilterLegacy" }
+      ],
+      "replace":[
+        { "path":"ParaViewCore/VTKExtensions/Default/module.cmake" }
       ],
       "cswrap":true,
       "pythonwrap":true

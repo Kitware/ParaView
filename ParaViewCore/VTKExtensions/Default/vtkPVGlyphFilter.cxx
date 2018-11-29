@@ -20,7 +20,10 @@
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataSet.h"
+#include "vtkDataSetSurfaceFilter.h"
+#include "vtkDataSetTriangleFilter.h"
 #include "vtkFloatArray.h"
+#include "vtkIdFilter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMinimalStandardRandomSequence.h"
@@ -33,161 +36,418 @@
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTetra.h"
 #include "vtkTransform.h"
+#include "vtkTriangle.h"
+#include "vtkTriangleFilter.h"
 #include "vtkTuple.h"
 #include "vtkUniformGrid.h"
+#include "vtkUnstructuredGrid.h"
 
 // C/C++ includes
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include <numeric>
+#include <random>
 #include <set>
 #include <vector>
 
+static const std::string IDS_ARRAY_NAME = "vtkPVGlyphFilter_Ids";
 class vtkPVGlyphFilter::vtkInternals
 {
+  vtkDataSet* LastDataSet = nullptr;
+
+  // Used only with SPATIALLY_UNIFORM_DISTRIBUTION
   vtkBoundingBox Bounds;
   double NearestPointRadius;
   std::vector<vtkTuple<double, 3> > Points;
   std::vector<vtkIdType> PointIds;
   size_t NextPointId;
-
   vtkNew<vtkOctreePointLocator> Locator;
 
-  void SetupLocator(vtkDataSet* ds)
-  {
-    if (this->Locator->GetDataSet() == ds)
-    {
-      return;
-    }
-
-    this->Locator->Initialize();
-    this->Locator->SetDataSet(ds);
-    this->Locator->BuildLocator();
-
-    this->PointIds.clear();
-    std::set<vtkIdType> pointset;
-    for (std::vector<vtkTuple<double, 3> >::iterator iter = this->Points.begin(),
-                                                     end = this->Points.end();
-         iter != end; ++iter)
-    {
-      double dist2;
-      vtkIdType ptId = this->Locator->FindClosestPointWithinRadius(
-        this->NearestPointRadius, iter->GetData(), dist2);
-      if (ptId >= 0)
-      {
-        pointset.insert(ptId);
-      }
-    }
-    this->PointIds.insert(this->PointIds.begin(), pointset.begin(), pointset.end());
-    this->NextPointId = 0;
-  }
+  // Used with SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_*
+  std::map<unsigned int, std::vector<double> > UniformSamplingVectorMap;
+  std::vector<vtkIdType> IdLookupTable;
+  double SamplingRunningSum = 0;
 
 public:
-  void Reset()
+  //---------------------------------------------------------------------------
+  // Check that the ds have a correct size for the sampling
+  // If not, use IDS_ARRAY_NAME to fill a id lookup table
+  // Used only with SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_*
+  // Return true if lookup table was computed, false otherwise.
+  bool ComputeIdLookupTable(vtkIdType samplingSize, vtkDataSet* ds, bool cellCenters)
   {
-    this->Bounds.Reset();
-    this->Points.clear();
-    this->Locator->Initialize();
-    this->Locator->SetDataSet(NULL);
+    this->IdLookupTable.resize(samplingSize);
+    std::iota(this->IdLookupTable.begin(), this->IdLookupTable.end(), 0);
+    vtkIdTypeArray* idArray = nullptr;
+    vtkIdType nIds;
+    if (cellCenters)
+    {
+      nIds = ds->GetNumberOfPoints();
+      idArray = vtkIdTypeArray::SafeDownCast(ds->GetPointData()->GetArray(IDS_ARRAY_NAME.c_str()));
+    }
+    else
+    {
+      nIds = ds->GetNumberOfCells();
+      idArray = vtkIdTypeArray::SafeDownCast(ds->GetCellData()->GetArray(IDS_ARRAY_NAME.c_str()));
+    }
+    if (nIds != samplingSize)
+    {
+      if (!idArray)
+      {
+        // This may happen with VTK_EMPTY_CELL in the input dataset
+        // because of vtkCellCenters implementation
+        return false;
+      }
+      for (vtkIdType i = 0; i < nIds; i++)
+      {
+        this->IdLookupTable[idArray->GetValue(i)] = i;
+      }
+    }
+    return true;
   }
 
   //---------------------------------------------------------------------------
-  // Update internal datastructures for the given dataset. This will collect
-  // bounds information for all datasets for SPATIALLY_UNIFORM_DISTRIBUTION.
-  void UpdateWithDataset(vtkDataSet* ds, vtkPVGlyphFilter* self)
+  // This will compute all visible points ahead of time if needed
+  void ComputeVisiblePointsIfNeeded(
+    unsigned int index, vtkDataSet* ds, bool cellCenters, vtkPVGlyphFilter* self)
   {
-    assert(ds != NULL && self != NULL);
-    if (self->GetGlyphMode() != vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
-    {
-      // nothing to do.
-      return;
-    }
-
-    // collect local bounds information.
-    double bds[6];
-    ds->GetBounds(bds);
-    if (vtkBoundingBox::IsValid(bds))
-    {
-      this->Bounds.AddBounds(bds);
-    }
-  }
-
-  //---------------------------------------------------------------------------
-  // Again, primarily for SPATIALLY_UNIFORM_DISTRIBUTION. We sync the bounds
-  // information among all ranks.
-  // Subsequently, we also build the list of random sample points using the
-  // synchronized bounds.
-  void SynchronizeGlobalInformation(vtkPVGlyphFilter* self)
-  {
-    if (self->GetGlyphMode() != vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
+    int glyphMode = self->GetGlyphMode();
+    if (glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION &&
+      glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE &&
+      glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME)
     {
       return; // nothing to do.
     }
 
-    vtkMultiProcessController* controller = self->GetController();
-    if (controller && controller->GetNumberOfProcesses() > 1)
-    {
-      double local_min[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
-      double local_max[3] = { VTK_DOUBLE_MIN, VTK_DOUBLE_MIN, VTK_DOUBLE_MIN };
-      if (this->Bounds.IsValid())
-      {
-        this->Bounds.GetMinPoint(local_min[0], local_min[1], local_min[2]);
-        this->Bounds.GetMaxPoint(local_max[0], local_max[1], local_max[2]);
-      }
-      double global_min[3], global_max[3];
-
-      controller->AllReduce(local_min, global_min, 3, vtkCommunicator::MIN_OP);
-      controller->AllReduce(local_max, global_max, 3, vtkCommunicator::MAX_OP);
-
-      this->Bounds.SetBounds(
-        global_min[0], global_max[0], global_min[1], global_max[1], global_min[2], global_max[2]);
-    }
-
-    if (!this->Bounds.IsValid())
+    if (ds == this->LastDataSet)
     {
       return;
     }
+    this->LastDataSet = ds;
 
-    // build up list of points to glyph.
-    vtkNew<vtkMinimalStandardRandomSequence> randomGenerator;
-    randomGenerator->SetSeed(self->GetSeed());
-    this->Points.resize(self->GetMaximumNumberOfSamplePoints());
-    for (vtkIdType cc = 0; cc < self->GetMaximumNumberOfSamplePoints(); cc++)
+    this->PointIds.clear();
+    std::set<vtkIdType> pointIds;
+
+    if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
     {
-      vtkTuple<double, 3>& tuple = this->Points[cc];
-      randomGenerator->Next();
-      tuple[0] = randomGenerator->GetRangeValue(
-        this->Bounds.GetMinPoint()[0], this->Bounds.GetMaxPoint()[0]);
-      randomGenerator->Next();
-      tuple[1] = randomGenerator->GetRangeValue(
-        this->Bounds.GetMinPoint()[1], this->Bounds.GetMaxPoint()[1]);
-      randomGenerator->Next();
-      tuple[2] = randomGenerator->GetRangeValue(
-        this->Bounds.GetMinPoint()[2], this->Bounds.GetMaxPoint()[2]);
-    }
+      this->Locator->Initialize();
+      this->Locator->SetDataSet(ds);
+      this->Locator->BuildLocator();
 
-    double l[3];
-    this->Bounds.GetLengths(l);
-
-    int dim = (l[0] > 0.0 && l[1] > 0.0 && l[2] > 0.0) ? 3 : 2;
-
-    double volume = std::pow(this->Bounds.GetDiagonalLength(), dim);
-    if (volume > 0.0)
-    {
-      assert(self->GetMaximumNumberOfSamplePoints() > 0);
-      double volumePerGlyph = volume / self->GetMaximumNumberOfSamplePoints();
-      double delta = std::pow(volumePerGlyph, 1.0 / dim);
-      this->NearestPointRadius = delta / 2.0;
+      for (auto iter : this->Points)
+      {
+        double dist2;
+        vtkIdType ptId = this->Locator->FindClosestPointWithinRadius(
+          this->NearestPointRadius, iter.GetData(), dist2);
+        if (ptId >= 0)
+        {
+          pointIds.insert(ptId);
+        }
+      }
     }
     else
     {
-      this->NearestPointRadius = 0.0001;
+      vtkNew<vtkIdList> cellPointIds;
+      auto& uniformSamplingVector = this->UniformSamplingVectorMap[index];
+      if (uniformSamplingVector.size() == 0)
+      {
+        vtkErrorWithObjectMacro(self, "Could not find sampling vector");
+        return;
+      }
+
+      if (!this->ComputeIdLookupTable(
+            static_cast<vtkIdType>(uniformSamplingVector.size()), ds, cellCenters))
+      {
+        vtkWarningWithObjectMacro(
+          self, "Provided dataset contain cells that can't be correctly sampled, ignored");
+        return;
+      }
+
+      // From the local dataset contribution to the sampling, compute the number of points to sample
+      double localSum = uniformSamplingVector.back();
+      vtkIdType nLocalPoint =
+        self->GetMaximumNumberOfSamplePoints() * localSum / this->SamplingRunningSum;
+
+      std::mt19937 gen(self->GetSeed());
+      std::uniform_real_distribution<> dis(0.0, localSum);
+      for (vtkIdType n = 0; n < nLocalPoint; n++)
+      {
+        // The sampling vector being sorted, just find the index of the sampled cell
+        double sample = dis(gen);
+        auto it =
+          std::upper_bound(uniformSamplingVector.begin(), uniformSamplingVector.end(), sample);
+
+        if (cellCenters)
+        {
+          // With cell centers, points are located at the center of the sampled cells
+          pointIds.insert(this->IdLookupTable[it - uniformSamplingVector.begin()]);
+        }
+        else
+        {
+          // Found a sampled cells, find any point from this cells that has not yet been added to
+          // the visible points
+          ds->GetCellPoints(this->IdLookupTable[it - uniformSamplingVector.begin()], cellPointIds);
+          for (vtkIdType iPtId = 0; iPtId < cellPointIds->GetNumberOfIds(); iPtId++)
+          {
+            vtkIdType pointId = cellPointIds->GetId(iPtId);
+            if (pointIds.insert(pointId).second)
+            {
+              break;
+            }
+            // If all points of the cells have already been added, do not add any point
+          }
+        }
+      }
+    }
+    this->PointIds.insert(this->PointIds.begin(), pointIds.begin(), pointIds.end());
+    this->NextPointId = 0;
+  }
+
+  //---------------------------------------------------------------------------
+  void Reset()
+  {
+    this->LastDataSet = nullptr;
+
+    this->Bounds.Reset();
+    this->Points.clear();
+    this->Locator->Initialize();
+    this->Locator->SetDataSet(NULL);
+
+    this->UniformSamplingVectorMap.clear();
+    this->SamplingRunningSum = 0;
+  }
+
+  //---------------------------------------------------------------------------
+  vtkSmartPointer<vtkDataSet> UpdateWithDataset(
+    unsigned int index, vtkDataSet* ds, vtkPVGlyphFilter* self)
+  {
+    assert(ds != NULL && self != NULL);
+
+    vtkSmartPointer<vtkDataSet> dataSetToReturn = ds;
+
+    int glyphMode = self->GetGlyphMode();
+    switch (glyphMode)
+    {
+      case vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION:
+        // collect local bounds information.
+        double bds[6];
+        ds->GetBounds(bds);
+        if (vtkBoundingBox::IsValid(bds))
+        {
+          this->Bounds.AddBounds(bds);
+        }
+        break;
+      case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE:
+        VTK_FALLTHROUGH;
+      case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME:
+      {
+        // No cells means no sampling possible
+        if (ds->GetNumberOfCells() == 0)
+        {
+          return dataSetToReturn;
+        }
+
+        // Get a sampling vector from the map
+        auto empRet = this->UniformSamplingVectorMap.emplace(std::piecewise_construct,
+          std::make_tuple(index), std::make_tuple(ds->GetNumberOfCells(), 0.0));
+        auto& uniformSamplingVector = empRet.first->second;
+
+        // Add cell ids to the dataset in order to be able to recover the right cells later
+        vtkNew<vtkIdFilter> idFilter;
+        idFilter->SetInputData(ds);
+        idFilter->SetIdsArrayName(IDS_ARRAY_NAME.c_str());
+        idFilter->PointIdsOff();
+        idFilter->Update();
+        dataSetToReturn = idFilter->GetOutput();
+        ds = dataSetToReturn.Get();
+
+        if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE)
+        {
+          vtkPolyData* pd = vtkPolyData::SafeDownCast(ds);
+          if (!pd)
+          {
+            // If dataset is not a PolyData, just extracts its surface so it will be used to sample
+            // glyphs instead
+            vtkNew<vtkDataSetSurfaceFilter> surface;
+            surface->SetInputData(ds);
+            surface->Update();
+            dataSetToReturn = ds = surface->GetOutput();
+          }
+
+          vtkNew<vtkTriangleFilter> triangleFilter;
+          triangleFilter->SetInputData(ds);
+          triangleFilter->PassLinesOff();
+          triangleFilter->PassVertsOff();
+          triangleFilter->Update();
+
+          vtkPolyData* trianglePolyData = triangleFilter->GetOutput();
+          vtkCellArray* triangleArray = trianglePolyData->GetPolys();
+
+          vtkIdTypeArray* cellIdArray = vtkIdTypeArray::SafeDownCast(
+            trianglePolyData->GetCellData()->GetArray(IDS_ARRAY_NAME.c_str()));
+          if (!cellIdArray)
+          {
+            vtkErrorWithObjectMacro(self, "Could not find id array");
+            return dataSetToReturn;
+          }
+
+          vtkIdType nPts;
+          vtkIdType triangleId = 0;
+          vtkIdType* pts;
+          for (triangleArray->InitTraversal(); triangleArray->GetNextCell(nPts, pts); triangleId++)
+          {
+            // Compute and stored in the sampling vector the area of each cell
+            double p1[3];
+            double p2[3];
+            double p3[3];
+            trianglePolyData->GetPoint(pts[0], p1);
+            trianglePolyData->GetPoint(pts[1], p2);
+            trianglePolyData->GetPoint(pts[2], p3);
+            uniformSamplingVector[cellIdArray->GetValue(triangleId)] +=
+              vtkTriangle::TriangleArea(p1, p2, p3);
+          }
+        }
+        else // if (glyphMode ==
+        // vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME)
+        {
+          vtkNew<vtkDataSetTriangleFilter> tetraFilter;
+          tetraFilter->SetInputData(ds);
+          tetraFilter->TetrahedraOnlyOn();
+          tetraFilter->Update();
+
+          vtkUnstructuredGrid* tetraUG = tetraFilter->GetOutput();
+          vtkCellArray* tetraArray = tetraUG->GetCells();
+
+          vtkIdTypeArray* cellIdArray =
+            vtkIdTypeArray::SafeDownCast(tetraUG->GetCellData()->GetArray(IDS_ARRAY_NAME.c_str()));
+          if (!cellIdArray)
+          {
+            vtkErrorWithObjectMacro(self, "Could not find id array");
+            return dataSetToReturn;
+          }
+
+          vtkIdType nPts;
+          vtkIdType tetraId = 0;
+          vtkIdType* pts;
+          for (tetraArray->InitTraversal(); tetraArray->GetNextCell(nPts, pts); tetraId++)
+          {
+            // Compute and stored in the sampling vector the volume of each cell
+            double p1[3];
+            double p2[3];
+            double p3[3];
+            double p4[3];
+            tetraUG->GetPoint(pts[0], p1);
+            tetraUG->GetPoint(pts[1], p2);
+            tetraUG->GetPoint(pts[2], p3);
+            tetraUG->GetPoint(pts[3], p4);
+            uniformSamplingVector[cellIdArray->GetValue(tetraId)] +=
+              vtkTetra::ComputeVolume(p1, p2, p3, p4);
+          }
+        }
+        // Compute a partial sum on the sampling vector in order to perform sampling later
+        std::partial_sum(uniformSamplingVector.begin(), uniformSamplingVector.end(),
+          uniformSamplingVector.begin());
+        this->SamplingRunningSum += uniformSamplingVector.back();
+      }
+      break;
+      default:
+        break;
+    }
+    return dataSetToReturn;
+  }
+
+  //---------------------------------------------------------------------------
+  void SynchronizeGlobalInformation(vtkPVGlyphFilter* self)
+  {
+    int glyphMode = self->GetGlyphMode();
+    if (glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION &&
+      glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE &&
+      glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME)
+    {
+      return; // nothing to do.
+    }
+
+    if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION)
+    {
+      vtkMultiProcessController* controller = self->GetController();
+      if (controller && controller->GetNumberOfProcesses() > 1)
+      {
+        double local_min[3] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, VTK_DOUBLE_MAX };
+        double local_max[3] = { VTK_DOUBLE_MIN, VTK_DOUBLE_MIN, VTK_DOUBLE_MIN };
+        if (this->Bounds.IsValid())
+        {
+          this->Bounds.GetMinPoint(local_min[0], local_min[1], local_min[2]);
+          this->Bounds.GetMaxPoint(local_max[0], local_max[1], local_max[2]);
+        }
+        double global_min[3], global_max[3];
+
+        controller->AllReduce(local_min, global_min, 3, vtkCommunicator::MIN_OP);
+        controller->AllReduce(local_max, global_max, 3, vtkCommunicator::MAX_OP);
+
+        this->Bounds.SetBounds(
+          global_min[0], global_max[0], global_min[1], global_max[1], global_min[2], global_max[2]);
+      }
+
+      if (!this->Bounds.IsValid())
+      {
+        return;
+      }
+
+      // build up list of points to glyph.
+      vtkNew<vtkMinimalStandardRandomSequence> randomGenerator;
+      randomGenerator->SetSeed(self->GetSeed());
+      this->Points.resize(self->GetMaximumNumberOfSamplePoints());
+      for (vtkIdType cc = 0; cc < self->GetMaximumNumberOfSamplePoints(); cc++)
+      {
+        vtkTuple<double, 3>& tuple = this->Points[cc];
+        randomGenerator->Next();
+        tuple[0] = randomGenerator->GetRangeValue(
+          this->Bounds.GetMinPoint()[0], this->Bounds.GetMaxPoint()[0]);
+        randomGenerator->Next();
+        tuple[1] = randomGenerator->GetRangeValue(
+          this->Bounds.GetMinPoint()[1], this->Bounds.GetMaxPoint()[1]);
+        randomGenerator->Next();
+        tuple[2] = randomGenerator->GetRangeValue(
+          this->Bounds.GetMinPoint()[2], this->Bounds.GetMaxPoint()[2]);
+      }
+
+      double l[3];
+      this->Bounds.GetLengths(l);
+
+      int dim = (l[0] > 0.0 && l[1] > 0.0 && l[2] > 0.0) ? 3 : 2;
+
+      double volume = std::pow(this->Bounds.GetDiagonalLength(), dim);
+      if (volume > 0.0)
+      {
+        assert(self->GetMaximumNumberOfSamplePoints() > 0);
+        double volumePerGlyph = volume / self->GetMaximumNumberOfSamplePoints();
+        double delta = std::pow(volumePerGlyph, 1.0 / dim);
+        this->NearestPointRadius = delta / 2.0;
+      }
+      else
+      {
+        this->NearestPointRadius = 0.0001;
+      }
+    }
+    else // if(glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE
+         // || glyphMode != vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME)
+    {
+      // With inverse transform sampling, just sum the SamplingRunningSum
+      vtkMultiProcessController* controller = self->GetController();
+      if (controller && controller->GetNumberOfProcesses() > 1)
+      {
+        double localSum = this->SamplingRunningSum;
+        controller->AllReduce(&localSum, &this->SamplingRunningSum, 1, vtkCommunicator::SUM_OP);
+      }
     }
   }
 
   //---------------------------------------------------------------------------
-  inline bool IsPointVisible(vtkDataSet* ds, vtkIdType ptId, vtkPVGlyphFilter* self)
+  inline bool IsPointVisible(
+    unsigned int index, vtkDataSet* ds, vtkIdType ptId, bool cellCenters, vtkPVGlyphFilter* self)
   {
     assert(ds != NULL && self != NULL);
     switch (self->GetGlyphMode())
@@ -199,9 +459,13 @@ public:
         return self->GetStride() <= 1 || (ptId % self->GetStride()) == 0;
 
       case vtkPVGlyphFilter::SPATIALLY_UNIFORM_DISTRIBUTION:
-        // This will initialize the point locator and build the list of PointIds
+        VTK_FALLTHROUGH;
+      case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE:
+        VTK_FALLTHROUGH;
+      case vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME:
+        // This will initialize the needed structure and compute visible points
         // that should be glyphed.
-        this->SetupLocator(ds);
+        this->ComputeVisiblePointsIfNeeded(index, ds, cellCenters, self);
 
         // since PointIds is a sorted list, and we know that IsPointVisible will
         // be called for in monotonically increasing fashion for a specific ds, we
@@ -369,11 +633,11 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 
   this->Internals->Reset();
 
-  vtkDataSet* ds = vtkDataSet::GetData(inputVector[0], 0);
+  vtkSmartPointer<vtkDataSet> ds = vtkDataSet::GetData(inputVector[0], 0);
   vtkCompositeDataSet* cds = vtkCompositeDataSet::GetData(inputVector[0], 0);
   if (ds)
   {
-    this->Internals->UpdateWithDataset(ds, this);
+    ds = this->Internals->UpdateWithDataset(0, ds, this);
     this->Internals->SynchronizeGlobalInformation(this);
 
     if (!this->IsInputArrayToProcessValid(ds))
@@ -383,30 +647,26 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 
     vtkPolyData* outputPD = vtkPolyData::GetData(outputVector);
     assert(outputPD);
-    if (this->UseCellCenters(ds))
-    {
-      return this->ExecuteWithCellCenters(ds, sourceVector, outputPD) ? 1 : 0;
-    }
-    else
-    {
-      return this->Execute(ds, sourceVector, outputPD) ? 1 : 0;
-    }
+    return this->Execute(0, ds, sourceVector, outputPD) ? 1 : 0;
   }
   else if (cds)
   {
     vtkMultiBlockDataSet* outputMD = vtkMultiBlockDataSet::GetData(outputVector);
     assert(outputMD);
-
     outputMD->CopyStructure(cds);
 
+    vtkNew<vtkMultiBlockDataSet> cdsCopy;
+    cdsCopy->ShallowCopy(cds);
+
     vtkSmartPointer<vtkCompositeDataIterator> iter;
-    iter.TakeReference(cds->NewIterator());
+    iter.TakeReference(cdsCopy->NewIterator());
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-      vtkDataSet* current = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      vtkSmartPointer<vtkDataSet> current = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (current)
       {
-        this->Internals->UpdateWithDataset(current, this);
+        current = this->Internals->UpdateWithDataset(iter->GetCurrentFlatIndex(), current, this);
+        cdsCopy->SetDataSet(iter, current);
       }
     }
     this->Internals->SynchronizeGlobalInformation(this);
@@ -423,14 +683,8 @@ int vtkPVGlyphFilter::RequestData(vtkInformation* vtkNotUsed(request),
 
         bool res;
         vtkNew<vtkPolyData> outputPD;
-        if (this->UseCellCenters(currentDS))
-        {
-          res = this->ExecuteWithCellCenters(currentDS, sourceVector, outputPD.GetPointer());
-        }
-        else
-        {
-          res = this->Execute(currentDS, sourceVector, outputPD.GetPointer());
-        }
+        res = this->Execute(
+          iter->GetCurrentFlatIndex(), currentDS, sourceVector, outputPD.GetPointer());
         if (!res)
         {
           vtkErrorMacro("Glyph generation failed for block: " << iter->GetCurrentFlatIndex());
@@ -472,9 +726,10 @@ int vtkPVGlyphFilter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVGlyphFilter::IsPointVisible(vtkDataSet* ds, vtkIdType ptId)
+int vtkPVGlyphFilter::IsPointVisible(
+  unsigned int index, vtkDataSet* ds, vtkIdType ptId, bool cellCenters)
 {
-  return this->Internals->IsPointVisible(ds, ptId, this);
+  return this->Internals->IsPointVisible(index, ds, ptId, cellCenters, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -520,33 +775,34 @@ bool vtkPVGlyphFilter::UseCellCenters(vtkDataSet* input)
     inVectorsAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS;
 }
 
-//-----------------------------------------------------------------------------
-bool vtkPVGlyphFilter::ExecuteWithCellCenters(
-  vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output)
-{
-  vtkNew<vtkCellCenters> cellCenters;
-  cellCenters->SetInputData(input);
-  cellCenters->Update();
-  input = cellCenters->GetOutput();
-  vtkDataArray* inSScalars = input->GetPointData()->GetArray(
-    this->GetInputArrayInformation(0)->Get(vtkDataObject::FIELD_NAME()));
-  vtkDataArray* inVectors = input->GetPointData()->GetArray(
-    this->GetInputArrayInformation(1)->Get(vtkDataObject::FIELD_NAME()));
-  return this->Execute(input, sourceVector, output, inSScalars, inVectors);
-}
-
 //----------------------------------------------------------------------------
 bool vtkPVGlyphFilter::Execute(
-  vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output)
+  unsigned int index, vtkDataSet* input, vtkInformationVector* sourceVector, vtkPolyData* output)
 {
-  vtkDataArray* scaleArray = this->GetInputArrayToProcess(0, input);
-  vtkDataArray* orientArray = this->GetInputArrayToProcess(1, input);
-  return this->Execute(input, sourceVector, output, scaleArray, orientArray);
+  if (this->UseCellCenters(input))
+  {
+    vtkNew<vtkCellCenters> cellCenters;
+    cellCenters->SetInputData(input);
+    cellCenters->Update();
+    input = cellCenters->GetOutput();
+    vtkDataArray* inSScalars = input->GetPointData()->GetArray(
+      this->GetInputArrayInformation(0)->Get(vtkDataObject::FIELD_NAME()));
+    vtkDataArray* inVectors = input->GetPointData()->GetArray(
+      this->GetInputArrayInformation(1)->Get(vtkDataObject::FIELD_NAME()));
+    return this->Execute(index, input, sourceVector, output, inSScalars, inVectors, true);
+  }
+  else
+  {
+    vtkDataArray* scaleArray = this->GetInputArrayToProcess(0, input);
+    vtkDataArray* orientArray = this->GetInputArrayToProcess(1, input);
+    return this->Execute(index, input, sourceVector, output, scaleArray, orientArray);
+  }
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVector,
-  vtkPolyData* output, vtkDataArray* scaleArray, vtkDataArray* orientArray)
+bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
+  vtkInformationVector* sourceVector, vtkPolyData* output, vtkDataArray* scaleArray,
+  vtkDataArray* orientArray, bool cellCenters)
 {
   assert(input && output);
   if (input == nullptr || output == nullptr)
@@ -755,7 +1011,7 @@ bool vtkPVGlyphFilter::Execute(vtkDataSet* input, vtkInformationVector* sourceVe
       continue;
     }
 
-    if (!this->IsPointVisible(input, inPtId))
+    if (!this->IsPointVisible(index, input, inPtId, cellCenters))
     {
       continue;
     }
@@ -884,6 +1140,14 @@ void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
 
     case SPATIALLY_UNIFORM_DISTRIBUTION:
       os << "SPATIALLY_UNIFORM_DISTRIBUTION" << endl;
+      break;
+
+    case SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE:
+      os << "SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE" << endl;
+      break;
+
+    case SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME:
+      os << "SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_VOLUME" << endl;
       break;
 
     default:
