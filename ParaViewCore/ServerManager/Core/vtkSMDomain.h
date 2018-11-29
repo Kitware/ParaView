@@ -16,7 +16,6 @@
  * @class   vtkSMDomain
  * @brief   represents the possible values a property can have
  *
- *
  * vtkSMDomain is an abstract class that describes the "domain" of a
  * a widget. A domain is a collection of possible values a property
  * can have.
@@ -29,7 +28,9 @@
  * Applications may decide to update the UI every-time the domain changes. As a
  * result, domains ideally should only fire that event when their values change
  * for real not just potentially changed.
-*/
+ * @sa vtkSMDomain::DeferDomainModifiedEvents.
+ *
+ */
 
 #ifndef vtkSMDomain_h
 #define vtkSMDomain_h
@@ -215,6 +216,41 @@ protected:
    */
   void SetProperty(vtkSMProperty*);
 
+  /**
+   * @class vtkSMDomain::DeferDomainModifiedEvents
+   * @brief helper to defer firing of vtkCommand::DomainModifiedEvent.
+   *
+   * When sub-classing vtkSMDomain, we need to ensure that the domain fires
+   * vtkCommand::DomainModifiedEvent if and only if the domain has been
+   * modified. Oftentimes we may have to defer domain modified events till all
+   * modifications have been done. This helper class helps us to that.
+   *
+   * For example, in the following code, the DomainModifiedEvent will only be
+   * fired once if `something_changed` or `something_else_changed` are true when
+   * `defer` goes out of scope.
+   *
+   * @code{cpp}
+   * void ...::Update(...)
+   * {
+   *    DeferDomainModifiedEvents defer(this);
+   *
+   *    if (something_changed)
+   *        this->DomainModified();
+   *    if (something_else_changed)
+   *        this->DomainModified();
+   * }
+   * @endcode
+   *
+   */
+  class VTKPVSERVERMANAGERCORE_EXPORT DeferDomainModifiedEvents
+  {
+    vtkSMDomain* Self;
+
+  public:
+    DeferDomainModifiedEvents(vtkSMDomain* self);
+    ~DeferDomainModifiedEvents();
+  };
+
   char* XMLName;
   bool IsOptional;
   vtkSMDomainInternals* Internals;
@@ -222,6 +258,10 @@ protected:
 private:
   vtkSMDomain(const vtkSMDomain&) = delete;
   void operator=(const vtkSMDomain&) = delete;
+
+  friend class DeferDomainModifiedEvents;
+  unsigned int DeferDomainModifiedEventsCount;
+  bool PendingDomainModifiedEvents;
 };
 
 #endif
