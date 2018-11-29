@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2014-2018 Kitware, Inc. -->
+<component type="desktop-application">
+ <id>org.paraview.paraview</id>
+ <metadata_license>CC-BY-4.0</metadata_license>
+ <project_license>BSD</project_license>
+ <name>ParaView</name>
+ <summary>Data analysis and visualization</summary>
+ <description>
+  <p>
+   ParaView is an open-source, multi-platform data analysis and visualization
+   application. ParaView users can quickly build visualizations to analyze
+   their data using qualitative and quantitative techniques. The data
+   exploration can be done interactively in 3D or programmatically using
+   ParaView’s batch processing capabilities.
+  </p>
+  <p>
+   ParaView was developed to analyze extremely large datasets using distributed
+   memory computing resources. It can be run on supercomputers to analyze
+   datasets of exascale size as well as on laptops for smaller data.
+  </p>
+ </description>
+ <categories>
+  <category>Science</category>
+ </categories>
+ <screenshots>
+  <screenshot type="default">
+   <caption>Using ParaView to compare simulated and analytical results (Image courtesy of Sandia National Labs)</caption>
+   <image width="902" height="677">http://www.paraview.org/wp-content/uploads/2014/04/full_AlegraVV.png</image>
+  </screenshot>
+  <screenshot>
+   <caption>Global Seismic Wave Propagation Simulation (Contributors from ICES, The University of Texas at Austin: Carsten Burstedde, Omar Ghattas, James R. Martin, Georg Stadler, Lucas C. Wilcox Visualization at the Texas Advanced Computing Center, the University of Texas at Austin by Greg Abram)</caption>
+   <image width="812" height="468">http://www.paraview.org/wp-content/uploads/2014/04/seismic.jpg</image>
+  </screenshot>
+  <screenshot>
+   <caption>Polar Vortex Breakdown Simulation (Image courtesy of Sandia National Labs)</caption>
+   <image width="940" height="661">http://www.paraview.org/wp-content/uploads/2014/04/full_PolarVortexBreakdown.png</image>
+  </screenshot>
+  <screenshot>
+   <caption>Hydrodynamic simulations of quark-gluon plasma (Russell Taylor's Comp 715: Visualization in the Sciences class at the University of North Carolina at Chapel Hill. Author: Joo Hwi Lee and Zhigang (Alfred) Zhong Copyright: Data courtesy of Steffen Bass and Hannah Peterson, Duke Physics)</caption>
+   <image width="875" height="700">http://www.paraview.org/wp-content/uploads/2014/04/full_hydrodynamic_simulation.png</image>
+  </screenshot>
+  <screenshot>
+   <caption>Cross Wind Fire Simulation (Image courtesy of Sandia National Labs)</caption>
+   <image width="902" height="609">http://www.paraview.org/wp-content/uploads/2014/04/0_full_Fire.png</image>
+  </screenshot>
+ </screenshots>
+ <launchable type="desktop-id">org.paraview.paraview.desktop</launchable>
+ <url type="homepage">http://paraview.org/</url>
+ <url type="bugtracker">https://gitlab.kitware.com/paraview/paraview/issues</url>
+ <url type="faq">https://www.paraview.org/Wiki/ParaView:FAQ</url>
+ <url type="help">https://www.paraview.org/documentation/</url>
+ <update_contact>paraview+paraview-support@discourse.paraview.org</update_contact>
+</component>

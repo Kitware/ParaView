@@ -148,11 +148,11 @@ elseif (APPLE AND PARAVIEW_DO_UNIX_STYLE_INSTALLS)
     COMPONENT Runtime)
 elseif (UNIX)
   configure_file(
-    paraview.desktop.in
-    "${CMAKE_CURRENT_BINARY_DIR}/paraview.desktop"
+    org.paraview.ParaView.desktop.in
+    "${CMAKE_CURRENT_BINARY_DIR}/org.paraview.ParaView.desktop"
     @ONLY)
   install(
-    FILES       "${CMAKE_CURRENT_BINARY_DIR}/paraview.desktop"
+    FILES       "${CMAKE_CURRENT_BINARY_DIR}/org.paraview.ParaView.desktop"
     DESTINATION share/applications
     COMPONENT   runtime)
   foreach (iconsize 22x22 32x32 96x96)
@@ -163,7 +163,7 @@ elseif (UNIX)
       COMPONENT   runtime)
   endforeach ()
   install(
-    FILES       paraview.appdata.xml
+    FILES       org.paraview.ParaView.appdata.xml
     DESTINATION share/appdata
     COMPONENT   runtime)
 endif()
