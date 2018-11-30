@@ -344,7 +344,7 @@ public:
             tetraUG->GetPoint(pts[2], p3);
             tetraUG->GetPoint(pts[3], p4);
             uniformSamplingVector[cellIdArray->GetValue(tetraId)] +=
-              vtkTetra::ComputeVolume(p1, p2, p3, p4);
+              std::abs(vtkTetra::ComputeVolume(p1, p2, p3, p4));
           }
         }
         // Compute a partial sum on the sampling vector in order to perform sampling later
