@@ -32,7 +32,7 @@ class IDistributed_data_subset_data_descriptor
       0xaa, 0xc8>
 {
 public:
-  /// Returns whether the data-subset data descriptor is valid or not.
+  /// Returns wheather the data-subset data descriptor is valid or not.
   ///
   virtual bool is_valid() const = 0;
 

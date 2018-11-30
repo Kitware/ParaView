@@ -121,14 +121,14 @@ bool vtknvindex_application::load_nvindex_library()
 
     ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
     ERROR_LOG << error_str;
-    ERROR_LOG << "Please verify that the PATH environment contains"
+    ERROR_LOG << "Please verify that the PATH environemnt contains"
                  " the location of the NVIDIA IndeX libraries.";
 #else // _WIN32
     const std::string error_str(dlerror());
 
     ERROR_LOG << "Failed to load the NVIDIA IndeX library.";
     ERROR_LOG << error_str;
-    ERROR_LOG << "Please verify that the LD_LIBRARY environment contains"
+    ERROR_LOG << "Please verify that the LD_LIBRARY environemnt contains"
                  " the location of the NVIDIA IndeX libraries.";
 #endif
     return false;
@@ -511,7 +511,7 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
     ERROR_LOG << "Start of the NVIDIA IndeX library failed.";
   }
 
-  // Synchronize IndeX viewer with remote instances.
+  // Syncronize IndeX viewer with remote instances.
   if (inetwork_configuration->get_mode() != mi::neuraylib::INetwork_configuration::MODE_OFF)
   {
     // IndeX viewer must wait until the remote nodes are connected
