@@ -32,6 +32,9 @@ void vtkPVPanoramicProjectionView::Initialize(unsigned int id)
   // remove cullers
   this->GetRenderer()->GetCullers()->RemoveAllItems();
 
+  // depth peeling is not working currently with panoramic pass
+  this->GetRenderer()->UseDepthPeelingOff();
+
   // FXAA is not supported when this pass is active
   this->UseFXAA = false;
 }
