@@ -1119,6 +1119,9 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
     outputPD->SetNormals(newNormals);
   }
 
+  // In certain cases, we can have a left over processing array, remove it.
+  outputPD->RemoveArray(IDS_ARRAY_NAME.c_str());
+
   // Update ourselves and release memory
   //
   output->SetPoints(newPts);
