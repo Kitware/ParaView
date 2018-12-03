@@ -40,7 +40,7 @@ void vtkPVDefaultPass::Render(const vtkRenderState* render_state)
   this->UpdateLightGeometry(renderer);
   this->UpdateLights(renderer);
 
-  this->UpdateGeometry(renderer);
+  this->UpdateGeometry(renderer, render_state->GetFrameBuffer());
 
   vtkOpenGLCheckErrorMacro("failed after Render");
 }
