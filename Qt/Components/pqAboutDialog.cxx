@@ -86,7 +86,7 @@ pqAboutDialog::pqAboutDialog(QWidget* Parent)
 
   this->Ui->VersionLabel->setText(
     QString("<html><b>Version: <i>%1</i></b></html>")
-      .arg(QString(PARAVIEW_VERSION_FULL) + " " + QString(PARAVIEW_BUILD_ARCHITECTURE) + "-bit"));
+      .arg(QString(PARAVIEW_VERSION_FULL));
 
   this->AddClientInformation();
   this->AddServerInformation();
@@ -129,15 +129,8 @@ void pqAboutDialog::AddClientInformation()
 
   QTreeWidget* tree = this->Ui->ClientInformation;
 
-  ::addItem(tree, "Version",
-    QString(PARAVIEW_VERSION_FULL) + " " + QString(PARAVIEW_BUILD_ARCHITECTURE) + "-bit");
+  ::addItem(tree, "Version", QString(PARAVIEW_VERSION_FULL));
   ::addItem(tree, "Qt Version", QT_VERSION_STR);
-
-#if defined(PARAVIEW_BUILD_ARCHITECTURE)
-  ::addItem(tree, "Architecture", PARAVIEW_BUILD_ARCHITECTURE);
-#else
-  ::addItem(tree, "Architecture", PARAVIEW_BUILD_ARCHITECTURE);
-#endif
 
   ::addItem(tree, "vtkIdType size", QString("%1bits").arg(8 * sizeof(vtkIdType)));
 
