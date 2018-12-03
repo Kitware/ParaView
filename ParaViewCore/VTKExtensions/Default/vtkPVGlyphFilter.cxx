@@ -250,6 +250,21 @@ public:
           return dataSetToReturn;
         }
 
+        if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE)
+        {
+          vtkPolyData* pd = vtkPolyData::SafeDownCast(ds);
+          if (!pd)
+          {
+            // If dataset is not a PolyData, just extracts its surface so it will be used to sample
+            // glyphs instead
+            vtkNew<vtkDataSetSurfaceFilter> surface;
+            surface->SetInputData(ds);
+            surface->Update();
+            dataSetToReturn = surface->GetOutput();
+            ds = dataSetToReturn.Get();
+          }
+        }
+
         // Get a sampling vector from the map
         auto empRet = this->UniformSamplingVectorMap.emplace(std::piecewise_construct,
           std::make_tuple(index), std::make_tuple(ds->GetNumberOfCells(), 0.0));
@@ -266,17 +281,6 @@ public:
 
         if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE)
         {
-          vtkPolyData* pd = vtkPolyData::SafeDownCast(ds);
-          if (!pd)
-          {
-            // If dataset is not a PolyData, just extracts its surface so it will be used to sample
-            // glyphs instead
-            vtkNew<vtkDataSetSurfaceFilter> surface;
-            surface->SetInputData(ds);
-            surface->Update();
-            dataSetToReturn = ds = surface->GetOutput();
-          }
-
           vtkNew<vtkTriangleFilter> triangleFilter;
           triangleFilter->SetInputData(ds);
           triangleFilter->PassLinesOff();
