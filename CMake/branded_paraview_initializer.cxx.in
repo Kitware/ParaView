@@ -58,23 +58,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pq@BPC_NAME@Initializer::pq@BPC_NAME@Initializer()
 {
-  this->PVApp = NULL;
-  this->MainWindow = NULL;
-  this->Splash = NULL;
+  this->PVApp = nullptr;
+  this->MainWindow = nullptr;
+  this->Splash = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 pq@BPC_NAME@Initializer::~pq@BPC_NAME@Initializer()
 {
   delete this->Splash;
-  this->Splash = NULL;
+  this->Splash = nullptr;
 
   delete this->MainWindow;
-  this->MainWindow = NULL;
+  this->MainWindow = nullptr;
 
   delete this->PVApp;
-  this->PVApp = 0;
+  this->PVApp = nullptr;
 }
+
 //-----------------------------------------------------------------------------
 pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
 {
