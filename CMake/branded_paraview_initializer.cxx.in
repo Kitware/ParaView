@@ -182,4 +182,3 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
     }
   return RunApplication;
 }
-// ***************** DO NOT EDIT ***********************************
