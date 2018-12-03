@@ -492,7 +492,7 @@ GW_Vertex* GW_Mesh::InsertVertexInEdge( GW_Vertex& Vert1, GW_Vertex& Vert2, GW_F
     this->SetVertex( this->GetNbrVertex()-1, pNewVert );
     /* set position */
     pNewVert->SetPosition( Vert1.GetPosition()*x + Vert2.GetPosition()*(1-x) );
-    /* retrieve the neigbor faces face */
+    /* retrieve the neighbor faces face */
     GW_Face* pFace1 = NULL;
     GW_Face* pFace2 = NULL;
     Vert1.GetFaces( Vert2, pFace1, pFace2 );

@@ -651,7 +651,7 @@ void vtkNIfTIReaderUpdate2(
   // 2: given .nii
   // 3: given .nii.gz
   // 4: given .hdr and image is .img.gz
-  //   Special processing needed for this case onl
+  //   Special processing needed for this case only
   // NOT NEEDED const std::string fileExt = GetExtension(m_FileName);
 
   /* Returns proper name for cases 1,2,3 */

@@ -9,8 +9,8 @@ configure_file("${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in"
 unset(CMAKE_CONFIGURABLE_FILE_CONTENT)
 
 #---------------------------------------------------------------------------------
-# add a custom command to package the documentations into a tar ball thats
-# easy  to move around.
+# add a custom command to package the documentations into a tarball that's
+# easy to move around.
 add_custom_target(ParaViewDoc-TGZ
   COMMAND
     ${CMAKE_COMMAND} -E tar cfz

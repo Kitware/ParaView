@@ -3296,7 +3296,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromSingleProcess(
       // be rejected. This rejection does not affect the fragment extraction
       // result at all while guaranteeing the generation of cell normals.
       //
-      // It is assumed that polygon degenration seldom ocurs and therefore
+      // It is assumed that polygon degeneration seldom ocurs and therefore
       // the lack of early exit (when evaluating an if-statement) does not
       // cause a negative effect while the use of a single comparison can
       // speed up the whole check.
@@ -3971,7 +3971,7 @@ void vtkRectilinearGridConnectivity::GenerateOutputFromMultiProcesses(
       // does not affect the fragment extraction result while guaranteeing
       // the generation of cell normals.
       //
-      // It is assumed that polygon degenration seldom ocurs and therefore
+      // It is assumed that polygon degeneration seldom ocurs and therefore
       // the lack of early exit (when evaluating an if-statement) does not
       // cause a negative effect while the use of a single comparison can
       // speed up the whole check.

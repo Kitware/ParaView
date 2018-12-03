@@ -590,7 +590,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
 #endif
         // Who will do attribute processing for fragments
         // that are split? Cycle through the processes
-        // assigning to each until all work has been alloted.
+        // assigning to each until all work has been allotted.
         vtkMaterialInterfaceProcessRing procRing;
         procRing.Initialize(nProcs);
         // Decide who needs to move and build corresponding
@@ -660,9 +660,9 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
         ++thisMsgId;
       }
 
-      // Brodcast the transaction matrix
+      // Broadcast the transaction matrix
       TM.Broadcast(comm, controllingProcId);
-      // Prepare for inverse look of of fragment ids
+      // Prepare for inverse look of fragment ids
       vtkMaterialInterfaceIdList idList;
       idList.Initialize(this->IntersectionIds[blockId], true);
 

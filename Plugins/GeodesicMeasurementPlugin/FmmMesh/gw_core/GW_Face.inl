@@ -290,7 +290,7 @@ GW_Vertex* GW_Face::GetNextVertex( const GW_Vertex& Vert )
 // Name : GW_Face::GetEdgeNumber
 /**
  *  \param  Face [GW_Face&] The neighbor face.
- *  \return [GW_I32] The numer. Return -1 if not found.
+ *  \return [GW_I32] The number. Return -1 if not found.
  *  \author Gabriel Peyré
  *  \date   2-15-2003
  *

@@ -82,7 +82,7 @@ Worry aobut this later.  Get something working...
 vtkStandardNewMacro(vtkGridConnectivity);
 
 //=============================================================================
-// This code implents the face hash that keeps track of external faces and
+// This code implements the face hash that keeps track of external faces and
 // there links back to cells.  Only worry about the three lowest corner
 // point ids.  Assume that any two faces that share three points are
 // the same face.

@@ -7620,7 +7620,7 @@ if ( FILE_Debug )
     Message("fileID = %d  nread   = %ld", fileptr->self, nread);
     Message("fileID = %d  offset  = %ld", fileptr->self, offset);
     Message("fileID = %d  Pos     = %ld", fileptr->self, fileptr->bufferPos);
-    Message("fileID = %d  postion = %ld", fileptr->self, fileptr->position);
+    Message("fileID = %d  position = %ld", fileptr->self, fileptr->position);
     }
 
 if ( offset > 0 )
@@ -7854,12 +7854,12 @@ if ( FileInfo )
         fprintf(stderr, " file size        : %I64d\n", (long long) fileptr->size);
         if ( fileptr->type == FILE_TYPE_OPEN )
             fprintf(stderr, " file position    : %I64d\n", (long long) fileptr->position);
-        fprintf(stderr, " bytes transfered : %I64d\n", (long long) fileptr->byteTrans);
+        fprintf(stderr, " bytes transferred : %I64d\n", (long long) fileptr->byteTrans);
 #else
         fprintf(stderr, " file size        : %lld\n", (long long) fileptr->size);
         if ( fileptr->type == FILE_TYPE_OPEN )
             fprintf(stderr, " file position    : %lld\n", (long long) fileptr->position);
-        fprintf(stderr, " bytes transfered : %lld\n", (long long) fileptr->byteTrans);
+        fprintf(stderr, " bytes transferred : %lld\n", (long long) fileptr->byteTrans);
 #endif
         }
     else
@@ -7867,7 +7867,7 @@ if ( FileInfo )
         fprintf(stderr, " file size        : %ld\n", (long) fileptr->size);
         if ( fileptr->type == FILE_TYPE_OPEN )
             fprintf(stderr, " file position    : %ld\n", (long) fileptr->position);
-        fprintf(stderr, " bytes transfered : %ld\n", (long) fileptr->byteTrans);
+        fprintf(stderr, " bytes transferred : %ld\n", (long) fileptr->byteTrans);
         }
 
     if ( fileptr->time_in_sec > 0 )
@@ -24647,7 +24647,7 @@ if ( name[0] )
         }
     while ( iz <= 99 );
 
-    if (iz > 99) Error("Variable name %s already exsist!", name);
+    if (iz > 99) Error("Variable name %s already exists!", name);
 
     if ( strcmp(name, varname) != 0 )
         Warning("Changed %s entry of variable name '%s' to '%s'!", (iz==1)?"double":"multiple", name, varname);
@@ -24677,7 +24677,7 @@ else
         }
     while ( iz <= 99 );
 
-    if (iz > 99) Error("Variable name %s already exsist!", name);
+    if (iz > 99) Error("Variable name %s already exists!", name);
 
     strcpy(name, varname);
     code = 0;
@@ -25890,7 +25890,7 @@ for ( int id = 0; id < 3; ++id )
             break;
 
         default:
-            Error("Internal errror: Malformed dimension order encountered. Please report this bug.\n");
+            Error("Internal error: Malformed dimension order encountered. Please report this bug.\n");
         }
     }
 

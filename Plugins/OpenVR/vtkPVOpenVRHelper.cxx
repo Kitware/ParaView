@@ -1276,7 +1276,7 @@ void vtkPVOpenVRHelper::EventCallback(
       self->LastPickedRepresentation = repr;
 
       // next two lines are debugging code to mark what actor was picked
-      // by changing its color. Usefull to track down picking errors.
+      // by changing its color. Useful to track down picking errors.
       // double *color = static_cast<vtkActor*>(prop)->GetProperty()->GetColor();
       // static_cast<vtkActor*>(prop)->GetProperty()->SetColor(color[0] > 0.0 ? 0.0 : 1.0, 0.5,
       // 0.5);

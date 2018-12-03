@@ -473,7 +473,7 @@ void vtkAnalyzeReaderUpdate2(vtkAnalyzeReader* self, vtkImageData* vtkNotUsed(da
   // 2: given .img
   // 3: given .img.gz
   // 4: given .hdr and image is .img.gz
-  //   Special processing needed for this case onl
+  //   Special processing needed for this case only
   // NOT NEEDED const std::string fileExt = GetExtension(m_FileName);
 
   /* Returns proper name for cases 1,2,3 */
@@ -569,7 +569,7 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData* vtkNotUsed(dat
   // 2: given .img
   // 3: given .img.gz
   // 4: given .hdr and image is .img.gz
-  //   Special processing needed for this case onl
+  //   Special processing needed for this case only
   // NOT NEEDED const std::string fileExt = GetExtension(m_FileName);
 
   /* Returns proper name for cases 1,2,3 */

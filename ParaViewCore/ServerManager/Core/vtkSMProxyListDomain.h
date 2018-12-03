@@ -18,7 +18,7 @@
  *
  * This domain is a collection of proxies that can be assigned as the value
  * to a vtkSMProxyProperty.
- * The Server Mananger configuration defines the proxy types that form this list,
+ * The Server Manager configuration defines the proxy types that form this list,
  * while the value of this domain is the list of instances of proxies.
  * Example usage :
  *

@@ -69,7 +69,7 @@ int vtkAppendRectilinearGrid::RequestUpdateExtent(vtkInformation* vtkNotUsed(req
         : outUpdateExt[2 * i + 1];
     }
 
-    // if min>max, the inpu is not needed at all.
+    // if min>max, the input is not needed at all.
     inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), inUpdateExt, 6);
   }
   return 1;

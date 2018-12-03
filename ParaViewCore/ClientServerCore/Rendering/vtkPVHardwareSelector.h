@@ -15,7 +15,7 @@
 /**
  * @class   vtkPVHardwareSelector
  * @brief   vtkHardwareSelector subclass with paraview
- * sepecific logic to avoid recapturing buffers unless needed.
+ * specific logic to avoid recapturing buffers unless needed.
  *
  * vtkHardwareSelector is subclass of vtkHardwareSelector that adds logic to
  * reuse the captured buffers as much as possible. Thus avoiding repeated

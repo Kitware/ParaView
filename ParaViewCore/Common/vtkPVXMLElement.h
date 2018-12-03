@@ -225,7 +225,7 @@ public:
 
   //@{
   /**
-   * Similar to DOM sepecific getElementsByTagName().
+   * Similar to DOM specific getElementsByTagName().
    * Returns a list of vtkPVXMLElements with the given name in the order
    * in which they will be encountered in a preorder traversal
    * of the sub-tree under this node. The elements are populated

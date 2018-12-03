@@ -114,7 +114,7 @@ protected:
     /** a function called to give an heuristic for the remaining distance */
     T_HeuristicToGoalCallbackFunction HeuristicToGoalCallbackFunction_;
 
-    /** just to controle interactive mode */
+    /** just to control interactive mode */
     GW_Bool bIsMarchingBegin_;
     GW_Bool bIsMarchingEnd_;
 

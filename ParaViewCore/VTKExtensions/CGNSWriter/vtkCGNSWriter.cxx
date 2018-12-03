@@ -644,7 +644,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteMultiPiece(
   vtkMultiPieceDataSet* vtkNotUsed(mp), const char* vtkNotUsed(file), string& error)
 {
   // todo: multi-piece writing to a single zone. Requires extensive rework, but may be done together
-  // with parallel writing implemenation?
+  // with parallel writing implementation?
   error = "Not implemented.";
   return false;
 }
