@@ -52,30 +52,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <clocale>
 #include <stdlib.h>
 
-namespace
-{
-// Return true when \a vname exists in the environment (empty or not).
-static bool checkenv(const char* vname)
-{
-#if !defined(_WIN32) || defined(__CYGWIN__)
-  return getenv(vname) ? true : false;
-#else
-  char* buf; //allocated or assigned by _dupenv_s
-  const bool valid = (_dupenv_s(&buf, NULL, vname) == 0) && (buf != NULL);
-  free(buf); //perfectly valid to free a NULL pointer
-  return valid;
-#endif
-}
-}
-
 int main(int argc, char* argv[])
 {
   // Here's the point to change default style, if you'd like e.g.
   // QApplication::setStyle(QStyleFactory::create("plastique"));
 
   // When playing tests, disable all effects.
-  if (checkenv("DART_TEST_FROM_DART") ||
-      checkenv("DASHBOARD_TEST_FROM_CTEST"))
+  if (vtksys::SystemTools::HasEnv("DART_TEST_FROM_DART") ||
+      vtksys::SystemTools::HasEnv("DASHBOARD_TEST_FROM_CTEST"))
   {
     QApplication::setDesktopSettingsAware(false);
     QApplication::setEffectEnabled(Qt::UI_AnimateMenu, false);
