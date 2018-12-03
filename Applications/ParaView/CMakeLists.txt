@@ -57,9 +57,9 @@ endif()
 set(SUPPORT_STATIC_PLUGINS TRUE)
 
 if (PARAVIEW_VERSION_NICKNAME)
-  set(title "ParaView ${PARAVIEW_VERSION_NICKNAME} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
+  set(title "ParaView ${PARAVIEW_VERSION_NICKNAME}")
 else()
-  set(title "ParaView ${PARAVIEW_VERSION_FULL} ${PARAVIEW_BUILD_ARCHITECTURE}-bit")
+  set(title "ParaView ${PARAVIEW_VERSION_FULL}")
 endif()
 
 #------------------------------------------------------------------------------

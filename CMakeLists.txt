@@ -335,13 +335,6 @@ if (UNIX)
   mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
 endif()
 
-# Is this a 32 bit or 64bit build. Display this in about dialog.
-if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
-  set(PARAVIEW_BUILD_ARCHITECTURE "64")
-else()
-  set(PARAVIEW_BUILD_ARCHITECTURE "32")
-endif()
-
 # setup external data. this will automatically download the test
 # data and baseline files to the build tree and set PARAVIEW_DATA_ROOT.
 include(ParaViewExternalData)
