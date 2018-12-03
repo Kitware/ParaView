@@ -111,9 +111,9 @@ int main(int argc, char* argv[])
   switch (status)
   {
     case pq@BPC_NAME@Initializer::ExitSuccess:
-      return 0;
+      return EXIT_SUCCESS;
     case pq@BPC_NAME@Initializer::ExitFailure:
-      return 1;
+      return EXIT_FAILURE;
     case pq@BPC_NAME@Initializer::RunApplication:
       return qtapp.exec();
   }
