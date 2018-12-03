@@ -50,6 +50,7 @@ paraview_test_load_data(""
   dualSphereAnimation4.pvd
   dualSphereAnimation.clone.pvd
   dualSphereAnimation.pvd
+  elements.vtu
   iron_protein.vtk
   linesPolydata.vtk
   LoadState.pvsm
@@ -388,6 +389,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Glyph3DCullingAndLOD.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Glyph3DRepresentation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GlyphUseCellCenters.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/GlyphWithEmptyCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HideAll.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/HorizontalColorLegendTitle.xml
