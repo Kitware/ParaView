@@ -261,7 +261,7 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
   endif()
 
   find_program(QT_XMLPATTERNS_EXECUTABLE
-    "${qt_xmlpatterns_name}" xmlpatterns
+    NAMES "${qt_xmlpatterns_name}" xmlpatterns
     HINTS "${qt_binary_dir_hints}"
     DOC "xmlpatterns used to generate html from Proxy documentation.")
   mark_as_advanced(QT_XMLPATTERNS_EXECUTABLE)
