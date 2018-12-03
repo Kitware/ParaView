@@ -113,13 +113,6 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
   }
 #endif
 
-  // Not sure why this is needed. Andy added this ages ago with comment saying
-  // needed for Mac apps. Need to check that it's indeed still required.
-  QDir dir(QApplication::applicationDirPath());
-  dir.cdUp();
-  dir.cd("Plugins");
-  QApplication::addLibraryPath(dir.absolutePath());
-
   // Create main window.
   this->MainWindow = new @BPC_PVMAIN_WINDOW@();
 
