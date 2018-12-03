@@ -76,14 +76,14 @@ int main(int argc, char* argv[])
   // When playing tests, disable all effects.
   if (checkenv("DART_TEST_FROM_DART") ||
       checkenv("DASHBOARD_TEST_FROM_CTEST"))
-    {
+  {
     QApplication::setDesktopSettingsAware(false);
     QApplication::setEffectEnabled(Qt::UI_AnimateMenu, false);
     QApplication::setEffectEnabled(Qt::UI_FadeMenu, false);
     QApplication::setEffectEnabled(Qt::UI_AnimateCombo, false);
     QApplication::setEffectEnabled(Qt::UI_AnimateTooltip, false);
     QApplication::setEffectEnabled(Qt::UI_FadeTooltip, false);
-    }
+  }
 
   QApplication::setApplicationName("@BPC_APPLICATION_NAME@");
   QApplication::setApplicationVersion("@BPC_VERSION_MAJOR@.@BPC_VERSION_MINOR@.@BPC_VERSION_PATCH@");
@@ -109,13 +109,12 @@ int main(int argc, char* argv[])
   pq@BPC_NAME@Initializer pvInitializer;
   pq@BPC_NAME@Initializer::Status status = pvInitializer.Initialize(argc, argv);
   switch (status)
-    {
+  {
     case pq@BPC_NAME@Initializer::ExitSuccess:
       return 0;
     case pq@BPC_NAME@Initializer::ExitFailure:
       return 1;
     case pq@BPC_NAME@Initializer::RunApplication:
       return qtapp.exec();
-    }
-
+  }
 }

@@ -44,11 +44,11 @@ class pq@BPC_NAME@Initializer
 {
 public:
   enum Status
-    {
+  {
     ExitSuccess,
     ExitFailure,
     RunApplication
-    };
+  };
 
   pq@BPC_NAME@Initializer();
   ~pq@BPC_NAME@Initializer();
