@@ -7354,6 +7354,16 @@ array.
           results.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetInvert"
+                         default_values="0"
+                         name="Invert"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Invert the threshold results. That is, cells that would have been in the
+          output with this option off are excluded, while cells that would have been excluded from
+          the output are included.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
       </Hints>
