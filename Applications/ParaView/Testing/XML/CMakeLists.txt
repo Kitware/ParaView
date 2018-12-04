@@ -54,6 +54,7 @@ paraview_test_load_data(""
   linesPolydata.vtk
   LoadState.pvsm
   LoadStateDialog.pvsm
+  manyTypes.vtu
   minimal.nii
   MultiBlockWithPieces_0_0.vtp
   MultiBlockWithPieces_1_0.vtp
@@ -405,6 +406,7 @@ list(APPEND TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateChooseFiles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateUseExisting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ManyTypesXMLWriterReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MoleculeBonds.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MoleculeToLines.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/MultiBlockAttributes1.xml
@@ -577,6 +579,9 @@ if (PARAVIEW_USE_MPI)
 
     # Test uses D3 which is available in MPI only builds.
     ${CMAKE_CURRENT_SOURCE_DIR}/ExportSelectionToCSV.xml
+  
+    # This test check spreadsheet values which include processID
+    ${CMAKE_CURRENT_SOURCE_DIR}/ManyTypesXMLWriterReaderMPI.xml
 
     # Test Use Data Partitions for volume rendering
     #${CMAKE_CURRENT_SOURCE_DIR}/UseDataPartitions.xml
@@ -1016,6 +1021,11 @@ IF (PARAVIEW_USE_MPI)
     set (TraceStatisticsFilter_DISABLE_CS TRUE)
     set (TraceStatisticsFilter_DISABLE_CRS TRUE)
   endif()
+
+  # Many types has a MPI version and Sequential version
+  set(ManyTypesXMLWriterReader_DISABLE_CS TRUE)
+  set(ManyTypesXMLWriterReader_DISABLE_CRS TRUE)
+  set(ManyTypesXMLWriterReaderMPI_DISABLE_C TRUE)
 ENDIF ()
 
 # Composite Surface Selection is currently broken in everything but builtin
