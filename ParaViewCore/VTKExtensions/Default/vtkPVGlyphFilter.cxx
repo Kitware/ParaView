@@ -250,6 +250,21 @@ public:
           return dataSetToReturn;
         }
 
+        if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE)
+        {
+          vtkPolyData* pd = vtkPolyData::SafeDownCast(ds);
+          if (!pd)
+          {
+            // If dataset is not a PolyData, just extracts its surface so it will be used to sample
+            // glyphs instead
+            vtkNew<vtkDataSetSurfaceFilter> surface;
+            surface->SetInputData(ds);
+            surface->Update();
+            dataSetToReturn = surface->GetOutput();
+            ds = dataSetToReturn.Get();
+          }
+        }
+
         // Get a sampling vector from the map
         auto empRet = this->UniformSamplingVectorMap.emplace(std::piecewise_construct,
           std::make_tuple(index), std::make_tuple(ds->GetNumberOfCells(), 0.0));
@@ -266,17 +281,6 @@ public:
 
         if (glyphMode == vtkPVGlyphFilter::SPATIALLY_UNIFORM_INVERSE_TRANSFORM_SAMPLING_SURFACE)
         {
-          vtkPolyData* pd = vtkPolyData::SafeDownCast(ds);
-          if (!pd)
-          {
-            // If dataset is not a PolyData, just extracts its surface so it will be used to sample
-            // glyphs instead
-            vtkNew<vtkDataSetSurfaceFilter> surface;
-            surface->SetInputData(ds);
-            surface->Update();
-            dataSetToReturn = ds = surface->GetOutput();
-          }
-
           vtkNew<vtkTriangleFilter> triangleFilter;
           triangleFilter->SetInputData(ds);
           triangleFilter->PassLinesOff();
@@ -344,7 +348,7 @@ public:
             tetraUG->GetPoint(pts[2], p3);
             tetraUG->GetPoint(pts[3], p4);
             uniformSamplingVector[cellIdArray->GetValue(tetraId)] +=
-              vtkTetra::ComputeVolume(p1, p2, p3, p4);
+              std::abs(vtkTetra::ComputeVolume(p1, p2, p3, p4));
           }
         }
         // Compute a partial sum on the sampling vector in order to perform sampling later
@@ -1114,6 +1118,9 @@ bool vtkPVGlyphFilter::Execute(unsigned int index, vtkDataSet* input,
   {
     outputPD->SetNormals(newNormals);
   }
+
+  // In certain cases, we can have a left over processing array, remove it.
+  outputPD->RemoveArray(IDS_ARRAY_NAME.c_str());
 
   // Update ourselves and release memory
   //
