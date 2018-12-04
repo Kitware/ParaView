@@ -1800,7 +1800,26 @@ found and the point will be rejected.</Documentation>
         <Documentation>Controls the coloring of the connected
         regions.</Documentation>
       </IntVectorProperty>
-
+      <IntVectorProperty command="SetRegionIdAssignmentMode"
+                         default_values="0"
+                         name="RegionIdAssignmentMode"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>
+          Specifies how regions IDs are assigned to the connected components. **Unspecified** means
+          regions will have no particular order, **Cell Count Descending** assigns increasing region
+          IDs to connected components with progressively smaller cell counts, and **Cell Count Ascending**
+          assigns increasing region IDs to connected components with progressively larger cell counts.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Unspecified"
+                 value="0" />
+          <Entry text="Cell Count Descending"
+                 value="1" />
+          <Entry text="Cell Count Ascending"
+                 value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
       <DoubleVectorProperty
         name="ClosestPoint"
         command="SetClosestPoint"

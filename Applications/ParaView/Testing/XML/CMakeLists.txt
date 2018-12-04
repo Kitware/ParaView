@@ -129,6 +129,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ChartLoadNoVariables.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ClampAndUpdateColorMap.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Connectivity.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Ensemble.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FastUniformGridSource.xml
