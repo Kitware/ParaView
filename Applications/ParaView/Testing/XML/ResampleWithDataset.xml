@@ -29,7 +29,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ResampleWithDataset" />
   <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mousePress" arguments="1,1,0,86,13,/0:0/1:0" />
   <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,86,13,/0:0/1:0" />
-  <pqevent object="pqClientMainWindow/SelectInputDialog/buttonFrame/Source" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/buttonFrame/DestinationMesh" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mousePress" arguments="1,1,0,54,11,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/SelectInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,54,11,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/SelectInputDialog/buttonBox/1QPushButton0" command="activate" arguments="" />

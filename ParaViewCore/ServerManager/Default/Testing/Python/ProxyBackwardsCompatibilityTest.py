@@ -5,7 +5,7 @@ sourceDs = Wavelet()
 inputDs = Sphere()
 
 # Test 'Resample With Dataset` proxies
-p1 = ResampleWithDataset(Input=inputDs, Source=sourceDs)
+p1 = ResampleWithDataset(SourceDataArrays=inputDs, DestinationMesh=sourceDs)
 print("Proxy Name before: %s" % p1.GetXMLName())
 assert p1.GetXMLName() == "ResampleWithDataset", "The default proxy name must be ResampleWithDataset"
 

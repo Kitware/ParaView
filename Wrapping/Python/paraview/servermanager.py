@@ -2990,7 +2990,7 @@ def demo3():
         # with a line
         line = sources.LineSource(Resolution=60)
     else:
-        probe = filters.ResampleWithDataset(Input=source)
+        probe = filters.ResampleWithDataset(SourceDataArrays=source)
         # with a line
         line = sources.Line(Resolution=60)
     # that spans the dataset
