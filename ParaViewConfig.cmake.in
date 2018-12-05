@@ -18,6 +18,14 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
+# Update CMAKE_PREFIX_PATH locally when PARAVIEW_NONRELOCATABLE_INSTALL=ON
+#------------------------------------------------------------------------------
+
+set(PARAVIEW_PREFIX_PATH "@paraview_prefix_path@")
+set(CMAKE_PREFIX_PATH_save "${CMAKE_PREFIX_PATH}")
+list(APPEND CMAKE_PREFIX_PATH "${PARAVIEW_PREFIX_PATH}")
+
+#------------------------------------------------------------------------------
 # Version information for ParaView
 SET(PARAVIEW_VERSION_MAJOR "@PARAVIEW_VERSION_MAJOR@")
 SET(PARAVIEW_VERSION_MINOR "@PARAVIEW_VERSION_MINOR@")
@@ -122,3 +130,10 @@ endif()
 
 # cleanup
 unset(__pv_install_tree)
+
+#------------------------------------------------------------------------------
+# restore CMAKE_PREFIX_PATH
+#------------------------------------------------------------------------------
+
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH_save}")
+unset(CMAKE_PREFIX_PATH_save)
