@@ -256,6 +256,25 @@ def setattr(proxy, pname, value):
             raise NotSupportedException(
                   "'%s' is obsolete on SpreadSheetRepresentation as of ParaView 5.6 and has been migrated to the view." % pname)
 
+    # In 5.7, we changed to the names of the input proxies in ResampleWithDataset to clarify what
+    # each source does.
+    if pname == "Input" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
+        if paraview.compatibility.GetVersion() < 5.7:
+            proxy.GetProperty("SourceDataArrays").SetData(value)
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                'The ResampleWithDataset.Input property has been changed in ParaView 5.7. '\
+                'Please set the SourceDataArrays property instead.')
+
+    if pname == "Source" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
+        if paraview.compatibility.GetVersion() < 5.7:
+            proxy.GetProperty("DestinationMesh").SetData(value)
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                'The ResampleWithDataset.Source property has been changed in ParaView 5.7. '\
+                'Please set the DestinationMesh property instead.')
 
     if not hasattr(proxy, pname):
         raise AttributeError()
@@ -460,7 +479,7 @@ def getattr(proxy, pname):
 
     # In 5.5, we changed the Clip to be inverted from what it was before and changed the InsideOut
     # property to be called Invert to be clearer.
-    if pname == "InsideOut" and proxy.SMProxy.GetName() == "Clip":
+    if pname == "InsideOut" and proxy.SMProxy.GetXMLName() == "Clip":
         if paraview.compatibility.GetVersion() <= 5.4:
             return proxy.GetProperty("Invert").GetData()
         else:
@@ -477,6 +496,25 @@ def getattr(proxy, pname):
         else:
             raise NotSupportedException(
                   "'%s' is obsolete on SpreadSheetRepresentation as of ParaView 5.6 and has been migrated to the view." % pname)
+
+    # In 5.7, we changed to the names of the input proxies in ResampleWithDataset to clarify what
+    # each source does.
+    if pname == "Input" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
+        if paraview.compatibility.GetVersion() < 5.7:
+            return proxy.GetProperty("SourceDataArrays")
+        else:
+            raise NotSupportedException(
+                'The ResampleWithDataset.Input property has been changed in ParaView 5.7. '\
+                'Please access the SourceDataArrays property instead.')
+
+    if pname == "Source" and proxy.SMProxy.GetXMLName() == "ResampleWithDataset":
+        if paraview.compatibility.GetVersion() < 5.7:
+            return proxy.GetProperty("DestinationMesh")
+        else:
+            raise NotSupportedException(
+                'The ResampleWithDataset.Source property has been changed in ParaView 5.7. '\
+                'Please access the DestinationMesh property instead.')
+
     raise Continue()
 
 def GetProxy(module, key):
