@@ -16074,12 +16074,13 @@ Every Nth Point.
                  label="Resample With Dataset"
                  name="ResampleWithDataset">
       <Documentation short_help="Sample data attributes at the points of a dataset.">
-          This filter takes two inputs - Input and Source, and samples the
-          point and cell values of Input on to the point locations of Source.
-          The output has the same structure as Source but its point data
-          have the resampled values from Input."
+          This filter takes two inputs - **Source Data Arrays**, and samples the
+          point and cell values of this input onto the point locations of the
+          **Destination Geometry** input. The output has the same structure as the
+          **Destination Geometry** input, but its point data has the resampled values from
+          the **Source Data Arrays**."
       </Documentation>
-      <InputProperty command="SetSourceConnection" name="Input">
+      <InputProperty command="SetSourceConnection" name="SourceDataArrays">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -16091,7 +16092,7 @@ Every Nth Point.
         <Documentation>This property specifies the dataset from which to obtain
         probe values. The data attributes come from this dataset.</Documentation>
       </InputProperty>
-      <InputProperty command="SetInputConnection" name="Source">
+      <InputProperty command="SetInputConnection" name="DestinationMesh">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
