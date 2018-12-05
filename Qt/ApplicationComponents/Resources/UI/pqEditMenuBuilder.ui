@@ -209,9 +209,6 @@
    <property name="toolTip">
     <string>Change the main window title</string>
    </property>
-   <property name="shortcut">
-    <string>F2</string>
-   </property>
   </action>
   <addaction name="actionEditUndo"/>
   <addaction name="actionEditRedo"/>
