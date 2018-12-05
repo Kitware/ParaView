@@ -124,7 +124,7 @@ if (CMAKE_CROSSCOMPILING
     AND NOT PARAVIEW_COMPILE_TOOLS_IMPORTED
     AND NOT DEFINED CMAKE_CROSSCOMPILING_EMULATOR
     AND CMAKE_VERSION VERSION_LESS 3.8)
-  # if CMAKE_CROSSCOMPILING is true and full crosscompiling support is not available 
+  # if CMAKE_CROSSCOMPILING is true and full crosscompiling support is not available
   # we need to import build-tools targets.
   find_package (ParaViewCompileTools REQUIRED)
   # this keeps VTK sub-dir from trying to import VTKCompileTools.
@@ -829,10 +829,24 @@ endforeach()
 # We create two versions of ParaViewConfig.cmake for the build tree and the
 # install tree.
 
+# When PARAVIEW_NONRELOCATABLE_INSTALL=ON we add to ParaViewConfig.cmake
+# set(PARAVIEW_PREFIX_PATH "${CMAKE_PREFIX_PATH}")
+option(
+  PARAVIEW_NONRELOCATABLE_INSTALL
+  "Capture CMAKE_PREFIX_PATH in Config.cmake file for external project"
+  OFF
+)
+mark_as_advanced(PARAVIEW_NONRELOCATABLE_INSTALL)
+set (paraview_prefix_path "${CMAKE_PREFIX_PATH}")
+
 # For build tree.
 set (PARAVIEW_CONFIG_INSTALLED FALSE)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfig.cmake @ONLY)
+
+if (NOT PARAVIEW_NONRELOCATABLE_INSTALL)
+  set(paraview_prefix_path)
+endif()
 
 set (PARAVIEW_CONFIG_INSTALLED TRUE)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
