@@ -19,7 +19,6 @@ include_directories(
 # Please leave these definitions in here and do not change them.
 # We use the cdi library to read both, netCDF2 and netCDF4 data.
 add_definitions(-DHAVE_LIBNETCDF -DHAVE_NETCDF2 -DHAVE_NETCDF4)
-set_source_files_properties(cdilib.c PROPERTIES C_STANDARD 99)
 
 vtk_module_warnings_disable(C)
 vtk_module_load(vtknetcdf)
@@ -34,4 +33,5 @@ add_paraview_plugin(CDIReader "1.3"
   REQUIRED_ON_SERVER
 )
 
+set_property(TARGET CDIReader PROPERTY C_STANDARD 99)
 target_link_libraries(CDIReader LINK_PRIVATE ${vtknetcdf_LIBRARIES})
