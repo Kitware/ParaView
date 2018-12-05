@@ -162,7 +162,8 @@ void pqCatalystExportInspector::Update()
       filterChoice->setCurrentText(current);
     }
     // reflect name changes, as happens when we open a Catalyst produced dataset with channel info
-    QObject::connect(i, SIGNAL(nameChanged(pqServerManagerModelItem*)), this, SLOT(Update()));
+    QObject::connect(i, SIGNAL(nameChanged(pqServerManagerModelItem*)), this, SLOT(Update()),
+      Qt::UniqueConnection);
   }
   // turn handling back on
   QObject::connect(
@@ -186,7 +187,8 @@ void pqCatalystExportInspector::Update()
       viewChoice->setCurrentText(current);
     }
     // reflect name changes
-    QObject::connect(i, SIGNAL(nameChanged(pqServerManagerModelItem*)), this, SLOT(Update()));
+    QObject::connect(i, SIGNAL(nameChanged(pqServerManagerModelItem*)), this, SLOT(Update()),
+      Qt::UniqueConnection);
   }
   // turn handling back on
   QObject::connect(
