@@ -604,9 +604,8 @@ def SetProperties(proxy=None, **params):
         proxy = active_objects.source
     properties = proxy.ListProperties()
     for param in params.keys():
-        if param not in properties:
-            raise AttributeError("object has no property %s" % param)
-        proxy.SetPropertyWithName(param, params[param])
+        pyproxy = servermanager._getPyProxy(proxy)
+        pyproxy.__setattr__(param, params[param])
 
 # -----------------------------------------------------------------------------
 
