@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIntMaskPropertyWidget.h"
 #include "pqLinePropertyWidget.h"
 #include "pqListPropertyWidget.h"
+#include "pqMoleculePropertyWidget.h"
 #include "pqMultiComponentsDecorator.h"
 #include "pqOSPRayHidingDecorator.h"
 #include "pqPauseLiveSourcePropertyWidget.h"
@@ -247,6 +248,10 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   else if (panelWidget == "SeriesEditor")
   {
     return new pqSeriesEditorPropertyWidget(proxy, group, parentWidget);
+  }
+  else if (panelWidget == "MoleculeParameters")
+  {
+    return new pqMoleculePropertyWidget(proxy, group, parentWidget);
   }
   else if (panelWidget == "TextLocationEditor")
   {

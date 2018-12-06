@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqColorChooserButtonWithPalettes.h"
 #include "pqComboBoxDomain.h"
+#include "pqDoubleSliderWidget.h"
 #include "pqSignalAdaptors.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
@@ -131,6 +132,13 @@ void pqPropertyGroupWidget::addPropertyLink(
   QSpinBox* spinBox, const char* propertyName, int smindex)
 {
   addIntValuePropertyLink(spinBox, propertyName, smindex);
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyGroupWidget::addPropertyLink(
+  pqDoubleSliderWidget* slider, const char* propertyName, int smindex)
+{
+  addDoubleValuePropertyLink(slider, propertyName, smindex);
 }
 
 //-----------------------------------------------------------------------------

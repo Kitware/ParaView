@@ -224,6 +224,8 @@ set (Module_SRCS
   pqMasterOnlyReaction.h
   pqModelTransformSupportBehavior.cxx
   pqModelTransformSupportBehavior.h
+  pqMoleculePropertyWidget.cxx
+  pqMoleculePropertyWidget.h
   pqMultiComponentsDecorator.cxx
   pqMultiComponentsDecorator.h
   pqObjectPickingBehavior.cxx
@@ -459,6 +461,7 @@ set (Module_MOC_HDRS
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
   pqModelTransformSupportBehavior.h
+  pqMoleculePropertyWidget.h
   pqMultiComponentsDecorator.h
   pqObjectPickingBehavior.h
   pqOpacityTableModel.h
@@ -573,6 +576,7 @@ set (Module_UI_FILES
   Resources/UI/pqImplicitPlanePropertyWidget.ui
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
+  Resources/UI/pqMoleculePropertyWidget.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui
