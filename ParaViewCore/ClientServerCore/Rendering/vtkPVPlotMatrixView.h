@@ -46,9 +46,9 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVPlotMatrixView : public vtkPVCo
 public:
   static vtkPVPlotMatrixView* New();
   vtkTypeMacro(vtkPVPlotMatrixView, vtkPVContextView);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  vtkAbstractContextItem* GetContextItem() VTK_OVERRIDE;
+  vtkAbstractContextItem* GetContextItem() override;
 
   // Description:
   // Representations can use this method to set the selection for a particular
@@ -56,7 +56,7 @@ public:
   // the chart using annotation link. Note this is meant to pass selection for
   // the local process alone. The view does not manage data movement for the
   // selection.
-  void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection) VTK_OVERRIDE;
+  void SetSelection(vtkChartRepresentation* repr, vtkSelection* selection) override;
 
   // Description:
   // Get/set the active plot in the scatter plot matrix.

@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCameraManipulatorGUIHelper : public 
 {
 public:
   vtkTypeMacro(vtkCameraManipulatorGUIHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Called by the manipulator to update the GUI.

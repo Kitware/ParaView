@@ -36,7 +36,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTesting : public vtkSMObject
 public:
   static vtkSMTesting* New();
   vtkTypeMacro(vtkSMTesting, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set/get the render module proxy.

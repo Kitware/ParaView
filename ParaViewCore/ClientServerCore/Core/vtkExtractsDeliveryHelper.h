@@ -39,7 +39,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkExtractsDeliveryHelper : public vtkObj
 public:
   static vtkExtractsDeliveryHelper* New();
   vtkTypeMacro(vtkExtractsDeliveryHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(ProcessIsProducer, bool);
   vtkGetMacro(ProcessIsProducer, bool);

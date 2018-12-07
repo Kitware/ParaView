@@ -33,7 +33,7 @@ class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIImageTextureProxy : public 
 public:
   static vtkSIImageTextureProxy* New();
   vtkTypeMacro(vtkSIImageTextureProxy, vtkSISourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSIImageTextureProxy();

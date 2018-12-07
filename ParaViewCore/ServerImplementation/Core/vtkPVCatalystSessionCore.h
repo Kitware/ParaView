@@ -36,14 +36,14 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVCatalystSessionCore : public vtk
 public:
   static vtkPVCatalystSessionCore* New();
   vtkTypeMacro(vtkPVCatalystSessionCore, vtkPVSessionCore);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Gather information about an object referred by the \c globalid.
    * \c location identifies the processes to gather the information from.
    */
   bool GatherInformation(
-    vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid) VTK_OVERRIDE;
+    vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid) override;
 
   /**
    * Update the data information for a given proxy with the given globalid.

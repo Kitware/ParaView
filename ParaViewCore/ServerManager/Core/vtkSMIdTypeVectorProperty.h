@@ -35,18 +35,18 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIdTypeVectorProperty : public vtkSMVect
 public:
   static vtkSMIdTypeVectorProperty* New();
   vtkTypeMacro(vtkSMIdTypeVectorProperty, vtkSMVectorProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the size of the vector.
    */
-  unsigned int GetNumberOfElements() VTK_OVERRIDE;
+  unsigned int GetNumberOfElements() override;
 
   /**
    * Sets the size of the vector. If num is larger than the current
    * number of elements, this may cause reallocation and copying.
    */
-  void SetNumberOfElements(unsigned int num) VTK_OVERRIDE;
+  void SetNumberOfElements(unsigned int num) override;
 
   /**
    * Set the value of 1 element. The vector is resized as necessary.
@@ -124,7 +124,7 @@ public:
    * the same as the number of elements but can be different
    * before a domain check is performed.
    */
-  unsigned int GetNumberOfUncheckedElements() VTK_OVERRIDE;
+  unsigned int GetNumberOfUncheckedElements() override;
 
   //@{
   /**
@@ -147,16 +147,16 @@ public:
   /**
    * Copy all property values.
    */
-  void Copy(vtkSMProperty* src) VTK_OVERRIDE;
+  void Copy(vtkSMProperty* src) override;
 
-  void ClearUncheckedElements() VTK_OVERRIDE;
+  void ClearUncheckedElements() override;
 
   /**
    * For properties that support specifying defaults in XML configuration, this
    * method will reset the property value to the default values specified in the
    * XML.
    */
-  void ResetToXMLDefaults() VTK_OVERRIDE;
+  void ResetToXMLDefaults() override;
 
 protected:
   vtkSMIdTypeVectorProperty();
@@ -165,14 +165,14 @@ protected:
   /**
    * Let the property write its content into the stream
    */
-  void WriteTo(vtkSMMessage*) VTK_OVERRIDE;
+  void WriteTo(vtkSMMessage*) override;
 
   /**
    * Let the property read and set its content from the stream
    */
-  void ReadFrom(const vtkSMMessage*, int msg_offset, vtkSMProxyLocator*) VTK_OVERRIDE;
+  void ReadFrom(const vtkSMMessage*, int msg_offset, vtkSMProxyLocator*) override;
 
-  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) override;
 
   int ArgumentIsArray;
 
@@ -181,15 +181,15 @@ protected:
    * the same as the number of elements but can be different
    * before a domain check is performed.
    */
-  void SetNumberOfUncheckedElements(unsigned int num) VTK_OVERRIDE;
+  void SetNumberOfUncheckedElements(unsigned int num) override;
 
   /**
    * Load the XML state.
    */
-  int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
+  int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) override;
 
   // Save concrete property values into the XML state property declaration
-  void SaveStateValues(vtkPVXMLElement* propElement) VTK_OVERRIDE;
+  void SaveStateValues(vtkPVXMLElement* propElement) override;
 
 private:
   vtkSMIdTypeVectorProperty(const vtkSMIdTypeVectorProperty&) = delete;

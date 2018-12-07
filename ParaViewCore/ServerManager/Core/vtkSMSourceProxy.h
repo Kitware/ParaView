@@ -51,12 +51,12 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSourceProxy : public vtkSMProxy
 public:
   static vtkSMSourceProxy* New();
   vtkTypeMacro(vtkSMSourceProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Calls UpdateInformation() on all sources.
    */
-  void UpdatePipelineInformation() VTK_OVERRIDE;
+  void UpdatePipelineInformation() override;
 
   /**
    * Calls Update() on all sources. It also creates output ports if
@@ -210,7 +210,7 @@ public:
   /**
    * Overridden to reserve additional IDs for use by "ExtractSelection" proxies.
    */
-  vtkTypeUInt32 GetGlobalID() VTK_OVERRIDE;
+  vtkTypeUInt32 GetGlobalID() override;
 
   enum ProcessSupportType
   {
@@ -222,7 +222,7 @@ public:
   /**
    * Marks the selection proxies dirty as well as chain to superclass.
    */
-  void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
+  void MarkDirty(vtkSMProxy* modifiedProxy) override;
 
 protected:
   vtkSMSourceProxy();
@@ -245,7 +245,7 @@ protected:
    * Call superclass' and then assigns a new executive
    * (vtkCompositeDataPipeline)
    */
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
   char* ExecutiveName;
   vtkSetStringMacro(ExecutiveName);
@@ -253,7 +253,7 @@ protected:
   /**
    * Read attributes from an XML element.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
   /**
    * Internal method which creates the output port proxies using the proxy specified.
@@ -276,7 +276,7 @@ protected:
   /**
    * Overwritten from superclass to invoke
    */
-  void PostUpdateData() VTK_OVERRIDE;
+  void PostUpdateData() override;
 
   // flag used to avoid creation of extract selection proxies for this source
   // proxy.

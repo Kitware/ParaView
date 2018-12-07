@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODActor : public vtkActor
 {
 public:
   vtkTypeMacro(vtkPVLODActor, vtkActor);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVLODActor* New();
 
@@ -46,20 +46,20 @@ public:
    * This causes the actor to be rendered. It, in turn, will render the actor's
    * property and then mapper.
    */
-  void Render(vtkRenderer*, vtkMapper*) VTK_OVERRIDE;
+  void Render(vtkRenderer*, vtkMapper*) override;
 
   /**
    * This method is used internally by the rendering process.
    * We override the superclass method to properly set the estimated render time.
    */
-  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport* viewport) override;
 
   /**
    * Release any graphics resources that are being consumed by this actor.
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) override;
 
   //@{
   /**
@@ -73,22 +73,22 @@ public:
    * This is a bit of a hack.  This returns the last mapper used to render.
    * It does this so that compositing can decide if anything was actually renderered.
    */
-  vtkMapper* GetMapper() VTK_OVERRIDE { return this->SelectMapper(); }
+  vtkMapper* GetMapper() override { return this->SelectMapper(); }
 
   /**
    * When this objects gets modified, this method also modifies the object.
    */
-  void Modified() VTK_OVERRIDE;
+  void Modified() override;
 
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
    */
-  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) override;
 
   /**
    * Get the bounds of the current mapper.
    */
-  double* GetBounds() VTK_OVERRIDE;
+  double* GetBounds() override;
 
   /**
    * When set, LODMapper, if present it used, otherwise the regular mapper is

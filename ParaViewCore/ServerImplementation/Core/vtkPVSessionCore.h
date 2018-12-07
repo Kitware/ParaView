@@ -44,7 +44,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionCore : public vtkObject
 public:
   static vtkPVSessionCore* New();
   vtkTypeMacro(vtkPVSessionCore, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

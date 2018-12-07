@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIsoVolume : public vtkDataObjectAlgori
 public:
   static vtkIsoVolume* New();
   vtkTypeMacro(vtkIsoVolume, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Criterion is cells whose scalars are between lower and upper thresholds
@@ -58,15 +58,14 @@ protected:
   ~vtkIsoVolume() override;
 
   // Usual data generation methods.
-  int RequestData(
-    vtkInformation* request, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation* request, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * This filter produces a vtkMultiBlockDataSet when the input is a
    * vtkCompositeDataSet otherwise, it produces a vtkUnstructuredGrid.
    */
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   vtkDataObject* Clip(
     vtkDataObject* input, double value, const char* array_name, int fieldAssociation, bool invert);

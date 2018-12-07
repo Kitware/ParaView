@@ -31,7 +31,7 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVSingleOutputExtractSelection
 public:
   static vtkPVSingleOutputExtractSelection* New();
   vtkTypeMacro(vtkPVSingleOutputExtractSelection, vtkPVExtractSelection);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVSingleOutputExtractSelection();

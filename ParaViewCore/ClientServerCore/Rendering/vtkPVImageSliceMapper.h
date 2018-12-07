@@ -46,14 +46,14 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImageSliceMapper : public vtkMa
 public:
   static vtkPVImageSliceMapper* New();
   vtkTypeMacro(vtkPVImageSliceMapper, vtkMapper);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * This calls RenderPiece (in a for loop is streaming is necessary).
    */
-  void Render(vtkRenderer* ren, vtkActor* act) VTK_OVERRIDE;
+  void Render(vtkRenderer* ren, vtkActor* act) override;
 
-  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) override;
 
   //@{
   /**
@@ -105,13 +105,13 @@ public:
   /**
    * Update that sets the update piece first.
    */
-  void Update(int port) VTK_OVERRIDE;
-  void Update() VTK_OVERRIDE { this->Superclass::Update(); }
-  int Update(int port, vtkInformationVector* requests) VTK_OVERRIDE
+  void Update(int port) override;
+  void Update() override { this->Superclass::Update(); }
+  int Update(int port, vtkInformationVector* requests) override
   {
     return this->Superclass::Update(port, requests);
   }
-  int Update(vtkInformation* requests) VTK_OVERRIDE { return this->Superclass::Update(requests); }
+  int Update(vtkInformation* requests) override { return this->Superclass::Update(requests); }
 
   //@{
   /**
@@ -138,8 +138,8 @@ public:
    * Return bounding box (array of six doubles) of data expressed as
    * (xmin,xmax, ymin,ymax, zmin,zmax).
    */
-  double* GetBounds() VTK_OVERRIDE;
-  void GetBounds(double bounds[6]) VTK_OVERRIDE { this->Superclass::GetBounds(bounds); };
+  double* GetBounds() override;
+  void GetBounds(double bounds[6]) override { this->Superclass::GetBounds(bounds); };
   //@}
 
   /**
@@ -152,7 +152,7 @@ protected:
   ~vtkPVImageSliceMapper() override;
 
   // Tell the executive that we accept vtkImageData.
-  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) override;
 
   /**
    * Perform the actual rendering.

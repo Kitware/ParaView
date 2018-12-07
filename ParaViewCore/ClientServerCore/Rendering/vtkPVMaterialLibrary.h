@@ -32,7 +32,7 @@ public:
   static vtkPVMaterialLibrary* New();
   vtkTypeMacro(vtkPVMaterialLibrary, vtkObject);
 
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   /**
    * Unlike vtkOSPRayMaterial::ReadFile, this searches in a number of
    * relative and environmental paths specified by the SearchPaths

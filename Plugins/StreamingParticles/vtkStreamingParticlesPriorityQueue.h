@@ -42,7 +42,7 @@ class vtkStreamingParticlesPriorityQueue : public vtkObject
 public:
   static vtkStreamingParticlesPriorityQueue* New();
   vtkTypeMacro(vtkStreamingParticlesPriorityQueue, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // If the controller is specified, the queue can be used in parallel. So long

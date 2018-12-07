@@ -29,7 +29,7 @@ class VTKPVANIMATION_EXPORT vtkSequenceAnimationPlayer : public vtkAnimationPlay
 public:
   static vtkSequenceAnimationPlayer* New();
   vtkTypeMacro(vtkSequenceAnimationPlayer, vtkAnimationPlayer);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetClampMacro(NumberOfFrames, int, 2, VTK_INT_MAX);
   vtkGetMacro(NumberOfFrames, int);
@@ -38,16 +38,16 @@ protected:
   vtkSequenceAnimationPlayer();
   ~vtkSequenceAnimationPlayer() override;
 
-  void StartLoop(double, double, double*) VTK_OVERRIDE;
-  void EndLoop() VTK_OVERRIDE{};
+  void StartLoop(double, double, double*) override;
+  void EndLoop() override{};
 
   /**
    * Return the next time given the current time.
    */
-  double GetNextTime(double currentime) VTK_OVERRIDE;
+  double GetNextTime(double currentime) override;
 
-  double GoToNext(double start, double end, double currenttime) VTK_OVERRIDE;
-  double GoToPrevious(double start, double end, double currenttime) VTK_OVERRIDE;
+  double GoToNext(double start, double end, double currenttime) override;
+  double GoToPrevious(double start, double end, double currenttime) override;
 
   int NumberOfFrames;
   int MaxFrameWindow;

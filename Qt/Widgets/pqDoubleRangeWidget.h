@@ -84,8 +84,8 @@ public slots:
   void setResolution(int);
 
 protected:
-  int valueToSliderPos(double val) VTK_OVERRIDE;
-  double sliderPosToValue(int pos) VTK_OVERRIDE;
+  int valueToSliderPos(double val) override;
+  double sliderPosToValue(int pos) override;
 
 private slots:
   void updateValidator();

@@ -33,7 +33,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMVectorProperty : public vtkSMProperty
 {
 public:
   vtkTypeMacro(vtkSMVectorProperty, vtkSMProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the size of the vector.
@@ -51,7 +51,7 @@ public:
    */
   virtual unsigned int GetNumberOfUncheckedElements() = 0;
   virtual void SetNumberOfUncheckedElements(unsigned int num) = 0;
-  void ClearUncheckedElements() VTK_OVERRIDE = 0;
+  void ClearUncheckedElements() override = 0;
   //@}
 
   //@{
@@ -120,7 +120,7 @@ public:
   /**
    * Copy all property values.
    */
-  void Copy(vtkSMProperty* src) VTK_OVERRIDE;
+  void Copy(vtkSMProperty* src) override;
 
   //@{
   /**
@@ -141,7 +141,7 @@ public:
    * a last resort, we check if the property has a non-empty \c information_property.
    * If so, we copy its values to this property as the default.
    */
-  bool ResetToDomainDefaults(bool use_unchecked_values = false) VTK_OVERRIDE;
+  bool ResetToDomainDefaults(bool use_unchecked_values = false) override;
 
 protected:
   vtkSMVectorProperty();
@@ -158,7 +158,7 @@ protected:
   /**
    * Set the appropriate ivars from the xml element.
    */
-  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) override;
 
 private:
   vtkSMVectorProperty(const vtkSMVectorProperty&) = delete;

@@ -31,7 +31,7 @@ class VTKPVANIMATION_EXPORT vtkSMAnimationSceneProxy : public vtkSMProxy
 public:
   static vtkSMAnimationSceneProxy* New();
   vtkTypeMacro(vtkSMAnimationSceneProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -68,14 +68,14 @@ protected:
    * Overridden to prune start/end time properties if not applicable to the
    * state being loaded.
    */
-  int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) override;
 
   /**
    * Given a class name (by setting VTKClassName) and server ids (by
    * setting ServerIDs), this methods instantiates the objects on the
    * server(s)
    */
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&) = delete;

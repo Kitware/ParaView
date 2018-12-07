@@ -97,7 +97,7 @@ public:
 
   // Description:
   // Overridden to include ArrowSourceObject's MTime.
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkArrowGlyphFilter();
@@ -109,10 +109,9 @@ protected:
     GlyphNPointsScatter = 738234
   };
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestUpdateExtent(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int, vtkInformation*) override;
 
   vtkIdType GatherTotalNumberOfPoints(vtkIdType localNumPts);
   int MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts, vtkDataSet* input,

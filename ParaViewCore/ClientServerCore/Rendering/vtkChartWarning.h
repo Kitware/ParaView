@@ -35,17 +35,17 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartWarning : public vtkBlockIte
 public:
   static vtkChartWarning* New();
   vtkTypeMacro(vtkChartWarning, vtkBlockItem);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Paint event for the item.
    */
-  bool Paint(vtkContext2D* painter) VTK_OVERRIDE;
+  bool Paint(vtkContext2D* painter) override;
 
   /**
    * Returns true if the supplied x, y coordinate is inside the item.
    */
-  bool Hit(const vtkContextMouseEvent& mouse) VTK_OVERRIDE;
+  bool Hit(const vtkContextMouseEvent& mouse) override;
 
   vtkSetMacro(TextPad, double);
   vtkGetMacro(TextPad, double);

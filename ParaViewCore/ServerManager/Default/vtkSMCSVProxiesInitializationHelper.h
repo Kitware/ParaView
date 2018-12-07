@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCSVProxiesInitializationHelper
 public:
   static vtkSMCSVProxiesInitializationHelper* New();
   vtkTypeMacro(vtkSMCSVProxiesInitializationHelper, vtkSMProxyInitializationHelper);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) override;
 

@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkSelectionSerializer : public vtkObject
 public:
   static vtkSelectionSerializer* New();
   vtkTypeMacro(vtkSelectionSerializer, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

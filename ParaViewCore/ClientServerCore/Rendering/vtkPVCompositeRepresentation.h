@@ -42,7 +42,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeRepresentation
 public:
   static vtkPVCompositeRepresentation* New();
   vtkTypeMacro(vtkPVCompositeRepresentation, vtkCompositeRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * These must only be set during initialization before adding the
@@ -60,13 +60,13 @@ public:
   /**
    * Propagate the modification to all internal representations.
    */
-  void MarkModified() VTK_OVERRIDE;
+  void MarkModified() override;
 
   /**
    * Set visibility of the representation.
    * Overridden to update the cube-axes and selection visibilities.
    */
-  void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) override;
 
   /**
    * Set the selection visibility.
@@ -82,15 +82,15 @@ public:
   /**
    * Passed on to internal representations as well.
    */
-  void SetUpdateTime(double time) VTK_OVERRIDE;
-  void SetForceUseCache(bool val) VTK_OVERRIDE;
-  void SetForcedCacheKey(double val) VTK_OVERRIDE;
-  void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
+  void SetUpdateTime(double time) override;
+  void SetForceUseCache(bool val) override;
+  void SetForcedCacheKey(double val) override;
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) override;
+  void SetInputConnection(vtkAlgorithmOutput* input) override;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) override;
+  void AddInputConnection(vtkAlgorithmOutput* input) override;
+  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) override;
+  void RemoveInputConnection(int port, int idx) override;
   //@}
 
   //@{
@@ -105,7 +105,7 @@ public:
    * Override because of internal composite representations that need to be
    * initialized as well.
    */
-  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
+  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) override;
 
 protected:
   vtkPVCompositeRepresentation();
@@ -116,14 +116,14 @@ protected:
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   vtkSelectionRepresentation* SelectionRepresentation;
   vtkPVGridAxes3DRepresentation* GridAxesRepresentation;

@@ -43,7 +43,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVAxesWidget : public vtkInteractorO
 public:
   static vtkPVAxesWidget* New();
   vtkTypeMacro(vtkPVAxesWidget, vtkInteractorObserver);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Layer number to use for the internal renderer created by vtkPVAxesWidget.
@@ -69,7 +69,7 @@ public:
   /**
    * Overridden to add interaction observers.
    */
-  void SetInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void SetInteractor(vtkRenderWindowInteractor* iren) override;
 
   /**
    * Get the renderer.
@@ -80,7 +80,7 @@ public:
    * Overridden to update this->Enabled and hide outline when disabled.
    * Use this method to enable/disable interactivity.
    */
-  void SetEnabled(int) VTK_OVERRIDE;
+  void SetEnabled(int) override;
 
   //@{
   /**

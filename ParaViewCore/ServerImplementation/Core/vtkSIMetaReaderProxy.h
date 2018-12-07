@@ -35,18 +35,18 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIMetaReaderProxy : public vtkSISo
 public:
   static vtkSIMetaReaderProxy* New();
   vtkTypeMacro(vtkSIMetaReaderProxy, vtkSISourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSIMetaReaderProxy();
   ~vtkSIMetaReaderProxy() override;
 
-  void OnCreateVTKObjects() VTK_OVERRIDE;
+  void OnCreateVTKObjects() override;
 
   /**
    * Read xml-attributes.
    */
-  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) override;
 
   // This is the name of the method used to set the file name on the
   // internal reader. See vtkFileSeriesReader for details.

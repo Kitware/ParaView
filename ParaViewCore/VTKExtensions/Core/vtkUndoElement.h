@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkUndoElement : public vtkObject
 {
 public:
   vtkTypeMacro(vtkUndoElement, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Undo the operation encapsulated by this element.

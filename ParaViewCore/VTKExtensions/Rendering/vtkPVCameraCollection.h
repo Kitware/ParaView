@@ -42,7 +42,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVCameraCollection : public vtkObjec
 public:
   static vtkPVCameraCollection* New();
   vtkTypeMacro(vtkPVCameraCollection, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Add  a cameras to the collection of discrete cameras. The code does not

@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVX3DExporter : public vtkX3DExporter
 public:
   static vtkPVX3DExporter* New();
   vtkTypeMacro(vtkPVX3DExporter, vtkX3DExporter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Indicates whether color legends should be exported.
@@ -46,14 +46,14 @@ public:
 
 protected:
   vtkPVX3DExporter();
-  ~vtkPVX3DExporter() VTK_OVERRIDE;
+  ~vtkPVX3DExporter() override;
 
   bool ExportColorLegends;
 
   /**
    * Write additional data, including color legends, to the output.
    */
-  void WriteAdditionalNodes(vtkX3DExporterWriter* writer) VTK_OVERRIDE;
+  void WriteAdditionalNodes(vtkX3DExporterWriter* writer) override;
 
   /**
    * Write out color legends.

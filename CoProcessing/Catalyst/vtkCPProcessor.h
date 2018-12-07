@@ -59,7 +59,7 @@ class VTKPVCATALYST_EXPORT vtkCPProcessor : public vtkObject
 public:
   static vtkCPProcessor* New();
   vtkTypeMacro(vtkCPProcessor, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// Add in a pipeline that is externally configured. Returns 1 if
   /// successful and 0 otherwise.

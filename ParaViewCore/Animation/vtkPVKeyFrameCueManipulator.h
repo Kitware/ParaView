@@ -47,7 +47,7 @@ class VTKPVANIMATION_EXPORT vtkPVKeyFrameCueManipulator : public vtkPVCueManipul
 {
 public:
   vtkTypeMacro(vtkPVKeyFrameCueManipulator, vtkPVCueManipulator);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVKeyFrameCueManipulator* New();
 
   /**
@@ -146,16 +146,16 @@ protected:
    * is done only once per Animation cycle. The Initialize method is used to
    * indicate that a new animation cycle has begun.
    */
-  void Initialize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Initialize(vtkPVAnimationCue*) override;
 
-  void Finalize(vtkPVAnimationCue*) VTK_OVERRIDE;
+  void Finalize(vtkPVAnimationCue*) override;
 
   vtkPVKeyFrameCueManipulatorInternals* Internals;
   /**
    * This updates the values based on currenttime.
    * currenttime is normalized to the time range of the Cue.
    */
-  void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy) override;
 
   int AddKeyFrameInternal(vtkPVKeyFrame* keyframe);
   int RemoveKeyFrameInternal(vtkPVKeyFrame* keyframe);

@@ -34,7 +34,7 @@ class VTKPVSERVERMANAGERAPPLICATION_EXPORT vtkInitializationHelper : public vtkO
 {
 public:
   vtkTypeMacro(vtkInitializationHelper, vtkObject);
-  void PrintSelf(ostream&, vtkIndent) VTK_OVERRIDE;
+  void PrintSelf(ostream&, vtkIndent) override;
 
   /**
    * Initializes the server manager. Do not use the server manager

@@ -45,23 +45,23 @@ class VTKPVCINEMAREADER_EXPORT vtkCinemaLayerMapper : public vtkMapper2D
 public:
   static vtkCinemaLayerMapper* New();
   vtkTypeMacro(vtkCinemaLayerMapper, vtkMapper2D);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * We update the rendering objects in this method.
    */
-  void RenderOpaqueGeometry(vtkViewport*, vtkActor2D*) VTK_OVERRIDE;
+  void RenderOpaqueGeometry(vtkViewport*, vtkActor2D*) override;
 
   /**
    * We do the actual rendering in this method.
    * TODO: it's unclear if we should render on overlay, for now, I'm doing that.
    */
-  void RenderOverlay(vtkViewport*, vtkActor2D*) VTK_OVERRIDE;
+  void RenderOverlay(vtkViewport*, vtkActor2D*) override;
 
   /**
    * Release graphics resources.
    */
-  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) override;
 
   //@{
   /**
@@ -83,7 +83,7 @@ public:
   /**
    * Overridden to include lookup table's mtime, if ScalarVisibility is ON.
    */
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() override;
 
   //@{
   /**

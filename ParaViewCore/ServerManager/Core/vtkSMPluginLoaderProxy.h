@@ -32,7 +32,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPluginLoaderProxy : public vtkSMProxy
 public:
   static vtkSMPluginLoaderProxy* New();
   vtkTypeMacro(vtkSMPluginLoaderProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Loads the plugin. Returns true on success else false. To get the error

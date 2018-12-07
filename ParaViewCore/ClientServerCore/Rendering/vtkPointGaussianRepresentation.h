@@ -40,10 +40,10 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPointGaussianRepresentation
 public:
   vtkTypeMacro(vtkPointGaussianRepresentation,
     vtkPVDataRepresentation) static vtkPointGaussianRepresentation* New();
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
   /**
    * Use to set the color map for the data in this representation
@@ -53,7 +53,7 @@ public:
   /**
    * Use to set whether the data in this representation is visible or not
    */
-  void SetVisibility(bool val) VTK_OVERRIDE;
+  void SetVisibility(bool val) override;
 
   /**
    * Use to set whether the splat emits light
@@ -192,11 +192,11 @@ protected:
   vtkPointGaussianRepresentation();
   ~vtkPointGaussianRepresentation() override;
 
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
+  bool RemoveFromView(vtkView* view) override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   void UpdateColoringParameters();
   vtkSetStringMacro(LastScaleArray);

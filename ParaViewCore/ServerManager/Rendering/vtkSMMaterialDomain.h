@@ -38,18 +38,18 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMaterialDomain : public vtkSMStrin
 public:
   static vtkSMMaterialDomain* New();
   vtkTypeMacro(vtkSMMaterialDomain, vtkSMStringListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Overridden to get list of materials from materiallibrary singleton.
    */
-  virtual void Update(vtkSMProperty*) VTK_OVERRIDE;
+  virtual void Update(vtkSMProperty*) override;
 
 protected:
   vtkSMMaterialDomain();
   ~vtkSMMaterialDomain();
 
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   void CallMeSometime();
   friend class vtkSMMaterialObserver;

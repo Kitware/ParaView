@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPExtractHistogram : public vtkExtractHist
 public:
   static vtkPExtractHistogram* New();
   vtkTypeMacro(vtkPExtractHistogram, vtkExtractHistogram);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -52,10 +52,10 @@ protected:
    * Returns the data range for the input array to process.
    * Overridden to reduce the range in parallel.
    */
-  bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]) VTK_OVERRIDE;
+  bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]) override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   vtkMultiProcessController* Controller;
 

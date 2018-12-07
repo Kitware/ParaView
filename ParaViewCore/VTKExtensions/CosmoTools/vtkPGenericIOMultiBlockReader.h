@@ -59,7 +59,7 @@ public:
 
   static vtkPGenericIOMultiBlockReader* New();
   vtkTypeMacro(vtkPGenericIOMultiBlockReader, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

@@ -52,7 +52,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMParaViewPipelineController : public vtk
 public:
   static vtkSMParaViewPipelineController* New();
   vtkTypeMacro(vtkSMParaViewPipelineController, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Call this method to setup a branch new session with state considered

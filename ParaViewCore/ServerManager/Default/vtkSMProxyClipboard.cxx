@@ -33,14 +33,14 @@ class vtkSMProxyClipboardPropertyIterator : public vtkSMPropertyIterator
 public:
   static vtkSMProxyClipboardPropertyIterator* New();
   vtkTypeMacro(vtkSMProxyClipboardPropertyIterator, vtkSMPropertyIterator);
-  void Next() VTK_OVERRIDE
+  void Next() override
   {
     do
     {
       this->Superclass::Next();
     } while (!this->IsAtEnd() && this->Skip(this->GetKey(), this->GetProperty()));
   }
-  void Begin() VTK_OVERRIDE
+  void Begin() override
   {
     this->Superclass::Begin();
     if (!this->IsAtEnd() && this->Skip(this->GetKey(), this->GetProperty()))

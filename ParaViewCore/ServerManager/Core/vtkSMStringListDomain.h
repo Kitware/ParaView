@@ -41,7 +41,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStringListDomain : public vtkSMDomain
 public:
   static vtkSMStringListDomain* New();
   vtkTypeMacro(vtkSMStringListDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns true if the value of the property is in the domain.
@@ -49,7 +49,7 @@ public:
    * vector values are in the domain, it returns 1. It returns
    * 0 otherwise.
    */
-  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) override;
 
   /**
    * Returns true if the string is in the domain.
@@ -71,12 +71,12 @@ public:
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  void SetAnimationValue(vtkSMProperty*, int, double) VTK_OVERRIDE;
+  void SetAnimationValue(vtkSMProperty*, int, double) override;
 
   //@{
   /**
@@ -89,7 +89,7 @@ public:
    * property.
    * Returns 1 if the domain updated the property.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
 protected:
   vtkSMStringListDomain();
@@ -100,9 +100,9 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
-  void ChildSaveState(vtkPVXMLElement* domainElement) VTK_OVERRIDE;
+  void ChildSaveState(vtkPVXMLElement* domainElement) override;
 
   //@{
   /**

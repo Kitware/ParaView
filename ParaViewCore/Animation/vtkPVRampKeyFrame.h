@@ -28,14 +28,14 @@ class VTKPVANIMATION_EXPORT vtkPVRampKeyFrame : public vtkPVKeyFrame
 public:
   static vtkPVRampKeyFrame* New();
   vtkTypeMacro(vtkPVRampKeyFrame, vtkPVKeyFrame);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * This method will do the actual interpolation.
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) override;
 
 protected:
   vtkPVRampKeyFrame();

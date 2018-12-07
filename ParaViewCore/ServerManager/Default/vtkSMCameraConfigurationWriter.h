@@ -40,7 +40,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationWriter
 {
 public:
   vtkTypeMacro(vtkSMCameraConfigurationWriter, vtkSMProxyConfigurationWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkSMCameraConfigurationWriter* New();
 
   /**
@@ -54,7 +54,7 @@ protected:
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
-  void SetProxy(vtkSMProxy*) VTK_OVERRIDE { vtkErrorMacro("Use SetRenderViewProxy."); }
+  void SetProxy(vtkSMProxy*) override { vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
   vtkSMCameraConfigurationWriter(const vtkSMCameraConfigurationWriter&) = delete;

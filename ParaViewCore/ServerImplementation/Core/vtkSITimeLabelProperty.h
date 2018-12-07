@@ -29,7 +29,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSITimeLabelProperty : public vtkSI
 public:
   static vtkSITimeLabelProperty* New();
   vtkTypeMacro(vtkSITimeLabelProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSITimeLabelProperty();
@@ -40,7 +40,7 @@ protected:
   /**
    * Pull the current state of the underneath implementation
    */
-  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) override;
 
 private:
   vtkSITimeLabelProperty(const vtkSITimeLabelProperty&) = delete;

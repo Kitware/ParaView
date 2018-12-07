@@ -47,7 +47,7 @@ class vtkTemporalRanges : public vtkTableAlgorithm
 public:
   vtkTypeMacro(vtkTemporalRanges, vtkTableAlgorithm);
   static vtkTemporalRanges* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum
   {
@@ -64,16 +64,15 @@ protected:
 
   int CurrentTimeIndex;
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
 
   virtual int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   virtual int RequestUpdateExtent(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   virtual void InitializeTable(vtkTable* output);
 

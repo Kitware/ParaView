@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonOptions : public vtkPVOptions
 public:
   static vtkPVPythonOptions* New();
   vtkTypeMacro(vtkPVPythonOptions, vtkPVOptions);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -60,13 +60,13 @@ protected:
   /**
    * After parsing, process extra option dependencies.
    */
-  int PostProcess(int argc, const char* const* argv) VTK_OVERRIDE;
+  int PostProcess(int argc, const char* const* argv) override;
 
   /**
    * This method is called when wrong argument is found. If it returns 0, then
    * the parsing will fail.
    */
-  int WrongArgument(const char* argument) VTK_OVERRIDE;
+  int WrongArgument(const char* argument) override;
 
   // Options:
   vtkSetStringMacro(PythonScriptName);

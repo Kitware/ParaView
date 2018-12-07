@@ -36,17 +36,17 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMGlobalPropertiesLinkUndoElement : publi
 public:
   static vtkSMGlobalPropertiesLinkUndoElement* New();
   vtkTypeMacro(vtkSMGlobalPropertiesLinkUndoElement, vtkSMUndoElement);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Undo the operation encapsulated by this element.
    */
-  int Undo() VTK_OVERRIDE;
+  int Undo() override;
 
   /**
    * Redo the operation encaspsulated by this element.
    */
-  int Redo() VTK_OVERRIDE;
+  int Redo() override;
 
   /**
    * Provide the information needed to restore the previous state

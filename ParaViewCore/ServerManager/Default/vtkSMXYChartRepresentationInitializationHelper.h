@@ -33,13 +33,13 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMXYChartRepresentationInitializationH
 public:
   static vtkSMXYChartRepresentationInitializationHelper* New();
   vtkTypeMacro(vtkSMXYChartRepresentationInitializationHelper, vtkSMProxyInitializationHelper);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) VTK_OVERRIDE;
+  void PostInitializeProxy(vtkSMProxy*, vtkPVXMLElement*, vtkMTimeType) override;
 
 protected:
   vtkSMXYChartRepresentationInitializationHelper();
-  ~vtkSMXYChartRepresentationInitializationHelper() VTK_OVERRIDE;
+  ~vtkSMXYChartRepresentationInitializationHelper() override;
 
 private:
   vtkSMXYChartRepresentationInitializationHelper(

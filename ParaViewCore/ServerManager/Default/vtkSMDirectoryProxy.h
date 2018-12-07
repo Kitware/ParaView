@@ -29,7 +29,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMDirectoryProxy : public vtkSMProxy
 public:
   static vtkSMDirectoryProxy* New();
   vtkTypeMacro(vtkSMDirectoryProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Create directory.

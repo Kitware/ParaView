@@ -320,7 +320,7 @@ class vtknifti1_io : public vtkObject
 public:
   static vtknifti1_io *New();
   vtkTypeMacro(vtknifti1_io,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 /*****************************************************************************/
 /*--------------- Prototypes of functions defined in this file --------------*/

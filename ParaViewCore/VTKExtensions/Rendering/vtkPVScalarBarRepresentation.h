@@ -42,7 +42,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVScalarBarRepresentation
 {
 public:
   vtkTypeMacro(vtkPVScalarBarRepresentation, vtkScalarBarRepresentation) void PrintSelf(
-    ostream& os, vtkIndent indent) VTK_OVERRIDE;
+    ostream& os, vtkIndent indent) override;
   static vtkPVScalarBarRepresentation* New();
 
   enum
@@ -76,7 +76,7 @@ public:
    * Override to obtain viewport size and potentially adjust placement
    * of the representation.
    */
-  int RenderOverlay(vtkViewport*) VTK_OVERRIDE;
+  int RenderOverlay(vtkViewport*) override;
 
 protected:
   vtkPVScalarBarRepresentation();

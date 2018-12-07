@@ -488,7 +488,7 @@ public:
    * Overridden to create/delete representations as views are added/removed.
    * Also handle this->OverlayViews == true.
    */
-  bool Resize(size_t num_comparisons) VTK_OVERRIDE
+  bool Resize(size_t num_comparisons) override
   {
     this->NumberOfComparisons = num_comparisons;
     if (this->OverlayViews)
@@ -589,7 +589,7 @@ protected:
    * A new view is being created, we need to create clones of representations too
    * and add them to the new view.
    */
-  vtkSMProxy* PushBack() VTK_OVERRIDE
+  vtkSMProxy* PushBack() override
   {
     if (vtkSMProxy* clone = this->Superclass::PushBack())
     {
@@ -617,7 +617,7 @@ protected:
   /**
    * A view is being removed; we need to remove clones of representations for that view too.
    */
-  void PopBack() VTK_OVERRIDE
+  void PopBack() override
   {
     vtkSMProxy* back = this->GetBack();
     if (back == this->GetRoot())

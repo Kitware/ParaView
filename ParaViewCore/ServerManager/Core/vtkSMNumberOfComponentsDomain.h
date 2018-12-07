@@ -39,7 +39,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNumberOfComponentsDomain : public vtkSM
 public:
   static vtkSMNumberOfComponentsDomain* New();
   vtkTypeMacro(vtkSMNumberOfComponentsDomain, vtkSMEnumerationDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Updates the range based on the scalar range of the currently selected
@@ -47,7 +47,7 @@ public:
    * (vtkSMStringVectorProperty) properties. Currently, this uses
    * only the first component of the array.
    */
-  void Update(vtkSMProperty* prop) VTK_OVERRIDE;
+  void Update(vtkSMProperty* prop) override;
 
 protected:
   vtkSMNumberOfComponentsDomain();
@@ -56,7 +56,7 @@ protected:
   /**
    * Set the appropriate ivars from the xml element.
    */
-  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   /**
    * Internal update method doing the actual work.

@@ -41,14 +41,14 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArraySelectionDomain : public vtkSMStri
 public:
   static vtkSMArraySelectionDomain* New();
   vtkTypeMacro(vtkSMArraySelectionDomain, vtkSMStringListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Since this domain relies on an information only property to get the default
    * status, we override this method to copy the values the info property as the
    * default array selection.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
   /**
    * Global flag to toggle between (a) the default behavior of setting default

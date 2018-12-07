@@ -44,7 +44,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDataTypeDomain : public vtkSMDomain
 public:
   static vtkSMDataTypeDomain* New();
   vtkTypeMacro(vtkSMDataTypeDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns true if the value of the property is in the domain.
@@ -52,7 +52,7 @@ public:
    * to a vtkSMSourceProxy. If all data types of the input's
    * parts are in the domain, it returns. It returns 0 otherwise.
    */
-  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) override;
 
   /**
    * Returns true if all parts of the source proxy are in the domain.
@@ -77,7 +77,7 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   vtkSMDataTypeDomainInternals* DTInternals;
 

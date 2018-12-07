@@ -49,7 +49,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartRepresentation : public vtkP
 public:
   static vtkChartRepresentation* New();
   vtkTypeMacro(vtkChartRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * These must only be set during initialization before adding the
@@ -60,7 +60,7 @@ public:
   /**
    * Set visibility of the representation.
    */
-  void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) override;
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -68,7 +68,7 @@ public:
    * have any real-input on the client side which messes with the Update
    * requests.
    */
-  void MarkModified() VTK_OVERRIDE;
+  void MarkModified() override;
 
   // *************************************************************************
 
@@ -91,7 +91,7 @@ public:
    * Override because of internal selection representations that need to be
    * initialized as well.
    */
-  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) VTK_OVERRIDE;
+  unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) override;
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -101,7 +101,7 @@ public:
    * Overridden to handle REQUEST_RENDER() to call PrepareForRendering.
    */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
   /**
    * Method to provide the default name given the name of a table and a column
@@ -163,7 +163,7 @@ protected:
   /**
    * Fill input port information.
    */
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   /**
    * This method is called before actual render if this->MTime was modified
@@ -187,26 +187,26 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
-  bool IsCached(double cache_key) VTK_OVERRIDE;
+  bool IsCached(double cache_key) override;
 
   /**
    * Convenience method to get the first vtkTable from LocalOutput, if any.

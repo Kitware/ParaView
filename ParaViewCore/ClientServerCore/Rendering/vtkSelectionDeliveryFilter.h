@@ -36,15 +36,15 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionDeliveryFilter
 public:
   static vtkSelectionDeliveryFilter* New();
   vtkTypeMacro(vtkSelectionDeliveryFilter, vtkSelectionAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSelectionDeliveryFilter();
   ~vtkSelectionDeliveryFilter() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   vtkReductionFilter* ReductionFilter;
   vtkClientServerMoveData* DeliveryFilter;

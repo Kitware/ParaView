@@ -54,7 +54,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIProxyDefinitionManager : public 
 public:
   static vtkSIProxyDefinitionManager* New();
   vtkTypeMacro(vtkSIProxyDefinitionManager, vtkSIObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the ID reserved for the proxy definition manager.
@@ -211,14 +211,14 @@ public:
    * The provided implementation just store the message
    * and return it at the Pull one.
    */
-  void Push(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Push(vtkSMMessage* msg) override;
 
   /**
    * Pull the current state of the underneath implementation
    * The provided implementation update the given message with the one
    * that has been previously pushed
    */
-  void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Pull(vtkSMMessage* msg) override;
 
   //@{
   /**

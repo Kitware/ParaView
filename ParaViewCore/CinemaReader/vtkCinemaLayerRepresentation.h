@@ -61,12 +61,12 @@ class VTKPVCINEMAREADER_EXPORT vtkCinemaLayerRepresentation : public vtkPVDataRe
 public:
   static vtkCinemaLayerRepresentation* New();
   vtkTypeMacro(vtkCinemaLayerRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void SetVisibility(bool) VTK_OVERRIDE;
-  void MarkModified() VTK_OVERRIDE;
+  void SetVisibility(bool) override;
+  void MarkModified() override;
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
   /**
    * Forwarded to the mapper
@@ -78,11 +78,11 @@ protected:
   vtkCinemaLayerRepresentation();
   ~vtkCinemaLayerRepresentation() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
-  bool IsCached(double cache_key) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  bool AddToView(vtkView* view) override;
+  bool RemoveFromView(vtkView* view) override;
+  bool IsCached(double cache_key) override;
 
   /**
    * Updates the Mapper. First, it creates a cinema query. Then, it sets

@@ -70,13 +70,13 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMBoundsDomain : public vtkSMDoubleRangeD
 public:
   static vtkSMBoundsDomain* New();
   vtkTypeMacro(vtkSMBoundsDomain, vtkSMDoubleRangeDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
   //@{
   vtkSetClampMacro(Mode, int, 0, 3);
@@ -116,7 +116,7 @@ public:
   /**
    * Overridden to handle APPROXIMATE_CELL_LENGTH.
    */
-  int SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty* property, bool use_unchecked_values) override;
 
 protected:
   vtkSMBoundsDomain();
@@ -126,7 +126,7 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   // Obtain the data information from the required property with
   // function "Input", if any.

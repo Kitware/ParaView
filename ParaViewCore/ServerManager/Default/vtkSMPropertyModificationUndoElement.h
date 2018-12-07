@@ -36,17 +36,17 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPropertyModificationUndoElement
 public:
   static vtkSMPropertyModificationUndoElement* New();
   vtkTypeMacro(vtkSMPropertyModificationUndoElement, vtkSMUndoElement);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Undo the operation encapsulated by this element.
    */
-  int Undo() VTK_OVERRIDE;
+  int Undo() override;
 
   /**
    * Redo the operation encaspsulated by this element.
    */
-  int Redo() VTK_OVERRIDE;
+  int Redo() override;
 
   /**
    * Set the property/proxy that was modified.
@@ -61,7 +61,7 @@ public:
    * represent change to the same property.
    * Returns if the merge was successful.
    */
-  bool Merge(vtkUndoElement* vtkNotUsed(new_element)) VTK_OVERRIDE;
+  bool Merge(vtkUndoElement* vtkNotUsed(new_element)) override;
 
 protected:
   vtkSMPropertyModificationUndoElement();

@@ -35,12 +35,12 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBagChartRepresentation
 public:
   static vtkPVBagChartRepresentation* New();
   vtkTypeMacro(vtkPVBagChartRepresentation, vtkChartRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set visibility of the representation.
    */
-  void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) override;
 
   /**
    * Provides access to the underlying VTK representation.
@@ -192,20 +192,20 @@ protected:
    * Overridden to pass information about changes to series visibility etc. to
    * the plot-matrix.
    */
-  void PrepareForRendering() VTK_OVERRIDE;
+  void PrepareForRendering() override;
 
   void SetPolyLineToTable(vtkPolyData* polydata, vtkTable* table);
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
 private:
   vtkPVBagChartRepresentation(const vtkPVBagChartRepresentation&) = delete;

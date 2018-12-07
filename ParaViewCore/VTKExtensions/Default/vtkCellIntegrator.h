@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCellIntegrator : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCellIntegrator, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns length/area/volume of a 1D/2D/3D cell given by cell id. If the

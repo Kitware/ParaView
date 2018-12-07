@@ -33,7 +33,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMWidgetRepresentationProxy : public
 public:
   static vtkSMWidgetRepresentationProxy* New();
   vtkTypeMacro(vtkSMWidgetRepresentationProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

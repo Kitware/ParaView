@@ -35,7 +35,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkLZ4Compressor : public vtkImageCompr
 public:
   static vtkLZ4Compressor* New();
   vtkTypeMacro(vtkLZ4Compressor, vtkImageCompressor);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -53,18 +53,18 @@ public:
    * Compress/Decompress data array on the objects input with results
    * in the objects output. See also Set/GetInput/Output.
    */
-  int Compress() VTK_OVERRIDE;
-  int Decompress() VTK_OVERRIDE;
+  int Compress() override;
+  int Decompress() override;
   //@}
 
   //@{
   /**
    * Serialize/Restore compressor configuration (but not the data) into the stream.
    */
-  void SaveConfiguration(vtkMultiProcessStream* stream) VTK_OVERRIDE;
-  bool RestoreConfiguration(vtkMultiProcessStream* stream) VTK_OVERRIDE;
-  const char* SaveConfiguration() VTK_OVERRIDE;
-  const char* RestoreConfiguration(const char* stream) VTK_OVERRIDE;
+  void SaveConfiguration(vtkMultiProcessStream* stream) override;
+  bool RestoreConfiguration(vtkMultiProcessStream* stream) override;
+  const char* SaveConfiguration() override;
+  const char* RestoreConfiguration(const char* stream) override;
   //@}
 
 protected:

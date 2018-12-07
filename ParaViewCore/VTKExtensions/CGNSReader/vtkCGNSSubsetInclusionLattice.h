@@ -43,7 +43,7 @@ class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSSubsetInclusionLattice
 public:
   static vtkCGNSSubsetInclusionLattice* New();
   vtkTypeMacro(vtkCGNSSubsetInclusionLattice, vtkSubsetInclusionLattice);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

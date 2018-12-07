@@ -55,7 +55,7 @@ class vtkPVOpenVRHelper : public vtkObject
 public:
   static vtkPVOpenVRHelper* New();
   vtkTypeMacro(vtkPVOpenVRHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Re-initializes the priority queue using the amr structure given to the most

@@ -39,7 +39,7 @@ class VTKPVCINEMAREADER_EXPORT vtkSMCinemaDatabaseImporter : public vtkSMObject
 public:
   static vtkSMCinemaDatabaseImporter* New();
   vtkTypeMacro(vtkSMCinemaDatabaseImporter, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns true if the \c session supports Cinema databases. Currently, only

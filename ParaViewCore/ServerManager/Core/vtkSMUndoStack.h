@@ -49,13 +49,13 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUndoStack : public vtkUndoStack
 public:
   static vtkSMUndoStack* New();
   vtkTypeMacro(vtkSMUndoStack, vtkUndoStack);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Push an undo set on the Undo stack. This will clear
    * any sets in the Redo stack.
    */
-  void Push(const char* label, vtkUndoSet* changeSet) VTK_OVERRIDE;
+  void Push(const char* label, vtkUndoSet* changeSet) override;
 
   /**
    * Performs an Undo using the set on the top of the undo stack. The set is poped from
@@ -64,7 +64,7 @@ public:
    * it fires vtkCommand::EndEvent.
    * \returns the status of the operation.
    */
-  int Undo() VTK_OVERRIDE;
+  int Undo() override;
 
   /**
    * Performs a Redo using the set on the top of the redo stack. The set is poped from
@@ -73,7 +73,7 @@ public:
    * it fires vtkCommand::EndEvent.
    * \returns the status of the operation.
    */
-  int Redo() VTK_OVERRIDE;
+  int Redo() override;
 
   enum EventIds
   {

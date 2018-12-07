@@ -29,9 +29,9 @@ class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIPVRepresentationProxy : pub
 public:
   static vtkSIPVRepresentationProxy* New();
   vtkTypeMacro(vtkSIPVRepresentationProxy, vtkSIProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void AboutToDelete() VTK_OVERRIDE;
+  void AboutToDelete() override;
 
 protected:
   vtkSIPVRepresentationProxy();
@@ -41,7 +41,7 @@ protected:
    * Parses the XML to create property/subproxy helpers.
    * Overridden to parse all the "RepresentationType" elements.
    */
-  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) override;
 
 private:
   vtkSIPVRepresentationProxy(const vtkSIPVRepresentationProxy&) = delete;

@@ -87,7 +87,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArrayListDomain : public vtkSMStringLis
 public:
   static vtkSMArrayListDomain* New();
   vtkTypeMacro(vtkSMArrayListDomain, vtkSMStringListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Updates the string list based on the available arrays. Requires
@@ -95,7 +95,7 @@ public:
    * vtkSMSourceProxy and contains a vtkSMInputArrayDomain. Only
    * the first proxy and domain are used.
    */
-  void Update(vtkSMProperty* prop) VTK_OVERRIDE;
+  void Update(vtkSMProperty* prop) override;
 
   /**
    * Returns true if the array with the given idx is partial
@@ -156,7 +156,7 @@ public:
    * property.
    * Returns 1 if the domain updated the property.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
   // This enum represents the possible strategies associated
   // with a given InformationKey :
@@ -231,7 +231,7 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   /**
    * HACK: Provides a temporary mechanism for subclasses to provide an

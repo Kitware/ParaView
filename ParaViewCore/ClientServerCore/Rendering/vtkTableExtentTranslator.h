@@ -33,7 +33,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkTableExtentTranslator : public vt
 {
 public:
   vtkTypeMacro(vtkTableExtentTranslator, vtkExtentTranslator);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkTableExtentTranslator* New();
 
@@ -43,7 +43,7 @@ public:
   // extra pieces will be empty data.  If this is more than one but
   // less than the number of pieces in the table then only this many
   // pieces will be returned (FIXME).
-  void SetNumberOfPieces(int pieces) VTK_OVERRIDE;
+  void SetNumberOfPieces(int pieces) override;
 
   //@{
   /**
@@ -57,18 +57,18 @@ public:
    * Called to translate the current piece into an extent.  This is
    * not thread safe.
    */
-  int PieceToExtent() VTK_OVERRIDE;
+  int PieceToExtent() override;
 
   /**
    * Not supported by this subclass of vtkExtentTranslator.
    */
-  int PieceToExtentByPoints() VTK_OVERRIDE;
+  int PieceToExtentByPoints() override;
 
   /**
    * Not supported by this subclass of vtkExtentTranslator.
    */
   int PieceToExtentThreadSafe(int piece, int numPieces, int ghostLevel, int* wholeExtent,
-    int* resultExtent, int splitMode, int byPoints) VTK_OVERRIDE;
+    int* resultExtent, int splitMode, int byPoints) override;
 
   /**
    * Set the extent to be used for a piece.  This sets the extent table

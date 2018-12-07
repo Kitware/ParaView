@@ -76,7 +76,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotReader : public vtkCompositeDat
 public:
   static vtkSpyPlotReader* New();
   vtkTypeMacro(vtkSpyPlotReader, vtkCompositeDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   void PrintBlockList(vtkNonOverlappingAMR* hbds, int myProcId);
 
   //@{
@@ -284,22 +284,22 @@ protected:
   // The array selections.
   vtkDataArraySelection* CellDataArraySelection;
 
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
   // Create either vtkNonOverlappingAMR or vtkMultiBlockDataSet based on
   // whether the dataset is AMR.
   int RequestDataObject(
-    vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) VTK_OVERRIDE;
+    vtkInformation* req, vtkInformationVector** inV, vtkInformationVector* outV) override;
 
   // Read the case file and the first binary file do get meta
   // information (number of files, number of fields, number of timestep).
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   // Read the data: get the number of pieces (=processors) and get
   // my piece id (=my processor id).
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * This does the updating of meta data of the dataset from the
@@ -344,7 +344,7 @@ protected:
    * Overwritten to avoid hiding.
    */
   int UpdateTimeStep(double time, int piece = -1, int numPieces = 1, int ghostLevels = 0,
-    const int extents[6] = 0) VTK_OVERRIDE
+    const int extents[6] = 0) override
   {
     return this->Superclass::UpdateTimeStep(time, piece, numPieces, ghostLevels, extents);
   }

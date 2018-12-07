@@ -48,7 +48,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRangedTransferFunctionDomain
 public:
   static vtkSMRangedTransferFunctionDomain* New();
   vtkTypeMacro(vtkSMRangedTransferFunctionDomain, vtkSMProxyListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return a range min. value if it exists. If the min. exists
@@ -98,13 +98,13 @@ public:
 
 protected:
   vtkSMRangedTransferFunctionDomain();
-  ~vtkSMRangedTransferFunctionDomain() VTK_OVERRIDE;
+  ~vtkSMRangedTransferFunctionDomain() override;
 
   /**
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   /**
    * Callback to invoke DomainModified event

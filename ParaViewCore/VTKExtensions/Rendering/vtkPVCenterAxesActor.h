@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVCenterAxesActor : public vtkOpenGL
 public:
   static vtkPVCenterAxesActor* New();
   vtkTypeMacro(vtkPVCenterAxesActor, vtkOpenGLActor);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * If Symmetric is on, the the axis continue to negative values.

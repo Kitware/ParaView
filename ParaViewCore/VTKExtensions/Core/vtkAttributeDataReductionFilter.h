@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkAttributeDataReductionFilter : public vtk
 public:
   static vtkAttributeDataReductionFilter* New();
   vtkTypeMacro(vtkAttributeDataReductionFilter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum ReductionTypes
   {
@@ -86,16 +86,15 @@ protected:
   ~vtkAttributeDataReductionFilter() override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * This is called by the superclass.
    * This is the method you should override.
    */
-  int RequestDataObject(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   int ReductionType;
   int AttributeType;
 

@@ -30,21 +30,21 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSICollaborationManager : public vt
 public:
   static vtkSICollaborationManager* New();
   vtkTypeMacro(vtkSICollaborationManager, vtkSIObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Push a new state to the underneath implementation
    * The provided implementation just store the message
    * and return it at the Pull one.
    */
-  void Push(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Push(vtkSMMessage* msg) override;
 
   /**
    * Pull the current state of the underneath implementation
    * The provided implementation update the given message with the one
    * that has been previously pushed
    */
-  void Pull(vtkSMMessage* msg) VTK_OVERRIDE;
+  void Pull(vtkSMMessage* msg) override;
 
 protected:
   vtkSICollaborationManager();

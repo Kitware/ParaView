@@ -182,8 +182,8 @@ public:
   static vtkPVRendererCuller* New();
   vtkTypeMacro(vtkPVRendererCuller, vtkCuller);
 
-  double Cull(vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength,
-    int& initialized) VTK_OVERRIDE
+  double Cull(
+    vtkRenderer* vtkNotUsed(ren), vtkProp** propList, int& listLength, int& initialized) override
   {
     double total_time = 0;
     if (listLength <= 0)

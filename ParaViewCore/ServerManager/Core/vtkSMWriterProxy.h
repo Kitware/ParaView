@@ -34,21 +34,21 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMWriterProxy : public vtkSMSourceProxy
 public:
   static vtkSMWriterProxy* New();
   vtkTypeMacro(vtkSMWriterProxy, vtkSMSourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Updates the pipeline and writes the file(s).
    * Must call UpdateVTKObjects() before calling UpdatePipeline()
    * to ensure that the filename etc. are set correctly.
    */
-  void UpdatePipeline() VTK_OVERRIDE;
+  void UpdatePipeline() override;
 
   /**
    * Updates the pipeline and writes the file(s).
    * Must call UpdateVTKObjects() before calling UpdatePipeline()
    * to ensure that the filename etc. are set correctly.
    */
-  void UpdatePipeline(double time) VTK_OVERRIDE;
+  void UpdatePipeline(double time) override;
 
   //@{
   /**
@@ -75,7 +75,7 @@ protected:
   /**
    * Read attributes from an XML element.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
   int SupportsParallel;
   int ParallelOnly;

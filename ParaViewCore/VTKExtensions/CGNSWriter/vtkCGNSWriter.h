@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSCGNSWRITER_EXPORT vtkCGNSWriter : public vtkWriter
 public:
   static vtkCGNSWriter* New();
   vtkTypeMacro(vtkCGNSWriter, vtkWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
   * Name for the output file.  If writing in parallel, the number
@@ -56,14 +56,14 @@ public:
 
 protected:
   vtkCGNSWriter();
-  ~vtkCGNSWriter() VTK_OVERRIDE;
+  ~vtkCGNSWriter() override;
 
   char* FileName;
   vtkDataObject* OriginalInput;
   bool UseHDF5; //
 
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
@@ -71,10 +71,10 @@ protected:
   virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   bool WasWritingSuccessful;
   void WriteData() override; // pure virtual override from vtkWriter

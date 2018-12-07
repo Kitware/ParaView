@@ -30,7 +30,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVTimerInformation : public vtkPVInfor
 public:
   static vtkPVTimerInformation* New();
   vtkTypeMacro(vtkPVTimerInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -54,21 +54,21 @@ public:
    * Transfer information about a single object into
    * this object.
    */
-  void CopyFromObject(vtkObject* data) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* data) override;
   virtual void CopyFromMessage(unsigned char* msg);
   //@}
 
   /**
    * Merge another information object.
    */
-  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) override;
 
   //@{
   /**
    * Serialize objects to/from a stream object.
    */
-  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  void CopyFromStream(const vtkClientServerStream* css) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) override;
+  void CopyFromStream(const vtkClientServerStream* css) override;
   //@}
 
   //@{
@@ -77,8 +77,8 @@ public:
    * gathered. This are different from the ivars that constitute the gathered
    * information itself.
    */
-  void CopyParametersToStream(vtkMultiProcessStream&) VTK_OVERRIDE;
-  void CopyParametersFromStream(vtkMultiProcessStream&) VTK_OVERRIDE;
+  void CopyParametersToStream(vtkMultiProcessStream&) override;
+  void CopyParametersFromStream(vtkMultiProcessStream&) override;
 
 protected:
   vtkPVTimerInformation();

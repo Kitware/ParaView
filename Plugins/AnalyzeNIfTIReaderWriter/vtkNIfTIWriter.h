@@ -37,7 +37,7 @@ class vtkNIfTIWriter : public vtkImageWriter
 public:
   static vtkNIfTIWriter* New();
   vtkTypeMacro(vtkNIfTIWriter, vtkImageWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void SetFileType(int inValue);
   int getFileType();
@@ -48,8 +48,8 @@ protected:
   vtkNIfTIWriter();
   ~vtkNIfTIWriter() override;
 
-  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wholeExtent[6]) VTK_OVERRIDE;
-  void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
+  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wholeExtent[6]) override;
+  void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) override;
 
 private:
   int FileType;

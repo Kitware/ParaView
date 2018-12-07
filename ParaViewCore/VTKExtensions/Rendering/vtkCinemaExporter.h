@@ -35,7 +35,7 @@ public:
   static vtkCinemaExporter* New();
   vtkTypeMacro(vtkCinemaExporter, vtkExporter);
 
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
@@ -53,7 +53,7 @@ protected:
   vtkCinemaExporter();
   ~vtkCinemaExporter() override;
 
-  void WriteData() VTK_OVERRIDE;
+  void WriteData() override;
 
   /////////////////////////////////////////////////////////////////////////////
 

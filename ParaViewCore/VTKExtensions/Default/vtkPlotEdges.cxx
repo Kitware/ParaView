@@ -46,7 +46,7 @@ class Segment : public vtkObject
 {
   vtkTypeMacro(Segment, vtkObject);
   static Segment* New();
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetObjectMacro(PolyData, vtkPolyData);
   vtkGetObjectMacro(PolyData, vtkPolyData);

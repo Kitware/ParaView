@@ -32,18 +32,18 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTimeStepProgressFilter : public vtkTab
 public:
   static vtkTimeStepProgressFilter* New();
   vtkTypeMacro(vtkTimeStepProgressFilter, vtkTableAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkTimeStepProgressFilter();
   ~vtkTimeStepProgressFilter() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   double TimeRange[2];
   double* TimeSteps;

@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkVRMLSource : public vtkMultiBlockDataS
 {
 public:
   vtkTypeMacro(vtkVRMLSource, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkVRMLSource* New();
 
   //@{
@@ -69,7 +69,7 @@ protected:
   vtkVRMLSource();
   ~vtkVRMLSource() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   void InitializeImporter();
   void CopyImporterToOutputs(vtkMultiBlockDataSet*);

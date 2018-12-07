@@ -70,7 +70,7 @@ class vtkGMVReader : public vtkMultiBlockDataSetAlgorithm
 public:
   static vtkGMVReader* New();
   vtkTypeMacro(vtkGMVReader, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Specify file name of GMV datafile to read
@@ -203,9 +203,8 @@ protected:
   vtkGMVReader();
   ~vtkGMVReader() override;
   // int ProcessRequest( vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   // Setup the output with no data available.  Used in error cases.
   void SetupEmptyOutput();

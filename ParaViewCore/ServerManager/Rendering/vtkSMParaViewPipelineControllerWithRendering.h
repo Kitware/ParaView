@@ -47,7 +47,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMParaViewPipelineControllerWithRend
 public:
   static vtkSMParaViewPipelineControllerWithRendering* New();
   vtkTypeMacro(vtkSMParaViewPipelineControllerWithRendering, vtkSMParaViewPipelineController);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Show the output data in the view. If data cannot be shown in the view,
@@ -148,7 +148,7 @@ public:
    * overrides, we must keep such overrides to a minimal and opting for domains
    * that set appropriate defaults where as much as possible.
    */
-  bool RegisterRepresentationProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
+  bool RegisterRepresentationProxy(vtkSMProxy* proxy) override;
 
   /**
    * Control how scalar bar visibility is updated by the Hide call.
@@ -169,13 +169,13 @@ public:
   /**
    * Overridden to handle default ColorArrayName for representations correctly.
    */
-  bool PostInitializeProxy(vtkSMProxy* proxy) VTK_OVERRIDE;
+  bool PostInitializeProxy(vtkSMProxy* proxy) override;
 
   //@{
   /**
    * Overridden to place the view in a layout on creation.
    */
-  bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname) VTK_OVERRIDE;
+  bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname) override;
   using Superclass::RegisterViewProxy;
   //@}
 

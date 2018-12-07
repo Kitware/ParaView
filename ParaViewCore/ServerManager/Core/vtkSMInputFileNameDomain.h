@@ -36,11 +36,11 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputFileNameDomain : public vtkSMStrin
 public:
   static vtkSMInputFileNameDomain* New();
   vtkTypeMacro(vtkSMInputFileNameDomain, vtkSMStringListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Update self checking the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
   vtkGetMacro(FileName, std::string);
 
@@ -50,7 +50,7 @@ public:
    * depends on the filename of the source.
    * Returns 1 if the domain updated the property.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
 protected:
   vtkSMInputFileNameDomain();

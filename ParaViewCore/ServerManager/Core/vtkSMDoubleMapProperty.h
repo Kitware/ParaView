@@ -33,7 +33,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDoubleMapProperty : public vtkSMMapProp
 public:
   static vtkSMDoubleMapProperty* New();
   vtkTypeMacro(vtkSMDoubleMapProperty, vtkSMMapProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Sets the number of components.
@@ -88,7 +88,7 @@ public:
   /**
    * Returns the number of elements.
    */
-  vtkIdType GetNumberOfElements() VTK_OVERRIDE;
+  vtkIdType GetNumberOfElements() override;
 
   /**
    * Returns true if the property has an element with the given index
@@ -111,28 +111,28 @@ public:
   /**
    * Copy all property values.
    */
-  void Copy(vtkSMProperty* src) VTK_OVERRIDE;
+  void Copy(vtkSMProperty* src) override;
 
   /**
    * For properties that support specifying defaults in XML configuration, this
    * method will reset the property value to the default values specified in the
    * XML.
    */
-  void ResetToXMLDefaults() VTK_OVERRIDE;
+  void ResetToXMLDefaults() override;
 
 protected:
   vtkSMDoubleMapProperty();
   ~vtkSMDoubleMapProperty() override;
 
-  void WriteTo(vtkSMMessage* msg) VTK_OVERRIDE;
+  void WriteTo(vtkSMMessage* msg) override;
 
   void ReadFrom(
-    const vtkSMMessage* message, int message_offset, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+    const vtkSMMessage* message, int message_offset, vtkSMProxyLocator* locator) override;
 
-  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) override;
 
-  void SaveStateValues(vtkPVXMLElement* propertyElement) VTK_OVERRIDE;
-  int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) VTK_OVERRIDE;
+  void SaveStateValues(vtkPVXMLElement* propertyElement) override;
+  int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader) override;
 
 private:
   vtkSMDoubleMapProperty(const vtkSMDoubleMapProperty&) = delete;

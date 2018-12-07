@@ -40,7 +40,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDiscreteDoubleDomain : public vtkSMDoma
 public:
   static vtkSMDiscreteDoubleDomain* New();
   vtkTypeMacro(vtkSMDiscreteDoubleDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns true if the value of the property is in the domain.
@@ -48,7 +48,7 @@ public:
    * vector value is in the domain, it returns 1. It returns
    * 0 otherwise.
    */
-  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) override;
 
   /**
    * Returns the vector of values.
@@ -63,7 +63,7 @@ public:
   /**
    * Updates this from the property.
    */
-  void Update(vtkSMProperty* property) VTK_OVERRIDE;
+  void Update(vtkSMProperty* property) override;
 
 protected:
   vtkSMDiscreteDoubleDomain();
@@ -72,7 +72,7 @@ protected:
   /**
    * Reads the "values" property, with a maximum of 256 values.
    */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   /**
    * A vector of allowed values for the domain.

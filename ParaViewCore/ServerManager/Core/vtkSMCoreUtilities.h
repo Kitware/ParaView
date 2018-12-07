@@ -33,7 +33,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCoreUtilities : public vtkObject
 public:
   static vtkSMCoreUtilities* New();
   vtkTypeMacro(vtkSMCoreUtilities, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Given a proxy (or proxy prototype), returns the name of the property that

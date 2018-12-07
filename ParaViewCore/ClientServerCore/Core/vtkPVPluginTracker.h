@@ -42,7 +42,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginTracker : public vtkObject
 public:
   static vtkPVPluginTracker* New();
   vtkTypeMacro(vtkPVPluginTracker, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Provides access to the singleton. This will create the vtkPVPluginTracker

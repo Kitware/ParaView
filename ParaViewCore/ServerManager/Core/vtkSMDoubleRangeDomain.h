@@ -45,7 +45,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDoubleRangeDomain : public vtkSMDomain
 public:
   static vtkSMDoubleRangeDomain* New();
   vtkTypeMacro(vtkSMDoubleRangeDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return a min. value if it exists. If the min. exists

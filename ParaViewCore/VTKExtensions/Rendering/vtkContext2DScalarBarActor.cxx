@@ -76,7 +76,7 @@ public:
   static vtkScalarBarItem* New() { VTK_OBJECT_FACTORY_NEW_BODY(vtkScalarBarItem); }
 
   // Forward calls to vtkContextItem::Paint to vtkContext2DScalarBarActor
-  bool Paint(vtkContext2D* painter) VTK_OVERRIDE
+  bool Paint(vtkContext2D* painter) override
   {
     bool somethingRendered = false;
     if (this->Actor)

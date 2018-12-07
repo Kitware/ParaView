@@ -38,7 +38,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIProperty : public vtkObject
 public:
   static vtkSIProperty* New();
   vtkTypeMacro(vtkSIProperty, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

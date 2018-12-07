@@ -56,7 +56,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkLiveInsituLink : public vtkSMObject
 public:
   static vtkLiveInsituLink* New();
   vtkTypeMacro(vtkLiveInsituLink, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

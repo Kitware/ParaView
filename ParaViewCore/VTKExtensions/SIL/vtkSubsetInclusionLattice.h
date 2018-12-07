@@ -78,7 +78,7 @@ class VTKPVVTKEXTENSIONSSIL_EXPORT vtkSubsetInclusionLattice : public vtkObject
 public:
   static vtkSubsetInclusionLattice* New();
   vtkTypeMacro(vtkSubsetInclusionLattice, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Initializes the SIL.
@@ -272,7 +272,7 @@ public:
    * Overridden to modify SelectionChangeTime, since any time the SIL structure
    * is modified, it's akin to selection states being modified.
    */
-  void Modified() VTK_OVERRIDE;
+  void Modified() override;
 
   /**
    * Key used to provide an instance of vtkSubsetInclusionLattice in the output

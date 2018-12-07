@@ -54,7 +54,7 @@ public:
   vtkSetObjectMacro(PrimaryRenderer, vtkRenderer);
   vtkSetMacro(View, vtkPVOrthographicSliceView*);
 
-  void OnLeftButtonDown() VTK_OVERRIDE
+  void OnLeftButtonDown() override
   {
     this->Superclass::OnLeftButtonDown();
 
@@ -72,7 +72,7 @@ public:
       this->ClickCounter = 0;
     }
   }
-  void OnLeftButtonUp() VTK_OVERRIDE
+  void OnLeftButtonUp() override
   {
     this->Superclass::OnLeftButtonUp();
 
@@ -103,8 +103,8 @@ public:
   }
 
   // Disable wheel-to-zoom in this view.
-  void OnMouseWheelForward() VTK_OVERRIDE {}
-  void OnMouseWheelBackward() VTK_OVERRIDE {}
+  void OnMouseWheelForward() override {}
+  void OnMouseWheelBackward() override {}
 
 protected:
   vtkPVOrthographicSliceViewInteractorStyle()
@@ -121,7 +121,7 @@ protected:
     this->SetPrimaryRenderer(NULL);
   }
 
-  vtkCameraManipulator* FindManipulator(int button, int shift, int control) VTK_OVERRIDE
+  vtkCameraManipulator* FindManipulator(int button, int shift, int control) override
   {
     if (this->CurrentRenderer == this->PrimaryRenderer)
     {

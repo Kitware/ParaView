@@ -33,7 +33,7 @@ class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIUnstructuredGridVolumeRepre
 public:
   static vtkSIUnstructuredGridVolumeRepresentationProxy* New();
   vtkTypeMacro(vtkSIUnstructuredGridVolumeRepresentationProxy, vtkSIProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSIUnstructuredGridVolumeRepresentationProxy();
@@ -42,7 +42,7 @@ protected:
   /**
    * Register the mappers
    */
-  bool CreateVTKObjects() VTK_OVERRIDE;
+  bool CreateVTKObjects() override;
 
 private:
   vtkSIUnstructuredGridVolumeRepresentationProxy(

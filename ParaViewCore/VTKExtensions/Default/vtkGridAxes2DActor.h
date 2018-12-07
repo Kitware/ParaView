@@ -51,7 +51,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkGridAxes2DActor : public vtkProp3D
 public:
   static vtkGridAxes2DActor* New();
   vtkTypeMacro(vtkGridAxes2DActor, vtkProp3D);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -205,7 +205,7 @@ public:
   /**
    * Returns the prop bounds.
    */
-  double* GetBounds() VTK_OVERRIDE
+  double* GetBounds() override
   {
     this->GetGridBounds(this->Bounds);
     return this->Bounds;
@@ -221,16 +221,16 @@ public:
   vtkBooleanMacro(ForceOpaque, bool);
   //@}
 
-  int RenderOpaqueGeometry(vtkViewport*) VTK_OVERRIDE;
-  int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  int RenderOverlay(vtkViewport* viewport) VTK_OVERRIDE;
-  int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
-  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport*) override;
+  int RenderTranslucentPolygonalGeometry(vtkViewport* viewport) override;
+  int RenderOverlay(vtkViewport* viewport) override;
+  int HasTranslucentPolygonalGeometry() override;
+  void ReleaseGraphicsResources(vtkWindow*) override;
 
   /**
    * Overridden to include the mtime for the text properties.
    */
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkGridAxes2DActor();

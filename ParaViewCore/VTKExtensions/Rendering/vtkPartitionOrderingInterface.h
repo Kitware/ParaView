@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPartitionOrderingInterface : public 
 public:
   vtkTypeMacro(vtkPartitionOrderingInterface, vtkObject);
 
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPartitionOrderingInterface* New();
 
   // the number of processes
@@ -74,7 +74,7 @@ public:
   vtkObject* GetImplementation() { return this->Implementation; }
   //@}
 
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkPartitionOrderingInterface();

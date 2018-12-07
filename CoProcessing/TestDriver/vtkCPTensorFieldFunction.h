@@ -29,7 +29,7 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPTensorFieldFunction : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPTensorFieldFunction, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Get the NumberOfComponents.  This is abstract to make sure

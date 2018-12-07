@@ -60,20 +60,20 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTCompositePass : public vtkRender
 public:
   static vtkIceTCompositePass* New();
   vtkTypeMacro(vtkIceTCompositePass, vtkRenderPass);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Perform rendering according to a render state \p s.
    * \pre s_exists: s!=0
    */
-  virtual void Render(const vtkRenderState* s) VTK_OVERRIDE;
+  virtual void Render(const vtkRenderState* s) override;
 
   /**
    * Release graphics resources and ask components to release their own
    * resources.
    * \pre w_exists: w!=0
    */
-  void ReleaseGraphicsResources(vtkWindow* w) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow* w) override;
 
   //@{
   /**

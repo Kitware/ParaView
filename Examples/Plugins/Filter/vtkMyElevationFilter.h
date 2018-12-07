@@ -30,7 +30,7 @@ class VTK_EXPORT vtkMyElevationFilter : public vtkElevationFilter
 public:
   static vtkMyElevationFilter* New();
   vtkTypeMacro(vtkMyElevationFilter, vtkElevationFilter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkMyElevationFilter();

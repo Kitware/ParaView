@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMInteractiveSelectionPipeline
 public:
   static vtkSMInteractiveSelectionPipeline* New();
   vtkTypeMacro(vtkSMInteractiveSelectionPipeline, vtkSMPreselectionPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkSMInteractiveSelectionPipeline* GetInstance();
 
 protected:

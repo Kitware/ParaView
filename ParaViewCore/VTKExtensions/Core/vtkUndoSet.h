@@ -44,7 +44,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkUndoSet : public vtkObject
 public:
   static vtkUndoSet* New();
   vtkTypeMacro(vtkUndoSet, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Perform an Undo.

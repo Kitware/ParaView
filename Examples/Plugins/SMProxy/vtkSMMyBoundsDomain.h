@@ -10,11 +10,11 @@ class vtkSMMyBoundsDomain : public vtkSMBoundsDomain
 public:
   static vtkSMMyBoundsDomain* New();
   vtkTypeMacro(vtkSMMyBoundsDomain, vtkSMBoundsDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // overload setting of default values so we can orient them
   // our way
-  void Update(vtkSMProperty* prop) VTK_OVERRIDE;
+  void Update(vtkSMProperty* prop) override;
 
 protected:
   vtkSMMyBoundsDomain();

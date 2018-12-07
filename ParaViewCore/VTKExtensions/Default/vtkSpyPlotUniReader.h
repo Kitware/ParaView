@@ -49,7 +49,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotUniReader : public vtkObject
 public:
   vtkTypeMacro(vtkSpyPlotUniReader, vtkObject);
   static vtkSpyPlotUniReader* New();
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

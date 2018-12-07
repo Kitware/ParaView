@@ -32,21 +32,18 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkOutlineRepresentation
 public:
   static vtkOutlineRepresentation* New();
   vtkTypeMacro(vtkOutlineRepresentation, vtkGeometryRepresentationWithFaces);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void SetRepresentation(const char*) VTK_OVERRIDE
-  {
-    this->Superclass::SetRepresentation("Wireframe");
-  }
-  void SetUseOutline(int) VTK_OVERRIDE { this->Superclass::SetUseOutline(1); }
-  void SetSuppressLOD(bool) VTK_OVERRIDE { this->Superclass::SetSuppressLOD(true); }
-  void SetPickable(int) VTK_OVERRIDE { this->Superclass::SetPickable(0); }
+  void SetRepresentation(const char*) override { this->Superclass::SetRepresentation("Wireframe"); }
+  void SetUseOutline(int) override { this->Superclass::SetUseOutline(1); }
+  void SetSuppressLOD(bool) override { this->Superclass::SetSuppressLOD(true); }
+  void SetPickable(int) override { this->Superclass::SetPickable(0); }
 
 protected:
   vtkOutlineRepresentation();
   ~vtkOutlineRepresentation() override;
 
-  void SetRepresentation(int) VTK_OVERRIDE { this->Superclass::SetRepresentation(WIREFRAME); }
+  void SetRepresentation(int) override { this->Superclass::SetRepresentation(WIREFRAME); }
 
 private:
   vtkOutlineRepresentation(const vtkOutlineRepresentation&) = delete;

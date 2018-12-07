@@ -73,7 +73,7 @@ public:
 
 protected:
   int RequestData(vtkInformation*, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE
+    vtkInformationVector* outputVector) override
   {
     vtkMultiBlockDataSet* inputMB = vtkMultiBlockDataSet::GetData(inputVector[0], 0);
     vtkMultiBlockDataSet* outputMB = vtkMultiBlockDataSet::GetData(outputVector, 0);
@@ -91,7 +91,7 @@ protected:
     return 1;
   }
 
-  int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE
+  int FillInputPortInformation(int, vtkInformation* info) override
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
     info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");

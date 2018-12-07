@@ -30,7 +30,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMTimeKeeperProxy : public vtkSMProxy
 public:
   static vtkSMTimeKeeperProxy* New();
   vtkTypeMacro(vtkSMTimeKeeperProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -131,7 +131,7 @@ protected:
   vtkSMTimeKeeperProxy();
   ~vtkSMTimeKeeperProxy() override;
 
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
 private:
   vtkSMTimeKeeperProxy(const vtkSMTimeKeeperProxy&) = delete;

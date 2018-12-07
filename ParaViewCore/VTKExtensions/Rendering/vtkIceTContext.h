@@ -53,7 +53,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTContext : public vtkObject
 public:
   vtkTypeMacro(vtkIceTContext, vtkObject);
   static vtkIceTContext* New();
-  virtual void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  virtual void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

@@ -39,7 +39,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMLiveInsituLinkProxy : public vtkSMProxy
 public:
   static vtkSMLiveInsituLinkProxy* New();
   vtkTypeMacro(vtkSMLiveInsituLinkProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -68,7 +68,7 @@ public:
   /**
    * Overridden to handle server-notification messages.
    */
-  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) override;
 
   /**
    * Push updated states from the client to the server in aggregate (originally,
@@ -83,7 +83,7 @@ protected:
 
   // overridden to ensure that we communicate the globalid for this proxy so
   // that the server-side can send messages to this proxy.
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
   void MarkStateDirty();
 

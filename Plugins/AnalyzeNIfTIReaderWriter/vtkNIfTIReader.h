@@ -39,30 +39,30 @@ class vtkNIfTIReader : public vtkImageReader
 public:
   static vtkNIfTIReader* New();
   vtkTypeMacro(vtkNIfTIReader, vtkImageReader);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description: is the given file name a png file?
-  int CanReadFile(const char* fname) VTK_OVERRIDE;
+  int CanReadFile(const char* fname) override;
 
   // Description:
   // Get the file extensions for this format.
   // Returns a string with a space separated list of extensions in
   // the format .extension
-  const char* GetFileExtensions() VTK_OVERRIDE { return ".nii .img .hdr"; }
+  const char* GetFileExtensions() override { return ".nii .img .hdr"; }
 
   // Description:
   // Return a descriptive name for the file format that might be useful in a GUI.
-  const char* GetDescriptiveName() VTK_OVERRIDE { return "NIfTI"; }
+  const char* GetDescriptiveName() override { return "NIfTI"; }
 
-  char* GetFileName() VTK_OVERRIDE { return (FileName); };
+  char* GetFileName() override { return (FileName); };
   unsigned int getImageSizeInBytes() { return (imageSizeInBytes); };
 
 protected:
   vtkNIfTIReader();
   ~vtkNIfTIReader() override;
 
-  void ExecuteInformation() VTK_OVERRIDE;
-  void ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo) VTK_OVERRIDE;
+  void ExecuteInformation() override;
+  void ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo) override;
 
 private:
   vtkNIfTIReader(const vtkNIfTIReader&) = delete;

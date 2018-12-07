@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVNullSource : public vtkLineSource
 public:
   static vtkPVNullSource* New();
   vtkTypeMacro(vtkPVNullSource, vtkLineSource);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVNullSource();

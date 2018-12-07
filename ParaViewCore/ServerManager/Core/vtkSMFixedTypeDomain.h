@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMFixedTypeDomain : public vtkSMDomain
 public:
   static vtkSMFixedTypeDomain* New();
   vtkTypeMacro(vtkSMFixedTypeDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns true if the value of the property is in the domain.
@@ -47,7 +47,7 @@ public:
    * has the same number of parts and data types as the old
    * (checked) one, it returns 1. Returns 0 otherwise.
    */
-  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) override;
 
   /**
    * Returns true if old and new source proxies have the same

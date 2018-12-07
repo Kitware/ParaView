@@ -34,7 +34,7 @@ class VTKPVCATALYST_EXPORT vtkCPCxxHelper : public vtkObject
 public:
   static vtkCPCxxHelper* New();
   vtkTypeMacro(vtkCPCxxHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkCPCxxHelper();

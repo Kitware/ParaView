@@ -34,7 +34,7 @@ class VTKPVANIMATION_EXPORT vtkPVCameraKeyFrame : public vtkPVKeyFrame
 public:
   static vtkPVCameraKeyFrame* New();
   vtkTypeMacro(vtkPVCameraKeyFrame, vtkPVKeyFrame);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * If the vtkPVCameraCueManipulator is in CAMERA mode, then this method is
@@ -43,11 +43,11 @@ public:
    * this method is called to allow the key frame to use vtkCameraInterpolator2
    * to do path-based interpolations for the camera.
    */
-  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) override;
 
   // Overridden, since these methods are not supported by this class.
-  void SetKeyValue(unsigned int, double) VTK_OVERRIDE {}
-  void SetKeyValue(double) VTK_OVERRIDE {}
+  void SetKeyValue(unsigned int, double) override {}
+  void SetKeyValue(double) override {}
   virtual double GetKeyValue(unsigned int) { return 0; }
 
   //@{

@@ -36,7 +36,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPExtentTranslator : public vtkExt
 public:
   static vtkPExtentTranslator* New();
   vtkTypeMacro(vtkPExtentTranslator, vtkExtentTranslator);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * If DataSet is topologically regular, each process will only know
@@ -50,7 +50,7 @@ protected:
   ~vtkPExtentTranslator() override;
   int PieceToExtentThreadSafe(int vtkNotUsed(piece), int vtkNotUsed(numPieces),
     int vtkNotUsed(ghostLevel), int* wholeExtent, int* resultExtent, int vtkNotUsed(splitMode),
-    int vtkNotUsed(byPoints)) VTK_OVERRIDE;
+    int vtkNotUsed(byPoints)) override;
 
 private:
   vtkPExtentTranslator(const vtkPExtentTranslator&) = delete;

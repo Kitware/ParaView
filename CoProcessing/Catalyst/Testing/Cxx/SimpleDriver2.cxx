@@ -26,7 +26,7 @@ class VTK_EXPORT vtkCPImplementedTestDriver : public vtkCPTestDriver
 public:
   static vtkCPImplementedTestDriver* New();
   vtkTypeMacro(vtkCPImplementedTestDriver, vtkCPTestDriver);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE
+  void PrintSelf(ostream& os, vtkIndent indent) override
   {
     this->Superclass::PrintSelf(os, indent);
   }

@@ -49,7 +49,7 @@ public:
   ~vtkSMMaterialObserver() {}
 
   void Execute(vtkObject* vtkNotUsed(caller), unsigned long vtkNotUsed(eventid),
-    void* vtkNotUsed(calldata)) VTK_OVERRIDE
+    void* vtkNotUsed(calldata)) override
   {
     this->Owner->CallMeSometime();
   }

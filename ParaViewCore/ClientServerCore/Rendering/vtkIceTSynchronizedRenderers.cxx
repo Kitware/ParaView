@@ -51,7 +51,7 @@ public:
   vtkRenderPass* DelegatePass;
   bool UseDepthBuffer;
 
-  virtual void Render(const vtkRenderState* render_state) VTK_OVERRIDE
+  virtual void Render(const vtkRenderState* render_state) override
   {
     vtkOpenGLClearErrorMacro();
     if (this->DelegatePass)
@@ -88,7 +88,7 @@ public:
 
   void SetUseDepthBuffer(bool useDB) { this->UseDepthBuffer = useDB; }
 
-  virtual void ReleaseGraphicsResources(vtkWindow* window) VTK_OVERRIDE
+  virtual void ReleaseGraphicsResources(vtkWindow* window) override
   {
     if (this->DelegatePass)
     {
@@ -128,7 +128,7 @@ public:
   vtkSetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
 
   virtual void GetTiledSizeAndOrigin(const vtkRenderState* render_state, int* width, int* height,
-    int* originX, int* originY) VTK_OVERRIDE
+    int* originX, int* originY) override
   {
     assert(this->IceTCompositePass != NULL);
     int tile_dims[2];
@@ -164,7 +164,7 @@ public:
     }
   }
 
-  virtual void ReleaseGraphicsResources(vtkWindow* window) VTK_OVERRIDE
+  virtual void ReleaseGraphicsResources(vtkWindow* window) override
   {
     if (this->IceTCompositePass)
     {
@@ -192,7 +192,7 @@ public:
   // Description:
   // Updates some IceT context parameters to suit ParaView's need esp. in
   // multi-view configuration.
-  virtual void SetupContext(const vtkRenderState* render_state) VTK_OVERRIDE
+  virtual void SetupContext(const vtkRenderState* render_state) override
   {
     vtkOpenGLClearErrorMacro();
     this->Superclass::SetupContext(render_state);

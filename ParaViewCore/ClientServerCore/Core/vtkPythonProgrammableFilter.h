@@ -50,7 +50,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonProgrammableFilter : public vtkP
 {
 public:
   vtkTypeMacro(vtkPythonProgrammableFilter, vtkProgrammableFilter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPythonProgrammableFilter* New();
 
   //@{
@@ -139,7 +139,7 @@ public:
    * Set the number of input ports
    * This function is explicitly exposed to enable a vtkClientServerInterpreter to call it
    */
-  void SetNumberOfInputPorts(int numberOfInputPorts) VTK_OVERRIDE
+  void SetNumberOfInputPorts(int numberOfInputPorts) override
   {
     this->Superclass::SetNumberOfInputPorts(numberOfInputPorts);
   }
@@ -165,30 +165,30 @@ protected:
    */
   void Exec(const char*, const char*);
 
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
   // overridden to allow multiple inputs to port 0
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   /**
    * Creates whatever output data set type is selected.
    */
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * We want to temporarilly cache request to be used in the Python
    * code so we override this method to store request for later use
    * since otherwise we won't have access to it.
    */
-  int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
-    vtkInformationVector* outInfo) VTK_OVERRIDE;
+  int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) override;
 
   char* Script;
   char* InformationScript;

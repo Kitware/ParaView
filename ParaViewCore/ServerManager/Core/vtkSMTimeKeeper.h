@@ -53,7 +53,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMTimeKeeper : public vtkObject
 public:
   static vtkSMTimeKeeper* New();
   vtkTypeMacro(vtkSMTimeKeeper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

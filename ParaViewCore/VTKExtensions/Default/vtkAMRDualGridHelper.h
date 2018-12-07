@@ -51,7 +51,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualGridHelper : public vtkObject
 public:
   static vtkAMRDualGridHelper* New();
   vtkTypeMacro(vtkAMRDualGridHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

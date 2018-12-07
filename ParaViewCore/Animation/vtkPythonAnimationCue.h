@@ -30,7 +30,7 @@ class VTKPVANIMATION_EXPORT vtkPythonAnimationCue : public vtkAnimationCue
 public:
   static vtkPythonAnimationCue* New();
   vtkTypeMacro(vtkPythonAnimationCue, vtkAnimationCue);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

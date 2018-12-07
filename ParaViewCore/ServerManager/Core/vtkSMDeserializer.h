@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializer : public vtkObject
 {
 public:
   vtkTypeMacro(vtkSMDeserializer, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Convenience method for setting the SessionProxyManager. This is equivalent

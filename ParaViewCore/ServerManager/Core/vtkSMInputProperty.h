@@ -42,7 +42,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputProperty : public vtkSMProxyProper
 public:
   static vtkSMInputProperty* New();
   vtkTypeMacro(vtkSMInputProperty, vtkSMProxyProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -102,13 +102,13 @@ protected:
    * Set the appropriate ivars from the xml element. Should
    * be overwritten by subclass if adding ivars.
    */
-  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProxy* parent, vtkPVXMLElement* element) override;
 
   /**
    * Fill state property/proxy XML element with output port attribute
    */
   vtkPVXMLElement* AddProxyElementState(
-    vtkPVXMLElement* propertyElement, unsigned int idx) VTK_OVERRIDE;
+    vtkPVXMLElement* propertyElement, unsigned int idx) override;
 
   int MultipleInput;
   int PortIndex;

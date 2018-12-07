@@ -39,7 +39,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkPVComparativeAnimationCue : public v
 public:
   static vtkPVComparativeAnimationCue* New();
   vtkTypeMacro(vtkPVComparativeAnimationCue, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

@@ -33,15 +33,14 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPUniformGridBuilder : public vtkCPGridB
 public:
   static vtkCPUniformGridBuilder* New();
   vtkTypeMacro(vtkCPUniformGridBuilder, vtkCPGridBuilder);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return a grid.  BuiltNewGrid is set to 0 if the grids
    * that were returned were already built before.
    * vtkCPUniformGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(
-    unsigned long timeStep, double time, int& builtNewGrid) VTK_OVERRIDE;
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   //@{
   /**

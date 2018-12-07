@@ -40,7 +40,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMContextViewProxy : public vtkSMVie
 public:
   static vtkSMContextViewProxy* New();
   vtkTypeMacro(vtkSMContextViewProxy, vtkSMViewProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Provides access to the vtk chart view.
@@ -56,7 +56,7 @@ public:
    * Return the render window from which offscreen rendering and interactor can
    * be accessed
    */
-  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
+  vtkRenderWindow* GetRenderWindow() override;
 
   /**
    * A client process need to set the interactor to enable interactivity. Use
@@ -64,12 +64,12 @@ public:
    * RenderView. This include changing the interactor style as well as
    * overriding VTK rendering to use the Proxy/ViewProxy API instead.
    */
-  void SetupInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void SetupInteractor(vtkRenderWindowInteractor* iren) override;
 
   /**
    * Returns the interactor.
    */
-  vtkRenderWindowInteractor* GetInteractor() VTK_OVERRIDE;
+  vtkRenderWindowInteractor* GetInteractor() override;
 
   /**
    * Resets the zoom level to 100%
@@ -83,7 +83,7 @@ public:
    * CreateDefaultRepresentation() will still work without regard for this
    * Plottable hint.
    */
-  bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  bool CanDisplayData(vtkSMSourceProxy* producer, int outputPort) override;
 
   vtkSelection* GetCurrentSelection();
 
@@ -91,7 +91,7 @@ protected:
   vtkSMContextViewProxy();
   ~vtkSMContextViewProxy() override;
 
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
   /**
    * Used to update the axis range properties on each interaction event.
@@ -116,12 +116,12 @@ protected:
    * Overridden to update ChartAxes ranges on every render. This ensures that
    * the property's values are up-to-date.
    */
-  void PostRender(bool interactive) VTK_OVERRIDE;
+  void PostRender(bool interactive) override;
 
   /**
    * Overridden to process the "skip_plotable_check" attribute.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
   /**
    * The context view that is used for all context derived charts.

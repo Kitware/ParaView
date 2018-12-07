@@ -131,7 +131,7 @@ A typical `RequestInformation` implementation will have the following form:
 
 @code{cpp}
 int vtkReader::RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) VTK_OVERRIDE
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector) override
 {
 
   if (/*filename changed*/)

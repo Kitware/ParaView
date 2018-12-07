@@ -33,13 +33,13 @@ class VTK_EXPORT vtkPVCustomTestDriver : public vtkCPTestDriver
 public:
   static vtkPVCustomTestDriver* New();
   vtkTypeMacro(vtkPVCustomTestDriver, vtkCPTestDriver);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Run the test driver with the coprocessor.
    * Returns 0 if there were no errors.
    */
-  virtual int Run() VTK_OVERRIDE;
+  virtual int Run() override;
 
   /**
    * Initialize the driver with the coprocessor.  fileName is the

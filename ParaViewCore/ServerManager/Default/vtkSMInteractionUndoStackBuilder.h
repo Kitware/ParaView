@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMInteractionUndoStackBuilder : public
 public:
   static vtkSMInteractionUndoStackBuilder* New();
   vtkTypeMacro(vtkSMInteractionUndoStackBuilder, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

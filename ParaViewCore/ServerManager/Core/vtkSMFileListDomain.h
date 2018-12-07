@@ -30,7 +30,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMFileListDomain : public vtkSMStringList
 public:
   static vtkSMFileListDomain* New();
   vtkTypeMacro(vtkSMFileListDomain, vtkSMStringListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSMFileListDomain();

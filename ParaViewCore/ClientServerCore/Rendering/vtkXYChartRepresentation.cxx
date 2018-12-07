@@ -48,7 +48,7 @@ protected:
 public:
   static SortTableFilter* New();
   int RequestData(
-    vtkInformation*, vtkInformationVector** inVector, vtkInformationVector* outVector) VTK_OVERRIDE
+    vtkInformation*, vtkInformationVector** inVector, vtkInformationVector* outVector) override
   {
     vtkTable* in = vtkTable::GetData(inVector[0], 0);
     vtkTable* out = vtkTable::GetData(outVector, 0);

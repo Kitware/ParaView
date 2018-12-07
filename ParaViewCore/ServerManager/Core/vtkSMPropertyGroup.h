@@ -30,7 +30,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyGroup : public vtkSMObject
 public:
   static vtkSMPropertyGroup* New();
   vtkTypeMacro(vtkSMPropertyGroup, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Sets the name of the property group to \p name.

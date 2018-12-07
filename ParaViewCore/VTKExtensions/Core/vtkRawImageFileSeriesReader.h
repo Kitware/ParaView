@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkRawImageFileSeriesReader : public vtkImag
 public:
   static vtkRawImageFileSeriesReader* New();
   vtkTypeMacro(vtkRawImageFileSeriesReader, vtkImageFileSeriesReader);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -58,7 +58,7 @@ protected:
    * Update the reader extent if the image file format does not know
    * what it is (e.g. the raw format). Here we pass in values set by the user.
    */
-  virtual void UpdateReaderDataExtent() VTK_OVERRIDE;
+  virtual void UpdateReaderDataExtent() override;
   //@}
 
   //@{

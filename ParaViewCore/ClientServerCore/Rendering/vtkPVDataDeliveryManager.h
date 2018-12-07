@@ -46,7 +46,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataDeliveryManager : public vt
 public:
   static vtkPVDataDeliveryManager* New();
   vtkTypeMacro(vtkPVDataDeliveryManager, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returned a hash number that can be used to verify that both client and

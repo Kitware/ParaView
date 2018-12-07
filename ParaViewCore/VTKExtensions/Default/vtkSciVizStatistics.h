@@ -52,7 +52,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSciVizStatistics : public vtkTableAlgo
 {
 public:
   vtkTypeMacro(vtkSciVizStatistics, vtkTableAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -144,15 +144,15 @@ protected:
   vtkSciVizStatistics();
   ~vtkSciVizStatistics() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
-  int ProcessRequest(vtkInformation* request, vtkInformationVector** input,
-    vtkInformationVector* output) VTK_OVERRIDE;
+  int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output) override;
   virtual int RequestDataObject(
     vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output);
-  int RequestData(vtkInformation* request, vtkInformationVector** input,
-    vtkInformationVector* output) VTK_OVERRIDE;
+  int RequestData(
+    vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output) override;
   virtual int RequestData(vtkCompositeDataSet* compDataOu, vtkCompositeDataSet* compModelOu,
     vtkCompositeDataSet* compDataIn, vtkCompositeDataSet* compModelIn, vtkDataObject* singleModel);
   virtual int RequestData(vtkDataObject* observationsOut, vtkDataObject* modelOut,

@@ -31,7 +31,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVJoystickFlyOut : public vtkPVJoyst
 public:
   static vtkPVJoystickFlyOut* New();
   vtkTypeMacro(vtkPVJoystickFlyOut, vtkPVJoystickFly);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVJoystickFlyOut();

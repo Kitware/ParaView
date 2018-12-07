@@ -39,7 +39,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginLoader : public vtkObject
 public:
   static vtkPVPluginLoader* New();
   vtkTypeMacro(vtkPVPluginLoader, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Tries to the load the plugin given the path to the plugin file.

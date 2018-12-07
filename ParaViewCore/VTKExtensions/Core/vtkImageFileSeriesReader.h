@@ -35,7 +35,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkImageFileSeriesReader : public vtkFileSer
 public:
   static vtkImageFileSeriesReader* New();
   vtkTypeMacro(vtkImageFileSeriesReader, vtkFileSeriesReader);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(ReadAsImageStack, bool);
   vtkGetMacro(ReadAsImageStack, bool);
@@ -46,7 +46,7 @@ public:
    * Overridden to directly call the internal reader after passing it the
    * correct filenames when ReadAsImageStack is true.
    */
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   //@}
 
 protected:

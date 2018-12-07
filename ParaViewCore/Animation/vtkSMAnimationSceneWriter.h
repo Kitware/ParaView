@@ -34,7 +34,7 @@ class VTKPVANIMATION_EXPORT vtkSMAnimationSceneWriter : public vtkSMSessionObjec
 {
 public:
   vtkTypeMacro(vtkSMAnimationSceneWriter, vtkSMSessionObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Convenience method to set the proxy.

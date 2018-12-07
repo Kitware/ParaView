@@ -36,7 +36,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVClientServerSynchronizedRendere
 public:
   static vtkPVClientServerSynchronizedRenderers* New();
   vtkTypeMacro(vtkPVClientServerSynchronizedRenderers, vtkSynchronizedRenderers);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // This flag is set by the renderer during still renderers. When set
@@ -68,7 +68,7 @@ protected:
    * the server. This ensures that any annotations rendered on the back of any
    * 3D geometry will be preserved.
    */
-  void PushImageToScreen() VTK_OVERRIDE;
+  void PushImageToScreen() override;
 
   //@{
   /**
@@ -81,9 +81,9 @@ protected:
   vtkUnsignedCharArray* Compress(vtkUnsignedCharArray*);
   void Decompress(vtkUnsignedCharArray* input, vtkUnsignedCharArray* outputBuffer);
 
-  void MasterEndRender() VTK_OVERRIDE;
-  void SlaveStartRender() VTK_OVERRIDE;
-  void SlaveEndRender() VTK_OVERRIDE;
+  void MasterEndRender() override;
+  void SlaveStartRender() override;
+  void SlaveEndRender() override;
 
   vtkImageCompressor* Compressor;
   bool LossLessCompression;

@@ -42,7 +42,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMNewWidgetRepresentationProxy : pub
 public:
   static vtkSMNewWidgetRepresentationProxy* New();
   vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -79,7 +79,7 @@ protected:
    * Overridden from vtkSMProxy to call BeginCreateVTKObjects() and
    * EndCreateVTKObjects().
    */
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
   vtkSMProxy* RepresentationProxy;
   vtkSMProxy* WidgetProxy;

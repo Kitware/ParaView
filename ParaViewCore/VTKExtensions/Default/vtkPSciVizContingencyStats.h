@@ -46,15 +46,15 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizContingencyStats : public vtkSc
 public:
   static vtkPSciVizContingencyStats* New();
   vtkTypeMacro(vtkPSciVizContingencyStats, vtkSciVizStatistics);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPSciVizContingencyStats();
   ~vtkPSciVizContingencyStats() override;
 
-  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) VTK_OVERRIDE;
+  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) override;
   int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) override;
 
 private:
   vtkPSciVizContingencyStats(const vtkPSciVizContingencyStats&) = delete;

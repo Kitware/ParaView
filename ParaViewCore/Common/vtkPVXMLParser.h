@@ -32,7 +32,7 @@ class VTKPVCOMMON_EXPORT vtkPVXMLParser : public vtkXMLParser
 {
 public:
   vtkTypeMacro(vtkPVXMLParser, vtkXMLParser);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVXMLParser* New();
 
   /**
@@ -70,9 +70,9 @@ protected:
 
   int SuppressErrorMessages;
 
-  void StartElement(const char* name, const char** atts) VTK_OVERRIDE;
-  void EndElement(const char* name) VTK_OVERRIDE;
-  void CharacterDataHandler(const char* data, int length) VTK_OVERRIDE;
+  void StartElement(const char* name, const char** atts) override;
+  void EndElement(const char* name) override;
+  void CharacterDataHandler(const char* data, int length) override;
 
   void AddElement(vtkPVXMLElement* element);
   void PushOpenElement(vtkPVXMLElement* element);
@@ -91,10 +91,10 @@ protected:
 
   // Called by Parse() to read the stream and call ParseBuffer.  Can
   // be replaced by subclasses to change how input is read.
-  int ParseXML() VTK_OVERRIDE;
+  int ParseXML() override;
 
   // Overridden to implement the SuppressErrorMessages feature.
-  void ReportXmlParseError() VTK_OVERRIDE;
+  void ReportXmlParseError() override;
 
 private:
   vtkPVXMLParser(const vtkPVXMLParser&) = delete;

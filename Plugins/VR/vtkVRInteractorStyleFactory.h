@@ -44,7 +44,7 @@ class vtkVRInteractorStyleFactory : public vtkObject
 public:
   static vtkVRInteractorStyleFactory* New();
   vtkTypeMacro(vtkVRInteractorStyleFactory, vtkObject) void PrintSelf(
-    ostream& os, vtkIndent indent) VTK_OVERRIDE;
+    ostream& os, vtkIndent indent) override;
 
   // Description:
   // Get the singleton instance of this class

@@ -33,7 +33,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIProxyProperty : public vtkSIProp
 public:
   static vtkSIProxyProperty* New();
   vtkTypeMacro(vtkSIProxyProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -66,12 +66,12 @@ protected:
   /**
    * Push a new state to the underneath implementation
    */
-  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) override;
 
   /**
    * Parse the xml for the property.
    */
-  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) override;
 
   //@{
   /**

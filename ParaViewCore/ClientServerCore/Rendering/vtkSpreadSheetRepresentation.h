@@ -41,7 +41,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetRepresentation
 public:
   static vtkSpreadSheetRepresentation* New();
   vtkTypeMacro(vtkSpreadSheetRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Overridden to update state of `GenerateCellConnectivity` and `FieldAssociation`
@@ -53,7 +53,7 @@ public:
   /**
    * Since this has no delivery, just mark ourselves modified.
    */
-  void MarkModified() VTK_OVERRIDE { this->Superclass::MarkModified(); }
+  void MarkModified() override { this->Superclass::MarkModified(); }
 
   vtkAlgorithmOutput* GetDataProducer();
   vtkAlgorithmOutput* GetExtractedDataProducer();
@@ -88,12 +88,12 @@ protected:
   /**
    * Fill input port information.
    */
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   /**
    * Overridden to invoke vtkCommand::UpdateDataEvent.
    */
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkNew<vtkCleanArrays> CleanArrays;
   vtkNew<vtkBlockDeliveryPreprocessor> DataConditioner;

@@ -55,7 +55,7 @@ public:
 
   static vtkUndoStack* New();
   vtkTypeMacro(vtkUndoStack, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Push an undo set on the Undo stack. This will clear

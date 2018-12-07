@@ -34,12 +34,12 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSICompoundSourceProxy : public vtk
 public:
   static vtkSICompoundSourceProxy* New();
   vtkTypeMacro(vtkSICompoundSourceProxy, vtkSISourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the vtkAlgorithmOutput for an output port, if valid.
    */
-  vtkAlgorithmOutput* GetOutputPort(int port) VTK_OVERRIDE;
+  vtkAlgorithmOutput* GetOutputPort(int port) override;
 
 protected:
   vtkSICompoundSourceProxy();
@@ -48,12 +48,12 @@ protected:
   /**
    * Read xml-attributes.
    */
-  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) override;
 
   /**
    * Create the output ports and add post filters for each output port.
    */
-  bool CreateOutputPorts() VTK_OVERRIDE;
+  bool CreateOutputPorts() override;
 
 private:
   vtkSICompoundSourceProxy(const vtkSICompoundSourceProxy&) = delete;

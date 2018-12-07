@@ -42,7 +42,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMRStreamingPriorityQueue : publi
 public:
   static vtkAMRStreamingPriorityQueue* New();
   vtkTypeMacro(vtkAMRStreamingPriorityQueue, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

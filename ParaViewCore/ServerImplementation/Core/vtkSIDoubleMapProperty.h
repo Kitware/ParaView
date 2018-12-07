@@ -30,15 +30,15 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIDoubleMapProperty : public vtkSI
 public:
   static vtkSIDoubleMapProperty* New();
   vtkTypeMacro(vtkSIDoubleMapProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkGetStringMacro(CleanCommand) vtkSetStringMacro(CleanCommand)
 
     protected : vtkSIDoubleMapProperty();
   ~vtkSIDoubleMapProperty() override;
 
-  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
-  bool ReadXMLAttributes(vtkSIProxy* parent, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) override;
+  bool ReadXMLAttributes(vtkSIProxy* parent, vtkPVXMLElement* element) override;
 
   unsigned int NumberOfComponents;
   char* CleanCommand;
