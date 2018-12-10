@@ -5066,6 +5066,7 @@ array.
           <Entry value="9" text="UnsignedLong"/>
           <Entry value="10" text="Float"/>
           <Entry value="11" text="Double"/>
+          <Entry value="12" text="vtkIdType"/>
         </EnumerationDomain>
         <Documentation>
           Specify the type of array to create (all components of this
