@@ -3,7 +3,7 @@
   <pqevent object="" command="comment" arguments="re-using the input file committed for VTK testing from ExternalData/VTK/Testing/Data" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/nanowireTB23K298.xyz" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/nanowireTB23K298.xyz" />
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCurrent" arguments="1.0" />
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="setCheckState" arguments="1.0,0" />
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />

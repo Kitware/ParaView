@@ -32,7 +32,7 @@
 
   <!-- Try loading/saving server configurations that define UI interfaces -->
     <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/load" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqServerConnectDialog/LoadServerConfigurationDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/servers-wiki.pvsc" />
+    <pqevent object="pqClientMainWindow/pqServerConnectDialog/LoadServerConfigurationDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/servers-wiki.pvsc" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mousePress" arguments="1,1,0,64,12,/0:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseRelease" arguments="1,0,0,64,12,/0:0" />
   <pqevent object="pqClientMainWindow/pqServerConnectDialog/stackedWidget/page_choose/servers" command="mouseDblClick" arguments="1,1,0,64,12,/0:0" />

@@ -5,7 +5,7 @@
   <pqevent object="TraceOptionsDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/can.ex2" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ApplyDisplacements/CheckBox" command="set_boolean" arguments="false" />
@@ -78,7 +78,7 @@
   <!-- I'm skipping the actual compare right now. We need to fix how charts
        render with mag>1, and also the fact that the spreadsheet header is too wide. -->
   <!--
-  <pqcompareview image="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TraceMultiViewsScreenshot.png" />
+  <pqcompareview image="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TraceMultiViewsScreenshot.png" />
   -->
 
   <!-- now reset session and  load the state file -->

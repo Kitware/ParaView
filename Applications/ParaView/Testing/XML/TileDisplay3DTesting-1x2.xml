@@ -69,6 +69,6 @@
 <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-Tile0.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-Tile1.png" />
+<pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TileDisplay3DTesting-1x2-Tile0.png" />
+<pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TileDisplay3DTesting-1x2-Tile1.png" />
 </pqevents>

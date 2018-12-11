@@ -13,7 +13,7 @@ undo for changes in the "View Settings" dialog.
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/ImportButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/filters.xml" />  
+  <pqevent object="pqClientMainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/filters.xml" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
