@@ -1,0 +1,5 @@
+NAME
+  ParaView::nvpipe
+LIBRARY_NAME
+  vtknvpipe
+THIRD_PARTY
