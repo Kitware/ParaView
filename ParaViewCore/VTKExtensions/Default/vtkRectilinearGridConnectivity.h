@@ -96,7 +96,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkRectilinearGridConnectivity
 public:
   vtkTypeMacro(vtkRectilinearGridConnectivity, vtkMultiBlockDataSetAlgorithm);
   static vtkRectilinearGridConnectivity* New();
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -162,10 +162,10 @@ protected:
   vtkRectilinearGridConnectivityFaceHash* FaceHash;
   vtkRectilinearGridConnectivityInternal* Internal;
 
-  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
-  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() override;
+  int FillInputPortInformation(int, vtkInformation*) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   // ---------------------------------------------------------------------- //
   // --------------------------- Volume  arrays --------------------------- //

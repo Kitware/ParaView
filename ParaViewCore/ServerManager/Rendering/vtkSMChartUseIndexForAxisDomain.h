@@ -40,7 +40,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartUseIndexForAxisDomain : publi
 public:
   static vtkSMChartUseIndexForAxisDomain* New();
   vtkTypeMacro(vtkSMChartUseIndexForAxisDomain, vtkSMBooleanDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set the default values for the property.
@@ -49,14 +49,14 @@ public:
    * e.g. XArrayName property has one of the known types of arrays, otherwise it
    * must be ON.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
   /**
    * Overridden to fire DomainModified when the required property changes. This ensures
    * that SetDefaultValues() is called during proxy post-initialization after the required
    * property has been reset to default.
    */
-  void Update(vtkSMProperty* requestingProperty) VTK_OVERRIDE;
+  void Update(vtkSMProperty* requestingProperty) override;
 
 protected:
   vtkSMChartUseIndexForAxisDomain();

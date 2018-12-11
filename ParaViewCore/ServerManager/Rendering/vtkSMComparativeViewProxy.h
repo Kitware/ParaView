@@ -38,12 +38,12 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMComparativeViewProxy : public vtkS
 public:
   static vtkSMComparativeViewProxy* New();
   vtkTypeMacro(vtkSMComparativeViewProxy, vtkSMViewProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Updates the data pipelines for all visible representations.
    */
-  void Update() VTK_OVERRIDE;
+  void Update() override;
 
   /**
    * Get all the internal views. The views should only be used to be laid out
@@ -61,21 +61,21 @@ public:
    * Dirty means this algorithm will execute during next update.
    * This all marks all consumers as dirty.
    */
-  void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
+  void MarkDirty(vtkSMProxy* modifiedProxy) override;
 
   /**
    * Overridden to forward the call to the internal root view proxy.
    */
-  const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) VTK_OVERRIDE;
+  const char* GetRepresentationType(vtkSMSourceProxy* producer, int outputPort) override;
 
   /**
    * Returns the render-window used by the root view, if any.
    */
-  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE
+  vtkRenderWindow* GetRenderWindow() override
   {
     return this->GetRootView() ? this->GetRootView()->GetRenderWindow() : NULL;
   }
-  vtkRenderWindowInteractor* GetInteractor() VTK_OVERRIDE
+  vtkRenderWindowInteractor* GetInteractor() override
   {
     return this->GetRootView() ? this->GetRootView()->GetInteractor() : NULL;
   }
@@ -85,13 +85,13 @@ public:
    * raise an error. Client code should set up interactor for each of the
    * internal views explicitly.
    */
-  void SetupInteractor(vtkRenderWindowInteractor* iren) VTK_OVERRIDE;
+  void SetupInteractor(vtkRenderWindowInteractor* iren) override;
 
   /**
    * Overridden to call MakeRenderWindowInteractor() on each of the internal
    * views.
    */
-  bool MakeRenderWindowInteractor(bool quiet = false) VTK_OVERRIDE;
+  bool MakeRenderWindowInteractor(bool quiet = false) override;
 
 protected:
   vtkSMComparativeViewProxy();
@@ -101,11 +101,11 @@ protected:
    * Overridden to do the capturing of images from each of the internal views
    * and then stitching them together.
    */
-  vtkImageData* CaptureWindowInternal(int magX, int magY) VTK_OVERRIDE;
+  vtkImageData* CaptureWindowInternal(int magX, int magY) override;
 
   void InvokeConfigureEvent();
 
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
 private:
   vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&) = delete;

@@ -46,7 +46,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMRStreamingVolumeRepresentation
 public:
   static vtkAMRStreamingVolumeRepresentation* New();
   vtkTypeMacro(vtkAMRStreamingVolumeRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum ResamplingModes
   {
@@ -75,13 +75,13 @@ public:
    * Overridden to skip processing when visibility if off.
    */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
    * representation of false, all view passes are ignored.
    */
-  void SetVisibility(bool val) VTK_OVERRIDE;
+  void SetVisibility(bool val) override;
 
   /**
    * Get/Set the resample buffer size. This controls the resolution at which the
@@ -103,19 +103,19 @@ public:
    * Set the input data arrays that this algorithm will process.
    */
   void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, const char* name) VTK_OVERRIDE;
+    int idx, int port, int connection, int fieldAssociation, const char* name) override;
   void SetInputArrayToProcess(
-    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) VTK_OVERRIDE
+    int idx, int port, int connection, int fieldAssociation, int fieldAttributeType) override
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, fieldAttributeType);
   }
-  void SetInputArrayToProcess(int idx, vtkInformation* info) VTK_OVERRIDE
+  void SetInputArrayToProcess(int idx, vtkInformation* info) override
   {
     this->Superclass::SetInputArrayToProcess(idx, info);
   }
   void SetInputArrayToProcess(int idx, int port, int connection, const char* fieldAssociation,
-    const char* attributeTypeorName) VTK_OVERRIDE
+    const char* attributeTypeorName) override
   {
     this->Superclass::SetInputArrayToProcess(
       idx, port, connection, fieldAssociation, attributeTypeorName);
@@ -159,19 +159,19 @@ protected:
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   /**
    * Fill input port information.
    */
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   /**
    * Overridden to check if the input pipeline is streaming capable. This method
@@ -179,7 +179,7 @@ protected:
    * and the input pipeline provides necessary AMR meta-data.
    */
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * Setup the block request. During StreamingUpdate, this will request the
@@ -189,14 +189,14 @@ protected:
    * that read only the root block (or a few more) in that case.
    */
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * Process the current input for volume rendering (if anything).
    * When not in StreamingUpdate, this also initializes the priority queue since
    * the input AMR may have totally changed, including its structure.
    */
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   //@{
   /**

@@ -39,7 +39,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCompositeDataToUnstructuredGridFilte
 public:
   static vtkCompositeDataToUnstructuredGridFilter* New();
   vtkTypeMacro(vtkCompositeDataToUnstructuredGridFilter, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -69,9 +69,9 @@ protected:
    * This is the method you should override.
    */
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   /**
    * Remove point/cell arrays not present on all processes.

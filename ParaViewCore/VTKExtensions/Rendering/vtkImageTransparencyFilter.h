@@ -39,14 +39,14 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkImageTransparencyFilter : public vtk
 public:
   static vtkImageTransparencyFilter* New();
   vtkTypeMacro(vtkImageTransparencyFilter, vtkImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
 protected:
   // Override to set two inputs
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
 protected:
   vtkImageTransparencyFilter();

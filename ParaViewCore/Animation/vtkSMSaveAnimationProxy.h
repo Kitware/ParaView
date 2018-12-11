@@ -40,7 +40,7 @@ class VTKPVANIMATION_EXPORT vtkSMSaveAnimationProxy : public vtkSMSaveScreenshot
 public:
   static vtkSMSaveAnimationProxy* New();
   vtkTypeMacro(vtkSMSaveAnimationProxy, vtkSMSaveScreenshotProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Save animation as images/video. The properties on this proxy provide all
@@ -65,12 +65,12 @@ protected:
   /**
    * Prepares for saving animation.
    */
-  bool Prepare() VTK_OVERRIDE;
+  bool Prepare() override;
 
   /**
    * This restores the state after saving the animation.
    */
-  bool Cleanup() VTK_OVERRIDE;
+  bool Cleanup() override;
 
   /**
    * Change "ImageResolution" property as needed for the file format requested.

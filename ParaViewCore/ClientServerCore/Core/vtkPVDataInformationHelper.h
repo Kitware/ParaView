@@ -36,7 +36,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVDataInformationHelper : public vtkOb
 {
 public:
   vtkTypeMacro(vtkPVDataInformationHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * This class is a friend of PVDI, so the work of copying

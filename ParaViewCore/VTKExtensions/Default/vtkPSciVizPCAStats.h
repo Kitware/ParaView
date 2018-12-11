@@ -54,7 +54,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizPCAStats : public vtkSciVizStat
 public:
   static vtkPSciVizPCAStats* New();
   vtkTypeMacro(vtkPSciVizPCAStats, vtkSciVizStatistics);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(NormalizationScheme, int);
   vtkGetMacro(NormalizationScheme, int);
@@ -76,9 +76,9 @@ protected:
   vtkPSciVizPCAStats();
   ~vtkPSciVizPCAStats() override;
 
-  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) VTK_OVERRIDE;
+  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) override;
   int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) override;
 
   int NormalizationScheme;
   int BasisScheme;

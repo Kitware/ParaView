@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizDescriptiveStats : public vtkSc
 public:
   static vtkPSciVizDescriptiveStats* New();
   vtkTypeMacro(vtkPSciVizDescriptiveStats, vtkSciVizStatistics);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(SignedDeviations, int);
   vtkGetMacro(SignedDeviations, int);
@@ -49,9 +49,9 @@ protected:
   vtkPSciVizDescriptiveStats();
   ~vtkPSciVizDescriptiveStats() override;
 
-  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) VTK_OVERRIDE;
+  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) override;
   int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) override;
 
   int SignedDeviations;
 

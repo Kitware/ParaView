@@ -35,7 +35,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderViewSettings : public vtk
 public:
   static vtkPVRenderViewSettings* New();
   vtkTypeMacro(vtkPVRenderViewSettings, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Access the singleton.

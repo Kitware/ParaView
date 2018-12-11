@@ -34,7 +34,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMMultiServerSourceProxy : public vtkS
 public:
   static vtkSMMultiServerSourceProxy* New();
   vtkTypeMacro(vtkSMMultiServerSourceProxy, vtkSMSourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Bind proxy with a given external proxy
@@ -49,7 +49,7 @@ public:
   /**
    * Marks the selection proxies dirty as well as chain to superclass.
    */
-  void MarkDirty(vtkSMProxy* modifiedProxy) VTK_OVERRIDE;
+  void MarkDirty(vtkSMProxy* modifiedProxy) override;
 
   /**
    * This method is used to initialise the object to the given state
@@ -58,7 +58,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* message, vtkSMProxyLocator* locator) override;
 
 protected:
   vtkSMMultiServerSourceProxy();

@@ -50,7 +50,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDomain : public vtkSMSessionObject
 {
 public:
   vtkTypeMacro(vtkSMDomain, vtkSMSessionObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Is the (unchecked) value of the property in the domain? Overwritten by

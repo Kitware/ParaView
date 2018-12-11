@@ -58,7 +58,7 @@ class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSReader : public vtkMultiBlockDa
 public:
   static vtkCGNSReader* New();
   vtkTypeMacro(vtkCGNSReader, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -257,10 +257,9 @@ protected:
   vtkCGNSReader();
   ~vtkCGNSReader() override;
 
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   vtkNew<vtkDataArraySelection> PointDataArraySelection;
   vtkNew<vtkDataArraySelection> CellDataArraySelection;

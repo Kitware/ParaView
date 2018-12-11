@@ -76,7 +76,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
 public:
   static vtkPVRenderView* New();
   vtkTypeMacro(vtkPVRenderView, vtkPVView);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum InteractionModes
   {
@@ -109,15 +109,15 @@ public:
    * must be called before calling any other methods on this class.
    * \note CallOnAllProcesses
    */
-  void Initialize(unsigned int id) VTK_OVERRIDE;
+  void Initialize(unsigned int id) override;
 
   //@{
   /**
    * Overridden to call InvalidateCachedSelection() whenever the render window
    * parameters change.
    */
-  void SetSize(int, int) VTK_OVERRIDE;
-  void SetPosition(int, int) VTK_OVERRIDE;
+  void SetSize(int, int) override;
+  void SetPosition(int, int) override;
   //@}
 
   //@{
@@ -157,7 +157,7 @@ public:
   /**
    * Returns the render window.
    */
-  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
+  vtkRenderWindow* GetRenderWindow() override;
 
   /**
    * Returns the interactor.
@@ -192,7 +192,7 @@ public:
    * \note Can be called on processes involved in rendering i.e those returned
    * by `this->GetStillRenderProcesses()`.
    */
-  void StillRender() VTK_OVERRIDE;
+  void StillRender() override;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
@@ -200,7 +200,7 @@ public:
    * \note Can be called on processes involved in rendering i.e those returned
    * by `this->GetInteractiveRenderProcesses()`.
    */
-  void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() override;
 
   //@{
   /**
@@ -675,7 +675,7 @@ public:
    * their inputs. Hence it's okay to do some extra inter-process communication
    * here.
    */
-  void Update() VTK_OVERRIDE;
+  void Update() override;
 
   /**
    * Asks representations to update their LOD geometries.
@@ -915,7 +915,7 @@ public:
    * For OSPRay, set the library of materials.
    */
   virtual void SetMaterialLibrary(vtkPVMaterialLibrary*);
-  void SetViewTime(double value) VTK_OVERRIDE;
+  void SetViewTime(double value) override;
   //@{
   /**
    * Set the size of OSPRay's temporal cache.
@@ -971,8 +971,8 @@ protected:
    * does any data-delivery, we don't assign IDs for these, nor affect the ID
    * uniquifier when a vtk3DWidgetRepresentation is added.
    */
-  void AddRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
-  void RemoveRepresentationInternal(vtkDataRepresentation* rep) VTK_OVERRIDE;
+  void AddRepresentationInternal(vtkDataRepresentation* rep) override;
+  void RemoveRepresentationInternal(vtkDataRepresentation* rep) override;
   //@}
 
   /**

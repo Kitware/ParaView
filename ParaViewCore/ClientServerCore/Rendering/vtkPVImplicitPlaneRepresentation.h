@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitPlaneRepresentation
 public:
   static vtkPVImplicitPlaneRepresentation* New();
   vtkTypeMacro(vtkPVImplicitPlaneRepresentation, vtkImplicitPlaneRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVImplicitPlaneRepresentation();

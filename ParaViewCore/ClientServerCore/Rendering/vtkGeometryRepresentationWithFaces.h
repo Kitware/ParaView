@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentationWithFaces
 public:
   static vtkGeometryRepresentationWithFaces* New();
   vtkTypeMacro(vtkGeometryRepresentationWithFaces, vtkGeometryRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum RepresentationTypesEx
   {
@@ -48,13 +48,13 @@ public:
    * PrepareForRendering.
    */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
   /**
    * Get/Set the visibility for this representation. When the visibility of
    * representation of false, all view passes are ignored.
    */
-  void SetVisibility(bool val) VTK_OVERRIDE;
+  void SetVisibility(bool val) override;
 
   //@{
   /**
@@ -80,26 +80,26 @@ protected:
    * they should call this method again in their constructor. It must be totally
    * safe to call this method repeatedly.
    */
-  void SetupDefaults() VTK_OVERRIDE;
+  void SetupDefaults() override;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   /**
    * Passes on parameters to vtkProperty and vtkMapper
    */
-  void UpdateColoringParameters() VTK_OVERRIDE;
+  void UpdateColoringParameters() override;
 
   vtkMapper* BackfaceMapper;
   vtkMapper* LODBackfaceMapper;

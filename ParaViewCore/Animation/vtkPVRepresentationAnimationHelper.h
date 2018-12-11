@@ -35,7 +35,7 @@ class VTKPVANIMATION_EXPORT vtkPVRepresentationAnimationHelper : public vtkSMPro
 public:
   static vtkPVRepresentationAnimationHelper* New();
   vtkTypeMacro(vtkPVRepresentationAnimationHelper, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

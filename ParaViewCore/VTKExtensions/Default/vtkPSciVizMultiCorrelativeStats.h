@@ -77,15 +77,15 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizMultiCorrelativeStats : public 
 public:
   static vtkPSciVizMultiCorrelativeStats* New();
   vtkTypeMacro(vtkPSciVizMultiCorrelativeStats, vtkSciVizStatistics);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPSciVizMultiCorrelativeStats();
   ~vtkPSciVizMultiCorrelativeStats() override;
 
-  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) VTK_OVERRIDE;
+  int LearnAndDerive(vtkMultiBlockDataSet* model, vtkTable* inData) override;
   int AssessData(
-    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) VTK_OVERRIDE;
+    vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model) override;
 
 private:
   vtkPSciVizMultiCorrelativeStats(const vtkPSciVizMultiCorrelativeStats&) = delete;

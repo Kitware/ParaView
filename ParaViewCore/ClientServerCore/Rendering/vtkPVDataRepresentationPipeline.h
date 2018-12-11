@@ -35,7 +35,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentationPipeline
 public:
   static vtkPVDataRepresentationPipeline* New();
   vtkTypeMacro(vtkPVDataRepresentationPipeline, vtkCompositeDataPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Expose `DataTime` timestamp. This gets changed anytime the `RequestData` is
@@ -48,18 +48,18 @@ protected:
   vtkPVDataRepresentationPipeline();
   ~vtkPVDataRepresentationPipeline() override;
 
-  int ForwardUpstream(int i, int j, vtkInformation* request) VTK_OVERRIDE;
-  int ForwardUpstream(vtkInformation* request) VTK_OVERRIDE;
+  int ForwardUpstream(int i, int j, vtkInformation* request) override;
+  int ForwardUpstream(vtkInformation* request) override;
 
   void ExecuteDataEnd(vtkInformation* request, vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+    vtkInformationVector* outInfoVec) override;
 
   // Override this check to account for update extent.
-  int NeedToExecuteData(int outputPort, vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+  int NeedToExecuteData(
+    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) override;
 
   int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+    vtkInformationVector* outInfoVec) override;
 
 private:
   vtkPVDataRepresentationPipeline(const vtkPVDataRepresentationPipeline&) = delete;

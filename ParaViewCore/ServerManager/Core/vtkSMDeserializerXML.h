@@ -36,7 +36,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializerXML : public vtkSMDeseriali
 public:
   static vtkSMDeserializerXML* New();
   vtkTypeMacro(vtkSMDeserializerXML, vtkSMDeserializer);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSMDeserializerXML();
@@ -48,7 +48,7 @@ protected:
   /**
    * Create a new proxy with the \c id if possible.
    */
-  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) override;
 
   /**
    * Locate the XML for the proxy with the given id.
@@ -67,7 +67,7 @@ protected:
    * simply asks the proxy manager to create a new proxy of the requested type.
    */
   vtkSMProxy* CreateProxy(
-    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL) VTK_OVERRIDE;
+    const char* xmlgroup, const char* xmlname, const char* subProxyName = NULL) override;
 
   /**
    * Called after a new proxy has been created. Gives the subclasses an

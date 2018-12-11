@@ -39,7 +39,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompoundSourceProxyDefinitionBuilder : 
 public:
   static vtkSMCompoundSourceProxyDefinitionBuilder* New();
   vtkTypeMacro(vtkSMCompoundSourceProxyDefinitionBuilder, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Resets the builder. This can be used when using the builder to create

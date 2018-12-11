@@ -106,7 +106,7 @@ protected:
   WindowToImageFilter() {}
   ~WindowToImageFilter() override {}
 
-  void Render() VTK_OVERRIDE
+  void Render() override
   {
     if (this->Parent)
     {

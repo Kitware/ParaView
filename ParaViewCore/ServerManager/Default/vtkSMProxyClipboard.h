@@ -48,7 +48,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMProxyClipboard : public vtkSMObject
 public:
   static vtkSMProxyClipboard* New();
   vtkTypeMacro(vtkSMProxyClipboard, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Put a proxy's state on the clipboard. Return true if the operation was

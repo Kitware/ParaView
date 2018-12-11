@@ -48,18 +48,18 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartSeriesListDomain : public vtk
 public:
   static vtkSMChartSeriesListDomain* New();
   vtkTypeMacro(vtkSMChartSeriesListDomain, vtkSMStringListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
   /**
    * Set the default values for the property.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
   /**
    * Returns the list of series that are know to this domain are are given a
@@ -77,7 +77,7 @@ protected:
    */
   vtkPVDataInformation* GetInputInformation();
 
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element) override;
 
   virtual void PopulateArrayComponents(vtkPVArrayInformation*, std::vector<vtkStdString>&);
 

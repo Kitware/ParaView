@@ -34,7 +34,7 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPTestDriver : public vtkObject
 public:
   static vtkCPTestDriver* New();
   vtkTypeMacro(vtkCPTestDriver, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Run the test driver.  Returns 0 if there were no errors.

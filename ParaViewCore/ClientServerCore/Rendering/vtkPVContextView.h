@@ -42,20 +42,20 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVContextView : public vtkPVView
 {
 public:
   vtkTypeMacro(vtkPVContextView, vtkPVView);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Triggers a high-resolution render.
    * \note CallOnAllProcesses
    */
-  void StillRender() VTK_OVERRIDE;
+  void StillRender() override;
 
   /**
    * Triggers a interactive render. Based on the settings on the view, this may
    * result in a low-resolution rendering or a simplified geometry rendering.
    * \note CallOnAllProcesses
    */
-  void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() override;
 
   //@{
   /**
@@ -70,7 +70,7 @@ public:
   virtual vtkAbstractContextItem* GetContextItem() = 0;
 
   //@{
-  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE { return this->RenderWindow; }
+  vtkRenderWindow* GetRenderWindow() override { return this->RenderWindow; }
   //@}
 
   //@{
@@ -88,13 +88,13 @@ public:
    * must be called before calling any other methods on this class.
    * \note CallOnAllProcesses
    */
-  void Initialize(unsigned int id) VTK_OVERRIDE;
+  void Initialize(unsigned int id) override;
 
   /**
    * Overridden to ensure that in multi-client configurations, same set of
    * representations are "dirty" on all processes to avoid race conditions.
    */
-  void Update() VTK_OVERRIDE;
+  void Update() override;
 
   /**
    * Representations can use this method to set the selection for a particular

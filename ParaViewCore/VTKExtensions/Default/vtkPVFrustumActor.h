@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVFrustumActor : public vtkOpenGLActor
 public:
   static vtkPVFrustumActor* New();
   vtkTypeMacro(vtkPVFrustumActor, vtkOpenGLActor);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Get/Set the frustum.

@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAllToNRedistributeCompositePolyData
 public:
   static vtkAllToNRedistributeCompositePolyData* New();
   vtkTypeMacro(vtkAllToNRedistributeCompositePolyData, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -55,13 +55,13 @@ protected:
    * in CreateDefaultExecutive() using NewInstance().
    * Otherwise, vtkStreamingDemandDrivenPipeline is created.
    */
-  virtual vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  virtual vtkExecutive* CreateDefaultExecutive() override;
 
   virtual int RequestDataObject(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
+  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int NumberOfProcesses;
   vtkMultiProcessController* Controller;

@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVPlane : public vtkPlane
 public:
   static vtkPVPlane* New();
   vtkTypeMacro(vtkPVPlane, vtkPlane);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -47,8 +47,8 @@ public:
    * Set/Get a transformation to apply to input points before
    * executing the implicit function.
    */
-  void SetTransform(vtkAbstractTransform*) VTK_OVERRIDE;
-  void SetTransform(const double elements[16]) VTK_OVERRIDE
+  void SetTransform(vtkAbstractTransform*) override;
+  void SetTransform(const double elements[16]) override
   {
     this->Superclass::SetTransform(elements);
   }
@@ -60,7 +60,7 @@ public:
    * any derived class.
    */
   using Superclass::EvaluateFunction;
-  double EvaluateFunction(double x[3]) VTK_OVERRIDE;
+  double EvaluateFunction(double x[3]) override;
 
   /**
    * Evaluate function gradient at position x-y-z and pass back vector.
@@ -68,7 +68,7 @@ public:
    * FunctionGradient() instead.  This method must be implemented by
    * any derived class.
    */
-  void EvaluateGradient(double x[3], double g[3]) VTK_OVERRIDE;
+  void EvaluateGradient(double x[3], double g[3]) override;
 
 protected:
   vtkPVPlane();

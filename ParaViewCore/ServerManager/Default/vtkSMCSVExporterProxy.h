@@ -33,18 +33,18 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCSVExporterProxy : public vtkSMExpor
 public:
   static vtkSMCSVExporterProxy* New();
   vtkTypeMacro(vtkSMCSVExporterProxy, vtkSMExporterProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Exports the view.
    */
-  void Write() VTK_OVERRIDE;
+  void Write() override;
 
   /**
    * Returns if the view can be exported.
    * Default implementation return true if the view is a render view.
    */
-  bool CanExport(vtkSMProxy*) VTK_OVERRIDE;
+  bool CanExport(vtkSMProxy*) override;
 
 protected:
   vtkSMCSVExporterProxy();

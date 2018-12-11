@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVEnSightMasterServerReader2
 public:
   static vtkPVEnSightMasterServerReader2* New();
   vtkTypeMacro(vtkPVEnSightMasterServerReader2, vtkPGenericEnSightReader);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -104,8 +104,8 @@ public:
    */
   void SetByteOrderToBigEndian();
   void SetByteOrderToLittleEndian();
-  void SetByteOrder(int byteOrder) VTK_OVERRIDE;
-  int GetByteOrder() VTK_OVERRIDE;
+  void SetByteOrder(int byteOrder) override;
+  int GetByteOrder() override;
   const char* GetByteOrderAsString();
   //@}
 
@@ -113,9 +113,8 @@ protected:
   vtkPVEnSightMasterServerReader2();
   ~vtkPVEnSightMasterServerReader2() override;
 
-  int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int ParseMasterServerFile();
 
   // The MPI controller used to communicate with the instances in

@@ -40,7 +40,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVDataSetAttributesInformation : publi
 public:
   static vtkPVDataSetAttributesInformation* New();
   vtkTypeMacro(vtkPVDataSetAttributesInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -75,7 +75,7 @@ public:
    * (same name and number of components)to be in final.
    */
   void AddInformation(vtkPVDataSetAttributesInformation* info);
-  void AddInformation(vtkPVInformation* info) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation* info) override;
   //@}
 
   /**
@@ -109,8 +109,8 @@ public:
   /**
    * Manage a serialized version of the information.
    */
-  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) override;
+  void CopyFromStream(const vtkClientServerStream*) override;
   //@}
 
 protected:

@@ -49,7 +49,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMProxyConfigurationReader : public vt
 public:
   static vtkSMProxyConfigurationReader* New();
   vtkTypeMacro(vtkSMProxyConfigurationReader, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

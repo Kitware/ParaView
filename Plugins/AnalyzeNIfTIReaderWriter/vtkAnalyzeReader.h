@@ -40,30 +40,30 @@ class vtkAnalyzeReader : public vtkImageReader
 public:
   static vtkAnalyzeReader* New();
   vtkTypeMacro(vtkAnalyzeReader, vtkImageReader);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description: is the given file name a png file?
-  int CanReadFile(const char* fname) VTK_OVERRIDE;
+  int CanReadFile(const char* fname) override;
 
   // Description:
   // Get the file extensions for this format.
   // Returns a string with a space separated list of extensions in
   // the format .extension
-  const char* GetFileExtensions() VTK_OVERRIDE { return ".img .hdr"; }
+  const char* GetFileExtensions() override { return ".img .hdr"; }
 
   // Description:
   // Return a descriptive name for the file format that might be useful in a GUI.
-  const char* GetDescriptiveName() VTK_OVERRIDE { return "Analyze"; }
+  const char* GetDescriptiveName() override { return "Analyze"; }
 
-  char* GetFileName() VTK_OVERRIDE { return (FileName); };
+  char* GetFileName() override { return (FileName); };
   unsigned int getImageSizeInBytes() { return (imageSizeInBytes); };
 
 protected:
   vtkAnalyzeReader();
   ~vtkAnalyzeReader() override;
 
-  void ExecuteInformation() VTK_OVERRIDE;
-  void ExecuteDataWithInformation(vtkDataObject* out, vtkInformation* outInfo) VTK_OVERRIDE;
+  void ExecuteInformation() override;
+  void ExecuteDataWithInformation(vtkDataObject* out, vtkInformation* outInfo) override;
 
 private:
   vtkAnalyzeReader(const vtkAnalyzeReader&) = delete;

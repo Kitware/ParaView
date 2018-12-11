@@ -35,18 +35,18 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMBooleanDomain : public vtkSMDomain
 public:
   static vtkSMBooleanDomain* New();
   vtkTypeMacro(vtkSMBooleanDomain, vtkSMDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns true if the property is a vtkSMIntVectorProperty.
    * Return 0 otherwise.
    */
-  int IsInDomain(vtkSMProperty* property) VTK_OVERRIDE;
+  int IsInDomain(vtkSMProperty* property) override;
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  void SetAnimationValue(vtkSMProperty* property, int idx, double value) VTK_OVERRIDE;
+  void SetAnimationValue(vtkSMProperty* property, int idx, double value) override;
 
 protected:
   vtkSMBooleanDomain();

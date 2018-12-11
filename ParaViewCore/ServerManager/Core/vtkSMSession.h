@@ -39,7 +39,7 @@ public:
   static vtkSMSession* New(vtkPVSessionBase* otherSession);
   static vtkSMSession* New(vtkPVSessionCore* otherSessionCore);
   vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //---------------------------------------------------------------------------
   // API for collaboration management
@@ -128,7 +128,7 @@ public:
   /**
    * Builtin session is always alive.
    */
-  bool GetIsAlive() VTK_OVERRIDE { return true; }
+  bool GetIsAlive() override { return true; }
 
   /**
    * Returns a ServerFlags indicate the nature of the current processes. e.g. if
@@ -137,23 +137,23 @@ public:
    * The implementation provided by this class returns
    * vtkPVSession::CLIENT_AND_SERVERS suitable for builtin-mode.
    */
-  ServerFlags GetProcessRoles() VTK_OVERRIDE;
+  ServerFlags GetProcessRoles() override;
 
   /**
    * Push the state message. Overridden to ensure that the information in the
    * undo-redo state manager is updated.
    */
-  void PushState(vtkSMMessage* msg) VTK_OVERRIDE;
+  void PushState(vtkSMMessage* msg) override;
 
   /**
    * Sends the message to all clients.
    */
-  void NotifyAllClients(const vtkSMMessage* msg) VTK_OVERRIDE { this->ProcessNotification(msg); }
+  void NotifyAllClients(const vtkSMMessage* msg) override { this->ProcessNotification(msg); }
 
   /**
    * Sends the message to all but the active client-session.
    */
-  void NotifyOtherClients(const vtkSMMessage*) VTK_OVERRIDE { /* nothing to do. */}
+  void NotifyOtherClients(const vtkSMMessage*) override { /* nothing to do. */}
 
   //---------------------------------------------------------------------------
   // API for Collaboration management

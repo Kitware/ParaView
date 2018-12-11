@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODVolume : public vtkVolume
 {
 public:
   vtkTypeMacro(vtkPVLODVolume, vtkVolume);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkPVLODVolume* New();
 
@@ -45,29 +45,29 @@ public:
   /**
    * This method is used internally by the rendering process.
    */
-  int RenderOpaqueGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  int RenderVolumetricGeometry(vtkViewport* viewport) VTK_OVERRIDE;
-  int RenderTranslucentPolygonalGeometry(vtkViewport*) VTK_OVERRIDE;
+  int RenderOpaqueGeometry(vtkViewport* viewport) override;
+  int RenderVolumetricGeometry(vtkViewport* viewport) override;
+  int RenderTranslucentPolygonalGeometry(vtkViewport*) override;
   //@}
 
   /**
    * Does this prop have some translucent polygonal geometry?
    */
-  int HasTranslucentPolygonalGeometry() VTK_OVERRIDE;
+  int HasTranslucentPolygonalGeometry() override;
 
   /**
    * Release any graphics resources that are being consumed by this actor.
    * The parameter window could be used to determine which graphic
    * resources to release.
    */
-  void ReleaseGraphicsResources(vtkWindow*) VTK_OVERRIDE;
+  void ReleaseGraphicsResources(vtkWindow*) override;
 
   //@{
   /**
    * Set the high res input.  Overloads the virtual vtkVolume method.
    */
   virtual void SetMapper(vtkAbstractVolumeMapper*);
-  vtkAbstractVolumeMapper* GetMapper() VTK_OVERRIDE;
+  vtkAbstractVolumeMapper* GetMapper() override;
   //@}
 
   //@{
@@ -81,22 +81,22 @@ public:
   /**
    * Sets the volume property.  Overloads the virtual vtkVolume method.
    */
-  virtual void SetProperty(vtkVolumeProperty* property) VTK_OVERRIDE;
+  virtual void SetProperty(vtkVolumeProperty* property) override;
 
   /**
    * Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
    */
-  void ShallowCopy(vtkProp* prop) VTK_OVERRIDE;
+  void ShallowCopy(vtkProp* prop) override;
 
   /**
    * Get the bounds of the current mapper.
    */
-  double* GetBounds() VTK_OVERRIDE;
+  double* GetBounds() override;
 
   /**
    * Overloads the virtual vtkProp method.
    */
-  void SetAllocatedRenderTime(double t, vtkViewport* v) VTK_OVERRIDE;
+  void SetAllocatedRenderTime(double t, vtkViewport* v) override;
 
   //@{
   /**

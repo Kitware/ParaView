@@ -49,13 +49,13 @@ public:
   static bool TestInternalClasses();
   static vtkSortedTableStreamer* New();
   vtkTypeMacro(vtkSortedTableStreamer, vtkTableAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   //@}
 
   /**
    * Only one input which is the table to sort
    */
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   //@{
   /**
@@ -105,7 +105,7 @@ protected:
   vtkSortedTableStreamer();
   ~vtkSortedTableStreamer() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   void CreateInternalIfNeeded(vtkTable* input, vtkDataArray* data);
   vtkDataArray* GetDataArrayToProcess(vtkTable* input);

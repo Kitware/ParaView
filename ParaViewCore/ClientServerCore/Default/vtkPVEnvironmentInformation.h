@@ -32,20 +32,20 @@ class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVEnvironmentInformation : public v
 public:
   static vtkPVEnvironmentInformation* New();
   vtkTypeMacro(vtkPVEnvironmentInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Transfer information about a single object into this object.
    * The object must be a vtkPVEnvironmentInformationHelper.
    */
-  void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* object) override;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) override;
+  void CopyFromStream(const vtkClientServerStream*) override;
   //@}
 
   //@{

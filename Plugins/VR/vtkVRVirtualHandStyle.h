@@ -47,7 +47,7 @@ class vtkVRVirtualHandStyle : public vtkVRTrackStyle
 public:
   static vtkVRVirtualHandStyle* New();
   vtkTypeMacro(vtkVRVirtualHandStyle, vtkVRTrackStyle);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkVRVirtualHandStyle();

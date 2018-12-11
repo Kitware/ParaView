@@ -53,7 +53,7 @@ class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkCGNSFileSeriesReader
 public:
   static vtkCGNSFileSeriesReader* New();
   vtkTypeMacro(vtkCGNSFileSeriesReader, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -105,7 +105,7 @@ public:
   /**
    * Overridden to setup the `Reader` and then forward the pass to the reader.
    */
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   //@{
   /**
@@ -123,7 +123,7 @@ protected:
   /**
    * Handles the RequestData pass.
    */
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Update `this->ActiveFiles`, a collection of files to be read to satisfy the

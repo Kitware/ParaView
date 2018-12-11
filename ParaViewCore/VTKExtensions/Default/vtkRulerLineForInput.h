@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkRulerLineForInput : public vtkPolyData
 {
 public:
   vtkTypeMacro(vtkRulerLineForInput, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkRulerLineForInput* New();
 
   enum class AxisType
@@ -60,11 +60,11 @@ protected:
   vtkRulerLineForInput();
   ~vtkRulerLineForInput() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestInformation(vtkInformation* request, vtkInformationVector** inVectors,
-    vtkInformationVector* outVector) VTK_OVERRIDE;
+    vtkInformationVector* outVector) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inVectors,
-    vtkInformationVector* outVector) VTK_OVERRIDE;
+    vtkInformationVector* outVector) override;
 
 private:
   vtkMultiProcessController* Controller;

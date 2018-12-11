@@ -34,7 +34,7 @@ class vtkAnalyzeWriter : public vtkImageWriter
 public:
   static vtkAnalyzeWriter* New();
   vtkTypeMacro(vtkAnalyzeWriter, vtkImageWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void SetFileType(int inValue);
   int getFileType();
@@ -45,8 +45,8 @@ protected:
   vtkAnalyzeWriter();
   ~vtkAnalyzeWriter() override;
 
-  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wExtent[6]) VTK_OVERRIDE;
-  void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) VTK_OVERRIDE;
+  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wExtent[6]) override;
+  void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) override;
 
 private:
   vtkAnalyzeWriter(const vtkAnalyzeWriter&) = delete;

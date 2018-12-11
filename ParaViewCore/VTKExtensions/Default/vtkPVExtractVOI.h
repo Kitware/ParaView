@@ -42,7 +42,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractVOI : public vtkDataSetAlgori
 public:
   static vtkPVExtractVOI* New();
   vtkTypeMacro(vtkPVExtractVOI, vtkDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -95,11 +95,9 @@ protected:
   vtkPVExtractVOI();
   ~vtkPVExtractVOI() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestUpdateExtent(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int VOI[6];
   int SampleRate[3];
@@ -109,7 +107,7 @@ protected:
   vtkExtractGrid* ExtractGrid;
   vtkExtractRectilinearGrid* ExtractRG;
 
-  void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) override;
 
 private:
   vtkPVExtractVOI(const vtkPVExtractVOI&) = delete;

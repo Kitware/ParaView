@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateFlowThroughSurface
 {
 public:
   vtkTypeMacro(vtkIntegrateFlowThroughSurface, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkIntegrateFlowThroughSurface* New();
 
 protected:
@@ -45,14 +45,13 @@ protected:
 
   // Usual data generation method
   // Usual data generation method
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestUpdateExtent(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   // Create a default executive.
-  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() override;
 
   vtkDataSet* GenerateSurfaceVectors(vtkDataSet* input);
 

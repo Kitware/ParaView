@@ -35,14 +35,13 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPMultiBlockGridBuilder : public vtkCPBa
 public:
   static vtkCPMultiBlockGridBuilder* New();
   vtkTypeMacro(vtkCPMultiBlockGridBuilder, vtkCPBaseGridBuilder);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return a grid.  BuiltNewGrid is 0 if the grid is the same
    * as the last time step.
    */
-  virtual vtkDataObject* GetGrid(
-    unsigned long timeStep, double time, int& builtNewGrid) VTK_OVERRIDE;
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   /**
    * Get the Grid.

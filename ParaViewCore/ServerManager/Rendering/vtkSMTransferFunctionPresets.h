@@ -42,7 +42,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTransferFunctionPresets : public v
 public:
   static vtkSMTransferFunctionPresets* New();
   vtkTypeMacro(vtkSMTransferFunctionPresets, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the number of presets current available (including builtin and

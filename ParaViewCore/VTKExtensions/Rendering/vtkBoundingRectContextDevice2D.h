@@ -58,7 +58,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBoundingRectContextDevice2D : public
 {
 public:
   vtkTypeMacro(vtkBoundingRectContextDevice2D, vtkContextDevice2D) void PrintSelf(
-    ostream& os, vtkIndent indent) VTK_OVERRIDE;
+    ostream& os, vtkIndent indent) override;
   static vtkBoundingRectContextDevice2D* New();
 
   /**
@@ -86,27 +86,27 @@ public:
   /**
    * Expand bounding box to contain the string's bounding box.
    */
-  void DrawString(float* point, const vtkStdString& string) VTK_OVERRIDE;
+  void DrawString(float* point, const vtkStdString& string) override;
 
   /**
    * Expand bounding box to contain the string's bounding box.
    */
-  void DrawString(float* point, const vtkUnicodeString& string) VTK_OVERRIDE;
+  void DrawString(float* point, const vtkUnicodeString& string) override;
 
   /**
    * Expand bounding box to contain the string's bounding box.
    */
-  void DrawMathTextString(float* point, const vtkStdString& string) VTK_OVERRIDE;
+  void DrawMathTextString(float* point, const vtkStdString& string) override;
 
   /**
    * Expand bounding box to contain the image's bounding box.
    */
-  void DrawImage(float p[2], float scale, vtkImageData* image) VTK_OVERRIDE;
+  void DrawImage(float p[2], float scale, vtkImageData* image) override;
 
   /**
    * Expand bounding box to contain the image's bounding box.
    */
-  void DrawImage(const vtkRectf& pos, vtkImageData* image) VTK_OVERRIDE;
+  void DrawImage(const vtkRectf& pos, vtkImageData* image) override;
 
   /**
    * Draw the supplied PolyData at the given x, y (p[0], p[1]) (bottom corner),
@@ -115,180 +115,180 @@ public:
    */
   void DrawPolyData(float vtkNotUsed(p)[2], float vtkNotUsed(scale),
     vtkPolyData* vtkNotUsed(polyData), vtkUnsignedCharArray* vtkNotUsed(colors),
-    int vtkNotUsed(scalarMode)) VTK_OVERRIDE
+    int vtkNotUsed(scalarMode)) override
   {
   }
 
   /**
    * Implement pure virtual member function. Does not affect bounding rect.
    */
-  void SetColor4(unsigned char color[4]) VTK_OVERRIDE;
+  void SetColor4(unsigned char color[4]) override;
 
   /**
    * Implement pure virtual member function. Does not affect bounding rect.
    */
-  void SetTexture(vtkImageData* image, int properties) VTK_OVERRIDE;
+  void SetTexture(vtkImageData* image, int properties) override;
 
   /**
    * Implement pure virtual member function. Does not affect bounding rect.
    */
-  void SetPointSize(float size) VTK_OVERRIDE;
+  void SetPointSize(float size) override;
 
   /**
    * Implement pure virtual member function. Forward line width to
    * delegate device.
    */
-  void SetLineWidth(float width) VTK_OVERRIDE;
+  void SetLineWidth(float width) override;
 
   /**
    * Implement pure virtual member function. Forward line type to
    * delegate device.
    */
-  void SetLineType(int type) VTK_OVERRIDE;
+  void SetLineType(int type) override;
 
   /**
    * Forward current matrix to delegate device.
    */
-  void SetMatrix(vtkMatrix3x3* m) VTK_OVERRIDE;
+  void SetMatrix(vtkMatrix3x3* m) override;
 
   /**
    * Get current matrix from delegate device.
    */
-  void GetMatrix(vtkMatrix3x3* m) VTK_OVERRIDE;
+  void GetMatrix(vtkMatrix3x3* m) override;
 
   /**
    * Multiply the current matrix in the delegate device by this one.
    */
-  void MultiplyMatrix(vtkMatrix3x3* m) VTK_OVERRIDE;
+  void MultiplyMatrix(vtkMatrix3x3* m) override;
 
   /**
    * Push matrix in the delegate device.
    */
-  void PushMatrix() VTK_OVERRIDE;
+  void PushMatrix() override;
 
   /**
    * Pope matrix from the delegate device.
    */
-  void PopMatrix() VTK_OVERRIDE;
+  void PopMatrix() override;
 
   /**
    * Implement pure virtual member function. Does nothing.
    */
-  void EnableClipping(bool enable) VTK_OVERRIDE;
+  void EnableClipping(bool enable) override;
 
   /**
    * Implement pure virtual member function. Does nothing.
    */
-  void SetClipping(int* x) VTK_OVERRIDE;
+  void SetClipping(int* x) override;
 
   /**
    * Forward the pen to the delegate device.
    */
-  void ApplyPen(vtkPen* pen) VTK_OVERRIDE;
+  void ApplyPen(vtkPen* pen) override;
 
   /**
    * Get the pen from the delegate device.
    */
-  vtkPen* GetPen() VTK_OVERRIDE;
+  vtkPen* GetPen() override;
 
   /**
    * Forward the brush to the delegate device.
    */
-  void ApplyBrush(vtkBrush* brush) VTK_OVERRIDE;
+  void ApplyBrush(vtkBrush* brush) override;
 
   /**
    * Get the brush from the delegate device.
    */
-  vtkBrush* GetBrush() VTK_OVERRIDE;
+  vtkBrush* GetBrush() override;
 
   /**
    * Forward the text property to the delegate device.
    */
-  void ApplyTextProp(vtkTextProperty* prop) VTK_OVERRIDE;
+  void ApplyTextProp(vtkTextProperty* prop) override;
 
   /**
    * Get the text property from the delegate device.
    */
-  vtkTextProperty* GetTextProp() VTK_OVERRIDE;
+  vtkTextProperty* GetTextProp() override;
 
   /**
    * Expand bounding box to contain the given polygon.
    */
-  void DrawPoly(float* points, int n, unsigned char* colors = 0, int nc_comps = 0) VTK_OVERRIDE;
+  void DrawPoly(float* points, int n, unsigned char* colors = 0, int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the given lines.
    */
-  void DrawLines(float* f, int n, unsigned char* colors = 0, int nc_comps = 0) VTK_OVERRIDE;
+  void DrawLines(float* f, int n, unsigned char* colors = 0, int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the given points.
    */
-  void DrawPoints(float* points, int n, unsigned char* colors = 0, int nc_comps = 0) VTK_OVERRIDE;
+  void DrawPoints(float* points, int n, unsigned char* colors = 0, int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the point sprites.
    */
   void DrawPointSprites(vtkImageData* sprite, float* points, int n, unsigned char* colors = 0,
-    int nc_comps = 0) VTK_OVERRIDE;
+    int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the markers.
    */
   void DrawMarkers(int shape, bool highlight, float* points, int n, unsigned char* colors = 0,
-    int nc_comps = 0) VTK_OVERRIDE;
+    int nc_comps = 0) override;
 
   /**
    * Expand bounding rect to contain the ellipse.
    */
   void DrawEllipseWedge(float x, float y, float outRx, float outRy, float inRx, float inRy,
-    float startAngle, float stopAngle) VTK_OVERRIDE;
+    float startAngle, float stopAngle) override;
 
   /**
    * Expand bounding rect to contain the elliptic arc.
    */
   void DrawEllipticArc(
-    float x, float y, float rX, float rY, float startAngle, float stopAngle) VTK_OVERRIDE;
+    float x, float y, float rX, float rY, float startAngle, float stopAngle) override;
 
   /**
    * Forward string bounds calculation to the delegate device.
    */
-  void ComputeStringBounds(const vtkStdString& string, float bounds[4]) VTK_OVERRIDE;
+  void ComputeStringBounds(const vtkStdString& string, float bounds[4]) override;
 
   /**
    * Forward string bounds calculation to the delegate device.
    */
-  void ComputeStringBounds(const vtkUnicodeString& string, float bounds[4]) VTK_OVERRIDE;
+  void ComputeStringBounds(const vtkUnicodeString& string, float bounds[4]) override;
 
   /**
    * Forward string bounds calculation to the delegate device.
    */
-  void ComputeJustifiedStringBounds(const char* string, float bounds[4]) VTK_OVERRIDE;
+  void ComputeJustifiedStringBounds(const char* string, float bounds[4]) override;
 
   /**
    * Call before drawing to this device.
    */
-  void Begin(vtkViewport*) VTK_OVERRIDE;
+  void Begin(vtkViewport*) override;
 
   /**
    * Call after drawing to this device.
    */
-  void End() VTK_OVERRIDE;
+  void End() override;
 
   /**
    * Get value from delegate device.
    */
-  bool GetBufferIdMode() const VTK_OVERRIDE;
+  bool GetBufferIdMode() const override;
 
   /**
    * Begin ID buffering mode.
    */
-  void BufferIdModeBegin(vtkAbstractContextBufferId* bufferId) VTK_OVERRIDE;
+  void BufferIdModeBegin(vtkAbstractContextBufferId* bufferId) override;
 
   /**
    * End ID buffering mode.
    */
-  void BufferIdModeEnd() VTK_OVERRIDE;
+  void BufferIdModeEnd() override;
 
 protected:
   vtkBoundingRectContextDevice2D();

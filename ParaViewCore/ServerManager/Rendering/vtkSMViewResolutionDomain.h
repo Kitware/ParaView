@@ -32,13 +32,13 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewResolutionDomain : public vtkS
 public:
   static vtkSMViewResolutionDomain* New();
   vtkTypeMacro(vtkSMViewResolutionDomain, vtkSMIntRangeDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Overridden to setup domain range values based on required properties
    * supported by this domain.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
 protected:
   vtkSMViewResolutionDomain();

@@ -50,7 +50,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMProxyConfigurationWriter : public vt
 public:
   static vtkSMProxyConfigurationWriter* New();
   vtkTypeMacro(vtkSMProxyConfigurationWriter, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

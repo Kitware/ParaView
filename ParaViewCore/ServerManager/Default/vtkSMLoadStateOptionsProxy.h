@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMLoadStateOptionsProxy : public vtkSM
 public:
   static vtkSMLoadStateOptionsProxy* New();
   vtkTypeMacro(vtkSMLoadStateOptionsProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set the state file to load. This may read the file and collect information

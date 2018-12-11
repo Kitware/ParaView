@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRDualClip : public vtkAMRDualClip
 public:
   static vtkPVAMRDualClip* New();
   vtkTypeMacro(vtkPVAMRDualClip, vtkAMRDualClip);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkPVAMRDualClip();
   ~vtkPVAMRDualClip() override;
@@ -58,7 +58,7 @@ public:
   vtkSetMacro(VolumeFractionSurfaceValue, double);
   //@}
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkPVAMRDualClip(const vtkPVAMRDualClip&) = delete;

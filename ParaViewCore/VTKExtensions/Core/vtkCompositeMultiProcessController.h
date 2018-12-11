@@ -35,7 +35,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkCompositeMultiProcessController
 public:
   static vtkCompositeMultiProcessController* New();
   vtkTypeMacro(vtkCompositeMultiProcessController, vtkMultiProcessController);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //  --------------------- Composite API -------------------------------
 
@@ -108,15 +108,15 @@ public:
   //  --------------- vtkMultiProcessController API ----------------------
   // Make sure inner vtkSocketController are initialized
   virtual void Initialize();
-  void Initialize(int*, char***) VTK_OVERRIDE { this->Initialize(); };
-  void Initialize(int*, char***, int) VTK_OVERRIDE { this->Initialize(); };
-  void Finalize() VTK_OVERRIDE{};              // Empty: Same as vtkSocketController
-  void Finalize(int) VTK_OVERRIDE{};           // Empty: Same as vtkSocketController
-  void SingleMethodExecute() VTK_OVERRIDE{};   // Empty: Same as vtkSocketController
-  void MultipleMethodExecute() VTK_OVERRIDE{}; // Empty: Same as vtkSocketController
-  void CreateOutputWindow() VTK_OVERRIDE{};    // Empty: Same as vtkSocketController
+  void Initialize(int*, char***) override { this->Initialize(); };
+  void Initialize(int*, char***, int) override { this->Initialize(); };
+  void Finalize() override{};              // Empty: Same as vtkSocketController
+  void Finalize(int) override{};           // Empty: Same as vtkSocketController
+  void SingleMethodExecute() override{};   // Empty: Same as vtkSocketController
+  void MultipleMethodExecute() override{}; // Empty: Same as vtkSocketController
+  void CreateOutputWindow() override{};    // Empty: Same as vtkSocketController
 
-  vtkCommunicator* GetCommunicator() VTK_OVERRIDE;
+  vtkCommunicator* GetCommunicator() override;
 
   //  --------------- RMIs Overloaded API -------------------
 
@@ -125,7 +125,7 @@ public:
    * When the RMI is triggered, all the callbacks are called
    * Adds a new callback for an RMI. Returns the identifier for the callback.
    */
-  unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag) VTK_OVERRIDE;
+  unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag) override;
 
   //@{
   /**
@@ -133,14 +133,14 @@ public:
    * When the RMI is triggered, all the callbacks are called
    * Removes all callbacks for the tag.
    */
-  void RemoveAllRMICallbacks(int tag) VTK_OVERRIDE;
-  int RemoveFirstRMI(int tag) VTK_OVERRIDE
+  void RemoveAllRMICallbacks(int tag) override;
+  int RemoveFirstRMI(int tag) override
   {
     vtkWarningMacro("RemoveRMICallbacks will remove all...");
     this->RemoveAllRMICallbacks(tag);
     return 1;
   }
-  bool RemoveRMICallback(unsigned long observerTagId) VTK_OVERRIDE;
+  bool RemoveRMICallback(unsigned long observerTagId) override;
   //@}
 
   enum EventId

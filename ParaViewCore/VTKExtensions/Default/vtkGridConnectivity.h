@@ -49,7 +49,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkGridConnectivity : public vtkMultiBloc
 {
 public:
   vtkTypeMacro(vtkGridConnectivity, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkGridConnectivity* New();
 
   // Public so templated function can access this method.
@@ -63,7 +63,7 @@ protected:
   vtkMultiProcessController* Controller;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   // I had to make this templated for global pointIds.
   // void ExecuteProcess(vtkUnstructuredGrid* inputs[],
@@ -72,9 +72,9 @@ protected:
   void GenerateOutput(vtkPolyData* output, vtkUnstructuredGrid* inputs[]);
 
   // Create a default executive.
-  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() override;
 
-  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) override;
 
   // This method returns 1 if the input has the necessary arrays for this filter.
   int CheckInput(vtkUnstructuredGrid* grid);

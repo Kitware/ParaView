@@ -36,13 +36,13 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMTimeStepIndexDomain : public vtkSMIntRa
 public:
   static vtkSMTimeStepIndexDomain* New();
   vtkTypeMacro(vtkSMTimeStepIndexDomain, vtkSMIntRangeDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
 protected:
   vtkSMTimeStepIndexDomain();

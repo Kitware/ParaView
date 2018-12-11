@@ -31,14 +31,14 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCacheKeeperPipeline
 public:
   static vtkPVCacheKeeperPipeline* New();
   vtkTypeMacro(vtkPVCacheKeeperPipeline, vtkCompositeDataPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVCacheKeeperPipeline();
   ~vtkPVCacheKeeperPipeline() override;
 
-  int ForwardUpstream(int i, int j, vtkInformation* request) VTK_OVERRIDE;
-  int ForwardUpstream(vtkInformation* request) VTK_OVERRIDE;
+  int ForwardUpstream(int i, int j, vtkInformation* request) override;
+  int ForwardUpstream(vtkInformation* request) override;
 
 private:
   vtkPVCacheKeeperPipeline(const vtkPVCacheKeeperPipeline&) = delete;

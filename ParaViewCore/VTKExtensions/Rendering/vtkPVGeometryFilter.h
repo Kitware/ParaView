@@ -52,7 +52,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGeometryFilter : public vtkDataObj
 public:
   static vtkPVGeometryFilter* New();
   vtkTypeMacro(vtkPVGeometryFilter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -223,18 +223,17 @@ protected:
    * Overridden to create vtkMultiBlockDataSet when input is a
    * composite-dataset and vtkPolyData when input is a vtkDataSet.
    */
-  int RequestDataObject(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestDataObject(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   virtual int RequestAMRData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
   virtual int RequestCompositeData(vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   //@}
 
   // Create a default executive.
-  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() override;
 
   /**
    * Produce geometry for a block in the dataset.
@@ -306,16 +305,15 @@ protected:
   // Callback for recording progress of internal filters.
   void HandleGeometryFilterProgress(vtkObject* caller, unsigned long, void*);
 
-  int FillInputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation*) override;
 
-  void ReportReferences(vtkGarbageCollector*) VTK_OVERRIDE;
+  void ReportReferences(vtkGarbageCollector*) override;
 
   /**
    * Overridden to request ghost-cells for vtkUnstructuredGrid inputs so that we
    * don't generate internal surfaces.
    */
-  int RequestUpdateExtent(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestUpdateExtent(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   // Convenience method to purge ghost cells.
   void RemoveGhostCells(vtkPolyData*);

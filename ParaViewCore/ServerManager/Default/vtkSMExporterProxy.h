@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMExporterProxy : public vtkSMProxy
 {
 public:
   vtkTypeMacro(vtkSMExporterProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -69,7 +69,7 @@ protected:
   /**
    * Read attributes from an XML element.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
   vtkSMViewProxy* View;
   std::vector<std::string> FileExtensions;

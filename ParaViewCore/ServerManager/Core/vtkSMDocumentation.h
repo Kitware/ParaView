@@ -35,7 +35,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDocumentation : public vtkSMObject
 public:
   static vtkSMDocumentation* New();
   vtkTypeMacro(vtkSMDocumentation, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the text for long help, if any. NULL otherwise.

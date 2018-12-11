@@ -57,7 +57,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSILModel : public vtkSMObject
 public:
   static vtkSMSILModel* New();
   vtkTypeMacro(vtkSMSILModel, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum CheckState
   {

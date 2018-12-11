@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVLinearExtrusionFilter : public vtkPL
 public:
   static vtkPVLinearExtrusionFilter* New();
   vtkTypeMacro(vtkPVLinearExtrusionFilter, vtkPLinearExtrusionFilter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVLinearExtrusionFilter();

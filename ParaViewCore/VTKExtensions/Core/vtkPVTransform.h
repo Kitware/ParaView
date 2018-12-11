@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVTransform : public vtkTransform
 public:
   static vtkPVTransform* New();
   vtkTypeMacro(vtkPVTransform, vtkTransform);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

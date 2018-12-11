@@ -44,7 +44,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSaveScreenshotProxy : public vtkSM
 public:
   static vtkSMSaveScreenshotProxy* New();
   vtkTypeMacro(vtkSMSaveScreenshotProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Capture image. The properties for this proxy provide all the necessary

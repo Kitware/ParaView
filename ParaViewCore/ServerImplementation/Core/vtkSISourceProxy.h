@@ -37,7 +37,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSISourceProxy : public vtkSIProxy
 public:
   static vtkSISourceProxy* New();
   vtkTypeMacro(vtkSISourceProxy, vtkSIProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the vtkAlgorithmOutput for an output port, if valid.
@@ -47,7 +47,7 @@ public:
   /**
    * Triggers UpdateInformation() on vtkObject if possible.
    */
-  void UpdatePipelineInformation() VTK_OVERRIDE;
+  void UpdatePipelineInformation() override;
 
   /**
    * Triggers UpdatePipeline().
@@ -69,7 +69,7 @@ public:
   /**
    * Overridden to update the output ports.
    */
-  void RecreateVTKObjects() VTK_OVERRIDE;
+  void RecreateVTKObjects() override;
 
 protected:
   vtkSISourceProxy();
@@ -78,12 +78,12 @@ protected:
   /**
    * Overridden to setup the output ports and pipelines for the output ports.
    */
-  bool CreateVTKObjects() VTK_OVERRIDE;
+  bool CreateVTKObjects() override;
 
   /**
    * Read xml-attributes.
    */
-  bool ReadXMLAttributes(vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkPVXMLElement* element) override;
 
   /**
    * Called after CreateVTKObjects(). The main difference for subclasses when

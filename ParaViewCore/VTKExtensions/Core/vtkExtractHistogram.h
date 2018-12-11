@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkExtractHistogram : public vtkTableAlgorit
 public:
   static vtkExtractHistogram* New();
   vtkTypeMacro(vtkExtractHistogram, vtkTableAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -114,10 +114,10 @@ protected:
    */
   virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]);
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   // Initialize the bin_extents using the data range for the selected
   // array.

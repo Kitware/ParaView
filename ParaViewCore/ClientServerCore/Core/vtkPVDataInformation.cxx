@@ -722,7 +722,7 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 void vtkPVDataInformation::CopyFromHyperTreeGrid(vtkHyperTreeGrid* data)
 {
   // Most of the work for these is done in CopyFromDataSet.
-  this->NumberOfTrees = data->GetNumberOfTrees();
+  this->NumberOfTrees = data->GetMaxNumberOfTrees();
   this->NumberOfVertices = data->GetNumberOfVertices();
   this->NumberOfLeaves = data->GetNumberOfLeaves();
 }

@@ -32,7 +32,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMaterialLibraryProxy : public vtkS
 public:
   static vtkSMMaterialLibraryProxy* New();
   vtkTypeMacro(vtkSMMaterialLibraryProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Copies the Material library on the root node of server to the client.
@@ -52,7 +52,7 @@ public:
   /**
    * Overridden to control load from server file system.
    */
-  void UpdateVTKObjects() VTK_OVERRIDE;
+  void UpdateVTKObjects() override;
 
 protected:
   vtkSMMaterialLibraryProxy();

@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitCylinderRepresentation
 public:
   static vtkPVImplicitCylinderRepresentation* New();
   vtkTypeMacro(vtkPVImplicitCylinderRepresentation, vtkImplicitCylinderRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVImplicitCylinderRepresentation();

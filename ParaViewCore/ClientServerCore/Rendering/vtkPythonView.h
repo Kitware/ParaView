@@ -40,7 +40,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPythonView : public vtkPVView
 public:
   static vtkPythonView* New();
   vtkTypeMacro(vtkPythonView, vtkPVView);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * This is a pass for delivering data from the server nodes to the client.
@@ -51,7 +51,7 @@ public:
    * Overrides the base class method to request an addition pass that moves data from the
    * server to the client.
    */
-  void Update() VTK_OVERRIDE;
+  void Update() override;
 
   /**
    * Gets the renderer for this view.
@@ -64,7 +64,7 @@ public:
   /**
    * Get a handle to the render window.
    */
-  vtkRenderWindow* GetRenderWindow() VTK_OVERRIDE;
+  vtkRenderWindow* GetRenderWindow() override;
 
   /**
    * Set the render window for this view. Note that this requires special
@@ -161,9 +161,9 @@ public:
    */
   void DisableAllAttributeArrays();
 
-  void StillRender() VTK_OVERRIDE;
+  void StillRender() override;
 
-  void InteractiveRender() VTK_OVERRIDE;
+  void InteractiveRender() override;
 
   //@{
   /**

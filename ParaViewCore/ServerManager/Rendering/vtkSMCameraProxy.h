@@ -31,15 +31,15 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMCameraProxy : public vtkSMProxy
 public:
   static vtkSMCameraProxy* New();
   vtkTypeMacro(vtkSMCameraProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
    * Updates all property information by calling UpdateInformation()
    * and populating the values.
    */
-  void UpdatePropertyInformation() VTK_OVERRIDE;
-  void UpdatePropertyInformation(vtkSMProperty* prop) VTK_OVERRIDE
+  void UpdatePropertyInformation() override;
+  void UpdatePropertyInformation(vtkSMProperty* prop) override
   {
     this->Superclass::UpdatePropertyInformation(prop);
   }

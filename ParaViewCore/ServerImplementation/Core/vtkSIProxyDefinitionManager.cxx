@@ -195,9 +195,9 @@ public:
   vtkTypeMacro(vtkInternalDefinitionIterator, vtkPVProxyDefinitionIterator);
 
   //-------------------------------------------------------------------------
-  void GoToFirstItem() VTK_OVERRIDE { this->Reset(); }
+  void GoToFirstItem() override { this->Reset(); }
   //-------------------------------------------------------------------------
-  void GoToNextItem() VTK_OVERRIDE
+  void GoToNextItem() override
   {
     if (!this->IsDoneWithCoreTraversal())
     {
@@ -217,7 +217,7 @@ public:
     }
   }
   //-------------------------------------------------------------------------
-  bool IsDoneWithTraversal() VTK_OVERRIDE
+  bool IsDoneWithTraversal() override
   {
     if (!this->Initialized)
     {
@@ -238,9 +238,9 @@ public:
     return false;
   }
   //-------------------------------------------------------------------------
-  const char* GetGroupName() VTK_OVERRIDE { return this->CurrentGroupName.c_str(); }
+  const char* GetGroupName() override { return this->CurrentGroupName.c_str(); }
   //-------------------------------------------------------------------------
-  const char* GetProxyName() VTK_OVERRIDE
+  const char* GetProxyName() override
   {
     if (this->IsCustom())
     {
@@ -252,9 +252,9 @@ public:
     }
   }
   //-------------------------------------------------------------------------
-  bool IsCustom() VTK_OVERRIDE { return this->IsDoneWithCoreTraversal(); }
+  bool IsCustom() override { return this->IsDoneWithCoreTraversal(); }
   //-------------------------------------------------------------------------
-  vtkPVXMLElement* GetProxyDefinition() VTK_OVERRIDE
+  vtkPVXMLElement* GetProxyDefinition() override
   {
     if (this->IsCustom())
     {
@@ -266,7 +266,7 @@ public:
     }
   }
   //-------------------------------------------------------------------------
-  vtkPVXMLElement* GetProxyHints() VTK_OVERRIDE
+  vtkPVXMLElement* GetProxyHints() override
   {
     vtkPVXMLElement* definition = this->GetProxyDefinition();
     if (definition)
@@ -276,7 +276,7 @@ public:
     return NULL;
   }
   //-------------------------------------------------------------------------
-  void AddTraversalGroupName(const char* groupName) VTK_OVERRIDE
+  void AddTraversalGroupName(const char* groupName) override
   {
     this->GroupNames.insert(std::string(groupName));
   }
@@ -294,7 +294,7 @@ public:
   }
 
   //-------------------------------------------------------------------------
-  void GoToNextGroup() VTK_OVERRIDE { this->NextGroup(); }
+  void GoToNextGroup() override { this->NextGroup(); }
 
 protected:
   vtkInternalDefinitionIterator()

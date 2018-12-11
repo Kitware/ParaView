@@ -34,10 +34,10 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMComparativeAnimationCueUndoElement
 public:
   static vtkSMComparativeAnimationCueUndoElement* New();
   vtkTypeMacro(vtkSMComparativeAnimationCueUndoElement, vtkSMUndoElement);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  int Undo() VTK_OVERRIDE;
-  int Redo() VTK_OVERRIDE;
+  int Undo() override;
+  int Redo() override;
 
   void SetXMLStates(vtkTypeUInt32 id, vtkPVXMLElement* before, vtkPVXMLElement* after);
 

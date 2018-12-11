@@ -66,7 +66,7 @@ class VTKCLIENTSERVER_EXPORT vtkClientServerInterpreter : public vtkObject
 public:
   static vtkClientServerInterpreter* New();
   vtkTypeMacro(vtkClientServerInterpreter, vtkObject);
-  void PrintSelf(ostream&, vtkIndent) VTK_OVERRIDE;
+  void PrintSelf(ostream&, vtkIndent) override;
 
   //@{
   /**

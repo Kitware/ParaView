@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVCompositeDataPipeline : public vtkCompo
 public:
   static vtkPVCompositeDataPipeline* New();
   vtkTypeMacro(vtkPVCompositeDataPipeline, vtkCompositeDataPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkPVCompositeDataPipeline();
@@ -44,10 +44,10 @@ protected:
 
   // Copy information for the given request.
   void CopyDefaultInformation(vtkInformation* request, int direction,
-    vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+    vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) override;
 
   // Remove update/whole extent when resetting pipeline information.
-  void ResetPipelineInformation(int port, vtkInformation*) VTK_OVERRIDE;
+  void ResetPipelineInformation(int port, vtkInformation*) override;
 
 private:
   vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&) = delete;

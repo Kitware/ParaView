@@ -35,13 +35,13 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVGridAxes3DRepresentation
 public:
   static vtkPVGridAxes3DRepresentation* New();
   vtkTypeMacro(vtkPVGridAxes3DRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void SetGridAxes(vtkPVGridAxes3DActor* gridAxes);
   vtkGetObjectMacro(GridAxes, vtkPVGridAxes3DActor)
 
-    void MarkModified() VTK_OVERRIDE;
-  void SetVisibility(bool) VTK_OVERRIDE;
+    void MarkModified() override;
+  void SetVisibility(bool) override;
   void SetGridAxesVisibility(bool);
   void SetPosition(double pos[3]);
   void SetPosition(double x, double y, double z);
@@ -49,18 +49,18 @@ public:
   void SetScale(double x, double y, double z);
 
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
 protected:
   vtkPVGridAxes3DRepresentation();
   ~vtkPVGridAxes3DRepresentation() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestData(vtkInformation* req, vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
-  bool IsCached(double cache_key) VTK_OVERRIDE;
+    vtkInformationVector* outInfoVec) override;
+  bool AddToView(vtkView* view) override;
+  bool RemoveFromView(vtkView* view) override;
+  bool IsCached(double cache_key) override;
   void UpdateVisibility();
 
   bool GridAxesVisibility;

@@ -43,7 +43,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkKdTreeManager : public vtkObject
 public:
   static vtkKdTreeManager* New();
   vtkTypeMacro(vtkKdTreeManager, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

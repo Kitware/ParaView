@@ -32,14 +32,14 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkUpdateSuppressorPipeline
 public:
   static vtkUpdateSuppressorPipeline* New();
   vtkTypeMacro(vtkUpdateSuppressorPipeline, vtkCompositeDataPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Generalized interface for asking the executive to fulfill update
    * requests.
    */
-  int ProcessRequest(vtkInformation* request, vtkInformationVector** inInfo,
-    vtkInformationVector* outInfo) VTK_OVERRIDE;
+  int ProcessRequest(
+    vtkInformation* request, vtkInformationVector** inInfo, vtkInformationVector* outInfo) override;
 
   //@{
   /**

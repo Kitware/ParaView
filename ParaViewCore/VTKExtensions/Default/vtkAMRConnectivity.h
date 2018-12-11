@@ -44,7 +44,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRConnectivity : public vtkMultiBlock
 {
 public:
   vtkTypeMacro(vtkAMRConnectivity, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkAMRConnectivity* New();
 
   //@{
@@ -102,10 +102,10 @@ protected:
   std::vector<std::vector<std::vector<int> > > NeighborList;
   std::vector<vtkSmartPointer<vtkIntArray> > EquivPairs;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   int DoRequestData(vtkNonOverlappingAMR*, const char*);
   int WavePropagation(vtkIdType cellIdStart, vtkUniformGrid* grid, vtkIdTypeArray* regionId,

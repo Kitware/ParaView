@@ -32,7 +32,7 @@ class VTKPVANIMATION_EXPORT vtkSIXMLAnimationWriterRepresentationProperty
 public:
   static vtkSIXMLAnimationWriterRepresentationProperty* New();
   vtkTypeMacro(vtkSIXMLAnimationWriterRepresentationProperty, vtkSIInputProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSIXMLAnimationWriterRepresentationProperty();
@@ -42,7 +42,7 @@ protected:
    * Overridden to call AddRepresentation on the vtkXMLPVAnimationWriter
    * instance with correct API.
    */
-  bool Push(vtkSMMessage*, int) VTK_OVERRIDE;
+  bool Push(vtkSMMessage*, int) override;
 
 private:
   vtkSIXMLAnimationWriterRepresentationProperty(

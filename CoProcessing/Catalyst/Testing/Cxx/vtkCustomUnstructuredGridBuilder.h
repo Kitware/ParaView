@@ -37,15 +37,14 @@ class VTK_EXPORT vtkCustomUnstructuredGridBuilder : public vtkCPUnstructuredGrid
 public:
   static vtkCustomUnstructuredGridBuilder* New();
   vtkTypeMacro(vtkCustomUnstructuredGridBuilder, vtkCPUnstructuredGridBuilder);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return a grid.  BuiltNewGrid is set to 0 if the grids
    * that were returned were already built before.
    * vtkCustomUnstructuredGridBuilder will also delete the grid.
    */
-  virtual vtkDataObject* GetGrid(
-    unsigned long timeStep, double time, int& builtNewGrid) VTK_OVERRIDE;
+  virtual vtkDataObject* GetGrid(unsigned long timeStep, double time, int& builtNewGrid) override;
 
   /**
    * Customized function to build UnstructuredGrid.

@@ -55,19 +55,19 @@ public:
 
   static vtkSMCollaborationManager* New();
   vtkTypeMacro(vtkSMCollaborationManager, vtkSMRemoteObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Get the global unique id for this object. If none is set and the session is
    * valid, a new global id will be assigned automatically.
    */
-  vtkTypeUInt32 GetGlobalID() VTK_OVERRIDE;
+  vtkTypeUInt32 GetGlobalID() override;
 
   /**
    * Override the session setting in order to update only once our current
    * local user id
    */
-  void SetSession(vtkSMSession*) VTK_OVERRIDE;
+  void SetSession(vtkSMSession*) override;
 
   /**
    * This method is used promote a new Master user. Master/Slave user doesn't
@@ -170,13 +170,13 @@ public:
   /**
    * This method return the state of the connected clients
    */
-  const vtkSMMessage* GetFullState() VTK_OVERRIDE;
+  const vtkSMMessage* GetFullState() override;
 
   /**
    * This method is used to either load its internal connected clients
    * information or to forward messages across clients
    */
-  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) override;
 
   /**
    * Enable or disable further connections to the server.

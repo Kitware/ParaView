@@ -34,7 +34,7 @@ class VTKPVVTKEXTENSIONSPOINTS_EXPORT vtkBoundedVolumeSource : public vtkImageAl
 public:
   static vtkBoundedVolumeSource* New();
   vtkTypeMacro(vtkBoundedVolumeSource, vtkImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -108,8 +108,8 @@ protected:
   ~vtkBoundedVolumeSource() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
-  void ExecuteDataWithInformation(vtkDataObject* data, vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
+  void ExecuteDataWithInformation(vtkDataObject* data, vtkInformation* outInfo) override;
 
   double Origin[3];
   double Scale[3];

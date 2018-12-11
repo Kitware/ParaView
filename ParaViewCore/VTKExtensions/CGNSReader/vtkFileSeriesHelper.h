@@ -46,7 +46,7 @@ class VTKPVVTKEXTENSIONSCGNSREADER_EXPORT vtkFileSeriesHelper : public vtkObject
 public:
   static vtkFileSeriesHelper* New();
   vtkTypeMacro(vtkFileSeriesHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   typedef bool (*FileNameFunctorType)(vtkAlgorithm* reader, const std::string& filename);
 

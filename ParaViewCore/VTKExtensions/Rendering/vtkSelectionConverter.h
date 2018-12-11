@@ -46,7 +46,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkSelectionConverter : public vtkObjec
 public:
   static vtkSelectionConverter* New();
   vtkTypeMacro(vtkSelectionConverter, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Convert input selection and store it in output. Currently, the

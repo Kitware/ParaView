@@ -46,7 +46,7 @@ class VTKPVANIMATION_EXPORT vtkPVCueManipulator : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVCueManipulator, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * StateModifiedEvent - This event is fired when the manipulator modifies the animated proxy.

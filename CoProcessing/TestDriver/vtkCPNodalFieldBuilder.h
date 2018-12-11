@@ -30,12 +30,12 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPNodalFieldBuilder : public vtkCPFieldB
 public:
   static vtkCPNodalFieldBuilder* New();
   vtkTypeMacro(vtkCPNodalFieldBuilder, vtkCPFieldBuilder);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return a field on Grid.
    */
-  virtual void BuildField(unsigned long timeStep, double time, vtkDataSet* grid) VTK_OVERRIDE;
+  virtual void BuildField(unsigned long timeStep, double time, vtkDataSet* grid) override;
 
 protected:
   vtkCPNodalFieldBuilder();

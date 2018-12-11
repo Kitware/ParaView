@@ -27,7 +27,7 @@ class VTKPVANIMATION_EXPORT vtkPVBooleanKeyFrame : public vtkPVKeyFrame
 {
 public:
   vtkTypeMacro(vtkPVBooleanKeyFrame, vtkPVKeyFrame);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVBooleanKeyFrame* New();
 
   /**
@@ -35,8 +35,7 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  void UpdateValue(
-    double currenttime, vtkPVAnimationCue* cueProxy, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cueProxy, vtkPVKeyFrame* next) override;
 
 protected:
   vtkPVBooleanKeyFrame();

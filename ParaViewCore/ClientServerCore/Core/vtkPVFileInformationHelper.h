@@ -38,7 +38,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVFileInformationHelper : public vtkOb
 public:
   static vtkPVFileInformationHelper* New();
   vtkTypeMacro(vtkPVFileInformationHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

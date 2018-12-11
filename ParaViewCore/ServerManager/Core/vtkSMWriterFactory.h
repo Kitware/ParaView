@@ -47,7 +47,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMWriterFactory : public vtkSMObject
 public:
   static vtkSMWriterFactory* New();
   vtkTypeMacro(vtkSMWriterFactory, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Cleanup all registered prototypes.

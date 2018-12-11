@@ -33,7 +33,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkTCPNetworkAccessManager : public vtkNe
 public:
   static vtkTCPNetworkAccessManager* New();
   vtkTypeMacro(vtkTCPNetworkAccessManager, vtkNetworkAccessManager);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Creates a new connection given the url.
@@ -71,40 +71,40 @@ public:
    * connect to the host/port. If absent, default is 60s. 0 implies no retry attempts.
    * A negative value implies an infinite number of retries.
    */
-  vtkMultiProcessController* NewConnection(const char* url) VTK_OVERRIDE;
+  vtkMultiProcessController* NewConnection(const char* url) override;
 
   /**
    * Used to abort pending connection creation, if any. Refer to
    * NewConnection() for details.
    */
-  void AbortPendingConnection() VTK_OVERRIDE;
+  void AbortPendingConnection() override;
 
   /**
    * Process any network activity.
    */
-  int ProcessEvents(unsigned long timeout_msecs) VTK_OVERRIDE;
+  int ProcessEvents(unsigned long timeout_msecs) override;
 
   /**
    * Peeks to check if any activity is available. When this call returns true,
    * ProcessEvents() will always result in some activity processing if called
    * afterword.
    */
-  bool GetNetworkEventsAvailable() VTK_OVERRIDE;
+  bool GetNetworkEventsAvailable() override;
 
   /**
    * Returns true is the manager is currently waiting for any connections.
    */
-  bool GetPendingConnectionsPresent() VTK_OVERRIDE;
+  bool GetPendingConnectionsPresent() override;
 
   /**
    * Enable/disable further connections for given port.
    */
-  virtual void DisableFurtherConnections(int port, bool disable) VTK_OVERRIDE;
+  virtual void DisableFurtherConnections(int port, bool disable) override;
 
   /**
    * Returns true if the last check of connect ids was wrong.
    */
-  virtual bool GetWrongConnectID() VTK_OVERRIDE;
+  virtual bool GetWrongConnectID() override;
 
 protected:
   vtkTCPNetworkAccessManager();

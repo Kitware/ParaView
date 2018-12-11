@@ -39,7 +39,7 @@ class VTKPVANIMATION_EXPORT vtkPVCompositeKeyFrame : public vtkPVKeyFrame
 public:
   static vtkPVCompositeKeyFrame* New();
   vtkTypeMacro(vtkPVCompositeKeyFrame, vtkPVKeyFrame);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum
   {
@@ -54,11 +54,11 @@ public:
   /**
    * Overridden to pass on to the internal keyframe proxies.
    */
-  void RemoveAllKeyValues() VTK_OVERRIDE;
-  void SetKeyTime(double time) VTK_OVERRIDE;
-  void SetKeyValue(double val) VTK_OVERRIDE { this->Superclass::SetKeyValue(val); }
-  void SetKeyValue(unsigned int index, double val) VTK_OVERRIDE;
-  void SetNumberOfKeyValues(unsigned int num) VTK_OVERRIDE;
+  void RemoveAllKeyValues() override;
+  void SetKeyTime(double time) override;
+  void SetKeyValue(double val) override { this->Superclass::SetKeyValue(val); }
+  void SetKeyValue(unsigned int index, double val) override;
+  void SetNumberOfKeyValues(unsigned int num) override;
   //@}
 
   //@{
@@ -96,7 +96,7 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) override;
 
 protected:
   vtkPVCompositeKeyFrame();

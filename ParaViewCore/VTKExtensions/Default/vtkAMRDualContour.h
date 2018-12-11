@@ -60,7 +60,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualContour : public vtkMultiBlockD
 public:
   static vtkAMRDualContour* New();
   vtkTypeMacro(vtkAMRDualContour, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(IsoValue, double);
   vtkGetMacro(IsoValue, double);
@@ -131,7 +131,7 @@ protected:
   int TriangulateCap;
   int SkipGhostCopy;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * This should be called before any number of calls to DoRequestData
@@ -149,8 +149,8 @@ protected:
    */
   vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input, const char* arrayNameToProcess);
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
   void ShareBlockLocatorWithNeighbors(vtkAMRDualGridHelperBlock* block);
 

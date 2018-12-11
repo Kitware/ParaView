@@ -52,7 +52,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkDataLabelRepresentation
 public:
   static vtkDataLabelRepresentation* New();
   vtkTypeMacro(vtkDataLabelRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * This needs to be called on all instances of vtkGeometryRepresentation when
@@ -60,15 +60,15 @@ public:
    * have any real-input on the client side which messes with the Update
    * requests.
    */
-  void MarkModified() VTK_OVERRIDE;
+  void MarkModified() override;
 
   //@{
   /**
    * Get/Set the visibility for this representation. When the visibility of
    * representation of false, all view passes are ignored.
    */
-  void SetVisibility(bool val) VTK_OVERRIDE;
-  bool GetVisibility() VTK_OVERRIDE;
+  void SetVisibility(bool val) override;
+  bool GetVisibility() override;
   //@}
 
   //@{
@@ -128,7 +128,7 @@ public:
    * PrepareForRendering.
    */
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
 protected:
   vtkDataLabelRepresentation();
@@ -139,19 +139,19 @@ protected:
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   /**
    * Fill input port information
    */
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   /**
    * Subclasses should override this to connect inputs to the internal pipeline
@@ -163,12 +163,12 @@ protected:
    * GetInternalSelectionOutputPort should be used to obtain a selection or
    * annotation port whose selections are localized for a particular input data object.
    */
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Overridden to check with the vtkPVCacheKeeper to see if the key is cached.
    */
-  bool IsCached(double cache_key) VTK_OVERRIDE;
+  bool IsCached(double cache_key) override;
 
   void UpdateTransform();
 

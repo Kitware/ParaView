@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractComponent : public vtkDataSet
 public:
   static vtkPVExtractComponent* New();
   vtkTypeMacro(vtkPVExtractComponent, vtkDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(InputArrayComponent, int);
   vtkGetMacro(InputArrayComponent, int);
@@ -44,9 +44,9 @@ protected:
   vtkPVExtractComponent();
   ~vtkPVExtractComponent() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int InputArrayComponent;
   char* OutputArrayName;

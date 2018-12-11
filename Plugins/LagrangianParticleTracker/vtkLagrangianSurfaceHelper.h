@@ -33,23 +33,23 @@ class vtkLagrangianSurfaceHelper : public vtkLagrangianHelperBase
 public:
   static vtkLagrangianSurfaceHelper* New();
   vtkTypeMacro(vtkLagrangianSurfaceHelper, vtkLagrangianHelperBase);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Remove all arrays to generate, no more array will be generated
    */
-  void RemoveAllArraysToGenerate() VTK_OVERRIDE;
+  void RemoveAllArraysToGenerate() override;
 
   /**
    * Set the number of arrays to generate
    */
-  void SetNumberOfArrayToGenerate(int i) VTK_OVERRIDE;
+  void SetNumberOfArrayToGenerate(int i) override;
 
   /**
    * Set an array to generate
    */
   void SetArrayToGenerate(int i, const char* arrayName, int type, int numberOfLeafs,
-    int numberOfComponents, const char* arrayValues) VTK_OVERRIDE;
+    int numberOfComponents, const char* arrayValues) override;
 
 protected:
   vtkLagrangianSurfaceHelper();
@@ -59,15 +59,15 @@ protected:
    * Fill the model with inputs if any.
    */
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * Creates the same output type as the input type.
    */
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Convenience method to fill field data of provided dataset

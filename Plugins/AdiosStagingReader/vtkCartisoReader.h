@@ -73,10 +73,10 @@ protected:
   ~vtkCartisoReader();
 
   // Usual data generation methods
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
   virtual int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  int FillOutputPortInformation(int, vtkInformation*) VTK_OVERRIDE;
+  int FillOutputPortInformation(int, vtkInformation*) override;
 
   void Initialize();
   void Finalize();

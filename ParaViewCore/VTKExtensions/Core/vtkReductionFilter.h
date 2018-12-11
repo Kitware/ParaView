@@ -45,7 +45,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkReductionFilter : public vtkDataObjectAlg
 public:
   static vtkReductionFilter* New();
   vtkTypeMacro(vtkReductionFilter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   typedef enum ReductionModeType {
     REDUCE_ALL_TO_ONE = 0,
@@ -135,12 +135,12 @@ protected:
 
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   void Reduce(vtkDataObject* input, vtkDataObject* output);
   vtkDataObject* PreProcess(vtkDataObject* input);

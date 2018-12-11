@@ -132,7 +132,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPPhastaReader : public vtkMultiBlockDa
 public:
   static vtkPPhastaReader* New();
   vtkTypeMacro(vtkPPhastaReader, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -164,9 +164,9 @@ protected:
   ~vtkPPhastaReader() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   char* FileName;
 

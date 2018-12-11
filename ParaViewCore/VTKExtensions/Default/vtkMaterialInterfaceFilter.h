@@ -72,7 +72,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceFilter
 public:
   static vtkMaterialInterfaceFilter* New();
   vtkTypeMacro(vtkMaterialInterfaceFilter, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // PARAVIEW interface stuff
 
@@ -330,15 +330,15 @@ public:
   /**
    * Return the mtime also considering the locator and clip function.
    */
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkMaterialInterfaceFilter();
   ~vtkMaterialInterfaceFilter() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
 
   // Set up the result arrays for the calculations we are about to
   // make.

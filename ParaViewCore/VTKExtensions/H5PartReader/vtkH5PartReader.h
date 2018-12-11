@@ -54,7 +54,7 @@ class VTKPVVTKEXTENSIONSH5PARTREADER_EXPORT vtkH5PartReader : public vtkPolyData
 public:
   static vtkH5PartReader* New();
   vtkTypeMacro(vtkH5PartReader, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -169,9 +169,8 @@ protected:
   vtkH5PartReader();
   ~vtkH5PartReader() override;
   //
-  int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int OpenFile();
   void CloseFile();
   //  void  CopyIntoCoords(int offset, vtkDataArray *source, vtkDataArray *dest);

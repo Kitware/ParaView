@@ -33,7 +33,7 @@ class VTKPVANIMATION_EXPORT vtkXMLPVAnimationWriter : public vtkXMLPVDWriter
 public:
   static vtkXMLPVAnimationWriter* New();
   vtkTypeMacro(vtkXMLPVAnimationWriter, vtkXMLPVDWriter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -63,7 +63,7 @@ protected:
   ~vtkXMLPVAnimationWriter() override;
 
   // Replace vtkXMLWriter's writing driver method.
-  int WriteInternal() VTK_OVERRIDE;
+  int WriteInternal() override;
 
   // Status safety check for method call ordering.
   int StartCalled;

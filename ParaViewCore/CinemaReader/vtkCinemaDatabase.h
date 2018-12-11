@@ -41,7 +41,7 @@ class VTKPVCINEMAREADER_EXPORT vtkCinemaDatabase : public vtkObject
 public:
   static vtkCinemaDatabase* New();
   vtkTypeMacro(vtkCinemaDatabase, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum Spec
   {

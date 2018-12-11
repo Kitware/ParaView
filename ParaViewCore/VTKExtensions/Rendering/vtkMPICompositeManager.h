@@ -30,13 +30,13 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMPICompositeManager : public vtkComp
 public:
   static vtkMPICompositeManager* New();
   vtkTypeMacro(vtkMPICompositeManager, vtkCompositeRenderManager);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * If the user wants to handle the event loop, then they must call this
    * method to initialize the RMIs.
    */
-  virtual void InitializeRMIs() VTK_OVERRIDE;
+  virtual void InitializeRMIs() override;
 
   /**
    * Get the z buffer value at a pixel.  GatherZBufferValue is
@@ -58,7 +58,7 @@ public:
   /**
    * Overridden to set the Image Size when ParallelRendering is off.
    */
-  virtual void StartRender() VTK_OVERRIDE;
+  virtual void StartRender() override;
 
   //@{
   /**
@@ -66,7 +66,7 @@ public:
    * Overridden to choose the back buffer only when the
    * buffers haven;t been swapped yet.
    */
-  virtual int ChooseBuffer() VTK_OVERRIDE;
+  virtual int ChooseBuffer() override;
 
 protected:
   vtkMPICompositeManager();

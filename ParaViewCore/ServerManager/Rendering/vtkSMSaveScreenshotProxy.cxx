@@ -274,25 +274,25 @@ public:
     }
   }
 
-  vtkVector2i GetSize() const VTK_OVERRIDE
+  vtkVector2i GetSize() const override
   {
     vtkVector2i size;
     vtkSMPropertyHelper(this->View, "ViewSize").Get(size.GetData(), 2);
     return size;
   }
 
-  vtkSmartPointer<vtkImageData> CaptureImage() VTK_OVERRIDE
+  vtkSmartPointer<vtkImageData> CaptureImage() override
   {
     vtkSmartPointer<vtkImageData> img;
     img.TakeReference(this->View->CaptureWindow(this->Magnification[0], this->Magnification[1]));
     return img;
   }
 
-  void SetStereoMode(int mode) VTK_OVERRIDE { this->SetViewStereoMode(this->View, mode); }
-  void SetFontScaling(int mode) VTK_OVERRIDE { this->SetViewFontScaling(this->View, mode); }
+  void SetStereoMode(int mode) override { this->SetViewStereoMode(this->View, mode); }
+  void SetFontScaling(int mode) override { this->SetViewFontScaling(this->View, mode); }
 
 protected:
-  void Resize(const vtkVector2i& size) VTK_OVERRIDE
+  void Resize(const vtkVector2i& size) override
   {
     vtkSMPropertyHelper(this->View, "ViewSize").Set(size.GetData(), 2);
     this->View->UpdateVTKObjects();
@@ -336,16 +336,16 @@ public:
     this->Layout->UpdateVTKObjects();
   }
 
-  vtkVector2i GetSize() const VTK_OVERRIDE { return this->Layout->GetSize(); }
+  vtkVector2i GetSize() const override { return this->Layout->GetSize(); }
 
-  vtkSmartPointer<vtkImageData> CaptureImage() VTK_OVERRIDE
+  vtkSmartPointer<vtkImageData> CaptureImage() override
   {
     vtkSmartPointer<vtkImageData> img;
     img.TakeReference(this->Layout->CaptureWindow(this->Magnification[0], this->Magnification[1]));
     return img;
   }
 
-  void SetStereoMode(int mode) VTK_OVERRIDE
+  void SetStereoMode(int mode) override
   {
     const std::vector<vtkSMViewProxy*> views = this->Layout->GetViews();
     for (auto iter = views.begin(); iter != views.end(); ++iter)
@@ -354,7 +354,7 @@ public:
     }
   }
 
-  void SetFontScaling(int mode) VTK_OVERRIDE
+  void SetFontScaling(int mode) override
   {
     const std::vector<vtkSMViewProxy*> views = this->Layout->GetViews();
     for (auto iter = views.begin(); iter != views.end(); ++iter)
@@ -363,12 +363,12 @@ public:
     }
   }
 
-  void SetSeparatorWidth(int width) VTK_OVERRIDE { this->Layout->SetSeparatorWidth(width); }
+  void SetSeparatorWidth(int width) override { this->Layout->SetSeparatorWidth(width); }
 
-  void SetSeparatorColor(double color[3]) VTK_OVERRIDE { this->Layout->SetSeparatorColor(color); }
+  void SetSeparatorColor(double color[3]) override { this->Layout->SetSeparatorColor(color); }
 
 protected:
-  void Resize(const vtkVector2i& size) VTK_OVERRIDE { this->Layout->SetSize(size.GetData()); }
+  void Resize(const vtkVector2i& size) override { this->Layout->SetSize(size.GetData()); }
 };
 
 //============================================================================

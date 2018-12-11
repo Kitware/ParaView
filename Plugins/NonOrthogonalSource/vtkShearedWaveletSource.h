@@ -26,7 +26,7 @@ class VTK_EXPORT vtkShearedWaveletSource : public vtkUnstructuredGridAlgorithm
 public:
   static vtkShearedWaveletSource* New();
   vtkTypeMacro(vtkShearedWaveletSource, vtkUnstructuredGridAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Set bounding box is model-space.
   // Specified as (xmin, xmax, ymin, ymax, zmin, zmax).
@@ -67,8 +67,7 @@ protected:
   vtkShearedWaveletSource();
   ~vtkShearedWaveletSource();
 
-  virtual int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   bool EnableAxisTitles;
   bool EnableTimeLabel;

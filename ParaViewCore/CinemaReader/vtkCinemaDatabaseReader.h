@@ -39,7 +39,7 @@ class VTKPVCINEMAREADER_EXPORT vtkCinemaDatabaseReader : public vtkPolyDataAlgor
 public:
   static vtkCinemaDatabaseReader* New();
   vtkTypeMacro(vtkCinemaDatabaseReader, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -74,9 +74,9 @@ protected:
   ~vtkCinemaDatabaseReader() override;
 
   int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector* outVector) VTK_OVERRIDE;
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outVector) override;
   int RequestData(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector* outVector) VTK_OVERRIDE;
+    vtkInformation*, vtkInformationVector**, vtkInformationVector* outVector) override;
 
   /**
    * Builds query string

@@ -37,18 +37,18 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMExtentDomain : public vtkSMIntRangeDoma
 public:
   static vtkSMExtentDomain* New();
   vtkTypeMacro(vtkSMExtentDomain, vtkSMIntRangeDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Update self checking the "unchecked" values of all required
    * properties. Overwritten by sub-classes.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
   /**
    * Set the value of an element of a property from the animation editor.
    */
-  void SetAnimationValue(vtkSMProperty* property, int idx, double value) VTK_OVERRIDE;
+  void SetAnimationValue(vtkSMProperty* property, int idx, double value) override;
 
   //@{
   /**
@@ -60,7 +60,7 @@ public:
    * application must explicitly call this method to initialize the
    * property.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
 protected:
   vtkSMExtentDomain();

@@ -36,7 +36,7 @@ class vtkLagrangianIntegrationModelExample : public vtkLagrangianBasicIntegratio
 {
 public:
   vtkTypeMacro(vtkLagrangianIntegrationModelExample, vtkLagrangianBasicIntegrationModel);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkLagrangianIntegrationModelExample* New();
 
   using Superclass::FunctionValues;
@@ -48,14 +48,14 @@ public:
    * THIS IS THE MAIN METHOD TO BE DEFINED IN A LAGRANGIAN INTEGRATION MODEL PLUGIN
    */
   virtual int FunctionValues(
-    vtkDataSet* dataSet, vtkIdType cellId, double* weights, double* x, double* f) VTK_OVERRIDE;
+    vtkDataSet* dataSet, vtkIdType cellId, double* weights, double* x, double* f) override;
 
   /**
    * This method is called each time a particle created from the seeds
    * It should be inherited in order to initialize variable data in user variables
    * from seed data
    */
-  virtual void InitializeParticle(vtkLagrangianParticle* particle) VTK_OVERRIDE;
+  virtual void InitializeParticle(vtkLagrangianParticle* particle) override;
 
   /**
    * This method is called when initializing output point data
@@ -65,7 +65,7 @@ public:
    * maxTuples tuples.
    */
   virtual void InitializeVariablesParticleData(
-    vtkPointData* particleData, int maxTuples = 0) VTK_OVERRIDE;
+    vtkPointData* particleData, int maxTuples = 0) override;
 
   /**
    * This method is called when inserting particle data in output point data
@@ -75,14 +75,14 @@ public:
    * arrayOffset. use stepEnum to identify which step ( prev, current or next ) should be inserted.
    */
   virtual void InsertVariablesParticleData(
-    vtkLagrangianParticle* particle, vtkPointData* data, int stepEnum) VTK_OVERRIDE;
+    vtkLagrangianParticle* particle, vtkPointData* data, int stepEnum) override;
 
   /**
    * This method is called when checking if a particle should be terminated in free flight
    * At vtkLagrangianBasicIntegrationModel this method does nothing
    * Return true if particle is terminated, false otherwise
    */
-  virtual bool CheckFreeFlightTermination(vtkLagrangianParticle* particle) VTK_OVERRIDE;
+  virtual bool CheckFreeFlightTermination(vtkLagrangianParticle* particle) override;
 
   /**
    * Methods used by ParaView surface helper to get default
@@ -92,8 +92,8 @@ public:
    * it is your responsibility to initialize all components of
    * defaultValues[nComponent]
    */
-  virtual void ComputeSurfaceDefaultValues(const char* arrayName, vtkDataSet* dataset,
-    int nComponents, double* defaultValues) VTK_OVERRIDE;
+  virtual void ComputeSurfaceDefaultValues(
+    const char* arrayName, vtkDataSet* dataset, int nComponents, double* defaultValues) override;
 
 protected:
   vtkLagrangianIntegrationModelExample();
@@ -109,8 +109,7 @@ protected:
    * create new particle...
    */
   virtual bool InteractWithSurface(int surfaceType, vtkLagrangianParticle* particle,
-    vtkDataSet* surface, vtkIdType cellId,
-    std::queue<vtkLagrangianParticle*>& particles) VTK_OVERRIDE;
+    vtkDataSet* surface, vtkIdType cellId, std::queue<vtkLagrangianParticle*>& particles) override;
 
   /**
    * This method is called when trying to find the intersection point between a particle
@@ -118,7 +117,7 @@ protected:
    * superclass method
    */
   virtual bool IntersectWithLine(
-    vtkCell* cell, double p1[3], double p2[3], double tol, double& t, double x[3]) VTK_OVERRIDE;
+    vtkCell* cell, double p1[3], double p2[3], double tol, double& t, double x[3]) override;
 
   double GetRelaxationTime(const double& dynVisc, const double& diameter, const double& density);
 

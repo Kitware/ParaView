@@ -39,7 +39,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkMultiProcessControllerHelper : public vtk
 public:
   static vtkMultiProcessControllerHelper* New();
   vtkTypeMacro(vtkMultiProcessControllerHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Reduce the stream to all processes calling the (*operation) for reduction.

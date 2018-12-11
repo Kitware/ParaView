@@ -38,7 +38,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHardwareSelector : public vtkOp
 public:
   static vtkPVHardwareSelector* New();
   vtkTypeMacro(vtkPVHardwareSelector, vtkOpenGLHardwareSelector);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Overridden to avoid clearing of captured buffers.
@@ -75,7 +75,7 @@ public:
   /**
    * Set the local ProcessId.
    */
-  void BeginRenderProp(vtkRenderWindow*) VTK_OVERRIDE;
+  void BeginRenderProp(vtkRenderWindow*) override;
 
 protected:
   vtkPVHardwareSelector();
@@ -84,7 +84,7 @@ protected:
   /**
    * Return a unique ID for the prop.
    */
-  int GetPropID(int idx, vtkProp* prop) VTK_OVERRIDE;
+  int GetPropID(int idx, vtkProp* prop) override;
 
   /**
    * Returns is the pass indicated is needed.
@@ -92,7 +92,7 @@ protected:
    * can be smart about it by only requiring it for sessions with more than 1
    * data-server.
    */
-  bool PassRequired(int pass) VTK_OVERRIDE;
+  bool PassRequired(int pass) override;
 
   /**
    * Prepare for selection.
@@ -100,7 +100,7 @@ protected:
    */
   bool PrepareSelect();
 
-  void SavePixelBuffer(int passNo) VTK_OVERRIDE;
+  void SavePixelBuffer(int passNo) override;
 
   vtkTimeStamp CaptureTime;
   int UniqueId;

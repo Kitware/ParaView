@@ -96,7 +96,7 @@ class vtkznzlib : public vtkObject
 public:
   static vtkznzlib *New();
   vtkTypeMacro(vtkznzlib,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 static znzFile znzopen(const char *path, const char *mode, int use_compression);
 

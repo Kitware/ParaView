@@ -32,7 +32,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGL2PSExporter : public vtkOpenGLGL
 public:
   static vtkPVGL2PSExporter* New();
   vtkTypeMacro(vtkPVGL2PSExporter, vtkOpenGLGL2PSExporter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -54,7 +54,7 @@ public:
     protected : vtkPVGL2PSExporter();
   ~vtkPVGL2PSExporter() override;
 
-  void WriteData() VTK_OVERRIDE;
+  void WriteData() override;
 
   vtkStdString FileName;
   int ExcludeCubeAxesActorsFromRasterization;

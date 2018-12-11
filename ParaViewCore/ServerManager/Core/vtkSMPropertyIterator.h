@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyIterator : public vtkSMObject
 public:
   static vtkSMPropertyIterator* New();
   vtkTypeMacro(vtkSMPropertyIterator, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set the proxy to be used.

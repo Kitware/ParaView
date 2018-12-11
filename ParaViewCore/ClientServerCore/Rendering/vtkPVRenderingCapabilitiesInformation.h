@@ -34,7 +34,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderingCapabilitiesInformatio
 public:
   static vtkPVRenderingCapabilitiesInformation* New();
   vtkTypeMacro(vtkPVRenderingCapabilitiesInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum CapabilitiesMask
   {
@@ -112,10 +112,10 @@ public:
   static vtkSmartPointer<vtkRenderWindow> NewOffscreenRenderWindow();
 
   //@}
-  void CopyFromObject(vtkObject*) VTK_OVERRIDE;
-  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
-  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject*) override;
+  void AddInformation(vtkPVInformation*) override;
+  void CopyToStream(vtkClientServerStream*) override;
+  void CopyFromStream(const vtkClientServerStream*) override;
 
 protected:
   vtkPVRenderingCapabilitiesInformation();

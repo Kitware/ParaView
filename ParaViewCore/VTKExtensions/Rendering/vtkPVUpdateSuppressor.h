@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVUpdateSuppressor : public vtkDataO
 {
 public:
   vtkTypeMacro(vtkPVUpdateSuppressor, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Construct with user-specified implicit function.
@@ -67,16 +67,16 @@ protected:
   ~vtkPVUpdateSuppressor() override;
 
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   vtkTimeStamp ForcedUpdateTimeStamp;
 
   bool Enabled;
 
   // Create a default executive.
-  vtkExecutive* CreateDefaultExecutive() VTK_OVERRIDE;
+  vtkExecutive* CreateDefaultExecutive() override;
 
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&) = delete;

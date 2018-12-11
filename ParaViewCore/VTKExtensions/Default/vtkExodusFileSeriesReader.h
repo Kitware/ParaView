@@ -47,17 +47,17 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExodusFileSeriesReader : public vtkFil
 public:
   vtkTypeMacro(vtkExodusFileSeriesReader, vtkFileSeriesReader);
   static vtkExodusFileSeriesReader* New();
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkExodusFileSeriesReader();
   ~vtkExodusFileSeriesReader() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   int RequestInformationForInput(
-    int index, vtkInformation* request, vtkInformationVector* outputVector) VTK_OVERRIDE;
+    int index, vtkInformation* request, vtkInformationVector* outputVector) override;
 
   // Replaces the filenames, which probably represents partitions of the data,
   // with a set of files where each represents a set of solution files for one

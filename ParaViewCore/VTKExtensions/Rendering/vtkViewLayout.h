@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkViewLayout : public vtkObject
 public:
   static vtkViewLayout* New();
   vtkTypeMacro(vtkViewLayout, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void ResetTileDisplay();
   void ShowOnTileDisplay(unsigned int);

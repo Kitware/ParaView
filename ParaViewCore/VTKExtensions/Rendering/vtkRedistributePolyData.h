@@ -39,7 +39,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkRedistributePolyData : public vtkPol
 {
 public:
   vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkRedistributePolyData* New();
 
@@ -152,7 +152,7 @@ protected:
   void ReceiveArrays(vtkDataArray*, vtkIdType, int, vtkIdType*, int);
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   // Do this as a proprocessing step.
   void CompleteInputArrays(vtkPolyData* input);

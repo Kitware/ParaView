@@ -46,7 +46,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompoundSourceProxy : public vtkSMSourc
 public:
   static vtkSMCompoundSourceProxy* New();
   vtkTypeMacro(vtkSMCompoundSourceProxy, vtkSMSourceProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Add a proxy to be included in this compound proxy.
@@ -105,20 +105,20 @@ public:
    * Each output port proxy corresponds to an actual output port on the
    * algorithm.
    */
-  void CreateOutputPorts() VTK_OVERRIDE;
+  void CreateOutputPorts() override;
 
   /**
    * Creates extract selection proxies for each output port if not already
    * created. Overridden to update the selection proxies.
    */
-  void CreateSelectionProxies() VTK_OVERRIDE;
+  void CreateSelectionProxies() override;
 
   /**
    * Update the VTK object on the server by pushing the values of
    * all modified properties (un-modified properties are ignored).
    * If the object has not been created, it will be created first.
    */
-  void UpdateVTKObjects() VTK_OVERRIDE;
+  void UpdateVTKObjects() override;
 
   /**
    * This is the same as save state except it will remove all references to
@@ -137,13 +137,13 @@ protected:
   /**
    * Read attributes from an XML element.
    */
-  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
   /**
    * Call superclass' and then assigns a new executive
    * (vtkCompositeDataPipeline)
    */
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
   // returns 1 if the value element should be written.
   // proxy property values that point to "outside" proxies

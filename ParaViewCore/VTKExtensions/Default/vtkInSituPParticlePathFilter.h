@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkInSituPParticlePathFilter : public vtk
 {
 public:
   vtkTypeMacro(vtkInSituPParticlePathFilter, vtkPParticlePathFilter);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkInSituPParticlePathFilter* New();
 
@@ -87,23 +87,23 @@ protected:
    * were written.
    */
   virtual std::vector<vtkDataSet*> GetSeedSources(
-    vtkInformationVector* inputVector, int timeStep) VTK_OVERRIDE;
+    vtkInformationVector* inputVector, int timeStep) override;
 
   /**
    * We add in a third, optional port for adding in particles for a
    * restarted simulation. These particles are only added at the first
    * time step.
    */
-  virtual int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * For restarts of particle paths, we add in the ability to add in
    * particles from a previous computation that we will still advect.
    */
-  virtual void AddRestartSeeds(vtkInformationVector**) VTK_OVERRIDE;
+  virtual void AddRestartSeeds(vtkInformationVector**) override;
 
   /**
    * Before starting the particle trace, classify
@@ -116,7 +116,7 @@ protected:
    */
   virtual void AssignSeedsToProcessors(double time, vtkDataSet* source, int sourceID, int ptId,
     vtkParticleTracerBaseNamespace::ParticleVector& localSeedPoints,
-    int& localAssignedCount) VTK_OVERRIDE;
+    int& localAssignedCount) override;
 
 private:
   vtkInSituPParticlePathFilter(const vtkInSituPParticlePathFilter&) = delete;

@@ -36,7 +36,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCleanArrays : public vtkPassInputTyp
 public:
   static vtkCleanArrays* New();
   vtkTypeMacro(vtkCleanArrays, vtkPassInputTypeAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -62,7 +62,7 @@ protected:
   ~vtkCleanArrays() override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   vtkMultiProcessController* Controller;
 

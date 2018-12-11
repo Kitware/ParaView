@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSurfaceLICRepresentation : public vtkGeometryRepresentation
 public:
   static vtkSurfaceLICRepresentation* New();
   vtkTypeMacro(vtkSurfaceLICRepresentation, vtkGeometryRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -40,7 +40,7 @@ public:
   // representations or ask them to perform certain tasks e.g.
   // PrepareForRendering.
   virtual int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
   // Description:
   // Indicates whether LIC should be used when doing LOD rendering.
@@ -100,7 +100,7 @@ protected:
 
   // Description:
   // Overridden method to set parameters on vtkProperty and vtkMapper.
-  void UpdateColoringParameters() VTK_OVERRIDE;
+  void UpdateColoringParameters() override;
 
   vtkCompositeSurfaceLICMapper* SurfaceLICMapper;
   vtkCompositeSurfaceLICMapper* SurfaceLICLODMapper;

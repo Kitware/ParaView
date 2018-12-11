@@ -40,7 +40,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVPostFilterExecutive : public vtkPVCompo
 public:
   static vtkPVPostFilterExecutive* New();
   vtkTypeMacro(vtkPVPostFilterExecutive, vtkPVCompositeDataPipeline);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   static vtkInformationInformationVectorKey* POST_ARRAYS_TO_PROCESS();
   static vtkInformationStringVectorKey* POST_ARRAY_COMPONENT_KEY();
@@ -59,8 +59,8 @@ protected:
   ~vtkPVPostFilterExecutive() override;
 
   // Overridden to always return true
-  int NeedToExecuteData(int outputPort, vtkInformationVector** inInfoVec,
-    vtkInformationVector* outInfoVec) VTK_OVERRIDE;
+  int NeedToExecuteData(
+    int outputPort, vtkInformationVector** inInfoVec, vtkInformationVector* outInfoVec) override;
 
   bool MatchingPropertyInformation(vtkInformation* inputArrayInfo, vtkInformation* postArrayInfo);
 

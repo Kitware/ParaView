@@ -34,7 +34,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractiveViewLinkRepresentation
 public:
   static vtkPVInteractiveViewLinkRepresentation* New();
   vtkTypeMacro(vtkPVInteractiveViewLinkRepresentation, vtkLogoRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Considering an eventPosition and current interaction state, this method will adjust
@@ -42,7 +42,7 @@ public:
    * going
    * over the edges of the render window
    */
-  void WidgetInteraction(double eventPos[2]) VTK_OVERRIDE;
+  void WidgetInteraction(double eventPos[2]) override;
 
 protected:
   vtkPVInteractiveViewLinkRepresentation();
@@ -51,7 +51,7 @@ protected:
   /**
    * Redefining method to avoid adjustment of image
    */
-  void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]) VTK_OVERRIDE;
+  void AdjustImageSize(double o[2], double borderSize[2], double imageSize[2]) override;
 
 private:
   vtkPVInteractiveViewLinkRepresentation(const vtkPVInteractiveViewLinkRepresentation&) = delete;

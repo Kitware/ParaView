@@ -32,7 +32,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVFilePathEncodingHelper : public 
 public:
   static vtkPVFilePathEncodingHelper* New();
   vtkTypeMacro(vtkPVFilePathEncodingHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

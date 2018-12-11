@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPExtractTemporalFieldData
 public:
   static vtkPExtractTemporalFieldData* New();
   vtkTypeMacro(vtkPExtractTemporalFieldData, vtkExtractTemporalFieldData);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -55,7 +55,7 @@ protected:
   ~vtkPExtractTemporalFieldData() override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   vtkMultiProcessController* Controller;
 

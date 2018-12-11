@@ -344,6 +344,7 @@
         { "path": "vtkGPUInfoListArray.h" },
         { "path": "vtkRenderingCoreEnums.h" },
         { "path": "vtkTDxMotionEventInfo.h" },
+        { "class": "vtkAbstractHyperTreeGridMapper" },
         { "class": "vtkAbstractMapper" },
         { "class": "vtkAbstractMapper3D" },
         { "class": "vtkAbstractPicker" },

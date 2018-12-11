@@ -40,7 +40,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkClientServerMoveData : public vtk
 public:
   static vtkClientServerMoveData* New();
   vtkTypeMacro(vtkClientServerMoveData, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -101,19 +101,19 @@ protected:
 
   // Overridden to mark input as optional, since input data may
   // not be available on all processes that this filter is instantiated.
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   // Create an output of the type defined by OutputDataType
   int RequestDataObject(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   // If there is an input call superclass' RequestInformation
   // otherwise set the output WHOLE_EXTENT() to be WholeExtent
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   virtual int SendData(vtkDataObject*, vtkMultiProcessController*);
   virtual vtkDataObject* ReceiveData(vtkMultiProcessController*);

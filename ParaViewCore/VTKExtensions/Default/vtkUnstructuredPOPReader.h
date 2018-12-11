@@ -52,7 +52,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkUnstructuredPOPReader
 public:
   vtkTypeMacro(vtkUnstructuredPOPReader, vtkUnstructuredGridAlgorithm);
   static vtkUnstructuredPOPReader* New();
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -124,7 +124,7 @@ protected:
   vtkUnstructuredPOPReader();
   ~vtkUnstructuredPOPReader() override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   static void SelectionModifiedCallback(
     vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
@@ -212,7 +212,7 @@ protected:
   bool ReadMetaData(int wholeExtent[6]);
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
   /**
    * Adds a point data field given by varidp in the NetCDF file

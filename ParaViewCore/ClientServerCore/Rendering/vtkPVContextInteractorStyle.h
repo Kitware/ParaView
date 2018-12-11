@@ -33,16 +33,16 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVContextInteractorStyle
 public:
   static vtkPVContextInteractorStyle* New();
   vtkTypeMacro(vtkPVContextInteractorStyle, vtkContextInteractorStyle);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void OnLeftButtonDown() VTK_OVERRIDE;
-  void OnLeftButtonUp() VTK_OVERRIDE;
-  void OnMiddleButtonDown() VTK_OVERRIDE;
-  void OnMiddleButtonUp() VTK_OVERRIDE;
-  void OnRightButtonDown() VTK_OVERRIDE;
-  void OnRightButtonUp() VTK_OVERRIDE;
-  void OnMouseWheelForward() VTK_OVERRIDE;
-  void OnMouseWheelBackward() VTK_OVERRIDE;
+  void OnLeftButtonDown() override;
+  void OnLeftButtonUp() override;
+  void OnMiddleButtonDown() override;
+  void OnMiddleButtonUp() override;
+  void OnRightButtonDown() override;
+  void OnRightButtonUp() override;
+  void OnMouseWheelForward() override;
+  void OnMouseWheelBackward() override;
 
 protected:
   vtkPVContextInteractorStyle();

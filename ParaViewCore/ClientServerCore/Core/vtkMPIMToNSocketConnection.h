@@ -46,7 +46,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkMPIMToNSocketConnection : public vtkOb
 public:
   static vtkMPIMToNSocketConnection* New();
   vtkTypeMacro(vtkMPIMToNSocketConnection, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void Initialize(int waiting_process_type);
 

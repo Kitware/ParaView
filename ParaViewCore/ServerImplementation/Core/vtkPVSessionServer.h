@@ -36,14 +36,14 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionServer : public vtkPVSess
 public:
   static vtkPVSessionServer* New();
   vtkTypeMacro(vtkPVSessionServer, vtkPVSessionBase);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns the active controller used to communicate with the process.
    * Value must be DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
    * But only the CLIENT do return something different than NULL;
    */
-  vtkMultiProcessController* GetController(ServerFlags processType) VTK_OVERRIDE;
+  vtkMultiProcessController* GetController(ServerFlags processType) override;
 
   /**
    * Connects a remote server. URL can be of the following format:
@@ -69,7 +69,7 @@ public:
   /**
    * Returns true is this session is active/alive/valid.
    */
-  bool GetIsAlive() VTK_OVERRIDE;
+  bool GetIsAlive() override;
 
   /**
    * Client-Server Communication tags.
@@ -129,12 +129,12 @@ public:
   /**
    * Sends the message to all clients.
    */
-  void NotifyAllClients(const vtkSMMessage*) VTK_OVERRIDE;
+  void NotifyAllClients(const vtkSMMessage*) override;
 
   /**
    * Sends the message to all but the active client-session.
    */
-  void NotifyOtherClients(const vtkSMMessage*) VTK_OVERRIDE;
+  void NotifyOtherClients(const vtkSMMessage*) override;
 
 protected:
   vtkPVSessionServer();

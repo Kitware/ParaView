@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyLocator : public vtkSMObject
 public:
   static vtkSMProxyLocator* New();
   vtkTypeMacro(vtkSMProxyLocator, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Locate a proxy with the given "name". If none can be found returns NULL.

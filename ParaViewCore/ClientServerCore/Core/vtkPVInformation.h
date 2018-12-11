@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVInformation : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVInformation, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Transfer information about a single object into this object.

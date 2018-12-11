@@ -54,7 +54,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVProgressHandler : public vtkObject
 public:
   static vtkPVProgressHandler* New();
   vtkTypeMacro(vtkPVProgressHandler, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

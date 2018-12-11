@@ -50,7 +50,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVRecoverGeometryWireframe : public 
 public:
   vtkTypeMacro(vtkPVRecoverGeometryWireframe, vtkPolyDataAlgorithm);
   static vtkPVRecoverGeometryWireframe* New();
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * In order to determine which edges existed in the original data, we need an
@@ -66,7 +66,7 @@ protected:
   ~vtkPVRecoverGeometryWireframe() override;
 
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
 private:
   vtkPVRecoverGeometryWireframe(const vtkPVRecoverGeometryWireframe&) = delete;

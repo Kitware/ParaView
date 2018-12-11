@@ -41,13 +41,13 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkXYChartRepresentation : public vt
 public:
   static vtkXYChartRepresentation* New();
   vtkTypeMacro(vtkXYChartRepresentation, vtkChartRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set visibility of the representation. Overridden to ensure that internally
    * added vtkPlot instances are updated when hiding the representation.
    */
-  void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) override;
 
   //@{
   /**
@@ -142,7 +142,7 @@ public:
    * a CSV file. Return false on failure which will call the exporting process
    * to abort and raise an error. Default implementation simply returns false.
    */
-  bool Export(vtkCSVExporter* exporter) VTK_OVERRIDE;
+  bool Export(vtkCSVExporter* exporter) override;
 
 protected:
   vtkXYChartRepresentation();
@@ -151,16 +151,16 @@ protected:
   /**
    * Overridden to remove all plots from the view.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-    vtkInformation* outInfo) VTK_OVERRIDE;
+    vtkInformation* outInfo) override;
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  vtkSmartPointer<vtkDataObject> TransformTable(vtkSmartPointer<vtkDataObject>) VTK_OVERRIDE;
+  vtkSmartPointer<vtkDataObject> TransformTable(vtkSmartPointer<vtkDataObject>) override;
 
-  void PrepareForRendering() VTK_OVERRIDE;
+  void PrepareForRendering() override;
 
   class vtkInternals;
   friend class vtkInternals;

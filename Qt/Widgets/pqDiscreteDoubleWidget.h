@@ -20,7 +20,7 @@
 #include <QVector>
 #include <QWidget>
 
-#include "vtkConfigure.h" // for VTK_OVERRIDE
+#include "vtkConfigure.h" // for override
 
 /**
  * Customize pqDoubleSliderWidget to use a custom set of allowed values
@@ -42,8 +42,8 @@ public:
   void setValues(std::vector<double> values);
 
 protected:
-  int valueToSliderPos(double val) VTK_OVERRIDE;
-  double sliderPosToValue(int pos) VTK_OVERRIDE;
+  int valueToSliderPos(double val) override;
+  double sliderPosToValue(int pos) override;
 
 private:
   QVector<double> Values;

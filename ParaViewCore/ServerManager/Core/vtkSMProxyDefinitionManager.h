@@ -38,7 +38,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyDefinitionManager : public vtkSMRe
 public:
   static vtkSMProxyDefinitionManager* New();
   vtkTypeMacro(vtkSMProxyDefinitionManager, vtkSMRemoteObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Synchronizes the client-side definitions using the server-side definitions,
@@ -52,7 +52,7 @@ public:
    * ensures that the internal references to vtkSIProxyDefinitionManager are
    * updated correctly.
    */
-  void SetSession(vtkSMSession*) VTK_OVERRIDE;
+  void SetSession(vtkSMSession*) override;
 
   //***************************************************************************
   // enums re-defined from vtkSIProxyDefinitionManager for convenience.
@@ -207,7 +207,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) override;
 
 protected:
   vtkSMProxyDefinitionManager();

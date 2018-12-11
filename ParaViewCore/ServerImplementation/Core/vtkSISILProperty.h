@@ -31,7 +31,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSISILProperty : public vtkSIProper
 public:
   static vtkSISILProperty* New();
   vtkTypeMacro(vtkSISILProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSISILProperty();
@@ -44,12 +44,12 @@ protected:
    * and the "output_port" if this one is different than the default one which
    * is 0.
    */
-  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) VTK_OVERRIDE;
+  bool ReadXMLAttributes(vtkSIProxy* proxyhelper, vtkPVXMLElement* element) override;
 
   /**
    * Pull the current state of the underneath implementation
    */
-  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) override;
 
   vtkSetStringMacro(SubTree);
 

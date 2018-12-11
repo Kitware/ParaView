@@ -27,7 +27,7 @@ class VTKPVANIMATION_EXPORT vtkPVExponentialKeyFrame : public vtkPVKeyFrame
 {
 public:
   vtkTypeMacro(vtkPVExponentialKeyFrame, vtkPVKeyFrame);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   static vtkPVExponentialKeyFrame* New();
 
   /**
@@ -35,7 +35,7 @@ public:
    * currenttime is normalized to the time range between
    * this key frame and the next key frame.
    */
-  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) VTK_OVERRIDE;
+  void UpdateValue(double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next) override;
 
   //@{
   /**

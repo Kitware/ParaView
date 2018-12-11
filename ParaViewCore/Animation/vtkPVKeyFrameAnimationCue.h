@@ -31,7 +31,7 @@ class VTKPVANIMATION_EXPORT vtkPVKeyFrameAnimationCue : public vtkPVAnimationCue
 {
 public:
   vtkTypeMacro(vtkPVKeyFrameAnimationCue, vtkPVAnimationCue);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

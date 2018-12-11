@@ -37,7 +37,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkParallelSerialWriter : public vtkDataObje
 public:
   static vtkParallelSerialWriter* New();
   vtkTypeMacro(vtkParallelSerialWriter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -50,7 +50,7 @@ public:
   /**
    * Return the MTime also considering the internal writer.
    */
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() override;
 
   //@{
   /**
@@ -151,11 +151,11 @@ protected:
   ~vtkParallelSerialWriter() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
 private:
   vtkParallelSerialWriter(const vtkParallelSerialWriter&) = delete;

@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRayCastPickingHelper : public v
 public:
   static vtkPVRayCastPickingHelper* New();
   vtkTypeMacro(vtkPVRayCastPickingHelper, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set input on which the selection apply

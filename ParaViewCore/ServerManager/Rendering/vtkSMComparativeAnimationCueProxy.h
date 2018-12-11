@@ -36,7 +36,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMComparativeAnimationCueProxy : pub
 public:
   static vtkSMComparativeAnimationCueProxy* New();
   vtkTypeMacro(vtkSMComparativeAnimationCueProxy, vtkSMProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -66,7 +66,7 @@ public:
    * This call saves all a proxy's properties, including exposed properties
    * and sub-proxies. More control is provided by the following overload.
    */
-  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root) VTK_OVERRIDE
+  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root) override
   {
     return this->Superclass::SaveXMLState(root);
   }
@@ -74,7 +74,7 @@ public:
   /**
    * The iterator is use to filter the property available on the given proxy
    */
-  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) VTK_OVERRIDE;
+  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter) override;
 
   /**
    * Loads the proxy state from the XML element. Returns 0 on failure.
@@ -83,7 +83,7 @@ public:
    * or subclasses). If locator is NULL, then such properties are left
    * unchanged.
    */
-  int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator) override;
 
 protected:
   vtkSMComparativeAnimationCueProxy();
@@ -94,7 +94,7 @@ protected:
    * setting ServerIDs), this methods instantiates the objects on the
    * server(s)
    */
-  void CreateVTKObjects() VTK_OVERRIDE;
+  void CreateVTKObjects() override;
 
   // Method used to simplify the access to the concreate VTK class underneath
   friend class vtkSMComparativeAnimationCueUndoElement;

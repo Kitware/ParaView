@@ -84,18 +84,18 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSubsetInclusionLatticeDomain : public v
 public:
   static vtkSMSubsetInclusionLatticeDomain* New();
   vtkTypeMacro(vtkSMSubsetInclusionLatticeDomain, vtkSMStringListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Returns 1 always. vtkSMSubsetInclusionLatticeDomain doesn't validate
    * values currently.
    */
-  int IsInDomain(vtkSMProperty*) VTK_OVERRIDE { return 1; }
+  int IsInDomain(vtkSMProperty*) override { return 1; }
 
   /**
    * The SIL may have changed. Update it.
    */
-  void Update(vtkSMProperty* requestingProperty) VTK_OVERRIDE;
+  void Update(vtkSMProperty* requestingProperty) override;
 
   /**
    * Returns the vtkSubsetInclusionLattice. May return an empty SIL, but never a
@@ -106,13 +106,13 @@ public:
   /**
    * Overridden to set default from SIL.
    */
-  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) VTK_OVERRIDE;
+  int SetDefaultValues(vtkSMProperty*, bool use_unchecked_values) override;
 
 protected:
   vtkSMSubsetInclusionLatticeDomain();
   ~vtkSMSubsetInclusionLatticeDomain();
 
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) override;
 
 private:
   vtkSMSubsetInclusionLatticeDomain(const vtkSMSubsetInclusionLatticeDomain&) = delete;

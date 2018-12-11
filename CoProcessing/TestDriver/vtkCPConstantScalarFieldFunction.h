@@ -31,13 +31,13 @@ class VTKPVCATALYSTTESTDRIVER_EXPORT vtkCPConstantScalarFieldFunction
 public:
   static vtkCPConstantScalarFieldFunction* New();
   vtkTypeMacro(vtkCPConstantScalarFieldFunction, vtkCPScalarFieldFunction);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Compute the field value at Point which is an array of length 3.
    */
   virtual double ComputeComponenentAtPoint(
-    unsigned int component, double* point, unsigned long timeStep, double time) VTK_OVERRIDE;
+    unsigned int component, double* point, unsigned long timeStep, double time) override;
 
   //@{
   /**

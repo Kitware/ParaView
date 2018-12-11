@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCameraInterpolator2 : public vtkObje
 public:
   static vtkCameraInterpolator2* New();
   vtkTypeMacro(vtkCameraInterpolator2, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Add points on the path. For a fixed location, simply add 1 point.
   void AddPositionPathPoint(double x, double y, double z);

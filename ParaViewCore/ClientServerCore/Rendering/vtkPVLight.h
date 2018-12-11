@@ -37,7 +37,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVLight : public vtkLight
 public:
   static vtkPVLight* New();
   vtkTypeMacro(vtkPVLight, vtkLight);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * When not, 0.0, the light will produce soft shadows.
@@ -55,7 +55,7 @@ public:
    * Overridden for special treatment of OSPRay specific
    * ambient light type.
    */
-  virtual void SetLightType(int t) VTK_OVERRIDE;
+  virtual void SetLightType(int t) override;
 
 protected:
   vtkPVLight();

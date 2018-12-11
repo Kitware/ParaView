@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVEnSightMasterServerReader
 public:
   static vtkPVEnSightMasterServerReader* New();
   vtkTypeMacro(vtkPVEnSightMasterServerReader, vtkGenericEnSightReader);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -66,9 +66,8 @@ protected:
   vtkPVEnSightMasterServerReader();
   ~vtkPVEnSightMasterServerReader() override;
 
-  int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int ParseMasterServerFile();
 
   void SuperclassExecuteInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);

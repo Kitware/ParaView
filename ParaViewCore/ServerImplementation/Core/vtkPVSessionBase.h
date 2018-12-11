@@ -40,7 +40,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionBase : public vtkPVSessio
 {
 public:
   vtkTypeMacro(vtkPVSessionBase, vtkPVSession);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   enum EventIds
   {
@@ -60,7 +60,7 @@ public:
    * DATA_SERVER | RENDER_SERVER. The implementation provided is suitable for
    * server processes such as pvserver, pvdataserver (both root and satellites).
    */
-  ServerFlags GetProcessRoles() VTK_OVERRIDE;
+  ServerFlags GetProcessRoles() override;
 
   /**
    * vtkPVServerInformation is an information-object that provides information
@@ -70,13 +70,13 @@ public:
    * Overridden to provide support for non-remote-server case. We simply read
    * the local process information and return it.
    */
-  vtkPVServerInformation* GetServerInformation() VTK_OVERRIDE;
+  vtkPVServerInformation* GetServerInformation() override;
 
   /**
    * This is socket connection, if any to communicate between the data-server
    * and render-server nodes. Forwarded for vtkPVSessionCore.
    */
-  vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection() VTK_OVERRIDE;
+  vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection() override;
 
   //---------------------------------------------------------------------------
   // Remote communication API. This API is used for communication in the
@@ -230,8 +230,8 @@ protected:
    * Should be called to begin/end receiving progresses on this session.
    * Overridden to relay to the server(s).
    */
-  void PrepareProgressInternal() VTK_OVERRIDE;
-  void CleanupPendingProgressInternal() VTK_OVERRIDE;
+  void PrepareProgressInternal() override;
+  void CleanupPendingProgressInternal() override;
   //@}
 
   friend class vtkSMRemoteObject;

@@ -34,7 +34,7 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVCompositeDataInformationIterator : p
 public:
   static vtkPVCompositeDataInformationIterator* New();
   vtkTypeMacro(vtkPVCompositeDataInformationIterator, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

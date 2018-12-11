@@ -32,13 +32,13 @@ class VTKPVANIMATION_EXPORT vtkSMAnimationFrameWindowDomain : public vtkSMIntRan
 public:
   static vtkSMAnimationFrameWindowDomain* New();
   vtkTypeMacro(vtkSMAnimationFrameWindowDomain, vtkSMIntRangeDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Overridden to setup domain range values based on required properties
    * supported by this domain.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
 protected:
   vtkSMAnimationFrameWindowDomain();

@@ -38,7 +38,7 @@ class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCameraManipulator : public vtkObject
 public:
   static vtkCameraManipulator* New();
   vtkTypeMacro(vtkCameraManipulator, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**

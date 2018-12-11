@@ -39,12 +39,12 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRepresentedArrayListDomain
 public:
   static vtkSMRepresentedArrayListDomain* New();
   vtkTypeMacro(vtkSMRepresentedArrayListDomain, vtkSMArrayListDomain);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Update the domain.
    */
-  void Update(vtkSMProperty*) VTK_OVERRIDE;
+  void Update(vtkSMProperty*) override;
 
   //@{
   /**
@@ -68,7 +68,7 @@ protected:
   /**
    * Overridden to process "use_true_parent".
    */
-  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) VTK_OVERRIDE;
+  int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem) override;
 
   /**
    * Returns true if an array should be filtered out based on its name or number
@@ -76,15 +76,14 @@ protected:
    * This implementation returns true if the array name matches
    * an expression in the vtkPVColorArrayListSettings singleton.
    */
-  bool IsFilteredArray(
-    vtkPVDataInformation* info, int association, const char* arrayName) VTK_OVERRIDE;
+  bool IsFilteredArray(vtkPVDataInformation* info, int association, const char* arrayName) override;
 
   /**
    * HACK: Provides a temporary mechanism for subclasses to provide an
    * "additional" vtkPVDataInformation instance to get available arrays list
    * from.
    */
-  vtkPVDataInformation* GetExtraDataInformation() VTK_OVERRIDE;
+  vtkPVDataInformation* GetExtraDataInformation() override;
 
   void SetRepresentationProxy(vtkSMRepresentationProxy*);
   void OnRepresentationDataUpdated();

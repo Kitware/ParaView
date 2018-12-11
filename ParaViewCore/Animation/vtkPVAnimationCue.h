@@ -39,7 +39,7 @@ class VTKPVANIMATION_EXPORT vtkPVAnimationCue : public vtkAnimationCue
 {
 public:
   vtkTypeMacro(vtkPVAnimationCue, vtkAnimationCue);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -96,9 +96,9 @@ public:
   /**
    * Overridden to ignore the calls when this->Enabled == false.
    */
-  void Initialize() VTK_OVERRIDE;
-  void Tick(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
-  void Finalize() VTK_OVERRIDE;
+  void Initialize() override;
+  void Tick(double currenttime, double deltatime, double clocktime) override;
+  void Finalize() override;
   //@}
 
 protected:
@@ -106,9 +106,9 @@ protected:
   ~vtkPVAnimationCue() override;
 
   //@{
-  void StartCueInternal() VTK_OVERRIDE;
-  void TickInternal(double currenttime, double deltatime, double clocktime) VTK_OVERRIDE;
-  void EndCueInternal() VTK_OVERRIDE;
+  void StartCueInternal() override;
+  void TickInternal(double currenttime, double deltatime, double clocktime) override;
+  void EndCueInternal() override;
   //@}
 
   friend class vtkSMAnimationSceneProxy;

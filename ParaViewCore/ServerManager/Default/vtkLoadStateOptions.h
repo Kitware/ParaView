@@ -32,7 +32,7 @@ class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkLoadStateOptions : public vtkObject
 public:
   static vtkLoadStateOptions* New();
   vtkTypeMacro(vtkLoadStateOptions, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(DataDirectory, std::string);
 

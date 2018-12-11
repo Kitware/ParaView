@@ -36,7 +36,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIIdTypeVectorProperty : public vt
 public:
   static vtkSIIdTypeVectorProperty* New();
   vtkTypeMacro(vtkSIIdTypeVectorProperty, vtkSIVectorProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSIIdTypeVectorProperty();

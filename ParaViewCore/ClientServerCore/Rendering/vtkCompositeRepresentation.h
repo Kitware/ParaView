@@ -43,12 +43,12 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCompositeRepresentation
 public:
   static vtkCompositeRepresentation* New();
   vtkTypeMacro(vtkCompositeRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Methods overridden to propagate to the active representation.
    */
-  void SetVisibility(bool val) VTK_OVERRIDE;
+  void SetVisibility(bool val) override;
 
   //@{
   /**
@@ -80,23 +80,23 @@ public:
    * won't need this if vtkPVDataRepresentation correctly respected in the
    * arguments passed to it during ProcessRequest() etc.
    */
-  void SetInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void SetInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void AddInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void AddInputConnection(vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) VTK_OVERRIDE;
-  void RemoveInputConnection(int port, int idx) VTK_OVERRIDE;
+  void SetInputConnection(int port, vtkAlgorithmOutput* input) override;
+  void SetInputConnection(vtkAlgorithmOutput* input) override;
+  void AddInputConnection(int port, vtkAlgorithmOutput* input) override;
+  void AddInputConnection(vtkAlgorithmOutput* input) override;
+  void RemoveInputConnection(int port, vtkAlgorithmOutput* input) override;
+  void RemoveInputConnection(int port, int idx) override;
   //@}
 
   /**
    * Propagate the modification to all internal representations.
    */
-  void MarkModified() VTK_OVERRIDE;
+  void MarkModified() override;
 
   /**
    * Returns the data object that is rendered from the given input port.
    */
-  vtkDataObject* GetRenderedDataObject(int port) VTK_OVERRIDE;
+  vtkDataObject* GetRenderedDataObject(int port) override;
 
   /**
    * Returns the list of available representation types as a string array.
@@ -107,30 +107,30 @@ public:
   /**
    * Passed on to internal representations as well.
    */
-  void SetUpdateTime(double time) VTK_OVERRIDE;
-  void SetForceUseCache(bool val) VTK_OVERRIDE;
-  void SetForcedCacheKey(double val) VTK_OVERRIDE;
+  void SetUpdateTime(double time) override;
+  void SetForceUseCache(bool val) override;
+  void SetForcedCacheKey(double val) override;
   //@}
 
 protected:
   vtkCompositeRepresentation();
   ~vtkCompositeRepresentation() override;
 
-  int FillInputPortInformation(int, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int, vtkInformation* info) override;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   /**
    * Fires UpdateDataEvent

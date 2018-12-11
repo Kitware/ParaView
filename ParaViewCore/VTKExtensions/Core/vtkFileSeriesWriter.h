@@ -33,7 +33,7 @@ class VTKPVVTKEXTENSIONSCORE_EXPORT vtkFileSeriesWriter : public vtkDataObjectAl
 public:
   static vtkFileSeriesWriter* New();
   vtkTypeMacro(vtkFileSeriesWriter, vtkDataObjectAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -46,7 +46,7 @@ public:
   /**
    * Return the MTime also considering the internal writer.
    */
-  vtkMTimeType GetMTime() VTK_OVERRIDE;
+  vtkMTimeType GetMTime() override;
 
   //@{
   /**
@@ -122,7 +122,7 @@ public:
   /**
    * see vtkAlgorithm for details
    */
-  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
+  int ProcessRequest(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
   /**
    * Get/Set the interpreter to use to call methods on the writer.
@@ -139,11 +139,11 @@ protected:
   ~vtkFileSeriesWriter() override;
 
   int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
   int RequestData(vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector) VTK_OVERRIDE;
+    vtkInformationVector* outputVector) override;
 
 private:
   vtkFileSeriesWriter(const vtkFileSeriesWriter&) = delete;

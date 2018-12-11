@@ -37,7 +37,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializerProtobuf : public vtkSMDese
 public:
   static vtkSMDeserializerProtobuf* New();
   vtkTypeMacro(vtkSMDeserializerProtobuf, vtkSMDeserializer);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -58,7 +58,7 @@ protected:
    * First ask the session, to find the given proxy.
    * If not found in the session then Create a new proxy with the id if possible.
    */
-  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  vtkSMProxy* NewProxy(vtkTypeUInt32 id, vtkSMProxyLocator* locator) override;
 
   vtkSMStateLocator* StateLocator;
 

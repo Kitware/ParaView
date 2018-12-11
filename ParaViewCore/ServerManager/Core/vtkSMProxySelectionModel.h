@@ -42,13 +42,13 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxySelectionModel : public vtkSMRemot
 public:
   static vtkSMProxySelectionModel* New();
   vtkTypeMacro(vtkSMProxySelectionModel, vtkSMRemoteObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Override the set session, so we can attach an observer to the Collaboration
    * manager in order to monitor master/slave changes.
    */
-  void SetSession(vtkSMSession*) VTK_OVERRIDE;
+  void SetSession(vtkSMSession*) override;
 
   //@{
   /**
@@ -145,7 +145,7 @@ public:
    * This method will be used to fill the undo stack.
    * If not overridden this will return NULL.
    */
-  const vtkSMMessage* GetFullState() VTK_OVERRIDE;
+  const vtkSMMessage* GetFullState() override;
 
   /**
    * This method is used to initialise the object to the given state
@@ -154,7 +154,7 @@ public:
    * globalID set. This allow to split the load process in 2 step to prevent
    * invalid state when property refere to a sub-proxy that does not exist yet.
    */
-  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) override;
 
 protected:
   vtkSMProxySelectionModel();

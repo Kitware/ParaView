@@ -34,7 +34,7 @@ class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMUtilities : public vtkSMObject
 public:
   static vtkSMUtilities* New();
   vtkTypeMacro(vtkSMUtilities, vtkSMObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Save the image to a file.

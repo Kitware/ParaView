@@ -35,9 +35,9 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVMultiSliceView : public vtkPVRe
 public:
   static vtkPVMultiSliceView* New();
   vtkTypeMacro(vtkPVMultiSliceView, vtkPVRenderView);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  void Update() VTK_OVERRIDE;
+  void Update() override;
 
   void SetNumberOfXSlices(unsigned int count) { this->SetNumberOfSlices(0, count); }
   void SetXSlices(const double* values) { this->SetSlices(0, values); }
@@ -74,7 +74,7 @@ protected:
   vtkPVMultiSliceView();
   ~vtkPVMultiSliceView() override;
 
-  void AboutToRenderOnLocalProcess(bool interactive) VTK_OVERRIDE;
+  void AboutToRenderOnLocalProcess(bool interactive) override;
 
   void SetNumberOfSlices(int type, unsigned int count);
   void SetSlices(int type, const double* values);

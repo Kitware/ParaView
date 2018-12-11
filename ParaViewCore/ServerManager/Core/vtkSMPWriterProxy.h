@@ -33,7 +33,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPWriterProxy : public vtkSMWriterProxy
 public:
   static vtkSMPWriterProxy* New();
   vtkTypeMacro(vtkSMPWriterProxy, vtkSMWriterProxy);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSMPWriterProxy();

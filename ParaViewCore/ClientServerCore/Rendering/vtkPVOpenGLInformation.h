@@ -32,7 +32,7 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLInformation : public vtkP
 public:
   static vtkPVOpenGLInformation* New();
   vtkTypeMacro(vtkPVOpenGLInformation, vtkPVInformation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Collects OpenGL information from the \c object. \c object must be
@@ -41,19 +41,19 @@ public:
    * information (see
    * vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow()).
    */
-  void CopyFromObject(vtkObject* object) VTK_OVERRIDE;
+  void CopyFromObject(vtkObject* object) override;
 
   /**
    * Merge another information object.
    */
-  void AddInformation(vtkPVInformation*) VTK_OVERRIDE;
+  void AddInformation(vtkPVInformation*) override;
 
   //@{
   /**
    * Manage a serialized version of the information.
    */
-  void CopyToStream(vtkClientServerStream*) VTK_OVERRIDE;
-  void CopyFromStream(const vtkClientServerStream*) VTK_OVERRIDE;
+  void CopyToStream(vtkClientServerStream*) override;
+  void CopyFromStream(const vtkClientServerStream*) override;
   //@}
 
   //@{

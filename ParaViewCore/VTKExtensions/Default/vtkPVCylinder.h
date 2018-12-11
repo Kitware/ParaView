@@ -31,7 +31,7 @@ public:
   static vtkPVCylinder* New();
 
   vtkTypeMacro(vtkPVCylinder, vtkCylinder);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   //@{
   /**
@@ -43,8 +43,8 @@ public:
   //@}
 
   // Reimplemented to update transform on change:
-  void SetCenter(double x, double y, double z) VTK_OVERRIDE;
-  void SetCenter(double xyz[3]) VTK_OVERRIDE;
+  void SetCenter(double x, double y, double z) override;
+  void SetCenter(double xyz[3]) override;
 
 protected:
   vtkPVCylinder();

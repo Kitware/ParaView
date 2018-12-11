@@ -29,7 +29,7 @@ class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSITimeStepsProperty : public vtkSI
 public:
   static vtkSITimeStepsProperty* New();
   vtkTypeMacro(vtkSITimeStepsProperty, vtkSIProperty);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 protected:
   vtkSITimeStepsProperty();
@@ -40,7 +40,7 @@ protected:
   /**
    * Pull the current state of the underneath implementation
    */
-  bool Pull(vtkSMMessage*) VTK_OVERRIDE;
+  bool Pull(vtkSMMessage*) override;
 
 private:
   vtkSITimeStepsProperty(const vtkSITimeStepsProperty&) = delete;

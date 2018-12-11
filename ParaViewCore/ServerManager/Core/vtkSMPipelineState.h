@@ -42,7 +42,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPipelineState : public vtkSMRemoteObjec
 public:
   static vtkSMPipelineState* New();
   vtkTypeMacro(vtkSMPipelineState, vtkSMRemoteObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * This method return the full object state that can be used to create that
@@ -50,12 +50,12 @@ public:
    * This method will be used to fill the undo stack.
    * If not overridden this will return NULL.
    */
-  const vtkSMMessage* GetFullState() VTK_OVERRIDE;
+  const vtkSMMessage* GetFullState() override;
 
   /**
    * This method is used to initialise the object to the given state
    */
-  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) VTK_OVERRIDE;
+  void LoadState(const vtkSMMessage* msg, vtkSMProxyLocator* locator) override;
 
   void ValidateState();
 

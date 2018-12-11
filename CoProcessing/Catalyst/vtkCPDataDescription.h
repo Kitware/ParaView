@@ -29,7 +29,7 @@ class VTKPVCATALYST_EXPORT vtkCPDataDescription : public vtkObject
 public:
   static vtkCPDataDescription* New();
   vtkTypeMacro(vtkCPDataDescription, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /// Set the time step and current simulation time.
   void SetTimeData(double time, vtkIdType timeStep);

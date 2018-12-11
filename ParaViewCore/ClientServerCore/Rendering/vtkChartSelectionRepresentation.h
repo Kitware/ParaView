@@ -43,18 +43,18 @@ class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartSelectionRepresentation
 public:
   static vtkChartSelectionRepresentation* New();
   vtkTypeMacro(vtkChartSelectionRepresentation, vtkPVDataRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * This needs to be called on all instances of vtkChartSelectionRepresentation when
    * the input is modified.
    */
-  void MarkModified() VTK_OVERRIDE { this->Superclass::MarkModified(); }
+  void MarkModified() override { this->Superclass::MarkModified(); }
 
   /**
    * Set visibility of the representation.
    */
-  void SetVisibility(bool visible) VTK_OVERRIDE;
+  void SetVisibility(bool visible) override;
 
   /**
    * Get/Set the chart representation for which this is a selection
@@ -66,23 +66,23 @@ protected:
   vtkChartSelectionRepresentation();
   ~vtkChartSelectionRepresentation() override;
 
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
   int RequestData(
-    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*) VTK_OVERRIDE;
+    vtkInformation*, vtkInformationVector** inputVector, vtkInformationVector*) override;
 
   /**
    * Adds the representation to the view.  This is called from
    * vtkView::AddRepresentation().  Subclasses should override this method.
    * Returns true if the addition succeeds.
    */
-  bool AddToView(vtkView* view) VTK_OVERRIDE;
+  bool AddToView(vtkView* view) override;
 
   /**
    * Removes the representation to the view.  This is called from
    * vtkView::RemoveRepresentation().  Subclasses should override this method.
    * Returns true if the removal succeeds.
    */
-  bool RemoveFromView(vtkView* view) VTK_OVERRIDE;
+  bool RemoveFromView(vtkView* view) override;
 
   vtkWeakPointer<vtkPVContextView> ContextView;
   vtkWeakPointer<vtkChartRepresentation> ChartRepresentation;

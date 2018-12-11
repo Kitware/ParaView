@@ -39,7 +39,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFlashContour : public vtkMultiBlockDat
 public:
   static vtkFlashContour* New();
   vtkTypeMacro(vtkFlashContour, vtkMultiBlockDataSetAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   vtkSetMacro(IsoValue, double);
   vtkGetMacro(IsoValue, double);
@@ -74,9 +74,9 @@ protected:
   char* CellArrayNameToProcess;
   vtkSetStringMacro(CellArrayNameToProcess);
 
-  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) VTK_OVERRIDE;
-  int FillInputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
-  int FillOutputPortInformation(int port, vtkInformation* info) VTK_OVERRIDE;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int FillInputPortInformation(int port, vtkInformation* info) override;
+  int FillOutputPortInformation(int port, vtkInformation* info) override;
   void PropogateNeighbors(int neighbors[3][3][3], int x, int y, int z);
 
   // Save some ivars to reduce arguments to recursive methods.

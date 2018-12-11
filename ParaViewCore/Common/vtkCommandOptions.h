@@ -36,7 +36,7 @@ class VTKPVCOMMON_EXPORT vtkCommandOptions : public vtkObject
 public:
   static vtkCommandOptions* New();
   vtkTypeMacro(vtkCommandOptions, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   int Parse(int argc, const char* const argv[]);
   void GetRemainingArguments(int* argc, char** argv[]);
