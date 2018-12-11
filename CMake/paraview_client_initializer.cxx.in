@@ -3,8 +3,8 @@
 // It will be replaced next time you rebuild.
 /*=========================================================================
 
-   Program: ParaView
-  Module:    branded_paraview_initializer.cxx.in
+   Program: @_paraview_client_NAME@
+   Module:  pq@_paraview_client_NAME@Initializer.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,7 +32,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pq@BPC_NAME@Initializer.h"
+#include "pq@_paraview_client_NAME@Initializer.h"
 
 #include <QApplication>
 #include <QBitmap>
@@ -40,12 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSplashScreen>
 #include <QtDebug>
 
-#include "@BPC_PVMAIN_WINDOW_INCLUDE@"
+#include "@_paraview_client_MAIN_WINDOW_INCLUDE@"
 #include "pqOptions.h"
 #include "pqPVApplicationCore.h"
 #include "pqSettings.h"
 
-#include "vtkInitializationHelper.h"
 #include "vtkPVConfig.h"
 #include "vtkPVPluginTracker.h"
 
@@ -53,10 +52,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtksys/SystemTools.hxx"
 
-#cmakedefine BPC_SPLASH_RESOURCE "@BPC_SPLASH_RESOURCE@"
+#cmakedefine01 _paraview_client_APPLICATION_XMLS
+#cmakedefine01 _paraview_client_SPLASH_IMAGE
+#cmakedefine01 _paraview_client_TITLE
 
 //-----------------------------------------------------------------------------
-pq@BPC_NAME@Initializer::pq@BPC_NAME@Initializer()
+pq@_paraview_client_NAME@Initializer::pq@_paraview_client_NAME@Initializer()
 {
   this->PVApp = nullptr;
   this->MainWindow = nullptr;
@@ -64,7 +65,7 @@ pq@BPC_NAME@Initializer::pq@BPC_NAME@Initializer()
 }
 
 //-----------------------------------------------------------------------------
-pq@BPC_NAME@Initializer::~pq@BPC_NAME@Initializer()
+pq@_paraview_client_NAME@Initializer::~pq@_paraview_client_NAME@Initializer()
 {
   delete this->Splash;
   this->Splash = nullptr;
@@ -77,7 +78,7 @@ pq@BPC_NAME@Initializer::~pq@BPC_NAME@Initializer()
 }
 
 //-----------------------------------------------------------------------------
-pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
+pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initializer::Initialize(int argc, char* argv[])
 {
   this->PVApp = new pqPVApplicationCore (argc, argv);
 
@@ -97,16 +98,16 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
   }
 
 #ifndef BUILD_SHARED_LIBS
-@ui_resource_init@
+@_paraview_client_resource_init@
 #endif
 
-#ifdef BPC_SPLASH_RESOURCE
+#if _paraview_client_SPLASH_IMAGE
   pqSettings *settings = this->PVApp->settings();
   if (this->PVApp->getOptions()->GetDisableRegistry() == false &&
     settings->value("GeneralSettings.ShowSplashScreen", true).toBool())
   {
     // Create and show the splash screen as the main window is being created.
-    QPixmap pixmap(BPC_SPLASH_RESOURCE);
+    QPixmap pixmap("@_paraview_client_splash_resource@");
     this->Splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
     this->Splash->setMask(pixmap.createMaskFromColor(QColor(Qt::transparent)));
     this->Splash->show();
@@ -114,10 +115,10 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
 #endif
 
   // Create main window.
-  this->MainWindow = new @BPC_PVMAIN_WINDOW@();
+  this->MainWindow = new @_paraview_client_MAIN_WINDOW_CLASS@();
 
   // Load required application plugins.
-  QString plugin_string = "@BPC_REQUIRED_PLUGINS@";
+  QString plugin_string = "@_paraview_client_REQUIRED_PLUGINS@";
   QStringList plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
   QString plugin_xml = "<Plugins>";
   foreach (const QString plugin_name, plugin_list)
@@ -130,7 +131,7 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
     plugin_xml.toLatin1().data());
 
   // Load optional plugins.
-  plugin_string = "@BPC_OPTIONAL_PLUGINS@";
+  plugin_string = "@_paraview_client_OPTIONAL_PLUGINS@";
   plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
   plugin_xml = "<Plugins>";
   foreach (const QString plugin_name, plugin_list)
@@ -142,20 +143,22 @@ pq@BPC_NAME@Initializer::Status pq@BPC_NAME@Initializer::Initialize(int argc, ch
   vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
     plugin_xml.toLatin1().data());
 
-#if @BPC_HAS_GUI_CONFIGURATION_XMLS@
+#if _paraview_client_APPLICATION_XMLS
   // Load configuration xmls after all components have been instantiated.
   // This configuration part is something that needs to be cleaned up, I haven't
   // given this too much thought.
-  QDir dir2(":/@BPC_NAME@/Configuration");
+  QDir dir2(":/@_paraview_client_NAME@/Configuration");
   QStringList files = dir2.entryList(QDir::Files);
   foreach (QString file, files)
   {
-    this->PVApp->loadConfiguration(QString(":/@BPC_NAME@/Configuration/") + file);
+    this->PVApp->loadConfiguration(QString(":/@_paraview_client_NAME@/Configuration/") + file);
   }
 #endif
-#if @BPC_HAS_TITLE@
-  this->MainWindow->setWindowTitle("@BPC_TITLE@");
+
+#if _paraview_client_TITLE
+  this->MainWindow->setWindowTitle("@_paraview_client_TITLE@");
 #endif
+
   // the user can specify a different window title by setting the PARAVIEW_WINDOW_TITLE
   // environment variable. This helps when using multiple PV GUIs simultaneously
   // and context switching quickly between them.

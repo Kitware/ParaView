@@ -1,7 +1,7 @@
 /*=========================================================================
 
-Program:   ParaView
-Module:    pv-forward.c.in
+Program:   @_paraview_client_NAME@
+Module:    @_paraview_client_NAME@_launcher.c
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -13,11 +13,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
-#define vtksys_SHARED_FORWARD_DIR_BUILD "@PV_FORWARD_DIR_BUILD@"
-#define vtksys_SHARED_FORWARD_PATH_BUILD @PV_FORWARD_PATH_BUILD@
-#define vtksys_SHARED_FORWARD_PATH_INSTALL @PV_FORWARD_PATH_INSTALL@
-#define vtksys_SHARED_FORWARD_EXE_BUILD "@PV_FORWARD_DIR_BUILD@/@PV_FORWARD_EXE@"
-#define vtksys_SHARED_FORWARD_EXE_INSTALL "@PV_FORWARD_DIR_INSTALL@/@PV_FORWARD_EXE@"
+#define vtksys_SHARED_FORWARD_DIR_BUILD "@_paraview_client_build_dir@"
+#define vtksys_SHARED_FORWARD_PATH_BUILD @_paraview_client_build_path@
+#define vtksys_SHARED_FORWARD_PATH_INSTALL @_paraview_client_install_path@
+#define vtksys_SHARED_FORWARD_EXE_BUILD "@_paraview_client_build_dir@/@_paraview_client_NAME@"
+#define vtksys_SHARED_FORWARD_EXE_INSTALL "@_paraview_client_install_dir@/@_paraview_client_NAME@"
 #define vtksys_SHARED_FORWARD_OPTION_PRINT "--print"
 #define vtksys_SHARED_FORWARD_OPTION_LDD "--ldd"
 
@@ -33,13 +33,13 @@ int get_driver_cache_user_path(char *driver_cache_path)
 {
   const char *home = getenv("HOME");
   if (!home)
-    {
+  {
     home = getpwuid(getuid())->pw_dir;
-    }
+  }
   if (!home)
-    {
+  {
     return 0;
-    }
+  }
   snprintf(driver_cache_path, KWSYS_SHARED_FORWARD_MAXPATH, "%s/.config/ParaView/ParaViewMesaConfig.ini", home);
   //fprintf(stdout, "User cache = %s\n", driver_cache_path);
   return 1;
@@ -71,9 +71,9 @@ int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
 
   // Use default native driver, so don't update LD_LIBRARY_PATH
   if (!driver || (driver && driver[0] == '\0'))
-    {
+  {
     return 0;
-    }
+  }
 
   kwsys_shared_forward_self_path(this_exe_path, self_path);
   kwsys_shared_forward_get_settings(self_path, throwaway_ldpath, exe);
@@ -93,35 +93,35 @@ int append_driver_to_ldpath(const char *this_exe_path, const char *driver)
 int choose_driver(const char *this_exe_path, const char *driver, int print)
 {
   if (driver == NULL || driver[0] == '\0')
-    {
+  {
     return 0;
-    }
+  }
   if (strcmp(driver, "mesa") == 0)
-    {
+  {
     // here we don't specify any GALLIUM_DRIVER and let user
     // setup the environment on their own.
     append_driver_to_ldpath(this_exe_path, "mesa");
-    }
+  }
   if (strcmp(driver, "mesa-llvm") == 0)
-    {
+  {
     if (print == 1)
-      {
+    {
       printf("GALLIUM_DRIVER=llvmpipe\n");
-      }
+    }
     setenv("GALLIUM_DRIVER", "llvmpipe", /*overwrite=*/ 1);
     append_driver_to_ldpath(this_exe_path, "mesa");
-    }
+  }
   else if (strcmp(driver, "mesa-swr-avx") == 0   ||
            strcmp(driver, "mesa-swr-avx2") == 0  ||
            strcmp(driver, "mesa-swr") == 0)
-    {
+  {
     if (print == 1)
-      {
+    {
       printf("GALLIUM_DRIVER=swr\n");
-      }
+    }
     setenv("GALLIUM_DRIVER", "swr", /*overwrite=*/ 1);
     append_driver_to_ldpath(this_exe_path, "mesa");
-    }
+  }
   return 0;
 }
 
@@ -144,58 +144,58 @@ int main(int argc, char** argv)
   get_driver_cache_site_path(argv[0], driver_cache_path);
   driver_cache = fopen(driver_cache_path, "r");
   if (driver_cache)
-    {
+  {
     if (fgets(driver_choice, sizeof(driver_choice), driver_cache) == 0)
-      {
+    {
       driver_choice[0] = 0;
-      }
-    fclose(driver_cache);
     }
+    fclose(driver_cache);
+  }
 
   // If there is a user config, override the site config
   get_driver_cache_user_path(driver_cache_path);
   driver_cache = fopen(driver_cache_path, "r");
   if (driver_cache)
-    {
+  {
     if (fgets(driver_choice, sizeof(driver_choice), driver_cache) == 0)
-      {
+    {
       driver_choice[0] = 0;
-      }
-    fclose(driver_cache);
     }
+    fclose(driver_cache);
+  }
 
   // Check for a newline in the driver name
   char *newline = strchr(driver_choice, '\n');
   if (newline)
-    {
+  {
     *newline = '\0';
-    }
+  }
 
   // Check for single-run driver specification; forward all other args
   for (; i < argc; ++i)
-    {
+  {
     if (strcmp(argv[i], "--native") == 0)
-      {
+    {
       driver_choice[0] = '\0';
-      }
+    }
     else if (strcmp(argv[i], "--mesa-llvm") == 0      ||
              strcmp(argv[i], "--mesa-swr-avx") == 0   ||
              strcmp(argv[i], "--mesa-swr-avx2") == 0  ||
              strcmp(argv[i], "--mesa-swr") == 0       ||
              strcmp(argv[i], "--mesa") == 0)
-      {
+    {
       snprintf(driver_choice, MAX_DRIVER_CHOICE, "%s", argv[i] + 2);
-      }
+    }
     else
-      {
+    {
       if (strcmp(argv[i], "--print") == 0)
-        {
+      {
         print = 1;
-        }
+      }
       true_argv[true_argc] = argv[i];
       true_argc++;
-      }
     }
+  }
   true_argv[true_argc] = NULL;
 
   choose_driver(argv[0], driver_choice, print);

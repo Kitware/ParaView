@@ -3,8 +3,8 @@
 // It will be replaced next time you rebuild.
 /*=========================================================================
 
-   Program: ParaView
-  Module:    branded_paraview_initializer.h.in
+   Program: @_paraview_client_NAME@
+   Module:  pq@_paraview_client_NAME@Initializer.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq@BPC_NAME@Initializer_h
-#define pq@BPC_NAME@Initializer_h
+#ifndef pq@_paraview_client_NAME@Initializer_h
+#define pq@_paraview_client_NAME@Initializer_h
 
 class QMainWindow;
 class pqPVApplicationCore;
 class QSplashScreen;
 
-class pq@BPC_NAME@Initializer
+class pq@_paraview_client_NAME@Initializer
 {
 public:
   enum Status
@@ -50,8 +50,8 @@ public:
     RunApplication
   };
 
-  pq@BPC_NAME@Initializer();
-  ~pq@BPC_NAME@Initializer();
+  pq@_paraview_client_NAME@Initializer();
+  ~pq@_paraview_client_NAME@Initializer();
 
   /// Initialize ParaView. It returns false if the initialization failed.
   Status Initialize(int argc, char* argv[]);

@@ -4,10 +4,10 @@
 <xsl:output method="text"/>
 
 <xsl:template match="/xml">
-<xsl:for-each select="proxy[group='@GROUP@']">
+<xsl:for-each select="proxy[group='@_paraview_gpd_group_real@']">
 <xsl:sort select="label"/>
 <xsl:variable name="proxy_name"><xsl:value-of select="label"/></xsl:variable>
-<xsl:if test="@QUERY@">
+<xsl:if test="@_paraview_gpd_query@">
 ==<xsl:value-of select="label" />==
 
 <xsl:value-of select="documentation/brief" />

@@ -3,8 +3,8 @@
 // It will be replaced next time you rebuild.
 /*=========================================================================
 
-   Program: ParaView
-  Module:    branded_paraview_main.cxx.in
+   Program: @_paraview_client_NAME@
+   Module:  @_paraview_client_NAME@_main.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -37,25 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLocale>
 #include <QStyleFactory>
 
-#include "pq@BPC_NAME@Initializer.h"
+#include "pq@_paraview_client_NAME@Initializer.h"
 #include "vtkPVConfig.h"
 // See Applications/ParaView/CMakeLists.txt for why this is necessary.
-#cmakedefine SUPPORT_STATIC_PLUGINS
-#ifdef SUPPORT_STATIC_PLUGINS
-#ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
-#endif
+#cmakedefine01 _paraview_client_PLUGINS_TARGET
+#if _paraview_client_PLUGINS_TARGET
+#include "@_paraview_client_PLUGINS_TARGET@.h"
 #endif
 
 #include <vtksys/SystemTools.hxx>
 
 #include <clocale>
-#include <stdlib.h>
+#include <cstdlib>
 
 int main(int argc, char* argv[])
 {
-  // Here's the point to change default style, if you'd like e.g.
-  // QApplication::setStyle(QStyleFactory::create("plastique"));
+  QApplication::setStyle(QStyleFactory::create("@_paraview_client_DEFAULT_STYLE@"));
 
   // When playing tests, disable all effects.
   if (vtksys::SystemTools::HasEnv("DART_TEST_FROM_DART") ||
@@ -69,36 +66,34 @@ int main(int argc, char* argv[])
     QApplication::setEffectEnabled(Qt::UI_FadeTooltip, false);
   }
 
-  QApplication::setApplicationName("@BPC_APPLICATION_NAME@");
-  QApplication::setApplicationVersion("@BPC_VERSION_MAJOR@.@BPC_VERSION_MINOR@.@BPC_VERSION_PATCH@");
-  QApplication::setOrganizationName("@BPC_ORGANIZATION@");
+  QApplication::setApplicationName("@_paraview_client_APPLICATION_NAME@");
+  QApplication::setApplicationVersion("@_paraview_client_VERSION@");
+  QApplication::setOrganizationName("@_paraview_client_ORGANIZATION@");
 
   // supports HDPI
   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-#ifdef SUPPORT_STATIC_PLUGINS
-#ifndef BUILD_SHARED_LIBS
-  paraview_static_plugins_init();
-#endif
+#if _paraview_client_PLUGINS_TARGET
+  @_paraview_client_PLUGINS_TARGET@_initialize();
 #endif
 
   QApplication qtapp(argc, argv);
-  // QApplication docs suggest resetting to "C" after the QApplication
-  // is initialized.
+  // QApplication docs suggest resetting to "C" after the QApplication is
+  // initialized.
   setlocale(LC_NUMERIC, "C");
 
   // However, this is needed to address BUG #17225, #17226.
   QLocale::setDefault(QLocale::c());
 
-  pq@BPC_NAME@Initializer pvInitializer;
-  pq@BPC_NAME@Initializer::Status status = pvInitializer.Initialize(argc, argv);
+  pq@_paraview_client_NAME@Initializer pvInitializer;
+  pq@_paraview_client_NAME@Initializer::Status status = pvInitializer.Initialize(argc, argv);
   switch (status)
   {
-    case pq@BPC_NAME@Initializer::ExitSuccess:
+    case pq@_paraview_client_NAME@Initializer::ExitSuccess:
       return EXIT_SUCCESS;
-    case pq@BPC_NAME@Initializer::ExitFailure:
+    case pq@_paraview_client_NAME@Initializer::ExitFailure:
       return EXIT_FAILURE;
-    case pq@BPC_NAME@Initializer::RunApplication:
+    case pq@_paraview_client_NAME@Initializer::RunApplication:
       return qtapp.exec();
   }
 }
