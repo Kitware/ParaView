@@ -15,7 +15,6 @@
 #include "vtkCommandOptions.h"
 #include "vtkCommandOptionsXMLParser.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 
 #include <sstream>
 #include <string>

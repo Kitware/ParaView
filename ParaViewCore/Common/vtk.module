@@ -1,0 +1,18 @@
+NAME
+  ParaView::Common
+LIBRARY_NAME
+  vtkPVCommon
+GROUPS
+  ParaViewCore
+KIT
+  ParaView::Core
+DEPENDS
+  ParaView::ClientServer
+  VTK::CommonCore
+  VTK::IOXMLParser
+PRIVATE_DEPENDS
+  VTK::vtksys
+TEST_DEPENDS
+  VTK::TestingCore
+TEST_LABELS
+  ParaView
