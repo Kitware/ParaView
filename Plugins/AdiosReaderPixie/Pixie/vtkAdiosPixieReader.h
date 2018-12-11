@@ -20,12 +20,13 @@
 #define vtkAdiosPixieReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkPVAdiosReaderPixieModule.h" // for export macro
 
 class vtkDataSetAttributes;
 class vtkInformationVector;
 class vtkInformation;
 
-class vtkAdiosPixieReader : public vtkMultiBlockDataSetAlgorithm
+class VTKPVADIOSREADERPIXIE_EXPORT vtkAdiosPixieReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkAdiosPixieReader* New();
