@@ -30,9 +30,10 @@
 #define vtkInSituPParticlePathFilter_h
 
 #include "vtkPParticlePathFilter.h"
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVVTKExtensionsDefaultParallelModule.h" //needed for exports
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkInSituPParticlePathFilter : public vtkPParticlePathFilter
+class VTKPVVTKEXTENSIONSDEFAULTPARALLEL_EXPORT vtkInSituPParticlePathFilter
+  : public vtkPParticlePathFilter
 {
 public:
   vtkTypeMacro(vtkInSituPParticlePathFilter, vtkPParticlePathFilter);
