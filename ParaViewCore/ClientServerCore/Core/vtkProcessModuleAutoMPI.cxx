@@ -166,7 +166,7 @@ int vtkProcessModuleAutoMPI::IsPossible()
 {
   this->Internals->TotalMulticoreProcessors = vtkProcessModuleAutoMPI::NumberOfCores;
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   if (this->Internals->TotalMulticoreProcessors > 1 && vtkProcessModuleAutoMPI::EnableAutoMPI &&
     this->Internals->CollectConfiguredOptions())
   {
@@ -178,7 +178,7 @@ int vtkProcessModuleAutoMPI::IsPossible()
   }
 #else
   return 0;
-#endif // PARAVIEW_USE_MPI
+#endif
 }
 
 //-----------------------------------------------------------------------public

@@ -14,7 +14,6 @@
 #include "vtkPVOptions.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
 #include "vtkProcessModule.h"
 // #include "vtkPVView.h"
@@ -267,7 +266,7 @@ void vtkPVOptions::Initialize()
     "the X environment is set up properly and your OpenGL support is adequate (experimental).",
     vtkPVOptions::PVSERVER | vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVBATCH);
 
-#if defined(PARAVIEW_USE_MPI)
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   // We add these here so that "--help" on the process can print these variables
   // out. Note the code in vtkProcessModule::Initialize() doesn't really rely on
   // the vtkPVOptions parsing these arguments since vtkPVOptions is called on to
@@ -352,7 +351,7 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     this->SetErrorMessage("You need to specify a connect ID (--connect-id).");
     return 0;
   }
-#endif // PARAVIEW_ALWAYS_SECURE_CONNECTION
+#endif
 
   // do this here for simplicity since it's
   // a universal option. The current kwsys implementation

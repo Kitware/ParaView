@@ -38,12 +38,12 @@
 
 #include <vtksys/SystemTools.hxx>
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
 #include "vtkMPIController.h"
 #endif
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPythonInterpreter.h"
 #endif
 
@@ -63,7 +63,7 @@
 
 namespace
 {
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 // Returns true if the arguments has the specified boolean_arg.
 bool vtkFindArgument(const char* boolean_arg, int argc, char**& argv)
 {
@@ -116,7 +116,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
 
   vtkProcessModule::GlobalController = vtkSmartPointer<vtkDummyController>::New();
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   // scan the arguments to determine if we need to initialize MPI on client.
   bool use_mpi;
   if (type == PROCESS_CLIENT)
@@ -187,7 +187,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
 #else
   static_cast<void>(argc); // unused warning when MPI is off
   static_cast<void>(argv); // unused warning when MPI is off
-#endif // PARAVIEW_USE_MPI
+#endif
   vtkProcessModule::GlobalController->BroadcastTriggerRMIOn();
   vtkMultiProcessController::SetGlobalController(vtkProcessModule::GlobalController);
 
@@ -233,7 +233,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
 
 #ifdef PARAVIEW_ENABLE_FPE
   vtkFloatingPointExceptions::Enable();
-#endif // PARAVIEW_ENABLE_FPE
+#endif
 
   if (vtkProcessModule::ProcessType != PROCESS_CLIENT)
   {
@@ -279,7 +279,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
 //----------------------------------------------------------------------------
 bool vtkProcessModule::Finalize()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
   // Finalize Python before anything else. This ensures that all proxy
   // references are removed before the process module disappears.
   if (vtkProcessModule::FinalizePython && vtkPythonInterpreter::IsInitialized())
@@ -307,7 +307,7 @@ bool vtkProcessModule::Finalize()
   vtkProcessModule::GlobalController->Finalize(/*finalizedExternally*/ 1);
   vtkProcessModule::GlobalController = NULL;
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   if (vtkProcessModule::FinalizeMPI)
   {
     MPI_Barrier(MPI_COMM_WORLD);
@@ -572,7 +572,7 @@ void vtkProcessModule::SetExecutablePath(const std::string& path)
 //----------------------------------------------------------------------------
 bool vtkProcessModule::InitializePythonEnvironment()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
   if (!vtkPythonInterpreter::IsInitialized())
   {
     // If someone already initialized Python before ProcessModule was started,

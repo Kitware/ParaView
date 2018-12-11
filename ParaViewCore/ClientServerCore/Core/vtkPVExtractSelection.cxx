@@ -36,7 +36,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPythonSelector.h"
 #endif
 
@@ -294,7 +294,7 @@ vtkSmartPointer<vtkSelector> vtkPVExtractSelection::NewSelectionOperator(
   if (type == vtkSelectionNode::QUERY)
   {
 // Return a query operator
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
     return vtkSmartPointer<vtkPythonSelector>::New();
 #else
     vtkErrorMacro(<< "vtkSelectionNode::QUERY is supported only when Python is enabled.");
