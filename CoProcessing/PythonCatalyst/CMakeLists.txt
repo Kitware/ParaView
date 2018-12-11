@@ -28,36 +28,34 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  CPythonAdaptorAPI.cxx
-  vtkCPPythonAdaptorAPI.cxx
-  vtkCPPythonPipeline.cxx
-  vtkCPPythonScriptPipeline.cxx
-  vtkCPPythonStringPipeline.cxx
-)
+set(classes
+  CPythonAdaptorAPI
+  vtkCPPythonAdaptorAPI
+  vtkCPPythonPipeline
+  vtkCPPythonScriptPipeline
+  vtkCPPythonStringPipeline)
 
-set (${vtk-module}_HDRS CPythonAdaptorAPI.h)
+set(catalyst_fortran_using_mangling)
 
-set (CATALYST_FORTRAN_USING_MANGLING)
 if (CMAKE_Fortran_COMPILER_WORKS)
   include(FortranCInterface)
   FortranCInterface_HEADER(FortranPythonAdaptorAPIMangling.h
     SYMBOLS coprocessorinitializewithpython coprocessoraddpythonscript)
-  set(CATALYST_FORTRAN_USING_MANGLING ${FortranCInterface_GLOBAL_FOUND})
-  set (Module_SRCS
-      ${Module_SRCS}
-      FortranPythonAdaptorAPI.cxx)
+  set(catalyst_fortran_using_mangling "${FortranCInterface_GLOBAL_FOUND}")
 
-  set (${vtk-module}_HDRS
-       ${${vtk-module}_HDRS}
-       FortranPythonAdaptorAPI.h
-       ${CMAKE_CURRENT_BINARY_DIR}/FortranPythonAdaptorAPIMangling.h)
-endif()
+  list(APPEND classes
+    FortranPythonAdaptorAPI.cxx)
+  list(APPEND headers
+    "${CMAKE_CURRENT_BINARY_DIR}/FortranPythonAdaptorAPIMangling.h")
+endif ()
 
-vtk_module_library(${vtk-module} ${Module_SRCS})
-target_link_libraries(${vtk-module} LINK_PRIVATE vtkUtilitiesPythonInitializer)
+vtk_module_add_module(ParaView::PythonCatalyst
+  CLASSES ${classes}
+  HEADERS ${headers})
+vtk_module_client_server_exclude()
 
-if (CATALYST_FORTRAN_USING_MANGLING)
-  set_property(TARGET ${vtk-module} APPEND PROPERTY COMPILE_DEFINITIONS
-      "CATALYST_FORTRAN_USING_MANGLING=1")
-endif()
+if (catalyst_fortran_using_mangling)
+  vtk_module_define(ParaView::PythonCatalyst
+    PRIVATE
+      CATALYST_FORTRAN_USING_MANGLING=1)
+endif ()
