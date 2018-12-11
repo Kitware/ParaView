@@ -15,6 +15,7 @@ readonly paths="
 CMakeLists.txt
 README.md
 README.kitware.md
+license.txt
 
 src/CMakeLists.txt
 src/cgns_error.c
@@ -22,7 +23,7 @@ src/cgns_header.h
 src/cgns_internals.c
 src/cgns_io.c
 src/cgns_io.h
-src/cgns_mangle.h
+src/vtk_cgns_mangle.h
 src/cgnsconfig.h.in
 src/cgnslib.c
 src/cgnslib.h
