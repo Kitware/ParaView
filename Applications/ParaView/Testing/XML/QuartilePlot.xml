@@ -42,14 +42,14 @@
   <pqevent object="pqClientMainWindow" command="process_events" arguments="1000" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/CentralWidgetFrame/Viewport"
-    baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/QuartilePlotArea.png" width="300" height="300" />
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/QuartilePlotArea.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/TitleBar/Minimize" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow" command="process_events" arguments="1000" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/TitleBar/Maximize" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow" command="process_events" arguments="1000" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/CentralWidgetFrame/Viewport"
-    baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/QuartilePlotLines.png" width="300" height="300" />
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/QuartilePlotLines.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/TitleBar/Minimize" command="activate" arguments="" />
   -->
 </pqevents>

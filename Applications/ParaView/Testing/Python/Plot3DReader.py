@@ -39,8 +39,8 @@ def checkPointVector(data, variables, expected):
 # Note the Entropy, MachNumber and PressureCoefficient will not be checked because they are infinity in this test case
 for i, arg in enumerate(sys.argv):
     if arg == "-D" and i+1 < len(sys.argv):
-        fname = sys.argv[i+1] + '/combxyz.bin'
-        qname = sys.argv[i+1] + '/comb.q'
+        fname = sys.argv[i+1] + '/Testing/Data/combxyz.bin'
+        qname = sys.argv[i+1] + '/Testing/Data/comb.q'
 
 combxyzbin = PLOT3DReader(QFileName=qname, FileName=fname, FunctionFileName='')
 combxyzbin.Functions = [110, 111, 112, 113, 120, 130, 140, 144, 153, 170, 184, 200, 201, 210, 211, 212]

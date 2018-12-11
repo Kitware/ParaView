@@ -10,7 +10,7 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,13,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,13,/0:0/0:1" />
 
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x1-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TileDisplayScatterPlot-2x1-Tile0.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x1-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TileDisplayScatterPlot-2x1-Tile1.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x1-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplayScatterPlot-2x1-Tile0.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x1-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplayScatterPlot-2x1-Tile1.png" />
 
 </pqevents>

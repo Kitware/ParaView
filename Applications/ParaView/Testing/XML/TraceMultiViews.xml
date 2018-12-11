@@ -78,7 +78,7 @@
   <!-- I'm skipping the actual compare right now. We need to fix how charts
        render with mag>1, and also the fact that the spreadsheet header is too wide. -->
   <!--
-  <pqcompareview image="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TraceMultiViewsScreenshot.png" />
+  <pqcompareview image="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TraceMultiViewsScreenshot.png" />
   -->
 
   <!-- now reset session and  load the state file -->

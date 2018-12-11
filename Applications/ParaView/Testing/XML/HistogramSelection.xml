@@ -44,12 +44,12 @@
        and Histogram View to verify that they are correct -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Maximize" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/CentralWidgetFrame/Viewport"
-    baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/HistogramSelection1.png" width="300" height="300" />
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/HistogramSelection1.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Minimize" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Maximize" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/CentralWidgetFrame/Viewport"
-    baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/HistogramSelection2.png" width="300" height="300" />
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/HistogramSelection2.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Minimize" command="activate" arguments="" />
 
   <!-- Now, if we make a selection in the Render View, the Histogram selection should get cleared -->
@@ -60,7 +60,7 @@
 
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Maximize" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/CentralWidgetFrame/Viewport"
-    baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/HistogramSelection3.png" width="300" height="300" />
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/HistogramSelection3.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/Minimize" command="activate" arguments="" />
 
 
@@ -88,6 +88,6 @@
 
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/Maximize" command="activate" arguments="" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/CentralWidgetFrame/Viewport"
-    baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/HistogramSelection4.png" width="300" height="300" />
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/HistogramSelection4.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/Minimize" command="activate" arguments="" />
 </pqevents>

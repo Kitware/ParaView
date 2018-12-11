@@ -41,6 +41,6 @@
 <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 
 <!-- These don't work right, see bug #15424: -->
-<!--  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-2x1-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TileDisplay3DTesting-2x1-Tile0.png" />-->
-<!--  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-2x1-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Testing/Data/Baseline/TileDisplay3DTesting-2x1-Tile1.png" />-->
+<!--  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-2x1-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplay3DTesting-2x1-Tile0.png" />-->
+<!--  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-2x1-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplay3DTesting-2x1-Tile1.png" />-->
 </pqevents>
