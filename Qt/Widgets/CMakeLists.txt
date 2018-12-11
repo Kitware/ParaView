@@ -28,251 +28,143 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set(Module_SRCS
-  pqAnimationKeyFrame.cxx
-  pqAnimationKeyFrame.h
-  pqAnimationModel.cxx
-  pqAnimationModel.h
-  pqAnimationTrack.cxx
-  pqAnimationTrack.h
-  pqAnimationWidget.cxx
-  pqAnimationWidget.h
-  pqCheckableHeaderView.cxx
-  pqCheckableHeaderView.h
-  pqCheckBoxPixMaps.cxx
-  pqCheckBoxPixMaps.cxx
-  pqCheckBoxPixMaps.h
-  pqCollapsedGroup.cxx
-  pqCollapsedGroup.h
-  pqColorButtonEventPlayer.cxx
-  pqColorButtonEventPlayer.h
-  pqColorButtonEventTranslator.cxx
-  pqColorButtonEventTranslator.h
-  pqColorChooserButton.cxx
-  pqColorChooserButton.h
-  pqColorDialogEventPlayer.cxx
-  pqColorDialogEventPlayer.h
-  pqColorDialogEventTranslator.cxx
-  pqColorDialogEventTranslator.h
-  pqConnect.cxx
-  pqConnect.h
-  pqConsoleWidget.cxx
-  pqConsoleWidgetEventPlayer.cxx
-  pqConsoleWidgetEventPlayer.h
-  pqConsoleWidgetEventTranslator.cxx
-  pqConsoleWidgetEventTranslator.h
-  pqConsoleWidget.h
-  pqDelimitedTextParser.cxx
-  pqDelimitedTextParser.h
-  pqDiscreteDoubleWidget.cxx
-  pqDiscreteDoubleWidget.h
-  pqDoubleLineEdit.cxx
-  pqDoubleLineEdit.h
-  pqDoubleLineEditEventPlayer.cxx
-  pqDoubleLineEditEventPlayer.h
-  pqDoubleLineEditEventTranslator.cxx
-  pqDoubleLineEditEventTranslator.h
-  pqDoubleRangeDialog.cxx
-  pqDoubleRangeDialog.h
-  pqDoubleRangeWidget.cxx
-  pqDoubleRangeWidget.h
-  pqDoubleSliderWidget.h
-  pqDoubleSliderWidget.cxx
-  pqDoubleSpinBox.cxx
-  pqDoubleSpinBox.h
-  pqExpandableTableView.cxx
-  pqExpandableTableView.h
-  pqExpanderButton.cxx
-  pqExpanderButton.h
-  pqFlatTreeView.cxx
-  pqFlatTreeView.h
-  pqHeaderView.cxx
-  pqHeaderView.h
-  pqHighlightablePushButton.cxx
-  pqHighlightablePushButton.h
-  pqHighlightableToolButton.cxx
-  pqHighlightableToolButton.h
-  pqLineEdit.cxx
-  pqLineEditEventPlayer.cxx
-  pqLineEditEventPlayer.h
-  pqLineEdit.h
-  pqListWidgetCheckHelper.cxx
-  pqListWidgetCheckHelper.h
-  pqListWidgetItemObject.cxx
-  pqListWidgetItemObject.h
-  pqMultiColumnHeaderView.cxx
-  pqMultiColumnHeaderView.h
-  pqProgressWidget.cxx
-  pqProgressWidget.h
-  pqQuickLaunchDialog.cxx
-  pqQuickLaunchDialog.h
-  pqScaleByButton.cxx
-  pqScaleByButton.h
-  pqSectionVisibilityContextMenu.cxx
-  pqSectionVisibilityContextMenu.h
-  pqSetData.cxx
-  pqSetData.h
-  pqSetName.cxx
-  pqSetName.h
-  pqSignalAdaptors.cxx
-  pqSignalAdaptors.h
-  pqSpinBox.cxx
-  pqSpinBox.h
-  pqTableView.cxx
-  pqTableView.h
-  pqTextEdit.cxx
-  pqTextEdit.h
-  pqTreeView.cxx
-  pqTreeViewExpandState.cxx
-  pqTreeViewExpandState.h
-  pqTreeView.h
-  pqTreeViewSelectionHelper.cxx
-  pqTreeViewSelectionHelper.h
-  pqTreeWidgetCheckHelper.cxx
-  pqTreeWidgetCheckHelper.h
-  pqTreeWidget.cxx
-  pqTreeWidget.h
-  pqTreeWidgetItem.cxx
-  pqTreeWidgetItem.h
-  pqTreeWidgetItemObject.cxx
-  pqTreeWidgetItemObject.h
-  pqTreeWidgetSelectionHelper.cxx
-  pqTreeWidgetSelectionHelper.h
-  pqWaitCursor.cxx
-  pqWaitCursor.h
-)
+set(classes
+  pqAnimationKeyFrame
+  pqAnimationModel
+  pqAnimationTrack
+  pqAnimationWidget
+  pqCheckBoxPixMaps
+  pqCheckBoxPixMaps
+  pqCheckableHeaderView
+  pqCollapsedGroup
+  pqColorButtonEventPlayer
+  pqColorButtonEventTranslator
+  pqColorChooserButton
+  pqColorDialogEventPlayer
+  pqColorDialogEventTranslator
+  pqConnect
+  pqConsoleWidget
+  pqConsoleWidgetEventPlayer
+  pqConsoleWidgetEventTranslator
+  pqDelimitedTextParser
+  pqDiscreteDoubleWidget
+  pqDoubleLineEdit
+  pqDoubleLineEditEventPlayer
+  pqDoubleLineEditEventTranslator
+  pqDoubleRangeDialog
+  pqDoubleRangeWidget
+  pqDoubleSliderWidget
+  pqDoubleSpinBox
+  pqExpandableTableView
+  pqExpanderButton
+  pqFlatTreeView
+  pqHeaderView
+  pqHighlightablePushButton
+  pqHighlightableToolButton
+  pqLineEdit
+  pqLineEditEventPlayer
+  pqListWidgetCheckHelper
+  pqListWidgetItemObject
+  pqMultiColumnHeaderView
+  pqProgressWidget
+  pqQuickLaunchDialog
+  pqScaleByButton
+  pqSectionVisibilityContextMenu
+  pqSetData
+  pqSetName
+  pqSignalAdaptors
+  pqSpinBox
+  pqTableView
+  pqTextEdit
+  pqTreeView
+  pqTreeViewExpandState
+  pqTreeViewSelectionHelper
+  pqTreeWidget
+  pqTreeWidgetCheckHelper
+  pqTreeWidgetItem
+  pqTreeWidgetItemObject
+  pqTreeWidgetSelectionHelper
+  pqWaitCursor)
 
-##########################################################################
-## Add the header files that need to moc processed.
-set (QtWidgets_SRCS
-#  QtWidgetsPlugin.h
+set(qt_components
+  Core
+  Gui
+  Network
+  Widgets)
 
-  pqAnimationKeyFrame.h
-  pqAnimationModel.h
-  pqAnimationTrack.h
-  pqAnimationWidget.h
-  pqCheckableHeaderView.h
-  pqCheckBoxPixMaps.h
-  pqCollapsedGroup.h
-  pqColorButtonEventPlayer.h
-  pqColorButtonEventTranslator.h
-  pqColorChooserButton.h
-  pqColorDialogEventPlayer.h
-  pqColorDialogEventTranslator.h
-  pqConsoleWidgetEventPlayer.h
-  pqConsoleWidgetEventTranslator.h
-  pqConsoleWidget.h
-  pqDelimitedTextParser.h
-  pqDiscreteDoubleWidget.h
-  pqDoubleLineEdit.h
-  pqDoubleLineEditEventPlayer.h
-  pqDoubleLineEditEventTranslator.h
-  pqDoubleRangeDialog.h
-  pqDoubleRangeWidget.h
-  pqDoubleSliderWidget.h
-  pqDoubleSpinBox.h
-  pqExpandableTableView.h
-  pqExpanderButton.h
-  pqFlatTreeView.h
-  pqHeaderView.h
-  pqHighlightablePushButton.h
-  pqHighlightableToolButton.h
-  pqLineEditEventPlayer.h
-  pqLineEdit.h
-  pqListWidgetCheckHelper.h
-  pqListWidgetItemObject.h
-  pqMultiColumnHeaderView.h
-  pqProgressWidget.h
-  pqQuickLaunchDialog.h
-  pqScaleByButton.h
-  pqSectionVisibilityContextMenu.h
-  pqSignalAdaptors.h
-  pqSpinBox.h
-  pqTableView.h
-  pqTextEdit.h
-  pqTreeViewExpandState.h
-  pqTreeView.h
-  pqTreeViewSelectionHelper.h
-  pqTreeWidgetCheckHelper.h
-  pqTreeWidget.h
-  pqTreeWidgetItemObject.h
-  pqTreeWidgetSelectionHelper.h
-)
-
-include(ParaViewQt)
-
-set(qt5_public_comps Core Gui Widgets)
-set(qt5_private_comps Network)
-if(APPLE)
-  list(APPEND qt5_private_comps PrintSupport)
-endif()
+if (APPLE)
+  list(APPEND qt_components
+    PrintSupport)
+endif ()
 
 if (PARAVIEW_USE_QTHELP)
-  list(APPEND Module_SRCS pqHelpWindow.cxx pqHelpWindow.h)
-  list(APPEND QtWidgets_SRCS pqHelpWindow.h)
-  set(${vtk-module}_EXPORT_CODE
-    "#ifndef PARAVIEW_USE_QTHELP\n#  define PARAVIEW_USE_QTHELP\n#endif\n")
-  list(APPEND qt5_private_comps Help)
-endif()
+  list(APPEND classes
+    pqHelpWindow)
 
-if(PARAVIEW_USE_QTWEBENGINE)
-  list(APPEND qt5_public_comps WebEngineWidgets)
-endif()
+  list(APPEND qt_components
+    Help)
+endif ()
 
-pv_find_package_qt(qt_public_targets REQUIRED
-  QT5_COMPONENTS ${qt5_public_comps})
-pv_find_package_qt(qt_private_targets REQUIRED
-  QT5_COMPONENTS ${qt5_private_comps})
+if (PARAVIEW_USE_QTWEBENGINE)
+  list(APPEND qt_components
+    WebEngineWidgets)
+endif ()
 
-set(${vtk-module}_EXPORT_CODE_INSTALL
-  "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
-  pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-    QT5_COMPONENTS ${qt5_public_comps})")
-set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
-
-pv_qt_wrap_cpp(QtWidgets_MOC_SOURCES ${QtWidgets_SRCS})
+vtk_module_find_package(
+  PACKAGE     Qt5
+  COMPONENTS  ${qt_components})
 
 ##########################################################################
 ## Add *.ui files to be uic processed.
-SET(QtWidgets_UI_FORMS
+set(ui_files
   Resources/UI/pqExpanderButton.ui
   Resources/UI/pqHelpWindow.ui
-  Resources/UI/pqQuickLaunchDialog.ui
-)
-
-pv_qt_wrap_ui(QtWidgets_UI_BUILT_SOURCES ${QtWidgets_UI_FORMS})
+  Resources/UI/pqQuickLaunchDialog.ui)
 
 ##########################################################################
 ## Add resources.
-SET(UI_RESOURCES
-  Resources/QtWidgets.qrc
-)
+set(resource_files
+  Resources/QtWidgets.qrc)
 
-pv_qt_add_resources(RCS_SOURCES ${UI_RESOURCES})
-
-SOURCE_GROUP("Resources" FILES
-  ${UI_RESOURCES}
-  ${QtWidgets_UI_FORMS}
-)
-
-SOURCE_GROUP("Generated" FILES
-  ${QtWidgets_MOC_SOURCES}
-  ${RCS_SOURCES}
-  ${QtWidgets_UI_BUILT_SOURCES}
-)
-
-SET(QT_WIDGETS_ALL_SRCS ${Module_SRCS} ${QtWidgets_MOC_SOURCES}
-  ${RCS_SOURCES} ${QtWidgets_UI_BUILT_SOURCES})
+source_group("Resources" FILES
+  ${ui_files}
+  ${resource_files})
 
 ##########################################################################
 # import Qt build settings
 set(${vtk-module}_NO_HeaderTest 1)
 
-vtk_module_export_code_find_package(Qt5 COMPONENTS ${qt5_public_comps})
-vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})
-target_link_libraries(${vtk-module}
-  LINK_PRIVATE ${qt_private_targets}
-  LINK_PUBLIC ${qt_public_targets})
-if(PARAVIEW_USE_QTWEBENGINE)
-  target_compile_definitions(${vtk-module} PRIVATE PARAVIEW_USE_QTWEBENGINE)
-endif()
+set(CMAKE_AUTOMOC 1)
+set(CMAKE_AUTORCC 1)
+set(CMAKE_AUTOUIC 1)
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
+
+vtk_module_add_module(ParaView::pqWidgets
+  CLASSES ${classes}
+  SOURCES ${ui_files}
+          ${resource_files})
+vtk_module_link(ParaView::pqWidgets
+  PUBLIC
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Widgets
+  PRIVATE
+    Qt5::Network)
+
+if (APPLE)
+  vtk_module_link(ParaView::pqWidgets
+    PRIVATE
+      Qt5::PrintSupport)
+endif ()
+
+if (PARAVIEW_USE_QTHELP)
+  vtk_module_link(ParaView::pqWidgets
+    PRIVATE
+      Qt5::Help)
+endif ()
+
+if (PARAVIEW_USE_QTWEBENGINE)
+  vtk_module_link(ParaView::pqWidgets
+    PRIVATE
+      Qt5::WebEngineWidgets)
+endif ()

@@ -1,0 +1,12 @@
+NAME
+  ParaView::pqWidgets
+GROUPS
+  ParaViewQt
+  Qt
+DEPENDS
+  ParaView::ServerManagerCore
+  ParaView::qttesting
+  VTK::GUISupportQt
+TEST_LABELS
+  ParaView
+EXCLUDE_WRAP
