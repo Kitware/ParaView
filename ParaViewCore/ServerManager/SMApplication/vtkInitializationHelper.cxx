@@ -231,7 +231,7 @@ void vtkInitializationHelper::Initialize(int argc, char** argv, int type, vtkPVO
 
   // this has to happen after process module is initialized and options have
   // been set.
-  PARAVIEW_INITIALIZE();
+  paraview_initialize();
 
   // Set multi-server flag to vtkProcessModule
   vtkProcessModule::GetProcessModule()->SetMultipleSessionsSupport(

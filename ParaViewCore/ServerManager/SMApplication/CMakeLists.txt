@@ -28,199 +28,96 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkInitializationHelper.cxx
-)
+set(classes
+  vtkInitializationHelper)
 
-vtk_module_library(vtkPVServerManagerApplication ${Module_SRCS})
+set(private_headers
+  vtkPVInitializer.h)
 
-#------------------------------------------------------------------------------
-# Generate ServerManager (xml and CS stream) initialization header.
-#------------------------------------------------------------------------------
-set(vtk-module-init-functions)
-set(vtk-module-init-calls)
-set(_dependencies)
-set(module_sm_xmls)
+vtk_module_add_module(ParaView::ServerManagerApplication
+  CLASSES ${classes}
+  PRIVATE_HEADERS ${private_headers})
+vtk_module_link(ParaView::ServerManagerApplication
+  PRIVATE
+    paraview_client_server
+    paraview_server_manager)
+vtk_module_client_server_exclude()
 
-# Create list of the modules we are going to client server wrap.
-# The user can specify a list in PARAVIEW_CS_MODULES
-if (PARAVIEW_CS_MODULES)
-  # use the user provide variable
-  set(PARAVIEW_CURRENT_CS_MODULES ${PARAVIEW_CS_MODULES} CACHE INTERNAL "List of modules to CS wrap")
-else()
-  # Default to VTK_MODULES_ENABLED but need to filter the list first ( its
-  # used else where without the guards below )
-  set(_tmp_list)
-  foreach (_module ${VTK_MODULES_ENABLED})
-    if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
-        NOT ${_module}_IS_TEST AND
-        NOT ${_module}_THIRD_PARTY)
-      list(APPEND _tmp_list ${_module})
-    endif()
-  endforeach()
-  set(PARAVIEW_CURRENT_CS_MODULES ${_tmp_list} CACHE INTERNAL "List of modules to CS wrap")
-endif()
+set(xml_files
+  Resources/3d_widgets.xml
+  Resources/filters.xml
+  Resources/internal_writers.xml
+  Resources/readers.xml
+  Resources/rendering.xml
+  Resources/sources.xml
+  Resources/utilities.xml
+  Resources/views_and_representations.xml
+  Resources/writers.xml)
 
-foreach (_module ${PARAVIEW_CURRENT_CS_MODULES})
-  if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
-      NOT ${_module}_IS_TEST AND
-      NOT ${_module}_THIRD_PARTY AND
-        (NOT _module STREQUAL "vtkPVServerManagerApplication") AND
-        (NOT _module MATCHES ".*Catalyst.*"))
-    #message("${_module} == Adding")
-    set(vtk-module-init-functions
-      "${vtk-module-init-functions}extern \"C\" void ${_module}CS_Initialize(vtkClientServerInterpreter*);\n")
-    set(vtk-module-init-calls
-      "${vtk-module-init-calls}  ${_module}CS_Initialize(interp);\n")
+if (TARGET VTK::mpi)
+  list(APPEND xml_files
+    Resources/proxies_mpi.xml)
+endif ()
 
-    list(APPEND _dependencies ${_module}CS)
-  endif()
+if (TARGET VTK::IOXdmf2)
+  list(APPEND xml_files
+    Resources/proxies_xdmf2.xml)
+endif ()
 
-  # if module provides server manager xmls, process them.
-  get_property(module_xmls GLOBAL PROPERTY ${_module}_SERVERMANAGER_XMLS)
-  if (module_xmls)
-    foreach(xml_path IN LISTS module_xmls)
-      list(APPEND module_sm_xmls ${xml_path})
-    endforeach()
-  endif()
-endforeach()
+if (TARGET VTK::IOXdmf3)
+  list(APPEND xml_files
+    Resources/proxies_xdmf3.xml)
+endif ()
 
-# Add link-dependencies on all wrapping classes.
-target_link_libraries(vtkPVServerManagerApplication
-  LINK_PRIVATE ${_dependencies}
-  LINK_PUBLIC vtkPVServerManagerCore)
+if (TARGET VTK::IOGDAL)
+  list(APPEND xml_files
+    Resources/proxies_gdal.xml)
+endif ()
 
-#------------------------------------------------------------------------------
-# Setup SM xmls. 
-#------------------------------------------------------------------------------
-SET(requestedResourceFiles
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
-  ${module_sm_xmls}
-  )
-if (PARAVIEW_USE_MPI)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_mpi.xml)
-endif()
+if (TARGET VTK::IOLAS)
+  list(APPEND xml_files
+    Resources/proxies_las.xml)
+endif ()
 
-#------------------------------------------------------------------------------
-list(FIND VTK_MODULES_ENABLED "vtkIOXdmf2" vtkioxdmf2_index)
-if (vtkioxdmf2_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_xdmf2.xml)
-endif()
+if (TARGET VTK::IOPDAL)
+  list(APPEND xml_files
+    Resources/proxies_pdal.xml)
+endif ()
 
-list(FIND VTK_MODULES_ENABLED "vtkIOXdmf3" vtkioxdmf3_index)
-if (vtkioxdmf3_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_xdmf3.xml)
-endif()
+if (TARGET VTK::IOCityGML)
+  list(APPEND xml_files
+    Resources/proxies_citygml.xml)
+endif ()
 
-list(FIND VTK_MODULES_ENABLED "vtkIOGDAL" vtkiogdal_index)
-if (vtkiogdal_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_gdal.xml)
-endif()
+if (TARGET VTK::IOSegY)
+  list(APPEND xml_files
+    Resources/proxies_segy.xml)
+endif ()
 
-list(FIND VTK_MODULES_ENABLED "vtkIOLAS" vtkiolas_index)
-if (vtkiolas_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_las.xml)
-endif()
+if (TARGET VTK::IOADIOS)
+  list(APPEND xml_files
+    Resources/proxies_adios.xml)
+endif ()
 
-list(FIND VTK_MODULES_ENABLED "vtkIOPDAL" vtkiopdal_index)
-if (vtkiopdal_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_pdal.xml)
-endif()
+if (TARGET VTK::IOMotionFX)
+  list(APPEND xml_files
+    Resources/proxies_motionfx.xml)
+endif ()
 
-list(FIND VTK_MODULES_ENABLED "vtkIOCityGML" vtkiocitygml_index)
-if (vtkiocitygml_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_citygml.xml)
-endif()
+if (TARGET VTK::FiltersOpenTurns)
+  list(APPEND xml_files
+    Resources/proxies_openturns.xml)
+endif ()
 
-list(FIND VTK_MODULES_ENABLED "vtkIOSegY" vtkiosegy_index)
-if (vtkiosegy_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_segy.xml)
-endif()
+if (TARGET VTK::FiltersMomentInvariants)
+  list(APPEND xml_files
+    Resources/MomentInvariants.xml)
+endif ()
 
+if (TARGET VTK::PythonInterpreter)
+  list(APPEND xml_files
+    Resources/pythonfilter.xml)
+endif ()
 
-list(FIND VTK_MODULES_ENABLED "vtkIOADIOS" vtkioadios_index)
-if (vtkioadios_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_adios.xml)
-endif()
-
-list(FIND VTK_MODULES_ENABLED "vtkIOMotionFX" vtkiomotionfx_index)
-if (vtkiomotionfx_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_motionfx.xml)
-endif()
-
-if (PARAVIEW_USE_OPENTURNS)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/proxies_openturns.xml)
-endif()
-
-list(FIND VTK_MODULES_ENABLED "vtkFiltersMomentInvariants" vtkFiltersMomentInvariants_index)
-if (vtkFiltersMomentInvariants_index GREATER 0)
-  list(APPEND requestedResourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/MomentInvariants.xml)
-endif()
-
-
-#------------------------------------------------------------------------------
-
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND requestedResourceFiles
-      ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
-  )
-endif()
-set(resourceFiles)
-foreach(requestedResourceFile IN LISTS requestedResourceFiles)
-  if (EXISTS "${requestedResourceFile}")
-    list(APPEND resourceFiles "${requestedResourceFile}")
-  endif ()
-endforeach()
-set (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
-    CACHE INTERNAL "Server Manager XMLs")
-
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
-  DEPENDS ${resourceFiles} kwProcessXML
-  COMMAND kwProcessXML
-       ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
-       vtkSMDefaultModules Interface GetInterfaces
-       ${resourceFiles}
-  COMMENT "Generating headers for ServerManager XMLs")
-set_source_files_properties(vtkInitializationHelper.cxx
-  PROPERTIES OBJECT_DEPENDS
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
-
-
-set (xml_init_code "")
-foreach(rf ${resourceFiles})
-  string(REGEX REPLACE "^.*/(.*).(xml|pvsm)$" "\\1" moduleName "${rf}")
-  set (oneModule
-"  init_string =  vtkSMDefaultModules${moduleName}GetInterfaces();
-  xmls.push_back(init_string);
-  delete[] init_string; init_string = NULL;")
-  set(xml_init_code
-    "${xml_init_code}\n${oneModule}")
-endforeach()
-
-#------------------------------------------------------------------------------
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkPVInitializer.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVInitializer.h
-  @ONLY)
-#------------------------------------------------------------------------------
+paraview_add_server_manager_xmls(
+  XMLS  ${xml_files})

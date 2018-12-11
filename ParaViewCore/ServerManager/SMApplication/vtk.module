@@ -1,0 +1,10 @@
+NAME
+  ParaView::ServerManagerApplication
+LIBRARY_NAME
+  vtkPVServerManagerApplication
+DEPENDS
+  ParaView::ServerManagerCore
+PRIVATE_DEPENDS
+  VTK::vtksys
+TEST_LABELS
+  ParaView

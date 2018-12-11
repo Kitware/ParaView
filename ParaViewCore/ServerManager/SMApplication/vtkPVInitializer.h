@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInitializer.h.in
+  Module:    vtkPVInitializer.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,26 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// THIS IS A GENERATED FILE -- DO NOT EDIT ---
+
 #ifndef vtkPVInitializer_h
 #define vtkPVInitializer_h
-#include "vtkPVConfig.h"
-#include "vtkSMGeneratedModules.h" // vtkPVConfig must be included before this
-                                   // file.
 
 #include "vtkPVPlugin.h"
 #include "vtkPVServerManagerPluginInterface.h"
 
+#include "paraview_client_server.h"
+#include "paraview_server_manager.h"
+
 class vtkClientServerInterpreter;
 
-@vtk-module-init-functions@
-void PARAVIEW_CSSTREAMS_INITIALIZE(vtkClientServerInterpreter* interp)
-{
-@vtk-module-init-calls@
-}
-
-class vtkPVInitializerPlugin : public vtkPVPlugin,
-  public vtkPVServerManagerPluginInterface
+class vtkPVInitializerPlugin : public vtkPVPlugin, public vtkPVServerManagerPluginInterface
 {
   const char* GetPluginName() override { return "vtkPVInitializerPlugin"; }
   const char* GetPluginVersionString() override { return "0.0"; }
@@ -39,29 +32,25 @@ class vtkPVInitializerPlugin : public vtkPVPlugin,
   bool GetRequiredOnClient() override { return false; }
   const char* GetRequiredPlugins() override { return ""; }
   const char* GetDescription() override { return ""; }
-  void GetBinaryResources(std::vector<std::string>&) override { }
+  void GetBinaryResources(std::vector<std::string>&) override {}
   const char* GetEULA() override { return nullptr; }
 
-  void GetXMLs(std::vector<std::string> &xmls) override
+  void GetXMLs(std::vector<std::string>& xmls) override
   {
-    (void) xmls;
-    char* init_string = NULL;
-    @xml_init_code@
-    (void) init_string;
+    paraview_server_manager_initialize(xmls);
   }
 
   vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
-    GetInitializeInterpreterCallback() override
+  GetInitializeInterpreterCallback() override
   {
-    return PARAVIEW_CSSTREAMS_INITIALIZE;
+    return paraview_client_server_initialize;
   }
 };
 
-void PARAVIEW_INITIALIZE()
+void paraview_initialize()
 {
   static vtkPVInitializerPlugin instance;
   vtkPVPlugin::ImportPlugin(&instance);
 }
 
 #endif
-// THIS IS A GENERATED FILE -- DO NOT EDIT ---
