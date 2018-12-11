@@ -17,8 +17,6 @@ README.md
 README.kitware.md
 
 api.c
-cmake/FindCUDA.cmake
-cmake/Config.cmake.in
 CMakeLists.txt
 config.nvp.h.in
 convert.cu
