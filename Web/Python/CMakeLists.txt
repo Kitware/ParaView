@@ -1,7 +1,20 @@
-include(vtkModuleMacrosPython)
+set(files
+  paraview/web/__init__.py
+  paraview/web/_default_proxies.py
+  paraview/web/camera.py
+  paraview/web/data_converter.py
+  paraview/web/data_writer.py
+  paraview/web/dataset_builder.py
+  paraview/web/decorators.py
+  paraview/web/helper.py
+  paraview/web/protocols.py
+  paraview/web/pv_wslink.py
+  paraview/web/test_server.py)
 
-# The RELATIVE make vtk_module_python_package() preserve the vtk/module package
-# structure when building/installing. Otherwise, we'd just get the "web"
-# package.
-vtk_module_python_package(${vtk-module} "paraview/web"
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}")
+vtk_module_add_python_package(ParaView::WebPython
+  FILES               ${files}
+  PACKAGE             "paraview.web"
+  MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}")
+
+vtk_module_add_python_module(ParaView::WebPython
+  PACKAGES "paraview.web")
