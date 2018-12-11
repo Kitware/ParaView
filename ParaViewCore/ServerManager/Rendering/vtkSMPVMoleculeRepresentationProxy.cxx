@@ -116,14 +116,14 @@ const char* vtkSMPVMoleculeRepresentationProxy::GetPresetDisplayName(int preset)
 int vtkSMPVMoleculeRepresentationProxy::GetCurrentPreset()
 {
   MapperParametersPreset p;
-  p.RenderAtoms = vtkSMUncheckedPropertyHelper(this, "RenderAtoms").GetAsInt();
-  p.RenderBonds = vtkSMUncheckedPropertyHelper(this, "RenderBonds").GetAsInt();
+  p.RenderAtoms = vtkSMUncheckedPropertyHelper(this, "RenderAtoms").GetAsInt() == 1;
+  p.RenderBonds = vtkSMUncheckedPropertyHelper(this, "RenderBonds").GetAsInt() == 1;
   p.AtomicRadiusType = vtkSMUncheckedPropertyHelper(this, "AtomicRadiusType").GetAsDouble();
   p.AtomicRadiusFactor = vtkSMUncheckedPropertyHelper(this, "AtomicRadiusFactor").GetAsDouble();
   p.UseMultiCylindersForBonds =
-    vtkSMUncheckedPropertyHelper(this, "MultiCylindersForBonds").GetAsInt();
+    vtkSMUncheckedPropertyHelper(this, "MultiCylindersForBonds").GetAsInt() == 1;
   p.BondRadius = vtkSMUncheckedPropertyHelper(this, "BondRadius").GetAsDouble();
-  p.UseAtomColorForBonds = vtkSMUncheckedPropertyHelper(this, "BondColorMode").GetAsInt();
+  p.UseAtomColorForBonds = vtkSMUncheckedPropertyHelper(this, "BondColorMode").GetAsInt() == 1;
 
   for (const auto& preset : this->Presets)
   {
