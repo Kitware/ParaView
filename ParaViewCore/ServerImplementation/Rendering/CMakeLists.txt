@@ -28,12 +28,10 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkSIImageTextureProxy.cxx
-  vtkSIPVRepresentationProxy.cxx
-  vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
-)
+set(classes
+  vtkSIImageTextureProxy
+  vtkSIPVRepresentationProxy
+  vtkSIUnstructuredGridVolumeRepresentationProxy)
 
-#------------------------------------------------------------------------------
-vtk_module_library(vtkPVServerImplementationRendering
-  ${Module_SRCS})
+vtk_module_add_module(ParaView::ServerImplementationRendering
+  CLASSES ${classes})
