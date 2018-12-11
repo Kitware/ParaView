@@ -1,0 +1,7 @@
+NAME
+  ParaView::WrapClientServer
+LIBRARY_NAME
+  vtkWrapClientServer
+PRIVATE_DEPENDS
+  VTK::WrappingTools
+EXCLUDE_WRAP

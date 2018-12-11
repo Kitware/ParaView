@@ -28,16 +28,12 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set(${vtk-module}_NO_HeaderTest 1)
-vtk_module_export("")
 
-if (NOT PARAVIEW_COMPILE_TOOLS_IMPORTED)
-  add_executable(vtkWrapClientServer vtkWrapClientServer.c)
-  target_link_libraries(vtkWrapClientServer vtkWrappingTools)
+if (NOT TARGET ParaView::WrapClientServer)
+  vtk_module_add_executable(ParaView::WrapClientServer vtkWrapClientServer.c)
   if (PARAVIEW_USE_UNIFIED_BINDINGS)
-    set_target_properties(vtkWrapClientServer
-      PROPERTIES
-        COMPILE_DEFINITIONS PARAVIEW_USE_UNIFIED_BINDINGS)
+    vtk_module_define(ParaView::WrapClientServer
+      PRIVATE
+        PARAVIEW_USE_UNIFIED_BINDINGS)
   endif ()
-  vtk_compile_tools_target(vtkWrapClientServer)
-endif()
+endif ()
