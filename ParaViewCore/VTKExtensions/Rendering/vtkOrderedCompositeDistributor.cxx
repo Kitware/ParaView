@@ -23,7 +23,6 @@
  */
 
 #include "vtkOrderedCompositeDistributor.h"
-#include "vtkPVConfig.h" // needed for PARAVIEW_USE_MPI
 
 #include "vtkBSPCuts.h"
 #include "vtkCallbackCommand.h"
@@ -39,12 +38,12 @@
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_FiltersParallelMPI
 #include "vtkDistributedDataFilter.h"
 #endif
 
 //-----------------------------------------------------------------------------
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_FiltersParallelMPI
 static void D3UpdateProgress(vtkObject* _D3, unsigned long, void* _distributor, void*)
 {
   vtkDistributedDataFilter* D3 = reinterpret_cast<vtkDistributedDataFilter*>(_D3);
@@ -166,7 +165,7 @@ int vtkOrderedCompositeDistributor::RequestData(vtkInformation* vtkNotUsed(reque
     return 1;
   }
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_FiltersParallelMPI
   if (!this->PKdTree)
   {
     vtkWarningMacro("No PKdTree set. vtkOrderedCompositeDistributor requires that"

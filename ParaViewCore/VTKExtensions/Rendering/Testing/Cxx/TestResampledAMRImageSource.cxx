@@ -44,7 +44,7 @@ int TestResampledAMRImageSource(int argc, char* argv[])
 
   vtkNew<vtkAMRFlashReader> reader;
   std::string filename = testing->GetDataRoot();
-  filename += "/smooth.flash";
+  filename += "/Testing/Data/smooth.flash";
   reader->SetFileName(filename.c_str());
   reader->SetMaxLevel(0);
   reader->UpdateInformation();
