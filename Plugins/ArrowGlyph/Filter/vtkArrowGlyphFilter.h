@@ -20,13 +20,14 @@
 #ifndef vtkArrowGlyphFilter_h
 #define vtkArrowGlyphFilter_h
 
+#include "vtkArrowGlyphFilterModule.h"
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkSmartPointer.h"
 
 class vtkArrowSource;
 class vtkMaskPoints;
 
-class VTK_EXPORT vtkArrowGlyphFilter : public vtkPolyDataAlgorithm
+class VTKARROWGLYPHFILTER_EXPORT vtkArrowGlyphFilter : public vtkPolyDataAlgorithm
 {
 public:
   static vtkArrowGlyphFilter* New();

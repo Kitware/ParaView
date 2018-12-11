@@ -1,0 +1,11 @@
+NAME
+  ArrowGlyph::ArrowGlyphFilter
+LIBRARY_NAME
+  vtkArrowGlyphFilter
+DEPENDS
+  VTK::CommonExecutionModel
+  VTK::CommonCore
+PRIVATE_DEPENDS
+  ParaView::ClientServerCoreCore
+  VTK::CommonDataModel
+  VTK::FiltersCore

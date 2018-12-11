@@ -1,0 +1,9 @@
+NAME
+  ArrowGlyph
+DESCRIPTION
+  Glyph with customizable Arrows
+REQUIRES_MODULES
+  VTK::CommonExecutionModel
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
