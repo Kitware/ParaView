@@ -34,79 +34,27 @@
 // Thanks to Uwe Schulzweida for the CDI code (uwe.schulzweida@mpimet.mpg.de)
 // Thanks to Moritz Hanke for the sorting code (hanke@dkrz.de)
 
-#ifndef __vtkCDIReader_h
-#define __vtkCDIReader_h
+#ifndef vtkCDIReader_h
+#define vtkCDIReader_h
 
 #define DEBUG 0
 #define MAX_VARS 100
 
-#ifdef _WIN32
-#define VTKIONETCDF_EXPORT __declspec(dllexport)
-#else
-#define VTKIONETCDF_EXPORT
-#endif
-
-#include <vtkCallbackCommand.h>
-#include <vtkCellArray.h>
-#include <vtkCellData.h>
-#include <vtkCellType.h>
-#include <vtkCommunicator.h>
-#include <vtkDataArraySelection.h>
-#include <vtkDataObject.h>
-#include <vtkDoubleArray.h>
-#include <vtkDummyController.h>
-#include <vtkErrorCode.h>
-#include <vtkExtractSelection.h>
-#include <vtkFloatArray.h>
-#include <vtkIONetCDFModule.h>
-#include <vtkInformation.h>
-#include <vtkInformationDoubleVectorKey.h>
-#include <vtkInformationVector.h>
-#include <vtkIntArray.h>
-#include <vtkMath.h>
-#ifdef PARAVIEW_USE_MPI
-#include <vtkMPI.h>
-#include <vtkMPIController.h>
-#endif
-#include <vtkObjectFactory.h>
-#include <vtkPVConfig.h>
-#include <vtkPointData.h>
-#include <vtkSelection.h>
-#include <vtkSelectionNode.h>
-#include <vtkSmartPointer.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
-#include <vtkStringArray.h>
-#include <vtkTableExtentTranslator.h>
-#include <vtkToolkits.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkUnstructuredGridAlgorithm.h>
-#include <vtk_netcdf.h>
-
-#include <algorithm>
-#include <cctype>
-#include <cfloat>
-#include <cmath>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <vector>
-
-#include "cdi.h"
+#include "vtkCDIReaderModule.h"
+#include "vtkDataArraySelection.h"
+#include "vtkIntArray.h"
+#include "vtkSmartPointer.h"
+#include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkCallbackCommand;
-class vtkDataArraySelection;
 class vtkDoubleArray;
-class vtkFloatArray;
+// FIXME: Don't expose this publicly.
 #ifdef PARAVIEW_USE_MPI
 class vtkMultiProcessController;
 #endif
 class vtkStringArray;
 
-class VTKIONETCDF_EXPORT vtkCDIReader : public vtkUnstructuredGridAlgorithm
+class VTKCDIREADER_EXPORT vtkCDIReader : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkCDIReader* New();

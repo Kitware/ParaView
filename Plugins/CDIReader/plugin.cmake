@@ -1,3 +1,0 @@
-pv_plugin(CDIReader
-DESCRIPTION "ICON netCDF/CDI Reader"
-DEFAULT_ENABLED)

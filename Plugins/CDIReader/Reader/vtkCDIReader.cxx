@@ -36,6 +36,26 @@
 
 #include "vtkCDIReader.h"
 
+#include "vtkCallbackCommand.h"
+#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkCellType.h"
+#include "vtkDataArraySelection.h"
+#include "vtkDataObject.h"
+#include "vtkDoubleArray.h"
+#include "vtkFieldData.h"
+#include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkPointData.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
+#include "vtkUnstructuredGrid.h"
+
+#include "cdi.h"
+#include "vtk_netcdf.h"
+
 using namespace std;
 
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()

@@ -1858,7 +1858,7 @@ void cdfClose(int fileID);
 
 #ifdef  HAVE_LIBNETCDF
 
-#include  <netcdf.h>
+#include  <vtk_netcdf.h>
 
 #ifdef  NC_FORMAT_64BIT_DATA
 #define  HAVE_NETCDF5  1
@@ -2527,7 +2527,7 @@ if ( gridsize > INT_MAX ) Error("%s format grid size (%zu) limit exceeded (%zu)!
 
 #ifdef HAVE_LIBNETCDF
 
-#include <netcdf.h>
+#include <vtk_netcdf.h>
 
 void cdf_create (const char *path, int cmode, int *idp);
 int  cdf_open   (const char *path, int omode, int *idp);

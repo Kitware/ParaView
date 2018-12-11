@@ -1,0 +1,8 @@
+NAME
+  CDIReader
+DESCRIPTION
+  ICON netCDF/CDI Reader
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::netcdf
