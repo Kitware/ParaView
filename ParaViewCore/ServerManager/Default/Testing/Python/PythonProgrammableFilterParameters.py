@@ -3,7 +3,7 @@ from paraview import smtesting
 import os.path
 
 smtesting.ProcessCommandLineArguments()
-pluginXML = os.path.join(smtesting.DataDir, "PythonProgrammableFilterParameters.xml")
+pluginXML = os.path.join(smtesting.DataDir, "Testing/Data/PythonProgrammableFilterParameters.xml")
 
 LoadPlugin(pluginXML, ns=globals())
 

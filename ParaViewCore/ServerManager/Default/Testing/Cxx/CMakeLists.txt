@@ -1,8 +1,8 @@
 ################################################################################
 # ParaView ServerManager Unit Tests
 if (PARAVIEW_ENABLE_QT_SUPPORT)
-  include(ParaViewQt)
-  pv_find_package_qt(qt_targets REQUIRED QT5_COMPONENTS Test)
+  find_package(Qt5 REQUIRED COMPONENTS Test)
+  set(CMAKE_AUTOMOC 1)
   set(UNITTESTS
     SMProxy
     SMProxyLink
@@ -13,13 +13,12 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     SMPropertyHelper
   )
   foreach(name IN LISTS UNITTESTS)
-    pv_qt_wrap_cpp(${name}_MOC_SOURCES vtk${name}Test.h)
     list(APPEND test_sources Test${name}.cxx)
     list(APPEND extra_sources vtk${name}Test.cxx ${${name}_MOC_SOURCES})
   endforeach()
 endif()
 
-paraview_add_test_cxx(${vtk-module}CxxTests tests
+vtk_add_test_cxx(vtkPVServerManagerDefaultCxxTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ParaViewCoreServerManagerPrintSelf.cxx
   TestComparativeAnimationCueProxy.cxx
@@ -30,21 +29,9 @@ paraview_add_test_cxx(${vtk-module}CxxTests tests
   TestXMLSaveLoadState.cxx
   ${test_sources}
   )
-vtk_test_cxx_executable(${vtk-module}CxxTests tests
+vtk_test_cxx_executable(vtkPVServerManagerDefaultCxxTests tests
   ${extra_sources}
   )
 if (PARAVIEW_ENABLE_QT_SUPPORT)
-  target_link_libraries(${vtk-module}CxxTests LINK_PRIVATE ${qt_targets})
+  target_link_libraries(vtkPVServerManagerDefaultCxxTests PRIVATE Qt5::Test)
 endif ()
-
-paraview_test_load_data_dirs(""
-  SPCTH
-  )
-paraview_test_load_data(""
-  ,REGEX:poisson_3d.*\\.h5
-  "iron_protein.vtk"
-  SPCTH/ball_and_box.spcth
-  sonic.pht
-  sonicgeom.dat.1
-  sonicrestart.1
-  )

@@ -11,7 +11,7 @@ from paraview import smtesting
 smtesting.ProcessCommandLineArguments()
 
 # create a new 'ExodusIIReader'
-canex2 = OpenDataFile(smtesting.DataDir + "/can.ex2")
+canex2 = OpenDataFile(smtesting.DataDir + "/Testing/Data/can.ex2")
 
 # get animation scene
 animationScene1 = GetAnimationScene()

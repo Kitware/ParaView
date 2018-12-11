@@ -4,7 +4,7 @@ from paraview.simple import *
 from paraview import smtesting
 smtesting.ProcessCommandLineArguments()
 
-canex2 = OpenDataFile(smtesting.DataDir + "/can.ex2")
+canex2 = OpenDataFile(smtesting.DataDir + "/Testing/Data/can.ex2")
 canex2.ElementVariables = ['EQPS']
 canex2.PointVariables = ['DISPL', 'VEL', 'ACCL']
 canex2.GlobalVariables = ['KE', 'XMOM', 'YMOM', 'ZMOM', 'NSTEPS', 'TMSTEP']

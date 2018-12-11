@@ -7,7 +7,7 @@ import os.path
 
 smtesting.ProcessCommandLineArguments()
 
-pluginXML = os.path.join(smtesting.DataDir, "TestRepresentationTypePlugin.xml")
+pluginXML = os.path.join(smtesting.DataDir, "Testing/Data/TestRepresentationTypePlugin.xml")
 LoadPlugin(pluginXML, ns=globals())
 
 SphereSpecial()

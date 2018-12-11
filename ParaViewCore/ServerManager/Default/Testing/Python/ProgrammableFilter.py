@@ -15,7 +15,7 @@ servermanager.Connect()
 
 # Create an Exodus reader to load our data ...
 #==============================================
-exodus_file = os.path.join(smtesting.DataDir, "disk_out_ref.ex2")
+exodus_file = os.path.join(smtesting.DataDir, "Testing/Data/disk_out_ref.ex2")
 reader = servermanager.sources.ExodusIIReader(FileName=exodus_file)
 reader.UpdatePipeline()
 reader.UpdatePropertyInformation()
@@ -77,7 +77,7 @@ if pointData.GetArray("PedigreeNodeId").GetValue(0) != 36120750:
 
 # Create an Exodus reader to load our data ...
 #==============================================
-exodus_file = os.path.join(smtesting.DataDir, "disk_out_ref.ex2")
+exodus_file = os.path.join(smtesting.DataDir, "Testing/Data/disk_out_ref.ex2")
 reader = servermanager.sources.ExodusIIReader(FileName=exodus_file)
 reader.UpdatePipeline()
 reader.UpdatePropertyInformation()

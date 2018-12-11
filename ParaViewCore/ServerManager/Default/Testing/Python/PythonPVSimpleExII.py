@@ -3,7 +3,7 @@ import sys
 from paraview import smtesting
 
 smtesting.ProcessCommandLineArguments()
-reader = ExodusIIReader(FileName=smtesting.DataDir+'/can.ex2')
+reader = ExodusIIReader(FileName=smtesting.DataDir+'/Testing/Data/can.ex2')
 
 if len(reader.TimestepValues) != 44:
     raise smtesting.TestError('Wrong amount of time steps.')

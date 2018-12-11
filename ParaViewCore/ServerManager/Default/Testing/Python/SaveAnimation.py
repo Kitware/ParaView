@@ -9,7 +9,7 @@ def RegressionTest(imageName, baselineName):
     testing.AddArgument("-T")
     testing.AddArgument(smtesting.TempDir)
     testing.AddArgument("-V")
-    testing.AddArgument(smtesting.DataDir + "/Baseline/" + baselineName)
+    testing.AddArgument(smtesting.DataDir + "/ParaViewCore/ServerManager/Default/Testing/Data/Baseline/" + baselineName)
     return testing.RegressionTest(smtesting.TempDir + "/" + imageName, 10) == vtkTesting.PASSED
 
 
@@ -21,7 +21,7 @@ renderView1.ViewSize = [300, 300]
 # ----------------------------------------------------------------
 
 # create a new 'ExodusIIReader'
-reader = OpenDataFile(smtesting.DataDir + '/dualSphereAnimation4.pvd')
+reader = OpenDataFile(smtesting.DataDir + '/Testing/Data/dualSphereAnimation4.pvd')
 
 # get animation scene
 animationScene1 = GetAnimationScene()

@@ -14,7 +14,7 @@ smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
-file1 = os.path.join(smtesting.DataDir, "quadraticTetra01.vtu")
+file1 = os.path.join(smtesting.DataDir, "Testing/Data/quadraticTetra01.vtu")
 reader1 = servermanager.sources.XMLUnstructuredGridReader(FileName=file1)
 reader1Output = servermanager.Fetch(reader1)
 
@@ -29,7 +29,7 @@ if util.IntegrateCell(reader1Output, 1) != 0.625:
     print("ERROR: incorrect result for cell 1 of 1st dataset")
     sys.exit(1)
 
-file2 = os.path.join(smtesting.DataDir, "elements.vtu")
+file2 = os.path.join(smtesting.DataDir, "Testing/Data/elements.vtu")
 reader2 = servermanager.sources.XMLUnstructuredGridReader(FileName=file2)
 reader2Output = servermanager.Fetch(reader2)
 
@@ -69,7 +69,7 @@ if util.IntegrateCell(reader2Output, 0) != 1.0:
     print("ERROR: incorrect result for cell 0 of 2nd dataset")
     sys.exit(1)
 
-file3 = os.path.join(smtesting.DataDir, "blow.vtk")
+file3 = os.path.join(smtesting.DataDir, "Testing/Data/blow.vtk")
 reader3 = servermanager.sources.LegacyVTKFileReader(FileNames=file3)
 reader3Output = servermanager.Fetch(reader3)
 

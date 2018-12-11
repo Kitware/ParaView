@@ -9,7 +9,7 @@ smtesting.ProcessCommandLineArguments()
 LoadDistributedPlugin('SLACTools', False, globals())
 LoadDistributedPlugin('SurfaceLIC', False, globals())
 
-filename = smtesting.DataDir + '/disk_out_ref.ex2'
+filename = smtesting.DataDir + '/Testing/Data/disk_out_ref.ex2'
 data = OpenDataFile(filename)
 rep = Show()
 

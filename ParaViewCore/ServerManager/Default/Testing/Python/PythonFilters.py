@@ -212,7 +212,7 @@ def test1 (query, types=[], associations=[], debug=1) :
             elif 'hex'  == type :
                 # I don't know how to generate mesh composed of hexahedra, instead
                 # just read in a dataset directly.
-                file = os.path.join(smtesting.DataDir, "multicomb_0.vts")
+                file = os.path.join(smtesting.DataDir, "Testing/Data/multicomb_0.vts")
                 reader = servermanager.sources.XMLStructuredGridReader(FileName=file)
             else : continue # Ideally, we should never come to here
 
@@ -243,7 +243,7 @@ def test1 (query, types=[], associations=[], debug=1) :
                 Tetrahedralize()
             elif 'hex'  == type :
                 dir = smtesting.DataDir
-                file = os.path.join(dir, "multicomb_0.vts")
+                file = os.path.join(dir, "Testing/Data/multicomb_0.vts")
                 reader = servermanager.sources.XMLStructuredGridReader(FileName=file)
             else : continue
 
