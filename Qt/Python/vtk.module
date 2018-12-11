@@ -1,0 +1,13 @@
+NAME
+  ParaView::pqPython
+LIBRARY_NAME
+  pqPython
+CONDITION
+  PARAVIEW_ENABLE_PYTHON
+DEPENDS
+  ParaView::pqCore
+  VTK::PythonInterpreter
+  VTK::WrappingPythonCore
+TEST_LABELS
+  ParaView
+EXCLUDE_WRAP
