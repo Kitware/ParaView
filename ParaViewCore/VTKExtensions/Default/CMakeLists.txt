@@ -28,136 +28,128 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set(Module_SRCS
-  vtkAdditionalFieldReader.cxx
-  vtkAMRConnectivity.cxx
-  vtkAMRDualClip.cxx
-  vtkAMRDualContour.cxx
-  vtkAMRDualGridHelper.cxx
-  vtkAMRFileSeriesReader.cxx
-  vtkAMRFragmentIntegration.cxx
-  vtkAMRFragmentsFilter.cxx
-  vtkAppendRectilinearGrid.cxx
-  vtkCellIntegrator.cxx
-  vtkCleanUnstructuredGridCells.cxx
-  vtkCleanUnstructuredGrid.cxx
-  vtkCSVWriter.cxx
-  vtkEnsembleDataReader.cxx
-  vtkEquivalenceSet.cxx
-  vtkExodusFileSeriesReader.cxx
-  vtkExtractScatterPlot.cxx
-  vtkExtractSelectionRange.cxx
-  vtkFileSequenceParser.cxx
-  vtkFlashContour.cxx
-  vtkGridAxes2DActor.cxx
-  vtkGridAxes3DActor.cxx
-  vtkGridAxesHelper.cxx
-  vtkGridAxesPlane2DActor.cxx
-  vtkGridConnectivity.cxx
-  vtkHierarchicalFractal.cxx
-  vtkHybridProbeFilter.cxx
-  vtkImageSimpleSource.cxx
-  vtkIntegrateFlowThroughSurface.cxx
-  vtkIntersectFragments.cxx
-  vtkIsoVolume.cxx
-  vtkMaterialInterfaceCommBuffer.cxx
-  vtkMaterialInterfaceFilter.cxx
-  vtkMaterialInterfaceIdList.cxx
-  vtkMaterialInterfacePieceLoading.cxx
-  vtkMaterialInterfacePieceTransaction.cxx
-  vtkMaterialInterfacePieceTransactionMatrix.cxx
-  vtkMaterialInterfaceProcessLoading.cxx
-  vtkMaterialInterfaceProcessRing.cxx
-  vtkMaterialInterfaceToProcMap.cxx
-  vtkMergeArrays.cxx
-  vtkMergeCompositeDataSet.cxx
-  vtkMinMax.cxx
-  vtkPEnSightGoldBinaryReader.cxx
-  vtkPEnSightGoldReader.cxx
-  vtkPEnSightReader.cxx
-  vtkPEquivalenceSet.cxx
-  vtkPExtractTemporalFieldData.cxx
-  vtkPGenericEnSightReader.cxx
-  vtkPhastaReader.cxx
-  vtkPlotEdges.cxx
-  vtkPointHandleRepresentationSphere.cxx
-  vtkPolyLineToRectilinearGridFilter.cxx
-  vtkPPhastaReader.cxx
-  vtkPSciVizContingencyStats.cxx
-  vtkPSciVizDescriptiveStats.cxx
-  vtkPSciVizKMeans.cxx
-  vtkPSciVizMultiCorrelativeStats.cxx
-  vtkPSciVizPCAStats.cxx
-  vtkPVAMRDualClip.cxx
-  vtkPVAMRDualContour.cxx
-  vtkPVAMRFragmentIntegration.cxx
-  vtkPVArrayCalculator.cxx
-  vtkPVBox.cxx
-  vtkPVClipClosedSurface.cxx
-  vtkPVClipDataSet.cxx
-  vtkPVConnectivityFilter.cxx
-  vtkPVContourFilter.cxx
-  vtkPVCylinder.cxx
-  vtkPVDataSetAlgorithmSelectorFilter.cxx
-  vtkPVDReader.cxx
-  vtkPVEnSightMasterServerReader2.cxx
-  vtkPVEnSightMasterServerReader.cxx
-  vtkPVEnSightMasterServerTranslator.cxx
-  vtkPVExtractBagPlots.cxx
-  vtkPVExtractComponent.cxx
-  vtkPVExtractVOI.cxx
-  vtkPVFrustumActor.cxx
-  vtkPVGlyphFilter.cxx
-  vtkPVGlyphFilterLegacy.cxx
-  vtkPVGridAxes3DActor.cxx
-  vtkPVLinearExtrusionFilter.cxx
-  vtkPVMetaClipDataSet.cxx
-  vtkPVMetaSliceDataSet.cxx
-  vtkPVPlane.cxx
-  vtkPVPLYWriter.cxx
-  vtkPVSelectionSource.cxx
-  vtkPVTextSource.cxx
-  vtkPVTransposeTable.cxx
-  vtkRulerLineForInput.cxx
-  vtkQuerySelectionSource.cxx
-  vtkRectilinearGridConnectivity.cxx
-  vtkSciVizStatistics.cxx
-  vtkSpyPlotBlock.cxx
-  vtkSpyPlotBlockIterator.cxx
-  vtkSpyPlotFileSeriesReader.cxx
-  vtkSpyPlotHistoryReader.cxx
-  vtkSpyPlotIStream.cxx
-  vtkSpyPlotReader.cxx
-  vtkSpyPlotReaderMap.cxx
-  vtkSpyPlotUniReader.cxx
-  vtkSurfaceVectors.cxx
-  vtkTimeStepProgressFilter.cxx
-  vtkTimeToTextConvertor.cxx
-  vtkUnstructuredPOPReader.cxx
-  vtkVRMLSource.cxx
-  vtkXMLCollectionReader.cxx
-  vtkXMLPVDWriter.cxx
-)
-if (PARAVIEW_USE_MPI)
-  list(APPEND Module_SRCS vtkInSituPParticlePathFilter.cxx)
-endif()
+set(classes
+  vtkAMRConnectivity
+  vtkAMRDualClip
+  vtkAMRDualContour
+  vtkAMRDualGridHelper
+  vtkAMRFileSeriesReader
+  vtkAMRFragmentIntegration
+  vtkAMRFragmentsFilter
+  vtkAdditionalFieldReader
+  vtkAppendRectilinearGrid
+  vtkCSVWriter
+  vtkCellIntegrator
+  vtkCleanUnstructuredGrid
+  vtkCleanUnstructuredGridCells
+  vtkEnsembleDataReader
+  vtkEquivalenceSet
+  vtkExodusFileSeriesReader
+  vtkExtractScatterPlot
+  vtkExtractSelectionRange
+  vtkFileSequenceParser
+  vtkFlashContour
+  vtkGridAxes2DActor
+  vtkGridAxes3DActor
+  vtkGridAxesHelper
+  vtkGridAxesPlane2DActor
+  vtkGridConnectivity
+  vtkHierarchicalFractal
+  vtkHybridProbeFilter
+  vtkImageSimpleSource
+  vtkIntegrateFlowThroughSurface
+  vtkIntersectFragments
+  vtkIsoVolume
+  vtkMaterialInterfaceCommBuffer
+  vtkMaterialInterfaceFilter
+  vtkMaterialInterfaceIdList
+  vtkMaterialInterfacePieceLoading
+  vtkMaterialInterfacePieceTransaction
+  vtkMaterialInterfacePieceTransactionMatrix
+  vtkMaterialInterfaceProcessLoading
+  vtkMaterialInterfaceProcessRing
+  vtkMaterialInterfaceToProcMap
+  vtkMergeArrays
+  vtkMergeCompositeDataSet
+  vtkMinMax
+  vtkPEnSightGoldBinaryReader
+  vtkPEnSightGoldReader
+  vtkPEnSightReader
+  vtkPEquivalenceSet
+  vtkPExtractTemporalFieldData
+  vtkPGenericEnSightReader
+  vtkPPhastaReader
+  vtkPSciVizContingencyStats
+  vtkPSciVizDescriptiveStats
+  vtkPSciVizKMeans
+  vtkPSciVizMultiCorrelativeStats
+  vtkPSciVizPCAStats
+  vtkPVAMRDualClip
+  vtkPVAMRDualContour
+  vtkPVAMRFragmentIntegration
+  vtkPVArrayCalculator
+  vtkPVBox
+  vtkPVClipClosedSurface
+  vtkPVClipDataSet
+  vtkPVConnectivityFilter
+  vtkPVContourFilter
+  vtkPVCylinder
+  vtkPVDReader
+  vtkPVDataSetAlgorithmSelectorFilter
+  vtkPVEnSightMasterServerReader
+  vtkPVEnSightMasterServerReader2
+  vtkPVEnSightMasterServerTranslator
+  vtkPVExtractBagPlots
+  vtkPVExtractComponent
+  vtkPVExtractVOI
+  vtkPVFrustumActor
+  vtkPVGlyphFilter
+  vtkPVGlyphFilterLegacy
+  vtkPVGridAxes3DActor
+  vtkPVLinearExtrusionFilter
+  vtkPVMetaClipDataSet
+  vtkPVMetaSliceDataSet
+  vtkPVPLYWriter
+  vtkPVPlane
+  vtkPVSelectionSource
+  vtkPVTextSource
+  vtkPVTransposeTable
+  vtkPhastaReader
+  vtkPlotEdges
+  vtkPointHandleRepresentationSphere
+  vtkPolyLineToRectilinearGridFilter
+  vtkQuerySelectionSource
+  vtkRectilinearGridConnectivity
+  vtkRulerLineForInput
+  vtkSciVizStatistics
+  vtkSpyPlotBlock
+  vtkSpyPlotBlockIterator
+  vtkSpyPlotFileSeriesReader
+  vtkSpyPlotHistoryReader
+  vtkSpyPlotIStream
+  vtkSpyPlotReader
+  vtkSpyPlotReaderMap
+  vtkSpyPlotUniReader
+  vtkSurfaceVectors
+  vtkTimeStepProgressFilter
+  vtkTimeToTextConvertor
+  vtkUnstructuredPOPReader
+  vtkVRMLSource
+  vtkXMLCollectionReader
+  vtkXMLPVDWriter)
 
-# Add header-only files so they get installed correctly.
-set (${vtk-module}_HDRS
-  vtkMaterialInterfaceIdListItem.h
-)
+set(headers
+  vtkMaterialInterfaceIdListItem.h)
 
-vtk_module_library(vtkPVVTKExtensionsDefault ${Module_SRCS})
-target_link_libraries(vtkPVVTKExtensionsDefault LINK_PRIVATE
-  ${vtkIOInfovis_LIBRARIES})
-include(vtkOpenGL)
-vtk_opengl_link(vtkPVVTKExtensionsDefault)
+vtk_module_add_module(ParaView::VTKExtensionsDefault
+  CLASSES ${classes}
+  HEADERS ${headers})
 
-OPTION(PARAVIEW_ENABLE_SPYPLOT_MARKERS
-       "Enables markers in the spyplot reader"
-       ON)
-MARK_AS_ADVANCED(PARAVIEW_ENABLE_SPYPLOT_MARKERS)
+option(PARAVIEW_ENABLE_SPYPLOT_MARKERS "Enables markers in the spyplot reader" ON)
+mark_as_advanced(PARAVIEW_ENABLE_SPYPLOT_MARKERS)
 
-IF(${PARAVIEW_ENABLE_SPYPLOT_MARKERS})
-  ADD_DEFINITIONS(-DPARAVIEW_ENABLE_SPYPLOT_MARKERS)
-ENDIF()
+if (PARAVIEW_ENABLE_SPYPLOT_MARKERS)
+  set_source_files_properties(vtkSpyPlotReader.cxx vtkSpyPlotFileSeriesReader.cxx
+    PROPERTIES
+      COMPILE_DEFINITIONS "PARAVIEW_ENABLE_SPYPLOT_MARKERS")
+endif ()

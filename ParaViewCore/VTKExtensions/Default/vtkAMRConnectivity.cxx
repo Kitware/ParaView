@@ -39,7 +39,7 @@
 #include "vtksys/SystemTools.hxx"
 
 #include "vtkPVConfig.h"
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPIController.h"
 #endif
 
@@ -181,7 +181,7 @@ private:
   vtkSmartPointer<vtkIntArray> set_to_min_id;
 };
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 
 static const int BOUNDARY_TAG = 857089;
 static const int EQUIV_SIZE_TAG = 748957;
@@ -234,7 +234,7 @@ public:
     return value_type();
   }
 };
-#endif /* PARAVIEW_USE_MPI */
+#endif
 
 //-----------------------------------------------------------------------------
 vtkAMRConnectivity::vtkAMRConnectivity()
@@ -334,7 +334,7 @@ int vtkAMRConnectivity::RequestData(vtkInformation* vtkNotUsed(request),
 int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* volumeName)
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   vtkMPIController* mpiController = vtkMPIController::SafeDownCast(controller);
 #endif
   int myProc = controller->GetLocalProcessId();
@@ -481,7 +481,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
       }
     }
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
     // Exchange all boundaries between processes where block and neighbor are different procs
     if (numProcs > 1 && !this->ExchangeBoundaries(mpiController))
     {
@@ -573,7 +573,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
           }
         }
       }
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
       if (numProcs > 1)
       {
         int out;
@@ -585,7 +585,7 @@ int vtkAMRConnectivity::DoRequestData(vtkNonOverlappingAMR* volume, const char* 
       {
         break;
       }
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
       if (numProcs > 1 && !this->ExchangeEquivPairs(mpiController))
       {
         return 0;
@@ -936,7 +936,7 @@ int vtkAMRConnectivity::ExchangeBoundaries(vtkMPIController* controller)
     return 0;
   }
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   int myProc = controller->GetLocalProcessId();
 
   vtkAMRConnectivityCommRequestList receiveList;
@@ -1040,7 +1040,7 @@ int vtkAMRConnectivity::ExchangeBoundaries(vtkMPIController* controller)
 
   sendList.WaitAll();
   sendList.clear();
-#endif /* PARAVIEW_USE_MPI */
+#endif
   return 1;
 }
 
@@ -1051,7 +1051,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs(vtkMPIController* controller)
     vtkErrorMacro("vtkAMRConnectivity only works parallel in MPI environment");
     return 0;
   }
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   int myProc = controller->GetLocalProcessId();
   int numProcs = controller->GetNumberOfProcesses();
 
@@ -1178,7 +1178,7 @@ int vtkAMRConnectivity::ExchangeEquivPairs(vtkMPIController* controller)
   receiveList.clear();
   sendList.WaitAll();
   sendList.clear();
-#endif /* PARAVIEW_USE_MPI */
+#endif
   return 1;
 }
 

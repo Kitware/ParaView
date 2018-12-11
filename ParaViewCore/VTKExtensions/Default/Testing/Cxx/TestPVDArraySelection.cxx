@@ -50,7 +50,8 @@ int TestPVDArraySelection(int argc, char* argv[])
 {
   vtkNew<vtkPVDReader> reader;
 
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "dualSphereAnimation.pvd");
+  char* fname =
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/dualSphereAnimation.pvd");
   reader->SetFileName(fname);
   delete[] fname;
 
