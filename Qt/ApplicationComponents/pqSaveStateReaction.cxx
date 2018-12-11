@@ -74,7 +74,7 @@ void pqSaveStateReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 bool pqSaveStateReaction::saveState()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   QString fileExt = tr("ParaView state file (*.pvsm);;Python state file (*.py);;All files (*)");
 #else
   QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
@@ -114,7 +114,7 @@ void pqSaveStateReaction::saveState(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqSaveStateReaction::savePythonState(const QString& filename)
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
   Q_ASSERT(pxm);
 

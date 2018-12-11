@@ -75,7 +75,7 @@ bool pqLoadMaterialsReaction::loadMaterials()
 //-----------------------------------------------------------------------------
 bool pqLoadMaterialsReaction::loadMaterials(const QString& dbase, pqServer* server)
 {
-#if defined(PARAVIEW_USE_OSPRAY)
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   CLEAR_UNDO_STACK();
 
   server = (server != NULL) ? server : pqActiveObjects::instance().activeServer();

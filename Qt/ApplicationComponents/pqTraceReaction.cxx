@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include "vtkPVConfig.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonScriptEditor.h"
 #else
 class pqPythonScriptEditor : public QObject
@@ -66,7 +66,7 @@ pqTraceReaction::pqTraceReaction(
   , StartTraceLabel(start_trace_label)
   , StopTraceLabel(stop_trace_label)
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   this->parentAction()->setEnabled(true);
   this->parentAction()->setText(
     vtkSMTrace::GetActiveTracer() == NULL ? this->StartTraceLabel : this->StopTraceLabel);
@@ -162,7 +162,7 @@ void pqTraceReaction::updateTrace()
 //-----------------------------------------------------------------------------
 void pqTraceReaction::editTrace(const QString& trace, bool incremental)
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   bool new_editor = false;
   if (this->Editor == nullptr)
   {

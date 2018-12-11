@@ -120,7 +120,7 @@ void pqLoadStateReaction::loadState(const QString& filename, bool dialogBlocked,
   }
   else
   { // python file
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
     pqPVApplicationCore::instance()->loadStateFromPythonFile(filename, server);
     pqStandardRecentlyUsedResourceLoaderImplementation::addStateFileToRecentResources(
       server, filename);
@@ -135,7 +135,7 @@ void pqLoadStateReaction::loadState()
 {
   pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(), tr("Load State File"), QString(),
     "ParaView state file (*.pvsm"
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
     " *.py"
 #endif
     ");;All files (*)");

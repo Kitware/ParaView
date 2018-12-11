@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqParaViewBehaviors.h"
 
-#include "vtkPVConfig.h" // for PARAVIEW_ENABLE_PYTHON
-
 #include "pqAlwaysConnectedBehavior.h"
 #include "pqApplicationCore.h"
 #include "pqApplyBehavior.h"
@@ -67,7 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVerifyRequiredPluginBehavior.h"
 #include "pqViewStreamingBehavior.h"
 
-#if defined(PARAVIEW_ENABLE_PYTHON)
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonShell.h"
 #endif
 
@@ -316,7 +314,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(QMainWindow* mainWindow, QObject* paren
     new pqLockPanelsBehavior(mainWindow);
   }
 
-#if defined(PARAVIEW_ENABLE_PYTHON)
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   if (PQ_IS_BEHAVIOR_ENABLED(PythonShellResetBehavior))
   {
     pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
