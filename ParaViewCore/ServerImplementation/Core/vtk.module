@@ -1,0 +1,15 @@
+NAME
+  ParaView::ServerImplementationCore
+LIBRARY_NAME
+  vtkPVServerImplementationCore
+GROUPS
+  ParaViewCore
+KIT
+  ParaView::ServerImplementation
+DEPENDS
+  ParaView::ClientServerCoreCore
+  ParaView::protobuf
+PRIVATE_DEPENDS
+  VTK::vtksys
+TEST_LABELS
+  ParaView
