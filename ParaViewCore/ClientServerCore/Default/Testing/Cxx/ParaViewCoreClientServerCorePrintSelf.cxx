@@ -81,10 +81,8 @@
 #include "vtkUnstructuredGridVolumeRepresentation.h"
 #include "vtkXYChartRepresentation.h"
 
-#ifdef PARAVIEW_USE_MPI
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
 #include "vtkIceTSynchronizedRenderers.h"
-#endif
 #endif
 
 #define PRINT_SELF(classname)                                                                      \
@@ -179,10 +177,8 @@ int ParaViewCoreClientServerCorePrintSelf(int, char* [])
   PRINT_SELF(vtkUnstructuredGridVolumeRepresentation);
   PRINT_SELF(vtkXYChartRepresentation);
 
-#ifdef PARAVIEW_USE_MPI
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
   PRINT_SELF(vtkIceTSynchronizedRenderers);
-#endif
 #endif
 
   return 0;

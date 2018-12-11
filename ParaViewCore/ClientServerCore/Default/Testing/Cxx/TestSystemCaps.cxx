@@ -1,4 +1,4 @@
-#if defined(TEST_MPI_CAPS)
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
 #endif
 
@@ -8,7 +8,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkSetGet.h"
 
-#if defined(TEST_PY_CAPS)
+#if VTK_MODULE_ENABLE_VTK_Python
 #include "patchlevel.h"
 #endif
 
@@ -21,7 +21,7 @@ using std::ostringstream;
 
 // Description:
 // Get python version
-#if defined(TEST_PY_CAPS)
+#if VTK_MODULE_ENABLE_VTK_Python
 string GetPythonVersion()
 {
   ostringstream oss;
@@ -37,7 +37,7 @@ string GetPythonVersion()
 // Description:
 // Get the version of the standard implemented by this
 // MPI
-#if defined(TEST_MPI_CAPS)
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 string GetMPIVersion()
 {
   ostringstream oss;
@@ -56,7 +56,7 @@ string GetMPIVersion()
 
 // Description:
 // Get the implementor name and release info
-#if defined(TEST_MPI_CAPS)
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 string GetMPILibraryVersion()
 {
   ostringstream oss;
