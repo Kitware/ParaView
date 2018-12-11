@@ -28,110 +28,87 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkPVComparativeAnimationCue.cxx
-  vtkPVComparativeView.cxx
-  vtkPVRepresentedArrayListSettings.cxx
-  vtkSMBagChartSeriesListDomain.cxx
-  vtkSMBoxRepresentationProxy.cxx
-  vtkSMCameraLink.cxx
-  vtkSMCameraProxy.cxx
-  vtkSMChartRepresentationProxy.cxx
-  vtkSMChartSeriesListDomain.cxx
-  vtkSMChartSeriesSelectionDomain.cxx
-  vtkSMChartUseIndexForAxisDomain.cxx
-  vtkSMComparativeAnimationCueProxy.cxx
-  vtkSMComparativeAnimationCueUndoElement.cxx
-  vtkSMComparativeViewProxy.cxx
-  vtkSMContextViewProxy.cxx
-  vtkSMDataDeliveryManager.cxx
-  vtkSMFunctionalBagChartSeriesSelectionDomain.cxx
-  vtkSMImplicitPlaneRepresentationProxy.cxx
-  vtkSMLightProxy.cxx
-  vtkSMMaterialDomain.cxx
-  vtkSMMaterialLibraryProxy.cxx
-  vtkSMPVMoleculeRepresentationProxy.cxx
-  vtkSMMultiSliceViewProxy.cxx
-  vtkSMNewWidgetRepresentationProxy.cxx
-  vtkSMOrthographicSliceViewProxy.cxx
-  vtkSMPlotMatrixViewProxy.cxx
-  vtkSMPVRepresentationProxy.cxx
-  vtkSMRenderViewProxy.cxx
-  vtkSMRangedTransferFunctionDomain.cxx
-  vtkSMRepresentationProxy.cxx
-  vtkSMRepresentationTypeDomain.cxx
-  vtkSMRepresentedArrayListDomain.cxx
-  vtkSMSaveScreenshotProxy.cxx
-  vtkSMScalarBarWidgetRepresentationProxy.cxx
-  vtkSMSelectionHelper.cxx
-  vtkSMSelectionLink.cxx
-  vtkSMSpreadSheetRepresentationProxy.cxx
-  vtkSMSpreadSheetViewProxy.cxx
-  vtkSMTextWidgetRepresentationProxy.cxx
-  vtkSMTransferFunctionManager.cxx
-  vtkSMTransferFunctionPresets.cxx
-  vtkSMTransferFunctionProxy.cxx
-  vtkSMUtilities.cxx
-  vtkSMViewLayoutProxy.cxx
-  vtkSMViewProxy.cxx
-  vtkSMViewProxyInteractorHelper.cxx
-  vtkSMViewResolutionDomain.cxx
-  vtkSMWidgetRepresentationProxy.cxx
-)
+set(classes
+  vtkPVComparativeAnimationCue
+  vtkPVComparativeView
+  vtkPVRepresentedArrayListSettings
+  vtkSMBagChartSeriesListDomain
+  vtkSMBoxRepresentationProxy
+  vtkSMCameraLink
+  vtkSMCameraProxy
+  vtkSMChartRepresentationProxy
+  vtkSMChartSeriesListDomain
+  vtkSMChartSeriesSelectionDomain
+  vtkSMChartUseIndexForAxisDomain
+  vtkSMComparativeAnimationCueProxy
+  vtkSMComparativeAnimationCueUndoElement
+  vtkSMComparativeViewProxy
+  vtkSMContextViewProxy
+  vtkSMDataDeliveryManager
+  vtkSMFunctionalBagChartSeriesSelectionDomain
+  vtkSMImplicitPlaneRepresentationProxy
+  vtkSMLightProxy
+  vtkSMMaterialDomain
+  vtkSMMaterialLibraryProxy
+  vtkSMMultiSliceViewProxy
+  vtkSMNewWidgetRepresentationProxy
+  vtkSMOrthographicSliceViewProxy
+  vtkSMPVMoleculeRepresentationProxy
+  vtkSMPVRepresentationProxy
+  vtkSMParaViewPipelineControllerWithRendering
+  vtkSMPlotMatrixViewProxy
+  vtkSMRangedTransferFunctionDomain
+  vtkSMRenderViewProxy
+  vtkSMRepresentationProxy
+  vtkSMRepresentationTypeDomain
+  vtkSMRepresentedArrayListDomain
+  vtkSMSaveScreenshotProxy
+  vtkSMScalarBarWidgetRepresentationProxy
+  vtkSMSelectionHelper
+  vtkSMSelectionLink
+  vtkSMSpreadSheetRepresentationProxy
+  vtkSMSpreadSheetViewProxy
+  vtkSMTextWidgetRepresentationProxy
+  vtkSMTransferFunctionManager
+  vtkSMTransferFunctionPresets
+  vtkSMTransferFunctionProxy
+  vtkSMUtilities
+  vtkSMViewLayoutProxy
+  vtkSMViewProxy
+  vtkSMViewProxyInteractorHelper
+  vtkSMViewResolutionDomain
+  vtkSMWidgetRepresentationProxy)
 
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND Module_SRCS vtkSMPythonViewProxy.cxx)
-endif()
+if (TARGET ParaView::ClientServerCorePython)
+  # TODO: Split these into a separate module so that there isn't a public
+  # optional dependency.
+  list(APPEND classes
+    vtkSMPythonViewProxy)
+endif ()
 
-
-#-----------------------------------------------------------------------------
-# Stuff for ObjectFactory override for vtkSMParaViewPipelineControllerWithRendering.
-list(APPEND Module_SRCS
-  vtkSMParaViewPipelineControllerWithRendering.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
-
-# Override some rendering classes. Create object factory:
-set(vtk_module_overrides "vtkSMParaViewPipelineController")
-set(vtk_module_vtkSMParaViewPipelineController_override
-  "vtkSMParaViewPipelineControllerWithRendering")
-
-# Now we iterate and create that class file...
-foreach(_class ${vtk_module_overrides})
-  set(_override ${vtk_module_${_class}_override})
-  set(_vtk_override_includes "${_vtk_override_includes}
-#include \"${_override}.h\"")
-  set(_vtk_override_creates "${_vtk_override_creates}
-VTK_CREATE_CREATE_FUNCTION(${_override})")
-  set(_vtk_override_do "${_vtk_override_do}
-  this->RegisterOverride(\"${_class}\",
-                         \"${_override}\",
-                         \"Override for ${vtk-module} module\", 1,
-                         vtkObjectFactoryCreate${_override});")
-endforeach()
-
-# Now lets create the object factory classes
-string(TOUPPER ${vtk-module} VTK-MODULE)
-configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.h)
-configure_file(${VTK_CMAKE_DIR}/vtkObjectFactory.cxx.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${vtk-module}ObjectFactory.cxx)
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
 # Compile ColorMaps.json
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json
-          kwProcessXML
-  COMMAND kwProcessXML
-          ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
+  OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h"
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json"
+          ParaView::ProcessXML
+  COMMAND ParaView::ProcessXML
+          "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h"
           vtkSMTransferFunctionPresets JSON JSON
-          ${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json
+          "${CMAKE_CURRENT_SOURCE_DIR}/ColorMaps.json"
   COMMENT "Processing builtin color maps")
-set(${vtk-module}_HDRS
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h)
-set_source_files_properties(
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h
-  HEADER_FILE_ONLY)
-#-----------------------------------------------------------------------------
-vtk_module_library(vtkPVServerManagerRendering ${Module_SRCS})
+set(headers
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTransferFunctionPresetsBuiltin.h")
+
+vtk_object_factory_declare(
+  BASE vtkSMParaViewPipelineController
+  OVERRIDE vtkSMParaViewPipelineControllerWithRendering)
+vtk_object_factory_configure(
+  SOURCE_FILE vtk_object_factory_source
+  HEADER_FILE vtk_object_factory_header
+  EXPORT_MACRO "VTKPVSERVERMANAGERRENDERING_EXPORT")
+
+vtk_module_add_module(ParaView::ServerManagerRendering
+  CLASSES ${classes}
+  SOURCES ${vtk_object_factory_source}
+  HEADERS ${headers}
+  PRIVATE_HEADERS ${vtk_object_factory_header})
