@@ -1,0 +1,12 @@
+NAME
+  ParaView::VTKExtensionsPoints
+LIBRARY_NAME
+  vtkPVVTKExtensionsPoints
+KIT
+  ParaView::Extensions
+DEPENDS
+  VTK::FiltersPoints
+PRIVATE_DEPENDS
+  VTK::FiltersCore
+TEST_LABELS
+  ParaView

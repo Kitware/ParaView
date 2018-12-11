@@ -1,5 +1,9 @@
-set(Module_SRCS
-  vtkBoundedPlaneSource.cxx
-  vtkBoundedVolumeSource.cxx
-)
-vtk_module_library(${vtk-module} ${Module_SRCS})
+set(classes
+  vtkBoundedPlaneSource
+  vtkBoundedVolumeSource)
+
+vtk_module_add_module(ParaView::VTKExtensionsPoints
+  CLASSES ${classes})
+
+paraview_add_server_manager_xmls(
+  XMLS  points.xml)
