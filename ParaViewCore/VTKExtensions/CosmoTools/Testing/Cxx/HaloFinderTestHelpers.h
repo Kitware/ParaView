@@ -108,7 +108,8 @@ inline HaloFinderTestVTKObjects SetupHaloFinderTest(int argc, char* argv[],
   bool findSubhalos = false)
 {
   HaloFinderTestVTKObjects testObjects;
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "genericio/m000.499.allparticles");
+  char* fname = vtkTestUtilities::ExpandDataFileName(
+    argc, argv, "Testing/Data/genericio/m000.499.allparticles");
 
   testObjects.reader->SetFileName(fname);
   testObjects.reader->UpdateInformation();

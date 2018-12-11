@@ -1,50 +1,41 @@
-# Bring in VTK's MPI macros for MPI dependency
-include(vtkMPI)
-
 # Resolve the GenericIO external dependency
 find_package(GenericIO REQUIRED)
 
-# Add external include directories
-include_directories(
-    ${GENERIC_IO_INCLUDE_DIR}
-    )
-
-# Define external libraries used by this module
-set(CosmoToolsExternalLibs
-    ${GENERIC_IO_LIBRARIES}
-    )
-
-# Set external includes for the CosmoTools module
-set(vtkPVVTKExtensionsCosmoTools_INCLUDE_DIRS
-    ${GENERIC_IO_INCLUDE_DIR}
-    )
-
 # List of module sources
-set(Module_SRCS
+set(classes
+  # Readers
+  vtkACosmoReader
+  vtkGenericIOUtilities
+  vtkPCosmoReader
+  vtkPGenericIOMultiBlockReader
+  vtkPGenericIOMultiBlockWriter
+  vtkPGenericIOReader
+  vtkPMultiResolutionGenericIOReader
 
-  ## Readers
-  vtkACosmoReader.cxx
-  vtkPCosmoReader.cxx
-  vtkPGenericIOReader.cxx
-  vtkGenericIOUtilities.cxx
-  vtkPGenericIOMultiBlockReader.cxx
-  vtkPGenericIOMultiBlockWriter.cxx
-  vtkPMultiResolutionGenericIOReader.cxx
+  # Filters
+  vtkMinkowskiFilter
+  vtkPANLHaloFinder
+  vtkPANLSubhaloFinder
+  vtkPLANLHaloFinder
+  vtkPMergeConnected)
 
-  ## Filters
-  vtkMinkowskiFilter.cxx
-  vtkPLANLHaloFinder.cxx
-  vtkPANLHaloFinder.cxx
-  vtkPANLSubhaloFinder.cxx
-  vtkPMergeConnected.cxx
-  )
+vtk_module_add_module(ParaView::VTKExtensionsCosmoTools
+  CLASSES ${classes})
+vtk_module_link(ParaView::VTKExtensionsCosmoTools
+  PRIVATE
+    )
 
-vtk_module_export_code_find_package(GenericIO)
+paraview_add_server_manager_xmls(
+  XMLS  ## CosmoTools Readers
+        resources/AdaptiveCosmoReader.xml
+        resources/CosmoReader.xml
+        resources/GenericIOReader.xml
+        resources/GenericIOWriter.xml
+        resources/MultiResolutionGenericIOReader.xml
 
-vtk_module_library(vtkPVVTKExtensionsCosmoTools ${Module_SRCS})
-vtk_module_link_libraries(vtkPVVTKExtensionsCosmoTools
-                      LINK_PRIVATE
-                        ${CosmoToolsExternalLibs}
-                        pthread
-                      )
-vtk_mpi_link(vtkPVVTKExtensionsCosmoTools)
+        ## CosmoTools Filters
+        resources/ANLHaloFinder.xml
+        resources/ANLSubHaloFinder.xml
+        resources/LANLHaloFinder.xml
+        resources/MergeConnected.xml
+        resources/MinkowskiFilter.xml)
