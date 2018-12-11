@@ -44,7 +44,7 @@ foreach (kernel_source IN LISTS kernel_sources)
     "${source}")
 endforeach ()
 
-ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.2"
+ADD_PARAVIEW_PLUGIN(pvNVIDIAIndeX "2.2.1"
     EULA "EULA.txt"
     SERVER_MANAGER_XML src/nvindex.xml
     SERVER_MANAGER_SOURCES

@@ -112,6 +112,27 @@ vtknvindex_irregular_volume_mapper::~vtknvindex_irregular_volume_mapper()
 }
 
 //----------------------------------------------------------------------------
+double* vtknvindex_irregular_volume_mapper::GetBounds()
+{
+  // Return the whole volume bounds instead of the local one to avoid that
+  // ParaView culls off any rank
+
+  return m_whole_bounds;
+}
+
+//----------------------------------------------------------------------------
+void vtknvindex_irregular_volume_mapper::set_whole_bounds(
+  const mi::math::Bbox<mi::Float64, 3> bounds)
+{
+  m_whole_bounds[0] = bounds.min.x;
+  m_whole_bounds[1] = bounds.max.x;
+  m_whole_bounds[2] = bounds.min.y;
+  m_whole_bounds[3] = bounds.max.y;
+  m_whole_bounds[4] = bounds.min.z;
+  m_whole_bounds[5] = bounds.max.z;
+}
+
+//----------------------------------------------------------------------------
 void vtknvindex_irregular_volume_mapper::shutdown()
 {
   if (m_is_nvindex_rank)
@@ -628,6 +649,9 @@ void vtknvindex_irregular_volume_mapper::Render(vtkRenderer* ren, vtkVolume* vol
     ERROR_LOG << "NVIDIA IndeX rendering was aborted.";
     return;
   }
+
+  // Wait all ranks finish to write volume data before the render starts.
+  m_controller->Barrier();
 
   if (m_is_viewer)
   {

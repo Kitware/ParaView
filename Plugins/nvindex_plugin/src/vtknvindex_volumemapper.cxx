@@ -102,7 +102,7 @@ vtknvindex_volumemapper::vtknvindex_volumemapper()
   m_controller = vtkMultiProcessController::GetGlobalController();
 
   for (mi::Uint32 i = 0; i < 6; i++)
-    m_cached_bounds[i] = 0.0;
+    m_whole_bounds[i] = 0.0;
 
   m_prev_property = "";
   m_last_MTime = 0;
@@ -117,23 +117,21 @@ vtknvindex_volumemapper::~vtknvindex_volumemapper()
 //----------------------------------------------------------------------------
 double* vtknvindex_volumemapper::GetBounds()
 {
-  // During a looping animation several dataset information are no longer available
-  // once the time steps are cached by NVIDIA IndeX. In this case dataset bounding boxes
-  // needs to be cached too in the first loop iteration.
+  // Return the whole volume bounds instead of the local one to avoid that
+  // ParaView culls off any rank
 
-  if (m_is_caching)
-  {
-    return m_cached_bounds;
-  }
-  else
-  {
-    double* bounds = this->Superclass::GetBounds();
+  return m_whole_bounds;
+}
 
-    for (mi::Uint32 i = 0; i < 6; i++)
-      m_cached_bounds[i] = bounds[i];
-
-    return bounds;
-  }
+//----------------------------------------------------------------------------
+void vtknvindex_volumemapper::set_whole_bounds(const mi::math::Bbox<mi::Float64, 3> bounds)
+{
+  m_whole_bounds[0] = bounds.min.x;
+  m_whole_bounds[1] = bounds.max.x;
+  m_whole_bounds[2] = bounds.min.y;
+  m_whole_bounds[3] = bounds.max.y;
+  m_whole_bounds[4] = bounds.min.z;
+  m_whole_bounds[5] = bounds.max.z;
 }
 
 //----------------------------------------------------------------------------
@@ -510,6 +508,9 @@ void vtknvindex_volumemapper::Render(vtkRenderer* ren, vtkVolume* vol)
     ERROR_LOG << "NVIDIA IndeX rendering was aborted.";
     return;
   }
+
+  // Wait all ranks finish to write volume data before the render starts.
+  m_controller->Barrier();
 
   if (m_is_viewer)
   {

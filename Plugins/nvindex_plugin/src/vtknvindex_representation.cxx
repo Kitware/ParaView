@@ -42,6 +42,7 @@
 #include "vtkOutlineSource.h"
 #include "vtkPExtentTranslator.h"
 #include "vtkPVCacheKeeper.h"
+#include "vtkPVGeneralSettings.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyDataMapper.h"
@@ -180,7 +181,6 @@ vtknvindex_cached_bounds::vtknvindex_cached_bounds(const double _data_bounds[6],
     spacing[i] = _spacing[i];
 }
 
-#ifdef USE_INDEX_CACHE_KEEPER
 // The class vtknvindex_cache_keeper is an derived class of the original vtkPVCacheKeeper
 // which it's used for datasets with time series to avoid data to be loaded again
 // when some time steps were already cached by NVIDIA IndeX.
@@ -216,7 +216,6 @@ protected:
 };
 
 vtkStandardNewMacro(vtknvindex_cache_keeper);
-#endif // USE_INDEX_CACHE_KEEPER
 
 //----------------------------------------------------------------------------
 class vtknvindex_lod_volume : public vtkPVLODVolume
@@ -257,12 +256,10 @@ vtknvindex_representation::vtknvindex_representation()
   this->VolumeMapper->Delete();
   this->VolumeMapper = vtknvindex_volumemapper::New();
 
-#ifdef USE_INDEX_CACHE_KEEPER
-// Replace default cache keeper.
-// this->CacheKeeper->Delete();
-// this->CacheKeeper = vtknvindex_cache_keeper::New();
-// this->CacheKeeper->SetInputData(this->Cache);
-#endif // USE_INDEX_CACHE_KEEPER
+  // Replace default cache keeper.
+  this->CacheKeeper->Delete();
+  this->CacheKeeper = vtknvindex_cache_keeper::New();
+  this->CacheKeeper->SetInputData(this->Cache);
 
   // Replace default Actor.
   this->Actor->Delete();
@@ -502,10 +499,14 @@ int vtknvindex_representation::RequestData(
   }
 
   // Check if dataset has time steps.
+
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   mi::Sint32 nb_time_steps = 0;
   mi::Sint32 cur_time_step = 0;
-  int has_time_steps = inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+  // Only use IndeX time series support if Cache Geometry for Animations is enabled.
+  int has_time_steps = vtkPVGeneralSettings::GetInstance()->GetCacheGeometryForAnimation() &&
+    inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
   if (has_time_steps)
   {
@@ -611,6 +612,8 @@ int vtknvindex_representation::RequestData(
 
         volume_bounds.insert(subset_bounds);
       }
+
+      static_cast<vtknvindex_volumemapper*>(this->VolumeMapper)->set_whole_bounds(volume_bounds);
 
       mi::math::Vector<mi::Float64, 3> scaling(
         (volume_extents.max.x - volume_extents.min.x) / (volume_bounds.max.x - volume_bounds.min.x),

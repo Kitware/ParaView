@@ -240,22 +240,28 @@ int vtknvindex_irregular_volume_representation::RequestData(
       m_controller->AllGather(this->DataBounds, all_rank_extents, 6);
     }
 
-    m_volume_dimensions.clear();
+    mi::math::Bbox<mi::Float64, 3> whole_bounds; // Cached volume dimensions
+    whole_bounds.clear();
 
     // volume dimensions
     for (mi::Sint32 i = 0, idx = 0; i < num_processes; i++, idx += 6)
     {
       mi::Float64* cur_extent = all_rank_extents + idx;
-      mi::math::Bbox<mi::Float32, 3> cur_volume_dimensions;
-      cur_volume_dimensions.min.x = static_cast<mi::Float32>(cur_extent[0]);
-      cur_volume_dimensions.min.y = static_cast<mi::Float32>(cur_extent[2]);
-      cur_volume_dimensions.min.z = static_cast<mi::Float32>(cur_extent[4]);
-      cur_volume_dimensions.max.x = static_cast<mi::Float32>(cur_extent[1]);
-      cur_volume_dimensions.max.y = static_cast<mi::Float32>(cur_extent[3]);
-      cur_volume_dimensions.max.z = static_cast<mi::Float32>(cur_extent[5]);
+      mi::math::Bbox<mi::Float64, 3> cur_volume_dimensions;
+      cur_volume_dimensions.min.x = cur_extent[0];
+      cur_volume_dimensions.min.y = cur_extent[2];
+      cur_volume_dimensions.min.z = cur_extent[4];
+      cur_volume_dimensions.max.x = cur_extent[1];
+      cur_volume_dimensions.max.y = cur_extent[3];
+      cur_volume_dimensions.max.z = cur_extent[5];
 
-      m_volume_dimensions.insert(cur_volume_dimensions);
+      whole_bounds.insert(cur_volume_dimensions);
     }
+
+    this->DefaultMapper->set_whole_bounds(whole_bounds);
+
+    m_volume_dimensions.min = mi::Float32_3(whole_bounds.min);
+    m_volume_dimensions.max = mi::Float32_3(whole_bounds.max);
 
     delete[] all_rank_extents;
 

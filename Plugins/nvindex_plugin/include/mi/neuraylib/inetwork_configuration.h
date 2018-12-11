@@ -375,6 +375,10 @@ public:
 
   /// Set the RDMA InfiniBand interface to be used.
   ///
+  /// The string can be either the interface name or it's address, which can be expressed in
+  /// CIDR format as well, similar to #set_cluster_interface. Note that only interface names
+  /// that start with the prefix 'ib' are accepted.
+  ///
   /// If unspecified, an arbitrary RDMA InfiniBand interface will be chosen.
   ///
   /// This can only be configured before \NeurayProductName has been started.
