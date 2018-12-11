@@ -42,8 +42,7 @@
 #include <sstream>
 #include <vector>
 
-extern const char* vtkExtrudePoint_gs;
-extern const char* vtkExtrudeCell_gs;
+#include "vtkExtrudeCell_gs.h"
 
 namespace
 {

@@ -28,9 +28,11 @@
 #ifndef vtkBumpMapRepresentation_h
 #define vtkBumpMapRepresentation_h
 
+#include "vtkEmbossingRepresentationsModule.h"
 #include "vtkGeometryRepresentationWithFaces.h"
 
-class VTK_EXPORT vtkBumpMapRepresentation : public vtkGeometryRepresentationWithFaces
+class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkBumpMapRepresentation
+  : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkBumpMapRepresentation* New();

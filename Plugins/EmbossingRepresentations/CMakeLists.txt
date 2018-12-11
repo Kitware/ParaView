@@ -1,50 +1,51 @@
-cmake_minimum_required(VERSION 3.3)
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Representations/vtk.module"
+  REQUEST_MODULES   EmbossingRepresentations::vtkEmbossingRepresentations
+  PROVIDES_MODULES  embossing_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-if (NOT ParaView_BINARY_DIR)
-  find_package(ParaView REQUIRED)
-  include(${PARAVIEW_USE_FILE})
-endif()
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-include(ParaViewPlugins)
+vtk_module_build(
+  MODULES             ${embossing_modules}
+  PACKAGE             EmbossingRepresentations
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-include_directories(
-  ${VTK_INCLUDE_DIRS}
-)
-
+set(interfaces)
+set(sources)
 if (PARAVIEW_BUILD_QT_GUI)
-  pv_find_package_qt(qt_targets REQUIRED QUIET
-    QT5_COMPONENTS Widgets)
-
-  pv_qt_wrap_cpp(mocsrcs
+  paraview_plugin_add_property_widget(
+    KIND        WIDGET_DECORATOR
+    TYPE        ExtrusionPropertyWidgetDecorator
+    CLASS_NAME  pqExtrusionPropertyWidgetDecorator
+    INTERFACES  pwi_interfaces
+    SOURCES     pwi_sources)
+  list(APPEND interfaces
+    ${pwi_interfaces})
+  list(APPEND sources
+    ${pwi_sources}
+    pqExtrusionPropertyWidgetDecorator.cxx
     pqExtrusionPropertyWidgetDecorator.h)
+endif ()
 
-  set(outifaces)
-  set(outsrcs)
-  add_paraview_property_widget_decorator(outifaces outsrcs
-    TYPE "ExtrusionPropertyWidgetDecorator"
-    CLASS_NAME pqExtrusionPropertyWidgetDecorator)
-  set(qtsrcs pqExtrusionPropertyWidgetDecorator.cxx)
-endif()
-
-encode_files_as_strings(shader_srcs
-  shaders/vtkExtrudeCell_gs.glsl)
-
-add_paraview_plugin(EmbossingRepresentations "1.0"
-  SERVER_MANAGER_XML
-    EmbossingRepresentations.xml
-  SERVER_MANAGER_SOURCES
-    vtkBumpMapRepresentation.cxx
-    vtkExtrusionRepresentation.cxx
-  GUI_INTERFACES
-    ${outifaces}
-  SOURCES
-    ${outsrcs}
-    ${mocsrcs}
-    ${qtsrcs}
-    vtkBumpMapMapper.cxx
-    vtkExtrusionMapper.cxx
-    ${shader_srcs})
+paraview_add_plugin(EmbossingRepresentations
+  VERSION       "1.0"
+  UI_INTERFACES ${interfaces}
+  SOURCES       ${sources}
+  MODULES       EmbossingRepresentations::vtkEmbossingRepresentations
+  XML_DOCUMENTATION OFF)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
-endif()
+endif ()

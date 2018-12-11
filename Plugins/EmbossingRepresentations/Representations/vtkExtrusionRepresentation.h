@@ -31,9 +31,11 @@
 #ifndef vtkExtrusionRepresentation_h
 #define vtkExtrusionRepresentation_h
 
+#include "vtkEmbossingRepresentationsModule.h"
 #include "vtkGeometryRepresentationWithFaces.h"
 
-class VTK_EXPORT vtkExtrusionRepresentation : public vtkGeometryRepresentationWithFaces
+class VTKEMBOSSINGREPRESENTATIONS_EXPORT vtkExtrusionRepresentation
+  : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkExtrusionRepresentation* New();
