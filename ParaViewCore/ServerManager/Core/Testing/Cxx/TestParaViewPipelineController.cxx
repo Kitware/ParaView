@@ -68,7 +68,7 @@ int TestParaViewPipelineController(int argc, char* argv[])
 
     controller->PreInitializeProxy(exodusReader);
 
-    char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "can.ex2");
+    char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/can.ex2");
     vtkSMPropertyHelper(exodusReader, "FileName").Set(fname);
     delete[] fname;
 
