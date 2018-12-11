@@ -3,7 +3,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqActionGroupImplementation.cxx.in
+   Module:  @_paraview_action_group_CLASS_NAME@Implementation.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,29 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "@ARG_CLASS_NAME@.h"
-#include "@ARG_CLASS_NAME@Implementation.h"
+#include "@_paraview_action_group_CLASS_NAME@.h"
+#include "@_paraview_action_group_CLASS_NAME@Implementation.h"
 
-@ARG_CLASS_NAME@Implementation::@ARG_CLASS_NAME@Implementation(QObject* p)
+@_paraview_action_group_CLASS_NAME@Implementation::@_paraview_action_group_CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
-  this->ActionGroup = new @ARG_CLASS_NAME@(this);
+  this->ActionGroup = new @_paraview_action_group_CLASS_NAME@(this);
 }
 
-@ARG_CLASS_NAME@Implementation::~@ARG_CLASS_NAME@Implementation()
+@_paraview_action_group_CLASS_NAME@Implementation::~@_paraview_action_group_CLASS_NAME@Implementation()
 {
 }
 
-QString @ARG_CLASS_NAME@Implementation::groupName()
+QString @_paraview_action_group_CLASS_NAME@Implementation::groupName()
 {
-  return "@ARG_GROUP_NAME@";
+  return "@_paraview_action_group_GROUP_NAME@";
 }
 
-
-QActionGroup* @ARG_CLASS_NAME@Implementation::actionGroup()
+QActionGroup* @_paraview_action_group_CLASS_NAME@Implementation::actionGroup()
 {
   return this->ActionGroup;
 }
-
-
-

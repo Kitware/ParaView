@@ -3,7 +3,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqPropertyWidgetInterface.h.in
+   Module:  @_paraview_property_widget_CLASS_NAME@PWIImplementation.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,34 +31,38 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "@name@Implementation.h"
 
-#include "@classname@.h"
+#include "@_paraview_property_widget_CLASS_NAME@PWIImplementation.h"
+
+#include "@_paraview_property_widget_CLASS_NAME@.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 
+#cmakedefine01 _paraview_property_widget_kind_widget
+#cmakedefine01 _paraview_property_widget_kind_group_widget
+#cmakedefine01 _paraview_property_widget_kind_widget_decorator
+
 //-----------------------------------------------------------------------------
-@name@Implementation::@name@Implementation(QObject* parentObject)
+@_paraview_property_widget_CLASS_NAME@PWIImplementation::@_paraview_property_widget_CLASS_NAME@PWIImplementation(QObject* parentObject)
   : QObject(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-@name@Implementation::~@name@Implementation()
+@_paraview_property_widget_CLASS_NAME@PWIImplementation::~@_paraview_property_widget_CLASS_NAME@PWIImplementation()
 {
 }
 
-
 //-----------------------------------------------------------------------------
-pqPropertyWidget* @name@Implementation::createWidgetForProperty(
+pqPropertyWidget* @_paraview_property_widget_CLASS_NAME@PWIImplementation::createWidgetForProperty(
   vtkSMProxy *smproxy, vtkSMProperty *smproperty, QWidget* parentWidget)
 {
-#if @pwi_widget@
+#if _paraview_property_widget_kind_widget
   // handle properties that specify custom panel widgets
   if (smproperty && smproperty->GetPanelWidget() &&
-      strcmp(smproperty->GetPanelWidget(), "@type@") == 0)
+      strcmp(smproperty->GetPanelWidget(), "@_paraview_property_widget_TYPE@") == 0)
   {
-    return new @classname@(smproxy, smproperty, parentWidget);
+    return new @_paraview_property_widget_CLASS_NAME@(smproxy, smproperty, parentWidget);
   }
 #endif
   Q_UNUSED(smproxy);
@@ -69,15 +73,15 @@ pqPropertyWidget* @name@Implementation::createWidgetForProperty(
 
 
 //-----------------------------------------------------------------------------
-pqPropertyWidget* @name@Implementation::createWidgetForPropertyGroup(
+pqPropertyWidget* @_paraview_property_widget_CLASS_NAME@PWIImplementation::createWidgetForPropertyGroup(
   vtkSMProxy *smproxy, vtkSMPropertyGroup *smgroup, QWidget* parentWidget)
 {
-#if @pwi_group@
+#if _paraview_property_widget_kind_group_widget
   // handle properties that specify custom panel widgets
   if (smgroup && smgroup->GetPanelWidget() &&
-      strcmp(smgroup->GetPanelWidget(), "@type@") == 0)
+      strcmp(smgroup->GetPanelWidget(), "@_paraview_property_widget_TYPE@") == 0)
   {
-    return new @classname@(smproxy, smgroup, parentWidget);
+    return new @_paraview_property_widget_CLASS_NAME@(smproxy, smgroup, parentWidget);
   }
 #endif
   Q_UNUSED(smproxy);
@@ -87,15 +91,15 @@ pqPropertyWidget* @name@Implementation::createWidgetForPropertyGroup(
 }
 
 //-----------------------------------------------------------------------------
-pqPropertyWidgetDecorator* @name@Implementation::createWidgetDecorator(
+pqPropertyWidgetDecorator* @_paraview_property_widget_CLASS_NAME@PWIImplementation::createWidgetDecorator(
   const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
 {
-#if @pwi_decorator@
+#if _paraview_property_widget_kind_widget_decorator
   // handle properties that specify custom panel widgets
-  if (type == "@type@")
-    {
-    return new @classname@(config, widget);
-    }
+  if (type == "@_paraview_property_widget_TYPE@")
+  {
+    return new @_paraview_property_widget_CLASS_NAME@(config, widget);
+  }
 #endif
   Q_UNUSED(type);
   Q_UNUSED(config);

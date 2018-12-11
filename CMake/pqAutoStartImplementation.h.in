@@ -1,7 +1,9 @@
+// Generated file.  Do not edit.
+
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqAutoStartImplementation.h.in
+   Module:  @_paraview_auto_start_CLASS_NAME@Implementation.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,21 +31,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef @ARG_CLASS_NAME@Implementation_h
-#define @ARG_CLASS_NAME@Implementation_h
+
+#ifndef @_paraview_auto_start_CLASS_NAME@Implementation_h
+#define @_paraview_auto_start_CLASS_NAME@Implementation_h
 
 #include "pqAutoStartInterface.h"
 #include <QObject>
 
-class @ARG_CLASS_NAME@;
+class @_paraview_auto_start_CLASS_NAME@;
 
-class @ARG_CLASS_NAME@Implementation : public QObject, public pqAutoStartInterface
+class @_paraview_auto_start_CLASS_NAME@Implementation : public QObject, public pqAutoStartInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqAutoStartInterface)
 public:
-  @ARG_CLASS_NAME@Implementation(QObject* p=0);
-  ~@ARG_CLASS_NAME@Implementation() override;
+  @_paraview_auto_start_CLASS_NAME@Implementation(QObject* p=0);
+  ~@_paraview_auto_start_CLASS_NAME@Implementation() override;
 
   /// Called once after the ParaView starts. If ParaView is already running when
   /// the plugin is loaded, this method will be called when the plugin is loaded.
@@ -52,7 +55,7 @@ public:
   /// Called once before the program shuts down.
   void shutdown() override;
 protected:
-  @ARG_CLASS_NAME@ *UserImplementation;
+  @_paraview_auto_start_CLASS_NAME@ *UserImplementation;
 };
 
 #endif

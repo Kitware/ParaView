@@ -3,7 +3,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDockWindowImplementation.cxx.in
+   Module:  @_paraview_dock_window_CLASS_NAME@Implementation.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,30 +32,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#include "@ARG_CLASS_NAME@.h"
-#include "@ARG_CLASS_NAME@Implementation.h"
+#include "@_paraview_dock_window_CLASS_NAME@.h"
+#include "@_paraview_dock_window_CLASS_NAME@Implementation.h"
 
 #include <QDockWidget>
 #include <QWidget>
 
-@ARG_CLASS_NAME@Implementation::@ARG_CLASS_NAME@Implementation(QObject* p)
+@_paraview_dock_window_CLASS_NAME@Implementation::@_paraview_dock_window_CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
   this->MyDock = 0;
 }
 
-QString @ARG_CLASS_NAME@Implementation::dockArea() const
+QString @_paraview_dock_window_CLASS_NAME@Implementation::dockArea() const
 {
   return "@ARG_DOCK_AREA@";
 }
 
-QDockWidget* @ARG_CLASS_NAME@Implementation::dockWindow(QWidget* p)
+QDockWidget* @_paraview_dock_window_CLASS_NAME@Implementation::dockWindow(QWidget* p)
 {
   if(!this->MyDock)
-    {
-    this->MyDock = new @ARG_CLASS_NAME@(p);
-    this->MyDock->setObjectName("@ARG_CLASS_NAME@");
-    }
+  {
+    this->MyDock = new @_paraview_dock_window_CLASS_NAME@(p);
+    this->MyDock->setObjectName("@_paraview_dock_window_CLASS_NAME@");
+  }
   return this->MyDock;
 }
-

@@ -1,7 +1,9 @@
+// Generated file.  Do not edit.
+
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeLayoutStrategyImplementation.h.in
+   Module:  @_paraview_tree_layout_strategy_STRATEGY_TYPE@Implementation.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,34 +31,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// Generated file.  Do not edit.
 
-#ifndef _@ARG_STRATEGY_TYPE@Implementation_h
-#define _@ARG_STRATEGY_TYPE@Implementation_h
+#ifndef @_paraview_tree_layout_strategy_STRATEGY_TYPE@Implementation_h
+#define @_paraview_tree_layout_strategy_STRATEGY_TYPE@Implementation_h
 
 #include <QObject>
 #include <pqTreeLayoutStrategyInterface.h>
 #include <vtkSmartPointer.h>
 
-class vtk@ARG_STRATEGY_TYPE@;
+class vtk@_paraview_tree_layout_strategy_STRATEGY_TYPE@;
 
 /// interface class for plugins that create view modules
-class @ARG_STRATEGY_TYPE@Implementation : public QObject,
+class @_paraview_tree_layout_strategy_STRATEGY_TYPE@Implementation : public QObject,
                                   public pqTreeLayoutStrategyInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqTreeLayoutStrategyInterface)
 public:
 
-  @ARG_STRATEGY_TYPE@Implementation(QObject* o);
+  @_paraview_tree_layout_strategy_STRATEGY_TYPE@Implementation(QObject* o);
 
   QStringList treeLayoutStrategies() const;
 
   vtkAreaLayoutStrategy* getTreeLayoutStrategy(const QString& layoutStrategy);
 
 protected:
-  vtkSmartPointer<vtk@ARG_STRATEGY_TYPE@> @ARG_STRATEGY_TYPE@;
+  vtkSmartPointer<vtk@_paraview_tree_layout_strategy_STRATEGY_TYPE@> @_paraview_tree_layout_strategy_STRATEGY_TYPE@;
 };
 
 #endif
-

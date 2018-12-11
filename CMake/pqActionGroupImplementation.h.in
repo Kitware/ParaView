@@ -3,7 +3,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqActionGroupImplementation.h.in
+   Module:  @_paraview_action_group_CLASS_NAME@Implementation.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,21 +32,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _@ARG_CLASS_NAME@Implementation_h
-#define _@ARG_CLASS_NAME@Implementation_h
+#ifndef @_paraview_action_group_CLASS_NAME@Implementation_h
+#define @_paraview_action_group_CLASS_NAME@Implementation_h
 
 #include "pqActionGroupInterface.h"
 #include <QObject>
 
 /// interface class for plugins that create QActionGroups
 /// for adding actions to menus and toolbars
-class @ARG_CLASS_NAME@Implementation : public QObject, public pqActionGroupInterface
+class @_paraview_action_group_CLASS_NAME@Implementation : public QObject, public pqActionGroupInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqActionGroupInterface)
 public:
-  @ARG_CLASS_NAME@Implementation(QObject* p);
-  ~@ARG_CLASS_NAME@Implementation() override;
+  @_paraview_action_group_CLASS_NAME@Implementation(QObject* p);
+  ~@_paraview_action_group_CLASS_NAME@Implementation() override;
 
   /// the identifier for this action group
   ///  return "ToolBar/MyTools to put them in a toolbar called MyTools
@@ -60,4 +60,3 @@ protected:
 };
 
 #endif
-
