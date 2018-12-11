@@ -28,7 +28,7 @@ void vtkPVInitializePythonModules();
 #include "vtkProcessModule.h"
 
 #ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
+#include "paraview_plugins_static.h"
 #endif
 
 static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
@@ -56,7 +56,7 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
 
 #ifndef BUILD_SHARED_LIBS
   // load static plugins
-  paraview_static_plugins_init();
+  paraview_plugins_static_init();
 #endif
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
