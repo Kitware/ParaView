@@ -33,7 +33,7 @@ def initialize():
         sys.exit(0)
 
     import numpy
-    from paraview.vtk import vtkPVCatalyst as catalyst
+    from paraview.modules import vtkPVCatalyst as catalyst
     import vtkPVPythonCatalystPython as pythoncatalyst
     import paraview.simple
     import paraview.vtk as vtk
@@ -65,7 +65,7 @@ def addscript(name):
 def coprocess(time, timeStep, grid, attributes):
     global coProcessor
     import vtk
-    from paraview.vtk import vtkPVCatalyst as catalyst
+    from paraview.modules import vtkPVCatalyst as catalyst
     import paraview
     from paraview.vtk.util import numpy_support
     dataDescription = catalyst.vtkCPDataDescription()

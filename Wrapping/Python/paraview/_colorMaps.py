@@ -2947,7 +2947,7 @@ __colorMapsXML = """
 def getColorMaps():
     """Returns the vtkPVXMLElement instance for the default (legacy) color maps"""
     global __colorMapsXML
-    from vtkmodules.vtkPVCommon import vtkPVXMLParser
+    from paraview.modules.vtkPVCommon import vtkPVXMLParser
     parser = vtkPVXMLParser()
     if parser.Parse(__colorMapsXML):
         return parser.GetRootElement()

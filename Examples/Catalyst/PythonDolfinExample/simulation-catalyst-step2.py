@@ -49,7 +49,7 @@ paraview.options.batch = True
 paraview.options.symmetric = True
 
 # [SC14-Catalyst] import user co-processing script
-from paraview.vtk import vtkPVCatalyst
+from paraview.modules import vtkPVCatalyst
 import os
 scriptpath, scriptname = os.path.split(sys.argv[1])
 sys.path.append(scriptpath)

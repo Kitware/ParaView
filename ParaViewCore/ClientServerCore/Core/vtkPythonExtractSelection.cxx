@@ -149,7 +149,7 @@ int vtkPythonExtractSelection::RequestData(vtkInformation* vtkNotUsed(request),
   std::ostringstream stream;
   stream << "def vtkPythonExtractSelection_RequestData():" << endl
          << "    from paraview import extract_selection as pv_es" << endl
-         << "    from paraview.vtk.vtkPVClientServerCoreCore import vtkPythonExtractSelection"
+         << "    from paraview.modules.vtkPVClientServerCoreCore import vtkPythonExtractSelection"
          << endl
          << "    me = vtkPythonExtractSelection('" << aplus << " ')" << endl
          << "    pv_es.execute(me)" << endl

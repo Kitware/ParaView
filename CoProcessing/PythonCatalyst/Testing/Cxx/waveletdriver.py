@@ -8,7 +8,7 @@ import paraview
 paraview.options.batch = True
 paraview.options.symmetric = True
 
-from paraview.vtk import vtkPVCatalyst
+from paraview.modules import vtkPVCatalyst
 import paraview.simple as pvsimple
 
 def _refHolderMaker(obj):

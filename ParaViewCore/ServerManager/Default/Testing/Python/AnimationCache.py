@@ -1,8 +1,8 @@
 from paraview.simple import *
 
 from paraview import smtesting
-from paraview.vtk.vtkPVClientServerCoreRendering import vtkPVCacheKeeper
-from paraview.vtk.vtkPVServerManagerDefault import vtkPVGeneralSettings
+from paraview.modules.vtkPVClientServerCoreRendering import vtkPVCacheKeeper
+from paraview.modules.vtkPVServerManagerDefault import vtkPVGeneralSettings
 
 smtesting.ProcessCommandLineArguments()
 

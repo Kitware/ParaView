@@ -6,7 +6,7 @@ from paraview.vtk import *
 from paraview.vtk.vtkFiltersSources import vtkSphereSource
 from paraview.vtk.vtkCommonDataModel import vtkPolyData
 from paraview.vtk.vtkCommonCore import vtkIntArray
-from paraview.vtk.vtkPVClientServerCoreCore import vtkPVDataInformation
+from paraview.modules.vtkPVClientServerCoreCore import vtkPVDataInformation
 
 source = PVTrivialProducer()
 algo = source.GetClientSideObject()

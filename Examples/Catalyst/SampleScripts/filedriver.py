@@ -31,7 +31,7 @@ paraview.options.batch = True
 paraview.options.symmetric = True
 
 import paraview.simple as pvsimple
-from paraview.vtk import vtkPVCatalyst, vtkPVCatalystPython, vtkPVPythonCatalystPython
+from paraview.modules import vtkPVCatalyst, vtkPVCatalystPython, vtkPVPythonCatalystPython
 pm = pvsimple.servermanager.vtkProcessModule.GetProcessModule()
 rank = pm.GetPartitionId()
 nranks = pm.GetNumberOfLocalPartitions()

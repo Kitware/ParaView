@@ -8,7 +8,7 @@ appropriate for co-processing.
 # for Python2 print statmements to output like Python3 print statements
 from __future__ import print_function
 from paraview import simple, servermanager
-from paraview.vtk.vtkPVVTKExtensionsCore import *
+from paraview.modules.vtkPVVTKExtensionsCore import *
 import math
 
 # If the user created a filename in a location that doesn't exist by default we'll

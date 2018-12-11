@@ -1,7 +1,7 @@
 
 import os, sys
 from paraview import simple
-from vtk.vtkPVServerManagerRendering import *
+from paraview.modules.vtkPVServerManagerRendering import *
 from vtk import *
 from paraview import smtesting
 
