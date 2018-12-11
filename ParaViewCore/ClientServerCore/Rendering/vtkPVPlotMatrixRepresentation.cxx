@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkAnnotationLink.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h" // for PARAVIEW_USE_OPENTURNS
 #include "vtkPVContextView.h"
 #include "vtkPlotPoints.h"
 #include "vtkScatterPlotMatrix.h"
@@ -42,9 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringArray.h"
 #include "vtkTable.h"
 
-#ifdef PARAVIEW_USE_OPENTURNS
+#if VTK_MODULE_ENABLE_VTK_FiltersOpenTurns
 #include "vtkOTScatterPlotMatrix.h"
-#endif // PARAVIEW_USE_OPENTURNS
+#endif
 
 #include <set>
 #include <string>
@@ -195,7 +194,7 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
   plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::SCATTERPLOT, this->ScatterPlotMarkerSize);
   plotMatrix->SetPlotMarkerSize(vtkScatterPlotMatrix::ACTIVEPLOT, this->ActivePlotMarkerSize);
 
-#ifdef PARAVIEW_USE_OPENTURNS
+#if VTK_MODULE_ENABLE_VTK_FiltersOpenTurns
   vtkOTScatterPlotMatrix* otPlotMatrix = vtkOTScatterPlotMatrix::SafeDownCast(plotMatrix);
   if (otPlotMatrix)
   {
@@ -220,7 +219,7 @@ void vtkPVPlotMatrixRepresentation::PrepareForRendering()
     otPlotMatrix->SetDensityMapColor(
       vtkScatterPlotMatrix::ACTIVEPLOT, 2, this->ActivePlotDensityMapLastDecileColor);
   }
-#endif // PARAVIEW_USE_OPENTURNS
+#endif
 
   // vtkPVPlotMatrixRepresentation doesn't support multiblock of tables, so we
   // only consider the first vtkTable.

@@ -49,7 +49,7 @@
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
 
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
 #include "vtkOSPRayActorNode.h"
 #endif
 
@@ -755,7 +755,7 @@ void vtkGeometryRepresentation::SetOpacity(double val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetLuminosity(double val)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkOSPRayActorNode::SetLuminosity(val, this->Property);
 #else
   (void)val;
@@ -1076,7 +1076,7 @@ void vtkGeometryRepresentation::UpdateBlockAttributes(vtkMapper* mapper)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetEnableScaling(int val)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   this->Actor->SetEnableScaling(val);
 #else
   (void)val;
@@ -1086,7 +1086,7 @@ void vtkGeometryRepresentation::SetEnableScaling(int val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetScalingArrayName(const char* val)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   this->Actor->SetScalingArrayName(val);
 #else
   (void)val;
@@ -1096,7 +1096,7 @@ void vtkGeometryRepresentation::SetScalingArrayName(const char* val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   this->Actor->SetScalingFunction(pwf);
 #else
   (void)pwf;
@@ -1106,7 +1106,7 @@ void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetMaterial(const char* val)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   if (!strcmp(val, "None"))
   {
     this->Property->SetMaterialName(nullptr);
