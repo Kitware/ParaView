@@ -1,10 +1,8 @@
-include(ParaViewQt)
-pv_find_package_qt(qt_targets REQUIRED QUIET
-                QT5_COMPONENTS Core Widgets)
-pv_qt_wrap_cpp(MOC_SRCS pqFileDialogTest.h)
+find_package(Qt5 REQUIRED QUIET COMPONENTS Core Widgets)
+set(CMAKE_AUTOMOC 1)
 vtk_module_test_executable(pqFileDialogTest
-  pqFileDialogTest.cxx pqFileDialogTest.h ${MOC_SRCS})
-target_link_libraries(pqFileDialogTest LINK_PRIVATE ${qt_targets})
+  pqFileDialogTest.cxx pqFileDialogTest.h)
+target_link_libraries(pqFileDialogTest LINK_PRIVATE Qt5::Core Qt5::Widgets)
 
 add_test(
   NAME pqFileDialogTest
@@ -13,4 +11,4 @@ add_test(
          "--test-script=${CMAKE_CURRENT_SOURCE_DIR}/pqFileDialogTest.py"
          --exit
 )
-set_tests_properties(pqFileDialogTest PROPERTIES LABELS "PARAVIEW")
+set_tests_properties(pqFileDialogTest PROPERTIES LABELS "ParaView")

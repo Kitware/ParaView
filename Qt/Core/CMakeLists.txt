@@ -28,367 +28,146 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #=========================================================================
-set(Module_SRCS
-  pqAnimationCue.cxx
-  pqAnimationCue.h
-  pqAnimationScene.cxx
-  pqAnimationScene.h
-  pqApplicationCore.cxx
-  pqApplicationCore.h
-  pqAutoStartInterface.cxx
-  pqAutoStartInterface.h
-  pqBoxChartView.cxx
-  pqBoxChartView.h
-  pqCheckBoxDelegate.h
-  pqCheckBoxDelegate.cxx
-  pqCollaborationEventPlayer.cxx
-  pqCollaborationEventPlayer.h
-  pqCollaborationManager.cxx
-  pqCollaborationManager.h
-  pqComparativeContextView.cxx
-  pqComparativeContextView.h
-  pqComparativeRenderView.cxx
-  pqComparativeRenderView.h
-  pqComparativeXYBarChartView.cxx
-  pqComparativeXYBarChartView.h
-  pqComparativeXYChartView.cxx
-  pqComparativeXYChartView.h
-  pqContextView.cxx
-  pqContextView.h
-  pqCoreInit.cxx
-  pqCoreInit.h
-  pqCoreTestUtility.cxx
-  pqCoreTestUtility.h
-  pqCoreUtilities.cxx
-  pqCoreUtilities.h
-  pqDataRepresentation.cxx
-  pqDataRepresentation.h
-  pqDebug.cxx
-  pqDebug.h
-  pqFileDialog.cxx
-  pqFileDialogEventPlayer.cxx
-  pqFileDialogEventPlayer.h
-  pqFileDialogEventTranslator.cxx
-  pqFileDialogEventTranslator.h
-  pqFileDialogFavoriteModel.cxx
-  pqFileDialogFavoriteModel.h
-  pqFileDialogFilter.cxx
-  pqFileDialogFilter.h
-  pqFileDialog.h
-  pqFileDialogModel.cxx
-  pqFileDialogModel.h
-  pqFileDialogRecentDirsModel.cxx
-  pqFileDialogRecentDirsModel.h
-  pqFlatTreeViewEventPlayer.cxx
-  pqFlatTreeViewEventPlayer.h
-  pqFlatTreeViewEventTranslator.cxx
-  pqFlatTreeViewEventTranslator.h
-  pqGraphLayoutStrategyInterface.cxx
-  pqGraphLayoutStrategyInterface.h
-  pqImageUtil.cxx
-  pqImageUtil.h
-  pqInteractiveViewLink.cxx
-  pqInteractiveViewLink.h
-  pqInterfaceTracker.cxx
-  pqInterfaceTracker.h
-  pqLinksModel.cxx
-  pqLinksModel.h
-  pqLinkViewWidget.cxx
-  pqLinkViewWidget.h
-  pqMainWindowEventManager.cxx
-  pqMainWindowEventManager.h
-  pqMultiSliceAxisWidget.cxx
-  pqMultiSliceAxisWidget.h
-  pqMultiSliceView.cxx
-  pqMultiSliceView.h
-  pqNonEditableStyledItemDelegate.cxx
-  pqNonEditableStyledItemDelegate.h
-  pqObjectBuilder.cxx
-  pqObjectBuilder.h
-  pqOptions.cxx
-  pqOptions.h
-  pqOutputPort.cxx
-  pqOutputPort.h
-  pqOutputWidget.cxx
-  pqOutputWidget.h
-  pqParallelCoordinatesChartView.cxx
-  pqParallelCoordinatesChartView.h
-  pqPipelineFilter.cxx
-  pqPipelineFilter.h
-  pqPipelineRepresentation.cxx
-  pqPipelineRepresentation.h
-  pqPipelineSource.cxx
-  pqPipelineSource.h
-  pqPlotMatrixView.cxx
-  pqPlotMatrixView.h
-  pqPluginManager.cxx
-  pqPluginManager.h
-  pqProgressManager.cxx
-  pqProgressManager.h
-  pqPropertyLinks.cxx
-  pqPropertyLinks.h
-  pqPropertyLinksConnection.cxx
-  pqPropertyLinksConnection.h
-  pqPropertyManager.cxx
-  pqPropertyManager.h
-  pqProxy.cxx
-  pqProxy.h
-  pqProxyModifiedStateUndoElement.cxx
-  pqProxyModifiedStateUndoElement.h
-  pqProxySelection.cxx
-  pqProxySelection.h
-  pqQVTKWidgetBase.h
-  pqQVTKWidget.cxx
-  pqQVTKWidgetEventPlayer.cxx
-  pqQVTKWidgetEventPlayer.h
-  pqQVTKWidgetEventTranslator.cxx
-  pqQVTKWidgetEventTranslator.h
-  pqQVTKWidget.h
-  pqRecentlyUsedResourceLoaderInterface.cxx
-  pqRecentlyUsedResourceLoaderInterface.h
-  pqRecentlyUsedResourcesList.cxx
-  pqRecentlyUsedResourcesList.h
-  pqRenderViewBase.cxx
-  pqRenderViewBase.h
-  pqRenderView.cxx
-  pqRenderView.h
-  pqRepresentation.cxx
-  pqRepresentation.h
-  pqScalarBarRepresentation.cxx
-  pqScalarBarRepresentation.h
-  pqScalarsToColors.cxx
-  pqScalarsToColors.h
-  pqServer.cxx
-  pqServer.h
-  pqServerConfiguration.cxx
-  pqServerConfiguration.h
-  pqServerConfigurationCollection.cxx
-  pqServerConfigurationCollection.h
-  pqServerManagerModel.cxx
-  pqServerManagerModel.h
-  pqServerManagerModelInterface.cxx
-  pqServerManagerModelInterface.h
-  pqServerManagerModelItem.cxx
-  pqServerManagerModelItem.h
-  pqServerManagerObserver.cxx
-  pqServerManagerObserver.h
-  pqServerResource.cxx
-  pqServerResource.h
-  pqSettings.cxx
-  pqSettings.h
-  pqSMAdaptor.cxx
-  pqSMAdaptor.h
-  pqSMProxy.cxx
-  pqSMProxy.h
-  pqSpreadSheetView.cxx
-  pqSpreadSheetView.h
-  pqSpreadSheetViewModel.cxx
-  pqSpreadSheetViewModel.h
-  pqSpreadSheetViewSelectionModel.cxx
-  pqSpreadSheetViewSelectionModel.h
-  pqSpreadSheetViewWidget.cxx
-  pqSpreadSheetViewWidget.h
-  pqStandardServerManagerModelInterface.cxx
-  pqStandardServerManagerModelInterface.h
-  pqTimeKeeper.cxx
-  pqTimeKeeper.h
-  pqTreeLayoutStrategyInterface.cxx
-  pqTreeLayoutStrategyInterface.h
-  pqUndoStack.cxx
-  pqUndoStack.h
-  pqView.cxx
-  pqView.h
-  pqXMLEventObserver.cxx
-  pqXMLEventObserver.h
-  pqXMLEventSource.cxx
-  pqXMLEventSource.h
-  pqXMLUtil.cxx
-  pqXMLUtil.h
-  pqXYBagChartView.cxx
-  pqXYBagChartView.h
-  pqXYBarChartView.cxx
-  pqXYBarChartView.h
-  pqXYFunctionalBagChartView.cxx
-  pqXYFunctionalBagChartView.h
-  pqXYHistogramChartView.cxx
-  pqXYHistogramChartView.h
-  pqXYChartView.cxx
-  pqXYChartView.h
-  vtkPVGUIPluginInterface.cxx
-  vtkPVGUIPluginInterface.h
-)
+set(classes
+  pqAnimationCue
+  pqAnimationScene
+  pqApplicationCore
+  pqAutoStartInterface
+  pqBoxChartView
+  pqCheckBoxDelegate
+  pqCollaborationEventPlayer
+  pqCollaborationManager
+  pqComparativeContextView
+  pqComparativeRenderView
+  pqComparativeXYBarChartView
+  pqComparativeXYChartView
+  pqContextView
+  pqCoreInit
+  pqCoreTestUtility
+  pqCoreUtilities
+  pqDataRepresentation
+  pqDebug
+  pqFileDialog
+  pqFileDialogEventPlayer
+  pqFileDialogEventTranslator
+  pqFileDialogFavoriteModel
+  pqFileDialogFilter
+  pqFileDialogModel
+  pqFileDialogRecentDirsModel
+  pqFlatTreeViewEventPlayer
+  pqFlatTreeViewEventTranslator
+  pqGraphLayoutStrategyInterface
+  pqImageUtil
+  pqInteractiveViewLink
+  pqInterfaceTracker
+  pqLinkViewWidget
+  pqLinksModel
+  pqMainWindowEventManager
+  pqMultiSliceAxisWidget
+  pqMultiSliceView
+  pqNonEditableStyledItemDelegate
+  pqObjectBuilder
+  pqOptions
+  pqOutputPort
+  pqOutputWidget
+  pqParallelCoordinatesChartView
+  pqPipelineFilter
+  pqPipelineRepresentation
+  pqPipelineSource
+  pqPlotMatrixView
+  pqPluginManager
+  pqProgressManager
+  pqPropertyLinks
+  pqPropertyLinksConnection
+  pqPropertyManager
+  pqProxy
+  pqProxyModifiedStateUndoElement
+  pqProxySelection
+  pqQVTKWidget
+  pqQVTKWidgetEventPlayer
+  pqQVTKWidgetEventTranslator
+  pqRecentlyUsedResourceLoaderInterface
+  pqRecentlyUsedResourcesList
+  pqRenderView
+  pqRenderViewBase
+  pqRepresentation
+  pqSMAdaptor
+  pqSMProxy
+  pqScalarBarRepresentation
+  pqScalarsToColors
+  pqServer
+  pqServerConfiguration
+  pqServerConfigurationCollection
+  pqServerManagerModel
+  pqServerManagerModelInterface
+  pqServerManagerModelItem
+  pqServerManagerObserver
+  pqServerResource
+  pqSettings
+  pqSpreadSheetView
+  pqSpreadSheetViewModel
+  pqSpreadSheetViewSelectionModel
+  pqSpreadSheetViewWidget
+  pqStandardServerManagerModelInterface
+  pqTimeKeeper
+  pqTreeLayoutStrategyInterface
+  pqUndoStack
+  pqView
+  pqXMLEventObserver
+  pqXMLEventSource
+  pqXMLUtil
+  pqXYBagChartView
+  pqXYBarChartView
+  pqXYChartView
+  pqXYFunctionalBagChartView
+  pqXYHistogramChartView
+  vtkPVGUIPluginInterface)
 
-set (Module_MOC_HDRS
-  pqAnimationCue.h
-  pqAnimationScene.h
-  pqApplicationCore.h
-  pqBoxChartView.h
-  pqCheckBoxDelegate.h
-  pqCollaborationEventPlayer.h
-  pqCollaborationManager.h
-  pqComparativeContextView.h
-  pqComparativeRenderView.h
-  pqComparativeXYBarChartView.h
-  pqComparativeXYChartView.h
-  pqContextView.h
-  pqCoreTestUtility.h
-  pqCoreUtilities.h
-  pqDataRepresentation.h
-  pqFileDialogEventPlayer.h
-  pqFileDialogEventTranslator.h
-  pqFileDialogFavoriteModel.h
-  pqFileDialogFilter.h
-  pqFileDialog.h
-  pqFileDialogModel.h
-  pqFileDialogRecentDirsModel.h
-  pqFlatTreeViewEventPlayer.h
-  pqFlatTreeViewEventTranslator.h
-  pqInteractiveViewLink.h
-  pqInterfaceTracker.h
-  pqLinksModel.h
-  pqLinkViewWidget.h
-  pqMainWindowEventManager.h
-  pqMultiSliceAxisWidget.h
-  pqMultiSliceView.h
-  pqNonEditableStyledItemDelegate.h
-  pqObjectBuilder.h
-  pqOutputPort.h
-  pqOutputWidget.h
-  pqParallelCoordinatesChartView.h
-  pqPipelineFilter.h
-  pqPipelineRepresentation.h
-  pqPipelineSource.h
-  pqPlotMatrixView.h
-  pqPluginManager.h
-  pqProgressManager.h
-  pqPropertyLinksConnection.h
-  pqPropertyLinks.h
-  pqPropertyManager.h
-  pqProxy.h
-  pqQVTKWidgetEventPlayer.h
-  pqQVTKWidgetEventTranslator.h
-  pqQVTKWidget.h
-  pqRecentlyUsedResourcesList.h
-  pqRenderViewBase.h
-  pqRenderView.h
-  pqRepresentation.h
-  pqScalarBarRepresentation.h
-  pqScalarsToColors.h
-#  pqScatterPlotRepresentation.h
-  pqServerConfigurationCollection.h
-  pqServer.h
-  pqServerManagerModel.h
-  pqServerManagerModelItem.h
-  pqServerManagerObserver.h
-  pqSettings.h
-  pqSpreadSheetView.h
-  pqSpreadSheetViewModel.h
-  pqSpreadSheetViewSelectionModel.h
-  pqSpreadSheetViewWidget.h
-  pqStandardServerManagerModelInterface.h
-  pqTimeKeeper.h
-  pqUndoStack.h
-  pqView.h
-  pqXMLEventObserver.h
-  pqXMLEventSource.h
-  pqXYBagChartView.h
-  pqXYBarChartView.h
-  pqXYFunctionalBagChartView.h
-  pqXYHistogramChartView.h
-  pqXYChartView.h
-)
-
-set (Module_UI_FILES
+set(ui_files
   Resources/UI/pqFileDialog.ui
   Resources/UI/pqOutputWidget.ui
-  Resources/UI/pqPluginEULADialog.ui
-)
+  Resources/UI/pqPluginEULADialog.ui)
 
-set (Module_RESOURCE_FILES
-  "${CMAKE_CURRENT_SOURCE_DIR}/Resources/pqCore.qrc"
-)
+set(resource_files
+  Resources/pqCore.qrc)
 
 if (PARAVIEW_ENABLE_PYTHON)
-  list (APPEND Module_SRCS
-    pqPythonView.cxx
-    pqPythonView.h
-    )
-  list (APPEND Module_MOC_HDRS
-    pqPythonView.h
-    )
-endif()
+  # TODO: Split these into a separate module so that there isn't a public
+  # optional dependency.
+  list(APPEND classes
+    pqPythonView)
+endif ()
 
-#-------------------------------------------------------------------------
-include(ParaViewQt)
+set(qt_components
+  Widgets)
+
 if (PARAVIEW_USE_QTHELP)
-  pv_find_package_qt(qt_private_targets REQUIRED QUIET
-    QT5_COMPONENTS Help)
+  list(APPEND qt_components
+    Help)
+endif ()
 
-  set(${vtk-module}_EXPORT_CODE_INSTALL
-    "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
-    pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-      QT5_COMPONENTS Help)")
-else()
-  pv_find_package_qt(qt_private_targets REQUIRED QUIET
-    QT5_COMPONENTS Widgets)
+vtk_module_find_package(
+  PACKAGE     Qt5
+  COMPONENTS  ${qt_components})
 
-  set(${vtk-module}_EXPORT_CODE_INSTALL
-    "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
-    pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-      QT5_COMPONENTS Widgets)")
-endif()
-set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
+set(CMAKE_AUTOMOC 1)
+set(CMAKE_AUTORCC 1)
+set(CMAKE_AUTOUIC 1)
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 
-pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-pv_qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+source_group("Resources" FILES
+  ${ui_files}
+  ${resource_files})
 
-#-------------------------------------------------------------------------
-set(${vtk-module}_NO_HeaderTest 1)
-
-
-SOURCE_GROUP("Resources" FILES
-  ${Module_UI_FILES}
-  ${Module_RESOURCE_FILES}
-)
-
-SOURCE_GROUP("Generated" FILES
-  ${__Module_RESOURCE_SRCS}
-  ${__Module_MOC_SRCS}
-  ${__Module_UI_SRCS}
-)
-
-vtk_module_library(${vtk-module}
-  ${Module_SRCS}
-  ${__Module_RESOURCE_SRCS}
-  ${__Module_MOC_SRCS}
-  ${__Module_UI_SRCS})
-target_link_libraries(${vtk-module}
-  LINK_PRIVATE ${qt_private_targets})
-
-#IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-#  # Headers
-#  GLOB_INSTALL_DEVELOPMENT(
-#      ${CMAKE_CURRENT_SOURCE_DIR}
-#      ${PV_INSTALL_INCLUDE_DIR}
-#      "*.h;*.hxx;*.txx")
-#  INSTALL(
-#      FILES ${dynamicHeaders}
-#      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-#      COMPONENT Development)
-#  # QT resources
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Core/Resources/UI"
-#    "${resPath}/*.ui")
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Core/Resources/Icons"
-#    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
-#ENDIF ()
-#
-#IF(BUILD_TESTING)
-#  ADD_SUBDIRECTORY(Testing)
-#ENDIF()
+vtk_module_add_module(ParaView::pqCore
+  CLASSES ${classes}
+  SOURCES ${ui_files}
+          ${resource_files})
+vtk_module_link(ParaView::pqCore
+  PRIVATE
+    Qt5::Widgets)
+if (PARAVIEW_USE_QTHELP)
+  vtk_module_link(ParaView::pqCore
+    PRIVATE
+      Qt5::Help)
+endif ()
