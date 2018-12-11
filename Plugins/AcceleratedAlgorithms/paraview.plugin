@@ -1,0 +1,6 @@
+NAME
+  AcceleratedAlgorithms
+DESCRIPTION
+  Testing plugin
+REQUIRES_MODULES
+  VTK::FiltersCore
