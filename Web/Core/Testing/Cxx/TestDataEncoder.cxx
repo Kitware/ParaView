@@ -1,7 +1,7 @@
+#include "vtkDataEncoder.h"
 #include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkPNGReader.h"
-#include "vtkPVDataEncoder.h"
 #include "vtkSmartPointer.h"
 #include "vtkTestUtilities.h"
 
@@ -22,9 +22,9 @@ int TestDataEncoder(int argc, char* argv[])
 
   // Open image files from the PARAVIEW_DATA_ROOT/Baseline and try to
   // encode/compress them and then verify that they are indeed the same.
-  const char* filenames[] = { "/Baseline/Clip.png", "/Baseline/Contour.png",
-    "/Baseline/ContourRange.png", "/Baseline/EnSight.png", "/Baseline/ExtractBlock.png",
-    "/Baseline/ExtractGrid.png", NULL };
+  const char* filenames[] = { "/Web/Core/Testing/Data/Baseline/Clip.png",
+    "/Web/Core/Testing/Data/Baseline/EnSight.png",
+    "/Web/Core/Testing/Data/Baseline/ExtractBlock.png", NULL };
 
   std::vector<vtkSmartPointer<vtkImageData> > images;
   for (int cc = 0; filenames[cc] != NULL; cc++)
@@ -38,7 +38,7 @@ int TestDataEncoder(int argc, char* argv[])
   }
 
   int errors = 0;
-  vtkNew<vtkPVDataEncoder> encoder;
+  vtkNew<vtkDataEncoder> encoder;
   for (size_t cc = 0; cc < images.size(); cc++)
   {
     vtkImageData* img = images[cc].GetPointer();
