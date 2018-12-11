@@ -44,7 +44,7 @@ int CPXMLPWriterPipeline(int argc, char* argv[])
   dd->GetInputDescriptionByName("ImageData")->SetGrid(imageData);
   dd->GetInputDescriptionByName("ImageData")->SetWholeExtent(extent);
 
-  if (const char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "cth.vtr"))
+  if (const char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/cth.vtr"))
   {
     vtkNew<vtkXMLRectilinearGridReader> rectilinearGridReader;
     rectilinearGridReader->SetFileName(fname);
@@ -60,7 +60,8 @@ int CPXMLPWriterPipeline(int argc, char* argv[])
     return 1;
   }
 
-  if (const char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "bluntfin.vts"))
+  if (const char* fname =
+        vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/bluntfin.vts"))
   {
     vtkNew<vtkXMLStructuredGridReader> structuredGridReader;
     structuredGridReader->SetFileName(fname);
@@ -76,7 +77,7 @@ int CPXMLPWriterPipeline(int argc, char* argv[])
     return 1;
   }
 
-  if (const char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "cow.vtp"))
+  if (const char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/cow.vtp"))
   {
     vtkNew<vtkXMLPolyDataReader> polyDataReader;
     polyDataReader->SetFileName(fname);
