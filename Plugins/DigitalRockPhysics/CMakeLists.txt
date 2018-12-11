@@ -1,20 +1,31 @@
-cmake_minimum_required(VERSION 3.3)
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
+  REQUEST_MODULES   DigitalRockPhysics::DigitalRocksFilters
+  PROVIDES_MODULES  drp_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-if (NOT ParaView_BINARY_DIR)
-  find_package(ParaView REQUIRED)
-  include(${PARAVIEW_USE_FILE})
-endif()
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-include(ParaViewPlugins)
+vtk_module_build(
+  MODULES             ${drp_modules}
+  PACKAGE             DigitalRockPhysics
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-include_directories(${VTK_INCLUDE_DIRS})
-
-add_paraview_plugin(DigitalRockPhysics "1.0"
-  DESCRIPTION "Digital Rock Physics analysis filters"
-  SERVER_MANAGER_XML DigitalRockPhysics.xml
-  SERVER_MANAGER_SOURCES vtkPMaterialClusterAnalysisFilter.cxx
-                         vtkPMaterialClusterExplodeFilter.cxx)
+paraview_add_plugin(DigitalRockPhysics
+  VERSION "1.0"
+  MODULES DigitalRockPhysics::DigitalRocksFilters)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
-endif()
+endif ()

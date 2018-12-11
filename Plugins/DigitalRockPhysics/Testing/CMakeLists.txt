@@ -1,25 +1,27 @@
-include(ParaViewTestingMacros)
+if (PARAVIEW_BUILD_QT_GUI)
+  set(_paraview_add_tests_default_test_data_target DigitalRockPhysicsData)
+  ExternalData_Expand_Arguments("${_paraview_add_tests_default_test_data_target}" _
+    "DATA{Data/rocksample.vti}")
 
-if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
-  paraview_test_load_data(DigitalRockPhysics rocksample.vti)
-
-  add_client_tests("pv"
+  paraview_add_client_tests(
     LOAD_PLUGIN "DigitalRockPhysics"
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DigitalRockPhysicsAnalysisFilter.xml)
-  add_client_tests("pv"
+    BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+    TEST_SCRIPTS DigitalRockPhysicsAnalysisFilter.xml)
+  paraview_add_client_tests(
     LOAD_PLUGIN "DigitalRockPhysics"
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DigitalRockPhysicsExplodeFilter.xml)
+    BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+    TEST_SCRIPTS DigitalRockPhysicsExplodeFilter.xml)
 
   if (PARAVIEW_USE_MPI)
-    add_client_server_tests("pvcs"
+    paraview_add_client_server_tests(
       LOAD_PLUGIN "DigitalRockPhysics"
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DigitalRockPhysicsAnalysisFilter.xml)
-    add_client_server_tests("pvcs"
+      BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+      TEST_SCRIPTS DigitalRockPhysicsAnalysisFilter.xml)
+    paraview_add_client_server_tests(
       LOAD_PLUGIN "DigitalRockPhysics"
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DigitalRockPhysicsExplodeFilter.xml)
-   endif()
-endif()
+      BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
+      TEST_SCRIPTS DigitalRockPhysicsExplodeFilter.xml)
+   endif ()
+
+   ExternalData_add_target("${_paraview_add_tests_default_test_data_target}")
+endif ()

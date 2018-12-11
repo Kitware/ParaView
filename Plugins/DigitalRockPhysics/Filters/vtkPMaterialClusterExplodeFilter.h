@@ -45,11 +45,12 @@
 #ifndef vtkPMaterialClusterExplodeFilter_h
 #define vtkPMaterialClusterExplodeFilter_h
 
+#include "vtkDigitalRocksFiltersModule.h"
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkImageData;
 
-class VTK_EXPORT vtkPMaterialClusterExplodeFilter : public vtkPolyDataAlgorithm
+class VTKDIGITALROCKSFILTERS_EXPORT vtkPMaterialClusterExplodeFilter : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPMaterialClusterExplodeFilter* New();

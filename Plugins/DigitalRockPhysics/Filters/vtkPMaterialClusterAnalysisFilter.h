@@ -37,9 +37,10 @@
 #ifndef vtkPMaterialClusterAnalysisFilter_h
 #define vtkPMaterialClusterAnalysisFilter_h
 
+#include "vtkDigitalRocksFiltersModule.h"
 #include "vtkImageAlgorithm.h"
 
-class VTK_EXPORT vtkPMaterialClusterAnalysisFilter : public vtkImageAlgorithm
+class VTKDIGITALROCKSFILTERS_EXPORT vtkPMaterialClusterAnalysisFilter : public vtkImageAlgorithm
 {
 public:
   static vtkPMaterialClusterAnalysisFilter* New();

@@ -1,0 +1,9 @@
+NAME
+  DigitalRockPhysics
+DESCRIPTION
+  Digital Rock Physics analysis filters
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelCore
