@@ -122,37 +122,32 @@ void vtkSMTestDriver::CollectConfiguredOptions()
 
 // now find all the mpi information if mpi run is set
 #ifdef PARAVIEW_USE_MPI
-#ifdef VTK_MPIRUN_EXE
-  this->MPIRun = VTK_MPIRUN_EXE;
+#ifdef PARAVIEW_MPIEXEC_EXECUTABLE
+  this->MPIRun = PARAVIEW_MPIEXEC_EXECUTABLE;
 #else
-  cerr << "Error: VTK_MPIRUN_EXE must be set when PARAVIEW_USE_MPI is on.\n";
-  return;
+#error "Error: PARAVIEW_MPIEXEC_EXECUTABLE must be set when PARAVIEW_USE_MPI is on."
 #endif
   int serverNumProc = 1;
   int renderNumProc = 1;
 
-#ifdef VTK_MPI_MAX_NUMPROCS
-  serverNumProc = VTK_MPI_MAX_NUMPROCS;
+#ifdef PARAVIEW_MPI_MAX_NUMPROCS
+  serverNumProc = PARAVIEW_MPI_MAX_NUMPROCS;
   renderNumProc = serverNumProc - 1;
   if (renderNumProc <= 0)
   {
     renderNumProc = 1;
   }
 #endif
-#ifdef VTK_MPI_NUMPROC_FLAG
-  this->MPINumProcessFlag = VTK_MPI_NUMPROC_FLAG;
+#ifdef PARAVIEW_MPI_NUMPROC_FLAG
+  this->MPINumProcessFlag = PARAVIEW_MPI_NUMPROC_FLAG;
 #else
-  cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test if MPI is on.\n";
-  return;
+#error "Error PARAVIEW_MPI_NUMPROC_FLAG must be defined to run test if MPI is on."
 #endif
-#ifdef VTK_MPI_PRENUMPROC_FLAGS
-  this->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
+#ifdef PARAVIEW_MPI_PREFLAGS
+  this->SeparateArguments(PARAVIEW_MPI_PREFLAGS, this->MPIPreFlags);
 #endif
-#ifdef VTK_MPI_PREFLAGS
-  this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIPreFlags);
-#endif
-#ifdef VTK_MPI_POSTFLAGS
-  this->SeparateArguments(VTK_MPI_POSTFLAGS, this->MPIPostFlags);
+#ifdef PARAVIEW_MPI_POSTFLAGS
+  this->SeparateArguments(PARAVIEW_MPI_POSTFLAGS, this->MPIPostFlags);
 #endif
   char buf[1024];
   sprintf(buf, "%d", serverNumProc);
@@ -161,19 +156,6 @@ void vtkSMTestDriver::CollectConfiguredOptions()
   sprintf(buf, "%d", renderNumProc);
   this->MPIRenderServerNumProcessFlag = buf;
 
-#endif // PARAVIEW_USE_MPI
-
-#ifdef VTK_MPI_SERVER_PREFLAGS
-  this->SeparateArguments(VTK_MPI_SERVER_PREFLAGS, this->MPIServerPreFlags);
-#endif
-#ifdef VTK_MPI_SERVER_POSTFLAGS
-  this->SeparateArguments(VTK_MPI_SERVER_POSTFLAGS, this->MPIServerPostFlags);
-#endif
-#ifdef VTK_MPI_SERVER_TD_PREFLAGS
-  this->SeparateArguments(VTK_MPI_SERVER_TD_PREFLAGS, this->TDServerPreFlags);
-#endif
-#ifdef VTK_MPI_SERVER_TD_POSTFLAGS
-  this->SeparateArguments(VTK_MPI_SERVER_TD_POSTFLAGS, this->TDServerPostFlags);
 #endif
 
 // For remote testing (via ssh)
@@ -296,8 +278,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
     }
     if (strncmp(argv[i], "--server-preflags", 17) == 0)
     {
-      this->SeparateArguments(argv[i + 1], this->MPIServerPreFlags);
-      fprintf(stderr, "Extras server preflags were specified: %s\n", argv[i + 1]);
+      fprintf(stderr, "Server preflags are no longer supported.\n");
     }
     if (strncmp(argv[i], "--allow-errors", strlen("--allow-errors")) == 0)
     {
@@ -327,40 +308,11 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
   if (this->MPIRun.size() && type != CLIENT)
   {
     commandLine.push_back(this->MPIRun.c_str());
-    if (!this->TestTiledDisplay)
-    {
-      for (unsigned int i = 0; i < this->MPIPreNumProcFlags.size(); ++i)
-      {
-        commandLine.push_back(this->MPIPreNumProcFlags[i].c_str());
-      }
-    }
     commandLine.push_back(this->MPINumProcessFlag.c_str());
     commandLine.push_back(numProc);
-    if (!this->TestTiledDisplay)
+    for (unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
     {
-      for (unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
-      {
-        commandLine.push_back(this->MPIPreFlags[i].c_str());
-      }
-      // If there is specific flags for the server to pass to mpirun, add them
-      if (type == SERVER || type == DATA_SERVER)
-      {
-        for (unsigned int i = 0; i < this->MPIServerPreFlags.size(); ++i)
-        {
-          commandLine.push_back(this->MPIServerPreFlags[i].c_str());
-        }
-      }
-    }
-    else ///  When tile display is enabled.
-    {
-      // If there is specific flags for the server to pass to mpirun, add them
-      if (type == SERVER || type == DATA_SERVER)
-      {
-        for (unsigned int i = 0; i < this->TDServerPreFlags.size(); ++i)
-        {
-          commandLine.push_back(this->TDServerPreFlags[i].c_str());
-        }
-      }
+      commandLine.push_back(this->MPIPreFlags[i].c_str());
     }
   }
 
@@ -382,13 +334,6 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
   else
   {
     commandLine.push_back(paraView);
-    if (type == CLIENT)
-    {
-      for (unsigned int i = 0; i < this->ClientPostFlags.size(); ++i)
-      {
-        commandLine.push_back(this->ClientPostFlags[i].c_str());
-      }
-    }
 
     if (this->ReverseConnection && type != CLIENT)
     {
@@ -398,39 +343,19 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
 #endif
     }
 
-    if (!this->TestTiledDisplay)
+    if (this->TestTiledDisplay)
     {
-      for (unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
-      {
-        commandLine.push_back(MPIPostFlags[i].c_str());
-      }
       // If there is specific flags for the server to pass to mpirun, add them
       if (type == SERVER || type == DATA_SERVER)
       {
-        for (unsigned int i = 0; i < this->MPIServerPostFlags.size(); ++i)
-        {
-          commandLine.push_back(this->MPIServerPostFlags[i].c_str());
-        }
+        commandLine.push_back(this->TestTiledDisplayTDX.c_str());
+        commandLine.push_back(this->TestTiledDisplayTDY.c_str());
       }
     }
-    else
+
+    for (unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
     {
-      // If there is specific flags for the server to pass to mpirun, add them
-      if (type == SERVER || type == DATA_SERVER)
-      {
-        if (this->TDServerPreFlags.size() == 0)
-        {
-          commandLine.push_back(this->TestTiledDisplayTDX.c_str());
-          commandLine.push_back(this->TestTiledDisplayTDY.c_str());
-        }
-        else
-        {
-          for (unsigned int i = 0; i < this->TDServerPostFlags.size(); ++i)
-          {
-            commandLine.push_back(this->TDServerPostFlags[i].c_str());
-          }
-        }
-      }
+      commandLine.push_back(MPIPostFlags[i].c_str());
     }
 
     // remaining flags for the test
