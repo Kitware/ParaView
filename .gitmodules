@@ -7,9 +7,6 @@
 [submodule "ThirdParty/IceT/vtkicet"]
 	path = ThirdParty/IceT/vtkicet
 	url = https://gitlab.kitware.com/icet/icet.git
-[submodule "ThirdParty/protobuf/vtkprotobuf"]
-	path = ThirdParty/protobuf/vtkprotobuf
-	url = https://gitlab.kitware.com/paraview/protobuf.git
 [submodule "ThirdParty/QtTesting/vtkqttesting"]
 	path = ThirdParty/QtTesting/vtkqttesting
 	url = https://gitlab.kitware.com/paraview/qttesting.git
