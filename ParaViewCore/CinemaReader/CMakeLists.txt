@@ -28,15 +28,16 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-include(vtkOpenGL)
+set(classes
+  vtkCinemaDatabase
+  vtkCinemaDatabaseReader
+  vtkCinemaLayerMapper
+  vtkCinemaLayerRepresentation
+  vtkPVCinemaDatabaseInformation
+  vtkSMCinemaDatabaseImporter)
 
-set(Module_SRCS
-  vtkSMCinemaDatabaseImporter.cxx
-  vtkCinemaDatabase.cxx
-  vtkCinemaDatabaseReader.cxx
-  vtkCinemaLayerMapper.cxx
-  vtkCinemaLayerRepresentation.cxx
-  vtkPVCinemaDatabaseInformation.cxx)
+vtk_module_add_module(ParaView::CinemaReader
+  CLASSES ${classes})
 
-vtk_module_library(${vtk-module} ${Module_SRCS})
-vtk_opengl_link(${vtk-module})
+paraview_add_server_manager_xmls(
+  XMLS  cinemareader.xml)
