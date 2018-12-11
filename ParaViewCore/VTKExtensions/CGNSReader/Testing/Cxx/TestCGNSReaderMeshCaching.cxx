@@ -36,7 +36,8 @@
 int TestCGNSReaderMeshCaching(int argc, char* argv[])
 {
   float cold_timing, hot_timing;
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "test_node_and_cell.cgns");
+  char* fname =
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/test_node_and_cell.cgns");
   vtkNew<vtkCGNSReader> reader;
   reader->SetFileName(fname);
   delete[] fname;

@@ -1,0 +1,26 @@
+NAME
+  ParaView::VTKExtensionsCGNSReader
+LIBRARY_NAME
+  vtkPVVTKExtensionsCGNSReader
+KIT
+  ParaView::Extensions
+DEPENDS
+  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsSIL
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelCore
+PRIVATE_DEPENDS
+  ParaView::cgns
+  VTK::FiltersExtraction
+  VTK::ParallelCore
+  VTK::hdf5
+  VTK::vtksys
+TEST_DEPENDS
+  VTK::CommonSystem
+  VTK::InteractionStyle
+  VTK::TestingCore
+  VTK::TestingRendering
+TEST_LABELS
+  ParaView

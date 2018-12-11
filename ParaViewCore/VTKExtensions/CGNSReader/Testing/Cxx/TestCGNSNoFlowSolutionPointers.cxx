@@ -28,7 +28,8 @@
 
 int TestCGNSNoFlowSolutionPointers(int argc, char* argv[])
 {
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "test_node_and_cell.cgns");
+  char* fname =
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/test_node_and_cell.cgns");
   vtkNew<vtkCGNSReader> reader;
   reader->SetFileName(fname);
   delete[] fname;

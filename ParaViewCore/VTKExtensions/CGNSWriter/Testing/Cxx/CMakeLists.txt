@@ -1,6 +1,4 @@
-include(ParaViewTestingMacros)
-
-paraview_add_test_cxx(
+vtk_add_test_cxx(
   ${vtk-module}CxxTests tests
   NO_VALID NO_DATA
   TestStructuredGrid.cxx
