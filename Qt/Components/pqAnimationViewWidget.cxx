@@ -82,7 +82,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMTrace.h"
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonSyntaxHighlighter.h"
 #endif
 //-----------------------------------------------------------------------------
@@ -354,7 +354,7 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   QWidget* w = this->Internal->AnimationWidget->createDeleteWidget();
 
   this->Internal->CreateSource = new pqAnimatableProxyComboBox(w) << pqSetName("ProxyCombo");
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   this->Internal->CreateSource->addProxy(0, "Python", NULL);
 #endif
   this->Internal->CreateProperty = new pqAnimatablePropertiesComboBox(w)
@@ -672,7 +672,7 @@ void pqAnimationViewWidget::trackSelected(pqAnimationTrack* track)
     QDialog dialog(this);
     Ui::PythonAnimationCue ui;
     ui.setupUi(&dialog);
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
     new pqPythonSyntaxHighlighter(ui.script, ui.script);
 #endif
     ui.script->setPlainText(vtkSMPropertyHelper(cue->getProxy(), "Script").GetAsString());
@@ -937,7 +937,7 @@ void pqAnimationViewWidget::createTrack()
 // we only support that when python is enabled.
 // we allow creating as many python tracks as needed, hence we don't check
 // if there exists a track already (which is the case with others).
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
     this->createPythonTrack();
 #endif
     return;
@@ -1027,7 +1027,7 @@ void pqAnimationViewWidget::createTrack()
 //-----------------------------------------------------------------------------
 void pqAnimationViewWidget::createPythonTrack()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   BEGIN_UNDO_SET("Add Animation Track");
 
   pqAnimationCue* cue = this->Internal->Scene->createCue("PythonAnimationCue");

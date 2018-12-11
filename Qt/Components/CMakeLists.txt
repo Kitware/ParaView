@@ -28,451 +28,160 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  pqAboutDialog.cxx
-  pqAboutDialog.h
-  pqActionGroupInterface.cxx
-  pqActionGroupInterface.h
-  pqActiveObjects.cxx
-  pqActiveObjects.h
-  pqAnimatablePropertiesComboBox.cxx
-  pqAnimatablePropertiesComboBox.h
-  pqAnimatableProxyComboBox.cxx
-  pqAnimatableProxyComboBox.h
-  pqAnimationManager.cxx
-  pqAnimationManager.h
-  pqAnimationViewWidget.cxx
-  pqAnimationViewWidget.h
-  pqArrayListDomain.cxx
-  pqArrayListDomain.h
-  pqArraySelectionWidget.cxx
-  pqArraySelectionWidget.h
-  pqArraySelectorPropertyWidget.cxx
-  pqArraySelectorPropertyWidget.h
-  pqArrayStatusPropertyWidget.cxx
-  pqArrayStatusPropertyWidget.h
-  pqFavoritesDialog.cxx
-  pqFavoritesDialog.h
-  pqFavoritesTreeWidget.cxx
-  pqFavoritesTreeWidget.h
-  pqCalculatorWidget.cxx
-  pqCalculatorWidget.h
-  pqCameraDialog.cxx
-  pqCameraDialog.h
-  pqCameraKeyFrameWidget.cxx
-  pqCameraKeyFrameWidget.h
-  pqChangeInputDialog.cxx
-  pqChangeInputDialog.h
-  pqCollaborationPanel.cxx
-  pqCollaborationPanel.h
-  pqColorChooserButtonWithPalettes.cxx
-  pqColorChooserButtonWithPalettes.h
-  pqComboBoxDomain.cxx
-  pqComboBoxDomain.h
-  pqCommandPropertyWidget.cxx
-  pqCommandPropertyWidget.h
-  pqComparativeCueWidget.cxx
-  pqComparativeCueWidget.h
-  pqComparativeVisPanel.cxx
-  pqComparativeVisPanel.h
-  pqComponentsInit.cxx
-  pqComponentsInit.h
-  pqComponentsTestUtility.cxx
-  pqComponentsTestUtility.h
-  pqCompositeDataInformationTreeModel.cxx
-  pqCompositeDataInformationTreeModel.h
-  pqCompositePropertyWidgetDecorator.cxx
-  pqCompositePropertyWidgetDecorator.h
-  pqCompositeTreePropertyWidget.cxx
-  pqCompositeTreePropertyWidget.h
-  pqCustomFilterDefinitionModel.cxx
-  pqCustomFilterDefinitionModel.h
-  pqCustomFilterDefinitionWizard.cxx
-  pqCustomFilterDefinitionWizard.h
-  pqCustomFilterManager.cxx
-  pqCustomFilterManager.h
-  pqCustomFilterManagerModel.cxx
-  pqCustomFilterManagerModel.h
-  pqCustomViewpointButtonDialog.cxx
-  pqCustomViewpointButtonDialog.h
-  pqDataInformationModel.cxx
-  pqDataInformationModel.h
-  pqDataInformationWidget.cxx
-  pqDataInformationWidget.h
-  pqDialog.cxx
-  pqDialog.h
-  pqDisplayColorWidget.cxx
-  pqDisplayColorWidget.h
-  pqDisplayPanel.cxx
-  pqDisplayPanel.h
-  pqDisplayPanelInterface.cxx
-  pqDisplayPanelInterface.h
-  pqDisplayPanelPropertyWidget.cxx
-  pqDisplayPanelPropertyWidget.h
-  pqDisplayRepresentationWidget.cxx
-  pqDisplayRepresentationWidget.h
-  pqDockWindowInterface.cxx
-  pqDockWindowInterface.h
-  pqDoubleVectorPropertyWidget.cxx
-  pqDoubleVectorPropertyWidget.h
-  pqFileChooserWidget.cxx
-  pqFileChooserWidget.h
-  pqFindDataCreateSelectionFrame.cxx
-  pqFindDataCreateSelectionFrame.h
-  pqFindDataCurrentSelectionFrame.cxx
-  pqFindDataCurrentSelectionFrame.h
-  pqFindDataSelectionDisplayFrame.cxx
-  pqFindDataSelectionDisplayFrame.h
-  pqFindDataDialog.cxx
-  pqFindDataDialog.h
-  pqHighlightItemDelegate.cxx
-  pqHighlightItemDelegate.h
-  pqImageTip.cxx
-  pqImageTip.h
-  pqIndexSelectionWidget.cxx
-  pqIndexSelectionWidget.h
-  pqInputSelectorWidget.cxx
-  pqInputSelectorWidget.h
-  pqIntMaskPropertyWidget.cxx
-  pqIntMaskPropertyWidget.h
-  pqIntRangeWidget.cxx
-  pqIntRangeWidget.h
-  pqIntVectorPropertyWidget.cxx
-  pqIntVectorPropertyWidget.h
-  pqItemViewSearchWidget.cxx
-  pqItemViewSearchWidget.h
-  pqItemViewSearchWidgetEventPlayer.cxx
-  pqItemViewSearchWidgetEventPlayer.h
-  pqKeyFrameEditor.cxx
-  pqKeyFrameEditor.h
-  pqKeyFrameTimeValidator.cxx
-  pqKeyFrameTimeValidator.h
-  pqKeyFrameTypeWidget.cxx
-  pqKeyFrameTypeWidget.h
-  pqLabel.cxx
-  pqLabel.h
-  pqLightsEditor.cxx
-  pqLightsEditor.h
-  pqLightsInspector.cxx
-  pqLightsInspector.h
-  pqLinksEditor.cxx
-  pqLinksEditor.h
-  pqLinksManager.cxx
-  pqLinksManager.h
-  pqLiveInsituManager.h
-  pqLiveInsituManager.cxx
-  pqLiveInsituVisualizationManager.cxx
-  pqLiveInsituVisualizationManager.h
-  pqLockViewSizeCustomDialog.cxx
-  pqLockViewSizeCustomDialog.h
-  pqMemoryInspectorPanel.cxx
-  pqMemoryInspectorPanel.h
-  pqMultiBlockInspectorWidget.cxx
-  pqMultiBlockInspectorWidget.h
-  pqMultiViewWidget.cxx
-  pqMultiViewWidget.h
-  pqSplitter.cxx
-  pqSplitter.h
-  pqOrbitCreatorDialog.cxx
-  pqOrbitCreatorDialog.h
-  pqOutputPortComboBox.cxx
-  pqOutputPortComboBox.h
-  pqPipelineAnnotationFilterModel.cxx
-  pqPipelineAnnotationFilterModel.h
-  pqPipelineBrowserWidget.cxx
-  pqPipelineBrowserWidget.h
-  pqPipelineInputComboBox.cxx
-  pqPipelineInputComboBox.h
-  pqPipelineModel.cxx
-  pqPipelineModel.h
-  pqPipelineModelSelectionAdaptor.cxx
-  pqPipelineModelSelectionAdaptor.h
-  pqPipelineTimeKeyFrameEditor.cxx
-  pqPipelineTimeKeyFrameEditor.h
-  pqPluginDialog.cxx
-  pqPluginDialog.h
-  pqPluginTreeWidgetEventPlayer.cxx
-  pqPluginTreeWidgetEventPlayer.h
-  pqPluginTreeWidgetEventTranslator.cxx
-  pqPluginTreeWidgetEventTranslator.h
-  pqPluginTreeWidget.h
-  pqPopOutWidget.cxx
-  pqPopOutWidget.h
-  pqPresetDialog.cxx
-  pqPresetDialog.h
-  pqPresetGroupsManager.cxx
-  pqPresetGroupsManager.h
-  pqPresetToPixmap.cxx
-  pqPresetToPixmap.h
-  pqPropertiesPanel.cxx
-  pqPropertiesPanel.h
-  pqPropertyGroupWidget.cxx
-  pqPropertyGroupWidget.h
-  pqPropertyWidget.cxx
-  pqPropertyWidget.h
-  pqPropertyWidgetDecorator.h
-  pqPropertyWidgetDecorator.cxx
-  pqPropertyWidgetInterface.cxx
-  pqPropertyWidgetInterface.h
-  pqProxiesWidget.cxx
-  pqProxiesWidget.h
-  pqProxyEditorPropertyWidget.cxx
-  pqProxyEditorPropertyWidget.h
-  pqProxyInformationWidget.cxx
-  pqProxyInformationWidget.h
-  pqProxyPropertyWidget.cxx
-  pqProxyPropertyWidget.h
-  pqProxySelectionWidget.cxx
-  pqProxySelectionWidget.h
-  pqProxySILModel.cxx
-  pqProxySILModel.h
-  pqProxyWidget.cxx
-  pqProxyWidgetDialog.cxx
-  pqProxyWidgetDialog.h
-  pqProxyWidget.h
-  pqQueryClauseWidget.cxx
-  pqQueryClauseWidget.h
-  pqRecentFilesMenu.cxx
-  pqRecentFilesMenu.h
-  pqRemoteCommandDialog.cxx
-  pqRemoteCommandDialog.h
-  pqRemoteCommandTemplateDialog.cxx
-  pqRemoteCommandTemplateDialog.h
-  pqRescaleRange.cxx
-  pqRescaleRange.h
-  pqSampleScalarAddRangeDialog.cxx
-  pqSampleScalarAddRangeDialog.h
-  pqSampleScalarWidget.cxx
-  pqSampleScalarWidget.h
-  pqScalarSetModel.cxx
-  pqScalarSetModel.h
-  pqScalarValueListPropertyWidget.cxx
-  pqScalarValueListPropertyWidget.h
-  pqSearchBox.cxx
-  pqSearchBox.h
-  pqSelectionAdaptor.cxx
-  pqSelectionAdaptor.h
-  pqSelectionInputWidget.cxx
-  pqSelectionInputWidget.h
-  pqSelectionLinkDialog.cxx
-  pqSelectionLinkDialog.h
-  pqSelectionManager.cxx
-  pqSelectionManager.h
-  pqSelectReaderDialog.cxx
-  pqSelectReaderDialog.h
-  pqServerConfigurationImporter.cxx
-  pqServerConfigurationImporter.h
-  pqServerConnectDialog.cxx
-  pqServerConnectDialog.h
-  pqServerLauncher.cxx
-  pqServerLauncher.h
-  pqSetBreakpointDialog.cxx
-  pqSetBreakpointDialog.h
-  pqSettingsDialog.cxx
-  pqSettingsDialog.h
-  pqShaderReplacementsComboBox.cxx
-  pqShaderReplacementsComboBox.h
-  pqShaderReplacementsSelectorPropertyWidget.cxx
-  pqShaderReplacementsSelectorPropertyWidget.h
-  pqSignalAdaptorKeyFrameType.cxx
-  pqSignalAdaptorKeyFrameType.h
-  pqSignalAdaptorSelectionTreeWidget.cxx
-  pqSignalAdaptorSelectionTreeWidget.h
-  pqSignalAdaptorTreeWidget.cxx
-  pqSignalAdaptorTreeWidget.h
-  pqSILModel.cxx
-  pqSILModel.h
-  pqSILWidget.cxx
-  pqSILWidget.h
-  pqSMSignalAdaptors.cxx
-  pqSMSignalAdaptors.h
-  pqStringVectorPropertyWidget.cxx
-  pqStringVectorPropertyWidget.h
-  pqSubsetInclusionLatticeTreeModel.cxx
-  pqSubsetInclusionLatticeTreeModel.h
-  pqSubsetInclusionLatticeWidget.cxx
-  pqSubsetInclusionLatticeWidget.h
-  pqTabbedMultiViewWidget.cxx
-  pqTabbedMultiViewWidget.h
-  pqTextureComboBox.cxx
-  pqTextureComboBox.h
-  pqTextureSelectorPropertyWidget.cxx
-  pqTextureSelectorPropertyWidget.h
-  pqTimerLogDisplay.cxx
-  pqTimerLogDisplay.h
-  pqToolBarInterface.cxx
-  pqToolBarInterface.h
-  pqToolTipTrapper.cxx
-  pqToolTipTrapper.h
-  pqTransferFunctionWidget.cxx
-  pqTransferFunctionWidget.h
-  pqTriggerOnIdleHelper.cxx
-  pqTriggerOnIdleHelper.h
-  pqUndoStackBuilder.cxx
-  pqUndoStackBuilder.h
-  pqVariableType.h
-  pqVCRController.cxx
-  pqVCRController.h
-  pqViewContextMenuHandler.cxx
-  pqViewContextMenuHandler.h
-  pqViewContextMenuManager.cxx
-  pqViewContextMenuManager.h
-  pqViewFrameActionsInterface.cxx
-  pqViewFrameActionsInterface.h
-  pqViewFrame.cxx
-  pqViewFrame.h
-  pqViewManager.cxx
-  pqViewManager.h
-  pqWidgetRangeDomain.cxx
-  pqWidgetRangeDomain.h
-  pqAbstractItemSelectionModel.cxx
-)
+set(classes
+  pqAboutDialog
+  pqAbstractItemSelectionModel
+  pqActionGroupInterface
+  pqActiveObjects
+  pqAnimatablePropertiesComboBox
+  pqAnimatableProxyComboBox
+  pqAnimationManager
+  pqAnimationViewWidget
+  pqArrayListDomain
+  pqArraySelectionWidget
+  pqArraySelectorPropertyWidget
+  pqArrayStatusPropertyWidget
+  pqCalculatorWidget
+  pqCameraDialog
+  pqCameraKeyFrameWidget
+  pqChangeInputDialog
+  pqCollaborationPanel
+  pqColorChooserButtonWithPalettes
+  pqComboBoxDomain
+  pqCommandPropertyWidget
+  pqComparativeCueWidget
+  pqComparativeVisPanel
+  pqComponentsInit
+  pqComponentsTestUtility
+  pqCompositeDataInformationTreeModel
+  pqCompositePropertyWidgetDecorator
+  pqCompositeTreePropertyWidget
+  pqCustomFilterDefinitionModel
+  pqCustomFilterDefinitionWizard
+  pqCustomFilterManager
+  pqCustomFilterManagerModel
+  pqCustomViewpointButtonDialog
+  pqDataInformationModel
+  pqDataInformationWidget
+  pqDialog
+  pqDisplayColorWidget
+  pqDisplayPanel
+  pqDisplayPanelInterface
+  pqDisplayPanelPropertyWidget
+  pqDisplayRepresentationWidget
+  pqDockWindowInterface
+  pqDoubleVectorPropertyWidget
+  pqFavoritesDialog
+  pqFavoritesTreeWidget
+  pqFileChooserWidget
+  pqFindDataCreateSelectionFrame
+  pqFindDataCurrentSelectionFrame
+  pqFindDataDialog
+  pqFindDataSelectionDisplayFrame
+  pqHighlightItemDelegate
+  pqImageTip
+  pqIndexSelectionWidget
+  pqInputSelectorWidget
+  pqIntMaskPropertyWidget
+  pqIntRangeWidget
+  pqIntVectorPropertyWidget
+  pqItemViewSearchWidget
+  pqItemViewSearchWidgetEventPlayer
+  pqKeyFrameEditor
+  pqKeyFrameTimeValidator
+  pqKeyFrameTypeWidget
+  pqLabel
+  pqLightsEditor
+  pqLightsInspector
+  pqLinksEditor
+  pqLinksManager
+  pqLiveInsituManager
+  pqLiveInsituVisualizationManager
+  pqLockViewSizeCustomDialog
+  pqMemoryInspectorPanel
+  pqMultiBlockInspectorWidget
+  pqMultiViewWidget
+  pqOrbitCreatorDialog
+  pqOutputPortComboBox
+  pqPipelineAnnotationFilterModel
+  pqPipelineBrowserWidget
+  pqPipelineInputComboBox
+  pqPipelineModel
+  pqPipelineModelSelectionAdaptor
+  pqPipelineTimeKeyFrameEditor
+  pqPluginDialog
+  pqPluginTreeWidgetEventPlayer
+  pqPluginTreeWidgetEventTranslator
+  pqPopOutWidget
+  pqPresetDialog
+  pqPresetGroupsManager
+  pqPresetToPixmap
+  pqPropertiesPanel
+  pqPropertyGroupWidget
+  pqPropertyWidget
+  pqPropertyWidgetDecorator
+  pqPropertyWidgetInterface
+  pqProxiesWidget
+  pqProxyEditorPropertyWidget
+  pqProxyInformationWidget
+  pqProxyPropertyWidget
+  pqProxySILModel
+  pqProxySelectionWidget
+  pqProxyWidget
+  pqProxyWidgetDialog
+  pqQueryClauseWidget
+  pqRecentFilesMenu
+  pqRemoteCommandDialog
+  pqRemoteCommandTemplateDialog
+  pqRescaleRange
+  pqSILModel
+  pqSILWidget
+  pqSMSignalAdaptors
+  pqSampleScalarAddRangeDialog
+  pqSampleScalarWidget
+  pqScalarSetModel
+  pqScalarValueListPropertyWidget
+  pqSearchBox
+  pqSelectReaderDialog
+  pqSelectionAdaptor
+  pqSelectionInputWidget
+  pqSelectionLinkDialog
+  pqSelectionManager
+  pqServerConfigurationImporter
+  pqServerConnectDialog
+  pqServerLauncher
+  pqSetBreakpointDialog
+  pqSettingsDialog
+  pqShaderReplacementsComboBox
+  pqShaderReplacementsSelectorPropertyWidget
+  pqSignalAdaptorKeyFrameType
+  pqSignalAdaptorSelectionTreeWidget
+  pqSignalAdaptorTreeWidget
+  pqSplitter
+  pqStringVectorPropertyWidget
+  pqSubsetInclusionLatticeTreeModel
+  pqSubsetInclusionLatticeWidget
+  pqTabbedMultiViewWidget
+  pqTextureComboBox
+  pqTextureSelectorPropertyWidget
+  pqTimerLogDisplay
+  pqToolBarInterface
+  pqToolTipTrapper
+  pqTransferFunctionWidget
+  pqTriggerOnIdleHelper
+  pqUndoStackBuilder
+  pqVCRController
+  pqViewContextMenuHandler
+  pqViewContextMenuManager
+  pqViewFrame
+  pqViewFrameActionsInterface
+  pqViewManager
+  pqWidgetRangeDomain)
 
-set (Module_MOC_HDRS
-  pqAboutDialog.h
-  pqActiveObjects.h
-  pqAnimatablePropertiesComboBox.h
-  pqAnimatableProxyComboBox.h
-  pqAnimationManager.h
-  pqAnimationViewWidget.h
-  pqArrayListDomain.h
-  pqArraySelectionWidget.h
-  pqArraySelectorPropertyWidget.h
-  pqArrayStatusPropertyWidget.h
-  pqFavoritesDialog.h
-  pqFavoritesTreeWidget.h
-  pqCalculatorWidget.h
-  pqCameraDialog.h
-  pqCameraKeyFrameWidget.h
-  pqChangeInputDialog.h
-  pqColorChooserButtonWithPalettes.h
-  pqCollaborationPanel.h
-  pqComboBoxDomain.h
-  pqCommandPropertyWidget.h
-  pqComparativeCueWidget.h
-  pqComparativeVisPanel.h
-  pqComponentsTestUtility.h
-  pqCompositeDataInformationTreeModel.h
-  pqCompositePropertyWidgetDecorator.h
-  pqCompositeTreePropertyWidget.h
-  pqCustomFilterDefinitionWizard.h
-  pqCustomFilterManager.h
-  pqCustomFilterManagerModel.h
-  pqCustomViewpointButtonDialog.h
-  pqDataInformationModel.h
-  pqDataInformationWidget.h
-  pqDialog.h
-  pqDisplayColorWidget.h
-  pqDisplayPanel.h
-  pqDisplayPanelPropertyWidget.h
-  pqDisplayRepresentationWidget.h
-  pqDoubleVectorPropertyWidget.h
-  pqFileChooserWidget.h
-  pqFindDataCreateSelectionFrame.h
-  pqFindDataCurrentSelectionFrame.h
-  pqFindDataDialog.h
-  pqFindDataSelectionDisplayFrame.h
-  pqHighlightItemDelegate.h
-  pqImageTip.h
-  pqIndexSelectionWidget.h
-  pqInputSelectorWidget.h
-  pqIntMaskPropertyWidget.h
-  pqIntRangeWidget.h
-  pqIntVectorPropertyWidget.h
-  pqItemViewSearchWidgetEventPlayer.h
-  pqItemViewSearchWidget.h
-  pqKeyFrameEditor.h
-  pqKeyFrameTimeValidator.h
-  pqKeyFrameTypeWidget.h
-  pqLabel.h
-  pqLightsEditor.h
-  pqLightsInspector.h
-  pqLinksEditor.h
-  pqLinksManager.h
-  pqLiveInsituManager.h
-  pqLiveInsituVisualizationManager.h
-  pqLockViewSizeCustomDialog.h
-  pqMemoryInspectorPanel.h
-  pqMultiBlockInspectorWidget.h
-  pqMultiViewWidget.h
-  pqSplitter.h
-  pqOrbitCreatorDialog.h
-  pqOutputPortComboBox.h
-  pqPipelineAnnotationFilterModel.h
-  pqPipelineBrowserWidget.h
-  pqPipelineInputComboBox.h
-  pqPipelineModel.h
-  pqPipelineModelSelectionAdaptor.h
-  pqPipelineTimeKeyFrameEditor.h
-  pqPluginDialog.h
-  pqPluginTreeWidgetEventPlayer.h
-  pqPluginTreeWidgetEventTranslator.h
-  pqPluginTreeWidget.h
-  pqPopOutWidget.h
-  pqPresetDialog.h
-  pqPresetGroupsManager.h
-  pqPresetToPixmap.h
-  pqPropertiesPanel.h
-  pqPropertyGroupWidget.h
-  pqPropertyWidgetDecorator.h
-  pqPropertyWidget.h
-  pqProxiesWidget.h
-  pqProxyEditorPropertyWidget.h
-  pqProxyInformationWidget.h
-  pqProxyPropertyWidget.h
-  pqProxySelectionWidget.h
-  pqProxySILModel.h
-  pqProxyWidgetDialog.h
-  pqProxyWidget.h
-  pqQueryClauseWidget.h
-  pqRecentFilesMenu.h
-  pqRemoteCommandDialog.h
-  pqRemoteCommandTemplateDialog.h
-  pqRescaleRange.h
-  pqSampleScalarAddRangeDialog.h
-  pqSampleScalarWidget.h
-  pqScalarSetModel.h
-  pqScalarValueListPropertyWidget.h
-  pqSearchBox.h
-  pqSelectionAdaptor.h
-  pqSelectionInputWidget.h
-  pqSelectionLinkDialog.h
-  pqSelectionManager.h
-  pqSelectReaderDialog.h
-  pqServerConfigurationImporter.h
-  pqServerConnectDialog.h
-  pqServerLauncher.h
-  pqSetBreakpointDialog.h
-  pqSettingsDialog.h
-  pqShaderReplacementsComboBox.h
-  pqShaderReplacementsSelectorPropertyWidget.h
-  pqSignalAdaptorKeyFrameType.h
-  pqSignalAdaptorSelectionTreeWidget.h
-  pqSignalAdaptorTreeWidget.h
-  pqSILModel.h
-  pqSILWidget.h
-  pqSMSignalAdaptors.h
-  pqStringVectorPropertyWidget.h
-  pqSubsetInclusionLatticeTreeModel.h
-  pqSubsetInclusionLatticeWidget.h
-  pqTabbedMultiViewWidget.h
-  pqTextureComboBox.h
-  pqTextureSelectorPropertyWidget.h
-  pqTimerLogDisplay.h
-  pqToolBarInterface.h
-  pqToolTipTrapper.h
-  pqTransferFunctionWidget.h
-  pqTriggerOnIdleHelper.h
-  pqVCRController.h
-  pqViewContextMenuHandler.h
-  pqViewContextMenuManager.h
-  pqViewFrame.h
-  pqViewManager.h
-  pqWidgetRangeDomain.h
-  pqAbstractItemSelectionModel.h
-)
+set(headers
+  pqPluginTreeWidget.h)
 
-set (Module_UI_FILES
+set(ui_files
   Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui
   Resources/UI/pqFavoritesDialog.ui
@@ -521,126 +230,79 @@ set (Module_UI_FILES
   Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqScalarValueListPropertyWidget.ui
   Resources/UI/pqSearchBox.ui
+  Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqSelectionInputWidget.ui
   Resources/UI/pqSelectionLinkDialog.ui
-  Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerConnectDialog.ui
   Resources/UI/pqServerLauncherDialog.ui
   Resources/UI/pqSetBreakpointDialog.ui
   Resources/UI/pqSettingsDialog.ui
   Resources/UI/pqTimerLogDisplay.ui
-  Resources/UI/pqViewFrame.ui
-)
+  Resources/UI/pqViewFrame.ui)
 
-if(PARAVIEW_ENABLE_PYTHON)
+set(sources)
+set(private_headers
+  pqSGExportStateWizardInternals.h)
+
+if (TARGET pqPython)
   # code for generating specialized Python scripts
   # from the GUI using trace information
-  LIST(APPEND Module_SRCS
-    pqImageOutputInfo.cxx
-    pqImageOutputInfo.h
-    pqCatalystExportStateWizard.cxx
-    pqCatalystExportStateWizard.h
-    pqCinemaTrack.cxx
-    pqCinemaTrack.h
-    pqCinemaConfiguration.cxx
-    pqExportViewSelection.cxx
+  list(APPEND classes
+    pqCatalystExportStateWizard
+    pqCinemaConfiguration
+    pqCinemaTrack
+    pqImageOutputInfo
+    pqSGExportStateWizard
+    pqSGPluginManager
+    pqSGWritersMenuManager)
+  list(APPEND sources
     pqCinemaTrackSelection.cxx
-    pqSGExportStateWizard.cxx
-    pqSGExportStateWizard.h
-    pqSGPluginManager.cxx
-    pqSGPluginManager.h
-    pqSGWritersMenuManager.cxx
-    pqSGWritersMenuManager.h
-    )
-  LIST(APPEND Module_MOC_HDRS
-    pqImageOutputInfo.h
-    pqCatalystExportStateWizard.h
-    pqCinemaTrack.h
-    pqCinemaConfiguration.h
-    pqExportViewSelection.h
+    pqExportViewSelection.cxx)
+  list(APPEND private_headers
     pqCinemaTrackSelection.h
-    pqSGExportStateWizard.h
-    pqSGPluginManager.h
-    pqSGWritersMenuManager.h
-    )
-  LIST(APPEND Module_UI_FILES
-    Resources/UI/pqImageOutputInfo.ui
-    Resources/UI/pqCinemaTrack.ui
-    Resources/UI/pqExportStateWizard.ui
+    pqExportViewSelection.h)
+
+  list(APPEND ui_files
     Resources/UI/pqCinemaConfiguration.ui
-    Resources/UI/pqExportViewSelection.ui
+    Resources/UI/pqCinemaTrack.ui
     Resources/UI/pqCinemaTrackSelection.ui
-    )
-endif()
+    Resources/UI/pqExportStateWizard.ui
+    Resources/UI/pqExportViewSelection.ui
+    Resources/UI/pqImageOutputInfo.ui)
+endif ()
 
-set (Module_RESOURCE_FILES
-  Resources/pqComponents.qrc
-)
+set(resource_files
+  Resources/pqComponents.qrc)
 
-include(ParaViewQt)
-pv_find_package_qt(qt_private_targets REQUIRED QUIET
-  QT5_COMPONENTS Widgets Network)
-pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-pv_qt_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
+vtk_module_find_package(
+  PACKAGE     Qt5
+  COMPONENTS  Network Widgets)
 
-set(${vtk-module}_EXPORT_CODE_INSTALL
-  "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
-  pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-    QT5_COMPONENTS Widgets Network)")
-set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
+source_group("Resources" FILES
+  ${ui_files}
+  ${resource_files})
 
-SOURCE_GROUP("Resources" FILES
-  ${Module_UI_FILES}
-  ${Module_RESOURCE_FILES}
-)
+set(CMAKE_AUTOMOC 1)
+set(CMAKE_AUTORCC 1)
+set(CMAKE_AUTOUIC 1)
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
 
-SOURCE_GROUP("Generated" FILES
-  ${__Module_RESOURCE_SRCS}
-  ${__Module_MOC_SRCS}
-  ${__Module_UI_SRCS}
-)
+vtk_module_add_module(ParaView::pqComponents
+  CLASSES ${classes}
+  HEADERS ${headers}
+  SOURCES ${sources}
+          ${ui_files}
+          ${resource_files}
+  PRIVATE_HEADERS ${private_headers})
+vtk_module_link(ParaView::pqComponents
+  PRIVATE
+    Qt5::Network
+    Qt5::Widgets)
 
-set(${vtk-module}_NO_HeaderTest 1)
-vtk_module_library(${vtk-module}
-  ${Module_SRCS}
-  ${__Module_RESOURCE_SRCS}
-  ${__Module_MOC_SRCS}
-  ${__Module_UI_SRCS})
-target_link_libraries(${vtk-module} LINK_PRIVATE ${qt_private_targets})
-
-#the pqSGExportStateWizard has subclasses that directly access
-#the UI file, and currently we don't have a clean way to break this hard
-#dependency, so for now we manually install this ui file.
-if(PARAVIEW_INSTALL_DEVELOPMENT_FILES AND PARAVIEW_ENABLE_PYTHON)
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ui_pqExportStateWizard.h"
-          DESTINATION "${VTK_INSTALL_INCLUDE_DIR}")
-endif()
-
-#IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-#  # Headers
-#  GLOB_INSTALL_DEVELOPMENT(
-#      ${CMAKE_CURRENT_SOURCE_DIR}
-#      ${PV_INSTALL_INCLUDE_DIR}
-#      "*.h;*.hxx;*.txx")
-#  INSTALL(
-#      FILES ${dynamicHeaders}
-#      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-#      COMPONENT Development)
-#  # QT resources
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Components/Resources/XML"
-#    "${resPath}/*.xml")
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Components/Resources/UI"
-#    "${resPath}/*.ui")
-#  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
-#  GLOB_INSTALL_DEVELOPMENT(
-#    "${CMAKE_CURRENT_SOURCE_DIR}"
-#    "${PV_INSTALL_INCLUDE_DIR}/Qt/Components/Resources/Icons"
-#    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
-#ENDIF ()
+if (PARAVIEW_ENABLE_PYTHON)
+  # The pqSGExportStateWizard has subclasses that directly access the UI file,
+  # and currently we don't have a clean way to break this hard dependency, so
+  # for now we manually install this ui file.
+  vtk_module_install_headers(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/pqComponents_autogen/include/ui_pqExportStateWizard.h")
+endif ()

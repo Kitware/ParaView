@@ -81,7 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonSyntaxHighlighter.h"
 #endif
 
@@ -374,7 +374,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     vbox->addWidget(w);
     if (python)
     {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
       PV_DEBUG_PANELS() << "Python text edit:";
       new pqPythonSyntaxHighlighter(textEdit, textEdit);
 #else
