@@ -143,10 +143,10 @@
                          name="CollateBands"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation> Sets if bands are collated in one scalar
-        array or not. Currently we collate bands into RGB, RGBA, gray alpha and
-        pallete. The default is true.
-</Documentation>
+        <Documentation> Sets if bands are collated in one scalar array
+        or not. Currently we collate bands into RGB, RGBA, gray alpha
+        and pallete. The default is true.
+        </Documentation>
       </IntVectorProperty>
 
       <Hints>
