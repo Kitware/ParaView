@@ -7497,5 +7497,3 @@ int vtknifti1_io::nifti_disp_type_list( int which )
 
     return 0;
 }
-
-

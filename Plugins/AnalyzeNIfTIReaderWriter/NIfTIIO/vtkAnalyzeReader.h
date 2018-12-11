@@ -1,7 +1,8 @@
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkNIfTIReader.h
+  Module:    vtkAnalyzeReader.h
 
   Copyright (c) Joseph Hennessey
   All rights reserved.
@@ -12,20 +13,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkNIfTIReader - read NIfTI files
+// .NAME vtkAnalyzeReader - read Analyze files
 // .SECTION Description
-// vtkNIfTIReader is a source object that reads NIfTI files.
-// It should be able to read most any NIfTI file
+// vtkAnalyzeReader is a source object that reads Analyze files.
+// It should be able to read most any Analyze file
 //
 // .SECTION See Also
-// vtkNIfTIWriter vtkAnalyzeReader vtkAnalyzeWriter
+// vtkAnalyzeWriter vtkNIfTIReader vtkNIfTIWriter
 
-#ifndef vtkNIfTIReader_h
-#define vtkNIfTIReader_h
+#ifndef vtkAnalyzeReader_h
+#define vtkAnalyzeReader_h
 
+#include "vtkAnalyzeNIfTIIOModule.h"
 #include "vtkImageReader.h"
 
-#define NIFTI_HEADER_ARRAY "vtkNIfTIReaderHeaderArray"
+#define ANALYZE_HEADER_ARRAY "vtkAnalyzeReaderHeaderArray"
 #define POINT_SPACE_ARRAY "vtkPointSpace"
 #define VOLUME_ORIGIN_DOUBLE_ARRAY "vtkVolumeOrigin"
 #define VOLUME_SPACING_DOUBLE_ARRAY "vtkVolumeSpacing"
@@ -34,11 +36,11 @@ class vtkDataArray;
 class vtkUnsignedCharArray;
 class vtkFieldData;
 
-class vtkNIfTIReader : public vtkImageReader
+class VTKANALYZENIFTIIO_EXPORT vtkAnalyzeReader : public vtkImageReader
 {
 public:
-  static vtkNIfTIReader* New();
-  vtkTypeMacro(vtkNIfTIReader, vtkImageReader);
+  static vtkAnalyzeReader* New();
+  vtkTypeMacro(vtkAnalyzeReader, vtkImageReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description: is the given file name a png file?
@@ -48,42 +50,48 @@ public:
   // Get the file extensions for this format.
   // Returns a string with a space separated list of extensions in
   // the format .extension
-  const char* GetFileExtensions() override { return ".nii .img .hdr"; }
+  const char* GetFileExtensions() override { return ".img .hdr"; }
 
   // Description:
   // Return a descriptive name for the file format that might be useful in a GUI.
-  const char* GetDescriptiveName() override { return "NIfTI"; }
+  const char* GetDescriptiveName() override { return "Analyze"; }
 
   char* GetFileName() override { return (FileName); };
   unsigned int getImageSizeInBytes() { return (imageSizeInBytes); };
 
 protected:
-  vtkNIfTIReader();
-  ~vtkNIfTIReader() override;
+  vtkAnalyzeReader();
+  ~vtkAnalyzeReader() override;
 
   void ExecuteInformation() override;
-  void ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo) override;
+  void ExecuteDataWithInformation(vtkDataObject* out, vtkInformation* outInfo) override;
 
 private:
-  vtkNIfTIReader(const vtkNIfTIReader&) = delete;
-  void operator=(const vtkNIfTIReader&) = delete;
+  vtkAnalyzeReader(const vtkAnalyzeReader&) = delete;
+  void operator=(const vtkAnalyzeReader&) = delete;
+
+  void vtkAnalyzeReaderUpdateVTKBit(vtkImageData* data, void* outPtr);
 
   unsigned int numberOfDimensions;
   unsigned int imageSizeInBytes;
-  unsigned int Type;
-  int width;
-  int height;
-  int depth;
-
+  unsigned int orientation;
   double dataTypeSize;
-  double** q;
-  double** s;
-  int sform_code;
-  int qform_code;
-  int niftiType;
+  unsigned int Type;
+  int voxelDimensions[3];
+  int diskDimensions[3];
+  int diskExtent[6];
+  double diskSpacing[3];
+  // int width;
+  // int height;
+  // int depth;
+  int binaryOnDiskWidth;
+  int binaryOnDiskHeight;
+  int binaryOnDiskDepth;
 
-  vtkUnsignedCharArray* niftiHeader;
-  unsigned char* niftiHeaderUnsignedCharArray;
-  int niftiHeaderSize;
+  vtkUnsignedCharArray* analyzeHeader;
+  unsigned char* analyzeHeaderUnsignedCharArray;
+  int analyzeHeaderSize;
+
+  bool fixFlipError;
 };
 #endif

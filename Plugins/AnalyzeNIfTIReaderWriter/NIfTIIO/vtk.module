@@ -1,0 +1,10 @@
+NAME
+  AnalyzeNIfTIIO::NIfTIIO
+LIBRARY_NAME
+  vtkAnalyzeNIfTIIO
+DEPENDS
+  VTK::IOImage
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::zlib

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkNIfTIWriter.h
+  Module:    vtkAnalyzeWriter.h
 
   Copyright (c) Joseph Hennessey
   All rights reserved.
@@ -12,31 +12,29 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkNIfTIWriter - Writes NIfTI files.
+// .NAME vtkAnalyzeWriter - Writes Analyze files.
 // .SECTION Description
-// vtkNIfTIWriter writes NIfTI files.
+// vtkAnalyzeWriter writes Analyze files.
 //
 // .SECTION See Also
-// vtkNIfTIReader vtkAnalayzeReader vtkAnalyzeWriter
+// vtkAnalyzeReader vtkNIfTIReader vtkNIfTIWriter
 
-#ifndef vtkNIfTIWriter_h
-#define vtkNIfTIWriter_h
+#ifndef vtkAnalyzeWriter_h
+#define vtkAnalyzeWriter_h
 
+#include "vtkAnalyzeNIfTIIOModule.h"
 #include "vtkImageWriter.h"
 
-#define NIFTI_HEADER_ARRAY "vtkNIfTIReaderHeaderArray"
-
-class vtkDataArray;
-class vtkFieldData;
+#define ANALYZE_HEADER_ARRAY "vtkAnalyzeReaderHeaderArray"
 
 class vtkImageData;
 class vtkUnsignedCharArray;
 
-class vtkNIfTIWriter : public vtkImageWriter
+class VTKANALYZENIFTIIO_EXPORT vtkAnalyzeWriter : public vtkImageWriter
 {
 public:
-  static vtkNIfTIWriter* New();
-  vtkTypeMacro(vtkNIfTIWriter, vtkImageWriter);
+  static vtkAnalyzeWriter* New();
+  vtkTypeMacro(vtkAnalyzeWriter, vtkImageWriter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void SetFileType(int inValue);
@@ -45,26 +43,26 @@ public:
   unsigned int getImageSizeInBytes() { return (imageSizeInBytes); };
 
 protected:
-  vtkNIfTIWriter();
-  ~vtkNIfTIWriter() override;
+  vtkAnalyzeWriter();
+  ~vtkAnalyzeWriter() override;
 
-  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wholeExtent[6]) override;
+  void WriteFile(ostream* file, vtkImageData* data, int ext[6], int wExtent[6]) override;
   void WriteFileHeader(ostream* file, vtkImageData* cache, int wholeExtent[6]) override;
 
 private:
+  vtkAnalyzeWriter(const vtkAnalyzeWriter&) = delete;
+  void operator=(const vtkAnalyzeWriter&) = delete;
+
   int FileType;
   unsigned int imageSizeInBytes;
+  unsigned int orientation;
   double dataTypeSize;
-  int iname_offset;
-  bool foundNiftiHeader;
+  int imageDataType;
   bool foundAnalayzeHeader;
-  double** q;
-  double** s;
-  int sform_code;
-  int qform_code;
-
-  vtkNIfTIWriter(const vtkNIfTIWriter&) = delete;
-  void operator=(const vtkNIfTIWriter&) = delete;
+  bool foundNiftiHeader;
+  int* savedFlipAxis;
+  int* savedInPlaceFilteredAxes;
+  bool fixFlipError;
 };
 
 #endif

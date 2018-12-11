@@ -305,5 +305,3 @@ int vtkznzlib::znzgetc(znzFile file)
 #endif
   return fgetc(file->nzfptr);
 }
-
-
