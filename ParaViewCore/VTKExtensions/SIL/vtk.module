@@ -1,0 +1,15 @@
+NAME
+  ParaView::VTKExtensionsSIL
+LIBRARY_NAME
+  vtkPVVTKExtensionsSIL
+KIT
+  ParaView::Extensions
+DEPENDS
+  VTK::CommonCore
+PRIVATE_DEPENDS
+  VTK::pugixml
+  VTK::vtksys
+TEST_DEPENDS
+  VTK::TestingCore
+TEST_LABELS
+  ParaView
