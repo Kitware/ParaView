@@ -37,10 +37,10 @@
 #ifndef vtkPythonAnnotationFilter_h
 #define vtkPythonAnnotationFilter_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include "vtkPVClientServerCorePythonModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonAnnotationFilter : public vtkTableAlgorithm
+class VTKPVCLIENTSERVERCOREPYTHON_EXPORT vtkPythonAnnotationFilter : public vtkTableAlgorithm
 {
 public:
   static vtkPythonAnnotationFilter* New();

@@ -161,7 +161,7 @@ void vtkPythonAnnotationFilter::EvaluateExpression()
   std::ostringstream stream;
   stream << "def vtkPythonAnnotationFilter_EvaluateExpression():" << endl
          << "    from paraview import annotation as pv_ann" << endl
-         << "    from paraview.vtk.vtkPVClientServerCoreCore import vtkPythonAnnotationFilter"
+         << "    from paraview.modules.vtkPVClientServerCoreCore import vtkPythonAnnotationFilter"
          << endl
          << "    me = vtkPythonAnnotationFilter('" << vtkGetReferenceAsString(this) << " ')" << endl
          << "    pv_ann.execute(me)" << endl

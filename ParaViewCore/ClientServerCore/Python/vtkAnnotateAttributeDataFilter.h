@@ -25,10 +25,10 @@
 #ifndef vtkAnnotateAttributeDataFilter_h
 #define vtkAnnotateAttributeDataFilter_h
 
-#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
+#include "vtkPVClientServerCorePythonModule.h" //needed for exports
 #include "vtkPythonAnnotationFilter.h"
 
-class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateAttributeDataFilter
+class VTKPVCLIENTSERVERCOREPYTHON_EXPORT vtkAnnotateAttributeDataFilter
   : public vtkPythonAnnotationFilter
 {
 public:

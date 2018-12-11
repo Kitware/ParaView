@@ -41,12 +41,12 @@
 #ifndef vtkPythonProgrammableFilter_h
 #define vtkPythonProgrammableFilter_h
 
-#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
+#include "vtkPVClientServerCorePythonModule.h" //needed for exports
 #include "vtkProgrammableFilter.h"
 
 class vtkPythonProgrammableFilterImplementation;
 
-class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonProgrammableFilter : public vtkProgrammableFilter
+class VTKPVCLIENTSERVERCOREPYTHON_EXPORT vtkPythonProgrammableFilter : public vtkProgrammableFilter
 {
 public:
   vtkTypeMacro(vtkPythonProgrammableFilter, vtkProgrammableFilter);

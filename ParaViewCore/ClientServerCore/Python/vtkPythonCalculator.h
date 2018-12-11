@@ -33,10 +33,10 @@
 #ifndef vtkPythonCalculator_h
 #define vtkPythonCalculator_h
 
-#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
+#include "vtkPVClientServerCorePythonModule.h" //needed for exports
 #include "vtkProgrammableFilter.h"
 
-class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPythonCalculator : public vtkProgrammableFilter
+class VTKPVCLIENTSERVERCOREPYTHON_EXPORT vtkPythonCalculator : public vtkProgrammableFilter
 {
 public:
   vtkTypeMacro(vtkPythonCalculator, vtkProgrammableFilter);

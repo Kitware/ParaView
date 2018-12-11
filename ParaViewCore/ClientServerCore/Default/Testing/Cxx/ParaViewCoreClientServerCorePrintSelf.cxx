@@ -87,11 +87,6 @@
 #endif
 #endif
 
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include "vtkPythonCalculator.h"
-#include "vtkPythonProgrammableFilter.h"
-#endif
-
 #define PRINT_SELF(classname)                                                                      \
   cout << "------------------------------------" << endl;                                          \
   cout << "Class: " << #classname << endl;                                                         \
@@ -188,11 +183,6 @@ int ParaViewCoreClientServerCorePrintSelf(int, char* [])
 #ifdef PARAVIEW_USE_ICE_T
   PRINT_SELF(vtkIceTSynchronizedRenderers);
 #endif
-#endif
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-  PRINT_SELF(vtkPythonCalculator);
-  PRINT_SELF(vtkPythonProgrammableFilter);
 #endif
 
   return 0;

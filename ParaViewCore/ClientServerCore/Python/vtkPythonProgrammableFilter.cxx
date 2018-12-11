@@ -289,7 +289,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
   {
     std::string pathscript;
     pathscript += "import sys\n";
-    std::vector<vtksys::String> paths = vtksys::SystemTools::SplitString(this->PythonPath, ';');
+    std::vector<std::string> paths = vtksys::SystemTools::SplitString(this->PythonPath, ';');
     for (unsigned int cc = 0; cc < static_cast<unsigned int>(paths.size()); cc++)
     {
       if (!paths[cc].empty())
@@ -374,7 +374,8 @@ void vtkPythonProgrammableFilter::Exec(const char* script, const char* funcname)
   std::string runscript;
 
   runscript += "from paraview import vtk\n";
-  runscript += "from paraview.vtk.vtkPVClientServerCoreCore import vtkPythonProgrammableFilter\n";
+  runscript +=
+    "from paraview.modules.vtkPVClientServerCorePython import vtkPythonProgrammableFilter\n";
   runscript += "hasnumpy = True\n";
   runscript += "try:\n";
   runscript += "  from numpy import *\n";
