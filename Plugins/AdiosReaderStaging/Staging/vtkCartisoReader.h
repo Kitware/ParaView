@@ -16,10 +16,11 @@
 #define vtkCartisoReader_h
 
 #include "vtkAlgorithm.h"
+#include "vtkPVAdiosReaderStagingModule.h"
 
 class vtkMultiProcessController;
 
-class vtkCartisoReader : public vtkAlgorithm
+class VTKPVADIOSREADERSTAGING_EXPORT vtkCartisoReader : public vtkAlgorithm
 {
 public:
   vtkTypeMacro(vtkCartisoReader, vtkAlgorithm);
