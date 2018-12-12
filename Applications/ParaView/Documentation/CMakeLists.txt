@@ -1,18 +1,18 @@
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/index.html.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/index.html"
-    @ONLY)
+  "${CMAKE_CURRENT_SOURCE_DIR}/index.html.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/index.html"
+  @ONLY)
 
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/about.html.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/about.html"
-    @ONLY)
+  "${CMAKE_CURRENT_SOURCE_DIR}/about.html.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/about.html"
+  @ONLY)
 
 # sanity check
 if (NOT application_gui_xmls)
   message(AUTHOR_WARNING "application_gui_xmls is empty."
     "It must generally point to all the gui xmls in your application")
-endif()
+endif ()
 
 # generate htmls from the server manager xmls.
 generate_htmls_from_xmls(proxy_html_outputs
