@@ -69,7 +69,6 @@ public:
   int ProcessViewRequest(vtkInformationRequestKey* request_type, vtkInformation* inInfo,
     vtkInformation* outInfo) override;
 
-  // BTX
 protected:
   vtkProgressBarSourceRepresentation();
   ~vtkProgressBarSourceRepresentation() override;
@@ -110,7 +109,6 @@ protected:
 private:
   vtkProgressBarSourceRepresentation(const vtkProgressBarSourceRepresentation&) = delete;
   void operator=(const vtkProgressBarSourceRepresentation&) = delete;
-  // ETX
 };
 
 #endif
