@@ -159,7 +159,7 @@ static bool getNetworkSubdirs(const std::string& path, std::vector<std::string>&
 
   static const int MaxTokens = 4;
 
-  std::vector<vtksys::String> pathtokens;
+  std::vector<std::string> pathtokens;
   pathtokens = vtksys::SystemTools::SplitString(path.c_str() + 1, '\\');
 
   static DWORD DisplayType[MaxTokens] = { RESOURCEDISPLAYTYPE_NETWORK, RESOURCEDISPLAYTYPE_DOMAIN,
@@ -231,7 +231,7 @@ static int vtkPVFileInformationGetType(const char* path)
     // this code doesn't give out anything with
     // "Windows Network\..." unless its a directory.
     // that may change
-    std::vector<vtksys::String> pathtokens;
+    std::vector<std::string> pathtokens;
     pathtokens = vtksys::SystemTools::SplitString(realpath.c_str(), '\\');
     if (pathtokens.size() == 1)
     {
@@ -254,7 +254,7 @@ static int vtkPVFileInformationGetType(const char* path)
   // is it the root of a shared folder?
   if (IsUncPath(realpath))
   {
-    std::vector<vtksys::String> parts =
+    std::vector<std::string> parts =
       vtksys::SystemTools::SplitString(realpath.c_str() + 2, '\\', true);
     if (parts.empty())
     {
@@ -670,7 +670,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   if (IsUncPath(lfullPath))
   {
     bool didListing = false;
-    std::vector<vtksys::String> parts =
+    std::vector<std::string> parts =
       vtksys::SystemTools::SplitString(this->FullPath + 2, '\\', true);
 
     if (parts.size() == 1)

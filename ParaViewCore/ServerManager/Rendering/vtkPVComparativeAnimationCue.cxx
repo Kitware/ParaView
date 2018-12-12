@@ -65,7 +65,7 @@ public:
       double* values = NULL;
       if (str != NULL && *str != 0)
       {
-        std::vector<vtksys::String> parts = vtksys::SystemTools::SplitString(str, ',');
+        std::vector<std::string> parts = vtksys::SystemTools::SplitString(str, ',');
         if (static_cast<unsigned int>(parts.size()) == this->NumberOfValues)
         {
           values = new double[this->NumberOfValues];
