@@ -69,7 +69,7 @@ public:
       this->UseBase64Encoding ? (std::ifstream::in | std::ifstream::binary) : std::ifstream::in);
     if (!ifs)
     {
-      cout << "Canot open file: " << file << endl;
+      cerr << "Cannot open file: " << file << endl;
       return 0;
     }
     if (this->UseBase64Encoding)
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
     int num = 0;
     if ((num = ot.ProcessFile(fname.c_str(), moduleName.c_str())) == 0)
     {
-      cout << "Problem generating header file from XML file: " << fname << endl;
+      cerr << "Problem generating header file from XML file: " << fname << endl;
       return 1;
     }
     int kk;
@@ -295,7 +295,7 @@ int main(int argc, char* argv[])
   FILE* fp = fopen(output.c_str(), "w");
   if (!fp)
   {
-    cout << "Cannot open output file: " << output << endl;
+    cerr << "Cannot open output file: " << output << endl;
     return 1;
   }
   fprintf(fp, "%s", ot.Stream.str().c_str());
