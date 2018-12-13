@@ -255,8 +255,6 @@ int main(int argc, char* argv[])
       return 1;
     }
 
-    cout << "-- Generate module: " << moduleName << endl;
-
     int num = 0;
     if ((num = ot.ProcessFile(fname.c_str(), moduleName.c_str())) == 0)
     {
