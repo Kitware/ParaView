@@ -66,7 +66,7 @@ unsigned int vtkTimestepsAnimationPlayer::GetNumberOfTimeSteps()
 }
 
 //-----------------------------------------------------------------------------
-void vtkTimestepsAnimationPlayer::StartLoop(double, double, double* playbackWindow)
+void vtkTimestepsAnimationPlayer::StartLoop(double, double, double, double* playbackWindow)
 {
   this->PlaybackWindow[0] = playbackWindow[0];
   this->PlaybackWindow[1] = playbackWindow[1];

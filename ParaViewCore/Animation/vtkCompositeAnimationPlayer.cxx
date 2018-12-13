@@ -57,12 +57,12 @@ vtkAnimationPlayer* vtkCompositeAnimationPlayer::GetActivePlayer()
 
 //----------------------------------------------------------------------------
 void vtkCompositeAnimationPlayer::StartLoop(
-  double starttime, double endtime, double* playbackWindow)
+  double starttime, double endtime, double curtime, double* playbackWindow)
 {
   vtkAnimationPlayer* player = this->GetActivePlayer();
   if (player)
   {
-    player->StartLoop(starttime, endtime, playbackWindow);
+    player->StartLoop(starttime, endtime, curtime, playbackWindow);
   }
 }
 

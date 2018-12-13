@@ -36,11 +36,11 @@ vtkRealtimeAnimationPlayer::~vtkRealtimeAnimationPlayer()
 }
 
 //----------------------------------------------------------------------------
-void vtkRealtimeAnimationPlayer::StartLoop(double start, double end, double* playbackWindow)
+void vtkRealtimeAnimationPlayer::StartLoop(
+  double start, double end, double curtime, double* playbackWindow)
 {
   this->StartTime = start;
   this->Factor = (end - start) / this->Duration;
-  double curtime = playbackWindow[0];
 
   // set a time shift to resume an interrupted animation (fix to bug #0008280)
   if (start < curtime && curtime < end)
