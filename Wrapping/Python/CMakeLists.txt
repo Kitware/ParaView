@@ -1,49 +1,62 @@
-#==========================================================================
-#
-#     Program: ParaView
-#
-#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
-#     All rights reserved.
-#
-#     ParaView is a free software; you can redistribute it and/or modify it
-#     under the terms of the ParaView license version 1.2.
-#
-#     See License_v1.2.txt for the full ParaView license.
-#     A copy of this license can be obtained by contacting
-#     Kitware Inc.
-#     28 Corporate Drive
-#     Clifton Park, NY 12065
-#     USA
-#
-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-#==========================================================================
+set(python_files
+  paraview/annotation.py
+  paraview/_backwardscompatibilityhelper.py
+  paraview/benchmark/basic.py
+  paraview/benchmark/__init__.py
+  paraview/benchmark/logbase.py
+  paraview/benchmark/logparser.py
+  paraview/benchmark/manyspheres.py
+  paraview/benchmark/waveletcontour.py
+  paraview/benchmark/waveletvolume.py
+  paraview/calculator.py
+  paraview/collaboration.py
+  paraview/_colorMaps.py
+  paraview/coprocessing.py
+  paraview/cpexport.py
+  paraview/cpstate.py
+  paraview/demos/demo1.py
+  paraview/demos/show_grid_as_background.py
+  paraview/detail/__init__.py
+  paraview/detail/pythonalgorithm.py
+  paraview/extract_selection.py
+  paraview/__init__.py
+  paraview/lookuptable.py
+  paraview/numeric.py
+  paraview/numpy_support.py
+  paraview/pv-vtk-all.py
+  paraview/python_selector.py
+  paraview/python_view.py
+  paraview/servermanager.py
+  paraview/simple.py
+  paraview/smstate.py
+  paraview/smtesting.py
+  paraview/smtrace.py
+  paraview/spatiotemporalparallelism.py
+  paraview/util/__init__.py
+  paraview/util/vtkAlgorithm.py
+  paraview/variant.py
+  paraview/vtkConstants.py
+  paraview/vtk.py)
 
-# This file manages the building/installing of ParaView's python modules.
-# Wrapping of classes is taken care of by VTK itself.
-if (NOT PARAVIEW_ENABLE_PYTHON)
-  return()
-endif()
-
-#------------------------------------------------------------------------------
-# Build paraview package.
-# This will also all install rules to install the `paraview` package.
-vtk_python_package(pvpython_pyc paraview DEPENDS ${_vtkpy_modules})
-
-add_custom_target(paraview_python_package DEPENDS pvpython_pyc)
-
-if(WIN32)
-  set(_module_extension "pyd")
-else()
-  set(_module_extension "so")
-endif()
+set(python_copied_modules)
+foreach (python_file IN LISTS python_files)
+  set(output_python_file
+    "${CMAKE_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file}")
+  add_custom_command(
+    OUTPUT  "${output_python_file}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/${python_file}"
+            "${output_python_file}"
+    COMMENT "Copying ${python_file} to the binary directory")
+  get_filename_component(python_file_directory "${python_file}" DIRECTORY)
+  install(
+    FILES       "${python_file}"
+    DESTINATION "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/${python_file_directory}"
+    COMPONENT   "python")
+  list(APPEND python_copied_modules
+    "${output_python_file}")
+endforeach ()
+add_custom_target(paraview_python_copy ALL
+  DEPENDS
+    ${python_copied_modules})
