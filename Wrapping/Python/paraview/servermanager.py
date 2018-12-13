@@ -2647,7 +2647,7 @@ def _createClass(groupName, proxyName, apxm=None):
     pxm = ProxyManager() if not apxm else apxm
     proto = pxm.GetPrototypeProxy(groupName, proxyName)
     if not proto:
-       paraview.print_error("Error while loading %s/%s %s"%(groupName, i['group'], proxyName))
+       paraview.print_error("Error while loading %s %s"%(groupName, proxyName))
        return None
     pname = proxyName
     if paraview.compatibility.GetVersion() >= 3.5 and proto.GetXMLLabel():
