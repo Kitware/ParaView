@@ -130,7 +130,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetTitleFontFile"
                             name="ChartTitleFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the chart title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTitleFontSize"
@@ -382,7 +383,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetLeftAxisTitleFontFile"
                             name="LeftAxisTitleFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetLeftAxisTitleFontSize"
@@ -533,7 +535,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetLeftAxisLabelFontFile"
                             name="LeftAxisLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetLeftAxisLabelFontSize"
@@ -663,7 +666,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetBottomAxisTitleFontFile"
                             name="BottomAxisTitleFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetBottomAxisTitleFontSize"
@@ -814,7 +818,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetBottomAxisLabelFontFile"
                             name="BottomAxisLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetBottomAxisLabelFontSize"
@@ -955,7 +960,7 @@
         <Documentation>Set the axis title font familyname.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetRightAxisTitleFontFile"
-                            default_values="Arial"
+                            default_values=""
                             name="RightAxisTitleFontFile"
                             number_of_elements="1">
         <Documentation>Set the axis title font file.</Documentation>
@@ -1112,7 +1117,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetRightAxisLabelFontFile"
                             name="RightAxisLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetRightAxisLabelFontSize"
@@ -1243,7 +1249,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetTopAxisTitleFontFile"
                             name="TopAxisTitleFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTopAxisTitleFontSize"
@@ -1398,7 +1405,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetTopAxisLabelFontFile"
                             name="TopAxisLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the axis title font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetTopAxisLabelFontSize"
@@ -3157,7 +3165,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetActivePlotAxisLabelFontFile"
                             name="ActivePlotAxisLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetActivePlotAxisLabelFontSize"
@@ -3290,7 +3299,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetScatterPlotAxisLabelFontFile"
                             name="ScatterPlotAxisLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetScatterPlotAxisLabelFontSize"
@@ -3423,7 +3433,8 @@
       </StringVectorProperty>
       <StringVectorProperty command="SetHistogramAxisLabelFontFile"
                             name="HistogramAxisLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Documentation>Set the font file.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty command="SetHistogramAxisLabelFontSize"
@@ -5887,7 +5898,8 @@
       </IntVectorProperty>
       <StringVectorProperty command="SetPointLabelFontFile"
                             name="PointLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
       </StringVectorProperty>
       <IntVectorProperty command="SetMaximumNumberOfLabels"
                          default_values="100"
@@ -6028,7 +6040,8 @@
       </IntVectorProperty>
       <StringVectorProperty command="SetCellLabelFontFile"
                             name="CellLabelFontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
       </StringVectorProperty>
       <IntVectorProperty command="SetCellLabelBold"
                          default_values="0"
