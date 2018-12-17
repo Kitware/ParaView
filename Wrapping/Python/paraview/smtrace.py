@@ -902,6 +902,14 @@ class CleanupAccessor(BookkeepingItem):
         import gc
         gc.collect()
 
+class BlockTraceItems(NestableTraceItem):
+    """Item to block further creation of trace items, even
+    those that are `NestableTraceItem`. Simply create this and
+    no trace items will be created by `_create_trace_item_internal`
+    until this instance is cleaned up.
+    """
+    pass
+
 class PropertiesModified(NestableTraceItem):
     """Traces properties modified on a specific proxy."""
     def __init__(self, proxy, comment=None):
@@ -1488,7 +1496,11 @@ def _create_trace_item_internal(key, args=None, kwargs=None):
         args = args if args else []
         kwargs = kwargs if kwargs else {}
         traceitemtype = g[key]
-        if len(__ActiveTraceItems) == 0 or issubclass(traceitemtype, NestableTraceItem):
+        if len(__ActiveTraceItems) == 0 or \
+                issubclass(traceitemtype, NestableTraceItem):
+            if len(__ActiveTraceItems) > 0 and \
+                    isinstance(__ActiveTraceItems[-1](), BlockTraceItems):
+                raise Untraceable("Not tracing since `BlockTraceItems` is active.")
             instance = traceitemtype(*args, **kwargs)
             if not issubclass(traceitemtype, BookkeepingItem):
                 __ActiveTraceItems.append(weakref.ref(instance))

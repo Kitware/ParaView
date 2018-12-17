@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyListDomain.h"
+#include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 
@@ -187,11 +188,14 @@ void pqProxySelectionWidget::currentIndexChanged(int idx)
 //-----------------------------------------------------------------------------
 void pqProxySelectionWidget::apply()
 {
-  if (this->Internal->ProxyWidget)
-  {
-    this->Internal->ProxyWidget->apply();
-  }
   this->Superclass::apply();
+  if (auto nestedWidget = this->Internal->ProxyWidget)
+  {
+    // we need to block tracing since the "nested proxy" will indeed get traced
+    // by the parent proxy. See #18127.
+    SM_SCOPED_TRACE(BlockTraceItems);
+    nestedWidget->apply();
+  }
 }
 
 //-----------------------------------------------------------------------------
