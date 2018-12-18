@@ -353,7 +353,8 @@
       <StringVectorProperty command="SetFontFile"
                             label="Name"
                             name="FontFile"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            default_values="">
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
