@@ -627,6 +627,12 @@ public:
   QList<QPair<unsigned int, QVariant> > BlockColors;
   QList<QPair<unsigned int, QVariant> > BlockOpacities;
 
+  // These are set when this->Representation is setup to match
+  // the capabilities available on the representation.
+  bool UserCheckable;
+  bool HasColors;
+  bool HasOpacities;
+
   pqPropertyLinks Links;
   pqTimer ColoringTimer;
   pqTimer ResetTimer;
@@ -635,7 +641,9 @@ public:
     : CDTModel(new pqCompositeDataInformationTreeModel(self))
     , ProxyModel(new MultiBlockInspectorModel(self))
     , SelectionModel(new MultiBlockInspectorSelectionModel(this->ProxyModel, this->CDTModel, self))
-
+    , UserCheckable(false)
+    , HasColors(false)
+    , HasOpacities(false)
   {
     this->Ui.setupUi(self);
     this->Ui.treeView->header()->setDefaultSectionSize(this->ProxyModel->iconSize() + 4);
@@ -695,18 +703,17 @@ public:
 
     bool prev = this->SelectionModel->blockSelectionPropagation(true);
     pqOutputPort* port = this->OutputPort;
-    pqRepresentation* repr = this->Representation;
     this->CDTModel->clearColumns();
-    if (repr)
+    this->CDTModel->setUserCheckable(this->UserCheckable);
+    if (this->HasColors)
     {
-      this->CDTModel->setUserCheckable(true);
-      this->CDTModel->setDefaultCheckState(true);
+      Q_ASSERT(this->Representation != nullptr);
       this->ProxyModel->setColorColumn(this->CDTModel->addColumn("color"));
-      this->ProxyModel->setOpacityColumn(this->CDTModel->addColumn("opacity"));
     }
-    else
+    if (this->HasOpacities)
     {
-      this->CDTModel->setUserCheckable(false);
+      Q_ASSERT(this->Representation != nullptr);
+      this->ProxyModel->setOpacityColumn(this->CDTModel->addColumn("opacity"));
     }
     this->updateRootLabel();
     bool is_composite =
@@ -751,9 +758,21 @@ public:
     if (this->Representation)
     {
       // restore check-state, property state, if possible.
-      this->CDTModel->setCheckStates(this->BlockVisibilities);
-      this->CDTModel->setColumnStates("color", this->BlockColors);
-      this->CDTModel->setColumnStates("opacity", this->BlockOpacities);
+      if (this->UserCheckable)
+      {
+        Q_ASSERT(this->CDTModel->userCheckable());
+        this->CDTModel->setCheckStates(this->BlockVisibilities);
+      }
+      if (this->HasColors)
+      {
+        Q_ASSERT(this->CDTModel->columnIndex("color") != -1);
+        this->CDTModel->setColumnStates("color", this->BlockColors);
+      }
+      if (this->HasOpacities)
+      {
+        Q_ASSERT(this->CDTModel->columnIndex("opacity") != -1);
+        this->CDTModel->setColumnStates("opacity", this->BlockOpacities);
+      }
     }
   }
 };
@@ -935,6 +954,7 @@ void pqMultiBlockInspectorWidget::setRepresentation(pqDataRepresentation* repr)
     }
     internals.Links.clear();
     internals.clearCache();
+    internals.UserCheckable = internals.HasColors = internals.HasOpacities = false;
     internals.Representation = repr;
     this->updateScalarColoring();
     if (repr)
@@ -946,18 +966,41 @@ void pqMultiBlockInspectorWidget::setRepresentation(pqDataRepresentation* repr)
       vtkSMProxy* reprProxy = repr->getProxy();
       if (vtkSMProperty* prop = reprProxy->GetProperty("BlockColor"))
       {
+        internals.HasColors = true;
         internals.Links.addPropertyLink<CConnectionType>(
           this, "blockColors", SIGNAL(blockColorsChanged()), reprProxy, prop);
       }
       if (vtkSMProperty* prop = reprProxy->GetProperty("BlockOpacity"))
       {
+        internals.HasOpacities = true;
         internals.Links.addPropertyLink<CConnectionType>(
           this, "blockOpacities", SIGNAL(blockOpacitiesChanged()), reprProxy, prop);
       }
       if (vtkSMProperty* prop = reprProxy->GetProperty("BlockVisibility"))
       {
+        internals.UserCheckable = true;
+        if (internals.CDTModel->defaultCheckState() == false)
+        {
+          internals.CDTModel->setDefaultCheckState(true);
+          // init check states to ensure the `setBlockVisibilities()` gets
+          // called appropriately when the link is added.
+          internals.CDTModel->setCheckStates(QList<QPair<unsigned int, bool> >());
+        }
         internals.Links.addPropertyLink(
           this, "blockVisibilities", SIGNAL(blockVisibilitiesChanged()), reprProxy, prop);
+      }
+      else if (vtkSMProperty* prop2 = reprProxy->GetProperty("CompositeDataSetIndex"))
+      {
+        internals.UserCheckable = true;
+        if (internals.CDTModel->defaultCheckState() == true)
+        {
+          internals.CDTModel->setDefaultCheckState(false);
+          // int check states to ensure the `setVisibleBlocks()` gets
+          // called appropriately when the link is added.
+          internals.CDTModel->setChecked(QList<unsigned int>());
+        }
+        internals.Links.addPropertyLink(
+          this, "visibleBlocks", SIGNAL(blockVisibilitiesChanged()), reprProxy, prop2);
       }
     }
     this->resetEventually();
@@ -1043,6 +1086,35 @@ void pqMultiBlockInspectorWidget::setBlockVisibilities(const QList<QVariant>& bv
   }
 
   internals.CDTModel->setCheckStates(states);
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqMultiBlockInspectorWidget::visibleBlocks() const
+{
+  QList<QVariant> retval;
+  pqInternals& internals = (*this->Internals);
+  auto checkedNodes = internals.CDTModel->checkedNodes();
+  for (const auto& val : checkedNodes)
+  {
+    retval.push_back(val);
+  }
+  return retval;
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiBlockInspectorWidget::setVisibleBlocks(const QList<QVariant>& vbs)
+{
+  QSignalBlocker b(this);
+
+  QList<unsigned int> indices;
+  for (const auto& vval : vbs)
+  {
+    indices.push_back(vval.value<unsigned int>());
+  }
+
+  pqInternals& internals = (*this->Internals);
+  internals.CDTModel->setChecked(indices);
+  internals.BlockVisibilities = internals.CDTModel->checkStates();
 }
 
 //-----------------------------------------------------------------------------
