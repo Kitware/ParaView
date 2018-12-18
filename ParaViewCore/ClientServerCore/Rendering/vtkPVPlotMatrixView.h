@@ -111,6 +111,7 @@ public:
   void SetTitleFontSize(int pointSize);
   void SetTitleBold(bool bold);
   void SetTitleItalic(bool italic);
+  void SetTitleFontFile(const char* file);
   const char* GetTitleFontFamily();
   int GetTitleFontSize();
   int GetTitleFontBold();
@@ -246,6 +247,8 @@ public:
   void SetAxisLabelFont(int plotType, const char* family, int pointSize, bool bold, bool italic);
   void SetAxisLabelFontFamily(int plotType, const char* family);
   GENERATE_PLOT_TYPE_DECLARATION(AxisLabelFontFamily, const char*);
+  void SetAxisLabelFontFile(int plotType, const char* file);
+  GENERATE_PLOT_TYPE_DECLARATION(AxisLabelFontFile, const char*);
   void SetAxisLabelFontSize(int plotType, int pointSize);
   GENERATE_PLOT_TYPE_DECLARATION(AxisLabelFontSize, int);
   void SetAxisLabelBold(int plotType, bool bold);

@@ -93,6 +93,7 @@ GENERATE_PLOT_TYPE_DEFINITION3(AxisColor, double, double, double);
 GENERATE_PLOT_TYPE_DEFINITION3(GridColor, double, double, double);
 GENERATE_PLOT_TYPE_DEFINITION(AxisLabelVisibility, bool);
 GENERATE_PLOT_TYPE_DEFINITION(AxisLabelFontFamily, const char*);
+GENERATE_PLOT_TYPE_DEFINITION(AxisLabelFontFile, const char*);
 GENERATE_PLOT_TYPE_DEFINITION(AxisLabelFontSize, int);
 GENERATE_PLOT_TYPE_DEFINITION(AxisLabelBold, bool);
 GENERATE_PLOT_TYPE_DEFINITION(AxisLabelItalic, bool);
@@ -240,6 +241,16 @@ void vtkPVPlotMatrixView::SetTitleFontSize(int pointSize)
   {
     vtkTextProperty* prop = this->PlotMatrix->GetTitleProperties();
     prop->SetFontSize(pointSize);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetTitleFontFile(const char* file)
+{
+  if (this->PlotMatrix)
+  {
+    vtkTextProperty* prop = this->PlotMatrix->GetTitleProperties();
+    prop->SetFontFile(file);
   }
 }
 
@@ -440,6 +451,17 @@ void vtkPVPlotMatrixView::SetAxisLabelFontFamily(int plotType, const char* famil
   {
     vtkTextProperty* prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
     prop->SetFontFamilyAsString(family);
+    this->PlotMatrix->UpdateChartSettings(plotType);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetAxisLabelFontFile(int plotType, const char* file)
+{
+  if (this->PlotMatrix)
+  {
+    vtkTextProperty* prop = this->PlotMatrix->GetAxisLabelProperties(plotType);
+    prop->SetFontFile(file);
     this->PlotMatrix->UpdateChartSettings(plotType);
   }
 }
