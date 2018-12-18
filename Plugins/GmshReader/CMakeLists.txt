@@ -1,29 +1,34 @@
-if (NOT ParaView_BINARY_DIR)
-   cmake_minimum_required(VERSION 3.3)
-   find_package(ParaView REQUIRED)
-   include(${PARAVIEW_USE_FILE})
-endif()
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Reader/vtk.module"
+  REQUEST_MODULES   GmshReader::vtkGmshReader
+  PROVIDES_MODULES  gmshreader_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(Gmsh 4.0.0 REQUIRED)
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-include_directories(
-  ${VTK_INCLUDE_DIRS}
-  ${Gmsh_INCLUDE_DIRS}
-  )
+list(INSERT CMAKE_MODULE_PATH 0
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-add_paraview_plugin(
-  GmshReader "1.0"
-  DESCRIPTION "Reader for visualization of high-order polynomial solutions under the Gmsh format"
-  SERVER_MANAGER_XML
-    GmshReaderServerManager.xml
-  SERVER_MANAGER_SOURCES
-    vtkGmshMetaReader.cxx
-    vtkGmshReader.cxx
-  )
+vtk_module_build(
+  MODULES             ${gmshreader_modules}
+  PACKAGE             GmshReader
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-target_link_libraries(GmshReader LINK_PRIVATE ${Gmsh_LIBRARIES})
+paraview_add_plugin(GmshReader
+  VERSION "1.0"
+  MODULES GmshReader::vtkGmshReader)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
-endif()
+endif ()

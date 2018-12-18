@@ -1,0 +1,9 @@
+NAME
+  GmshReader
+DESCRIPTION
+  Reader for visualization of high-order polynomial solutions under the Gmsh format
+REQUIRES_MODULES
+  ParaView::Common
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::vtksys
