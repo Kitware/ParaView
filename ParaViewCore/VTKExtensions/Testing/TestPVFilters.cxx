@@ -36,7 +36,7 @@
 
 int TestPVFilters(int argc, char* argv[])
 {
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/blow.vtk");
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/blow.vtk");
 
   vtkUnstructuredGridReader* reader = vtkUnstructuredGridReader::New();
   reader->SetFileName(fname);

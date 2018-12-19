@@ -25,7 +25,7 @@
 
 int TestContinuousClose3D(int argc, char* argv[])
 {
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/headsq/quarter");
+  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/headsq/quarter");
 
   // Image pipeline
   vtkImageReader* reader = vtkImageReader::New();

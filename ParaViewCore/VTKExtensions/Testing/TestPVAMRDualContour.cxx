@@ -35,7 +35,7 @@ int TestPVAMRDualContour(int argc, char* argv[])
   //      "/media/shared/Data/ParaViewData/Data/SPCTH/Dave_Karelitz_Small/spcth.0";
 
   const char* fname =
-    vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/Dave_Karelitz_Small/spcth.0");
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/Dave_Karelitz_Small/spcth.0");
 
   vtkSpyPlotReaderRefPtr reader = vtkSpyPlotReaderRefPtr::New();
   reader->SetFileName(fname);
