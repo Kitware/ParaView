@@ -121,8 +121,8 @@ def wrap(inFileName, outFileName, exportSymbol, exportHeader, classNamePrefixes,
 
     outFile = open(outFileName, 'w')
     outFile.write('''
-#ifndef __%s_h
-#define __%s_h
+#ifndef %s_h
+#define %s_h
 
 #include <QObject>
 #include "PythonQt.h"
