@@ -73,6 +73,9 @@ class PQCOMPONENTS_EXPORT pqMultiBlockInspectorWidget : public QWidget
   Q_PROPERTY(QList<QVariant> blockOpacities READ blockOpacities WRITE setBlockOpacities NOTIFY
       blockOpacitiesChanged);
 
+  Q_PROPERTY(QList<QVariant> visibleBlocks READ visibleBlocks WRITE setVisibleBlocks NOTIFY
+      blockOpacitiesChanged);
+
 public:
   pqMultiBlockInspectorWidget(
     QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags(), bool autotracking = true);
@@ -94,6 +97,15 @@ public:
    */
   QList<QVariant> blockVisibilities() const;
   void setBlockVisibilities(const QList<QVariant>& bvs);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the visible blocks. Unlike blockVisibilities, this is compact list
+   * of visible blocks given the current hierarchy.
+   */
+  QList<QVariant> visibleBlocks() const;
+  void setVisibleBlocks(const QList<QVariant>& vbs);
   //@}
 
   //@{
