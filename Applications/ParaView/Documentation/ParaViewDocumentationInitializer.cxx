@@ -1,10 +1,9 @@
 #include "ParaViewDocumentationInitializer.h"
 
-#include "vtkPVConfig.h"
 #include <QObject>
 #include <QtPlugin>
 
-void PARAVIEW_DOCUMENTATION_INIT()
+void paraview_documentation_initialize()
 {
   Q_INIT_RESOURCE(paraview_documentation);
 }

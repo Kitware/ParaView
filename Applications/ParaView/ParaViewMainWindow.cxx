@@ -120,7 +120,7 @@ ParaViewMainWindow::ParaViewMainWindow()
 
 #ifdef PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
   // init the ParaView embedded documentation.
-  PARAVIEW_DOCUMENTATION_INIT();
+  paraview_documentation_initialize();
 #endif
 
   this->Internals = new pqInternals();

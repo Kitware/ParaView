@@ -1,7 +1,13 @@
-find_package(Qt5 REQUIRED QUIET COMPONENTS Widgets)
+cmake_dependent_option(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
+  "Build the ParaView help menu documentation for ParaView and its plugins" ON
+  "PARAVIEW_BUILD_QT_GUI" ON)
+mark_as_advanced(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 
-# TODO: Documentation
-if (FALSE AND PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+set(xmls
+  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewSources.xml")
+
+if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
   #------------------------------------------------------------------------------
   # Build Online-Help (aka Embedded Help) for the ParaView application.
   # This is done after the above piece of code that sets the application_gui_xmls
@@ -18,9 +24,6 @@ set(paraview_title "")
 
 set(CMAKE_AUTOMOC 1)
 set(CMAKE_AUTOUIC 1)
-set(xmls
-  ParaViewFilters.xml
-  ParaViewSources.xml)
 
 set(sources
   ParaViewMainWindow.cxx
@@ -50,17 +53,21 @@ paraview_client_add(
   APPLICATION_XMLS  ${xmls}
   FORWARD_EXECUTABLE "${paraview_forward_executable}")
 
+find_package(Qt5 REQUIRED QUIET COMPONENTS Widgets)
+
 target_link_libraries(paraview
   PRIVATE
     ParaView::ServerManagerDefault
     Qt5::Core
     Qt5::Widgets)
 
-# TODO: Documentation
-if (FALSE AND PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
+  target_compile_definitions(paraview
+    PRIVATE
+      PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
   target_link_libraries(paraview
     PRIVATE
-      ParaViewDocumentation)
+      vtkParaViewDocumentation)
 endif ()
 
 if (PARAVIEW_ENABLE_PYTHON)

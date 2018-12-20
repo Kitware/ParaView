@@ -90,6 +90,7 @@ list(APPEND CMAKE_MODULE_PATH
   "${paraview_cmake_dir}")
 include(ParaViewServerManager)
 include(ParaViewTesting)
+include(ParaViewClient)
 include(ParaViewPlugin)
 include(vtkModuleWrapClientServer)
 include(CTest)
@@ -652,7 +653,8 @@ vtk_module_wrap_client_server(
 paraview_server_manager_process(
   MODULES   ${paraview_modules}
             ${vtk_modules}
-  TARGET    paraview_server_manager)
+  TARGET    paraview_server_manager
+  XML_FILES paraview_server_manager_files)
 
 if (PARAVIEW_ENABLE_PYTHON)
   if (PARAVIEW_USE_EXTERNAL_VTK)
@@ -761,13 +763,6 @@ if (BUILD_DOCUMENTATION)
   add_subdirectory(Utilities/Sphinx)
   add_subdirectory(Documentation)
 endif()
-
-# This option controls the behavior of the build_help_project function.  If it is
-# on then the .qch file will be generated, if not then the function does nothing.
-cmake_dependent_option(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
-  "Build the ParaView help menu documentation for ParaView and its plugins" ON
-  "PARAVIEW_BUILD_QT_GUI" ON)
-mark_as_advanced(PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 
 #------------------------------------------------------------------------------
 # Test to check install tree

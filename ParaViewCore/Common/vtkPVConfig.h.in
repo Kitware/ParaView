@@ -58,6 +58,4 @@
 // and double to string
 #define DEFAULT_DOUBLE_PRECISION_VALUE 16
 
-#cmakedefine PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION
-
 #endif
