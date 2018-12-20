@@ -8385,5 +8385,18 @@ series.
         <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
     </SourceProxy>
+
+    <SourceProxy name="SEPReader" class="vtkSEPReader" label="SEP Reader">
+      <Documentation
+        short_help="Stanford Exploration Project files reader."
+        long_help="This reader takes a .H file that points to a .H@ file and contains all the information to interpret the raw data in the .H@ file.">
+      </Documentation>
+       <Hints>
+          <ReaderFactory extensions="H" file_description="SEP file (Plugin)"/>
+       </Hints>
+       <StringVectorProperty name="FileName" command="SetFileName" animateable="0" number_of_elements="1">
+           <FileListDomain name="files"/>
+       </StringVectorProperty>
+    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
