@@ -56,6 +56,8 @@
 #include "cdi.h"
 #include "vtk_netcdf.h"
 
+#include <sstream>
+
 using namespace std;
 
 #define VTK_CREATE(type, name) vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
