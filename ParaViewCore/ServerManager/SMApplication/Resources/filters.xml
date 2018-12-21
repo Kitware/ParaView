@@ -12309,23 +12309,6 @@ Every Nth Point.
         <Documentation>The value of this property specifies the array component
         from which the histogram should be computed.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetCenterBinsAroundMinAndMax"
-                         default_values="0"
-                         name="CenterBinsAroundMinAndMax"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
-        <BooleanDomain name="bool" />
-        <Documentation>When set to true, first and last bin will be centered
-          around the minimum and the maximum values of the data.
-          By default, set to false.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="UseCustomBinRanges"
-                                   value="0" />
-          <!-- show this widget when UseCustomBinRanges==0 -->
-        </Hints>
-      </IntVectorProperty>
       <IntVectorProperty command="SetCalculateAverages"
                          default_values="0"
                          name="CalculateAverages"
@@ -12346,6 +12329,21 @@ Every Nth Point.
         of using the full range for the selected array. By default, set to
         false.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetCenterBinsAroundMinAndMax"
+                         default_values="0"
+                         name="CenterBinsAroundMinAndMax"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>When set to true, first and last bin will be centered
+          around the minimum and the maximum values of the data.
+          By default, set to false.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomBinRanges" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </IntVectorProperty>
       <DoubleVectorProperty command="SetCustomBinRanges"
                             default_values="0.0 100.0"
                             name="CustomBinRanges"
@@ -12361,6 +12359,11 @@ Every Nth Point.
                       name="SelectInputArray" />
           </RequiredProperties>
         </ArrayRangeDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="ShowWidgetDecorator">
+            <Property name="UseCustomBinRanges" function="boolean" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </DoubleVectorProperty>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
