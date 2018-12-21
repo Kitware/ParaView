@@ -53,6 +53,11 @@ public:
   void setSaveDialogDefaultDirectory(const QString& dir);
   void setPythonManager(pqPythonManager* manager);
 
+  /*
+   * Scroll the editor to the bottom of the scroll area
+   */
+  void scrollToBottom();
+
 public slots:
 
   void open(const QString& filename);

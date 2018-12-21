@@ -174,6 +174,13 @@ void pqTraceReaction::editTrace(const QString& trace, bool incremental)
   Q_ASSERT(this->Editor);
   this->Editor->setText(trace);
   this->Editor->show();
+
+  // Scroll to bottom of the editor when addding content in an incremental trace
+  if (!new_editor && incremental)
+  {
+    this->Editor->scrollToBottom();
+  }
+
   if (new_editor ||
     incremental == false) // don't raise the window if we are just updating the trace.
   {

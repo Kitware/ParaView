@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QStatusBar>
 #include <QTextEdit>
 #include <QTextStream>
@@ -379,4 +380,10 @@ void pqPythonScriptEditor::setCurrentFile(const QString& fileName)
 QString pqPythonScriptEditor::strippedName(const QString& fullFileName)
 {
   return QFileInfo(fullFileName).fileName();
+}
+
+//-----------------------------------------------------------------------------
+void pqPythonScriptEditor::scrollToBottom()
+{
+  this->TextEdit->verticalScrollBar()->setValue(this->TextEdit->verticalScrollBar()->maximum());
 }
