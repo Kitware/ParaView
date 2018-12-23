@@ -622,6 +622,7 @@ public:
   QPointer<pqView> View;
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqDataRepresentation> Representation;
+  void* RepresentationVoidPtr; // used to check if the ptr changed.
 
   QList<QPair<unsigned int, bool> > BlockVisibilities;
   QList<QPair<unsigned int, QVariant> > BlockColors;
@@ -641,6 +642,7 @@ public:
     : CDTModel(new pqCompositeDataInformationTreeModel(self))
     , ProxyModel(new MultiBlockInspectorModel(self))
     , SelectionModel(new MultiBlockInspectorSelectionModel(this->ProxyModel, this->CDTModel, self))
+    , RepresentationVoidPtr(nullptr)
     , UserCheckable(false)
     , HasColors(false)
     , HasOpacities(false)
@@ -945,7 +947,7 @@ void pqMultiBlockInspectorWidget::setOutputPortInternal(pqOutputPort* port)
 void pqMultiBlockInspectorWidget::setRepresentation(pqDataRepresentation* repr)
 {
   pqInternals& internals = (*this->Internals);
-  if (internals.Representation != repr)
+  if (internals.RepresentationVoidPtr != repr)
   {
     if (internals.Representation)
     {
@@ -956,6 +958,7 @@ void pqMultiBlockInspectorWidget::setRepresentation(pqDataRepresentation* repr)
     internals.clearCache();
     internals.UserCheckable = internals.HasColors = internals.HasOpacities = false;
     internals.Representation = repr;
+    internals.RepresentationVoidPtr = repr;
     this->updateScalarColoring();
     if (repr)
     {
