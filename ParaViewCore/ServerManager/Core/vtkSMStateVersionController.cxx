@@ -624,6 +624,32 @@ struct Process_5_5_to_5_6
   }
 };
 
+//===========================================================================
+struct Process_5_6_to_5_7
+{
+  bool operator()(xml_document& document) { return ConvertResampleWithDataset(document); }
+
+  static bool ConvertResampleWithDataset(xml_document& document)
+  {
+    // Change InputProperty names for the inputs to be a bit clearer.
+    pugi::xpath_node_set elements = document.select_nodes(
+      "//ServerManagerState/Proxy[@group='filters' and @type='ResampleWithDataset']");
+    for (auto iter = elements.begin(); iter != elements.end(); ++iter)
+    {
+      pugi::xml_node proxy_node = iter->node();
+      // Rename the Input property and change the name attribute.
+      pugi::xml_node input_node = proxy_node.find_child_by_attribute("Property", "name", "Input");
+      input_node.attribute("name").set_value("SourceDataArrays");
+
+      // Rename the Source property and change the name attribute.
+      pugi::xml_node source_node = proxy_node.find_child_by_attribute("Property", "name", "Source");
+      source_node.attribute("name").set_value("DestinationMesh");
+    }
+
+    return true;
+  }
+};
+
 } // end of namespace
 
 vtkStandardNewMacro(vtkSMStateVersionController);
@@ -712,6 +738,13 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
     Process_5_5_to_5_6 converter;
     status = converter(document);
     version = vtkSMVersion(5, 6, 0);
+  }
+
+  if (status && (version < vtkSMVersion(5, 7, 0)))
+  {
+    Process_5_6_to_5_7 converter;
+    status = converter(document);
+    version = vtkSMVersion(5, 7, 0);
   }
 
   if (status)
