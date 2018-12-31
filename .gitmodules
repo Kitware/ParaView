@@ -6,7 +6,8 @@
 	url = https://gitlab.kitware.com/paraview/visitbridge.git
 [submodule "ThirdParty/IceT/vtkicet"]
 	path = ThirdParty/IceT/vtkicet
-	url = https://gitlab.kitware.com/icet/icet.git
+	url = https://gitlab.kitware.com/paraview/icet.git
+	branch = for/paraview
 [submodule "ThirdParty/QtTesting/vtkqttesting"]
 	path = ThirdParty/QtTesting/vtkqttesting
 	url = https://gitlab.kitware.com/paraview/qttesting.git
