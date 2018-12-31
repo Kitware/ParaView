@@ -11,8 +11,7 @@ endif (WIN32)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 if (CGNS_ENABLE_HDF5)
   add_definitions(-DBUILD_HDF5)
-  # XXX(kitware): Handled by ParaView.
-  if (FALSE)
+  if (FALSE) # XXX(kitware): Handled by ParaView.
   if (WIN32)
     if (HDF5_LIBRARY)
      # file(STRINGS ${HDF5_LIBRARY} HDF5isDLL REGEX "__imp__H5close")
@@ -35,8 +34,6 @@ endif (CGNS_ENABLE_HDF5)
 # create configed header files #
 ################################
 
-include(CheckTypeSize)
-CHECK_TYPE_SIZE(long SIZE_OF_LONG)
 if ("${SIZE_OF_LONG}" GREATER 4)
   set(CGLONGT long)
 else ("${SIZE_OF_LONG}" GREATER 4)
@@ -67,8 +64,7 @@ if (CGNS_ENABLE_BASE_SCOPE)
   set(BUILDBASESCOPE 1)
 endif (CGNS_ENABLE_BASE_SCOPE)
 
-# XXX(kitware): ParaView handles flags better.
-if (FALSE)
+if (FALSE) # XXX(kitware): ParaView handles flags better.
 set(SYSCFLAGS "")
 set(CFGFLAGS "")
 set(LIBS "")
@@ -322,8 +318,7 @@ endif (BUILDFORTRAN)
 
 macro(native_paths INPUT_PATH_VARIABLE RESULT_VARIABLE)
   set(${RESULT_VARIABLE} "")
-  # XXX(kitware): This hard-codes full paths into the build; removing.
-  if (FALSE)
+  if (FALSE) # XXX(kitware): This hard-codes full paths into the build; removing.
   foreach(PATH ${${INPUT_PATH_VARIABLE}})
     file(TO_NATIVE_PATH ${PATH} NATIVE_PATH)
     list(APPEND ${RESULT_VARIABLE} ${NATIVE_PATH})
@@ -337,8 +332,7 @@ endmacro(native_paths)
 #-----------------------------------------------------------------------------
 
 MACRO (CHECK_HDF5_FEATURE FUNCTION CODE VARIABLE)
-  # XXX(kitware): I don't see any HDF5 source which provide the tested features.
-  IF (NOT DEFINED ${VARIABLE} AND FALSE)
+  IF (NOT DEFINED ${VARIABLE})
     FILE (WRITE
         ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/test_HDF.c
         "${CODE}"
@@ -369,7 +363,7 @@ MACRO (CHECK_HDF5_FEATURE FUNCTION CODE VARIABLE)
           "Determining if the HDF5 ${FUNCTION} exists failed with the following output:\n"
           "${OUTPUT}\n\n")
     ENDIF (${VARIABLE})
-  ENDIF ()
+  ENDIF (NOT DEFINED ${VARIABLE})
 ENDMACRO (CHECK_HDF5_FEATURE)
 
 if (CGNS_ENABLE_HDF5)
@@ -513,8 +507,7 @@ else (CGNS_ENABLE_FORTRAN)
   set(cgns_FILES ${cgns_C_FILES})
 endif (CGNS_ENABLE_FORTRAN)
 
-# XXX(kitware): Handled by ParaView.
-if (FALSE)
+if (FALSE) # XXX(kitware): Handled by ParaView.
 set(CGNS_BUILD_SHARED "ON" CACHE BOOL "Build a shared version of the library")
 option(CGNS_USE_SHARED "Link programs to the CGNS shared library" "ON")
 
@@ -585,52 +578,57 @@ if(CGNS_BUILD_SHARED)
                                RUNTIME DESTINATION bin)
 endif(CGNS_BUILD_SHARED)
 else ()
-  vtk_add_library(vtkcgns ${cgns_FILES})
-  target_link_libraries(vtkcgns ${vtkhdf5_LIBRARIES})
-  set_target_properties(vtkcgns PROPERTIES DEFINE_SYMBOL BUILD_DLL)
+vtk_module_add_module(ParaView::cgns
+  SOURCES ${cgns_FILES})
+set_target_properties(cgns PROPERTIES DEFINE_SYMBOL BUILD_DLL)
 endif ()
 
-# XXX(kitware): Fix the include install directory.
-if (NOT VTK_INSTALL_NO_DEVELOPMENT)
-set(cgns_include_directory "${VTK_INSTALL_INCLUDE_DIR}/vtkcgns")
-
 # Set the install path of the header files
-install(FILES
-	cgns_mangle.h
-	cgnslib.h
-	cgns_io.h
-	#cgnswin_f.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnsconfig.h
-	${CMAKE_CURRENT_BINARY_DIR}/cgnstypes.h
-	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f.h
-	#${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f03.h
-	#${CMAKE_CURRENT_BINARY_DIR}/cgnsBuild.defs
-	DESTINATION ${cgns_include_directory})
+set(headers
+  vtk_cgns_mangle.h
+  cgnslib.h
+  cgns_io.h
+  #cgnswin_f.h
+  ${CMAKE_CURRENT_BINARY_DIR}/cgnsconfig.h
+  ${CMAKE_CURRENT_BINARY_DIR}/cgnstypes.h)
+  #${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f.h
+  #${CMAKE_CURRENT_BINARY_DIR}/cgnstypes_f03.h
+  #${CMAKE_CURRENT_BINARY_DIR}/cgnsBuild.defs)
 
 if (CGNS_ENABLE_FORTRAN)
-  install(FILES
-          ${CMAKE_CURRENT_BINARY_DIR}/cgns.mod
-          DESTINATION ${cgns_include_directory})
+  list(APPEND headers
+    ${CMAKE_CURRENT_BINARY_DIR}/cgns.mod)
 endif (CGNS_ENABLE_FORTRAN)
 
 if (CGNS_ENABLE_PARALLEL)
-  install(FILES	pcgnslib.h DESTINATION ${cgns_include_directory})
+  list(APPEND headers
+    pcgnslib.h)
 endif (CGNS_ENABLE_PARALLEL)
 
 if (CGNS_ENABLE_LEGACY)
-  install(FILES adf/ADF.h DESTINATION ${cgns_include_directory}/adf)
+  list(APPEND headers
+    adf/ADF.h)
   if (CGNS_ENABLE_HDF5)
-    install(FILES adfh/ADFH.h DESTINATION ${cgns_include_directory}/adfh)
+    list(APPEND headers
+      adfh/ADFH.h)
   endif (CGNS_ENABLE_HDF5)
 endif (CGNS_ENABLE_LEGACY)
-endif()
+
+if (FALSE) # XXX(kitware): Use the VTK module system.
+# Set the install path of the header files
+install(FILES ${headers}
+	DESTINATION include)
+else ()
+vtk_module_install_headers(
+  FILES   ${headers}
+  SUBDIR  "vtkcgns/src")
+endif ()
 
 #########
 # Tools #
 #########
 
-# XXX(kitware): ParaView doesn't need this.
-if (FALSE)
+if (FALSE) # XXX(kitware): ParaView doesn't need this.
 add_subdirectory(tools)
 
 #########
