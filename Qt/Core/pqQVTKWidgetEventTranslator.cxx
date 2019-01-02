@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QVTKOpenGLNativeWidget.h"
 #include "QVTKOpenGLWidget.h"
+#include "QVTKOpenGLWindow.h"
 
 pqQVTKWidgetEventTranslator::pqQVTKWidgetEventTranslator(QObject* p)
   : pqWidgetEventTranslator(p)
@@ -72,13 +73,13 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
   QVTKOpenGLWidget* const qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object);
   if (qvtkWidget != nullptr)
   {
-    rw = qvtkWidget->GetRenderWindow();
+    rw = qvtkWidget->renderWindow();
   }
 
   QVTKOpenGLNativeWidget* const qvtkNativeWidget = qobject_cast<QVTKOpenGLNativeWidget*>(Object);
   if (qvtkNativeWidget != nullptr)
   {
-    rw = qvtkNativeWidget->GetRenderWindow();
+    rw = qvtkNativeWidget->renderWindow();
   }
 
   // Could not find a render window, don't translate the event

@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqConsoleWidgetEventTranslator.h"
 #include "pqDoubleLineEditEventPlayer.h"
 #include "pqDoubleLineEditEventTranslator.h"
+#include "pqEventDispatcher.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
 #include "pqFlatTreeViewEventPlayer.h"
@@ -322,6 +323,7 @@ public:
     {
       this->OldSize = widget->size();
       widget->resize(size);
+      pqEventDispatcher::processEventsAndWait(10);
     }
   }
   ~WidgetSizer()

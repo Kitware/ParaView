@@ -166,8 +166,8 @@ void pqComparativeRenderView::updateViewWidgets(QWidget* container /*=NULL*/)
     renView->UpdateVTKObjects();
 
     pqQVTKWidget* wdg = new pqQVTKWidget();
-    wdg->SetRenderWindow(renView->GetRenderWindow());
-    renView->SetupInteractor(wdg->GetInteractor());
+    wdg->setRenderWindow(renView->GetRenderWindow());
+    renView->SetupInteractor(wdg->interactor());
     wdg->setSession(compView->GetSession());
     wdg->installEventFilter(this);
     wdg->setContextMenuPolicy(Qt::NoContextMenu);

@@ -143,7 +143,7 @@ QWidget* pqMultiSliceView::createWidget()
   vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
   if (this->InternalWidget && renModule)
   {
-    this->InternalWidget->SetRenderWindow(renModule->GetRenderWindow());
+    this->InternalWidget->setRenderWindow(renModule->GetRenderWindow());
   }
 
   for (int cc = 0; cc < 3; cc++)

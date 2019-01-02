@@ -196,13 +196,11 @@ public:
     this->Timer.setSingleShot(true);
     this->Timer.setInterval(0);
 
-    QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
-    fmt.setSamples(8);
-    this->Widget->setFormat(fmt);
-    this->Widget->setEnableHiDPI(true);
+    this->Window->SetMultiSamples(8);
 
+    this->Widget->setEnableHiDPI(true);
     this->Widget->setObjectName("1QVTKWidget0");
-    this->Widget->SetRenderWindow(this->Window.Get());
+    this->Widget->setRenderWindow(this->Window.Get());
     this->ContextView->SetRenderWindow(this->Window.Get());
 
     this->ChartXY->SetAutoSize(true);
@@ -210,7 +208,7 @@ public:
     this->ChartXY->SetForceAxesToBounds(true);
     this->ChartXY->SetZoomWithMouseWheel(false);
     this->ContextView->GetScene()->AddItem(this->ChartXY.GetPointer());
-    this->ContextView->SetInteractor(this->Widget->GetInteractor());
+    this->ContextView->SetInteractor(this->Widget->interactor());
     this->ContextView->GetRenderWindow()->SetLineSmoothing(true);
 
     this->ChartXY->SetActionToButton(vtkChart::PAN, -1);

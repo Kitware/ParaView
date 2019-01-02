@@ -99,8 +99,8 @@ QWidget* pqPythonView::createWidget()
   vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
   vtkwidget->installEventFilter(this);
 
-  vtkwidget->SetRenderWindow(viewProxy->GetRenderWindow());
-  viewProxy->SetupInteractor(vtkwidget->GetInteractor());
+  vtkwidget->setRenderWindow(viewProxy->GetRenderWindow());
+  viewProxy->SetupInteractor(vtkwidget->interactor());
   return vtkwidget;
 }
 

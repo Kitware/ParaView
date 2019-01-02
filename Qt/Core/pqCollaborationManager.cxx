@@ -423,12 +423,17 @@ void pqCollaborationManager::updateEnabledState()
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::attachMouseListenerTo3DViews()
 {
-  QWidget* mainWidget = pqCoreUtilities::mainWidget();
-  foreach (pqQVTKWidget* widget, mainWidget->findChildren<pqQVTKWidget*>())
-  {
-    QObject::connect(widget, SIGNAL(mouseEvent(QMouseEvent*)), this,
-      SLOT(updateMousePointerLocation(QMouseEvent*)), Qt::UniqueConnection);
-  }
+  // I am deliberately commenting this out. Collaboration is slated for
+  // deprecation. Since we removed the unnecessary `mouseEvent`, it no longer
+  // possible to support this. Rather than add more code to support a deprecated
+  // use-case, we just drop it for now.
+
+  // QWidget* mainWidget = pqCoreUtilities::mainWidget();
+  // foreach (pqQVTKWidget* widget, mainWidget->findChildren<pqQVTKWidget*>())
+  //{
+  //  QObject::connect(widget, SIGNAL(mouseEvent(QMouseEvent*)), this,
+  //    SLOT(updateMousePointerLocation(QMouseEvent*)), Qt::UniqueConnection);
+  //}
 }
 
 //-----------------------------------------------------------------------------

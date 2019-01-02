@@ -91,9 +91,6 @@ protected:
   bool renderVTK();
   bool canRender();
 
-private slots:
-  void updateSizeProperties();
-
 private:
   Q_DISABLE_COPY(pqQVTKWidget)
   vtkSmartPointer<vtkSMProxy> ViewProxy;

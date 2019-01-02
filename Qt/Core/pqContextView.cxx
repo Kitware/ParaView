@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSelectionHelper.h"
@@ -65,10 +66,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QPointer>
 #include <QVariant>
-
-#if QT_VERSION >= 0x050000
-#include <QSurfaceFormat>
-#endif
 
 // Command implementation
 class pqContextView::command : public vtkCommand
@@ -132,31 +129,23 @@ pqContextView::~pqContextView()
 //-----------------------------------------------------------------------------
 QWidget* pqContextView::createWidget()
 {
+  vtkSMContextViewProxy* proxy = this->getContextViewProxy();
+  Q_ASSERT(proxy);
+
+  // Enable multisample for chart views when not running tests. Multisamples
+  // is disabled for testing to avoid failures due to antialiasing
+  // differences.
+  bool use_multisampling = (!vtksys::SystemTools::HasEnv("DASHBOARD_TEST_FROM_CTEST"));
+  auto renWin = proxy->GetRenderWindow();
+  renWin->SetMultiSamples(use_multisampling ? 8 : 0);
+
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
-#if QT_VERSION >= 0x050000
-  if (!vtksys::SystemTools::HasEnv("DASHBOARD_TEST_FROM_CTEST"))
-  {
-    // Enable multisample for chart views when not running tests. Multisamples
-    // is disabled for testing to avoid failures due to antialiasing
-    // differences.
-    QSurfaceFormat fmt = QSurfaceFormat::defaultFormat();
-    fmt.setSamples(8);
-    vtkwidget->setFormat(fmt);
-  }
-#else
-  // don't use caching for charts since the charts don't seem to render
-  // correctly when an overlapping window is present, unlike 3D views.
-  vtkwidget->setAutomaticImageCacheEnabled(false);
-#endif
   vtkwidget->setViewProxy(this->getProxy());
   vtkwidget->setContextMenuPolicy(Qt::NoContextMenu);
   vtkwidget->installEventFilter(this);
 
-  vtkSMContextViewProxy* proxy = this->getContextViewProxy();
-  Q_ASSERT(proxy);
-
-  vtkwidget->SetRenderWindow(proxy->GetRenderWindow());
-  proxy->SetupInteractor(vtkwidget->GetInteractor());
+  vtkwidget->setRenderWindow(proxy->GetRenderWindow());
+  proxy->SetupInteractor(vtkwidget->interactor());
   return vtkwidget;
 }
 

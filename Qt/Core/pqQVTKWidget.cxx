@@ -54,8 +54,6 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   : Superclass(parentObject, f)
   , SizePropertyName("ViewSize")
 {
-  this->connect(this, SIGNAL(resized()), SLOT(updateSizeProperties()));
-
   // disable HiDPI if we are running tests
   this->setEnableHiDPI(vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
 }
@@ -63,22 +61,6 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
 //----------------------------------------------------------------------------
 pqQVTKWidget::~pqQVTKWidget()
 {
-}
-
-//----------------------------------------------------------------------------
-void pqQVTKWidget::updateSizeProperties()
-{
-  if (this->ViewProxy)
-  {
-    BEGIN_UNDO_EXCLUDE();
-    int view_size[2];
-    view_size[0] = this->size().width() * this->GetInteractorAdapter()->GetDevicePixelRatio();
-    view_size[1] = this->size().height() * this->GetInteractorAdapter()->GetDevicePixelRatio();
-    vtkSMPropertyHelper(this->ViewProxy, this->SizePropertyName.toLocal8Bit().data())
-      .Set(view_size, 2);
-    this->ViewProxy->UpdateProperty(this->SizePropertyName.toLocal8Bit().data());
-    END_UNDO_EXCLUDE();
-  }
 }
 
 //----------------------------------------------------------------------------
