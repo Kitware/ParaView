@@ -467,7 +467,6 @@ set(paraview_default_plugins
   #GeodesicMeasurementPlugin
   #LagrangianParticleTracker
   #MOOSETools
-  #NetCDFTimeAnnotationPlugin
   #NonOrthogonalSource
   #PanoramicProjectionView
   #SLACTools
@@ -486,6 +485,7 @@ set(paraview_default_plugins
   EmbossingRepresentations
   EyeDomeLighting
   Moments
+  NetCDFTimeAnnotationPlugin
   PacMan
   VTKmFilters)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
