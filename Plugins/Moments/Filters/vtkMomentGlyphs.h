@@ -31,11 +31,12 @@
 #ifndef vtkMomentGlyphs_h
 #define vtkMomentGlyphs_h
 
+#include "vtkMomentFiltersModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 #include "vtkSmartPointer.h" // For internal methods.
 
-class vtkMomentGlyphs : public vtkPolyDataAlgorithm
+class VTKMOMENTFILTERS_EXPORT vtkMomentGlyphs : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkMomentGlyphs, vtkPolyDataAlgorithm);

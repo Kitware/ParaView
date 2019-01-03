@@ -1,0 +1,13 @@
+NAME
+  Moments::MomentFilters
+LIBRARY_NAME
+  vtkMomentFilters
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonTransforms
+  VTK::FiltersCore
+  VTK::FiltersGeneral
+  VTK::FiltersSources

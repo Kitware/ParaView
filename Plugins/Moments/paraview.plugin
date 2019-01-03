@@ -1,0 +1,12 @@
+NAME
+  Moments
+DESCRIPTION
+  Filters for Flux and Circulation Fields
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonTransforms
+  VTK::FiltersCore
+  VTK::FiltersGeneral
+  VTK::FiltersSources

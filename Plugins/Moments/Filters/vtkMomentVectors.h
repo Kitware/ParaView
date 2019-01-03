@@ -33,8 +33,9 @@
 #define vtkMomentVectors_h
 
 #include "vtkDataSetAlgorithm.h"
+#include "vtkMomentFiltersModule.h" // for export macro
 
-class vtkMomentVectors : public vtkDataSetAlgorithm
+class VTKMOMENTFILTERS_EXPORT vtkMomentVectors : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkMomentVectors, vtkDataSetAlgorithm);

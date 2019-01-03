@@ -3,23 +3,34 @@
 # flows through the area of the cell.  Circulation fields are defined on 1D
 # cells and describes flows in the direction of the cell.
 
-include_directories(${VTK_INCLUDE_DIRS})
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
+  REQUEST_MODULES   Moments::MomentFilters
+  PROVIDES_MODULES  moments_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-SET(PLUGIN_NAME Moments)
-SET(PLUGIN_VERSION "0.0")
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-SET(SM_XML
-  Moments.xml
-  )
+list(INSERT CMAKE_MODULE_PATH 0
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-SET(SM_SRC
-  vtkMomentGlyphs.cxx
-  vtkMomentVectors.cxx
-  )
+vtk_module_build(
+  MODULES             ${moments_modules}
+  PACKAGE             Moments
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-ADD_PARAVIEW_PLUGIN(${PLUGIN_NAME} ${PLUGIN_VERSION}
-  DESCRIPTION "Filters for Flux and Circulation Fields"
+paraview_add_plugin(Moments
   REQUIRED_ON_SERVER
-  SERVER_MANAGER_XML ${SM_XML}
-  SERVER_MANAGER_SOURCES ${SM_SRC}
-  )
+  VERSION "0.0"
+  MODULES Moments::MomentFilters)
