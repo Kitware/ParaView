@@ -460,6 +460,38 @@ set_property(GLOBAL
   PROPERTY
     "_vtk_module_autoinit_include" "\"vtkAutoInit.h\"")
 
+set(paraview_default_plugins
+  # These plugins have not yet been updated.
+  #EyeDomeLighting
+  #GMVReader
+  #GenericIOReader
+  #GeodesicMeasurementPlugin
+  #LagrangianParticleTracker
+  #MOOSETools
+  #Moments
+  #NetCDFTimeAnnotationPlugin
+  #NonOrthogonalSource
+  #PanoramicProjectionView
+  #SLACTools
+  #SierraPlotTools
+  #StreamLinesRepresentation
+  #StreamingParticles
+  #SurfaceLIC
+  #ThickenLayeredCells
+  #pvblot
+  AcceleratedAlgorithms
+  AnalyzeNIfTIReaderWriter
+  ArrowGlyph
+  CDIReader
+  DigitalRockPhysics
+  EULATestPlugin
+  EmbossingRepresentations
+  PacMan
+  VTKmFilters)
+foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
+  set("_paraview_plugin_default_${paraview_default_plugin}" ON)
+endforeach ()
+
 set(paraview_plugin_directories
   "${CMAKE_CURRENT_SOURCE_DIR}/Plugins")
 paraview_plugin_find_plugins(paraview_plugin_files ${paraview_plugin_directories})
