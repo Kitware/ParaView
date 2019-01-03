@@ -462,7 +462,6 @@ set_property(GLOBAL
 
 set(paraview_default_plugins
   # These plugins have not yet been updated.
-  #EyeDomeLighting
   #GMVReader
   #GenericIOReader
   #GeodesicMeasurementPlugin
@@ -486,6 +485,13 @@ set(paraview_default_plugins
   DigitalRockPhysics
   EULATestPlugin
   EmbossingRepresentations
+  EyeDomeLighting
+  GMVReader
+  LagrangianParticleTracker
+  Moments
+  MooseXfemClip
+  NetCDFTimeAnnotationPlugin
+  NonOrthogonalSource
   PacMan
   VTKmFilters)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)

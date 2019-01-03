@@ -1,16 +1,34 @@
-project(EyeDomeLighting)
-cmake_minimum_required(VERSION 3.3)
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/EyeDomeLightingView/vtk.module"
+  REQUEST_MODULES   EyeDomeLighting::EyeDomeLightingView
+  PROVIDES_MODULES  eyedomelighting_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-if(NOT ParaView_SOURCE_DIR)
-  find_package(ParaView)
-  include("${PARAVIEW_USE_FILE}")
-  include (ParaViewPlugins)
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-  # Load information about VTK/ParaView modules loaded/available.
-  pv_setup_module_environment("EyeDomeLighting")
-else()
-  # we're building from within ParaView Source.
-endif()
+vtk_module_build(
+  MODULES             ${eyedomelighting_modules}
+  PACKAGE             EyeDomeLighting
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-# Process the ParaView plugin.
-add_subdirectory(ParaViewPlugin)
+paraview_add_plugin(EyeDomeLighting
+  REQUIRED_ON_SERVER
+  REQUIRED_ON_CLIENT
+  VERSION "1.0"
+  MODULES EyeDomeLighting::EyeDomeLightingView
+  XML_DOCUMENTATION OFF)
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()
