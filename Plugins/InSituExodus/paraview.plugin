@@ -1,0 +1,6 @@
+NAME
+  InSituExodus
+DESCRIPTION
+  Experimental memory-conserving Exodus II file reader.
+REQUIRES_MODULES
+  VTK::IOExodus
