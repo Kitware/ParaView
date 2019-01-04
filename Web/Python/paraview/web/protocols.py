@@ -547,7 +547,27 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
         realViewId = sView.GetGlobalIDAsString()
 
         if realViewId in self.viewsInAnimations:
+            progressRendering = self.trackingViews[realViewId]['streaming']
             self.viewsInAnimations.remove(realViewId)
+            if progressRendering:
+                self.progressiveRender(realViewId)
+
+
+    def progressiveRender(self, viewId = '-1'):
+        sView = self.getView(viewId)
+        realViewId = sView.GetGlobalIDAsString()
+
+        if realViewId in self.viewsInAnimations:
+            return
+
+        if sView.GetSession().GetPendingProgress():
+            reactor.callLater(self.deltaStaleTimeBeforeRender, lambda: self.progressiveRender(viewId))
+        else:
+            again = sView.StreamingUpdate(True)
+            self.pushRender(realViewId, True)
+
+            if again:
+                reactor.callLater(0.001, lambda: self.progressiveRender(viewId))
 
 
     @exportRpc("viewport.image.push")
@@ -642,7 +662,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             tagStart = self.getApplication().AddObserver('StartInteractionEvent', startCallback)
             tagStop = self.getApplication().AddObserver('EndInteractionEvent', stopCallback)
             # TODO do we need self.getApplication().AddObserver('ResetActiveView', resetActiveView())
-            self.trackingViews[realViewId] = { 'tags': [tag, tagStart, tagStop], 'observerCount': 1, 'mtime': 0, 'enabled': True, 'quality': 100 }
+            self.trackingViews[realViewId] = { 'tags': [tag, tagStart, tagStop], 'observerCount': 1, 'mtime': 0, 'enabled': True, 'quality': 100, 'streaming': sView.GetClientSideObject().GetEnableStreaming() }
         else:
             # There is an observer on this view already
             self.trackingViews[realViewId]['observerCount'] += 1
