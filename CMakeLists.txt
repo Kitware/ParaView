@@ -705,6 +705,15 @@ if (PARAVIEW_ENABLE_PYTHON)
     add_subdirectory(VTK/Wrapping/Python)
   endif ()
 
+  get_property(vtk_required_python_modules GLOBAL
+    PROPERTY  vtk_required_python_modules)
+  if (vtk_required_python_modules)
+    list(REMOVE_DUPLICATES vtk_required_python_modules)
+  endif ()
+  string(REPLACE ";" "\n" vtk_required_python_modules "${vtk_required_python_modules}")
+  file(WRITE "${CMAKE_BINARY_DIR}/requirements.txt"
+    "${vtk_required_python_modules}\n")
+
   vtk_module_wrap_python(
     MODULES         ${paraview_modules}
     INSTALL_EXPORT  ParaView
