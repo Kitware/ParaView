@@ -1,16 +1,3 @@
-paraview_test_load_baselines_dirs(""
-  SurfaceLICPlugin
-  )
-paraview_test_load_data_dirs(SurfaceLIC
-  shuttle-surf
-  )
-
-set(data_files shuttle-surf.vtm)
-if(NOT PARAVIEW_BUILD_QT_GUI)
-    list(APPEND data_files office.binary.vtk)
-endif()
-paraview_test_load_data(SurfaceLIC ${data_files})
-
 # Surface LIC Plugin testing
 # these tests could run safely in serial and
 # in parallel.
@@ -19,7 +6,7 @@ SET(PVBATCH_TESTS
   SurfaceLIC-ShuttleZoom2
   SurfaceLIC-ShuttleAll
   )
-IF (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
+if (PARAVIEW_USE_MPI)
   # run the tests in parallel
   SET(NP 3)
   # these depend on the D3 filter and

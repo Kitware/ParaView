@@ -1,34 +1,28 @@
-include_directories(
-  ${VTK_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  )
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Representations/vtk.module"
+  REQUEST_MODULES   SurfaceLIC::vtkSurfaceLICRepresentations
+  PROVIDES_MODULES  surfacelic_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-add_paraview_plugin(
-  SurfaceLIC "2.0"
-  DESCRIPTION "Add Surface-LIC vector visualization representation"
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
+
+vtk_module_build(
+  MODULES             ${surfacelic_modules}
+  PACKAGE             SurfaceLIC
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
+
+paraview_add_plugin(SurfaceLIC
+  VERSION "2.0"
   DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
-  SERVER_MANAGER_XML vtkSurfaceLICRepresentation.xml
-  SERVER_MANAGER_SOURCES vtkSurfaceLICRepresentation.cxx
-  )
-target_link_libraries(SurfaceLIC
-  LINK_PRIVATE vtkRenderingLICOpenGL2)
-
-if (VTK_RENDERINGPARALLELLIC_SURFACELICPAINTER_TIMER)
-  add_definitions("-DvtkSurfaceLICPainterTIME")
-endif()
-if (VTK_RENDERINGPARALLELLIC_LINEINTEGRALCONVLOLUTION2D_TIMER)
-  add_definitions("-DvtkLineIntegralConvolution2DTIME")
-endif()
-
-# because these tests can be a little flakey provide the
-# option to disable them on problematic systems.
-SET(SURFACELIC_PLUGIN_TESTING
-  ON CACHE BOOL
-  "Explicitly disable SurfaceLIC plugin ctests"
-  )
-mark_as_advanced(SURFACELIC_PLUGIN_TESTING)
-
-if (BUILD_TESTING AND SURFACELIC_PLUGIN_TESTING AND PARAVIEW_ENABLE_PYTHON)
-  add_subdirectory(Testing/Python)
-endif()
+  MODULES SurfaceLIC::vtkSurfaceLICRepresentations)

@@ -1,0 +1,9 @@
+NAME
+  SurfaceLIC
+DESCRIPTION
+  Add Surface-LIC vector visualization support
+REQUIRES_MODULES
+  ParaView::ClientServerCoreRendering
+  VTK::CommonCore
+  VTK::RenderingCore
+  VTK::RenderingLICOpenGL2
