@@ -28,13 +28,14 @@
 #define vtkStreamLinesMapper_h
 
 #include "vtkMapper.h"
+#include "vtkStreamLinesModule.h" // for export macro
 
 class vtkActor;
 class vtkDataSet;
 class vtkImageData;
 class vtkRenderer;
 
-class VTK_EXPORT vtkStreamLinesMapper : public vtkMapper
+class VTKSTREAMLINES_EXPORT vtkStreamLinesMapper : public vtkMapper
 {
 public:
   static vtkStreamLinesMapper* New();

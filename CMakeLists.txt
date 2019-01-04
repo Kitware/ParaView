@@ -465,7 +465,6 @@ set(paraview_default_plugins
   #GMVReader
   #GenericIOReader
   #GeodesicMeasurementPlugin
-  #StreamLinesRepresentation
   #SurfaceLIC
   #ThickenLayeredCells
   #pvblot
@@ -486,6 +485,7 @@ set(paraview_default_plugins
   PanoramicProjectionView
   SLACTools
   SierraPlotTools
+  StreamLinesRepresentation
   StreamingParticles
   VTKmFilters)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)

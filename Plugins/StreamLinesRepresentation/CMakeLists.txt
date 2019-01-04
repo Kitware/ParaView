@@ -1,64 +1,61 @@
-if (NOT ParaView_BINARY_DIR)
-  cmake_minimum_required(VERSION 3.3)
-  find_package(ParaView REQUIRED)
-  include(${PARAVIEW_USE_FILE})
-endif()
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Representations/vtk.module"
+  REQUEST_MODULES   StreamLinesRepresentation::vtkStreamLines
+  PROVIDES_MODULES  streamlines_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-include_directories(
-  ${VTK_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  )
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-include(vtkOpenGL)
+vtk_module_build(
+  MODULES             ${streamlines_modules}
+  PACKAGE             StreamLinesRepresentation
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-set(SRCS)
+set(sources)
+set(interfaces)
 
-if(PARAVIEW_BUILD_QT_GUI)
-  pv_find_package_qt(qt_targets REQUIRED QUIET
-    QT5_COMPONENTS Widgets)
+if (PARAVIEW_BUILD_QT_GUI)
+  list(APPEND sources
+    pqStreamLinesAnimationManager.cxx
+    pqStreamLinesAnimationManager.h)
 
-  pv_qt_wrap_cpp(MOC_SRCS
-    pqStreamLinesAnimationManager.h
-    )
-
-  add_paraview_auto_start(
-    IFACES IFACE_SRCS
-    CLASS_NAME pqStreamLinesAnimationManager
+  paraview_plugin_add_auto_start(
+    CLASS_NAME "pqStreamLinesAnimationManager"
     STARTUP onStartup
     SHUTDOWN onShutdown
-    )
- list(APPEND SRCS "pqStreamLinesAnimationManager.cxx")
-endif()
+    INTERFACES autostart_interface
+    SOURCES autostart_sources)
+  list(APPEND interfaces
+    ${autostart_interface})
+  list(APPEND sources
+    ${autostart_sources})
+endif ()
 
-encode_files_as_strings(ENCODED_STRING_FILES
-  shaders/vtkStreamLines_fs.glsl
-  shaders/vtkStreamLines_gs.glsl
-  shaders/vtkStreamLines_vs.glsl
-  shaders/vtkStreamLinesBlending_fs.glsl
-  shaders/vtkStreamLinesCopy_fs.glsl
-  )
+paraview_add_plugin(StreamLinesRepresentation
+  VERSION "0.1"
+  UI_INTERFACES ${interfaces}
+  SOURCES ${sources}
+  MODULES StreamLinesRepresentation::vtkStreamLines
+  XML_DOCUMENTATION OFF)
 
-add_paraview_plugin(
-  StreamLinesRepresentation "0.1"
-  DESCRIPTION "Add animated Stream Lines representation for any type of dataset"
-  SERVER_MANAGER_XML StreamLinesRepresentation.xml
-  SERVER_MANAGER_SOURCES
-    vtkStreamLinesRepresentation.cxx
-    vtkStreamLinesMapper.cxx
-  GUI_INTERFACES ${IFACES}
-  SOURCES
-    ${ENCODED_STRING_FILES}
-    ${SRCS} ${MOC_SRCS} ${RCS_SRCS} ${IFACE_SRCS}
-  )
+if (PARAVIEW_BUILD_QT_GUI)
+  target_link_libraries(StreamLinesRepresentation
+    PRIVATE
+      ParaView::ServerManagerCore
+      ParaView::ServerManagerRendering)
+endif ()
 
-include(vtkOpenGL)
-vtk_opengl_link(StreamLinesRepresentation)
-
-if(PARAVIEW_BUILD_QT_GUI)
-  target_link_libraries(StreamLinesRepresentation LINK_PRIVATE pqApplicationComponents)
-
-  if (BUILD_TESTING)
-    add_subdirectory(Testing)
-  endif()
-endif()
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()

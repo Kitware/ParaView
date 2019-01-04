@@ -1,0 +1,17 @@
+NAME
+  StreamLinesRepresentation
+DESCRIPTION
+  Add animated Stream Lines representation for any type of dataset
+REQUIRES_MODULES
+  ParaView::ClientServerCoreRendering
+  ParaView::ServerManagerCore
+  ParaView::ServerManagerRendering
+  ParaView::VTKExtensionsRendering
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMath
+  VTK::CommonTransforms
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::glew

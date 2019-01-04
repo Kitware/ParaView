@@ -26,6 +26,7 @@
 
 #include "vtkNew.h" // needed for vtkNew.
 #include "vtkPVDataRepresentation.h"
+#include "vtkStreamLinesModule.h" // for export macro
 
 class vtkColorTransferFunction;
 class vtkExtentTranslator;
@@ -40,7 +41,7 @@ class vtkPVLODActor;
 class vtkScalarsToColors;
 class vtkStreamLinesMapper;
 
-class VTK_EXPORT vtkStreamLinesRepresentation : public vtkPVDataRepresentation
+class VTKSTREAMLINES_EXPORT vtkStreamLinesRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkStreamLinesRepresentation* New();
