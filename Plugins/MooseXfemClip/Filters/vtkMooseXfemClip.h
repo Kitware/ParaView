@@ -38,14 +38,15 @@
  * Will Schroeder, and Bill Lorensen
  */
 
-#ifndef vtkXFEMClip_h
-#define vtkXFEMClip_h
+#ifndef vtkMooseXFEMClip_h
+#define vtkMooseXFEMClip_h
 
+#include "vtkMooseXfemClipModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkIncrementalPointLocator;
 
-class VTK_EXPORT vtkMooseXfemClip : public vtkUnstructuredGridAlgorithm
+class VTKMOOSEXFEMCLIP_EXPORT vtkMooseXfemClip : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkMooseXfemClip* New();

@@ -466,7 +466,6 @@ set(paraview_default_plugins
   #GenericIOReader
   #GeodesicMeasurementPlugin
   #LagrangianParticleTracker
-  #MOOSETools
   #SLACTools
   #SierraPlotTools
   #StreamLinesRepresentation
@@ -483,6 +482,7 @@ set(paraview_default_plugins
   EmbossingRepresentations
   EyeDomeLighting
   Moments
+  MooseXfemClip
   NetCDFTimeAnnotationPlugin
   NonOrthogonalSource
   PacMan
