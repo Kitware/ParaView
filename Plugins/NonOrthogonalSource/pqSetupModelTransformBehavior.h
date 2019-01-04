@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-class VTK_EXPORT pqSetupModelTransformBehavior : public QObject
+class pqSetupModelTransformBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;

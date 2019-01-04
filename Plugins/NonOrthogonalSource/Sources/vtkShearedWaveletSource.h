@@ -19,9 +19,10 @@
 #ifndef vtkShearedWaveletSource_h
 #define vtkShearedWaveletSource_h
 
+#include "vtkNonOrthogonalSourcesModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
-class VTK_EXPORT vtkShearedWaveletSource : public vtkUnstructuredGridAlgorithm
+class VTKNONORTHOGONALSOURCES_EXPORT vtkShearedWaveletSource : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkShearedWaveletSource* New();

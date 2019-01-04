@@ -467,7 +467,6 @@ set(paraview_default_plugins
   #GeodesicMeasurementPlugin
   #LagrangianParticleTracker
   #MOOSETools
-  #NonOrthogonalSource
   #SLACTools
   #SierraPlotTools
   #StreamLinesRepresentation
@@ -485,6 +484,7 @@ set(paraview_default_plugins
   EyeDomeLighting
   Moments
   NetCDFTimeAnnotationPlugin
+  NonOrthogonalSource
   PacMan
   PanoramicProjectionView
   VTKmFilters)

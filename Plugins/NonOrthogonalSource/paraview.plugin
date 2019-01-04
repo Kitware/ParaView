@@ -1,0 +1,14 @@
+NAME
+  NonOrthogonalSource
+DESCRIPTION
+  Non Orthogonal Source code sample
+REQUIRES_MODULES
+  ParaView::VTKExtensionsCore
+  ParaView::pqApplicationComponents
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMath
+  VTK::CommonTransforms
+  VTK::FiltersGeneral
+  VTK::ImagingCore
