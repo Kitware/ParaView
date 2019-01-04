@@ -1,0 +1,16 @@
+NAME
+  LagrangianParticleTracker
+DESCRIPTION
+  Highly customizable filter for particle tracking
+CONDITION
+  # TODO: It seems at a glance that it should still work without
+  # this? The plugin was behind this conditional previously.
+  PARAVIEW_BUILD_QT_GUI
+REQUIRES_MODULES
+  ParaView::ClientServerCoreCore
+  ParaView::ServerManagerCore
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersFlowPaths
+  VTK::GUISupportQt

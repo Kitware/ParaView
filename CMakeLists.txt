@@ -465,7 +465,6 @@ set(paraview_default_plugins
   #GMVReader
   #GenericIOReader
   #GeodesicMeasurementPlugin
-  #LagrangianParticleTracker
   #SLACTools
   #SierraPlotTools
   #StreamLinesRepresentation
@@ -481,6 +480,7 @@ set(paraview_default_plugins
   EULATestPlugin
   EmbossingRepresentations
   EyeDomeLighting
+  LagrangianParticleTracker
   Moments
   MooseXfemClip
   NetCDFTimeAnnotationPlugin
