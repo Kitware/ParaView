@@ -1,0 +1,15 @@
+NAME
+  StreamingParticles
+DESCRIPTION
+  Render Particles with Streaming
+REQUIRES_MODULES
+  ParaView::ClientServerCoreRendering
+  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsRendering
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersCore
+  VTK::ParallelCore
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
