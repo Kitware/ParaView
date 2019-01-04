@@ -148,7 +148,8 @@
     <!-- Begin CGNSSeriesReader -->
     <SourceProxy name="CGNSSeriesReader"
                  class="vtkCGNSFileSeriesReader"
-                 label="CGNS Series Reader">
+                 label="CGNS Series Reader"
+                 si_class="vtkSIMetaReaderProxy">
       <Documentation
          short_help="Read a dataset in CGNS format."
          long_help="Read binary files stored in CGNS format.">
