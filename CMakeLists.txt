@@ -468,7 +468,6 @@ set(paraview_default_plugins
   #LagrangianParticleTracker
   #MOOSETools
   #NonOrthogonalSource
-  #PanoramicProjectionView
   #SLACTools
   #SierraPlotTools
   #StreamLinesRepresentation
@@ -487,6 +486,7 @@ set(paraview_default_plugins
   Moments
   NetCDFTimeAnnotationPlugin
   PacMan
+  PanoramicProjectionView
   VTKmFilters)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
   set("_paraview_plugin_default_${paraview_default_plugin}" ON)

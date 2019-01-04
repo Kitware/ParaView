@@ -17,6 +17,7 @@
 #include "vtkCullerCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSynchronizedRenderer.h"
+#include "vtkPanoramicProjectionPass.h"
 #include "vtkRenderer.h"
 
 //-----------------------------------------------------------------------------

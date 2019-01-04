@@ -22,11 +22,13 @@
 #ifndef vtkPVPanoramicProjectionView_h
 #define vtkPVPanoramicProjectionView_h
 
-#include "vtkNew.h"
+#include "vtkNew.h" // for vtkNew
 #include "vtkPVRenderView.h"
-#include "vtkPanoramicProjectionPass.h"
+#include "vtkPanoramicProjectionViewsModule.h" // for export macro
 
-class VTK_EXPORT vtkPVPanoramicProjectionView : public vtkPVRenderView
+class vtkPanoramicProjectionPass;
+
+class VTKPANORAMICPROJECTIONVIEWS_EXPORT vtkPVPanoramicProjectionView : public vtkPVRenderView
 {
 public:
   static vtkPVPanoramicProjectionView* New();
