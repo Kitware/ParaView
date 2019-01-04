@@ -465,7 +465,6 @@ set(paraview_default_plugins
   #GMVReader
   #GenericIOReader
   #GeodesicMeasurementPlugin
-  #ThickenLayeredCells
   #pvblot
   AcceleratedAlgorithms
   AnalyzeNIfTIReaderWriter
@@ -487,6 +486,7 @@ set(paraview_default_plugins
   StreamLinesRepresentation
   StreamingParticles
   SurfaceLIC
+  ThickenLayeredCells
   VTKmFilters)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
   set("_paraview_plugin_default_${paraview_default_plugin}" ON)

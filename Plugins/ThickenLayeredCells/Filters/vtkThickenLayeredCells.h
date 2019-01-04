@@ -22,9 +22,11 @@
 #ifndef vtkThickenLayeredCells_h
 #define vtkThickenLayeredCells_h
 
+#include "vtkThickenLayeredCellsFiltersModule.h" // for export macro
 #include "vtkUnstructuredGridAlgorithm.h"
 
-class vtkThickenLayeredCells : public vtkUnstructuredGridAlgorithm
+class VTKTHICKENLAYEREDCELLSFILTERS_EXPORT vtkThickenLayeredCells
+  : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkThickenLayeredCells* New();
