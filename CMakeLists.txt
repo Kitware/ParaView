@@ -465,7 +465,6 @@ set(paraview_default_plugins
   #GMVReader
   #GenericIOReader
   #GeodesicMeasurementPlugin
-  #SLACTools
   #StreamLinesRepresentation
   #StreamingParticles
   #SurfaceLIC
@@ -486,6 +485,7 @@ set(paraview_default_plugins
   NonOrthogonalSource
   PacMan
   PanoramicProjectionView
+  SLACTools
   SierraPlotTools
   VTKmFilters)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)

@@ -1,0 +1,13 @@
+NAME
+  SLACTools::vtkSLACFilters
+LIBRARY_NAME
+  vtkSLACFilters
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsCore
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::FiltersSources
+  VTK::ParallelCore
