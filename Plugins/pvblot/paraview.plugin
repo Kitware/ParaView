@@ -1,0 +1,12 @@
+NAME
+  pvblot
+DESCRIPTION
+  PVBLOT Plugin
+CONDITION
+  # blot is currently not working. We'll fix it when needed.
+  # For one, it seems to use `vtkPVPythonInterpretor` which, AFAICT, does not
+  # and has not existed. Its expected API also doesn't match with what
+  # `vtkPythonInterpreter` provides today.
+  FALSE AND PARAVIEW_ENABLE_PYTHON
+REQUIRES_MODULES
+  ParaView::ClientServerCoreCore

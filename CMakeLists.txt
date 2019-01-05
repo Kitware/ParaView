@@ -464,7 +464,6 @@ set(paraview_default_plugins
   # These plugins have not yet been updated.
   #GenericIOReader
   #GeodesicMeasurementPlugin
-  #pvblot
   AcceleratedAlgorithms
   AnalyzeNIfTIReaderWriter
   ArrowGlyph
@@ -487,7 +486,8 @@ set(paraview_default_plugins
   StreamingParticles
   SurfaceLIC
   ThickenLayeredCells
-  VTKmFilters)
+  VTKmFilters
+  pvblot)
 foreach (paraview_default_plugin IN LISTS paraview_default_plugins)
   set("_paraview_plugin_default_${paraview_default_plugin}" ON)
 endforeach ()
