@@ -44,28 +44,21 @@
 #ifndef vtkGMVReader_h
 #define vtkGMVReader_h
 
-#include "vtkDataSet.h"
-#include "vtkFieldData.h"
+#include "vtkGMVReaderModule.h" // for export macro
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkPVConfig.h" // For PARAVIEW_USE_MPI
-#include "vtkPolyData.h"
 
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStringArray.h"
 #include <map>    // for TimeStepValuesMap & NumberOfPolygonsMap
 #include <string> // for TimeStepValuesMap & NumberOfPolygonsMap
-#include <sys/stat.h>
-#include <vector> // for NodeDataInfoTemp & CellDataInfoTemp
 
-class vtkIntArray;
-class vtkStringArray;
-class vtkDataArraySelection;
 class vtkCallbackCommand;
-#ifdef PARAVIEW_USE_MPI
+class vtkDataArraySelection;
+class vtkDataSet;
+class vtkFieldData class vtkIntArray;
 class vtkMultiProcessController;
-#endif
+class vtkPolyData;
+class vtkStringArray;
 
-class vtkGMVReader : public vtkMultiBlockDataSetAlgorithm
+class VTKGMVREADER_EXPORT vtkGMVReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkGMVReader* New();
@@ -188,16 +181,12 @@ public:
   int GetHasPolygons();
   int GetHasProbtimeKeyword();
 
-#ifdef PARAVIEW_USE_MPI
-
   // Description:
   // Set the controller use in compositing (set to
   // the global controller by default)
   // If not using the default, this must be called before any
   // other methods.
   virtual void SetController(vtkMultiProcessController* controller);
-
-#endif
 
 protected:
   vtkGMVReader();
@@ -240,11 +229,7 @@ protected:
   static void SelectionModifiedCallback(
     vtkObject* caller, unsigned long eid, void* clientdata, void* calldata);
 
-#ifdef PARAVIEW_USE_MPI
-
   vtkMultiProcessController* Controller;
-
-#endif
 
 private:
   vtkGMVReader(const vtkGMVReader&) = delete;
@@ -286,7 +271,6 @@ private:
     VFACE3D = 10
   };
 
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
   template <class C>
   struct DataInfo
   {
@@ -297,7 +281,6 @@ private:
 
   DataInfo<float>* NodeDataInfo; // type float because Get{Node,Cell}DataRange
   DataInfo<float>* CellDataInfo; // takes floats for min/max
-#endif
 
   // Toggle whether GMV node numbers needs to decremented by 1 for VTK
   bool DecrementNodeIds;

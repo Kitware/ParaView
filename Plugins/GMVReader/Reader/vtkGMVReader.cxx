@@ -41,9 +41,14 @@
 #include <set>
 #include <vtksys/SystemTools.hxx>
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelCore
 #include "vtkMultiProcessController.h"
 vtkCxxSetObjectMacro(vtkGMVReader, Controller, vtkMultiProcessController);
+#else
+void vtkGMVReader::SetController(vtkMultiProcessController*)
+{
+  vtkWarningMacro("Ignoring SetController in a non-MPI build");
+}
 #endif
 
 vtkStandardNewMacro(vtkGMVReader);
@@ -154,10 +159,8 @@ vtkGMVReader::vtkGMVReader()
   this->NumberOfPolygons = 0;
   this->ImportPolygons = 0;
 
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
   this->NodeDataInfo = NULL;
   this->CellDataInfo = NULL;
-#endif
 
   this->PointDataArraySelection = vtkDataArraySelection::New();
   this->CellDataArraySelection = vtkDataArraySelection::New();
@@ -174,10 +177,10 @@ vtkGMVReader::vtkGMVReader()
 
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
-// this->CurrentOutput = 0;
+  // this->CurrentOutput = 0;
 
-#ifdef PARAVIEW_USE_MPI
-  this->Controller = NULL;
+  this->Controller = nullptr;
+#if VTK_MODULE_ENABLE_VTK_ParallelCore
   this->SetController(vtkMultiProcessController::GetGlobalController());
 #endif
 }
@@ -194,12 +197,10 @@ vtkGMVReader::~vtkGMVReader()
   this->NumberOfTracersMap.clear();
   this->NumberOfPolygonsMap.clear();
 
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
   if (this->NodeDataInfo)
     delete[] this->NodeDataInfo;
   if (this->CellDataInfo)
     delete[] this->CellDataInfo;
-#endif
 
   this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
   this->PointDataArraySelection->Delete();
@@ -218,7 +219,7 @@ vtkGMVReader::~vtkGMVReader()
   if (this->Polygons)
     this->Polygons->Delete();
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelCore
   this->SetController(NULL);
 #endif
 }
@@ -1991,7 +1992,7 @@ int vtkGMVReader::RequestData(vtkInformation* vtkNotUsed(request),
 int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelCore
   if (this->Controller)
   {
     if (this->Controller->GetNumberOfProcesses() > 1)
@@ -2023,7 +2024,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   if (ierr != -1)
     this->BinaryFile = 1;
 
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
   std::vector<DataInfo<float> > NodeDataInfoTemp, CellDataInfoTemp;
   DataInfo<float> Info;
 #endif
@@ -2108,7 +2109,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfNodes, miL, mxL);
             Info.min[0] = float(miL);
             Info.max[0] = float(mxL);
@@ -2121,7 +2122,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (CELL):
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfCells, miL, mxL);
             Info.min[0] = float(miL);
             Info.max[0] = float(mxL);
@@ -2149,7 +2150,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (NODE):
             this->NumberOfNodeFields += 3;
             this->NumberOfNodeComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
             Info.min[0] = miD;
             Info.max[0] = mxD;
@@ -2168,7 +2169,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (CELL):
             this->NumberOfCellFields += 3;
             this->NumberOfCellComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
             Info.min[0] = miD;
             Info.max[0] = mxD;
@@ -2198,7 +2199,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
             Info.min[0] = miD;
             Info.max[0] = mxD;
@@ -2211,7 +2212,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (CELL):
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
             Info.min[0] = miD;
             Info.max[0] = mxD;
@@ -2237,7 +2238,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
             Info.min[0] = miD;
             Info.max[0] = mxD;
@@ -2250,7 +2251,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (CELL):
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
             Info.min[0] = miD;
             Info.max[0] = mxD;
@@ -2283,7 +2284,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             // GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
             Info.min[0] = 0;
             Info.max[0] = 0;
@@ -2296,7 +2297,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (CELL):
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             // GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
             Info.min[0] = 0;
             Info.max[0] = 0;
@@ -2341,7 +2342,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
 
           case (TRACERDATA):
 // Determine min/max values for statistics tab
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfTracers, miD, mxD);
             Info.min[0] = miD;
             Info.max[0] = mxD;
@@ -2369,7 +2370,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
         break;
 
       case (TRACEIDS):
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
         GMVRead::minmax(GMVRead::gmv_data.longdata1, int(GMVRead::gmv_data.num), miL, mxL);
         Info.min[0] = float(miL);
         Info.max[0] = float(mxL);
@@ -2417,7 +2418,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (REGULAR):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfNodes, miL, mxL);
             Info.min[0] = float(miL);
             Info.max[0] = float(mxL);
@@ -2437,7 +2438,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
           case (REGULAR):
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
             GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfCells, miL, mxL);
             Info.min[0] = float(miL);
             Info.max[0] = float(mxL);
@@ -2523,7 +2524,7 @@ int vtkGMVReader::RequestInformation(vtkInformation* vtkNotUsed(request),
     }
   }
 
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
   if (NodeDataInfoTemp.size() > 0)
   {
     this->NumberOfNodeComponents = (unsigned int)NodeDataInfoTemp.size();
@@ -2693,7 +2694,7 @@ const char* vtkGMVReader::GetByteOrderAsString()
 }
 
 //----------------------------------------------------------------------------
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
+#if PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS
 void vtkGMVReader::GetNodeDataRange(int nodeComp, int index, float* min, float* max)
 {
   if (index >= this->NodeDataInfo[nodeComp].veclen || index < 0)

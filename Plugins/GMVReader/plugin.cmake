@@ -1,4 +1,12 @@
-pv_plugin(GMVReader
-  DESCRIPTION "Reader for binary or ASCII files stored in General Mesh Viewer file format"
-  DEFAULT_ENABLED
-  )
+NAME
+  GMVReader
+DESCRIPTION
+  Reader for binary or ASCII files stored in General Mesh Viewer file format
+REQUIRES_MODULES
+  # See CMakeLists.txt.
+  #ParaView::Common
+  #ParaView::ServerManagerCore
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMisc

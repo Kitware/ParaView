@@ -1,0 +1,12 @@
+NAME
+  GMVReader::vtkGMVReader
+LIBRARY_NAME
+  vtkGMVReader
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonMisc
+OPTIONAL_DEPENDS
+  VTK::ParallelCore
