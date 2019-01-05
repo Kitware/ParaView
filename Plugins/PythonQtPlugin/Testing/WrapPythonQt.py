@@ -137,14 +137,14 @@ class %s %s : public QObject
 public:
 
   %s(QObject* parent=0) : QObject(parent)
-    {
+  {
 %s
-    }
+  }
 
   inline void registerClassForPythonQt(const QMetaObject* metaobject)
-    {
+  {
     PythonQt::self()->registerClass(metaobject, "%s");
-    }
+  }
 
 public slots:
 

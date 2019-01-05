@@ -42,7 +42,7 @@ Testing the Plugin
 ------------------
 
 After loading the PythonQt plugin in ParaView, you can try out the functions
-defined by demo.py.
+defined by samples/demo.py.
 
 
 Wrapping the ParaView Qt Interface
