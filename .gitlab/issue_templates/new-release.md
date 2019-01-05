@@ -226,6 +226,7 @@ If making a non-RC release:
 <!--
 If making a non-RC release:
 
+  - [ ] Update link to ParaView Guide PDF at https://www.paraview.org/paraview-guide/
   - [ ] Update release notes
     (https://www.paraview.org/Wiki/ParaView_Release_Notes)
   - [ ] Move unclosed issues to next release milestone in GitLab
