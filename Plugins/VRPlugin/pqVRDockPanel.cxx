@@ -46,10 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRQueueHandler.h"
 #include "pqView.h"
 
-#ifdef PARAVIEW_USE_VRPN
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
 #include "pqVRPNConnection.h"
 #endif
-#ifdef PARAVIEW_USE_VRUI
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
 #include "pqVRUIConnection.h"
 #endif
 
@@ -219,14 +219,14 @@ void pqVRDockPanel::editConnection(QListWidgetItem* item)
 
   pqVRAddConnectionDialog dialog(this);
   bool set = false;
-#ifdef PARAVIEW_USE_VRPN
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
   if (pqVRPNConnection* vrpnConn = mgr->GetVRPNConnection(connName))
   {
     set = true;
     dialog.setConnection(vrpnConn);
   }
 #endif
-#ifdef PARAVIEW_USE_VRUI
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
   if (pqVRUIConnection* vruiConn = mgr->GetVRUIConnection(connName))
   {
     if (!set)
@@ -269,14 +269,14 @@ void pqVRDockPanel::addConnection()
   {
     pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
     dialog.updateConnection();
-#ifdef PARAVIEW_USE_VRPN
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
     if (dialog.isVRPN())
     {
       pqVRPNConnection* conn = dialog.getVRPNConnection();
       mgr->add(conn);
     }
 #endif
-#ifdef PARAVIEW_USE_VRUI
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
     if (dialog.isVRUI())
     {
       pqVRUIConnection* conn = dialog.getVRUIConnection();
@@ -298,14 +298,14 @@ void pqVRDockPanel::removeConnection()
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
 
   pqVRAddConnectionDialog dialog(this);
-#ifdef PARAVIEW_USE_VRPN
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
   if (pqVRPNConnection* vrpnConn = mgr->GetVRPNConnection(name))
   {
     mgr->remove(vrpnConn);
     return;
   }
 #endif
-#ifdef PARAVIEW_USE_VRUI
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
   if (pqVRUIConnection* vruiConn = mgr->GetVRUIConnection(name))
   {
     mgr->remove(vruiConn);

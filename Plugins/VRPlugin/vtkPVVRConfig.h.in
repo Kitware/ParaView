@@ -16,7 +16,7 @@
 #ifndef vtkPVVRConfig_h
 #define vtkPVVRConfig_h
 
-#cmakedefine PARAVIEW_USE_VRPN
-#cmakedefine PARAVIEW_USE_VRUI
+#cmakedefine01 PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+#cmakedefine01 PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
 
 #endif // vtkPVVRConfig.h_h

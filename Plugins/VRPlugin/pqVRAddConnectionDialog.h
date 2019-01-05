@@ -29,48 +29,59 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef vtkVRStyleGrabNRotateSliceNormal_h
-#define vtkVRStyleGrabNRotateSliceNormal_h
+#ifndef pqVRAddConnectionDialog_h
+#define pqVRAddConnectionDialog_h
 
-#include "vtkSmartPointer.h"
-#include "vtkVRStyleGrabNUpdateMatrix.h"
-#include <map>
-#include <vector>
+#include <QDialog>
 
-class vtkSMProperty;
-class vtkSMProxy;
-class vtkSMRenderViewProxy;
-class vtkMatrix4x4;
-class vtkSMDoubleVectorProperty;
+#include "vtkPVVRConfig.h"
 
-class vtkVRStyleGrabNRotateSliceNormal : public vtkVRStyleGrabNUpdateMatrix
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+class pqVRPNConnection;
+#endif
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+class pqVRUIConnection;
+#endif
+
+class pqVRAddConnectionDialog : public QDialog
 {
   Q_OBJECT
-  typedef vtkVRStyleGrabNUpdateMatrix Superclass;
+  typedef QDialog Superclass;
 
 public:
-  vtkVRStyleGrabNRotateSliceNormal(QObject* parent = 0);
-  virtual ~vtkVRStyleGrabNRotateSliceNormal();
-  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* saveConfiguration() const;
-  virtual void HandleButton(const vtkVREventData& data);
-  virtual void HandleTracker(const vtkVREventData& data);
-  virtual void GetPropertyData();
-  virtual void SetProperty();
-  virtual bool update();
-  bool GetNormalProxyNProperty();
+  pqVRAddConnectionDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  virtual ~pqVRAddConnectionDialog();
+
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN
+  void setConnection(pqVRPNConnection* conn);
+  pqVRPNConnection* getVRPNConnection();
+  bool isVRPN();
+#endif
+#if PARAVIEW_PLUGIN_VRPlugin_USE_VRUI
+  void setConnection(pqVRUIConnection* conn);
+  pqVRUIConnection* getVRUIConnection();
+  bool isVRUI();
+#endif
+
+  void updateConnection();
+
+public slots:
+  void accept();
 
 protected:
-  std::string NormalProxyName;
-  std::string NormalPropertyName;
-  bool IsFoundNormalProxyProperty;
+  void keyPressEvent(QKeyEvent*);
 
-  vtkSMProxy* NormalProxy;
-  vtkSMDoubleVectorProperty* NormalProperty;
-  double Normal[4];
+private slots:
+  void addInput();
+  void removeInput();
+
+  void connectionTypeChanged();
 
 private:
-  Q_DISABLE_COPY(vtkVRStyleGrabNRotateSliceNormal)
+  Q_DISABLE_COPY(pqVRAddConnectionDialog)
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif
