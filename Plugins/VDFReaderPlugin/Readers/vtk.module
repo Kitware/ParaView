@@ -1,0 +1,10 @@
+NAME
+  VDFReaderPlugin::vtkVaporReaders
+LIBRARY_NAME
+  vtkVaporReaders
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsCore
+  VTK::CommonCore
+  VTK::CommonDataModel

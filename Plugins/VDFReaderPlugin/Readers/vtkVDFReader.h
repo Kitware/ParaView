@@ -131,10 +131,11 @@
 // controlled by the refinement parameter.
 //
 
-#ifndef _vtkVDFReader_h
-#define _vtkVDFReader_h
+#ifndef vtkVDFReader_h
+#define vtkVDFReader_h
 
 #include "vtkImageAlgorithm.h"
+#include "vtkVaporReadersModule.h" // for export macro
 
 #include "vapor/DataMgr.h"                    //needed for vapor datastructures
 #include "vapor/WaveletBlock3DRegionReader.h" //needed for vapor datastructures
@@ -146,7 +147,7 @@
 // using namespace std;
 using namespace VAPoR;
 
-class VTK_EXPORT vtkVDFReader : public vtkImageAlgorithm
+class VTKVAPORREADERS_EXPORT vtkVDFReader : public vtkImageAlgorithm
 {
 public:
   static vtkVDFReader* New();
