@@ -15,9 +15,12 @@
                      to write expressions by defining certain variables. The
                      filter tries to assign each array to a variable of the
                      same name. If the name of the array is not a valid Python
-                     variable, it has to be accessed through a dictionary
-                     called arrays (i.e. arrays['array_name']). The points can
-                     be accessed using the points variable.</Documentation>
+                     variable, it may be accessed through a variable with a
+                     sanitized version of that array name consisting of only
+                     '_' and the alphanumeric characters in the name joined
+                     together with no spaces. Point coordinates from datasets
+                     that explicitly define them can be accessed using the variable
+                     named 'points'.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
@@ -223,7 +226,8 @@ annotation text.
                  name="PythonAnnotation">
       <Documentation long_help="This filter evaluates a Python expression for a text annotation"
                      short_help="Evaluates a Python expression for a text annotation">
-                     This filter uses Python to calculate an expression. It
+                     This filter uses Python to calculate an expression and display
+                     the result as an annotation in the render view. It
                      depends heavily on the numpy and paraview.vtk modules. To
                      use the parallel functions, mpi4py is also necessary. The
                      expression is evaluated and the resulting scalar value or
@@ -233,8 +237,12 @@ annotation text.
                      to write expressions by defining certain variables. The
                      filter tries to assign each array to a variable of the
                      same name. If the name of the array is not a valid Python
-                     variable, it has to be accessed through a dictionary
-                     called arrays (i.e. arrays['array_name']).</Documentation>
+                     variable, it may be accessed through a variable with a
+                     sanitized version of that array name consisting of only
+                     '_' and the alphanumeric characters in the name joined
+                     together with no spaces. Point coordinates from datasets
+                     that explicitly define them can be accessed using the variable
+                     named 'points'.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
