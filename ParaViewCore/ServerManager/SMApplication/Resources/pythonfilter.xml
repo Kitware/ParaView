@@ -252,7 +252,7 @@ annotation text.
                          default_values="2"
                          name="ArrayAssociation"
                          number_of_elements="1">
-        <Documentation>Select the attribute to use to popular array names from.</Documentation>
+        <Documentation>Select the attribute to use to populate array names.</Documentation>
         <EnumerationDomain name="enum">
           <Entry text="Point Data" value="0" />
           <Entry text="Cell Data" value="1" />
@@ -264,7 +264,7 @@ annotation text.
                             name="Expression"
                             number_of_elements="1">
         <Documentation>The Python expression evaluated during execution.
-        FieldData arrays are direclty available through their name. Set of
+        FieldData arrays are directly available through their name. Set of
         provided variables [input, t_value, t_steps, t_range, t_index,
         FieldData, PointData, CellData] (i.e.: "Momentum: (%f, %f, %f)" %
         (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )</Documentation>
