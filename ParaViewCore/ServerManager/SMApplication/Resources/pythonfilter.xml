@@ -106,15 +106,15 @@ timestep.
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Choose arrays that is going to be
-        displayed</Documentation>
+        <Documentation>Choose array that is going to be
+        displayed.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetPrefix"
                             default_values="Value is: "
                             name="Prefix"
                             number_of_elements="1">
         <Documentation>Text that is used as a prefix to the field
-        value</Documentation>
+        value.</Documentation>
       </StringVectorProperty>
       <StringVectorProperty command="SetFormat"
                             default_values="%7.5g"
@@ -129,7 +129,7 @@ timestep.
                             name="Suffix"
                             number_of_elements="1">
         <Documentation>Text that is used as a suffix to the field
-        value</Documentation>
+        value.</Documentation>
       </StringVectorProperty>
       <Hints>
         <Visibility replace_input="0" />
