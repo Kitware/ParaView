@@ -90,54 +90,43 @@ public:
 
   //@{
   /**
-   * Set the title of the active plot.
+   * Get/Set the font of the title.
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
    */
-  void SetTitle(const char* title);
-  const char* GetTitle();
+  void SetTitleFont(const char* family, int pointSize, bool bold, bool italic) override;
+  void SetTitleFontFamily(const char* family) override;
+  void SetTitleFontSize(int pointSize) override;
+  void SetTitleBold(bool bold) override;
+  void SetTitleItalic(bool italic) override;
+  void SetTitleFontFile(const char* file) override;
+  const char* GetTitleFontFamily() override;
+  int GetTitleFontSize() override;
+  int GetTitleFontBold() override;
+  int GetTitleFontItalic() override;
   //@}
 
   //@{
   /**
-   * Set the active plot title's font.
+   * Get/Set the color of the title.
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
    */
-  void SetTitleFont(const char* family, int pointSize, bool bold, bool italic);
-  void SetTitleFontFamily(const char* family);
-  void SetTitleFontSize(int pointSize);
-  void SetTitleBold(bool bold);
-  void SetTitleItalic(bool italic);
-  void SetTitleFontFile(const char* file);
-  const char* GetTitleFontFamily();
-  int GetTitleFontSize();
-  int GetTitleFontBold();
-  int GetTitleFontItalic();
+  void SetTitleColor(double red, double green, double blue) override;
+  double* GetTitleColor() override;
   //@}
 
   //@{
   /**
-   * Set the active plot title's color.
+   * Set the alignement of the title.
    * These methods should not be called directly. They are made public only so
    * that the client-server-stream-interpreter can invoke them. Use the
    * corresponding properties to change these values.
    */
-  void SetTitleColor(double red, double green, double blue);
-  double* GetTitleColor();
-  //@}
-
-  //@{
-  /**
-   * Set the active plot title's alignment.
-   * These methods should not be called directly. They are made public only so
-   * that the client-server-stream-interpreter can invoke them. Use the
-   * corresponding properties to change these values.
-   */
-  void SetTitleAlignment(int alignment);
-  int GetTitleAlignment();
+  void SetTitleAlignment(int alignment) override;
+  int GetTitleAlignment() override;
   //@}
 
   /**
@@ -346,6 +335,11 @@ public:
 protected:
   vtkPVPlotMatrixView();
   ~vtkPVPlotMatrixView() override;
+
+  /**
+   * Actual rendering implementation.
+   */
+  void Render(bool interactive) override;
 
   /**
    * The callback function when SelectionChangedEvent is invoked from

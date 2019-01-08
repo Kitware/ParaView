@@ -39,9 +39,10 @@
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
 
+#include <sstream>
+
 //----------------------------------------------------------------------------
 vtkPVContextView::vtkPVContextView()
-  : InteractorStyle()
 {
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
 
@@ -67,6 +68,7 @@ vtkPVContextView::~vtkPVContextView()
 
   this->RenderWindow->Delete();
   this->ContextView->Delete();
+  this->SetTitle(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -355,6 +357,23 @@ bool vtkPVContextView::Export(vtkCSVExporter* exporter)
   }
   exporter->Close();
   return true;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVContextView::GetFormattedTitle()
+{
+  std::string formattedTitle = this->GetTitle();
+
+  std::string key = "${TIME}";
+  size_t pos = formattedTitle.find(key);
+  if (pos != std::string::npos)
+  {
+    std::ostringstream stream;
+    stream << formattedTitle.substr(0, pos) << this->GetViewTime()
+           << formattedTitle.substr(pos + key.length());
+    formattedTitle = stream.str();
+  }
+  return formattedTitle;
 }
 
 //----------------------------------------------------------------------------

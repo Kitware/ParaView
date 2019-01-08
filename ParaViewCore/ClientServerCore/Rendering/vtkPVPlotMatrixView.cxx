@@ -203,15 +203,6 @@ void vtkPVPlotMatrixView::AdvanceAnimationPath()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlotMatrixView::SetTitle(const char* title)
-{
-  if (this->PlotMatrix)
-  {
-    this->PlotMatrix->SetTitle(title);
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::SetTitleFont(const char* family, int pointSize, bool bold, bool italic)
 {
   if (this->PlotMatrix)
@@ -621,12 +612,6 @@ double* vtkPVPlotMatrixView::GetTitleColor()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVPlotMatrixView::GetTitle()
-{
-  return this->PlotMatrix ? this->PlotMatrix->GetTitle() : NULL;
-}
-
-//----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetTitleAlignment()
 {
   return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetJustification() : 0;
@@ -727,4 +712,15 @@ double* vtkPVPlotMatrixView::GetScatterPlotSelectedActiveColor()
   return this->PlotMatrix
     ? this->PlotMatrix->GetScatterPlotSelectedActiveColor().Cast<double>().GetData()
     : NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::Render(bool interactive)
+{
+  if (!this->PlotMatrix)
+  {
+    return;
+  }
+  this->PlotMatrix->SetTitle(this->GetFormattedTitle());
+  this->Superclass::Render(interactive);
 }

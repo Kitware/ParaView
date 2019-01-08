@@ -121,6 +121,57 @@ public:
    */
   virtual bool Export(vtkCSVExporter* exporter);
 
+  //@{
+  /**
+   * Get/Set the title.
+   * These methods should not be called directly. They are made public only so
+   * that the client-server-stream-interpreter can invoke them. Use the
+   * corresponding properties to change these values.
+   */
+  vtkSetStringMacro(Title);
+  vtkGetStringMacro(Title);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the font of the title.
+   * These methods should not be called directly. They are made public only so
+   * that the client-server-stream-interpreter can invoke them. Use the
+   * corresponding properties to change these values.
+   */
+  virtual void SetTitleFont(const char* family, int pointSize, bool bold, bool italic) = 0;
+  virtual void SetTitleFontFamily(const char* family) = 0;
+  virtual void SetTitleFontSize(int pointSize) = 0;
+  virtual void SetTitleBold(bool bold) = 0;
+  virtual void SetTitleItalic(bool italic) = 0;
+  virtual void SetTitleFontFile(const char* file) = 0;
+  virtual const char* GetTitleFontFamily() = 0;
+  virtual int GetTitleFontSize() = 0;
+  virtual int GetTitleFontBold() = 0;
+  virtual int GetTitleFontItalic() = 0;
+  //@}
+
+  //@{
+  /**
+   * Get/Set the color of the title.
+   * These methods should not be called directly. They are made public only so
+   * that the client-server-stream-interpreter can invoke them. Use the
+   * corresponding properties to change these values.
+   */
+  virtual void SetTitleColor(double red, double green, double blue) = 0;
+  virtual double* GetTitleColor() = 0;
+  //@}
+
+  //@{
+  /**
+   * Get/Set the alignement of the title.
+   * These methods should not be called directly. They are made public only so
+   * that the client-server-stream-interpreter can invoke them. Use the
+   * corresponding properties to change these values.
+   */
+  virtual void SetTitleAlignment(int alignment) = 0;
+  virtual int GetTitleAlignment() = 0;
+
 protected:
   vtkPVContextView();
   ~vtkPVContextView() override;
@@ -153,12 +204,21 @@ protected:
   void OnEndRender();
   //@}
 
+  /**
+   * Method to get the Formatted title after replacing some key strings
+   * eg: ${TIME}
+   * Child class should inherit this to add their own key strings
+   */
+  virtual std::string GetFormattedTitle();
+
   vtkContextView* ContextView;
   vtkRenderWindow* RenderWindow;
 
 private:
   vtkPVContextView(const vtkPVContextView&) = delete;
   void operator=(const vtkPVContextView&) = delete;
+
+  char* Title = nullptr;
 
   // Used in GetSelection to avoid modifying the selection obtained from the
   // annotation link.

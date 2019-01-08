@@ -35,9 +35,6 @@
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
 
-#include <sstream>
-#include <string>
-
 bool vtkPVXYChartView::IgnoreNegativeLogAxisWarning = false;
 
 class vtkPVXYChartView::vtkInternals
@@ -68,7 +65,6 @@ vtkPVXYChartView::vtkPVXYChartView()
   this->Internals = new vtkInternals();
 
   this->Chart = NULL;
-  this->InternalTitle = NULL;
   this->PlotTime = vtkPVPlotTime::New();
   this->HideTimeMarker = false;
   this->SortByXAxis = false;
@@ -93,9 +89,6 @@ vtkPVXYChartView::~vtkPVXYChartView()
   }
   this->PlotTime->Delete();
   this->PlotTime = NULL;
-
-  this->SetInternalTitle(NULL);
-
   delete this->Internals;
 }
 
@@ -202,24 +195,6 @@ void vtkPVXYChartView::SetChartType(const char* type)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::SetTitle(const char* title)
-{
-  if (this->Chart)
-  {
-    std::string tmp(title);
-    if (tmp.find("${TIME}") != std::string::npos)
-    {
-      this->SetInternalTitle(title);
-    }
-    else
-    {
-      this->Chart->SetTitle(title);
-      this->SetInternalTitle(NULL);
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetTitleFont(const char* family, int pointSize, bool bold, bool italic)
 {
   if (this->Chart)
@@ -292,6 +267,42 @@ void vtkPVXYChartView::SetTitleAlignment(int alignment)
   {
     this->Chart->GetTitleProperties()->SetJustification(alignment);
   }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVXYChartView::GetTitleFontFamily()
+{
+  return this->Chart ? this->Chart->GetTitleProperties()->GetFontFamilyAsString() : nullptr;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXYChartView::GetTitleFontSize()
+{
+  return this->Chart ? this->Chart->GetTitleProperties()->GetFontSize() : -1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXYChartView::GetTitleFontBold()
+{
+  return this->Chart ? this->Chart->GetTitleProperties()->GetBold() : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXYChartView::GetTitleFontItalic()
+{
+  return this->Chart ? this->Chart->GetTitleProperties()->GetItalic() : 0;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVXYChartView::GetTitleColor()
+{
+  return this->Chart ? this->Chart->GetTitleProperties()->GetColor() : nullptr;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXYChartView::GetTitleAlignment()
+{
+  return this->Chart ? this->Chart->GetTitleProperties()->GetJustification() : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -754,19 +765,7 @@ void vtkPVXYChartView::Render(bool interactive)
   {
     return;
   }
-  if (this->InternalTitle)
-  {
-    std::ostringstream new_title;
-    std::string title(this->InternalTitle);
-    size_t pos = title.find("${TIME}");
-    if (pos != std::string::npos)
-    {
-      // The string was found - replace it and set the chart title.
-      new_title << title.substr(0, pos) << this->GetViewTime()
-                << title.substr(pos + strlen("${TIME}"));
-      this->Chart->SetTitle(new_title.str().c_str());
-    }
-  }
+  this->Chart->SetTitle(this->GetFormattedTitle());
 
   this->PlotTime->SetTime(this->GetViewTime());
   this->PlotTime->SetTimeAxisMode(vtkPVPlotTime::NONE);
