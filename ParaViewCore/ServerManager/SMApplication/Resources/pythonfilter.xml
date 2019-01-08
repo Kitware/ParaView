@@ -142,7 +142,7 @@ timestep.
     <SourceProxy class="vtkAnnotateAttributeDataFilter"
                  label="Annotate Attribute Data"
                  name="AnnotateAttributeData">
-      <Documentation short_help="Adds a text annotation to a Rander View">
+      <Documentation short_help="Adds a text annotation to a Render View">
 This filter can be used to add a text annotation to a Render View (or
 similar) using a tuple from any attribute array (point/cell/field/row
 etc.) from a specific rank (when running in parallel). Use **ArrayName**
@@ -185,7 +185,7 @@ annotation text.
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>This property indicates the name of the array from which
-        to compute the histogram.</Documentation>
+        to obtain the annotation value.</Documentation>
       </StringVectorProperty>
       <IntVectorProperty name="ElementId"
                          command="SetElementId"
