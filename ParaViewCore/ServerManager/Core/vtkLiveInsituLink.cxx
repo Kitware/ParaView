@@ -1139,6 +1139,7 @@ void vtkLiveInsituLink::OnInsituPostProcess(double time, vtkIdType timeStep)
     this->Proc0NodesController->Receive((char*)data, size, 1, 674524);
     vtkClientServerStream mainStream;
     mainStream.SetData(data, size);
+    delete[] data;
 
     int nbArgs = mainStream.GetNumberOfArguments(0);
     int arg = 0;
