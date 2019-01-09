@@ -29,31 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef pqPipelineModel_h
-#define pqPipelineModel_h
-
-#include "pqComponentsModule.h"
-
-#include "pqView.h"
-#include "vtkSmartPointer.h"
-#include <QAbstractItemModel>
-#include <QPointer>
-
-class pqDataRepresentation;
-class pqPipelineModelFilter;
-class pqPipelineModelInternal;
-class pqPipelineModelItem;
-class pqPipelineModelOutput;
-class pqPipelineModelSource;
-class pqPipelineSource;
-class pqView;
-class pqServer;
-class pqServerManagerModel;
-class pqServerManagerModelItem;
-class QFont;
-class QPixmap;
-class ModifiedLiveInsituLink;
-
 /**
 * \class pqPipelineModel
 * \brief
@@ -73,13 +48,26 @@ class ModifiedLiveInsituLink;
 * pipeline object.
 */
 
-class pqPipelineModelInternal;
-class pqServerManagerModelItem;
-class pqPipelineSource;
-class pqServer;
+#ifndef pqPipelineModel_h
+#define pqPipelineModel_h
+
+#include "pqComponentsModule.h" // For export macro
+#include "pqView.h"             // For View
+
+#include <QAbstractItemModel>
+#include <QMap>     // For PixmapMap
+#include <QPointer> // For View
+
+class ModifiedLiveInsituLink;
+class QFont;
 class QPixmap;
 class QString;
 class pqPipelineModelDataItem;
+class pqPipelineModelInternal;
+class pqPipelineSource;
+class pqServer;
+class pqServerManagerModel;
+class pqServerManagerModelItem;
 class vtkSession;
 
 /**
@@ -430,9 +418,18 @@ private:
 
   QModelIndex getIndex(pqPipelineModelDataItem* item) const;
 
+  /**
+   * Check the PixmapMap contains a pixmap associated to the provided iconType.
+   * Return true if yes.
+   * If not it will try to load a new pixmap interpreting iconType as a Qt resource name
+   * and add it to the map.
+   * Return true if sucessful, false otherwise.
+   */
+  bool checkAndLoadPipelinePixmap(const QString& iconType);
+
 private:
   pqPipelineModelInternal* Internal; ///< Stores the pipeline representation.
-  QPixmap* PixmapList;               ///< Stores the item icons.
+  QMap<QString, QPixmap> PixmapMap;  ///< Stores the item icons.
   QPointer<pqView> View;
   bool Editable;
   QString FilterRoleAnnotationKey;
