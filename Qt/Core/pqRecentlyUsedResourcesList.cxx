@@ -64,7 +64,7 @@ void pqRecentlyUsedResourcesList::add(const pqServerResource& resource)
 
   this->ResourceList.prepend(resource);
 
-  const int max_length = 10;
+  const int max_length = 30;
   while (this->ResourceList.size() > max_length)
   {
     this->ResourceList.removeAt(max_length);
