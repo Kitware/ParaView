@@ -68,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelpReaction.h"
 #endif
 #include "pqIgnoreSourceTimeReaction.h"
+#include "pqImmediateExportReaction.h"
 #include "pqImportCinemaReaction.h"
 #include "pqLinkSelectionReaction.h"
 #include "pqLoadDataReaction.h"
@@ -697,6 +698,8 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
   QAction* gcatalyst = menu.addAction("Export Catalyst Script")
     << pqSetName("actionExportCatalyst");
   new pqCatalystExportReaction(gcatalyst);
+  QAction* gimmediate = menu.addAction("Export Now") << pqSetName("actionExportImmediate");
+  new pqImmediateExportReaction(gimmediate);
   QAction* gtemporal = menu.addAction("Export Temporal Script")
     << pqSetName("actionExportTemporal");
   new pqTemporalExportReaction(gtemporal);

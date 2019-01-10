@@ -4798,12 +4798,12 @@
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="1" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="1" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="2" />
               </Expression>
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="2" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="3" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="3" />
               </Expression>
             </Expression>
           </PropertyWidgetDecorator>
@@ -4836,12 +4836,12 @@
           <PropertyWidgetDecorator type="CompositeDecorator">
             <Expression type="and">
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="1" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Deferred Rendering" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="1" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="DeferredRendering" value="2" />
               </Expression>
               <Expression type="or">
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="2" />
-                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="Camera Model" value="3" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="2" />
+                <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="CameraModel" value="3" />
               </Expression>
             </Expression>
           </PropertyWidgetDecorator>
