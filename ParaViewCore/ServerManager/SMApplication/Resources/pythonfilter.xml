@@ -245,7 +245,7 @@ annotation text.
                      named 'points'.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
-                     multiple_input="1"
+                     multiple_input="0"
                      name="Input">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
