@@ -33,6 +33,7 @@
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMTransferFunctionProxy.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMVectorProperty.h"
 #include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
@@ -197,12 +198,16 @@ void vtkInheritRepresentationProperties(vtkSMRepresentationProxy* repr, vtkSMSou
       // representation, which is incorrect.
       continue;
     }
+    auto destVP = vtkSMVectorProperty::SafeDownCast(dest);
+    auto sourceVP = vtkSMVectorProperty::SafeDownCast(source);
     if (dest && source &&
       // the property wasn't modified since initialization or if it is
       // "Representation" property -- (HACK)
       (dest->GetMTime() < initTimeStamp || strcmp("Representation", pname) == 0) &&
       // the property types match.
-      strcmp(dest->GetClassName(), source->GetClassName()) == 0)
+      strcmp(dest->GetClassName(), source->GetClassName()) == 0 &&
+      // ensure vector properties have the same number of elements
+      !(destVP && sourceVP && destVP->GetNumberOfElements() != sourceVP->GetNumberOfElements()))
     {
       dest->Copy(source);
     }
