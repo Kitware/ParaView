@@ -143,6 +143,32 @@ public:
   virtual const char* GetPreferredViewType(vtkSMSourceProxy* producer, int outputPort);
 
   /**
+   * Return the pipeline icon to use with the provided producer.
+   * It can be either a view type name, an existing icon resource or nullptr.
+   * Here is the strategy to determine the pipeline icon.
+   *
+   * # Using XML hints.
+   *    A producer proxy can provide XML hints to define the pipeline icon to use
+   *    of each (or all) of its output ports. This is done as follows:
+   *
+   *    @code{xml}
+   *      <SourceProxy>
+   *        <Hints>
+   *          <PipelineIcon name="<view name or icon resource>" port="<output port number>" />
+   *        </Hints>
+   *      </SourceProxy>
+   *    @endcode
+   *
+   *    Attribute `port` is optional and only needed to explicitly specify
+   *    different view types for different output ports.
+   *
+   * # Using GetPreferredViewType
+   *    If no PipelineIcon as been provided, we fall back to using
+   *    GetPreferredViewType.
+   */
+  virtual const char* GetPipelineIcon(vtkSMSourceProxy* producer, int outputPort);
+
+  /**
    * Overridden to create color and opacity transfer functions if applicable.
    * While it is tempting to add any default property setup logic in such
    * overrides, we must keep such overrides to a minimal and opting for domains

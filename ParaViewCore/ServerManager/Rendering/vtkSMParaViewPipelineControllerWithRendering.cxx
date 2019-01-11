@@ -667,6 +667,21 @@ const char* vtkSMParaViewPipelineControllerWithRendering::GetPreferredViewType(
 }
 
 //----------------------------------------------------------------------------
+const char* vtkSMParaViewPipelineControllerWithRendering::GetPipelineIcon(
+  vtkSMSourceProxy* producer, int outputPort)
+{
+  // 1. Check if there's a hint for the producer. If so, use that.
+  vtkPVXMLElement* hint = vtkFindChildFromHints(producer->GetHints(), outputPort, "PipelineIcon");
+  if (hint && hint->GetAttribute("name"))
+  {
+    return hint->GetAttribute("name");
+  }
+
+  // 2. If not, return the prefered view type
+  return this->GetPreferredViewType(producer, outputPort);
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::AlsoShowInCurrentView(
   vtkSMSourceProxy* producer, int outputPort, vtkSMViewProxy* vtkNotUsed(currentView))
 {
