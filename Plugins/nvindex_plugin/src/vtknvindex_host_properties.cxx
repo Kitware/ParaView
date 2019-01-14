@@ -447,7 +447,7 @@ void vtknvindex_host_properties::deserialize(mi::neuraylib::IDeserializer* deser
 
       std::vector<shm_info> shmlist;
 
-      for (mi::Uint32 i = 0; i < shmlist_size; ++i)
+      for (mi::Uint32 j = 0; j < shmlist_size; ++j)
       {
         shm_info shm;
         deserializer->read(&shm.m_shm_bbox.min.x, 6);
