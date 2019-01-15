@@ -374,7 +374,9 @@ void ParaViewMainWindow::updateFontSize()
 
   if (internals.CurrentGUIFontSize != fontSize)
   {
-    this->setStyleSheet(QString("* { font-size: %1pt }").arg(fontSize));
+    QFont newFont = this->font();
+    newFont.setPointSize(fontSize);
+    this->setFont(newFont);
     this->Internals->CurrentGUIFontSize = fontSize;
   }
 
