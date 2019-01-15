@@ -53,7 +53,7 @@
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: blue;</string>
+         <string notr="true">color: palette(link);</string>
         </property>
         <property name="text">
          <string>Example Visualizations</string>
@@ -83,7 +83,7 @@
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: blue;</string>
+         <string notr="true">color: palette(link);</string>
         </property>
         <property name="text">
          <string>Getting Started Guide</string>
