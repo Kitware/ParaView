@@ -80,6 +80,15 @@ void vtkCPPythonPipeline::FixEOL(std::string& str)
     str.replace(start_pos, from.length(), to);
     start_pos += to.length();
   }
+  // sanitize triple quotes while we are at it
+  const std::string from2 = "\"\"\"";
+  const std::string to2 = "'''";
+  start_pos = 0;
+  while ((start_pos = str.find(from2, start_pos)) != std::string::npos)
+  {
+    str.replace(start_pos, from2.length(), to2);
+    start_pos += to.length();
+  }
   return;
 }
 
