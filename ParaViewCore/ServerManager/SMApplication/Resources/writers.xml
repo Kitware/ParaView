@@ -1428,130 +1428,18 @@
       <!-- End of XMLPVAnimationWriter -->
     </SourceProxy>
     <!-- ================================================================= -->
-    <PSWriterProxy class="vtkParallelSerialWriter"
-                   file_name_method="SetFileName"
-                   name="CSVWriter">
+    <PWriterProxy class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="CSVWriter">
       <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
-      delimited files from a table. In parallel, it delivers the table to the root node and
-      then saves the delimited file. For composite datasets, it saves multiple delimited
-      files. If the file extension is tsv it uses the tab character
+      delimited files from a table. If the file extension is tsv it uses the tab character
       for the delimiter. Otherwise it uses a comma.</Documentation>
-      <SubProxy>
-        <Proxy class="vtkCSVWriter"
-               name="Writer">
-          <IntVectorProperty command="SetPrecision"
-                             default_values="5"
-                             name="Precision"
-                             number_of_elements="1">
-            <IntRangeDomain min="0"
-                            name="range" />
-          </IntVectorProperty>
-          <IntVectorProperty command="SetUseScientificNotation"
-                             default_values="0"
-                             name="UseScientificNotation"
-                             number_of_elements="1">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-          <StringVectorProperty command="SetFieldDelimiter"
-                                name="FieldDelimiter"
-                                default_values=","
-                                number_of_elements="1">
-            <Documentation>Used to set the delimiter character. This is hidden from the user
-            and set automatically based on the file extension. An extension of .tsv will set
-            the delimiter character to a tab. Otherwise a comma will be used as the delimiter.</Documentation>
-          </StringVectorProperty>
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Precision" />
-          <Property name="UseScientificNotation" />
-          <Property name="FieldDelimiter" />
-        </ExposedProperties>
-      </SubProxy>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable" />
         </DataTypeDomain>
-        <Documentation>The input filter/source whose output dataset is to
-        written to the file.</Documentation>
-      </InputProperty>
-      <StringVectorProperty command="SetFileName"
-                            name="FileName"
-                            number_of_elements="1">
-        <Documentation>The name of the file to be written.</Documentation>
-      </StringVectorProperty>
-      <IntVectorProperty command="SetWriteAllTimeSteps"
-                         default_values="0"
-                         name="WriteTimeSteps"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>When WriteTimeSteps is turned ON, the writer is
-        executed once for each time step available from its input.</Documentation>
-      </IntVectorProperty>
-      <SubProxy>
-        <Proxy class="vtkPVMergeTables"
-               name="PostGatherHelper" />
-      </SubProxy>
-      <Hints>
-        <Property name="Input"
-                  show="0" />
-        <Property name="FieldDelimiter"
-                  show="0" />
-        <Property name="FileName"
-                  show="0" />
-        <WriterFactory extensions="csv txt tsv"
-                       file_description="Comma or Tab Delimited Files" />
-        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
-      </Hints>
-      <!-- End of CSVWriter -->
-    </PSWriterProxy>
-    <!-- ================================================================= -->
-    <PSWriterProxy class="vtkParallelSerialWriter"
-                   file_name_method="SetFileName"
-                   name="DataSetCSVWriter">
-      <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
-      delimited files from any dataset. Set FieldAssociation to choose whether cell
-      data/point data needs to be saved. In parallel, it delivers the table to
-      the root node and then saves the delimited file. For composite datasets, it saves
-      multiple delimited files. If the file extension is tsv it uses the tab character
-      for the delimiter. Otherwise it uses a comma.</Documentation>
-      <SubProxy>
-        <Proxy class="vtkCSVWriter"
-               name="Writer">
-          <IntVectorProperty command="SetPrecision"
-                             default_values="5"
-                             name="Precision"
-                             number_of_elements="1">
-            <IntRangeDomain min="0"
-                            name="range" />
-          </IntVectorProperty>
-          <IntVectorProperty command="SetUseScientificNotation"
-                             default_values="0"
-                             name="UseScientificNotation"
-                             number_of_elements="1">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-          <StringVectorProperty command="SetFieldDelimiter"
-                                name="FieldDelimiter"
-                                default_values=","
-                                number_of_elements="1">
-            <Documentation>Used to set the delimiter character. This is hidden from the user
-            and set automatically based on the file extension. An extension of .tsv will set
-            the delimiter character to a tab. Otherwise a comma will be used as the delimiter.</Documentation>
-          </StringVectorProperty>
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Precision" />
-          <Property name="UseScientificNotation" />
-          <Property name="FieldDelimiter" />
-        </ExposedProperties>
-      </SubProxy>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet" />
-        </DataTypeDomain>
-        <Documentation>The input filter/source whose output dataset is to
+        <Documentation>The input filter/source whose output table is to be
         written to the file.</Documentation>
       </InputProperty>
       <StringVectorProperty command="SetFileName"
@@ -1567,61 +1455,125 @@
         <Documentation>When WriteTimeSteps is turned ON, the writer is
         executed once for each timestep available from its input.</Documentation>
       </IntVectorProperty>
+      <StringVectorProperty command="SetFileNameSuffix"
+			    default_values="_%d"
+		            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+	  The suffix to append to the file name when writing files at different timesteps.
+	  (File extensions such as .csv should be excluded.)
+          The % format specifiers are used. For example, _%d will write files as FileName_0,
+	  FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+	    <Property name="WriteTimeSteps" function="boolean" />
+	  </PropertyWidgetDecorator>
+	</Hints>
+      </StringVectorProperty>
       <SubProxy>
-        <Proxy class="vtkAttributeDataToTableFilter"
-               name="PreGatherHelper">
-          <IntVectorProperty command="SetFieldAssociation"
-                             default_values="0"
-                             name="FieldAssociation"
-                             number_of_elements="1">
-            <Documentation>Select the attribute data to pass.</Documentation>
-            <EnumerationDomain name="enum">
-              <Entry text="Points"
-                     value="0" />
-              <Entry text="Cells"
-                     value="1" />
-              <Entry text="Field Data"
-                     value="2" />
-              <!-- These values are not applicable for vtkDataSet.
-               <Entry text="Vertices" value="4" />
-               <Entry text="Edges" value="5" />
-               <Entry text="Rows" value="6" />
-               -->
-            </EnumerationDomain>
-          </IntVectorProperty>
-          <IntVectorProperty command="SetAddMetaData"
-                             default_values="1"
-                             name="AddMetaData"
-                             number_of_elements="1">
-            <Documentation>It is possible for this filter to add additional
-            meta-data to the field data such as point coordinates (when point
-            attributes are selected and input is pointset) or structured
-            coordinates etc. To enable this addition of extra information, turn
-            this flag on.</Documentation>
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-        </Proxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="CSVWriter"></Proxy>
         <ExposedProperties>
-          <Property name="FieldAssociation" />
+          <PropertyGroup label="CSV Writer Parameters">
+            <Property name="Precision" />
+            <Property name="UseScientificNotation" />
+            <Property name="FieldDelimiter" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
-      <SubProxy>
-        <Proxy class="vtkPVMergeTables"
-               name="PostGatherHelper" />
-      </SubProxy>
+
       <Hints>
         <Property name="Input"
                   show="0" />
-        <Property name="FieldDelimiter"
-                  show="0" />
         <Property name="FileName"
                   show="0" />
+        <Property name="FieldDelimiter"
+                  show="0"/>
         <WriterFactory extensions="csv txt tsv"
                        file_description="Comma or Tab Delimited Files" />
         <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
       </Hints>
       <!-- End of CSVWriter -->
-    </PSWriterProxy>
+    </PWriterProxy>
+    <PWriterProxy class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="DataSetCSVWriter">
+      <Documentation short_help="Writer to write CSV files">Writer to write comma or tab
+      delimited files from any dataset. Set FieldAssociation to choose whether cell
+      data/point data needs to be saved. If the file extension is tsv it uses the tab character
+      for the delimiter. Otherwise it uses a comma.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>The input filter/source whose output dataset is to be
+        written to the file.</Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>The name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetWriteAllTimeSteps"
+                         default_values="0"
+                         name="WriteTimeSteps"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When WriteTimeSteps is turned ON, the writer is
+        executed once for each timestep available from its input.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetFileNameSuffix"
+			    default_values="_%d"
+		            label = "File name suffix"
+                            name="FileNameSuffix"
+                            number_of_elements="1">
+        <Documentation>
+	  The suffix to append to the file name when writing files at different timesteps.
+	  (File extensions such as .csv should be excluded.)
+          The % format specifiers are used. For example, _%d will write files as FileName_0,
+	  FileName_1, FileName_2, etc., and _%.3d will write files as FileName_000,
+          FileName_001, FileName_002 etc.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+	    <Property name="WriteTimeSteps" function="boolean" />
+	  </PropertyWidgetDecorator>
+	</Hints>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Writer"
+               proxygroup="internal_writers"
+               proxyname="CSVWriter"></Proxy>
+        <ExposedProperties>
+          <PropertyGroup label="CSV Writer Parameters">
+            <Property name="Precision" />
+            <Property name="FieldDelimiter"
+                      show="0"/>
+            <Property name="UseScientificNotation" />
+            <Property name="FieldAssociation" />
+            <Property name="AddMetaData" />
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <Hints>
+        <Property name="Input"
+                  show="0" />
+        <Property name="FileName"
+                  show="0" />
+        <Property name="FieldDelimiter"
+                  show="0" />
+        <WriterFactory extensions="csv txt tsv"
+                       file_description="Comma or Tab Delimited Files" />
+        <InitializationHelper class="vtkSMCSVProxiesInitializationHelper" />
+      </Hints>
+      <!-- End of DataSetCSVWriter -->
+    </PWriterProxy>
     <!-- ================================================================= -->
     <WriterProxy class="vtkXMLHyperTreeGridWriter"
                  name="HyperTreeGridWriter">

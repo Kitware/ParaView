@@ -88,24 +88,55 @@ public:
 
   //@{
   /**
-   * Internal method: decortes the "string" with the "StringDelimiter" if
+   * Get/set the attribute data to write if the input is either
+   * a vtkDataSet or composite of vtkDataSets. 0 is for point data (vtkDataObject::POINT),
+   * 1 is for cell data (vtkDataObject::CELL) and 2 is for field data (vtkDataObject::FIELD).
+   * Default is 0.
+   */
+  vtkSetClampMacro(FieldAssociation, int, 0, 2);
+  vtkGetMacro(FieldAssociation, int);
+  //@}
+
+  //@{
+  /**
+   * Get/Set whether to add additional meta-data to the field data such as
+   * point coordinates (when point attributes are selected and input is pointset)
+   * or structured coordinates etc. if the input is either a vtkDataSet or composite
+   * of vtkDataSets.
+   */
+  vtkSetMacro(AddMetaData, bool);
+  vtkGetMacro(AddMetaData, bool);
+  vtkBooleanMacro(AddMetaData, bool);
+  //@}
+
+  //@{
+  /**
+   * Internal method: decorates the "string" with the "StringDelimiter" if
    * UseStringDelimiter is true.
    */
   vtkStdString GetString(vtkStdString string);
+  //@}
 
 protected:
   vtkCSVWriter();
   ~vtkCSVWriter() override;
-  //@}
 
-  bool OpenFile();
+  /**
+   * Open the file. If append is true then the file will be appended. Otherwise the file
+   * will be overwritten.
+   */
+  bool OpenFile(bool append);
 
   void WriteData() override;
-  virtual void WriteTable(vtkTable* rectilinearGrid);
+  virtual void WriteTable(vtkTable* table);
 
   // see algorithm for more info.
-  // This writer takes in vtkTable.
+  // This writer takes in vtkTable, vtkDataSet or vtkCompositeDataSet.
   int FillInputPortInformation(int port, vtkInformation* info) override;
+
+  // see algorithm for more info. needed here so we can request pieces.
+  int ProcessRequest(vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector) override;
 
   char* FileName;
   char* FieldDelimiter;
@@ -113,6 +144,8 @@ protected:
   bool UseStringDelimiter;
   int Precision;
   bool UseScientificNotation;
+  int FieldAssociation;
+  bool AddMetaData;
 
   ofstream* Stream;
 
