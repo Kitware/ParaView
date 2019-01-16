@@ -217,6 +217,20 @@ void vtkPVXMLElement::RemoveNestedElement(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXMLElement::ReplaceNestedElement(
+  vtkPVXMLElement* elementToReplace, vtkPVXMLElement* element)
+{
+  for (auto& elem : this->Internal->NestedElements)
+  {
+    if (elem.GetPointer() == elementToReplace)
+    {
+      elem = element;
+      break;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXMLElement::AddNestedElement(vtkPVXMLElement* element)
 {
   this->AddNestedElement(element, 1);
