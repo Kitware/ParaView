@@ -60,6 +60,18 @@ public:
   vtkBooleanMacro(MergePoints, bool);
   //@}
 
+  //@{
+  /**
+   * Get/Set the tolerance to use to find coincident points when `MergePoints`
+   * is `true`. Default is 0.0.
+   *
+   * This is simply passed on to the internal vtkAppendFilter::vtkLocator used to merge points.
+   * @sa `vtkLocator::SetTolerance`.
+   */
+  vtkSetClampMacro(Tolerance, double, 0.0, VTK_DOUBLE_MAX);
+  vtkGetMacro(Tolerance, double);
+  //@}
+
 protected:
   vtkCompositeDataToUnstructuredGridFilter();
   ~vtkCompositeDataToUnstructuredGridFilter() override;
@@ -83,6 +95,7 @@ protected:
   void ExecuteSubTree(vtkCompositeDataSet* cd, vtkAppendFilter* output);
   unsigned int SubTreeCompositeIndex;
   bool MergePoints;
+  double Tolerance;
 
 private:
   vtkCompositeDataToUnstructuredGridFilter(

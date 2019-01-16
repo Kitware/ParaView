@@ -13269,6 +13269,21 @@ Every Nth Point.
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                         default_values="0"
+                         label="Tolerance"
+                         name="Tolerance"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <Documentation>Set the tolerance for merging points if **Merge Points** is enabled.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MergePoints"
+                                   value="1" />
+          <!-- show this widget when MergePoints==1 and showing advanced options -->
+        </Hints>
+      </DoubleVectorProperty>
       <!-- End of MergeBlocks -->
     </SourceProxy>
     <!-- ==================================================================== -->
