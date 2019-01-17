@@ -29,7 +29,7 @@
 #ifndef CGNSTYPES_H
 #define CGNSTYPES_H
 
-#include "cgns_mangle.h"
+#include "vtk_cgns_mangle.h"
 
 #define CG_BUILD_LEGACY @BUILDLEGACY@
 #define CG_BUILD_64BIT  @BUILD64BIT@

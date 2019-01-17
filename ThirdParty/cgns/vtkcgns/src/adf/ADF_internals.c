@@ -187,6 +187,7 @@ bytes   start   end   description      range / format
 #else
 # include <unistd.h>
 # include <sys/param.h>
+# include <sys/stat.h>
 # define ACCESS access
 # define OPEN   open
 # define CLOSE  close
