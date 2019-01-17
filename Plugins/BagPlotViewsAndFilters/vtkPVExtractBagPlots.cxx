@@ -264,7 +264,8 @@ int vtkPVExtractBagPlots::RequestData(
   }
 
   pca->SetBasisScheme(vtkPCAStatistics::FIXED_BASIS_SIZE);
-  pca->SetFixedBasisSize(2);
+  pca->SetFixedBasisSize(
+    this->NumberOfProjectionAxes); // Number of PCA projection axis - 10 is the max we will allow
   pca->SetTrainingFraction(1.0);
   pca->SetRobustPCA(this->RobustPCA);
   pca->Update();
@@ -283,65 +284,67 @@ int vtkPVExtractBagPlots::RequestData(
   this->GetEigenvectors(outputMetaDS, eigenVectors.Get(), eigenValues.Get());
 
   double sumOfEigenValues = 0;
+  double partialSumOfEigenValues = 0;
   for (vtkIdType i = 0; i < eigenValues->GetNumberOfTuples(); i++)
   {
-    sumOfEigenValues += eigenValues->GetValue(i);
+    double val = eigenValues->GetValue(i);
+    sumOfEigenValues += val;
+    partialSumOfEigenValues += i < this->NumberOfProjectionAxes ? val : 0;
   }
-  double explainedVariance =
-    100. * ((eigenValues->GetValue(0) + eigenValues->GetValue(1)) / sumOfEigenValues);
+  double explainedVariance = 100. * (partialSumOfEigenValues / sumOfEigenValues);
 
   // Compute HDR
   vtkNew<vtkHighestDensityRegionsStatistics> hdr;
   hdr->SetInputData(vtkStatisticsAlgorithm::INPUT_DATA, outputPCATable);
 
   // Fetch and rename the 2 PCA coordinates components arrays
-  vtkDataArray* xArray = NULL;
-  vtkDataArray* yArray = NULL;
+  std::vector<vtkDataArray*> cArrays;
+  vtkDataArray* hdrArrays[2];
+  vtkIdType iArray = 0;
   for (vtkIdType i = 0; i < outputPCATable->GetNumberOfColumns(); i++)
   {
     vtkAbstractArray* arr = outputPCATable->GetColumn(i);
     char* str = arr->GetName();
     if (strstr(str, "PCA"))
     {
-      if (strstr(str, "(0)"))
+      std::string name = "x" + std::to_string(iArray);
+      arr->SetName(name.c_str());
+      cArrays.push_back(vtkDataArray::SafeDownCast(arr));
+      if (iArray < 2)
       {
-        arr->SetName("x");
-        xArray = vtkDataArray::SafeDownCast(arr);
+        // select the first two arrays for the hdr computation
+        hdrArrays[iArray] = vtkDataArray::SafeDownCast(arr);
       }
-      else
-      {
-        arr->SetName("y");
-        yArray = vtkDataArray::SafeDownCast(arr);
-      }
+      iArray++;
     }
   }
 
   double bounds[4] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, VTK_DOUBLE_MIN };
-  xArray->GetRange(&bounds[0], 0);
-  yArray->GetRange(&bounds[2], 0);
+  hdrArrays[0]->GetRange(&bounds[0], 0);
+  hdrArrays[1]->GetRange(&bounds[2], 0);
 
   double sigma = this->KernelWidth;
   if (this->UseSilvermanRule)
   {
-    vtkIdType len = xArray->GetNumberOfTuples();
+    vtkIdType len = hdrArrays[0]->GetNumberOfTuples();
     double xMean = 0.0;
     for (vtkIdType i = 0; i < len; i++)
     {
-      xMean += xArray->GetTuple1(i);
+      xMean += hdrArrays[0]->GetTuple1(i);
     }
     xMean /= len;
 
     sigma = 0.0;
     for (vtkIdType i = 0; i < len; i++)
     {
-      sigma += (xArray->GetTuple1(i) - xMean) * (xArray->GetTuple1(i) - xMean);
+      sigma += (hdrArrays[0]->GetTuple1(i) - xMean) * (hdrArrays[0]->GetTuple1(i) - xMean);
     }
     sigma /= len;
     sigma = sqrt(sigma) * pow(len, -1. / 6.);
   }
 
   hdr->SetSigma(sigma);
-  hdr->AddColumnPair("x", "y");
+  hdr->AddColumnPair("x0", "x1");
   hdr->SetLearnOption(true);
   hdr->SetDeriveOption(true);
   hdr->SetAssessOption(false);
@@ -351,10 +354,10 @@ int vtkPVExtractBagPlots::RequestData(
   // Compute Grid
   vtkNew<vtkDoubleArray> inObs;
   inObs->SetNumberOfComponents(2);
-  inObs->SetNumberOfTuples(xArray->GetNumberOfTuples());
+  inObs->SetNumberOfTuples(hdrArrays[0]->GetNumberOfTuples());
 
-  inObs->CopyComponent(0, xArray, 0);
-  inObs->CopyComponent(1, yArray, 0);
+  inObs->CopyComponent(0, hdrArrays[0], 0);
+  inObs->CopyComponent(1, hdrArrays[1], 0);
 
   // Add border to grid
   const double borderSize = 0.15;
@@ -461,6 +464,12 @@ int vtkPVExtractBagPlots::RequestData(
     hdr->GetOutputDataObject(vtkStatisticsAlgorithm::OUTPUT_MODEL));
   vtkTable* outputHDRTable = vtkTable::SafeDownCast(outputHDR->GetBlock(0));
   outTable2 = outputHDRTable;
+
+  for (auto* arr : cArrays)
+  {
+    outTable2->AddColumn(arr);
+  }
+
   vtkAbstractArray* cname = inputTable->GetColumnByName("ColName");
   if (cname)
   {
@@ -483,7 +492,7 @@ int vtkPVExtractBagPlots::RequestData(
   vtkNew<vtkExtractFunctionalBagPlot> ebp;
   ebp->SetInputData(0, outTable);
   ebp->SetInputData(1, outputHDRTable);
-  ebp->SetInputArrayToProcess(0, 1, 0, vtkDataObject::FIELD_ASSOCIATION_ROWS, "HDR (y,x)");
+  ebp->SetInputArrayToProcess(0, 1, 0, vtkDataObject::FIELD_ASSOCIATION_ROWS, "HDR (x1,x0)");
   ebp->SetInputArrayToProcess(1, 1, 0, vtkDataObject::FIELD_ASSOCIATION_ROWS, "ColName");
   ebp->SetDensityForP50(p50);
   ebp->SetDensityForPUser(pUser);
@@ -495,7 +504,7 @@ int vtkPVExtractBagPlots::RequestData(
   double maxHdr = VTK_DOUBLE_MIN;
   std::string maxHdrCName = "";
   vtkDataArray* seriesHdr =
-    vtkDataArray::SafeDownCast(outputHDRTable->GetColumnByName("HDR (y,x)"));
+    vtkDataArray::SafeDownCast(outputHDRTable->GetColumnByName("HDR (x1,x0)"));
   vtkStringArray* seriesColName =
     vtkStringArray::SafeDownCast(outputHDRTable->GetColumnByName("ColName"));
   assert(seriesHdr && seriesColName);

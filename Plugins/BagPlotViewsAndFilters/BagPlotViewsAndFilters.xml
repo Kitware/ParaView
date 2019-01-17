@@ -96,6 +96,15 @@
         <Documentation>This flag indicates if the PCA should be run
         in robust mode or not.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfProjectionAxes"
+                         default_values="2"
+                         name="NumberOfProjectionAxes"
+                         number_of_elements="1">
+        <IntRangeDomain min="2" max="10" name="range"/>
+        <Documentation> This allows to set the number of PCA projection axis
+        determining the final computed variables
+        </Documentation>
+      </IntVectorProperty>
 
       <!-- View can be used to specify the preferred view for the proxy -->
       <Hints>

@@ -102,6 +102,15 @@ public:
   vtkSetClampMacro(UserQuantile, int, 0, 100);
   //@}
 
+  //@{
+  /**
+   * Set/Get the number of PCA projection axis.
+   * Default and minimum is 2, maximum is 10.
+   */
+  vtkGetMacro(NumberOfProjectionAxes, int);
+  vtkSetClampMacro(NumberOfProjectionAxes, int, 2, 10);
+  //@}
+
 protected:
   vtkPVExtractBagPlots();
   ~vtkPVExtractBagPlots() override;
@@ -122,6 +131,7 @@ protected:
   bool TransposeTable;
   bool RobustPCA;
   bool UseSilvermanRule;
+  int NumberOfProjectionAxes = 2;
 
 private:
   vtkPVExtractBagPlots(const vtkPVExtractBagPlots&) = delete;
