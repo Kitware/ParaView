@@ -119,6 +119,33 @@
     </SourceProxy>
   </ProxyGroup>
   <ProxyGroup name="representations">
+    <ChartRepresentationProxy base_proxygroup="representations"
+                              base_proxyname="PlotMatrixRepresentation"
+                              class="vtkPVBagPlotMatrixRepresentation"
+                              name="BagPlotMatrixRepresentation"
+                              processes="client|dataserver|renderserver">
+      <Documentation>Representation used by BagPlotMatrixView.</Documentation>
+      <IntVectorProperty command="SetCompositeDataSetIndex"
+                   default_values="2"
+                   number_of_elements="1"
+                   name="CompositeDataSetIndex"
+                   override="1">
+        <CompositeTreeDomain mode="leaves" name="tree">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
+        <Documentation>
+          This property lists the ids of the blocks to extract
+          from the input multiblock dataset.
+        </Documentation>
+        <Hints>
+          <NoDefault/>
+        </Hints>
+      </IntVectorProperty>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
     <ChartRepresentationProxy class="vtkPVBagChartRepresentation"
                               name="XYBagChartRepresentation"
                               processes="client|dataserver|renderserver" >
@@ -659,6 +686,31 @@
     </ChartRepresentationProxy>
   </ProxyGroup>
   <ProxyGroup name="views">
+    <PlotMatrixViewProxy base_proxygroup="views"
+                         base_proxyname="PlotMatrixView"
+                         class="vtkPVBagPlotMatrixView"
+                         name="BagPlotMatrixView"
+                         label="Bag Plot Matrix View"
+                         processes="client|renderserver|dataserver"
+                         representation_name="BagPlotMatrixRepresentation"
+                         skip_plotable_check="1">
+      <Documentation>This is the proxy for the bag plot matrix
+      view.</Documentation>
+      <StringVectorProperty command="SetTitle"
+                            name="ChartTitle"
+                            number_of_elements="1"
+                            override="1"
+                            default_values="Explained Variance: ${VARIANCE}%">
+        <Documentation>
+          Set the title to use for the bag plot matrix view.
+          Use ${VARIANCE} to display the explained variance and ${TIME} to display the current time.
+        </Documentation>
+        <Hints>
+          <PlaceholderText>Use ${VARIANCE} to display explained variance</PlaceholderText>
+        </Hints>
+      </StringVectorProperty>
+    </PlotMatrixViewProxy>
+  <!-- ================================================================== -->
     <ContextViewProxy base_proxygroup="internal_views"
                       base_proxyname="XYChartViewBase"
                       class="vtkPVXYChartView"
