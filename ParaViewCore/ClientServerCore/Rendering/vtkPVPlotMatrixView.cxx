@@ -588,16 +588,23 @@ void vtkPVPlotMatrixView::UpdateSettings()
 //----------------------------------------------------------------------------
 const char* vtkPVPlotMatrixView::GetTitleFontFamily()
 {
-  return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetFontFamilyAsString() : NULL;
+  return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetFontFamilyAsString()
+                          : nullptr;
 }
+
+//----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetTitleFontSize()
 {
   return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetFontSize() : -1;
 }
+
+//----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetTitleFontBold()
 {
   return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetBold() : 0;
 }
+
+//----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetTitleFontItalic()
 {
   return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetItalic() : 0;
@@ -608,7 +615,7 @@ double* vtkPVPlotMatrixView::GetTitleColor()
 {
   // FIXME: Do we need this style of API? It means keeping around a double[3]
   // in order to support it. I don't like it, and would rather avoid it.
-  return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetColor() : NULL;
+  return this->PlotMatrix ? this->PlotMatrix->GetTitleProperties()->GetColor() : nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -655,16 +662,22 @@ const char* vtkPVPlotMatrixView::GetAxisLabelFontFamily(int plotType)
 {
   return this->PlotMatrix
     ? this->PlotMatrix->GetAxisLabelProperties(plotType)->GetFontFamilyAsString()
-    : NULL;
+    : nullptr;
 }
+
+//----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetAxisLabelFontSize(int plotType)
 {
   return this->PlotMatrix ? this->PlotMatrix->GetAxisLabelProperties(plotType)->GetFontSize() : -1;
 }
+
+//----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetAxisLabelFontBold(int plotType)
 {
   return this->PlotMatrix ? this->PlotMatrix->GetAxisLabelProperties(plotType)->GetBold() : 0;
 }
+
+//----------------------------------------------------------------------------
 int vtkPVPlotMatrixView::GetAxisLabelFontItalic(int plotType)
 {
   return this->PlotMatrix ? this->PlotMatrix->GetAxisLabelProperties(plotType)->GetItalic() : 0;
@@ -673,7 +686,8 @@ int vtkPVPlotMatrixView::GetAxisLabelFontItalic(int plotType)
 //----------------------------------------------------------------------------
 double* vtkPVPlotMatrixView::GetAxisLabelColor(int plotType)
 {
-  return this->PlotMatrix ? this->PlotMatrix->GetAxisLabelProperties(plotType)->GetColor() : NULL;
+  return this->PlotMatrix ? this->PlotMatrix->GetAxisLabelProperties(plotType)->GetColor()
+                          : nullptr;
 }
 
 //----------------------------------------------------------------------------

@@ -52,9 +52,9 @@ vtkPVContextView::vtkPVContextView()
   this->ContextView->SetRenderWindow(this->RenderWindow);
   if (this->ContextView->GetInteractor())
   {
-    this->ContextView->GetInteractor()->SetInteractorStyle(NULL);
+    this->ContextView->GetInteractor()->SetInteractorStyle(nullptr);
   }
-  this->ContextView->SetInteractor(NULL);
+  this->ContextView->SetInteractor(nullptr);
   this->ContextView->GetRenderer()->AddObserver(
     vtkCommand::StartEvent, this, &vtkPVContextView::OnStartRender);
   this->ContextView->GetRenderer()->AddObserver(
@@ -283,7 +283,8 @@ vtkSelection* vtkPVContextView::GetSelectionImplementation(T* chart)
 {
   if (vtkSelection* selection = chart->GetAnnotationLink()->GetCurrentSelection())
   {
-    if (this->SelectionClone == NULL || this->SelectionClone->GetMTime() < selection->GetMTime() ||
+    if (this->SelectionClone == nullptr ||
+      this->SelectionClone->GetMTime() < selection->GetMTime() ||
       this->SelectionClone->GetMTime() < chart->GetAnnotationLink()->GetMTime())
     {
       // we need to treat vtkSelection obtained from vtkAnnotationLink as
@@ -301,8 +302,8 @@ vtkSelection* vtkPVContextView::GetSelectionImplementation(T* chart)
     }
     return this->SelectionClone;
   }
-  this->SelectionClone = NULL;
-  return NULL;
+  this->SelectionClone = nullptr;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -319,8 +320,8 @@ vtkSelection* vtkPVContextView::GetSelection()
   }
 
   vtkWarningMacro("Unsupported context item type.");
-  this->SelectionClone = NULL;
-  return NULL;
+  this->SelectionClone = nullptr;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

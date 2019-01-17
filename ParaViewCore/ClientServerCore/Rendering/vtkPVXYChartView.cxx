@@ -64,14 +64,14 @@ vtkPVXYChartView::vtkPVXYChartView()
 {
   this->Internals = new vtkInternals();
 
-  this->Chart = NULL;
+  this->Chart = nullptr;
   this->PlotTime = vtkPVPlotTime::New();
   this->HideTimeMarker = false;
   this->SortByXAxis = false;
 
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);
-  this->LogScaleWarningLabel = NULL;
+  this->LogScaleWarningLabel = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -80,15 +80,15 @@ vtkPVXYChartView::~vtkPVXYChartView()
   if (this->Chart)
   {
     this->Chart->Delete();
-    this->Chart = NULL;
+    this->Chart = nullptr;
   }
   if (LogScaleWarningLabel)
   {
     this->LogScaleWarningLabel->Delete();
-    this->LogScaleWarningLabel = NULL;
+    this->LogScaleWarningLabel = nullptr;
   }
   this->PlotTime->Delete();
-  this->PlotTime = NULL;
+  this->PlotTime = nullptr;
   delete this->Internals;
 }
 
@@ -116,12 +116,12 @@ void vtkPVXYChartView::SetChartType(const char* type)
   if (this->Chart)
   {
     this->Chart->Delete();
-    this->Chart = NULL;
+    this->Chart = nullptr;
   }
   if (LogScaleWarningLabel)
   {
     this->LogScaleWarningLabel->Delete();
-    this->LogScaleWarningLabel = NULL;
+    this->LogScaleWarningLabel = nullptr;
   }
 
   // Construct the correct type of chart
@@ -806,7 +806,7 @@ void vtkPVXYChartView::Update()
   // At this point, all representations must have updated which series are
   // visible, etc. So we can now recalculate the axes bounds to pick a good
   // value.
-  if (this->Chart == NULL)
+  if (this->Chart == nullptr)
   {
     return;
   }
@@ -840,7 +840,7 @@ void vtkPVXYChartView::Update()
     }
     else
     {
-      chartAxis->SetCustomTickPositions(NULL);
+      chartAxis->SetCustomTickPositions(nullptr);
     }
     chartAxis->Update();
   }
