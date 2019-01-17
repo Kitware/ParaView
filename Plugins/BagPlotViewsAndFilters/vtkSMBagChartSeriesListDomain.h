@@ -24,13 +24,11 @@
 #ifndef vtkSMBagChartSeriesListDomain_h
 #define vtkSMBagChartSeriesListDomain_h
 
-#include "vtkPVServerManagerRenderingModule.h" // needed for exports
 #include "vtkSMChartSeriesListDomain.h"
 
 class vtkPVDataInformation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMBagChartSeriesListDomain
-  : public vtkSMChartSeriesListDomain
+class VTK_EXPORT vtkSMBagChartSeriesListDomain : public vtkSMChartSeriesListDomain
 {
 public:
   static vtkSMBagChartSeriesListDomain* New();

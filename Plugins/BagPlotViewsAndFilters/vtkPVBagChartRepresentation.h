@@ -29,8 +29,7 @@ class vtkChartXY;
 class vtkImageData;
 class vtkScalarsToColors;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBagChartRepresentation
-  : public vtkChartRepresentation
+class VTK_EXPORT vtkPVBagChartRepresentation : public vtkChartRepresentation
 {
 public:
   static vtkPVBagChartRepresentation* New();

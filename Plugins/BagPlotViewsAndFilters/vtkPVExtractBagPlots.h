@@ -23,14 +23,13 @@
 #define vtkPVExtractBagPlots_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkDoubleArray;
 class vtkMultiBlockDataSet;
 
 class PVExtractBagPlotsInternal;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractBagPlots : public vtkMultiBlockDataSetAlgorithm
+class VTK_EXPORT vtkPVExtractBagPlots : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPVExtractBagPlots* New();

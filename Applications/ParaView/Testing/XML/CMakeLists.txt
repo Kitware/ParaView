@@ -628,8 +628,6 @@ list(APPEND TESTS_WITH_BASELINES
   AddActiveValuesFromVisibleObjects.xml
   AnimatePipelineTime.xml
   AngularPeriodicFilter.xml
-  BagPlots.xml
-  BagPlotsSelection.xml
   3DWidgetInCustomFilter.xml
   CalcParens.xml
   Calculator.xml
@@ -679,7 +677,6 @@ list(APPEND TESTS_WITH_BASELINES
   FollowHiddenData.xml
   ForceTime.xml
   Fractal2D.xml
-  FunctionalBagPlots.xml
   Glyph3DCullingAndLOD.xml
   Glyph3DRepresentation.xml
   GlyphUseCellCenters.xml
@@ -1303,15 +1300,6 @@ IF (PARAVIEW_USE_MPI)
   set (LineChartSelection_DISABLE_CS TRUE)
   set (LineChartSelection_DISABLE_CRS TRUE)
 
-  # Selections end up highlighting different set of ID based points in parallel.
-  # Hence disable them.
-  set (BagPlots_DISABLE_CS TRUE)
-  set (BagPlots_DISABLE_CRS TRUE)
-  set (BagPlotsSelection_DISABLE_CS TRUE)
-  set (BagPlotsSelection_DISABLE_CRS TRUE)
-  set (FunctionalBagPlots_DISABLE_CS TRUE)
-  set (FunctionalBagPlots_DISABLE_CRS TRUE)
-
   # Selection link may highlight incorrect ID in parallel,
   # hence disable them.
   set(SelectionLinkBasic_DISABLE_CS TRUE)
@@ -1398,7 +1386,6 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 # Since this involves charts.
 SET(HistogramSelection_THRESHOLD 40)
 SET(LineChartSelection_THRESHOLD 40)
-SET(FunctionalBagPlots_THRESHOLD 40)
 
 # Increate threshold for this one since the chart axes
 # tends to render slightly differently.
