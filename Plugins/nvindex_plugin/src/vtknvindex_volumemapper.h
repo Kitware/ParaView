@@ -70,6 +70,9 @@ public:
   double* GetBounds() override;
   using Superclass::GetBounds;
 
+  // Set the whole volume bounds.
+  void set_whole_bounds(const mi::math::Bbox<mi::Float64, 3> bounds);
+
   // Shutdown forward loggers, NVIDIA IndeX library and unload libraries.
   void shutdown();
 
@@ -146,7 +149,7 @@ private:
   vtkMultiProcessController* m_controller;             // MPI controller from ParaView.
   vtkDataArray* m_scalar_array;                        // Scalar array containing actual data.
 
-  mi::Float64 m_cached_bounds[6]; // Cached bounds used on animation loops.
+  mi::Float64 m_whole_bounds[6]; // Whole volume bounds.
 
   vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The CUDA code applied to the current volume.
 };

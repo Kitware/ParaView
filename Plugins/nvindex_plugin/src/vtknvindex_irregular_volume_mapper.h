@@ -66,6 +66,13 @@ public:
   vtknvindex_irregular_volume_mapper();
   ~vtknvindex_irregular_volume_mapper();
 
+  // Get dataset bounding box.
+  double* GetBounds() override;
+  using Superclass::GetBounds;
+
+  // Set the whole volume bounds.
+  void set_whole_bounds(const mi::math::Bbox<mi::Float64, 3> bounds);
+
   // Shutdown forward loggers, IndeX library and unload libraries.
   void shutdown();
 
@@ -138,6 +145,8 @@ private:
   vtknvindex_irregular_volume_data m_volume_data;      // Tetrahedral volume data.
 
   vtkPKdTree* m_kd_tree; // ParaView domain subdivision.
+
+  mi::Float64 m_whole_bounds[6]; // whole volume bounds.
 
   vtknvindex_rtc_params_buffer m_volume_rtc_kernel; // The CUDA code applied to the current volume.
 };

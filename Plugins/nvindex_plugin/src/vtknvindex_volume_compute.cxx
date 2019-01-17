@@ -115,10 +115,6 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
   mi::base::Handle<const ISparse_volume_subset_data_descriptor> svol_subset_desc(
     svol_data_subset->get_subset_data_descriptor());
 
-  const Bbox3i svol_compute_bbox = svol_dst_buffer->get_clipped_volume_subset_data_bbox();
-  const Bbox3i svol_compute_already_computed_bbox =
-    svol_dst_buffer->get_already_computed_volume_subset_data_bbox();
-
   // we are writing the first attribute
   const mi::Uint32 active_compute_attrib_idx = 0u;
   ISparse_volume_attribute_set_descriptor::Attribute_parameters active_compute_attrib_params;
@@ -133,20 +129,6 @@ void vtknvindex_volume_compute::launch_compute(mi::neuraylib::IDice_transaction*
 
   const nv::index::Sparse_volume_voxel_format vol_fmt = active_compute_attrib_params.format;
   const mi::Sint32 vol_fmt_size = volume_format_size(vol_fmt);
-
-  // // prepare to read subsets
-  // const Vec3i volume_dims = Vec3i(m_volume_size.x, m_volume_size.y, m_volume_size.z);
-  // const Bbox3i read_bounds = Bbox3i(mi::math::elementwise_max(request_bbox.min, Vec3i(0)),
-  // mi::math::elementwise_min(request_bbox.max, volume_dims));
-
-  // // Calculate bounds without border. Required to query shader memory
-  // const Bbox3i request_bbox = svol_dst_buffer->get_clipped_volume_subset_data_bbox();
-  // mi::math::Bbox<mi::Float32, 3> request_bbox_no_border(request_bbox.min.x + m_border_size,
-  // request_bbox.min.y + m_border_size,
-  // request_bbox.min.z + m_border_size,
-  // request_bbox.max.x - m_border_size,
-  // request_bbox.max.y - m_border_size,
-  // request_bbox.max.z - m_border_size);
 
   mi::math::Bbox<mi::Float32, 3> request_bbox = svol_subset_desc->get_subregion_scene_space();
 

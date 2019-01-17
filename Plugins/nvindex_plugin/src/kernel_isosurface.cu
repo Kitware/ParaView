@@ -236,24 +236,4 @@ public:
     return clamp(
       make_float4(shade_color.x, shade_color.y, shade_color.z, sample_color.w), 0.0f, 1.0f);
   }
-
-  // float3 get_gradient(const Sparse_volume_sampler<float>& sampler, const float3 sample_position, const float dh)
-  // {
-      // // get spatial sample points for each dimensions
-      // const float vs_dx_p = sampler.fetch_sample(sample_position + make_float3( dh, 0, 0));
-      // const float vs_dx_n = sampler.fetch_sample(sample_position + make_float3(-dh, 0, 0));
-      // const float vs_dy_p = sampler.fetch_sample(sample_position + make_float3(  0, dh, 0));
-      // const float vs_dy_n = sampler.fetch_sample(sample_position + make_float3(  0,-dh, 0));
-      // const float vs_dz_p = sampler.fetch_sample(sample_position + make_float3(  0, 0, dh));
-      // const float vs_dz_n = sampler.fetch_sample(sample_position + make_float3(  0, 0,-dh));
-
-      // // get finite differences for each dimension
-      // const float vs_grad_x = (vs_dx_p - vs_dx_n) / dh;
-      // const float vs_grad_y = (vs_dy_p - vs_dy_n) / dh;
-      // const float vs_grad_z = (vs_dz_p - vs_dz_n) / dh;
-
-      // // get R3 gradient vector
-      // return make_float3(vs_grad_x, vs_grad_y, vs_grad_z);
-  // }
-
 }; // class Volume_sample_program

@@ -29,6 +29,8 @@
 #include <windows.h>
 #else // _WIN32
 #include <dlfcn.h>
+#include <ifaddrs.h>
+#include <netdb.h>
 #endif // _WIN32
 
 #include "vtksys/SystemTools.hxx"
@@ -71,6 +73,39 @@ static std::string get_last_error_as_str()
   }
   return std::string();
 }
+
+#else
+std::string get_interface_address(const std::string interface_name, bool ipv6 = false)
+{
+  std::string result;
+
+  ifaddrs* if_list;
+  if (getifaddrs(&if_list) == 0)
+  {
+    for (ifaddrs* i = if_list; i; i = i->ifa_next)
+    {
+      if (i->ifa_addr != 0 && i->ifa_name != 0 && ((i->ifa_addr->sa_family == AF_INET && !ipv6) ||
+                                                    (i->ifa_addr->sa_family == AF_INET6 && ipv6)) &&
+        std::string(i->ifa_name) == interface_name)
+      {
+        char buf[1025];
+        int s = getnameinfo(i->ifa_addr,
+          (i->ifa_addr->sa_family == AF_INET) ? sizeof(struct sockaddr_in)
+                                              : sizeof(struct sockaddr_in6),
+          buf, 1025, 0, 0, NI_NUMERICHOST);
+        if (s == 0)
+        {
+          result = buf;
+          break;
+        }
+      }
+    }
+    freeifaddrs(if_list);
+  }
+
+  return result;
+}
+
 #endif // _WIN32
 
 //-------------------------------------------------------------------------------------------------
@@ -248,196 +283,234 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
     m_nvindex_interface->get_api_component<mi::neuraylib::INetwork_configuration>());
   assert(inetwork_configuration.is_valid_interface());
 
+  std::vector<std::string> host_list;
+  for (mi::Uint32 i = 0; i < host_names.size(); ++i)
+  {
+    if (find(host_list.begin(), host_list.end(), host_names[i]) == host_list.end())
+      host_list.push_back(host_names[i]);
+  }
+
   // Networking is off by default.
   inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_OFF);
 
-  if (use_config_file)
+  if (host_list.size() > 1)
   {
-    std::map<std::string, std::string> network_params;
-    if (xml_parser.get_section_settings(network_params, "network"))
+    if (use_config_file)
     {
-      std::map<std::string, std::string>::iterator it;
-
-      // Cluster network mode (protocol).
-      it = network_params.find("cluster_mode");
-      if (it != network_params.end())
+      std::map<std::string, std::string> network_params;
+      if (xml_parser.get_section_settings(network_params, "network"))
       {
-        const std::string cluster_mode(it->second);
+        std::map<std::string, std::string>::iterator it;
 
-        if (cluster_mode == "OFF")
-        {
-          inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_OFF);
-        }
-        else if (cluster_mode == "TCP")
-        {
-          inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_TCP);
-        }
-        else if (cluster_mode == "UDP")
-        {
-          inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_UDP);
-
-          // Multicast address.
-          it = network_params.find("multicast_address");
-          if (it != network_params.end())
-          {
-            const std::string multicast_address(it->second);
-            inetwork_configuration->set_multicast_address(multicast_address.c_str());
-          }
-          else
-          {
-            // Use default multicast address.
-            inetwork_configuration->set_multicast_address("224.1.3.2");
-          }
-        }
-        else if (cluster_mode == "TCP_WITH_DISCOVERY")
-        {
-          inetwork_configuration->set_mode(
-            mi::neuraylib::INetwork_configuration::MODE_TCP_WITH_DISCOVERY);
-
-          // Discovery address (required when cluster_mode is "TCP_WITH_DISCOVERY").
-          it = network_params.find("discovery_address");
-          if (it != network_params.end())
-          {
-            const std::string discovery_address(it->second);
-            inetwork_configuration->set_discovery_address(discovery_address.c_str());
-          }
-          else
-          {
-            // use default discovery address
-            inetwork_configuration->set_discovery_address("224.1.3.3:5555");
-          }
-        }
-      }
-      else
-      {
-        // Use default cluster mode, which is "OFF".
-        inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_OFF);
-      }
-
-      if (inetwork_configuration->get_mode() != mi::neuraylib::INetwork_configuration::MODE_OFF)
-      {
-        // Cluster interface address.
-        it = network_params.find("cluster_interface_address");
+        // Cluster network mode (protocol).
+        it = network_params.find("cluster_mode");
         if (it != network_params.end())
         {
-          const std::string cluster_interface_address(it->second);
-          inetwork_configuration->set_cluster_interface(cluster_interface_address.c_str());
-        }
+          const std::string cluster_mode(it->second);
 
-        // use RDMA.
-        it = network_params.find("use_rdma");
-        if (it != network_params.end())
-        {
-          const std::string use_rdma(it->second);
-          inetwork_configuration->set_use_rdma(
-            use_rdma == std::string("1") || use_rdma == std::string("yes"));
+          if (cluster_mode == "OFF")
+          {
+            inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_OFF);
+          }
+          else if (cluster_mode == "TCP")
+          {
+            inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_TCP);
+            for (mi::Uint32 i = 0; i < host_list.size(); ++i)
+            {
+              inetwork_configuration->add_configured_host(host_list[i].c_str());
+            }
+          }
+          else if (cluster_mode == "UDP")
+          {
+            inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_UDP);
+
+            // Multicast address.
+            it = network_params.find("multicast_address");
+            if (it != network_params.end())
+            {
+              const std::string multicast_address(it->second);
+              inetwork_configuration->set_multicast_address(multicast_address.c_str());
+            }
+            else
+            {
+              // Use default multicast address.
+              inetwork_configuration->set_multicast_address("224.1.3.2");
+            }
+          }
+          else if (cluster_mode == "TCP_WITH_DISCOVERY")
+          {
+            inetwork_configuration->set_mode(
+              mi::neuraylib::INetwork_configuration::MODE_TCP_WITH_DISCOVERY);
+
+            // Discovery address (required when cluster_mode is "TCP_WITH_DISCOVERY").
+            it = network_params.find("discovery_address");
+            if (it != network_params.end())
+            {
+              const std::string discovery_address(it->second);
+              inetwork_configuration->set_discovery_address(discovery_address.c_str());
+            }
+            else
+            {
+              // use default discovery address
+              const std::string discovery_address = std::string(host_list[0].c_str()) + ":5555";
+              inetwork_configuration->set_discovery_address(discovery_address.c_str());
+            }
+          }
         }
         else
         {
-          // Use RDMA by default.
-          inetwork_configuration->set_use_rdma(true);
+          // Use default cluster mode, which is "OFF".
+          inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_OFF);
+        }
+
+        if (inetwork_configuration->get_mode() != mi::neuraylib::INetwork_configuration::MODE_OFF)
+        {
+          // Cluster interface address.
+          it = network_params.find("cluster_interface_address");
+          if (it != network_params.end())
+          {
+            const std::string cluster_interface_address(it->second);
+            inetwork_configuration->set_cluster_interface(cluster_interface_address.c_str());
+          }
+
+          // use RDMA.
+          it = network_params.find("use_rdma");
+          if (it != network_params.end())
+          {
+            const std::string use_rdma(it->second);
+            inetwork_configuration->set_use_rdma(
+              use_rdma == std::string("1") || use_rdma == std::string("yes"));
+          }
+          else
+          {
+            // Use RDMA by default.
+            inetwork_configuration->set_use_rdma(true);
+          }
+
+          // Set RDMA interface
+          if (inetwork_configuration->get_use_rdma())
+          {
+            it = network_params.find("rdma_interface");
+            if (it != network_params.end())
+            {
+              const std::string rdma_interface(it->second);
+              inetwork_configuration->set_rdma_interface(rdma_interface.c_str());
+            }
+
+#ifndef _WIN32
+            // Set alternative RDMA interface by name
+            it = network_params.find("rdma_interface_by_name");
+            if (it != network_params.end())
+            {
+              const std::string rdma_interface_name(it->second);
+              const std::string rdma_interface_address = get_interface_address(rdma_interface_name);
+              inetwork_configuration->set_rdma_interface(rdma_interface_address.c_str());
+            }
+#endif // _WIN32
+          }
+        }
+      }
+      else // Use automatic cluster configuration.
+      {
+        inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_TCP);
+        for (mi::Uint32 i = 0; i < host_list.size(); ++i)
+        {
+          inetwork_configuration->add_configured_host(host_list[i].c_str());
         }
       }
     }
-    else if (host_names.size() > 1) // Use automatic cluster configuration.
+    else // Use automatic cluster configuration.
     {
       inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_TCP);
-      for (mi::Uint32 i = 0; i < host_names.size(); ++i)
+      for (mi::Uint32 i = 0; i < host_list.size(); ++i)
       {
-        inetwork_configuration->add_configured_host(host_names[i].c_str());
+        inetwork_configuration->add_configured_host(host_list[i].c_str());
       }
     }
-  }
-  else if (host_names.size() > 1) // Use automatic cluster configuration.
-  {
-    inetwork_configuration->set_mode(mi::neuraylib::INetwork_configuration::MODE_TCP);
-    for (mi::Uint32 i = 0; i < host_names.size(); ++i)
+
+    if (inetwork_configuration->get_mode() != mi::neuraylib::INetwork_configuration::MODE_OFF)
     {
-      inetwork_configuration->add_configured_host(host_names[i].c_str());
-    }
-  }
+      // Define service mode.
+      mi::base::Handle<nv::index::ICluster_configuration> icluster_configuration(
+        m_nvindex_interface->get_api_component<nv::index::ICluster_configuration>());
+      icluster_configuration->set_service_mode("rendering_and_compositing");
 
-  if (inetwork_configuration->get_mode() != mi::neuraylib::INetwork_configuration::MODE_OFF)
-  {
-    // Define service mode.
-    mi::base::Handle<nv::index::ICluster_configuration> icluster_configuration(
-      m_nvindex_interface->get_api_component<nv::index::ICluster_configuration>());
-    icluster_configuration->set_service_mode("rendering_and_compositing");
-
-    // Debug configuration.
-    mi::base::Handle<mi::neuraylib::IDebug_configuration> idebug_configuration(
-      m_nvindex_interface->get_api_component<mi::neuraylib::IDebug_configuration>());
-    assert(idebug_configuration.is_valid_interface());
-    {
-      std::map<std::string, std::string> network_params;
-      std::map<std::string, std::string>::iterator it;
-
-      if (use_config_file)
-        xml_parser.get_section_settings(network_params, "network");
-
-      // Setting max bandwidth.
-      it = network_params.find("max_bandwidth");
-      if (it != network_params.end())
+      // Debug configuration.
+      mi::base::Handle<mi::neuraylib::IDebug_configuration> idebug_configuration(
+        m_nvindex_interface->get_api_component<mi::neuraylib::IDebug_configuration>());
+      assert(idebug_configuration.is_valid_interface());
       {
-        std::string max_bandwidth = std::string("max_bandwidth=") + it->second;
-        idebug_configuration->set_option(max_bandwidth.c_str());
-      }
+        std::map<std::string, std::string> network_params;
+        std::map<std::string, std::string>::iterator it;
 
-      // Setting unicast nak interval.
-      it = network_params.find("unicast_nak_interval");
-      if (it != network_params.end())
-      {
-        std::string unicast_nak_interval = std::string("unicast_nak_interval=") + it->second;
-        idebug_configuration->set_option(unicast_nak_interval.c_str());
-      }
+        if (use_config_file)
+          xml_parser.get_section_settings(network_params, "network");
 
-      // Bandwidth increment.
-      it = network_params.find("bandwidth_increment");
-      if (it != network_params.end())
-      {
-        std::string bandwidth_increment = std::string("bandwidth_increment=") + it->second;
-        idebug_configuration->set_option(bandwidth_increment.c_str());
-      }
+        // Setting max bandwidth.
+        it = network_params.find("max_bandwidth");
+        if (it != network_params.end())
+        {
+          std::string max_bandwidth = std::string("max_bandwidth=") + it->second;
+          idebug_configuration->set_option(max_bandwidth.c_str());
+        }
 
-      // Bandwidth decrement.
-      it = network_params.find("bandwidth_decrement");
-      if (it != network_params.end())
-      {
-        std::string bandwidth_decrement = std::string("bandwidth_decrement=") + it->second;
-        idebug_configuration->set_option(bandwidth_decrement.c_str());
-      }
+        // Setting unicast nak interval.
+        it = network_params.find("unicast_nak_interval");
+        if (it != network_params.end())
+        {
+          std::string unicast_nak_interval = std::string("unicast_nak_interval=") + it->second;
+          idebug_configuration->set_option(unicast_nak_interval.c_str());
+        }
 
-      // Retransmission interval.
-      it = network_params.find("retransmission_interval");
-      if (it != network_params.end())
-      {
-        std::string retransmission_interval = std::string("retransmission_interval=") + it->second;
-        idebug_configuration->set_option(retransmission_interval.c_str());
-      }
+        // Bandwidth increment.
+        it = network_params.find("bandwidth_increment");
+        if (it != network_params.end())
+        {
+          std::string bandwidth_increment = std::string("bandwidth_increment=") + it->second;
+          idebug_configuration->set_option(bandwidth_increment.c_str());
+        }
 
-      // Additional unicast sockets.
-      it = network_params.find("additional_unicast_sockets");
-      if (it != network_params.end())
-      {
-        std::string additional_unicast_sockets =
-          std::string("additional_unicast_sockets=") + it->second;
-        idebug_configuration->set_option(additional_unicast_sockets.c_str());
-      }
+        // Bandwidth decrement.
+        it = network_params.find("bandwidth_decrement");
+        if (it != network_params.end())
+        {
+          std::string bandwidth_decrement = std::string("bandwidth_decrement=") + it->second;
+          idebug_configuration->set_option(bandwidth_decrement.c_str());
+        }
 
-      // Retention time.
-      it = network_params.find("retention");
-      if (it != network_params.end())
-      {
-        std::string retention = std::string("retention=") + it->second;
-        idebug_configuration->set_option(retention.c_str());
-      }
+        // Retransmission interval.
+        it = network_params.find("retransmission_interval");
+        if (it != network_params.end())
+        {
+          std::string retransmission_interval =
+            std::string("retransmission_interval=") + it->second;
+          idebug_configuration->set_option(retransmission_interval.c_str());
+        }
 
-      // Alive factor.
-      it = network_params.find("alive_factor");
-      if (it != network_params.end())
-      {
-        std::string alive_factor = std::string("alive_factor=") + it->second;
-        idebug_configuration->set_option(alive_factor.c_str());
+        // Additional unicast sockets.
+        it = network_params.find("additional_unicast_sockets");
+        if (it != network_params.end())
+        {
+          std::string additional_unicast_sockets =
+            std::string("additional_unicast_sockets=") + it->second;
+          idebug_configuration->set_option(additional_unicast_sockets.c_str());
+        }
+
+        // Retention time.
+        it = network_params.find("retention");
+        if (it != network_params.end())
+        {
+          std::string retention = std::string("retention=") + it->second;
+          idebug_configuration->set_option(retention.c_str());
+        }
+
+        // Alive factor.
+        it = network_params.find("alive_factor");
+        if (it != network_params.end())
+        {
+          std::string alive_factor = std::string("alive_factor=") + it->second;
+          idebug_configuration->set_option(alive_factor.c_str());
+        }
       }
     }
   }
@@ -449,17 +522,12 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
       m_nvindex_interface->get_api_component<nv::index::IIndex_debug_configuration>());
     assert(idebug_configuration.is_valid_interface());
 
-    std::string use_greater_than_comparison_for_sparse_volume_octree_builds =
-      std::string("use_greater_than_comparison_for_sparse_volume_octree_builds=1");
-    idebug_configuration->set_option(
-      use_greater_than_comparison_for_sparse_volume_octree_builds.c_str());
-
     std::string disable_timeseries_data_prefetch =
       std::string("timeseries_data_prefetch_disable=1");
     idebug_configuration->set_option(disable_timeseries_data_prefetch.c_str());
 
-    // use strict domain subdivision only in cluster mode.
-    if (host_names.size() > 1)
+    // use strict domain subdivision only with multiples ranks.
+    if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
     {
       std::string use_strict_domain_subdivision = std::string("use_strict_domain_subdivision=1");
       idebug_configuration->set_option(use_strict_domain_subdivision.c_str());
@@ -519,13 +587,6 @@ mi::Uint32 vtknvindex_application::setup_nvindex_library(const std::vector<std::
     {
       mi::base::Handle<nv::index::ICluster_configuration> icluster_configuration(
         m_nvindex_interface->get_api_component<nv::index::ICluster_configuration>());
-
-      std::vector<std::string> host_list;
-      for (mi::Uint32 i = 0; i < host_names.size(); ++i)
-      {
-        if (find(host_list.begin(), host_list.end(), host_names[i]) == host_list.end())
-          host_list.push_back(host_names[i]);
-      }
 
       const mi::Uint32 cluster_size = static_cast<mi::Uint32>(host_list.size());
       if (cluster_size > 0)

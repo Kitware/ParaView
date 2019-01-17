@@ -267,7 +267,7 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
 
   // Set affinity information for NVIDIA IndeX.
   m_affinity->reset_affinity();
-  m_affinity->add_affinity(current_bbox, 1, nv::index::IAffinity_information::ANY_GPU);
+  m_affinity->add_affinity(current_bbox, 1);
 
   m_rankid_to_hostid[0] = 1;
 
@@ -306,8 +306,8 @@ bool vtknvindex_cluster_properties::retrieve_process_configuration(
     ss << "_" << vtknvindex::util::get_process_user_name();
 #endif
 
-    std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.find(1);
-    vtknvindex_host_properties* host_properties = shmit->second;
+    std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmjt = m_hostinfo.find(1);
+    vtknvindex_host_properties* host_properties = shmjt->second;
     mi::Uint64 shm_size = 0;
     std::string scalar_type = dataset_parameters.scalar_type;
 
@@ -590,8 +590,8 @@ bool vtknvindex_cluster_properties::retrieve_cluster_configuration(
       ss << "_" << vtknvindex::util::get_process_user_name();
 #endif
 
-      std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmit = m_hostinfo.find(hostid);
-      vtknvindex_host_properties* host_properties = shmit->second;
+      std::map<mi::Uint32, vtknvindex_host_properties*>::iterator shmjt = m_hostinfo.find(hostid);
+      vtknvindex_host_properties* host_properties = shmjt->second;
       mi::Uint64 shm_size = 0;
 
       if (dataset_parameters.volume_type == vtknvindex_scene::VOLUME_TYPE_REGULAR)

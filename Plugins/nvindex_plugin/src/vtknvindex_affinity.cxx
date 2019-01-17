@@ -146,8 +146,8 @@ bool vtknvindex_affinity::get_affinity(const mi::math::Bbox_struct<mi::Float32, 
       if (get_gpu_id(host_id, gpu_id))
       {
         // This is stored here only for the scene dump.
-        affinity_struct affinity(subregion, host_id, gpu_id);
-        m_final_spatial_subdivision.push_back(affinity);
+        affinity_struct affinity_dump(subregion, host_id, gpu_id);
+        m_final_spatial_subdivision.push_back(affinity_dump);
 
         return true;
       }
