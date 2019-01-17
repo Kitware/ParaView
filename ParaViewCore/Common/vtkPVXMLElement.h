@@ -163,6 +163,11 @@ public:
   void RemoveNestedElement(vtkPVXMLElement*);
 
   /**
+   * Replace a particular element with another
+   */
+  void ReplaceNestedElement(vtkPVXMLElement* elementToReplace, vtkPVXMLElement* element);
+
+  /**
    * Lookup the element with the given id, starting at this scope.
    */
   vtkPVXMLElement* LookupElement(const char* id);
