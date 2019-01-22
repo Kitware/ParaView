@@ -54,7 +54,7 @@ if (Gmsh_FOUND)
   set(Gmsh_INCLUDE_DIRS "${Gmsh_INCLUDE_DIR}")
   if (NOT TARGET Gmsh::Gmsh)
     add_library(Gmsh::Gmsh UNKNOWN IMPORTED)
-    set_target_properties(TARGET Gmsh::Gmsh
+    set_target_properties(Gmsh::Gmsh
       PROPERTIES
         IMPORTED_LOCATION "${Gmsh_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${Gmsh_INCLUDE_DIR}")
