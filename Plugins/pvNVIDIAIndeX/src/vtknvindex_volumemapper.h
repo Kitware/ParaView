@@ -50,13 +50,15 @@
 #include "vtknvindex_rtc_kernel_params.h"
 #include "vtknvindex_scene.h"
 
+#include "vtkIndeXRepresentationsModule.h"
+
 class vtknvindex_cluster_properties;
 
 // The class vtknvindex_volumemapper is responsible for all NVIDIA IndeX data preparation, the scene
 // creation,
 // the update and rendering of regular volumes.
 
-class VTK_EXPORT vtknvindex_volumemapper : public vtkSmartVolumeMapper
+class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_volumemapper : public vtkSmartVolumeMapper
 {
 public:
   static vtknvindex_volumemapper* New();

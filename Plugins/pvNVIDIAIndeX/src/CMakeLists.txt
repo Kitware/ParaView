@@ -1,6 +1,7 @@
 set(classes
   vtknvindex_irregular_volume_mapper
   vtknvindex_irregular_volume_representation
+  vtknvindex_performance_values
   vtknvindex_representation
   vtknvindex_volumemapper)
 
@@ -16,7 +17,6 @@ set(private_classes
   vtknvindex_irregular_volume_importer
   vtknvindex_opengl_app_buffer
   vtknvindex_opengl_canvas
-  vtknvindex_performance_values
   vtknvindex_receiving_logger
   vtknvindex_regular_volume_properties
   # This duplicates the generated kernel sources below. Should this file be

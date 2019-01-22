@@ -36,6 +36,8 @@
 
 #include "vtknvindex_rtc_kernel_params.h"
 
+#include "vtkIndeXRepresentationsModule.h"
+
 class vtkMultiProcessController;
 
 class vtknvindex_affinity;
@@ -62,7 +64,7 @@ struct vtknvindex_cached_bounds
 // The class vtknvindex_representation represents the base class for distributing and rendering
 // of regular volume data (structured volume grids) in NVIDIA IndeX.
 
-class VTK_EXPORT vtknvindex_representation : public vtkImageVolumeRepresentation
+class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_representation : public vtkImageVolumeRepresentation
 {
 public:
   static vtknvindex_representation* New();
@@ -225,7 +227,7 @@ private:
 };
 
 // Schwartz counter to manage initialization.
-class VTK_EXPORT vtknvindex_representation_initializer
+class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_representation_initializer
 {
 public:
   vtknvindex_representation_initializer();

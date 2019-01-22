@@ -48,6 +48,8 @@
 #include "vtknvindex_performance_values.h"
 #include "vtknvindex_scene.h"
 
+#include "vtkIndeXRepresentationsModule.h"
+
 class vtknvindex_cluster_properties;
 class vtkPKdTree;
 
@@ -56,7 +58,8 @@ class vtkPKdTree;
 // All NVIDIA IndeX data preparation, scene creation,
 // update and rendering for irregular volumes is triggered by an instance of this class.
 
-class VTK_EXPORT vtknvindex_irregular_volume_mapper : public vtkUnstructuredGridVolumeMapper
+class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_irregular_volume_mapper
+  : public vtkUnstructuredGridVolumeMapper
 {
 public:
   static vtknvindex_irregular_volume_mapper* New();
