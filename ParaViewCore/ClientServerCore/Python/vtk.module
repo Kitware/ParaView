@@ -7,7 +7,7 @@ CONDITION
 GROUPS
   ParaViewCore
 KIT
-  ParaView::ClientServer
+  ParaView::ClientServerKit
 DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersProgrammable
