@@ -24,9 +24,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-vtk_module_third_party(NvPipe
-  INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/vtknvpipe
-    ${CMAKE_CURRENT_BINARY_DIR}/vtknvpipe
-  LIBRARIES nvpipe
-)
+vtk_module_third_party(
+  INTERNAL
+    LICENSE_FILES "vtknvpipe/LICENSE"
+    VERSION       "master"
+    STANDARD_INCLUDE_DIRS
+  EXTERNAL
+    PACKAGE nvpipe
+    TARGETS nvpipe
+    STANDARD_INCLUDE_DIRS)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtk_nvpipe.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtk_nvpipe.h")
+
+vtk_module_install_headers(
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/vtk_nvpipe.h")

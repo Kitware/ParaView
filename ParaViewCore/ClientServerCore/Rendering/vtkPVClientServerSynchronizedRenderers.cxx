@@ -23,7 +23,7 @@
 #include "vtkSquirtCompressor.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkZlibImageCompressor.h"
-#ifdef PARAVIEW_ENABLE_NVPIPE
+#if VTK_MODULE_ENABLE_ParaView_nvpipe
 #include "vtkNvPipeCompressor.h"
 #endif
 
@@ -192,7 +192,7 @@ void vtkPVClientServerSynchronizedRenderers::ConfigureCompressor(const char* str
     }
     else if (className == "vtkNvPipeCompressor" && this->NVPipeSupport)
     {
-#ifdef PARAVIEW_ENABLE_NVPIPE
+#if VTK_MODULE_ENABLE_ParaView_nvpipe
       comp = vtkNvPipeCompressor::New();
 #else
       assert(false);

@@ -14,11 +14,8 @@
 =========================================================================*/
 #include "vtkCinemaExporter.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
-#include "vtkStdString.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPythonInterpreter.h"
-#endif
+#include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkCinemaExporter);
 
@@ -52,7 +49,6 @@ void vtkCinemaExporter::WriteData()
     return;
   }
 
-#ifdef PARAVIEW_ENABLE_PYTHON
   int const r = vtkPythonInterpreter::RunSimpleString(this->GetPythonScript().c_str());
 
   if (r != 0)
@@ -60,12 +56,10 @@ void vtkCinemaExporter::WriteData()
     vtkErrorMacro(<< "An error occurred while running the Cinema export script!");
     return;
   }
-#endif
 }
 
 bool vtkCinemaExporter::checkInterpreterInitialization()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
   if (!vtkPythonInterpreter::IsInitialized())
   {
     // Initialize() returns false if already initialized, so a second check is necessary.
@@ -80,10 +74,6 @@ bool vtkCinemaExporter::checkInterpreterInitialization()
   }
 
   return true;
-#else
-  vtkErrorMacro(<< "Export Failed! Python support is required to export a Cinema store.");
-  return false;
-#endif
 }
 
 const vtkStdString vtkCinemaExporter::GetPythonScript()

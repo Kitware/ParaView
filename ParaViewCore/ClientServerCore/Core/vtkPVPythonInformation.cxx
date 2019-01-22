@@ -15,15 +15,14 @@
 
 // Include vtkPython.h first to avoid warnings:
 #include "vtkPVConfig.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_WrappingPythonCore
 #include "vtkPython.h"
 
 #include "vtkNew.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkSmartPyObject.h"
 #include "vtkStringOutputWindow.h"
-
-#endif // PARAVIEW_ENABLE_PYTHON
+#endif
 
 #include "vtkClientServerStream.h"
 #include "vtkMultiProcessController.h"
@@ -97,7 +96,7 @@ void vtkPVPythonInformation::DeepCopy(vtkPVPythonInformation* info)
 #undef COPY_IVAR_SETGET
 }
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_WrappingPythonCore
 namespace
 {
 
@@ -158,12 +157,12 @@ std::string chopFilename(const std::string& path)
   return path;
 }
 }
-#endif // PARAVIEW_ENABLE_PYTHON
+#endif
 
 //----------------------------------------------------------------------------
 void vtkPVPythonInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter && VTK_MODULE_ENABLE_VTK_WrappingPythonCore
   this->SetPythonSupport(true);
 
   vtkPythonInterpreter::Initialize();
@@ -206,7 +205,7 @@ void vtkPVPythonInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
   this->MatplotlibSupportOff();
   this->SetMatplotlibPath("");
   this->SetMatplotlibVersion("");
-#endif // PARAVIEW_ENABLE_PYTHON
+#endif
 }
 
 //----------------------------------------------------------------------------

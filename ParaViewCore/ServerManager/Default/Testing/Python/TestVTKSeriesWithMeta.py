@@ -7,7 +7,7 @@ import os.path
 
 smtesting.ProcessCommandLineArguments()
 
-meta_file = os.path.join(smtesting.DataDir, "FileSeries/blow.vtk.series")
+meta_file = os.path.join(smtesting.DataDir, "Testing/Data/FileSeries/blow.vtk.series")
 LegacyVTKReader(FileNames=[meta_file])
 
 warpByVector1 = WarpByVector()

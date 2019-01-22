@@ -15,5 +15,5 @@
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
   <!-- compare the saved screenshot -->
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/colorlegendscaledscreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/ColorLegendScaledScreenshot.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/colorlegendscaledscreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/ColorLegendScaledScreenshot.png" />
 </pqevents>

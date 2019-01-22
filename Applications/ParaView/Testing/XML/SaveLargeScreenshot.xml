@@ -34,7 +34,7 @@
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorWidth/IntRangeWidget/LineEdit" command="set_string" arguments="0" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorColor/ColorButton" command="setChosenColor" arguments="0,0,0" />
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/SaveLargeScreenshot.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/SaveLargeScreenshot.png" />
 
   <!-- save small screenshot views -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
@@ -53,5 +53,5 @@
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SeparatorColor/ColorButton" command="setChosenColor" arguments="0,0,0" />
 
   <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/savesmallscreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/SaveSmallScreenshot.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/savesmallscreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/SaveSmallScreenshot.png" />
 </pqevents>

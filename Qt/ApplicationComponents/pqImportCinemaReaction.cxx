@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "vtkNew.h"
 
-#if defined(PARAVIEW_ENABLE_PYTHON)
+#if VTK_MODULE_ENABLE_ParaView_CinemaReader
 #include "vtkSMCinemaDatabaseImporter.h"
 #endif
 
@@ -65,7 +65,7 @@ pqImportCinemaReaction::~pqImportCinemaReaction()
 //-----------------------------------------------------------------------------
 void pqImportCinemaReaction::updateEnableState()
 {
-#if defined(PARAVIEW_ENABLE_PYTHON)
+#if VTK_MODULE_ENABLE_ParaView_CinemaReader
   bool enable_state = false;
   pqActiveObjects& activeObjects = pqActiveObjects::instance();
   vtkSMSession* session =
@@ -84,13 +84,7 @@ void pqImportCinemaReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 bool pqImportCinemaReaction::loadCinemaDatabase()
 {
-#if !defined(PARAVIEW_ENABLE_PYTHON)
-  pqCoreUtilities::promptUser("pqImportCinemaReaction::NoPython", QMessageBox::Critical,
-    tr("Python support not enabled"), tr("Python support is required to load a Cinema database, "
-                                         "but is not available in this build."),
-    QMessageBox::Ok | QMessageBox::Save);
-  return false;
-#else
+#if VTK_MODULE_ENABLE_ParaView_CinemaReader
   pqServer* server = pqActiveObjects::instance().activeServer();
   pqFileDialog fileDialog(server, pqCoreUtilities::mainWidget(), tr("Open Cinema Database:"),
     QString(), "Cinema Database Files (info.json);;All files(*)");
@@ -101,13 +95,19 @@ bool pqImportCinemaReaction::loadCinemaDatabase()
     return pqImportCinemaReaction::loadCinemaDatabase(fileDialog.getSelectedFiles(0)[0]);
   }
   return false;
+#else
+  pqCoreUtilities::promptUser("pqImportCinemaReaction::NoPython", QMessageBox::Critical,
+    tr("Python support not enabled"), tr("Python support is required to load a Cinema database, "
+                                         "but is not available in this build."),
+    QMessageBox::Ok | QMessageBox::Save);
+  return false;
 #endif
 }
 
 //-----------------------------------------------------------------------------
 bool pqImportCinemaReaction::loadCinemaDatabase(const QString& dbase, pqServer* server)
 {
-#if defined(PARAVIEW_ENABLE_PYTHON)
+#if VTK_MODULE_ENABLE_ParaView_CinemaReader
   CLEAR_UNDO_STACK();
 
   server = (server != NULL) ? server : pqActiveObjects::instance().activeServer();

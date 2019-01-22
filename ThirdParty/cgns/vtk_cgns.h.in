@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtk_cgns.h.in
+  Module:    vtk_cgns.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -15,13 +15,15 @@
 #ifndef vtk_cgns_h
 #define vtk_cgns_h
 
-#cmakedefine VTK_USE_SYSTEM_CGNS
-#ifdef VTK_USE_SYSTEM_CGNS
-# include <cgnslib.h> // DataType, and other definition
-# include <cgns_io.h> // Low level IO for fast parsing
+/* Use the cgns library configured for ParaView.  */
+#cmakedefine01 VTK_MODULE_USE_EXTERNAL_vtkcgns
+
+#if VTK_MODULE_USE_EXTERNAL_vtkcgns
+# include <cgnslib.h>
+# include <cgns_io.h>
 #else
-# include <vtkcgns/src/cgnslib.h> // DataType, and other definition
-# include <vtkcgns/src/cgns_io.h> // Low level IO for fast parsing
+# include <vtkcgns/src/cgnslib.h>
+# include <vtkcgns/src/cgns_io.h>
 #endif
 
 #endif

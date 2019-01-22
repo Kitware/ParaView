@@ -3,7 +3,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqToolBarImplementation.cxx.in
+   Module:  @_paraview_toolbar_CLASS_NAME@Implementation.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,19 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "@ARG_CLASS_NAME@.h"
-#include "@ARG_CLASS_NAME@Implementation.h"
+#include "@_paraview_toolbar_CLASS_NAME@.h"
+#include "@_paraview_toolbar_CLASS_NAME@Implementation.h"
 
-@ARG_CLASS_NAME@Implementation::@ARG_CLASS_NAME@Implementation(QObject* p)
+@_paraview_toolbar_CLASS_NAME@Implementation::@_paraview_toolbar_CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
 }
 
-@ARG_CLASS_NAME@Implementation::~@ARG_CLASS_NAME@Implementation()
+@_paraview_toolbar_CLASS_NAME@Implementation::~@_paraview_toolbar_CLASS_NAME@Implementation()
 {
 }
 
-QToolBar* @ARG_CLASS_NAME@Implementation::toolBar(QWidget* parentWdg)
+QToolBar* @_paraview_toolbar_CLASS_NAME@Implementation::toolBar(QWidget* parentWdg)
 {
-  return new @ARG_CLASS_NAME@(parentWdg);
+  return new @_paraview_toolbar_CLASS_NAME@(parentWdg);
 }

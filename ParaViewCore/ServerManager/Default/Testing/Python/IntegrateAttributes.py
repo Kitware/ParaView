@@ -15,7 +15,7 @@ smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
-file1 = os.path.join(smtesting.DataDir, "quadraticTetra01.vtu")
+file1 = os.path.join(smtesting.DataDir, "Testing/Data/quadraticTetra01.vtu")
 reader1 = servermanager.sources.XMLUnstructuredGridReader(FileName=file1)
 
 filter1 = servermanager.filters.IntegrateAttributes(Input=reader1)
@@ -30,7 +30,7 @@ if val < 0.128 or val > 0.1284:
     print("ERROR: Wrong Volume value for dataset 1")
     sys.exit(1)
 
-file2 = os.path.join(smtesting.DataDir, "elements.vtu")
+file2 = os.path.join(smtesting.DataDir, "Testing/Data/elements.vtu")
 reader2 = servermanager.sources.XMLUnstructuredGridReader(FileName=file2)
 
 filter2 = servermanager.filters.IntegrateAttributes(Input=reader2)
@@ -45,7 +45,7 @@ val = filter2Output.GetPointData().GetArray("pointScalars").GetValue(0)
 #    print "ERROR: Wrong Volume value for dataset 2"
 #    sys.exit(1)
 
-file3 = os.path.join(smtesting.DataDir, "blow.vtk")
+file3 = os.path.join(smtesting.DataDir, "Testing/Data/blow.vtk")
 reader3 = servermanager.sources.LegacyVTKFileReader(FileNames=file3)
 
 filter3 = servermanager.filters.DataSetSurfaceFilter(Input=reader3)

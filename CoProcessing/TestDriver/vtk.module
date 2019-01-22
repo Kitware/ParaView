@@ -1,0 +1,9 @@
+NAME
+  ParaView::CatalystTestDriver
+LIBRARY_NAME
+  vtkPVCatalystTestDriver
+DEPENDS
+  ParaView::Catalyst
+TEST_LABELS
+  Catalyst
+  ParaView

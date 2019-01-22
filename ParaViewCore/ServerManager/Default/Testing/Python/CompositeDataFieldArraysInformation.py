@@ -2,7 +2,7 @@
 # Ensures that field data arrays are correctly marked as partial when dealing
 # with composite datasets.
 
-from paraview.vtk.vtkPVClientServerCoreCore import vtkPVDataInformation
+from paraview.modules.vtkPVClientServerCoreCore import vtkPVDataInformation
 from paraview.vtk.vtkCommonDataModel import vtkMultiBlockDataSet, vtkPolyData
 from paraview.vtk.vtkCommonCore import vtkFloatArray
 

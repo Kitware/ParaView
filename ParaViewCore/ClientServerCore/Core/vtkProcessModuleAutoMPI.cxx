@@ -81,15 +81,9 @@ class vtkProcessModuleAutoMPIInternals
 {
 public:
   // This specify the preflags and post flags that can be set using:
-  // VTK_MPI_PRENUMPROC_FLAGS VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
-  std::vector<std::string> MPIPreNumProcFlags;
+  // PARAVIEW_MPI_PREFLAGS / PARAVIEW_MPI_POSTFLAGS at config time
   std::vector<std::string> MPIPreFlags;
   std::vector<std::string> MPIPostFlags;
-
-  // MPIServerFlags allows you to specify flags specific for
-  // the client or the server
-  std::vector<std::string> MPIServerPreFlags;
-  std::vector<std::string> MPIServerPostFlags;
 
   int TotalMulticoreProcessors;
   std::string ServerExecutablePath; // fullpath to paraview server executable
@@ -166,7 +160,7 @@ int vtkProcessModuleAutoMPI::IsPossible()
 {
   this->Internals->TotalMulticoreProcessors = vtkProcessModuleAutoMPI::NumberOfCores;
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   if (this->Internals->TotalMulticoreProcessors > 1 && vtkProcessModuleAutoMPI::EnableAutoMPI &&
     this->Internals->CollectConfiguredOptions())
   {
@@ -178,7 +172,7 @@ int vtkProcessModuleAutoMPI::IsPossible()
   }
 #else
   return 0;
-#endif // PARAVIEW_USE_MPI
+#endif
 }
 
 //-----------------------------------------------------------------------public
@@ -329,48 +323,36 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
   }
 
 // now find all the mpi information if mpi run is set
-#ifdef PARAVIEW_USE_MPI
-#ifdef VTK_MPIRUN_EXE
-  if (!this->SetMPIRun(VTK_MPIRUN_EXE))
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
+#ifdef PARAVIEW_MPIEXEC_EXECUTABLE
+  if (!this->SetMPIRun(PARAVIEW_MPIEXEC_EXECUTABLE))
   {
-    this->MPIRun = VTK_MPIRUN_EXE;
+    this->MPIRun = PARAVIEW_MPIEXEC_EXECUTABLE;
   }
 #else
-  cerr << "AutoMPI Error: "
-       << "VTK_MPIRUN_EXE must be set when PARAVIEW_USE_MPI is on." << endl;
-  return 0;
+#error "PARAVIEW_MPIEXEC_EXECUTABLE must be set when PARAVIEW_USE_MPI is on."
 #endif
   if (this->TotalMulticoreProcessors > 1)
   {
     int serverNumProc = this->TotalMulticoreProcessors;
 
-#ifdef VTK_MPI_NUMPROC_FLAG
-    this->MPINumProcessFlag = VTK_MPI_NUMPROC_FLAG;
+#ifdef PARAVIEW_MPI_NUMPROC_FLAG
+    this->MPINumProcessFlag = PARAVIEW_MPI_NUMPROC_FLAG;
 #else
-    cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test if MPI is on.\n";
-    return 0;
+#error "Error PARAVIEW_MPI_NUMPROC_FLAG must be defined to run test if MPI is on."
 #endif
-#ifdef VTK_MPI_PRENUMPROC_FLAGS
-    this->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
+#ifdef PARAVIEW_MPI_PREFLAGS
+    this->SeparateArguments(PARAVIEW_MPI_PREFLAGS, this->MPIPreFlags);
 #endif
-#ifdef VTK_MPI_PREFLAGS
-    this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIPreFlags);
-#endif
-#ifdef VTK_MPI_POSTFLAGS
-    this->SeparateArguments(VTK_MPI_POSTFLAGS, this->MPIPostFlags);
+#ifdef PARAVIEW_MPI_POSTFLAGS
+    this->SeparateArguments(PARAVIEW_MPI_POSTFLAGS, this->MPIPostFlags);
 #endif
     char buf[1024];
     sprintf(buf, "%d", serverNumProc);
     this->MPIServerNumProcessFlag = buf;
   }
-#endif // PARAVIEW_USE_MPI
+#endif
 
-#ifdef VTK_MPI_SERVER_PREFLAGS
-  this->SeparateArguments(VTK_MPI_SERVER_PREFLAGS, this->MPIServerPreFlags);
-#endif
-#ifdef VTK_MPI_SERVER_POSTFLAGS
-  this->SeparateArguments(VTK_MPI_SERVER_POSTFLAGS, this->MPIServerPostFlags);
-#endif
   return 1;
 }
 
@@ -389,20 +371,12 @@ void vtkProcessModuleAutoMPIInternals::CreateCommandLine(
   if (this->MPIRun.size())
   {
     commandLine.push_back(this->MPIRun.c_str());
-    for (unsigned int i = 0; i < this->MPIPreNumProcFlags.size(); ++i)
-    {
-      commandLine.push_back(this->MPIPreNumProcFlags[i].c_str());
-    }
 
     commandLine.push_back(this->MPINumProcessFlag.c_str());
     commandLine.push_back(numProc);
     for (unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
     {
       commandLine.push_back(this->MPIPreFlags[i].c_str());
-    }
-    for (unsigned int i = 0; i < this->MPIServerPreFlags.size(); ++i)
-    {
-      commandLine.push_back(this->MPIServerPreFlags[i].c_str());
     }
   }
 
@@ -411,11 +385,6 @@ void vtkProcessModuleAutoMPIInternals::CreateCommandLine(
   for (unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
   {
     commandLine.push_back(this->MPIPostFlags[i].c_str());
-  }
-  // If there is specific flags for the server to pass to mpirun, add them
-  for (unsigned int i = 0; i < this->MPIServerPostFlags.size(); ++i)
-  {
-    commandLine.push_back(this->MPIServerPostFlags[i].c_str());
   }
 
   if (vtkProcessModule::GetProcessModule()->GetOptions()->GetConnectID() != 0)

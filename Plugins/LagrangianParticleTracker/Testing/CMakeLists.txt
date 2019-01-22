@@ -1,77 +1,92 @@
-include(ParaViewTestingMacros)
-
 if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
-  paraview_test_load_data_dirs(LagrangianParticleTracker
-    LagrangianParticleTracker
-    LagrangianParticleTracker/flow
-    LagrangianParticleTracker/surface)
-  
-  add_client_tests("pv"
+  ExternalData_Expand_Arguments("ParaViewData" _
+    "DATA{Data/LagrangianParticleTracker/,REGEX:.*}"
+    "DATA{Data/LagrangianParticleTracker/flow/,REGEX:.*}"
+    "DATA{Data/LagrangianParticleTracker/surface/,REGEX:.*}")
+
+  paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSeedHelperCustom.xml)
-  add_client_tests("pv"
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS LagrangianSeedHelperCustom.xml)
+  paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSeedHelper.xml)
-  add_client_tests("pv"
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS LagrangianSeedHelper.xml)
+  paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSurfaceHelper.xml)
-  add_client_tests("pv"
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS LagrangianSurfaceHelper.xml)
+  paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSurfaceHelperNone.xml)
-  add_client_tests("pv"
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS LagrangianSurfaceHelperNone.xml)
+  paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
+    TEST_DATA_TARGET ParaViewData
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianSurfaceHelperComposite.xml)
-  add_client_tests("pv"
+    TEST_SCRIPTS LagrangianSurfaceHelperComposite.xml)
+  paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
+    TEST_DATA_TARGET ParaViewData
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTracker.xml)
-  add_client_tests("pv"
+    TEST_SCRIPTS LagrangianParticleTracker.xml)
+  paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"
+    TEST_DATA_TARGET ParaViewData
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerReseeding.xml)
+    TEST_SCRIPTS LagrangianParticleTrackerReseeding.xml)
 
   if (PARAVIEW_USE_MPI)
-    add_client_server_tests("pvcs"
+    paraview_add_client_server_tests(
       LOAD_PLUGIN "LagrangianParticleTracker"
+      TEST_DATA_TARGET ParaViewData
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerParallel.xml)
-    add_client_render_server_tests("pvcrs"
+    paraview_add_client_server_render_tests(
       LOAD_PLUGIN "LagrangianParticleTracker"
+      TEST_DATA_TARGET ParaViewData
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerParallel.xml)
-    add_client_server_tests("pvcs"
+    paraview_add_client_server_tests(
       LOAD_PLUGIN "LagrangianParticleTracker"
+      TEST_DATA_TARGET ParaViewData
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerParallelDistributed.xml)
-    add_client_render_server_tests("pvcrs"
+    paraview_add_client_server_render_tests(
       LOAD_PLUGIN "LagrangianParticleTracker"
+      TEST_DATA_TARGET ParaViewData
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerParallelDistributed.xml)
-    add_client_server_tests("pvcs"
+    paraview_add_client_server_tests(
       LOAD_PLUGIN "LagrangianParticleTracker"
+      TEST_DATA_TARGET ParaViewData
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerParallelSurfDistributed.xml)
-    add_client_render_server_tests("pvcrs"
+    paraview_add_client_server_render_tests(
       LOAD_PLUGIN "LagrangianParticleTracker"
+      TEST_DATA_TARGET ParaViewData
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerParallelSurfDistributed.xml)
-  else()
-    add_client_server_tests("pvcs"
-      LOAD_PLUGIN "LagrangianParticleTracker"
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerReseeding.xml)
-    add_client_render_server_tests("pvcrs"
-      LOAD_PLUGIN "LagrangianParticleTracker"
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerReseeding.xml)
-    add_client_server_tests("pvcs"
-      LOAD_PLUGIN "LagrangianParticleTracker"
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTracker.xml)
-    add_client_render_server_tests("pvcrs"
-      LOAD_PLUGIN "LagrangianParticleTracker"
-      BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTracker.xml)
-  endif()
-endif()
+  endif ()
+
+  paraview_add_client_server_tests(
+    LOAD_PLUGIN "LagrangianParticleTracker"
+    TEST_DATA_TARGET ParaViewData
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerReseeding.xml)
+  paraview_add_client_server_render_tests(
+    LOAD_PLUGIN "LagrangianParticleTracker"
+    TEST_DATA_TARGET ParaViewData
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTrackerReseeding.xml)
+  paraview_add_client_server_tests(
+    LOAD_PLUGIN "LagrangianParticleTracker"
+    TEST_DATA_TARGET ParaViewData
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTracker.xml)
+  paraview_add_client_server_render_tests(
+    LOAD_PLUGIN "LagrangianParticleTracker"
+    TEST_DATA_TARGET ParaViewData
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LagrangianParticleTracker.xml)
+endif ()

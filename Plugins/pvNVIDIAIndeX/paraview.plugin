@@ -1,0 +1,26 @@
+NAME
+  pvNVIDIAIndeX
+DESCRIPTION
+  Plugin for NVIDIA IndeX
+REQUIRES_MODULES
+  ParaView::ClientServerCoreCore
+  ParaView::ClientServerCoreRendering
+  ParaView::Common
+  ParaView::ServerManagerDefault
+  ParaView::VTKExtensionsRendering
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMath
+  VTK::CommonSystem
+  VTK::CommonTransforms
+  VTK::FiltersCore
+  VTK::FiltersParallel
+  VTK::FiltersSources
+  VTK::IOXML
+  VTK::IOXMLParser
+  VTK::ParallelCore
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingVolume
+  VTK::RenderingVolumeOpenGL2

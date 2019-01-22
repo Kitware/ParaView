@@ -1,20 +1,21 @@
-SET(TestDriver_SRCS
-  vtkCPBaseFieldBuilder.cxx
-  vtkCPBaseGridBuilder.cxx
-  vtkCPCellFieldBuilder.cxx
-  vtkCPConstantScalarFieldFunction.cxx
-  vtkCPFieldBuilder.cxx
-  vtkCPFileGridBuilder.cxx
-  vtkCPGridBuilder.cxx
-  vtkCPLinearScalarFieldFunction.cxx
-  vtkCPMultiBlockGridBuilder.cxx
-  vtkCPNodalFieldBuilder.cxx
-  vtkCPScalarFieldFunction.cxx
-  vtkCPTensorFieldFunction.cxx
-  vtkCPTestDriver.cxx
-  vtkCPUniformGridBuilder.cxx
-  vtkCPUnstructuredGridBuilder.cxx
-  vtkCPVector3FieldFunction.cxx
-)
+set(classes
+  vtkCPBaseFieldBuilder
+  vtkCPBaseGridBuilder
+  vtkCPCellFieldBuilder
+  vtkCPConstantScalarFieldFunction
+  vtkCPFieldBuilder
+  vtkCPFileGridBuilder
+  vtkCPGridBuilder
+  vtkCPLinearScalarFieldFunction
+  vtkCPMultiBlockGridBuilder
+  vtkCPNodalFieldBuilder
+  vtkCPScalarFieldFunction
+  vtkCPTensorFieldFunction
+  vtkCPTestDriver
+  vtkCPUniformGridBuilder
+  vtkCPUnstructuredGridBuilder
+  vtkCPVector3FieldFunction)
 
-vtk_module_library(${vtk-module} ${TestDriver_SRCS})
+vtk_module_add_module(ParaView::CatalystTestDriver
+  CLASSES ${classes})
+vtk_module_client_server_exclude()

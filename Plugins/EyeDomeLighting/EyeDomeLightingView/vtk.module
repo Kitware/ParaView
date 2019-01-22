@@ -1,0 +1,9 @@
+NAME
+  EyeDomeLighting::EyeDomeLightingView
+LIBRARY_NAME
+  vtkEyeDomeLightingView
+DEPENDS
+  ParaView::ClientServerCoreRendering
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::RenderingOpenGL2

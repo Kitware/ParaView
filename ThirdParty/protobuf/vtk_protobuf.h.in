@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMMessage.h
+  Module:    vtk_protobuf.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -15,18 +15,13 @@
 #ifndef vtk_protobuf_h
 #define vtk_protobuf_h
 
-/* Use the protobuf library configured for VTK.  */
-#cmakedefine VTK_USE_SYSTEM_PROTOBUF
-#ifndef VTK_USE_SYSTEM_PROTOBUF
-# include "vtkPVConfig.h" // for BUILD_SHARED_LIBS
-# if defined(_MSC_VER) && defined(BUILD_SHARED_LIBS)
-// When building on Windows with shared libraries enabled, any VTK/ParaView code
-// that imports the protobuf headers needs to have this definitions otherwise
-// the export signatures will not match and we get tons of warnings.
-# define PROTOBUF_USE_DLLS
-# endif
-#endif
+/* Use the protobuf library configured for ParaView.  */
+#cmakedefine01 VTK_MODULE_USE_EXTERNAL_vtkprotobuf
 
-/* Include the top-level header here.  */
+#if VTK_MODULE_USE_EXTERNAL_vtkprotobuf
+# include <google/protobuf/message.h>
+#else
+# include <vtkprotobuf/src/google/protobuf/message.h>
+#endif
 
 #endif

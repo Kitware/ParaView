@@ -3,10 +3,10 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadLocal" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/PluginManagerDialog/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/TestMultipleNumberOfComponentsPlugin.xml" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/TestMultipleNumberOfComponentsPlugin.xml" />
   <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/tensors.pvti" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/tensors.pvti" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="RandomAttributeGenerator" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/GenerateCellVectors/CheckBox" command="set_boolean" arguments="false" />

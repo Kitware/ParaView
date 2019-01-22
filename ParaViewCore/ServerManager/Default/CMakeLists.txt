@@ -28,37 +28,40 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkLoadStateOptions.cxx
-  vtkPVGeneralSettings.cxx
-  vtkPVMultiServerDataSource.cxx
-  vtkPVX3DExporter.cxx
-  vtkSMCameraConfigurationReader.cxx
-  vtkSMCameraConfigurationWriter.cxx
-  vtkSMCSVExporterProxy.cxx
-  vtkSMCSVProxiesInitializationHelper.cxx
-  vtkSMDirectoryProxy.cxx
-  vtkSMEnsembleDataReaderProxy.cxx
-  vtkSMExporterProxy.cxx
-  vtkSMGL2PSExporterProxy.cxx
-  vtkSMInteractionUndoStackBuilder.cxx
-  vtkSMInteractiveSelectionPipeline.cxx
-  vtkSMLoadStateOptionsProxy.cxx
-  vtkSMMultiServerSourceProxy.cxx
-  vtkSMPLYWriterProxyInitializationHelper.cxx
-  vtkSMPreselectionPipeline.cxx
-  vtkSMPropertyModificationUndoElement.cxx
-  vtkSMProxyClipboard.cxx
-  vtkSMProxyConfigurationReader.cxx
-  vtkSMProxyConfigurationWriter.cxx
-  vtkSMPSWriterProxy.cxx
-  vtkSMReaderReloadHelper.cxx
-  vtkSMRenderViewExporterProxy.cxx
-  vtkSMSpreadSheetRepresentationInitializationHelper.cxx
-  vtkSMTesting.cxx
-  vtkSMTooltipSelectionPipeline.cxx
-  vtkSMViewExportHelper.cxx
-  vtkSMXYChartRepresentationInitializationHelper.cxx
-)
+set(classes
+  vtkLoadStateOptions
+  vtkPVGeneralSettings
+  vtkPVMultiServerDataSource
+  vtkPVX3DExporter
+  vtkSMCSVExporterProxy
+  vtkSMCSVProxiesInitializationHelper
+  vtkSMCameraConfigurationReader
+  vtkSMCameraConfigurationWriter
+  vtkSMDirectoryProxy
+  vtkSMEnsembleDataReaderProxy
+  vtkSMExporterProxy
+  vtkSMGL2PSExporterProxy
+  vtkSMInteractionUndoStackBuilder
+  vtkSMInteractiveSelectionPipeline
+  vtkSMLoadStateOptionsProxy
+  vtkSMMultiServerSourceProxy
+  vtkSMPLYWriterProxyInitializationHelper
+  vtkSMPSWriterProxy
+  vtkSMPreselectionPipeline
+  vtkSMPropertyModificationUndoElement
+  vtkSMProxyClipboard
+  vtkSMProxyConfigurationReader
+  vtkSMProxyConfigurationWriter
+  vtkSMReaderReloadHelper
+  vtkSMRenderViewExporterProxy
+  vtkSMSpreadSheetRepresentationInitializationHelper
+  vtkSMTesting
+  vtkSMTooltipSelectionPipeline
+  vtkSMViewExportHelper
+  vtkSMXYChartRepresentationInitializationHelper)
 
-vtk_module_library(vtkPVServerManagerDefault ${Module_SRCS})
+vtk_module_add_module(ParaView::ServerManagerDefault
+  CLASSES ${classes})
+
+paraview_add_server_manager_xmls(
+  XMLS  settings.xml)

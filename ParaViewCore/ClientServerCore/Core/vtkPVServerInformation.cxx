@@ -26,7 +26,7 @@
 #include "vtkPVServerOptionsInternals.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
-#ifdef PARAVIEW_ENABLE_NVPIPE
+#if VTK_MODULE_ENABLE_ParaView_nvpipe
 #include <nvpipe.h>
 #endif
 
@@ -41,7 +41,7 @@
 // reasonably safe to assume OGGTHEORA is always enabled here.
 // #include "vtkIOMovieConfigure.h"
 
-#ifdef PARAVIEW_ENABLE_NVPIPE
+#if VTK_MODULE_ENABLE_ParaView_nvpipe
 //----------------------------------------------------------------------------
 // NVPipe requires Kepler-class (or newer) NVIDIA hardware at runtime.  This
 // verifies that such hardware is available.
@@ -72,7 +72,7 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
   this->TileMullions[0] = this->TileMullions[1] = 0;
   this->Timeout = 0;
-#if defined(PARAVIEW_USE_ICE_T) && defined(PARAVIEW_USE_MPI)
+#if VTK_MODULE_ENABLE_ParaView_icet
   this->UseIceT = 1;
 #else
   this->UseIceT = 0;
@@ -82,13 +82,13 @@ vtkPVServerInformation::vtkPVServerInformation()
 #if defined(_WIN32)
   this->AVISupport = 1;
 #else
-#if defined(PARAVIEW_ENABLE_FFMPEG)
+#if VTK_MODULE_ENABLE_VTK_IOFFMPEG
   this->AVISupport = 1;
 #endif
 #endif
 
   this->NVPipeSupport = false;
-#if defined(PARAVIEW_ENABLE_NVPIPE)
+#if VTK_MODULE_ENABLE_ParaView_nvpipe
   if (NVPipeAvailable())
   {
     this->NVPipeSupport = true;

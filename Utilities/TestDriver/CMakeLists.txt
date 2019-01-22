@@ -28,40 +28,60 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-SET(PV_TEST_USE_RANDOM_PORTS ON CACHE BOOL
-  "Use random port numbers when testing client-server configurations.")
-MARK_AS_ADVANCED(PV_TEST_USE_RANDOM_PORTS)
 
-SET(PV_TEST_INIT_COMMAND "" CACHE STRING
-  "Command to run before a test begins. Multiple commands are separated by ';'.")
-MARK_AS_ADVANCED(PV_TEST_INIT_COMMAND)
+set(PV_SETUP_SCRIPT ""
+  CACHE STRING "The script to use for setup when testing client-server configurations.")
+set(PV_SSH_FLAGS ""
+  CACHE STRING "Flags for using SSH when testing client-server configurations.")
+option(PV_TEST_USE_RANDOM_PORTS
+  "Use random port numbers when testing client-server configurations." ON)
+set(PV_TEST_INIT_COMMAND ""
+  CACHE STRING "Command to run before a test begins. Multiple commands are separated by ';'.")
+set(PV_TEST_CLEAN_COMMAND ""
+  CACHE STRING "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
+set(PV_TEST_CLIENT "localhost"
+  CACHE STRING "Node which serves as the client node, used to connect from the server side in reverse connection mode.")
+mark_as_advanced(
+  PV_SETUP_SCRIPT
+  PV_SSH_FLAGS
+  PV_TEST_CLEAN_COMMAND
+  PV_TEST_CLIENT
+  PV_TEST_INIT_COMMAND
+  PV_TEST_USE_RANDOM_PORTS)
 
-SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
-  "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
-MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h"
+  ESCAPE_QUOTES
+  @ONLY)
 
-SET (PV_TEST_CLIENT "localhost" CACHE STRING
-  "Node which serves as the client node, used to connect from the server side in reverse connection mode.")
-MARK_AS_ADVANCED(PV_TEST_CLIENT)
-
-# Add the test driver executable. This is not done in the above loop to avoid
-# adding dependencies ${LIBS} since we only need vtksys for this executable.
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h @ONLY ESCAPE_QUOTES)
-
-include(vtkForwardingExecutable)
-
-vtk_module_impl()
-vtk_module_export("")
-vtk_add_executable_with_forwarding(out_exe_suffix
-  smTestDriver
+vtk_module_add_executable(ParaView::smTestDriver
   vtkSMTestDriver.cxx
-  vtkSMTestDriver.h)
-set_property(GLOBAL APPEND PROPERTY VTK_TARGETS smTestDriver)
+  vtkSMTestDriver.h
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h")
 
-target_link_libraries(smTestDriver
-  vtksys
-  vtkCommonCore)
-if (NOT VTK_INSTALL_NO_DEVELOPMENT)
-  pv_executable_install(smTestDriver "${out_exe_suffix}")
-endif()
+set(mpi_defines)
+if (PARAVIEW_USE_MPI)
+  find_package(MPI QUIET REQUIRED)
+
+  list(APPEND mpi_defines
+    PARAVIEW_USE_MPI
+    "PARAVIEW_MPIEXEC_EXECUTABLE=\"${MPIEXEC_EXECUTABLE}\""
+    "PARAVIEW_MPI_NUMPROC_FLAG=\"${MPIEXEC_NUMPROC_FLAG}\""
+    "PARAVIEW_MPI_MAX_NUMPROCS=${VTK_MPI_MAX_NUMPROCS}")
+
+  if (MPI_PREFLAGS)
+    list(APPEND mpi_defines
+      "PARAVIEW_MPI_PREFLAGS=\"${MPI_PREFLAGS}\"")
+  endif ()
+  if (MPI_POSTFLAGS)
+    list(APPEND mpi_defines
+      "PARAVIEW_MPI_POSTFLAGS=\"${MPI_POSTFLAGS}\"")
+  endif ()
+endif ()
+
+if (mpi_defines)
+  vtk_module_definitions(ParaView::smTestDriver
+    PRIVATE
+      ${mpi_defines})
+endif ()

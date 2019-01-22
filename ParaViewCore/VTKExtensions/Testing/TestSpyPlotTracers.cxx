@@ -7,7 +7,8 @@
 
 int TestSpyPlotTracers(int argc, char* argv[])
 {
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "Data/SPCTH/ball_and_box.spcth");
+  char* fname =
+    vtkTestUtilities::ExpandDataFileName(argc, argv, "Testing/Data/SPCTH/ball_and_box.spcth");
 
   VTK_CREATE(vtkDummyController, controller);
   vtkMultiProcessController::SetGlobalController(controller);

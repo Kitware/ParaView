@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqApplicationCore_h
 
 #include "pqCoreModule.h"
+#include "vtkPVConfig.h" // for PARAVIEW_USE_QTHELP
 #include <QObject>
 #include <QPointer>
 

@@ -242,7 +242,7 @@ public:
 
   void Initialize()
   {
-    this->Document.load("<Node name='SIL' version='1.0' uid='0' next_uid='1' state='0' />");
+    this->Document.load_string("<Node name='SIL' version='1.0' uid='0' next_uid='1' state='0' />");
     this->NextUID = 1;
   }
 
@@ -256,7 +256,7 @@ public:
   bool Deserialize(const char* data, vtkSubsetInclusionLattice* self)
   {
     pugi::xml_document document;
-    if (!document.load(data))
+    if (!document.load_string(data))
     {
       // leave state untouched.
       return false;
@@ -293,10 +293,7 @@ public:
 
   pugi::xml_node GetRoot() const { return this->Document.first_child(); }
 
-  pugi::xml_node Find(const char* xpath) const
-  {
-    return this->Document.select_single_node(xpath).node();
-  }
+  pugi::xml_node Find(const char* xpath) const { return this->Document.select_node(xpath).node(); }
 
   int GetNextUID()
   {
@@ -416,7 +413,7 @@ public:
   void Merge(const std::string& state)
   {
     pugi::xml_document other;
-    if (!other.load(state.c_str()))
+    if (!other.load_string(state.c_str()))
     {
       return;
     }

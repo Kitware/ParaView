@@ -33,7 +33,7 @@
 #include "vtkTransmitUnstructuredGridPiece.h"
 #include "vtkUnstructuredGrid.h"
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPICommunicator.h"
 #endif
 
@@ -97,7 +97,7 @@ void vtkPVEnSightMasterServerReader2::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 template <class T>
 int vtkPVEnSightMasterServerReader2SyncValues(
   T* data, int numValues, int numPieces, vtkMultiProcessController* controller)

@@ -5,7 +5,7 @@ from paraview.simple import *
 from paraview import smtesting
 smtesting.ProcessCommandLineArguments()
 
-filename = smtesting.DataDir + '/can.ex2'
+filename = smtesting.DataDir + '/Testing/Data/can.ex2'
 can_ex2 = OpenDataFile(filename)
 
 AnimationScene1 = GetAnimationScene()

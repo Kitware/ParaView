@@ -1,48 +1,73 @@
-include_directories(${VTK_INCLUDE_DIRS})
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
+  REQUEST_MODULES   LagrangianParticleTracker::vtkLagrangianParticleTracker
+  PROVIDES_MODULES  lagrangian_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-if (PARAVIEW_BUILD_QT_GUI)
-  pv_find_package_qt(qt_targets REQUIRED QUIET
-    QT5_COMPONENTS Widgets)
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-  pv_qt_wrap_cpp(MOC_SRCS
-    pqIntegrationModelHelperWidget.h
-    pqIntegrationModelSeedHelperWidget.h
-    pqIntegrationModelSurfaceHelperWidget.h)
+vtk_module_build(
+  MODULES             ${lagrangian_modules}
+  PACKAGE             LagrangianParticleTracker
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-  set(OUTIFACES0)
-  set(OUTSRCS0)
-  add_paraview_property_widget(OUTIFACES0 OUTSRCS0
-    TYPE "integration_model_seed_helper_widget"
-    CLASS_NAME pqIntegrationModelSeedHelperWidget)
+set(interfaces)
+set(sources
+  pqIntegrationModelHelperWidget.cxx
+  pqIntegrationModelHelperWidget.h
+  pqIntegrationModelSeedHelperWidget.cxx
+  pqIntegrationModelSeedHelperWidget.h
+  pqIntegrationModelSurfaceHelperWidget.cxx
+  pqIntegrationModelSurfaceHelperWidget.h)
 
-  set(OUTIFACES1)
-  set(OUTSRCS1)
-  add_paraview_property_widget(OUTIFACES1 OUTSRCS1
-    TYPE "integration_model_surface_helper_widget"
-    CLASS_NAME pqIntegrationModelSurfaceHelperWidget)
+paraview_plugin_add_property_widget(
+  KIND WIDGET
+  TYPE "integration_model_seed_helper_widget"
+  CLASS_NAME pqIntegrationModelSurfaceHelperWidget
+  INTERFACES pwi_interfaces
+  SOURCES pwi_sources)
+list(APPEND interfaces
+  ${pwi_interfaces})
+list(APPEND sources
+  ${pwi_sources})
 
-  add_paraview_plugin(LagrangianParticleTracker "1.0"
-    DESCRIPTION "Highly customizable filter for particle tracking"
-    REQUIRED_ON_SERVER
-    REQUIRED_ON_CLIENT
-    SERVER_MANAGER_XML
-      LagrangianParticleTracker.xml
-    SERVER_MANAGER_SOURCES
-      vtkLagrangianHelperBase.cxx
-      vtkLagrangianSeedHelper.cxx
-      vtkLagrangianSurfaceHelper.cxx
-    GUI_INTERFACES
-      ${OUTIFACES0} ${OUTIFACES1}
-    GUI_SOURCES
-      ${MOC_SRCS} ${OUTSRCS0} ${OUTSRCS1}
-      pqIntegrationModelHelperWidget.cxx
-      pqIntegrationModelSeedHelperWidget.cxx
-      pqIntegrationModelSurfaceHelperWidget.cxx)
+paraview_plugin_add_property_widget(
+  KIND WIDGET
+  TYPE "integration_model_surface_helper_widget"
+  CLASS_NAME pqIntegrationModelSurfaceHelperWidget
+  INTERFACES pwi_interfaces
+  SOURCES pwi_sources)
+list(APPEND interfaces
+  ${pwi_interfaces})
+list(APPEND sources
+  ${pwi_sources})
 
-  target_link_libraries(LagrangianParticleTracker
-                        LINK_PRIVATE vtkFiltersFlowPaths)
+paraview_add_plugin(LagrangianParticleTracker
+  REQUIRED_ON_SERVER
+  REQUIRED_ON_CLIENT
+  VERSION "1.0"
+  UI_INTERFACES ${interfaces}
+  SOURCES ${sources}
+  MODULES LagrangianParticleTracker::vtkLagrangianParticleTracker)
 
-  if (BUILD_TESTING)
-    add_subdirectory(Testing)
-  endif()
-endif()
+target_link_libraries(LagrangianParticleTracker
+  PRIVATE
+    ParaView::ClientServerCoreCore
+    ParaView::ServerManagerCore
+    VTK::CommonCore
+    VTK::GUISupportQt)
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()

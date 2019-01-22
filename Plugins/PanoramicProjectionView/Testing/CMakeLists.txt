@@ -1,21 +1,12 @@
-include(ParaViewTestingMacros)
-
 if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
-  add_client_tests("pv"
+  paraview_add_client_tests(
     LOAD_PLUGIN "PanoramicProjectionView"
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/PanoramicProjectionEquirectangular.xml)
-  add_client_tests("pv"
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS PanoramicProjectionEquirectangular.xml PanoramicProjectionAzimuthal.xml)
+  paraview_add_client_server_tests(
     LOAD_PLUGIN "PanoramicProjectionView"
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/PanoramicProjectionAzimuthal.xml)
-
-  add_client_server_tests("pvcs"
-    LOAD_PLUGIN "PanoramicProjectionView"
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/PanoramicProjectionEquirectangular.xml)
-  add_client_server_tests("pvcs"
-    LOAD_PLUGIN "PanoramicProjectionView"
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/PanoramicProjectionAzimuthal.xml)
-endif()
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS PanoramicProjectionEquirectangular.xml PanoramicProjectionAzimuthal.xml)
+endif ()

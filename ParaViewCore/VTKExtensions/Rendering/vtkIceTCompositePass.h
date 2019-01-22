@@ -43,7 +43,11 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkRenderPass.h"
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
-#include <IceT.h>                     // for icet types
+// FIXME: This should not publicly change its implementation based on a feature
+// flag.
+#if !defined(__VTK_WRAP__) && !defined(VTK_WRAPPING_CXX)
+#include <IceT.h> // for icet types
+#endif
 
 class vtkMultiProcessController;
 class vtkPartitionOrderingInterface;
@@ -238,8 +242,9 @@ public:
    * last-rendered-tile maps.
    */
   vtkGetVector4Macro(PhysicalViewport, double);
-  //@}
+//@}
 
+#if !defined(__VTK_WRAP__) && !defined(VTK_WRAPPING_CXX)
   //@{
   /**
    * Internal callback. Don't use.
@@ -247,7 +252,8 @@ public:
   virtual void Draw(const vtkRenderState*, const IceTDouble* proj_matrix,
     const IceTDouble* mv_matrix, const IceTFloat* background_color, const IceTInt* viewport,
     IceTImage result);
-  //@}
+//@}
+#endif
 
 protected:
   vtkIceTCompositePass();

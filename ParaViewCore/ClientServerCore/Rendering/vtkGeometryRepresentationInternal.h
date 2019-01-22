@@ -17,11 +17,11 @@
 // fallback to vtkQuadricClustering, since vtkmLevelOfDetail is slow on the
 // serial backend.
 #ifndef __VTK_WRAP__
-#ifdef PARAVIEW_USE_VTKM
+#if VTK_MODULE_ENABLE_VTK_vtkm
 #include "vtkmConfig.h" // for VTKM_ENABLE_TBB
-#endif                  // PARAVIEW_USE_VTKM
+#endif
 
-#ifdef VTKM_ENABLE_TBB
+#if defined(VTKM_ENABLE_TBB) && VTK_MODULE_ENABLE_VTK_AcceleratorsVTKm
 #include "vtkmLevelOfDetail.h"
 namespace vtkGeometryRepresentation_detail
 {

@@ -1,0 +1,26 @@
+NAME
+  ParaView::pqComponents
+LIBRARY_NAME
+  pqComponents
+GROUPS
+  ParaViewQt
+DEPENDS
+  ParaView::pqCore
+  VTK::jsoncpp
+PRIVATE_DEPENDS
+  ParaView::Animation
+  ParaView::ClientServerCoreDefault
+  ParaView::ServerManagerDefault
+  ParaView::ServerManagerRendering
+  VTK::ChartsCore
+  VTK::IOImage
+  VTK::pugixml
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+
+  # These affect the public API.
+  ParaView::pqPython
+TEST_LABELS
+  ParaView
+EXCLUDE_WRAP

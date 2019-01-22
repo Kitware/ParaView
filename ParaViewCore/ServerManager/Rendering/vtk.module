@@ -1,0 +1,27 @@
+NAME
+  ParaView::ServerManagerRendering
+LIBRARY_NAME
+  vtkPVServerManagerRendering
+GROUPS
+  ParaViewRendering
+KIT
+  ParaView::ServerManager
+IMPLEMENTS
+  ParaView::ServerManagerCore
+DEPENDS
+  ParaView::ServerImplementationRendering
+  ParaView::ServerManagerCore
+  VTK::jsoncpp
+PRIVATE_DEPENDS
+  VTK::CommonColor
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  VTK::RenderingOSPRay
+
+  # These affect the public API.
+  ParaView::ClientServerCorePython
+TEST_DEPENDS
+  ParaView::ServerManagerApplication
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

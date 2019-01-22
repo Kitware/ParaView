@@ -79,7 +79,7 @@ pqImageCompressorWidget::pqImageCompressorWidget(
   this->connect(ui.zlibLevel, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
   this->connect(ui.zlibStripAlpha, SIGNAL(stateChanged(int)), SIGNAL(compressorConfigChanged()));
 
-#ifdef PARAVIEW_ENABLE_NVPIPE
+#if VTK_MODULE_ENABLE_ParaView_nvpipe
   ui.compressionType->addItem("NvPipe");
   this->connect(ui.nvpLevel, SIGNAL(valueChanged(int)), SIGNAL(compressorConfigChanged()));
 #endif
@@ -201,7 +201,7 @@ void pqImageCompressorWidget::currentIndexChanged(int index)
   ui.zlibColorSpace->setVisible(index == ZLIB_COMPRESSION);
   ui.zlibStripAlpha->setVisible(index == ZLIB_COMPRESSION);
 
-#ifdef PARAVIEW_ENABLE_NVPIPE
+#if VTK_MODULE_ENABLE_ParaView_nvpipe
   ui.nvpLabel->setVisible(index == NVPIPE_COMPRESSION);
   ui.nvpLevel->setVisible(index == NVPIPE_COMPRESSION);
 #else

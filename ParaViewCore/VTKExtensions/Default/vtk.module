@@ -1,0 +1,34 @@
+NAME
+  ParaView::VTKExtensionsDefault
+LIBRARY_NAME
+  vtkPVVTKExtensionsDefault
+KIT
+  ParaView::Extensions
+DEPENDS
+  VTK::FiltersAMR
+  VTK::FiltersExtraction
+  VTK::FiltersGeneral
+  VTK::FiltersParallelStatistics
+  VTK::IOEnSight
+  VTK::IOImage
+  VTK::IOImport
+  VTK::IOParallel
+  VTK::IOParallelExodus
+  VTK::IOParallelXML
+  VTK::ImagingFourier
+  VTK::ImagingSources
+  VTK::InteractionWidgets
+  ParaView::VTKExtensionsCore
+  ParaView::VTKExtensionsRendering
+PRIVATE_DEPENDS
+  VTK::ChartsCore
+  VTK::IOInfovis
+  VTK::IOPLY
+  VTK::ParallelCore
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  VTK::ParallelMPI
+TEST_DEPENDS
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

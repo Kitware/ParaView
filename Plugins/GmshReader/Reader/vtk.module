@@ -1,0 +1,10 @@
+NAME
+  GmshReader::vtkGmshReader
+LIBRARY_NAME
+  vtkGmshReader
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::Common
+  VTK::vtksys

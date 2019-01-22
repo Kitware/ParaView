@@ -28,34 +28,36 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set(Module_SRCS
-  vtkAttributeDataReductionFilter.cxx
-  vtkCommunicationErrorCatcher.cxx
-  vtkCompositeMultiProcessController.cxx
-  vtkDistributedTrivialProducer.cxx
-  vtkExtractHistogram.cxx
-  vtkFileSeriesReader.cxx
-  vtkFileSeriesWriter.cxx
-  vtkImageFileSeriesReader.cxx
-  vtkMemberFunctionCommand.h
-  vtkMetaReader.cxx
-  vtkMultiProcessControllerHelper.cxx
-  vtkParallelSerialWriter.cxx
-  vtkPExtractHistogram.cxx
-  vtkPResourceFileLocator.cxx
-  vtkPVCompositeDataPipeline.cxx
-  vtkPVInformationKeys.cxx
-  vtkPVNullSource.cxx
-  vtkPVPostFilter.cxx
-  vtkPVPostFilterExecutive.cxx
-  vtkPVTransform.cxx
-  vtkPVTrivialProducer.cxx
-  vtkRawImageFileSeriesReader.cxx
-  vtkReductionFilter.cxx
-  vtkSelectionSerializer.cxx
-  vtkUndoElement.cxx
-  vtkUndoSet.cxx
-  vtkUndoStack.cxx
-)
+set(classes
+  vtkAttributeDataReductionFilter
+  vtkCommunicationErrorCatcher
+  vtkCompositeMultiProcessController
+  vtkDistributedTrivialProducer
+  vtkExtractHistogram
+  vtkFileSeriesReader
+  vtkFileSeriesWriter
+  vtkImageFileSeriesReader
+  vtkMetaReader
+  vtkMultiProcessControllerHelper
+  vtkPExtractHistogram
+  vtkPResourceFileLocator
+  vtkPVCompositeDataPipeline
+  vtkPVInformationKeys
+  vtkPVNullSource
+  vtkPVPostFilter
+  vtkPVPostFilterExecutive
+  vtkPVTransform
+  vtkPVTrivialProducer
+  vtkParallelSerialWriter
+  vtkRawImageFileSeriesReader
+  vtkReductionFilter
+  vtkSelectionSerializer
+  vtkUndoElement
+  vtkUndoSet
+  vtkUndoStack)
+set(headers
+  vtkMemberFunctionCommand.h)
 
-vtk_module_library(vtkPVVTKExtensionsCore ${Module_SRCS})
+vtk_module_add_module(ParaView::VTKExtensionsCore
+  CLASSES ${classes}
+  HEADERS ${headers})

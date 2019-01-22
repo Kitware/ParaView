@@ -28,23 +28,24 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  CAdaptorAPI.cxx
-  vtkCPAdaptorAPI.cxx
-  vtkCPCxxHelper.cxx
-  vtkCPDataDescription.cxx
-  vtkCPInputDataDescription.cxx
-  vtkCPPipeline.cxx
-  vtkCPProcessor.cxx
-  vtkCPXMLPWriterPipeline.cxx
-)
+set(classes
+  CAdaptorAPI
+  vtkCPAdaptorAPI
+  vtkCPCxxHelper
+  vtkCPDataDescription
+  vtkCPInputDataDescription
+  vtkCPPipeline
+  vtkCPProcessor
+  vtkCPXMLPWriterPipeline)
 
-set (${vtk-module}_HDRS CAdaptorAPI.h)
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkCPConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkCPConfig.h"
+  @ONLY)
+set(headers
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkCPConfig.h")
 
-configure_file(vtkCPConfig.h.in
-               vtkCPConfig.h @ONLY)
-
-set (CATALYST_FORTRAN_USING_MANGLING)
+set(CATALYST_FORTRAN_USING_MANGLING)
 
 if (CMAKE_Fortran_COMPILER_WORKS)
   include(FortranCInterface)
@@ -56,29 +57,21 @@ if (CMAKE_Fortran_COMPILER_WORKS)
       needtocreategrid
       coprocess)
 
-  set(CATALYST_FORTRAN_USING_MANGLING ${FortranCInterface_GLOBAL_FOUND})
+  set(CATALYST_FORTRAN_USING_MANGLING "${FortranCInterface_GLOBAL_FOUND}")
 
-  set (Module_SRCS
-      ${Module_SRCS}
-      FortranAdaptorAPI.cxx)
+  list(APPEND classes
+    FortranAdaptorAPI)
+  list(APPEND headers
+    "${CMAKE_CURRENT_BINARY_DIR}/FortranAdaptorAPIMangling.h")
+endif ()
 
-  set (${vtk-module}_HDRS
-       ${${vtk-module}_HDRS}
-       FortranAdaptorAPI.h
-       ${CMAKE_CURRENT_BINARY_DIR}/FortranAdaptorAPIMangling.h)
-endif()
+vtk_module_add_module(ParaView::Catalyst
+  CLASSES ${classes}
+  HEADERS ${headers})
+vtk_module_client_server_exclude()
 
-if (PARAVIEW_USE_MPI)
-  # this needs to be done before the vtk_module_library() since
-  # vtkMPI has add_definitions() call it in.
-  include(vtkMPI)
-endif()
-
-vtk_module_library(${vtk-module} ${Module_SRCS})
-if(PARAVIEW_USE_MPI)
-  vtk_mpi_link(${vtk-module})
-endif()
 if (CATALYST_FORTRAN_USING_MANGLING)
-  set_property(TARGET ${vtk-module} APPEND PROPERTY COMPILE_DEFINITIONS
-      "CATALYST_FORTRAN_USING_MANGLING=1")
-endif()
+  vtk_module_define(ParaView::Catalyst
+    PRIVATE
+      CATALYST_FORTRAN_USING_MANGLING=1)
+endif ()

@@ -1,6 +1,6 @@
 if(PARAVIEW_ENABLE_PYTHON AND VTK_PYTHON_FULL_THREADSAFE)
   vtk_module_test_executable(pqApplicationComponentsTestVtkPythonScopeGilEnsurer TestVtkPythonScopeGilEnsurer.cxx ${MOC_SRCS})
-  ExternalData_add_test(ParaViewData
+  ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
     NAME pqApplicationComponentsTestVtkPythonScopeGilEnsurer
     COMMAND pqApplicationComponentsTestVtkPythonScopeGilEnsurer)
   set_tests_properties(pqApplicationComponentsTestVtkPythonScopeGilEnsurer PROPERTIES LABELS "PARAVIEW")

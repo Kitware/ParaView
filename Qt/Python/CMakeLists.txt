@@ -28,98 +28,31 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set(Module_SRCS
-  pqPythonDebugLeaksView.cxx
-  pqPythonDebugLeaksView.h
-  pqPythonMacroSupervisor.cxx
-  pqPythonMacroSupervisor.h
-  pqPythonManager.cxx
-  pqPythonManager.h
-  pqPythonScriptEditor.cxx
-  pqPythonScriptEditor.h
-  pqPythonShell.cxx
-  pqPythonShell.h
-  pqPythonSyntaxHighlighter.cxx
-  pqPythonSyntaxHighlighter.h
-)
+set(classes
+  pqPythonDebugLeaksView
+  pqPythonMacroSupervisor
+  pqPythonManager
+  pqPythonScriptEditor
+  pqPythonShell
+  pqPythonSyntaxHighlighter)
 
-set (Module_MOC_HDRS
-  pqPythonDebugLeaksView.h
-  pqPythonMacroSupervisor.h
-  pqPythonManager.h
-  pqPythonScriptEditor.h
-  pqPythonShell.h
-  pqPythonSyntaxHighlighter.h
-)
+set(ui_files
+  pqPythonShell.ui)
 
-set (Module_UI_FILES
-  pqPythonShell.ui
-)
+set(CMAKE_AUTOMOC 1)
+set(CMAKE_AUTOUIC 1)
 
-find_package(PythonLibs REQUIRED)
+vtk_module_find_package(
+  PACKAGE     Qt5
+  COMPONENTS  Widgets)
 
-include_directories(
-  "${VTK_SOURCE_DIR}/Wrapping/Python"
-  "${VTK_BINARY_DIR}/Wrapping/Python"
-  ${PYTHON_INCLUDE_DIRS}
-  )
+source_group("Resources" FILES
+  ${ui_files})
 
-#-------------------------------------------------------------------------
-set(${vtk-module}_NO_HeaderTest 1)
-
-include(ParaViewQt)
-pv_find_package_qt(qt_private_targets REQUIRED
-                QT5_COMPONENTS Widgets)
-pv_qt_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
-pv_qt_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-
-set(${vtk-module}_EXPORT_CODE_INSTALL
-  "include(\${ParaView_CMAKE_DIR}/ParaViewQt.cmake)
-  pv_find_package_qt(__${vtk-module}_qt_targets REQUIRED QUIET
-    QT5_COMPONENTS Widgets)")
-set(${vtk-module}_EXPORT_CODE_BUILD "${${vtk-module}_EXPORT_CODE_INSTALL}")
-
-SOURCE_GROUP("Resources" FILES
-  ${Module_UI_FILES}
-  ${Module_RESOURCE_FILES}
-)
-
-SOURCE_GROUP("Generated" FILES
-  ${__Module_MOC_SRCS}
-  ${__Module_UI_SRCS}
-)
-
-vtk_module_library(${vtk-module}
-  ${Module_SRCS}
-  ${__Module_MOC_SRCS}
-  ${__Module_UI_SRCS})
-target_link_libraries(${vtk-module} LINK_PRIVATE ${qt_private_targets})
-
-## Install
-##--------------------------------------------------------------------------------------------------
-## Libraries
-#IF(NOT PV_INSTALL_NO_LIBRARIES)
-#  SET (targets_to_install QtPython)
-#  INSTALL(TARGETS ${targets_to_install}
-#    EXPORT ${PV_INSTALL_EXPORT_NAME}
-#    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-#    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-#    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
-#ENDIF()
-## Development
-#IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-#  # Headers
-#  GLOB_INSTALL_DEVELOPMENT(
-#      ${CMAKE_CURRENT_SOURCE_DIR}
-#      ${PV_INSTALL_INCLUDE_DIR} 
-#      "*.h;*.hxx;*.txx")
-#  INSTALL(
-#      FILES ${dynamicHeaders}
-#      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-#      COMPONENT Development)
-#  # QT resources
-#  GLOB_INSTALL_DEVELOPMENT( 
-#    ${CMAKE_CURRENT_SOURCE_DIR}
-#    ${PV_INSTALL_INCLUDE_DIR}/Qt/Python/Resources
-#    "*.ui;*.ico;*.png;*.svg;*.xpm;*.rc;*.qrc")
-#ENDIF ()
+vtk_module_add_module(ParaView::pqPython
+  CLASSES ${classes}
+  SOURCES ${ui_files}
+          ${resource_files})
+vtk_module_link(ParaView::pqPython
+  PRIVATE
+    Qt5::Widgets)

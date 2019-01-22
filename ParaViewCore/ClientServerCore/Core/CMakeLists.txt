@@ -28,57 +28,132 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkCompleteArrays.cxx
-  vtkExtractsDeliveryHelper.cxx
-  vtkMPIMToNSocketConnection.cxx
-  vtkMPIMToNSocketConnectionPortInformation.cxx
-  vtkNetworkAccessManager.cxx
-  vtkPConvertSelection.cxx
-  vtkProcessModuleAutoMPI.cxx
-  vtkProcessModule.cxx
-  vtkPVAlgorithmPortsInformation.cxx
-  vtkPVArrayInformation.cxx
-  vtkPVClassNameInformation.cxx
-  vtkPVCompositeDataInformation.cxx
-  vtkPVCompositeDataInformationIterator.cxx
-  vtkPVDataInformation.cxx
-  vtkPVDataInformationHelper.cxx
-  vtkPVDataSetAttributesInformation.cxx
-  vtkPVDataSizeInformation.cxx
-  vtkPVDisableStackTraceSignalHandler.cxx
-  vtkPVEnableStackTraceSignalHandler.cxx
-  vtkPVExtractSelection.cxx
-  vtkPVFileInformationHelper.cxx
-  vtkPVGenericAttributeInformation.cxx
-  vtkPVInformation.cxx
-  vtkPVMemoryUseInformation.cxx
-  vtkPVMultiClientsInformation.cxx
-  vtkPVOptions.cxx
-  vtkPVOptionsXMLParser.cxx
-  vtkPVPlugin.cxx
-  vtkPVPluginLoader.cxx
-  vtkPVPluginsInformation.cxx
-  vtkPVPluginTracker.cxx
-  vtkPVProgressHandler.cxx
-  vtkPVPythonInformation.cxx
-  vtkPVPythonModule.cxx
-  vtkPVPythonOptions.cxx
-  vtkPVPythonPluginInterface.cxx
-  vtkPVServerInformation.cxx
-  vtkPVServerManagerPluginInterface.cxx
-  vtkPVServerOptions.cxx
-  vtkPVSession.cxx
-  vtkPVSILInformation.cxx
-  vtkPVSystemConfigInformation.cxx
-  vtkPVSystemInformation.cxx
-  vtkPVTemporalDataInformation.cxx
-  vtkPVTimerInformation.cxx
-  vtkSession.cxx
-  vtkSessionIterator.cxx
-  vtkTCPNetworkAccessManager.cxx
-  vtkEnvironmentAnnotationFilter.cxx
-)
+set(classes
+  vtkCompleteArrays
+  vtkEnvironmentAnnotationFilter
+  vtkExtractsDeliveryHelper
+  vtkMPIMToNSocketConnection
+  vtkMPIMToNSocketConnectionPortInformation
+  vtkNetworkAccessManager
+  vtkPConvertSelection
+  vtkPVAlgorithmPortsInformation
+  vtkPVArrayInformation
+  vtkPVClassNameInformation
+  vtkPVCompositeDataInformation
+  vtkPVCompositeDataInformationIterator
+  vtkPVDataInformation
+  vtkPVDataInformationHelper
+  vtkPVDataSetAttributesInformation
+  vtkPVDataSizeInformation
+  vtkPVDisableStackTraceSignalHandler
+  vtkPVEnableStackTraceSignalHandler
+  vtkPVExtractSelection
+  vtkPVFileInformationHelper
+  vtkPVGenericAttributeInformation
+  vtkPVInformation
+  vtkPVMemoryUseInformation
+  vtkPVMultiClientsInformation
+  vtkPVOptions
+  vtkPVOptionsXMLParser
+  vtkPVPlugin
+  vtkPVPluginLoader
+  vtkPVPluginTracker
+  vtkPVPluginsInformation
+  vtkPVProgressHandler
+  vtkPVPythonInformation
+  vtkPVPythonModule
+  vtkPVPythonOptions
+  vtkPVPythonPluginInterface
+  vtkPVSILInformation
+  vtkPVServerInformation
+  vtkPVServerManagerPluginInterface
+  vtkPVServerOptions
+  vtkPVSession
+  vtkPVSystemConfigInformation
+  vtkPVSystemInformation
+  vtkPVTemporalDataInformation
+  vtkPVTimerInformation
+  vtkProcessModule
+  vtkProcessModuleAutoMPI
+  vtkSession
+  vtkSessionIterator
+  vtkTCPNetworkAccessManager)
+
+if (TARGET VTK::PythonInterpreter)
+  # TODO: Split these into a separate module so that there isn't a public
+  # optional dependency.
+  list(APPEND classes
+    vtkPythonExtractSelection
+    vtkPythonSelector)
+endif ()
+
+cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
+  "Use MPI synchronous-send commands for communication" OFF
+  "PARAVIEW_USE_MPI" OFF)
+cmake_dependent_option(PARAVIEW_INITIALIZE_MPI_ON_CLIENT
+  "Initialize MPI on client-processes by default. Can be overridden using command line arguments" ON
+  "PARAVIEW_USE_MPI" OFF)
+mark_as_advanced(
+  PARAVIEW_INITIALIZE_MPI_ON_CLIENT
+  PARAVIEW_USE_MPI_SSEND)
+
+set(vtkProcessModule_defines)
+if (PARAVIEW_USE_MPI_SSEND)
+  list(APPEND vtkProcessModule_defines
+    PARAVIEW_USE_MPI_SSEND)
+endif ()
+if (PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
+  list(APPEND vtkProcessModule_defines
+    PARAVIEW_INITIALIZE_MPI_ON_CLIENT)
+endif ()
+set_source_files_properties(vtkProcessModule.cxx
+  PROPERTIES
+    COMPILE_DEFINITIONS "${vtkProcessModule_defines}")
+
+# TODO: Expose CMake options for these?
+set(vtkPVOptions_defines)
+if (PARAVIEW_ALWAYS_SECURE_CONNECTION)
+  list(APPEND vtkPVOptions_defines
+    PARAVIEW_ALWAYS_SECURE_CONNECTION)
+endif ()
+if (PARAVIEW_ENABLE_FPE)
+  list(APPEND vtkPVOptions_defines
+    PARAVIEW_ENABLE_FPE)
+endif ()
+if (PARAVIEW_WITH_SUPERBUILD_MESA)
+  list(APPEND vtkPVOptions_defines
+    PARAVIEW_WITH_SUPERBUILD_MESA)
+
+  if (PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
+    list(APPEND vtkPVOptions_defines
+      PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
+  endif ()
+endif ()
+if (VTK_OPENGL_HAS_EGL)
+  list(APPEND vtkPVOptions_defines
+    VTK_OPENGL_HAS_EGL)
+endif ()
+set_source_files_properties(vtkPVOptions.cxx
+  PROPERTIES
+    COMPILE_DEFINITIONS "${vtkPVOptions_defines}")
+
+set(vtkProcessModuleAutoMPI_defines)
+if (TARGET VTK::ParallelMPI)
+  list(APPEND vtkProcessModuleAutoMPI_defines
+    "PARAVIEW_MPIEXEC_EXECUTABLE=\"${MPIEXEC_EXECUTABLE}\""
+    "PARAVIEW_MPI_NUMPROC_FLAG=\"${MPIEXEC_NUMPROC_FLAG}\"")
+  if (MPI_PREFLAGS)
+    list(APPEND vtkProcessModuleAutoMPI_defines
+      "PARAVIEW_MPI_PREFLAGS=\"${MPIEXEC_PREFLAGS}\"")
+  endif ()
+  if (MPI_POSTFLAGS)
+    list(APPEND vtkProcessModuleAutoMPI_defines
+      "PARAVIEW_MPI_POSTFLAGS=\"${MPIEXEC_POSTFLAGS}\"")
+  endif ()
+endif ()
+set_source_files_properties(vtkProcessModuleAutoMPI.cxx
+  PROPERTIES
+    COMPILE_DEFINITIONS "${vtkProcessModuleAutoMPI_defines}")
 
 set(PARAVIEW_PLUGIN_LOADER_PATHS ""
   CACHE STRING "Extra paths to search for plugins")
@@ -89,41 +164,5 @@ if (PARAVIEW_PLUGIN_LOADER_PATHS)
       COMPILE_DEFINITIONS PARAVIEW_PLUGIN_LOADER_PATHS=\"${PARAVIEW_PLUGIN_LOADER_PATHS}\")
 endif ()
 
-if (PARAVIEW_WITH_SUPERBUILD_MESA)
-  set(pv_options_definitions
-    PARAVIEW_WITH_SUPERBUILD_MESA)
-
-  if (PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
-    list(APPEND pv_options_definitions
-      PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
-  endif ()
-
-  set_source_files_properties(vtkPVOptions.cxx
-    PROPERTIES
-      COMPILE_DEFINITIONS "${pv_options_definitions}")
-endif ()
-
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND Module_SRCS
-    vtkPythonExtractSelection.cxx
-    vtkPythonProgrammableFilter.cxx
-    vtkPythonAnnotationFilter.cxx
-    vtkPythonSelector.cxx
-    )
-endif()
-
-if(VTK_OPENGL_HAS_EGL)
-  set_source_files_properties(
-    vtkPVOptions.cxx
-    PROPERTIES
-    COMPILE_DEFINITIONS VTK_OPENGL_HAS_EGL)
-endif()
-
-if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
-endif()
-
-vtk_module_library(vtkPVClientServerCoreCore ${Module_SRCS})
-if(PARAVIEW_USE_MPI)
-  vtk_mpi_link(${vtk-module})
-endif()
+vtk_module_add_module(ParaView::ClientServerCoreCore
+  CLASSES ${classes})

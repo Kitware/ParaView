@@ -1,0 +1,12 @@
+NAME
+  AdiosReaderPixie
+CONDITION
+  NOT WIN32 AND PARAVIEW_USE_MPI
+DESCRIPTION
+  Reader for *.bp ADIOS files
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::ParallelCore
+  VTK::mpi
+  VTK::vtksys

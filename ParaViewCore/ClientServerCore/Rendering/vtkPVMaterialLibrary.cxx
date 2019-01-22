@@ -18,7 +18,7 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
 #include "vtkResourceFileLocator.h"
@@ -41,7 +41,7 @@ vtkStandardNewMacro(vtkPVMaterialLibrary);
 vtkPVMaterialLibrary::vtkPVMaterialLibrary()
 {
 // initialize the class that will act as library of materials
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   this->MaterialLibrary = vtkOSPRayMaterialLibrary::New();
 #else
   this->MaterialLibrary = nullptr;
@@ -49,7 +49,7 @@ vtkPVMaterialLibrary::vtkPVMaterialLibrary()
 
   // now look for any materials that we want preloaded into the application
   this->SearchPaths = nullptr;
-  vtksys::String paths;
+  std::string paths;
 
   // user can define a path via environment variables
   const char* env = vtksys::SystemTools::GetEnv("PV_MATERIALS_PATH");
@@ -107,7 +107,7 @@ void vtkPVMaterialLibrary::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 void vtkPVMaterialLibrary::ReadRelativeFile(const char* FileName)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   std::vector<std::string> paths;
   vtksys::SystemTools::Split(this->SearchPaths, paths, ENV_PATH_SEP);
   for (size_t cc = 0; cc < paths.size(); cc++)
@@ -137,7 +137,7 @@ vtkObject* vtkPVMaterialLibrary::GetMaterialLibrary()
 //-----------------------------------------------------------------------------
 bool vtkPVMaterialLibrary::ReadFile(const char* FileName)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->ReadFile(FileName);
 #else
   (void)FileName;
@@ -148,7 +148,7 @@ bool vtkPVMaterialLibrary::ReadFile(const char* FileName)
 //-----------------------------------------------------------------------------
 bool vtkPVMaterialLibrary::ReadBuffer(const char* FileName)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->ReadBuffer(FileName);
 #else
   (void)FileName;
@@ -159,7 +159,7 @@ bool vtkPVMaterialLibrary::ReadBuffer(const char* FileName)
 //-----------------------------------------------------------------------------
 const char* vtkPVMaterialLibrary::WriteBuffer()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->WriteBuffer();
 #else
   return nullptr;

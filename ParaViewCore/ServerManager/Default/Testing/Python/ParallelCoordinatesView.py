@@ -3,7 +3,7 @@ from paraview.simple import *
 from paraview import smtesting
 smtesting.ProcessCommandLineArguments()
 
-filename = smtesting.DataDir + '/Data/vehicle_data.csv'
+filename = smtesting.DataDir + '/Testing/Data/vehicle_data.csv'
 
 vehicle_data_csv = OpenDataFile(filename)
 

@@ -1,0 +1,5 @@
+NAME
+  ParaView::protobuf
+LIBRARY_NAME
+  vtkprotobuf
+THIRD_PARTY

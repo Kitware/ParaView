@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkSMAnimationScene.h"
-#include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
 
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkEventForwarderCommand.h"
@@ -28,7 +27,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkVector.h"
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPythonAnimationCue.h"
 #endif
 
@@ -121,7 +120,7 @@ protected:
   virtual bool IsAcceptable(vtkAnimationCue* cue) const
   {
     return (cue &&
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
       (vtkPythonAnimationCue::SafeDownCast(cue) == NULL) &&
 #endif
       (vtkPVCameraAnimationCue::SafeDownCast(cue) == NULL));
@@ -200,7 +199,7 @@ protected:
   {
     (void)cue;
     return (false
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
       || (vtkPythonAnimationCue::SafeDownCast(cue) != NULL)
 #endif
         );

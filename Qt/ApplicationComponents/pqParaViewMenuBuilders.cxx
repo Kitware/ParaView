@@ -104,7 +104,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVCRToolbar.h"
 #include "pqViewMenuManager.h"
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqMacroReaction.h"
 #include "pqPythonManager.h"
 #include "pqSGWritersMenuManager.h"
@@ -137,7 +137,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);
   new pqImportCinemaReaction(ui.actionFileImportCinemaDatabase);
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   new pqLoadMaterialsReaction(ui.actionFileLoadMaterials);
 #else
   delete ui.actionFileLoadMaterials;
@@ -291,7 +291,7 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   new pqTimerLogReaction(menu.addAction("Timer Log") << pqSetName("actionToolsTimerLog"));
   menu.addSeparator(); // --------------------------------------------------
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   menu.addSeparator(); // --------------------------------------------------
   new pqTraceReaction(menu.addAction("Start Trace") << pqSetName("actionToolsStartStopTrace"),
     "Start Trace", "Stop Trace");
@@ -489,7 +489,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QMenu& menu)
 void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
 {
   Q_UNUSED(menu);
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   // Give the macros menu to the pqPythonMacroSupervisor
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
@@ -654,7 +654,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   axesToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, axesToolbar);
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   // Give the macros menu to the pqPythonMacroSupervisor
   pqPythonManager* manager =
     qobject_cast<pqPythonManager*>(pqApplicationCore::instance()->manager("PYTHON_MANAGER"));
@@ -683,7 +683,7 @@ void pqParaViewMenuBuilders::buildCatalystMenu(QMenu& menu, QWidget* exportConfi
   new pqCatalystRemoveBreakpointReaction(
     menu.addAction("Remove Breakpoint") << pqSetName("actionCatalystRemoveBreakpoint"));
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #define SHOWNEWCATALYSTGUI 1
 #if SHOWNEWCATALYSTGUI
   menu.addSeparator(); // --------------------------------------------------

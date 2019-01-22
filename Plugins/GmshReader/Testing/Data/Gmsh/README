@@ -1,0 +1,2 @@
+NACA high order mesh and solution files for visualization with GmshReader plugin of ParaView.
+ParaView can be run in serial or in parallel under the client-server mode to visualize this case.

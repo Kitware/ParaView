@@ -1,0 +1,167 @@
+#[==[.md
+# paraview-config.cmake
+
+This file is used by CMake when finding ParaView.
+
+The following variables are provided by this module:
+
+  * `ParaView_VERSION`: The version of ParaView found.
+  * `PARAVIEW_BUILD_QT_GUI`: If ParaView's Qt GUI is available.
+  * `PARAVIEW_USE_MPI`: If ParaView is built with MPI support.
+  * `PARAVIEW_ENABLE_PYTHON`: If ParaView is built with Python support.
+  * `PARAVIEW_PYTHONPATH`: Where ParaView's Python modules live. Unset if
+    Python is not available.
+  * `ParaView_LIBRARIES`: The list of modules specified by `COMPONENTS` and
+    `OPTIONAL_COMPONENTS`. This may be used in `MODULES` arguments in the API
+    (e.g., `vtk_module_autoinit`). All modules are also targets and may be
+    linked to using `target_link_libraries`.
+#]==]
+
+set(CMAKE_MODULE_PATH_save "${CMAKE_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH
+  "${CMAKE_CURRENT_LIST_DIR}")
+
+set("${CMAKE_FIND_PACKAGE_NAME}_VERSION" "@PARAVIEW_MAJOR_VERSION@.@PARAVIEW_MINOR_VERSION@.@PARAVIEW_BUILD_VERSION@")
+
+unset("${CMAKE_FIND_PACKAGE_NAME}_FOUND")
+include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-targets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-properties.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-find-packages.cmake")
+
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewClient.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
+
+set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
+set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
+set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
+
+if (PARAVIEW_ENABLE_PYTHON)
+  include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapPython.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/vtk-python.cmake")
+else ()
+  set(PARAVIEW_PYTHONPATH)
+endif ()
+
+set(_paraview_use_external_vtk "@PARAVIEW_USE_EXTERNAL_VTK@")
+set(_paraview_find_package_args)
+if (NOT _paraview_use_external_vtk)
+  list(APPEND _paraview_find_package_args
+    PATHS "${CMAKE_CURRENT_LIST_DIR}/vtk"
+    NO_DEFAULT_PATH)
+endif ()
+find_package(VTK QUIET REQUIRED
+  ${_paraview_find_package_args})
+if (NOT VTK_FOUND)
+  set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" 0)
+endif ()
+unset(_paraview_find_package_args)
+unset(_paraview_use_external_vtk)
+unset(_paraview_vtk_components)
+
+set(_paraview_components_to_check)
+foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
+  if (DEFINED "${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND")
+    # It was already not-found (likely due to `find-package` failures).
+  elseif (TARGET "${CMAKE_FIND_PACKAGE_NAME}::${_paraview_component}")
+    list(APPEND _paraview_components_to_check
+      "${_paraview_component}")
+  else ()
+    set("${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND" 0)
+    list(APPEND "${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_NOT_FOUND_MESSAGE"
+      "The ${_paraview_component} component is not available.")
+  endif ()
+endforeach ()
+unset(_paraview_component)
+
+set(_paraview_vtk_components)
+
+while (_paraview_components_to_check)
+  list(GET _paraview_components_to_check 0 _paraview_component)
+  list(REMOVE_AT _paraview_components_to_check 0)
+  if (DEFINED "${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND")
+    # We've already made a determiniation.
+    continue ()
+  endif ()
+
+  get_property(_paraview_dependencies
+    TARGET    "${CMAKE_FIND_PACKAGE_NAME}::${_paraview_component}"
+    PROPERTY  "INTERFACE_paraview_module_depends")
+  string(REPLACE "${CMAKE_FIND_PACKAGE_NAME}::" "" _paraview_dependencies "${_paraview_dependencies}")
+  set(_paraview_all_dependencies_checked TRUE)
+  foreach (_paraview_dependency IN LISTS _paraview_dependencies)
+    # Handle VTK module dependencies.
+    string(FIND "${_paraview_component}" "VTK::" _paraview_vtk_idx)
+    if (NOT _paraview_vtk_idx EQUAL -1)
+      unset(_paraview_vtk_idx)
+      if (NOT TARGET "${_paraview_dependency}")
+        set("${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND" 0)
+        list(APPEND "${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_NOT_FOUND_MESSAGE"
+          "Failed to find the ${_paraview_dependency} module.")
+      endif ()
+      continue ()
+    endif ()
+    unset(_paraview_vtk_idx)
+
+    if (DEFINED "${CMAKE_FIND_PACKAGE_NAME}_${_paraview_dependency}_FOUND")
+      if (NOT ${CMAKE_FIND_PACKAGE_NAME}_${_paraview_dependency}_FOUND)
+        set("${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND" 0)
+        list(APPEND "${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_NOT_FOUND_MESSAGE"
+          "Failed to find the ${_paraview_dependency} component.")
+      endif ()
+    else ()
+      # Check its dependencies.
+      list(APPEND _paraview_components_to_check
+        "${_paraview_dependency}")
+      set(_paraview_all_found FALSE)
+    endif ()
+  endforeach ()
+  if (NOT DEFINED "${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND")
+    if (_paraview_all_dependencies_checked)
+      set("${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND" 1)
+    else ()
+      list(APPEND _paraview_components_to_check
+        "${_paraview_component}")
+    endif ()
+  endif ()
+  unset(_paraview_all_dependencies_checked)
+  unset(_paraview_dependency)
+  unset(_paraview_dependencies)
+endwhile ()
+unset(_paraview_component)
+unset(_paraview_components_to_check)
+
+set(_paraview_missing_components)
+foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
+  if (NOT ${CMAKE_FIND_PACKAGE_NAME}_${_paraview_component}_FOUND AND ${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_${_paraview_component})
+    list(APPEND _paraview_missing_components
+      "${_paraview_component}")
+  endif ()
+endforeach ()
+
+if (_paraview_missing_components)
+  list(REMOVE_DUPLICATES _paraview_missing_components)
+  list(SORT _paraview_missing_components)
+  string(REPLACE ";" ", " _paraview_missing_components "${_paraview_missing_components}")
+  set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" 0)
+  set("${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE"
+    "Could not find the ${CMAKE_FIND_PACKAGE_NAME} package with the following required components: ${_paraview_missing_components}.")
+endif ()
+unset(_paraview_missing_components)
+
+set("${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES")
+if (NOT DEFINED "${CMAKE_FIND_PACKAGE_NAME}_FOUND")
+  # If nothing went wrong, we've successfully found the package.
+  set("${CMAKE_FIND_PACKAGE_NAME}_FOUND" 1)
+  # Build the `_LIBRARIES` variable.
+  foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
+    list(APPEND "${CMAKE_FIND_PACKAGE_NAME}_LIBRARIES"
+      "${CMAKE_FIND_PACKAGE_NAME}::${_paraview_component}")
+  endforeach ()
+  unset(_paraview_component)
+endif ()
+
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH_save}")
+unset(CMAKE_MODULE_PATH_save)

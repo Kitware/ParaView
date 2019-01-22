@@ -55,7 +55,7 @@
 #include <sstream>
 #include <vector>
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkAllToNRedistributeCompositePolyData.h"
 #include "vtkMPICommunicator.h"
 #endif
@@ -614,7 +614,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input, vtkDataObject* outpu
   }
 
 // Perform the M to N operation.
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   vtkAllToNRedistributeCompositePolyData* AllToN = NULL;
   AllToN = vtkAllToNRedistributeCompositePolyData::New();
   AllToN->SetController(controller);
@@ -641,7 +641,7 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataObject* input, vtkDataObject* ou
     return;
   }
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   int idx;
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
 
@@ -713,7 +713,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
 
   vtkTimerLog::MarkStartEvent("Dataserver gathering to 0");
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   int idx;
   int myId = this->Controller->GetLocalProcessId();
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
@@ -956,7 +956,7 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataObject* data)
     return;
   }
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   int myId = this->Controller->GetLocalProcessId();
 
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());

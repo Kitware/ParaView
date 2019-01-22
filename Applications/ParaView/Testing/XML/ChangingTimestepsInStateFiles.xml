@@ -3,7 +3,7 @@
   <!-- BUG #0015407 -->
   <!-- open dataset with 4 timesteps, with end time = 4 -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/dualSphereAnimation4.pvd" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dualSphereAnimation4.pvd" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Solid Color" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton4" command="activate" arguments="" />
@@ -18,7 +18,7 @@
   <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/LoadStateDataFileOptions/ComboBox" command="activated" arguments="Choose File Names" />
   <!-- change to dataset with 10 timesteps, with end time > 4 -->
   <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/dualSphereAnimation4pvd.FileName/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/dualSphereAnimation4pvd.FileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/dualSphereAnimation.pvd" />
+  <pqevent object="LoadStateOptionsDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/dualSphereAnimation4pvd.FileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/dualSphereAnimation.pvd" />
   <pqevent object="LoadStateOptionsDialog/widget/OKButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />

@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewModel.h"
 #include "vtkProcessModule.h"
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonManager.h"
 #endif
 
@@ -91,7 +91,7 @@ pqPVApplicationCore::pqPVApplicationCore(int& argc, char** argv, pqOptions* opti
   pqApplicationCore::instance()->registerManager("PRESET_GROUP_MANAGER", presetGroupManager);
 
   this->PythonManager = 0;
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   this->PythonManager = new pqPythonManager(this);
 
 // Ensure that whenever Python is initialized, we tell paraview.servermanager
@@ -107,7 +107,7 @@ pqPVApplicationCore::~pqPVApplicationCore()
 {
   delete this->AnimationManager;
   delete this->SelectionManager;
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   delete this->PythonManager;
 #endif
 }
@@ -195,7 +195,7 @@ pqAnimationManager* pqPVApplicationCore::animationManager() const
 //-----------------------------------------------------------------------------
 pqPythonManager* pqPVApplicationCore::pythonManager() const
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   return this->PythonManager;
 #else
   return 0;
@@ -247,7 +247,7 @@ bool pqPVApplicationCore::eventFilter(QObject* obj, QEvent* event_)
 //-----------------------------------------------------------------------------
 void pqPVApplicationCore::loadStateFromPythonFile(const QString& filename, pqServer* server)
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   pqPythonManager* pythonMgr = this->pythonManager();
   this->clearViewsForLoadingState(server);
   // comment in pqApplicationCore says this->LoadingState is unreliable, but it is still

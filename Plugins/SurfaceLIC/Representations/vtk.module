@@ -1,0 +1,10 @@
+NAME
+  SurfaceLIC::vtkSurfaceLICRepresentations
+LIBRARY_NAME
+  vtkSurfaceLICRepresentations
+DEPENDS
+  ParaView::ClientServerCoreRendering
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::RenderingCore
+  VTK::RenderingLICOpenGL2

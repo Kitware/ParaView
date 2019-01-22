@@ -6,13 +6,12 @@
 	url = https://gitlab.kitware.com/paraview/visitbridge.git
 [submodule "ThirdParty/IceT/vtkicet"]
 	path = ThirdParty/IceT/vtkicet
-	url = https://gitlab.kitware.com/icet/icet.git
-[submodule "ThirdParty/protobuf/vtkprotobuf"]
-	path = ThirdParty/protobuf/vtkprotobuf
-	url = https://gitlab.kitware.com/paraview/protobuf.git
+	url = https://gitlab.kitware.com/paraview/icet.git
+	branch = for/paraview
 [submodule "ThirdParty/QtTesting/vtkqttesting"]
 	path = ThirdParty/QtTesting/vtkqttesting
 	url = https://gitlab.kitware.com/paraview/qttesting.git
+	branch = for/paraview
 [submodule "ThirdParty/cinema/vtkcinemapython"]
 	path = ThirdParty/cinema/vtkcinemapython
 	url = https://gitlab.kitware.com/cinema/cinema_python.git

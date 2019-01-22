@@ -3,7 +3,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqViewFrameActionGroupImplementation.cxx.in
+   Module:  @_paraview_view_frame_action_group_CLASS_NAME@Implementation.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,33 +32,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "@ARG_CLASS_NAME@.h"
-#include "@ARG_CLASS_NAME@Implementation.h"
+#include "@_paraview_view_frame_action_group_CLASS_NAME@.h"
+#include "@_paraview_view_frame_action_group_CLASS_NAME@Implementation.h"
 
-@ARG_CLASS_NAME@Implementation::@ARG_CLASS_NAME@Implementation(QObject* p)
+@_paraview_view_frame_action_group_CLASS_NAME@Implementation::@_paraview_view_frame_action_group_CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
-  this->ActionGroup = new @ARG_CLASS_NAME@(this);
+  this->ActionGroup = new @_paraview_view_frame_action_group_CLASS_NAME@(this);
 }
 
-@ARG_CLASS_NAME@Implementation::~@ARG_CLASS_NAME@Implementation()
+@_paraview_view_frame_action_group_CLASS_NAME@Implementation::~@_paraview_view_frame_action_group_CLASS_NAME@Implementation()
 {
 }
 
-bool @ARG_CLASS_NAME@Implementation::connect(pqMultiViewFrame *frame, pqView *view)
+bool @_paraview_view_frame_action_group_CLASS_NAME@Implementation::connect(pqMultiViewFrame *frame, pqView *view)
 {
   return this->ActionGroup->connect(frame, view);
 }
 
-bool @ARG_CLASS_NAME@Implementation::disconnect(pqMultiViewFrame *frame, pqView *view)
+bool @_paraview_view_frame_action_group_CLASS_NAME@Implementation::disconnect(pqMultiViewFrame *frame, pqView *view)
 {
   return this->ActionGroup->disconnect(frame, view);
 }
 
-pqViewFrameActionGroup* @ARG_CLASS_NAME@Implementation::actionGroup()
+pqViewFrameActionGroup* @_paraview_view_frame_action_group_CLASS_NAME@Implementation::actionGroup()
 {
   return this->ActionGroup;
 }
-
-
-

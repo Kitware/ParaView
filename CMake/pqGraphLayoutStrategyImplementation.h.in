@@ -1,7 +1,9 @@
+// Generated file.  Do not edit.
+
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGraphLayoutStrategyImplementation.h.in
+   Module:  @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,34 +31,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// Generated file.  Do not edit.
 
-#ifndef _@ARG_STRATEGY_TYPE@Implementation_h
-#define _@ARG_STRATEGY_TYPE@Implementation_h
+#ifndef @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation_h
+#define @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation_h
 
 #include <QObject>
 #include <pqGraphLayoutStrategyInterface.h>
-#include <vtkSmartPointer.h>
 
-class vtk@ARG_STRATEGY_TYPE@;
+class vtk@_paraview_graph_layout_strategy_STRATEGY_TYPE@;
 
 /// interface class for plugins that create view modules
-class @ARG_STRATEGY_TYPE@Implementation : public QObject,
+class @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation : public QObject,
                                   public pqGraphLayoutStrategyInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqGraphLayoutStrategyInterface)
 public:
 
-  @ARG_STRATEGY_TYPE@Implementation(QObject* o);
+  @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation(QObject* o);
 
   QStringList graphLayoutStrategies() const;
 
   vtkGraphLayoutStrategy* getGraphLayoutStrategy(const QString& layoutStrategy);
-
-protected:
-//  vtkSmartPointer<vtk@ARG_STRATEGY_TYPE@> @ARG_STRATEGY_TYPE@;
 };
 
 #endif
-

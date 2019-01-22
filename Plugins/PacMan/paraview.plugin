@@ -1,0 +1,8 @@
+NAME
+  PacMan
+DESCRIPTION
+  Testing plugin
+CONDITION
+  BUILD_TESTING
+REQUIRES_MODULES
+  VTK::FiltersSources

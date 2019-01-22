@@ -53,27 +53,27 @@ import paraview, re, os, os.path, types, sys, atexit
 from paraview import vtk
 from paraview import _backwardscompatibilityhelper as _bc
 
-from vtkmodules.vtkPVServerImplementationCore import *
-from vtkmodules.vtkPVClientServerCoreCore import *
-from vtkmodules.vtkPVServerManagerCore import *
+from paraview.modules.vtkPVServerImplementationCore import *
+from paraview.modules.vtkPVClientServerCoreCore import *
+from paraview.modules.vtkPVServerManagerCore import *
 
 try:
-  from vtkmodules.vtkPVServerManagerDefault import *
+  from paraview.modules.vtkPVServerManagerDefault import *
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerDefault")
 try:
-  from vtkmodules.vtkPVServerManagerRendering import *
+  from paraview.modules.vtkPVServerManagerRendering import *
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerRendering")
 try:
-  from vtkmodules.vtkPVServerManagerApplication import *
+  from paraview.modules.vtkPVServerManagerApplication import *
 except:
   paraview.print_error("Error: Cannot import vtkPVServerManagerApplication")
 try:
-  from vtkmodules.vtkPVAnimation import *
+  from paraview.modules.vtkPVAnimation import *
 except:
   paraview.print_error("Error: Cannot import vtkPVAnimation")
-from vtkmodules.vtkPVCommon import *
+from paraview.modules.vtkPVCommon import *
 
 def _wrap_property(proxy, smproperty):
     """ Internal function.
@@ -2647,7 +2647,7 @@ def _createClass(groupName, proxyName, apxm=None):
     pxm = ProxyManager() if not apxm else apxm
     proto = pxm.GetPrototypeProxy(groupName, proxyName)
     if not proto:
-       paraview.print_error("Error while loading %s/%s %s"%(groupName, i['group'], proxyName))
+       paraview.print_error("Error while loading %s %s"%(groupName, proxyName))
        return None
     pname = proxyName
     if paraview.compatibility.GetVersion() >= 3.5 and proto.GetXMLLabel():

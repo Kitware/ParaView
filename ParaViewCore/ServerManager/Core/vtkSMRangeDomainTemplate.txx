@@ -225,7 +225,7 @@ int vtkSMRangeDomainTemplate<T>::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXML
   const char* default_mode = element->GetAttribute("default_mode");
   if (default_mode)
   {
-    typedef std::vector<vtksys::String> VStrings;
+    typedef std::vector<std::string> VStrings;
     const VStrings modes = vtksys::SystemTools::SplitString(default_mode, ',');
 
     this->DefaultModeVector.clear();

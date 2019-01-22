@@ -30,7 +30,7 @@
 
 #include <math.h>
 
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
 #include "vtkOSPRayActorNode.h"
 #endif
 
@@ -320,7 +320,7 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVLODActor::SetEnableScaling(int val)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   if (this->Mapper)
   {
     vtkInformation* info = this->Mapper->GetInformation();
@@ -339,7 +339,7 @@ void vtkPVLODActor::SetEnableScaling(int val)
 //----------------------------------------------------------------------------
 void vtkPVLODActor::SetScalingArrayName(const char* val)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   if (this->Mapper)
   {
     vtkInformation* mapperInfo = this->Mapper->GetInformation();
@@ -358,7 +358,7 @@ void vtkPVLODActor::SetScalingArrayName(const char* val)
 //----------------------------------------------------------------------------
 void vtkPVLODActor::SetScalingFunction(vtkPiecewiseFunction* pwf)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   if (this->Mapper)
   {
     vtkInformation* mapperInfo = this->Mapper->GetInformation();

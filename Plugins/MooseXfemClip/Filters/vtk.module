@@ -1,0 +1,9 @@
+NAME
+  MooseXfemClip::vtkMooseXfemClip
+LIBRARY_NAME
+  vtkMooseXfemClip
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel

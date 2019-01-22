@@ -1,0 +1,23 @@
+NAME
+  OpenVR
+DESCRIPTION
+  OpenVR Support
+CONDITION
+  PARAVIEW_BUILD_QT_GUI
+REQUIRES_MODULES
+  ParaView::ClientServerCoreRendering
+  ParaView::Common
+  ParaView::ServerManagerCore
+  ParaView::ServerManagerRendering
+  ParaView::VTKExtensionsRendering
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::IOCore
+  VTK::IOImage
+  VTK::IOXML
+  VTK::IOXMLParser
+  VTK::InteractionWidgets
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingOpenVR
+  VTK::ViewsCore

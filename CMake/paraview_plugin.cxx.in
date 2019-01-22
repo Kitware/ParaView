@@ -1,0 +1,153 @@
+#include "@_paraview_build_plugin@Plugin.h"
+
+#include "vtkObjectFactory.h"
+#include "vtkPVPluginLoader.h"
+
+#cmakedefine BUILD_SHARED_LIBS
+#cmakedefine01 _paraview_add_plugin_EULA
+#cmakedefine01 _paraview_add_plugin_SERVER_MANAGER_XML
+#cmakedefine01 _paraview_add_plugin_MODULES
+#cmakedefine01 _paraview_add_plugin_UI_INTERFACES
+
+#if _paraview_add_plugin_EULA
+#include "@_paraview_add_plugin_eula_header@"
+#endif
+
+@_paraview_add_plugin_includes@
+namespace
+{
+  // This ensures that when the shared library for this plugin is
+  // unloaded during finalization sequence, it notifies the vtkPVPluginLoader
+  // so it does not double-dlclose() an already unloaded plugin.
+  // This does not affect static builds and hence we don't need to worry about
+  // making sure this instance gets created in static builds.
+  static class @_paraview_build_plugin@PluginCleaner
+  {
+  public:
+    @_paraview_build_plugin@PluginCleaner()
+    {
+    }
+    ~@_paraview_build_plugin@PluginCleaner()
+    {
+      // The plugin library is being unloaded.
+      // Let the plugin loader know so it doesn't try to unload it again.
+      vtkPVPluginLoader::PluginLibraryUnloaded("@_paraview_build_plugin@");
+    }
+  } @_paraview_build_plugin@PluginCleaner_Instance;
+}
+
+//-----------------------------------------------------------------------------
+#if _paraview_add_plugin_SERVER_MANAGER_XML
+#include "@_paraview_build_plugin@_server_manager.h"
+#endif
+
+#if _paraview_add_plugin_MODULES
+#include "@_paraview_build_plugin@_server_manager_modules.h"
+#include "@_paraview_build_plugin@_client_server.h"
+#endif
+
+//-----------------------------------------------------------------------------
+void @_paraview_build_plugin@Plugin::GetBinaryResources(
+  std::vector<std::string>& resources)
+{
+@_paraview_add_plugin_binary_resources@
+  (void)resources;
+}
+
+//-----------------------------------------------------------------------------
+#if _paraview_add_plugin_with_ui
+@_paraview_add_plugin_include_interfaces@
+@_paraview_add_plugin_push_back_interfaces@
+#endif
+
+//-----------------------------------------------------------------------------
+#if _paraview_add_plugin_with_xml
+vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
+@_paraview_build_plugin@Plugin::GetInitializeInterpreterCallback()
+{
+#if _paraview_add_plugin_MODULES
+  return @_paraview_build_plugin@_client_server_initialize;
+#else
+  return nullptr;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void @_paraview_build_plugin@Plugin::GetXMLs(std::vector<std::string> &xmls)
+{
+  (void)xmls;
+#if _paraview_add_plugin_SERVER_MANAGER_XML
+  @_paraview_build_plugin@_server_manager_initialize(xmls);
+#endif
+#if _paraview_add_plugin_MODULES
+  @_paraview_build_plugin@_server_manager_modules_initialize(xmls);
+#endif
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if _paraview_add_plugin_with_ui
+QObjectList @_paraview_build_plugin@Plugin::interfaces()
+{
+  QObjectList ifaces;
+#if _paraview_add_plugin_UI_INTERFACES
+  PARAVIEW_ADD_INTERFACES(ifaces);
+#endif
+  return ifaces;
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#if _paraview_add_plugin_with_python
+@_paraview_add_plugin_python_includes@
+void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string>& modules,
+  std::vector<std::string>& sources,
+  std::vector<int> &package_flags)
+{
+  const char *moduleNames[] = {
+@_paraview_add_plugin_python_modules@
+  };
+  char *moduleSources[] = {
+@_paraview_add_plugin_python_module_sources@
+  };
+  const int packageFlags[] = {
+@_paraview_add_plugin_python_package_flags@
+  };
+
+  for (int cc=0; moduleNames[cc]; cc++)
+  {
+    modules.push_back(moduleNames[cc]);
+    sources.push_back(moduleSources[cc]);
+    package_flags.push_back(packageFlags[cc]);
+
+    // free allocated memory.
+    delete moduleSources[cc];
+    moduleSources[cc] = nullptr;
+  }
+}
+#endif
+
+//-----------------------------------------------------------------------------
+@_paraview_build_plugin@Plugin::@_paraview_build_plugin@Plugin()
+{
+#if !defined(BUILD_SHARED_LIBS) && _paraview_add_plugin_with_ui
+  // For static builds, initialize the Qt resources as well as the Qt plugin.
+@_paraview_add_plugin_resources_init@
+  // Qt 5
+  Q_IMPORT_PLUGIN(@_paraview_build_plugin@Plugin)
+#endif
+}
+
+//-----------------------------------------------------------------------------
+const char* @_paraview_build_plugin@Plugin::GetEULA()
+{
+#if _paraview_add_plugin_EULA
+  return @_paraview_build_plugin@_EULA;
+#else
+  return nullptr;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// Mark this as a ParaView-ServerManager plugin.
+PV_PLUGIN_EXPORT(@_paraview_build_plugin@, @_paraview_build_plugin@Plugin)

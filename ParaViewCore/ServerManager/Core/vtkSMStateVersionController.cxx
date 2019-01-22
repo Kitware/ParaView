@@ -413,15 +413,14 @@ struct Process_5_4_to_5_5
         continue;
       }
       // If the property LightSwitch is on, we add a light
-      auto switchNode = proxyNode.select_single_node("//Property[@name='LightSwitch']");
+      auto switchNode = proxyNode.select_node("//Property[@name='LightSwitch']");
       if (switchNode.node().child("Element").attribute("value").as_int() == 1)
       {
         // add a proxy group to the SM, with one headlight, with intensity and color set
         // get the old color and intensity. Diffuse color was set by the UI.
         double diffuseR = 1, diffuseG = 1, diffuseB = 1;
         double intensity = 1;
-        auto colorNode =
-          proxyNode.select_single_node("//Property[@name='LightDiffuseColor']").node();
+        auto colorNode = proxyNode.select_node("//Property[@name='LightDiffuseColor']").node();
         if (colorNode)
         {
           auto colorElt = colorNode.child("Element");
@@ -431,8 +430,7 @@ struct Process_5_4_to_5_5
           colorElt = colorElt.next_sibling("Element");
           diffuseB = colorElt.attribute("value").as_double();
         }
-        auto intensityNode =
-          proxyNode.select_single_node("//Property[@name='LightIntensity']").node();
+        auto intensityNode = proxyNode.select_node("//Property[@name='LightIntensity']").node();
         if (intensityNode)
         {
           auto intensityElt = intensityNode.child("Element");
@@ -503,7 +501,7 @@ struct Process_5_4_to_5_5
         //   <Proxy value="8232"/>
         // </Property>
         auto additionalLightsNode =
-          proxyNode.select_single_node("//Property[@name='AdditionalLights']").node();
+          proxyNode.select_node("//Property[@name='AdditionalLights']").node();
         if (!additionalLightsNode)
         {
           additionalLightsNode = proxyNode.append_child("Property");
@@ -543,8 +541,7 @@ struct Process_5_4_to_5_5
         continue;
       }
 
-      auto prop =
-        proxyNode.select_single_node("//Property[@name='DataBoundsInflateFactor']").node();
+      auto prop = proxyNode.select_node("//Property[@name='DataBoundsInflateFactor']").node();
       auto valueElt = prop.child("Element");
       double inflateFactor = valueElt.attribute("value").as_double();
 
@@ -569,7 +566,7 @@ struct Process_5_4_to_5_5
         continue;
       }
 
-      auto prop = proxyNode.select_single_node("//Property[@name='InsideOut']").node();
+      auto prop = proxyNode.select_node("//Property[@name='InsideOut']").node();
       auto valueElt = prop.child("Element");
       int invert = valueElt.attribute("value").as_int();
 
@@ -707,7 +704,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent, vtkSMSession*
   // parse using pugi.
   pugi::xml_document document;
 
-  if (!document.load(stream.str().c_str()))
+  if (!document.load_string(stream.str().c_str()))
   {
     vtkErrorMacro("Failed to convert from vtkPVXMLElement to pugi::xml_document");
     return false;

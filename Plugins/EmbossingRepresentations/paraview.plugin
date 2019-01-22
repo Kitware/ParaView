@@ -1,0 +1,13 @@
+NAME
+  EmbossingRepresentations
+DESCRIPTION
+  Embossing representations
+REQUIRES_MODULES
+  ParaView::ClientServerCoreRendering
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::ParallelCore
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::glew

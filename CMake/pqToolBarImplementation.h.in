@@ -3,7 +3,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqToolBarImplementation.h.
+   Module:  @_paraview_toolbar_CLASS_NAME@Implementation.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,24 +31,25 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _@ARG_CLASS_NAME@Implementation_h
-#define _@ARG_CLASS_NAME@Implementation_h
+
+#ifndef @_paraview_toolbar_CLASS_NAME@Implementation_h
+#define @_paraview_toolbar_CLASS_NAME@Implementation_h
 
 #include "pqToolBarInterface.h"
 #include <QObject>
 
 /// interface class for plugins that create QActionGroups
 /// for adding actions to menus and toolbars
-class @ARG_CLASS_NAME@Implementation : public QObject, public pqToolBarInterface
+class @_paraview_toolbar_CLASS_NAME@Implementation : public QObject, public pqToolBarInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqToolBarInterface)
 public:
-  @ARG_CLASS_NAME@Implementation(QObject* p);
-  ~@ARG_CLASS_NAME@Implementation() override;
+  @_paraview_toolbar_CLASS_NAME@Implementation(QObject* p);
+  ~@_paraview_toolbar_CLASS_NAME@Implementation() override;
   QToolBar* toolBar(QWidget* parent) override;
 private:
-  Q_DISABLE_COPY(@ARG_CLASS_NAME@Implementation);
+  Q_DISABLE_COPY(@_paraview_toolbar_CLASS_NAME@Implementation);
 };
 
 #endif

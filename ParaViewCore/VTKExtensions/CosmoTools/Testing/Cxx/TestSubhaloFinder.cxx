@@ -40,7 +40,8 @@ namespace
 
 int runSubhaloFinderTest(int argc, char* argv[])
 {
-  char* fname = vtkTestUtilities::ExpandDataFileName(argc, argv, "genericio/m000.499.allparticles");
+  char* fname = vtkTestUtilities::ExpandDataFileName(
+    argc, argv, "Testing/Data/genericio/m000.499.allparticles");
 
   vtkNew<vtkPGenericIOReader> reader;
   reader->SetFileName(fname);

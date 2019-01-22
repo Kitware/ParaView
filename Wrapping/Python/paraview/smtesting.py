@@ -3,7 +3,7 @@
 import os
 import re
 import sys
-from vtk.vtkPVServerManagerDefault import *
+from paraview.modules.vtkPVServerManagerDefault import *
 
 # we get different behavior based on how we import servermanager
 # so we want to import servermanager the same way in this module

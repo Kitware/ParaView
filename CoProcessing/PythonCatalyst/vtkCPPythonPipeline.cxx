@@ -54,7 +54,7 @@ void CatalystInitializePython()
                     << "import paraview.servermanager\n"
                     << "paraview.print_error = f1\n"
                     << "paraview.print_debug_info = f2\n"
-                    << "from paraview.vtk import vtkPVCatalyst\n";
+                    << "from paraview.modules import vtkPVCatalyst\n";
   vtkPythonInterpreter::RunSimpleString(loadPythonModules.str().c_str());
 }
 }

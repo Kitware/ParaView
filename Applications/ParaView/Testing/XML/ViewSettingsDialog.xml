@@ -15,6 +15,6 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/BackgroundType" command="set_string" arguments="Image" />
   <!-- next command was written by by hand -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_3/Image" command="set_string" arguments="Load ..." />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_3/Image/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/NE2_ps_bath.png" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_3/Image/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/NE2_ps_bath.png" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/ViewFrame/ProxyPanel/BackgroundEditor/stackedWidget/page_3/Image" command="set_string" arguments="NE2_ps_bath.png" />
 </pqevents>

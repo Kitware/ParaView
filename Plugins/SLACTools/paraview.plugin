@@ -1,0 +1,15 @@
+NAME
+  SLACTools
+DESCRIPTION
+  SLAC Tools
+REQUIRES_MODULES
+  ParaView::ClientServerCoreCore
+  ParaView::ServerManagerCore
+  ParaView::ServerManagerRendering
+  ParaView::VTKExtensionsCore
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersCore
+  VTK::FiltersSources
+  VTK::ParallelCore

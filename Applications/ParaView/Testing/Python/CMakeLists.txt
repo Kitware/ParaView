@@ -1,23 +1,20 @@
-include(ParaViewTestingMacros)
-
 # Check that matplotlib is available
 include(FindPythonModules)
 find_python_module(matplotlib matplotlib_found)
 
 # Set variables to make the testing functions.
-set(vtk-module pvpython)
-set(${vtk-module}_TEST_LABELS PARAVIEW)
+set(_vtk_build_test "paraview")
+set(${_vtk_build_test}_TEST_LABELS PARAVIEW)
 
-paraview_test_load_data(""
-  can.ex2
-  multicomb_0.vts
-  )
+ExternalData_Expand_Arguments(ParaViewData _
+  "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
+  "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}")
 
 # only enable TestPythonAnnotationFilter test if numpy is available
 find_python_module(numpy numpy_found)
 if (numpy_found)
-  set(PARAVIEW_PYTHON_ARGS
-    --data=${PARAVIEW_TEST_OUTPUT_DATA_DIR}/can.ex2)
+  set(paraview_python_args
+    --data=${paraview_test_data_directory_output}/can.ex2)
   # Add pvpython tests
   paraview_add_test_python(
     NO_DATA NO_VALID NO_OUTPUT NO_RT
@@ -35,7 +32,7 @@ if (numpy_found)
     NO_VALID NO_RT
     FileSeriesWriterSubTimeSteps.py
     )
-  set(PARAVIEW_PYTHON_ARGS)
+  unset(paraview_python_args)
 
   if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
     # add Matplotlib tests only if matplotlib was found at configure time.
@@ -97,7 +94,7 @@ foreach (tfile IN LISTS PVBATCH_TESTS)
 endforeach ()
 if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
   # run the tests in parallel
-  set(${vtk-module}_NUMPROCS 3)
+  set(${}_NUMPROCS 3)
   paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS}
@@ -132,14 +129,13 @@ paraview_add_test_driven(
 # Python Multi-servers test
 # => Only for shared build as we dynamically load plugins
 if(BUILD_SHARED_LIBS)
-  set(vtk-module multi-servers)
   set(TestMultiServersConfig_ARGS
     --test-multi-servers 2
     )
   set(TestMultiServersRemoteProxy_ARGS
     --test-multi-servers 3
     )
-  set(${vtk-module}_TEST_LABELS PARAVIEW)
+  set(${_vtk_build_test}_TEST_LABELS PARAVIEW)
 
   paraview_add_test_driven(
     NO_DATA NO_VALID NO_OUTPUT NO_RT

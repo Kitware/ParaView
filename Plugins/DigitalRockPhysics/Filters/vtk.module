@@ -1,0 +1,10 @@
+NAME
+  DigitalRockPhysics::DigitalRocksFilters
+LIBRARY_NAME
+  vtkDigitalRocksFilters
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::ParallelCore

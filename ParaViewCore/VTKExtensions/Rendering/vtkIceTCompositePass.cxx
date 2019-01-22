@@ -40,7 +40,8 @@
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
 
-#include "vtk_icet.h"
+#include <IceT.h>
+#include <IceTGL.h>
 #include <assert.h>
 
 #include "vtkCompositeZPassFS.h"

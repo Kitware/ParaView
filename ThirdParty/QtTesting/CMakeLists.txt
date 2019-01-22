@@ -28,23 +28,27 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
+
+# FIXME: export symbols on non-Windows as well.
+set(CMAKE_CXX_VISIBILITY_PRESET "default")
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
+
 # ParaView can no longer support QT_TESTING_WITH_PYTHON due to Matplotlib
 # initializing Python.
-set (QT_TESTING_WITH_PYTHON FALSE)
-set (QtTesting_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
-set (QtTesting_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
-set (QtTesting_INSTALL_LIBRARY_DIR ${VTK_INSTALL_LIBRARY_DIR})
-set (QT_TESTING_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
-set (QtTesting_INSTALL_INCLUDE_DIR ${VTK_INSTALL_INCLUDE_DIR})
-set (QtTesting_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
-set (QtTesting_QT_VERSION ${PARAVIEW_QT_VERSION})
-set (QT_TESTING_CUSTOM_LIBRARY_SUFFIX ${VTK_CUSTOM_LIBRARY_SUFFIX})
-##########################################################################
-# import Qt build settings
-vtk_module_third_party(qttesting
-  INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/vtkqttesting
-    ${CMAKE_CURRENT_BINARY_DIR}/vtkqttesting
-  LIBRARIES QtTesting
-)
-vtk_target_export(QtTesting)
+set(QT_TESTING_WITH_PYTHON FALSE)
+
+set(QtTesting_QT_VERSION 5)
+set(QtTesting_INSTALL_BIN_DIR "${_vtk_build_RUNTIME_DESTINATION}")
+set(QtTesting_INSTALL_INCLUDE_DIR "${_vtk_build_HEADERS_DESTINATION}/vtkqttesting")
+set(QtTesting_INSTALL_LIB_DIR "${_vtk_build_LIBRARY_DESTINATION}")
+set(QtTesting_INSTALL_CMAKE_DIR "${_vtk_build_CMAKE_DESTINATION}")
+set(QtTesting_INSTALL_NO_DEVELOPMENT TRUE)
+set(QT_TESTING_EVENT_PLAYBACK_DELAY 100)
+set(QtTesting_ENABLE_EXAMPLES OFF)
+set(QtTesting_ENABLE_TESTING OFF)
+set(QT_TESTING_INSTALL_EXPORT_NAME "ParaView")
+set(BUILD_TESTING OFF)
+
+vtk_module_third_party_internal(
+  #LICENSE_FILES "vtkqttesting/License_v1.2.txt"
+  VERSION       "master")

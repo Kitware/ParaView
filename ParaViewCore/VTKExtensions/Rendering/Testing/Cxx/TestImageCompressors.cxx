@@ -106,7 +106,7 @@ int TestImageCompressors(int argc, char* argv[])
     vtkNew<vtkTesting> testing;
     testing->AddArguments(argc, (const char**)(argv));
     imageFile = testing->GetDataRoot();
-    imageFile += "/NE2_ps_bath.png";
+    imageFile += "/Testing/Data/NE2_ps_bath.png";
     max_count = 1;
     test_lossy = false;
   }

@@ -1,0 +1,9 @@
+NAME
+  VDFReaderPlugin
+DESCRIPTION
+  Plugin to read NCAR VDR files
+REQUIRES_MODULES
+  ParaView::VTKExtensionsCore
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel

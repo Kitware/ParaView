@@ -1,0 +1,14 @@
+NAME
+  NonOrthogonalSource::vtkNonOrthogonalSources
+LIBRARY_NAME
+  vtkNonOrthogonalSources
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsCore
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonMath
+  VTK::CommonTransforms
+  VTK::FiltersGeneral
+  VTK::ImagingCore

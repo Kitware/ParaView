@@ -48,6 +48,7 @@ endif()
 
 execute_process_with_echo(COMMAND
     ${PARAVIEW_EXECUTABLE} -dr
+    --data-directory=${COPROCESSING_DATA_DIR}
     --test-directory=${COPROCESSING_TEST_DIR}
     --test-script=${PARAVIEW_TEST_XML}
     --exit

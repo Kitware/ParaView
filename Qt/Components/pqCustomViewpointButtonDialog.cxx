@@ -448,7 +448,7 @@ void pqCustomViewpointButtonDialog::exportConfigurations()
       if (!this->Configurations[i].isEmpty())
       {
         pugi::xml_document camConfigDoc;
-        camConfigDoc.load(this->Configurations[i].toStdString().c_str());
+        camConfigDoc.load_string(this->Configurations[i].toStdString().c_str());
         config.append_copy(camConfigDoc.first_child());
       }
     }

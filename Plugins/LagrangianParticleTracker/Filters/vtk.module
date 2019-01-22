@@ -1,0 +1,11 @@
+NAME
+  LagrangianParticleTracker::vtkLagrangianParticleTracker
+LIBRARY_NAME
+  vtkLagrangianParticleTracker
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersFlowPaths

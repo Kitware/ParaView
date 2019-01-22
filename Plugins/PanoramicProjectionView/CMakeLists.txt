@@ -1,32 +1,34 @@
-project(PanoramicProjection)
-cmake_minimum_required(VERSION 3.3)
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Views/vtk.module"
+  REQUEST_MODULES   PanoramicProjectionView::vtkPanoramicProjectionViews
+  PROVIDES_MODULES  views_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-if(NOT ParaView_SOURCE_DIR)
-  find_package(ParaView)
-  include("${PARAVIEW_USE_FILE}")
-  include (ParaViewPlugins)
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-  # Load information about VTK/ParaView modules loaded/available.
-  pv_setup_module_environment("PanoramicProjection")
-endif()
+vtk_module_build(
+  MODULES             ${views_modules}
+  PACKAGE             PanoramicProjectionView
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-include_directories(
-  ${VTK_INCLUDE_DIRS}
-  ${PARAVIEW_INCLUDE_DIRS}
-  ${PARAVIEW_GUI_INCLUDE_DIRS}
-  )
-
-add_paraview_plugin(
-  PanoramicProjectionView "1.0"
-  DESCRIPTION "Add a panoramic projection 3D view"
-  REQUIRED_ON_SERVER
+paraview_add_plugin(PanoramicProjectionView
   REQUIRED_ON_CLIENT
-  SERVER_MANAGER_SOURCES
-    vtkPVPanoramicProjectionView.cxx
-  SERVER_MANAGER_XML
-    PanoramicProjectionView.xml
-)
+  REQUIRED_ON_SERVER
+  VERSION "1.0"
+  MODULES PanoramicProjectionView::vtkPanoramicProjectionViews
+  XML_DOCUMENTATION OFF)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
-endif()
+endif ()

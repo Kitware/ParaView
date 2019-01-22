@@ -28,22 +28,25 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set(Module_SRCS
-  vtkClientServerInterpreterInitializer.cxx
-  vtkCommandOptions.cxx
-  vtkCommandOptions.h
-  vtkCommandOptionsXMLParser.cxx
-  vtkCommandOptionsXMLParser.h
-  vtkPVTestUtilities.cxx
-  vtkPVTestUtilities.h
-  vtkPVXMLElement.cxx
-  vtkPVXMLElement.h
-  vtkPVXMLParser.cxx
-  vtkPVXMLParser.h
-  vtkStringList.cxx
-  vtkStringList.h
-  vtkPVInstantiator.cxx
-  vtkPVInstantiator.h
-)
+set(classes
+  vtkClientServerInterpreterInitializer
+  vtkCommandOptions
+  vtkCommandOptionsXMLParser
+  vtkPVInstantiator
+  vtkPVTestUtilities
+  vtkPVXMLElement
+  vtkPVXMLParser
+  vtkStringList)
 
-vtk_module_library(vtkPVCommon ${Module_SRCS})
+# Based on state of VTK modules, set up some variables that paraview needs to
+# compile optional code.
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVConfig.h"
+  @ONLY)
+set(headers
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkPVConfig.h")
+
+vtk_module_add_module(ParaView::Common
+  CLASSES ${classes}
+  HEADERS ${headers})

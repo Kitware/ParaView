@@ -60,7 +60,7 @@
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/CustomFilterList" command="mouseRelease" arguments="1,0,0,86,6,/0:0" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/RemoveButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/ImportButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/filters.xml" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/filters.xml" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow" command="pause" arguments="100"/>
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyElevation" />

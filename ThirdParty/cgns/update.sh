@@ -8,13 +8,14 @@ readonly name="cgns"
 readonly ownership="cgns Upstream <kwrobot@kitware.com>"
 readonly subtree="ThirdParty/$name/vtk$name"
 readonly repo="https://gitlab.kitware.com/third-party/cgns.git"
-readonly tag="for/paraview"
+readonly tag="for/paraview-20181231-3.3.1"
 
 readonly paths="
 .gitattributes
 CMakeLists.txt
 README.md
 README.kitware.md
+license.txt
 
 src/CMakeLists.txt
 src/cgns_error.c
@@ -22,7 +23,7 @@ src/cgns_header.h
 src/cgns_internals.c
 src/cgns_io.c
 src/cgns_io.h
-src/cgns_mangle.h
+src/vtk_cgns_mangle.h
 src/cgnsconfig.h.in
 src/cgnslib.c
 src/cgnslib.h

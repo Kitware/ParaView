@@ -1,0 +1,120 @@
+#cmakedefine01 _paraview_add_plugin_with_python
+#cmakedefine01 _paraview_add_plugin_with_ui
+#cmakedefine01 _paraview_add_plugin_with_xml
+
+#include "vtkPVPlugin.h"
+
+#if _paraview_add_plugin_with_ui
+#include "vtkPVGUIPluginInterface.h"
+#include <QObject>
+#include <QtPlugin>
+#endif
+
+#if _paraview_add_plugin_with_xml
+#include "vtkPVServerManagerPluginInterface.h"
+#endif
+
+#if _paraview_add_plugin_with_python
+#include "vtkPVPythonPluginInterface.h"
+#endif
+
+class @_paraview_build_plugin@Plugin :
+#if _paraview_add_plugin_with_ui
+  public QObject,
+  public vtkPVGUIPluginInterface,
+#endif
+
+  public vtkPVPlugin
+
+#if _paraview_add_plugin_with_xml
+  , public vtkPVServerManagerPluginInterface
+#endif
+#if _paraview_add_plugin_with_python
+  , public vtkPVPythonPluginInterface
+#endif
+
+{
+#if _paraview_add_plugin_with_ui
+  Q_OBJECT
+  Q_INTERFACES(vtkPVGUIPluginInterface)
+  Q_PLUGIN_METADATA(IID "com.kitware/paraview/@_paraview_build_plugin@Plugin")
+#endif
+public:
+  @_paraview_build_plugin@Plugin();
+
+  /**
+   * Returns the name for this plugin.
+   */
+  const char* GetPluginName() override
+    {return "@_paraview_build_plugin@"; }
+
+  /**
+   * Returns the version for this plugin.
+   */
+  const char* GetPluginVersionString() override
+    { return "@_paraview_add_plugin_VERSION@"; }
+
+  /**
+   * Returns true if this plugin is required on the server.
+   */
+  bool GetRequiredOnServer() override
+    { return @_paraview_add_plugin_required_on_server@; }
+
+  /**
+   * Returns true if this plugin is required on the client.
+   */
+  bool GetRequiredOnClient() override
+    { return @_paraview_add_plugin_required_on_client@; }
+
+  /**
+   * Returns a ';' separated list of plugin names required by this plugin.
+   */
+  const char* GetRequiredPlugins() override
+    { return "@_paraview_add_plugin_REQUIRED_PLUGINS@"; }
+
+  /**
+   * Returns a description of this plugin.
+   */
+  const char* GetDescription() override
+    { return "@_paraview_add_plugin_DESCRIPTION@"; }
+
+  /**
+   * Returns EULA for the plugin, if any. If none, this will return nullptr.
+   */
+  const char* GetEULA() override;
+
+  /**
+   * Provides access to binary resources compiled into the plugin. This is
+   * primarily used to compile in icons and compressed help project (qch) files
+   * into plugins.
+   */
+  void GetBinaryResources(std::vector<std::string>& resources) override;
+
+#if _paraview_add_plugin_with_xml
+  /**
+   * Obtain the server-manager configuration xmls, if any.
+   */
+  void GetXMLs(std::vector<std::string> &xmls) override;
+
+  /**
+   * Returns the callback function to call to initialize the interpretor for
+   * the new vtk/server-manager classes added by this plugin. Returning NULL is
+   * perfectly valid.
+   */
+  vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
+    GetInitializeInterpreterCallback() override;
+#endif
+
+#if _paraview_add_plugin_with_ui
+  /**
+   * Returns the list of ParaView-Interfaces provided by this plugin.
+   */
+  QObjectList interfaces() override;
+#endif
+
+#if _paraview_add_plugin_with_python
+  void GetPythonSourceList(std::vector<std::string>& modules,
+    std::vector<std::string>& sources,
+    std::vector<int>& package_flags) override;
+#endif
+};

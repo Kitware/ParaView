@@ -29,34 +29,36 @@
 #
 #==========================================================================
 
-# Configure protobuf
-set (PROTOBUF_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
-set (PROTOBUF_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
-set (PROTOBUF_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
+# FIXME: export symbols on non-Windows as well.
+set(CMAKE_CXX_VISIBILITY_PRESET "default")
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
 
-# we don't use zlib compression
-set (PROTOBUF_ENABLE_ZLIB 0)
+vtk_module_third_party(
+  INTERNAL
+    LICENSE_FILES "vtkprotobuf/LICENSE"
+    VERSION       "3.6.1.2"
+    STANDARD_INCLUDE_DIRS
+  EXTERNAL
+    PACKAGE Protobuf
+    TARGETS protobuf::libprotobuf
+    STANDARD_INCLUDE_DIRS)
 
-vtk_module_third_party(Protobuf
-  INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/vtkprotobuf/src
-  LIBRARIES protobuf
-)
+if (VTK_MODULE_USE_EXTERNAL_ParaView::protobuf)
+  set(protobuf_function_file "${CMAKE_CURRENT_SOURCE_DIR}/protobuf-function.cmake")
+else ()
+  set(protobuf_function_file "${CMAKE_CURRENT_SOURCE_DIR}/vtkprotobuf/cmake/protobuf-function.cmake")
+endif ()
+set(protobuf_function_file_output
+  "${CMAKE_CURRENT_BINARY_DIR}/${_vtk_build_CMAKE_DESTINATION}/protobuf-function.cmake")
+configure_file(
+  "${protobuf_function_file}"
+  "${protobuf_function_file_output}"
+  COPYONLY)
+include("${protobuf_function_file_output}")
 
-# protobuf exports it's build-dir targets to a custom file
-# (PROTOBUF_EXPORTS.cmake). We don't care much about that. We export
-# build-dir targets ourselves.
-if(NOT VTK_USE_SYSTEM_PROTOBUF)
-  vtk_target_export(protobuf)
-  vtk_target_export(protobuf-lite)
-  if (NOT CMAKE_CROSSCOMPILING)
-    vtk_compile_tools_target_export(protoc_compiler)
-  endif()
-else()
-  add_executable(protoc_compiler IMPORTED GLOBAL)
-  set_target_properties(protoc_compiler PROPERTIES
-    IMPORTED_LOCATION "${PROTOBUF_PROTOC_EXECUTABLE}")
-endif()
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/vtk_protobuf.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/vtk_protobuf.h")
 
-# All these exports don't add any install rules. However we make protobuf itself
-# install components at the right location by setting PROTOBUF_INSTALL_*
-# variables.
+vtk_module_install_headers(
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/vtk_protobuf.h")

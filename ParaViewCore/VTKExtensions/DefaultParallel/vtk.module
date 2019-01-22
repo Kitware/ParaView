@@ -1,0 +1,10 @@
+NAME
+  ParaView::VTKExtensionsDefaultParallel
+LIBRARY_NAME
+  vtkPVVTKExtensionsDefaultParallel
+CONDITION
+  PARAVIEW_USE_MPI
+DEPENDS
+  VTK::FiltersParallelFlowPaths
+PRIVATE_DEPENDS
+  VTK::ParallelCore

@@ -28,41 +28,63 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkAnimationPlayer.cxx
-  vtkCompositeAnimationPlayer.cxx
-  vtkPVAnimationCue.cxx
-  vtkPVBooleanKeyFrame.cxx
-  vtkPVCameraAnimationCue.cxx
-  vtkPVCameraCueManipulator.cxx
-  vtkPVCameraKeyFrame.cxx
-  vtkPVCompositeKeyFrame.cxx
-  vtkPVCueManipulator.cxx
-  vtkPVExponentialKeyFrame.cxx
-  vtkPVKeyFrameAnimationCue.cxx
-  vtkPVKeyFrameAnimationCueForProxies.cxx
-  vtkPVKeyFrameCueManipulator.cxx
-  vtkPVKeyFrame.cxx
-  vtkPVRampKeyFrame.cxx
-  vtkPVRepresentationAnimationHelper.cxx
-  vtkPVSinusoidKeyFrame.cxx
-  vtkRealtimeAnimationPlayer.cxx
-  vtkSequenceAnimationPlayer.cxx
-  vtkSIXMLAnimationWriterRepresentationProperty.cxx
-  vtkSMAnimationFrameWindowDomain.cxx
-  vtkSMAnimationScene.cxx
-  vtkSMAnimationSceneGeometryWriter.cxx
-  vtkSMAnimationSceneProxy.cxx
-  vtkSMAnimationSceneWriter.cxx
-  vtkSMSaveAnimationProxy.cxx
-  vtkTimestepsAnimationPlayer.cxx
-  vtkXMLPVAnimationWriter.cxx
-)
+set(classes
+  vtkAnimationPlayer
+  vtkCompositeAnimationPlayer
+  vtkPVAnimationCue
+  vtkPVBooleanKeyFrame
+  vtkPVCameraAnimationCue
+  vtkPVCameraCueManipulator
+  vtkPVCameraKeyFrame
+  vtkPVCompositeKeyFrame
+  vtkPVCueManipulator
+  vtkPVExponentialKeyFrame
+  vtkPVKeyFrame
+  vtkPVKeyFrameAnimationCue
+  vtkPVKeyFrameAnimationCueForProxies
+  vtkPVKeyFrameCueManipulator
+  vtkPVRampKeyFrame
+  vtkPVRepresentationAnimationHelper
+  vtkPVSinusoidKeyFrame
+  vtkRealtimeAnimationPlayer
+  vtkSIXMLAnimationWriterRepresentationProperty
+  vtkSMAnimationFrameWindowDomain
+  vtkSMAnimationScene
+  vtkSMAnimationSceneGeometryWriter
+  vtkSMAnimationSceneProxy
+  vtkSMAnimationSceneWriter
+  vtkSMSaveAnimationProxy
+  vtkSequenceAnimationPlayer
+  vtkTimestepsAnimationPlayer
+  vtkXMLPVAnimationWriter)
 
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND Module_SRCS
-    vtkPythonAnimationCue.cxx
-    )
-endif()
+if (TARGET VTK::PythonInterpreter)
+  # TODO: Split these into a separate module so that there isn't a public
+  # optional dependency.
+  list(APPEND classes
+    vtkPythonAnimationCue)
+endif ()
 
-vtk_module_library(${vtk-module} ${Module_SRCS})
+vtk_module_add_module(ParaView::Animation
+  CLASSES ${classes})
+
+set(xml_files
+  animation.xml)
+
+if (WIN32)
+  list(APPEND xml_files
+    animation_win.xml)
+endif ()
+
+if (TARGET VTK::IOFFMPEG)
+  list(APPEND xml_files
+    animation_ffmpeg.xml)
+endif ()
+
+if (TARGET VTK::IOOggTheora)
+  list(APPEND xml_files
+    animation_oggtheora.xml)
+endif ()
+
+paraview_add_server_manager_xmls(
+  XMLS  ${xml_files})

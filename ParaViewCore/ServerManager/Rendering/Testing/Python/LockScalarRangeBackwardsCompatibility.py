@@ -21,7 +21,7 @@ assert (type(lsr) == int), "'LockScalarRange' must return an int"
 
 # Locking the scalar range corresponds to never automatically updating it
 lut.LockScalarRange = 1
-from paraview.vtk.vtkPVServerManagerDefault import vtkPVGeneralSettings
+from paraview.modules.vtkPVServerManagerDefault import vtkPVGeneralSettings
 assert (lut.AutomaticRescaleRangeMode == 'Never')
 
 # Unlocking the scalar range corresponds to setting the reset mode to the global

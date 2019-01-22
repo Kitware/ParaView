@@ -1,0 +1,10 @@
+NAME
+  EULATestPlugin
+DESCRIPTION
+  Plugin to test EULAs
+CONDITION
+  BUILD_TESTING
+REQUIRES_MODULES
+  # Not actually required, but avoids a warning about not requiring any
+  # modules.
+  VTK::CommonCore

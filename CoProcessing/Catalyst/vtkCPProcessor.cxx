@@ -23,7 +23,7 @@
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFieldData.h"
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #include "vtkMPI.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
@@ -171,7 +171,7 @@ int vtkCPProcessor::Initialize(const char* workingDirectory)
 //----------------------------------------------------------------------------
 int vtkCPProcessor::Initialize(vtkMPICommunicatorOpaqueComm& comm, const char* workingDirectory)
 {
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   if (vtkCPProcessor::Controller)
   {
     vtkErrorMacro("Can only initialize with a communicator once per process.");

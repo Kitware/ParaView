@@ -1,0 +1,22 @@
+NAME
+  ParaView::Animation
+LIBRARY_NAME
+  vtkPVAnimation
+DEPENDS
+  ParaView::ServerManagerCore
+  ParaView::ServerManagerRendering
+  ParaView::VTKExtensionsDefault
+  VTK::IOMovie
+PRIVATE_DEPENDS
+  ParaView::ServerManagerDefault
+  VTK::vtksys
+OPTIONAL_DEPENDS
+  VTK::IOFFMPEG
+  VTK::IOOggTheora
+
+  # These affect the public API.
+  VTK::PythonInterpreter
+TEST_DEPENDS
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

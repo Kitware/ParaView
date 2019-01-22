@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMTransferFunctionProxy.h"
 
+// This is required to get the mangled name for `Json::Value` used below.
+#include "vtk_jsoncpp_fwd.h"
+
 QPointer<pqPresetDialog> pqChooseColorPresetReaction::PresetDialog;
 
 namespace pvInternals
@@ -150,7 +153,15 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
   PresetDialog->setCustomizableLoadOpacities(!indexedLookup);
   PresetDialog->setCustomizableUsePresetRange(!indexedLookup);
   PresetDialog->setCustomizableLoadAnnotations(indexedLookup);
+// XXX(Qt): For some reason, on Windows, this signal is not hooked up
+// properly because the name is never mangled. Instead, just handle the
+// mangling here manually.
+#if VTK_MODULE_USE_EXTERNAL_vtkjsoncpp
   this->connect(PresetDialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
+#else
+  this->connect(
+    PresetDialog, SIGNAL(applyPreset(const vtkJson::Value&)), SLOT(applyCurrentPreset()));
+#endif
   PresetDialog->show();
   return true;
 }

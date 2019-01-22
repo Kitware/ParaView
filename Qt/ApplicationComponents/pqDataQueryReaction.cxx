@@ -33,10 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreUtilities.h"
 #include "pqFindDataDialog.h"
-#ifdef PARAVIEW_USE_QTHELP
-#include "pqHelpReaction.h"
-#endif
-#include "vtkPVConfig.h"
 
 #include <QMessageBox>
 
@@ -56,7 +52,7 @@ pqDataQueryReaction::~pqDataQueryReaction()
 //-----------------------------------------------------------------------------
 void pqDataQueryReaction::showQueryDialog()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   if (pqFindDataSingleton.isNull())
   {
     pqFindDataDialog* dialog = new pqFindDataDialog(pqCoreUtilities::mainWidget());
@@ -70,5 +66,5 @@ void pqDataQueryReaction::showQueryDialog()
     "Error: Find Data requires that ParaView be built with "
     "Python enabled. To enable Python set the CMake flag '"
     "PARAVIEW_ENABLE_PYTHON' to True.");
-#endif // PARAVIEW_ENABLE_PYTHON
+#endif
 }

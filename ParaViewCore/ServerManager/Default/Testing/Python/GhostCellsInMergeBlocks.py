@@ -7,7 +7,7 @@ import os.path
 
 smtesting.ProcessCommandLineArguments()
 
-xmf_file = os.path.join(smtesting.DataDir, "poisson_3dall_2.xmf")
+xmf_file = os.path.join(smtesting.DataDir, "Testing/Data/poisson_3dall_2.xmf")
 XDMFReader(FileNames=xmf_file)
 MergeBlocks()
 Show()

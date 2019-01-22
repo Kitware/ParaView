@@ -5,7 +5,7 @@ import os
 import shutil
 
 smtesting.ProcessCommandLineArguments()
-canex2 = ExodusIIReader(FileName=smtesting.DataDir+'/can.ex2')
+canex2 = ExodusIIReader(FileName=smtesting.DataDir+'/Testing/Data/can.ex2')
 canex2.NodeSetArrayStatus = []
 canex2.SideSetArrayStatus = []
 

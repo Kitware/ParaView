@@ -28,9 +28,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkPVWebApplication.cxx
-)
+set(classes
+  vtkPVWebApplication)
 
-vtk_module_library(${vtk-module}
-  ${Module_SRCS})
+vtk_module_add_module(ParaView::PVWebCore
+  CLASSES ${classes})

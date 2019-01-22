@@ -29,44 +29,34 @@
 #
 #==========================================================================
 
-if (APPLE)
-  set (Mac_SRCS
-    vtkPVMacFileInformationHelper.mm
-  )
-endif()
+set(classes
+  vtkNetworkImageSource
+  vtkPVCatalystChannelInformation
+  vtkPVEnsembleDataReaderInformation
+  vtkPVEnvironmentInformation
+  vtkPVEnvironmentInformationHelper
+  vtkPVFileInformation
+  vtkPVSingleOutputExtractSelection
+  vtkSliceAlongPolyPlane)
 
-set (Module_SRCS
-  vtkNetworkImageSource.cxx
-  vtkPVCatalystChannelInformation.cxx
-  vtkPVEnsembleDataReaderInformation.cxx
-  vtkPVEnvironmentInformation.cxx
-  vtkPVEnvironmentInformationHelper.cxx
-  vtkPVFileInformation.cxx
-  vtkPVSingleOutputExtractSelection.cxx
-  vtkSliceAlongPolyPlane.cxx
-  ${Mac_SRCS}
-)
+set(sources)
+set(private_headers)
 
 if (APPLE)
-  set_source_files_properties(
-    vtkPVMacFileInformationHelper
-    PROPERTIES
-      SKIP_HEADER_INSTALL 1
-  )
-endif()
+  list(APPEND sources
+    vtkPVMacFileInformationHelper.mm)
+  list(APPEND private_headers
+    vtkPVMacFileInformationHelper.h)
+endif ()
 
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND Module_SRCS
-    vtkAnnotateGlobalDataFilter.cxx
-    vtkPythonCalculator.cxx
-    vtkAnnotateAttributeDataFilter.cxx
-    )
-endif()
-
-vtk_module_library(vtkPVClientServerCoreDefault ${Module_SRCS})
+vtk_module_add_module(ParaView::ClientServerCoreDefault
+  CLASSES ${classes}
+  SOURCES ${sources}
+  PRIVATE_HEADERS ${private_headers})
 
 # for vtkPVFileInformation
 if (WIN32)
-  vtk_module_link_libraries(vtkPVClientServerCoreDefault
-    LINK_PRIVATE mpr)
-endif()
+  vtk_module_link(ParaView::ClientServerCoreDefault
+    PRIVATE
+      mpr)
+endif ()

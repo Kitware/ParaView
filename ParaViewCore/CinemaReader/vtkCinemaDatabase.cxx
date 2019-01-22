@@ -12,7 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVConfig.h" // needed for PARAVIEW_ENABLE_PYTHON
 #include "vtkPython.h"
 
 #include "vtkCamera.h"

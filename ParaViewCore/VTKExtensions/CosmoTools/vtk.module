@@ -1,0 +1,22 @@
+NAME
+  ParaView::VTKExtensionsCosmoTools
+LIBRARY_NAME
+  vtkPVVTKExtensionsCosmoTools
+KIT
+  ParaView::Extensions
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelCore
+PRIVATE_DEPENDS
+  ParaView::VTKExtensionsDefault
+  ParaView::cosmohalofinder
+  VTK::ParallelMPI
+  VTK::jsoncpp
+TEST_DEPENDS
+  VTK::TestingCore
+  VTK::TestingRendering
+  VTK::ParallelMPI
+TEST_LABELS
+  ParaView

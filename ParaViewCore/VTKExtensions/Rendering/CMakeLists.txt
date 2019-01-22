@@ -28,100 +28,102 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set(Module_SRCS
-  vtkAttributeDataToTableFilter.cxx
-  vtkBlockDeliveryPreprocessor.cxx
-  vtkCameraInterpolator2.cxx
-  vtkCameraManipulator.cxx
-  vtkCameraManipulatorGUIHelper.cxx
-  vtkCleanArrays.cxx
-  vtkCompositeDataToUnstructuredGridFilter.cxx
-  vtkContext2DScalarBarActor.cxx
-  vtkCSVExporter.cxx
-  vtkImageCompressor.cxx
-  vtkImageTransparencyFilter.cxx
-  vtkKdTreeGenerator.cxx
-  vtkKdTreeManager.cxx
-  vtkLZ4Compressor.cxx
-  vtkMarkSelectedRows.cxx
-  vtkMultiSliceContextItem.cxx
-  vtkOrderedCompositeDistributor.cxx
-  vtkPartitionOrdering.cxx
-  vtkPartitionOrderingInterface.cxx
-  vtkPVAxesActor.cxx
-  vtkPVAxesWidget.cxx
-  vtkPVCameraCollection.cxx
-  vtkPVCenterAxesActor.cxx
-  vtkBoundingRectContextDevice2D.cxx
-  vtkPVDefaultPass.cxx
-  vtkPVDiscretizableColorTransferFunction.cxx
-  vtkPVGeometryFilter.cxx
-  vtkPVGL2PSExporter.cxx
-  vtkPVInteractiveViewLinkRepresentation.cxx
-  vtkPVInteractorStyle.cxx
-  vtkPVJoystickFly.cxx
-  vtkPVJoystickFlyIn.cxx
-  vtkPVJoystickFlyOut.cxx
-  vtkPVLODActor.cxx
-  vtkPVLODVolume.cxx
-  vtkPVMergeTables.cxx
-  vtkPVMergeTablesMultiBlock.cxx
-  vtkPVPlotTime.cxx
-  vtkPVRecoverGeometryWireframe.cxx
-  vtkPVScalarBarActor.cxx
-  vtkPVScalarBarRepresentation.cxx
-  vtkPVTrackballMoveActor.cxx
-  vtkPVTrackballMultiRotate.cxx
-  vtkPVTrackballPan.cxx
-  vtkPVTrackballRoll.cxx
-  vtkPVTrackballRotate.cxx
-  vtkPVTrackballZoom.cxx
-  vtkPVTrackballZoomToMouse.cxx
-  vtkPVUpdateSuppressor.cxx
-  vtkResampledAMRImageSource.cxx
-  vtkSelectionConverter.cxx
-  vtkSortedTableStreamer.cxx
-  vtkSquirtCompressor.cxx
-  vtkTileDisplayHelper.cxx
-  vtkTilesHelper.cxx
-  vtkTrackballPan.cxx
-  vtkUpdateSuppressorPipeline.cxx
-  vtkViewLayout.cxx
-  vtkVolumeRepresentationPreprocessor.cxx
-  vtkZlibImageCompressor.cxx
-)
+set(classes
+  vtkAttributeDataToTableFilter
+  vtkBlockDeliveryPreprocessor
+  vtkBoundingRectContextDevice2D
+  vtkCSVExporter
+  vtkCameraInterpolator2
+  vtkCameraManipulator
+  vtkCameraManipulatorGUIHelper
+  vtkCleanArrays
+  vtkCompositeDataToUnstructuredGridFilter
+  vtkContext2DScalarBarActor
+  vtkImageCompressor
+  vtkImageTransparencyFilter
+  vtkKdTreeGenerator
+  vtkKdTreeManager
+  vtkLZ4Compressor
+  vtkMarkSelectedRows
+  vtkMultiSliceContextItem
+  vtkOrderedCompositeDistributor
+  vtkPVAxesActor
+  vtkPVAxesWidget
+  vtkPVCameraCollection
+  vtkPVCenterAxesActor
+  vtkPVDefaultPass
+  vtkPVDiscretizableColorTransferFunction
+  vtkPVGL2PSExporter
+  vtkPVGeometryFilter
+  vtkPVInteractiveViewLinkRepresentation
+  vtkPVInteractorStyle
+  vtkPVJoystickFly
+  vtkPVJoystickFlyIn
+  vtkPVJoystickFlyOut
+  vtkPVLODActor
+  vtkPVLODVolume
+  vtkPVMergeTables
+  vtkPVMergeTablesMultiBlock
+  vtkPVPlotTime
+  vtkPVRecoverGeometryWireframe
+  vtkPVScalarBarActor
+  vtkPVScalarBarRepresentation
+  vtkPVTrackballMoveActor
+  vtkPVTrackballMultiRotate
+  vtkPVTrackballPan
+  vtkPVTrackballRoll
+  vtkPVTrackballRotate
+  vtkPVTrackballZoom
+  vtkPVTrackballZoomToMouse
+  vtkPVUpdateSuppressor
+  vtkPartitionOrdering
+  vtkPartitionOrderingInterface
+  vtkResampledAMRImageSource
+  vtkSelectionConverter
+  vtkSortedTableStreamer
+  vtkSquirtCompressor
+  vtkTileDisplayHelper
+  vtkTilesHelper
+  vtkTrackballPan
+  vtkUpdateSuppressorPipeline
+  vtkViewLayout
+  vtkVolumeRepresentationPreprocessor
+  vtkZlibImageCompressor)
 
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND Module_SRCS
-    vtkCinemaExporter.cxx
-    )
-endif()
+if (TARGET VTK::PythonInterpreter)
+  # TODO: Split these into a separate module so that there isn't a public
+  # optional dependency.
+  list(APPEND classes
+    vtkCinemaExporter)
+endif ()
 
-if (PARAVIEW_USE_MPI)
-  list(APPEND Module_SRCS
-    vtkAllToNRedistributeCompositePolyData.cxx
-    vtkAllToNRedistributePolyData.cxx
-    vtkBalancedRedistributePolyData.cxx
-    vtkRedistributePolyData.cxx
-    vtkWeightedRedistributePolyData.cxx
-    vtkMPICompositeManager.cxx # deprecate?
-    )
+if (TARGET VTK::ParallelMPI)
+  # TODO: Split these into a separate module so that there isn't a public
+  # optional dependency.
+  list(APPEND classes
+    vtkAllToNRedistributeCompositePolyData
+    vtkAllToNRedistributePolyData
+    vtkBalancedRedistributePolyData
+    vtkMPICompositeManager # deprecate?
+    vtkRedistributePolyData
+    vtkWeightedRedistributePolyData)
 
-  if (PARAVIEW_USE_ICE_T)
-    list(APPEND Module_SRCS
-      vtkIceTCompositePass.cxx
-      vtkIceTContext.cxx)
-  endif()
-endif()
+  if (TARGET ParaView::icet)
+    # TODO: Split these into a separate module so that there isn't a public
+    # optional dependency.
+    list(APPEND classes
+      vtkIceTCompositePass
+      vtkIceTContext)
+  endif ()
+endif ()
 
 if (PARAVIEW_ENABLE_NVPIPE)
-  find_package(nvpipe REQUIRED)
-  list(APPEND Module_SRCS
-    vtkNvPipeCompressor.cxx
-    )
-  include_directories(${NVPIPE_INCLUDE_DIRS})
-endif()
+  list(APPEND classes
+    vtkNvPipeCompressor)
+endif ()
 
+set(sources)
+set(private_headers)
 #---------------------------------------------------------
 # Encode glsl files.
 foreach (file vtkIceTCompositeZPassShader_fs.glsl)
@@ -133,21 +135,11 @@ foreach (file vtkIceTCompositeZPassShader_fs.glsl)
     EXPORT_HEADER "vtkPVVTKExtensionsRenderingModule.h"
     HEADER_OUTPUT header
     SOURCE_OUTPUT source)
-  list(APPEND Module_SRCS ${source})
-endforeach()
-#---------------------------------------------------------
+  list(APPEND sources ${source})
+  list(APPEND private_headers ${header})
+endforeach ()
 
-if(PARAVIEW_USE_MPI)
-  include(vtkMPI)
-endif()
-vtk_module_library(vtkPVVTKExtensionsRendering ${Module_SRCS})
-if(PARAVIEW_USE_MPI)
-  vtk_mpi_link(${vtk-module})
-endif()
-include(vtkOpenGL)
-vtk_opengl_link(vtkPVVTKExtensionsRendering)
-
-if(PARAVIEW_ENABLE_NVPIPE)
-  target_link_libraries(vtkPVVTKExtensionsRendering LINK_PRIVATE
-    ${NVPIPE_LIBRARIES})
-endif()
+vtk_module_add_module(ParaView::VTKExtensionsRendering
+  CLASSES ${classes}
+  SOURCES ${sources}
+  PRIVATE_HEADERS ${private_headers})

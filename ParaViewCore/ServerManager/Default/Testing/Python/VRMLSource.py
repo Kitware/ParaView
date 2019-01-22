@@ -13,7 +13,7 @@ smtesting.ProcessCommandLineArguments()
 
 servermanager.Connect()
 
-file1 = os.path.join(smtesting.DataDir, "bot2.wrl")
+file1 = os.path.join(smtesting.DataDir, "Testing/Data/bot2.wrl")
 reader = servermanager.sources.vrmlreader(FileName = file1)
 readerOutput = servermanager.Fetch(reader)
 if readerOutput.GetClassName() != "vtkMultiBlockDataSet":

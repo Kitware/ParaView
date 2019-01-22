@@ -97,11 +97,11 @@
 #include "vtkLightingMapPass.h"
 #include "vtkValuePass.h"
 
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
 #include "vtkIceTSynchronizedRenderers.h"
 #endif
 
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
 #include "vtkOSPRayLightNode.h"
 #include "vtkOSPRayMaterialLibrary.h"
 #include "vtkOSPRayPass.h"
@@ -121,7 +121,7 @@ class vtkPVRenderView::vtkInternals
 public:
   vtkNew<vtkValuePass> ValuePasses;
   vtkNew<vtkLightingMapPass> LightingMapPass;
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkNew<vtkOSPRayPass> OSPRayPass;
 #endif
   vtkSmartPointer<vtkRenderPass> SavedRenderPass;
@@ -261,7 +261,7 @@ private:
 };
 vtkStandardNewMacro(vtkPVRendererCuller);
 
-#if defined(PARAVIEW_USE_ICE_T)
+#if VTK_MODULE_ENABLE_ParaView_icet
 //------------------------------------------------------------------------------
 // vtkIceTCompositePass needs to know the set RenderPass will read from its
 // internal float FBO in order to setup an adequate context.
@@ -2798,7 +2798,7 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
   {
     case vtkValuePass::FLOATING_POINT:
     {
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
       IceTPassEnableFloatPass(true, this->SynchronizedRenderers);
 #endif
       this->Internals->ValuePasses->SetRenderingMode(mode);
@@ -2808,7 +2808,7 @@ void vtkPVRenderView::SetValueRenderingModeCommand(int mode)
     case vtkValuePass::INVERTIBLE_LUT:
     default:
     {
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
       IceTPassEnableFloatPass(false, this->SynchronizedRenderers);
 #endif
       this->Internals->ValuePasses->SetRenderingMode(mode);
@@ -2853,7 +2853,7 @@ void vtkPVRenderView::BeginValueCapture()
 {
   if (!this->Internals->IsInCapture)
   {
-#if defined(PARAVIEW_USE_ICE_T)
+#if VTK_MODULE_ENABLE_ParaView_icet
     if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
     {
       // Let the IceTPass know FLOATING_POINT is already enabled.
@@ -2886,7 +2886,7 @@ void vtkPVRenderView::BeginValueCapture()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EndValueCapture()
 {
-#if defined(PARAVIEW_USE_ICE_T)
+#if VTK_MODULE_ENABLE_ParaView_icet
   if (vtkValuePass::FLOATING_POINT == this->Internals->ValuePasses->GetRenderingMode())
   {
     // Let the IceTPass know vtkValuePass will be removed.
@@ -2929,7 +2929,7 @@ void vtkPVRenderView::StopCaptureLuminance()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::CaptureZBuffer()
 {
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
   vtkIceTSynchronizedRenderers* IceTSynchronizedRenderers =
     vtkIceTSynchronizedRenderers::SafeDownCast(
       this->SynchronizedRenderers->GetParallelSynchronizer());
@@ -2967,7 +2967,7 @@ vtkFloatArray* vtkPVRenderView::GetCapturedZBuffer()
 void vtkPVRenderView::CaptureValuesFloat()
 {
   vtkFloatArray* values = NULL;
-#ifdef PARAVIEW_USE_ICE_T
+#if VTK_MODULE_ENABLE_ParaView_icet
   vtkIceTSynchronizedRenderers* IceTSynchronizedRenderers =
     vtkIceTSynchronizedRenderers::SafeDownCast(
       this->SynchronizedRenderers->GetParallelSynchronizer());
@@ -3015,7 +3015,7 @@ vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetViewTime(double value)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetViewTime(value, ren);
 #endif
@@ -3025,7 +3025,7 @@ void vtkPVRenderView::SetViewTime(double value)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetEnableOSPRay(bool v)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   if (this->Internals->IsInOSPRay == v)
   {
     return;
@@ -3062,7 +3062,7 @@ bool vtkPVRenderView::GetEnableOSPRay()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetMaterialLibrary(vtkPVMaterialLibrary* ml)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaterialLibrary(
     vtkOSPRayMaterialLibrary::SafeDownCast(ml->GetMaterialLibrary()), ren);
@@ -3074,7 +3074,7 @@ void vtkPVRenderView::SetMaterialLibrary(vtkPVMaterialLibrary* ml)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetOSPRayRendererType(std::string name)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetRendererType(name, ren);
 #else
@@ -3085,7 +3085,7 @@ void vtkPVRenderView::SetOSPRayRendererType(std::string name)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetShadows(bool v)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   this->Internals->OSPRayShadows = v;
   vtkRenderer* ren = this->GetRenderer();
   if (this->Internals->IsInOSPRay)
@@ -3100,7 +3100,7 @@ void vtkPVRenderView::SetShadows(bool v)
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetShadows()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   if (ren->GetUseShadows() == 1)
   {
@@ -3118,7 +3118,7 @@ bool vtkPVRenderView::GetShadows()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetAmbientSamples(v, ren);
 #else
@@ -3129,7 +3129,7 @@ void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetAmbientOcclusionSamples()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetAmbientSamples(ren);
 #else
@@ -3140,7 +3140,7 @@ int vtkPVRenderView::GetAmbientOcclusionSamples()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetSamplesPerPixel(int v)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetSamplesPerPixel(v, ren);
 #else
@@ -3151,7 +3151,7 @@ void vtkPVRenderView::SetSamplesPerPixel(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetSamplesPerPixel()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetSamplesPerPixel(ren);
 #else
@@ -3162,7 +3162,7 @@ int vtkPVRenderView::GetSamplesPerPixel()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetMaxFrames(int v)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
 #else
@@ -3173,7 +3173,7 @@ void vtkPVRenderView::SetMaxFrames(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetMaxFrames()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetMaxFrames(ren);
 #else
@@ -3184,7 +3184,7 @@ int vtkPVRenderView::GetMaxFrames()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetLightScale(double v)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkOSPRayLightNode::SetLightScale(v);
 #else
   (void)v;
@@ -3194,7 +3194,7 @@ void vtkPVRenderView::SetLightScale(double v)
 //----------------------------------------------------------------------------
 double vtkPVRenderView::GetLightScale()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   return vtkOSPRayLightNode::GetLightScale();
 #else
   return 0.5;
@@ -3204,7 +3204,7 @@ double vtkPVRenderView::GetLightScale()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetOSPRayContinueStreaming()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   if (!this->Internals->IsInOSPRay)
   {
     return false;
@@ -3224,7 +3224,7 @@ bool vtkPVRenderView::GetOSPRayContinueStreaming()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackgroundNorth(double x, double y, double z)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   double dir[3] = { x, y, z };
   vtkOSPRayRendererNode::SetNorthPole(dir, ren);
@@ -3238,7 +3238,7 @@ void vtkPVRenderView::SetBackgroundNorth(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackgroundEast(double x, double y, double z)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   double dir[3] = { x, y, z };
   vtkOSPRayRendererNode::SetEastPole(dir, ren);
@@ -3252,7 +3252,7 @@ void vtkPVRenderView::SetBackgroundEast(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetTimeCacheSize(int v)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetTimeCacheSize(v, ren);
 #else
@@ -3263,7 +3263,7 @@ void vtkPVRenderView::SetTimeCacheSize(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetTimeCacheSize()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetTimeCacheSize(ren);
 #else

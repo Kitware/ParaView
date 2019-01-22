@@ -40,8 +40,7 @@
 #include "vtksys/SystemTools.hxx"
 
 // Determine if we can use the MPI controller for asynchronous communication.
-#include "vtkPVConfig.h"
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
 #define VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"

@@ -1,0 +1,27 @@
+NAME
+  pvNVIDIAIndeX::IndeXRepresentations
+LIBRARY_NAME
+  vtkIndeXRepresentations
+DEPENDS
+  ParaView::ClientServerCoreRendering
+  ParaView::Common
+  VTK::CommonCore
+  VTK::CommonTransforms
+  VTK::IOXMLParser
+  VTK::ParallelCore
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingVolume
+  VTK::RenderingVolumeOpenGL2
+PRIVATE_DEPENDS
+  ParaView::ClientServerCoreCore
+  ParaView::ServerManagerDefault
+  ParaView::VTKExtensionsRendering
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::CommonMath
+  VTK::CommonSystem
+  VTK::FiltersCore
+  VTK::FiltersParallel
+  VTK::FiltersSources
+  VTK::IOXML

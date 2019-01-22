@@ -25,7 +25,7 @@
 #include "vtkSMSession.h"
 #include "vtkSmartPointer.h"
 
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
 
@@ -43,7 +43,7 @@ vtkSMMaterialLibraryProxy::~vtkSMMaterialLibraryProxy()
 //-----------------------------------------------------------------------------
 void vtkSMMaterialLibraryProxy::LoadMaterials(const char* filename)
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadFile" << filename
          << vtkClientServerStream::End;
@@ -59,7 +59,7 @@ void vtkSMMaterialLibraryProxy::LoadMaterials(const char* filename)
 //-----------------------------------------------------------------------------
 void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   // todo: this should be relative to binary or in prefs/settings, see pq
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadRelativeFile"
@@ -73,7 +73,7 @@ void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
 //-----------------------------------------------------------------------------
 void vtkSMMaterialLibraryProxy::Synchronize()
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   bool builtinMode = false;
   if (!this->GetSession() || (this->GetSession()->GetProcessRoles() & vtkPVSession::SERVERS) != 0)
   {

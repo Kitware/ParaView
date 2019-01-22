@@ -1,0 +1,11 @@
+NAME
+  ParaView::PythonInitializer
+LIBRARY_NAME
+  vtkUtilitiesPythonInitializer
+CONDITION
+  PARAVIEW_ENABLE_PYTHON
+PRIVATE_DEPENDS
+  VTK::WrappingPythonCore
+  VTK::CommonCore
+  VTK::vtksys
+EXCLUDE_WRAP

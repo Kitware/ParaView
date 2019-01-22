@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMTestDriverConfig.h.in
+  Module:    vtkSMTestDriverConfig.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,17 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#cmakedefine VTK_MPIRUN_EXE "@VTK_MPIRUN_EXE@"
-#cmakedefine VTK_MPI_PRENUMPROC_FLAGS "@VTK_MPI_PRENUMPROC_FLAGS@"
-#cmakedefine VTK_MPI_NUMPROC_FLAG "@VTK_MPI_NUMPROC_FLAG@"
-#cmakedefine VTK_MPI_PREFLAGS "@VTK_MPI_PREFLAGS@"
-#cmakedefine VTK_MPI_POSTFLAGS "@VTK_MPI_POSTFLAGS@"
-#cmakedefine VTK_MPI_SERVER_PREFLAGS "@VTK_MPI_SERVER_PREFLAGS@"
-#cmakedefine VTK_MPI_SERVER_POSTFLAGS "@VTK_MPI_SERVER_POSTFLAGS@"
-#cmakedefine VTK_MPI_SERVER_TD_PREFLAGS "@VTK_MPI_SERVER_TD_PREFLAGS@"
-#cmakedefine VTK_MPI_SERVER_TD_POSTFLAGS "@VTK_MPI_SERVER_TD_POSTFLAGS@"
-#cmakedefine VTK_MPI_MAX_NUMPROCS @VTK_MPI_MAX_NUMPROCS@
-#cmakedefine PARAVIEW_USE_MPI
 #cmakedefine PV_TEST_INIT_COMMAND "@PV_TEST_INIT_COMMAND@"
 #cmakedefine PV_TEST_CLEAN_COMMAND "@PV_TEST_CLEAN_COMMAND@"
 

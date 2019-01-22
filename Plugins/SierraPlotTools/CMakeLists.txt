@@ -5,99 +5,68 @@
 # Author:  Jon Goldman
 # Created:  Aug 2009 -to- Jan 2010
 
-SET(PLUGIN_NAME SierraPlotTools)
-SET(PLUGIN_VERSION "1.0")
-
-#
-# This macro changes the Visual Studio warning levels from 3 to 4,
-#  to catch things such as "unreferenced local variable"
-#
-MACRO(VS_SET_VS_WARNING_4)
-  IF(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
-    #MESSAGE(WARNING "CMAKE_BUILD_TOOL MATCHES msdev|devenv|nmake")
-
-    add_definitions(-DDISABLE_NOISY_COMPILE_WARNINGS)
-
-    # Use the highest warning level for visual studio.
-    SET(CMAKE_CXX_WARNING_LEVEL 4)
-    IF(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-     STRING(REGEX REPLACE "/W[0-4]" "/W4"
-            CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    ELSE()
-     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-    ENDIF()
-  ENDIF()
-ENDMACRO()
-
-# Comment out VS_SET_VS_WARNING_4 to keep default Visual Studio Warning level 3
-# unComment VS_SET_VS_WARNING_4 to change Visual Studio Warning level to 4
-#VS_SET_VS_WARNING_4()
-
-INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIRS}
-  )
-
-SET(UI_FILES
-  # pqSierraPlotToolsActionHolder.ui -- container for plot tools actions
+set(ui_files
+  # container for plot tools actions
   pqSierraPlotToolsActionHolder.ui
-  
   pqSierraPlotToolsDataLoadManager.ui
-  pqVariablePlot.ui
-  
-  # pqSierraToolsRichTextDocs.ui -- container for Rich Text documents
+  # container for Rich Text documents
   pqSierraToolsRichTextDocs.ui
-  )
+  pqVariablePlot.ui)
 
-SET(MOC_HEADERS
-  pqElementPlotter.h
-  pqHoverLabel.h
-  pqGlobalPlotter.h
-  pqNodePlotter.h
-  pqPlotVariablesDialog.h
-  pqPlotter.h
-  pqResizingScrollArea.h
-  pqSierraPlotToolsActionGroup.h
-  pqSierraPlotToolsDataLoadManager.h
-  pqSierraPlotToolsManager.h
-  pqVariableVariablePlotter.h
-  )
-
-SET(HEADERS
-  ${MOC_HEADERS}
-  pqSierraPlotToolsUtils.h
-  warningState.h
-  )
-
-SET(CLIENT_SRCS
+set(sources
   pqElementPlotter.cxx
+  pqElementPlotter.h
   pqGlobalPlotter.cxx
+  pqGlobalPlotter.h
   pqHoverLabel.cxx
+  pqHoverLabel.h
   pqNodePlotter.cxx
-  pqPlotVariablesDialog.cxx
+  pqNodePlotter.h
   pqPlotter.cxx
+  pqPlotter.h
+  pqPlotVariablesDialog.cxx
+  pqPlotVariablesDialog.h
   pqResizingScrollArea.cxx
+  pqResizingScrollArea.h
   pqSierraPlotToolsActionGroup.cxx
+  pqSierraPlotToolsActionGroup.h
   pqSierraPlotToolsDataLoadManager.cxx
+  pqSierraPlotToolsDataLoadManager.h
   pqSierraPlotToolsManager.cxx
+  pqSierraPlotToolsManager.h
   pqSierraPlotToolsUtils.cxx
+  pqSierraPlotToolsUtils.h
   pqVariableVariablePlotter.cxx
-  )
+  pqVariableVariablePlotter.h
+  warningState.h)
 
-IF (PARAVIEW_BUILD_QT_GUI)
-  INCLUDE (ParaViewQt)
-  pv_find_package_qt(qt_targets REQUIRED QT5_COMPONENTS Widgets)
-  pv_qt_wrap_cpp(MOC_SRCS ${MOC_HEADERS})
-  pv_qt_wrap_ui(UI_SRCS ${UI_FILES})
-  ADD_PARAVIEW_ACTION_GROUP(SIERRA_PLOT_TOOLS_TOOLBAR_IFACE SIERRA_PLOT_TOOLS_TOOLBAR_IFACE_SRCS
-    CLASS_NAME pqSierraPlotToolsActionGroup
-    GROUP_NAME "ToolBar/SierraTools"
-    )
-  ADD_PARAVIEW_PLUGIN(${PLUGIN_NAME} ${PLUGIN_VERSION}
-    GUI_INTERFACES ${SIERRA_PLOT_TOOLS_TOOLBAR_IFACE}
-    GUI_RESOURCES SierraPlotTools.qrc
-    SOURCES  ${HEADERS}  ${MOC_SRCS} ${UI_SRCS} ${SIERRA_PLOT_TOOLS_TOOLBAR_IFACE_SRCS} ${CLIENT_SRCS}
-    )
-  target_link_libraries(${PLUGIN_NAME}
-    LINK_PRIVATE vtkPVVTKExtensionsDefault vtkPVServerManagerRendering ${qt_targets})
-ELSE ()
-ENDIF ()
+set(qrc_files
+  SierraPlotTools.qrc)
+
+set(interfaces)
+paraview_plugin_add_action_group(
+  CLASS_NAME pqSierraPlotToolsActionGroup
+  GROUP_NAME "ToolBar/SierraTools"
+  INTERFACES action_interfaces
+  SOURCES action_sources)
+list(APPEND interfaces
+  ${action_interfaces})
+list(APPEND sources
+  ${action_sources})
+
+paraview_add_plugin(SierraPlotTools
+  VERSION "1.0"
+  UI_INTERFACES ${interfaces}
+  UI_RESOURCES ${qrc_files}
+  UI_FILES ${ui_files}
+  SOURCES ${sources})
+
+target_link_libraries(SierraPlotTools
+  PRIVATE
+    ParaView::ClientServerCoreCore
+    ParaView::ServerManagerCore
+    ParaView::ServerManagerRendering
+    ParaView::VTKExtensionsDefault
+    VTK::CommonCore
+    VTK::CommonDataModel
+    VTK::IOExodus)

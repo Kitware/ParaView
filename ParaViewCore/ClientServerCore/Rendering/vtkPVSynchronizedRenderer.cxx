@@ -32,7 +32,7 @@
 #include "vtkRenderer.h"
 #include "vtkSocketController.h"
 
-#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_ParaView_icet
 #include "vtkIceTSynchronizedRenderers.h"
 #endif
 #include "vtkCompositedSynchronizedRenderers.h"
@@ -185,7 +185,7 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session, unsigned int i
       {
 // ICET now handles stereo properly, so use it no matter the number
 // of partitions
-#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_ParaView_icet
         if (this->DisableIceT)
         {
           this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
@@ -308,7 +308,7 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
     return;
   }
 
-#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_ParaView_icet
   if (this->ParallelSynchronizer->IsA("vtkIceTSynchronizedRenderers") == 1)
   {
     vtkIceTSynchronizedRenderers* aux = (vtkIceTSynchronizedRenderers*)this->ParallelSynchronizer;
@@ -326,7 +326,7 @@ void vtkPVSynchronizedRenderer::SetRenderEmptyImages(bool useREI)
   {
     return;
   }
-#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_ParaView_icet
   vtkIceTSynchronizedRenderers* sync =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (sync)
@@ -354,7 +354,7 @@ void vtkPVSynchronizedRenderer::SetNVPipeSupport(bool enable)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetupPasses()
 {
-#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_ParaView_icet
   vtkIceTSynchronizedRenderers* iceTRen =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (iceTRen)
@@ -466,7 +466,7 @@ void vtkPVSynchronizedRenderer::SetImageReductionFactor(int factor)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetDataReplicatedOnAllProcesses(bool replicated)
 {
-#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_ParaView_icet
   vtkIceTSynchronizedRenderers* sync =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (sync)
@@ -481,7 +481,7 @@ void vtkPVSynchronizedRenderer::SetDataReplicatedOnAllProcesses(bool replicated)
 void vtkPVSynchronizedRenderer::SetPartitionOrdering(
   vtkPartitionOrderingInterface* partitionOrdering)
 {
-#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_ParaView_icet
   vtkIceTSynchronizedRenderers* sync =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (sync)

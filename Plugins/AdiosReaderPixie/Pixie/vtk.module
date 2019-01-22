@@ -1,0 +1,11 @@
+NAME
+  AdiosReaderPixie::Pixie
+LIBRARY_NAME
+  vtkPVAdiosReaderPixie
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::ParallelCore
+  VTK::mpi
+  VTK::vtksys

@@ -26,7 +26,7 @@
 #include "vtkStructuredGrid.h"
 
 #include "vtkPVConfig.h"
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_FiltersParallelMPI
 #include "vtkPExtractGrid.h"
 #include "vtkPExtractRectilinearGrid.h"
 #include "vtkPExtractVOI.h"
@@ -49,7 +49,7 @@ vtkPVExtractVOI::vtkPVExtractVOI()
 
   this->IncludeBoundary = 0;
 
-#ifdef PARAVIEW_USE_MPI
+#if VTK_MODULE_ENABLE_VTK_FiltersParallelMPI
   this->ExtractGrid = vtkPExtractGrid::New();
   this->ExtractVOI = vtkPExtractVOI::New();
   this->ExtractRG = vtkPExtractRectilinearGrid::New();

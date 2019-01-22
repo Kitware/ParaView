@@ -1,7 +1,9 @@
+// Generated file.  Do not edit.
+
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGraphLayoutStrategyImplementation.cxx.in
+   Module:  @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +31,25 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// Generated file.  Do not edit.
 
-#include "@ARG_STRATEGY_TYPE@Implementation.h"
-#include "vtk@ARG_STRATEGY_TYPE@.h"
+#include "@_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation.h"
+#include "vtk@_paraview_graph_layout_strategy_STRATEGY_TYPE@.h"
 
-// configured with CMake
-// requires: ARG_STRATEGY_TYPE ARG_STRATEGY_LABEL
-
-@ARG_STRATEGY_TYPE@Implementation::@ARG_STRATEGY_TYPE@Implementation(QObject* o)
+@_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation::@_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation(QObject* o)
   : QObject(o)
 {
-//  this->@ARG_STRATEGY_TYPE@ = vtkSmartPointer<vtk@ARG_STRATEGY_TYPE@>::New();
 }
 
-QStringList @ARG_STRATEGY_TYPE@Implementation::graphLayoutStrategies() const
+QStringList @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation::graphLayoutStrategies() const
 {
-  return QStringList() << "@ARG_STRATEGY_LABEL@";
+  return QStringList() << "@_paraview_graph_layout_strategy_STRATEGY_LABEL@";
 }
 
-vtkGraphLayoutStrategy* @ARG_STRATEGY_TYPE@Implementation::getGraphLayoutStrategy(const QString& layoutStrategy)
+vtkGraphLayoutStrategy* @_paraview_graph_layout_strategy_STRATEGY_TYPE@Implementation::getGraphLayoutStrategy(const QString& layoutStrategy)
 {
-  if(layoutStrategy == "@ARG_STRATEGY_LABEL@")
-    {
-//    return this->@ARG_STRATEGY_TYPE@;
-      return vtk@ARG_STRATEGY_TYPE@::New();
-    }
+  if(layoutStrategy == "@_paraview_graph_layout_strategy_STRATEGY_LABEL@")
+  {
+    return vtk@_paraview_graph_layout_strategy_STRATEGY_TYPE@::New();
+  }
   return NULL;
 }

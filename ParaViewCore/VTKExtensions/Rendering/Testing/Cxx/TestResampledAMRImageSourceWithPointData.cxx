@@ -44,7 +44,7 @@ int TestResampledAMRImageSourceWithPointData(int argc, char* argv[])
 
   vtkNew<vtkXMLUniformGridAMRReader> reader;
   std::string filename = testing->GetDataRoot();
-  filename += "/Data/amr/wavelet.vthb";
+  filename += "/Testing/Data/amr/wavelet.vthb";
   reader->SetFileName(filename.c_str());
   reader->SetMaximumLevelsToReadByDefault(1);
   reader->Update();

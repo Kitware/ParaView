@@ -1,20 +1,19 @@
 /// Generated file. Do not edit.
 
-
-#ifndef @ARG_TYPE@ServerManagerModelImplementation_h
-#define @ARG_TYPE@ServerManagerModelImplementation_h
+#ifndef @_paraview_proxy_NAME@ServerManagerModelImplementation_h
+#define @_paraview_proxy_NAME@ServerManagerModelImplementation_h
 
 #include "pqServerManagerModelInterface.h"
 
 /// Used by add_pqproxy() macro.
-class @ARG_TYPE@ServerManagerModelImplementation : public QObject,
+class @_paraview_proxy_NAME@ServerManagerModelImplementation : public QObject,
                     public pqServerManagerModelInterface
 {
   Q_OBJECT;
   Q_INTERFACES(pqServerManagerModelInterface);
 public:
-  @ARG_TYPE@ServerManagerModelImplementation(QObject* parentObject=NULL);
-  ~@ARG_TYPE@ServerManagerModelImplementation() override;
+  @_paraview_proxy_NAME@ServerManagerModelImplementation(QObject* parentObject=nullptr);
+  ~@_paraview_proxy_NAME@ServerManagerModelImplementation() override;
 
   /// Creates a pqProxy subclass for the vtkSMProxy given the details for its
   /// registration with the proxy manager.
@@ -26,7 +25,7 @@ public:
     const QString& regName, vtkSMProxy* proxy, pqServer* server) const override;
 
 private:
-  Q_DISABLE_COPY(@ARG_TYPE@ServerManagerModelImplementation)
+  Q_DISABLE_COPY(@_paraview_proxy_NAME@ServerManagerModelImplementation)
 };
 
-#endif // endif ifndef
+#endif

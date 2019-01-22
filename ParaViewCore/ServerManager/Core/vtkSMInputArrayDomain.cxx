@@ -270,7 +270,7 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
   const char* numComponents = element->GetAttribute("number_of_components");
   if (numComponents)
   {
-    typedef std::vector<vtksys::String> VStrings;
+    typedef std::vector<std::string> VStrings;
     const VStrings numbers = vtksys::SystemTools::SplitString(numComponents, ',');
 
     this->AcceptableNumbersOfComponents.clear();

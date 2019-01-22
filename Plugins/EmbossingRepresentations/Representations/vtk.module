@@ -1,0 +1,14 @@
+NAME
+  EmbossingRepresentations::vtkEmbossingRepresentations
+LIBRARY_NAME
+  vtkEmbossingRepresentations
+DEPENDS
+  ParaView::ClientServerCoreRendering
+  VTK::RenderingOpenGL2
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::ParallelCore
+  VTK::RenderingCore
+  VTK::glew

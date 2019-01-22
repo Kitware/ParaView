@@ -246,7 +246,7 @@ vtkPVPluginLoader::vtkPVPluginLoader()
   this->Loaded = false;
   this->SetErrorString("No plugin loaded yet.");
 
-  vtksys::String paths;
+  std::string paths;
   const char* env = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
   if (env)
   {

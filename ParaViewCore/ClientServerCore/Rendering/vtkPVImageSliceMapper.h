@@ -145,7 +145,7 @@ public:
   /**
    * Make a shallow copy of this mapper.
    */
-  virtual void ShallowCopy(vtkAbstractMapper* m);
+  void ShallowCopy(vtkAbstractMapper* m) override;
 
 protected:
   vtkPVImageSliceMapper();

@@ -13,16 +13,10 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "pvserver_common.h"
-#ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
-#endif
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-#ifndef BUILD_SHARED_LIBS
-  paraview_static_plugins_init();
-#endif
   // Init current process type
   return RealMain(argc, argv, vtkProcessModule::PROCESS_SERVER) ? 0 : 1;
 }

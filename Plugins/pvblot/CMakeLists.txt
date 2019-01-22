@@ -1,105 +1,82 @@
-# This plugin implements scripting that resembles commands from the SEACAS blot
-# program.
+# This plugin implements scripting that resembles commands from
+# the SEACAS blot program.
 
-SET(PYMODULES
-  blotish.py
-  pvblot.py
-  blot_common.py
-  number_list_parser.py
-  tplot.py
+set(python_modules
   async_io_helper.py
+  blot_common.py
+  blotish.py
+  number_list_parser.py
+  pvblot.py
   timestep_selection.py
-  )
+  tplot.py)
 
-SET(MOC_HEADERS
-  pqBlotDialog.h
-  pqBlotShell.h
-  PVBlotPluginActions.h
-  )
+set(interfaces)
+set(ui_files)
+set(qrc_files)
+set(sources)
 
-SET(UI_FILES
-  pqBlotDialog.ui
-  )
+if (PARAVIEW_BUILD_QT_GUI)
+  list(APPEND ui_files
+    pqBlotDialog.ui)
+  list(APPEND qrc_files
+    pvblot.qrc)
+  list(APPEND sources
+    PVBlotPluginActions.cxx
+    PVBlotPluginActions.h
+    pqBlotDialog.cxx
+    pqBlotDialog.h
+    pqBlotDialog.ui
+    pqBlotShell.cxx
+    pqBlotShell.h)
 
-SET(CLIENT_SRCS
-  pqBlotDialog.cxx
-  pqBlotShell.cxx
-  PVBlotPluginActions.cxx
-  )
+  paraview_plugin_add_action_group(
+    CLASS_NAME "PVBlotPluginActions"
+    GROUP_NAME "MenuBar/Tools"
+    INTERFACES group_interfaces
+    SOURCES group_sources)
+  list(APPEND interfaces
+    ${group_interfaces})
+  list(APPEND sources
+    ${group_sources})
+endif ()
 
-INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
+paraview_add_plugin(pvblot
+  REQUIRED_ON_CLIENT
+  VERSION "1.0"
+  PYTHON_MODULES ${python_modules}
+  UI_INTERFACES ${interfaces}
+  UI_RESOURCES ${qrc_files}
+  UI_FILES ${ui_files}
+  SOURCES ${sources})
 
-IF (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_BUILD_QT_GUI)
+  target_link_libraries(pvblot
+    PRIVATE
+      ParaView::ClientServerCoreCore
+      VTK::GUISupportQt
+      VTK::Python)
+endif ()
 
-  IF(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-    SET(Qt5_FIND_COMPONENTS Widgets)
-    INCLUDE(ParaViewQt5)
-  ELSE()
-    INCLUDE(${QT_USE_FILE})
-  ENDIF()
+set(ext "")
+if (WIN32 AND NOT CYGWIN)
+  set(ext ".bat")
+endif ()
 
-  INCLUDE_DIRECTORIES(
-    ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
-    ${pqCore_SOURCE_DIR}
-    ${pqCore_BINARY_DIR}
-    ${pqComponents_SOURCE_DIR}
-    ${pqComponents_BINARY_DIR}
-    ${QtWidgets_SOURCE_DIR}
-    ${QtWidgets_BINARY_DIR}
-    )
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot${ext}.in.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/pvblot${ext}.in"
+  @ONLY)
 
-  QT5_WRAP_CPP(MOC_SRCS ${MOC_HEADERS})
-  QT5_WRAP_UI(UI_SRCS ${UI_FILES})
+get_property(is_multi_config GLOBAL
+  PROPERTY GENERATOR_IS_MULTI_CONFIG)
+set(config_subdir "")
+if (is_multi_config)
+  set(config_subdir "/$<CONFIGURATION>")
+endif ()
 
-  ADD_PARAVIEW_ACTION_GROUP(IFACES IFACE_SRCS
-    CLASS_NAME PVBlotPluginActions
-    GROUP_NAME "MenuBar/Tools")
+file(GENERATE
+  OUTPUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${config_subdir}/pvblot${ext}"
+  INPUT  "${CMAKE_CURRENT_BINARY_DIR}/pvblot${ext}.in")
 
-  ADD_PARAVIEW_PLUGIN(pvblot "1.0"
-    PYTHON_MODULES ${PYMODULES}
-    GUI_INTERFACES ${IFACES}
-    GUI_RESOURCES pvblot.qrc
-    REQUIRED_ON_CLIENT
-    SOURCES ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS} ${CLIENT_SRCS}
-    )
-ELSE ()
-  ADD_PARAVIEW_PLUGIN(pvblot "1.0"
-    PYTHON_MODULES ${PYMODULES}
-    REQUIRED_ON_CLIENT
-    )
-ENDIF ()
-
-#############################################################################
-# Set up a simple shell script to run pvblot from the command line.
-GET_TARGET_PROPERTY(PVBLOT_PVPYTHON_EXECUTABLE pvpython LOCATION)
-SET(PVBLOT_BLOTISH_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-
-SET(script_ext)
-IF(WIN32 AND NOT CYGWIN)
-  SET(script_ext ".bat")
-ENDIF()
-
-#############################################################################
-# Set up pvblot script for when ParaView is installed.  This includes
-# installing the Python source files.
-INSTALL(
-  FILES ${PYMODULES}
-  DESTINATION ${PV_INSTALL_LIB_DIR}
-  )
-
-SET(PVBLOT_PVPYTHON_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvpython${PV_EXE_SUFFIX}")
-SET(PVBLOT_BLOTISH_PATH "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
-
-
-CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot${script_ext}.in"
-  "${ParaView_BINARY_DIR}/CMake/tmp/pvblot${script_ext}"
-  @ONLY
-  )
-
-
-INSTALL(
-  FILES "${ParaView_BINARY_DIR}/CMake/tmp/pvblot${script_ext}"
-  DESTINATION ${PV_INSTALL_BIN_DIR}
-  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-  )
+# TODO: Install the pvblot script. This requires the python modules to be
+# installed as well.

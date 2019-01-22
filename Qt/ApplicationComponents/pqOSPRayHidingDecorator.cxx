@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqOSPRayHidingDecorator.h"
 
-#include "vtkPVConfig.h"
-
 //-----------------------------------------------------------------------------
 pqOSPRayHidingDecorator::pqOSPRayHidingDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
@@ -48,7 +46,7 @@ pqOSPRayHidingDecorator::~pqOSPRayHidingDecorator()
 //-----------------------------------------------------------------------------
 bool pqOSPRayHidingDecorator::canShowWidget(bool show_advanced) const
 {
-#ifdef PARAVIEW_USE_OSPRAY
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   return this->Superclass::canShowWidget(show_advanced);
 #else
   (void)show_advanced;

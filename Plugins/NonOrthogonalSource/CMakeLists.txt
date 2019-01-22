@@ -1,36 +1,55 @@
-SET(PLUGIN_NAME NonOrthogonalSource)
-SET(PLUGIN_VERSION "1.0")
+vtk_module_scan(
+  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Sources/vtk.module"
+  REQUEST_MODULES   NonOrthogonalSource::vtkNonOrthogonalSources
+  PROVIDES_MODULES  sources_modules
+  REQUIRES_MODULES  required_modules
+  HIDE_MODULES_FROM_CACHE ON)
 
-include_directories(${VTK_INCLUDE_DIRS})
+if (required_modules)
+  foreach (required_module IN LISTS required_modules)
+    if (NOT TARGET "${required_module}")
+      message(FATAL_ERROR
+        "Failed to find the required module ${required_module}.")
+    endif ()
+  endforeach ()
+endif ()
 
-set(sources)
+vtk_module_build(
+  MODULES             ${sources_modules}
+  PACKAGE             NonOrthogonalSource
+  INSTALL_HEADERS     OFF
+  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  VERSION             "${PARAVIEW_VERSION}"
+  SOVERSION           "1")
 
-if(PARAVIEW_BUILD_QT_GUI)
-  pv_find_package_qt(qt_targets REQUIRED QUIET
-    QT5_COMPONENTS Widgets)
-  pv_qt_wrap_cpp(MOC_SRCS pqNonOrthogonalAutoStart.h)
-  add_paraview_auto_start(IFACES IFACE_SRCS
-    CLASS_NAME pqNonOrthogonalAutoStart
-    STARTUP startup
-    SHUTDOWN shutdown)
-  list(APPEND sources
-    pqNonOrthogonalAutoStart.cxx
-    ${MOC_SRCS}
-    ${IFACE_SRCS})
-endif()
-
-add_paraview_plugin(NonOrthogonalSource "1.0"
-  SERVER_MANAGER_XML
-    vtkNonOrthogonalSource.xml
-  SERVER_MANAGER_SOURCES
-    vtkShearedWaveletSource.cxx
-  GUI_INTERFACES ${IFACES}
-  SOURCES ${sources}
-)
+set(interfaces)
+set(sources
+  pqNonOrthogonalAutoStart.cxx
+  pqNonOrthogonalAutoStart.h
+  pqSetupModelTransformBehavior.h)
 if (PARAVIEW_BUILD_QT_GUI)
-  target_link_libraries(NonOrthogonalSource LINK_PRIVATE pqApplicationComponents)
-endif()
+  paraview_plugin_add_auto_start(
+    CLASS_NAME pqNonOrthogonalAutoStart
+    INTERFACES autostart_interface
+    SOURCES autostart_sources)
+  list(APPEND interfaces
+    ${autostart_interface})
+  list(APPEND sources
+    ${autostart_sources})
+endif ()
 
-if(BUILD_TESTING)
+paraview_add_plugin(NonOrthogonalSource
+  VERSION       "1.0"
+  UI_INTERFACES ${interfaces}
+  SOURCES       ${sources}
+  MODULES       NonOrthogonalSource::vtkNonOrthogonalSources)
+
+if (PARAVIEW_BUILD_QT_GUI)
+  target_link_libraries(NonOrthogonalSource
+    PRIVATE
+      ParaView::pqApplicationComponents)
+endif ()
+
+if (BUILD_TESTING)
   add_subdirectory(Testing)
-endif()
+endif ()

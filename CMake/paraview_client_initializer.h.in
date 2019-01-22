@@ -1,0 +1,64 @@
+// ***************** DO NOT EDIT ***********************************
+// This is a generated file.
+// It will be replaced next time you rebuild.
+/*=========================================================================
+
+   Program: @_paraview_client_NAME@
+   Module:  pq@_paraview_client_NAME@Initializer.h
+
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+
+#ifndef pq@_paraview_client_NAME@Initializer_h
+#define pq@_paraview_client_NAME@Initializer_h
+
+class QMainWindow;
+class pqPVApplicationCore;
+class QSplashScreen;
+
+class pq@_paraview_client_NAME@Initializer
+{
+public:
+  enum Status
+  {
+    ExitSuccess,
+    ExitFailure,
+    RunApplication
+  };
+
+  pq@_paraview_client_NAME@Initializer();
+  ~pq@_paraview_client_NAME@Initializer();
+
+  /// Initialize ParaView. It returns false if the initialization failed.
+  Status Initialize(int argc, char* argv[]);
+private:
+  pqPVApplicationCore* PVApp;
+  QMainWindow* MainWindow;
+  QSplashScreen* Splash;
+};
+
+#endif

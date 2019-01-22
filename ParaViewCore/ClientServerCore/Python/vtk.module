@@ -1,0 +1,22 @@
+NAME
+  ParaView::ClientServerCorePython
+LIBRARY_NAME
+  vtkPVClientServerCorePython
+CONDITION
+  PARAVIEW_ENABLE_PYTHON
+GROUPS
+  ParaViewCore
+KIT
+  ParaView::ClientServer
+DEPENDS
+  VTK::CommonExecutionModel
+  VTK::FiltersProgrammable
+  VTK::PythonInterpreter
+PRIVATE_DEPENDS
+  ParaView::ClientServerCoreCore
+  VTK::ParallelCore
+TEST_DEPENDS
+  ParaView::Common
+  VTK::TestingCore
+TEST_LABELS
+  ParaView

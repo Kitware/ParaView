@@ -1,7 +1,9 @@
+// Generated file.  Do not edit.
+
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqAutoStartImplementation.cxx.in
+   Module:  @_paraview_auto_start_CLASS_NAME@Implementation.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,32 +32,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "@ARG_CLASS_NAME@.h"
-#include "@ARG_CLASS_NAME@Implementation.h"
+#include "@_paraview_auto_start_CLASS_NAME@.h"
+#include "@_paraview_auto_start_CLASS_NAME@Implementation.h"
 
 //-----------------------------------------------------------------------------
-@ARG_CLASS_NAME@Implementation::@ARG_CLASS_NAME@Implementation(QObject* _parent)
+@_paraview_auto_start_CLASS_NAME@Implementation::@_paraview_auto_start_CLASS_NAME@Implementation(QObject* _parent)
   : QObject(_parent)
 {
-  this->UserImplementation = new @ARG_CLASS_NAME@();
+  this->UserImplementation = new @_paraview_auto_start_CLASS_NAME@();
 }
 
 //-----------------------------------------------------------------------------
-@ARG_CLASS_NAME@Implementation::~@ARG_CLASS_NAME@Implementation()
+@_paraview_auto_start_CLASS_NAME@Implementation::~@_paraview_auto_start_CLASS_NAME@Implementation()
 {
   delete this->UserImplementation;
   this->UserImplementation = 0;
 }
 
 //-----------------------------------------------------------------------------
-void @ARG_CLASS_NAME@Implementation::startup()
+void @_paraview_auto_start_CLASS_NAME@Implementation::startup()
 {
-  this->UserImplementation->@ARG_STARTUP@();
+  this->UserImplementation->@_paraview_auto_start_STARTUP@();
 }
 
 //-----------------------------------------------------------------------------
-void @ARG_CLASS_NAME@Implementation::shutdown()
+void @_paraview_auto_start_CLASS_NAME@Implementation::shutdown()
 {
-  this->UserImplementation->@ARG_SHUTDOWN@();
+  this->UserImplementation->@_paraview_auto_start_SHUTDOWN@();
 }
-

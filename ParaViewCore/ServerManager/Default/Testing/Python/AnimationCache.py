@@ -1,12 +1,12 @@
 from paraview.simple import *
 
 from paraview import smtesting
-from paraview.vtk.vtkPVClientServerCoreRendering import vtkPVCacheKeeper
-from paraview.vtk.vtkPVServerManagerDefault import vtkPVGeneralSettings
+from paraview.modules.vtkPVClientServerCoreRendering import vtkPVCacheKeeper
+from paraview.modules.vtkPVServerManagerDefault import vtkPVGeneralSettings
 
 smtesting.ProcessCommandLineArguments()
 
-filename = smtesting.DataDir + '/can.ex2'
+filename = smtesting.DataDir + '/Testing/Data/can.ex2'
 can_ex2 = OpenDataFile(filename)
 
 AnimationScene1 = GetAnimationScene()

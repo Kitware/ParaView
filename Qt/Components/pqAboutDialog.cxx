@@ -167,7 +167,7 @@ void pqAboutDialog::AddClientInformation()
   ::addItem(tree, "Python Testing", "Off");
 #endif
 
-#if defined(PARAVIEW_USE_MPI)
+#if VTK_MODULE_ENABLE_VTK_ParallelMPI
   ::addItem(tree, "MPI Enabled", "On");
 #else
   ::addItem(tree, "MPI Enabled", "Off");

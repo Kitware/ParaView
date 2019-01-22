@@ -28,86 +28,60 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-set (Module_SRCS
-  vtkPVCatalystSessionCore.cxx
-  vtkPVFilePathEncodingHelper.cxx
-  vtkPVProxyDefinitionIterator.cxx
-  vtkPVSessionBase.cxx
-  vtkPVSessionCore.cxx
-  vtkPVSessionCoreInterpreterHelper.cxx
-  vtkPVSessionServer.cxx
-  vtkSIArraySelectionProperty.cxx
-  vtkSICollaborationManager.cxx
-  vtkSICompoundSourceProxy.cxx
-  vtkSIDataArrayProperty.cxx
-  vtkSIDataArraySelectionProperty.cxx
-  vtkSIDirectoryProxy.cxx
-  vtkSIDoubleMapProperty.cxx
-  vtkSIDoubleVectorProperty.cxx
-  vtkSIIdTypeVectorProperty.cxx
-  vtkSIIndexSelectionProperty.cxx
-  vtkSIInputProperty.cxx
-  vtkSIIntVectorProperty.cxx
-  vtkSIMetaReaderProxy.cxx
-  vtkSIObject.cxx
-  vtkSIProperty.cxx
-  vtkSIProxy.cxx
-  vtkSIProxyDefinitionManager.cxx
-  vtkSIProxyProperty.cxx
-  vtkSISILProperty.cxx
-  vtkSISourceProxy.cxx
-  vtkSIStringVectorProperty.cxx
-  vtkSITimeLabelProperty.cxx
-  vtkSITimeRangeProperty.cxx
-  vtkSITimeStepsProperty.cxx
-  vtkSIVectorProperty.cxx
-  vtkSIWriterProxy.cxx
-  vtkSMMessage.cxx
-)
+set(classes
+  vtkPVCatalystSessionCore
+  vtkPVFilePathEncodingHelper
+  vtkPVProxyDefinitionIterator
+  vtkPVSessionBase
+  vtkPVSessionCore
+  vtkPVSessionCoreInterpreterHelper
+  vtkPVSessionServer
+  vtkSIArraySelectionProperty
+  vtkSICollaborationManager
+  vtkSICompoundSourceProxy
+  vtkSIDataArrayProperty
+  vtkSIDataArraySelectionProperty
+  vtkSIDirectoryProxy
+  vtkSIDoubleMapProperty
+  vtkSIDoubleVectorProperty
+  vtkSIIdTypeVectorProperty
+  vtkSIIndexSelectionProperty
+  vtkSIInputProperty
+  vtkSIIntVectorProperty
+  vtkSIMetaReaderProxy
+  vtkSIObject
+  vtkSIProperty
+  vtkSIProxy
+  vtkSIProxyDefinitionManager
+  vtkSIProxyProperty
+  vtkSISILProperty
+  vtkSISourceProxy
+  vtkSIStringVectorProperty
+  vtkSITimeLabelProperty
+  vtkSITimeRangeProperty
+  vtkSITimeStepsProperty
+  vtkSIVectorProperty
+  vtkSIWriterProxy
+  vtkSMMessage)
 
-# Add header-only files so they get installed correctly.
-set (${vtk-module}_HDRS
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkSMMessageMinimal.h
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkSIVectorPropertyTemplate.h
-  )
+set(headers
+  vtkSMMessageMinimal.h
+  vtkSIVectorPropertyTemplate.h)
 
-#------------------------------------------------------------------------------
-# Generate the protbuf message file.
-#------------------------------------------------------------------------------
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
-           ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
+vtk_module_add_module(ParaView::ServerImplementationCore
+  CLASSES ${classes}
+  HEADERS ${headers})
 
-    COMMAND protoc_compiler
-           "--cpp_out=dllexport_decl=VTKPVSERVERIMPLEMENTATIONCORE_EXPORT:${CMAKE_CURRENT_BINARY_DIR}"
-           --proto_path "${CMAKE_CURRENT_SOURCE_DIR}"
-           "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto"
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto protoc_compiler
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-add_custom_target(
-  protobuf_code_generation
+paraview_protobuf_generate(
+  PROTOS    vtkPVMessage.proto
+  OUT_VAR   vtkPVMessage_sources
+  LANGUAGE  cpp
+  EXPORT_MACRO VTKPVSERVERIMPLEMENTATIONCORE_EXPORT)
+# Install this way to hide it from the wrappers.
+vtk_module_install_headers(
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h")
+add_custom_target(vtkPVMessage_protobuf_compile
   DEPENDS
-    ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
-    ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
-)
-
-#------------------------------------------------------------------------------
-vtk_module_library(vtkPVServerImplementationCore
-  ${Module_SRCS})
-
-if (VTK_USE_SYSTEM_PROTOBUF)
-  # Protobuf 3.1 doesn't decorate some of its symbols with the _EXPORT macro,
-  # so they are not visible when using `-fvisibility=hidden`. Explicitly set
-  # the visibility to `default` to work around this. It is fixed as of
-  # protobuf-3.2.0-rc1 by this commit:
-  # <https://github.com/google/protobuf/commit/b1295eeffbf2ae7da8a5c7d8601c3ace0663fa09>.
-  set_target_properties(vtkPVServerImplementationCore
-    PROPERTIES
-      CXX_VISIBILITY_PRESET default)
-endif ()
-
-add_dependencies(vtkPVServerImplementationCore
-  protobuf_code_generation)
+    ${vtkPVMessage_sources})
+vtk_module_depend(ParaView::ServerImplementationCore
+  vtkPVMessage_protobuf_compile)

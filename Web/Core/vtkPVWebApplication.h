@@ -25,13 +25,13 @@
 #define vtkPVWebApplication_h
 
 #include "vtkObject.h"
-#include "vtkParaViewWebCoreModule.h" // needed for exports
+#include "vtkPVWebCoreModule.h" // needed for exports
 
 class vtkUnsignedCharArray;
 class vtkSMViewProxy;
 class vtkWebInteractionEvent;
 
-class VTKPARAVIEWWEBCORE_EXPORT vtkPVWebApplication : public vtkObject
+class VTKPVWEBCORE_EXPORT vtkPVWebApplication : public vtkObject
 {
 public:
   static vtkPVWebApplication* New();

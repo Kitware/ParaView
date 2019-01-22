@@ -1,0 +1,9 @@
+NAME
+  PanoramicProjectionView::vtkPanoramicProjectionViews
+LIBRARY_NAME
+  vtkPanoramicProjectionViews
+DEPENDS
+  ParaView::ClientServerCoreRendering
+  VTK::CommonCore
+PRIVATE_DEPENDS
+  VTK::RenderingCore

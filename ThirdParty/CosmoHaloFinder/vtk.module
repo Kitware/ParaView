@@ -1,0 +1,7 @@
+NAME
+  ParaView::cosmohalofinder
+LIBRARY_NAME
+  vtkcosmohalofinder
+PRIVATE_DEPENDS
+  VTK::mpi
+THIRD_PARTY

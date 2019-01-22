@@ -1,0 +1,36 @@
+NAME
+  ParaView::ClientServerCoreRendering
+LIBRARY_NAME
+  vtkPVClientServerCoreRendering
+GROUPS
+  ParaViewRendering
+KIT
+  ParaView::ClientServer
+DEPENDS
+  ParaView::ClientServerCoreCore
+  ParaView::VTKExtensionsDefault
+  ParaView::VTKExtensionsRendering
+  VTK::DomainsChemistry
+  VTK::FiltersAMR
+  VTK::RenderingLabel
+  VTK::RenderingVolumeOpenGL2
+  VTK::ViewsContext2D
+  VTK::ViewsCore
+  VTK::jsoncpp
+PRIVATE_DEPENDS
+  VTK::InfovisCore
+  VTK::vtksys
+  VTK::zlib
+OPTIONAL_DEPENDS
+  VTK::AcceleratorsVTKm
+  VTK::FiltersOpenTurns
+  VTK::ParallelMPI
+  VTK::RenderingOSPRay
+  VTK::vtkm
+
+  # These affect the public API.
+  ParaView::icet
+  VTK::PythonInterpreter
+  VTK::WrappingPythonCore
+TEST_LABELS
+  ParaView
