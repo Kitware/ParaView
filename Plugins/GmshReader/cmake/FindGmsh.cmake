@@ -49,7 +49,7 @@ find_package_handle_standard_args(Gmsh
   REQUIRED_VARS Gmsh_LIBRARY Gmsh_INCLUDE_DIR
   VERSION_VAR Gmsh_VERSION)
 
-if (Gmsg_FOUND)
+if (Gmsh_FOUND)
   set(Gmsh_LIBRARIES "${Gmsh_LIBRARY}")
   set(Gmsh_INCLUDE_DIRS "${Gmsh_INCLUDE_DIR}")
   if (NOT TARGET Gmsh::Gmsh)
