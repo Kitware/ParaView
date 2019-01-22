@@ -838,9 +838,8 @@ if (PARAVIEW_PLUGIN_ENABLE_pvNVIDIAIndeX)
 endif ()
 
 if(VTK_USE_LARGE_DATA)
-  paraview_test_load_data_dirs(""
-    bake
-  )
+  ExternalData_Expand_Arguments(ParaViewData _
+    "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}")
   list(APPEND TESTS_WITH_BASELINES
     CheckSelectedBlocks.xml
     RestoreBlockColorDefaultTransferFunction.xml
