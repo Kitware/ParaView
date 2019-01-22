@@ -23,9 +23,10 @@
 
 #include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 #include "vtkPVDataRepresentation.h"
-#include "vtkSmartPointer.h" // for smart pointer.
-#include "vtkWeakPointer.h"  // for weak pointer.
-#include <vector>            // needed for std::vector
+#include "vtkSmartPointer.h"             // for smart pointer.
+#include "vtkStreamingParticlesModule.h" // for export macro
+#include "vtkWeakPointer.h"              // for weak pointer.
+#include <vector>                        // needed for std::vector
 
 class vtkCompositePolyDataMapper2;
 class vtkMultiBlockDataSet;
@@ -33,7 +34,8 @@ class vtkPVLODActor;
 class vtkScalarsToColors;
 class vtkStreamingParticlesPriorityQueue;
 
-class vtkStreamingParticlesRepresentation : public vtkPVDataRepresentation
+class VTKSTREAMINGPARTICLES_EXPORT vtkStreamingParticlesRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkStreamingParticlesRepresentation* New();

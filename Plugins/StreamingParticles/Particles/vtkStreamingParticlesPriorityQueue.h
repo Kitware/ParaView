@@ -31,13 +31,13 @@
 #define vtkStreamingParticlesPriorityQueue_h
 
 #include "vtkObject.h"
-#include "vtkPVClientServerCoreRenderingModule.h" // for export macros
-#include <set>                                    // needed for set
+#include "vtkStreamingParticlesModule.h" // for export macro
+#include <set>                           // needed for set
 
 class vtkMultiBlockDataSet;
 class vtkMultiProcessController;
 
-class vtkStreamingParticlesPriorityQueue : public vtkObject
+class VTKSTREAMINGPARTICLES_EXPORT vtkStreamingParticlesPriorityQueue : public vtkObject
 {
 public:
   static vtkStreamingParticlesPriorityQueue* New();
