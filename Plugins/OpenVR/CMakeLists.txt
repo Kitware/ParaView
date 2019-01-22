@@ -26,7 +26,7 @@ paraview_add_plugin(OpenVR
 target_link_libraries(OpenVR
   PRIVATE
     ParaView::ClientServerCoreRendering
-    ParaView::Common
+    ParaView::Core
     ParaView::ServerManagerCore
     ParaView::ServerManagerRendering
     ParaView::VTKExtensionsRendering

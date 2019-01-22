@@ -5,6 +5,6 @@ DESCRIPTION
 CONDITION
   PARAVIEW_BUILD_QT_GUI AND PARAVIEW_ENABLE_PYTHON
 REQUIRES_MODULES
-  ParaView::Common
+  ParaView::Core
   ParaView::ServerManagerCore
   ParaView::ServerManagerRendering

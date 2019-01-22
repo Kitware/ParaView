@@ -13,7 +13,7 @@
   c->Print(cout);                                                                                  \
   c->Delete();
 
-int ParaViewCoreCommonPrintSelf(int, char* [])
+int ParaViewCoreCorePrintSelf(int, char* [])
 {
   vtkObject* c;
   PRINT_SELF(vtkCommandOptions);

@@ -277,7 +277,7 @@ endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
   list(APPEND paraview_requested_modules
-    ParaView::Common
+    ParaView::Core
     ParaView::ServerManagerApplication
     ParaView::ServerManagerCore
     ParaView::ServerManagerDefault

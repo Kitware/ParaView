@@ -73,7 +73,7 @@ try:
   from paraview.modules.vtkPVAnimation import *
 except:
   paraview.print_error("Error: Cannot import vtkPVAnimation")
-from paraview.modules.vtkPVCommon import *
+from paraview.modules.vtkPVCore import *
 
 def _wrap_property(proxy, smproperty):
     """ Internal function.

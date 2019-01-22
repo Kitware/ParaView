@@ -26,12 +26,12 @@
 #define vtkCommandOptions_h
 
 #include "vtkObject.h"
-#include "vtkPVCommonModule.h" // needed for export macro
+#include "vtkPVCoreModule.h" // needed for export macro
 
 class vtkCommandOptionsInternal;
 class vtkCommandOptionsXMLParser;
 
-class VTKPVCOMMON_EXPORT vtkCommandOptions : public vtkObject
+class VTKPVCORE_EXPORT vtkCommandOptions : public vtkObject
 {
 public:
   static vtkCommandOptions* New();

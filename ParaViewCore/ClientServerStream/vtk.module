@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkClientServer
 KIT
-  ParaView::Core
+  ParaView::CoreKit
 DEPENDS
   VTK::CommonCore
 PRIVATE_DEPENDS

@@ -7,7 +7,7 @@ GROUPS
 KIT
   ParaView::ClientServerKit
 DEPENDS
-  ParaView::Common
+  ParaView::Core
   ParaView::VTKExtensionsCore
   ParaView::VTKExtensionsSIL
   VTK::CommonCore

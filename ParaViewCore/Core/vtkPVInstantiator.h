@@ -26,9 +26,9 @@
 #define vtkPVInstantiator_h
 
 #include "vtkObject.h"
-#include "vtkPVCommonModule.h" // needed for export macro
+#include "vtkPVCoreModule.h" // needed for export macro
 
-class VTKPVCOMMON_EXPORT vtkPVInstantiator : public vtkObject
+class VTKPVCORE_EXPORT vtkPVInstantiator : public vtkObject
 {
 public:
   static vtkPVInstantiator* New();

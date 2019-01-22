@@ -24,9 +24,9 @@
 #define vtkStringList_h
 
 #include "vtkObject.h"
-#include "vtkPVCommonModule.h" // needed for export macro
+#include "vtkPVCoreModule.h" // needed for export macro
 
-class VTKPVCOMMON_EXPORT vtkStringList : public vtkObject
+class VTKPVCORE_EXPORT vtkStringList : public vtkObject
 {
 public:
   static vtkStringList* New();

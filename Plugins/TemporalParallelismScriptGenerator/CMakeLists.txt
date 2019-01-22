@@ -45,7 +45,7 @@ paraview_add_plugin(TemporalParallelismScriptGenerator
   SOURCES ${sources})
 target_link_libraries(TemporalParallelismScriptGenerator
   PRIVATE
-    ParaView::Common
+    ParaView::Core
     ParaView::ServerManagerCore
     ParaView::ServerManagerRendering)
 

@@ -6,7 +6,7 @@ paraview_add_plugin(GMVReader
 # TODO: What to do with pqGMVReaderPanel? This is needed if it is to be used.
 target_link_libraries(GMVReader
   PRIVATE
-    ParaView::Common
+    ParaView::Core
     ParaView::ServerManagerCore)
 
 if (BUILD_TESTING)

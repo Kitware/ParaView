@@ -16,7 +16,7 @@ PRIVATE_DEPENDS
   ParaView::ClientServerCoreCore
   VTK::ParallelCore
 TEST_DEPENDS
-  ParaView::Common
+  ParaView::Core
   VTK::TestingCore
 TEST_LABELS
   ParaView
