@@ -42,6 +42,6 @@ target_include_directories(cosmohalofinder SYSTEM
     ${GENERIC_IO_INCLUDE_DIR})
 
 include(GenerateExportHeader)
-generate_export_header(
+generate_export_header(cosmohalofinder
   EXPORT_MACRO_NAME VTKCOSMOHALOFINDER_EXPORT
   EXPORT_FILE_NAME  "vtkCosmoHaloFinderModule.h")
