@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <pqevents>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/LagrangianParticleTracker/flow.vtm" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/LagrangianParticleTracker/Testing/Data/LagrangianParticleTracker/flow.vtm" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/LagrangianParticleTracker/seeds.vtp" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/LagrangianParticleTracker/Testing/Data/LagrangianParticleTracker/seeds.vtp" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/LagrangianParticleTracker/surface.vtm" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/LagrangianParticleTracker/Testing/Data/LagrangianParticleTracker/surface.vtm" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,66,5,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,66,5,/0:0/0:0" />
