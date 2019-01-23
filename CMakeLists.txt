@@ -334,6 +334,9 @@ endif ()
 if (PARAVIEW_ENABLE_NVPIPE)
   list(APPEND paraview_requested_modules
     ParaView::nvpipe)
+else ()
+  list(APPEND paraview_rejected_modules
+    ParaView::nvpipe)
 endif ()
 
 if (PARAVIEW_ENABLE_GDAL)
