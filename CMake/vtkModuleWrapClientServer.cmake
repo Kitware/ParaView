@@ -34,9 +34,9 @@ function (_vtk_module_wrap_client_server_sources module sources classes)
   set(_vtk_client_server_args_file "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_vtk_client_server_library_name}-client-server.$<CONFIGURATION>.args")
 
   set(_vtk_client_server_genex_compile_definitions
-    "$<TARGET_PROPERTY:${module},COMPILE_DEFINITIONS>")
+    "$<TARGET_PROPERTY:${_vtk_client_server_target_name},COMPILE_DEFINITIONS>")
   set(_vtk_client_server_genex_include_directories
-    "$<TARGET_PROPERTY:${module},INCLUDE_DIRECTORIES>")
+    "$<TARGET_PROPERTY:${_vtk_client_server_target_name},INCLUDE_DIRECTORIES>")
   file(GENERATE
     OUTPUT  "${_vtk_client_server_args_file}"
     CONTENT "$<$<BOOL:${_vtk_client_server_genex_compile_definitions}>:\n-D\"$<JOIN:${_vtk_client_server_genex_compile_definitions},\"\n-D\">\">\n
