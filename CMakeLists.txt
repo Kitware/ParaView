@@ -770,7 +770,8 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
   set(is_git TRUE)
 endif ()
 
-if (NOT WIN32 AND is_git)
+# XXX: Disabled for now; needs investigation.
+if (FALSE AND NOT WIN32 AND is_git)
   set(source_all)
   if (PARAVIEW_SOURCE_TARBALL_TARGETS)
     set(source_all ALL)
