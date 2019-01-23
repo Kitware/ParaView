@@ -40,6 +40,7 @@ vtk_module_third_party(
     STANDARD_INCLUDE_DIRS
   EXTERNAL
     PACKAGE Protobuf
+    VERSION "3.4"
     TARGETS protobuf::libprotobuf
     STANDARD_INCLUDE_DIRS)
 
