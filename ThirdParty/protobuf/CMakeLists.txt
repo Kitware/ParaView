@@ -43,7 +43,7 @@ vtk_module_third_party(
     TARGETS protobuf::libprotobuf
     STANDARD_INCLUDE_DIRS)
 
-if (VTK_MODULE_USE_EXTERNAL_ParaView::protobuf)
+if (VTK_MODULE_USE_EXTERNAL_ParaView_protobuf)
   set(protobuf_function_file "${CMAKE_CURRENT_SOURCE_DIR}/protobuf-function.cmake")
 else ()
   set(protobuf_function_file "${CMAKE_CURRENT_SOURCE_DIR}/vtkprotobuf/cmake/protobuf-function.cmake")

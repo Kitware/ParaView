@@ -156,7 +156,7 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
 // XXX(Qt): For some reason, on Windows, this signal is not hooked up
 // properly because the name is never mangled. Instead, just handle the
 // mangling here manually.
-#if VTK_MODULE_USE_EXTERNAL_vtkjsoncpp
+#if VTK_MODULE_USE_EXTERNAL_VTK_jsoncpp
   this->connect(PresetDialog, SIGNAL(applyPreset(const Json::Value&)), SLOT(applyCurrentPreset()));
 #else
   this->connect(

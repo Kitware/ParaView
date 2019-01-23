@@ -16,9 +16,9 @@
 #define vtk_protobuf_h
 
 /* Use the protobuf library configured for ParaView.  */
-#cmakedefine01 VTK_MODULE_USE_EXTERNAL_vtkprotobuf
+#cmakedefine01 VTK_MODULE_USE_EXTERNAL_ParaView_protobuf
 
-#if VTK_MODULE_USE_EXTERNAL_vtkprotobuf
+#if VTK_MODULE_USE_EXTERNAL_ParaView_protobuf
 # include <google/protobuf/message.h>
 #else
 # include <vtkprotobuf/src/google/protobuf/message.h>
