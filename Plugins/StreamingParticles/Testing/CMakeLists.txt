@@ -1,11 +1,11 @@
 # TODO: Update
 
-if (PARAVIEW_BUILD_QT_GUI AND PARAVIEW_ENABLE_COSMOTOOLS)
+if (FALSE AND PARAVIEW_BUILD_QT_GUI AND PARAVIEW_ENABLE_COSMOTOOLS)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/adaptive-cosmo/,REGEX:.*}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/multiresolution-streaming/,REGEX:.*}")
 
-  add_pv_test("pv" "_DISABLE_C"
+  paraview_add_client_tests(
     COMMAND --client ${CLIENT_EXECUTABLE}
             --enable-bt
             -dr
@@ -18,7 +18,7 @@ if (PARAVIEW_BUILD_QT_GUI AND PARAVIEW_ENABLE_COSMOTOOLS)
   paraview_test_load_data_dirs(NewGenericIOStreaming
     multiresolution-streaming
     )
-  add_pv_test("pv" "_DISABLE_C"
+  paraview_add_client_tests(
     COMMAND --client ${CLIENT_EXECUTABLE}
             --enable-bt
             -dr
@@ -29,7 +29,7 @@ if (PARAVIEW_BUILD_QT_GUI AND PARAVIEW_ENABLE_COSMOTOOLS)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS NewGenericIOStreaming.xml
     )
-  add_pv_test("pvcs" "_DISABLE_CS"
+  paraview_add_client_server_tests(
     COMMAND --server-np 2
             --server $<TARGET_FILE:pvserver>
             --enable-bt --enable-streaming
@@ -44,7 +44,7 @@ if (PARAVIEW_BUILD_QT_GUI AND PARAVIEW_ENABLE_COSMOTOOLS)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS NewGenericIOStreaming.xml
     )
-  add_pv_test("pvcrs" "_DISABLE_CRS"
+  paraview_add_client_server_render_tests(
     COMMAND --server-np 2
             --server $<TARGET_FILE:pvserver>
             --enable-bt --enable-streaming
