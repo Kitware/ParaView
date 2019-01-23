@@ -19,7 +19,6 @@
 
 #include "vtkPVConfig.h"
 #ifdef PARAVIEW_USE_MPI
-#define MPICH_SKIP_MPICXX
 #include "vtkMPI.h"
 #endif
 #include <iostream>
