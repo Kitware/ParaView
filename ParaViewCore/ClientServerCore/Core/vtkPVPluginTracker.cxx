@@ -81,9 +81,9 @@ std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
 #if defined(_WIN32) && !defined(__CYGWIN__)
   return pluginname + ".dll";
 #elif defined(__APPLE__)
-  return "lib" + pluginname + ".dylib";
+  return pluginname + ".dylib";
 #else
-  return "lib" + pluginname + ".so";
+  return pluginname + ".so";
 #endif
 }
 
