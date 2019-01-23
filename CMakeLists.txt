@@ -519,8 +519,6 @@ vtk_module_scan(
   REQUEST_MODULES     ${paraview_requested_modules}
                       ${paraview_plugin_required_modules}
   REJECT_MODULES      ${paraview_rejected_modules}
-                      ParaView::nvpipe
-                      ParaView::cosmohalofinder
   PROVIDES_MODULES    paraview_modules
   PROVIDES_KITS       paraview_kits
   REQUIRES_MODULES    paraview_required_modules
