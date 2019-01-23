@@ -94,7 +94,7 @@ if(BUILD_NPIC_ADAPTOR)
   build_adaptor(NPICAdaptor
     "C"
     COMMENT "Building NPIC Adaptor"
-    DEPENDS vtkPVCatalyst)
+    DEPENDS ParaView::Catalyst)
 endif()
 
 if (PARAVIEW_USE_MPI)
@@ -106,7 +106,7 @@ if (PARAVIEW_USE_MPI)
     build_adaptor(ParticleAdaptor
       "C"
       COMMENT "Building Particle Adaptor"
-      DEPENDS vtkPVCatalyst)
+      DEPENDS ParaView::Catalyst)
   endif()
 endif()
 
@@ -123,7 +123,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
     build_adaptor(PhastaAdaptor
       "C;Fortran"
       COMMENT "Building Phasta Adaptor"
-      DEPENDS vtkPVCatalyst)
+      DEPENDS ParaView::Catalyst)
   endif()
 endif()
 
@@ -135,13 +135,13 @@ if (PARAVIEW_ENABLE_PYTHON AND NOT WIN32)
   build_adaptor(CTHAdaptor
     "C"
     COMMENT "Building CTH Adaptor"
-    DEPENDS vtkPVPythonCatalyst)
+    DEPENDS ParaView::PythonCatalyst)
 
   if (PARAVIEW_USE_MPI)
       build_adaptor(CamAdaptor
                     ""
                     COMMENT "Building Cam Adaptor"
-                    DEPENDS vtkPVCatalyst)
+                    DEPENDS ParaView::Catalyst)
   endif()
 
   #------------------------------------------------------------------------------
