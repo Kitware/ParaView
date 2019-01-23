@@ -2,6 +2,8 @@ NAME
   ParaView::cosmohalofinder
 LIBRARY_NAME
   vtkcosmohalofinder
+CONDITION
+  NOT WIN32 AND NOT APPLE
 PRIVATE_DEPENDS
   VTK::mpi
 THIRD_PARTY
