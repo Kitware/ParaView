@@ -26,9 +26,10 @@
 #define vtkLagrangianHelperBase_h
 
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkLagrangianParticleTrackerModule.h" // for export macro
 
 class vtkLagrangianBasicIntegrationModel;
-class vtkLagrangianHelperBase : public vtkDataObjectAlgorithm
+class VTKLAGRANGIANPARTICLETRACKER_EXPORT vtkLagrangianHelperBase : public vtkDataObjectAlgorithm
 {
 public:
   vtkTypeMacro(vtkLagrangianHelperBase, vtkDataObjectAlgorithm);

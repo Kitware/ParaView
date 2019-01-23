@@ -27,8 +27,10 @@
 #define vtkLagrangianSurfaceHelper_h
 
 #include "vtkLagrangianHelperBase.h"
+#include "vtkLagrangianParticleTrackerModule.h" // for export macro
 
-class vtkLagrangianSurfaceHelper : public vtkLagrangianHelperBase
+class VTKLAGRANGIANPARTICLETRACKER_EXPORT vtkLagrangianSurfaceHelper
+  : public vtkLagrangianHelperBase
 {
 public:
   static vtkLagrangianSurfaceHelper* New();

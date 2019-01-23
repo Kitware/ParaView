@@ -26,8 +26,9 @@
 #define vtkLagrangianSeedHelper_h
 
 #include "vtkLagrangianHelperBase.h"
+#include "vtkLagrangianParticleTrackerModule.h" // for export macro
 
-class vtkLagrangianSeedHelper : public vtkLagrangianHelperBase
+class VTKLAGRANGIANPARTICLETRACKER_EXPORT vtkLagrangianSeedHelper : public vtkLagrangianHelperBase
 {
 public:
   static vtkLagrangianSeedHelper* New();
