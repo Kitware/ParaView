@@ -397,6 +397,9 @@ endif ()
 if (PARAVIEW_ENABLE_COSMOTOOLS)
   list(APPEND paraview_requested_modules
     ParaView::VTKExtensionsCosmoTools)
+else ()
+  list(APPEND paraview_rejected_modules
+    ParaView::VTKExtensionsCosmoTools)
 endif ()
 
 if (PARAVIEW_ENABLE_CATALYST)
