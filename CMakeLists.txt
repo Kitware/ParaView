@@ -223,7 +223,8 @@ mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
 option(PARAVIEW_ENABLE_CATALYST "Enable Catalyst CoProcessing modules" ON)
 cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
   "Build Adaptors for various simulation codes" OFF
-  "PARAVIEW_ENABLE_CATALYST;NOT WIN32" OFF)
+  # XXX: Adaptors need some work yet.
+  "FALSE;PARAVIEW_ENABLE_CATALYST;NOT WIN32" OFF)
 mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
 
 # XXX(VTK): External VTK is not yet actually supported.
