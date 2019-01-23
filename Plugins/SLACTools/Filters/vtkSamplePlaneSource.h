@@ -35,10 +35,11 @@
 #define vtkSamplePlaneSource_h
 
 #include "vtkPolyDataAlgorithm.h"
+#include "vtkSLACFiltersModule.h" // for export macro
 
 class vtkMultiProcessController;
 
-class vtkSamplePlaneSource : public vtkPolyDataAlgorithm
+class VTKSLACFILTERS_EXPORT vtkSamplePlaneSource : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkSamplePlaneSource, vtkPolyDataAlgorithm);
