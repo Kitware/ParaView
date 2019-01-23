@@ -393,7 +393,7 @@ endif ()
 
 if (PARAVIEW_ENABLE_COSMOTOOLS)
   list(APPEND paraview_requested_modules
-    ParaView::PVVTKExtensionsCosmoTools)
+    ParaView::VTKExtensionsCosmoTools)
 endif ()
 
 if (PARAVIEW_ENABLE_CATALYST)
