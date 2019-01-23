@@ -69,4 +69,4 @@ add_custom_target(ParaViewDoxygenDoc
   -P ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake
   DEPENDS ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake)
 
-add_dependencies(ParaViewDoc ParaViewDoxygenDoc)
+add_dependencies(paraview_doc ParaViewDoxygenDoc)
