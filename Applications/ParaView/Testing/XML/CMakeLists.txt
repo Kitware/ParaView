@@ -1196,7 +1196,6 @@ set (TestPythonView_FORCE_SERIAL TRUE) # Seems to work better in serial.
 set (SaveColorMap_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (CategoricalColors_FORCE_SERIAL TRUE) # Uses inline edit popups
 set (ChartAxisRangeAndLabels_FORCE_SERIAL TRUE) # Uses inline edit popups
-set (SaveTSV_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (ComparativeViewOverlay_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalAutomaticAnnotations_FORCE_SERIAL TRUE) # Seems to works better in serial
 set (CategoricalOpacities_FORCE_SERIAL TRUE) # Seems to works better in serial
