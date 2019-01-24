@@ -26,6 +26,7 @@ set(interfaces)
 set(sources
   pqNonOrthogonalAutoStart.cxx
   pqNonOrthogonalAutoStart.h
+  pqSetupModelTransformBehavior.cxx
   pqSetupModelTransformBehavior.h)
 if (PARAVIEW_BUILD_QT_GUI)
   paraview_plugin_add_auto_start(
