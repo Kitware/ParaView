@@ -928,6 +928,8 @@ if (PARAVIEW_USE_MPI)
 
   if (PARAVIEW_ENABLE_COSMOTOOLS)
     # Test the Generic IO file writer in VTKExtensions/CosmoTools
+    ExternalData_Expand_Arguments(ParaViewData _
+      "DATA{${paraview_test_data_directory_input}/Data/genericio/m000.499.allparticles}")
     paraview_add_client_tests(
       ARGS --mpi
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
