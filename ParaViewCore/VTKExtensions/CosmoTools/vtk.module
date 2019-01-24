@@ -15,8 +15,9 @@ PRIVATE_DEPENDS
   VTK::ParallelMPI
   VTK::jsoncpp
 TEST_DEPENDS
+  VTK::RenderingOpenGL2
+  VTK::ParallelMPI
   VTK::TestingCore
   VTK::TestingRendering
-  VTK::ParallelMPI
 TEST_LABELS
   ParaView
