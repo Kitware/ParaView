@@ -68,7 +68,11 @@ if (PARAVIEW_USE_MPI)
     PARAVIEW_USE_MPI
     "PARAVIEW_MPIEXEC_EXECUTABLE=\"${MPIEXEC_EXECUTABLE}\""
     "PARAVIEW_MPI_NUMPROC_FLAG=\"${MPIEXEC_NUMPROC_FLAG}\""
-    "PARAVIEW_MPI_MAX_NUMPROCS=${MPIEXEC_MAX_NUMPROCS}")
+    # FIXME: This is currently hard-coded to 2 since the maximum isn't
+    # sensible. However, there is no command line flag to override the number
+    # of processes to use for a given test, so instead, just use 2 for now.
+    "PARAVIEW_MPI_MAX_NUMPROCS=2")
+    #"PARAVIEW_MPI_MAX_NUMPROCS=${MPIEXEC_MAX_NUMPROCS}")
 
   if (MPI_PREFLAGS)
     list(APPEND mpi_defines
