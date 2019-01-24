@@ -721,10 +721,33 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromHyperTreeGrid(vtkHyperTreeGrid* data)
 {
-  // Most of the work for these is done in CopyFromDataSet.
   this->NumberOfTrees = data->GetMaxNumberOfTrees();
   this->NumberOfVertices = data->GetNumberOfVertices();
   this->NumberOfLeaves = data->GetNumberOfLeaves();
+
+  int idx;
+  double* bds;
+
+  this->SetDataClassName(data->GetClassName());
+  this->DataSetType = data->GetDataObjectType();
+
+  this->NumberOfDataSets = 1;
+
+  bds = data->GetBounds();
+  for (idx = 0; idx < 6; ++idx)
+  {
+    this->Bounds[idx] = bds[idx];
+  }
+  this->MemorySize = data->GetActualMemorySize();
+
+  this->PointDataInformation->CopyFromDataSetAttributes(data->GetPointData());
+
+  // Copy Field Data information, if any
+  vtkFieldData* fd = data->GetFieldData();
+  if (fd && fd->GetNumberOfArrays() > 0)
+  {
+    this->FieldDataInformation->CopyFromFieldData(fd);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -792,7 +815,6 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (htg)
   {
     this->CopyFromHyperTreeGrid(htg);
-    this->CopyFromDataSet(htg);
     this->CopyCommonMetaData(htg, info);
   }
 
