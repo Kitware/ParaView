@@ -18,6 +18,7 @@ PRIVATE_DEPENDS
   VTK::ParallelMPI
   VTK::jsoncpp
 TEST_DEPENDS
+  VTK::InteractionStyle
   VTK::RenderingOpenGL2
   VTK::ParallelMPI
   VTK::TestingCore
