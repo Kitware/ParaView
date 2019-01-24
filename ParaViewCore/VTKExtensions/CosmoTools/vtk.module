@@ -6,12 +6,15 @@ KIT
   ParaView::Extensions
 DEPENDS
   VTK::CommonCore
-  VTK::CommonDataModel
   VTK::CommonExecutionModel
-  VTK::ParallelCore
+  VTK::IOCore
+  VTK::mpi
 PRIVATE_DEPENDS
-  ParaView::VTKExtensionsDefault
+  ParaView::VTKExtensionsCore
   ParaView::cosmohalofinder
+  VTK::CommonDataModel
+  VTK::CommonMisc
+  VTK::ParallelCore
   VTK::ParallelMPI
   VTK::jsoncpp
 TEST_DEPENDS
