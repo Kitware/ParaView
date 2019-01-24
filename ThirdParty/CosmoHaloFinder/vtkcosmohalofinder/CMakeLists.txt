@@ -25,9 +25,14 @@ set(headers
   CosmoHalo.h
   "${CMAKE_CURRENT_BINARY_DIR}/vtkCosmoHaloFinderModule.h")
 
+set(private_headers
+  Timer.h
+  Timings.h)
+
 vtk_module_add_module(ParaView::cosmohalofinder
   CLASSES ${classes}
   HEADERS ${headers}
+  PRIVATE_HEADERS ${private_headers}
   HEADERS_SUBDIR "vtkcosmohalofinder")
 target_link_libraries(cosmohalofinder
   PRIVATE
