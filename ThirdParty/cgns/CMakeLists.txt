@@ -5,7 +5,7 @@ vtk_module_third_party(
     STANDARD_INCLUDE_DIRS
   EXTERNAL
     PACKAGE CGNS
-    TARGET  CGNS::CGNS
+    TARGETS CGNS::CGNS
     STANDARD_INCLUDE_DIRS)
 
 configure_file(
