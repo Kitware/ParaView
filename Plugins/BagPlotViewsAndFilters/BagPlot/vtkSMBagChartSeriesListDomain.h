@@ -24,11 +24,13 @@
 #ifndef vtkSMBagChartSeriesListDomain_h
 #define vtkSMBagChartSeriesListDomain_h
 
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
 #include "vtkSMChartSeriesListDomain.h"
 
 class vtkPVDataInformation;
 
-class VTK_EXPORT vtkSMBagChartSeriesListDomain : public vtkSMChartSeriesListDomain
+class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkSMBagChartSeriesListDomain
+  : public vtkSMChartSeriesListDomain
 {
 public:
   static vtkSMBagChartSeriesListDomain* New();

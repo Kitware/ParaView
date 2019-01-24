@@ -23,13 +23,15 @@
 #ifndef vtkPVBagChartRepresentation_h
 #define vtkPVBagChartRepresentation_h
 
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
 #include "vtkChartRepresentation.h"
 
 class vtkChartXY;
 class vtkImageData;
 class vtkScalarsToColors;
 
-class VTK_EXPORT vtkPVBagChartRepresentation : public vtkChartRepresentation
+class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkPVBagChartRepresentation
+  : public vtkChartRepresentation
 {
 public:
   static vtkPVBagChartRepresentation* New();
