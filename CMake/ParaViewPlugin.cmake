@@ -664,9 +664,10 @@ function (paraview_add_plugin name)
       ParaView::pqComponents)
   endif ()
 
+  set(_paraview_add_plugin_with_resources 0)
   set(_paraview_add_plugin_resources_init)
   if (_paraview_add_plugin_UI_RESOURCES)
-    set(_paraview_add_plugin_with_ui 1)
+    set(_paraview_add_plugin_with_resources 1)
     set(CMAKE_AUTORCC 1)
     if (NOT BUILD_SHARED_LIBS)
       foreach (_paraview_add_plugin_ui_resource IN LISTS _paraview_add_plugin_UI_RESOURCES)
@@ -691,11 +692,14 @@ function (paraview_add_plugin name)
       ${_paraview_add_plugin_UI_FILES})
   endif ()
 
-  if (_paraview_add_plugin_with_ui)
+  if (_paraview_add_plugin_with_ui OR _paraview_add_plugin_with_resources)
     find_package(Qt5 QUIET REQUIRED COMPONENTS Core ${_paraview_add_plugin_qt_extra_components})
     list(APPEND _paraview_add_plugin_required_libraries
-      ParaView::pqCore
       Qt5::Core)
+    if (_paraview_add_plugin_with_ui)
+      list(APPEND _paraview_add_plugin_required_libraries
+        ParaView::pqCore)
+    endif ()
   endif ()
 
   set(_paraview_add_plugin_with_python 0)

@@ -8,6 +8,7 @@
 #cmakedefine01 _paraview_add_plugin_SERVER_MANAGER_XML
 #cmakedefine01 _paraview_add_plugin_MODULES
 #cmakedefine01 _paraview_add_plugin_UI_INTERFACES
+#cmakedefine01 _paraview_add_plugin_with_resources
 
 #if _paraview_add_plugin_EULA
 #include "@_paraview_add_plugin_eula_header@"
@@ -130,10 +131,12 @@ void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string
 //-----------------------------------------------------------------------------
 @_paraview_build_plugin@Plugin::@_paraview_build_plugin@Plugin()
 {
-#if !defined(BUILD_SHARED_LIBS) && _paraview_add_plugin_with_ui
-  // For static builds, initialize the Qt resources as well as the Qt plugin.
+#if !defined(BUILD_SHARED_LIBS) && _paraview_add_plugin_with_resources
+  // For static builds, initialize the Qt resources.
 @_paraview_add_plugin_resources_init@
-  // Qt 5
+#endif
+#if !defined(BUILD_SHARED_LIBS) && _paraview_add_plugin_with_ui
+  // For static builds, initialize the Qt plugin.
   Q_IMPORT_PLUGIN(@_paraview_build_plugin@Plugin)
 #endif
 }
