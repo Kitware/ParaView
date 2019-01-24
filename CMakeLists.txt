@@ -675,6 +675,7 @@ vtk_module_build(
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
 
 paraview_plugin_build(
+  RUNTIME_DESTINATION   "${CMAKE_INSTALL_BINDIR}"
   LIBRARY_DESTINATION   "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY_SUBDIRECTORY  "paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}/plugins"
   PLUGINS_FILE_NAME ".plugins"

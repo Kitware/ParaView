@@ -237,6 +237,7 @@ paraview_plugin_build(
   [TARGET <target>]
   [AUTOLOAD <plugin>...]
 
+  [RUNTIME_DESTINATION <destination>]
   [LIBRARY_DESTINATION <destination>]
   [LIBRARY_SUBDIRECTORY <subdirectory>]
 
@@ -249,11 +250,14 @@ paraview_plugin_build(
     initializes static plugins. The function is provided, but is a no-op for
     shared plugin builds.
   * `AUTOLOAD`: A list of plugins to mark for autoloading.
+  * `RUNTIME_DESTINATION`: (Defaults to `${CMAKE_INSTALL_BINDIR}`) Where to
+    install runtime files.
   * `LIBRARY_DESTINATION`: (Defaults to `${CMAKE_INSTALL_LIBDIR}`) Where to
     install modules built by plugins.
   * `LIBRARY_SUBDIRECTORY`: (Defaults to `""`) Where to install the plugins
     themselves. Each plugin lives in a directory of its name in
-    `<LIBRARY_DESTINATION>/<LIBRARY_SUBDIRECTORY>`.
+    `<RUNTIME_DESTINATION>/<LIBRARY_SUBDIRECTORY>` (for Windows) or
+    `<LIBRARY_DESTINATION>/<LIBRARY_SUBDIRECTORY>` for other platforms.
   * `PLUGINS_FILE_NAME`: The name of the XML plugin file to generate for the
     built plugins. This file will be placed under
     `<LIBRARY_DESTINATION>/<LIBRARY_SUBDIRECTORY>`. It will be installed with
@@ -262,7 +266,7 @@ paraview_plugin_build(
 function (paraview_plugin_build)
   cmake_parse_arguments(_paraview_build
     ""
-    "LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME"
+    "RUNTIME_DESTINATION;LIBRARY_DESTINATION;LIBRARY_SUBDIRECTORY;TARGET;PLUGINS_FILE_NAME"
     "PLUGINS;AUTOLOAD"
     ${ARGN})
 
@@ -272,6 +276,10 @@ function (paraview_plugin_build)
       "${_paraview_build_UNPARSED_ARGUMENTS}")
   endif ()
 
+  if (NOT DEFINED _paraview_build_RUNTIME_DESTINATION)
+    set(_paraview_build_RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}")
+  endif ()
+
   if (NOT DEFINED _paraview_build_LIBRARY_DESTINATION)
     set(_paraview_build_LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}")
   endif ()
@@ -279,6 +287,13 @@ function (paraview_plugin_build)
   if (NOT DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
     set(_paraview_build_LIBRARY_SUBDIRECTORY "")
   endif ()
+
+  if (WIN32)
+    set(_paraview_build_plugin_destination "${_paraview_build_RUNTIME_DESTINATION}")
+  else ()
+    set(_paraview_build_plugin_destination "${_paraview_build_LIBRARY_DESTINATION}")
+  endif ()
+  string(APPEND _paraview_build_plugin_destination "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
 
   foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
     get_property(_paraview_build_plugin_file GLOBAL
@@ -389,11 +404,7 @@ bool ${_paraview_build_TARGET}_static_plugins_func(const char* name, bool load)
 
   if (DEFINED _paraview_build_PLUGINS_FILE_NAME)
     set(_paraview_build_xml_file
-      "${CMAKE_BINARY_DIR}/${_paraview_build_LIBRARY_DESTINATION}")
-    if (DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
-      string(APPEND _paraview_build_xml_file "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
-    endif ()
-    string(APPEND _paraview_build_xml_file "/${_paraview_build_PLUGINS_FILE_NAME}")
+      "${CMAKE_BINARY_DIR}/${_paraview_build_plugin_destination}/${_paraview_build_PLUGINS_FILE_NAME}")
     set(_paraview_build_xml_content
       "<?xml version=\"1.0\"?>\n<Plugins>\n")
     foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
@@ -413,7 +424,7 @@ bool ${_paraview_build_TARGET}_static_plugins_func(const char* name, bool load)
       CONTENT "${_paraview_build_xml_content}")
     install(
       FILES       "${_paraview_build_xml_file}"
-      DESTINATION "${_paraview_build_LIBRARY_DESTINATION}/${_paraview_build_LIBRARY_SUBDIRECTORY}"
+      DESTINATION "${_paraview_build_plugin_destination}"
       COMPONENT   "plugin")
   endif ()
 endfunction ()
@@ -764,6 +775,11 @@ function (paraview_add_plugin name)
     "${_paraview_plugin_source_dir}/paraview_plugin.cxx.in"
     "${_paraview_add_plugin_source}")
 
+  if (WIN32)
+    # On Windows, we want `MODULE` libraries to go to the runtime directory,
+    # but CMake always uses `CMAKE_LIBRARY_OUTPUT_DIRECTORY`.
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+  endif ()
   if (DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
     string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
   endif ()
@@ -805,7 +821,7 @@ function (paraview_add_plugin name)
       PREFIX "")
 
   set(_paraview_add_plugin_destination
-    "${_paraview_build_LIBRARY_DESTINATION}/${_paraview_build_LIBRARY_SUBDIRECTORY}/${_paraview_build_plugin}")
+    "${_paraview_build_plugin_destination}/${_paraview_build_plugin}")
   install(
     TARGETS "${_paraview_build_plugin}"
     COMPONENT "plugin"
