@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkPVVTKExtensionsSIL
 KIT
-  ParaView::Extensions
+  ParaView::CoreKit
 DEPENDS
   VTK::CommonCore
 PRIVATE_DEPENDS

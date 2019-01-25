@@ -15,6 +15,7 @@ PRIVATE_DEPENDS
 TEST_DEPENDS
   ParaView::Animation
   ParaView::ServerManagerApplication
+  VTK::FiltersVerdict
   VTK::TestingRendering
 TEST_LABELS
   ParaView

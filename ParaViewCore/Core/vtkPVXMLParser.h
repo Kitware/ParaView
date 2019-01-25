@@ -22,13 +22,13 @@
 #ifndef vtkPVXMLParser_h
 #define vtkPVXMLParser_h
 
-#include "vtkPVCommonModule.h" // needed for export macro
-#include "vtkSmartPointer.h"   // needed for vtkSmartPointer.
+#include "vtkPVCoreModule.h" // needed for export macro
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 #include "vtkXMLParser.h"
 
 class vtkPVXMLElement;
 
-class VTKPVCOMMON_EXPORT vtkPVXMLParser : public vtkXMLParser
+class VTKPVCORE_EXPORT vtkPVXMLParser : public vtkXMLParser
 {
 public:
   vtkTypeMacro(vtkPVXMLParser, vtkXMLParser);

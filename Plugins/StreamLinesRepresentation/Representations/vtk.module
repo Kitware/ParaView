@@ -3,10 +3,10 @@ NAME
 LIBRARY_NAME
   vtkStreamLines
 DEPENDS
+  ParaView::ClientServerCoreRendering
   VTK::CommonCore
   VTK::RenderingCore
 PRIVATE_DEPENDS
-  ParaView::ClientServerCoreRendering
   ParaView::VTKExtensionsRendering
   VTK::CommonCore
   VTK::CommonDataModel

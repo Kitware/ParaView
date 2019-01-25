@@ -5,9 +5,9 @@ LIBRARY_NAME
 GROUPS
   ParaViewCore
 KIT
-  ParaView::Extensions
+  ParaView::CoreKit
 DEPENDS
-  ParaView::Common
+  ParaView::Core
   VTK::CommonMisc
   VTK::FiltersCore
   VTK::FiltersSources

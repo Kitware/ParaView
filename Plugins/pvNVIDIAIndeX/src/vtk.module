@@ -4,7 +4,7 @@ LIBRARY_NAME
   vtkIndeXRepresentations
 DEPENDS
   ParaView::ClientServerCoreRendering
-  ParaView::Common
+  ParaView::Core
   VTK::CommonCore
   VTK::CommonTransforms
   VTK::IOXMLParser

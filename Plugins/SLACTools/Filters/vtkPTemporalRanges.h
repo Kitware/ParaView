@@ -29,11 +29,12 @@
 #ifndef vtkPTemporalRanges_h
 #define vtkPTemporalRanges_h
 
+#include "vtkSLACFiltersModule.h" // for export macro
 #include "vtkTemporalRanges.h"
 
 class vtkMultiProcessController;
 
-class vtkPTemporalRanges : public vtkTemporalRanges
+class VTKSLACFILTERS_EXPORT vtkPTemporalRanges : public vtkTemporalRanges
 {
 public:
   vtkTypeMacro(vtkPTemporalRanges, vtkTemporalRanges);

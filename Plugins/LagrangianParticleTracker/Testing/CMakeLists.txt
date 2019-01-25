@@ -2,7 +2,29 @@ if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
   ExternalData_Expand_Arguments("ParaViewData" _
     "DATA{Data/LagrangianParticleTracker/,REGEX:.*}"
     "DATA{Data/LagrangianParticleTracker/flow/,REGEX:.*}"
-    "DATA{Data/LagrangianParticleTracker/surface/,REGEX:.*}")
+    "DATA{Data/LagrangianParticleTracker/surface/,REGEX:.*}"
+
+    "DATA{Data/Baseline/LagrangianParticleTracker.png}"
+    "DATA{Data/Baseline/LagrangianParticleTracker_InterA.png}"
+    "DATA{Data/Baseline/LagrangianParticleTracker_InterB.png}"
+    "DATA{Data/Baseline/LagrangianParticleTracker_InterF.png}"
+    "DATA{Data/Baseline/LagrangianParticleTracker_InterG.png}"
+    "DATA{Data/Baseline/LagrangianParticleTracker_InterH.png}"
+    "DATA{Data/Baseline/LagrangianParticleTracker_InterI.png}"
+    "DATA{Data/Baseline/LagrangianParticleTracker_InterJ.png}"
+
+    "DATA{Data/Baseline/LagrangianParticleTrackerParallel.png}"
+    "DATA{Data/Baseline/LagrangianParticleTrackerParallel_InterA.png}"
+    "DATA{Data/Baseline/LagrangianParticleTrackerParallel_InterB.png}"
+
+    "DATA{Data/Baseline/LagrangianParticleTrackerParallelDistributed.png}"
+    "DATA{Data/Baseline/LagrangianParticleTrackerParallelDistributed_InterA.png}"
+
+    "DATA{Data/Baseline/LagrangianParticleTrackerParallelSurfDistributed.png}"
+    "DATA{Data/Baseline/LagrangianParticleTrackerParallelSurfDistributed_1.png}"
+
+    "DATA{Data/Baseline/LagrangianParticleTrackerReseeding.png}"
+    "DATA{Data/Baseline/LagrangianSurfaceHelperComposite.png}")
 
   paraview_add_client_tests(
     LOAD_PLUGIN "LagrangianParticleTracker"

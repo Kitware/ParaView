@@ -1,14 +1,16 @@
-#ifndef VTKPVRANDOMPOINTSSTREAMINGSOURCE_H
-#define VTKPVRANDOMPOINTSSTREAMINGSOURCE_H
+#ifndef vtkPVRandomPointsStreamingSource_h
+#define vtkPVRandomPointsStreamingSource_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkStreamingParticlesModule.h" // for export macro
 
 // Description:
 // This class generateds a multiblock datastructure of random points in space.
 // The dataset generated is an octree of blocks, with one block on the first
 // level, eight on the second, etc...
 
-class vtkPVRandomPointsStreamingSource : public vtkMultiBlockDataSetAlgorithm
+class VTKSTREAMINGPARTICLES_EXPORT vtkPVRandomPointsStreamingSource
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkPVRandomPointsStreamingSource, vtkMultiBlockDataSetAlgorithm);
@@ -47,4 +49,4 @@ protected:
   vtkInternals* Internal;
 };
 
-#endif // VTKPVRANDOMPOINTSSTREAMINGSOURCE_H
+#endif // vtkPVRandomPointsStreamingSource_h

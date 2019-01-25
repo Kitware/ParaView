@@ -1,11 +1,11 @@
 NAME
-  ParaView::Common
+  ParaView::Core
 LIBRARY_NAME
-  vtkPVCommon
+  vtkPVCore
 GROUPS
   ParaViewCore
 KIT
-  ParaView::Core
+  ParaView::CoreKit
 DEPENDS
   ParaView::ClientServer
   VTK::CommonCore

@@ -4,8 +4,8 @@ VTK's module system has been updated and ParaView now works with it. CMake
 variables have changed names:
 
   - `Module_X` becomes `VTK_MODULE_ENABLE_M` where X is the "library name"
-    (e.g., `vtkPVCommon` and `M` is the sanitized module name (e.g.,
-    `ParaView::Common`'s sanitized name is `ParaView_Common`).
+    (e.g., `vtkPVCore` and `M` is the sanitized module name (e.g.,
+    `ParaView::Core`'s sanitized name is `ParaView_Core`).
   - `PARAVIEW_BUILD_PLUGIN_P` becomes `PARAVIEW_PLUGIN_ENABLE_P`. Enabling a
     plugin now requests that its required modules are built.
   - ParaView's flags forcefully disable some modules. For example, ParaView

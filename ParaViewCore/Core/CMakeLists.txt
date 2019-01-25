@@ -47,6 +47,6 @@ configure_file(
 set(headers
   "${CMAKE_CURRENT_BINARY_DIR}/vtkPVConfig.h")
 
-vtk_module_add_module(ParaView::Common
+vtk_module_add_module(ParaView::Core
   CLASSES ${classes}
   HEADERS ${headers})

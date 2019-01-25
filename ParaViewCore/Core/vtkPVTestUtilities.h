@@ -23,12 +23,12 @@
 #define vtkPVTestUtilities_h
 
 #include "vtkObject.h"
-#include "vtkPVCommonModule.h" // needed for export macro
+#include "vtkPVCoreModule.h" // needed for export macro
 
 class vtkPolyData;
 class vtkDataArray;
 
-class VTKPVCOMMON_EXPORT vtkPVTestUtilities : public vtkObject
+class VTKPVCORE_EXPORT vtkPVTestUtilities : public vtkObject
 {
 public:
   // the usual vtk stuff

@@ -5,7 +5,7 @@ DESCRIPTION
 REQUIRES_MODULES
   ParaView::ClientServerCoreCore
   ParaView::ClientServerCoreRendering
-  ParaView::Common
+  ParaView::Core
   ParaView::ServerManagerDefault
   ParaView::VTKExtensionsRendering
   VTK::CommonCore

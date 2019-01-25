@@ -26,13 +26,13 @@
 #define vtkCommandOptionsXMLParser_h
 
 #include "vtkCommandOptions.h" // for enum
-#include "vtkPVCommonModule.h" // needed for export macro
+#include "vtkPVCoreModule.h"   // needed for export macro
 #include "vtkXMLParser.h"
 
 class vtkCommandOptionsXMLParserInternal;
 class vtkCommandOptions;
 
-class VTKPVCOMMON_EXPORT vtkCommandOptionsXMLParser : public vtkXMLParser
+class VTKPVCORE_EXPORT vtkCommandOptionsXMLParser : public vtkXMLParser
 {
 public:
   static vtkCommandOptionsXMLParser* New();

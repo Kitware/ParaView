@@ -21,9 +21,12 @@ set(classes
 
 vtk_module_add_module(ParaView::VTKExtensionsCosmoTools
   CLASSES ${classes})
+vtk_module_include(ParaView::VTKExtensionsCosmoTools
+  PRIVATE
+    ${GENERIC_IO_INCLUDE_DIR})
 vtk_module_link(ParaView::VTKExtensionsCosmoTools
   PRIVATE
-    )
+    ${GENERIC_IO_LIBRARIES})
 
 paraview_add_server_manager_xmls(
   XMLS  ## CosmoTools Readers

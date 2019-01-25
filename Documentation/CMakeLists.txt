@@ -18,4 +18,4 @@ add_custom_target(ParaViewDoc-TGZ
     ${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}
   WORKING_DIRECTORY ${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/..
   COMMENT "Generate ParaViewGeneratedDocs.tar.gz")
-add_dependencies(ParaViewDoc-TGZ ParaViewDoc)
+add_dependencies(ParaViewDoc-TGZ paraview_doc)

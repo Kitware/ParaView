@@ -31,8 +31,9 @@
 #define vtkSLACPlaneGlyphs_h
 
 #include "vtkPolyDataAlgorithm.h"
+#include "vtkSLACFiltersModule.h" // for export macro
 
-class vtkSLACPlaneGlyphs : public vtkPolyDataAlgorithm
+class VTKSLACFILTERS_EXPORT vtkSLACPlaneGlyphs : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkSLACPlaneGlyphs, vtkPolyDataAlgorithm);

@@ -110,7 +110,7 @@ paraview_add_plugin(VRPlugin
 target_link_libraries (VRPlugin
   LINK_PRIVATE
     ParaView::ClientServerCoreCore
-    ParaView::Common
+    ParaView::Core
     ParaView::ServerManagerCore
     ParaView::ServerManagerRendering
     VTK::CommonCore

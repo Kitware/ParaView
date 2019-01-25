@@ -3,7 +3,7 @@ NAME
 LIBRARY_NAME
   vtkPVClientServerCoreDefault
 KIT
-  ParaView::ClientServer
+  ParaView::ClientServerKit
 DEPENDS
   ParaView::ClientServerCoreRendering
   ParaView::VTKExtensionsDefault

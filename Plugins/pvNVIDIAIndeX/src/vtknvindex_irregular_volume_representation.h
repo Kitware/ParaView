@@ -35,6 +35,8 @@
 
 #include "vtknvindex_rtc_kernel_params.h"
 
+#include "vtkIndeXRepresentationsModule.h"
+
 //#if PARAVIEW_VERSION_MAJOR == 5 && PARAVIEW_VERSION_MINOR >= 2
 #define PARAVIEW_UGRID_USE_PARTITIONS
 //#endif
@@ -62,7 +64,8 @@ class vtknvindex_irregular_volume_mapper;
 // The class vtknvindex_representation represents the base class for distributing and rendering
 // of irregular volume data (unstructured volume grids) in NVIDIA IndeX.
 
-class VTK_EXPORT vtknvindex_irregular_volume_representation : public vtkPVDataRepresentation
+class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_irregular_volume_representation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtknvindex_irregular_volume_representation* New();

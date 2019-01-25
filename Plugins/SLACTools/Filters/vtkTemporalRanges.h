@@ -35,6 +35,7 @@
 #ifndef vtkTemporalRanges_h
 #define vtkTemporalRanges_h
 
+#include "vtkSLACFiltersModule.h" // for export macro
 #include "vtkTableAlgorithm.h"
 
 class vtkCompositeDataSet;
@@ -42,7 +43,7 @@ class vtkDataSet;
 class vtkDoubleArray;
 class vtkFieldData;
 
-class vtkTemporalRanges : public vtkTableAlgorithm
+class VTKSLACFILTERS_EXPORT vtkTemporalRanges : public vtkTableAlgorithm
 {
 public:
   vtkTypeMacro(vtkTemporalRanges, vtkTableAlgorithm);

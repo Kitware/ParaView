@@ -5,9 +5,9 @@ LIBRARY_NAME
 GROUPS
   ParaViewCore
 KIT
-  ParaView::ClientServer
+  ParaView::CoreKit
 DEPENDS
-  ParaView::Common
+  ParaView::Core
   ParaView::VTKExtensionsCore
   ParaView::VTKExtensionsSIL
   VTK::CommonCore

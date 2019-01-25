@@ -223,7 +223,8 @@ mark_as_advanced(PARAVIEW_ENABLE_COSMOTOOLS)
 option(PARAVIEW_ENABLE_CATALYST "Enable Catalyst CoProcessing modules" ON)
 cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
   "Build Adaptors for various simulation codes" OFF
-  "PARAVIEW_ENABLE_CATALYST;NOT WIN32" OFF)
+  # XXX: Adaptors need some work yet.
+  "FALSE;PARAVIEW_ENABLE_CATALYST;NOT WIN32" OFF)
 mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
 
 # XXX(VTK): External VTK is not yet actually supported.
@@ -277,7 +278,7 @@ endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
   list(APPEND paraview_requested_modules
-    ParaView::Common
+    ParaView::Core
     ParaView::ServerManagerApplication
     ParaView::ServerManagerCore
     ParaView::ServerManagerDefault
@@ -332,6 +333,9 @@ endif ()
 
 if (PARAVIEW_ENABLE_NVPIPE)
   list(APPEND paraview_requested_modules
+    ParaView::nvpipe)
+else ()
+  list(APPEND paraview_rejected_modules
     ParaView::nvpipe)
 endif ()
 
@@ -392,7 +396,10 @@ endif ()
 
 if (PARAVIEW_ENABLE_COSMOTOOLS)
   list(APPEND paraview_requested_modules
-    ParaView::PVVTKExtensionsCosmoTools)
+    ParaView::VTKExtensionsCosmoTools)
+else ()
+  list(APPEND paraview_rejected_modules
+    ParaView::VTKExtensionsCosmoTools)
 endif ()
 
 if (PARAVIEW_ENABLE_CATALYST)
@@ -429,6 +436,7 @@ list(APPEND paraview_requested_modules
   ParaView::ProcessXML
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
+  VTK::FiltersVerdict
   VTK::IOTRUCHAS
   VTK::IOTecplotTable
   VTK::IOVeraOut)
@@ -518,8 +526,6 @@ vtk_module_scan(
   REQUEST_MODULES     ${paraview_requested_modules}
                       ${paraview_plugin_required_modules}
   REJECT_MODULES      ${paraview_rejected_modules}
-                      ParaView::nvpipe
-                      ParaView::cosmohalofinder
   PROVIDES_MODULES    paraview_modules
   PROVIDES_KITS       paraview_kits
   REQUIRES_MODULES    paraview_required_modules
@@ -670,6 +676,7 @@ vtk_module_build(
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
 
 paraview_plugin_build(
+  RUNTIME_DESTINATION   "${CMAKE_INSTALL_BINDIR}"
   LIBRARY_DESTINATION   "${CMAKE_INSTALL_LIBDIR}"
   LIBRARY_SUBDIRECTORY  "paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}/plugins"
   PLUGINS_FILE_NAME ".plugins"
@@ -765,7 +772,8 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
   set(is_git TRUE)
 endif ()
 
-if (NOT WIN32 AND is_git)
+# XXX: Disabled for now; needs investigation.
+if (FALSE AND NOT WIN32 AND is_git)
   set(source_all)
   if (PARAVIEW_SOURCE_TARBALL_TARGETS)
     set(source_all ALL)
@@ -799,7 +807,8 @@ endif ()
 
 #-----------------------------------------------------------------------------
 # Build doxygen documentation.
-if (BUILD_DOCUMENTATION)
+# XXX: Disabled for now.
+if (FALSE AND BUILD_DOCUMENTATION)
   add_subdirectory(Utilities/Doxygen)
   add_subdirectory(Utilities/Sphinx)
   add_subdirectory(Documentation)

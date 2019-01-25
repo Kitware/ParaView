@@ -339,6 +339,9 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_AllBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_OneBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_TwoBlocks.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UniformInverseTransformSamplingGlyph_A.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UniformInverseTransformSamplingGlyph_B.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UniformInverseTransformSamplingGlyph_C.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UpdateTransferFunctionRanges1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UpdateTransferFunctionRanges2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/UpdateTransferFunctionRanges3.png}"
@@ -838,9 +841,8 @@ if (PARAVIEW_PLUGIN_ENABLE_pvNVIDIAIndeX)
 endif ()
 
 if(VTK_USE_LARGE_DATA)
-  paraview_test_load_data_dirs(""
-    bake
-  )
+  ExternalData_Expand_Arguments(ParaViewData _
+    "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}")
   list(APPEND TESTS_WITH_BASELINES
     CheckSelectedBlocks.xml
     RestoreBlockColorDefaultTransferFunction.xml
@@ -926,6 +928,8 @@ if (PARAVIEW_USE_MPI)
 
   if (PARAVIEW_ENABLE_COSMOTOOLS)
     # Test the Generic IO file writer in VTKExtensions/CosmoTools
+    ExternalData_Expand_Arguments(ParaViewData _
+      "DATA{${paraview_test_data_directory_input}/Data/genericio/m000.499.allparticles}")
     paraview_add_client_tests(
       ARGS --mpi
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}

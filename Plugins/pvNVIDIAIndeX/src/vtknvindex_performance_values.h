@@ -35,6 +35,8 @@
 
 #include <nv/index/iindex.h>
 
+#include "vtkIndeXRepresentationsModule.h"
+
 class vtknvindex_application;
 
 // The class vtknvindex_performance_values represents a helper class to collect
@@ -63,7 +65,7 @@ private:
 };
 
 // General use system information
-class VTK_EXPORT vtknvindex_sysinfo
+class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_sysinfo
 {
 public:
   vtknvindex_sysinfo();
