@@ -343,6 +343,12 @@ bool createWidgets(QMap<QString, pqWidget*>& widgets, QDialog& dialog,
         QLineEdit* widget = new QLineEdit(QString(), &dialog);
         widgets[name] = new pqWidget(widget, "text");
       }
+      else if (strcmp(typeNode->GetName(), "Password") == 0)
+      {
+        QLineEdit* widget = new QLineEdit(QString(), &dialog);
+        widget->setEchoMode(QLineEdit::Password);
+        widgets[name] = new pqWidget(widget, "text");
+      }
       else if (strcmp(typeNode->GetName(), "File") == 0)
       {
         pqFileChooserWidget* widget = new pqFileChooserWidget(&dialog);
