@@ -39,6 +39,7 @@ set(classes
   vtkCleanArrays
   vtkCompositeDataToUnstructuredGridFilter
   vtkContext2DScalarBarActor
+  vtkDataObjectTreeToPointSetFilter
   vtkImageCompressor
   vtkImageTransparencyFilter
   vtkKdTreeGenerator
