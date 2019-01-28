@@ -80,7 +80,7 @@ if (NVINDEX_SKIP_BUILD_RPATH)
 endif ()
 
 if (NVINDEX_INTERNAL_BUILD)
-  vtk_module_define(pvNVIDIAIndeX::IndeXRepresentations
+  vtk_module_definitions(pvNVIDIAIndeX::IndeXRepresentations
     PRIVATE
       NVINDEX_INTERNAL_BUILD)
 endif ()

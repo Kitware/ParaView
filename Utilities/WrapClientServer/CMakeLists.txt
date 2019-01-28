@@ -32,7 +32,7 @@
 if (NOT TARGET ParaView::WrapClientServer)
   vtk_module_add_executable(ParaView::WrapClientServer vtkWrapClientServer.c)
   if (PARAVIEW_USE_UNIFIED_BINDINGS)
-    vtk_module_define(ParaView::WrapClientServer
+    vtk_module_definitions(ParaView::WrapClientServer
       PRIVATE
         PARAVIEW_USE_UNIFIED_BINDINGS)
   endif ()

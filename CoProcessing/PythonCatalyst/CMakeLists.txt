@@ -55,7 +55,7 @@ vtk_module_add_module(ParaView::PythonCatalyst
 vtk_module_client_server_exclude()
 
 if (catalyst_fortran_using_mangling)
-  vtk_module_define(ParaView::PythonCatalyst
+  vtk_module_definitions(ParaView::PythonCatalyst
     PRIVATE
       CATALYST_FORTRAN_USING_MANGLING=1)
 endif ()

@@ -21,7 +21,7 @@ endif ()
 vtk_module_add_module(GMVReader::vtkGMVReader
   CLASSES ${classes}
   PRIVATE_HEADERS ${private_headers})
-vtk_module_define(GMVReader::vtkGMVReader
+vtk_module_definitions(GMVReader::vtkGMVReader
   PRIVATE
     "PARAVIEW_PLUGIN_GMVReader_SKIP_DATARANGE_CALCULATIONS=${skip_datarange_calculations}"
     # Disable deprecation warnings for C and STL functions for MSVC.
