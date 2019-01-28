@@ -151,11 +151,6 @@ function (paraview_server_manager_process_files)
       "${_paraview_sm_process_files_UNPARSED_ARGUMENTS}")
   endif ()
 
-  if (NOT _paraview_sm_process_files_FILES)
-    message(FATAL_ERROR
-      "The `FILES` argument is required.")
-  endif ()
-
   if (NOT DEFINED _paraview_sm_process_files_TARGET)
     message(FATAL_ERROR
       "The `TARGET` argument is required.")
