@@ -366,7 +366,7 @@ endif ()
 
 if (PARAVIEW_ENABLE_VISITBRIDGE)
   list(APPEND paraview_requested_modules
-    VTK::IOVisItBridge)
+    ParaView::IOVisItBridge)
 endif ()
 
 if (PARAVIEW_ENABLE_XDMF2)
