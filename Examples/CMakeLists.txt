@@ -37,10 +37,10 @@ endif ()
 
 add_example(Plugins/Autostart)
 add_example(Plugins/DockWidget)
+add_example(Plugins/ElevationFilter)
 
 if (FALSE)
 
-add_subdirectory(Plugins/Filter)
 add_subdirectory(Plugins/ParametricSource)
 add_subdirectory(Plugins/SMProxy)
 add_subdirectory(Plugins/Representation)

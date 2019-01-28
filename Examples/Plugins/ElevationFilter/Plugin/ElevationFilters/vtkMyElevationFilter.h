@@ -23,9 +23,10 @@
 #ifndef vtkMyElevationFilter_h
 #define vtkMyElevationFilter_h
 
+#include "ElevationFiltersModule.h" // for export macro
 #include "vtkElevationFilter.h"
 
-class VTK_EXPORT vtkMyElevationFilter : public vtkElevationFilter
+class ELEVATIONFILTERS_EXPORT vtkMyElevationFilter : public vtkElevationFilter
 {
 public:
   static vtkMyElevationFilter* New();
