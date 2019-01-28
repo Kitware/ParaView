@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
-   <SourceProxy name="MyPNGReader" 
+   <SourceProxy name="MyPNGReader"
                 class="vtkPNGReader"
                 label="PNG reader">
      <Documentation
@@ -27,4 +27,3 @@
    </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
-
