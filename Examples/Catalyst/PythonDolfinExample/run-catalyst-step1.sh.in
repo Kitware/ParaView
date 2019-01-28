@@ -1,2 +1,2 @@
-LD_LIBRARY_PATH=@LDLIBRARYPATH@:${LD_LIBRARY_PATH} \
-python @DOLFIN_EXAMPLE_SOURCE_DIR@/simulation-catalyst-step1.py @DOLFIN_EXAMPLE_SOURCE_DIR@/CatalystScriptTest.py 1000
+#!/bin/sh
+python "@DOLFIN_EXAMPLE_SOURCE_DIR@/simulation-catalyst-step1.py" "@DOLFIN_EXAMPLE_SOURCE_DIR@/CatalystScriptTest.py" 1000

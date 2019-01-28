@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iterator>
 #include <mpi.h>
 #include <stdlib.h>
 

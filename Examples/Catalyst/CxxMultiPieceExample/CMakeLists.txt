@@ -1,38 +1,28 @@
-cmake_minimum_required(VERSION 3.3)
-project(CatalystCxxMultiPieceExample)
-
-set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
-if(USE_CATALYST)
-  find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
-  include("${PARAVIEW_USE_FILE}")
-  set(Adaptor_SRCS
+if (USE_CATALYST)
+  add_library(CxxMultiPieceExampleAdaptor
     FEAdaptor.cxx
-    )
-  add_library(CxxMultiPieceExampleAdaptor ${Adaptor_SRCS})
-  target_link_libraries(CxxMultiPieceExampleAdaptor vtkPVPythonCatalyst)
-  add_definitions("-DUSE_CATALYST")
-  if(NOT PARAVIEW_USE_MPI)
-    message(SEND_ERROR "ParaView must be built with MPI enabled")
-  endif()
-else()
-  find_package(MPI REQUIRED)
-  include_directories(${MPI_CXX_INCLUDE_PATH})
-endif()
+    FEAdaptor.h)
+  target_link_libraries(CxxMultiPieceExampleAdaptor
+    PRIVATE
+      ParaView::PythonCatalyst
+      VTK::mpi)
+endif ()
 
-add_executable(CxxMultiPieceExample FEDriver.cxx FEDataStructures.cxx)
-if(USE_CATALYST)
-  target_link_libraries(CxxMultiPieceExample LINK_PRIVATE CxxMultiPieceExampleAdaptor)
-  include(vtkModuleMacros)
-  include(vtkMPI)
-  vtk_mpi_link(CxxMultiPieceExample)
-else()
-  target_link_libraries(CxxMultiPieceExample LINK_PRIVATE ${MPI_LIBRARIES})
-endif()
+add_executable(CxxMultiPieceExample
+  FEDataStructures.cxx
+  FEDataStructures.h
+  FEDriver.cxx)
+if (TARGET CxxMultiPieceExampleAdaptor)
+  target_link_libraries(CxxMultiPieceExample
+    PRIVATE
+      CxxMultiPieceExampleAdaptor
+      VTK::mpi)
+else ()
+  target_link_libraries(CxxMultiPieceExample
+    PRIVATE
+      MPI::MPI_C)
+endif ()
 
-option(BUILD_TESTING "Build Testing" OFF)
-# Setup testing.
 if (BUILD_TESTING)
-  include(CTest)
   add_test(NAME CxxMultiPieceExampleTest COMMAND CxxMultiPieceExample ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
-  set_tests_properties(CxxMultiPieceExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()

@@ -1,38 +1,27 @@
-cmake_minimum_required(VERSION 3.3)
-project(CatalystCxxImageDataExample)
-
-set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
-if(USE_CATALYST)
-  find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
-  include("${PARAVIEW_USE_FILE}")
-  set(Adaptor_SRCS
+if (USE_CATALYST)
+  add_library(CxxImageDataExampleAdaptor
     FEAdaptor.cxx
-    )
-  add_library(CxxImageDataExampleAdaptor ${Adaptor_SRCS})
-  target_link_libraries(CxxImageDataExampleAdaptor vtkPVPythonCatalyst)
-  add_definitions("-DUSE_CATALYST")
-  if(NOT PARAVIEW_USE_MPI)
-    message(SEND_ERROR "ParaView must be built with MPI enabled")
-  endif()
-else()
-  find_package(MPI REQUIRED)
-  include_directories(${MPI_CXX_INCLUDE_PATH})
-endif()
+    FEAdaptor.h)
+  target_link_libraries(CxxImageDataExampleAdaptor
+    PRIVATE
+      ParaView::PythonCatalyst)
+endif ()
 
-add_executable(CxxImageDataExample FEDriver.cxx FEDataStructures.cxx)
-if(USE_CATALYST)
-  target_link_libraries(CxxImageDataExample LINK_PRIVATE CxxImageDataExampleAdaptor)
-  include(vtkModuleMacros)
-  include(vtkMPI)
-  vtk_mpi_link(CxxImageDataExample)
-else()
-  target_link_libraries(CxxImageDataExample LINK_PRIVATE ${MPI_LIBRARIES})
-endif()
+add_executable(CxxImageDataExample
+  FEDataStructures.cxx
+  FEDataStructures.h
+  FEDriver.cxx)
+if (TARGET CxxImageDataExampleAdaptor)
+  target_link_libraries(CxxImageDataExample
+    PRIVATE
+      CxxImageDataExampleAdaptor
+      VTK::mpi)
+else ()
+  target_link_libraries(CxxImageDataExample
+    PRIVATE
+      MPI::MPI_C)
+endif ()
 
-option(BUILD_TESTING "Build Testing" OFF)
-# Setup testing.
 if (BUILD_TESTING)
-  include(CTest)
   add_test(NAME CxxImageDataExampleTest COMMAND CxxImageDataExample ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
-  set_tests_properties(CxxImageDataExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()

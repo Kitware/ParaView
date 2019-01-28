@@ -61,10 +61,4 @@ add_example(CustomApplications/MultiServerClient)
 # TODO Update this custom application to load only specific data types.
 # add_example(CustomApplications/Spreadsheet)
 
-if (FALSE)
-
-if (ENABLE_CATALYST)
-  add_subdirectory(Catalyst)
-endif ()
-
-endif ()
+add_example(Catalyst)

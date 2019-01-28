@@ -1,6 +1,7 @@
 #include "FEDataStructures.h"
 
 #include <iostream>
+#include <iterator>
 #include <mpi.h>
 
 Grid::Grid()
