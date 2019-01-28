@@ -3,7 +3,7 @@
     <Proxy name="ParametricBoy" class="vtkParametricBoy"/>
     <Proxy name="ParametricConicSpiral" class="vtkParametricConicSpiral">
       <DoubleVectorProperty name="TubeRadius" command="SetA"
-         animateable="1" 
+         animateable="1"
          number_of_elements="1" default_values="0.2">
          <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
@@ -24,8 +24,8 @@
   </ProxyGroup>
 
   <ProxyGroup name="sources">
-   <SourceProxy name="ParametricSource" 
-                class="vtkParametricFunctionSource" 
+   <SourceProxy name="ParametricSource"
+                class="vtkParametricFunctionSource"
                 label="Parametric Source">
      <ProxyProperty
        command="SetParametricFunction"
@@ -40,4 +40,3 @@
    </SourceProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>
-

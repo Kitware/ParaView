@@ -45,10 +45,10 @@ add_example(Plugins/OverrideXMLOnly)
 add_example(Plugins/PropertyWidgets)
 add_example(Plugins/ReaderXMLOnly)
 add_example(Plugins/Representation)
+add_example(Plugins/SMParametricSource)
 
 if (FALSE)
 
-add_subdirectory(Plugins/ParametricSource)
 add_subdirectory(Plugins/SMProxy)
 
 if (ENABLE_CATALYST)

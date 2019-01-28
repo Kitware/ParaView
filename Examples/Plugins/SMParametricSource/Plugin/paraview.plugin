@@ -1,0 +1,7 @@
+NAME
+  SMParametricSource
+DESCRIPTION
+  An example ParaView plugin containing server manager xml for classes already
+  part of ParaView's build. This plugin can be loaded on the server side.
+REQUIRES_MODULES
+  VTK::FiltersSources
