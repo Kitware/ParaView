@@ -45,7 +45,7 @@ configure_file(
 set(headers
   "${CMAKE_CURRENT_BINARY_DIR}/vtkCPConfig.h")
 
-set(CATALYST_FORTRAN_USING_MANGLING)
+set(catalyst_fortran_using_mangling)
 
 if (CMAKE_Fortran_COMPILER_WORKS)
   include(FortranCInterface)
@@ -57,7 +57,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
       needtocreategrid
       coprocess)
 
-  set(CATALYST_FORTRAN_USING_MANGLING "${FortranCInterface_GLOBAL_FOUND}")
+  set(catalyst_fortran_using_mangling "${FortranCInterface_GLOBAL_FOUND}")
 
   list(APPEND classes
     FortranAdaptorAPI)
@@ -70,7 +70,7 @@ vtk_module_add_module(ParaView::Catalyst
   HEADERS ${headers})
 vtk_module_client_server_exclude()
 
-if (CATALYST_FORTRAN_USING_MANGLING)
+if (catalyst_fortran_using_mangling)
   vtk_module_define(ParaView::Catalyst
     PRIVATE
       CATALYST_FORTRAN_USING_MANGLING=1)
