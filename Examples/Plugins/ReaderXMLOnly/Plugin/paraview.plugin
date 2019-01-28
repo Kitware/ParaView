@@ -1,0 +1,6 @@
+NAME
+  ReaderXMLOnly
+DESCRIPTION
+  An example plugin which adds a reader via a server manager XML file.
+REQUIRES_MODULES
+  VTK::IOImage

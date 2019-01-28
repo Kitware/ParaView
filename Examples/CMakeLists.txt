@@ -43,6 +43,7 @@ add_example(Plugins/LagrangianIntegrationModel)
 add_example(Plugins/MyPNGReader)
 add_example(Plugins/OverrideXMLOnly)
 add_example(Plugins/PropertyWidgets)
+add_example(Plugins/ReaderXMLOnly)
 
 if (FALSE)
 
@@ -55,7 +56,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  add_subdirectory(Plugins/ReaderXMLOnly)
   # TODO: update this plugin to use the pipeline controller instead.
   #add_subdirectory(Plugins/RepresentationBehavior)
   add_subdirectory(Plugins/SourceToolbar)
