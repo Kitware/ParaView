@@ -11,6 +11,8 @@ The following variables are provided by this module:
   * `PARAVIEW_ENABLE_PYTHON`: If ParaView is built with Python support.
   * `PARAVIEW_PYTHONPATH`: Where ParaView's Python modules live. Unset if
     Python is not available.
+  * `PARAVIEW_PLUGIN_SUBDIR`: The subdirectory under the library directory for
+    plugins.
   * `ParaView_LIBRARIES`: The list of modules specified by `COMPONENTS` and
     `OPTIONAL_COMPONENTS`. This may be used in `MODULES` arguments in the API
     (e.g., `vtk_module_autoinit`). All modules are also targets and may be
@@ -53,6 +55,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
 set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
 set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
 set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
+set(PARAVIEW_PLUGIN_SUBDIR "paraview-@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@/plugins")
 
 set(_paraview_components_to_check)
 foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
