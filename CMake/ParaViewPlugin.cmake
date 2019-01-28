@@ -850,7 +850,7 @@ TODO: What is a property widget?
 ```
 paraview_plugin_add_property_widget(
   KIND  <WIDGET|GROUP_WIDGET|WIDGET_DECORATOR>
-  TYPE <type> 
+  TYPE <type>
   CLASS_NAME <name>
   INTERFACES <variable>
   SOURCES <variable>)
