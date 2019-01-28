@@ -36,6 +36,7 @@ else ()
 endif ()
 
 add_example(Plugins/Autostart)
+add_example(Plugins/DockWidget)
 
 if (FALSE)
 
@@ -49,7 +50,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  add_subdirectory(Plugins/DockWidget)
   add_subdirectory(Plugins/GUIToolBar)
   add_subdirectory(Plugins/LagrangianIntegrationModel)
   add_subdirectory(Plugins/OverrideXMLOnly)
