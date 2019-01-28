@@ -24,26 +24,6 @@ list(APPEND CMAKE_MODULE_PATH
 set("${CMAKE_FIND_PACKAGE_NAME}_VERSION" "@PARAVIEW_MAJOR_VERSION@.@PARAVIEW_MINOR_VERSION@.@PARAVIEW_BUILD_VERSION@")
 
 unset("${CMAKE_FIND_PACKAGE_NAME}_FOUND")
-include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-targets.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-properties.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-find-packages.cmake")
-
-include("${CMAKE_CURRENT_LIST_DIR}/ParaViewClient.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
-
-set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
-set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
-set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
-
-if (PARAVIEW_ENABLE_PYTHON)
-  include("${CMAKE_CURRENT_LIST_DIR}/paraview.modules-vtk-python-module-properties.cmake")
-  include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapPython.cmake")
-  include("${CMAKE_CURRENT_LIST_DIR}/vtk-python.cmake")
-else ()
-  set(PARAVIEW_PYTHONPATH)
-endif ()
 
 set(_paraview_use_external_vtk "@PARAVIEW_USE_EXTERNAL_VTK@")
 set(_paraview_find_package_args)
@@ -60,6 +40,19 @@ endif ()
 unset(_paraview_find_package_args)
 unset(_paraview_use_external_vtk)
 unset(_paraview_vtk_components)
+
+include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-targets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-properties.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/${CMAKE_FIND_PACKAGE_NAME}-vtk-module-find-packages.cmake")
+
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewClient.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewPlugin.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ParaViewServerManager.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/vtkModuleWrapClientServer.cmake")
+
+set(PARAVIEW_BUILD_QT_GUI "@PARAVIEW_BUILD_QT_GUI@")
+set(PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
+set(PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
 
 set(_paraview_components_to_check)
 foreach (_paraview_component IN LISTS "${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS")
