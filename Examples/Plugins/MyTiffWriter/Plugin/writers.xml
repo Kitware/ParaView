@@ -2,7 +2,7 @@
 
   <ProxyGroup name="writers">
 
-    <WriterProxy name="MyTIFFWriter" 
+    <WriterProxy name="MyTIFFWriter"
                  class="vtkTIFFWriter"
                  label="My TIFF Writer">
       <Documentation short_help="Write image data as a TIF file.">
