@@ -57,6 +57,7 @@ add_example(CustomApplications/Clone1)
 add_example(CustomApplications/Clone2)
 add_example(CustomApplications/Demo0)
 add_example(CustomApplications/Demo1)
+add_example(CustomApplications/MultiServerClient)
 
 if (FALSE)
 
@@ -65,7 +66,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  add_subdirectory(CustomApplications/MultiServerClient)
 # TODO Update this custom application to load only specific data types.
 #  add_subdirectory(CustomApplications/Spreadsheet) 
 endif()
