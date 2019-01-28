@@ -2,10 +2,11 @@
 #ifndef vtkSMMyElevationProxy_h
 #define vtkSMMyElevationProxy_h
 
+#include "MyProxyModule.h" // for export macro
 #include "vtkSMSourceProxy.h"
 
 /// useless but just showing we can do it
-class vtkSMMyElevationProxy : public vtkSMSourceProxy
+class MYPROXY_EXPORT vtkSMMyElevationProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMMyElevationProxy* New();

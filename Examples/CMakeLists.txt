@@ -46,10 +46,9 @@ add_example(Plugins/PropertyWidgets)
 add_example(Plugins/ReaderXMLOnly)
 add_example(Plugins/Representation)
 add_example(Plugins/SMParametricSource)
+add_example(Plugins/SMMyProxy)
 
 if (FALSE)
-
-add_subdirectory(Plugins/SMProxy)
 
 if (ENABLE_CATALYST)
   add_subdirectory(Catalyst)

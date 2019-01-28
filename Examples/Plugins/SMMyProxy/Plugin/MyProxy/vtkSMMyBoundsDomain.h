@@ -2,10 +2,11 @@
 #ifndef vtkSMMyBoundsDomain_h
 #define vtkSMMyBoundsDomain_h
 
+#include "MyProxyModule.h" // for export macro
 #include "vtkSMBoundsDomain.h"
 
 /// useless but just showing we can do it
-class vtkSMMyBoundsDomain : public vtkSMBoundsDomain
+class MYPROXY_EXPORT vtkSMMyBoundsDomain : public vtkSMBoundsDomain
 {
 public:
   static vtkSMMyBoundsDomain* New();

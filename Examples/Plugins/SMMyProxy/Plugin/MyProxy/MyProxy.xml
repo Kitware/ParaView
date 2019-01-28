@@ -76,7 +76,7 @@ The Input menu allows the user to select the data set to which this filter will 
       </PropertyGroup>
    <!-- End OrientedElevationFilter -->
    </MyElevationProxy>
-  
+
    </ProxyGroup>
 
 </ServerManagerConfiguration>
