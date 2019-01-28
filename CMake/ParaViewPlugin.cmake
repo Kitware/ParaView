@@ -622,6 +622,9 @@ function (paraview_add_plugin name)
               "${_paraview_build_plugin}_qch"
               ParaView::ProcessXML
       COMMENT "Generating header for ${_paraview_build_plugin} documentation")
+    set_property(SOURCE "${_paraview_add_plugin_qch_output}"
+      PROPERTY
+        SKIP_AUTOMOC 1)
 
     string(APPEND _paraview_add_plugin_includes
       "#include \"${_paraview_build_plugin}_qch.h\"\n")
