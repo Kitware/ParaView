@@ -33,13 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_myMainWindow.h"
 
 #include "pqAlwaysConnectedBehavior.h"
-#include "pqApplyBehavior.h"
-#include "pqDefaultViewBehavior.h"
-#ifdef PARAVIEW_USE_QTHELP
-#include "pqHelpReaction.h"
-#endif
 #include "pqApplicationCore.h"
+#include "pqApplyBehavior.h"
 #include "pqAutoLoadPluginXMLBehavior.h"
+#include "pqDefaultViewBehavior.h"
+#include "pqHelpReaction.h"
 #include "pqInterfaceTracker.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
@@ -182,7 +180,5 @@ myMainWindow::~myMainWindow()
 //-----------------------------------------------------------------------------
 void myMainWindow::showHelpForProxy(const QString& groupname, const QString& proxyname)
 {
-#ifdef PARAVIEW_USE_QTHELP
   pqHelpReaction::showProxyHelp(groupname, proxyname);
-#endif
 }

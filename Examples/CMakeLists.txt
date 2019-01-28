@@ -54,6 +54,7 @@ add_example(Plugins/SourceToolbar)
 # add_example(Plugins/VisItReader)
 
 add_example(CustomApplications/Clone1)
+add_example(CustomApplications/Clone2)
 
 if (FALSE)
 
@@ -62,7 +63,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  add_subdirectory(CustomApplications/Clone2)
   add_subdirectory(CustomApplications/Demo0)
   add_subdirectory(CustomApplications/Demo1)
   add_subdirectory(CustomApplications/MultiServerClient)
