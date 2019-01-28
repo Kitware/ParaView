@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 QString @_paraview_dock_window_CLASS_NAME@Implementation::dockArea() const
 {
-  return "@ARG_DOCK_AREA@";
+  return "@_paraview_dock_window_DOCK_AREA@";
 }
 
 QDockWidget* @_paraview_dock_window_CLASS_NAME@Implementation::dockWindow(QWidget* p)
