@@ -46,9 +46,12 @@ add_example(Plugins/OverrideXMLOnly)
 add_example(Plugins/PropertyWidgets)
 add_example(Plugins/ReaderXMLOnly)
 add_example(Plugins/Representation)
+# TODO: update this plugin to use the pipeline controller instead.
+#add_example(Plugins/RepresentationBehavior)
 add_example(Plugins/SMParametricSource)
 add_example(Plugins/SMMyProxy)
 add_example(Plugins/SourceToolbar)
+# add_example(Plugins/VisItReader)
 
 if (FALSE)
 
@@ -57,9 +60,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  # TODO: update this plugin to use the pipeline controller instead.
-  #add_subdirectory(Plugins/RepresentationBehavior)
-
   add_subdirectory(CustomApplications/Clone1)
   add_subdirectory(CustomApplications/Clone2)
   add_subdirectory(CustomApplications/Demo0)
@@ -68,9 +68,5 @@ if (PARAVIEW_BUILD_QT_GUI)
 # TODO Update this custom application to load only specific data types.
 #  add_subdirectory(CustomApplications/Spreadsheet) 
 endif()
-
-if (TARGET vtkIOVisItBridge)
-  # add_subdirectory(Plugins/VisItReader)
-endif ()
 
 endif ()
