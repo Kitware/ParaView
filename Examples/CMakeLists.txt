@@ -35,6 +35,8 @@ else ()
   endmacro ()
 endif ()
 
+add_example(Plugins/Autostart)
+
 if (FALSE)
 
 add_subdirectory(Plugins/Filter)
@@ -47,7 +49,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  add_subdirectory(Plugins/Autostart)
   add_subdirectory(Plugins/DockWidget)
   add_subdirectory(Plugins/GUIToolBar)
   add_subdirectory(Plugins/LagrangianIntegrationModel)

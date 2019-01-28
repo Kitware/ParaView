@@ -1,0 +1,7 @@
+NAME
+  Autostart
+DESCRIPTION
+  An example auto-start plugin. Auto start plugins provide callbacks that get
+  called when the plugin is loaded and when the application is shutdown.
+REQUIRES_MODULES
+  ParaView::pqComponents
