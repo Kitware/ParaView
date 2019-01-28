@@ -53,6 +53,8 @@ add_example(Plugins/SMMyProxy)
 add_example(Plugins/SourceToolbar)
 # add_example(Plugins/VisItReader)
 
+add_example(CustomApplications/Clone1)
+
 if (FALSE)
 
 if (ENABLE_CATALYST)
@@ -60,7 +62,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  add_subdirectory(CustomApplications/Clone1)
   add_subdirectory(CustomApplications/Clone2)
   add_subdirectory(CustomApplications/Demo0)
   add_subdirectory(CustomApplications/Demo1)
