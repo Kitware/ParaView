@@ -48,6 +48,7 @@ add_example(Plugins/ReaderXMLOnly)
 add_example(Plugins/Representation)
 add_example(Plugins/SMParametricSource)
 add_example(Plugins/SMMyProxy)
+add_example(Plugins/SourceToolbar)
 
 if (FALSE)
 
@@ -58,7 +59,6 @@ endif ()
 if (PARAVIEW_BUILD_QT_GUI)
   # TODO: update this plugin to use the pipeline controller instead.
   #add_subdirectory(Plugins/RepresentationBehavior)
-  add_subdirectory(Plugins/SourceToolbar)
 
   add_subdirectory(CustomApplications/Clone1)
   add_subdirectory(CustomApplications/Clone2)

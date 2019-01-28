@@ -1,0 +1,6 @@
+NAME
+  SourceToolbar
+DESCRIPTION
+  An example plugin for adding a toolbar.
+REQUIRES_MODULES
+  ParaView::pqComponents
