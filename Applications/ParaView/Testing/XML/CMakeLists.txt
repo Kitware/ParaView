@@ -91,6 +91,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation.pvd}"
   "DATA{${paraview_test_data_directory_input}/Data/singleSphereAnimation/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/tensors.pvti}"
+  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol.vtpc}"
+  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartdscol/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds.vtpd}"
+  "DATA{${paraview_test_data_directory_input}/Data/testxmlpartds/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/timestep_0_15.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/tube.exo}"
   "DATA{${paraview_test_data_directory_input}/Data/vehicle_data.csv}"
@@ -236,6 +240,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMajorAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMediumAxis.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/OBBMinorAxis.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Slice.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSet_Surface.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Slice.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PartitionedDataSetCollection_Surface.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PLYWriter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PointGaussianScaleOpacityArrayA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/PolyLineSourceInterA.png}"
@@ -452,6 +460,8 @@ SET (TESTS_WITH_INLINE_COMPARES
   MemoryInspectorPanel.xml
   Molecule.xml
   NonlinearSubdivisionDisplay.xml
+  PartitionedDataSet.xml
+  PartitionedDataSetCollection.xml
   QuartilePlot.xml
   ReadPartitionedCGNS.xml
   RectilinearFractal.xml

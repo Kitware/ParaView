@@ -21,6 +21,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPartitionedDataSet.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
@@ -179,6 +180,15 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
   {
     this->DataIsMultiPiece = 1;
     this->SetNumberOfPieces(mpDS->GetNumberOfPieces());
+    return;
+  }
+
+  // partitioned datasets are treated like multi-piece here:
+  vtkPartitionedDataSet* partDS = vtkPartitionedDataSet::SafeDownCast(cds);
+  if (partDS)
+  {
+    this->DataIsMultiPiece = 1;
+    this->SetNumberOfPieces(partDS->GetNumberOfPartitions());
     return;
   }
 
