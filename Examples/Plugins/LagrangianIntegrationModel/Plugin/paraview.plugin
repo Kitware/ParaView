@@ -1,0 +1,9 @@
+NAME
+  LagrangianIntegrationModel
+DESCRIPTION
+  An example plugin for implementing your own LagrangianIntegrationModel to be
+  used in the LagrangianParticleTracker.
+REQUIRES_MODULES
+  VTK::FiltersFlowPaths
+  VTK::CommonCore
+  VTK::CommonDataModel

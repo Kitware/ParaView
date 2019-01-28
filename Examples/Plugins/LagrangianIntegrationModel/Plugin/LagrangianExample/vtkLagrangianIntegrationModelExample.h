@@ -30,9 +30,11 @@
 #ifndef vtkLagrangianIntegrationModelExample_h
 #define vtkLagrangianIntegrationModelExample_h
 
+#include "LagrangianExampleModule.h" // for export macro
 #include "vtkLagrangianBasicIntegrationModel.h"
 
-class vtkLagrangianIntegrationModelExample : public vtkLagrangianBasicIntegrationModel
+class LAGRANGIANEXAMPLE_EXPORT vtkLagrangianIntegrationModelExample
+  : public vtkLagrangianBasicIntegrationModel
 {
 public:
   vtkTypeMacro(vtkLagrangianIntegrationModelExample, vtkLagrangianBasicIntegrationModel);

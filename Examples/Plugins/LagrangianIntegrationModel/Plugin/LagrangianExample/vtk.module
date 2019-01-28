@@ -1,0 +1,7 @@
+NAME
+  LagrangianExample
+DEPENDS
+  VTK::FiltersFlowPaths
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
