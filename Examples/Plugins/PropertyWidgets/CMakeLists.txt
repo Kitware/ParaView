@@ -1,54 +1,28 @@
-# This plugin demonstrates creating new types pqPropertyWidget and
-# pqPropertyWidgetDecorator instances for customizing the Properties panel.
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.8)
+project(PropertyWidgets)
 
-if (NOT ParaView_BINARY_DIR)
-  find_package(ParaView REQUIRED)
-  include(${PARAVIEW_USE_FILE})
-endif()
+find_package(ParaView REQUIRED)
 
-# Set a consistent MACOSX_RPATH default across all CMake versions.
-# When CMake 2.8.12 is required, change this default to 1.
-# When CMake 3.0.0 is required, remove this block (see CMP0042).
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-  set(CMAKE_MACOSX_RPATH 0)
-endif()
+include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
-if (PARAVIEW_BUILD_QT_GUI)
-  qt5_wrap_cpp(moc_srcs
-    pqMyPropertyWidgetForProperty.h
-    pqMyPropertyWidgetForGroup.h
-    pqMyPropertyWidgetDecorator.h)
+set("_paraview_plugin_default_${CMAKE_PROJECT_NAME}" ON)
+paraview_plugin_scan(
+  PLUGIN_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/paraview.plugin"
+  PROVIDES_PLUGINS  plugins
+  REQUIRES_MODULES  required_modules)
 
-  set (outifaces0)
-  set (outsrcs0)
-  add_paraview_property_widget(outifaces0 outsrcs0
-    TYPE "my_property_widget_type"
-    CLASS_NAME pqMyPropertyWidgetForProperty)
+foreach (module IN LISTS required_modules)
+  if (NOT TARGET "${module}")
+    message("Missing required module: ${module}")
+    return ()
+  endif ()
+endforeach ()
 
-  set (outifaces1)
-  set (outsrcs1)
-  add_paraview_property_group_widget(outifaces1 outsrcs1
-    TYPE "my_property_group_type"
-    CLASS_NAME pqMyPropertyWidgetForGroup)
-
-  set (outifaces2)
-  set (outsrcs2)
-  add_paraview_property_widget_decorator(outifaces2 outsrcs2
-    TYPE "my_decorator"
-    CLASS_NAME pqMyPropertyWidgetDecorator)
-
-  # Now, create the plugin.
-  add_paraview_plugin(ExamplesPropertyWidgets "1.0"
-                      SERVER_MANAGER_XML PropertyWidgetsFilter.xml
-                      GUI_INTERFACES ${outifaces0}
-                                     ${outifaces1}
-                                     ${outifaces2}
-                      SOURCES ${outsrcs0}
-                              ${outsrcs1}
-                              ${outsrcs2}
-                              ${moc_srcs}
-                              pqMyPropertyWidgetForProperty.cxx
-                              pqMyPropertyWidgetForGroup.cxx
-                              pqMyPropertyWidgetDecorator.cxx)
-endif()
+paraview_plugin_build(
+  RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY_SUBDIRECTORY "${PARAVIEW_PLUGIN_SUBDIR}"
+  PLUGINS ${plugins})

@@ -1,0 +1,9 @@
+NAME
+  PropertyWidgets
+DESCRIPTION
+  An example plugin which demonstrates creating new types `pqPropertyWidget`
+  and `pqPropertyWidgetDecorator` instances for customizing the Properties
+  panel.
+REQUIRES_MODULES
+  ParaView::pqComponents
+  VTK::FiltersGeneral
