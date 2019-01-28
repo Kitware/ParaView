@@ -1,38 +1,33 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.8)
 project(Demo1)
 
 find_package(ParaView REQUIRED)
-include(${PARAVIEW_USE_FILE})
+
 if (NOT PARAVIEW_BUILD_QT_GUI)
-  message(FATAL_ERROR
-    "Demo1 example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
-    "Please rebuild ParaView (or point to a different build of ParaView) "
-    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+  message(STATUS
+    "${CMAKE_PROJECT_NAME} example requires PARAVIEW_BUILD_QT_GUI to be "
+    "enabled. Please rebuild ParaView (or point to a different build of "
+    "ParaView) with PARAVIEW_BUILD_QT_GUI set to TRUE")
+  return ()
 endif()
 
-# Set a consistent MACOSX_RPATH default across all CMake versions.
-# When CMake 2.8.12 is required, change this default to 1.
-# When CMake 3.0.0 is required, remove this block (see CMP0042).
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-  set(CMAKE_MACOSX_RPATH 0)
-endif()
+include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
-SET (SOURCE_FILES
-  DemoApp1.cxx
+find_package(Qt5 REQUIRED COMPONENTS Widgets)
+
+set(CMAKE_AUTOMOC 1)
+set(CMAKE_AUTOUIC 1)
+
+set(sources
   myMainWindow.cxx
   myMainWindow.h
-)
+  myMainWindow.ui)
 
-pv_qt_wrap_cpp(MOC_SRCS myMainWindow.h)
-pv_qt_wrap_ui(UI_BUILT_SOURCES myMainWindow.ui)
-
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR})
-
-add_executable(DemoApp1 ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES})
-target_link_libraries(DemoApp1 pqApplicationComponents)
-if(PARAVIEW_QT_VERSION VERSION_GREATER "4")
-  set_target_properties(DemoApp1 PROPERTIES
-    COMPILE_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-endif()
+add_executable(DemoApp1 DemoApp1.cxx ${sources})
+target_link_libraries(DemoApp1
+  PRIVATE
+    ParaView::pqApplicationComponents
+    Qt5::Widgets)
