@@ -44,12 +44,12 @@ add_example(Plugins/MyPNGReader)
 add_example(Plugins/OverrideXMLOnly)
 add_example(Plugins/PropertyWidgets)
 add_example(Plugins/ReaderXMLOnly)
+add_example(Plugins/Representation)
 
 if (FALSE)
 
 add_subdirectory(Plugins/ParametricSource)
 add_subdirectory(Plugins/SMProxy)
-add_subdirectory(Plugins/Representation)
 
 if (ENABLE_CATALYST)
   add_subdirectory(Catalyst)

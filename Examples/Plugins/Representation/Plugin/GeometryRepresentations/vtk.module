@@ -1,0 +1,7 @@
+NAME
+  GeometryRepresentations
+DEPENDS
+  ParaView::ClientServerCoreRendering
+  VTK::RenderingOpenGL2
+PRIVATE_DEPENDS
+  VTK::CommonCore

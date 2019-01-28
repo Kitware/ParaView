@@ -23,9 +23,10 @@
 #ifndef vtkMySpecialPolyDataMapper_h
 #define vtkMySpecialPolyDataMapper_h
 
+#include "GeometryRepresentationsModule.h" // for export macro
 #include "vtkCompositePolyDataMapper2.h"
 
-class VTK_EXPORT vtkMySpecialPolyDataMapper : public vtkCompositePolyDataMapper2
+class GEOMETRYREPRESENTATIONS_EXPORT vtkMySpecialPolyDataMapper : public vtkCompositePolyDataMapper2
 {
 public:
   static vtkMySpecialPolyDataMapper* New();

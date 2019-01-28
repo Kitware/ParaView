@@ -19,9 +19,11 @@
 #ifndef vtkMySpecialRepresentation_h
 #define vtkMySpecialRepresentation_h
 
+#include "GeometryRepresentationsModule.h" // for export macro
 #include "vtkGeometryRepresentationWithFaces.h"
 
-class VTK_EXPORT vtkMySpecialRepresentation : public vtkGeometryRepresentationWithFaces
+class GEOMETRYREPRESENTATIONS_EXPORT vtkMySpecialRepresentation
+  : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkMySpecialRepresentation* New();

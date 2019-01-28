@@ -10,7 +10,7 @@
         the SurfaceRepresentation except that we are overriding the mapper with
         our mapper.
       </Documentation>
-      
+
     <!-- End of MySpecialRepresentation -->
     </RepresentationProxy>
 
