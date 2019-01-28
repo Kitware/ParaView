@@ -40,6 +40,7 @@ add_example(Plugins/DockWidget)
 add_example(Plugins/ElevationFilter)
 add_example(Plugins/GUIMyToolBar)
 add_example(Plugins/LagrangianIntegrationModel)
+add_example(Plugins/OverrideXMLOnly)
 
 if (FALSE)
 
@@ -52,7 +53,6 @@ if (ENABLE_CATALYST)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
-  add_subdirectory(Plugins/OverrideXMLOnly)
   add_subdirectory(Plugins/PropertyWidgets)
   add_subdirectory(Plugins/Reader)
   add_subdirectory(Plugins/ReaderXMLOnly)
