@@ -1,18 +1,41 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.8)
 project(ParaViewExamples)
 
-option(ENABLE_CATALYST "Enable Catalyst Examples" OFF)
+if (ParaView_BINARY_DIR)
+  function (add_example dir)
+    add_test(
+      NAME    "ParaViewExample-${dir}"
+      COMMAND "${CMAKE_CTEST_COMMAND}"
+              --build-generator
+                "${CMAKE_GENERATOR}"
+              --build-and-test
+                "${CMAKE_CURRENT_SOURCE_DIR}/${dir}"
+                "${CMAKE_CURRENT_BINARY_DIR}/${dir}"
+              --build-options
+                "-DBUILD_TESTING=ON"
+                "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
+                "-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}"
+                "-DParaView_DIR=${paraview_cmake_build_dir}"
+              --test-command
+                "${CMAKE_CTEST_COMMAND}"
+                  -C $<CONFIGURATION>)
+    if (WIN32)
+      set(example_path "$ENV{PATH};${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+      string(REPLACE ";" "\;" example_path "${example_path}")
+      set_property(TEST "ParaViewExample-${dir}" APPEND
+        PROPERTY
+          ENVIRONMENT "PATH=${example_path}")
+    endif ()
+  endfunction ()
+else ()
+  find_package(ParaView REQUIRED)
 
-set(paraview_components)
-if (ENABLE_CATALYST)
-  list(APPEND paraview_components vtkPVPythonCatalyst)
+  macro (add_example dir)
+    add_subdirectory("${dir}")
+  endmacro ()
 endif ()
 
-if (paraview_components)
-  list(INSERT paraview_components 0 COMPONENTS)
-endif ()
-find_package(ParaView REQUIRED ${paraview_components})
-include(${PARAVIEW_USE_FILE})
+if (FALSE)
 
 add_subdirectory(Plugins/Filter)
 add_subdirectory(Plugins/ParametricSource)
@@ -48,4 +71,6 @@ endif()
 
 if (TARGET vtkIOVisItBridge)
   # add_subdirectory(Plugins/VisItReader)
+endif ()
+
 endif ()
