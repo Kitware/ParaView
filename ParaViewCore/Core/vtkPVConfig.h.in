@@ -16,7 +16,6 @@
 #ifndef vtkPVConfig_h
 #define vtkPVConfig_h
 
-#cmakedefine PARAVIEW_USE_ICE_T
 #cmakedefine PARAVIEW_USE_QTHELP
 
 // defined when ParaView is built with MPI.
