@@ -196,6 +196,14 @@ set(classes
   pqWelcomeDialog
   pqYoungsMaterialPropertyWidget)
 
+set(built_shared 0)
+if (BUILD_SHARED_LIBS)
+  set(built_shared 1)
+endif ()
+set_property(SOURCE pqApplicationComponentsInit.cxx APPEND
+  PROPERTY
+    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+
 set(headers
   pqCatalystContinueReaction.h)
 

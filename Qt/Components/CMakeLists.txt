@@ -176,6 +176,14 @@ set(classes
   pqViewManager
   pqWidgetRangeDomain)
 
+set(built_shared 0)
+if (BUILD_SHARED_LIBS)
+  set(built_shared 1)
+endif ()
+set_property(SOURCE pqComponentsInit.cxx APPEND
+  PROPERTY
+    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+
 set(headers
   pqPluginTreeWidget.h)
 
