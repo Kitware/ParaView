@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #cmakedefine01 _paraview_client_APPLICATION_XMLS
 #cmakedefine01 _paraview_client_SPLASH_IMAGE
 #cmakedefine01 _paraview_client_TITLE
+#cmakedefine01 _paraview_client_built_shared
 
 //-----------------------------------------------------------------------------
 pq@_paraview_client_NAME@Initializer::pq@_paraview_client_NAME@Initializer()
@@ -97,7 +98,7 @@ pq@_paraview_client_NAME@Initializer::Status pq@_paraview_client_NAME@Initialize
     return ExitSuccess;
   }
 
-#ifndef BUILD_SHARED_LIBS
+#if !_paraview_client_built_shared
 @_paraview_client_resource_init@
 #endif
 
