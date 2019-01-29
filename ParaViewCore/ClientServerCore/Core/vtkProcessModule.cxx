@@ -201,8 +201,9 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int& argc, char**& argv)
   {
     if (strcmp(argv[i], "-display") == 0)
     {
-      char* displayenv = new char[strlen(argv[i + 1]) + 10];
-      sprintf(displayenv, "DISPLAY=%s", argv[i + 1]);
+      size_t size = strlen(argv[i + 1]) + 10;
+      char* displayenv = new char[size];
+      snprintf(displayenv, size, "DISPLAY=%s", argv[i + 1]);
       vtksys::SystemTools::PutEnv(displayenv);
       delete[] displayenv;
       // safe to delete since PutEnv keeps a copy of the string.
