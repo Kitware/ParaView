@@ -1,3 +1,4 @@
+#cmakedefine01 _paraview_add_plugin_built_shared
 #cmakedefine01 _paraview_add_plugin_with_python
 #cmakedefine01 _paraview_add_plugin_with_ui
 #cmakedefine01 _paraview_add_plugin_with_xml

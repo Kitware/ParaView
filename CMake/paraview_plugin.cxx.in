@@ -3,7 +3,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVPluginLoader.h"
 
-#cmakedefine BUILD_SHARED_LIBS
 #cmakedefine01 _paraview_add_plugin_EULA
 #cmakedefine01 _paraview_add_plugin_SERVER_MANAGER_XML
 #cmakedefine01 _paraview_add_plugin_MODULES
@@ -131,11 +130,11 @@ void @_paraview_build_plugin@Plugin::GetPythonSourceList(std::vector<std::string
 //-----------------------------------------------------------------------------
 @_paraview_build_plugin@Plugin::@_paraview_build_plugin@Plugin()
 {
-#if !defined(BUILD_SHARED_LIBS) && _paraview_add_plugin_with_resources
+#if !_paraview_add_plugin_built_shared && _paraview_add_plugin_with_resources
   // For static builds, initialize the Qt resources.
 @_paraview_add_plugin_resources_init@
 #endif
-#if !defined(BUILD_SHARED_LIBS) && _paraview_add_plugin_with_ui
+#if !_paraview_add_plugin_built_shared && _paraview_add_plugin_with_ui
   // For static builds, initialize the Qt plugin.
   Q_IMPORT_PLUGIN(@_paraview_build_plugin@Plugin)
 #endif
