@@ -291,7 +291,7 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
 {
-#ifdef BUILD_SHARED_LIBS
+#if BUILD_SHARED_LIBS
   vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "Loading Plugins from standard PLUGIN_PATHS\n%s",
     (this->SearchPaths ? this->SearchPaths : "(nullptr)"));
 
@@ -314,7 +314,7 @@ void vtkPVPluginLoader::LoadPluginsFromPluginSearchPath()
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::LoadPluginsFromPluginConfigFile()
 {
-#ifdef BUILD_SHARED_LIBS
+#if BUILD_SHARED_LIBS
   const char* configFiles = vtksys::SystemTools::GetEnv("PV_PLUGIN_CONFIG_FILE");
   if (configFiles != NULL)
   {
@@ -399,7 +399,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
     return false;
   }
 
-#ifndef BUILD_SHARED_LIBS
+#if !BUILD_SHARED_LIBS
   vtkPVPluginLoaderErrorMacro("Could not find the plugin statically linked in, and "
                               "cannot load dynamic plugins  in static builds.");
   return false;

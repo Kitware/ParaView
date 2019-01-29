@@ -98,7 +98,7 @@ std::string vtkLocatePluginOrConfigFile(
     return std::string();
   }
 
-#ifndef BUILD_SHARED_LIBS
+#if !BUILD_SHARED_LIBS
   bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   if (isPlugin)
   {
@@ -121,7 +121,7 @@ std::string vtkLocatePluginOrConfigFile(
   vtkVLogF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), "VTK libraries location is '%s'", vtklib.c_str());
 
   std::vector<std::string> prefixes = {
-#if defined(BUILD_SHARED_LIBS)
+#if BUILD_SHARED_LIBS
     std::string("paraview-" PARAVIEW_VERSION "/plugins/") + plugin,
     std::string("paraview-" PARAVIEW_VERSION "/plugins/"),
 #else

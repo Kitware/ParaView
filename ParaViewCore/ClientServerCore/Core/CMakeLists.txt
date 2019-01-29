@@ -79,6 +79,17 @@ set(classes
   vtkSessionIterator
   vtkTCPNetworkAccessManager)
 
+set(built_shared 0)
+if (BUILD_SHARED_LIBS)
+  set(built_shared 1)
+endif ()
+set_property(SOURCE
+  vtkPVPluginLoader.cxx
+  vtkPVPluginTracker.cxx
+  APPEND
+  PROPERTY
+    COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+
 if (TARGET VTK::PythonInterpreter)
   # TODO: Split these into a separate module so that there isn't a public
   # optional dependency.
