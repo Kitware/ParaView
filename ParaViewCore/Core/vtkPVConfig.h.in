@@ -31,13 +31,6 @@
 #define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
 #define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
 
-#cmakedefine BUILD_SHARED_LIBS
-#ifdef BUILD_SHARED_LIBS
-// for sake of old code, we define the PARAVIEW_BUILD_SHARED_LIBS variable. This
-// can be deprecated once the cleanup is complete.
-# define PARAVIEW_BUILD_SHARED_LIBS
-#endif
-
 // The default prevision value for conversion for string to double
 // and double to string
 #define DEFAULT_DOUBLE_PRECISION_VALUE 16
