@@ -33,7 +33,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
-#include "vtkPVConfig.h" // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
+#include "vtkPVConfig.h"                     // needed for PARAVIEW_VERSION
 #include <string>
 #include <vector>
 
@@ -157,12 +157,8 @@ private:
 //@}
 
 #ifndef __WRAP__
-typedef const char*(C_DECL* pv_plugin_query_verification_data_fptr)();
 typedef vtkPVPlugin*(C_DECL* pv_plugin_query_instance_fptr)();
 #endif
-
-/// TODO: add compiler version.
-#define _PV_PLUGIN_VERIFICATION_STRING "paraviewplugin|" CMAKE_CXX_COMPILER_ID "|" PARAVIEW_VERSION
 
 // vtkPVPluginLoader checks for existence of this function
 // to determine if the shared-library is a paraview-server-manager plugin or
@@ -172,10 +168,6 @@ typedef vtkPVPlugin*(C_DECL* pv_plugin_query_instance_fptr)();
 // verification is not necessary.
 #ifdef BUILD_SHARED_LIBS
 #define _PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)                                                        \
-  C_EXPORT const char* C_DECL pv_plugin_query_verification_data()                                  \
-  {                                                                                                \
-    return _PV_PLUGIN_VERIFICATION_STRING;                                                         \
-  }                                                                                                \
   C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance() { return pv_plugin_instance_##PLUGIN(); }
 #else // BUILD_SHARED_LIBS
 // define empty export. When building static, we don't want to define the global
