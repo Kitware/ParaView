@@ -445,6 +445,9 @@ if (paraview_requested_modules)
   list(REMOVE_DUPLICATES paraview_requested_modules)
 endif ()
 
+option(PARAVIEW_BUILD_ALL_MODULES "Build all modules by default" OFF)
+mark_as_advanced(PARAVIEW_BUILD_ALL_MODULES)
+
 if (PARAVIEW_USE_EXTERNAL_VTK)
   find_package(VTK REQUIRED)
 else ()
@@ -530,7 +533,7 @@ vtk_module_scan(
   PROVIDES_KITS       paraview_kits
   REQUIRES_MODULES    paraview_required_modules
   UNRECOGNIZED_MODULES paraview_unrecognized_modules
-  WANT_BY_DEFAULT     ON
+  WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
   ENABLE_TESTS        ON)
 
 set(paraview_unrecognized_paraview_modules)
