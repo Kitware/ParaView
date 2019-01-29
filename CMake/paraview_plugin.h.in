@@ -3,6 +3,8 @@
 #cmakedefine01 _paraview_add_plugin_with_ui
 #cmakedefine01 _paraview_add_plugin_with_xml
 
+#define PARAVIEW_BUILDING_PLUGIN
+#define PARAVIEW_PLUGIN_BUILT_SHARED _paraview_add_plugin_built_shared
 #include "vtkPVPlugin.h"
 
 #if _paraview_add_plugin_with_ui
