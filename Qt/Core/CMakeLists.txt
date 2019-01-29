@@ -132,6 +132,9 @@ endif ()
 set_property(SOURCE pqCoreInit.cxx APPEND
   PROPERTY
     COMPILE_DEFINITIONS "BUILD_SHARED_LIBS=${built_shared}")
+set_property(SOURCE pqCoreTestUtility.cxx APPEND
+  PROPERTY
+    COMPILE_DEFINITIONS "PARAVIEW_DATA_ROOT=\"${PARAVIEW_DATA_ROOT}\"")
 
 set(ui_files
   Resources/UI/pqFileDialog.ui
