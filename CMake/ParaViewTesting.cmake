@@ -139,6 +139,8 @@ function (_paraview_add_tests function)
         list(APPEND _paraview_add_tests_client_args
           "--test-baseline=DATA{${_paraview_add_tests_BASELINE_DIR}/${_paraview_add_tests_name_base}.png}")
       endif ()
+      ExternalData_Expand_Arguments("${_paraview_add_tests_TEST_DATA_TARGET}" _
+        "DATA{${_paraview_add_tests_BASELINE_DIR}/,REGEX:${_paraview_add_tests_name_base}(-.*)?(_[0-9]+)?.png}")
     endif ()
     if (DEFINED "${_paraview_add_tests_name}_BASELINE")
       list(APPEND _paraview_add_tests_client_args
