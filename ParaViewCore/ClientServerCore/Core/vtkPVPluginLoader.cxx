@@ -519,7 +519,7 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
   size_t eop = thisPluginsPath.rfind(PATH_SEP);
   thisPluginsPath = thisPluginsPath.substr(0, eop);
   // Load the shared library search path.
-  const char* pLdLibPath = getenv(LIB_PATH_NAME);
+  const char* pLdLibPath = vtksys::SystemTools::GetEnv(LIB_PATH_NAME);
   bool pluginPathPresent =
     pLdLibPath == NULL ? false : strstr(pLdLibPath, thisPluginsPath.c_str()) != NULL;
   // Update it.

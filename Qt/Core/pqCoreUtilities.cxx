@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNumberToString.h"
 #include "vtkObject.h"
 #include "vtkWeakPointer.h"
+#include "vtksys/SystemTools.hxx"
 
 #include <cstdlib>
 #include <sstream>
@@ -231,7 +232,7 @@ bool pqCoreUtilities::promptUser(const QString& settingsKey, QMessageBox::Icon i
   const QString& title, const QString& message, QMessageBox::StandardButtons buttons,
   QWidget* parentWdg)
 {
-  if (getenv("DASHBOARD_TEST_FROM_CTEST") != NULL)
+  if (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") != NULL)
   {
     return true;
   }

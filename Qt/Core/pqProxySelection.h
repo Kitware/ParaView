@@ -45,7 +45,7 @@ class vtkSMProxySelectionModel;
 */
 class PQCORE_EXPORT pqProxySelection : public QList<pqServerManagerModelItem*>
 {
-  typedef QList<pqServerManagerModelItem> Superclass;
+  typedef QList<pqServerManagerModelItem*> Superclass;
 
 public:
   /**

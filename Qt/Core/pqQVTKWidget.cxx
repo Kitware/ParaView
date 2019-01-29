@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtksys/SystemTools.hxx"
 
 #include "QVTKInteractorAdapter.h"
 
@@ -56,7 +57,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
   this->connect(this, SIGNAL(resized()), SLOT(updateSizeProperties()));
 
   // disable HiDPI if we are running tests
-  this->setEnableHiDPI(getenv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
+  this->setEnableHiDPI(vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
 }
 
 //----------------------------------------------------------------------------

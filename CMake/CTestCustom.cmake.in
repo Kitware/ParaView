@@ -5,7 +5,9 @@ if (NOT paraview_use_external_vtk)
 endif ()
 
 # Regular expression for warning exception during build process
-list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION)
+list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
+  # Ignore `getenv` "deprecation" with MSVC.
+  "vtknvindex_utilities.h.*: warning C4996: 'getenv'")
 
 # Regular expression for excluding files from coverage testing
 list(APPEND CTEST_CUSTOM_COVERAGE_EXCLUDE

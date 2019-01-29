@@ -87,6 +87,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTesting.h"
 #include "vtkTrivialProducer.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtksys/SystemTools.hxx"
 
 #ifdef QT_TESTING_WITH_PYTHON
 #include "pqPythonEventSourceImage.h"
@@ -162,7 +163,7 @@ QString pqCoreTestUtility::DataRoot()
   // Let the user override the defaults by setting an environment variable ...
   if (result.isEmpty())
   {
-    result = getenv("PARAVIEW_DATA_ROOT");
+    result = vtksys::SystemTools::GetEnv("PARAVIEW_DATA_ROOT");
   }
 
   // Otherwise, go with the compiled-in default ...
@@ -199,7 +200,7 @@ QString pqCoreTestUtility::BaselineDirectory()
   // Let the user override the defaults by setting an environment variable ...
   if (result.isEmpty())
   {
-    result = getenv("PARAVIEW_TEST_BASELINE_DIR");
+    result = vtksys::SystemTools::GetEnv("PARAVIEW_TEST_BASELINE_DIR");
   }
 
   // Finally use the xml file location if an instance is available
@@ -428,7 +429,7 @@ QString pqCoreTestUtility::TestDirectory()
   // Let the user override the defaults by setting an environment variable ...
   if (result.isEmpty())
   {
-    result = getenv("PARAVIEW_TEST_DIR");
+    result = vtksys::SystemTools::GetEnv("PARAVIEW_TEST_DIR");
   }
 
   // Ensure all slashes face forward ...
