@@ -81,6 +81,7 @@ endif ()
 if (PARAVIEW_ENABLE_PYTHON)
   target_link_libraries(paraview
     PRIVATE
+      ParaView::pvpythonmodules
       ParaView::pqPython
       ParaView::PythonInitializer)
 endif ()

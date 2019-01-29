@@ -60,6 +60,7 @@ if (PARAVIEW_ENABLE_PYTHON)
     paraview_add_executable("${exe}" "${exe}.cxx")
     target_link_libraries("${exe}"
       PRIVATE
+        ParaView::pvpythonmodules
         VTK::PythonInterpreter)
     list(APPEND paraview_tools
       "${exe}")
