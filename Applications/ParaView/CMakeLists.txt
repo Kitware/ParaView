@@ -79,6 +79,9 @@ if (PARAVIEW_ENABLE_EMBEDDED_DOCUMENTATION)
 endif ()
 
 if (PARAVIEW_ENABLE_PYTHON)
+  target_compile_definitions(paraview
+    PRIVATE
+      PARAVIEW_ENABLE_PYTHON)
   target_link_libraries(paraview
     PRIVATE
       ParaView::pvpythonmodules

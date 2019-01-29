@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 #include "pqCoreUtilities.h"
-#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqCatalystExportStateWizard.h"
 #endif
 #include <iostream>
@@ -52,7 +52,7 @@ pqCatalystScriptGeneratorReaction::~pqCatalystScriptGeneratorReaction()
 //-----------------------------------------------------------------------------
 void pqCatalystScriptGeneratorReaction::onTriggered()
 {
-#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
+#if VTK_MODULE_ENABLE_ParaView_pqPython
   pqCatalystExportStateWizard wizard(pqCoreUtilities::mainWidget());
   wizard.customize();
   wizard.exec();

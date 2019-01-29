@@ -24,6 +24,9 @@ function (paraview_add_executable name)
       paraview_plugins)
 
   if (PARAVIEW_ENABLE_PYTHON)
+    target_compile_definitions("${name}"
+      PRIVATE
+        PARAVIEW_ENABLE_PYTHON)
     target_link_libraries("${name}"
       PRIVATE
         ParaView::pvpythonmodules

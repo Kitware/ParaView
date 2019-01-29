@@ -252,7 +252,7 @@ set(sources)
 set(private_headers
   pqSGExportStateWizardInternals.h)
 
-if (TARGET pqPython)
+if (TARGET ParaView::pqPython)
   # code for generating specialized Python scripts
   # from the GUI using trace information
   list(APPEND classes

@@ -377,7 +377,7 @@ void ParaViewMainWindow::updateFontSize()
   }
 
 // Console font size
-#if defined(PARAVIEW_ENABLE_PYTHON)
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonShell* shell = qobject_cast<pqPythonShell*>(this->Internals->pythonShellDock->widget());
   shell->setFontSize(fontSize);
 #endif
