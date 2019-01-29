@@ -31,8 +31,4 @@
 #define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
 #define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
 
-// The default prevision value for conversion for string to double
-// and double to string
-#define DEFAULT_DOUBLE_PRECISION_VALUE 16
-
 #endif

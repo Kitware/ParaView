@@ -14,12 +14,12 @@
 =========================================================================*/
 #include "pqDoubleSliderWidget.h"
 
-#include "vtkPVConfig.h"
-
 // Qt includes
 #include <QDoubleValidator>
 #include <QHBoxLayout>
 #include <QSlider>
+
+#define DEFAULT_DOUBLE_PRECISION_VALUE 16
 
 pqDoubleSliderWidget::pqDoubleSliderWidget(QWidget* parent)
   : QWidget(parent)
