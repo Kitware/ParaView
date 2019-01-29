@@ -27,9 +27,7 @@ void vtkPVInitializePythonModules();
 #include "vtkPVSessionServer.h"
 #include "vtkProcessModule.h"
 
-#ifndef BUILD_SHARED_LIBS
-#include "paraview_plugins_static.h"
-#endif
+#include "paraview_plugins.h"
 
 static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type)
 {
@@ -54,10 +52,8 @@ static bool RealMain(int argc, char* argv[], vtkProcessModule::ProcessTypes type
   vtkPVInitializePythonModules();
 #endif
 
-#ifndef BUILD_SHARED_LIBS
   // load static plugins
-  paraview_plugins_static_init();
-#endif
+  paraview_plugins_initialize();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();

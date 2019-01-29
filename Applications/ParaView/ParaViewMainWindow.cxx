@@ -58,10 +58,6 @@ void vtkPVInitializePythonModules();
 #include "vtkSMSettings.h"
 #include "vtksys/SystemTools.hxx"
 
-#ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
-#endif
-
 #ifdef PARAVIEW_USE_QTHELP
 #include "pqHelpReaction.h"
 #endif
