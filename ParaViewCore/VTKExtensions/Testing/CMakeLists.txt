@@ -19,6 +19,12 @@ vtk_add_test_cxx(${vtk-modules}ServerFilterTests tests
   TestPVAMRDualContour.cxx
   )
 
+if (PARAVIEW_USE_MPI)
+  set_property(SOURCE ParaViewCoreVTKExtensionsPrintSelf.cxx APPEND
+    PROPERTY
+      COMPILE_DEFINITIONS PARAVIEW_USE_MPI)
+endif ()
+
 if (PARAVIEW_USE_ICE_T)
   set_property(SOURCE ParaViewCoreVTKExtensionsPrintSelf.cxx APPEND
     PROPERTY

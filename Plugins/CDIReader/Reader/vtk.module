@@ -8,3 +8,6 @@ DEPENDS
   VTK::CommonExecutionModel
 PRIVATE_DEPENDS
   VTK::netcdf
+OPTIONAL_DEPENDS
+  VTK::ParallelCore
+  VTK::ParallelMPI

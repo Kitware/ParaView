@@ -13,6 +13,13 @@ vtk_module_add_module(CDIReader::vtkCDIReader
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers})
 
+if (TARGET VTK::ParallelMPI)
+  # FIXME: The API should not depend on this.
+  vtk_module_definitions(CDIReader::vtkCDIReader
+    PUBLIC
+      PARAVIEW_USE_MPI)
+endif ()
+
 vtk_module_definitions(CDIReader::vtkCDIReader
   PRIVATE
     # Please leave these definitions in here and do not change them. We use the
