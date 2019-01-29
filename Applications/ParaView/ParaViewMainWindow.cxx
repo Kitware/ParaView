@@ -56,6 +56,7 @@ void vtkPVInitializePythonModules();
 #include "vtkPVPlugin.h"
 #include "vtkProcessModule.h"
 #include "vtkSMSettings.h"
+#include "vtksys/SystemTools.hxx"
 
 #ifndef BUILD_SHARED_LIBS
 #include "pvStaticPluginsInit.h"
@@ -107,7 +108,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   // the debug leaks view should be constructed as early as possible
   // so that it can monitor vtk objects created at application startup.
   DebugLeaksViewType* leaksView = nullptr;
-  if (getenv("PV_DEBUG_LEAKS_VIEW"))
+  if (vtksys::SystemTools::GetEnv("PV_DEBUG_LEAKS_VIEW"))
   {
     leaksView = new DebugLeaksViewType(this);
     leaksView->setWindowFlags(Qt::Window);

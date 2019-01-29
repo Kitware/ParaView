@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 
+#include "vtksys/SystemTools.hxx"
+
 #include <QApplication>
 #include <QFile>
 #include <QFileDialog>
@@ -140,7 +142,7 @@ void pqCrashRecoveryBehavior::onServerDisconnect()
   }
   inQuit = true;
 
-  if (getenv("DASHBOARD_TEST_FROM_CTEST") == NULL)
+  if (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") == NULL)
   {
     // enable user interaction (BUG #17155).
     pqProgressManager* pgm = pqApplicationCore::instance()->getProgressManager();
