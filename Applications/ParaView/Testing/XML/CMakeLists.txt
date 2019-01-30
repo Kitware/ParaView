@@ -1574,22 +1574,22 @@ paraview_add_multi_server_tests(3
 #   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
 #   TEST_SCRIPTS TileDisplayScatterPlot-2x2.xml)
 
-# This test has been behaving badly across many platforms and needs to be fixed
-# before it can be useful. Disabling for now, see bug #15424.
+# These tests have been behaving badly across many platforms and needs to be
+# fixed before it can be useful. Disabling for now, see bug #15424.
 #set (TileDisplay3DTesting-1x2_THRESHOLD 270)
 #add_tile_display_tests("pvcs-tile-display" 1 2
 #   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
 #   TEST_SCRIPTS TileDisplay3DTesting-1x2.xml)
 
+#set (TileDisplay3DTesting-2x2_THRESHOLD 270)
+#paraview_add_tile_display_tests(2 2
+#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#   TEST_SCRIPTS TileDisplay3DTesting-2x2.xml)
+
 set (TileDisplay3DTesting-2x1_THRESHOLD 270)
 paraview_add_tile_display_tests(2 1
    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
    TEST_SCRIPTS TileDisplay3DTesting-2x1.xml)
-
-set (TileDisplay3DTesting-2x2_THRESHOLD 270)
-paraview_add_tile_display_tests(2 2
-   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-   TEST_SCRIPTS TileDisplay3DTesting-2x2.xml)
 
 
 #------------------------------------------------------------------
