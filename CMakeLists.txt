@@ -827,7 +827,7 @@ if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     -DPARAVIEW_VERSION:STRING=${PARAVIEW_VERSION}
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ParaViewTestInstall.cmake)
   set_tests_properties(pv.TestDevelopmentInstall PROPERTIES
-    LABELS "PARAVIEW"
+    LABELS "paraview"
     ENVIRONMENT "DESTDIR=${CMAKE_BINARY_DIR}/test-install")
 endif()
 #------------------------------------------------------------------------------
@@ -843,7 +843,7 @@ if (BUILD_TESTING AND PARAVIEW_ENABLE_PYTHON AND UNIX AND NOT APPLE)
     -DPARAVIEW_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
     -P ${CMAKE_SOURCE_DIR}/CMake/ParaViewTestCatalystCodeGeneration.cmake)
   set_tests_properties(GenerateCatalystEditions PROPERTIES
-    LABELS "PARAVIEW;CATALYST")
+    LABELS "paraview;catalyst")
 endif()
 #------------------------------------------------------------------------------
 

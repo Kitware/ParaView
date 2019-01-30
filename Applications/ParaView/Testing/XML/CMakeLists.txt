@@ -542,7 +542,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
     --test-directory=${PARAVIEW_TEST_DIR}
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${test_name}.xml
-    EXTRA_LABELS "CATALYST")
+    EXTRA_LABELS "catalyst")
 
   add_pv_test(pvcs "_DISABLE_CS"
     COMMAND
@@ -561,7 +561,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
     --test-directory=${PARAVIEW_TEST_DIR}
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${test_name}.xml
-    EXTRA_LABELS "CATALYST")
+    EXTRA_LABELS "catalyst")
 
 endmacro(ADD_CATALYST_LIVE_TEST)
 
@@ -1682,6 +1682,6 @@ if (PARAVIEW_ENABLE_PYTHON)
       -DTEMPORARY_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
       -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTestDriver.cmake
     )
-    set_tests_properties(${python_state_test} PROPERTIES LABELS "PARAVIEW")
+    set_tests_properties(${python_state_test} PROPERTIES LABELS "paraview")
   endforeach()
 endif()

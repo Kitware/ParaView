@@ -4,7 +4,7 @@ find_python_module(matplotlib matplotlib_found)
 
 # Set variables to make the testing functions.
 set(_vtk_build_test "paraview")
-set(${_vtk_build_test}_TEST_LABELS PARAVIEW)
+set(${_vtk_build_test}_TEST_LABELS paraview)
 
 ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
@@ -135,7 +135,7 @@ if(BUILD_SHARED_LIBS)
   set(TestMultiServersRemoteProxy_ARGS
     --test-multi-servers 3
     )
-  set(${_vtk_build_test}_TEST_LABELS PARAVIEW)
+  set(${_vtk_build_test}_TEST_LABELS paraview)
 
   paraview_add_test_driven(
     NO_DATA NO_VALID NO_OUTPUT NO_RT
