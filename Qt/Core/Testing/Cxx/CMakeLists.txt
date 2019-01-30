@@ -9,4 +9,3 @@ ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}"
           "--test-baseline=DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/pqCoreBasicApp.png}"
           --exit
   )
-set_tests_properties(pqCoreBasicApp PROPERTIES LABELS "PARAVIEW")

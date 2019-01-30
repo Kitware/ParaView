@@ -4,4 +4,3 @@ vtk_module_test_executable(pqPipelineApp FilteredPipelineBrowserApp.cxx Filtered
 target_link_libraries(pqPipelineApp PRIVATE Qt5::Core Qt5::Widgets)
 
 #ADD_TEST(pqPipelineApp "${EXECUTABLE_OUTPUT_PATH}/pqPipelineApp" -dr "--test-directory=${PARAVIEW_TEST_DIR}")
-#set_tests_properties(pqPipelineApp PROPERTIES LABELS "PARAVIEW")
