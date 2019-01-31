@@ -26,7 +26,6 @@
 // script. Note that through configuration
 // that the driver can be run without linking
 // to Catalyst.
-#include <unistd.h>
 int main(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
