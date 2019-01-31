@@ -404,8 +404,12 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
   this->CurrentBuffer->SetContext(renWin);
   this->CurrentBuffer->SaveCurrentBindingsAndBuffers();
   this->CurrentBuffer->Bind();
+#ifdef VTK_UPDATED_FRAMEBUFFER
+  this->CurrentBuffer->AddColorAttachment(0, this->CurrentTexture);
+#else
   this->CurrentBuffer->AddColorAttachment(
     this->CurrentBuffer->GetBothMode(), 0, this->CurrentTexture);
+#endif
   this->CurrentBuffer->AddDepthAttachment(); // auto create depth buffer
   this->CurrentBuffer->ActivateBuffer(0);
   this->CurrentBuffer->Start(this->CurrentTexture->GetWidth(), this->CurrentTexture->GetHeight());
@@ -506,7 +510,11 @@ void vtkStreamLinesMapper::Private::DrawParticles(vtkRenderer* ren, vtkActor* ac
     this->FrameBuffer->SetContext(renWin);
     this->FrameBuffer->SaveCurrentBindingsAndBuffers();
     this->FrameBuffer->Bind();
+#ifdef VTK_UPDATED_FRAMEBUFFER
+    this->FrameBuffer->AddColorAttachment(0, this->FrameTexture);
+#else
     this->FrameBuffer->AddColorAttachment(this->FrameBuffer->GetBothMode(), 0, this->FrameTexture);
+#endif
     this->FrameBuffer->AddDepthAttachment(); // auto create depth buffer
     this->FrameBuffer->ActivateBuffer(0);
     this->FrameBuffer->Start(this->FrameTexture->GetWidth(), this->FrameTexture->GetHeight());
