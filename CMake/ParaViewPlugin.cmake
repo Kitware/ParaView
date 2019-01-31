@@ -700,6 +700,24 @@ function (paraview_add_plugin name)
       list(APPEND _paraview_add_plugin_required_libraries
         ParaView::pqCore)
     endif ()
+
+    # CMake 3.13 started using Qt5's version variables to detect what version
+    # of Qt's tools to run for automoc, autouic, and autorcc. However, they are
+    # looked up using the target's directory scope, but these are here in a
+    # local scope and unset when AutoGen gets around to asking about the
+    # variables at generate time.
+
+    # Fix for 3.13.0–3.13.3. Does not work if `paraview_add_plugin` is called
+    # from another function.
+    set(Qt5Core_VERSION_MAJOR "${Qt5Core_VERSION_MAJOR}" PARENT_SCOPE)
+    set(Qt5Core_VERSION_MINOR "${Qt5Core_VERSION_MINOR}" PARENT_SCOPE)
+    # Fix for 3.13.4+.
+    set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      PROPERTY
+        Qt5Core_VERSION_MAJOR "${Qt5Core_VERSION_MAJOR}")
+    set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      PROPERTY
+        Qt5Core_VERSION_MINOR "${Qt5Core_VERSION_MAJOR}")
   endif ()
 
   set(_paraview_add_plugin_with_python 0)
