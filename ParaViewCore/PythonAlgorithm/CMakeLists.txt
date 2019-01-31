@@ -1,6 +1,6 @@
-set(Module_SRCS
-  vtkSIPythonSourceProxy.cxx
-  vtkPVPythonAlgorithmPlugin.cxx
-  )
+set(classes
+  vtkPVPythonAlgorithmPlugin
+  vtkSIPythonSourceProxy)
 
-vtk_module_library(vtkPVPythonAlgorithm ${Module_SRCS})
+vtk_module_add_module(ParaView::PythonAlgorithm
+  CLASSES ${classes})
