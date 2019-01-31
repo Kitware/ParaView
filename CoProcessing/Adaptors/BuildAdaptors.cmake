@@ -70,7 +70,7 @@ function(build_adaptor name languages)
                             -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
                             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
                             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-                            -DCMAKE_PREFIX_PATH:STRING=${CMAKE_PREFIX_PATH}
+                            -DCMAKE_PREFIX_PATH:STRING="${CMAKE_PREFIX_PATH}"
                             ${language_options}
                             ${extra_params}
                             --no-warn-unused-cli
