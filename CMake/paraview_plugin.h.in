@@ -76,7 +76,7 @@ public:
    * Returns a description of this plugin.
    */
   const char* GetDescription() override
-    { return "@_paraview_add_plugin_DESCRIPTION@"; }
+    { return "@_paraview_add_plugin_description@"; }
 
   /**
    * Returns EULA for the plugin, if any. If none, this will return nullptr.
