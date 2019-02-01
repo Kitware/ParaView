@@ -1,0 +1,6 @@
+NAME
+  GUIMyToolBar
+DESCRIPTION
+  An example plugin that implements an object panel for a source proxy.
+REQUIRES_MODULES
+  ParaView::pqComponents

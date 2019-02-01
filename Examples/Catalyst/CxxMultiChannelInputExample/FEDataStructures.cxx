@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iterator>
 #include <mpi.h>
 #include <stdlib.h>
 
@@ -156,7 +157,7 @@ void Attributes::UpdateFields(double time)
   std::fill(this->Velocity.begin() + numPoints, this->Velocity.end(), 0.);
   size_t numCells = this->GridPtr->GetNumberOfCells();
   this->Pressure.resize(numCells);
-  std::fill(this->Pressure.begin(), this->Pressure.end(), 1.);
+  std::fill(this->Pressure.begin(), this->Pressure.end(), 1.f);
 }
 
 double* Attributes::GetVelocityArray()

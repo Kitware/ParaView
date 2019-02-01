@@ -1,1 +1,3 @@
-python @DOLFIN_EXAMPLE_SOURCE_DIR@/simulation.py
+#!/bin/sh
+
+python "@DOLFIN_EXAMPLE_SOURCE_DIR@/simulation.py"

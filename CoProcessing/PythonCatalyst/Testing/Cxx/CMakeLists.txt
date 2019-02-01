@@ -1,8 +1,6 @@
 include_directories(
   ${TestDriver_SOURCE_DIR})
 
-set(CP_LABELS PARAVIEW CATALYST)
-
 #------------------------------------------------------------------------------
 vtk_module_test_executable(CoProcessingPythonScriptExample
   PythonScriptCoProcessingExample.cxx
@@ -20,7 +18,6 @@ add_test(NAME CoProcessingTestInput
   COMMAND pvbatch -sym ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
   ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py 4
   )
-set_tests_properties(CoProcessingTestInput PROPERTIES LABELS "${CP_LABELS}")
 
 
 
@@ -51,7 +48,6 @@ else()
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
 endif()
 
-set_tests_properties(CoProcessingImport PROPERTIES LABELS "${CP_LABELS}")
 set_tests_properties(CoProcessingImport PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 
 # test if we can use a Python programmable filter in a Catalyst Python script
@@ -77,7 +73,6 @@ else()
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
 endif()
 
-set_tests_properties(CoProcessingProgrammableFilter PROPERTIES LABELS "${CP_LABELS}")
 set_tests_properties(CoProcessingProgrammableFilter PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 #-  add_test(NAME CoProcessingProgrammableFilter
 #-    COMMAND CoProcessingProgrammableFilter
@@ -109,7 +104,6 @@ else()
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
 endif()
 
-set_tests_properties(CoProcessingTestPythonScript PROPERTIES LABELS "${CP_LABELS}")
 set_tests_properties(CoProcessingTestPythonScript PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 
 if (PARAVIEW_USE_MPI)
@@ -130,7 +124,6 @@ if (PARAVIEW_USE_MPI)
   # both the parallel and the serial tests create the same output images
   # so we run this one serially so that they don't interfere.
   set_tests_properties(PCoProcessingTestPythonScript PROPERTIES RUN_SERIAL ON)
-  set_tests_properties(PCoProcessingTestPythonScript PROPERTIES LABELS "${CP_LABELS}")
   set_tests_properties(PCoProcessingTestPythonScript PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
 endif()
 
@@ -154,7 +147,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_NAME:STRING=CoProcessingFullWorkflow
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
-    set_tests_properties(CoProcessingFullWorkflow PROPERTIES LABELS "${CP_LABELS}")
 
     add_test(NAME CoProcessingFullWorkflowNewUI
       COMMAND ${CMAKE_COMMAND}
@@ -169,7 +161,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_NAME:STRING=CoProcessingFullWorkflowNewUI
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(CoProcessingFullWorkflowNewUI PROPERTIES RUN_SERIAL ON)
-    set_tests_properties(CoProcessingFullWorkflowNewUI PROPERTIES LABELS "${CP_LABELS}")
 
     add_test(NAME CoProcessingFullWorkflowWithOnlyExtracts
       COMMAND ${CMAKE_COMMAND}
@@ -184,7 +175,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_NAME:STRING=CoProcessingFullWorkflowWithOnlyExtracts
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(CoProcessingFullWorkflowWithOnlyExtracts PROPERTIES RUN_SERIAL ON)
-    set_tests_properties(CoProcessingFullWorkflowWithOnlyExtracts PROPERTIES LABELS "${CP_LABELS}")
 
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME CoProcessingFullWorkflowWithPlots
       COMMAND ${CMAKE_COMMAND}
@@ -201,7 +191,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflowPlot1.png}
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflowPlot2.png} )
     set_tests_properties(CoProcessingFullWorkflowWithPlots PROPERTIES RUN_SERIAL ON)
-    set_tests_properties(CoProcessingFullWorkflowWithPlots PROPERTIES LABELS "${CP_LABELS}")
 
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME CoProcessingFullWorkflowWithOnlyPlots
       COMMAND ${CMAKE_COMMAND}
@@ -217,7 +206,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflowPlot2.png} )
     set_tests_properties(CoProcessingFullWorkflowWithOnlyPlots PROPERTIES RUN_SERIAL ON)
-    set_tests_properties(CoProcessingFullWorkflowWithOnlyPlots PROPERTIES LABELS "${CP_LABELS}")
 
     find_python_module(numpy numpy_found)
     if (numpy_found)
@@ -231,7 +219,6 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinema
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES RUN_SERIAL ON)
-      set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES LABELS "${CP_LABELS}")
 
       add_test(NAME CoProcessingFullWorkflowCinemaComposite
         COMMAND ${CMAKE_COMMAND}
@@ -243,7 +230,6 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaComposite
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES RUN_SERIAL ON)
-      set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES LABELS "${CP_LABELS}")
 
       add_test(NAME CoProcessingFullWorkflowCinemaCompositeFloat
         COMMAND ${CMAKE_COMMAND}
@@ -255,7 +241,6 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaCompositeFloat
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinemaCompositeFloat PROPERTIES RUN_SERIAL ON)
-      set_tests_properties(CoProcessingFullWorkflowCinemaCompositeFloat PROPERTIES LABELS "${CP_LABELS}")
 
     endif()
 
@@ -270,7 +255,6 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_NAME:STRING=TemporalScriptFullWorkflow
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(TemporalScriptFullWorkflow PROPERTIES RUN_SERIAL ON)
-    set_tests_properties(TemporalScriptFullWorkflow PROPERTIES LABELS "${CP_LABELS}")
 
   ENDIF ()
 endif()

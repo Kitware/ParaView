@@ -1,0 +1,7 @@
+NAME
+  ExampleDockPanel
+DESCRIPTION
+  Example plugin demonstrating how to add a dock panel to ParaView. This plugin
+  adds the panel ExampleDockPanel to the client.
+REQUIRES_MODULES
+  ParaView::pqComponents

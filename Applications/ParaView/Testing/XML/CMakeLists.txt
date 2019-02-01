@@ -7,6 +7,10 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00000/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00000/particles/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00000/particles/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/ANALYZE/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree.vtm}"
@@ -538,7 +542,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
     --test-directory=${PARAVIEW_TEST_DIR}
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${test_name}.xml
-    EXTRA_LABELS "CATALYST")
+    EXTRA_LABELS "catalyst")
 
   add_pv_test(pvcs "_DISABLE_CS"
     COMMAND
@@ -557,7 +561,7 @@ macro(ADD_CATALYST_LIVE_TEST test_name duration command_line_connect_command)
     --test-directory=${PARAVIEW_TEST_DIR}
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS ${test_name}.xml
-    EXTRA_LABELS "CATALYST")
+    EXTRA_LABELS "catalyst")
 
 endmacro(ADD_CATALYST_LIVE_TEST)
 
@@ -1570,22 +1574,22 @@ paraview_add_multi_server_tests(3
 #   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
 #   TEST_SCRIPTS TileDisplayScatterPlot-2x2.xml)
 
-# This test has been behaving badly across many platforms and needs to be fixed
-# before it can be useful. Disabling for now, see bug #15424.
+# These tests have been behaving badly across many platforms and needs to be
+# fixed before it can be useful. Disabling for now, see bug #15424.
 #set (TileDisplay3DTesting-1x2_THRESHOLD 270)
 #add_tile_display_tests("pvcs-tile-display" 1 2
 #   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
 #   TEST_SCRIPTS TileDisplay3DTesting-1x2.xml)
 
+#set (TileDisplay3DTesting-2x2_THRESHOLD 270)
+#paraview_add_tile_display_tests(2 2
+#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+#   TEST_SCRIPTS TileDisplay3DTesting-2x2.xml)
+
 set (TileDisplay3DTesting-2x1_THRESHOLD 270)
 paraview_add_tile_display_tests(2 1
    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
    TEST_SCRIPTS TileDisplay3DTesting-2x1.xml)
-
-set (TileDisplay3DTesting-2x2_THRESHOLD 270)
-paraview_add_tile_display_tests(2 2
-   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-   TEST_SCRIPTS TileDisplay3DTesting-2x2.xml)
 
 
 #------------------------------------------------------------------
@@ -1678,6 +1682,6 @@ if (PARAVIEW_ENABLE_PYTHON)
       -DTEMPORARY_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
       -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTestDriver.cmake
     )
-    set_tests_properties(${python_state_test} PROPERTIES LABELS "PARAVIEW")
+    set_tests_properties(${python_state_test} PROPERTIES LABELS "paraview")
   endforeach()
 endif()

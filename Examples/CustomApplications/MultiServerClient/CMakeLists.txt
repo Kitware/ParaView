@@ -7,8 +7,8 @@
 #   All rights reserved.
 #
 #   ParaView is a free software; you can redistribute it and/or modify it
-#   under the terms of the ParaView license version 1.2. 
-#   
+#   under the terms of the ParaView license version 1.2.
+#
 #   See License_v1.2.txt for the full ParaView license.
 #   A copy of this license can be obtained by contacting
 #   Kitware Inc.
@@ -29,49 +29,42 @@
 #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #========================================================================
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.8)
 project(MultiServerClient)
 
 find_package(ParaView REQUIRED)
-include(${PARAVIEW_USE_FILE})
+
 if (NOT PARAVIEW_BUILD_QT_GUI)
-  message(FATAL_ERROR
-    "MultiServerClient example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
-    "Please rebuild ParaView (or point to a different build of ParaView) "
-    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+  message(STATUS
+    "${CMAKE_PROJECT_NAME} example requires PARAVIEW_BUILD_QT_GUI to be "
+    "enabled. Please rebuild ParaView (or point to a different build of "
+    "ParaView) with PARAVIEW_BUILD_QT_GUI set to TRUE")
+  return ()
 endif()
 
-# Set a consistent MACOSX_RPATH default across all CMake versions.
-# When CMake 2.8.12 is required, change this default to 1.
-# When CMake 3.0.0 is required, remove this block (see CMP0042).
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-  set(CMAKE_MACOSX_RPATH 0)
-endif()
+include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
-SET (SOURCE_FILES
+set(CMAKE_AUTOMOC 1)
+set(CMAKE_AUTOUIC 1)
+
+set(sources
   MultiServerClientMainWindow.cxx
-  MultiServerClientMainWindow.h
-)
+  MultiServerClientMainWindow.h)
+set(ui_files
+  MultiServerClientMainWindow.ui)
+set(xml_files
+  Sources.xml)
 
-pv_qt_wrap_cpp(MOC_SRCS MultiServerClientMainWindow.h)
-pv_qt_wrap_ui(UI_BUILT_SOURCES MultiServerClientMainWindow.ui)
+paraview_client_add(
+  NAME multiserverclient
+  VERSION "1.0.0"
+  SOURCES ${sources} ${ui_files}
+  APPLICATION_XMLS ${xml_files}
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-)
+  MAIN_WINDOW_CLASS MultiServerClientMainWindow
 
-#------------------------------------------------------------------------------
-# Build the client
-include(ParaViewBranding)
-
-build_paraview_client(multiserverclient
-    TITLE "Multi-Server Client (ParaView-based Example Application)"
-    ORGANIZATION  "Kitware Inc"
-    VERSION_MAJOR 1
-    VERSION_MINOR 0
-    VERSION_PATCH 0
-    PVMAIN_WINDOW MultiServerClientMainWindow 
-    PVMAIN_WINDOW_INCLUDE MultiServerClientMainWindow.h
-    SOURCES ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES}
-    GUI_CONFIGURATION_XMLS ${CMAKE_CURRENT_SOURCE_DIR}/Sources.xml
-)
+  ORGANIZATION "Kitware, Inc."
+  TITLE "Multi-Server Client (ParaView-based Example Application)")

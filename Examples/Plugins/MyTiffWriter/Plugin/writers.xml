@@ -1,0 +1,61 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="writers">
+
+    <WriterProxy name="MyTIFFWriter"
+                 class="vtkTIFFWriter"
+                 label="My TIFF Writer">
+      <Documentation short_help="Write image data as a TIF file.">
+        Writes image data as a TIFF data file. Data can be written uncompressed or compressed. Several forms of compression are supported including packed bits, JPEG, and deflation.  By setting a file pattern, you can write a sequence of slices.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+                            command="SetFilePrefix"
+                            number_of_elements="1"
+                            label="File Prefix">
+        <Documentation>
+          The prefix of the file name.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FilePattern"
+                            command="SetFilePattern"
+                            number_of_elements="1"
+                            default_values="%s">
+        <Documentation>
+          The sprintf format used to build filename from FilePrefix and number.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="Compression"
+                         command="SetCompression"
+                         number_of_elements="1"
+                         default_values="1">
+        <Documentation>
+          The type of compression used in the file.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="No Compression" />
+          <Entry value="1" text="Pack Bits" />
+          <Entry value="2" text="JPEG" />
+          <Entry value="3" text="Deflate" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <WriterFactory extensions="tif"
+                       file_description="My Tiff Files" />
+      </Hints>
+
+    </WriterProxy>
+
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

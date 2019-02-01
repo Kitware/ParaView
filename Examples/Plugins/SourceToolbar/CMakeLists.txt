@@ -1,32 +1,28 @@
+cmake_minimum_required(VERSION 3.8)
+project(SourceToolbar)
 
+find_package(ParaView REQUIRED)
 
-cmake_minimum_required(VERSION 3.3)
+include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
-IF(NOT ParaView_BINARY_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF()
+set("_paraview_plugin_default_${CMAKE_PROJECT_NAME}" ON)
+paraview_plugin_scan(
+  PLUGIN_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/paraview.plugin"
+  PROVIDES_PLUGINS  plugins
+  REQUIRES_MODULES  required_modules)
 
-# Set a consistent MACOSX_RPATH default across all CMake versions.
-# When CMake 2.8.12 is required, change this default to 1.
-# When CMake 3.0.0 is required, remove this block (see CMP0042).
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-  set(CMAKE_MACOSX_RPATH 0)
-endif()
+foreach (module IN LISTS required_modules)
+  if (NOT TARGET "${module}")
+    message("Missing required module: ${module}")
+    return ()
+  endif ()
+endforeach ()
 
-IF(PARAVIEW_BUILD_QT_GUI)
-  # We need to wrap for Qt stuff such as signals/slots etc. to work correctly.
-  QT5_WRAP_CPP(MOC_SRCS SourceToolbarActions.h)
-
-  # This is a macro for adding QActionGroup subclasses automatically as toolbars.
-  ADD_PARAVIEW_ACTION_GROUP(IFACES IFACE_SRCS
-                            CLASS_NAME SourceToolbarActions
-                            GROUP_NAME "ToolBar/SourceToolbar")
-
-  # Now crete a plugin for the toolbar. Here we pass IFACES and IFACE_SRCS
-  # which are filled up by the above macro with relevant entries
-  ADD_PARAVIEW_PLUGIN(SourceToolbar "1.0"
-                      GUI_INTERFACES ${IFACES}
-                      SOURCES ${MOC_SRCS} ${IFACE_SRCS}
-                      SourceToolbarActions.cxx)
-ENDIF()
+paraview_plugin_build(
+  RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY_SUBDIRECTORY "${PARAVIEW_PLUGIN_SUBDIR}"
+  PLUGINS ${plugins})

@@ -1,38 +1,30 @@
-cmake_minimum_required(VERSION 3.3)
-project(CxxMappedDataArrayExample)
-
-set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
-if(USE_CATALYST)
-  find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
-  include("${PARAVIEW_USE_FILE}")
-  set(Adaptor_SRCS
+if (USE_CATALYST)
+  add_library(CxxMappedDataArrayExampleAdaptor
     FEAdaptor.cxx
-    )
-  add_library(CxxMappedDataArrayExampleAdaptor ${Adaptor_SRCS})
-  target_link_libraries(CxxMappedDataArrayExampleAdaptor vtkPVPythonCatalyst vtkParallelMPI)
-  add_definitions("-DUSE_CATALYST")
-  if(NOT PARAVIEW_USE_MPI)
-    message(SEND_ERROR "ParaView must be built with MPI enabled")
-  endif()
-else()
-  find_package(MPI REQUIRED)
-  include_directories(${MPI_C_INCLUDE_PATH})
-endif()
+    FEAdaptor.h
+    vtkCPMappedVectorArrayTemplate.h
+    vtkCPMappedVectorArrayTemplate.txx)
+  target_link_libraries(CxxMappedDataArrayExampleAdaptor
+    PRIVATE
+      ParaView::PythonCatalyst
+      VTK::ParallelMPI)
+endif ()
 
-add_executable(CxxMappedDataArrayExample FEDriver.cxx FEDataStructures.cxx)
-if(USE_CATALYST)
-  target_link_libraries(CxxMappedDataArrayExample LINK_PRIVATE CxxMappedDataArrayExampleAdaptor)
-  include(vtkModuleMacros)
-  include(vtkMPI)
-  vtk_mpi_link(CxxMappedDataArrayExample)
-else()
-  target_link_libraries(CxxMappedDataArrayExample LINK_PRIVATE ${MPI_LIBRARIES})
-endif()
+add_executable(CxxMappedDataArrayExample
+  FEDataStructures.cxx
+  FEDataStructures.h
+  FEDriver.cxx)
+if (TARGET CxxMappedDataArrayExampleAdaptor)
+  target_link_libraries(CxxMappedDataArrayExample
+    PRIVATE
+      CxxMappedDataArrayExampleAdaptor
+      VTK::mpi)
+else ()
+  target_link_libraries(CxxMappedDataArrayExample
+    PRIVATE
+      MPI::MPI_C)
+endif ()
 
-option(BUILD_TESTING "Build Testing" OFF)
-# Setup testing.
 if (BUILD_TESTING)
-  include(CTest)
   add_test(NAME CxxMappedDataArrayExampleTest COMMAND CxxMappedDataArrayExample ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
-  set_tests_properties(CxxMappedDataArrayExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()

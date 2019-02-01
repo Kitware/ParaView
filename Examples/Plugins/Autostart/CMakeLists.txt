@@ -1,28 +1,28 @@
-# Create an auto-start plugin. Auto start plugins provide callbacks that get
-# called when the plugin is loaded and when the application shutsdown.
+cmake_minimum_required(VERSION 3.8)
+project(Autostart)
 
-cmake_minimum_required(VERSION 3.3)
+find_package(ParaView REQUIRED)
 
-IF(NOT ParaView_BINARY_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF()
+include(GNUInstallDirs)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 
-# Set a consistent MACOSX_RPATH default across all CMake versions.
-# When CMake 2.8.12 is required, change this default to 1.
-# When CMake 3.0.0 is required, remove this block (see CMP0042).
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-  set(CMAKE_MACOSX_RPATH 0)
-endif()
+set("_paraview_plugin_default_${CMAKE_PROJECT_NAME}" ON)
+paraview_plugin_scan(
+  PLUGIN_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Plugin/paraview.plugin"
+  PROVIDES_PLUGINS  plugins
+  REQUIRES_MODULES  required_modules)
 
-QT5_WRAP_CPP(MOC_SRCS pqMyApplicationStarter.h)
+foreach (module IN LISTS required_modules)
+  if (NOT TARGET "${module}")
+    message("Missing required module: ${module}")
+    return ()
+  endif ()
+endforeach ()
 
-ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqMyApplicationStarter
-                        STARTUP onStartup
-                        SHUTDOWN onShutdown)
-
-# create a plugin for this starter
-ADD_PARAVIEW_PLUGIN(Autostart "1.0" 
-                    GUI_INTERFACES ${IFACES} 
-                    SOURCES pqMyApplicationStarter.cxx ${MOC_SRCS} ${RCS_SRCS} ${IFACE_SRCS})
-
+paraview_plugin_build(
+  RUNTIME_DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  LIBRARY_DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  LIBRARY_SUBDIRECTORY "${PARAVIEW_PLUGIN_SUBDIR}"
+  PLUGINS ${plugins})

@@ -15,6 +15,16 @@ write_basic_package_version_file("${paraview_cmake_build_dir}/paraview-config-ve
   VERSION "${PARAVIEW_MAJOR_VERSION}.${PARAVIEW_MINOR_VERSION}.${PARAVIEW_BUILD_VERSION}"
   COMPATIBILITY SameMinorVersion)
 
+# For convenience, a package is written to the top of the build tree. At some
+# point, this should probably be deprecated and warn when it is used.
+file(GENERATE
+  OUTPUT  "${CMAKE_BINARY_DIR}/paraview-config.cmake"
+  CONTENT "include(\"${paraview_cmake_build_dir}/paraview-config.cmake\")\n")
+configure_file(
+  "${paraview_cmake_build_dir}/paraview-config-version.cmake"
+  "${CMAKE_BINARY_DIR}/paraview-config-version.cmake"
+  COPYONLY)
+
 set(paraview_cmake_module_files
   FindCGNS.cmake
 

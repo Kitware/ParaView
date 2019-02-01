@@ -1,22 +1,22 @@
-cmake_minimum_required(VERSION 3.3)
-project(CatalystCxxNonOverlappingAMRExample)
+if (NOT USE_CATALYST)
+  message(STATUS
+    "Skipping CxxNonOverlappingAMRExample because `USE_CATALYST` is not set.")
+  return ()
+endif ()
 
-find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
-include("${PARAVIEW_USE_FILE}")
-set(Adaptor_SRCS
+add_library(CxxNonOverlappingAMRExampleAdaptor
   FEAdaptor.cxx
-  )
-add_library(CxxNonOverlappingAMRExampleAdaptor ${Adaptor_SRCS})
-target_link_libraries(CxxNonOverlappingAMRExampleAdaptor vtkPVPythonCatalyst)
-add_definitions("-DUSE_CATALYST")
+  FEAdaptor.h)
+target_link_libraries(CxxNonOverlappingAMRExampleAdaptor
+  PRIVATE
+    ParaView::PythonCatalyst)
 
-add_executable(CxxNonOverlappingAMRExample FEDriver.cxx)
-target_link_libraries(CxxNonOverlappingAMRExample CxxNonOverlappingAMRExampleAdaptor)
+add_executable(CxxNonOverlappingAMRExample
+  FEDriver.cxx)
+target_link_libraries(CxxNonOverlappingAMRExample
+  PRIVATE
+    CxxNonOverlappingAMRExampleAdaptor)
 
-option(BUILD_TESTING "Build Testing" OFF)
-# Setup testing.
 if (BUILD_TESTING)
-  include(CTest)
   add_test(NAME CxxNonOverlappingAMRExampleTest COMMAND CxxNonOverlappingAMRExample ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
-  set_tests_properties(CxxNonOverlappingAMRExampleTest PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()

@@ -1,0 +1,8 @@
+NAME
+  Representation
+DESCRIPTION
+  Example plugin for a custom representation.
+REQUIRES_MODULES
+  ParaView::ClientServerCoreRendering
+  VTK::CommonCore
+  VTK::RenderingOpenGL2

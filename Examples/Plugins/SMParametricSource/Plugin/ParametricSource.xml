@@ -1,0 +1,42 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="parametric_functions">
+    <Proxy name="ParametricBoy" class="vtkParametricBoy"/>
+    <Proxy name="ParametricConicSpiral" class="vtkParametricConicSpiral">
+      <DoubleVectorProperty name="TubeRadius" command="SetA"
+         animateable="1"
+         number_of_elements="1" default_values="0.2">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Height" command="SetB"
+         number_of_elements="1" default_values="1">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Radius" command="SetC"
+         number_of_elements="1" default_values="0.1">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="NumberOfWindings" command="SetN"
+         number_of_elements="1" default_values="2">
+         <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+    </Proxy>
+    <Proxy name="ParametricEllipsoid" class="vtkParametricEllipsoid"/>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+   <SourceProxy name="ParametricSource"
+                class="vtkParametricFunctionSource"
+                label="Parametric Source">
+     <ProxyProperty
+       command="SetParametricFunction"
+       name="ParametricFunction"
+       label="Parametric Function">
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="parametric_functions" name="ParametricBoy" />
+         <Proxy group="parametric_functions" name="ParametricConicSpiral" />
+         <Proxy group="parametric_functions" name="ParametricEllipsoid" />
+       </ProxyListDomain>
+     </ProxyProperty>
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

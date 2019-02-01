@@ -366,7 +366,7 @@ endif ()
 
 if (PARAVIEW_ENABLE_VISITBRIDGE)
   list(APPEND paraview_requested_modules
-    VTK::IOVisItBridge)
+    ParaView::IOVisItBridge)
 endif ()
 
 if (PARAVIEW_ENABLE_XDMF2)
@@ -827,7 +827,7 @@ if (BUILD_TESTING AND PARAVIEW_INSTALL_DEVELOPMENT_FILES)
     -DPARAVIEW_VERSION:STRING=${PARAVIEW_VERSION}
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ParaViewTestInstall.cmake)
   set_tests_properties(pv.TestDevelopmentInstall PROPERTIES
-    LABELS "PARAVIEW"
+    LABELS "paraview"
     ENVIRONMENT "DESTDIR=${CMAKE_BINARY_DIR}/test-install")
 endif()
 #------------------------------------------------------------------------------
@@ -843,7 +843,7 @@ if (BUILD_TESTING AND PARAVIEW_ENABLE_PYTHON AND UNIX AND NOT APPLE)
     -DPARAVIEW_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
     -P ${CMAKE_SOURCE_DIR}/CMake/ParaViewTestCatalystCodeGeneration.cmake)
   set_tests_properties(GenerateCatalystEditions PROPERTIES
-    LABELS "PARAVIEW;CATALYST")
+    LABELS "paraview;catalyst")
 endif()
 #------------------------------------------------------------------------------
 
@@ -856,18 +856,6 @@ if (PARAVIEW_BUILD_CATALYST_ADAPTORS)
 endif()
 
 #-----------------------------------------------------------------------------
-if (BUILD_EXAMPLES)
-        # Don't do parallel make when cross compiling.
-  # BuildExamples.cmake builds the examples as a separate project. This ensures
-  # that examples can be built by themselves as well as avoiding pollution of
-  # the ParaView target space with targets (and other things) from examples.
-  include(${CMAKE_CURRENT_SOURCE_DIR}/Examples/BuildExamples.cmake)
-  if (BUILD_TESTING AND PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND PARAVIEW_ENABLE_CATALYST)
-    set_property(
-      DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
-      APPEND
-      PROPERTY
-      TEST_INCLUDE_FILE "${CMAKE_CURRENT_BINARY_DIR}/CatalystExamples.cmake")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CatalystExamples.cmake" "subdirs(${CMAKE_CURRENT_BINARY_DIR}/Examples/All/Catalyst/)")
-  ENDIF ()
-endif()
+if (PARAVIEW_BUILD_EXAMPLES)
+  add_subdirectory(Examples)
+endif ()

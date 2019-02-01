@@ -29,7 +29,6 @@ if (PARAVIEW_USE_MPI)
         -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
         --threshold 30
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
-    SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
   SET(SurfaceLIC-OfficeSlices_THRESHOLD 30)
   SET(SurfaceLIC-OfficeVSlice_THRESHOLD 30)
@@ -46,7 +45,6 @@ ELSE()
         -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
         --threshold 30
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
-    SET_TESTS_PROPERTIES(${tfile}-Batch PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH()
 ENDIF()
 

@@ -1,6 +1,7 @@
 #include "FEDataStructures.h"
 
 #include <iostream>
+#include <iterator>
 #include <mpi.h>
 
 Grid::Grid()
@@ -133,7 +134,7 @@ void Attributes::UpdateFields(double time)
   std::fill(this->Velocity.begin() + numPoints, this->Velocity.end(), 0.);
   size_t numCells = this->GridPtr->GetNumberOfCells();
   this->Pressure.resize(numCells);
-  std::fill(this->Pressure.begin(), this->Pressure.end(), 1.);
+  std::fill(this->Pressure.begin(), this->Pressure.end(), 1.f);
 }
 
 double* Attributes::GetVelocityArray()

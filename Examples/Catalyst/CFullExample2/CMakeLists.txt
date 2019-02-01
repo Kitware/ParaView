@@ -1,40 +1,28 @@
-cmake_minimum_required(VERSION 3.3)
-project(CatalystCFullExample2 C)
-
-set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
-if(USE_CATALYST)
-  # we only need C++ compilers if we're building the Adaptor
-  enable_language(CXX)
-  find_package(ParaView 4.1 REQUIRED COMPONENTS vtkPVPythonCatalyst)
-  include("${PARAVIEW_USE_FILE}")
-  set(Adaptor_SRCS
+if (USE_CATALYST)
+  add_library(CFullExample2Adaptor
     FEAdaptor.cxx
-    )
-  add_library(CFullExample2Adaptor ${Adaptor_SRCS})
-  target_link_libraries(CFullExample2Adaptor vtkPVPythonCatalyst)
-  add_definitions("-DUSE_CATALYST")
-  if(NOT PARAVIEW_USE_MPI)
-    message(SEND_ERROR "ParaView must be built with MPI enabled")
-  endif()
-else()
-  find_package(MPI REQUIRED)
-  include_directories(${MPI_C_INCLUDE_PATH})
-endif()
+    FEAdaptor.h)
+  target_link_libraries(CFullExample2Adaptor
+    PRIVATE
+      ParaView::PythonCatalyst)
+endif ()
 
-add_executable(CFullExample2 FEDriver.c FEDataStructures.c)
-if(USE_CATALYST)
-  target_link_libraries(CFullExample2 LINK_PRIVATE CFullExample2Adaptor)
-  include(vtkModuleMacros)
-  include(vtkMPI)
-  vtk_mpi_link(CFullExample2)
-else()
-  target_link_libraries(CFullExample2 LINK_PRIVATE ${MPI_LIBRARIES})
-endif()
+add_executable(CFullExample2
+  FEDataStructures.c
+  FEDataStructures.h
+  FEDriver.c)
+if (TARGET CFullExample2Adaptor)
+  target_link_libraries(CFullExample2
+    PRIVATE
+      CFullExample2Adaptor
+      ParaView::PythonCatalyst
+      VTK::mpi)
+else ()
+  target_link_libraries(CFullExample2
+    PRIVATE
+      MPI::MPI_C)
+endif ()
 
-option(BUILD_TESTING "Build Testing" OFF)
-# Setup testing.
 if (BUILD_TESTING)
-  include(CTest)
   add_test(NAME CFullExample2Test COMMAND CFullExample2 ${CMAKE_CURRENT_SOURCE_DIR}/SampleScripts/feslicescript.py)
-  set_tests_properties(CFullExample2Test PROPERTIES LABELS "PARAVIEW;CATALYST")
 endif()
