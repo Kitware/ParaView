@@ -580,6 +580,9 @@ else ()
       "${vtk_module}")
   endforeach ()
 
+  # Forward Python option to VTK.
+  set(VTK_WRAP_PYTHON "${PARAVIEW_ENABLE_PYTHON}")
+
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   vtk_module_find_kits(vtk_kit_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   vtk_module_scan(
