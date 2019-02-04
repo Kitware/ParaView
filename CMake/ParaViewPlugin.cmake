@@ -212,6 +212,9 @@ function (paraview_plugin_scan)
         "_paraview_plugin_${_paraview_scan_plugin_name}_file" "${_paraview_scan_plugin_file}")
     set_property(GLOBAL
       PROPERTY
+        "_paraview_plugin_${_paraview_scan_plugin_name}_description" "${${_paraview_scan_plugin_name}_DESCRIPTION}")
+    set_property(GLOBAL
+      PROPERTY
       "_paraview_plugin_${_paraview_scan_plugin_name}_required_modules" "${${_paraview_scan_plugin_name}_REQUIRES_MODULES}")
   endforeach ()
 
@@ -792,6 +795,9 @@ function (paraview_add_plugin name)
     "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}Plugin.h")
   set(_paraview_add_plugin_source
     "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}Plugin.cxx")
+
+  get_property(_paraview_add_plugin_description GLOBAL
+    PROPERTY "_paraview_plugin_${_paraview_build_plugin}_description")
 
   configure_file(
     "${_paraview_plugin_source_dir}/paraview_plugin.h.in"
