@@ -91,7 +91,7 @@ void vtkAnimationPlayer::Play()
 
   do
   {
-    this->StartLoop(starttime, endtime, playbackWindow);
+    this->StartLoop(starttime, endtime, this->CurrentTime, playbackWindow);
     this->AnimationScene->Initialize();
     double deltatime = 0.0;
     while (!this->StopPlay && this->CurrentTime <= playbackWindow[1])

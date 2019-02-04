@@ -30,7 +30,8 @@ vtkSequenceAnimationPlayer::~vtkSequenceAnimationPlayer()
 }
 
 //----------------------------------------------------------------------------
-void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime, double* playbackWindow)
+void vtkSequenceAnimationPlayer::StartLoop(
+  double starttime, double endtime, double vtkNotUsed(curtime), double* playbackWindow)
 {
   // the frame index is inited to 0 ONLY when an animation is not resumed from
   // an intermediate frame

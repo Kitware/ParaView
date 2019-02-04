@@ -44,7 +44,7 @@ protected:
   vtkRealtimeAnimationPlayer();
   ~vtkRealtimeAnimationPlayer() override;
 
-  void StartLoop(double, double, double*) override;
+  void StartLoop(double, double, double, double*) override;
   void EndLoop() override {}
 
   /**

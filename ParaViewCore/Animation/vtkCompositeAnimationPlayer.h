@@ -79,7 +79,7 @@ protected:
   /**
    * Delegated to the active animation player.
    */
-  void StartLoop(double starttime, double endtime, double* playbackWindow) override;
+  void StartLoop(double starttime, double endtime, double curtime, double* playbackWindow) override;
   void EndLoop() override;
   double GetNextTime(double currentime) override;
   //@}

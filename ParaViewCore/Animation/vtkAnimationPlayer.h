@@ -92,7 +92,8 @@ protected:
 
   friend class vtkCompositeAnimationPlayer;
 
-  virtual void StartLoop(double starttime, double endtime, double* playbackWindow) = 0;
+  virtual void StartLoop(
+    double starttime, double endtime, double curtime, double* playbackWindow) = 0;
   virtual void EndLoop() = 0;
 
   /**
