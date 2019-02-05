@@ -163,6 +163,16 @@ option(PARAVIEW_ENABLE_XDMF2 "Enable Xdmf2 support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_XDMF2)
 option(PARAVIEW_ENABLE_XDMF3 "Enable Xdmf3 support." OFF)
 
+set(PARAVIEW_BUILD_TESTING "OFF"
+  CACHE STRING "Build module testing directories")
+set_property(CACHE PARAVIEW_BUILD_TESTING
+  PROPERTY
+    STRINGS "ON;OFF;WANT")
+set(BUILD_TESTING OFF)
+if (PARAVIEW_BUILD_TESTING)
+  set(BUILD_TESTING ON)
+endif ()
+
 if (UNIX)
   option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
 endif ()
@@ -445,6 +455,9 @@ if (paraview_requested_modules)
   list(REMOVE_DUPLICATES paraview_requested_modules)
 endif ()
 
+option(PARAVIEW_BUILD_ALL_MODULES "Build all modules by default" OFF)
+mark_as_advanced(PARAVIEW_BUILD_ALL_MODULES)
+
 if (PARAVIEW_USE_EXTERNAL_VTK)
   find_package(VTK REQUIRED)
 else ()
@@ -530,8 +543,8 @@ vtk_module_scan(
   PROVIDES_KITS       paraview_kits
   REQUIRES_MODULES    paraview_required_modules
   UNRECOGNIZED_MODULES paraview_unrecognized_modules
-  WANT_BY_DEFAULT     ON
-  ENABLE_TESTS        ON)
+  WANT_BY_DEFAULT     "${PARAVIEW_BUILD_ALL_MODULES}"
+  ENABLE_TESTS        "${PARAVIEW_BUILD_TESTING}")
 
 set(paraview_unrecognized_paraview_modules)
 foreach (paraview_module IN LISTS paraview_unrecognized_modules)
@@ -580,6 +593,13 @@ else ()
       "${vtk_module}")
   endforeach ()
 
+  cmake_dependent_option(PARAVIEW_BUILD_VTK_TESTING "" OFF
+    "PARAVIEW_BUILD_TESTING" OFF)
+  set(vtk_enable_tests "OFF")
+  if (PARAVIEW_BUILD_VTK_TESTING)
+    set(vtk_enable_tests "${PARAVIEW_BUILD_TESTING}")
+  endif ()
+
   # Forward Python option to VTK.
   set(VTK_WRAP_PYTHON "${PARAVIEW_ENABLE_PYTHON}")
 
@@ -596,7 +616,7 @@ else ()
     REQUIRES_MODULES    vtk_required_modules
     UNRECOGNIZED_MODULES vtk_unrecognized_modules
     WANT_BY_DEFAULT     OFF
-    ENABLE_TESTS        OFF
+    ENABLE_TESTS        "${vtk_enable_tests}"
     HIDE_MODULES_FROM_CACHE ON)
 
   if (vtk_required_modules OR vtk_unrecognized_modules)
