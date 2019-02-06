@@ -1390,12 +1390,17 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement* par
         vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
         for (; it3 != it2->second.end(); ++it3)
         {
-          if (visited_proxies.find(it3->GetPointer()->Proxy.GetPointer()) != visited_proxies.end())
+          auto curproxy = it3->GetPointer()->Proxy.GetPointer();
+          if (visited_proxies.find(curproxy) != visited_proxies.end())
           {
             vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
             itemElement->SetName("Item");
-            itemElement->AddAttribute("id", it3->GetPointer()->Proxy->GetGlobalID());
+            itemElement->AddAttribute("id", curproxy->GetGlobalID());
             itemElement->AddAttribute("name", it2->first.c_str());
+            if (curproxy->GetLogName() != nullptr)
+            {
+              itemElement->AddAttribute("logname", curproxy->GetLogName());
+            }
             collectionElement->AddNestedElement(itemElement);
             itemElement->Delete();
             some_proxy_added = true;

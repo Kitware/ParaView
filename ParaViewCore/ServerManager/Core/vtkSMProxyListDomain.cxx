@@ -561,6 +561,19 @@ void vtkSMProxyListDomain::SetProxies(vtkSMProxy** proxies, unsigned int count)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMProxyListDomain::SetLogName(const char* prefix)
+{
+  for (const auto& item : this->Internals->GetProxies())
+  {
+    if (item.Proxy != nullptr)
+    {
+      std::string name = std::string(prefix ? prefix : "") + "/" + item.Proxy->GetXMLName();
+      item.Proxy->SetLogName(name.c_str());
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMProxyListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

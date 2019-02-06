@@ -25,12 +25,12 @@
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPKdTree.h"
 #include "vtkPVDataRepresentation.h"
+#include "vtkPVLogger.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
 
 #include <cassert>
@@ -242,7 +242,7 @@ public:
         // release old memory (not necessarily, but no harm).
         this->RedistributedDataObject = nullptr;
 
-        vtkTimerLog::FormatAndMarkEvent("do-redistribution: %s", debugName.c_str());
+        vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "redistribute: %s", debugName.c_str());
 
         vtkNew<vtkOrderedCompositeDistributor> redistributor;
         redistributor->SetController(vtkMultiProcessController::GetGlobalController());
@@ -693,6 +693,8 @@ int vtkPVDataDeliveryManager::GetViewDataDistributionMode(bool use_lod)
 bool vtkPVDataDeliveryManager::NeedsDelivery(
   vtkMTimeType timestamp, std::vector<unsigned int>& keys_to_deliver, bool interactive)
 {
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "check for delivery (interactive=%s)",
+    (interactive ? "true" : "false"));
   assert(this->RenderView);
   const bool use_lod = interactive && this->RenderView->GetUseLODForInteractiveRender();
   const int data_distribution_mode = this->GetViewDataDistributionMode(use_lod);
@@ -705,14 +707,15 @@ bool vtkPVDataDeliveryManager::NeedsDelivery(
       if (item.GetTimeStamp() > timestamp ||
         item.GetDeliveryTimeStamp(data_distribution_mode) < item.GetTimeStamp())
       {
-        vtkTimerLog::FormatAndMarkEvent(
-          "needs-delivery: %s", this->GetRepresentation(iter->first.first)->GetDebugName().c_str());
+        vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "needs-delivery: %s",
+          this->GetRepresentation(iter->first.first)->GetLogName().c_str());
         // FIXME: convert keys_to_deliver to a vector of pairs.
         keys_to_deliver.push_back(iter->first.first);
         keys_to_deliver.push_back(static_cast<unsigned int>(iter->first.second));
       }
     }
   }
+  vtkVLogIfF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), keys_to_deliver.size() == 0, "none");
   return keys_to_deliver.size() > 0;
 }
 
@@ -734,7 +737,8 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
 
   assert(size % 2 == 0);
 
-  vtkTimerLog::MarkStartEvent(use_lod ? "LowRes Data Migration" : "FullRes Data Migration");
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "%s data migration",
+    (use_lod ? "low-resolution" : "full resolution"));
   const int mode = this->GetViewDataDistributionMode(use_lod != 0);
 
   for (unsigned int cc = 0; cc < size; cc += 2)
@@ -751,12 +755,10 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       continue;
     }
 
-    vtkTimerLog::FormatAndMarkEvent(
-      "do-delivery: %s", this->GetRepresentation(id)->GetDebugName().c_str());
+    vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "move-data: %s",
+      this->GetRepresentation(id)->GetLogName().c_str());
     item->Deliver(mode);
   }
-
-  vtkTimerLog::MarkEndEvent(use_lod ? "LowRes Data Migration" : "FullRes Data Migration");
 }
 
 //----------------------------------------------------------------------------
@@ -783,7 +785,7 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
         {
           token_stream << ";a" << iter->first.first << "=" << item.GetTimeStamp();
           // cout << "use structured info: ";
-          // cout << this->GetRepresentation(iter->first.first)->GetDebugName() << "("
+          // cout << this->GetRepresentation(iter->first.first)->GetLogName() << "("
           // <<iter->first.second<<")" << endl;
           // implies that the representation is providing us with means to
           // override how the ordered compositing happens.
@@ -796,7 +798,7 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
           token_stream << "b" << iter->first.first << "=" << item.GetTimeStamp() << ","
                        << item.GetDeliveryTimeStamp(mode);
           // cout << "redistribute: ";
-          // cout << this->GetRepresentation(iter->first.first)->GetDebugName() << "("
+          // cout << this->GetRepresentation(iter->first.first)->GetLogName() << "("
           // <<iter->first.second<<") = "
           //   << item.GetDeliveredDataObject()
           //   << endl;
@@ -807,14 +809,15 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
 
     if (this->LastCutsGeneratorToken != token_stream.str())
     {
-      vtkTimerLogScope tlevent("regenerate kd-tree");
+      vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "regenerate kd-tree");
       cutsGenerator->GenerateKdTree();
       this->KdTree = cutsGenerator->GetKdTree();
       this->LastCutsGeneratorToken = token_stream.str();
     }
     else
     {
-      vtkTimerLog::FormatAndMarkEvent("skipping kd-tree regeneration (nothing relevant changed).");
+      vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(),
+        "skipping kd-tree regeneration (nothing relevant changed).");
     }
   }
 
@@ -834,14 +837,14 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(bool use_lo
       continue;
     }
 
-    const auto debugName = this->GetRepresentation(id)->GetDebugName();
+    const auto debugName = this->GetRepresentation(id)->GetLogName();
     vtkInternals::vtkItem& item = use_lod ? iter->second.second : iter->second.first;
     anything_moved = item.Redistribute(mode, this->KdTree, debugName) || anything_moved;
   }
 
   if (!anything_moved)
   {
-    vtkTimerLog::FormatAndMarkEvent("no redistribution was done.");
+    vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "no redistribution was done.");
   }
 }
 

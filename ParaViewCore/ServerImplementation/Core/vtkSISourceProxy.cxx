@@ -25,6 +25,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeDataPipeline.h"
 #include "vtkPVInstantiator.h"
+#include "vtkPVLogger.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPolyData.h"
@@ -222,6 +223,10 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   {
     return;
   }
+
+  vtkVLogScopeF(PARAVIEW_LOG_PIPELINE_VERBOSITY(), "%s: update pipeline(%d, %f, %s) ",
+    this->GetLogNameOrDefault(), port, time, (doTime ? "true" : "false"));
+
   vtkAlgorithm* algo = output_port->GetProducer();
   assert(algo);
 
@@ -257,6 +262,9 @@ void vtkSISourceProxy::UpdatePipelineInformation()
     return;
   }
 
+  vtkVLogScopeF(PARAVIEW_LOG_PIPELINE_VERBOSITY(), "%s: update pipeline information",
+    this->GetLogNameOrDefault());
+
   if (this->GetVTKObject())
   {
     vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
@@ -288,19 +296,20 @@ void vtkSISourceProxy::SetupSelectionProxy(int port, vtkSIProxy* extractSelectio
 void vtkSISourceProxy::MarkStartEvent()
 {
   std::ostringstream filterName;
-  filterName << "Execute "
-             << (this->GetVTKClassName() ? this->GetVTKClassName() : this->GetClassName())
-             << " id: " << this->GetGlobalID();
+  filterName << "Execute " << this->GetLogNameOrDefault() << " id: " << this->GetGlobalID();
   vtkTimerLog::MarkStartEvent(filterName.str().c_str());
+
+  vtkVLogStartScopeF(PARAVIEW_LOG_PIPELINE_VERBOSITY(), vtkLogIdentifier(this), "%s: execute",
+    this->GetLogNameOrDefault());
 }
 
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::MarkEndEvent()
 {
+  vtkLogEndScope(vtkLogIdentifier(this));
+
   std::ostringstream filterName;
-  filterName << "Execute "
-             << (this->GetVTKClassName() ? this->GetVTKClassName() : this->GetClassName())
-             << " id: " << this->GetGlobalID();
+  filterName << "Execute " << this->GetLogNameOrDefault() << " id: " << this->GetGlobalID();
   vtkTimerLog::MarkEndEvent(filterName.str().c_str());
 }
 

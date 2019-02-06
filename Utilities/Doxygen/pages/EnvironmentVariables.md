@@ -7,7 +7,6 @@ runtime.
 Variable | Description
 ---------|---------------------------------------------------------
 PARAVIEW_DATA_ROOT  | Change the location of the data root for testing.
-PV_DEBUG_APPLY_BUTTON | When set, debugging text will be printed out to assist developers with the reasons behind the change in state for the "Apply" button on the properties panel (pqPropertiesPanel).
 PV_DEBUG_PANELS | When set, debugging text will be printed out explaining the reason for creation of various widgets on the properties panel (pqPropertiesPanel).
 PV_DEBUG_SKIP_OPENGL_VERSION_CHECK | Skip test to validate OpenGL support at launch.
 PV_DEBUG_TEST | Prints debugging information about the testing framework during playback to cout.
@@ -16,8 +15,23 @@ PV_DEBUG_REMOTE_RENDERING | Forces server-side render windows to swap buffers in
 PV_MACRO_PATH | Additional directories defined by the user to store macros.
 PV_ALLOW_BATCH_INTERACTION | Allow interactions in batch mode.
 PV_PLUGIN_CONFIG_FILE | XML Plugin Configuration Files to specify which plugin to load on startup.
-PV_PLUGIN_DEBUG | Prints debugging information when loading plugins into ParaView.
 PV_PLUGIN_PATH | Directories containing plugins to be loaded on startup.
-PV_SETTINGS_DEBUG | When set, debugging text will be printed out to assist developers debug settings.
 QT_MAC_NO_NATIVE_MENUBAR | Qt flag to force the Qt menu bar rather than the native mac menu bar.
 PV_USE_OFFSCREEN_BUFFERS_FOR_IMAGE_CAPTURE | A temporary environment variable which defined causes ParaView to use offscreen frame buffer when capturing images (see #18446). This may be removed in future without notice.
+PV_PLUGIN_DEBUG | (obsolete) Use **PARAVIEW_LOG_PLUGIN_VERBOSITY** instead.
+PV_SETTINGS_DEBUG | (obsolete) Use **PARAVIEW_LOG_APPLICATION_VERBOSITY** instead.
+PV_DEBUG_APPLY_BUTTON | (obsolete) Use **PARAVIEW_LOG_APPLICATION_VERBOSITY** instead.
+
+ParaView supports generating logs that includes debugging and tracking
+information. The log messages are categorized and it is possible to temporarily
+elevate the log level for any category using the following environment
+variables. The value for each of the variables can be a number in the range
+[-2, 9] or the strings `INFO`, `ERROR`, `WARNING`, `TRACE`, or `MAX` (See
+`vtkLogger` for additional information about log levels).
+
+Variable | Description
+---------|-----------------------------------------
+PARAVIEW_LOG_PLUGIN_VERBOSITY | Log messages related to ParaView plugins (see vtkPVLogger::GetPluginVerbosity())
+PARAVIEW_LOG_PIPELINE_VERBOSITY  | Log messages related to Pipeline execution (see vtkPVLogger::GetPipelineVerbosity())
+PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY | Log messages related to data movement for rendering and other tasks (see vtkPVLogger::GetDataMovementVerbosity())
+PARAVIEW_LOG_APPLICATION_VERBOSITY | Log messages related to the application (see vtkPVLogger::GetApplicationVerbosity())

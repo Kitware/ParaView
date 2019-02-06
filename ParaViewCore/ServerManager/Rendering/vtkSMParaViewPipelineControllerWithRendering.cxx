@@ -391,15 +391,6 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
   // Since no repr exists, create a new one if possible.
   if (vtkSMRepresentationProxy* repr = view->CreateDefaultRepresentation(producer, outputPort))
   {
-    // let's set a name to make debugging easier.
-    auto pxm = producer->GetSessionProxyManager();
-    if (auto pname = pxm->GetProxyName("sources", producer))
-    {
-      std::ostringstream debugname;
-      debugname << pname << "(" << repr->GetXMLName() << ")";
-      repr->SetDebugName(debugname.str().c_str());
-    }
-
     vtkTimerLogScope scopeTimer2(
       "ParaViewPipelineControllerWithRendering::Show::CreatingRepresentation");
     SM_SCOPED_TRACE(Show)
@@ -409,6 +400,14 @@ vtkSMProxy* vtkSMParaViewPipelineControllerWithRendering::Show(
       .arg("display", repr);
 
     this->PreInitializeProxy(repr);
+
+    // let's set a name to make debugging easier.
+    if (auto pname = producer->GetLogName())
+    {
+      std::ostringstream logname;
+      logname << pname << "(" << repr->GetXMLName() << ")";
+      repr->SetLogName(logname.str().c_str());
+    }
 
     vtkTimeStamp ts;
     ts.Modified();

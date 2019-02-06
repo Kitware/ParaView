@@ -17,12 +17,17 @@
  * @brief   Used to load ParaView plugins.
  *
  * vtkPVPluginLoader can be used to load plugins for ParaView. vtkPVPluginLoader
- * loads the plugin on the local process. For verbose details during the process
- * of loading the plugin, try setting the environment variable PV_PLUGIN_DEBUG.
+ * loads the plugin on the local process.
+ *
+ * vtkPVPluginLoader logs plugin related messages using at
+ * `PARAVIEW_LOG_PLUGIN_VERBOSITY` level. See `vtkPVLogger::SetPluginVerbosity`
+ * for information on using environment variables to override or elevate the
+ * verbosity level.
+ *
  * This class only needed when loading plugins from shared libraries
  * dynamically. For statically importing plugins, one directly uses
  * PV_PLUGIN_IMPORT() macro defined in vtkPVPlugin.h.
-*/
+ */
 
 #ifndef vtkPVPluginLoader_h
 #define vtkPVPluginLoader_h
@@ -167,7 +172,6 @@ protected:
   char* PluginVersion;
   char* FileName;
   char* SearchPaths;
-  bool DebugPlugin;
   bool Loaded;
 
 private:

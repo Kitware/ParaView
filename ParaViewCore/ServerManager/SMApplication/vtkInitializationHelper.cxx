@@ -162,7 +162,9 @@ void vtkInitializationHelper::Initialize(const char* executable, int type, vtkPV
     argv.push_back(vtksys::SystemTools::DuplicateString("--mpi"));
   }
 
-  vtkInitializationHelper::Initialize(static_cast<int>(argv.size()), &argv[0], type, newoptions);
+  argv.push_back(nullptr);
+  vtkInitializationHelper::Initialize(
+    static_cast<int>(argv.size()) - 1, &argv[0], type, newoptions);
 
   for (auto tofree : argv)
   {

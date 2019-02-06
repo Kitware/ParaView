@@ -128,7 +128,7 @@ int vtkPVDataRepresentation::RequestData(
   this->InvokeEvent(vtkCommand::UpdateDataEvent);
   this->NeedUpdate = false;
 
-  // cout << "Updated: " << this->DebugName << endl;
+  // cout << "Updated: " << this->LogName << endl;
   return 1;
 }
 

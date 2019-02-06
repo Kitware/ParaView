@@ -123,6 +123,11 @@ public:
    */
   unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable) override;
 
+  /**
+   * Overridden to pass logname to internal GeometryRepresentation.
+   */
+  void SetLogName(const std::string&) override;
+
 protected:
   vtkSelectionRepresentation();
   ~vtkSelectionRepresentation() override;

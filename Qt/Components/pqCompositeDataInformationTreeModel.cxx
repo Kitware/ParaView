@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataObjectTypes.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkTimerLog.h"
+#include "vtkPVLogger.h"
 
 #include <QList>
 #include <QSet>
@@ -721,8 +721,7 @@ bool pqCompositeDataInformationTreeModel::setHeaderData(
 //-----------------------------------------------------------------------------
 bool pqCompositeDataInformationTreeModel::reset(vtkPVDataInformation* info)
 {
-  vtkTimerLogScope mark("pqCompositeDataInformationTreeModel::reset");
-  (void)mark;
+  vtkVLogScopeFunction(PARAVIEW_LOG_APPLICATION_VERBOSITY());
 
   pqInternals& internals = (*this->Internals);
 

@@ -592,8 +592,21 @@ bool vtkSMParaViewPipelineController::RegisterPipelineProxy(
   this->CreateAnimationHelpers(proxy);
 
   // Now register the proxy itself.
-  // If proxyname is NULL, the proxy manager makes up a name.
-  proxy->GetSessionProxyManager()->RegisterProxy("sources", proxyname, proxy);
+  // If proxyname is nullptr, the proxy manager makes up a name.
+  if (proxyname == nullptr)
+  {
+    auto pname = proxy->GetSessionProxyManager()->RegisterProxy("sources", proxy);
+
+    // assign a name for logging
+    proxy->SetLogName(pname.c_str());
+  }
+  else
+  {
+    proxy->GetSessionProxyManager()->RegisterProxy("sources", proxyname, proxy);
+
+    // assign a name for logging
+    proxy->SetLogName(proxyname);
+  }
 
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());

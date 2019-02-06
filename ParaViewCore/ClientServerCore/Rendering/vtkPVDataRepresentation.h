@@ -185,12 +185,11 @@ public:
 
   //@{
   /**
-   * See `vtkSMRepresentationProxy::SetDebugName`.
    * This is solely intended to simplify debugging and use for any other purpose
    * is vehemently discouraged.
    */
-  void SetDebugName(const std::string& name) { this->DebugName = name; }
-  const std::string& GetDebugName() const { return this->DebugName; }
+  virtual void SetLogName(const std::string& name) { this->LogName = name; }
+  const std::string& GetLogName() const { return this->LogName; }
   //@}
 
 protected:
@@ -226,14 +225,6 @@ protected:
   bool UpdateTimeValid;
   unsigned int UniqueIdentifier;
 
-  void SetDebugName(vtkPVDataRepresentation* repr, const std::string& name)
-  {
-    if (repr && repr->GetDebugName().empty())
-    {
-      repr->SetDebugName(this->DebugName + "/" + name);
-    }
-  }
-
 private:
   vtkPVDataRepresentation(const vtkPVDataRepresentation&) = delete;
   void operator=(const vtkPVDataRepresentation&) = delete;
@@ -246,7 +237,7 @@ private:
   class Internals;
   Internals* Implementation;
   vtkWeakPointer<vtkView> View;
-  std::string DebugName;
+  std::string LogName;
 };
 
 #endif

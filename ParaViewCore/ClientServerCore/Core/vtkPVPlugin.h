@@ -21,10 +21,12 @@
  * The header file also defines few import macros that are required for
  * exporting/importing plugins.
  *
- * When debugging issues with plugins try setting the PV_PLUGIN_DEBUG
- * environment variable on all the processes where you are trying to load the
- * plugin. That will print extra information as the plugin is being loaded.
-*/
+ * When debugging issues with plugins try setting the
+ * `PARAVIEW_LOG_PLUGIN_VERBOSITY=<level>`  environment variable on all the processes
+ * where you are trying to load the plugin. That will print extra information as
+ * the plugin is being loaded. See `vtkPVLogger::SetPluginVerbosity` for
+ * details.
+ */
 
 #ifndef vtkPVPlugin_h
 #define vtkPVPlugin_h

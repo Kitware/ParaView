@@ -49,6 +49,15 @@ inline void SafePyErrorPrintAndClear()
   }
 }
 
+inline void SafePyErrorClear()
+{
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  if (PyErr_Occurred() != nullptr)
+  {
+    PyErr_Clear();
+  }
+}
+
 class create_error : public std::exception
 {
 };
@@ -260,6 +269,9 @@ int vtkCustomPythonAlgorithmCommand(vtkClientServerInterpreter*, vtkObjectBase* 
     vtkSmartPyObject pymethod(PyObject_GetAttrString(vtkself, method));
     if (!pymethod)
     {
+      // this ensures that we can call non-existent methods silently, if that's
+      // what was intended.
+      SafePyErrorClear();
       std::ostringstream vtkmsg;
       vtkmsg << "No method named `" << method << "` found.";
       resultStream.Reset();
@@ -389,6 +401,12 @@ vtkObjectBase* vtkSIPythonSourceProxy::NewVTKObject(const char* className)
           {
             newmodule.TakeReference(PyObject_CallFunctionObjArgs(
               reload_plugin_module, internals.Module.GetPointer(), nullptr));
+          }
+          else
+          {
+            // silently clear the AttributeError raised by
+            // `PyObject_GetAttrString`
+            SafePyErrorClear();
           }
         }
       }

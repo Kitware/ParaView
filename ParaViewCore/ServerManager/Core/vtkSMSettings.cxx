@@ -16,6 +16,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -39,16 +40,6 @@
 #include <cfloat>
 #include <memory>
 #include <string>
-
-#define vtkSMSettingsDebugMacro(x)                                                                 \
-  {                                                                                                \
-    if (vtksys::SystemTools::GetEnv("PV_SETTINGS_DEBUG"))                                          \
-    {                                                                                              \
-      std::ostringstream vtkerror;                                                                 \
-      vtkerror << x << endl;                                                                       \
-      vtkOutputWindowDisplayText(vtkerror.str().c_str());                                          \
-    }                                                                                              \
-  }
 
 //----------------------------------------------------------------------------
 namespace
@@ -939,6 +930,12 @@ vtkSMSettings::vtkSMSettings()
   this->Internal = new vtkSMSettingsInternal();
   this->Internal->SettingCollectionsAreSorted = false;
   this->Internal->IsModified = false;
+  if (vtksys::SystemTools::GetEnv("PV_SETTINGS_DEBUG") != nullptr)
+  {
+    vtkWarningMacro("`PV_SETTINGS_DEBUG` environment variable has been deprecated."
+                    "Please use `PARAVIEW_LOG_APPLICATION_VERBOSITY=INFO` instead.");
+    vtkPVLogger::SetApplicationVerbosity(vtkLogger::VERBOSITY_INFO);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -967,7 +964,8 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
   SettingsCollection collection;
   collection.Priority = priority;
 
-  vtkSMSettingsDebugMacro("Loading settings JSON string '" << settings << "'");
+  vtkVLogF(
+    PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading settings JSON string '%s'", settings.c_str());
 
   // If the settings string is empty, the JSON parser can't handle it.
   // Replace the empty string with {}
@@ -991,7 +989,7 @@ bool vtkSMSettings::AddCollectionFromString(const std::string& settings, double 
   {
     this->Internal->SettingCollections.push_back(collection);
     this->Internal->SettingCollectionsAreSorted = false;
-    vtkSMSettingsDebugMacro("Successfully parsed settings string");
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "successfully parsed settings string");
     return true;
   }
   else
@@ -1007,7 +1005,6 @@ bool vtkSMSettings::AddCollectionFromFile(const std::string& fileName, double pr
 {
   std::string settingsFileName(fileName);
   std::ifstream settingsFile(settingsFileName.c_str(), ios::in | ios::binary | ios::ate);
-  vtkSMSettingsDebugMacro("Attempting to load settings file '" << fileName << "'");
   if (settingsFile.is_open())
   {
     std::streampos size = settingsFile.tellg();
@@ -1021,14 +1018,14 @@ bool vtkSMSettings::AddCollectionFromFile(const std::string& fileName, double pr
     bool success = this->AddCollectionFromString(std::string(settingsString), priority);
     delete[] settingsString;
 
-    vtkSMSettingsDebugMacro(
-      "Loading settings file '" << fileName << "' " << (success ? "succeeded" : "failed"));
-
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "load settings file `%s` -- %s",
+      fileName.c_str(), (success ? "succeeded" : "failed"));
     return success;
   }
   else
   {
-    vtkSMSettingsDebugMacro("Could not open settings file '" << fileName << "'");
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "load settings file `%s` -- missing (skipped)",
+      fileName.c_str());
     return false;
   }
 }
@@ -1102,7 +1099,11 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
   if (this->Internal->SettingCollections.size() == 0 || !this->Internal->IsModified)
   {
     // No settings to save, so we'll always succeed.
-    vtkSMSettingsDebugMacro("No settings to save");
+    vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+      (this->Internal->SettingCollections.size() != 0 && this->Internal->IsModified == false),
+      "settings not modified, hence not saved.");
+    vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+      (this->Internal->SettingCollections.size() == 0), "settings empty, hence not saved.");
     return true;
   }
 
@@ -1116,7 +1117,6 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
     return false;
   }
 
-  vtkSMSettingsDebugMacro("Opening settings file '" << filePath << "' for writing");
   std::ofstream settingsFile(filePath.c_str(), ios::out | ios::binary);
   if (settingsFile.is_open())
   {
@@ -1125,11 +1125,12 @@ bool vtkSMSettings::SaveSettingsToFile(const std::string& filePath)
 
     this->Internal->IsModified = false;
 
-    vtkSMSettingsDebugMacro("Succeeded writing settings file '" << filePath << "'");
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "saving settings to '%s'", filePath.c_str());
     return true;
   }
 
-  vtkSMSettingsDebugMacro("Failed writing settings file '" << filePath << "'");
+  vtkVLogF(
+    PARAVIEW_LOG_APPLICATION_VERBOSITY(), "could not save settings to '%s'!", filePath.c_str());
   return false;
 }
 

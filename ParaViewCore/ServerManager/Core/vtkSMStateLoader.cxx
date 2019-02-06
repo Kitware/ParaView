@@ -40,6 +40,7 @@ struct vtkSMStateLoaderRegistrationInfo
 {
   std::string GroupName;
   std::string ProxyName;
+  std::string LogName;
 };
 
 struct vtkSMStateLoaderInternals
@@ -176,6 +177,21 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
 //---------------------------------------------------------------------------
 void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
+  // set logname first, if provided by state file.
+  const auto reginfoIter = this->Internal->RegistrationInformation.find(id);
+  if (reginfoIter != this->Internal->RegistrationInformation.end())
+  {
+    for (const auto& regInfo : reginfoIter->second)
+    {
+      if (!regInfo.LogName.empty())
+      {
+        proxy->SetLogNameInternal(regInfo.LogName.c_str(), /*propagate_to_subproxies=*/true,
+          /*propagate_to_proxylistdomains=*/false);
+        break;
+      }
+    }
+  }
+
   // Ensure that the proxy is created before it is registered, unless we are
   // reviving the server-side server manager, which needs special handling.
   if (this->Internal->KeepOriginalId)
@@ -209,10 +225,9 @@ void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
   {
     return;
   }
-  vtkSMStateLoaderInternals::VectorOfRegInfo::iterator iter2;
-  for (iter2 = iter->second.begin(); iter2 != iter->second.end(); iter2++)
+  for (const auto& regInfo : iter->second)
   {
-    this->RegisterProxyInternal(iter2->GroupName.c_str(), iter2->ProxyName.c_str(), proxy);
+    this->RegisterProxyInternal(regInfo.GroupName.c_str(), regInfo.ProxyName.c_str(), proxy);
   }
 }
 
@@ -355,9 +370,13 @@ int vtkSMStateLoader::BuildProxyCollectionInformation(vtkPVXMLElement* collectio
                       "with the proxy manager.");
         continue;
       }
+
+      auto logname = currentElement->GetAttribute("logname");
+
       vtkSMStateLoaderRegistrationInfo info;
       info.GroupName = groupName;
       info.ProxyName = name;
+      info.LogName = (logname ? logname : "");
       this->Internal->RegistrationInformation[id].push_back(info);
     }
   }
