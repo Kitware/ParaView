@@ -14,7 +14,7 @@ vtk_add_test_cxx(vtkPVCatalystCxxTests tests
 # allow running MPI programs with the proper ${MPIEXEC}
 if (PARAVIEW_USE_MPI)
   vtk_add_test_mpi(vtkPVCatalystCxx-MPI mpi_tests
-    NO_DATA NO_VALID NO_OUTPUT
+    NO_VALID
     CoProcessingTestOutputs.cxx
     SubController.cxx
     )
