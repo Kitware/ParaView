@@ -52,7 +52,6 @@ set(classes
   vtkMoleculeRepresentation
   vtkOutlineRepresentation
   vtkPExtentTranslator
-  vtkPVBagChartRepresentation
   vtkPVBoxChartRepresentation
   vtkPVCacheKeeper
   vtkPVCacheKeeperPipeline

@@ -32,7 +32,6 @@ set(classes
   vtkPVComparativeAnimationCue
   vtkPVComparativeView
   vtkPVRepresentedArrayListSettings
-  vtkSMBagChartSeriesListDomain
   vtkSMBoxRepresentationProxy
   vtkSMCameraLink
   vtkSMCameraProxy
@@ -45,7 +44,6 @@ set(classes
   vtkSMComparativeViewProxy
   vtkSMContextViewProxy
   vtkSMDataDeliveryManager
-  vtkSMFunctionalBagChartSeriesSelectionDomain
   vtkSMImplicitPlaneRepresentationProxy
   vtkSMLightProxy
   vtkSMMaterialDomain

@@ -24,10 +24,10 @@
 #ifndef vtkSMFunctionalBagChartSeriesSelectionDomain_h
 #define vtkSMFunctionalBagChartSeriesSelectionDomain_h
 
-#include "vtkPVServerManagerRenderingModule.h" // needed for exports
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
 #include "vtkSMChartSeriesSelectionDomain.h"
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMFunctionalBagChartSeriesSelectionDomain
+class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkSMFunctionalBagChartSeriesSelectionDomain
   : public vtkSMChartSeriesSelectionDomain
 {
 public:

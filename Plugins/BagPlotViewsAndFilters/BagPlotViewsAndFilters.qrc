@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/BagPlotViewsAndFilters" >
+    <file>Icons/pqBagChart16.png</file>
+    <file>Icons/pqFunctionalBagChart16.png</file>
+  </qresource>
+</RCC>

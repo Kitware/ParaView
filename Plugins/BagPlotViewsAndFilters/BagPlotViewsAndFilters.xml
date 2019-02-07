@@ -1,0 +1,736 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkPVExtractBagPlots"
+                 label="Extract Bag Plots"
+                 name="ExtractBagPlots">
+      <Documentation long_help="Extract Bag Plots."
+                     short_help="Extract tables used to display Bag Plots
+                     views.">
+                     </Documentation>
+      <InputProperty command="SetInputConnection"
+                    name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="row"
+                          name="input_aray"
+                          number_of_components="1"/>
+        <Documentation>This property specifies the input to the
+        filter.</Documentation>
+      </InputProperty>
+      <StringVectorProperty clean_command="ClearAttributeArrays"
+                            command="EnableAttributeArray"
+                            label="Variables of Interest"
+                            name="SelectArrays"
+                            number_of_elements_per_command="1"
+                            repeat_command="1">
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Choose arrays whose entries will be used to form
+        observations for statistical analysis.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetUseSilvermanRule"
+                         default_values="1"
+                         name="UseSilvermanRule"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates kernel width must be automatically
+        computed using Silverman's rules (sigma*n^(-1/(d+4))).</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetKernelWidth"
+                         default_values="1"
+                         name="KernelWidth"
+                         number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseSilvermanRule"
+                                   value="0" />
+          <!-- show this widget when UseSilvermanRule==0 -->
+        </Hints>
+        <Documentation>Specify the kernel width used to compute the HDR.
+        </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGridSize"
+                         default_values="100"
+                         name="GridSize"
+                         number_of_elements="1">
+        <IntRangeDomain min="1" name="grid_range"/>
+        <Documentation>Width and height of the grid image to perform the PCA on.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUserQuantile"
+                         default_values="95"
+                         name="UserQuantile"
+                         number_of_elements="1">
+        <IntRangeDomain min="0" max="100" name="range"/>
+        <Documentation>
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetTransposeTable"
+                         default_values="1"
+                         name="TransposeTable"
+                         label="Process the transposed of the input table"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if the input table must
+        be transposed first.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRobustPCA"
+                         default_values="0"
+                         name="RobustPCA"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>This flag indicates if the PCA should be run
+        in robust mode or not.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfProjectionAxes"
+                         default_values="2"
+                         name="NumberOfProjectionAxes"
+                         number_of_elements="1">
+        <IntRangeDomain min="2" max="10" name="range"/>
+        <Documentation> This allows to set the number of PCA projection axis
+        determining the final computed variables
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <Hints>
+        <ShowInMenu category="Statistics" icon=":/BagPlotViewsAndFilters/Icons/pqFunctionalBagChart16.png" />
+        <Visibility replace_input="0" />
+        <PipelineIcon name=":/BagPlotViewsAndFilters/Icons/pqFunctionalBagChart16.png" />
+        <View type="XYFunctionalBagChartView" port="0" />
+        <Plotable />
+      </Hints>
+
+      <!-- End ExtractBagPlots -->
+    </SourceProxy>
+  </ProxyGroup>
+  <ProxyGroup name="representations">
+    <ChartRepresentationProxy base_proxygroup="representations"
+                              base_proxyname="PlotMatrixRepresentation"
+                              class="vtkPVBagPlotMatrixRepresentation"
+                              name="BagPlotMatrixRepresentation"
+                              processes="client|dataserver|renderserver">
+      <Documentation>Representation used by BagPlotMatrixView.</Documentation>
+      <IntVectorProperty command="SetCompositeDataSetIndex"
+                   default_values="2"
+                   number_of_elements="1"
+                   name="CompositeDataSetIndex"
+                   override="1">
+        <CompositeTreeDomain mode="leaves" name="tree">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
+        <Documentation>
+          This property lists the ids of the blocks to extract
+          from the input multiblock dataset.
+        </Documentation>
+        <Hints>
+          <NoDefault/>
+        </Hints>
+      </IntVectorProperty>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy class="vtkPVBagChartRepresentation"
+                              name="XYBagChartRepresentation"
+                              processes="client|dataserver|renderserver" >
+      <Documentation>Representation used by XYBagChartView.</Documentation>
+
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
+                   command="AddCompositeDataSetIndex"
+                   default_values="2 3 4"
+                   number_of_elements="3"
+                   name="CompositeDataSetIndex"
+                   number_of_elements_per_command="1"
+                   panel_visibility="default"
+                   repeat_command="1">
+        <CompositeTreeDomain mode="leaves" name="tree">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
+        <Documentation>
+          This property lists the ids of the blocks to extract
+          from the input multiblock dataset.
+        </Documentation>
+        <Hints>
+          <NoDefault/>
+        </Hints>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="AttributeType"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to render.</Documentation>
+        <FieldDataDomain enable_field_data="1"
+                         name="enum">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseIndexForXAxis"
+                         default_values="0"
+                         name="UseIndexForXAxis"
+                         number_of_elements="1">
+        <!-- We deliberately don't use ChartUseIndexForAxisDomain domain here
+             since we don't want the property's default to be updated at runtime
+             using the value for XArrayName.
+        -->
+        <BooleanDomain name="bool" />
+        <Documentation>When set, the array index will be used for X axis,
+        otherwise the array identified by XAxisSeriesName will be
+        used.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetXAxisSeriesName"
+                            default_values="x"
+                            name="XArrayName"
+                            number_of_elements="1">
+        <Documentation>Set the array to use on X axis. This is used only when
+        UseIndexForXAxis is set to 0.</Documentation>
+        <BagChartSeriesListDomain name="array_list"
+                                  hide_partial_arrays="0"
+                                  array_type="x">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </BagChartSeriesListDomain>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          UseIndexForXAxis is unchecked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseIndexForXAxis" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetYAxisSeriesName"
+                            default_values=""
+                            name="YArrayName"
+                            number_of_elements="1">
+        <Documentation>Set the bag plot Y serie.</Documentation>
+        <BagChartSeriesListDomain name="array_list"
+                                  hide_partial_arrays="0"
+                                  array_type="y">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </BagChartSeriesListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetDensitySeriesName"
+                            default_values=""
+                            name="DensityArrayName"
+                            number_of_elements="1">
+        <Documentation>Set the bag plot density serie.</Documentation>
+        <BagChartSeriesListDomain name="array_list"
+                                  hide_partial_arrays="0"
+                                  array_type="density">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </BagChartSeriesListDomain>
+      </StringVectorProperty>
+      <DoubleVectorProperty command="SetBagColor"
+                            name="BagColor"
+                            number_of_elements="3"
+                            default_values="1.0 0.0 0.0"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Set the series bag color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLineColor"
+                            name="LineColor"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Set the series points color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetLineThickness"
+                         name="LineThickness"
+                         number_of_elements="1"
+                         default_values="2"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line thickness.</Documentation>
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetLineStyle"
+                         name="LineStyle"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line style.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Solid" value="1" />
+          <Entry text="Dash" value="2" />
+          <Entry text="Dot" value="3" />
+          <Entry text="Dash Dot" value="4" />
+          <Entry text="Dash Dot Dot" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPointColor"
+                            name="PointColor"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Set the series points color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetPointSize"
+                            default_values="1"
+                            name="PointSize"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>Set the size of the points.</Documentation>
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPUserColor"
+                                  name="PUserColor"
+                                  number_of_elements="3"
+                                  default_values="0.5 0.0 0.5"
+                                  panel_widget="color_selector"
+                                  panel_visibility="advanced">
+        <Documentation>Set the series P99 color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetP50Color"
+                            name="P50Color"
+                            number_of_elements="3"
+                            default_values="0.2 0.0 0.2"
+                            panel_widget="color_selector"
+                            panel_visibility="advanced">
+        <Documentation>Set the series P50 color.</Documentation>
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetGridLineThickness"
+                         name="GridLineThickness"
+                         number_of_elements="1"
+                         default_values="2"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line thickness.</Documentation>
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetGridLineStyle"
+                         name="GridLineStyle"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="advanced">
+        <Documentation>Set the series line style.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="None" value="0" />
+          <Entry text="Solid" value="1" />
+          <Entry text="Dash" value="2" />
+          <Entry text="Dot" value="3" />
+          <Entry text="Dash Dot" value="4" />
+          <Entry text="Dash Dot Dot" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <PropertyGroup label="Plot Axis"
+                     panel_visibility="default" >
+        <Property name="UseIndexForXAxis" />
+        <Property name="XArrayName" />
+        <Property name="YArrayName" />
+        <Property name="DensityArrayName" />
+      </PropertyGroup>
+      <PropertyGroup label="Bag Styling"
+                     panel_visibility="default" >
+        <Property name="BagColor" />
+        <Property name="LineThickness" />
+        <Property name="LineStyle" />
+        <Property name="LineColor" />
+        <Property name="PointSize" />
+        <Property name="PointColor" />
+      </PropertyGroup>
+      <PropertyGroup label="Grid Styling"
+                     panel_visibility="default" >
+        <Property name="PUserColor" />
+        <Property name="P50Color" />
+        <Property name="GridLineThickness" />
+        <Property name="GridLineStyle" />
+      </PropertyGroup>
+      <!--
+          Set the palette SelectionColor color to all the plots in the chart.
+        -->
+      <DoubleVectorProperty command="SetSelectionColor"
+                            default_values="1.0 0.0 1.0"
+                            name="Color"
+                            number_of_elements="3"
+                            panel_visibility="never">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <SubProxy command="SetSelectionRepresentation">
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
+    </ChartRepresentationProxy>
+
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy class="vtkXYChartRepresentation"
+                              name="XYFunctionalBagChartRepresentation"
+                              processes="client|dataserver|renderserver"
+                              post_creation="SetChartTypeToFunctionalBag">
+      <Documentation>Representation used by XYFunctionalBagChartView.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <Documentation>Data input for the representation.</Documentation>
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetCompositeDataSetIndex"
+                         default_values="1"
+                         name="CompositeDataSetIndex"
+                         number_of_elements="1">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the
+          dataset to pass. The flat index must point to a non-empty,
+          non-composite dataset for anything to be passed through. If the input
+          is not a composite dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain mode="leaves"
+                             name="tree">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </CompositeTreeDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFieldAssociation"
+                         default_values="0"
+                         name="AttributeType"
+                         number_of_elements="1">
+        <Documentation>Select the attribute data to render.</Documentation>
+        <FieldDataDomain enable_field_data="1"
+                         name="enum">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetUseIndexForXAxis"
+                         default_values="1"
+                         name="UseIndexForXAxis"
+                         number_of_elements="1">
+        <ChartUseIndexForAxisDomain name="bool">
+          <RequiredProperties>
+            <Property function="ArraySelection" name="XArrayName" />
+          </RequiredProperties>
+        </ChartUseIndexForAxisDomain>
+        <Documentation>When set, the array index will be used for X axis,
+        otherwise the array identified by XArrayName will be
+        used.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetXAxisSeriesName"
+                            default_values=""
+                            name="XArrayName"
+                            number_of_elements="1">
+        <Documentation>Set the array to use on X axis. This is used only when
+        UseIndexForXAxis is set to 0.</Documentation>
+        <ChartSeriesListDomain name="array_list"
+                              hide_partial_arrays="1">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+          </RequiredProperties>
+        </ChartSeriesListDomain>
+        <Hints>
+          <!-- the widget for this property is only enabled, when
+          UseIndexForXAxis is unchecked. -->
+          <PropertyWidgetDecorator type="EnableWidgetDecorator">
+            <Property name="UseIndexForXAxis" function="boolean_invert" />
+          </PropertyWidgetDecorator>
+        </Hints>
+      </StringVectorProperty>
+      <PropertyGroup label="X Axis Parameters">
+        <Property name="UseIndexForXAxis" />
+        <Property name="XArrayName" />
+      </PropertyGroup>
+      <StringVectorProperty command="SetLabel"
+                            clean_command="ClearLabels"
+                            element_types="2 2"
+                            name="SeriesLabel"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series labels.</Documentation>
+        <FunctionalBagChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
+                                    default_mode="label"
+                                    flatten_table="false">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </FunctionalBagChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetColor"
+                            clean_command="ClearColors"
+                            element_types="2 1 1 1"
+                            name="SeriesColor"
+                            number_of_elements_per_command="4"
+                            repeat_command="1">
+        <Documentation>Set the series line/bar color.</Documentation>
+        <FunctionalBagChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
+                                    default_mode="color"
+                                    flatten_table="false">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </FunctionalBagChartSeriesSelectionDomain>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetChartType"
+                         default_values="5"
+                         name="ChartType"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <EnumerationDomain name="enum">
+          <Entry text="Line" value="0" />
+          <Entry text="Bar" value="2" />
+          <Entry text="Bag" value="4" />
+          <Entry text="FunctionalBag" value="5" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetFlattenTable"
+                         default_values="0"
+                         name="FlattenTable"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Flatten the table, i.e. split any multicomponent
+        columns into separate components.</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetSeriesVisibility"
+                            clean_command="ClearSeriesVisibilities"
+                            element_types="2 0"
+                            name="SeriesVisibility"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <Documentation>Set the series visibility.</Documentation>
+        <FunctionalBagChartSeriesSelectionDomain name="array_list"
+                                    hide_partial_arrays="0"
+                                    default_mode="visibility"
+                                    flatten_table="false">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+            <Property function="FieldDataSelection" name="AttributeType" />
+            <Property function="CompositeIndexSelection" name="CompositeDataSetIndex" />
+          </RequiredProperties>
+        </FunctionalBagChartSeriesSelectionDomain>
+        <Hints>
+          <!-- when present, the SeriesEditor widget will allow user to
+          re-order the series which will affect the rendered plot -->
+          <SeriesEditor supports_reordering="1" />
+        </Hints>
+
+      </StringVectorProperty>
+
+      <PropertyGroup label="Series Parameters"
+                     panel_widget="SeriesEditor"
+                     panel_visibility="default" >
+        <Property name="SeriesVisibility"
+                  function="SeriesVisibility" />
+        <Property name="SeriesColor"
+                  function="SeriesColor" />
+        <Property name="SeriesLabel"
+                  function="SeriesLabel" />
+      </PropertyGroup>
+      <!--
+          Set the palette SelectionColor color to all the plots in the chart.
+        -->
+      <DoubleVectorProperty command="SetSelectionColor"
+                            default_values="1.0 0.0 1.0"
+                            name="Color"
+                            number_of_elements="3"
+                            panel_visibility="never">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+        <Hints>
+          <GlobalPropertyLink type="ColorPalette" property="SelectionColor" />
+        </Hints>
+      </DoubleVectorProperty>
+      <SubProxy command="SetSelectionRepresentation">
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
+    </ChartRepresentationProxy>
+  </ProxyGroup>
+  <ProxyGroup name="views">
+    <PlotMatrixViewProxy base_proxygroup="views"
+                         base_proxyname="PlotMatrixView"
+                         class="vtkPVBagPlotMatrixView"
+                         name="BagPlotMatrixView"
+                         label="Bag Plot Matrix View"
+                         processes="client|renderserver|dataserver"
+                         representation_name="BagPlotMatrixRepresentation"
+                         skip_plotable_check="1">
+      <Documentation>This is the proxy for the bag plot matrix
+      view.</Documentation>
+      <StringVectorProperty command="SetTitle"
+                            name="ChartTitle"
+                            number_of_elements="1"
+                            override="1"
+                            default_values="Explained Variance: ${VARIANCE}%">
+        <Documentation>
+          Set the title to use for the bag plot matrix view.
+          Use ${VARIANCE} to display the explained variance and ${TIME} to display the current time.
+        </Documentation>
+        <Hints>
+          <PlaceholderText>Use ${VARIANCE} to display explained variance</PlaceholderText>
+        </Hints>
+      </StringVectorProperty>
+    </PlotMatrixViewProxy>
+  <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase"
+                      class="vtkPVXYChartView"
+                      name="XYBagChartView"
+                      label="Bag Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="XYBagChartRepresentation"
+                      post_creation="SetChartTypeToBag" >
+      <Documentation>This is the proxy for bag chart view.</Documentation>
+    </ContextViewProxy>
+  <!-- ================================================================== -->
+    <ContextViewProxy base_proxygroup="internal_views"
+                      base_proxyname="XYChartViewBase"
+                      class="vtkPVXYChartView"
+                      name="XYFunctionalBagChartView"
+                      label="FunctionalBag Chart View"
+                      processes="client|renderserver|dataserver"
+                      representation_name="XYFunctionalBagChartRepresentation"
+                      post_creation="SetChartTypeToFunctionalBag" >
+      <Documentation>This is the proxy for functional bag chart view.</Documentation>
+    </ContextViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

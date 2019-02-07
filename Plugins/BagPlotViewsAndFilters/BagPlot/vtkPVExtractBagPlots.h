@@ -22,15 +22,16 @@
 #ifndef vtkPVExtractBagPlots_h
 #define vtkPVExtractBagPlots_h
 
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 
 class vtkDoubleArray;
 class vtkMultiBlockDataSet;
 
 class PVExtractBagPlotsInternal;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractBagPlots : public vtkMultiBlockDataSetAlgorithm
+class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkPVExtractBagPlots
+  : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPVExtractBagPlots* New();
@@ -103,6 +104,15 @@ public:
   vtkSetClampMacro(UserQuantile, int, 0, 100);
   //@}
 
+  //@{
+  /**
+   * Set/Get the number of PCA projection axis.
+   * Default and minimum is 2, maximum is 10.
+   */
+  vtkGetMacro(NumberOfProjectionAxes, int);
+  vtkSetClampMacro(NumberOfProjectionAxes, int, 2, 10);
+  //@}
+
 protected:
   vtkPVExtractBagPlots();
   ~vtkPVExtractBagPlots() override;
@@ -123,6 +133,7 @@ protected:
   bool TransposeTable;
   bool RobustPCA;
   bool UseSilvermanRule;
+  int NumberOfProjectionAxes = 2;
 
 private:
   vtkPVExtractBagPlots(const vtkPVExtractBagPlots&) = delete;

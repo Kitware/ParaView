@@ -13,7 +13,6 @@
         <file>Icons/pqAutoApply32.png</file>
         <file>Icons/pqAxes.png</file>
         <file>Icons/pqBack16.png</file>
-        <file>Icons/pqBagChart16.png</file>
         <file>Icons/pqBottomCenter32.png</file>
         <file>Icons/pqBottomLeftCorner32.png</file>
         <file>Icons/pqBottomRightCorner32.png</file>
@@ -85,7 +84,6 @@
         <file>Icons/pqFolderUp16.png</file>
         <file>Icons/pqFrustumSelectionCell24.png</file>
         <file>Icons/pqFrustumSelectionPoint24.png</file>
-        <file>Icons/pqFunctionalBagChart16.png</file>
         <file>Icons/pqGlobalData16.png</file>
         <file>Icons/pqGlyph24.png</file>
         <file>Icons/pqGroup24.png</file>

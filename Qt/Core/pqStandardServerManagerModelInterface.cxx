@@ -48,10 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
 #include "pqTimeKeeper.h"
-#include "pqXYBagChartView.h"
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
-#include "pqXYFunctionalBagChartView.h"
 #include "pqXYHistogramChartView.h"
 #include "vtkPVConfig.h"
 #include "vtkSMComparativeViewProxy.h"
@@ -118,11 +116,6 @@ inline pqProxy* CreatePQView(
       return new pqXYChartView(
         group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
     }
-    if (xmlname == "XYBagChartView")
-    {
-      return new pqXYBagChartView(
-        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-    }
     if (xmlname == "XYBarChartView")
     {
       return new pqXYBarChartView(
@@ -136,11 +129,6 @@ inline pqProxy* CreatePQView(
     if (xmlname == "BoxChartView")
     {
       return new pqBoxChartView(
-        group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
-    }
-    if (xmlname == "XYFunctionalBagChartView")
-    {
-      return new pqXYFunctionalBagChartView(
         group, name, vtkSMContextViewProxy::SafeDownCast(proxy), server, parent);
     }
     if (xmlname == "ParallelCoordinatesChartView")

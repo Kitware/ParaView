@@ -39,9 +39,10 @@
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
 
+#include <sstream>
+
 //----------------------------------------------------------------------------
 vtkPVContextView::vtkPVContextView()
-  : InteractorStyle()
 {
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
 
@@ -51,9 +52,9 @@ vtkPVContextView::vtkPVContextView()
   this->ContextView->SetRenderWindow(this->RenderWindow);
   if (this->ContextView->GetInteractor())
   {
-    this->ContextView->GetInteractor()->SetInteractorStyle(NULL);
+    this->ContextView->GetInteractor()->SetInteractorStyle(nullptr);
   }
-  this->ContextView->SetInteractor(NULL);
+  this->ContextView->SetInteractor(nullptr);
   this->ContextView->GetRenderer()->AddObserver(
     vtkCommand::StartEvent, this, &vtkPVContextView::OnStartRender);
   this->ContextView->GetRenderer()->AddObserver(
@@ -67,6 +68,7 @@ vtkPVContextView::~vtkPVContextView()
 
   this->RenderWindow->Delete();
   this->ContextView->Delete();
+  this->SetTitle(nullptr);
 }
 
 //----------------------------------------------------------------------------
@@ -281,7 +283,8 @@ vtkSelection* vtkPVContextView::GetSelectionImplementation(T* chart)
 {
   if (vtkSelection* selection = chart->GetAnnotationLink()->GetCurrentSelection())
   {
-    if (this->SelectionClone == NULL || this->SelectionClone->GetMTime() < selection->GetMTime() ||
+    if (this->SelectionClone == nullptr ||
+      this->SelectionClone->GetMTime() < selection->GetMTime() ||
       this->SelectionClone->GetMTime() < chart->GetAnnotationLink()->GetMTime())
     {
       // we need to treat vtkSelection obtained from vtkAnnotationLink as
@@ -299,8 +302,8 @@ vtkSelection* vtkPVContextView::GetSelectionImplementation(T* chart)
     }
     return this->SelectionClone;
   }
-  this->SelectionClone = NULL;
-  return NULL;
+  this->SelectionClone = nullptr;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -317,8 +320,8 @@ vtkSelection* vtkPVContextView::GetSelection()
   }
 
   vtkWarningMacro("Unsupported context item type.");
-  this->SelectionClone = NULL;
-  return NULL;
+  this->SelectionClone = nullptr;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -355,6 +358,23 @@ bool vtkPVContextView::Export(vtkCSVExporter* exporter)
   }
   exporter->Close();
   return true;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkPVContextView::GetFormattedTitle()
+{
+  std::string formattedTitle = this->GetTitle();
+
+  std::string key = "${TIME}";
+  size_t pos = formattedTitle.find(key);
+  if (pos != std::string::npos)
+  {
+    std::ostringstream stream;
+    stream << formattedTitle.substr(0, pos) << this->GetViewTime()
+           << formattedTitle.substr(pos + key.length());
+    formattedTitle = stream.str();
+  }
+  return formattedTitle;
 }
 
 //----------------------------------------------------------------------------

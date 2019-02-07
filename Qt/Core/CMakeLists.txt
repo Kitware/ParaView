@@ -116,10 +116,8 @@ set(classes
   pqXMLEventObserver
   pqXMLEventSource
   pqXMLUtil
-  pqXYBagChartView
   pqXYBarChartView
   pqXYChartView
-  pqXYFunctionalBagChartView
   pqXYHistogramChartView
   vtkPVGUIPluginInterface)
 

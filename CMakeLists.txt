@@ -488,6 +488,7 @@ set(paraview_default_plugins
   AcceleratedAlgorithms
   AnalyzeNIfTIReaderWriter
   ArrowGlyph
+  BagPlotViewsAndFilters
   CDIReader
   DigitalRockPhysics
   EULATestPlugin

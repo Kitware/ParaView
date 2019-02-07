@@ -1,0 +1,9 @@
+NAME
+  BagPlotViewsAndFilters
+DESCRIPTION
+  Bag Plot related views and filters
+REQUIRES_MODULES
+  VTK::CommonExecutionModel
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore

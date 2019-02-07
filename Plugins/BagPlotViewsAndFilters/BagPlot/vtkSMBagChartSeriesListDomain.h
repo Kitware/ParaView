@@ -24,12 +24,12 @@
 #ifndef vtkSMBagChartSeriesListDomain_h
 #define vtkSMBagChartSeriesListDomain_h
 
-#include "vtkPVServerManagerRenderingModule.h" // needed for exports
+#include "vtkBagPlotViewsAndFiltersBagPlotModule.h"
 #include "vtkSMChartSeriesListDomain.h"
 
 class vtkPVDataInformation;
 
-class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMBagChartSeriesListDomain
+class VTKBAGPLOTVIEWSANDFILTERSBAGPLOT_EXPORT vtkSMBagChartSeriesListDomain
   : public vtkSMChartSeriesListDomain
 {
 public:
