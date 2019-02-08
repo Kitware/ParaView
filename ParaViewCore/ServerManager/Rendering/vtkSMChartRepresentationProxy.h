@@ -52,6 +52,11 @@ protected:
    * Overridden to ensure that whenever "Input" property changes, we update the
    * "Input" properties for all internal representations (including setting up
    * of the link to the extract-selection representation).
+   * Two selection input properties are available. The standard one, created by
+   * vtkPVExtractSelection, is named "SelectionInput". The other one, which is just the
+   * original input selection, is named "OriginalSelectionInput".
+   * see views_and_representations.xml::HistogramChartRepresentation::SelectionRepresentation
+   * for an example usage.
    */
   void SetPropertyModifiedFlag(const char* name, int flag) override;
 
