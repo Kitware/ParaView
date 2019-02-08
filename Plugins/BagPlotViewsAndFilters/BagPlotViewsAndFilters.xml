@@ -440,7 +440,7 @@
                class="vtkChartSelectionRepresentation"
                processes="client|dataserver|renderserver">
           <InputProperty command="SetInputConnection"
-                         name="SelectionInput"/>
+                         name="OriginalSelectionInput"/>
         </RepresentationProxy>
       </SubProxy>
     </ChartRepresentationProxy>
@@ -680,7 +680,7 @@
                class="vtkChartSelectionRepresentation"
                processes="client|dataserver|renderserver">
           <InputProperty command="SetInputConnection"
-                         name="SelectionInput"/>
+                         name="OriginalSelectionInput"/>
         </RepresentationProxy>
       </SubProxy>
     </ChartRepresentationProxy>
