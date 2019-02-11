@@ -44,7 +44,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
   set(catalyst_fortran_using_mangling "${FortranCInterface_GLOBAL_FOUND}")
 
   list(APPEND classes
-    FortranPythonAdaptorAPI.cxx)
+    FortranPythonAdaptorAPI)
   list(APPEND headers
     "${CMAKE_CURRENT_BINARY_DIR}/FortranPythonAdaptorAPIMangling.h")
 endif ()
