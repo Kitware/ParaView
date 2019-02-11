@@ -584,6 +584,10 @@
         </Documentation>
         <Hints>
           <RestartRequired />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="ResolveCoincidentTopology"
+                                   value="3" />
         </Hints>
       </DoubleVectorProperty>
 
