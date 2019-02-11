@@ -91,7 +91,7 @@ function(paraview_protobuf_generate)
       OUTPUT ${_generated_srcs}
       COMMAND  $<TARGET_FILE:ParaView::protoc>
       ARGS --${protobuf_generate_LANGUAGE}_out ${_dll_export_decl}${CMAKE_CURRENT_BINARY_DIR} ${_protobuf_include_path} ${_abs_file}
-      DEPENDS ${ABS_FIL} ParaView::protoc
+      DEPENDS ${_abs_file} ParaView::protoc
       COMMENT "Running ${protobuf_generate_LANGUAGE} protocol buffer compiler on ${_proto}"
       VERBATIM )
   endforeach()
