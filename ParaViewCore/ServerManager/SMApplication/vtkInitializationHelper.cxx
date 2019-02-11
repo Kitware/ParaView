@@ -330,7 +330,8 @@ void vtkInitializationHelper::LoadSettings()
 
   // Load site-level settings
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  std::string app_dir = options->GetApplicationPath();
+  const char* app_dir_p = options->GetApplicationPath();
+  std::string app_dir = app_dir_p ? app_dir_p : "";
   app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
 
   // If the application path ends with lib/paraview-X.X, shared
