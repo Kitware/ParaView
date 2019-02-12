@@ -21,6 +21,7 @@ set(python_files
   paraview/detail/pythonalgorithm.py
   paraview/extract_selection.py
   paraview/lookuptable.py
+  paraview/modules/__init__.py
   paraview/numeric.py
   paraview/numpy_support.py
   paraview/pv-vtk-all.py
