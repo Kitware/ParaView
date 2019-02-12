@@ -142,7 +142,6 @@ std::string vtkLocatePluginOrConfigFile(
   const std::string landmark = isPlugin ? vtkGetPluginFileNameFromName(plugin) : plugin;
 
   vtkNew<vtkPResourceFileLocator> locator;
-  locator->SetPrintDebugInformation(debug_plugin);
 
   // First try the test plugin path, if it exists.
   vtkPVOptions* options = pm->GetOptions();
