@@ -22,11 +22,18 @@ vtk_module_build(
   VERSION             "${PARAVIEW_VERSION}"
   SOVERSION           "1")
 
+set(qrc_files)
+
+if (PARAVIEW_BUILD_QT_GUI)
+  list(APPEND qrc_files
+    BagPlotViewsAndFilters.qrc)
+endif ()
+
 paraview_add_plugin(BagPlotViewsAndFilters
   REQUIRED_ON_SERVER
   VERSION "1.0"
   SERVER_MANAGER_XML BagPlotViewsAndFilters.xml
-  UI_RESOURCES BagPlotViewsAndFilters.qrc 
+  UI_RESOURCES ${qrc_files}
   MODULES BagPlotViewsAndFilters::BagPlotViewsAndFiltersBagPlot)
 
 if (BUILD_TESTING)

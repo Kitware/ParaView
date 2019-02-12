@@ -313,6 +313,14 @@ if (PARAVIEW_BUILD_QT_GUI)
       @ONLY)
     unset(high_resolution_capable)
   endif ()
+else ()
+  list(APPEND paraview_rejected_modules
+    ParaView::pqApplicationComponents
+    ParaView::pqComponents
+    ParaView::pqCore
+    ParaView::pqWidgets
+    ParaView::qttesting
+    VTK::GUISupportQt)
 endif ()
 
 if (PARAVIEW_USE_MPI)
