@@ -18,11 +18,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 
-#define VTK_PRESOURCE_FILE_LOCATOR_DEBUG(x)                                                        \
-  if (this->PrintDebugInformation)                                                                 \
-  {                                                                                                \
-    cout << "# pv: " x << endl;                                                                    \
-  }
+#define VTK_PRESOURCE_FILE_LOCATOR_DEBUG(x)
 
 vtkStandardNewMacro(vtkPResourceFileLocator);
 //----------------------------------------------------------------------------
