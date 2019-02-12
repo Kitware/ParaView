@@ -1,8 +1,10 @@
 set(python_files
-  paraview/annotation.py
+  paraview/__init__.py
   paraview/_backwardscompatibilityhelper.py
-  paraview/benchmark/basic.py
+  paraview/_colorMaps.py
+  paraview/annotation.py
   paraview/benchmark/__init__.py
+  paraview/benchmark/basic.py
   paraview/benchmark/logbase.py
   paraview/benchmark/logparser.py
   paraview/benchmark/manyspheres.py
@@ -10,7 +12,6 @@ set(python_files
   paraview/benchmark/waveletvolume.py
   paraview/calculator.py
   paraview/collaboration.py
-  paraview/_colorMaps.py
   paraview/coprocessing.py
   paraview/cpexport.py
   paraview/cpstate.py
@@ -19,7 +20,6 @@ set(python_files
   paraview/detail/__init__.py
   paraview/detail/pythonalgorithm.py
   paraview/extract_selection.py
-  paraview/__init__.py
   paraview/lookuptable.py
   paraview/numeric.py
   paraview/numpy_support.py
