@@ -23,12 +23,13 @@ vtk_module_build(
   SOVERSION           "1")
 
 set(interfaces)
-set(sources
-  pqNonOrthogonalAutoStart.cxx
-  pqNonOrthogonalAutoStart.h
-  pqSetupModelTransformBehavior.cxx
-  pqSetupModelTransformBehavior.h)
+set(sources)
 if (PARAVIEW_BUILD_QT_GUI)
+  list(APPEND sources
+    pqNonOrthogonalAutoStart.cxx
+    pqNonOrthogonalAutoStart.h
+    pqSetupModelTransformBehavior.cxx
+    pqSetupModelTransformBehavior.h)
   paraview_plugin_add_auto_start(
     CLASS_NAME pqNonOrthogonalAutoStart
     INTERFACES autostart_interface
