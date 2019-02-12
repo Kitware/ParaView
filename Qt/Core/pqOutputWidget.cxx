@@ -90,11 +90,7 @@ public:
   }
 
 protected:
-  OutputWindow()
-  {
-    this->PromptUserOff();
-    this->UseStdErrorForAllMessagesOff();
-  }
+  OutputWindow() { this->PromptUserOff(); }
   ~OutputWindow() override {}
 
   QPointer<pqOutputWidget> Widget;
