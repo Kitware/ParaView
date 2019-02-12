@@ -86,15 +86,38 @@ if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
 endif ()
 
 set(paraview_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+set(vtk_cmake_dir "${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake")
 list(APPEND CMAKE_MODULE_PATH
-  "${paraview_cmake_dir}")
+  "${paraview_cmake_dir}"
+  "${vtk_cmake_dir}")
 include(ParaViewServerManager)
 include(ParaViewTesting)
 include(ParaViewClient)
 include(ParaViewPlugin)
 include(vtkModuleWrapClientServer)
 include(CTest)
-include(GNUInstallDirs)
+
+include(vtkCompilerChecks)
+include(vtkCompilerPlatformFlags)
+include(vtkCompilerExtraFlags)
+include(vtkInitializeBuildType)
+include(vtkSupportMacros)
+include(vtkDirectories)
+
+#-----------------------------------------------------------------------------
+# Does VTK require support for 64 bit file systems
+include(CheckCXXSourceRuns)
+file(READ "${vtk_cmake_dir}/vtkRequireLargeFilesSupport.cxx"
+  VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE)
+check_cxx_source_runs("${VTK_REQUIRE_LARGE_FILE_SUPPORT_FILE}"
+  CMAKE_REQUIRE_LARGE_FILE_SUPPORT "Support for 64 bit file systems")
+set(VTK_REQUIRE_LARGE_FILE_SUPPORT ${CMAKE_REQUIRE_LARGE_FILE_SUPPORT})
+
+#-----------------------------------------------------------------------------
+# Provide compatibility options.
+option(VTK_LEGACY_REMOVE "Remove all legacy code completely." OFF)
+option(VTK_LEGACY_SILENT "Silence all legacy code messages." OFF)
+mark_as_advanced(VTK_LEGACY_REMOVE VTK_LEGACY_SILENT)
 
 # Setup external data. this will automatically download the test data and
 # baseline files to the build tree and set PARAVIEW_DATA_ROOT.
