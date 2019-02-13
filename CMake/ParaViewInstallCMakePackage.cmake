@@ -12,7 +12,7 @@ configure_file(
   @ONLY)
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${paraview_cmake_build_dir}/paraview-config-version.cmake"
-  VERSION "${PARAVIEW_MAJOR_VERSION}.${PARAVIEW_MINOR_VERSION}.${PARAVIEW_BUILD_VERSION}"
+  VERSION "${PARAVIEW_VERSION_FULL}"
   COMPATIBILITY SameMinorVersion)
 
 # For convenience, a package is written to the top of the build tree. At some
