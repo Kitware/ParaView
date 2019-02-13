@@ -6,11 +6,12 @@ if(WIN32)
 endif()
 
 message(
-  "${PARAVIEW_EXECUTABLE} -dr --data-directory=${PARAVIEW_TEST_OUTPUT_DIR} --test-script=${TEST_SCRIPT} --exit"
+  "${PARAVIEW_EXECUTABLE} -dr --test-directory=${PARAVIEW_TEST_DIR} --data-directory=${PARAVIEW_TEST_OUTPUT_DIR} --test-script=${TEST_SCRIPT} --exit"
 )
 
 execute_process(
   COMMAND ${PARAVIEW_EXECUTABLE} -dr
+          --test-directory=${PARAVIEW_TEST_DIR}
           --data-directory=${PARAVIEW_TEST_OUTPUT_DIR}
           --test-script=${TEST_SCRIPT}
           --exit
