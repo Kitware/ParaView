@@ -102,8 +102,8 @@ std::string vtkLocatePluginOrConfigFile(
     return std::string();
   }
 
-  bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
 #ifndef BUILD_SHARED_LIBS
+  bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   if (isPlugin)
   {
     vtkPVPluginTrackerDebugMacro("Looking for static plugin \'" << plugin << "\'");
