@@ -487,6 +487,7 @@ list(APPEND paraview_requested_modules
   VTK::FiltersFlowPaths
   VTK::FiltersVerdict
   VTK::IOAMR
+  VTK::IOParallelLSDyna
   VTK::IOTecplotTable
   VTK::IOTRUCHAS
   VTK::IOVeraOut
