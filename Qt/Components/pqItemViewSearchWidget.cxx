@@ -280,7 +280,7 @@ void pqItemViewSearchWidget::findNext()
 
   // Loop through all the model indices in the model
   QAbstractItemModel* viewModel = theView->model();
-  QModelIndex current, firstmactch, start = this->Private->CurrentFound;
+  QModelIndex current, start = this->Private->CurrentFound;
   if (start.isValid())
   {
     this->Private->BaseWidget->setItemDelegateForRow(start.row(), this->Private->UnHighlighter);
@@ -384,7 +384,7 @@ void pqItemViewSearchWidget::findPrevious()
 
   // Loop through all the model indices in the model
   QAbstractItemModel* viewModel = theView->model();
-  QModelIndex current, firstmactch, start = this->Private->CurrentFound;
+  QModelIndex current, start = this->Private->CurrentFound;
   if (start.isValid())
   {
     this->Private->BaseWidget->setItemDelegateForRow(start.row(), this->Private->UnHighlighter);
