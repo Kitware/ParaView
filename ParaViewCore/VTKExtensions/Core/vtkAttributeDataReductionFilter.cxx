@@ -167,7 +167,7 @@ static void vtkAttributeDataReductionFilterReduce(vtkDataSetAttributes* output,
     if (dsa->GetNumberOfArrays() > 0 && dsa->GetNumberOfTuples() == numTuples)
     {
       // Now combine this inPD with the outPD using the reduction indicated.
-      auto f = [list_index, progress_offset, progress_factor, self](
+      auto f = [progress_offset, progress_factor, self](
         vtkAbstractArray* fromA, vtkAbstractArray* toA) {
         vtkDataArray* toDA = vtkDataArray::SafeDownCast(toA);
         vtkDataArray* fromDA = vtkDataArray::SafeDownCast(fromA);
