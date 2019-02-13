@@ -134,7 +134,7 @@ if (PARAVIEW_BUILD_QT_GUI)
   # which can't be used when running the 'simulation' since those same
   # plugins won't be loaded then.
   IF ( BUILD_SHARED_LIBS )
-    add_test(NAME CoProcessingFullWorkflow
+    ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME CoProcessingFullWorkflow
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
       -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
@@ -145,7 +145,8 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DCOPROCESSING_DATA_DIR:PATH=${paraview_test_data_directory_output}/Testing/Data/Baseline
       -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
       -DTEST_NAME:STRING=CoProcessingFullWorkflow
-      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake
+      DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflow.png})
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
 
     add_test(NAME CoProcessingFullWorkflowNewUI
