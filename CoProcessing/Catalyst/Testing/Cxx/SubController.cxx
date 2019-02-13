@@ -5,6 +5,7 @@
 #include <vtkMPI.h>
 #include <vtkSmartPointer.h>
 
+#include <cassert>
 #include <vector>
 
 void SubCommunicatorDriver(MPI_Comm* handle)
@@ -23,16 +24,23 @@ int SubController(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
   MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 
+  if (numprocs < 2)
+  {
+    cout << "ERROR: Too few ranks. Needs at least 2!" << std::endl;
+    MPI_Finalize();
+    return EXIT_FAILURE;
+  }
+
   MPI_Group orig_group;
   MPI_Comm_group(MPI_COMM_WORLD, &orig_group);
 
   std::vector<int> subranks;
   for (int i = 0; i < numprocs / 2; i++)
-    subranks.push_back(i);
-  if (subranks.empty())
   {
-    subranks.push_back(0);
+    subranks.push_back(i);
   }
+  assert(subranks.size() >= 1);
+
   MPI_Group subgroup;
   MPI_Group_incl(orig_group, static_cast<int>(subranks.size()), &(subranks[0]), &subgroup);
   MPI_Comm subcommunicator;
@@ -51,17 +59,16 @@ int SubController(int argc, char* argv[])
     std::cout << "Process " << myrank << " did not do any co-processing.\n";
   }
 
-  int output;
-  MPI_Allreduce(&didCoProcessing, &output, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  int ranksThatDidCoProcessing;
+  MPI_Allreduce(&didCoProcessing, &ranksThatDidCoProcessing, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-  int retVal = 0;
-  if (output != 1)
+  int retVal = EXIT_SUCCESS;
+  if (ranksThatDidCoProcessing != static_cast<int>(subranks.size()))
   {
-    vtkGenericWarningMacro("Sum should be 1 but is " << output);
-    retVal = 1;
+    vtkGenericWarningMacro("Sum should be 1 but is " << ranksThatDidCoProcessing);
+    retVal = EXIT_FAILURE;
   }
 
   MPI_Finalize();
-
   return retVal;
 }

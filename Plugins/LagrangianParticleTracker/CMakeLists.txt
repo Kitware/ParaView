@@ -34,7 +34,7 @@ set(sources
 paraview_plugin_add_property_widget(
   KIND WIDGET
   TYPE "integration_model_seed_helper_widget"
-  CLASS_NAME pqIntegrationModelSurfaceHelperWidget
+  CLASS_NAME pqIntegrationModelSeedHelperWidget
   INTERFACES pwi_interfaces
   SOURCES pwi_sources)
 list(APPEND interfaces

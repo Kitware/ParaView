@@ -4,7 +4,7 @@ from __future__ import print_function
 import sys
 import paraview.simple
 
-paraview.simple.LoadDistributedPlugin("EyeDomeLightingView", True, globals())
+paraview.simple.LoadDistributedPlugin("EyeDomeLighting", True, globals())
 print('loaded the first time successfully')
-paraview.simple.LoadDistributedPlugin("EyeDomeLightingView", True, globals())
+paraview.simple.LoadDistributedPlugin("EyeDomeLighting", True, globals())
 print('loaded the second time successfully')

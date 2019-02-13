@@ -7,6 +7,8 @@ DEPENDS
 PRIVATE_DEPENDS
   VTK::FiltersGeneral
   VTK::vtksys
+OPTIONAL_DEPENDS
+  VTK::ParallelMPI
 TEST_DEPENDS
   ParaView::CatalystTestDriver
   VTK::IOXML

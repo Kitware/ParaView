@@ -475,12 +475,16 @@ endif ()
 
 list(APPEND paraview_requested_modules
   ParaView::ProcessXML
+  ParaView::VTKExtensionsCGNSReader
+  ParaView::VTKExtensionsH5PartReader
+  ParaView::VTKExtensionsPoints
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
   VTK::FiltersVerdict
-  VTK::IOTRUCHAS
   VTK::IOTecplotTable
-  VTK::IOVeraOut)
+  VTK::IOTRUCHAS
+  VTK::IOVeraOut
+  )
 
 if (paraview_requested_modules)
   list(REMOVE_DUPLICATES paraview_requested_modules)
