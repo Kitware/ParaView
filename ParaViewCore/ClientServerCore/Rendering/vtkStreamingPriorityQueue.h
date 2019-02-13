@@ -24,9 +24,11 @@
 
 #ifndef vtkStreamingPriorityQueue_h
 #define vtkStreamingPriorityQueue_h
+#ifndef VTK_WRAPPING_CXX
 
 #include "vtkBoundingBox.h"
 #include "vtkMath.h"
+#include "vtkWrappingHints.h"
 
 #include <algorithm>
 #include <queue>
@@ -167,7 +169,7 @@ double vtkComputeScreenCoverage(const double planes[24], const double bounds[6],
 }
 }
 
-class vtkStreamingPriorityQueueItem
+class VTK_WRAPEXCLUDE vtkStreamingPriorityQueueItem
 {
 public:
   unsigned int Identifier; // this is used to identify this block when making a
@@ -196,7 +198,7 @@ public:
   }
 };
 
-class vtkStreamingPriorityQueueItemComparator
+class VTK_WRAPEXCLUDE vtkStreamingPriorityQueueItemComparator
 {
 public:
   bool operator()(
@@ -207,8 +209,9 @@ public:
 };
 
 template <typename Comparator = vtkStreamingPriorityQueueItemComparator>
-class vtkStreamingPriorityQueue : public std::priority_queue<vtkStreamingPriorityQueueItem,
-                                    std::vector<vtkStreamingPriorityQueueItem>, Comparator>
+class VTK_WRAPEXCLUDE vtkStreamingPriorityQueue
+  : public std::priority_queue<vtkStreamingPriorityQueueItem,
+      std::vector<vtkStreamingPriorityQueueItem>, Comparator>
 {
 public:
   //@{
@@ -269,6 +272,7 @@ public:
     }
   }
 };
+#endif
 #endif
 
 // VTK-HeaderTest-Exclude: vtkStreamingPriorityQueue.h
