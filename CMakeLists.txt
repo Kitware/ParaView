@@ -486,6 +486,7 @@ list(APPEND paraview_requested_modules
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
   VTK::FiltersVerdict
+  VTK::IOAMR
   VTK::IOTecplotTable
   VTK::IOTRUCHAS
   VTK::IOVeraOut
