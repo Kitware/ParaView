@@ -476,6 +476,7 @@ endif ()
 list(APPEND paraview_requested_modules
   ParaView::ProcessXML
   ParaView::VTKExtensionsCGNSReader
+  ParaView::VTKExtensionsH5PartReader
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
   VTK::FiltersVerdict
