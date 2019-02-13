@@ -473,6 +473,11 @@ if (PARAVIEW_ENABLE_CATALYST)
   endif ()
 endif ()
 
+if (PARAVIEW_BUILD_TESTING)
+  list(APPEND paraview_requested_modules
+    ParaView::smTestDriver)
+endif ()
+
 list(APPEND paraview_requested_modules
   ParaView::ProcessXML
   ParaView::VTKExtensionsCGNSReader
