@@ -37,11 +37,14 @@ static int class_is_wrapped(const char* classname)
     if (entry)
     {
       /* only allow non-excluded vtkObjects as args */
-      if (vtkParseHierarchy_GetProperty(entry, "WRAP_EXCLUDE_PYTHON") ||
+      if (vtkParseHierarchy_GetProperty(entry, "WRAPEXCLUDE") ||
         !vtkParseHierarchy_IsTypeOf(hierarchyInfo, entry, "vtkObjectBase"))
       {
         return 0;
       }
+
+      /* the primary class is the one the header is named after */
+      return vtkParseHierarchy_IsPrimary(entry);
     }
   }
 
@@ -572,7 +575,7 @@ typedef struct _NewClassInfo
 int notWrappable(FunctionInfo* curFunction)
 {
   return (curFunction->IsOperator || curFunction->ArrayFailure || !curFunction->IsPublic ||
-    !curFunction->Name || curFunction->Template);
+    !curFunction->Name || curFunction->Template || curFunction->IsExcluded);
 }
 
 //--------------------------------------------------------------------------nix
@@ -1208,9 +1211,10 @@ int main(int argc, char* argv[])
   options = vtkParse_GetCommandLineOptions();
 
   /* get the hierarchy info for accurate typing */
-  if (options->HierarchyFileName)
+  if (options->HierarchyFileNames)
   {
-    hierarchyInfo = vtkParseHierarchy_ReadFile(options->HierarchyFileName);
+    hierarchyInfo =
+      vtkParseHierarchy_ReadFiles(options->NumberOfHierarchyFileNames, options->HierarchyFileNames);
   }
 
   /* get the output file */
