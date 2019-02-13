@@ -11,6 +11,10 @@ if(WIN32)
   set(PARAVIEW_EXECUTABLE cmd /c ${PARAVIEW_EXECUTABLE})
 endif()
 
+# set `DASHBOARD_TEST_FROM_CTEST` environment variable to ensure
+# the executables realize we're running tests.
+set(ENV{DASHBOARD_TEST_FROM_CTEST} "1")
+
 # run paraview to setup and save the python state file
 execute_process(
   COMMAND ${PARAVIEW_EXECUTABLE} -dr
