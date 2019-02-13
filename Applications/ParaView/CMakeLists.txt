@@ -99,6 +99,6 @@ if (UNIX AND NOT APPLE)
   endforeach ()
   install(
     FILES       org.paraview.ParaView.appdata.xml
-    DESTINATION share/appdata
+    DESTINATION share/metainfo
     COMPONENT   runtime)
 endif ()
