@@ -7,7 +7,10 @@ endif ()
 # Regular expression for warning exception during build process
 list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   # Ignore `getenv` "deprecation" with MSVC.
-  "vtknvindex_utilities.h.*: warning C4996: 'getenv'")
+  "vtknvindex_utilities.h.*: warning C4996: 'getenv'"
+
+  # Ignore protobuf-generated source file warnings.
+  "vtkPVMessage.pb.cc")
 
 # Regular expression for excluding files from coverage testing
 list(APPEND CTEST_CUSTOM_COVERAGE_EXCLUDE
