@@ -164,19 +164,19 @@ set(paraview_python_state_tests
 )
 foreach(python_state_test ${paraview_python_state_tests})
   if (PARAVIEW_BUILD_QT_GUI)
-    if(BUILD_SHARED_LIBS)
-      add_test(NAME ${python_state_test}
-        COMMAND ${CMAKE_COMMAND}
-        -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
-        -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
-        -DPARAVIEW_TEST_OUTPUT_DIR:PATH=${paraview_test_data_directory_output}
-        -DPARAVIEW_TEST_OUTPUT_BASELINE_DIR:PATH=${paraview_test_data_directory_output}/Testing/Data/Baseline
-        -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.py
-        -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${python_state_test}.xml
-        -DTEMPORARY_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
-        -DPYTHON_STATE_TEST_NAME:STRING=${python_state_test}
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.cmake)
-      set_tests_properties(${python_state_test} PROPERTIES LABELS "PARAVIEW")
-    endif()
+    set(tname "ParaView::ServerManagerDefaultPython-${python_state_test}")
+    ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME ${tname}
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
+      -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
+      -DPARAVIEW_TEST_OUTPUT_BASELINE_DIR:PATH=${paraview_test_data_directory_output}/Testing/Data/Baseline
+      -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.py
+      -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${python_state_test}.xml
+      -DTEMPORARY_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
+      -DPYTHON_STATE_TEST_NAME:STRING=${python_state_test}
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonStateTestDriver.cmake
+      DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/${python_state_test}.png}
+      )
+    set_tests_properties(${tname} PROPERTIES LABELS "PARAVIEW")
   endif()
 endforeach()
