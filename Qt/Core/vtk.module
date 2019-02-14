@@ -7,6 +7,7 @@ GROUPS
 DEPENDS
   ParaView::ClientServerCoreDefault
   ParaView::pqWidgets
+  ParaView::qttesting
   VTK::GUISupportQt
 PRIVATE_DEPENDS
   ParaView::Animation
