@@ -1,14 +1,12 @@
-include(ParaViewTestingMacros)
+if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
+  set(_paraview_add_tests_default_test_data_target ParaViewData)
+  ExternalData_Expand_Arguments(ParaViewData _
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Gmsh/,REGEX:viz_*}"
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Gmsh/naca0012/,REGEX:.*}")
 
-set(GenericIO_TESTS_WITH_BASELINES
-  ${CMAKE_CURRENT_SOURCE_DIR}/GenericIOTest.xml
-)
-
-if(PARAVIEW_DATA_ROOT AND BUILD_SHARED_LIBS)
-  add_client_tests("pv"
+  paraview_add_client_tests(
     LOAD_PLUGIN "GenericIOReader"
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-    TEST_SCRIPTS ${GenericIO_TESTS_WITH_BASELINES}
-  )
-
-endif(PARAVIEW_DATA_ROOT AND BUILD_SHARED_LIBS)
+    TEST_DATA_TARGET ParaViewData
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/GenericIOTest.xml)
+endif ()

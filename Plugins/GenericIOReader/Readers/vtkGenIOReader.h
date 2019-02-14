@@ -42,77 +42,34 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _VTK_GIO_READER_H_
-#define _VTK_GIO_READER_H_
+#ifndef vtkGenIOReader_h
+#define vtkGenIOReader_h
 
-#define OCTREE_ENABLED 0 // Disabled right now until octree is integrated in HACC output
-
-#ifndef LANL_GENERICIO_NO_MPI
-#include <mpi.h>
-#endif
-
-#include <stdlib.h>
-#include <time.h>
-
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-
-#include <set>
-#include <sstream>
-#include <unordered_map>
-
-#include <algorithm>
-#include <cctype>
-#include <mutex>
-#include <numeric>
-#include <random>
-#include <string>
-#include <thread>
-#include <utility>
-
-#include <vtkCellArray.h>
-#include <vtkDataObject.h>
-#include <vtkDoubleArray.h>
-#include <vtkFloatArray.h>
-#include <vtkImageData.h>
-#include <vtkInformation.h>
-#include <vtkInformationVector.h>
-#include <vtkMPI.h>
-#include <vtkMPICommunicator.h>
-#include <vtkMultiProcessController.h>
-#include <vtkPointData.h>
-#include <vtkPoints.h>
-#include <vtkSmartPointer.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
-#include <vtkType.h>
-#include <vtkTypeInt16Array.h>
-#include <vtkTypeInt32Array.h>
-#include <vtkTypeInt64Array.h>
-#include <vtkTypeInt8Array.h>
-#include <vtkTypeUInt16Array.h>
-#include <vtkTypeUInt32Array.h>
-#include <vtkTypeUInt64Array.h>
-#include <vtkTypeUInt8Array.h>
-#include <vtkUnstructuredGrid.h>
-
+#include "vtkCellArray.h"
 #include "vtkDataArraySelection.h"
-#include "vtkMPICommunicator.h"
-#include "vtkMPIController.h"
-#include "vtkMultiProcessController.h"
-#include "vtkStringArray.h"
+#include "vtkGenericIOReaderModule.h"
+#include "vtkPoints.h"
+#include "vtkSmartPointer.h"
 #include "vtkUnstructuredGridAlgorithm.h"
 
-#include "LANL/GIO/GenericIO.h"
+#include "utils/gioData.h"
+#include "utils/log.h"
 
-#include "LANL/utils/log.h"
-#include "LANL/utils/timer.h"
+#include <mutex>
+#include <sstream>
+#include <string>
+#include <vector>
 
-#include "LANL/utils/gioData.h"
+class vtkDataArray;
+class vtkMultiProcessController;
 
-class vtkDataArraySelection;
-class vtkStringArray;
-class vtkUnstructuredGrid;
+namespace lanl
+{
+namespace gio
+{
+class GenericIO;
+}
+}
 
 //
 // Creates a selection
@@ -156,7 +113,7 @@ struct ParaviewField
   }
 };
 
-class vtkGenIOReader : public vtkUnstructuredGridAlgorithm
+class VTKGENERICIOREADER_EXPORT vtkGenIOReader : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkGenIOReader* New();

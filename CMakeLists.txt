@@ -524,8 +524,6 @@ set_property(GLOBAL
     "_vtk_module_autoinit_include" "\"vtkAutoInit.h\"")
 
 set(paraview_default_plugins
-  # These plugins have not yet been updated.
-  #GenericIOReader
   AcceleratedAlgorithms
   AnalyzeNIfTIReaderWriter
   ArrowGlyph
@@ -535,6 +533,7 @@ set(paraview_default_plugins
   EULATestPlugin
   EmbossingRepresentations
   EyeDomeLighting
+  GenericIOReader
   GeodesicMeasurement
   GMVReader
   LagrangianParticleTracker
