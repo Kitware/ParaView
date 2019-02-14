@@ -73,13 +73,15 @@
 #ifndef vtkFastMarchingGeodesicDistance_h
 #define vtkFastMarchingGeodesicDistance_h
 
+#include "vtkGeodesicMeasurementFiltersModule.h" // for export macro
 #include "vtkPolyDataGeodesicDistance.h"
 
 class vtkPolyData;
 class vtkDataArray;
 class vtkGeodesicMeshInternals;
 
-class VTK_EXPORT vtkFastMarchingGeodesicDistance : public vtkPolyDataGeodesicDistance
+class VTKGEODESICMEASUREMENTFILTERS_EXPORT vtkFastMarchingGeodesicDistance
+  : public vtkPolyDataGeodesicDistance
 {
 public:
   static vtkFastMarchingGeodesicDistance* New();

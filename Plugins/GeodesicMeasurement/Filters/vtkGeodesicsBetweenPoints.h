@@ -26,9 +26,10 @@
 #ifndef vtkGeodesicsBetweenPoints_h
 #define vtkGeodesicsBetweenPoints_h
 
+#include "vtkGeodesicMeasurementFiltersModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
-class VTK_EXPORT vtkGeodesicsBetweenPoints : public vtkPolyDataAlgorithm
+class VTKGEODESICMEASUREMENTFILTERS_EXPORT vtkGeodesicsBetweenPoints : public vtkPolyDataAlgorithm
 {
 public:
   static vtkGeodesicsBetweenPoints* New();

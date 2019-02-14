@@ -1,0 +1,10 @@
+NAME
+  GeodesicMeasurement
+DESCRIPTION
+  Filters for geodesic measurement
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::FiltersCore
+  VTK::FiltersModeling
