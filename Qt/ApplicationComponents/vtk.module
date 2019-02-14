@@ -6,6 +6,7 @@ GROUPS
   ParaViewQt
 DEPENDS
   ParaView::pqComponents
+  ParaView::qttesting
   VTK::GUISupportQt
 PRIVATE_DEPENDS
   ParaView::Animation
