@@ -18,7 +18,7 @@ set(ENV{DASHBOARD_TEST_FROM_CTEST} "1")
 # run paraview to setup and save the python state file
 execute_process(
   COMMAND ${PARAVIEW_EXECUTABLE} -dr
-          --test-directory=${PARAVIEW_TEST_OUTPUT_DIR}
+          --test-directory=${TEMPORARY_DIR}
           --test-script=${TEST_SCRIPT}
           --exit
   RESULT_VARIABLE rv)
@@ -30,8 +30,8 @@ endif()
 execute_process(
   COMMAND ${PVPYTHON_EXECUTABLE} -dr
   ${TEST_DRIVER}
-  ${PARAVIEW_TEST_OUTPUT_DIR}/${PYTHON_STATE_TEST_NAME}-StateFile.py
-  -T ${PARAVIEW_TEST_OUTPUT_DIR}
+  ${TEMPORARY_DIR}/${PYTHON_STATE_TEST_NAME}-StateFile.py
+  -T ${TEMPORARY_DIR}
   -V ${PARAVIEW_TEST_OUTPUT_BASELINE_DIR}/${PYTHON_STATE_TEST_NAME}.png
   RESULT_VARIABLE rv)
 if(NOT rv EQUAL 0)
