@@ -9,21 +9,16 @@ args = parser.parse_args(sys.argv[1:])
 
 expected_columns = [
     '"Time"',
-    '"avg ACCL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"min ACCL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"max ACCL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"q1 ACCL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"q3 ACCL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"avg DISPL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"min DISPL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"max DISPL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"q1 DISPL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"q3 DISPL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"avg VEL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"min VEL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"max VEL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"q1 VEL (Magnitude) (Block: 2 ; Point Statistics)"',
-    '"q3 VEL (Magnitude) (Block: 2 ; Point Statistics)"'
+    '"avg DISPL (Magnitude) ( block=2)"',
+    '"min DISPL (Magnitude) ( block=2)"',
+    '"max DISPL (Magnitude) ( block=2)"',
+    '"q1 DISPL (Magnitude) ( block=2)"',
+    '"q3 DISPL (Magnitude) ( block=2)"',
+    '"avg VEL (Magnitude) ( block=2)"',
+    '"min VEL (Magnitude) ( block=2)"',
+    '"max VEL (Magnitude) ( block=2)"',
+    '"q1 VEL (Magnitude) ( block=2)"',
+    '"q3 VEL (Magnitude) ( block=2)"'
     ]
 
 # Open CSV file written by the XML test and verify the column names.
@@ -36,8 +31,8 @@ with open(csv_file_name, 'r') as f:
     header_columns = header.split(',')
 
     if len(expected_columns) != len(header_columns):
-        print("Number of columns in '%s' does not match expected number of columns"
-              % csv_file_name)
+        print("Number of columns in '%s' does not match expected number of columns (%d != %d)"
+              % (csv_file_name, len(header_columns), len(expected_columns)))
         sys.exit(1)
 
     for (expected, read) in zip(expected_columns, header_columns):
