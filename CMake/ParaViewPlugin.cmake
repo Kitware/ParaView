@@ -1450,7 +1450,7 @@ function (paraview_plugin_add_proxy)
           "Missing `PROXY_TYPE` for `XML_NAME`")
       endif ()
       if (DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_name" OR
-          DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_nam_regex")
+          DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_name_regex")
         message(FATAL_ERROR
           "Duplicate `XML_NAME` or `XML_NAME_REGEX` for `${_paraview_proxy_type}`")
       endif ()
@@ -1463,7 +1463,7 @@ function (paraview_plugin_add_proxy)
           "Missing `PROXY_TYPE` for `XML_NAME_REGEX`")
       endif ()
       if (DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_name" OR
-          DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_nam_regex")
+          DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_name_regex")
         message(FATAL_ERROR
           "Duplicate `XML_NAME` or `XML_NAME_REGEX` for `${_paraview_proxy_type}`")
       endif ()
