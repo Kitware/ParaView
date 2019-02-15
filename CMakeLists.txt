@@ -410,6 +410,9 @@ endif ()
 if (PARAVIEW_ENABLE_VISITBRIDGE)
   list(APPEND paraview_requested_modules
     ParaView::IOVisItBridge)
+else ()
+  list(APPEND paraview_rejected_modules
+    ParaView::IOVisItBridge)
 endif ()
 
 if (PARAVIEW_ENABLE_XDMF2)
