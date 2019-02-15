@@ -75,6 +75,7 @@ if (NOT BUILD_SHARED_LIBS)
 endif ()
 
 # Set up our directory structure for output libraries and binaries
+include(GNUInstallDirs)
 if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 endif ()
