@@ -149,6 +149,7 @@ endif ()
 
 include(CMakeDependentOption)
 option(PARAVIEW_BUILD_EXAMPLES "Build ParaView examples" OFF)
+option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Build ParaView C++/Python docs" OFF)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
@@ -875,8 +876,7 @@ endif ()
 
 #-----------------------------------------------------------------------------
 # Build doxygen documentation.
-# XXX: Disabled for now.
-if (FALSE AND BUILD_DOCUMENTATION)
+if (PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION)
   add_subdirectory(Utilities/Doxygen)
   add_subdirectory(Utilities/Sphinx)
   add_subdirectory(Documentation)
