@@ -350,6 +350,7 @@ endif ()
 if (PARAVIEW_USE_MPI)
   list(APPEND paraview_requested_modules
     VTK::FiltersParallelFlowPaths
+    VTK::FiltersParallelGeometry
     VTK::FiltersParallelMPI
     # Required because of ParaView::VTKExtensionsDefault having an optional dependency.
     VTK::IOMPIImage
