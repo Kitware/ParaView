@@ -42,3 +42,7 @@ if (NVINDEX_SKIP_BUILD_RPATH)
       SKIP_BUILD_RPATH TRUE
       INSTALL_RPATH_USE_LINK_PATH FALSE)
 endif ()
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif ()

@@ -8,5 +8,11 @@ set_property(GLOBAL APPEND
     vtk_required_python_modules "netcdftime")
 
 if (BUILD_TESTING)
-  add_subdirectory(Testing)
+  include(FindPythonModules)
+  find_python_module(netcdftime netcdftime_found)
+  if (netcdftime_found)
+    add_subdirectory(Testing)
+  else ()
+    message(WARNING "netcdftime Python is needed to test NetCDFTimeAnnotation plugin.")
+  endif()
 endif ()

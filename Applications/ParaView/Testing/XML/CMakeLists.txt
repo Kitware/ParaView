@@ -822,24 +822,6 @@ if (TARGET VTK::IOParallelLSDyna)
     )
 endif ()
 
-if (PARAVIEW_PLUGIN_ENABLE_pvNVIDIAIndeX)
-  list(APPEND TESTS_WITH_BASELINES
-    IndeXRepresentation.xml)
-  set(IndeXRepresentation_DISABLE_CS TRUE)
-  set(IndeXRepresentation_DISABLE_CRS TRUE)
-
-  # The embedded free IndeX license doesn't support parallel processing.
-  # Disable the test on MPI builds.
-  if (NOT PARAVIEW_USE_MPI)
-    list(APPEND TESTS_WITH_BASELINES
-      IndeXRepresentationServer.xml)
-    set(IndeXRepresentationServer_DISABLE_C TRUE)
-    # This won't work until image delivery for the render server is
-    # implemented.
-    set(IndeXRepresentationServer_DISABLE_CRS TRUE)
-  endif ()
-endif ()
-
 if(VTK_USE_LARGE_DATA)
   ExternalData_Expand_Arguments(ParaViewData _
     "DATA{${paraview_test_data_directory_input}/Data/bake/bake.e}")
