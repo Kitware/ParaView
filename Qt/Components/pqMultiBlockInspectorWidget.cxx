@@ -707,15 +707,21 @@ public:
     pqOutputPort* port = this->OutputPort;
     this->CDTModel->clearColumns();
     this->CDTModel->setUserCheckable(this->UserCheckable);
-    if (this->HasColors)
+    if (this->HasColors && this->Representation != nullptr)
     {
-      Q_ASSERT(this->Representation != nullptr);
       this->ProxyModel->setColorColumn(this->CDTModel->addColumn("color"));
     }
-    if (this->HasOpacities)
+    else
     {
-      Q_ASSERT(this->Representation != nullptr);
+      this->HasColors = false;
+    }
+    if (this->HasOpacities && this->Representation != nullptr)
+    {
       this->ProxyModel->setOpacityColumn(this->CDTModel->addColumn("opacity"));
+    }
+    else
+    {
+      this->HasOpacities = false;
     }
     this->updateRootLabel();
     bool is_composite =
