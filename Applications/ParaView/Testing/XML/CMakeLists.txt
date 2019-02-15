@@ -1581,13 +1581,13 @@ if (TARGET paraview)
     # on backwards compatibility.
     set (Calculator54State_THRESHOLD 100)
     paraview_add_client_tests(
-      ARGS "--state=${CMAKE_CURRENT_BINARY_DIR}/Calculator54State.py"
+      ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.py"
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS Calculator54State.xml)
 
     # Test backwards compatibility for Glyph filter change in ParaView 5.6
     paraview_add_client_tests(
-      ARGS "--state=${CMAKE_CURRENT_BINARY_DIR}/Glyph56State.py"
+      ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/Glyph56State.py"
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS Glyph56State.xml
     )
