@@ -1581,13 +1581,13 @@ if (TARGET paraview)
     # on backwards compatibility.
     set (Calculator54State_THRESHOLD 100)
     paraview_add_client_tests(
-      ARGS "--state=${CMAKE_CURRENT_BINARY_DIR}/Calculator54State.py"
+      ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/Calculator54State.py"
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS Calculator54State.xml)
 
     # Test backwards compatibility for Glyph filter change in ParaView 5.6
     paraview_add_client_tests(
-      ARGS "--state=${CMAKE_CURRENT_BINARY_DIR}/Glyph56State.py"
+      ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/Glyph56State.py"
       BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
       TEST_SCRIPTS Glyph56State.xml
     )
@@ -1639,18 +1639,18 @@ set(paraview_python_verify_tests
 
 if (PARAVIEW_ENABLE_PYTHON)
   foreach(test_name ${paraview_python_verify_tests})
-    add_test(NAME ${test_name}
+    set(tname "ParaView::Applications::${test_name}")
+    add_test(NAME ${tname}
       COMMAND ${CMAKE_COMMAND}
       -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
       -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvpython>
-      -DPARAVIEW_TEST_OUTPUT_DIR:PATH=${paraview_test_data_directory_output}
-      -DPARAVIEW_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+      -DDATA_DIR:PATH=${paraview_test_data_directory_output}
       -DTEST_NAME:STRING=${test_name}
       -DTEST_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${test_name}.xml
-      -DTEST_DRIVER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${test_name}Verify.py
+      -DTEST_VERIFIER:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/${test_name}Verify.py
       -DTEMPORARY_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
       -P ${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTestDriver.cmake
     )
-    set_tests_properties(${python_state_test} PROPERTIES LABELS "paraview")
+    set_tests_properties(${tname} PROPERTIES LABELS "paraview")
   endforeach()
 endif()

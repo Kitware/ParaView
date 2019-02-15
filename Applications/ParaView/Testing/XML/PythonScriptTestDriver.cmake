@@ -5,14 +5,18 @@ if(WIN32)
   set(PARAVIEW_EXECUTABLE cmd /c ${PARAVIEW_EXECUTABLE})
 endif()
 
+# set `DASHBOARD_TEST_FROM_CTEST` environment variable to ensure
+# the executables realize we're running tests.
+set(ENV{DASHBOARD_TEST_FROM_CTEST} "1")
+
 message(
-  "${PARAVIEW_EXECUTABLE} -dr --test-directory=${PARAVIEW_TEST_DIR} --data-directory=${PARAVIEW_TEST_OUTPUT_DIR} --test-script=${TEST_SCRIPT} --exit"
+  "${PARAVIEW_EXECUTABLE} -dr --test-directory=${TEMPORARY_DIR} --data-directory=${DATA_DIR} --test-script=${TEST_SCRIPT} --exit"
 )
 
 execute_process(
   COMMAND ${PARAVIEW_EXECUTABLE} -dr
-          --test-directory=${PARAVIEW_TEST_DIR}
-          --data-directory=${PARAVIEW_TEST_OUTPUT_DIR}
+          --test-directory=${TEMPORARY_DIR}
+          --data-directory=${DATA_DIR}
           --test-script=${TEST_SCRIPT}
           --exit
   RESULT_VARIABLE rv
@@ -22,13 +26,13 @@ if (NOT rv EQUAL 0)
 endif()
 
 message(
-  "${PVPYTHON_EXECUTABLE} -dr ${TEST_VERIFIER} -T ${PARAVIEW_TEST_OUTPUT_DIR} -N ${TEST_NAME}"
+  "${PVPYTHON_EXECUTABLE} -dr ${TEST_VERIFIER} -T ${TEMPORARY_DIR} -N ${TEST_NAME}"
 )
 
 execute_process(
   COMMAND ${PVPYTHON_EXECUTABLE} -dr
   ${TEST_VERIFIER}
-  -T ${PARAVIEW_TEST_OUTPUT_DIR}
+  -T ${TEMPORARY_DIR}
   -N ${TEST_NAME}
   RESULT_VARIABLE rv
 )
