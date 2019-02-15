@@ -30,7 +30,7 @@ endif()
 unset(PV_MODULE_DIRS_DOXYGEN)
 unset(PV_MODULE_DIRS_DOXYGEN_ESCAPED)
 file(GLOB_RECURSE src RELATIVE "${ParaView_SOURCE_DIR}"
-    "${ParaView_SOURCE_DIR}/module.cmake")
+    "${ParaView_SOURCE_DIR}/vtk.module")
 foreach(module ${src})
   get_filename_component(module_BASE ${module} PATH)
   if("${module_BASE}" MATCHES "^Utilities" OR ${module_BASE} MATCHES "^Third" OR
@@ -68,5 +68,3 @@ add_custom_target(ParaViewDoxygenDoc
   ${CMAKE_COMMAND}
   -P ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake
   DEPENDS ${ParaView_BINARY_DIR}/Utilities/Doxygen/doc_makeall.cmake)
-
-add_dependencies(paraview_doc ParaViewDoxygenDoc)

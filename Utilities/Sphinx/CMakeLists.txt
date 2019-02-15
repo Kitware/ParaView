@@ -1,5 +1,5 @@
 # Build Sphinx documentation for Python modules.
-if (NOT PARAVIEW_ENABLE_PYTHON OR NOT BUILD_DOCUMENTATION)
+if (NOT PARAVIEW_ENABLE_PYTHON)
   return()
 endif()
 
@@ -22,7 +22,7 @@ file(COPY config
      PATTERN "*.in" EXCLUDE)
 
 set (paraview_paths
-  "['${VTK_BUILD_PYTHON_MODULES_DIR}',
+  "['${ParaView_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}',
     '${CMAKE_RUNTIME_OUTPUT_DIRECTORY}',
     '${CMAKE_LIBRARY_OUTPUT_DIRECTORY}']")
 configure_file(config/conf.py.in config/conf.py @ONLY)
@@ -35,7 +35,7 @@ add_custom_target(ParaViewPythonDoc
   COMMAND $<TARGET_FILE:pvpython>
           "${CMAKE_CURRENT_SOURCE_DIR}/sphinx_apidoc.py"
           -o "${CMAKE_CURRENT_BINARY_DIR}/config"
-          "${VTK_BUILD_PYTHON_MODULES_DIR}/paraview"
+          "${ParaView_BINARY_DIR}/${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}/paraview"
   COMMAND ${sphinx-build}
           -b html "${CMAKE_CURRENT_BINARY_DIR}/config"
           "${PARAVIEW_GENERATED_DOCUMENTATION_OUTPUT_DIRECTORY}/python"
@@ -44,5 +44,3 @@ add_custom_target(ParaViewPythonDoc
           config/quick-start.rst
           config/api-changes.rst
           config/conf.py.in)
-
-add_dependencies(paraview_doc ParaViewPythonDoc)
