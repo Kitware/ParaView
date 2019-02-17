@@ -277,6 +277,12 @@ const Json::Value& vtkSMTransferFunctionPresets::GetFirstPresetWithName(const ch
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMTransferFunctionPresets::HasPreset(const char* name)
+{
+  return !this->GetFirstPresetWithName(name).isNull();
+}
+
+//----------------------------------------------------------------------------
 vtkStdString vtkSMTransferFunctionPresets::GetPresetName(unsigned int index)
 {
   const std::vector<Json::Value>& presets = this->Internals->GetPresets();

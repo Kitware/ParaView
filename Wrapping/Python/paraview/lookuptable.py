@@ -1,5 +1,9 @@
 r"""Utility module for easy manipultions of lookup tables.
-This module is intended for use with by simple.py."""
+This module is intended for use with by simple.py.
+
+
+DEPRECATED: will be removed in future releases of ParaView.
+"""
 #==============================================================================
 #
 #  Program:   ParaView

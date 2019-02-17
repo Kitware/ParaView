@@ -1519,7 +1519,6 @@ def CreatePiecewiseFunction(**params):
     return pfunc
 
 # -----------------------------------------------------------------------------
-
 def GetLookupTableForArray(arrayname, num_components, **params):
     """Used to get an existing lookuptable for a array or to create one if none
     exists. Keyword arguments can be passed in to initialize the LUT if a new
@@ -1527,46 +1526,54 @@ def GetLookupTableForArray(arrayname, num_components, **params):
     *** DEPRECATED ***: Use GetColorTransferFunction instead"""
     return GetColorTransferFunction(arrayname, **params)
 
-# global lookup table reader instance
-# the user can use the simple api below
-# rather than creating a lut reader themself
-_lutReader = None
-def _GetLUTReaderInstance():
-    """ Internal api. Return the lookup table reader singleton. Create
-    it if needed."""
-    global _lutReader
-    if _lutReader is None:
-      import lookuptable
-      _lutReader = lookuptable.vtkPVLUTReader()
-    return _lutReader
-
 # -----------------------------------------------------------------------------
+def AssignLookupTable(arrayInfo, lutName, rangeOveride=[]):
+    """Assign a lookup table to an array by lookup table name.
 
-def AssignLookupTable(arrayObject, LUTName, rangeOveride=[]):
-    """Assign a lookup table to an array by lookup table name. The array
-    may ber obtained from a ParaView source in it's point or cell data.
-    The lookup tables available in ParaView's GUI are loaded by default.
-    To get a list of the available lookup table names see GetLookupTableNames.
-    To load a custom lookup table see LoadLookupTable."""
-    return _GetLUTReaderInstance().GetLUT(arrayObject, LUTName, rangeOveride)
+    `arrayInfo` is the information object for the array. The array name and its
+    range is determined using the info object provided.
 
-# -----------------------------------------------------------------------------
+    `lutName` is the name for the transfer function preset.
 
-def GetLookupTableNames():
-    """Return a list containing the currently available lookup table names.
-    A name maybe used to assign a lookup table to an array. See
-    AssignLookupTable.
+    `rangeOveride` is provided is the range to use instead of the range of the
+    array determined using the `arrayInfo`.
+
+    Example usage::
+
+      track = GetAnimationTrack("Center", 0, sphere) or
+      arrayInfo = source.PointData["Temperature"]
+      AssignLookupTable(arrayInfo, "Cool to Warm")
+
     """
-    return _GetLUTReaderInstance().GetLUTNames()
+    presets = servermanager.vtkSMTransferFunctionPresets()
+    if not presets.HasPreset(lutName):
+        raise RuntimeError("no preset with name `%s` present", lutName)
+
+    lut = GetColorTransferFunction(arrayInfo.Name)
+    if not lut.ApplyPreset(lutName):
+        return False
+
+    if rangeOveride:
+        lut.RescaleTransferFunction(rangeOveride)
+    return True
+
+# -----------------------------------------------------------------------------
+def GetLookupTableNames():
+    """Returns a list containing the currently available transfer function
+    presets."""
+    presets = servermanager.vtkSMTransferFunctionPresets()
+    return [presets.GetPresetName(index) for index in range(presets.GetNumberOfPresets())]
 
 # -----------------------------------------------------------------------------
 
 def LoadLookupTable(fileName):
-    """Read the lookup tables in the named file and append them to the
-    global collection of lookup tables. The newly loaded lookup tables
-    may then be used with AssignLookupTable function.
+    """Load transfer function preset from a file.
+    Both JSON (new) and XML (legacy) preset formats are supported.
+    If the filename ends with a .xml, it's assumed to be a legacy color map XML
+    and will be converted to the new format before processing.
     """
-    return _GetLUTReaderInstance().Read(fileName)
+    presets = servermanager.vtkSMTransferFunctionPresets()
+    return presets.ImportPresets(fileName)
 
 # -----------------------------------------------------------------------------
 
