@@ -1,12 +1,7 @@
-# This plugin contains a set of filters that helps analysis of flux and
-# circulation fields.  Flux fields are defined on 2D cells and describe
-# flows through the area of the cell.  Circulation fields are defined on 1D
-# cells and describes flows in the direction of the cell.
-
 vtk_module_scan(
   MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
-  REQUEST_MODULES   Moments::MomentFilters
-  PROVIDES_MODULES  moments_modules
+  REQUEST_MODULES   GeodesicMeasurement::GeodesicMeasurementFilters
+  PROVIDES_MODULES  geodesicmeasurement_modules
   REQUIRES_MODULES  required_modules
   HIDE_MODULES_FROM_CACHE ON)
 
@@ -20,14 +15,13 @@ if (required_modules)
 endif ()
 
 vtk_module_build(
-  MODULES             ${moments_modules}
-  PACKAGE             Moments
+  MODULES             ${geodesicmeasurement_modules}
+  PACKAGE             GeodesicMeasurement
   INSTALL_HEADERS     OFF
   LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
   VERSION             "${PARAVIEW_VERSION}"
   SOVERSION           "1")
 
-paraview_add_plugin(Moments
-  REQUIRED_ON_SERVER
-  VERSION "0.0"
-  MODULES Moments::MomentFilters)
+paraview_add_plugin(GeodesicMeasurement
+  VERSION "1.0"
+  MODULES GeodesicMeasurement::GeodesicMeasurementFilters)

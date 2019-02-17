@@ -1,0 +1,12 @@
+NAME
+  GenericIOReader
+DESCRIPTION
+  GenericIO Reader for HACC data
+CONDITION
+  PARAVIEW_USE_MPI
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelCore
+  VTK::ParallelMPI

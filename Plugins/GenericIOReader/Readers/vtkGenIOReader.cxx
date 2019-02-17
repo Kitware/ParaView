@@ -43,7 +43,95 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkGenIOReader.h"
+
+#include "vtkDataArray.h"
+#include "vtkDataObject.h"
+#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkTypeInt16Array.h"
+#include "vtkTypeInt32Array.h"
+#include "vtkTypeInt64Array.h"
+#include "vtkTypeInt8Array.h"
+#include "vtkTypeUInt16Array.h"
+#include "vtkTypeUInt32Array.h"
+#include "vtkTypeUInt64Array.h"
+#include "vtkTypeUInt8Array.h"
+#include "vtkUnstructuredGrid.h"
+
+#include "GIO/GenericIO.h"
+#include "utils/timer.h"
+
+#include <algorithm>
+#include <numeric>
+#include <random>
+#include <thread>
+
+/*
+#ifndef LANL_GENERICIO_NO_MPI
+#include <mpi.h>
+#endif
+
+#include <stdlib.h>
+#include <time.h>
+
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+#include <set>
+#include <sstream>
+#include <unordered_map>
+
+#include <algorithm>
+#include <cctype>
+#include <mutex>
+#include <numeric>
+#include <random>
+#include <string>
+#include <thread>
+#include <utility>
+
+#include <vtkCellArray.h>
+#include <vtkDataObject.h>
+#include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
+#include <vtkImageData.h>
+#include <vtkInformation.h>
+#include <vtkInformationVector.h>
+#include <vtkMPI.h>
+#include <vtkMPICommunicator.h>
+#include <vtkMultiProcessController.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkSmartPointer.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkType.h>
+#include <vtkTypeInt16Array.h>
+#include <vtkTypeInt32Array.h>
+#include <vtkTypeInt64Array.h>
+#include <vtkTypeInt8Array.h>
+#include <vtkTypeUInt16Array.h>
+#include <vtkTypeUInt32Array.h>
+#include <vtkTypeUInt64Array.h>
+#include <vtkTypeUInt8Array.h>
+#include <vtkUnstructuredGrid.h>
+
+#include "vtkDataArraySelection.h"
+#include "vtkMPICommunicator.h"
+#include "vtkMPIController.h"
+#include "vtkMultiProcessController.h"
+#include "vtkStringArray.h"
+#include "vtkUnstructuredGridAlgorithm.h"
+
+#include "LANL/GIO/GenericIO.h"
+
+#include "LANL/utils/timer.h"
+*/
 
 vtkStandardNewMacro(vtkGenIOReader)
 

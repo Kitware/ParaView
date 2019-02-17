@@ -1,0 +1,11 @@
+NAME
+  GeodesicMeasurement::GeodesicMeasurementFilters
+LIBRARY_NAME
+  vtkGeodesicMeasurementFilters
+DEPENDS
+  VTK::CommonExecutionModel
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::FiltersModeling

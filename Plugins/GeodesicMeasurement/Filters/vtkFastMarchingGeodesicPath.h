@@ -58,13 +58,14 @@
 #ifndef vtkFastMarchingGeodesicPath_h
 #define vtkFastMarchingGeodesicPath_h
 
+#include "vtkGeodesicMeasurementFiltersModule.h" // for export macro
 #include "vtkGeodesicPath.h"
 
 class vtkIdList;
 class vtkPoints;
 class vtkFastMarchingGeodesicDistance;
 
-class VTK_EXPORT vtkFastMarchingGeodesicPath : public vtkGeodesicPath
+class VTKGEODESICMEASUREMENTFILTERS_EXPORT vtkFastMarchingGeodesicPath : public vtkGeodesicPath
 {
 public:
   static vtkFastMarchingGeodesicPath* New();

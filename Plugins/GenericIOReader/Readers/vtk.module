@@ -1,0 +1,10 @@
+NAME
+  GenericIOReader::vtkGenericIOReader
+LIBRARY_NAME
+  vtkGenericIOReader
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelCore
+  VTK::ParallelMPI

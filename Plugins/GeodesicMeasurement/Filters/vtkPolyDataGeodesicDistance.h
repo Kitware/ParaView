@@ -28,14 +28,14 @@
 #ifndef vtkPolyDataGeodesicDistance_h
 #define vtkPolyDataGeodesicDistance_h
 
-#include "vtkFiltersModelingModule.h" // For export macro
+#include "vtkGeodesicMeasurementFiltersModule.h" // for export macro
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkPolyData;
 class vtkFloatArray;
 class vtkIdList;
 
-class VTK_EXPORT vtkPolyDataGeodesicDistance : public vtkPolyDataAlgorithm
+class VTKGEODESICMEASUREMENTFILTERS_EXPORT vtkPolyDataGeodesicDistance : public vtkPolyDataAlgorithm
 {
 public:
   // Description:

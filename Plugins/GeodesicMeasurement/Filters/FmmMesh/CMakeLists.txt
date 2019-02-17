@@ -1,11 +1,6 @@
 project( FmmMesh )
 
-set( vtkFmmMesh_THIRD_PARTY 1)
-set(vtkFmmMesh_LIBRARIES FmmMesh)
-
 set(CMAKE_CXX_STANDARD 11)
-
-set( VTKFMMMESH_BUILD_SHARED_LIBS OFF )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkFmmMeshConfig.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/vtkFmmMeshConfig.h)
 
@@ -43,17 +38,19 @@ set( ${PROJECT_NAME}_HDRS
      gw_geodesic/GW_TriangularInterpolation_Linear.h
      gw_geodesic/GW_TriangularInterpolation_Quadratic.h
      gw_geodesic/GW_TriangularInterpolation_Cubic.h
+     ${CMAKE_CURRENT_BINARY_DIR}/vtkFmmMeshConfig.h
 )
-
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/gw_core
-                     ${CMAKE_CURRENT_SOURCE_DIR}/gw_geodesic
-                     ${CMAKE_CURRENT_BINARY_DIR} )
 
 add_library( ${PROJECT_NAME} STATIC
   ${${PROJECT_NAME}_SRCS}
   ${${PROJECT_NAME}_HDRS} )
 
-if (NOT WIN32)
-  set_property(TARGET ${PROJECT_NAME} APPEND
-    PROPERTY COMPILE_FLAGS "-fPIC")
-endif()
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gw_core>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gw_geodesic>")
+set_property(TARGET "${PROJECT_NAME}"
+  PROPERTY
+    POSITION_INDEPENDENT_CODE ON)
