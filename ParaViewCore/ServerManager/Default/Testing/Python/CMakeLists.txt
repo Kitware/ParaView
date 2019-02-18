@@ -12,6 +12,7 @@ set(PY_TESTS
   CSVWriterReader.py,NO_VALID
   GhostCellsInMergeBlocks.py
   IntegrateAttributes.py,NO_VALID
+  LookupTable.py,NO_VALID
   MultiServer.py,NO_VALID
   PointGaussianProperties.py
   CompositeDataFieldArraysInformation.py,NO_VALID

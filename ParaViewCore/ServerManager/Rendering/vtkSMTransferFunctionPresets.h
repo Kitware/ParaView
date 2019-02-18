@@ -86,6 +86,11 @@ public:
   vtkStdString GetPresetName(unsigned int index);
 
   /**
+   * Returns true if a present with given name exists.
+   */
+  bool HasPreset(const char* name);
+
+  /**
    * Returns true if the preset has opacities i.e. values for a piecewise function.
    */
   bool GetPresetHasOpacities(const Json::Value& preset);
