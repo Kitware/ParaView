@@ -480,7 +480,7 @@ SET(TESTS_WITH_BASELINES
   TestOpacityRendering.xml
 )
 
-if(PARAVIEW_USE_VISITBRIDGE)
+if(PARAVIEW_ENABLE_VISITBRIDGE)
   list(APPEND TESTS_WITH_BASELINES
     VisItBridgeChombo.xml
     VisItBridgeLAMMPSDump.xml
