@@ -103,7 +103,7 @@ pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
   this->setHorizontalHeader(hheader);
 
   // setup the delegate.
-  this->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
+  this->setItemDelegate(new pqDelegate(this));
 
   QObject::connect(this->horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this,
     SLOT(onSortIndicatorChanged(int, Qt::SortOrder)));
