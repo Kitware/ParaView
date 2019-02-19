@@ -357,7 +357,6 @@ if (PARAVIEW_USE_MPI)
     VTK::IOMPIImage
     VTK::IOParallelLSDyna
     VTK::IOParallelNetCDF
-    VTK::IOVPIC
     VTK::ParallelMPI
     ParaView::icet)
 else ()
@@ -499,6 +498,7 @@ list(APPEND paraview_requested_modules
   VTK::IOTecplotTable
   VTK::IOTRUCHAS
   VTK::IOVeraOut
+  VTK::IOVPIC
   )
 
 if (paraview_requested_modules)
