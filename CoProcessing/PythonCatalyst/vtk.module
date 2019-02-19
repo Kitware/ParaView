@@ -9,9 +9,12 @@ DEPENDS
   VTK::PythonInterpreter
 PRIVATE_DEPENDS
   ParaView::PythonInitializer
+  VTK::ParallelCore
 TEST_DEPENDS
   ParaView::CatalystTestDriver
+  ParaView::Core
   VTK::IOImage
+  VTK::ParallelCore
   VTK::TestingRendering
 TEST_OPTIONAL_DEPENDS
   VTK::ParallelMPI
