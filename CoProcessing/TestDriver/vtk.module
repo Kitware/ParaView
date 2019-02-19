@@ -4,6 +4,9 @@ LIBRARY_NAME
   vtkPVCatalystTestDriver
 DEPENDS
   ParaView::Catalyst
+PRIVATE_DEPENDS
+  VTK::CommonDataModel
+  VTK::ParallelCore
 TEST_LABELS
   Catalyst
   ParaView

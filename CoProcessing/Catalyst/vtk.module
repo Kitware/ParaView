@@ -3,14 +3,16 @@ NAME
 LIBRARY_NAME
   vtkPVCatalyst
 DEPENDS
-  ParaView::ServerManagerApplication
+  VTK::CommonCore
 PRIVATE_DEPENDS
+  ParaView::ServerManagerApplication
   VTK::FiltersGeneral
   VTK::vtksys
 OPTIONAL_DEPENDS
   VTK::ParallelMPI
 TEST_DEPENDS
   ParaView::CatalystTestDriver
+  VTK::FiltersSources
   VTK::IOXML
   VTK::TestingCore
 TEST_OPTIONAL_DEPENDS
