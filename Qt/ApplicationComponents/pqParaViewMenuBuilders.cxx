@@ -569,9 +569,9 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   new pqDesktopServicesReaction(QUrl("http://www.paraview.org/Wiki/ParaView"),
     (menu.addAction("ParaView Wiki") << pqSetName("actionWiki")));
 
-  // ParaView Mailing Lists
-  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/mailing-lists/"),
-    (menu.addAction("ParaView Mailing Lists") << pqSetName("actionMailingLists")));
+  // ParaView Community Support
+  new pqDesktopServicesReaction(QUrl("http://www.paraview.org/community-support/"),
+    (menu.addAction("ParaView Community Support") << pqSetName("actionCommunitySupport")));
 
   // ParaView Release Notes
   QString versionString(PARAVIEW_VERSION_FULL);
