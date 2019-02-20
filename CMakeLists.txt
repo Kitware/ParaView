@@ -311,6 +311,14 @@ else ()
     VTK::RenderingMatplotlib)
 endif ()
 
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_BUILD_TESTING)
+  # testing needs Python interpreter i.e. `PYTHON_EXECUTABLE` without which
+  # our `find_python_module` checks to determine which tests to add or exclude
+  # will fail. We find it here.
+  find_package(PythonInterp "${PARAVIEW_PYTHON_VERSION}" QUIET)
+  mark_as_advanced(PYTHON_EXECUTABLE)
+endif()
+
 if (PARAVIEW_BUILD_QT_GUI)
   list(APPEND paraview_requested_modules
     ParaView::Core
