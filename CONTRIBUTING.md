@@ -155,8 +155,8 @@ Typically, one addresses issues by writing code. To start contributing to ParaVi
     the customer with any details necessary to test the fix.
 
 Our [Wiki][] is used to document features, flesh out designs and host other
-documentation. We have several [Mailing Lists][] to coordinate development and
-to provide support.
+documentation. We have a [ParaView Discourse][] forum to coordinate development
+and to provide support.
 
 [ParaView Git README]: Documentation/dev/git/README.md
 [developer instructions]: Documentation/dev/git/develop.md
@@ -176,7 +176,7 @@ to provide support.
 [Labels]: https://gitlab.kitware.com/paraview/paraview/labels
 [Milestones]: https://gitlab.kitware.com/paraview/paraview/milestones
 [Wiki]: http://www.paraview.org/Wiki/ParaView
-[Mailing Lists]: http://www.paraview.org/mailing-lists/
+[ParaView Discourse]: https://discourse.paraview.org/
 [Gitlab Markdown]: https://gitlab.kitware.com/help/markdown/markdown
 [new issue]: https://gitlab.kitware.com/paraview/paraview/issues/new
 [Labels Glossary]: Documentation/dev/git/labels.md
