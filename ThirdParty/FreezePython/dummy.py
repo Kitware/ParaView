@@ -5,15 +5,15 @@ except:
     pass
 
 import paraview
-import paraview.annotation
+import paraview.detail.annotation
 import paraview.benchmark
-import paraview.calculator
+import paraview.detail.calculator
 import paraview.collaboration
 import paraview.compile_all_pv
 import paraview.coprocessing
 import paraview.cpexport
 import paraview.cpstate
-import paraview.extract_selection
+import paraview.detail.extract_selection
 import paraview.lookuptable
 import paraview.numeric
 import paraview.python_view

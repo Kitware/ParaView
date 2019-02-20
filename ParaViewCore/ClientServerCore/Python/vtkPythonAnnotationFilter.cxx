@@ -12,6 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // has to be first!
+
 #include "vtkPythonAnnotationFilter.h"
 
 #include "vtkDataObjectTypes.h"
@@ -21,6 +23,8 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
 #include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
@@ -31,6 +35,20 @@
 #include <sstream>
 #include <vector>
 #include <vtksys/SystemTools.hxx>
+
+namespace
+{
+bool CheckAndFlushPythonErrors()
+{
+  if (PyErr_Occurred())
+  {
+    PyErr_Print();
+    PyErr_Clear();
+    return true;
+  }
+  return false;
+}
+}
 
 vtkStandardNewMacro(vtkPythonAnnotationFilter);
 //----------------------------------------------------------------------------
@@ -142,36 +160,30 @@ int vtkPythonAnnotationFilter::FillInputPortInformation(int vtkNotUsed(port), vt
 }
 
 //----------------------------------------------------------------------------
-static std::string vtkGetReferenceAsString(void* ref)
-{
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", ref);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-  {
-    aplus += 2; // skip over "0x"
-  }
-  return std::string(aplus);
-}
-
-//----------------------------------------------------------------------------
 void vtkPythonAnnotationFilter::EvaluateExpression()
 {
-  std::ostringstream stream;
-  stream << "def vtkPythonAnnotationFilter_EvaluateExpression():" << endl
-         << "    from paraview import annotation as pv_ann" << endl
-         << "    from paraview.modules.vtkPVClientServerCoreCore import vtkPythonAnnotationFilter"
-         << endl
-         << "    me = vtkPythonAnnotationFilter('" << vtkGetReferenceAsString(this) << " ')" << endl
-         << "    pv_ann.execute(me)" << endl
-         << "    del me" << endl
-         << "vtkPythonAnnotationFilter_EvaluateExpression()" << endl
-         << "del vtkPythonAnnotationFilter_EvaluateExpression" << endl;
-
-  // ensure Python is initialized.
+  // ensure Python is initialized (safe to call many times)
   vtkPythonInterpreter::Initialize();
-  vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject modAnnotation(PyImport_ImportModule("paraview.detail.annotation"));
+  CheckAndFlushPythonErrors();
+  if (!modAnnotation)
+  {
+    vtkErrorMacro("Failed to import `paraview.detail.annotation` module.");
+    return;
+  }
+
+  vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
+  vtkSmartPyObject fname(PyString_FromString("execute"));
+
+  // call `paraview.detail.annotation.execute(self)`
+  vtkSmartPyObject retVal(
+    PyObject_CallMethodObjArgs(modAnnotation, fname.GetPointer(), self.GetPointer(), nullptr));
+
+  CheckAndFlushPythonErrors();
+  // at some point we may want to check retval
+  (void)retVal;
 }
 
 //----------------------------------------------------------------------------

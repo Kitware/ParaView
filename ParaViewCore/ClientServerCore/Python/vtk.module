@@ -15,6 +15,7 @@ DEPENDS
 PRIVATE_DEPENDS
   ParaView::ClientServerCoreCore
   VTK::ParallelCore
+  VTK::WrappingPythonCore
 TEST_DEPENDS
   ParaView::Core
   VTK::TestingCore

@@ -2,7 +2,6 @@ set(python_files
   paraview/__init__.py
   paraview/_backwardscompatibilityhelper.py
   paraview/_colorMaps.py
-  paraview/annotation.py
   paraview/benchmark/__init__.py
   paraview/benchmark/basic.py
   paraview/benchmark/logbase.py
@@ -10,7 +9,6 @@ set(python_files
   paraview/benchmark/manyspheres.py
   paraview/benchmark/waveletcontour.py
   paraview/benchmark/waveletvolume.py
-  paraview/calculator.py
   paraview/collaboration.py
   paraview/coprocessing.py
   paraview/cpexport.py
@@ -18,14 +16,16 @@ set(python_files
   paraview/demos/demo1.py
   paraview/demos/show_grid_as_background.py
   paraview/detail/__init__.py
+  paraview/detail/annotation.py
+  paraview/detail/calculator.py
+  paraview/detail/extract_selection.py
   paraview/detail/pythonalgorithm.py
-  paraview/extract_selection.py
+  paraview/detail/python_selector.py
   paraview/lookuptable.py
   paraview/modules/__init__.py
   paraview/numeric.py
   paraview/numpy_support.py
   paraview/pv-vtk-all.py
-  paraview/python_selector.py
   paraview/python_view.py
   paraview/servermanager.py
   paraview/simple.py

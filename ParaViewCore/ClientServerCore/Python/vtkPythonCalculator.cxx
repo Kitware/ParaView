@@ -12,6 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // has to be first!
+
 #include "vtkPythonCalculator.h"
 
 #include "vtkCellData.h"
@@ -26,12 +28,28 @@
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
 
 #include <algorithm>
 #include <map>
 #include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
+
+namespace
+{
+bool CheckAndFlushPythonErrors()
+{
+  if (PyErr_Occurred())
+  {
+    PyErr_Print();
+    PyErr_Clear();
+    return true;
+  }
+  return false;
+}
+}
 
 vtkStandardNewMacro(vtkPythonCalculator);
 
@@ -118,26 +136,31 @@ void vtkPythonCalculator::Exec(const char* expression)
       orgscript.push_back(expression[i]);
     }
   }
-  std::replace(orgscript.begin(), orgscript.end(), '\'', '"');
 
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+  // ensure Python is initialized (safe to call many times)
+  vtkPythonInterpreter::Initialize();
+
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject modCalculator(PyImport_ImportModule("paraview.detail.calculator"));
+  CheckAndFlushPythonErrors();
+  if (!modCalculator)
   {
-    aplus += 2; // skip over "0x"
+    vtkErrorMacro("Failed to import `paraview.detail.calculator` module.");
+    return;
   }
 
-  std::ostringstream python_stream;
-  python_stream << "import paraview\n"
-                << "from paraview import calculator\n"
-                << "from paraview.vtk.vtkPVClientServerCoreDefault import vtkPythonCalculator\n"
-                << "calculator.execute(vtkPythonCalculator('" << aplus << "'), '"
-                << orgscript.c_str() << "')\n";
+  vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
+  vtkSmartPyObject fname(PyString_FromString("execute"));
+  vtkSmartPyObject pyexpression(PyString_FromString(orgscript.c_str()));
 
-  vtkPythonInterpreter::Initialize();
-  vtkPythonInterpreter::RunSimpleString(python_stream.str().c_str());
+  // call `paraview.detail.calculator.execute(self)`
+  vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(
+    modCalculator, fname.GetPointer(), self.GetPointer(), pyexpression.GetPointer(), nullptr));
+
+  CheckAndFlushPythonErrors();
+
+  // at some point we may want to check retval
+  (void)retVal;
 }
 
 //----------------------------------------------------------------------------
