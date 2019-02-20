@@ -751,6 +751,14 @@ vtk_module_build(
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
 
+include(vtkModuleJson)
+vtk_module_json(
+  MODULES "${vtk_modules}"
+  OUTPUT "vtk-modules.json")
+vtk_module_json(
+  MODULES "${paraview_modules}"
+  OUTPUT "paraview-modules.json")
+
 paraview_plugin_build(
   RUNTIME_DESTINATION   "${CMAKE_INSTALL_BINDIR}"
   LIBRARY_DESTINATION   "${CMAKE_INSTALL_LIBDIR}"
