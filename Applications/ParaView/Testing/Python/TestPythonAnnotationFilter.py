@@ -29,9 +29,10 @@ def equal(a, b):
 
 print ("Start PythonAnnotationFilter testing")
 
-options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
-dataToLoad = options.GetParaViewDataName()
-
+# now try with the can.ex2 exodus file for multiblock testing
+from paraview.vtk.util.misc import vtkGetDataRoot
+import os.path
+dataToLoad = os.path.join(vtkGetDataRoot(), 'Testing/Data/can.ex2')
 
 # Load data file
 reader = OpenDataFile(dataToLoad)

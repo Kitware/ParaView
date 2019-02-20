@@ -35,6 +35,7 @@ except:
 
 import os
 baseline_file = os.path.join(baselinePath, "TestPythonViewNumpyScript.png")
+print("baseline_file == ", baseline_file)
 
 from paraview.vtk.test import Testing
 from paraview.vtk.util.misc import vtkGetTempDir

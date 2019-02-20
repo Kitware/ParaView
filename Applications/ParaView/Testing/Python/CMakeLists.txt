@@ -7,32 +7,37 @@ set(_vtk_build_test "paraview")
 set(${_vtk_build_test}_TEST_LABELS paraview)
 
 ExternalData_Expand_Arguments(ParaViewData _
+  # data files
   "DATA{${paraview_test_data_directory_input}/Data/can.ex2}"
-  "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}")
+  "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}"
+
+  # baselines
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewMatplotlibScript.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewNumpyScript.png}"
+  )
 
 # only enable TestPythonAnnotationFilter test if numpy is available
 find_python_module(numpy numpy_found)
 if (numpy_found)
-  set(paraview_python_args
-    --data=${paraview_test_data_directory_output}/can.ex2)
-  # Add pvpython tests
   paraview_add_test_python(
-    NO_DATA NO_VALID NO_OUTPUT NO_RT
-    TestPythonAnnotationFilter.py
-    TestPythonAnnotationFilterNoMerge.py
+    NO_DATA NO_VALID NO_RT
     TestAnnotateAttributeData.py
     CinemaAERTest.py
     )
+
   paraview_add_test_python(
-    NO_VALID NO_OUTPUT NO_RT
-    AppendAttributes.py
-    UnstructuredCellTypePythonCalculator.py
+    NO_DATA NO_RT
+    TestPythonViewNumpyScript.py
     )
+
   paraview_add_test_python(
     NO_VALID NO_RT
+    AppendAttributes.py
     FileSeriesWriterSubTimeSteps.py
+    TestPythonAnnotationFilterNoMerge.py
+    TestPythonAnnotationFilter.py
+    UnstructuredCellTypePythonCalculator.py
     )
-  unset(paraview_python_args)
 
   if (matplotlib_found)
     # add Matplotlib tests only if matplotlib was found at configure time.
@@ -41,11 +46,6 @@ if (numpy_found)
       TestPythonViewMatplotlibScript.py
       )
   endif()
-
-  paraview_add_test_python(
-    NO_DATA NO_RT
-    TestPythonViewNumpyScript.py
-    )
 endif()
 
 paraview_add_test_python(
