@@ -92,9 +92,9 @@ foreach (tfile IN LISTS PVBATCH_TESTS)
   set(${test}_ARGS
     --state ${CMAKE_CURRENT_SOURCE_DIR}/${test}.pvsm)
 endforeach ()
-if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE)
+if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE)
   # run the tests in parallel
-  set(${}_NUMPROCS 3)
+  set(${_vtk_build_test}_NUMPROCS 3)
   paraview_add_test_pvbatch_mpi(
     JUST_VALID
     ${PVBATCH_TESTS}
