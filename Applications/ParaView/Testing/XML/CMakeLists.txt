@@ -960,7 +960,7 @@ if(PARAVIEW_ENABLE_PYTHON)
   # Check that matplotlib is available
   include(FindPythonModules)
   find_python_module(matplotlib matplotlib_found)
-  if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
+  if (matplotlib_found)
     list(APPEND TESTS_WITH_BASELINES TestPythonView.xml)
   endif()
 

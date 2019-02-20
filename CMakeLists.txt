@@ -242,10 +242,6 @@ cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
-cmake_dependent_option(PARAVIEW_ENABLE_MATPLOTLIB
-  "Enable/Disable Python scripting support" ON
-  "PARAVIEW_ENABLE_PYTHON" OFF)
-mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
 
 # If building on Unix with MPI enabled, we will present another option to
 # enable building of CosmoTools VTK extensions. This option is by default
@@ -306,11 +302,13 @@ if (PARAVIEW_ENABLE_PYTHON)
 
   list(APPEND paraview_requested_modules
     ParaView::PythonAlgorithm
-    ParaView::PythonInitializer)
+    ParaView::PythonInitializer
+    VTK::RenderingMatplotlib)
 else ()
   list(APPEND paraview_rejected_modules
     ParaView::PythonAlgorithm
-    ParaView::PythonInitializer)
+    ParaView::PythonInitializer
+    VTK::RenderingMatplotlib)
 endif ()
 
 if (PARAVIEW_BUILD_QT_GUI)
@@ -437,11 +435,6 @@ endif ()
 if (PARAVIEW_USE_ICE_T)
   list(APPEND paraview_requested_modules
     ParaView::icet)
-endif ()
-
-if (PARAVIEW_ENABLE_MATPLOTLIB)
-  list(APPEND paraview_requested_modules
-    VTK::RenderingMatplotlib)
 endif ()
 
 if (PARAVIEW_ENABLE_COSMOTOOLS)

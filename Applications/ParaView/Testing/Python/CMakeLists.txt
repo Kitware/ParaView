@@ -34,7 +34,7 @@ if (numpy_found)
     )
   unset(paraview_python_args)
 
-  if (PARAVIEW_ENABLE_MATPLOTLIB AND matplotlib_found)
+  if (matplotlib_found)
     # add Matplotlib tests only if matplotlib was found at configure time.
     paraview_add_test_python(
       NO_DATA NO_RT
