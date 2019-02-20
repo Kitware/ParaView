@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSpreadSheetViewProxy.h"
 
-#if VTK_MODULE_ENABLE_ParaView_pqCorePython
+#if PARAVIEW_PQCORE_ENABLE_PYTHON
 #include "pqPythonView.h"
 #endif
 
@@ -83,7 +83,7 @@ inline pqProxy* CreatePQView(
   {
     return new pqMultiSliceView(xmlname, group, name, proxy, server, parent);
   }
-#if VTK_MODULE_ENABLE_ParaView_pqCorePython
+#if PARAVIEW_PQCORE_ENABLE_PYTHON
   if (xmlname == pqPythonView::pythonViewType())
   {
     return new pqPythonView(xmlname, group, name, proxy, server, parent);
