@@ -372,6 +372,14 @@ else ()
     VTK::mpi)
 endif ()
 
+if (PARAVIEW_USE_MPI AND PARAVIEW_ENABLE_PYTHON)
+  list(APPEND paraview_requested_modules
+    VTK::ParallelMPI4Py)
+else ()
+  list(APPEND paraview_rejected_modules
+    VTK::ParallelMPI4Py)
+endif()
+
 if (PARAVIEW_USE_VTKM)
   list(APPEND paraview_requested_modules
     VTK::AcceleratorsVTKm)
