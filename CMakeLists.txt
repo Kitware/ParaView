@@ -305,9 +305,11 @@ if (PARAVIEW_ENABLE_PYTHON)
   set(VTK_PYTHON_VERSION "${PARAVIEW_PYTHON_VERSION}")
 
   list(APPEND paraview_requested_modules
+    ParaView::PythonAlgorithm
     ParaView::PythonInitializer)
 else ()
   list(APPEND paraview_rejected_modules
+    ParaView::PythonAlgorithm
     ParaView::PythonInitializer)
 endif ()
 
