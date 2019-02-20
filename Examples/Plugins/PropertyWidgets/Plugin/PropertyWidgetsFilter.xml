@@ -34,6 +34,16 @@
           <PropertyWidgetDecorator type="my_decorator" />
       </Hints>
     </DoubleVectorProperty>
+    <DoubleVectorProperty command="GetShrinkFactor"
+                       information_only="1"
+                       panel_visibility="default"
+                       name="ShrinkFactorInformation">
+      <Documentation>
+        This property's widget is standard, but it is a information_only property.
+        The resulting widget will be disabled and show the value of GetShrinkFactor,
+        once the changes have been applied.
+      </Documentation>
+    </DoubleVectorProperty>
    </SourceProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>
