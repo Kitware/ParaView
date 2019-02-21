@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QToolBar>
 
+#include <cassert>
 #include <iostream>
 
 //-----------------------------------------------------------------------------
@@ -47,8 +48,8 @@ pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
   pqProxyGroupMenuManager* menuManager, QMainWindow* mainWindow)
   : Superclass(menuManager)
 {
-  Q_ASSERT(menuManager != 0);
-  Q_ASSERT(mainWindow != 0);
+  assert(menuManager != 0);
+  assert(mainWindow != 0);
 
   this->MainWindow = mainWindow;
   this->MenuManager = menuManager;

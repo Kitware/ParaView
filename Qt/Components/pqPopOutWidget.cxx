@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QWidget>
 
+#include <cassert>
+
 class pqPopOutWidget::pqInternal
 {
 public:
@@ -96,7 +98,7 @@ pqPopOutWidget::~pqPopOutWidget()
 void pqPopOutWidget::setPopOutButton(QPushButton* button)
 {
   // It could handle multiple buttons, but doesn't right now
-  Q_ASSERT(this->Internals->Button.isNull());
+  assert(this->Internals->Button.isNull());
   this->Internals->Button = button;
   if (this->Internals->WidgetIsInDialog)
   {
