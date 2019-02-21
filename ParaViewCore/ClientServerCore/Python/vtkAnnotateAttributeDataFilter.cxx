@@ -12,6 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // has to be first!
+
 #include "vtkAnnotateAttributeDataFilter.h"
 
 #include "vtkDataObject.h"
@@ -19,31 +21,32 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
 
-#include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
 
-//----------------------------------------------------------------------------
-static std::string vtkGetReferenceAsString(void* ref)
+namespace
 {
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", ref);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+bool CheckAndFlushPythonErrors()
+{
+  if (PyErr_Occurred())
   {
-    aplus += 2; // skip over "0x"
+    PyErr_Print();
+    PyErr_Clear();
+    return true;
   }
-  return std::string(aplus);
+  return false;
+}
 }
 
 vtkStandardNewMacro(vtkAnnotateAttributeDataFilter);
 //----------------------------------------------------------------------------
 vtkAnnotateAttributeDataFilter::vtkAnnotateAttributeDataFilter()
 {
-  this->ArrayName = NULL;
-  this->Prefix = NULL;
+  this->ArrayName = nullptr;
+  this->Prefix = nullptr;
   this->ElementId = 0;
   this->ProcessId = 0;
   this->SetArrayAssociation(vtkDataObject::ROW);
@@ -52,33 +55,43 @@ vtkAnnotateAttributeDataFilter::vtkAnnotateAttributeDataFilter()
 //----------------------------------------------------------------------------
 vtkAnnotateAttributeDataFilter::~vtkAnnotateAttributeDataFilter()
 {
-  this->SetArrayName(NULL);
-  this->SetPrefix(NULL);
+  this->SetArrayName(nullptr);
+  this->SetPrefix(nullptr);
 }
 
 //----------------------------------------------------------------------------
 void vtkAnnotateAttributeDataFilter::EvaluateExpression()
 {
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  bool evaluate_locally = (controller == NULL) ||
+  bool evaluate_locally = (controller == nullptr) ||
     (controller->GetLocalProcessId() == this->ProcessId) || (this->ProcessId == -1);
 
-  std::ostringstream stream;
-  stream
-    << "def vtkAnnotateAttributeDataFilter_EvaluateExpression():" << endl
-    << "    from paraview import annotation as pv_ann" << endl
-    << "    from paraview.vtk.vtkPVClientServerCoreDefault import vtkAnnotateAttributeDataFilter"
-    << endl
-    << "    me = vtkAnnotateAttributeDataFilter('" << vtkGetReferenceAsString(this) << " ')" << endl
-    << "    pv_ann.execute_on_attribute_data(me," << (evaluate_locally ? "True" : "False") << ")"
-    << endl
-    << "    del me" << endl
-    << "vtkAnnotateAttributeDataFilter_EvaluateExpression()" << endl
-    << "del vtkAnnotateAttributeDataFilter_EvaluateExpression" << endl;
-
-  // ensure Python is initialized.
+  // ensure Python is initialized (safe to call many times)
   vtkPythonInterpreter::Initialize();
-  vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject modAnnotation(PyImport_ImportModule("paraview.detail.annotation"));
+
+  CheckAndFlushPythonErrors();
+
+  if (!modAnnotation)
+  {
+    vtkErrorMacro("Failed to import `paraview.detail.annotation` module.");
+    return;
+  }
+
+  vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
+  vtkSmartPyObject fname(PyString_FromString("execute_on_attribute_data"));
+
+  // call `paraview.detail.annotation.execute_on_attribute_data(self)`
+  vtkSmartPyObject retVal(PyObject_CallMethodObjArgs(modAnnotation, fname.GetPointer(),
+    self.GetPointer(), (evaluate_locally ? Py_True : Py_False), nullptr));
+
+  CheckAndFlushPythonErrors();
+
+  // we don't check the return val since if the call fails on one rank, we may
+  // end up with deadlocks so we do the reduction no matter what.
+  (void)retVal;
 
   if (controller && controller->GetNumberOfProcesses() > 1 && this->ProcessId != -1)
   {

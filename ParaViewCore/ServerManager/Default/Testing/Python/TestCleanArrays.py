@@ -1,8 +1,12 @@
 from __future__ import print_function
 
-import vtk
-from vtk.vtkPVVTKExtensionsRendering import vtkCleanArrays
-cntrl = vtk.vtkMultiProcessController.GetGlobalController()
+from paraview.modules.vtkPVVTKExtensionsRendering import vtkCleanArrays
+from vtkmodules.vtkParallelCore import vtkMultiProcessController
+from vtkmodules.vtkFiltersSources import vtkSphereSource
+from vtkmodules.vtkCommonDataModel import *
+from vtkmodules.vtkCommonCore import *
+
+cntrl = vtkMultiProcessController.GetGlobalController()
 rank = cntrl.GetLocalProcessId()
 numprocs = cntrl.GetNumberOfProcesses()
 
@@ -11,7 +15,7 @@ if rank == 0:
     print("Testing on non-composite dataset")
 
 def get_dataset(pa=None,ca=None):
-    sphere = vtk.vtkSphereSource()
+    sphere = vtkSphereSource()
     sphere.Update()
 
     data = sphere.GetOutputDataObject(0)
@@ -19,13 +23,13 @@ def get_dataset(pa=None,ca=None):
     data.GetCellData().Initialize()
 
     if pa:
-        array = vtk.vtkIntArray()
+        array = vtkIntArray()
         array.SetName(pa)
         array.SetNumberOfTuples(data.GetNumberOfPoints())
         data.GetPointData().AddArray(array)
 
     if ca:
-        array = vtk.vtkIntArray()
+        array = vtkIntArray()
         array.SetName(ca)
         array.SetNumberOfTuples(data.GetNumberOfCells())
         data.GetCellData().AddArray(array)
@@ -67,7 +71,7 @@ if rank == 0:
 
 #-----------------------------------------------------------------------------
 # Dataset with identical arrays for non-empty datasets on all ranks.
-mb = vtk.vtkMultiBlockDataSet()
+mb = vtkMultiBlockDataSet()
 mb.SetNumberOfBlocks(numprocs)
 mb.SetBlock(rank, get_dataset(pa="pa", ca="ca"))
 
@@ -86,7 +90,7 @@ assert result.GetBlock(rank).GetPointData().GetNumberOfArrays() == 1 and \
 
 #-----------------------------------------------------------------------------
 # Dataset with partial arrays for non-empty datasets on all ranks.
-mb = vtk.vtkMultiBlockDataSet()
+mb = vtkMultiBlockDataSet()
 mb.SetNumberOfBlocks(2*numprocs)
 mb.SetBlock(rank, get_dataset(pa="pa-%d" % rank, ca="ca-%d" % rank))
 # Let's add an extra block with new arrays so the test can work even when

@@ -15,16 +15,21 @@
 r"""
 This module is used by vtkPythonAnnotationFilter.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 try:
     import numpy as np
 except ImportError:
     raise RuntimeError("'numpy' module is not found. numpy is needed for "\
             "this functionality to work. Please install numpy and try again.")
 
-from paraview import calculator
+from . import calculator
 from vtkmodules.vtkCommonDataModel import vtkDataObject
 from vtkmodules.numpy_interface import dataset_adapter as dsa
+
+# import vtkPVClientServerCorePython so vtkAnnotateAttributeDataFilter wrapping
+# is registered.
+import paraview.modules.vtkPVClientServerCorePython
+
 import sys # also for sys.stderr
 if sys.version_info >= (3,):
     xrange = range
@@ -162,12 +167,14 @@ def execute_on_attribute_data(self, evaluate_locally):
     association = info.Get(vtkDataObject.FIELD_ASSOCIATION())
     array_name = info.Get(vtkDataObject.FIELD_NAME())
 
+    # note: _get_ns() needs to be called on all ranks to avoid deadlocks.
     ns = _get_ns(self, inputs[0], association)
     if array_name not in ns:
         print("Failed to locate array '%s'." % array_name, file=sys.stderr)
         raise RuntimeError("Failed to locate array")
 
     if not evaluate_locally:
+        # don't evaluate the expression locally.
         return True
 
     array = ns[array_name]

@@ -12,6 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // has to be first!
+
 #include "vtkPythonExtractSelection.h"
 
 #include "vtkAbstractArray.h"
@@ -26,14 +28,30 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
+#include "vtkSmartPyObject.h"
 #include "vtkTable.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <cassert>
 #include <sstream>
+
+namespace
+{
+bool CheckAndFlushPythonErrors()
+{
+  if (PyErr_Occurred())
+  {
+    PyErr_Print();
+    PyErr_Clear();
+    return true;
+  }
+  return false;
+}
+}
 
 vtkStandardNewMacro(vtkPythonExtractSelection);
 //----------------------------------------------------------------------------
@@ -134,30 +152,35 @@ int vtkPythonExtractSelection::RequestData(vtkInformation* vtkNotUsed(request),
   vtkDataObject* output = vtkDataObject::GetData(outputVector, 0);
   this->InitializeOutput(output, input);
 
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-  {
-    aplus += 2; // skip over "0x"
-  }
-
-  // ensure Python is initialized.
+  // ensure Python is initialized (safe to call many times)
   vtkPythonInterpreter::Initialize();
 
-  std::ostringstream stream;
-  stream << "def vtkPythonExtractSelection_RequestData():" << endl
-         << "    from paraview import extract_selection as pv_es" << endl
-         << "    from paraview.modules.vtkPVClientServerCoreCore import vtkPythonExtractSelection"
-         << endl
-         << "    me = vtkPythonExtractSelection('" << aplus << " ')" << endl
-         << "    pv_es.execute(me)" << endl
-         << "    del me" << endl
-         << "    del pv_es" << endl
-         << "vtkPythonExtractSelection_RequestData()" << endl
-         << "del vtkPythonExtractSelection_RequestData" << endl;
-  vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject module(PyImport_ImportModule("paraview.detail.extract_selection"));
+  CheckAndFlushPythonErrors();
+  if (!module)
+  {
+    vtkErrorMacro("Failed to import `paraview.detail.extract_selection` module.");
+    return 0;
+  }
+
+  vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
+  vtkSmartPyObject fname(PyString_FromString("execute"));
+
+  // call `paraview.detail.annotation.execute_on_attribute_data(self)`
+  vtkSmartPyObject retVal(
+    PyObject_CallMethodObjArgs(module, fname.GetPointer(), self.GetPointer(), nullptr));
+
+  if (CheckAndFlushPythonErrors())
+  {
+    // some Python errors reported.
+    return 0;
+  }
+
+  // we don't check the return val since if the call fails on one rank, we may
+  // end up with deadlocks so we do the reduction no matter what.
+  (void)retVal;
+
   return 1;
 }
 

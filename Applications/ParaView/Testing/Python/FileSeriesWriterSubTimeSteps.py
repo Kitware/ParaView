@@ -5,7 +5,7 @@ dataFile = None
 tempDir = None
 for i, arg in enumerate(sys.argv):
     if arg == "-D" and i+1 < len(sys.argv):
-        dataFile = sys.argv[i+1] + '/can.ex2'
+        dataFile = sys.argv[i+1] + '/Testing/Data/can.ex2'
     elif arg == "-T" and i+1 < len(sys.argv):
         tempDir = sys.argv[i+1]
 

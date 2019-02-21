@@ -4,7 +4,7 @@ specifically, the Python code used by that class, to compute a mask array from
 the query expression. Once the mask array is obtained, this module will
 mark those elements as requested.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 try:
   import numpy as np
 except ImportError:
@@ -16,7 +16,10 @@ import vtkmodules.numpy_interface.dataset_adapter as dsa
 import vtkmodules.numpy_interface.algorithms as algos
 from vtkmodules.vtkCommonDataModel import vtkDataObject
 from vtkmodules.util import vtkConstants
-from paraview import calculator
+from . import calculator
+
+# import wrapping module for `vtkPythonSelector`
+from paraview.modules import vtkPVClientServerCoreCore
 
 import sys
 if sys.hexversion < 0x03000000:

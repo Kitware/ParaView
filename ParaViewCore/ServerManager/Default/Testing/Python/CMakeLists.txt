@@ -91,7 +91,7 @@ endif()
 set(PVBATCH_NO_SYMMETRIC_TESTS
   SaveAnimation.py
   )
-IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
+IF (MPIEXEC_EXECUTABLE)
   set(vtkPVServerManagerDefault_NUMPROCS 2)
   paraview_add_test_pvbatch_mpi(
     JUST_VALID
@@ -142,8 +142,8 @@ if (numpy_found)
   # set_tests_properties(vtkPVServerManagerDefaultPython-SymmetricPythonFilters PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
 endif()
 
-if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE AND NOT WIN32)
-  set(ParaView::ServerManagerDefault_ARGS
+if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE AND NOT WIN32)
+  set(paraview_pvbatch_args
     --symmetric)
   paraview_add_test_pvbatch_mpi(
     NO_DATA NO_OUTPUT NO_VALID
@@ -151,7 +151,7 @@ if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE AND NOT WIN32)
     TestMPI4PY.py
     ParallelPythonImport.py
     )
-  set(ParaView::ServerManagerDefault_ARGS)
+  unset(paraview_pvbatch_args)
 endif()
 
 # Python state tests. Each test executes an XML test in the ParaView UI, saves

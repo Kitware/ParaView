@@ -38,11 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include <QTimer>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqPersistentMainWindowStateBehavior::pqPersistentMainWindowStateBehavior(QMainWindow* parentWindow)
   : Superclass(parentWindow)
 {
-  Q_ASSERT(parentWindow != NULL);
+  assert(parentWindow != NULL);
   QObject::connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(saveState()));
 
   // This is done after a slight delay so that any GUI elements that get created

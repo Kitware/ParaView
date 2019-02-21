@@ -12,28 +12,31 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // has to be first!
+
 #include "vtkAnnotateGlobalDataFilter.h"
 
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPythonInterpreter.h"
+#include "vtkPythonUtil.h"
+#include "vtkSmartPyObject.h"
 
-#include <sstream>
 #include <string>
 #include <vtksys/SystemTools.hxx>
 
-//----------------------------------------------------------------------------
-static std::string vtkGetReferenceAsString(void* ref)
+namespace
 {
-  // Set self to point to this
-  char addrofthis[1024];
-  sprintf(addrofthis, "%p", ref);
-  char* aplus = addrofthis;
-  if ((addrofthis[0] == '0') && ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+bool CheckAndFlushPythonErrors()
+{
+  if (PyErr_Occurred())
   {
-    aplus += 2; // skip over "0x"
+    PyErr_Print();
+    PyErr_Clear();
+    return true;
   }
-  return std::string(aplus);
+  return false;
+}
 }
 
 vtkStandardNewMacro(vtkAnnotateGlobalDataFilter);
@@ -59,21 +62,31 @@ vtkAnnotateGlobalDataFilter::~vtkAnnotateGlobalDataFilter()
 //----------------------------------------------------------------------------
 void vtkAnnotateGlobalDataFilter::EvaluateExpression()
 {
-  std::ostringstream stream;
-  stream << "def vtkAnnotateGlobalDataFilter_EvaluateExpression():" << endl
-         << "    from paraview import annotation as pv_ann" << endl
-         << "    from paraview.vtk.vtkPVClientServerCoreDefault import vtkAnnotateGlobalDataFilter"
-         << endl
-         << "    me = vtkAnnotateGlobalDataFilter('" << vtkGetReferenceAsString(this) << " ')"
-         << endl
-         << "    pv_ann.execute_on_global_data(me)" << endl
-         << "    del me" << endl
-         << "vtkAnnotateGlobalDataFilter_EvaluateExpression()" << endl
-         << "del vtkAnnotateGlobalDataFilter_EvaluateExpression" << endl;
-
-  // ensure Python is initialized.
+  // ensure Python is initialized (safe to call many times)
   vtkPythonInterpreter::Initialize();
-  vtkPythonInterpreter::RunSimpleString(stream.str().c_str());
+
+  vtkPythonScopeGilEnsurer gilEnsurer;
+  vtkSmartPyObject modAnnotation(PyImport_ImportModule("paraview.detail.annotation"));
+
+  CheckAndFlushPythonErrors();
+
+  if (!modAnnotation)
+  {
+    vtkErrorMacro("Failed to import `paraview.detail.annotation` module.");
+    return;
+  }
+
+  vtkSmartPyObject self(vtkPythonUtil::GetObjectFromPointer(this));
+  vtkSmartPyObject fname(PyString_FromString("execute_on_global_data"));
+
+  // call `paraview.detail.annotation.execute_on_global_data(self)`
+  vtkSmartPyObject retVal(
+    PyObject_CallMethodObjArgs(modAnnotation, fname.GetPointer(), self.GetPointer(), nullptr));
+
+  CheckAndFlushPythonErrors();
+
+  // at some point we may want to check retval
+  (void)retVal;
 }
 
 //----------------------------------------------------------------------------

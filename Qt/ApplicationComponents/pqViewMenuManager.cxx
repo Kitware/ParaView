@@ -42,12 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QToolBar>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqViewMenuManager::pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu)
   : Superclass(mainWindow)
 {
-  Q_ASSERT(mainWindow != NULL);
-  Q_ASSERT(menu != NULL);
+  assert(mainWindow != NULL);
+  assert(menu != NULL);
 
   this->Menu = menu;
   this->Window = mainWindow;
@@ -110,7 +112,7 @@ void pqViewMenuManager::buildMenu()
 void pqViewMenuManager::updateMenu()
 {
   // update invariants only.
-  Q_ASSERT(this->ToolbarsMenu);
+  assert(this->ToolbarsMenu);
 
   this->ToolbarsMenu->clear();
   QList<QToolBar*> all_toolbars = this->Window->findChildren<QToolBar*>();
@@ -126,12 +128,12 @@ void pqViewMenuManager::updateMenu()
     }
   }
 
-  Q_ASSERT(this->DockPanelSeparators[0] && this->DockPanelSeparators[1]);
+  assert(this->DockPanelSeparators[0] && this->DockPanelSeparators[1]);
   // remove all dock panel actions and add them back in.
   QList<QAction*> acts = this->Menu->actions();
   int start = acts.indexOf(this->DockPanelSeparators[0]);
   int end = acts.indexOf(this->DockPanelSeparators[1]);
-  Q_ASSERT(start != -1 && end != -1);
+  assert(start != -1 && end != -1);
   for (int cc = start + 1; cc < end; ++cc)
   {
     this->Menu->removeAction(acts[cc]);

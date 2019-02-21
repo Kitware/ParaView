@@ -169,3 +169,11 @@ if (PARAVIEW_USE_QTHELP)
     PRIVATE
       Qt5::Help)
 endif ()
+
+if (PARAVIEW_ENABLE_PYTHON)
+  vtk_module_definitions(ParaView::pqCore
+    PRIVATE PARAVIEW_PQCORE_ENABLE_PYTHON=1)
+else ()
+  vtk_module_definitions(ParaView::pqCore
+    PRIVATE PARAVIEW_PQCORE_ENABLE_PYTHON=0)
+endif()

@@ -1,10 +1,9 @@
 r"""This module is used by vtkPythonExtractSelection to extract query-based
-selections. It relies on the python-calculator (vtkPythonCalculator),
-specifically, the Python code used by that class, to compute a mask array from
-the query expression. Once the mask array is obtained, this filter will either
-extract the selected ids, or mark those elements as requested.
+selections. It relies on `paraview.detail.calculator`
+to compute a mask array from the query expression. Once the mask array is obtained,
+this filter will either extract the selected ids, or mark those elements as requested.
 """
-from __future__ import print_function
+from __future__ import absolute_import, print_function
 try:
   import numpy as np
 except ImportError:
@@ -16,7 +15,12 @@ import vtkmodules.numpy_interface.dataset_adapter as dsa
 import vtkmodules.numpy_interface.algorithms as algos
 from vtkmodules.vtkCommonDataModel import vtkDataObject
 from vtkmodules.util import vtkConstants
-from paraview import calculator
+
+from . import calculator
+
+# this module is needed to ensure that python wrapping for
+# `vtkPythonExtractSelection` is setup correctly.
+from paraview.modules import vtkPVClientServerCoreCore
 
 def _create_id_array(dataobject, attributeType):
     """Returns a VTKArray or VTKCompositeDataArray for the ids"""

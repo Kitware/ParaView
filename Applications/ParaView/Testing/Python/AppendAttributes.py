@@ -35,7 +35,7 @@ if arrayRange[0] < 237 or arrayRange[0] > 238 or arrayRange[1] < 476 or arrayRan
 # now try with the can.ex2 exodus file for multiblock testing
 for i, arg in enumerate(sys.argv):
     if arg == "-D" and i+1 < len(sys.argv):
-        dataFile = sys.argv[i+1] + '/can.ex2'
+        dataFile = sys.argv[i+1] + '/Testing/Data/can.ex2'
 
 canex2 = ExodusIIReader(FileName=[dataFile])
 canex2.ElementVariables = ['EQPS']

@@ -242,10 +242,6 @@ cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
-cmake_dependent_option(PARAVIEW_ENABLE_MATPLOTLIB
-  "Enable/Disable Python scripting support" ON
-  "PARAVIEW_ENABLE_PYTHON" OFF)
-mark_as_advanced(PARAVIEW_ENABLE_MATPLOTLIB)
 
 # If building on Unix with MPI enabled, we will present another option to
 # enable building of CosmoTools VTK extensions. This option is by default
@@ -305,11 +301,23 @@ if (PARAVIEW_ENABLE_PYTHON)
   set(VTK_PYTHON_VERSION "${PARAVIEW_PYTHON_VERSION}")
 
   list(APPEND paraview_requested_modules
-    ParaView::PythonInitializer)
+    ParaView::PythonAlgorithm
+    ParaView::PythonInitializer
+    VTK::RenderingMatplotlib)
 else ()
   list(APPEND paraview_rejected_modules
-    ParaView::PythonInitializer)
+    ParaView::PythonAlgorithm
+    ParaView::PythonInitializer
+    VTK::RenderingMatplotlib)
 endif ()
+
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_BUILD_TESTING)
+  # testing needs Python interpreter i.e. `PYTHON_EXECUTABLE` without which
+  # our `find_python_module` checks to determine which tests to add or exclude
+  # will fail. We find it here.
+  find_package(PythonInterp "${PARAVIEW_PYTHON_VERSION}" QUIET)
+  mark_as_advanced(PYTHON_EXECUTABLE)
+endif()
 
 if (PARAVIEW_BUILD_QT_GUI)
   list(APPEND paraview_requested_modules
@@ -363,6 +371,14 @@ else ()
   list(APPEND paraview_rejected_modules
     VTK::mpi)
 endif ()
+
+if (PARAVIEW_USE_MPI AND PARAVIEW_ENABLE_PYTHON)
+  list(APPEND paraview_requested_modules
+    VTK::ParallelMPI4Py)
+else ()
+  list(APPEND paraview_rejected_modules
+    VTK::ParallelMPI4Py)
+endif()
 
 if (PARAVIEW_USE_VTKM)
   list(APPEND paraview_requested_modules
@@ -435,11 +451,6 @@ endif ()
 if (PARAVIEW_USE_ICE_T)
   list(APPEND paraview_requested_modules
     ParaView::icet)
-endif ()
-
-if (PARAVIEW_ENABLE_MATPLOTLIB)
-  list(APPEND paraview_requested_modules
-    VTK::RenderingMatplotlib)
 endif ()
 
 if (PARAVIEW_ENABLE_COSMOTOOLS)
@@ -747,6 +758,14 @@ vtk_module_build(
   USE_EXTERNAL        "${PARAVIEW_USE_EXTERNAL}"
   TEST_INPUT_DATA_DIRECTORY   "${paraview_test_data_directory_input}"
   TEST_OUTPUT_DATA_DIRECTORY  "${paraview_test_data_directory_output}")
+
+include(vtkModuleJson)
+vtk_module_json(
+  MODULES "${vtk_modules}"
+  OUTPUT "vtk-modules.json")
+vtk_module_json(
+  MODULES "${paraview_modules}"
+  OUTPUT "paraview-modules.json")
 
 paraview_plugin_build(
   RUNTIME_DESTINATION   "${CMAKE_INSTALL_BINDIR}"

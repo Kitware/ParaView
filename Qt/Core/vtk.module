@@ -15,9 +15,6 @@ PRIVATE_DEPENDS
   ParaView::ServerManagerDefault
   VTK::TestingRendering
   VTK::vtksys
-OPTIONAL_DEPENDS
-  # These affect the public API.
-  #ParaView::pqCorePython
 TEST_DEPENDS
   ParaView::ServerManagerRendering
 TEST_LABELS

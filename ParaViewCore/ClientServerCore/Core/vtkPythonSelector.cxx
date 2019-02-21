@@ -50,7 +50,7 @@ bool vtkPythonSelector::ComputeSelectedElements(vtkDataObject* input, vtkDataObj
   vtkPythonScopeGilEnsurer gilEnsurer;
 
   vtkSmartPyObject psModule;
-  psModule.TakeReference(PyImport_ImportModule("paraview.python_selector"));
+  psModule.TakeReference(PyImport_ImportModule("paraview.detail.python_selector"));
   if (!psModule)
   {
     vtkWarningMacro("Failed to import 'paraview.python_selector'");
