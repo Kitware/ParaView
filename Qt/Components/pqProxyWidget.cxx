@@ -194,6 +194,7 @@ class pqProxyWidgetItem : public QObject
     , Group(false)
     , GroupTag()
     , Advanced(false)
+    , InformationOnly(false)
   {
   }
 
@@ -201,6 +202,7 @@ public:
   // Regular expression with tags used to match search text.
   QStringList SearchTags;
   bool Advanced;
+  bool InformationOnly;
 
   ~pqProxyWidgetItem() override
   {
@@ -326,6 +328,10 @@ public:
 
   bool enableWidget() const
   {
+    if (this->InformationOnly)
+    {
+      return false;
+    }
     foreach (const pqPropertyWidgetDecorator* decorator, this->PropertyWidget->decorators())
     {
       if (decorator && !decorator->enableWidget())
@@ -453,15 +459,6 @@ bool skip_property(vtkSMProperty* smproperty, const std::string& key,
   {
     PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
                       << " gets skipped because it is not listed in the properties argument";
-    PV_DEBUG_PANELS() << ""; // this adds a newline.
-    return true;
-  }
-
-  if (smproperty->GetInformationOnly())
-  {
-    // skip information only properties
-    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
-                      << " gets skipped because it is an information only property";
     PV_DEBUG_PANELS() << ""; // this adds a newline.
     return true;
   }
@@ -1072,6 +1069,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 
     // save record of the property widget and containing widget
     item->SearchTags << xmllabel << xmlDocumentation << smkey.c_str();
+    item->InformationOnly = smproperty->GetInformationOnly();
     item->Advanced =
       smproperty->GetPanelVisibility() && strcmp(smproperty->GetPanelVisibility(), "advanced") == 0;
     if (smproperty->GetPanelVisibilityDefaultForRepresentation())

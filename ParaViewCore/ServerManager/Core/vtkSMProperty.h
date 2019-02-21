@@ -332,8 +332,9 @@ public:
    * * "default": Show the property by default.
    * * "advanced": Only show the property in the advanced view.
    * * "never": Never show the property on the panel.
-
-   * By default, all properties have "default" visibility.
+   *
+   * By default, standard properties have "default" visibility,
+   * while information_only properties have "never" visibility.
    */
   vtkSetStringMacro(PanelVisibility)
     //@}

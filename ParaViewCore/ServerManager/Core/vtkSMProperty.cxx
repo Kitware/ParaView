@@ -70,9 +70,6 @@ vtkSMProperty::vtkSMProperty()
   this->BlockModifiedEvents = false;
   this->PendingModifiedEvents = false;
 
-  // by default, properties are set to show only in advanced mode
-  this->SetPanelVisibility("default");
-
   this->Proxy = 0;
 
   // Whenever the property fires UncheckedPropertyModifiedEvent, we update any
@@ -453,6 +450,10 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy, vtkPVXMLElement* element
   if (panel_visibility)
   {
     this->SetPanelVisibility(panel_visibility);
+  }
+  else
+  {
+    this->SetPanelVisibility(this->GetInformationOnly() ? "never" : "default");
   }
 
   const char* panel_visibility_default_for_representation =
