@@ -9,15 +9,15 @@ Adapted from the [Paraview wiki](http://www.paraview.org/Wiki/ParaView:Build_And
 
 Prerequisites
 =============
-* The ParaView build process requires [CMake](http://www.cmake.org/) version 3.3 or higher and a working compiler. On Unix-like operating systems, it also requires Make, while on Windows it requires Visual Studio and Ninja build.
-* Building ParaView's user interface requires [Qt](http://www.qt.io/download-open-source/), version 5.6+ (5.9.\* is recommended, 5.7.\* and 5.8\* also work, 5.10 is not yet recommended). To compile ParaView, either the LGPL or commercial versions of Qt may be used. Also note that on Windows you need to choose a Visual Studio version to match binaries available for your Qt version.
-* For Windows builds, unix-like environments such as Cygwin, or MinGW are not supported.
+* The ParaView build process requires [CMake](http://www.cmake.org/) version 3.10 or higher and a working compiler. On Unix-like operating systems, it also requires Make, while on Windows it requires Visual Studio. The Ninja build system speeds up compilation on most systems substantially.
+* Building ParaView's user interface requires [Qt](http://www.qt.io/download-open-source/), version 5.6+ (5.9.\* is recommended, 5.7.\*, 5.8\*, and 5.10 also work). To compile ParaView, either the LGPL or commercial versions of Qt may be used. Also note that on Windows you need to choose a Visual Studio version to match binaries available for your Qt version.
+* For Windows builds, unix-like environments such as Cygwin, or MinGW are not officially supported.
 
 Download And Install CMake
 --------------------------
 CMake is a tool that makes cross-platform building simple. On several systems it will probably be already installed. If it is not, please use the following instructions to install it.
 
-There are several precompiled binaries available at the [CMake download page](https://cmake.org/download/).
+There are several precompiled binaries available at the [CMake download page](https://cmake.org/download/). Download version 3.10 or later.
 
 Add CMake to your PATH environment variable if you downloaded an archive and not an installer.
 
@@ -52,7 +52,7 @@ running ParaView.
 Windows:
 
 * Visual Studio 2015 Community Edition
-* Use "VS2015 x64 Native Tools Command Prompt" for cmake and build.
+* Use "VS2015 x64 Native Tools Command Prompt" to configure with CMake and to build with ninja.
 * Get [Ninja Build](https://ninja-build.org/). Unzip the binary and put it on your path.
 
 Optional Additions
@@ -66,8 +66,7 @@ When the ability to write .avi files is desired, and writing these files is not 
 To run ParaView in parallel, an [MPI](http://www-unix.mcs.anl.gov/mpi/) implementation is required. If an MPI implementation that exploits special interconnect hardware is provided on your system, we suggest using it for optimal performance. Otherwise, on Linux/Mac, we suggest either [OpenMPI](http://www.open-mpi.org/) or [MPICH](http://www.mpich.org/). On Windows, we suggest [Microsoft MPI](https://msdn.microsoft.com/en-us/library/bb524831.aspx).
 
 ### Python
-In order to use scripting, [Python](http://www.python.org/) is required (version 2.7 is supported, whereas version 3.5 support is under development).
-Python is also required for ParaViewWeb builds.
+In order to use scripting, [Python](http://www.python.org/) is required (versions 2.7, 3.6, and 3.7.1 are supported). Python is also required for ParaViewWeb builds.
 
 ### OSMesa
 Off-screen Mesa can be used as a software-renderer for running ParaView on a server without hardware OpenGL acceleration.
@@ -80,7 +79,7 @@ Retrieve the Source
 
 * [Develop ParaView](git/develop.md) - Create a fork and checkout the source code.
     - A useful directory structure is ParaView/src for the git source tree, ParaView/build for the build tree, and if needed, ParaView/install for the install directory.
-    - Please follow the instructions in [git/develop.md] for creating a fork and setting up the repository for contributing to ParaView.
+    - If you wish to contribute bug fixes or features to ParaView, please follow the instructions in [git/develop.md] for creating a fork and setting up the repository for contributing.
 
 Run CMake
 ---------
