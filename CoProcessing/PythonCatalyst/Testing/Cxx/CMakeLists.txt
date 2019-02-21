@@ -209,7 +209,7 @@ if (PARAVIEW_BUILD_QT_GUI)
     set_tests_properties(CoProcessingFullWorkflowWithOnlyPlots PROPERTIES RUN_SERIAL ON)
 
     find_python_module(numpy numpy_found)
-    if (numpy_found)
+    if (numpy_found AND TARGET ParaView::CinemaReader)
       add_test(NAME CoProcessingFullWorkflowCinema
         COMMAND ${CMAKE_COMMAND}
         -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
