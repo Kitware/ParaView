@@ -311,6 +311,18 @@ else ()
     VTK::RenderingMatplotlib)
 endif ()
 
+if (PARAVIEW_ENABLE_PYTHON AND (NOT PARAVIEW_PYTHON_VERSION STREQUAL "3"))
+  # cinema_python doesn't support Python 3 yet
+  # paraview/paraview#17353
+  list(APPEND paraview_requested_modules
+    ParaView::CinemaPython
+    ParaView::CinemaReader)
+else ()
+  list(APPEND paraview_rejected_modules
+    ParaView::CinemaPython
+    ParaView::CinemaReader)
+endif()
+
 if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_BUILD_TESTING)
   # testing needs Python interpreter i.e. `PYTHON_EXECUTABLE` without which
   # our `find_python_module` checks to determine which tests to add or exclude
