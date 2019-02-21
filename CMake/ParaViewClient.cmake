@@ -353,7 +353,6 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
         ",\"${_paraview_client_install_path_dir}\"")
     endforeach ()
 
-    # TODO: Set variables for the file.
     configure_file(
       "${_ParaViewClient_cmake_dir}/paraview_client_launcher.c.in"
       "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_client_NAME}_launcher.c"
