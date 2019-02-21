@@ -359,7 +359,7 @@ class CoProcessor(object):
                     self.__AppendToCinemaDTable(timestep, "view_%s" % self.__ViewsList.index(view), fname)
 
         if len(cinema_dirs) > 1:
-            import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
+            import paraview.tpl.cinema_python.adaptors.paraview.pv_introspect as pv_introspect
             pv_introspect.make_workspace_file("cinema", cinema_dirs)
 
 
@@ -655,9 +655,9 @@ class CoProcessor(object):
             return
 
         try:
-            import cinema_python.adaptors.explorers as explorers
-            import cinema_python.adaptors.paraview.pv_explorers as pv_explorers
-            import cinema_python.adaptors.paraview.pv_introspect as pv_introspect
+            import paraview.tpl.cinema_python.adaptors.explorers as explorers
+            import paraview.tpl.cinema_python.adaptors.paraview.pv_explorers as pv_explorers
+            import paraview.tpl.cinema_python.adaptors.paraview.pv_introspect as pv_introspect
         except ImportError as e:
             import paraview
             paraview.print_error("Cannot import cinema")
