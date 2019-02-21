@@ -143,7 +143,7 @@ if (numpy_found)
 endif()
 
 if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE AND NOT WIN32)
-  set(ParaView::ServerManagerDefault_ARGS
+  set(paraview_pvbatch_args
     --symmetric)
   paraview_add_test_pvbatch_mpi(
     NO_DATA NO_OUTPUT NO_VALID
@@ -151,7 +151,7 @@ if (PARAVIEW_USE_MPI AND MPIEXEC_EXECUTABLE AND NOT WIN32)
     TestMPI4PY.py
     ParallelPythonImport.py
     )
-  set(ParaView::ServerManagerDefault_ARGS)
+  unset(paraview_pvbatch_args)
 endif()
 
 # Python state tests. Each test executes an XML test in the ParaView UI, saves
