@@ -472,6 +472,8 @@ def Show(proxy=None, view=None, **params):
     If pipeline object and/or view are not specified, active objects are used."""
     if proxy == None:
         proxy = GetActiveSource()
+    if proxy.GetNumberOfOutputPorts() == 0:
+        raise RuntimeError('Cannot show a sink i.e. algorithm with no output.')
     if proxy == None:
         raise RuntimeError ("Show() needs a proxy argument or that an active source is set.")
     if not view:
