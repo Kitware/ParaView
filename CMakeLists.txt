@@ -517,6 +517,7 @@ list(APPEND paraview_requested_modules
   VTK::FiltersFlowPaths
   VTK::FiltersVerdict
   VTK::IOAMR
+  VTK::IOAsynchronous # needed for cinema, but no harm adding always.
   VTK::IOParallelLSDyna
   VTK::IOTecplotTable
   VTK::IOTRUCHAS
