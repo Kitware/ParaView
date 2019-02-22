@@ -512,6 +512,32 @@ list(APPEND paraview_requested_modules
   VTK::IOVPIC
   )
 
+if (PARAVIEW_ENABLE_WEB)
+  list(APPEND paraview_requested_modules
+    ParaView::PVWebCore
+    ParaView::PVWebPython
+    VTK::WebCore
+    VTK::WebPython
+  )
+  if (PARAVIEW_PYTHON_VERSION STREQUAL "2")
+    list(APPEND paraview_requested_modules
+      ParaView::PVWebPython2
+    )
+  else ()
+    list(APPEND paraview_rejected_modules
+      ParaView::PVWebPython2
+    )
+  endif ()
+else()
+  list(APPEND paraview_rejected_modules
+    ParaView::PVWebCore
+    ParaView::PVWebPython
+    ParaView::PVWebPython2
+    VTK::WebCore
+    VTK::WebPython
+  )
+endif ()
+
 if (paraview_requested_modules)
   list(REMOVE_DUPLICATES paraview_requested_modules)
 endif ()

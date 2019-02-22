@@ -1,12 +1,10 @@
 NAME
-  ParaView::WebPython2
+  ParaView::PVWebPython2
 LIBRARY_NAME
   vtkPVWebPython2
 CONDITION
   # FIXME: This is for Python 2.x.
   PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_WEB
-DEPENDS
-  ParaView::WebPython
 TEST_LABELS
   ParaView
   ParaViewWeb

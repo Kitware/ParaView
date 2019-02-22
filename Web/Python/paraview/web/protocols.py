@@ -24,14 +24,14 @@ from vtkmodules.web import iteritems
 from vtkmodules.web.render_window_serializer import SynchronizationContext, initializeSerializers, serializeInstance, getReferenceId
 from paraview.web.decorators import *
 
-from vtkmodules.vtkCommonDataModel             import vtkImageData
-from vtkmodules.vtkCommonCore                  import vtkUnsignedCharArray, vtkCollection
-from vtkmodules.vtkWebCore                     import vtkDataEncoder, vtkWebInteractionEvent
-from vtkmodules.vtkPVServerManagerRendering    import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
-from vtkmodules.vtkPVServerManagerCore         import vtkSMProxyManager
-from vtkmodules.vtkCommonDataModel             import vtkDataObject
-from vtkmodules.vtkPVClientServerCoreCore      import vtkProcessModule
-from vtkmodules.vtkPVClientServerCoreRendering import vtkPVRenderView
+from vtkmodules.vtkCommonDataModel import vtkImageData, vtkDataObject
+from vtkmodules.vtkCommonCore      import vtkUnsignedCharArray, vtkCollection
+from vtkmodules.vtkWebCore         import vtkDataEncoder, vtkWebInteractionEvent
+
+from paraview.modules.vtkPVServerManagerRendering    import vtkSMPVRepresentationProxy, vtkSMTransferFunctionProxy, vtkSMTransferFunctionManager
+from paraview.modules.vtkPVServerManagerCore         import vtkSMProxyManager
+from paraview.modules.vtkPVClientServerCoreCore      import vtkProcessModule
+from paraview.modules.vtkPVClientServerCoreRendering import vtkPVRenderView
 
 if sys.version_info >= (3,):
     xrange = range
@@ -3153,7 +3153,7 @@ class ParaViewWebFileListing(ParaViewWebProtocol):
 # Handle Data Selection
 #
 # =============================================================================
-from vtkmodules.vtkPVClientServerCoreRendering import *
+from paraview.modules.vtkPVClientServerCoreRendering import *
 from vtkmodules.vtkCommonCore import *
 
 class ParaViewWebSelectionHandler(ParaViewWebProtocol):
