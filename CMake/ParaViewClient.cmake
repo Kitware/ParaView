@@ -403,7 +403,8 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       PROPERTIES
         MACOSX_BUNDLE_BUNDLE_NAME           "${_paraview_client_APPLICATION_NAME}"
         MACOSX_BUNDLE_GUI_IDENTIFIER        "org.${_paraview_client_organization}.${_paraview_client_APPLICATION_NAME}"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING  "${_paraview_client_VERSION}")
+        MACOSX_BUNDLE_SHORT_VERSION_STRING  "${_paraview_client_VERSION}"
+        MACOSX_BUNDLE_INFO_PLIST            "${ParaView_BINARY_DIR}/MacOSXBundleInfo.plist.in")
   endif ()
 endfunction ()
 
