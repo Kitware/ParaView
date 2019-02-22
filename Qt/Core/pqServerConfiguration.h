@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreModule.h"
 #include "pqServerResource.h"
+#include "vtkPVXMLElement.h" // needed for ivar
 #include "vtkSmartPointer.h"
 #include <QObject>
 

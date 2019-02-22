@@ -80,7 +80,7 @@ public:
   struct LinkedSelection
   {
   public:
-    LinkedSelection(vtkSMProxy* proxy, int updateDir)
+    LinkedSelection(vtkSMSourceProxy* proxy, int updateDir)
       : Proxy(proxy)
       , UpdateDirection(updateDir)
     {

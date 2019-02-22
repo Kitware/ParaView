@@ -350,7 +350,7 @@ void vtkSMViewLayoutProxy::LoadState(const vtkSMMessage* message, vtkSMProxyLoca
 
     if (locator && vtkSMProxyProperty::CanCreateProxy())
     {
-      cell.ViewProxy = locator->LocateProxy(value.proxy_global_id(0));
+      cell.ViewProxy = vtkSMViewProxy::SafeDownCast(locator->LocateProxy(value.proxy_global_id(0)));
     }
     else
     {
@@ -492,7 +492,7 @@ int vtkSMViewLayoutProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocat
     cell.SplitFraction = fraction;
     if (viewid)
     {
-      cell.ViewProxy = locator->LocateProxy(viewid);
+      cell.ViewProxy = vtkSMViewProxy::SafeDownCast(locator->LocateProxy(viewid));
     }
     else
     {

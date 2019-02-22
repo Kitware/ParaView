@@ -62,9 +62,9 @@ class SceneImageWriter : public vtkSMAnimationSceneWriter
 public:
   vtkTemplateTypeMacro(SceneImageWriter, vtkSMAnimationSceneWriter);
   /**
-   * Set the vtkSMSaveScreenshotProxy proxy.
+   * Set the vtkSMSaveAnimationProxy proxy.
    */
-  void SetHelper(vtkSMSaveScreenshotProxy* helper) { this->Helper = helper; }
+  void SetHelper(vtkSMSaveAnimationProxy* helper) { this->Helper = helper; }
 
   /**
    * Set the writer to use.
