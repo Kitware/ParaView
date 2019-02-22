@@ -1,6 +1,17 @@
 include_directories(
   ${TestDriver_SOURCE_DIR})
 
+function (_set_standard_test_properties test_name)
+  set(_vtk_fail_regex "(\n|^)ERROR: " "instance(s)? still around")
+  set_tests_properties("${test_name}"
+    PROPERTIES
+      LABELS "${_vtk_build_test_labels}"
+      FAIL_REGULAR_EXPRESSION "${_vtk_fail_regex}"
+      # This must match VTK_SKIP_RETURN_CODE in vtkTestingObjectFactory.h"
+      SKIP_RETURN_CODE 125
+    )
+endfunction ()
+
 #------------------------------------------------------------------------------
 vtk_module_test_executable(CoProcessingPythonScriptExample
   PythonScriptCoProcessingExample.cxx
@@ -18,6 +29,7 @@ add_test(NAME CoProcessingTestInput
   COMMAND pvbatch -sym ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
   ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py 4
   )
+_set_standard_test_properties(CoProcessingTestInput)
 
 
 
@@ -49,6 +61,7 @@ else()
 endif()
 
 set_tests_properties(CoProcessingImport PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
+_set_standard_test_properties(CoProcessingImport)
 
 # test if we can use a Python programmable filter in a Catalyst Python script
 if (NOT PARAVIEW_USE_MPI)
@@ -74,6 +87,8 @@ else()
 endif()
 
 set_tests_properties(CoProcessingProgrammableFilter PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
+_set_standard_test_properties(CoProcessingProgrammableFilter)
+
 #-  add_test(NAME CoProcessingProgrammableFilter
 #-    COMMAND CoProcessingProgrammableFilter
 #-    ${CMAKE_CURRENT_SOURCE_DIR}/cpprogrammablefilter.py)
@@ -105,6 +120,7 @@ else()
 endif()
 
 set_tests_properties(CoProcessingTestPythonScript PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
+_set_standard_test_properties(CoProcessingTestPythonScript)
 
 if (PARAVIEW_USE_MPI)
   add_test(NAME PCoProcessingTestPythonScript
@@ -125,6 +141,7 @@ if (PARAVIEW_USE_MPI)
   # so we run this one serially so that they don't interfere.
   set_tests_properties(PCoProcessingTestPythonScript PROPERTIES RUN_SERIAL ON)
   set_tests_properties(PCoProcessingTestPythonScript PROPERTIES PASS_REGULAR_EXPRESSION "in DoCoProcessing")
+  _set_standard_test_properties(PCoProcessingTestPythonScript)
 endif()
 
 if (PARAVIEW_BUILD_QT_GUI)
@@ -148,6 +165,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflow.png})
     set_tests_properties(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(CoProcessingFullWorkflow)
 
     add_test(NAME CoProcessingFullWorkflowNewUI
       COMMAND ${CMAKE_COMMAND}
@@ -162,6 +180,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_NAME:STRING=CoProcessingFullWorkflowNewUI
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(CoProcessingFullWorkflowNewUI PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(CoProcessingFullWorkflowNewUI)
 
     add_test(NAME CoProcessingFullWorkflowWithOnlyExtracts
       COMMAND ${CMAKE_COMMAND}
@@ -176,6 +195,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_NAME:STRING=CoProcessingFullWorkflowWithOnlyExtracts
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(CoProcessingFullWorkflowWithOnlyExtracts PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(CoProcessingFullWorkflowWithOnlyExtracts)
 
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME CoProcessingFullWorkflowWithPlots
       COMMAND ${CMAKE_COMMAND}
@@ -192,6 +212,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflowPlot1.png}
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflowPlot2.png} )
     set_tests_properties(CoProcessingFullWorkflowWithPlots PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(CoProcessingFullWorkflowWithPlots)
 
     ExternalData_add_test("${_vtk_build_TEST_DATA_TARGET}" NAME CoProcessingFullWorkflowWithOnlyPlots
       COMMAND ${CMAKE_COMMAND}
@@ -207,6 +228,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake
       DATA{${_vtk_build_TEST_INPUT_DATA_DIRECTORY}/Data/Baseline/CPFullWorkflowPlot2.png} )
     set_tests_properties(CoProcessingFullWorkflowWithOnlyPlots PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(CoProcessingFullWorkflowWithOnlyPlots)
 
     find_python_module(numpy numpy_found)
     if (numpy_found AND TARGET ParaView::CinemaReader)
@@ -220,6 +242,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinema
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinema PROPERTIES RUN_SERIAL ON)
+      _set_standard_test_properties(CoProcessingFullWorkflowCinema)
 
       add_test(NAME CoProcessingFullWorkflowCinemaComposite
         COMMAND ${CMAKE_COMMAND}
@@ -231,6 +254,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaComposite
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinemaComposite PROPERTIES RUN_SERIAL ON)
+      _set_standard_test_properties(CoProcessingFullWorkflowCinemaComposite)
 
       add_test(NAME CoProcessingFullWorkflowCinemaCompositeFloat
         COMMAND ${CMAKE_COMMAND}
@@ -242,6 +266,7 @@ if (PARAVIEW_BUILD_QT_GUI)
         -DTEST_NAME:STRING=CoProcessingFullWorkflowCinemaCompositeFloat
         -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
       set_tests_properties(CoProcessingFullWorkflowCinemaCompositeFloat PROPERTIES RUN_SERIAL ON)
+      _set_standard_test_properties(CoProcessingFullWorkflowCinemaCompositeFloat)
 
     endif()
 
@@ -256,6 +281,7 @@ if (PARAVIEW_BUILD_QT_GUI)
       -DTEST_NAME:STRING=TemporalScriptFullWorkflow
       -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
     set_tests_properties(TemporalScriptFullWorkflow PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(TemporalScriptFullWorkflow)
 
   ENDIF ()
 endif()
