@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMTransferFunctionManager.h"
 #include "vtkSMViewProxy.h"
+#include "vtksys/SystemTools.hxx"
 
 #include <QAction>
 #include <QApplication>
@@ -152,6 +153,13 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
           // we need to flip Y.
           int height = senderWidget->size().height();
           pos[1] = height - pos[1];
+          // Account for HiDPI displays
+          qreal devicePixelRatioF = senderWidget->devicePixelRatioF();
+          if (!vtksys::SystemTools::HasEnv("DASHBOARD_TEST_FROM_CTEST"))
+          {
+            pos[0] = pos[0] * devicePixelRatioF;
+            pos[1] = pos[1] * devicePixelRatioF;
+          }
           unsigned int blockIndex = 0;
           this->PickedRepresentation = view->pickBlock(pos, blockIndex);
           this->buildMenu(this->PickedRepresentation, blockIndex);
