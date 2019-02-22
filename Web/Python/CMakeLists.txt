@@ -11,10 +11,10 @@ set(files
   paraview/web/pv_wslink.py
   paraview/web/test_server.py)
 
-vtk_module_add_python_package(ParaView::WebPython
+vtk_module_add_python_package(ParaView::PVWebPython
   FILES               ${files}
   PACKAGE             "paraview.web"
   MODULE_DESTINATION  "${PARAVIEW_PYTHON_SITE_PACKAGES_SUFFIX}")
 
-vtk_module_add_python_module(ParaView::WebPython
+vtk_module_add_python_module(ParaView::PVWebPython
   PACKAGES "paraview.web")

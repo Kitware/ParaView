@@ -1,5 +1,5 @@
 NAME
-  ParaView::WebPython
+  ParaView::PVWebPython
 LIBRARY_NAME
   vtkPVWebPython
 CONDITION
