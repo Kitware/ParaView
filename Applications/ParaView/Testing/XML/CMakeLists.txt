@@ -587,9 +587,12 @@ if(PARAVIEW_ENABLE_CATALYST AND PARAVIEW_ENABLE_PYTHON)
   paraview_add_client_tests(
     FORCE_SERIAL
     TEST_SCRIPTS CatalystGUI.xml )
-  paraview_add_client_tests(
-    FORCE_SERIAL
-    TEST_SCRIPTS CatalystCinemaGUI.xml )
+
+  if (TARGET ParaView::CinemaPython)
+    paraview_add_client_tests(
+      FORCE_SERIAL
+      TEST_SCRIPTS CatalystCinemaGUI.xml )
+  endif ()
 
   #add_catalyst_live_test(CatalystLiveSetBreakpoint 222 "")
   # the CatalystLivePause test uses the --live=22222 command line option to automatically
@@ -994,39 +997,41 @@ if(PARAVIEW_ENABLE_PYTHON)
     list(APPEND TESTS_WITH_INLINE_COMPARES
       FindDataDialog.xml)
 
-    # Cinema importing capabilities are only available in Python + OpenGL2
-    # add the cinema database files.
-    set(cinema_data
-      "cinema-composite.cdb/image/info.json")
-    foreach(poseidx RANGE 0 17)
-      foreach(visidx RANGE 0 1)
-        list(APPEND cinema_data
-          "cinema-composite.cdb/image/pose=${poseidx}/vis=${visidx}/,REGEX:.*")
+    if (TARGET ParaView::CinemaReader)
+      # Cinema importing capabilities are only available in Python + OpenGL2
+      # add the cinema database files.
+      set(cinema_data
+        "cinema-composite.cdb/image/info.json")
+      foreach(poseidx RANGE 0 17)
+        foreach(visidx RANGE 0 1)
+          list(APPEND cinema_data
+            "cinema-composite.cdb/image/pose=${poseidx}/vis=${visidx}/,REGEX:.*")
+        endforeach()
       endforeach()
-    endforeach()
-    list(APPEND cinema_data
-      "cinema-non-composite.cdb/image/info.json")
-    foreach(phi 0 90 180)
       list(APPEND cinema_data
-        "cinema-non-composite.cdb/image/${phi}/0/,REGEX:.*")
-    endforeach()
-    set(cinema_data_refs)
-    foreach (cinema_data_file IN LISTS cinema_data)
-      list(APPEND cinema_data_refs
-        "DATA{${paraview_test_data_directory_input}/Data/${cinema_data_file}}")
-    endforeach ()
-    ExternalData_Expand_Arguments(ParaViewData _
-      ${cinema_data_refs})
+        "cinema-non-composite.cdb/image/info.json")
+      foreach(phi 0 90 180)
+        list(APPEND cinema_data
+          "cinema-non-composite.cdb/image/${phi}/0/,REGEX:.*")
+      endforeach()
+      set(cinema_data_refs)
+      foreach (cinema_data_file IN LISTS cinema_data)
+        list(APPEND cinema_data_refs
+          "DATA{${paraview_test_data_directory_input}/Data/${cinema_data_file}}")
+      endforeach ()
+      ExternalData_Expand_Arguments(ParaViewData _
+        ${cinema_data_refs})
 
-    list(APPEND TESTS_WITH_BASELINES
-      ImportCinema.xml
-      ImportCinemaSpecA.xml)
+      list(APPEND TESTS_WITH_BASELINES
+        ImportCinema.xml
+        ImportCinemaSpecA.xml)
 
-    # presently, we don't support client-server configurations.
-    set(ImportCinema_DISABLE_CS TRUE)
-    set(ImportCinema_DISABLE_CRS TRUE)
-    set(ImportCinemaSpecA_DISABLE_CS TRUE)
-    set(ImportCinemaSpecA_DISABLE_CRS TRUE)
+      # presently, we don't support client-server configurations.
+      set(ImportCinema_DISABLE_CS TRUE)
+      set(ImportCinema_DISABLE_CRS TRUE)
+      set(ImportCinemaSpecA_DISABLE_CS TRUE)
+      set(ImportCinemaSpecA_DISABLE_CRS TRUE)
+    endif ()
 
 
     # PythonAlgorithm plugin tests.
