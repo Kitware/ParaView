@@ -25,9 +25,9 @@ function (paraview_add_executable name)
         JOB_POOL_LINK "${paraview_exe_job_link_pool}")
   endif ()
 
-  set(_paraview_client_RUNTIME_DESTINATION
+  set(_paraview_launcher_RUNTIME_DESTINATION
     "${CMAKE_INSTALL_BINDIR}")
-  set(_paraview_client_LIBRARY_DESTINATION
+  set(_paraview_launcher_LIBRARY_DESTINATION
     "${CMAKE_INSTALL_LIBDIR}")
 
   install(
@@ -37,13 +37,13 @@ function (paraview_add_executable name)
     EXPORT      ParaView)
   
   # set up forwarding executables
-  set(_paraview_client_destination "${_paraview_client_RUNTIME_DESTINATION}")
+  set(_paraview_launcher_destination "${_paraview_launcher_RUNTIME_DESTINATION}")
   if (BUILD_SHARED_LIBS AND UNIX AND NOT APPLE)
-    set(_paraview_client_build_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-    set(_paraview_client_build_path "\"${_paraview_client_build_dir}\"")
-    set(_paraview_client_install_dir "../${_paraview_client_LIBRARY_DESTINATION}")
-    set(_paraview_client_install_path "\"${_paraview_client_install_dir}\"")
-    set(_paraview_client_NAME ${name})
+    set(_paraview_launcher_build_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+    set(_paraview_launcher_build_path "\"${_paraview_launcher_build_dir}\"")
+    set(_paraview_launcher_install_dir "../${_paraview_launcher_LIBRARY_DESTINATION}")
+    set(_paraview_launcher_install_path "\"${_paraview_launcher_install_dir}\"")
+    set(_paraview_launcher_NAME ${name})
     set(_executable_cmake_dir "${ParaView_SOURCE_DIR}/CMake")
     configure_file(
       "${_executable_cmake_dir}/paraview_client_launcher.c.in"
@@ -63,14 +63,12 @@ function (paraview_add_executable name)
 
     install(
       TARGETS "${name}-launcher"
-      RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}")
-    set(_paraview_client_destination "${_paraview_client_LIBRARY_DESTINATION}")
+      RUNTIME DESTINATION "${_paraview_launcher_RUNTIME_DESTINATION}")
+    set(_paraview_launcher_destination "${_paraview_launcher_LIBRARY_DESTINATION}")
   endif()
 
   install(
     TARGETS "${name}"
     # TODO - need export targets?
-    RUNTIME DESTINATION "${_paraview_client_destination}")
-
-  # todo - setup install directory for launcher
+    RUNTIME DESTINATION "${_paraview_launcher_destination}")
 endfunction ()

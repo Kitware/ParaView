@@ -337,7 +337,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
         "${_paraview_client_PLUGINS_TARGET}")
   endif ()
 
-  # XXX(deprecated): ParaView should not need to use this.
+  # Set up the forwarding executable
   set(_paraview_client_destination "${_paraview_client_RUNTIME_DESTINATION}")
   if (BUILD_SHARED_LIBS AND UNIX AND NOT APPLE AND _paraview_client_FORWARD_EXECUTABLE)
     set(_paraview_client_build_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
@@ -351,6 +351,11 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     foreach (_paraview_client_install_path_dir IN LISTS )
       string(APPEND _paraview_client_install_path
         ",\"${_paraview_client_install_path_dir}\"")
+    endforeach ()
+
+    # Set up variables expected in paraview_launcher.c.in
+    foreach(suffix build_dir build_path install_dir install_path NAME)
+      set(_paraview_launcher_${suffix} ${_paraview_client_${suffix}})
     endforeach ()
 
     configure_file(
