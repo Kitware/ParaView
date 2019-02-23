@@ -46,7 +46,7 @@ function (paraview_add_executable name)
     set(_paraview_launcher_NAME ${name})
     set(_executable_cmake_dir "${ParaView_SOURCE_DIR}/CMake")
     configure_file(
-      "${_executable_cmake_dir}/paraview_client_launcher.c.in"
+      "${_executable_cmake_dir}/paraview_launcher.c.in"
       "${CMAKE_CURRENT_BINARY_DIR}/${name}_launcher.c"
       @ONLY)
     add_executable("${name}-launcher"
