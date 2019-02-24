@@ -17,7 +17,6 @@ PV_ALLOW_BATCH_INTERACTION | Allow interactions in batch mode.
 PV_PLUGIN_CONFIG_FILE | XML Plugin Configuration Files to specify which plugin to load on startup.
 PV_PLUGIN_PATH | Directories containing plugins to be loaded on startup.
 QT_MAC_NO_NATIVE_MENUBAR | Qt flag to force the Qt menu bar rather than the native mac menu bar.
-PV_USE_OFFSCREEN_BUFFERS_FOR_IMAGE_CAPTURE | A temporary environment variable which defined causes ParaView to use offscreen frame buffer when capturing images (see #18446). This may be removed in future without notice.
 PV_PLUGIN_DEBUG | (obsolete) Use **PARAVIEW_LOG_PLUGIN_VERBOSITY** instead.
 PV_SETTINGS_DEBUG | (obsolete) Use **PARAVIEW_LOG_APPLICATION_VERBOSITY** instead.
 PV_DEBUG_APPLY_BUTTON | (obsolete) Use **PARAVIEW_LOG_APPLICATION_VERBOSITY** instead.
