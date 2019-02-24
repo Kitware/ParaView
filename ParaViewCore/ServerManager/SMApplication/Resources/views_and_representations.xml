@@ -9586,6 +9586,7 @@
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
           <Property name="AxesGrid" />
+          <Property name="PPI" />
 
           <Property name="CenterAxesVisibility" />
           <PropertyGroup label="Orientation Axes">
@@ -9676,6 +9677,7 @@
                proxygroup="views"
                proxyname="XYChartView"></Proxy>
         <ExposedProperties>
+          <Property name="PPI" />
           <PropertyGroup label="Title">
             <Property name="ChartTitle"/>
             <Property name="ChartTitleAlignment"/>
@@ -9894,6 +9896,7 @@
                proxygroup="views"
                proxyname="XYBarChartView"></Proxy>
         <ExposedProperties>
+          <Property name="PPI" />
           <PropertyGroup label="Title">
             <Property name="ChartTitle"/>
             <Property name="ChartTitleAlignment"/>
