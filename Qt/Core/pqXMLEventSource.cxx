@@ -159,11 +159,6 @@ int pqXMLEventSource::getNextEvent(
       return FAILURE;
     }
 
-    // Resize widget
-    QSize old_size = widget->maximumSize();
-    widget->setMaximumSize(width, height);
-    widget->resize(width, height);
-
     // Recover test directory
     QString testDir = pqCoreTestUtility::TestDirectory();
 
@@ -196,8 +191,8 @@ int pqXMLEventSource::getNextEvent(
     }
 
     // Compare image with widget
-    bool retVal = pqCoreTestUtility::CompareImage(widget, baseline, threshold, std::cerr, testDir);
-    widget->setMaximumSize(old_size);
+    bool retVal = pqCoreTestUtility::CompareImage(
+      widget, baseline, threshold, std::cerr, testDir, QSize(width, height));
     if (!retVal)
     {
       qCritical()
