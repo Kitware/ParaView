@@ -40,9 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // non-portable version.
 #include "QVTKOpenGLNativeWidget.h"
 using pqQVTKWidgetBase = QVTKOpenGLNativeWidget;
+#define PARAVIEW_USING_QVTKOPENGLNATIVEWIDGET 1
+#define PARAVIEW_USING_QVTKOPENGLWIDGET 0
 #else
 #include "QVTKOpenGLWidget.h"
 using pqQVTKWidgetBase = QVTKOpenGLWidget;
+#define PARAVIEW_USING_QVTKOPENGLNATIVEWIDGET 0
+#define PARAVIEW_USING_QVTKOPENGLWIDGET 1
 #endif
 
 class vtkGenericOpenGLRenderWindow;
