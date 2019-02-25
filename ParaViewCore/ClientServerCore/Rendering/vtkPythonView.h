@@ -48,6 +48,13 @@ public:
   static vtkInformationRequestKey* REQUEST_DELIVER_DATA_TO_CLIENT();
 
   /**
+   * Initialize the view with an identifier. Unless noted otherwise, this method
+   * must be called before calling any other methods on this class.
+   * \note CallOnAllProcesses
+   */
+  void Initialize(unsigned int id) override;
+
+  /**
    * Overrides the base class method to request an addition pass that moves data from the
    * server to the client.
    */

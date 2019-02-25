@@ -495,6 +495,20 @@ bool vtkPythonView::IsLocalDataAvailable()
 }
 
 //----------------------------------------------------------------------------
+void vtkPythonView::Initialize(unsigned int id)
+{
+  if (this->Identifier == id)
+  {
+    // already initialized
+    return;
+  }
+
+  this->SynchronizedWindows->AddRenderWindow(id, this->GetRenderWindow());
+  this->SynchronizedWindows->AddRenderer(id, this->GetRenderer());
+  this->Superclass::Initialize(id);
+}
+
+//----------------------------------------------------------------------------
 void vtkPythonView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
