@@ -11,7 +11,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
-  "DATA{${paraview_test_data_directory_input}/Data/ANALYZE/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree/,REGEX:.*}"
@@ -73,7 +72,6 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/iron_protein.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/linesPolydata.vtk}"
   "DATA{${paraview_test_data_directory_input}/Data/manyTypes.vtu}"
-  "DATA{${paraview_test_data_directory_input}/Data/minimal.nii}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_0.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_1.vts}"
   "DATA{${paraview_test_data_directory_input}/Data/multicomb_2.vts}"
@@ -828,11 +826,6 @@ list(APPEND TESTS_WITH_BASELINES
   #  XYBarChart.xml
   RandomAttributes.xml
 )
-
-if (PARAVIEW_PLUGIN_ENABLE_AnalyzeNIfTIIO)
-  list(APPEND TESTS_WITH_BASELINES
-    NiftiReaderWriterPlugin.xml)
-endif ()
 
 if (TARGET VTK::IOParallelLSDyna)
   list(APPEND TESTS_WITH_BASELINES

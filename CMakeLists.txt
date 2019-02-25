@@ -583,7 +583,7 @@ set_property(GLOBAL
 
 set(paraview_default_plugins
   AcceleratedAlgorithms
-  AnalyzeNIfTIReaderWriter
+  AnalyzeNIfTIIO
   ArrowGlyph
   BagPlotViewsAndFilters
   CDIReader
