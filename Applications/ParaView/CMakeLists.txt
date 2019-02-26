@@ -44,7 +44,7 @@ paraview_client_add(
   APPLICATION_NAME  "ParaView"
   TITLE             "ParaView ${paraview_version}"
   ORGANIZATION      "ParaView"
-  VERSION           "${PARAVIEW_VERSION_FULL}"
+  VERSION           "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}"
   MAIN_WINDOW_CLASS "ParaViewMainWindow"
   BUNDLE_ICON       "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.icns"
   APPLICATION_ICON  "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.ico"
