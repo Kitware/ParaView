@@ -46,7 +46,6 @@ set(classes
   pqCoreTestUtility
   pqCoreUtilities
   pqDataRepresentation
-  pqDebug
   pqFileDialog
   pqFileDialogEventPlayer
   pqFileDialogEventTranslator
@@ -120,6 +119,11 @@ set(classes
   pqXYChartView
   pqXYHistogramChartView
   vtkPVGUIPluginInterface)
+
+if (NOT VTK_LEGACY_REMOVE)
+  list(APPEND classes
+    pqDebug)
+endif()
 
 set(ui_files
   Resources/UI/pqFileDialog.ui

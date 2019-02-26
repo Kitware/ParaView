@@ -31,11 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqDebug.h"
 
+#include "vtkObject.h"
 #include <QProcessEnvironment>
 
 //-----------------------------------------------------------------------------
 pqDebugType::pqDebugType(const QString& envVariable /*=QString()*/)
 {
+  VTK_LEGACY_REPLACED_BODY(pqDebug, "ParaView 5.7", "vtkPVLogger");
+
   // since call to systemEnvironment is expensive, we only do it once.
   static QProcessEnvironment systemEnvironment = QProcessEnvironment::systemEnvironment();
 
