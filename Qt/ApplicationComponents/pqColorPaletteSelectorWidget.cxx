@@ -46,8 +46,6 @@ pqColorPaletteSelectorWidget::pqColorPaletteSelectorWidget(
   vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
   : Superclass(smproxy, parentObject)
 {
-  PV_DEBUG_PANELS() << "pqColorPaletteSelectorWidget for a property with "
-                       "the panel_widget=\"color_palette_selector\" attribute.";
   // this->setShowLabel(false);
 
   QVBoxLayout* vbox = new QVBoxLayout(this);

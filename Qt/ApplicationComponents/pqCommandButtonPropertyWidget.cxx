@@ -56,9 +56,6 @@ pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(
 
   this->setShowLabel(false);
   this->setLayout(l);
-
-  PV_DEBUG_PANELS() << "pqCommandButtonPropertyWidget for a property with "
-                    << "the panel_widget=\"command_button\" attribute";
 }
 
 //-----------------------------------------------------------------------------

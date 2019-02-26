@@ -57,8 +57,6 @@ pqCommandPropertyWidget::pqCommandPropertyWidget(
   layoutLocal->setMargin(0);
   layoutLocal->addWidget(button);
   layoutLocal->addStretch();
-
-  PV_DEBUG_PANELS() << "QPushButton for a vtkSMProperty";
   this->setShowLabel(false);
 }
 

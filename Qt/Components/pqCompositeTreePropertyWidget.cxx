@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeView.h"
 #include "pqTreeViewSelectionHelper.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMIntVectorProperty.h"
@@ -149,6 +150,8 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
       if (elem->GetScalarAttribute("number_of_rows", &row_count))
       {
         treeView->setMaximumRowCountBeforeScrolling(row_count);
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+          "widget height limited to %d rows using `WidgetHeight` hint.", row_count);
       }
     }
   }
@@ -160,9 +163,6 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
   this->addPropertyLink(this, "values", SIGNAL(valuesChanged()), smproperty);
   this->connect(
     dmodel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), SIGNAL(valuesChanged()));
-
-  PV_DEBUG_PANELS() << "pqCompositeTreePropertyWidget for an IntVectorPropertyWidget with a "
-                    << "CompositeTreeDomain";
 }
 
 //-----------------------------------------------------------------------------

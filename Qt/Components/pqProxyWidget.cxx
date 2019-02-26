@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h"
 #include "vtkCollection.h"
 #include "vtkNew.h"
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompoundSourceProxy.h"
 #include "vtkSMDocumentation.h"
@@ -452,33 +453,26 @@ bool skip_property(vtkSMProperty* smproperty, const std::string& key,
 {
   const QString skey = QString(key.c_str());
   const QString simplifiedKey = QString(key.c_str()).remove(' ');
-  auto xmllabel = smproperty->GetXMLLabel();
 
   if (!chosenProperties.isEmpty() &&
     !(chosenProperties.contains(simplifiedKey) || chosenProperties.contains(skey)))
   {
-    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
-                      << " gets skipped because it is not listed in the properties argument";
-    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since not in chosen properties set.");
     return true;
   }
 
   if (smproperty->GetIsInternal())
   {
     // skip internal properties
-    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
-                      << " gets skipped because it is an internal property";
-    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since internal.");
     return true;
   }
 
   if (smproperty->GetPanelVisibility() && strcmp(smproperty->GetPanelVisibility(), "never") == 0 &&
     chosenProperties.size() == 0)
   {
-    // skip properties marked as never show (unless it was explicitly 'chosen').
-    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
-                      << " gets skipped because it has panel_visibility of \"never\"";
-    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+      "skip since marked as never show (unless it was explicitly 'chosen').");
     return true;
   }
 
@@ -486,11 +480,11 @@ bool skip_property(vtkSMProperty* smproperty, const std::string& key,
     (legacyHiddenProperties.contains(skey) || legacyHiddenProperties.contains(simplifiedKey)))
   {
     // skipping properties marked with "show=0" in the hints section.
-    PV_DEBUG_PANELS() << "Property:" << skey << " (" << xmllabel << ")"
-                      << " gets skipped because is has show='0' specified in the Hints.";
-    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    vtkVLogF(
+      PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since legacy hint with `show=0` specified.");
     return true;
   }
+
   return false;
 }
 
@@ -500,6 +494,7 @@ bool skip_group(vtkSMPropertyGroup* smgroup, const QStringList& chosenProperties
 {
   if (!chosenProperties.empty() && !chosenProperties.contains(smgroup->GetXMLLabel()))
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since group not chosen.");
     return true;
   }
 
@@ -507,10 +502,7 @@ bool skip_group(vtkSMPropertyGroup* smgroup, const QStringList& chosenProperties
     chosenProperties.size() == 0)
   {
     // skip property groups marked as never show
-    PV_DEBUG_PANELS() << "  - Group "
-                      << (smgroup->GetXMLLabel() ? smgroup->GetXMLLabel() : "(null)")
-                      << " gets skipped because it has panel_visibility of \"never\"";
-    PV_DEBUG_PANELS() << ""; // this adds a newline.
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since group visibility is set to `never`");
     return true;
   }
   return false;
@@ -822,10 +814,8 @@ void pqProxyWidget::createWidgets(const QStringList& properties)
 {
   vtkSMProxy* smproxy = this->proxy();
 
-  PV_DEBUG_PANELS() << "------------------------------------------------------";
-  PV_DEBUG_PANELS() << "Creating Properties Panel for" << smproxy->GetXMLLabel() << "("
-                    << smproxy->GetXMLGroup() << "," << smproxy->GetXMLName() << ")";
-  PV_DEBUG_PANELS() << "------------------------------------------------------";
+  vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "creating widgets for `%s`",
+    smproxy->GetLogNameOrDefault());
 
   QGridLayout* gridLayout = qobject_cast<QGridLayout*>(this->layout());
   Q_ASSERT(gridLayout);
@@ -944,6 +934,8 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
   {
     auto smproperty = apair.first;
     const std::string& smkey = apair.second;
+    vtkVLogScopeF(
+      PARAVIEW_LOG_APPLICATION_VERBOSITY(), "create property widget for  `%s`", smkey.c_str());
     if (smproperty == nullptr ||
       ::skip_property(smproperty, smkey, properties, legacyHiddenProperties))
     {
@@ -957,6 +949,10 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     catch (std::out_of_range&)
     {
     }
+
+    vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), smgroup != nullptr,
+      "part of property-group with label `%s`",
+      (smgroup->GetXMLLabel() ? smgroup->GetXMLLabel() : "(unspecified)"));
     if (smgroup != nullptr && ::skip_group(smgroup, properties))
     {
       if (properties.size() > 0)
@@ -968,7 +964,8 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
         // i.e. just create the widget for this property as if it was not part
         // of the group at all.
         smgroup = nullptr;
-        PV_DEBUG_PANELS() << "Ignoring property group for explicitly selected property: " << smkey;
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+          "treat as a non-group property since explicitly selected in isolation.");
       }
       else
       {
@@ -983,6 +980,8 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       {
         // already created a custom widget for this group, skip
         // the property.
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+          "skip since already handled in custom group widget");
         continue;
       }
 
@@ -997,9 +996,8 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
         {
           if (auto gwidget = iface->createWidgetForPropertyGroup(smproxy, smgroup, this))
           {
-            PV_DEBUG_PANELS() << "Group `"
-                              << (smgroup->GetXMLLabel() ? smgroup->GetXMLLabel() : "(null)")
-                              << "` is controlled by widget " << gwidget->metaObject()->className();
+            vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "created group widget `%s`",
+              gwidget->metaObject()->className());
 
             // handle group decorators for custom widget, if any.
             ::add_decorators(gwidget, smgroup->GetHints());
@@ -1021,7 +1019,6 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
 
             this->Internals->appendToItems(item, this);
             group_widget_status[smgroup] = EnumState::Custom;
-            PV_DEBUG_PANELS() << ""; // this adds a newline.
             break;
           }
         } // for ()
@@ -1049,14 +1046,13 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     const QString xmlDocumentation = pqProxyWidget::documentationText(smproperty);
 
     // create property widget
-    PV_DEBUG_PANELS() << "Property:" << smkey << "(" << xmllabel << ")";
     pqPropertyWidget* pwidget = this->createWidgetForProperty(smproperty, smproxy, this);
     if (!pwidget)
     {
-      PV_DEBUG_PANELS() << "Property:" << smkey << "(" << xmllabel << ")"
-                        << " gets skipped as we could not determine the widget type to create.";
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "skip since failed to determine widget type.");
       continue;
     }
+
     pwidget->setObjectName(QString(smkey.c_str()).remove(' '));
 
     const QString itemLabel = this->UseDocumentationForLabels
@@ -1092,7 +1088,6 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
     }
 
     this->Internals->appendToItems(item, this);
-    PV_DEBUG_PANELS() << ""; // this adds a newline.
   }
 }
 
@@ -1168,17 +1163,19 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
 
   if (widget)
   {
+    vtkVLogF(
+      PARAVIEW_LOG_APPLICATION_VERBOSITY(), "created `%s`", widget->metaObject()->className());
     widget->setProperty(smproperty);
-  }
 
-  // Create decorators, if any.
-  ::add_decorators(widget, smproperty->GetHints());
+    // Create decorators, if any.
+    ::add_decorators(widget, smproperty->GetHints());
 
-  // Create all default decorators
-  for (int cc = 0; cc < interfaces.size(); cc++)
-  {
-    pqPropertyWidgetInterface* interface = interfaces[cc];
-    interface->createDefaultWidgetDecorators(widget);
+    // Create all default decorators
+    for (int cc = 0; cc < interfaces.size(); cc++)
+    {
+      pqPropertyWidgetInterface* interface = interfaces[cc];
+      interface->createDefaultWidgetDecorators(widget);
+    }
   }
 
   return widget;

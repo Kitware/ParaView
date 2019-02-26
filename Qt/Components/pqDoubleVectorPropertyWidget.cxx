@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetRangeDomain.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMBoundsDomain.h"
@@ -141,6 +142,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   vtkSMDoubleRangeDomain* range = vtkSMDoubleRangeDomain::SafeDownCast(domain);
   if (this->property()->GetRepeatable())
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+      "use `pqScalarValueListPropertyWidget` since property is repeatable");
+
     pqScalarValueListPropertyWidget* widget =
       new pqScalarValueListPropertyWidget(smProperty, this->proxy(), this);
     widget->setObjectName("ScalarValueList");
@@ -155,18 +159,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     this->setChangeAvailableAsChangeFinished(true);
     layoutLocal->addWidget(widget);
     this->setShowLabel(showLabels != nullptr);
-
-    if (range)
-    {
-      PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for a repeatable "
-                        << "DoubleVectorProperty with a BoundsDomain ("
-                        << pqPropertyWidget::getXMLName(range) << ") ";
-    }
-    else
-    {
-      PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for a repeatable "
-                        << "DoubleVectorProperty without a BoundsDomain";
-    }
   }
   else if (range)
   {
@@ -176,6 +168,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
             dvp->FindDomain("vtkSMBoundsDomain") != nullptr)))
     {
       // bounded ranges are represented with a slider and a spin box
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        "use `pqDoubleRangeWidget` since property has range with min and max");
+
       pqDoubleRangeWidget* widget = new pqDoubleRangeWidget(this);
       widget->setObjectName("DoubleRangeWidget");
       widget->setUseGlobalPrecisionAndNotation(true);
@@ -193,17 +188,13 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
       this->connect(widget, SIGNAL(valueEdited(double)), this, SIGNAL(changeFinished()));
 
       layoutLocal->addWidget(widget, 1);
-
-      PV_DEBUG_PANELS() << "pqDoubleRangeWidget for a DoubleVectorProperty "
-                        << "with a single element and a "
-                        << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                        << "with a minimum and a maximum";
     }
     else
     {
       // unbounded ranges are represented with a line edit
       if (elementCount == 6)
       {
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use 6 `pqDoubleLineEdit` in a 3X2 grid.");
         QGridLayout* gridLayout = new QGridLayout;
         gridLayout->setHorizontalSpacing(0);
         gridLayout->setVerticalSpacing(2);
@@ -251,14 +242,11 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
         }
 
         layoutLocal->addLayout(gridLayout);
-
-        PV_DEBUG_PANELS() << "3x2 grid of QLineEdit's for an DoubleVectorProperty "
-                          << "with an "
-                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                          << "and 6 elements";
       }
       else
       {
+        vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use %d `pqDoubleLineEdit` instance(s).",
+          dvp->GetNumberOfElements());
         for (unsigned int i = 0; i < dvp->GetNumberOfElements(); i++)
         {
           if (showLabels)
@@ -277,11 +265,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           this->connect(lineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
             SIGNAL(changeFinished()));
         }
-
-        PV_DEBUG_PANELS() << "List of QLineEdit's for an DoubleVectorProperty "
-                          << "with an "
-                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                          << "and more than one element";
       }
     }
   }
@@ -289,6 +272,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   {
     if (discrete->GetValuesExists())
     {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+        "use discrete slider widget `pqDiscreteDoubleWidget`");
+
       pqDiscreteDoubleWidget* widget = new pqDiscreteDoubleWidget(this);
       widget->setObjectName("DiscreteDoubleWidget");
       widget->setUseGlobalPrecisionAndNotation(true);
@@ -298,11 +284,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
       this->connect(widget, SIGNAL(valueEdited(double)), this, SIGNAL(changeFinished()));
 
       layoutLocal->addWidget(widget);
-
-      PV_DEBUG_PANELS() << "pqDiscreteDoubleWidget for an DoubleVectorProperty "
-                        << "with a single element and a DiscreteDoubleDomain"
-                        << " (" << pqPropertyWidget::getXMLName(discrete) << ") "
-                        << "with a set of values";
     }
     else
     {
@@ -313,13 +294,13 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   if (dvp->FindDomain("vtkSMArrayRangeDomain") != nullptr ||
     dvp->FindDomain("vtkSMBoundsDomain") != nullptr)
   {
-    PV_DEBUG_PANELS() << "Adding \"Scale\" button since the domain is dynamically";
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "add `Scale By` button");
     pqScaleByButton* scaleButton = new pqScaleByButton(this);
     scaleButton->setObjectName("ScaleBy");
     this->connect(scaleButton, SIGNAL(scale(double)), SLOT(scale(double)));
     layoutLocal->addWidget(scaleButton, 0, Qt::AlignBottom);
 
-    PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically";
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "add `Reset-to-domain` button");
 
     // if this has an vtkSMArrayRangeDomain, add a "reset" button.
     pqHighlightableToolButton* resetButton = new pqHighlightableToolButton(this);

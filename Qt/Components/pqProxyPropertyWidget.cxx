@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxySelectionWidget.h"
 #include "pqSelectionInputWidget.h"
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyListDomain.h"
@@ -52,6 +53,7 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(
     (smProperty->GetHints() && smProperty->GetHints()->FindNestedElementByName("SelectionInput"));
   if (selection_input)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqSelectionInputWidget`.");
     pqSelectionInputWidget* siw = new pqSelectionInputWidget(this);
     siw->setObjectName(smProxy->GetPropertyName(smProperty));
     vbox->addWidget(siw);
@@ -67,15 +69,11 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(
 
     // don't show label for the proxy selection widget
     this->setShowLabel(false);
-
-    PV_DEBUG_PANELS() << "pqSelectionInputWidget for a ProxyProperty with a "
-                      << "SelectionInput hint";
   }
-  else if (vtkSMProxyListDomain* pld =
-             vtkSMProxyListDomain::SafeDownCast(smProperty->FindDomain("vtkSMProxyListDomain")))
+  else if (vtkSMProxyListDomain::SafeDownCast(smProperty->FindDomain("vtkSMProxyListDomain")))
   {
-    PV_DEBUG_PANELS() << "pqProxySelectionWidget for a "
-                      << "ProxyListDomain (" << pld->GetXMLName() << ")";
+    vtkVLogF(
+      PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqProxySelectionWidget` for proxy-list domain.");
     pqProxySelectionWidget* widget = new pqProxySelectionWidget(smProperty, smProxy, this);
     widget->setView(this->view());
     this->connect(widget, SIGNAL(changeAvailable()), SIGNAL(changeAvailable()));
