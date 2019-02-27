@@ -22,7 +22,7 @@ vtk_module_build(
   VERSION             "${PARAVIEW_VERSION}"
   SOVERSION           "1")
 
-paraview_add_plugin(AnalyzeNIfTIIO
+paraview_add_plugin(AnalyzeNIfTIReaderWriter
   REQUIRED_ON_SERVER
   VERSION "1.0"
   MODULES AnalyzeNIfTIIO::NIfTIIO)

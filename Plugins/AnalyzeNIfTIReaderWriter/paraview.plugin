@@ -1,5 +1,5 @@
 NAME
-  AnalyzeNIfTIIO
+  AnalyzeNIfTIReaderWriter
 DESCRIPTION
   Reader/Writer for Analyze and NifTI files
 REQUIRES_MODULES
