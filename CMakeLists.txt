@@ -378,6 +378,7 @@ if (PARAVIEW_USE_MPI)
     VTK::IOParallelLSDyna
     VTK::IOParallelNetCDF
     VTK::ParallelMPI
+    ParaView::VTKExtensionsDefaultParallel
     ParaView::icet)
 else ()
   list(APPEND paraview_rejected_modules

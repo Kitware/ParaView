@@ -9,7 +9,8 @@ if (USE_CATALYST)
     PRIVATE
       ParaView::Catalyst
       ParaView::ClientServerCoreCore
-      ParaView::VTKExtensionsDefault)
+      ParaView::VTKExtensionsDefault
+      ParaView::ServerManagerCore)
 endif ()
 
 add_executable(CxxVTKPipelineExample

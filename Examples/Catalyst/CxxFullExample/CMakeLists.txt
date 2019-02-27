@@ -4,7 +4,8 @@ if (USE_CATALYST)
     FEAdaptor.h)
   target_link_libraries(CxxFullExampleAdaptor
     PRIVATE
-      ParaView::PythonCatalyst)
+      ParaView::PythonCatalyst
+      VTK::CommonDataModel)
 endif ()
 
 add_executable(CxxFullExample

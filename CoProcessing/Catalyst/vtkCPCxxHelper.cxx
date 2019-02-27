@@ -80,8 +80,9 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
 #endif
 
     int argc = 1;
-    char** argv = new char*[1];
+    char** argv = new char*[2];
     argv[0] = vtksys::SystemTools::DuplicateString(programname.c_str());
+    argv[1] = nullptr;
 
     vtkCPCxxHelper::Instance->Options = vtkPVOptions::New();
     vtkCPCxxHelper::Instance->Options->SetSymmetricMPIMode(1);

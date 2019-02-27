@@ -8,7 +8,8 @@ if (USE_CATALYST)
   target_link_libraries(CxxPVSMPipelineExampleAdaptor
     PRIVATE
       ParaView::Catalyst
-      ParaView::VTKExtensionsDefault)
+      ParaView::VTKExtensionsDefault
+      ParaView::ServerManagerCore)
 endif ()
 
 add_executable(CxxPVSMPipelineExample

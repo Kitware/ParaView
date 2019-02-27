@@ -13,6 +13,7 @@ add_executable(MPISubCommunicatorExample
 target_link_libraries(MPISubCommunicatorExample
   PRIVATE
     ParaView::PythonCatalyst
+    VTK::CommonDataModel
     VTK::ParallelMPI)
 
 if (BUILD_TESTING)
