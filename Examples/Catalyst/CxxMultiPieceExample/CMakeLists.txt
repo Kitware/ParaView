@@ -5,7 +5,9 @@ if (USE_CATALYST)
   target_link_libraries(CxxMultiPieceExampleAdaptor
     PRIVATE
       ParaView::PythonCatalyst
-      VTK::mpi)
+      VTK::CommonDataModel
+      VTK::mpi
+      VTK::ParallelCore)
 endif ()
 
 add_executable(CxxMultiPieceExample

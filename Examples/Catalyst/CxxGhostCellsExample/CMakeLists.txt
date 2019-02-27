@@ -11,8 +11,10 @@ add_executable(CxxGhostCellsExample
 target_link_libraries(CxxGhostCellsExample
   PRIVATE
     ParaView::PythonCatalyst
-    VTK::ParallelMPI
-    VTK::mpi)
+    VTK::CommonDataModel
+    VTK::CommonExecutionModel
+    VTK::mpi
+    VTK::ParallelMPI)
 
 if (BUILD_TESTING)
   add_test(NAME CxxGhostCellsExampleTest COMMAND CxxGhostCellsExample -s ${CMAKE_CURRENT_SOURCE_DIR}/../SampleScripts/gridwriter.py)

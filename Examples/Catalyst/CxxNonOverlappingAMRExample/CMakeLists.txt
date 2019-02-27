@@ -9,7 +9,8 @@ add_library(CxxNonOverlappingAMRExampleAdaptor
   FEAdaptor.h)
 target_link_libraries(CxxNonOverlappingAMRExampleAdaptor
   PRIVATE
-    ParaView::PythonCatalyst)
+    ParaView::PythonCatalyst
+    VTK::CommonDataModel)
 
 add_executable(CxxNonOverlappingAMRExample
   FEDriver.cxx)
