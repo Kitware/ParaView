@@ -9,7 +9,7 @@ if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/minimal.nii}")
 
   paraview_add_client_tests(
-    LOAD_PLUGIN   "AnalyzeNIfTIIO"
+    LOAD_PLUGIN   "AnalyzeNIfTIReaderWriter"
     BASELINE_DIR  ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_DATA_TARGET ParaViewData
     TEST_SCRIPTS  ${module_tests})
