@@ -50,5 +50,5 @@ set(QT_TESTING_INSTALL_EXPORT_NAME "ParaView")
 set(BUILD_TESTING OFF)
 
 vtk_module_third_party_internal(
-  #LICENSE_FILES "vtkqttesting/License_v1.2.txt"
+  LICENSE_FILES "${PROJECT_SOURCE_DIR}/License_v1.2.txt"
   VERSION       "master")
