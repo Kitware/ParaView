@@ -29,7 +29,6 @@
 #include "vtkClientServerID.h" // Needed for vtkClientServerID.
 
 class vtkClientServerInterpreter;
-class vtkClientServerInterpreterCommand;
 class vtkClientServerInterpreterInternals;
 class vtkClientServerStream;
 
@@ -221,8 +220,6 @@ private:
 
   // Internal implementation details.
   vtkClientServerInterpreterInternals* Internal;
-
-  friend class vtkClientServerInterpreterCommand;
 
 private:
   vtkClientServerInterpreter(const vtkClientServerInterpreter&) = delete;
