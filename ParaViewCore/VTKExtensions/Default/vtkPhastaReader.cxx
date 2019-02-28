@@ -169,10 +169,36 @@ size_t vtkPhastaReader::typeSize(const char typestring[])
   }
   else
   {
-    fprintf(stderr, "unknown type : %s\n", ts1);
+    vtkGenericWarningMacro(<< "unknown type : " << ts1 << endl);
     delete[] ts1;
     return 0;
   }
+}
+
+namespace
+{
+void xfgets(char* str, int num, FILE* stream)
+{
+  if (fgets(str, num, stream) == NULL)
+  {
+    vtkGenericWarningMacro(<< "Could not read or end of file" << endl);
+  }
+}
+
+void xfread(void* ptr, size_t size, size_t count, FILE* stream)
+{
+  if (fread(ptr, size, count, stream) != count)
+  {
+    vtkGenericWarningMacro(<< "Could not read or end of file" << endl);
+  }
+}
+
+template <typename... Args>
+void xfscanf(FILE* stream, const char* format, Args... args)
+{
+  int ret = fscanf(stream, format, args...);
+  (void)ret;
+}
 }
 
 int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* params, int expect)
@@ -191,7 +217,8 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
     rewind(fileObject);
     clearerr(fileObject);
     rewind_count++;
-    fgets(Line, 1024, fileObject);
+
+    xfgets(Line, 1024, fileObject);
   }
 
   while (!FOUND && (rewind_count < 2))
@@ -214,15 +241,15 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
         }
         if (i < expect)
         {
-          fprintf(stderr, "Expected # of ints not found for: %s\n", phrase);
+          vtkGenericWarningMacro(<< "Expected # of ints not found for: " << phrase << endl);
         }
       }
       else if (cscompare(token, "byteorder magic number"))
       {
         if (binary_format)
         {
-          fread((void*)&integer_value, sizeof(int), 1, fileObject);
-          fread(&junk, sizeof(char), 1, fileObject);
+          xfread((void*)&integer_value, sizeof(int), 1, fileObject);
+          xfread(&junk, sizeof(char), 1, fileObject);
           if (362436 != integer_value)
           {
             Wrong_Endian = 1;
@@ -230,7 +257,7 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
         }
         else
         {
-          fscanf(fileObject, "%d\n", &integer_value);
+          xfscanf(fileObject, "%d\n", &integer_value);
         }
       }
       else
@@ -246,7 +273,7 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
         {
           for (int gama = 0; gama < skip_size; gama++)
           {
-            fgets(Line, 1024, fileObject);
+            xfgets(Line, 1024, fileObject);
           }
         }
       }
@@ -260,14 +287,14 @@ int vtkPhastaReader::readHeader(FILE* fileObject, const char phrase[], int* para
         rewind(fileObject);
         clearerr(fileObject);
         rewind_count++;
-        fgets(Line, 1024, fileObject);
+        xfgets(Line, 1024, fileObject);
       }
     }
   }
 
   if (!FOUND)
   {
-    fprintf(stderr, "Error: Could not find: %s\n", phrase);
+    vtkGenericWarningMacro(<< "Could not find: " << phrase << endl);
     return 1;
   }
   return 0;
@@ -316,7 +343,7 @@ void vtkPhastaReader::openfile(const char filename[], const char mode[], int* fi
 
   if (!file)
   {
-    fprintf(stderr, "unable to open file : %s\n", fname);
+    vtkGenericWarningMacro(<< "unable to open file : " << fname << endl);
   }
   else
   {
@@ -350,10 +377,10 @@ void vtkPhastaReader::readheader(int* fileDescriptor, const char keyphrase[], vo
 
   if (*fileDescriptor < 1 || *fileDescriptor > (int)fileArray.size())
   {
-    fprintf(stderr, "No file associated with Descriptor %d\n", *fileDescriptor);
-    fprintf(stderr, "openfile function has to be called before \n");
-    fprintf(stderr, "accessing the file\n ");
-    fprintf(stderr, "fatal error: cannot continue, returning out of call\n");
+    vtkGenericWarningMacro(<< "No file associated with Descriptor " << *fileDescriptor << "\n"
+                           << "openfile function has to be called before \n"
+                           << "accessing the file\n "
+                           << "fatal error: cannot continue, returning out of call\n");
     return;
   }
 
@@ -391,10 +418,10 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
 
   if (*fileDescriptor < 1 || *fileDescriptor > (int)fileArray.size())
   {
-    fprintf(stderr, "No file associated with Descriptor %d\n", *fileDescriptor);
-    fprintf(stderr, "openfile function has to be called before \n");
-    fprintf(stderr, "accessing the file\n ");
-    fprintf(stderr, "fatal error: cannot continue, returning out of call\n");
+    vtkGenericWarningMacro(<< "No file associated with Descriptor " << *fileDescriptor << "\n"
+                           << "openfile function has to be called before \n"
+                           << "accessing the file\n "
+                           << "fatal error: cannot continue, returning out of call\n");
     return;
   }
 
@@ -404,13 +431,12 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
 
   if (!cscompare(LastHeaderKey[filePtr], keyphrase))
   {
-    fprintf(stderr, "Header not consistent with data block\n");
-    fprintf(stderr, "Header: %s\n", LastHeaderKey[filePtr]);
-    fprintf(stderr, "DataBlock: %s\n ", keyphrase);
-    fprintf(stderr, "Please recheck read sequence \n");
-    if (Strict_Error)
+    vtkGenericWarningMacro(<< "Header not consistent with data block\n"
+                           << "Header: " << LastHeaderKey[filePtr] << "\n"
+                           << "DataBlock: " << keyphrase << "\n"
+                           << "Please recheck read sequence \n") if (Strict_Error)
     {
-      fprintf(stderr, "fatal error: cannot continue, returning out of call\n");
+      vtkGenericWarningMacro(<< "fatal error: cannot continue, returning out of call\n");
       return;
     }
   }
@@ -429,8 +455,8 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
 
   if (binary_format)
   {
-    fread(valueArray, type_size, nUnits, fileObject);
-    fread(&junk, sizeof(char), 1, fileObject);
+    xfread(valueArray, type_size, nUnits, fileObject);
+    xfread(&junk, sizeof(char), 1, fileObject);
     if (Wrong_Endian)
     {
       SwapArrayByteOrder(valueArray, static_cast<int>(type_size), nUnits);
@@ -443,14 +469,14 @@ void vtkPhastaReader::readdatablock(int* fileDescriptor, const char keyphrase[],
     {
       for (int n = 0; n < nUnits; n++)
       {
-        fscanf(fileObject, "%d\n", (int*)((int*)valueArray + n));
+        xfscanf(fileObject, "%d\n", (int*)((int*)valueArray + n));
       }
     }
     else if (cscompare("double", ts1))
     {
       for (int n = 0; n < nUnits; n++)
       {
-        fscanf(fileObject, "%lf\n", (double*)((double*)valueArray + n));
+        xfscanf(fileObject, "%lf\n", (double*)((double*)valueArray + n));
       }
     }
     delete[] ts1;
