@@ -921,10 +921,10 @@ _open_field_group (
  if ( ! _have_object ( b->blockgroup, name ) )
   return HANDLE_H5PART_NOENT_ERR ( name );
 
- herr_t herr = H5Gopen ( b->blockgroup, name );
- if ( herr < 0 ) return HANDLE_H5G_OPEN_ERR ( name );
+ hid_t hid = H5Gopen ( b->blockgroup, name );
+ if ( hid < 0 ) return HANDLE_H5G_OPEN_ERR ( name );
 
- b->field_group_id = herr;
+ b->field_group_id = hid;
 
  return H5PART_SUCCESS;
 }
@@ -1281,6 +1281,7 @@ _create_block_group (
 
  herr_t herr;
  struct H5BlockStruct *b = f->block;
+ hid_t hid;
 
  if ( b->blockgroup > 0 ) {
   herr = H5Gclose ( b->blockgroup );
@@ -1288,10 +1289,10 @@ _create_block_group (
   f->block->blockgroup = -1;
  }
 
- herr = H5Gcreate ( f->timegroup, H5BLOCK_GROUPNAME_BLOCK, 0 );
- if ( herr < 0 ) return HANDLE_H5G_CREATE_ERR ( H5BLOCK_GROUPNAME_BLOCK );
+ hid = H5Gcreate ( f->timegroup, H5BLOCK_GROUPNAME_BLOCK, 0 );
+ if ( hid < 0 ) return HANDLE_H5G_CREATE_ERR ( H5BLOCK_GROUPNAME_BLOCK );
 
- f->block->blockgroup = herr;
+ f->block->blockgroup = hid;
  return H5PART_SUCCESS;
 }
 
@@ -1310,7 +1311,7 @@ _create_field_group (
 
  h5part_int64_t h5err;
  struct H5BlockStruct *b = f->block;
-
+ hid_t hid;
 
  if ( ! _have_object ( f->timegroup, H5BLOCK_GROUPNAME_BLOCK ) ) {
   h5err = _create_block_group ( f );
@@ -1325,9 +1326,9 @@ _create_field_group (
  if ( _have_object ( b->blockgroup, name ) )
   return  HANDLE_H5PART_GROUP_EXISTS_ERR ( name );
 
- herr_t herr = H5Gcreate ( b->blockgroup, name, 0 );
- if ( herr < 0 ) return HANDLE_H5G_CREATE_ERR ( name );
- b->field_group_id = herr;
+ hid = H5Gcreate ( b->blockgroup, name, 0 );
+ if ( hid < 0 ) return HANDLE_H5G_CREATE_ERR ( name );
+ b->field_group_id = hid;
 
  return H5PART_SUCCESS;
 } 

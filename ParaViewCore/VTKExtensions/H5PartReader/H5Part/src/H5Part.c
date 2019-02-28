@@ -216,6 +216,9 @@ _H5Part_open_file (
   f->comm = comm;
 
   MPI_Info_free(&info);
+#else
+  (void)comm;
+  (void)f_collective;
 #endif
  } else {
   f->comm = 0;
@@ -792,7 +795,7 @@ _H5Part_normalize_h5_type (
  hid_t type
  ) {
  H5T_class_t tclass = H5Tget_class ( type );
- int size = H5Tget_size ( type );
+ size_t size = H5Tget_size ( type );
 
  switch ( tclass ){
  case H5T_INTEGER:
@@ -905,6 +908,7 @@ _H5Part_get_attrib_info (
 
  herr_t herr;
  hid_t attrib_id;
+ hid_t hid;
  hid_t mytype;
  hid_t space_id;
 
@@ -923,11 +927,11 @@ _H5Part_get_attrib_info (
   if ( herr < 0 ) return HANDLE_H5S_CLOSE_ERR;
  }
  if ( attrib_name ) {
-  herr = H5Aget_name (
+  hid = H5Aget_name (
    attrib_id,
    (size_t)len_attrib_name,
    attrib_name );
-  if ( herr < 0 ) return HANDLE_H5A_GET_NAME_ERR;
+  if ( hid < 0 ) return HANDLE_H5A_GET_NAME_ERR;
  }
  if ( attrib_type ) {
   mytype = H5Aget_type ( attrib_id );
@@ -1502,7 +1506,7 @@ _H5Part_get_num_objects_matching_pattern (
  struct _iter_op_data data;
 
  memset ( &data, 0, sizeof ( data ) );
- data.type = type;
+ data.type = (int)type;
  data.pattern = pattern;
 
  herr = H5Giterate ( group_id, group_name, &idx,
@@ -1532,8 +1536,8 @@ _H5Part_get_object_name (
  int iterator_idx = 0;
 
  memset ( &data, 0, sizeof ( data ) );
- data.stop_idx = (hid_t)idx;
- data.type = type;
+ data.stop_idx = (int)idx;
+ data.type = (int)type;
  data.name = obj_name;
  data.len = (size_t)len_obj_name;
 
@@ -1791,6 +1795,7 @@ _get_memshape_for_reading (
  hid_t dataset
  ) {
 
+ (void)dataset;
  if(H5PartHasView(f)) {
   hsize_t dmax=H5S_UNLIMITED;
   hsize_t len = f->viewend - f->viewstart;
@@ -2440,6 +2445,7 @@ H5PartReportErrorHandler (
  ...
  ) {
 
+ (void)funcname;
  _h5part_errno = eno;
  if ( _debug > 0 ) {
   va_list ap;
@@ -2495,6 +2501,7 @@ _init ( void ) {
 static herr_t
 _h5_error_handler ( void* unused ) {
  
+ (void)unused;
  if ( _debug >= 5 ) {
   H5Eprint (stderr);
  }
@@ -2508,6 +2515,7 @@ _vprint (
  const char *fmt,
  va_list ap
  ) {
+ (void)f;
  char *fmt2 = (char*)malloc( strlen ( prefix ) +strlen ( fmt ) + strlen ( __funcname ) + 16 );
  if ( fmt2 == NULL ) return;
  sprintf ( fmt2, "%s: %s: %s\n", prefix, __funcname, fmt ); 
