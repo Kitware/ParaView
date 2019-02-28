@@ -712,6 +712,8 @@ int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj, vtkClientServerI
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
 class vtkClientServerInterpreterCommand : public vtkCommand
 {
 public:
@@ -731,6 +733,7 @@ private:
   vtkClientServerInterpreterCommand(const vtkClientServerInterpreterCommand&);
   void operator=(const vtkClientServerInterpreterCommand&);
 };
+}
 
 int vtkClientServerInterpreter::NewObserver(
   vtkObject* obj, const char* event, const vtkClientServerStream& css)
