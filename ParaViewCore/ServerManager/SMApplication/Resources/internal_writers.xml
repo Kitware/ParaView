@@ -521,6 +521,23 @@
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
                   base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPartitionedDataSetWriter"
+                  name="XMLPartitionedDataSetWriterCore">
+      <Documentation>Internal proxy used by XMLPartitionedDataSetWriter.</Documentation>
+      <!-- End of XMLPartitionedDataSetWriterCore -->
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
+                  class="vtkXMLPartitionedDataSetCollectionWriter"
+                  name="XMLPartitionedDataSetCollectionWriterCore">
+      <Documentation>Internal proxy used by
+      XMLPartitionedDataSetCollectionWriter.</Documentation>
+      <!-- End of XMLPartitionedDataSetCollectionWriterCore -->
+    </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                  base_proxyname="XMLDataObjectWriterCore"
                   class="vtkXMLPUniformGridAMRWriter"
                   name="XMLPUniformGridAMRWriter">
       <Documentation>

@@ -1089,9 +1089,11 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
 const char* vtkPVDataInformation::GetPrettyDataTypeString()
 {
   int dataType = this->DataSetType;
+  const char* className = this->DataClassName;
   if (this->CompositeDataSetType >= 0)
   {
     dataType = this->CompositeDataSetType;
+    className = this->CompositeDataClassName;
   }
 
   switch (dataType)
@@ -1158,6 +1160,10 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Directed Acyclic Graph";
     case VTK_MOLECULE:
       return "Molecule";
+    case VTK_PARTITIONED_DATA_SET:
+      return "Partitioned Dataset";
+    case VTK_PARTITIONED_DATA_SET_COLLECTION:
+      return "Partitioned Dataset Collection";
     default:
       vtkPVDataInformationHelper* dhelper = vtkPVDataInformation::FindHelper(this->DataClassName);
       if (dhelper)
@@ -1168,7 +1174,7 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       }
   }
 
-  return "UnknownType";
+  return (className && className[0]) ? className : "UnknownType";
 }
 
 //----------------------------------------------------------------------------

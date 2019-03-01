@@ -308,7 +308,7 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
   {
     proxyname = "HierarchicalDataIDSelectionSource";
   }
-  else if (cdclassname && strcmp(cdclassname, "vtkMultiBlockDataSet") == 0)
+  else if (cdclassname)
   {
     proxyname = "CompositeDataIDSelectionSource";
   }

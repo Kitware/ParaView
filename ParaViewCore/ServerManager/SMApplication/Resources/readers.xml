@@ -1515,6 +1515,144 @@
       </IntVectorProperty>
       <!-- End MultiBlockDataReader -->
     </Proxy>
+    <Proxy class="vtkXMLPartitionedDataSetReader"
+           label="XML Partitioned Dataset Reader"
+           name="XMLPartitionedDataSetReaderCore">
+      <Documentation>Internal proxy.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the VTK
+        multiblock reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetPieceDistribution"
+                         default_values="0"
+                         name="PieceDistribution"
+                         number_of_elements="1">
+        <Documentation>Control how datasets are loaded in parallel.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Block"
+                 value="0" />
+          <Entry text="Interleave"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- End XMLPartitionedDataSetReader -->
+    </Proxy>
+    <Proxy class="vtkXMLPartitionedDataSetCollectionReader"
+           label="XML Partitioned Dataset Collection Reader"
+           name="XMLPartitionedDataSetCollectionReaderCore">
+      <Documentation>Internal proxy.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the VTK
+        multiblock reader.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="CellArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetCellArrayStatus"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays"
+                            name="CellArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which cell-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays"
+                            name="PointArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>This property lists which point-centered arrays to
+        read.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetPieceDistribution"
+                         default_values="0"
+                         name="PieceDistribution"
+                         number_of_elements="1">
+        <Documentation>Control how datasets are loaded in parallel.</Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Block"
+                 value="0" />
+          <Entry text="Interleave"
+                 value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <!-- End XMLPartitionedDataSetCollectionReader -->
+    </Proxy>
     <Proxy class="vtkXMLHierarchicalBoxDataReader"
                  label="XML Hierarchical Box Data reader"
                  name="XMLHierarchicalBoxDataReaderCore">
@@ -3660,6 +3798,124 @@
                        file_description="VTK MultiBlock Data Files" />
       </Hints>
       <!-- end of XMLMultiBlockDataReader -->
+    </SourceProxy>
+
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML Partitioned Dataset Reader"
+                 name="XMLPartitionedDataSetReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a VTK XML partitioned dataset file and the serial VTK XML data files to which it points."
+                     short_help="Read VTK XML partitioned datasets.">The XML
+                     Partitioned Dataset reader reads the VTK XML Partitioned Dataset
+                     file format. XML partitioned dataset files are meta-files
+                     that point to a list of serial VTK XML files. When reading
+                     in parallel, this reader will distribute sub-blocks among
+                     processors. The expected file extensions are .vtpd.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLPartitionedDataSetReaderCore"></Proxy>
+          <ExposedProperties>
+            <PropertyGroup label="Cell/Point Array Status"
+                           name="CellPointArrayStatus"
+                           panel_visibility="default"
+                           panel_widget="ArrayStatus">
+              <Property name="CellArrayInfo" />
+              <Property name="CellArrayStatus" />
+              <Property name="PointArrayInfo" />
+              <Property name="PointArrayStatus" />
+            </PropertyGroup>
+            <Property name="PieceDistribution" />
+          </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="vtpd vtpd.series"
+                       file_description="VTK Partitioned Dataset Files" />
+      </Hints>
+      <!-- end of XMLPartitionedDataSetReader -->
+    </SourceProxy>
+
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML Partitioned Dataset Collection Reader"
+                 name="XMLPartitionedDataSetCollectionReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads a VTK XML partitioned dataset collection file and the serial VTK XML data files to which it points."
+                     short_help="Read VTK XML partitioned datasets.">The XML
+                     Partitioned Dataset Collection reader reads the VTK XML Partitioned Dataset Collection
+                     file format. XML partitioned dataset collection files are meta-files
+                     that point to a list of serial VTK XML files. When reading
+                     in parallel, this reader will distribute sub-blocks among
+                     processors. The expected file extensions are .vtpc.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLPartitionedDataSetCollectionReaderCore"></Proxy>
+          <ExposedProperties>
+            <PropertyGroup label="Cell/Point Array Status"
+                           name="CellPointArrayStatus"
+                           panel_visibility="default"
+                           panel_widget="ArrayStatus">
+              <Property name="CellArrayInfo" />
+              <Property name="CellArrayStatus" />
+              <Property name="PointArrayInfo" />
+              <Property name="PointArrayStatus" />
+            </PropertyGroup>
+            <Property name="PieceDistribution" />
+          </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="vtpc vtpc.series"
+                       file_description="VTK Partitioned Dataset Collection Files" />
+      </Hints>
+      <!-- end of XMLPartitionedDataSetCollectionReader -->
     </SourceProxy>
 
     <SourceProxy class="vtkFileSeriesReader"
