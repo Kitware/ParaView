@@ -64,7 +64,7 @@ validate () {
     readonly actual
 
     if ! [ "$actual" = "$expected" ]; then
-        die "Object $expected is corrupt: $file"
+        die "Object $expected is corrupt (got $actual): $file"
     fi
 }
 
