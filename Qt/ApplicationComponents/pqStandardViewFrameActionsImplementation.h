@@ -143,6 +143,11 @@ protected slots:
   */
   void interactiveSelectionToggled(bool checked);
 
+  /**
+  * This slot is called when a capture view action is triggered.
+  */
+  void captureViewTriggered();
+
 protected:
   /**
   * called to setup empty frame.

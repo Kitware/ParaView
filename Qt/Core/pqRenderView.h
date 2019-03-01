@@ -148,6 +148,13 @@ public:
   bool canRedo() const override;
 
   /**
+  * Returns if this view module can support
+  * image capture. Returns false by default. Subclassess must override
+  * if that's not the case.
+  */
+  bool supportsCapture() const override { return true; }
+
+  /**
   * For linking of interaction undo stacks.
   * This method is used by pqLinksModel to link
   * interaction undo stack for linked render views.
