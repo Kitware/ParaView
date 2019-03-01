@@ -22,6 +22,7 @@
 #include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositePolyDataMapper2.h"
+#include "vtkHyperTreeGrid.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -277,6 +278,7 @@ int vtkGeometryRepresentation::FillInputPortInformation(int vtkNotUsed(port), vt
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHyperTreeGrid");
 
   // Saying INPUT_IS_OPTIONAL() is essential, since representations don't have
   // any inputs on client-side (in client-server, client-render-server mode) and
@@ -495,6 +497,11 @@ bool vtkGeometryRepresentation::GetBounds(
   else if (vtkDataSet* ds = vtkDataSet::SafeDownCast(dataObject))
   {
     ds->GetBounds(bounds);
+    return (vtkMath::AreBoundsInitialized(bounds) == 1);
+  }
+  else if (vtkHyperTreeGrid* htg = vtkHyperTreeGrid::SafeDownCast(dataObject))
+  {
+    htg->GetBounds(bounds);
     return (vtkMath::AreBoundsInitialized(bounds) == 1);
   }
   return false;
