@@ -134,7 +134,7 @@ void pqSaveScreenshotReaction::saveScreenshot(bool clipboardMode)
 
   if (clipboardMode)
   {
-    pqSaveScreenshotReaction::copyScreenshotToclipboard(view->getSize(), false);
+    pqSaveScreenshotReaction::copyScreenshotToClipboard(view->getSize(), false);
     return;
   }
 
