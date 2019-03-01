@@ -3015,7 +3015,7 @@ vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetViewTime(double value)
 {
-#if VTK_MODULE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetViewTime(value, ren);
 #endif
@@ -3252,7 +3252,7 @@ void vtkPVRenderView::SetBackgroundEast(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetTimeCacheSize(int v)
 {
-#if VTK_MODULE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetTimeCacheSize(v, ren);
 #else
@@ -3263,7 +3263,7 @@ void vtkPVRenderView::SetTimeCacheSize(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetTimeCacheSize()
 {
-#if VTK_MODULE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetTimeCacheSize(ren);
 #else
