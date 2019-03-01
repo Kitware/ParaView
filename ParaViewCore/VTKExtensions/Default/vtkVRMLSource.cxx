@@ -64,7 +64,10 @@ int vtkVRMLSource::CanReadFile(const char* filename)
     return 0;
 
   char header[128];
-  fgets(header, 128, fd);
+  if (fgets(header, 128, fd) == NULL)
+  {
+    return 0;
+  }
 
   // Technically, the header should start with "#VRML V2.0 utf8", but who's
   // to say that new versions will not be forward compatible.  Let's not be
