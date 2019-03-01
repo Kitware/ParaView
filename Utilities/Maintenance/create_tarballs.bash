@@ -207,7 +207,7 @@ read_all_submodules () {
 }
 
 read_submodules_into_index () {
-    local object_dirs=""
+    local object_dirs="$( git rev-parse --git-dir )/objects"
     local new_object_dirs
 
     while git ls-files -s | grep -q -e '^160000'; do
