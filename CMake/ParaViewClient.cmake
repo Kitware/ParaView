@@ -546,10 +546,11 @@ if (_paraview_generate_proxy_documentation_run AND CMAKE_SCRIPT_MODE_FILE)
               "${_paraview_gpd_to_xml}"
               "${_paraview_gpd_xml}"
       OUTPUT_VARIABLE _paraview_gpd_output
+      ERROR_VARIABLE  _paraview_gpd_error
       RESULT_VARIABLE _paraview_gpd_result)
     if (_paraview_gpd_result)
       message(FATAL_ERROR
-        "Failed to convert servermanager XML")
+        "Failed to convert servermanager XML: ${_paraview_gpd_error}")
     endif ()
 
     string(APPEND _paraview_gpd_xslt
