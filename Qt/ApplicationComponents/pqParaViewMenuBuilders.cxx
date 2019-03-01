@@ -182,6 +182,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu, pqPropertiesPanel* prope
   new pqDeleteReaction(ui.actionDelete_All, true);
   new pqShowHideAllReaction(ui.actionShow_All, pqShowHideAllReaction::ActionType::Show);
   new pqShowHideAllReaction(ui.actionHide_All, pqShowHideAllReaction::ActionType::Hide);
+  new pqSaveScreenshotReaction(ui.actionCopyScreenshotToClipboard, true);
   new pqCopyReaction(ui.actionCopy);
   new pqCopyReaction(ui.actionPaste, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);

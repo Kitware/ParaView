@@ -99,6 +99,13 @@ public:
   virtual bool supportsUndo() const { return false; }
 
   /**
+  * Returns if this view module can support
+  * image capture. Returns false by default. Subclassess must override
+  * if that's not the case.
+  */
+  virtual bool supportsCapture() const { return false; }
+
+  /**
   * Returns the type of this view module.
   */
   QString getViewType() const { return this->ViewType; }

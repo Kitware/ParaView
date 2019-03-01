@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenameProxyReaction.h"
 #include "pqRenderView.h"
 #include "pqRenderViewSelectionReaction.h"
+#include "pqSaveScreenshotReaction.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewDecorator.h"
@@ -64,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTooltipSelectionPipeline.h"
 #include "vtkSmartPointer.h"
 
+#include <QGuiApplication>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QPushButton>
@@ -291,6 +293,21 @@ void pqStandardViewFrameActionsImplementation::addGenericActions(pqViewFrame* fr
         frame->addTitleBarAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"), "Camera Redo");
       forwardAction->setObjectName("actionForwardButton");
       new pqCameraUndoRedoReaction(forwardAction, false, view);
+    }
+
+    this->addSeparator(frame, view);
+  }
+
+  if (view->supportsCapture())
+  {
+    if (this->isButtonVisible("captureViewAction", view))
+    {
+      QAction* captureViewAction = frame->addTitleBarAction(
+        QIcon(":/pqWidgets/Icons/pqCaptureScreenshot24.png"), "Capture to Clipboard or File");
+      captureViewAction->setObjectName("actionCaptureView");
+      captureViewAction->setToolTip("Capture screenshot to the clipboard or to a file if a "
+                                    "modifier key (Ctrl, Alt or Shift) is pressed.");
+      this->connect(captureViewAction, SIGNAL(triggered(bool)), SLOT(captureViewTriggered()));
     }
   }
 }
@@ -802,5 +819,18 @@ void pqStandardViewFrameActionsImplementation::interactiveSelectionToggled(bool 
       vtkSMRenderViewProxy::SafeDownCast(pqActiveObjects::instance().activeView()->getViewProxy()));
     vtkSMTooltipSelectionPipeline::GetInstance()->Hide(
       vtkSMRenderViewProxy::SafeDownCast(pqActiveObjects::instance().activeView()->getViewProxy()));
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqStandardViewFrameActionsImplementation::captureViewTriggered()
+{
+  pqView* activeView = pqActiveObjects::instance().activeView();
+  if (activeView)
+  {
+    // If a modifier key is enabled, let's save screenshot to a file, otherwise
+    // copy the screenshot to the clipboard.
+    bool clipboardMode = QGuiApplication::queryKeyboardModifiers() == 0;
+    pqSaveScreenshotReaction::saveScreenshot(clipboardMode);
   }
 }

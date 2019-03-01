@@ -76,6 +76,18 @@
     <string>Change a Filter's Input</string>
    </property>
   </action>
+  <action name="actionCopyScreenshotToClipboard">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqCaptureScreenshot24.png</normaloff>:/pqWidgets/Icons/pqCaptureScreenshot24.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Copy Screenshot to Clipboard</string>
+   </property>
+   <property name="statusTip">
+    <string>Copy Screenshot to Clipboard</string>
+   </property>
+  </action>
   <action name="actionCopy">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
@@ -215,6 +227,8 @@
   <addaction name="separator"/>
   <addaction name="actionEditCameraUndo"/>
   <addaction name="actionEditCameraRedo"/>
+  <addaction name="separator"/>
+  <addaction name="actionCopyScreenshotToClipboard"/>
   <addaction name="separator"/>
   <addaction name="actionCopy"/>
   <addaction name="actionPaste"/>
