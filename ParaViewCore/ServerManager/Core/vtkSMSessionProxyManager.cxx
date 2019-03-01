@@ -47,7 +47,6 @@
 #include "vtkSMUndoStack.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSmartPointer.h"
-#include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkVersion.h"
 
@@ -568,22 +567,22 @@ void vtkSMSessionProxyManager::GetProxyNames(
 }
 
 //---------------------------------------------------------------------------
-vtkStdString vtkSMSessionProxyManager::RegisterProxy(const char* groupname, vtkSMProxy* proxy)
+std::string vtkSMSessionProxyManager::RegisterProxy(const char* groupname, vtkSMProxy* proxy)
 {
   assert(proxy != NULL);
 
-  vtkStdString label = vtkSMCoreUtilities::SanitizeName(proxy->GetXMLLabel());
-  vtkStdString name = this->GetUniqueProxyName(groupname, label.c_str());
+  std::string label = vtkSMCoreUtilities::SanitizeName(proxy->GetXMLLabel());
+  std::string name = this->GetUniqueProxyName(groupname, label.c_str());
   this->RegisterProxy(groupname, name.c_str(), proxy);
   return name;
 }
 
 //---------------------------------------------------------------------------
-vtkStdString vtkSMSessionProxyManager::GetUniqueProxyName(const char* groupname, const char* prefix)
+std::string vtkSMSessionProxyManager::GetUniqueProxyName(const char* groupname, const char* prefix)
 {
   if (!groupname || !prefix)
   {
-    return vtkStdString();
+    return std::string();
   }
 
   vtkSMSessionProxyManagerInternals::ProxyGroupType::iterator it =
