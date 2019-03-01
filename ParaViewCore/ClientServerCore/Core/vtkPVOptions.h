@@ -28,6 +28,9 @@
 #include "vtkCommandOptions.h"
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
+#include <utility> // needed for pair
+#include <vector>  // needed for vector
+
 class vtkPVOptionsInternal;
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptions : public vtkCommandOptions
@@ -257,6 +260,14 @@ public:
   vtkBooleanMacro(ForceMPIInitOnClient, int);
   //@}
 
+  //@{
+  /**
+   * Returns the verbosity level for stderr output chosen.
+   * Is set to vtkLogger::VERBOSITY_INVALID if not specified.
+   */
+  vtkGetMacro(LogStdErrVerbosity, int);
+  //@}
+
   enum ProcessTypeEnum
   {
     PARAVIEW = 0x2,
@@ -362,6 +373,12 @@ private:
 
   vtkSetStringMacro(HostName);
   char* HostName;
+  int LogStdErrVerbosity;
+
+  std::vector<std::pair<std::string, int> > LogFiles;
+
+  static int VerbosityArgumentHandler(const char* argument, const char* value, void* call_data);
+  static int LogArgumentHandler(const char* argument, const char* value, void* call_data);
 };
 
 #endif

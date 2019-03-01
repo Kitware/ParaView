@@ -86,13 +86,6 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
 
   layoutLocal->addWidget(lineEdit);
 
-  PV_DEBUG_PANELS() << "LineEdit for a "
-                    << "StringVectorProperty with a InputFileNameDomain ("
-                    << pqPropertyWidget::getXMLName(vtkSMInputFileNameDomain::SafeDownCast(domain))
-                    << ") ";
-
-  PV_DEBUG_PANELS() << "Adding \"Reset\" button since the domain is dynamically allocated";
-
   // add a "reset" button.
   pqHighlightableToolButton* resetButton = new pqHighlightableToolButton(this);
   resetButton->setObjectName("Reset");

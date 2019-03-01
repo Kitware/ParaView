@@ -76,6 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkInitializationHelper.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVXMLElement.h"
@@ -528,7 +529,13 @@ pqSettings* pqApplicationCore::settings()
       QSettings::IniFormat, QSettings::UserScope, settingsOrg, settingsApp + suffix, this);
     if (disable_settings || settings->value("pqApplicationCore.DisableSettings", false).toBool())
     {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading of Qt settings skipped (disabled).");
       settings->clear();
+    }
+    else
+    {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "loading Qt settings from '%s'",
+        settings->fileName().toLocal8Bit().data());
     }
     // now settings are ready!
 

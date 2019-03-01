@@ -44,9 +44,6 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(
   vtkSMProxy* smProxy, vtkSMProperty* smProperty, bool withPalette, QWidget* pWidget)
   : pqPropertyWidget(smProxy, pWidget)
 {
-  PV_DEBUG_PANELS() << "pqColorSelectorPropertyWidget for a property with "
-                    << "the panel_widget=\"color_chooser\" attribute";
-
   this->setShowLabel(false);
 
   bool useDocumentationForLabels = pqProxyWidget::useDocumentationForLabels(smProxy);

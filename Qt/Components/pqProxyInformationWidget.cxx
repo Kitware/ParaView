@@ -50,13 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVLogger.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSmartPointer.h"
-#include "vtkTimerLog.h"
 
 #include "vtkPVGeneralSettings.h"
 
@@ -157,9 +157,6 @@ pqOutputPort* pqProxyInformationWidget::getOutputPort()
 //-----------------------------------------------------------------------------
 void pqProxyInformationWidget::updateInformation()
 {
-  vtkTimerLogScope mark("pqProxyInformationWidget::updateInformation");
-  (void)mark;
-
   this->Ui->compositeTreeModel->reset(nullptr);
   this->Ui->compositeTree->setVisible(false);
   this->Ui->filename->setText(tr("NA"));
@@ -182,9 +179,13 @@ void pqProxyInformationWidget::updateInformation()
 
   if (!source || !dataInformation)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "update-information-panel (nullptr)");
     this->fillDataInformation(0);
     return;
   }
+
+  vtkVLogScopeF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "update-information-panel for `%s`",
+    source->getProxy()->GetLogNameOrDefault());
 
   if (this->Ui->compositeTreeModel->reset(dataInformation))
   {

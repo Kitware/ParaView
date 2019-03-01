@@ -163,18 +163,11 @@ public:
 
   //@{
   /**
-   * Get/Set a name for debugging purposes only.
-   *
-   * Debugging issues with representation updates etc can be very tricky since
-   * there are several representations (and nested representations) in a typical
-   * scene. This string provides a mechanism to name a representation (and
-   * all its nested representations) to ease debugging. Use of this name for any
-   * other purpose is strictly discouraged.
-   *
-   * The name, if any, should be set before calling `CreateVTKObjects`.
+   * @deprecated in ParaView 5.7. Use
+   * vtkSMProxy::SetLogName/vtkSMProxy::GetLogName instead.
    */
-  void SetDebugName(const char* name);
-  const char* GetDebugName() const;
+  VTK_LEGACY(void SetDebugName(const char* name));
+  VTK_LEGACY(const char* GetDebugName());
   //@}
 
   void MarkDirty(vtkSMProxy* modifiedProxy) override;

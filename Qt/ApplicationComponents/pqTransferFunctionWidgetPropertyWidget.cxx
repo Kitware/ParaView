@@ -97,9 +97,6 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
   l->addWidget(button);
 
   this->setLayout(l);
-
-  PV_DEBUG_PANELS() << "pqTransferFunctionWidgetPropertyWidget for a property with "
-                    << "the panel_widget=\"transfer_function_editor\" attribute";
 }
 
 pqTransferFunctionWidgetPropertyWidget::~pqTransferFunctionWidgetPropertyWidget()

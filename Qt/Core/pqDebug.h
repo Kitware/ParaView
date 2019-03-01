@@ -32,20 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqDebug_h
 #define pqDebug_h
 
+#include "vtkSetGet.h" // for VTK_LEGACY_REMOVE
+
+#if !defined(VTK_LEGACY_REMOVE)
 #include "pqCoreModule.h"
 #include <QDebug>
 
 /**
-* pqDebugType provides a mechanism for application to define categories for
-* debugging various components of the UI. By passing an appropriate name for
-* the envVariable in the constructor, the debug output will only be
-* generated when that variable is set.
-* For example, if you want to put out debug messages when an environment
-* variable MY_DEBUG_FOO is defined, you can do the following:
-* \code{.cpp}
-*   pqDebug("MY_DEBUG_FOO") << "This will be printed when MY_DEBUG_FOO "
-*                           << "is defined.";
-* \endcode
+ * @deprecated in ParaView 5.7. Use vtkLogger / vtkPVLogger instead.
 */
 class PQCORE_EXPORT pqDebugType
 {
@@ -54,7 +48,6 @@ protected:
 
 public:
   pqDebugType(const QString& envVariable = QString());
-
   virtual ~pqDebugType();
 
   // Casting operator that returns true when the envVariable is set,
@@ -74,5 +67,7 @@ inline QDebug& operator<<(QDebug debug, const std::string& stdstring)
   debug << stdstring.c_str();
   return debug.maybeSpace();
 }
+
+#endif // !defined(VTK_LEGACY_REMOVE)
 
 #endif

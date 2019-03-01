@@ -19,6 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
 #include "vtkGarbageCollector.h"
+#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVInstantiator.h"
@@ -32,6 +33,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -46,6 +48,7 @@
 #include <string>
 #include <vector>
 #include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemTools.hxx>
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -122,6 +125,8 @@ vtkSMProxy::vtkSMProxy()
   this->Deprecated = 0;
 
   this->State = new vtkSMMessage();
+
+  this->LogName = nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -154,6 +159,30 @@ vtkSMProxy::~vtkSMProxy()
     delete this->State;
     this->State = 0;
   }
+
+  delete[] this->LogName;
+  this->LogName = nullptr;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxy::GetLogNameOrDefault()
+{
+  if (this->LogName && this->LogName[0] != '\0')
+  {
+    return this->LogName;
+  }
+
+  if (this->DefaultLogName.empty())
+  {
+    std::ostringstream stream;
+    stream << vtkLogger::GetIdentifier(this);
+    if (this->XMLName && this->XMLGroup)
+    {
+      stream << "[" << this->XMLGroup << ", " << this->XMLName << "]";
+    }
+    this->DefaultLogName = stream.str();
+  }
+  return this->DefaultLogName.c_str();
 }
 
 //---------------------------------------------------------------------------
@@ -736,6 +765,10 @@ void vtkSMProxy::CreateVTKObjects()
   if (this->XMLSubProxyName)
   {
     message.SetExtension(ProxyState::xml_sub_proxy_name, this->XMLSubProxyName);
+  }
+  if (this->LogName)
+  {
+    message.SetExtension(ProxyState::log_name, this->LogName);
   }
 
   // Create sub-proxies first.
@@ -1936,6 +1969,7 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
+  os << indent << "LogName: " << (this->LogName ? this->LogName : "(null)") << endl;
   os << indent << "VTKClassName: " << (this->VTKClassName ? this->VTKClassName : "(null)") << endl;
   os << indent << "XMLName: " << (this->XMLName ? this->XMLName : "(null)") << endl;
   os << indent << "XMLGroup: " << (this->XMLGroup ? this->XMLGroup : "(null)") << endl;
@@ -2504,4 +2538,66 @@ void vtkSMProxy::RecreateVTKObjects()
   // Push our full state over to the server. This is akin to loading the
   // state on the newly created VTK object.
   this->PushState(this->State);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetLogName(const char* name)
+{
+  if (name == nullptr || name[0] == '\0')
+  {
+    vtkErrorMacro("Invalid name (nullptr or empty), ignoring.");
+  }
+  else
+  {
+    this->SetLogNameInternal(name, true, true);
+  }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetLogNameInternal(
+  const char* name, bool propagate_to_subproxies, bool propagate_to_proxylistdomains)
+{
+  assert(name != nullptr && name[0] != '\0');
+  delete[] this->LogName;
+  this->LogName = vtksys::SystemTools::DuplicateString(name);
+
+  if (propagate_to_subproxies)
+  {
+    // recursively label subproxies.
+    for (const auto& apair : this->Internals->SubProxies)
+    {
+      if (apair.second != nullptr)
+      {
+        std::ostringstream str;
+        str << this->LogName << "/" << apair.first;
+        apair.second->SetLogName(str.str().c_str());
+      }
+    }
+  }
+
+  if (propagate_to_proxylistdomains)
+  {
+    // recursively label proxy-list domain proxies.
+    for (const auto& apair : this->Internals->Properties)
+    {
+      if (auto plistdomain = apair.second.Property->FindDomain<vtkSMProxyListDomain>())
+      {
+        std::ostringstream str;
+        str << this->LogName << "/" << apair.first;
+        plistdomain->SetLogName(str.str().c_str());
+      }
+    }
+  }
+
+  if (this->ObjectsCreated)
+  {
+    // need to push state to update log name on the si objects.
+    vtkSMMessage logname_state;
+    logname_state.SetExtension(ProxyState::log_name, (this->LogName ? this->LogName : ""));
+
+    // update local `full state`.
+    this->State->SetExtension(ProxyState::log_name, (this->LogName ? this->LogName : ""));
+
+    this->PushState(&logname_state);
+  }
 }

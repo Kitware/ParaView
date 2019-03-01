@@ -33,10 +33,12 @@ set(classes
   vtkCommandOptions
   vtkCommandOptionsXMLParser
   vtkPVInstantiator
+  vtkPVLogger
   vtkPVTestUtilities
   vtkPVXMLElement
   vtkPVXMLParser
-  vtkStringList)
+  vtkStringList
+  )
 
 # Based on state of VTK modules, set up some variables that paraview needs to
 # compile optional code.

@@ -80,8 +80,6 @@ pqProxyEditorPropertyWidget::pqProxyEditorPropertyWidget(
   hbox->addWidget(button);
 
   this->addPropertyLink(this, "proxyToEdit", SIGNAL(dummySignal()), smproperty);
-
-  PV_DEBUG_PANELS() << "pqProxyEditorPropertyWidget for a ProxyProperty.";
 }
 
 //-----------------------------------------------------------------------------

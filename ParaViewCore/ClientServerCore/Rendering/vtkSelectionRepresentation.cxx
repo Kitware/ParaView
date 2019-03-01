@@ -128,11 +128,6 @@ bool vtkSelectionRepresentation::AddToView(vtkView* view)
 {
   view->AddRepresentation(this->GeometryRepresentation);
   view->AddRepresentation(this->LabelRepresentation);
-
-  // a good spot to update debug names for internal representations.
-  this->SetDebugName(this->GeometryRepresentation, "Selection");
-  this->SetDebugName(this->LabelRepresentation, "Label");
-
   return this->Superclass::AddToView(view);
 }
 
@@ -277,6 +272,16 @@ void vtkSelectionRepresentation::SetCellFieldDataArrayName(const char* val)
 {
   this->LabelRepresentation->SetCellFieldDataArrayName(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkSelectionRepresentation::SetLogName(const std::string& name)
+{
+  this->Superclass::SetLogName(name);
+
+  // we need to label GeometryRepresentation since it's not set via public API.
+  this->GeometryRepresentation->SetLogName(this->GetLogName() + "/Geometry");
+}
+
 //----------------------------------------------------------------------------
 unsigned int vtkSelectionRepresentation::Initialize(
   unsigned int minIdAvailable, unsigned int maxIdAvailable)

@@ -90,11 +90,6 @@ bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
   {
     view->AddRepresentation(this->PolarAxesRepresentation);
   }
-
-  // a good spot to update debug names for internal representations.
-  this->SetDebugName(this->SelectionRepresentation, "Selection");
-  this->SetDebugName(this->PolarAxesRepresentation, "PolarAxes");
-  this->SetDebugName(this->GridAxesRepresentation, "GridAxes");
   return true;
 }
 

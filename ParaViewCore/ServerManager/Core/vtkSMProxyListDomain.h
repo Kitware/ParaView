@@ -151,7 +151,6 @@ public:
    */
   void CreateProxies(vtkSMSessionProxyManager* pxm);
 
-  //@{
   /**
    * A vtkSMProperty is often defined with a default value in the
    * XML itself. However, many times, the default value must be determined
@@ -163,10 +162,15 @@ public:
    */
   int SetDefaultValues(vtkSMProperty* prop, bool use_unchecked_values) override;
 
+  /**
+   * Sets log name for each of the proxy in the domain using the prefix
+   * provided.
+   */
+  void SetLogName(const char* prefix);
+
 protected:
   vtkSMProxyListDomain();
   ~vtkSMProxyListDomain() override;
-  //@}
 
   /**
    * Set the appropriate ivars from the xml element. Should

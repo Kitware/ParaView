@@ -62,9 +62,6 @@ pqPauseLiveSourcePropertyWidget::pqPauseLiveSourcePropertyWidget(
     }
     button->setChecked(pqLiveSourceBehavior::isPaused());
   });
-
-  PV_DEBUG_PANELS() << "pqPauseLiveSourcePropertyWidget for a property with "
-                    << "the panel_widget=\"pause_livesource\" attribute";
 }
 
 //-----------------------------------------------------------------------------

@@ -37,6 +37,7 @@
 #include "vtkOutlineFilter.h"
 #include "vtkOverlappingAMR.h"
 #include "vtkPVConfig.h"
+#include "vtkPVLogger.h"
 #include "vtkPVSession.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
@@ -414,6 +415,7 @@ int vtkMPIMoveData::RequestData(
     // PassThrough mode for compositing.
     if (this->MoveMode == vtkMPIMoveData::PASS_THROUGH)
     {
+      vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
       output->ShallowCopy(input);
       return 1;
     }
@@ -423,6 +425,7 @@ int vtkMPIMoveData::RequestData(
       // Collect
       this->DataServerGatherToZero(input, output);
       // PassThrough
+      vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
       output->ShallowCopy(input);
       return 1;
     }
@@ -437,6 +440,7 @@ int vtkMPIMoveData::RequestData(
   {
     if (input)
     {
+      vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
       output->ShallowCopy(input);
     }
     return 1;
@@ -540,6 +544,7 @@ int vtkMPIMoveData::RequestData(
         this->DataServerSendToClient(tmp);
         tmp->Delete();
         tmp = NULL;
+        vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
         output->ShallowCopy(input);
         return 1;
       }
@@ -610,11 +615,13 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input, vtkDataObject* outpu
 
   if (n == m)
   {
+    vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
     output->ShallowCopy(input);
   }
 
 // Perform the M to N operation.
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "redistribute MxN (M=%d, N=%d)", m, n);
   vtkAllToNRedistributeCompositePolyData* AllToN = NULL;
   AllToN = vtkAllToNRedistributeCompositePolyData::New();
   AllToN->SetController(controller);
@@ -636,12 +643,15 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataObject* input, vtkDataObject* ou
   {
     if (input)
     {
+      vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
       output->ShallowCopy(input);
     }
     return;
   }
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "gather-all");
+
   int idx;
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
 
@@ -698,6 +708,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
   {
     if (input)
     {
+      vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
       output->ShallowCopy(input);
     }
     return;
@@ -706,6 +717,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
   {
     if (this->Controller->GetLocalProcessId() == 0 && input)
     {
+      vtkVLogF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "pass-through");
       output->ShallowCopy(input);
     }
     return;
@@ -714,6 +726,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input, vtkDataObject*
   vtkTimerLog::MarkStartEvent("Dataserver gathering to 0");
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "gather-to-0");
   int idx;
   int myId = this->Controller->GetLocalProcessId();
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
@@ -789,6 +802,8 @@ void vtkMPIMoveData::DataServerSendToRenderServer(vtkDataObject* output)
     return;
   }
 
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "send-to-renderserver");
+
   // int fixme;
   // We might be able to eliminate this marshal.
   this->ClearBuffer();
@@ -809,6 +824,8 @@ void vtkMPIMoveData::RenderServerReceiveFromDataServer(vtkDataObject* output)
     vtkErrorMacro("All render server processes should have sockets.");
     return;
   }
+
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "receive-from-dataserver");
 
   this->ClearBuffer();
   com->Receive(&(this->NumberOfBuffers), 1, 1, 23480);
@@ -846,6 +863,8 @@ void vtkMPIMoveData::DataServerZeroSendToRenderServerZero(vtkDataObject* data)
       return;
     }
 
+    vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "send-to-renderserver-root");
+
     // int fixme;
     // We might be able to eliminate this marshal.
     this->ClearBuffer();
@@ -871,6 +890,8 @@ void vtkMPIMoveData::RenderServerZeroReceiveFromDataServerZero(vtkDataObject* da
       vtkErrorMacro("All render server processes should have sockets.");
       return;
     }
+
+    vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "receive-from-dataserver-root");
 
     this->ClearBuffer();
     com->Receive(&(this->NumberOfBuffers), 1, 1, 23480);
@@ -905,6 +926,7 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
 
   if (myId == 0)
   {
+    vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "send-to-client");
     vtkTimerLog::MarkStartEvent("Dataserver sending to client");
     this->ClearBuffer();
     this->MarshalDataToBuffer(output);
@@ -927,6 +949,8 @@ void vtkMPIMoveData::ClientReceiveFromDataServer(vtkDataObject* output)
     vtkErrorMacro("Missing socket controller on client.");
     return;
   }
+
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "receive-from-dataserver");
 
   this->ClearBuffer();
   com->Receive(&(this->NumberOfBuffers), 1, 1, 23490);
@@ -957,6 +981,7 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataObject* data)
   }
 
 #if VTK_MODULE_ENABLE_VTK_ParallelMPI
+  vtkVLogScopeF(PARAVIEW_LOG_DATA_MOVEMENT_VERBOSITY(), "broadcast");
   int myId = this->Controller->GetLocalProcessId();
 
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());

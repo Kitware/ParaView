@@ -154,6 +154,8 @@ option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
 option(PARAVIEW_USE_OSPRAY "Build ParaView with OSPRay Ray Traced rendering" OFF)
+option(PARAVIEW_ENABLE_LOGGING "Enable logging support." ON)
+mark_as_advanced(PARAVIEW_ENABLE_LOGGING)
 
 set(paraview_web_default ON)
 if (PARAVIEW_ENABLE_PYTHON AND WIN32)
@@ -703,6 +705,12 @@ else ()
 
   # Forward Python option to VTK.
   set(VTK_WRAP_PYTHON "${PARAVIEW_ENABLE_PYTHON}")
+
+  # Forward logging option to VTK.
+  set(VTK_ENABLE_LOGGING "${PARAVIEW_ENABLE_LOGGING}")
+  if (PARAVIEW_ENABLE_LOGGING)
+    list(APPEND vtk_requested_modules VTK::loguru)
+  endif()
 
   vtk_module_find_modules(vtk_module_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   vtk_module_find_kits(vtk_kit_files "${CMAKE_CURRENT_SOURCE_DIR}/VTK")

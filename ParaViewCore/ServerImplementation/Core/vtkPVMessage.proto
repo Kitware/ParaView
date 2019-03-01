@@ -110,6 +110,7 @@ message ProxyState
     repeated Annotation annotation          = 25;
     optional bool       has_annotation      = 26 [default = false];
     repeated UserData   user_data           = 27;
+    optional string     log_name            = 28;
   }
 }
 

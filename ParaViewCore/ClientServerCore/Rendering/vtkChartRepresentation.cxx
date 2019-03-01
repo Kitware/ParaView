@@ -79,7 +79,6 @@ void vtkChartRepresentation::SetSelectionRepresentation(vtkChartSelectionReprese
   if (repr)
   {
     repr->SetChartRepresentation(this);
-    this->SetDebugName(repr, "Selection");
   }
 }
 

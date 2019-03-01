@@ -14,11 +14,13 @@
 =========================================================================*/
 #include "vtkPResourceFileLocator.h"
 
+#include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 
-#define VTK_PRESOURCE_FILE_LOCATOR_DEBUG(x)
+#define VTK_PRESOURCE_FILE_LOCATOR_DEBUG(...)                                                      \
+  vtkVLogF(static_cast<vtkLogger::Verbosity>(this->GetLogVerbosity()), __VA_ARGS__)
 
 vtkStandardNewMacro(vtkPResourceFileLocator);
 //----------------------------------------------------------------------------
@@ -53,7 +55,7 @@ std::string vtkPResourceFileLocator::Locate(const std::string& anchor,
     if (controller->Broadcast(stream, 0) && myRank > 0)
     {
       stream >> result;
-      VTK_PRESOURCE_FILE_LOCATOR_DEBUG("received from rank 0: '" << result << "'");
+      VTK_PRESOURCE_FILE_LOCATOR_DEBUG("received from rank 0: '%s'", result.c_str());
     }
   }
   return result;

@@ -260,10 +260,12 @@ public:
     summaryItem->setFlags(summaryItem->flags() ^ Qt::ItemIsEditable);
     summaryItem->setForeground(this->foregroundColor(type));
     summaryItem->setIcon(this->icon(type));
+    summaryItem->setData(QVariant(Qt::AlignLeft | Qt::AlignTop), Qt::TextAlignmentRole);
 
     QStandardItem* messageItem = new QStandardItem(tr(message));
     messageItem->setFlags(messageItem->flags() ^ Qt::ItemIsEditable);
     messageItem->setForeground(this->foregroundColor(type));
+    messageItem->setData(QVariant(Qt::AlignLeft | Qt::AlignTop), Qt::TextAlignmentRole);
 
     QList<QStandardItem*> items;
     items << messageItem << this->newEmptyItem();

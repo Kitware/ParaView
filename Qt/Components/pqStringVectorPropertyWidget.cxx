@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStringVectorPropertyWidget.h"
 
+#include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMArraySelectionDomain.h"
@@ -155,6 +156,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
   if (fileListDomain)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqFileChooserWidget`.");
     pqFileChooserWidget* chooser = new pqFileChooserWidget(this);
     chooser->setObjectName("FileChooser");
 
@@ -204,7 +206,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
         const char* file_description = childXML->GetAttribute("file_description");
         if (!extensions || !file_description)
         {
-          PV_DEBUG_PANELS() << "Incomplete 'FileChooser' hints specified. Skipping them.";
+          vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "incomplete `FileChooser` hint skipped.");
         }
         else
         {
@@ -217,7 +219,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
     if (supportedExtensions.size() > 0)
     {
-      PV_DEBUG_PANELS() << "Using extensions specified using FileChooser hints.";
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "using extensions `%s`",
+        supportedExtensions.join(", ").toLocal8Bit().data());
       chooser->setExtension(supportedExtensions.join(";;"));
     }
 
@@ -225,13 +228,13 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     chooser->setServer(smm->findServer(smProxy->GetSession()));
 
     vbox->addWidget(chooser);
-
-    PV_DEBUG_PANELS() << "pqFileChooserWidget for a StringVectorProperty with "
-                      << "a FileListDomain";
   }
   else if (arrayListDomain)
   {
     Q_ASSERT(smProperty->GetRepeatable());
+
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqArraySelectionWidget`.");
+
     // repeatable array list domains get a the pqArraySelectionWidget
     // that lists each array name with a check box
     auto selectorWidget = new pqArraySelectionWidget(this);
@@ -248,10 +251,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     vbox->addWidget(selectorWidget);
 
-    PV_DEBUG_PANELS() << "pqArrayStatusPropertyWidget for a "
-                      << "StringVectorProperty with a repeatable "
-                      << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
-
     // unlike vtkSMArraySelectionDomain which is doesn't tend to change based
     // on values of other properties, typically, vtkSMArrayListDomain changes
     // on other property values e.g. when one switches from point-data to
@@ -260,14 +259,13 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     new pqArrayListDomain(
       selectorWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty, arrayListDomain);
 
-    PV_DEBUG_PANELS() << " Also creating pqArrayListDomain to keep the list updated.";
-
     this->addPropertyLink(
       selectorWidget, smProxy->GetPropertyName(smProperty), SIGNAL(widgetModified()), smProperty);
     this->setChangeAvailableAsChangeFinished(true);
   }
   else if (silDomain)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqSILWidget`.");
     pqSILWidget* tree = new pqSILWidget(silDomain->GetSubTree(), this);
     tree->setObjectName("BlockSelectionWidget");
 
@@ -286,14 +284,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     setShowLabel(false);
 
     vbox->addWidget(tree);
-
-    PV_DEBUG_PANELS() << "pqSILWidget for a StringVectorProperty with a "
-                      << "SILDomain (" << silDomain->GetXMLName() << ")";
   }
   else if (silDomain2)
   {
     this->setShowLabel(false);
 
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqSubsetInclusionLatticeWidget`.");
     auto model = new pqSubsetInclusionLatticeTreeModel(this);
 
     model->setSubsetInclusionLattice(silDomain2->GetSIL());
@@ -304,6 +300,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   }
   else if (arraySelectionDomain)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqArraySelectionWidget`.");
     auto selectorWidget = new pqArraySelectionWidget(this);
     selectorWidget->setObjectName("ArraySelectionWidget");
     selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
@@ -324,15 +321,10 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
 
     new pqArrayListDomain(selectorWidget, smProxy->GetPropertyName(smProperty), smProxy, smProperty,
       arraySelectionDomain);
-
-    PV_DEBUG_PANELS() << " Also creating pqArrayListDomain to keep the list updated.";
-
-    PV_DEBUG_PANELS() << "pqArraySelectionWidget for a StringVectorProperty "
-                      << "with a ArraySelectionDomain (" << arraySelectionDomain->GetXMLName()
-                      << ")";
   }
   else if (stringListDomain)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `QComboBox`.");
     QComboBox* comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
 
@@ -342,12 +334,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     this->setChangeAvailableAsChangeFinished(true);
 
     vbox->addWidget(comboBox);
-
-    PV_DEBUG_PANELS() << "QComboBox for a StringVectorProperty with a "
-                      << "StringListDomain (" << stringListDomain->GetXMLName() << ")";
   }
   else if (multiline_text)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqTextEdit`.");
+
     QWidget* w = new QWidget(this);
     QHBoxLayout* hbox = new QHBoxLayout(this);
     hbox->setMargin(0);
@@ -375,10 +366,11 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     if (python)
     {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
-      PV_DEBUG_PANELS() << "Python text edit:";
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "supports Python syntax highlighter.");
       new pqPythonSyntaxHighlighter(textEdit, textEdit);
 #else
-      PV_DEBUG_PANELS() << "Python text edit when python not enabled:";
+      vtkVLogF(
+        PARAVIEW_LOG_APPLICATION_VERBOSITY(), "Python not enabled, no syntax highlighter support.");
 #endif
       pqPopOutWidget* popOut = new pqPopOutWidget(textEdit,
         QString("%1 - %2").arg(smProperty->GetParent()->GetXMLLabel(), smProperty->GetXMLLabel()),
@@ -393,11 +385,10 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       vbox->addWidget(textEdit);
     }
     this->setShowLabel(false);
-
-    PV_DEBUG_PANELS() << "QTextEdit for a StringVectorProperty with multi line text";
   }
   else if (enumerationDomain)
   {
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqComboBoxDomain`.");
     QComboBox* comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
 
@@ -412,14 +403,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
 
     vbox->addWidget(comboBox);
-
-    PV_DEBUG_PANELS() << "QComboBox for a StringVectorProperty with an "
-                      << "EnumerationDomain (" << enumerationDomain->GetXMLName() << ")";
   }
   else
   {
     if (smProperty->GetRepeatable())
     {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqScalarValueListPropertyWidget`.");
       pqScalarValueListPropertyWidget* widget =
         new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
       widget->setObjectName("ScalarValueList");
@@ -430,6 +419,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
     }
     else
     {
+      vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqLineEdit`.");
       // add a single line edit.
       QLineEdit* lineEdit = new pqLineEdit(this);
       lineEdit->setObjectName(smProxy->GetPropertyName(smProperty));
@@ -444,8 +434,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
       }
 
       vbox->addWidget(lineEdit);
-
-      PV_DEBUG_PANELS() << "QLineEdit for a StringVectorProperty with no domain";
     }
   }
   this->setLayout(vbox);

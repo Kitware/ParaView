@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVPlugin.h"
 
+#include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkProcessModule.h"
 #include <vtksys/SystemTools.hxx>
@@ -26,7 +27,6 @@ vtkPVPlugin::EULAConfirmationCallback vtkPVPlugin::EULAConfirmationCallbackPtr =
 //-----------------------------------------------------------------------------
 bool vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
 {
-  static bool printDebugInfo = (vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != nullptr);
   std::ostringstream msg;
   bool status = false;
   if (plugin)
@@ -57,12 +57,9 @@ bool vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
       msg << "  Plugin has EULA and was not accepted. Plugin won't be imported." << endl;
     }
   }
-  if (printDebugInfo && msg.str().size())
-  {
-    msg << "Import status: " << status << endl;
-    vtkOutputWindowDisplayText(msg.str().c_str());
-  }
 
+  vtkVLogIfF(PARAVIEW_LOG_PLUGIN_VERBOSITY(), (msg.str().size() > 0), "Import status: %s \n%s",
+    (status ? "success" : "failure"), msg.str().c_str());
   return status;
 }
 

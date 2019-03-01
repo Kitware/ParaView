@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
-#include "pqDebug.h"
 #include "pqLiveInsituManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -51,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkNew.h"
 #include "vtkPVGeneralSettings.h"
+#include "vtkPVLogger.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyClipboard.h"
 #include "vtkSMSourceProxy.h"
@@ -118,9 +118,10 @@ public:
     this->Panel->filterWidgets(show_advanced, filterText);
   }
 
-  void apply(pqView* view)
+  void apply(pqView* vtkNotUsed(view))
   {
-    (void)view;
+    vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), this->Proxy != nullptr,
+      "applying changes to `%s`", this->Proxy->getProxy()->GetLogNameOrDefault());
     this->Panel->apply();
   }
 
@@ -141,8 +142,6 @@ private:
 
 unsigned long pqProxyWidgets::Counter = 0;
 };
-
-#define DEBUG_APPLY_BUTTON() pqDebug("PV_DEBUG_APPLY_BUTTON")
 
 bool pqPropertiesPanel::AutoApply = false;
 int pqPropertiesPanel::AutoApplyDelay = 0; // in msec
@@ -655,18 +654,13 @@ void pqPropertiesPanel::renderActiveView()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::sourcePropertyChanged(bool change_finished /*=true*/)
 {
-  // FIXME:
-  QString senderClass("(unknown)");
-  QString senderLabel("(unknown)");
-  QObject* signalSender = this->sender();
-  if (signalSender)
+  std::string proxyLabel("(unknown)");
+  if (auto signalSender = qobject_cast<pqProxyWidget*>(this->sender()))
   {
-    senderClass = signalSender->metaObject()->className();
-    // pqPropertyWidget *senderWidget = qobject_cast<pqPropertyWidget *>(signalSender);
-    // if (senderWidget)
-    //  {
-    //  senderLabel = senderWidget->property()->GetXMLLabel();
-    //  }
+    if (auto proxy = signalSender->proxy())
+    {
+      proxyLabel = proxy->GetLogNameOrDefault();
+    }
   }
 
   if (!change_finished)
@@ -675,13 +669,16 @@ void pqPropertiesPanel::sourcePropertyChanged(bool change_finished /*=true*/)
   }
   if (change_finished && !this->Internals->ReceivedChangeAvailable)
   {
-    DEBUG_APPLY_BUTTON() << "Received change-finished before change-available. Ignoring it.";
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "received `changeFinished` signal without "
+                                                   "receiving a `changeAvailable` signal from "
+                                                   "`%s`'s proxy-widget;"
+                                                   "ignoring it!",
+      proxyLabel.c_str());
     return;
   }
 
-  DEBUG_APPLY_BUTTON() << "Property change " << (change_finished ? "finished" : "available")
-                       << senderLabel << "(" << senderClass << ")";
-
+  vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "received `%s` from `%s`'s proxy-widget",
+    (change_finished ? "changeFinished" : "changeAvailable"), proxyLabel.c_str());
   if (this->Internals->Source && this->Internals->Source->modifiedState() == pqProxy::UNMODIFIED)
   {
     this->Internals->Source->setModifiedState(pqProxy::MODIFIED);
@@ -690,19 +687,19 @@ void pqPropertiesPanel::sourcePropertyChanged(bool change_finished /*=true*/)
   {
     this->Internals->triggerAutoApply();
   }
-
   this->updateButtonState();
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::updateButtonState()
 {
-  Ui::propertiesPanel& ui = this->Internals->Ui;
+  const Ui::propertiesPanel& ui = this->Internals->Ui;
+
+  const bool previous_apply_state = ui.Accept->isEnabled();
+
   ui.Accept->setEnabled(false);
   ui.Reset->setEnabled(false);
-
   ui.Help->setEnabled(this->Internals->Source != NULL);
-
   ui.Delete->setEnabled(this->Internals->Source != NULL &&
     this->Internals->Source->getNumberOfConsumers() == 0 &&
     !pqLiveInsituManager::isInsitu(this->Internals->Source));
@@ -717,26 +714,28 @@ void pqPropertiesPanel::updateButtonState()
 
     if (proxy->modifiedState() == pqProxy::UNINITIALIZED)
     {
-      DEBUG_APPLY_BUTTON() << "Enabling the Apply button because the "
-                           << (proxy->getProxy() ? proxy->getProxy()->GetXMLName() : "(unknown)")
-                           << "proxy is uninitialized";
-
+      vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), previous_apply_state == false,
+        "`Apply` button enabled since `%s` became uninitialized.",
+        proxy->getProxy()->GetLogNameOrDefault());
       ui.Accept->setEnabled(true);
       ui.PropertiesRestoreDefaults->setEnabled(true);
       ui.PropertiesSaveAsDefaults->setEnabled(true);
     }
     else if (proxy->modifiedState() == pqProxy::MODIFIED)
     {
-      DEBUG_APPLY_BUTTON() << "Enabling the Apply button because the "
-                           << (proxy->getProxy() ? proxy->getProxy()->GetXMLName() : "(unknown)")
-                           << "proxy is modified";
-
+      vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), previous_apply_state == false,
+        "`Apply` button enabled since `%s` became modified.",
+        proxy->getProxy()->GetLogNameOrDefault());
       ui.Accept->setEnabled(true);
       ui.Reset->setEnabled(true);
       ui.PropertiesRestoreDefaults->setEnabled(true);
       ui.PropertiesSaveAsDefaults->setEnabled(true);
     }
   }
+
+  vtkVLogIfF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
+    (previous_apply_state && !ui.Accept->isEnabled()),
+    "`Apply` button disabled since no changes are apply-able changes are present.");
 
   if (!ui.Accept->isEnabled())
   {
@@ -810,6 +809,8 @@ void pqPropertiesPanel::updateButtonEnableState()
 //-----------------------------------------------------------------------------
 void pqPropertiesPanel::apply()
 {
+  vtkVLogScopeFunction(PARAVIEW_LOG_APPLICATION_VERBOSITY());
+
   vtkTimerLog::MarkStartEvent("PropertiesPanel::Apply");
   this->Internals->AutoApplyTimer.stop();
 

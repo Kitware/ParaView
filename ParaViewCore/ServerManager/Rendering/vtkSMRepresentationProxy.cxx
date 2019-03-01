@@ -57,32 +57,24 @@ vtkSMRepresentationProxy::~vtkSMRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void vtkSMRepresentationProxy::SetDebugName(const char* name)
 {
-  if (this->ObjectsCreated)
-  {
-    vtkErrorMacro("`SetDebugName` cannot be called after `CreateVTKObjects`.");
-  }
-  else if (name != nullptr && name[0] != '\0')
-  {
-    this->DebugName = name;
-    for (unsigned int cc = 0, max = this->GetNumberOfSubProxies(); cc < max; ++cc)
-    {
-      if (auto subrepr = vtkSMRepresentationProxy::SafeDownCast(this->GetSubProxy(cc)))
-      {
-        std::ostringstream str;
-        str << this->DebugName << "/" << this->GetSubProxyName(cc);
-        subrepr->SetDebugName(str.str().c_str());
-      }
-    }
-  }
+  VTK_LEGACY_REPLACED_BODY(
+    vtkSMRepresentationProxy::SetDebugName, "ParaView 5.7", vtkSMProxy::SetLogName);
+  this->SetLogName(name);
 }
+#endif
 
 //----------------------------------------------------------------------------
-const char* vtkSMRepresentationProxy::GetDebugName() const
+#if !defined(VTK_LEGACY_REMOVE)
+const char* vtkSMRepresentationProxy::GetDebugName()
 {
-  return this->DebugName.empty() ? nullptr : this->DebugName.c_str();
+  VTK_LEGACY_REPLACED_BODY(
+    vtkSMRepresentationProxy::GetDebugName, "ParaView 5.7", vtkSMProxy::GetLogName);
+  return this->GetLogName();
 }
+#endif
 
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::CreateVTKObjects()
@@ -106,11 +98,6 @@ void vtkSMRepresentationProxy::CreateVTKObjects()
          << static_cast<unsigned int>(this->GetGlobalID())
          << static_cast<unsigned int>(this->GetGlobalID() + MAX_NUMBER_OF_INTERNAL_REPRESENTATIONS)
          << vtkClientServerStream::End;
-  if (!this->DebugName.empty())
-  {
-    stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetDebugName"
-           << this->DebugName.c_str() << vtkClientServerStream::End;
-  }
   this->ExecuteStream(stream);
 
   if (auto obj = vtkObject::SafeDownCast(this->GetClientSideObject()))

@@ -590,6 +590,31 @@ public:
    */
   size_t GetNumberOfPropertyGroups() const;
 
+  //@{
+  /**
+   * Log name is a name for this proxy that will be used when logging status
+   * messages. This helps make the log more user friendly by making sure it uses
+   * names that the user can easily map to objects shown in the user interface.
+   *
+   * This method will set the log name for this proxy and iterate over all
+   * subproxies and set log name for each using the provided `name` as prefix.
+   *
+   * Furthermore, for all properties with vtkSMProxyListDomain, it will set log
+   * name for proxies in those domains to use the provided `name` as prefix as
+   * well.
+   *
+   * @note The use of this name for any other purpose than logging is strictly
+   * discouraged.
+   */
+  void SetLogName(const char* name);
+  vtkGetStringMacro(LogName);
+  //@}
+
+  /**
+   * A helper that makes up an default name if none is provided.
+   */
+  const char* GetLogNameOrDefault();
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy() override;
@@ -663,6 +688,7 @@ protected:
   friend class vtkSMDeserializerProtobuf;
   friend class vtkSMStateLocator;
   friend class vtkSMMultiServerSourceProxy;
+  friend class vtkSMStateLoader;
   //@}
 
   //@{
@@ -897,6 +923,12 @@ protected:
   */
   void RebuildStateForProperties();
 
+  /**
+   * Internal method used by `SetLogName`
+   */
+  void SetLogNameInternal(
+    const char* name, bool propagate_to_subproxies, bool propagate_to_proxylistdomains);
+
   //@{
   /**
    * SIClassName identifies the classname for the helper on the server side.
@@ -961,6 +993,9 @@ private:
   vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement, const char* subproxy_name);
 
   friend class vtkSMProxyInfo;
+
+  char* LogName;
+  std::string DefaultLogName;
 };
 
 /// This defines a stream manipulator for the vtkClientServerStream that can be used

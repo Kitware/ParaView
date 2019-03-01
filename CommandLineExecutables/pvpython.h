@@ -19,6 +19,7 @@ void vtkPVInitializePythonModules();
 }
 
 #include "vtkInitializationHelper.h"
+#include "vtkLogger.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVPythonOptions.h"
 #include "vtkProcessModule.h"
@@ -101,12 +102,20 @@ int Run(int processType, int argc, char* argv[])
     std::vector<char*> pythonArgs;
     ProcessArgsForPython(
       pythonArgs, options->GetPythonScriptName(), remaining_argc, remaining_argv);
+    pythonArgs.push_back(nullptr);
+
+    // if user specified verbosity option on command line, then we make vtkPythonInterpreter post
+    // log information as INFO, otherwise we leave it at default which is TRACE.
+    vtkPythonInterpreter::SetLogVerbosity(
+      options->GetLogStdErrVerbosity() != vtkLogger::VERBOSITY_INVALID
+        ? vtkLogger::VERBOSITY_INFO
+        : vtkLogger::VERBOSITY_TRACE);
 
     // Start interpretor
     vtkPythonInterpreter::Initialize();
 
     ret_val =
-      vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()), &*pythonArgs.begin());
+      vtkPythonInterpreter::PyMain(static_cast<int>(pythonArgs.size()) - 1, &*pythonArgs.begin());
 
     // Free python args
     std::vector<char*>::iterator it = pythonArgs.begin();

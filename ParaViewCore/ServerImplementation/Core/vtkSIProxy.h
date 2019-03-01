@@ -130,6 +130,11 @@ public:
    */
   virtual bool ExtendDefinition(const char* xml);
 
+  /**
+   * A helper that makes up an default name if none is provided.
+   */
+  const char* GetLogNameOrDefault();
+
 protected:
   vtkSIProxy();
   ~vtkSIProxy() override;
@@ -206,6 +211,9 @@ protected:
   vtkSetStringMacro(XMLSubProxyName);
   vtkSetStringMacro(PostPush);
   vtkSetStringMacro(PostCreation);
+  vtkGetStringMacro(LogName);
+
+  void SetLogName(const char* name);
 
   char* VTKClassName;
   char* XMLGroup;
@@ -224,6 +232,9 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  char* LogName;
+  std::string DefaultLogName;
 };
 
 #endif
