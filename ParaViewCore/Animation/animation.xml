@@ -169,8 +169,7 @@
                      clean_command="RemoveAllViewProxies"
                      command="AddViewProxy"
                      name="ViewModules"
-                     repeat_command="1"
-                     state_ignored="1">
+                     repeat_command="1">
         <ProxyGroupDomain name="groups">
           <Group name="views" />
         </ProxyGroupDomain>
