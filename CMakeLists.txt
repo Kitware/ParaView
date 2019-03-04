@@ -97,6 +97,9 @@ include(ParaViewClient)
 include(ParaViewPlugin)
 include(vtkModuleWrapClientServer)
 include(CTest)
+set_property(CACHE BUILD_TESTING
+  PROPERTY
+    TYPE INTERNAL)
 
 include(vtkCompilerChecks)
 include(vtkCompilerPlatformFlags)
