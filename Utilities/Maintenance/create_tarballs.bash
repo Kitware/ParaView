@@ -4,7 +4,7 @@
 set -e
 
 # The URLs where data is stored for ParaView.
-readonly urlbases="http://www.paraview.org/files/ExternalData/ALGO/HASH http://midas3.kitware.com/midas/api/rest?method=midas.bitstream.download&checksum=HASH&algorithm=ALGO"
+readonly urlbases="http://www.paraview.org/files/ExternalData/ALGO/HASH http://www.vtk.org/files/ExternalData/ALGO/HASH https://data.kitware.com/api/v1/file/hashsum/ALGO/HASH/download"
 
 # Move to the top of the ParaView tree.
 readonly output_base="$( pwd )"
@@ -64,7 +64,7 @@ validate () {
     readonly actual
 
     if ! [ "$actual" = "$expected" ]; then
-        die "Object $expected is corrupt: $file"
+        die "Object $expected is corrupt (got $actual): $file"
     fi
 }
 
@@ -198,15 +198,16 @@ read_all_submodules () {
         cd "$toplevel"
         GIT_INDEX_FILE="$git_index"
         export GIT_INDEX_FILE
-        git rm --cached "$path" 2>/dev/null
-        GIT_ALTERNATE_OBJECT_DIRECTORIES="$gitdir/objects" git read-tree -i --prefix="$path/" "$sha1"
+        git add .gitmodules 2>/dev/null
+        git rm --cached "$displaypath" >&2
+        GIT_ALTERNATE_OBJECT_DIRECTORIES="$gitdir/objects" git read-tree -i --prefix="$sm_path/" "$sha1"
         echo "$gitdir/objects"
     ' | \
         tr '\n' ':'
 }
 
 read_submodules_into_index () {
-    local object_dirs=""
+    local object_dirs="$( git rev-parse --git-dir )/objects"
     local new_object_dirs
 
     while git ls-files -s | grep -q -e '^160000'; do
