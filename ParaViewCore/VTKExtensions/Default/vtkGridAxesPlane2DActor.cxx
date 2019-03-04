@@ -27,6 +27,7 @@
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkVectorOperators.h"
+#include "vtkWindow.h"
 
 #include <algorithm>
 #include <cassert>
@@ -246,6 +247,10 @@ bool vtkGridAxesPlane2DActor::UpdateTicks(vtkViewport* viewport)
   double offsets[4];
   vtkNew<vtkCoordinate> coordinate;
 
+  vtkWindow* renWin = viewport->GetVTKWindow();
+  int tileScale[2];
+  renWin->GetTileScale(tileScale);
+
   for (int cc = 0; cc < 4; cc++)
   {
     vtkVector2d normal = viewportNormals[cc];
@@ -259,7 +264,7 @@ bool vtkGridAxesPlane2DActor::UpdateTicks(vtkViewport* viewport)
     coordinate->SetValue(pt2.GetX(), pt2.GetY());
     value = coordinate->GetComputedWorldValue(viewport);
     vtkVector3d pw2(value);
-    offsets[cc] = (pw2 - pw1).Norm();
+    offsets[cc] = (pw2 - pw1).Norm() * tileScale[0];
     // FIXME: make this better -- maybe use average?
   }
 

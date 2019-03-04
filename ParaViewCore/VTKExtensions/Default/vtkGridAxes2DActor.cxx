@@ -555,7 +555,7 @@ void vtkGridAxes2DActor::UpdateLabelPositions(vtkViewport*)
 }
 
 //----------------------------------------------------------------------------
-void vtkGridAxes2DActor::UpdateTextActors(vtkViewport*)
+void vtkGridAxes2DActor::UpdateTextActors(vtkViewport* viewport)
 {
   const vtkTuple<vtkVector3d, 4>& gridPoints = this->Helper->GetPoints();
   const vtkVector2i& activeAxes = this->Helper->GetActiveAxes();
@@ -566,6 +566,10 @@ void vtkGridAxes2DActor::UpdateTextActors(vtkViewport*)
   vtkAxis* activeAxisHelpers[2];
   activeAxisHelpers[0] = this->AxisHelpers[activeAxes[0]].GetPointer();
   activeAxisHelpers[1] = this->AxisHelpers[activeAxes[1]].GetPointer();
+
+  vtkWindow* renWin = viewport->GetVTKWindow();
+  int tileScale[2];
+  renWin->GetTileScale(tileScale);
 
   for (int index = 0; index < 4; index++)
   {
@@ -580,8 +584,8 @@ void vtkGridAxes2DActor::UpdateTextActors(vtkViewport*)
     }
 
     /// XXX: improve this.
-    vtkVector2i offset(vtkContext2D::FloatToInt(axisNormals[index].GetX() * 10),
-      vtkContext2D::FloatToInt(axisNormals[index].GetY() * 10));
+    vtkVector2i offset(vtkContext2D::FloatToInt(axisNormals[index].GetX() * 10 * tileScale[0]),
+      vtkContext2D::FloatToInt(axisNormals[index].GetY() * 10 * tileScale[1]));
 
     vtkLabels::ResizeLabels(
       this->Labels->TickLabels[index], numTicks, activeAxisHelpers[axis]->GetLabelProperties());
@@ -613,8 +617,8 @@ void vtkGridAxes2DActor::UpdateTextActors(vtkViewport*)
     {
       vtkVector3d midPoint = (facePoints[index] + facePoints[(index + 1) % 4]) * 0.5;
       /// XXX: improve this.
-      vtkVector2i offset(vtkContext2D::FloatToInt(axisNormals[index].GetX() * 30),
-        vtkContext2D::FloatToInt(axisNormals[index].GetY() * 30));
+      vtkVector2i offset(vtkContext2D::FloatToInt(axisNormals[index].GetX() * 30 * tileScale[0]),
+        vtkContext2D::FloatToInt(axisNormals[index].GetY() * 30 * tileScale[1]));
       titleActor->SetInput(label.c_str());
       titleActor->GetTextProperty()->SetJustification(this->Labels->Justifications[index].GetX());
       titleActor->GetTextProperty()->SetVerticalJustification(
