@@ -387,6 +387,11 @@ int get_section_connectivity(const int cgioNum, const double cgioSectionId, cons
   const cgsize_t* memStart, const cgsize_t* memEnd, const cgsize_t* memStride,
   const cgsize_t* memDim, vtkIdType* localElements);
 //------------------------------------------------------------------------------
+int get_section_start_offset(const int cgioNum, const double cgioSectionId, const int dim,
+  const cgsize_t* srcStart, const cgsize_t* srcEnd, const cgsize_t* srcStride,
+  const cgsize_t* memStart, const cgsize_t* memEnd, const cgsize_t* memStride,
+  const cgsize_t* memDim, vtkIdType* localElementsIdx);
+//------------------------------------------------------------------------------
 int GetVTKElemType(
   CGNS_ENUMT(ElementType_t) elemType, bool& higherOrderWarning, bool& cgnsOrderFlag);
 //------------------------------------------------------------------------------
