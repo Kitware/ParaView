@@ -65,7 +65,7 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
   , DecorationsVisible(true)
   , TitleBarVisible(true)
   , BorderVisible(false)
-  , Buttons(SplitVertical | SplitHorizontal | Maximize | Close)
+  , Buttons(NoButton)
   , UniqueID(QUuid::createUuid())
   , Internals(new pqViewFrame::pqInternals(this))
 {
@@ -116,6 +116,8 @@ pqViewFrame::pqViewFrame(QWidget* parentObject)
 
   this->setBorderColor(QColor("blue"));
   this->Internals->Ui.TitleLabel->installEventFilter(this);
+
+  this->setStandardButtons(SplitVertical | SplitHorizontal | Maximize | Close);
 }
 
 //-----------------------------------------------------------------------------
