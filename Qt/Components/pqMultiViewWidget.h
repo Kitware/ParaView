@@ -49,6 +49,9 @@ class vtkSMViewProxy;
 * works together with a vtkSMViewLayoutProxy instance to keep track of the layout
 * for the views. It's acceptable to create multiple instances of
 * pqMultiViewWidget in the same application.
+*
+* @sa pqHierarchicalGridLayout, pqHierarchicalGridWidget
+*
 */
 class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
 {
@@ -70,7 +73,7 @@ public:
   /**
   * Returns whether window decorations and splitter handles are visible.
   */
-  bool isDecorationsVisible() const { return this->DecorationsVisible; }
+  bool isDecorationsVisible() const;
 
   /**
   * Returns list of views assigned to frames in this widget.
@@ -177,7 +180,6 @@ protected slots:
   * directly. These result in updating the layoutManager.
   */
   void standardButtonPressed(int);
-  void splitterMoved();
 
   /**
   * Makes a frame active. This also call pqActiveObjects::setActiveView() to
@@ -225,28 +227,14 @@ protected:
   bool eventFilter(QObject* caller, QEvent* evt) override;
 
 private:
-  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg, int& maxIndex);
   void layoutPropertyModified(vtkObject*, unsigned long, void*);
-
-  /**
-  * called when the vtkSMViewLayoutProxy is changed in order to synchronize
-  * the separator width and color with the user inputs.
-  */
-  void updateSplitter();
-
-  /**
-   * called when the vtkSMViewLayoutProxy's "PreviewMode" property is changed.
-   */
-  void updatePreviewMode();
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget)
 
   class pqInternals;
   pqInternals* Internals;
-
-  bool DecorationsVisible;
-  QSize LockViewSize;
+  friend class pqInternals;
 };
 
 #endif
