@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
+#include "pqHierarchicalGridLayout.h"
 #include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqPropertyLinks.h"
@@ -163,52 +164,6 @@ void ConnectFrameToView(pqViewFrame* frame, pqView* pqview)
     frame->setCentralWidget(viewWidget, pqview);
   }
 }
-
-/// A simple subclass of QBoxLayout mimicking the layout style of a QSplitter
-/// with just 2 widgets.
-class pqSplitterLayout : public QBoxLayout
-{
-  double SplitFraction;
-
-public:
-  pqSplitterLayout(QBoxLayout::Direction dir, QWidget* parentWdg)
-    : QBoxLayout(dir, parentWdg)
-    , SplitFraction(0.5)
-  {
-    this->setContentsMargins(0, 0, 0, 0);
-    this->setSpacing(0);
-  };
-
-  ~pqSplitterLayout() override {}
-
-  void setSplitFraction(double val) { this->SplitFraction = val; }
-
-  void setGeometry(const QRect& rect) override
-  {
-    this->QLayout::setGeometry(rect);
-
-    Q_ASSERT(this->count() <= 2);
-
-    int offset = 0;
-    double fractions[2] = { this->SplitFraction, 1.0 - this->SplitFraction };
-    for (int cc = 0; cc < this->count(); cc++)
-    {
-      QLayoutItem* item = this->itemAt(cc);
-      if (this->direction() == LeftToRight)
-      {
-        item->setGeometry(QRect(offset + rect.x(), rect.y(),
-          static_cast<int>(fractions[cc] * rect.width()), rect.height()));
-        offset += static_cast<int>(fractions[cc] * rect.width());
-      }
-      else if (this->direction() == TopToBottom)
-      {
-        item->setGeometry(QRect(rect.x(), offset + rect.y(), rect.width(),
-          static_cast<int>(fractions[cc] * rect.height())));
-        offset += static_cast<int>(fractions[cc] * rect.height());
-      }
-    }
-  }
-};
 }
 
 //-----------------------------------------------------------------------------
