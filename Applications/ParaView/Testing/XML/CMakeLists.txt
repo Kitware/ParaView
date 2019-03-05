@@ -148,6 +148,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomViewpoints.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomViewpoints_A.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/CustomViewpoints_B.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/DataAxesGrid2X.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT0.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/EnsembleT3.png}"
@@ -441,6 +442,7 @@ SET (TESTS_WITH_INLINE_COMPARES
   ClampAndUpdateColorMap.xml
   Connectivity.xml
   Contour.xml
+  DataAxesGrid2X.xml
   Ensemble.xml
   FastUniformGridSource.xml
   FileSeries.xml
