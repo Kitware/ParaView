@@ -28,11 +28,12 @@
 #ifndef vtkGmshReader_h
 #define vtkGmshReader_h
 
+#include "vtkGmshReaderModule.h"
 #include "vtkUnstructuredGridAlgorithm.h"
 
 struct vtkGmshReaderInternal;
 
-class VTK_EXPORT vtkGmshReader : public vtkUnstructuredGridAlgorithm
+class VTKGMSHREADER_EXPORT vtkGmshReader : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkGmshReader* New();

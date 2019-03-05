@@ -28,6 +28,7 @@
 #ifndef vtkGmshMetaReader_h
 #define vtkGmshMetaReader_h
 
+#include "vtkGmshReaderModule.h"
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkNew.h"
 #include "vtkSmartPointer.h"
@@ -38,7 +39,7 @@ class vtkGmshReader;
 class vtkPVXMLParser;
 struct vtkGmshMetaReaderInternal;
 
-class vtkGmshMetaReader : public vtkMultiBlockDataSetAlgorithm
+class VTKGMSHREADER_EXPORT vtkGmshMetaReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkGmshMetaReader* New();
