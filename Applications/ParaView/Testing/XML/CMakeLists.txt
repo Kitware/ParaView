@@ -498,8 +498,8 @@ if(NOT APPLE)
 endif()
 
 SET(TESTS_WITH_BASELINES
+  DataAxesGrid.xml
   MoleculeScalarBar.xml
-  TestDataGridAxes.xml
   TestHiddenLineRemoval.xml
   TestOpacityRendering.xml
 )
