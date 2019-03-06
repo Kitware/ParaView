@@ -4,7 +4,7 @@ find_path(VRPN_INCLUDE_DIR
 mark_as_advanced(VRPN_INCLUDE_DIR)
 
 find_library(VRPN_LIBRARY
-  NAME vrpn
+  NAMES vrpn
   DOC   "VRPN library")
 mark_as_advanced(VRPN_LIBRARY)
 
