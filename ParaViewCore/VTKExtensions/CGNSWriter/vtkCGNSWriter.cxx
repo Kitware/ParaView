@@ -832,14 +832,14 @@ void vtkCGNSWriter::WriteData()
     }
     else
     {
-      error = string("Incorrect class type '") + this->OriginalInput->GetClassName() +
+      error = string("Unsupported class type '") + this->OriginalInput->GetClassName() +
         "' on input.\nSupported types are vtkStructuredGrid, vtkPointSet, their subclasses and "
         "multi-block datasets of said classes.";
     }
   }
   else
   {
-    vtkErrorMacro(<< "Incorrect class type '" << this->OriginalInput->GetClassName()
+    vtkErrorMacro(<< "Unsupported class type '" << this->OriginalInput->GetClassName()
                   << "' on input.\nSupported types are vtkStructuredGrid, vtkPointSet, their "
                      "subclasses and multi-block datasets of said classes.");
   }
