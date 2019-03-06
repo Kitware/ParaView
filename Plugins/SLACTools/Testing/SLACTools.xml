@@ -25,24 +25,24 @@
   in the view.  I'm not really happy with this hack because it won't catch if
   accepting the dialog really doesn't render the final view.
   -->
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.5,0.5,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.5,0.5,1,0,0)" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsInitialLoad.png" width="300" height="300" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.5,0.5,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.5,0.5,1,0,0)" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsInitialLoad.png" width="300" height="300" />
   <!--
   Show the magnetic (b) field and change the representation to solid+wireframe.
   -->
   <pqevent object="pqSLACActionHolder/actionShowBField" command="activate" arguments="" />
   <pqevent object="pqSLACActionHolder/actionWireframeSolidMesh" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsBFieldWireSolid.png" width="300" height="300" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsBFieldWireSolid.png" width="300" height="300" />
   <!--
   Rotate the camera, show front wireframe + solid back, show electric (e)
   field scaled to all time steps, turn off particles.
   -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.863333,0.543333,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.743333,0.633333,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.743333,0.633333,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.863333,0.543333,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.743333,0.633333,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.743333,0.633333,1,0,0)" />
   <!--
   Restore window
   -->
@@ -52,7 +52,7 @@
   <pqevent object="pqSLACActionHolder/actionShowEField" command="activate" arguments="" />
   <pqevent object="pqSLACActionHolder/actionTemporalResetRange" command="activate" arguments="" />
   <pqevent object="pqSLACActionHolder/actionShowParticles" command="set_boolean" arguments="false" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsWireEFieldTempResetHideP.png" width="300" height="300" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsWireEFieldTempResetHideP.png" width="300" height="300" />
   <!--
   Restore black background, restore solid, restore particles, restore camera
   -->
@@ -60,12 +60,12 @@
   <pqevent object="pqSLACActionHolder/actionSolidMesh" command="activate" arguments="" />
   <pqevent object="pqSLACActionHolder/actionShowParticles" command="set_boolean" arguments="true" />
   <pqevent object="pqSLACActionHolder/actionShowStandardViewpoint" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsBlackBackReset.png" width="300" height="300" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsBlackBackReset.png" width="300" height="300" />
   <!--
   Plot over Z axis, change time.
   -->
   <pqevent object="pqSLACActionHolder/actionPlotOverZ" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Close" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsPlotOverZ.png" width="300" height="300" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1/Close" command="activate" arguments="" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Plugins/SLACTools/Testing/Data/Baseline/SLACToolsPlotOverZ.png" width="300" height="300" />
 </pqevents>

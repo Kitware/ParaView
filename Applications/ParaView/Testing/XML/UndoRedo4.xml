@@ -77,9 +77,9 @@ This test tests animation key frame undo/redo.
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.0691318,0.926244,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.28135,0.912521,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.28135,0.912521,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.0691318,0.926244,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.28135,0.912521,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.28135,0.912521,1,0,0)" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />

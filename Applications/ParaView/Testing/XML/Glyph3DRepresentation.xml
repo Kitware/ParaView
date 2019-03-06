@@ -59,7 +59,7 @@
 
   <!-- ensure changing glyph type works -->
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/GlyphType/ProxySelectionWidget/comboBox" command="activated" arguments="Cylinder" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/Glyph3DRepresentation_Cylinder.png" width="300" height="300" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/Glyph3DRepresentation_Cylinder.png" width="300" height="300" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/GlyphType/ProxySelectionWidget/comboBox" command="activated" arguments="Sphere" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/GlyphType/ProxySelectionWidget/comboBox" command="activated" arguments="Arrow" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/GlyphType/ProxySelectionWidget/comboBox" command="activated" arguments="Sphere" />

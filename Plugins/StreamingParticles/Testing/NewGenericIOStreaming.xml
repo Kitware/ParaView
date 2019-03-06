@@ -33,18 +33,18 @@
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming1.png" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming1.png" />
 
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.606667,0.336667,2,2,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.606667,0.336667,2,2,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.746667,0.75,2,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.746667,0.75,2,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.746667,0.75,2,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.746667,0.75,2,0,0)" />
   <!-- step down the streaming updates a few times -->
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
@@ -55,11 +55,11 @@
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming2.png" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming2.png" />
 
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.646667,0.553333,1,1,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(1.38,0.613333,1,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(1.38,0.613333,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.646667,0.553333,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(1.38,0.613333,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(1.38,0.613333,1,0,0)" />
   <!-- step down the streaming updates a few times -->
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
@@ -70,18 +70,18 @@
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming3.png" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming3.png" />
 
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.68,0.736667,2,2,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mousePress" arguments="(0.68,0.736667,2,2,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.653333,0.23,2,0,0)" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.653333,0.23,2,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseMove" arguments="(0.653333,0.23,2,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" command="mouseRelease" arguments="(0.653333,0.23,2,0,0)" />
   <!-- step down the streaming updates a few times -->
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
@@ -90,7 +90,7 @@
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming4.png" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming4.png" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/DetailLevel/DoubleLineEdit0" command="set_full_precision_text" arguments="4" />
   <!-- step down the streaming updates a few times -->
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
@@ -100,5 +100,5 @@
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
   <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming5.png" />
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/NewGenericIOStreaming5.png" />
 </pqevents>
