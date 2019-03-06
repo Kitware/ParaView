@@ -407,15 +407,27 @@ void vtkFileSeriesReader::RemoveAllFileNames()
 }
 
 //----------------------------------------------------------------------------
+void vtkFileSeriesReader::RemoveAllFileNamesInternal()
+{
+  this->Internal->FileNames.clear();
+}
+
+//----------------------------------------------------------------------------
 void vtkFileSeriesReader::AddFileNameInternal(const char* name)
 {
   this->Internal->FileNames.push_back(name);
 }
 
 //----------------------------------------------------------------------------
-void vtkFileSeriesReader::RemoveAllFileNamesInternal()
+void vtkFileSeriesReader::RemoveAllRealFileNamesInternal()
 {
-  this->Internal->FileNames.clear();
+  this->Internal->RealFileNames.clear();
+}
+
+//----------------------------------------------------------------------------
+void vtkFileSeriesReader::CopyRealFileNamesFromFileNames()
+{
+  this->Internal->RealFileNames = this->Internal->FileNames;
 }
 
 //----------------------------------------------------------------------------
@@ -911,7 +923,7 @@ void vtkFileSeriesReader::UpdateMetaData()
   }
   else
   {
-    this->Internal->RealFileNames = this->Internal->FileNames;
+    this->CopyRealFileNamesFromFileNames();
   }
 
   this->MetaFileReadTime.Modified();
