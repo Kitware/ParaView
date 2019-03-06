@@ -128,7 +128,8 @@ void pqCatalystExportReaction::onTriggered()
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqPipelineSource*>();
   foreach (pqPipelineSource* source, sources)
   {
-    if (qobject_cast<pqPipelineFilter*>(source))
+    if (qobject_cast<pqPipelineFilter*>(source) ||
+      vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()) == nullptr)
     {
       continue;
     }
