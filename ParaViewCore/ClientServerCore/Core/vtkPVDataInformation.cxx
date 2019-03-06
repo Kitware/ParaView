@@ -1220,6 +1220,7 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
   { // Every type is of type vtkDataObject.
     return 1;
   }
+
   if (strcmp(type, "vtkDataSet") == 0)
   { // Every type is of type vtkDataObject.
     if (this->DataSetType == VTK_POLY_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
@@ -1258,6 +1259,16 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
       return 1;
     }
   }
+  if (strcmp(type, "vtkGraph") == 0)
+  {
+    if (this->DataSetType == VTK_GRAPH || this->DataSetType == VTK_TREE ||
+      this->DataSetType == VTK_DIRECTED_GRAPH || this->DataSetType == VTK_UNDIRECTED_GRAPH ||
+      this->DataSetType == VTK_DIRECTED_ACYCLIC_GRAPH || this->DataSetType == VTK_REEB_GRAPH ||
+      this->DataSetType == VTK_MOLECULE)
+    {
+      return 1;
+    }
+  }
   return 0;
 }
 
@@ -1274,6 +1285,37 @@ int vtkPVDataInformation::IsDataStructured()
       return 1;
   }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVDataInformation::IsAttributeValid(int fieldAssociation)
+{
+  // CompositeDataSet are not analysed by this method
+  if (this->CompositeDataSetType >= 0)
+  {
+    return true;
+  }
+
+  switch (fieldAssociation)
+  {
+    case vtkDataObject::FIELD_ASSOCIATION_NONE:
+      return true;
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+      return this->DataSetTypeIsA("vtkDataSet");
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+      return this->DataSetTypeIsA("vtkGraph");
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+      return this->DataSetType == VTK_TABLE;
+      break;
+    default:
+      return false;
+      break;
+  }
 }
 
 //----------------------------------------------------------------------------

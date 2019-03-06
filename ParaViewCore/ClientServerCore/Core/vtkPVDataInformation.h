@@ -271,6 +271,13 @@ public:
    */
   int IsDataStructured();
 
+  /**
+   * Returns true if provided fieldAssociation is valid for this dataset, false otherwise.
+   * Always returns true for composite datasets.
+   * eg, FIELD_ASSOCIATION_EDGES will return false for a vtkPolyData, true for a vtkGraph.
+   */
+  bool IsAttributeValid(int fieldAssociation);
+
   //@{
   /**
    * If this instance of vtkPVDataInformation summarizes a node in a
