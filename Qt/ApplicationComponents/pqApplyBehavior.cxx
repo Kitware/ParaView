@@ -343,6 +343,13 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
     // pqApplyBehavior::applied().
     this->Internals->NewlyCreatedRepresentations.push_back(
       pqInternals::PairType(reprProxy, preferredView));
+
+    // If the currentViewProxy is undefined, then a new view has been created for
+    // the first output port. Attempt to use it for the remaining output ports.
+    if (currentViewProxy == nullptr)
+    {
+      currentViewProxy = preferredView;
+    }
   }
 }
 
