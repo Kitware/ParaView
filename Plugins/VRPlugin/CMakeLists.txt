@@ -113,6 +113,7 @@ target_link_libraries (VRPlugin
     ParaView::Core
     ParaView::ServerManagerCore
     ParaView::ServerManagerRendering
+    ParaView::pqApplicationComponents
     VTK::CommonCore
     VTK::CommonMath
     VTK::CommonTransforms
