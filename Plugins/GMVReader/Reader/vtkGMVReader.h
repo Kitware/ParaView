@@ -53,7 +53,8 @@
 class vtkCallbackCommand;
 class vtkDataArraySelection;
 class vtkDataSet;
-class vtkFieldData class vtkIntArray;
+class vtkFieldData;
+class vtkIntArray;
 class vtkMultiProcessController;
 class vtkPolyData;
 class vtkStringArray;
