@@ -549,22 +549,22 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
           zonename = zonename.substr(0, 32);
           for (auto& e : o2d)
           {
-            int i = 1;
-            while (e.name == zonename && i < 100)
+            int j = 1;
+            while (e.name == zonename && j < 100)
             {
-              zonename = zonename.substr(0, i < 10 ? 31 : 30) + to_string(i);
-              ++i;
+              zonename = zonename.substr(0, j < 10 ? 31 : 30) + to_string(j);
+              ++j;
             }
             // if there are 100 duplicate zones after truncation, give up.
             // an error will be given by CGNS that a duplicate name has been found.
           }
           for (auto& e : o3d)
           {
-            int i = 1;
-            while (e.name == zonename && i < 100)
+            int j = 1;
+            while (e.name == zonename && j < 100)
             {
-              zonename = zonename.substr(0, i < 10 ? 31 : 30) + to_string(i);
-              ++i;
+              zonename = zonename.substr(0, j < 10 ? 31 : 30) + to_string(j);
+              ++j;
             }
             // if there are 100 duplicate zones after truncation, give up.
             // an error will be given by CGNS that a duplicate name has been found.
