@@ -264,38 +264,6 @@ void pqComboBoxDomain::internalDomainChanged()
     combo->setEnabled(texts.size() > 1);
     cur_property_value = pqSMAdaptor::getEnumerationProperty(this->Internal->Property);
   }
-  else if (type == pqSMAdaptor::FIELD_SELECTION)
-  {
-    if (this->Internal->DomainName == "field_list")
-    {
-      texts = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
-      foreach (QString str, texts)
-      {
-        data.push_back(str);
-        infos.append(QString());
-        icons.append(QIcon());
-      }
-    }
-    else if (this->Internal->DomainName == "array_list")
-    {
-      QList<QPair<QString, bool> > arrays =
-        pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Internal->Property);
-      for (int kk = 0; kk < arrays.size(); kk++)
-      {
-        QPair<QString, bool> pair = arrays[kk];
-        QString arrayName = pair.first;
-        if (pair.second)
-        {
-          arrayName += " (partial)";
-        }
-        texts.append(arrayName);
-        data.append(pair.first);
-        infos.append(QString());
-        icons.append(QIcon());
-      }
-    }
-    cur_property_value = pqSMAdaptor::getElementProperty(this->Internal->Property);
-  }
   else if (type == pqSMAdaptor::PROXYSELECTION || type == pqSMAdaptor::PROXYLIST)
   {
     QList<pqSMProxy> proxies = pqSMAdaptor::getProxyPropertyDomain(this->Internal->Property);
@@ -380,9 +348,6 @@ void pqComboBoxDomain::internalDomainChanged()
       {
         case (pqSMAdaptor::ENUMERATION):
           cur_property_value = pqSMAdaptor::getEnumerationProperty(this->Internal->Property);
-          break;
-        case (pqSMAdaptor::FIELD_SELECTION):
-          cur_property_value = pqSMAdaptor::getElementProperty(this->Internal->Property);
           break;
         case (pqSMAdaptor::PROXYSELECTION):
         case (pqSMAdaptor::PROXYLIST):
