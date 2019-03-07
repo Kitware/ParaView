@@ -156,7 +156,7 @@ protected:
 
   void AdjustAxes()
   {
-    this->GetAxis(vtkAxis::BOTTOM)->SetRange(this->XRange[0], this->XRange[1]);
+    this->GetAxis(vtkAxis::BOTTOM)->SetUnscaledRange(this->XRange[0], this->XRange[1]);
     this->GetAxis(vtkAxis::LEFT)->SetRange(0, 1);
 
     // for recalculation of transforms using current axes ranges.
