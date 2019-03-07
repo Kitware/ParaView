@@ -3,7 +3,7 @@
   <!-- Load the data -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/gmvtest.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/gmvtest.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
 
@@ -37,7 +37,7 @@
 
   <!-- 2 identical pyramid cells, defined with differing vertex order -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/2pyramids.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/2pyramids.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -66,7 +66,7 @@
   <!-- quadratic cell tests -->
   <!-- 3-nodes, isoparametric parabolic line -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/3line.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/3line.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -78,7 +78,7 @@
 
   <!-- parabolic, isoparametric triangle -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/6tri.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/6tri.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -89,7 +89,7 @@
 
   <!-- 8-node isoparametric parabolic quadrilateral element -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/8quad.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/8quad.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -100,7 +100,7 @@
 
   <!-- parabolic, 20-node isoparametric hexahedron -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/phex20.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/phex20.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -114,7 +114,7 @@
 
   <!-- parabolic, 27-node isoparametric hexahedron -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/phex27.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/phex27.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -128,7 +128,7 @@
 
   <!-- parabolic, 15-node isoparametric wedge -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/pprism15.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/pprism15.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -143,7 +143,7 @@
 
   <!-- parabolic, 13-node isoparametric pyramid -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/ppyrmd13.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/ppyrmd13.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -158,7 +158,7 @@
 
   <!-- 10-node, isoparametric parabolic tetrahedron -->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/quadratic_cells/ptet10.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/quadratic_cells/ptet10.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -173,7 +173,7 @@
   <!-- partially defined pyramids -->
 
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.1.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.1.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -184,7 +184,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Orientation/DoubleLineEdit2" command="set_full_precision_text" arguments="100" />
 
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.2.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.2.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -195,7 +195,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Orientation/DoubleLineEdit2" command="set_full_precision_text" arguments="100" />
 
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.3.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.3.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -206,7 +206,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Orientation/DoubleLineEdit2" command="set_full_precision_text" arguments="100" />
 
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.4.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.4.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
@@ -217,7 +217,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Orientation/DoubleLineEdit2" command="set_full_precision_text" arguments="100" />
 
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.5.gmv" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Plugins/GMVReader/Testing/Data/GMV/partial-pyramid/partial-pyramid-as-polyhedron.faces.5.gmv" />
   <pqevent object="pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="GMV Binary/ASCII Files (Plugin)" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />

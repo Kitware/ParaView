@@ -53,7 +53,8 @@
 class vtkCallbackCommand;
 class vtkDataArraySelection;
 class vtkDataSet;
-class vtkFieldData class vtkIntArray;
+class vtkFieldData;
+class vtkIntArray;
 class vtkMultiProcessController;
 class vtkPolyData;
 class vtkStringArray;
@@ -168,14 +169,6 @@ public:
   void EnableAllCellArrays();
   void DisableAllFieldArrays();
   void EnableAllFieldArrays();
-
-  // get min and max value for the index-th value of a node component
-  // index varies from 0 to (veclen - 1)
-  void GetNodeDataRange(int nodeComp, int index, float* min, float* max);
-
-  // get min and max value for the index-th value of a cell component
-  // index varies from 0 to (veclen - 1)
-  void GetCellDataRange(int cellComp, int index, float* min, float* max);
 
   int GetHasTracers();
   int GetHasPolygons();
