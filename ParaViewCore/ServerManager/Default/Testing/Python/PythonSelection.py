@@ -7,7 +7,7 @@ s = Sphere()
 c =Cone(Resolution=10)
 GroupDatasets(Input=[s,c])
 GenerateIds()
-sel = SelectCells("Ids > 4")
+sel = SelectCells("CellIds > 4")
 
 e = ExtractSelection(Selection=sel)
 r = Show()

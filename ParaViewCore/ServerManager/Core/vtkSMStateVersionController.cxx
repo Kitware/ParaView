@@ -624,7 +624,10 @@ struct Process_5_5_to_5_6
 //===========================================================================
 struct Process_5_6_to_5_7
 {
-  bool operator()(xml_document& document) { return ConvertResampleWithDataset(document); }
+  bool operator()(xml_document& document)
+  {
+    return ConvertResampleWithDataset(document) && ConvertIdsFilter(document);
+  }
 
   static bool ConvertResampleWithDataset(xml_document& document)
   {
@@ -645,6 +648,30 @@ struct Process_5_6_to_5_7
 
     return true;
   }
+
+  static bool ConvertIdsFilter(xml_document& document)
+  {
+    // `ArrayName` property was removed, instead replaced by `CellIdsArrayName`
+    // and `PointIdsArrayName`.
+    pugi::xpath_node_set elements =
+      document.select_nodes("//ServerManagerState/Proxy[@group='filters' and "
+                            "@type='GenerateIdScalars']/Property[@name='ArrayName']");
+    for (auto iter = elements.begin(); iter != elements.end(); ++iter)
+    {
+      auto arrayname_node = iter->node();
+      auto proxy_node = arrayname_node.parent();
+      std::string id = proxy_node.attribute("id").value();
+
+      arrayname_node.attribute("name").set_value("CellIdsArrayName");
+      arrayname_node.attribute("id").set_value((id + ".CellIdsArrayName").c_str());
+      proxy_node.append_copy(arrayname_node);
+
+      arrayname_node.attribute("name").set_value("PointIdsArrayName");
+      arrayname_node.attribute("id").set_value((id + ".PointIdsArrayName").c_str());
+    }
+
+    return true;
+  };
 };
 
 } // end of namespace

@@ -276,6 +276,18 @@ def setattr(proxy, pname, value):
                 'The ResampleWithDataset.Source property has been changed in ParaView 5.7. '\
                 'Please set the DestinationMesh property instead.')
 
+    # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
+    # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
+    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
+        if paraview.compatibility.GetVersion() < 5.7:
+            proxy.GetProperty("PointIdsArrayName").SetData(value)
+            proxy.GetProperty("CellIdsArrayName").SetData(value)
+            raise Continue()
+        else:
+            raise NotSupportedException(
+                'The GenerateIdScalars.ArrayName property has been removed in ParaView 5.7. '\
+                'Please set `PointIdsArrayName` or `CellIdsArrayName` property instead.')
+
     if not hasattr(proxy, pname):
         raise AttributeError()
     proxy.__dict__[pname] = value
@@ -514,6 +526,16 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                 'The ResampleWithDataset.Source property has been changed in ParaView 5.7. '\
                 'Please access the DestinationMesh property instead.')
+
+    # In 5.7, we removed `ArrayName` property on the `GenerateIdScalars` filter
+    # and replaced it with `CellIdsArrayName` and `PointIdsArrayName`.
+    if pname == "ArrayName" and proxy.SMProxy.GetXMLName() == "GenerateIdScalars":
+        if paraview.compatibility.GetVersion() < 5.7:
+            return proxy.GetProperty("PointIdsArrayName")
+        else:
+            raise NotSupportedException(
+                'The GenerateIdScalars.ArrayName property has been removed in ParaView 5.7. ' \
+                'Please access `PointIdsArrayName` or `CellIdsArrayName` property instead.')
 
     raise Continue()
 
