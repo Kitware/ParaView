@@ -17,7 +17,7 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,69,9,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,69,9,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport"
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport"
     baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/ReloadExodusFile-BeforeReload.png" width="400" height="400" />
 
 
@@ -37,6 +37,6 @@
   <!-- hit reload again, this time we expect no prompt -->
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionReloadFiles" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
-  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/CentralWidgetFrame/Viewport"
+  <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/Viewport"
     baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/ReloadExodusFile-AfterReload.png" width="400" height="400" />
 </pqevents>

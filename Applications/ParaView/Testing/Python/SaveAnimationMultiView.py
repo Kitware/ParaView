@@ -15,7 +15,7 @@ QtTesting.playCommand(object24, 'set_string', 'Surface')
 object25 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables'
 QtTesting.playCommand(object25, 'set_string', 'RTData')
 QtTesting.playCommand(object6, 'set_tab_with_text', 'Properties')
-object3 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/SplitHorizontal'
+object3 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/SplitHorizontal'
 QtTesting.playCommand(object3, 'activate', '')
 
 QtTesting.playCommand(object1, 'activate', 'Arrow')
@@ -23,7 +23,7 @@ QtTesting.playCommand(object2, 'activate', '')
 object4 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Delete'
 QtTesting.playCommand(object4, 'activate', '')
 
-object4 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/SplitVertical'
+object4 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/SplitVertical'
 QtTesting.playCommand(object4, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'Sphere')
 QtTesting.playCommand(object2, 'activate', '')

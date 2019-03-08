@@ -395,5 +395,5 @@ int pqTextEditTest(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   pqTextEditTester test1;
-  return QTest::qExec(&test1);
+  return QTest::qExec(&test1, argc, argv);
 }

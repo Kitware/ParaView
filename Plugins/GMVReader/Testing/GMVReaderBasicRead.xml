@@ -201,7 +201,7 @@
 
   <!-- To minimize tiny picture norm deviations among platforms: -->
   <!-- a) 2D view -->
-  <!-- pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/ToggleInteractionMode" command="activate" arguments="" /> -->
+  <!-- pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/ToggleInteractionMode" command="activate" arguments="" /> -->
   <!-- b) disable orientation axes actor -->
   <pqevent object="pqClientMainWindow/axesToolbar/actionShowOrientationAxes" command="set_boolean" arguments="false" />
   <!-- c) disable center axes actor -->

@@ -16,5 +16,5 @@ QtTesting.playCommand(object23, 'mousePress', '1,1,0,0,0,0')
 QtTesting.playCommand(object23, 'mouseRelease', '1,0,0,0,0,0')
 QtTesting.playCommand(object4, 'activate', '')
 # DO_IMAGE_COMPARE
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'CTHAMRMaterialInterfaceFilter.png', 300, 300)

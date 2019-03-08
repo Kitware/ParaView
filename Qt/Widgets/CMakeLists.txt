@@ -59,6 +59,8 @@ set(classes
   pqExpanderButton
   pqFlatTreeView
   pqHeaderView
+  pqHierarchicalGridLayout
+  pqHierarchicalGridWidget
   pqHighlightablePushButton
   pqHighlightableToolButton
   pqLineEdit
