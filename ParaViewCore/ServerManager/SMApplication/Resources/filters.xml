@@ -1296,13 +1296,60 @@
         <Documentation>This property specifies the input to the Cell Data to
         Point Data filter.</Documentation>
       </InputProperty>
-      <StringVectorProperty command="SetIdsArrayName"
-                            default_values="Ids"
-                            name="ArrayName"
+      <IntVectorProperty name="GeneratePointIds"
+                         command="SetPointIds"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable generation of point ids.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetPointIdsArrayName"
+                            default_values="PointIds"
+                            name="PointIdsArrayName"
                             number_of_elements="1">
-        <Documentation>The name of the array that will contain
-        ids.</Documentation>
+        <Documentation>The name of the point ids array.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GeneratePointIds"
+                                   value="1" />
+        </Hints>
       </StringVectorProperty>
+
+      <IntVectorProperty name="GenerateCellIds"
+                         command="SetCellIds"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable generation of cell ids.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty command="SetCellIdsArrayName"
+                            default_values="CellIds"
+                            name="CellIdsArrayName"
+                            number_of_elements="1">
+        <Documentation>The name of the cell ids array.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="enabled_state"
+                                   property="GenerateCellIds"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+      <PropertyGroup label="Point Ids">
+        <Property name="GeneratePointIds" />
+        <Property name="PointIdsArrayName" />
+      </PropertyGroup>
+      <PropertyGroup label="Cell Ids">
+        <Property name="GenerateCellIds" />
+        <Property name="CellIdsArrayName" />
+      </PropertyGroup>
+
       <!-- End GenerateIdScalars -->
     </SourceProxy>
     <!-- ==================================================================== -->
