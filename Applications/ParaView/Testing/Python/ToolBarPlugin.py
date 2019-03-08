@@ -7,9 +7,6 @@ libname = 'libGUIMyToolBar.so'
 if sys.platform == 'win32':
     libname = 'GUIMyToolBar.dll'
 
-if sys.platform == 'darwin':
-    libname = 'libGUIMyToolBar.dylib'
-
 object1 = 'pqClientMainWindow/menubar/menuTools'
 QtTesting.playCommand(object1, 'activate', 'actionManage_Plugins')
 object2 = "pqClientMainWindow/pqPluginDialog/localGroup/loadLocal"

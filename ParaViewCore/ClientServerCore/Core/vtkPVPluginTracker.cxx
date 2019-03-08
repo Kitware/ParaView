@@ -72,9 +72,10 @@ std::string vtkGetPluginFileNameFromName(const std::string& pluginname)
 {
 #if defined(_WIN32) && !defined(__CYGWIN__)
   return pluginname + ".dll";
-#elif defined(__APPLE__)
-  return pluginname + ".dylib";
 #else
+  // starting with ParaView 5.7, we are building .so's even on macOS
+  // since they are built as "add_library(.. MODULE)" which by default generates
+  // `.so`s which seems to be the convention.
   return pluginname + ".so";
 #endif
 }

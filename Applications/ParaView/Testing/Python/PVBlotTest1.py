@@ -34,9 +34,6 @@ pluginFile = 'libpvblot.so'
 if sys.platform == 'win32':
     pluginFile = 'pvblot.dll'
 
-if sys.platform == 'darwin':
-    pluginFile = 'libpvblot.dylib'
-
 dataFile = '$PARAVIEW_DATA_ROOT/Testing/Data/can.ex2'
 
 object1 = 'pqClientMainWindow/menubar/menuTools'
