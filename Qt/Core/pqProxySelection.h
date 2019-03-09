@@ -43,10 +43,10 @@ class vtkSMProxySelectionModel;
 * pqProxySelection provides methods to convert to and from
 * vtkSMProxySelectionModel.
 */
-class PQCORE_EXPORT pqProxySelection : public QList<pqServerManagerModelItem*>
-{
-  typedef QList<pqServerManagerModelItem*> Superclass;
+using pqProxySelection = QList<pqServerManagerModelItem*>;
 
+class PQCORE_EXPORT pqProxySelectionUtilities
+{
 public:
   /**
   * copy values from vtkSMProxySelectionModel. All proxies in the
@@ -54,12 +54,12 @@ public:
   * it will be ignored. Returns true, if the selection was changed, otherwise
   * returns false.
   */
-  bool copyFrom(vtkSMProxySelectionModel* other);
+  static bool copy(vtkSMProxySelectionModel* source, pqProxySelection& dest);
 
   /**
   * copy values to vtkSMProxySelectionModel. Clears any existing selection.
   */
-  bool copyTo(vtkSMProxySelectionModel* other) const;
+  static bool copy(const pqProxySelection& source, vtkSMProxySelectionModel* dest);
 };
 
 #endif

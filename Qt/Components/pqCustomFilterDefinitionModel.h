@@ -41,9 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QAbstractItemModel>
 
+#include "pqProxySelection.h" // for pqProxySelection.
+
 class pqCustomFilterDefinitionModelItem;
 class pqPipelineSource;
-class pqProxySelection;
 class QPixmap;
 class vtkCollection;
 
