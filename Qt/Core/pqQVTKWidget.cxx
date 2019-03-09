@@ -31,23 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqQVTKWidget.h"
 
-#include <QImage>
-#include <QMoveEvent>
-#include <QPainter>
-#include <QPixmap>
-#include <QPoint>
-#include <QPointer>
 #include <QResizeEvent>
 
+#include "pqApplicationCore.h"
+#include "pqOptions.h"
 #include "pqUndoStack.h"
+#include "vtkPVLogger.h"
 #include "vtkRenderWindow.h"
-#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
 #include "vtksys/SystemTools.hxx"
-
-#include "QVTKInteractorAdapter.h"
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
@@ -56,6 +50,20 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WindowFlags f)
 {
   // disable HiDPI if we are running tests
   this->setEnableHiDPI(vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST") ? false : true);
+
+  // if active stereo requested, then we need to request appropriate context.
+  auto options = pqApplicationCore::instance()->getOptions();
+  if (options->GetStereoType() && strcmp(options->GetStereoType(), "Crystal Eyes") == 0)
+  {
+#if PARAVIEW_USING_QVTKOPENGLWIDGET
+    auto fmt = this->defaultFormat(/*supports_stereo =*/true);
+    this->setFormat(fmt);
+    vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "requesting stereo-capable context.");
+#else
+    vtkLogF(WARNING,
+      "we do not support stereo capable context on this platform; stereo request ignored.");
+#endif
+  }
 }
 
 //----------------------------------------------------------------------------
