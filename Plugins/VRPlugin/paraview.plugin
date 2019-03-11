@@ -9,6 +9,7 @@ REQUIRES_MODULES
   ParaView::Core
   ParaView::ServerManagerCore
   ParaView::ServerManagerRendering
+  ParaView::pqApplicationComponents
   VTK::CommonCore
   VTK::CommonMath
   VTK::CommonTransforms

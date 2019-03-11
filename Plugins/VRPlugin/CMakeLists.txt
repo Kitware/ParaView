@@ -107,12 +107,17 @@ paraview_add_plugin(VRPlugin
   UI_FILES ${ui_files}
   SOURCES ${sources})
 
-target_link_libraries (VRPlugin
-  LINK_PRIVATE
+target_include_directories(VRPlugin
+  PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}")
+
+target_link_libraries(VRPlugin
+  PRIVATE
     ParaView::ClientServerCoreCore
     ParaView::Core
     ParaView::ServerManagerCore
     ParaView::ServerManagerRendering
+    ParaView::pqApplicationComponents
     VTK::CommonCore
     VTK::CommonMath
     VTK::CommonTransforms
