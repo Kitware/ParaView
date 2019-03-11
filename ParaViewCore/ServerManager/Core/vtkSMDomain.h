@@ -110,10 +110,18 @@ public:
   vtkSMProperty* GetProperty();
 
   /**
-     * Helper method to get vtkPVDataInformation from input proxy connected to the
-     * required property with the given function.
-     */
-  virtual vtkPVDataInformation* GetInputDataInformation(const char* function, int index = 0);
+   * Helper method to get vtkPVDataInformation from input proxy connected to the
+   * required property with the given function and provided input index.
+   */
+  virtual vtkPVDataInformation* GetInputDataInformation(
+    const char* function, unsigned int index = 0);
+
+  /**
+   * Helper method to get the number of input connections hence the number of available
+   * vtkPVDataInformation
+   * from input proxy connected to the required property with the given function.
+   */
+  virtual unsigned int GetNumberOfInputConnections(const char* function);
 
 protected:
   vtkSMDomain();
