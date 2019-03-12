@@ -125,7 +125,7 @@ public:
   vtkGetMacro(DataSetType, int);
   vtkGetMacro(CompositeDataSetType, int);
   const char* GetDataSetTypeAsString();
-  int DataSetTypeIsA(const char* type);
+  bool DataSetTypeIsA(const char* type);
   vtkGetMacro(NumberOfPoints, vtkTypeInt64);
   vtkGetMacro(NumberOfCells, vtkTypeInt64);
   vtkGetMacro(NumberOfRows, vtkTypeInt64);
@@ -269,7 +269,7 @@ public:
   /**
    * Returns if the data type is structured.
    */
-  int IsDataStructured();
+  bool IsDataStructured();
 
   /**
    * Returns true if provided fieldAssociation is valid for this dataset, false otherwise.
