@@ -1,0 +1,98 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <!-- ================================================================== -->
+    <RepresentationProxy name="PythonRepresentation"
+                        class="vtkPythonRepresentation"
+                        processes="client|dataserver|renderserver">
+      <InputProperty command="SetInputConnection" name="Input"/>
+      <IntVectorProperty command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Visibility of the representation.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetForceUseCache"
+                         default_values="0"
+                         is_internal="1"
+                         name="ForceUseCache"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetForcedCacheKey"
+                            default_values="none"
+                            is_internal="1"
+                            name="ForcedCacheKey"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Typically UseCache and CacheKey are updated by the View
+        and representations cache based on what the view tells it. However in
+        some cases we may want to force a representation to cache irrespective
+        of the view (e.g. comparative views). In which case these ivars can up
+        set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+        Instead, ForcedCacheKey is used.</Documentation>
+      </DoubleVectorProperty>
+    </RepresentationProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="views">
+    <!-- ================================================================== -->
+    <PythonViewProxy name="PythonView" class="vtkPythonView"
+                     label="Python View"
+                     processes="client|dataserver|renderserver"
+                     base_proxygroup="internal_views"
+                     base_proxyname="ViewBase"
+                     representation_name="PythonRepresentation">
+      <StringVectorProperty command="SetScript"
+                            name="Script"
+                            number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line" syntax="python"/>
+        </Hints>
+        <Documentation>This property contains the text of a Python program used
+        to generate a plot. Use the TAB key to end editing and generate the
+        plot.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="GetNumberOfVisibleDataObjects"
+                         name="NumberOfVisibleDataObjects"
+                         number_of_elements="1"
+                         default_values="1"
+                         information_only="1"
+                         panel_visibility="never">
+      <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+     <IntVectorProperty command="SetForceUseCache"
+                        default_values="0"
+                        is_internal="1"
+                        name="ForceUseCache"
+                        number_of_elements="1">
+       <BooleanDomain name="bool" />
+       <Documentation>Typically UseCache and CacheKey are updated by the View
+       and representations cache based on what the view tells it. However in
+       some cases we may want to force a representation to cache irrespective
+       of the view (e.g. comparative views). In which case these ivars can up
+       set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+       Instead, ForcedCacheKey is used.</Documentation>
+     </IntVectorProperty>
+     <DoubleVectorProperty command="SetForcedCacheKey"
+                           default_values="none"
+                           is_internal="1"
+                           name="ForcedCacheKey"
+                           number_of_elements="1">
+       <DoubleRangeDomain name="range" />
+       <Documentation>Typically UseCache and CacheKey are updated by the View
+       and representations cache based on what the view tells it. However in
+       some cases we may want to force a representation to cache irrespective
+       of the view (e.g. comparative views). In which case these ivars can up
+       set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+       Instead, ForcedCacheKey is used.</Documentation>
+     </DoubleVectorProperty>
+    </PythonViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

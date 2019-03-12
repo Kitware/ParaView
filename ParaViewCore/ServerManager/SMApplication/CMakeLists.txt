@@ -116,7 +116,8 @@ endif ()
 
 if (TARGET VTK::PythonInterpreter)
   list(APPEND xml_files
-    Resources/pythonfilter.xml)
+    Resources/pythonfilter.xml
+    Resources/pythonviews.xml)
 endif ()
 
 paraview_add_server_manager_xmls(
