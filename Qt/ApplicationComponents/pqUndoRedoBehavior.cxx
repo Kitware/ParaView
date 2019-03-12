@@ -70,16 +70,4 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
     core->getServerManagerModel(), SIGNAL(serverAdded(pqServer*)), stack, SLOT(clear()));
   QObject::connect(
     core->getServerManagerModel(), SIGNAL(finishedRemovingServer()), stack, SLOT(clear()));
-
-  // As the undo-stack is properly setup now, record the current ProxyManager state
-  //  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  //  pxm->GetActiveSessionProxyManager()->TriggerStateUpdate();
-
-  // FIXME disable undo when VCR is used
-  //  QObject::connect(
-  //      &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
-  //      this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
-  //  QObject::connect(
-  //      &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
-  //      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 }
