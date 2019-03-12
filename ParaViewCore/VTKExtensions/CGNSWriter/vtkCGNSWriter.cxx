@@ -351,6 +351,8 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
   int nArr = dsa->GetNumberOfArrays();
   if (nArr > 0)
   {
+    vector<double> temp;
+
     int dummy(0);
     cg_check_operation(cg_sol_write(info.F, info.B, info.Z, solution, location, &(info.Sol)));
     for (int i = 0; i < nArr; ++i)
@@ -359,6 +361,7 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
       if (!da)
         continue;
 
+      temp.reserve(da->GetNumberOfTuples());
       if (da->GetNumberOfComponents() != 1)
       {
         string fieldName = da->GetName();
@@ -366,42 +369,44 @@ bool vtkCGNSWriter::vtkPrivate::WriteFieldArray(write_info& info, const char* so
         {
           // here we have to stripe the XYZ values, same as with the vertices.
           const char* const components[3] = { "X", "Y", "Z" };
-          double* temp = new (nothrow) double[da->GetNumberOfTuples()];
-          if (!temp)
-          {
-            error = "Failed to allocate temporary array";
-            return false;
-          }
 
           for (int idx = 0; idx < 3; ++idx)
           {
             for (vtkIdType t = 0; t < da->GetNumberOfTuples(); ++t)
             {
               double* tpl = da->GetTuple(t);
-              temp[t] = tpl[idx];
+              temp.push_back(tpl[idx]);
             }
 
             string fieldComponentName = fieldName + components[idx];
-            if (CG_OK != cg_field_write(info.F, info.B, info.Z, info.Sol, CGNS_ENUMV(RealDouble),
-                           fieldComponentName.c_str(), temp, &dummy))
-            {
-              delete[] temp; // don't leak
-              error = cg_get_error();
-              return false;
-            }
-          }
 
-          delete[] temp; // don't leak
+            cg_check_operation(cg_field_write(info.F, info.B, info.Z, info.Sol,
+              CGNS_ENUMV(RealDouble), fieldComponentName.c_str(), temp.data(), &dummy));
+
+            temp.clear();
+          }
         }
         else
         {
-          continue; // no support for ncomponents != 3
+          vtkWarningWithObjectMacro(nullptr, << " Field " << da->GetName() << " has "
+                                             << da->GetNumberOfComponents()
+                                             << " components, which is not supported. Skipping...");
         }
       }
       else // 1-component field data.
       {
+        // force to double precision, even if data type is single precision,
+        // see https://gitlab.kitware.com/paraview/paraview/issues/18827
+        for (vtkIdType t = 0; t < da->GetNumberOfTuples(); ++t)
+        {
+          double* tpl = da->GetTuple(t);
+          temp.push_back(*tpl);
+        }
+
         cg_check_operation(cg_field_write(info.F, info.B, info.Z, info.Sol, CGNS_ENUMV(RealDouble),
-          da->GetName(), da->GetVoidPointer(0), &dummy));
+          da->GetName(), temp.data(), &dummy));
+
+        temp.clear();
       }
     }
   }
@@ -538,6 +543,37 @@ void Flatten(vtkMultiBlockDataSet* mb, vector<entry>& o2d, vector<entry>& o3d, i
       if (md->Has(vtkCompositeDataSet::NAME()))
       {
         zonename = md->Get(vtkCompositeDataSet::NAME());
+        if (zonename.length() > 32)
+        {
+          string oldname(zonename);
+          zonename = zonename.substr(0, 32);
+          for (auto& e : o2d)
+          {
+            int j = 1;
+            while (e.name == zonename && j < 100)
+            {
+              zonename = zonename.substr(0, j < 10 ? 31 : 30) + to_string(j);
+              ++j;
+            }
+            // if there are 100 duplicate zones after truncation, give up.
+            // an error will be given by CGNS that a duplicate name has been found.
+          }
+          for (auto& e : o3d)
+          {
+            int j = 1;
+            while (e.name == zonename && j < 100)
+            {
+              zonename = zonename.substr(0, j < 10 ? 31 : 30) + to_string(j);
+              ++j;
+            }
+            // if there are 100 duplicate zones after truncation, give up.
+            // an error will be given by CGNS that a duplicate name has been found.
+          }
+
+          vtkWarningWithObjectMacro(
+            nullptr, << "Zone name '" << oldname << "' has been truncated to '" << zonename
+                     << " to conform to 32-character limit on names in CGNS.");
+        }
       }
     }
 
@@ -794,10 +830,18 @@ void vtkCGNSWriter::WriteData()
       vtkPointSet* ug = vtkPointSet::SafeDownCast(this->OriginalInput);
       WasWritingSuccessful = vtkCGNSWriter::vtkPrivate::WritePointSet(ug, this->FileName, error);
     }
+    else
+    {
+      error = string("Unsupported class type '") + this->OriginalInput->GetClassName() +
+        "' on input.\nSupported types are vtkStructuredGrid, vtkPointSet, their subclasses and "
+        "multi-block datasets of said classes.";
+    }
   }
   else
   {
-    vtkErrorMacro(<< "Incorrect class type " << this->OriginalInput->GetClassName() << " on input");
+    vtkErrorMacro(<< "Unsupported class type '" << this->OriginalInput->GetClassName()
+                  << "' on input.\nSupported types are vtkStructuredGrid, vtkPointSet, their "
+                     "subclasses and multi-block datasets of said classes.");
   }
   if (!WasWritingSuccessful)
   {
