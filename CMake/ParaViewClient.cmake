@@ -402,7 +402,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     if (DEFINED _paraview_client_BUNDLE_ICON)
       set_property(TARGET "${_paraview_client_NAME}"
         PROPERTY
-          MACOSX_BUNDLE_ICON_FILE "${_paraview_client_bundle_icon}")
+          MACOSX_BUNDLE_ICON_FILE "${_paraview_client_BUNDLE_ICON}")
     endif ()
     if (DEFINED _paraview_client_BUNDLE_PLIST)
       set_property(TARGET "${_paraview_client_NAME}"
