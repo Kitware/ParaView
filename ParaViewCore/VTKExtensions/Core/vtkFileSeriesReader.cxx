@@ -793,7 +793,6 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char* metafilename, vtkStringArr
         if (astep.isString())
         {
           std::string name = astep.asString();
-          std::cout << name << std::endl;
           filesToRead->InsertNextValue(FromRelativeToMetaFile(metafilename, name.c_str()));
         }
         else if (astep.isObject())
