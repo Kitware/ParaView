@@ -29,6 +29,7 @@ paraview_client_add(
 
   [APPLICATION_ICON <icon>]
   [BUNDLE_ICON      <icon>]
+  [BUNDLE_PLIST     <plist>]
   [SPLASH_IMAGE     <image>]
 
   [NAMESPACE            <namespace>]
@@ -64,6 +65,7 @@ paraview_client_add(
     application.
   * `APPLICATION_ICON`: The path to the icon for the Windows application.
   * `BUNDLE_ICON`: The path to the icon for the macOS bundle.
+  * `BUNDLE_PLIST`: The path to the `Info.plist.in` template.
   * `SPLASH_IMAGE`: The image to display upon startup.
   * `NAMESPACE`: If provided, an alias target `<NAMESPACE>::<NAME>` will be
     created.
@@ -85,7 +87,7 @@ paraview_client_add(
 function (paraview_client_add)
   cmake_parse_arguments(_paraview_client
     ""
-    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;FORWARD_EXECUTABLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT"
+    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;FORWARD_EXECUTABLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT"
     "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILE"
     ${ARGN})
 
@@ -402,13 +404,17 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
         PROPERTY
           MACOSX_BUNDLE_ICON_FILE "${_paraview_client_bundle_icon}")
     endif ()
+    if (DEFINED _paraview_client_BUNDLE_PLIST)
+      set_property(TARGET "${_paraview_client_NAME}"
+        PROPERTY
+          MACOSX_BUNDLE_INFO_PLIST "${_paraview_client_BUNDLE_PLIST}")
+    endif ()
     string(TOLOWER "${_paraview_client_ORGANIZATION}" _paraview_client_organization)
     set_target_properties("${_paraview_client_NAME}"
       PROPERTIES
         MACOSX_BUNDLE_BUNDLE_NAME           "${_paraview_client_APPLICATION_NAME}"
         MACOSX_BUNDLE_GUI_IDENTIFIER        "org.${_paraview_client_organization}.${_paraview_client_APPLICATION_NAME}"
-        MACOSX_BUNDLE_SHORT_VERSION_STRING  "${_paraview_client_VERSION}"
-        MACOSX_BUNDLE_INFO_PLIST            "${ParaView_BINARY_DIR}/MacOSXBundleInfo.plist.in")
+        MACOSX_BUNDLE_SHORT_VERSION_STRING  "${_paraview_client_VERSION}")
   endif ()
 endfunction ()
 
