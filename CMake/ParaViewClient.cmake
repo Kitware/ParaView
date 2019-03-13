@@ -73,8 +73,7 @@ paraview_client_add(
   * `FORCE_UNIX_LAYOUT`: (Defaults to `OFF`) Forces a Unix-style layout even on
     platforms for which they are not the norm for GUI applications (e.g.,
     macOS).
-  * `BUNDLE_DESTINATION`: (Defaults to
-    `<RUNTIME_DESTINATION>/<NAME>.app/Contents/MacOS`) Where to place the
+  * `BUNDLE_DESTINATION`: (Defaults to `Applications`) Where to place the
     bundle executable.
   * `RUNTIME_DESTINATION`: (Defaults to `${CMAKE_INSTALL_BINDIR}`) Where to
     place the binary.
@@ -132,6 +131,11 @@ function (paraview_client_add)
   if (NOT DEFINED _paraview_client_DEFAULT_STYLE)
     set(_paraview_client_DEFAULT_STYLE
       "plastique")
+  endif ()
+
+  if (NOT DEFINED _paraview_client_BUNDLE_DESTINATION)
+    set(_paraview_client_BUNDLE_DESTINATION
+      "Applications")
   endif ()
 
   if (NOT DEFINED _paraview_client_RUNTIME_DESTINATION)
@@ -194,10 +198,6 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
   elseif (APPLE)
     # TODO: bundle icon
     # TODO: nib files
-
-    if (NOT DEFINED _paraview_client_BUNDLE_DESTINATION)
-      set(_paraview_client_BUNDLE_DESTINATION "${_paraview_client_RUNTIME_DESTINATION}/${_paraview_client_NAME}.app/Contents/MacOS")
-    endif ()
 
     set(_paraview_client_bundle_args
       BUNDLE DESTINATION "${_paraview_client_BUNDLE_DESTINATION}")
