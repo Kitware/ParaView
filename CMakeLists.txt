@@ -350,19 +350,6 @@ if (PARAVIEW_BUILD_QT_GUI)
     list(APPEND paraview_requested_modules
       ParaView::pqPython)
   endif ()
-
-  if (APPLE)
-    # Enable high resolution when using Qt5
-    # This configuring of MacOSXBundleInfo may no longer be needed, but I am
-    # leaving it in since in future we could build the supported extensions list
-    # more exhaustively here.
-    set(high_resolution_capable "true")
-    configure_file(
-      "${paraview_cmake_dir}/MacOSXBundleInfo.plist.in.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/MacOSXBundleInfo.plist.in"
-      @ONLY)
-    unset(high_resolution_capable)
-  endif ()
 else ()
   list(APPEND paraview_rejected_modules
     ParaView::pqApplicationComponents
