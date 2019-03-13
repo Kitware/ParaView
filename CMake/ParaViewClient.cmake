@@ -196,7 +196,6 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     set(_paraview_client_executable_flags
       WIN32)
   elseif (APPLE)
-    # TODO: bundle icon
     # TODO: nib files
 
     set(_paraview_client_bundle_args
@@ -403,6 +402,9 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
       set_property(TARGET "${_paraview_client_NAME}"
         PROPERTY
           MACOSX_BUNDLE_ICON_FILE "${_paraview_client_BUNDLE_ICON}")
+      install(
+        FILES       "${_paraview_client_BUNDLE_ICON}"
+        DESTINATION "${_paraview_client_BUNDLE_DESTINATION}/${_paraview_client_APPLICATION_NAME}.app/Contents/Resources")
     endif ()
     if (DEFINED _paraview_client_BUNDLE_PLIST)
       set_property(TARGET "${_paraview_client_NAME}"
