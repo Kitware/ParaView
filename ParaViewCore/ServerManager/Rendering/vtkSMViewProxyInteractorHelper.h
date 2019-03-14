@@ -94,6 +94,7 @@ protected:
   void Execute(vtkObject* caller, unsigned long event, void* calldata);
   void Render();
   void CleanupTimer();
+  void Resize();
   //@}
 
   vtkCommand* Observer;

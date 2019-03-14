@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqConsoleWidgetEventTranslator.h"
 #include "pqDoubleLineEditEventPlayer.h"
 #include "pqDoubleLineEditEventTranslator.h"
+#include "pqEventDispatcher.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
 #include "pqFlatTreeViewEventPlayer.h"
@@ -296,56 +297,12 @@ bool pqCoreTestUtility::CompareImage(vtkImageData* testImage, const QString& Ref
   return false;
 }
 
-namespace pqCoreTestUtilityInternal
-{
-class WidgetSizer
-{
-  QSize OldSize;
-  QWidget* Widget;
-  bool EnableHiDPI;
-
-public:
-  WidgetSizer(QWidget* widget, const QSize& size)
-    : Widget(widget)
-    , EnableHiDPI(true)
-  {
-    pqQVTKWidget* w = dynamic_cast<pqQVTKWidget*>(widget);
-    if (w)
-    {
-      // We need to disable the HiDPI during capture to ensure target size
-      // is exactly respected (otherwise, as we convert size from float to int
-      // and back and forth, we loose precision).
-      this->EnableHiDPI = w->enableHiDPI();
-      w->setEnableHiDPI(false);
-    }
-    if (widget != nullptr && size.isValid())
-    {
-      this->OldSize = widget->size();
-      widget->resize(size);
-    }
-  }
-  ~WidgetSizer()
-  {
-    pqQVTKWidget* w = dynamic_cast<pqQVTKWidget*>(this->Widget);
-    if (w)
-    {
-      w->setEnableHiDPI(this->EnableHiDPI);
-    }
-    if (this->Widget && this->OldSize.isValid())
-    {
-      this->Widget->resize(this->OldSize);
-    }
-  }
-};
-}
-
 //-----------------------------------------------------------------------------
 bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceImage,
-  double threshold, ostream& output, const QString& tempDirectory,
+  double threshold, ostream& vtkNotUsed(output), const QString& tempDirectory,
   const QSize& size /*=QSize(300, 300)*/)
 {
   Q_ASSERT(widget != NULL);
-  pqCoreTestUtilityInternal::WidgetSizer sizer(widget, size);
 
   // try to locate a pqView, if any associated with the QWidget.
   QList<pqView*> views =
@@ -355,33 +312,12 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
     if (view && (view->widget() == widget))
     {
       cout << "Using View API for capture" << endl;
-      return pqCoreTestUtility::CompareView(view, referenceImage, threshold, tempDirectory);
+      return pqCoreTestUtility::CompareView(view, referenceImage, threshold, tempDirectory, size);
     }
   }
 
-  // for generic QWidget's, let's paint the widget into our QPixmap,
-  // put it in a vtkImageData and compare the image with a baseline
-  QFont oldFont = widget->font();
-#if defined(Q_WS_WIN) || defined(Q_OS_WIN)
-  QFont newFont("Courier", 10, QFont::Normal, false);
-#elif defined(Q_WS_X11) || defined(Q_OS_LINUX)
-  QFont newFont("Courier", 10, QFont::Normal, false);
-#else
-  QFont newFont("Courier Regular", 10, QFont::Normal, false);
-#endif
-  QCommonStyle style;
-  QStyle* oldStyle = widget->style();
-  widget->setStyle(&style);
-  widget->setFont(newFont);
-  QImage img = QPixmap::grabWidget(widget).toImage();
-  widget->setFont(oldFont);
-  widget->setStyle(oldStyle);
-
-  vtkSmartPointer<vtkImageData> vtkimage = vtkSmartPointer<vtkImageData>::New();
-  pqImageUtil::toImageData(img, vtkimage);
-
-  return pqCoreTestUtility::CompareImage(
-    vtkimage, referenceImage, threshold, output, tempDirectory);
+  qFatal("CompareImage not supported!");
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -389,9 +325,34 @@ bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceIma
   double threshold, const QString& tempDirectory, const QSize& size /*=QSize()*/)
 {
   Q_ASSERT(curView != NULL);
-  pqCoreTestUtilityInternal::WidgetSizer sizer(curView->widget(), size);
 
-  vtkImageData* test_image = curView->getViewProxy()->CaptureWindow(1);
+  auto viewProxy = curView->getViewProxy();
+
+  // update size and 2d text dpi for tests.
+  int original_size[2];
+  vtkSMPropertyHelper sizeHelper(viewProxy, "ViewSize");
+  sizeHelper.Get(original_size, 2);
+
+  vtkSMPropertyHelper dpiHelper(viewProxy, "PPI");
+  const int original_dpi = dpiHelper.GetAsInt();
+
+  if (size.isValid() && !size.isEmpty())
+  {
+    const int new_size[2] = { size.width(), size.height() };
+    sizeHelper.Set(new_size, 2);
+    dpiHelper.Set(72); // fixed DPI for testing.
+  }
+  viewProxy->UpdateVTKObjects();
+
+  auto test_image = vtkSmartPointer<vtkImageData>::Take(viewProxy->CaptureWindow(1));
+
+  // restore size and dpi.
+  sizeHelper.Set(original_size, 2);
+  dpiHelper.Set(original_dpi);
+  viewProxy->UpdateVTKObjects();
+
+  curView->widget()->update();
+
   if (!test_image)
   {
     qCritical() << "ERROR: Failed to capture snapshot.";
@@ -400,19 +361,18 @@ bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceIma
 
   // The returned image will have extents translated to match the view position,
   // we shift them back.
-  int viewPos[2];
-  vtkSMPropertyHelper(curView->getViewProxy(), "ViewPosition").Get(viewPos, 2);
+  int view_position[2];
+  vtkSMPropertyHelper(viewProxy, "ViewPosition").Get(view_position, 2);
   // Update image extents based on ViewPosition
   int extents[6];
   test_image->GetExtent(extents);
   for (int cc = 0; cc < 4; cc++)
   {
-    extents[cc] -= viewPos[cc / 2];
+    extents[cc] -= view_position[cc / 2];
   }
   test_image->SetExtent(extents);
   bool ret =
     pqCoreTestUtility::CompareImage(test_image, referenceImage, threshold, cout, tempDirectory);
-  test_image->Delete();
   return ret;
 }
 

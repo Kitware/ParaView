@@ -118,6 +118,8 @@ void pqTestingReaction::lockViewSize(bool lock)
   if (viewManager)
   {
     viewManager->lockViewSize(lock ? QSize(300, 300) : QSize(-1, -1));
+    // wait for 500ms to give the widgets a chance to sync up.
+    pqEventDispatcher::processEventsAndWait(500);
   }
   else
   {

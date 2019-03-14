@@ -94,12 +94,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMWriterFactory.h"
 #include "vtkSmartPointer.h"
 
-// Do this after all above includes. On a VS2015 with Qt 5,
-// these includes cause build errors with pqRenderView etc.
-// due to some leaked through #define's (is my guess).
-#include "pqQVTKWidgetBase.h"
-#include <QSurfaceFormat>
-
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
 {
@@ -134,19 +128,6 @@ pqApplicationCore::pqApplicationCore(
   vtkInitializationHelper::SetOrganizationName(QApplication::organizationName().toStdString());
   vtkInitializationHelper::SetApplicationName(QApplication::applicationName().toStdString());
   vtkInitializationHelper::Initialize(argc, argv, vtkProcessModule::PROCESS_CLIENT, options);
-
-  // Setup the default format.
-  QSurfaceFormat fmt = pqQVTKWidgetBase::defaultFormat();
-
-  // Request quad-buffered stereo format only for Crystal Eyes
-  std::string stereoType = options->GetStereoType();
-  fmt.setStereo(stereoType == "Crystal Eyes");
-
-  // ParaView does not support multisamples.
-  fmt.setSamples(0);
-
-  QSurfaceFormat::setDefaultFormat(fmt);
-
   this->constructor();
 }
 

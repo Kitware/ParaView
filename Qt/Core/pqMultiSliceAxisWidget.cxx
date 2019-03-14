@@ -77,7 +77,7 @@ public:
   void init()
   {
     vtkNew<pqQVTKWidgetBaseRenderWindowType> renWin;
-    this->View->SetRenderWindow(renWin.Get());
+    this->View->setRenderWindow(renWin.Get());
     this->ContextView->SetRenderWindow(renWin.Get());
 
 #if defined(Q_WS_WIN) || defined(Q_OS_WIN)
@@ -162,13 +162,13 @@ void pqMultiSliceAxisWidget::renderView()
   // bug 0013947
   // on Mac OSX don't render into invalid drawable, all subsequent
   // OpenGL calls fail with invalid framebuffer operation.
-  vtkRenderWindow* renWin = this->Internal->View->GetRenderWindow();
+  vtkRenderWindow* renWin = this->Internal->View->renderWindow();
   if (!renWin->IsDrawable())
   {
     return;
   }
 
-  this->Internal->View->GetRenderWindow()->Render();
+  renWin->Render();
 }
 
 // ----------------------------------------------------------------------------

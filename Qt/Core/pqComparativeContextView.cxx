@@ -179,8 +179,8 @@ void pqComparativeContextView::updateViewWidgets()
     cntxtView->UpdateVTKObjects();
 
     pqQVTKWidgetBase* wdg = new pqQVTKWidgetBase();
-    wdg->SetRenderWindow(cntxtView->GetContextView()->GetRenderWindow());
-    cntxtView->SetupInteractor(wdg->GetInteractor());
+    wdg->setRenderWindow(cntxtView->GetContextView()->GetRenderWindow());
+    cntxtView->SetupInteractor(wdg->interactor());
     wdg->installEventFilter(this);
     wdg->setContextMenuPolicy(Qt::NoContextMenu);
     this->Internal->RenderWidgets[key] = wdg;

@@ -135,14 +135,14 @@ void pqVCRController::onTick()
 void pqVCRController::onBeginPlay()
 {
   emit this->playing(true);
-  emit this->beginNonUndoableChanges();
+  BEGIN_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onEndPlay()
 {
   emit this->playing(false);
-  emit this->endNonUndoableChanges();
+  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
@@ -175,35 +175,35 @@ void pqVCRController::onPause()
 //-----------------------------------------------------------------------------
 void pqVCRController::onFirstFrame()
 {
-  emit this->beginNonUndoableChanges();
+  BEGIN_UNDO_EXCLUDE();
   this->Scene->getProxy()->InvokeCommand("GoToFirst");
   SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToFirst");
-  emit this->endNonUndoableChanges();
+  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onPreviousFrame()
 {
-  emit this->beginNonUndoableChanges();
+  BEGIN_UNDO_EXCLUDE();
   this->Scene->getProxy()->InvokeCommand("GoToPrevious");
   SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToPrevious");
-  emit this->endNonUndoableChanges();
+  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onNextFrame()
 {
-  emit this->beginNonUndoableChanges();
+  BEGIN_UNDO_EXCLUDE();
   this->Scene->getProxy()->InvokeCommand("GoToNext");
   SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToNext");
-  emit this->endNonUndoableChanges();
+  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
 void pqVCRController::onLastFrame()
 {
-  emit this->beginNonUndoableChanges();
+  BEGIN_UNDO_EXCLUDE();
   this->Scene->getProxy()->InvokeCommand("GoToLast");
   SM_SCOPED_TRACE(CallMethod).arg(this->Scene->getProxy()).arg("GoToLast");
-  emit this->endNonUndoableChanges();
+  END_UNDO_EXCLUDE();
 }

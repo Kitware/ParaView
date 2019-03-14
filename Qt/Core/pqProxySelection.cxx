@@ -39,15 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxySelectionModel.h"
 
 //-----------------------------------------------------------------------------
-bool pqProxySelection::copyFrom(vtkSMProxySelectionModel* other)
+bool pqProxySelectionUtilities::copy(vtkSMProxySelectionModel* source, pqProxySelection& dest)
 {
-  Q_ASSERT(other != NULL);
+  Q_ASSERT(source != NULL);
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
   pqProxySelection new_selection;
   vtkSMProxySelectionModel::SelectionType::const_iterator iter;
-  const vtkSMProxySelectionModel::SelectionType& selection = other->GetSelection();
+  const vtkSMProxySelectionModel::SelectionType& selection = source->GetSelection();
   for (iter = selection.begin(); iter != selection.end(); ++iter)
   {
     vtkSMProxy* proxy = iter->GetPointer();
@@ -58,9 +58,9 @@ bool pqProxySelection::copyFrom(vtkSMProxySelectionModel* other)
     }
   }
 
-  if (*this != new_selection)
+  if (dest != new_selection)
   {
-    *this = new_selection;
+    dest = new_selection;
     return true;
   }
 
@@ -68,12 +68,12 @@ bool pqProxySelection::copyFrom(vtkSMProxySelectionModel* other)
 }
 
 //-----------------------------------------------------------------------------
-bool pqProxySelection::copyTo(vtkSMProxySelectionModel* other) const
+bool pqProxySelectionUtilities::copy(const pqProxySelection& source, vtkSMProxySelectionModel* dest)
 {
-  Q_ASSERT(other != NULL);
+  Q_ASSERT(dest != NULL);
 
   vtkSMProxySelectionModel::SelectionType selection;
-  foreach (pqServerManagerModelItem* item, *this)
+  foreach (pqServerManagerModelItem* item, source)
   {
     pqProxy* proxy = qobject_cast<pqProxy*>(item);
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
@@ -86,9 +86,9 @@ bool pqProxySelection::copyTo(vtkSMProxySelectionModel* other) const
       selection.push_back(proxy->getProxy());
     }
   }
-  if (other->GetSelection() != selection)
+  if (dest->GetSelection() != selection)
   {
-    other->Select(selection, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
+    dest->Select(selection, vtkSMProxySelectionModel::CLEAR_AND_SELECT);
     return true;
   }
   return false;

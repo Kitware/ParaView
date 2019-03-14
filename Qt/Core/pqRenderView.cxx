@@ -184,10 +184,10 @@ QWidget* pqRenderView::createWidget()
   if (pqQVTKWidgetBase* qvtkwidget = qobject_cast<pqQVTKWidgetBase*>(vtkwidget))
   {
     vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
-    qvtkwidget->SetRenderWindow(renModule->GetRenderWindow());
+    qvtkwidget->setRenderWindow(renModule->GetRenderWindow());
     // This is needed to ensure that the interactor is initialized with
     // ParaView specific interactor styles etc.
-    renModule->SetupInteractor(qvtkwidget->GetInteractor());
+    renModule->SetupInteractor(qvtkwidget->interactor());
   }
   return vtkwidget;
 }
@@ -894,13 +894,8 @@ void pqRenderView::onInteractionModeChange()
 //-----------------------------------------------------------------------------
 void pqRenderView::setCursor(const QCursor& c)
 {
-  QWidget* widget = this->widget();
-  if (pqQVTKWidgetBase* qvtkwidget = qobject_cast<pqQVTKWidgetBase*>(widget))
+  if (QWidget* wdg = this->widget())
   {
-    qvtkwidget->setQVTKCursor(c);
-  }
-  else
-  {
-    widget->setCursor(c);
+    wdg->setCursor(c);
   }
 }

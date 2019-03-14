@@ -295,7 +295,7 @@ void pqActiveObjects::sourceSelectionChanged()
   }
 
   // Update the Selection.
-  this->Selection.copyFrom(selModel);
+  pqProxySelectionUtilities::copy(selModel, this->Selection);
 
   this->updateRepresentation();
   // updateRepresentation calls triggerSignals().
@@ -490,7 +490,7 @@ void pqActiveObjects::setSelection(
   {
     this->setActiveServer(server);
 
-    selection_.copyTo(server->activeSourcesSelectionModel());
+    pqProxySelectionUtilities::copy(selection_, server->activeSourcesSelectionModel());
     // this triggers a call to selectionChanged() if selection actually changed.
 
     vtkSMProxy* proxy = current_proxy ? current_proxy->getProxy()

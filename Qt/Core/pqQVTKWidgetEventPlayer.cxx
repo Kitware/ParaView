@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqQVTKWidgetEventPlayer.cxx
+   Module:  pqQVTKWidgetEventPlayer.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqQVTKWidgetEventPlayer.h"
 
 #include <QApplication>
@@ -37,10 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRegExp>
 #include <QtDebug>
 
-#include <QtDebug>
-
 #include "QVTKOpenGLNativeWidget.h"
 #include "QVTKOpenGLWidget.h"
+#include "QVTKOpenGLWindow.h"
 #include "pqEventDispatcher.h"
 
 pqQVTKWidgetEventPlayer::pqQVTKWidgetEventPlayer(QObject* p)
@@ -98,7 +96,7 @@ bool pqQVTKWidgetEventPlayer::playEvent(
           // be propagated back to the internal QVTKOpenGLWindow when being fired
           // explicitly on the widget instance. We have to use a custom event
           // callback in this case to ensure that events are passed to the window.
-          qvtkWidget->testingEvent(&e);
+          qApp->notify(qvtkWidget->embeddedOpenGLWindow(), &e);
         }
 
         if (qvtkNativeWidget != nullptr)

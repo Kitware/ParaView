@@ -89,6 +89,8 @@ void vtkSMViewProxyInteractorHelper::SetupInteractor(vtkRenderWindowInteractor* 
     this->Interactor->AddObserver(vtkCommand::InteractionEvent, this->Observer);
     this->Interactor->AddObserver(vtkCommand::EndInteractionEvent, this->Observer);
     this->Interactor->AddObserver(vtkCommand::TimerEvent, this->Observer);
+
+    this->Interactor->AddObserver(vtkCommand::WindowResizeEvent, this->Observer);
   }
 }
 
@@ -121,6 +123,10 @@ void vtkSMViewProxyInteractorHelper::Execute(vtkObject* caller, unsigned long ev
   assert(iren);
   switch (event)
   {
+    case vtkCommand::WindowResizeEvent:
+      this->Resize();
+      break;
+
     case vtkCommand::RenderEvent:
       this->CleanupTimer();
       this->Render();
@@ -212,6 +218,19 @@ void vtkSMViewProxyInteractorHelper::Render()
   else
   {
     this->ViewProxy->StillRender();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewProxyInteractorHelper::Resize()
+{
+  if (auto iren = this->GetInteractor())
+  {
+    int size[2];
+    iren->GetSize(size);
+
+    vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(size, 2);
+    this->ViewProxy->UpdateProperty("ViewSize");
   }
 }
 

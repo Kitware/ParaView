@@ -32,10 +32,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include <QApplication>
 #include <QLocale>
 #include <QStyleFactory>
+#include <QSurfaceFormat>
 
 #include "pq@_paraview_client_NAME@Initializer.h"
 #include "vtkPVConfig.h"
@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <vtksys/SystemTools.hxx>
+#include <QVTKRenderWindowAdapter.h>
 
 #include <clocale>
 #include <cstdlib>
@@ -77,6 +78,11 @@ int main(int argc, char* argv[])
   @_paraview_client_PLUGINS_TARGET@_initialize();
 #endif
 
+  // always request a non-stereo format; when using quadbuffer stereo, we
+  // request stereo capable format for the individual `QVTKOpenGLWindow`
+  // instance.
+  QSurfaceFormat::setDefaultFormat(QVTKRenderWindowAdapter::defaultFormat(/*supports_stereo=*/false));
+
   QApplication qtapp(argc, argv);
   // QApplication docs suggest resetting to "C" after the QApplication is
   // initialized.
@@ -85,15 +91,17 @@ int main(int argc, char* argv[])
   // However, this is needed to address BUG #17225, #17226.
   QLocale::setDefault(QLocale::c());
 
-  pq@_paraview_client_NAME@Initializer pvInitializer;
-  pq@_paraview_client_NAME@Initializer::Status status = pvInitializer.Initialize(argc, argv);
+  using InitializerT = pq@_paraview_client_NAME@Initializer;
+
+  InitializerT pvInitializer;
+  InitializerT::Status status = pvInitializer.Initialize(argc, argv);
   switch (status)
   {
-    case pq@_paraview_client_NAME@Initializer::ExitSuccess:
+    case InitializerT::ExitSuccess:
       return EXIT_SUCCESS;
-    case pq@_paraview_client_NAME@Initializer::ExitFailure:
+    case InitializerT::ExitFailure:
       return EXIT_FAILURE;
-    case pq@_paraview_client_NAME@Initializer::RunApplication:
+    case InitializerT::RunApplication:
       return qtapp.exec();
   }
 }
