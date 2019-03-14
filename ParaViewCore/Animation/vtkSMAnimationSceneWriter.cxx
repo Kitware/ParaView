@@ -140,18 +140,6 @@ bool vtkSMAnimationSceneWriter::Save()
   // Take the animation scene to the beginning.
   this->AnimationScene->GoToFirst();
 
-  /*
-  int play_mode = this->AnimationScene->GetPlayMode();
-
-  // If play mode is real time, we switch it to sequence.
-  // We are assuming that the frame rate has been set correctly
-  // on the scene, even in real time mode.
-  if (play_mode == vtkAnimationScene::PLAYMODE_REALTIME)
-    {
-    this->AnimationScene->SetPlayMode(vtkAnimationScene::PLAYMODE_SEQUENCE);
-    }
-    */
-
   // Disable looping.
   int loop = this->AnimationScene->GetLoop();
   this->AnimationScene->SetLoop(0);
@@ -172,13 +160,6 @@ bool vtkSMAnimationSceneWriter::Save()
   }
 
   status = this->SaveFinalize() && status;
-
-  /*
-  if (play_mode == vtkAnimationScene::PLAYMODE_REALTIME)
-    {
-    this->AnimationScene->SetPlayMode(play_mode);
-    }
-    */
 
   // Restore scene parameters, if changed.
   this->AnimationScene->SetLoop(loop);
