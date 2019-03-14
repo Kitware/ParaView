@@ -44,12 +44,12 @@
                          default_values="0"
                          name="ArrayAssociation"
                          number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Point Data"
-                 value="0" />
-          <Entry text="Cell Data"
-                 value="1" />
-        </EnumerationDomain>
+        <FieldDataDomain name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
         <Documentation>This property controls the association of the output
         array as well as which arrays are defined as variables.</Documentation>
       </IntVectorProperty>
@@ -261,12 +261,13 @@ annotation text.
                          name="ArrayAssociation"
                          number_of_elements="1">
         <Documentation>Select the attribute to use to populate array names.</Documentation>
-        <EnumerationDomain name="enum">
-          <Entry text="Point Data" value="0" />
-          <Entry text="Cell Data" value="1" />
-          <Entry text="Field Data" value="2" />
-          <Entry text="Row Data" value="6" />
-        </EnumerationDomain>
+        <FieldDataDomain enable_field_data="1"
+                         name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
       </IntVectorProperty>
       <StringVectorProperty command="SetExpression"
                             name="Expression"
