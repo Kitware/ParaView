@@ -138,6 +138,7 @@ public:
   bool IsInCapture;
   bool IsInOSPRay;
   bool OSPRayShadows;
+  bool OSPRayDenoise;
   int OSPRayCount;
   vtkNew<vtkFloatArray> ArrayHolder;
   vtkNew<vtkWindowToImageFilter> ZGrabber;
@@ -338,6 +339,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Internals->IsInCapture = false;
   this->Internals->IsInOSPRay = false;
   this->Internals->OSPRayShadows = false;
+  this->Internals->OSPRayDenoise = true;
   this->Internals->OSPRayCount = 0;
 
   // non-reference counted, so no worries about reference loops.
@@ -3202,6 +3204,36 @@ int vtkPVRenderView::GetMaxFrames()
   return vtkOSPRayRendererNode::GetMaxFrames(ren);
 #else
   return 1;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDenoise(bool v)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+  this->Internals->OSPRayDenoise = v;
+  vtkRenderer* ren = this->GetRenderer();
+  vtkOSPRayRendererNode::SetEnableDenoiser(v, ren);
+#else
+  (void)v;
+#endif
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::GetDenoise()
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+  vtkRenderer* ren = this->GetRenderer();
+  if (vtkOSPRayRendererNode::GetEnableDenoiser(ren) == 1)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+#else
+  return false;
 #endif
 }
 

@@ -2683,6 +2683,22 @@
                                    values="1" />
         </Hints>
       </IntVectorProperty>
+      <IntVectorProperty
+          name="Denoise"
+          command="SetDenoise"
+          default_values="1"
+          animateable="0"
+          number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Controls whether to denoise images.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="EnableOSPRay"
+                                   values="1" />
+        </Hints>
+      </IntVectorProperty>
       <DoubleVectorProperty
           name="LightScale"
           command="SetLightScale"
@@ -2835,6 +2851,7 @@
         <Property name="AmbientSamples"/>
         <Property name="SamplesPerPixel"/>
         <Property name="MaxFrames"/>
+        <Property name="Denoise"/>
         <Property name="LightScale"/>
 	<Property name="OSPRayTemporalCacheSize"/>
       </PropertyGroup>
