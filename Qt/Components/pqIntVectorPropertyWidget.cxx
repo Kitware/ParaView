@@ -65,30 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QIntValidator>
 
-namespace
-{
-QIcon get_icon(int assoc)
-{
-  switch (assoc)
-  {
-    case vtkDataObject::POINT:
-      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
-    case vtkDataObject::CELL:
-      return QIcon(":/pqWidgets/Icons/pqCellData16.png");
-    case vtkDataObject::FIELD:
-      return QIcon(":/pqWidgets/Icons/pqGlobalData16.png");
-    case vtkDataObject::VERTEX:
-      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
-    case vtkDataObject::EDGE:
-      return QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
-    case vtkDataObject::ROW:
-      return QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
-    default:
-      return QIcon();
-  }
-}
-}
-
 //-----------------------------------------------------------------------------
 pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
   vtkSMProperty* smproperty, vtkSMProxy* smProxy, QWidget* parentObject)
@@ -144,7 +120,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
     }
     this->setShowLabel(false);
   }
-  else if (vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(domain))
+  else if (vtkSMEnumerationDomain::SafeDownCast(domain))
   {
     if (vtkSMVectorProperty::SafeDownCast(smproperty)->GetRepeatCommand())
     {
@@ -182,29 +158,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use a combo-box for a enumerated list.");
       QComboBox* comboBox = new QComboBox(this);
       comboBox->setObjectName("ComboBox");
-      auto is_fielddatadomain = (vtkSMFieldDataDomain::SafeDownCast(domain) != nullptr);
-      for (unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
-      {
-        const char* entryText = ed->GetEntryText(i);
-        QIcon icon = is_fielddatadomain ? ::get_icon(ed->GetEntryValue(i)) : QIcon();
-        if (const char* info = ed->GetInfoText(i))
-        {
-          comboBox->addItem(icon, QString("%1 (%2)").arg(entryText).arg(info), entryText);
-        }
-        else
-        {
-          comboBox->addItem(icon, entryText, entryText);
-        }
-      }
-
-      // vtkSMNumberOfComponentsDomain is a dynamic domain
-      // hence we need to connect it to a pqComboBoxDomain
-      // so the combobox will stay updated.
-      if (vtkSMNumberOfComponentsDomain::SafeDownCast(domain))
-      {
-        new pqComboBoxDomain(comboBox, smproperty, "comps");
-      }
-
+      new pqComboBoxDomain(comboBox, smproperty, domain->GetXMLName());
       pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
       this->addPropertyLink(
         adaptor, "currentData", SIGNAL(currentTextChanged(QString)), smproperty);

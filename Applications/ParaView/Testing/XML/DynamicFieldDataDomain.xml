@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/sineWaves.csv" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Testing/Data/porphyrin.cml" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,59,9,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,59,9,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="DescriptiveStatistics" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" property="modelItemData" arguments="0.9,RTData" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/1pqSpreadSheetViewWidget0" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.2/CentralWidgetFrame/Viewport/pqSpreadSheetViewDecorator/Source" command="activated" arguments="sineWaves.csv" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionChangeInput" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mousePress" arguments="1,1,0,64,8,/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,64,8,/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/AttributeMode/ComboBox" property="currentText" arguments="Row Data" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionChangeInput" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mousePress" arguments="1,1,0,57,6,/0:0/2:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,57,6,/0:0/2:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/AttributeMode/ComboBox" property="currentText" arguments="Vertex Data" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionChangeInput" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mousePress" arguments="1,1,0,48,1,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,48,1,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqcheck object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/AttributeMode/ComboBox" property="currentText" arguments="Point Data" />
+</pqevents>

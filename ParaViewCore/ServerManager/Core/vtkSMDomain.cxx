@@ -163,7 +163,20 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
 }
 
 //---------------------------------------------------------------------------
-vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function, int /*index=0*/)
+unsigned int vtkSMDomain::GetNumberOfInputConnections(const char* function)
+{
+  vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
+  if (!inputProperty)
+  {
+    return 0;
+  }
+
+  vtkSMUncheckedPropertyHelper helper(inputProperty);
+  return helper.GetNumberOfElements();
+}
+
+//---------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function, unsigned int index)
 {
   vtkSMProperty* inputProperty = this->GetRequiredProperty(function);
   if (!inputProperty)
@@ -172,9 +185,9 @@ vtkPVDataInformation* vtkSMDomain::GetInputDataInformation(const char* function,
   }
 
   vtkSMUncheckedPropertyHelper helper(inputProperty);
-  if (helper.GetNumberOfElements() > 0)
+  if (helper.GetNumberOfElements() > index)
   {
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(0));
+    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(helper.GetAsProxy(index));
     if (sp)
     {
       return sp->GetDataInformation(helper.GetOutputPort());

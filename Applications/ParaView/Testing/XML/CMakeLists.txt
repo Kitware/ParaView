@@ -396,6 +396,7 @@ SET (TESTS_WITHOUT_BASELINES
   FavoritesFilters.xml
   CustomOutputFormat.xml
   DelimitedTextReader.xml
+  DynamicFieldDataDomain.xml
   ExportFilteredColumnsSpreadsheet.xml
   FindWidget.xml
   ModifyGUIWindowTitle.xml

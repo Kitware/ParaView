@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 
 // VTK includes
+#include <vtkDataObject.h>
 #include <vtkEventQtSlotConnect.h>
+#include <vtkSMFieldDataDomain.h>
 #include <vtkSmartPointer.h>
 
 // ParaView Server Manager includes
@@ -52,6 +54,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSMAdaptor.h>
 
 #include <assert.h>
+
+namespace
+{
+QIcon get_icon(int assoc)
+{
+  switch (assoc)
+  {
+    case vtkDataObject::POINT:
+      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
+    case vtkDataObject::CELL:
+      return QIcon(":/pqWidgets/Icons/pqCellData16.png");
+    case vtkDataObject::FIELD:
+      return QIcon(":/pqWidgets/Icons/pqGlobalData16.png");
+    case vtkDataObject::VERTEX:
+      return QIcon(":/pqWidgets/Icons/pqPointData16.png");
+    case vtkDataObject::EDGE:
+      return QIcon(":/pqWidgets/Icons/pqEdgeCenterData16.png");
+    case vtkDataObject::ROW:
+      return QIcon(":/pqWidgets/Icons/pqSpreadsheet16.png");
+    default:
+      return QIcon();
+  }
+}
+}
 
 class pqComboBoxDomain::pqInternal
 {
@@ -181,6 +207,8 @@ void pqComboBoxDomain::internalDomainChanged()
   }
 
   QList<QString> texts;
+  QList<QString> infos; // For enumeration domain only
+  QList<QIcon> icons;   // For field data domain only
   QList<QVariant> data;
 
   pqSMAdaptor::PropertyType type;
@@ -194,43 +222,47 @@ void pqComboBoxDomain::internalDomainChanged()
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   if (type == pqSMAdaptor::ENUMERATION)
   {
-    QList<QVariant> enums;
-    enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
-    foreach (QVariant var, enums)
+    // Use the domain directly if possible
+    bool isEnumerationDomain = false;
+    if (this->Internal->Domain)
     {
-      texts.append(var.toString());
-      data.append(var.toString());
-    }
-    combo->setEnabled(enums.size() > 1);
-    cur_property_value = pqSMAdaptor::getEnumerationProperty(this->Internal->Property);
-  }
-  else if (type == pqSMAdaptor::FIELD_SELECTION)
-  {
-    if (this->Internal->DomainName == "field_list")
-    {
-      texts = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
-      foreach (QString str, texts)
+      vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(this->Internal->Domain);
+      if (ed)
       {
-        data.push_back(str);
-      }
-    }
-    else if (this->Internal->DomainName == "array_list")
-    {
-      QList<QPair<QString, bool> > arrays =
-        pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Internal->Property);
-      for (int kk = 0; kk < arrays.size(); kk++)
-      {
-        QPair<QString, bool> pair = arrays[kk];
-        QString arrayName = pair.first;
-        if (pair.second)
+        isEnumerationDomain = true;
+        bool isFieldDataDomain =
+          (vtkSMFieldDataDomain::SafeDownCast(this->Internal->Domain) != nullptr);
+        for (unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
         {
-          arrayName += " (partial)";
+          texts.append(ed->GetEntryText(i));
+          data.append(ed->GetEntryText(i));
+          if (const char* info = ed->GetInfoText(i))
+          {
+            infos.append(info);
+          }
+          else
+          {
+            infos.append(QString());
+          }
+          icons.append(isFieldDataDomain ? ::get_icon(ed->GetEntryValue(i)) : QIcon());
         }
-        texts.append(arrayName);
-        data.append(pair.first);
       }
     }
-    cur_property_value = pqSMAdaptor::getElementProperty(this->Internal->Property);
+
+    if (!isEnumerationDomain)
+    {
+      QList<QVariant> enums;
+      enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
+      for (QVariant var : enums)
+      {
+        texts.append(var.toString());
+        data.append(var.toString());
+        infos.append(QString());
+        icons.append(QIcon());
+      }
+    }
+    combo->setEnabled(texts.size() > 1);
+    cur_property_value = pqSMAdaptor::getEnumerationProperty(this->Internal->Property);
   }
   else if (type == pqSMAdaptor::PROXYSELECTION || type == pqSMAdaptor::PROXYLIST)
   {
@@ -239,6 +271,8 @@ void pqComboBoxDomain::internalDomainChanged()
     {
       texts.append(pxy->GetXMLLabel());
       data.append(pxy->GetXMLLabel());
+      infos.append(QString());
+      icons.append(QIcon());
     }
     pqSMProxy cur_value = pqSMAdaptor::getProxyProperty(this->Internal->Property);
     if (cur_value)
@@ -253,6 +287,8 @@ void pqComboBoxDomain::internalDomainChanged()
     {
       texts.push_front(userStr);
       data.push_front(userStr);
+      infos.append(QString());
+      icons.append(QIcon());
     }
   }
 
@@ -288,7 +324,14 @@ void pqComboBoxDomain::internalDomainChanged()
     combo->clear();
     for (int cc = 0; cc < data.size(); cc++)
     {
-      combo->addItem(texts[cc], data[cc]);
+      if (!infos[cc].isEmpty())
+      {
+        combo->addItem(icons[cc], texts[cc] + " (" + infos[cc] + ")", data[cc]);
+      }
+      else
+      {
+        combo->addItem(icons[cc], texts[cc], data[cc]);
+      }
     }
     combo->setCurrentIndex(-1);
     combo->blockSignals(prev);
@@ -299,7 +342,35 @@ void pqComboBoxDomain::internalDomainChanged()
     }
     else
     {
-      combo->setCurrentIndex(0);
+      // Old value was not present, reset to domain default and recover new default
+      this->Internal->Property->ResetToDomainDefaults();
+      switch (type)
+      {
+        case (pqSMAdaptor::ENUMERATION):
+          cur_property_value = pqSMAdaptor::getEnumerationProperty(this->Internal->Property);
+          break;
+        case (pqSMAdaptor::PROXYSELECTION):
+        case (pqSMAdaptor::PROXYLIST):
+        {
+          pqSMProxy cur_value = pqSMAdaptor::getProxyProperty(this->Internal->Property);
+          if (cur_value)
+          {
+            cur_property_value = cur_value->GetXMLLabel();
+          }
+        }
+        break;
+        default:
+          break;
+      }
+      int foundDefault = combo->findData(cur_property_value);
+      if (foundDefault >= 0)
+      {
+        combo->setCurrentIndex(foundDefault);
+      }
+      else
+      {
+        combo->setCurrentIndex(0);
+      }
     }
   }
   this->markForUpdate(false);

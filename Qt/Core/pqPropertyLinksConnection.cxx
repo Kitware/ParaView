@@ -162,10 +162,6 @@ QVariant pqPropertyLinksConnection::currentServerManagerValue(bool use_unchecked
       }
       break;
 
-    case pqSMAdaptor::FIELD_SELECTION:
-      currentSMValue = pqSMAdaptor::getFieldSelection(this->PropertySM, value_type);
-      break;
-
     case pqSMAdaptor::UNKNOWN:
       break;
   }
@@ -250,10 +246,6 @@ void pqPropertyLinksConnection::setServerManagerValue(bool use_unchecked, const 
       {
         pqSMAdaptor::setMultipleElementProperty(this->PropertySM, this->IndexSM, value, value_type);
       }
-      break;
-
-    case pqSMAdaptor::FIELD_SELECTION:
-      pqSMAdaptor::setFieldSelection(this->PropertySM, value.toStringList(), value_type);
       break;
 
     case pqSMAdaptor::UNKNOWN:

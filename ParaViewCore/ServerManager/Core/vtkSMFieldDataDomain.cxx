@@ -56,7 +56,7 @@ const char* vtkSMFieldDataDomain::GetAttributeTypeAsString(int attrType)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMFieldDataDomain::ComputeDefaultValue()
+int vtkSMFieldDataDomain::ComputeDefaultValue(int currentValue)
 {
   auto dataInfo = this->GetInputDataInformation("Input");
   if (!dataInfo)
@@ -67,7 +67,7 @@ int vtkSMFieldDataDomain::ComputeDefaultValue()
   // first, find an attribute with non-empty arrays and tuples
   for (unsigned int cc = 0, max = this->GetNumberOfEntries(); cc < max; ++cc)
   {
-    const int attrType = this->GetEntryValue(cc);
+    const int attrType = this->GetEntryValue((cc + currentValue) % max);
     auto attrInfo = dataInfo->GetAttributeInformation(attrType);
     if (attrInfo && attrInfo->GetNumberOfArrays() > 0 && attrInfo->GetMaximumNumberOfTuples() > 0)
     {
@@ -78,7 +78,7 @@ int vtkSMFieldDataDomain::ComputeDefaultValue()
   // if that fails, find an attribute with non-empty arrays
   for (unsigned int cc = 0, max = this->GetNumberOfEntries(); cc < max; ++cc)
   {
-    const int attrType = this->GetEntryValue(cc);
+    const int attrType = this->GetEntryValue((cc + currentValue) % max);
     auto attrInfo = dataInfo->GetAttributeInformation(attrType);
     if (attrInfo && attrInfo->GetNumberOfArrays() > 0)
     {
@@ -94,7 +94,8 @@ int vtkSMFieldDataDomain::SetDefaultValues(vtkSMProperty* prop, bool use_uncheck
 {
   if (vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop))
   {
-    const int defaultValue = this->ComputeDefaultValue();
+    int currentValue = ivp->GetElement(0);
+    const int defaultValue = this->ComputeDefaultValue(currentValue);
     if (defaultValue != -1)
     {
       if (use_unchecked_values)
@@ -159,9 +160,19 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
   {
     this->EnableFieldDataSelection = (enable_field_data != 0) ? true : false;
   }
+  this->Update(prop);
+  return 1;
+}
 
-  // iterate over all attribute types and add the "acceptable" attribute types
-  // to this domain.
+//---------------------------------------------------------------------------
+void vtkSMFieldDataDomain::Update(vtkSMProperty* vtkNotUsed(prop))
+{
+  // Use data information only with a single input
+  vtkPVDataInformation* dataInfo = nullptr;
+  if (this->GetNumberOfInputConnections("Input") == 1)
+  {
+    dataInfo = this->GetInputDataInformation("Input");
+  }
   this->RemoveAllEntries();
   for (int idx = 0; idx < vtkSMInputArrayDomain::NUMBER_OF_ATTRIBUTE_TYPES; idx++)
   {
@@ -174,10 +185,13 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement
     {
       continue;
     }
+    if (dataInfo && !dataInfo->IsAttributeValid(idx))
+    {
+      continue;
+    }
     this->AddEntry(label, idx);
   }
-
-  return 1;
+  this->DomainModified();
 }
 
 //---------------------------------------------------------------------------

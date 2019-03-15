@@ -73,6 +73,12 @@ public:
    */
   static const char* GetAttributeTypeAsString(int attrType);
 
+  /**
+   * Updates the available field data based on the input dataset type, if possible.
+   * The provided property is not used.
+   */
+  void Update(vtkSMProperty* property) override;
+
 protected:
   vtkSMFieldDataDomain();
   ~vtkSMFieldDataDomain() override;
@@ -90,7 +96,7 @@ private:
   vtkSMFieldDataDomain(const vtkSMFieldDataDomain&) = delete;
   void operator=(const vtkSMFieldDataDomain&) = delete;
 
-  int ComputeDefaultValue();
+  int ComputeDefaultValue(int currentValue);
 };
 
 #endif
