@@ -37,6 +37,19 @@ endif ()
 
 find_package(Qt5 REQUIRED QUIET COMPONENTS Core Widgets)
 
+if (APPLE)
+  # Enable high resolution when using Qt5
+  # This configuring of MacOSXBundleInfo may no longer be needed, but I am
+  # leaving it in since in future we could build the supported extensions list
+  # more exhaustively here.
+  set(high_resolution_capable "true")
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/MacOSXBundleInfo.plist.in.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/MacOSXBundleInfo.plist.in"
+    @ONLY)
+  unset(high_resolution_capable)
+endif ()
+
 paraview_client_add(
   NAME              paraview
   NAMESPACE         "ParaView"
@@ -47,6 +60,7 @@ paraview_client_add(
   VERSION           "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}"
   MAIN_WINDOW_CLASS "ParaViewMainWindow"
   BUNDLE_ICON       "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.icns"
+  BUNDLE_PLIST      "${CMAKE_CURRENT_BINARY_DIR}/MacOSXBundleInfo.plist.in"
   APPLICATION_ICON  "${CMAKE_CURRENT_SOURCE_DIR}/pvIcon.ico"
   SOURCES           ${sources}
   PLUGINS_TARGET    paraview_plugins
