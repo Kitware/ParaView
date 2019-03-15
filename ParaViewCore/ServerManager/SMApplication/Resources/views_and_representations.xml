@@ -2727,7 +2727,7 @@
         <IntRangeDomain
             min="0"
             name="range"/>
-        <Documentation>Set the size of the timestep cache that speeds up flip book animation of volumes in OSPRay.</Documentation>
+        <Documentation>Set the size of the timestep cache that speeds up flip book animation in OSPRay.</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"

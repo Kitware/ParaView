@@ -3128,14 +3128,7 @@ bool vtkPVRenderView::GetShadows()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
-  if (ren->GetUseShadows() == 1)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return (ren->GetUseShadows() == 1);
 #else
   return false;
 #endif
@@ -3224,14 +3217,7 @@ bool vtkPVRenderView::GetDenoise()
 {
 #if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
   vtkRenderer* ren = this->GetRenderer();
-  if (vtkOSPRayRendererNode::GetEnableDenoiser(ren) == 1)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return (vtkOSPRayRendererNode::GetEnableDenoiser(ren) == 1);
 #else
   return false;
 #endif
