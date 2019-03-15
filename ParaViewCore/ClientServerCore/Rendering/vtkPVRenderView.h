@@ -894,6 +894,14 @@ public:
   bool GetOSPRayContinueStreaming();
   //@{
   /**
+   * Controls whether to use image denoising to improve appearance.
+   */
+  void SetDenoise(bool);
+  bool GetDenoise();
+  //@}
+
+  //@{
+  /**
    * Dimish or Amplify all lights in the scene.
    */
   void SetLightScale(double);
