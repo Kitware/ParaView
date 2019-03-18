@@ -30,6 +30,7 @@ target_link_libraries(OpenVR
     ParaView::ServerManagerCore
     ParaView::ServerManagerRendering
     ParaView::VTKExtensionsRendering
+    ParaView::pqApplicationComponents
     VTK::CommonCore
     VTK::CommonDataModel
     VTK::IOCore
