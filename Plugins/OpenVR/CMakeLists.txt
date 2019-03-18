@@ -20,7 +20,7 @@ list(APPEND sources
 paraview_add_plugin(OpenVR
   VERSION "1.1"
   UI_FILES pvOpenVRDockPanel.ui
-  INTERFACES ${interfaces}
+  UI_INTERFACES ${interfaces}
   SOURCES ${sources})
 
 target_link_libraries(OpenVR
