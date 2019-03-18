@@ -834,7 +834,7 @@
       <!-- End of ExtractSelectionOverTime -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPExtractTemporalFieldData"
+    <SourceProxy class="vtkPExtractExodusGlobalTemporalVariables"
                  label="Plot Global Variables Over Time"
                  name="ExtractFieldDataOverTime">
       <Documentation long_help="Extracts and plots data in field data over time."
@@ -855,18 +855,6 @@
         <Documentation>The input from which the selection is
         extracted.</Documentation>
       </InputProperty>
-      <IntVectorProperty name="HandleBlocksIndividually"
-        command="SetHandleCompositeDataBlocksIndividually"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="never">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When checked, if the input is a composite-dataset, then
-          each block in the input dataset is processed. If unchecked,
-          then the first non-empty FieldData is considered.
-        </Documentation>
-      </IntVectorProperty>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYChartView" />

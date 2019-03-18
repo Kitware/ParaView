@@ -11,6 +11,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/Level_0/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/AMReX-MFIX/plt00005/particles/Level_0/,REGEX:.*}"
+  "DATA{${paraview_test_data_directory_input}/Data/can-restarts/,REGEX:.*}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphInput.vtp}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree.vtm}"
   "DATA{${paraview_test_data_directory_input}/Data/CompositeGlyphTree/,REGEX:.*}"
@@ -683,6 +684,7 @@ list(APPEND TESTS_WITH_BASELINES
   EnSightTensorInversion.xml
   EnSightTensorInversionBin.xml
   ExodusXML.xml
+  ExodusGlobalDataWithRestarts.xml
   ExportLinePlotToCSV.xml
   ExportLinePlotToTSV.xml
   ExportSceneSpreadSheetView2.xml
