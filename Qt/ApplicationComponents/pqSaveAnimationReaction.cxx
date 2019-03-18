@@ -32,13 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveAnimationReaction.h"
 
 #include "pqActiveObjects.h"
+#include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
+#include "pqProgressManager.h"
 #include "pqProxyWidgetDialog.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
@@ -54,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 
 #include <QDebug>
+#include <QProgressDialog>
 
 //-----------------------------------------------------------------------------
 pqSaveAnimationReaction::pqSaveAnimationReaction(QAction* parentObject)
@@ -161,7 +165,35 @@ void pqSaveAnimationReaction::saveAnimation()
 
   if (dialog.exec() == QDialog::Accepted)
   {
+    QProgressDialog progress(
+      "Save animation progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
+    progress.setWindowModality(Qt::ApplicationModal);
+    progress.setWindowTitle("Saving Animation ...");
+    progress.show();
+    QObject::connect(&progress, &QProgressDialog::canceled, [scene, &progress]() {
+      progress.hide();
+      scene->InvokeCommand("Stop");
+    });
+
+    auto appcore = pqApplicationCore::instance();
+    auto pqscene = appcore->getServerManagerModel()->findItem<pqAnimationScene*>(scene);
+    auto sceneConnection =
+      QObject::connect(pqscene, &pqAnimationScene::tick, [&progress](int progressInPercent) {
+        if (progress.isVisible())
+        {
+          progress.setValue(progressInPercent);
+        }
+      });
+
+    auto pgm = appcore->getProgressManager();
+    // this is essential since pqProgressManager blocks all interaction
+    // events when progress events are pending. since we have a QProgressDialog
+    // as modal, we don't need to that. Plus, we want the cancel button on the
+    // dialog to work.
+    const auto prev = pgm->unblockEvents(true);
     ahProxy->WriteAnimation(filename.toUtf8().data());
+    pgm->unblockEvents(prev);
+    pqscene->disconnect(sceneConnection);
   }
 
   if (layout)

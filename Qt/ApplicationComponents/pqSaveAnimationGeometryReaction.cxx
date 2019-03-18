@@ -33,11 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"
+#include "pqAnimationScene.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqPVApplicationCore.h"
+#include "pqProgressManager.h"
 
 #include <QDebug>
+#include <QProgressDialog>
 
 //-----------------------------------------------------------------------------
 pqSaveAnimationGeometryReaction::pqSaveAnimationGeometryReaction(QAction* parentObject)
@@ -105,8 +108,36 @@ void pqSaveAnimationGeometryReaction::saveAnimationGeometry(const QString& filen
     return;
   }
 
+  auto pqscene = mgr->getActiveScene();
+
+  QProgressDialog progress(
+    "Save geometry progress", "Abort", 0, 100, pqCoreUtilities::mainWidget());
+  progress.setWindowModality(Qt::ApplicationModal);
+  progress.setWindowTitle("Saving Geometry ...");
+  progress.show();
+  QObject::connect(&progress, &QProgressDialog::canceled, [pqscene, &progress]() {
+    progress.hide();
+    pqscene->pause();
+  });
+
+  auto sceneConnection =
+    QObject::connect(pqscene, &pqAnimationScene::tick, [&progress](int progressInPercent) {
+      if (progress.isVisible())
+      {
+        progress.setValue(progressInPercent);
+      }
+    });
+
+  auto pgm = pqPVApplicationCore::instance()->getProgressManager();
+  // this is essential since pqProgressManager blocks all interaction
+  // events when progress events are pending. since we have a QProgressDialog
+  // as modal, we don't need to that. Plus, we want the cancel button on the
+  // dialog to work.
+  const auto prev = pgm->unblockEvents(true);
   if (!mgr->saveGeometry(filename, view))
   {
     qDebug() << "Animation save geometry failed!";
   }
+  pgm->unblockEvents(prev);
+  pqscene->disconnect(sceneConnection);
 }
