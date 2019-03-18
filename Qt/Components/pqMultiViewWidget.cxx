@@ -112,7 +112,7 @@ public:
     auto hlayout = new pqHierarchicalGridLayout(this->Container);
     hlayout->setSpacing(PARAVIEW_DEFAULT_LAYOUT_SPACING);
 
-    QObject::connect(this->Container, &pqHierarchicalGridWidget::splitterMoved,
+    QObject::connect(this->Container.data(), &pqHierarchicalGridWidget::splitterMoved,
       [self](int location, double fraction) {
         if (auto vlayout = self->layoutManager())
         {
