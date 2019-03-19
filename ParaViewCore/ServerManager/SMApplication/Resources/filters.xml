@@ -1117,20 +1117,17 @@
       <!-- End AppendPolyData -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkAppendFilter"
+    <SourceProxy class="vtkAppendDataSets"
                  label="Append Datasets"
                  name="Append">
-      <Documentation long_help="Takes an input of multiple datasets and output has only one unstructured grid."
+      <Documentation long_help="Takes an input of multiple datasets and output has only one unstructured grid or polydata."
                      short_help="Append multiple datasets into one.">The Append
                      Datasets filter operates on multiple data sets of any type
-                     (polygonal, structured, etc.). It merges their geometry
-                     into a single data set. Only the point and cell attributes
-                     that all of the input data sets have in common will appear
-                     in the output. The input data sets must already be
-                     collected together, either as a result of a reader that
-                     loads multiple parts (e.g., EnSight reader) or because the
-                     Group Parts filter has been run to form a collection of
-                     data sets.</Documentation>
+                     (polygonal, structured, etc.). It merges their meshes
+                     into a single dataset. If all inputs are polydata, the output
+                     is a polydata, otherwise it is an unstructured grid.
+                     Only the point and cell attributes that all of the input
+                     datasets have in common will appear in the output.</Documentation>
       <InputProperty clean_command="RemoveAllInputs"
                      command="AddInputConnection"
                      multiple_input="1"
@@ -1146,6 +1143,24 @@
         <Documentation>This property specifies the datasets to be merged into a
         single dataset by the Append Datasets filter.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="4"
+                         number_of_elements="1"
+                         name="OutputDataSetType"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Polygonal Mesh"
+                 value="0" />
+          <Entry text="Unstructured Grid"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>Determines the output type produced by this filter. Only input datasets compatible
+        with the output type will be merged in the output. For example, if the output type is
+        "Polygonal Mesh", then inputs of type "Image Data", "StructuredGrid", etc. will not be merged.
+        On the other hand, if the output type is "Unstructured Grid", then inputs of almost any type
+        will be merged in the output. Defaults to "Unstructured Grid".
+        </Documentation>
+      </IntVectorProperty>
       <!-- End AppendDataSet -->
     </SourceProxy>
     <!-- ==================================================================== -->
