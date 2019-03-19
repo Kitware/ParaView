@@ -271,11 +271,13 @@ void vtkExodusFileSeriesReader::FindRestartedResults()
       continue;
     this->AddFileNameInternal((path + file).c_str());
   }
+  this->CopyRealFileNamesFromFileNames();
 
   // Check to make sure we found something.
   if (this->GetNumberOfFileNames() < 1)
   {
     vtkWarningMacro(<< "Could not find any actual files matching " << originalFile.c_str());
     this->AddFileNameInternal(originalFile);
+    this->CopyRealFileNamesFromFileNames();
   }
 }

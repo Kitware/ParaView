@@ -207,9 +207,21 @@ protected:
    */
   void ResetTimeRanges();
 
-  // Add/Remove filenames without changing the MTime.
+  /**
+   * Add/Remove filenames without changing the MTime.
+   */
   void RemoveAllFileNamesInternal();
   void AddFileNameInternal(const char*);
+
+  /**
+   * Remove all real file names.
+   */
+  virtual void RemoveAllRealFileNamesInternal();
+
+  /**
+   * Set the real filenames to those in the internal FileNames.
+   */
+  void CopyRealFileNamesFromFileNames();
 
   bool IgnoreReaderTime;
 
