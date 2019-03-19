@@ -222,6 +222,7 @@ bool vtkSMLoadStateOptionsProxy::PrepareToLoad(const char* statefilename)
     newReaderProxy.TakeReference(
       pxm->NewProxy(proxyXML.attribute("group").value(), proxyXML.attribute("type").value()));
     newReaderProxy->PrototypeOn();
+    newReaderProxy->SetLocation(0);
 
     // Property group to group properties by source
     pugi::xml_document propertyGroup;
