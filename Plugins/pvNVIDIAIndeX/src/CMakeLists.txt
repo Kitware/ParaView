@@ -79,6 +79,10 @@ if (NVINDEX_SKIP_BUILD_RPATH)
     INSTALL_RPATH_USE_LINK_PATH FALSE)
 endif ()
 
+vtk_module_definitions(pvNVIDIAIndeX::IndeXRepresentations
+  PRIVATE
+    USE_SPARSE_VOLUME)
+
 if (NVINDEX_INTERNAL_BUILD)
   vtk_module_definitions(pvNVIDIAIndeX::IndeXRepresentations
     PRIVATE
