@@ -1000,6 +1000,7 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(const vtkRenderState* ren
   ostate->vtkglColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
   GLboolean prevDepthTest = ostate->GetEnumState(GL_DEPTH_TEST);
+  ostate->vtkglEnable(GL_DEPTH_TEST);
 
   GLboolean prevDepthMask;
   ostate->vtkglGetBooleanv(GL_DEPTH_WRITEMASK, &prevDepthMask);
