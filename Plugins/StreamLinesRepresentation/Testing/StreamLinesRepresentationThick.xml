@@ -11,7 +11,7 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="activated" arguments="Stream Lines" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/LineWidth/DoubleLineEdit0" command="set_full_precision_text" arguments="2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/LineWidth/DoubleLineEdit0" command="set_string" arguments="2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchBox/AdvancedButton" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/NumberOfAnimationSteps/LineEdit0" command="set_string" arguments="100" />
 </pqevents>
