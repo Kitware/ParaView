@@ -70,14 +70,13 @@ bool pqQVTKWidgetEventTranslator::translateEvent(
   // Look for a render window in the possible widget types.
   vtkRenderWindow* rw = nullptr;
 
-  QVTKOpenGLWidget* const qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object);
-  if (qvtkWidget != nullptr)
+  if (QVTKOpenGLWidget* const qvtkWidget = qobject_cast<QVTKOpenGLWidget*>(Object))
   {
-    rw = qvtkWidget->renderWindow();
+    rw = qvtkWidget->embeddedOpenGLWindow() ? qvtkWidget->renderWindow() : nullptr;
   }
 
-  QVTKOpenGLNativeWidget* const qvtkNativeWidget = qobject_cast<QVTKOpenGLNativeWidget*>(Object);
-  if (qvtkNativeWidget != nullptr)
+  if (QVTKOpenGLNativeWidget* const qvtkNativeWidget =
+        qobject_cast<QVTKOpenGLNativeWidget*>(Object))
   {
     rw = qvtkNativeWidget->renderWindow();
   }

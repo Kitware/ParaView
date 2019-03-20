@@ -76,7 +76,6 @@ set(classes
   vtkPEnSightGoldReader
   vtkPEnSightReader
   vtkPEquivalenceSet
-  vtkPExtractTemporalFieldData
   vtkPGenericEnSightReader
   vtkPPhastaReader
   vtkPSciVizContingencyStats
