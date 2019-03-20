@@ -151,7 +151,17 @@ if (NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 endif ()
 
 include(CMakeDependentOption)
-option(PARAVIEW_BUILD_EXAMPLES "Build ParaView examples" OFF)
+set(examples_default OFF)
+if (DEFINED PARAVIEW_BUILD_EXAMPLES)
+  message(DEPRECATION
+    "PARAVIEW_BUILD_EXAMPLES has been renamed to PARAVIEW_ENABLE_EXAMPLES.")
+  # Use the old variable as the default for the new variable if present.
+  set(examples_default "${PARAVIEW_BUILD_EXAMPLES}")
+  # Remove the old setting from the cache and local scope.
+  unset(PARAVIEW_BUILD_EXAMPLES)
+  unset(PARAVIEW_BUILD_EXAMPLES CACHE)
+endif ()
+option(PARAVIEW_ENABLE_EXAMPLES "Enable ParaView examples" "${examples_default}")
 option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Build ParaView C++/Python docs" OFF)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
@@ -987,6 +997,6 @@ if (PARAVIEW_BUILD_CATALYST_ADAPTORS)
 endif()
 
 #-----------------------------------------------------------------------------
-if (PARAVIEW_BUILD_EXAMPLES)
+if (PARAVIEW_ENABLE_EXAMPLES)
   add_subdirectory(Examples)
 endif ()

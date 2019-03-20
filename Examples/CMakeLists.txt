@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.8)
 project(ParaViewExamples)
 
+if (CMAKE_VERSION VERSION_LESS "3.11" AND
+    CMAKE_GENERATOR STREQUAL "Ninja")
+  message(WARNING
+    "CMake < 3.11 with the Ninja generator causes issues with the way "
+    "examples are built. Skipping examples for now.")
+  return ()
+endif ()
+
 if (ParaView_BINARY_DIR)
   function (add_example dir)
     add_test(
