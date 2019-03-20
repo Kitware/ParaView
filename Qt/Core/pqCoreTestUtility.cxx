@@ -52,8 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorDialogEventTranslator.h"
 #include "pqConsoleWidgetEventPlayer.h"
 #include "pqConsoleWidgetEventTranslator.h"
-#include "pqDoubleLineEditEventPlayer.h"
-#include "pqDoubleLineEditEventTranslator.h"
 #include "pqEventDispatcher.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
@@ -127,7 +125,6 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p)
   this->addEventSource("py", new pqPythonEventSourceImage(this));
 #endif
 
-  this->eventTranslator()->addWidgetEventTranslator(new pqDoubleLineEditEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(new pqQVTKWidgetEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(new pqFileDialogEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(new pqFlatTreeViewEventTranslator(this));
@@ -136,7 +133,6 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p)
   this->eventTranslator()->addWidgetEventTranslator(new pqConsoleWidgetEventTranslator(this));
 
   this->eventPlayer()->addWidgetEventPlayer(new pqLineEditEventPlayer(this));
-  this->eventPlayer()->addWidgetEventPlayer(new pqDoubleLineEditEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqQVTKWidgetEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqFileDialogEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(new pqFlatTreeViewEventPlayer(this));

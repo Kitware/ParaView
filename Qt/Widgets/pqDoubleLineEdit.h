@@ -33,42 +33,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqDoubleLineEdit_h
 
 // Qt Includes.
-#include <QLineEdit>
+#include <QScopedPointer> // for ivar
 
 // ParaView Includes.
+#include "pqLineEdit.h"
 #include "pqWidgetsModule.h"
 
 /**
+ * @class pqDoubleLineEdit
+ * @brief pqLineEdit subclass that supports a low precision view when inactive
+ *
  * pqDoubleLineEdit allows to edit a real number in full precision and display
- * a simpified version.
+ * a simplified version when the widget is not in focus or under mouse pointer.
  *
  * The precision and notation associated with the displayed number can be
- * configured using the corresponding properties.
+ * configured using the `precision` and `notation` properties on the
+ * pqDoubleLineEdit instance. Additionally, pqDoubleLineEdit can be configure to
+ * simply respect a global precision and notation specification by using the
+ * property `useGlobalPrecisionAndNotation` (which is default).
  *
- * In its constructor, pqDoubleLineEdit sets up a QDoubleValidator as the
- * validator for the line edit.
+ * Since pqDoubleLineEdit is intended for numeric values, in its constructor, a
+ * `QDoubleValidator` is created for convenience.
+ *
  */
-class PQWIDGETS_EXPORT pqDoubleLineEdit : public QLineEdit
+class PQWIDGETS_EXPORT pqDoubleLineEdit : public pqLineEdit
 {
   Q_OBJECT
   Q_ENUMS(RealNumberNotation)
-  Q_PROPERTY(QString fullPrecisionText READ fullPrecisionText WRITE setFullPrecisionText)
   Q_PROPERTY(RealNumberNotation notation READ notation WRITE setNotation)
   Q_PROPERTY(int precision READ precision WRITE setPrecision)
   Q_PROPERTY(bool useGlobalPrecisionAndNotation READ useGlobalPrecisionAndNotation WRITE
       setUseGlobalPrecisionAndNotation)
-
-  using Superclass = QLineEdit;
+  using Superclass = pqLineEdit;
 
 public:
   pqDoubleLineEdit(QWidget* parent = 0);
   ~pqDoubleLineEdit() override;
-
-  /**
-   * Get the real number
-   * \sa setFullPrecisionText()
-   */
-  QString fullPrecisionText() const;
 
   /**
    * This enum specifies which notations to use for displaying the value.
@@ -109,16 +109,14 @@ public:
   static int globalPrecision();
   static RealNumberNotation globalNotation();
   //@}
-public slots:
-  /**
-   * Set the real number in standard notation.
-   *
-   * The signal fullPrecisionTextChanged() is emitted whenever the full precision text changes.
-   *
-   * \sa fullPrecisionText(), fullPrecisionTextChanged()
-   */
-  void setFullPrecisionText(const QString& _text);
 
+  /**
+   * Returns the text being shown when the widget is not active or under mouse
+   * pointer. Primarily intended for test or debugging purposes.
+   */
+  QString simplifiedText() const;
+
+public slots:
   /**
    * Set the notation used to display the number.
    * \sa notation()
@@ -137,50 +135,20 @@ public slots:
    */
   void setUseGlobalPrecisionAndNotation(bool value);
 
-signals:
-  /**
-   * This signal is emitted when the Return or Enter key is pressed or the line edit loses focus
-   * and the full precision text is updated and is different from its original value.
-   */
-  void fullPrecisionTextChangedAndEditingFinished();
-
-  /**
-   * This signal is emitted whenever the full precision text changes. The text argument is the
-   * new text.
-   * Unlike fullPrecisionTextChangedAndEditingFinished(), this signal is also emitted when the
-   * text is changed programmatically, for example, by calling setFullPrecisionText().
-   *
-   * \sa setFullPrecisionText()
-   */
-  void fullPrecisionTextChanged(const QString&);
-
-protected slots:
-  void onEditingStarted();
-  void onEditingFinished();
-
-  friend class pqDoubleLineEditEventPlayer;
-  /**
-   * This is called by pqDoubleLineEditEventPlayer during event playback to ensure
-   * that the fullPrecisionTextChangedAndEditingFinished() signal is fired when text
-   * is changed using setFullPrecisionText() in playback.
-   */
-  void triggerFullPrecisionTextChangedAndEditingFinished();
-
 protected:
-  void focusInEvent(QFocusEvent* event) override;
-  void updateLimitedPrecisionText();
+  void enterEvent(QEvent* event) override;
+  void leaveEvent(QEvent* event) override;
+  void paintEvent(QPaintEvent* evt) override;
+  void resizeEvent(QResizeEvent* event) override;
 
 private:
   Q_DISABLE_COPY(pqDoubleLineEdit)
 
-  QString FullPrecisionText;
-  RealNumberNotation Notation;
-
-  int Precision;
-  bool UseGlobalPrecisionAndNotation;
-
   static int GlobalPrecision;
   static RealNumberNotation GlobalNotation;
+
+  class pqInternals;
+  QScopedPointer<pqInternals> Internals;
 };
 
 #endif

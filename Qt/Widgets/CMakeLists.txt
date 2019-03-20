@@ -49,8 +49,6 @@ set(classes
   pqDelimitedTextParser
   pqDiscreteDoubleWidget
   pqDoubleLineEdit
-  pqDoubleLineEditEventPlayer
-  pqDoubleLineEditEventTranslator
   pqDoubleRangeDialog
   pqDoubleRangeWidget
   pqDoubleSliderWidget
