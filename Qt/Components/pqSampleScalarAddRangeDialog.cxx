@@ -85,22 +85,22 @@ pqSampleScalarAddRangeDialog::~pqSampleScalarAddRangeDialog()
 
 double pqSampleScalarAddRangeDialog::from() const
 {
-  return this->Implementation->Ui.from->fullPrecisionText().toDouble();
+  return this->Implementation->Ui.from->text().toDouble();
 }
 
 void pqSampleScalarAddRangeDialog::setFrom(double value)
 {
-  this->Implementation->Ui.from->setFullPrecisionText(pqCoreUtilities::number(value));
+  this->Implementation->Ui.from->setText(pqCoreUtilities::number(value));
 }
 
 double pqSampleScalarAddRangeDialog::to() const
 {
-  return this->Implementation->Ui.to->fullPrecisionText().toDouble();
+  return this->Implementation->Ui.to->text().toDouble();
 }
 
 void pqSampleScalarAddRangeDialog::setTo(double value)
 {
-  this->Implementation->Ui.to->setFullPrecisionText(pqCoreUtilities::number(value));
+  this->Implementation->Ui.to->setText(pqCoreUtilities::number(value));
 }
 
 unsigned long pqSampleScalarAddRangeDialog::steps() const

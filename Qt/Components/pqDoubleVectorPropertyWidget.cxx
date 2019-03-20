@@ -215,10 +215,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           {
             gridLayout->addWidget(lineEdit, i, 0);
           }
-          this->addPropertyLink(
-            lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, 2 * i);
-          this->connect(lineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
-            SIGNAL(changeFinished()));
+          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, 2 * i);
+          this->connect(
+            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
 
           lineEdit = new pqDoubleLineEdit(this);
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(2 * i + 1));
@@ -235,10 +234,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
             gridLayout->addWidget(lineEdit, i, 1);
           }
           this->addPropertyLink(
-            lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, 2 * i + 1);
+            lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, 2 * i + 1);
 
-          this->connect(lineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
-            SIGNAL(changeFinished()));
+          this->connect(
+            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
         }
 
         layoutLocal->addLayout(gridLayout);
@@ -259,11 +258,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
           lineEdit->setObjectName(QString("DoubleLineEdit%1").arg(i));
           lineEdit->setUseGlobalPrecisionAndNotation(true);
           layoutLocal->addWidget(lineEdit);
-          this->addPropertyLink(
-            lineEdit, "fullPrecisionText", SIGNAL(textChanged(const QString&)), dvp, i);
+          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(const QString&)), dvp, i);
 
-          this->connect(lineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
-            SIGNAL(changeFinished()));
+          this->connect(
+            lineEdit, SIGNAL(textChangedAndEditingFinished()), this, SIGNAL(changeFinished()));
         }
       }
     }

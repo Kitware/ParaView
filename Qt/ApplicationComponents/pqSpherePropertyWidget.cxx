@@ -48,12 +48,9 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
 
   if (vtkSMProperty* center = smgroup->GetProperty("Center"))
   {
-    this->addPropertyLink(ui.centerX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), center, 0);
-    this->addPropertyLink(ui.centerY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), center, 1);
-    this->addPropertyLink(ui.centerZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), center, 2);
+    this->addPropertyLink(ui.centerX, "text2", SIGNAL(textChangedAndEditingFinished()), center, 0);
+    this->addPropertyLink(ui.centerY, "text2", SIGNAL(textChangedAndEditingFinished()), center, 1);
+    this->addPropertyLink(ui.centerZ, "text2", SIGNAL(textChangedAndEditingFinished()), center, 2);
     ui.centerLabel->setText(center->GetXMLLabel());
     ui.pickLabel->setText(
       ui.pickLabel->text().replace("'Center'", QString("'%1'").arg(center->GetXMLLabel())));
@@ -70,12 +67,9 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
 
   if (vtkSMProperty* normal = smgroup->GetProperty("Normal"))
   {
-    this->addPropertyLink(ui.normalX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 0);
-    this->addPropertyLink(ui.normalY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 1);
-    this->addPropertyLink(ui.normalZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 2);
+    this->addPropertyLink(ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
+    this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
+    this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
     ui.normalLabel->setText(normal->GetXMLLabel());
     QString tooltip = this->getTooltip(normal);
     ui.normalX->setToolTip(tooltip);
@@ -93,8 +87,7 @@ pqSpherePropertyWidget::pqSpherePropertyWidget(
 
   if (vtkSMProperty* radius = smgroup->GetProperty("Radius"))
   {
-    this->addPropertyLink(
-      ui.radius, "fullPrecisionText", SIGNAL(fullPrecisionTextChangedAndEditingFinished()), radius);
+    this->addPropertyLink(ui.radius, "text2", SIGNAL(textChangedAndEditingFinished()), radius);
     ui.radiusLabel->setText(radius->GetXMLLabel());
     QString tooltip = this->getTooltip(radius);
     ui.radius->setToolTip(tooltip);

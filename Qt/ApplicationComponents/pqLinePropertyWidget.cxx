@@ -69,12 +69,9 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   if (vtkSMProperty* p1 = smgroup->GetProperty("Point1WorldPosition"))
   {
     ui.labelPoint1->setText(tr(p1->GetXMLLabel()));
-    this->addPropertyLink(
-      ui.point1X, "fullPrecisionText", SIGNAL(fullPrecisionTextChangedAndEditingFinished()), p1, 0);
-    this->addPropertyLink(
-      ui.point1Y, "fullPrecisionText", SIGNAL(fullPrecisionTextChangedAndEditingFinished()), p1, 1);
-    this->addPropertyLink(
-      ui.point1Z, "fullPrecisionText", SIGNAL(fullPrecisionTextChangedAndEditingFinished()), p1, 2);
+    this->addPropertyLink(ui.point1X, "text2", SIGNAL(textChangedAndEditingFinished()), p1, 0);
+    this->addPropertyLink(ui.point1Y, "text2", SIGNAL(textChangedAndEditingFinished()), p1, 1);
+    this->addPropertyLink(ui.point1Z, "text2", SIGNAL(textChangedAndEditingFinished()), p1, 2);
     ui.labelPoint1->setText(p1->GetXMLLabel());
   }
   else
@@ -85,12 +82,9 @@ pqLinePropertyWidget::pqLinePropertyWidget(
   if (vtkSMProperty* p2 = smgroup->GetProperty("Point2WorldPosition"))
   {
     ui.labelPoint2->setText(tr(p2->GetXMLLabel()));
-    this->addPropertyLink(
-      ui.point2X, "fullPrecisionText", SIGNAL(fullPrecisionTextChangedAndEditingFinished()), p2, 0);
-    this->addPropertyLink(
-      ui.point2Y, "fullPrecisionText", SIGNAL(fullPrecisionTextChangedAndEditingFinished()), p2, 1);
-    this->addPropertyLink(
-      ui.point2Z, "fullPrecisionText", SIGNAL(fullPrecisionTextChangedAndEditingFinished()), p2, 2);
+    this->addPropertyLink(ui.point2X, "text2", SIGNAL(textChangedAndEditingFinished()), p2, 0);
+    this->addPropertyLink(ui.point2Y, "text2", SIGNAL(textChangedAndEditingFinished()), p2, 1);
+    this->addPropertyLink(ui.point2Z, "text2", SIGNAL(textChangedAndEditingFinished()), p2, 2);
     ui.labelPoint2->setText(p2->GetXMLLabel());
   }
   else

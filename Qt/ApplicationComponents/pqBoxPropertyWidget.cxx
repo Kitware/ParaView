@@ -60,12 +60,12 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
 
   if (vtkSMProperty* position = smgroup->GetProperty("Position"))
   {
-    this->addPropertyLink(ui.translateX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), position, 0);
-    this->addPropertyLink(ui.translateY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), position, 1);
-    this->addPropertyLink(ui.translateZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), position, 2);
+    this->addPropertyLink(
+      ui.translateX, "text2", SIGNAL(textChangedAndEditingFinished()), position, 0);
+    this->addPropertyLink(
+      ui.translateY, "text2", SIGNAL(textChangedAndEditingFinished()), position, 1);
+    this->addPropertyLink(
+      ui.translateZ, "text2", SIGNAL(textChangedAndEditingFinished()), position, 2);
     ui.labelTranslate->setText(position->GetXMLLabel());
     QString tooltip = this->getTooltip(position);
     ui.translateX->setToolTip(tooltip);
@@ -87,12 +87,12 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
 
   if (vtkSMProperty* rotation = smgroup->GetProperty("Rotation"))
   {
-    this->addPropertyLink(ui.rotateX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), rotation, 0);
-    this->addPropertyLink(ui.rotateY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), rotation, 1);
-    this->addPropertyLink(ui.rotateZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), rotation, 2);
+    this->addPropertyLink(
+      ui.rotateX, "text2", SIGNAL(textChangedAndEditingFinished()), rotation, 0);
+    this->addPropertyLink(
+      ui.rotateY, "text2", SIGNAL(textChangedAndEditingFinished()), rotation, 1);
+    this->addPropertyLink(
+      ui.rotateZ, "text2", SIGNAL(textChangedAndEditingFinished()), rotation, 2);
     ui.labelRotate->setText(rotation->GetXMLLabel());
     QString tooltip = this->getTooltip(rotation);
     ui.rotateX->setToolTip(tooltip);
@@ -114,12 +114,9 @@ pqBoxPropertyWidget::pqBoxPropertyWidget(
 
   if (vtkSMProperty* scale = smgroup->GetProperty("Scale"))
   {
-    this->addPropertyLink(ui.scaleX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), scale, 0);
-    this->addPropertyLink(ui.scaleY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), scale, 1);
-    this->addPropertyLink(ui.scaleZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), scale, 2);
+    this->addPropertyLink(ui.scaleX, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 0);
+    this->addPropertyLink(ui.scaleY, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 1);
+    this->addPropertyLink(ui.scaleZ, "text2", SIGNAL(textChangedAndEditingFinished()), scale, 2);
     ui.labelScale->setText(scale->GetXMLLabel());
     QString tooltip = this->getTooltip(scale);
     ui.scaleX->setToolTip(tooltip);

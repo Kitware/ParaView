@@ -52,10 +52,10 @@ pqRescaleRange::pqRescaleRange(QWidget* widgetParent)
   this->Form->setupUi(this);
 
   // Connect the gui elements.
-  this->connect(this->Form->MinimumScalar, SIGNAL(fullPrecisionTextChanged(const QString&)), this,
-    SLOT(validate()));
-  this->connect(this->Form->MaximumScalar, SIGNAL(fullPrecisionTextChanged(const QString&)), this,
-    SLOT(validate()));
+  this->connect(
+    this->Form->MinimumScalar, SIGNAL(textChanged(const QString&)), this, SLOT(validate()));
+  this->connect(
+    this->Form->MaximumScalar, SIGNAL(textChanged(const QString&)), this, SLOT(validate()));
 
   this->connect(this->Form->RescaleOnlyButton, SIGNAL(clicked()), SLOT(accept()));
   this->connect(this->Form->RescaleButton, SIGNAL(clicked()), SLOT(rescaleAndLock()));
@@ -77,24 +77,24 @@ void pqRescaleRange::setRange(double min, double max)
   }
 
   // Update the displayed range.
-  this->Form->MinimumScalar->setFullPrecisionText(pqCoreUtilities::number(min));
-  this->Form->MaximumScalar->setFullPrecisionText(pqCoreUtilities::number(max));
+  this->Form->MinimumScalar->setText(pqCoreUtilities::number(min));
+  this->Form->MaximumScalar->setText(pqCoreUtilities::number(max));
 }
 
 double pqRescaleRange::minimum() const
 {
-  return this->Form->MinimumScalar->fullPrecisionText().toDouble();
+  return this->Form->MinimumScalar->text().toDouble();
 }
 
 double pqRescaleRange::maximum() const
 {
-  return this->Form->MaximumScalar->fullPrecisionText().toDouble();
+  return this->Form->MaximumScalar->text().toDouble();
 }
 
 void pqRescaleRange::validate()
 {
-  QString tmp1 = this->Form->MinimumScalar->fullPrecisionText();
-  QString tmp2 = this->Form->MaximumScalar->fullPrecisionText();
+  QString tmp1 = this->Form->MinimumScalar->text();
+  QString tmp2 = this->Form->MaximumScalar->text();
   if (tmp1.toDouble() <= tmp2.toDouble())
   {
     this->Form->RescaleButton->setEnabled(true);
