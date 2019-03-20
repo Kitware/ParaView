@@ -701,6 +701,9 @@ else ()
   set(vtk_enable_tests "OFF")
   if (PARAVIEW_BUILD_VTK_TESTING)
     set(vtk_enable_tests "${PARAVIEW_BUILD_TESTING}")
+    # Needed for `rtImageTest.py` tests to work. See note in `vtkModuleTesting`
+    # about this.
+    set(VTK_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/VTK")
   endif ()
 
   # Forward Python option to VTK.
