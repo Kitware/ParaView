@@ -79,12 +79,9 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
   ui.setupUi(this);
   if (vtkSMProperty* origin = smgroup->GetProperty("Origin"))
   {
-    this->addPropertyLink(ui.originX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), origin, 0);
-    this->addPropertyLink(ui.originY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), origin, 1);
-    this->addPropertyLink(ui.originZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), origin, 2);
+    this->addPropertyLink(ui.originX, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 0);
+    this->addPropertyLink(ui.originY, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 1);
+    this->addPropertyLink(ui.originZ, "text2", SIGNAL(textChangedAndEditingFinished()), origin, 2);
     ui.labelOrigin->setText(origin->GetXMLLabel());
     ui.pickLabel->setText(
       ui.pickLabel->text().replace("'Origin'", QString("'%1'").arg(origin->GetXMLLabel())));
@@ -101,12 +98,9 @@ pqImplicitPlanePropertyWidget::pqImplicitPlanePropertyWidget(
 
   if (vtkSMProperty* normal = smgroup->GetProperty("Normal"))
   {
-    this->addPropertyLink(ui.normalX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 0);
-    this->addPropertyLink(ui.normalY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 1);
-    this->addPropertyLink(ui.normalZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), normal, 2);
+    this->addPropertyLink(ui.normalX, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 0);
+    this->addPropertyLink(ui.normalY, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 1);
+    this->addPropertyLink(ui.normalZ, "text2", SIGNAL(textChangedAndEditingFinished()), normal, 2);
     ui.labelNormal->setText(normal->GetXMLLabel());
     QString tooltip = this->getTooltip(normal);
     ui.normalX->setToolTip(tooltip);

@@ -299,45 +299,33 @@ void pqCameraDialog::setupGUI()
     proxy->SynchronizeCameraProperties();
 
     this->Internal->CameraLinks.removeAllPropertyLinks();
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->position0, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraPosition"), 0);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->position1, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraPosition"), 1);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->position2, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraPosition"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->position0, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraPosition"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->position1, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraPosition"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->position2, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraPosition"), 2);
 
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint0, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraFocalPoint"), 0);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint1, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraFocalPoint"), 1);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint2, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraFocalPoint"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint0, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraFocalPoint"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint1, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraFocalPoint"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->focalPoint2, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraFocalPoint"), 2);
 
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp0, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraViewUp"), 0);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp1, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraViewUp"), 1);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp2, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CameraViewUp"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp0, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraViewUp"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp1, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraViewUp"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->viewUp2, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CameraViewUp"), 2);
 
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CenterOfRotation"), 0);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CenterOfRotation"), 1);
-    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), proxy,
-      proxy->GetProperty("CenterOfRotation"), 2);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterX, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CenterOfRotation"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterY, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CenterOfRotation"), 1);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->CenterZ, "text2",
+      SIGNAL(textChangedAndEditingFinished()), proxy, proxy->GetProperty("CenterOfRotation"), 2);
 
     this->Internal->CameraLinks.addPropertyLink(this->Internal->rotationFactor, "value",
       SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("RotationFactor"), 0);

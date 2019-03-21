@@ -47,12 +47,12 @@ pqHandlePropertyWidget::pqHandlePropertyWidget(
 
   if (vtkSMProperty* worldPosition = smgroup->GetProperty("WorldPosition"))
   {
-    this->addPropertyLink(ui.worldPositionX, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), worldPosition, 0);
-    this->addPropertyLink(ui.worldPositionY, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), worldPosition, 1);
-    this->addPropertyLink(ui.worldPositionZ, "fullPrecisionText",
-      SIGNAL(fullPrecisionTextChangedAndEditingFinished()), worldPosition, 2);
+    this->addPropertyLink(
+      ui.worldPositionX, "text2", SIGNAL(textChangedAndEditingFinished()), worldPosition, 0);
+    this->addPropertyLink(
+      ui.worldPositionY, "text2", SIGNAL(textChangedAndEditingFinished()), worldPosition, 1);
+    this->addPropertyLink(
+      ui.worldPositionZ, "text2", SIGNAL(textChangedAndEditingFinished()), worldPosition, 2);
     ui.pointLabel->setText(worldPosition->GetXMLLabel());
     ui.pickLabel->setText(
       ui.pickLabel->text().replace("'Point'", QString("'%1'").arg(worldPosition->GetXMLLabel())));

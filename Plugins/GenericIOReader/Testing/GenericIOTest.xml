@@ -5,6 +5,6 @@
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/GenericIOReader/m000.halo.499.fofproperties" />
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="VtkGenIOReader" />
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ShowData%:/DoubleRangeWidget/DoubleLineEdit" command="set_full_precision_text" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ShowData%:/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="1.0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 </pqevents>

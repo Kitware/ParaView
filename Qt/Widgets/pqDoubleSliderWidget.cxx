@@ -38,13 +38,13 @@ pqDoubleSliderWidget::pqDoubleSliderWidget(QWidget* parent)
   this->DoubleLineEdit = new pqDoubleLineEdit(this);
   l->addWidget(this->DoubleLineEdit);
   this->DoubleLineEdit->setObjectName("DoubleLineEdit");
-  this->DoubleLineEdit->setFullPrecisionText(QString().setNum(this->Value));
+  this->DoubleLineEdit->setText(QString().setNum(this->Value));
 
   QObject::connect(this->Slider, SIGNAL(valueChanged(int)), this, SLOT(sliderChanged(int)));
-  QObject::connect(this->DoubleLineEdit, SIGNAL(fullPrecisionTextChanged(const QString&)), this,
+  QObject::connect(this->DoubleLineEdit, SIGNAL(textChanged(const QString&)), this,
     SLOT(textChanged(const QString&)));
-  QObject::connect(this->DoubleLineEdit, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
-    SLOT(editingFinished()));
+  QObject::connect(
+    this->DoubleLineEdit, SIGNAL(textChangedAndEditingFinished()), this, SLOT(editingFinished()));
 
   // let's avoid firing `valueChanged` events until the user has released the
   // slider.
@@ -80,8 +80,7 @@ void pqDoubleSliderWidget::setValue(double val)
 
     // set the text
     this->BlockUpdate = true;
-    this->DoubleLineEdit->setFullPrecisionText(
-      QString().setNum(val, 'g', DEFAULT_DOUBLE_PRECISION_VALUE));
+    this->DoubleLineEdit->setText(QString().setNum(val, 'g', DEFAULT_DOUBLE_PRECISION_VALUE));
     this->BlockUpdate = false;
   }
 
@@ -107,7 +106,7 @@ void pqDoubleSliderWidget::sliderChanged(int val)
   {
     double v = this->sliderPosToValue(val);
     this->BlockUpdate = true;
-    this->DoubleLineEdit->setFullPrecisionText(QString().setNum(v));
+    this->DoubleLineEdit->setText(QString().setNum(v));
     this->setValue(v);
     this->emitValueEdited();
     this->BlockUpdate = false;

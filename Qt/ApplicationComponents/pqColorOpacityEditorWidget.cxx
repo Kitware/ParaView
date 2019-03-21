@@ -233,8 +233,8 @@ pqColorOpacityEditorWidget::pqColorOpacityEditorWidget(
   this->connect(
     ui.UseLogScaleOpacity, SIGNAL(clicked(bool)), SLOT(useLogScaleOpacityClicked(bool)));
   // if the user edits the "DataValue", we need to update the transfer function.
-  QObject::connect(ui.CurrentDataValue, SIGNAL(fullPrecisionTextChangedAndEditingFinished()), this,
-    SLOT(currentDataEdited()));
+  QObject::connect(
+    ui.CurrentDataValue, SIGNAL(textChangedAndEditingFinished()), this, SLOT(currentDataEdited()));
 
   vtkSMProperty* smproperty = smgroup->GetProperty("XRGBPoints");
   if (smproperty)
@@ -487,7 +487,7 @@ void pqColorOpacityEditorWidget::updateCurrentData()
   {
     double xrgbms[6];
     stc->GetNodeValue(ui.ColorEditor->currentPoint(), xrgbms);
-    ui.CurrentDataValue->setFullPrecisionText(pqCoreUtilities::number(xrgbms[0]));
+    ui.CurrentDataValue->setText(pqCoreUtilities::number(xrgbms[0]));
 
     // Don't enable widget for first/last control point. For those, users must
     // rescale the transfer function manually
@@ -498,7 +498,7 @@ void pqColorOpacityEditorWidget::updateCurrentData()
   {
     double xvms[4];
     pwf->GetNodeValue(ui.OpacityEditor->currentPoint(), xvms);
-    ui.CurrentDataValue->setFullPrecisionText(pqCoreUtilities::number(xvms[0]));
+    ui.CurrentDataValue->setText(pqCoreUtilities::number(xvms[0]));
 
     // Don't enable widget for first/last control point. For those, users must
     // rescale the transfer function manually
@@ -649,11 +649,11 @@ void pqColorOpacityEditorWidget::currentDataEdited()
   Ui::ColorOpacityEditorWidget& ui = this->Internals->Ui;
   if (ui.ColorEditor->currentPoint() >= 0 && stc)
   {
-    ui.ColorEditor->setCurrentPointPosition(ui.CurrentDataValue->fullPrecisionText().toDouble());
+    ui.ColorEditor->setCurrentPointPosition(ui.CurrentDataValue->text().toDouble());
   }
   else if (ui.OpacityEditor->currentPoint() >= 0 && pwf)
   {
-    ui.OpacityEditor->setCurrentPointPosition(ui.CurrentDataValue->fullPrecisionText().toDouble());
+    ui.OpacityEditor->setCurrentPointPosition(ui.CurrentDataValue->text().toDouble());
   }
 
   this->updateCurrentData();

@@ -6,9 +6,11 @@ SET(MyTests
   )
 
 set(TestsNoArgs
+  DoubleLineEdit
   HierarchicalGridLayout)
 
 SET(MocSources
+  DoubleLineEdit.h
   HierarchicalGridLayout.h
   SignalCatcher.h)
 

@@ -24,6 +24,16 @@ a result, XML attributes `force_point_cell_data` and
 have been deprecated and should simply be removed from the XML as they are no
 longer relevant.
 
+##pqDoubleLineEdit API changes##
+
+`pqDoubleLineEdit` now is simply a `pqLineEdit` with no signficant API differences
+as far as setting and getting text values is concerned. This implies, however, that
+tests that were updated in ParaView 5.6 to use `set_full_precision_text` instead of
+`set_string` must now be reverted back to use `set_string`.
+
+The following command was adequate for ParaView test changes:
+`git grep -l set_full_ | xargs sed -i 's/set_full_precision_text/set_string/g'`.
+
 Changes in 5.6
 --------------
 
