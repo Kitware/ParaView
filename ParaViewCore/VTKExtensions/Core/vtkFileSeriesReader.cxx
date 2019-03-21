@@ -30,6 +30,7 @@
 #include "vtkGenericDataObjectReader.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
+#include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -54,7 +55,9 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-
+vtkInformationKeyMacro(vtkFileSeriesReader, FILE_SERIES_NUMBER_OF_FILES, Integer);
+vtkInformationKeyMacro(vtkFileSeriesReader, FILE_SERIES_CURRENT_FILE_NUMBER, Integer);
+vtkInformationKeyMacro(vtkFileSeriesReader, FILE_SERIES_FIRST_FILENAME, String);
 //=============================================================================
 // Internal class for holding time ranges.
 class vtkFileSeriesReaderTimeRanges
@@ -537,6 +540,12 @@ int vtkFileSeriesReader::ProcessRequest(
       this->RequestUpdateTimeDependentInformation(request, inputVector, outputVector);
     }
 
+    // Expose number of files and first filename as
+    // information keys for potential use in the internal reader
+    outputVector->GetInformationObject(0)->Set(
+      FILE_SERIES_NUMBER_OF_FILES(), this->GetNumberOfFileNames());
+    outputVector->GetInformationObject(0)->Set(FILE_SERIES_FIRST_FILENAME(), this->GetFileName(0));
+
     // Let the reader process anything we did not handle ourselves.
     int retVal = this->Reader->ProcessRequest(request, inputVector, outputVector);
 
@@ -573,6 +582,9 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
     // the reader.
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+
+    // Expose current file number as information key for potential use in the internal reader
+    outputVector->GetInformationObject(requestFromPort)->Set(FILE_SERIES_CURRENT_FILE_NUMBER(), 0);
     this->RequestInformationForInput(0, request, outputVector);
 
     // vtkErrorMacro("Expecting at least 1 file.  Cannot proceed.");
@@ -583,6 +595,9 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
   // determine if the inputs have time information
   outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+
+  // Expose current file number as information key for potential use in the internal reader
+  outputVector->GetInformationObject(requestFromPort)->Set(FILE_SERIES_CURRENT_FILE_NUMBER(), 0);
   this->RequestInformationForInput(0, request, outputVector);
 
   bool ignoreReaderTime = this->IgnoreReaderTime;
@@ -615,6 +630,9 @@ int vtkFileSeriesReader::RequestInformation(vtkInformation* request,
     // Query all the other files for time info.
     for (unsigned int i = 1; i < numFiles; i++)
     {
+      // Expose current file number as information key for potential use in the internal reader
+      outputVector->GetInformationObject(requestFromPort)
+        ->Set(FILE_SERIES_CURRENT_FILE_NUMBER(), static_cast<int>(i));
       this->RequestInformationForInput(static_cast<int>(i), request, outputVector);
       this->Internal->TimeRanges->AddTimeRange(static_cast<int>(i), outInfo);
     }
@@ -652,6 +670,8 @@ int vtkFileSeriesReader::RequestUpdateExtent(vtkInformation* request,
 
   // Make sure that the reader file name is set correctly and that
   // RequestInformation has been called.
+  outputVector->GetInformationObject(requestFromPort)
+    ->Set(FILE_SERIES_CURRENT_FILE_NUMBER(), index);
   this->RequestInformationForInput(index);
 
 // I commented out the following block because it is probably not important
