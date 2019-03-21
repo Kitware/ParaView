@@ -136,8 +136,6 @@ public slots:
   void setUseGlobalPrecisionAndNotation(bool value);
 
 protected:
-  void enterEvent(QEvent* event) override;
-  void leaveEvent(QEvent* event) override;
   void paintEvent(QPaintEvent* evt) override;
   void resizeEvent(QResizeEvent* event) override;
 
