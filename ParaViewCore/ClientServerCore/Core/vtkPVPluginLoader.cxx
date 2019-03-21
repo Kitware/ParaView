@@ -404,7 +404,14 @@ bool vtkPVPluginLoader::LoadPluginInternal(const char* file, bool no_errors)
                               "cannot load dynamic plugins  in static builds.");
   return false;
 #else // ifndef BUILD_SHARED_LIBS
-  vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
+  int flags = 0;
+#ifdef _WIN32
+  // Windows doesn't have rpath or other mechanisms for specifying where
+  // dependent libraries live. Assume those not provided by ParaView live next
+  // to the plugin.
+  flags |= vtksys::DynamicLoader::SearchBesideLibrary;
+#endif
+  vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file, flags);
   if (!lib)
   {
     vtkPVPluginLoaderErrorMacro(vtkDynamicLoader::LastError());
