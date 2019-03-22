@@ -695,6 +695,10 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
           handledCenterings.insert(varCentering);
           solutionNames.push_back(nodeName);
         }
+        else if (self->GetCreateEachSolutionAsBlock())
+        {
+          solutionNames.push_back(nodeName);
+        }
       }
     }
   }
