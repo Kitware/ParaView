@@ -103,7 +103,8 @@ int vtkReductionFilter::RequestDataObject(
 
     const char* hOT = helpersInfo->Get(vtkDataObject::DATA_TYPE_NAME());
     const char* helpersOutType = hOT;
-    if ((!strcmp(hOT, "vtkDataSet") || !strcmp(hOT, "vtkDataObject")))
+    if ((!strcmp(hOT, "vtkPointSet") || !strcmp(hOT, "vtkDataSet") ||
+          !strcmp(hOT, "vtkDataObject")))
     {
       // Output type must be same as input.
       vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
