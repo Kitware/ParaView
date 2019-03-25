@@ -976,9 +976,11 @@ function (paraview_client_qt_resource)
   get_filename_component(_paraview_client_resource_file_path
     "${_paraview_client_resource_file_path}"
     REALPATH)
-  file(TO_NATIVE_PATH
-    "${_paraview_client_resource_file_path}"
-    _paraview_client_resource_file_path)
+  if (WIN32)
+    file(TO_NATIVE_PATH
+      "${_paraview_client_resource_file_path}"
+      _paraview_client_resource_file_path)
+  endif ()
 
   # We cannot use file(GENERATE) because automoc doesn't like when generated
   # sources are in the source list.
@@ -1051,9 +1053,11 @@ function (paraview_client_qt_resources)
     get_filename_component(_paraview_client_resources_file_path
       "${_paraview_client_resources_file_path}"
       REALPATH)
-    file(TO_NATIVE_PATH
-      "${_paraview_client_resources_file_path}"
-      _paraview_client_resources_file_path)
+    if (WIN32)
+      file(TO_NATIVE_PATH
+        "${_paraview_client_resources_file_path}"
+        _paraview_client_resources_file_path)
+    endif ()
     string(APPEND _paraview_client_resources_contents
       "    <file alias=\"${_paraview_client_resources_alias}\">${_paraview_client_resources_file_path}</file>\n")
   endforeach ()
