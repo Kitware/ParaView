@@ -26,7 +26,7 @@ vtk_module_build(
   SOVERSION           "1")
 
 paraview_add_plugin(GmshReader
-  REQUIRED_ON_SERVER                    
+  REQUIRED_ON_SERVER
   VERSION "1.0"
   MODULES GmshReader::vtkGmshReader)
 
