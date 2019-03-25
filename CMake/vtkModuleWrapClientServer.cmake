@@ -39,8 +39,8 @@ function (_vtk_module_wrap_client_server_sources module sources classes)
     "$<TARGET_PROPERTY:${_vtk_client_server_target_name},INCLUDE_DIRECTORIES>")
   file(GENERATE
     OUTPUT  "${_vtk_client_server_args_file}"
-    CONTENT "$<$<BOOL:${_vtk_client_server_genex_compile_definitions}>:\n-D\"$<JOIN:${_vtk_client_server_genex_compile_definitions},\"\n-D\">\">\n
-$<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\"$<JOIN:${_vtk_client_server_genex_include_directories},\"\n-I\">\">\n")
+    CONTENT "$<$<BOOL:${_vtk_client_server_genex_compile_definitions}>:\n-D\'$<JOIN:${_vtk_client_server_genex_compile_definitions},\'\n-D\'>\'>\n
+$<$<BOOL:${_vtk_client_server_genex_include_directories}>:\n-I\'$<JOIN:${_vtk_client_server_genex_include_directories},\'\n-I\'>\'>\n")
 
   _vtk_module_get_module_property("${module}"
     PROPERTY  "hierarchy"
