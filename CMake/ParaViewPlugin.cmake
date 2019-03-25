@@ -444,6 +444,8 @@ paraview_add_plugin(<name>
   [REQUIRED_ON_SERVER] [REQUIRED_ON_CLIENT]
   VERSION <version>
 
+  [MODULE_FILES <vtk.module>...]
+  [MODULE_ARGS <arg>...]
   [MODULES <module>...]
   [SOURCES <source>...]
   [SERVER_MANAGER_XML <xml>...]
@@ -468,6 +470,9 @@ paraview_add_plugin(<name>
   * `REQUIRED_ON_CLIENT`: The plugin is required to be loaded on the client for
     proper functionality.
   * `VERSION`: (Required) The version number of the plugin.
+  * `MODULE_FILES`: Paths to `vtk.module` files describing modules to include
+    in the plugin.
+  * `MODULE_ARGS`: Arguments to pass to `vtk_module_build` for included modules.
   * `MODULES`: Modules to include in the plugin. These modules will be wrapped
     using client server and have their server manager XML files processed.
   * `SOURCES`: Source files for the plugin.
@@ -498,7 +503,7 @@ function (paraview_add_plugin name)
   cmake_parse_arguments(_paraview_add_plugin
     "REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT"
     "VERSION;EULA;EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR"
-    "REQUIRED_PLUGINS;SERVER_MANAGER_XML;SOURCES;MODULES;UI_INTERFACES;UI_RESOURCES;UI_FILES;PYTHON_MODULES"
+    "REQUIRED_PLUGINS;SERVER_MANAGER_XML;SOURCES;MODULES;UI_INTERFACES;UI_RESOURCES;UI_FILES;PYTHON_MODULES;MODULE_FILES;MODULE_ARGS"
     ${ARGN})
 
   if (_paraview_add_plugin_UNPARSED_ARGUMENTS)
@@ -523,6 +528,43 @@ function (paraview_add_plugin name)
     message(FATAL_ERROR
       "Specifying `DOCUMENTATION_DIR` and turning off `XML_DOCUMENTATION` "
       "makes no sense.")
+  endif ()
+
+  if (_paraview_add_plugin_MODULE_ARGS)
+    if (NOT _paraview_add_plugin_MODULES_FILES OR
+        NOT _paraview_add_plugin_MODULES)
+      message(FATAL_ERROR
+        "The `MODULE_ARGS` argument requires `MODULE_FILES` and `MODULES` to be provided.")
+    endif ()
+  endif ()
+
+  if (_paraview_add_plugin_MODULE_FILES)
+    if (NOT _paraview_add_plugin_MODULES)
+      message(FATAL_ERROR
+        "The `MODULE_FILES` argument requires `MODULES` to be provided.")
+    endif ()
+
+    vtk_module_scan(
+      MODULE_FILES      ${_paraview_add_plugin_MODULE_FILES}
+      REQUEST_MODULES   ${_paraview_add_plugin_MODULES}
+      PROVIDES_MODULES  plugin_modules
+      REQUIRES_MODULES  required_modules
+      HIDE_MODULES_FROM_CACHE ON)
+
+    if (required_modules)
+      foreach (required_module IN LISTS required_modules)
+        if (NOT TARGET "${required_module}")
+          message(FATAL_ERROR
+            "Failed to find the required module ${required_module}.")
+        endif ()
+      endforeach ()
+    endif ()
+
+    vtk_module_build(
+      MODULES             ${plugin_modules}
+      PACKAGE             "${_paraview_build_plugin}"
+      INSTALL_HEADERS     OFF
+      ${_paraview_add_plugin_MODULE_ARGS})
   endif ()
 
   # TODO: resource initialization for static builds
