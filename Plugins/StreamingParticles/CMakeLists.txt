@@ -14,9 +14,6 @@ if (required_modules)
   endforeach ()
 endif ()
 
-list(INSERT CMAKE_MODULE_PATH 0
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 vtk_module_build(
   MODULES             ${particles_modules}
   PACKAGE             StreamingParticles
