@@ -83,14 +83,14 @@ public:
   static void handlerVTK(QtMsgType type, const QString& msg);
 
 signals:
-  void message(QtMsgType type, const QString& msg);
+  void message(QtMsgType type, const QString& fileName, int lineNumber, const QString& msg);
   void showMessage(QString msg, QtMsgType type);
 
 private:
   static MessageHandler* instance();
 
 private slots:
-  void displayMessage(QtMsgType type, const QString& msg);
+  void displayMessage(QtMsgType type, const QString& fileName, int lineNumber, const QString& msg);
 };
 
 /**

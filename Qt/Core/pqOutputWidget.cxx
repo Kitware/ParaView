@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
+#include "vtkLogger.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
@@ -122,9 +123,10 @@ void MessageHandler::install(pqOutputWidget* widget)
 
 void MessageHandler::handler(QtMsgType type, const QMessageLogContext& cntxt, const QString& msg)
 {
+  QString fileName(cntxt.file);
   QString formattedMsg = qFormatLogMessage(type, cntxt, msg);
-  formattedMsg += "\n";
-  emit instance()->message(type, formattedMsg);
+
+  emit instance()->message(type, fileName, cntxt.line, formattedMsg);
 }
 
 void MessageHandler::handlerVTK(QtMsgType type, const QString& msg)
@@ -138,32 +140,45 @@ MessageHandler* MessageHandler::instance()
   return &instance;
 }
 
-void MessageHandler::displayMessage(QtMsgType type, const QString& msg)
+void MessageHandler::displayMessage(
+  QtMsgType type, const QString& fileName, int lineNumber, const QString& msg)
 {
-  QByteArray localMsg = msg.toLocal8Bit();
+  const QByteArray fileNameArray = fileName.toLocal8Bit();
+  const char* fileNameCStr = fileNameArray.constData();
+  const QByteArray logMsgArray = msg.toLocal8Bit();
+  const char* logMsgCStr = logMsgArray.constData();
+  QString displayMsg(msg);
+  displayMsg += "\n";
+  QByteArray displayMsgArray = displayMsg.toLocal8Bit();
+  const char* displayMsgCStr = displayMsgArray.constData();
+
   vtkOutputWindow* vtkWindow = vtkOutputWindow::GetInstance();
   if (vtkWindow)
   {
     switch (type)
     {
       case QtDebugMsg:
-        vtkWindow->DisplayDebugText(localMsg.constData());
+        vtkLogger::Log(vtkLogger::VERBOSITY_INFO, fileNameCStr, lineNumber, logMsgCStr);
         break;
 
       case QtInfoMsg:
-        vtkWindow->DisplayText(localMsg.constData());
+        vtkLogger::Log(vtkLogger::VERBOSITY_INFO, fileNameCStr, lineNumber, logMsgCStr);
         break;
 
       case QtWarningMsg:
-        vtkWindow->DisplayWarningText(localMsg.constData());
+        vtkLogger::Log(vtkLogger::VERBOSITY_WARNING, fileNameCStr, lineNumber, logMsgCStr);
         break;
 
       case QtCriticalMsg:
-        vtkWindow->DisplayErrorText(localMsg.constData());
+        // Display critical messages
+        vtkWindow->DisplayErrorText(displayMsgCStr);
+        vtkLogger::Log(vtkLogger::VERBOSITY_ERROR, fileNameCStr, lineNumber, logMsgCStr);
         break;
 
       case QtFatalMsg:
-        vtkWindow->DisplayErrorText(localMsg.constData());
+        // Display fatal messages
+        vtkWindow->DisplayErrorText(displayMsgCStr);
+        vtkLogger::Log(vtkLogger::VERBOSITY_ERROR, fileNameCStr, lineNumber, logMsgCStr);
         abort();
         break;
     }
