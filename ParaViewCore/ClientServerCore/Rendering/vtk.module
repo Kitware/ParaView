@@ -22,6 +22,7 @@ PRIVATE_DEPENDS
   VTK::vtksys
   VTK::zlib
 OPTIONAL_DEPENDS
+  ParaView::nvpipe
   VTK::AcceleratorsVTKm
   VTK::FiltersOpenTurns
   VTK::ParallelMPI
