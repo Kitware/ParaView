@@ -84,7 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyGroup.h"
 
-#if VTK_MODULE_ENABLE_ParaView_pqComponentsPython
+#if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqCinemaConfiguration.h"
 #endif
 
@@ -295,7 +295,7 @@ pqPropertyWidget* pqStandardPropertyWidgetInterface::createWidgetForPropertyGrou
   }
   else if (panelWidget == "cinema_export_selector")
   {
-#if VTK_MODULE_ENABLE_ParaView_pqComponentsPython
+#if VTK_MODULE_ENABLE_ParaView_pqPython
     return new pqCinemaConfiguration(proxy, group, parentWidget);
 #else
     return NULL;

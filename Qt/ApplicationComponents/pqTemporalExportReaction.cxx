@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <string>
 
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPythonInterpreter.h"
 #endif
 
@@ -283,7 +283,7 @@ pqTemporalExportReaction::~pqTemporalExportReaction()
 //-----------------------------------------------------------------------------
 void pqTemporalExportReaction::onTriggered()
 {
-#ifdef PARAVIEW_ENABLE_PYTHON
+#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMExportProxyDepot* ed = pxm->GetExportDepot();
