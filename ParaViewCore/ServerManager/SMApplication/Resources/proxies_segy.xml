@@ -71,7 +71,7 @@ As per SEG-Y rev 2.0 specification:
                          number_of_elements="1"
                          panel_visibility="advanced">
         <EnumerationDomain name="enum">
-          <Entry text="Heigths"
+          <Entry text="Heights"
                  value="0" />
           <Entry text="Depths"
                  value="1" />
