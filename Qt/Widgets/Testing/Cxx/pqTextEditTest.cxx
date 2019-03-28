@@ -103,7 +103,12 @@ void pqTextEditTester::testTypeText()
 
   this->TextEdit->show();
 #if QT_VERSION >= 0x050000
-  QTest::qWaitForWindowActive(this->TextEdit);
+  bool active = QTest::qWaitForWindowActive(this->TextEdit);
+  if (!active)
+  {
+    qCritical() << "Window did not become active. Skipping testTypeText.";
+    return;
+  }
 #else
   QTest::qWaitForWindowShown(this->TextEdit);
 #endif
@@ -201,7 +206,12 @@ void pqTextEditTester::testFocus()
 
   this->TextEdit->show();
 #if QT_VERSION >= 0x050000
-  QTest::qWaitForWindowActive(this->TextEdit);
+  bool active = QTest::qWaitForWindowActive(this->TextEdit);
+  if (!active)
+  {
+    qCritical() << "Window did not become active. Skipping testFocus.";
+    return;
+  }
 #else
   QTest::qWaitForWindowShown(this->TextEdit);
 #endif
@@ -289,7 +299,12 @@ void pqTextEditTester::testReTypeText()
 
   this->TextEdit->show();
 #if QT_VERSION >= 0x050000
-  QTest::qWaitForWindowActive(this->TextEdit);
+  bool active = QTest::qWaitForWindowActive(this->TextEdit);
+  if (!active)
+  {
+    qCritical() << "Window did not become active. Skipping testReTypeText.";
+    return;
+  }
 #else
   QTest::qWaitForWindowShown(this->TextEdit);
 #endif
