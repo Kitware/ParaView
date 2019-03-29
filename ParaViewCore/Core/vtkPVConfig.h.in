@@ -44,9 +44,6 @@
 # define PARAVIEW_QT_VERSION @PARAVIEW_QT_VERSION@
 #endif
 
-// ParaView data root (useful for testing).
-#define PARAVIEW_DATA_ROOT "@PARAVIEW_DATA_ROOT@"
-
 #cmakedefine BUILD_SHARED_LIBS
 #ifdef BUILD_SHARED_LIBS
 // for sake of old code, we define the PARAVIEW_BUILD_SHARED_LIBS variable. This

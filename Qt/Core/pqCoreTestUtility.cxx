@@ -163,25 +163,7 @@ QString pqCoreTestUtility::DataRoot()
     result = vtksys::SystemTools::GetEnv("PARAVIEW_DATA_ROOT");
   }
 
-  // Otherwise, go with the compiled-in default ...
-  if (result.isEmpty())
-  {
-    result = PARAVIEW_DATA_ROOT;
-  }
-
-  // Ensure all slashes face forward ...
-  result.replace('\\', '/');
-
-  // Remove any trailing slashes ...
-  if (result.size() && result.at(result.size() - 1) == '/')
-  {
-    result.chop(1);
-  }
-
-  // Trim excess whitespace ...
-  result = result.trimmed();
-
-  return result;
+  return result.isEmpty() ? result : QDir::cleanPath(result);
 }
 
 //-----------------------------------------------------------------------------
