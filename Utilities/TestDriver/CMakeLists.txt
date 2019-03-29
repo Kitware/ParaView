@@ -62,7 +62,7 @@ vtk_module_add_executable(ParaView::smTestDriver
 
 set(mpi_defines)
 if (PARAVIEW_USE_MPI)
-  find_package(MPI QUIET REQUIRED)
+  find_package(MPI QUIET REQUIRED COMPONENTS C)
 
   list(APPEND mpi_defines
     PARAVIEW_USE_MPI
