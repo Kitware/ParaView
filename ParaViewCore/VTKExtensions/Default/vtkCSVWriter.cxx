@@ -252,8 +252,8 @@ bool SomethingForMeToDo(int myRank, const std::vector<vtkIdType>& numRowsGlobal)
       {
         return false; // someone else will write the header info
       }
-      return true; // I have to write the header info even though I have no rows
     }
+    return true; // I have to write the header info even though I have no rows
   }
   return false;
 }
