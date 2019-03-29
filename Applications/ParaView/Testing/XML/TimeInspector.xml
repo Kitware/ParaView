@@ -47,7 +47,7 @@
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AnimationTimeNotation/ComboBox" command="activated" arguments="Scientific" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AnimationTimePrecision/LineEdit0" command="set_string" arguments="4" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" property="currentText" arguments="2.0000e+0" />
+  <pqcheck object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" property="currentText" arguments="2.0000e+00" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaGeneralSettings/qt_scrollarea_viewport/Container/ProxyWidget/AnimationTimeNotation/ComboBox" command="activated" arguments="Mixed" />
