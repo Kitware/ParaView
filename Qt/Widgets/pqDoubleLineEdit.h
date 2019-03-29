@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt Includes.
 #include <QScopedPointer> // for ivar
+#include <QTextStream>    // for formatDouble
 
 // ParaView Includes.
 #include "pqLineEdit.h"
@@ -115,6 +116,13 @@ public:
    * pointer. Primarily intended for test or debugging purposes.
    */
   QString simplifiedText() const;
+
+  /**
+   * Return a double formatted according to a QTextStream::RealNumberNotation and number
+   * of digits of precision.
+   */
+  static QString formatDouble(
+    double value, QTextStream::RealNumberNotation notation, int precision);
 
 public slots:
   /**

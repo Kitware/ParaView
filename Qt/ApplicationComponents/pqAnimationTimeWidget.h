@@ -133,6 +133,12 @@ public slots:
    */
   void repopulateTimeComboBox();
 
+protected:
+  /**
+   * Format a double with the requested notation and precision.
+   */
+  QString formatDouble(double value);
+
 private slots:
   void updateTimestepCountLabelVisibility();
 
