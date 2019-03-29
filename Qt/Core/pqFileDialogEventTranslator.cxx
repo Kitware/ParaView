@@ -72,19 +72,16 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
 
 void pqFileDialogEventTranslator::onFilesSelected(const QString& file)
 {
+  QString cleanedFile = QDir::cleanPath(file);
   QString data_directory = pqCoreTestUtility::DataRoot();
-  data_directory = QDir::cleanPath(QDir::fromNativeSeparators(data_directory));
   if (data_directory.isEmpty())
   {
     qWarning()
       << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
   }
-
-  QString cleanedFile = QDir::cleanPath(QDir::fromNativeSeparators(file));
-
-  if (cleanedFile.indexOf(data_directory, 0, Qt::CaseInsensitive) == 0)
+  else if (cleanedFile.startsWith(data_directory, Qt::CaseInsensitive))
   {
-    cleanedFile.replace(data_directory, "$PARAVIEW_DATA_ROOT", Qt::CaseInsensitive);
+    cleanedFile.replace(0, data_directory.size(), "$PARAVIEW_DATA_ROOT");
   }
   else
   {
