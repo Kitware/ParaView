@@ -42,9 +42,10 @@
       <StringVectorProperty name="CompressorFourCC"
         command="SetCompressorFourCC"
         number_of_elements="1"
-        default_values="MSVC"
-        panel_visibility="never" />
-
+        default_values="I420"
+        panel_visibility="advanced">
+        <Documentation>Specify FourCC code for video codec to use.</Documentation>
+      </StringVectorProperty>
       <Hints>
         <FormatOptions extensions="avi" file_description="VFW AVI files" />
       </Hints>
