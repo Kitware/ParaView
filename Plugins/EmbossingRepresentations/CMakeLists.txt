@@ -1,27 +1,3 @@
-vtk_module_scan(
-  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Representations/vtk.module"
-  REQUEST_MODULES   EmbossingRepresentations::vtkEmbossingRepresentations
-  PROVIDES_MODULES  embossing_modules
-  REQUIRES_MODULES  required_modules
-  HIDE_MODULES_FROM_CACHE ON)
-
-if (required_modules)
-  foreach (required_module IN LISTS required_modules)
-    if (NOT TARGET "${required_module}")
-      message(FATAL_ERROR
-        "Failed to find the required module ${required_module}.")
-    endif ()
-  endforeach ()
-endif ()
-
-vtk_module_build(
-  MODULES             ${embossing_modules}
-  PACKAGE             EmbossingRepresentations
-  INSTALL_HEADERS     OFF
-  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
-  VERSION             "${PARAVIEW_VERSION}"
-  SOVERSION           "1")
-
 set(interfaces)
 set(sources)
 if (PARAVIEW_BUILD_QT_GUI)
@@ -44,6 +20,7 @@ paraview_add_plugin(EmbossingRepresentations
   UI_INTERFACES ${interfaces}
   SOURCES       ${sources}
   MODULES       EmbossingRepresentations::vtkEmbossingRepresentations
+  MODULE_FILES  "${CMAKE_CURRENT_SOURCE_DIR}/Representations/vtk.module"
   XML_DOCUMENTATION OFF)
 
 if (BUILD_TESTING)

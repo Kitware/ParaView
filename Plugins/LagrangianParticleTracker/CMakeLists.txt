@@ -1,27 +1,3 @@
-vtk_module_scan(
-  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
-  REQUEST_MODULES   LagrangianParticleTracker::vtkLagrangianParticleTracker
-  PROVIDES_MODULES  lagrangian_modules
-  REQUIRES_MODULES  required_modules
-  HIDE_MODULES_FROM_CACHE ON)
-
-if (required_modules)
-  foreach (required_module IN LISTS required_modules)
-    if (NOT TARGET "${required_module}")
-      message(FATAL_ERROR
-        "Failed to find the required module ${required_module}.")
-    endif ()
-  endforeach ()
-endif ()
-
-vtk_module_build(
-  MODULES             ${lagrangian_modules}
-  PACKAGE             LagrangianParticleTracker
-  INSTALL_HEADERS     OFF
-  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
-  VERSION             "${PARAVIEW_VERSION}"
-  SOVERSION           "1")
-
 set(interfaces)
 set(sources
   pqIntegrationModelHelperWidget.cxx
@@ -59,7 +35,8 @@ paraview_add_plugin(LagrangianParticleTracker
   VERSION "1.0"
   UI_INTERFACES ${interfaces}
   SOURCES ${sources}
-  MODULES LagrangianParticleTracker::vtkLagrangianParticleTracker)
+  MODULES LagrangianParticleTracker::vtkLagrangianParticleTracker
+  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module")
 
 target_link_libraries(LagrangianParticleTracker
   PRIVATE

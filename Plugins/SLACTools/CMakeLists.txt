@@ -1,33 +1,6 @@
 # This plugin contains tools developed for the Stanford Linear Accelerator
 # Center to make it easier to visualize finite element simulation results.
 
-vtk_module_scan(
-  MODULE_FILES      "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module"
-  REQUEST_MODULES   SLACTools::vtkSLACFilters
-  PROVIDES_MODULES  slac_modules
-  REQUIRES_MODULES  required_modules
-  HIDE_MODULES_FROM_CACHE ON)
-
-if (required_modules)
-  foreach (required_module IN LISTS required_modules)
-    if (NOT TARGET "${required_module}")
-      message(FATAL_ERROR
-        "Failed to find the required module ${required_module}.")
-    endif ()
-  endforeach ()
-endif ()
-
-list(INSERT CMAKE_MODULE_PATH 0
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-vtk_module_build(
-  MODULES             ${slac_modules}
-  PACKAGE             SLACTools
-  INSTALL_HEADERS     OFF
-  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
-  VERSION             "${PARAVIEW_VERSION}"
-  SOVERSION           "1")
-
 set(ui_files)
 set(qrc_files)
 set(sources)
@@ -65,7 +38,8 @@ paraview_add_plugin(SLACTools
   UI_INTERFACES ${interfaces}
   UI_RESOURCES ${qrc_files}
   SOURCES ${sources}
-  MODULES SLACTools::vtkSLACFilters)
+  MODULES SLACTools::vtkSLACFilters
+  MODULE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Filters/vtk.module")
 
 if (PARAVIEW_BUILD_QT_GUI)
   target_link_libraries(SLACTools
