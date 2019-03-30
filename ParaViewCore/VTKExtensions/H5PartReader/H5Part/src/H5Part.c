@@ -1071,7 +1071,7 @@ H5PartWriteStepAttrib (
  herr = _H5Part_write_attrib (
   f->timegroup,
   attrib_name,
-  (const hid_t)attrib_type,
+  (hid_t)attrib_type,
   attrib_value,
   attrib_nelem );
  if ( herr < 0 ) return herr;
@@ -1121,7 +1121,7 @@ H5PartWriteFileAttrib (
  herr = _H5Part_write_attrib (
   group_id,
   attrib_name,
-  (const hid_t)attrib_type,
+  (hid_t)attrib_type,
   attrib_value,
   attrib_nelem );
  if ( herr < 0 ) return herr;
