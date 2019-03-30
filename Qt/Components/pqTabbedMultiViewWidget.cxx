@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTabWidget>
 #include <QtDebug>
 
+static const int PQTABBED_WIDGET_PIXMAP_SIZE = 16;
 //-----------------------------------------------------------------------------
 // ******************** pqTabWidget **********************
 //-----------------------------------------------------------------------------
@@ -123,19 +124,23 @@ int pqTabbedMultiViewWidget::pqTabWidget::addAsTab(
   this->connect(item, SIGNAL(nameChanged(pqServerManagerModelItem*)), self,
     SLOT(onLayoutNameChanged(pqServerManagerModelItem*)));
 
-  QLabel* label = new QLabel(this);
+  QLabel* label = new QLabel();
   label->setObjectName("popout");
   label->setToolTip(pqTabWidget::popoutLabelText(false));
   label->setStatusTip(pqTabWidget::popoutLabelText(false));
-  label->setPixmap(this->style()->standardPixmap(pqTabWidget::popoutLabelPixmap(false)));
+  label->setPixmap(label->style()
+                     ->standardIcon(pqTabWidget::popoutLabelPixmap(false))
+                     .pixmap(PQTABBED_WIDGET_PIXMAP_SIZE, PQTABBED_WIDGET_PIXMAP_SIZE));
   this->setTabButton(tab_index, QTabBar::LeftSide, label);
   label->installEventFilter(self);
 
-  label = new QLabel(this);
+  label = new QLabel();
   label->setObjectName("close");
   label->setToolTip("Close layout");
   label->setStatusTip("Close layout");
-  label->setPixmap(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton));
+  label->setPixmap(label->style()
+                     ->standardIcon(QStyle::SP_TitleBarCloseButton)
+                     .pixmap(PQTABBED_WIDGET_PIXMAP_SIZE, PQTABBED_WIDGET_PIXMAP_SIZE));
   this->setTabButton(tab_index, QTabBar::RightSide, label);
   label->installEventFilter(self);
   label->setVisible(!this->ReadOnly);
@@ -592,8 +597,9 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject* obj, QEvent* evt)
         {
           QLabel* label = qobject_cast<QLabel*>(obj);
           bool popped_out = tabPage->togglePopout();
-          label->setPixmap(
-            this->style()->standardPixmap(pqTabWidget::popoutLabelPixmap(popped_out)));
+          label->setPixmap(label->style()
+                             ->standardIcon(pqTabWidget::popoutLabelPixmap(popped_out))
+                             .pixmap(PQTABBED_WIDGET_PIXMAP_SIZE, PQTABBED_WIDGET_PIXMAP_SIZE));
           label->setToolTip(pqTabWidget::popoutLabelText(popped_out));
           label->setStatusTip(pqTabWidget::popoutLabelText(popped_out));
         }
