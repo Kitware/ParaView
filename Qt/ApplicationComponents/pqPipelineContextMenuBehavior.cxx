@@ -70,6 +70,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPair>
 #include <QWidget>
 
+#include <cassert>
+
 namespace
 {
 // converts array association/name pair to QVariant.
@@ -91,7 +93,7 @@ QPair<int, QString> convert(const QVariant& val)
   if (val.canConvert<QStringList>())
   {
     QStringList list = val.toStringList();
-    Q_ASSERT(list.size() == 2);
+    assert(list.size() == 2);
     result.first = list[0].toInt();
     result.second = list[1];
   }

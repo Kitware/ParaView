@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMap>
 #include <QtDebug>
+
+#include <cassert>
 #include <set>
 
 class pqPropertyLinks::pqInternals
@@ -89,7 +91,7 @@ void pqPropertyLinks::setUseUncheckedProperties(bool val)
 //-----------------------------------------------------------------------------
 bool pqPropertyLinks::addNewConnection(pqPropertyLinksConnection* connection)
 {
-  Q_ASSERT(connection);
+  assert(connection);
 
   // Avoid adding duplicates.
   foreach (pqPropertyLinksConnection* existing, this->Internals->Connections)

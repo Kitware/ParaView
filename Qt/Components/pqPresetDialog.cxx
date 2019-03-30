@@ -55,6 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSortFilterProxyModel>
 #include <QtDebug>
 
+#include <cassert>
+
 class pqPresetDialogTableModel : public QAbstractTableModel
 {
   typedef QAbstractTableModel Superclass;
@@ -780,7 +782,7 @@ void pqPresetDialog::updateForSelectedIndex(const QModelIndex& proxyIndex)
   QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
   idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
-  Q_ASSERT(preset.empty() == false);
+  assert(preset.empty() == false);
   auto column = internals.Model->GroupManager->groupNames().indexOf("default") + 1;
   QModelIndex defaultColumnIndex = internals.Model->index(idx.row(), column);
 
@@ -811,7 +813,7 @@ void pqPresetDialog::triggerApply(const QModelIndex& _proxyIndex)
   QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
   idx = internals.ProxyModel->mapToSource(idx);
   const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
-  Q_ASSERT(preset.empty() == false);
+  assert(preset.empty() == false);
   emit this->applyPreset(preset);
 }
 
@@ -850,7 +852,7 @@ const Json::Value& pqPresetDialog::currentPreset()
     QModelIndex idx = internals.ReflowModel->mapToSource(proxyIndex);
     idx = internals.ProxyModel->mapToSource(idx);
     const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
-    Q_ASSERT(preset.empty() == false);
+    assert(preset.empty() == false);
     return preset;
   }
 
@@ -946,7 +948,7 @@ void pqPresetDialog::exportPresets()
     const Json::Value& preset = internals.Model->Presets->GetPreset(idx.row());
     presetCollection.append(preset);
   }
-  Q_ASSERT(presetCollection.size() > 0);
+  assert(presetCollection.size() > 0);
 
   ofstream outfs;
   outfs.open(filename.toStdString().c_str());

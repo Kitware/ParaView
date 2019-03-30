@@ -47,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 class pqLiveInsituVisualizationManager::pqInternals
 {
@@ -63,7 +65,7 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
   : Superclass(server)
   , Internals(new pqInternals())
 {
-  Q_ASSERT(server != NULL);
+  assert(server != NULL);
 
   this->Internals->DisplaySession = server;
 
@@ -77,7 +79,7 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
     core->getObjectBuilder()->createProxy("coprocessing", "LiveInsituLink", server, "coprocessing");
 
   vtkSMLiveInsituLinkProxy* adaptor = vtkSMLiveInsituLinkProxy::SafeDownCast(proxy);
-  Q_ASSERT(adaptor != NULL);
+  assert(adaptor != NULL);
 
   vtkSMPropertyHelper(adaptor, "InsituPort").Set(connection_port);
   vtkSMPropertyHelper(adaptor, "ProcessType").Set("Visualization");
@@ -204,7 +206,7 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
 
   pqPipelineSource* pqproxy =
     pqApplicationCore::instance()->getServerManagerModel()->findItem<pqPipelineSource*>(proxy);
-  Q_ASSERT(pqproxy);
+  assert(pqproxy);
   pqproxy->setModifiedState(pqProxy::UNINITIALIZED);
   pqproxy->setProperty("CATALYST_EXTRACT", true);
 

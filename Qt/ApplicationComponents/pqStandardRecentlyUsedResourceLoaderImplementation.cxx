@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QtDebug>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqStandardRecentlyUsedResourceLoaderImplementation::
   pqStandardRecentlyUsedResourceLoaderImplementation(QObject* parentObject)
@@ -69,7 +71,7 @@ bool pqStandardRecentlyUsedResourceLoaderImplementation::canLoad(const pqServerR
 bool pqStandardRecentlyUsedResourceLoaderImplementation::load(
   const pqServerResource& resource, pqServer* server)
 {
-  Q_ASSERT(this->canLoad(resource));
+  assert(this->canLoad(resource));
   if (resource.hasData("PARAVIEW_STATE"))
   {
     return this->loadState(resource, server);

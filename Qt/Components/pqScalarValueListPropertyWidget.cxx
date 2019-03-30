@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarValueListPropertyWidget.h"
 #include "ui_pqScalarValueListPropertyWidget.h"
 
+#include <cassert>
 #include <cmath>
 
 #include <QAbstractTableModel>
@@ -76,7 +77,7 @@ public:
     , NumberOfColumns(num_columns)
     , AllowIntegralValuesOnly(integers_only)
   {
-    Q_ASSERT(num_columns > 0);
+    assert(num_columns > 0);
   }
 
   ~pqTableModel() override {}
@@ -197,7 +198,7 @@ public:
       emit this->endInsertRows();
     }
 
-    Q_ASSERT(this->Values.size() == values.size());
+    assert(this->Values.size() == values.size());
 
     // now check which data has changed.
     for (int cc = 0; cc < this->Values.size(); cc++)
@@ -389,7 +390,7 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
   this->setShowLabel(false);
 
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(smProperty);
-  Q_ASSERT(vp != NULL);
+  assert(vp != NULL);
 
   this->Internals = new pqInternals(this, vp->GetNumberOfElementsPerCommand());
   QObject::connect(&this->Internals->Model,

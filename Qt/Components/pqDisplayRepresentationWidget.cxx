@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QSet>
 
+#include <cassert>
 #include <cstdlib>
 
 //=============================================================================
@@ -64,7 +65,7 @@ protected:
   /// Called to update the ServerManager Property due to UI change.
   void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
-    Q_ASSERT(use_unchecked == false);
+    assert(use_unchecked == false);
     Q_UNUSED(use_unchecked);
 
     BEGIN_UNDO_SET("Change representation type");

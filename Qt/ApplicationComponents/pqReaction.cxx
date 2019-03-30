@@ -33,11 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqServer.h"
+
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqReaction::pqReaction(QAction* parentObject, Qt::ConnectionType type)
   : Superclass(parentObject)
 {
-  Q_ASSERT(parentObject != NULL);
+  assert(parentObject != NULL);
 
   QObject::connect(parentObject, SIGNAL(triggered(bool)), this, SLOT(onTriggered()), type);
 

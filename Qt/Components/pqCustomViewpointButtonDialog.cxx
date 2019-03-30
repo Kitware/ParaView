@@ -8,6 +8,7 @@
 #include "vtkIndent.h"
 #include "vtkSMCameraConfigurationFileInfo.h"
 
+#include <cassert>
 #include <sstream>
 #include <string>
 #include <vtk_pugixml.h>
@@ -99,7 +100,7 @@ public:
 
   void setToolTips(const QStringList& txts)
   {
-    Q_ASSERT(this->Rows.size() == txts.size());
+    assert(this->Rows.size() == txts.size());
     for (int cc = 0, max = this->Rows.size(); cc < max; ++cc)
     {
       this->Rows[cc].ToolTipEdit->setText(txts[cc]);
@@ -118,7 +119,7 @@ public:
 
   void setToolTip(int index, const QString& txt)
   {
-    Q_ASSERT(index >= 0 && index < this->Rows.size());
+    assert(index >= 0 && index < this->Rows.size());
     this->Rows[index].ToolTipEdit->setText(txt);
     this->Rows[index].ToolTipEdit->selectAll();
     this->Rows[index].ToolTipEdit->setFocus();
@@ -126,13 +127,13 @@ public:
 
   QString toolTip(int index) const
   {
-    Q_ASSERT(index >= 0 && index < this->Rows.size());
+    assert(index >= 0 && index < this->Rows.size());
     return this->Rows[index].ToolTipEdit->text();
   }
 
   void deleteRow(int index)
   {
-    Q_ASSERT(index >= 0 && index < this->Rows.size());
+    assert(index >= 0 && index < this->Rows.size());
     auto& arow = this->Rows[index];
     this->gridLayout->removeWidget(arow.IndexLabel);
     this->gridLayout->removeWidget(arow.ToolTipEdit);
@@ -431,7 +432,7 @@ void pqCustomViewpointButtonDialog::exportConfigurations()
     root.append_attribute("version").set_value(fileInfo.WriterVersion);
 
     const QStringList toolTipTexts = this->ui->toolTips();
-    Q_ASSERT(toolTipTexts.size() == this->Configurations.size());
+    assert(toolTipTexts.size() == this->Configurations.size());
     for (int i = 0, max = this->ui->rowCount(); i < max; ++i)
     {
       auto button =
@@ -463,7 +464,7 @@ void pqCustomViewpointButtonDialog::exportConfigurations()
 void pqCustomViewpointButtonDialog::appendRow()
 {
   const int numRows = this->ui->rowCount();
-  Q_ASSERT(numRows < MAXIMUM_NUMBER_OF_ITEMS);
+  assert(numRows < MAXIMUM_NUMBER_OF_ITEMS);
   this->ui->setNumberOfRows(numRows + 1);
   this->Configurations.push_back(QString());
 }

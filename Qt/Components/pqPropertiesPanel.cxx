@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QStyleFactory>
 
+#include <cassert>
 #include <iostream>
 
 namespace
@@ -101,7 +102,7 @@ public:
 
   void show(QWidget* parentWdg)
   {
-    Q_ASSERT(parentWdg != NULL);
+    assert(parentWdg != NULL);
 
     delete parentWdg->layout();
     QVBoxLayout* layout = new QVBoxLayout(parentWdg);

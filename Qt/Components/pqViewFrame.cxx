@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QVBoxLayout>
 
+#include <cassert>
+
 #include "vtksys/SystemInformation.hxx"
 
 const int ICON_SIZE = 12;
@@ -399,7 +401,7 @@ void pqViewFrame::drop(QDropEvent* evt)
 //-----------------------------------------------------------------------------
 void pqViewFrame::finishedDrag(pqViewFrame* source)
 {
-  Q_ASSERT(source != NULL);
+  assert(source != NULL);
   emit this->swapPositions(source->uniqueID().toString());
 }
 

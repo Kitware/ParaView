@@ -37,6 +37,7 @@
 #include "pqQVTKWidget.h"
 #include "pqServer.h"
 
+#include <cassert>
 #include <string>
 
 class pqPythonView::pqInternal
@@ -92,7 +93,7 @@ QString pqPythonView::getPythonScript()
 QWidget* pqPythonView::createWidget()
 {
   vtkSMViewProxy* viewProxy = this->getViewProxy();
-  Q_ASSERT(viewProxy);
+  assert(viewProxy);
 
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
   vtkwidget->setViewProxy(viewProxy);

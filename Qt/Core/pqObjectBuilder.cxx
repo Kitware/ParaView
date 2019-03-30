@@ -78,6 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #endif
 
+#include <cassert>
 #include <chrono>
 
 namespace pqObjectBuilderNS
@@ -734,7 +735,7 @@ void pqObjectBuilder::removeServer(pqServer* server)
 //-----------------------------------------------------------------------------
 pqServer* pqObjectBuilder::resetServer(pqServer* server)
 {
-  Q_ASSERT(server);
+  assert(server);
 
   // save the current remaining lifetime to restore it
   // when we recreate the server following reset.

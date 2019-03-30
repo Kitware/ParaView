@@ -18,6 +18,8 @@
 #include "pqSMProxy.h"
 #include "pqView.h"
 
+#include <cassert>
+
 class vtkSMPythonViewProxy;
 
 class PQCORE_EXPORT pqPythonView : public pqView

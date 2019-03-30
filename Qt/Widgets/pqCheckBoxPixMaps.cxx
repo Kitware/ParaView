@@ -31,17 +31,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCheckBoxPixMaps.h"
 
+#include "assert.h"
+
 #include <QPainter>
 #include <QPixmap>
 #include <QStyle>
 #include <QStyleOptionButton>
 #include <QWidget>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqCheckBoxPixMaps::pqCheckBoxPixMaps(QWidget* parentWidget)
   : Superclass(parentWidget)
 {
-  Q_ASSERT(parentWidget != 0);
+  assert(parentWidget != 0);
 
   // Initialize the pixmaps. The following style array should
   // correspond to the PixmapStateIndex enum.

@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSpreadSheetViewWidget.h"
 
+#include "assert.h"
 #include "pqNonEditableStyledItemDelegate.h"
 #include "pqSpreadSheetViewModel.h"
 
@@ -46,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextLayout>
 #include <QTextOption>
 #include <QVBoxLayout>
+
+#include <cassert>
 
 //-----------------------------------------------------------------------------
 /*
@@ -118,7 +121,7 @@ pqSpreadSheetViewWidget::~pqSpreadSheetViewWidget()
 void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* modelToUse)
 {
   // if model is non-null, then it must be a pqSpreadSheetViewModel.
-  Q_ASSERT(modelToUse == NULL || qobject_cast<pqSpreadSheetViewModel*>(modelToUse) != NULL);
+  assert(modelToUse == NULL || qobject_cast<pqSpreadSheetViewModel*>(modelToUse) != NULL);
   this->Superclass::setModel(modelToUse);
   if (modelToUse)
   {

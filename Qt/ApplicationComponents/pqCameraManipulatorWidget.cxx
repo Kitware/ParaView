@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
+#include <cassert>
+
 class pqCameraManipulatorWidget::PropertyLinksConnection : public pqPropertyLinksConnection
 {
   typedef pqPropertyLinksConnection Superclass;
@@ -59,7 +61,7 @@ protected:
   {
     QList<QVariant> list = value.toList();
 
-    Q_ASSERT(list.size() == 9);
+    assert(list.size() == 9);
     int values[9];
     for (int cc = 0; cc < 9; cc++)
     {

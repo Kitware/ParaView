@@ -68,6 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqView.h"
 
+#include <cassert>
+
 class pqComparativeVisPanel::pqInternal : public Ui::pqComparativeVisPanel
 {
 public:
@@ -443,7 +445,7 @@ void pqComparativeVisPanel::removeParameter(int index)
   }
 
   QTableWidgetItem* item = this->Internal->activeParameters->item(index, 0);
-  Q_ASSERT(item);
+  assert(item);
 
   BEGIN_UNDO_SET("Remove Parameter");
 

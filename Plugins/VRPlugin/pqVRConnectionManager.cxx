@@ -339,7 +339,7 @@ void pqVRConnectionManager::configureConnections(vtkPVXMLElement* xml, vtkSMProx
 // ----------------------------------------------------------------------------
 void pqVRConnectionManager::saveConnectionsConfiguration(vtkPVXMLElement* root)
 {
-  Q_ASSERT(root != NULL);
+  assert(root != NULL);
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRConnectionManager");
 #if PARAVIEW_PLUGIN_VRPlugin_USE_VRPN

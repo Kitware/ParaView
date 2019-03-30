@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqBoolPropertyWidgetDecorator::pqBoolPropertyWidgetDecorator(
   vtkPVXMLElement* config, pqPropertyWidget* parentObject)
@@ -47,7 +49,7 @@ pqBoolPropertyWidgetDecorator::pqBoolPropertyWidgetDecorator(
   , BoolProperty(true)
 {
   vtkSMProxy* proxy = this->parentWidget()->proxy();
-  Q_ASSERT(proxy != NULL);
+  assert(proxy != NULL);
 
   for (unsigned int cc = 0; cc < config->GetNumberOfNestedElements(); cc++)
   {

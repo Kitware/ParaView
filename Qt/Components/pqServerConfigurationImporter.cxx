@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QtNetwork>
 
+#include <cassert>
+
 class pqServerConfigurationImporter::pqInternals
 {
 public:
@@ -264,7 +266,7 @@ void pqServerConfigurationImporter::abortFetch()
 //-----------------------------------------------------------------------------
 void pqServerConfigurationImporter::readCurrentData()
 {
-  Q_ASSERT(this->Internals->ActiveReply != NULL);
+  assert(this->Internals->ActiveReply != NULL);
   this->Internals->ActiveFetchedData.append(this->Internals->ActiveReply->readAll());
 }
 

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 
 // Std includes
+#include <cassert>
 #include <map>
 
 // Qt includes
@@ -266,7 +267,7 @@ void pqLinksModel::onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locat
 
 void pqLinksModel::onStateSaved(vtkPVXMLElement* root)
 {
-  Q_ASSERT(root != NULL);
+  assert(root != NULL);
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("InteractiveViewLinks");
 

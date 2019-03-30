@@ -52,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 #include <QtDebug>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -116,7 +118,7 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
 {
 #if VTK_MODULE_ENABLE_ParaView_pqPython
   vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
-  Q_ASSERT(pxm);
+  assert(pxm);
 
   vtkSmartPointer<vtkSMProxy> options;
   options.TakeReference(pxm->NewProxy("pythontracing", "PythonStateOptions"));

@@ -67,6 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QVariant>
 
+#include <cassert>
+
 // Command implementation
 class pqContextView::command : public vtkCommand
 {
@@ -130,7 +132,7 @@ pqContextView::~pqContextView()
 QWidget* pqContextView::createWidget()
 {
   vtkSMContextViewProxy* proxy = this->getContextViewProxy();
-  Q_ASSERT(proxy);
+  assert(proxy);
 
   // Enable multisample for chart views when not running tests. Multisamples
   // is disabled for testing to avoid failures due to antialiasing

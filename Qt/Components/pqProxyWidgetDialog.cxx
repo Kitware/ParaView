@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QStyle>
 
+#include <cassert>
+
 class pqProxyWidgetDialog::pqInternals
 {
   QPointer<QWidget> Container;
@@ -57,17 +59,17 @@ class pqProxyWidgetDialog::pqInternals
 
   QString KEY_VALID()
   {
-    Q_ASSERT(!this->SettingsKey.isEmpty());
+    assert(!this->SettingsKey.isEmpty());
     return QString("%1.Valid").arg(this->SettingsKey);
   }
   QString KEY_GEOMETRY()
   {
-    Q_ASSERT(!this->SettingsKey.isEmpty());
+    assert(!this->SettingsKey.isEmpty());
     return QString("%1.Geometry").arg(this->SettingsKey);
   }
   QString KEY_SEARCHBOX()
   {
-    Q_ASSERT(!this->SettingsKey.isEmpty());
+    assert(!this->SettingsKey.isEmpty());
     return QString("%1.SearchBox").arg(this->SettingsKey);
   }
 
@@ -109,7 +111,7 @@ public:
     , HasVisibleWidgets(false)
     , HasAdvancedProperties(hasAdvancedProperties(proxy))
   {
-    Q_ASSERT(proxy != NULL);
+    assert(proxy != NULL);
 
     Ui::ProxyWidgetDialog& ui = this->Ui;
     ui.setupUi(self);

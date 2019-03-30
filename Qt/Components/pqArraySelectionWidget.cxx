@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStandardItem>
 #include <QStandardItemModel>
 
+#include <cassert>
 #include <map>
 
 namespace
@@ -153,8 +154,8 @@ public:
         // add to map.
         iter = items_map.insert(std::pair<QString, QStandardItem*>(pair.first, item)).first;
       }
-      Q_ASSERT(iter != items_map.end());
-      Q_ASSERT(iter->second != nullptr);
+      assert(iter != items_map.end());
+      assert(iter->second != nullptr);
       iter->second->setCheckState(pair.second ? Qt::Checked : Qt::Unchecked);
     }
     // potentially changed, so just indicate that.
@@ -403,10 +404,10 @@ bool pqArraySelectionWidget::event(QEvent* evt)
 //-----------------------------------------------------------------------------
 void pqArraySelectionWidget::propertyChanged(const QString& pname)
 {
-  Q_ASSERT(this->UpdatingProperty == false);
+  assert(this->UpdatingProperty == false);
 
   auto amodel = this->realModel();
-  Q_ASSERT(amodel);
+  assert(amodel);
 
   QVariant value = this->property(pname.toLocal8Bit().data());
   if (!value.isValid())
@@ -458,7 +459,7 @@ void pqArraySelectionWidget::updateProperty(const QString& pname, const QVariant
 void pqArraySelectionWidget::setHeaderLabel(const QString& label)
 {
   auto amodel = this->realModel();
-  Q_ASSERT(amodel);
+  assert(amodel);
   amodel->setHeaderData(0, Qt::Horizontal, label, Qt::DisplayRole);
 }
 
@@ -466,6 +467,6 @@ void pqArraySelectionWidget::setHeaderLabel(const QString& label)
 QString pqArraySelectionWidget::headerLabel() const
 {
   auto amodel = this->realModel();
-  Q_ASSERT(amodel);
+  assert(amodel);
   return amodel->headerData(0, Qt::Horizontal, Qt::DisplayRole).toString();
 }

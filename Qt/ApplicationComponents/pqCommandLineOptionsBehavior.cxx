@@ -68,6 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 
+#include <cassert>
+
 #if VTK_MODULE_ENABLE_VTK_PythonInterpreter
 #include "vtkPythonInterpreter.h"
 #endif
@@ -125,7 +127,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // Now we are assured that some default server connection has been made
   // (either the one requested by the user on the command line or simply the
   // default one).
-  Q_ASSERT(pqActiveObjects::instance().activeServer() != 0);
+  assert(pqActiveObjects::instance().activeServer() != 0);
 
   // For tile display testing lets enable the dump of images
   if (options->GetTileImagePath())

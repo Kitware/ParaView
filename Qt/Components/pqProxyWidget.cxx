@@ -136,7 +136,7 @@ void add_decorators(pqPropertyWidget* widget, vtkPVXMLElement* hints)
     auto xmls = get_decorators(hints);
     for (auto xml : xmls)
     {
-      Q_ASSERT(xml && xml->GetAttribute("type"));
+      assert(xml && xml->GetAttribute("type"));
       pqPropertyWidgetDecorator::create(xml, widget);
     }
   }
@@ -583,7 +583,7 @@ public:
 
     // Add widget to the layout.
     QGridLayout* gridLayout = qobject_cast<QGridLayout*>(self->layout());
-    Q_ASSERT(gridLayout);
+    assert(gridLayout);
     item->appendToLayout(gridLayout, self->useDocumentationForLabels());
 
     foreach (pqPropertyWidgetDecorator* decorator, item->propertyWidget()->decorators())
@@ -614,7 +614,7 @@ pqProxyWidget::pqProxyWidget(
 void pqProxyWidget::constructor(
   vtkSMProxy* smproxy, const QStringList& properties, QWidget* parentObject, Qt::WindowFlags wflags)
 {
-  Q_ASSERT(smproxy);
+  assert(smproxy);
   (void)parentObject;
   (void)wflags;
 
@@ -818,7 +818,7 @@ void pqProxyWidget::createWidgets(const QStringList& properties)
     smproxy->GetLogNameOrDefault());
 
   QGridLayout* gridLayout = qobject_cast<QGridLayout*>(this->layout());
-  Q_ASSERT(gridLayout);
+  assert(gridLayout);
 
   DocumentationType dtype = this->showProxyDocumentationInPanel(smproxy);
   if (dtype != NONE)
@@ -1037,7 +1037,7 @@ void pqProxyWidget::createPropertyWidgets(const QStringList& properties)
       }
     }
 
-    Q_ASSERT(smgroup == nullptr || group_widget_status[smgroup] == EnumState::Collection);
+    assert(smgroup == nullptr || group_widget_status[smgroup] == EnumState::Collection);
 
     const bool isCompoundProxy = vtkSMCompoundSourceProxy::SafeDownCast(smproxy) != nullptr;
     const char* xmllabel =

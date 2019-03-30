@@ -72,6 +72,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqTimer.h"
 
+#include <cassert>
+
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
   return qHash(index.Tuple[2]);
@@ -115,7 +117,7 @@ public:
 pqSpreadSheetViewModel::pqSpreadSheetViewModel(vtkSMProxy* view, QObject* parentObject)
   : Superclass(parentObject)
 {
-  Q_ASSERT(view != NULL);
+  assert(view != NULL);
   this->ViewProxy = view;
   this->Internal = new pqInternal(this);
   this->Internal->VTKView = vtkSpreadSheetView::SafeDownCast(view->GetClientSideObject());
@@ -485,7 +487,7 @@ QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
   QSet<vtkIndex> vtkindices;
 
   vtkSpreadSheetView* view = this->GetView();
-  Q_ASSERT(view->GetShowExtractedSelection() == 0);
+  assert(view->GetShowExtractedSelection() == 0);
 
   vtkIdType numrows = view->GetNumberOfRows();
   foreach (QModelIndex idx, indexes)
@@ -509,7 +511,7 @@ QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
       if (cid.IsArray())
       {
         vtkUnsignedIntArray* array = vtkUnsignedIntArray::SafeDownCast(cid.ToArray());
-        Q_ASSERT(array->GetNumberOfTuples() * array->GetNumberOfComponents() == 2);
+        assert(array->GetNumberOfTuples() * array->GetNumberOfComponents() == 2);
         value.Tuple[0] = static_cast<vtkIdType>(array->GetValue(0));
         value.Tuple[1] = static_cast<vtkIdType>(array->GetValue(1));
       }

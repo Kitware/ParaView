@@ -58,6 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 #include <QtDebug>
 
+#include <cassert>
+
 namespace
 {
 
@@ -109,9 +111,9 @@ public:
     {
       return ValueType();
     }
-    Q_ASSERT(value.canConvert<QStringList>());
+    assert(value.canConvert<QStringList>());
     QStringList strList = value.toStringList();
-    Q_ASSERT(strList.size() == 2);
+    assert(strList.size() == 2);
     return ValueType(strList[0].toInt(), strList[1]);
   }
   static QVariant convert(const ValueType& value)
@@ -130,7 +132,7 @@ protected:
   /// Called to update the ServerManager Property due to UI change.
   void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
-    Q_ASSERT(use_unchecked == false);
+    assert(use_unchecked == false);
     Q_UNUSED(use_unchecked);
 
     ValueType val = this->convert(value);
@@ -186,7 +188,7 @@ protected:
   /// called to get the current value for the ServerManager Property.
   QVariant currentServerManagerValue(bool use_unchecked) const override
   {
-    Q_ASSERT(use_unchecked == false);
+    assert(use_unchecked == false);
     Q_UNUSED(use_unchecked);
     ValueType val;
     vtkSMProxy* reprProxy = this->proxySM();
@@ -400,7 +402,7 @@ void pqDisplayColorWidget::setArraySelection(const QPair<int, QString>& value)
     index = this->addOutOfDomainEntry(association, arrayName);
     this->Variables->blockSignals(prev);
   }
-  Q_ASSERT(index != -1);
+  assert(index != -1);
   this->Variables->setCurrentIndex(index);
   this->refreshComponents();
 }
@@ -449,7 +451,7 @@ void pqDisplayColorWidget::refreshColorArrayNames()
   this->Variables->addItem(*this->SolidColorIcon, "Solid Color", QVariant());
 
   vtkSMArrayListDomain* domain = this->Internals->Domain;
-  Q_ASSERT(domain);
+  assert(domain);
 
   QSet<QString> uniquifier; // we sometimes end up with duplicate entries.
   // overcome that for now. We need a proper fix in
@@ -534,7 +536,7 @@ void pqDisplayColorWidget::setComponentNumber(int val)
       qDebug() << "Component " << val << " is not currently known. "
                                          "Will add a new entry for it.";
     }
-    Q_ASSERT(index != -1);
+    assert(index != -1);
     this->Components->blockSignals(true);
     this->Components->setCurrentIndex(index);
     this->Components->blockSignals(false);

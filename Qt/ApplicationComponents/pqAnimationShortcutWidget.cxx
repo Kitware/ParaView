@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QMenu>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqAnimationShortcutWidget::pqAnimationShortcutWidget(
   QWidget* p, vtkSMProxy* proxy, vtkSMProperty* property)
@@ -103,7 +105,7 @@ void pqAnimationShortcutWidget::setScene(pqAnimationScene* scene)
 void pqAnimationShortcutWidget::updateMenu()
 {
   QMenu* popupMenu = this->menu();
-  Q_ASSERT(popupMenu);
+  assert(popupMenu);
 
   popupMenu->clear();
 

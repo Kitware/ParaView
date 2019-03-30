@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <string>

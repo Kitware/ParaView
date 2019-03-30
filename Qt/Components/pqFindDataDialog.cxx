@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMessageBox>
 
+#include <cassert>
+
 class pqFindDataDialog::pqInternals
 {
 public:
@@ -103,7 +105,7 @@ void pqFindDataDialog::showing(pqOutputPort* port)
 void pqFindDataDialog::freezeSelection()
 {
   pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
-  Q_ASSERT(port != NULL);
+  assert(port != NULL);
 
   vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(port->getSelectionInput());
 
@@ -157,7 +159,7 @@ void pqFindDataDialog::freezeSelection()
 void pqFindDataDialog::extractSelection()
 {
   pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
-  Q_ASSERT(port != NULL);
+  assert(port != NULL);
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   builder->createFilter("filters", "ExtractSelection", port->getSource(), port->getPortNumber());
 }
@@ -166,7 +168,7 @@ void pqFindDataDialog::extractSelection()
 void pqFindDataDialog::extractSelectionOverTime()
 {
   pqOutputPort* port = this->Internals->Ui.currentSelectionFrame->showingPort();
-  Q_ASSERT(port != NULL);
+  assert(port != NULL);
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
   builder->createFilter(
     "filters", "ExtractSelectionOverTime", port->getSource(), port->getPortNumber());

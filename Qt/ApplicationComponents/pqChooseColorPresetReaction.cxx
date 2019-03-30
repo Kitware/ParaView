@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This is required to get the mangled name for `Json::Value` used below.
 #include "vtk_jsoncpp_fwd.h"
 
+#include <cassert>
+
 QPointer<pqPresetDialog> pqChooseColorPresetReaction::PresetDialog;
 
 namespace pvInternals
@@ -170,8 +172,8 @@ bool pqChooseColorPresetReaction::choosePreset(const char* presetName)
 void pqChooseColorPresetReaction::applyCurrentPreset()
 {
   pqPresetDialog* dialog = qobject_cast<pqPresetDialog*>(this->sender());
-  Q_ASSERT(dialog);
-  Q_ASSERT(dialog == PresetDialog);
+  assert(dialog);
+  assert(dialog == PresetDialog);
 
   vtkSMProxy* lut = this->TransferFunctionProxy;
   if (!lut)

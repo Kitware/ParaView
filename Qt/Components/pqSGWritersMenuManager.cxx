@@ -60,7 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMenuBar>
 
-#include <assert.h>
+#include <cassert>
 
 namespace
 {

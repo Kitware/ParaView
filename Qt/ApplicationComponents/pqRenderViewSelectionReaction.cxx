@@ -478,7 +478,7 @@ void pqRenderViewSelectionReaction::preSelection()
   }
 
   vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
-  Q_ASSERT(rmp != NULL);
+  assert(rmp != NULL);
 
   int x = rmp->GetInteractor()->GetEventPosition()[0];
   int y = rmp->GetInteractor()->GetEventPosition()[1];
@@ -615,7 +615,7 @@ void pqRenderViewSelectionReaction::onLeftButtonRelease()
   }
 
   vtkSMRenderViewProxy* viewProxy = this->View->getRenderViewProxy();
-  Q_ASSERT(viewProxy != NULL);
+  assert(viewProxy != NULL);
 
   int x = viewProxy->GetInteractor()->GetEventPosition()[0];
   int y = viewProxy->GetInteractor()->GetEventPosition()[1];
@@ -656,7 +656,7 @@ int pqRenderViewSelectionReaction::getSelectionModifier()
   int selectionModifier = this->Superclass::getSelectionModifier();
 
   vtkSMRenderViewProxy* rmp = this->View->getRenderViewProxy();
-  Q_ASSERT(rmp != NULL);
+  assert(rmp != NULL);
 
   bool ctrl = rmp->GetInteractor()->GetControlKey() == 1;
   bool shift = rmp->GetInteractor()->GetShiftKey() == 1;

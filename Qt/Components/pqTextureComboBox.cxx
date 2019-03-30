@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSessionProxyManager.h"
 
-#include <assert.h>
+#include <cassert>
 #include <vtksys/SystemTools.hxx>
 
 // Qt Includes.

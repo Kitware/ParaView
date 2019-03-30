@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxySelectionModel.h"
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 bool pqProxySelectionUtilities::copy(vtkSMProxySelectionModel* source, pqProxySelection& dest)
 {
-  Q_ASSERT(source != NULL);
+  assert(source != NULL);
 
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
 
@@ -70,7 +72,7 @@ bool pqProxySelectionUtilities::copy(vtkSMProxySelectionModel* source, pqProxySe
 //-----------------------------------------------------------------------------
 bool pqProxySelectionUtilities::copy(const pqProxySelection& source, vtkSMProxySelectionModel* dest)
 {
-  Q_ASSERT(dest != NULL);
+  assert(dest != NULL);
 
   vtkSMProxySelectionModel::SelectionType selection;
   foreach (pqServerManagerModelItem* item, source)

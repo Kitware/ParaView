@@ -65,6 +65,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalBlocker>
 #include <QStyle>
 
+#include <cassert>
+
 namespace
 {
 //-----------------------------------------------------------------------------
@@ -262,7 +264,7 @@ public:
 
   QColor color(const QModelIndex& idx) const
   {
-    Q_ASSERT(idx.column() == this->ColorColumn);
+    assert(idx.column() == this->ColorColumn);
 
     const QModelIndex srcIdx = this->mapToSource(idx);
     QColor dcolor = this->sourceModel()->data(srcIdx, Qt::DisplayRole).value<QColor>();
@@ -283,7 +285,7 @@ public:
 
   QPixmap colorPixmap(const QModelIndex& idx) const
   {
-    Q_ASSERT(idx.column() == this->ColorColumn);
+    assert(idx.column() == this->ColorColumn);
 
     const QModelIndex srcIdx = this->mapToSource(idx);
     QColor dcolor = this->sourceModel()->data(srcIdx, Qt::DisplayRole).value<QColor>();
@@ -311,19 +313,19 @@ public:
 
   void setColor(const QModelIndex& idx, const QColor& acolor)
   {
-    Q_ASSERT(idx.column() == this->ColorColumn);
+    assert(idx.column() == this->ColorColumn);
     this->sourceModel()->setData(this->mapToSource(idx), acolor, Qt::DisplayRole);
   }
 
   void setColor(const QModelIndex& idx, const QVariant& acolor)
   {
-    Q_ASSERT(idx.column() == this->ColorColumn);
+    assert(idx.column() == this->ColorColumn);
     this->sourceModel()->setData(this->mapToSource(idx), acolor, Qt::DisplayRole);
   }
 
   double opacity(const QModelIndex& idx) const
   {
-    Q_ASSERT(idx.column() == this->OpacityColumn);
+    assert(idx.column() == this->OpacityColumn);
     const QModelIndex srcIdx = this->mapToSource(idx);
     const QVariant vval = this->sourceModel()->data(srcIdx, Qt::DisplayRole);
     return vval.isValid() ? vval.toDouble() : 1.0;
@@ -331,7 +333,7 @@ public:
 
   QPixmap opacityPixmap(const QModelIndex& idx) const
   {
-    Q_ASSERT(idx.column() == this->OpacityColumn);
+    assert(idx.column() == this->OpacityColumn);
     const QModelIndex srcIdx = this->mapToSource(idx);
     const QVariant vval = this->sourceModel()->data(srcIdx, Qt::DisplayRole);
     double dval = vval.isValid() ? vval.toDouble() : -1.0;
@@ -343,13 +345,13 @@ public:
 
   void setOpacity(const QModelIndex& idx, double aopacity)
   {
-    Q_ASSERT(idx.column() == this->OpacityColumn);
+    assert(idx.column() == this->OpacityColumn);
     this->sourceModel()->setData(this->mapToSource(idx), aopacity, Qt::DisplayRole);
   }
 
   void setOpacity(const QModelIndex& idx, const QVariant& aopacity)
   {
-    Q_ASSERT(idx.column() == this->OpacityColumn);
+    assert(idx.column() == this->OpacityColumn);
     this->sourceModel()->setData(this->mapToSource(idx), aopacity, Qt::DisplayRole);
   }
 
@@ -546,7 +548,7 @@ public:
 private:
   void selectBlocks(const std::vector<vtkIdType>& ids)
   {
-    Q_ASSERT(this->BlockSelectionPropagation == false);
+    assert(this->BlockSelectionPropagation == false);
     QScopedValueRollback<bool> r(this->BlockSelectionPropagation, true);
 
     pqOutputPort* port = this->MBWidget->outputPort();
@@ -759,17 +761,17 @@ public:
       // restore check-state, property state, if possible.
       if (this->UserCheckable)
       {
-        Q_ASSERT(this->CDTModel->userCheckable());
+        assert(this->CDTModel->userCheckable());
         this->CDTModel->setCheckStates(this->BlockVisibilities);
       }
       if (this->HasColors)
       {
-        Q_ASSERT(this->CDTModel->columnIndex("color") != -1);
+        assert(this->CDTModel->columnIndex("color") != -1);
         this->CDTModel->setColumnStates("color", this->BlockColors);
       }
       if (this->HasOpacities)
       {
-        Q_ASSERT(this->CDTModel->columnIndex("opacity") != -1);
+        assert(this->CDTModel->columnIndex("opacity") != -1);
         this->CDTModel->setColumnStates("opacity", this->BlockOpacities);
       }
     }

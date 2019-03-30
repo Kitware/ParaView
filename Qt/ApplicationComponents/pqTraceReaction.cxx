@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMTrace.h"
 #include "vtkSmartPointer.h"
 
+#include <cassert>
+
 #include "vtkPVConfig.h"
 #if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonScriptEditor.h"
@@ -171,7 +173,7 @@ void pqTraceReaction::editTrace(const QString& trace, bool incremental)
     new_editor = true;
   }
 
-  Q_ASSERT(this->Editor);
+  assert(this->Editor);
   this->Editor->setText(trace);
   this->Editor->show();
 

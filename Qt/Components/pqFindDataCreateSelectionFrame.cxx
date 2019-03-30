@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 
+#include <cassert>
+
 namespace
 {
 static QMap<int, QIcon> Icons;
@@ -233,7 +235,7 @@ void pqFindDataCreateSelectionFrame::refreshQuery()
 void pqFindDataCreateSelectionFrame::runQuery()
 {
   Ui::FindDataCreateSelectionFrame& ui = this->Internals->Ui;
-  Q_ASSERT(ui.source->currentPort() == ui.queryClauseWidget->producer() &&
+  assert(ui.source->currentPort() == ui.queryClauseWidget->producer() &&
     ui.source->currentPort() != NULL);
 
   pqOutputPort* port = ui.source->currentPort();

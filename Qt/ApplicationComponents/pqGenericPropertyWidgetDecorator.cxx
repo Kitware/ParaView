@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 #include <QtDebug>
+
+#include <cassert>
 #include <sstream>
 
 class pqGenericPropertyWidgetDecorator::pqInternals
@@ -176,7 +178,7 @@ pqGenericPropertyWidgetDecorator::pqGenericPropertyWidgetDecorator(
   , Internals(new pqGenericPropertyWidgetDecorator::pqInternals())
 {
   vtkSMProxy* proxy = this->parentWidget()->proxy();
-  Q_ASSERT(proxy != nullptr);
+  assert(proxy != nullptr);
 
   const char* propertyName = config->GetAttribute("property");
   if (propertyName == nullptr || proxy->GetProperty(propertyName) == nullptr)

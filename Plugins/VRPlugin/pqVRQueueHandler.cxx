@@ -155,7 +155,7 @@ void pqVRQueueHandler::stop()
 //----------------------------------------------------------------------------
 void pqVRQueueHandler::processEvents()
 {
-  Q_ASSERT(this->Internals->Queue != NULL);
+  assert(this->Internals->Queue != NULL);
   std::queue<vtkVREventData> events;
   this->Internals->Queue->TryDequeue(events);
 
@@ -259,7 +259,7 @@ void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* 
 //----------------------------------------------------------------------------
 void pqVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
 {
-  Q_ASSERT(root != NULL);
+  assert(root != NULL);
 
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRInteractorStyles");

@@ -50,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 #include <QUrl>
 
+#include <cassert>
+
 namespace
 {
 enum
@@ -308,7 +310,7 @@ void pqServerConnectDialog::updateConfigurations()
 //-----------------------------------------------------------------------------
 void pqServerConnectDialog::onServerSelected()
 {
-  Q_ASSERT(this->Internals->servers->rowCount() == this->Internals->Configurations.size());
+  assert(this->Internals->servers->rowCount() == this->Internals->Configurations.size());
   this->updateButtons();
 }
 
@@ -358,12 +360,12 @@ void pqServerConnectDialog::updateButtons()
 void pqServerConnectDialog::editServer()
 {
   int row = this->Internals->servers->currentRow();
-  Q_ASSERT(row >= 0 && row < this->Internals->servers->rowCount());
+  assert(row >= 0 && row < this->Internals->servers->rowCount());
 
   // covert the row number to original index (since servers can be sorted).
   int original_index = this->Internals->servers->item(row, 0)->data(Qt::UserRole).toInt();
 
-  Q_ASSERT(original_index >= 0 && original_index < this->Internals->Configurations.size());
+  assert(original_index >= 0 && original_index < this->Internals->Configurations.size());
 
   this->editConfiguration(this->Internals->Configurations[original_index]);
 }
@@ -372,7 +374,7 @@ void pqServerConnectDialog::editServer()
 void pqServerConnectDialog::editConfiguration(const pqServerConfiguration& configuration)
 {
   // ensure that we are not editing non-mutable configurations by mistake.
-  Q_ASSERT(configuration.isMutable());
+  assert(configuration.isMutable());
 
   this->Internals->ActiveConfiguration = configuration.clone();
   this->Internals->OriginalName = configuration.name();
@@ -623,12 +625,12 @@ void pqServerConnectDialog::goToFirstPage()
 void pqServerConnectDialog::deleteServer()
 {
   int row = this->Internals->servers->currentRow();
-  Q_ASSERT(row >= 0 && row < this->Internals->servers->rowCount());
+  assert(row >= 0 && row < this->Internals->servers->rowCount());
 
   // covert the row number to original index (since servers can be sorted).
   int original_index = this->Internals->servers->item(row, 0)->data(Qt::UserRole).toInt();
 
-  Q_ASSERT(original_index >= 0 && original_index < this->Internals->Configurations.size());
+  assert(original_index >= 0 && original_index < this->Internals->Configurations.size());
 
   const pqServerConfiguration& config = this->Internals->Configurations[original_index];
   if (QMessageBox::question(this, "Delete Server Configuration",
@@ -680,12 +682,12 @@ void pqServerConnectDialog::loadServers()
 void pqServerConnectDialog::connect()
 {
   int row = this->Internals->servers->currentRow();
-  Q_ASSERT(row >= 0 && row < this->Internals->servers->rowCount());
+  assert(row >= 0 && row < this->Internals->servers->rowCount());
 
   // covert the row number to original index (since servers can be sorted).
   int original_index = this->Internals->servers->item(row, 0)->data(Qt::UserRole).toInt();
 
-  Q_ASSERT(original_index >= 0 && original_index < this->Internals->Configurations.size());
+  assert(original_index >= 0 && original_index < this->Internals->Configurations.size());
 
   this->Internals->ToConnect = this->Internals->Configurations[original_index];
   this->Internals->ToConnect.setConnectionTimeout(this->Internals->timeoutSpinBox->value());

@@ -94,6 +94,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMWriterFactory.h"
 #include "vtkSmartPointer.h"
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
 {
@@ -135,7 +137,7 @@ pqApplicationCore::pqApplicationCore(
 void pqApplicationCore::constructor()
 {
   // Only 1 pqApplicationCore instance can be created.
-  Q_ASSERT(pqApplicationCore::Instance == NULL);
+  assert(pqApplicationCore::Instance == NULL);
   pqApplicationCore::Instance = this;
 
   this->UndoStack = NULL;

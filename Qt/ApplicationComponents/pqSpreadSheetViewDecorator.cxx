@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSpreadSheetView.h"
 
 #include <algorithm>
+#include <cassert>
 #include <set>
 
 namespace
@@ -389,7 +390,7 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
   {
     if (auto activeRepr = this->Spreadsheet->activeRepresentation())
     {
-      Q_ASSERT(activeRepr->isVisible());
+      assert(activeRepr->isVisible());
       auto inputPort = activeRepr->getOutputPortFromInput();
       vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
       controller->Hide(

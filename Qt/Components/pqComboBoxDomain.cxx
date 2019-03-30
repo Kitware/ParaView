@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include <pqSMAdaptor.h>
 
-#include <assert.h>
+#include <cassert>
 
 namespace
 {
@@ -200,7 +200,7 @@ void pqComboBoxDomain::domainChanged()
 void pqComboBoxDomain::internalDomainChanged()
 {
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
-  Q_ASSERT(combo != NULL);
+  assert(combo != NULL);
   if (!combo)
   {
     return;

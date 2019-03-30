@@ -57,7 +57,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 #include <QTextStream>
 
+#include <cassert>
 #include <sstream>
+
 class pqPluginManager::pqInternals
 {
 public:
@@ -91,7 +93,7 @@ public:
 //=============================================================================
 static QString pqPluginManagerSettingsKeyForRemote(pqServer* server)
 {
-  Q_ASSERT(server && server->isRemote());
+  assert(server && server->isRemote());
   // locate the xml-config from settings associated with this server and ask
   // the server to parse it.
   const pqServerResource& resource = server->getResource();
@@ -311,7 +313,7 @@ bool pqPluginManager::verifyPlugins(pqServer* activeServer)
 //-----------------------------------------------------------------------------
 bool pqPluginManager::confirmEULA(vtkPVPlugin* plugin)
 {
-  Q_ASSERT(plugin->GetEULA() != nullptr);
+  assert(plugin->GetEULA() != nullptr);
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
