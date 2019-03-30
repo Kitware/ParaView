@@ -1071,7 +1071,7 @@ H5PartWriteStepAttrib (
  herr = _H5Part_write_attrib (
   f->timegroup,
   attrib_name,
-  (const hid_t)attrib_type,
+  (hid_t)attrib_type,
   attrib_value,
   attrib_nelem );
  if ( herr < 0 ) return herr;
@@ -1121,7 +1121,7 @@ H5PartWriteFileAttrib (
  herr = _H5Part_write_attrib (
   group_id,
   attrib_name,
-  (const hid_t)attrib_type,
+  (hid_t)attrib_type,
   attrib_value,
   attrib_nelem );
  if ( herr < 0 ) return herr;
@@ -2237,9 +2237,10 @@ _read_data (
   if ( herr < 0 ) return HANDLE_H5S_CLOSE_ERR;
  }
 
- if ( memspace_id != H5S_ALL )
+ if ( memspace_id != H5S_ALL ) {
   herr = H5Sclose ( memspace_id );
   if ( herr < 0 ) return HANDLE_H5S_CLOSE_ERR;
+ }
 
  herr = H5Dclose ( dataset_id );
  if ( herr < 0 ) return HANDLE_H5D_CLOSE_ERR;

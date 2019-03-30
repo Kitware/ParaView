@@ -88,7 +88,7 @@ public:
     {
       this->move(pos);
       this->RubberBand->hide();
-      assert(this->Active != -1 && this->Splitters.size() > this->Active);
+      assert(this->Active != -1 && static_cast<int>(this->Splitters.size()) > this->Active);
 
       const auto& spair = this->Splitters[this->Active];
       const auto& point = this->RubberBand->geometry().center();
@@ -104,7 +104,7 @@ public:
 
   void move(const QPoint& pos)
   {
-    assert(this->Active != -1 && this->Splitters.size() > this->Active);
+    assert(this->Active != -1 && static_cast<int>(this->Splitters.size()) > this->Active);
 
     const auto& spair = this->Splitters[this->Active];
     int newpos = (spair.first.Direction == Qt::Horizontal ? pos.x() : pos.y());
