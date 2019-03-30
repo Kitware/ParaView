@@ -2237,9 +2237,10 @@ _read_data (
   if ( herr < 0 ) return HANDLE_H5S_CLOSE_ERR;
  }
 
- if ( memspace_id != H5S_ALL )
+ if ( memspace_id != H5S_ALL ) {
   herr = H5Sclose ( memspace_id );
   if ( herr < 0 ) return HANDLE_H5S_CLOSE_ERR;
+ }
 
  herr = H5Dclose ( dataset_id );
  if ( herr < 0 ) return HANDLE_H5D_CLOSE_ERR;
