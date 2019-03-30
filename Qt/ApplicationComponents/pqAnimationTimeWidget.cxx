@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTimeWidget.h"
 #include "ui_pqAnimationTimeWidget.h"
 
+#include "pqDoubleLineEdit.h"
 #include "pqPropertyLinks.h"
 #include "pqPropertyLinksConnection.h"
 #include "pqTimer.h"
@@ -179,8 +180,9 @@ void pqAnimationTimeWidget::setTimeValue(double time)
 {
   Ui::AnimationTimeWidget& ui = this->Internals->Ui;
   ui.timeValue->setProperty("PQ_DOUBLE_VALUE", QVariant(time));
-  QString textValue =
-    QString::number(time, this->Internals->TimeNotation.toLatin1(), this->Internals->Precision);
+
+  QString textValue = this->formatDouble(time);
+
   ui.timeValue->setTextAndResetCursor(textValue);
 
   for (int index = 0; index < ui.timeValueComboBox->count(); index++)
@@ -373,15 +375,34 @@ void pqAnimationTimeWidget::repopulateTimeComboBox()
   vtkSMPropertyHelper helper(this->timeKeeper(), "TimestepValues");
   bool prev = ui.timeValueComboBox->blockSignals(true);
   ui.timeValueComboBox->clear();
+
   for (unsigned int index = 0; index < helper.GetNumberOfElements(); index++)
   {
-    QString textValue = QString::number(helper.GetAsDouble(index),
-      this->Internals->TimeNotation.toLatin1(), this->Internals->Precision);
+    QString textValue = this->formatDouble(helper.GetAsDouble(index));
     ui.timeValueComboBox->addItem(textValue, helper.GetAsDouble(index));
   }
   ui.timeValueComboBox->blockSignals(prev);
 
   this->setTimeValue(currentTimeValue);
+}
+
+//-----------------------------------------------------------------------------
+QString pqAnimationTimeWidget::formatDouble(double value)
+{
+  QChar format = this->Internals->TimeNotation.toUpper();
+  QTextStream::RealNumberNotation notation = QTextStream::ScientificNotation;
+  if (format == QChar('F'))
+  {
+    notation = QTextStream::FixedNotation;
+  }
+  else if (format == QChar('G'))
+  {
+    notation = QTextStream::SmartNotation;
+  }
+
+  QString textValue = pqDoubleLineEdit::formatDouble(value, notation, this->Internals->Precision);
+
+  return textValue;
 }
 
 //-----------------------------------------------------------------------------

@@ -103,11 +103,8 @@ public:
     const auto real_notation =
       this->UseGlobalPrecisionAndNotation ? pqDoubleLineEdit::globalNotation() : this->Notation;
 
-    QString limited;
-    QTextStream converter(&limited);
-    converter.setRealNumberNotation(toTextStreamNotation(real_notation));
-    converter.setRealNumberPrecision(real_precision);
-    converter << self->text().toDouble();
+    QString limited = pqDoubleLineEdit::formatDouble(
+      self->text().toDouble(), toTextStreamNotation(real_notation), real_precision);
 
     const bool changed = (limited != this->InactiveLineEdit->text());
     this->InactiveLineEdit->setText(limited);
@@ -281,4 +278,17 @@ QString pqDoubleLineEdit::simplifiedText() const
 {
   auto& internals = (*this->Internals);
   return internals.InactiveLineEdit->text();
+}
+
+//-----------------------------------------------------------------------------
+QString pqDoubleLineEdit::formatDouble(
+  double value, QTextStream::RealNumberNotation notation, int precision)
+{
+  QString text;
+  QTextStream converter(&text);
+  converter.setRealNumberNotation(notation);
+  converter.setRealNumberPrecision(precision);
+  converter << value;
+
+  return text;
 }
