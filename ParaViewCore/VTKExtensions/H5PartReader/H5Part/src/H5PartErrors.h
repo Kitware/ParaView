@@ -86,7 +86,7 @@
    _H5Part_get_funcname(), \
    H5PART_ERR_NOENTRY, \
    "No entry with index %lld and type %d in group %s!", \
-   (long long)idx, type, group_name );
+   (long long)idx, (int)type, group_name );
 
 /**************** HDF5 *********************/
 /* H5A: Attribute */
