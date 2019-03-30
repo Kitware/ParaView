@@ -17,7 +17,11 @@
 
 #include "vtkAMRDualContour.h"
 #include "vtkAppendPolyData.h"
+#include "vtkArrayDispatch.h"
+#include "vtkAssume.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkDataArray.h"
+#include "vtkDataArrayAccessor.h"
 #include "vtkDataObject.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkHierarchicalBoxDataSet.h"
@@ -26,7 +30,12 @@
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkSMPTools.h"
 #include "vtkSmartPointer.h"
+
+#include <cmath>
+#include <set>
 
 vtkStandardNewMacro(vtkPVContourFilter);
 
@@ -188,7 +197,15 @@ int vtkPVContourFilter::ContourUsingSuperclass(
   vtkCompositeDataSet* inputCD = vtkCompositeDataSet::SafeDownCast(inputDO);
   if (!inputCD)
   {
-    return this->Superclass::RequestData(request, inputVector, outputVector);
+    auto retval = this->Superclass::RequestData(request, inputVector, outputVector);
+    if (retval)
+    {
+      if (auto polydata = vtkPolyData::GetData(outputVector, 0))
+      {
+        this->CleanOutputScalars(polydata->GetPointData()->GetScalars());
+      }
+    }
+    return retval;
   }
 
   vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(outputDO);
@@ -221,6 +238,7 @@ int vtkPVContourFilter::ContourUsingSuperclass(
     {
       return 0;
     }
+    this->CleanOutputScalars(polydata->GetPointData()->GetScalars());
     outputCD->SetDataSet(iter, polydata);
   }
 
@@ -243,4 +261,64 @@ int vtkPVContourFilter::FillInputPortInformation(int port, vtkInformation* info)
   // input data set type since VTK 5.2.
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+namespace
+{
+struct Cleaner
+{
+  std::set<double> Values;
+
+  template <typename ArrayT>
+  void operator()(ArrayT* scalars) const
+  {
+    VTK_ASSUME(scalars->GetNumberOfComponents() == 1);
+    vtkDataArrayAccessor<ArrayT> accessor(scalars);
+    using ValueT = typename vtkDataArrayAccessor<ArrayT>::APIType;
+
+    vtkSMPTools::For(
+      0, scalars->GetNumberOfTuples(), [this, &accessor](vtkIdType begin, vtkIdType end) {
+        for (vtkIdType cc = begin; cc < end; ++cc)
+        {
+          accessor.Set(
+            cc, 0, static_cast<ValueT>(this->GetClosest(static_cast<double>(accessor.Get(cc, 0)))));
+        }
+      });
+  }
+
+  double GetClosest(const double& val) const
+  {
+    double delta = VTK_DOUBLE_MAX;
+    double closeset_val = val;
+    for (const auto& set_val : this->Values)
+    {
+      const auto curDelta = std::abs(val - set_val);
+      if (curDelta < delta)
+      {
+        closeset_val = set_val;
+        delta = curDelta;
+      }
+    }
+    return closeset_val;
+  }
+};
+}
+void vtkPVContourFilter::CleanOutputScalars(vtkDataArray* outScalars)
+{
+  if (outScalars)
+  {
+    Cleaner worker;
+    const auto values = this->GetValues();
+    for (int cc = 0, max = this->GetNumberOfContours(); cc < max; ++cc)
+    {
+      worker.Values.insert(values[cc]);
+    }
+
+    using DispatcherT = vtkArrayDispatch::DispatchByValueType<vtkArrayDispatch::Reals>;
+    if (!DispatcherT::Execute(outScalars, worker))
+    {
+      worker(outScalars);
+    }
+  }
 }
