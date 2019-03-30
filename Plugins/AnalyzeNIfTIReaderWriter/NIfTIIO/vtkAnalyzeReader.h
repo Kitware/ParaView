@@ -72,7 +72,6 @@ private:
 
   void vtkAnalyzeReaderUpdateVTKBit(vtkImageData* data, void* outPtr);
 
-  unsigned int numberOfDimensions;
   unsigned int imageSizeInBytes;
   unsigned int orientation;
   double dataTypeSize;

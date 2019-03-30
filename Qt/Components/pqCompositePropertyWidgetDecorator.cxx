@@ -59,6 +59,8 @@ struct BaseOperation
 
   virtual bool canShowWidget(bool show_advanced) const = 0;
   virtual bool enableWidget() const = 0;
+
+  virtual ~BaseOperation() {}
 };
 
 template <typename BinaryOperation, bool init_value, bool default_value = init_value>

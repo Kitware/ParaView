@@ -1032,7 +1032,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
           shiftedBitValue = inBitValue << (outBitCount);
           if (outByteCount >= tempSizeInt)
           {
-            outByteCount = outByteCount;
+            outByteCount = tempSizeInt - 1;
           }
 
           tempUnsignedCharData[outByteCount] += shiftedBitValue;
@@ -1088,7 +1088,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
           shiftedBitValue = inBitValue << (outBitCount);
           if (outByteCount >= tempSizeInt)
           {
-            outByteCount = outByteCount;
+            outByteCount = tempSizeInt - 1;
           }
           count++;
         }
@@ -1198,15 +1198,6 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
           {
             charOutOffset = outOffset + idSize;
             outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
-            unsigned char tempByte = outUnsignedCharPtr[charOutOffset];
-            if (tempByte != 0)
-            {
-              tempByte = tempByte;
-            }
-            else
-            {
-              tempByte = tempByte;
-            }
           }
         }
         else
@@ -1224,7 +1215,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
           shiftedBitValue = inBitValue << (outBitCount);
           if (outByteCount >= tempSizeInt)
           {
-            outByteCount = outByteCount;
+            outByteCount = tempSizeInt - 1;
           }
           count++;
         }
