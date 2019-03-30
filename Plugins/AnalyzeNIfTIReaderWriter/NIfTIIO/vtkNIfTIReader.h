@@ -69,7 +69,6 @@ private:
   vtkNIfTIReader(const vtkNIfTIReader&) = delete;
   void operator=(const vtkNIfTIReader&) = delete;
 
-  unsigned int numberOfDimensions;
   unsigned int imageSizeInBytes;
   unsigned int Type;
   int width;
