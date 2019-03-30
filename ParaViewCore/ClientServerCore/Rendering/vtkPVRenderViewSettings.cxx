@@ -91,6 +91,20 @@ void vtkPVRenderViewSettings::SetPolygonOffsetParameters(double factor, double u
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderViewSettings::SetLineOffsetParameters(double factor, double units)
+{
+  vtkMapper::SetResolveCoincidentTopologyLineOffsetParameters(factor, units);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderViewSettings::SetPointOffsetParameter(double units)
+{
+  vtkMapper::SetResolveCoincidentTopologyPointOffsetParameter(units);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderViewSettings::SetZShift(double val)
 {
   vtkMapper::SetResolveCoincidentTopologyZShift(val);
