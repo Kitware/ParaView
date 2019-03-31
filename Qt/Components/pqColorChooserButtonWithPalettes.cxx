@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 #include <QMenu>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqColorChooserButtonWithPalettes::pqColorChooserButtonWithPalettes(QWidget* parentObject)
   : Superclass(parentObject)
@@ -83,7 +85,7 @@ vtkSMGlobalPropertiesProxy* pqColorChooserButtonWithPalettes::colorPalette() con
 void pqColorChooserButtonWithPalettes::updateMenu()
 {
   QMenu* popupMenu = this->menu();
-  Q_ASSERT(popupMenu);
+  assert(popupMenu);
 
   popupMenu->clear();
 
@@ -145,7 +147,7 @@ void pqColorChooserButtonWithPalettes::actionTriggered(QAction* action)
   {
     QString prop_name = action->data().toString();
     vtkSMProxy* globalProps = this->colorPalette();
-    Q_ASSERT(globalProps);
+    assert(globalProps);
 
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       globalProps->GetProperty(prop_name.toLocal8Bit().data()));
@@ -175,7 +177,7 @@ pqColorPaletteLinkHelper::pqColorPaletteLinkHelper(
   , SMProxy(smproxy)
   , SMPropertyName(smproperty)
 {
-  Q_ASSERT(button && smproperty && smproxy);
+  assert(button && smproperty && smproxy);
 }
 
 //-----------------------------------------------------------------------------
@@ -188,7 +190,7 @@ void pqColorPaletteLinkHelper::setSelectedPaletteColor(const QString& colorName)
 {
   pqColorChooserButtonWithPalettes* button =
     qobject_cast<pqColorChooserButtonWithPalettes*>(this->parent());
-  Q_ASSERT(button);
+  assert(button);
 
   vtkSMGlobalPropertiesProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)
@@ -203,7 +205,7 @@ QString pqColorPaletteLinkHelper::selectedPaletteColor() const
 {
   pqColorChooserButtonWithPalettes* button =
     qobject_cast<pqColorChooserButtonWithPalettes*>(this->parent());
-  Q_ASSERT(button);
+  assert(button);
 
   vtkSMGlobalPropertiesProxy* palette = button->colorPalette();
   if (palette && this->SMProxy)

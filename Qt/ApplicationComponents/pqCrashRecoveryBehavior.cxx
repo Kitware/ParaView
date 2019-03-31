@@ -53,6 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h> /* _exit */
 #endif
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqCrashRecoveryBehavior::pqCrashRecoveryBehavior(QObject* parentObject)
   : Superclass(parentObject)

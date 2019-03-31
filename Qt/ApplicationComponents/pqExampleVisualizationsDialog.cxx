@@ -11,6 +11,8 @@
 #include <QFileInfo>
 #include <QMessageBox>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqExampleVisualizationsDialog::pqExampleVisualizationsDialog(QWidget* parentObject)
   : Superclass(parentObject)
@@ -87,7 +89,7 @@ void pqExampleVisualizationsDialog::onButtonPressed()
     }
 
     this->hide();
-    Q_ASSERT(stateFile != NULL);
+    assert(stateFile != NULL);
 
     QFile qfile(stateFile);
     if (qfile.open(QIODevice::ReadOnly | QIODevice::Text))

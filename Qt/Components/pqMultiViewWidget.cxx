@@ -277,7 +277,7 @@ pqView* getPQView(vtkSMProxy* view)
 
 void ConnectFrameToView(pqViewFrame* frame, pqView* pqview)
 {
-  Q_ASSERT(frame);
+  assert(frame);
   // if pqview == NULL, then the frame is either being assigned to a empty
   // view, or pqview for a view-proxy just isn't present yet.
   // it's possible that pqview is NULL, if the view proxy hasn't been registered
@@ -385,12 +385,12 @@ vtkSMViewLayoutProxy* pqMultiViewWidget::layoutManager() const
 void pqMultiViewWidget::layoutPropertyModified(
   vtkObject* sender, unsigned long eventid, void* vdata)
 {
-  Q_ASSERT(eventid == vtkCommand::PropertyModifiedEvent);
+  assert(eventid == vtkCommand::PropertyModifiedEvent);
   Q_UNUSED(eventid);
 
   auto& internals = (*this->Internals);
   auto vlayout = vtkSMViewLayoutProxy::SafeDownCast(sender);
-  Q_ASSERT(vlayout);
+  assert(vlayout);
   if (const char* pname = reinterpret_cast<const char*>(vdata))
   {
     if (strcmp(pname, "SeparatorWidth") == 0)
@@ -584,7 +584,7 @@ void pqMultiViewWidget::reload()
 
   auto& internals = (*this->Internals);
   auto hlayout = qobject_cast<pqHierarchicalGridLayout*>(internals.Container->layout());
-  Q_ASSERT(hlayout != nullptr);
+  assert(hlayout != nullptr);
 
   internals.Frames.clear();
 
@@ -624,7 +624,7 @@ void pqMultiViewWidget::reload()
     {
       auto viewProxy = vlayout->GetView(location); // may be nullptr.
       auto frame = internals.ViewFrames.value(viewProxy, nullptr);
-      Q_ASSERT(viewProxy == nullptr || frame != nullptr);
+      assert(viewProxy == nullptr || frame != nullptr);
       if (viewProxy == nullptr && frame == nullptr)
       {
         if (empty_frames.size() > 0)
@@ -880,7 +880,7 @@ bool pqMultiViewWidget::togglePopout()
   }
   else
   {
-    Q_ASSERT(internals.PopoutWindow != nullptr);
+    assert(internals.PopoutWindow != nullptr);
     internals.PopoutWindow->hide();
     internals.PopoutWindow->layout()->removeWidget(internals.Container);
 

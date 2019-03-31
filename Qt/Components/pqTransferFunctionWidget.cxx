@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <cassert>
 
 namespace
 {
@@ -413,7 +414,7 @@ void pqTransferFunctionWidget::onCurrentPointEditEvent()
   }
 
   vtkColorTransferFunction* ctf = cpitem->GetColorTransferFunction();
-  Q_ASSERT(ctf != NULL);
+  assert(ctf != NULL);
 
   double xrgbms[6];
   ctf->GetNodeValue(currentIdx, xrgbms);

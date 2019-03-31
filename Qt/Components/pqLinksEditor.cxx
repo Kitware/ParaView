@@ -65,6 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLinksModel.h"
 #include "ui_pqLinksEditor.h"
 
+// std
+#include <cassert>
+
 static QString propertyType(vtkSMProperty* p)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
@@ -102,7 +105,7 @@ public:
   pqLinksEditorProxyModel(QObject* p)
     : QAbstractItemModel(p)
   {
-    Q_ASSERT(sizeof(RowIndex) == sizeof(void*));
+    assert(sizeof(RowIndex) == sizeof(void*));
   }
   ~pqLinksEditorProxyModel() override {}
 

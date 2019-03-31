@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QtDebug>
 
+#include <cassert>
 #include <cmath>
 
 namespace
@@ -830,7 +831,7 @@ void pqColorOpacityEditorWidget::saveAsPreset()
     return;
   }
 
-  Q_ASSERT(ui.saveColors->isChecked());
+  assert(ui.saveColors->isChecked());
   Json::Value preset = vtkSMTransferFunctionProxy::GetStateAsPreset(this->proxy());
 
   if (ui.saveOpacities->isChecked())

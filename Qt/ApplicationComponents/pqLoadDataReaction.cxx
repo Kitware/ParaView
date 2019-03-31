@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqLoadDataReaction::pqLoadDataReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -81,7 +83,7 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
   }
   else
   {
-    Q_ASSERT(filters.isEmpty());
+    assert(filters.isEmpty());
     filters = "All Files (*)";
   }
 

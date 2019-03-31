@@ -284,7 +284,7 @@ public:
 
   const QVariant& customColumnState(int col) const
   {
-    Q_ASSERT(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
+    assert(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
     return this->CustomColumnState[col].first;
   }
 
@@ -305,7 +305,7 @@ public:
   void setCustomColumnState(
     int col, const QVariant& value, bool force, pqCompositeDataInformationTreeModel* dmodel)
   {
-    Q_ASSERT(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
+    assert(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
     std::pair<QVariant, bool>& value_pair = this->CustomColumnState[col];
     if (value_pair.first != value)
     {
@@ -340,7 +340,7 @@ public:
 
   void customColumnStates(int col, QList<QPair<unsigned int, QVariant> >& values) const
   {
-    Q_ASSERT(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
+    assert(col >= 0 && col < static_cast<int>(this->CustomColumnState.size()));
     const std::pair<QVariant, bool>& value_pair = this->CustomColumnState[col];
 
     // add explicitly set values.

@@ -88,6 +88,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWindowToImageFilter.h"
 #include "vtksys/SystemTools.hxx"
 
+#include <cassert>
+
 #ifdef QT_TESTING_WITH_PYTHON
 #include "pqPythonEventSourceImage.h"
 #endif
@@ -280,7 +282,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
   double threshold, ostream& vtkNotUsed(output), const QString& tempDirectory,
   const QSize& size /*=QSize(300, 300)*/)
 {
-  Q_ASSERT(widget != NULL);
+  assert(widget != NULL);
 
   // try to locate a pqView, if any associated with the QWidget.
   QList<pqView*> views =
@@ -302,7 +304,7 @@ bool pqCoreTestUtility::CompareImage(QWidget* widget, const QString& referenceIm
 bool pqCoreTestUtility::CompareView(pqView* curView, const QString& referenceImage,
   double threshold, const QString& tempDirectory, const QSize& size /*=QSize()*/)
 {
-  Q_ASSERT(curView != NULL);
+  assert(curView != NULL);
 
   auto viewProxy = curView->getViewProxy();
 

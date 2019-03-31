@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSubsetInclusionLattice.h"
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 class pqSubsetInclusionLatticeTreeModel::pqInternals
 {
@@ -187,7 +189,7 @@ QModelIndex pqSubsetInclusionLatticeTreeModel::parent(const QModelIndex& idx) co
   }
 
   const int parentNodeIdx = internals.SIL->GetParent(nodeIdx);
-  Q_ASSERT(parentNodeIdx >= 0);
+  assert(parentNodeIdx >= 0);
   if (parentNodeIdx == 0)
   {
     return QModelIndex();
@@ -196,7 +198,7 @@ QModelIndex pqSubsetInclusionLatticeTreeModel::parent(const QModelIndex& idx) co
   int childIndex = 0;
   const int parentsParentNodeIdx = internals.SIL->GetParent(parentNodeIdx, &childIndex);
   (void)parentsParentNodeIdx;
-  Q_ASSERT(parentsParentNodeIdx != -1);
+  assert(parentsParentNodeIdx != -1);
 
   return this->createIndex(childIndex, 0, static_cast<quintptr>(parentNodeIdx));
 }

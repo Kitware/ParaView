@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 #include <algorithm>
+#include <cassert>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -98,7 +99,7 @@ public:
 
   void addSource(pqPipelineSource* src, vtkPVXMLElement* liveHints)
   {
-    Q_ASSERT(liveHints != nullptr);
+    assert(liveHints != nullptr);
     int interval = 0;
     if (!liveHints->GetScalarAttribute("interval", &interval) || interval <= 0)
     {

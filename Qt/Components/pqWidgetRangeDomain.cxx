@@ -52,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSMAdaptor.h>
 #include <pqTimer.h>
 
+#include <cassert>
+
 class pqWidgetRangeDomain::pqInternal
 {
 public:
@@ -161,7 +163,7 @@ void pqWidgetRangeDomain::setRange(QVariant min, QVariant max)
 QWidget* pqWidgetRangeDomain::getWidget() const
 {
   QWidget* range = qobject_cast<QWidget*>(this->parent());
-  Q_ASSERT(range != NULL);
+  assert(range != NULL);
   return range;
 }
 

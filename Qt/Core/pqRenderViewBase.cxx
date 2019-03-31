@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqTimer.h"
 
+#include <cassert>
 #include <string>
 
 class pqRenderViewBase::pqInternal
@@ -185,7 +186,7 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
   if (renderViewProxy != NULL)
   {
     vtkSMViewProxyInteractorHelper* helper = renderViewProxy->GetInteractorHelper();
-    Q_ASSERT(helper);
+    assert(helper);
     vtkEventQtSlotConnect* cntor = this->getConnector();
     cntor->Connect(helper, vtkCommand::CreateTimerEvent, this, SLOT(beginDelayInteractiveRender()));
     cntor->Connect(helper, vtkCommand::DestroyTimerEvent, this, SLOT(endDelayInteractiveRender()));

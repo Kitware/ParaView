@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QtDebug>
 
+#include <cassert>
+
 class pqArrayListDomain::pqInternals
 {
 public:
@@ -68,7 +70,7 @@ pqArrayListDomain::pqArrayListDomain(QWidget* selectorWidget, const QString& qpr
   : Superclass(selectorWidget)
   , Internals(new pqInternals())
 {
-  Q_ASSERT(selectorWidget && proxy && smproperty && domain);
+  assert(selectorWidget && proxy && smproperty && domain);
 
   this->Internals->QProperty = qproperty;
   this->Internals->SMProxy = proxy;

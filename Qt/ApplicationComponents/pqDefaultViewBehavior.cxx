@@ -47,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCoreApplication>
 #include <QMessageBox>
 
+#include <cassert>
+
 namespace
 {
 QString openGLVersionInfo(vtkSMSession* session, vtkPVSession::ServerFlags server_flag)
@@ -153,7 +155,7 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
     if (server->proxyManager()->GetNumberOfProxies("layouts") == 0)
     {
       vtkSMProxy* vlayout = builder->createProxy("misc", "ViewLayout", server, "layouts");
-      Q_ASSERT(vlayout != NULL);
+      assert(vlayout != NULL);
       (void)vlayout;
     }
 

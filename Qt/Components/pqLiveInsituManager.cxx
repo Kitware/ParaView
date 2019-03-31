@@ -57,6 +57,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
+#include <cassert>
+
 //#define pqLiveInsituManagerDebugMacro(x) std::cerr << x << endl;
 #define pqLiveInsituManagerDebugMacro(x)
 
@@ -332,7 +334,7 @@ void pqLiveInsituManager::time(pqPipelineSource* pipelineSource, double* time, v
       vtkSMSession* session = pipelineSource->getSourceProxy()->GetSession();
       pqServer* insituSession = model->findServer(session);
       vtkSMLiveInsituLinkProxy* linkProxy = pqLiveInsituManager::linkProxy(insituSession);
-      Q_ASSERT(linkProxy);
+      assert(linkProxy);
       *timeStep = linkProxy->GetTimeStep();
     }
   }

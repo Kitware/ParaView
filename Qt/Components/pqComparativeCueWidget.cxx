@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMPropertyHelper.h"
 
+#include <cassert>
 #include <vector>
 
 namespace
@@ -340,12 +341,12 @@ void pqComparativeCueWidget::editRange()
               break;
 
             case HORZ_ONLY:
-              Q_ASSERT(range.columnCount() > 1);
+              assert(range.columnCount() > 1);
               scale_factor = xx * 1.0 / (range.columnCount() - 1);
               break;
 
             case VERT_ONLY:
-              Q_ASSERT(range.rowCount() > 1);
+              assert(range.rowCount() > 1);
               scale_factor = yy * 1.0 / (range.rowCount() - 1);
               break;
             default:

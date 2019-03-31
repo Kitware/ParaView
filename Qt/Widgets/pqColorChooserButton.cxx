@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // self includes
 #include "pqColorChooserButton.h"
 
+#include "cassert"
+
 // Qt includes
 #include <QColorDialog>
 #include <QPainter>
@@ -91,7 +93,7 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
 //-----------------------------------------------------------------------------
 void pqColorChooserButton::setChosenColorRgbF(const QVariantList& val)
 {
-  Q_ASSERT(val.size() == 3);
+  assert(val.size() == 3);
   QColor color;
   color.setRgbF(val[0].toDouble(), val[1].toDouble(), val[2].toDouble());
 
@@ -115,7 +117,7 @@ void pqColorChooserButton::setChosenColorRgbF(const QVariantList& val)
 //-----------------------------------------------------------------------------
 void pqColorChooserButton::setChosenColorRgbaF(const QVariantList& val)
 {
-  Q_ASSERT(val.size() == 4);
+  assert(val.size() == 4);
   QColor color;
   color.setRgbF(val[0].toDouble(), val[1].toDouble(), val[2].toDouble(), val[3].toDouble());
 

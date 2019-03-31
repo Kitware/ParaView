@@ -81,6 +81,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 
 #include <QStringList>
+
+#include <cassert>
 #include <set>
 
 const int pqSMAdaptor::metaId = qRegisterMetaType<QList<QList<QVariant> > >();
@@ -90,7 +92,7 @@ namespace
 template <class T>
 T* FindDomain(vtkSMProperty* prop)
 {
-  Q_ASSERT(prop != NULL);
+  assert(prop != NULL);
 
   vtkSmartPointer<vtkSMDomainIterator> iter;
   iter.TakeReference(prop->NewDomainIterator());
@@ -734,7 +736,7 @@ void pqSMAdaptor::setSelectionProperty(
   if (StringListDomain || StringDomain)
   {
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(Property);
-    Q_ASSERT(svp);
+    assert(svp);
     if (Type == CHECKED)
     {
       svp->SetElements(smValueStrings.GetPointer());
@@ -747,7 +749,7 @@ void pqSMAdaptor::setSelectionProperty(
   else if (EnumerationDomain)
   {
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(Property);
-    Q_ASSERT(ivp);
+    assert(ivp);
     smValueInts.push_back(0); // avoids need to check for size==0.
     if (Type == CHECKED)
     {

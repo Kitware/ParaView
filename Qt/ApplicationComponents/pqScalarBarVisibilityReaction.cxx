@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QMessageBox>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqScalarBarVisibilityReaction::pqScalarBarVisibilityReaction(
   QAction* parentObject, bool track_active_objects)
@@ -119,8 +121,8 @@ void pqScalarBarVisibilityReaction::setRepresentation(pqDataRepresentation* repr
 
   if (can_show_sb)
   {
-    Q_ASSERT(repr);
-    Q_ASSERT(view);
+    assert(repr);
+    assert(view);
 
     // get whether the scalar bar is currently shown.
     vtkSMProxy* sb = this->scalarBarProxy();

@@ -37,6 +37,8 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkView.h"
 
+#include <cassert>
+
 #define MULTI_SLICE_AXIS_THICKNESS 80
 #define MULTI_SLICE_AXIS_ACTIVE_SIZE 20
 #define MULTI_SLICE_AXIS_EDGE_MARGIN 10
@@ -168,7 +170,7 @@ void pqMultiSliceView::updateAxisBounds()
 {
   double bounds[6];
   vtkSMMultiSliceViewProxy* viewPxy = vtkSMMultiSliceViewProxy::SafeDownCast(this->getProxy());
-  Q_ASSERT(viewPxy);
+  assert(viewPxy);
 
   viewPxy->GetDataBounds(bounds);
   if (vtkMath::AreBoundsInitialized(bounds))
@@ -235,7 +237,7 @@ void pqMultiSliceView::onSliceAdded(int activeSliceIndex)
   QObject* aSender = this->sender();
   int axisIndex = this->getAxisIndex(aSender);
 
-  Q_ASSERT(axisIndex >= 0 && axisIndex <= 2);
+  assert(axisIndex >= 0 && axisIndex <= 2);
   this->updateSlices();
 
   // Notify that the slices location have changed
@@ -247,7 +249,7 @@ void pqMultiSliceView::onSliceRemoved(int activeSliceIndex)
 {
   QObject* aSender = this->sender();
   int axisIndex = this->getAxisIndex(aSender);
-  Q_ASSERT(axisIndex >= 0 && axisIndex <= 2);
+  assert(axisIndex >= 0 && axisIndex <= 2);
   this->updateSlices();
 
   // Notify that the slices location have changed
@@ -259,7 +261,7 @@ void pqMultiSliceView::onSliceModified(int activeSliceIndex)
 {
   QObject* aSender = this->sender();
   int axisIndex = this->getAxisIndex(aSender);
-  Q_ASSERT(axisIndex >= 0 && axisIndex <= 2);
+  assert(axisIndex >= 0 && axisIndex <= 2);
   this->updateSlices();
 
   // Notify that the slices location have changed

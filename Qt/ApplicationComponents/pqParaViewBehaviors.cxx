@@ -76,6 +76,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 #include <QSlider>
 
+#include <cassert>
+
 namespace
 {
 class WheelFilter : public QObject
@@ -88,7 +90,7 @@ public:
   ~WheelFilter() {}
   bool eventFilter(QObject* obj, QEvent* evt) override
   {
-    Q_ASSERT(obj && evt);
+    assert(obj && evt);
     if (obj->isWidgetType()) // shortcut to avoid doing work when not a widget.
     {
       QWidget* wdg = reinterpret_cast<QWidget*>(obj);

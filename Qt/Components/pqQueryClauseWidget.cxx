@@ -55,6 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 #include <QMap>
 
+#include <cassert>
+
 namespace
 {
 class SCOPED_BLOCK_SIGNALS
@@ -721,7 +723,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       }
       else
       {
-        Q_ASSERT(info.ComponentNo == 0 && info.NumberOfComponents == 1);
+        assert(info.ComponentNo == 0 && info.NumberOfComponents == 1);
         fieldName.append(info.ArrayName);
       }
       break;

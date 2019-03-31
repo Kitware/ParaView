@@ -82,6 +82,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMTrace.h"
 
+#include <cassert>
+
 #if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonSyntaxHighlighter.h"
 #endif
@@ -1031,7 +1033,7 @@ void pqAnimationViewWidget::createPythonTrack()
   BEGIN_UNDO_SET("Add Animation Track");
 
   pqAnimationCue* cue = this->Internal->Scene->createCue("PythonAnimationCue");
-  Q_ASSERT(cue != NULL);
+  assert(cue != NULL);
   (void)cue;
   END_UNDO_SET();
 #else

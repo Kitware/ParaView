@@ -36,15 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 
-#include <QStringList>
-#include <QTextStream>
-#include <sstream>
-
 #include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
+#include <QStringList>
+#include <QTextStream>
+
+#include <cassert>
+#include <sstream>
 
 #define SERVER_CONFIGURATION_DEFAULT_NAME "unknown"
 
@@ -66,7 +67,7 @@ pqServerConfiguration::pqServerConfiguration(vtkPVXMLElement* xml, int connectio
 //-----------------------------------------------------------------------------
 void pqServerConfiguration::constructor(vtkPVXMLElement* xml, int connectionTimeout)
 {
-  Q_ASSERT(xml && xml->GetName() && strcmp(xml->GetName(), "Server") == 0);
+  assert(xml && xml->GetName() && strcmp(xml->GetName(), "Server") == 0);
   this->XML = xml;
   this->ConnectionTimeout = connectionTimeout;
   this->Mutable = true;
@@ -638,7 +639,7 @@ void pqServerConfiguration::setStartupToCommand(
     startupElement->FindNestedElementByName(CommandXMLString.toUtf8().data());
 
   QStringList commandList = command_str.split(" ", QString::SkipEmptyParts);
-  Q_ASSERT(commandList.size() >= 1);
+  assert(commandList.size() >= 1);
 
   xmlCommand->SetAttribute("exec", commandList[0].toLocal8Bit().data());
   xmlCommand->SetAttribute("timeout", QString::number(timeout).toUtf8().data());

@@ -62,6 +62,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QtDebug>
 
+#include <cassert>
+
 class ModifiedLiveInsituLink : public vtkCommand
 {
 public:
@@ -142,7 +144,7 @@ public:
     if (itemType == pqPipelineModel::Link)
     {
       pqPipelineModelDataItem* proxyItem = model->getDataItem(object, NULL, pqPipelineModel::Proxy);
-      Q_ASSERT(proxyItem != 0);
+      assert(proxyItem != 0);
       proxyItem->Links.push_back(this);
     }
     if (this->Object)
@@ -186,7 +188,7 @@ public:
     {
       pqPipelineModelDataItem* proxyItem =
         this->Model->getDataItem(this->Object, NULL, pqPipelineModel::Proxy);
-      Q_ASSERT(proxyItem != 0);
+      assert(proxyItem != 0);
       proxyItem->Links.push_back(this);
     }
     foreach (pqPipelineModelDataItem* child, this->Children)
@@ -1298,7 +1300,7 @@ void pqPipelineModel::removeConnection(
   // Has a fan-in for sure.
   // Remove the link item under the source.
   pqPipelineModelDataItem* linkItem = this->getDataItem(sink, srcItem, pqPipelineModel::Link);
-  Q_ASSERT(linkItem != 0);
+  assert(linkItem != 0);
   this->removeChildFromParent(linkItem);
   delete linkItem;
 

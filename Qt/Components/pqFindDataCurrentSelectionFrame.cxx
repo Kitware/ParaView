@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 
+#include <cassert>
+
 class pqFindDataCurrentSelectionFrame::pqInternals
 {
   vtkSmartPointer<vtkSMProxy> RepresentationProxy;
@@ -103,14 +105,14 @@ public:
       return;
     }
 
-    Q_ASSERT(server != NULL);
+    assert(server != NULL);
 
     if (this->ViewProxy && this->ViewProxy->GetSession() != server->session())
     {
       this->deleteSpreadSheet();
     }
 
-    Q_ASSERT(this->ViewProxy == NULL || (this->ViewProxy->GetSession() == server->session()));
+    assert(this->ViewProxy == NULL || (this->ViewProxy->GetSession() == server->session()));
     if (!this->ViewProxy)
     {
       vtkSMSessionProxyManager* pxm = server->proxyManager();

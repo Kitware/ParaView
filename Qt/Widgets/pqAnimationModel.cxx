@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationModel.h"
 
+#include "assert.h"
+
 #include <QEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
@@ -42,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTrack.h"
 #include "pqCheckBoxPixMaps.h"
 
+#include <cassert>
 #include <iostream>
 
 pqAnimationModel::pqAnimationModel(QGraphicsView* p)
@@ -274,7 +277,7 @@ double pqAnimationModel::timeFromTick(int tick)
 {
   if (this->Mode == Custom)
   {
-    Q_ASSERT(tick <= this->CustomTicks.size());
+    assert(tick <= this->CustomTicks.size());
     return this->CustomTicks[tick];
   }
 

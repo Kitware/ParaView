@@ -82,6 +82,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include <cassert>
+
 #if VTK_MODULE_ENABLE_ParaView_pqPython
 #include "pqPythonSyntaxHighlighter.h"
 #endif
@@ -231,7 +233,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(
   }
   else if (arrayListDomain)
   {
-    Q_ASSERT(smProperty->GetRepeatable());
+    assert(smProperty->GetRepeatable());
 
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqArraySelectionWidget`.");
 

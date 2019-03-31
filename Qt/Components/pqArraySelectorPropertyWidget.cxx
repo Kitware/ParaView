@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalBlocker>
 #include <QVBoxLayout>
 
+#include <cassert>
+
 namespace
 {
 QIcon get_icon(int assoc)
@@ -99,7 +101,7 @@ public:
    */
   void updateDomain()
   {
-    Q_ASSERT(this->ComboBox && this->Domain);
+    assert(this->ComboBox && this->Domain);
     const QSignalBlocker blocker(this->ComboBox);
 
     auto combobox = this->ComboBox;
@@ -203,7 +205,7 @@ protected:
   void setServerManagerValue(bool use_unchecked, const QVariant& value) override
   {
     QList<QVariant> list = value.value<QList<QVariant> >();
-    Q_ASSERT(list.size() == 2);
+    assert(list.size() == 2);
 
     vtkSMPropertyHelper helper(this->propertySM());
     helper.SetUseUnchecked(use_unchecked);
@@ -244,7 +246,7 @@ pqArraySelectorPropertyWidget::pqArraySelectorPropertyWidget(
   internals.ComboBox = combobox;
 
   auto ald = smproperty->FindDomain<vtkSMArrayListDomain>();
-  Q_ASSERT(ald != nullptr);
+  assert(ald != nullptr);
 
   // update domain.
   internals.Domain = ald;
@@ -252,7 +254,7 @@ pqArraySelectorPropertyWidget::pqArraySelectorPropertyWidget(
   internals.VTKConnect->Connect(ald, vtkCommand::DomainModifiedEvent, this, SLOT(domainModified()));
 
   auto vproperty = vtkSMVectorProperty::SafeDownCast(smproperty);
-  Q_ASSERT(vproperty);
+  assert(vproperty);
 
   if (vproperty->GetNumberOfElements() == 2 || vproperty->GetNumberOfElements() == 5)
   {
@@ -294,7 +296,7 @@ QList<QVariant> pqArraySelectorPropertyWidget::array() const
 //-----------------------------------------------------------------------------
 void pqArraySelectorPropertyWidget::setArray(const QList<QVariant>& val)
 {
-  Q_ASSERT(val.size() == 2);
+  assert(val.size() == 2);
   this->setArray(val[0].toInt(), val[1].toString());
 }
 

@@ -59,6 +59,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QPointer>
 
+#include <cassert>
+
 class pqFindDataSelectionDisplayFrame::pqInternals
 {
   vtkSmartPointer<vtkSMProxy> FrustumWidget;
@@ -171,7 +173,7 @@ public:
     }
 
     pqDataRepresentation* repr = this->Port->getRepresentation(this->View);
-    Q_ASSERT(repr != NULL);
+    assert(repr != NULL);
 
     menu.addAction("ID")->setData(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS
         ? "vtkOriginalCellIds"
@@ -222,7 +224,7 @@ public:
   // Set the active representation  to label using the array mentioned.
   void labelBy(int fieldAssociation, QAction* action)
   {
-    Q_ASSERT(this->Port && this->View && this->Port->getRepresentation(this->View));
+    assert(this->Port && this->View && this->Port->getRepresentation(this->View));
     pqDataRepresentation* repr = this->Port->getRepresentation(this->View);
     vtkSMProxy* selectionProxy = repr->getProxy();
     vtkSMRenderViewProxy* viewProxy = vtkSMRenderViewProxy::SafeDownCast(this->View->getProxy());

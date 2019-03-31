@@ -67,6 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTabWidget>
 #include <QtDebug>
 
+#include <cassert>
+
 static const int PQTABBED_WIDGET_PIXMAP_SIZE = 16;
 //-----------------------------------------------------------------------------
 // ******************** pqTabWidget **********************
@@ -542,7 +544,7 @@ void pqTabbedMultiViewWidget::createTab(pqServer* server)
     BEGIN_UNDO_SET("Add View Tab");
     vtkSMProxy* vlayout = pqApplicationCore::instance()->getObjectBuilder()->createProxy(
       "misc", "ViewLayout", server, "layouts");
-    Q_ASSERT(vlayout != NULL);
+    assert(vlayout != NULL);
     (void)vlayout;
     END_UNDO_SET();
   }

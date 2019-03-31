@@ -78,7 +78,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QString>
 #include <QTextStream>
+
 #include <algorithm>
+#include <cassert>
 #include <set>
 
 namespace
@@ -315,8 +317,8 @@ public:
   bool setData(const QModelIndex& idx, const QVariant& value, int role = Qt::EditRole) override
   {
     Q_UNUSED(role);
-    Q_ASSERT(idx.row() < this->rowCount());
-    Q_ASSERT(idx.column() >= 0 && idx.column() < 4);
+    assert(idx.row() < this->rowCount());
+    assert(idx.column() >= 0 && idx.column() < 4);
     if (this->Items[idx.row()].setData(idx.column(), value))
     {
       emit this->dataChanged(idx, idx);

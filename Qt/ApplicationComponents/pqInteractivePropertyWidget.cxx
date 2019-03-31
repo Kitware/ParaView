@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
+#include <cassert>
+
 class pqInteractivePropertyWidget::pqInternals
 {
 public:
@@ -76,10 +78,10 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(const char* widget_smgr
   : Superclass(smproxy, parentObject)
   , Internals(new pqInteractivePropertyWidget::pqInternals())
 {
-  Q_ASSERT(widget_smgroup);
-  Q_ASSERT(widget_smname);
-  Q_ASSERT(smproxy);
-  Q_ASSERT(smgroup);
+  assert(widget_smgroup);
+  assert(widget_smname);
+  assert(smproxy);
+  assert(smgroup);
 
   BEGIN_UNDO_EXCLUDE();
 
@@ -110,7 +112,7 @@ pqInteractivePropertyWidget::pqInteractivePropertyWidget(const char* widget_smgr
                 << aProxy->GetClassName() << "'. Aborting for debugging purposes.";
     abort();
   }
-  Q_ASSERT(wdgProxy);
+  assert(wdgProxy);
 
   internals.WidgetProxy = wdgProxy;
 
@@ -247,7 +249,7 @@ void pqInteractivePropertyWidget::updateWidgetVisibility()
 {
   bool visible = this->isSelected() && this->isWidgetVisible() && this->view();
   vtkSMProxy* wdgProxy = this->widgetProxy();
-  Q_ASSERT(wdgProxy);
+  assert(wdgProxy);
 
   vtkSMPropertyHelper(wdgProxy, "Visibility", true).Set(visible);
   vtkSMPropertyHelper(wdgProxy, "Enabled", true).Set(visible);
@@ -309,8 +311,8 @@ void pqInteractivePropertyWidget::handleUserEvent(
   Q_UNUSED(caller);
   Q_UNUSED(eventid);
 
-  Q_ASSERT(caller == this->proxy());
-  Q_ASSERT(eventid == vtkCommand::UserEvent);
+  assert(caller == this->proxy());
+  assert(eventid == vtkCommand::UserEvent);
 
   const char* message = reinterpret_cast<const char*>(calldata);
   if (message != NULL && strcmp("HideWidget", message) == 0)

@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTableView.h"
 
+#include "cassert"
+
 #include <QAbstractItemModel>
 #include <QEvent>
 #include <QHeaderView>
@@ -169,7 +171,7 @@ QSize pqTableView::sizeHint() const
   }
 
   // rows can't be negative.
-  Q_ASSERT(rows >= 0);
+  assert(rows >= 0);
 
   int pixelsPerRow = this->sizeHintForRow(0);
   pixelsPerRow = qMax(pixelsPerRow, this->verticalHeader()->defaultSectionSize());

@@ -39,13 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVLogger.h"
 #include "vtkPVXMLElement.h"
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 pqPropertyWidgetDecorator::pqPropertyWidgetDecorator(
   vtkPVXMLElement* xmlConfig, pqPropertyWidget* parentObject)
   : Superclass(parentObject)
   , XML(xmlConfig)
 {
-  Q_ASSERT(parentObject);
+  assert(parentObject);
   parentObject->addDecorator(this);
 }
 

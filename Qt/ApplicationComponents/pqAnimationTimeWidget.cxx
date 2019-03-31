@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
+#include <cassert>
+
 class pqAnimationTimeWidget::pqInternals
 {
 public:
@@ -84,7 +86,7 @@ public:
 protected:
   QVariant currentServerManagerValue(bool use_unchecked) const override
   {
-    Q_ASSERT(use_unchecked == false);
+    assert(use_unchecked == false);
     Q_UNUSED(use_unchecked);
     unsigned int count = vtkSMPropertyHelper(this->propertySM()).GetNumberOfElements();
     return QVariant(static_cast<int>(count));
@@ -151,7 +153,7 @@ void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* ascene)
   // In a ParaView application, it's safe to assume that the timekeeper an
   // animation scene is using doesn't change in the life span of the scene.
   vtkSMProxy* atimekeeper = vtkSMPropertyHelper(ascene, "TimeKeeper").GetAsProxy();
-  Q_ASSERT(atimekeeper != NULL);
+  assert(atimekeeper != NULL);
 
   internals.Links.addPropertyLink<pqAnimationTimeWidgetLinks>(this, "timeStepCount",
     SIGNAL(dummySignal()), atimekeeper, atimekeeper->GetProperty("TimestepValues"));

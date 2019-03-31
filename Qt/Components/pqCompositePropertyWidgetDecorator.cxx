@@ -45,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <vector>
 
+#include <cassert>
+
 namespace
 {
 
@@ -173,7 +175,7 @@ pqCompositePropertyWidgetDecorator::pqCompositePropertyWidgetDecorator(
   : Superclass(xmlConfig, parentObject)
   , Internals(new pqCompositePropertyWidgetDecorator::pqInternals())
 {
-  Q_ASSERT(xmlConfig);
+  assert(xmlConfig);
 
   auto expressionXML = xmlConfig->FindNestedElementByName("Expression");
   this->Internals->Expression = this->Internals->Parse(expressionXML, this);

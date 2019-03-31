@@ -57,6 +57,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSortFilterProxyModel>
 #include <QVector>
 
+#include <cassert>
+
 //=============================================================================
 // QAbstractTableModel for showing the series properties. Since series
 // properties are specified on several different vtkSMProperty instances on the
@@ -165,7 +167,7 @@ public:
 
   QVariant data(const QModelIndex& idx, int role = Qt::DisplayRole) const override
   {
-    Q_ASSERT(idx.row() < this->Visibilities.size());
+    assert(idx.row() < this->Visibilities.size());
 #ifndef __APPLE__
     // On OSX, the default row-size ends up being reasonable. Hence, don't override it on OsX.
     if (role == Qt::SizeHintRole)
@@ -240,14 +242,14 @@ public:
     if (idx.column() == VISIBILITY && role == Qt::CheckStateRole)
     {
       bool checkState = (value.toInt() == Qt::Checked);
-      Q_ASSERT(idx.row() < this->Visibilities.size());
+      assert(idx.row() < this->Visibilities.size());
       this->Visibilities[idx.row()].second = checkState;
       emit this->dataChanged(idx, idx);
       return true;
     }
     else if (idx.column() == COLOR && role == Qt::EditRole)
     {
-      Q_ASSERT(idx.row() < this->Visibilities.size());
+      assert(idx.row() < this->Visibilities.size());
       if (value.canConvert(QVariant::Color))
       {
         this->Colors[this->Visibilities[idx.row()].first] = value.value<QColor>();
@@ -257,7 +259,7 @@ public:
     }
     else if (idx.column() == LABEL && role == Qt::EditRole)
     {
-      Q_ASSERT(idx.row() < this->Visibilities.size());
+      assert(idx.row() < this->Visibilities.size());
       this->Labels[this->Visibilities[idx.row()].first] = value.toString();
       emit this->dataChanged(idx, idx);
       return true;
@@ -958,7 +960,7 @@ void pqSeriesEditorPropertyWidget::savePropertiesWidgets()
   pqSeriesParametersModel& model = this->Internals->Model;
 
   QWidget* senderWidget = qobject_cast<QWidget*>(this->sender());
-  Q_ASSERT(senderWidget);
+  assert(senderWidget);
 
   QModelIndexList selectedIndexes = ui.SeriesTable->selectionModel()->selectedIndexes();
   foreach (QModelIndex selIdx, selectedIndexes)

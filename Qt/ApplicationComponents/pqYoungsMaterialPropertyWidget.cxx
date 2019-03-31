@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMap>
 
+#include <cassert>
+
 namespace
 {
 class pqYoungsMaterialPropertyLinksConnection : public pqPropertyLinksConnection
@@ -95,13 +97,13 @@ pqYoungsMaterialPropertyWidget::pqYoungsMaterialPropertyWidget(
   ui.setupUi(frame);
   this->layout()->addWidget(frame);
 
-  Q_ASSERT(smproxy != NULL);
-  Q_ASSERT(smgroup->GetProperty("VolumeFractionArrays"));
-  Q_ASSERT(smgroup->GetProperty("OrderingArrays"));
-  Q_ASSERT(smgroup->GetProperty("NormalArrays"));
+  assert(smproxy != NULL);
+  assert(smgroup->GetProperty("VolumeFractionArrays"));
+  assert(smgroup->GetProperty("OrderingArrays"));
+  assert(smgroup->GetProperty("NormalArrays"));
 
   QTreeWidget* volumeFractionArraysWidget = this->findChild<QTreeWidget*>("ArraySelectionWidget");
-  Q_ASSERT(volumeFractionArraysWidget);
+  assert(volumeFractionArraysWidget);
   internals.VolumeFractionArrays = volumeFractionArraysWidget;
 
   QObject::connect(volumeFractionArraysWidget,

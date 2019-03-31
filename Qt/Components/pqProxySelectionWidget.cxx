@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 
+#include <cassert>
+
 //-----------------------------------------------------------------------------
 class pqProxySelectionWidget::pqInternal
 {
@@ -118,7 +120,7 @@ pqProxySelectionWidget::pqProxySelectionWidget(
 
   // This widget is intended to be used for properties with ProxyListDomains
   // alone.
-  Q_ASSERT(this->Internal->Domain);
+  assert(this->Internal->Domain);
   this->connect(
     this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)), SLOT(currentIndexChanged(int)));
   new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, "proxy_list");

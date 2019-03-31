@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
+#include <cassert>
+
 namespace
 {
 static vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view)
@@ -78,7 +80,7 @@ static vtkSMSourceProxy* FindVisibleProducerWithChangeOfBasisMatrix(pqView* view
 void SafeSetAxisTitle(vtkSMProxy* gridAxis, const char* pname, const char* value)
 {
   vtkSMProperty* prop = gridAxis->GetProperty(pname);
-  Q_ASSERT(prop);
+  assert(prop);
 
   vtkSMPropertyHelper helper(prop);
 
@@ -131,7 +133,7 @@ void pqModelTransformSupportBehavior::viewAdded(pqView* view)
 void pqModelTransformSupportBehavior::viewUpdated()
 {
   pqView* view = qobject_cast<pqView*>(this->sender());
-  Q_ASSERT(view);
+  assert(view);
 
   // Check if there is any data source visible in the view that has a
   // ChangeOfBasisMatrix and BoundingBoxInModelCoordinates specified.

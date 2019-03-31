@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QSignalBlocker>
 
+#include <cassert>
+
 namespace
 {
 template <class L, class T>
@@ -103,7 +105,7 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
 
   vtkSMCompositeTreeDomain* ctd =
     vtkSMCompositeTreeDomain::SafeDownCast(smproperty->FindDomain("vtkSMCompositeTreeDomain"));
-  Q_ASSERT(ctd);
+  assert(ctd);
   this->Domain = ctd;
 
   this->VTKConnect->Connect(ctd, vtkCommand::DomainModifiedEvent, &this->Timer, SLOT(start()));
@@ -193,7 +195,7 @@ void pqCompositeTreePropertyWidget::domainModified()
 //-----------------------------------------------------------------------------
 QList<QVariant> pqCompositeTreePropertyWidget::values() const
 {
-  Q_ASSERT(this->Model && this->Property && this->Domain);
+  assert(this->Model && this->Property && this->Domain);
   switch (this->Domain->GetMode())
   {
     case vtkSMCompositeTreeDomain::ALL:
@@ -221,7 +223,7 @@ QList<QVariant> pqCompositeTreePropertyWidget::values() const
 //-----------------------------------------------------------------------------
 void pqCompositeTreePropertyWidget::setValues(const QList<QVariant>& values)
 {
-  Q_ASSERT(this->Model && this->Property && this->Domain);
+  assert(this->Model && this->Property && this->Domain);
   switch (this->Domain->GetMode())
   {
     case vtkSMCompositeTreeDomain::ALL:

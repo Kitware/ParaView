@@ -63,6 +63,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 #include <QtDebug>
 
+#include <cassert>
+
 class pqApplyBehavior::pqInternals
 {
 public:
@@ -85,7 +87,7 @@ pqApplyBehavior::~pqApplyBehavior()
 //-----------------------------------------------------------------------------
 void pqApplyBehavior::registerPanel(pqPropertiesPanel* panel)
 {
-  Q_ASSERT(panel);
+  assert(panel);
 
   this->connect(panel, SIGNAL(applied(pqProxy*)), SLOT(onApplied(pqProxy*)));
   this->connect(panel, SIGNAL(applied()), SLOT(onApplied()));
@@ -94,7 +96,7 @@ void pqApplyBehavior::registerPanel(pqPropertiesPanel* panel)
 //-----------------------------------------------------------------------------
 void pqApplyBehavior::unregisterPanel(pqPropertiesPanel* panel)
 {
-  Q_ASSERT(panel);
+  assert(panel);
   this->disconnect(panel);
 }
 
@@ -127,7 +129,7 @@ void pqApplyBehavior::applied(pqPropertiesPanel*, pqProxy* pqproxy)
     return;
   }
 
-  Q_ASSERT(pqsource);
+  assert(pqsource);
 
   if (pqsource->modifiedState() == pqProxy::UNINITIALIZED)
   {
@@ -294,7 +296,7 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
 
     // reset camera if this is the only visible dataset.
     pqView* pqPreferredView = smmodel->findItem<pqView*>(preferredView);
-    Q_ASSERT(pqPreferredView);
+    assert(pqPreferredView);
     if (preferredView != currentViewProxy)
     {
       // implying a new view was created, always reset that.
