@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChooseColorPresetReaction.h"
 #include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
+#include "pqDoubleLineEdit.h"
 #include "pqDoubleRangeDialog.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqPropertiesPanel.h"
@@ -739,13 +740,15 @@ bool pqColorAnnotationsPropertyWidget::pqInternals::updateAnnotations(
     {
       std::ostringstream str;
       str << vtkNumberToString()(val.ToDouble());
-      candidate_tuples.push_back(std::pair<QString, QString>(str.str().c_str(), str.str().c_str()));
+      candidate_tuples.push_back(std::make_pair(QString(str.str().c_str()),
+        pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(val.ToDouble())));
     }
     else if (val.IsFloat())
     {
       std::ostringstream str;
       str << vtkNumberToString()(val.ToFloat());
-      candidate_tuples.push_back(std::pair<QString, QString>(str.str().c_str(), str.str().c_str()));
+      candidate_tuples.push_back(std::make_pair(QString(str.str().c_str()),
+        pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(val.ToDouble())));
     }
     else
     {

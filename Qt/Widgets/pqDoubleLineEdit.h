@@ -117,12 +117,24 @@ public:
    */
   QString simplifiedText() const;
 
+  //@{
   /**
    * Return a double formatted according to a QTextStream::RealNumberNotation and number
    * of digits of precision.
    */
   static QString formatDouble(
     double value, QTextStream::RealNumberNotation notation, int precision);
+  static QString formatDouble(
+    double value, pqDoubleLineEdit::RealNumberNotation notation, int precision);
+  //@}
+
+  //@{
+  /**
+   * Return a double formatted according to the values set for global precision
+   * and notation.
+   */
+  static QString formatDoubleUsingGlobalPrecisionAndNotation(double value);
+  //@}
 
 public slots:
   /**
