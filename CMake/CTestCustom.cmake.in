@@ -10,7 +10,11 @@ list(APPEND CTEST_CUSTOM_WARNING_EXCEPTION
   "vtknvindex_utilities.h.*: warning C4996: 'getenv'"
 
   # Ignore protobuf-generated source file warnings.
-  "vtkPVMessage.pb.cc")
+  "vtkPVMessage.pb.cc"
+
+  # Unreachable code in xutility causes C4702 warnings in MSVC.
+  "xutility.*unreachable code"
+  )
 
 # Regular expression for excluding files from coverage testing
 list(APPEND CTEST_CUSTOM_COVERAGE_EXCLUDE
