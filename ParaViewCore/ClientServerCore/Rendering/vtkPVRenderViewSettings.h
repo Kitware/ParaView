@@ -56,6 +56,8 @@ public:
    */
   void SetResolveCoincidentTopology(int mode);
   void SetPolygonOffsetParameters(double factor, double units);
+  void SetLineOffsetParameters(double factor, double units);
+  void SetPointOffsetParameter(double units);
   void SetZShift(double a);
   //@}
 
