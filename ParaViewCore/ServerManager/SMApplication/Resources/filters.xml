@@ -7570,9 +7570,10 @@ array.
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetComputeScalars"
-                         default_values="0"
+                         default_values="1"
                          name="ComputeScalars"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, an array of scalars
         (containing the contour value) will be added to the output dataset. If
