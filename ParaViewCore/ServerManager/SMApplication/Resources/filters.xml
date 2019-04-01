@@ -17126,15 +17126,16 @@ Every Nth Point.
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
       </InputProperty>
-      <ProxyProperty command="SetPlane"
-                     name="Plane">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-        </ProxyListDomain>
-        <Documentation>This property sets the parameters of the plane
-        function.</Documentation>
-      </ProxyProperty>
+      <DoubleVectorProperty
+        command="SetPlane"
+        name="Plane"
+        number_of_elements="4"
+        default_values="1 0 0 0">
+        <Documentation>
+          This property sets the parameters of the plane function.
+          Specify the plane with its [a,b,c,d] Cartesian coefficients a.x + b.y + c.z = d
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty name="UseDualGrid"
                          command="SetDual"
                          default_values="0"
