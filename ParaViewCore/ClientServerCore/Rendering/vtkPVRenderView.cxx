@@ -470,7 +470,6 @@ vtkPVRenderView::vtkPVRenderView()
 
     this->RubberBandZoom = vtkInteractorStyleRubberBandZoom::New();
     this->RubberBandZoom->SetLockAspectToViewport(true);
-    this->RubberBandZoom->SetCenterAtStartPosition(true);
     this->RubberBandZoom->SetUseDollyForPerspectiveProjection(false);
     this->PolygonStyle = vtkInteractorStyleDrawPolygon::New();
     vtkCommand* observer3 =
