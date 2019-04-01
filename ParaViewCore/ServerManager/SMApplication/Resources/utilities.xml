@@ -1820,6 +1820,34 @@
         <Property name="ZAxisLabels" />
       </PropertyGroup>
 
+      <IntVectorProperty name="UseCustomBounds"
+                         command="SetUseCustomTransformedBounds"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If set, the axes will use explicitly specified bounds rather than using the bounds
+          computed from datasets currently visible in the view.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CustomBounds"
+                            command="SetCustomTransformedBounds"
+                            number_of_elements="6"
+                            default_values="0 1 0 1 0 1 0 1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify the explicit bounds to use when **UseCustomBounds** is checked.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="UseCustomBounds"
+                                   value="1"/>
+          <!-- show only when UseCustomBounds is true -->
+        </Hints>
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty name="DataScale"
                             command="SetDataScale"
                             number_of_elements="3"
@@ -1881,8 +1909,13 @@
                                    value="0"/>
           <!-- disable this when UseModelTransform is true -->
         </Hints>
-
       </DoubleVectorProperty>
+
+      <PropertyGroup label="Bounds">
+        <Property name="UseCustomBounds" />
+        <Property name="CustomBounds" />
+      </PropertyGroup>
+
       <PropertyGroup label="Data Transform">
         <Property name="DataScale" />
         <Property name="DataPosition" />

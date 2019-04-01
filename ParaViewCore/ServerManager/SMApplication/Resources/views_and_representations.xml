@@ -6522,6 +6522,10 @@
             <Property name="ZAxisUseCustomLabels" />
             <Property name="ZAxisLabels" />
           </PropertyGroup>
+          <PropertyGroup label="Bounds">
+            <Property name="UseCustomBounds" />
+            <Property name="CustomBounds" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of GridAxesRepresentation -->
