@@ -1353,7 +1353,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor">
+      <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
         <Property name="XTitleColor" function="Color"/>
         <Property name="XTitleFontFamily" function="Family"/>
         <Property name="XTitleFontFile" function="File"/>
@@ -1378,7 +1378,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor">
+      <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
         <Property name="YTitleColor" function="Color"/>
         <Property name="YTitleFontFamily" function="Family"/>
         <Property name="YTitleFontFile" function="File"/>
@@ -1403,7 +1403,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor">
+      <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
         <Property name="ZTitleColor" function="Color"/>
         <Property name="ZTitleFontFamily" function="Family"/>
         <Property name="ZTitleFontFile" function="File"/>
@@ -1582,7 +1582,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor">
+      <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
         <Property name="XLabelColor" function="Color"/>
         <Property name="XLabelFontFamily" function="Family"/>
         <Property name="XLabelFontFile" function="File"/>
@@ -1607,7 +1607,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor">
+      <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
         <Property name="YLabelColor" function="Color"/>
         <Property name="YLabelFontFamily" function="Family"/>
         <Property name="YLabelFontFile" function="File"/>
@@ -1632,7 +1632,7 @@
         </ExposedProperties>
       </SubProxy>
 
-      <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor">
+      <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
         <Property name="ZLabelColor" function="Color"/>
         <Property name="ZLabelFontFamily" function="Family"/>
         <Property name="ZLabelFontFile" function="File"/>
