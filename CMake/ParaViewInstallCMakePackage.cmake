@@ -31,7 +31,6 @@ set(paraview_cmake_module_files
   # Client API
   paraview_client_initializer.cxx.in
   paraview_client_initializer.h.in
-  paraview_launcher.c.in
   paraview_client_main.cxx.in
   ParaViewClient.cmake
   paraview_servermanager_convert_categoryindex.xsl
