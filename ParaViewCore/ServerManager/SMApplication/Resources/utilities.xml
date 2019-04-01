@@ -1840,11 +1840,15 @@
           Specify the explicit bounds to use when **UseCustomBounds** is checked.
         </Documentation>
         <Hints>
+          <!-- show only when UseCustomBounds is true -->
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
                                    property="UseCustomBounds"
                                    value="1"/>
-          <!-- show only when UseCustomBounds is true -->
+          <DoubleVectorPropertyWidget>
+            <!-- add buttons to reset using active bounds -->
+            <Button type="use_active_source_bounds" />
+          </DoubleVectorPropertyWidget>
         </Hints>
       </DoubleVectorProperty>
 
