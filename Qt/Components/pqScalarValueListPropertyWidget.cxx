@@ -407,6 +407,13 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(
   QObject::connect(ui.Remove, SIGNAL(clicked()), this, SLOT(remove()));
   QObject::connect(ui.RemoveAll, SIGNAL(clicked()), this, SLOT(removeAll()));
   QObject::connect(ui.Table, SIGNAL(editPastLastRow()), this, SLOT(editPastLastRow()));
+
+  // update `Remove` button enabled state based on selection.
+  ui.Remove->setEnabled(false);
+  QObject::connect(ui.Table->selectionModel(), &QItemSelectionModel::selectionChanged,
+    [&ui](const QItemSelection&, const QItemSelection&) {
+      ui.Remove->setEnabled(ui.Table->selectionModel()->selectedIndexes().size() > 0);
+    });
 }
 
 //-----------------------------------------------------------------------------
@@ -473,7 +480,9 @@ void pqScalarValueListPropertyWidget::remove()
 //-----------------------------------------------------------------------------
 void pqScalarValueListPropertyWidget::removeAll()
 {
-  this->Internals->Model.removeAll();
+  auto& internals = (*this->Internals);
+  internals.Ui.Table->selectionModel()->clear();
+  internals.Model.removeAll();
   emit this->scalarsChanged();
 }
 
