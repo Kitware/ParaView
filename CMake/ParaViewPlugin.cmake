@@ -577,10 +577,23 @@ function (paraview_add_plugin name)
       endforeach ()
     endif ()
 
+    if (WIN32)
+      set(_paraview_plugin_subdir "${_paraview_build_RUNTIME_DESTINATION}")
+    else ()
+      set(_paraview_plugin_subdir "${_paraview_build_LIBRARY_DESTINATION}")
+    endif ()
+    if (DEFINED _paraview_build_LIBRARY_SUBDIRECTORY)
+      string(APPEND _paraview_plugin_subdir "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
+    endif ()
+    string(APPEND _paraview_plugin_subdir "/${_paraview_build_plugin}")
+
     vtk_module_build(
       MODULES             ${plugin_modules}
       PACKAGE             "${_paraview_build_plugin}"
       INSTALL_HEADERS     OFF
+      ARCHIVE_DESTINATION "${_paraview_plugin_subdir}"
+      LIBRARY_DESTINATION "${_paraview_plugin_subdir}"
+      RUNTIME_DESTINATION "${_paraview_plugin_subdir}"
       ${_paraview_add_plugin_MODULE_ARGS})
   endif ()
 
