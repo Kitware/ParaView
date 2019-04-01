@@ -292,3 +292,17 @@ QString pqDoubleLineEdit::formatDouble(
 
   return text;
 }
+
+//-----------------------------------------------------------------------------
+QString pqDoubleLineEdit::formatDouble(
+  double value, pqDoubleLineEdit::RealNumberNotation notation, int precision)
+{
+  return pqDoubleLineEdit::formatDouble(value, toTextStreamNotation(notation), precision);
+}
+
+//-----------------------------------------------------------------------------
+QString pqDoubleLineEdit::formatDoubleUsingGlobalPrecisionAndNotation(double value)
+{
+  return pqDoubleLineEdit::formatDouble(
+    value, pqDoubleLineEdit::globalNotation(), pqDoubleLineEdit::globalPrecision());
+}

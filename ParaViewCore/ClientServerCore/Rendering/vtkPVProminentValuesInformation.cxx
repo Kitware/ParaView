@@ -293,44 +293,23 @@ void vtkPVProminentValuesInformation::CopyFromLeafDataObject(vtkDataObject* dobj
     return;
   }
 
-  vtkAbstractArray* array = 0;
-  vtkFieldData* fieldData;
-  int fieldAssoc = vtkDataObject::GetAssociationTypeFromString(this->FieldAssociation);
-  vtkDataSet* dset = vtkDataSet::SafeDownCast(dobj);
-  vtkGraph* graph = vtkGraph::SafeDownCast(dobj);
-  vtkTable* table = vtkTable::SafeDownCast(dobj);
+  vtkFieldData* fieldData = nullptr;
+  const int fieldAssoc = vtkDataObject::GetAssociationTypeFromString(this->FieldAssociation);
   switch (fieldAssoc)
   {
-    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-      fieldData = dset ? dset->GetPointData() : 0;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-      fieldData = dset ? dset->GetCellData() : 0;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_NONE:
-      fieldData = dset ? dset->GetFieldData() : 0;
-      break;
     case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
-      fieldData = dset ? dset->GetPointData() : 0;
-      array = fieldData ? fieldData->GetAbstractArray(this->FieldName) : 0;
-      fieldData = dset ? dset->GetCellData() : 0;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-      fieldData = graph ? graph->GetVertexData() : 0;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      fieldData = graph ? graph->GetEdgeData() : 0;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      fieldData = table ? table->GetRowData() : 0;
+      // try points first, then cells.
+      fieldData = dobj->GetAttributesAsFieldData(vtkDataObject::FIELD_ASSOCIATION_POINTS);
+      if (fieldData == nullptr || fieldData->GetAbstractArray(this->FieldName) == nullptr)
+      {
+        fieldData = dobj->GetAttributesAsFieldData(vtkDataObject::FIELD_ASSOCIATION_CELLS);
+      }
       break;
     default:
-      fieldData = 0;
-      array = 0;
+      fieldData = dobj->GetAttributesAsFieldData(fieldAssoc);
       break;
   }
-  array = array ? array : (fieldData ? fieldData->GetAbstractArray(this->FieldName) : 0);
-  if (array)
+  if (auto array = fieldData ? fieldData->GetAbstractArray(this->FieldName) : nullptr)
   {
     this->CopyDistinctValuesFromObject(array);
   }
