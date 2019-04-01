@@ -6431,7 +6431,7 @@
             <Property name="YTitle"/>
             <Property name="ZTitle"/>
           </PropertyGroup>
-          <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor">
+          <PropertyGroup label="X Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
             <Property name="XTitleColor" function="Color"/>
             <Property name="XTitleFontFamily" function="Family"/>
             <Property name="XTitleFontFile" function="File"/>
@@ -6441,7 +6441,7 @@
             <Property name="XTitleShadow" function="Shadow" />
             <Property name="XTitleOpacity" function="Opacity" />
           </PropertyGroup>
-          <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor">
+          <PropertyGroup label="Y Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
             <Property name="YTitleColor" function="Color"/>
             <Property name="YTitleFontFamily" function="Family"/>
             <Property name="YTitleFontFile" function="File"/>
@@ -6451,7 +6451,7 @@
             <Property name="YTitleShadow" function="Shadow" />
             <Property name="YTitleOpacity" function="Opacity" />
           </PropertyGroup>
-          <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor">
+          <PropertyGroup label="Z Title Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
             <Property name="ZTitleColor" function="Color"/>
             <Property name="ZTitleFontFamily" function="Family"/>
             <Property name="ZTitleFontFile" function="File"/>
@@ -6474,7 +6474,7 @@
             <Property name="LabelUniqueEdgesOnly" />
             <Property name="AxesToLabel" />
           </PropertyGroup>
-          <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor">
+          <PropertyGroup label="X Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
             <Property name="XLabelColor" function="Color"/>
             <Property name="XLabelFontFamily" function="Family"/>
             <Property name="XLabelFontFile" function="File"/>
@@ -6484,7 +6484,7 @@
             <Property name="XLabelShadow" function="Shadow" />
             <Property name="XLabelOpacity" function="Opacity" />
           </PropertyGroup>
-          <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor">
+          <PropertyGroup label="Y Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
             <Property name="YLabelColor" function="Color"/>
             <Property name="YLabelFontFamily" function="Family"/>
             <Property name="YLabelFontFile" function="File"/>
@@ -6494,7 +6494,7 @@
             <Property name="YLabelShadow" function="Shadow" />
             <Property name="YLabelOpacity" function="Opacity" />
           </PropertyGroup>
-          <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor">
+          <PropertyGroup label="Z Axis Label Font Properties" panel_widget="FontEditor" panel_visibility="advanced">
             <Property name="ZLabelColor" function="Color"/>
             <Property name="ZLabelFontFamily" function="Family"/>
             <Property name="ZLabelFontFile" function="File"/>
@@ -6521,6 +6521,10 @@
             <Property name="ZAxisPrecision" />
             <Property name="ZAxisUseCustomLabels" />
             <Property name="ZAxisLabels" />
+          </PropertyGroup>
+          <PropertyGroup label="Bounds">
+            <Property name="UseCustomBounds" />
+            <Property name="CustomBounds" />
           </PropertyGroup>
         </ExposedProperties>
       </SubProxy>

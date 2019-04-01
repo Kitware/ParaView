@@ -66,6 +66,16 @@ protected slots:
   void scaleTwice();
   void scale(double);
 
+  /**
+   * sets the value using active source's data bounds.
+   */
+  void resetToActiveDataBounds();
+
+  /**
+   * sets the value to the specified bounds.
+   */
+  void resetToBounds(const double bds[6]);
+
 private:
   Q_DISABLE_COPY(pqDoubleVectorPropertyWidget)
 };
