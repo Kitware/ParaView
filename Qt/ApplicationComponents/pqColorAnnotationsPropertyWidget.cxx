@@ -994,9 +994,11 @@ void pqColorAnnotationsPropertyWidget::setIndexedOpacities(const QList<QVariant>
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::addAnnotation()
 {
-  QModelIndex idx =
-    this->Internals->Model.addAnnotation(this->Internals->Ui.AnnotationsTable->currentIndex());
-  this->Internals->Ui.AnnotationsTable->setCurrentIndex(idx);
+  auto& internals = (*this->Internals);
+  QModelIndex idx = internals.Model.addAnnotation(internals.Ui.AnnotationsTable->currentIndex());
+  // now select the newly added item.
+  internals.Ui.AnnotationsTable->selectionModel()->setCurrentIndex(
+    idx, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
   emit this->annotationsChanged();
 }
 
@@ -1010,15 +1012,16 @@ void pqColorAnnotationsPropertyWidget::editPastLastRow()
 //-----------------------------------------------------------------------------
 void pqColorAnnotationsPropertyWidget::removeAnnotation()
 {
-  QModelIndexList indexes =
-    this->Internals->Ui.AnnotationsTable->selectionModel()->selectedIndexes();
+  auto& internals = (*this->Internals);
+  QModelIndexList indexes = internals.Ui.AnnotationsTable->selectionModel()->selectedIndexes();
   if (indexes.size() == 0)
   {
     // Nothing selected. Nothing to remove
     return;
   }
-  QModelIndex idx = this->Internals->Model.removeAnnotations(indexes);
-  this->Internals->Ui.AnnotationsTable->setCurrentIndex(idx);
+  QModelIndex idx = internals.Model.removeAnnotations(indexes);
+  internals.Ui.AnnotationsTable->selectionModel()->setCurrentIndex(
+    idx, QItemSelectionModel::Rows | QItemSelectionModel::ClearAndSelect);
   emit this->annotationsChanged();
 }
 
