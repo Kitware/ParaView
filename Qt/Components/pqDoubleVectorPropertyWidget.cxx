@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMUncheckedPropertyHelper.h"
+#include "vtkSmartPointer.h"
 
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
@@ -79,7 +80,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   }
 
   // find the domain
-  vtkSMDoubleRangeDomain* defaultDomain = nullptr;
+  vtkSmartPointer<vtkSMDoubleRangeDomain> defaultDomain;
 
   vtkSMDomain* domain = nullptr;
   vtkSMDomainIterator* domainIter = dvp->NewDomainIterator();
@@ -91,7 +92,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
 
   if (!domain)
   {
-    defaultDomain = vtkSMDoubleRangeDomain::New();
+    defaultDomain = vtkSmartPointer<vtkSMDoubleRangeDomain>::New();
     domain = defaultDomain;
   }
 
@@ -319,10 +320,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     resetButton->connect(this, SIGNAL(clearHighlight()), SLOT(clear()));
 
     layoutLocal->addWidget(resetButton, 0, Qt::AlignBottom);
-  }
-  if (defaultDomain)
-  {
-    defaultDomain->Delete();
   }
 }
 
