@@ -16923,23 +16923,13 @@ Every Nth Point.
                                    value="0" />
         </Hints>
       </IntVectorProperty>
-      <DoubleVectorProperty name="MinimumBoxCorner"
-                            command="SetMinimumBounds"
-                            number_of_elements="3"
-                            default_values="-0.5 -0.5 -0.5">
-        <Documentation>Defines the most negative point of the clip box.</Documentation>
-        <Hints>
-          <PropertyWidgetDecorator type="GenericDecorator"
-                                   mode="visibility"
-                                   property="ClipType"
-                                   value="1" />
-        </Hints>
-      </DoubleVectorProperty>
-      <DoubleVectorProperty name="MaximumBoxCorner"
-                            command="SetMaximumBounds"
-                            number_of_elements="3"
-                            default_values="0.5 0.5 0.5">
-        <Documentation>Defines the most positive point of the clip box.</Documentation>
+      <DoubleVectorProperty name="Bounds"
+                            command="SetBounds"
+                            number_of_elements="6"
+                            default_values="-0.5 0.5 -0.5 0.5 -0.5 0.5">
+        <Documentation>
+          Defines the bounds (minX, maxX, minY, maxY, minZ, maxZ) of the clip box.
+        </Documentation>
         <Hints>
           <PropertyWidgetDecorator type="GenericDecorator"
                                    mode="visibility"
@@ -16950,7 +16940,7 @@ Every Nth Point.
       <DoubleVectorProperty name="QuadricCoefficients"
                             command="SetQuadricCoefficients"
                             number_of_elements="10"
-                            default_values="1. 1. 1. 0. 0. 0. 0. 0. 0. -1.">
+                            default_values="1 1 1 0 0 0 0 0 0 -1">
         <Documentation>
           Coefficients of the quadric function, defined as the 'a' values in:
           F(x,y,z) = a0*x^2 + a1*y^2 + a2*z^2 + a3*x*y + a4*y*z + a5*x*z + a6*x + a7*y + a8*z + a9
@@ -17137,15 +17127,16 @@ Every Nth Point.
           <DataType value="vtkHyperTreeGrid" />
         </DataTypeDomain>
       </InputProperty>
-      <ProxyProperty command="SetPlane"
-                     name="Plane">
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="implicit_functions"
-                 name="Plane" />
-        </ProxyListDomain>
-        <Documentation>This property sets the parameters of the plane
-        function.</Documentation>
-      </ProxyProperty>
+      <DoubleVectorProperty
+        command="SetPlane"
+        name="Plane"
+        number_of_elements="4"
+        default_values="1 0 0 0">
+        <Documentation>
+          This property sets the parameters of the plane function.
+          Specify the plane with its [a,b,c,d] Cartesian coefficients a.x + b.y + c.z = d
+        </Documentation>
+      </DoubleVectorProperty>
       <IntVectorProperty name="UseDualGrid"
                          command="SetDual"
                          default_values="0"
