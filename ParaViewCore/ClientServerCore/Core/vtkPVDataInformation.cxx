@@ -66,20 +66,6 @@ std::map<std::string, std::string> helpers;
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
 {
-  this->CompositeDataSetType = -1;
-  this->DataSetType = -1;
-  this->NumberOfPoints = 0;
-  this->NumberOfCells = 0;
-  this->NumberOfRows = 0;
-  this->NumberOfTrees = 0;
-  this->NumberOfVertices = 0;
-  this->NumberOfLeaves = 0;
-  this->MemorySize = 0;
-  this->PolygonCount = 0;
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_INT_MAX;
-  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_INT_MAX;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
   this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
@@ -88,19 +74,6 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->RowDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
   this->PointArrayInformation = vtkPVArrayInformation::New();
-
-  this->DataClassName = nullptr;
-  this->CompositeDataClassName = nullptr;
-  this->CompositeDataSetName = nullptr;
-  this->NumberOfDataSets = 0;
-  this->TimeSpan[0] = VTK_DOUBLE_MAX;
-  this->TimeSpan[1] = -VTK_DOUBLE_MAX;
-  this->HasTime = 0;
-  this->Time = 0.0;
-  this->NumberOfTimeSteps = 0;
-  this->TimeLabel = nullptr;
-
-  this->PortNumber = -1;
 
   // Update field association information on the all the
   // vtkPVDataSetAttributesInformation instances.
