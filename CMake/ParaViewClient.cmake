@@ -731,7 +731,7 @@ function (paraview_client_generate_help)
 
   if (NOT DEFINED _paraview_client_help_OUTPUT_DIR)
     set(_paraview_client_help_OUTPUT_DIR
-      "${CMAKE_CURRENT_BINARY_DIR}")
+      "${CMAKE_CURRENT_BINARY_DIR}/paraview_help")
   endif ()
 
   if (NOT DEFINED _paraview_client_help_NAMESPACE)
