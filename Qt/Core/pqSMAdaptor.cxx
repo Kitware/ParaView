@@ -85,8 +85,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <set>
 
-const int pqSMAdaptor::metaId = qRegisterMetaType<QList<QList<QVariant> > >();
-
 namespace
 {
 template <class T>

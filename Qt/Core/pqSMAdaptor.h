@@ -44,8 +44,6 @@ class vtkObject;
 #include <QPair>
 #include <QVariant>
 
-Q_DECLARE_METATYPE(QList<QList<QVariant> >)
-
 /**
 * Translates server manager events into Qt-compatible slots and signals
 */
@@ -55,9 +53,6 @@ protected:
   // class not instantiated
   pqSMAdaptor();
   ~pqSMAdaptor();
-
-private:
-  static const int metaId;
 
 public:
   /**
