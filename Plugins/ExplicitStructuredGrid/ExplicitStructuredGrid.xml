@@ -1,0 +1,205 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExplicitStructuredGridGeneratorSource"
+                 label="Explicit Structured Grid Generator Source"
+                 name="ExplicitUnstructuredGeneratorSource">
+      <Documentation long_help="Generate reservoir grids described as VTK unstructured grids.">
+      </Documentation>
+      <IntVectorProperty command="SetGeneratorMode"
+                         default_values="2"
+                         name="GeneratorMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Pillar" value="0" />
+          <Entry text="Discontinuous" value="1" />
+          <Entry text="Continuous" value="2" />
+          <Entry text="Steps" value="3" />
+          <Entry text="Pyramid" value="4" />
+        </EnumerationDomain>
+        <Documentation>This property set the generator to use.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetDataExtent"
+                         default_values="0 50 0 50 0 50"
+                         name="DataExtent"
+                         number_of_elements="6"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" />
+        <Documentation>The whole grid extent to generate.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPyramidStepSize"
+                         default_values="10"
+                         name="PyramidStepSize"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" />
+        <Documentation>The pyramid or step size.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetNumberOfTimeSteps"
+                         default_values="20"
+                         name="NumberOfTimeSteps"
+                         number_of_elements="1"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" />
+        <Documentation>The number of generated time steps.</Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy name="ExplicitStructuredGridCrop"
+                 class="vtkExplicitStructuredGridCrop"
+                 label="ExplicitStructuredGrid Crop">
+      <Documentation long_help="Efficiently extract a volume of interest from a 3d explicit structured grid."
+                     short_help="Extract a volume of interest.">
+        The Crop filter extracts a volume of interest from a 3D explicit structured
+        grid by allowing the user to specify the minimum and maximum extents of each
+        dimension of the data. Both the input and output of this filter are explicit
+        structured grids.
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkExplicitStructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetOutputWholeExtent"
+                         default_values="0 0 0 0 0 0"
+                         name="OutputWholeExtent"
+                         number_of_elements="6">
+        <ExtentDomain name="extent">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ExtentDomain>
+        <Documentation>
+          This property gives the minimum and maximum point index
+          (extent) in each dimension for the output dataset.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="ExplicitStructuredGridToUnstructuredGrid"
+                 class="vtkExplicitStructuredGridToUnstructuredGrid"
+                 label="ExplicitStructuredGrid To UnstructuredGrid">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkExplicitStructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <SourceProxy name="ImageDataToExplicitStructuredGrid"
+                 class="vtkImageDataToExplicitStructuredGrid"
+                 label="ImageData To ExplicitStructuredGrid">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="UnstructuredGridToExplicitStructuredGrid"
+                 class="vtkUnstructuredGridToExplicitStructuredGrid"
+                 label="UnstructuredGrid To ExplicitStructuredGrid">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="cell"
+                          name="input_array"
+                          number_of_components="1"/>
+        <Documentation>This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="0;0;0;0;BLOCK_I"
+                            element_types="0 0 0 0 2"
+                            label="I Array"
+                            name="iArray"
+                            number_of_elements="5">
+        <ArrayListDomain input_domain_name="input_array"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="1;0;0;0;BLOCK_J"
+                            element_types="0 0 0 0 2"
+                            label="J Array"
+                            name="jArray"
+                            number_of_elements="5">
+        <ArrayListDomain input_domain_name="input_array"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values_delimiter=";"
+                            default_values="2;0;0;0;BLOCK_K"
+                            element_types="0 0 0 0 2"
+                            label="K Array"
+                            name="kArray"
+                            number_of_elements="5">
+        <ArrayListDomain input_domain_name="input_array"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetWholeExtent"
+                         default_values="0 -1 0 -1 0 -1"
+                         name="WholeExtent"
+                         number_of_elements="6">
+        <Documentation>
+          This property gives the minimum and maximum point index
+          (extent) in each dimension for the output dataset.
+        </Documentation>
+      </IntVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

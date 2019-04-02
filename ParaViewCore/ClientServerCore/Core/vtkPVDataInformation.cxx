@@ -27,6 +27,7 @@
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkExecutive.h"
+#include "vtkExplicitStructuredGrid.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGraph.h"
 #include "vtkHyperTreeGrid.h"
@@ -65,20 +66,6 @@ std::map<std::string, std::string> helpers;
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
 {
-  this->CompositeDataSetType = -1;
-  this->DataSetType = -1;
-  this->NumberOfPoints = 0;
-  this->NumberOfCells = 0;
-  this->NumberOfRows = 0;
-  this->NumberOfTrees = 0;
-  this->NumberOfVertices = 0;
-  this->NumberOfLeaves = 0;
-  this->MemorySize = 0;
-  this->PolygonCount = 0;
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_INT_MAX;
-  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_INT_MAX;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
   this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
@@ -87,19 +74,6 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->RowDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
   this->PointArrayInformation = vtkPVArrayInformation::New();
-
-  this->DataClassName = nullptr;
-  this->CompositeDataClassName = nullptr;
-  this->CompositeDataSetName = nullptr;
-  this->NumberOfDataSets = 0;
-  this->TimeSpan[0] = VTK_DOUBLE_MAX;
-  this->TimeSpan[1] = -VTK_DOUBLE_MAX;
-  this->HasTime = 0;
-  this->Time = 0.0;
-  this->NumberOfTimeSteps = 0;
-  this->TimeLabel = nullptr;
-
-  this->PortNumber = -1;
 
   // Update field association information on the all the
   // vtkPVDataSetAttributesInformation instances.
@@ -517,6 +491,9 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
       break;
     case VTK_STRUCTURED_GRID:
       ext = static_cast<vtkStructuredGrid*>(data)->GetExtent();
+      break;
+    case VTK_EXPLICIT_STRUCTURED_GRID:
+      ext = static_cast<vtkExplicitStructuredGrid*>(data)->GetExtent();
       break;
     case VTK_RECTILINEAR_GRID:
       ext = static_cast<vtkRectilinearGrid*>(data)->GetExtent();
@@ -1180,6 +1157,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Multi-piece Dataset";
     case VTK_DIRECTED_ACYCLIC_GRAPH:
       return "Directed Acyclic Graph";
+    case VTK_EXPLICIT_STRUCTURED_GRID:
+      return "Explicit Structured Grid";
     case VTK_MOLECULE:
       return "Molecule";
     case VTK_PARTITIONED_DATA_SET:
@@ -1225,7 +1204,8 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
   { // Every type is of type vtkDataObject.
     if (this->DataSetType == VTK_POLY_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
       this->DataSetType == VTK_UNSTRUCTURED_GRID || this->DataSetType == VTK_IMAGE_DATA ||
-      this->DataSetType == VTK_RECTILINEAR_GRID || this->DataSetType == VTK_UNSTRUCTURED_GRID ||
+      this->DataSetType == VTK_RECTILINEAR_GRID ||
+      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID ||
       this->DataSetType == VTK_HYPER_TREE_GRID || this->DataSetType == VTK_STRUCTURED_POINTS)
     {
       return true;
@@ -1238,7 +1218,8 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
   if (strcmp(type, "vtkPointSet") == 0)
   {
     if (this->DataSetType == VTK_POLY_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
-      this->DataSetType == VTK_UNSTRUCTURED_GRID)
+      this->DataSetType == VTK_UNSTRUCTURED_GRID ||
+      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID)
     {
       return true;
     }
@@ -1246,7 +1227,8 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
   if (strcmp(type, "vtkStructuredData") == 0)
   {
     if (this->DataSetType == VTK_IMAGE_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
-      this->DataSetType == VTK_RECTILINEAR_GRID)
+      this->DataSetType == VTK_RECTILINEAR_GRID ||
+      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID)
     {
       return true;
     }
@@ -1279,6 +1261,7 @@ bool vtkPVDataInformation::IsDataStructured()
   {
     case VTK_IMAGE_DATA:
     case VTK_STRUCTURED_GRID:
+    case VTK_EXPLICIT_STRUCTURED_GRID:
     case VTK_RECTILINEAR_GRID:
     case VTK_UNIFORM_GRID:
     case VTK_GENERIC_DATA_SET:

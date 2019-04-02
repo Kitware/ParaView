@@ -28,6 +28,7 @@
 class vtkCallbackCommand;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
+class vtkExplicitStructuredGrid;
 class vtkFeatureEdges;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
@@ -269,6 +270,9 @@ protected:
   void PolyDataExecute(vtkPolyData* input, vtkPolyData* output, int doCommunicate);
 
   void HyperTreeGridExecute(vtkHyperTreeGrid* input, vtkPolyData* output, int doCommunicate);
+
+  void ExplicitStructuredGridExecute(
+    vtkExplicitStructuredGrid* input, vtkPolyData* out, int doCommunicate, const int* wholeExtent);
 
   /**
    * Cleans up the output polydata. If doCommunicate is true the method is free

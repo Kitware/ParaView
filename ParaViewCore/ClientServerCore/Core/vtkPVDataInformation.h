@@ -316,34 +316,36 @@ protected:
   static vtkPVDataInformationHelper* FindHelper(const char* classname);
 
   // Data information collected from remote processes.
-  int DataSetType;
-  int CompositeDataSetType;
-  int NumberOfDataSets;
-  vtkTypeInt64 NumberOfPoints; // data sets
-  vtkTypeInt64 NumberOfCells;
-  vtkTypeInt64 NumberOfRows;  // tables
-  vtkTypeInt64 NumberOfTrees; // hypertreegrids
-  vtkTypeInt64 NumberOfVertices;
-  vtkTypeInt64 NumberOfLeaves;
-  int MemorySize;
-  vtkIdType PolygonCount;
-  double Bounds[6];
-  int Extent[6];
-  double TimeSpan[2];
-  double Time;
-  int HasTime;
-  int NumberOfTimeSteps;
+  int DataSetType = -1;
+  int CompositeDataSetType = -1;
+  int NumberOfDataSets = 0;
+  vtkTypeInt64 NumberOfPoints = 0; // data sets
+  vtkTypeInt64 NumberOfCells = 0;
+  vtkTypeInt64 NumberOfRows = 0;  // tables
+  vtkTypeInt64 NumberOfTrees = 0; // hypertreegrids
+  vtkTypeInt64 NumberOfVertices = 0;
+  vtkTypeInt64 NumberOfLeaves = 0;
+  int MemorySize = 0;
+  vtkIdType PolygonCount = 0;
+  double Bounds[6] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX, VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX,
+    VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
+  int Extent[6] = { VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX, -VTK_INT_MAX, VTK_INT_MAX,
+    -VTK_INT_MAX };
+  double TimeSpan[2] = { VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX };
+  double Time = 0.0;
+  int HasTime = 0;
+  int NumberOfTimeSteps = 0;
 
-  char* DataClassName;
+  char* DataClassName = nullptr;
   vtkSetStringMacro(DataClassName);
 
-  char* TimeLabel;
+  char* TimeLabel = nullptr;
   vtkSetStringMacro(TimeLabel);
 
-  char* CompositeDataClassName;
+  char* CompositeDataClassName = nullptr;
   vtkSetStringMacro(CompositeDataClassName);
 
-  char* CompositeDataSetName;
+  char* CompositeDataSetName = nullptr;
   vtkSetStringMacro(CompositeDataSetName);
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
@@ -364,7 +366,7 @@ private:
   vtkPVDataInformation(const vtkPVDataInformation&) = delete;
   void operator=(const vtkPVDataInformation&) = delete;
 
-  int PortNumber;
+  int PortNumber = -1;
 };
 
 #endif
