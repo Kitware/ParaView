@@ -489,8 +489,9 @@ paraview_add_plugin(<name>
     before the plugin is initialized at runtime.
   * `XML_DOCUMENTATION`: (Defaults to `ON`) If set, documentation will be
     generated for the associated XML files.
-  * `DOCUMENTATION_DIR`: (Defaults to `${CMAKE_CURRENT_SOURCE_DIR}`) Where to
-    look for documentation files.
+  * `DOCUMENTATION_DIR`: If specified, `*.html`, `*.css`, `*.png`, and `*.jpg`
+    files in this directory will be copied and made available to the
+    documentation.
   * `EXPORT`: If provided, the plugin will be added to the given export set.
 #]==]
 function (paraview_add_plugin name)
@@ -521,10 +522,8 @@ function (paraview_add_plugin name)
     set(_paraview_add_plugin_XML_DOCUMENTATION ON)
   endif ()
 
-  if (NOT DEFINED _paraview_add_plugin_DOCUMENTATION_DIR)
-    set(_paraview_add_plugin_DOCUMENTATION_DIR
-      "${CMAKE_CURRENT_SOURCE_DIR}")
-  elseif (NOT _paraview_add_plugin_XML_DOCUMENTATION)
+  if (DEFINED _paraview_add_plugin_DOCUMENTATION_DIR AND
+      NOT _paraview_add_plugin_XML_DOCUMENTATION)
     message(FATAL_ERROR
       "Specifying `DOCUMENTATION_DIR` and turning off `XML_DOCUMENTATION` "
       "makes no sense.")
@@ -641,10 +640,17 @@ function (paraview_add_plugin name)
       TARGET  "${_paraview_build_plugin}_doc"
       XMLS    ${_paraview_add_plugin_module_xmls}
               ${_paraview_add_plugin_xmls})
+
+    set(_paraview_build_plugin_doc_source_args)
+    if (DEFINED _paraview_add_plugin_DOCUMENTATION_DIR)
+      set(_paraview_build_plugin_doc_source_args
+        SOURCE_DIR "${_paraview_add_plugin_DOCUMENTATION_DIR}")
+    endif ()
+
     paraview_client_generate_help(
       NAME        "${_paraview_build_plugin}"
       TARGET      "${_paraview_build_plugin}_qch"
-      SOURCE_DIR  "${_paraview_add_plugin_DOCUMENTATION_DIR}"
+      ${_paraview_build_plugin_doc_source_args}
       DEPENDS     "${_paraview_build_plugin}_doc"
       PATTERNS    "*.html" "*.css" "*.png" "*.jpg")
 
