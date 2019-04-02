@@ -27,6 +27,7 @@ set(paraview_documentation_qrc
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
 paraview_client_generate_help(
   NAME        paraview
+  OUTPUT_PATH paraview_qch
   TARGET      paraview_qhp
   OUTPUT_DIR  "${CMAKE_CURRENT_BINARY_DIR}"
   SOURCE_DIR  "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -56,6 +57,6 @@ target_link_libraries(vtkParaViewDocumentation
     Qt5::Core)
 
 install(
-  FILES       "${CMAKE_CURRENT_BINARY_DIR}/paraview.qch"
+  FILES       "${paraview_qch}"
   DESTINATION "${CMAKE_INSTALL_DOCDIR}"
   COMPONENT   doc)

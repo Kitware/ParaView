@@ -669,6 +669,8 @@ paraview_client_generate_help(
   NAME    <name>
   [TARGET <target>]
 
+  OUTPUT_PATH <var>
+
   [OUTPUT_DIR <directory>]
   [SOURCE_DIR <directory>]
   [PATTERNS   <pattern>...]
@@ -686,6 +688,8 @@ paraview_client_generate_help(
 
   * `NAME`: (Required) The basename of the generated `.qch` file.
   * `TARGET`: (Defaults to `<NAME>`) The name of the generated target.
+  * `OUTPUT_PATH`: (Required) This variable is set to the output path of the
+    generated `.qch` file.
   * `OUTPUT_DIR`: (Defaults to `${CMAKE_CURRENT_BINARY_DIR}`) Where to place
     generated files.
   * `SOURCE_DIR`: Where to copy input files from.
@@ -709,7 +713,7 @@ paraview_client_generate_help(
 function (paraview_client_generate_help)
   cmake_parse_arguments(_paraview_client_help
     ""
-    "NAME;TARGET;OUTPUT_DIR;SOURCE_DIR;NAMESPACE;FOLDER;TABLE_OF_CONTENTS;TABLE_OF_CONTENTS_FILE;RESOURCE_FILE;RESOURCE_PREFIX"
+    "NAME;TARGET;OUTPUT_DIR;SOURCE_DIR;NAMESPACE;FOLDER;TABLE_OF_CONTENTS;TABLE_OF_CONTENTS_FILE;RESOURCE_FILE;RESOURCE_PREFIX;OUTPUT_PATH"
     "PATTERNS;DEPENDS"
     ${ARGN})
 
@@ -722,6 +726,11 @@ function (paraview_client_generate_help)
   if (NOT DEFINED _paraview_client_help_NAME)
     message(FATAL_ERROR
       "The `NAME` argument is required.")
+  endif ()
+
+  if (NOT DEFINED _paraview_client_help_OUTPUT_PATH)
+    message(FATAL_ERROR
+      "The `OUTPUT_PATH` argument is required.")
   endif ()
 
   if (NOT DEFINED _paraview_client_help_TARGET)
@@ -822,6 +831,10 @@ function (paraview_client_generate_help)
       PROPERTY
         OBJECT_DEPENDS "${_paraview_client_help_output}")
   endif ()
+
+  set("${_paraview_client_help_OUTPUT_PATH}"
+    "${_paraview_client_help_output}"
+    PARENT_SCOPE)
 endfunction ()
 
 # Handle the generation of the help file.

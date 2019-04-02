@@ -649,6 +649,7 @@ function (paraview_add_plugin name)
 
     paraview_client_generate_help(
       NAME        "${_paraview_build_plugin}"
+      OUTPUT_PATH _paraview_build_plugin_qch_path
       TARGET      "${_paraview_build_plugin}_qch"
       ${_paraview_build_plugin_doc_source_args}
       DEPENDS     "${_paraview_build_plugin}_doc"
@@ -668,8 +669,8 @@ function (paraview_add_plugin name)
               \"\"
               "_qch"
               "_qch"
-              "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}.qch"
-      DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}.qch"
+              "${_paraview_build_plugin_qch_path}"
+      DEPENDS "${_paraview_build_plugin_qch_path}"
               "${_paraview_build_plugin}_qch"
               ParaView::ProcessXML
       COMMENT "Generating header for ${_paraview_build_plugin} documentation")
