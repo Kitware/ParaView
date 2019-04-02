@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqMultiViewWidget_h
 
 #include "pqComponentsModule.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 #include <QWidget>
 
 class pqProxy;
@@ -55,10 +56,11 @@ class vtkSMViewProxy;
 */
 class PQCOMPONENTS_EXPORT pqMultiViewWidget : public QWidget
 {
-  Q_OBJECT
+  Q_OBJECT;
   typedef QWidget Superclass;
-  Q_PROPERTY(bool decorationsVisibility READ isDecorationsVisible WRITE setDecorationsVisible NOTIFY
-      decorationsVisibilityChanged)
+  Q_PROPERTY(bool decorationsVisibility READ decorationsVisibility WRITE setDecorationsVisibility
+      NOTIFY decorationsVisibilityChanged);
+
 public:
   pqMultiViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~pqMultiViewWidget() override;
@@ -73,7 +75,7 @@ public:
   /**
   * Returns whether window decorations and splitter handles are visible.
   */
-  bool isDecorationsVisible() const;
+  bool decorationsVisibility() const;
 
   /**
   * Returns list of views assigned to frames in this widget.
@@ -113,6 +115,16 @@ public:
    */
   QSize preview(const QSize& previewSize = QSize());
 
+  /**
+   * @deprecated use `decorationsVisibility` instead.
+   */
+  VTK_LEGACY(bool isDecorationsVisible() const);
+
+  /**
+   * @deprecated, use `setDecorationsVisibility` instead.
+   */
+  VTK_LEGACY(void setDecorationsVisible(bool val));
+
 signals:
   /**
   * fired when a frame in this widget becomes active.
@@ -148,12 +160,14 @@ public slots:
   */
   void makeFrameActive();
 
+  //@{
   /**
-  * Set the visibility for frame decorations and splitter handles.
-  */
-  void setDecorationsVisible(bool);
-  void showDecorations() { this->setDecorationsVisible(true); }
-  void hideDecorations() { this->setDecorationsVisible(false); }
+   * Set the visibility for frame decorations and splitter handles.
+   */
+  void setDecorationsVisibility(bool);
+  void showDecorations() { this->setDecorationsVisibility(true); }
+  void hideDecorations() { this->setDecorationsVisibility(false); }
+  //@}
 
   /**
   * Locks the maximum size for each view-frame to the given size.

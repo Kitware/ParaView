@@ -85,6 +85,11 @@ public:
   */
   vtkSMViewLayoutProxy* layoutProxy() const;
 
+  /**
+   * Returns whether frame decorations are shown.
+   */
+  bool decorationsVisibility() const;
+
 signals:
   /**
   * fired when lockViewSize() is called.
@@ -96,6 +101,16 @@ public slots:
   virtual void createTab(pqServer*);
   virtual void createTab(vtkSMViewLayoutProxy*);
   virtual void closeTab(int);
+
+  //@{
+  /**
+   * When set to false, all decorations including title frames, separators,
+   * tab-bars are hidden.
+   */
+  void setDecorationsVisibility(bool);
+  void showDecorations() { this->setDecorationsVisibility(true); }
+  void hideDecorations() { this->setDecorationsVisibility(false); }
+  //@}
 
   /**
   * toggles fullscreen state.
@@ -151,12 +166,6 @@ protected slots:
   * add a new tab to the widget.
   */
   virtual void currentTabChanged(int);
-
-  /**
-  * called when a frame in pqMultiViewWidget is activated. Ensures that that
-  * widget is visible.
-  */
-  virtual void frameActivated();
 
   /**
   * verifies that all views loaded from state are indeed assigned to some view

@@ -98,7 +98,15 @@ void pqViewMenuManager::buildMenu()
     QAction* fullscreen = this->Menu->addAction("Full Screen");
     fullscreen->setObjectName("actionFullScreen");
     fullscreen->setShortcut(QKeySequence("F11"));
-    QObject::connect(fullscreen, SIGNAL(triggered()), viewManager, SLOT(toggleFullScreen()));
+    QObject::connect(
+      fullscreen, &QAction::triggered, viewManager, &pqTabbedMultiViewWidget::toggleFullScreen);
+
+    auto showDecorations = this->Menu->addAction("Show Frame Decorations");
+    showDecorations->setCheckable(true);
+    showDecorations->setChecked(viewManager->decorationsVisibility());
+    QObject::connect(showDecorations, &QAction::triggered, viewManager,
+      &pqTabbedMultiViewWidget::setDecorationsVisibility);
+    this->ShowFrameDecorationsAction = showDecorations;
   }
 
   QAction* lockDockWidgetsAction = this->Menu->addAction("Toggle Lock Panels");
@@ -145,5 +153,12 @@ void pqViewMenuManager::updateMenu()
   {
     this->Menu->insertAction(
       /*before*/ this->DockPanelSeparators[1], dock_widget->toggleViewAction());
+  }
+
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+  if (viewManager && this->ShowFrameDecorationsAction)
+  {
+    this->ShowFrameDecorationsAction->setChecked(viewManager->decorationsVisibility());
   }
 }
