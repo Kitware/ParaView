@@ -1,0 +1,45 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkExplicitStructuredGridPythonExtractor"
+                 label="Explicit Structured Grid Slice and Cells Extractor"
+                 name="ExplicitStructuredGridPythonExtractor">
+      <Documentation long_help="Extract a i-j-k slice from a reservoir grid described as an unstructured grid or a 3D image data.">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkExplicitStructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>The input from which the selection is
+        extracted.</Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPassDataToScript"
+                         default_values="0"
+                         name="PassDataToScript"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If ON, the script will have access to the cell data arrays (CellArray) and the 8 points data arrays (PointArray)
+          of the evaluated cell - activate it only if needed, the cost is lot higher.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetPythonExpression"
+                            default_values="ret=(i==0 or j==0 or k==0)"
+                            name="PythonExpression"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Documentation>
+          This property contains the Python script that will be evaluated on each grid cell. The script has access to
+          variables i, j and k which are the coordinates of the cell grid exprimed in the whole grid extent. The
+          script should modify the value of variable 'ret'. If ret is 0, the cell will be discarded, otherwise it
+          will be copied in the output grid.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

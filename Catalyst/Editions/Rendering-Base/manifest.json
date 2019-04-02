@@ -258,7 +258,8 @@
     { "name": "vtkFiltersGeometry",
       "path": "VTK/Filters/Geometry",
       "include": [
-        { "class": "vtkGeometryFilter" }
+        { "class": "vtkGeometryFilter" },
+        { "class": "vtkExplicitStructuredGridSurfaceFilter" }
       ],
       "cswrap": true,
       "pythonwrap": true

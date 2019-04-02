@@ -657,13 +657,18 @@ int vtkProcessModule::GetNumberOfGhostLevelsToRequest(vtkInformation* info)
     return 0;
   }
 
-  if (vtkDataSet::GetData(info) != nullptr || vtkCompositeDataSet::GetData(info) != nullptr)
+  vtkDataSet* ds = vtkDataSet::GetData(info);
+  if (ds || vtkCompositeDataSet::GetData(info) != nullptr)
   {
     // Check if this is structured-pipeline, this includes unstructured pipelines
     // downstream from structured source e.g. Wavelet - > Clip.
     // To do that, we use a trick. If WHOLE_EXTENT() key us present, it must have
     // started as a structured dataset.
-    const bool is_structured = (info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
+    // The is one exception to this for ExplicitStructuredGrid data, their
+    // behavior is both structured and unstructured but regarding ghost cells
+    // they have the behavior of an unstructured dataset.
+    const bool is_structured = (info->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0) &&
+      (!ds || (ds && !ds->IsA("vtkExplicitStructuredGrid")));
     return is_structured
       ? vtkProcessModule::GetDefaultMinimumGhostLevelsToRequestForStructuredPipelines()
       : vtkProcessModule::GetDefaultMinimumGhostLevelsToRequestForUnstructuredPipelines();

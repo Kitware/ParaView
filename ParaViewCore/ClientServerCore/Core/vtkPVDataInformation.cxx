@@ -1231,7 +1231,8 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
   { // Every type is of type vtkDataObject.
     if (this->DataSetType == VTK_POLY_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
       this->DataSetType == VTK_UNSTRUCTURED_GRID || this->DataSetType == VTK_IMAGE_DATA ||
-      this->DataSetType == VTK_RECTILINEAR_GRID || this->DataSetType == VTK_UNSTRUCTURED_GRID ||
+      this->DataSetType == VTK_RECTILINEAR_GRID ||
+      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID ||
       this->DataSetType == VTK_HYPER_TREE_GRID || this->DataSetType == VTK_STRUCTURED_POINTS)
     {
       return true;
@@ -1244,7 +1245,8 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
   if (strcmp(type, "vtkPointSet") == 0)
   {
     if (this->DataSetType == VTK_POLY_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
-      this->DataSetType == VTK_UNSTRUCTURED_GRID)
+      this->DataSetType == VTK_UNSTRUCTURED_GRID ||
+      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID)
     {
       return true;
     }
@@ -1252,7 +1254,8 @@ bool vtkPVDataInformation::DataSetTypeIsA(const char* type)
   if (strcmp(type, "vtkStructuredData") == 0)
   {
     if (this->DataSetType == VTK_IMAGE_DATA || this->DataSetType == VTK_STRUCTURED_GRID ||
-      this->DataSetType == VTK_RECTILINEAR_GRID)
+      this->DataSetType == VTK_RECTILINEAR_GRID ||
+      this->DataSetType == VTK_EXPLICIT_STRUCTURED_GRID)
     {
       return true;
     }

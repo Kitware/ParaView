@@ -594,6 +594,7 @@ set(paraview_default_plugins
   EULATestPlugin
   EmbossingRepresentations
   EyeDomeLighting
+  ExplicitStructuredGrid
   GenericIOReader
   GeodesicMeasurement
   GMVReader
