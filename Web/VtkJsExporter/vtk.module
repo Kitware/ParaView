@@ -1,0 +1,17 @@
+NAME
+  ParaView::PVWebExporter
+LIBRARY_NAME
+  vtkPVWebExporter
+CONDITION
+  PARAVIEW_ENABLE_WEB
+DEPENDS
+  VTK::IOExport
+OPTIONAL_DEPENDS
+  VTK::WebPython
+  VTK::Python
+  VTK::PythonInterpreter
+  VTK::WrappingPythonCore
+TEST_DEPENDS
+TEST_LABELS
+  ParaView
+  ParaViewWeb
