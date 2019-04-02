@@ -27,6 +27,7 @@
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkExecutive.h"
+#include "vtkExplicitStructuredGrid.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGraph.h"
 #include "vtkHyperTreeGrid.h"
@@ -517,6 +518,9 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
       break;
     case VTK_STRUCTURED_GRID:
       ext = static_cast<vtkStructuredGrid*>(data)->GetExtent();
+      break;
+    case VTK_EXPLICIT_STRUCTURED_GRID:
+      ext = static_cast<vtkExplicitStructuredGrid*>(data)->GetExtent();
       break;
     case VTK_RECTILINEAR_GRID:
       ext = static_cast<vtkRectilinearGrid*>(data)->GetExtent();
@@ -1180,6 +1184,8 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Multi-piece Dataset";
     case VTK_DIRECTED_ACYCLIC_GRAPH:
       return "Directed Acyclic Graph";
+    case VTK_EXPLICIT_STRUCTURED_GRID:
+      return "Explicit Structured Grid";
     case VTK_MOLECULE:
       return "Molecule";
     case VTK_PARTITIONED_DATA_SET:
@@ -1279,6 +1285,7 @@ bool vtkPVDataInformation::IsDataStructured()
   {
     case VTK_IMAGE_DATA:
     case VTK_STRUCTURED_GRID:
+    case VTK_EXPLICIT_STRUCTURED_GRID:
     case VTK_RECTILINEAR_GRID:
     case VTK_UNIFORM_GRID:
     case VTK_GENERIC_DATA_SET:
