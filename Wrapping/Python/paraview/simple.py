@@ -1305,8 +1305,11 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     formatProperties = formatProxy.ListProperties()
     for prop in formatProperties:
         if prop in params:
-            formatProxy.SetPropertyWithName(prop, params[prop])
-            del params[prop]
+            # see comment at vtkSMSaveAnimationProxy.cxx:327
+            # to why we save FrameRate on SaveAnimation proxy.
+            if formatProxy.GetProperty(prop).GetPanelVisibility() != "never":
+                formatProxy.SetPropertyWithName(prop, params[prop])
+                del params[prop]
 
     if "ImageQuality" in params:
         import warnings
