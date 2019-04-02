@@ -636,10 +636,14 @@ function (paraview_add_plugin name)
 
   if ((_paraview_add_plugin_module_xmls OR _paraview_add_plugin_xmls) AND
       PARAVIEW_BUILD_QT_GUI AND _paraview_add_plugin_XML_DOCUMENTATION)
+    set(_paraview_build_plugin_docdir
+      "${CMAKE_CURRENT_BINARY_DIR}/paraview_help")
+
     paraview_client_documentation(
-      TARGET  "${_paraview_build_plugin}_doc"
-      XMLS    ${_paraview_add_plugin_module_xmls}
-              ${_paraview_add_plugin_xmls})
+      TARGET      "${_paraview_build_plugin}_doc"
+      OUTPUT_DIR  "${_paraview_build_plugin_docdir}"
+      XMLS        ${_paraview_add_plugin_module_xmls}
+                  ${_paraview_add_plugin_xmls})
 
     set(_paraview_build_plugin_doc_source_args)
     if (DEFINED _paraview_add_plugin_DOCUMENTATION_DIR)
@@ -650,15 +654,16 @@ function (paraview_add_plugin name)
     paraview_client_generate_help(
       NAME        "${_paraview_build_plugin}"
       OUTPUT_PATH _paraview_build_plugin_qch_path
+      OUTPUT_DIR  "${_paraview_build_plugin_docdir}"
       TARGET      "${_paraview_build_plugin}_qch"
       ${_paraview_build_plugin_doc_source_args}
       DEPENDS     "${_paraview_build_plugin}_doc"
       PATTERNS    "*.html" "*.css" "*.png" "*.jpg")
 
     list(APPEND _paraview_add_plugin_extra_include_dirs
-      "${CMAKE_CURRENT_BINARY_DIR}")
+      "${_paraview_build_plugin_docdir}")
     set(_paraview_add_plugin_qch_output
-      "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}_qch.h")
+      "${_paraview_build_plugin_docdir}/${_paraview_build_plugin}_qch.h")
     list(APPEND _paraview_add_plugin_binary_headers
       "${_paraview_add_plugin_qch_output}")
     add_custom_command(
