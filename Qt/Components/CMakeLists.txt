@@ -170,8 +170,6 @@ set(classes
   pqTriggerOnIdleHelper
   pqUndoStackBuilder
   pqVCRController
-  pqViewContextMenuHandler
-  pqViewContextMenuManager
   pqViewFrame
   pqViewFrameActionsInterface
   pqViewManager
