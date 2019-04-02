@@ -1106,6 +1106,28 @@
       </StringVectorProperty>
     </Proxy>
     <!-- End XMLHyperTreeReaderCore -->
+    <!-- Start XMLPHyperTreeReaderCore -->
+    <Proxy class="vtkXMLPHyperTreeGridReader"
+                 label="XML Partitioned HyperTree Grid Reader"
+                 name="XMLPHyperTreeGridReaderCore">
+      <Documentation long_help="Reads the summary file and the associated VTK XML htg files."
+                     short_help="Read partitioned VTK XML htg files.">
+                     The XML HyperTree Grid reader reads the
+                     partitioned VTK htg data file format. It
+                     reads the partitioned format's summary file and then the
+                     associated VTK XML htg data files. The
+                     expected file extension is .phtg.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the file name for the
+        partitioned VTK XML htg reader.</Documentation>
+      </StringVectorProperty>
+    </Proxy>
+    <!-- End XMLPHyperTreeReaderCore -->
     <Proxy class="vtkXMLPTableReader"
                  label="XML Partitioned Table Reader"
                  name="XMLPTableReaderCore">
@@ -8514,6 +8536,57 @@ series.
           extensions="htg"
           file_description="HyperTreeGrid"
         />
+      </Hints>
+    </SourceProxy>
+    <!-- PHyperTreeGridReader -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML Partitioned HyperTree Grid Reader"
+                 name="XMLPHyperTreeGridReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation long_help="Reads the summary file and the associated VTK XML htg data files."
+                     short_help="Read partitioned VTK XML htg data files.">
+                     The XML Partitioned Hyper Tree Grid reader reads the
+                     partitioned VTK htg data file format. It
+                     reads the partitioned format's summary file and then the
+                     associated VTK XML htg data files. The
+                     expected file extension is .phtg. This reader also
+                     supports file series.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLPHyperTreeGridReaderCore"></Proxy>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the partitioned VTK XML phtg data
+        format. The standard extension is .phtg. If more than one file is
+        specified, the reader will switch to file series mode in which it will
+        pretend that it can support time and provide one file per time
+        step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="phtg"
+                       file_description="HyperTreeGrid (partitioned)" />
       </Hints>
     </SourceProxy>
     <!-- AMReXParticlesReader -->

@@ -672,5 +672,22 @@
           pvt* file without its extension</Documentation>
       </IntVectorProperty>
     </PWriterProxy>
+    <!-- ================================================================= -->
+    <PWriterProxy base_proxygroup="internal_writers"
+                 base_proxyname="XMLDataObjectWriterCore"
+                 class="vtkXMLPHyperTreeGridWriter"
+                 name="XMLPHyperTreeGridWriterCore">
+      <Documentation>Internal writer used to write XML hyper tree grid data in parallel</Documentation>
+      <IntVectorProperty command="SetUseSubdirectory"
+                         name="UseSubdirectory"
+                         label="Store Data in Subdirectory"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>This property controls whether the writer puts the files for each piece
+          in the same directory as the phtg file or in a subdirectory named the same as the
+          phtg file without its extension</Documentation>
+      </IntVectorProperty>
+    </PWriterProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
