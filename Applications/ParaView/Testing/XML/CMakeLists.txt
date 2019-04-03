@@ -504,19 +504,21 @@ if(PARAVIEW_ENABLE_VISITBRIDGE)
     VisItBridgeLAMMPSDump2.xml
     VisItBridgeNas.xml
     VisItBridgeNek.xml
+    VisItBridgeMoleculeColoring.xml
     VisItBridgePdb.xml
     VisItBridgePFLOTRAN.xml
     VisItBridgePixie.xml
     VisItBridgeSamrai.xml
     TruchasReaderWithVisItBridge.xml)
 else()
-  # The TruchasReader test behavior changes depending on whether the
-  # VisItBridge is enabled. A number of VisIt readers support
-  # reading of .h5 files, so when the VisItBridge is enabled,
+  # A number of VisIt readers support reading of .pdb and
+  # of .h5 files, so when the VisItBridge is enabled,
   # the test must take extra steps to select the correct reader.
+  #
   # When the VisItBridge is not enabled, there is no need to select
   # a reader.
   list(APPEND TESTS_WITH_BASELINES
+    MoleculeColoring.xml
     TruchasReader.xml)
 endif()
 
@@ -722,7 +724,6 @@ list(APPEND TESTS_WITH_BASELINES
   LoadSaveStateVolume.xml
   ManyTypesXMLWriterReader.xml
   MoleculeBonds.xml
-  MoleculeColoring.xml
   MoleculeToLines.xml
   MultiBlockAttributes1.xml
   MultiBlockInspector.xml
@@ -1401,10 +1402,10 @@ set (LoadStateMultiView_THRESHOLD 20)
 set (ResetToVisibleRange_DISABLE_CRS TRUE)
 
 # Molecules are not supported in client-serve modes, currently.
-set (Molecule_DISABLE_CS TRUE)
-set (Molecule_DISABLE_CRS TRUE)
-set (MoleculeColoring_DISABLE_CS TRUE)
-set (MoleculeColoring_DISABLE_CRS TRUE)
+#set (Molecule_DISABLE_CS TRUE)
+#set (Molecule_DISABLE_CRS TRUE)
+#set (MoleculeColoring_DISABLE_CS TRUE)
+#set (MoleculeColoring_DISABLE_CRS TRUE)
 
 ##########################################################
 # List of known incompatible tests for Collaboration
