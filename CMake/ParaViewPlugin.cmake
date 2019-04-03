@@ -661,9 +661,9 @@ function (paraview_add_plugin name)
       PATTERNS    "*.html" "*.css" "*.png" "*.jpg")
 
     list(APPEND _paraview_add_plugin_extra_include_dirs
-      "${_paraview_build_plugin_docdir}")
+      "${CMAKE_CURRENT_BINARY_DIR}")
     set(_paraview_add_plugin_qch_output
-      "${_paraview_build_plugin_docdir}/${_paraview_build_plugin}_qch.h")
+      "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}_qch.h")
     list(APPEND _paraview_add_plugin_binary_headers
       "${_paraview_add_plugin_qch_output}")
     add_custom_command(
