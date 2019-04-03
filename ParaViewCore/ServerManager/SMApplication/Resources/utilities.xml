@@ -3570,13 +3570,20 @@
       <!-- End of GL2PSContextViewExporterSVG -->
     </GL2PSExporterProxy>
 
-    <RenderViewExporterProxy name="WebGLExporter" class="vtkPVWebGLExporter">
+    <RenderViewExporterProxy name="WebExporter" class="vtkPVWebExporter">
        <StringVectorProperty name="FileName" command="SetFileName"
                              number_of_elements="1">
           <Documentation>Name of the file to write into</Documentation>
        </StringVectorProperty>
+       <StringVectorProperty name="ParaViewGlanceHTML"
+                             command="SetParaViewGlanceHTML"
+                             number_of_elements="1"
+                             panel_visibility="advanced">
+          <Documentation>Filepath to the HTML viewer to embed data in</Documentation>
+          <FileListDomain name="files" />
+       </StringVectorProperty>
       <Hints>
-        <ExporterFactory extensions="webgl" />
+        <ExporterFactory extensions="vtkjs" />
       </Hints>
       <!-- End of WebGLExporter -->
     </RenderViewExporterProxy>
