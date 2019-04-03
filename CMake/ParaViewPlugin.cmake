@@ -892,11 +892,6 @@ function (paraview_add_plugin name)
     PRIVATE
       ParaView::ClientServerCoreCore
       ${_paraview_add_plugin_required_libraries})
-  if (_paraview_add_plugin_UI_INTERFACES)
-    target_include_directories("${_paraview_build_plugin}"
-      PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}")
-  endif ()
   target_include_directories("${_paraview_build_plugin}"
     PRIVATE
       "${CMAKE_CURRENT_SOURCE_DIR}"
