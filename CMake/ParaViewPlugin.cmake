@@ -661,9 +661,9 @@ function (paraview_add_plugin name)
       PATTERNS    "*.html" "*.css" "*.png" "*.jpg")
 
     list(APPEND _paraview_add_plugin_extra_include_dirs
-      "${_paraview_build_plugin_docdir}")
+      "${CMAKE_CURRENT_BINARY_DIR}")
     set(_paraview_add_plugin_qch_output
-      "${_paraview_build_plugin_docdir}/${_paraview_build_plugin}_qch.h")
+      "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_build_plugin}_qch.h")
     list(APPEND _paraview_add_plugin_binary_headers
       "${_paraview_add_plugin_qch_output}")
     add_custom_command(
@@ -892,11 +892,6 @@ function (paraview_add_plugin name)
     PRIVATE
       ParaView::ClientServerCoreCore
       ${_paraview_add_plugin_required_libraries})
-  if (_paraview_add_plugin_UI_INTERFACES)
-    target_include_directories("${_paraview_build_plugin}"
-      PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}")
-  endif ()
   target_include_directories("${_paraview_build_plugin}"
     PRIVATE
       "${CMAKE_CURRENT_SOURCE_DIR}"
