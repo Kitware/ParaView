@@ -4,13 +4,15 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkCompositeDataToUnstructuredGridFilter.h"
 #include "vtkDataSet.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLogger.h"
 #include "vtkMaskPoints.h"
+#include "vtkMath.h"
 #include "vtkMatrix4x4.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
@@ -19,7 +21,6 @@
 #include "vtkPointGaussianMapper.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
-#include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkPointGaussianRepresentation)
 
@@ -191,12 +192,26 @@ int vtkPointGaussianRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkSmartPointer<vtkDataSet> input = vtkDataSet::GetData(inputVector[0]);
-  vtkPolyData* inputPolyData = vtkPolyData::SafeDownCast(input);
   vtkCompositeDataSet* compositeInput = vtkCompositeDataSet::GetData(inputVector[0], 0);
   this->ProcessedData = NULL;
-  if (inputPolyData)
+  if (input)
   {
-    this->ProcessedData = inputPolyData;
+    // The mapper underneath expects only vtkPolyData or vtkCompositeDataSet,
+    // so convert to a vtkCompositeDataSet consisting of one vtkPolyData child.
+    // Turn off GenerateVertices to ensure all points are drawn.
+    vtkNew<vtkMaskPoints> unstructuredToPolyData;
+    unstructuredToPolyData->SetInputData(input);
+    unstructuredToPolyData->SetMaximumNumberOfPoints(input->GetNumberOfPoints());
+    unstructuredToPolyData->GenerateVerticesOff();
+    unstructuredToPolyData->SetOnRatio(1);
+    unstructuredToPolyData->Update();
+
+    vtkNew<vtkPolyData> clone;
+    clone->ShallowCopy(unstructuredToPolyData->GetOutput());
+
+    auto outputMB = vtkSmartPointer<vtkMultiBlockDataSet>::New();
+    outputMB->SetBlock(0, clone);
+    this->ProcessedData = outputMB;
   }
   else if (compositeInput)
   {
@@ -216,9 +231,9 @@ int vtkPointGaussianRepresentation::RequestData(
       }
       else if (ds && ds->GetNumberOfPoints() > 0)
       {
-        // The mapper underneath expect only PolyData or CompositePD
-        // Apply conversion - We do not need vertex list as we
-        // use all the points in that use case
+        // The mapper underneath expects only vtkPolyData or vtkCompositeDataSet,
+        // so convert to a vtkCompositeDataSet consisting of one vtkPolyData child.
+        // Turn off GenerateVertices to ensure all points are drawn.
         vtkNew<vtkMaskPoints> unstructuredToPolyData;
         unstructuredToPolyData->SetInputData(ds);
         unstructuredToPolyData->SetMaximumNumberOfPoints(ds->GetNumberOfPoints());
@@ -229,23 +244,11 @@ int vtkPointGaussianRepresentation::RequestData(
       }
     }
   }
-  else if (input != NULL && input->GetNumberOfPoints() > 0)
-  {
-    // The mapper underneath expect only PolyData or CompositePD
-    // Apply conversion - We do not need vertex list as we
-    // use all the points in that use case
-    vtkNew<vtkMaskPoints> unstructuredToPolyData;
-    unstructuredToPolyData->SetInputData(input);
-    unstructuredToPolyData->SetMaximumNumberOfPoints(input->GetNumberOfPoints());
-    unstructuredToPolyData->GenerateVerticesOff();
-    unstructuredToPolyData->SetOnRatio(1);
-    unstructuredToPolyData->Update();
-    this->ProcessedData = unstructuredToPolyData->GetOutput();
-  }
 
+  // Create a vtkMultiBlockDataSet on the client to match what is delivered by the server
   if (this->ProcessedData == NULL)
   {
-    this->ProcessedData = vtkSmartPointer<vtkPolyData>::New();
+    this->ProcessedData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
   }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -266,32 +269,19 @@ int vtkPointGaussianRepresentation::ProcessViewRequest(
   if (request_type == vtkPVView::REQUEST_UPDATE())
   {
     double bounds[6] = { 0, 0, 0, 0, 0, 0 };
+
     // Standard representation stuff, first.
     // 1. Provide the data being rendered.
     if (this->ProcessedData)
     {
-      vtkPolyData* pd = vtkPolyData::SafeDownCast(this->ProcessedData);
       vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(this->ProcessedData);
-      if (pd)
-      {
-        pd->GetBounds(bounds);
-      }
       if (cd)
       {
-        vtkBoundingBox bbox;
-        vtkCompositeDataIterator* iter = cd->NewIterator();
-        for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-        {
-          vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-          if (ds)
-          {
-            double tmpBounds[6];
-            ds->GetBounds(tmpBounds);
-            bbox.AddBounds(tmpBounds);
-          }
-        }
-        bbox.GetBounds(bounds);
-        iter->Delete();
+        cd->GetBounds(bounds);
+      }
+      else
+      {
+        vtkMath::UninitializeBounds(bounds);
       }
 
       vtkPVRenderView::SetPiece(inInfo, this, this->ProcessedData);
