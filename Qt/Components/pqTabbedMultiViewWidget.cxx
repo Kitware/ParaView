@@ -202,6 +202,8 @@ QSize pqTabbedMultiViewWidget::pqTabWidget::preview(const QSize& nsize)
 //-----------------------------------------------------------------------------
 class pqTabbedMultiViewWidget::pqInternals
 {
+  bool DecorationsVisibility = true;
+
 public:
   QPointer<pqTabWidget> TabWidget;
   QMultiMap<pqServer*, QPointer<pqMultiViewWidget> > TabWidgets;
@@ -239,6 +241,42 @@ public:
       this->TabWidget->removeTab(this->TabWidget->indexOf(this->NewTabWidget));
       delete this->NewTabWidget;
     }
+  }
+
+  void setDecorationsVisibility(bool val)
+  {
+    this->TabWidget->setTabBarVisibility(val);
+    this->DecorationsVisibility = val;
+    for (int cc = 0, max = this->TabWidget->count(); cc < max; ++cc)
+    {
+      if (auto mvwidget = qobject_cast<pqMultiViewWidget*>(this->TabWidget->widget(cc)))
+      {
+        mvwidget->setDecorationsVisibility(val);
+      }
+    }
+  }
+
+  bool decorationsVisibility() const { return this->DecorationsVisibility; }
+
+  /// adds a vtkSMViewLayoutProxy to a new tab.
+  void addTab(vtkSMViewLayoutProxy* vlayout, pqTabbedMultiViewWidget* self)
+  {
+    const int count = this->TabWidget->count();
+    auto widget = new pqMultiViewWidget();
+    widget->setObjectName(QString("MultiViewWidget%1").arg(count));
+    widget->setLayoutManager(vlayout);
+    widget->setDecorationsVisibility(this->decorationsVisibility());
+
+    // ensure that the tab current when the pqMultiViewWidget becomes
+    // active.
+    QObject::connect(widget, &pqMultiViewWidget::frameActivated,
+      [this, widget]() { this->TabWidget->setCurrentWidget(widget); });
+
+    int tab_index = this->TabWidget->addAsTab(widget, self);
+    this->TabWidget->setCurrentIndex(tab_index);
+    auto server =
+      pqApplicationCore::instance()->getServerManagerModel()->findServer(vlayout->GetSession());
+    this->TabWidgets.insert(server, widget);
   }
 };
 
@@ -327,23 +365,24 @@ bool pqTabbedMultiViewWidget::tabVisibility() const
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::toggleFullScreen()
 {
+  auto& internals = (*this->Internals);
   if (this->Internals->FullScreenWindow)
   {
-    this->Internals->FullScreenWindow->layout()->removeWidget(this->Internals->TabWidget);
-    this->layout()->addWidget(this->Internals->TabWidget);
-    delete this->Internals->FullScreenWindow;
+    internals.FullScreenWindow->layout()->removeWidget(this->Internals->TabWidget);
+    this->layout()->addWidget(internals.TabWidget);
+    delete internals.FullScreenWindow;
   }
   else
   {
     QWidget* fullScreenWindow = new QWidget(this, Qt::Window);
-    this->Internals->FullScreenWindow = fullScreenWindow;
+    internals.FullScreenWindow = fullScreenWindow;
     fullScreenWindow->setObjectName("FullScreenWindow");
-    this->layout()->removeWidget(this->Internals->TabWidget);
+    this->layout()->removeWidget(internals.TabWidget);
 
     QGridLayout* glayout = new QGridLayout(fullScreenWindow);
     glayout->setSpacing(0);
     glayout->setMargin(0);
-    glayout->addWidget(this->Internals->TabWidget, 0, 0);
+    glayout->addWidget(internals.TabWidget, 0, 0);
     fullScreenWindow->showFullScreen();
     fullScreenWindow->show();
 
@@ -352,6 +391,9 @@ void pqTabbedMultiViewWidget::toggleFullScreen()
     QShortcut* f11 = new QShortcut(Qt::Key_F11, fullScreenWindow);
     QObject::connect(f11, SIGNAL(activated()), this, SLOT(toggleFullScreen()));
   }
+
+  // when we enter full screen, let's hide decorations by default.
+  internals.setDecorationsVisibility(internals.FullScreenWindow == nullptr);
 }
 
 //-----------------------------------------------------------------------------
@@ -553,18 +595,8 @@ void pqTabbedMultiViewWidget::createTab(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
 {
-  pqMultiViewWidget* widget = new pqMultiViewWidget(this);
-  QObject::connect(widget, SIGNAL(frameActivated()), this, SLOT(frameActivated()));
-
-  int count = this->Internals->TabWidget->count();
-  widget->setObjectName(QString("MultiViewWidget%1").arg(count));
-  widget->setLayoutManager(vlayout);
-
-  int tab_index = this->Internals->TabWidget->addAsTab(widget, this);
-  this->Internals->TabWidget->setCurrentIndex(tab_index);
-  pqServer* server =
-    pqApplicationCore::instance()->getServerManagerModel()->findServer(vlayout->GetSession());
-  this->Internals->TabWidgets.insert(server, widget);
+  auto& internals = (*this->Internals);
+  internals.addTab(vlayout, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -616,12 +648,22 @@ bool pqTabbedMultiViewWidget::eventFilter(QObject* obj, QEvent* evt)
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::toggleWidgetDecoration()
 {
-  pqMultiViewWidget* widget =
-    qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  if (widget)
-  {
-    widget->setDecorationsVisible(!widget->isDecorationsVisible());
-  }
+  auto& internals = (*this->Internals);
+  this->setDecorationsVisibility(!internals.decorationsVisibility());
+}
+
+//-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::setDecorationsVisibility(bool val)
+{
+  auto& internals = (*this->Internals);
+  internals.setDecorationsVisibility(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqTabbedMultiViewWidget::decorationsVisibility() const
+{
+  auto& internals = (*this->Internals);
+  return internals.decorationsVisibility();
 }
 
 //-----------------------------------------------------------------------------
@@ -669,16 +711,6 @@ void pqTabbedMultiViewWidget::reset()
   if (widget)
   {
     widget->reset();
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::frameActivated()
-{
-  pqMultiViewWidget* widget = qobject_cast<pqMultiViewWidget*>(this->sender());
-  if (widget)
-  {
-    this->Internals->TabWidget->setCurrentWidget(widget);
   }
 }
 

@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqUndoStack.h"
 #include "vtkDataObject.h"
 #include "vtkNew.h"
@@ -330,6 +331,16 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr, unsign
 
   // when nothing was picked we show the "link camera" menu.
   this->Menu->addAction("Link Camera...", view, SLOT(linkToOtherView()));
+
+  if (auto tmvwidget = qobject_cast<pqTabbedMultiViewWidget*>(
+        pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET")))
+  {
+    auto actn = this->Menu->addAction("Show Frame Decorations");
+    actn->setCheckable(true);
+    actn->setChecked(tmvwidget->decorationsVisibility());
+    QObject::connect(
+      actn, &QAction::triggered, tmvwidget, &pqTabbedMultiViewWidget::setDecorationsVisibility);
+  }
 }
 
 //-----------------------------------------------------------------------------

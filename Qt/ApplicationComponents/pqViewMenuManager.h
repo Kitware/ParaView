@@ -74,6 +74,7 @@ protected:
   QPointer<QMenu> Menu;
   QPointer<QMenu> ToolbarsMenu;
   QPointer<QAction> DockPanelSeparators[2];
+  QPointer<QAction> ShowFrameDecorationsAction;
 
 private:
   Q_DISABLE_COPY(pqViewMenuManager)

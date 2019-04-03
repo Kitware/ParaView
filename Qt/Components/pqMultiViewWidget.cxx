@@ -198,7 +198,6 @@ public:
     this->PreviewSize = size;
     if (size.isEmpty())
     {
-      this->setDecorationsVisibility(true);
       this->Container->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
       this->Container->layout()->setSpacing(PARAVIEW_DEFAULT_LAYOUT_SPACING);
 
@@ -207,7 +206,6 @@ public:
     }
     else
     {
-      this->setDecorationsVisibility(false);
       this->Container->layout()->setSpacing(this->PreviewSpacing);
       auto palette = this->Container->palette();
       palette.setColor(QPalette::Window, this->PreviewColor);
@@ -221,21 +219,29 @@ public:
       vtkSMSaveScreenshotProxy::ComputeMagnification(tsize, csize);
       this->Container->setMaximumSize(csize[0], csize[1]);
     }
+    this->updateDecorations();
   }
 
   void setDecorationsVisibility(bool val)
   {
     this->DecorationsVisibility = val;
+    this->updateDecorations();
+  }
+
+  bool decorationsVisibility() const { return this->DecorationsVisibility; }
+
+  void updateDecorations()
+  {
+    // we show decorations if explicitly requested *and* we're not in preview mode.
+    const bool showDecorations = this->DecorationsVisibility && this->PreviewSize.isEmpty();
     for (auto iter = this->ViewFrames.begin(); iter != this->ViewFrames.end(); ++iter)
     {
       if (iter.value() != nullptr)
       {
-        iter.value()->setDecorationsVisibility(val);
+        iter.value()->setDecorationsVisibility(showDecorations);
       }
     }
   }
-
-  bool decorationsVisibility() const { return this->DecorationsVisibility; }
 
   void lockViewSize(const QSize& size)
   {
@@ -779,7 +785,17 @@ void pqMultiViewWidget::destroyAllViews()
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 void pqMultiViewWidget::setDecorationsVisible(bool val)
+{
+  VTK_LEGACY_REPLACED_BODY(pqMultiViewWidget::setDecorationsVisible, "ParaView 5.7",
+    pqMultiViewWidget::setDecorationsVisibility);
+  this->setDecorationsVisibility(val);
+}
+#endif
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::setDecorationsVisibility(bool val)
 {
   auto& internals = (*this->Internals);
   internals.setDecorationsVisibility(val);
@@ -787,9 +803,19 @@ void pqMultiViewWidget::setDecorationsVisible(bool val)
 }
 
 //-----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
 bool pqMultiViewWidget::isDecorationsVisible() const
 {
-  const auto& internals = (*this->Internals);
+  VTK_LEGACY_REPLACED_BODY(pqMultiViewWidget::isDecorationsVisible, "ParaView 5.7",
+    pqMultiViewWidget::decorationsVisibility);
+  return this->decorationsVisibility();
+}
+#endif
+
+//-----------------------------------------------------------------------------
+bool pqMultiViewWidget::decorationsVisibility() const
+{
+  auto& internals = (*this->Internals);
   return internals.decorationsVisibility();
 }
 
