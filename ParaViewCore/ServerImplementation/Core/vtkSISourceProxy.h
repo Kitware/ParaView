@@ -121,6 +121,7 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
   bool PortsCreated;
+  int StartEventCounter;
 };
 
 #endif
