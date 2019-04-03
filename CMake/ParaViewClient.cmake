@@ -783,6 +783,8 @@ function (paraview_client_generate_help)
       ${_paraview_client_help_PATTERNS})
   endif ()
 
+  file(MAKE_DIRECTORY "${_paraview_client_help_OUTPUT_DIR}")
+
   set(_paraview_client_help_patterns "${_paraview_client_help_PATTERNS}")
   _paraview_client_escape_cmake_list(_paraview_client_help_patterns)
 
