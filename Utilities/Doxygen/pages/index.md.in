@@ -14,6 +14,7 @@ Page | Description
 -----|----------------------------------------
 [Environment Variables](@ref EnvironmentVariables) | Environment variables that affect application behavior.
 [Major API Changes](@ref MajorAPIChanges) | Descriptions for major API changes.
+[Plugin Howto](@ref PluginHowto) | Tutorial on using and creating Plugins.
 [Proxy Hints And Annotations](@ref ProxyHints) | ServerManager XML hints for Proxies.
 [Property Hints](@ref PropertyHints) | ServerManager XML hints for Properties.
 [Proxy Documentation Formatting](@ref ProxyDocumentationFormatting) | Formatting options for proxy documentation.
