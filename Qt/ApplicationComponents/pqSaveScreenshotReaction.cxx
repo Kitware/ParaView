@@ -58,7 +58,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QClipboard>
 #include <QDebug>
 #include <QFileInfo>
+#include <QMainWindow>
 #include <QMimeData>
+#include <QStatusBar>
 
 //-----------------------------------------------------------------------------
 pqSaveScreenshotReaction::pqSaveScreenshotReaction(QAction* parentObject, bool clipboardMode)
@@ -285,5 +287,12 @@ bool pqSaveScreenshotReaction::copyScreenshotToClipboard(const QSize& size, bool
   QMimeData* data = new QMimeData;
   data->setImageData(qimg);
   QApplication::clipboard()->setMimeData(data);
+  QMainWindow* mainWindow = qobject_cast<QMainWindow*>(pqCoreUtilities::mainWidget());
+  if (mainWindow)
+  {
+    mainWindow->statusBar()->showMessage(
+      tr("View content has been copied to the clipboard."), 2000);
+  }
+
   return true;
 }
