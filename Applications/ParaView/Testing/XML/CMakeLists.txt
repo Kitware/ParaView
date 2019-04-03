@@ -1406,10 +1406,6 @@ set (ResetToVisibleRange_DISABLE_CRS TRUE)
 set (Molecule_DISABLE_CS TRUE)
 set (Molecule_DISABLE_CRS TRUE)
 
-# Because of #18421, we need to disable this test in client/server
-set (PointGaussianMultiBlockDataSet_DISABLE_CS TRUE)
-set (PointGaussianMultiBlockDataSet_DISABLE_CRS TRUE)
-
 ##########################################################
 # List of known incompatible tests for Collaboration
 #
