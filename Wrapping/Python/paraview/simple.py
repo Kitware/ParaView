@@ -1306,7 +1306,10 @@ def SaveAnimation(filename, viewOrLayout=None, scene=None, **params):
     for prop in formatProperties:
         if prop in params:
             # see comment at vtkSMSaveAnimationProxy.cxx:327
-            # to why we save FrameRate on SaveAnimation proxy.
+            # certain 'prop' (such as FrameRate) are present
+            # in both SaveAnimation and formatProxy (FFMPEG with
+            # panel_visibility="never"). In this case save it only
+            # in SaveAnimation
             if formatProxy.GetProperty(prop).GetPanelVisibility() != "never":
                 formatProxy.SetPropertyWithName(prop, params[prop])
                 del params[prop]
