@@ -302,7 +302,7 @@ void vtkSISourceProxy::MarkStartEvent()
     filterName << "Execute " << this->GetLogNameOrDefault() << " id: " << this->GetGlobalID();
     vtkTimerLog::MarkStartEvent(filterName.str().c_str());
 
-    vtkVLogStartScopeF(PARAVIEW_LOG_PIPELINE_VERBOSITY(), vtkLogIdentifier(this), "%s: execute",
+    vtkVLogStartScopeF(PARAVIEW_LOG_EXECUTION_VERBOSITY(), vtkLogIdentifier(this), "%s: execute",
       this->GetLogNameOrDefault());
   }
 }

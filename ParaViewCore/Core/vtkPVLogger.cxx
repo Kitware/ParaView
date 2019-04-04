@@ -77,6 +77,7 @@ static const int PluginVerbosityKey = 2;
 static const int DataMovementVerbosityKey = 3;
 static const int RenderingVerbosityKey = 4;
 static const int ApplicationVerbosityKey = 5;
+static const int ExecutionVerbosityKey = 6;
 }
 
 //----------------------------------------------------------------------------
@@ -113,6 +114,25 @@ void vtkPVLogger::SetPipelineVerbosity(vtkLogger::Verbosity value)
   if (value > vtkLogger::VERBOSITY_INVALID && value <= vtkLogger::VERBOSITY_MAX)
   {
     set_verbosity(PipelineVerbosityKey, value);
+  }
+  else
+  {
+    vtkLogF(WARNING, "ignoring invalid verbosity %d", value);
+  }
+}
+
+//----------------------------------------------------------------------------
+vtkLogger::Verbosity vtkPVLogger::GetExecutionVerbosity()
+{
+  return get_verbosity(ExecutionVerbosityKey, "PARAVIEW_LOG_EXECUTION_VERBOSITY");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLogger::SetExecutionVerbosity(vtkLogger::Verbosity value)
+{
+  if (value > vtkLogger::VERBOSITY_INVALID && value <= vtkLogger::VERBOSITY_MAX)
+  {
+    set_verbosity(ExecutionVerbosityKey, value);
   }
   else
   {
