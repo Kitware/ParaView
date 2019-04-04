@@ -50,6 +50,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QtDebug>
 
+#include <cassert>
+
 class pqVRQueueHandler::pqInternals
 {
 public:

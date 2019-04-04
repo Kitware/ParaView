@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QtDebug>
 
+#include <cassert>
+
 // ----------------------------------------------------------------------------
 QPointer<pqVRConnectionManager> pqVRConnectionManager::Instance;
 void pqVRConnectionManager::setInstance(pqVRConnectionManager* mgr)
