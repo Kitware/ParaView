@@ -90,14 +90,29 @@ public:
   * Returns false if link adding fails for some reason.
   */
   bool addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
-    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1)
-  {
-    return this->addPropertyLink<pqPropertyLinksConnection>(
-      qobject, qproperty, qsignal, smproxy, smproperty, smindex);
-  }
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
 
+  /**
+   * Like addPropertyLink, but also sets up properties to be Python traceable.
+   */
+  bool addTraceablePropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
+
+  /**
+   * Like addPropertyLink, but used to create a custom subclass of pqPropertyLinksConnection.
+   */
   template <class ConnectionType>
   bool addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+    vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1,
+    ConnectionType* notused = NULL);
+
+  /**
+   * Like addPropertyLink, but used to create a custom subclass of pqPropertyLinksConnection
+   * and flag it as traceable. Note that subclasses of pqPropertyLinksConnection may ignore
+   * the TraceChanges flag set on it with this method.
+   */
+  template <class ConnectionType>
+  bool addTraceablePropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1,
     ConnectionType* notused = NULL);
 
@@ -157,6 +172,10 @@ private slots:
 private:
   bool addNewConnection(pqPropertyLinksConnection*);
 
+  template <class ConnectionType>
+  ConnectionType* addPropertyLinkInternal(QObject* qobject, const char* qproperty,
+    const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex = -1);
+
 private:
   Q_DISABLE_COPY(pqPropertyLinks)
 
@@ -168,20 +187,48 @@ private:
 
 //-----------------------------------------------------------------------------
 template <class ConnectionType>
-bool pqPropertyLinks::addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
-  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, ConnectionType*)
+ConnectionType* pqPropertyLinks::addPropertyLinkInternal(QObject* qobject, const char* qproperty,
+  const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
 {
   if (!qobject || !qproperty || !qsignal || !smproxy || !smproperty)
   {
-    qCritical() << "Invalid parameters to pqPropertyLinks::addPropertyLink";
+    qCritical() << "Invalid parameters to pqPropertyLinks::addPropertyLinkInternal";
     qDebug() << "(" << qobject << ", " << qproperty << ", " << qsignal << ") <==> ("
              << (smproxy ? smproxy->GetXMLName() : "(none)") << ","
              << (smproperty ? smproperty->GetXMLLabel() : "(none)") << smindex << ")";
-    return false;
+    return nullptr;
   }
-  pqPropertyLinksConnection* connection = new ConnectionType(qobject, qproperty, qsignal, smproxy,
-    smproperty, smindex, this->useUncheckedProperties(), this);
-  return this->addNewConnection(connection);
+
+  ConnectionType* connection = new ConnectionType(qobject, qproperty, qsignal, smproxy, smproperty,
+    smindex, this->useUncheckedProperties(), this);
+  this->addNewConnection(connection);
+
+  return connection;
+}
+
+//-----------------------------------------------------------------------------
+template <class ConnectionType>
+bool pqPropertyLinks::addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, ConnectionType*)
+{
+  auto connection = this->addPropertyLinkInternal<ConnectionType>(
+    qobject, qproperty, qsignal, smproxy, smproperty, smindex);
+  return connection != nullptr;
+}
+
+//-----------------------------------------------------------------------------
+template <class ConnectionType>
+bool pqPropertyLinks::addTraceablePropertyLink(QObject* qobject, const char* qproperty,
+  const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex, ConnectionType*)
+{
+  auto connection = this->addPropertyLinkInternal<ConnectionType>(
+    qobject, qproperty, qsignal, smproxy, smproperty, smindex);
+  if (connection)
+  {
+    connection->setTraceChanges(true);
+    return true;
+  }
+  return false;
 }
 
 #endif

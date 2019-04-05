@@ -88,6 +88,12 @@ public:
   vtkSMProperty* propertySM() const { return this->PropertySM; }
   int indexSM() const { return this->IndexSM; }
 
+  /**
+   * Provide access to whether changes sent from Qt to the server manager are traceable.
+   */
+  void setTraceChanges(bool trace) { this->TraceChanges = trace; }
+  bool traceChanges() const { return this->TraceChanges; }
+
 public slots:
   /**
   * Copy values from ServerManager to Qt. If use_unchecked is true, unchecked
@@ -135,6 +141,7 @@ private:
   vtkWeakPointer<vtkSMProxy> ProxySM;
   vtkWeakPointer<vtkSMProperty> PropertySM;
   int IndexSM;
+  bool TraceChanges;
 };
 
 #endif
