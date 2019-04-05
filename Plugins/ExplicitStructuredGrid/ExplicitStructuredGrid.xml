@@ -91,6 +91,82 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy name="ExplicitStructuredGridSurfaceFilter"
+                 class="vtkExplicitStructuredGridSurfaceFilter"
+                 label="ExplicitStructuredGrid Extract Surface">
+      <Documentation long_help="Extract the surface of an explicit structured grid as vtkPolyData.">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkExplicitStructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the filter.
+        </Documentation>
+      </InputProperty>
+      <IntVectorProperty command="SetPassThroughCellIds"
+                         default_values="0"
+                         name="PassThroughCellIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, the output polygonal dataset will have a celldata array that
+          holds the cell index of the original 3D cell that produced each output
+          cell. This is useful for cell picking. The default is off to conserve
+          memory.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetPassThroughPointIds"
+                         default_values="0"
+                         name="PassThroughPointIds"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, the output polygonal dataset will have a pointdata array that
+          holds the point index of the original 3D point that produced each output
+          point. This is useful for point picking. The default is off to conserve
+          memory.
+        </Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty command="SetOriginalCellIdsName"
+                            default_values="vtkOriginalCellIds"
+                            name="OriginalCellIdsName"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Documentation>
+          If PassThroughCellIds is on, then these ivars control the name given to
+          the field in which the ids are written into.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="PassThroughCellIds"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetOriginalPointIdsName"
+                            default_values="vtkOriginalPointIds"
+                            name="OriginalPointIdsName"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <Documentation>
+          If PassThroughPointIds is on, then these ivars control the name given to
+          the field in which the ids are written into.
+        </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="PassThroughPointIds"
+                                   value="1" />
+        </Hints>
+      </StringVectorProperty>
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy name="ExplicitStructuredGridToUnstructuredGrid"
                  class="vtkExplicitStructuredGridToUnstructuredGrid"
                  label="ExplicitStructuredGrid To UnstructuredGrid">
