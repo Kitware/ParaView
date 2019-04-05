@@ -255,11 +255,6 @@ protected:
    */
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
-  /**
-   * Internal method which creates the output port proxies using the proxy specified.
-   */
-  void CreateOutputPortsInternal(vtkSMProxy* op);
-
   //@{
   /**
    * Method to set an output port at the given index. Provided for subclasses to
