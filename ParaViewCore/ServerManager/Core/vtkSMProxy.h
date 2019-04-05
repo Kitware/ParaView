@@ -926,7 +926,7 @@ protected:
   /**
    * Internal method used by `SetLogName`
    */
-  void SetLogNameInternal(
+  virtual void SetLogNameInternal(
     const char* name, bool propagate_to_subproxies, bool propagate_to_proxylistdomains);
 
   //@{

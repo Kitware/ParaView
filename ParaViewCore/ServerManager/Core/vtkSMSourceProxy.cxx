@@ -570,6 +570,10 @@ void vtkSMSourceProxy::CreateSelectionProxies()
       esProxy->SetGlobalID(this->GetGlobalID() + j + 1);
       esProxy->UpdateVTKObjects();
 
+      std::ostringstream sstream;
+      sstream << this->GetLogNameOrDefault() << "(ExtractSelection:" << j << ")";
+      esProxy->SetLogName(sstream.str().c_str());
+
       this->PInternals->SelectionProxies[j] = esProxy;
 
       // We don't use input property since that leads to reference loop cycles
@@ -664,6 +668,24 @@ vtkSMSourceProxy* vtkSMSourceProxy::GetSelectionOutput(unsigned int portIndex)
   }
 
   return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::SetLogNameInternal(
+  const char* name, bool propagate_to_subproxies, bool propagate_to_proxylistdomains)
+{
+  this->Superclass::SetLogNameInternal(
+    name, propagate_to_subproxies, propagate_to_proxylistdomains);
+  auto& internals = *this->PInternals;
+  for (size_t port = 0, max = internals.SelectionProxies.size(); port < max; ++port)
+  {
+    if (auto esProxy = internals.SelectionProxies[port])
+    {
+      std::ostringstream stream;
+      stream << name << "(ExtractSelection:" << port << ")";
+      esProxy->SetLogName(stream.str().c_str());
+    }
+  }
 }
 
 //---------------------------------------------------------------------------

@@ -273,6 +273,12 @@ protected:
    */
   void PostUpdateData() override;
 
+  /**
+   * Overridden to pass the logname to the internal ExtractSelection proxies.
+   */
+  void SetLogNameInternal(
+    const char* name, bool propagate_to_subproxies, bool propagate_to_proxylistdomains) override;
+
   // flag used to avoid creation of extract selection proxies for this source
   // proxy.
   bool DisableSelectionProxies;
