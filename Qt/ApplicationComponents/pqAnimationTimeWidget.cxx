@@ -145,9 +145,9 @@ void pqAnimationTimeWidget::setAnimationScene(vtkSMProxy* ascene)
     return;
   }
 
-  internals.Links.addPropertyLink(
+  internals.Links.addTraceablePropertyLink(
     this, "timeValue", SIGNAL(timeValueChanged()), ascene, ascene->GetProperty("AnimationTime"));
-  internals.Links.addPropertyLink(
+  internals.Links.addTraceablePropertyLink(
     this, "playMode", SIGNAL(playModeChanged()), ascene, ascene->GetProperty("PlayMode"));
 
   // In a ParaView application, it's safe to assume that the timekeeper an
