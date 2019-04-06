@@ -209,19 +209,19 @@ protected:
   long FileSize;
 
   // Float Vector Buffer utils
-  void GetVectorFromFloatBuffer(int i, float* vector);
+  void GetVectorFromFloatBuffer(vtkIdType i, float* vector);
   void UpdateFloatBuffer();
   // The buffer
   float** FloatBuffer;
   // The buffer size. Default is 1000
-  int FloatBufferSize;
+  vtkIdType FloatBufferSize;
   // The FloatBuffer store the vectors
   // from FloatBufferIndexBegin to FloatBufferIndexBegin + FloatBufferSize
-  int FloatBufferIndexBegin;
+  vtkIdType FloatBufferIndexBegin;
   // X variable positions of vector number 0 in file
-  long FloatBufferFilePosition;
+  vtkIdType FloatBufferFilePosition;
   // Total number of vectors;
-  int FloatBufferNumberOfVectors;
+  vtkIdType FloatBufferNumberOfVectors;
 
 private:
   vtkPEnSightGoldBinaryReader(const vtkPEnSightGoldBinaryReader&) = delete;
