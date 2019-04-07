@@ -360,6 +360,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TimeStepProgressBar_Inter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceExodus.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceMultiViews.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceTimeControls.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_AllBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_OneBlock.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TransferFunctionResetOnVisibilityChange_TwoBlocks.png}"
@@ -969,6 +970,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     TraceSaveGeometry.xml
     TraceStatisticsFilter.xml
     TraceSupplementalProxiesFully.xml
+    TraceTimeControls.xml
   )
   list(APPEND TESTS_WITH_INLINE_COMPARES
     RestoreArrayDefaultTransferFunction.xml
