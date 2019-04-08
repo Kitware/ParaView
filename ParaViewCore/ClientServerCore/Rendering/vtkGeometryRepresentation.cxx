@@ -50,7 +50,7 @@
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
 
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayActorNode.h"
 #endif
 
@@ -762,7 +762,7 @@ void vtkGeometryRepresentation::SetOpacity(double val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetLuminosity(double val)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayActorNode::SetLuminosity(val, this->Property);
 #else
   (void)val;
@@ -1083,7 +1083,7 @@ void vtkGeometryRepresentation::UpdateBlockAttributes(vtkMapper* mapper)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetEnableScaling(int val)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->Actor->SetEnableScaling(val);
 #else
   (void)val;
@@ -1093,7 +1093,7 @@ void vtkGeometryRepresentation::SetEnableScaling(int val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetScalingArrayName(const char* val)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->Actor->SetScalingArrayName(val);
 #else
   (void)val;
@@ -1103,7 +1103,7 @@ void vtkGeometryRepresentation::SetScalingArrayName(const char* val)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->Actor->SetScalingFunction(pwf);
 #else
   (void)pwf;
@@ -1113,7 +1113,7 @@ void vtkGeometryRepresentation::SetScalingFunction(vtkPiecewiseFunction* pwf)
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::SetMaterial(const char* val)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (!strcmp(val, "None"))
   {
     this->Property->SetMaterialName(nullptr);

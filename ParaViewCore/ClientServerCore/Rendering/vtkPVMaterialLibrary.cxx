@@ -18,7 +18,7 @@
 
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
 #include "vtkResourceFileLocator.h"
@@ -41,7 +41,7 @@ vtkStandardNewMacro(vtkPVMaterialLibrary);
 vtkPVMaterialLibrary::vtkPVMaterialLibrary()
 {
 // initialize the class that will act as library of materials
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->MaterialLibrary = vtkOSPRayMaterialLibrary::New();
 #else
   this->MaterialLibrary = nullptr;
@@ -107,7 +107,7 @@ void vtkPVMaterialLibrary::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 void vtkPVMaterialLibrary::ReadRelativeFile(const char* FileName)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   std::vector<std::string> paths;
   vtksys::SystemTools::Split(this->SearchPaths, paths, ENV_PATH_SEP);
   for (size_t cc = 0; cc < paths.size(); cc++)
@@ -137,7 +137,7 @@ vtkObject* vtkPVMaterialLibrary::GetMaterialLibrary()
 //-----------------------------------------------------------------------------
 bool vtkPVMaterialLibrary::ReadFile(const char* FileName)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->ReadFile(FileName);
 #else
   (void)FileName;
@@ -148,7 +148,7 @@ bool vtkPVMaterialLibrary::ReadFile(const char* FileName)
 //-----------------------------------------------------------------------------
 bool vtkPVMaterialLibrary::ReadBuffer(const char* FileName)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->ReadBuffer(FileName);
 #else
   (void)FileName;
@@ -159,7 +159,7 @@ bool vtkPVMaterialLibrary::ReadBuffer(const char* FileName)
 //-----------------------------------------------------------------------------
 const char* vtkPVMaterialLibrary::WriteBuffer()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->WriteBuffer();
 #else
   return nullptr;

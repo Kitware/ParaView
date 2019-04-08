@@ -15,7 +15,7 @@ endif()
 
 list(APPEND __dependencies vtkglew)
 
-if(PARAVIEW_USE_OSPRAY)
+if(PARAVIEW_USE_RAYTRACING)
   #list(APPEND __dependencies vtkRenderingOSPRay)
 endif()
 

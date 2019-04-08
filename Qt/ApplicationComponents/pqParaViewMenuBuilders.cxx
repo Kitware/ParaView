@@ -137,7 +137,7 @@ void pqParaViewMenuBuilders::buildFileMenu(QMenu& menu)
   // now setup reactions.
   new pqLoadDataReaction(ui.actionFileOpen);
   new pqImportCinemaReaction(ui.actionFileImportCinemaDatabase);
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   new pqLoadMaterialsReaction(ui.actionFileLoadMaterials);
 #else
   delete ui.actionFileLoadMaterials;

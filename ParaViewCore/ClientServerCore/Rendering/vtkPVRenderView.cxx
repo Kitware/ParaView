@@ -102,7 +102,7 @@
 #include "vtkIceTSynchronizedRenderers.h"
 #endif
 
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayLightNode.h"
 #include "vtkOSPRayMaterialLibrary.h"
 #include "vtkOSPRayPass.h"
@@ -122,7 +122,7 @@ class vtkPVRenderView::vtkInternals
 public:
   vtkNew<vtkValuePass> ValuePasses;
   vtkNew<vtkLightingMapPass> LightingMapPass;
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkNew<vtkOSPRayPass> OSPRayPass;
 #endif
   vtkSmartPointer<vtkRenderPass> SavedRenderPass;
@@ -3040,7 +3040,7 @@ vtkFloatArray* vtkPVRenderView::GetCapturedValuesFloat()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetViewTime(double value)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetViewTime(value, ren);
 #endif
@@ -3050,7 +3050,7 @@ void vtkPVRenderView::SetViewTime(double value)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetEnableOSPRay(bool v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (this->Internals->IsInOSPRay == v)
   {
     return;
@@ -3087,7 +3087,7 @@ bool vtkPVRenderView::GetEnableOSPRay()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetMaterialLibrary(vtkPVMaterialLibrary* ml)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaterialLibrary(
     vtkOSPRayMaterialLibrary::SafeDownCast(ml->GetMaterialLibrary()), ren);
@@ -3099,7 +3099,7 @@ void vtkPVRenderView::SetMaterialLibrary(vtkPVMaterialLibrary* ml)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetOSPRayRendererType(std::string name)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetRendererType(name, ren);
 #else
@@ -3110,7 +3110,7 @@ void vtkPVRenderView::SetOSPRayRendererType(std::string name)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetShadows(bool v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->Internals->OSPRayShadows = v;
   vtkRenderer* ren = this->GetRenderer();
   if (this->Internals->IsInOSPRay)
@@ -3125,7 +3125,7 @@ void vtkPVRenderView::SetShadows(bool v)
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetShadows()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return (ren->GetUseShadows() == 1);
 #else
@@ -3136,7 +3136,7 @@ bool vtkPVRenderView::GetShadows()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetAmbientSamples(v, ren);
 #else
@@ -3147,7 +3147,7 @@ void vtkPVRenderView::SetAmbientOcclusionSamples(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetAmbientOcclusionSamples()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetAmbientSamples(ren);
 #else
@@ -3158,7 +3158,7 @@ int vtkPVRenderView::GetAmbientOcclusionSamples()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetSamplesPerPixel(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetSamplesPerPixel(v, ren);
 #else
@@ -3169,7 +3169,7 @@ void vtkPVRenderView::SetSamplesPerPixel(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetSamplesPerPixel()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetSamplesPerPixel(ren);
 #else
@@ -3180,7 +3180,7 @@ int vtkPVRenderView::GetSamplesPerPixel()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetMaxFrames(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetMaxFrames(v, ren);
 #else
@@ -3191,7 +3191,7 @@ void vtkPVRenderView::SetMaxFrames(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetMaxFrames()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetMaxFrames(ren);
 #else
@@ -3202,7 +3202,7 @@ int vtkPVRenderView::GetMaxFrames()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDenoise(bool v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   this->Internals->OSPRayDenoise = v;
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetEnableDenoiser(v, ren);
@@ -3214,7 +3214,7 @@ void vtkPVRenderView::SetDenoise(bool v)
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetDenoise()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return (vtkOSPRayRendererNode::GetEnableDenoiser(ren) == 1);
 #else
@@ -3225,7 +3225,7 @@ bool vtkPVRenderView::GetDenoise()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetLightScale(double v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayLightNode::SetLightScale(v);
 #else
   (void)v;
@@ -3235,7 +3235,7 @@ void vtkPVRenderView::SetLightScale(double v)
 //----------------------------------------------------------------------------
 double vtkPVRenderView::GetLightScale()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   return vtkOSPRayLightNode::GetLightScale();
 #else
   return 0.5;
@@ -3245,7 +3245,7 @@ double vtkPVRenderView::GetLightScale()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetOSPRayContinueStreaming()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (!this->Internals->IsInOSPRay)
   {
     return false;
@@ -3265,7 +3265,7 @@ bool vtkPVRenderView::GetOSPRayContinueStreaming()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackgroundNorth(double x, double y, double z)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   double dir[3] = { x, y, z };
   vtkOSPRayRendererNode::SetNorthPole(dir, ren);
@@ -3279,7 +3279,7 @@ void vtkPVRenderView::SetBackgroundNorth(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackgroundEast(double x, double y, double z)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   double dir[3] = { x, y, z };
   vtkOSPRayRendererNode::SetEastPole(dir, ren);
@@ -3293,7 +3293,7 @@ void vtkPVRenderView::SetBackgroundEast(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetTimeCacheSize(int v)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   vtkOSPRayRendererNode::SetTimeCacheSize(v, ren);
 #else
@@ -3304,7 +3304,7 @@ void vtkPVRenderView::SetTimeCacheSize(int v)
 //----------------------------------------------------------------------------
 int vtkPVRenderView::GetTimeCacheSize()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkRenderer* ren = this->GetRenderer();
   return vtkOSPRayRendererNode::GetTimeCacheSize(ren);
 #else

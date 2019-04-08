@@ -38,8 +38,8 @@ OPTIONAL_DEPENDS
   ParaView::icet
   ParaView::nvpipe
   VTK::FiltersParallelMPI
-  VTK::RenderingOSPRay
-
+  VTK::RenderingMatplotlib
+  VTK::RenderingRayTracing
   # These affect the public API.
   ParaView::icet
   VTK::ParallelMPI

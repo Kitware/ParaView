@@ -166,7 +166,15 @@ option(PARAVIEW_BUILD_DEVELOPER_DOCUMENTATION "Build ParaView C++/Python docs" O
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_VTKM "Enable VTK-m accelerated algorithms" ON)
-option(PARAVIEW_USE_OSPRAY "Build ParaView with OSPRay Ray Traced rendering" OFF)
+set(raytracing_default OFF)
+if (DEFINED PARAVIEW_USE_OSPRAY)
+  message(DEPRECATION
+    "PARAVIEW_USE_OSPRAY has been renamed to PARAVIEW_USE_RAYTRACING.")
+  set(raytracing_default "${PARAVIEW_USE_OSPRAY}")
+  unset(PARAVIEW_USE_OSPRAY)
+  unset(PARAVIEW_USE_OSPRAY CACHE)
+endif ()
+option(PARAVIEW_USE_RAYTRACING "Build ParaView with OSPRay and/or OptiX ray Traced rendering" ${raytracing_default})
 option(PARAVIEW_ENABLE_LOGGING "Enable logging support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_LOGGING)
 
@@ -408,9 +416,9 @@ if (PARAVIEW_USE_VTKM)
     VTK::AcceleratorsVTKm)
 endif ()
 
-if (PARAVIEW_USE_OSPRAY)
+if (PARAVIEW_USE_RAYTRACING)
   list(APPEND paraview_requested_modules
-    VTK::RenderingOSPRay)
+    VTK::RenderingRayTracing)
 endif ()
 
 if (PARAVIEW_ENABLE_NVPIPE)

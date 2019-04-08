@@ -16,7 +16,7 @@ PRIVATE_DEPENDS
   VTK::CommonColor
   VTK::vtksys
 OPTIONAL_DEPENDS
-  VTK::RenderingOSPRay
+  VTK::RenderingRayTracing
 
   # These affect the public API.
   ParaView::ClientServerCorePython

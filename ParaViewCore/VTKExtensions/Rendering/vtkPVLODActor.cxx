@@ -30,7 +30,7 @@
 
 #include <math.h>
 
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayActorNode.h"
 #endif
 
@@ -320,7 +320,7 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVLODActor::SetEnableScaling(int val)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (this->Mapper)
   {
     vtkInformation* info = this->Mapper->GetInformation();
@@ -339,7 +339,7 @@ void vtkPVLODActor::SetEnableScaling(int val)
 //----------------------------------------------------------------------------
 void vtkPVLODActor::SetScalingArrayName(const char* val)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (this->Mapper)
   {
     vtkInformation* mapperInfo = this->Mapper->GetInformation();
@@ -358,7 +358,7 @@ void vtkPVLODActor::SetScalingArrayName(const char* val)
 //----------------------------------------------------------------------------
 void vtkPVLODActor::SetScalingFunction(vtkPiecewiseFunction* pwf)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   if (this->Mapper)
   {
     vtkInformation* mapperInfo = this->Mapper->GetInformation();

@@ -530,7 +530,7 @@ else()
     TruchasReader.xml)
 endif()
 
-if(PARAVIEW_USE_OSPRAY)
+if(PARAVIEW_USE_RAYTRACING)
   list(APPEND TESTS_WITH_BASELINES
     OSPRay.xml)
 endif()

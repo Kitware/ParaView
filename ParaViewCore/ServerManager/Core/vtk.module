@@ -17,7 +17,7 @@ PRIVATE_DEPENDS
 OPTIONAL_DEPENDS
   VTK::Python
   VTK::PythonInterpreter
-  VTK::RenderingOSPRay
+  VTK::RenderingRayTracing
   VTK::WrappingPythonCore
 TEST_DEPENDS
   ParaView::ServerManagerApplication
