@@ -12,9 +12,10 @@
 
 #include <cstring>
 
-vtkObjectFactoryNewMacro(vtkLagrangianIntegrationModelExample)
+vtkObjectFactoryNewMacro(vtkLagrangianIntegrationModelExample);
 
-  vtkLagrangianIntegrationModelExample::vtkLagrangianIntegrationModelExample()
+//----------------------------------------------------------------------------
+vtkLagrangianIntegrationModelExample::vtkLagrangianIntegrationModelExample()
 {
   // Fill the helper array
   // Here one should set the seed and surface array name and components
@@ -40,81 +41,73 @@ vtkObjectFactoryNewMacro(vtkLagrangianIntegrationModelExample)
   this->NumFuncs = this->NumIndepVars - 1;
 }
 
-vtkLagrangianIntegrationModelExample::~vtkLagrangianIntegrationModelExample()
-{
-}
-
+//----------------------------------------------------------------------------
 void vtkLagrangianIntegrationModelExample::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
-int vtkLagrangianIntegrationModelExample::FunctionValues(
+//----------------------------------------------------------------------------
+int vtkLagrangianIntegrationModelExample::FunctionValues(vtkLagrangianParticle* particle,
   vtkDataSet* dataSet, vtkIdType cellId, double* weights, double* x, double* f)
 {
   // Initialize output
   std::fill(f, f + this->NumFuncs, 0.0);
 
   // Check for a particle
-  if (this->CurrentParticle == NULL)
+  if (!particle)
   {
-    vtkErrorMacro(<< "No Particle to integrate");
+    vtkErrorMacro("No Particle to integrate");
     return 0;
   }
 
   // Sanity Check
-  if (dataSet == NULL || cellId == -1)
+  if (!dataSet || cellId == -1)
   {
-    vtkErrorMacro(<< "No cell or dataset to integrate the Particle on : Dataset: " << dataSet
-                  << " CellId:" << cellId);
+    vtkErrorMacro("No cell or dataset to integrate the Particle on : Dataset: "
+      << dataSet << " CellId:" << cellId);
     return 0;
   }
 
-  // Recover Flow Properties
-  int nComponent;
-  double* tmp;
-
-  // Fetch each array at correct indexes, as defined in the xml.
-
   // Fetch flowVelocity at index 3
-  if (!this->GetFlowOrSurfaceData(3, dataSet, cellId, weights, tmp, nComponent) || nComponent != 3)
+  double flowVelocity[3];
+  if (this->GetFlowOrSurfaceDataNumberOfComponents(3, dataSet) != 3 ||
+    !this->GetFlowOrSurfaceData(3, dataSet, cellId, weights, flowVelocity))
   {
     vtkErrorMacro("Flow velocity is not set in source flow dataset or "
                   "have incorrect number of components, cannot use Matida equations");
     return 0;
   }
-  // do not forget to copy the data
-  double flowVelocity[3];
-  std::memcpy(flowVelocity, tmp, sizeof(double) * nComponent);
 
   // Fetch flowDensity at index 4
-  if (!this->GetFlowOrSurfaceData(4, dataSet, cellId, weights, tmp, nComponent) || nComponent != 1)
+  double flowDensity;
+  if (this->GetFlowOrSurfaceDataNumberOfComponents(4, dataSet) != 1 ||
+    !this->GetFlowOrSurfaceData(4, dataSet, cellId, weights, &flowDensity))
   {
     vtkErrorMacro("Flow density is not set in source flow dataset or "
                   "have incorrect number of components, cannot use Matida equations");
     return 0;
   }
-  double flowDensity = *tmp;
 
   // Fetch flowDynamicViscosity at index 5
-  if (!this->GetFlowOrSurfaceData(5, dataSet, cellId, weights, tmp, nComponent) || nComponent != 1)
+  double flowDynamicViscosity;
+  if (this->GetFlowOrSurfaceDataNumberOfComponents(5, dataSet) != 1 ||
+    !this->GetFlowOrSurfaceData(5, dataSet, cellId, weights, &flowDynamicViscosity))
   {
     vtkErrorMacro("Flow dynamic viscosity is not set in source flow dataset or "
                   "have incorrect number of components, cannot use Matida equations");
     return 0;
   }
-  double flowDynamicViscosity = *tmp;
 
   // Fetch Particle Properties
-  vtkIdType tupleIndex = this->CurrentParticle->GetSeedArrayTupleIndex();
+  vtkIdType tupleIndex = particle->GetSeedArrayTupleIndex();
 
   // Fetch Particle Diameter as the first user variables
-  double particleDiameter = this->CurrentParticle->GetUserVariables()[0];
+  double particleDiameter = particle->GetUserVariables()[0];
 
   // Fetch Particle Density at index 7
-  vtkDataArray* particleDensities =
-    vtkDataArray::SafeDownCast(this->GetSeedArray(7, this->CurrentParticle));
-  if (particleDensities == NULL)
+  vtkDataArray* particleDensities = vtkDataArray::SafeDownCast(this->GetSeedArray(7, particle));
+  if (!particleDensities)
   {
     vtkErrorMacro("Particle density is not set in particle data, "
                   "cannot use Matida equations");
@@ -124,21 +117,22 @@ int vtkLagrangianIntegrationModelExample::FunctionValues(
 
   // Recover Gravity constant, idx 8, FieldData, as defined in the xml.
   // We read at a index 0 because these is the only tuple in the fieldData
-  if (!this->GetFlowOrSurfaceData(8, dataSet, 0, weights, tmp, nComponent) || nComponent != 1)
+  double gravityConstant;
+  if (this->GetFlowOrSurfaceDataNumberOfComponents(8, dataSet) != 1 ||
+    !this->GetFlowOrSurfaceData(8, dataSet, 0, weights, &gravityConstant))
   {
     vtkErrorMacro("GravityConstant is not set in source flow dataset or have"
                   "incorrect number of components, cannot use Matida Equations");
     return 0;
   }
-  double gravityConstant = *tmp;
 
   // Compute function values
   for (int i = 0; i < 3; i++)
   {
     // Matida Equation
     f[i + 3] = (flowVelocity[i] - x[i + 3]) *
-      this->GetDragCoefficient(flowVelocity, this->CurrentParticle->GetVelocity(),
-        flowDynamicViscosity, particleDiameter, flowDensity) /
+      this->GetDragCoefficient(flowVelocity, particle->GetVelocity(), flowDynamicViscosity,
+        particleDiameter, flowDensity) /
       (this->GetRelaxationTime(flowDynamicViscosity, particleDiameter, particleDensity));
     f[i] = x[i + 3];
   }
@@ -195,7 +189,7 @@ void vtkLagrangianIntegrationModelExample::InitializeParticle(vtkLagrangianParti
 
   // Recover Particle Diameter, idx 6, see xml file
   vtkDoubleArray* particleDiameters = vtkDoubleArray::SafeDownCast(this->GetSeedArray(6, particle));
-  if (particleDiameters == NULL)
+  if (!particleDiameters)
   {
     vtkErrorMacro("ParticleDiameter is not set in particle data, variable not set");
   }

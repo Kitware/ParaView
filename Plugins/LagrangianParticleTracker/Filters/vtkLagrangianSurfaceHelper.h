@@ -21,7 +21,7 @@
  * This filter enables generation of field data array by array,
  * different for each block when using composite data,
  * from constant value
-*/
+ */
 
 #ifndef vtkLagrangianSurfaceHelper_h
 #define vtkLagrangianSurfaceHelper_h

@@ -49,7 +49,7 @@ class pqIntegrationModelSeedHelperWidget : public pqIntegrationModelHelperWidget
 public:
   pqIntegrationModelSeedHelperWidget(
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
-  ~pqIntegrationModelSeedHelperWidget() override;
+  ~pqIntegrationModelSeedHelperWidget() override = default;
 
   QList<QVariant> arrayToGenerate() const;
 

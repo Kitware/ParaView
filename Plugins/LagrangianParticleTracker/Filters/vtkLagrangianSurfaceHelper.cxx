@@ -130,6 +130,7 @@ int vtkLagrangianSurfaceHelper::RequestData(
   else
   {
     vtkErrorMacro("Unsupported dataset type : " << output->GetClassName());
+    return 0;
   }
   return 1;
 }
@@ -144,7 +145,7 @@ void vtkLagrangianSurfaceHelper::FillFieldData(vtkDataSet* dataset, int leaf)
     vtkInternals::ArrayVal& arrayVal = this->Internals->ArraysToGenerate[i];
     if (leaf > arrayVal.NumberOfLeafs)
     {
-      vtkErrorMacro("Leaf :" << leaf << "does not exist in constants values. Ignoring.");
+      vtkWarningMacro("Leaf :" << leaf << "does not exist in constants values. Ignoring.");
       return;
     }
 
