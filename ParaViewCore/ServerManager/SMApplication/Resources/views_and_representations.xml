@@ -2579,6 +2579,7 @@
         are encoded into RGB.</Documentation>
       </Property>
       <IntVectorProperty name="EnableOSPRay"
+          label="Enable Ray Tracing"
           command="SetEnableOSPRay"
           default_values="0"
           animateable="0"
@@ -2608,12 +2609,13 @@
       </IntVectorProperty>
       <StringVectorProperty name="OSPRayRendererType"
           command="SetOSPRayRendererType"
-          label="OSPRay Renderer"
+          label="Back End"
           default_values="scivis"
           number_of_elements="1">
         <StringListDomain name="list">
-          <String value="scivis" />
-          <String value="pathtracer" />
+          <String value="OSPRay raycaster" />
+          <String value="OSPRay pathtracer" />
+          <String value="OptiX pathtracer" />
         </StringListDomain>
         <Documentation>Set the OSPRay renderer to use.</Documentation>
         <Hints>
@@ -2690,7 +2692,7 @@
           animateable="0"
           number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>Controls whether to denoise images.</Documentation>
+        <Documentation>Controls whether to denoise images (if available).</Documentation>
         <Hints>
           <PropertyWidgetDecorator type="OSPRayHidingDecorator" />
           <PropertyWidgetDecorator type="GenericDecorator"
@@ -2843,7 +2845,7 @@
         <Property name="StartCaptureLuminance" />
         <Property name="StopCaptureLuminance" />
       </PropertyGroup>
-      <PropertyGroup label="OSPRay Rendering"
+      <PropertyGroup label="Ray Traced Rendering"
                      panel_visibility="advanced">
         <Property name="EnableOSPRay"/>
         <Property name="Shadows"/>
@@ -3835,7 +3837,7 @@
           </PropertyGroup>
 
           <PropertyGroup panel_visibility="advanced"
-                         label="OSPRay" >
+                         label="Ray Tracing" >
             <Property name="OSPRayUseScaleArray" />
             <Property name="OSPRayScaleArray" />
             <Property name="OSPRayScaleFunction" />
@@ -10767,7 +10769,7 @@
       <IntVectorProperty command="SetEnableScaling"
                          default_values="0"
                          name="OSPRayUseScaleArray"
-                         label="OSPRay Use Scale Array"
+                         label="Use Scale Array"
                          number_of_elements="1">
         <Documentation>
           Allows OSPRay implicit points and lines to be sized by an array.
@@ -10780,7 +10782,7 @@
       <StringVectorProperty command="SetScalingArrayName"
                             default_values=""
                             name="OSPRayScaleArray"
-                            label="OSPRay Scale Array"
+                            label="Scale Array"
                             number_of_elements="1"
                             panel_visibility="advanced">
         <ArrayListDomain input_domain_name="input_array_point"
@@ -10798,7 +10800,7 @@
       </StringVectorProperty>
       <ProxyProperty command="SetScalingFunction"
                      name="OSPRayScaleFunction"
-                     label="OSPRay Scale Function"
+                     label="Scale Function"
                      panel_visibility="advanced"
                      panel_widget="transfer_function_editor" >
         <Documentation>Set the piecewise function used to map data array to sprite size.
@@ -10816,7 +10818,7 @@
       </ProxyProperty>
       <StringVectorProperty command="SetMaterial"
                             name="OSPRayMaterial"
-                            label="OSPRay Material"
+                            label="Material"
                             number_of_elements="1"
                             panel_visibility="advanced"
                             default_values="None">

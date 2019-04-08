@@ -178,13 +178,13 @@
   </action>
   <action name="actionFileLoadMaterials">
    <property name="text">
-    <string>Load OSPRay Materials...</string>
+    <string>Load Path Tracer Materials...</string>
    </property>
    <property name="toolTip">
-    <string>Load an OSPRay Materials file</string>
+    <string>Load a Materials file that contains appearance settings for use in high quality rendering modes.</string>
    </property>
    <property name="statusTip">
-    <string>Load an OSPRay Materials file</string>
+    <string>Load an Appearance Materials file</string>
    </property>
   </action>
   <addaction name="actionFileOpen"/>
