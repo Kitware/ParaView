@@ -1063,7 +1063,7 @@ int vtkCGNSReader::vtkPrivate::readSolution(const std::string& solutionNameStr, 
     else if (cgnsVars[nv].xyzIndex == 1)
     {
       dsa->AddArray(vtkVars[nv]);
-      if (!dsa->GetVectors())
+      if (!dsa->GetVectors() && physicalDim == 3)
       {
         dsa->SetVectors(vtkVars[nv]);
       }
@@ -1936,6 +1936,7 @@ int vtkCGNSReader::GetUnstructuredZone(
       //
       std::vector<vtkIdType> faceElementsIdx;
       std::vector<vtkIdType> faceElementsArr;
+      bool old_polygonal_layout = false;
       //
       //
       faceElementsArr.resize(faceElementsSize);
@@ -1971,9 +1972,9 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_start_offset(this->cgioNum, elemIdList[osec], 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localFaceElementsIdx))
         {
-          vtkErrorMacro(<< "FAILED to read NGON_n ElementStartOffset array."
-                           " Please refer to CGNS 3.4 or later\n");
-          return 1;
+          vtkWarningMacro(<< "FAILED to read NGON_n ElementStartOffset array."
+                             " Trying a fallback solution for CGNS previous to 3.4\n");
+          old_polygonal_layout = true;
         }
 
         if (startArraySec[sec] != 0)
@@ -2007,6 +2008,29 @@ int vtkCGNSReader::GetUnstructuredZone(
       }
       // Loading Done
       //
+      if (old_polygonal_layout)
+      {
+        // Regenerate a faceElementIdx lookupTable
+        vtkIdType curFace = 0;
+        vtkIdType curNodeInFace = 0;
+
+        faceElementsIdx[0] = 0;
+
+        for (vtkIdType idxFace = 0; idxFace < static_cast<vtkIdType>(faceElementsIdx.size() - 1);
+             ++idxFace)
+        {
+          vtkIdType nVertexOnCurFace = faceElementsArr[curFace];
+
+          faceElementsIdx[idxFace + 1] = faceElementsIdx[idxFace] + nVertexOnCurFace;
+
+          for (vtkIdType idxVertex = 0; idxVertex < nVertexOnCurFace; idxVertex++)
+          {
+            faceElementsArr[curNodeInFace] = faceElementsArr[curFace + idxVertex + 1];
+            curNodeInFace++;
+          }
+          curFace += nVertexOnCurFace + 1;
+        }
+      }
       // Now take care of NFACE_n properly
       //
       // In case of unordered section :
@@ -2077,9 +2101,9 @@ int vtkCGNSReader::GetUnstructuredZone(
         if (0 != CGNSRead::get_section_start_offset(this->cgioNum, cgioSectionId, 1, srcStart,
                    srcEnd, srcStride, memStart, memEnd, memStride, memDim, localCellElementsIdx))
         {
-          vtkErrorMacro(<< "FAILED to read NFACE_n ElementStartOffset array."
-                           " Please refer to CGNS 3.4 or later\n");
-          return 1;
+          vtkWarningMacro(<< "FAILED to read NFACE_n ElementStartOffset array."
+                             " Trying a fallback solution for CGNS previous to 3.4\n");
+          old_polygonal_layout = true;
         }
         if (startNFaceArraySec[sec] != 0)
         {
@@ -2118,6 +2142,30 @@ int vtkCGNSReader::GetUnstructuredZone(
       // intermediate faces
       // need to be taken out of the description.
       // Basic CGNS 3.4 support
+
+      if (old_polygonal_layout)
+      {
+        // Regenerate cellElementIdx lookupTable
+        vtkIdType curCell = 0;
+        vtkIdType curFaceInCell = 0;
+
+        cellElementsIdx[0] = 0;
+
+        for (vtkIdType idxCell = 0; idxCell < static_cast<vtkIdType>(cellElementsIdx.size() - 1);
+             ++idxCell)
+        {
+          vtkIdType nFaceInCell = cellElementsArr[curCell];
+
+          cellElementsIdx[idxCell + 1] = cellElementsIdx[idxCell] + nFaceInCell;
+
+          for (vtkIdType idxFace = 0; idxFace < nFaceInCell; idxFace++)
+          {
+            cellElementsArr[curFaceInCell] = cellElementsArr[curCell + idxFace + 1];
+            curFaceInCell++;
+          }
+          curCell += nFaceInCell + 1;
+        }
+      }
 
       for (vtkIdType nc = 0; nc < numCells; nc++)
       {
@@ -2180,6 +2228,7 @@ int vtkCGNSReader::GetUnstructuredZone(
 
         for (vtkIdType nf = 0; nf < numFaces; ++nf)
         {
+
           vtkIdType startNode = faceElementsIdx[nf];
           vtkIdType endNode = faceElementsIdx[nf + 1];
           vtkIdType numNodes = endNode - startNode;

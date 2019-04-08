@@ -237,7 +237,7 @@ int get_section_start_offset(const int cgioNum, const double cgioSectionId, cons
 
   if (cgio_get_node_id(cgioNum, cgioSectionId, offsetPath, &cgioElemOffsetId) != CG_OK)
   {
-    std::cerr << "ElementStartOffset not found\n";
+    // std::cerr << "ElementStartOffset not found\n";
     return 1;
   }
 
