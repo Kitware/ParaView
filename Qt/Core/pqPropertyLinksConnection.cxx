@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMAdaptor.h"
 #include "vtkCommand.h"
+#include "vtkSMTrace.h"
 
 #include <QStringList>
 #include <QtDebug>
@@ -48,6 +49,7 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(QObject* qobject, const cha
   , ProxySM(smproxy)
   , PropertySM(smproperty)
   , IndexSM(smindex)
+  , TraceChanges(false)
 {
   setUseUncheckedProperties(use_unchecked_modified_event);
 
@@ -283,7 +285,16 @@ void pqPropertyLinksConnection::copyValuesFromQtToServerManager(bool use_uncheck
   bool prev = this->blockSignals(true);
 
   QVariant qtValue = this->currentQtValue();
-  this->setServerManagerValue(use_unchecked, qtValue);
+
+  if (this->traceChanges())
+  {
+    SM_SCOPED_TRACE(PropertiesModified).arg("proxy", this->proxySM());
+    this->setServerManagerValue(use_unchecked, qtValue);
+  }
+  else
+  {
+    this->setServerManagerValue(use_unchecked, qtValue);
+  }
 
   this->blockSignals(prev);
 }

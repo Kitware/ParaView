@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!-- create a time source  -->
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="TimeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Growing/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- start a trace -->
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="TraceOptionsDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- change time steps in a variet of ways -->
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="activated" arguments="0.666667" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timeValueComboBox" command="activated" arguments="0.888889" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+
+  <!-- When played back during testing, these events do not trigger the creation of trace items. However, trace items are created when
+       these events are executed manually in the UI. -->
+  <!--<pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="5" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="4" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="3" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/AnimationTimeWidget/timestepValue" command="set_int" arguments="2" />-->
+
+  <!-- save trace -->
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/PythonScriptEditorMenuBar/File" command="activate" arguments="Save &amp;As..." />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceTimeControls.py" />
+  <pqevent object="pqClientMainWindow/1pqPythonScriptEditor0/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceTimeControls.py" />
+
+  <!-- reset the state -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionDelete_All" />
+
+  <!-- create the time source again -->
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="TimeSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Growing/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- now run the trace -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceTimeControls.py" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+</pqevents>

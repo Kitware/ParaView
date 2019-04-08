@@ -338,16 +338,16 @@ void pqTimeInspectorWidget::updateScene()
 
   this->Internals->Ui.AnimationTimeWidget->setAnimationScene(sceneProxy);
 
-  links.addPropertyLink(this, "sceneStartTime", SIGNAL(dummySignal()), sceneProxy,
+  links.addTraceablePropertyLink(this, "sceneStartTime", SIGNAL(dummySignal()), sceneProxy,
     sceneProxy->GetProperty("StartTime"));
-  links.addPropertyLink(
+  links.addTraceablePropertyLink(
     this, "sceneEndTime", SIGNAL(dummySignal()), sceneProxy, sceneProxy->GetProperty("EndTime"));
-  links.addPropertyLink(
+  links.addTraceablePropertyLink(
     this, "scenePlayMode", SIGNAL(dummySignal()), sceneProxy, sceneProxy->GetProperty("PlayMode"));
-  links.addPropertyLink(this, "sceneNumberOfFrames", SIGNAL(dummySignal()), sceneProxy,
+  links.addTraceablePropertyLink(this, "sceneNumberOfFrames", SIGNAL(dummySignal()), sceneProxy,
     sceneProxy->GetProperty("NumberOfFrames"));
-  links.addPropertyLink(this, "sceneCurrentTime", SIGNAL(sceneCurrentTimeChanged()), sceneProxy,
-    sceneProxy->GetProperty("AnimationTime"));
+  links.addTraceablePropertyLink(this, "sceneCurrentTime", SIGNAL(sceneCurrentTimeChanged()),
+    sceneProxy, sceneProxy->GetProperty("AnimationTime"));
   // FIXME: update ticks based on play mode.
 
   vtkSMProxy* timeKeeper = controller->FindTimeKeeper(session);

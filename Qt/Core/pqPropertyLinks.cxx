@@ -72,6 +72,22 @@ pqPropertyLinks::~pqPropertyLinks()
 }
 
 //-----------------------------------------------------------------------------
+bool pqPropertyLinks::addPropertyLink(QObject* qobject, const char* qproperty, const char* qsignal,
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
+{
+  return this->addPropertyLink<pqPropertyLinksConnection>(
+    qobject, qproperty, qsignal, smproxy, smproperty, smindex);
+}
+
+//-----------------------------------------------------------------------------
+bool pqPropertyLinks::addTraceablePropertyLink(QObject* qobject, const char* qproperty,
+  const char* qsignal, vtkSMProxy* smproxy, vtkSMProperty* smproperty, int smindex)
+{
+  return this->addTraceablePropertyLink<pqPropertyLinksConnection>(
+    qobject, qproperty, qsignal, smproxy, smproperty, smindex);
+}
+
+//-----------------------------------------------------------------------------
 void pqPropertyLinks::setUseUncheckedProperties(bool val)
 {
   if (val == this->UseUncheckedProperties)
