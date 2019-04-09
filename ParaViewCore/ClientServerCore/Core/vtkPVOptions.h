@@ -28,6 +28,7 @@
 #include "vtkCommandOptions.h"
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 
+#include <string>  // used for ivar
 #include <utility> // needed for pair
 #include <vector>  // needed for vector
 
