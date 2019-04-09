@@ -532,6 +532,7 @@ if (PARAVIEW_ENABLE_WEB)
   list(APPEND paraview_requested_modules
     ParaView::PVWebCore
     ParaView::PVWebPython
+    ParaView::PVWebExporter
     VTK::WebCore
     VTK::WebPython
   )
@@ -549,6 +550,7 @@ else()
     ParaView::PVWebCore
     ParaView::PVWebPython
     ParaView::PVWebPython2
+    ParaView::PVWebExporter
     VTK::WebCore
     VTK::WebPython
   )
