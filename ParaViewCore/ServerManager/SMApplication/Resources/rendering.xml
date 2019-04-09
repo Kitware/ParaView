@@ -652,7 +652,7 @@
   <ProxyGroup name="materials">
     <MaterialLibraryProxy class="vtkPVMaterialLibrary"
                  name="MaterialLibrary"
-                 processes="client|renderserver">
+                 processes="client|renderserver|dataserver">
       <StringVectorProperty
                  default_values=""
                  label="Load Materials"
