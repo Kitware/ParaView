@@ -42,6 +42,7 @@ class vtkOpenVRRenderWindowInteractor;
 class vtkOpenVRRenderer;
 class vtkOpenVRRenderWindow;
 class vtkPropCollection;
+class vtkPVOpenVRCollaborationClient;
 class vtkPVDataRepresentation;
 class vtkPVRenderView;
 class vtkPVXMLElement;
@@ -98,9 +99,16 @@ public:
   void ExportLocationsAsSkyboxes(vtkSMViewProxy* view);
   void ExportLocationsAsView(vtkSMViewProxy* view);
 
+  vtkPVOpenVRCollaborationClient* GetCollaborationClient() { return this->CollaborationClient; }
+  bool CollaborationConnect();
+  bool CollaborationDisconnect();
+  void GoToSavedLocation(int, double*, double*);
+
 protected:
   vtkPVOpenVRHelper();
   ~vtkPVOpenVRHelper();
+
+  vtkPVOpenVRCollaborationClient* CollaborationClient;
 
   // state settings that the helper loads
   // These are typically not exposed in the GUI

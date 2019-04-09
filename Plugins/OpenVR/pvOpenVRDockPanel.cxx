@@ -11,6 +11,7 @@
 #include "vtkSMRenderViewProxy.h"
 
 #include "vtkNew.h"
+#include "vtkPVOpenVRCollaborationClient.h"
 #include "vtkPVOpenVRHelper.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVXMLElement.h"
@@ -68,6 +69,26 @@ void pvOpenVRDockPanel::constructor()
     pqPVApplicationCore::instance()->animationManager(), SIGNAL(endPlay()), this, SLOT(endPlay()));
 
   this->Helper->SetFieldValues(this->Internals->fieldValues->text().toLatin1().data());
+
+  if (this->Helper->GetCollaborationClient()->SupportsCollaboration())
+  {
+    this->Internals->cConnectButton->setEnabled(false);
+    connect(this->Internals->cConnectButton, SIGNAL(clicked()), this, SLOT(collaborationConnect()));
+  }
+  else
+  {
+    // hide widgets
+    this->Internals->cConnectButton->hide();
+    this->Internals->cSessionLabel->hide();
+    this->Internals->cSessionValue->hide();
+    this->Internals->cNameLabel->hide();
+    this->Internals->cNameValue->hide();
+    this->Internals->cPortLabel->hide();
+    this->Internals->cPortValue->hide();
+    this->Internals->cServerLabel->hide();
+    this->Internals->cServerValue->hide();
+    this->Internals->cHeader->hide();
+  }
 }
 
 void pvOpenVRDockPanel::sendToOpenVR()
@@ -75,7 +96,45 @@ void pvOpenVRDockPanel::sendToOpenVR()
   pqView* view = pqActiveObjects::instance().activeView();
 
   vtkSMViewProxy* smview = view->getViewProxy();
+  this->Internals->cConnectButton->setEnabled(true);
+  this->Internals->cConnectButton->setText("Connect");
   this->Helper->SendToOpenVR(smview);
+  this->Internals->cConnectButton->setEnabled(false);
+}
+
+void pvOpenVRDockPanel::collaborationConnect()
+{
+  if (this->Internals->cConnectButton->text() == "Connect")
+  {
+    vtkPVOpenVRCollaborationClient* cc = this->Helper->GetCollaborationClient();
+    cc->SetLogCallback(std::bind(&pvOpenVRDockPanel::collaborationCallback, this,
+                         std::placeholders::_1, std::placeholders::_2),
+      nullptr);
+    cc->SetCollabHost(this->Internals->cServerValue->text().toLatin1().data());
+    cc->SetCollabSession(this->Internals->cSessionValue->text().toLatin1().data());
+    cc->SetCollabName(this->Internals->cNameValue->text().toLatin1().data());
+    cc->SetCollabPort(this->Internals->cPortValue->text().toInt());
+    if (this->Helper->CollaborationConnect())
+    {
+      this->Internals->cConnectButton->setText("Disconnect");
+    }
+  }
+  else
+  {
+    this->Internals->cConnectButton->setText("Connect");
+    this->Helper->CollaborationDisconnect();
+  }
+}
+
+void pvOpenVRDockPanel::collaborationCallback(std::string const& msg, void*)
+{
+  // send message if any to text window
+  if (!msg.length())
+  {
+    return;
+  }
+
+  this->Internals->outputWindow->appendPlainText(msg.c_str());
 }
 
 void pvOpenVRDockPanel::exportLocationsAsSkyboxes()

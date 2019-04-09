@@ -49,6 +49,7 @@
 #include "vtkOpenVRRenderWindow.h"
 #include "vtkOpenVRRenderWindowInteractor.h"
 #include "vtkOpenVRRenderer.h"
+#include "vtkPVOpenVRCollaborationClient.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPointHandleRepresentation3D.h"
 #include "vtkRenderViewBase.h"
@@ -127,6 +128,9 @@ vtkPVOpenVRHelper::vtkPVOpenVRHelper()
 
   this->NeedStillRender = false;
   this->LoadSlotValue = -1;
+
+  this->CollaborationClient = vtkPVOpenVRCollaborationClient::New();
+  this->CollaborationClient->SetHelper(this);
 }
 
 //----------------------------------------------------------------------------
@@ -144,6 +148,23 @@ vtkPVOpenVRHelper::~vtkPVOpenVRHelper()
 
   this->EventCommand->Delete();
   this->AddedProps->Delete();
+
+  this->CollaborationClient->Delete();
+  this->CollaborationClient = nullptr;
+}
+
+bool vtkPVOpenVRHelper::CollaborationConnect()
+{
+  if (!this->Renderer)
+  {
+    return false;
+  }
+  return this->CollaborationClient->Connect(this->Renderer);
+}
+
+bool vtkPVOpenVRHelper::CollaborationDisconnect()
+{
+  return this->CollaborationClient->Disconnect();
 }
 
 namespace
@@ -1463,6 +1484,17 @@ void vtkPVOpenVRHelper::EventCallback(
   }
 }
 
+void vtkPVOpenVRHelper::GoToSavedLocation(int pos, double* collabTrans, double* collabDir)
+{
+  this->CollaborationClient->SetCurrentLocation(pos);
+
+  this->RenderWindow->GetDashboardOverlay()->LoadCameraPose(pos);
+  this->RenderWindow->UpdateHMDMatrixPose();
+  this->RenderWindow->SetPhysicalTranslation(collabTrans);
+  this->RenderWindow->SetPhysicalViewDirection(collabDir);
+  this->RenderWindow->UpdateHMDMatrixPose();
+}
+
 void vtkPVOpenVRHelper::LoadLocationState()
 {
   int slot = this->LoadSlotValue;
@@ -1473,6 +1505,8 @@ void vtkPVOpenVRHelper::LoadLocationState()
   {
     return;
   }
+
+  this->CollaborationClient->GoToSavedLocation(slot);
 
   vtkSMPropertyHelper helper(this->SMView, "Representations");
   for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
@@ -2136,6 +2170,7 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
     while (this->Interactor && !this->Interactor->GetDone())
     {
       this->Interactor->DoOneEvent(this->RenderWindow, this->Renderer);
+      this->CollaborationClient->Render();
       QCoreApplication::processEvents();
       if (this->NeedStillRender)
       {
@@ -2164,6 +2199,9 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
 
   this->RemoveAllThickCrops();
   this->RemoveAllCropPlanes();
+
+  // disconnect
+  this->CollaborationClient->Disconnect();
 
   this->AddedProps->RemoveAllItems();
   this->DistanceWidget->Delete(); // must delete before the interactor

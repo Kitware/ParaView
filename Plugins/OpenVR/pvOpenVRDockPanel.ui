@@ -6,141 +6,243 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>258</width>
-    <height>241</height>
+    <width>402</width>
+    <height>481</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout_4">
    <item>
-    <widget class="QPushButton" name="sendToOpenVRButton">
-     <property name="text">
-      <string>Send To OpenVR</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="multisamples">
-     <property name="toolTip">
-      <string extracomment="Whether or not to use multisampled framebuffers. Using multisamples can reduce flickering but currently does not work with volume rendering."/>
-     </property>
-     <property name="text">
-      <string>Use MultiSamples</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLineEdit" name="cropThickness">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>60</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="baseSize">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string extracomment="Thickness to use for new thick crops. A value of 0 defaults to automatic thickness."/>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="cropThicknessLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="toolTip">
-        <string extracomment="When using thick cropping planes this specifies the thickness of those planes."/>
-       </property>
-       <property name="text">
-        <string>Crop Thickness</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLineEdit" name="editableField">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string extracomment="What scalar field can be edited in VR. This is an advanced feature still in development. You must specify field values below for this to work and the editable field specified must be a scalar array present in your data."/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="scalarFieldLabel">
-       <property name="text">
-        <string>Editable Field</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QLabel" name="fieldValuesLabel">
-     <property name="text">
-      <string>Field Values</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="fieldValues">
-     <property name="toolTip">
-      <string extracomment="The options available when editing a field in VR. These values, text or numeric will be stored in the currently selected point/cell for the specified editable field array above. This is in development."/>
-     </property>
-     <property name="text">
-      <string>Yes, No</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="exportLocationsAsSkyboxesButton">
-     <property name="toolTip">
-      <string extracomment="Export the saved locations from VR as skyboxes suitable for viewing with vtk.js. This option will produce a pv-skybox folder that can be zipped up for use by ParaView Glance or vtk.js."/>
-     </property>
-     <property name="text">
-      <string>Export Locations as Skyboxes</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="exportLocationsAsViewButton">
-     <property name="toolTip">
-      <string extracomment="This option will export the saved locations, their geometry, txtures, and properties into a form that can be used in MineView. The result is stored in a pv-view directory. "/>
-     </property>
-     <property name="text">
-      <string>Export Locations as a View</string>
-     </property>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="multisamples">
+        <property name="toolTip">
+         <string extracomment="Whether or not to use multisampled framebuffers. Using multisamples can reduce flickering but currently does not work with volume rendering."/>
+        </property>
+        <property name="text">
+         <string>Use MultiSamples</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="sendToOpenVRButton">
+        <property name="text">
+         <string>Send To OpenVR</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="exportLocationsAsViewButton">
+        <property name="toolTip">
+         <string extracomment="This option will export the saved locations, their geometry, txtures, and properties into a form that can be used in MineView. The result is stored in a pv-view directory. "/>
+        </property>
+        <property name="text">
+         <string>Export Locations as a View</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="exportLocationsAsSkyboxesButton">
+        <property name="toolTip">
+         <string extracomment="Export the saved locations from VR as skyboxes suitable for viewing with vtk.js. This option will produce a pv-skybox folder that can be zipped up for use by ParaView Glance or vtk.js."/>
+        </property>
+        <property name="text">
+         <string>Export Locations as Skyboxes</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLineEdit" name="cropThickness">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string extracomment="Thickness to use for new thick crops. A value of 0 defaults to automatic thickness."/>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="cropThicknessLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string extracomment="When using thick cropping planes this specifies the thickness of those planes."/>
+          </property>
+          <property name="text">
+           <string>Crop Thickness</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLineEdit" name="editableField">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string extracomment="What scalar field can be edited in VR. This is an advanced feature still in development. You must specify field values below for this to work and the editable field specified must be a scalar array present in your data."/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="scalarFieldLabel">
+          <property name="text">
+           <string>Editable Field</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="fieldValuesLabel">
+        <property name="text">
+         <string>Field Values</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="fieldValues">
+        <property name="toolTip">
+         <string extracomment="The options available when editing a field in VR. These values, text or numeric will be stored in the currently selected point/cell for the specified editable field array above. This is in development."/>
+        </property>
+        <property name="text">
+         <string>Yes, No</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="cHeader">
+        <property name="text">
+         <string>Collaboration</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="0">
+         <widget class="QLabel" name="cServerLabel">
+          <property name="toolTip">
+           <string>The IP address or server name to connect to</string>
+          </property>
+          <property name="text">
+           <string>Server</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="cNameLabel">
+          <property name="toolTip">
+           <string>Your name to appear in VR</string>
+          </property>
+          <property name="text">
+           <string>Name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="cServerValue">
+          <property name="text">
+           <string>vrserver.kitware.com</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="cNameValue">
+          <property name="text">
+           <string>Anonymous</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="cSessionLabel">
+          <property name="toolTip">
+           <string>What session to connect to. A session is a string name. People who join the same session on the same server will see each other.</string>
+          </property>
+          <property name="text">
+           <string>Session</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="cSessionValue">
+          <property name="text">
+           <string>pv</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="cPortValue">
+          <property name="text">
+           <string>5555</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="cPortLabel">
+          <property name="toolTip">
+           <string>What port to connect to</string>
+          </property>
+          <property name="text">
+           <string>Port</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cConnectButton">
+        <property name="text">
+         <string>Connect</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="outputWindow"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
