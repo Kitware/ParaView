@@ -9503,13 +9503,13 @@ Every Nth Point.
         <Property name="InitialIntegrationStep" />
         <Property name="MinimumIntegrationStep" />
         <Property name="MaximumIntegrationStep" />
+        <Property name="MaximumError" />
       </PropertyGroup>
 
       <PropertyGroup label="Streamline Parameters" >
         <Property name="MaximumNumberOfSteps" />
         <Property name="MaximumPropagation" />
         <Property name="TerminalSpeed" />
-        <Property name="MaximumError" />
       </PropertyGroup>
 
       <Hints>
