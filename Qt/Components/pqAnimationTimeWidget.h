@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAnimationTimeWidget_h
 #define pqAnimationTimeWidget_h
 
-#include "pqApplicationComponentsModule.h"
+#include "pqComponentsModule.h"
 
 #include <QScopedPointer>
 #include <QWidget>
@@ -53,7 +53,7 @@ class vtkSMProxy;
 *     user to change the play mode by setting playModeReadOnly to true
 *     (default is false).
 */
-class PQAPPLICATIONCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
+class PQCOMPONENTS_EXPORT pqAnimationTimeWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(double timeValue READ timeValue WRITE setTimeValue NOTIFY timeValueChanged)

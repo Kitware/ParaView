@@ -36,6 +36,7 @@ set(classes
   pqAnimatablePropertiesComboBox
   pqAnimatableProxyComboBox
   pqAnimationManager
+  pqAnimationTimeWidget
   pqAnimationViewWidget
   pqArrayListDomain
   pqArraySelectionWidget
@@ -181,6 +182,7 @@ set(headers
 set(ui_files
   Resources/UI/pqAbortAnimation.ui
   Resources/UI/pqAboutDialog.ui
+  Resources/UI/pqAnimationTimeWidget.ui
   Resources/UI/pqFavoritesDialog.ui
   Resources/UI/pqCalculatorWidget.ui
   Resources/UI/pqCameraDialog.ui

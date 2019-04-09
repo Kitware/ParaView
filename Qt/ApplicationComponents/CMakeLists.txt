@@ -35,7 +35,6 @@ set(classes
   pqAnimationShortcutDecorator
   pqAnimationShortcutWidget
   pqAnimationTimeToolbar
-  pqAnimationTimeWidget
   pqApplicationComponentsInit
   pqApplicationSettingsReaction
   pqApplyBehavior
@@ -207,7 +206,6 @@ if (TARGET ParaView::pqPython)
 endif ()
 
 set(ui_files
-  Resources/UI/pqAnimationTimeWidget.ui
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqBackgroundEditorWidget.ui
   Resources/UI/pqBoxPropertyWidget.ui
