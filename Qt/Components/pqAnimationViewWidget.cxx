@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationKeyFrame.h"
 #include "pqAnimationModel.h"
 #include "pqAnimationScene.h"
+#include "pqAnimationTimeWidget.h"
 #include "pqAnimationTrack.h"
 #include "pqAnimationWidget.h"
 #include "pqApplicationCore.h"
@@ -94,9 +95,8 @@ class pqAnimationViewWidget::pqInternal
 public:
   pqInternal()
     : AnimationWidget(NULL)
+    , AnimationTimeWidget(NULL)
     , PlayMode(NULL)
-    , Time(NULL)
-    , TimeLabel(NULL)
     , StartTime(NULL)
     , StartTimeLabel(NULL)
     , EndTime(NULL)
@@ -116,13 +116,12 @@ public:
 
   QPointer<pqAnimationScene> Scene;
   pqAnimationWidget* AnimationWidget;
+  pqAnimationTimeWidget* AnimationTimeWidget;
   QSignalMapper KeyFramesChanged;
   typedef QMap<QPointer<pqAnimationCue>, pqAnimationTrack*> TrackMapType;
   TrackMapType TrackMap;
   QPointer<QDialog> Editor;
   QComboBox* PlayMode;
-  QLineEdit* Time;
-  QLabel* TimeLabel;
   QLineEdit* StartTime;
   QLabel* StartTimeLabel;
   QLineEdit* EndTime;
@@ -269,12 +268,10 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent)
   this->Internal->PlayMode = new QComboBox(this) << pqSetName("PlayMode");
   this->Internal->PlayMode->addItem("Snap to Timesteps");
   hboxlayout->addWidget(this->Internal->PlayMode);
-  this->Internal->TimeLabel = new QLabel("Time:", this);
-  hboxlayout->addWidget(this->Internal->TimeLabel);
-  this->Internal->Time = new QLineEdit(this) << pqSetName("Time");
-  this->Internal->Time->setValidator(new QDoubleValidator(this->Internal->Time));
-  this->Internal->Time->setMinimumWidth(30);
-  hboxlayout->addWidget(this->Internal->Time);
+  this->Internal->AnimationTimeWidget = new pqAnimationTimeWidget(this);
+  this->Internal->AnimationTimeWidget->setPlayModeReadOnly(true);
+  hboxlayout->addWidget(this->Internal->AnimationTimeWidget);
+
   this->Internal->StartTimeLabel = new QLabel("Start Time:", this);
   hboxlayout->addWidget(this->Internal->StartTimeLabel);
   this->Internal->StartTime = new QLineEdit(this) << pqSetName("StartTime");
@@ -414,9 +411,10 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
       scene->getProxy()->GetProperty("PlayMode"));
 
     // connect time
-    this->Internal->Links.addTraceablePropertyLink(this->Internal->Time, "text",
-      SIGNAL(editingFinished()), scene->getProxy(),
+    this->Internal->Links.addTraceablePropertyLink(this->Internal->AnimationTimeWidget, "timeValue",
+      SIGNAL(timeValueChanged()), scene->getProxy(),
       scene->getProxy()->GetProperty("AnimationTime"));
+    this->Internal->AnimationTimeWidget->setAnimationScene(scene->getProxy());
     // connect start time
     this->Internal->Links.addTraceablePropertyLink(this->Internal->StartTime, "text",
       SIGNAL(editingFinished()), scene->getProxy(), scene->getProxy()->GetProperty("StartTime"));
@@ -727,6 +725,8 @@ void pqAnimationViewWidget::updatePlayMode()
 
   this->Internal->DurationLink.removeAllPropertyLinks();
 
+  this->Internal->AnimationTimeWidget->setPlayMode(mode);
+
   if (mode == "Real Time")
   {
     animModel->setMode(pqAnimationModel::Real);
@@ -742,7 +742,7 @@ void pqAnimationViewWidget::updatePlayMode()
 
     this->Internal->StartTime->setEnabled(true);
     this->Internal->EndTime->setEnabled(true);
-    this->Internal->Time->setEnabled(true);
+    this->Internal->AnimationTimeWidget->setEnabled(true);
     this->Internal->Duration->setEnabled(true);
     this->Internal->DurationLabel->setEnabled(true);
     this->Internal->DurationLabel->setText("Duration (s):");
@@ -765,7 +765,6 @@ void pqAnimationViewWidget::updatePlayMode()
 
     this->Internal->StartTime->setEnabled(true);
     this->Internal->EndTime->setEnabled(true);
-    this->Internal->Time->setEnabled(true);
     this->Internal->Duration->setEnabled(true);
     this->Internal->DurationLabel->setEnabled(true);
     this->Internal->DurationLabel->setText("No. Frames:");
@@ -790,7 +789,6 @@ void pqAnimationViewWidget::updatePlayMode()
     this->Internal->DurationLabel->setEnabled(false);
     this->Internal->StartTime->setEnabled(false);
     this->Internal->EndTime->setEnabled(false);
-    this->Internal->Time->setEnabled(false);
   }
   else
   {
@@ -1030,7 +1028,6 @@ void pqAnimationViewWidget::onTimeLabelChanged()
   }
 
   // Update labels
-  this->Internal->TimeLabel->setText(timeName);
   this->Internal->StartTimeLabel->setText(QString("Start %1:").arg(timeName));
   this->Internal->EndTimeLabel->setText(QString("End %1:").arg(timeName));
 }
