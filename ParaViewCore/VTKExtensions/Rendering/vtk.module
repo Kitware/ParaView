@@ -38,13 +38,11 @@ OPTIONAL_DEPENDS
   ParaView::icet
   ParaView::nvpipe
   VTK::FiltersParallelMPI
-  VTK::RenderingMatplotlib
   VTK::RenderingOSPRay
 
   # These affect the public API.
   ParaView::icet
   VTK::ParallelMPI
-  VTK::PythonInterpreter
 TEST_DEPENDS
   VTK::IOAMR
   VTK::IOXML

@@ -90,13 +90,6 @@ set(classes
   vtkVolumeRepresentationPreprocessor
   vtkZlibImageCompressor)
 
-if (TARGET VTK::PythonInterpreter)
-  # TODO: Split these into a separate module so that there isn't a public
-  # optional dependency.
-  list(APPEND classes
-    vtkCinemaExporter)
-endif ()
-
 if (TARGET VTK::ParallelMPI)
   # TODO: Split these into a separate module so that there isn't a public
   # optional dependency.
