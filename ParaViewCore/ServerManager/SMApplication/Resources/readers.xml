@@ -3252,6 +3252,28 @@
         <Documentation>This property specifies the file name for the PLY
         reader.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetDuplicatePointsForFaceTexture"
+                         default_values="1"
+                         name="DuplicatePointsForFaceTexture"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>If true (default) and the "face" element has
+        the property "texcoord" duplicate face points if they have 2
+        or more different texture coordinates. Otherwise, each texture
+        coordinate for a face point overwrites previously set texture
+        coordinates for that point.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetFaceTextureTolerance"
+                            default_values="0.000001"
+                            name="FaceTextureTolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <DoubleRangeDomain name="range" />
+        <Documentation>Tolerance used to detect different texture
+        coordinates for shared points for faces</Documentation>
+      </DoubleVectorProperty>
       <!-- End PLYReaderCore -->
     </Proxy>
 
@@ -5243,6 +5265,10 @@
         <Proxy name="Reader"
                proxygroup="internal_sources"
                proxyname="PLYReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="DuplicatePointsForFaceTexture" />
+          <Property name="FaceTextureTolerance" />
+        </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
                             information_only="1"
