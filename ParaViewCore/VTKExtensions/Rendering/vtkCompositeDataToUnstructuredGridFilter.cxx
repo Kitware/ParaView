@@ -112,7 +112,14 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(vtkInformation* vtkNot
     // this will override field data the vtkAppendFilter passed from the first
     // block. It seems like a reasonable approach, if global field data is
     // present.
-    output->GetFieldData()->PassData(cd->GetFieldData());
+    if (ds)
+    {
+      output->GetFieldData()->PassData(ds->GetFieldData());
+    }
+    else if (cd)
+    {
+      output->GetFieldData()->PassData(cd->GetFieldData());
+    }
   }
 
   this->RemovePartialArrays(output);
