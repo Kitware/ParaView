@@ -486,23 +486,13 @@
                      most notably a string descriptor, to generate a vtkHyperTreeGrid instance
                      representing the corresponding a tree-based AMR grid with arbitrary rectilinear
                      geometry and either binary or ternary subdivision.</Documentation>
-      <IntVectorProperty command="SetDimension"
-                         default_values="3"
-                         name="Dimension"
-                         number_of_elements="1">
-        <IntRangeDomain max="3"
-                        min="2"
-                        name="range" />
-        <Documentation>This property specifies the dimensionality of
-        the hyper tree grid.</Documentation>
-      </IntVectorProperty>
-      <IntVectorProperty command="SetGridSize"
-                         default_values="1 1 1"
-                         name="GridSize"
+      <IntVectorProperty command="SetDimensions"
+                         default_values="2 2 2"
+                         name="Dimensions"
                          number_of_elements="3">
         <IntRangeDomain name="range" />
         <Documentation>The three values in this property specify the number
-        of root cells in each dimension of the hyper tree grid.</Documentation>
+        of points in each dimension of the hyper tree grid.</Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetGridScale"
                          default_values="1 1 1"
@@ -558,11 +548,11 @@
                          name="Seed"
                          number_of_elements="1">
       </IntVectorProperty>
-      <IntVectorProperty command="SetGridSize"
-                         default_values="5 5 2"
-                         name="GridSize"
+      <IntVectorProperty command="SetDimensions"
+                         default_values="6 6 3"
+                         name="Dimensions"
                          number_of_elements="3">
-        <IntRangeDomain min="0"
+        <IntRangeDomain min="1"
                         name="range" />
         <Documentation>The three values in this property specify the number
         of root cells in each dimension of the hyper tree grid.</Documentation>
