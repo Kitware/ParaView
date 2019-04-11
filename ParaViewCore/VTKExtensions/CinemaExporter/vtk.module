@@ -1,0 +1,13 @@
+NAME
+  ParaView::VTKExtensionsCinemaExporter
+LIBRARY_NAME
+  vtkPVVTKExtensionsCinemaExporter
+CONDITION
+  PARAVIEW_ENABLE_PYTHON
+KIT
+  ParaView::CoreKit
+DEPENDS
+  VTK::IOExport
+PRIVATE_DEPENDS
+  VTK::CommonCore
+  VTK::PythonInterpreter

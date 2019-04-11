@@ -27,9 +27,9 @@
 #define vtkCinemaExporter_h
 
 #include "vtkExporter.h"
-#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkPVVTKExtensionsCinemaExporterModule.h" // needed for export macro
 
-class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCinemaExporter : public vtkExporter
+class VTKPVVTKEXTENSIONSCINEMAEXPORTER_EXPORT vtkCinemaExporter : public vtkExporter
 {
 public:
   static vtkCinemaExporter* New();
