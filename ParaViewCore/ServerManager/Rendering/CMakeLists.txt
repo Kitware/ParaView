@@ -77,7 +77,8 @@ set(classes
   vtkSMViewResolutionDomain
   vtkSMWidgetRepresentationProxy)
 
-if (TARGET ParaView::ClientServerCorePython)
+if (TARGET ParaView::ClientServerCorePython AND
+    TARGET ParaView::ClientServerCorePythonRendering)
   # TODO: Split these into a separate module so that there isn't a public
   # optional dependency.
   list(APPEND classes

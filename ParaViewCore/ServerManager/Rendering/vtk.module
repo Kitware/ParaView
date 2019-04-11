@@ -20,6 +20,7 @@ OPTIONAL_DEPENDS
 
   # These affect the public API.
   ParaView::ClientServerCorePython
+  ParaView::ClientServerCorePythonRendering
 TEST_DEPENDS
   ParaView::ServerManagerApplication
   VTK::TestingCore

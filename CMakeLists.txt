@@ -318,11 +318,13 @@ if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND paraview_requested_modules
     ParaView::PythonAlgorithm
     ParaView::PythonInitializer
+    ParaView::ClientServerCorePythonRendering
     VTK::RenderingMatplotlib)
 else ()
   list(APPEND paraview_rejected_modules
     ParaView::PythonAlgorithm
     ParaView::PythonInitializer
+    ParaView::ClientServerCorePythonRendering
     VTK::RenderingMatplotlib)
 endif ()
 

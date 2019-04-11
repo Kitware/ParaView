@@ -107,14 +107,6 @@ set(classes
   vtkUnstructuredGridVolumeRepresentation
   vtkXYChartRepresentation)
 
-if (TARGET VTK::WrappingPythonCore AND TARGET VTK::PythonInterpreter)
-  # TODO: Split these into a separate module so that there isn't a public
-  # optional dependency.
-  list(APPEND classes
-    vtkPythonRepresentation
-    vtkPythonView)
-endif ()
-
 if (TARGET VTK::ParallelMPI AND TARGET ParaView::icet)
   # TODO: Split these into a separate module so that there isn't a public
   # optional dependency.

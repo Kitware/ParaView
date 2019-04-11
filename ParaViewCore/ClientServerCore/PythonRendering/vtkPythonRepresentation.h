@@ -25,11 +25,12 @@
 
 #include "vtkPVDataRepresentation.h"
 
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkPVClientServerCorePythonRenderingModule.h" //needed for exports
 
 class vtkReductionFilter;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPythonRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCOREPYTHONRENDERING_EXPORT vtkPythonRepresentation
+  : public vtkPVDataRepresentation
 {
 public:
   static vtkPythonRepresentation* New();

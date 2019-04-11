@@ -1,0 +1,13 @@
+NAME
+  ParaView::ClientServerCorePythonRendering
+LIBRARY_NAME
+  vtkPVClientServerCorePythonRendering
+CONDITION
+  PARAVIEW_ENABLE_PYTHON
+KIT
+  ParaView::ClientServerKit
+DEPENDS
+  ParaView::ClientServerCoreRendering
+PRIVATE_DEPENDS
+  VTK::PythonInterpreter
+  VTK::WrappingPythonCore
