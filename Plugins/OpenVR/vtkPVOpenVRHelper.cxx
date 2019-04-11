@@ -38,12 +38,12 @@
 #include "vtkNumberToString.h"
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLTexture.h"
-#include "vtkOpenVRCamera.h"
 #include "vtkOpenVRFollower.h"
 #include "vtkOpenVRInteractorStyle.h"
 #include "vtkOpenVRMenuRepresentation.h"
 #include "vtkOpenVRMenuWidget.h"
 #include "vtkOpenVROverlay.h"
+#include "vtkOpenVROverlayInternal.h"
 #include "vtkOpenVRPanelRepresentation.h"
 #include "vtkOpenVRPanelWidget.h"
 #include "vtkOpenVRRenderWindow.h"
@@ -87,6 +87,15 @@
 
 #include <QCoreApplication>
 
+vtkPVOpenVRHelperLocation::vtkPVOpenVRHelperLocation()
+{
+  this->Pose = new vtkOpenVRCameraPose();
+}
+vtkPVOpenVRHelperLocation::~vtkPVOpenVRHelperLocation()
+{
+  delete this->Pose;
+}
+
 vtkStandardNewMacro(vtkPVOpenVRHelper);
 
 //----------------------------------------------------------------------------
@@ -123,11 +132,10 @@ vtkPVOpenVRHelper::vtkPVOpenVRHelper()
 
   this->CropSnapping = false;
   this->MultiSample = false;
-  this->NavigationPanelVisibility = 0;
   this->DefaultCropThickness = 0;
 
   this->NeedStillRender = false;
-  this->LoadSlotValue = -1;
+  this->LoadLocationValue = -1;
 
   this->CollaborationClient = vtkPVOpenVRCollaborationClient::New();
   this->CollaborationClient->SetHelper(this);
@@ -166,7 +174,6 @@ bool vtkPVOpenVRHelper::CollaborationDisconnect()
 {
   return this->CollaborationClient->Disconnect();
 }
-
 namespace
 {
 vtkPVDataRepresentation* FindRepresentation(vtkProp* prop, vtkView* view)
@@ -911,21 +918,28 @@ void vtkPVOpenVRHelper::SaveState(vtkPVXMLElement* root)
     this->RecordState();
   }
 
-  root->AddAttribute("PluginVersion", "1.1");
+  root->AddAttribute("PluginVersion", "1.2");
   // ??  OpenVR_Plugin()->GetPluginVersionString());
 
-  // save the camera poses
+  // save the locations
+  vtkNew<vtkPVXMLElement> e;
+  e->SetName("Locations");
+  for (auto& loci : this->Locations)
   {
-    vtkNew<vtkPVXMLElement> e;
-    e->SetName("CameraPoses");
-    for (auto p : this->SavedCameraPoses)
+    auto& loc = loci.second;
+
+    vtkOpenVRCameraPose& pose = *loc.Pose;
+    if (pose.Loaded)
     {
-      vtkOpenVRCameraPose& pose = p.second;
-      if (pose.Loaded)
+      vtkNew<vtkPVXMLElement> locel;
+      locel->SetName("Location");
+      locel->AddAttribute("PoseNumber", loci.first);
+
+      // camera pose
       {
-        vtkPVXMLElement* el = vtkPVXMLElement::New();
+        vtkNew<vtkPVXMLElement> el;
         el->SetName("CameraPose");
-        el->AddAttribute("PoseNumber", p.first);
+        el->AddAttribute("PoseNumber", loci.first);
         addVectorAttribute(el, "Position", pose.Position, 3);
         el->AddAttribute("Distance", pose.Distance, 20);
         el->AddAttribute("MotionFactor", pose.MotionFactor, 20);
@@ -933,122 +947,198 @@ void vtkPVOpenVRHelper::SaveState(vtkPVXMLElement* root)
         addVectorAttribute(el, "InitialViewUp", pose.PhysicalViewUp, 3);
         addVectorAttribute(el, "InitialViewDirection", pose.PhysicalViewDirection, 3);
         addVectorAttribute(el, "ViewDirection", pose.ViewDirection, 3);
-        e->AddNestedElement(el);
-        el->FastDelete();
+        locel->AddNestedElement(el);
       }
+
+      locel->AddAttribute("NavigationPanel", loc.NavigationPanelVisibility);
+
+      { // regular crops
+        vtkNew<vtkPVXMLElement> el;
+        el->SetName("CropPlanes");
+        for (auto i : loc.CropPlaneStates)
+        {
+          vtkNew<vtkPVXMLElement> child;
+          child->SetName("Crop");
+          child->AddAttribute("origin0", i.first[0], 20);
+          child->AddAttribute("origin1", i.first[1], 20);
+          child->AddAttribute("origin2", i.first[2], 20);
+          child->AddAttribute("normal0", i.second[0], 20);
+          child->AddAttribute("normal1", i.second[1], 20);
+          child->AddAttribute("normal2", i.second[2], 20);
+          el->AddNestedElement(child);
+        }
+        locel->AddNestedElement(el);
+      }
+
+      { // thick crops
+        vtkNew<vtkPVXMLElement> el;
+        el->SetName("ThickCrops");
+        for (auto t : loc.ThickCropStates)
+        {
+          vtkNew<vtkPVXMLElement> child;
+          child->SetName("Crop");
+          for (int i = 0; i < 16; ++i)
+          {
+            std::ostringstream o;
+            o << "transform" << i;
+            child->AddAttribute(o.str().c_str(), t[i]);
+          }
+          el->AddNestedElement(child);
+        }
+        locel->AddNestedElement(el);
+      }
+
+      // save the visibility information
+      {
+        vtkNew<vtkPVXMLElement> el;
+        el->SetName("Visibility");
+        for (auto vdi : loc.Visibility)
+        {
+          vtkNew<vtkPVXMLElement> gchild;
+          gchild->SetName("RepVisibility");
+          gchild->AddAttribute("id", vdi.first->GetGlobalID());
+          gchild->AddAttribute("visibility", vdi.second);
+          el->AddNestedElement(gchild);
+        }
+        locel->AddNestedElement(el);
+      }
+
+      e->AddNestedElement(locel);
     }
-    root->AddNestedElement(e.Get(), 1);
   }
+  root->AddNestedElement(e);
 
   root->AddAttribute("CropSnapping", this->CropSnapping ? 1 : 0);
-
-  root->AddAttribute("NavigationPanel", this->NavigationPanelVisibility);
-
-  { // regular crops
-    vtkNew<vtkPVXMLElement> e;
-    e->SetName("CropPlanes");
-    for (auto i : this->CropPlaneStates)
-    {
-      vtkPVXMLElement* child = vtkPVXMLElement::New();
-      child->SetName("Crop");
-      child->AddAttribute("origin0", i.first[0], 20);
-      child->AddAttribute("origin1", i.first[1], 20);
-      child->AddAttribute("origin2", i.first[2], 20);
-      child->AddAttribute("normal0", i.second[0], 20);
-      child->AddAttribute("normal1", i.second[1], 20);
-      child->AddAttribute("normal2", i.second[2], 20);
-      e->AddNestedElement(child);
-      child->FastDelete();
-    }
-    root->AddNestedElement(e.Get(), 1);
-  }
-
-  { // thick crops
-    vtkNew<vtkPVXMLElement> e;
-    e->SetName("ThickCrops");
-    for (auto t : this->ThickCropStates)
-    {
-      vtkPVXMLElement* child = vtkPVXMLElement::New();
-      child->SetName("Crop");
-      for (int i = 0; i < 16; ++i)
-      {
-        std::ostringstream o;
-        o << "transform" << i;
-        child->AddAttribute(o.str().c_str(), t[i]);
-      }
-      e->AddNestedElement(child);
-      child->FastDelete();
-    }
-    root->AddNestedElement(e.Get(), 1);
-  }
-
-  // save the visibility information
-  {
-    vtkNew<vtkPVXMLElement> e;
-    e->SetName("ExtraCameraLocationInformation");
-    for (auto sdi : this->SlotValues)
-    {
-      vtkPVXMLElement* child = vtkPVXMLElement::New();
-      child->SetName("ExtraInformation");
-      child->AddAttribute("slot", sdi.first);
-      for (auto vdi : sdi.second.Visibility)
-      {
-        vtkPVXMLElement* gchild = vtkPVXMLElement::New();
-        gchild->SetName("RepVisibility");
-        gchild->AddAttribute("id", vdi.first->GetGlobalID());
-        gchild->AddAttribute("visibility", vdi.second);
-        child->AddNestedElement(gchild);
-        gchild->FastDelete();
-      }
-      e->AddNestedElement(child);
-      child->FastDelete();
-    }
-    root->AddNestedElement(e.Get(), 1);
-  }
 }
 
 void vtkPVOpenVRHelper::RecordState()
 {
   // save the camera poses
-  this->SavedCameraPoses = this->RenderWindow->GetDashboardOverlay()->GetSavedCameraPoses();
-
-  this->NavigationPanelVisibility = this->NavWidget->GetEnabled();
-
-  { // regular crops
-    this->CropPlaneStates.clear();
-    for (vtkImplicitPlaneWidget2* iter : this->CropPlanes)
-    {
-      vtkImplicitPlaneRepresentation* rep =
-        static_cast<vtkImplicitPlaneRepresentation*>(iter->GetRepresentation());
-      std::pair<std::array<double, 3>, std::array<double, 3> > data;
-      rep->GetOrigin(data.first.data());
-      rep->GetNormal(data.second.data());
-      this->CropPlaneStates.push_back(data);
-    }
-  }
-
-  { // thick crops
-    this->ThickCropStates.clear();
-    for (vtkBoxWidget2* iter : this->ThickCrops)
-    {
-      vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(iter->GetRepresentation());
-      vtkNew<vtkTransform> t;
-      rep->GetTransform(t);
-      std::array<double, 16> tdata;
-      std::copy(t->GetMatrix()->GetData(), t->GetMatrix()->GetData() + 16, tdata.data());
-      this->ThickCropStates.push_back(tdata);
-    }
-  }
 }
 
 void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator)
 {
-  this->CropPlaneStates.clear();
-  this->ThickCropStates.clear();
-  this->SlotValues.clear();
-  this->SavedCameraPoses.clear();
+  this->Locations.clear();
 
-  // load the camera poses
+  double version = -1.0;
+  e->GetScalarAttribute("PluginVersion", &version);
+
+  if (version < 1.1)
+  {
+    vtkErrorMacro("State file too old for OpenVRPlugin to load.");
+    return;
+  }
+
+  if (version > 1.2)
+  {
+    vtkErrorMacro("State file too recent for OpenVRPlugin to load.");
+    return;
+  }
+
+  // new style 1.2 or later
+  vtkPVXMLElement* locels = e->FindNestedElementByName("Locations");
+  if (locels)
+  {
+    int numnest = locels->GetNumberOfNestedElements();
+    for (int li = 0; li < numnest; ++li)
+    {
+      vtkPVXMLElement* locel = locels->GetNestedElement(li);
+      int poseNum = 0;
+      locel->GetScalarAttribute("PoseNumber", &poseNum);
+
+      vtkPVOpenVRHelperLocation& loc = this->Locations[poseNum];
+
+      vtkPVXMLElement* child = locel->FindNestedElementByName("CameraPose");
+      if (child)
+      {
+        auto& pose = *loc.Pose;
+        pose.Loaded = true;
+        child->GetVectorAttribute("Position", 3, pose.Position);
+        child->GetScalarAttribute("Distance", &pose.Distance);
+        child->GetScalarAttribute("MotionFactor", &pose.MotionFactor);
+        child->GetVectorAttribute("Translation", 3, pose.Translation);
+        child->GetVectorAttribute("InitialViewUp", 3, pose.PhysicalViewUp);
+        child->GetVectorAttribute("InitialViewDirection", 3, pose.PhysicalViewDirection);
+        child->GetVectorAttribute("ViewDirection", 3, pose.ViewDirection);
+      }
+
+      child = locel->FindNestedElementByName("Visibility");
+      if (child)
+      {
+        int numnest2 = child->GetNumberOfNestedElements();
+        for (int i = 0; i < numnest2; ++i)
+        {
+          vtkPVXMLElement* gchild = child->GetNestedElement(i);
+          int id = 0;
+          gchild->GetScalarAttribute("id", &id);
+          int vis;
+          gchild->GetScalarAttribute("visibility", &vis);
+          vtkSMProxy* proxy = locator->LocateProxy(id);
+          if (!proxy)
+          {
+            vtkErrorMacro("unable to lookup proxy for id " << id);
+          }
+          else
+          {
+            loc.Visibility[proxy] = (vis != 0 ? true : false);
+          }
+        }
+      }
+
+      // load crops
+      child = locel->FindNestedElementByName("CropPlanes");
+      if (child)
+      {
+        int numnest2 = child->GetNumberOfNestedElements();
+        for (int i = 0; i < numnest2; ++i)
+        {
+          vtkPVXMLElement* gchild = child->GetNestedElement(i);
+          std::array<double, 3> origin;
+          std::array<double, 3> normal;
+          gchild->GetScalarAttribute("origin0", origin.data());
+          gchild->GetScalarAttribute("origin1", origin.data() + 1);
+          gchild->GetScalarAttribute("origin2", origin.data() + 2);
+          gchild->GetScalarAttribute("normal0", normal.data());
+          gchild->GetScalarAttribute("normal1", normal.data() + 1);
+          gchild->GetScalarAttribute("normal2", normal.data() + 2);
+          loc.CropPlaneStates.push_back(
+            std::pair<std::array<double, 3>, std::array<double, 3> >(origin, normal));
+        }
+      }
+
+      // load thick crops
+      child = locel->FindNestedElementByName("ThickCrops");
+      if (child)
+      {
+        int numnest2 = child->GetNumberOfNestedElements();
+        for (int i = 0; i < numnest2; ++i)
+        {
+          std::array<double, 16> tform;
+          vtkPVXMLElement* gchild = child->GetNestedElement(i);
+          for (int j = 0; j < 16; ++j)
+          {
+            std::ostringstream o;
+            o << "transform" << j;
+            gchild->GetScalarAttribute(o.str().c_str(), tform.data() + j);
+          }
+          loc.ThickCropStates.push_back(tform);
+        }
+      }
+
+      locel->GetScalarAttribute("NavigationPanel", &loc.NavigationPanelVisibility);
+    }
+
+    // if we are in VR then applyState
+    if (this->Interactor)
+    {
+      this->ApplyState();
+    }
+
+    return;
+  }
+
+  // old style XML 1.1
+  // load the camera poses and create a location per pose
   {
     vtkPVXMLElement* e2 = e->FindNestedElementByName("CameraPoses");
     if (e2)
@@ -1059,7 +1149,10 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
         vtkPVXMLElement* child = e2->GetNestedElement(i);
         int poseNum = 0;
         child->GetScalarAttribute("PoseNumber", &poseNum);
-        vtkOpenVRCameraPose& pose = this->SavedCameraPoses[poseNum];
+
+        vtkPVOpenVRHelperLocation& loc = this->Locations[poseNum];
+        auto& pose = *loc.Pose;
+
         pose.Loaded = true;
         child->GetVectorAttribute("Position", 3, pose.Position);
         child->GetScalarAttribute("Distance", &pose.Distance);
@@ -1070,42 +1163,6 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
         child->GetVectorAttribute("ViewDirection", 3, pose.ViewDirection);
       }
     }
-    else // look for the old style camera pose values
-    {
-      std::string poses = e->GetAttributeOrEmpty("CameraPoses");
-      std::istringstream iss(poses);
-      vtkXMLDataElement* topel = vtkXMLUtilities::ReadElementFromStream(iss);
-      if (topel)
-      {
-        int numnest = topel->GetNumberOfNestedElements();
-        for (int i = 0; i < numnest; ++i)
-        {
-          vtkXMLDataElement* el = topel->GetNestedElement(static_cast<int>(i));
-          int poseNum = 0;
-          el->GetScalarAttribute("PoseNumber", poseNum);
-          poseNum--; // zero indexed
-          el->GetVectorAttribute("Position", 3, this->SavedCameraPoses[poseNum].Position);
-          el->GetVectorAttribute(
-            "InitialViewUp", 3, this->SavedCameraPoses[poseNum].PhysicalViewUp);
-          el->GetVectorAttribute(
-            "InitialViewDirection", 3, this->SavedCameraPoses[poseNum].PhysicalViewDirection);
-          el->GetVectorAttribute("ViewDirection", 3, this->SavedCameraPoses[poseNum].ViewDirection);
-          el->GetVectorAttribute("Translation", 3, this->SavedCameraPoses[poseNum].Translation);
-          el->GetScalarAttribute("Distance", this->SavedCameraPoses[poseNum].Distance);
-          el->GetScalarAttribute("MotionFactor", this->SavedCameraPoses[poseNum].MotionFactor);
-          this->SavedCameraPoses[poseNum].Loaded = true;
-        }
-        topel->Delete();
-      }
-    }
-  }
-
-  // for everything else also watch for old style XML
-  // where the data was under OpenVRHelper
-  vtkPVXMLElement* olde = e->FindNestedElementByName("OpenVRHelper");
-  if (olde)
-  {
-    e = olde;
   }
 
   // load the visibility information
@@ -1120,7 +1177,6 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
         int slot = 0;
         child->GetScalarAttribute("slot", &slot);
         int cnumnest = child->GetNumberOfNestedElements();
-        SlotData sd;
         for (int j = 0; j < cnumnest; ++j)
         {
           vtkPVXMLElement* gchild = child->GetNestedElement(j);
@@ -1135,65 +1191,69 @@ void vtkPVOpenVRHelper::LoadState(vtkPVXMLElement* e, vtkSMProxyLocator* locator
           }
           else
           {
-            sd.Visibility[proxy] = (vis != 0 ? true : false);
+            this->Locations[slot].Visibility[proxy] = (vis != 0 ? true : false);
           }
         }
-        this->SlotValues[slot] = sd;
       }
     }
   }
 
-  // navigation panel
-  e->GetScalarAttribute("NavigationPanel", &this->NavigationPanelVisibility);
+  for (auto& loci : this->Locations)
+  {
+    auto& loc = loci.second;
+
+    // navigation panel
+    e->GetScalarAttribute("NavigationPanel", &loc.NavigationPanelVisibility);
+
+    // load crops
+    {
+      vtkPVXMLElement* e2 = e->FindNestedElementByName("CropPlanes");
+      if (e2)
+      {
+        int numnest = e2->GetNumberOfNestedElements();
+        for (int i = 0; i < numnest; ++i)
+        {
+          vtkPVXMLElement* child = e2->GetNestedElement(i);
+          std::array<double, 3> origin;
+          std::array<double, 3> normal;
+          child->GetScalarAttribute("origin0", origin.data());
+          child->GetScalarAttribute("origin1", origin.data() + 1);
+          child->GetScalarAttribute("origin2", origin.data() + 2);
+          child->GetScalarAttribute("normal0", normal.data());
+          child->GetScalarAttribute("normal1", normal.data() + 1);
+          child->GetScalarAttribute("normal2", normal.data() + 2);
+          loc.CropPlaneStates.push_back(
+            std::pair<std::array<double, 3>, std::array<double, 3> >(origin, normal));
+        }
+      }
+    }
+
+    // load thick crops
+    {
+      vtkPVXMLElement* e2 = e->FindNestedElementByName("ThickCrops");
+      if (e2)
+      {
+        int numnest = e2->GetNumberOfNestedElements();
+        for (int i = 0; i < numnest; ++i)
+        {
+          std::array<double, 16> tform;
+          vtkPVXMLElement* child = e2->GetNestedElement(i);
+          for (int j = 0; j < 16; ++j)
+          {
+            std::ostringstream o;
+            o << "transform" << j;
+            child->GetScalarAttribute(o.str().c_str(), tform.data() + j);
+          }
+          loc.ThickCropStates.push_back(tform);
+        }
+      }
+    }
+  }
 
   int itmp = 0;
   if (e->GetScalarAttribute("CropSnapping", &itmp))
   {
     this->CropSnapping = (itmp == 0 ? false : true);
-  }
-
-  // load crops
-  {
-    vtkPVXMLElement* e2 = e->FindNestedElementByName("CropPlanes");
-    if (e2)
-    {
-      int numnest = e2->GetNumberOfNestedElements();
-      for (int i = 0; i < numnest; ++i)
-      {
-        vtkPVXMLElement* child = e2->GetNestedElement(i);
-        std::array<double, 3> origin;
-        std::array<double, 3> normal;
-        child->GetScalarAttribute("origin0", origin.data());
-        child->GetScalarAttribute("origin1", origin.data() + 1);
-        child->GetScalarAttribute("origin2", origin.data() + 2);
-        child->GetScalarAttribute("normal0", normal.data());
-        child->GetScalarAttribute("normal1", normal.data() + 1);
-        child->GetScalarAttribute("normal2", normal.data() + 2);
-        this->CropPlaneStates.push_back(
-          std::pair<std::array<double, 3>, std::array<double, 3> >(origin, normal));
-      }
-    }
-  }
-
-  // load thick crops
-  {
-    vtkPVXMLElement* e2 = e->FindNestedElementByName("ThickCrops");
-    if (e2)
-    {
-      int numnest = e2->GetNumberOfNestedElements();
-      for (int i = 0; i < numnest; ++i)
-      {
-        std::array<double, 16> tform;
-        vtkPVXMLElement* child = e2->GetNestedElement(i);
-        for (int j = 0; j < 16; ++j)
-        {
-          std::ostringstream o;
-          o << "transform" << j;
-          child->GetScalarAttribute(o.str().c_str(), tform.data() + j);
-        }
-        this->ThickCropStates.push_back(tform);
-      }
-    }
   }
 
   // if we are in VR then applyState
@@ -1209,31 +1269,12 @@ void vtkPVOpenVRHelper::ApplyState()
   this->CropMenu->RenameMenuItem(
     "togglesnapping", (this->CropSnapping ? "Turn Snap to Axes Off" : "Turn Snap to Axes On"));
 
-  // apply navigation panel
-  if (this->NavWidget->GetEnabled() != this->NavigationPanelVisibility)
-  {
-    this->ToggleNavigationPanel();
-  }
-
-  // load crops
-  this->RemoveAllCropPlanes();
-  for (auto i : this->CropPlaneStates)
-  {
-    this->AddACropPlane(i.first.data(), i.second.data());
-  }
-
-  // load thick crops
-  this->RemoveAllThickCrops();
-  vtkNew<vtkTransform> t;
-  for (auto i : this->ThickCropStates)
-  {
-    t->Identity();
-    t->Concatenate(i.data());
-    this->AddAThickCrop(t);
-  }
-
   // set camera poses
-  this->RenderWindow->GetDashboardOverlay()->GetSavedCameraPoses() = this->SavedCameraPoses;
+  this->RenderWindow->GetDashboardOverlay()->GetSavedCameraPoses().clear();
+  for (auto& loci : this->Locations)
+  {
+    this->RenderWindow->GetDashboardOverlay()->SetSavedCameraPose(loci.first, loci.second.Pose);
+  }
 }
 
 void vtkPVOpenVRHelper::EventCallback(
@@ -1265,7 +1306,7 @@ void vtkPVOpenVRHelper::EventCallback(
     break;
     case vtkCommand::LoadStateEvent:
     {
-      self->LoadSlotValue = reinterpret_cast<vtkTypeInt64>(calldata);
+      self->LoadLocationValue = reinterpret_cast<vtkTypeInt64>(calldata);
     }
     break;
     case vtkCommand::EndPickEvent:
@@ -1497,16 +1538,41 @@ void vtkPVOpenVRHelper::GoToSavedLocation(int pos, double* collabTrans, double* 
 
 void vtkPVOpenVRHelper::LoadLocationState()
 {
-  int slot = this->LoadSlotValue;
-  this->LoadSlotValue = -1;
+  int slot = this->LoadLocationValue;
+  this->LoadLocationValue = -1;
 
-  auto sdi = this->SlotValues.find(slot);
-  if (sdi == this->SlotValues.end())
+  auto sdi = this->Locations.find(slot);
+  if (sdi == this->Locations.end())
   {
     return;
   }
 
   this->CollaborationClient->GoToSavedLocation(slot);
+
+  auto& loc = sdi->second;
+
+  // apply navigation panel
+  if (this->NavWidget->GetEnabled() != loc.NavigationPanelVisibility)
+  {
+    this->ToggleNavigationPanel();
+  }
+
+  // load crops
+  this->RemoveAllCropPlanes();
+  for (auto i : loc.CropPlaneStates)
+  {
+    this->AddACropPlane(i.first.data(), i.second.data());
+  }
+
+  // load thick crops
+  this->RemoveAllThickCrops();
+  vtkNew<vtkTransform> t;
+  for (auto i : loc.ThickCropStates)
+  {
+    t->Identity();
+    t->Concatenate(i.data());
+    this->AddAThickCrop(t);
+  }
 
   vtkSMPropertyHelper helper(this->SMView, "Representations");
   for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
@@ -1529,7 +1595,41 @@ void vtkPVOpenVRHelper::LoadLocationState()
 
 void vtkPVOpenVRHelper::SaveLocationState(int slot)
 {
-  SlotData sd;
+  auto spose = this->RenderWindow->GetDashboardOverlay()->GetSavedCameraPose(slot);
+  if (!spose)
+  {
+    return;
+  }
+
+  vtkPVOpenVRHelperLocation& sd = this->Locations[slot];
+  *sd.Pose = *spose;
+  sd.NavigationPanelVisibility = this->NavWidget->GetEnabled();
+
+  { // regular crops
+    sd.CropPlaneStates.clear();
+    for (vtkImplicitPlaneWidget2* iter : this->CropPlanes)
+    {
+      vtkImplicitPlaneRepresentation* rep =
+        static_cast<vtkImplicitPlaneRepresentation*>(iter->GetRepresentation());
+      std::pair<std::array<double, 3>, std::array<double, 3> > data;
+      rep->GetOrigin(data.first.data());
+      rep->GetNormal(data.second.data());
+      sd.CropPlaneStates.push_back(data);
+    }
+  }
+
+  { // thick crops
+    sd.ThickCropStates.clear();
+    for (vtkBoxWidget2* iter : this->ThickCrops)
+    {
+      vtkBoxRepresentation* rep = static_cast<vtkBoxRepresentation*>(iter->GetRepresentation());
+      vtkNew<vtkTransform> t;
+      rep->GetTransform(t);
+      std::array<double, 16> tdata;
+      std::copy(t->GetMatrix()->GetData(), t->GetMatrix()->GetData() + 16, tdata.data());
+      sd.ThickCropStates.push_back(tdata);
+    }
+  }
 
   vtkSMPropertyHelper helper(this->SMView, "Representations");
   for (unsigned int i = 0; i < helper.GetNumberOfElements(); i++)
@@ -1543,7 +1643,6 @@ void vtkPVOpenVRHelper::SaveLocationState(int slot)
         (vtkSMPropertyHelper(repr, "Visibility").GetAsInt() != 0 ? true : false);
     }
   }
-  this->SlotValues[slot] = sd;
 }
 
 void vtkPVOpenVRHelper::ViewRemoved(vtkSMViewProxy* smview)
@@ -1568,8 +1667,6 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
   this->SMView = smview;
   this->View = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
   vtkRenderer* pvRenderer = this->View->GetRenderView()->GetRenderer();
-
-  auto camPoses = this->SavedCameraPoses;
 
   vtkNew<vtkRenderWindow> renWin;
   renWin->SetSize(1024, 1024);
@@ -1621,9 +1718,10 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
           "\"arguments\": { \"poseIndex\": { \"values\": [";
 
   int count = 0;
-  for (int i = 0; i < static_cast<int>(camPoses.size()); ++i)
+  for (auto& loci : this->Locations)
   {
-    if (!camPoses[i].Loaded)
+    auto& loc = loci.second;
+    if (!loc.Pose->Loaded)
     {
       continue;
     }
@@ -1632,8 +1730,10 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
     sdir << dir << count;
     vtksys::SystemTools::MakeDirectory(sdir.str());
 
-    this->LoadSlotValue = i;
+    this->LoadLocationValue = loci.first;
     this->LoadLocationState();
+
+    auto& camPose = *loc.Pose;
 
     //    QCoreApplication::processEvents();
     //  this->SMView->StillRender();
@@ -1641,25 +1741,26 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
     renWin->Render();
 
     double vright[3];
-    vtkMath::Cross(camPoses[i].PhysicalViewDirection, camPoses[i].PhysicalViewUp, vright);
+
+    vtkMath::Cross(camPose.PhysicalViewDirection, camPose.PhysicalViewUp, vright);
 
     // now generate the six images, right, left, top, bottom, back, front
     //
     double directions[6][3] = { vright[0], vright[1], vright[2], -1 * vright[0], -1 * vright[1],
-      -1 * vright[2], camPoses[i].PhysicalViewUp[0], camPoses[i].PhysicalViewUp[1],
-      camPoses[i].PhysicalViewUp[2], -1 * camPoses[i].PhysicalViewUp[0],
-      -1 * camPoses[i].PhysicalViewUp[1], -1 * camPoses[i].PhysicalViewUp[2],
-      -1 * camPoses[i].PhysicalViewDirection[0], -1 * camPoses[i].PhysicalViewDirection[1],
-      -1 * camPoses[i].PhysicalViewDirection[2], camPoses[i].PhysicalViewDirection[0],
-      camPoses[i].PhysicalViewDirection[1], camPoses[i].PhysicalViewDirection[2] };
-    double vups[6][3] = { camPoses[i].PhysicalViewUp[0], camPoses[i].PhysicalViewUp[1],
-      camPoses[i].PhysicalViewUp[2], camPoses[i].PhysicalViewUp[0], camPoses[i].PhysicalViewUp[1],
-      camPoses[i].PhysicalViewUp[2], -1 * camPoses[i].PhysicalViewDirection[0],
-      -1 * camPoses[i].PhysicalViewDirection[1], -1 * camPoses[i].PhysicalViewDirection[2],
-      camPoses[i].PhysicalViewDirection[0], camPoses[i].PhysicalViewDirection[1],
-      camPoses[i].PhysicalViewDirection[2], camPoses[i].PhysicalViewUp[0],
-      camPoses[i].PhysicalViewUp[1], camPoses[i].PhysicalViewUp[2], camPoses[i].PhysicalViewUp[0],
-      camPoses[i].PhysicalViewUp[1], camPoses[i].PhysicalViewUp[2] };
+      -1 * vright[2], camPose.PhysicalViewUp[0], camPose.PhysicalViewUp[1],
+      camPose.PhysicalViewUp[2], -1 * camPose.PhysicalViewUp[0], -1 * camPose.PhysicalViewUp[1],
+      -1 * camPose.PhysicalViewUp[2], -1 * camPose.PhysicalViewDirection[0],
+      -1 * camPose.PhysicalViewDirection[1], -1 * camPose.PhysicalViewDirection[2],
+      camPose.PhysicalViewDirection[0], camPose.PhysicalViewDirection[1],
+      camPose.PhysicalViewDirection[2] };
+    double vups[6][3] = { camPose.PhysicalViewUp[0], camPose.PhysicalViewUp[1],
+      camPose.PhysicalViewUp[2], camPose.PhysicalViewUp[0], camPose.PhysicalViewUp[1],
+      camPose.PhysicalViewUp[2], -1 * camPose.PhysicalViewDirection[0],
+      -1 * camPose.PhysicalViewDirection[1], -1 * camPose.PhysicalViewDirection[2],
+      camPose.PhysicalViewDirection[0], camPose.PhysicalViewDirection[1],
+      camPose.PhysicalViewDirection[2], camPose.PhysicalViewUp[0], camPose.PhysicalViewUp[1],
+      camPose.PhysicalViewUp[2], camPose.PhysicalViewUp[0], camPose.PhysicalViewUp[1],
+      camPose.PhysicalViewUp[2] };
 
     const char* dirnames[6] = { "right", "left", "up", "down", "back", "front" };
 
@@ -1671,9 +1772,9 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
 
     vtkCamera* cam = ren->GetActiveCamera();
     cam->SetViewAngle(90);
-    cam->SetPosition(camPoses[i].Position);
+    cam->SetPosition(camPose.Position);
     // doubel *drange = ren->GetActiveCamera()->GetClippingRange();
-    // cam->SetClippingRange(0.2*camPoses[i].Distance, drange);
+    // cam->SetClippingRange(0.2*camPose.Distance, drange);
     double* pos = cam->GetPosition();
 
     renWin->MakeCurrent();
@@ -1692,13 +1793,12 @@ void vtkPVOpenVRHelper::ExportLocationsAsSkyboxes(vtkSMViewProxy* smview)
     for (int j = 0; j < 6; ++j)
     {
       // view angle of 90
-      cam->SetFocalPoint(pos[0] + camPoses[i].Distance * directions[j][0],
-        pos[1] + camPoses[i].Distance * directions[j][1],
-        pos[2] + camPoses[i].Distance * directions[j][2]);
+      cam->SetFocalPoint(pos[0] + camPose.Distance * directions[j][0],
+        pos[1] + camPose.Distance * directions[j][1], pos[2] + camPose.Distance * directions[j][2]);
       cam->SetViewUp(vups[j][0], vups[j][1], vups[j][2]);
       ren->ResetCameraClippingRange();
       double* crange = cam->GetClippingRange();
-      cam->SetClippingRange(0.2 * camPoses[i].Distance, crange[1]);
+      cam->SetClippingRange(0.2 * camPose.Distance, crange[1]);
 
       vtkNew<vtkWindowToImageFilter> w2i;
       w2i->SetInput(renWin);
@@ -1785,8 +1885,6 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
   this->View = vtkPVRenderView::SafeDownCast(smview->GetClientSideView());
   vtkRenderer* pvRenderer = this->View->GetRenderView()->GetRenderer();
 
-  auto camPoses = this->SavedCameraPoses;
-
   vtkNew<vtkRenderWindow> renWin;
   renWin->SetSize(1024, 1024);
   vtkNew<vtkRenderer> ren;
@@ -1809,16 +1907,17 @@ void vtkPVOpenVRHelper::ExportLocationsAsView(vtkSMViewProxy* smview)
   posesel->SetName("CameraPoses");
 
   int count = 0;
-  for (int i = 0; i < static_cast<int>(camPoses.size()); ++i)
+  for (auto& loci : this->Locations)
   {
-    if (!camPoses[i].Loaded)
+    auto& loc = loci.second;
+    if (!loc.Pose->Loaded)
     {
       continue;
     }
 
-    vtkOpenVRCameraPose& pose = camPoses[i];
+    vtkOpenVRCameraPose& pose = *loc.Pose;
 
-    this->LoadSlotValue = i;
+    this->LoadLocationValue = loci.first;
     this->LoadLocationState();
 
     QCoreApplication::processEvents();
@@ -2046,17 +2145,17 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
   vtkRenderer* pvRenderer = this->View->GetRenderView()->GetRenderer();
   vtkRenderWindow* pvRenderWindow = vtkRenderWindow::SafeDownCast(pvRenderer->GetVTKWindow());
 
-  this->RenderWindow = vtkOpenVRRenderWindow::New();
-  // test out sharing the context
-  this->RenderWindow->SetHelperWindow(static_cast<vtkOpenGLRenderWindow*>(pvRenderWindow));
+  if (!this->RenderWindow)
+  {
+    this->RenderWindow = vtkOpenVRRenderWindow::New();
+    // test out sharing the context
+    this->RenderWindow->SetHelperWindow(static_cast<vtkOpenGLRenderWindow*>(pvRenderWindow));
+  }
 
   this->Renderer = vtkOpenVRRenderer::New();
   this->RenderWindow->AddRenderer(this->Renderer);
   this->Interactor = vtkOpenVRRenderWindowInteractor::New();
   this->RenderWindow->SetInteractor(this->Interactor);
-  vtkOpenVRCamera* cam = vtkOpenVRCamera::New();
-  this->Renderer->SetActiveCamera(cam);
-  cam->Delete();
 
   // iren->SetDesiredUpdateRate(220.0);
   // iren->SetStillUpdateRate(220.0);
@@ -2183,7 +2282,7 @@ void vtkPVOpenVRHelper::SendToOpenVR(vtkSMViewProxy* smview)
         this->SelectScalar();
         this->SMView->StillRender();
       }
-      if (this->LoadSlotValue >= 0)
+      if (this->LoadLocationValue >= 0)
       {
         this->SMView->StillRender();
         this->LoadLocationState();

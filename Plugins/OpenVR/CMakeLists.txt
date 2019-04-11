@@ -9,13 +9,12 @@ set(sources
   vtkPVOpenVRHelper.cxx
   vtkPVOpenVRHelper.h)
 
+
 # if we build the openvr plugin then look to add collaboration
-# for collaboration we leverage mineview. Just git clone mineview
-# in this directory and it will be automatically added
+# for collaboration we leverage mineview.
 #-----------------------------------------------------------------------------
-if (WIN32 AND PARAVIEW_PLUGIN_ENABLE_OpenVR AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/mineview")
-  list(APPEND sources mineview/mvCollaborationClient.cxx)
-  set(openvr_extra_includes ${CMAKE_CURRENT_SOURCE_DIR}/mineview/zeromq/release)
+if (WIN32 AND PARAVIEW_PLUGIN_ENABLE_OpenVR AND PARAVIEW_MINEVIEW_SOURCE_DIR)
+  list(APPEND sources "${PARAVIEW_MINEVIEW_SOURCE_DIR}/mvCollaborationClient.cxx")
 endif()
 
 paraview_plugin_add_dock_window(

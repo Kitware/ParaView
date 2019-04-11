@@ -51,6 +51,19 @@ class vtkSMProxyLocator;
 class vtkSMViewProxy;
 class vtkTransform;
 
+// helper class to store information per location
+class vtkPVOpenVRHelperLocation
+{
+public:
+  vtkPVOpenVRHelperLocation();
+  ~vtkPVOpenVRHelperLocation();
+  int NavigationPanelVisibility;
+  std::vector<std::pair<std::array<double, 3>, std::array<double, 3> > > CropPlaneStates;
+  std::vector<std::array<double, 16> > ThickCropStates;
+  std::map<vtkSMProxy*, bool> Visibility;
+  vtkOpenVRCameraPose* Pose;
+};
+
 class vtkPVOpenVRHelper : public vtkObject
 {
 public:
@@ -62,7 +75,7 @@ public:
    * Re-initializes the priority queue using the amr structure given to the most
    * recent call to Initialize().
    */
-  void SendToOpenVR(vtkSMViewProxy* view);
+  virtual void SendToOpenVR(vtkSMViewProxy* view);
 
   // called when a view is removed from PV
   void ViewRemoved(vtkSMViewProxy* view);
@@ -104,6 +117,8 @@ public:
   bool CollaborationDisconnect();
   void GoToSavedLocation(int, double*, double*);
 
+  bool InVR() { return this->Interactor != nullptr; }
+
 protected:
   vtkPVOpenVRHelper();
   ~vtkPVOpenVRHelper();
@@ -111,22 +126,14 @@ protected:
   vtkPVOpenVRCollaborationClient* CollaborationClient;
 
   // state settings that the helper loads
-  // These are typically not exposed in the GUI
-  // state exposed inthe GUI is handled by the DockPanel
-  // gui class.
-  int NavigationPanelVisibility;
-  std::vector<std::pair<std::array<double, 3>, std::array<double, 3> > > CropPlaneStates;
-  std::vector<std::array<double, 16> > ThickCropStates;
   bool CropSnapping;
-
   std::string EditableField;
   std::string FieldValues;
   bool MultiSample;
+  double DefaultCropThickness;
 
   void ApplyState();
   void RecordState();
-
-  double DefaultCropThickness;
 
   std::map<int, std::string> EditFieldMap;
   vtkOpenVRMenuWidget* EditFieldMenu;
@@ -190,15 +197,9 @@ protected:
 
   void SaveLocationState(int slot);
   void LoadLocationState();
-  class SlotData
-  {
-  public:
-    std::map<vtkSMProxy*, bool> Visibility;
-  };
-  std::map<int, SlotData> SlotValues;
-  int LoadSlotValue;
+  int LoadLocationValue;
 
-  std::map<int, vtkOpenVRCameraPose> SavedCameraPoses;
+  std::map<int, vtkPVOpenVRHelperLocation> Locations;
 
 private:
   vtkPVOpenVRHelper(const vtkPVOpenVRHelper&) = delete;

@@ -97,9 +97,16 @@ void pvOpenVRDockPanel::sendToOpenVR()
 
   vtkSMViewProxy* smview = view->getViewProxy();
   this->Internals->cConnectButton->setEnabled(true);
-  this->Internals->cConnectButton->setText("Connect");
+  if (this->Internals->cConnectButton->text() != "Connect")
+  {
+    this->Internals->cConnectButton->setText("Connect");
+  }
   this->Helper->SendToOpenVR(smview);
-  this->Internals->cConnectButton->setEnabled(false);
+
+  if (!this->Helper->InVR())
+  {
+    this->Internals->cConnectButton->setEnabled(false);
+  }
 }
 
 void pvOpenVRDockPanel::collaborationConnect()
@@ -216,11 +223,27 @@ void pvOpenVRDockPanel::loadState(vtkPVXMLElement* root, vtkSMProxyLocator* loca
     {
       this->Internals->cropThickness->setText(QString::number(dcropThickness));
     }
-    std::string ef = e->GetAttributeOrEmpty("EditableField");
-    this->Internals->editableField->setText(QString(ef.c_str()));
-    std::string fv = e->GetAttributeOrEmpty("FieldValues");
-    this->Internals->fieldValues->setText(QString(fv.c_str()));
 
+    std::string tmp = e->GetAttributeOrEmpty("EditableField");
+    this->Internals->editableField->setText(QString(tmp.c_str()));
+    tmp = e->GetAttributeOrEmpty("FieldValues");
+    this->Internals->fieldValues->setText(QString(tmp.c_str()));
+
+    tmp = e->GetAttributeOrEmpty("CollaborationServer");
+    if (tmp.size())
+    {
+      this->Internals->cServerValue->setText(QString(tmp.c_str()));
+    }
+    tmp = e->GetAttributeOrEmpty("CollaborationSession");
+    if (tmp.size())
+    {
+      this->Internals->cSessionValue->setText(QString(tmp.c_str()));
+    }
+    tmp = e->GetAttributeOrEmpty("CollaborationPort");
+    if (tmp.size())
+    {
+      this->Internals->cPortValue->setText(QString(tmp.c_str()));
+    }
     this->Helper->LoadState(e, locator);
   }
 }
@@ -237,6 +260,10 @@ void pvOpenVRDockPanel::saveState(vtkPVXMLElement* root)
   e->AddAttribute("MultiSample", this->Helper->GetMultiSample() ? 1 : 0);
 
   e->AddAttribute("DefaultCropThickness", this->Helper->GetDefaultCropThickness());
+
+  e->AddAttribute("CollaborationServer", this->Internals->cServerValue->text().toLatin1().data());
+  e->AddAttribute("CollaborationSession", this->Internals->cSessionValue->text().toLatin1().data());
+  e->AddAttribute("CollaborationPort", this->Internals->cPortValue->text().toLatin1().data());
 
   this->Helper->SaveState(e);
 
