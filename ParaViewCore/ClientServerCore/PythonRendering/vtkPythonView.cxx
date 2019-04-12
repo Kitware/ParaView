@@ -53,10 +53,10 @@ class vtkPythonView::vtkInternals
 
       // import the wrapping module.
       this->WrappingModule.TakeReference(
-        PyImport_ImportModule("paraview.modules.vtkPVClientServerCoreRendering"));
+        PyImport_ImportModule("paraview.modules.vtkPVClientServerCorePythonRendering"));
       if (!this->WrappingModule)
       {
-        vtkGenericWarningMacro("Failed to import `vtkPVClientServerCoreRendering`.");
+        vtkGenericWarningMacro("Failed to import `vtkPVClientServerCorePythonRendering`.");
         if (PyErr_Occurred())
         {
           PyErr_Print();

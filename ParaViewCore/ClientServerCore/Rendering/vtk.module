@@ -31,7 +31,5 @@ OPTIONAL_DEPENDS
 
   # These affect the public API.
   ParaView::icet
-  VTK::PythonInterpreter
-  VTK::WrappingPythonCore
 TEST_LABELS
   ParaView

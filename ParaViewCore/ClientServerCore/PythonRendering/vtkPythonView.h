@@ -24,9 +24,9 @@
 
 #include "vtkPVView.h"
 
-#include "vtkImageData.h"                         // needed for member variable
-#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkSmartPointer.h"                      //needed for member variables
+#include "vtkImageData.h"                               // needed for member variable
+#include "vtkPVClientServerCorePythonRenderingModule.h" //needed for exports
+#include "vtkSmartPointer.h"                            //needed for member variables
 
 class vtkImageData;
 class vtkInformationRequestKey;
@@ -35,7 +35,7 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkTexture;
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPythonView : public vtkPVView
+class VTKPVCLIENTSERVERCOREPYTHONRENDERING_EXPORT vtkPythonView : public vtkPVView
 {
 public:
   static vtkPythonView* New();

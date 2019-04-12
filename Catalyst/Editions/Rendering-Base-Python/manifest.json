@@ -5,8 +5,8 @@
     "Enable-Python"
   ],
   "modules": [
-    { "name": "vtkPVClientServerCoreRendering",
-      "path": "ParaViewCore/ClientServerCore/Rendering",
+    { "name": "vtkPVClientServerCorePythonRendering",
+      "path": "ParaViewCore/ClientServerCore/PythonRendering",
       "include": [
         { "class": "vtkPythonRepresentation" },
         { "class": "vtkPythonView" }
