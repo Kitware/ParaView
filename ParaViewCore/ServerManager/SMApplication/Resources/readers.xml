@@ -481,6 +481,104 @@
       </StringVectorProperty>
     </Proxy>
     <!-- END ENZO AMR Core Reader definition -->
+
+    <!-- AMReX AMR Core Reader definition -->
+    <Proxy name="vtkAMReXGridReaderCore" class="vtkAMReXGridReader" label="AMReX Grid Reader">
+      <Documentation
+        long_help="Reads AMReX plotfiles (grids) data."
+        short_help="Reads AMReX plotfiles (grids) data.">
+                     This AMReX reader loads data stored in AMReX's plt flie format. The
+                     output of this reader is a hierarchical-box dataset.</Documentation>
+      <!-- Define Flas FileName -->
+      <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never"
+      >
+        <FileListDomain name="files" />
+      </StringVectorProperty>
+      <!-- Display the number of levels -->
+      <IntVectorProperty command="GetNumberOfLevels"
+                         information_only="1"
+                         name="NumLevels">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <!--  Display the number of blocks -->
+      <IntVectorProperty command="GetNumberOfBlocks"
+                         information_only="1"
+                         name="NumBlocks">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <!--  Define EnableCaching property -->
+      <IntVectorProperty command="SetEnableCaching"
+                         default_values="0"
+                         name="EnableCaching"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Turn caching on/off</Documentation>
+      </IntVectorProperty>
+      <!--  Define MaxLevel property -->
+      <IntVectorProperty command="SetMaxLevel"
+                         default_values="1"
+                         name="Level"
+                         number_of_elements="1">
+        <IntRangeDomain max="100"
+                        min="0"
+                        name="range" />
+        <Documentation>This property specifies the desired level of resolution
+        that will be visible.</Documentation>
+      </IntVectorProperty>
+      <StringVectorProperty name="PointArrayInfo"
+        command="GetPointDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="PointArrayStatus"
+        command="GetPointDataArraySelection"
+        information_property="PointArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="PointArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the point arrays to read load.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayInfo"
+        command="GetCellDataArraySelection"
+        number_of_elements_per_command="2"
+        information_only="1"
+        si_class="vtkSIDataArraySelectionProperty" />
+
+      <StringVectorProperty name="CellArrayStatus"
+        command="GetCellDataArraySelection"
+        information_property="CellArrayInfo"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        si_class="vtkSIDataArraySelectionProperty">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList" name="CellArrayInfo" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>Select the cell arrays to read load.</Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory
+          filename_patterns="plt*"
+          file_description="AMReX plotfiles (grids)"
+          is_directory="1" />
+      </Hints>
+    </Proxy>
+    <!-- END AMReX AMR Core Reader definition -->
     <Proxy class="vtkAVSucdReader"
                  label="AVS UCD Reader"
                  name="AVSucdReader">
@@ -3537,6 +3635,64 @@
       </Hints>
     </SourceProxy>
     <!--  END Enzo Reader -->
+
+    <!--  AMReX Reader -->
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="AMReX Grid Reader"
+                 name="AMReXGridReader"
+                 si_class="vtkSIMetaReaderProxy">
+      <Documentation
+        long_help="Reads AMReX plotfiles (grids) data."
+        short_help="Reads AMReX plotfiles (grids) data.">
+                     This AMReX reader loads data stored in AMReX plt file format. The
+                     output of this reader is a hierarchical-box dataset.</Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="vtkAMReXGridReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="NumLevels" />
+          <Property name="NumBlocks" />
+          <Property name="EnableCaching" />
+          <Property name="Level" />
+          <Property name="PointArrayStatus" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            name="FileNames"
+                            number_of_elements="0"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the
+        reader.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory
+          filename_patterns="plt*"
+          file_description="AMReX plotfiles (grids)"
+          is_directory="1"
+        />
+      </Hints>
+    </SourceProxy>
+    <!--  END AMReX Reader -->
+
     <SourceProxy class="vtkDEMReader"
                  label="DEM Reader"
                  name="DEMReader">
