@@ -527,18 +527,22 @@ public:
 
     QItemSelection aselection;
     const QAbstractProxyModel* amodel = qobject_cast<const QAbstractProxyModel*>(this->model());
-
-    vtkSMSourceProxy* selSource = port ? port->getSelectionInput() : nullptr;
-    if (selSource && strcmp(selSource->GetXMLName(), "BlockSelectionSource") == 0)
+    // amodel's source model may be null if the data is not a composite dataset
+    // BUG #18939.
+    if (amodel->sourceModel() != nullptr)
     {
-      vtkSMPropertyHelper blocksHelper(selSource, "Blocks");
-      for (unsigned int cc = 0, max = blocksHelper.GetNumberOfElements(); cc < max; ++cc)
+      vtkSMSourceProxy* selSource = port ? port->getSelectionInput() : nullptr;
+      if (selSource && strcmp(selSource->GetXMLName(), "BlockSelectionSource") == 0)
       {
-        const QModelIndex midx = this->CDTModel->find(blocksHelper.GetAsIdType(cc));
-        if (midx.isValid())
+        vtkSMPropertyHelper blocksHelper(selSource, "Blocks");
+        for (unsigned int cc = 0, max = blocksHelper.GetNumberOfElements(); cc < max; ++cc)
         {
-          const QModelIndex idx = amodel->mapFromSource(midx);
-          aselection.select(idx, idx);
+          const QModelIndex midx = this->CDTModel->find(blocksHelper.GetAsIdType(cc));
+          if (midx.isValid())
+          {
+            const QModelIndex idx = amodel->mapFromSource(midx);
+            aselection.select(idx, idx);
+          }
         }
       }
     }
