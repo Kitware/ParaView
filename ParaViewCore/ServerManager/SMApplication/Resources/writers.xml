@@ -345,8 +345,7 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPPolyDataWriter"
-                 parallel_only="1">
+                 name="XMLPPolyDataWriter">
       <Documentation short_help="Write polydata in a xml-based vtk data file.">
       Writer to write polydata in a xml-based vtk data file. Can be used for
       parallel writing.</Documentation>
@@ -394,8 +393,7 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPUnstructuredGridWriter"
-                 parallel_only="1">
+                 name="XMLPUnstructuredGridWriter">
       <Documentation short_help="Write unstructured grid in a xml-based vtk data file.">
       Writer to write unstructured grid in a xml-based vtk data file. Can be
       used for parallel writing.</Documentation>
@@ -443,8 +441,7 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPTableWriter"
-                 parallel_only="1">
+                 name="XMLPTableWriter">
       <Documentation short_help="Write table in a xml-based vtk data file.">
       Writer to write table in a xml-based vtk data file. Can be
       used for parallel writing.</Documentation>
@@ -490,8 +487,7 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPStructuredGridWriter"
-                 parallel_only="1">
+                 name="XMLPStructuredGridWriter">
       <Documentation short_help="Write structured grid in a xml-based vtk data file.">
       Writer to write structured grid in a xml-based vtk data file. Can be used
       for parallel writing.</Documentation>
@@ -535,8 +531,7 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPRectilinearGridWriter"
-                 parallel_only="1">
+                 name="XMLPRectilinearGridWriter">
       <Documentation short_help="Write rectilinear grid in a xml-based vtk data file.">
       Writer to write rectilinear grid in a xml-based vtk data file. Can be
       used for parallel writing.</Documentation>
@@ -580,8 +575,7 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPImageDataWriter"
-                 parallel_only="1">
+                 name="XMLPImageDataWriter">
       <Documentation short_help="Write image data in a xml-based vtk data file.">
       Writer to write image data in a xml-based vtk data file. Can be used for
       parallel writing.</Documentation>
@@ -1829,8 +1823,7 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPHyperTreeGridWriter"
-                 parallel_only="1">
+                 name="XMLPHyperTreeGridWriter">
       <Documentation short_help="Write hyper tree grid in a xml-based vtk data file.">
       Writer to write hyper tree grid in a xml-based vtk data file. Can be
       used for parallel writing.</Documentation>
