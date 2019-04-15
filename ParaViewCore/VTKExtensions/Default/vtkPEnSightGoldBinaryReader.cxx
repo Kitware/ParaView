@@ -3719,9 +3719,9 @@ int vtkPEnSightGoldBinaryReader::CreateStructuredGridOutput(
   int lineRead;
   int iblanked = 0;
   int dimensions[3];
-  int i;
+  vtkIdType i;
   vtkPoints* points = vtkPoints::New();
-  int numPts;
+  vtkIdType numPts;
 
   this->NumberOfNewOutputs++;
 
@@ -4325,8 +4325,6 @@ int vtkPEnSightGoldBinaryReader::ReadFloatArray(float* result, int numFloats)
 int vtkPEnSightGoldBinaryReader::ReadOrSkipCoordinates(
   vtkPoints* points, long offset, int partId, bool skip)
 {
-  int numPts;
-
   if (offset == -1)
   {
     return 0;
@@ -4334,7 +4332,9 @@ int vtkPEnSightGoldBinaryReader::ReadOrSkipCoordinates(
 
   this->IFile->seekg(offset);
 
-  this->ReadInt(&numPts);
+  int numPtsTmp;
+  this->ReadInt(&numPtsTmp);
+  vtkIdType numPts = numPtsTmp;
   if (numPts < 0 || numPts > this->FileSize || numPts * (int)sizeof(int) > this->FileSize)
   {
     vtkErrorMacro(
@@ -4388,7 +4388,7 @@ int vtkPEnSightGoldBinaryReader::ReadOrSkipCoordinates(
     else
     {
       // Inject really needed points
-      int i;
+      vtkIdType i;
       int localNumberOfIds = this->GetPointIds(partId)->GetLocalNumberOfIds();
       points->Allocate(localNumberOfIds);
       points->SetNumberOfPoints(localNumberOfIds);
@@ -4470,18 +4470,18 @@ int vtkPEnSightGoldBinaryReader::InjectCoordinatesAtEnd(
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightGoldBinaryReader::GetVectorFromFloatBuffer(int i, float* vector)
+void vtkPEnSightGoldBinaryReader::GetVectorFromFloatBuffer(vtkIdType i, float* vector)
 {
   // We assume FloatBufferIndexBegin, FloatBufferFilePosition, and FloatBufferNumberOfVectors
   // were previously set.
-  int closestBufferBegin = (i / this->FloatBufferSize) * this->FloatBufferSize;
+  vtkIdType closestBufferBegin = (i / this->FloatBufferSize) * this->FloatBufferSize;
   if ((this->FloatBufferIndexBegin == -1) || (closestBufferBegin != this->FloatBufferIndexBegin))
   {
     this->FloatBufferIndexBegin = closestBufferBegin;
     this->UpdateFloatBuffer();
   }
 
-  int index = i - this->FloatBufferIndexBegin;
+  vtkIdType index = i - this->FloatBufferIndexBegin;
   vector[0] = this->FloatBuffer[0][index];
   vector[1] = this->FloatBuffer[1][index];
   vector[2] = this->FloatBuffer[2][index];
@@ -4492,7 +4492,7 @@ void vtkPEnSightGoldBinaryReader::UpdateFloatBuffer()
 {
   long currentPosition = this->IFile->tellg();
 
-  int sizeToRead;
+  vtkIdType sizeToRead;
   if (this->FloatBufferIndexBegin + this->FloatBufferSize > this->FloatBufferNumberOfVectors)
   {
     sizeToRead = this->FloatBufferNumberOfVectors - this->FloatBufferIndexBegin;
@@ -4502,18 +4502,26 @@ void vtkPEnSightGoldBinaryReader::UpdateFloatBuffer()
     sizeToRead = this->FloatBufferSize;
   }
 
-  for (int i = 0; i < 3; i++)
+  for (vtkIdType i = 0; i < 3; i++)
   {
     // We cannot use ReadFloatArray method, because Fortran format has dummy things
     if (this->Fortran)
+    {
       this->IFile->seekg(this->FloatBufferFilePosition + 4 +
         i * (this->FloatBufferNumberOfVectors * sizeof(float) + 8) +
         this->FloatBufferIndexBegin * sizeof(float));
+    }
     else
-      this->IFile->seekg(this->FloatBufferFilePosition +
+    {
+      vtkIdType ost = this->FloatBufferFilePosition +
         i * this->FloatBufferNumberOfVectors * sizeof(float) +
-        this->FloatBufferIndexBegin * sizeof(float));
-
+        this->FloatBufferIndexBegin * sizeof(float);
+      this->IFile->seekg(ost);
+      if (this->IFile->good() != true)
+      {
+        vtkErrorMacro("File seek failed");
+      }
+    }
     if (!this->IFile->read((char*)this->FloatBuffer[i], sizeof(float) * sizeToRead).good())
     {
       vtkErrorMacro("Read failed");
