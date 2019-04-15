@@ -3795,7 +3795,7 @@ int vtkPEnSightGoldBinaryReader::CreateStructuredGridOutput(
   this->FloatBufferFilePosition = currentPositionInFile;
   this->FloatBufferIndexBegin = 0;
   this->FloatBufferNumberOfVectors = numPts;
-  long endFilePosition = currentPositionInFile + 3 * numPts * sizeof(float);
+  long endFilePosition = currentPositionInFile + 3 * numPts * (long)sizeof(float);
   if (this->Fortran)
     endFilePosition += 24; // 4 * (begin + end) * number of components (3)
   this->UpdateFloatBuffer();
@@ -4357,7 +4357,7 @@ int vtkPEnSightGoldBinaryReader::ReadOrSkipCoordinates(
   this->UpdateFloatBuffer();
 
   // Position to reach at the end of this method
-  long endFilePosition = currentPositionInFile + 3 * numPts * sizeof(float);
+  long endFilePosition = currentPositionInFile + 3 * numPts * (long)sizeof(float);
   if (this->Fortran)
     endFilePosition += 24; // 4 * (begin + end) * number of components (3)
 
