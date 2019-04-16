@@ -208,7 +208,11 @@ bool vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input, vtkInformation* i
       // Print this->CurrentTimeIndex to a string using this->FileNameSuffix as format
       char suffix[100];
       snprintf(suffix, 100, this->FileNameSuffix, this->CurrentTimeIndex);
-      fname << path << "/" << fnamenoext << suffix << ext;
+      if (!path.empty() && path != "")
+      {
+        fname << path << "/";
+      }
+      fname << fnamenoext << suffix << ext;
     }
     else
     {
