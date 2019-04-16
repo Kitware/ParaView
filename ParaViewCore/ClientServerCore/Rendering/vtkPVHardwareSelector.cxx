@@ -16,20 +16,20 @@
 
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
 #include "vtkPVRenderViewSettings.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
 
 #include <map>
 
-#include "vtkProcessModule.h"
 //#define vtkPVHardwareSelectorDEBUG
 #ifdef vtkPVHardwareSelectorDEBUG
 #include "vtkImageImport.h"
 #include "vtkNew.h"
 #include "vtkPNMWriter.h"
-#include "vtkProcessModule.h"
 #include "vtkWindows.h" // OK on Unix etc
 #include <sstream>
 #endif
@@ -193,7 +193,6 @@ void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
   this->Superclass::SavePixelBuffer(passNo);
 
 #ifdef vtkPVHardwareSelectorDEBUG
-
   vtkNew<vtkImageImport> ii;
   ii->SetImportVoidPointer(this->PixBuffer[passNo], 1);
   ii->SetDataScalarTypeToUnsignedChar();
@@ -201,27 +200,13 @@ void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
   ii->SetDataExtent(this->Area[0], this->Area[2], this->Area[1], this->Area[3], 0, 0);
   ii->SetWholeExtent(this->Area[0], this->Area[2], this->Area[1], this->Area[3], 0, 0);
 
-  // hardcode the path so you can find where MPI etc leaves all these files
-  std::string fname = "C:/Users/ken.martin/pickbuffer_";
-
-  std::ostringstream toString;
-  toString.str("");
-  toString.clear();
-// is there a platform generic way of doing this?
-//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-//  toString << pm->GetPartitionId();
-//  toString << pm->GetGlobalController()->GetLocalProcessId();
-#if defined(_WIN32)
-  toString << GetCurrentProcessId();
-#endif
-  fname += toString.str();
-  fname += "_";
-  fname += ('0' + passNo);
-  fname += ".pnm";
+  // hard-coded path with threadname which ensures a good process-specific name.
+  const std::string fname =
+    "/tmp/buffer-" + vtkLogger::GetThreadName() + "-pass-" + std::to_string(passNo) + ".pnm";
   vtkNew<vtkPNMWriter> pw;
   pw->SetInputConnection(ii->GetOutputPort());
   pw->SetFileName(fname.c_str());
   pw->Write();
-  cerr << "wrote to " << fname << "\n";
+  vtkLogF(INFO, "wrote pixel buffer to '%s'", fname.c_str());
 #endif
 }
