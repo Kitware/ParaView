@@ -28,13 +28,16 @@
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkView.h"
+#include "vtkWeakPointer.h" // for vtkWeakPointer
 
+class vtkBoundingBox;
 class vtkInformation;
 class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInformationVector;
-class vtkPVSynchronizedRenderWindows;
 class vtkRenderWindow;
+class vtkViewLayout;
+class vtkPVSession;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVView : public vtkView
 {
@@ -50,17 +53,9 @@ public:
     ViewTimeChangedEvent = 9000
   };
 
-  /**
-   * Initialize the view with an identifier. Unless noted otherwise, this method
-   * must be called before calling any other methods on this class.
-   * \note CallOnAllProcesses
-   */
-  virtual void Initialize(unsigned int id);
-
   //@{
   /**
    * Set the position on this view in the multiview configuration.
-   * This can be called only after Initialize().
    * \note CallOnAllProcesses
    */
   virtual void SetPosition(int, int);
@@ -70,7 +65,6 @@ public:
   //@{
   /**
    * Set the size of this view in the multiview configuration.
-   * This can be called only after Initialize().
    * \note CallOnAllProcesses
    */
   virtual void SetSize(int, int);
@@ -80,7 +74,6 @@ public:
   /**
    * Description:
    * Set the screen PPI.
-   * This can be called only after Initialize().
    * \note CallOnAllProcesses
    */
   virtual void SetPPI(int);
@@ -98,22 +91,6 @@ public:
    * \note CallOnAllProcesses
    */
   virtual void InteractiveRender() = 0;
-
-  //@{
-  /**
-   * This encapsulates a whole lot of logic for
-   * communication between processes. Given the ton of information this class
-   * keeps, it can easily aid vtkViews to synchronize information such as bounds/
-   * data-size among all processes efficiently. This can be achieved by using
-   * these methods.
-   * Note that these methods should be called on all processes at the same time
-   * otherwise we will have deadlocks.
-   * We may make this API generic in future, for now this works.
-   */
-  bool SynchronizeBounds(double bounds[6]);
-  bool SynchronizeSize(double& size);
-  bool SynchronizeSize(unsigned int& size);
-  //@}
 
   //@{
   /**
@@ -215,23 +192,83 @@ public:
   bool GetLocalProcessSupportsInteraction();
 
   /**
-   * Returns the unique identifier used for this view. This gets set in
-   * `Initialize()`.
-   */
-  vtkGetMacro(Identifier, unsigned int);
-
-  /**
    * If this view needs a render window (not all views may use one),
    * this method can be used to get the render window associated with this view
    * on the current process. Note that this window may be shared with other
    * views depending on the process on which this is called and the
    * configuration ParaView is running under.
    */
-  virtual vtkRenderWindow* GetRenderWindow();
+  vtkRenderWindow* GetRenderWindow() { return this->RenderWindow; }
+
+  //@{
+  /**
+   * Use this to indicate that the process should use
+   * vtkGenericOpenGLRenderWindow rather than vtkRenderWindow when creating an
+   * new render window.
+   */
+  static void SetUseGenericOpenGLRenderWindow(bool val);
+  static bool GetUseGenericOpenGLRenderWindow();
+  //@}
+
+  //@{
+  /**
+   * When saving screenshots with tiling, these methods get called.
+   * Not to be confused with tile scale and viewport setup on tile display.
+   *
+   * @sa vtkViewLayout::UpdateLayoutForTileDisplay
+   */
+  void SetTileScale(int x, int y);
+  void SetTileViewport(double x0, double y0, double x1, double y1);
+  //@}
+
+  //@{
+  /**
+   * This is solely intended to simplify debugging and use for any other purpose
+   * is vehemently discouraged.
+   */
+  virtual void SetLogName(const std::string& name) { this->LogName = name; }
+  const std::string& GetLogName() const { return this->LogName; }
+  //@}
+
+  /**
+   * vtkViewLayout calls this method to update the total viewport available for
+   * this view. Generally, views can assume viewport is [0, 0, 1, 1] i.e. the
+   * view has control over the complete window. However, in tile display mode,
+   * this may not be the case, and hence a reduced viewport may be passed.
+   * Generally, subclasses don't need to do much more than scale viewport for
+   * each renderer they create within the provided viewport.
+   *
+   * Default implementation iterates over all renderers in the render window and
+   * scales each assuming reach render's viewport is [0, 0, 1, 1]. Subclasses
+   * may want to override to update renderers for which that is not the case.
+   */
+  virtual void ScaleRendererViewports(const double viewport[4]);
 
 protected:
-  vtkPVView();
+  vtkPVView(bool create_render_window = true);
   ~vtkPVView() override;
+
+  /**
+   * Subclasses should use this method to create new render windows instead of
+   * directly creating a new one.
+   */
+  vtkRenderWindow* NewRenderWindow();
+
+  /**
+   * Subclasses can use this method to set the render window created for this
+   * view.
+   */
+  void SetRenderWindow(vtkRenderWindow*);
+
+  /**
+   * Reduce bounding box between all participating processes.
+   */
+  void AllReduce(const vtkBoundingBox& source, vtkBoundingBox& dest);
+
+  /**
+   * Reduce the max value between all participating processes.
+   */
+  void AllReduceMAX(const vtkTypeUInt64 source, vtkTypeUInt64& dest);
 
   /**
    * Overridden to check that the representation has View setup properly. Older
@@ -240,24 +277,6 @@ protected:
    * warn.
    */
   void AddRepresentationInternal(vtkDataRepresentation* rep) override;
-
-  // vtkPVSynchronizedRenderWindows is used to ensure that this view participates
-  // in tile-display configurations. Even if your view subclass a simple
-  // Qt-based client-side view that does not render anything on the
-  // tile-display, it needs to be "registered with the
-  // vtkPVSynchronizedRenderWindows so that the layout on the tile-displays for
-  // other views shows up correctly. Ideally you'd want to paste some image on
-  // the tile-display, maybe just a capture of the image rendering on the
-  // client.
-  // If your view needs a vtkRenderWindow, don't directly create it, always get
-  // using vtkPVSynchronizedRenderWindows::NewRenderWindow().
-  vtkPVSynchronizedRenderWindows* SynchronizedWindows;
-
-  /**
-   * Every view gets a unique identifier that it uses to register itself with
-   * the SynchronizedWindows. This is set in Initialize().
-   */
-  unsigned int Identifier;
 
   //@{
   /**
@@ -278,6 +297,8 @@ protected:
   double ViewTime;
   //@}
 
+  vtkPVSession* GetSession();
+
   double CacheKey;
   bool UseCache;
 
@@ -289,12 +310,13 @@ private:
   vtkPVView(const vtkPVView&) = delete;
   void operator=(const vtkPVView&) = delete;
 
-  class vtkInternals;
-
+  vtkRenderWindow* RenderWindow;
   bool ViewTimeValid;
-  bool LastRenderOneViewAtATime;
-
   static bool EnableStreaming;
+  vtkWeakPointer<vtkPVSession> Session;
+  std::string LogName;
+
+  static bool UseGenericOpenGLRenderWindow;
 };
 
 #endif

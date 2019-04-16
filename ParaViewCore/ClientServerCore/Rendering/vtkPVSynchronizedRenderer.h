@@ -13,12 +13,18 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVSynchronizedRenderer
- * @brief   synchronizes and composites renderers among
- * processes in ParaView configurations.
+ * @class vtkPVSynchronizedRenderer
+ * @brief coordinates rendering between corresponding renderers across multiple
+ *        processes
  *
+ * vtkPVSynchronizedRenderer coordinates rendering between renderers that are
+ * split across multiple ranks. It internally uses other
+ * vtkSynchronizedRenderers subclasses based on the operation mode to do the
+ * actual coordination such as vtkCaveSynchronizedRenderers,
+ * vtkIceTSynchronizedRenderers, vtkPVClientServerSynchronizedRenderers and
+ * vtkCompositedSynchronizedRenderers.
  *
-*/
+ */
 
 #ifndef vtkPVSynchronizedRenderer_h
 #define vtkPVSynchronizedRenderer_h
@@ -52,13 +58,12 @@ public:
   vtkGetMacro(DisableIceT, bool);
   //@}
 
-  // Must be called once to initialize the class. Id is uniquefier. It is
-  // typically same as the id passed to vtkPVView::Initialize(). This makes it
-  // possible to identify what view this instance corresponds to.
-  // vtkPVSynchronizedRenderer passes this id to vtkIceTSynchronizedRenderers.
-  // vtkIceTSynchronizedRenderers uses the id to ensure that the correct group
-  // of views is shown on a tile-display.
-  void Initialize(vtkPVSession* session, unsigned int id);
+  /**
+   * Must be called once to initialize the instance. This will create
+   * appropriate internal vtkSynchronizedRenderers subclasses based on the
+   * process type and session provided.
+   */
+  void Initialize(vtkPVSession* session);
 
   /**
    * partition ordering that gives processes ordering. Initial value is a NULL pointer.
@@ -179,16 +184,6 @@ protected:
   vtkImageProcessingPass* ImageProcessingPass;
   vtkRenderPass* RenderPass;
 
-  enum ModeEnum
-  {
-    INVALID,
-    BUILTIN,
-    CLIENT,
-    SERVER,
-    BATCH
-  };
-
-  ModeEnum Mode;
   bool Enabled;
   bool DisableIceT;
   int ImageReductionFactor;

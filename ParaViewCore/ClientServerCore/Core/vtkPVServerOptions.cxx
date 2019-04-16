@@ -254,19 +254,19 @@ int vtkPVServerOptions::ParseExtraXMLTag(const char* name, const char** atts)
 }
 
 //----------------------------------------------------------------------------
-double vtkPVServerOptions::GetEyeSeparation()
+double vtkPVServerOptions::GetEyeSeparation() const
 {
   return static_cast<double>(this->Internals->EyeSeparation);
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkPVServerOptions::GetNumberOfMachines()
+unsigned int vtkPVServerOptions::GetNumberOfMachines() const
 {
   return static_cast<unsigned int>(this->Internals->MachineInformationVector.size());
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVServerOptions::GetMachineName(unsigned int idx)
+const char* vtkPVServerOptions::GetMachineName(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -277,7 +277,7 @@ const char* vtkPVServerOptions::GetMachineName(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVServerOptions::GetDisplayName(unsigned int idx)
+const char* vtkPVServerOptions::GetDisplayName(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -288,7 +288,7 @@ const char* vtkPVServerOptions::GetDisplayName(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-int* vtkPVServerOptions::GetGeometry(unsigned int idx)
+int* vtkPVServerOptions::GetGeometry(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -299,7 +299,7 @@ int* vtkPVServerOptions::GetGeometry(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVServerOptions::GetFullScreen(unsigned int idx)
+bool vtkPVServerOptions::GetFullScreen(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -310,7 +310,7 @@ bool vtkPVServerOptions::GetFullScreen(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVServerOptions::GetStereoType(unsigned int idx)
+int vtkPVServerOptions::GetStereoType(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -321,7 +321,7 @@ int vtkPVServerOptions::GetStereoType(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVServerOptions::GetShowBorders(unsigned int idx)
+bool vtkPVServerOptions::GetShowBorders(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -332,7 +332,7 @@ bool vtkPVServerOptions::GetShowBorders(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVServerOptions::GetLowerLeft(unsigned int idx)
+double* vtkPVServerOptions::GetLowerLeft(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -342,7 +342,7 @@ double* vtkPVServerOptions::GetLowerLeft(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVServerOptions::GetLowerRight(unsigned int idx)
+double* vtkPVServerOptions::GetLowerRight(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -352,7 +352,7 @@ double* vtkPVServerOptions::GetLowerRight(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-double* vtkPVServerOptions::GetUpperRight(unsigned int idx)
+double* vtkPVServerOptions::GetUpperRight(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
@@ -362,13 +362,24 @@ double* vtkPVServerOptions::GetUpperRight(unsigned int idx)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVServerOptions::GetCaveBoundsSet(unsigned int idx)
+bool vtkPVServerOptions::GetCaveBoundsSet(unsigned int idx) const
 {
   if (idx >= this->Internals->MachineInformationVector.size())
   {
     return 0;
   }
   return this->Internals->MachineInformationVector[idx].CaveBoundsSet == 1;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerOptions::GetIsInCave() const
+{
+  if (this->Superclass::GetIsInCave())
+  {
+    return true;
+  }
+
+  return (this->GetIsInTileDisplay() == false && this->GetNumberOfMachines() > 0);
 }
 
 //----------------------------------------------------------------------------

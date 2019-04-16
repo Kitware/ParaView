@@ -70,10 +70,6 @@ public:
   virtual vtkAbstractContextItem* GetContextItem() = 0;
 
   //@{
-  vtkRenderWindow* GetRenderWindow() override { return this->RenderWindow; }
-  //@}
-
-  //@{
   /**
    * Set the interactor. Client applications must set the interactor to enable
    * interactivity. Note this method will also change the interactor styles set
@@ -82,13 +78,6 @@ public:
   virtual void SetupInteractor(vtkRenderWindowInteractor*);
   vtkRenderWindowInteractor* GetInteractor();
   //@}
-
-  /**
-   * Initialize the view with an identifier. Unless noted otherwise, this method
-   * must be called before calling any other methods on this class.
-   * \note CallOnAllProcesses
-   */
-  void Initialize(unsigned int id) override;
 
   /**
    * Overridden to ensure that in multi-client configurations, same set of
@@ -193,17 +182,6 @@ protected:
    */
   virtual bool MapSelectionToInput(vtkSelection*);
 
-  //@{
-  /**
-   * Callbacks called when the primary "renderer" in the vtkContextView
-   * starts/ends rendering. Note that this is called on the renderer, hence
-   * before the rendering cleanup calls like SwapBuffers called by the
-   * render-window.
-   */
-  void OnStartRender();
-  void OnEndRender();
-  //@}
-
   /**
    * Method to get the Formatted title after replacing some key strings
    * eg: ${TIME}
@@ -212,7 +190,6 @@ protected:
   virtual std::string GetFormattedTitle();
 
   vtkContextView* ContextView;
-  vtkRenderWindow* RenderWindow;
 
 private:
   vtkPVContextView(const vtkPVContextView&) = delete;

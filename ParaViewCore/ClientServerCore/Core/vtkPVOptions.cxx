@@ -22,6 +22,8 @@
 #include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
 
@@ -443,14 +445,8 @@ int vtkPVOptions::PostProcess(int argc, const char* const* argv)
 
   if (this->TileDimensions[0] > 0 || this->TileDimensions[1] > 0)
   {
-    if (this->TileDimensions[0] <= 0)
-    {
-      this->TileDimensions[0] = 1;
-    }
-    if (this->TileDimensions[1] <= 0)
-    {
-      this->TileDimensions[1] = 1;
-    }
+    this->TileDimensions[0] = std::max(1, this->TileDimensions[0]);
+    this->TileDimensions[1] = std::max(1, this->TileDimensions[1]);
   }
 
 #ifdef PARAVIEW_ALWAYS_SECURE_CONNECTION
@@ -532,6 +528,18 @@ int vtkPVOptions::WrongArgument(const char* argument)
 int vtkPVOptions::DeprecatedArgument(const char* argument)
 {
   return this->Superclass::DeprecatedArgument(argument);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVOptions::GetIsInTileDisplay() const
+{
+  return (this->TileDimensions[0] > 0 && this->TileDimensions[1] > 0);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVOptions::GetIsInCave() const
+{
+  return false;
 }
 
 //----------------------------------------------------------------------------

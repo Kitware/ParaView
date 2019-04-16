@@ -36,6 +36,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
+   * Overridden to pass a unique identifier to vtkSpreadSheetView.
+   */
+  void CreateVTKObjects() override;
+
+  /**
    * Overridden to update `FieldAssociation` property on the view to match the
    * data type being shown.
    */

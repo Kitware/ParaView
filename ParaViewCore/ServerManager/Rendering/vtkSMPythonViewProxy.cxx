@@ -18,6 +18,7 @@
 #include "vtkDataArray.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSession.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkPythonView.h"
@@ -87,6 +88,12 @@ vtkImageData* vtkSMPythonViewProxy::CaptureWindowInternal(int magX, int magY)
     pv->SetMagnification(1, 1);
   }
   return image;
+}
+
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMPythonViewProxy::PreRender(bool vtkNotUsed(interactive))
+{
+  return vtkPVSession::CLIENT;
 }
 
 //----------------------------------------------------------------------------

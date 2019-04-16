@@ -1243,17 +1243,6 @@ void vtkSMRenderViewProxy::SetValueRenderingMode(int mode)
 }
 
 //----------------------------------------------------------------------------
-double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
-{
-  this->Session->Activate();
-  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
-  double result = rv ? rv->GetZbufferDataAtPoint(x, y) : 1.0;
-  this->Session->DeActivate();
-
-  return result;
-}
-
-//----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

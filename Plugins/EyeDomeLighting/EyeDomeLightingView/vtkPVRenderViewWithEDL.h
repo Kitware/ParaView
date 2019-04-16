@@ -54,14 +54,8 @@ public:
   vtkTypeMacro(vtkPVRenderViewWithEDL, vtkPVRenderView);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  // Description:
-  // Initialize the view with an identifier. Unless noted otherwise, this method
-  // must be called before calling any other methods on this class.
-  // \note CallOnAllProcesses
-  void Initialize(unsigned int id) override;
-
 protected:
-  vtkPVRenderViewWithEDL() = default;
+  vtkPVRenderViewWithEDL();
 
 private:
   vtkPVRenderViewWithEDL(const vtkPVRenderViewWithEDL&) = delete;

@@ -51,18 +51,13 @@ public:
   void SetAngle(double angle);
 
   /**
-   * Initialize the view
-   */
-  void Initialize(unsigned int id) override;
-
-  /**
    * FXAA is not supported yet in this view
    * This method has no effect
    */
   void SetUseFXAA(bool) override{};
 
 protected:
-  vtkPVPanoramicProjectionView() = default;
+  vtkPVPanoramicProjectionView();
   ~vtkPVPanoramicProjectionView() override = default;
 
 private:

@@ -61,6 +61,16 @@ public:
   vtkGetVector2Macro(TileMullions, int);
 
   /**
+   * Returns true if the tile display configuration is requested.
+   */
+  virtual bool GetIsInTileDisplay() const;
+
+  /**
+   * Returns true of CAVE configuration is requested.
+   */
+  virtual bool GetIsInCave() const;
+
+  /**
    * Returns the egl device index. -1 indicates that no value was specified.
    */
   vtkGetMacro(EGLDeviceIndex, int);
@@ -104,15 +114,6 @@ public:
    */
   vtkSetStringMacro(LogFileName);
   vtkGetStringMacro(LogFileName);
-  //@}
-
-  //@{
-  /**
-   * vtkPVProcessModule needs to set this.
-   */
-  vtkSetVector2Macro(TileDimensions, int);
-  vtkSetVector2Macro(TileMullions, int);
-  vtkSetMacro(UseOffscreenRendering, int);
   //@}
 
   /**

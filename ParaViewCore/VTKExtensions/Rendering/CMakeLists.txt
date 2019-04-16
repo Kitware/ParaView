@@ -83,11 +83,9 @@ set(classes
   vtkSelectionConverter
   vtkSortedTableStreamer
   vtkSquirtCompressor
-  vtkTileDisplayHelper
   vtkTilesHelper
   vtkTrackballPan
   vtkUpdateSuppressorPipeline
-  vtkViewLayout
   vtkVolumeRepresentationPreprocessor
   vtkZlibImageCompressor)
 

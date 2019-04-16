@@ -165,18 +165,10 @@ void vtkSMViewProxy::CreateVTKObjects()
     return;
   }
 
-  if (!this->ObjectsCreated)
+  if (auto object = vtkObject::SafeDownCast(this->GetClientSideObject()))
   {
-    return;
+    object->AddObserver(vtkPVView::ViewTimeChangedEvent, this, &vtkSMViewProxy::ViewTimeChanged);
   }
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "Initialize"
-         << static_cast<int>(this->GetGlobalID()) << vtkClientServerStream::End;
-  this->ExecuteStream(stream);
-
-  vtkObject::SafeDownCast(this->GetClientSideObject())
-    ->AddObserver(vtkPVView::ViewTimeChangedEvent, this, &vtkSMViewProxy::ViewTimeChanged);
 }
 
 //----------------------------------------------------------------------------
@@ -228,7 +220,21 @@ void vtkSMViewProxy::StillRender()
 
   if (this->ObjectsCreated)
   {
+    auto window = this->GetRenderWindow();
     vtkClientServerStream stream;
+    if (window)
+    {
+      int tileScale[2];
+      window->GetTileScale(tileScale);
+      stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetTileScale" << tileScale[0]
+             << tileScale[1] << vtkClientServerStream::End;
+
+      double tileViewport[4];
+      window->GetTileViewport(tileViewport);
+      stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetTileViewport"
+             << tileViewport[0] << tileViewport[1] << tileViewport[2] << tileViewport[3]
+             << vtkClientServerStream::End;
+    }
     stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "StillRender"
            << vtkClientServerStream::End;
     this->ExecuteStream(stream, false, render_location);

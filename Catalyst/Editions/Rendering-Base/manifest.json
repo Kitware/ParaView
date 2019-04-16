@@ -162,7 +162,6 @@
         { "class": "vtkSelectionConverter" },
         { "class": "vtkSortedTableStreamer" },
         { "class": "vtkSquirtCompressor" },
-        { "class": "vtkTileDisplayHelper" },
         { "class": "vtkTilesHelper" },
         { "class": "vtkTrackballPan" },
         { "class": "vtkUpdateSuppressorPipeline" },

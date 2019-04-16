@@ -30,9 +30,7 @@
 
 #include "vtkOpenGLHardwareSelector.h"
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkWeakPointer.h"                       // needed for vtkWeakPointer.
 
-class vtkPVSynchronizedRenderWindows;
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVHardwareSelector : public vtkOpenGLHardwareSelector
 {
 public:
@@ -63,12 +61,6 @@ public:
   void InvalidateCachedSelection() { this->Modified(); }
 
   int AssignUniqueId(vtkProp*);
-
-  /**
-   * Set the vtkPVSynchronizedRenderWindows instance. This is used to
-   * communicate between all active processes.
-   */
-  void SetSynchronizedWindows(vtkPVSynchronizedRenderWindows*);
 
   // Fixes a -Woverloaded-virtual warning.
   using vtkOpenGLHardwareSelector::BeginRenderProp;
@@ -104,7 +96,6 @@ protected:
 
   vtkTimeStamp CaptureTime;
   int UniqueId;
-  vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
 
 private:
   vtkPVHardwareSelector(const vtkPVHardwareSelector&) = delete;

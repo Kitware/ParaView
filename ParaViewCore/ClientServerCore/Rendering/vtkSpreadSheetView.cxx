@@ -29,7 +29,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVMergeTables.h"
-#include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
@@ -341,19 +341,15 @@ namespace
 {
 void FetchRMI(void* localArg, void* remoteArg, int remoteArgLength, int)
 {
-  vtkMultiProcessStream stream;
-  stream.SetRawData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
-  unsigned int id = 0;
-  int blockid = -1;
-  stream >> id >> blockid;
+  assert(remoteArgLength == sizeof(vtkTypeUInt64) * 2);
+  (void)remoteArgLength;
+
+  auto arg = reinterpret_cast<vtkTypeUInt64*>(remoteArg);
   vtkSpreadSheetView* self = reinterpret_cast<vtkSpreadSheetView*>(localArg);
-  if (self->GetIdentifier() == id)
+  if (static_cast<vtkTypeUInt32>(self->GetIdentifier()) == arg[0])
   {
-    self->FetchBlockCallback(blockid);
+    self->FetchBlockCallback(static_cast<vtkIdType>(arg[1]));
   }
-}
-void FetchRMIBogus(void*, void*, int, int)
-{
 }
 
 unsigned long vtkCountNumberOfRows(vtkDataObject* dobj)
@@ -414,6 +410,10 @@ vtkAlgorithmOutput* vtkGetDataProducer(vtkSpreadSheetView* self, vtkSpreadSheetR
 vtkStandardNewMacro(vtkSpreadSheetView);
 //----------------------------------------------------------------------------
 vtkSpreadSheetView::vtkSpreadSheetView()
+  : Superclass(/*create_render_window=*/false)
+  , CRMICallbackTag(0)
+  , PRMICallbackTag(0)
+  , Identifier(0)
 {
   this->NumberOfRows = 0;
   this->ShowExtractedSelection = false;
@@ -439,15 +439,15 @@ vtkSpreadSheetView::vtkSpreadSheetView()
     vtkMakeMemberFunctionCommand(*this, &vtkSpreadSheetView::OnRepresentationUpdated);
   this->SomethingUpdated = false;
 
-  if (vtkProcessModule::GetProcessType() != vtkProcessModule::PROCESS_RENDER_SERVER)
+  auto session = this->GetSession();
+  assert(session);
+  if (auto cController = session->GetController(vtkPVSession::CLIENT))
   {
-    this->RMICallbackTag =
-      this->SynchronizedWindows->AddRMICallback(::FetchRMI, this, FETCH_BLOCK_TAG);
+    this->CRMICallbackTag = cController->AddRMICallback(::FetchRMI, this, FETCH_BLOCK_TAG);
   }
-  else
+  if (auto pController = vtkMultiProcessController::GetGlobalController())
   {
-    this->RMICallbackTag =
-      this->SynchronizedWindows->AddRMICallback(::FetchRMIBogus, this, FETCH_BLOCK_TAG);
+    this->PRMICallbackTag = pController->AddRMICallback(::FetchRMI, this, FETCH_BLOCK_TAG);
   }
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 }
@@ -455,8 +455,17 @@ vtkSpreadSheetView::vtkSpreadSheetView()
 //----------------------------------------------------------------------------
 vtkSpreadSheetView::~vtkSpreadSheetView()
 {
-  this->SynchronizedWindows->RemoveRMICallback(this->RMICallbackTag);
-  this->RMICallbackTag = 0;
+  auto session = this->GetSession();
+  if (auto cController = session ? session->GetController(vtkPVSession::CLIENT) : nullptr)
+  {
+    cController->RemoveRMICallback(this->CRMICallbackTag);
+    this->CRMICallbackTag = 0;
+  }
+  if (auto pController = session ? vtkMultiProcessController::GetGlobalController() : nullptr)
+  {
+    pController->RemoveRMICallback(this->PRMICallbackTag);
+    this->PRMICallbackTag = 0;
+  }
 
   this->TableStreamer->Delete();
   this->TableSelectionMarker->Delete();
@@ -613,7 +622,7 @@ int vtkSpreadSheetView::StreamToClient()
     return 0;
   }
 
-  unsigned int num_rows = 0;
+  vtkTypeUInt64 num_rows = 0;
 
   // From the active representation obtain the data/selection producers that
   // need to be streamed to the client.
@@ -635,10 +644,7 @@ int vtkSpreadSheetView::StreamToClient()
     this->DeliveryFilter->RemoveAllInputs();
   }
 
-  if (cur)
-  {
-    this->SynchronizedWindows->SynchronizeSize(num_rows);
-  }
+  this->AllReduceMAX(num_rows, num_rows);
 
   if (this->NumberOfRows != static_cast<vtkIdType>(num_rows))
   {
@@ -683,9 +689,17 @@ vtkTable* vtkSpreadSheetView::FetchBlockCallback(vtkIdType blockindex)
   }
 
   // cout << "FetchBlockCallback" << endl;
-  vtkMultiProcessStream stream;
-  stream << this->Identifier << static_cast<int>(blockindex);
-  this->SynchronizedWindows->TriggerRMI(stream, FETCH_BLOCK_TAG);
+  vtkTypeUInt64 data[2] = { this->Identifier, static_cast<vtkTypeUInt64>(blockindex) };
+  if (auto dController = this->GetSession()->GetController(vtkPVSession::DATA_SERVER_ROOT))
+  {
+    dController->TriggerRMIOnAllChildren(data, sizeof(vtkTypeUInt64) * 2, FETCH_BLOCK_TAG);
+  }
+  auto pController = vtkMultiProcessController::GetGlobalController();
+  if (pController && pController->GetLocalProcessId() == 0 &&
+    pController->GetNumberOfProcesses() > 1)
+  {
+    pController->TriggerRMIOnAllChildren(data, sizeof(vtkTypeUInt64) * 2, FETCH_BLOCK_TAG);
+  }
 
   this->TableStreamer->SetBlock(blockindex);
   this->TableStreamer->Modified();

@@ -13,8 +13,8 @@
 
 =========================================================================*/
 /**
- * @class   vtkPVOrthographicSliceView
- * View.
+ * @class vtkPVOrthographicSliceView
+ * @brief view with 3 orthographic slice views and 1 3D view.
  *
  * vtkPVOrthographicSliceView extends vtkPVMultiSliceView to support showing a
  * quad-view with orthographic views along with the 3D view. Work with
@@ -29,7 +29,7 @@
  * plane (in which case the \c SliceIncrements are used to update the slice
  * position). Additionally, users can double click in any of the orthographic
  * views to move the slice position to that location.
-*/
+ */
 
 #ifndef vtkPVOrthographicSliceView_h
 #define vtkPVOrthographicSliceView_h
@@ -44,13 +44,6 @@ public:
   static vtkPVOrthographicSliceView* New();
   vtkTypeMacro(vtkPVOrthographicSliceView, vtkPVMultiSliceView);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  /**
-   * Initialize the view with an identifier. Unless noted otherwise, this method
-   * must be called before calling any other methods on this class.
-   * \note CallOnAllProcesses
-   */
-  void Initialize(unsigned int id) override;
 
   /**
    * Overridden to ensure that the SlicePositionAxes3D doesn't get used when
@@ -109,6 +102,11 @@ public:
   void SetBackgroundTexture(vtkTexture* val) override;
   void SetGradientBackground(int val) override;
   void SetTexturedBackground(int val) override;
+
+  /**
+   * Overridden to scale the projection viewports appropriately.
+   */
+  void ScaleRendererViewports(const double viewport[4]) override;
 
 protected:
   vtkPVOrthographicSliceView();

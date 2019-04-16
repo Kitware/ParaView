@@ -132,13 +132,7 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // For tile display testing lets enable the dump of images
   if (options->GetTileImagePath())
   {
-    vtkSMProxy* proxy =
-      vtkSMProxyManager::GetProxyManager()->NewProxy("tile_helper", "TileDisplayHelper");
-    vtkSMStringVectorProperty* pathProperty =
-      vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("DumpImagePath"));
-    pathProperty->SetElement(0, options->GetTileImagePath());
-    proxy->UpdateVTKObjects();
-    proxy->Delete();
+    // FIXME
   }
 
   // check for --data option.

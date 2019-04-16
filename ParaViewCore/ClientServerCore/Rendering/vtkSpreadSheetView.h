@@ -44,6 +44,15 @@ public:
   vtkTypeMacro(vtkSpreadSheetView, vtkPVView);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  //@{
+  /**
+   * A unique identifier for this vtkSpreadSheetView across all processes.
+   *
+   */
+  vtkSetMacro(Identifier, vtkTypeUInt32);
+  vtkGetMacro(Identifier, vtkTypeUInt32);
+  //@}
+
   /**
    * Triggers a high-resolution render.
    * \note CallOnAllProcesses
@@ -242,9 +251,11 @@ private:
   friend class vtkInternals;
   vtkInternals* Internals;
   bool SomethingUpdated;
-  unsigned long RMICallbackTag;
+  unsigned long CRMICallbackTag;
+  unsigned long PRMICallbackTag;
 
   int FieldAssociation;
+  vtkTypeUInt32 Identifier;
 };
 
 #endif

@@ -37,174 +37,126 @@
 #endif
 #include "vtkCompositedSynchronizedRenderers.h"
 
-#include <assert.h>
+#include <cassert>
 
 vtkStandardNewMacro(vtkPVSynchronizedRenderer);
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
+  : CSSynchronizer(nullptr)
+  , ParallelSynchronizer(nullptr)
+  , ImageProcessingPass(nullptr)
+  , RenderPass(nullptr)
+  , Enabled(true)
+  , DisableIceT(false)
+  , ImageReductionFactor(1)
+  , Renderer(nullptr)
+  , UseDepthBuffer(false)
+  , RenderEmptyImages(false)
+  , DataReplicatedOnAllProcesses(false)
 {
-  this->ImageProcessingPass = NULL;
-  this->RenderPass = NULL;
-  this->Enabled = true;
-  this->ImageReductionFactor = 1;
-  this->Renderer = 0;
-  this->UseDepthBuffer = false;
-  this->Mode = INVALID;
-  this->CSSynchronizer = 0;
-  this->ParallelSynchronizer = 0;
   this->DisableIceT = vtkPVRenderViewSettings::GetInstance()->GetDisableIceT();
-  this->DataReplicatedOnAllProcesses = false;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session, unsigned int id)
+void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
 {
-  if (this->Mode != INVALID)
-  {
-    vtkWarningMacro("vtkPVSynchronizedRenderer is already initialized...");
-    return;
-  }
-  assert(this->Mode == INVALID);
+  // session must be valid.
+  assert(session != nullptr);
+  assert(this->CSSynchronizer == nullptr && this->ParallelSynchronizer == nullptr);
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
   {
-    vtkErrorMacro("vtkPVSynchronizedRenderWindows cannot be used in the current\n"
+    vtkErrorMacro("vtkPVSynchronizedRenderer cannot be used in the current\n"
                   "setup. Aborting for debugging purposes.");
     abort();
   }
-  if (id == 0)
-  {
-    vtkWarningMacro("Id should not be 0.");
-  }
 
-  // active session must be a paraview-session.
-  assert(session != NULL);
+  auto serverInfo = session->GetServerInformation();
 
-  int processtype = pm->GetProcessType();
-  switch (processtype)
-  {
-    case vtkProcessModule::PROCESS_BATCH:
-      this->Mode = BATCH;
-      break;
-
-    case vtkProcessModule::PROCESS_RENDER_SERVER:
-    case vtkProcessModule::PROCESS_SERVER:
-      this->Mode = SERVER;
-      break;
-
-    case vtkProcessModule::PROCESS_DATA_SERVER:
-      this->Mode = BUILTIN;
-      break;
-
-    case vtkProcessModule::PROCESS_CLIENT:
-      this->Mode = BUILTIN;
-      if (session->IsA("vtkSMSessionClient"))
-      {
-        this->Mode = CLIENT;
-      }
-      break;
-  }
-
-  this->CSSynchronizer = 0;
-  this->ParallelSynchronizer = 0;
-
-  bool in_tile_display_mode = false;
-  bool in_cave_mode = false;
   int tile_dims[2] = { 0, 0 };
   int tile_mullions[2] = { 0, 0 };
+  serverInfo->GetTileDimensions(tile_dims);
+  serverInfo->GetTileMullions(tile_mullions);
 
-  vtkPVServerInformation* info = session->GetServerInformation();
-  info->GetTileDimensions(tile_dims);
-  in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
-  tile_dims[0] = (tile_dims[0] == 0) ? 1 : tile_dims[0];
-  tile_dims[1] = (tile_dims[1] == 0) ? 1 : tile_dims[1];
-  info->GetTileMullions(tile_mullions);
-  if (!in_tile_display_mode)
+  const bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+  const bool in_cave_mode = !in_tile_display_mode ? (serverInfo->GetNumberOfMachines() > 0) : false;
+
+  switch (pm->GetProcessType())
   {
-    in_cave_mode = info->GetNumberOfMachines() > 0;
-    // these are present when a pvx file is specified.
-  }
-
-  // we ensure that tile_dims are non-zero. We are passing the tile_dims to
-  // vtkIceTSynchronizedRenderers and should be (1, 1) when not in tile-display
-  // mode.
-  tile_dims[0] = tile_dims[0] > 0 ? tile_dims[0] : 1;
-  tile_dims[1] = tile_dims[1] > 0 ? tile_dims[1] : 1;
-
-  switch (this->Mode)
-  {
-    case BUILTIN:
-      break;
-
-    case CLIENT:
-    {
-      if (in_tile_display_mode || in_cave_mode)
+    case vtkProcessModule::PROCESS_CLIENT:
+      if (auto cs_controller = session->GetController(vtkPVSession::RENDER_SERVER_ROOT))
       {
-        this->CSSynchronizer = vtkSynchronizedRenderers::New();
-        this->CSSynchronizer->WriteBackImagesOff();
-      }
-      else
-      {
-        this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
-        this->CSSynchronizer->WriteBackImagesOn();
-      }
-      this->CSSynchronizer->SetRootProcessId(0);
-      this->CSSynchronizer->SetParallelController(
-        session->GetController(vtkPVSession::RENDER_SERVER));
-    }
-    break;
-
-    case SERVER:
-    {
-      if (in_tile_display_mode || in_cave_mode)
-      {
-        this->CSSynchronizer = vtkSynchronizedRenderers::New();
-      }
-      else
-      {
-        this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
-      }
-      this->CSSynchronizer->WriteBackImagesOff();
-      this->CSSynchronizer->SetRootProcessId(1);
-      this->CSSynchronizer->SetParallelController(session->GetController(vtkPVSession::CLIENT));
-    }
-      VTK_FALLTHROUGH;
-
-    // DON'T BREAK, server needs to setup everything in the BATCH case
-
-    case BATCH:
-      if (in_cave_mode)
-      {
-        this->ParallelSynchronizer = vtkCaveSynchronizedRenderers::New();
-        this->ParallelSynchronizer->SetParallelController(
-          vtkMultiProcessController::GetGlobalController());
-        this->ParallelSynchronizer->WriteBackImagesOn();
-      }
-      else if (pm->GetNumberOfLocalPartitions() > 1 ||
-        (pm->GetNumberOfLocalPartitions() == 1 && in_tile_display_mode))
-      {
-// ICET now handles stereo properly, so use it no matter the number
-// of partitions
-#if VTK_MODULE_ENABLE_ParaView_icet
-        if (this->DisableIceT)
+        // in client-server mode.
+        if (in_tile_display_mode || in_cave_mode)
         {
-          this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
+          this->CSSynchronizer = vtkSynchronizedRenderers::New();
+          this->CSSynchronizer->WriteBackImagesOff();
         }
         else
         {
+          this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
+          this->CSSynchronizer->WriteBackImagesOn();
+        }
+        this->CSSynchronizer->SetRootProcessId(0);
+        this->CSSynchronizer->SetParallelController(cs_controller);
+      }
+      else
+      {
+        // builtin mode, no CSSynchronizer is needed.
+      }
+      break;
+
+    case vtkProcessModule::PROCESS_SERVER:
+    case vtkProcessModule::PROCESS_RENDER_SERVER:
+    case vtkProcessModule::PROCESS_BATCH:
+      if (auto cs_controller = session->GetController(vtkPVSession::CLIENT))
+      {
+        // note cs_controller will be null in batch mode and on satellites.
+        assert(pm->GetPartitionId() == 0);
+        if (in_tile_display_mode || in_cave_mode)
+        {
+          this->CSSynchronizer = vtkSynchronizedRenderers::New();
+        }
+        else
+        {
+          this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
+        }
+        this->CSSynchronizer->WriteBackImagesOff();
+        this->CSSynchronizer->SetRootProcessId(1);
+        this->CSSynchronizer->SetParallelController(cs_controller);
+      }
+
+      if (in_cave_mode)
+      {
+        this->ParallelSynchronizer = vtkCaveSynchronizedRenderers::New();
+        this->ParallelSynchronizer->SetParallelController(pm->GetGlobalController());
+        this->ParallelSynchronizer->WriteBackImagesOn();
+      }
+      else if (in_tile_display_mode || pm->GetNumberOfLocalPartitions() > 1)
+      {
+#if VTK_MODULE_ENABLE_ParaView_icet
+        if (!this->DisableIceT)
+        {
           vtkIceTSynchronizedRenderers* isr = vtkIceTSynchronizedRenderers::New();
-          isr->SetIdentifier(id);
-          isr->SetTileDimensions(tile_dims[0], tile_dims[1]);
+          isr->SetTileDimensions(std::max(tile_dims[0], 1), std::max(tile_dims[1], 1));
           isr->SetTileMullions(tile_mullions[0], tile_mullions[1]);
           this->ParallelSynchronizer = isr;
         }
+        else
 #else
-        // FIXME: need to add support for compositing when not using IceT
-        this->ParallelSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
+        {
+          this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
+        }
 #endif
-        this->ParallelSynchronizer->SetParallelController(
-          vtkMultiProcessController::GetGlobalController());
-        if ((pm->GetPartitionId() == 0 && this->Mode == BATCH) || in_tile_display_mode)
+          this->ParallelSynchronizer->SetParallelController(pm->GetGlobalController());
+        this->ParallelSynchronizer->SetRootProcessId(0);
+        if (in_tile_display_mode)
+        {
+          this->ParallelSynchronizer->WriteBackImagesOn();
+        }
+        else if (pm->GetProcessType() == vtkProcessModule::PROCESS_BATCH &&
+          pm->GetPartitionId() == 0)
         {
           this->ParallelSynchronizer->WriteBackImagesOn();
         }
@@ -212,11 +164,11 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session, unsigned int i
         {
           this->ParallelSynchronizer->WriteBackImagesOff();
         }
-        this->ParallelSynchronizer->SetRootProcessId(0);
       }
       break;
 
     default:
+      vtkErrorMacro("Unknown process type detected. Aborting for debugging purposes!");
       abort();
   }
 
@@ -443,23 +395,10 @@ void vtkPVSynchronizedRenderer::SetImageReductionFactor(int factor)
   }
 
   this->ImageReductionFactor = factor;
-
-  switch (this->Mode)
+  if (this->ParallelSynchronizer)
   {
-    case SERVER:
-    case BATCH:
-      if (this->ParallelSynchronizer)
-      {
-        this->ParallelSynchronizer->SetImageReductionFactor(this->ImageReductionFactor);
-      }
-      break;
-
-    case BUILTIN:
-    case CLIENT:
-    default:
-      break;
+    this->ParallelSynchronizer->SetImageReductionFactor(this->ImageReductionFactor);
   }
-
   this->Modified();
 }
 

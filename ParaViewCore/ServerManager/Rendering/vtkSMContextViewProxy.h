@@ -124,6 +124,13 @@ protected:
   int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element) override;
 
   /**
+   * Overridden to return a location of vtkPVSession::CLIENT unless in
+   * tile-display mode, in which case
+   * `vtkPVSession::CLIENT |vtkPVSession::RENDER_SERVER` is returned.
+   */
+  vtkTypeUInt32 PreRender(bool interactive) override;
+
+  /**
    * The context view that is used for all context derived charts.
    */
   vtkContextView* ChartView;

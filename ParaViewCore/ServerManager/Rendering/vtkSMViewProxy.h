@@ -262,7 +262,18 @@ protected:
    */
   virtual void RenderForImageCapture() { this->StillRender(); }
 
+  /**
+   * This method is called before executing code that could cause a render on
+   * the underlying vtkPVView. This is the method where subclasses can ensure
+   * that the data for rendering is made available ranks that will be doing the
+   * rendering and then return the location where the rendering will happen.
+   *
+   * Thus vtkSMViewProxy can send the render request to only those processes
+   * that will be doing rendering avoiding unnecessary communication to
+   * non-participating ranks.
+   */
   virtual vtkTypeUInt32 PreRender(bool vtkNotUsed(interactive)) { return this->GetLocation(); }
+
   virtual void PostRender(bool vtkNotUsed(interactive)) {}
 
   /**

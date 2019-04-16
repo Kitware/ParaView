@@ -48,13 +48,6 @@ public:
   static vtkInformationRequestKey* REQUEST_DELIVER_DATA_TO_CLIENT();
 
   /**
-   * Initialize the view with an identifier. Unless noted otherwise, this method
-   * must be called before calling any other methods on this class.
-   * \note CallOnAllProcesses
-   */
-  void Initialize(unsigned int id) override;
-
-  /**
    * Overrides the base class method to request an addition pass that moves data from the
    * server to the client.
    */
@@ -67,18 +60,6 @@ public:
 
   // Sets the renderer for this view.
   virtual void SetRenderer(vtkRenderer* ren);
-
-  /**
-   * Get a handle to the render window.
-   */
-  vtkRenderWindow* GetRenderWindow() override;
-
-  /**
-   * Set the render window for this view. Note that this requires special
-   * handling in order to do correctly - see the notes in the detailed
-   * description of vtkRenderViewBase.
-   */
-  virtual void SetRenderWindow(vtkRenderWindow* win);
 
   //@{
   /**
@@ -187,7 +168,6 @@ protected:
 
   vtkSmartPointer<vtkTexture> RenderTexture;
   vtkSmartPointer<vtkRenderer> Renderer;
-  vtkSmartPointer<vtkRenderWindow> RenderWindow;
 
   // Needed to handle rendering at different magnifications
   int Magnification[2];

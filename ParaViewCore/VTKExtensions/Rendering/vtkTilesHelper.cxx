@@ -15,6 +15,10 @@
 #include "vtkTilesHelper.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkVectorOperators.h"
+
+#include <algorithm>
+#include <cassert>
 
 vtkStandardNewMacro(vtkTilesHelper);
 //----------------------------------------------------------------------------
@@ -32,134 +36,95 @@ vtkTilesHelper::~vtkTilesHelper()
 }
 
 //----------------------------------------------------------------------------
-static double vtkMin(double x, double y)
+bool vtkTilesHelper::GetTileIndex(int rank, int* tileX, int* tileY) const
 {
-  return x < y ? x : y;
-}
-
-//----------------------------------------------------------------------------
-static double vtkMax(double x, double y)
-{
-  return x > y ? x : y;
-}
-
-//----------------------------------------------------------------------------
-void vtkTilesHelper::GetTileIndex(int rank, int* tileX, int* tileY)
-{
-  int x = rank % this->TileDimensions[0];
-  int y = rank / this->TileDimensions[0];
-  if (y >= this->TileDimensions[1])
+  if (rank < (this->TileDimensions[0] * this->TileDimensions[1]))
   {
-    y = this->TileDimensions[1] - 1;
-  }
+    int x = rank % this->TileDimensions[0];
+    int y = rank / this->TileDimensions[0];
+    assert(y < this->TileDimensions[1]);
 
-  // invert y so that the 0th rank corresponds to the top-left tile rather than
-  // bottom left tile.
-  y = this->TileDimensions[1] - y - 1;
-  *tileX = x;
-  *tileY = y;
-}
-
-//----------------------------------------------------------------------------
-bool vtkTilesHelper::GetNormalizedTileViewport(
-  const double* viewport, int rank, double out_tile_viewport[4])
-{
-  double normalized_mullions[2];
-  normalized_mullions[0] = static_cast<double>(this->TileMullions[0]) /
-    (this->TileWindowSize[0] * this->TileDimensions[0]);
-  normalized_mullions[1] = static_cast<double>(this->TileMullions[1]) /
-    (this->TileWindowSize[1] * this->TileDimensions[1]);
-
-  // The size of the tile as a fraction of the total display size.
-  double normalized_tile_size[2];
-  normalized_tile_size[0] = 1.0 / this->TileDimensions[0];
-  normalized_tile_size[1] = 1.0 / this->TileDimensions[1];
-
-  int x, y;
-  this->GetTileIndex(rank, &x, &y);
-
-  out_tile_viewport[0] = x * normalized_tile_size[0];
-  out_tile_viewport[1] = y * normalized_tile_size[1];
-  out_tile_viewport[2] = out_tile_viewport[0] + normalized_tile_size[0];
-  out_tile_viewport[3] = out_tile_viewport[1] + normalized_tile_size[1];
-
-  // Now the tile for the given rank is showing the normalized viewport
-  // indicated by out_tile_viewport. Now, we intersect it with the
-  // viewport to return where the current viewport maps in the tile.
-  if (viewport)
-  {
-    out_tile_viewport[0] = ::vtkMax(viewport[0], out_tile_viewport[0]);
-    out_tile_viewport[1] = ::vtkMax(viewport[1], out_tile_viewport[1]);
-    out_tile_viewport[2] = ::vtkMin(viewport[2], out_tile_viewport[2]);
-    out_tile_viewport[3] = ::vtkMin(viewport[3], out_tile_viewport[3]);
-  }
-
-  if (out_tile_viewport[2] <= out_tile_viewport[0] || out_tile_viewport[3] <= out_tile_viewport[1])
-  {
-    return false;
-  }
-
-  // Shift the entire viewport around using the mullions.
-  out_tile_viewport[0] += x * normalized_mullions[0];
-  out_tile_viewport[1] += y * normalized_mullions[1];
-  out_tile_viewport[2] += x * normalized_mullions[0];
-  out_tile_viewport[3] += y * normalized_mullions[1];
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkTilesHelper::GetTileViewport(const double* viewport, int rank, int out_tile_viewport[4])
-{
-  double normalized_tile_viewport[4];
-  if (this->GetNormalizedTileViewport(viewport, rank, normalized_tile_viewport))
-  {
-    out_tile_viewport[0] = static_cast<int>(
-      normalized_tile_viewport[0] * this->TileWindowSize[0] * this->TileDimensions[0] + 0.5);
-    out_tile_viewport[1] = static_cast<int>(
-      normalized_tile_viewport[1] * this->TileWindowSize[1] * this->TileDimensions[1] + 0.5);
-    out_tile_viewport[2] =
-      static_cast<int>(
-        normalized_tile_viewport[2] * this->TileWindowSize[0] * this->TileDimensions[0] + 0.5) -
-      1;
-    out_tile_viewport[3] =
-      static_cast<int>(
-        normalized_tile_viewport[3] * this->TileWindowSize[1] * this->TileDimensions[1] + 0.5) -
-      1;
-    // due to rounding, we although normalized ranges maybe valid, we may end
-    // up with invalid integral ranges. So test again.
-    if (out_tile_viewport[2] <= out_tile_viewport[0] ||
-      out_tile_viewport[3] <= out_tile_viewport[1])
-    {
-      return false;
-    }
+    // invert y so that the 0th rank corresponds to the top-left tile rather than
+    // bottom left tile.
+    y = (this->TileDimensions[1] - 1) - y;
+    *tileX = x;
+    *tileY = y;
     return true;
   }
   return false;
 }
 
 //----------------------------------------------------------------------------
-bool vtkTilesHelper::GetPhysicalViewport(
-  const double* global_viewport, int rank, double out_phyiscal_viewport[4])
+bool vtkTilesHelper::GetTileViewport(int rank, vtkVector4d& tile_viewport) const
 {
-  // Get the normalized tile-viewport for the full tile on this rank.
-  double full_tile_viewport[4];
-  this->GetNormalizedTileViewport(NULL, rank, full_tile_viewport);
-
-  // effectively, clamp the  global_viewport to the full_tile_viewport.
-  double clamped_global_viewport[4];
-  if (this->GetNormalizedTileViewport(global_viewport, rank, clamped_global_viewport) == false)
+  vtkVector2i size, origin;
+  if (!this->GetTiledSizeAndOrigin(rank, size, origin))
   {
     return false;
   }
 
-  double dx = full_tile_viewport[2] - full_tile_viewport[0];
-  double dy = full_tile_viewport[3] - full_tile_viewport[1];
+  const vtkVector2i full_size(
+    this->TileDimensions[0] * (this->TileMullions[0] + this->TileWindowSize[0]) -
+      this->TileMullions[0],
+    this->TileDimensions[1] * (this->TileMullions[1] + this->TileWindowSize[1]) -
+      this->TileMullions[1]);
 
-  out_phyiscal_viewport[0] = (clamped_global_viewport[0] - full_tile_viewport[0]) / dx;
-  out_phyiscal_viewport[1] = (clamped_global_viewport[1] - full_tile_viewport[1]) / dy;
-  out_phyiscal_viewport[2] = (clamped_global_viewport[2] - full_tile_viewport[0]) / dx;
-  out_phyiscal_viewport[3] = (clamped_global_viewport[3] - full_tile_viewport[1]) / dy;
+  tile_viewport[0] = static_cast<double>(origin[0]) / full_size[0];
+  tile_viewport[1] = static_cast<double>(origin[1]) / full_size[1];
+  tile_viewport[2] = static_cast<double>(origin[0] + size[0]) / full_size[0];
+  tile_viewport[3] = static_cast<double>(origin[1] + size[1]) / full_size[1];
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkTilesHelper::GetTiledSizeAndOrigin(
+  int rank, vtkVector2i& size, vtkVector2i& lowerLeft) const
+{
+  vtkVector2i tindex;
+  if (!this->GetTileIndex(rank, &tindex[0], &tindex[1]))
+  {
+    return false;
+  }
+
+  size[0] = this->TileWindowSize[0];
+  size[1] = this->TileWindowSize[1];
+  lowerLeft[0] = tindex[0] * (this->TileWindowSize[0] + this->TileMullions[0]);
+  lowerLeft[1] = tindex[1] * (this->TileWindowSize[1] + this->TileMullions[1]);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkTilesHelper::GetTiledSizeAndOrigin(
+  int rank, vtkVector2i& size, vtkVector2i& lowerLeft, vtkVector4d viewport) const
+{
+  const vtkVector2i full_size(
+    this->TileDimensions[0] * (this->TileMullions[0] + this->TileWindowSize[0]) -
+      this->TileMullions[0],
+    this->TileDimensions[1] * (this->TileMullions[1] + this->TileWindowSize[1]) -
+      this->TileMullions[1]);
+
+  vtkVector2i vpLowerLeft(static_cast<int>(viewport[0] * full_size[0] + 0.5),
+    static_cast<int>(viewport[1] * full_size[1] + 0.5));
+  vtkVector2i vpUpperRight(static_cast<int>(viewport[2] * full_size[0] + 0.5),
+    static_cast<int>(viewport[3] * full_size[1] + 0.5));
+
+  if (!this->GetTiledSizeAndOrigin(rank, size, lowerLeft))
+  {
+    return false;
+  }
+  const vtkVector2i tUpperRight = lowerLeft + size;
+
+  vpLowerLeft[0] = std::max(vpLowerLeft[0], lowerLeft[0]);
+  vpLowerLeft[1] = std::max(vpLowerLeft[1], lowerLeft[1]);
+
+  vpUpperRight[0] = std::min(vpUpperRight[0], tUpperRight[0]);
+  vpUpperRight[1] = std::min(vpUpperRight[1], tUpperRight[1]);
+
+  lowerLeft = vpLowerLeft;
+  size = vpUpperRight - vpLowerLeft;
+  size[0] = std::max(0, size[0]);
+  size[1] = std::max(0, size[1]);
+  return (size[0] > 0 && size[1] > 0);
 }
 
 //----------------------------------------------------------------------------

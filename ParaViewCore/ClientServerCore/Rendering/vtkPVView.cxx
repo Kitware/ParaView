@@ -14,56 +14,122 @@
 =========================================================================*/
 #include "vtkPVView.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkCacheSizeKeeper.h"
+#include "vtkCommunicator.h"
+#include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkInformation.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentation.h"
+#include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
+#include "vtkPVProcessWindow.h"
+#include "vtkPVRenderingCapabilitiesInformation.h"
+#include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkPVStreamingMacros.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
 #include "vtkTimerLog.h"
 
-#include <assert.h>
+#include <cassert>
 #include <map>
+#include <sstream>
 
-class vtkPVView::vtkInternals
+namespace
 {
-private:
-  typedef std::map<vtkPVSession*, vtkWeakPointer<vtkPVSynchronizedRenderWindows> >
-    MapOfSynchronizedWindows;
-  static MapOfSynchronizedWindows SynchronizedWindows;
-
+class vtkOffscreenOpenGLRenderWindow : public vtkGenericOpenGLRenderWindow
+{
 public:
-  static vtkPVSynchronizedRenderWindows* NewSynchronizedWindows(vtkPVSession* session)
+  static vtkOffscreenOpenGLRenderWindow* New();
+  vtkTypeMacro(vtkOffscreenOpenGLRenderWindow, vtkGenericOpenGLRenderWindow);
+
+  void SetContext(vtkOpenGLRenderWindow* cntxt)
   {
-    vtkPVSynchronizedRenderWindows* srw = vtkInternals::SynchronizedWindows[session].GetPointer();
-    if (srw == NULL)
+    if (cntxt == this->Context)
     {
-      srw = vtkPVSynchronizedRenderWindows::New(session);
-      vtkInternals::SynchronizedWindows[session] = srw;
-      return srw;
+      return;
     }
-    else
+
+    if (this->Context)
     {
-      srw->Register(NULL);
-      return srw;
+      this->MakeCurrent();
+      this->Finalize();
+    }
+
+    this->SetReadyForRendering(false);
+    this->Context = cntxt;
+    if (cntxt)
+    {
+      this->SetForceMaximumHardwareLineWidth(1);
+      this->SetReadyForRendering(true);
+      this->SetOwnContext(0);
     }
   }
+  vtkOpenGLRenderWindow* GetContext() { return this->Context; }
+
+  void MakeCurrent() override
+  {
+    if (this->Context)
+    {
+      this->Context->MakeCurrent();
+      this->Superclass::MakeCurrent();
+    }
+  }
+
+  bool IsCurrent() override { return this->Context ? this->Context->IsCurrent() : false; }
+
+  void SetUseOffScreenBuffers(bool) override {}
+  void SetShowWindow(bool) override {}
+
+  void Render() override
+  {
+    if (this->Context && this->GetReadyForRendering())
+    {
+      if (!this->Initialized)
+      {
+        this->Context->Initialize();
+        this->Context->MakeCurrent();
+        this->OpenGLInit();
+      }
+
+      this->Superclass::Render();
+    }
+  }
+
+  vtkOpenGLState* GetState() override
+  {
+    return this->Context ? this->Context->GetState() : this->Superclass::GetState();
+  }
+
+protected:
+  vtkOffscreenOpenGLRenderWindow()
+  {
+    this->SetReadyForRendering(false);
+    this->Superclass::SetShowWindow(false);
+    this->Superclass::SetUseOffScreenBuffers(true);
+  }
+
+private:
+  vtkOffscreenOpenGLRenderWindow(const vtkOffscreenOpenGLRenderWindow&) = delete;
+  void operator=(const vtkOffscreenOpenGLRenderWindow&) = delete;
+
+  vtkSmartPointer<vtkOpenGLRenderWindow> Context;
 };
 
-vtkPVView::vtkInternals::MapOfSynchronizedWindows vtkPVView::vtkInternals::SynchronizedWindows;
+vtkStandardNewMacro(vtkOffscreenOpenGLRenderWindow);
+}
 
 vtkInformationKeyMacro(vtkPVView, REQUEST_RENDER, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE_LOD, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE, Request);
 vtkInformationKeyRestrictedMacro(vtkPVView, VIEW, ObjectBase, "vtkPVView");
-
+//----------------------------------------------------------------------------
 bool vtkPVView::EnableStreaming = false;
 //----------------------------------------------------------------------------
 void vtkPVView::SetEnableStreaming(bool val)
@@ -79,10 +145,24 @@ bool vtkPVView::GetEnableStreaming()
 }
 
 //----------------------------------------------------------------------------
-vtkPVView::vtkPVView()
+bool vtkPVView::UseGenericOpenGLRenderWindow = false;
+//----------------------------------------------------------------------------
+void vtkPVView::SetUseGenericOpenGLRenderWindow(bool val)
 {
-  vtkStreamingStatusMacro("View Streaming  Status: " << vtkPVView::GetEnableStreaming());
+  vtkPVView::UseGenericOpenGLRenderWindow = val;
+}
 
+//----------------------------------------------------------------------------
+bool vtkPVView::GetUseGenericOpenGLRenderWindow()
+{
+  return vtkPVView::UseGenericOpenGLRenderWindow;
+}
+
+//----------------------------------------------------------------------------
+vtkCxxSetObjectMacro(vtkPVView, RenderWindow, vtkRenderWindow);
+//----------------------------------------------------------------------------
+vtkPVView::vtkPVView(bool create_render_window)
+{
   // Ensure vtkProcessModule is setup correctly.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -91,6 +171,15 @@ vtkPVView::vtkPVView()
     abort();
   }
 
+  // enable/disable streaming. This doesn't need to done on every constructor
+  // call, but no harm even if it is done.
+  if (auto options = pm->GetOptions())
+  {
+    vtkPVView::SetEnableStreaming(options->GetEnableStreaming() != 0);
+  }
+
+  vtkStreamingStatusMacro("View Streaming  Status: " << vtkPVView::GetEnableStreaming());
+
   vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
   if (!activeSession)
   {
@@ -98,8 +187,7 @@ vtkPVView::vtkPVView()
     abort();
   }
 
-  this->SynchronizedWindows = vtkInternals::NewSynchronizedWindows(activeSession);
-  this->Identifier = 0;
+  this->Session = activeSession;
   this->ViewTime = 0.0;
   this->CacheKey = 0.0;
   this->UseCache = false;
@@ -108,66 +196,125 @@ vtkPVView::vtkPVView()
   this->ReplyInformationVector = vtkInformationVector::New();
 
   this->ViewTimeValid = false;
-  this->LastRenderOneViewAtATime = false;
 
   this->Size[1] = this->Size[0] = 300;
   this->Position[0] = this->Position[1] = 0;
   this->PPI = 96;
+
+  // Create render window, if requested.
+  this->RenderWindow = create_render_window ? this->NewRenderWindow() : nullptr;
+  if (this->RenderWindow)
+  {
+    this->RenderWindow->SetSize(this->Size);
+    this->RenderWindow->SetPosition(this->Position);
+    this->RenderWindow->SetDPI(this->PPI);
+  }
 }
 
 //----------------------------------------------------------------------------
 vtkPVView::~vtkPVView()
 {
-  this->SynchronizedWindows->RemoveAllRenderers(this->Identifier);
-  this->SynchronizedWindows->RemoveRenderWindow(this->Identifier);
-  this->SynchronizedWindows->Delete();
-  this->SynchronizedWindows = NULL;
-
   this->RequestInformation->Delete();
   this->ReplyInformationVector->Delete();
+  this->SetRenderWindow(nullptr);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVView::Initialize(unsigned int id)
+vtkRenderWindow* vtkPVView::NewRenderWindow()
 {
-  if (this->Identifier == id)
+  auto pm = vtkProcessModule::GetProcessModule();
+  auto options = pm->GetOptions();
+
+  vtkSmartPointer<vtkRenderWindow> window;
+  switch (pm->GetProcessType())
   {
-    // already initialized
-    return;
+    case vtkProcessModule::PROCESS_DATA_SERVER:
+      window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+      break;
+
+    case vtkProcessModule::PROCESS_CLIENT:
+      if (vtkPVView::GetUseGenericOpenGLRenderWindow())
+      {
+        window = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+      }
+      else if (options->GetForceOffscreenRendering())
+      {
+        // this may be a headless window if ParaView was built with headless
+        // capabilities.
+        window = vtkPVRenderingCapabilitiesInformation::NewOffscreenRenderWindow();
+      }
+      else
+      {
+        window = vtkSmartPointer<vtkRenderWindow>::New();
+      }
+      break;
+
+    case vtkProcessModule::PROCESS_SERVER:
+    case vtkProcessModule::PROCESS_RENDER_SERVER:
+    case vtkProcessModule::PROCESS_BATCH:
+      if (auto processWindow = vtkPVProcessWindow::GetRenderWindow())
+      {
+        auto owindow = vtkSmartPointer<vtkOffscreenOpenGLRenderWindow>::New();
+        owindow->SetContext(vtkOpenGLRenderWindow::SafeDownCast(processWindow));
+        owindow->DoubleBufferOff();
+        window = owindow;
+      }
+      else
+      {
+        vtkErrorMacro(
+          "Expecting a process window, which is missing. Aborting for debugging purposes.");
+        abort();
+      }
+      break;
+
+    default:
+      vtkErrorMacro("Invalid process type. Aborting for debugging purposes.");
+      abort();
   }
-  assert(this->Identifier == 0 && id != 0);
 
-  this->Identifier = id;
-  this->SetSize(this->Size[0], this->Size[1]);
-  this->SetPosition(this->Position[0], this->Position[1]);
-
-  // enable/disable streaming. This doesn't need to done on every Initialize()
-  // call, but no harm even if it is done.
-  if (vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions())
+  if (window)
   {
-    vtkPVView::SetEnableStreaming(options->GetEnableStreaming() != 0);
-  }
-}
+    vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(),
+      "created a `%s` as a new render window for view %s", vtkLogIdentifier(window),
+      vtkLogIdentifier(this));
 
-//----------------------------------------------------------------------------
-vtkRenderWindow* vtkPVView::GetRenderWindow()
-{
-  if (this->Identifier == 0)
-  {
-    vtkWarningMacro("`GetRenderWindow` has been called before the view was initialized.");
-    return nullptr;
+    window->AlphaBitPlanesOn();
+
+    std::ostringstream str;
+    switch (pm->GetProcessType())
+    {
+      case vtkProcessModule::PROCESS_DATA_SERVER:
+        str << "ParaView Data-Server";
+        break;
+      case vtkProcessModule::PROCESS_SERVER:
+        str << "ParaView Server";
+        break;
+      case vtkProcessModule::PROCESS_RENDER_SERVER:
+        str << "ParaView Render-Server";
+        break;
+      case vtkProcessModule::PROCESS_CLIENT:
+      case vtkProcessModule::PROCESS_BATCH:
+      default:
+        str << "ParaView";
+        break;
+    }
+    if (pm->GetNumberOfLocalPartitions() > 1)
+    {
+      str << pm->GetPartitionId();
+    }
+    window->SetWindowName(str.str().c_str());
+    window->Register(this);
+    return window;
   }
 
-  return this->SynchronizedWindows->GetRenderWindow(this->Identifier);
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(),
+    "created `nullptr` as a new render window for view %s", vtkLogIdentifier(this));
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::SetPosition(int x, int y)
 {
-  if (this->Identifier != 0)
-  {
-    this->SynchronizedWindows->SetWindowPosition(this->Identifier, x, y);
-  }
   this->Position[0] = x;
   this->Position[1] = y;
 }
@@ -175,9 +322,17 @@ void vtkPVView::SetPosition(int x, int y)
 //----------------------------------------------------------------------------
 void vtkPVView::SetSize(int x, int y)
 {
-  if (this->Identifier != 0)
+  if (this->InTileDisplayMode() || this->InCaveDisplayMode())
   {
-    this->SynchronizedWindows->SetWindowSize(this->Identifier, x, y);
+    // the size request is ignored.
+  }
+  else if (auto window = this->GetRenderWindow())
+  {
+    const auto cur_size = window->GetActualSize();
+    if (cur_size[0] != x || cur_size[1] != y)
+    {
+      window->SetSize(x, y);
+    }
   }
   this->Size[0] = x;
   this->Size[1] = y;
@@ -187,12 +342,9 @@ void vtkPVView::SetSize(int x, int y)
 void vtkPVView::SetPPI(int ppi)
 {
   this->PPI = ppi;
-  if (this->Identifier)
+  if (auto window = this->GetRenderWindow())
   {
-    if (vtkRenderWindow* win = this->SynchronizedWindows->GetRenderWindow(this->Identifier))
-    {
-      win->SetDPI(ppi);
-    }
+    window->SetDPI(ppi);
   }
   this->Modified();
 }
@@ -212,58 +364,42 @@ void vtkPVView::SetViewTime(double time)
 //----------------------------------------------------------------------------
 bool vtkPVView::InTileDisplayMode()
 {
-  int temp[2];
-  return this->SynchronizedWindows->GetTileDisplayParameters(temp, temp);
+  auto serverInfo = this->Session->GetServerInformation();
+  return (serverInfo->GetTileDimensions()[0] > 0 || serverInfo->GetTileDimensions()[1] > 0);
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVView::InCaveDisplayMode()
 {
-  return this->SynchronizedWindows->GetIsInCave();
+  auto serverInfo = this->Session->GetServerInformation();
+  return (serverInfo->GetNumberOfMachines() > 0) && !this->InTileDisplayMode();
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVView::GetLocalProcessSupportsInteraction()
 {
-  // Remember that in batch mode, we should not create interaction on any of the
-  // ranks since all views share the same render window. Setting up interactor
-  // on even the root node will have unintended side effects since all views
-  // share the render window. One can override this and allow the creation of an
-  // interactor by setting the PV_ALLOW_BATCH_INTERACTION environment variable.
-  if (getenv("PV_ALLOW_BATCH_INTERACTION"))
+  auto pm = vtkProcessModule::GetProcessModule();
+  switch (pm->GetProcessType())
   {
-    return this->SynchronizedWindows->GetLocalProcessIsDriver();
+    case vtkProcessModule::PROCESS_CLIENT:
+      assert(pm->GetPartitionId() == 0);
+      return true;
+
+    case vtkProcessModule::PROCESS_BATCH:
+      return (pm->GetPartitionId() == 0);
+
+    case vtkProcessModule::PROCESS_DATA_SERVER:
+    case vtkProcessModule::PROCESS_SERVER:
+    case vtkProcessModule::PROCESS_RENDER_SERVER:
+    default:
+      return false;
   }
-  else
-  {
-    return this->SynchronizedWindows->GetLocalProcessIsDriver() &&
-      this->SynchronizedWindows->GetMode() != vtkPVSynchronizedRenderWindows::BATCH;
-  }
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVView::SynchronizeBounds(double bounds[6])
-{
-  return this->SynchronizedWindows->SynchronizeBounds(bounds);
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVView::SynchronizeSize(double& size)
-{
-  return this->SynchronizedWindows->SynchronizeSize(size);
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVView::SynchronizeSize(unsigned int& size)
-{
-  return this->SynchronizedWindows->SynchronizeSize(size);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Identifier: " << this->Identifier << endl;
   os << indent << "ViewTime: " << this->ViewTime << endl;
   os << indent << "CacheKey: " << this->CacheKey << endl;
   os << indent << "UseCache: " << this->UseCache << endl;
@@ -272,37 +408,29 @@ void vtkPVView::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVView::PrepareForScreenshot()
 {
-  if (!this->InTileDisplayMode())
-  {
-    this->LastRenderOneViewAtATime = this->SynchronizedWindows->GetRenderOneViewAtATime();
-    this->SynchronizedWindows->RenderOneViewAtATimeOn();
-  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::CleanupAfterScreenshot()
 {
-  if (!this->InTileDisplayMode())
-  {
-    this->SynchronizedWindows->RenderOneViewAtATimeOff();
-    this->SynchronizedWindows->SetRenderOneViewAtATime(this->LastRenderOneViewAtATime);
-  }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::Update()
 {
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: update view", this->GetLogName().c_str());
+
   vtkTimerLog::MarkStartEvent("vtkPVView::Update");
   // Ensure that cache size if synchronized among the processes.
   if (this->GetUseCache())
   {
     vtkCacheSizeKeeper* cacheSizeKeeper = vtkCacheSizeKeeper::GetInstance();
-    unsigned int cache_full = 0;
+    vtkTypeUInt64 cache_full = 0;
     if (cacheSizeKeeper->GetCacheSize() > cacheSizeKeeper->GetCacheLimit())
     {
       cache_full = 1;
     }
-    this->SynchronizedWindows->SynchronizeSize(cache_full);
+    this->AllReduceMAX(cache_full, cache_full);
     cacheSizeKeeper->SetCacheFull(cache_full > 0);
   }
 
@@ -376,4 +504,222 @@ void vtkPVView::AddRepresentationInternal(vtkDataRepresentation* rep)
     }
   }
   this->Superclass::AddRepresentationInternal(rep);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::ScaleRendererViewports(const double viewport[4])
+{
+  auto window = this->GetRenderWindow();
+  if (!window)
+  {
+    return;
+  }
+
+  assert(viewport[0] >= 0 && viewport[0] <= 1.0);
+  assert(viewport[1] >= 0 && viewport[1] <= 1.0);
+  assert(viewport[2] >= 0 && viewport[2] <= 1.0);
+  assert(viewport[3] >= 0 && viewport[3] <= 1.0);
+
+  auto collection = window->GetRenderers();
+  collection->InitTraversal();
+  while (auto renderer = collection->GetNextItem())
+  {
+    renderer->SetViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::AllReduce(const vtkBoundingBox& arg_source, vtkBoundingBox& dest)
+{
+  assert(this->Session);
+
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "all-reduce-bounds");
+
+  vtkBoundingBox source = arg_source;
+  if (!arg_source.IsValid())
+  {
+    source.Reset(); // need to make sure the min and max values are set to fixed ones.
+  }
+
+  auto pController = vtkMultiProcessController::GetGlobalController();
+  if (pController)
+  {
+    pController->Reduce(source, dest, 0);
+    source = dest;
+  }
+
+  auto cController = this->Session->GetController(vtkPVSession::CLIENT);
+  if (cController)
+  {
+    assert(pController == nullptr || pController->GetLocalProcessId() == 0);
+    double bds[6];
+    source.GetBounds(bds);
+    cController->Send(bds, 6, 1, 41232);
+    cController->Receive(bds, 6, 1, 41233);
+    source.SetBounds(bds);
+  }
+
+  auto crController = this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
+  auto cdController = this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT);
+  if (crController == cdController)
+  {
+    cdController = nullptr;
+  }
+
+  if (crController)
+  {
+    double bds[6];
+    crController->Receive(bds, 6, 1, 41232);
+    source.AddBounds(bds);
+  }
+
+  if (cdController)
+  {
+    double bds[6];
+    cdController->Receive(bds, 6, 1, 41232);
+    source.AddBounds(bds);
+  }
+
+  if (crController)
+  {
+    double bds[6];
+    source.GetBounds(bds);
+    crController->Send(bds, 6, 1, 41233);
+  }
+
+  if (cdController)
+  {
+    double bds[6];
+    source.GetBounds(bds);
+    cdController->Send(bds, 6, 1, 41233);
+  }
+
+  if (pController)
+  {
+    double bds[6];
+    source.GetBounds(bds);
+    pController->Broadcast(bds, 6, 0);
+    source.SetBounds(bds);
+  }
+
+  dest = source;
+
+  if (arg_source.IsValid() && dest.IsValid())
+  {
+    double src_bds[6], dest_bds[6];
+    arg_source.GetBounds(src_bds);
+    dest.GetBounds(dest_bds);
+    vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(),
+      "source=(%g, %g, %g, %g, %g, %g), result=(%g, %g, %g, %g, %g, %g)", src_bds[0], src_bds[1],
+      src_bds[2], src_bds[3], src_bds[4], src_bds[5], dest_bds[0], dest_bds[1], dest_bds[2],
+      dest_bds[3], dest_bds[4], dest_bds[5]);
+  }
+  else if (arg_source.IsValid())
+  {
+    double src_bds[6];
+    arg_source.GetBounds(src_bds);
+    vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(),
+      "source=(%g, %g, %g, %g, %g, %g), result=(invalid)", src_bds[0], src_bds[1], src_bds[2],
+      src_bds[3], src_bds[4], src_bds[5]);
+  }
+  else if (dest.IsValid())
+  {
+    double dest_bds[6];
+    dest.GetBounds(dest_bds);
+    vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(),
+      "source=(invalid), result=(%g, %g, %g, %g, %g, %g)", dest_bds[0], dest_bds[1], dest_bds[2],
+      dest_bds[3], dest_bds[4], dest_bds[5]);
+  }
+  else
+  {
+    vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "source=(invalid), result=(invalid)");
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::AllReduceMAX(const vtkTypeUInt64 arg_source, vtkTypeUInt64& dest)
+{
+  assert(this->Session);
+  vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "all-reduce-max");
+
+  vtkTypeUInt64 source = arg_source;
+  auto pController = vtkMultiProcessController::GetGlobalController();
+  if (pController)
+  {
+    pController->Reduce(&source, &dest, 1, vtkCommunicator::MAX_OP, 0);
+    source = dest;
+  }
+
+  auto cController = this->Session->GetController(vtkPVSession::CLIENT);
+  if (cController)
+  {
+    assert(pController == nullptr || pController->GetLocalProcessId() == 0);
+    cController->Send(&source, 1, 1, 41234);
+    cController->Receive(&source, 1, 1, 41235);
+  }
+
+  auto crController = this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
+  auto cdController = this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT);
+  if (crController == cdController)
+  {
+    cdController = nullptr;
+  }
+
+  if (crController)
+  {
+    vtkTypeUInt64 val;
+    crController->Receive(&val, 1, 1, 41234);
+    source = std::max(source, val);
+  }
+
+  if (cdController)
+  {
+    vtkTypeUInt64 val;
+    cdController->Receive(&val, 1, 1, 41234);
+    source = std::max(source, val);
+  }
+
+  if (crController)
+  {
+    crController->Send(&source, 1, 1, 41235);
+  }
+
+  if (cdController)
+  {
+    cdController->Send(&source, 1, 1, 41235);
+  }
+
+  if (pController)
+  {
+    pController->Broadcast(&source, 1, 0);
+  }
+
+  dest = source;
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "source=%llu, result=%llu", arg_source, dest);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetTileScale(int x, int y)
+{
+  auto window = this->GetRenderWindow();
+  if (window && !this->InTileDisplayMode() && !this->InCaveDisplayMode())
+  {
+    window->SetTileScale(x, y);
+  }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVView::SetTileViewport(double x0, double y0, double x1, double y1)
+{
+  auto window = this->GetRenderWindow();
+  if (window && !this->InTileDisplayMode() && !this->InCaveDisplayMode())
+  {
+    window->SetTileViewport(x0, y0, x1, y1);
+  }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVSession* vtkPVView::GetSession()
+{
+  return this->Session;
 }

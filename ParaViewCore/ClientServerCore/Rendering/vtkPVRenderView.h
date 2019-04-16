@@ -104,13 +104,6 @@ public:
   vtkGetMacro(InteractionMode, int);
   //@}
 
-  /**
-   * Initialize the view with an identifier. Unless noted otherwise, this method
-   * must be called before calling any other methods on this class.
-   * \note CallOnAllProcesses
-   */
-  void Initialize(unsigned int id) override;
-
   //@{
   /**
    * Overridden to call InvalidateCachedSelection() whenever the render window
@@ -153,11 +146,6 @@ public:
   vtkCamera* GetActiveCamera();
   virtual void SetActiveCamera(vtkCamera*);
   //@}
-
-  /**
-   * Returns the render window.
-   */
-  vtkRenderWindow* GetRenderWindow() override;
 
   /**
    * Returns the interactor.
@@ -445,12 +433,6 @@ public:
    * \note CallOnAllProcesses
    */
   void InvalidateCachedSelection();
-
-  /**
-   * Returns the z-buffer value at the given location.
-   * \note CallOnClientOnly
-   */
-  double GetZbufferDataAtPoint(int x, int y);
 
   //@{
   /**
@@ -965,6 +947,11 @@ public:
 
   // Get the RenderViewBase used by this
   vtkGetObjectMacro(RenderView, vtkRenderViewBase);
+
+  /**
+   * Overridden to scale the OrientationWidget appropriately.
+   */
+  void ScaleRendererViewports(const double viewport[4]) override;
 
 protected:
   vtkPVRenderView();

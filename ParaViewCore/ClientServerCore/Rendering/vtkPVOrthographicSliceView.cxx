@@ -23,7 +23,6 @@
 #include "vtkPVChangeOfBasisHelper.h"
 #include "vtkPVGridAxes3DActor.h"
 #include "vtkPVInteractorStyle.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
@@ -222,6 +221,10 @@ vtkPVOrthographicSliceView::vtkPVOrthographicSliceView()
   }
 
   this->SetSlicePosition(0, 0, 0);
+
+  // setup viewports for each of the renderers.
+  double viewport[] = { 0, 0, 1, 1 };
+  this->ScaleRendererViewports(viewport);
 }
 
 //----------------------------------------------------------------------------
@@ -322,42 +325,33 @@ vtkRenderer* vtkPVOrthographicSliceView::GetRenderer(int rendererType)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOrthographicSliceView::Initialize(unsigned int id)
+void vtkPVOrthographicSliceView::ScaleRendererViewports(const double viewport[4])
 {
-  if (this->Identifier == id)
-  {
-    return;
-  }
+  const double size[2] = { viewport[2] - viewport[0], viewport[3] - viewport[1] };
+  const double start[2] = { viewport[0], viewport[1] };
+  const double mid[2] = { viewport[0] + size[0] / 2, viewport[1] + size[1] / 2 };
+  const double end[2] = { viewport[2], viewport[3] };
 
-  this->Superclass::Initialize(id);
+  double lowerRight[] = { mid[0], start[1], end[0], mid[1] };
+  this->Superclass::ScaleRendererViewports(lowerRight);
 
-  double lowerRight[] = { 0.5, 0, 1, 0.5 };
-  vtkRenderer* renderer = this->GetRenderer();
-  renderer->SetViewport(lowerRight);
-  this->SynchronizedWindows->UpdateRendererViewport(id, renderer, lowerRight);
-  this->NonCompositedRenderer->SetViewport(lowerRight);
-  this->SynchronizedWindows->UpdateRendererViewport(id, this->NonCompositedRenderer, lowerRight);
-
-  double topRight[] = { 0.5, 0.5, 1, 1 };
+  double topRight[] = { mid[0], mid[1], end[0], end[1] };
   this->Renderers[SIDE_VIEW]->SetViewport(topRight);
-  this->SynchronizedWindows->AddRenderer(id, this->Renderers[SIDE_VIEW].GetPointer(), topRight);
 
-  double topLeft[] = { 0, 0.5, 0.5, 1 };
+  double topLeft[] = { start[0], mid[1], mid[0], end[1] };
   this->Renderers[TOP_VIEW]->SetViewport(topLeft);
-  this->SynchronizedWindows->AddRenderer(id, this->Renderers[TOP_VIEW].GetPointer(), topLeft);
 
-  double lowerLeft[] = { 0, 0, 0.5, 0.5 };
+  double lowerLeft[] = { start[0], start[1], mid[0], mid[1] };
   this->Renderers[FRONT_VIEW]->SetViewport(lowerLeft);
-  this->SynchronizedWindows->AddRenderer(id, this->Renderers[FRONT_VIEW].GetPointer(), lowerLeft);
 
   for (int cc = 0; cc < 3; cc++)
   {
-    double viewport[4];
-    this->Renderers[cc]->GetViewport(viewport);
-    // BUG: one would think x coordinate should be viewport[0]. But there's
+    double vp[4];
+    this->Renderers[cc]->GetViewport(vp);
+    // BUG: one would think x coordinate should be vp[0]. But there's
     // something funny with vtkTextRepresentation. We x coordinate relative to
     // the renderer's viewport, but y coordinate relative to the window!
-    this->SliceAnnotations[cc]->SetPosition(0 + 0.01, viewport[1] + 0.01);
+    this->SliceAnnotations[cc]->SetPosition(0 + 0.01, vp[1] + 0.01);
   }
 }
 

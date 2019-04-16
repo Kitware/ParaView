@@ -64,23 +64,26 @@ public:
   /**
    * Get information about machines used in a data or render server.
    */
-  double GetEyeSeparation();
-  unsigned int GetNumberOfMachines();
-  const char* GetMachineName(unsigned int idx);
-  const char* GetDisplayName(unsigned int idx);
-  int* GetGeometry(unsigned int idx);
-  bool GetFullScreen(unsigned int idx);
-  bool GetShowBorders(unsigned int idx);
-  double* GetLowerLeft(unsigned int idx);
-  double* GetLowerRight(unsigned int idx);
-  double* GetUpperRight(unsigned int idx);
-  bool GetCaveBoundsSet(unsigned int idx);
+  double GetEyeSeparation() const;
+  unsigned int GetNumberOfMachines() const;
+  const char* GetMachineName(unsigned int idx) const;
+  const char* GetDisplayName(unsigned int idx) const;
+  int* GetGeometry(unsigned int idx) const;
+  bool GetFullScreen(unsigned int idx) const;
+  bool GetShowBorders(unsigned int idx) const;
+  double* GetLowerLeft(unsigned int idx) const;
+  double* GetLowerRight(unsigned int idx) const;
+  double* GetUpperRight(unsigned int idx) const;
+  bool GetCaveBoundsSet(unsigned int idx) const;
   //@}
 
   // Returns -1 to indicate not stereo type was specified. 0 indicate no stereo
   // is to be used.
-  int GetStereoType(unsigned int idx);
+  int GetStereoType(unsigned int idx) const;
   char* GetStereoType() override { return this->Superclass::GetStereoType(); }
+
+  bool GetIsInCave() const override;
+
 protected:
   /**
    * Add machine information from the xml tag <Machine ....>

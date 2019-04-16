@@ -46,10 +46,8 @@ Ph.D. thesis of Christian BOUCHENY.
 vtkStandardNewMacro(vtkPVRenderViewWithEDL);
 
 //----------------------------------------------------------------------------
-void vtkPVRenderViewWithEDL::Initialize(unsigned int id)
+vtkPVRenderViewWithEDL::vtkPVRenderViewWithEDL()
 {
-  this->Superclass::Initialize(id);
-
   vtkNew<vtkEDLShading> pass;
   this->SynchronizedRenderers->SetImageProcessingPass(pass);
   this->SynchronizedRenderers->SetUseDepthBuffer(true);

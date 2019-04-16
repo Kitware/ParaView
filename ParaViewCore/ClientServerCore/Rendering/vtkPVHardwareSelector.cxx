@@ -15,10 +15,10 @@
 #include "vtkPVHardwareSelector.h"
 
 #include "vtkCamera.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLogger.h"
 #include "vtkPVRenderViewSettings.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
@@ -61,16 +61,6 @@ vtkPVHardwareSelector::~vtkPVHardwareSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVHardwareSelector::SetSynchronizedWindows(vtkPVSynchronizedRenderWindows* sw)
-{
-  if (this->SynchronizedWindows != sw)
-  {
-    this->SynchronizedWindows = sw;
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::PassRequired(int pass)
 {
   if (pass == PROCESS_PASS && this->Iteration == 0)
@@ -80,11 +70,12 @@ bool vtkPVHardwareSelector::PassRequired(int pass)
 
   vtkIdType passRequiredValue = this->Superclass::PassRequired(pass) ? 1 : 0;
 
-  // synchronize the value among all active processes (BUG #141112).
-  if (this->SynchronizedWindows && this->SynchronizedWindows->GetEnabled())
-  {
-    this->SynchronizedWindows->Reduce(passRequiredValue, vtkPVSynchronizedRenderWindows::MAX_OP);
-  }
+  // FIXME:
+  //// synchronize the value among all active processes (BUG #14112).
+  // if (this->View)
+  //{
+  //  this->View->Reduce(passRequiredValue, vtkPVSynchronizedRenderWindows::MAX_OP);
+  //}
 
   return passRequiredValue > 0;
 }
