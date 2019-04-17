@@ -15,6 +15,25 @@
  *  =========================================================================*/
 // .NAME cdilib.c - part of the ICON/CDI netCDF reader
 
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4013 4068 4101 4244 4267 4273 4477 4700 )
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#pragma GCC diagnostic ignored "-Wunused-function"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
+#if defined(__GNUC__) && (__GNUC___ > 8 || (__GNUC__ == 8 && __GNUC_MINOR__ >= 0))
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 #if defined(_WIN32) || defined(_WIN64)
 #define restrict
 #define ssize_t long
@@ -5793,6 +5812,7 @@ cdiDecodeParam(param, &num, &cat, &dis);
 
 size_t umaxlen = maxlen >= 0 ? (unsigned)maxlen : 0U;
 int len;
+len = 1;
 /*
 if ( dis == 255 && (cat == 255 || cat == 0 ) )
     len = snprintf(paramstr, umaxlen, "%d", num);
@@ -21065,19 +21085,12 @@ if ( calendar == CDI_UNDEFID && streamptr->tsteps[0].taxis.type != TAXIS_ABSOLUT
     calendar = CALENDAR_STANDARD;
     }
 
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 5)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic warning "-Wstrict-overflow"
-#endif
 if ( calendar != CDI_UNDEFID )
     {
     taxis_t *taxis = &streamptr->tsteps[0].taxis;
     taxis->calendar = calendar;
     taxisDefCalendar(taxisID, calendar);
     }
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 5)
-#pragma GCC diagnostic pop
-#endif
 
 vlistDefTaxis(vlistID, taxisID);
 
@@ -22615,10 +22628,10 @@ int ncvarid = *ncvaridp;
 
 size_t len = 0;
 char txt[CDI_MAX_NAME];
-if ( p0status == 0 )
-    len = (size_t)(sprintf(txt, "%s%s %s%s", "a: a b: b p0: ", p0name, "ps: ", psname));
-else
-    len = (size_t)(sprintf(txt, "%s%s", "ap: ap b: b ps: ", psname));
+//if ( p0status == 0 )
+//    len = (size_t)(sprintf(txt, "%s%s %s%s", "a: a b: b p0: ", p0name, "ps: ", psname));
+//else
+//    len = (size_t)(sprintf(txt, "%s%s", "ap: ap b: b ps: ", psname));
 cdf_put_att_text(fileID, ncvarid, "formula_terms", len, txt);
 
 int ncbvarid = CDI_UNDEFID;
@@ -22673,10 +22686,10 @@ else
             cdf_put_att_text(fileID, ncbvarid, "units", strlen(zunits), zunits);
         }
 
-        if ( p0status == 0 )
-            len = (size_t)(sprintf(txt, "%s%s %s%s", "a: a_bnds b: b_bnds p0: ", p0name, "ps: ", psname));
-        else
-            len = (size_t)(sprintf(txt, "%s%s", "ap: ap_bnds b: b_bnds ps: ", psname));
+        //if ( p0status == 0 )
+        //    len = (size_t)(sprintf(txt, "%s%s %s%s", "a: a_bnds b: b_bnds p0: ", p0name, "ps: ", psname));
+        //else
+        //    len = (size_t)(sprintf(txt, "%s%s", "ap: ap_bnds b: b_bnds ps: ", psname));
         cdf_put_att_text(fileID, ncbvarid, "formula_terms", len, txt);
         }
     }
@@ -28532,6 +28545,7 @@ int vtime_lb, vtime_ub;
 taxisInqVdateBounds ( taxisptr->self, &vdate_lb, &vdate_ub);
 taxisInqVtimeBounds ( taxisptr->self, &vtime_lb, &vtime_ub);
 
+/*
 fprintf(fp,
         "#\n"
         "# taxisID %d\n"
@@ -28565,7 +28579,7 @@ fprintf(fp,
         taxisptr->numavg, (int)taxisptr->climatology,
         (int) taxisptr->has_bounds,
         vdate_lb, vtime_lb, vdate_ub, vtime_ub,
-        taxisptr->fc_unit, taxisptr->fc_period );
+        taxisptr->fc_unit, taxisptr->fc_period );*/
 }
 
 static int
@@ -29912,14 +29926,6 @@ struct cdi_generate_varinfo
 int        varid;
 const char *name;
 };
-
-static
-int cdi_generate_cmp_varname(const void *s1, const void *s2)
-{
-const struct cdi_generate_varinfo *x = (const struct cdi_generate_varinfo *)s1,
-                                    *y = (const struct cdi_generate_varinfo *)s2;
-return strcmp(x->name, y->name);
-}
 
 void cdi_generate_vars(stream_t *streamptr)
 {
@@ -32737,8 +32743,6 @@ const char *units;
 }
 param_type;
 
-
-static void tableLink(int tableID, const param_type *pars, int npars);
 int tableDef(int modelID, int tablegribID, const char *tablename);
 
 int tableInqParCode(int tableID, char *name, int *code);
@@ -34553,21 +34557,6 @@ if ( units && units[0] )
     parTable[tableID].pars[item].units    = strdupx(units);
     parTable[tableID].pars[item].dupflags |= TABLE_DUP_UNITS;
     }
-}
-
-static void tableLink(int tableID, const param_type *pars, int npars)
-{
-for ( int item = 0; item < npars; item++ )
-    {
-    parTable[tableID].pars[item].id       = pars[item].id;
-    parTable[tableID].pars[item].ltype    = pars[item].ltype;
-    parTable[tableID].pars[item].dupflags = 0;
-    parTable[tableID].pars[item].name     = pars[item].name;
-    parTable[tableID].pars[item].longname = pars[item].longname;
-    parTable[tableID].pars[item].units    = pars[item].units;
-    }
-
-parTable[tableID].npars = npars;
 }
 
 static void parTableInitEntry(int tableID)
@@ -36850,3 +36839,11 @@ const char *cdiLibraryVersion(void)
 {
 return cdi_libvers;
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif

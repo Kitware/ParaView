@@ -48,10 +48,6 @@
 
 class vtkCallbackCommand;
 class vtkDoubleArray;
-// FIXME: Don't expose this publicly.
-#ifdef PARAVIEW_USE_MPI
-class vtkMultiProcessController;
-#endif
 class vtkStringArray;
 
 class VTKCDIREADER_EXPORT vtkCDIReader : public vtkUnstructuredGridAlgorithm
@@ -62,15 +58,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   void SetFileName(const char* val);
-  vtkGetStringMacro(FileName);
 
   vtkGetMacro(MaximumCells, int);
   vtkGetMacro(MaximumPoints, int);
   vtkGetMacro(NumberOfCellVars, int);
   vtkGetMacro(NumberOfPointVars, int);
 
-  void SetFileSeriesNumbers(int val1, int val2);
-  void SetFileSeriesFirstName(const char* val);
   vtkStringArray* VariableDimensions;
   vtkStringArray* AllDimensions;
   vtkSmartPointer<vtkIntArray> LoadingDimensions;
@@ -183,7 +176,6 @@ protected:
   bool BuildDomainCellVars();
   void RemoveDuplicates(
     double* PointLon, double* PointLat, int temp_nbr_vertices, int* triangle_list, int* nbr_cells);
-
   long GetPartitioning(int piece, int numPieces, int numCellsPerLevel, int numPointsPerCell,
     int& beginPoint, int& endPoint, int& beginCell, int& endCell);
   void SetupPointConnectivity();
@@ -220,7 +212,9 @@ protected:
   int NumberAllPoints;
   bool Decomposition;
 
-  char *FileName, *FileNameGrid, *FileSeriesFirstName;
+  std::string FileName;
+  std::string FileNameGrid;
+  std::string FileSeriesFirstName;
   int* VariableType;
   int NumberOfTimeSteps;
   double DTime;

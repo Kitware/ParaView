@@ -85,6 +85,8 @@
 
 #include <vector> // Needed for protected API
 
+class vtkInformationIntegerKey;
+class vtkInformationStringKey;
 class vtkStringArray;
 
 struct vtkFileSeriesReaderInternals;
@@ -150,6 +152,12 @@ public:
   vtkSetMacro(IgnoreReaderTime, bool);
   vtkBooleanMacro(IgnoreReaderTime, bool);
   //@}
+
+  // Expose number of files, first filename and current file number as
+  // information keys for potential use in the internal reader
+  static vtkInformationIntegerKey* FILE_SERIES_NUMBER_OF_FILES();
+  static vtkInformationIntegerKey* FILE_SERIES_CURRENT_FILE_NUMBER();
+  static vtkInformationStringKey* FILE_SERIES_FIRST_FILENAME();
 
 protected:
   vtkFileSeriesReader();

@@ -128,6 +128,7 @@
           <Entry value="1" text="Lon/Lat Projection"/>
           <Entry value="2" text="Cassini Projection"/>
           <Entry value="3" text="Mollweide Projection"/>
+          <Entry value="4" text="Catalyst (no scaling)"/>
         </EnumerationDomain>
         <Documentation>
           Select one out of four different projections for the data. The default is lon/lat projection.
