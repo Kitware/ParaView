@@ -6,13 +6,13 @@ if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
 
   paraview_add_client_tests(
     LOAD_PLUGIN "GmshReader"
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
     TEST_DATA_TARGET ParaViewData
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/GmshReaderTest.xml)
 
   paraview_add_client_server_tests(
     LOAD_PLUGIN "GmshReader"
-    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    BASELINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline"
     TEST_DATA_TARGET ParaViewData
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/GmshReaderMeshOnlyTest.xml)
 endif()
