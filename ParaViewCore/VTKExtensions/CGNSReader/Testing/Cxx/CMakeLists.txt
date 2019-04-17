@@ -3,5 +3,6 @@ vtk_add_test_cxx(vtkPVVTKExtensionsCGNSReaderCxxTests tests
   TestCGNSReader.cxx
   TestReadCGNSSolution.cxx
   TestCGNSNoFlowSolutionPointers.cxx
+  TestCGNSUnsteadyGrid.cxx
   TestCGNSReaderMeshCaching.cxx)
 vtk_test_cxx_executable(vtkPVVTKExtensionsCGNSReaderCxxTests tests)
