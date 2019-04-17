@@ -178,6 +178,8 @@ option(PARAVIEW_USE_RAYTRACING "Build ParaView with OSPRay and/or OptiX ray Trac
 option(PARAVIEW_ENABLE_LOGGING "Enable logging support." ON)
 mark_as_advanced(PARAVIEW_ENABLE_LOGGING)
 
+option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
+
 set(paraview_web_default ON)
 if (PARAVIEW_ENABLE_PYTHON AND WIN32)
   include("${CMAKE_CURRENT_SOURCE_DIR}/VTK/CMake/FindPythonModules.cmake")
@@ -263,8 +265,6 @@ mark_as_advanced(PARAVIEW_USE_QTHELP)
 cmake_dependent_option(PARAVIEW_ENABLE_COMMANDLINE_TOOLS
   "Build ParaView command-line tools" ON
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
-
-option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
 # If building on Unix with MPI enabled, we will present another option to
 # enable building of CosmoTools VTK extensions. This option is by default
