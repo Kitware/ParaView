@@ -223,9 +223,8 @@ if (PARAVIEW_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
 
-if (UNIX)
-  option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
-endif ()
+cmake_dependent_option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF
+  "UNIX" OFF)
 
 cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
   "Use MPI synchronous-send commands for communication" OFF
