@@ -626,7 +626,8 @@ struct Process_5_6_to_5_7
 {
   bool operator()(xml_document& document)
   {
-    return ConvertResampleWithDataset(document) && ConvertIdsFilter(document);
+    return ConvertResampleWithDataset(document) && ConvertIdsFilter(document) &&
+      ConvertOSPRayNames(document);
   }
 
   static bool ConvertResampleWithDataset(xml_document& document)
@@ -668,6 +669,25 @@ struct Process_5_6_to_5_7
 
       arrayname_node.attribute("name").set_value("PointIdsArrayName");
       arrayname_node.attribute("id").set_value((id + ".PointIdsArrayName").c_str());
+    }
+
+    return true;
+  };
+
+  static bool ConvertOSPRayNames(xml_document& document)
+  {
+    // The `EnableOSPray` property for the first time got a label, which is `Enable Ray Tracing`.
+    // Other OSPRay label changes appear to have no effect on the state file.
+    pugi::xpath_node_set elements =
+      document.select_nodes("//ServerManagerState/Proxy[@group='views' "
+                            "and @type='RenderView']/Property[@name='EnableOSPRay']");
+    for (auto iter = elements.begin(); iter != elements.end(); ++iter)
+    {
+      auto property_node = iter->node();
+      auto proxy_node = property_node.parent();
+
+      property_node.attribute("name").set_value("EnableRayTracing");
+      proxy_node.append_copy(property_node);
     }
 
     return true;
