@@ -27,6 +27,7 @@ class FileStore(store.Store):
         self.cached_searches = {}
         self.cached_files = {}
         self.metadata = {}
+        self.__new_files = []
 
     def create(self):
         """creates a new file store"""
@@ -188,6 +189,9 @@ class FileStore(store.Store):
         super(FileStore, self).insert(document)
 
         fname = self._get_filename(document.descriptor, readingFile=False)
+        if not os.path.exists(fname):
+            self.__new_files.append((document.descriptor,fname))
+
         dirname = os.path.dirname(fname)
         if not os.path.exists(dirname):
             # In batch mode '-sym', the dir might be created by a different
@@ -313,3 +317,6 @@ class FileStore(store.Store):
         """ optimization of find()[0] for an important case where caller
         knows exactly what to retrieve."""
         return self._load_data(q)
+
+    def get_new_files(self):
+        return self.__new_files
