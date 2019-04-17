@@ -90,7 +90,7 @@ def run(output_basename='log', dimension=100, view_size=(1920, 1080),
 
     view = get_render_view(view_size)
     if ospray:
-        view.EnableOSPRay = 1
+        view.EnableRayTracing = 1
 
     print('Generating wavelet')
     wavelet = Wavelet()

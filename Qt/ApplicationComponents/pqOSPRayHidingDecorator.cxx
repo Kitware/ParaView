@@ -46,7 +46,7 @@ pqOSPRayHidingDecorator::~pqOSPRayHidingDecorator()
 //-----------------------------------------------------------------------------
 bool pqOSPRayHidingDecorator::canShowWidget(bool show_advanced) const
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   return this->Superclass::canShowWidget(show_advanced);
 #else
   (void)show_advanced;

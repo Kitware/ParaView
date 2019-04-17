@@ -26,7 +26,7 @@
 
 #include "vtkPVConfig.h"
 
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
 
@@ -42,7 +42,7 @@ public:
   vtkSMMaterialObserver()
   {
     this->Owner = nullptr;
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     this->Watchee = nullptr;
 #endif
   }
@@ -56,7 +56,7 @@ public:
 
   void StartWatching()
   {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     vtkNew<vtkSMParaViewPipelineController> controller;
     vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(
       controller->FindMaterialLibrary(this->Owner->GetSession()));
@@ -74,7 +74,7 @@ public:
   }
   void StopWatching()
   {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     if (this->Watchee)
     {
       this->Watchee->RemoveObserver(this);
@@ -82,7 +82,7 @@ public:
 #endif
   }
   vtkWeakPointer<vtkSMMaterialDomain> Owner;
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkWeakPointer<vtkOSPRayMaterialLibrary> Watchee;
 #endif
 };
@@ -113,7 +113,7 @@ void vtkSMMaterialDomain::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 int vtkSMMaterialDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   int retVal = this->Superclass::ReadXMLAttributes(prop, element);
   if (!retVal)
   {
@@ -142,7 +142,7 @@ void vtkSMMaterialDomain::CallMeSometime()
 //---------------------------------------------------------------------------
 void vtkSMMaterialDomain::Update(vtkSMProperty* vtkNotUsed(prop))
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   // find the material library we reflect contents of
   vtkNew<vtkSMParaViewPipelineController> controller;
   vtkSMMaterialLibraryProxy* mlp =

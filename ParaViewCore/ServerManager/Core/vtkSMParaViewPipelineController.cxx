@@ -401,7 +401,7 @@ bool vtkSMParaViewPipelineController::InitializeSession(vtkSMSession* session)
   vtkSmartPointer<vtkSMProxy> materialLib = this->FindMaterialLibrary(session);
   if (!materialLib)
   {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     materialLib.TakeReference(vtkSafeNewProxy(pxm, "materials", "MaterialLibrary"));
     if (materialLib)
     {

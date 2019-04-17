@@ -26,7 +26,7 @@ OPTIONAL_DEPENDS
   VTK::AcceleratorsVTKm
   VTK::FiltersOpenTurns
   VTK::ParallelMPI
-  VTK::RenderingOSPRay
+  VTK::RenderingRayTracing
   VTK::vtkm
 
   # These affect the public API.

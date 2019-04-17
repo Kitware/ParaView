@@ -2795,7 +2795,7 @@
         <Element index="0" value="0"/>
         <Domain name="bool" id="8800.DrawCells.bool"/>
       </Property>
-      <Property name="EnableOSPRay" id="8800.EnableOSPRay" number_of_elements="1">
+      <Property name="EnableRayTracing" id="8800.EnableOSPRay" number_of_elements="1">
         <Element index="0" value="0"/>
         <Domain name="bool" id="8800.EnableOSPRay.bool"/>
       </Property>

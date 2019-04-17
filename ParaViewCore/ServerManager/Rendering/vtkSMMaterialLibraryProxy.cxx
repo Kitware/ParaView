@@ -25,7 +25,7 @@
 #include "vtkSMSession.h"
 #include "vtkSmartPointer.h"
 
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayMaterialLibrary.h"
 #endif
 
@@ -43,7 +43,7 @@ vtkSMMaterialLibraryProxy::~vtkSMMaterialLibraryProxy()
 //-----------------------------------------------------------------------------
 void vtkSMMaterialLibraryProxy::LoadMaterials(const char* filename)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadFile" << filename
          << vtkClientServerStream::End;
@@ -59,7 +59,7 @@ void vtkSMMaterialLibraryProxy::LoadMaterials(const char* filename)
 //-----------------------------------------------------------------------------
 void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   // todo: this should be relative to binary or in prefs/settings, see pq
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ReadRelativeFile"
@@ -73,7 +73,7 @@ void vtkSMMaterialLibraryProxy::LoadDefaultMaterials()
 //-----------------------------------------------------------------------------
 void vtkSMMaterialLibraryProxy::Synchronize()
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   bool builtinMode = false;
   if (!this->GetSession() || (this->GetSession()->GetProcessRoles() & vtkPVSession::SERVERS) != 0)
   {

@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
 
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
 #include "vtkOSPRayLightNode.h"
 #endif
 
@@ -45,7 +45,7 @@ void vtkPVLight::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVLight::SetRadius(double r)
 {
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
   vtkOSPRayLightNode::SetRadius(r, this);
 #else
   (void)r;
@@ -74,14 +74,14 @@ void vtkPVLight::SetLightType(int t)
   if (t < VTK_LIGHT_TYPE_AMBIENT_LIGHT)
   {
     this->Superclass::SetLightType(t);
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     vtkOSPRayLightNode::SetIsAmbient(0, this);
 #endif
   }
   else
   {
     this->Superclass::SetLightType(VTK_LIGHT_TYPE_HEADLIGHT);
-#if VTK_MODULE_ENABLE_VTK_RenderingOSPRay
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
     vtkOSPRayLightNode::SetIsAmbient(1, this);
 #endif
   }

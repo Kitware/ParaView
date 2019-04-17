@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**
 * pqOSPRayHidingDecorator's purpose is to prevent the GUI from
-* showing any of the OSPRay specific rendering controls when
-* Paraview is not configured with PARAVIEW_USE_OSPRAY
+* showing any of the RayTracing specific rendering controls when
+* Paraview is not configured with PARAVIEW_USE_RAYTRACING
 */
 class pqOSPRayHidingDecorator : public pqPropertyWidgetDecorator
 {

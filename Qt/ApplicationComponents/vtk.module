@@ -20,7 +20,7 @@ OPTIONAL_DEPENDS
   ParaView::CinemaReader
   ParaView::nvpipe
   VTK::PythonInterpreter
-  VTK::RenderingOSPRay
+  VTK::RenderingRayTracing
 
   # These affect the public API.
   #ParaView::pqComponentsPython
