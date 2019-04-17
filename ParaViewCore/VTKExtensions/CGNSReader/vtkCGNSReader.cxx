@@ -504,8 +504,8 @@ int vtkCGNSReader::vtkPrivate::getGridAndSolutionNames(int base, std::string& gr
           self->cgioNum, ziterId, "DataArray_t", &giterId, "GridCoordinatesPointers") == CG_OK)
     {
       CGNSRead::char_33 gname;
-      const cgsize_t offset = static_cast<cgsize_t>(self->ActualTimeStep * 32 + 1);
-      cgio_read_block_data(self->cgioNum, giterId, offset, offset + 32, (void*)gname);
+      const cgsize_t offset = static_cast<cgsize_t>(self->ActualTimeStep * 32);
+      cgio_read_block_data(self->cgioNum, giterId, offset + 1, offset + 32, (void*)gname);
       gname[32] = '\0';
       // NOTE: Names or identifiers contain no spaces and capitalization
       //       is used to distinguish individual words making up a name.
