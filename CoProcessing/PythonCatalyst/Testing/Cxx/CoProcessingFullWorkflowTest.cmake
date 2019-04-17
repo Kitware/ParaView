@@ -16,7 +16,7 @@ macro(execute_process_with_echo)
     set (_cmd "${_cmd} ${arg}")
   endforeach()
   message(STATUS "Executing command: \n    ${_cmd}")
-  execute_process(${ARGV})
+  execute_process(${ARGV} WORKING_DIRECTORY ${COPROCESSING_TEST_DIR})
 endmacro()
 
 file(REMOVE
@@ -33,6 +33,7 @@ file(REMOVE
   "${COPROCESSING_TEST_DIR}/Slice1_4.pvtp"
   "${COPROCESSING_TEST_DIR}/Slice1_4"
   "${COPROCESSING_TEST_DIR}/RenderView1_4.png"
+  "${COPROCESSING_TEST_DIR}/CinD"
   )
 
 if (NOT EXISTS "${PARAVIEW_EXECUTABLE}")
@@ -63,19 +64,25 @@ endif()
 
 message("Running pvbatch")
 
-if(NOT "${TEST_NAME}" STREQUAL "TemporalScriptFullWorkflow")
+if("${TEST_NAME}" STREQUAL "TemporalScriptFullWorkflow")
   execute_process_with_echo(COMMAND
     ${PVBATCH_EXECUTABLE} -sym -dr
     ${COPROCESSING_DRIVER_SCRIPT}
-    ${COPROCESSING_TEST_DIR}/cptest.py 1
     WORKING_DIRECTORY ${COPROCESSING_TEST_DIR}
     RESULT_VARIABLE rv)
 else()
-  execute_process_with_echo(COMMAND
-    ${PVBATCH_EXECUTABLE} -sym -dr
-    ${COPROCESSING_DRIVER_SCRIPT}
-    WORKING_DIRECTORY ${COPROCESSING_TEST_DIR}
-    RESULT_VARIABLE rv)
+  if("${TEST_NAME}" STREQUAL "ExportNow")
+    #don't need batch for this, but the rest of the infrastructure
+    #is handy
+    set(rv 0)
+  else()
+    execute_process_with_echo(COMMAND
+      ${PVBATCH_EXECUTABLE} -sym -dr
+      ${COPROCESSING_DRIVER_SCRIPT}
+      ${COPROCESSING_TEST_DIR}/cptest.py 1
+      WORKING_DIRECTORY ${COPROCESSING_TEST_DIR}
+      RESULT_VARIABLE rv)
+  endif()
 endif()
 
 if(rv)
@@ -121,6 +128,20 @@ if("${TEST_NAME}" STREQUAL "TemporalScriptFullWorkflow")
   endif()
   if(NOT EXISTS "${COPROCESSING_TEST_DIR}/RenderView1_4.png")
     message(FATAL_ERROR "TemporalScript did not generate a screen capture!")
+  endif()
+  return()
+endif()
+
+if("${TEST_NAME}" STREQUAL "ExportNow")
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CinD/Slice1_0.vtp" AND
+     NOT EXISTS "${COPROCESSING_TEST_DIR}/CinD/Slice1_0.pvtp")
+    message(FATAL_ERROR "ExportNow did not generate a data extract!")
+  endif()
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CinD/RenderView1_0.png")
+    message(FATAL_ERROR "ExportNow did not generate a screen capture!")
+  endif()
+  if(NOT EXISTS "${COPROCESSING_TEST_DIR}/CinD/data.csv")
+    message(FATAL_ERROR "ExportNow did not generate a CinemaD index!")
   endif()
   return()
 endif()

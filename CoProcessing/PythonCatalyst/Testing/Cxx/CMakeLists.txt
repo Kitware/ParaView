@@ -283,5 +283,16 @@ if (PARAVIEW_BUILD_QT_GUI)
     set_tests_properties(TemporalScriptFullWorkflow PROPERTIES RUN_SERIAL ON)
     _set_standard_test_properties(TemporalScriptFullWorkflow)
 
+    add_test(NAME ExportNow
+      COMMAND ${CMAKE_COMMAND}
+      -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::paraview>
+      -DCOPROCESSING_TEST_DIR:PATH=${CMAKE_BINARY_DIR}/Testing/Temporary
+      -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Applications/ParaView/Testing/XML/ExportNowGUI.xml
+      -DPVBATCH_EXECUTABLE:FILEPATH=$<TARGET_FILE:ParaView::pvbatch>
+      -DTEST_NAME:STRING=ExportNow
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+    set_tests_properties(ExportNow PROPERTIES RUN_SERIAL ON)
+    _set_standard_test_properties(ExportNow)
+
   ENDIF ()
 endif()

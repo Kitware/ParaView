@@ -18,6 +18,7 @@ set(python_files
   paraview/detail/__init__.py
   paraview/detail/annotation.py
   paraview/detail/calculator.py
+  paraview/detail/exportnow.py
   paraview/detail/extract_selection.py
   paraview/detail/pythonalgorithm.py
   paraview/detail/python_selector.py

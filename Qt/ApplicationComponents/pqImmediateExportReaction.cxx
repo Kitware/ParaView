@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCatalystExportReaction.cxx
+   Module:    pqImmediateExportReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,14 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCatalystExportReaction.h"
+#include "pqImmediateExportReaction.h"
 
 #include "vtkCamera.h"
-#include "vtkCollection.h"
-#include "vtkCollectionIterator.h"
 #include "vtkPVConfig.h"
-#include "vtkRenderWindow.h"
-#include "vtkSMCoreUtilities.h"
 #include "vtkSMExportProxyDepot.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -48,114 +44,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkVectorOperators.h"
 
 #include "pqApplicationCore.h"
-#include "pqFileDialog.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 
-#include <QWidget>
-
-#include <iostream>
-#include <sstream>
-#include <string>
-
-#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
+#ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPythonInterpreter.h"
 #endif
 
+// clang-format off
 namespace
 {
-static const char* cp_python_export_code = "from paraview import cpexport\n"
-                                           "cpexport.DumpCoProcessingScript(export_rendering=%1,\n"
-                                           "   simulation_input_map={%2},\n"
-                                           "   screenshot_info={%3},\n"
-                                           "   padding_amount=%4,\n"
-                                           "   rescale_data_range=%5,\n"
-                                           "   enable_live_viz=%6,\n"
-                                           "   live_viz_frequency=%7,\n"
-                                           "   cinema_tracks={%8},\n"
-                                           "   filename='%9',\n"
-                                           "   cinema_arrays={%10},\n"
-                                           "   write_start=%11,\n"
-                                           "   make_cinema_table=%12,\n"
-                                           "   root_directory='%13',\n"
-                                           "   request_specific_arrays=%14,\n"
-                                           "   force_first_output=%15)\n";
+static const char* export_now_code = R"DONTPARSE(
+root_directory='%1'
+file_name_padding=%2
+make_cinema_table=%3
+cinema_tracks={%4}
+cinema_arrays={%5}
+rendering_info={%6}
+
+from paraview.detail import exportnow
+
+exportnow.ExportNow(root_directory, file_name_padding, make_cinema_table, cinema_tracks, cinema_arrays, rendering_info)
+
+)DONTPARSE";
 }
+// clang-format on
 
 //-----------------------------------------------------------------------------
-pqCatalystExportReaction::pqCatalystExportReaction(QAction* parentObject)
+pqImmediateExportReaction::pqImmediateExportReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqCatalystExportReaction::~pqCatalystExportReaction()
+pqImmediateExportReaction::~pqImmediateExportReaction()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportReaction::onTriggered()
+void pqImmediateExportReaction::onTriggered()
 {
-#if VTK_MODULE_ENABLE_VTK_PythonInterpreter
-
-  // We populate these from information from the export proxies
-  QString live_visualization = "True";
-  int live_visualization_frequency = 1;
-
-  int write_start = 0;
-  QString paddingAmount = "0";
-
-  QString export_rendering = "False";
-  QString
-    sim_inputs_map; // a map from the simulation inputs in the gui to the adaptor's named inputs
-  QString rendering_info; // a map from the render view name to render output params
-  QString rescale_data_range = "False";
-  QString make_cinema_table = "False";
-  QString root_directory = "";
-  QString request_specific_arrays = "False";
-  QString force_first_output = "False";
-
   vtkSMSessionProxyManager* pxm =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
   vtkSMExportProxyDepot* ed = pxm->GetExportDepot();
 
-  // populate the simulation inputs map
-  QList<pqPipelineSource*> sources =
-    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqPipelineSource*>();
-  foreach (pqPipelineSource* source, sources)
-  {
-    if (qobject_cast<pqPipelineFilter*>(source) ||
-      vtkSMCoreUtilities::GetFileNameProperty(source->getProxy()) == nullptr)
-    {
-      continue;
-    }
-    QString mapentry = source->getSMName() + ":" + source->getSMName();
-    QString sourceFormat = "'%1':'%1'";
-    sim_inputs_map += sourceFormat.arg(source->getSMName()) + ",";
-  }
-
-  // use export proxy state to populate the rest
   // global options
   vtkSMProxy* globaloptions = ed->GetGlobalOptions();
-  live_visualization =
-    vtkSMPropertyHelper(globaloptions, "EnableLive").GetAsInt(0) == 0 ? "False" : "True";
-  live_visualization_frequency = vtkSMPropertyHelper(globaloptions, "LiveFrequency").GetAsInt(0);
-  write_start = vtkSMPropertyHelper(globaloptions, "WriteStart").GetAsInt(0);
-  paddingAmount = QString::fromStdString(
-    std::to_string(vtkSMPropertyHelper(globaloptions, "FileNamePadding").GetAsInt(0)));
-  rescale_data_range =
-    vtkSMPropertyHelper(globaloptions, "RescaleToDataRange").GetAsInt(0) == 0 ? "False" : "True";
-  make_cinema_table =
+  QString root_directory = vtkSMPropertyHelper(globaloptions, "RootDirectory").GetAsString();
+  int file_name_padding = vtkSMPropertyHelper(globaloptions, "FileNamePadding").GetAsInt();
+  QString make_cinema_table =
     vtkSMPropertyHelper(globaloptions, "SaveDTable").GetAsInt(0) == 0 ? "False" : "True";
-  root_directory = vtkSMPropertyHelper(globaloptions, "RootDirectory").GetAsString(0);
-  request_specific_arrays =
-    vtkSMPropertyHelper(globaloptions, "RequestSpecificArrays").GetAsInt(0) == 0 ? "False" : "True";
-  force_first_output =
-    vtkSMPropertyHelper(globaloptions, "ForceFirstOutput").GetAsInt(0) == 0 ? "False" : "True";
 
   // writers
   bool exported_any_writers = false;
@@ -240,26 +181,8 @@ void pqCatalystExportReaction::onTriggered()
   }
 
   // screenshots
-  /*
-   * Make a string containing a comma separated set of views with each
-   * view defined as in 'format'.
-   * Order of view values:
-   * 1. View name
-   * 2. Image file name
-   * 3. Frequency
-   * 4. Fit to screen
-   * 5. Magnification
-   * 6. Image width
-   * 7. Image height
-   * 8. Cinema specific options (dictionary; phi, theta, composite, etc..)
-   *
-   * Example: Format as defined in pqCinemaConfiguration
-   * format = "'%1' : ['%2', %3, %4, %5, %6, %7, %8]"
-   * returns -> 'ViewName1' : ['Imname', 1, 1, 1, 1, 1, {'composite': True ...}],
-   *            'ViewName2' : [...],
-   *            ... (for N views)
-   */
   bool exported_any_screenshots = false;
+  QString rendering_info; // a map from the render view name to render output params
   ed->InitNextScreenshotProxy();
   while (auto nextScreenshot = ed->GetNextScreenshotProxy())
   {
@@ -479,50 +402,21 @@ void pqCatalystExportReaction::onTriggered()
   }
   else
   {
-    QString filters = "ParaView Python State Files (*.py);;All files (*)";
-
-    pqFileDialog file_dialog(
-      NULL, parentAction()->parentWidget(), tr("Save Server State:"), QString(), filters);
-    file_dialog.setObjectName("ExportCoprocessingStateFileDialog");
-    file_dialog.setFileMode(pqFileDialog::AnyFile);
-    if (!file_dialog.exec())
-    {
-      return;
-    }
-
-    QString filename = file_dialog.getSelectedFiles()[0];
-#ifdef _WIN32
-    // Convert to forward slashes. The issue is that the path is interpreted as a
-    // Python string when passed to the interpreter, so a path such as "C:\tests"
-    // is read as "C:<TAB>ests" which isn't what we want. Since Windows is
-    // flexible anyways, just use Unix separators.
-    filename.replace('\\', '/');
-#endif
-
-    QString command = cp_python_export_code;
-    export_rendering = (exported_any_screenshots ? "True" : "False");
-
-    sim_inputs_map.chop(1); // remove last ","
-    rendering_info.chop(1);
-    command = command.arg(export_rendering)
-                .arg(sim_inputs_map)
-                .arg(rendering_info)
-                .arg(paddingAmount)
-                .arg(rescale_data_range)
-                .arg(live_visualization)
-                .arg(live_visualization_frequency)
-                .arg(cinema_tracks)
-                .arg(filename)
-                .arg(cinema_arrays)
-                .arg(write_start)
+    QString command = export_now_code;
+    command = command.arg(root_directory)
+                .arg(file_name_padding)
                 .arg(make_cinema_table)
-                .arg(root_directory)
-                .arg(request_specific_arrays)
-                .arg(force_first_output);
+                .arg(cinema_tracks)
+                .arg(cinema_arrays)
+                .arg(rendering_info);
+// cerr << command.toStdString() << endl;
 
-    // ensure Python in initialized.
+// ensure Python in initialized.
+#ifdef PARAVIEW_ENABLE_PYTHON
     vtkPythonInterpreter::Initialize();
     vtkPythonInterpreter::RunSimpleString(command.toLocal8Bit().data());
-  }
+#else
+    qWarning("Export Now requires PARAVIEW_ENABLE_PYTHON");
 #endif
+  }
 }

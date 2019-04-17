@@ -9,6 +9,8 @@ appropriate for co-processing.
 from __future__ import print_function
 from paraview import simple, servermanager
 from paraview.modules.vtkPVVTKExtensionsCore import *
+from paraview.detail import exportnow
+
 import math
 
 # If the user created a filename in a location that doesn't exist by default we'll
@@ -66,9 +68,8 @@ class CoProcessor(object):
         self.__FirstTimeStepIndex = None
         # a list of arrays requested for each channel, e.g. {'input': ["a point data array name", 0], ["a cell data array name", 1]}
         self.__RequestedArrays = None
-        self.__EnableCinemaDTable = False
-        self.__WroteCinemaDHeader = False
         self.__RootDirectory = ""
+        self.__CinemaDHelper = None
 
     def SetPrintEnsightFormatString(self, enable):
         """If outputting ExodusII files with the purpose of reading them into
@@ -261,6 +262,7 @@ class CoProcessor(object):
                         return
                 writer.UpdatePipeline(datadescription.GetTime())
                 self.__AppendToCinemaDTable(timestep, "writer_%s" % self.__WritersList.index(writer), writer.FileName)
+        self.__FinalizeCinemaDTable()
 
 
     def WriteImages(self, datadescription, rescale_lookuptable=False,
@@ -317,13 +319,13 @@ class CoProcessor(object):
                 cinemaOptions = view.cpCinemaOptions
                 if cinemaOptions and 'camera' in cinemaOptions:
                     if 'composite' in view.cpCinemaOptions and view.cpCinemaOptions['composite'] == True:
-                        dirname = self.UpdateCinema(view, datadescription,
+                        dirname, filelist = self.UpdateCinema(view, datadescription,
                                                     specLevel="B")
                     else:
-                        dirname = self.UpdateCinema(view, datadescription,
+                        dirname, filelist = self.UpdateCinema(view, datadescription,
                                                     specLevel="A")
                     if dirname:
-                        self.__AppendToCinemaDTable(timestep, "view_%s" % self.__ViewsList.index(view), "cinema/"+dirname)
+                        self.__AppendCViewToCinemaDTable(timestep, "view_%s" % self.__ViewsList.index(view), filelist)
                         cinema_dirs.append(dirname)
                 else:
                     if '/' in fname and createDirectoriesIfNeeded:
@@ -360,7 +362,9 @@ class CoProcessor(object):
 
         if len(cinema_dirs) > 1:
             import paraview.tpl.cinema_python.adaptors.paraview.pv_introspect as pv_introspect
-            pv_introspect.make_workspace_file("cinema", cinema_dirs)
+            pv_introspect.make_workspace_file("cinema\\", cinema_dirs)
+
+        self.__FinalizeCinemaDTable()
 
 
     def DoLiveVisualization(self, datadescription, hostname, port):
@@ -733,7 +737,8 @@ class CoProcessor(object):
 
         enableFloatVal = False if 'floatValues' not in co else co['floatValues']
 
-        pv_introspect.explore(fs, p, iSave = (pid == 0),
+        new_files = {}
+        ret = pv_introspect.explore(fs, p, iSave = (pid == 0),
                               currentTime = {'time':formatted_time},
                               userDefined = self.__CinemaTracks,
                               specLevel = specLevel,
@@ -743,12 +748,13 @@ class CoProcessor(object):
                               disableValues = disableValues)
         if pid == 0:
             fs.save()
+        new_files[vfname] = ret;
 
         view.LockBounds = 0
 
         #restore what we showed
         pv_introspect.restore_visibility(pxystate)
-        return os.path.basename(vfname)
+        return os.path.basename(vfname), new_files
 
     def IsInModulo(self, datadescription, frequencies):
         """
@@ -797,38 +803,49 @@ class CoProcessor(object):
 
     def EnableCinemaDTable(self):
         """ Enable the normally disabled cinema D table export feature """
-        self.__EnableCinemaDTable = True
+        self.__CinemaDHelper = exportnow.CinemaDHelper(True, self.__RootDirectory)
 
 
-    def __AppendToCinemaDTable(self, time, producer, filename):
+    def __AppendCViewToCinemaDTable(self, time, producer, filelist):
         """
-        This is called every time catalyst writes any data product to update the
-        Cinema D index of outputs table.
+        This is called every time catalyst writes any cinema image result
+        to update the Cinema D index of outputs table.
+        Note, we aggregate file operations later with __FinalizeCinemaDTable.
         """
-        if not self.__EnableCinemaDTable:
+        if self.__CinemaDHelper is None:
             return
         import vtk
         comm = vtk.vtkMultiProcessController.GetGlobalController()
         if comm.GetLocalProcessId() == 0:
-            # strip possible leading root directory from filename
-            datafilename = filename
-            indexfilename = "data.csv"
-            if self.__RootDirectory is not "":
-              rdprefix = self.__RootDirectory + "/"
-              datafilename = filename[filename.startswith(rdprefix) and len(rdprefix):] #strip rdprefix
-              indexfilename = rdprefix + "/data.csv"
-            if not self.__WroteCinemaDHeader:
-                self.__WroteCinemaDHeader = True
-                f = open(indexfilename, "w")
-                f.write("timestep,producer,FILE\n")
-                f.close()
-            f = open(indexfilename, "a+")
-            f.write("%s,%s,%s\n" % (time, producer, datafilename))
-            f.close()
+            self.__CinemaDHelper.AppendCViewToCinemaDTable(time, producer, filelist)
+
+
+    def __AppendToCinemaDTable(self, time, producer, filename):
+        """
+        This is called every time catalyst writes any data file or screenshot
+        to update the Cinema D index of outputs table.
+        Note, we aggregate file operations later with __FinalizeCinemaDTable.
+        """
+        if self.__CinemaDHelper is None:
+            return
+        import vtk
+        comm = vtk.vtkMultiProcessController.GetGlobalController()
+        if comm.GetLocalProcessId() == 0:
+            self.__CinemaDHelper.AppendToCinemaDTable(time, producer, filename)
+
+    def __FinalizeCinemaDTable(self):
+        if self.__CinemaDHelper is None:
+            return
+        import vtk
+        comm = vtk.vtkMultiProcessController.GetGlobalController()
+        if comm.GetLocalProcessId() == 0:
+            self.__CinemaDHelper.WriteNow()
 
 
     def SetRootDirectory(self, root_directory):
         """ Makes Catalyst put all output under this directory. """
+        if root_directory is not '' and not root_directory.endswith("/"):
+            root_directory = root_directory + "/"
         self.__RootDirectory = root_directory
 
 
@@ -837,8 +854,8 @@ class CoProcessor(object):
         if self.__RootDirectory is "":
             return
         for view in self.__ViewsList:
-            view.cpFileName = self.__RootDirectory + "/" + view.cpFileName
+            view.cpFileName = self.__RootDirectory + view.cpFileName
         for writer in self.__WritersList:
-            fileName = self.__RootDirectory + "/" + writer.parameters.GetProperty("FileName").GetElement(0)
+            fileName = self.__RootDirectory + writer.parameters.GetProperty("FileName").GetElement(0)
             writer.parameters.GetProperty("FileName").SetElement(0, fileName)
             writer.parameters.FileName = fileName

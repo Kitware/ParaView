@@ -530,7 +530,7 @@ def make_cinema_store(proxies,
                 "color"+proxy_name, 'vis', [proxy_name])
 
     fnp = ""
-    if forcetime:
+    if forcetime is not False:
         # time specified, use it, being careful to append if already a list
         tvalues.append(forcetime)
         tprop = store.make_parameter('time', tvalues)
@@ -809,6 +809,8 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined={},
     at = project_to_at(eye, _fp, _cr)
     up = [x for x in view_proxy.CameraViewUp]
     times = paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues
+    if currentTime:
+        times = False
 
     cam = paraview.simple.GetActiveCamera()
 
@@ -835,7 +837,11 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined={},
                 nearfar_values.append([x for x in cam.GetClippingRange()])
                 viewangle_values.append(cam.GetViewAngle())
         except (KeyError):
-            pass
+            eye_values.append([x for x in eye])
+            at_values.append([x for x in at])
+            up_values.append([x for x in up])
+            nearfar_values.append([x for x in cam.GetClippingRange()])
+            viewangle_values.append(cam.GetViewAngle())
         cs.add_metadata({'camera_eye': eye_values})
         cs.add_metadata({'camera_at': at_values})
         cs.add_metadata({'camera_up': up_values})
@@ -864,6 +870,8 @@ def explore(cs, proxies, iSave=True, currentTime=None, userDefined={},
 
             update_all_ranges(cs, arrayRanges)
             explo.explore({'time': float_limiter(t)}, progressObject)
+
+    return cs.get_new_files()
 
 
 def explore_customized_array_selection(
@@ -912,7 +920,7 @@ def explore_customized_array_selection(
     return numVals
 
 
-def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
+def export_scene(baseDirName, viewSelection, trackSelection, arraySelection, forcetime=False):
     '''
     This explores a set of user-defined views and tracks. export_scene is
     called from vtkCinemaExport.  The expected order of parameters is as
@@ -947,6 +955,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
     atLeastOneViewExported = False
     cinema_dirs = []
+    new_files = {}
     for viewName, viewParams in viewSelection.iteritems():
 
         extension = os.path.splitext(viewParams[0])[1]
@@ -1008,7 +1017,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
         arrayRanges = {}
         disableValues = cinemaParams.get('noValues', False)
 
-        cs = make_cinema_store(p, filePath, view, forcetime=False,
+        cs = make_cinema_store(p, filePath, view, forcetime=forcetime,
                                userDefined=userDefValues,
                                specLevel=specLevel,
                                camType=camType,
@@ -1022,13 +1031,20 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
 
         progObj = progress.ProgressObject()
         progObj.StartEvent()
-        explore(cs, p, iSave=(pid == 0), userDefined=userDefValues,
+        currentTime = None
+        if forcetime is not False:
+            currentTime = {'time':forcetime}
+        explore(cs, p, iSave=(pid == 0),
+                currentTime=currentTime,
+                userDefined=userDefValues,
                 specLevel=specLevel,
                 camType=camType,
                 tracking=tracking_def, floatValues=enableFloatVal,
                 arrayRanges=arrayRanges, disableValues=disableValues,
                 progressObject=progObj)
         progObj.EndEvent()
+
+        new_files[viewName] = cs.get_new_files()
 
         view.LockBounds = 0
 
@@ -1045,7 +1061,7 @@ def export_scene(baseDirName, viewSelection, trackSelection, arraySelection):
     # restore initial state
     paraview.simple.SetActiveView(initialView)
     restore_visibility(pvstate)
-    print ("Finished exporting Cinema database!")
+    return new_files
 
 
 def prepare_selection(trackSelection, arraySelection):
@@ -1122,7 +1138,7 @@ def make_workspace_file(basedirname, cinema_dirs):
     pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
     pid = pm.GetPartitionId()
     if len(cinema_dirs) > 1 and pid == 0:
-        workspace = open(basedirname + '/info.json', 'w')
+        workspace = open(basedirname + 'info.json', 'w')
         workspace.write('{\n')
         workspace.write('    "metadata": {\n')
         workspace.write('        "type": "workbench"\n')
