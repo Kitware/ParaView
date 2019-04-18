@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /**
    \file
@@ -31,7 +31,6 @@ namespace index
 // forward declarations
 class IScene_path; // see iscene_query_result.h
 class IIndex_rendering;
-class IIndex_canvas;
 class IRay_sampling_value_format;
 class IRay_sampling_query;
 class IRay_sampling_result;

@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief Abstract interface for factories for user-defined class.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_IUSER_CLASS_FACTORY_H
 #define MI_NEURAYLIB_IUSER_CLASS_FACTORY_H

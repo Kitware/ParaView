@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for user-defined compute tasks that apply to volume bricks.
@@ -106,7 +106,6 @@ public:
   {
     return 0;
   }
-
   using mi::base::Interface_implement<IIrregular_volume_compute_task>::edit;
 
   /// Apply an editing to the scalar values only.

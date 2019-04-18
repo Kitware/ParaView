@@ -1,12 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/base/config.h
 /// \brief Configuration of the Base API.
 ///
 /// See \ref mi_base_config.
-///
-//*****************************************************************************
 
 #ifndef MI_BASE_CONFIG_H
 #define MI_BASE_CONFIG_H
@@ -22,7 +20,7 @@
  */
 
 // The current copyright year string.
-#define MI_COPYRIGHT_YEARS_STRING "2018"
+#define MI_COPYRIGHT_YEARS_STRING "2019"
 
 // The NVIDIA company name string for copyrights etc.
 #define MI_COPYRIGHT_COMPANY_STRING "NVIDIA Corporation"
@@ -269,7 +267,7 @@
 #if defined(_MSC_VER) /* Microsoft Visual C++ */
 #define MI_FORCE_INLINE __forceinline
 #elif defined(__GNUC__) /* GNU C/C++ Compiler */
-#if !defined(NDEBUG)
+#if defined(DEBUG)
 /* Known bug in some g++ compiler versions: forced inlining produces
  * buggy code when compiling without optimization.
  */
@@ -288,6 +286,11 @@
 #else
 /// The operating system specific default filename extension for shared libraries (DLLs)
 #define MI_BASE_DLL_FILE_EXT ".so"
+#endif
+
+#if (__cplusplus >= 201103L)
+/// This macro is defined if the compiler supports rvalue references.
+#define MI_CXX_FEATURE_RVALUE_REFERENCES
 #endif
 
 /*@}*/ // end group mi_base_config

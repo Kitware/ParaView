@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief API component for creation, assignment, and cloning of instances of types.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_IFACTORY_H
 #define MI_NEURAYLIB_IFACTORY_H
@@ -202,13 +201,6 @@ public:
     /// Deep assignment was requested and \p target is an instance of #mi::IConst_pointer (or
     /// a key of \p target is an instance of #mi::IConst_pointer).
     DEEP_ASSIGNMENT_TO_CONST_POINTER = 256,
-
-    /// \if IRAY_API
-    /// The assignment failed due to incompatible reference types, e.g., assigning from
-    /// #mi::IRef of type "Ref<Texture>" to an #mi::IRef of type "Ref<Lightprofile>" (because
-    /// #mi::IRef::set_reference() failed).
-    /// \endif
-    INCOMPATIBLE_REF_TYPES = 512,
 
     /// The assignment failed due to incompatible privacy levels, i.e.,
     /// #mi::IRef::set_reference() returned error code -4.

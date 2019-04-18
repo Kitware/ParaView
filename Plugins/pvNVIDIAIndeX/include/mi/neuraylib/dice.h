@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief \NeurayApiName for implementing distributed parallel computing algorithms.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_DICE_H
 #define MI_NEURAYLIB_DICE_H
@@ -50,7 +49,7 @@
 #define MI_NEURAYLIB_DICE_VERSION_QUALIFIER_EMPTY
 
 /// DiCE product version number in a string representation, such as \c "2016".
-#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING "2018"
+#define MI_NEURAYLIB_DICE_PRODUCT_VERSION_STRING "2019"
 
 /*@}*/ // end group mi_neuray_dice
 
@@ -296,23 +295,33 @@ public:
   /// retains ownership of the stored data. You can obtain the stored version from the database
   /// using the #access() or #edit() methods.
   ///
-  /// \param element  The database element to be stored in the database.
-  /// \param tag      An optional tag used to identify the database element in the database. The
-  ///                 tag must be #NULL_TAG (the default) or must have been obtained from previous
-  ///                 calls to #store(), #store_for_reference_counting(), #name_to_tag(), or
-  ///                 #reserve_tag(). An existing database element/job associated with this tag
-  ///                 will be replaced. See also the documentation of the return value and the
-  ///                 note below.
-  /// \param name     An optional name used to identify the database element in the database. An
-  ///                 existing database element/job associated with this name will be replaced.
-  /// \param privacy_level The privacy level in which the database element shall be stored.
-  ///                 The constant #LOCAL_SCOPE can be used to indicate the privacy level of the
-  ///                 scope of this transaction.
-  /// \return         The tag that identifies the stored database element, or #NULL_TAG in case of
-  ///                 errors. Note that the returned tag might differ from \p tag or
-  ///                 #name_to_tag() applied to \p name if there is already a database element/job
-  ///                 associated with that tag, that database element/job is to be removed, and no
-  ///                 other database element/job is referencing it anymore.
+  /// \param element         The database element to be stored in the database.
+  /// \param tag             An optional tag used to identify the database element in the
+  ///                        database. The tag must be #NULL_TAG (the default) or must have been
+  ///                        obtained from previous calls to #store(),
+  ///                        #store_for_reference_counting(), #name_to_tag(), or #reserve_tag().
+  ///                        An existing database element/job associated with this tag will be
+  ///                        replaced. See also the documentation of the return value and the note
+  ///                        below.
+  /// \param name            An optional name used to identify the database element in the
+  ///                        database. An existing database element/job associated with this name
+  ///                        will be replaced.
+  /// \param privacy_level   The privacy level under which to store \p db_element (in the range
+  ///                        from 0 to the privacy level of the scope of this transaction). In
+  ///                        addition, the constant #LOCAL_SCOPE can be used as a shortcut to
+  ///                        indicate the privacy level of the scope of this transaction without
+  ///                        supplying the actual value itself.
+  /// \return                The tag that identifies the stored database element, or #NULL_TAG in
+  ///                        case of errors. Possible reasons for errors are:
+  ///                        - The class ID of the element has not been registered (see
+  ///                         #mi::neuraylib::IDice_configuration::register_serializable_class()).
+  ///                        - The privacy level is invalid.
+  ///                        - The element is already stored in the database.
+  ///                        .
+  ///                        Note that the returned tag might differ from \p tag or #name_to_tag()
+  ///                        applied to \p name if there is already a database element/job
+  ///                        associated with that tag, that database element/job is to be removed,
+  ///                        and no other database element/job is referencing it anymore.
   ///
   /// \note The parameter \p tag is ignored if \p name is given and there is a database
   ///       element/job with that name. The tag of that database element/job is used instead of
@@ -326,23 +335,32 @@ public:
   /// except for releasing it. This is due to the fact that after a #store() the database
   /// retains ownership of the stored data.
   ///
-  /// \param job      The database job to be stored in the database.
-  /// \param tag      An optional tag used to identify the database job in the database. The tag
-  ///                 must be #NULL_TAG (the default) or must have been obtained from previous
-  ///                 calls to #store(), #store_for_reference_counting(), #name_to_tag(), or
-  ///                 #reserve_tag(). An existing database element/job associated with this tag
-  ///                 will be replaced. See also the documentation of the return value and the
-  ///                 note below.
-  /// \param name     An optional name used to identify the database job in the database. An
-  ///                 existing database element/job associated with this name will be replaced.
-  /// \param privacy_level The privacy level in which the database job shall be stored.
-  ///                 The constant #LOCAL_SCOPE can be used to indicate the privacy level of the
-  ///                 scope of this transaction.
-  /// \return         The tag that identifies the stored database job, or #NULL_TAG in case of
-  ///                 errors. Note that the returned tag might differ from \p tag or
-  ///                 #name_to_tag() applied to \p name if there is already a database element/job
-  ///                 associated with that tag, that database element/job is to be removed, and no
-  ///                 other database element/job is referencing it anymore.
+  /// \param job             The database job to be stored in the database.
+  /// \param tag             An optional tag used to identify the database job in the database.
+  ///                        The tag must be #NULL_TAG (the default) or must have been obtained
+  ///                        from previous calls to #store(), #store_for_reference_counting(),
+  ///                        #name_to_tag(), or #reserve_tag(). An existing database element/job
+  ///                        associated with this tag will be replaced. See also the documentation
+  ///                        of the return value and the note below.
+  /// \param name            An optional name used to identify the database job in the database.
+  ///                        An existing database element/job associated with this name will be
+  ///                        replaced.
+  /// \param privacy_level   The privacy level under which to store \p job (in the range from 0 to
+  ///                        the privacy level of the scope of this transaction). In addition, the
+  ///                        constant #LOCAL_SCOPE can be used as a shortcut to indicate the
+  ///                        privacy level of the scope of this transaction without supplying the
+  ///                        actual value itself.
+  /// \return                The tag that identifies the stored database job, or #NULL_TAG in case
+  ///                        of errors. Possible reasons for errors are:
+  ///                        - The class ID of the job has not been registered (see
+  ///                         #mi::neuraylib::IDice_configuration::register_serializable_class()).
+  ///                        - The privacy level is invalid.
+  ///                        - The job is already stored in the database.
+  ///                        .
+  ///                        Note that the returned tag might differ from \p tag or #name_to_tag()
+  ///                        applied to \p name if there is already a database element/job
+  ///                        associated with that tag, that database element/job is to be removed,
+  ///                        and no other database element/job is referencing it anymore.
   ///
   /// \note The parameter \p tag is ignored if \p name is given and there is a database
   ///       element/job with that name. The tag of that database element/job is used instead of

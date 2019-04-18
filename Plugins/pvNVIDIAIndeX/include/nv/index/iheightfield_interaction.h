@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Cluster-wide interaction and computing tasks operating on heightfield data

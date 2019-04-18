@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief Node manager API
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_INODE_MANAGER_H
 #define MI_NEURAYLIB_INODE_MANAGER_H
@@ -591,6 +590,27 @@ public:
   ///
   /// \see #add_client_node_callback()
   virtual void remove_head_node_callback(IHead_node_callback* callback) = 0;
+
+  /// Grows the cluster by one node, if a worker node is available.
+  ///
+  /// The new node will be added to the cluster by starting a worker process on
+  /// that node using the worker_node_filter, program_name, argument_string
+  /// and child_process_timeout parameters passed to
+  /// #mi::neuraylib;;INode_manager_client::join_or_create_cluster() to create the cluster.
+  ///
+  /// \return The descriptor of the worker node that has been added to the
+  ///         cluster or \c NULL if no worker node was available.
+  virtual const IWorker_node_descriptor* grow() = 0;
+
+  /// Shrinks the cluster by one node.
+  ///
+  /// \param remove_node  The descriptor of the node that is supposed to be
+  ///                     removed from the cluster.
+  ///
+  /// \return   -  0 Success.
+  ///           - -1 The specified node is not a member of the cluster.
+  ///           - -2 The specified node is invalid (\c NULL pointer).
+  virtual Sint32 shrink(const IWorker_node_descriptor* remove_node) = 0;
 };
 
 mi_static_assert(sizeof(INode_manager_cluster::Cluster_status) == sizeof(Uint32));
@@ -792,7 +812,10 @@ public:
   ///                                               will be joined.
   /// \param worker_node_filter                     A filter specifying required worker node
   ///                                               properties. If \c NULL, no cluster will be
-  ///                                               created.
+  ///                                               created. The filter will be used again when
+  ///                                               calling
+  ///                                               #mi::neuraylib::INode_manager_cluster::grow()
+  ///                                               to add nodes to the cluster later on.
   /// \param program_name                           The name of the program to run on the worker
   ///                                               nodes. If \c NULL, a cluster is created
   ///                                               without child processes being forked by the

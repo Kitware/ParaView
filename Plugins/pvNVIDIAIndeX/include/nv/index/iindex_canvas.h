@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief User-defined rendering canvas.
@@ -195,15 +195,16 @@ public:
   ///
   virtual mi::Uint32 get_nb_frame_buffer_layers() const { return 0; }
 
-  /// Return number of layers.
+  /// Return the frame buffer layer type
   ///
-  /// \return The number of layers.
+  /// \return The Frame_buffer_layer_type
   ///
   virtual Frame_buffer_layer_type get_layer_type(mi::Uint32 /*layer_id*/) const
   {
     return IIndex_canvas::FB_LAYER_UNDEFINED;
   }
 
+  /// \implements
   virtual void render_tile(mi::Uint32 /*layer_id*/, Frame_buffer_layer_type layer_type,
     const mi::math::Bbox_struct<mi::Uint32, 2>& area, mi::Uint8* buffer)
   {
@@ -223,6 +224,7 @@ public:
     }
   }
 
+  /// \implements
   virtual mi::neuraylib::ICanvas* get_canvas() const { return NULL; }
 };
 

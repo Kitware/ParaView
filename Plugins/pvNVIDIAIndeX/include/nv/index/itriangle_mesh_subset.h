@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Sub-meshes of a triangle mesh.
@@ -80,25 +80,26 @@ public:
   ///
   virtual bool initialize(const mi::math::Bbox_struct<mi::Float32, 3>& bounding_box,
 
-    mi::math::Vector_struct<mi::Float32, 3>* vertices, mi::Uint32 nb_vertices,
+    const mi::math::Vector_struct<mi::Float32, 3>* vertices, mi::Uint32 nb_vertices,
 
-    mi::Uint32* vertex_indices, mi::Uint32 nb_indices,
+    const mi::Uint32* vertex_indices, mi::Uint32 nb_indices,
 
-    mi::Uint64* global_triangle_ids, mi::Uint64 nb_global_triangle_ids,
+    const mi::Uint64* global_triangle_ids, mi::Uint64 nb_global_triangle_ids,
 
-    mi::math::Vector_struct<mi::Float32, 3>* normals = 0, mi::Uint32 nb_normals = 0,
+    const mi::math::Vector_struct<mi::Float32, 3>* normals = 0, mi::Uint32 nb_normals = 0,
 
-    mi::math::Vector_struct<mi::Float32, 2>* texture_coordinates = 0,
+    const mi::math::Vector_struct<mi::Float32, 2>* texture_coordinates = 0,
     mi::Uint32 nb_texture_coordinates = 0,
 
-    mi::math::Color_struct* colors = 0, mi::Uint32 nb_colors = 0,
+    const mi::math::Color_struct* colors = 0, mi::Uint32 nb_colors = 0,
 
-    mi::Uint32* normal_indices = 0, mi::Uint32* tex_coord_indices = 0,
-    mi::Uint32* color_indices = 0, mi::Uint32* colormap_indices = 0,
+    const mi::Uint32* normal_indices = 0, const mi::Uint32* tex_coord_indices = 0,
+    const mi::Uint32* color_indices = 0, const mi::Uint32* colormap_indices = 0,
 
-    mi::Uint16* materials = 0, mi::Uint32 nb_materials = 0,
+    const mi::Uint16* materials = 0, mi::Uint32 nb_materials = 0,
 
-    ITriangle_mesh_subset::Triflags* triangle_flags = 0, mi::Uint32 nb_triangle_flags = 0) = 0;
+    const ITriangle_mesh_subset::Triflags* triangle_flags = 0,
+    mi::Uint32 nb_triangle_flags = 0) = 0;
 
   /// Returns the number of triangles in the sub-mesh.
   /// \return Number of triangles
@@ -110,12 +111,12 @@ public:
 
   /// Returns the vertex position array.
   /// \return Vertex position array
-  virtual mi::math::Vector_struct<mi::Float32, 3>* get_vertices() const = 0;
+  virtual const mi::math::Vector_struct<mi::Float32, 3>* get_vertices() const = 0;
 
   /// Returns the tri-vertex to vertex position index array.
   /// The array length is number of triangles * 3.
   /// \return Tri-vertex to vertex position index array
-  virtual mi::Uint32* get_vertex_indices() const = 0;
+  virtual const mi::Uint32* get_vertex_indices() const = 0;
 
   /// Returns the number of vertex normals.
   /// \return Length of the vertex normal array
@@ -123,12 +124,12 @@ public:
 
   /// Returns the vertex normals array.
   /// \return Vertex normal array
-  virtual mi::math::Vector_struct<mi::Float32, 3>* get_normals() const = 0;
+  virtual const mi::math::Vector_struct<mi::Float32, 3>* get_normals() const = 0;
 
   /// Returns the tri-vertex to normal index array.
   /// The array length is number of triangles * 3.
   /// \return Tri-vertex to normal index array
-  virtual mi::Uint32* get_normal_indices() const = 0;
+  virtual const mi::Uint32* get_normal_indices() const = 0;
 
   /// Returns the number of texture coordinates.
   /// \return Length of the texture coordinate array
@@ -136,12 +137,12 @@ public:
 
   /// Returns the vertex texture coordinate array.
   /// \return Vertex texture coordinate array
-  virtual mi::math::Vector_struct<mi::Float32, 2>* get_texture_coordinates() const = 0;
+  virtual const mi::math::Vector_struct<mi::Float32, 2>* get_texture_coordinates() const = 0;
 
   /// Returns the tri-vertex to texture coordinate index array.
   /// The array length is number of triangles * 3.
   /// \return Tri-vertex to texture coordinate index array
-  virtual mi::Uint32* get_texture_coordinate_indices() const = 0;
+  virtual const mi::Uint32* get_texture_coordinate_indices() const = 0;
 
   /// Returns the number of colors.
   /// \return Length of the vertex color array
@@ -149,17 +150,17 @@ public:
 
   /// Returns the vertex color array.
   /// \return Vertex color array
-  virtual mi::math::Color_struct* get_colors() const = 0;
+  virtual const mi::math::Color_struct* get_colors() const = 0;
 
   /// Returns the tri-vertex to color index.
   /// The array length is number of triangles * 3.
   /// \return Tri-vertex to color index array
-  virtual mi::Uint32* get_color_indices() const = 0;
+  virtual const mi::Uint32* get_color_indices() const = 0;
 
   /// Returns the tri-vertex to colormap index array.
   /// The array length is number of triangles * 3.
   /// \return Tri-vertex to colormap index array, or 0
-  virtual mi::Uint32* get_colormap_indices() const = 0;
+  virtual const mi::Uint32* get_colormap_indices() const = 0;
 
   /// Returns the number of materials
   /// \return Length of the material array
@@ -167,7 +168,7 @@ public:
 
   /// Returns the triangle materials.
   /// \return Material array
-  virtual mi::Uint16* get_materials() const = 0;
+  virtual const mi::Uint16* get_materials() const = 0;
 
   /// Returns the number of triangle flags.
   /// \return Length of the triangle flag array
@@ -175,12 +176,12 @@ public:
 
   /// Returns the triangle flags.
   /// \return Triangle flag array
-  virtual ITriangle_mesh_subset::Triflags* get_triangle_flags() const = 0;
+  virtual const ITriangle_mesh_subset::Triflags* get_triangle_flags() const = 0;
 
   /// Returns the IDs of the triangles in the sub-mesh.
   /// The array length is number of triangles.
   /// \return Triangle ID array
-  virtual mi::Uint64* get_global_triangle_ids() const = 0;
+  virtual const mi::Uint64* get_global_triangle_ids() const = 0;
 
   /// Returns the bounding box of the sub-mesh.
   ///

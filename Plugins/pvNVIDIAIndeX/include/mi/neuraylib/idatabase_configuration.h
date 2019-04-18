@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief API component that provides access to the database configuration.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_IDATABASE_CONFIGURATION_H
 #define MI_NEURAYLIB_IDATABASE_CONFIGURATION_H

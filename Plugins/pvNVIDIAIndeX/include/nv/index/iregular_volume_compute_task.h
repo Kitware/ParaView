@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for user-defined compute tasks that apply to volume bricks.
@@ -121,9 +121,13 @@ public:
   ///
   /// \return                         false, as no data is modified.
   ///
-  virtual bool compute_gpu(const mi::math::Bbox_struct<mi::Uint32, 3>& /*brick_bbox*/,
-    cudaArray* /*voxel_values*/, mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
+  virtual bool compute_gpu(const mi::math::Bbox_struct<mi::Uint32, 3>& brick_bbox,
+    cudaArray* voxel_values, mi::neuraylib::IDice_transaction* dice_transaction) const
   {
+    (void)brick_bbox;       // avoid unused warnings
+    (void)voxel_values;     // avoid unused warnings
+    (void)dice_transaction; // avoid unused warnings
+
     return false;
   }
 

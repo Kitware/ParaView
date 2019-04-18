@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interfaces for exposing the data distribution scheme.
@@ -211,6 +211,21 @@ public:
 };
 
 /// @ingroup nv_index_data_access
+/// The interface class exposes the locality information of a distributed height-field dataset.
+///
+/// The interface method \c IData_distribution::retrieve_data_locality()
+/// returns the height-field data locality.
+///
+/// \deprecated This interface class is subject to change!
+///
+class IHeight_field_data_locality
+  : public mi::base::Interface_declare<0xb7e4caa4, 0x36d7, 0x4712, 0xba, 0x91, 0x89, 0x9d, 0x70,
+      0x3e, 0x4c, 0x7a, IDistributed_data_locality>
+{
+public:
+};
+
+/// @ingroup nv_index_data_access
 /// The interface class exposes the locality information of a distributed regular heightfield
 /// dataset.
 ///
@@ -346,6 +361,42 @@ public:
   virtual ISparse_volume_data_locality* retrieve_sparse_volume_data_locality(
     mi::neuraylib::Tag_struct scene_element_tag,
     const mi::math::Bbox_struct<mi::Sint32, 3>& query_bbox,
+    mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
+
+  /// Height-field data locality query mode.
+  ///
+  /// This mode allows to query the height-field data locality of the data subsets
+  /// which are either globally unique or unique per host. Globally unique mode will
+  /// reference a single subset subset only once, while in per-host unique mode the
+  /// locality potentially references a subset multiple times, but only once per host.
+  ///
+  enum Height_field_locality_query_mode
+  {
+    HFLOCALITY_SUBSETS_UNIQUE_GLOBAL = 0x01u,
+    HFLOCALITY_SUBSETS_UNIQUE_PER_HOST = 0x02u
+  };
+  /// Query the distribution of sparse-volume data in the cluster. The returned
+  /// instance of the class that implements interface \c ISparse_volume_data_locality
+  /// provides the cluster nodes where parts of the queried data including their
+  /// respective bounding boxes (subset bounding box) are stored.
+  ///
+  /// \param[in] scene_element_tag    The sparse-volume scene element tag that refers to
+  ///                                 data representation whose distribution shall
+  ///                                 be returned.
+  /// \param[in] query_bbox           The bounding box in scene element's local space.
+  ///                                 The data distribution will be exposed for the
+  ///                                 user-defined bounding box passed to the query.
+  /// \param[in] query_mode           Height field data locality query mode.
+  ///                                 See Height_field_locality_query_mode.
+  /// \param[in] dice_transaction     The DiCE transaction that the operation runs in.
+  ///
+  /// \return                         Returns the data distribution scheme that
+  ///                                 corresponds to the query parameters.
+  ///
+  virtual IHeight_field_data_locality* retrieve_height_field_data_locality(
+    mi::neuraylib::Tag_struct scene_element_tag,
+    const mi::math::Bbox_struct<mi::Sint32, 2>& query_bbox,
+    Height_field_locality_query_mode query_mode,
     mi::neuraylib::IDice_transaction* dice_transaction) const = 0;
 
   /// Query the distribution of heightfield data in the cluster. The returned

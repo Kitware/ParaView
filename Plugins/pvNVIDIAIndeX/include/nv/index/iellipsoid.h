@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element representing a ellipsoid higher-level shape.
@@ -65,7 +65,7 @@ public:
   /// \param[in]      c       The axis of the ellipsoid in z direction.
   ///
   virtual void set_semi_axes(const mi::math::Vector_struct<mi::Float32, 3>& a,
-    const mi::math::Vector_struct<mi::Float32, 3>& b, float c) = 0;
+    const mi::math::Vector_struct<mi::Float32, 3>& b, mi::Float32 c) = 0;
 };
 }
 } // namespace index / nv

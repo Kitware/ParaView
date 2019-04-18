@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Interface for a session
@@ -51,6 +51,10 @@ public:
   /// \param[in]  camera_type_iid     The UUID of the requested camera to be created.
   ///                                 By default a \c IPerspective_camera instance
   ///                                 is created.
+  /// \param[in]  camera_name         The name for this camera. This name can be used
+  ///                                 to lookup the camera tag using
+  ///                                 IDice_transaction::name_to_tag().
+  ///                                 When it is 0, no name is assigned.
   ///
   /// \return     Returns the tag that references the created instance of the \c ICamera interface
   /// camera.
@@ -60,7 +64,8 @@ public:
   ///
   virtual mi::neuraylib::Tag_struct create_camera(
     mi::neuraylib::IDice_transaction* dice_transaction,
-    const mi::base::Uuid& camera_type_uuid = IPerspective_camera::IID()) const = 0;
+    const mi::base::Uuid& camera_type_uuid = IPerspective_camera::IID(),
+    const char* camera_name = 0) const = 0;
   ///@}
 
   ///////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +153,7 @@ public:
   /// application logic represents the method of choice.
   ///
   /// \return Returns an instance of the interface class \c IScene_convenience_manipulation, which
-  ///         exposes means for conveniently manipulate a scene's configuration.
+  ///         exposes means for conveniently manipulating a scene's configuration.
   ///
   virtual IScene_convenience_manipulation* get_conveniences() const = 0;
   ///@}

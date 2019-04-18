@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -98,6 +98,7 @@ public:
 
   // Get the number of subregions produced by NVIDIA IndeX.
   mi::Uint32 get_nb_subregions() const override;
+
   // Get the bounding box associated to a subregion.
   mi::math::Bbox_struct<mi::Float32, 3> get_subregion(mi::Uint32 index) const override;
 

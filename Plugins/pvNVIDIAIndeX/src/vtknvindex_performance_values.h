@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,8 +37,6 @@
 
 #include "vtkIndeXRepresentationsModule.h"
 
-class vtknvindex_application;
-
 // The class vtknvindex_performance_values represents a helper class to collect
 // performance values of NVIDIA IndeX renderings and output them to a text file
 // along with system/hardware information for offline analysis.
@@ -50,8 +48,7 @@ public:
   ~vtknvindex_performance_values();
 
   // Print performance values to a file.
-  void print_perf_values(
-    vtknvindex_application& application, mi::base::Handle<nv::index::IFrame_results> frame_results);
+  void print_perf_values(mi::base::Handle<nv::index::IFrame_results> frame_results);
 
 private:
   vtknvindex_performance_values(const vtknvindex_performance_values&) = delete;
@@ -65,13 +62,14 @@ private:
 };
 
 // General use system information
-class VTKINDEXREPRESENTATIONS_EXPORT vtknvindex_sysinfo
+class vtknvindex_sysinfo
 {
 public:
   vtknvindex_sysinfo();
   ~vtknvindex_sysinfo();
 
-  vtksys::SystemInformation& get_sysinfo();
+  static vtknvindex_sysinfo* create_sysinfo();
+  static vtknvindex_sysinfo* get_sysinfo();
 
   mi::Uint32 get_number_logical_cpu() const;
 
@@ -79,8 +77,7 @@ private:
   vtknvindex_sysinfo(const vtknvindex_sysinfo&) = delete;
   void operator=(const vtknvindex_sysinfo&) = delete;
 
-  vtksys::SystemInformation m_sys_info;
+  static vtknvindex_sysinfo* s_vtknvindex_sysinfo;
   mi::Uint32 m_nb_logical_cpu;
 };
-static vtknvindex_sysinfo vtknvindex_sysinfo_instance;
 #endif

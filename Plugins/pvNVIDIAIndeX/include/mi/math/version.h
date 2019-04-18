@@ -1,11 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/math/version.h
 /// \brief Major and minor version number and an optional qualifier.
 ///
 /// See \ref mi_math_version.
-//*****************************************************************************
 
 #ifndef MI_MATH_VERSION_H
 #define MI_MATH_VERSION_H
@@ -45,7 +44,7 @@
 /// Math API minor version number
 ///
 /// \see   \ref mi_math_intro_versioning
-#define MI_MATH_VERSION_MINOR 0
+#define MI_MATH_VERSION_MINOR 1
 
 /// Math API version qualifier
 ///

@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief Type traits
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_TYPE_TRAITS_H
 #define MI_NEURAYLIB_TYPE_TRAITS_H
@@ -41,7 +40,6 @@ class IString;
 class IUuid;
 class IVoid;
 class IRef;
-class IParameter;
 class IBoolean_2;
 class IBoolean_3;
 class IBoolean_4;
@@ -282,13 +280,6 @@ struct Type_traits<mi::IRef>
 {
   static const char* get_type_name() { return "Ref"; }
   typedef const char* Primitive_type;
-};
-
-template <>
-struct Type_traits<mi::IParameter>
-{
-  static const char* get_type_name() { return "Parameter"; }
-  typedef mi::Uint32 Primitive_type;
 };
 
 template <>

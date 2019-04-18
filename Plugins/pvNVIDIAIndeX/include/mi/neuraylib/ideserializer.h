@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief      Deserialization of objects from a byte stream.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_IDESERIALIZER_H
 #define MI_NEURAYLIB_IDESERIALIZER_H
@@ -17,9 +16,11 @@ namespace mi
 namespace neuraylib
 {
 
-/** \if IRAY_API \addtogroup mi_neuray_plugins
-    \else \addtogroup mi_neuray_dice
-    \endif
+/**
+\if IRAY_API \addtogroup mi_neuray_plugins
+\elseif MDL_SOURCE_RELEASE \addtogroup mi_neuray_plugins
+\else \addtogroup mi_neuray_dice
+\endif
 @{
 */
 

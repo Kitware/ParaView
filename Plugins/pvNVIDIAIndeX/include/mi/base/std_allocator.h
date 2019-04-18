@@ -1,12 +1,11 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/base/std_allocator.h
 /// \brief Standard STL %allocator implementation.
 ///
 /// The implementation is based on the #mi::base::IAllocator interface.
 /// See \ref mi_base_iinterface.
-//*****************************************************************************
 
 #ifndef MI_BASE_STD_ALLOCATOR_H
 #define MI_BASE_STD_ALLOCATOR_H

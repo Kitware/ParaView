@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Generic camera
@@ -41,7 +41,7 @@ class ICamera : public mi::base::Interface_declare<0x1247f2e7, 0x1725, 0x47e1, 0
                   0x63, 0xa4, 0x85, 0x64, 0x29, mi::neuraylib::IElement>
 {
 public:
-  /// Set the basic camera parameters. A convenient method for set
+  /// Set the basic camera parameters. A convenienve method for setting
   /// up basic camera parameters.
   ///
   /// \param[in]  eye_point    Camera eye point

@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief A lightweight HTTP server.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_HTTP_H
 #define MI_NEURAYLIB_HTTP_H
@@ -446,6 +445,10 @@ public:
   /// \param buffer   The buffer to write the the data into.
   /// \return         The number of bytes read or 0 if no more data will come.
   virtual Sint32 read_data(Size size, char* buffer) = 0;
+
+  /// Query whether this is a secure (i.e. HTTPS) connection
+  /// \return A bool indicating whether this is a secure connection
+  virtual bool is_secure_connection() = 0;
 };
 
 /// A WebSocket state handler that can be installed to a WebSocket connection to handle events of
@@ -730,7 +733,11 @@ public:
   /// \see #shutdown()
   ///
   /// \param listen_address   The address to listen on.
-  /// \return                 0, if the server could be started, or -1 in case of errors.
+  /// \return
+  ///                                -  0: Success.
+  ///                                - -1: Listen failed, e.g. \p listen_address already in use.
+  ///                                - -2: The method has already been called.
+  ///                                - -7: Invalid listen address
   virtual Sint32 start(const char* listen_address) = 0;
 
   /// Starts the server in SSL mode listening on the given address.
@@ -744,13 +751,14 @@ public:
   /// \see #shutdown()
   ///
   /// \param listen_address          The address to listen on.
-  /// \param cert_file               The file containing the server's certificate.
+  /// \param cert_file               The file containing the server's certificate. The certificate
+  ///                                needs to be in PEM format. The DER format is not supported.
   /// \param private_key_file        The file containing the server's private key.
   /// \param password                The password for decrypting the private key.
   ///
   /// \return
   ///                                -  0: Success.
-  ///                                - -1: \p listen_address already in use.
+  ///                                - -1: Listen failed, e.g. \p listen_address already in use.
   ///                                - -2: The method has already been called.
   ///                                - -3: Invalid certificate.
   ///                                - -4: Invalid private key.

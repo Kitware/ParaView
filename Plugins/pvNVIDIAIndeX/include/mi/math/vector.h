@@ -1,12 +1,11 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/math/vector.h
 /// \brief Math vector class template of fixed dimension with arithmetic operators and generic
 ///        functions.
 ///
 /// See \ref mi_math_vector.
-//*****************************************************************************
 
 #ifndef MI_MATH_VECTOR_H
 #define MI_MATH_VECTOR_H
@@ -345,7 +344,7 @@ public:
   /// The default constructor leaves the vector elements uninitialized.
   inline Vector()
   {
-#if !defined(NDEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
+#if defined(DEBUG) || (defined(_MSC_VER) && _MSC_VER <= 1310)
     // In debug mode, default-constructed vectors are initialized with signaling NaNs or, if not
     // applicable, with a maximum value to increase the chances of diagnosing incorrect use of
     // an uninitialized vector.

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Scene element for irregular volumes.
@@ -33,13 +33,6 @@ public:
   /// \returns    The length of the longest edge in the irregular volume mesh.
   ///
   virtual mi::Float32 get_max_mesh_edge_length() const = 0;
-
-  /// Returns the tag of the import strategy that is used for
-  /// loading the dataset.
-  ///
-  /// \return tag of the IDistributed_data_import_strategy
-  ///
-  virtual mi::neuraylib::Tag_struct get_import_callback() const = 0;
 };
 }
 }

@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief API component for various image-related functions.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_IIMAGE_API_H
 #define MI_NEURAYLIB_IIMAGE_API_H
@@ -13,6 +12,8 @@
 namespace mi
 {
 
+class IArray;
+
 namespace neuraylib
 {
 
@@ -21,8 +22,17 @@ class ICanvas;
 class IReader;
 class ITile;
 
+/**
+\if MDL_SDK_API
+    \defgroup mi_neuray_mdl_sdk_misc Miscellaneous Interfaces
+    \ingroup mi_neuray
+
+    \brief Various utility classes.
+\endif
+*/
+
 /** \if IRAY_API \addtogroup mi_neuray_rendering
-    \elseif MDL_SDK_API \addtogroup mi_neuray_misc
+    \elseif MDL_SDK_API \addtogroup mi_neuray_mdl_sdk_misc
     \elseif DICE_API \addtogroup mi_neuray_rtmp
     \endif
 @{
@@ -278,6 +288,19 @@ public:
   ///
   /// \see #get_components_per_pixel()
   virtual Uint32 get_bytes_per_component(const char* pixel_type) const = 0;
+
+  /// Creates mipmaps from the given canvas.
+  ///
+  /// \note The base level (the canvas that is passed in) is not included in the returned
+  /// canvas array.
+  ///
+  /// \param canvas           The canvas to create the mipmaps from.
+  /// \param gamma_override   If this parameter is different from zero, it is used instead of the
+  ///                         canvas gamma during mipmap creation.
+  /// \return                 An array of type #mi::IPointer containing pointers to
+  ///                         the mipmaps of type #mi::neuraylib::ICanvas.
+  ///                         If no mipmaps could be created, NULL is returned.
+  virtual IArray* create_mipmaps(const ICanvas* canvas, Float32 gamma_override = 0.0f) const = 0;
 
   //@}
 };

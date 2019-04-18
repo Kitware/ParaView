@@ -1,4 +1,4 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -97,7 +97,7 @@ vtknvindex_import_bricks::vtknvindex_import_bricks(
   , m_border_size(border_size)
 {
   m_nb_bricks = subset_data_descriptor->get_subset_number_of_data_bricks();
-  m_nb_fragments = vtknvindex_sysinfo_instance.get_number_logical_cpu();
+  m_nb_fragments = vtknvindex_sysinfo::get_sysinfo()->get_number_logical_cpu();
 
   // if number of cpus could not be determinated, used default fragments.
   if (m_nb_fragments == 0)

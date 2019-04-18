@@ -1,12 +1,10 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/base/iallocator.h
 /// \brief %Allocator interface class to dynamically allocate and deallocate memory.
 ///
 /// See \ref mi_base_iinterface.
-///
-//*****************************************************************************
 
 #ifndef MI_BASE_IALLOCATOR_H
 #define MI_BASE_IALLOCATOR_H

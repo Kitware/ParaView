@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /**
    \file
@@ -25,7 +25,8 @@ class IIrregular_volume_rendering_properties
 public:
   struct Rendering
   {
-    mi::Uint32 sampling_mode;                      ///< Mode for sampling.
+    mi::Uint32
+      sampling_mode; ///< Mode for sampling (0 = preintegrated colormap; 1 = discrete sampling)
     mi::Float32 sampling_segment_length;           ///< Segment length for sampling.
     mi::Float32 sampling_reference_segment_length; ///< Segment length for sampling.
   };

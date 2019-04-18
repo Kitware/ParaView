@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief Distributed subsets of irregular volume datasets.
@@ -41,9 +41,9 @@ namespace index
 ///
 /// \note The current implementation of NVIDIA IndeX only allows for tetrahedral cells defining an
 /// irregular volume.
-///       While the interface allows to generate multiple attribute sets
-///       associated with the irregular volume dataset only the first attribute set is regarded for
-///       rendering.
+///       While the interface allows to generate multiple attribute sets associated with the
+///       irregular volume dataset,
+///       only the first attribute set is regarded for rendering.
 ///
 class IIrregular_volume_subset
   : public mi::base::Interface_declare<0xe00304d7, 0x3f25, 0x4719, 0xb4, 0x7e, 0x3d, 0x10, 0xec,
@@ -53,14 +53,14 @@ public:
   /// Irregular volume cell definition.
   ///
   /// This structure holds the number of faces of the irregular volume cell and the starting
-  /// index of the face index in the shared cell-face array (see \c Mesh_storage).The cell-face
+  /// index of the face index in the shared cell-face array (see \c Mesh_storage). The cell-face
   /// indices are
   /// stored consecutively in the shared cell-face array.
   ///
   struct Cell
   {
     mi::Uint32 nb_faces;         ///< Number of faces compounding this cell.
-    mi::Uint32 start_face_index; ///< Starting index to the cell-face index array.
+    mi::Uint32 start_face_index; ///< Starting index into the cell-face index array.
   };
 
   /// Irregular volume cell-face definition.
@@ -73,7 +73,7 @@ public:
   struct Face
   {
     mi::Uint32 nb_vertices;        ///< Number of vertices in the face.
-    mi::Uint32 start_vertex_index; ///< Starting index to the face-vertex index array.
+    mi::Uint32 start_vertex_index; ///< Starting index into the face-vertex index array.
   };
 
   /// Irregular volume mesh storage parameters.
@@ -261,7 +261,7 @@ public:
   ///
   virtual mi::Uint32 get_nb_attributes() const = 0;
 
-  /// Get the attribute parameters of an currently valid attribute set for a given index.
+  /// Get the attribute parameters of a currently valid attribute set for a given index.
   ///
   /// \param[in]  attrib_index    The storage index of the attribute set.
   /// \param[out] attrib_params   The attribute set parameters for the given index.

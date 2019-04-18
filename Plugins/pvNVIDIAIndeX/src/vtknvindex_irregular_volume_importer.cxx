@@ -1,35 +1,41 @@
-/* Copyright 2018 NVIDIA Corporation. All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*  * Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-*  * Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*  * Neither the name of NVIDIA CORPORATION nor the names of its
-*    contributors may be used to endorse or promote products derived
-*    from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+/* Copyright 2019 NVIDIA Corporation. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *  * Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  * Neither the name of NVIDIA CORPORATION nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <fcntl.h>
 #include <string>
 #include <typeinfo>
+#include <unordered_map>
 
 #include "vtkMultiProcessController.h"
+#include "vtkTimerLog.h"
+
+#include "vtkCellData.h"
+#include "vtkCellIterator.h"
+#include "vtkUnstructuredGrid.h"
 
 #include <nv/index/iirregular_volume_subset.h>
 
@@ -81,6 +87,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   nv::index::IData_subset_factory* factory,
   mi::neuraylib::IDice_transaction* /*dice_transaction*/) const
 {
+  vtkTimerLog::MarkStartEvent("NVIDIA-IndeX: Importing");
   vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
   mi::Sint32 rank_id = controller ? controller->GetLocalProcessId() : 0;
 
@@ -115,6 +122,8 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     return 0;
   }
 
+  vtkUnstructuredGridBase* pv_ugrid = nullptr;
+
   mi::Uint32 num_points = 0u;
   mi::Uint32 num_cells = 0u;
   mi::math::Vector<mi::Float32, 3>* points = NULL;
@@ -123,21 +132,19 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   mi::Uint8* shm_ivol = NULL;
   mi::Float32 max_edge_length_sqr = 0.f;
 
+  INFO_LOG << "The bounding box requested by NVIDIA IndeX: " << bounding_box << ".";
+
   if (raw_mem_pointer) // The volume data is available in local memory.
   {
     vtknvindex_irregular_volume_data* ivol_data =
       static_cast<vtknvindex_irregular_volume_data*>(raw_mem_pointer);
 
-    num_points = ivol_data->num_points;
-    num_cells = ivol_data->num_cells;
-    points = &ivol_data->points[0];
-    cells = &ivol_data->cells[0];
+    pv_ugrid = ivol_data->pv_unstructured_grid;
     scalars = ivol_data->scalars;
     max_edge_length_sqr = ivol_data->max_edge_length2;
   }
   else // The volume data is in shared memory.
   {
-    INFO_LOG << "The bounding box requested by NVIDIA IndeX: " << bounding_box << ".";
     INFO_LOG << "Using shared memory: " << shm_memory_name << " with bbox: " << shm_bbox << ".";
 
     shm_ivol = vtknvindex::util::get_vol_shm<mi::Uint8>(shm_memory_name, shm_size);
@@ -202,21 +209,83 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   std::vector<mi::Uint8> subset_scalars_uint8;
   std::vector<mi::Uint16> subset_scalars_uint16;
   std::vector<mi::Float32> subset_scalars_float32;
-  std::map<mi::Uint32, mi::Uint32>
-    global_to_local_vtx_idx_map; // TODO: change to unordered_map when available
+  std::unordered_map<mi::Uint32, mi::Uint32> global_to_local_vtx_idx_map;
 
-  for (mi::Uint32 t = 0u; t < num_cells; ++t)
+  if (pv_ugrid != nullptr)
   {
-    const Vec4ui& tet_vtx_indices = cells[t];
+    bool gave_error = false;
+    vtkSmartPointer<vtkCellIterator> cellIter =
+      vtkSmartPointer<vtkCellIterator>::Take(pv_ugrid->NewCellIterator());
+    for (cellIter->InitTraversal(); !cellIter->IsDoneWithTraversal(); cellIter->GoToNextCell())
+    {
+      vtkIdType npts = cellIter->GetNumberOfPoints();
+      if (npts != 4)
+      {
+        if (!gave_error)
+        {
+          ERROR_LOG << "Encountered non-tetrahedral cell. NVIDIA IndeX's irregular volume "
+                       "renderer supports tetrahedral cells only.";
+          gave_error = true;
+        }
+        continue;
+      }
 
-    mi::math::Bbox<mi::Float32, 3> tet_bbox;
-    tet_bbox.clear();
+      vtkIdType* cell_point_ids = cellIter->GetPointIds()->GetPointer(0);
 
-    for (mi::Uint32 k = 0; k < 4; k++)
-      tet_bbox.insert(points[tet_vtx_indices[k]]);
+      // check for degenerated cells
+      bool invalid_cell = false;
+      for (mi::Uint32 i = 0; i < 3; i++)
+      {
+        for (mi::Uint32 j = i + 1; j < 4; j++)
+        {
+          if (cell_point_ids[i] == cell_point_ids[j])
+          {
+            invalid_cell = true;
+            break;
+          }
+        }
 
-    if (tet_bbox.intersects(subset_bbox))
-      subset_tetrahedrons.push_back(tet_vtx_indices);
+        if (invalid_cell)
+          break;
+      }
+
+      if (invalid_cell)
+        continue;
+
+      mi::math::Bbox<mi::Float32, 3> tet_bbox;
+      tet_bbox.clear();
+
+      for (mi::Uint32 i = 0; i < 4; i++)
+      {
+        mi::Float64 point[3];
+        pv_ugrid->GetPoint(cell_point_ids[i], point);
+        tet_bbox.insert(mi::Float32_3(static_cast<mi::Float32>(point[0]),
+          static_cast<mi::Float32>(point[1]), static_cast<mi::Float32>(point[2])));
+      }
+
+      if (tet_bbox.intersects(subset_bbox))
+      {
+        Vec4ui tet_vtx_indices(
+          cell_point_ids[0], cell_point_ids[1], cell_point_ids[2], cell_point_ids[3]);
+        subset_tetrahedrons.push_back(tet_vtx_indices);
+      }
+    }
+  }
+  else
+  {
+    for (mi::Uint32 t = 0u; t < num_cells; ++t)
+    {
+      const Vec4ui& tet_vtx_indices = cells[t];
+
+      mi::math::Bbox<mi::Float32, 3> tet_bbox;
+      tet_bbox.clear();
+
+      for (mi::Uint32 k = 0; k < 4; k++)
+        tet_bbox.insert(points[tet_vtx_indices[k]]);
+
+      if (tet_bbox.intersects(subset_bbox))
+        subset_tetrahedrons.push_back(tet_vtx_indices);
+    }
   }
 
   // Build subset vertex list and remap indices.
@@ -239,7 +308,7 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
     {
       mi::Uint32& vtx_index = tet_vtx_indices[j];
 
-      std::map<mi::Uint32, mi::Uint32>::const_iterator kt =
+      std::unordered_map<mi::Uint32, mi::Uint32>::const_iterator kt =
         global_to_local_vtx_idx_map.find(vtx_index);
       if (kt != global_to_local_vtx_idx_map.end())
       {
@@ -250,7 +319,19 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
         const mi::Uint32 new_vtx_idx = static_cast<mi::Uint32>(subset_vertices.size());
         global_to_local_vtx_idx_map[vtx_index] = new_vtx_idx;
 
-        subset_vertices.push_back(points[vtx_index]);
+        if (pv_ugrid)
+        {
+          double* cur_pv_vertice = pv_ugrid->GetPoint(vtx_index);
+          Vec3f cur_vertice(static_cast<mi::Float32>(cur_pv_vertice[0]),
+            static_cast<mi::Float32>(cur_pv_vertice[1]),
+            static_cast<mi::Float32>(cur_pv_vertice[2]));
+
+          subset_vertices.push_back(cur_vertice);
+        }
+        else
+        {
+          subset_vertices.push_back(points[vtx_index]);
+        }
 
         if (*scalar_type_info == typeid(mi::Uint8))
           subset_scalars_uint8.push_back((reinterpret_cast<mi::Uint8*>(scalars))[vtx_index]);
@@ -437,6 +518,9 @@ nv::index::IDistributed_data_subset* vtknvindex_irregular_volume_importer::creat
   }
 
   irregular_volume_subset->retain();
+
+  vtkTimerLog::MarkEndEvent("NVIDIA-IndeX: Importing");
+
   return irregular_volume_subset.get();
 }
 

@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file mi/base/interface_implement.h
 /// \brief Mixin class template for deriving interface implementations.
-//*****************************************************************************
 
 #ifndef MI_BASE_INTERFACE_IMPLEMENT_H
 #define MI_BASE_INTERFACE_IMPLEMENT_H

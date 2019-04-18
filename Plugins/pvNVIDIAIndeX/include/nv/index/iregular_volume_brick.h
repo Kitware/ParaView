@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 NVIDIA Corporation. All rights reserved.
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
  *****************************************************************************/
 /// \file
 /// \brief The interface class representing a distributed brick of the entire large-scale regular
@@ -81,7 +81,7 @@ public:
   ///
   /// The method can be called only once to initialize the memory.
   ///
-  /// This method is a convenient method to execute two things:
+  /// This method is a convenience method to execute two things:
   /// 1. allocate_data(), 2. copy the voxels data into this brick.
   ///
   /// \deprecated Shall only be used to be compatible with

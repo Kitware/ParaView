@@ -1,9 +1,8 @@
-//*****************************************************************************
-// Copyright 2018 NVIDIA Corporation. All rights reserved.
-//*****************************************************************************
+/***************************************************************************************************
+ * Copyright 2019 NVIDIA Corporation. All rights reserved.
+ **************************************************************************************************/
 /// \file
 /// \brief      Serialization of objects to a byte stream.
-//*****************************************************************************
 
 #ifndef MI_NEURAYLIB_ISERIALIZER_H
 #define MI_NEURAYLIB_ISERIALIZER_H
@@ -19,16 +18,18 @@ namespace neuraylib
 class ISerializer;
 class IDeserializer;
 
-/** \defgroup mi_neuray_plugins Extensions and Plugins
+/**
+    \defgroup mi_neuray_plugins Extensions and Plugins
     \ingroup mi_neuray
 
     Various ways to extend the \NeurayApiName, for example, \if IRAY_API image and \endif video
     plugins, or user-defined DB elements.
 */
-
-/** \if IRAY_API \addtogroup mi_neuray_plugins
-    \else \addtogroup mi_neuray_dice
-    \endif
+/**
+\if IRAY_API \addtogroup mi_neuray_plugins
+\elseif MDL_SOURCE_RELEASE \addtogroup mi_neuray_plugins
+\else \addtogroup mi_neuray_dice
+\endif
 @{
 */
 
@@ -124,14 +125,6 @@ inline bool operator>=(const Tag& lhs, const Tag& rhs)
 
 /// This value of the tag represents an invalid tag which can not be accessed.
 const Tag NULL_TAG;
-
-/*@}*/ // end group mi_neuray_plugins / mi_neuray_dice
-
-/** \if IRAY_API \addtogroup mi_neuray_plugins
-    \else \addtogroup mi_neuray_dice
-    \endif
-@{
-*/
 
 /// All serializable objects have to be derived from this interface.
 ///
