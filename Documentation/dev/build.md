@@ -16,7 +16,9 @@ ParaView is being built (e.g., Python, Qt).
 To obtain ParaView's sources locally, clone this repository using
 [Git][git].
 
-  $ git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
+```sh
+git clone --recursive https://gitlab.kitware.com/paraview/paraview.git
+```
 
 ## Building
 
@@ -194,10 +196,6 @@ Less common, but variables which may be of interest to some:
   * `PARAVIEW_ENABLE_LOGGING` (default `ON`): If set, enhanced logging will be
     enabled.
   * `PARAVIEW_USE_VTKM` (default `ON`): Enable VTK-m accelerated algorithms in ParaView.
-<!--
-  * `PARAVIEW_FREEZE_PYTHON` (default `OFF`): Whether Python modules will be
-    frozen into ParaView itself or installed as a normal Python package.
--->
   * `PARAVIEW_ENABLE_VISITBRIDGE` (default `OFF`): Enable support for VisIt
     readers.
   * `PARAVIEW_BUILD_TESTING` (default `OFF`): Whether to build tests or not.
@@ -209,6 +207,13 @@ Less common, but variables which may be of interest to some:
     ParaView takes a long time to launch due to expensive disk access.
   * `PARAVIEW_ENABLE_CATALYST` (default `ON`): Whether to build Catalyst
     CoProcessing support or not.
+
+<!--
+These variables should be documented once they're effective again.
+
+  * `PARAVIEW_FREEZE_PYTHON` (default `OFF`): Whether Python modules will be
+    frozen into ParaView itself or installed as a normal Python package.
+-->
 
 More advanced options:
 
@@ -249,14 +254,15 @@ More advanced options:
   * `PARAVIEW_ENABLE_COMMANDLINE_TOOLS` (default `ON`; implied by
     `PARAVIEW_BUILD_QT_GUI`): Build command line tools such as `pvserver` and
     `pvrenderserver`.
+  * `PARAVIEW_USE_EXTERNAL` (default `OFF`): Whether to prefer external third
+    party libraries or the versions ParaView's source contains.
+
 <!--
+These variables should be documented once they're effective again.
+
   * `PARAVIEW_USE_EXTERNAL_VTK` (default `OFF`): Use an externally provided
     VTK. Note that ParaView has fairly narrow requirements for the VTK it can
     use, so only very recent versions are likely to work.
--->
-  * `PARAVIEW_USE_EXTERNAL` (default `OFF`): Whether to prefer external third
-    party libraries or the versions ParaView's source contains.
-<!--
   * `PARAVIEW_BUILD_CATALYST_ADAPTORS` (default `OFF`; requires
     `PARAVIEW_ENABLE_CATALYST` and not available on Windows): If set,
     ParaView's example Catalyst adaptors will be added as tests to the ParaView
