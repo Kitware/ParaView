@@ -142,7 +142,7 @@ function (_paraview_add_tests function)
       ExternalData_Expand_Arguments("${_paraview_add_tests_TEST_DATA_TARGET}" _
         "DATA{${_paraview_add_tests_BASELINE_DIR}/,REGEX:${_paraview_add_tests_name_base}(-.*)?(_[0-9]+)?.png}")
     endif ()
-    if (DEFINED "${_paraview_add_tests_name}_BASELINE")
+    if (DEFINED "${_paraview_add_tests_name}_THRESHOLD")
       list(APPEND _paraview_add_tests_client_args
         "--test-threshold=${${_paraview_add_tests_name}_THRESHOLD}")
     endif ()

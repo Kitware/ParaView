@@ -26,7 +26,7 @@ if (PARAVIEW_USE_MPI)
         ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICTestDriver.py
         -D ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
         -T ${PARAVIEW_TEST_OUTPUT_DIR}
-        -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
+        -V DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/${tfile}.png}
         --threshold 30
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
   ENDFOREACH()
@@ -42,7 +42,7 @@ ELSE()
         ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICTestDriver.py
         -D ${PARAVIEW_TEST_OUTPUT_DATA_DIR}
         -T ${PARAVIEW_TEST_OUTPUT_DIR}
-        -V DATA{${PARAVIEW_TEST_BASELINE_DIR}/SurfaceLICPlugin/${tfile}.png}
+        -V DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/${tfile}.png}
         --threshold 30
         --state ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.pvsm)
   ENDFOREACH()
