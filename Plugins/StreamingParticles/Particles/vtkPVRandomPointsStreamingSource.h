@@ -37,16 +37,19 @@ public:
 
 protected:
   vtkPVRandomPointsStreamingSource();
-  virtual ~vtkPVRandomPointsStreamingSource();
+  ~vtkPVRandomPointsStreamingSource();
 
-  virtual int RequestInformation(
-    vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
+  int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int NumLevels;
   int PointsPerBlock;
   int Seed;
   class vtkInternals;
   vtkInternals* Internal;
+
+private:
+  vtkPVRandomPointsStreamingSource(const vtkPVRandomPointsStreamingSource&) = delete;
+  void operator=(const vtkPVRandomPointsStreamingSource&) = delete;
 };
 
 #endif // vtkPVRandomPointsStreamingSource_h
