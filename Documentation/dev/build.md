@@ -256,6 +256,12 @@ More advanced options:
     `pvrenderserver`.
   * `PARAVIEW_USE_EXTERNAL` (default `OFF`): Whether to prefer external third
     party libraries or the versions ParaView's source contains.
+  * `PARAVIEW_VERSIONED_INSTALL` (default `ON`): Whether to add version numbers
+    to ParaView's include and plugin directories in the install tree.
+  * `PARAVIEW_CUSTOM_LIBRARY_SUFFIX` (default depends on
+    `PARAVIEW_VERSIONED_INSTALL`): The custom suffix for libraries built by
+    ParaView. Defaults to either an empty string or `pvX.Y` where `X` and `Y`
+    are ParaView's major and minor version components, respectively.
 
 <!--
 These variables should be documented once they're effective again.
