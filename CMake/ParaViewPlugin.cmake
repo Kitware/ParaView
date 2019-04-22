@@ -322,25 +322,26 @@ function (paraview_plugin_build)
     set(_paraview_build_include_file
       "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_build_TARGET}/${_paraview_build_TARGET}.h")
 
-    if (BUILD_SHARED_LIBS)
-      set(_paraview_build_include_content
-        "#ifndef ${_paraview_build_TARGET}_h
-#define ${_paraview_build_TARGET}_h
+    set(_paraview_static_plugins)
+    foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
+      get_property(_paraview_build_plugin_type
+        TARGET    "${_paraview_build_plugin}"
+        PROPERTY  TYPE)
+      if (_paraview_build_plugin_type STREQUAL "STATIC_LIBRARY")
+        list(APPEND _paraview_static_plugins
+          "${_paraview_build_plugin}")
+      endif ()
+    endforeach ()
 
-void ${_paraview_build_TARGET}_initialize()
-{
-}
-
-#endif\n")
-    else ()
+    if (_paraview_static_plugins)
       target_link_libraries("${_paraview_build_TARGET}"
         INTERFACE
           ParaView::ClientServerCoreCore
-          ${_paraview_build_PLUGINS})
+          ${_paraview_static_plugins})
 
       set(_paraview_build_declarations)
       set(_paraview_build_calls)
-      foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
+      foreach (_paraview_build_plugin IN LISTS _paraview_static_plugins)
         string(APPEND _paraview_build_declarations
           "PV_PLUGIN_IMPORT_INIT(${_paraview_build_plugin});\n")
         string(APPEND _paraview_build_calls
@@ -395,6 +396,16 @@ bool ${_paraview_build_TARGET}_static_plugins_func(const char* name, bool load)
 
   ${_paraview_build_calls}
   return false;
+}
+
+#endif\n")
+    else ()
+      set(_paraview_build_include_content
+        "#ifndef ${_paraview_build_TARGET}_h
+#define ${_paraview_build_TARGET}_h
+
+void ${_paraview_build_TARGET}_initialize()
+{
 }
 
 #endif\n")
