@@ -46,6 +46,7 @@
 #include "vtkSelection.h"
 #include "vtkSelectionConverter.h"
 #include "vtkSelectionNode.h"
+#include "vtkShaderProperty.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
@@ -1183,16 +1184,14 @@ void vtkGeometryRepresentation::SetShaderReplacements(const char* replacementsSt
 //----------------------------------------------------------------------------
 void vtkGeometryRepresentation::UpdateShaderReplacements()
 {
-  vtkOpenGLPolyDataMapper* glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->Mapper);
-  vtkOpenGLPolyDataMapper* glLODMapper = vtkOpenGLPolyDataMapper::SafeDownCast(this->LODMapper);
+  vtkShaderProperty* props = this->Actor->GetShaderProperty();
 
-  if (!glMapper || !glLODMapper)
+  if (!props)
   {
     return;
   }
 
-  glMapper->ClearAllShaderReplacements();
-  glLODMapper->ClearAllShaderReplacements();
+  props->ClearAllShaderReplacements();
 
   if (!this->UseShaderReplacements || this->ShaderReplacementsString == "")
   {
@@ -1260,7 +1259,20 @@ void vtkGeometryRepresentation::UpdateShaderReplacements()
 
   for (const auto& r : replacements)
   {
-    glMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
-    glLODMapper->AddShaderReplacement(std::get<0>(r), std::get<1>(r), true, std::get<2>(r), true);
+    switch (std::get<0>(r))
+    {
+      case vtkShader::Fragment:
+        props->AddFragmentShaderReplacement(std::get<1>(r), true, std::get<2>(r), true);
+        break;
+      case vtkShader::Vertex:
+        props->AddVertexShaderReplacement(std::get<1>(r), true, std::get<2>(r), true);
+        break;
+      case vtkShader::Geometry:
+        props->AddGeometryShaderReplacement(std::get<1>(r), true, std::get<2>(r), true);
+        break;
+      default:
+        assert(false && "unknown shader replacement type");
+        break;
+    }
   }
 }

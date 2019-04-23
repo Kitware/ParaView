@@ -123,6 +123,7 @@ void vtkPVLODActor::Render(vtkRenderer* ren, vtkMapper* vtkNotUsed(m))
     this->Texture->Render(ren);
   }
   this->Device->SetTexture(this->Texture);
+  this->Device->SetShaderProperty(this->ShaderProperty);
 
   // make sure the device has the same matrix
   matrix = this->Device->GetUserMatrix();
