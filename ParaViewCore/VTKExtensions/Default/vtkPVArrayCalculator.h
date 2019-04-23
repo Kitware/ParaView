@@ -51,17 +51,30 @@ protected:
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  //@{
   /**
-   * This function updates the (scalar and vector arrays / variables) names
-   * to make them consistent with those of the upstream calculator(s). This
-   * addresses the scenarios where the user modifies the name of a calculator
-   * whose output is the input of a (some) subsequent calculator(s) or the user
-   * changes the input of a downstream calculator. Argument inDataAttrs refers
-   * to the attributes of the input dataset. This function should be called by
-   * RequestData() only.
+   * Get the attribute type.
    */
-  void UpdateArrayAndVariableNames(vtkDataObject* theInputObj, vtkDataSetAttributes* inDataAttrs);
+  int GetAttributeTypeFromInput(vtkDataObject* input);
+
+  /**
+   * Clears the array and variable names.
+   */
+  void ResetArrayAndVariableNames();
+
+  /**
+   * Add coordinate variable names.
+   */
+  void AddCoordinateVariableNames();
+
+  /**
+   * This function adds the scalar and vector arrays as variables available
+   * to the calculator. It can be called multiple times for the datasets in
+   * a vtkCompositeDataSet. Argument inDataAttrs refers to the attributes of
+   * the input dataset. This function should be called by RequestData() only.
+   * Use ResetArrayAndVariableNames() prior to clear out previously set variable
+   * names.
+   */
+  void AddArrayAndVariableNames(vtkDataObject* theInputObj, vtkDataSetAttributes* inDataAttrs);
 
 private:
   vtkPVArrayCalculator(const vtkPVArrayCalculator&) = delete;
