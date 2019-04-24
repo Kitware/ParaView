@@ -33,6 +33,19 @@
 # TODO: Support static plugins.
 # TODO: Link pvserver and friends to ParaView::PythonInitializer for static builds?
 
+# Set up rpaths
+set(CMAKE_BUILD_RPATH_USE_ORIGIN 1)
+if (UNIX AND NOT APPLE)
+  file(RELATIVE_PATH _paraview_client_relpath
+    "/prefix/${CMAKE_INSTALL_BINDIR}"
+    "/prefix/${CMAKE_INSTALL_LIBDIR}")
+  set(_paraview_client_origin_rpath
+    "$ORIGIN/${_paraview_client_relpath}")
+
+  list(APPEND CMAKE_INSTALL_RPATH
+    "${_paraview_client_origin_rpath}")
+endif()
+
 include("${CMAKE_CURRENT_SOURCE_DIR}/ParaViewCommandLineExecutables.cmake")
 
 foreach (exe IN ITEMS pvserver pvdataserver pvrenderserver)
