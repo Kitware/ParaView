@@ -322,25 +322,26 @@ function (paraview_plugin_build)
     set(_paraview_build_include_file
       "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_paraview_build_TARGET}/${_paraview_build_TARGET}.h")
 
-    if (BUILD_SHARED_LIBS)
-      set(_paraview_build_include_content
-        "#ifndef ${_paraview_build_TARGET}_h
-#define ${_paraview_build_TARGET}_h
+    set(_paraview_static_plugins)
+    foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
+      get_property(_paraview_build_plugin_type
+        TARGET    "${_paraview_build_plugin}"
+        PROPERTY  TYPE)
+      if (_paraview_build_plugin_type STREQUAL "STATIC_LIBRARY")
+        list(APPEND _paraview_static_plugins
+          "${_paraview_build_plugin}")
+      endif ()
+    endforeach ()
 
-void ${_paraview_build_TARGET}_initialize()
-{
-}
-
-#endif\n")
-    else ()
+    if (_paraview_static_plugins)
       target_link_libraries("${_paraview_build_TARGET}"
         INTERFACE
           ParaView::ClientServerCoreCore
-          ${_paraview_build_PLUGINS})
+          ${_paraview_static_plugins})
 
       set(_paraview_build_declarations)
       set(_paraview_build_calls)
-      foreach (_paraview_build_plugin IN LISTS _paraview_build_PLUGINS)
+      foreach (_paraview_build_plugin IN LISTS _paraview_static_plugins)
         string(APPEND _paraview_build_declarations
           "PV_PLUGIN_IMPORT_INIT(${_paraview_build_plugin});\n")
         string(APPEND _paraview_build_calls
@@ -395,6 +396,16 @@ bool ${_paraview_build_TARGET}_static_plugins_func(const char* name, bool load)
 
   ${_paraview_build_calls}
   return false;
+}
+
+#endif\n")
+    else ()
+      set(_paraview_build_include_content
+        "#ifndef ${_paraview_build_TARGET}_h
+#define ${_paraview_build_TARGET}_h
+
+void ${_paraview_build_TARGET}_initialize()
+{
 }
 
 #endif\n")
@@ -461,7 +472,9 @@ paraview_add_plugin(<name>
   [XML_DOCUMENTATION <ON|OFF>]
   [DOCUMENTATION_DIR <directory>]
 
-  [EXPORT <export>])
+  [EXPORT <export>]
+
+  [FORCE_STATIC <ON|OFF>])
 ```
 
   * `REQUIRED_ON_SERVER`: The plugin is required to be loaded on the server for
@@ -492,6 +505,8 @@ paraview_add_plugin(<name>
     files in this directory will be copied and made available to the
     documentation.
   * `EXPORT`: If provided, the plugin will be added to the given export set.
+  * `FORCE_STATIC`: (Defaults to `OFF`) If set, the plugin will be built
+    statically so that it can be embedded into an application.
 #]==]
 function (paraview_add_plugin name)
   if (NOT name STREQUAL _paraview_build_plugin)
@@ -502,7 +517,7 @@ function (paraview_add_plugin name)
 
   cmake_parse_arguments(_paraview_add_plugin
     "REQUIRED_ON_SERVER;REQUIRED_ON_CLIENT"
-    "VERSION;EULA;EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR"
+    "VERSION;EULA;EXPORT;XML_DOCUMENTATION;DOCUMENTATION_DIR;FORCE_STATIC"
     "REQUIRED_PLUGINS;SERVER_MANAGER_XML;SOURCES;MODULES;UI_INTERFACES;UI_RESOURCES;UI_FILES;PYTHON_MODULES;MODULE_FILES;MODULE_ARGS"
     ${ARGN})
 
@@ -519,6 +534,10 @@ function (paraview_add_plugin name)
 
   if (NOT DEFINED _paraview_add_plugin_XML_DOCUMENTATION)
     set(_paraview_add_plugin_XML_DOCUMENTATION ON)
+  endif ()
+
+  if (NOT DEFINED _paraview_add_plugin_FORCE_STATIC)
+    set(_paraview_add_plugin_FORCE_STATIC OFF)
   endif ()
 
   if (DEFINED _paraview_add_plugin_DOCUMENTATION_DIR AND
@@ -728,7 +747,7 @@ function (paraview_add_plugin name)
   if (_paraview_add_plugin_UI_RESOURCES)
     set(_paraview_add_plugin_with_resources 1)
     set(CMAKE_AUTORCC 1)
-    if (NOT BUILD_SHARED_LIBS)
+    if (NOT BUILD_SHARED_LIBS OR _paraview_add_plugin_FORCE_STATIC)
       foreach (_paraview_add_plugin_ui_resource IN LISTS _paraview_add_plugin_UI_RESOURCES)
         get_filename_component(_paraview_add_plugin_ui_resource_base "${_paraview_add_plugin_ui_resource}" NAME_WE)
         string(APPEND _paraview_add_plugin_resources_init
@@ -870,7 +889,7 @@ function (paraview_add_plugin name)
   string(APPEND CMAKE_LIBRARY_OUTPUT_DIRECTORY "/${_paraview_build_plugin}")
 
   set(_paraview_build_plugin_type MODULE)
-  if (NOT BUILD_SHARED_LIBS)
+  if (NOT BUILD_SHARED_LIBS OR _paraview_add_plugin_FORCE_STATIC)
     set(_paraview_build_plugin_type STATIC)
   endif ()
 
@@ -882,7 +901,7 @@ function (paraview_add_plugin name)
     ${_paraview_add_plugin_ui_sources}
     ${_paraview_add_plugin_python_sources}
     ${_paraview_add_plugin_SOURCES})
-  if (NOT BUILD_SHARED_LIBS)
+  if (NOT BUILD_SHARED_LIBS OR _paraview_add_plugin_FORCE_STATIC)
     target_compile_definitions("${_paraview_build_plugin}"
       PRIVATE
         QT_STATICPLUGIN)
