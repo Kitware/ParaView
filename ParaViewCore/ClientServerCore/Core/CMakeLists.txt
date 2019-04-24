@@ -120,15 +120,6 @@ if (PARAVIEW_ENABLE_FPE)
   list(APPEND vtkPVOptions_defines
     PARAVIEW_ENABLE_FPE)
 endif ()
-if (PARAVIEW_WITH_SUPERBUILD_MESA)
-  list(APPEND vtkPVOptions_defines
-    PARAVIEW_WITH_SUPERBUILD_MESA)
-
-  if (PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
-    list(APPEND vtkPVOptions_defines
-      PARAVIEW_WITH_SUPERBUILD_MESA_SWR)
-  endif ()
-endif ()
 if (VTK_OPENGL_HAS_EGL)
   list(APPEND vtkPVOptions_defines
     VTK_OPENGL_HAS_EGL)
