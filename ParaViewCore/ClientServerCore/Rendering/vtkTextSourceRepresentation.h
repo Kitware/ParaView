@@ -28,6 +28,7 @@
 #include "vtkPVDataRepresentation.h"
 
 class vtk3DWidgetRepresentation;
+class vtkFlagpoleLabel;
 class vtkPolyData;
 class vtkPVCacheKeeper;
 
@@ -58,6 +59,21 @@ public:
    * Set the interactivity.
    */
   void SetInteractivity(bool);
+
+  /**
+   * Control how the text is rendered. Possible values include
+   * 0: render as a 3DWidgetRepresentation
+   * 1: Render as a FlagpoleLabel
+   */
+  void SetTextPropMode(int);
+
+  //@{
+  /**
+   * Set the FlagpoleLabel
+   */
+  void SetFlagpoleLabel(vtkFlagpoleLabel* val);
+  vtkGetObjectMacro(FlagpoleLabel, vtkFlagpoleLabel);
+  //@}
 
   /**
    * vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -104,6 +120,8 @@ protected:
   vtkPVCacheKeeper* CacheKeeper;
   vtkPolyData* DummyPolyData;
   vtk3DWidgetRepresentation* TextWidgetRepresentation;
+  vtkFlagpoleLabel* FlagpoleLabel;
+  int TextPropMode;
 
 private:
   vtkTextSourceRepresentation(const vtkTextSourceRepresentation&) = delete;

@@ -19,6 +19,7 @@
 #include "vtkAbstractWidget.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkFlagpoleLabel.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -26,6 +27,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
+#include "vtkRenderer.h"
 #include "vtkTable.h"
 #include "vtkTextRepresentation.h"
 #include "vtkVariant.h"
@@ -48,10 +50,15 @@ std::string vtkExtractString(vtkDataObject* data)
 vtkStandardNewMacro(vtkTextSourceRepresentation);
 vtkCxxSetObjectMacro(
   vtkTextSourceRepresentation, TextWidgetRepresentation, vtk3DWidgetRepresentation);
+vtkCxxSetObjectMacro(vtkTextSourceRepresentation, FlagpoleLabel, vtkFlagpoleLabel);
+
 //----------------------------------------------------------------------------
 vtkTextSourceRepresentation::vtkTextSourceRepresentation()
 {
-  this->TextWidgetRepresentation = 0;
+  this->TextPropMode = 0;
+  this->TextWidgetRepresentation = nullptr;
+  // this->FlagpoleLabel = vtkFlagpoleLabel::New();
+  this->FlagpoleLabel = nullptr;
 
   this->CacheKeeper = vtkPVCacheKeeper::New();
 
@@ -68,7 +75,8 @@ vtkTextSourceRepresentation::vtkTextSourceRepresentation()
 //----------------------------------------------------------------------------
 vtkTextSourceRepresentation::~vtkTextSourceRepresentation()
 {
-  this->SetTextWidgetRepresentation(0);
+  this->SetFlagpoleLabel(nullptr);
+  this->SetTextWidgetRepresentation(nullptr);
   this->DummyPolyData->Delete();
   this->CacheKeeper->Delete();
 }
@@ -81,6 +89,11 @@ void vtkTextSourceRepresentation::SetVisibility(bool val)
   {
     this->TextWidgetRepresentation->GetRepresentation()->SetVisibility(val);
     this->TextWidgetRepresentation->SetEnabled(val);
+  }
+
+  if (this->FlagpoleLabel && this->TextPropMode == 1)
+  {
+    this->FlagpoleLabel->SetVisibility(val);
   }
 }
 
@@ -104,9 +117,18 @@ int vtkTextSourceRepresentation::FillInputPortInformation(int, vtkInformation* i
 //----------------------------------------------------------------------------
 bool vtkTextSourceRepresentation::AddToView(vtkView* view)
 {
-  if (this->TextWidgetRepresentation)
+  if (this->TextWidgetRepresentation /*&& this->TextPropMode == 0*/)
   {
     view->AddRepresentation(this->TextWidgetRepresentation);
+  }
+  if (this->FlagpoleLabel /*&& this->TextPropMode == 1*/)
+  {
+    vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
+    if (pvview)
+    {
+      vtkRenderer* activeRenderer = pvview->GetRenderer();
+      activeRenderer->AddActor(this->FlagpoleLabel);
+    }
   }
   return this->Superclass::AddToView(view);
 }
@@ -117,6 +139,15 @@ bool vtkTextSourceRepresentation::RemoveFromView(vtkView* view)
   if (this->TextWidgetRepresentation)
   {
     view->RemoveRepresentation(this->TextWidgetRepresentation);
+  }
+  if (this->FlagpoleLabel)
+  {
+    vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
+    if (pvview)
+    {
+      vtkRenderer* activeRenderer = pvview->GetRenderer();
+      activeRenderer->RemoveActor(this->FlagpoleLabel);
+    }
   }
   return this->Superclass::RemoveFromView(view);
 }
@@ -190,16 +221,34 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
 
     std::string text =
       vtkExtractString(producerPort->GetProducer()->GetOutputDataObject(producerPort->GetIndex()));
-    vtkTextRepresentation* repr = vtkTextRepresentation::SafeDownCast(
-      this->TextWidgetRepresentation ? this->TextWidgetRepresentation->GetRepresentation() : NULL);
+    vtkTextRepresentation* repr = vtkTextRepresentation::SafeDownCast(this->TextWidgetRepresentation
+        ? this->TextWidgetRepresentation->GetRepresentation()
+        : nullptr);
     if (repr)
     {
       repr->SetText(text.c_str());
-      repr->SetVisibility(text.empty() ? 0 : 1);
+      repr->SetVisibility(text.empty() ? 0 : this->TextPropMode == 0);
+    }
+    if (this->FlagpoleLabel)
+    {
+      this->FlagpoleLabel->SetInput(text.c_str());
+      this->FlagpoleLabel->SetVisibility(text.empty() ? 0 : this->TextPropMode == 1);
     }
   }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkTextSourceRepresentation::SetTextPropMode(int val)
+{
+  if (this->TextPropMode == val)
+  {
+    return;
+  }
+
+  this->TextPropMode = val;
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
