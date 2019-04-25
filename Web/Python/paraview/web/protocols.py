@@ -429,8 +429,8 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
     def __init__(self, decode=True, **kwargs):
         ParaViewWebProtocol.__init__(self)
         self.trackingViews = {}
-        self.lastStaleTime = 0
-        self.staleHandlerCount = 0
+        self.lastStaleTime = {}
+        self.staleHandlerCount = {}
         self.deltaStaleTimeBeforeRender = 0.5 # 0.5s
         self.decode = decode
         self.viewsInAnimations = []
@@ -476,23 +476,23 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             reply["id"] = vId
             self.publish('viewport.image.push.subscription', reply)
         if stale:
-            self.lastStaleTime = time.time()
-            if self.staleHandlerCount == 0:
-                self.staleHandlerCount += 1
+            self.lastStaleTime[vId] = time.time()
+            if self.staleHandlerCount[vId] == 0:
+                self.staleHandlerCount[vId] += 1
                 reactor.callLater(self.deltaStaleTimeBeforeRender, lambda: self.renderStaleImage(vId))
         else:
-            self.lastStaleTime = 0
+            self.lastStaleTime[vId] = 0
 
 
     def renderStaleImage(self, vId):
-        self.staleHandlerCount -= 1
+        self.staleHandlerCount[vId] -= 1
 
-        if self.lastStaleTime != 0:
-            delta = (time.time() - self.lastStaleTime)
+        if self.lastStaleTime[vId] != 0:
+            delta = (time.time() - self.lastStaleTime[vId])
             if delta >= self.deltaStaleTimeBeforeRender:
                 self.pushRender(vId)
             else:
-                self.staleHandlerCount += 1
+                self.staleHandlerCount[vId] += 1
                 reactor.callLater(self.deltaStaleTimeBeforeRender - delta + 0.001, lambda: self.renderStaleImage(vId))
 
 
@@ -663,6 +663,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             tagStop = self.getApplication().AddObserver('EndInteractionEvent', stopCallback)
             # TODO do we need self.getApplication().AddObserver('ResetActiveView', resetActiveView())
             self.trackingViews[realViewId] = { 'tags': [tag, tagStart, tagStop], 'observerCount': 1, 'mtime': 0, 'enabled': True, 'quality': 100, 'streaming': sView.GetClientSideObject().GetEnableStreaming() }
+            self.staleHandlerCount[realViewId] = 0
         else:
             # There is an observer on this view already
             self.trackingViews[realViewId]['observerCount'] += 1
@@ -692,6 +693,7 @@ class ParaViewWebPublishImageDelivery(ParaViewWebProtocol):
             for tag in observerInfo['tags']:
                 self.getApplication().RemoveObserver(tag)
             del self.trackingViews[realViewId]
+            del self.staleHandlerCount[realViewId]
 
         return { 'result': 'success' }
 
