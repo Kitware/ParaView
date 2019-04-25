@@ -135,6 +135,9 @@ set(classes
   pqModelTransformSupportBehavior
   pqMoleculePropertyWidget
   pqMultiComponentsDecorator
+  pqMaterialAttributesDelegate
+  pqMaterialEditor
+  pqNewMaterialDialog
   pqObjectPickingBehavior
   pqOMETransferFunctionsPropertyWidget
   pqOpacityTableModel
@@ -257,10 +260,12 @@ set(ui_files
   Resources/UI/pqLightPropertyWidget.ui
   Resources/UI/pqLinePropertyWidget.ui
   Resources/UI/pqMainControlsToolbar.ui
+  Resources/UI/pqMaterialEditor.ui
   Resources/UI/pqMoleculePropertyWidget.ui
   Resources/UI/pqOMETransferFunctionsPropertyWidget.ui
   Resources/UI/pqOMETransferFunctionsPropertyWidgetPage.ui
   Resources/UI/pqPropertyCollectionWidget.ui
+  Resources/UI/pqNewMaterialDialog.ui
   Resources/UI/pqResetScalarRangeToDataOverTime.ui
   Resources/UI/pqSavePresetOptions.ui
   Resources/UI/pqSeriesEditorPropertyWidget.ui

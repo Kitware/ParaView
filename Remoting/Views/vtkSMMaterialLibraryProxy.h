@@ -49,14 +49,9 @@ public:
    */
   void LoadMaterials(const char*);
 
-  /**
-   * Overridden to control load from server file system.
-   */
-  void UpdateVTKObjects() override;
-
 protected:
-  vtkSMMaterialLibraryProxy();
-  ~vtkSMMaterialLibraryProxy() override;
+  vtkSMMaterialLibraryProxy() = default;
+  ~vtkSMMaterialLibraryProxy() override = default;
 
 private:
   vtkSMMaterialLibraryProxy(const vtkSMMaterialLibraryProxy&) = delete;

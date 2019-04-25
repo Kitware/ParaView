@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqTextureSelectorPropertyWidget.h
+   Module:    pqNewMaterialDialog.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,50 +29,42 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef pqNewMaterialDialog_h
+#define pqNewMaterialDialog_h
 
-#ifndef _pqTextureSelectorPropertyWidget_h
-#define _pqTextureSelectorPropertyWidget_h
+#include "pqApplicationComponentsModule.h"
+#include "pqDialog.h"
 
-#include "pqComponentsModule.h"
+class vtkOSPRayMaterialLibrary;
 
-#include "pqPropertyWidget.h"
-#include "vtkNew.h"
-
-/**
-* Property widget for selecting the texture to apply to a surface.
-*
-* To use this widget for a property add the 'panel_widget="texture_selector"'
-* to the property's XML.
-*/
-class vtkSMProxyGroupDomain;
-class pqTextureComboBox;
-class pqDataRepresentation;
-class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqNewMaterialDialog : public pqDialog
 {
   Q_OBJECT
-  Q_PROPERTY(QString selectedName READ selectedName USER true);
+  typedef pqDialog Superclass;
 
 public:
-  pqTextureSelectorPropertyWidget(vtkSMProxy* proxy, vtkSMProperty* property, QWidget* parent = 0);
-  ~pqTextureSelectorPropertyWidget() override = default;
+  pqNewMaterialDialog(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  ~pqNewMaterialDialog() override;
 
-  /**
-   * Get the selected texture name.
-   */
-  const QString& selectedName() const;
+  void setMaterialLibrary(vtkOSPRayMaterialLibrary* lib);
 
-protected slots:
-  void onTextureChanged(vtkSMProxy* texture);
-  void onPropertyChanged();
-  void checkAttributes(bool tcoords, bool tangents);
+  const QString& name() { return this->Name; }
+  const QString& type() { return this->Type; }
+
+public slots:
+  void accept() override;
+
+protected:
+  vtkOSPRayMaterialLibrary* MaterialLibrary;
+
+  QString Name;
+  QString Type;
 
 private:
-  vtkNew<vtkEventQtSlotConnect> VTKConnector;
-  pqTextureComboBox* Selector;
-  vtkSMProxyGroupDomain* Domain;
-  pqDataRepresentation* Representation = nullptr;
-  pqView* View = nullptr;
-  QString SelectedName;
+  Q_DISABLE_COPY(pqNewMaterialDialog)
+  class pqInternals;
+  pqInternals* Internals;
+  friend class pqInternals;
 };
 
-#endif // _pqTextureSelectorPropertyWidget_h
+#endif

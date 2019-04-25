@@ -272,6 +272,18 @@
    </attribute>
    <widget class="pqColorMapEditor" name="colorMapEditorPanel"/>
   </widget>
+  <widget class="QDockWidget" name="materialEditorDock">
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Material Editor</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="pqMaterialEditor" name="materialEditorPanel"/>
+  </widget>
   <widget class="QDockWidget" name="displayPropertiesDock">
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
@@ -490,6 +502,12 @@
    <class>pqOutputWidget</class>
    <extends>QWidget</extends>
    <header>pqOutputWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqMaterialEditor</class>
+   <extends>QWidget</extends>
+   <header>pqMaterialEditor.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

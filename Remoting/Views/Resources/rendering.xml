@@ -305,6 +305,23 @@
         values are mapped to a generic color map.</Documentation>
       </IntVectorProperty>
     </Proxy>
+    <Proxy class="vtkTexture"
+           name="ImageDataTexture"
+           si_class="vtkSIImageTextureProxy"
+           processes="client|renderserver|dataserver">
+      <Documentation>This is a proxy for a vtkTexture that includes an image
+        algorithm. In contrast to proxy ImageTexture, ImageDataTexture allows
+        to pass a vtkImageData directly without reading a file and transmit it
+        to the client/render server to be used for texturing. </Documentation>
+      <SubProxy>
+        <Proxy name="Source"
+               proxygroup="sources"
+               proxyname="NetworkImageData" />
+        <ExposedProperties>
+          <Property name="Input" />
+        </ExposedProperties>
+      </SubProxy>
+    </Proxy>
   </ProxyGroup>
   <ProxyGroup name="props">
     <Proxy class="vtkTextActor"
@@ -762,16 +779,51 @@
   </ProxyGroup>
 
   <ProxyGroup name="materials">
+
+    <Proxy class="vtkPVMaterial"
+                 name="Material"
+                 processes="client|renderserver|dataserver">
+      <StringVectorProperty
+          name="Name"
+          command="SetName"
+          animateable="0"
+          panel_visibility="never"
+          number_of_elements="1">
+      </StringVectorProperty>
+      <StringVectorProperty
+          name="Type"
+          command="SetType"
+          animateable="0"
+          panel_visibility="never"
+          number_of_elements="1">
+      </StringVectorProperty>
+      <StringVectorProperty
+                 name="DoubleVariables"
+                 command="AddVariable"
+                 clean_command="RemoveAllVariables"
+                 number_of_elements_per_command="2"
+                 element_types="2 2"
+                 panel_visibility="never"
+                 repeat_command="1">
+      </StringVectorProperty>
+      <ProxyProperty command="SetTexture"
+                     name="CurrentTexture">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+
     <MaterialLibraryProxy class="vtkPVMaterialLibrary"
                  name="MaterialLibrary"
                  processes="client|renderserver|dataserver">
-      <StringVectorProperty
-                 default_values=""
-                 label="Load Materials"
-                 name="LoadMaterials"
-                 number_of_elements="1"
-                 panel_visibility="never">
-      </StringVectorProperty>
+      <ProxyProperty command="AddMaterial"
+                     name="Materials"
+                     remove_command="RemoveMaterial"
+                     repeatable="1">
+      </ProxyProperty>
     </MaterialLibraryProxy>
   </ProxyGroup>
+
+
 </ServerManagerConfiguration>

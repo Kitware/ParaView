@@ -41,6 +41,7 @@ set(classes
   vtkLZ4Compressor
   vtkMarkSelectedRows
   vtkMPIMoveData
+  vtkNetworkImageData
   vtkNetworkImageSource
   vtkOrderedCompositeDistributor
   vtkPVGeometryFilter

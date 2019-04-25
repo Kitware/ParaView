@@ -26,6 +26,9 @@
 #include "vtkRemotingViewsModule.h" //needed for exports
 
 #include "vtkObject.h"
+
+class vtkPVMaterial;
+
 class VTKREMOTINGVIEWS_EXPORT vtkPVMaterialLibrary : public vtkObject
 {
 public:
@@ -65,6 +68,10 @@ public:
    * Defer to contained MaterialLibrary
    */
   bool ReadBuffer(const char*);
+
+  void AddMaterial(vtkPVMaterial* material);
+
+  void RemoveMaterial(vtkPVMaterial* material);
 
 protected:
   vtkPVMaterialLibrary();

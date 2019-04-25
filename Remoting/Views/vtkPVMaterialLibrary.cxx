@@ -17,6 +17,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
+#include "vtkPVMaterial.h"
 #include "vtkProcessModule.h"
 #include "vtkResourceFileLocator.h"
 #include "vtkVersion.h"
@@ -170,5 +171,26 @@ const char* vtkPVMaterialLibrary::WriteBuffer()
   return vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary())->WriteBuffer();
 #else
   return nullptr;
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMaterialLibrary::AddMaterial(vtkPVMaterial* material)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+
+  vtkOSPRayMaterialLibrary* l = vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary());
+  l->AddMaterial(material->GetName(), material->GetType());
+  l->Fire();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMaterialLibrary::RemoveMaterial(vtkPVMaterial* material)
+{
+#if VTK_MODULE_ENABLE_VTK_RenderingRayTracing
+  vtkOSPRayMaterialLibrary* l = vtkOSPRayMaterialLibrary::SafeDownCast(this->GetMaterialLibrary());
+  l->RemoveMaterial(material->GetName());
+  l->Fire();
 #endif
 }

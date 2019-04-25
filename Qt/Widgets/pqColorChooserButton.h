@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PQWIDGETS_EXPORT pqColorChooserButton : public QToolButton
 {
   Q_OBJECT
-  Q_PROPERTY(QColor chosenColor READ chosenColor WRITE setChosenColor);
+  Q_PROPERTY(QColor chosenColor READ chosenColor WRITE setChosenColor USER true);
   Q_PROPERTY(QVariantList chosenColorRgbF READ chosenColorRgbF WRITE setChosenColorRgbF);
   Q_PROPERTY(QVariantList chosenColorRgbaF READ chosenColorRgbaF WRITE setChosenColorRgbaF);
   Q_PROPERTY(bool showAlphaChannel READ showAlphaChannel WRITE setShowAlphaChannel);

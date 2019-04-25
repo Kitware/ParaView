@@ -125,7 +125,9 @@ void pqTextureSelectorPropertyWidget::onTextureChanged(vtkSMProxy* texture)
 void pqTextureSelectorPropertyWidget::onPropertyChanged()
 {
   bool block = this->blockSignals(true);
-  this->Selector->updateFromTexture(vtkSMPropertyHelper(this->property()).GetAsProxy());
+  vtkSMProxy* proxy = vtkSMPropertyHelper(this->property()).GetAsProxy();
+  this->Selector->updateFromTexture(proxy);
+  this->SelectedName = this->Domain->GetProxyName(proxy);
   this->blockSignals(block);
 }
 
@@ -158,4 +160,9 @@ void pqTextureSelectorPropertyWidget::checkAttributes(bool tcoords, bool tangent
   {
     this->setToolTip("");
   }
+}
+
+const QString& pqTextureSelectorPropertyWidget::selectedName() const
+{
+  return this->SelectedName;
 }
