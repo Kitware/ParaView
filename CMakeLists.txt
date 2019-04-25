@@ -683,6 +683,12 @@ endif ()
 set(paraview_cmake_destination
   "${CMAKE_INSTALL_LIBDIR}/cmake/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
 
+# Search for dependent libraries beside
+set(_paraview_CMAKE_INSTALL_RPATH_save
+  "${CMAKE_INSTALL_RPATH}")
+list(APPEND CMAKE_INSTALL_RPATH
+  "$ORIGIN")
+
 if (PARAVIEW_USE_EXTERNAL_VTK)
   if (paraview_required_modules OR paraview_unrecognized_modules)
     message(FATAL_ERROR
@@ -843,6 +849,9 @@ paraview_plugin_build(
   PLUGINS_FILE_NAME ".plugins"
   TARGET  paraview_plugins
   PLUGINS ${paraview_plugins})
+
+set(CMAKE_INSTALL_RPATH
+  "${_paraview_CMAKE_INSTALL_RPATH_save}")
 
 vtk_module_wrap_client_server(
   MODULES   ${paraview_modules}

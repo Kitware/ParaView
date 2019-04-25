@@ -38,7 +38,6 @@ paraview_client_add(
   [BUNDLE_DESTINATION   <directory>]
   [RUNTIME_DESTINATION  <directory>]
   [LIBRARY_DESTINATION  <directory>]
-  [FORWARD_EXECUTABLE   <ON|OFF>]
 ```
 
   * `NAME`: (Required) The name of the application. This is used as the target
@@ -77,16 +76,14 @@ paraview_client_add(
     bundle executable.
   * `RUNTIME_DESTINATION`: (Defaults to `${CMAKE_INSTALL_BINDIR}`) Where to
     place the binary.
-  * `LIBRARY_DESTINATION`: (Defaults to `${CMAKE_INSTALL_LIBDIR}`) Where to
-    place libraries. Only used if `FORWARD_EXECUTABLE` is `ON`.
-  * `FORWARD_EXECUTABLE`: (Deprecated) (Defaults to `OFF`) On non-macOS Unix
-    platforms, create a binary to set up `LD_LIBRARY_PATH` for the real
-    executable.
+  * `LIBRARY_DESTINATION`: (Defaults to `${CMAKE_INSTALL_LIBDIR}`) Where
+    libraries are placed. Sets up `RPATH` on ELF platforms (e.g., Linux and the
+    BSD family).
 #]==]
 function (paraview_client_add)
   cmake_parse_arguments(_paraview_client
     ""
-    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;FORWARD_EXECUTABLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT"
+    "NAME;APPLICATION_NAME;ORGANIZATION;TITLE;SPLASH_IMAGE;BUNDLE_DESTINATION;BUNDLE_ICON;BUNDLE_PLIST;APPLICATION_ICON;MAIN_WINDOW_CLASS;MAIN_WINDOW_INCLUDE;VERSION;FORCE_UNIX_LAYOUT;PLUGINS_TARGET;DEFAULT_STYLE;RUNTIME_DESTINATION;LIBRARY_DESTINATION;NAMESPACE;EXPORT"
     "REQUIRED_PLUGINS;OPTIONAL_PLUGINS;APPLICATION_XMLS;SOURCES;QCH_FILE"
     ${ARGN})
 
@@ -146,12 +143,6 @@ function (paraview_client_add)
   if (NOT DEFINED _paraview_client_LIBRARY_DESTINATION)
     set(_paraview_client_LIBRARY_DESTINATION
       "${CMAKE_INSTALL_LIBDIR}")
-  endif ()
-
-  if (NOT DEFINED _paraview_client_FORWARD_EXECUTABLE)
-    #message(DEPRECATION
-    #  "The `FORWARD_EXECUTABLE` argument is deprecated.")
-    set(_paraview_client_FORWARD_EXECUTABLE OFF)
   endif ()
 
   if (NOT DEFINED _paraview_client_MAIN_WINDOW_CLASS)
@@ -307,6 +298,19 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     "${CMAKE_CURRENT_BINARY_DIR}/pq${_paraview_client_NAME}Initializer.h"
     @ONLY)
 
+  # Set up rpaths
+  set(CMAKE_BUILD_RPATH_USE_ORIGIN 1)
+  if (UNIX AND NOT APPLE)
+    file(RELATIVE_PATH _paraview_client_relpath
+      "/prefix/${_paraview_client_RUNTIME_DESTINATION}"
+      "/prefix/${_paraview_client_LIBRARY_DESTINATION}")
+    set(_paraview_client_origin_rpath
+      "$ORIGIN/${_paraview_client_relpath}")
+
+    list(APPEND CMAKE_INSTALL_RPATH
+      "${_paraview_client_origin_rpath}")
+  endif ()
+
   if (_paraview_client_resource_files)
     source_group("resources"
       FILES
@@ -338,53 +342,6 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
         "${_paraview_client_PLUGINS_TARGET}")
   endif ()
 
-  # Set up the forwarding executable
-  set(_paraview_client_destination "${_paraview_client_RUNTIME_DESTINATION}")
-  if (BUILD_SHARED_LIBS AND UNIX AND NOT APPLE AND _paraview_client_FORWARD_EXECUTABLE)
-    set(_paraview_client_build_dir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-    set(_paraview_client_build_path "\"${_paraview_client_build_dir}\"")
-    foreach (_paraview_client_build_path_dir IN LISTS )
-      string(APPEND _paraview_client_build_path
-        ",\"${_paraview_client_build_path_dir}\"")
-    endforeach ()
-    set(_paraview_client_install_dir "../${_paraview_client_LIBRARY_DESTINATION}")
-    set(_paraview_client_install_path "\"${_paraview_client_install_dir}\"")
-    foreach (_paraview_client_install_path_dir IN LISTS )
-      string(APPEND _paraview_client_install_path
-        ",\"${_paraview_client_install_path_dir}\"")
-    endforeach ()
-
-    # Set up variables expected in paraview_launcher.c.in
-    foreach(suffix build_dir build_path install_dir install_path NAME)
-      set(_paraview_launcher_${suffix} ${_paraview_client_${suffix}})
-    endforeach ()
-
-    configure_file(
-      "${_ParaViewClient_cmake_dir}/paraview_launcher.c.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_client_NAME}_launcher.c"
-      @ONLY)
-    add_executable("${_paraview_client_NAME}-launcher"
-      "${CMAKE_CURRENT_BINARY_DIR}/${_paraview_client_NAME}_launcher.c")
-    # https://gitlab.kitware.com/cmake/cmake/issues/18049
-    #target_link_libraries("${_paraview_client_NAME}-launcher"
-    #  PRIVATE
-    #    VTK::vtksys)
-    target_include_directories("${_paraview_client_NAME}-launcher"
-      PRIVATE
-        "$<TARGET_PROPERTY:VTK::vtksys,INTERFACE_INCLUDE_DIRECTORIES>")
-    set_target_properties("${_paraview_client_NAME}-launcher"
-      PROPERTIES
-        OUTPUT_NAME               "${_paraview_client_NAME}"
-        RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/launcher")
-    add_dependencies("${_paraview_client_NAME}-launcher"
-      "${_paraview_client_NAME}")
-
-    install(
-      TARGETS "${_paraview_client_NAME}-launcher"
-      RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}")
-    set(_paraview_client_destination "${_paraview_client_LIBRARY_DESTINATION}")
-  endif ()
-
   set(_paraview_client_export)
   if (DEFINED _paraview_client_EXPORT)
     set(_paraview_client_export
@@ -395,7 +352,7 @@ IDI_ICON1 ICON \"${_paraview_client_APPLICATION_ICON}\"\n")
     TARGETS "${_paraview_client_NAME}"
     ${_paraview_client_export}
     ${_paraview_client_bundle_args}
-    RUNTIME DESTINATION "${_paraview_client_destination}")
+    RUNTIME DESTINATION "${_paraview_client_RUNTIME_DESTINATION}")
 
   if (APPLE)
     if (DEFINED _paraview_client_BUNDLE_ICON)
