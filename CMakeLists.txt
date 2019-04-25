@@ -680,8 +680,26 @@ if (paraview_unrecognized_paraview_modules)
     "${paraview_unrecognized_paraview_modules}.")
 endif ()
 
+option(PARAVIEW_VERSIONED_INSTALL "Install artifacts with versioned names." ON)
+mark_as_advanced(PARAVIEW_VERSIONED_INSTALL)
+set(paraview_version_suffix "")
+if (PARAVIEW_VERSIONED_INSTALL)
+  set(paraview_version_suffix "-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
+endif ()
+
 set(paraview_cmake_destination
-  "${CMAKE_INSTALL_LIBDIR}/cmake/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
+  "${CMAKE_INSTALL_LIBDIR}/cmake/paraview${paraview_version_suffix}")
+
+set(PARAVIEW_CUSTOM_LIBRARY_SUFFIX "<DEFAULT>"
+  CACHE STRING "Custom library file name suffix (defaults to the version number)")
+mark_as_advanced(PARAVIEW_CUSTOM_LIBRARY_SUFFIX)
+if (PARAVIEW_CUSTOM_LIBRARY_SUFFIX STREQUAL "<DEFAULT>")
+  if (PARAVIEW_VERSIONED_INSTALL)
+    set(PARAVIEW_CUSTOM_LIBRARY_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
+  else ()
+    set(PARAVIEW_CUSTOM_LIBRARY_SUFFIX "")
+  endif ()
+endif ()
 
 # Search for dependent libraries beside
 set(_paraview_CMAKE_INSTALL_RPATH_save
@@ -786,10 +804,10 @@ else ()
     KITS                ${vtk_kits}
     PACKAGE             VTK
     INSTALL_EXPORT      VTK
-    HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+    HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
     CMAKE_DESTINATION   "${paraview_cmake_destination}/vtk"
     HIERARCHY_DESTINATION "${CMAKE_INSTALL_LIBDIR}/vtk/hierarchy/${CMAKE_PROJECT_NAME}"
-    LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+    LIBRARY_NAME_SUFFIX "${PARAVIEW_CUSTOM_LIBRARY_SUFFIX}"
     VERSION             "${PARAVIEW_VERSION}"
     SOVERSION           "1"
     TEST_DATA_TARGET    ParaViewData
@@ -822,10 +840,10 @@ vtk_module_build(
   MODULES             ${paraview_modules}
   KITS                ${paraview_kits}
   INSTALL_EXPORT      ParaView
-  HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  HEADERS_DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/paraview${paraview_version_suffix}"
   CMAKE_DESTINATION   "${paraview_cmake_destination}"
   HIERARCHY_DESTINATION "${CMAKE_INSTALL_LIBDIR}/vtk/hierarchy/${CMAKE_PROJECT_NAME}"
-  LIBRARY_NAME_SUFFIX "pv${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
+  LIBRARY_NAME_SUFFIX "${PARAVIEW_CUSTOM_LIBRARY_SUFFIX}"
   VERSION             "${PARAVIEW_VERSION}"
   SOVERSION           "1"
   TEST_DATA_TARGET    ParaViewData
@@ -845,7 +863,7 @@ vtk_module_json(
 paraview_plugin_build(
   RUNTIME_DESTINATION   "${CMAKE_INSTALL_BINDIR}"
   LIBRARY_DESTINATION   "${CMAKE_INSTALL_LIBDIR}"
-  LIBRARY_SUBDIRECTORY  "paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}/plugins"
+  LIBRARY_SUBDIRECTORY  "paraview${paraview_version_suffix}/plugins"
   PLUGINS_FILE_NAME ".plugins"
   TARGET  paraview_plugins
   PLUGINS ${paraview_plugins})
