@@ -42,6 +42,7 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkRenderPass.h"
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
+#include <memory>                     // for std::unique_pt
 
 class vtkMultiProcessController;
 class vtkPartitionOrderingInterface;
@@ -289,15 +290,7 @@ protected:
   vtkTextureObject* ZTexture;
   vtkOpenGLHelper* Program;
 
-  // Stereo Render support requires us
-  // to have to raw image one for each eye so that we
-  // don't overwrite the left eye with the right eyes image
-  // will point at the last rendered eye
-  vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
-
-  // actual rendered raw images for stereo. Left Eye is index 0
-  // and Right Eye is index 1
-  vtkSynchronizedRenderers::vtkRawImage* LastRenderedEyes[2];
+  std::unique_ptr<vtkSynchronizedRenderers::vtkRawImage> LastRenderedRGBAColors;
 
 private:
   vtkIceTCompositePass(const vtkIceTCompositePass&) = delete;

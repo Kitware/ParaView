@@ -139,9 +139,7 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->RenderEmptyImages = false;
   this->UseOrderedCompositing = false;
 
-  this->LastRenderedEyes[0] = new vtkSynchronizedRenderers::vtkRawImage();
-  this->LastRenderedEyes[1] = new vtkSynchronizedRenderers::vtkRawImage();
-  this->LastRenderedRGBAColors = this->LastRenderedEyes[0];
+  this->LastRenderedRGBAColors.reset(new vtkSynchronizedRenderers::vtkRawImage());
 
   this->PBO = 0;
   this->ZTexture = 0;
@@ -173,12 +171,7 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
   this->SetController(0);
   this->IceTContext->Delete();
   this->IceTContext = 0;
-
-  delete this->LastRenderedEyes[0];
-  delete this->LastRenderedEyes[1];
-  this->LastRenderedEyes[0] = nullptr;
-  this->LastRenderedEyes[1] = nullptr;
-  this->LastRenderedRGBAColors = nullptr;
+  this->LastRenderedRGBAColors.reset();
 }
 
 //----------------------------------------------------------------------------
@@ -433,15 +426,6 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   // isolate vtk from IceT OpenGL errors
   vtkOpenGLClearErrorMacro();
 
-  vtkRenderer* ren = render_state->GetRenderer();
-  if (ren->GetRenderWindow()->GetStereoRender() == 1)
-  {
-    // if we are doing a stereo render we need to know
-    // which stereo eye we are currently rendering. If we don't do this
-    // we will overwrite the left eye with the right eye image
-    int eyeIndex = render_state->GetRenderer()->GetActiveCamera()->GetLeftEye() == 1 ? 0 : 1;
-    this->LastRenderedRGBAColors = this->LastRenderedEyes[eyeIndex];
-  }
   IceTEnum const format =
     this->EnableFloatValuePass ? ICET_IMAGE_COLOR_RGBA_FLOAT : ICET_IMAGE_COLOR_RGBA_UBYTE;
 
