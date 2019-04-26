@@ -268,7 +268,7 @@ protected:
   /**
    * Reduce the max value between all participating processes.
    */
-  void AllReduceMAX(const vtkTypeUInt64 source, vtkTypeUInt64& dest);
+  void AllReduceMAX(const vtkTypeUInt64 source, vtkTypeUInt64& dest, bool skip_data_server = false);
 
   /**
    * Overridden to check that the representation has View setup properly. Older

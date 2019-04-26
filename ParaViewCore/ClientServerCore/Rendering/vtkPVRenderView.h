@@ -953,6 +953,12 @@ public:
    */
   void ScaleRendererViewports(const double viewport[4]) override;
 
+  /**
+   * This is used by vtkPVHardwareSelector to synchronize element ids between
+   * all ranks involved in selection.
+   */
+  void SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* maxCellId);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView() override;

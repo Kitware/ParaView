@@ -380,6 +380,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->LastSelection = NULL;
   this->UseInteractiveRenderingForScreenshots = false;
   this->Selector = vtkPVHardwareSelector::New();
+  this->Selector->SetView(this); // not reference counted.
   this->NeedsOrderedCompositing = false;
   this->RenderEmptyImages = false;
   this->UseFXAA = false;
@@ -3332,4 +3333,22 @@ void vtkPVRenderView::ScaleRendererViewports(const double viewport[4])
   this->OrientationWidget->SetViewport(viewport[0], viewport[1],
     viewport[0] + 0.25 * (viewport[2] - viewport[0]),
     viewport[1] + 0.25 * (viewport[3] - viewport[1]));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SynchronizeMaximumIds(vtkIdType* maxPointId, vtkIdType* maxCellId)
+{
+  if (this->SynchronizedRenderers->GetEnabled())
+  {
+    vtkTypeUInt64 ptid = static_cast<vtkTypeUInt64>(*maxPointId);
+    vtkTypeUInt64 cellid = static_cast<vtkTypeUInt64>(*maxCellId);
+
+    // skip data server since this method is only called on processes involved
+    // in rendering.
+    this->AllReduceMAX(ptid, ptid, /*skip_data_server=*/true);
+    this->AllReduceMAX(cellid, cellid, /*skip_data_server=*/true);
+
+    *maxPointId = static_cast<vtkIdType>(ptid);
+    *maxCellId = static_cast<vtkIdType>(cellid);
+  }
 }

@@ -637,7 +637,8 @@ void vtkPVView::AllReduce(const vtkBoundingBox& arg_source, vtkBoundingBox& dest
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVView::AllReduceMAX(const vtkTypeUInt64 arg_source, vtkTypeUInt64& dest)
+void vtkPVView::AllReduceMAX(
+  const vtkTypeUInt64 arg_source, vtkTypeUInt64& dest, bool skip_data_server)
 {
   assert(this->Session);
   vtkVLogScopeF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "all-reduce-max");
@@ -660,7 +661,7 @@ void vtkPVView::AllReduceMAX(const vtkTypeUInt64 arg_source, vtkTypeUInt64& dest
 
   auto crController = this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
   auto cdController = this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT);
-  if (crController == cdController)
+  if (skip_data_server || (crController == cdController))
   {
     cdController = nullptr;
   }

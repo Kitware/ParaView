@@ -18,10 +18,12 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVLogger.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVRenderViewSettings.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
+#include "vtkWeakPointer.h"
 
 #include <map>
 
@@ -39,6 +41,8 @@ class vtkPVHardwareSelector::vtkInternals
 public:
   typedef std::map<void*, int> PropMapType;
   PropMapType PropMap;
+
+  vtkWeakPointer<vtkPVRenderView> View;
 };
 
 //----------------------------------------------------------------------------
@@ -61,23 +65,33 @@ vtkPVHardwareSelector::~vtkPVHardwareSelector()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVHardwareSelector::SetView(vtkPVRenderView* view)
+{
+  this->Internals->View = view;
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::PassRequired(int pass)
 {
+  // To ensure all processes make consistent decisions about which passes to
+  // render, we need to make sure all processes have the same values for
+  // MaximumPointId and MaximumCellId. These are set in Iteration 0,
+  // pass MIN_KNOWN_PASS. So the first pass after that, we tell the view to sync
+  // up those values.
+  if (this->Iteration == 0 && pass == (MIN_KNOWN_PASS + 1))
+  {
+    if (auto view = this->Internals->View)
+    {
+      view->SynchronizeMaximumIds(&this->MaximumPointId, &this->MaximumCellId);
+    }
+  }
+
   if (pass == PROCESS_PASS && this->Iteration == 0)
   {
     return true;
   }
 
-  vtkIdType passRequiredValue = this->Superclass::PassRequired(pass) ? 1 : 0;
-
-  // FIXME:
-  //// synchronize the value among all active processes (BUG #14112).
-  // if (this->View)
-  //{
-  //  this->View->Reduce(passRequiredValue, vtkPVSynchronizedRenderWindows::MAX_OP);
-  //}
-
-  return passRequiredValue > 0;
+  return this->Superclass::PassRequired(pass);
 }
 
 //----------------------------------------------------------------------------
