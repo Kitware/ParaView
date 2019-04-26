@@ -53,6 +53,9 @@ protected slots:
   void onViewAdded(pqView*);
   void onViewRemoved(pqView*);
 
+  void collaborationConnect();
+  void collaborationCallback(std::string const& data, void* cd);
+
 private:
   void constructor();
 
