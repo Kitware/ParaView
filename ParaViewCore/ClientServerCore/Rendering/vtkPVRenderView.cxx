@@ -1255,16 +1255,16 @@ void vtkPVRenderView::Update()
   }
 
   // Gather information about geometry sizes from all representations.
-  // double local_size = this->GetDeliveryManager()->GetVisibleDataSize(false) / 1024.0;
-  vtkTypeUInt64 local_size = this->GetDeliveryManager()->GetVisibleDataSize(false);
-  vtkTypeUInt64 global_size;
-  this->AllReduceMAX(local_size, global_size);
-  // cout << "Full Geometry size: " << global_size << endl;
+  const vtkTypeUInt64 lsize = this->GetDeliveryManager()->GetVisibleDataSize(/*low_res*/ false);
+  vtkTypeUInt64 gsize;
+  this->AllReduceMAX(lsize, gsize);
+  const double geometry_size = gsize / 1024;
 
+  // cout << "Full Geometry size: " << geometry_size << endl;
   // Update decisions about lod-rendering and remote-rendering.
-  this->UseLODForInteractiveRender = this->ShouldUseLODRendering(global_size / 1024.0);
+  this->UseLODForInteractiveRender = this->ShouldUseLODRendering(geometry_size);
   this->UseDistributedRenderingForRender =
-    this->ShouldUseDistributedRendering(local_size, /*using_lod=*/false);
+    this->ShouldUseDistributedRendering(geometry_size, /*using_lod=*/false);
   if (!this->UseLODForInteractiveRender)
   {
     this->UseDistributedRenderingForLODRender = this->UseDistributedRenderingForRender;
@@ -1324,13 +1324,14 @@ void vtkPVRenderView::UpdateLOD()
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_UPDATE_LOD(), this->RequestInformation, this->ReplyInformationVector);
 
-  vtkTypeUInt64 local_size = this->GetDeliveryManager()->GetVisibleDataSize(true);
-  vtkTypeUInt64 global_size;
-  this->AllReduceMAX(local_size, global_size);
-  // cout << "LOD Geometry size: " << global_size << endl;
+  const vtkTypeUInt64 lsize = this->GetDeliveryManager()->GetVisibleDataSize(/*low_res*/ true);
+  vtkTypeUInt64 gsize;
+  this->AllReduceMAX(lsize, gsize);
+  const double geometry_size = gsize / 1024;
+  // cout << "LOD Geometry size: " << geometry_size << endl;
 
   this->UseDistributedRenderingForLODRender =
-    this->ShouldUseDistributedRendering(global_size / 1024.0, /*using_lod=*/true);
+    this->ShouldUseDistributedRendering(geometry_size, /*using_lod=*/true);
 
   this->InteractiveRenderProcesses = vtkPVSession::CLIENT;
   bool in_tile_display_mode = this->InTileDisplayMode();
