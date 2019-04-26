@@ -135,6 +135,14 @@ vtkRenderWindow* vtkPVProcessWindow::NewWindow()
     window = vtkRenderWindow::New();
   }
 
+  // if active-stereo is requested, let's create a stereo capable window.
+  if (pvoptions->GetUseStereoRendering() && pvoptions->GetStereoType() != nullptr &&
+    strcmp(pvoptions->GetStereoType(), "Crystal Eyes") == 0)
+  {
+    window->SetStereoCapableWindow(true);
+    window->SetStereoType(VTK_STEREO_CRYSTAL_EYES);
+  }
+
   window->DoubleBufferOn();
   window->AlphaBitPlanesOn();
 

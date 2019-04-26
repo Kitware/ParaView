@@ -206,13 +206,15 @@ void vtkPVOptions::Initialize()
 #endif
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
     "Tell the application to enable stereo rendering",
-    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW | vtkPVOptions::PVRENDER_SERVER |
+      vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
   this->AddArgument("--stereo-type", 0, &this->StereoType,
     "Specify the stereo type. This valid only when "
     "--stereo is specified. Possible values are "
     "\"Crystal Eyes\", \"Red-Blue\", \"Interlaced\", "
     "\"Dresden\", \"Anaglyph\", \"Checkerboard\",\"SplitViewportHorizontal\"",
-    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW | vtkPVOptions::PVRENDER_SERVER |
+      vtkPVOptions::PVSERVER | vtkPVOptions::PVBATCH);
 
   this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection,
     "Have the server connect to the client.",

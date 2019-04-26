@@ -16,6 +16,7 @@
 
 #include "vtk_glew.h"
 
+#include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
@@ -318,6 +319,18 @@ void vtkViewLayout::UpdateDisplay(vtkObject* sender, unsigned long, void*)
   auto& internals = (*this->Internals);
   internals.ActiveRenderWindow = window;
 
+  if (this->NeedsActiveStereo() && processWindow->GetStereoCapableWindow())
+  {
+    // the shared window only does stereo rendering for active stereo. For all
+    // other modes, there's nothing specific to do since each view will compose
+    // the stereo image separately.
+    processWindow->SetStereoRender(true);
+  }
+  else if (processWindow->GetStereoRender())
+  {
+    processWindow->SetStereoRender(false);
+  }
+
   if (!this->InTileDisplay && !this->InCave)
   {
     // this is batch mode or server mode when debugging rendering;
@@ -352,6 +365,8 @@ void vtkViewLayout::Paint(vtkViewport* vp)
   auto& internals = (*this->Internals);
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkViewLayout::Paint Start");
   auto renderer = vtkOpenGLRenderer::SafeDownCast(vp);
+  auto camera = renderer->GetActiveCamera();
+
   assert(renderer != nullptr);
   auto window = vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
   auto ostate = window->GetState();
@@ -395,6 +410,18 @@ void vtkViewLayout::Paint(vtkViewport* vp)
         }
         fbo->SaveCurrentBindingsAndBuffers(GL_READ_FRAMEBUFFER);
         fbo->Bind(GL_READ_FRAMEBUFFER);
+        // if rendering active-stereo, make sure we grab from the appropriate color
+        // buffer.
+        if (camera->GetLeftEye() == 0 && renWin->GetStereoRender() &&
+          renWin->GetStereoType() == VTK_STEREO_CRYSTAL_EYES &&
+          fbo->GetNumberOfColorAttachments() == 2)
+        {
+          fbo->ActivateReadBuffer(1);
+        }
+        else
+        {
+          fbo->ActivateReadBuffer(0);
+        }
         const int extents[] = { 0, size[0], 0, size[1] };
         fbo->Blit(extents, extents, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         fbo->RestorePreviousBindingsAndBuffers(GL_READ_FRAMEBUFFER);
@@ -402,6 +429,33 @@ void vtkViewLayout::Paint(vtkViewport* vp)
     }
   }
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkViewLayout::Paint End");
+}
+
+//----------------------------------------------------------------------------
+bool vtkViewLayout::NeedsActiveStereo() const
+{
+  const auto& internals = (*this->Internals);
+  if (this->InTileDisplay)
+  {
+    // in tile display mode, we care about all views.
+    for (auto& item : internals.Items)
+    {
+      auto window = item.View->GetRenderWindow();
+      if (window && window->GetStereoCapableWindow() && window->GetStereoRender() &&
+        window->GetStereoType() == VTK_STEREO_CRYSTAL_EYES)
+      {
+        return true;
+      }
+    }
+  }
+  else
+  {
+    // in non-tile display mode, we only care about the active view.
+    auto window = internals.ActiveRenderWindow;
+    return (window && window->GetStereoCapableWindow() && window->GetStereoRender() &&
+      window->GetStereoType() == VTK_STEREO_CRYSTAL_EYES);
+  }
+  return false;
 }
 
 //----------------------------------------------------------------------------

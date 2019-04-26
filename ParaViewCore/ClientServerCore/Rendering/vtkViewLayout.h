@@ -94,6 +94,11 @@ protected:
 
   void Paint(vtkViewport*);
 
+  /**
+   * Returns true if any of the layout needs active stereo for current render.
+   */
+  bool NeedsActiveStereo() const;
+
 private:
   vtkViewLayout(const vtkViewLayout&) = delete;
   void operator=(const vtkViewLayout&) = delete;
