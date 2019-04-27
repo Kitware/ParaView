@@ -49,7 +49,6 @@ public:
   vtkTypeMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  vtkGetStringMacro(TileImagePath);
   vtkGetStringMacro(BaselineDirectory);
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(DataDirectory);
@@ -73,7 +72,6 @@ public:
   */
   vtkGetStringMacro(ServerResourceName);
 
-  vtkSetStringMacro(TileImagePath);
   vtkSetStringMacro(BaselineDirectory);
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(DataDirectory);
@@ -119,7 +117,6 @@ protected:
   char* DataDirectory;
   char* ServerResourceName;
   char* StateFileName; // loading state file(Bug #5711)
-  char* TileImagePath;
 
   int ExitAppWhenTestsDone;
   int DisableRegistry;

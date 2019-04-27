@@ -1183,6 +1183,17 @@ std::vector<vtkSMViewProxy*> vtkSMViewLayoutProxy::GetViews()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::SaveAsPNG(int rank, const char* fname)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SaveAsPNG" << rank << fname
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER);
+  // ensure that the server is done saving the image before proceeding.
+  this->GetLastResult(vtkPVSession::RENDER_SERVER_ROOT);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMViewLayoutProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

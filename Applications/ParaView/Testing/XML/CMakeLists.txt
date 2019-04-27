@@ -332,32 +332,12 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestPythonViewScript.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Threshold.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/ThresholdInvert.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile0.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile0_1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile0_2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile0_3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile0_4.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile1_1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile1_2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile1_3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile1_4.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-1x2-Tile1_5.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-2x2-Tile0.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-2x2-Tile1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-2x2-Tile2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplay3DTesting-2x2-Tile3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x1-Tile0.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x1-Tile0_1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x1-Tile1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x1-Tile1_1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x1-Tile1_2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x1-Tile1_3.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x1-Tile1_4.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x2-Tile0.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x2-Tile1.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x2-Tile2.png}"
-  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplayScatterPlot-2x2-Tile3.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-1x1-tile0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-2x1-tile0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-2x1-tile1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-3x1-tile0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-3x1-tile1.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TileDisplaySplitView-3x1-tile2.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TimeStepProgressBar_Inter.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceExodus.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TraceMultiViews.png}"
@@ -1557,36 +1537,15 @@ paraview_add_multi_server_tests(3
    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
    TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
 
-# Removing these test since these have been failing for a while the the testing
-# infrastrructure not catching it properly until now. We need to redo the tile display
-# testing :(.
-#set (TileDisplayScatterPlot-2x1_THRESHOLD 40)
-#add_tile_display_tests("pvcs-tile-display" 2 1
-#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-#   TEST_SCRIPTS TileDisplayScatterPlot-2x1.xml)
-#
-#set (TileDisplayScatterPlot-2x2_THRESHOLD 40)
-#add_tile_display_tests("pvcs-tile-display" 2 2
-#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-#   TEST_SCRIPTS TileDisplayScatterPlot-2x2.xml)
-
-# These tests have been behaving badly across many platforms and needs to be
-# fixed before it can be useful. Disabling for now, see bug #15424.
-#set (TileDisplay3DTesting-1x2_THRESHOLD 270)
-#add_tile_display_tests("pvcs-tile-display" 1 2
-#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-#   TEST_SCRIPTS TileDisplay3DTesting-1x2.xml)
-
-#set (TileDisplay3DTesting-2x2_THRESHOLD 270)
-#paraview_add_tile_display_tests(2 2
-#   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-#   TEST_SCRIPTS TileDisplay3DTesting-2x2.xml)
-
-set (TileDisplay3DTesting-2x1_THRESHOLD 270)
-paraview_add_tile_display_tests(2 1
-   BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
-   TEST_SCRIPTS TileDisplay3DTesting-2x1.xml)
-
+# set (TileDisplay3DTesting-2x1_THRESHOLD 270)
+paraview_add_tile_display_tests(1 1
+   TEST_SCRIPTS TileDisplaySplitView.xml)
+if (PARAVIEW_USE_MPI)
+  paraview_add_tile_display_tests(2 1
+     TEST_SCRIPTS TileDisplaySplitView.xml)
+  paraview_add_tile_display_tests(3 1
+     TEST_SCRIPTS TileDisplaySplitView.xml)
+endif()
 
 #------------------------------------------------------------------
 # Add tests that test command line arguments (among other things).

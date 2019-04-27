@@ -66,6 +66,12 @@ public:
   void AddView(vtkPVView*, const double* viewport);
   //@}
 
+  /**
+   * Intended for testing and debugging. When called, this will save the layout
+   * results to an png file.
+   */
+  bool SaveAsPNG(int rank, const char* fname);
+
 protected:
   vtkViewLayout();
   ~vtkViewLayout() override;

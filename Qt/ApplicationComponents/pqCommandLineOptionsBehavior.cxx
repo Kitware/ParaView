@@ -129,12 +129,6 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // default one).
   assert(pqActiveObjects::instance().activeServer() != 0);
 
-  // For tile display testing lets enable the dump of images
-  if (options->GetTileImagePath())
-  {
-    // FIXME
-  }
-
   // check for --data option.
   if (options->GetParaViewDataName())
   {

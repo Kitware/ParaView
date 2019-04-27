@@ -293,28 +293,32 @@ function (paraview_add_multi_server_tests count)
 endfunction ()
 
 function (paraview_add_tile_display_tests width height)
-  if (NOT PARAVIEW_USE_MPI)
+  math(EXPR _paraview_add_tile_display_cpu_count "${width} * ${height}")
+
+  if (_paraview_add_tile_display_cpu_count GREATER 1 AND NOT PARAVIEW_USE_MPI)
+    # we can run 1x1 tile display tests on non MPI builds.
     return ()
   endif ()
 
-  math(EXPR _paraview_add_tile_display_cpu_count "${width} * ${height} - 1")
-
   _paraview_add_tests("paraview_add_tile_display_tests"
-    FORCE_SERIAL
     PREFIX "pvcs-tile-display"
     SUFFIX "-${width}x${height}"
     ENVIRONMENT
       PV_ICET_WINDOW_BORDERS=1
+      SMTESTDRIVER_MPI_NUMPROCS=${_paraview_add_tile_display_cpu_count}
     _COMMAND_PATTERN
-      --test-tiled "${width}" "${height}"
       --server "$<TARGET_FILE:ParaView::pvserver>"
         --enable-bt
+        -tdx=${width}
+        -tdy=${height}
+        # using offscreen to avoid clobbering display (although should not be
+        # necessary) when running tests in parallel.
+        --force-offscreen-rendering
       --client __paraview_client__
         --enable-bt
         __paraview_args__
         __paraview_script__
         __paraview_client_args__
-        "--tile-image-prefix=${CMAKE_BINARY_DIR}/Testing/Temporary/__paraview_test_name__"
         -dr
         --exit
     ${ARGN})

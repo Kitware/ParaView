@@ -113,6 +113,8 @@ int pqXMLEventSource::getNextEvent(
   int index = this->Implementation->CurrentEvent;
   this->Implementation->CurrentEvent++;
 
+  auto options = pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+
   vtkPVXMLElement* elem = this->Implementation->XML->GetNestedElement(index);
 
   // First handle specific cases
@@ -128,11 +130,7 @@ int pqXMLEventSource::getNextEvent(
     QString widgetName = elem->GetAttribute("object");
 
     // Recover baseline file location
-    QString baseline = elem->GetAttribute("baseline");
-    baseline = baseline.replace("$PARAVIEW_TEST_ROOT", pqCoreTestUtility::TestDirectory());
-    baseline = baseline.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
-    baseline =
-      baseline.replace("$PARAVIEW_TEST_BASELINE_DIR", pqCoreTestUtility::BaselineDirectory());
+    QString baseline = pqCoreTestUtility::fixPath(elem->GetAttribute("baseline"));
 
     // Recover optional width and height
     int width = 300, height = 300;
@@ -147,8 +145,6 @@ int pqXMLEventSource::getNextEvent(
     }
     else
     {
-      pqOptions* const options =
-        pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
       threshold = options->GetCurrentImageThreshold();
     }
 
@@ -216,19 +212,59 @@ int pqXMLEventSource::getNextEvent(
     // <pqcompareimage image="GeneratedImage.png"
     //                baseline="ExtractBlock.png"
     //                width="300" height="300" />
-    QString image = elem->GetAttribute("image");
-    image = image.replace("$PARAVIEW_TEST_ROOT", pqCoreTestUtility::TestDirectory());
-    image = image.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
+    QString image = pqCoreTestUtility::fixPath(elem->GetAttribute("image"));
 
-    QString baseline = elem->GetAttribute("baseline");
-    baseline = baseline.replace("$PARAVIEW_TEST_ROOT", pqCoreTestUtility::TestDirectory());
-    baseline = baseline.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
-
-    pqOptions* const options =
-      pqOptions::SafeDownCast(vtkProcessModule::GetProcessModule()->GetOptions());
+    QString baseline = pqCoreTestUtility::fixPath(elem->GetAttribute("baseline"));
 
     if (!pqCoreTestUtility::CompareImage(image, baseline, options->GetCurrentImageThreshold(),
           std::cerr, pqCoreTestUtility::TestDirectory()))
+    {
+      qCritical()
+        << "ERROR: The following event FAILED !!! Yet will continue with the rest of the test.";
+      qCritical()
+        << "----------------------------------------------------------------------------------";
+      std::stringstream ss;
+      elem->PrintXML(ss, vtkIndent());
+      std::string sstr(ss.str());
+      qCritical() << sstr.c_str();
+      qCritical()
+        << "----------------------------------------------------------------------------------";
+    }
+    return this->getNextEvent(object, command, arguments, eventType);
+  }
+  else if (elem->GetName() && strcmp(elem->GetName(), "pqcomparetile") == 0 &&
+    elem->GetAttribute("object") && elem->GetAttribute("rank") && elem->GetAttribute("baseline"))
+  {
+    // support elements of the following form.
+    //
+    // <pqcomparetile rank="0" baseline="image.png" object="a-view-widget" tdx="1" tdy="1" />
+
+    // find widget; while we really need active layout, since pqCore has no
+    // concept of active, we determine the layout to use from the view.
+    QWidget* widget =
+      qobject_cast<QWidget*>(pqObjectNaming::GetObject(elem->GetAttribute("object")));
+    if (!widget)
+    {
+      return FAILURE;
+    }
+
+    int rank = 0;
+    elem->GetScalarAttribute("rank", &rank);
+
+    // tdx, tdy helps used determine when this image compare is active.
+    // 0 means not specified, indicating always do the compare.
+    int tdx = 0, tdy = 0;
+    elem->GetScalarAttribute("tdx", &tdx);
+    elem->GetScalarAttribute("tdy", &tdy);
+    const QString baseline = pqCoreTestUtility::fixPath(elem->GetAttribute("baseline"));
+    int threshold = 0;
+    if (!elem->GetScalarAttribute("threshold", &threshold))
+    {
+      threshold = options->GetCurrentImageThreshold();
+    }
+
+    if (!pqCoreTestUtility::CompareTile(widget, rank, tdx, tdy, baseline, threshold, std::cerr,
+          pqCoreTestUtility::TestDirectory()))
     {
       qCritical()
         << "ERROR: The following event FAILED !!! Yet will continue with the rest of the test.";
@@ -251,7 +287,7 @@ int pqXMLEventSource::getNextEvent(
     object = elem->GetAttribute("object");
     command = elem->GetAttribute("command");
     arguments = elem->GetAttribute("arguments");
-    arguments = arguments.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
+    arguments = pqCoreTestUtility::fixPath(arguments);
     return SUCCESS;
   }
   else if (elem->GetName() && strcmp(elem->GetName(), "pqcheck") == 0)

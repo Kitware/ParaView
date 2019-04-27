@@ -18,6 +18,7 @@
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkCommunicator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
@@ -26,6 +27,7 @@
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLState.h"
+#include "vtkPNGWriter.h"
 #include "vtkPVLogger.h"
 #include "vtkPVOptions.h"
 #include "vtkPVProcessWindow.h"
@@ -38,6 +40,7 @@
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
 #include "vtkWeakPointer.h"
+#include "vtkWindowToImageFilter.h"
 
 #include <vector>
 
@@ -454,6 +457,40 @@ bool vtkViewLayout::NeedsActiveStereo() const
     auto window = internals.ActiveRenderWindow;
     return (window && window->GetStereoCapableWindow() && window->GetStereoRender() &&
       window->GetStereoType() == VTK_STEREO_CRYSTAL_EYES);
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkViewLayout::SaveAsPNG(int rank, const char* filename)
+{
+  auto processWindow = vtkPVProcessWindow::GetRenderWindow();
+  auto pm = vtkProcessModule::GetProcessModule();
+  if (processWindow)
+  {
+    int result = 0;
+    if (pm->GetPartitionId() == rank)
+    {
+      vtkLogF(INFO, "saving tile to %s", filename);
+      vtkNew<vtkWindowToImageFilter> wif;
+      wif->SetReadFrontBuffer(false);
+      wif->SetShouldRerender(true);
+      wif->SetInput(processWindow);
+      wif->Update();
+
+      vtkNew<vtkPNGWriter> writer;
+      writer->SetFileName(filename);
+      writer->SetInputDataObject(wif->GetOutput());
+      writer->Write();
+      result = 1;
+    }
+
+    int all_result = result;
+    if (pm->GetNumberOfLocalPartitions() > 1)
+    {
+      pm->GetGlobalController()->Reduce(&result, &all_result, 1, 0, vtkCommunicator::MAX_OP);
+    }
+    return all_result > 0;
   }
   return false;
 }

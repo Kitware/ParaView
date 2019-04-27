@@ -300,6 +300,16 @@ public:
   vtkGetMacro(SeparatorWidth, int);
   //@}
 
+  //@{
+  /**
+   * This is only meant for testing and debugging purposes. This allows the
+   * application to save the image rendered on the server side in certain
+   * configurations (tile display and cave) to a png file for regression
+   * testing.
+   */
+  void SaveAsPNG(int rank, const char* fname);
+  //@}
+
 protected:
   vtkSMViewLayoutProxy();
   ~vtkSMViewLayoutProxy() override;

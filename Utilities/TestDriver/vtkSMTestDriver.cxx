@@ -22,7 +22,8 @@
 #include <vtksys/String.hxx>
 #include <vtksys/SystemTools.hxx>
 
-#include <assert.h>
+#include <algorithm>
+#include <cassert>
 
 #include <sstream>
 #if !defined(_WIN32) || defined(__CYGWIN__)
@@ -74,7 +75,6 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->TestRenderServer = 0;
   this->TestServer = 0;
   this->TestScript = 0;
-  this->TestTiledDisplay = 0;
   this->ReverseConnection = 0;
   this->TestRemoteRendering = 0;
   this->TestMultiClient = 0;
@@ -129,15 +129,16 @@ void vtkSMTestDriver::CollectConfiguredOptions()
 #endif
   int serverNumProc = 1;
   int renderNumProc = 1;
-
 #ifdef PARAVIEW_MPI_MAX_NUMPROCS
   serverNumProc = PARAVIEW_MPI_MAX_NUMPROCS;
-  renderNumProc = serverNumProc - 1;
-  if (renderNumProc <= 0)
-  {
-    renderNumProc = 1;
-  }
 #endif
+  if (vtksys::SystemTools::HasEnv("SMTESTDRIVER_MPI_NUMPROCS"))
+  {
+    serverNumProc = std::atoi(vtksys::SystemTools::GetEnv("SMTESTDRIVER_MPI_NUMPROCS"));
+  }
+  serverNumProc = std::max(1, serverNumProc);
+  renderNumProc = std::max(1, serverNumProc - 1);
+
 #ifdef PARAVIEW_MPI_NUMPROC_FLAG
   this->MPINumProcessFlag = PARAVIEW_MPI_NUMPROC_FLAG;
 #else
@@ -236,16 +237,6 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->ScriptExecutable.ArgEnd = FindLastExecutableArg(i + 2, argc, argv);
       fprintf(stderr, "Test Script.\n");
     }
-    if (strcmp(argv[i], "--test-tiled") == 0)
-    {
-      this->TestServer = 1;
-      this->TestTiledDisplay = 1;
-      this->TestTiledDisplayTDX = "-tdx=";
-      this->TestTiledDisplayTDX += argv[i + 1];
-      this->TestTiledDisplayTDY = "-tdy=";
-      this->TestTiledDisplayTDY += argv[i + 2];
-      fprintf(stderr, "Test Tiled Display.\n");
-    }
     if (strcmp(argv[i], "--test-multi-clients") == 0)
     {
       this->TestMultiClient = 1;
@@ -341,16 +332,6 @@ void vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine, c
 #ifdef PV_TEST_CLIENT
       commandLine.push_back("-ch=" PV_TEST_CLIENT);
 #endif
-    }
-
-    if (this->TestTiledDisplay)
-    {
-      // If there is specific flags for the server to pass to mpirun, add them
-      if (type == SERVER || type == DATA_SERVER)
-      {
-        commandLine.push_back(this->TestTiledDisplayTDX.c_str());
-        commandLine.push_back(this->TestTiledDisplayTDY.c_str());
-      }
     }
 
     for (unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
