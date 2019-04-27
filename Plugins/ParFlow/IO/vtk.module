@@ -1,0 +1,10 @@
+NAME
+  ParFlow::IO
+LIBRARY_NAME
+  vtkParFlowIO
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonMath
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelCore

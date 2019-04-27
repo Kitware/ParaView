@@ -1,0 +1,348 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="internal_sources">
+
+    <!-- Single-file reader -->
+    <SourceProxy
+      name="ParFlowBinaryReader"
+      class="vtkParFlowReader"
+      label="ParFlow Reader"
+      >
+      <Documentation
+        long_help="Read binary ParFlow simulation input and output files."
+        short_help="Read ParFlow simulation data"
+        >
+      </Documentation>
+      <StringVectorProperty
+        name="FileName"
+        animateable="1"
+        command="SetFileName"
+        number_of_elements="1"
+        >
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      <Hints>
+        <ReaderFactory
+          extensions="pfb"
+          file_description="ParFlow simulation data"
+        />
+      </Hints>
+    </SourceProxy>
+
+  </ProxyGroup>
+  <ProxyGroup name="sources">
+
+    <!-- Single-field timeseries reader -->
+    <SourceProxy
+      name="PFBReader"
+      class="vtkFileSeriesReader"
+      si_class="vtkSIMetaReaderProxy"
+      label="PFB reader"
+      file_name_method="SetFileName">
+      <SubProxy>
+        <Proxy
+          name="Reader"
+          proxygroup="internal_sources"
+          proxyname="ParFlowBinaryReader">
+        </Proxy>
+      </SubProxy>
+
+      <StringVectorProperty
+        name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of files to be read by the reader. If more than 1 file is specified,
+          the reader will switch to file series mode in which it will pretend that it
+          can support time and provide 1 file per time step.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory
+          extensions="pfb"
+          file_description="ParFlow Simulation Data" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- Metadata reader -->
+    <SourceProxy
+      name="ParFlowReader"
+      class="vtkParFlowMetaReader"
+      label="ParFlow Reader"
+      >
+      <Documentation
+        long_help="Read ParFlow simulation metadata summary files."
+        short_help="Read ParFlow simulation data"
+        >Read ParFlow simulation data by inspecting a `.pfmetadata` file.
+        The output of this reader is a uniform grid.
+      </Documentation>
+      <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1"
+        panel_visibility="never"
+        >
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        information_only="1"
+        name="TimestepValues"
+        repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+
+      <!-- Enable/disable mesh outputs -->
+      <IntVectorProperty
+        name="EnableSubsurfaceDomain"
+        default_values="1"
+        number_of_elements="1"
+        command="SetEnableSubsurfaceDomain">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="EnableSurfaceDomain"
+        default_values="1"
+        number_of_elements="1"
+        command="SetEnableSurfaceDomain">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <!-- Enable/disable mesh deformation/variable-z-spacing -->
+      <IntVectorProperty
+        name="DeflectTerrain"
+        default_values="1"
+        number_of_elements="1"
+        command="SetDeflectTerrain">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="DeflectionScale"
+        default_values="1"
+        number_of_elements="1"
+        command="SetDeflectionScale">
+        <DoubleRangeDomain min="0" max="100" name="range"/>
+      </DoubleVectorProperty>
+
+      <!-- Regions to read (subsets of the file's domains) -->
+      <IntVectorProperty
+        name="SubsurfaceVOI"
+        panel_visibility="advanced"
+        default_values="0 -1 0 -1 0 -1"
+        number_of_elements="6"
+        command="SetSubsurfaceVOI">
+        <IntRangeDomain name="range"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="SurfaceAOI"
+        panel_visibility="advanced"
+        default_values="0 -1 0 -1"
+        number_of_elements="4"
+        command="SetSurfaceAOI">
+        <IntRangeDomain name="range"/>
+      </IntVectorProperty>
+
+      <!-- Variables to read -->
+      <StringVectorProperty
+        information_only="1"
+        name="SubsurfaceVariableStatusInfo">
+        <ArraySelectionInformationHelper attribute_name="SubsurfaceVariable" />
+      </StringVectorProperty>
+      <StringVectorProperty
+        name="SubsurfaceVariableStatus"
+        label="3D Grid Arrays"
+        information_property="SubsurfaceVariableStatusInfo"
+        command="SetSubsurfaceVariableArrayStatus"
+        element_types="2 0"
+        number_of_elements="0"
+        number_of_elements_per_command="2"
+        repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property
+              function="ArrayList"
+              name="SubsurfaceVariableStatusInfo" />
+            </RequiredProperties>
+          </ArraySelectionDomain>
+        <Documentation>Use this property to select which variables defined over
+        3-D cells should be loaded.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        information_only="1"
+        name="SurfaceVariableStatusInfo">
+        <ArraySelectionInformationHelper attribute_name="SurfaceVariable" />
+      </StringVectorProperty>
+      <StringVectorProperty
+        name="SurfaceVariableStatus"
+        information_property="SurfaceVariableStatusInfo"
+        command="SetSurfaceVariableArrayStatus"
+        label="2D Grid Arrays"
+        element_types="2 0"
+        number_of_elements="0"
+        number_of_elements_per_command="2"
+        repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property
+              function="ArrayList"
+              name="SurfaceVariableStatusInfo" />
+            </RequiredProperties>
+          </ArraySelectionDomain>
+        <Documentation>Use this property to select which variables defined over
+        2-D cells should be loaded.</Documentation>
+      </StringVectorProperty>
+
+      <OutputPort index="0" name="Subsurface" />
+      <OutputPort index="1" name="Surface" />
+
+      <ExposedProperties>
+        <Property name="EnableSubsurfaceDomain"/>
+        <Property name="SubsurfaceVOI"/>
+        <PropertyGroup
+          label="Subsurface Variables"
+          name="SubsurfaceVariableStatus"
+          panel_visibility="default"
+          panel_widget="ArrayStatus">
+          <Property name="SubsurfaceVariableStatusInfo" />
+          <Property name="SubsurfaceVariableStatus" />
+          <Hints>
+            <WidgetHeight number_of_rows="20" />
+          </Hints>
+        </PropertyGroup>
+        <Property name="EnableSurfaceDomain"/>
+        <Property name="SurfaceAOI"/>
+        <PropertyGroup
+          label="Surface Variables"
+          name="SurfaceVariableStatus"
+          panel_visibility="default"
+          panel_widget="ArrayStatus">
+          <Property name="SurfaceVariableStatusInfo" />
+          <Property name="SurfaceVariableStatus" />
+          <Hints>
+            <WidgetHeight number_of_rows="20" />
+          </Hints>
+        </PropertyGroup>
+      </ExposedProperties>
+      <Hints>
+        <ReaderFactory
+          extensions="pfmetadata"
+          file_description="ParFlow Simulation Data" />
+      </Hints>
+    </SourceProxy>
+
+    <!-- Multi-field timeseries reader -->
+    <!--
+    <SourceProxy
+      name="ParFlowSim"
+      class="vtkFileSeriesReader"
+      si_class="vtkSIMetaReaderProxy"
+      file_name_method="SetFileName">
+      <Documentation long_help="Read ParFlow simulation data."
+        short_help="Read ParFlow metadata file.">The ParFlow reader
+        parses .pfmetadata files and reads a subset of the binary
+        data chosen by the user from the table of contents in the
+        metadata file.</Documentation>
+      <SubProxy>
+        <Proxy
+          name="Reader"
+          proxygroup="internal_sources"
+          proxyname="ParFlowReader"/>
+        <ExposedProperties>
+          <Property name="EnableSubsurfaceDomain"/>
+          <Property name="SubsurfaceVOI"/>
+          <PropertyGroup
+            label="Subsurface Variables"
+            name="SubsurfaceVariableStatus"
+            panel_visibility="default"
+            panel_widget="ArrayStatus">
+            <Property name="SubsurfaceVariableStatusInfo" />
+            <Property name="SubsurfaceVariableStatus" />
+            <Hints>
+              <WidgetHeight number_of_rows="20" />
+            </Hints>
+          </PropertyGroup>
+          <Property name="EnableSurfaceDomain"/>
+          <Property name="SurfaceAOI"/>
+          <PropertyGroup
+            label="Surface Variables"
+            name="SurfaceVariableStatus"
+            panel_visibility="default"
+            panel_widget="ArrayStatus">
+            <Property name="SurfaceVariableStatusInfo" />
+            <Property name="SurfaceVariableStatus" />
+            <Hints>
+              <WidgetHeight number_of_rows="20" />
+            </Hints>
+          </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+
+      <StringVectorProperty
+        name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of files to be read by the reader. If more than 1 file is specified,
+          the reader will switch to file series mode in which it will pretend that it
+          can support time and provide 1 file per time step.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory
+          extensions="pfmetadata"
+          file_description="ParFlow Simulation Data" />
+      </Hints>
+    </SourceProxy>
+    -->
+  </ProxyGroup>
+</ServerManagerConfiguration>
