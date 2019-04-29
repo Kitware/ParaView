@@ -185,7 +185,9 @@ void vtkPVOpenVRCollaborationClient::SetCollabPort(int)
 {
 }
 void vtkPVOpenVRCollaborationClient::SetLogCallback(
-  std::function<void(std::string const& data, void* cd)>, void*);
+  std::function<void(std::string const&, void*)>, void*)
+{
+}
 void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int)
 {
 }
