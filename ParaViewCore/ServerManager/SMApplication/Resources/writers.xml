@@ -1911,6 +1911,26 @@
       <!-- End of XMLPUnstructuredGridWriter -->
     </WriterProxy>
     <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLPHyperTreeGridWriter"
+                 class="vtkFileSeriesWriter"
+                 name="XMLPHyperTreeGridWriter">
+      <Documentation short_help="Expose a writer for catalyst.">
+        Variation with catalyst specific extensions.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="CatalystOptions"
+               proxygroup="misc"
+               proxyname="CatalystOptions"></Proxy>
+        <ExposedProperties>
+           <PropertyGroup label="Catalyst Options">
+             <Property name="WriteFrequency" />
+             <Property name="CatalystFilePattern" />
+           </PropertyGroup>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of XMLPHyperTreeGridWriter -->
+    </WriterProxy>
+    <WriterProxy base_proxygroup="writers"
                  base_proxyname="XMLPStructuredGridWriter"
                  class="vtkFileSeriesWriter"
                  name="XMLPStructuredGridWriter">
