@@ -167,6 +167,9 @@ void vtkPVSynchronizedRenderer::Initialize(vtkPVSession* session)
       }
       break;
 
+    case vtkProcessModule::PROCESS_DATA_SERVER:
+      break;
+
     default:
       vtkErrorMacro("Unknown process type detected. Aborting for debugging purposes!");
       abort();

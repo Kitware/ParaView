@@ -1276,11 +1276,11 @@ void vtkPVRenderView::Update()
   bool in_cave_mode = this->InCaveDisplayMode();
   if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForRender)
   {
-    this->StillRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    this->StillRenderProcesses = vtkPVSession::CLIENT | vtkPVSession::RENDER_SERVER;
   }
   if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForLODRender)
   {
-    this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    this->InteractiveRenderProcesses = vtkPVSession::CLIENT | vtkPVSession::RENDER_SERVER;
   }
 
   // Synchronize data bounds.
@@ -1339,7 +1339,7 @@ void vtkPVRenderView::UpdateLOD()
   bool in_cave_mode = this->InCaveDisplayMode();
   if (in_tile_display_mode || in_cave_mode || this->UseDistributedRenderingForLODRender)
   {
-    this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    this->InteractiveRenderProcesses = vtkPVSession::CLIENT | vtkPVSession::RENDER_SERVER;
   }
 
   vtkTimerLog::MarkEndEvent("RenderView::UpdateLOD");
