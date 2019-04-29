@@ -323,3 +323,33 @@ function (paraview_add_tile_display_tests width height)
         --exit
     ${ARGN})
 endfunction ()
+
+function (paraview_add_cave_tests num_ranks config)
+  if (num_ranks GREATER 1 AND NOT PARAVIEW_USE_MPI)
+    return ()
+  endif ()
+
+  get_filename_component(_config_name "${config}" NAME_WE)
+
+  _paraview_add_tests("paraview_add_cave_tests"
+    PREFIX "pvcs-cave-${_config_name}"
+    SUFFIX "-${num_ranks}"
+    ENVIRONMENT
+      PV_SHARED_WINDOW_SIZE=400x300
+      SMTESTDRIVER_MPI_NUMPROCS=${num_ranks}
+    _COMMAND_PATTERN
+      --server "$<TARGET_FILE:ParaView::pvserver>"
+        --enable-bt
+        # using offscreen to avoid clobbering display (although should not be
+        # necessary) when running tests in parallel.
+        --force-offscreen-rendering
+        ${config}
+      --client __paraview_client__
+        --enable-bt
+        __paraview_args__
+        __paraview_script__
+        __paraview_client_args__
+        -dr
+        --exit
+    ${ARGN})
+endfunction ()

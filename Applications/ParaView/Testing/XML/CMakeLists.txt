@@ -310,6 +310,8 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StepColorSpaceA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridCellBlanking.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridVolumeRendering.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCAVE-tile0.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestCAVE-tile1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestClipCylinder.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorHistogram.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/TestColorHistogram_1.png}"
@@ -1541,7 +1543,6 @@ paraview_add_multi_server_tests(3
    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
    TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
 
-# set (TileDisplay3DTesting-2x1_THRESHOLD 270)
 paraview_add_tile_display_tests(1 1
    TEST_SCRIPTS TileDisplaySplitView.xml)
 if (PARAVIEW_USE_MPI)
@@ -1552,6 +1553,9 @@ if (PARAVIEW_USE_MPI)
   paraview_add_tile_display_tests(3 1
      TEST_SCRIPTS TileDisplaySplitView.xml)
 endif()
+
+paraview_add_cave_tests(2 "${CMAKE_CURRENT_SOURCE_DIR}/LeftRight.pvx"
+  TEST_SCRIPTS TestCAVE.xml)
 
 #------------------------------------------------------------------
 # Add tests that test command line arguments (among other things).

@@ -391,7 +391,8 @@ void vtkViewLayout::UpdateDisplay(vtkObject* sender, unsigned long, void*)
   processWindow->Render();
   vtkOpenGLRenderUtilities::MarkDebugEvent("vtkViewLayout::UpdateDisplayForTileDisplay End");
 
-  internals.ActiveRenderWindow = nullptr;
+  // note, we don't restore active window to null here since we want it to be
+  // preserved for `SaveAsPNG` if it gets called for testing purposes.
 }
 
 //----------------------------------------------------------------------------
@@ -515,7 +516,9 @@ bool vtkViewLayout::SaveAsPNG(int rank, const char* filename)
       wif->SetReadFrontBuffer(false);
       wif->SetShouldRerender(true);
       wif->SetInput(processWindow);
+      processWindow->SetSwapBuffers(false);
       wif->Update();
+      processWindow->SetSwapBuffers(true);
 
       vtkNew<vtkPNGWriter> writer;
       writer->SetFileName(filename);
