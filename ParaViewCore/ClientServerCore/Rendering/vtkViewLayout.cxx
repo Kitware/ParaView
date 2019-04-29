@@ -219,13 +219,52 @@ void vtkViewLayout::UpdateLayout(vtkObject* sender, unsigned long, void*)
   }
   else if (this->InCave)
   {
-    // there's really nothing to do here.
+    this->UpdateLayoutForCAVE(window);
   }
   else
   {
     // this would happen in remote rendering case.
     // nothing to do.
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkViewLayout::UpdateLayoutForCAVE(vtkRenderWindow*)
+{
+  auto& internals = (*this->Internals);
+  assert(internals.Items.size() > 0);
+  if (internals.UpdateLayoutTime > this->GetMTime())
+  {
+    return;
+  }
+
+  // get the window onto which we'll display the results on this process.
+  // (cannot be null).
+  auto processWindow = vtkPVProcessWindow::GetRenderWindow();
+  assert(processWindow);
+
+  vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "%s: UpdateLayoutForCAVE", vtkLogIdentifier(this));
+
+  const auto size = processWindow->GetActualSize();
+
+  // iterate over all views and setup window size and viewport for each view.
+  for (auto& item : internals.Items)
+  {
+    // Here we're setting up the window size such that the entire view can
+    // shown on  the current rank.
+    if (auto renWin = item.View->GetRenderWindow())
+    {
+      renWin->SetSize(size);
+    }
+    // scale each renderer's viewport simply to the whole window since
+    // in CAVE we only render one view at a time.
+    double viewport[] = { 0, 0, 1, 1 };
+    item.View->ScaleRendererViewports(viewport);
+    item.TiledOrigin = vtkVector2i(0, 0);
+    item.TiledSize = vtkVector2i(size);
+  }
+
+  internals.UpdateLayoutTime.Modified();
 }
 
 //----------------------------------------------------------------------------

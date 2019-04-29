@@ -95,6 +95,7 @@ protected:
 
   void UpdateLayout(vtkObject*, unsigned long, void*);
   void UpdateLayoutForTileDisplay(vtkRenderWindow*);
+  void UpdateLayoutForCAVE(vtkRenderWindow*);
 
   void UpdateDisplay(vtkObject*, unsigned long, void*);
 

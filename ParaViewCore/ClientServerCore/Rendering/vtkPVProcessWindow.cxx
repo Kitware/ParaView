@@ -294,10 +294,12 @@ vtkRenderWindow* vtkPVProcessWindow::NewCAVEWindow()
       const int sz = std::max(50, std::atoi(parts[0].c_str()));
       window->SetSize(sz, sz);
     }
+    window->SetBorders(1);
   }
   else if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
   {
     window->SetSize(400, 400);
+    window->SetBorders(1);
   }
   else if (fullscreen)
   {
