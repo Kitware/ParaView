@@ -309,7 +309,31 @@ int main(int argc, char* argv[])
   vtksysProcess_SetPipeShared(proc, vtksysProcess_Pipe_STDOUT, 1);
   vtksysProcess_SetPipeShared(proc, vtksysProcess_Pipe_STDERR, 1);
   vtksysProcess_Execute(proc);
-  int ret = vtksysProcess_GetExitValueByIndex(proc, 0);
+  vtksysProcess_WaitForExit(proc, nullptr);
+
+  // Extract the result of the command.
+  int const state = vtksysProcess_GetState(proc);
+  int ret = EXIT_FAILURE;
+  if (state == vtksysProcess_State_Exited)
+  {
+    ret = vtksysProcess_GetExitValue(proc);
+  }
+  else if (state == vtksysProcess_State_Exception)
+  {
+    const char* exception_str = vtksysProcess_GetExceptionString(proc);
+    error("exception occurred: ", exception_str);
+  }
+  else if (state == vtksysProcess_State_Error)
+  {
+    const char* error_str = vtksysProcess_GetErrorString(proc);
+    error("process error: ", error_str);
+  }
+  else if (state == vtksysProcess_State_Expired)
+  {
+    error("timeout error", nullptr);
+  }
+
+  // Cleanup.
   vtksysProcess_Delete(proc);
 
   return ret;
