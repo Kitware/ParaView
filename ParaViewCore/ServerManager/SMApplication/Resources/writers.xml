@@ -672,7 +672,7 @@
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
                  name="SerialHTGMultiBlock"
-                 supports_parallel="0">
+                 supports_parallel="1">
       <Documentation short_help="Write a multiblock in a xml-based vtk data file.">
       Writer to write a multiblock dataset in a xml-based vtk data file. Can be
       used for parallel writing as well as serial writing.</Documentation>
@@ -1829,7 +1829,8 @@
                  base_proxyname="ParallelFileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPHyperTreeGridWriter">
+                 name="XMLPHyperTreeGridWriter"
+                 supports_parallel="1">
       <Documentation short_help="Write hyper tree grid in a xml-based vtk data file.">
       Writer to write hyper tree grid in a xml-based vtk data file. Can be
       used for parallel writing.</Documentation>
