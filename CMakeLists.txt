@@ -622,6 +622,7 @@ set(paraview_default_plugins
   NonOrthogonalSource
   PacMan
   PanoramicProjectionView
+  # ParFlow - Because of dependency to nlohmann_json
   SLACTools
   SierraPlotTools
   StreamLinesRepresentation

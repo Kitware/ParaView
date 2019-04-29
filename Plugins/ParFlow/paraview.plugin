@@ -1,0 +1,9 @@
+NAME
+  ParFlow
+DESCRIPTION
+  Support for reading ParFlow simulation results.
+REQUIRES_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::CommonExecutionModel
+  VTK::ParallelCore
