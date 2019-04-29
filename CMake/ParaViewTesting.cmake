@@ -304,7 +304,7 @@ function (paraview_add_tile_display_tests width height)
     PREFIX "pvcs-tile-display"
     SUFFIX "-${width}x${height}"
     ENVIRONMENT
-      PV_ICET_WINDOW_BORDERS=1
+      PV_SHARED_WINDOW_SIZE=800x600
       SMTESTDRIVER_MPI_NUMPROCS=${_paraview_add_tile_display_cpu_count}
     _COMMAND_PATTERN
       --server "$<TARGET_FILE:ParaView::pvserver>"

@@ -2074,8 +2074,11 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
     case vtkProcessModule::PROCESS_SERVER:
     case vtkProcessModule::PROCESS_BATCH:
     case vtkProcessModule::PROCESS_RENDER_SERVER:
-      if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
+      if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1 ||
+        this->InTileDisplayMode())
       {
+        // in tile display mode, we need ordered compositing as
+        // vtkIceTCompositePass uses that as indicator to not use z buffer.
         return true;
       }
       VTK_FALLTHROUGH;

@@ -15,9 +15,11 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ElevationFilter" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <!-- change opacity to 0.5 to trigger ordered compositing -->
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Opacity/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/Opacity/DoubleRangeWidget/DoubleLineEdit" command="key" arguments="16777221" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/InteractiveLine/show3DWidget" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/TitleBar/TitleLabel" command="mousePress" arguments="1,1,0,48,4" />
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/TitleBar/TitleLabel" command="mouseMove" arguments="1,0,0,58,4" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/TitleBar/TitleLabel" command="mouseRelease" arguments="1,0,0,58,4" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="TextSource" />
@@ -35,6 +37,20 @@
   <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/CentralWidgetFrame/Viewport"
     tdx="2" tdy="1" rank="1"
     baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplaySplitView-2x1-tile1.png" />
+
+  <!-- tiles on 2x2 -->
+  <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/CentralWidgetFrame/Viewport"
+    tdx="2" tdy="2" rank="0"
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplaySplitView-2x2-tile0.png" />
+  <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/CentralWidgetFrame/Viewport"
+    tdx="2" tdy="2" rank="1"
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplaySplitView-2x2-tile1.png" />
+  <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/CentralWidgetFrame/Viewport"
+    tdx="2" tdy="2" rank="2"
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplaySplitView-2x2-tile2.png" />
+  <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/CentralWidgetFrame/Viewport"
+    tdx="2" tdy="2" rank="3"
+    baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TileDisplaySplitView-2x2-tile3.png" />
 
   <!-- tiles on 3x1 -->
   <pqcomparetile object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.3/CentralWidgetFrame/Viewport"

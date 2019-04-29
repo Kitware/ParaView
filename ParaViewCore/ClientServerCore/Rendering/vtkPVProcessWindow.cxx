@@ -23,6 +23,7 @@
 #include "vtkRenderer.h"
 #include <vtksys/SystemTools.hxx>
 
+#include <algorithm>
 #include <cassert>
 #include <string>
 
@@ -204,7 +205,22 @@ vtkRenderWindow* vtkPVProcessWindow::NewTileDisplayWindow()
     window = renWindow;
   }
 
-  if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
+  if (auto pv_shared_window_size = vtksys::SystemTools::GetEnv("PV_SHARED_WINDOW_SIZE"))
+  {
+    auto parts = vtksys::SystemTools::SplitString(pv_shared_window_size, 'x');
+    if (parts.size() == 2)
+    {
+      const int w = std::max(50, std::atoi(parts[0].c_str()));
+      const int h = std::max(50, std::atoi(parts[1].c_str()));
+      window->SetSize(w, h);
+    }
+    else
+    {
+      const int sz = std::max(50, std::atoi(parts[0].c_str()));
+      window->SetSize(sz, sz);
+    }
+  }
+  else if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
   {
     window->SetSize(400, 400);
   }
@@ -264,7 +280,22 @@ vtkRenderWindow* vtkPVProcessWindow::NewCAVEWindow()
 
   window->SetBorders(showborders ? 1 : 0);
   // Preserve old behavior for PV_ICET_WINDOW_BORDERS env var
-  if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
+  if (auto pv_shared_window_size = vtksys::SystemTools::GetEnv("PV_SHARED_WINDOW_SIZE"))
+  {
+    auto parts = vtksys::SystemTools::SplitString(pv_shared_window_size, 'x');
+    if (parts.size() == 2)
+    {
+      const int w = std::max(50, std::atoi(parts[0].c_str()));
+      const int h = std::max(50, std::atoi(parts[1].c_str()));
+      window->SetSize(w, h);
+    }
+    else
+    {
+      const int sz = std::max(50, std::atoi(parts[0].c_str()));
+      window->SetSize(sz, sz);
+    }
+  }
+  else if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
   {
     window->SetSize(400, 400);
   }

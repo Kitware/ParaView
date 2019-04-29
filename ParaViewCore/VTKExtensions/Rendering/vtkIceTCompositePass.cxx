@@ -572,7 +572,17 @@ void vtkIceTCompositePass::Draw(
     cam->SetExplicitProjectionTransformMatrix(this->IceTProjection);
     cam->UseExplicitProjectionTransformMatrixOn();
 
+    // since icetPhysicalRenderSize is set to full window implying that we are
+    // rendering to the full window, we need to update flags on the renderer
+    // here so that depth peeling etc. uses correct viewport.
+    // see paraview/paraview#18978
+    double viewport[4];
+    ren->GetViewport(viewport);
+    ren->SetViewport(0, 0, 1, 1);
     this->RenderPass->Render(render_state);
+
+    // reset viewport
+    ren->SetViewport(viewport);
 
     // Reset the projection matrix:
     cam->SetExplicitProjectionTransformMatrix(oldExplicitProj);
@@ -712,7 +722,6 @@ vtkFloatArray* vtkIceTCompositePass::GetLastRenderedRGBA32F()
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::DisplayResultsIfNeeded(const vtkRenderState* render_state)
 {
-  using RenUtils = vtkOpenGLRenderUtilities;
   if (this->DisplayRGBAResults)
   {
     vtkSynchronizedRenderers::vtkRawImage tile;
@@ -724,9 +733,9 @@ void vtkIceTCompositePass::DisplayResultsIfNeeded(const vtkRenderState* render_s
     vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "displaying rgba results");
 
     auto renderer = render_state->GetRenderer();
-    RenUtils::MarkDebugEvent("vtkIceTCompositePass: display RGBA results begin");
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: display RGBA results begin");
     tile.PushToViewport(renderer);
-    RenUtils::MarkDebugEvent("vtkIceTCompositePass: display RGBA results end");
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: display RGBA results end");
     vtkOpenGLCheckErrorMacro("failed after push rgba buffer");
   }
   // tile.SaveAsPNG(std::string("/tmp/" + vtkPVLogger::GetThreadName() + ".png").c_str());
@@ -734,9 +743,9 @@ void vtkIceTCompositePass::DisplayResultsIfNeeded(const vtkRenderState* render_s
   if (this->DisplayDepthResults)
   {
     vtkVLogF(PARAVIEW_LOG_RENDERING_VERBOSITY(), "displaying depth results");
-    RenUtils::MarkDebugEvent("vtkIceTCompositePass: display depth results begin");
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: display depth results begin");
     this->PushIceTDepthBufferToScreen(render_state);
-    RenUtils::MarkDebugEvent("vtkIceTCompositePass: display depth results end");
+    vtkOpenGLRenderUtilities::MarkDebugEvent("vtkIceTCompositePass: display depth results end");
     vtkOpenGLCheckErrorMacro("failed after push depth buffer");
   }
 }
