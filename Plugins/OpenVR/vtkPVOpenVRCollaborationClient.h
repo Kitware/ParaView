@@ -20,12 +20,16 @@
 #ifndef vtkPVOpenVRCollaborationClient_h
 #define vtkPVOpenVRCollaborationClient_h
 
+#include "vtkEventData.h"
 #include "vtkObject.h"
 #include <functional> // for method
+#include <set>        // for ivar
 
+class vtkImplicitPlaneWidget2;
 class vtkOpenVRRenderer;
 class vtkPVOpenVRCollaborationClientInternal;
 class vtkPVOpenVRHelper;
+class vtkOpenVRModel;
 
 class vtkPVOpenVRCollaborationClient : public vtkObject
 {
@@ -50,6 +54,11 @@ public:
   void GoToSavedLocation(int pos);
   void SetCurrentLocation(int val) { this->CurrentLocation = val; }
   void SetLogCallback(std::function<void(std::string const& data, void* cd)> cb, void* clientData);
+
+  void RemoveAllCropPlanes();
+  void UpdateCropPlanes(std::set<vtkImplicitPlaneWidget2*> const&);
+
+  void UpdateRay(vtkOpenVRModel*, vtkEventDataDevice);
 
 protected:
   vtkPVOpenVRCollaborationClient();

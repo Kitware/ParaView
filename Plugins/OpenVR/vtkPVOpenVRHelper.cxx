@@ -42,10 +42,12 @@
 #include "vtkOpenVRInteractorStyle.h"
 #include "vtkOpenVRMenuRepresentation.h"
 #include "vtkOpenVRMenuWidget.h"
+#include "vtkOpenVRModel.h"
 #include "vtkOpenVROverlay.h"
 #include "vtkOpenVROverlayInternal.h"
 #include "vtkOpenVRPanelRepresentation.h"
 #include "vtkOpenVRPanelWidget.h"
+#include "vtkOpenVRRay.h"
 #include "vtkOpenVRRenderWindow.h"
 #include "vtkOpenVRRenderWindowInteractor.h"
 #include "vtkOpenVRRenderer.h"
@@ -167,11 +169,36 @@ bool vtkPVOpenVRHelper::CollaborationConnect()
   {
     return false;
   }
+
+  // add observers to vr rays
+  vtkOpenVRModel* cmodel =
+    this->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+  if (cmodel)
+  {
+    cmodel->GetRay()->AddObserver(vtkCommand::ModifiedEvent, this->EventCommand);
+  }
+  cmodel = this->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+  if (cmodel)
+  {
+    cmodel->GetRay()->AddObserver(vtkCommand::ModifiedEvent, this->EventCommand);
+  }
+
   return this->CollaborationClient->Connect(this->Renderer);
 }
 
 bool vtkPVOpenVRHelper::CollaborationDisconnect()
 {
+  vtkOpenVRModel* cmodel =
+    this->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+  if (cmodel)
+  {
+    cmodel->GetRay()->RemoveObservers(vtkCommand::ModifiedEvent, this->EventCommand);
+  }
+  cmodel = this->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+  if (cmodel)
+  {
+    cmodel->GetRay()->RemoveObservers(vtkCommand::ModifiedEvent, this->EventCommand);
+  }
   return this->CollaborationClient->Disconnect();
 }
 namespace
@@ -391,6 +418,44 @@ void vtkPVOpenVRHelper::ToggleNavigationPanel()
   }
 }
 
+void vtkPVOpenVRHelper::SetNumberOfCropPlanes(int count)
+{
+  if (count == 0)
+  {
+    this->RemoveAllCropPlanes();
+    return;
+  }
+
+  if (count < this->CropPlanes.size())
+  {
+    this->RemoveAllCropPlanes();
+  }
+
+  // update will set the real values
+  for (int i = static_cast<int>(this->CropPlanes.size()); i < count; ++i)
+  {
+    double origin[3] = { 0.0, 0.0, 0.0 };
+    this->AddACropPlane(origin, origin);
+  }
+}
+
+void vtkPVOpenVRHelper::UpdateCropPlane(int index, double* origin, double* normal)
+{
+  int count = 0;
+  for (auto const& widget : this->CropPlanes)
+  {
+    if (count == index)
+    {
+      vtkImplicitPlaneRepresentation* rep =
+        static_cast<vtkImplicitPlaneRepresentation*>(widget->GetRepresentation());
+      rep->SetOrigin(origin);
+      rep->SetNormal(normal);
+      return;
+    }
+    count++;
+  }
+}
+
 void vtkPVOpenVRHelper::AddACropPlane(double* origin, double* normal)
 {
   vtkNew<vtkImplicitPlaneRepresentation> rep;
@@ -431,6 +496,7 @@ void vtkPVOpenVRHelper::AddACropPlane(double* origin, double* normal)
   ps->SetRepresentation(rep.Get());
   ps->SetInteractor(this->Interactor);
   ps->SetEnabled(1);
+  ps->AddObserver(vtkCommand::InteractionEvent, this->EventCommand);
 
   vtkCollectionSimpleIterator pit;
   vtkProp* prop;
@@ -509,6 +575,7 @@ void vtkPVOpenVRHelper::RemoveAllCropPlanes()
     iter->UnRegister(this);
   }
   this->CropPlanes.clear();
+  this->CollaborationClient->RemoveAllCropPlanes();
 }
 
 void vtkPVOpenVRHelper::AddAThickCrop(vtkTransform* intrans)
@@ -791,6 +858,7 @@ void vtkPVOpenVRHelper::HandleMenuEvent(
     if (name == "addacropplane")
     {
       this->AddACropPlane(nullptr, nullptr);
+      this->CollaborationClient->UpdateCropPlanes(this->CropPlanes);
     }
     if (name == "addathickcrop")
     {
@@ -1518,6 +1586,37 @@ void vtkPVOpenVRHelper::EventCallback(
 
       is->ShowBillboard(toString.str());
       is->ShowPickCell(cell, vtkProp3D::SafeDownCast(prop));
+    }
+    break;
+    case vtkCommand::InteractionEvent:
+    {
+      vtkImplicitPlaneWidget2* widget = vtkImplicitPlaneWidget2::SafeDownCast(caller);
+      if (widget)
+      {
+        self->CollaborationClient->UpdateCropPlanes(self->CropPlanes);
+      }
+    }
+    break;
+    case vtkCommand::ModifiedEvent:
+    {
+      vtkOpenVRRay* ray = vtkOpenVRRay::SafeDownCast(caller);
+      if (ray)
+      {
+        // find the model
+        vtkOpenVRModel* model =
+          self->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::LeftController);
+        if (model && model->GetRay() == ray)
+        {
+          self->CollaborationClient->UpdateRay(model, vtkEventDataDevice::LeftController);
+          return;
+        }
+        model = self->RenderWindow->GetTrackedDeviceModel(vtkEventDataDevice::RightController);
+        if (model && model->GetRay() == ray)
+        {
+          self->CollaborationClient->UpdateRay(model, vtkEventDataDevice::RightController);
+          return;
+        }
+      }
     }
     break;
   }

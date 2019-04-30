@@ -13,7 +13,11 @@
 =========================================================================*/
 #include "vtkPVOpenVRCollaborationClient.h"
 
+#include "vtkImplicitPlaneRepresentation.h"
+#include "vtkImplicitPlaneWidget2.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenVRModel.h"
+#include "vtkOpenVRRay.h"
 #include "vtkOpenVRRenderWindow.h"
 #include "vtkOpenVRRenderer.h"
 #include "vtkPVOpenVRHelper.h"
@@ -62,6 +66,41 @@ protected:
       if (otherID != this->CollabID)
       {
         this->Helper->GoToSavedLocation(viewIndex, updateTranslation, updateDirection);
+      }
+    }
+    // clip planes
+    else if (type == "CPC")
+    {
+      zmq::message_t update;
+      int count = 0;
+
+      this->Subscriber.recv(&update);
+      memcpy(&count, update.data(), sizeof(count));
+
+      // only want to change if it's from someone else.
+      if (otherID != this->CollabID)
+      {
+        this->Helper->SetNumberOfCropPlanes(count);
+      }
+    }
+    else if (type == "CPU")
+    {
+      zmq::message_t update;
+      int count = 0;
+      double origin[3] = { 0.0 };
+      double normal[3] = { 0.0 };
+
+      this->Subscriber.recv(&update);
+      memcpy(&count, update.data(), sizeof(count));
+      this->Subscriber.recv(&update);
+      memcpy(&origin[0], update.data(), sizeof(origin));
+      this->Subscriber.recv(&update);
+      memcpy(&normal[0], update.data(), sizeof(normal));
+
+      // only want to change if it's from someone else.
+      if (otherID != this->CollabID)
+      {
+        this->Helper->UpdateCropPlane(count, origin, normal);
       }
     }
     else
@@ -171,6 +210,44 @@ void vtkPVOpenVRCollaborationClient::SetHelper(vtkPVOpenVRHelper* val)
   this->Internal->SetHelper(val);
 }
 
+void vtkPVOpenVRCollaborationClient::RemoveAllCropPlanes()
+{
+  if (this->Internal->GetConnected())
+  {
+    this->Internal->SendMessage("CPC", 0);
+  }
+}
+
+void vtkPVOpenVRCollaborationClient::UpdateCropPlanes(
+  std::set<vtkImplicitPlaneWidget2*> const& planes)
+{
+  if (this->Internal->GetConnected())
+  {
+    this->Internal->SendMessage("CPC", static_cast<int>(planes.size()));
+  }
+
+  int count = 0;
+  for (auto const& widget : planes)
+  {
+    vtkImplicitPlaneRepresentation* rep =
+      static_cast<vtkImplicitPlaneRepresentation*>(widget->GetRepresentation());
+    double origin[3];
+    double normal[3];
+    rep->GetOrigin(origin);
+    rep->GetNormal(normal);
+    this->Internal->SendMessage("CPU", count, origin, normal);
+    count++;
+  }
+}
+
+void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel* model, vtkEventDataDevice dev)
+{
+  if (this->Internal->GetConnected())
+  {
+    this->Internal->SendMessage(model->GetRay()->GetShow() ? "SR" : "HR", static_cast<int>(dev));
+  }
+}
+
 #else
 void vtkPVOpenVRCollaborationClient::SetCollabHost(std::string const&)
 {
@@ -192,6 +269,15 @@ void vtkPVOpenVRCollaborationClient::GoToSavedLocation(int)
 {
 }
 void vtkPVOpenVRCollaborationClient::SetHelper(vtkPVOpenVRHelper*)
+{
+}
+void vtkPVOpenVRCollaborationClient::RemoveAllCropPlanes()
+{
+}
+void vtkPVOpenVRCollaborationClient::UpdateCropPlanes(std::set<vtkImplicitPlaneWidget2*> const&)
+{
+}
+void vtkPVOpenVRCollaborationClient::UpdateRay(vtkOpenVRModel*, vtkEventDataDevice)
 {
 }
 #endif

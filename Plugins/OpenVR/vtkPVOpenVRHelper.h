@@ -119,6 +119,13 @@ public:
 
   bool InVR() { return this->Interactor != nullptr; }
 
+  void AddACropPlane(double* origin, double* normal);
+  void RemoveAllCropPlanes();
+  void AddAThickCrop(vtkTransform* t);
+  void RemoveAllThickCrops();
+  void SetNumberOfCropPlanes(int);
+  void UpdateCropPlane(int count, double* origin, double* normal);
+
 protected:
   vtkPVOpenVRHelper();
   ~vtkPVOpenVRHelper();
@@ -160,10 +167,6 @@ protected:
 
   std::set<vtkImplicitPlaneWidget2*> CropPlanes;
   std::set<vtkBoxWidget2*> ThickCrops;
-  void AddACropPlane(double* origin, double* normal);
-  void RemoveAllCropPlanes();
-  void AddAThickCrop(vtkTransform* t);
-  void RemoveAllThickCrops();
   void ToggleCropSnapping();
   vtkNew<vtkOpenVRMenuRepresentation> CropMenuRepresentation;
   vtkNew<vtkOpenVRMenuWidget> CropMenu;
