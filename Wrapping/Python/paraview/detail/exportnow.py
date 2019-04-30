@@ -42,8 +42,8 @@ class CinemaDHelper(object):
         indexfilename, datafilename = self.__MakeCinDFileNamesUnderRootDir(filename)
         self.Keys.add("timestep")
         self.Keys.add("producer")
-        self.Keys.add("FILES")
-        self.Contents.append({'timestep':time,'producer':producer,'FILES':datafilename})
+        self.Keys.add("FILE")
+        self.Contents.append({'timestep':time,'producer':producer,'FILE':datafilename})
 
     def AppendCViewToCinemaDTable(self, time, producer, filelist):
         """ keep a record of every new file that cinema image writes along with the keys that produced them so that we can list them all later """
@@ -51,7 +51,7 @@ class CinemaDHelper(object):
             return
         self.Keys.add("timestep")
         self.Keys.add("producer")
-        self.Keys.add("FILES")
+        self.Keys.add("FILE")
         #unroll the contents into key lists and filenames
         for viewname in filelist:
            for entry in filelist[viewname]:
@@ -64,7 +64,7 @@ class CinemaDHelper(object):
                    self.Keys.add(k)
                keylist['timestep']=time
                keylist['producer']=producer
-               keylist['FILES']=self.__StripRootDir(entry[1])
+               keylist['FILE']=self.__StripRootDir(entry[1])
                self.Contents.append(keylist)
 
     def Finalize(self):
@@ -80,20 +80,20 @@ class CinemaDHelper(object):
         f.write("timestep,")
         f.write("producer,")
         for k in self.Keys:
-            if k != 'timestep' and k != 'producer' and k != 'FILES':
+            if k != 'timestep' and k != 'producer' and k != 'FILE':
                 f.write("%s,"%k)
-        f.write("FILES\n")
+        f.write("FILE\n")
         # write all of the contents
         for l in self.Contents:
             f.write("%s,"%l['timestep'])
             f.write("%s,"%l['producer'])
             for k in self.Keys:
-                if k != 'timestep' and k != 'producer' and k != 'FILES':
+                if k != 'timestep' and k != 'producer' and k != 'FILE':
                     v = ''
                     if k in l:
                         v = l[k]
                     f.write("%s,"%v)
-            f.write("%s\n"%self.__StripRootDir(l['FILES']))
+            f.write("%s\n"%self.__StripRootDir(l['FILE']))
         f.close()
 
     def WriteNow(self):
@@ -109,12 +109,12 @@ class CinemaDHelper(object):
                 f.write("%s,"%l['timestep'])
                 f.write("%s,"%l['producer'])
                 for k in self.Keys:
-                    if k != 'timestep' and k != 'producer' and k != 'FILES':
+                    if k != 'timestep' and k != 'producer' and k != 'FILE':
                         v = ''
                         if k in l:
                             v = l[k]
                         f.write("%s,"%v)
-                f.write("%s\n"%self.__StripRootDir(l['FILES']))
+                f.write("%s\n"%self.__StripRootDir(l['FILE']))
             f.close()
             self.Contents = []
             return
