@@ -27,8 +27,12 @@ if (PARAVIEW_ENABLE_PYTHON)
 
   ExternalData_Expand_Arguments(ParaViewData _
     # Baselines
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/,REGEX:SaveScreenshotBarPlot.*\\.png}"
     "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/,REGEX:SaveScreenshotOutline.*\\.png}"
-    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/,REGEX:SaveScreenshotSurface.*\\.png}")
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/,REGEX:SaveScreenshotLinePlot.*\\.png}"
+    "DATA{${CMAKE_CURRENT_SOURCE_DIR}/Data/Baseline/,REGEX:SaveScreenshotSurface.*\\.png}"
+    
+    )
 
   add_subdirectory(Python)
 endif ()

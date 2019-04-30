@@ -98,10 +98,8 @@ SaveScreenshot(smtesting.TempDir + "/SaveScreenshotBarPlot.png", magnification=2
 
 val1 = RegressionTest("SaveScreenshotOutline.png")
 val2 = RegressionTest("SaveScreenshotSurface.png")
+val3 = RegressionTest("SaveScreenshotLinePlot.png")
+val4 = RegressionTest("SaveScreenshotBarPlot.png")
 
-# charts are not rendering correctly when magnification factor is large.
-# val3 = RegressionTest("SaveScreenshotLinePlot.png")
-# val4 = RegressionTest("SaveScreenshotBarPlot.png")
-
-if not (val1 and val2): # and val3 and val4):
+if not (val1 and val2 and val3 and val4):
     raise RuntimeError("Test Failed")
