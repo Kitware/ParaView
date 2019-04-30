@@ -15,6 +15,8 @@
 #include "vtkPVArrayCalculator.h"
 
 #include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
 #include "vtkFunctionParser.h"
@@ -73,6 +75,9 @@ vtkStandardNewMacro(vtkPVArrayCalculator);
 // ----------------------------------------------------------------------------
 vtkPVArrayCalculator::vtkPVArrayCalculator()
 {
+  // We'll tell the superclass about all arrays (partial and full) and have it
+  // ignore missing arrays when evaluating the calculator.
+  this->IgnoreMissingArrays = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -81,11 +86,34 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
-  vtkDataObject* vtkNotUsed(theInputObj), vtkDataSetAttributes* inDataAttrs)
+int vtkPVArrayCalculator::GetAttributeTypeFromInput(vtkDataObject* input)
 {
-  vtkMTimeType mtime = this->GetMTime();
+  int attributeType = this->AttributeType;
+  if (attributeType == vtkArrayCalculator::DEFAULT_ATTRIBUTE_TYPE)
+  {
+    vtkGraph* graphInput = vtkGraph::SafeDownCast(input);
+    vtkDataSet* dsInput = vtkDataSet::SafeDownCast(input);
+    vtkTable* tableInput = vtkTable::SafeDownCast(input);
+    if (graphInput)
+    {
+      attributeType = vtkDataObject::VERTEX;
+    }
+    if (dsInput)
+    {
+      attributeType = vtkDataObject::POINT;
+    }
+    if (tableInput)
+    {
+      attributeType = vtkDataObject::ROW;
+    }
+  }
 
+  return attributeType;
+}
+
+// ----------------------------------------------------------------------------
+void vtkPVArrayCalculator::ResetArrayAndVariableNames()
+{
   // Make sure we reparse the function based on the current array order
   this->FunctionParser->InvalidateFunction();
 
@@ -94,13 +122,22 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
   // It's safe to call these methods in RequestData() since they don't call
   // this->Modified().
   this->RemoveAllVariables();
+}
 
+// ----------------------------------------------------------------------------
+void vtkPVArrayCalculator::AddCoordinateVariableNames()
+{
   // Add coordinate scalar and vector variables
   this->AddCoordinateScalarVariable("coordsX", 0);
   this->AddCoordinateScalarVariable("coordsY", 1);
   this->AddCoordinateScalarVariable("coordsZ", 2);
   this->AddCoordinateVectorVariable("coords", 0, 1, 2);
+}
 
+// ----------------------------------------------------------------------------
+void vtkPVArrayCalculator::AddArrayAndVariableNames(
+  vtkDataObject* vtkNotUsed(theInputObj), vtkDataSetAttributes* inDataAttrs)
+{
   // add non-coordinate scalar and vector variables
   int numberArays = inDataAttrs->GetNumberOfArrays(); // the input
   for (int j = 0; j < numberArays; j++)
@@ -151,53 +188,58 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames(
       }
     }
   }
-
-  assert(this->GetMTime() == mtime && "post: mtime cannot be changed in RequestData()");
-  static_cast<void>(mtime); // added so compiler won't complain im release mode.
 }
 
 // ----------------------------------------------------------------------------
 int vtkPVArrayCalculator::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  vtkDataObject* input = inputVector[0]->GetInformationObject(0)->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
 
-  vtkIdType numTuples = 0;
-  vtkDataSetAttributes* dataAttrs = NULL;
+  // Ensure the mtime is not modified in RequestData.
+  vtkMTimeType mtime = this->GetMTime();
 
-  int attributeType = this->AttributeType;
+  // Reset the array and variable names to start out
+  this->ResetArrayAndVariableNames();
 
-  if (attributeType == vtkArrayCalculator::DEFAULT_ATTRIBUTE_TYPE)
+  // Add coordinate variable names just once per multiblock dataset
+  this->AddCoordinateVariableNames();
+
+  // Add arrays to the calculator
+  auto inputCD = vtkCompositeDataSet::GetData(inputVector[0], 0);
+  if (inputCD)
   {
-    vtkGraph* graphInput = vtkGraph::SafeDownCast(input);
-    vtkDataSet* dsInput = vtkDataSet::SafeDownCast(input);
-    vtkTable* tableInput = vtkTable::SafeDownCast(input);
-    if (graphInput)
+    vtkSmartPointer<vtkCompositeDataIterator> cdIter;
+    cdIter.TakeReference(inputCD->NewIterator());
+    cdIter->SkipEmptyNodesOn();
+    for (cdIter->InitTraversal(); !cdIter->IsDoneWithTraversal(); cdIter->GoToNextItem())
     {
-      attributeType = vtkDataObject::VERTEX;
+      vtkDataObject* dataObject = cdIter->GetCurrentDataObject();
+      if (dataObject)
+      {
+        int attributeType = this->GetAttributeTypeFromInput(dataObject);
+        vtkDataSetAttributes* dataAttrs = dataObject->GetAttributes(attributeType);
+        vtkIdType numTuples = dataAttrs->GetNumberOfTuples();
+        if (numTuples > 0)
+        {
+          this->AddArrayAndVariableNames(input, dataAttrs);
+        }
+      }
     }
-    if (dsInput)
+  }
+  else
+  {
+    int attributeType = this->GetAttributeTypeFromInput(input);
+    vtkDataSetAttributes* dataAttrs = input->GetAttributes(attributeType);
+    vtkIdType numTuples = dataAttrs->GetNumberOfTuples();
+    if (numTuples > 0)
     {
-      attributeType = vtkDataObject::POINT;
-    }
-    if (tableInput)
-    {
-      attributeType = vtkDataObject::ROW;
+      this->AddArrayAndVariableNames(input, dataAttrs);
     }
   }
 
-  dataAttrs = input->GetAttributes(attributeType);
-  numTuples = input->GetNumberOfElements(attributeType);
-
-  if (numTuples > 0)
-  {
-    // Let's update the (scalar and vector arrays / variables) names  to make
-    // them consistent with those of the upstream calculator(s). This addresses
-    // the scenarios where the user modifies the name of a calculator whose out-
-    // put is the input of a (some) subsequent calculator(s) or the user changes
-    // the input of a downstream calculator.
-    this->UpdateArrayAndVariableNames(input, dataAttrs);
-  }
+  assert(this->GetMTime() == mtime && "post: mtime cannot be changed in RequestData()");
+  (void)mtime;
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
