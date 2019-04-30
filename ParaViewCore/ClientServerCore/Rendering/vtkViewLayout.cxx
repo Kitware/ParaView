@@ -208,6 +208,12 @@ void vtkViewLayout::AddView(vtkPVView* view, const double* viewport)
 }
 
 //----------------------------------------------------------------------------
+void vtkViewLayout::AddView(vtkPVComparativeView*, const double*)
+{
+  // deferring for later.
+}
+
+//----------------------------------------------------------------------------
 void vtkViewLayout::UpdateLayout(vtkObject* sender, unsigned long, void*)
 {
   auto window = vtkRenderWindow::SafeDownCast(sender);

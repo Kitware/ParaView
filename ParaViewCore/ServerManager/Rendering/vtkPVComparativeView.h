@@ -142,6 +142,17 @@ public:
   }
   //@}
 
+  //@{
+  /**
+   * When saving screenshots with tiling, these methods get called.
+   * Not to be confused with tile scale and viewport setup on tile display.
+   *
+   * @sa vtkViewLayout::UpdateLayoutForTileDisplay
+   */
+  void SetTileScale(int x, int y);
+  void SetTileViewport(double x0, double y0, double x1, double y1);
+  //@}
+
   /**
    * Satisfying vtkPVView API. We don't need to do anything here since the
    * subviews have their own PPI settings.

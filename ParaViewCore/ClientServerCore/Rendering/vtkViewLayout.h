@@ -44,6 +44,7 @@ class vtkPVView;
 class vtkRenderWindow;
 class vtkViewLayoutProp;
 class vtkViewport;
+class vtkPVComparativeView;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkViewLayout : public vtkObject
 {
@@ -64,6 +65,7 @@ public:
    */
   void RemoveAllViews();
   void AddView(vtkPVView*, const double* viewport);
+  void AddView(vtkPVComparativeView*, const double* viewport);
   //@}
 
   /**

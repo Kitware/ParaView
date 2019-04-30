@@ -973,6 +973,20 @@ vtkImageData* vtkPVComparativeView::CaptureWindow(int magX, int magY)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVComparativeView::SetTileScale(int, int)
+{
+  // we don't do anything here since `CaptureWindow` will handle scaling of each
+  // view separately.
+}
+
+//----------------------------------------------------------------------------
+void vtkPVComparativeView::SetTileViewport(double, double, double, double)
+{
+  // we don't do anything here since `CaptureWindow` will handle scaling of each
+  // view separately.
+}
+
+//----------------------------------------------------------------------------
 void vtkPVComparativeView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

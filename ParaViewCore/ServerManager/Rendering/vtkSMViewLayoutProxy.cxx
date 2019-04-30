@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRect.h"
+#include "vtkSMComparativeViewProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
@@ -434,7 +435,8 @@ void vtkSMViewLayoutProxy::UpdateState()
   for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
        iter != this->Internals->KDTree.end(); ++iter)
   {
-    if (iter->ViewProxy.GetPointer() != nullptr)
+    if (iter->ViewProxy != nullptr &&
+      vtkSMComparativeViewProxy::SafeDownCast(iter->ViewProxy) == nullptr)
     {
       stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "AddView"
              << VTKOBJECT(iter->ViewProxy)
