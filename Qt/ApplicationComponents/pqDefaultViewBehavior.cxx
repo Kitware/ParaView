@@ -67,6 +67,9 @@ pqDefaultViewBehavior::pqDefaultViewBehavior(QObject* parentObject)
 {
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)), this, SLOT(onServerCreation(pqServer*)));
+
+  this->WarningsTimer.setSingleShot(true);
+  this->connect(&this->WarningsTimer, SIGNAL(timeout()), SLOT(showWarnings()));
 }
 
 //-----------------------------------------------------------------------------
@@ -142,7 +145,7 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
   }
 
   // Setup a timer to show warning messages, if needed.
-  pqTimer::singleShot(500, this, SLOT(showWarnings()));
+  this->WarningsTimer.start(500);
 
   // See if some view are already present and if we're in a collaborative
   // session, we are the master.
