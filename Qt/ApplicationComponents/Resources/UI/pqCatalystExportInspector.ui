@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Catalyst Export Inspector</string>
+   <string>Export Inspector</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
