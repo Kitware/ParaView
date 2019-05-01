@@ -134,6 +134,11 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionExportImmediate">
+   <property name="text">
+    <string>Export Now</string>
+   </property>
+  </action>
   <action name="actionExport">
    <property name="text">
     <string>Export Scene...</string>
@@ -196,6 +201,7 @@
   <addaction name="separator"/>
   <addaction name="actionFileSaveData"/>
   <addaction name="actionFileSaveScreenshot"/>
+  <addaction name="actionExportImmediate"/>
   <addaction name="actionExport"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
