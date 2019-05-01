@@ -1288,6 +1288,67 @@
       </SubProxy>
     </Proxy>
 
+    <Proxy class="vtkFlagpoleLabel"
+           name="FlagpoleLabel"
+           processes="client|dataserver|renderserver"
+           >
+      <Documentation>FlagpoleLabel is a 3D representation for a text
+     source.</Documentation>
+      <DoubleVectorProperty name="BasePosition"
+                            command="SetBasePosition"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0"
+                            >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          The world coordinate position of the base of the flagpole.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TopPosition"
+                            command="SetTopPosition"
+                            number_of_elements="3"
+                            default_values="0.0 1.0 0.0"
+                            >
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          The world coordinate position of the top of the flagpole.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="FlagSize"
+                            command="SetFlagSize"
+                            number_of_elements="1"
+                            default_values="1.0"
+                            >
+        <DoubleRangeDomain  min="0.001" name="range" />
+        <Documentation>
+          The size of the flag. 1.0 is the default size which corresponds to
+          a preset texels/window value. Adjust this to increase or decrease
+          the default size.The world coordinate position of the top of the
+          flagpole.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <SubProxy command="SetTextProperty">
+        <Proxy name="TextProperty"
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
+        <ExposedProperties>
+          <Property name="Color"/>
+          <Property name="Opacity"/>
+          <Property name="FontFamily"/>
+          <Property name="FontFile"/>
+          <Property name="Bold"/>
+          <Property name="Italic"/>
+          <Property name="Shadow"/>
+          <Property name="FontSize"/>
+          <Property name="Justification"/>
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of FlagpoleLabel -->
+    </Proxy>
+
     <!-- ================================================================== -->
     <Proxy name="GridAxes3DActor"
            class="vtkPVGridAxes3DActor"

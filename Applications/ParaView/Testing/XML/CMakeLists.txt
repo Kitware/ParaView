@@ -702,6 +702,7 @@ list(APPEND TESTS_WITH_BASELINES
   FeatureEdges.xml
   FFTOverTime.xml
   FieldDataBlocks.xml
+  Flagpole.xml
   Flow.xml
   Flow2.xml
   FollowHiddenData.xml

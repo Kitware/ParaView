@@ -8149,6 +8149,20 @@
           <DataType value="vtkTable" />
         </DataTypeDomain>
       </InputProperty>
+
+      <IntVectorProperty command="SetTextPropMode"
+                         default_values="0"
+                         name="TextPropMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="2D Text Widget" value="0" />
+          <Entry text="Flagpole Actor" value="1" />
+        </EnumerationDomain>
+        <Documentation>
+Select how you want the text to be represented in the view.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty command="SetVisibility"
                          default_values="1"
                          name="Visibility"
@@ -8190,7 +8204,14 @@
         <Documentation>
           Set whether user should be able to interactively place the text in the view.
         </Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                  mode="visibility"
+                                  property="TextPropMode"
+                                  value="0" />
+        </Hints>
       </IntVectorProperty>
+
       <SubProxy command="SetTextWidgetRepresentation">
         <Proxy name="TextWidgetRepresentation"
                proxygroup="representations"
@@ -8216,9 +8237,45 @@
             <Property name="Position2" panel_visibility="never"/>
             <Property name="PositionInfo" />
             <Property name="Position2Info" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="TextPropMode"
+                                      value="0" />
+            </Hints>
           </PropertyGroup>
           <Property name="TextScaleMode" panel_visibility="never"/>
           <Property name="Resizable" panel_visibility="never"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy command="SetFlagpoleLabel">
+        <Proxy name="FlagpoleLabel"
+               proxygroup="annotations"
+               proxyname="FlagpoleLabel"></Proxy>
+         <ShareProperties subproxy="TextWidgetRepresentation">
+           <Exception name="Orientation" />
+           <Exception name="WindowLocation" />
+           <Exception name="Position" />
+           <Exception name="Position2" />
+           <Exception name="PositionInfo" />
+           <Exception name="Position2Info" />
+           <Exception name="TextScaleMode" />
+           <Exception name="Resizable" />
+         </ShareProperties>
+        <ExposedProperties>
+          <!-- properties for Text -->
+          <PropertyGroup label="Flagpole Properties">
+            <Property name="BasePosition" />
+            <Property name="TopPosition" />
+            <Property name="FlagSize" />
+            <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                      mode="visibility"
+                                      property="TextPropMode"
+                                      value="1" />
+            </Hints>
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of TextSourceRepresentation -->
