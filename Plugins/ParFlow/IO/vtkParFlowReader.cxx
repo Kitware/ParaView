@@ -17,15 +17,39 @@
 static constexpr std::streamoff headerSize = 6 * sizeof(double) + 4 * sizeof(int);
 static constexpr std::streamoff subgridHeaderSize = 9 * sizeof(int);
 static constexpr std::streamoff pfbEntrySize = sizeof(double);
-static constexpr std::streamoff clmEntrySize =
-  11 * sizeof(double); // TODO: This is just a starting point.
+static constexpr int clmBaseComponents = 11;
+static constexpr std::streamoff clmEntrySize = clmBaseComponents * sizeof(double);
+static const char* clmBaseComponentNames[clmBaseComponents] = { "eflx_lh_tot", "eflx_lwrad_out",
+  "eflx_sh_tot", "eflx_soil_grnd", "qflx_evap_tot", "qflx_evap_grnd", "qflx_evap_soi",
+  "qflx_evap_veg", "qflx_infl", "swe_out", "t_grnd" };
+
+static std::streamoff computeEntrySize(bool isCLM, int nz)
+{
+  std::streamoff sz;
+  if (!isCLM)
+  {
+    sz = pfbEntrySize;
+  }
+  else
+  {
+    if (nz < clmBaseComponents)
+    {
+      std::cerr << "Invalid CLM file: k axis must have at least " << clmBaseComponents
+                << " entries but has " << nz << "\n";
+    }
+    sz = nz * sizeof(double);
+  }
+  return sz;
+}
 
 vtkStandardNewMacro(vtkParFlowReader);
 
 vtkParFlowReader::vtkParFlowReader()
   : FileName(nullptr)
-  , IsCLMFile(0)
-  , CLMIrrType(1)
+  , IsCLMFile(-1)
+  , CLMIrrType(0)
+  , NZ(0)
+  , InferredAsCLM(-1)
 {
   this->SetNumberOfInputPorts(0);
 }
@@ -39,7 +63,9 @@ void vtkParFlowReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: " << (this->FileName ? this->FileName : "(null)") << "\n";
-  os << indent << "IsCLMFile: " << (this->IsCLMFile ? "true" : "false") << "\n";
+  os << indent
+     << "IsCLMFile: " << (this->IsCLMFile > 0 ? "true" : this->IsCLMFile < 0 ? "infer" : "false")
+     << "\n";
   os << indent << "CLMIrrType: " << this->CLMIrrType << "\n";
   os << indent << "IJKDivs:\n";
   vtkIndent i2 = indent.GetNextIndent();
@@ -93,11 +119,16 @@ int vtkParFlowReader::RequestData(vtkInformation* vtkNotUsed(request),
     fnparts.push_back(token);
   }
   std::string arrayName("data");
+  this->InferredAsCLM = 0;
   if (!fnparts.empty())
   {
     fnparts.pop_back(); // Drop the ".pfb".
     if (!fnparts.empty())
     {
+      if (fnparts.back() == "C" || fnparts.back() == "c")
+      {
+        this->InferredAsCLM = 1;
+      }
       if (is_number(fnparts.back()))
       {
         fnparts.pop_back(); // Drop the timestep.
@@ -107,6 +138,10 @@ int vtkParFlowReader::RequestData(vtkInformation* vtkNotUsed(request),
         arrayName = fnparts.back();
       }
     }
+  }
+  if (this->IsCLMFile >= 0)
+  {
+    this->InferredAsCLM = this->IsCLMFile;
   }
 
   // When run in parallel, we choose a range of blocks
@@ -136,6 +171,8 @@ int vtkParFlowReader::RequestData(vtkInformation* vtkNotUsed(request),
   vtkByteSwap::SwapBERange(nn.GetData(), 3);
   vtkByteSwap::SwapBERange(dx.GetData(), 3);
   vtkByteSwap::SwapBE(&numSubGrids);
+
+  this->NZ = nn[2]; // For computing size of CLM state.
 
   std::streamoff measuredHeaderSize = pfb.tellg();
   if (measuredHeaderSize != headerSize)
@@ -167,6 +204,10 @@ int vtkParFlowReader::RequestData(vtkInformation* vtkNotUsed(request),
   {
     this->ReadBlock(pfb, output, xx, dx, arrayName, ni);
   }
+
+  // Prevent accidents; don't preserve across calls to RequestData:
+  this->NZ = 0;
+  this->InferredAsCLM = -1;
 
   return 1;
 }
@@ -265,7 +306,7 @@ std::streamoff vtkParFlowReader::GetBlockOffset(int blockId) const
 std::streamoff vtkParFlowReader::GetBlockOffset(const vtkVector3i& blockIJK) const
 {
   std::streamoff offset;
-  std::streamoff entrySize = this->IsCLMFile ? clmEntrySize : pfbEntrySize;
+  std::streamoff entrySize = computeEntrySize(this->InferredAsCLM, this->NZ);
   int ni = static_cast<int>(this->IJKDivs[0].size()) - 1;
   int nj = static_cast<int>(this->IJKDivs[1].size()) - 1;
   int blockId = blockIJK[0] + ni * (blockIJK[1] + nj * blockIJK[2]);
@@ -291,7 +332,7 @@ std::streamoff vtkParFlowReader::GetBlockOffset(const vtkVector3i& blockIJK) con
 std::streamoff vtkParFlowReader::GetEndOffset() const
 {
   std::streamoff offset;
-  std::streamoff entrySize = this->IsCLMFile ? clmEntrySize : pfbEntrySize;
+  std::streamoff entrySize = computeEntrySize(this->InferredAsCLM, this->NZ);
   int ni = static_cast<int>(this->IJKDivs[0].size()) - 1;
   int nj = static_cast<int>(this->IJKDivs[1].size()) - 1;
   int nk = static_cast<int>(this->IJKDivs[2].size()) - 1;
@@ -320,18 +361,82 @@ void vtkParFlowReader::ReadBlock(std::ifstream& pfb, vtkMultiBlockDataSet* outpu
   if (this->ReadSubgridHeader(pfb, si, sn, sr))
   {
     vtkNew<vtkImageData> image;
-    vtkNew<vtkDoubleArray> field;
     image->SetOrigin(origin.GetData());
     image->SetSpacing(spacing.GetData());
-    image->SetExtent(si[0], si[0] + sn[0], si[1], si[1] + sn[1], si[2], si[2] + sn[2]);
-    field->SetNumberOfTuples(image->GetNumberOfCells());
-    field->SetName(arrayName.c_str());
-    image->GetCellData()->SetScalars(field);
 
-    vtkIdType numValues = sn[0] * sn[1] * sn[2];
-    pfb.read(reinterpret_cast<char*>(field->GetVoidPointer(0)), sizeof(double) * numValues);
-    vtkByteSwap::SwapBERange(reinterpret_cast<double*>(field->GetVoidPointer(0)), numValues);
+    if (this->InferredAsCLM)
+    {
+      // The CLM files have the full simulation extent listed but only
+      // provide data on the top 2-d surface:
+      image->SetExtent(si[0], si[0] + sn[0], si[1], si[1] + sn[1], si[2], si[2]);
+
+      const int numCLMVars = sn[2] - si[2];
+      int numComponents = 0;
+      for (int cc = 0; cc < clmBaseComponents && cc < numCLMVars; ++cc, ++numComponents)
+      {
+        vtkNew<vtkDoubleArray> field;
+        field->SetName(clmBaseComponentNames[cc]);
+        this->ReadBlockIntoArray(pfb, image, field);
+      }
+      switch (this->CLMIrrType)
+      {
+        case 1:
+        {
+          vtkNew<vtkDoubleArray> field;
+          field->SetName("qflx_qirr");
+          this->ReadBlockIntoArray(pfb, image, field);
+          ++numComponents;
+        }
+        break;
+        case 3:
+        {
+          vtkNew<vtkDoubleArray> field;
+          field->SetName("qflx_qirr_inst");
+          this->ReadBlockIntoArray(pfb, image, field);
+          ++numComponents;
+        }
+        break;
+        default:
+          break;
+      }
+      for (int cz = 0; numComponents < numCLMVars; ++cz, ++numComponents)
+      {
+        vtkNew<vtkDoubleArray> field;
+        std::ostringstream name;
+        name << "tsoil_" << cz;
+        field->SetName(name.str().c_str());
+        this->ReadBlockIntoArray(pfb, image, field);
+      }
+    }
+    else
+    {
+      // Read a single PFB state variable:
+      vtkNew<vtkDoubleArray> field;
+      image->SetExtent(si[0], si[0] + sn[0], si[1], si[1] + sn[1], si[2], si[2] + sn[2]);
+      field->SetName(arrayName.c_str());
+      this->ReadBlockIntoArray(pfb, image, field);
+    }
 
     output->SetBlock(blockId, image);
   }
+}
+
+void vtkParFlowReader::ReadBlockIntoArray(
+  std::ifstream& file, vtkImageData* img, vtkDoubleArray* arr)
+{
+  arr->SetNumberOfTuples(img->GetNumberOfCells());
+  auto cellData = img->GetCellData();
+  // Calling cellData->SetScalars(arr) multiple times removes
+  // previous arrays set as scalars, so be careful not to:
+  cellData->AddArray(arr);
+  if (!cellData->GetScalars())
+  {
+    cellData->SetScalars(arr);
+  }
+
+  vtkIdType numValues = arr->GetNumberOfTuples() * arr->GetNumberOfComponents();
+  file.read(reinterpret_cast<char*>(arr->GetVoidPointer(0)), sizeof(double) * numValues);
+  vtkByteSwap::SwapBERange(reinterpret_cast<double*>(arr->GetVoidPointer(0)), numValues);
+  // std::cout << arr->GetNumberOfComponents() << " " << numValues << "Read to byte " << pfb.tellg()
+  // << "\n";
 }

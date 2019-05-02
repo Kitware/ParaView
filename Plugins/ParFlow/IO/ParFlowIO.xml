@@ -21,6 +21,35 @@
         >
         <FileListDomain name="files"/>
       </StringVectorProperty>
+      <IntVectorProperty
+        name="IsCLMFile"
+        label="Does file hold CLM data?"
+        animateable="1"
+        command="SetIsCLMFile"
+        default_values="-1"
+        number_of_elements="1"
+        >
+        <EnumerationDomain name="enum">
+          <Entry text="Infer from filename" value="-1"/>
+          <Entry text="No" value="0"/>
+          <Entry text="Yes" value="1"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="CLMIrrType"
+        label="CLM irrigation type"
+        animateable="1"
+        command="SetCLMIrrType"
+        default_values="0"
+        number_of_elements="1"
+        >
+      <EnumerationDomain name="enum">
+        <Entry text="None" value="0"/>
+        <Entry text="Spray" value="1"/>
+        <Entry text="Drip" value="2"/>
+        <Entry text="Instant" value="3"/>
+      </EnumerationDomain>
+      </IntVectorProperty>
       <Hints>
         <ReaderFactory
           extensions="pfb"
@@ -45,6 +74,10 @@
           proxygroup="internal_sources"
           proxyname="ParFlowBinaryReader">
         </Proxy>
+        <ExposedProperties>
+          <Property name="IsCLMFile"/>
+          <Property name="CLMIrrType"/>
+        </ExposedProperties>
       </SubProxy>
 
       <StringVectorProperty
