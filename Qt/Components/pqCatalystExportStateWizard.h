@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @deprecated ParaView 5.6
  *
  * pqCatalystExportStateWizard has been deprecated in ParaView 5.6 and has
- * been replaced by pqCatalystExportInspector
+ * been replaced by pqExportInspector
 */
 class PQCOMPONENTS_EXPORT pqCatalystExportStateWizard : public pqSGExportStateWizard
 {

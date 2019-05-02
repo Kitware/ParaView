@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqCatalystExportInspector.h
+   Module:  pqExportInspector.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,30 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef pqCatalystExportInspector_h
-#define pqCatalystExportInspector_h
+#ifndef pqExportInspector_h
+#define pqExportInspector_h
 
 #include "pqApplicationComponentsModule.h" // for exports
 #include <QWidget>
 
 /**
- * @class pqCatalystExportInspector
+ * @class pqExportInspector
  * @brief widget to setup Catalyst export scripts and data products
  *
- * pqCatalystExportInspector is a central place where the user can set up
+ * pqExportInspector is a central place where the user can set up
  * a Catalyst script including all of the data products that the script
  * will produce when a Catalyzed simulation runs it.
  */
 
-class PQAPPLICATIONCOMPONENTS_EXPORT pqCatalystExportInspector : public QWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqExportInspector : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
 
 public:
-  pqCatalystExportInspector(
+  pqExportInspector(
     QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags(), bool autotracking = true);
-  ~pqCatalystExportInspector() override;
+  ~pqExportInspector() override;
 
 protected:
   /**
@@ -108,7 +108,7 @@ private slots:
   void Search(const QString&);
 
 private:
-  Q_DISABLE_COPY(pqCatalystExportInspector);
+  Q_DISABLE_COPY(pqExportInspector);
 
   // helpers to maintain the content
   void PopulateWriterFormats();
