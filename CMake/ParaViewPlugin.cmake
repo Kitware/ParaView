@@ -586,6 +586,14 @@ function (paraview_add_plugin name)
       string(APPEND _paraview_plugin_subdir "/${_paraview_build_LIBRARY_SUBDIRECTORY}")
     endif ()
     string(APPEND _paraview_plugin_subdir "/${_paraview_build_plugin}")
+    set(_paraview_plugin_CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+    set(_paraview_plugin_CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+    set(_paraview_plugin_CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+    set(_paraview_plugin_CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_NAME_DIR}")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_plugin_subdir}")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_plugin_subdir}")
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${_paraview_plugin_subdir}")
+    set(CMAKE_INSTALL_NAME_DIR "@loader_path")
 
     vtk_module_build(
       MODULES             ${plugin_modules}
@@ -595,6 +603,15 @@ function (paraview_add_plugin name)
       LIBRARY_DESTINATION "${_paraview_plugin_subdir}"
       RUNTIME_DESTINATION "${_paraview_plugin_subdir}"
       ${_paraview_add_plugin_MODULE_ARGS})
+
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${_paraview_plugin_CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${_paraview_plugin_CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${_paraview_plugin_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}")
+    set(CMAKE_INSTALL_NAME_DIR "${_paraview_plugin_CMAKE_INSTALL_NAME_DIR}")
+    unset(_paraview_plugin_CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    unset(_paraview_plugin_CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    unset(_paraview_plugin_CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    unset(_paraview_plugin_CMAKE_INSTALL_NAME_DIR)
   endif ()
 
   # TODO: resource initialization for static builds
