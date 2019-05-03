@@ -1027,8 +1027,9 @@ int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
     {
       for (int pp = lo[0]; pp <= hi[0]; ++pp)
       {
-        int subgrid =
-          pp + (this->IJKDivs[dom][0].size() - 1) * (qq + (this->IJKDivs[dom][1].size() - 1) * rr);
+        int isizem1 = static_cast<int>(this->IJKDivs[dom][0].size() - 1);
+        int jsizem1 = static_cast<int>(this->IJKDivs[dom][1].size() - 1);
+        int subgrid = pp + isizem1 * (qq + jsizem1 * rr);
         std::streamoff off = this->GetBlockOffset(dom, subgrid);
         // std::cout << variable->GetName() << " comp " << component << " subgrid " << subgrid << "
         // offset " << off << "\n";
@@ -1308,7 +1309,8 @@ int vtkParFlowMetaReader::RequestInformation(
     for (int ii = 0; ii < 2; ++ii)
     {
       auto info = outInfo->GetInformationObject(ii);
-      info->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &times[0], times.size());
+      info->Set(
+        vtkStreamingDemandDrivenPipeline::TIME_STEPS(), &times[0], static_cast<int>(times.size()));
       info->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
     }
   }
