@@ -714,53 +714,6 @@ void vtkSMParaViewPipelineControllerWithRendering::UpdatePipelineBeforeDisplay(
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMParaViewPipelineControllerWithRendering::RegisterViewProxy(
-  vtkSMProxy* proxy, const char* proxyname)
-{
-  if (!proxy)
-  {
-    return false;
-  }
-
-  bool retval = this->Superclass::RegisterViewProxy(proxy, proxyname);
-  if (proxy->HasAnnotation("ParaView::DetachedFromLayout") &&
-    strcmp(proxy->GetAnnotation("ParaView::DetachedFromLayout"), "true") == 0)
-  {
-    return retval;
-  }
-
-  vtkSMSessionProxyManager* pxm = proxy->GetSessionProxyManager();
-
-  // locate layout (create a new one if needed).
-  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveView");
-  assert(selmodel != nullptr);
-  vtkSMViewProxy* activeView = vtkSMViewProxy::SafeDownCast(selmodel->GetCurrentProxy());
-  vtkSMProxy* activeLayout = vtkSMViewLayoutProxy::FindLayout(activeView);
-  activeLayout =
-    activeLayout ? activeLayout : this->FindProxy(pxm, "layouts", "misc", "ViewLayout");
-  if (!activeLayout)
-  {
-    // no active layout is present at all. Create a new one.
-    activeLayout = pxm->NewProxy("misc", "ViewLayout");
-    if (activeLayout)
-    {
-      this->InitializeProxy(activeLayout);
-      this->RegisterLayoutProxy(activeLayout);
-      activeLayout->FastDelete();
-    }
-  }
-  if (activeLayout)
-  {
-    vtkSMProxy* layoutAssigned =
-      vtkSMViewLayoutProxy::FindLayout(vtkSMViewProxy::SafeDownCast(proxy));
-    activeLayout = layoutAssigned ? layoutAssigned : activeLayout;
-    vtkSMViewLayoutProxy::SafeDownCast(activeLayout)
-      ->AssignViewToAnyCell(vtkSMViewProxy::SafeDownCast(proxy), 0);
-  }
-  return retval;
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMParaViewPipelineControllerWithRendering::RegisterLayoutProxy(
   vtkSMProxy* proxy, const char* proxyname)
 {
@@ -788,4 +741,57 @@ void vtkSMParaViewPipelineControllerWithRendering::DoMaterialSetup(vtkSMProxy* p
   vtkSMMaterialLibraryProxy* mlp = vtkSMMaterialLibraryProxy::SafeDownCast(prox);
   mlp->LoadDefaultMaterials();
   mlp->Synchronize();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParaViewPipelineControllerWithRendering::AssignViewToLayout(
+  vtkSMViewProxy* view, vtkSMViewLayoutProxy* layout, int hint)
+{
+  if (!view)
+  {
+    vtkErrorMacro("`AssignViewToLayout` called with `view==nullptr`.");
+    return;
+  }
+
+  // sanity check, the view cannot be assigned to another layout already.
+  if (vtkSMViewLayoutProxy::FindLayout(view) != nullptr)
+  {
+    return;
+  }
+
+  if (layout && layout->GetSession() != view->GetSession())
+  {
+    // both layout and view must be on the same session.
+    layout = nullptr;
+  }
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("AssignViewToLayout")
+    .arg("view", view)
+    .arg("layout", layout)
+    .arg("hint", hint)
+    .arg("comment", "add view to a layout so it's visible in UI");
+
+  auto pxm = view->GetSessionProxyManager();
+  if (layout == nullptr)
+  {
+    layout =
+      vtkSMViewLayoutProxy::SafeDownCast(this->FindProxy(pxm, "layouts", "misc", "ViewLayout"));
+  }
+
+  if (layout == nullptr)
+  {
+    // create a new layout.
+    if ((layout = vtkSMViewLayoutProxy::SafeDownCast(pxm->NewProxy("misc", "ViewLayout"))))
+    {
+      this->InitializeProxy(layout);
+      this->RegisterLayoutProxy(layout);
+      layout->FastDelete();
+    }
+  }
+
+  if (layout)
+  {
+    layout->AssignViewToAnyCell(view, hint);
+  }
 }

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataQueryReaction.h"
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
+#include "pqMultiViewWidget.h"
 #include "pqObjectBuilder.h"
 #include "pqRenameProxyReaction.h"
 #include "pqRenderView.h"
@@ -52,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToggleInteractionViewMode.h"
 #include "pqUndoStack.h"
 #include "pqViewFrame.h"
-
 #include "vtkChart.h"
 #include "vtkCollection.h"
 #include "vtkPVProxyDefinitionIterator.h"
@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMTooltipSelectionPipeline.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "vtkSmartPointer.h"
 
 #include <QGuiApplication>
@@ -74,6 +75,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 
 #include <cassert>
+
+namespace
+{
+template <typename T>
+T findParent(QObject* obj)
+{
+  if (auto view = qobject_cast<T>(obj))
+  {
+    return view;
+  }
+  else if (obj)
+  {
+    return findParent<T>(obj->parent());
+  }
+  return nullptr;
+}
+}
 
 //-----------------------------------------------------------------------------
 pqStandardViewFrameActionsImplementation::pqStandardViewFrameActionsImplementation(
@@ -596,16 +614,18 @@ void pqStandardViewFrameActionsImplementation::aboutToShowConvertMenu()
   if (menu)
   {
     menu->clear();
+
+    auto viewframe = ::findParent<pqViewFrame*>(menu);
+    assert(viewframe != nullptr);
+
     QList<ViewType> views = this->availableViewTypes();
     foreach (const ViewType& type, views)
     {
       QAction* view_action = new QAction(type.Label, menu);
-      view_action->setProperty("PV_VIEW_TYPE", type.Name);
-      view_action->setProperty("PV_VIEW_LABEL", type.Label);
-      view_action->setProperty("PV_COMMAND", "Convert To");
       menu->addAction(view_action);
-      QObject::connect(
-        view_action, SIGNAL(triggered()), this, SLOT(invoked()), Qt::QueuedConnection);
+      QObject::connect(view_action, &QAction::triggered, this,
+        [viewframe, type, this](bool) { this->invoked(viewframe, type, "Convert To"); },
+        Qt::QueuedConnection);
     }
   }
 }
@@ -616,46 +636,51 @@ void pqStandardViewFrameActionsImplementation::setupEmptyFrame(QWidget* frame)
   Ui::EmptyView ui;
   ui.setupUi(frame);
 
+  auto viewframe = ::findParent<pqViewFrame*>(frame);
+  assert(viewframe != nullptr);
+
   QList<ViewType> views = this->availableViewTypes();
   foreach (const ViewType& type, views)
   {
     QPushButton* button = new QPushButton(type.Label, ui.ConvertActionsFrame);
     button->setObjectName(type.Name);
-    button->setProperty("PV_VIEW_TYPE", type.Name);
-    button->setProperty("PV_VIEW_LABEL", type.Label);
-    button->setProperty("PV_COMMAND", "Create");
-
-    QObject::connect(button, SIGNAL(clicked()), this, SLOT(invoked()), Qt::QueuedConnection);
+    QObject::connect(button, &QPushButton::clicked, this,
+      [viewframe, type, this]() { this->invoked(viewframe, type, "Create"); },
+      Qt::QueuedConnection);
     ui.ConvertActionsFrame->layout()->addWidget(button);
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqStandardViewFrameActionsImplementation::invoked()
+void pqStandardViewFrameActionsImplementation::invoked(pqViewFrame* viewframe,
+  const pqStandardViewFrameActionsImplementation::ViewType& vtype, const QString& command)
 {
-  QObject* osender = this->sender();
-  if (!osender)
+  if (!viewframe)
   {
     return;
   }
 
-  // either create a new view, or convert the existing one.
-  // This slot is called either from an action in the "Convert To" menu, or from
-  // the buttons on an empty frame.
-  QString type = osender->property("PV_VIEW_TYPE").toString();
-  QString label = osender->property("PV_VIEW_LABEL").toString();
-  QString command = osender->property("PV_COMMAND").toString();
+  // this implementation is a little hackish.
+  // pqStandardViewFrameActionsImplementation is ripe for refactoring.
+  auto pqmvwidget = ::findParent<pqMultiViewWidget*>(viewframe);
+  assert(pqmvwidget != nullptr);
 
-  BEGIN_UNDO_SET(QString("%1 %2").arg(command).arg(label));
-  ViewType vtype;
-  vtype.Label = label;
-  vtype.Name = type;
-  this->handleCreateView(vtype);
+  int frameIndex = viewframe->property("FRAME_INDEX").toInt();
+  viewframe = nullptr;
+
+  // either create a new view, or convert the existing one.
+  BEGIN_UNDO_SET(QString("%1 %2").arg(command).arg(vtype.Label));
+  if (auto view = this->handleCreateView(vtype))
+  {
+    // note: handleCreateView may destroy the pqViewFrame.
+    // assign it to layout.
+    pqmvwidget->layoutManager()->AssignViewToAnyCell(view->getViewProxy(), frameIndex);
+  }
   END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
-void pqStandardViewFrameActionsImplementation::handleCreateView(
+pqView* pqStandardViewFrameActionsImplementation::handleCreateView(
   const pqStandardViewFrameActionsImplementation::ViewType& viewType)
 {
   pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
@@ -667,8 +692,9 @@ void pqStandardViewFrameActionsImplementation::handleCreateView(
   }
   if (viewType.Name != "None")
   {
-    builder->createView(viewType.Name, pqActiveObjects::instance().activeServer());
+    return builder->createView(viewType.Name, pqActiveObjects::instance().activeServer());
   }
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------

@@ -116,6 +116,11 @@ public:
   QSize preview(const QSize& previewSize = QSize());
 
   /**
+   * Returns the location of the active frame, if any, else -1.
+   */
+  int activeFrameLocation() const;
+
+  /**
    * @deprecated use `decorationsVisibility` instead.
    */
   VTK_LEGACY(bool isDecorationsVisible() const);
@@ -144,14 +149,6 @@ public slots:
   * explicitly, it is called automatically when the layoutManager is modified.
   */
   void reload();
-
-  /**
-  * Assigns a frame to the view. This assumes that the view not already been
-  * placed in a frame. This will try to locate an empty frame, if possible. If
-  * no empty frames are available, it will split the active frame along its
-  * longest dimension and place the view in the newly created child-frame.
-  */
-  void assignToFrame(pqView*);
 
   /**
   * In a tabbed setup, when pqMultiViewWidget becomes active, this method

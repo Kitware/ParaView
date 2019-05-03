@@ -115,6 +115,16 @@ public:
    */
   vtkSMViewLayoutProxy* activeLayout() const;
 
+  /**
+   * Convenience method to locate the active vtkSMViewLayoutProxy and the active
+   * cell in it. Since currently this information is not available at the
+   * server-manager level, especially if the active view is nullptr, we use
+   * pqMultiViewWidget and pqTabbedMultiViewWidget to find this.
+   *
+   * Returns 0 if one could not determined.
+   */
+  int activeLayoutLocation() const;
+
 public slots:
   void setActiveView(pqView* view);
   void setActiveSource(pqPipelineSource* source);

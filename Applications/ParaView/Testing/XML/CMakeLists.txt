@@ -307,6 +307,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SliceWithPlaneMultiBlockSurface_1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SpherePointSource_InterA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SpherePointSource_InterB.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/SplitViewTraceScreenshot.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StepColorSpaceA.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridCellBlanking.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/StructuredGridVolumeRendering.png}"
@@ -426,7 +427,6 @@ endif ()
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND TESTS_WITHOUT_BASELINES
-    DetachedFromLayoutIndirect.xml
     TestPythonConsole.xml
     TestPopOutWidget.xml # needs programmable filter
     MultipleNumberOfComponents.xml
@@ -978,6 +978,7 @@ if(PARAVIEW_ENABLE_PYTHON)
     RestoreArrayDefaultTransferFunction.xml
     RestoreDefaultTransferFunction.xml
     TraceMultiViews.xml
+    SplitViewTrace.xml
   )
   list(APPEND TESTS_WITHOUT_BASELINES
     PythonCalculator.xml

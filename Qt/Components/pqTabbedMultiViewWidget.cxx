@@ -210,22 +210,6 @@ public:
   QPointer<QWidget> FullScreenWindow;
   QPointer<QWidget> NewTabWidget;
 
-  /// returns a frame that can be used to assign the view proxy. May return NULL
-  /// if no suitable frame is found.
-  pqMultiViewWidget* assignableFrame(pqProxy* view)
-  {
-    pqMultiViewWidget* current = qobject_cast<pqMultiViewWidget*>(this->TabWidget->currentWidget());
-    if (current && this->TabWidgets.contains(view->getServer(), current))
-    {
-      return current;
-    }
-    if (this->TabWidgets.count(view->getServer()) > 0)
-    {
-      return this->TabWidgets.value(view->getServer());
-    }
-    return NULL;
-  }
-
   void addNewTabWidget()
   {
     if (!this->NewTabWidget)
@@ -404,43 +388,6 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     auto vlayout = vtkSMViewLayoutProxy::SafeDownCast(proxy->getProxy());
     this->createTab(vlayout);
   }
-  else if (qobject_cast<pqView*>(proxy))
-  {
-    pqView* view = qobject_cast<pqView*>(proxy);
-    if (pqApplicationCore::instance()->isLoadingState() || view == NULL)
-    {
-      return;
-    }
-    // also check with the proxy manager, since the pqApplicationCore's state
-    // loading flag won't get set if state was being loaded from Python Shell.
-    vtkSMSessionProxyManager* pxm = proxy->getServer()->proxyManager();
-    if (pxm && pxm->GetInLoadXMLState())
-    {
-      return;
-    }
-
-    // check if this proxy has been assigned a frame already. This typically can
-    // happen when loading states (for collaboration or otherwise).
-    QList<QPointer<pqMultiViewWidget> > widgets = this->Internals->TabWidgets.values();
-
-    foreach (pqMultiViewWidget* widget, widgets)
-    {
-      if (widget && widget->isViewAssigned(view))
-      {
-        return;
-      }
-    }
-
-    if (!(proxy->getProxy()->HasAnnotation("ParaView::DetachedFromLayout") &&
-          strcmp(proxy->getProxy()->GetAnnotation("ParaView::DetachedFromLayout"), "true") == 0))
-    {
-      // FIXME: we may want to give server-manager the opportunity to place the
-      // view after creation, if it wants. The GUI should try to find a place for
-      // it, only if the server-manager (through undo-redo, or loading state or
-      // Python or collaborative-client).
-      this->assignToFrame(view, true);
-    }
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -466,34 +413,6 @@ void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
         break;
       }
     }
-  }
-}
-
-//-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::assignToFrame(pqView* view, bool warnIfTabCreated)
-{
-  pqMultiViewWidget* frame = this->Internals->assignableFrame(view);
-
-  if (!frame)
-  {
-    if (warnIfTabCreated)
-    {
-      qWarning() << "This code may not work in multi-clients mode";
-    }
-
-    // implies no vtkSMViewLayoutProxy was registered for this session.
-    this->createTab(view->getServer());
-    frame = qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget());
-  }
-
-  if (frame)
-  {
-    frame->assignToFrame(view);
-  }
-  else
-  {
-    qCritical() << "A new view was added, but pqTabbedMultiViewWidget has no "
-                   "idea where to put this view.";
   }
 }
 
@@ -717,6 +636,9 @@ void pqTabbedMultiViewWidget::reset()
 //-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::onStateLoaded()
 {
+// FIXME: remove
+// maybe warn there are views in state file not assigned to layout
+#if 0
   QSet<vtkSMViewProxy*> proxies;
   foreach (pqMultiViewWidget* wdg, this->Internals->TabWidgets.values())
   {
@@ -737,6 +659,7 @@ void pqTabbedMultiViewWidget::onStateLoaded()
       this->assignToFrame(view, false);
     }
   }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -806,6 +729,23 @@ vtkSMViewLayoutProxy* pqTabbedMultiViewWidget::layoutProxy() const
   if (auto widget = qobject_cast<pqMultiViewWidget*>(this->Internals->TabWidget->currentWidget()))
   {
     return widget->layoutManager();
+  }
+  return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+pqMultiViewWidget* pqTabbedMultiViewWidget::findTab(vtkSMViewLayoutProxy* layoutManager) const
+{
+  auto tabWidget = this->Internals->TabWidget;
+  for (int cc = 0, max = tabWidget->count(); cc < max; ++cc)
+  {
+    if (auto mvwidget = qobject_cast<pqMultiViewWidget*>(tabWidget->widget(cc)))
+    {
+      if (mvwidget->layoutManager() == layoutManager)
+      {
+        return mvwidget;
+      }
+    }
   }
   return nullptr;
 }

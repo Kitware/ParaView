@@ -459,21 +459,6 @@ void pqMultiViewWidget::proxyRemoved(pqProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqMultiViewWidget::assignToFrame(pqView* view)
-{
-  if (this->layoutManager() && view)
-  {
-    int active_index = 0;
-    if (this->Internals->ActiveFrame)
-    {
-      active_index = this->Internals->ActiveFrame->property("FRAME_INDEX").toInt();
-    }
-    this->layoutManager()->AssignViewToAnyCell(view->getViewProxy(), active_index);
-  }
-  pqActiveObjects::instance().setActiveView(view);
-}
-
-//-----------------------------------------------------------------------------
 void pqMultiViewWidget::makeFrameActive()
 {
   /// note pqMultiViewWidget::markActive(pqViewFrame*) fires a signal that
@@ -695,6 +680,10 @@ void pqMultiViewWidget::reload()
 
   // let's make sure maximum size on all `pqViewFrame`s is set correctly.
   internals.lockViewSize(internals.lockedSize());
+
+  // post reload, the active frames may have changed.
+  // so we ensure we mark the right one active.
+  this->markActive(pqActiveObjects::instance().activeView());
 
   // // we let the GUI updated immediately. This is needed since when a new view is
   // // created (for example), it may depend on the size of the view during its
@@ -942,4 +931,14 @@ QSize pqMultiViewWidget::preview(const QSize& nsize)
     vlayout->UpdateVTKObjects();
   }
   return this->Internals->Container->maximumSize();
+}
+
+//-----------------------------------------------------------------------------
+int pqMultiViewWidget::activeFrameLocation() const
+{
+  if (auto frame = this->Internals->ActiveFrame)
+  {
+    return frame->property("FRAME_INDEX").toInt();
+  }
+  return -1;
 }

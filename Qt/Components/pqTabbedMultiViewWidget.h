@@ -81,7 +81,7 @@ public:
   bool tabVisibility() const;
 
   /**
-  * Return the layout proxy.
+  * Return the layout proxy for the current tab.
   */
   vtkSMViewLayoutProxy* layoutProxy() const;
 
@@ -89,6 +89,12 @@ public:
    * Returns whether frame decorations are shown.
    */
   bool decorationsVisibility() const;
+
+  /**
+   * Locate the pqMultiViewWidget associated with the vtkSMViewLayoutProxy held
+   * by this pqTabbedMultiViewWidget instance, if any.
+   */
+  pqMultiViewWidget* findTab(vtkSMViewLayoutProxy*) const;
 
 signals:
   /**
@@ -190,11 +196,6 @@ protected slots:
 
 protected:
   bool eventFilter(QObject* obj, QEvent* event) override;
-
-  /**
-  * assigns a frame to the view.
-  */
-  virtual void assignToFrame(pqView*, bool warnIfTabCreated);
 
   /**
   * Internal class used as the TabWidget.

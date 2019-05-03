@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pqObjectBuilder_h
 
 #include "pqCoreModule.h"
+#include "vtkSetGet.h" // for VTK_LEGACY
 #include <QMap>
 #include <QObject>
 #include <QVariant>
@@ -134,14 +135,26 @@ public:
   /**
   * Creates a new view module of the given type on the given server.
   */
-  virtual pqView* createView(
-    const QString& type, pqServer* server, bool detachedFromLayout = false);
+  virtual pqView* createView(const QString& type, pqServer* server);
+
+  /**
+   * Deprecated in ParaView 5.7. `detachedFromLayout` argument is not longer
+   * applicable. All views are now created *detached* by default.
+   */
+  VTK_LEGACY(pqView* createView(const QString& type, pqServer* server, bool detachedFromLayout));
 
   /**
   * Destroys the view module. This destroys the view module
   * as well as all the displays in the view module.
   */
   virtual void destroy(pqView* view);
+
+  /**
+   * Assigns the view to the layout. If layout is nullptr, this method will
+   * use an arbitrary layout on the same server as the view, if any, or create a
+   * new layout and assign the view to it.
+   */
+  virtual void addToLayout(pqView* view, pqProxy* layout = nullptr);
 
   /**
   * Creates a representation to show the data from the given output port of a

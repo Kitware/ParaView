@@ -1281,12 +1281,36 @@ class RegisterLayoutProxy(TraceItem):
     def __init__(self, layout):
         TraceItem.__init__(self)
         self.Layout = sm._getPyProxy(layout)
-    def finalize(self):
+    def finalize(self, filter=None):
+        if filter is None:
+            filter = lambda x: True
         pname = Trace.get_registered_name(self.Layout, "layouts")
         accessor = ProxyAccessor(Trace.get_varname(pname), self.Layout)
         Trace.Output.append_separated([\
-            "# create new layout object",
-            "%s = CreateLayout()" % accessor])
+            "# create new layout object '%s'" % pname,
+            "%s = CreateLayout(name='%s')" % (accessor, pname)])
+
+        # Let's trace out the state for the layout.
+        def _trace_layout(layout, laccessor, location):
+            sdir = layout.GetSplitDirection(location)
+            sfraction = layout.GetSplitFraction(location)
+            if sdir == layout.SMProxy.VERTICAL:
+                Trace.Output.append([\
+                    "%s.SplitVertical(%d, %f)" % (laccessor, location, sfraction)])
+                _trace_layout(layout, laccessor, layout.GetFirstChild(location))
+                _trace_layout(layout, laccessor, layout.GetSecondChild(location))
+            elif sdir == layout.SMProxy.HORIZONTAL:
+                Trace.Output.append([\
+                    "%s.SplitHorizontal(%d, %f)" % (laccessor, location, sfraction)])
+                _trace_layout(layout, laccessor, layout.GetFirstChild(location))
+                _trace_layout(layout, laccessor, layout.GetSecondChild(location))
+            elif sdir == layout.SMProxy.NONE:
+                view = layout.GetView(location)
+                if view and filter(view):
+                    vaccessor = Trace.get_accessor(view)
+                    Trace.Output.append([\
+                        "%s.AssignView(%d, %s)" % (laccessor, location, vaccessor)])
+        _trace_layout(self.Layout, accessor, 0)
         TraceItem.finalize(self)
 
 class LoadPlugin(TraceItem):
@@ -1536,6 +1560,13 @@ def _stop_trace_internal():
         ])
     trace = str(Trace.Output)
     Trace.reset()
+
+    # essential to ensure any obsolete accessor don't linger can cause havoc
+    # when saving state following a Python trace session
+    # (paraview/paraview#18994)
+    import gc
+    gc.collect()
+    gc.collect()
     return trace
 
 #------------------------------------------------------------------------------

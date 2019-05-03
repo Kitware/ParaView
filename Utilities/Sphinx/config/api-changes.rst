@@ -1,6 +1,19 @@
 API Changes between ParaView versions
 =====================================
 
+Changes in 5.7
+--------------
+
+Views and Layouts
+-----------------
+
+`CreateView`, `CreateRenderView`, etc. no longer automatically associates the
+created view with a layout. One has to explicitly assign the view to a layout.
+`simple.AssignViewToLayout` may be used to assign the view to an available
+layout, or create a new one if none exists.
+
+`detachedFromLayout` argument to all the view creation functions is now
+obsolete since all views are created detached from layout.
 
 Changes in 5.5
 --------------

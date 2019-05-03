@@ -296,8 +296,9 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
 {
   if (port)
   {
+    auto& activeObjects = pqActiveObjects::instance();
     vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
-    pqView* activeView = pqActiveObjects::instance().activeView();
+    pqView* activeView = activeObjects.activeView();
     vtkSMViewProxy* viewProxy = activeView ? activeView->getViewProxy() : NULL;
     int scalarBarMode = vtkPVGeneralSettings::GetInstance()->GetScalarBarMode();
 
@@ -320,10 +321,24 @@ void pqPipelineBrowserWidget::setVisibility(bool visible, pqOutputPort* port)
       {
         // Make sure the given port is selected specially if we are in
         // multi-server / catalyst configuration type
-        pqActiveObjects::instance().setActivePort(port);
+        activeObjects.setActivePort(port);
       }
+
+      auto activeLayout = activeObjects.activeLayout();
+      const auto location = activeObjects.activeLayoutLocation();
+
       vtkSMProxy* repr = controller->SetVisibility(
         port->getSourceProxy(), port->getPortNumber(), viewProxy, visible);
+      if (visible && viewProxy == nullptr && repr)
+      {
+        // this implies that the controller would have created a new view.
+        // let's get that view so we toggle scalar bar visibility in that view
+        // and also add it to layout.
+        viewProxy = vtkSMViewProxy::FindView(repr);
+        controller->AssignViewToLayout(viewProxy, activeLayout, location);
+      }
+
+      // assign to layout, in case a new view is created.
       // update scalar bars: show new ones if needed. Hiding of scalar bars is
       // taken care of by vtkSMParaViewPipelineControllerWithRendering (I still
       // wonder if that's the best thing to do).

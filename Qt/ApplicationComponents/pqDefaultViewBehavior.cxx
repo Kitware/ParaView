@@ -152,22 +152,16 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
   if (core->getServerManagerModel()->getNumberOfItems<pqView*>() == 0 && server->isMaster())
   {
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-
-    // before creating a view, ensure that a layout (vtkSMViewLayoutProxy) is
-    // present.
-    if (server->proxyManager()->GetNumberOfProxies("layouts") == 0)
-    {
-      vtkSMProxy* vlayout = builder->createProxy("misc", "ViewLayout", server, "layouts");
-      assert(vlayout != NULL);
-      (void)vlayout;
-    }
-
-    QString curView = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
-    if (curView != "None" && !curView.isEmpty() &&
+    const QString viewType = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
+    if (viewType != "None" && !viewType.isEmpty() &&
       RCInfo::Supports(this->ClientCapabilities, RCInfo::OPENGL))
     {
       // When a server is created, we create a new render view for it.
-      builder->createView(curView, server);
+      if (auto pqview = builder->createView(viewType, server))
+      {
+        // let's put this view under a layout.
+        builder->addToLayout(pqview);
+      }
     }
   }
 
