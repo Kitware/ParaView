@@ -10,6 +10,7 @@ wavelet1 = Wavelet()
 renderView1 = GetActiveViewOrCreate('RenderView')
 # uncomment following to set a specific view size
 # renderView1.ViewSize = [1013, 781]
+AssignViewToLayout(renderView1)
 
 # show data in view
 wavelet1Display = Show(wavelet1, renderView1)

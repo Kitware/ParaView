@@ -18,6 +18,8 @@ def RegressionTest(imageName):
 renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [200, 200]
 
+AssignViewToLayout(renderView1)
+
 # get layout
 layout1 = GetLayout()
 
