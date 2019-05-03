@@ -12,6 +12,7 @@
 #include "vtkVector.h"
 #include "vtkVectorOperators.h"
 
+#include <cctype>
 #include <sstream>
 
 static constexpr std::streamoff headerSize = 6 * sizeof(double) + 4 * sizeof(int);
