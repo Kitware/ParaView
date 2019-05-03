@@ -129,7 +129,7 @@ int vtkParFlowReader::RequestData(vtkInformation* vtkNotUsed(request),
       {
         this->InferredAsCLM = 1;
       }
-      if (is_number(fnparts.back()))
+      if (is_number(fnparts.back().substr(0, 1)))
       {
         fnparts.pop_back(); // Drop the timestep.
       }
