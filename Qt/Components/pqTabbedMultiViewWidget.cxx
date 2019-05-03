@@ -243,7 +243,7 @@ public:
   bool decorationsVisibility() const { return this->DecorationsVisibility; }
 
   /// adds a vtkSMViewLayoutProxy to a new tab.
-  void addTab(vtkSMViewLayoutProxy* vlayout, pqTabbedMultiViewWidget* self)
+  int addTab(vtkSMViewLayoutProxy* vlayout, pqTabbedMultiViewWidget* self)
   {
     const int count = this->TabWidget->count();
     auto widget = new pqMultiViewWidget();
@@ -257,10 +257,34 @@ public:
       [this, widget]() { this->TabWidget->setCurrentWidget(widget); });
 
     int tab_index = this->TabWidget->addAsTab(widget, self);
-    this->TabWidget->setCurrentIndex(tab_index);
     auto server =
       pqApplicationCore::instance()->getServerManagerModel()->findServer(vlayout->GetSession());
     this->TabWidgets.insert(server, widget);
+    return tab_index;
+  }
+
+  int tabIndex(vtkSMProxy* vlayout)
+  {
+    const int count = this->TabWidget->count();
+    for (int cc = 0; cc < count; ++cc)
+    {
+      if (auto mvwidget = qobject_cast<pqMultiViewWidget*>(this->TabWidget->widget(cc)))
+      {
+        if (mvwidget->layoutManager() == vlayout)
+        {
+          return cc;
+        }
+      }
+    }
+    return -1;
+  }
+
+  void setCurrentTab(int index)
+  {
+    if (index >= 0 && index < this->TabWidget->count())
+    {
+      this->TabWidget->setCurrentIndex(index);
+    }
   }
 };
 
@@ -300,9 +324,6 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   // some layout correctly.
   QObject::connect(
     core, SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)), this, SLOT(onStateLoaded()));
-
-  QObject::connect(core->getObjectBuilder(), SIGNAL(aboutToCreateView(pqServer*)), this,
-    SLOT(aboutToCreateView(pqServer*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -417,15 +438,6 @@ void pqTabbedMultiViewWidget::proxyRemoved(pqProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::aboutToCreateView(pqServer* server)
-{
-  if (!this->Internals->TabWidgets.contains(server))
-  {
-    this->createTab(server);
-  }
-}
-
-//-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 {
   // remove all tabs corresponding to the closed session.
@@ -456,7 +468,7 @@ void pqTabbedMultiViewWidget::currentTabChanged(int /* index*/)
   {
     // count() > 1 check keeps this widget from creating new tabs as the tabs are
     // being removed.
-    this->createTab();
+    this->Internals->setCurrentTab(this->createTab());
   }
 }
 
@@ -483,22 +495,19 @@ void pqTabbedMultiViewWidget::closeTab(int index)
 
   if (this->Internals->TabWidget->count() == 1)
   {
-    this->createTab();
+    this->Internals->setCurrentTab(this->createTab());
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::createTab()
+int pqTabbedMultiViewWidget::createTab()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
-  if (server)
-  {
-    this->createTab(server);
-  }
+  return server ? this->createTab(server) : -1;
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::createTab(pqServer* server)
+int pqTabbedMultiViewWidget::createTab(pqServer* server)
 {
   if (server)
   {
@@ -506,16 +515,19 @@ void pqTabbedMultiViewWidget::createTab(pqServer* server)
     vtkSMProxy* vlayout = pqApplicationCore::instance()->getObjectBuilder()->createProxy(
       "misc", "ViewLayout", server, "layouts");
     assert(vlayout != NULL);
-    (void)vlayout;
     END_UNDO_SET();
+
+    auto& internals = (*this->Internals);
+    return internals.tabIndex(vlayout);
   }
+  return -1;
 }
 
 //-----------------------------------------------------------------------------
-void pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
+int pqTabbedMultiViewWidget::createTab(vtkSMViewLayoutProxy* vlayout)
 {
   auto& internals = (*this->Internals);
-  internals.addTab(vlayout, this);
+  return internals.addTab(vlayout, this);
 }
 
 //-----------------------------------------------------------------------------

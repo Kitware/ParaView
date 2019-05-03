@@ -103,9 +103,9 @@ signals:
   void viewSizeLocked(bool);
 
 public slots:
-  virtual void createTab();
-  virtual void createTab(pqServer*);
-  virtual void createTab(vtkSMViewLayoutProxy*);
+  virtual int createTab();
+  virtual int createTab(pqServer*);
+  virtual int createTab(vtkSMViewLayoutProxy*);
   virtual void closeTab(int);
 
   //@{
@@ -178,14 +178,6 @@ protected slots:
   * layout, or we just assign them to one.
   */
   virtual void onStateLoaded();
-
-  /**
-  * called when pqObjectBuilder is about to create a new view. We ensure that
-  * a layout exists to accept that view. This is essential for collaborative
-  * mode to work correctly without ending up multiple layouts on the two
-  * processes.
-  */
-  virtual void aboutToCreateView(pqServer*);
 
   /**
   * called when context menu need to be created on the tab title.
