@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqSpreadSheetView.h"
+#include "vtkNew.h"
+#include "vtkSMParaViewPipelineControllerWithRendering.h"
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetVisibilityBehavior::pqSpreadSheetVisibilityBehavior(QObject* parentObject)
@@ -60,9 +62,9 @@ void pqSpreadSheetVisibilityBehavior::showActiveSource(pqView* view)
       {
         port = source->getOutputPort(0);
       }
-      // If a new spreadsheet view is created, we show the active source in it by
-      // default.
-      pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(port, view);
+
+      vtkNew<vtkSMParaViewPipelineControllerWithRendering> controller;
+      controller->Show(source->getSourceProxy(), port->getPortNumber(), view->getViewProxy());
       // trigger an eventual-render.
       view->render();
     }
