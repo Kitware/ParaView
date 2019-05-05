@@ -24,10 +24,8 @@
 vtkStandardNewMacro(vtkPVPanoramicProjectionView);
 
 //----------------------------------------------------------------------------
-void vtkPVPanoramicProjectionView::Initialize(unsigned int id)
+vtkPVPanoramicProjectionView::vtkPVPanoramicProjectionView()
 {
-  this->Superclass::Initialize(id);
-
   this->SynchronizedRenderers->SetImageProcessingPass(this->ProjectionPass);
 
   // remove cullers

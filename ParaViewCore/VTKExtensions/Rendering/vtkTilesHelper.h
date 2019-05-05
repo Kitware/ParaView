@@ -26,6 +26,7 @@
 
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include "vtkVector.h"                         // for vtkVector
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkTilesHelper : public vtkObject
 {
@@ -53,41 +54,52 @@ public:
 
   //@{
   /**
-   * Set the tile size i.e. the size of the render window for a tile. We assumes
-   * that all tiles have the same size (since that's a requirement for IceT).
+   * Set the tile size i.e. the size of the render window for a single tile. An assumption,
+   * in ParaView is that all tiles will be of the same size.
    */
   vtkSetVector2Macro(TileWindowSize, int);
   vtkGetVector2Macro(TileWindowSize, int);
   //@}
 
   /**
-   * Returns (x-origin, y-origin, x-max, y-max) in pixels for a tile with given
-   * \c rank. \c viewport is in normalized display coordinates i.e. in range
-   * [0, 1] indicating the viewport covered by the current renderer on the whole
-   * i.e. treating all tiles as one large display if TileDimensions > (1, 1).
-   * Returns false to indicate the result hasn't been computed.
+   * For the specified `rank`, returns the tile size and origin of the tile
+   * rendered by the rank in display coordinates. If the rank is not expected to
+   * render an tile then returns false and `size` and `lowerLeft` will be left
+   * unchanged. Otherwise, returns true after updating `size` and `lowerLeft`
+   * appropriately.
    */
-  bool GetTileViewport(const double* viewport, int rank, int out_tile_viewport[4]);
+  bool GetTiledSizeAndOrigin(int rank, vtkVector2i& size, vtkVector2i& lowerLeft) const;
 
   /**
-   * Same as GetTileViewport() except that the returns values are in
-   * normalized-display coordinates instead of display coordinates.
-   * Returns false to indicate the result hasn't been computed.
+   * A `GetTiledSizeAndOrigin` overload that takes in a `viewport` expressed as
+   * `(xmin, ymin, xmax, ymax)` where each coordinate is in the range `[0, 1.0]`
+   * (same as vtkViewport::SetViewport). The size and origin returned are
+   * limited to the specified viewport.
    */
-  bool GetNormalizedTileViewport(const double* viewport, int rank, double out_tile_viewport[4]);
+  bool GetTiledSizeAndOrigin(
+    int rank, vtkVector2i& size, vtkVector2i& lowerLeft, vtkVector4d viewport) const;
 
   /**
-   * Given a global-viewport for a renderer, returns the physical viewport on
-   * the rank indicated.
-   * Returns false to indicate the result hasn't been computed.
+   * Provides the viewport for the tile displayed on the rank, if any. Returns
+   * false if the rank is not expected to display a tile. Otherwise returns true
+   * after updating `tile_viewport` to the result.
    */
-  bool GetPhysicalViewport(
-    const double* global_viewport, int rank, double out_phyiscal_viewport[4]);
+  bool GetTileViewport(int rank, vtkVector4d& tile_viewport) const;
 
   /**
-   * Given the rank, returns the tile location.
+   * Given the rank, returns the tile location. Returns false if the rank is not
+   * expected to render any tile.
    */
-  void GetTileIndex(int rank, int* tileX, int* tileY);
+  bool GetTileIndex(int rank, int* tileX, int* tileY) const;
+
+  /**
+   * Returns true if current rank will render a tile.
+   */
+  bool GetTileEnabled(int rank) const
+  {
+    int x, y;
+    return this->GetTileIndex(rank, &x, &y);
+  }
 
 protected:
   vtkTilesHelper();

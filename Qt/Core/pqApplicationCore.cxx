@@ -78,7 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGeneralSettings.h"
 #include "vtkPVLogger.h"
 #include "vtkPVPluginTracker.h"
-#include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
@@ -117,7 +117,7 @@ pqApplicationCore::pqApplicationCore(
   int& argc, char** argv, pqOptions* options, QObject* parentObject)
   : QObject(parentObject)
 {
-  vtkPVSynchronizedRenderWindows::SetUseGenericOpenGLRenderWindow(true);
+  vtkPVView::SetUseGenericOpenGLRenderWindow(true);
 
   vtkSmartPointer<pqOptions> defaultOptions;
   if (!options)

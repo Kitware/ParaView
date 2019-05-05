@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSpreadSheetViewProxy.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
@@ -30,6 +31,26 @@ vtkSMSpreadSheetViewProxy::vtkSMSpreadSheetViewProxy()
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetViewProxy::~vtkSMSpreadSheetViewProxy()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSpreadSheetViewProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+  {
+    return;
+  }
+
+  this->Superclass::CreateVTKObjects();
+  if (!this->ObjectsCreated || this->Location == 0)
+  {
+    return;
+  }
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SetIdentifier"
+         << this->GetGlobalID() << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------

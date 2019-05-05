@@ -72,6 +72,12 @@ protected:
   ~vtkSMPythonViewProxy() override;
 
   /**
+   * This view currently only supports rendering on client, even in tile-display
+   * mode. Which means it will not show any results on the tile display.
+   */
+  vtkTypeUInt32 PreRender(bool interactive) override;
+
+  /**
    * Subclasses should override this method to do the actual image capture.
    */
   vtkImageData* CaptureWindowInternal(int magX, int magY) override;

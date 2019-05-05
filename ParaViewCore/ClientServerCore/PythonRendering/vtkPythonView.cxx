@@ -21,7 +21,6 @@
 
 #include "vtkDataObject.h"
 #include "vtkInformationRequestKey.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPythonInterpreter.h"
 #include "vtkPythonRepresentation.h"
 #include "vtkRenderWindow.h"
@@ -184,8 +183,7 @@ vtkPythonView::vtkPythonView()
   this->RenderTexture = vtkSmartPointer<vtkTexture>::New();
   this->Renderer = vtkSmartPointer<vtkRenderer>::New();
   this->Renderer->SetBackgroundTexture(this->RenderTexture);
-  this->RenderWindow.TakeReference(this->SynchronizedWindows->NewRenderWindow());
-  this->RenderWindow->AddRenderer(this->Renderer);
+  this->GetRenderWindow()->AddRenderer(this->Renderer);
   this->Magnification[0] = this->Magnification[1] = 1;
   this->ImageData = NULL;
 
@@ -234,44 +232,18 @@ vtkRenderer* vtkPythonView::GetRenderer()
 //----------------------------------------------------------------------------
 void vtkPythonView::SetRenderer(vtkRenderer* renderer)
 {
-  vtkRendererCollection* rens = this->RenderWindow->GetRenderers();
+  auto window = this->GetRenderWindow();
+  vtkRendererCollection* rens = window->GetRenderers();
   vtkCollectionSimpleIterator cookie;
   rens->InitTraversal(cookie);
   while (vtkRenderer* ren = rens->GetNextRenderer(cookie))
   {
     ren->SetRenderWindow(NULL);
-    this->RenderWindow->RemoveRenderer(ren);
+    window->RemoveRenderer(ren);
   }
 
-  this->RenderWindow->AddRenderer(renderer);
+  window->AddRenderer(renderer);
   this->Renderer = renderer;
-}
-
-//----------------------------------------------------------------------------
-vtkRenderWindow* vtkPythonView::GetRenderWindow()
-{
-  return this->RenderWindow;
-}
-
-//----------------------------------------------------------------------------
-void vtkPythonView::SetRenderWindow(vtkRenderWindow* renWin)
-{
-  if (!renWin)
-  {
-    vtkErrorMacro(<< "SetRenderWindow called with a null window pointer."
-                  << " That can't be right.");
-    return;
-  }
-
-  // move renderers to new window
-  vtkRendererCollection* rens = this->RenderWindow->GetRenderers();
-  while (rens->GetNumberOfItems())
-  {
-    vtkRenderer* ren = rens->GetFirstRenderer();
-    ren->SetRenderWindow(NULL);
-    renWin->AddRenderer(ren);
-    this->RenderWindow->RemoveRenderer(ren);
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -438,28 +410,25 @@ void vtkPythonView::DisableAllAttributeArrays()
 void vtkPythonView::StillRender()
 {
   // Render only on the client
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+  this->SetImageData(NULL);
+
+  // Now draw the image
+  int width = this->Size[0] * this->Magnification[0];
+  int height = this->Size[1] * this->Magnification[1];
+
+  this->Internals->CallRender(this, width, height);
+
+  // this->ImageData should be set by the call_render() function invoked above.
+  if (this->ImageData)
   {
-    this->SetImageData(NULL);
-
-    // Now draw the image
-    int width = this->Size[0] * this->Magnification[0];
-    int height = this->Size[1] * this->Magnification[1];
-
-    this->Internals->CallRender(this, width, height);
-
-    // this->ImageData should be set by the call_render() function invoked above.
-    if (this->ImageData)
-    {
-      this->RenderTexture->SetInputData(this->ImageData);
-      this->Renderer->TexturedBackgroundOn();
-    }
-    else
-    {
-      this->Renderer->TexturedBackgroundOff();
-    }
-    this->RenderWindow->Render();
+    this->RenderTexture->SetInputData(this->ImageData);
+    this->Renderer->TexturedBackgroundOn();
   }
+  else
+  {
+    this->Renderer->TexturedBackgroundOff();
+  }
+  this->GetRenderWindow()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -495,20 +464,6 @@ bool vtkPythonView::IsLocalDataAvailable()
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonView::Initialize(unsigned int id)
-{
-  if (this->Identifier == id)
-  {
-    // already initialized
-    return;
-  }
-
-  this->SynchronizedWindows->AddRenderWindow(id, this->GetRenderWindow());
-  this->SynchronizedWindows->AddRenderer(id, this->GetRenderer());
-  this->Superclass::Initialize(id);
-}
-
-//----------------------------------------------------------------------------
 void vtkPythonView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -528,16 +483,6 @@ void vtkPythonView::PrintSelf(ostream& os, vtkIndent indent)
   {
     os << endl;
     this->Renderer->PrintSelf(os, indent.GetNextIndent());
-  }
-  else
-  {
-    os << "(none)" << endl;
-  }
-  os << indent << "RenderWindow: ";
-  if (this->RenderWindow)
-  {
-    os << endl;
-    this->RenderWindow->PrintSelf(os, indent.GetNextIndent());
   }
   else
   {

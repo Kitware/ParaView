@@ -15,21 +15,23 @@
 #include "vtkPVHardwareSelector.h"
 
 #include "vtkCamera.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVLogger.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVRenderViewSettings.h"
-#include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderer.h"
 #include "vtkSelection.h"
+#include "vtkWeakPointer.h"
 
 #include <map>
 
-#include "vtkProcessModule.h"
 //#define vtkPVHardwareSelectorDEBUG
 #ifdef vtkPVHardwareSelectorDEBUG
 #include "vtkImageImport.h"
 #include "vtkNew.h"
 #include "vtkPNMWriter.h"
-#include "vtkProcessModule.h"
 #include "vtkWindows.h" // OK on Unix etc
 #include <sstream>
 #endif
@@ -39,6 +41,8 @@ class vtkPVHardwareSelector::vtkInternals
 public:
   typedef std::map<void*, int> PropMapType;
   PropMapType PropMap;
+
+  vtkWeakPointer<vtkPVRenderView> View;
 };
 
 //----------------------------------------------------------------------------
@@ -61,32 +65,33 @@ vtkPVHardwareSelector::~vtkPVHardwareSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVHardwareSelector::SetSynchronizedWindows(vtkPVSynchronizedRenderWindows* sw)
+void vtkPVHardwareSelector::SetView(vtkPVRenderView* view)
 {
-  if (this->SynchronizedWindows != sw)
-  {
-    this->SynchronizedWindows = sw;
-    this->Modified();
-  }
+  this->Internals->View = view;
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::PassRequired(int pass)
 {
+  // To ensure all processes make consistent decisions about which passes to
+  // render, we need to make sure all processes have the same values for
+  // MaximumPointId and MaximumCellId. These are set in Iteration 0,
+  // pass MIN_KNOWN_PASS. So the first pass after that, we tell the view to sync
+  // up those values.
+  if (this->Iteration == 0 && pass == (MIN_KNOWN_PASS + 1))
+  {
+    if (auto view = this->Internals->View)
+    {
+      view->SynchronizeMaximumIds(&this->MaximumPointId, &this->MaximumCellId);
+    }
+  }
+
   if (pass == PROCESS_PASS && this->Iteration == 0)
   {
     return true;
   }
 
-  vtkIdType passRequiredValue = this->Superclass::PassRequired(pass) ? 1 : 0;
-
-  // synchronize the value among all active processes (BUG #141112).
-  if (this->SynchronizedWindows && this->SynchronizedWindows->GetEnabled())
-  {
-    this->SynchronizedWindows->Reduce(passRequiredValue, vtkPVSynchronizedRenderWindows::MAX_OP);
-  }
-
-  return passRequiredValue > 0;
+  return this->Superclass::PassRequired(pass);
 }
 
 //----------------------------------------------------------------------------
@@ -193,7 +198,6 @@ void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
   this->Superclass::SavePixelBuffer(passNo);
 
 #ifdef vtkPVHardwareSelectorDEBUG
-
   vtkNew<vtkImageImport> ii;
   ii->SetImportVoidPointer(this->PixBuffer[passNo], 1);
   ii->SetDataScalarTypeToUnsignedChar();
@@ -201,27 +205,13 @@ void vtkPVHardwareSelector::SavePixelBuffer(int passNo)
   ii->SetDataExtent(this->Area[0], this->Area[2], this->Area[1], this->Area[3], 0, 0);
   ii->SetWholeExtent(this->Area[0], this->Area[2], this->Area[1], this->Area[3], 0, 0);
 
-  // hardcode the path so you can find where MPI etc leaves all these files
-  std::string fname = "C:/Users/ken.martin/pickbuffer_";
-
-  std::ostringstream toString;
-  toString.str("");
-  toString.clear();
-// is there a platform generic way of doing this?
-//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-//  toString << pm->GetPartitionId();
-//  toString << pm->GetGlobalController()->GetLocalProcessId();
-#if defined(_WIN32)
-  toString << GetCurrentProcessId();
-#endif
-  fname += toString.str();
-  fname += "_";
-  fname += ('0' + passNo);
-  fname += ".pnm";
+  // hard-coded path with threadname which ensures a good process-specific name.
+  const std::string fname =
+    "/tmp/buffer-" + vtkLogger::GetThreadName() + "-pass-" + std::to_string(passNo) + ".pnm";
   vtkNew<vtkPNMWriter> pw;
   pw->SetInputConnection(ii->GetOutputPort());
   pw->SetFileName(fname.c_str());
   pw->Write();
-  cerr << "wrote to " << fname << "\n";
+  vtkLogF(INFO, "wrote pixel buffer to '%s'", fname.c_str());
 #endif
 }

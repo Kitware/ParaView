@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRect.h"
+#include "vtkSMComparativeViewProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
@@ -48,11 +49,13 @@ public:
   {
     vtkSMViewLayoutProxy::Direction Direction;
     double SplitFraction;
+    vtkVector4d Viewport;
     vtkWeakPointer<vtkSMViewProxy> ViewProxy;
 
     Cell()
       : Direction(vtkSMViewLayoutProxy::NONE)
       , SplitFraction(0.5)
+      , Viewport(0, 0, 0, 0)
     {
     }
   };
@@ -135,6 +138,27 @@ public:
     size_t max_index = this->GetMaxChildIndex(0);
     assert(max_index < this->KDTree.size());
     this->KDTree.resize(max_index + 1);
+  }
+
+  void UpdateViewports(int index = 0, const vtkVector4d& parentViewport = vtkVector4d(0, 0, 1, 1))
+  {
+    Cell& cell = this->KDTree[index];
+    cell.Viewport = parentViewport;
+    if (cell.Direction != vtkSMViewLayoutProxy::NONE)
+    {
+      cell.Viewport = parentViewport;
+
+      const int dim = cell.Direction == vtkSMViewLayoutProxy::HORIZONTAL ? 0 : 1;
+      const double delta1 = (parentViewport[2 + dim] - parentViewport[dim]) * cell.SplitFraction;
+      const double delta2 = (parentViewport[2 + dim] - parentViewport[dim]) - delta1;
+
+      vtkVector4d vp1(parentViewport), vp2(parentViewport);
+      vp1[2 + dim] = vp1[dim] + delta1;
+      vp2[dim] = vp1[2 + dim];
+      vp2[2 + dim] = vp2[dim] + delta2;
+      this->UpdateViewports(vtkSMViewLayoutProxy::GetFirstChild(index), vp1);
+      this->UpdateViewports(vtkSMViewLayoutProxy::GetSecondChild(index), vp2);
+    }
   }
 
   void UpdateViewPositions(int root = 0, int posx = 0, int posy = 0)
@@ -402,8 +426,25 @@ void vtkSMViewLayoutProxy::UpdateState()
 
   this->PushState(this->State);
   this->InvokeEvent(vtkCommand::ConfigureEvent);
-
   this->UpdateViewPositions();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "RemoveAllViews"
+         << vtkClientServerStream::End;
+
+  for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
+       iter != this->Internals->KDTree.end(); ++iter)
+  {
+    if (iter->ViewProxy != nullptr &&
+      vtkSMComparativeViewProxy::SafeDownCast(iter->ViewProxy) == nullptr)
+    {
+      stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "AddView"
+             << VTKOBJECT(iter->ViewProxy)
+             << vtkClientServerStream::InsertArray(iter->Viewport.GetData(), 4)
+             << vtkClientServerStream::End;
+    }
+  }
+  this->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------
@@ -951,6 +992,7 @@ void vtkSMViewLayoutProxy::UpdateViewPositions()
   if (this->MaximizedCell == -1)
   {
     this->Internals->UpdateViewPositions();
+    this->Internals->UpdateViewports();
   }
   else
   {
@@ -963,6 +1005,7 @@ void vtkSMViewLayoutProxy::UpdateViewPositions()
         int pos[2] = { 0, 0 };
         vtkSMPropertyHelper(iter->ViewProxy, "ViewPosition").Set(pos, 2);
         iter->ViewProxy->UpdateProperty("ViewPosition");
+        iter->Viewport = vtkVector4d(0, 0, 1, 1);
       }
     }
   }
@@ -1017,25 +1060,10 @@ void vtkSMViewLayoutProxy::SetSize(const int size[2])
 void vtkSMViewLayoutProxy::ShowViewsOnTileDisplay()
 {
   this->CreateVTKObjects();
-
-  vtkSMProxy* proxy = this->GetSessionProxyManager()->NewProxy("misc", "InternalViewLayoutHelper");
-  proxy->UpdateVTKObjects();
-
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << VTKOBJECT(proxy) << "ResetTileDisplay"
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "ShowOnTileDisplay"
          << vtkClientServerStream::End;
-  for (vtkInternals::KDTreeType::iterator iter = this->Internals->KDTree.begin();
-       iter != this->Internals->KDTree.end(); ++iter)
-  {
-    if (iter->ViewProxy.GetPointer() != NULL)
-    {
-      stream << vtkClientServerStream::Invoke << VTKOBJECT(proxy) << "ShowOnTileDisplay"
-             << static_cast<unsigned int>(iter->ViewProxy->GetGlobalID())
-             << vtkClientServerStream::End;
-    }
-  }
-  this->GetSession()->ExecuteStream(proxy->GetLocation(), stream, false);
-  proxy->Delete();
+  this->ExecuteStream(stream);
 }
 
 //----------------------------------------------------------------------------
@@ -1154,6 +1182,17 @@ std::vector<vtkSMViewProxy*> vtkSMViewLayoutProxy::GetViews()
     }
   }
   return views;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMViewLayoutProxy::SaveAsPNG(int rank, const char* fname)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << VTKOBJECT(this) << "SaveAsPNG" << rank << fname
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream, false, vtkPVSession::RENDER_SERVER);
+  // ensure that the server is done saving the image before proceeding.
+  this->GetLastResult(vtkPVSession::RENDER_SERVER_ROOT);
 }
 
 //----------------------------------------------------------------------------

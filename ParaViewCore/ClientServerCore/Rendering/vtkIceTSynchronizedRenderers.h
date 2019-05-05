@@ -36,7 +36,6 @@
 
 class vtkCameraPass;
 class vtkImageProcessingPass;
-class vtkMyImagePasterPass;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkIceTSynchronizedRenderers
   : public vtkSynchronizedRenderers
@@ -45,14 +44,6 @@ public:
   static vtkIceTSynchronizedRenderers* New();
   vtkTypeMacro(vtkIceTSynchronizedRenderers, vtkSynchronizedRenderers);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  //@{
-  /**
-   * Identifier used to identify the view to the vtkTileDisplayHelper.
-   */
-  vtkSetMacro(Identifier, unsigned int);
-  vtkGetMacro(Identifier, unsigned int);
-  //@}
 
   /**
    * Set the renderer to be synchronized by this instance. A
@@ -169,8 +160,6 @@ protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();
 
-  unsigned int Identifier;
-
   virtual void HandleEndRender() override;
 
   /**
@@ -181,7 +170,6 @@ protected:
   // We use vtkIceTCompositePass internally.
   vtkCameraPass* CameraRenderPass;
   vtkIceTCompositePass* IceTCompositePass;
-  vtkMyImagePasterPass* ImagePastingPass;
 
   // User specified custom passes
   vtkRenderPass* RenderPass;

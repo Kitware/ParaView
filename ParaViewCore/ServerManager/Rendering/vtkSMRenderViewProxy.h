@@ -163,11 +163,6 @@ public:
   virtual bool LastRenderWasInteractive();
 
   /**
-   * Returns the Z-buffer value at the given location in this view.
-   */
-  double GetZBufferValue(int x, int y);
-
-  /**
    * Called vtkPVView::Update on the server-side. Overridden to update the state
    * of NeedsUpdateLOD flag.
    */

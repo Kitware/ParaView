@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqItemViewSearchWidgetEventPlayer.h"
 #include "pqPluginTreeWidgetEventPlayer.h"
 #include "pqPluginTreeWidgetEventTranslator.h"
+#include "pqServerManagerModel.h"
 #include "pqTabbedMultiViewWidget.h"
 #include "pqView.h"
 #include "vtkImageData.h"
@@ -58,6 +59,16 @@ bool pqComponentsTestUtility::CompareView(
   const QString& referenceImage, double threshold, const QString& tempDirectory)
 {
   pqView* curView = pqActiveObjects::instance().activeView();
+  if (curView == nullptr)
+  {
+    // let's find the first view.
+    auto views = pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
+    if (views.size() > 0)
+    {
+      curView = views[0];
+    }
+  }
+
   if (!curView)
   {
     qCritical() << "ERROR: Could not locate the active view.";

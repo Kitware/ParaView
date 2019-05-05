@@ -14,8 +14,7 @@
 =========================================================================*/
 /**
  * @class   vtkIceTCompositePass
- * @brief   vtkRenderPass subclass for compositing
- * renderings across processes using IceT.
+ * @brief   IceT enabled render pass for distributed rendering
  *
  * vtkIceTCompositePass is a vtkRenderPass subclass that can be used for
  * compositing images (RGBA_UBYTE, depth or RGBA_32F) across processes using IceT.
@@ -34,7 +33,7 @@
  * Compositing RGBA_32F is only supported for a specific pass (vtkValuePass).
  * For a more generic integration, vtkRenderPass should expose an internal FBO
  * API.
-*/
+ */
 
 #ifndef vtkIceTCompositePass_h
 #define vtkIceTCompositePass_h
@@ -43,11 +42,7 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkRenderPass.h"
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
-// FIXME: This should not publicly change its implementation based on a feature
-// flag.
-#if !defined(__VTK_WRAP__) && !defined(VTK_WRAPPING_CXX)
-#include <IceT.h> // for icet types
-#endif
+#include <memory>                     // for std::unique_pt
 
 class vtkMultiProcessController;
 class vtkPartitionOrderingInterface;
@@ -58,6 +53,7 @@ class vtkOpenGLRenderWindow;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
 class vtkOpenGLHelper;
+class vtkMatrix4x4;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -175,28 +171,6 @@ public:
   vtkBooleanMacro(UseOrderedCompositing, bool);
   //@}
 
-  //@{
-  /**
-   * Tell to only deal with the depth component and ignore the color
-   * components.
-   * If true, UseOrderedCompositing is ignored.
-   * Initial value is false.
-   */
-  vtkGetMacro(DepthOnly, bool);
-  vtkSetMacro(DepthOnly, bool);
-  //@}
-
-  //@{
-  /**
-   * IceT does not deal well with the background, by setting FixBackground to
-   * true, the pass will take care of displaying the correct background at the
-   * price of some copy operations.
-   * Initial value is false.
-   */
-  vtkGetMacro(FixBackground, bool);
-  vtkSetMacro(FixBackground, bool);
-  //@}
-
   /**
    * Returns the last rendered tile from this process, if any.
    * Image is invalid if tile is not available on the current process.
@@ -230,34 +204,33 @@ public:
    */
   void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
 
-  /**
-   * Obtains the composited color-buffer from IceT and pushes it to the screen.
-   * This is only done when FixBackground is true.
-   */
-  void PushIceTColorBufferToScreen(const vtkRenderState* render_state);
-
   //@{
   /**
-   * PhysicalViewport is the viewport in the current render-window where the
-   * last-rendered-tile maps.
+   * When set to true, vtkIceTCompositePass will push back compositing results
+   * to the display on ranks where the IceT generated a composited result.
+   * Generally speaking, for a vtkRenderPass, this must always be `true`.
+   * However, for ParaView use cases many times we display the
+   * compositing result on the server-side. In which case, we can save on the
+   * extra work to push results to screen. Hence, vtkIceTCompositePass sets this
+   * to false by default.
    */
-  vtkGetVector4Macro(PhysicalViewport, double);
-//@}
+  vtkSetMacro(DisplayRGBAResults, bool);
+  vtkGetMacro(DisplayRGBAResults, bool);
+  vtkSetMacro(DisplayDepthResults, bool);
+  vtkGetMacro(DisplayDepthResults, bool);
+  //@}
 
-#if !defined(__VTK_WRAP__) && !defined(VTK_WRAPPING_CXX)
   //@{
   /**
    * Internal callback. Don't use.
    */
-  virtual void Draw(const vtkRenderState*, const IceTDouble* proj_matrix,
-    const IceTDouble* mv_matrix, const IceTFloat* background_color, const IceTInt* viewport,
-    IceTImage result);
-//@}
-#endif
+  struct IceTDrawParams;
+  void Draw(const vtkRenderState* render_state, const IceTDrawParams&);
+  //@}
 
 protected:
   vtkIceTCompositePass();
-  ~vtkIceTCompositePass();
+  ~vtkIceTCompositePass() override;
 
   //@{
   /**
@@ -279,6 +252,19 @@ protected:
    */
   void UpdateTileInformation(const vtkRenderState*);
 
+  /**
+   * Called after Icet results have been generated. vtkIceTCompositePass will
+   * paste back the IceT results image to the viewport if so requested by
+   * DisplayDepthResults and DisplayRGBAResults flags.
+   */
+  void DisplayResultsIfNeeded(const vtkRenderState*);
+
+  /**
+   * Update projection and model view matrices using current camera
+   * and provided aspect ratio.
+   */
+  void UpdateMatrices(const vtkRenderState*, double aspect);
+
   vtkMultiProcessController* Controller;
   vtkPartitionOrderingInterface* PartitionOrdering;
   vtkRenderPass* RenderPass;
@@ -286,18 +272,15 @@ protected:
 
   bool RenderEmptyImages;
   bool UseOrderedCompositing;
-  bool DepthOnly;
   bool DataReplicatedOnAllProcesses;
   bool EnableFloatValuePass;
   int TileDimensions[2];
   int TileMullions[2];
 
-  int LastTileDimensions[2];
-  int LastTileMullions[2];
-  int LastTileViewport[4];
-  double PhysicalViewport[4];
-
   int ImageReductionFactor;
+
+  bool DisplayRGBAResults;
+  bool DisplayDepthResults;
 
   vtkNew<vtkFloatArray> LastRenderedDepths;
 
@@ -307,23 +290,15 @@ protected:
   vtkTextureObject* ZTexture;
   vtkOpenGLHelper* Program;
 
-  bool FixBackground;
-  vtkTextureObject* BackgroundTexture;
-  vtkTextureObject* IceTTexture;
-
-  // Stereo Render support requires us
-  // to have to raw image one for each eye so that we
-  // don't overwrite the left eye with the right eyes image
-  // will point at the last rendered eye
-  vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
-
-  // actual rendered raw images for stereo. Left Eye is index 0
-  // and Right Eye is index 1
-  vtkSynchronizedRenderers::vtkRawImage* LastRenderedEyes[2];
+  std::unique_ptr<vtkSynchronizedRenderers::vtkRawImage> LastRenderedRGBAColors;
 
 private:
   vtkIceTCompositePass(const vtkIceTCompositePass&) = delete;
   void operator=(const vtkIceTCompositePass&) = delete;
+
+  vtkNew<vtkMatrix4x4> ModelView;
+  vtkNew<vtkMatrix4x4> Projection;
+  vtkNew<vtkMatrix4x4> IceTProjection;
 };
 
 #endif

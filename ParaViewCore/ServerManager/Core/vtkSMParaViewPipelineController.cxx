@@ -678,7 +678,20 @@ bool vtkSMParaViewPipelineController::RegisterViewProxy(vtkSMProxy* proxy, const
   this->RegisterProxiesForProxyListDomains(proxy);
 
   // Now register the proxy itself.
-  proxy->GetSessionProxyManager()->RegisterProxy("views", proxyname, proxy);
+  if (proxyname == nullptr)
+  {
+    auto pname = proxy->GetSessionProxyManager()->RegisterProxy("views", proxy);
+
+    // assign a name for logging
+    proxy->SetLogName(pname.c_str());
+  }
+  else
+  {
+    proxy->GetSessionProxyManager()->RegisterProxy("views", proxyname, proxy);
+
+    // assign a name for logging
+    proxy->SetLogName(proxyname);
+  }
 
   // Register proxy with TimeKeeper.
   vtkSMProxy* timeKeeper = this->FindTimeKeeper(proxy->GetSession());

@@ -23,7 +23,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVChangeOfBasisHelper.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkTransform.h"
 
 #include <algorithm>
@@ -128,12 +127,11 @@ void vtkPVMultiSliceView::Update()
 
   this->Superclass::Update();
 
-  double dataBounds[6];
-  this->Internal->DataBounds.GetBounds(dataBounds);
-  this->SynchronizedWindows->SynchronizeBounds(dataBounds);
-  if (vtkMath::AreBoundsInitialized(dataBounds))
+  vtkBoundingBox result;
+  this->AllReduce(this->Internal->DataBounds, result);
+  if (result.IsValid())
   {
-    this->Internal->DataBounds.SetBounds(dataBounds);
+    this->Internal->DataBounds = result;
   }
   else
   {

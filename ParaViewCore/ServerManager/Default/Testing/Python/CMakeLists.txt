@@ -67,7 +67,6 @@ set(ParaView::ServerManagerDefault_ARGS)
 
 vtk_module_test_data(
   "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_chart_view.png"
-  "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_chart_view_1.png"
   "${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MultiView_render_view.png")
 
 set(PVBATCH_TESTS

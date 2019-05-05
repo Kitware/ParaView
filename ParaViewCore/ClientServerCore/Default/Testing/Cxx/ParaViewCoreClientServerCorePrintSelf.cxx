@@ -63,7 +63,6 @@
 #include "vtkPVServerManagerPluginInterface.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVSession.h"
-#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVTimerInformation.h"
@@ -158,7 +157,6 @@ int ParaViewCoreClientServerCorePrintSelf(int, char* [])
   // PRINT_SELF(vtkPVServerManagerPluginInterface);
   PRINT_SELF(vtkPVServerOptions);
   PRINT_SELF(vtkPVSession);
-  // PRINT_SELF(vtkPVSynchronizedRenderWindows);
   // PRINT_SELF(vtkPVSynchronizedRenderer);
   PRINT_SELF(vtkPVTemporalDataInformation);
   PRINT_SELF(vtkPVTimerInformation);

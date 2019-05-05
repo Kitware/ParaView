@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Contour" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/Close" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.0/CentralWidgetFrame/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderViewWithEDL" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,13,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,13,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/tabBar" command="set_tab_with_text" arguments="Render View" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/SearchBox/SearchLineEdit" command="set_string" arguments="remot" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/RemoteRenderThreshold/DoubleRangeWidget/DoubleLineEdit" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/SearchBox/SearchLineEdit" command="set_string" arguments="sub" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/stackedWidget/ScrollAreaRenderViewSettings/qt_scrollarea_viewport/Container/ProxyWidget/StillRenderImageReductionFactor/IntRangeWidget/LineEdit" command="set_string" arguments="4" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/buttonBox/1QPushButton0" command="activate" arguments="" />
+</pqevents>

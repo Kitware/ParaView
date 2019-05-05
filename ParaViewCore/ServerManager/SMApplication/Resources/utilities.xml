@@ -2876,7 +2876,8 @@
       <!-- End of TimerLog -->
     </Proxy>
     <ViewLayoutProxy name="ViewLayout"
-                     processes="client">
+                     class="vtkViewLayout"
+                     processes="client|renderserver">
       <Documentation>Proxy used to manage layout for multiple views.</Documentation>
       <IntVectorProperty name="PreviewMode"
         number_of_elements="2"
@@ -2903,12 +2904,6 @@
         </Documentation>
       </DoubleVectorProperty>
     </ViewLayoutProxy>
-    <Proxy class="vtkViewLayout"
-           name="InternalViewLayoutHelper"
-           processes="renderserver">
-      <Documentation>Proxy used to manage layout for multiple
-      views.</Documentation>
-    </Proxy>
     <Proxy class="vtkPVRayCastPickingHelper"
            name="PickingHelper"
            processes="dataserver">
@@ -3724,21 +3719,6 @@
            base_proxyname="ContourLineInterpolatorBase"
            class="vtkPolygonalSurfaceContourLineInterpolator"
            name="PolygonalSurfaceContourLineInterpolator"></Proxy>
-  </ProxyGroup>
-  <ProxyGroup name="tile_helper">
-    <Proxy class="vtkTileDisplayHelper"
-           name="TileDisplayHelper"
-           processes="renderserver">
-      <Documentation>Helper proxy used to enable/disable server side tile image
-      dump.</Documentation>
-      <StringVectorProperty command="SetDumpImagePath"
-                            default_values=""
-                            name="DumpImagePath"
-                            number_of_elements="1">
-        <Documentation>Full Path + prefix file name. The image full path will
-        be: ${DumpImagePath}-Tile${processId}.png</Documentation>
-      </StringVectorProperty>
-    </Proxy>
   </ProxyGroup>
   <ProxyGroup name="coprocessing">
     <LiveInsituLinkProxy name="LiveInsituLink" class="vtkLiveInsituLink"

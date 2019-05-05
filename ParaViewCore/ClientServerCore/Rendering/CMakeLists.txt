@@ -48,10 +48,13 @@ set(classes
   vtkGlyph3DRepresentation
   vtkImageSliceRepresentation
   vtkImageVolumeRepresentation
-  vtkMPIMoveData
   vtkMoleculeRepresentation
+  vtkMPIMoveData
   vtkOutlineRepresentation
   vtkPExtentTranslator
+  vtkPointGaussianRepresentation
+  vtkPolarAxesRepresentation
+  vtkProgressBarSourceRepresentation
   vtkPVBoxChartRepresentation
   vtkPVCacheKeeper
   vtkPVCacheKeeperPipeline
@@ -79,21 +82,18 @@ set(classes
   vtkPVParallelCoordinatesRepresentation
   vtkPVPlotMatrixRepresentation
   vtkPVPlotMatrixView
+  vtkPVProcessWindow
   vtkPVProminentValuesInformation
   vtkPVRayCastPickingHelper
+  vtkPVRenderingCapabilitiesInformation
   vtkPVRenderView
   vtkPVRenderViewSettings
-  vtkPVRenderingCapabilitiesInformation
   vtkPVRepresentedDataInformation
   vtkPVSelectionInformation
   vtkPVStreamingPiecesInformation
-  vtkPVSynchronizedRenderWindows
   vtkPVSynchronizedRenderer
   vtkPVView
   vtkPVXYChartView
-  vtkPointGaussianRepresentation
-  vtkPolarAxesRepresentation
-  vtkProgressBarSourceRepresentation
   vtkQuartileChartRepresentation
   vtkRulerSourceRepresentation
   vtkSelectionDeliveryFilter
@@ -105,6 +105,7 @@ set(classes
   vtkTextSourceRepresentation
   vtkThreeSliceFilter
   vtkUnstructuredGridVolumeRepresentation
+  vtkViewLayout
   vtkXYChartRepresentation)
 
 if (TARGET VTK::ParallelMPI AND TARGET ParaView::icet)

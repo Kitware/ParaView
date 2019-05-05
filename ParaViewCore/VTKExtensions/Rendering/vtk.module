@@ -41,7 +41,6 @@ OPTIONAL_DEPENDS
   VTK::RenderingMatplotlib
   VTK::RenderingRayTracing
   # These affect the public API.
-  ParaView::icet
   VTK::ParallelMPI
 TEST_DEPENDS
   VTK::IOAMR

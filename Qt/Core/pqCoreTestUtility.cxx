@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQVTKWidget.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 #include "pqXMLEventObserver.h"
@@ -77,9 +78,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
 #include "vtkPVConfig.h"
+#include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMViewLayoutProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkTIFFWriter.h"
@@ -401,4 +404,60 @@ bool pqCoreTestUtility::CompareImage(const QString& testPNGImage, const QString&
   reader->Update();
   return pqCoreTestUtility::CompareImage(
     reader->GetOutput(), referenceImage, threshold, output, tempDirectory);
+}
+
+//-----------------------------------------------------------------------------
+QString pqCoreTestUtility::fixPath(const QString& path)
+{
+  QString newpath = path;
+  newpath.replace("$PARAVIEW_TEST_ROOT", pqCoreTestUtility::TestDirectory());
+  newpath.replace("$PARAVIEW_TEST_BASELINE_DIR", pqCoreTestUtility::BaselineDirectory());
+  newpath.replace("$PARAVIEW_DATA_ROOT", pqCoreTestUtility::DataRoot());
+  return newpath;
+}
+
+//-----------------------------------------------------------------------------
+bool pqCoreTestUtility::CompareTile(QWidget* widget, int rank, int tdx, int tdy,
+  const QString& baseline, double threshold, ostream& output, const QString& tempDirectory)
+{
+  // try to locate a pqView, if any associated with the QWidget.
+  auto views = pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
+  for (pqView* view : views)
+  {
+    if (view && (view->widget() == widget))
+    {
+      return pqCoreTestUtility::CompareTile(
+        view, rank, tdx, tdy, baseline, threshold, output, tempDirectory);
+    }
+  }
+
+  qFatal("CompareTile not supported on the provided widget");
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool pqCoreTestUtility::CompareTile(pqView* view, int rank, int tdx, int tdy,
+  const QString& baseline, double threshold, ostream& output, const QString& tempDirectory)
+{
+  auto layout = view ? vtkSMViewLayoutProxy::FindLayout(view->getViewProxy()) : nullptr;
+  if (!layout)
+  {
+    return false;
+  }
+
+  if (tdx >= 1 && tdy >= 1)
+  {
+    auto serverInfo = view->getServer()->getServerInformation();
+    if (!serverInfo || serverInfo->GetTileDimensions()[0] != tdx ||
+      serverInfo->GetTileDimensions()[1] != tdy)
+    {
+      // skip compare.
+      return true;
+    }
+  }
+
+  const QString imagepath =
+    QString("%1/tile-%2.png").arg(tempDirectory).arg(QFileInfo(baseline).baseName());
+  layout->SaveAsPNG(rank, imagepath.toLocal8Bit().data());
+  return pqCoreTestUtility::CompareImage(imagepath, baseline, threshold, output, tempDirectory);
 }

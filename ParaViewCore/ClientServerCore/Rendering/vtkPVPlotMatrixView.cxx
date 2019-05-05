@@ -193,7 +193,7 @@ void vtkPVPlotMatrixView::AddAnimationPath(int i, int j)
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixView::StartAnimationPath()
 {
-  this->PlotMatrix->BeginAnimationPath(this->RenderWindow->GetInteractor());
+  this->PlotMatrix->BeginAnimationPath(this->GetRenderWindow()->GetInteractor());
 }
 
 //----------------------------------------------------------------------------

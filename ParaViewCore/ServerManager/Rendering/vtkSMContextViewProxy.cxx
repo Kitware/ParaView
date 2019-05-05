@@ -23,11 +23,11 @@
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
 #include "vtkEventForwarderCommand.h"
-#include "vtkEventForwarderCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVContextView.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
@@ -323,6 +323,17 @@ int vtkSMContextViewProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPV
     this->GetProperty("TopAxisUseCustomRange") != nullptr;
 
   return ret;
+}
+
+//----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMContextViewProxy::PreRender(bool)
+{
+  if (auto pvview = vtkPVView::SafeDownCast(this->GetClientSideObject()))
+  {
+    return pvview->InTileDisplayMode() ? vtkPVSession::RENDER_SERVER | vtkPVSession::CLIENT
+                                       : vtkPVSession::CLIENT;
+  }
+  return vtkPVSession::CLIENT;
 }
 
 //----------------------------------------------------------------------------
