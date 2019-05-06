@@ -379,7 +379,7 @@ pqView* pqObjectBuilder::createView(const QString& type, pqServer* server)
 #if !defined(VTK_LEGACY_REMOVE)
 pqView* pqObjectBuilder::createView(const QString& type, pqServer* server, bool)
 {
-  return this->createView(type);
+  return this->createView(type, server);
 }
 #endif
 
