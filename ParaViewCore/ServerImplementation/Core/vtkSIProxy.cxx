@@ -122,6 +122,8 @@ void vtkSIProxy::SetVTKObject(vtkObjectBase* obj)
 //----------------------------------------------------------------------------
 void vtkSIProxy::Push(vtkSMMessage* message)
 {
+  this->Superclass::Push(message);
+
   // Push() is the trigger to get the SIProxy initialized. Let's ensure that
   // it's properly initialized before proceeding further.
   if (!this->InitializeAndCreateVTKObjects(message))
@@ -236,7 +238,25 @@ void vtkSIProxy::Pull(vtkSMMessage* message)
       subproxy->set_global_id(it2->GlobalID);
     }
   }
+
+  // a fixed set of properties were not requested, lets see if there was any
+  // custom data in the pushed state. it may be worthwhile to send that back
+  // too. This is essential to ensure that odd proxies like
+  // vtkSMViewLayoutProxy's state gets correctly pull in collaboration mode
+  // otherwise the non-master client will not get correct layout state on
+  // initial pull.
+  if (prop_names.size() == 0 && this->LastPushedMessage &&
+    this->LastPushedMessage->ExtensionSize(ProxyState::user_data) > 0)
+  {
+    const int count = this->LastPushedMessage->ExtensionSize(ProxyState::user_data);
+    for (int cc = 0; cc < count; ++cc)
+    {
+      *message->AddExtension(ProxyState::user_data) =
+        this->LastPushedMessage->GetExtension(ProxyState::user_data, cc);
+    }
+  }
 }
+
 //----------------------------------------------------------------------------
 vtkSIProxyDefinitionManager* vtkSIProxy::GetProxyDefinitionManager()
 {
