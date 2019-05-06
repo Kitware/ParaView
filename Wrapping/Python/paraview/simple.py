@@ -1692,17 +1692,15 @@ def GetAnimationScene():
 
 # -----------------------------------------------------------------------------
 
-def AnimateReader(reader=None, view=None, filename=None):
+def AnimateReader(reader=None, view=None):
     """This is a utility function that, given a reader and a view
-    animates over all time steps of the reader. If the optional
-    filename is provided, a movie is created (type depends on the
-    extension of the filename."""
+    animates over all time steps of the reader."""
     if not reader:
         reader = active_objects.source
     if not view:
         view = active_objects.view
 
-    return servermanager.AnimateReader(reader, view, filename)
+    return servermanager.AnimateReader(reader, view)
 
 # -----------------------------------------------------------------------------
 
