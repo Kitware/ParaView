@@ -10287,7 +10287,7 @@ Select how you want the text to be represented in the view.
                            name="range" />
       </DoubleVectorProperty>
       <IntVectorProperty command="SetShade"
-                         default_values="1"
+                         default_values="0"
                          name="Shade"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
