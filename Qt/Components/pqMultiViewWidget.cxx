@@ -685,10 +685,13 @@ void pqMultiViewWidget::reload()
   // so we ensure we mark the right one active.
   this->markActive(pqActiveObjects::instance().activeView());
 
-  // // we let the GUI updated immediately. This is needed since when a new view is
-  // // created (for example), it may depend on the size of the view during its
-  // // initialization to ensure camera is reset correctly.
-  QCoreApplication::sendPostedEvents();
+  // we let the GUI updated immediately. This is needed since when a new view is
+  // created (for example), it may depend on the size of the view during its
+  // initialization to ensure camera is reset correctly.
+  // We have gone back and forth between whether we should let the qt app
+  // process events on just process posted events. Calling `processEvents` was
+  // finally chosen to address issues like paraview/paraview#18963.
+  pqEventDispatcher::processEvents();
 }
 
 //-----------------------------------------------------------------------------
