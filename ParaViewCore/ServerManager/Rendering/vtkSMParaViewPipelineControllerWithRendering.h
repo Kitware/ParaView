@@ -197,18 +197,23 @@ public:
    */
   bool PostInitializeProxy(vtkSMProxy* proxy) override;
 
-  //@{
-  /**
-   * Overridden to place the view in a layout on creation.
-   */
-  bool RegisterViewProxy(vtkSMProxy* proxy, const char* proxyname) override;
-  using Superclass::RegisterViewProxy;
-  //@}
-
   /**
    * Register layout proxy.
    */
   virtual bool RegisterLayoutProxy(vtkSMProxy* proxy, const char* proxyname = NULL);
+
+  /**
+   * Assigns the view to any cell in the layout. If the layout is null, then
+   * this will locate a layout on the same session and use it. If no layout is
+   * present on the session, a new layout will be created (and registered)
+   * before assigning the view to it.
+   *
+   * If the view is already assigned to a layout then this method is a no-op.
+   *
+   * @sa vtkSMViewProxy::AssignViewToAnyCell
+   */
+  virtual void AssignViewToLayout(
+    vtkSMViewProxy* view, vtkSMViewLayoutProxy* layout = nullptr, int hint = 0);
 
 protected:
   vtkSMParaViewPipelineControllerWithRendering();

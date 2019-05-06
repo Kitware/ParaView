@@ -45,6 +45,7 @@ import paraview._backwardscompatibilityhelper
 from paraview.servermanager import OutputPort
 
 import sys
+import warnings
 
 if sys.version_info >= (3,):
     xrange = range
@@ -135,11 +136,16 @@ def SetActiveConnection(connection=None, ns=None):
 #==============================================================================
 # Views and Layout methods
 #==============================================================================
-def CreateView(view_xml_name, detachedFromLayout=False, **params):
+def CreateView(view_xml_name, detachedFromLayout=None, **params):
     """Creates and returns the specified proxy view based on its name/label.
-    If detachedFromLayout is true, the view will no be grabbed by the layout
-    hence not visible unless it is attached after. This also set params keywords
-    arguments as view properties."""
+    Also set params keywords arguments as view properties.
+
+    `detachedFromLayout` has been deprecated in ParaView 5.7 as it is no longer
+    needed. All views are created detached by default.
+    """
+    if detachedFromLayout is not None:
+        warnings.warn("`detachedFromLayout` is deprecated in ParaView 5.7", DeprecationWarning)
+
     view = servermanager._create_view(view_xml_name)
     if not view:
         raise RuntimeError ("Failed to create requested view", view_xml_name)
@@ -158,9 +164,12 @@ def CreateView(view_xml_name, detachedFromLayout=False, **params):
     controller.PreInitializeProxy(view)
     SetProperties(view, **params)
     controller.PostInitializeProxy(view)
-    if detachedFromLayout:
-      view.SMProxy.SetAnnotation("ParaView::DetachedFromLayout", "true")
     controller.RegisterViewProxy(view, registrationName)
+
+    if paraview.compatibility.GetVersion() <= 5.6:
+        # older versions automatically assigned view to a
+        # layout.
+        controller.AssignViewToLayout(view)
 
     # setup an interactor if current process support interaction if an
     # interactor hasn't already been set. This overcomes the problem where VTK
@@ -376,11 +385,8 @@ def GetLayout(view=None):
         view = GetActiveView()
     if not view:
         raise RuntimeError ("No active view was found.")
-    layouts = GetLayouts()
-    for layout in layouts.values():
-        if layout.GetViewLocation(view) != -1:
-            return layout
-    return None
+    lproxy = servermanager.vtkSMViewLayoutProxy.FindLayout(view.SMProxy)
+    return servermanager._getPyProxy(lproxy)
 
 def GetLayoutByName(name):
     """Return the first layout with the given name, if any."""
@@ -398,6 +404,22 @@ def GetViewsInLayout(layout=None):
         raise RuntimeError ("Layout couldn't be determined. Please specify a valid layout.")
     views = GetViews()
     return [x for x in views if layout.GetViewLocation(x) != -1]
+
+def AssignViewToLayout(view=None, layout=None, hint=0):
+    """Assigns the view provided (or active view if None) to the
+    layout provided. If layout is None, then either the active layout or an
+    existing layout on the same server will be used. If no layout exists, then
+    a new layout will be created. Returns True on success.
+
+    It is an error to assign the same view to multiple layouts.
+    """
+    view = view if view else GetActiveView()
+    if not view:
+        raise RuntimeError("No active view was found.")
+
+    layout = layout if layout else GetLayout()
+    controller = servermanager.ParaViewPipelineController()
+    return controller.AssignViewToLayout(view, layout, hint)
 
 # -----------------------------------------------------------------------------
 

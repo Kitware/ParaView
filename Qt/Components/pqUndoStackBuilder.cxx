@@ -86,8 +86,10 @@ bool pqUndoStackBuilder::Filter(vtkSMSession* session, vtkTypeUInt32 globalId)
     return true;
   }
 
-  // We do not keep track of ProxySelectionModel in Undo/redo
-  if (remoteObj->IsA("vtkSMProxySelectionModel"))
+  // We do not keep track of ProxySelectionModel in Undo/Redo except if we're
+  // already with in begin/end. In that case, it makes sense to track how the
+  // active source/view is changed so it can restored after undo/redo.
+  if (remoteObj->IsA("vtkSMProxySelectionModel") && !this->HandleChangeEvents())
   {
     return true;
   }

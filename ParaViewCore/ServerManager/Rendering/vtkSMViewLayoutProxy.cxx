@@ -638,12 +638,12 @@ bool vtkSMViewLayoutProxy::AssignView(int location, vtkSMViewProxy* view)
     return false;
   }
 
-  SM_SCOPED_TRACE(CallMethod)
-    .arg(this)
-    .arg("AssignView")
-    .arg(location)
-    .arg(view)
-    .arg("assign view to a particular cell in the layout");
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("AssignViewToLayout")
+    .arg("view", view)
+    .arg("layout", this)
+    .arg("hint", location)
+    .arg("comment", "assign view to a particular cell in the layout");
 
   if (cell.ViewProxy == view)
   {

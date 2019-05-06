@@ -105,6 +105,13 @@ def get_producers(proxy, filter, producer_set):
 def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPERTIES,
     skipHiddenRepresentations=True, source_set=[], filter=None, raw=False):
     """Returns the state string"""
+
+    # essential to ensure any obsolete accessor don't linger can cause havoc
+    # when saving state following a Python trace session
+    # (paraview/paraview#18994)
+    import gc
+    gc.collect()
+
     if sm.vtkSMTrace.GetActiveTracer():
         raise RuntimeError ("Cannot generate Python state when tracing is active.")
 
@@ -141,8 +148,8 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
 
     #--------------------------------------------------------------------------
     # First, we trace the views and layouts, if any.
-    # TODO: add support for layouts.
     views = [x for x in proxies_of_interest if smtrace.Trace.get_registered_name(x, "views")]
+
     if views:
         # sort views by their names, so the state has some structure to it.
         views = sorted(views, key=lambda x:\
@@ -157,6 +164,31 @@ def get_state(propertiesToTraceOnCreate=1, # sm.vtkSMTrace.RECORD_MODIFIED_PROPE
             traceitem.finalize()
             del traceitem
         trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+        trace.append_separated(["SetActiveView(None)"])
+
+    # from views,  build the list of layouts of interest.
+    layouts = set()
+    for aview in views:
+        l = simple.GetLayout(aview)
+        if l:
+            layouts.add(simple.GetLayout(aview))
+
+    # trace create of layouts
+    if layouts:
+        layouts = sorted(layouts, key=lambda x:\
+                  smtrace.Trace.get_registered_name(x, "layouts"))
+        trace.append_separated([\
+            "# ----------------------------------------------------------------",
+            "# setup view layouts",
+            "# ----------------------------------------------------------------"])
+        for layout in layouts:
+            traceitem = smtrace.RegisterLayoutProxy(layout)
+            traceitem.finalize(filter=lambda x: x in views)
+            del traceitem
+        trace.append_separated(smtrace.get_current_trace_output_and_reset(raw=True))
+
+    if views:
+        # restore the active view after the layouts have been created.
         trace.append_separated([\
             "# ----------------------------------------------------------------",
             "# restore active view",

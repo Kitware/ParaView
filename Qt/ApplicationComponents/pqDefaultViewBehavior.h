@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 
+#include "pqTimer.h" // for pqTimer
 #include "vtkType.h" // for vtkTypeUInt32.
 
 class pqServer;
@@ -67,6 +68,7 @@ private:
   vtkTypeUInt32 ServerCapabilities;
   vtkTypeUInt32 ClientCapabilities;
   QPointer<pqServer> Server;
+  pqTimer WarningsTimer;
 };
 
 #endif

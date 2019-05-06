@@ -290,10 +290,9 @@ reader proxy to invoke to make the reader refresh.
 View Annotations
 ----------------
 Views support the following annotations:
-1. **ParaView::DetachedFromLayout**: If set to "True", this annotation will prevent the
-layout from grabbing the view, enabling custom application developers to assign or
-position the view themselves. Use `pqObjectBuilder::createView(viewType, server, true)`
-to create a new view with this annotation added.
+
+1. **ParaView::DetachedFromLayout**: **Deprecated in ParaView 5.7**.
+This is no longer applicable as all views are created detached from layout by default.
 
 Live Source
 ------------

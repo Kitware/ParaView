@@ -280,6 +280,10 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
 
   vtkSMViewProxy* currentViewProxy = view ? view->getViewProxy() : NULL;
 
+  const auto& activeObjects = pqActiveObjects::instance();
+  auto activeLayout = activeObjects.activeLayout();
+  const auto location = activeObjects.activeLayoutLocation();
+
   QSet<vtkSMProxy*> updated_views;
 
   // create representations for all output ports.
@@ -291,8 +295,12 @@ void pqApplyBehavior::showData(pqPipelineSource* source, pqView* view)
     {
       continue;
     }
-
+    // if new view was created, let's make sure it is assigned to a layout.
+    controller->AssignViewToLayout(preferredView, activeLayout, location);
     updated_views.insert(preferredView);
+
+    // if active layout changed, let's use that from this point on.
+    activeLayout = activeObjects.activeLayout();
 
     // reset camera if this is the only visible dataset.
     pqView* pqPreferredView = smmodel->findItem<pqView*>(preferredView);

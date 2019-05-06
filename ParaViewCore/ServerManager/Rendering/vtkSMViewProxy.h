@@ -240,6 +240,12 @@ public:
     }
   }
   //@}
+
+  /**
+   * Helper method to locate a view to which the representation has been added.
+   */
+  static vtkSMViewProxy* FindView(vtkSMProxy* repr, const char* reggroup = "views");
+
 protected:
   vtkSMViewProxy();
   ~vtkSMViewProxy() override;

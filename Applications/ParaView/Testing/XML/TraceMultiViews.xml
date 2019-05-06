@@ -12,8 +12,6 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
@@ -38,16 +36,6 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Container/Frame.1" command="mouseRelease" arguments="1,0,0,221,22" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
 
-  <!-- save a multiview screenshot -->
-  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="800" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="800" />
-  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
-
-
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsStartStopTrace" />
 
@@ -63,6 +51,17 @@
   <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsState.py" />
   <pqevent object="StateOptionsDialog/widget/OKButton" command="activate" arguments="" />
 
+  <!-- save a multiview screenshot -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViews.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViews.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- compare screenshot saved during xml test playback -->
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TraceMultiViews.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TraceMultiViews.png" />
 
   <!-- now reset the session and play back the trace -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
@@ -70,16 +69,20 @@
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Python Shell" />
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/runScriptButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" />
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsTrace.py" />
   <pqevent object="pqClientMainWindow/pythonShellDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 
-  <!-- compare the image saved in the trace -->
-  <!-- I'm skipping the actual compare right now. We need to fix how charts
-       render with mag>1, and also the fact that the spreadsheet header is too wide. -->
-  <!--
-  <pqcompareview image="$PARAVIEW_TEST_ROOT/TraceMultiViewsScreenshot.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TraceMultiViewsScreenshot.png" />
-  -->
+  <!-- save a multiview screenshot -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViews-Trace.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViews-Trace.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
+
+  <!-- compare screenshot saved during trace playback -->
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TraceMultiViews-Trace.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TraceMultiViews.png" />
 
   <!-- now reset session and  load the state file -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
@@ -94,8 +97,18 @@
   <pqevent object="pqClientMainWindow/pythonShellDock/pythonShell/PythonShellRunScriptDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViewsState.py" />
   <pqevent object="pqClientMainWindow/pythonShellDock/qt_dockwidget_closebutton" command="activate" arguments="" />
 
-  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  <!-- save a multiview screenshot -->
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViews-State.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/TraceMultiViews-State.png" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/SaveAllViews/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/width" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/scrollArea/qt_scrollarea_viewport/Container/ProxyWidget/ImageResolution/height" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/SaveScreenshotDialog/widget/OKButton" command="activate" arguments="" />
 
-  <!-- FIXME: this test doesn't do baseline compares yet. Some issue with state
-       not saving view layout and GUI not respecting active view from Python need to be fixed first. -->
+  <!-- compare screenshot saved during trace playback -->
+  <!--
+       We skip this compare currently since state doesn't save current time
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TraceMultiViews-State.png" baseline="$PARAVIEW_DATA_ROOT/Applications/ParaView/Testing/Data/Baseline/TraceMultiViews.png" />
+  -->
 </pqevents>

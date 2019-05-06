@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 
 #include "pqApplicationCore.h"
+#include "pqMultiViewWidget.h"
 #include "pqServerManagerModel.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
@@ -40,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSession.h"
 #include "vtkSMViewLayoutProxy.h"
 
-#include <QDebug>
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 pqActiveObjects& pqActiveObjects::instance()
@@ -477,7 +479,7 @@ void pqActiveObjects::setSelection(
       }
       else
       {
-        qCritical() << "Selections with heterogeneous servers are not supported.";
+        qCritical("Selections with heterogeneous servers are not supported.");
         return;
       }
     }
@@ -533,7 +535,43 @@ vtkSMViewLayoutProxy* pqActiveObjects::activeLayout() const
 {
   if (pqView* view = this->activeView())
   {
-    return vtkSMViewLayoutProxy::FindLayout(view->getViewProxy());
+    if (auto l = vtkSMViewLayoutProxy::FindLayout(view->getViewProxy()))
+    {
+      return l;
+    }
   }
-  return nullptr;
+
+  auto server = this->activeServer();
+  if (!server)
+  {
+    // if not active server, then don't even attempt to deduce the active layout
+    // using the pqTabbedMultiViewWidget since that doesn't matter, there's no
+    // active server.
+    return nullptr;
+  }
+
+  // if no active view is present, let's attempt to look for
+  // pqTabbedMultiViewWidget and use its current tab if it is on the active
+  // server.
+  auto core = pqApplicationCore::instance();
+  auto tmvwidget = qobject_cast<pqTabbedMultiViewWidget*>(core->manager("MULTIVIEW_WIDGET"));
+  auto layoutProxy = tmvwidget ? tmvwidget->layoutProxy() : nullptr;
+  return (layoutProxy && server->session() == layoutProxy->GetSession()) ? layoutProxy : nullptr;
+}
+
+//-----------------------------------------------------------------------------
+int pqActiveObjects::activeLayoutLocation() const
+{
+  if (auto layout = this->activeLayout())
+  {
+    auto core = pqApplicationCore::instance();
+    if (auto tmvwidget = qobject_cast<pqTabbedMultiViewWidget*>(core->manager("MULTIVIEW_WIDGET")))
+    {
+      if (auto mvwidget = tmvwidget->findTab(layout))
+      {
+        return std::max(mvwidget->activeFrameLocation(), 0);
+      }
+    }
+  }
+  return 0;
 }

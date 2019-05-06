@@ -12,6 +12,8 @@ renderView1 = CreateView('RenderView')
 renderView1.ViewSize = [300, 259]
 renderView1.Background = [0.32, 0.34, 0.43]
 
+AssignViewToLayout(renderView1)
+
 layout1 = GetLayout()
 layout1.SplitVertical(0, 0.5)
 

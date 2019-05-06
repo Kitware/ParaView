@@ -67,6 +67,9 @@ pqDefaultViewBehavior::pqDefaultViewBehavior(QObject* parentObject)
 {
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(serverAdded(pqServer*)), this, SLOT(onServerCreation(pqServer*)));
+
+  this->WarningsTimer.setSingleShot(true);
+  this->connect(&this->WarningsTimer, SIGNAL(timeout()), SLOT(showWarnings()));
 }
 
 //-----------------------------------------------------------------------------
@@ -142,29 +145,23 @@ void pqDefaultViewBehavior::onServerCreation(pqServer* server)
   }
 
   // Setup a timer to show warning messages, if needed.
-  pqTimer::singleShot(500, this, SLOT(showWarnings()));
+  this->WarningsTimer.start(500);
 
   // See if some view are already present and if we're in a collaborative
   // session, we are the master.
   if (core->getServerManagerModel()->getNumberOfItems<pqView*>() == 0 && server->isMaster())
   {
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
-
-    // before creating a view, ensure that a layout (vtkSMViewLayoutProxy) is
-    // present.
-    if (server->proxyManager()->GetNumberOfProxies("layouts") == 0)
-    {
-      vtkSMProxy* vlayout = builder->createProxy("misc", "ViewLayout", server, "layouts");
-      assert(vlayout != NULL);
-      (void)vlayout;
-    }
-
-    QString curView = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
-    if (curView != "None" && !curView.isEmpty() &&
+    const QString viewType = vtkPVGeneralSettings::GetInstance()->GetDefaultViewType();
+    if (viewType != "None" && !viewType.isEmpty() &&
       RCInfo::Supports(this->ClientCapabilities, RCInfo::OPENGL))
     {
       // When a server is created, we create a new render view for it.
-      builder->createView(curView, server);
+      if (auto pqview = builder->createView(viewType, server))
+      {
+        // let's put this view under a layout.
+        builder->addToLayout(pqview);
+      }
     }
   }
 

@@ -32,7 +32,9 @@
 #include "vtkRendererCollection.h"
 #include "vtkSMParaViewPipelineControllerWithRendering.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
@@ -778,4 +780,32 @@ bool vtkSMViewProxy::MakeRenderWindowInteractor(bool quiet)
   }
   this->SetupInteractor(iren);
   return this->GetInteractor() != NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkSMViewProxy* vtkSMViewProxy::FindView(vtkSMProxy* repr, const char* reggroup /*=views*/)
+{
+  if (!repr)
+  {
+    return nullptr;
+  }
+
+  vtkSMSessionProxyManager* pxm = repr->GetSessionProxyManager();
+  vtkNew<vtkSMProxyIterator> iter;
+  iter->SetSessionProxyManager(pxm);
+  iter->SetModeToOneGroup();
+  for (iter->Begin(reggroup); !iter->IsAtEnd(); iter->Next())
+  {
+    if (vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(iter->GetProxy()))
+    {
+      auto reprs = vtkSMProxyProperty::SafeDownCast(view->GetProperty("Representations"));
+      auto hreprs = vtkSMProxyProperty::SafeDownCast(view->GetProperty("HiddenRepresentations"));
+      if ((reprs != nullptr && reprs->IsProxyAdded(repr)) ||
+        (hreprs != nullptr && hreprs->IsProxyAdded(repr)))
+      {
+        return view;
+      }
+    }
+  }
+  return nullptr;
 }
