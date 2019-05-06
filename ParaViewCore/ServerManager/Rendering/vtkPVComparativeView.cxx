@@ -469,7 +469,8 @@ public:
       "ViewSize", "ViewTime", "CacheKey", "UseCache", "ViewPosition",
       // Camera is linked via CameraLink.
       "CameraPositionInfo", "CameraPosition", "CameraFocalPointInfo", "CameraFocalPoint",
-      "CameraViewUpInfo", "CameraViewUp", "CameraViewAngleInfo", "CameraViewAngle"
+      "CameraViewUpInfo", "CameraViewUp", "CameraViewAngleInfo", "CameraViewAngle",
+      "CameraFocalDiskInfo", "CameraFocalDisk", "CameraDepthOfFieldInfo", "CameraDepthOfField"
     };
 
     this->Setup(root, exceptions);

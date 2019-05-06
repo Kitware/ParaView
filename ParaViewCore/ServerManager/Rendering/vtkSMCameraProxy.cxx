@@ -14,9 +14,10 @@
 =========================================================================*/
 #include "vtkSMCameraProxy.h"
 
-#include "vtkCamera.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCamera.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMCameraProxy);
 //-----------------------------------------------------------------------------
@@ -37,7 +38,7 @@ void vtkSMCameraProxy::UpdatePropertyInformation()
     return;
   }
 
-  vtkCamera* camera = vtkCamera::SafeDownCast(this->GetClientSideObject());
+  vtkPVCamera* camera = vtkPVCamera::SafeDownCast(this->GetClientSideObject());
   if (!camera)
   {
     this->Superclass::UpdatePropertyInformation();
@@ -59,6 +60,13 @@ void vtkSMCameraProxy::UpdatePropertyInformation()
 
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraViewAngleInfo"));
   dvp->SetElement(0, camera->GetViewAngle());
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty("CameraFocalDiskInfo"));
+  dvp->SetElement(0, camera->GetFocalDisk());
+
+  vtkSMIntVectorProperty* ivp;
+  ivp = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty("CameraDepthOfFieldInfo"));
+  ivp->SetElement(0, camera->GetDepthOfField());
 }
 
 //-----------------------------------------------------------------------------

@@ -35,9 +35,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-11</y>
+        <y>0</y>
         <width>390</width>
-        <height>704</height>
+        <height>712</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -465,37 +465,15 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_22">
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_8">
            <property name="text">
-            <string>Position</string>
+            <string>Focal Disk</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="pqDoubleLineEdit" name="position0"/>
-         </item>
-         <item row="0" column="2">
-          <widget class="pqDoubleLineEdit" name="position1"/>
-         </item>
-         <item row="0" column="3">
-          <widget class="pqDoubleLineEdit" name="position2"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_17">
-           <property name="text">
-            <string>Focal Point</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="pqDoubleLineEdit" name="focalPoint0"/>
-         </item>
-         <item row="1" column="2">
-          <widget class="pqDoubleLineEdit" name="focalPoint1"/>
-         </item>
-         <item row="1" column="3">
-          <widget class="pqDoubleLineEdit" name="focalPoint2"/>
+         <item row="2" column="1">
+          <widget class="pqDoubleLineEdit" name="viewUp0"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_14">
@@ -504,14 +482,34 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="pqDoubleLineEdit" name="viewUp0"/>
+         <item row="1" column="1">
+          <widget class="pqDoubleLineEdit" name="focalPoint0"/>
          </item>
-         <item row="2" column="2">
-          <widget class="pqDoubleLineEdit" name="viewUp1"/>
+         <item row="1" column="3">
+          <widget class="pqDoubleLineEdit" name="focalPoint2"/>
          </item>
-         <item row="2" column="3">
-          <widget class="pqDoubleLineEdit" name="viewUp2"/>
+         <item row="0" column="1">
+          <widget class="pqDoubleLineEdit" name="position0"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>Position</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="pqDoubleLineEdit" name="position2"/>
+         </item>
+         <item row="3" column="2">
+          <widget class="QPushButton" name="loadCameraConfiguration">
+           <property name="toolTip">
+            <string>Load camera properties.</string>
+           </property>
+           <property name="text">
+            <string>Load</string>
+           </property>
+          </widget>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="label_23">
@@ -530,15 +528,24 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="2">
-          <widget class="QPushButton" name="loadCameraConfiguration">
-           <property name="toolTip">
-            <string>Load camera properties.</string>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="focalDisk">
+           <property name="decimals">
+            <number>2</number>
            </property>
-           <property name="text">
-            <string>Load</string>
+           <property name="maximum">
+            <double>999998.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
            </property>
           </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="pqDoubleLineEdit" name="viewUp2"/>
+         </item>
+         <item row="1" column="2">
+          <widget class="pqDoubleLineEdit" name="focalPoint1"/>
          </item>
          <item row="3" column="3">
           <widget class="QPushButton" name="saveCameraConfiguration">
@@ -565,6 +572,13 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="depthOfFieldCheckBox">
+         <property name="text">
+          <string>Enable Depth of Field</string>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_9">

@@ -60,6 +60,7 @@ set(classes
   vtkPVCacheKeeper
   vtkPVCacheKeeperPipeline
   vtkPVCacheSizeInformation
+  vtkPVCamera
   vtkPVClientServerSynchronizedRenderers
   vtkPVCompositeOrthographicSliceRepresentation
   vtkPVCompositeRepresentation

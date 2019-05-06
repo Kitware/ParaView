@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="camera">
-    <CameraProxy class="vtkCamera"
+    <CameraProxy class="vtkPVCamera"
                  name="Camera"
                  processes="client">
       <!-- |dataserver|renderserver -->
@@ -32,6 +32,34 @@
                             information_property="CameraFocalPointInfo"
                             name="CameraFocalPoint"
                             number_of_elements="3"></DoubleVectorProperty>
+        <DoubleVectorProperty command="GetFocalDisk"
+                              default_values="1"
+                              information_only="1"
+                              name="CameraFocalDiskInfo"
+                              number_of_elements="1">
+            <SimpleDoubleInformationHelper />
+        </DoubleVectorProperty>
+        <DoubleVectorProperty command="SetFocalDisk"
+                            default_values="0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalDiskInfo"
+                            name="CameraFocalDisk"
+                            number_of_elements="1"></DoubleVectorProperty>
+        <IntVectorProperty command="GetDepthOfField"
+                              default_values="0"
+                              information_only="1"
+                              name="CameraDepthOfFieldInfo"
+                              number_of_elements="1">
+            <SimpleIntInformationHelper />
+        </IntVectorProperty>
+        <IntVectorProperty command="SetDepthOfField"
+                            default_values="0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraDepthOfFieldInfo"
+                            name="CameraDepthOfField"
+                            number_of_elements="1"></IntVectorProperty>
       <DoubleVectorProperty command="GetViewUp"
                             default_values="0 1 0"
                             information_only="1"
