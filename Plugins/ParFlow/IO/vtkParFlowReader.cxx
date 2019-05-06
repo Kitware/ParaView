@@ -19,7 +19,6 @@ static constexpr std::streamoff headerSize = 6 * sizeof(double) + 4 * sizeof(int
 static constexpr std::streamoff subgridHeaderSize = 9 * sizeof(int);
 static constexpr std::streamoff pfbEntrySize = sizeof(double);
 static constexpr int clmBaseComponents = 11;
-static constexpr std::streamoff clmEntrySize = clmBaseComponents * sizeof(double);
 static const char* clmBaseComponentNames[clmBaseComponents] = { "eflx_lh_tot", "eflx_lwrad_out",
   "eflx_sh_tot", "eflx_soil_grnd", "qflx_evap_tot", "qflx_evap_grnd", "qflx_evap_soi",
   "qflx_evap_veg", "qflx_infl", "swe_out", "t_grnd" };
@@ -307,7 +306,7 @@ std::streamoff vtkParFlowReader::GetBlockOffset(int blockId) const
 std::streamoff vtkParFlowReader::GetBlockOffset(const vtkVector3i& blockIJK) const
 {
   std::streamoff offset;
-  std::streamoff entrySize = computeEntrySize(this->InferredAsCLM, this->NZ);
+  std::streamoff entrySize = computeEntrySize(!!this->InferredAsCLM, this->NZ);
   int ni = static_cast<int>(this->IJKDivs[0].size()) - 1;
   int nj = static_cast<int>(this->IJKDivs[1].size()) - 1;
   int blockId = blockIJK[0] + ni * (blockIJK[1] + nj * blockIJK[2]);
@@ -333,7 +332,7 @@ std::streamoff vtkParFlowReader::GetBlockOffset(const vtkVector3i& blockIJK) con
 std::streamoff vtkParFlowReader::GetEndOffset() const
 {
   std::streamoff offset;
-  std::streamoff entrySize = computeEntrySize(this->InferredAsCLM, this->NZ);
+  std::streamoff entrySize = computeEntrySize(!!this->InferredAsCLM, this->NZ);
   int ni = static_cast<int>(this->IJKDivs[0].size()) - 1;
   int nj = static_cast<int>(this->IJKDivs[1].size()) - 1;
   int nk = static_cast<int>(this->IJKDivs[2].size()) - 1;
