@@ -12,7 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkObject.h"
 
 #include <fstream>
 #include <iostream>
