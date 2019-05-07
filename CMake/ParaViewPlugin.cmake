@@ -155,6 +155,11 @@ function (paraview_plugin_scan)
   set(_paraview_scan_required_modules)
 
   foreach (_paraview_scan_plugin_file IN LISTS _paraview_scan_PLUGIN_FILES)
+    if (NOT IS_ABSOLUTE "${_paraview_scan_plugin_file}")
+      set(_paraview_scan_plugin_file
+        "${CMAKE_CURRENT_SOURCE_DIR}/${_paraview_scan_plugin_file}")
+    endif ()
+
     set_property(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" APPEND
       PROPERTY
         CMAKE_CONFIGURE_DEPENDS "${_paraview_scan_plugin_file}")
