@@ -1609,7 +1609,7 @@ function (paraview_plugin_add_proxy)
       message(FATAL_ERROR
         "Missing `XML_GROUP` for `${_paraview_proxy_type}`")
     endif ()
-    if (NOT DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_name" OR
+    if (NOT DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_name" AND
         NOT DEFINED "_paraview_proxy_type_${_paraview_proxy_type}_xml_name_regex")
       message(FATAL_ERROR
         "Missing `XML_NAME` or `XML_NAME_REGEX` for `${_paraview_proxy_type}`")
