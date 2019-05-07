@@ -60,6 +60,11 @@ public:
 
   void UpdateRay(vtkOpenVRModel*, vtkEventDataDevice);
 
+  void ShowBillboard(std::string const& text);
+
+  void AddPointToSource(double const* pt);
+  void ClearPointSource();
+
 protected:
   vtkPVOpenVRCollaborationClient();
   ~vtkPVOpenVRCollaborationClient();

@@ -1,32 +1,54 @@
+/*=========================================================================
+
+  Program:   ParaView
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+/**
+ * @class   pqOpenVRDockPanel
+ * @brief   PV GUI dock panel for OpenVR
+ *
+ * This class exists as part of the desktop GUI for ParaView and exposes
+ * OpenVR settings and controls.
+*/
 
 #include <QDockWidget>
 
+class pqOpenVRControls;
 class pqView;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkPVOpenVRHelper;
 
-class pvOpenVRDockPanel : public QDockWidget
+class pqOpenVRDockPanel : public QDockWidget
 {
   Q_OBJECT
   typedef QDockWidget Superclass;
 
 public:
-  pvOpenVRDockPanel(const QString& t, QWidget* p = 0, Qt::WindowFlags f = 0)
+  pqOpenVRDockPanel(const QString& t, QWidget* p = 0, Qt::WindowFlags f = 0)
     : Superclass(t, p, f)
   {
     this->constructor();
   }
-  pvOpenVRDockPanel(QWidget* p = 0, Qt::WindowFlags f = 0)
+  pqOpenVRDockPanel(QWidget* p = 0, Qt::WindowFlags f = 0)
     : Superclass(p, f)
   {
     this->constructor();
   }
 
-  ~pvOpenVRDockPanel();
+  ~pqOpenVRDockPanel();
 
 protected:
   vtkPVOpenVRHelper* Helper;
+  pqOpenVRControls* OpenVRControls;
 
 protected slots:
   void sendToOpenVR();
@@ -36,8 +58,6 @@ protected slots:
 
   void multiSampleChanged(int state);
   void defaultCropThicknessChanged(const QString& text);
-  void editableFieldChanged(const QString& text);
-  void fieldValuesChanged(const QString& text);
 
   void setActiveView(pqView*);
 
