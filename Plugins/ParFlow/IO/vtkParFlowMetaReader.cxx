@@ -566,8 +566,8 @@ void vtkParFlowMetaReader::GenerateDistributedMesh(
               def->GetTuple1((ii == subext[1] ? ii - 1 : ii) - subext[0] +
                 (subext[1] - subext[0]) * ((jj == subext[3] ? jj - 1 : jj) - subext[2]))
             : 0.0;
-          vtkVector3d pt =
-            origin + vtkVector3d(ii * spacing[0], jj * spacing[1], kk * spacing[2] * dz[kk] + elev);
+          vtkVector3d pt = origin + vtkVector3d(ii * spacing[0], jj * spacing[1],
+                                      kk * spacing[2] * dz[kk - subext[4]] + elev);
           pts->SetPoint(pid, pt.GetData());
         }
       }
@@ -736,7 +736,7 @@ int vtkParFlowMetaReader::FindPFBFiles(std::vector<std::string>& filesToLoad,
   return status;
 }
 
-std::streamoff vtkParFlowMetaReader::GetBlockOffset(Domain dom, int blockId) const
+std::streamoff vtkParFlowMetaReader::GetBlockOffset(Domain dom, int blockId, int nz) const
 {
   int gridTopo[3] = { static_cast<int>(this->IJKDivs[dom][0].size() - 1),
     static_cast<int>(this->IJKDivs[dom][1].size() - 1),
@@ -744,10 +744,11 @@ std::streamoff vtkParFlowMetaReader::GetBlockOffset(Domain dom, int blockId) con
   vtkVector3i blockIJK(blockId % gridTopo[0], (blockId / gridTopo[0]) % gridTopo[1],
     blockId / gridTopo[0] / gridTopo[1]);
 
-  return this->GetBlockOffset(dom, blockIJK);
+  return this->GetBlockOffset(dom, blockIJK, nz);
 }
 
-std::streamoff vtkParFlowMetaReader::GetBlockOffset(Domain dom, const vtkVector3i& blockIJK) const
+std::streamoff vtkParFlowMetaReader::GetBlockOffset(
+  Domain dom, const vtkVector3i& blockIJK, int nz) const
 {
   (void)clmEntrySize;
   std::streamoff offset;
@@ -767,7 +768,7 @@ std::streamoff vtkParFlowMetaReader::GetBlockOffset(Domain dom, const vtkVector3
   int dk = this->IJKDivs[dom][2][blockIJK[2] + 1] - this->IJKDivs[dom][2][blockIJK[2]];
   if (dk == 0)
   {
-    dk = 1;
+    dk = nz <= 0 ? 1 : nz;
   }
   offset += entrySize * dk * this->IJKDivs[dom][1][blockIJK[1]] * this->IJKDivs[dom][0].back();
 
@@ -888,6 +889,7 @@ bool vtkParFlowMetaReader::ReadComponentSubgridOverlap(ifstream& pfb, const vtkV
           }
           else
           {
+            arrayOffset *= m_nc;
             const double* from = m_buffer + fileOffset;
             double* to = m_darray + arrayOffset;
             for (int ii = 0; ii < m_id; ++ii, ++from, to += m_nc)
@@ -981,6 +983,9 @@ int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
     return 0;
   }
 
+  // TODO: Handle funky surface-domain cases:
+  //       (1) .C.pfb files will have nn[2] > 1
+  //       (2) 2d pfb timeseries will have nn[2] > 1
   if (nn[0] != (this->IJKDivs[dom][0].back() - this->IJKDivs[dom][0].front()) ||
     nn[1] != (this->IJKDivs[dom][1].back() - this->IJKDivs[dom][1].front()) ||
     (dom == Domain::Subsurface &&
@@ -1030,7 +1035,8 @@ int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
         int isizem1 = static_cast<int>(this->IJKDivs[dom][0].size() - 1);
         int jsizem1 = static_cast<int>(this->IJKDivs[dom][1].size() - 1);
         int subgrid = pp + isizem1 * (qq + jsizem1 * rr);
-        std::streamoff off = this->GetBlockOffset(dom, subgrid);
+        vtkVector3i subgridIdx(pp, qq, rr);
+        std::streamoff off = this->GetBlockOffset(dom, subgridIdx, nn[2]);
         // std::cout << variable->GetName() << " comp " << component << " subgrid " << subgrid << "
         // offset " << off << "\n";
         vtkVector3i si;
@@ -1039,18 +1045,21 @@ int vtkParFlowMetaReader::LoadPFBComponent(Domain dom, vtkDoubleArray* variable,
         pfb.seekg(off);
         if (!this->ReadSubgridHeader(pfb, si, sn, sr))
         {
-          vtkErrorMacro("Could not read subgrid header, block " << subgrid);
+          vtkErrorMacro("Could not read \"" << filename << "\" subgrid header, block " << subgrid);
           return 0;
         }
-        if (dom == Domain::Surface && sn[2] == 1)
+        if (dom == Domain::Surface)
         {
-          // 2-D PFB files (non-timeseries) report as if they have cells with a z extent of 1,
-          // which will confuse ReadComponentSubgridOverlap() below.
-          sn[2] = 0;
+          if (sn[2] == 1)
+          {
+            // 2-D PFB files (non-timeseries) report as if they have cells with a z extent of 1,
+            // which will confuse ReadComponentSubgridOverlap() below.
+            sn[2] = 0;
+          }
         }
         if (!this->ReadComponentSubgridOverlap(pfb, si, sn, extent, component, variable))
         {
-          vtkErrorMacro("Could not read subgrid data, block " << subgrid);
+          vtkErrorMacro("Could not read \"" << filename << "\" subgrid data, block " << subgrid);
           return 0;
         }
         /*

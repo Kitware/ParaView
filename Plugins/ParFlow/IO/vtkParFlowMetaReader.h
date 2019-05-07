@@ -179,8 +179,8 @@ protected:
   /// Use grid topology to compute a block (subgrid) offset.
   ///
   /// Only call this after IJKDivs has been set.
-  std::streamoff GetBlockOffset(Domain dom, int blockId) const;
-  std::streamoff GetBlockOffset(Domain dom, const vtkVector3i& blockIJK) const;
+  std::streamoff GetBlockOffset(Domain dom, int blockId, int nz) const;
+  std::streamoff GetBlockOffset(Domain dom, const vtkVector3i& blockIJK, int nz) const;
 
   /// Use current grid topology to compute a just-past-the-end subgrid offset.
   ///
