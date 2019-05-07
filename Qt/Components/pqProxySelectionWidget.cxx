@@ -115,15 +115,14 @@ pqProxySelectionWidget::pqProxySelectionWidget(
   , Internal(new pqProxySelectionWidget::pqInternal(this))
 {
   this->Internal->Ui.label->setText(smproperty->GetXMLLabel());
-  this->Internal->Domain =
-    vtkSMProxyListDomain::SafeDownCast(smproperty->FindDomain("vtkSMProxyListDomain"));
+  this->Internal->Domain = smproperty->FindDomain<vtkSMProxyListDomain>();
 
   // This widget is intended to be used for properties with ProxyListDomains
   // alone.
   assert(this->Internal->Domain);
   this->connect(
     this->Internal->Ui.comboBox, SIGNAL(currentIndexChanged(int)), SLOT(currentIndexChanged(int)));
-  new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, "proxy_list");
+  new pqComboBoxDomain(this->Internal->Ui.comboBox, smproperty, this->Internal->Domain);
   this->addPropertyLink(this, "chosenProxy", SIGNAL(chosenProxyChanged()), smproperty);
 
   // If selected_proxy_panel_visibility="advanced" hint is specified, we

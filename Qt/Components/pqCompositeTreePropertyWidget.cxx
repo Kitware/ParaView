@@ -103,8 +103,7 @@ pqCompositeTreePropertyWidget::pqCompositeTreePropertyWidget(
   this->setShowLabel(false);
   this->setChangeAvailableAsChangeFinished(true);
 
-  vtkSMCompositeTreeDomain* ctd =
-    vtkSMCompositeTreeDomain::SafeDownCast(smproperty->FindDomain("vtkSMCompositeTreeDomain"));
+  auto ctd = smproperty->FindDomain<vtkSMCompositeTreeDomain>();
   assert(ctd);
   this->Domain = ctd;
 

@@ -116,11 +116,13 @@ pqSampleScalarWidget::~pqSampleScalarWidget()
     this->Implementation->RangeProperty->RemoveObserver(this->Implementation->DomainObserver);
   }
 
-  if (this->Implementation->SampleProperty &&
-    this->Implementation->SampleProperty->GetDomain("scalar_range"))
+  if (this->Implementation->SampleProperty)
   {
-    this->Implementation->SampleProperty->GetDomain("scalar_range")
-      ->RemoveObserver(this->Implementation->PropertyObserver);
+    auto domain = this->Implementation->SampleProperty->FindDomain<vtkSMDoubleRangeDomain>();
+    if (domain)
+    {
+      domain->RemoveObserver(this->Implementation->PropertyObserver);
+    }
   }
 
   delete this->Implementation;
@@ -142,11 +144,13 @@ void pqSampleScalarWidget::setDataSources(pqSMProxy controlled_proxy,
   this->Implementation->SampleProperty = sample_property;
   this->Implementation->RangeProperty = range_property;
 
-  if (this->Implementation->SampleProperty &&
-    this->Implementation->SampleProperty->GetDomain("scalar_range"))
+  if (this->Implementation->SampleProperty)
   {
-    this->Implementation->SampleProperty->GetDomain("scalar_range")
-      ->AddObserver(vtkCommand::DomainModifiedEvent, this->Implementation->PropertyObserver);
+    auto domain = this->Implementation->SampleProperty->FindDomain<vtkSMDoubleRangeDomain>();
+    if (domain)
+    {
+      domain->AddObserver(vtkCommand::DomainModifiedEvent, this->Implementation->PropertyObserver);
+    }
   }
 
   if (this->Implementation->RangeProperty)
@@ -394,15 +398,7 @@ bool pqSampleScalarWidget::getRange(double& range_min, double& range_max)
   // Return the range of values in the input (if available)
   if (this->Implementation->SampleProperty)
   {
-    vtkSMDoubleRangeDomain* domain;
-    domain = vtkSMDoubleRangeDomain::SafeDownCast(
-      this->Implementation->SampleProperty->GetDomain("scalar_range"));
-    if (!domain)
-    {
-      domain = vtkSMDoubleRangeDomain::SafeDownCast(
-        this->Implementation->SampleProperty->GetDomain("bounds"));
-    }
-
+    auto domain = this->Implementation->SampleProperty->FindDomain<vtkSMDoubleRangeDomain>();
     if (domain)
     {
       int min_exists = 0;

@@ -62,9 +62,7 @@ void vtkSMXYChartRepresentationInitializationHelper::PostInitializeProxy(
         repr->GetProperty("SeriesPlotCorner"))
       {
         vtkSMProperty* corner = repr->GetProperty("SeriesPlotCorner");
-        vtkSMChartSeriesSelectionDomain* cornerDomain =
-          vtkSMChartSeriesSelectionDomain::SafeDownCast(
-            corner->FindDomain("vtkSMChartSeriesSelectionDomain"));
+        auto cornerDomain = corner->FindDomain<vtkSMChartSeriesSelectionDomain>();
         cornerDomain->SetDefaultValue("2");
       }
     }

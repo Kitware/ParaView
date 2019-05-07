@@ -370,8 +370,7 @@ void vtkPVKeyFrameCueManipulator::UpdateKeyTimeDomains()
       vtkWarningMacro("KeyFrameProxy should have a KeyTime property.");
       continue;
     }
-    vtkSMDoubleRangeDomain* dr =
-      vtkSMDoubleRangeDomain::SafeDownCast(keyTimeProp->GetDomain("range"));
+    auto dr = keyTimeProp->FindDomain<vtkSMDoubleRangeDomain>();
     if (dr)
     {
       int exists;

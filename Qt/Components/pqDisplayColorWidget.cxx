@@ -341,8 +341,7 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* repr)
   }
 
   vtkSMProperty* prop = proxy->GetProperty("ColorArrayName");
-  vtkSMArrayListDomain* domain =
-    vtkSMArrayListDomain::SafeDownCast(prop->FindDomain("vtkSMArrayListDomain"));
+  auto domain = prop->FindDomain<vtkSMArrayListDomain>();
   if (!domain)
   {
     qCritical("Representation has ColorArrayName property without "

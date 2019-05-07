@@ -356,8 +356,11 @@ void pqPipelineContextMenuBehavior::buildColorFieldsMenu(
 
   menu->addAction(solidColorIcon, "Solid Color")->setData(convert(QPair<int, QString>()));
   vtkSMProperty* prop = pipelineRepr->getProxy()->GetProperty("ColorArrayName");
-  vtkSMArrayListDomain* domain =
-    prop ? vtkSMArrayListDomain::SafeDownCast(prop->FindDomain("vtkSMArrayListDomain")) : NULL;
+  if (!prop)
+  {
+    return;
+  }
+  auto domain = prop->FindDomain<vtkSMArrayListDomain>();
   if (!domain)
   {
     return;

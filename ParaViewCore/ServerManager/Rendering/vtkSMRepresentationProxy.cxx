@@ -410,9 +410,7 @@ bool vtkSMRepresentationProxy::SetRepresentationType(const char* type)
 {
   if (vtkSMProperty* property = this->GetProperty("Representation"))
   {
-    vtkSMStringListDomain* sld =
-      vtkSMStringListDomain::SafeDownCast(property->FindDomain("vtkSMStringListDomain"));
-
+    auto sld = property->FindDomain<vtkSMStringListDomain>();
     unsigned int tmp;
     if (sld != NULL && sld->IsInDomain(type, tmp) == 0)
     {

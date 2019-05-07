@@ -765,7 +765,7 @@ vtkSMProxyListDomain* pqLinksModel::proxyListDomain(vtkSMProxy* pxy)
     vtkSMProxyProperty* pxyProperty = vtkSMProxyProperty::SafeDownCast(iter->GetProperty());
     if (pxyProperty)
     {
-      pxyDomain = vtkSMProxyListDomain::SafeDownCast(pxyProperty->GetDomain("proxy_list"));
+      pxyDomain = pxyProperty->FindDomain<vtkSMProxyListDomain>();
     }
   }
   iter->Delete();

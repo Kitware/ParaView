@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleVectorPropertyWidget.h"
 
 #include "vtkPVGeneralSettings.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMIntRangeDomain.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMVectorProperty.h"
@@ -80,10 +82,10 @@ bool pqAnimationShortcutDecorator::accept(pqPropertyWidget* parentWidget)
     if (source && !repr && vp && vp->GetNumberOfElements() == 1 && vp->GetAnimateable())
     {
       bool hasRange = true;
-      vtkSMDomain* domain = vp->GetDomain("scalar_range");
+      vtkSMDomain* domain = vp->FindDomain<vtkSMDoubleRangeDomain>();
       if (!domain)
       {
-        domain = vp->GetDomain("range");
+        domain = vp->FindDomain<vtkSMIntRangeDomain>();
         if (!domain)
         {
           hasRange = false;

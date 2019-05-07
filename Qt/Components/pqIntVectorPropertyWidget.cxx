@@ -158,7 +158,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use a combo-box for a enumerated list.");
       QComboBox* comboBox = new QComboBox(this);
       comboBox->setObjectName("ComboBox");
-      new pqComboBoxDomain(comboBox, smproperty, domain->GetXMLName());
+      new pqComboBoxDomain(comboBox, smproperty, domain);
       pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
       this->addPropertyLink(
         adaptor, "currentData", SIGNAL(currentTextChanged(QString)), smproperty);
@@ -269,7 +269,7 @@ pqIntVectorPropertyWidget::~pqIntVectorPropertyWidget()
 pqPropertyWidget* pqIntVectorPropertyWidget::createWidget(
   vtkSMIntVectorProperty* smproperty, vtkSMProxy* smproxy, QWidget* parent)
 {
-  if (smproperty != nullptr && smproperty->FindDomain("vtkSMCompositeTreeDomain") != nullptr)
+  if (smproperty != nullptr && smproperty->FindDomain<vtkSMCompositeTreeDomain>() != nullptr)
   {
     return new pqCompositeTreePropertyWidget(smproperty, smproxy, parent);
   }

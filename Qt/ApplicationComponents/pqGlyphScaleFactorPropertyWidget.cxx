@@ -68,11 +68,14 @@ void pqGlyphScaleFactorPropertyWidget::resetButtonClicked()
   // This logic has been ported directly from the old pqGlyphPanel class for the
   // most part.
 
+  // It uses the GetDomain("name") method, which is based on named domains.
+  // We should rewrite this at some point.
+
   vtkSMProxy* smproxy = this->proxy();
   vtkSMProperty* smproperty = this->property();
 
   double scaledExtent = 1.0;
-  if (vtkSMBoundsDomain* domain = vtkSMBoundsDomain::SafeDownCast(smproperty->GetDomain("bounds")))
+  if (auto domain = smproperty->FindDomain<vtkSMBoundsDomain>())
   {
     if (domain->GetMaximumExists(0))
     {

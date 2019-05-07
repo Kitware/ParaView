@@ -180,9 +180,8 @@ bool vtkSMParaViewPipelineController::CreateProxiesForProxyListDomains(vtkSMProx
   iter.TakeReference(proxy->NewPropertyIterator());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
-    vtkSMProxyListDomain* pld = iter->GetProperty()
-      ? vtkSMProxyListDomain::SafeDownCast(iter->GetProperty()->FindDomain("vtkSMProxyListDomain"))
-      : NULL;
+    auto pld =
+      iter->GetProperty() ? iter->GetProperty()->FindDomain<vtkSMProxyListDomain>() : nullptr;
     if (pld)
     {
       pld->CreateProxies(proxy->GetSessionProxyManager());
@@ -221,9 +220,8 @@ void vtkSMParaViewPipelineController::RegisterProxiesForProxyListDomains(vtkSMPr
   iter.TakeReference(proxy->NewPropertyIterator());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
   {
-    vtkSMProxyListDomain* pld = iter->GetProperty()
-      ? vtkSMProxyListDomain::SafeDownCast(iter->GetProperty()->FindDomain("vtkSMProxyListDomain"))
-      : NULL;
+    auto pld =
+      iter->GetProperty() ? iter->GetProperty()->FindDomain<vtkSMProxyListDomain>() : nullptr;
     if (!pld)
     {
       continue;

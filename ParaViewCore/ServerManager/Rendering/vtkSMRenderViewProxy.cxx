@@ -381,8 +381,7 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   {
     vtkSMPropertyHelper(this, "StereoCapableWindow").Set(1);
     vtkSMPropertyHelper(this, "StereoRender").Set(1);
-    vtkSMEnumerationDomain* domain =
-      vtkSMEnumerationDomain::SafeDownCast(this->GetProperty("StereoType")->GetDomain("enum"));
+    auto domain = this->GetProperty("StereoType")->FindDomain<vtkSMEnumerationDomain>();
     if (domain && domain->HasEntryText(pvoptions->GetStereoType()))
     {
       vtkSMPropertyHelper(this, "StereoType")

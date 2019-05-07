@@ -110,12 +110,12 @@ pqYoungsMaterialPropertyWidget::pqYoungsMaterialPropertyWidget(
     SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateComboBoxes()));
 
   pqComboBoxDomain* domain1 =
-    new pqComboBoxDomain(ui.OrderingArrays, smgroup->GetProperty("OrderingArrays"), "array_list");
+    new pqComboBoxDomain(ui.OrderingArrays, smgroup->GetProperty("OrderingArrays"));
   domain1->setObjectName("OrderingArraysDomain");
   domain1->addString("None");
 
   pqComboBoxDomain* domain2 =
-    new pqComboBoxDomain(ui.NormalArrays, smproxy->GetProperty("NormalArrays"), "array_list");
+    new pqComboBoxDomain(ui.NormalArrays, smproxy->GetProperty("NormalArrays"));
   domain2->setObjectName("NormalArraysDomain");
   domain2->addString("None");
 

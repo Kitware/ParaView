@@ -170,8 +170,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
   {
     if (dvp->GetNumberOfElements() == 1 &&
       ((range->GetMinimumExists(0) && range->GetMaximumExists(0)) ||
-          (dvp->FindDomain("vtkSMArrayRangeDomain") != nullptr ||
-            dvp->FindDomain("vtkSMBoundsDomain") != nullptr)))
+          (dvp->FindDomain<vtkSMArrayRangeDomain>() != nullptr ||
+            dvp->FindDomain<vtkSMBoundsDomain>() != nullptr)))
     {
       // bounded ranges are represented with a slider and a spin box
       vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(),
@@ -295,8 +295,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(
     }
   }
 
-  if (dvp->FindDomain("vtkSMArrayRangeDomain") != nullptr ||
-    dvp->FindDomain("vtkSMBoundsDomain") != nullptr)
+  if (dvp->FindDomain<vtkSMArrayRangeDomain>() != nullptr ||
+    dvp->FindDomain<vtkSMBoundsDomain>() != nullptr)
   {
     vtkVLogF(PARAVIEW_LOG_APPLICATION_VERBOSITY(), "add `Scale By` button");
     pqScaleByButton* scaleButton = new pqScaleByButton(this);
