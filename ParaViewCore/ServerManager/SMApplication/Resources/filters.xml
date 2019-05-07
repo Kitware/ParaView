@@ -13215,22 +13215,40 @@ Every Nth Point.
       <!-- End of ConvertSelection -->
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkCompositeDataToUnstructuredGridFilter"
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkDataObjectTreeToPointSetFilter"
                  label="Merge Blocks"
                  name="MergeBlocks">
-      <Documentation short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid">
-      vtkCompositeDataToUnstructuredGridFilter appends all vtkDataSet leaves of
-      the input composite dataset to a single unstructured grid. The subtree to
-      be combined can be chosen using the SubTreeCompositeIndex. If the
-      SubTreeCompositeIndex is a leaf node, then no appending is
-      required.</Documentation>
+      <Documentation short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid or vtkPolyData">
+      Merge Blocks appends all vtkDataSet leaves of the input composite dataset to a single
+      unstructured grid (or polydata if all leaves are polydata). The subtree to
+      be combined can be chosen using the SubTreeCompositeIndex. If the SubTreeCompositeIndex
+      is a leaf node, then no appending is required nor performed.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkCompositeDataSet" />
+          <DataType value="vtkDataObjectTree" />
         </DataTypeDomain>
         <Documentation>Set the input composite dataset.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="4"
+                         number_of_elements="1"
+                         name="OutputDataSetType"
+                         panel_visibility="advanced">
+        <EnumerationDomain name="enum">
+          <Entry text="Polygonal Mesh"
+                 value="0" />
+          <Entry text="Unstructured Grid"
+                 value="4" />
+        </EnumerationDomain>
+        <Documentation>Determines the output type produced by this filter. Only blocks compatible
+        with the output type will be merged in the output. For example, if the output type is
+        "Polygonal Mesh", then blocks of type "Image Data", "Structured Grid", etc. will not be merged.
+        If the output type is "UnstructuredGrid", then blocks of any type will be merged in the output.
+        Defaults to "Unstructured Grid".
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetSubTreeCompositeIndex"
                          default_values="0"
                          is_internal="1"
@@ -13252,6 +13270,41 @@ Every Nth Point.
                          name="MergePoints"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Documentation>Merge points within a distance specified by the **Tolerance**
+        property.</Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetTolerance"
+                            default_values="0"
+                            label="Tolerance"
+                            name="Tolerance"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>Set the tolerance for merging points if **Merge Points** is enabled.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MergePoints"
+                                   value="1" />
+          <!-- show this widget when MergePoints==1 and showing advanced options -->
+        </Hints>
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetToleranceIsAbsolute"
+                         default_values="0"
+                         name="ToleranceIsAbsolute"
+                         number_of_elements="1"
+                         panel_visibility="advanced">
+        <BooleanDomain name="bool" />
+        <Documentation>This property determines whether to treat the **Tolerance**
+        property as absolute (points closer than Tolerance are merged) or relative
+        (points closer than a fraction of the input data's bounding box diagonal length)
+        when performing point merging.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="GenericDecorator"
+                                   mode="visibility"
+                                   property="MergePoints"
+                                   value="1" />
+          <!-- show this widget when MergePoints==1 and showing advanced options -->
+        </Hints>
       </IntVectorProperty>
       <!-- End of MergeBlocks -->
     </SourceProxy>
