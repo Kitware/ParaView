@@ -22,5 +22,7 @@ pqProxy* @_paraview_proxy_NAME@ServerManagerModelImplementation::createPQProxy(
   {
     return nullptr;
   }
+
 @_paraview_proxy_body@
+  return nullptr;
 }

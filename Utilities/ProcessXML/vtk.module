@@ -3,7 +3,6 @@ NAME
 LIBRARY_NAME
   vtkProcessXML
 PRIVATE_DEPENDS
-  VTK::CommonCore
   VTK::vtksys
 TEST_LABELS
   ParaView
