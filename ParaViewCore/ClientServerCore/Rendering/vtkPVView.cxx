@@ -93,11 +93,11 @@ public:
     {
       if (!this->Initialized)
       {
-        this->Context->Initialize();
+        // ensures that context is created.
+        vtkPVProcessWindow::PrepareForRendering();
         this->Context->MakeCurrent();
         this->OpenGLInit();
       }
-
       this->Superclass::Render();
     }
   }

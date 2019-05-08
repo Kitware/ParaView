@@ -47,6 +47,12 @@ public:
    */
   static vtkRenderWindow* GetRenderWindow();
 
+  /**
+   * This may be called to ensured that the shared window is created/initialized
+   * at least once.
+   */
+  static void PrepareForRendering();
+
 protected:
   vtkPVProcessWindow();
   ~vtkPVProcessWindow();
