@@ -548,6 +548,7 @@ int vtkSMViewLayoutProxy::LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocat
   }
 
   this->UpdateViewPositions();
+  this->UpdateState();
   return 1;
 }
 
