@@ -299,11 +299,6 @@ mark_as_advanced(PARAVIEW_USE_EXTERNAL)
 set(paraview_requested_modules)
 set(paraview_rejected_modules)
 
-if (PARAVIEW_ENABLE_COMMANDLINE_TOOLS)
-  list(APPEND paraview_requested_modules
-    ParaView::ServerManagerApplication)
-endif ()
-
 if (PARAVIEW_ENABLE_COMMANDLINE_TOOLS AND PARAVIEW_ENABLE_PYTHON)
   list(APPEND paraview_requested_modules
     VTK::PythonInterpreter)
@@ -359,14 +354,9 @@ endif()
 
 if (PARAVIEW_BUILD_QT_GUI)
   list(APPEND paraview_requested_modules
-    ParaView::Core
-    ParaView::ServerManagerApplication
-    ParaView::ServerManagerCore
-    ParaView::ServerManagerDefault
     ParaView::pqApplicationComponents
     ParaView::pqComponents
     ParaView::pqCore)
-
   if (PARAVIEW_ENABLE_PYTHON)
     list(APPEND paraview_requested_modules
       ParaView::pqPython)
@@ -527,7 +517,10 @@ if (PARAVIEW_BUILD_TESTING)
 endif ()
 
 list(APPEND paraview_requested_modules
+  ParaView::Animation
   ParaView::ProcessXML
+  ParaView::ServerManagerApplication
+  ParaView::ServerManagerDefault
   ParaView::VTKExtensionsCGNSReader
   ParaView::VTKExtensionsH5PartReader
   ParaView::VTKExtensionsPoints

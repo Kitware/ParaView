@@ -31,6 +31,7 @@
 namespace
 {
 static vtkRenderWindow* ProcessWindowSingleton = nullptr;
+static bool ProcessWindowSingletonPrepared = false;
 static int PVProcessWindowSingletonCleanerNiftyCounter = 0;
 static void DeleteProcessWindowSingleton()
 {
@@ -38,6 +39,7 @@ static void DeleteProcessWindowSingleton()
   {
     ::ProcessWindowSingleton->Delete();
     ::ProcessWindowSingleton = nullptr;
+    ::ProcessWindowSingletonPrepared = false;
   }
 }
 }
@@ -84,6 +86,18 @@ vtkRenderWindow* vtkPVProcessWindow::GetRenderWindow()
     ::ProcessWindowSingleton = vtkPVProcessWindow::NewWindow();
   }
   return ::ProcessWindowSingleton;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVProcessWindow::PrepareForRendering()
+{
+  if (::ProcessWindowSingleton != nullptr && ::ProcessWindowSingletonPrepared == false)
+  {
+    // calling Window::Initialize() should have done the trick, but it doesn't,
+    // so we call render (see OSMesa errors reported here paraview/paraview#18938).
+    ::ProcessWindowSingleton->Render();
+    ::ProcessWindowSingletonPrepared = true;
+  }
 }
 
 //----------------------------------------------------------------------------

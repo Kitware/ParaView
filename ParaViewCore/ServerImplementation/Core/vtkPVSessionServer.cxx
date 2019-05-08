@@ -670,7 +670,8 @@ void vtkPVSessionServer::GatherInformationInternal(vtkTypeUInt32 location, const
   }
   else
   {
-    vtkErrorMacro("Could not create information object.");
+    vtkErrorMacro(
+      "Could not create information object: `" << (classname ? classname : "(nullptr)") << "`.");
     // let client know that gather failed.
     int len = 0;
     this->Internal->GetActiveController()->Send(
