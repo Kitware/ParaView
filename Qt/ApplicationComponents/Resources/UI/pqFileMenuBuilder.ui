@@ -134,11 +134,6 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionExportImmediate">
-   <property name="text">
-    <string>Export Now</string>
-   </property>
-  </action>
   <action name="actionExport">
    <property name="text">
     <string>Export Scene...</string>
@@ -166,19 +161,28 @@
     <string>Load window arrangement from a file</string>
    </property>
   </action>
+  <action name="actionExportImmediate">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/cinemascience_mark.png</normaloff>:/pqWidgets/Icons/cinemascience_mark.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export Now</string>
+   </property>
+  </action>
   <action name="actionFileImportCinemaDatabase">
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
      <normaloff>:/pqWidgets/Icons/cinemascience_mark.png</normaloff>:/pqWidgets/Icons/cinemascience_mark.png</iconset>
    </property>
    <property name="text">
-    <string>Import Cinema Database...</string>
+    <string>Import Cinema Image Database...</string>
    </property>
    <property name="toolTip">
-    <string>Import a Cinema Database file</string>
+    <string>Import a Cinema Image Database file</string>
    </property>
    <property name="statusTip">
-    <string>Import a Cinema Database file</string>
+    <string>Import a Cinema Image Database file</string>
    </property>
   </action>
   <action name="actionFileLoadMaterials">
@@ -201,12 +205,12 @@
   <addaction name="separator"/>
   <addaction name="actionFileSaveData"/>
   <addaction name="actionFileSaveScreenshot"/>
-  <addaction name="actionExportImmediate"/>
   <addaction name="actionExport"/>
   <addaction name="separator"/>
   <addaction name="actionFileSaveAnimation"/>
   <addaction name="actionFileSaveGeometry"/>
   <addaction name="separator"/>
+  <addaction name="actionExportImmediate"/>
   <addaction name="actionFileImportCinemaDatabase"/>
   <addaction name="separator"/>
   <addaction name="actionFileLoadMaterials"/>

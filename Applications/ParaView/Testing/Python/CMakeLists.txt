@@ -24,13 +24,6 @@ if (numpy_found)
     TestAnnotateAttributeData.py
     )
 
-  if (TARGET ParaView::CinemaPython)
-    paraview_add_test_python(
-      NO_DATA NO_VALID NO_RT
-      CinemaAERTest.py
-      )
-  endif ()
-
   paraview_add_test_python(
     NO_DATA NO_RT
     TestPythonViewNumpyScript.py
