@@ -332,6 +332,8 @@ void pqCameraDialog::setupGUI()
 
     this->Internal->CameraLinks.addPropertyLink(this->Internal->viewAngle, "value",
       SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("CameraViewAngle"), 0);
+    this->Internal->CameraLinks.addPropertyLink(this->Internal->eyeAngle, "value",
+      SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("EyeAngle"), 0);
 
     QObject::connect(&this->Internal->CameraLinks, SIGNAL(qtWidgetChanged()),
       this->Internal->RenderModule, SLOT(render()));

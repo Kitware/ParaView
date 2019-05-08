@@ -2500,6 +2500,7 @@ inline int vtkGetNumberOfRendersPerFrame(int stereoMode)
     case VTK_STEREO_CHECKERBOARD:
     case VTK_STEREO_SPLITVIEWPORT_HORIZONTAL:
     case VTK_STEREO_FAKE:
+    case VTK_STEREO_EMULATE:
       return 2;
 
     case VTK_STEREO_LEFT:
@@ -2517,27 +2518,79 @@ void vtkPVRenderView::UpdateStereoProperties()
     return;
   }
 
-  if (this->ServerStereoType != 0 &&
-    vtkGetNumberOfRendersPerFrame(this->ServerStereoType) !=
-      vtkGetNumberOfRendersPerFrame(this->StereoType))
+  // VTK_STEREO_FAKE got added to the XML config as the value for `None`. Let's
+  // switch to simply rendering LEFT eye in that mode, since we don't really
+  // need two passes.
+  if (this->StereoType == VTK_STEREO_FAKE)
+  {
+    this->StereoType = VTK_STEREO_LEFT;
+  }
+  if (this->ServerStereoType == VTK_STEREO_FAKE)
+  {
+    this->ServerStereoType = VTK_STEREO_LEFT;
+  }
+
+  int client_type = this->StereoType;
+  int server_type = (this->ServerStereoType == VTK_STEREOTYPE_SAME_AS_CLIENT)
+    ? client_type
+    : this->ServerStereoType;
+
+  if (this->InTileDisplayMode() || this->InCaveDisplayMode())
+  {
+    // in this mode, the render server processes are showing results to the user
+    // and the stereo mode is more relevant on the server side than the client
+    // side since the client is merely a driver.
+    if (vtkGetNumberOfRendersPerFrame(server_type) != vtkGetNumberOfRendersPerFrame(client_type))
+    {
+      if (vtkGetNumberOfRendersPerFrame(server_type) == 2)
+      {
+        client_type = VTK_STEREO_EMULATE;
+      }
+      else
+      {
+        client_type = server_type;
+      }
+    }
+  }
+  else
+  {
+    // the client is the main viewport for the user, the server side processes
+    // are not showing final results to the user. The server never needs any 2
+    // pass mode except VTK_STEREO_EMULATE.
+    if (vtkGetNumberOfRendersPerFrame(client_type) == 2)
+    {
+      server_type = VTK_STEREO_EMULATE;
+    }
+    else
+    {
+      server_type = client_type;
+    }
+  }
+
+  if (this->StereoType != client_type)
   {
     vtkWarningMacro("Incompatible stereo types for client and server ranks. "
-                    "Forcing the server use the same type as the client.");
-    this->ServerStereoType = 0;
+                    "Forcing the client to use '"
+      << vtkRenderWindow::GetStereoTypeAsString(client_type) << "'.");
+    this->StereoType = client_type;
   }
+
+  if (this->ServerStereoType != server_type)
+  {
+    // we don't warn here since this only happens in modes where the server
+    // not showing final results to the user.
+    this->ServerStereoType = server_type;
+  }
+
+  // by this point, the ServerStereoType should have been updated to be a type
+  // VTK knows about.
+  assert(this->ServerStereoType != VTK_STEREOTYPE_SAME_AS_CLIENT);
 
   switch (vtkProcessModule::GetProcessType())
   {
     case vtkProcessModule::PROCESS_RENDER_SERVER:
     case vtkProcessModule::PROCESS_SERVER:
-      if (this->ServerStereoType == VTK_STEREOTYPE_SAME_AS_CLIENT)
-      {
-        this->GetRenderWindow()->SetStereoType(this->StereoType);
-      }
-      else
-      {
-        this->GetRenderWindow()->SetStereoType(this->ServerStereoType);
-      }
+      this->GetRenderWindow()->SetStereoType(this->ServerStereoType);
       break;
 
     default:
