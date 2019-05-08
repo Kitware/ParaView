@@ -118,6 +118,8 @@ private:
   void UpdateGlobalOptions(const QString& searchString);
   void InternalScreenshotCheckbox(int i);
   void InternalWriterCheckbox(int i);
+  bool IsWriterChecked(const QString& filter, const QString& writer);
+  bool IsScreenShotChecked(const QString& filter, const QString& writer);
 
   class pqInternals;
   QScopedPointer<pqInternals> Internals;

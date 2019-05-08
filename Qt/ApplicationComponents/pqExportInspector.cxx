@@ -144,6 +144,7 @@ void pqExportInspector::showEvent(QShowEvent* e)
 void pqExportInspector::Update()
 {
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+  pqActiveObjects& ao = pqActiveObjects::instance();
 
   // filters and writers
   // turn off handling temporarily while we set up the menu
@@ -152,7 +153,13 @@ void pqExportInspector::Update()
   // the filters we might configure for export
   QList<pqPipelineSource*> filters = smModel->findItems<pqPipelineSource*>();
   QComboBox* filterChoice = this->Internals->Ui.filterChoice;
+
   QString current = filterChoice->currentText();
+  pqPipelineSource* activeFilter = ao.activeSource();
+  if (activeFilter)
+  {
+    current = activeFilter->getSMName();
+  }
   filterChoice->clear();
   foreach (auto i, filters)
   {
@@ -178,6 +185,13 @@ void pqExportInspector::Update()
   QList<pqRenderViewBase*> views = smModel->findItems<pqRenderViewBase*>();
   QComboBox* viewChoice = this->Internals->Ui.viewChoice;
   current = viewChoice->currentText();
+
+  pqRenderViewBase* activeView = static_cast<pqRenderViewBase*>(ao.activeView());
+  if (activeView)
+  {
+    current = activeView->getSMName();
+  }
+
   viewChoice->clear();
   foreach (auto i, views)
   {
@@ -280,12 +294,21 @@ void pqExportInspector::PopulateWriterFormats()
   std::string availproxies = wf->GetSupportedWriterProxies(filter, portnum);
   std::stringstream ss(availproxies);
   std::string item;
+  std::string firstchecked = "none";
   while (std::getline(ss, item, ';'))
   {
+    if (firstchecked == "none" && this->IsWriterChecked(filterName, QString::fromStdString(item)))
+    {
+      firstchecked = item;
+    }
     if (item != "Cinema image options" || this->Internals->Ui.advanced->isChecked())
     {
       this->Internals->Ui.filterFormat->addItem(item.c_str());
     }
+  }
+  if (firstchecked != "none")
+  {
+    this->Internals->Ui.filterFormat->setCurrentText(firstchecked.c_str());
   }
 }
 
@@ -410,6 +433,42 @@ void pqExportInspector::UpdateWriterCheckbox(int i)
 }
 
 //-----------------------------------------------------------------------------
+bool pqExportInspector::IsWriterChecked(const QString& filterName, const QString& writerName)
+{
+  if (filterName == "" || writerName == "")
+  {
+    return false;
+  }
+
+  vtkSMSourceProxy* filter;
+  int portnum;
+  ::getFilterProxyAndPort(filterName, filter, portnum);
+  if (!filter)
+  {
+    return false;
+  }
+
+  vtkSMExportProxyDepot* ed =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetExportDepot();
+  if (!ed->HasWriterProxy(filterName.toStdString().c_str(), writerName.toStdString().c_str()))
+  {
+    return false;
+  }
+
+  vtkSMSourceProxy* writerProxy =
+    ed->GetWriterProxy(filter, filterName.toStdString().c_str(), writerName.toStdString().c_str());
+  const char* enablestate = writerProxy->GetAnnotation("enabled");
+  if (enablestate)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+//-----------------------------------------------------------------------------
 void pqExportInspector::InternalWriterCheckbox(int i)
 {
   QString filterName = this->Internals->Ui.filterChoice->currentText();
@@ -461,12 +520,20 @@ void pqExportInspector::PopulateViewFormats()
   QComboBox* viewFormat = this->Internals->Ui.viewFormat;
   viewFormat->clear();
   // todo: customize this based on type of view
-  viewFormat->addItem("PNG image (*.png)");
-  viewFormat->addItem("JPG image (*.jpg)");
-  viewFormat->addItem("TIFF image (*.tif)");
-  viewFormat->addItem("BMP image (*.bmp)");
-  viewFormat->addItem("PPM image (*.ppm)");
-  viewFormat->addItem("Cinema image database (*.cdb)");
+  std::vector<QString> writers;
+  writers.push_back(QString("PNG image (*.png)"));
+  writers.push_back(QString("JPG image (*.jpg)"));
+  writers.push_back(QString("TIFF image (*.tif)"));
+  writers.push_back(QString("BMP image (*.bmp)"));
+  writers.push_back(QString("Cinema image database (*.cdb)"));
+  for (auto i = writers.begin(); i != writers.end(); i++)
+  {
+    viewFormat->addItem(*i);
+    if (this->IsScreenShotChecked(current, *i))
+    {
+      viewFormat->setCurrentText(*i);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -594,6 +661,42 @@ void pqExportInspector::UpdateScreenshotCheckbox(int i)
   {
     QObject::connect(
       this->Internals->Ui.viewExtract, SIGNAL(toggled(bool)), this, SLOT(ExportView(bool)));
+  }
+}
+
+//-----------------------------------------------------------------------------
+bool pqExportInspector::IsScreenShotChecked(const QString& viewName, const QString& writerName)
+{
+  if (viewName == "" || writerName == "")
+  {
+    return false;
+  }
+
+  pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+  pqRenderViewBase* pqview = smModel->findItem<pqRenderViewBase*>(viewName);
+  vtkSMViewProxy* view = pqview->getViewProxy();
+  if (!view)
+  {
+    return false;
+  }
+
+  vtkSMExportProxyDepot* ed =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetExportDepot();
+  if (!ed->HasScreenshotProxy(viewName.toStdString().c_str(), writerName.toStdString().c_str()))
+  {
+    return false;
+  }
+
+  vtkSMSaveScreenshotProxy* writerProxy = vtkSMSaveScreenshotProxy::SafeDownCast(
+    ed->GetScreenshotProxy(view, viewName.toStdString().c_str(), writerName.toStdString().c_str()));
+  const char* enablestate = writerProxy->GetAnnotation("enabled");
+  if (enablestate)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
   }
 }
 
