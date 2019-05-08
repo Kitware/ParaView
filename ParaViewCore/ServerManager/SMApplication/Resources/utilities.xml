@@ -3854,8 +3854,7 @@
       <IntVectorProperty name="SaveDTable"
                          label="Save Cinema D Table"
                          default_values="0"
-                         number_of_elements="1"
-                         panel_visibility="advanced">
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>
           Creates a Cinema table that indexes all output files.
