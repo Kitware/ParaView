@@ -282,7 +282,10 @@ void pqExportInspector::PopulateWriterFormats()
   std::string item;
   while (std::getline(ss, item, ';'))
   {
-    this->Internals->Ui.filterFormat->addItem(item.c_str());
+    if (item != "Cinema image options" || this->Internals->Ui.advanced->isChecked())
+    {
+      this->Internals->Ui.filterFormat->addItem(item.c_str());
+    }
   }
 }
 
@@ -642,6 +645,7 @@ void pqExportInspector::InternalScreenshotCheckbox(int i)
 void pqExportInspector::Advanced(bool vtkNotUsed(setting))
 {
   this->UpdateGlobalOptions();
+  this->PopulateWriterFormats();
 }
 
 //-----------------------------------------------------------------------------
