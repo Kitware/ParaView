@@ -40,8 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @brief widget to setup Catalyst export scripts and data products
  *
  * pqExportInspector is a central place where the user can set up
- * a Catalyst script including all of the data products that the script
- * will produce when a Catalyzed simulation runs it.
+ * a set of data products that ParaView will produce via the Export Now
+ * action or that Catalyst or a Temporal batch script will eventually
+ * produce when they are run.
  */
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqExportInspector : public QWidget
