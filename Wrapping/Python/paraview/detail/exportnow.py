@@ -189,13 +189,10 @@ def ExportNow(root_directory,
     s.GoToFirst()
     et = s.EndTime
     tnow = s.AnimationTime
+    numTimesteps = len(paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues)
+        # this is the current timestep, and is a counter for the following loop
     tstep = 0
-
-    # a flag to exit early if there is just one timestep
-    noDataTime = len(paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues) == 0
-
-    # loop through available time
-    while tnow < et:
+    while (tstep < numTimesteps):
         padded_tstep = str(tstep).rjust(file_name_padding, '0')
 
         # loop through the configured writers and export at the requested times
@@ -261,7 +258,7 @@ def ExportNow(root_directory,
         s.GoToNext()
         tnow = s.AnimationTime
 
-        if noDataTime:
+        if numTimesteps == 0:
             # if data is not time varying, just do one export cycle
             break
 
