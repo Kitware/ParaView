@@ -13,6 +13,10 @@
 
 =========================================================================*/
 
+/**
+ * @class vtkMoleculeRepresentation
+ * @brief representation for showing vtkMolecules
+ */
 #ifndef vtkMoleculeRepresentation_h
 #define vtkMoleculeRepresentation_h
 
@@ -46,17 +50,26 @@ public:
 
   void SetLookupTable(vtkScalarsToColors* lut);
 
-  //***************************************************************************
-  // Forwarded to Actor->GetProperty()
+  /**
+   * Set the opacity on the corresponding actor property.
+   */
   virtual void SetOpacity(double val);
 
-  // Description:
-  // No-op. For compatibility with vtkPVCompositeRepresentation, which calls
-  // SetRepresentation on it's subproxies.
+  /**
+   * Set if scalars are mapped through a color-map or are used directly as colors.
+   * @see vtkScalarsToColors::MapScalars
+   */
+  void SetMapScalars(bool map);
+
+  /**
+   * No-op. For compatibility with vtkPVCompositeRepresentation, which calls
+   * SetRepresentation on it's subproxies.
+   */
   void SetRepresentation(const char*) {}
 
-  // Description:
-  // Returns the data object that is rendered from the given input port.
+  /**
+   * Return the data object that is rendered from the given input port.
+   */
   vtkDataObject* GetRenderedDataObject(int port) override;
 
   void MarkModified() override;

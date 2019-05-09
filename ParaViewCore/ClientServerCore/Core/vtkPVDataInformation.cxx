@@ -139,6 +139,7 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CompositeDataSetType: " << this->CompositeDataSetType << endl;
   os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
   os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
+  os << indent << "NumberOfEdges: " << this->NumberOfEdges << endl;
   os << indent << "NumberOfRows: " << this->NumberOfRows << endl;
   os << indent << "NumberOfTrees: " << this->NumberOfTrees << endl;
   os << indent << "NumberOfVertices: " << this->NumberOfVertices << endl;
@@ -228,9 +229,7 @@ vtkTypeInt64 vtkPVDataInformation::GetNumberOfElements(int type)
     case vtkDataObject::VERTEX:
       return this->GetNumberOfVertices();
     case vtkDataObject::EDGE:
-      // this is odd, but we're currently accumulating edge counts in
-      // NumberOfCells. That should be fixed.
-      return this->GetNumberOfCells();
+      return this->GetNumberOfEdges();
     case vtkDataObject::ROW:
       return this->GetNumberOfRows();
     default:
@@ -245,6 +244,7 @@ void vtkPVDataInformation::Initialize()
   this->CompositeDataSetType = -1;
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
+  this->NumberOfEdges = 0;
   this->NumberOfRows = 0;
   this->NumberOfTrees = 0;
   this->NumberOfVertices = 0;
@@ -293,6 +293,7 @@ void vtkPVDataInformation::DeepCopy(
 
   this->NumberOfPoints = dataInfo->GetNumberOfPoints();
   this->NumberOfCells = dataInfo->GetNumberOfCells();
+  this->NumberOfEdges = dataInfo->GetNumberOfEdges();
   this->NumberOfRows = dataInfo->GetNumberOfRows();
   this->NumberOfTrees = dataInfo->GetNumberOfTrees();
   this->NumberOfVertices = dataInfo->GetNumberOfVertices();
@@ -657,17 +658,15 @@ void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
     data->GetPoints()->GetBounds(this->Bounds);
 
   this->MemorySize = data->GetActualMemorySize();
-  this->NumberOfCells = data->GetNumberOfEdges();
-  this->NumberOfPoints = data->GetNumberOfVertices();
+  this->NumberOfEdges = data->GetNumberOfEdges();
+  this->NumberOfVertices = data->GetNumberOfVertices();
   this->NumberOfRows = 0;
 
-  // For whatever reason, the code above maps edges to cells and vertices to
-  // points. We should just add new ivars to track vertices and edges.
-  if (this->NumberOfPoints > 0)
+  if (this->NumberOfVertices > 0)
   {
     this->VertexDataInformation->CopyFromFieldData(data->GetVertexData());
   }
-  if (this->NumberOfCells > 0)
+  if (this->NumberOfEdges > 0)
   {
     this->EdgeDataInformation->CopyFromFieldData(data->GetEdgeData());
   }
@@ -886,7 +885,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
   }
 
   if (this->NumberOfPoints == 0 && this->NumberOfCells == 0 && this->NumberOfDataSets == 0 &&
-    this->NumberOfRows == 0 && this->NumberOfVertices == 0 &&
+    this->NumberOfRows == 0 && this->NumberOfVertices == 0 && this->NumberOfEdges == 0 &&
     this->FieldDataInformation->GetNumberOfArrays() == 0)
   {
     // Just copy the other array information.
@@ -930,7 +929,8 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
 
   // Empty data set? Ignore bounds, extent and array info.
   if (info->GetNumberOfCells() == 0 && info->GetNumberOfPoints() == 0 &&
-    info->GetNumberOfRows() == 0 && info->GetNumberOfVertices() == 0)
+    info->GetNumberOfRows() == 0 && info->GetNumberOfVertices() == 0 &&
+    info->GetNumberOfEdges() == 0)
   {
     return;
   }
@@ -1056,6 +1056,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi, int addingParts
 
   this->NumberOfPoints += info->GetNumberOfPoints();
   this->NumberOfCells += info->GetNumberOfCells();
+  this->NumberOfEdges += info->GetNumberOfEdges();
   this->MemorySize += info->GetMemorySize();
   this->NumberOfRows += info->GetNumberOfRows();
 
@@ -1354,7 +1355,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->DataClassName << this->DataSetType << this->NumberOfDataSets << this->NumberOfPoints
        << this->NumberOfCells << this->NumberOfRows << this->NumberOfTrees << this->NumberOfVertices
        << this->NumberOfLeaves << this->MemorySize << this->PolygonCount << this->Time
-       << this->HasTime << this->NumberOfTimeSteps << this->TimeLabel
+       << this->HasTime << this->NumberOfTimeSteps << this->TimeLabel << this->NumberOfEdges
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6);
 
@@ -1519,6 +1520,11 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
   }
   this->SetTimeLabel(timeLabel);
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfEdges))
+  {
+    vtkErrorMacro("Error parsing number of edges.");
+    return;
+  }
   if (!CSS_GET_NEXT_ARGUMENT2(css, 0, this->Bounds, 6))
   {
     vtkErrorMacro("Error parsing bounds.");

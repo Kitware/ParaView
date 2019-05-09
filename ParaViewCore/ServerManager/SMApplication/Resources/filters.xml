@@ -2570,9 +2570,10 @@ being of a vtkDoubleArray.</Documentation>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkGraph"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array" optional="1"/>
-        <Documentation>This property specifies the input dataset to the
+        <Documentation>This property specifies the input dataset (vtkDataSet or vtkGraph) to the
         Calculator filter. The scalar and vector variables may be chosen from
         this dataset's arrays.</Documentation>
       </InputProperty>
@@ -2580,12 +2581,14 @@ being of a vtkDoubleArray.</Documentation>
                          default_values="0"
                          name="AttributeType"
                          number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Point Data" value="0" />
-          <Entry text="Cell Data" value="1" />
-        </EnumerationDomain>
-        <Documentation>This property determines whether the computation is to
-        be performed on point-centered or cell-centered data.</Documentation>
+        <FieldDataDomain name="enum">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>This property determines on which types of field data the computation is to
+        be performed on.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetCoordinateResults"
                          default_values="0"

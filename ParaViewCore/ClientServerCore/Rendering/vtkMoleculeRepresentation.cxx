@@ -323,3 +323,8 @@ void vtkMoleculeRepresentation::UpdateColoringParameters()
   }
 
 vtkForwardPropertyCallMacro(SetOpacity, value, double);
+
+void vtkMoleculeRepresentation::SetMapScalars(bool map)
+{
+  this->Mapper->SetMapScalars(map);
+}
