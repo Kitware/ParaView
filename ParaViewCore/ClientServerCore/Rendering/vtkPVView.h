@@ -299,6 +299,12 @@ protected:
 
   vtkPVSession* GetSession();
 
+  /**
+   * Flag set to true between calls to `PrepareForScreenshot` and
+   * `CleanupAfterScreenshot`.
+   */
+  vtkGetMacro(InCaptureScreenshot, bool);
+
   double CacheKey;
   bool UseCache;
 
@@ -317,6 +323,8 @@ private:
   std::string LogName;
 
   static bool UseGenericOpenGLRenderWindow;
+
+  bool InCaptureScreenshot;
 };
 
 #endif

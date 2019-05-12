@@ -46,6 +46,7 @@ class vtkView;
 namespace vtkSMViewProxyNS
 {
 class WindowToImageFilter;
+class CaptureHelper;
 }
 
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewProxy : public vtkSMProxy
@@ -327,11 +328,9 @@ private:
 
   // Actual logic for taking a screenshot.
   vtkImageData* CaptureWindowSingle(int magnificationX, int magnificationY);
-  class vtkRendererSaveInfo;
-  vtkRendererSaveInfo* PrepareRendererBackground(vtkRenderer*, double, double, double, bool);
-  void RestoreRendererBackground(vtkRenderer*, vtkRendererSaveInfo*);
 
   friend class vtkSMViewProxyNS::WindowToImageFilter;
+  friend class vtkSMViewProxyNS::CaptureHelper;
 };
 
 #endif

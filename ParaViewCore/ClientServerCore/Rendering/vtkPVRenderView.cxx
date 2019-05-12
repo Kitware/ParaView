@@ -2535,7 +2535,7 @@ void vtkPVRenderView::UpdateStereoProperties()
     ? client_type
     : this->ServerStereoType;
 
-  if (this->InTileDisplayMode() || this->InCaveDisplayMode())
+  if ((this->InTileDisplayMode() || this->InCaveDisplayMode()) && !this->GetInCaptureScreenshot())
   {
     // in this mode, the render server processes are showing results to the user
     // and the stereo mode is more relevant on the server side than the client

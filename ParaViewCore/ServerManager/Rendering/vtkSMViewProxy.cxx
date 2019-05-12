@@ -26,6 +26,7 @@
 #include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -41,6 +42,8 @@
 #include "vtkSMUncheckedPropertyHelper.h"
 #include "vtkSMUtilities.h"
 #include "vtkSmartPointer.h"
+#include "vtkStereoCompositor.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkWindowToImageFilter.h"
 
 #include <assert.h>
@@ -122,7 +125,204 @@ private:
   void operator=(const WindowToImageFilter&) = delete;
 };
 vtkStandardNewMacro(WindowToImageFilter);
+
+/**
+ * Helper to help with image capture to handle all sorts of configurations
+ * including transparent background and stereo.
+ */
+
+class CaptureHelper
+{
+  vtkSMViewProxy* Self = nullptr;
+
+public:
+  CaptureHelper(vtkSMViewProxy* self)
+    : Self(self)
+  {
+  }
+  ~CaptureHelper() = default;
+
+  vtkSmartPointer<vtkImageData> StereoCapture(int magX, int magY)
+  {
+    auto self = this->Self;
+    vtkRenderWindow* window = self->GetRenderWindow();
+    if (!window)
+    {
+      return this->TranslucentCapture(magX, magY);
+    }
+
+    const bool stereo_render = vtkSMPropertyHelper(self, "StereoRender", true).GetAsInt() == 1;
+    const int stereo_type = vtkSMPropertyHelper(self, "StereoType", true).GetAsInt();
+
+    // determine if we're capture a stereo image that needs two passes.
+    const bool two_pass_stereo =
+      stereo_render &&
+      (stereo_type == VTK_STEREO_RED_BLUE || stereo_type == VTK_STEREO_ANAGLYPH ||
+        stereo_type == VTK_STEREO_INTERLACED || stereo_type == VTK_STEREO_DRESDEN ||
+        stereo_type == VTK_STEREO_CHECKERBOARD ||
+        stereo_type == VTK_STEREO_SPLITVIEWPORT_HORIZONTAL);
+
+    const bool one_pass_stereo =
+      stereo_render && (stereo_type == VTK_STEREO_LEFT || stereo_type == VTK_STEREO_RIGHT);
+
+    if (!one_pass_stereo && !two_pass_stereo && stereo_render)
+    {
+      // The render window is using crystal eyes, fake or emulate modes.
+      // All of these modes don't impact on how images are saved. So disable stereo.
+      vtkSMPropertyHelper(self, "StereoRender").Set(0);
+    }
+
+    vtkSmartPointer<vtkImageData> img;
+    if (two_pass_stereo)
+    {
+      // two_pass_stereo doesn't support transparent background since
+      // `vtkStereoCompositor` currently only works with RGB images.
+      vtkSmartPointer<vtkImageData> images[2];
+      vtkSMPropertyHelper(self, "StereoType").Set(VTK_STEREO_LEFT);
+      self->UpdateVTKObjects();
+      images[0] = this->Capture(magX, magY);
+
+      vtkSMPropertyHelper(self, "StereoType").Set(VTK_STEREO_RIGHT);
+      self->UpdateVTKObjects();
+      images[1] = this->Capture(magX, magY);
+
+      this->StereoCompose(stereo_type, images[0], images[1]);
+      img = images[0];
+    }
+    else
+    {
+      img = this->TranslucentCapture(magX, magY);
+    }
+
+    vtkSMPropertyHelper(self, "StereoRender", true).Set(stereo_render ? 1 : 0);
+    vtkSMPropertyHelper(self, "StereoType", true).Set(stereo_type);
+    self->UpdateVTKObjects();
+    return img;
+  }
+
+private:
+  vtkSmartPointer<vtkImageData> TranslucentCapture(int magX, int magY)
+  {
+    auto self = this->Self;
+    vtkRenderWindow* window = self->GetRenderWindow();
+    if (window && vtkSMViewProxy::GetTransparentBackground())
+    {
+      if (auto renderer = this->FindBackgroundRenderer(window))
+      {
+        std::unique_ptr<RendererSaverRAII> rsaver(new RendererSaverRAII(renderer));
+        renderer->SetGradientBackground(false);
+        renderer->SetTexturedBackground(false);
+        renderer->SetBackground(1.0, 1.0, 1.0);
+        auto whiteImage = this->Capture(magX, magY);
+        renderer->SetBackground(0, 0, 0);
+        auto blackImage = this->Capture(magX, magY);
+        rsaver.reset();
+
+        vtkNew<vtkImageTransparencyFilter> tfilter;
+        tfilter->AddInputData(whiteImage);
+        tfilter->AddInputData(blackImage);
+        tfilter->Update();
+
+        vtkSmartPointer<vtkImageData> result;
+        result = tfilter->GetOutput();
+        return result;
+      }
+    }
+
+    return this->Capture(magX, magY);
+  }
+
+  vtkSmartPointer<vtkImageData> Capture(int magX, int magY)
+  {
+    return vtkSmartPointer<vtkImageData>::Take(this->Self->CaptureWindowSingle(magX, magY));
+  }
+
+  vtkRenderer* FindBackgroundRenderer(vtkRenderWindow* window) const
+  {
+    vtkCollectionSimpleIterator cookie;
+    auto renderers = window->GetRenderers();
+    renderers->InitTraversal(cookie);
+    while (auto renderer = renderers->GetNextRenderer(cookie))
+    {
+      if (renderer->GetErase())
+      {
+        // Found a background-writing renderer.
+        return renderer;
+      }
+    }
+
+    return nullptr;
+  }
+
+  class RendererSaverRAII
+  {
+    vtkRenderer* Renderer;
+    const bool Gradient;
+    const bool Textured;
+    const double Background[3];
+
+  public:
+    RendererSaverRAII(vtkRenderer* ren)
+      : Renderer(ren)
+      , Gradient(ren->GetGradientBackground())
+      , Textured(ren->GetTexturedBackground())
+      , Background{ ren->GetBackground()[0], ren->GetBackground()[1], ren->GetBackground()[2] }
+    {
+    }
+
+    ~RendererSaverRAII()
+    {
+      this->Renderer->SetGradientBackground(this->Gradient);
+      this->Renderer->SetTexturedBackground(this->Textured);
+      this->Renderer->SetBackground(const_cast<double*>(this->Background));
+    }
+  };
+
+  bool StereoCompose(int type, vtkImageData* leftNResult, vtkImageData* right)
+  {
+    vtkRenderWindow* renWin = this->Self->GetRenderWindow();
+    assert(renWin);
+
+    auto lbuffer = vtkUnsignedCharArray::SafeDownCast(leftNResult->GetPointData()->GetScalars());
+    auto rbuffer = vtkUnsignedCharArray::SafeDownCast(right->GetPointData()->GetScalars());
+    if (lbuffer == nullptr || rbuffer == nullptr)
+    {
+      return false;
+    }
+
+    const int size[2] = { leftNResult->GetDimensions()[0], leftNResult->GetDimensions()[1] };
+    vtkNew<vtkStereoCompositor> compositor;
+    switch (type)
+    {
+      case VTK_STEREO_RED_BLUE:
+        return compositor->RedBlue(lbuffer, rbuffer);
+
+      case VTK_STEREO_ANAGLYPH:
+        return compositor->Anaglyph(
+          lbuffer, rbuffer, renWin->GetAnaglyphColorSaturation(), renWin->GetAnaglyphColorMask());
+
+      case VTK_STEREO_INTERLACED:
+        return compositor->Interlaced(lbuffer, rbuffer, size);
+
+      case VTK_STEREO_DRESDEN:
+        return compositor->Dresden(lbuffer, rbuffer, size);
+
+      case VTK_STEREO_CHECKERBOARD:
+        return compositor->Checkerboard(lbuffer, rbuffer, size);
+
+      case VTK_STEREO_SPLITVIEWPORT_HORIZONTAL:
+        return compositor->SplitViewportHorizontal(lbuffer, rbuffer, size);
+    }
+
+    return false;
+  }
+
+private:
+  CaptureHelper(const CaptureHelper&) = delete;
+  void operator=(const CaptureHelper&) = delete;
 };
+
+} // end of vtkSMViewProxyNS
 
 bool vtkSMViewProxy::TransparentBackground = false;
 
@@ -451,107 +651,16 @@ int vtkSMViewProxy::ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElem
   return 1;
 }
 
-class vtkSMViewProxy::vtkRendererSaveInfo
-{
-public:
-  vtkRendererSaveInfo(vtkRenderer* renderer)
-    : Gradient(renderer->GetGradientBackground())
-    , Textured(renderer->GetTexturedBackground())
-    , Red(renderer->GetBackground()[0])
-    , Green(renderer->GetBackground()[1])
-    , Blue(renderer->GetBackground()[2])
-  {
-  }
-
-  const bool Gradient;
-  const bool Textured;
-  const double Red;
-  const double Green;
-  const double Blue;
-
-private:
-  vtkRendererSaveInfo(const vtkRendererSaveInfo&) = delete;
-  void operator=(const vtkRendererSaveInfo&) = delete;
-};
-
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMViewProxy::CaptureWindow(int magX, int magY)
 {
-  vtkRenderWindow* window = this->GetRenderWindow();
-
-  if (window && this->TransparentBackground)
+  vtkSMViewProxyNS::CaptureHelper helper(this);
+  if (auto img = helper.StereoCapture(magX, magY))
   {
-    vtkRendererCollection* renderers = window->GetRenderers();
-    vtkRenderer* renderer = renderers->GetFirstRenderer();
-    while (renderer)
-    {
-      if (renderer->GetErase())
-      {
-        // Found a background-writing renderer.
-        break;
-      }
-
-      renderer = renderers->GetNextItem();
-    }
-
-    if (!renderer)
-    {
-      // No renderer?
-      return NULL;
-    }
-
-    vtkRendererSaveInfo* info = this->PrepareRendererBackground(renderer, 255, 255, 255, true);
-    vtkImageData* captureWhite = this->CaptureWindowSingle(magX, magY);
-
-    this->PrepareRendererBackground(renderer, 0, 0, 0, false);
-    vtkImageData* captureBlack = this->CaptureWindowSingle(magX, magY);
-
-    vtkNew<vtkImageTransparencyFilter> transparencyFilter;
-    transparencyFilter->SetInputData(captureWhite);
-    transparencyFilter->AddInputData(captureBlack);
-    transparencyFilter->Update();
-
-    vtkImageData* capture = vtkImageData::New();
-    capture->ShallowCopy(transparencyFilter->GetOutput());
-
-    this->RestoreRendererBackground(renderer, info);
-
-    captureWhite->Delete();
-    captureBlack->Delete();
-
-    return capture;
+    img->Register(this);
+    return img.GetPointer();
   }
-
-  // Fall back to using no transparency.
-  return this->CaptureWindowSingle(magX, magY);
-}
-
-//----------------------------------------------------------------------------
-vtkSMViewProxy::vtkRendererSaveInfo* vtkSMViewProxy::PrepareRendererBackground(
-  vtkRenderer* renderer, double r, double g, double b, bool save)
-{
-  vtkRendererSaveInfo* info = NULL;
-
-  if (save)
-  {
-    info = new vtkRendererSaveInfo(renderer);
-  }
-
-  renderer->SetGradientBackground(false);
-  renderer->SetTexturedBackground(false);
-  renderer->SetBackground(r, g, b);
-
-  return info;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMViewProxy::RestoreRendererBackground(vtkRenderer* renderer, vtkRendererSaveInfo* info)
-{
-  renderer->SetGradientBackground(info->Gradient);
-  renderer->SetTexturedBackground(info->Textured);
-  renderer->SetBackground(info->Red, info->Green, info->Blue);
-
-  delete info;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
