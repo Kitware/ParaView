@@ -94,6 +94,11 @@ if (TARGET VTK::IOSegY)
     Resources/proxies_segy.xml)
 endif ()
 
+if (TARGET VTK::IOADIOS2)
+  list(APPEND xml_files
+    Resources/proxies_adios2.xml)
+endif()
+
 if (TARGET VTK::IOMotionFX)
   list(APPEND xml_files
     Resources/proxies_motionfx.xml)
