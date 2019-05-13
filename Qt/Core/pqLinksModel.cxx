@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSelectionLink.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMTrace.h"
 
 // pqCore includes
 #include "pqApplicationCore.h"
@@ -611,6 +612,13 @@ void pqLinksModel::addCameraLink(
   link->Delete();
   emit this->linkAdded(pqLinksModel::Camera);
   CLEAR_UNDO_STACK();
+
+  SM_SCOPED_TRACE(CallFunction)
+    .arg("AddCameraLink")
+    .arg(inputProxy)
+    .arg(outputProxy)
+    .arg(name.toLocal8Bit().data())
+    .arg("comment", "link cameras in two views");
 
   if (interactiveViewLink)
   {
