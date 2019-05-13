@@ -81,8 +81,7 @@ pqTransferFunctionWidgetPropertyWidget::pqTransferFunctionWidgetPropertyWidget(
   this->TFProxy = vtkSMTransferFunctionProxy::SafeDownCast(pxy);
 
   this->Connection = vtkEventQtSlotConnect::New();
-  this->Domain =
-    vtkSMRangedTransferFunctionDomain::SafeDownCast(proxyProperty->GetDomain("proxy_list"));
+  this->Domain = proxyProperty->FindDomain<vtkSMRangedTransferFunctionDomain>();
   if (this->Domain)
   {
     this->Connection->Connect(

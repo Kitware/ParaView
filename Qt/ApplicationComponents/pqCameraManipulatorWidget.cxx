@@ -133,8 +133,7 @@ pqCameraManipulatorWidget::pqCameraManipulatorWidget(
   boxes[7] = ui.comboBox_8;
   boxes[8] = ui.comboBox_9;
 
-  vtkSMEnumerationDomain* domain =
-    vtkSMEnumerationDomain::SafeDownCast(smproperty->FindDomain("vtkSMEnumerationDomain"));
+  auto domain = smproperty->FindDomain<vtkSMEnumerationDomain>();
   if (!domain)
   {
     qCritical("Developer error: pqCameraManipulatorWidget needs vtkSMEnumerationDomain.");

@@ -70,7 +70,7 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(
     // don't show label for the proxy selection widget
     this->setShowLabel(false);
   }
-  else if (vtkSMProxyListDomain::SafeDownCast(smProperty->FindDomain("vtkSMProxyListDomain")))
+  else if (smProperty->FindDomain<vtkSMProxyListDomain>())
   {
     vtkVLogF(
       PARAVIEW_LOG_APPLICATION_VERBOSITY(), "use `pqProxySelectionWidget` for proxy-list domain.");

@@ -151,7 +151,7 @@ void vtkSMSILModel::Initialize(vtkSMProxy* proxy, vtkSMStringVectorProperty* svp
   if (this->Property)
   {
     this->Property->RemoveObserver(this->PropertyObserver);
-    vtkSMDomain* domain = this->Property->FindDomain("vtkSMSILDomain");
+    auto domain = this->Property->FindDomain<vtkSMSILDomain>();
     if (domain)
     {
       domain->RemoveObserver(this->DomainObserver);
@@ -164,7 +164,7 @@ void vtkSMSILModel::Initialize(vtkSMProxy* proxy, vtkSMStringVectorProperty* svp
     // unset the SIL if any.
     this->Property->AddObserver(vtkCommand::ModifiedEvent, this->PropertyObserver);
 
-    vtkSMDomain* domain = this->Property->FindDomain("vtkSMSILDomain");
+    auto domain = this->Property->FindDomain<vtkSMSILDomain>();
     if (domain)
     {
       domain->AddObserver(vtkCommand::DomainModifiedEvent, this->DomainObserver);
@@ -397,8 +397,7 @@ void vtkSMSILModel::OnPropertyModified()
 //-----------------------------------------------------------------------------
 void vtkSMSILModel::OnDomainModified()
 {
-  vtkSMSILDomain* domain =
-    vtkSMSILDomain::SafeDownCast(this->Property->FindDomain("vtkSMSILDomain"));
+  auto domain = this->Property->FindDomain<vtkSMSILDomain>();
   this->SetSIL(domain->GetSIL());
 }
 

@@ -154,8 +154,7 @@ inline const char* vtkSMPropertyHelper::GetProperty(unsigned int index) const
   else if (this->Type == INT)
   {
     // enumeration domain
-    vtkSMEnumerationDomain* domain =
-      vtkSMEnumerationDomain::SafeDownCast(this->Property->FindDomain("vtkSMEnumerationDomain"));
+    auto domain = this->Property->FindDomain<vtkSMEnumerationDomain>();
     if (domain != NULL)
     {
       const char* entry = domain->GetEntryTextForValue(
@@ -385,8 +384,7 @@ inline void vtkSMPropertyHelper::SetProperty(unsigned int index, const char* val
   else if (this->Type == INT)
   {
     // enumeration domain
-    vtkSMEnumerationDomain* domain =
-      vtkSMEnumerationDomain::SafeDownCast(this->Property->FindDomain("vtkSMEnumerationDomain"));
+    auto domain = this->Property->FindDomain<vtkSMEnumerationDomain>();
     if (domain != NULL && domain->HasEntryText(value))
     {
       int valid; // We already know that the entry exist...

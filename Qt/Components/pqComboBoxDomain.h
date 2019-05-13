@@ -52,10 +52,10 @@ public:
   /**
   * constructor requires a QComboBox,
   * and the property with the domain to observe
-  * optionally pass in a domainName if a specific one
+  * optionally pass in a domain if a specific one
   * needs to be watched
   */
-  pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, const QString& domainName = QString());
+  pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, vtkSMDomain* domain = nullptr);
   ~pqComboBoxDomain() override;
 
   // explicitly trigger a domain change.
@@ -73,7 +73,6 @@ public:
 
   vtkSMProperty* getProperty() const;
   vtkSMDomain* getDomain() const;
-  const QString& getDomainName() const;
   const QStringList& getUserStrings() const;
 
 public slots:

@@ -225,8 +225,7 @@ pqIndexSelectionWidget::pqIndexSelectionWidget(
   , Form(new QFormLayout(this->GroupBox))
   , Internals(new pqInternals())
 {
-  vtkSMIndexSelectionDomain* domain =
-    vtkSMIndexSelectionDomain::SafeDownCast(pushProp->GetDomain("index_selection"));
+  auto domain = pushProp->FindDomain<vtkSMIndexSelectionDomain>();
   if (!domain)
   {
     qWarning() << "Missing domain for index_selection widget.";

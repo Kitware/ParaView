@@ -222,9 +222,7 @@ public:
       for (auto iter = this->PLDLinks.begin(); iter != this->PLDLinks.end(); ++iter)
       {
         vtkSMProperty* prop = clone->GetProperty(iter->first.c_str());
-        vtkSMProxyListDomain* pld = prop
-          ? vtkSMProxyListDomain::SafeDownCast(prop->FindDomain("vtkSMProxyListDomain"))
-          : nullptr;
+        auto pld = prop ? prop->FindDomain<vtkSMProxyListDomain>() : nullptr;
         if (pld)
         {
           for (int cc = 0, max = pld->GetNumberOfProxies(); cc < max; ++cc)
@@ -262,9 +260,7 @@ public:
     for (auto iter = this->PLDLinks.begin(); iter != this->PLDLinks.end(); ++iter)
     {
       vtkSMProperty* prop = back->GetProperty(iter->first.c_str());
-      vtkSMProxyListDomain* pld = prop
-        ? vtkSMProxyListDomain::SafeDownCast(prop->FindDomain("vtkSMProxyListDomain"))
-        : nullptr;
+      auto pld = prop ? prop->FindDomain<vtkSMProxyListDomain>() : nullptr;
       if (pld)
       {
         for (int cc = 0, max = pld->GetNumberOfProxies(); cc < max; ++cc)
@@ -311,9 +307,7 @@ protected:
     for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
       vtkSMProperty* prop = iter->GetProperty();
-      vtkSMProxyListDomain* pld = prop
-        ? vtkSMProxyListDomain::SafeDownCast(prop->FindDomain("vtkSMProxyListDomain"))
-        : nullptr;
+      auto pld = prop ? prop->FindDomain<vtkSMProxyListDomain>() : nullptr;
       if (!pld)
       {
         continue;

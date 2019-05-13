@@ -65,7 +65,7 @@ protected:
       return true;
     }
     else if (vtkSMProxyProperty::SafeDownCast(prop) &&
-      (prop->GetRepeatable() || prop->FindDomain("vtkSMProxyListDomain")))
+      (prop->GetRepeatable() || prop->FindDomain<vtkSMProxyListDomain>()))
     {
       // we skip repeatable properties to skip properties like Representations,
       // Props etc.
@@ -101,8 +101,7 @@ class vtkSMProxyClipboardInternals
     for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
     {
       vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(piter->GetProperty());
-      vtkSMProxyListDomain* pld =
-        pp ? vtkSMProxyListDomain::SafeDownCast(pp->FindDomain("vtkSMProxyListDomain")) : NULL;
+      auto pld = pp ? pp->FindDomain<vtkSMProxyListDomain>() : nullptr;
       if (!pld)
       {
         continue;
@@ -151,8 +150,7 @@ class vtkSMProxyClipboardInternals
       }
       vtkSMProxyProperty* pp =
         vtkSMProxyProperty::SafeDownCast(target->GetProperty(elem->GetAttribute("property_name")));
-      vtkSMProxyListDomain* pld =
-        pp ? vtkSMProxyListDomain::SafeDownCast(pp->FindDomain("vtkSMProxyListDomain")) : NULL;
+      auto pld = pp ? pp->FindDomain<vtkSMProxyListDomain>() : nullptr;
       if (!pld)
       {
         continue;

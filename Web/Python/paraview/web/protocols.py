@@ -1786,10 +1786,9 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
         foundPLDChild = False
         subProxiesToProcess = []
 
-        pldChild = proxyPropElement.FindNestedElementByName('ProxyListDomain')
+        domain = propInstance.FindDomain("vtkSMProxyListDomain")
 
-        if pldChild:
-            domain = propInstance.GetDomain(pldChild.GetAttribute('name'))
+        if domain:
             foundPLDChild = True
             for j in range(domain.GetNumberOfProxies()):
                 subProxy = domain.GetProxy(j)
@@ -2139,7 +2138,7 @@ class ParaViewWebProxyManager(ParaViewWebProtocol):
             if prop.IsA('vtkSMProxyProperty'):
                 try:
                     if len(prop.Available) and prop.GetNumberOfProxies() == 1:
-                        listdomain = prop.GetDomain('proxy_list')
+                        listdomain = prop.FindDomain("vtkSMProxyListDomain")
                         if listdomain:
                             for i in xrange(listdomain.GetNumberOfProxies()):
                                 internal_proxy = listdomain.GetProxy(i)

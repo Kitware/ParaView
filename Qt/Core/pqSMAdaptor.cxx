@@ -134,7 +134,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       type = pqSMAdaptor::PROXYLIST;
     }
     type = pqSMAdaptor::PROXY;
-    if (vtkSMProxyListDomain::SafeDownCast(Property->GetDomain("proxy_list")))
+    if (Property->FindDomain<vtkSMProxyListDomain>())
     {
       type = pqSMAdaptor::PROXYSELECTION;
     }
@@ -363,10 +363,8 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
 
     // get group domain of this property
     // and add all proxies in those groups to our list
-    vtkSMProxyGroupDomain* gd;
-    vtkSMProxyListDomain* ld;
-    ld = vtkSMProxyListDomain::SafeDownCast(Property->GetDomain("proxy_list"));
-    gd = vtkSMProxyGroupDomain::SafeDownCast(Property->GetDomain("groups"));
+    auto ld = Property->FindDomain<vtkSMProxyListDomain>();
+    auto gd = Property->FindDomain<vtkSMProxyGroupDomain>();
     if (ld)
     {
       unsigned int numProxies = ld->GetNumberOfProxies();

@@ -262,7 +262,7 @@ def getProxyAsState(id):
             except:
                 pass
             if len(proxyList) and prop.GetNumberOfProxies() == 1:
-                listdomain = prop.GetDomain('proxy_list')
+                listdomain = prop.FindDomain("vtkSMProxyListDomain")
                 if listdomain:
                     proxyPropertyValue = prop.GetProxy(0)
                     for i in xrange(listdomain.GetNumberOfProxies()):
@@ -296,10 +296,10 @@ def updateProxyProperties(proxy, properties):
           if validKey in allowedProperties:
              value = removeUnicode(properties[key])
              property = servermanager._wrap_property(proxy, proxy.GetProperty(validKey))
-             if property.GetDomain('proxy_list') and len(value) == 1 and type(value[0]) == str:
+             if property.FindDomain("vtkSMProxyListDomain") and len(value) == 1 and type(value[0]) == str:
                  try:
                     idx = property.GetAvailable().index(value[0])
-                    proxyToSet = servermanager._getPyProxy(property.GetDomain('proxy_list').GetProxy(idx))
+                    proxyToSet = servermanager._getPyProxy(property.FindDomain("vtkSMProxyListDomain").GetProxy(idx))
                     property.SetData(proxyToSet)
                  except:
                     traceback.print_stack()
@@ -483,7 +483,7 @@ def apply_domains(parentProxy, proxy_id):
         if prop.IsA('vtkSMProxyProperty'):
             try:
                 if len(prop.Available) and prop.GetNumberOfProxies() == 1:
-                    listdomain = prop.GetDomain('proxy_list')
+                    listdomain = prop.FindDomain("vtkSMProxyListDomain")
                     if listdomain:
                         for i in xrange(listdomain.GetNumberOfProxies()):
                             internal_proxy = listdomain.GetProxy(i)

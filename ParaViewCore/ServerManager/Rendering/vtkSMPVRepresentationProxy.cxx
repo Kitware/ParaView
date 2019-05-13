@@ -831,9 +831,7 @@ bool vtkSMPVRepresentationProxy::SetRepresentationType(const char* type)
     vtkSMProperty* colorArrayName = this->GetProperty("ColorArrayName");
     if (colorArrayName)
     {
-      vtkSMArrayListDomain* ald =
-        vtkSMArrayListDomain::SafeDownCast(colorArrayName->FindDomain("vtkSMArrayListDomain"));
-
+      auto ald = colorArrayName->FindDomain<vtkSMArrayListDomain>();
       if (ald && ald->GetNumberOfStrings() > 0)
       {
         unsigned int index = 0;

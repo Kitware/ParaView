@@ -261,8 +261,7 @@ public:
       return false;
     }
 
-    vtkSMDomain* domain = property->FindDomain("vtkSMEnumerationDomain");
-    vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(domain);
+    auto enumDomain = property->FindDomain<vtkSMEnumerationDomain>();
     if (enumDomain)
     {
       // The enumeration property could be either text or value
@@ -359,9 +358,8 @@ public:
   //----------------------------------------------------------------------------
   bool GetPropertySetting(const char* settingName, vtkSMInputProperty* property, double maxPriority)
   {
-    vtkSMDomain* domain = property->GetDomain("proxy_list");
-    vtkSMProxyListDomain* proxyListDomain = NULL;
-    if ((proxyListDomain = vtkSMProxyListDomain::SafeDownCast(domain)))
+    auto proxyListDomain = property->FindDomain<vtkSMProxyListDomain>();
+    if (proxyListDomain)
     {
       // Now check whether this proxy is the one we want
       std::string sourceSettingString(settingName);
@@ -1410,8 +1408,7 @@ Json::Value vtkConvertXMLElementToJSON(
   vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
 {
   // Since we need to handle enumeration domain :/.
-  vtkSMEnumerationDomain* enumDomain =
-    vtkSMEnumerationDomain::SafeDownCast(vp->FindDomain("vtkSMEnumerationDomain"));
+  auto enumDomain = vp->FindDomain<vtkSMEnumerationDomain>();
   Json::Value value(Json::arrayValue);
   for (size_t cc = 0; cc < elements.size(); ++cc)
   {
@@ -1448,8 +1445,7 @@ Json::Value vtkConvertXMLElementToJSON<vtkIdType>(
   vtkSMVectorProperty* vp, const std::vector<vtkSmartPointer<vtkPVXMLElement> >& elements)
 {
   // Since we need to handle enumeration domain :/.
-  vtkSMEnumerationDomain* enumDomain =
-    vtkSMEnumerationDomain::SafeDownCast(vp->FindDomain("vtkSMEnumerationDomain"));
+  auto enumDomain = vp->FindDomain<vtkSMEnumerationDomain>();
   Json::Value value(Json::arrayValue);
   for (size_t cc = 0; cc < elements.size(); ++cc)
   {
@@ -1565,8 +1561,7 @@ bool vtkSMSettings::DeserializeFromJSON(vtkSMProxy* proxy, const Json::Value& va
       continue;
     }
     // Since we need to handle enumeration domain :/.
-    vtkSMEnumerationDomain* enumDomain =
-      vtkSMEnumerationDomain::SafeDownCast(prop->FindDomain("vtkSMEnumerationDomain"));
+    auto enumDomain = prop->FindDomain<vtkSMEnumerationDomain>();
 
     vtkNew<vtkPVXMLElement> propXML;
     propXML->SetName("Property");

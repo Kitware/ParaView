@@ -61,29 +61,20 @@ pqCinemaTrack::pqCinemaTrack(
   std::string vtkClassName = prox->GetVTKClassName();
 
   // only the following are currently supported by cinema
-  std::pair<std::string, std::string> tags;
-  if (vtkClassName == "vtkPVMetaSliceDataSet")
+  std::string propName;
+  if (vtkClassName == "vtkPVMetaSliceDataSet" || vtkClassName == "vtkPVContourFilter")
   {
-    tags.first = "ContourValues";
-    tags.second = "bounds";
-  }
-  else if (vtkClassName == "vtkPVContourFilter")
-  {
-    tags.first = "ContourValues";
-    tags.second = "scalar_range";
+    propName = "ContourValues";
   }
   else if (vtkClassName == "vtkPVMetaClipDataSet")
   {
-    tags.first = "Value";
-    tags.second = "range";
+    propName = "Value";
   }
 
-  vtkSMProperty* prop = prox->GetProperty(tags.first.c_str());
+  vtkSMProperty* prop = prox->GetProperty(propName.c_str());
   if (prop)
   {
-    vtkSMDoubleRangeDomain* dom =
-      vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain(tags.second.c_str()));
-
+    auto dom = prop->FindDomain<vtkSMDoubleRangeDomain>();
     if (dom)
     {
       this->Track->label->setText(filter->getSMName());

@@ -536,8 +536,8 @@ void pqSLACManager::updatePlotField()
 
   // Iterate over all the series.  Turn them all off except the one associated
   // with the viewed mesh.
-  vtkSMChartSeriesSelectionDomain* domain = vtkSMChartSeriesSelectionDomain::SafeDownCast(
-    reprProxy->GetProperty("SeriesVisibility")->FindDomain("vtkSMChartSeriesSelectionDomain"));
+  auto domain =
+    reprProxy->GetProperty("SeriesVisibility")->FindDomain<vtkSMChartSeriesSelectionDomain>();
   if (domain == NULL)
   {
     return;

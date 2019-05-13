@@ -206,6 +206,7 @@ public:
 
   /**
    * Returns a domain give a name.
+   * Avoids using this method and use FindDomain instead.
    */
   vtkSMDomain* GetDomain(const char* name);
 
@@ -233,8 +234,8 @@ public:
   inline DomainType* FindDomain();
 
   /**
-   * Returns the number of domains this property has. This can be
-   * used to specify a valid index for GetDomain(index).
+   * Returns the number of domains this property has.
+   * One can use a domain iterator to access domains then.
    */
   unsigned int GetNumberOfDomains();
 

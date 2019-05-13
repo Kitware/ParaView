@@ -317,10 +317,8 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
     return;
   }
 
-  vtkSMProxyListDomain* spld =
-    vtkSMProxyListDomain::SafeDownCast(src->FindDomain("vtkSMProxyListDomain"));
-  vtkSMProxyListDomain* tpld =
-    vtkSMProxyListDomain::SafeDownCast(this->FindDomain("vtkSMProxyListDomain"));
+  auto spld = src->FindDomain<vtkSMProxyListDomain>();
+  auto tpld = this->FindDomain<vtkSMProxyListDomain>();
 
   bool modified = false;
   bool unchecked_modified = false;

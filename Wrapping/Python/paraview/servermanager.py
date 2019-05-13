@@ -83,43 +83,36 @@ def _wrap_property(proxy, smproperty):
     property = None
     if paraview.compatibility.GetVersion() >= 3.5 and \
       smproperty.IsA("vtkSMStringVectorProperty"):
-        al = smproperty.GetDomain("array_list")
-        if al and al.IsA("vtkSMArraySelectionDomain") and \
-            smproperty.GetRepeatable():
+        arraySelectionDomain = smproperty.FindDomain("vtkSMArraySelectionDomain")
+        chartSeriesSelectionDomain = smproperty.FindDomain("vtkSMChartSeriesSelectionDomain")
+        subsetInclusionLatticeDomain = smproperty.FindDomain("vtkSMSubsetInclusionLatticeDomain")
+        arrayListDomain = smproperty.FindDomain("vtkSMArrayListDomain")
+        fileListDomain = smproperty.FindDomain("vtkSMFileListDomain")
+        stringListDomain = smproperty.FindDomain("vtkSMStringListDomain")
+        if arraySelectionDomain and smproperty.GetRepeatable():
             property = ArrayListProperty(proxy, smproperty)
-        elif al and al.IsA("vtkSMChartSeriesSelectionDomain") and \
-            smproperty.GetRepeatable() and al.GetDefaultMode() == 1:
+        elif chartSeriesSelectionDomain and smproperty.GetRepeatable() and \
+          chartSeriesSelectionDomain.GetDefaultMode() == 1:
             property = ArrayListProperty(proxy, smproperty)
-        elif al and al.IsA("vtkSMSubsetInclusionLatticeDomain") and \
-            smproperty.GetRepeatable():
+        elif subsetInclusionLatticeDomain and smproperty.GetRepeatable():
             property = SubsetInclusionLatticeProperty(proxy, smproperty)
-        elif al and al.IsA("vtkSMArrayListDomain") and \
-            smproperty.GetRepeatable():
+        elif arrayListDomain and smproperty.GetRepeatable():
             # if it is repeatable, then it is not a single array selection... and if it happens
             # to have 5 elements in the repeatable proxy, avoid an exception by testing this case
             # first.
             property = VectorProperty(proxy, smproperty)
-        elif al and al.IsA("vtkSMArrayListDomain") and smproperty.GetNumberOfElements() == 5:
+        elif arrayListDomain and smproperty.GetNumberOfElements() == 5:
             property = ArraySelectionProperty(proxy, smproperty)
+        elif fileListDomain and fileListDomain.GetIsOptional() == 0:
+            # Refer to BUG #9710 to see why optional domains need to be ignored.
+            property = FileNameProperty(proxy, smproperty)
+        elif stringListDomain:
+            property = StringListProperty(proxy, smproperty)
         else:
-            iter = smproperty.NewDomainIterator()
-            isFileName = False
-            while not iter.IsAtEnd():
-                # Refer to BUG #9710 to see why optional domains need to be
-                # ignored.
-                if iter.GetDomain().IsA("vtkSMFileListDomain") and \
-                  iter.GetDomain().GetIsOptional() == 0 :
-                    isFileName = True
-                    break
-                iter.Next()
-            iter.UnRegister(None)
-            if isFileName:
-                property = FileNameProperty(proxy, smproperty)
-            else:
-                property = VectorProperty(proxy, smproperty)
+            property = VectorProperty(proxy, smproperty)
     elif smproperty.IsA("vtkSMVectorProperty"):
         if smproperty.IsA("vtkSMIntVectorProperty") and \
-          (smproperty.GetDomain("enum") or smproperty.GetDomain("comps")):
+          smproperty.FindDomain("vtkSMEnumerationDomain"):
             property = EnumerationProperty(proxy, smproperty)
         else:
             property = VectorProperty(proxy, smproperty)
@@ -898,34 +891,31 @@ class EnumerationProperty(VectorProperty):
         """Returns the text for the given element if available. Returns
         the numerical values otherwise."""
         val = self.SMProperty.GetElement(index)
-        domain = self.SMProperty.GetDomain("enum")
-        if not domain:
-          domain = self.SMProperty.GetDomain("comps")
-        for i in range(domain.GetNumberOfEntries()):
-            if domain.GetEntryValue(i) == val:
-                return domain.GetEntryText(i)
+        domain = self.SMProperty.FindDomain("vtkSMEnumerationDomain")
+        if domain:
+            for i in range(domain.GetNumberOfEntries()):
+                if domain.GetEntryValue(i) == val:
+                    return domain.GetEntryText(i)
         return val
 
     def ConvertValue(self, value):
         """Converts value to type suitable for vtSMProperty::SetElement()"""
         if type(value) == str:
-            domain = self.SMProperty.GetDomain("enum")
-            if not domain:
-              domain = self.SMProperty.GetDomain("comps")
-            if domain.HasEntryText(value):
-                return domain.GetEntryValueForText(value)
-            else:
-                raise ValueError("%s is not a valid value." % value)
+            domain = self.SMProperty.FindDomain("vtkSMEnumerationDomain")
+            if domain:
+                if domain.HasEntryText(value):
+                    return domain.GetEntryValueForText(value)
+                else:
+                    raise ValueError("%s is not a valid value." % value)
         return VectorProperty.ConvertValue(self, value)
 
     def GetAvailable(self):
-        "Returns the list of available values for the property."
+        "Returns the list of available values for the property, if an enumeration domain is available."
         retVal = []
-        domain = self.SMProperty.GetDomain("enum")
-        if not domain:
-          domain = self.SMProperty.GetDomain("comps")
-        for i in range(domain.GetNumberOfEntries()):
-            retVal.append(domain.GetEntryText(i))
+        domain = self.SMProperty.FindDomain("vtkSMEnumerationDomain")
+        if domain:
+            for i in range(domain.GetNumberOfEntries()):
+                retVal.append(domain.GetEntryText(i))
         return retVal
 
     Available = property(GetAvailable, None, None, \
@@ -1024,6 +1014,22 @@ class ArraySelectionProperty(VectorProperty):
                 self.SMProperty.SetElement(i, '0')
         self.SMProperty.ResetToDomainDefaults(False)
 
+class StringListProperty(VectorProperty):
+    """Property to set/get the a string with a string list domain.
+    This property provides an interface to get available strings."""
+
+    def GetAvailable(self):
+        "Returns the list of string values available for the property."
+        retVal = []
+        domain = self.SMProperty.FindDomain("vtkSMStringListDomain")
+        if domain:
+            for i in range(domain.GetNumberOfStrings()):
+                retVal.append(domain.GetString(i))
+        return retVal
+
+    Available = property(GetAvailable, None, None, \
+        "This read-only property contains the list of values that can be applied to this property.")
+
 class ArrayListProperty(VectorProperty):
     """This property provides a simpler interface for selecting arrays.
     Simply assign a list of arrays that should be loaded by the reader.
@@ -1035,10 +1041,13 @@ class ArrayListProperty(VectorProperty):
 
     def GetAvailable(self):
         "Returns the list of available arrays"
-        dm = self.GetDomain("array_list")
+        dm = self.SMProperty.FindDomain("vtkSMArraySelectionDomain")
+        if not dm:
+            dm = self.SMProperty.FindDomain("vtkSMChartSeriesSelectionDomain")
         retVal = []
-        for i in range(dm.GetNumberOfStrings()):
-            retVal.append(dm.GetString(i))
+        if dm:
+            for i in range(dm.GetNumberOfStrings()):
+                retVal.append(dm.GetString(i))
         return retVal
 
     Available = property(GetAvailable, None, None, \
@@ -1171,10 +1180,8 @@ class ProxyProperty(Property):
         Property.__init__(self, proxy, smproperty)
         # Check to see if there is a proxy list domain and, if so,
         # initialize ourself. (Should this go in ProxyProperty?)
-        listdomain = self.GetDomain('proxy_list')
+        listdomain = self.FindDomain("vtkSMProxyListDomain")
         if listdomain:
-            if not listdomain.IsA('vtkSMProxyListDomain'):
-                raise ValueError ("Found a 'proxy_list' domain on an InputProperty that is not a ProxyListDomain.")
             pm = ProxyManager()
             group = "pq_helper_proxies." + proxy.GetGlobalIDAsString()
             if listdomain.GetNumberOfProxies() == 0:
@@ -1189,7 +1196,7 @@ class ProxyProperty(Property):
         """If this proxy has a list domain, then this function returns the
         strings you can use to select from the domain.  If there is no such
         list domain, the returned list is empty."""
-        listdomain = self.GetDomain('proxy_list')
+        listdomain = self.SMProperty.FindDomain("vtkSMProxyListDomain")
         retval = []
         if listdomain:
             for i in range(listdomain.GetNumberOfProxies()):
@@ -1296,7 +1303,9 @@ class ProxyProperty(Property):
                 position = self.Available.index(values)
             except:
                 raise ValueError (values + " is not a valid object in the domain.")
-            values = self.GetDomain('proxy_list').GetProxy(position)
+            listdomain = self.SMProperty.FindDomain("vtkSMProxyListDomain")
+            if listdomain:
+                values = listdomain.GetProxy(position)
         if not isinstance(values, tuple) and \
            not isinstance(values, list):
             values = (values,)

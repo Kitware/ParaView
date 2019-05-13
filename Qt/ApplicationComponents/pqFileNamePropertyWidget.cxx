@@ -66,9 +66,7 @@ pqFileNamePropertyWidget::pqFileNamePropertyWidget(
   }
 
   // find the domain
-  vtkSmartPointer<vtkSMInputFileNameDomain> domain =
-    vtkSMInputFileNameDomain::SafeDownCast(svp->FindDomain("vtkSMInputFileNameDomain"));
-
+  vtkSmartPointer<vtkSMInputFileNameDomain> domain = svp->FindDomain<vtkSMInputFileNameDomain>();
   if (!domain)
   {
     domain = vtkSmartPointer<vtkSMInputFileNameDomain>::New();
@@ -124,8 +122,7 @@ void pqFileNamePropertyWidget::resetButtonClicked()
   vtkSMProperty* smproperty = this->property();
 
   const char* fileName = "";
-  if (vtkSMInputFileNameDomain* domain =
-        vtkSMInputFileNameDomain::SafeDownCast(smproperty->GetDomain("filename")))
+  if (auto domain = smproperty->FindDomain<vtkSMInputFileNameDomain>())
   {
     if (domain->GetFileName() != "")
     {

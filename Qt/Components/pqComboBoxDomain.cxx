@@ -91,23 +91,18 @@ public:
   vtkSmartPointer<vtkSMProperty> Property;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
-  QString DomainName;
   QStringList UserStrings;
   bool MarkedForUpdate;
 };
 
-pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, const QString& domainName)
+pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop, vtkSMDomain* domain)
   : QObject(p)
 {
   this->Internal = new pqInternal();
   this->Internal->Property = prop;
-  this->Internal->DomainName = domainName;
+  this->Internal->Domain = domain;
 
-  if (!domainName.isEmpty())
-  {
-    this->Internal->Domain = prop->GetDomain(domainName.toLocal8Bit().data());
-  }
-  else
+  if (!this->Internal->Domain)
   {
     // get domain
     vtkSMDomainIterator* iter = prop->NewDomainIterator();
@@ -174,11 +169,6 @@ vtkSMProperty* pqComboBoxDomain::getProperty() const
 vtkSMDomain* pqComboBoxDomain::getDomain() const
 {
   return this->Internal->Domain;
-}
-
-const QString& pqComboBoxDomain::getDomainName() const
-{
-  return this->Internal->DomainName;
 }
 
 const QStringList& pqComboBoxDomain::getUserStrings() const

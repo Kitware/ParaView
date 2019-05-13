@@ -205,8 +205,7 @@ void vtkPVOpenVRHelper::GetScalars()
     vtkSMProperty* prop = repr ? repr->GetProperty("ColorArrayName") : nullptr;
     if (prop)
     {
-      vtkSMRepresentedArrayListDomain* scalars = vtkSMRepresentedArrayListDomain::SafeDownCast(
-        prop->FindDomain("vtkSMRepresentedArrayListDomain"));
+      auto scalars = prop->FindDomain<vtkSMRepresentedArrayListDomain>();
       int numsc = scalars->GetNumberOfStrings();
       for (int j = 0; j < numsc; ++j)
       {
@@ -692,8 +691,7 @@ void vtkPVOpenVRHelper::SelectScalar()
     vtkSMProperty* prop = repr ? repr->GetProperty("ColorArrayName") : nullptr;
     if (prop)
     {
-      vtkSMRepresentedArrayListDomain* scalars = vtkSMRepresentedArrayListDomain::SafeDownCast(
-        prop->FindDomain("vtkSMRepresentedArrayListDomain"));
+      auto scalars = prop->FindDomain<vtkSMRepresentedArrayListDomain>();
       int numsc = scalars->GetNumberOfStrings();
       bool found = false;
       for (int j = 0; j < numsc && !found; ++j)
