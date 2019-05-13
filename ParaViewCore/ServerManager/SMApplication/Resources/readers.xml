@@ -2604,66 +2604,31 @@
         identifying the file it came from? If turned on, a cell variable named
         "FileId" should be present.</Documentation>
       </IntVectorProperty>
-      <StringVectorProperty command="GetFilePrefix"
-                            information_only="1"
-                            name="FilePrefixInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetFilePrefix"
-                            information_property="FilePrefixInfo"
                             name="FilePrefix"
                             number_of_elements="1">
-        <FileListDomain name="default_value"
-                        optional="1">
-          <RequiredProperties>
-            <Property function="Prefix"
-                      name="FilePrefixInfo" />
-          </RequiredProperties>
-        </FileListDomain>
+        <FileListDomain name="default_value" optional="1"/>
         <Documentation>This property specifies the file root used with the file
         pattern to format a file name. (See the File Pattern
         property).</Documentation>
       </StringVectorProperty>
-      <StringVectorProperty command="GetFilePattern"
-                            information_only="1"
-                            name="FilePatternInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             command="SetFilePattern"
-                            information_property="FilePatternInfo"
                             name="FilePattern"
                             number_of_elements="1">
-        <FileListDomain name="default_value"
-                        optional="1">
-          <RequiredProperties>
-            <Property function="Pattern"
-                      name="FilePatternInfo" />
-          </RequiredProperties>
-        </FileListDomain>
+        <FileListDomain name="default_value" optional="1"/>
         <Documentation>This property contains a text string specifying the
         pattern used to load files. There are two parts to it: the prefix (%s)
         and the file number (%i). The format used is the same as that used for
         printf.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty command="GetFileRange"
-                         information_only="1"
-                         name="FileRangeInfo">
-        <SimpleIntInformationHelper />
-      </IntVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetFileRange"
                          default_values="-1 -1"
-                         information_property="FileRangeInfo"
                          name="FileRange"
                          number_of_elements="2">
-        <IntRangeDomain name="range">
-          <RequiredProperties>
-            <Property function="Range"
-                      name="FileRangeInfo" />
-          </RequiredProperties>
-        </IntRangeDomain>
+        <IntRangeDomain name="range" />
         <Documentation>This property controls the indices of the first and last
         files to be read.</Documentation>
       </IntVectorProperty>
@@ -6256,11 +6221,8 @@
           </PropertyGroup>
           <PropertyGroup label="File Pattern">
             <Property name="FilePrefix" panel_visibility="advanced" />
-            <Property name="FilePrefixInfo" />
             <Property name="FilePattern" panel_visibility="advanced"/>
-            <Property name="FilePatternInfo" />
             <Property name="FileRange" panel_visibility="advanced" />
-            <Property name="FileRangeInfo" />
             <Property name="XMLFileName" panel_visibility="advanced"/>
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
@@ -6397,11 +6359,8 @@
           </PropertyGroup>
           <PropertyGroup label="File Pattern">
             <Property name="FilePrefix" panel_visibility="advanced"/>
-            <Property name="FilePrefixInfo" />
             <Property name="FilePattern" panel_visibility="advanced"/>
-            <Property name="FilePatternInfo" />
             <Property name="FileRange" panel_visibility="advanced"/>
-            <Property name="FileRangeInfo" />
             <Property name="XMLFileName" panel_visibility="advanced"/>
             <Property name="XMLFileNameInfo" />
           </PropertyGroup>
