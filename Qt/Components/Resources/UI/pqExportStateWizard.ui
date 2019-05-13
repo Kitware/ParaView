@@ -63,7 +63,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Please note - this wizard is deprecated in favor of the Catalyst Export Inspector as of ParaView 5.6 and will be removed in a future version.</string>
+       <string>Please note - this wizard is deprecated in favor of the Export Inspector as of ParaView 5.6 and will be removed in a future version.</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>

@@ -370,8 +370,7 @@ void pqTemporalExportReaction::onTriggered()
 
   if (!(exported_any_screenshots || exported_any_writers))
   {
-    qWarning(
-      "Nothing to export, use Catalyst Export Inspector to configure what you want to write.");
+    qWarning("Nothing to export, use Export Inspector to configure what you want to write.");
   }
   else
   {

@@ -201,7 +201,7 @@ set(headers
 
 if (TARGET ParaView::pqPython)
   list(APPEND classes
-    pqCatalystExportInspector
+    pqExportInspector
     pqMacroReaction
     pqTraceReaction)
 endif ()
@@ -212,7 +212,7 @@ set(ui_files
   Resources/UI/pqBoxPropertyWidget.ui
   Resources/UI/pqCameraManipulatorWidget.ui
   Resources/UI/pqCameraToolbar.ui
-  Resources/UI/pqCatalystExportInspector.ui
+  Resources/UI/pqExportInspector.ui
   Resources/UI/pqColorAnnotationsPropertyWidget.ui
   Resources/UI/pqColorEditorPropertyWidget.ui
   Resources/UI/pqColorMapEditor.ui

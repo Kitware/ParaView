@@ -77,7 +77,7 @@ void vtkPVInitializePythonModules();
 #endif
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqCatalystExportInspector.h"
+#include "pqExportInspector.h"
 #include "pqPythonDebugLeaksView.h"
 #include "pqPythonShell.h"
 typedef pqPythonDebugLeaksView DebugLeaksViewType;
@@ -139,7 +139,7 @@ ParaViewMainWindow::ParaViewMainWindow()
 #endif
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-  pqCatalystExportInspector* catalystInspector = new pqCatalystExportInspector(this);
+  pqExportInspector* catalystInspector = new pqExportInspector(this);
   this->Internals->catalystInspectorDock->setWidget(catalystInspector);
   this->Internals->catalystInspectorDock->hide();
 #else

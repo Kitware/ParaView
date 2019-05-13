@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqCatalystExportInspector.cxx
+   Module:  pqExportInspector.cxx
 
    Copyright (c) 2018 Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqCatalystExportInspector.h"
-#include "ui_pqCatalystExportInspector.h"
+#include "pqExportInspector.h"
+#include "ui_pqExportInspector.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -59,15 +59,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 
 //=============================================================================
-class pqCatalystExportInspector::pqInternals
+class pqExportInspector::pqInternals
 {
 public:
-  Ui::CatalystExportInspector Ui;
-  pqCatalystExportInspector* self;
+  Ui::ExportInspector Ui;
+  pqExportInspector* self;
 
   pqProxyWidget* GlobalOptionsUI;
 
-  pqInternals(pqCatalystExportInspector* inSelf)
+  pqInternals(pqExportInspector* inSelf)
     : self(inSelf)
   {
     this->Ui.setupUi(inSelf);
@@ -78,10 +78,10 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqCatalystExportInspector::pqCatalystExportInspector(
+pqExportInspector::pqExportInspector(
   QWidget* parentObject, Qt::WindowFlags f, bool /* arg_autotracking */)
   : Superclass(parentObject, f)
-  , Internals(new pqCatalystExportInspector::pqInternals(this))
+  , Internals(new pqExportInspector::pqInternals(this))
 {
   // default to non-advanced
   this->Internals->Ui.advanced->setChecked(false);
@@ -129,21 +129,22 @@ pqCatalystExportInspector::pqCatalystExportInspector(
 }
 
 //-----------------------------------------------------------------------------
-pqCatalystExportInspector::~pqCatalystExportInspector()
+pqExportInspector::~pqExportInspector()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::showEvent(QShowEvent* e)
+void pqExportInspector::showEvent(QShowEvent* e)
 {
   (void)e;
   this->Update();
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::Update()
+void pqExportInspector::Update()
 {
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+  pqActiveObjects& ao = pqActiveObjects::instance();
 
   // filters and writers
   // turn off handling temporarily while we set up the menu
@@ -152,7 +153,13 @@ void pqCatalystExportInspector::Update()
   // the filters we might configure for export
   QList<pqPipelineSource*> filters = smModel->findItems<pqPipelineSource*>();
   QComboBox* filterChoice = this->Internals->Ui.filterChoice;
+
   QString current = filterChoice->currentText();
+  pqPipelineSource* activeFilter = ao.activeSource();
+  if (activeFilter)
+  {
+    current = activeFilter->getSMName();
+  }
   filterChoice->clear();
   foreach (auto i, filters)
   {
@@ -178,6 +185,13 @@ void pqCatalystExportInspector::Update()
   QList<pqRenderViewBase*> views = smModel->findItems<pqRenderViewBase*>();
   QComboBox* viewChoice = this->Internals->Ui.viewChoice;
   current = viewChoice->currentText();
+
+  pqRenderViewBase* activeView = static_cast<pqRenderViewBase*>(ao.activeView());
+  if (activeView)
+  {
+    current = activeView->getSMName();
+  }
+
   viewChoice->clear();
   foreach (auto i, views)
   {
@@ -200,13 +214,13 @@ void pqCatalystExportInspector::Update()
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::UpdateGlobalOptions()
+void pqExportInspector::UpdateGlobalOptions()
 {
   this->UpdateGlobalOptions(QString(""));
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::UpdateGlobalOptions(const QString& searchString)
+void pqExportInspector::UpdateGlobalOptions(const QString& searchString)
 {
   vtkSMExportProxyDepot* ed =
     vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetExportDepot();
@@ -246,7 +260,7 @@ void getFilterProxyAndPort(QString filterName, vtkSMSourceProxy*& filter, int& p
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::PopulateWriterFormats()
+void pqExportInspector::PopulateWriterFormats()
 {
   QComboBox* writerChoice = this->Internals->Ui.filterFormat;
   writerChoice->clear();
@@ -280,14 +294,26 @@ void pqCatalystExportInspector::PopulateWriterFormats()
   std::string availproxies = wf->GetSupportedWriterProxies(filter, portnum);
   std::stringstream ss(availproxies);
   std::string item;
+  std::string firstchecked = "none";
   while (std::getline(ss, item, ';'))
   {
-    this->Internals->Ui.filterFormat->addItem(item.c_str());
+    if (firstchecked == "none" && this->IsWriterChecked(filterName, QString::fromStdString(item)))
+    {
+      firstchecked = item;
+    }
+    if (item != "Cinema image options" || this->Internals->Ui.advanced->isChecked())
+    {
+      this->Internals->Ui.filterFormat->addItem(item.c_str());
+    }
+  }
+  if (firstchecked != "none")
+  {
+    this->Internals->Ui.filterFormat->setCurrentText(firstchecked.c_str());
   }
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::ExportFilter(bool enableWriter)
+void pqExportInspector::ExportFilter(bool enableWriter)
 {
   QString filterName = this->Internals->Ui.filterChoice->currentText();
   QString writerName = this->Internals->Ui.filterFormat->currentText();
@@ -353,7 +379,7 @@ void pqCatalystExportInspector::ExportFilter(bool enableWriter)
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::ConfigureWriterProxy()
+void pqExportInspector::ConfigureWriterProxy()
 {
   if (!this->Internals->Ui.filterExtract->isChecked())
   {
@@ -390,7 +416,7 @@ void pqCatalystExportInspector::ConfigureWriterProxy()
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::UpdateWriterCheckbox(int i)
+void pqExportInspector::UpdateWriterCheckbox(int i)
 {
   if (i != -1)
   {
@@ -407,7 +433,43 @@ void pqCatalystExportInspector::UpdateWriterCheckbox(int i)
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::InternalWriterCheckbox(int i)
+bool pqExportInspector::IsWriterChecked(const QString& filterName, const QString& writerName)
+{
+  if (filterName == "" || writerName == "")
+  {
+    return false;
+  }
+
+  vtkSMSourceProxy* filter;
+  int portnum;
+  ::getFilterProxyAndPort(filterName, filter, portnum);
+  if (!filter)
+  {
+    return false;
+  }
+
+  vtkSMExportProxyDepot* ed =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetExportDepot();
+  if (!ed->HasWriterProxy(filterName.toStdString().c_str(), writerName.toStdString().c_str()))
+  {
+    return false;
+  }
+
+  vtkSMSourceProxy* writerProxy =
+    ed->GetWriterProxy(filter, filterName.toStdString().c_str(), writerName.toStdString().c_str());
+  const char* enablestate = writerProxy->GetAnnotation("enabled");
+  if (enablestate)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqExportInspector::InternalWriterCheckbox(int i)
 {
   QString filterName = this->Internals->Ui.filterChoice->currentText();
   QString writerName = this->Internals->Ui.filterFormat->currentText();
@@ -451,23 +513,31 @@ void pqCatalystExportInspector::InternalWriterCheckbox(int i)
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::PopulateViewFormats()
+void pqExportInspector::PopulateViewFormats()
 {
   QComboBox* viewChoice = this->Internals->Ui.viewChoice;
   QString current = viewChoice->currentText();
   QComboBox* viewFormat = this->Internals->Ui.viewFormat;
   viewFormat->clear();
   // todo: customize this based on type of view
-  viewFormat->addItem("PNG image (*.png)");
-  viewFormat->addItem("JPG image (*.jpg)");
-  viewFormat->addItem("TIFF image (*.tif)");
-  viewFormat->addItem("BMP image (*.bmp)");
-  viewFormat->addItem("PPM image (*.ppm)");
-  viewFormat->addItem("Cinema image database (*.cdb)");
+  std::vector<QString> writers;
+  writers.push_back(QString("PNG image (*.png)"));
+  writers.push_back(QString("JPG image (*.jpg)"));
+  writers.push_back(QString("TIFF image (*.tif)"));
+  writers.push_back(QString("BMP image (*.bmp)"));
+  writers.push_back(QString("Cinema image database (*.cdb)"));
+  for (auto i = writers.begin(); i != writers.end(); i++)
+  {
+    viewFormat->addItem(*i);
+    if (this->IsScreenShotChecked(current, *i))
+    {
+      viewFormat->setCurrentText(*i);
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::ExportView(bool enableSS)
+void pqExportInspector::ExportView(bool enableSS)
 {
   QString viewName = this->Internals->Ui.viewChoice->currentText();
   QString ssName = this->Internals->Ui.viewFormat->currentText();
@@ -540,7 +610,7 @@ void pqCatalystExportInspector::ExportView(bool enableSS)
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::ConfigureScreenshotProxy()
+void pqExportInspector::ConfigureScreenshotProxy()
 {
   if (!this->Internals->Ui.viewExtract->isChecked())
   {
@@ -578,7 +648,7 @@ void pqCatalystExportInspector::ConfigureScreenshotProxy()
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::UpdateScreenshotCheckbox(int i)
+void pqExportInspector::UpdateScreenshotCheckbox(int i)
 {
   if (i != -1)
   {
@@ -595,7 +665,43 @@ void pqCatalystExportInspector::UpdateScreenshotCheckbox(int i)
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::InternalScreenshotCheckbox(int i)
+bool pqExportInspector::IsScreenShotChecked(const QString& viewName, const QString& writerName)
+{
+  if (viewName == "" || writerName == "")
+  {
+    return false;
+  }
+
+  pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+  pqRenderViewBase* pqview = smModel->findItem<pqRenderViewBase*>(viewName);
+  vtkSMViewProxy* view = pqview->getViewProxy();
+  if (!view)
+  {
+    return false;
+  }
+
+  vtkSMExportProxyDepot* ed =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetExportDepot();
+  if (!ed->HasScreenshotProxy(viewName.toStdString().c_str(), writerName.toStdString().c_str()))
+  {
+    return false;
+  }
+
+  vtkSMSaveScreenshotProxy* writerProxy = vtkSMSaveScreenshotProxy::SafeDownCast(
+    ed->GetScreenshotProxy(view, viewName.toStdString().c_str(), writerName.toStdString().c_str()));
+  const char* enablestate = writerProxy->GetAnnotation("enabled");
+  if (enablestate)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqExportInspector::InternalScreenshotCheckbox(int i)
 {
   QString viewName = this->Internals->Ui.viewChoice->currentText();
   QString writerName = this->Internals->Ui.viewFormat->currentText();
@@ -639,13 +745,14 @@ void pqCatalystExportInspector::InternalScreenshotCheckbox(int i)
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::Advanced(bool vtkNotUsed(setting))
+void pqExportInspector::Advanced(bool vtkNotUsed(setting))
 {
   this->UpdateGlobalOptions();
+  this->PopulateWriterFormats();
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::Help()
+void pqExportInspector::Help()
 {
 #ifdef PARAVIEW_USE_QTHELP
   // this is better than nothing, but we want a custom page
@@ -654,7 +761,7 @@ void pqCatalystExportInspector::Help()
 }
 
 //-----------------------------------------------------------------------------
-void pqCatalystExportInspector::Search(const QString& searchString)
+void pqExportInspector::Search(const QString& searchString)
 {
   this->UpdateGlobalOptions(searchString);
 }

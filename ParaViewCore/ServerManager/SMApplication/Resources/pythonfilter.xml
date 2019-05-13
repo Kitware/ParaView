@@ -613,48 +613,4 @@ annotation text.
       <!-- end of PythonAnimationCue -->
     </Proxy>
   </ProxyGroup>
-  <ProxyGroup name="exporters">
-    <!-- Proxy group for exporters used to export views.  -->
-    <RenderViewExporterProxy class="vtkCinemaExporter"
-                             name="CinemaExporter">
-      <Documentation long_help="Export view to a Cinema Database"
-                     short_help="Cinema Database">CinemaExporter is a render window
-                     exporter which writes out the renderered scene as a
-                     Cinema database.</Documentation>
-      <StringVectorProperty name="FileName"
-                            command="SetFileName"
-                            number_of_elements="1">
-        <Documentation>Name of the file to be written.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ViewSelection"
-                            command="SetViewSelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the view selection.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="TrackSelection"
-                            command="SetTrackSelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the track selection.</Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="ArraySelection"
-                            command="SetArraySelection"
-                            number_of_elements="1">
-        <Documentation>Script string defining the arrays selected in an item.</Documentation>
-      </StringVectorProperty>
-
-      <PropertyGroup label="Cinema Configuration"
-                     panel_widget="cinema_export_selector">
-        <Property name="ViewSelection"/>
-        <Property name="TrackSelection"/>
-        <Property name="ArraySelection"/>
-      </PropertyGroup>
-      <Hints>
-        <ExporterFactory extensions="cdb" />
-      </Hints>
-      <!-- End of Cinema Exporter -->
-    </RenderViewExporterProxy>
-  </ProxyGroup>
 </ServerManagerConfiguration>

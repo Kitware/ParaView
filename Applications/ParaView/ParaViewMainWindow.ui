@@ -271,7 +271,7 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Catalyst Export Inspector</string>
+    <string>Export Inspector</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -506,9 +506,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>pqCatalystExportInspector</class>
+   <class>pqExportInspector</class>
    <extends>QWidget</extends>
-   <header>pqCatalystExportInspector.h</header>
+   <header>pqExportInspector.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

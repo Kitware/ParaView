@@ -335,13 +335,11 @@ if (PARAVIEW_ENABLE_PYTHON AND (NOT PARAVIEW_PYTHON_VERSION STREQUAL "3"))
   # paraview/paraview#17353
   list(APPEND paraview_requested_modules
     ParaView::CinemaPython
-    ParaView::CinemaReader
-    ParaView::VTKExtensionsCinemaExporter)
+    ParaView::CinemaReader)
 else ()
   list(APPEND paraview_rejected_modules
     ParaView::CinemaPython
-    ParaView::CinemaReader
-    ParaView::VTKExtensionsCinemaExporter)
+    ParaView::CinemaReader)
 endif()
 
 if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_BUILD_TESTING)
