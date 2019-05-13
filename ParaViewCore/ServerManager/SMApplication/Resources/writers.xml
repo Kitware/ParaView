@@ -1873,7 +1873,8 @@
     <WriterProxy base_proxygroup="writers"
                  base_proxyname="XMLPPolyDataWriter"
                  class="vtkFileSeriesWriter"
-                 name="XMLPPolyDataWriter">
+                 name="XMLPPolyDataWriter"
+                 supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -1893,7 +1894,8 @@
     <WriterProxy base_proxygroup="writers"
                  base_proxyname="XMLPUnstructuredGridWriter"
                  class="vtkFileSeriesWriter"
-                 name="XMLPUnstructuredGridWriter">
+                 name="XMLPUnstructuredGridWriter"
+                 supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -1913,7 +1915,8 @@
     <WriterProxy base_proxygroup="writers"
                  base_proxyname="XMLPHyperTreeGridWriter"
                  class="vtkFileSeriesWriter"
-                 name="XMLPHyperTreeGridWriter">
+                 name="XMLPHyperTreeGridWriter"
+                 supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -1933,7 +1936,8 @@
     <WriterProxy base_proxygroup="writers"
                  base_proxyname="XMLPStructuredGridWriter"
                  class="vtkFileSeriesWriter"
-                 name="XMLPStructuredGridWriter">
+                 name="XMLPStructuredGridWriter"
+                 supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -1954,7 +1958,8 @@
                  base_proxyname="XMLPRectilinearGridWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLPRectilinearGridWriter">
+                 name="XMLPRectilinearGridWriter"
+                 supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -1974,7 +1979,8 @@
     <WriterProxy base_proxygroup="writers"
                base_proxyname="XMLPImageDataWriter"
                class="vtkFileSeriesWriter"
-               name="XMLPImageDataWriter">
+               name="XMLPImageDataWriter"
+               supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -1994,7 +2000,8 @@
     <WriterProxy base_proxygroup="writers"
                  base_proxyname="XMLMultiBlockDataWriter"
                  class="vtkFileSeriesWriter"
-                 name="XMLMultiBlockDataWriter">
+                 name="XMLMultiBlockDataWriter"
+                 supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -2014,7 +2021,8 @@
     <PWriterProxy base_proxygroup="writers"
                   base_proxyname="ExodusIIWriter"
                   class="vtkExodusIIWriter"
-                  name="ExodusIIWriter">
+                  name="ExodusIIWriter"
+                  supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -2042,7 +2050,8 @@
     <PSWriterProxy base_proxygroup="writers"
                    base_proxyname="CSVWriter"
                    class="vtkParallelSerialWriter"
-                   name="CSVWriter">
+                   name="CSVWriter"
+                   supports_parallel="1">
       <Documentation short_help="Expose a writer for catalyst.">
         Variation with catalyst specific extensions.
       </Documentation>
@@ -2061,7 +2070,8 @@
     </PSWriterProxy>
 
     <WriterProxy name="Cinema image options"
-                 class="vtkPassThroughFilter">
+                 class="vtkPassThroughFilter"
+                 supports_parallel="1">
       <Documentation short_help="Per object setup for Cinema Image Database output."/>
       <InputProperty command="SetInputConnection"
                      name="Input">
