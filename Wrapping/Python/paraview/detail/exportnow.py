@@ -183,7 +183,6 @@ def ExportNow(root_directory,
 
     # get a hold of the scene
     spm = servermanager.vtkSMProxyManager.GetProxyManager().GetActiveSessionProxyManager()
-    isParallel = spm.GetSession().GetNumberOfProcesses(0) > 1
     ed = spm.GetExportDepot()
     s = GetAnimationScene()
     s.GoToFirst()
@@ -215,16 +214,9 @@ def ExportNow(root_directory,
                 inputproxy = FindSource(inputname)
                 fname = wp.GetProperty("CatalystFilePattern").GetElement(0)
                 if wp.GetXMLName() == "ExodusIIWriter":
-                    if not isParallel:
-                        #is there a cleaner way to replace the last occurance?
-                        fname = fname[::-1].replace(".e-s"[::-1],("."+padded_tstep+".ex2")[::-1],1)[::-1]
-                        fnamefilled = root_directory+fname
-                    else:
-                        fnamefilled = root_directory+fname+padded_tstep
+                    fnamefilled = root_directory+fname+padded_tstep
                 else:
                     fnamefilled = root_directory+fname.replace("%t", padded_tstep)
-                    if not isParallel:
-                        fnamefilled = fnamefilled[::-1].replace(".p"[::-1],".",1)[::-1]
                 # finally after all of the finageling above, save the data
                 SaveData(fnamefilled, inputproxy)
                 # don't forget to tell cinema D about it
