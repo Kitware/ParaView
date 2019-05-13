@@ -190,7 +190,7 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
   // Only filenames or filepaths need it.
   // It can be a StringVectorProperty called FileName (all writers, see writers.xml)
   // Or FileNameInfo for information property.
-  // Or it can be a StringVectorProperty with a fileListDomain names files
+  // Or it can be a StringVectorProperty with a fileListDomain.
   const char* name = element->GetAttributeOrEmpty("name");
   if (strcmp(name, "FileName") == 0 || strcmp(name, "FileNameInfo") == 0)
   {
@@ -201,8 +201,7 @@ bool vtkSIStringVectorProperty::ReadXMLAttributes(vtkSIProxy* proxy, vtkPVXMLEle
     for (unsigned int i = 0; i < element->GetNumberOfNestedElements(); i++)
     {
       vtkPVXMLElement* nested = element->GetNestedElement(i);
-      if (strcmp(nested->GetName(), "FileListDomain") == 0 &&
-        strcmp(nested->GetAttributeOrEmpty("name"), "files") == 0)
+      if (strcmp(nested->GetName(), "FileListDomain") == 0)
       {
         this->NeedReencoding = true;
       }

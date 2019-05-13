@@ -18,12 +18,10 @@
  *
  * This domain represent a single vtkSMTransferFunctionProxy with
  * a range defined by a vtkSMArrayRangeDomain used internally.
- * It still need to be named "proxy_list" so the associated python class
- * supports it.
  *
  * Example usage :
  * @code{xml}
- *       <RangedTransferFunctionDomain name="proxy_list">
+ *       <RangedTransferFunctionDomain name="domain">
  *         <RequiredProperties>
  *           <Property function="Input" name="Input" />
  *           <Property function="ArraySelection" name="OpacityArray" />

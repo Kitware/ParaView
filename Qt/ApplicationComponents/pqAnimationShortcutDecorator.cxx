@@ -92,7 +92,7 @@ bool pqAnimationShortcutDecorator::accept(pqPropertyWidget* parentWidget)
         }
       }
 
-      // And it must contain a "scalar_range" or "range" domain
+      // And it must contain a range domain
       if (hasRange)
       {
         return true;
