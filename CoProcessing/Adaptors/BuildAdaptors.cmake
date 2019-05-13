@@ -51,6 +51,28 @@ function(build_adaptor name languages)
       -DCMAKE_${lang}_FLAGS:STRING=${CMAKE_${lang}_FLAGS})
   endforeach ()
 
+  #This generated file ensures that the adaptor's CMakeCache ends up with
+  #the same CMAKE_PREFIX_PATH that ParaView's does, even if that has multiple
+  #paths in it. It is necessary because ctest's argument parsing in the
+  #custom command below destroys path separators.
+  #Note: the generated file will become stale if these variables change.
+  #In that case it will need manual intervention (remove it) to fix.
+  file(GENERATE
+    OUTPUT "${BINARY_DIR}/${lname}_build_options.cmake"
+    CONTENT
+"
+set(ParaView_DIR ${ParaView_BINARY_DIR} CACHE PATH \"\")
+set(QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE} CACHE PATH \"\")
+set(Qt5_DIR ${Qt5_DIR} CACHE PATH \"\")
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING \"\")
+set(CMAKE_CXX_COMPILER ${CMAKE_CXX_COMPILER} CACHE FILEPATH \"\")
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} CACHE STRING \"\")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} CACHE PATH \"\")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} CACHE PATH \"\")
+set(CMAKE_PREFIX_PATH \"${CMAKE_PREFIX_PATH}\" CACHE STRING \"\")
+"
+)
+
   add_custom_command(
     OUTPUT "${BINARY_DIR}/${lname}.done"
     COMMAND ${CMAKE_CTEST_COMMAND}
@@ -62,15 +84,7 @@ function(build_adaptor name languages)
             --build-project ${name}
             --build-generator ${CMAKE_GENERATOR}
             --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-            --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
-                            -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-                            -DQt5_DIR:PATH=${Qt5_DIR}
-                            -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-                            -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
-                            -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
-                            -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-                            -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-                            -DCMAKE_PREFIX_PATH:STRING="${CMAKE_PREFIX_PATH}"
+            --build-options -C "${BINARY_DIR}/${lname}_build_options.cmake"
                             ${language_options}
                             ${extra_params}
                             --no-warn-unused-cli
