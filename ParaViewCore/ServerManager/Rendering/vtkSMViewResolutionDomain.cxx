@@ -79,10 +79,9 @@ void vtkSMViewResolutionDomain::GetLayoutResolution(vtkSMViewLayoutProxy* layout
 {
   if (layout)
   {
-    int extents[4];
-    layout->GetLayoutExtent(extents);
-    resolution[0] = extents[1] - extents[0] + 1;
-    resolution[1] = extents[3] - extents[2] + 1;
+    auto size = layout->GetSize();
+    resolution[0] = size[0];
+    resolution[1] = size[1];
   }
 }
 

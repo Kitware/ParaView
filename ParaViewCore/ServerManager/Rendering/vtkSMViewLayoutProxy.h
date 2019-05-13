@@ -271,35 +271,6 @@ public:
    */
   std::vector<vtkSMViewProxy*> GetViews();
 
-  /**
-   * Set the color to use for separator between views in multi-view
-   * configurations when saving images.
-   * @param[in] r Red component value in range (0, 255);
-   * @param[in] g Green component value in range (0, 255);
-   * @param[in] b Blue component value in range (0, 255);
-   */
-  void SetSeparatorColor(unsigned char r, unsigned char g, unsigned char b);
-
-  //@{
-  /**
-   * Set the color to use for separator between views in multi-view
-   * configurations when saving images.
-   *
-   * The arguments are the components of the red, green, and blue channels from 0.0 to 1.0.
-   */
-  vtkSetVector3Macro(SeparatorColor, double);
-  vtkGetVector3Macro(SeparatorColor, double);
-  //@}
-
-  //@{
-  /**
-   * Get/Set the separator width (in pixels) to use for separator between views
-   * in multi-view configurations.
-   */
-  vtkSetClampMacro(SeparatorWidth, int, 0, VTK_INT_MAX);
-  vtkGetMacro(SeparatorWidth, int);
-  //@}
-
   //@{
   /**
    * This is only meant for testing and debugging purposes. This allows the
@@ -339,9 +310,6 @@ protected:
   int GetSplittableCell(int root, Direction& suggested_direction);
 
   int MaximizedCell;
-
-  double SeparatorColor[3];
-  int SeparatorWidth;
 
 private:
   vtkSMViewLayoutProxy(const vtkSMViewLayoutProxy&) = delete;

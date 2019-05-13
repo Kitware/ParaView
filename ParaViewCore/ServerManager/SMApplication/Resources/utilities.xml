@@ -2888,6 +2888,7 @@
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty name="SeparatorWidth"
+        command="SetSeparatorWidth"
         number_of_elements="1"
         default_values="1">
         <IntRangeDomain name="range" min="0" max="10" />
@@ -2896,6 +2897,7 @@
         </Documentation>
       </IntVectorProperty>
       <DoubleVectorProperty name="SeparatorColor"
+        command="SetSeparatorColor"
         number_of_elements="3"
         default_values="0.937 0.922 0.906">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />

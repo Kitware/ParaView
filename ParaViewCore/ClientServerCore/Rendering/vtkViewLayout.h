@@ -74,6 +74,26 @@ public:
    */
   bool SaveAsPNG(int rank, const char* fname);
 
+  //@{
+  /**
+   * Set the color to use for separator between views in multi-view
+   * configurations when saving images.
+   *
+   * The arguments are the components of the red, green, and blue channels from 0.0 to 1.0.
+   */
+  vtkSetVector3Macro(SeparatorColor, double);
+  vtkGetVector3Macro(SeparatorColor, double);
+  //@}
+
+  //@{
+  /**
+   * Get/Set the separator width (in pixels) to use for separator between views
+   * in multi-view configurations.
+   */
+  vtkSetClampMacro(SeparatorWidth, int, 0, VTK_INT_MAX);
+  vtkGetMacro(SeparatorWidth, int);
+  //@}
+
 protected:
   vtkViewLayout();
   ~vtkViewLayout() override;
@@ -122,6 +142,9 @@ private:
   int TileMullions[2];
   bool InCave;
   bool DisplayResults;
+  int SeparatorWidth;
+  double SeparatorColor[3];
+
   friend class vtkViewLayoutProp;
 };
 
