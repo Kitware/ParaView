@@ -351,11 +351,17 @@ class Proxy(object):
         """Returns a scalar for properties with 1 elements, the property
         itself for vectors."""
         p = self.GetProperty(name)
-        if isinstance(p, VectorProperty):
-            if paraview.compatibility.GetVersion() <= 4.1 and name == "ColorArrayName":
-              # Return ColorArrayName as just the array name for backwards compatibility.
-              return p[1]
-            elif p.GetNumberOfElements() == 1 and not p.GetRepeatable():
+        if isinstance(p, VectorProperty) and paraview.compatibility.GetVersion() <= 4.1 and name == "ColorArrayName":
+            # Return ColorArrayName as just the array name for backwards compatibility.
+            return p[1]
+        if isinstance(p, EnumerationProperty) or \
+          isinstance(p, ArraySelectionProperty) or \
+          isinstance(p, StringListProperty) or \
+          isinstance(p, ArrayListProperty):
+            # with domain based property, return the property to provide access to Available method
+            return p
+        elif isinstance(p, VectorProperty):
+            if p.GetNumberOfElements() == 1 and not p.GetRepeatable():
                 if p.SMProperty.IsA("vtkSMStringVectorProperty") or not p.GetArgumentIsArray():
                     return p[0]
         elif isinstance(p, InputProperty):
@@ -658,6 +664,16 @@ class Property(object):
         import weakref
         self.SMProperty = smproperty
         self.Proxy = proxy
+
+    def __eq__(self, other):
+        "Returns true if the properties or properties values are the same."
+        return ((self is None and other is None) or
+                (self is not None and other is not None and self.__repr__() == other.__repr__()))
+
+    if sys.version_info < (3,):
+        def __ne__(self, other):
+            "Returns true if the properties or properties values are not the same."
+            return not self.__eq__(other)
 
     def __repr__(self):
         """Returns a string representation containing property name
