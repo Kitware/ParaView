@@ -1463,7 +1463,7 @@ const char* vtkSMPropertyHelper::GetInputArrayNameToProcess() const
 
 //----------------------------------------------------------------------------
 template <typename T>
-bool vtkSMPropertyHelper::CopyInternal(vtkSMPropertyHelper& source)
+bool vtkSMPropertyHelper::CopyInternal(const vtkSMPropertyHelper& source)
 {
   std::vector<T> values = source.GetPropertyArray<T>();
   this->SetPropertyArray<T>(
@@ -1472,7 +1472,7 @@ bool vtkSMPropertyHelper::CopyInternal(vtkSMPropertyHelper& source)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMPropertyHelper::Copy(vtkSMPropertyHelper& source)
+bool vtkSMPropertyHelper::Copy(const vtkSMPropertyHelper& source)
 {
   if (this->Type != source.Type)
   {
