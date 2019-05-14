@@ -50,8 +50,3 @@ pqIntegrationModelHelperWidget::pqIntegrationModelHelperWidget(
   this->VTKConnector->Connect(
     this->ModelProperty, vtkCommand::UncheckedPropertyModifiedEvent, this, SLOT(resetWidget()));
 }
-
-//-----------------------------------------------------------------------------
-pqIntegrationModelHelperWidget::~pqIntegrationModelHelperWidget()
-{
-}

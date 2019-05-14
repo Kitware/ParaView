@@ -51,7 +51,7 @@ class pqIntegrationModelHelperWidget : public pqPropertyWidget
 public:
   pqIntegrationModelHelperWidget(
     vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject = 0);
-  ~pqIntegrationModelHelperWidget() override;
+  ~pqIntegrationModelHelperWidget() override = default;
 
 protected slots:
   virtual void resetWidget() = 0;

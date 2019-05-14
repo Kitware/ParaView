@@ -8,7 +8,6 @@ if (PARAVIEW_BUILD_QT_GUI AND BUILD_SHARED_LIBS)
     "DATA{Data/Baseline/LagrangianParticleTracker_InterB.png}"
     "DATA{Data/Baseline/LagrangianParticleTracker_InterF.png}"
     "DATA{Data/Baseline/LagrangianParticleTracker_InterG.png}"
-    "DATA{Data/Baseline/LagrangianParticleTracker_InterH.png}"
     "DATA{Data/Baseline/LagrangianParticleTracker_InterI.png}"
     "DATA{Data/Baseline/LagrangianParticleTracker_InterJ.png}"
 

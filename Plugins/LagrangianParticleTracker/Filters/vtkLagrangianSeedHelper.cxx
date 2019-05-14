@@ -26,6 +26,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLagrangianBasicIntegrationModel.h"
+#include "vtkLagrangianParticle.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -38,11 +39,11 @@ vtkStandardNewMacro(vtkLagrangianSeedHelper);
 class vtkLagrangianSeedHelper::vtkInternals
 {
 public:
-  vtkInternals() { this->CompositeDataIterator = NULL; }
+  vtkInternals() { this->CompositeDataIterator = nullptr; }
 
   ~vtkInternals()
   {
-    if (this->CompositeDataIterator != NULL)
+    if (this->CompositeDataIterator)
     {
       this->CompositeDataIterator->Delete();
     }
@@ -135,6 +136,7 @@ int vtkLagrangianSeedHelper::RequestData(
   else
   {
     vtkErrorMacro("Ignored Flow input of type: " << (flow ? flow->GetClassName() : "(none)"));
+    return 0;
   }
 
   // Copy input into output
@@ -164,11 +166,16 @@ int vtkLagrangianSeedHelper::RequestData(
       vtkIdType cellId;
       vtkDataSet* dataset;
       vtkAbstractCellLocator* loc;
-      double* weights = new double[this->IntegrationModel->GetWeightsSize()];
+      std::vector<double> weights(this->IntegrationModel->GetWeightsSize());
+      double* weightsPtr = weights.data();
+
+      // Create and set a dummy particle so FindInLocators can use caching.
+      vtkLagrangianParticle dummyParticle(
+        0, 0, 0, 0, 0, nullptr, this->IntegrationModel->GetWeightsSize());
       for (int iPt = 0; iPt < output->GetNumberOfPoints(); iPt++)
       {
         if (this->IntegrationModel->FindInLocators(
-              output->GetPoint(iPt), dataset, cellId, loc, weights))
+              output->GetPoint(iPt), &dummyParticle, dataset, cellId, loc, weightsPtr))
         {
           if (arrayVal.FlowFieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
           {
@@ -179,7 +186,6 @@ int vtkLagrangianSeedHelper::RequestData(
             {
               vtkErrorMacro("Could not find " << arrayVal.FlowArray.c_str()
                                               << " array in flow cell data. Aborting");
-              delete[] weights;
               return 0;
             }
             if (flowArray->GetNumberOfComponents() != arrayVal.NumberOfComponents)
@@ -187,7 +193,6 @@ int vtkLagrangianSeedHelper::RequestData(
               vtkErrorMacro(
                 << arrayVal.FlowArray.c_str()
                 << " cell data flow array does not have the right number of components. Aborting");
-              delete[] weights;
               return 0;
             }
             seedArray->SetTuple(iPt, flowArray->GetTuple(cellId));
@@ -201,7 +206,6 @@ int vtkLagrangianSeedHelper::RequestData(
             {
               vtkErrorMacro("Could not find " << arrayVal.FlowArray.c_str()
                                               << " array in flow point data. Aborting");
-              delete[] weights;
               return 0;
             }
             if (flowArray->GetNumberOfComponents() != arrayVal.NumberOfComponents)
@@ -209,14 +213,13 @@ int vtkLagrangianSeedHelper::RequestData(
               vtkErrorMacro(
                 << arrayVal.FlowArray.c_str()
                 << " point data flow array does not have the right number of components. Aborting");
-              delete[] weights;
               return 0;
             }
             vtkDataArray* tmpArray = flowArray->NewInstance();
             tmpArray->SetNumberOfComponents(arrayVal.NumberOfComponents);
             tmpArray->SetNumberOfTuples(1);
             tmpArray->InterpolateTuple(
-              0, dataset->GetCell(cellId)->GetPointIds(), flowArray, weights);
+              0, dataset->GetCell(cellId)->GetPointIds(), flowArray, weightsPtr);
             seedArray->SetTuple(iPt, tmpArray->GetTuple(0));
             tmpArray->Delete();
           }
@@ -230,7 +233,6 @@ int vtkLagrangianSeedHelper::RequestData(
           }
         }
       }
-      delete[] weights;
     }
     outputPD->AddArray(seedArray);
     seedArray->Delete();
@@ -253,7 +255,7 @@ int vtkLagrangianSeedHelper::RequestDataObject(
     if (hdInput)
     {
       // Composite data
-      if (this->Internals->CompositeDataIterator != NULL)
+      if (this->Internals->CompositeDataIterator)
       {
         this->Internals->CompositeDataIterator->Delete();
       }

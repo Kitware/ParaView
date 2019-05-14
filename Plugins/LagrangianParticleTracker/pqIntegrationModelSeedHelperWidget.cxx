@@ -68,11 +68,6 @@ pqIntegrationModelSeedHelperWidget::pqIntegrationModelSeedHelperWidget(
 }
 
 //-----------------------------------------------------------------------------
-pqIntegrationModelSeedHelperWidget::~pqIntegrationModelSeedHelperWidget()
-{
-}
-
-//-----------------------------------------------------------------------------
 void pqIntegrationModelSeedHelperWidget::resetWidget()
 {
   this->resetSeedWidget(false);
@@ -97,7 +92,7 @@ void pqIntegrationModelSeedHelperWidget::resetSeedWidget(bool force)
     qDeleteAll(this->children());
 
     // Recover model array names and components
-    if (this->ModelPropertyValue != NULL)
+    if (this->ModelPropertyValue)
     {
       this->ModelPropertyValue->UpdatePropertyInformation();
       vtkSMStringVectorProperty* namesProp = vtkSMStringVectorProperty::SafeDownCast(
@@ -300,7 +295,7 @@ void pqIntegrationModelSeedHelperWidget::setArrayToGenerate(const QList<QVariant
     // Recover array name
     QString arrayName = i->toString();
     int type = (i + 1)->toInt();
-    gb = NULL;
+    gb = nullptr;
     foreach (gb, gbs)
     {
       // Identify correct combo box
@@ -309,7 +304,7 @@ void pqIntegrationModelSeedHelperWidget::setArrayToGenerate(const QList<QVariant
         break;
       }
     }
-    if (gb == NULL)
+    if (!gb)
     {
       qCritical() << "Could not find group box with name" << arrayName;
       continue;

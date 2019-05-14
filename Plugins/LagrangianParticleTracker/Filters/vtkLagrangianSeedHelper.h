@@ -20,7 +20,7 @@
  *
  * This filter enable to generate point data, array by array
  * from constant value or by interpolating from a volumic input
-*/
+ */
 
 #ifndef vtkLagrangianSeedHelper_h
 #define vtkLagrangianSeedHelper_h

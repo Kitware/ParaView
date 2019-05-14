@@ -20,7 +20,7 @@
  * This is an abstract class for Lagrangian helper
  * It defines the integration model
  * as well as the SetArrayToGenerate method signature
-*/
+ */
 
 #ifndef vtkLagrangianHelperBase_h
 #define vtkLagrangianHelperBase_h
