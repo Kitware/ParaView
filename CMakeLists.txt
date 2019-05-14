@@ -520,13 +520,13 @@ list(APPEND paraview_requested_modules
   ParaView::ServerManagerApplication
   ParaView::ServerManagerDefault
   ParaView::VTKExtensionsCGNSReader
-  ParaView::VTKExtensionsH5PartReader
   ParaView::VTKExtensionsPoints
   ParaView::WrapClientServer
   VTK::FiltersFlowPaths
   VTK::FiltersVerdict
   VTK::IOAMR
   VTK::IOAsynchronous # needed for cinema, but no harm adding always.
+  VTK::IOH5part
   VTK::IOParallelLSDyna
   VTK::IOTecplotTable
   VTK::IOTRUCHAS

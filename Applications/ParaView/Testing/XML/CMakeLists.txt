@@ -1414,7 +1414,7 @@ set (ResetToVisibleRange_DISABLE_CRS TRUE)
 #     - Clip, UndoRedo, UndoRedo[1-8]
 #
 #   Contains Plugin Loading actions:
-#     - LoadPlugins, NiftiReaderWriterPlugin, H5PartReaderPlugin
+#     - LoadPlugins, NiftiReaderWriterPlugin
 #
 #   Does not work in CS or CRS mode
 #     - ViewSettingsDialog, RectilinearFractal, NewColorEditor
