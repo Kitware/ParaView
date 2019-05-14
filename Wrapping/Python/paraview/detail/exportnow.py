@@ -189,10 +189,18 @@ def ExportNow(root_directory,
     s.GoToFirst()
     et = s.EndTime
     tnow = s.AnimationTime
+
     numTimesteps = len(paraview.simple.GetAnimationScene().TimeKeeper.TimestepValues)
-        # this is the current timestep, and is a counter for the following loop
-    tstep = 0
-    while (tstep < numTimesteps):
+    timesteps = {}
+    # We must perform the export loop at least once, even in the case where
+    # the input data contains no timesteps
+    if (numTimesteps == 0):
+        timesteps = list(range(1))
+    else:
+        timesteps = list(range(numTimesteps))
+
+    # export loop
+    for tstep in timesteps:
         padded_tstep = str(tstep).rjust(file_name_padding, '0')
 
         # loop through the configured writers and export at the requested times
@@ -257,10 +265,6 @@ def ExportNow(root_directory,
         tstep = tstep + 1
         s.GoToNext()
         tnow = s.AnimationTime
-
-        if numTimesteps == 0:
-            # if data is not time varying, just do one export cycle
-            break
 
     # defer actual cinema D output until the end because we only know now what the full set of cinema D columns actually are
     CIND.Finalize()
