@@ -136,7 +136,6 @@ private:
   std::unique_ptr<vtkInternals> Internals;
   vtkNew<vtkViewLayoutProp> Prop;
 
-  bool Enabled;
   bool InTileDisplay;
   int TileDimensions[2];
   int TileMullions[2];
