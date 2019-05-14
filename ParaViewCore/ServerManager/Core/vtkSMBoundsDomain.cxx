@@ -311,7 +311,6 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
     entries.push_back(vtkEntry(0, maxbounds));
     this->SetEntries(entries);
   }
-
   else if (this->Mode == vtkSMBoundsDomain::APPROXIMATE_CELL_LENGTH)
   {
     double diameter = sqrt((bounds[1] - bounds[0]) * (bounds[1] - bounds[0]) +
@@ -319,6 +318,19 @@ void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
       (bounds[5] - bounds[4]) * (bounds[5] - bounds[4]));
     std::vector<vtkEntry> entries;
     entries.push_back(vtkEntry(0, diameter));
+    this->SetEntries(entries);
+  }
+  else if (this->Mode == vtkSMBoundsDomain::COMPONENT_MAGNITUDE)
+  {
+    if (vtkMath::AreBoundsInitialized(bounds) == 0)
+    {
+      return;
+    }
+
+    std::vector<vtkEntry> entries;
+    entries.emplace_back(vtkEntry(0, bounds[1] - bounds[0]));
+    entries.emplace_back(vtkEntry(0, bounds[3] - bounds[2]));
+    entries.emplace_back(vtkEntry(0, bounds[5] - bounds[4]));
     this->SetEntries(entries);
   }
 }
@@ -381,6 +393,10 @@ int vtkSMBoundsDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* e
     else if (strcmp(mode, "oriented_magnitude") == 0)
     {
       this->Mode = vtkSMBoundsDomain::ORIENTED_MAGNITUDE;
+    }
+    else if (strcmp(mode, "component_magnitude") == 0)
+    {
+      this->Mode = vtkSMBoundsDomain::COMPONENT_MAGNITUDE;
     }
     else if (strcmp(mode, "scaled_extent") == 0)
     {
