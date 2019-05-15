@@ -201,6 +201,8 @@ vtkPVView::vtkPVView(bool create_render_window)
   this->Position[0] = this->Position[1] = 0;
   this->PPI = 96;
 
+  this->InCaptureScreenshot = false;
+
   // Create render window, if requested.
   this->RenderWindow = create_render_window ? this->NewRenderWindow() : nullptr;
   if (this->RenderWindow)
@@ -408,11 +410,13 @@ void vtkPVView::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVView::PrepareForScreenshot()
 {
+  this->InCaptureScreenshot = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::CleanupAfterScreenshot()
 {
+  this->InCaptureScreenshot = false;
 }
 
 //----------------------------------------------------------------------------

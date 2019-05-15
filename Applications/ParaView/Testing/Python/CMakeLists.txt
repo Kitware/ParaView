@@ -145,3 +145,26 @@ if(BUILD_SHARED_LIBS)
     TestRemoteProgrammableFilter.py
     )
 endif()
+
+#------------------------------------------------------------------------------
+# add a test for stereo batch (#18974).
+set(paraview_pvbatch_args --stereo --stereo-type=SplitViewportHorizontal)
+paraview_add_test_pvbatch(
+  NO_DATA NO_RT
+  TestStereoSaveScreenshot.py
+)
+if(PARAVIEW_USE_MPI)
+  paraview_add_test_pvbatch_mpi(
+    NO_DATA NO_RT
+    TestStereoSaveScreenshot.py
+  )
+endif()
+unset(paraview_pvbatch_args)
+
+set(paraview_python_args --stereo --stereo-type=SplitViewportHorizontal)
+paraview_add_test_python(
+  NO_DATA NO_RT
+  TestStereoSaveScreenshot.py
+)
+unset(paraview_python_args)
+#------------------------------------------------------------------------------
