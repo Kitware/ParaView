@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+
+  <!-- Create the default mandelbrot source -->
+  <pqevent object="pqClientMainWindow/menubar/menuSources/Alphabetical" command="activate" arguments="Mandelbrot" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Clip the mandelbrot in half -->
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Clip" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Clip the mandelbrot to get the other half -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,14,8,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,14,8,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,29,8,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,29,8,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Clip" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Invert/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Group the two halves into a multiblock dataset -->
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,38,14,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,38,14,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="keyEvent" arguments="6,16777248,33554432,,0,1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,33554432,44,8,/0:0/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,33554432,44,8,/0:0/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="keyEvent" arguments="7,16777248,0,,0,1" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/GroupDataSets" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- Merge the blocks into one dataset -->
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/MergeBlocks" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+</pqevents>
