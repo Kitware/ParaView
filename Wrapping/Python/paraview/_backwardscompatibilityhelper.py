@@ -621,6 +621,14 @@ def getattr(proxy, pname):
             raise NotSupportedException(
                 'The `OSPRayMaterial` control has been renamed in ParaView 5.7 to `Material`.')
 
+    #  In 5.7, the `Box` implicit function's Scale property was renamed to
+    #  Length.
+    if pname == "Scale" and proxy.SMProxy.GetXMLName() == "Box":
+        if paraview.compatibility.GetVersion() < 5.7:
+            return proxy.GetProperty("Length")
+        else:
+            raise NotSupportedException(
+                    'The `Scale` property has been renamed in ParaView 5.7 to `Length`.')
     raise Continue()
 
 def GetProxy(module, key):

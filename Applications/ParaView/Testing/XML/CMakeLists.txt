@@ -1586,6 +1586,11 @@ if (TARGET paraview)
     BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
     TEST_SCRIPTS LoadExodusStateFile.xml)
 
+  paraview_add_client_tests(
+    ARGS "--state=${CMAKE_CURRENT_SOURCE_DIR}/boxClip.5.6.pvsm"
+    BASELINE_DIR ${PARAVIEW_TEST_BASELINE_DIR}
+    TEST_SCRIPTS BoxClipStateBackwardsCompatibility.xml)
+
   if (PARAVIEW_ENABLE_PYTHON)
     # Test whether or not we can load a Python state file with the --state
     # command line option as well as loading a Python state file that was

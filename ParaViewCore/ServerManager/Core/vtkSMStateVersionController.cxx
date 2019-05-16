@@ -711,7 +711,18 @@ struct Process_5_6_to_5_7
       auto elem = node.append_child("Element");
       elem.append_attribute("index").set_value("0");
       elem.append_attribute("value").set_value("1");
+
+      // find 'Scale' property and rename it to 'Length'
+      for (auto pchild = proxy_node.child("Property"); pchild;
+           pchild = pchild.next_sibling("Property"))
+      {
+        if (strcmp(pchild.attribute("name").as_string(), "Scale") == 0)
+        {
+          pchild.attribute("name").set_value("Length");
+        }
+      }
     }
+
     return true;
   }
 };

@@ -753,7 +753,7 @@
       <DoubleVectorProperty animateable="1"
                             command="SetScale"
                             default_values="1.0 1.0 1.0"
-                            name="Scale"
+                            name="Length"
                             number_of_elements="3">
         <BoundsDomain default_mode="max" mode="component_magnitude" name="range">
           <RequiredProperties>
@@ -767,7 +767,7 @@
       <PropertyGroup label="Box Parameters" panel_widget="InteractiveBox">
         <Property function="Position" name="Position" />
         <Property function="Rotation" name="Rotation" />
-        <Property function="Scale" name="Scale" />
+        <Property function="Scale" name="Length" />
         <Property function="Input" name="Input" />
         <Property function="UseReferenceBounds" name="UseReferenceBounds" />
         <Property function="ReferenceBounds" name="Bounds" />
