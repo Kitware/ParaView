@@ -223,6 +223,7 @@ ExternalData_Expand_Arguments(ParaViewData _
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMap7.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMapToggle1.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/LogColorMapToggle2.png}"
+  "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/MergePointBlocks.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-BallStick.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-Custom.png}"
   "DATA{${CMAKE_CURRENT_SOURCE_DIR}/../Data/Baseline/Molecule-Liquorice.png}"
@@ -723,6 +724,7 @@ list(APPEND TESTS_WITH_BASELINES
   LoadStateUseExisting.xml
   LoadSaveStateVolume.xml
   ManyTypesXMLWriterReader.xml
+  MergePointBlocks.xml
   MoleculeBonds.xml
   MoleculeToLines.xml
   MultiBlockAttributes1.xml
