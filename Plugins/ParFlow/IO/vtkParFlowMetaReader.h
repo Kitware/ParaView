@@ -257,8 +257,6 @@ protected:
   //@{
   /// The entire metadata structure.
   json Metadata;
-  /// The contents of the pfidb configuration file:
-  json Config;
 
   /// 3D grid size, spacing, and origin of entire simulation in file.
   int SubsurfaceExtent[6];

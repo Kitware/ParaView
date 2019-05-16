@@ -18,10 +18,11 @@
 static constexpr std::streamoff headerSize = 6 * sizeof(double) + 4 * sizeof(int);
 static constexpr std::streamoff subgridHeaderSize = 9 * sizeof(int);
 static constexpr std::streamoff pfbEntrySize = sizeof(double);
-static constexpr int clmBaseComponents = 11;
-static const char* clmBaseComponentNames[clmBaseComponents] = { "eflx_lh_tot", "eflx_lwrad_out",
-  "eflx_sh_tot", "eflx_soil_grnd", "qflx_evap_tot", "qflx_evap_grnd", "qflx_evap_soi",
-  "qflx_evap_veg", "qflx_infl", "swe_out", "t_grnd" };
+static const char* clmBaseComponentNames[] = { "eflx_lh_tot", "eflx_lwrad_out", "eflx_sh_tot",
+  "eflx_soil_grnd", "qflx_evap_tot", "qflx_evap_grnd", "qflx_evap_soi", "qflx_evap_veg",
+  "qflx_tran_veg", "qflx_infl", "swe_out", "t_grnd" };
+static constexpr int clmBaseComponents =
+  static_cast<int>(sizeof(clmBaseComponentNames) / sizeof(clmBaseComponentNames[0]));
 
 static std::streamoff computeEntrySize(bool isCLM, int nz)
 {

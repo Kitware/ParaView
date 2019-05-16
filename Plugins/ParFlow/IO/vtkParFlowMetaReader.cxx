@@ -25,6 +25,7 @@
 
 #include "nlohmann/json.hpp"
 
+#include <algorithm>
 #include <sstream>
 
 using json = nlohmann::json;
@@ -278,7 +279,6 @@ bool vtkParFlowMetaReader::IngestMetadata()
   {
     json inputs = this->Metadata["inputs"];
     json outputs = this->Metadata["outputs"];
-    json solution = outputs["solution"];
     json domains = this->Metadata["domains"];
 
     // Get the grid extents
@@ -319,9 +319,18 @@ bool vtkParFlowMetaReader::IngestMetadata()
     {
       this->IngestMetadataItem("inputs", entry.key(), entry.value());
     }
-    for (auto& entry : solution.items())
+    for (auto& entry : outputs.items())
     {
-      this->IngestMetadataItem("solution", entry.key(), entry.value());
+      this->IngestMetadataItem("outputs", entry.key(), entry.value());
+    }
+    // Accept older metadata that segregated solution variables from other output.
+    if (outputs.find("solution") != outputs.end())
+    {
+      json solution = outputs["solution"];
+      for (auto& entry : solution.items())
+      {
+        this->IngestMetadataItem("solution", entry.key(), entry.value());
+      }
     }
   }
   catch (std::exception&)
@@ -527,13 +536,25 @@ void vtkParFlowMetaReader::GenerateDistributedMesh(
     }
     try
     {
-      if (this->Config.find("VariableDZ") != this->Config.end())
-      {
-        dz = this->Config["VariableDZ"].get<std::vector<double> >();
-      }
-      else
-      {
-        dz.clear();
+      dz.clear();
+      auto cfg = this->Metadata["inputs"]["configuration"]["data"];
+      auto vdz = cfg["Solver.Nonlinear.VariableDz"];
+      auto val = vdz.get<std::string>();
+      std::transform(val.begin(), val.end(), val.begin(), ::tolower);
+      if (val == "true" || val == "on" || val == "1")
+      { // Have variable dz... fetch multipliers
+        double zaccum = 0.0;
+        dz.push_back(zaccum);
+        for (int kk = subext[4]; kk < subext[5]; ++kk)
+        {
+          std::ostringstream name;
+          name << "Cell." << kk << ".dzScale.Value";
+          std::istringstream multiplier(cfg[name.str()].get<std::string>());
+          double dzv;
+          multiplier >> dzv;
+          zaccum += spacing[2] * dzv;
+          dz.push_back(zaccum);
+        }
       }
     }
     catch (std::exception&)
@@ -544,13 +565,18 @@ void vtkParFlowMetaReader::GenerateDistributedMesh(
     {
       if (!def)
       {
-        // No variable dz, no elevation. Just create regular grid (and warn user this is bad?).
-        vtkWarningMacro("No variable dz and no elevation. "
-                        "It would be more efficient to turn DeflectTerrain off.");
+        static bool once = false;
+        // No variable dz, no elevation. Warn user this is inefficient.
+        if (!once)
+        {
+          once = true;
+          vtkWarningMacro("No variable dz and no elevation. "
+                          "It would be more efficient to turn DeflectTerrain off.");
+        }
       }
       for (int kk = subext[4]; kk <= subext[5]; ++kk)
       {
-        dz.push_back(1.0);
+        dz.push_back(1.0 * spacing[2] * kk);
       }
     }
     vtkIdType pid = 0;
@@ -562,12 +588,11 @@ void vtkParFlowMetaReader::GenerateDistributedMesh(
         for (int ii = subext[0]; ii <= subext[1]; ++ii, ++pid)
         {
           double elev = def
-            ? deflectionScale *
-              def->GetTuple1((ii == subext[1] ? ii - 1 : ii) - subext[0] +
+            ? def->GetTuple1((ii == subext[1] ? ii - 1 : ii) - subext[0] +
                 (subext[1] - subext[0]) * ((jj == subext[3] ? jj - 1 : jj) - subext[2]))
             : 0.0;
           vtkVector3d pt = origin + vtkVector3d(ii * spacing[0], jj * spacing[1],
-                                      kk * spacing[2] * dz[kk - subext[4]] + elev);
+                                      deflectionScale * (dz[kk - subext[4]] + elev));
           pts->SetPoint(pid, pt.GetData());
         }
       }
@@ -1364,8 +1389,8 @@ int vtkParFlowMetaReader::RequestDataObject(vtkInformation* vtkNotUsed(request),
   return 1;
 }
 
-int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inInfo), vtkInformationVector* outInfo)
+int vtkParFlowMetaReader::RequestData(
+  vtkInformation* request, vtkInformationVector** vtkNotUsed(inInfo), vtkInformationVector* outInfo)
 {
   auto subsurface = vtkDataSet::GetData(outInfo, 0);
   auto subsurfaceInfo = outInfo->GetInformationObject(0);
@@ -1376,8 +1401,7 @@ int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   auto surface = vtkDataSet::GetData(outInfo, 1);
-  // auto surfaceInfo = outInfo->GetInformationObject(1); // We should be fetching
-  // UPDATE_TIME_STEP...
+  auto surfaceInfo = outInfo->GetInformationObject(1);
   if (!surface)
   {
     vtkErrorMacro("No surface data object created.");
@@ -1385,11 +1409,15 @@ int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   int timeStep = this->TimeStep;
-  // Always fetch the pipeline-requested timestep, even when we are not going
-  // to generate output for the subsurface.
-  if (subsurfaceInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+  int requestPort = request->Has(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT())
+    ? request->Get(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT())
+    : 0;
+  auto reqPortOutInfo = requestPort == 0 ? subsurfaceInfo : surfaceInfo;
+  // Fetch the pipeline-requested timestep and use it for both outputs, regardless
+  // of which port's downstream filters initiated the request.
+  if (reqPortOutInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
   {
-    double ts = subsurfaceInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    double ts = reqPortOutInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     timeStep = this->ClosestTimeStep(ts);
   }
 
@@ -1429,14 +1457,6 @@ int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
 
   if (this->EnableSurfaceDomain)
   {
-    /*
-    VTK/ParaView does not provide an update time step on any output but the first.
-    if (surfaceInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
-    {
-      double ts = surfaceInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-      timeStep = this->ClosestTimeStep(ts);
-    }
-    */
     this->LoadSurfaceData(surface, timeStep);
     surface->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), timeStep);
   }

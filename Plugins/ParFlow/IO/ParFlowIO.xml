@@ -179,6 +179,7 @@
         name="DeflectionScale"
         default_values="1"
         number_of_elements="1"
+        panel_visibility="advanced"
         command="SetDeflectionScale">
         <DoubleRangeDomain min="0" max="100" name="range"/>
       </DoubleVectorProperty>
@@ -288,6 +289,8 @@
         <ReaderFactory
           extensions="pfmetadata"
           file_description="ParFlow Simulation Data" />
+        <RepresentationType port="0" view="RenderView" type="Surface" />
+        <RepresentationType port="1" view="RenderView" type="Surface" />
       </Hints>
     </SourceProxy>
 
