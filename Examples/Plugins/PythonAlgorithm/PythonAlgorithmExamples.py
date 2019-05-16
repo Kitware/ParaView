@@ -149,7 +149,6 @@ class PythonCSVReader(VTKPythonAlgorithmBase):
             return timesteps[0]
 
     def _get_array_selection(self):
-        self._get_raw_data()
         return self._arrayselection
 
     @smproperty.stringvector(name="FileName")
