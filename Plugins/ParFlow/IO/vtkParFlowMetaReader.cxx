@@ -565,9 +565,14 @@ void vtkParFlowMetaReader::GenerateDistributedMesh(
     {
       if (!def)
       {
-        // No variable dz, no elevation. Just create regular grid (and warn user this is bad?).
-        vtkWarningMacro("No variable dz and no elevation. "
-                        "It would be more efficient to turn DeflectTerrain off.");
+        static bool once = false;
+        // No variable dz, no elevation. Warn user this is inefficient.
+        if (!once)
+        {
+          once = true;
+          vtkWarningMacro("No variable dz and no elevation. "
+                          "It would be more efficient to turn DeflectTerrain off.");
+        }
       }
       for (int kk = subext[4]; kk <= subext[5]; ++kk)
       {
