@@ -1384,8 +1384,8 @@ int vtkParFlowMetaReader::RequestDataObject(vtkInformation* vtkNotUsed(request),
   return 1;
 }
 
-int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inInfo), vtkInformationVector* outInfo)
+int vtkParFlowMetaReader::RequestData(
+  vtkInformation* request, vtkInformationVector** vtkNotUsed(inInfo), vtkInformationVector* outInfo)
 {
   auto subsurface = vtkDataSet::GetData(outInfo, 0);
   auto subsurfaceInfo = outInfo->GetInformationObject(0);
@@ -1396,8 +1396,7 @@ int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   auto surface = vtkDataSet::GetData(outInfo, 1);
-  // auto surfaceInfo = outInfo->GetInformationObject(1); // We should be fetching
-  // UPDATE_TIME_STEP...
+  auto surfaceInfo = outInfo->GetInformationObject(1);
   if (!surface)
   {
     vtkErrorMacro("No surface data object created.");
@@ -1405,11 +1404,15 @@ int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
   }
 
   int timeStep = this->TimeStep;
-  // Always fetch the pipeline-requested timestep, even when we are not going
-  // to generate output for the subsurface.
-  if (subsurfaceInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+  int requestPort = request->Has(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT())
+    ? request->Get(vtkStreamingDemandDrivenPipeline::FROM_OUTPUT_PORT())
+    : 0;
+  auto reqPortOutInfo = requestPort == 0 ? subsurfaceInfo : surfaceInfo;
+  // Fetch the pipeline-requested timestep and use it for both outputs, regardless
+  // of which port's downstream filters initiated the request.
+  if (reqPortOutInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
   {
-    double ts = subsurfaceInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    double ts = reqPortOutInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     timeStep = this->ClosestTimeStep(ts);
   }
 
@@ -1449,14 +1452,6 @@ int vtkParFlowMetaReader::RequestData(vtkInformation* vtkNotUsed(request),
 
   if (this->EnableSurfaceDomain)
   {
-    /*
-    VTK/ParaView does not provide an update time step on any output but the first.
-    if (surfaceInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
-    {
-      double ts = surfaceInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-      timeStep = this->ClosestTimeStep(ts);
-    }
-    */
     this->LoadSurfaceData(surface, timeStep);
     surface->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), timeStep);
   }
